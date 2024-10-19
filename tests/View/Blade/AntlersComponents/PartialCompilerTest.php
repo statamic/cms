@@ -227,4 +227,31 @@ EXPECTED;
             Blade::render($template)
         );
     }
+
+    #[Test]
+    public function it_merges_frontmatter_using_directive()
+    {
+        $this->withFakeViews();
+
+        $partial = <<<'BLADE'
+@frontmatter([
+  'name'  => 'The Name!',
+  'image' => 'https://example.com/placeholder.png',
+])
+
+{{ $name }} {{ $image }}
+BLADE;
+
+        $this->viewShouldReturnRaw('the_partial', $partial, 'blade.php');
+
+        $this->assertSame(
+            'The Name! https://example.com/placeholder.png',
+            Blade::render('<s:partial:the_partial />')
+        );
+
+        $this->assertSame(
+            'A different name! https://example.com/placeholder.png',
+            Blade::render('<s:partial:the_partial name="A different name!" />')
+        );
+    }
 }

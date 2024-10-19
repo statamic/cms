@@ -165,18 +165,11 @@ class ViewServiceProvider extends ServiceProvider
         Blade::directive('cascade', function ($expression) {
             return "<?php extract(\Statamic\View\Blade\CascadeDirective::handle($expression)) ?>";
         });
-    }
-
-    public function boot()
-    {
-        ViewFactory::addNamespace('compiled__views', storage_path('framework/views'));
-
-        $this->registerBladeDirectives();
-
-        Blade::precompiler(function ($content) {
-            return (new StatamicTagCompiler())->compile($content);
+        Blade::directive('frontmatter', function ($exp) {
+            return "<?php
+extract(array_merge({$exp}, \$view ?? [], \$__frontmatter ?? []));
+?>";
         });
-
         Blade::directive('recursive_children', function ($exp) {
             $nested = $exp ?? '$children';
 
@@ -196,6 +189,18 @@ PHP;
             ], $recursiveChildren);
 
             return Blade::compileString($recursiveChildren);
+        });
+
+    }
+
+    public function boot()
+    {
+        ViewFactory::addNamespace('compiled__views', storage_path('framework/views'));
+
+        $this->registerBladeDirectives();
+
+        Blade::precompiler(function ($content) {
+            return (new StatamicTagCompiler())->compile($content);
         });
 
         Blade::precompiler(function ($content) {
