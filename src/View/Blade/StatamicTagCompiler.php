@@ -146,6 +146,7 @@ class StatamicTagCompiler
         return (string) str($template)
             ->swap(array_merge([
                 '$tagName' => $name,
+                '$fullTagName' => $component->tagName,
                 '$tagMethod' => "'".$method."'",
                 '$originalMethod' => "'".$originalMethod."'",
                 '$params' => $this->attributeCompiler->compile($params),

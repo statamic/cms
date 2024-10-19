@@ -249,4 +249,23 @@ BLADE;
 
         $this->assertSame('4', trim(Blade::render($template)));
     }
+
+    #[Test]
+    public function it_passes_full_tag_name()
+    {
+        (new class extends Tags
+        {
+            protected static $handle = 'my_tag';
+
+            public function wildcard()
+            {
+                return $this->tag;
+            }
+        })::register();
+
+        $this->assertSame(
+            'my_tag:the_method',
+            Blade::render('<s:my_tag:the_method />'),
+        );
+    }
 }

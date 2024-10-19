@@ -23,7 +23,7 @@ $__statamicBladeHostVarSuffix->setTag(
         'params' => $params,
         'content' => '',
         'context' => [],
-        'tag' => '$tagName',
+        'tag' => '$fullTagName',
         'tag_method' => $originalMethod,
     ]),
     $tagMethod

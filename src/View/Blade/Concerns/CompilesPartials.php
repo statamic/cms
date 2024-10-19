@@ -116,7 +116,7 @@ $__statamicResultVarSuffix = (new \Statamic\View\Blade\BladeTagHost(get_defined_
             'params' => $params,
             'content' => '',
             'context' => [],
-            'tag' => '$tagName',
+            'tag' => '$fullTagName',
             'tag_method' => $originalMethod,
         ]), $tagMethod)->setIsPair($isPair)->setContent(base64_decode($__statamicResultVarSuffixTagContent))->render();
 
