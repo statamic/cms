@@ -254,4 +254,31 @@ BLADE;
             Blade::render('<s:partial:the_partial name="A different name!" />')
         );
     }
+
+    #[Test]
+    public function frontmatter_populates_view_array()
+    {
+        $this->withFakeViews();
+
+        $partial = <<<'BLADE'
+@frontmatter([
+  'name'  => 'The Name!',
+  'image' => 'https://example.com/placeholder.png',
+])
+
+{{ $view['name'] }} {{ $view['image'] }}
+BLADE;
+
+        $this->viewShouldReturnRaw('the_partial', $partial, 'blade.php');
+
+        $this->assertSame(
+            'The Name! https://example.com/placeholder.png',
+            Blade::render('<s:partial:the_partial />')
+        );
+
+        $this->assertSame(
+            'A different name! https://example.com/placeholder.png',
+            Blade::render('<s:partial:the_partial name="A different name!" />')
+        );
+    }
 }

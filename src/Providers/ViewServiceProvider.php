@@ -167,7 +167,9 @@ class ViewServiceProvider extends ServiceProvider
         });
         Blade::directive('frontmatter', function ($exp) {
             return "<?php
-extract(array_merge({$exp}, \$view ?? [], \$__frontmatter ?? []));
+if (! isset(\$view)) { \$view = []; }
+\$view = array_merge({$exp}, \$view ?? [], \$__frontmatter ?? []); 
+extract(\$view);
 ?>";
         });
         Blade::directive('recursive_children', function ($exp) {
