@@ -2,6 +2,7 @@
 
 namespace Statamic\View\Blade;
 
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Data\Augmentable;
@@ -164,7 +165,7 @@ class BladeTagHost
                 return false;
             }
 
-            if ($value instanceof Augmentable) {
+            if ($value instanceof Augmentable || $value instanceof Arrayable) {
                 return false;
             }
         }
@@ -196,6 +197,10 @@ class BladeTagHost
 
         if ($value instanceof Augmentable) {
             $value = $value->toDeferredAugmentedArray();
+        }
+
+        if ($value instanceof Arrayable) {
+            $value = $value->toArray();
         }
 
         return $value;
