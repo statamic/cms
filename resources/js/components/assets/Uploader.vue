@@ -213,7 +213,7 @@ export default {
                     msg = __('Upload failed. The file might be larger than is allowed by your server.');
                 }
             } else {
-                if (status === 422) {
+                if ([422, 409].includes(status)) {
                     msg = Object.values(response.errors)[0][0]; // Get first validation message.
                 }
             }

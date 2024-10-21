@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Assets;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 use Statamic\Assets\AssetUploader;
 use Statamic\Assets\UploadedReplacementFile;
 use Statamic\Contracts\Assets\Asset as AssetContract;
@@ -97,7 +98,11 @@ class AssetsController extends CpController
         $validator = Validator::make(['path' => $path], ['path' => new UploadableAssetPath($container)]);
 
         if (! in_array($request->option, ['timestamp', 'overwrite'])) {
-            $validator->validate();
+            try {
+                $validator->validate();
+            } catch (ValidationException $e) {
+                throw $e->status(409);
+            }
         }
 
         $asset = $container->asset($path) ?? $container->makeAsset($path);
