@@ -89,7 +89,7 @@ class AssetsController extends CpController
 
         // Append relative path as subfolder when upload was part of a folder and container allows it
         if ($container->createFolders() && ($relativePath = AssetUploader::getSafePath($request->relativePath))) {
-            $folder = rtrim($folder.'/', '/').$relativePath;
+            $folder = rtrim($folder, '/').'/'.$relativePath;
         }
 
         $basename = $request->option === 'rename' && $request->filename
