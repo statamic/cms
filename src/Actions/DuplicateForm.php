@@ -53,7 +53,7 @@ class DuplicateForm extends Action
                 ->honeypot($original->honeypot())
                 ->store($original->store())
                 ->email($original->email())
-                ->data($origina->data());
+                ->data($original->data());
 
             $form->save();
 
