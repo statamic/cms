@@ -154,7 +154,7 @@ export default {
                     if (entry.isFile) {
                         entry.file((file) => {
                             if (! file.name.startsWith('.')) {
-                                file.fullPath = `${path}/${file.name}`;
+                                file.relativePath = path;
                                 this.addFile(file);
                             }
                         });
@@ -216,8 +216,8 @@ export default {
             form.append('file', file);
 
             // Pass along the relative path of files uploaded as a directory
-            if (file.fullPath) {
-                form.append('subfolder', file.fullPath.split('/').slice(0, -1).join('/'));
+            if (file.relativePath) {
+                form.append('relativePath', file.relativePath);
             }
 
             for (let key in this.extraData) {
