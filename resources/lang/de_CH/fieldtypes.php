@@ -19,7 +19,7 @@ return [
     'assets.config.restrict' => 'Verhindern, dass Benutzer:innen zu anderen Ordnern navigieren können.',
     'assets.config.show_filename' => 'Dateiname neben dem Vorschaubild anzeigen.',
     'assets.config.show_set_alt' => 'Einen Link zum Erfassen des Alt-Texts bei allen Bildern anzeigen.',
-    'assets.dynamic_folder_pending' => 'Dieser Upload-Ordner wird verfügbar sein, sobald :field festgelegt ist.',
+    'assets.dynamic_folder_pending_field' => 'Dieser Upload-Ordner wird verfügbar sein, sobald :field festgelegt ist.',
     'assets.title' => 'Dateien',
     'bard.config.allow_source' => 'Ermöglicht beim Schreiben das Anzeigen des HTML-Quellcodes.',
     'bard.config.always_show_set_button' => 'Ermöglicht das ständige Anzeigen des «Set hinzufügen»-Buttons.',
