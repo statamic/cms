@@ -6,7 +6,7 @@
             <loading-graphic />
         </div>
 
-        <header v-if="!loading" class="flex items-center sticky top-0 inset-x-0 bg-white dark:bg-dark-550 shadow dark:shadow-dark px-8 py-2 z-20 h-13">
+        <header v-if="!loading" class="flex items-center sticky top-0 inset-x-0 bg-white dark:bg-dark-550 shadow dark:shadow-dark px-8 py-2 z-1 h-13">
             <h1 class="flex-1 flex items-center text-xl">
                 {{ __(values.display) || __(config.display) || config.handle }}
                 <small class="badge-pill bg-gray-100 dark:bg-dark-400 rtl:mr-4 ltr:ml-4 border dark:border-dark-200 text-xs text-gray-700 dark:text-dark-150 font-medium leading-none flex items-center">
@@ -25,7 +25,7 @@
                 v-text="__('Apply')"
             ></button>
         </header>
-        <section class="py-4 px-3 md:px-8">
+        <section class="isolate py-4 px-3 md:px-8">
             <div class="tabs-container">
                 <div class="publish-tabs tabs">
                     <button class="tab-button"
