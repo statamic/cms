@@ -14,12 +14,12 @@ class Countries extends BasicDictionary
     public function __construct()
     {
         $this->regions = [
-            'africa' => __('statamic::dictonary-countries.regions.africa'),
-            'americas' => __('statamic::dictonary-countries.regions.americas'),
-            'asia' => __('statamic::dictonary-countries.regions.asia'),
-            'europe' => __('statamic::dictonary-countries.regions.europe'),
-            'oceania' => __('statamic::dictonary-countries.regions.oceania'),
-            'polar' => __('statamic::dictonary-countries.regions.polar'),
+            'africa' => __('statamic::dictionary-countries.regions.africa'),
+            'americas' => __('statamic::dictionary-countries.regions.americas'),
+            'asia' => __('statamic::dictionary-countries.regions.asia'),
+            'europe' => __('statamic::dictionary-countries.regions.europe'),
+            'oceania' => __('statamic::dictionary-countries.regions.oceania'),
+            'polar' => __('statamic::dictionary-countries.regions.polar'),
         ];
 
         $this->subregions = [
