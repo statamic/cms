@@ -12,6 +12,7 @@
                     :fields="section.fields"
                     :read-only="readOnly"
                     :syncable="syncable"
+                    :syncable-fields="syncableFields"
                     @updated="(handle, value) => $emit('updated', handle, value)"
                     @meta-updated="(handle, value) => $emit('meta-updated', handle, value)"
                     @synced="$emit('synced', $event)"

@@ -1,5 +1,50 @@
 # Release Notes
 
+## 5.32.0 (2024-10-18)
+
+### What's new
+- Improve duplicate asset upload handling [#10959](https://github.com/statamic/cms/issues/10959) by @jasonvarga
+- Add `parent` keyword to field conditions [#9385](https://github.com/statamic/cms/issues/9385) by @florianbrinkmann
+- Add `filter_empty` modifier [#10962](https://github.com/statamic/cms/issues/10962) by @marcorieser
+- Add `invalid_token` variable for password-protected page [#10956](https://github.com/statamic/cms/issues/10956) by @aerni
+
+### What's fixed
+- Fix error when editing Bard field with set and no fields [#10971](https://github.com/statamic/cms/issues/10971) by @duncanmcclean
+- Fix issue where editing an asset loads the `/edit` url in the browser [#10964](https://github.com/statamic/cms/issues/10964) by @daun
+- Remove deprecated options from PHPUnit stub [#10963](https://github.com/statamic/cms/issues/10963) by @duncanmcclean
+- German translations [#10968](https://github.com/statamic/cms/issues/10968) by @helloDanuk
+
+
+
+## 5.31.0 (2024-10-14)
+
+### What's new
+- Dictionary tag [#10885](https://github.com/statamic/cms/issues/10885) by @ryanmitchell
+- Make data of password-protected available in the view [#10946](https://github.com/statamic/cms/issues/10946) by @aerni
+- Prompt for license when installing starter kit [#10951](https://github.com/statamic/cms/issues/10951) by @duncanmcclean
+- Add `taxonomy:count` tag [#10923](https://github.com/statamic/cms/issues/10923) by @aerni
+
+### What's fixed
+- Improve UX of rename asset action [#10941](https://github.com/statamic/cms/issues/10941) by @jasonvarga
+- Improve UX of rename asset folder action [#10950](https://github.com/statamic/cms/issues/10950) by @duncanmcclean
+- Addon `make` commands no longer add to service providers since they are autoloaded [#10942](https://github.com/statamic/cms/issues/10942) by @duncanmcclean
+- Tweak `make` command descriptions [#10952](https://github.com/statamic/cms/issues/10952) by @duncanmcclean
+- Fix error if submitted password is null [#10945](https://github.com/statamic/cms/issues/10945) by @aerni
+- Prevent timeout during `install:eloquent-driver` command [#10955](https://github.com/statamic/cms/issues/10955) by @duncanmcclean
+- Fix asset browser history navigation [#10948](https://github.com/statamic/cms/issues/10948) by @daun
+- Fix errors in upload queue [#10944](https://github.com/statamic/cms/issues/10944) by @jasonvarga
+- Fix error when deleting collections [#10908](https://github.com/statamic/cms/issues/10908) by @duncanmcclean
+- Fix ordering search results by date [#10939](https://github.com/statamic/cms/issues/10939) by @duncanmcclean
+- Only show the sync/de-synced state for syncable nav fields [#10933](https://github.com/statamic/cms/issues/10933) by @duncanmcclean
+- Ensure default values for globals are available in templates [#10909](https://github.com/statamic/cms/issues/10909) by @duncanmcclean
+- Handle empty nodes in `bard_text` modifier [#10913](https://github.com/statamic/cms/issues/10913) by @ryanmitchell
+- Use directory paths from stache config instead of static paths [#10914](https://github.com/statamic/cms/issues/10914) by @Alpenverein
+- Improvements to the `install:eloquent-driver` command [#10910](https://github.com/statamic/cms/issues/10910) by @duncanmcclean
+- Check site requested when using global route binding on api routes [#10894](https://github.com/statamic/cms/issues/10894) by @ryanmitchell
+- Update "Bug Report" issue template [#10918](https://github.com/statamic/cms/issues/10918) by @duncanmcclean
+
+
+
 ## 5.30.0 (2024-10-03)
 
 ### What's new

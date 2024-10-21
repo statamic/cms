@@ -31,6 +31,14 @@ class Taxonomy extends Tags
         return $this->output($terms);
     }
 
+    /**
+     * {{ taxonomy:count from="" }}
+     */
+    public function count()
+    {
+        return $this->terms()->count();
+    }
+
     protected function terms()
     {
         return new Terms($this->params);

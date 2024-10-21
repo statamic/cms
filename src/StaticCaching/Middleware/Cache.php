@@ -179,8 +179,12 @@ class Cache
             return false;
         }
 
-        // Draft and private pages should not be cached.
-        if ($response->headers->has('X-Statamic-Draft') || $response->headers->has('X-Statamic-Private')) {
+        // Draft, private and protected pages should not be cached.
+        if (
+            $response->headers->has('X-Statamic-Draft')
+            || $response->headers->has('X-Statamic-Private')
+            || $response->headers->has('X-Statamic-Protected')
+        ) {
             return false;
         }
 
