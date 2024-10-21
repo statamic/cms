@@ -126,6 +126,7 @@
                     :name="publishContainer"
                     :blueprint="fieldset"
                     :values="values"
+                    :extra-values="extraValues"
                     :meta="meta"
                     :errors="errors"
                     @updated="values = { ...$event, focus: values.focus }"
@@ -204,6 +205,7 @@ import FocalPointEditor from './FocalPointEditor.vue';
 import PdfViewer from './PdfViewer.vue';
 import PublishFields from '../../publish/Fields.vue';
 import HasHiddenFields from '../../publish/HasHiddenFields';
+import pick from 'underscore/modules/pick';
 
 export default {
 
@@ -245,6 +247,7 @@ export default {
             asset: null,
             publishContainer: 'asset',
             values: {},
+            extraValues: {},
             meta: {},
             fields: null,
             fieldset: null,
@@ -330,6 +333,11 @@ export default {
             this.$axios.get(url).then(response => {
                 const data = response.data.data;
                 this.asset = data;
+
+                // If there are no fields, it will be an empty array when PHP encodes
+                // it into JSON on the server. We'll ensure it's always an object.
+                this.values = _.isArray(data.values) ? {} : data.values;
+
                 this.meta = data.meta;
                 this.actionUrl = data.actionUrl;
                 this.actions = data.actions;
@@ -342,39 +350,10 @@ export default {
                     .flatten(true)
                     .value();
 
-                // If there are no fields, it will be an empty array when PHP encodes
-                // it into JSON on the server. We'll ensure it's always an object.
-                const blueprintValues = _.isArray(data.values) ? {} : data.values;
-                const assetValues = _.chain(this.asset)
-                    .pick(['filename', 'basename', 'extension', 'path', 'mimeType', 'width', 'height', 'duration'])
-                    .omit(_.pluck(this.fields, 'handle'))
-                    .value();
-
-                // Merge asset file data with asset blueprint data
-                this.values = { ...assetValues, ...blueprintValues };
-
-                // Append hidden fields to blueprint to allow field conditions
-                const hiddenFields = Object.keys(assetValues).map(handle => this.createHiddenField(handle));
-                this.fieldset = this.extendBlueprintFields(this.fieldset, hiddenFields);
+                this.extraValues = pick(this.asset, ['filename', 'basename', 'extension', 'path', 'mimeType', 'width', 'height', 'duration']);
 
                 this.loading = false;
             });
-        },
-
-        createHiddenField(handle) {
-            return {
-                handle,
-                display: handle,
-                type: 'text',
-                if: { 'internal_should_not_exist_in_blueprint': 'equals true' }
-            };
-        },
-
-        extendBlueprintFields(blueprint, fields) {
-            const extended = clone(blueprint);
-            const existingFields = data_get(extended, 'tabs.0.sections.0.fields');
-            existingFields?.push(...fields);
-            return extended;
         },
 
         openFocalPointEditor() {
