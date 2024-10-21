@@ -52,7 +52,8 @@ class DuplicateForm extends Action
                 ->title($values['title'])
                 ->honeypot($original->honeypot())
                 ->store($original->store())
-                ->email($original->email());
+                ->email($original->email())
+                ->data($origina->data());
 
             $form->save();
 
