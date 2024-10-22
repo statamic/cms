@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'any.config.antlers' => "Kích hoạt phân tích Antlers trong nội dung của trường này.",
+    'any.config.antlers' => 'Kích hoạt phân tích Antlers trong nội dung của trường này.',
     'any.config.cast_booleans' => 'Các tùy chọn có giá trị true và false sẽ được lưu dưới dạng boolean.',
     'any.config.mode' => 'Chọn kiểu giao diện ưa thích của bạn.',
     'array.config.expand' => 'Lưu mảng ở định dạng mở rộng. Sử dụng nếu bạn cần có các giá trị số.',

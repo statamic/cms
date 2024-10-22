@@ -167,4 +167,3 @@ return [
     'view_more_count' => 'Xem thêm :count',
     'width_x_height' => ':width x :height',
 ];
-
