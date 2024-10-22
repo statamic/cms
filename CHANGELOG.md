@@ -1,5 +1,12 @@
 # Release Notes
 
+## 5.33.1 (2024-10-22)
+
+### What's fixed
+- Avoid error when marketplace client returns null [#10996](https://github.com/statamic/cms/issues/10996) by @jasonvarga
+
+
+
 ## 5.33.0 (2024-10-22)
 
 ### What's new
