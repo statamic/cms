@@ -142,7 +142,7 @@ trait RendersForms
             ->filter()->all();
 
         $data = array_merge($configDefaults, $field->toArray(), [
-            'id' => $field->form()->handle().'-form-' . $field->handle().'-field',
+            'id' => $this->generateFieldId($field->form()?->handle(), $field->handle()),
             'instructions' => $field->instructions(),
             'error' => $errors->first($field->handle()) ?: null,
             'default' => $field->value() ?? $field->defaultValue(),
@@ -174,5 +174,13 @@ trait RendersForms
         $html = preg_replace('/\s*(<(?!\/*('.$ignoredHtmlElements.'))[^>]+>)\s*/', '$1', $html);
 
         return $html;
+    }
+
+    /**
+     * Generate a field id to associate input with label.
+     */
+    protected function generateFieldId(?string $formName, ?string $fieldHandle): string
+    {
+        return $formName.'-form-'.$fieldHandle.'-field';
     }
 }
