@@ -142,6 +142,7 @@ trait RendersForms
             ->filter()->all();
 
         $data = array_merge($configDefaults, $field->toArray(), [
+            'id' => $field->form()->handle().'-form-' . $field->handle().'-field',
             'instructions' => $field->instructions(),
             'error' => $errors->first($field->handle()) ?: null,
             'default' => $field->value() ?? $field->defaultValue(),
