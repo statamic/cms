@@ -68,6 +68,8 @@ class Tags extends BaseTags
 
         $jsDriver = $this->parseJsParamDriverAndOptions($this->params->get('js'), $form);
 
+        $data['errors'] = $this->getErrors();
+
         $data['form_config'] = ($configFields = Form::extraConfigFor($form->handle()))
             ? Blueprint::makeFromTabs($configFields)->fields()->addValues($form->data()->all())->values()->all()
             : [];
@@ -142,18 +144,31 @@ class Tags extends BaseTags
      */
     public function errors()
     {
-        $sessionHandle = $this->sessionHandle();
-
-        $errors = $this->getFormSession($sessionHandle)['errors'];
+        $errors = $this->getErrors();
 
         // If this is a single tag just output a boolean.
         if ($this->content === '') {
             return ! empty($errors);
         }
 
-        return $this->parseLoop(collect($errors)->map(function ($error) {
-            return ['value' => $error];
-        }));
+        return $this->parseLoop($errors);
+    }
+
+    /**
+     * Get errors for the current submission, with field name and id.
+     *
+     * @return array
+     */
+    public function getErrors()
+    {
+        $formHandle = $this->getForm();
+        $sessionHandle = $this->sessionHandle();
+
+        $errors = $this->getFormSession($sessionHandle)['field_errors'];
+
+        return collect($errors)
+            ->map(fn ($error) => [...$error, 'id' => $this->generateFieldId($formHandle, $error['field'])])
+            ->all();
     }
 
     /**
