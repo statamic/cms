@@ -39,9 +39,9 @@ class Marketplace
         $uri = "packages/$package/releases";
 
         return Cache::rememberWithExpiration("marketplace-$uri", function () use ($uri) {
-            try {
-                $fallback = [5 => collect()];
+            $fallback = [5 => collect()];
 
+            try {
                 if (! $response = Client::get($uri)) {
                     return $fallback;
                 }
