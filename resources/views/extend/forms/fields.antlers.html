@@ -2,6 +2,9 @@
     <div class="p-4">
         <label for="{{ id }}">{{ display }}</label>
         <div class="p-2">{{ field }}</div>
+        {{ if instructions }}
+            <p class="text-gray-500" id="{{ id }}-instructions">{{ instructions }}</p>
+        {{ /if }}
         {{ if error }}
             <p class="text-gray-500">{{ error }}</p>
         {{ /if }}
