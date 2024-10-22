@@ -141,8 +141,9 @@ trait RendersForms
             ->map->get('default')
             ->filter()->all();
 
+        $formHandle = $field->form()?->handle() ?? Str::slug($errorBag);
         $data = array_merge($configDefaults, $field->toArray(), [
-            'id' => $this->generateFieldId($field->form()?->handle(), $field->handle()),
+            'id' => $this->generateFieldId($formHandle, $field->handle()),
             'instructions' => $field->instructions(),
             'error' => $errors->first($field->handle()) ?: null,
             'default' => $field->value() ?? $field->defaultValue(),
