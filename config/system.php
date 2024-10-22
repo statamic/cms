@@ -76,6 +76,25 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Client Timezone
+    |--------------------------------------------------------------------------
+    |
+    | If specified, this timezone is used as the timezone for visible date and
+    | time values in the control panel and in Antlers. That allows you to keep
+    | the app timezone in UTC while having, for example, the `Europe/Berlin`
+    | timezone for the control panel.
+    |
+    | That means, if you publish an entry at 2024-05-22 10:15 with the
+    | client timezone being set to `Europe/Berlin` and the app timezone being
+    | set to `UTC`, the entry date will be 2024-05-22 08:15 internally, but
+    | displayed as 2024-05-22 10:15 in the control panel and in antlers.
+    |
+    */
+
+    'client_timezone' => null,
+
+    /*
+    |--------------------------------------------------------------------------
     | Default Character Set
     |--------------------------------------------------------------------------
     |
