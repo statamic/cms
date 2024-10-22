@@ -2,6 +2,7 @@
 
 namespace Statamic\Stache\Stores;
 
+use Statamic\Contracts\Auth\Passkey;
 use Statamic\Facades\Role as UserRole;
 use Statamic\Facades\User;
 use Statamic\Facades\UserGroup;
@@ -51,6 +52,14 @@ class UsersStore extends BasicStore
             ->email(pathinfo($path, PATHINFO_FILENAME))
             ->preferences(Arr::pull($data, 'preferences', []))
             ->data($data);
+
+        $user->passkeys(collect(Arr::pull($data, 'passkeys', []))
+            ->map(function ($keydata) use ($user) {
+                return app(Passkey::class)
+                    ->id($keydata['id'])
+                    ->data(Arr::except($keydata, ['id']))
+                    ->user($user);
+            }));
 
         if (Arr::get($data, 'password') || isset($idGenerated)) {
             $user->writeFile();

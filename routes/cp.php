@@ -24,6 +24,7 @@ use Statamic\Http\Controllers\CP\Auth\ImpersonationController;
 use Statamic\Http\Controllers\CP\Auth\LoginController;
 use Statamic\Http\Controllers\CP\Auth\ResetPasswordController;
 use Statamic\Http\Controllers\CP\Auth\UnauthorizedController;
+use Statamic\Http\Controllers\CP\Auth\WebAuthnController;
 use Statamic\Http\Controllers\CP\Collections\CollectionActionController;
 use Statamic\Http\Controllers\CP\Collections\CollectionBlueprintsController;
 use Statamic\Http\Controllers\CP\Collections\CollectionsController;
@@ -121,6 +122,11 @@ Route::group(['prefix' => 'auth'], function () {
     Route::get('unauthorized', UnauthorizedController::class)->name('unauthorized');
 
     Route::get('stop-impersonating', [ImpersonationController::class, 'stop'])->name('impersonation.stop');
+
+    Route::group(['prefix' => 'webauthn'], function () {
+        Route::get('verify', [WebAuthnController::class, 'verifyOptions'])->name('webauthn.verify-options');
+        Route::post('verify', [WebAuthnController::class, 'verify'])->name('webauthn.verify');
+    });
 });
 
 Route::middleware('statamic.cp.authenticated')->group(function () {
@@ -356,7 +362,15 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         });
     });
 
+    Route::group(['prefix' => 'webauthn'], function () {
+        Route::get('/', [WebAuthnController::class, 'view'])->name('webauthn.view');
+        Route::get('create', [WebAuthnController::class, 'createOptions'])->name('webauthn.create-options');
+        Route::post('create', [WebAuthnController::class, 'create'])->name('webauthn.create');
+        Route::delete('delete/{id}', [WebAuthnController::class, 'delete'])->name('webauthn.delete');
+    });
+
     Route::post('slug', SlugController::class);
+
     Route::get('session-timeout', SessionTimeoutController::class)->name('session.timeout');
 
     Route::view('/playground', 'statamic::playground')->name('playground');
