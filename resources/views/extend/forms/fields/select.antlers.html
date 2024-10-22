@@ -1,6 +1,6 @@
 <select
-    name="{{ handle }}{{ multiple ?= "[]" }}"
     id="{{ id }}"
+    name="{{ handle }}{{ multiple ?= "[]" }}"
     {{ if js_driver }}{{ js_attributes }}{{ /if }}
     {{ if multiple }}multiple{{ /if }}
     {{ if validate|contains:required }}required{{ /if }}
