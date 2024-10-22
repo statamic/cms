@@ -19,6 +19,7 @@ trait GetsFormSession
         $data['errors'] = $errors ? $errors->all() : [];
         $data['error'] = $errors ? $this->getFirstErrorForEachField($errors) : [];
         $data['success'] = $this->getFromFormSession($formName, 'success');
+        $data['field_errors'] = $errors ? $this->getErrorsWithFieldHandles($errors) : [];
 
         // Only include this boolean if it's actually passed in session;
         // It will be for form submissions, but not for user login/register submissions.
@@ -49,6 +50,27 @@ trait GetsFormSession
                 ? "{$formName}.{$key}"
                 : $key
         );
+    }
+
+    /**
+     * Get errors, associated with the field name for templating.
+     *
+     * @param  \Illuminate\Support\MessageBag  $messageBag
+     * @return array
+     */
+    protected function getErrorsWithFieldHandles($messageBag)
+    {
+        return collect($messageBag->messages())
+            ->map(function ($errors, $field) {
+                return collect($errors)
+                    ->map(fn ($error) => [
+                        'field' => $field,
+                        'value' => $error,
+                    ])
+                    ->all();
+            })
+            ->flatten(1)
+            ->all();
     }
 
     /**
