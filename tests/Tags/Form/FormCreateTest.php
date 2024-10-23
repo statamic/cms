@@ -65,9 +65,9 @@ class FormCreateTest extends FormTestCase
 EOT
         ));
 
-        $this->assertStringContainsString('<label>Full Name</label><input type="text" name="name" value="">', $output);
-        $this->assertStringContainsString('<label>Email Address</label><input type="email" name="email" value="" required>', $output);
-        $this->assertStringContainsString('<label>Message</label><textarea name="message" rows="5" required></textarea>', $output);
+        $this->assertStringContainsString('<label>Full Name</label><input id="contact-form-name-input" type="text" name="name" value="">', $output);
+        $this->assertStringContainsString('<label>Email Address</label><input id="contact-form-email-input" type="email" name="email" value="" required>', $output);
+        $this->assertStringContainsString('<label>Message</label><textarea id="contact-form-message-input" name="message" rows="5" required></textarea>', $output);
 
         preg_match_all('/<label>(.+)<\/label>/U', $output, $fieldOrder);
 
@@ -78,7 +78,7 @@ EOT
     public function it_dynamically_renders_text_field()
     {
         $this->assertFieldRendersHtml([
-            '<input type="text" name="favourite_animal" value="">',
+            '<input id="default-form-favourite_animal-field" type="text" name="favourite_animal" value="">',
         ], [
             'handle' => 'favourite_animal',
             'field' => [
@@ -87,7 +87,7 @@ EOT
         ]);
 
         $this->assertFieldRendersHtml([
-            '<input type="text" name="favourite_animal" value="buffalo">',
+            '<input id="default-form-favourite_animal-field" type="text" name="favourite_animal" value="buffalo">',
         ], [
             'handle' => 'favourite_animal',
             'field' => [
@@ -102,7 +102,7 @@ EOT
     public function it_dynamically_renders_text_field_with_custom_input_type()
     {
         $this->assertFieldRendersHtml([
-            '<input type="number" name="age" value="">',
+            '<input id="default-form-age-field" type="number" name="age" value="">',
         ], [
             'handle' => 'age',
             'field' => [
@@ -112,7 +112,7 @@ EOT
         ]);
 
         $this->assertFieldRendersHtml([
-            '<input type="number" name="age" value="24">',
+            '<input id="default-form-age-field" type="number" name="age" value="24">',
         ], [
             'handle' => 'age',
             'field' => [
@@ -128,7 +128,7 @@ EOT
     public function it_dynamically_renders_textarea_field()
     {
         $this->assertFieldRendersHtml([
-            '<textarea name="comment" rows="5"></textarea>',
+            '<textarea id="default-form-comment-field" name="comment" rows="5"></textarea>',
         ], [
             'handle' => 'comment',
             'field' => [
@@ -137,7 +137,7 @@ EOT
         ]);
 
         $this->assertFieldRendersHtml([
-            '<textarea name="comment" rows="5">Hey hoser!</textarea>',
+            '<textarea id="default-form-comment-field" name="comment" rows="5">Hey hoser!</textarea>',
         ], [
             'handle' => 'comment',
             'field' => [
@@ -152,11 +152,11 @@ EOT
     public function it_dynamically_renders_checkboxes_field()
     {
         $this->assertFieldRendersHtml([
-            '<label><input type="checkbox" name="favourite_animals[]" value="cat">Cat</label>',
+            '<label><input id="default-form-favourite_animals-field-cat-option" type="checkbox" name="favourite_animals[]" value="cat">Cat</label>',
             '<br>',
-            '<label><input type="checkbox" name="favourite_animals[]" value="armadillo">Armadillo</label>',
+            '<label><input id="default-form-favourite_animals-field-armadillo-option" type="checkbox" name="favourite_animals[]" value="armadillo">Armadillo</label>',
             '<br>',
-            '<label><input type="checkbox" name="favourite_animals[]" value="rat">rat</label>',
+            '<label><input id="default-form-favourite_animals-field-rat-option" type="checkbox" name="favourite_animals[]" value="rat">rat</label>',
         ], [
             'handle' => 'favourite_animals',
             'field' => [
@@ -170,11 +170,11 @@ EOT
         ]);
 
         $this->assertFieldRendersHtml([
-            '<label><input type="checkbox" name="favourite_animals[]" value="cat" checked>Cat</label>',
+            '<label><input id="default-form-favourite_animals-field-cat-option" type="checkbox" name="favourite_animals[]" value="cat" checked>Cat</label>',
             '<br>',
-            '<label><input type="checkbox" name="favourite_animals[]" value="armadillo">Armadillo</label>',
+            '<label><input id="default-form-favourite_animals-field-armadillo-option" type="checkbox" name="favourite_animals[]" value="armadillo">Armadillo</label>',
             '<br>',
-            '<label><input type="checkbox" name="favourite_animals[]" value="rat" checked>rat</label>',
+            '<label><input id="default-form-favourite_animals-field-rat-option" type="checkbox" name="favourite_animals[]" value="rat" checked>rat</label>',
         ], [
             'handle' => 'favourite_animals',
             'field' => [
@@ -194,9 +194,9 @@ EOT
     public function it_dynamically_renders_inline_checkboxes_field()
     {
         $this->assertFieldRendersHtml([
-            '<label><input type="checkbox" name="favourite_animals[]" value="cat">Cat</label>',
-            '<label><input type="checkbox" name="favourite_animals[]" value="armadillo">Armadillo</label>',
-            '<label><input type="checkbox" name="favourite_animals[]" value="rat">rat</label>',
+            '<label><input id="default-form-favourite_animals-field-cat-option" type="checkbox" name="favourite_animals[]" value="cat">Cat</label>',
+            '<label><input id="default-form-favourite_animals-field-armadillo-option" type="checkbox" name="favourite_animals[]" value="armadillo">Armadillo</label>',
+            '<label><input id="default-form-favourite_animals-field-rat-option" type="checkbox" name="favourite_animals[]" value="rat">rat</label>',
         ], [
             'handle' => 'favourite_animals',
             'field' => [
@@ -211,9 +211,9 @@ EOT
         ]);
 
         $this->assertFieldRendersHtml([
-            '<label><input type="checkbox" name="favourite_animals[]" value="cat" checked>Cat</label>',
-            '<label><input type="checkbox" name="favourite_animals[]" value="armadillo">Armadillo</label>',
-            '<label><input type="checkbox" name="favourite_animals[]" value="rat" checked>rat</label>',
+            '<label><input id="default-form-favourite_animals-field-cat-option" type="checkbox" name="favourite_animals[]" value="cat" checked>Cat</label>',
+            '<label><input id="default-form-favourite_animals-field-armadillo-option" type="checkbox" name="favourite_animals[]" value="armadillo">Armadillo</label>',
+            '<label><input id="default-form-favourite_animals-field-rat-option" type="checkbox" name="favourite_animals[]" value="rat" checked>rat</label>',
         ], [
             'handle' => 'favourite_animals',
             'field' => [
@@ -234,11 +234,11 @@ EOT
     public function it_dynamically_renders_radio_field()
     {
         $this->assertFieldRendersHtml([
-            '<label><input type="radio" name="favourite_animal" value="cat">Cat</label>',
+            '<label><input id="default-form-favourite_animal-field-cat-option" type="radio" name="favourite_animal" value="cat">Cat</label>',
             '<br>',
-            '<label><input type="radio" name="favourite_animal" value="armadillo">Armadillo</label>',
+            '<label><input id="default-form-favourite_animal-field-armadillo-option" type="radio" name="favourite_animal" value="armadillo">Armadillo</label>',
             '<br>',
-            '<label><input type="radio" name="favourite_animal" value="rat">rat</label>',
+            '<label><input id="default-form-favourite_animal-field-rat-option" type="radio" name="favourite_animal" value="rat">rat</label>',
         ], [
             'handle' => 'favourite_animal',
             'field' => [
@@ -252,11 +252,11 @@ EOT
         ]);
 
         $this->assertFieldRendersHtml([
-            '<label><input type="radio" name="favourite_animal" value="cat">Cat</label>',
+            '<label><input id="default-form-favourite_animal-field-cat-option" type="radio" name="favourite_animal" value="cat">Cat</label>',
             '<br>',
-            '<label><input type="radio" name="favourite_animal" value="armadillo" checked>Armadillo</label>',
+            '<label><input id="default-form-favourite_animal-field-armadillo-option" type="radio" name="favourite_animal" value="armadillo" checked>Armadillo</label>',
             '<br>',
-            '<label><input type="radio" name="favourite_animal" value="rat">rat</label>',
+            '<label><input id="default-form-favourite_animal-field-rat-option" type="radio" name="favourite_animal" value="rat">rat</label>',
         ], [
             'handle' => 'favourite_animal',
             'field' => [
@@ -276,9 +276,9 @@ EOT
     public function it_dynamically_renders_inline_radio_field()
     {
         $this->assertFieldRendersHtml([
-            '<label><input type="radio" name="favourite_animal" value="cat">Cat</label>',
-            '<label><input type="radio" name="favourite_animal" value="armadillo">Armadillo</label>',
-            '<label><input type="radio" name="favourite_animal" value="rat">rat</label>',
+            '<label><input id="default-form-favourite_animal-field-cat-option" type="radio" name="favourite_animal" value="cat">Cat</label>',
+            '<label><input id="default-form-favourite_animal-field-armadillo-option" type="radio" name="favourite_animal" value="armadillo">Armadillo</label>',
+            '<label><input id="default-form-favourite_animal-field-rat-option" type="radio" name="favourite_animal" value="rat">rat</label>',
         ], [
             'handle' => 'favourite_animal',
             'field' => [
@@ -293,9 +293,9 @@ EOT
         ]);
 
         $this->assertFieldRendersHtml([
-            '<label><input type="radio" name="favourite_animal" value="cat">Cat</label>',
-            '<label><input type="radio" name="favourite_animal" value="armadillo" checked>Armadillo</label>',
-            '<label><input type="radio" name="favourite_animal" value="rat">rat</label>',
+            '<label><input id="default-form-favourite_animal-field-cat-option" type="radio" name="favourite_animal" value="cat">Cat</label>',
+            '<label><input id="default-form-favourite_animal-field-armadillo-option" type="radio" name="favourite_animal" value="armadillo" checked>Armadillo</label>',
+            '<label><input id="default-form-favourite_animal-field-rat-option" type="radio" name="favourite_animal" value="rat">rat</label>',
         ], [
             'handle' => 'favourite_animal',
             'field' => [
@@ -316,7 +316,7 @@ EOT
     public function it_dynamically_renders_select_field()
     {
         $this->assertFieldRendersHtml([
-            '<select name="favourite_animal">',
+            '<select id="default-form-favourite_animal-field" name="favourite_animal">',
             '<option value>Please select...</option>',
             '<option value="cat">Cat</option>',
             '<option value="armadillo">Armadillo</option>',
@@ -335,7 +335,7 @@ EOT
         ]);
 
         $this->assertFieldRendersHtml([
-            '<select name="favourite_animal">',
+            '<select id="default-form-favourite_animal-field" name="favourite_animal">',
             '<option value>Please select...</option>',
             '<option value="cat" selected>Cat</option>',
             '<option value="armadillo">Armadillo</option>',
@@ -360,7 +360,7 @@ EOT
     public function it_dynamically_renders_multiple_select_field()
     {
         $this->assertFieldRendersHtml([
-            '<select name="favourite_animals[]" multiple>',
+            '<select id="default-form-favourite_animals-field" name="favourite_animals[]" multiple>',
             '<option value="cat">Cat</option>',
             '<option value="armadillo">Armadillo</option>',
             '<option value="rat">rat</option>',
@@ -379,7 +379,7 @@ EOT
         ]);
 
         $this->assertFieldRendersHtml([
-            '<select name="favourite_animals[]" multiple>',
+            '<select id="default-form-favourite_animals-field" name="favourite_animals[]" multiple>',
             '<option value="cat" selected>Cat</option>',
             '<option value="armadillo">Armadillo</option>',
             '<option value="rat" selected>rat</option>',
@@ -404,7 +404,7 @@ EOT
     public function it_dynamically_renders_asset_field()
     {
         $this->assertFieldRendersHtml([
-            '<input type="file" name="cat_selfie">',
+            '<input id="default-form-cat_selfie-field" type="file" name="cat_selfie">',
         ], [
             'handle' => 'cat_selfie',
             'field' => [
@@ -419,7 +419,7 @@ EOT
     public function it_dynamically_renders_multiple_assets_field()
     {
         $this->assertFieldRendersHtml([
-            '<input type="file" name="cat_selfies[]" multiple>',
+            '<input id="default-form-cat_selfies-field" type="file" name="cat_selfies[]" multiple>',
         ], [
             'handle' => 'cat_selfies',
             'field' => [
@@ -433,7 +433,7 @@ EOT
     public function it_dynamically_renders_field_with_fallback_to_default_partial()
     {
         $this->assertFieldRendersHtml([
-            '<input type="text" name="custom" value="">',
+            '<input id="default-form-custom-field" type="text" name="custom" value="">',
         ], [
             'handle' => 'custom',
             'field' => [
@@ -442,7 +442,7 @@ EOT
         ]);
 
         $this->assertFieldRendersHtml([
-            '<input type="text" name="custom" value="fall back to default partial">',
+            '<input id="default-form-custom-field" type="text" name="custom" value="fall back to default partial">',
         ], [
             'handle' => 'custom',
             'field' => [
