@@ -5,6 +5,7 @@
         <uploader
             ref="uploader"
             :url="meta.uploadUrl"
+            :extra-data="{ config: configParameter }"
             :container="config.container"
             @updated="uploadsUpdated"
             @upload-complete="uploadComplete"
@@ -85,6 +86,12 @@ export default {
         return {
             uploads: [],
         }
+    },
+
+    computed: {
+        configParameter() {
+            return utf8btoa(JSON.stringify(this.config));
+        },
     },
 
     methods: {

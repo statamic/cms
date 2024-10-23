@@ -32,7 +32,11 @@ export default {
         },
         container: String,
         path: String,
-        url: { type: String, default: () => cp_url('assets') }
+        url: { type: String, default: () => cp_url('assets') },
+        extraData: {
+            type: Object,
+            default: () => ({})
+        }
     },
 
 
@@ -41,19 +45,6 @@ export default {
             dragging: false,
             uploads: []
         }
-    },
-
-
-    computed: {
-
-        extraData() {
-            return {
-                container: this.container,
-                folder: this.path,
-                _token: Statamic.$config.get('csrfToken')
-            };
-        }
-
     },
 
 
@@ -164,8 +155,15 @@ export default {
 
             form.append('file', file);
 
-            for (let key in this.extraData) {
-                form.append(key, this.extraData[key]);
+            let parameters = {
+                ...this.extraData,
+                container: this.container,
+                folder: this.path,
+                _token: Statamic.$config.get('csrfToken')
+            }
+
+            for (let key in parameters) {
+                form.append(key, parameters[key]);
             }
 
             for (let key in data) {
