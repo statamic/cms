@@ -53,7 +53,7 @@
                                 <td class="p-0 w-8 rtl:text-left ltr:text-right align-middle">
                                     <button
                                         @click="remove(i)"
-                                        class="flex items-center p-2 w-full h-full text-gray-600 hover:text-gray-900"
+                                        class="flex items-center p-2 w-full h-full text-gray-600 dark:text-dark-150 hover:text-gray-950 dark:hover:text-dark-100"
                                     >
                                         <svg-icon name="micro/trash" class="w-6 h-6" />
                                     </button>
