@@ -143,7 +143,7 @@ trait RendersForms
 
         $formHandle = $field->form()?->handle() ?? Str::slug($errorBag);
         $data = array_merge($configDefaults, $field->toArray(), [
-            'id' => $this->generateFieldId($formHandle, $field->handle()),
+            'id' => $this->generateFieldId($field->handle(), $formHandle),
             'instructions' => $field->instructions(),
             'error' => $errors->first($field->handle()) ?: null,
             'default' => $field->value() ?? $field->defaultValue(),
@@ -180,8 +180,8 @@ trait RendersForms
     /**
      * Generate a field id to associate input with label.
      */
-    protected function generateFieldId(?string $formName, ?string $fieldHandle): string
+    protected function generateFieldId(string $fieldHandle, ?string $formName = null): string
     {
-        return $formName.'-form-'.$fieldHandle.'-field';
+        return ($formName ?? 'default').'-form-'.$fieldHandle.'-field';
     }
 }
