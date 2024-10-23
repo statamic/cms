@@ -37,7 +37,7 @@
                             <tr
                                 v-for="(file, i) in value"
                                 :key="file"
-                                class="asset-row bg-white hover:bg-gray-100"
+                                class="asset-row bg-white dark:bg-dark-600 hover:bg-gray-100"
                             >
                                 <td class="flex items-center">
                                     <div

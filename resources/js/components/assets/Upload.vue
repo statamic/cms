@@ -13,7 +13,7 @@
 
         <div
             v-if="status !== 'error'"
-            class="bg-white dark:bg-dark-600 flex-1 h-4 mx-2 rounded"
+            class="bg-white flex-1 h-4 mx-2 rounded"
         >
             <div class="bg-blue h-full rounded"
                 :style="{ width: percent+'%' }" />
