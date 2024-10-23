@@ -118,13 +118,14 @@ class ImageGenerator
         $this->skip_validation = true;
         $this->setParams($params);
 
+        $qs = Str::after($url, '?');
         $parsed = $this->parseUrl($url);
 
         $this->server->setSource($this->guzzleSourceFilesystem($parsed['base']));
         $this->server->setSourcePathPrefix('/');
         $this->server->setCachePathPrefix('http');
 
-        return $this->generate($parsed['path']);
+        return $this->generate($parsed['path'].($qs ? '?'.$qs : ''));
     }
 
     /**
