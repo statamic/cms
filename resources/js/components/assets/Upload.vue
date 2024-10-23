@@ -23,14 +23,14 @@
             {{ error }}
             <dropdown-list v-if="errorStatus === 409">
                 <template #trigger>
-                    <button class="ml-4 btn btn-xs" v-text="`${__('Fix')}...`" />
+                    <button type="button" class="ml-4 btn btn-xs" v-text="`${__('Fix')}...`" />
                 </template>
                 <dropdown-item @click="retryAndOverwrite" :text="__('messages.uploader_overwrite_existing')" />
                 <dropdown-item @click="openNewFilenameModal" :text="`${__('messages.uploader_choose_new_filename')}...`" />
                 <dropdown-item @click="retryWithTimestamp" :text="__('messages.uploader_append_timestamp')" />
                 <dropdown-item @click="selectExisting" v-if="allowSelectingExisting" :text="__('messages.uploader_discard_use_existing')" />
             </dropdown-list>
-            <button class="btn btn-xs" @click="clear" v-text="__('Discard')" />
+            <button type="button" class="btn btn-xs" @click="clear" v-text="__('Discard')" />
         </div>
 
         <confirmation-modal
