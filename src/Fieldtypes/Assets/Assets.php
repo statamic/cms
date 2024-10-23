@@ -3,6 +3,7 @@
 namespace Statamic\Fieldtypes\Assets;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Statamic\Actions\RenameAssetFolder;
 use Statamic\Assets\OrderedQueryBuilder;
 use Statamic\Contracts\Entries\Entry;
@@ -160,7 +161,12 @@ class Assets extends Fieldtype
         $max_files = (int) $this->config('max_files');
 
         $values = collect($data)->map(function ($id) {
-            return Asset::find($id)->path();
+            $asset = Asset::find($id);
+            if (is_null($asset)) {
+                Log::error("Can't find asset: $id");
+            }
+
+            return $asset->path();
         });
 
         return $this->config('max_files') === 1 ? $values->first() : $values->all();
