@@ -70,10 +70,10 @@ EOT
         preg_match_all('/<label>.+<\/label><input.+>/U', $output, $actual);
 
         $expected = [
-            '<label>Email Address</label><input type="email" name="email" value="">',
-            '<label>Password</label><input type="password" name="password" value="">',
-            '<label>Password Confirmation</label><input type="password" name="password_confirmation" value="">',
-            '<label>Name</label><input type="text" name="name" value="">',
+            '<label>Email Address</label><input id="userregister-form-email-field" type="email" name="email" value="">',
+            '<label>Password</label><input id="userregister-form-password-field" type="password" name="password" value="">',
+            '<label>Password Confirmation</label><input id="userregister-form-password_confirmation-field" type="password" name="password_confirmation" value="">',
+            '<label>Name</label><input id="userregister-form-name-field" type="text" name="name" value="">',
         ];
 
         $this->assertEquals($expected, $actual[0]);
@@ -96,12 +96,12 @@ EOT
         preg_match_all('/<label>.+<\/label><input.+>/U', $output, $actual);
 
         $expected = [
-            '<label>Email Address</label><input type="email" name="email" value="">',
-            '<label>Password</label><input type="password" name="password" value="">',
-            '<label>Password Confirmation</label><input type="password" name="password_confirmation" value="">',
-            '<label>Full Name</label><input type="text" name="name" value="">',
-            '<label>Phone Number</label><input type="text" name="phone" value="">',
-            '<label>Over 18 years of age?</label><input type="text" name="age" value="" required>',
+            '<label>Email Address</label><input id="userregister-form-email-field" type="email" name="email" value="">',
+            '<label>Password</label><input id="userregister-form-password-field" type="password" name="password" value="">',
+            '<label>Password Confirmation</label><input id="userregister-form-password_confirmation-field" type="password" name="password_confirmation" value="">',
+            '<label>Full Name</label><input id="userregister-form-name-field" type="text" name="name" value="">',
+            '<label>Phone Number</label><input id="userregister-form-phone-field" type="text" name="phone" value="">',
+            '<label>Over 18 years of age?</label><input id="userregister-form-age-field" type="text" name="age" value="" required>',
         ];
 
         $this->assertEquals($expected, $actual[0]);
