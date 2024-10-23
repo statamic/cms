@@ -122,10 +122,7 @@ class AllowedFile implements ValidationRule
 
     private function isAllowedExtension(UploadedFile $file): bool
     {
-        $extensions = array_merge(
-            $this->allowedExtensions ?? static::EXTENSIONS,
-            config('statamic.assets.additional_uploadable_extensions', [])
-        );
+        $extensions = $this->allowedExtensions ?? array_merge(static::EXTENSIONS, config('statamic.assets.additional_uploadable_extensions', []));
 
         return in_array(trim(strtolower($file->getClientOriginalExtension())), $extensions);
     }
