@@ -12,7 +12,37 @@
             @upload-complete="uploadComplete"
         >
             <div slot-scope="{ dragging }">
-                <div class="markdown-toolbar">
+
+                <publish-field-header
+                    v-if="fullScreenMode"
+                    :config="config"
+                    :run-action="runAction"
+                    :actions="visibleActions"
+                    :internal-actions="visibleInternalActions"
+                    :quick-actions="visibleQuickActions"
+                    @close="toggleFullscreen">
+                    <div class="markdown-toolbar">
+                        <div class="markdown-modes">
+                            <button @click="mode = 'write'" :class="{ 'active': mode == 'write' }" v-text=" __('Write')" :aria-pressed="mode === 'write' ? 'true' : 'false'" />
+                            <button @click="mode = 'preview'" :class="{ 'active': mode == 'preview' }" v-text=" __('Preview')" :aria-pressed="mode === 'preview' ? 'true' : 'false'" />
+                        </div>
+                        <div class="markdown-buttons" v-if="! isReadOnly">
+                            <button
+                                v-for="button in buttons"
+                                v-tooltip="button.text"
+                                :aria-label="button.text"
+                                @click="button.command(editor)"
+                            >
+                                <svg-icon :name="button.svg" class="w-4 h-4" />
+                            </button>
+                            <button @click="toggleDarkMode" v-tooltip="darkMode ? __('Light Mode') : __('Dark Mode')" :aria-label="__('Toggle Dark Mode')" v-if="fullScreenMode">
+                                <svg-icon name="dark-mode" class="w-4 h-4" />
+                            </button>
+                        </div>
+                    </div>
+                </publish-field-header>
+
+                <div class="markdown-toolbar" v-if="!fullScreenMode">
                     <div class="markdown-modes">
                         <button @click="mode = 'write'" :class="{ 'active': mode == 'write' }" v-text=" __('Write')" :aria-pressed="mode === 'write' ? 'true' : 'false'" />
                         <button @click="mode = 'preview'" :class="{ 'active': mode == 'preview' }" v-text=" __('Preview')" :aria-pressed="mode === 'preview' ? 'true' : 'false'" />
@@ -28,10 +58,6 @@
                         </button>
                         <button @click="toggleDarkMode" v-tooltip="darkMode ? __('Light Mode') : __('Dark Mode')" :aria-label="__('Toggle Dark Mode')" v-if="fullScreenMode">
                             <svg-icon name="dark-mode" class="w-4 h-4" />
-                        </button>
-                        <button @click="toggleFullScreen" v-tooltip="__('Toggle Fullscreen')" :aria-label="__('Toggle Fullscreen Mode')">
-                            <svg-icon name="expand-bold" class="w-4 h-4" v-show="!fullScreenMode" />
-                            <svg-icon name="arrows-shrink" class="w-4 h-4" v-show="fullScreenMode" />
                         </button>
                     </div>
                 </div>
@@ -715,7 +741,11 @@ export default {
 
             this.count.characters = ucs2decode(trimmed.replace(/\s/g, '')).length;
             this.count.words = trimmed.split(/\s+/).filter(word => word.length > 0).length;
-        }
+        },
+
+        toggleFullscreen() {
+            this.fullScreenMode = !this.fullScreenMode;
+        },
     },
 
     computed: {
@@ -744,7 +774,18 @@ export default {
 
             return marked(this.data || '', { renderer: new PlainTextRenderer })
                 .replace(/<\/?[^>]+(>|$)/g, "");
-        }
+        },
+
+        internalActions() {
+            return [
+                {
+                    title: __('Toggle Fullscreen Mode'),
+                    icon: 'expand-bold',
+                    quick: true,
+                    run: this.toggleFullscreen,
+                },
+            ];
+        },
     }
 
 };
