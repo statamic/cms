@@ -110,11 +110,11 @@ class MakeUserTest extends TestCase
     #[Test]
     public function it_can_make_a_user_with_password_option()
     {
-        $this->withoutMockingConsoleOutput();
-
         $this->assertEmpty(User::all());
 
-        $this->artisan('statamic:make:user', ['email' => 'duncan@likesteatime.com', '--password' => 'PacManMoonwalk#84'])
+        $password = 'PacManMoonwalk#84';
+
+        $this->artisan('statamic:make:user', ['email' => 'duncan@likesteatime.com', '--password' => $password])
             ->expectsOutputToContain('User created successfully.');
 
         $user = User::all()->first();
@@ -122,5 +122,6 @@ class MakeUserTest extends TestCase
         $this->assertNotEmpty($user->id());
         $this->assertEquals('duncan@likesteatime.com', $user->email());
         $this->assertNotEmpty($user->password());
+        $this->assertTrue(password_verify($password, $user->password()));
     }
 }
