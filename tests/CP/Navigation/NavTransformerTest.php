@@ -867,8 +867,8 @@ class NavTransformerTest extends TestCase
                     'content::navigation',
                     'content::taxonomies',
                     'content::assets',
-                    'content::collections',
-                    'content::globals',
+                    // `Collections` and `Taxnomies` are omitted because they are left over items in the same order they originally were, therefore redundant
+                    // Our new `Custom Item` is omitted because it's a new item at the end of the list, so it doesn't need to be in the order
                 ],
                 'items' => [
                     'content::taxonomies' => [
@@ -1091,6 +1091,8 @@ class NavTransformerTest extends TestCase
                 'tools',
                 'content',
                 'users',
+                // `Settings` and `Custom Section` are omitted because they are left over items in the same order they originally were, therefore redundant
+                // Also `Custom Section` is omitted because it's a new item at the end of the list, so it doesn't need to be in the order
             ],
             'sections' => [
                 'fields' => [
