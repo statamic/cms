@@ -118,7 +118,7 @@ class ImageGenerator
         $this->skip_validation = true;
         $this->setParams($params);
 
-        $qs = Str::after($url, '?');
+        $qs = Str::contains($url, '?') ? Str::after($url, '?') : null;
         $parsed = $this->parseUrl($url);
 
         $this->server->setSource($this->guzzleSourceFilesystem($parsed['base']));
