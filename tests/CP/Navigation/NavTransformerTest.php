@@ -1070,6 +1070,7 @@ class NavTransformerTest extends TestCase
             ['display_original' => 'Tools'],
             ['display_original' => 'Content'],
             ['display_original' => 'Users'],
+            ['display_original' => 'Settings'],
             [
                 'display' => 'Custom Section',
                 'action' => '@create',
