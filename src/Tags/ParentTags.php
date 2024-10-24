@@ -85,7 +85,7 @@ class ParentTags extends Tags
         // Find the parent by stripping away URL segments
         foreach ($segment_urls as $segment_url) {
             if ($content = Entry::findByUri($segment_url, Site::current())) {
-                return $content->toAugmentedArray();
+                return $this->aliasedResult($content->toAugmentedArray());
             }
         }
 

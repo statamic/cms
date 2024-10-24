@@ -119,7 +119,7 @@ class Glide extends Tags
      *
      * Generates the image and makes variables available within the pair.
      *
-     * @return string
+     * @return string|array
      */
     public function generate($items = null)
     {
@@ -131,7 +131,11 @@ class Glide extends Tags
 
         $items = is_iterable($items) ? collect($items) : collect([$items]);
 
-        return $items->map(function ($item) {
+        if ($alias = $this->params->get('as')) {
+            unset($this->params['as']);
+        }
+
+        $items = $items->map(function ($item) {
             try {
                 $data = ['url' => $this->generateGlideUrl($item)];
 
@@ -150,6 +154,14 @@ class Glide extends Tags
                 \Log::error($e->getMessage());
             }
         })->filter()->all();
+
+        if ($alias) {
+            return [
+                $alias => $items,
+            ];
+        }
+
+        return $items;
     }
 
     /**
