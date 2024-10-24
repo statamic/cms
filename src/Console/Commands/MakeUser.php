@@ -43,6 +43,12 @@ class MakeUser extends Command
     protected $email;
 
     /**
+     *  The user's password.
+     * @var string
+     */
+    protected $password;
+
+    /**
      * The user's data.
      *
      * @var array
@@ -172,6 +178,7 @@ class MakeUser extends Command
 
         $user = User::make()
             ->email($this->email)
+            ->password($this->option('password'))
             ->data($this->data);
 
         if ($this->super || $this->option('super')) {
@@ -241,6 +248,7 @@ class MakeUser extends Command
     {
         return array_merge(parent::getOptions(), [
             ['super', '', InputOption::VALUE_NONE, 'Generate a super user with permission to do everything'],
+            ['password', '', InputOption::VALUE_OPTIONAL, 'Generate a user with given password'],
         ]);
     }
 }
