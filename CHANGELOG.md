@@ -1,5 +1,15 @@
 # Release Notes
 
+## 5.34.0 (2024-10-24)
+
+### What's new
+- Add `password` option to `make:user` command [#11005](https://github.com/statamic/cms/issues/11005) by @joshuablum
+
+### What's fixed
+- Fix issues with the Files fieldtype in Dark Mode [#10999](https://github.com/statamic/cms/issues/10999) by @duncanmcclean
+
+
+
 ## 5.33.1 (2024-10-22)
 
 ### What's fixed
