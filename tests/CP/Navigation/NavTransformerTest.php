@@ -848,13 +848,20 @@ class NavTransformerTest extends TestCase
                         ],
                     ],
                     ['id' => 'content::assets'],
+                    [
+                        'id' => 'content::custom_item_one',
+                        'manipulations' => [
+                            'action' => '@create',
+                            'display' => 'Custom Item One',
+                        ],
+                    ],
                     ['id' => 'content::collections'],
                     ['id' => 'content::globals'],
                     [
-                        'id' => 'content::custom_item',
+                        'id' => 'content::custom_item_two',
                         'manipulations' => [
                             'action' => '@create',
-                            'display' => 'Custom Item',
+                            'display' => 'Custom Item Two',
                         ],
                     ],
                 ],
@@ -867,17 +874,23 @@ class NavTransformerTest extends TestCase
                     'content::navigation',
                     'content::taxonomies',
                     'content::assets',
+                    'content::custom_item_one',
                     // `Collections` and `Taxnomies` are omitted because they are left over items in the same order they originally were, therefore redundant
-                    // Our new `Custom Item` is omitted because it's a new item at the end of the list, so it doesn't need to be in the order
+                    // Our new `Custom Item Two` is omitted because it's a new item at the end of the list, so it doesn't need to be in the order
+                    // But `Custom Item One` still needs to be in the order, because it's not just appended to the end of the list
                 ],
                 'items' => [
                     'content::taxonomies' => [
                         'action' => '@modify',
                         'display' => 'Favourite Taxonomies',
                     ],
-                    'content::custom_item' => [
+                    'content::custom_item_one' => [
                         'action' => '@create',
-                        'display' => 'Custom Item',
+                        'display' => 'Custom Item One',
+                    ],
+                    'content::custom_item_two' => [
+                        'action' => '@create',
+                        'display' => 'Custom Item Two',
                     ],
                 ],
             ],
@@ -1053,6 +1066,66 @@ class NavTransformerTest extends TestCase
 
     #[Test]
     public function it_can_reorder_custom_and_modified_sections()
+    {
+        $transformed = $this->transform([
+            ['display_original' => 'Top Level'],
+            [
+                'display_original' => 'Fields',
+                'items' => [
+                    [
+                        'id' => 'content::collections',
+                        'manipulations' => [
+                            'action' => '@alias',
+                        ],
+                    ],
+                ],
+            ],
+            ['display_original' => 'Tools'],
+            ['display_original' => 'Content'],
+            ['display_original' => 'Users'],
+            [
+                'display' => 'Custom Section',
+                'action' => '@create',
+                'items' => [
+                    [
+                        'id' => 'content::collections::pages',
+                        'manipulations' => [
+                            'action' => '@alias',
+                        ],
+                    ],
+                ],
+            ],
+            ['display_original' => 'Settings'],
+        ]);
+
+        $expected = [
+            'reorder' => [
+                'fields',
+                'tools',
+                'content',
+                'users',
+                'custom_section',
+                // `Settings` is omitted because it's the only one left over at the end of the list, therefore redundant
+            ],
+            'sections' => [
+                'fields' => [
+                    'content::collections' => '@alias',
+                ],
+                'custom_section' => [
+                    'display' => 'Custom Section',
+                    'action' => '@create',
+                    'items' => [
+                        'content::collections::pages' => '@alias',
+                    ],
+                ],
+            ],
+        ];
+
+        $this->assertEquals($expected, $transformed);
+    }
+
+    #[Test]
+    public function it_can_reorder_sections_but_ignores_custom_sections_left_at_the_end()
     {
         $transformed = $this->transform([
             ['display_original' => 'Top Level'],
