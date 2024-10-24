@@ -1,12 +1,18 @@
 <label>
     <input type="hidden" name="{{ handle }}" value="0">
     <input
+        id="{{ id }}"
         type="checkbox"
         name="{{ handle }}"
         value="1"
         {{ if js_driver }}{{ js_attributes }}{{ /if }}
         {{ if value && value !== '0' }}checked{{ /if }}
         {{ if validate|contains:required }}required{{ /if }}
+        {{ if error }}
+            aria-invalid="true" aria-describedby="{{ id }}-error"
+        {{ elseif instructions }}
+            aria-describedby="{{ id }}-instructions"
+        {{ /if }}
     >
     {{ if inline_label }}
         {{ inline_label }}
