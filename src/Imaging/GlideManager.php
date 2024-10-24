@@ -167,7 +167,7 @@ class GlideManager
         $hashCallable = $this->getHashCallable();
 
         return function ($path, $params) use ($hashCallable) {
-            $qs = Str::after($path, '?');
+            $qs = Str::contains($path, '?') ? Str::after($path, '?') : null;
             $path = Str::before($path, '?');
 
             if ($qs) {
