@@ -43,7 +43,7 @@ class MakeUser extends Command
     protected $email;
 
     /**
-     *  The user's password.
+     * The user's password.
      *
      * @var string
      */
@@ -72,6 +72,10 @@ class MakeUser extends Command
     {
         if (! Statamic::pro() && User::query()->count() > 0) {
             return error(__('Statamic Pro is required.'));
+        }
+
+        if ($password = $this->option('password')) {
+            $this->password = $password;
         }
 
         // If email argument exists, non-interactively create user.
@@ -140,7 +144,11 @@ class MakeUser extends Command
      */
     protected function promptPassword()
     {
-        $this->data['password'] = password(label: 'Password', required: true);
+        if ($this->password) {
+            return $this;
+        }
+
+        $this->password = password(label: 'Password', required: true);
 
         if ($this->passwordValidationFails()) {
             return $this->promptPassword();
@@ -179,8 +187,8 @@ class MakeUser extends Command
 
         $user = User::make()
             ->email($this->email)
-            ->password($this->option('password'))
-            ->data($this->data);
+            ->data($this->data)
+            ->password($this->password);
 
         if ($this->super || $this->option('super')) {
             $user->makeSuper();
@@ -209,7 +217,7 @@ class MakeUser extends Command
     protected function passwordValidationFails()
     {
         return $this->validationFails(
-            $this->data['password'],
+            $this->password,
             ['required', Password::default()]
         );
     }
