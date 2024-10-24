@@ -19,6 +19,7 @@ use Statamic\Query\Scopes\AppliesScopes;
 abstract class Builder implements Contract
 {
     use AppliesScopes, FakesQueries;
+    use Traits\QueriesRelationships;
 
     protected $columns;
     protected $limit;
