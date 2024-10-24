@@ -44,6 +44,7 @@ class MakeUser extends Command
 
     /**
      *  The user's password.
+     *
      * @var string
      */
     protected $password;
