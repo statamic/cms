@@ -167,7 +167,13 @@ class GlideManager
         $hashCallable = $this->getHashCallable();
 
         return function ($path, $params) use ($hashCallable) {
+            $qs = Str::after($path, '?');
             $path = Str::before($path, '?');
+
+            if ($qs) {
+                $path = Str::replaceLast('.', '-'.md5($qs).'.', $path);
+            }
+
             $sourcePath = $this->getSourcePath($path);
 
             if ($this->sourcePathPrefix) {
