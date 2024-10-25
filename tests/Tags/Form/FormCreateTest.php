@@ -75,6 +75,18 @@ EOT
     }
 
     #[Test]
+    public function it_dynamically_renders_with_form_handle()
+    {
+        foreach (['contact', 'contact-form', 'kontakt_formular'] as $handle) {
+            $this->createForm(handle: $handle);
+            $output = $this->normalizeHtml($this->tag('{{ form in="'.$handle.'" }}{{ fields }}{{ field }}{{ /fields }}{{ /form }}'));
+            $this->assertStringContainsString('<input id="'.$handle.'-form-name-field"', $output);
+            $this->assertStringContainsString('<input id="'.$handle.'-form-email-field"', $output);
+            $this->assertStringContainsString('<textarea id="'.$handle.'-form-message-field"', $output);
+        }
+    }
+
+    #[Test]
     public function it_dynamically_renders_text_field()
     {
         $this->assertFieldRendersHtml([

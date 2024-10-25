@@ -116,7 +116,7 @@ abstract class FormTestCase extends TestCase
         );
 
         $expected = collect(Arr::wrap($expectedHtmlParts))
-            ->map(fn($html) => str_replace('[[form-handle]]', $handle, $html)) // allow testing against dynamic form handle
+            ->map(fn ($html) => str_replace('[[form-handle]]', $handle, $html)) // allow testing against dynamic form handle
             ->implode('');
 
         $this->assertStringContainsString($expected, $output);
