@@ -81,6 +81,7 @@ export default {
                     return 'video';
                 case 'xml':
                     return 'xml';
+                case 'avif':
                 case 'bmp':
                 case 'gif':
                 case 'ico':
