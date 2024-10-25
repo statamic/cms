@@ -201,10 +201,46 @@ class FileCacher extends AbstractCacher
         $this->nocacheJs = $js;
     }
 
-    public function getNocacheJs(): string
+    public function getCsrfTokenJs(): string
     {
         $csrfPlaceholder = CsrfTokenReplacer::REPLACEMENT;
 
+        return <<<EOT
+(function() {
+    fetch('/!/csrf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+    })
+    .then((response) => response.json())
+    .then((data) => {
+        for (const input of document.querySelectorAll('input[value="$csrfPlaceholder"]')) {
+            input.value = data.csrf;
+        }
+
+        for (const meta of document.querySelectorAll('meta[content="$csrfPlaceholder"]')) {
+            meta.content = data.csrf;
+        }
+
+        for (const input of document.querySelectorAll('script[data-csrf="$csrfPlaceholder"]')) {
+            input.setAttribute('data-csrf', data.csrf);
+        }
+
+        if (window.hasOwnProperty('livewire_token')) {
+            window.livewire_token = data.csrf
+        }
+
+        if (window.hasOwnProperty('livewireScriptConfig')) {
+            window.livewireScriptConfig.csrf = data.csrf
+        }
+
+        document.dispatchEvent(new CustomEvent('statamic:csrf.replaced', { detail: data }));
+    });
+})();
+EOT;
+    }
+
+    public function getNocacheJs(): string
+    {
         $default = <<<EOT
 (function() {
     var els = document.getElementsByClassName('nocache');
@@ -227,26 +263,6 @@ class FileCacher extends AbstractCacher
         const regions = data.regions;
         for (var key in regions) {
             if (map[key]) map[key].outerHTML = regions[key];
-        }
-
-        for (const input of document.querySelectorAll('input[value="$csrfPlaceholder"]')) {
-            input.value = data.csrf;
-        }
-
-        for (const meta of document.querySelectorAll('meta[content="$csrfPlaceholder"]')) {
-            meta.content = data.csrf;
-        }
-
-        for (const input of document.querySelectorAll('script[data-csrf="$csrfPlaceholder"]')) {
-            input.setAttribute('data-csrf', data.csrf);
-        }
-
-        if (window.hasOwnProperty('livewire_token')) {
-            window.livewire_token = data.csrf
-        }
-
-        if (window.hasOwnProperty('livewireScriptConfig')) {
-            window.livewireScriptConfig.csrf = data.csrf
         }
 
         document.dispatchEvent(new CustomEvent('statamic:nocache.replaced', { detail: data }));

@@ -6,6 +6,8 @@ class CsrfTokenController
 {
     public function __invoke()
     {
-        return csrf_token();
+        return [
+            'csrf' => csrf_token(),
+        ];
     }
 }
