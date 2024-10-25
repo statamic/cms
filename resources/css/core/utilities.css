@@ -56,6 +56,11 @@
     width: fit-content;
 }
 
+.break-overflowing-words {
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
 .saving-overlay {
     @apply absolute inset-0 z-200 flex items-center rounded;
     background: rgba(255, 255, 255, .9);

@@ -115,7 +115,7 @@ class StoreAssetTest extends TestCase
         $this
             ->actingAs($this->userWithPermission())
             ->submit()
-            ->assertStatus(422)
+            ->assertStatus(409)
             ->assertInvalid(['path' => 'A file already exists with this name.']);
     }
 
@@ -130,7 +130,7 @@ class StoreAssetTest extends TestCase
             ->submit([
                 'file' => UploadedFile::fake()->image('tEsT.jpg'),
             ])
-            ->assertStatus(422)
+            ->assertStatus(409)
             ->assertInvalid(['path' => 'A file already exists with this name.']);
     }
 

@@ -3,11 +3,11 @@
     <div>
         <breadcrumb v-if="breadcrumbs" :url="breadcrumbs[1].url" :title="breadcrumbs[1].text" />
 
-        <div class="flex items-center mb-6">
-            <h1 class="flex-1">
-                <div class="flex items-center">
-                    <span v-if="! isCreating" class="little-dot rtl:ml-2 ltr:mr-2" :class="activeLocalization.status" v-tooltip="__(activeLocalization.status)" />
-                    <span v-html="$options.filters.striptags(__(title))" />
+        <div class="flex items-baseline mb-6">
+            <h1 class="flex-1 self-start rtl:ml-4 ltr:mr-4">
+                <div class="flex items-baseline">
+                    <span v-if="! isCreating" class="little-dot rtl:ml-2 ltr:mr-2 -top-1" :class="activeLocalization.status" v-tooltip="__(activeLocalization.status)" />
+                    <span class="break-overflowing-words" v-html="$options.filters.striptags(__(title))" />
                 </div>
             </h1>
 
