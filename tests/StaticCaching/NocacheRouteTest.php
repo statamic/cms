@@ -46,7 +46,6 @@ class NocacheRouteTest extends TestCase
             ->postJson('/!/nocache', ['url' => 'http://localhost/test'])
             ->assertOk()
             ->assertExactJson([
-                'csrf' => csrf_token(),
                 'regions' => [
                     $regionOne->key() => 'First 1 Dustin Test',
                     $regionTwo->key() => 'Second 2 Will Test',
