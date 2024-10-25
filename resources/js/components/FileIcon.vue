@@ -91,6 +91,7 @@ export default {
                 case 'raw':
                 case 'nef':
                 case 'tiff':
+                case 'webp':
                     return 'image';
                 default:
                     return 'generic';
