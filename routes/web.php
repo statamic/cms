@@ -19,6 +19,7 @@ use Statamic\Http\Controllers\User\RegisterController;
 use Statamic\Http\Middleware\AuthGuard;
 use Statamic\Http\Middleware\CP\AuthGuard as CPAuthGuard;
 use Statamic\Statamic;
+use Statamic\StaticCaching\NoCache\CsrfTokenController;
 use Statamic\StaticCaching\NoCache\NoCacheController;
 use Statamic\StaticCaching\NoCache\NoCacheLocalize;
 
@@ -51,6 +52,9 @@ Route::name('statamic.')->group(function () {
 
         Route::post('nocache', NoCacheController::class)
             ->middleware(NoCacheLocalize::class)
+            ->withoutMiddleware(['App\Http\Middleware\VerifyCsrfToken', 'Illuminate\Foundation\Http\Middleware\VerifyCsrfToken']);
+
+        Route::post('csrf', CsrfTokenController::class)
             ->withoutMiddleware(['App\Http\Middleware\VerifyCsrfToken', 'Illuminate\Foundation\Http\Middleware\VerifyCsrfToken']);
 
         Statamic::additionalActionRoutes();
