@@ -230,16 +230,26 @@ abstract class AddonServiceProvider extends ServiceProvider
                 $reflection = new \ReflectionClass($class);
 
                 if (
-                    ! $reflection->hasMethod('handle')
-                    || ! isset($reflection->getMethod('handle')->getParameters()[0])
-                    || ! $reflection->getMethod('handle')->getParameters()[0]->hasType()
+                    $reflection->hasMethod('handle')
+                    && isset($reflection->getMethod('handle')->getParameters()[0])
+                    && $reflection->getMethod('handle')->getParameters()[0]->hasType()
                 ) {
-                    return [];
+                    $event = $reflection->getMethod('handle')->getParameters()[0]->getType()->getName();
+
+                    return [$event => $class];
                 }
 
-                $event = $reflection->getMethod('handle')->getParameters()[0]->getType()->getName();
+                if (
+                    $reflection->hasMethod('__invoke')
+                    && isset($reflection->getMethod('__invoke')->getParameters()[0])
+                    && $reflection->getMethod('__invoke')->getParameters()[0]->hasType()
+                ) {
+                    $event = $reflection->getMethod('__invoke')->getParameters()[0]->getType()->getName();
 
-                return [$event => $class];
+                    return [$event => $class];
+                }
+
+                return [];
             })
             ->filter()
             ->merge(collect($this->listen)->flatMap(fn ($listeners, $event) => collect($listeners)->mapWithKeys(fn ($listener) => [$event => $listener])))
