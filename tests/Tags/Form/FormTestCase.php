@@ -93,7 +93,9 @@ abstract class FormTestCase extends TestCase
 
     protected function assertFieldRendersHtml($expectedHtmlParts, $fieldConfig, $oldData = [], $extraParams = [])
     {
-        $handle = 'test';
+        $randomString = str_shuffle('nobodymesseswiththehoff');
+
+        $handle = $fieldConfig['handle'].'_'.$randomString;
 
         $fields = $oldData
             ? array_merge([['handle' => 'failing_field', 'field' => ['type' => 'text', 'validate' => 'required']]], [$fieldConfig])
