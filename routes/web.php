@@ -49,13 +49,12 @@ Route::name('statamic.')->group(function () {
             Route::post('activate', [ActivateAccountController::class, 'reset'])->name('account.activate.action');
         });
 
+        Route::post('nocache', NoCacheController::class)
+            ->middleware(NoCacheLocalize::class)
+            ->withoutMiddleware(['App\Http\Middleware\VerifyCsrfToken', 'Illuminate\Foundation\Http\Middleware\VerifyCsrfToken']);
+
         Statamic::additionalActionRoutes();
     });
-
-    Route::prefix(config('statamic.routes.action'))
-        ->post('nocache', NoCacheController::class)
-        ->middleware(NoCacheLocalize::class)
-        ->withoutMiddleware(['App\Http\Middleware\VerifyCsrfToken', 'Illuminate\Foundation\Http\Middleware\VerifyCsrfToken']);
 
     if (OAuth::enabled()) {
         Route::get(config('statamic.oauth.routes.login'), [OAuthController::class, 'redirectToProvider'])->name('oauth.login');
