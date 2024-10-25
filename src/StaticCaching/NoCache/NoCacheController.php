@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Statamic\StaticCaching\Replacers\NoCacheReplacer;
 use Statamic\Support\Str;
 
-class Controller
+class NoCacheController
 {
     public function __invoke(Request $request, Session $session)
     {
