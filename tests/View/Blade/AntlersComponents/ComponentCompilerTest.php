@@ -331,4 +331,41 @@ BLADE;
             (string) Antlers::parse('{{ my_tag }}'),
         );
     }
+
+    #[Test]
+    public function it_supports_void_params()
+    {
+        (new class extends Tags
+        {
+            protected static $handle = 'my_tag';
+
+            public function index()
+            {
+                if ($this->params->has('the_param')) {
+                    return 'It does!';
+                }
+
+                return 'It does not.';
+            }
+        })::register();
+
+        $template = <<<'BLADE'
+@php
+  use function \Statamic\View\Blade\{void};
+@endphp
+<s:my_tag
+  :the_param="$do_include ? 'Yes' : void()"
+/>
+BLADE;
+
+        $this->assertSame(
+            'It does!',
+            Blade::render($template, ['do_include' => true]),
+        );
+
+        $this->assertSame(
+            'It does not.',
+            Blade::render($template, ['do_include' => false]),
+        );
+    }
 }

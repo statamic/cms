@@ -9,6 +9,7 @@ use Statamic\Contracts\Data\Augmentable;
 use Statamic\Fields\Value;
 use Statamic\Tags\Structure;
 use Statamic\Tags\Tags;
+use Statamic\View\Antlers\Language\Nodes\AntlersNode;
 
 class BladeTagHost
 {
@@ -184,6 +185,21 @@ class BladeTagHost
     public function hasTag(): bool
     {
         return $this->tag != null;
+    }
+
+    public static function filterParams(array $params): array
+    {
+        $values = [];
+
+        foreach ($params as $key => $value) {
+            if (AntlersNode::isVoidValue($value)) {
+                continue;
+            }
+
+            $values[$key] = $value;
+        }
+
+        return $values;
     }
 
     public static function adjustBladeValue(mixed $value): mixed

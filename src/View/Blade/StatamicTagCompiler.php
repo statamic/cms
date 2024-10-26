@@ -39,6 +39,11 @@ class StatamicTagCompiler
         return ltrim($variableName, '$');
     }
 
+    protected function compileParameters(array $params): string
+    {
+        return '\Statamic\View\Blade\BladeTagHost::filterParams('.$this->attributeCompiler->compile($params).')';
+    }
+
     public function prependCompiledContent(string $content): static
     {
         $this->prependCompiledContent = $content;
@@ -149,7 +154,7 @@ class StatamicTagCompiler
                 '$fullTagName' => $component->tagName,
                 '$tagMethod' => "'".$method."'",
                 '$originalMethod' => "'".$originalMethod."'",
-                '$params' => $this->attributeCompiler->compile($params),
+                '$params' => $this->compileParameters($params),
                 '$isPair' => $isPair,
                 '#compiled#' => $nestedContent,
                 '#compiledEncoded#' => base64_encode($nestedContent),
