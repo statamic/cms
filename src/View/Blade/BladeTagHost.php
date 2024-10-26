@@ -97,9 +97,10 @@ class BladeTagHost
         $this->tag->isPair = $this->isPair;
         $this->tag->setContext($this->context);
 
+        $this->tag->setTagRenderer(app(TagRenderer::class));
+
         if ($this->isPair) {
-            $this->tag->setContent($this->content)
-                ->setTagRenderer(app(TagRenderer::class));
+            $this->tag->setContent($this->content);
             $this->tag->isPair = true;
         }
 

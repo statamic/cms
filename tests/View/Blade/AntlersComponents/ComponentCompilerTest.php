@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Antlers;
 use Statamic\Facades\Collection;
 use Statamic\Tags\Concerns\RendersAttributes;
 use Statamic\Tags\Tags;
@@ -300,6 +301,34 @@ BLADE;
         $this->assertSame(
             'Hello! Nothing to see here!',
             Str::squish(Blade::render($template, ['the_array' => [], 'title' => 'Hello!'])),
+        );
+    }
+
+    #[Test]
+    public function it_detects_blade_vs_antlers()
+    {
+        (new class extends Tags
+        {
+            protected static $handle = 'my_tag';
+
+            public function index()
+            {
+                if ($this->isAntlersBladeComponent()) {
+                    return 'Hello, Blade!';
+                }
+
+                return 'Hello, Antlers!';
+            }
+        })::register();
+
+        $this->assertSame(
+            'Hello, Blade!',
+            Blade::render('<s:my_tag />'),
+        );
+
+        $this->assertSame(
+            'Hello, Antlers!',
+            (string) Antlers::parse('{{ my_tag }}'),
         );
     }
 }
