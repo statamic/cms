@@ -115,7 +115,7 @@ class StoreAssetTest extends TestCase
         $this
             ->actingAs($this->userWithPermission())
             ->submit()
-            ->assertStatus(422)
+            ->assertStatus(409)
             ->assertInvalid(['path' => 'A file already exists with this name.']);
     }
 
@@ -130,7 +130,7 @@ class StoreAssetTest extends TestCase
             ->submit([
                 'file' => UploadedFile::fake()->image('tEsT.jpg'),
             ])
-            ->assertStatus(422)
+            ->assertStatus(409)
             ->assertInvalid(['path' => 'A file already exists with this name.']);
     }
 
@@ -184,6 +184,53 @@ class StoreAssetTest extends TestCase
 
         $this->assertCount(2, $files = Storage::disk('test')->files('path/to'));
         $this->assertEquals(['path/to/newname.jpg', 'path/to/test.jpg'], $files);
+    }
+
+    #[Test]
+    public function it_can_upload_to_relative_path()
+    {
+        Storage::disk('test')->assertMissing('path/to/test.jpg');
+        Storage::disk('test')->assertMissing('path/to/sub/folder/test.jpg');
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->submit(['relativePath' => 'sub/folder'])
+            ->assertOk()
+            ->assertJson([
+                'data' => [
+                    'id' => 'test_container::path/to/sub/folder/test.jpg',
+                    'path' => 'path/to/sub/folder/test.jpg',
+                ],
+            ]);
+
+        Storage::disk('test')->assertMissing('path/to/test.jpg');
+        Storage::disk('test')->assertExists('path/to/sub/folder/test.jpg');
+    }
+
+    #[Test]
+    public function flattens_relative_path_unless_container_allows_creating_folders()
+    {
+        Storage::disk('test')->assertMissing('path/to/test.jpg');
+        Storage::disk('test')->assertMissing('path/to/sub/folder/test.jpg');
+
+        $createFolders = $this->container->createFolders();
+        $this->container->createFolders(false)->save();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->submit(['relativePath' => 'sub/folder'])
+            ->assertOk()
+            ->assertJson([
+                'data' => [
+                    'id' => 'test_container::path/to/test.jpg',
+                    'path' => 'path/to/test.jpg',
+                ],
+            ]);
+
+        Storage::disk('test')->assertExists('path/to/test.jpg');
+        Storage::disk('test')->assertMissing('path/to/sub/folder/test.jpg');
+
+        $this->container->createFolders($createFolders)->save();
     }
 
     private function submit($overrides = [])

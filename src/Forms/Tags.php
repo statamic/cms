@@ -108,6 +108,7 @@ class Tags extends BaseTags
         if ($jsDriver) {
             $attrs = array_merge($attrs, $jsDriver->addToFormAttributes($form));
         }
+        $attrs = $this->runHooks('attrs', ['attrs' => $attrs, 'data' => $data])['attrs'];
 
         $params = [];
 
@@ -127,11 +128,13 @@ class Tags extends BaseTags
         }
 
         $html = $this->formOpen($action, $method, $knownParams, $attrs);
+        $html = $this->runHooks('after-open', ['html' => $html, 'data' => $data])['html'];
 
         $html .= $this->formMetaFields($params);
 
         $html .= $this->parse($data);
 
+        $html = $this->runHooks('before-close', ['html' => $html, 'data' => $data])['html'];
         $html .= $this->formClose();
 
         if ($jsDriver) {

@@ -225,13 +225,42 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     public function bootEvents()
     {
-        foreach ($this->listen as $event => $listeners) {
-            foreach ($listeners as $listener) {
-                Event::listen($event, $listener);
-            }
-        }
+        collect($this->autoloadFilesFromFolder('Listeners'))
+            ->mapWithKeys(function ($class) {
+                $reflection = new \ReflectionClass($class);
 
-        foreach ($this->subscribe as $subscriber) {
+                if (
+                    $reflection->hasMethod('handle')
+                    && isset($reflection->getMethod('handle')->getParameters()[0])
+                    && $reflection->getMethod('handle')->getParameters()[0]->hasType()
+                ) {
+                    $event = $reflection->getMethod('handle')->getParameters()[0]->getType()->getName();
+
+                    return [$event => $class];
+                }
+
+                if (
+                    $reflection->hasMethod('__invoke')
+                    && isset($reflection->getMethod('__invoke')->getParameters()[0])
+                    && $reflection->getMethod('__invoke')->getParameters()[0]->hasType()
+                ) {
+                    $event = $reflection->getMethod('__invoke')->getParameters()[0]->getType()->getName();
+
+                    return [$event => $class];
+                }
+
+                return [];
+            })
+            ->filter()
+            ->merge(collect($this->listen)->flatMap(fn ($listeners, $event) => collect($listeners)->mapWithKeys(fn ($listener) => [$event => $listener])))
+            ->unique()
+            ->each(fn ($listener, $event) => Event::listen($event, $listener));
+
+        $subscribers = collect($this->subscribe)
+            ->merge($this->autoloadFilesFromFolder('Subscribers'))
+            ->unique();
+
+        foreach ($subscribers as $subscriber) {
             Event::subscribe($subscriber);
         }
 
@@ -726,7 +755,7 @@ abstract class AddonServiceProvider extends ServiceProvider
         return $this;
     }
 
-    protected function autoloadFilesFromFolder($folder, $requiredClass)
+    protected function autoloadFilesFromFolder($folder, $requiredClass = null)
     {
         try {
             $addon = $this->getAddon();
@@ -757,9 +786,11 @@ abstract class AddonServiceProvider extends ServiceProvider
                 continue;
             }
 
-            if (is_subclass_of($fqcn, $requiredClass)) {
-                $autoloadable[] = $fqcn;
+            if ($requiredClass && ! is_subclass_of($fqcn, $requiredClass)) {
+                return;
             }
+
+            $autoloadable[] = $fqcn;
         }
 
         return $autoloadable;

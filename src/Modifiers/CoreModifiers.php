@@ -2376,7 +2376,12 @@ class CoreModifiers extends Modifier
     public function sort($value, $params)
     {
         $key = Arr::get($params, 0, 'true');
-        $desc = strtolower(Arr::get($params, 1, 'asc')) == 'desc';
+        $order = strtolower(Arr::get($params, 1, 'asc'));
+        $desc = $order == 'desc';
+
+        if (Compare::isQueryBuilder($value)) {
+            return $key === 'random' ? $value->inRandomOrder() : $value->orderBy($key, $order);
+        }
 
         $value = $value instanceof Collection ? $value : collect($value);
 
