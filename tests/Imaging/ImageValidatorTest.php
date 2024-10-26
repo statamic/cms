@@ -20,7 +20,7 @@ class ImageValidatorTest extends TestCase
         ]]);
 
         // We'll test `isValidExtension()` functionality separately below, and just mock here...
-        ImageValidator::shouldReceive('isValidExtension')->andReturnTrue()->times(23);
+        ImageValidator::shouldReceive('isValidExtension')->andReturnTrue()->times(24);
         ImageValidator::makePartial();
 
         $this->assertTrue(ImageValidator::isValidImage('jpg', 'image/jpeg'));

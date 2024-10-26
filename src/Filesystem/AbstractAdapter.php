@@ -100,7 +100,7 @@ abstract class AbstractAdapter implements Filesystem
     {
         return in_array(
             strtolower($this->extension($path)),
-            ['jpg', 'jpeg', 'png', 'gif']
+            ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif']
         );
     }
 
