@@ -226,6 +226,11 @@ class BladeTagHost
         return is_array($this->tagValue);
     }
 
+    public function isEmpty(): bool
+    {
+        return count($this->tagValue) === 0;
+    }
+
     public function canRenderAsString(): bool
     {
         return is_string($this->tagValue) || is_numeric($this->tagValue);

@@ -268,4 +268,38 @@ BLADE;
             Blade::render('<s:my_tag:the_method />'),
         );
     }
+
+    #[Test]
+    public function it_compiles_no_results()
+    {
+        (new class extends Tags
+        {
+            protected static $handle = 'my_tag';
+
+            public function index()
+            {
+                return $this->context['the_array'];
+            }
+        })::register();
+
+        $template = <<<'BLADE'
+<s:my_tag>
+  {{ $value }}
+  
+  <s:no_results>
+     {{ $title }} Nothing to see here!
+  </s:no_results>
+</s:my_tag>
+BLADE;
+
+        $this->assertSame(
+            'a b c',
+            Str::squish(Blade::render($template, ['the_array' => ['a', 'b', 'c']])),
+        );
+
+        $this->assertSame(
+            'Hello! Nothing to see here!',
+            Str::squish(Blade::render($template, ['the_array' => [], 'title' => 'Hello!'])),
+        );
+    }
 }
