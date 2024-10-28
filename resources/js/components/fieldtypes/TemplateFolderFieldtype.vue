@@ -2,10 +2,10 @@
     <div class="template-folder-fieldtype-wrapper">
         <relationship-fieldtype
             :handle="handle"
-            :value="value"
             :meta="relationshipMeta"
             :config="{ type: 'template_folder', mode: 'select', max_items: 1 }"
-            @input="update"
+            :model-value="modelValue"
+            @update:model-value="update"
         />
     </div>
 </template>

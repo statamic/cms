@@ -1,5 +1,4 @@
 <template>
-
     <publish-container
         v-if="blueprint"
         ref="container"
@@ -11,26 +10,25 @@
         :errors="errors"
         @updated="values = $event"
     >
-        <div slot-scope="{ setFieldValue, setFieldMeta }">
-            <header class="mb-6">
-                <breadcrumb :url="url" :title="values.title" />
-                <div class="flex items-center">
-                    <h1 class="flex-1" v-text="__('Configure Taxonomy')" />
-                    <button type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
-                </div>
-            </header>
-            <configure-tabs
-                @updated="setFieldValue"
-                @meta-updated="setFieldMeta"
-                :enable-sidebar="false"/>
-        </div>
-    </publish-container>
+        <template #default="{ setFieldValue, setFieldMeta }">
+            <div>
+                <header class="mb-6">
+                    <breadcrumb :url="url" :title="values.title" />
 
+                    <div class="flex items-center">
+                        <h1 class="flex-1" v-text="__('Configure Taxonomy')" />
+                        <button type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
+                    </div>
+                </header>
+
+                <configure-tabs @updated="setFieldValue" @meta-updated="setFieldMeta" />
+            </div>
+        </template>
+    </publish-container>
 </template>
 
 <script>
 export default {
-
     props: {
         blueprint: Object,
         initialValues: Object,
@@ -47,7 +45,6 @@ export default {
     },
 
     methods: {
-
         clearErrors() {
             this.error = null;
             this.errors = {};
@@ -75,15 +72,13 @@ export default {
                 this.$toast.error(__('Something went wrong'));
             }
         },
-
     },
 
-    created() {
+    mounted() {
         this.$keys.bindGlobal(['command+s'], e => {
             e.preventDefault();
             this.submit();
         });
     },
-
 }
 </script>

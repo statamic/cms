@@ -2,7 +2,7 @@
     <button
         type="button"
         class="toggle-container"
-        :class="{ 'on': value, 'cursor-not-allowed read-only': readOnly }"
+        :class="{ 'on': modelValue, 'cursor-not-allowed read-only': readOnly }"
         @click="toggle"
         :aria-pressed="stateLiteral"
         :aria-label="__('Toggle Button')"
@@ -16,8 +16,10 @@
 <script>
 
 export default {
+    emits: ['update:model-value'],
+
     props: {
-        value: {
+        modelValue: {
             type: Boolean
         },
         readOnly: {
@@ -28,7 +30,7 @@ export default {
 
     computed: {
         stateLiteral() {
-            if (this.value) {
+            if (this.modelValue) {
                 return 'true';
             }
 
@@ -39,7 +41,7 @@ export default {
     methods: {
         toggle() {
             if (! this.readOnly) {
-                this.$emit("input", !this.value)
+                this.$emit('update:model-value', !this.modelValue)
             }
         }
     }

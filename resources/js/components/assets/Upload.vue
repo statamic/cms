@@ -1,7 +1,5 @@
 <template>
-
     <div class="flex items-center my-4" :class="{'text-red-500': status == 'error'}">
-
         <div class="flex items-center flex-1">
             <div class="mx-2 flex items-center">
                 <svg-icon name="micro/warning" class="text-red-500 h-4 w-4" v-if="status === 'error'" />
@@ -15,8 +13,7 @@
             v-if="status !== 'error'"
             class="bg-white flex-1 h-4 mx-2 rounded"
         >
-            <div class="bg-blue h-full rounded"
-                :style="{ width: percent+'%' }" />
+            <div class="bg-blue h-full rounded" :style="{ width: percent+'%' }" />
         </div>
 
         <div class="ml-4 px-2 flex items-center gap-2" v-if="status === 'error'">
@@ -41,15 +38,11 @@
         >
             <text-input autoselect v-model="newFilename" @keydown.enter="confirmNewFilename" />
         </confirmation-modal>
-
     </div>
-
 </template>
-
 
 <script>
 export default {
-
     props: {
         extension: String,
         basename: String,
@@ -58,16 +51,13 @@ export default {
         errorStatus: Number,
         allowSelectingExisting: Boolean,
     },
-
     data() {
         return {
             showNewFilenameModal: false,
             newFilename: '',
         }
     },
-
     computed: {
-
         status() {
             if (this.error) {
                 return 'error';
@@ -77,12 +67,8 @@ export default {
                 return 'uploading';
             }
         }
-
     },
-
-
     methods: {
-
         clear() {
             this.$emit('clear');
         },
@@ -112,8 +98,6 @@ export default {
         selectExisting() {
             this.$emit('existing-selected');
         }
-
     }
-
 }
 </script>

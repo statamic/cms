@@ -1,6 +1,5 @@
 <script>
 export default {
-
     props: {
         config: Object,
         initialValue: {},
@@ -10,23 +9,21 @@ export default {
     data() {
         return {
             meta: this.initialMeta,
-            value: this.initialValue,
+            modelValue: this.initialValue,
             loading: false,
         }
     },
 
     computed: {
-
         isPreloadable() {
             return this.$config.get('preloadableFieldtypes').includes(this.config.type);
         }
-
     },
 
-    render(h) {
-        return this.$scopedSlots.default({
+    render() {
+        return this.$slots.default({
             meta: this.meta,
-            value: this.value,
+            modelValue: this.modelValue,
             loading: this.loading,
             updateMeta: this.updateMeta,
         });
@@ -42,30 +39,27 @@ export default {
     },
 
     watch: {
-
         initialValue(value) {
-            this.value = value;
+            this.modelValue = value;
         },
 
         initialMeta(meta) {
             this.meta = meta;
         }
-
     },
 
     methods: {
-
         load() {
             this.loading = true;
 
             const params = {
                 config: utf8btoa(JSON.stringify(this.config)),
-                value: this.value,
+                value: this.modelValue,
             };
 
             this.$axios.post(cp_url('fields/field-meta'), params).then(response => {
                 this.meta = response.data.meta;
-                this.value = response.data.value;
+                this.modelValue = response.data.value;
                 this.loading = false;
             });
         },
@@ -73,8 +67,6 @@ export default {
         updateMeta(value) {
             this.meta = value;
         }
-
     }
-
 }
 </script>

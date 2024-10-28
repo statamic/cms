@@ -44,6 +44,7 @@
 
 <script>
 import { SortableList, SortableItem, SortableHelpers } from '../sortable/Sortable';
+import Fieldtype from './Fieldtype.vue';
 
 export default {
 
@@ -78,10 +79,11 @@ export default {
         },
 
 
-        value: {
+        modelValue: {
             immediate: true,
             handler(value) {
                 if (JSON.stringify(value) == JSON.stringify(this.sortableToArray(this.data))) return;
+
                 this.data = this.arrayToSortable(value);
             }
         },
@@ -141,7 +143,6 @@ export default {
 
             event.preventDefault();
         },
-
 
         previousItem() {
             this.deleteIfEmpty();

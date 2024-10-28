@@ -1,7 +1,12 @@
 <template>
     <div class="time-fieldtype-container">
         <div class="input-group">
-            <button class="input-group-prepend flex items-center" v-tooltip="__('Set to now')" @click="setToNow" v-if="!isReadOnly">
+            <button
+                class="input-group-prepend flex items-center"
+                v-tooltip="__('Set to now')"
+                @click="setToNow"
+                v-if="!isReadOnly"
+            >
                 <svg-icon name="light/time" class="w-4 h-4" />
             </button>
             <input
@@ -21,9 +26,10 @@
 
 <script>
 import IMask from 'imask';
+import Fieldtype from './Fieldtype.vue';
 
 export default {
-
+    emits: ['focus', 'blur'],
     mixins: [Fieldtype],
 
     props: {
@@ -41,19 +47,19 @@ export default {
 
     data() {
         return {
-            inputValue: this.value,
+            inputValue: this.modelValue,
             mask: null,
         };
     },
 
     watch: {
-        // We use this instead of v-model or :value because the mask library wants to be in control of the value.
+        // We use this instead of v-model or :model-value because the mask library wants to be in control of the value.
         inputValue(value) {
             this.mask.value = value;
         },
         // When the value is changed via the prop (e.g. through collaboration or other JS manually
         // setting the value) we'll want to make sure it's reflected correctly here.
-        value(value) {
+        modelValue(value) {
             this.inputValue = value;
             this.updateActualValue();
         },
@@ -83,7 +89,7 @@ export default {
         this.mask.on('accept', e => this.inputValue = this.mask.value);
     },
 
-    destroyed() {
+    unmounted() {
         this.$events.$off(`container.${this.storeName}.saving`, this.updateActualValue);
         this.mask.destroy();
     },
@@ -95,7 +101,7 @@ export default {
         },
 
         focus() {
-             this.$refs.time.focus();
+            this.$refs.time.focus();
         },
 
         // This will take the value of the input, add appropriate padding, and update the actual fieldtype value.
@@ -104,7 +110,7 @@ export default {
         //      03:20:4 -> 03:20:04
         //      3:2:4   -> 03:02:04
         updateActualValue() {
-            if (! this.inputValue) {
+            if (!this.inputValue) {
                 this.update(null);
                 return;
             }
@@ -116,7 +122,8 @@ export default {
 
             let newValue = parts.join(':');
 
-            if (this.value !== newValue) this.update(newValue);
+            if (this.modelValue !== newValue) this.update(newValue);
+
             this.inputValue = newValue;
         },
 

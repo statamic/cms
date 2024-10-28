@@ -9,7 +9,7 @@
             <div class="flex items-center">
                 <h1 class="flex-1" v-text="__(title)" />
 
-                <dropdown-list class="rtl:ml-2 ltr:mr-2" v-if="!!this.$scopedSlots.twirldown">
+                <dropdown-list class="rtl:ml-2 ltr:mr-2" v-if="!!this.$slots.twirldown">
                     <slot name="twirldown" :actionCompleted="actionCompleted" />
                 </dropdown-list>
 
@@ -35,8 +35,8 @@
                         v-if="sites.length > 1"
                         class="rtl:ml-4 ltr:mr-4"
                         :sites="sites"
-                        :value="site"
-                        @input="site = $event.handle"
+                        :model-value="site"
+                        @update:model-value="site = $event.handle"
                     />
 
                     <button
@@ -45,7 +45,8 @@
                         :disabled="!treeIsDirty"
                         @click="saveTree"
                         v-text="__('Save Changes')"
-                        v-tooltip="deletedEntries.length ? __n('An entry will be deleted|:count entries will be deleted', deletedEntries.length) : null" />
+                        v-tooltip="deletedEntries.length ? __n('An entry will be deleted|:count entries will be deleted', deletedEntries.length) : null"
+                    />
 
                 </template>
 
@@ -54,23 +55,28 @@
                         v-if="sites.length > 1 && reordering && site"
                         class="rtl:ml-4 ltr:mr-4"
                         :sites="sites"
-                        :value="site"
-                        @input="site = $event.handle"
+                        :model-value="site"
+                        @update:model-value="site = $event.handle"
                     />
 
                     <button class="btn rtl:ml-4 ltr:mr-4"
                         v-if="!reordering"
                         @click="reordering = true"
-                        v-text="__('Reorder')" />
+                        v-text="__('Reorder')"
+                    />
 
                     <template v-if="reordering">
-                        <button class="btn rtl:mr-2 ltr:ml-2"
+                        <button
+                            class="btn rtl:mr-2 ltr:ml-2"
                             @click="reordering = false"
-                            v-text="__('Cancel')" />
+                            v-text="__('Cancel')"
+                        />
 
-                        <button class="btn-primary rtl:mr-2 ltr:ml-2"
+                        <button
+                            class="btn-primary rtl:mr-2 ltr:ml-2"
                             @click="$refs.list.saveOrder"
-                            v-text="__('Save Order')" />
+                            v-text="__('Save Order')"
+                        />
                     </template>
                 </template>
 

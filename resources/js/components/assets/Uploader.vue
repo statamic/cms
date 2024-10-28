@@ -1,29 +1,31 @@
 <script>
+import { h } from 'vue';
 import { Upload } from 'upload';
 import uniqid from 'uniqid';
 
 export default {
+    expose: ['browse'],
 
-    render(h) {
+    render() {
         const fileField = h('input', {
             class: { hidden: true },
-            attrs: { type: 'file', multiple: true },
-            ref: 'nativeFileField'
+            type: 'file',
+            multiple: true,
+            ref: 'nativeFileField',
         });
 
-        return h('div', { on: {
-            'dragenter': this.dragenter,
-            'dragover': this.dragover,
-            'dragleave': this.dragleave,
-            'drop': this.drop,
-        }}, [
-            h('div', { class: { 'pointer-events-none': this.dragging }}, [
+        return h('div', {
+            onDragenter: this.dragenter,
+            onDragover: this.dragover,
+            onDragleave: this.dragleave,
+            onDrop: this.drop,
+        }, [
+            h('div', { class: { 'pointer-events-none': this.dragging } }, [
                 fileField,
-                ...this.$scopedSlots.default({ dragging: this.enabled ? this.dragging : false })
+                ...this.$slots.default({ dragging: this.enabled ? this.dragging : false })
             ])
         ]);
     },
-
 
     props: {
         enabled: {
@@ -39,37 +41,29 @@ export default {
         }
     },
 
-
     data() {
         return {
             dragging: false,
             uploads: []
-        }
+        };
     },
-
 
     mounted() {
         this.$refs.nativeFileField.addEventListener('change', this.addNativeFileFieldSelections);
     },
 
-
-    beforeDestroy() {
+    beforeUnmount() {
         this.$refs.nativeFileField.removeEventListener('change', this.addNativeFileFieldSelections);
     },
 
-
     watch: {
-
         uploads(uploads) {
             this.$emit('updated', uploads);
             this.processUploadQueue();
         }
-
     },
 
-
     methods: {
-
         browse() {
             this.$refs.nativeFileField.click();
         },
@@ -103,7 +97,7 @@ export default {
             e.preventDefault();
             this.dragging = false;
 
-            const { files, items } = e.dataTransfer;
+            const {files, items} = e.dataTransfer;
 
             // Handle DataTransferItems if browser supports dropping of folders
             if (items && items.length && items[0].webkitGetAsEntry) {
@@ -130,7 +124,7 @@ export default {
                         this.addFilesFromDirectory(entry, entry.name);
                     }
                 } else if (item.getAsFile) {
-                    if (item.kind === "file" || ! item.kind) {
+                    if (item.kind === "file" || !item.kind) {
                         this.addFile(item.getAsFile());
                     }
                 }
@@ -144,7 +138,7 @@ export default {
                 for (let entry of entries) {
                     if (entry.isFile) {
                         entry.file((file) => {
-                            if (! file.name.startsWith('.')) {
+                            if (!file.name.startsWith('.')) {
                                 file.relativePath = path;
                                 this.addFile(file);
                             }
@@ -160,21 +154,35 @@ export default {
         },
 
         addFile(file, data = {}) {
-            if (! this.enabled) return;
+            if (!this.enabled) return;
 
             const id = uniqid();
             const upload = this.makeUpload(id, file, data);
 
-            this.uploads.push({
-                id,
-                basename: file.name,
-                extension: file.name.split('.').pop(),
-                percent: 0,
-                errorMessage: null,
-                errorStatus: null,
-                instance: upload,
-                retry: (opts) => this.retry(id, opts)
-            });
+            this.uploads = [
+                ...this.uploads,
+                {
+                    id,
+                    basename: file.name,
+                    extension: file.name.split('.').pop(),
+                    percent: 0,
+                    processing: false,
+                    errorMessage: null,
+                    errorStatus: null,
+                    instance: upload,
+                    retry: (opts) => this.retry(id, opts)
+                }
+            ];
+        },
+
+        updateUpload(uploadId, callback) {
+            this.uploads = this.uploads.map(upload => {
+                if (upload.id !== uploadId) {
+                    return upload;
+                }
+
+                return callback(upload)
+            })
         },
 
         findUpload(id) {
@@ -195,7 +203,10 @@ export default {
             });
 
             upload.on('progress', progress => {
-                this.findUpload(id).percent = progress * 100;
+                this.updateUpload(id, (upload) => ({
+                    ...upload,
+                    percent: progress * 100
+                }))
             });
 
             return upload;
@@ -231,10 +242,15 @@ export default {
 
         processUploadQueue() {
             // Make sure we're not grabbing a running or failed upload
-            const upload = this.uploads.find(u => u.instance.state === 'new' && !u.errorMessage);
+            const upload = this.uploads.find(u => !u.processing && !u.errorMessage);
             if (!upload) return;
 
             const id = upload.id;
+
+            this.updateUpload(id, (upload) => ({
+                ...upload,
+                processing: true,
+            }))
 
             upload.instance.upload().then(response => {
                 let json = null;
@@ -253,13 +269,15 @@ export default {
 
         handleUploadSuccess(id, response) {
             this.$emit('upload-complete', response.data, this.uploads);
-            this.uploads.splice(this.findUploadIndex(id), 1);
+
+            this.uploads = this.uploads.filter((upload) => upload.id !== id);
         },
 
         handleUploadError(id, status, response) {
             const upload = this.findUpload(id);
             let msg = response?.message;
-            if (! msg) {
+
+            if (!msg) {
                 if (status === 413) {
                     msg = __('Upload failed. The file is larger than is allowed by your server.');
                 } else {
@@ -270,8 +288,13 @@ export default {
                     msg = Object.values(response.errors)[0][0]; // Get first validation message.
                 }
             }
-            upload.errorMessage = msg;
-            upload.errorStatus = status;
+
+            this.updateUpload(id, (upload) => ({
+                ...upload,
+                errorMessage: msg,
+                errorStatus: status
+            }))
+
             this.$emit('error', upload, this.uploads);
             this.processUploadQueue();
         },
@@ -283,5 +306,5 @@ export default {
         }
     }
 
-}
+};
 </script>

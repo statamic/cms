@@ -1,5 +1,4 @@
 <template>
-
     <publish-container
         v-if="blueprint"
         ref="container"
@@ -11,19 +10,20 @@
         :errors="errors"
         @updated="values = $event"
     >
-        <div slot-scope="{ setFieldValue, setFieldMeta }">
-            <configure-tabs
-                @updated="setFieldValue"
-                @meta-updated="setFieldMeta"
-                :enable-sidebar="false"/>
+        <template #default="{ setFieldValue, setFieldMeta }">
+            <form @submit.prevent="submit">
+                <configure-tabs
+                    @updated="setFieldValue"
+                    @meta-updated="setFieldMeta"
+                />
 
-            <div class="py-4 border-t dark:border-dark-950 flex justify-between">
-                <a :href="url" class="btn" v-text="__('Cancel') "/>
-                <button type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
-            </div>
-        </div>
+                <div class="py-4 border-t dark:border-dark-950 flex justify-between">
+                    <a :href="url" class="btn" v-text="__('Cancel') "/>
+                    <button type="submit" class="btn-primary">{{ __('Save') }}</button>
+                </div>
+            </form>
+        </template>
     </publish-container>
-
 </template>
 
 <script>

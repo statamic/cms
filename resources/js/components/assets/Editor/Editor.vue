@@ -1,9 +1,11 @@
 <template>
 
-    <stack name="asset-editor"
+    <stack
+        name="asset-editor"
         :before-close="shouldClose"
         :full="true"
-        @closed="close">
+        @closed="close"
+    >
 
     <div class="asset-editor flex flex-col relative bg-gray-100 dark:bg-dark-800 h-full rounded" :class="isImage ? 'is-image' : 'is-file'">
 
@@ -131,22 +133,24 @@
                     :errors="errors"
                     @updated="values = { ...$event, focus: values.focus }"
                 >
-                    <div class="w-full sm:p-4 md:pt-px md:w-1/3 md:grow h-1/2 md:h-full overflow-scroll" slot-scope="{ setFieldValue, setFieldMeta }">
+                    <template #default="{ setFieldValue, setFieldMeta }">
+                        <div class="w-full sm:p-4 md:pt-px md:w-1/3 md:grow h-1/2 md:h-full overflow-scroll">
 
-                        <div v-if="saving" class="loading">
-                            <loading-graphic text="Saving" />
+                            <div v-if="saving" class="loading">
+                                <loading-graphic text="Saving" />
+                            </div>
+
+                            <div v-if="error" class="bg-red-500 text-white p-4 shadow mb-4" v-text="error" />
+
+                            <publish-sections
+                                :sections="fieldset.tabs[0].sections"
+                                :read-only="readOnly"
+                                @updated="setFieldValue"
+                                @meta-updated="setFieldMeta"
+                            />
+
                         </div>
-
-                        <div v-if="error" class="bg-red-500 text-white p-4 shadow mb-4" v-text="error" />
-
-                        <publish-sections
-                            :sections="fieldset.tabs[0].sections"
-                            :read-only="readOnly"
-                            @updated="setFieldValue"
-                            @meta-updated="setFieldMeta"
-                        />
-
-                    </div>
+                    </template>
                 </publish-container>
             </div>
 
@@ -305,7 +309,7 @@ export default {
     },
 
     mounted() {
-        this.$modal.show('asset-editor');
+        this.$modal.open('asset-editor');
         this.load();
     },
 
@@ -401,7 +405,7 @@ export default {
         },
 
         close() {
-            this.$modal.hide('asset-editor');
+            this.$modal.close('asset-editor');
             this.$emit('closed');
         },
 

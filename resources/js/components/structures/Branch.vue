@@ -58,21 +58,19 @@
 </template>
 
 <script>
-import * as th from 'tree-helper';
-
 export default {
 
     props: {
         page: Object,
         depth: Number,
         root: Boolean,
-        vm: Object,
         firstPageIsRoot: Boolean,
         isOpen: Boolean,
         hasChildren: Boolean,
         showSlugs: Boolean,
         showBlueprint: Boolean,
-        editable: Boolean,
+        editable: { type: Boolean, default: true },
+        stat: Object,
     },
 
     data() {
@@ -88,10 +86,18 @@ export default {
         },
 
         isRoot() {
+            // @todo pass root prop at other places where <tree-branch> is being used.
+            // then we can remove the other props.
+            if (this.root) {
+                return true
+            }
+
             if (!this.firstPageIsRoot) return false;
             if (!this.isTopLevel) return false;
 
-            const firstNodeId = this.vm.data.parent.children[0].id;
+            const firstNodeId = '' // @todo(jelleroorda): fix.
+            // const firstNodeId = this.vm.data.parent.children[0].id;
+
             return this.page.id === firstNodeId;
         },
 
@@ -133,6 +139,9 @@ export default {
         },
 
         remove() {
+            // @todo(jelleroorda): fix me.
+            return;
+
             const store = this.page._vm.store;
             store.deleteNode(this.page);
             this.$emit('removed', store);

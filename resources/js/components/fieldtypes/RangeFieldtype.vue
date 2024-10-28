@@ -28,7 +28,7 @@ export default {
 
     mixins: [Fieldtype],
 
-     data() {
+    data() {
         return {
             val: this.getValue(),
         }
@@ -50,8 +50,8 @@ export default {
         },
 
         getValue() {
-            if (typeof(this.value) === 'number') {
-                return this.value;
+            if (typeof(this.modelValue) === 'number') {
+                return this.modelValue;
             }
 
             if (typeof(this.config.default) === 'number') {
@@ -64,7 +64,7 @@ export default {
 
 
     watch: {
-        value(value) {
+        modelValue(value) {
             this.val = value;
         },
         val(value) {

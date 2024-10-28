@@ -1,7 +1,5 @@
 <template>
-
     <div class="w-full">
-
         <div class="form-group publish-field select-fieldtype field-w-full">
             <label class="publish-field-label">{{ __('Conditions') }}</label>
             <div class="help-block -mt-2"><p>{{ __('messages.field_conditions_instructions') }}</p></div>
@@ -10,19 +8,22 @@
                 <select-input
                     v-model="when"
                     :options="whenOptions"
-                    :placeholder="false" />
+                    :placeholder="false"
+                />
 
                 <select-input
                     v-if="hasConditions"
                     v-model="type"
                     :options="typeOptions"
                     :placeholder="false"
-                    class="rtl:mr-4 ltr:ml-4" />
+                    class="rtl:mr-4 ltr:ml-4"
+                />
 
                 <text-input
                     v-if="hasConditions && isCustom"
                     v-model="customMethod"
-                    class="rtl:mr-4 ltr:ml-4 flex-1" />
+                    class="rtl:mr-4 ltr:ml-4 flex-1"
+                />
             </div>
 
             <condition
@@ -42,9 +43,9 @@
                 <button
                     v-text="__('Add Condition')"
                     @click="add"
-                    class="btn-default" />
+                    class="btn-default"
+                />
             </div>
-
         </div>
 
         <div class="form-group publish-field select-fieldtype field-w-full">
@@ -54,9 +55,7 @@
             </div>
             <toggle-input v-model="alwaysSave" />
         </div>
-
     </div>
-
 </template>
 
 
@@ -69,7 +68,6 @@ import Condition from './Condition.vue';
 import { __ } from '../../bootstrap/globals';
 
 export default {
-
     mixins: [HasInputOptions],
 
     components: { Condition },
@@ -90,11 +88,10 @@ export default {
             customMethod: null,
             conditions: [],
             alwaysSave: false,
-        }
+        };
     },
 
     computed: {
-
         whenOptions() {
             return this.normalizeInputOptions({
                 always: __('Always show'),
@@ -116,7 +113,7 @@ export default {
         },
 
         isStandard() {
-            return this.hasConditions && ! this.isCustom;
+            return this.hasConditions && !this.isCustom;
         },
 
         isCustom() {
@@ -128,7 +125,7 @@ export default {
             let key = this.type === 'any' ? `${this.when}_any` : this.when;
             let saveableConditions = this.prepareSaveableConditions(this.conditions);
 
-            if (this.isStandard && ! _.isEmpty(saveableConditions)) {
+            if (this.isStandard && !_.isEmpty(saveableConditions)) {
                 conditions[key] = saveableConditions;
             } else if (this.isCustom && this.customMethod) {
                 conditions[key] = this.customMethod;
@@ -136,11 +133,9 @@ export default {
 
             return conditions;
         }
-
     },
 
     watch: {
-
         saveableConditions: {
             deep: true,
             handler(conditions) {
@@ -151,7 +146,6 @@ export default {
         alwaysSave(alwaysSave) {
             this.$emit('updated-always-save', alwaysSave);
         },
-
     },
 
     created() {
@@ -161,7 +155,6 @@ export default {
     },
 
     methods: {
-
         add() {
             this.conditions.push({
                 _id: uniqid(),
@@ -187,7 +180,7 @@ export default {
 
             let conditions = this.config[key];
 
-            if (! conditions) {
+            if (!conditions) {
                 return;
             }
 
@@ -222,7 +215,7 @@ export default {
 
         prepareSaveableConditions(conditions) {
             conditions = _.reject(conditions, condition => {
-                return ! condition.field || ! condition.value;
+                return !condition.field || !condition.value;
             });
 
             return (new Converter).toBlueprint(conditions);
@@ -240,7 +233,6 @@ export default {
 
             return operator;
         },
-
     }
-}
+};
 </script>

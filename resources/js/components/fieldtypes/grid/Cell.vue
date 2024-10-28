@@ -5,13 +5,13 @@
             <component
                 :is="fieldtypeComponent"
                 :config="field"
-                :value="value"
                 :meta="meta"
                 :handle="field.handle"
                 :name-prefix="namePrefix"
                 :field-path-prefix="fieldPath"
                 :read-only="grid.isReadOnly"
-                @input="$emit('updated', $event)"
+                :model-value="modelValue"
+                @update:model-value="$emit('updated', $event)"
                 @meta-updated="$emit('meta-updated', $event)"
                 @focus="$emit('focus')"
                 @blur="$emit('blur')"
@@ -33,7 +33,7 @@ export default {
             type: Object,
             required: true
         },
-        value: {
+        modelValue: {
             required: true
         },
         meta: {

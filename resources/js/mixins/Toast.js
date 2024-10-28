@@ -1,16 +1,3 @@
-import Toasted from 'vue-toasted';
-
-Vue.use(Toasted, {
-    position: 'bottom-left',
-    duration: 3500,
-    theme: 'statamic',
-    action: {
-        text: '×',
-        onClick: (e, toastObject) => {
-            toastObject.goAway(0);
-        }
-    }
-})
 
 export default {
 
@@ -61,7 +48,7 @@ export default {
                     return el;
                 },
             ...opts};
-            this.$toasted.show(message, this.normalizeToastOptions(opts))
+            // this.$toasted.show(message, this.normalizeToastOptions(opts))
         },
 
         setFlashSuccess(message, opts) {
@@ -72,7 +59,7 @@ export default {
                     return el;
                 },
             ...opts};
-            this.$toasted.success(message, this.normalizeToastOptions(opts))
+            // this.$toasted.success(message, this.normalizeToastOptions(opts))
         },
 
         setFlashError(message, opts) {
@@ -84,7 +71,7 @@ export default {
                 },
                 ...opts
             };
-            this.$toasted.error(message, this.normalizeToastOptions(opts))
+            // this.$toasted.error(message, this.normalizeToastOptions(opts))
         },
 
         normalizeToastOptions(opts) {
