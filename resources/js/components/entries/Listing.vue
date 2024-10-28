@@ -140,6 +140,7 @@ export default {
             currentSite: this.site,
             initialSite: this.site,
             pushQuery: true,
+            previousFilters: null,
         }
     },
 
@@ -214,6 +215,7 @@ export default {
         },
 
         reorder() {
+            this.previousFilters = this.activeFilters;
             this.filtersReset();
 
             // When reordering, we *need* a site, since mixing them up would be awkward.
@@ -227,6 +229,8 @@ export default {
         },
 
         cancelReordering() {
+            this.resetToPreviousFilters();
+
             this.request();
         },
 
@@ -260,6 +264,14 @@ export default {
                     this.$toast.error(__('Something went wrong'));
                 });
         },
+
+        resetToPreviousFilters() {
+            this.filtersReset();
+
+            if (this.previousFilters) this.filtersChanged(this.previousFilters);
+
+            this.previousFilters = null;
+        }
     }
 
 }

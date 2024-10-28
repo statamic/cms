@@ -1,0 +1,103 @@
+<?php
+
+return [
+
+    'super' => 'Người dùng Super',
+    'super_desc' => 'Quản trị viên Super có toàn quyền kiểm soát và truy cập vào mọi thứ trong bảng điều khiển. Hãy cấp quyền này một cách cẩn thận.',
+
+    'group_cp' => 'Bảng điều khiển',
+    'access_cp' => 'Truy cập vào Bảng điều khiển',
+    'access_cp_desc' => 'Cho phép truy cập vào bảng điều khiển, nhưng không đảm bảo có thể thực hiện bất kỳ hành động nào bên trong.',
+    'configure_sites' => 'Cấu hình Các Trang',
+    'configure_sites_desc' => 'Có quyền cấu hình các trang khi chức năng nhiều trang (multi-site) được bật.',
+    'configure_fields' => 'Cấu hình Trường',
+    'configure_fields_desc' => 'Có quyền chỉnh sửa bản thiết kế, bộ trường, và các trường của chúng.',
+    'configure_addons' => 'Cấu hình Addon',
+    'configure_addons_desc' => 'Có quyền truy cập vào khu vực addon để cài đặt và gỡ bỏ các addon.',
+    'manage_preferences' => 'Quản lý Tuỳ chọn',
+    'manage_preferences_desc' => 'Có quyền tuỳ chỉnh các tuỳ chọn toàn cầu và theo vai trò.',
+
+    'group_sites' => 'Trang',
+    'access_{site}_site' => 'Truy cập trang :site',
+
+    'group_collections' => 'Bộ sưu tập',
+    'configure_collections' => 'Cấu hình Bộ sưu tập',
+    'configure_collections_desc' => 'Cấp quyền truy cập vào tất cả các quyền liên quan đến bộ sưu tập',
+    'view_{collection}_entries' => 'Xem mục trong :collection',
+    'edit_{collection}_entries' => 'Chỉnh sửa mục',
+    'create_{collection}_entries' => 'Tạo mục mới',
+    'delete_{collection}_entries' => 'Xóa mục',
+    'publish_{collection}_entries' => 'Quản lý trạng thái xuất bản',
+    'publish_{collection}_entries_desc' => 'Có quyền thay đổi từ nháp sang đã xuất bản và ngược lại',
+    'reorder_{collection}_entries' => 'Sắp xếp lại các mục',
+    'reorder_{collection}_entries_desc' => 'Cho phép sắp xếp lại bằng cách kéo và thả',
+    'edit_other_authors_{collection}_entries' => 'Chỉnh sửa mục của tác giả khác',
+    'publish_other_authors_{collection}_entries' => 'Quản lý trạng thái xuất bản của mục của tác giả khác',
+    'delete_other_authors_{collection}_entries' => 'Xóa mục của tác giả khác',
+
+    'group_taxonomies' => 'Phân loại',
+    'configure_taxonomies' => 'Cấu hình Phân loại',
+    'configure_taxonomies_desc' => 'Cấp quyền truy cập vào tất cả các quyền liên quan đến phân loại',
+    'view_{taxonomy}_terms' => 'Xem các thuật ngữ trong :taxonomy',
+    'edit_{taxonomy}_terms' => 'Chỉnh sửa thuật ngữ',
+    'create_{taxonomy}_terms' => 'Tạo thuật ngữ mới',
+    'delete_{taxonomy}_terms' => 'Xóa thuật ngữ',
+    'publish_{taxonomy}_terms' => 'Quản lý trạng thái xuất bản',
+    'reorder_{taxonomy}_terms' => 'Sắp xếp lại thuật ngữ',
+
+    'group_navigation' => 'Điều hướng',
+    'configure_navs' => 'Cấu hình Điều hướng',
+    'configure_navs_desc' => 'Cấp quyền truy cập vào tất cả các quyền liên quan đến điều hướng',
+    'view_{nav}_nav' => 'Xem điều hướng :nav',
+    'edit_{nav}_nav' => 'Chỉnh sửa điều hướng',
+
+    'group_globals' => 'Biến toàn cục',
+    'configure_globals' => 'Cấu hình Biến toàn cục',
+    'configure_globals_desc' => 'Cấp quyền truy cập vào tất cả các quyền liên quan đến biến toàn cục',
+    'edit_{global}_globals' => 'Chỉnh sửa :global toàn cục',
+
+    'group_assets' => 'Tài nguyên',
+    'configure_asset_containers' => 'Cấu hình Kho tài nguyên',
+    'configure_asset_containers_desc' => 'Cấp quyền truy cập vào tất cả các quyền liên quan đến tài nguyên',
+    'view_{container}_assets' => 'Xem tài nguyên trong :container',
+    'upload_{container}_assets' => 'Tải lên tài nguyên mới',
+    'edit_{container}_assets' => 'Chỉnh sửa tài nguyên',
+    'move_{container}_assets' => 'Di chuyển tài nguyên',
+    'rename_{container}_assets' => 'Đổi tên tài nguyên',
+    'delete_{container}_assets' => 'Xóa tài nguyên',
+
+    'group_forms' => 'Biểu mẫu',
+    'configure_forms' => 'Cấu hình Biểu mẫu',
+    'configure_forms_desc' => 'Cấp quyền truy cập vào tất cả các quyền liên quan đến biểu mẫu',
+    'configure_form_fields' => 'Cấu hình Trường Biểu mẫu',
+    'configure_form_fields_desc' => 'Có quyền chỉnh sửa bản thiết kế biểu mẫu, bộ trường và các trường của chúng.',
+    'view_{form}_form_submissions' => 'Xem gửi biểu mẫu :form',
+    'delete_{form}_form_submissions' => 'Xóa gửi biểu mẫu :form',
+
+    'group_users' => 'Người dùng',
+    'view_users' => 'Xem người dùng',
+    'edit_users' => 'Chỉnh sửa người dùng',
+    'create_users' => 'Tạo người dùng',
+    'delete_users' => 'Xóa người dùng',
+    'change_passwords' => 'Đổi mật khẩu',
+    'edit_user_groups' => 'Chỉnh sửa nhóm người dùng',
+    'edit_roles' => 'Chỉnh sửa vai trò',
+    'assign_user_groups' => 'Gán nhóm cho người dùng',
+    'assign_roles' => 'Gán vai trò cho người dùng',
+    'impersonate_users' => 'Giả mạo người dùng',
+
+    'group_updates' => 'Cập nhật',
+    'view_updates' => 'Xem cập nhật',
+
+    'group_utilities' => 'Tiện ích',
+    'access_utility' => ':title',
+    'access_utility_desc' => 'Cấp quyền truy cập vào tiện ích :title',
+
+    'group_misc' => 'Khác',
+    'resolve_duplicate_ids' => 'Giải quyết ID trùng lặp',
+    'resolve_duplicate_ids_desc' => 'Cấp quyền xem và giải quyết các ID trùng lặp.',
+
+    'view_graphql' => 'Xem GraphQL',
+    'view_graphql_desc' => 'Cấp quyền truy cập vào trình xem GraphQL',
+
+];

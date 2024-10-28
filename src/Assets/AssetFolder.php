@@ -97,6 +97,17 @@ class AssetFolder implements Arrayable, Contract
         return $date;
     }
 
+    public function size()
+    {
+        $size = 0;
+
+        foreach ($this->assets() as $asset) {
+            $size += $asset->size();
+        }
+
+        return $size;
+    }
+
     public function save()
     {
         $this->disk()->put($this->path().'/.gitkeep', '');
@@ -133,7 +144,7 @@ class AssetFolder implements Arrayable, Contract
         });
         $cache->save();
 
-        AssetFolderDeleted::dispatch($this);
+        AssetFolderDeleted::dispatch(clone $this);
 
         return $this;
     }
@@ -182,6 +193,8 @@ class AssetFolder implements Arrayable, Contract
         $this->container()->assetFolders($oldPath)->each->move($newPath);
         $this->container()->assets($oldPath)->each->move($newPath);
         $this->delete();
+
+        $this->path($newPath);
 
         return $folder;
     }

@@ -18,8 +18,12 @@ use Statamic\Tags\Tags as BaseTags;
 class Tags extends BaseTags
 {
     use Concerns\GetsFormSession,
+        Concerns\GetsQueryResults,
         Concerns\GetsRedirects,
         Concerns\OutputsItems,
+        Concerns\QueriesConditions,
+        Concerns\QueriesOrderBys,
+        Concerns\QueriesScopes,
         Concerns\RendersForms;
 
     const HANDLE_PARAM = ['handle', 'is', 'in', 'form', 'formset'];
@@ -98,6 +102,7 @@ class Tags extends BaseTags
         if ($jsDriver) {
             $attrs = array_merge($attrs, $jsDriver->addToFormAttributes($form));
         }
+        $attrs = $this->runHooks('attrs', ['attrs' => $attrs, 'data' => $data])['attrs'];
 
         $params = [];
 
@@ -117,11 +122,13 @@ class Tags extends BaseTags
         }
 
         $html = $this->formOpen($action, $method, $knownParams, $attrs);
+        $html = $this->runHooks('after-open', ['html' => $html, 'data' => $data])['html'];
 
         $html .= $this->formMetaFields($params);
 
         $html .= $this->parse($data);
 
+        $html = $this->runHooks('before-close', ['html' => $html, 'data' => $data])['html'];
         $html .= $this->formClose();
 
         if ($jsDriver) {
@@ -184,9 +191,13 @@ class Tags extends BaseTags
      */
     public function submissions()
     {
-        $submissions = $this->form()->submissions();
+        $query = $this->form()->querySubmissions();
 
-        return $this->output($submissions);
+        $this->queryConditions($query);
+        $this->queryScopes($query);
+        $this->queryOrderBys($query);
+
+        return $this->output($this->results($query));
     }
 
     /**

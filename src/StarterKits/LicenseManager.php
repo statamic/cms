@@ -6,6 +6,8 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use Statamic\Console\NullConsole;
 
+use function Laravel\Prompts\text;
+
 final class LicenseManager
 {
     const OUTPOST_ENDPOINT = 'https://outpost.statamic.com/v3/starter-kits/';
@@ -13,25 +15,27 @@ final class LicenseManager
     private $package;
     private $licenseKey;
     private $console;
+    private $isInteractive;
     private $details;
     private $valid = false;
 
     /**
      * Instantiate starter kit license manager.
      */
-    public function __construct(string $package, ?string $licenseKey = null, ?Command $console = null)
+    public function __construct(string $package, ?string $licenseKey = null, ?Command $console = null, bool $isInteractive = false)
     {
         $this->package = $package;
         $this->licenseKey = $licenseKey ?? config('statamic.system.license_key');
         $this->console = $console ?? new NullConsole;
+        $this->isInteractive = $isInteractive;
     }
 
     /**
      * Instantiate starter kit license manager.
      */
-    public static function validate(string $package, ?string $licenceKey = null, ?Command $console = null): self
+    public static function validate(string $package, ?string $licenceKey = null, ?Command $console = null, bool $isInteractive = false): self
     {
-        return (new self($package, $licenceKey, $console))->performValidation();
+        return (new self($package, $licenceKey, $console, $isInteractive))->performValidation();
     }
 
     /**
@@ -74,10 +78,18 @@ final class LicenseManager
         $marketplaceUrl = "https://statamic.com/starter-kits/{$sellerSlug}/{$kitSlug}";
 
         if (! $this->licenseKey) {
-            return $this
-                ->error("License required for [{$this->package}]!")
+            if (! $this->isInteractive) {
+                return $this
+                    ->error("License required for [{$this->package}]!")
+                    ->comment('This is a paid starter kit. If you haven\'t already, you may purchase a license at:')
+                    ->comment($marketplaceUrl);
+            }
+
+            $this
                 ->comment('This is a paid starter kit. If you haven\'t already, you may purchase a license at:')
                 ->comment($marketplaceUrl);
+
+            $this->licenseKey = text('Please enter your license key', required: true);
         }
 
         if ($this->outpostValidatesLicense()) {
