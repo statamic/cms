@@ -1,5 +1,20 @@
 # Release Notes
 
+## 5.35.0 (2024-10-28)
+
+### What's new
+- Drag and drop folders into the asset browser [#10583](https://github.com/statamic/cms/issues/10583) by @daun
+- Include Algolia highlights and snippets [#11008](https://github.com/statamic/cms/issues/11008) by @jacksleight
+- Introduce additional form tag hooks [#11010](https://github.com/statamic/cms/issues/11010) by @leewillis77
+- Add `allowed_extensions` option to Files fieldtype [#10998](https://github.com/statamic/cms/issues/10998) by @duncanmcclean
+
+### What's fixed
+- Support unions in addon event listener discovery [#11015](https://github.com/statamic/cms/issues/11015) by @jasonvarga
+- Support auto-registering of listeners using __invoke() not handle [#11009](https://github.com/statamic/cms/issues/11009) by @leewillis77
+- French translations [#10995](https://github.com/statamic/cms/issues/10995) by @ebeauchamps
+
+
+
 ## 5.34.0 (2024-10-24)
 
 ### What's new
