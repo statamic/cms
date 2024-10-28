@@ -78,7 +78,7 @@ class FluentTag implements \ArrayAccess, \IteratorAggregate
      * @param  string  $content
      * @return $this
      */
-    public function content($content)
+    public function withContent($content)
     {
         $this->content = $content;
 

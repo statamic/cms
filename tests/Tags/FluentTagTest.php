@@ -103,7 +103,7 @@ class FluentTagTest extends TestCase
             ->once()
             ->andReturn($tag);
 
-        $fluentTag = FluentTag::make('foo')->content('the content');
+        $fluentTag = FluentTag::make('foo')->withContent('the content');
 
         $this->assertInstanceOf(FluentTag::class, $fluentTag);
 
