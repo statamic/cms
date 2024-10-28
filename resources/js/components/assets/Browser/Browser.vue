@@ -76,7 +76,9 @@
                                     <uploads
                                         v-if="uploads.length"
                                         :uploads="uploads"
-                                        class="-mt-px"
+                                        :allow-selecting-existing="allowSelectingExistingUpload"
+                                        :class="{ '-mt-px': !hasSelections, 'mt-10': hasSelections }"
+                                        @existing-selected="existingUploadSelected"
                                     />
 
                                     <div class="overflow-x-auto overflow-y-hidden">
@@ -318,6 +320,7 @@ export default {
         initialEditingAssetId: String,
         autoselectUploads: Boolean,
         autofocusSearch: Boolean,
+        allowSelectingExistingUpload: Boolean
     },
 
     data() {
@@ -435,8 +438,11 @@ export default {
     },
 
     watch: {
-        selectedPath(path) {
-            this.path = path
+        selectedPath(selectedPath) {
+            // The selected path might change from outside due to a popstate navigation
+            if (!selectedPath.endsWith('/edit')) {
+                this.path = selectedPath;
+            }
         },
 
         initialContainer() {
@@ -587,6 +593,14 @@ export default {
         uploadError(upload, uploads) {
             this.uploads = uploads;
             this.$toast.error(upload.errorMessage);
+        },
+
+        existingUploadSelected(upload) {
+            const path = `${this.folder.path}/${upload.basename}`.replace(/^\/+/, '');
+            const id = `${this.container.id}::${path}`;
+
+            this.selectedAssets.push(id);
+            this.$emit('selections-updated', this.selectedAssets);
         },
 
         openFileBrowser() {

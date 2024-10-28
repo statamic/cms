@@ -32,6 +32,10 @@ export default {
             type: Object,
             default: () => ({})
         },
+        extraValues: {
+            type: Object,
+            default: () => {}
+        },
         meta: {
             type: Object,
             default: () => ({})
@@ -96,6 +100,7 @@ export default {
             const initial = {
                 blueprint: _.clone(this.blueprint),
                 values: _.clone(this.values),
+                extraValues: _.clone(this.extraValues),
                 meta: _.clone(this.meta),
                 localizedFields: _.clone(this.localizedFields),
                 site: this.site,
@@ -115,6 +120,7 @@ export default {
                 state: {
                     blueprint: initial.blueprint,
                     values: initial.values,
+                    extraValues: initial.extraValues,
                     hiddenFields: {},
                     jsonSubmittingFields: [],
                     revealerFields: [],

@@ -128,6 +128,7 @@
                     :name="publishContainer"
                     :blueprint="fieldset"
                     :values="values"
+                    :extra-values="extraValues"
                     :meta="meta"
                     :errors="errors"
                     @updated="values = { ...$event, focus: values.focus }"
@@ -208,6 +209,7 @@ import FocalPointEditor from './FocalPointEditor.vue';
 import PdfViewer from './PdfViewer.vue';
 import PublishFields from '../../publish/Fields.vue';
 import HasHiddenFields from '../../publish/HasHiddenFields';
+import pick from 'underscore/modules/pick';
 
 export default {
 
@@ -249,6 +251,7 @@ export default {
             asset: null,
             publishContainer: 'asset',
             values: {},
+            extraValues: {},
             meta: {},
             fields: null,
             fieldset: null,
@@ -350,6 +353,8 @@ export default {
                     .map(section => section.fields)
                     .flatten(true)
                     .value();
+
+                this.extraValues = pick(this.asset, ['filename', 'basename', 'extension', 'path', 'mimeType', 'width', 'height', 'duration']);
 
                 this.loading = false;
             });

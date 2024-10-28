@@ -711,6 +711,19 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Filters out empty values from an array or collection.
+     *
+     * @param  array  $value
+     * @return array
+     */
+    public function filterEmpty($value)
+    {
+        return collect($value)
+            ->filter()
+            ->when(is_array($value), fn ($collection) => $collection->all());
+    }
+
+    /**
      * Returns the first $params[0] characters of a string, or the first element of an array.
      *
      * @return string
@@ -2363,7 +2376,12 @@ class CoreModifiers extends Modifier
     public function sort($value, $params)
     {
         $key = Arr::get($params, 0, 'true');
-        $desc = strtolower(Arr::get($params, 1, 'asc')) == 'desc';
+        $order = strtolower(Arr::get($params, 1, 'asc'));
+        $desc = $order == 'desc';
+
+        if (Compare::isQueryBuilder($value)) {
+            return $key === 'random' ? $value->inRandomOrder() : $value->orderBy($key, $order);
+        }
 
         $value = $value instanceof Collection ? $value : collect($value);
 

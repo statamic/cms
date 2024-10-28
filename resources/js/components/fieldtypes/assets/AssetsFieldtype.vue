@@ -65,6 +65,8 @@
                     <uploads
                         v-if="uploads.length"
                         :uploads="uploads"
+                        allow-selecting-existing
+                        @existing-selected="uploadSelected"
                     />
 
                     <template v-if="expanded">
@@ -251,7 +253,9 @@ export default {
                 folder = folder + '/' + (this.lockedDynamicFolder || this.dynamicFolder);
             }
 
-            return folder.replace(/^\/+/, '');
+            folder = folder.replace(/^\/+/, '');
+
+            return folder === '' ? '/' : folder;
         },
 
         configuredFolder() {
@@ -574,6 +578,21 @@ export default {
             const newFolder = response[0].path;
             this.update(this.value.map(id => id.replace(`::${this.folder}`, `::${newFolder}`)));
             this.lockedDynamicFolder = this.configuredFolder ? newFolder.replace(`${this.configuredFolder}/`, '') : newFolder;
+        },
+
+        uploadSelected(upload) {
+            const path = `${this.folder}/${upload.basename}`.replace(/^\/+/, '');
+            const id = `${this.container}::${path}`;
+
+            this.uploads.splice(this.uploads.indexOf(upload), 1);
+
+            if (this.value.includes(id)) return;
+
+            if (this.maxFiles === 1) {
+                this.loadAssets([id]);
+            } else {
+                this.loadAssets([...this.value, id]);
+            }
         }
 
     },

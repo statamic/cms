@@ -1,5 +1,77 @@
 # Release Notes
 
+## 5.35.0 (2024-10-28)
+
+### What's new
+- Drag and drop folders into the asset browser [#10583](https://github.com/statamic/cms/issues/10583) by @daun
+- Include Algolia highlights and snippets [#11008](https://github.com/statamic/cms/issues/11008) by @jacksleight
+- Introduce additional form tag hooks [#11010](https://github.com/statamic/cms/issues/11010) by @leewillis77
+- Add `allowed_extensions` option to Files fieldtype [#10998](https://github.com/statamic/cms/issues/10998) by @duncanmcclean
+
+### What's fixed
+- Support unions in addon event listener discovery [#11015](https://github.com/statamic/cms/issues/11015) by @jasonvarga
+- Support auto-registering of listeners using __invoke() not handle [#11009](https://github.com/statamic/cms/issues/11009) by @leewillis77
+- French translations [#10995](https://github.com/statamic/cms/issues/10995) by @ebeauchamps
+
+
+
+## 5.34.0 (2024-10-24)
+
+### What's new
+- Add `password` option to `make:user` command [#11005](https://github.com/statamic/cms/issues/11005) by @joshuablum
+
+### What's fixed
+- Fix issues with the Files fieldtype in Dark Mode [#10999](https://github.com/statamic/cms/issues/10999) by @duncanmcclean
+
+
+
+## 5.33.1 (2024-10-22)
+
+### What's fixed
+- Avoid error when marketplace client returns null [#10996](https://github.com/statamic/cms/issues/10996) by @jasonvarga
+
+
+
+## 5.33.0 (2024-10-22)
+
+### What's new
+- Improve handling of scheduled entries [#10966](https://github.com/statamic/cms/issues/10966) by @jasonvarga
+- Field conditions can be based on other data. Assets can use extension, dimensions, etc. [#10588](https://github.com/statamic/cms/issues/10588) by @daun
+- Make email config data accessible in email templates [#10949](https://github.com/statamic/cms/issues/10949) by @Jade-GG
+- Autoload event listeners and subscribers [#10911](https://github.com/statamic/cms/issues/10911) by @duncanmcclean
+- Make sort modifier work with query builders [#10924](https://github.com/statamic/cms/issues/10924) by @aerni
+- Allow sorting folders in asset browser [#10935](https://github.com/statamic/cms/issues/10935) by @duncanmcclean
+- Vietnamese translations [#10989](https://github.com/statamic/cms/issues/10989) by @diepdo1810
+
+### What's fixed
+- Optimize display of long titles in edit forms [#10988](https://github.com/statamic/cms/issues/10988) by @daun
+- Improve the dynamic upload folder help text [#10903](https://github.com/statamic/cms/issues/10903) by @jackmcdade
+- Fix z-index issue when configuring Replicator fields [#10937](https://github.com/statamic/cms/issues/10937) by @duncanmcclean
+- Avoid showing asset upload fixes when inappropriate [#10986](https://github.com/statamic/cms/issues/10986) by @jasonvarga
+- Translate dictionaries [#10982](https://github.com/statamic/cms/issues/10982) by @andjsch
+- Duplicate form data when duplicating the form [#10985](https://github.com/statamic/cms/issues/10985) by @ryanmitchell
+- Prevent protected pages being cached [#10929](https://github.com/statamic/cms/issues/10929) by @duncanmcclean
+- Remove mention of installing addons via CP from addon stub [#10975](https://github.com/statamic/cms/issues/10975) by @duncanmcclean
+- French translations [#10977](https://github.com/statamic/cms/issues/10977) by @ebeauchamps
+
+
+
+## 5.32.0 (2024-10-18)
+
+### What's new
+- Improve duplicate asset upload handling [#10959](https://github.com/statamic/cms/issues/10959) by @jasonvarga
+- Add `parent` keyword to field conditions [#9385](https://github.com/statamic/cms/issues/9385) by @florianbrinkmann
+- Add `filter_empty` modifier [#10962](https://github.com/statamic/cms/issues/10962) by @marcorieser
+- Add `invalid_token` variable for password-protected page [#10956](https://github.com/statamic/cms/issues/10956) by @aerni
+
+### What's fixed
+- Fix error when editing Bard field with set and no fields [#10971](https://github.com/statamic/cms/issues/10971) by @duncanmcclean
+- Fix issue where editing an asset loads the `/edit` url in the browser [#10964](https://github.com/statamic/cms/issues/10964) by @daun
+- Remove deprecated options from PHPUnit stub [#10963](https://github.com/statamic/cms/issues/10963) by @duncanmcclean
+- German translations [#10968](https://github.com/statamic/cms/issues/10968) by @helloDanuk
+
+
+
 ## 5.31.0 (2024-10-14)
 
 ### What's new

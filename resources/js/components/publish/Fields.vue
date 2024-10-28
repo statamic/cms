@@ -60,6 +60,10 @@ export default {
             return this.state.values;
         },
 
+        extraValues() {
+            return this.state.extraValues || {};
+        },
+
         meta() {
             return this.state.meta;
         },

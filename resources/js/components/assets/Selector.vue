@@ -12,6 +12,7 @@
                 :query-scopes="queryScopes"
                 :autoselect-uploads="true"
                 :autofocus-search="true"
+                allow-selecting-existing-upload
                 @selections-updated="selectionsUpdated"
                 @asset-doubleclicked="select"
             >
