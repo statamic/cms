@@ -176,7 +176,7 @@ export default {
                 return false;
             }
 
-            let rule = _.chain(RULES)
+            let rule = _.chain([...RULES, ...Statamic.$config.get('extensionRules')])
                 .filter(rule => rule.value === this.selectedLaravelRule)
                 .first()
                 .value();
