@@ -53,4 +53,14 @@ return [
 
     'middleware' => 'web',
 
+    /*
+    |--------------------------------------------------------------------------
+    | Layout
+    |--------------------------------------------------------------------------
+    |
+    | Define the default layout that will be used by front end routes.
+    |
+    */
+
+    'layout' => env('STATAMIC_FRONTEND_ROUTES_LAYOUT', 'layout'),
 ];
