@@ -368,4 +368,35 @@ BLADE;
             Blade::render($template, ['do_include' => false]),
         );
     }
+
+    #[Test]
+    public function it_correctly_compiles_nested_self_closing_tags()
+    {
+        (new class extends Tags
+        {
+            protected static $handle = 'my_tag';
+
+            public function index()
+            {
+                if (! $this->isPair) {
+                    return 'Just a self-closing tag.';
+                }
+
+                return [['title' => 'One'], ['title' => 'Two']];
+            }
+        })::register();
+
+        $template = <<<'BLADE'
+<s:my_tag />|
+<s:my_tag>
+{{ $title }}
+<s:my_tag />|
+</s:my_tag>
+BLADE;
+
+        $this->assertSame(
+            'Just a self-closing tag.| One Just a self-closing tag.| Two Just a self-closing tag.|',
+            Str::squish(Blade::render($template)),
+        );
+    }
 }
