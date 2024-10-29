@@ -96,4 +96,13 @@ class AssetUploader extends Uploader
             ->when(config('statamic.assets.lowercase'), fn ($stringable) => $stringable->lower())
             ->ascii();
     }
+
+    public static function getSafePath($path)
+    {
+        return Str::of($path)
+            ->split('/[\/\\\\]+/')
+            ->map(fn ($folder) => self::getSafeFilename($folder))
+            ->filter()
+            ->implode('/');
+    }
 }

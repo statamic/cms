@@ -106,4 +106,43 @@ class MakeUserTest extends TestCase
         $this->assertTrue($jason->isSuper());
         $this->assertFalse($girl->isSuper());
     }
+
+    #[Test]
+    public function it_can_make_a_user_with_password_option()
+    {
+        $this->assertEmpty(User::all());
+
+        $password = 'PacManMoonwalk#84';
+
+        $this->artisan('statamic:make:user', ['email' => 'duncan@likesteatime.com', '--password' => $password])
+            ->expectsOutputToContain('User created successfully.');
+
+        $user = User::all()->first();
+
+        $this->assertNotEmpty($user->id());
+        $this->assertEquals('duncan@likesteatime.com', $user->email());
+        $this->assertNotEmpty($user->password());
+        $this->assertTrue(password_verify($password, $user->password()));
+    }
+
+    #[Test]
+    public function if_password_option_is_passed_it_will_not_prompt_for_password()
+    {
+        $this->assertEmpty(User::all());
+
+        $password = 'PacManMoonwalk#84';
+
+        $this->artisan('statamic:make:user', ['--password' => $password])
+            ->expectsQuestion('Email', 'duncan@likesteatime.com')
+            ->expectsQuestion('Name', 'Duncan')
+            ->expectsQuestion('Super user?', false)
+            ->assertExitCode(0);
+
+        $user = User::all()->first();
+
+        $this->assertNotEmpty($user->id());
+        $this->assertEquals('duncan@likesteatime.com', $user->email());
+        $this->assertNotEmpty($user->password());
+        $this->assertTrue(password_verify($password, $user->password()));
+    }
 }
