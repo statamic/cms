@@ -88,7 +88,7 @@ class Value implements ArrayAccess, IteratorAggregate, JsonSerializable
         return $value;
     }
 
-    protected function iteratorValue()
+    private function iteratorValue()
     {
         $value = $this->value();
 
@@ -218,22 +218,6 @@ class Value implements ArrayAccess, IteratorAggregate, JsonSerializable
         $this->resolve();
 
         return get_object_vars($this);
-    }
-
-    public function __call(string $name, array $arguments)
-    {
-        return call_user_func_array([$this->value(), $name], $arguments);
-    }
-
-    public function __get($key)
-    {
-        $value = $this->value()?->{$key};
-
-        if ($value instanceof static) {
-            $value = $value->value();
-        }
-
-        return $value;
     }
 
     #[\ReturnTypeWillChange]
