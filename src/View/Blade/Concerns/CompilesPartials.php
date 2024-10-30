@@ -89,7 +89,7 @@ UNSET;
             $injectedParam->setName($name);
             $injectedParam->type = ParameterType::DynamicVariable;
 
-            $injectedParam->value = '\Illuminate\Support\Facades\Blade::render($'.$hoistedVarName.', get_defined_vars())';
+            $injectedParam->value = 'new \Illuminate\Support\HtmlString(\Illuminate\Support\Facades\Blade::render($'.$hoistedVarName.', get_defined_vars()))';
 
             $hoistedSet .= Str::swap([
                 '$varName' => $hoistedVarName,

@@ -333,4 +333,50 @@ BLADE;
             Str::squish(Blade::render($template))
         );
     }
+
+    #[Test]
+    public function slot_content_does_not_need_to_be_manually_escaped()
+    {
+        $this->withFakeViews();
+
+        $partial = <<<'BLADE'
+Partial Start {{ $slot }} Partial End
+BLADE;
+
+        $this->viewShouldReturnRaw('the_partial', $partial, 'blade.php');
+
+        $template = <<<'BLADE'
+<s:partial:the_partial>
+<strong>I am the slot content!</strong>
+</s:partial:the_partial>
+BLADE;
+
+        $this->assertSame(
+            'Partial Start <strong>I am the slot content!</strong> Partial End',
+            Blade::render($template),
+        );
+        $partial = <<<'BLADE'
+Header Start {{ $header }} Header End
+Partial Start {{ $slot }} Partial End
+BLADE;
+
+        $this->viewShouldReturnRaw('the_partial', $partial, 'blade.php');
+
+        $template = <<<'BLADE'
+<s:partial:the_partial>
+<s:slot:header>I am <em>the header!</em></s:slot:header>
+<strong>I am the slot content!</strong>
+</s:partial:the_partial>
+BLADE;
+
+        $expected = <<<'EXPECTED'
+Header Start I am <em>the header!</em> Header End
+Partial Start <strong>I am the slot content!</strong> Partial End
+EXPECTED;
+
+        $this->assertSame(
+            $expected,
+            Blade::render($template),
+        );
+    }
 }
