@@ -30,11 +30,7 @@ trait CompilesComponents
             }
 
             if ($node instanceof ComponentNode) {
-                if ($node->isClosedBy === null || $node->isSelfClosing) {
-                    $newContent .= $node->content;
-                } else {
-                    $newContent .= $node->outerDocumentContent;
-                }
+                $newContent .= $this->getComponentContent($node);
             } elseif ($node instanceof LiteralNode) {
                 $newContent .= $node->unescapedContent;
             }

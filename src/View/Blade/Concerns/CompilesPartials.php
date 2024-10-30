@@ -35,7 +35,7 @@ trait CompilesPartials
             }
 
             if ($node instanceof ComponentNode) {
-                $newContent .= $node->outerDocumentContent;
+                $newContent .= $this->getComponentContent($node);
             } elseif ($node instanceof LiteralNode) {
                 $newContent .= $node->unescapedContent;
             }

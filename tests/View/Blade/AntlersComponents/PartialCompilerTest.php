@@ -3,6 +3,7 @@
 namespace Tests\View\Blade\AntlersComponents;
 
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\FakesViews;
@@ -279,6 +280,57 @@ BLADE;
         $this->assertSame(
             'A different name! https://example.com/placeholder.png',
             Blade::render('<s:partial:the_partial name="A different name!" />')
+        );
+    }
+
+    #[Test]
+    public function it_compiles_nested_self_closing_partial_tags()
+    {
+        $this->withFakeViews();
+
+        $this->viewShouldReturnRaw('one', 'Just Some Text', 'blade.php');
+
+        $this->viewShouldReturnRaw('two', '{{ $slot }}', 'blade.php');
+
+        $template = <<<'BLADE'
+<s:partial:one />
+|
+<s:partial:two>
+Some More Text
+|
+    <s:partial:one />
+    | After Nested Partial Call
+</s:partial:two>
+BLADE;
+
+        $this->assertSame(
+            'Just Some Text| Some More Text | Just Some Text | After Nested Partial Call',
+            Str::squish(Blade::render($template))
+        );
+
+        $template = <<<'BLADE'
+<s:partial:one />
+|
+Partial Two Call One
+<s:partial:two>
+Some More Text
+|
+    <s:partial:one />
+    | After Nested Partial Call
+    | Partial Two Call Two
+    |
+    <s:partial:two>
+Some Even More Text
+|
+    <s:partial:one />
+    | After Another Nested Partial Call
+</s:partial:two>
+</s:partial:two>
+BLADE;
+
+        $this->assertSame(
+            'Just Some Text| Partial Two Call One Some More Text | Just Some Text | After Nested Partial Call | Partial Two Call Two | Some Even More Text | Just Some Text | After Another Nested Partial Call',
+            Str::squish(Blade::render($template))
         );
     }
 }

@@ -34,6 +34,15 @@ class StatamicTagCompiler
             });
     }
 
+    protected function getComponentContent(ComponentNode $node): string
+    {
+        if ($node->isClosedBy === null || $node->isSelfClosing) {
+            return $node->content;
+        }
+
+        return $node->outerDocumentContent;
+    }
+
     public static function adjustDynamicVariableName(string $variableName): string
     {
         return ltrim($variableName, '$');
