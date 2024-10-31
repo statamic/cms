@@ -1,5 +1,19 @@
 # Release Notes
 
+## 5.36.0 (2024-10-31)
+
+### What's new
+- New Blade syntax for using Tags [#10967](https://github.com/statamic/cms/issues/10967) by @JohnathonKoster
+- Add support for avif image format [#11016](https://github.com/statamic/cms/issues/11016) by @daun
+- Allow setting tag pair content from fluent tags [#11018](https://github.com/statamic/cms/issues/11018) by @daun
+
+### What's fixed
+- Fix Filesystem AbstractAdapter put method return [#11032](https://github.com/statamic/cms/issues/11032) by @godismyjudge95
+- Fix color fieldtype's collapsed state showing plain HTML [#11031](https://github.com/statamic/cms/issues/11031) by @jackmcdade
+- Fix helpBlock error with custom js validation rule [#11023](https://github.com/statamic/cms/issues/11023) by @irfandumanx
+
+
+
 ## 5.35.0 (2024-10-28)
 
 ### What's new
