@@ -18,9 +18,11 @@ class GetSite extends Tags
             throw new \Exception("Site [$handle] does not exist.");
         }
 
-        return (Str::contains($tag, ':') && ($var = Str::after($tag, ':')))
+        $result = (Str::contains($tag, ':') && ($var = Str::after($tag, ':')))
             ? $site->$var
             : $site;
+
+        return $this->aliasedResult($result);
     }
 
     /**
@@ -36,6 +38,6 @@ class GetSite extends Tags
             throw new \Exception("Site [$handle] does not exist.");
         }
 
-        return $site;
+        return $this->aliasedResult($site);
     }
 }

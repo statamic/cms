@@ -55,4 +55,15 @@ class ArrayableStringTest extends TestCase
         $this->assertTrue((new ArrayableString(4))->toBool());
         $this->assertFalse((new ArrayableString(''))->toBool());
     }
+
+    #[Test]
+    public function it_uses_array_access()
+    {
+        $val = new ArrayableString('foo', ['one' => 'a', 'two' => 'b']);
+
+        $this->assertTrue(isset($val['one']));
+        $this->assertFalse(isset($val['three']));
+        $this->assertEquals('a', $val['one']);
+        $this->assertEquals('nope', $val['three'] ?? 'nope');
+    }
 }

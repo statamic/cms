@@ -69,7 +69,7 @@ class ViewTest extends TestCase
     public function a_non_antlers_template_will_not_attempt_to_load_the_layout()
     {
         Event::fake();
-        $this->viewShouldReturnRaw('template', file_get_contents(__DIR__.'/fixtures/template.antlers.html'), 'blade.php');
+        $this->viewShouldReturnRaw('template', 'Template: {{ $foo }}', 'blade.php');
         $this->viewShouldReturnRaw('layout', file_get_contents(__DIR__.'/fixtures/layout.antlers.html'));
 
         $view = (new View)
