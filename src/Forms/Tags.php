@@ -51,13 +51,7 @@ class Tags extends BaseTags
     {
         $this->context['form'] = $this->params->get(static::HANDLE_PARAM);
 
-        if ($this->tagRenderer) {
-            return $this->parse([
-                'success' => $this->success(),
-            ]);
-        }
-
-        return [];
+        return $this->parse();
     }
 
     /**
