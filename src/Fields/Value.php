@@ -225,6 +225,12 @@ class Value implements ArrayAccess, IteratorAggregate, JsonSerializable
         return $this->value()->{$name}(...$arguments);
     }
 
+    public function __get($key)
+    {
+        return $this->value()?->{$key} ?? null;
+    }
+
+    //
     #[\ReturnTypeWillChange]
     public function offsetExists(mixed $offset)
     {

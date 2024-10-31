@@ -319,6 +319,23 @@ class ValueTest extends TestCase
 
         $this->assertEquals('foo', $value->bar());
     }
+
+    #[Test]
+    public function it_can_proxy_property_access_to_value()
+    {
+        // This is useful when the value is an object like an Entry, you could
+        // do $value->slug.
+
+        $object = new class
+        {
+            public $bar = 'foo';
+        };
+
+        $value = new Value($object);
+
+        $this->assertEquals('foo', $value->bar);
+        $this->assertEquals('nope', $value->baz ?? 'nope');
+    }
 }
 
 class DummyAugmentable implements \Statamic\Contracts\Data\Augmentable
