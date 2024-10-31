@@ -26,7 +26,7 @@ abstract class AbstractAdapter implements Filesystem
     {
         $this->makeDirectory(pathinfo($path)['dirname']);
 
-        $this->filesystem->put($this->normalizePath($path), $contents);
+        return $this->filesystem->put($this->normalizePath($path), $contents);
     }
 
     public function delete($path)
