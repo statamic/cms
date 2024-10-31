@@ -240,19 +240,20 @@ EXPECTED;
   'image' => 'https://example.com/placeholder.png',
 ])
 
-{{ $name }} {{ $image }}
+Without view: {{ $name ?? '' }} {{ $image ?? '' }} |
+With view: {{ $view['name'] }} {{ $view['image'] }}
 BLADE;
 
         $this->viewShouldReturnRaw('the_partial', $partial, 'blade.php');
 
         $this->assertSame(
-            'The Name! https://example.com/placeholder.png',
-            Blade::render('<s:partial:the_partial />')
+            'Without view: | With view: The Name! https://example.com/placeholder.png',
+            Str::squish(Blade::render('<s:partial:the_partial />'))
         );
 
         $this->assertSame(
-            'A different name! https://example.com/placeholder.png',
-            Blade::render('<s:partial:the_partial name="A different name!" />')
+            'Without view: A different name! | With view: A different name! https://example.com/placeholder.png',
+            Str::squish(Blade::render('<s:partial:the_partial name="A different name!" />'))
         );
     }
 
