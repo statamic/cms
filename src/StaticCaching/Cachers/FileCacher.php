@@ -29,6 +29,11 @@ class FileCacher extends AbstractCacher
     /**
      * @var string
      */
+    private $csrfTokenJs;
+
+    /**
+     * @var string
+     */
     private $nocacheJs;
 
     /**
@@ -196,6 +201,11 @@ class FileCacher extends AbstractCacher
         return Str::contains($path, '_lqs_');
     }
 
+    public function setCsrfTokenJs(string $js)
+    {
+        $this->csrfTokenJs = $js;
+    }
+
     public function setNocacheJs(string $js)
     {
         $this->nocacheJs = $js;
@@ -205,7 +215,7 @@ class FileCacher extends AbstractCacher
     {
         $csrfPlaceholder = CsrfTokenReplacer::REPLACEMENT;
 
-        return <<<EOT
+        $default = <<<EOT
 (function() {
     fetch('/!/csrf', {
         method: 'POST',
@@ -237,6 +247,8 @@ class FileCacher extends AbstractCacher
     });
 })();
 EOT;
+
+        return $this->csrfTokenJs ?? $default;
     }
 
     public function getNocacheJs(): string
