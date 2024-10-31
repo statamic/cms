@@ -253,7 +253,7 @@ EOT;
 
     public function getNocacheJs(): string
     {
-        $default = <<<EOT
+        $default = <<<'EOT'
 (function() {
     var els = document.getElementsByClassName('nocache');
     var map = {};
