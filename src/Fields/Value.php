@@ -230,7 +230,6 @@ class Value implements ArrayAccess, IteratorAggregate, JsonSerializable
         return $this->value()?->{$key} ?? null;
     }
 
-    //
     #[\ReturnTypeWillChange]
     public function offsetExists(mixed $offset)
     {
