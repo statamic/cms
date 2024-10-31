@@ -220,6 +220,11 @@ class Value implements ArrayAccess, IteratorAggregate, JsonSerializable
         return get_object_vars($this);
     }
 
+    public function __call(string $name, array $arguments)
+    {
+        return $this->value()->{$name}(...$arguments);
+    }
+
     #[\ReturnTypeWillChange]
     public function offsetExists(mixed $offset)
     {

@@ -300,6 +300,25 @@ class ValueTest extends TestCase
             'b' => 'bravo',
         ], $arr);
     }
+
+    #[Test]
+    public function it_can_proxy_methods_to_value()
+    {
+        // This is useful when the value is an object like an Entry, you could
+        // do $value->slug(). Or for a LabeledValue you could do $value->label().
+
+        $object = new class
+        {
+            public function bar()
+            {
+                return 'foo';
+            }
+        };
+
+        $value = new Value($object);
+
+        $this->assertEquals('foo', $value->bar());
+    }
 }
 
 class DummyAugmentable implements \Statamic\Contracts\Data\Augmentable
