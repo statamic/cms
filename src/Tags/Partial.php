@@ -31,7 +31,7 @@ class Partial extends Tags
             ->render();
     }
 
-    protected function getSlotContent()
+    private function getSlotContent()
     {
         $content = trim($this->parse());
 
