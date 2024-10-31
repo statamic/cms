@@ -173,7 +173,6 @@ class Tags extends BaseTags
             return str($successMessage)->length() > 0;
         }
 
-        // TODO: Should probably output success string instead of `true` boolean for consistency.
         return $successMessage;
     }
 
