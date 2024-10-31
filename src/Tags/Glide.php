@@ -15,6 +15,7 @@ use Statamic\Facades\Image;
 use Statamic\Facades\Path;
 use Statamic\Facades\URL;
 use Statamic\Imaging\ImageGenerator;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class Glide extends Tags
@@ -131,10 +132,6 @@ class Glide extends Tags
 
         $items = is_iterable($items) ? collect($items) : collect([$items]);
 
-        if ($alias = $this->params->get('as')) {
-            unset($this->params['as']);
-        }
-
         $items = $items->map(function ($item) {
             try {
                 $data = ['url' => $this->generateGlideUrl($item)];
@@ -155,7 +152,7 @@ class Glide extends Tags
             }
         })->filter()->all();
 
-        if ($alias) {
+        if ($alias = $this->params->get('as')) {
             return [
                 $alias => $items,
             ];
@@ -316,7 +313,7 @@ class Glide extends Tags
     {
         $params = collect();
 
-        foreach ($this->params as $param => $value) {
+        foreach (Arr::except(this->params, ['as']) as $param => $value) {
             if (! in_array($param, ['src', 'id', 'path', 'tag', 'alt', 'absolute'])) {
                 $params->put($param, $value);
             }
