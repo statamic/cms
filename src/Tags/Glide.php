@@ -15,7 +15,6 @@ use Statamic\Facades\Image;
 use Statamic\Facades\Path;
 use Statamic\Facades\URL;
 use Statamic\Imaging\ImageGenerator;
-use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class Glide extends Tags
@@ -313,7 +312,7 @@ class Glide extends Tags
     {
         $params = collect();
 
-        foreach (Arr::except(this->params, ['as']) as $param => $value) {
+        foreach (collect($this->params)->except('as') as $param => $value) {
             if (! in_array($param, ['src', 'id', 'path', 'tag', 'alt', 'absolute'])) {
                 $params->put($param, $value);
             }
