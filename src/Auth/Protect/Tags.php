@@ -31,6 +31,7 @@ class Tags extends BaseTags
 
         $data = [
             'no_token' => false,
+            'invalid_token' => false,
             'errors' => $errors->toArray(),
             'error' => $errors->first(),
         ];
