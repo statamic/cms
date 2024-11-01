@@ -345,7 +345,7 @@ class RoutesTest extends TestCase
     #[Test]
     public function it_uses_a_non_default_layout()
     {
-        config()->set('statamic.routes.layout', 'custom-layout');
+        config()->set('statamic.system.layout', 'custom-layout');
         $this->viewShouldReturnRaw('custom-layout', 'Custom layout {{ template_content }}');
         $this->viewShouldReturnRaw('test', 'Hello {{ hello }}');
 
