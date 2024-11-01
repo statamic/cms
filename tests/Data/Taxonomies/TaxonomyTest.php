@@ -391,6 +391,72 @@ class TaxonomyTest extends TestCase
     }
 
     #[Test]
+    public function it_gets_and_sets_the_routes()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://domain.com/'],
+            'fr' => ['url' => 'http://domain.com/fr/'],
+            'de' => ['url' => 'http://domain.com/de/'],
+        ]);
+
+        // A taxonomy with no sites uses the default site.
+        $taxonomy = new Taxonomy;
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $taxonomy->routes());
+        $this->assertEquals(['en' => '/'], $taxonomy->routes()->all());
+
+        $return = $taxonomy->routes([
+            'en' => 'blog/',
+            'fr' => 'le-blog/',
+            'de' => 'das-blog/',
+        ]);
+
+        $this->assertEquals($taxonomy, $return);
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $taxonomy->routes());
+
+        // Only routes corresponding to the collection's sites will be returned.
+        $this->assertEquals(['en' => 'blog/'], $taxonomy->routes()->all());
+        $this->assertEquals('blog/', $taxonomy->route('en'));
+        $this->assertNull($taxonomy->route('fr'));
+        $this->assertNull($taxonomy->route('de'));
+        $this->assertNull($taxonomy->route('unknown'));
+
+        $taxonomy->sites(['en', 'fr']);
+
+        $this->assertEquals([
+            'en' => 'blog/',
+            'fr' => 'le-blog/',
+        ], $taxonomy->routes()->all());
+        $this->assertEquals('blog/', $taxonomy->route('en'));
+        $this->assertEquals('le-blog/', $taxonomy->route('fr'));
+        $this->assertNull($taxonomy->route('de'));
+        $this->assertNull($taxonomy->route('unknown'));
+    }
+
+    #[Test]
+    public function it_sets_all_the_routes_identically()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://domain.com/'],
+            'fr' => ['url' => 'http://domain.com/fr/'],
+            'de' => ['url' => 'http://domain.com/de/'],
+        ]);
+
+        $taxonomy = (new Taxonomy)->sites(['en', 'fr']);
+
+        $return = $taxonomy->routes('{slug}');
+
+        $this->assertEquals($taxonomy, $return);
+        $this->assertEquals([
+            'en' => '{slug}',
+            'fr' => '{slug}',
+        ], $taxonomy->routes()->all());
+        $this->assertEquals('{slug}', $taxonomy->route('en'));
+        $this->assertEquals('{slug}', $taxonomy->route('fr'));
+        $this->assertNull($taxonomy->route('de'));
+        $this->assertNull($taxonomy->route('unknown'));
+    }
+
+    #[Test]
     public function it_gets_and_sets_the_layout()
     {
         $taxonomy = (new Taxonomy)->handle('tags');

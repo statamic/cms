@@ -82,13 +82,16 @@ class TermRepository implements RepositoryContract
 
         $uri = Str::removeLeft($uri, '/');
 
-        [$taxonomy, $slug] = array_pad(explode('/', $uri), 2, null);
+        $uriParts = array_pad(explode('/', $uri), 2, null);
+
+        $slug = array_pop($uriParts);
+        $taxonomy = implode('/', $uriParts);
 
         if (! $slug) {
             return null;
         }
 
-        if (! $taxonomy = $this->findTaxonomyHandleByUri($taxonomy)) {
+        if (! $taxonomy = $this->findTaxonomyHandleByUri($taxonomy, $site)) {
             return null;
         }
 
@@ -182,9 +185,15 @@ class TermRepository implements RepositoryContract
         ];
     }
 
-    private function findTaxonomyHandleByUri($uri)
+    private function findTaxonomyHandleByUri($uri, $site)
     {
-        return $this->stache->store('taxonomies')->index('uri')->items()->flip()->get(Str::ensureLeft($uri, '/'));
+        $routes = $this->stache->store('taxonomies')->index('routes')->items()->map(fn ($item) => $item->get($site))->filter()->flip();
+
+        if ($handle = $routes->get($uri)) {
+            return $handle;
+        }
+
+        return $routes->get(Str::ensureLeft($uri, '/'));
     }
 
     public function substitute($item)

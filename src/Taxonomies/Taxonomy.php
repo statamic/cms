@@ -38,6 +38,7 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
     protected $handle;
     protected $title;
     protected $blueprints = [];
+    protected $routes = [];
     protected $sites = [];
     protected $collection;
     protected $defaultPublishState = true;
@@ -279,6 +280,7 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
             'title' => $this->title,
             'blueprints' => $this->blueprints,
             'preview_targets' => $this->previewTargetsForFile(),
+            'route' => $this->routes,
             'template' => $this->template,
             'term_template' => $this->termTemplate,
             'layout' => $this->layout,
@@ -349,7 +351,7 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
 
         $prefix = $this->collection() ? $this->collection()->uri($site->handle()) : '/';
 
-        return URL::tidy($prefix.str_replace('_', '-', '/'.$this->handle));
+        return URL::tidy($prefix.$this->routes()->get($site->handle()));
     }
 
     public function collection($collection = null)
@@ -365,6 +367,25 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
                 ->keyBy->handle()
                 ->has($this->handle);
         })->values();
+    }
+
+    public function routes($routes = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('routes')
+            ->getter(function ($routes) {
+                return $this->sites()->mapWithKeys(function ($site) use ($routes) {
+                    $siteRoute = is_string($routes) ? $routes : ($routes[$site] ?? str_replace('_', '-', '/'.$this->handle));
+
+                    return [$site => $siteRoute];
+                });
+            })
+            ->args(func_get_args());
+    }
+
+    public function route($site)
+    {
+        return $this->routes()->get($site);
     }
 
     public function toResponse($request)

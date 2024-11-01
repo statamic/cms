@@ -346,7 +346,8 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
 
     public function route()
     {
-        $route = '/'.str_replace('_', '-', $this->taxonomyHandle()).'/{slug}';
+        $route = '/'.$this->taxonomy()->routes()->get($this->locale()).'/';
+        $route .= Str::contains($route, '{{') ? '{{ slug }}' : '{slug}';
 
         if ($this->collection()) {
             $collectionUrl = $this->collection()->uri($this->locale()) ?? $this->collection()->handle();
