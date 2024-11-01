@@ -82,6 +82,48 @@ class SelectedSiteTest extends TestCase
     }
 
     #[Test]
+    public function it_sets_the_correct_site_when_first_logging_in()
+    {
+        $this->setSites([
+            'en' => ['url' => 'https://en.test', 'locale' => 'en'],
+            'fr' => ['url' => 'https://fr.test', 'locale' => 'fr'],
+            'de' => ['url' => 'https://de.test', 'locale' => 'de'],
+        ]);
+
+        $this->setTestRoles(['test' => [
+            // no authorized sites
+        ]]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        $this->actingAs($user);
+        $request = $this->createRequest('https://fr.test/cp/foo');
+        $handled = false;
+
+        (new SelectedSite())->handle($request, function () use (&$handled) {
+            $handled = true;
+
+            return new Response;
+        });
+
+        $this->assertTrue($handled);
+        $this->assertEquals('fr', Site::selected()->handle());
+
+        Site::setSelected('en');
+
+        $request = $this->createRequest('https://fr.test/cp/bar');
+        $handled = false;
+
+        (new SelectedSite())->handle($request, function () use (&$handled) {
+            $handled = true;
+
+            return new Response;
+        });
+
+        $this->assertTrue($handled);
+        $this->assertEquals('en', Site::selected()->handle());
+    }
+
+    #[Test]
     public function middleware_attached_to_routes()
     {
         /** @var Router $router */
