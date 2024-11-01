@@ -112,6 +112,7 @@ export default {
     inject: {
         storeName: { default: null },
         isInsideConfigFields: { default: false },
+        isInsideFormSubmission: { default: false },
     },
 
     computed: {
@@ -159,6 +160,7 @@ export default {
                 `${this.config.component || this.config.type}-fieldtype`,,
                 this.isReadOnly ? 'read-only-field' : '',
                 this.isInsideConfigFields ? 'config-field' : `${tailwind_width_class(this.config.width)}`,
+                this.isInsideFormSubmission ? 'form-submission-field' : '',
                 this.config.classes || '',
                 this.config.full_width_setting ? 'full-width-setting' : '',
                 { 'has-error': this.hasError || this.hasNestedError }

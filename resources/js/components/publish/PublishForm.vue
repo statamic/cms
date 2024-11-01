@@ -5,7 +5,7 @@
         :name="name"
         :blueprint="blueprint"
         v-model="currentValues"
-        reference="collection"
+        :reference="initialReference"
         :meta="meta"
         :errors="errors"
         v-slot="{ setFieldValue, setFieldMeta }"
@@ -40,7 +40,14 @@ export default {
         breadcrumbs: Array,
         action: String,
         method: { type: String, default: 'post' },
-        readOnly: { type: Boolean, default: false }
+        readOnly: { type: Boolean, default: false },
+        initialReference: { type: String, default: 'collection' },
+    },
+
+    provide() {
+        return {
+            isInsideFormSubmission: this.initialReference.startsWith('submission::'),
+        }
     },
 
     data() {

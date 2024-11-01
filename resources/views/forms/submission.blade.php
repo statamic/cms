@@ -14,6 +14,7 @@
         :meta='@json($meta)'
         :values='@json($values)'
         read-only
+        initial-reference="{{ $reference }}"
     ></publish-form>
 
 @endsection
