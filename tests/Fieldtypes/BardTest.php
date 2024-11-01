@@ -954,7 +954,7 @@ EOT;
             ],
         ]];
 
-        $this->assertEquals($expected, $this->bard(['inline' => true, 'sets' => null])->preProcess($data));
+        $this->assertEquals($expected, $this->bard(['inline' => 'break', 'sets' => null])->preProcess($data));
     }
 
     #[Test]
