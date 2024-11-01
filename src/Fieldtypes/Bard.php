@@ -379,16 +379,16 @@ class Bard extends Replicator
         $value = $this->convertLegacyTiptap($value);
 
         if ($this->config('inline')) {
-            // Root should be text, if it's not this must be a block field converted
+            // Root should be text or br, if it's not this must be a block field converted
             // to inline. In that instance unwrap the content of the first node.
-            if ($value[0]['type'] !== 'text') {
+            if (! in_array($value[0]['type'], ['text', 'hardBreak'])) {
                 $value = $this->unwrapInlineValue($value);
             }
             $value = $this->wrapInlineValue($value);
         } else {
-            // Root should not be text, if it is this must be an inline field converted
+            // Root should not be text or br, if it is this must be an inline field converted
             // to block. In that instance wrap the content in a paragraph node.
-            if ($value[0]['type'] === 'text') {
+            if (in_array($value[0]['type'], ['text', 'hardBreak'])) {
                 $value = $this->wrapInlineValue($value);
             }
         }
