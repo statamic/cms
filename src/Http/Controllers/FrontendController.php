@@ -45,7 +45,7 @@ class FrontendController extends Controller
 
         $view = app(View::class)
             ->template($view)
-            ->layout(Arr::get($data, 'layout', 'layout'))
+            ->layout(Arr::get($data, 'layout', config('statamic.system.layout', 'layout')))
             ->with($data)
             ->cascadeContent($this->getLoadedRouteItem($data));
 
