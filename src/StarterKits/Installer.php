@@ -324,12 +324,12 @@ final class Installer
     {
         $shouldPrompt = true;
 
-        if (Arr::get($config, 'prompt') === false) {
-            $shouldPrompt = false;
+        if (Arr::has($config, 'options')) {
+            return $this->instantiateSelectModule($config, $key);
         }
 
-        if (Arr::has($config, 'options')) {
-            return $this->instantiateSelectModule($config, $key, $shouldPrompt);
+        if (Arr::get($config, 'prompt') === false) {
+            $shouldPrompt = false;
         }
 
         $name = str_replace('_', ' ', $key);
@@ -346,27 +346,28 @@ final class Installer
     /**
      * Instantiate select module.
      */
-    protected function instantiateSelectModule(array $config, string $key, bool $shouldPrompt): InstallableModule|array|bool
+    protected function instantiateSelectModule(array $config, string $key): InstallableModule|array|bool
     {
+        $skipOptionLabel = Arr::get($config, 'skip_option', 'No');
+        $skipModuleValue = 'skip_module';
+
         $options = collect($config['options'])
             ->map(fn ($option, $optionKey) => Arr::get($option, 'label', ucfirst($optionKey)))
-            ->prepend(Arr::get($config, 'skip_option', 'No'), $skipModule = 'skip_module')
+            ->when($skipOptionLabel !== false, fn ($c) => $c->prepend($skipOptionLabel, $skipModuleValue))
             ->all();
 
         $name = str_replace('_', ' ', $key);
 
-        if ($shouldPrompt && $this->isInteractive) {
+        if ($this->isInteractive) {
             $choice = select(
                 label: Arr::get($config, 'prompt', "Would you like to install one of the following [{$name}] modules?"),
                 options: $options,
             );
-        } elseif ($shouldPrompt && ! $this->isInteractive) {
-            return false;
-        } elseif (! $shouldPrompt && ! $choice = Arr::get($config, 'default')) {
+        } elseif (! $this->isInteractive && ! $choice = Arr::get($config, 'default')) {
             return false;
         }
 
-        if ($choice === $skipModule) {
+        if ($choice === $skipModuleValue) {
             return false;
         }
 
