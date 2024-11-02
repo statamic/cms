@@ -19,7 +19,7 @@ class SelectedSite
     {
         $siteByUrl = Site::findByUrl($request->getSchemeAndHttpHost());
 
-        /* Ensure that we only make this automatic selection when first loggin in */
+        /* Ensure that we only make this automatic selection when first logging in */
         if (! session('statamic.cp.selected-site') && $siteByUrl) {
             Site::setSelected($siteByUrl->handle());
         }
