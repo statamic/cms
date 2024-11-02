@@ -959,7 +959,120 @@ EOT;
     }
 
     #[Test]
-    public function it_display_custom_module_prompts()
+    public function it_allows_user_to_skip_in_select_module_prompts()
+    {
+        $this->setConfig([
+            'modules' => [
+                'js' => [
+                    'prompt' => 'Want one of these fancy JS options?',
+                    'options' => [
+                        'react' => [
+                            'label' => 'React JS',
+                            'export_paths' => [
+                                'resources/js/react.js',
+                            ],
+                        ],
+                        'vue' => [
+                            'label' => 'Vue JS',
+                            'export_paths' => [
+                                'resources/js/vue.js',
+                            ],
+                        ],
+                        'svelte' => [
+                            'export_paths' => [
+                                'resources/js/svelte.js',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/vue.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/svelte.js'));
+
+        $command = $this->installCoolRunningsModules();
+
+        // Some fixes to `expectsChoice()` were merged for us, but are not available on 11.20.0 and below
+        // See: https://github.com/laravel/framework/pull/52408
+        if (version_compare(app()->version(), '11.20.0', '>')) {
+            $command->expectsChoice('Want one of these fancy JS options?', 'skip_module', [
+                'skip_module' => 'No',
+                'react' => 'React JS',
+                'vue' => 'Vue JS',
+                'svelte' => 'Svelte',
+            ]);
+        } else {
+            $command->expectsQuestion('Want one of these fancy JS options?', 'skip_module');
+        }
+
+        $command->run();
+
+        $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/vue.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/svelte.js'));
+    }
+
+    #[Test]
+    public function it_can_disable_skip_option_in_select_module_prompts()
+    {
+        $this->setConfig([
+            'modules' => [
+                'js' => [
+                    'prompt' => 'Want one of these fancy JS options?',
+                    'skip_option' => false,
+                    'options' => [
+                        'react' => [
+                            'label' => 'React JS',
+                            'export_paths' => [
+                                'resources/js/react.js',
+                            ],
+                        ],
+                        'vue' => [
+                            'label' => 'Vue JS',
+                            'export_paths' => [
+                                'resources/js/vue.js',
+                            ],
+                        ],
+                        'svelte' => [
+                            'export_paths' => [
+                                'resources/js/svelte.js',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/vue.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/svelte.js'));
+
+        $command = $this->installCoolRunningsModules();
+
+        // Some fixes to `expectsChoice()` were merged for us, but are not available on 11.20.0 and below
+        // See: https://github.com/laravel/framework/pull/52408
+        if (version_compare(app()->version(), '11.20.0', '>')) {
+            $command->expectsChoice('Want one of these fancy JS options?', 'svelte', [
+                // 'skip_module' => 'No', // This should not be here anymore, because of `skip_option: false`
+                'react' => 'React JS',
+                'vue' => 'Vue JS',
+                'svelte' => 'Svelte',
+            ]);
+        } else {
+            $command->expectsQuestion('Want one of these fancy JS options?', 'svelte');
+        }
+
+        $command->run();
+
+        $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/vue.js'));
+        $this->assertFileExists(base_path('resources/js/svelte.js'));
+    }
+
+    #[Test]
+    public function it_display_custom_module_prompts_and_option_labels()
     {
         $this->setConfig([
             'modules' => [
@@ -971,6 +1084,7 @@ EOT;
                 ],
                 'js' => [
                     'prompt' => 'Want one of these fancy JS options?',
+                    'skip_option' => 'No, thank you!',
                     'options' => [
                         'react' => [
                             'label' => 'React JS',
@@ -1007,7 +1121,7 @@ EOT;
         // See: https://github.com/laravel/framework/pull/52408
         if (version_compare(app()->version(), '11.20.0', '>')) {
             $command->expectsChoice('Want one of these fancy JS options?', 'svelte', [
-                'skip_module' => 'No',
+                'skip_module' => 'No, thank you!',
                 'react' => 'React JS',
                 'vue' => 'Vue JS',
                 'svelte' => 'Svelte',
