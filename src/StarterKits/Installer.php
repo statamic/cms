@@ -324,12 +324,12 @@ final class Installer
     {
         $shouldPrompt = true;
 
-        if (Arr::has($config, 'options')) {
-            return $this->instantiateSelectModule($config, $key);
-        }
-
         if (Arr::get($config, 'prompt') === false) {
             $shouldPrompt = false;
+        }
+
+        if (Arr::has($config, 'options')) {
+            return $this->instantiateSelectModule($config, $key, $shouldPrompt);
         }
 
         $name = str_replace('_', ' ', $key);
@@ -346,7 +346,7 @@ final class Installer
     /**
      * Instantiate select module.
      */
-    protected function instantiateSelectModule(array $config, string $key): InstallableModule|array|bool
+    protected function instantiateSelectModule(array $config, string $key, bool $shouldPrompt): InstallableModule|array|bool
     {
         $options = collect($config['options'])
             ->map(fn ($option, $optionKey) => Arr::get($option, 'label', ucfirst($optionKey)))
@@ -355,10 +355,16 @@ final class Installer
 
         $name = str_replace('_', ' ', $key);
 
-        $choice = select(
-            label: Arr::get($config, 'prompt', "Would you like to install one of the following [{$name}] modules?"),
-            options: $options,
-        );
+        if ($shouldPrompt && $this->isInteractive) {
+            $choice = select(
+                label: Arr::get($config, 'prompt', "Would you like to install one of the following [{$name}] modules?"),
+                options: $options,
+            );
+        } elseif ($shouldPrompt && ! $this->isInteractive) {
+            return false;
+        } elseif (! $shouldPrompt && ! $choice = Arr::get($config, 'default')) {
+            return false;
+        }
 
         if ($choice === $skipModule) {
             return false;
