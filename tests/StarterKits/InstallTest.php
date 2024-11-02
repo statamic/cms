@@ -772,7 +772,7 @@ EOT;
     }
 
     #[Test]
-    public function it_installs_modules_with_prompt_false_config_by_default_when_running_non_interactively()
+    public function it_can_still_install_modules_with_prompt_false_or_default_config()
     {
         $this->setConfig([
             'export_paths' => [
@@ -780,7 +780,7 @@ EOT;
             ],
             'modules' => [
                 'seo' => [
-                    'prompt' => false, // Setting prompt to false skips confirmation, so this module should still get installed
+                    'prompt' => false, // Setting `prompt: false` skips confirmation, so this module should still get installed
                     'export_paths' => [
                         'resources/css/seo.css',
                     ],
@@ -797,14 +797,13 @@ EOT;
                     ],
                 ],
                 'jamaica' => [
-                    'prompt' => false, // Setting prompt to false skips confirmation, so this module should still get installed
+                    'prompt' => false, // Setting `prompt: false` skips confirmation, so this module should still get installed
                     'export_as' => [
                         'resources/css/theme.css' => 'resources/css/jamaica.css',
                     ],
                 ],
                 'js' => [
-                    'prompt' => false, // Setting prompt to false skips confirmation, so this module should still get installed
-                    'default' => 'vue', // And a `default` is required so that we know which one to install
+                    'default' => 'vue', // Setting a `default` option, so this module should still get installed
                     'options' => [
                         'react' => [
                             'label' => 'React JS',
@@ -821,7 +820,7 @@ EOT;
                     ],
                 ],
                 'js_invalid' => [
-                    'prompt' => false, // Setting prompt to false without a `default`, is not valid config
+                    'prompt' => false, // Setting `prompt: false` doesn't do anything for select modules, should use `default` like above
                     'options' => [
                         'svelte' => [
                             'export_paths' => [
@@ -1180,7 +1179,7 @@ EOT;
     }
 
     #[Test]
-    public function it_installs_nested_modules_with_prompt_false_config_by_default_when_running_non_interactively()
+    public function it_can_still_install_nested_modules_with_prompt_false_or_default_config()
     {
         $this->setConfig([
             'export_paths' => [
@@ -1188,13 +1187,13 @@ EOT;
             ],
             'modules' => [
                 'canada' => [
-                    'prompt' => false, // Setting prompt to false skips confirmation, so this module should still get installed non-interactively
+                    'prompt' => false, // Setting `prompt: false` skips confirmation, so this module should still get installed
                     'export_paths' => [
                         'resources/css/hockey.css',
                     ],
                     'modules' => [
                         'hockey_players' => [
-                            'prompt' => false, // Setting prompt to false skips confirmation, so this module should still get installed non-interactively
+                            'prompt' => false, // Setting `prompt: false` skips confirmation, so this module should still get installed
                             'export_paths' => [
                                 'resources/dictionaries/players.yaml',
                             ],
@@ -1208,14 +1207,13 @@ EOT;
                                     ],
                                 ],
                                 'hockey_night_in_canada' => [
-                                    'prompt' => false, // Setting prompt to false skips confirmation, so this module should still get installed non-interactively
+                                    'prompt' => false, // Setting `prompt: false` skips confirmation, so this module should still get installed
                                     'export_paths' => [
                                         'resources/dictionaries/canadian_players.yaml',
                                     ],
                                 ],
                                 'js' => [
-                                    'prompt' => false, // Setting prompt to false skips confirmation, so this module should still get installed
-                                    'default' => 'vue', // And a `default` is required so that we know which one to install
+                                    'default' => 'vue', // Setting a `default` option, so this module should still get installed
                                     'options' => [
                                         'react' => [
                                             'label' => 'React JS',
