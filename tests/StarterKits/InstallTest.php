@@ -780,7 +780,7 @@ EOT;
             ],
             'modules' => [
                 'seo' => [
-                    'prompt' => false, // Setting prompt to false skips confirmation, so this module should still get installed non-interactively
+                    'prompt' => false, // Setting prompt to false skips confirmation, so this module should still get installed
                     'export_paths' => [
                         'resources/css/seo.css',
                     ],
@@ -797,9 +797,37 @@ EOT;
                     ],
                 ],
                 'jamaica' => [
-                    'prompt' => false, // Setting prompt to false skips confirmation, so this module should still get installed non-interactively
+                    'prompt' => false, // Setting prompt to false skips confirmation, so this module should still get installed
                     'export_as' => [
                         'resources/css/theme.css' => 'resources/css/jamaica.css',
+                    ],
+                ],
+                'js' => [
+                    'prompt' => false, // Setting prompt to false skips confirmation, so this module should still get installed
+                    'default' => 'vue', // And a `default` is required so that we know which one to install
+                    'options' => [
+                        'react' => [
+                            'label' => 'React JS',
+                            'export_paths' => [
+                                'resources/js/react.js',
+                            ],
+                        ],
+                        'vue' => [
+                            'label' => 'Vue JS',
+                            'export_paths' => [
+                                'resources/js/vue.js',
+                            ],
+                        ],
+                    ],
+                ],
+                'js_invalid' => [
+                    'prompt' => false, // Setting prompt to false without a `default`, is not valid config
+                    'options' => [
+                        'svelte' => [
+                            'export_paths' => [
+                                'resources/js/svelte.js',
+                            ],
+                        ],
                     ],
                 ],
             ],
@@ -811,6 +839,9 @@ EOT;
         $this->assertFileDoesNotExist(base_path('resources/css/theme.css'));
         $this->assertComposerJsonDoesntHave('statamic/seo-pro');
         $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
+        $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/vue.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/svelte.js'));
 
         $this->installCoolRunnings();
 
@@ -820,6 +851,9 @@ EOT;
         $this->assertFileExists(base_path('resources/css/theme.css'));
         $this->assertComposerJsonHasPackageVersion('require', 'statamic/seo-pro', '^0.2.0');
         $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
+        $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
+        $this->assertFileExists(base_path('resources/js/vue.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/svelte.js'));
     }
 
     #[Test]
@@ -1179,6 +1213,24 @@ EOT;
                                         'resources/dictionaries/canadian_players.yaml',
                                     ],
                                 ],
+                                'js' => [
+                                    'prompt' => false, // Setting prompt to false skips confirmation, so this module should still get installed
+                                    'default' => 'vue', // And a `default` is required so that we know which one to install
+                                    'options' => [
+                                        'react' => [
+                                            'label' => 'React JS',
+                                            'export_paths' => [
+                                                'resources/js/react.js',
+                                            ],
+                                        ],
+                                        'vue' => [
+                                            'label' => 'Vue JS',
+                                            'export_paths' => [
+                                                'resources/js/vue.js',
+                                            ],
+                                        ],
+                                    ],
+                                ],
                             ],
                         ],
                     ],
@@ -1192,6 +1244,8 @@ EOT;
         $this->assertFileDoesNotExist(base_path('resources/dictionaries/players.yaml'));
         $this->assertFileDoesNotExist(base_path('resources/dictionaries/american_players.yaml'));
         $this->assertFileDoesNotExist(base_path('resources/dictionaries/canadian_players.yaml'));
+        $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/vue.js'));
 
         $this->installCoolRunnings();
 
@@ -1201,6 +1255,8 @@ EOT;
         $this->assertFileExists(base_path('resources/dictionaries/players.yaml'));
         $this->assertFileDoesNotExist(base_path('resources/dictionaries/american_players.yaml'));
         $this->assertFileExists(base_path('resources/dictionaries/canadian_players.yaml'));
+        $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
+        $this->assertFileExists(base_path('resources/js/vue.js'));
     }
 
     #[Test]
