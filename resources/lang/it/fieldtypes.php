@@ -106,7 +106,7 @@ return [
     'html.title' => 'HTML',
     'icon.config.directory' => 'Il percorso verso la directory contenente le icone.',
     'icon.config.folder' => 'Una sottodirectory contenente un set di icone specifico.',
-    'icon.title' => '',
+    'icon.title' => 'Icona',
     'integer.title' => 'Integer',
     'link.config.collections' => 'Le voci di queste raccolte saranno disponibili. Lasciando vuoto questo campo, saranno disponibili le voci delle raccolte instradabili.',
     'link.config.container' => 'Scegli quale contenitore dei media utilizzare per questo campo.',

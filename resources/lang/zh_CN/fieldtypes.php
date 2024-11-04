@@ -106,7 +106,7 @@ return [
     'html.title' => 'HTML',
     'icon.config.directory' => '包含图标的目录的路径。',
     'icon.config.folder' => '包含特定图标集的子目录。',
-    'icon.title' => '',
+    'icon.title' => '图标',
     'integer.title' => '整数',
     'link.config.collections' => '这些集合的条目可用。 留空将使可路由集合中的条目可用。',
     'link.config.container' => '选择用于该字段的资产容器。',

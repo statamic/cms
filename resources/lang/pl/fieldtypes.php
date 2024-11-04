@@ -106,7 +106,7 @@ return [
     'html.title' => 'HTML',
     'icon.config.directory' => 'Ścieżka do katalogu zawierającego ikony.',
     'icon.config.folder' => 'Podkatalog zawierający określony zestaw ikon.',
-    'icon.title' => '',
+    'icon.title' => 'Ikona',
     'integer.title' => 'Całkowita',
     'link.config.collections' => 'Wpisy z tych kolekcji będą dostępne. Pozostawienie tego pustego sprawi, że dostępne będą wpisy z kolekcji z trasowaniem.',
     'link.config.container' => 'Wybierz, który kontener zasobów użyć dla tego pola.',

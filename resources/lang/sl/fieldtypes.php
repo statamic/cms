@@ -106,7 +106,7 @@ return [
     'html.title' => 'HTML',
     'icon.config.directory' => 'Pot do imenika, ki vsebuje ikone.',
     'icon.config.folder' => 'Podimenik, ki vsebuje določen nabor ikon.',
-    'icon.title' => '',
+    'icon.title' => 'Ikona',
     'integer.title' => 'Integer',
     'link.config.collections' => 'Vnosi iz teh zbirk bodo na voljo. Če to polje pustite prazno, bodo na voljo vnosi iz usmerjevalnih zbirk.',
     'link.config.container' => 'Izberite vsebnik sredstva, ki ga želite uporabiti za to polje.',

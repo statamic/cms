@@ -106,7 +106,7 @@ return [
     'html.title' => 'HTML',
     'icon.config.directory' => 'Stien til den mappe, der indeholder ikonerne.',
     'icon.config.folder' => 'En undermappe, der indeholder et specifikt ikonsæt.',
-    'icon.title' => '',
+    'icon.title' => 'Ikon',
     'integer.title' => 'Heltal',
     'link.config.collections' => 'Indlæg fra disse samlinger vil være tilgængelige. Hvis du lader denne stå tom, bliver poster fra samlinger, der kan dirigeres, tilgængelige.',
     'link.config.container' => 'Vælg hvilken medie beholder, der skal bruges til dette felt.',

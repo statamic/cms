@@ -106,7 +106,7 @@ return [
     'html.title' => 'HTML',
     'icon.config.directory' => 'アイコンを含むディレクトリへのパス。',
     'icon.config.folder' => '特定のアイコン セットを含むサブディレクトリ。',
-    'icon.title' => '',
+    'icon.title' => 'アイコン',
     'integer.title' => '整数',
     'link.config.collections' => 'これらのコレクションからのエントリーが利用可能になります。これを空のままにすると、ルーティング可能なコレクションのエントリが使用可能になります。',
     'link.config.container' => 'このフィールドに使用するアセット コンテナを選択します。',

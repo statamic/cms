@@ -106,7 +106,7 @@ return [
     'html.title' => 'HTML',
     'icon.config.directory' => 'Az ikonokat tartalmazó könyvtár elérési útja.',
     'icon.config.folder' => 'Egy adott ikonkészletet tartalmazó alkönyvtár.',
-    'icon.title' => '',
+    'icon.title' => 'Ikon',
     'integer.title' => 'Egész szám',
     'link.config.collections' => 'Ezekből a gyűjteményekből lesznek elérhetőek a bejegyzések. Ha ezt üresen hagyja, akkor elérhetővé válnak az irányítható gyűjtemények _(routable collections)_ bejegyzései.',
     'link.config.container' => 'Válassza ki, hogy melyik eszköztárolót használja ehhez a mezőhöz.',

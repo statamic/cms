@@ -106,7 +106,7 @@ return [
     'html.title' => 'HTML',
     'icon.config.directory' => 'Stien til mappen som inneholder ikonene.',
     'icon.config.folder' => 'En undermappe som inneholder et bestemt ikonsett.',
-    'icon.title' => '',
+    'icon.title' => 'Ikon',
     'integer.title' => 'Heltall',
     'link.config.collections' => 'Oppføringer fra disse samlingene vil være tilgjengelige. Lar du denne stå tom, blir oppføringer fra rutbare samlinger tilgjengelige.',
     'link.config.container' => 'Velg filbeholderen som skal brukes for dette feltet.',

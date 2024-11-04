@@ -106,7 +106,7 @@ return [
     'html.title' => 'HTML',
     'icon.config.directory' => '包含图标的目录的路径。',
     'icon.config.folder' => '包含特定图标集的子目录。',
-    'icon.title' => '',
+    'icon.title' => '图标',
     'integer.title' => '整數',
     'link.config.collections' => '將可選擇這些條目集中的條目。留空則會顯示所有條目。',
     'link.config.container' => '選擇用於此欄位的素材容器。',

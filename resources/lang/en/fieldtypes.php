@@ -106,7 +106,7 @@ return [
     'html.title' => 'HTML',
     'icon.config.directory' => 'The path to the directory containing the icons.',
     'icon.config.folder' => 'A subdirectory containing a specific icon set.',
-    'icon.title' => '',
+    'icon.title' => 'Icon',
     'integer.title' => 'Integer',
     'link.config.collections' => 'Entries from these collections will be available. Leaving this empty will make entries from routable collections available.',
     'link.config.container' => 'Choose which asset container to use for this field.',

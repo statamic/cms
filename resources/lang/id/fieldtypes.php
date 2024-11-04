@@ -106,7 +106,7 @@ return [
     'html.title' => 'HTML',
     'icon.config.directory' => 'Jalur ke direktori yang berisi ikon.',
     'icon.config.folder' => 'Subdirektori yang berisi kumpulan ikon tertentu.',
-    'icon.title' => '',
+    'icon.title' => 'Ikon',
     'integer.title' => 'Integer',
     'link.config.collections' => 'Entri dari koleksi ini akan tersedia. Membiarkannya kosong akan membuat entri dari koleksi yang dapat dirutekan tersedia.',
     'link.config.container' => 'Pilih penampung aset mana yang akan digunakan untuk bidang ini.',

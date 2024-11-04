@@ -106,7 +106,7 @@ return [
     'html.title' => 'HTML',
     'icon.config.directory' => 'Đường dẫn đến thư mục chứa biểu tượng.',
     'icon.config.folder' => 'Thư mục con chứa bộ biểu tượng cụ thể.',
-    'icon.title' => '',
+    'icon.title' => 'Biểu tượng',
     'integer.title' => 'Số nguyên',
     'link.config.collections' => 'Các mục trong những bộ sưu tập này sẽ được hiển thị. Để trống nếu muốn hiển thị từ các bộ sưu tập có thể định tuyến.',
     'link.config.container' => 'Chọn vùng chứa tài sản cho trường này.',

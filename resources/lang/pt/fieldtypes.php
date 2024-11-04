@@ -106,7 +106,7 @@ return [
     'html.title' => 'HTML',
     'icon.config.directory' => 'O caminho para o diretório que contém os ícones.',
     'icon.config.folder' => 'Um subdiretório contendo um conjunto de ícones específico.',
-    'icon.title' => '',
+    'icon.title' => 'Ícone',
     'integer.title' => 'Integer',
     'link.config.collections' => 'Entradas dessas coleções estarão disponíveis. Deixar isso em branco tornará as entradas de coleções roteáveis disponíveis.',
     'link.config.container' => 'Escolha qual o contentor de activos a utilizar para este campo.',

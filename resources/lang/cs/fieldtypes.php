@@ -106,7 +106,7 @@ return [
     'html.title' => 'HTML',
     'icon.config.directory' => 'Cesta k adresáři obsahujícímu ikony.',
     'icon.config.folder' => 'Podadresář obsahující konkrétní sadu ikon.',
-    'icon.title' => '',
+    'icon.title' => 'Ikona',
     'integer.title' => 'Integer',
     'link.config.collections' => 'Z těchto sbírek budou k dispozici příspěvky. Pokud zůstane prázdná, budou k dispozici záznamy ze směrovaných sbírek.',
     'link.config.container' => 'Pro toto pole vyberte kontejner souboru.',

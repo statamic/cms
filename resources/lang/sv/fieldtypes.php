@@ -106,7 +106,7 @@ return [
     'html.title' => 'HTML',
     'icon.config.directory' => 'Sökvägen till katalogen som innehåller ikonerna.',
     'icon.config.folder' => 'En underkatalog som innehåller en specifik ikonuppsättning.',
-    'icon.title' => '',
+    'icon.title' => 'Ikon',
     'integer.title' => 'Heltal',
     'link.config.collections' => 'Bidrag från dessa samlingar kommer att finnas tillgängliga. Om du lämnar denna tom blir poster från ruttbara samlingar tillgängliga.',
     'link.config.container' => 'Välj vilken tillgångsbehållare som ska användas för det här fältet.',
