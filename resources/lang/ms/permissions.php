@@ -1,18 +1,21 @@
 <?php
 
 return [
-
     'super' => 'Pengguna Super',
     'super_desc' => 'Pentadbir super mempunyai kawalan penuh dan akses kepada semua dalam panel kawalan. Berikan peranan ini dengan bijak.',
-
     'group_cp' => 'Control Panel',
     'access_cp' => 'Akses Panel Kawalan',
     'access_cp_desc' => 'Membenarkan akses ke panel kawalan, tetapi tidak menjamin apa-apa boleh dilakukan sebaik sahaja masuk.',
+    'configure_sites' => 'Konfigurasi Tapak',
+    'configure_sites_desc' => 'Keupayaan untuk mengkonfigurasi tapak apabila berbilang tapak didayakan.',
     'configure_fields' => 'Konfigurasikan Medan',
     'configure_fields_desc' => 'Keupayaan untuk menyunting cetakan biru, set bidang dan bidangnya.',
     'configure_addons' => 'Konfigurasikan Addons',
     'configure_addons_desc' => 'Keupayaan untuk mengakses kawasan addon untuk memasang dan menyahpasang addon.',
-
+    'manage_preferences' => 'Urus Keutamaan',
+    'manage_preferences_desc' => 'Keupayaan untuk menyesuaikan keutamaan global dan khusus peranan.',
+    'group_sites' => 'Tapak',
+    'access_{site}_site' => 'Akses :site',
     'group_collections' => 'Collections',
     'configure_collections' => 'Konfigurasikan Koleksi',
     'configure_collections_desc' => 'Memberi akses kepada semua kebenaran berkaitan koleksi',
@@ -27,7 +30,6 @@ return [
     'edit_other_authors_{collection}_entries' => 'Sunting entri pengarang lain',
     'publish_other_authors_{collection}_entries' => 'Uruskan keadaan penerbitan entri pengarang lain',
     'delete_other_authors_{collection}_entries' => 'Padamkan entri pengarang lain',
-
     'group_taxonomies' => 'Taksonomi',
     'configure_taxonomies' => 'Konfigurasikan Taksonomi',
     'configure_taxonomies_desc' => 'Memberi akses kepada semua kebenaran berkaitan taksonomi',
@@ -37,18 +39,15 @@ return [
     'delete_{taxonomy}_terms' => 'Padamkan istilah',
     'publish_{taxonomy}_terms' => 'Uruskan keadaan penerbitan',
     'reorder_{taxonomy}_terms' => 'Susun semula istilah',
-
     'group_navigation' => 'Navigasi',
     'configure_navs' => 'Konfigurasikan Navigasi',
     'configure_navs_desc' => 'Memberi akses kepada semua kebenaran berkaitan navigasi',
     'view_{nav}_nav' => 'Lihat navigasi :nav',
     'edit_{nav}_nav' => 'Sunting navigasi',
-
     'group_globals' => 'Global',
     'configure_globals' => 'Konfigurasikan Globals',
     'configure_globals_desc' => 'Memberi akses kepada semua kebenaran berkaitan global',
     'edit_{global}_globals' => 'sunting globals :global',
-
     'group_assets' => 'Aset',
     'configure_asset_containers' => 'Konfigurasikan Penampung Aset',
     'configure_asset_containers_desc' => 'Memberi akses kepada semua kebenaran berkaitan aset',
@@ -58,13 +57,13 @@ return [
     'move_{container}_assets' => 'Pindahkan aset',
     'rename_{container}_assets' => 'Namakan semula aset',
     'delete_{container}_assets' => 'Padamkan aset',
-
     'group_forms' => 'Borang',
     'configure_forms' => 'Konfigurasikan Borang',
     'configure_forms_desc' => 'Memberi akses kepada semua kebenaran berkaitan borang',
+    'configure_form_fields' => 'Konfigurasi Medan Borang',
+    'configure_form_fields_desc' => 'Keupayaan untuk mengedit cetak biru borang, set medan dan medannya.',
     'view_{form}_form_submissions' => 'Lihat penyerahan :form',
     'delete_{form}_form_submissions' => 'Padamkan penyerahan :form',
-
     'group_users' => 'Pengguna',
     'view_users' => 'Lihat pengguna',
     'edit_users' => 'Suntingkan pengguna',
@@ -73,16 +72,17 @@ return [
     'change_passwords' => 'Tukar kata laluan',
     'edit_user_groups' => 'Suntingkan kumpulan',
     'edit_roles' => 'Suntingkan peranan',
-
+    'assign_user_groups' => 'Tetapkan kumpulan kepada pengguna',
+    'assign_roles' => 'Berikan peranan kepada pengguna',
+    'impersonate_users' => 'Menyamar sebagai pengguna',
     'group_updates' => 'Kemas kini',
     'view_updates' => 'Lihat Kemas kini',
-
     'group_utilities' => 'Utilities',
     'access_utility' => ':title',
     'access_utility_desc' => 'Memberi akses kepada utiliti :title',
-
     'group_misc' => 'pelbagai',
     'resolve_duplicate_ids' => 'Selesaikan ID Pendua',
     'resolve_duplicate_ids_desc' => 'Memberi keupayaan untuk melihat dan menyelesaikan ID pendua.',
-
+    'view_graphql' => 'Lihat GraphQL',
+    'view_graphql_desc' => 'Memberi keupayaan untuk mengakses pemapar GraphQL',
 ];

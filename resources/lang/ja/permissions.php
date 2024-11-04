@@ -6,6 +6,8 @@ return [
     'group_cp' => 'コントロールパネル',
     'access_cp' => 'コントロールパネルにアクセスする',
     'access_cp_desc' => 'コントロール パネルへのアクセスは許可されますが、コントロール パネルに入ると何もできることは保証されません。',
+    'configure_sites' => 'サイトを構成する',
+    'configure_sites_desc' => 'マルチサイトが有効な場合にサイトを構成する機能。',
     'configure_fields' => 'フィールドの構成',
     'configure_fields_desc' => 'ブループリント、フィールドセット、およびそれらのフィールドを編集する機能。',
     'configure_addons' => 'アドオンの構成',
