@@ -131,7 +131,6 @@ export default {
                 const fuse = new Fuse(options, {
                     findAllMatches: true,
                     threshold: 0.1,
-                    minMatchCharLength: 2,
                     keys: ['text'],
                 });
 
