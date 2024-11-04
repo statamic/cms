@@ -131,7 +131,10 @@ export default {
                 const fuse = new Fuse(options, {
                     findAllMatches: true,
                     threshold: 0.1,
-                    keys: ['text'],
+                    keys: [
+                        {name: 'text', weight: 1},
+                        {name: 'categories', weight: 0.1}
+                    ],
                 });
 
                 options = fuse.search(this.search).map(result => result.item);
