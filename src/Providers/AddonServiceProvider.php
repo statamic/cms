@@ -255,7 +255,7 @@ abstract class AddonServiceProvider extends ServiceProvider
 
         foreach ($this->listen as $event => $listeners) {
             foreach ($listeners as $listener) {
-                if (!in_array($listener, $arr[$event] ?? [])) {
+                if (! in_array($listener, $arr[$event] ?? [])) {
                     $arr[$event][] = $listener;
                 }
             }
