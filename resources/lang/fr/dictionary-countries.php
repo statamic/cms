@@ -16,7 +16,7 @@ return [
     'subregions.eastern_europe' => 'Europe de l\'est',
     'subregions.melanesia' => 'Mélanésie',
     'subregions.micronesia' => 'Micronésie',
-    'subregions.middle_africa' => '',
+    'subregions.middle_africa' => 'Afrique centrale',
     'subregions.northern_africa' => 'Afrique du nord',
     'subregions.northern_america' => 'Amérique du nord',
     'subregions.northern_europe' => 'Europe du nord',
