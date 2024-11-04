@@ -23,6 +23,8 @@ $manualFiles = [
     'markdown',
     'validation',
     'moment',
+    'dictionary-countries',
+    'dictionary-currencies',
 ];
 
 // Don't translate the following files.
