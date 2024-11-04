@@ -134,7 +134,7 @@ export default {
                     keys: [
                         {name: 'text', weight: 1},
                         {name: 'categories', weight: 0.1},
-                        {name: 'keywords', weight: 0.8},
+                        {name: 'keywords', weight: 0.4},
                     ],
                 });
 
