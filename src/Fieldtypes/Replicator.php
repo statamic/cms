@@ -17,6 +17,7 @@ use Statamic\Support\Str;
 class Replicator extends Fieldtype
 {
     protected $categories = ['structured'];
+    protected $keywords = ['builder', 'page builder', 'content'];
     protected $rules = ['array'];
 
     protected function configFieldItems(): array

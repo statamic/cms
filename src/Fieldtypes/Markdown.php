@@ -10,7 +10,7 @@ use Statamic\Support\Html;
 class Markdown extends Fieldtype
 {
     protected $categories = ['text'];
-    protected $keywords = ['md'];
+    protected $keywords = ['md', 'content', 'html'];
 
     use Concerns\ResolvesStatamicUrls;
 
