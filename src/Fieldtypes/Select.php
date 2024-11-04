@@ -9,6 +9,7 @@ class Select extends Fieldtype
     use HasSelectOptions;
 
     protected $categories = ['controls'];
+    protected $keywords = ['select', 'option', 'choice', 'dropdown', 'list'];
     protected $selectableInForms = true;
     protected $indexComponent = 'tags';
 

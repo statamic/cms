@@ -8,6 +8,7 @@ class Countries extends BasicDictionary
 {
     protected string $valueKey = 'iso3';
     protected array $searchable = ['name', 'iso3'];
+    protected array $keywords = ['countries', 'country'];
     private array $regions;
     private array $subregions;
 

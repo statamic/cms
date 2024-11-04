@@ -38,6 +38,7 @@ class Bard extends Replicator
     ];
 
     protected $categories = ['text', 'structured'];
+    protected $keywords = ['rich', 'richtext', 'rich text', 'editor', 'wysiwg', 'builder', 'page builder', 'gutenberg', 'content'];
     protected $rules = [];
 
     protected function configFieldItems(): array
