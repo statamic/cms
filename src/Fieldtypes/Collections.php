@@ -10,6 +10,7 @@ use Statamic\GraphQL\Types\CollectionType;
 class Collections extends Relationship
 {
     protected $categories = ['relationship'];
+    protected $keywords = ['entries'];
     protected $canEdit = false;
     protected $canCreate = false;
     protected $canSearch = false;
