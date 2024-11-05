@@ -38,6 +38,7 @@ export default {
     },
 
     computed: {
+
         selected() {
             if (this.isHovering) {
                 return this.hoveringOver;
