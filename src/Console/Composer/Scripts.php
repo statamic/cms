@@ -13,4 +13,12 @@ class Scripts
     {
         Lock::backup();
     }
+
+    public static function prePackageUninstall($event)
+    {
+        passthru(sprintf(
+            'php artisan statamic:addons:uninstall %s --no-interaction',
+            $event->getOperation()->getPackage()->getName()
+        ));
+    }
 }
