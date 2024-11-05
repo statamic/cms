@@ -9,6 +9,7 @@
             :multiple="maxItems > 1"
             :typeahead="mode === 'typeahead'"
             :taggable="taggable"
+            :creatables="creatables"
             :read-only="readOnly"
             :url="selectionsUrl"
             :site="site"
