@@ -142,14 +142,9 @@ export default {
             this.$emit('input', items);
         },
 
-        createOption(title) {
-            const prefix = this.creatables?.length === 1
-                ? this.creatables[0].prefix
-                : '';
-
-            const id = prefix + str_slug(title);
-
-            return { id, title };
+        createOption(value) {
+            const existing = this.options.find((option) => option.title === value);
+            return existing || { id: value, title: value };
         },
 
     }
