@@ -57,7 +57,7 @@ abstract class Relationship extends Fieldtype
 
     public function preProcess($data)
     {
-        return ($data = Arr::wrap($data)) ? array_values($data) : $data;
+        return Arr::wrap($data);
     }
 
     public function preProcessConfig($data)
