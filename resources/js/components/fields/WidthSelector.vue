@@ -6,14 +6,14 @@
     >
         <div class="w-full flex">
             <div
-                v-for="width in normalizedWidths"
+                v-for="width in widths"
                 :key="width"
                 @mouseenter.stop="hoveringOver = width"
                 @click="$emit('input', width)"
                 :class="[
                     'field-width-notch',
                     'notch-' + width,
-                    { 'filled': selected >= width, 'selected': selected === width }
+                    { 'filled': selected >= width, 'selected': selected == width }
                 ]"
             />
         </div>
@@ -38,10 +38,6 @@ export default {
     },
 
     computed: {
-        normalizedWidths() {
-            return this.widths.map(o => Number(o)).filter(o => !isNaN(o));
-        },
-
         selected() {
             if (this.isHovering) {
                 return this.hoveringOver;
