@@ -508,6 +508,10 @@ export default {
                     // the hooks are resolved because if this form is being shown in a stack, we only
                     // want to close it once everything's done.
                     else {
+                        // Make sure slug changes are reflected in the edit form URL
+                        if (window.location.href !== this.actions.edit) {
+                            window.history.replaceState({}, '', this.actions.edit);
+                        }
                         this.values = this.resetValuesFromResponse(response.data.data.values);
                         this.$nextTick(() => this.$emit('saved', response));
                     }
