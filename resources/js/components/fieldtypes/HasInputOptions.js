@@ -4,7 +4,7 @@ export default {
             if (! Array.isArray(options)) {
                 return _.map(options, (value, key) => {
                     return {
-                        'value': String(Array.isArray(options) ? value : key),
+                        'value': Array.isArray(options) ? value : key,
                         'label': __(value) || key
                     };
                 });
@@ -22,13 +22,13 @@ export default {
                     }
 
                     return {
-                        'value': String(option[valueKey]),
+                        'value': option[valueKey],
                         'label': __(option[labelKey]) || option[valueKey]
                     };
                 }
 
                 return {
-                    'value': String(option),
+                    'value': option,
                     'label': __(option) || option
                 };
             });

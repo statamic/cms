@@ -7,10 +7,10 @@
                 ref="button"
                 type="button"
                 :name="name"
-                @click="update($event.target.value)"
+                @click="update(option.value)"
                 :value="option.value"
                 :disabled="isReadOnly"
-                :class="{'active': value === option.value}"
+                :class="{'active': value == option.value}"
                 v-text="option.label || option.value"
             />
         </div>
