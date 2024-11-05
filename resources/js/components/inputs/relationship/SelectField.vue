@@ -74,7 +74,6 @@ export default {
         typeahead: Boolean,
         multiple: Boolean,
         taggable: Boolean,
-        creatables: Array,
         config: Object,
         readOnly: Boolean,
         site: String,
@@ -89,7 +88,6 @@ export default {
     computed: {
         isTaggable() {
             if (data_get(this.config, 'create') === false) return false;
-            if (this.creatables?.length >= 2) return false;
 
             return this.taggable;
         },
