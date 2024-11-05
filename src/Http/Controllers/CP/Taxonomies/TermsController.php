@@ -102,6 +102,7 @@ class TermsController extends CpController
             'reference' => $term->reference(),
             'editing' => true,
             'actions' => [
+                'edit' => $term->editUrl(),
                 'save' => $term->updateUrl(),
                 'publish' => $term->publishUrl(),
                 'unpublish' => $term->unpublishUrl(),
