@@ -463,6 +463,7 @@ export default {
                 }
                 this.title = response.data.data.title;
                 this.permalink = response.data.data.permalink;
+                this.actions = response.data.actions;
                 this.isWorkingCopy = true;
                 if (!this.isCreating) this.$toast.success(__('Saved'));
                 this.$refs.container.saved();
