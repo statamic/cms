@@ -3,6 +3,7 @@
 namespace Statamic\CP\Navigation;
 
 use Facades\Statamic\CP\Navigation\NavItemIdHasher;
+use Illuminate\Support\Collection;
 use Statamic\Facades\CP\Nav;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -256,10 +257,12 @@ class NavTransformer
      */
     protected function getReorderedItems($originalList, $newList): bool|array
     {
-        $itemsAreReordered = collect($originalList)
+        $comparableLists = collect($originalList)
             ->intersect($newList)
             ->values()
-            ->zip($newList)
+            ->zip($newList);
+
+        $itemsAreReordered = $comparableLists
             ->reject(fn ($pair) => is_null($pair->first()))
             ->reject(fn ($pair) => $pair->first() === $pair->last())
             ->isNotEmpty();
@@ -269,33 +272,53 @@ class NavTransformer
         }
 
         return collect($newList)
-            ->take($this->calculateMinimumItemsForReorder($originalList, $newList))
+            ->take($this->calculateMinimumItemsForReorder($comparableLists->map->first(), $comparableLists->map->last()))
             ->all();
     }
 
     /**
      * Calculate minimum number of items needed for reorder config.
-     *
-     * @param  array  $originalList
-     * @param  array  $newList
      */
-    protected function calculateMinimumItemsForReorder($originalList, $newList): int
+    protected function calculateMinimumItemsForReorder(Collection $originalList, Collection $newList): int
+    {
+        $continueFiltering = true;
+
+        $newList = $this->rejectNewItemsFromEndOfNewList($originalList, $newList);
+
+        $redundantTailItems = $originalList
+            ->filter()
+            ->values()
+            ->reverse()
+            ->zip($newList->reverse())
+            ->filter(function ($pair) use (&$continueFiltering) {
+                if ($continueFiltering && $pair->first() === $pair->last()) {
+                    return true;
+                }
+
+                return $continueFiltering = false;
+            });
+
+        return max(1, $newList->count() - $redundantTailItems->count() - 1);
+    }
+
+    /**
+     * Reject new items from the tail end end of our new list by checking to see if they existed in the old list.
+     */
+    protected function rejectNewItemsFromEndOfNewList(Collection $originalList, Collection $newList): Collection
     {
         $continueRejecting = true;
 
-        $minimumItemsCount = collect($originalList)
+        return $newList
             ->reverse()
-            ->zip(collect($newList)->reverse())
-            ->reject(function ($pair) use (&$continueRejecting) {
-                if ($continueRejecting && $pair->first() === $pair->last()) {
+            ->reject(function ($item) use ($originalList, &$continueRejecting) {
+                if ($continueRejecting && ! $originalList->contains($item)) {
                     return true;
                 }
 
                 return $continueRejecting = false;
             })
-            ->count();
-
-        return max(1, $minimumItemsCount - 1);
+            ->reverse()
+            ->values();
     }
 
     /**
