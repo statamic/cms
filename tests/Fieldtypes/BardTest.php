@@ -939,6 +939,25 @@ EOT;
     }
 
     #[Test]
+    public function it_preprocesses_inline_value_with_break()
+    {
+        $data = [
+            ['type' => 'hardBreak'],
+            ['type' => 'text', 'text' => 'This is inline text.'],
+        ];
+
+        $expected = [[
+            'type' => 'paragraph',
+            'content' => [
+                ['type' => 'hardBreak'],
+                ['type' => 'text', 'text' => 'This is inline text.'],
+            ],
+        ]];
+
+        $this->assertEquals($expected, $this->bard(['inline' => 'break', 'sets' => null])->preProcess($data));
+    }
+
+    #[Test]
     public function it_preprocesses_inline_value_to_block_value()
     {
         $data = [
@@ -948,6 +967,25 @@ EOT;
         $expected = [[
             'type' => 'paragraph',
             'content' => [
+                ['type' => 'text', 'text' => 'This is inline text.'],
+            ],
+        ]];
+
+        $this->assertEquals($expected, $this->bard(['input_mode' => 'block', 'sets' => null])->preProcess($data));
+    }
+
+    #[Test]
+    public function it_preprocesses_inline_value_with_break_to_block_value()
+    {
+        $data = [
+            ['type' => 'hardBreak'],
+            ['type' => 'text', 'text' => 'This is inline text.'],
+        ];
+
+        $expected = [[
+            'type' => 'paragraph',
+            'content' => [
+                ['type' => 'hardBreak'],
                 ['type' => 'text', 'text' => 'This is inline text.'],
             ],
         ]];

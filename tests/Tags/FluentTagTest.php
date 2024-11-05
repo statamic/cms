@@ -90,6 +90,27 @@ class FluentTagTest extends TestCase
     }
 
     #[Test]
+    public function it_handles_content_fluently()
+    {
+        $tag = Mockery::mock(Tags::class)->makePartial();
+        $tag->shouldReceive('index')->andReturn('the content');
+
+        $this->mock(Loader::class)
+            ->shouldReceive('load')
+            ->withArgs(
+                fn ($arg1, $arg2) => $arg1 === 'foo' && Arr::get($arg2, 'content') === 'the content'
+            )
+            ->once()
+            ->andReturn($tag);
+
+        $fluentTag = FluentTag::make('foo')->withContent('the content');
+
+        $this->assertInstanceOf(FluentTag::class, $fluentTag);
+
+        $this->assertEquals('the content', $fluentTag->fetch());
+    }
+
+    #[Test]
     public function it_can_iterate_over_tag_results()
     {
         $this->mockTagThatReturns(collect([

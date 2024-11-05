@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Tags;
+namespace Tests\Tags\Dictionary;
 
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Parse;

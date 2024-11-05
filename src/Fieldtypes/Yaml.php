@@ -9,6 +9,7 @@ use Statamic\Yaml\ParseException;
 class Yaml extends Fieldtype
 {
     protected $categories = ['special'];
+    protected $keywords = ['yml'];
 
     protected function configFieldItems(): array
     {

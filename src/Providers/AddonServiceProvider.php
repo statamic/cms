@@ -8,6 +8,7 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Reflector;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Actions\Action;
 use Statamic\Dictionaries\Dictionary;
@@ -225,26 +226,11 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     public function bootEvents()
     {
-        collect($this->autoloadFilesFromFolder('Listeners'))
-            ->mapWithKeys(function ($class) {
-                $reflection = new \ReflectionClass($class);
-
-                if (
-                    ! $reflection->hasMethod('handle')
-                    || ! isset($reflection->getMethod('handle')->getParameters()[0])
-                    || ! $reflection->getMethod('handle')->getParameters()[0]->hasType()
-                ) {
-                    return [];
-                }
-
-                $event = $reflection->getMethod('handle')->getParameters()[0]->getType()->getName();
-
-                return [$event => $class];
-            })
-            ->filter()
-            ->merge(collect($this->listen)->flatMap(fn ($listeners, $event) => collect($listeners)->mapWithKeys(fn ($listener) => [$event => $listener])))
-            ->unique()
-            ->each(fn ($listener, $event) => Event::listen($event, $listener));
+        $this->getEventListeners()->each(function ($listeners, $event) {
+            foreach ($listeners as $listener) {
+                Event::listen($event, $listener);
+            }
+        });
 
         $subscribers = collect($this->subscribe)
             ->merge($this->autoloadFilesFromFolder('Subscribers'))
@@ -255,6 +241,47 @@ abstract class AddonServiceProvider extends ServiceProvider
         }
 
         return $this;
+    }
+
+    private function getEventListeners()
+    {
+        $arr = [];
+
+        foreach ($this->discoverListenerEvents() as $listener => $events) {
+            foreach ($events as $event) {
+                $arr[$event][] = $listener;
+            }
+        }
+
+        foreach ($this->listen as $event => $listeners) {
+            foreach ($listeners as $listener) {
+                if (! in_array($listener, $arr[$event] ?? [])) {
+                    $arr[$event][] = $listener;
+                }
+            }
+        }
+
+        return collect($arr);
+    }
+
+    private function discoverListenerEvents()
+    {
+        return collect($this->autoloadFilesFromFolder('Listeners'))->mapWithKeys(function ($class) {
+            $listener = new \ReflectionClass($class);
+            $events = [];
+
+            foreach ($listener->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
+                if ((! Str::is('handle*', $method->name) && ! Str::is('__invoke', $method->name)) || ! isset($method->getParameters()[0])) {
+                    continue;
+                }
+
+                $key = Str::is(['__invoke', 'handle'], $method->name) ? $class : $class.'@'.$method->name;
+
+                $events[$key] = Reflector::getParameterClassNames($method->getParameters()[0]);
+            }
+
+            return $events;
+        });
     }
 
     protected function bootTags()

@@ -9,6 +9,7 @@ use Illuminate\Support\Arr;
 use Statamic\Search\Documents;
 use Statamic\Search\Index as BaseIndex;
 use Statamic\Search\IndexNotFoundException;
+use Statamic\Search\Result;
 use Statamic\Support\Str;
 
 class Index extends BaseIndex
@@ -119,5 +120,13 @@ class Index extends BaseIndex
         }
 
         throw $e;
+    }
+
+    public function extraAugmentedResultData(Result $result)
+    {
+        return [
+            'search_highlights' => $result->getRawResult()['_highlightResult'] ?? null,
+            'search_snippets' => $result->getRawResult()['_snippetResult'] ?? null,
+        ];
     }
 }

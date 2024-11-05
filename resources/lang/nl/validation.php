@@ -146,6 +146,10 @@ return [
     'unique_user_value' => 'Deze waarde is al gekozen.',
     'unique_uri' => 'Deze URI is al in gebruik.',
     'time' => 'Dit is geen geldig tijdstip.',
+    'asset_current_filename' => 'Dit is de huidige bestandsnaam.',
+    'asset_file_exists' => 'Er bestaat al een bestand met deze naam.',
+    'asset_file_exists_same_content' => 'Er bestaat al een bestand met deze naam en dezelfde inhoud. U kunt dit bestand verwijderen in plaats van het te hernoemen.',
+    'asset_file_exists_different_content' => 'Er bestaat al een bestand met deze naam, maar met andere inhoud. U kunt het andere bestand vervangen door dit bestand.',
     'custom.attribute-name.rule-name' => 'aangepast-bericht',
     'attributes' => [],
 ];
