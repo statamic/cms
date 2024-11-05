@@ -12,7 +12,7 @@
             :options="options"
             :get-option-key="(option) => option.id"
             :get-option-label="(option) => __(option.title)"
-            :create-option="(value) => ({ title: value, id: value })"
+            :create-option="(value) => createOption(value)"
             :placeholder="__(config.placeholder) || __('Choose...')"
             :searchable="true"
             :taggable="isTaggable"
@@ -140,6 +140,16 @@ export default {
             }
 
             this.$emit('input', items);
+        },
+
+        createOption(title) {
+            const prefix = this.creatables?.length === 1
+                ? this.creatables[0].prefix
+                : '';
+
+            const id = prefix + str_slug(title);
+
+            return { id, title };
         },
 
     }

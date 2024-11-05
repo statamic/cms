@@ -323,6 +323,7 @@ class Terms extends Relationship
                 return [
                     'title' => $this->getCreatableTitle($taxonomy, $blueprint, count($taxonomies), $blueprints->count()),
                     'url' => cp_route('taxonomies.terms.create', [$taxonomy->handle(), Site::selected()->handle()]).'?blueprint='.$blueprint->handle(),
+                    'prefix' => $taxonomy->handle().'::',
                 ];
             });
         })->all();
