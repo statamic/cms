@@ -102,7 +102,6 @@ class TermsController extends CpController
             'reference' => $term->reference(),
             'editing' => true,
             'actions' => [
-                'edit' => $term->editUrl(),
                 'save' => $term->updateUrl(),
                 'publish' => $term->publishUrl(),
                 'unpublish' => $term->unpublishUrl(),
@@ -216,16 +215,6 @@ class TermsController extends CpController
                 'saved' => $saved,
                 'data' => [
                     'values' => $values,
-                ],
-                'actions' => [
-                    'edit' => $term->editUrl(),
-                    'save' => $term->updateUrl(),
-                    'publish' => $term->publishUrl(),
-                    'unpublish' => $term->unpublishUrl(),
-                    'revisions' => $term->revisionsUrl(),
-                    'restore' => $term->restoreRevisionUrl(),
-                    'createRevision' => $term->createRevisionUrl(),
-                    'editBlueprint' => cp_route('taxonomies.blueprints.edit', [$taxonomy, $term->blueprint()]),
                 ],
             ]);
     }

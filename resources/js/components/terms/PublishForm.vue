@@ -463,7 +463,6 @@ export default {
                 }
                 this.title = response.data.data.title;
                 this.permalink = response.data.data.permalink;
-                this.actions = response.data.actions;
                 this.isWorkingCopy = true;
                 if (!this.isCreating) this.$toast.success(__('Saved'));
                 this.$refs.container.saved();
@@ -504,14 +503,15 @@ export default {
                         window.location = this.listingUrl;
                     }
 
+                    // If the edit URL was changed (i.e. the term slug was updated), redirect them there.
+                    else if (window.location.href !== response.data.data.edit_url) {
+                        window.location = response.data.data.edit_url;
+                    }
+
                     // Otherwise, leave them on the edit form and emit an event. We need to wait until after
                     // the hooks are resolved because if this form is being shown in a stack, we only
                     // want to close it once everything's done.
                     else {
-                        // Make sure slug changes are reflected in the edit form URL
-                        if (window.location.href !== this.actions.edit) {
-                            window.history.replaceState({}, '', this.actions.edit);
-                        }
                         this.values = this.resetValuesFromResponse(response.data.data.values);
                         this.$nextTick(() => this.$emit('saved', response));
                     }
