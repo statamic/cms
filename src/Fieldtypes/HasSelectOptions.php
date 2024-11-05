@@ -43,7 +43,7 @@ trait HasSelectOptions
         }
 
         return collect($options)
-            ->map(fn ($item) => ['value' => $item['key'], 'label' => $item['value'] ? strval($item['value']) : null])
+            ->map(fn ($item) => ['value' => $item['key'], 'label' => $item['value']])
             ->values()
             ->all();
     }
