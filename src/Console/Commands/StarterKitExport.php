@@ -20,7 +20,9 @@ class StarterKitExport extends Command
      *
      * @var string
      */
-    protected $signature = 'statamic:starter-kit:export { path : Specify the path you are exporting to }';
+    protected $signature = 'statamic:starter-kit:export
+        { path : Specify the path you are exporting to }
+        { --clear : Clear out everything at target export path before exporting }';
 
     /**
      * The console command description.
@@ -42,7 +44,8 @@ class StarterKitExport extends Command
             $this->askToCreateExportPath($path);
         }
 
-        $exporter = new StarterKitExporter($path);
+        $exporter = (new StarterKitExporter($path))
+            ->clear($this->option('clear'));
 
         try {
             $exporter->export();
