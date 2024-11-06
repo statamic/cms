@@ -210,6 +210,68 @@ class InstallTest extends TestCase
     }
 
     #[Test]
+    public function it_installs_as_living_addon_with_custom_config()
+    {
+        $this->setConfig([
+            'addon' => true, // With `addon: true`, kit should live on as composer updatable addon
+            'export_paths' => [
+                'copied.md',
+            ],
+        ]);
+
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+
+        $this->installCoolRunnings();
+
+        $this->assertFileExists(base_path('copied.md'));
+        $this->assertComposerJsonDoesntHave('repositories');
+
+        // Keep addon around
+        $this->assertFileExists($this->kitVendorPath());
+
+        // But ensure we still delete backup composer.json, which is only used for error handling purposes
+        $this->assertFileDoesNotExist(base_path('composer.json.bak'));
+    }
+
+    #[Test]
+    public function it_leaves_custom_repository_for_living_addon()
+    {
+        $this->setConfig([
+            'addon' => true, // With `addon: true`, kit should live on as composer updatable addon
+            'export_paths' => [
+                'copied.md',
+            ],
+        ]);
+
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertComposerJsonDoesntHave('repositories');
+
+        $this->installCoolRunnings([], [
+            'outpost.*' => Http::response(['data' => ['price' => null]], 200),
+            'github.com/*' => Http::response('', 200),
+            '*' => Http::response('', 404),
+        ]);
+
+        $this->assertFileExists(base_path('copied.md'));
+
+        // Keep addon around
+        $this->assertFileExists($this->kitVendorPath());
+
+        // As well as custom repository, which will be needed for composer updates, if it was needed for install
+        $composerJson = json_decode($this->files->get(base_path('composer.json')), true);
+        $this->assertCount(1, $composerJson['repositories']);
+        $this->assertEquals([[
+            'type' => 'vcs',
+            'url' => 'https://github.com/statamic/cool-runnings',
+        ]], $composerJson['repositories']);
+
+        // But delete backup composer.json, which is only used for error handling purposes
+        $this->assertFileDoesNotExist(base_path('composer.json.bak'));
+    }
+
+    #[Test]
     public function it_fails_if_starter_kit_config_does_not_exist()
     {
         $this->files->delete($this->kitRepoPath('starter-kit.yaml'));
