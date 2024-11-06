@@ -1,5 +1,28 @@
 # Release Notes
 
+## 5.37.0 (2024-11-06)
+
+### What's new
+- Improved fieldtype search using keywords [#11053](https://github.com/statamic/cms/issues/11053) by @jasonvarga
+- Offer to enable Pro during make user command [#11071](https://github.com/statamic/cms/issues/11071) by @jasonvarga
+- Add `--clear` option for `starter-kit:export` [#11079](https://github.com/statamic/cms/issues/11079) by @jesseleite
+- Extra values for entry field conditions, including depth [#11080](https://github.com/statamic/cms/issues/11080) by @jasonvarga
+- Add a config for specifying the default layout [#11025](https://github.com/statamic/cms/issues/11025) by @ryanmitchell
+
+### What's fixed
+- Integer fields should render with `type="number"` [#11065](https://github.com/statamic/cms/issues/11065) by @duncanmcclean
+- Update addon `.gitignore` stub [#11068](https://github.com/statamic/cms/issues/11068) by @duncanmcclean
+- Adjust legacy ignition classes [#11073](https://github.com/statamic/cms/issues/11073) by @jasonvarga
+- Fix Ignition Runnable Error Solutions [#11072](https://github.com/statamic/cms/issues/11072) by @jasonvarga
+- Fix typeahead relationship input corrupting data [#11059](https://github.com/statamic/cms/issues/11059) by @daun
+- Files Fieldtype: Don't truncate existing filename [#11055](https://github.com/statamic/cms/issues/11055) by @duncanmcclean
+- Fix addon events dispatched twice if registered manually [#11049](https://github.com/statamic/cms/issues/11049) by @morhi
+- Fix query parameters in external script URLs being wrongly encoded [#11052](https://github.com/statamic/cms/issues/11052) by @duncanmcclean
+- Fix inline Bard with leading line break [#11038](https://github.com/statamic/cms/issues/11038) by @jacksleight
+- Update Translations and fill in blanks with Google Translate [#11050](https://github.com/statamic/cms/issues/11050) by @jasonvarga
+
+
+
 ## 5.36.0 (2024-10-31)
 
 ### What's new
