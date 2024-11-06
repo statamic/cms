@@ -548,7 +548,7 @@ EOT;
      */
     public function removeStarterKit(): self
     {
-        if ($this->disableCleanup) {
+        if ($this->isAddon() || $this->disableCleanup) {
             return $this;
         }
 
@@ -589,7 +589,7 @@ EOT;
      */
     protected function removeRepository(): self
     {
-        if ($this->fromLocalRepo || ! $this->url) {
+        if ($this->isAddon() || $this->fromLocalRepo || ! $this->url) {
             return $this;
         }
 
@@ -681,5 +681,13 @@ EOT;
         }
 
         return $config;
+    }
+
+    /**
+     * Should starter kit be treated as a regular addon, and live on for future composer updates, etc?
+     */
+    protected function isAddon(): bool
+    {
+        return (bool) $this->config('addon');
     }
 }
