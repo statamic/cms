@@ -22,12 +22,14 @@ class Actions {
     }
 
     modal(props) {
+        const name = props.fields ? 'fields-modal' : 'confirmation-modal';
         return new Promise((resolve) => {
-            const component = Statamic.$components.append('action-modal', { props });
-            component.on('confirm', (data) => {
+            const component = Statamic.$components.append(name, { props });
+            component.on('confirm', (data = {}) => {
                 if (props.keepOpen) {
                     resolve({
                         ...data,
+                        confirmed: true,
                         close: () => Statamic.$components.destroy(component.id),
                     });                          
                 } else {
@@ -36,7 +38,9 @@ class Actions {
                 }
             });
             component.on('cancel', () => {
-                resolve(false);
+                resolve({
+                    confirmed: false,
+                });
                 Statamic.$components.destroy(component.id);
             });
         });

@@ -115,7 +115,7 @@ export default {
                 return;
             }
             this.resolving = true;
-            this.$axios.post(cp_url(`action-modal/resolve`), {
+            this.$axios.post(cp_url(`fields-modal/resolve`), {
                 fields: this.fields,
             }).then(response => {
                 this.fieldset = { tabs: [{ fields: response.data.fieldset }]};
@@ -130,7 +130,7 @@ export default {
                 return;
             }
             this.processing = true;
-            this.$axios.post(cp_url('action-modal/process'), {
+            this.$axios.post(cp_url('fields-modal/process'), {
                 fields: this.fields,
                 values: this.values,
             }).then(response => {

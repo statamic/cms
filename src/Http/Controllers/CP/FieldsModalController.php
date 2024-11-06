@@ -5,7 +5,7 @@ namespace Statamic\Http\Controllers\CP;
 use Illuminate\Http\Request;
 use Statamic\Fields\Fields;
 
-class ActionModalController extends CpController
+class FieldsModalController extends CpController
 {
     public function resolve(Request $request)
     {
