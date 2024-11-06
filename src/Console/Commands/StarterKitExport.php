@@ -44,7 +44,8 @@ class StarterKitExport extends Command
             $this->askToCreateExportPath($path);
         }
 
-        $exporter = new StarterKitExporter($path);
+        $exporter = (new StarterKitExporter($path))
+            ->clear($this->option('clear'));
 
         try {
             $exporter->export();
