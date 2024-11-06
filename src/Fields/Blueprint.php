@@ -130,6 +130,19 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
         ]));
     }
 
+    public function fullyQualifiedHandle(): string
+    {
+        $handle = $this->handle();
+
+        if ($this->namespace()) {
+            $handle = $this->isNamespaced()
+                ? $this->namespace().'::'.$handle
+                : $this->namespace().'.'.$handle;
+        }
+
+        return $handle;
+    }
+
     public function setContents(array $contents)
     {
         $this->contents = $contents;
@@ -515,6 +528,11 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
         BlueprintReset::dispatch($this);
 
         return true;
+    }
+
+    public function fresh()
+    {
+        return BlueprintRepository::find($this->fullyQualifiedHandle());
     }
 
     public function ensureField($handle, $fieldConfig, $tab = null, $prepend = false)
