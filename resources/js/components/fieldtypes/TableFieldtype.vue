@@ -3,6 +3,7 @@
         <div class="table-fieldtype-container" :class="{'table-fullscreen bg-white dark:bg-dark-700': fullScreenMode }">
             <publish-field-header
                 v-if="fullScreenMode"
+                :field="_self"
                 :config="config"
                 :run-action="runAction"
                 :actions="visibleActions"
@@ -176,7 +177,7 @@ export default {
             return [
                 {
                     title: __('Toggle Fullscreen Mode'),
-                    icon: 'expand-bold',
+                    icon: ({ field }) => field.fullScreenMode ? 'shrink-all' : 'expand-bold',
                     quick: true,
                     run: this.toggleFullscreen,
                 },

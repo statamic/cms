@@ -56,7 +56,7 @@
                         v-for="action, index in fieldQuickActions"
                         :key="index"
                         :text="action.title"
-                        :icon="action.icon"
+                        :icon="fieldActionIcon(action)"
                         @click="fieldRunAction(action)" />
                     <template #dropdown>
                         <dropdown-actions :actions="fieldActions" @run="fieldRunAction" v-if="fieldActions.length" />
@@ -296,7 +296,11 @@ export default {
 
         fieldRunAction(action) {
             this.$refs.field.runAction(action);
-        }
+        },
+
+        fieldActionIcon({ icon }) {
+            return typeof icon === 'function' ? icon({ field: this }) : icon;
+        },
 
     }
 }

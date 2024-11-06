@@ -17,7 +17,7 @@
                 :key="index"
                 v-tooltip="action.title"
                 @click="runAction(action)">
-                <svg-icon :name="action.icon" class="h-4 w-4" />
+                <svg-icon :name="fieldActionIcon(action)" class="h-4 w-4" />
             </button>
         </div>
     </header>
@@ -29,6 +29,10 @@
 export default {
 
     props: {
+        field: {
+            type: Object,
+            required: true,
+        },
         config: {
             type: Object,
             required: true,
@@ -49,6 +53,14 @@ export default {
             type: Array,
             default: () => [],
         },
+    },
+
+    methods: {
+
+        fieldActionIcon({ icon }) {
+            return typeof icon === 'function' ? icon({ field: this.field }) : icon;
+        },
+
     },
 
 }
