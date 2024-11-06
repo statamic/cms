@@ -63,8 +63,6 @@ final class Installer
     public function branch(?string $branch = null): self|bool|null
     {
         return $this->fluentlyGetOrSet('branch')->args(func_get_args());
-
-        return $this;
     }
 
     /**
@@ -73,8 +71,6 @@ final class Installer
     public function fromLocalRepo(bool $fromLocalRepo = false): self|bool|null
     {
         return $this->fluentlyGetOrSet('fromLocalRepo')->args(func_get_args());
-
-        return $this;
     }
 
     /**
@@ -83,8 +79,6 @@ final class Installer
     public function withConfig(bool $withConfig = false): self|bool|null
     {
         return $this->fluentlyGetOrSet('withConfig')->args(func_get_args());
-
-        return $this;
     }
 
     /**
@@ -101,8 +95,6 @@ final class Installer
     public function withUserPrompt(bool $withUserPrompt = false): self|bool|null
     {
         return $this->fluentlyGetOrSet('withUserPrompt')->args(func_get_args());
-
-        return $this;
     }
 
     /**
@@ -119,8 +111,6 @@ final class Installer
     public function usingSubProcess(bool $usingSubProcess = false): self|bool|null
     {
         return $this->fluentlyGetOrSet('usingSubProcess')->args(func_get_args());
-
-        return $this;
     }
 
     /**
