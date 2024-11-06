@@ -6,7 +6,7 @@ use Exception;
 use Spatie\ErrorSolutions\Contracts\BaseSolution;
 use Spatie\ErrorSolutions\Contracts\ProvidesSolution;
 use Spatie\ErrorSolutions\Contracts\Solution;
-use Spatie\LaravelIgnition\Support\StringComparator;
+use Spatie\ErrorSolutions\Support\Laravel\StringComparator;
 use Statamic\Statamic;
 
 class WidgetNotFoundException extends Exception implements ProvidesSolution
