@@ -4,9 +4,9 @@ namespace Statamic\Exceptions;
 
 use Exception;
 use Facades\Statamic\Fields\FieldtypeRepository;
-use Spatie\Ignition\Contracts\BaseSolution;
-use Spatie\Ignition\Contracts\ProvidesSolution;
-use Spatie\Ignition\Contracts\Solution;
+use Spatie\ErrorSolutions\Contracts\BaseSolution;
+use Spatie\ErrorSolutions\Contracts\ProvidesSolution;
+use Spatie\ErrorSolutions\Contracts\Solution;
 use Spatie\LaravelIgnition\Support\StringComparator;
 use Statamic\Statamic;
 

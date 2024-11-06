@@ -2,7 +2,7 @@
 
 namespace Statamic\Ignition\Solutions;
 
-use Spatie\Ignition\Contracts\Solution;
+use Spatie\ErrorSolutions\Contracts\Solution;
 
 class UpdateClassReference implements Solution
 {
