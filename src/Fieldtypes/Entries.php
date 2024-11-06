@@ -46,6 +46,7 @@ class Entries extends Relationship
         'initialReference' => 'reference',
         'initialFieldset' => 'blueprint',
         'initialValues' => 'values',
+        'initialExtraValues' => 'extraValues',
         'initialLocalizedFields' => 'localizedFields',
         'initialMeta' => 'meta',
         'initialPermalink' => 'permalink',
