@@ -672,7 +672,9 @@ EOT;
      */
     protected function config(?string $key = null): mixed
     {
-        $config = collect(YAML::parse($this->files->get($this->starterKitPath('starter-kit.yaml'))));
+        $config = Blink::once('starter-kit-config', function () {
+            return collect(YAML::parse($this->files->get($this->starterKitPath('starter-kit.yaml'))));
+        });
 
         if ($key) {
             return $config->get($key);
