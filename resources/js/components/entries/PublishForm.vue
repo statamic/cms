@@ -68,6 +68,7 @@
             :name="publishContainer"
             :blueprint="fieldset"
             :values="values"
+            :extra-values="extraValues"
             :reference="initialReference"
             :meta="meta"
             :errors="errors"
@@ -335,6 +336,7 @@ export default {
         initialReference: String,
         initialFieldset: Object,
         initialValues: Object,
+        initialExtraValues: Object,
         initialMeta: Object,
         initialTitle: String,
         initialLocalizations: Array,
@@ -375,6 +377,7 @@ export default {
             title: this.initialTitle,
             values: _.clone(this.initialValues),
             meta: _.clone(this.initialMeta),
+            extraValues: _.clone(this.initialExtraValues),
             localizations: _.clone(this.initialLocalizations),
             localizedFields: this.initialLocalizedFields,
             hasOrigin: this.initialHasOrigin,
@@ -606,6 +609,7 @@ export default {
                         clearTimeout(this.trackDirtyStateTimeout)
                         this.trackDirtyState = false
                         this.values = this.resetValuesFromResponse(response.data.data.values);
+                        this.extraValues = response.data.data.extraValues;
                         this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500)
                         this.$nextTick(() => this.$emit('saved', response));
                         return;
@@ -630,6 +634,7 @@ export default {
                         clearTimeout(this.trackDirtyStateTimeout);
                         this.trackDirtyState = false;
                         this.values = this.resetValuesFromResponse(response.data.data.values);
+                        this.extraValues = response.data.data.extraValues;
                         this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500);
                         this.initialPublished = response.data.data.published;
                         this.activeLocalization.published = response.data.data.published;
