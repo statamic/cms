@@ -291,6 +291,11 @@ class Fieldset
         return true;
     }
 
+    public function fresh()
+    {
+        return Facades\Fieldset::find($this->handle());
+    }
+
     public static function __callStatic($method, $parameters)
     {
         return Facades\Fieldset::{$method}(...$parameters);
