@@ -210,10 +210,10 @@ class InstallTest extends TestCase
     }
 
     #[Test]
-    public function it_installs_as_living_addon_with_custom_config()
+    public function it_installs_as_living_package_with_custom_config()
     {
         $this->setConfig([
-            'addon' => true, // With `addon: true`, kit should live on as composer updatable addon
+            'updatable' => true, // With `updatable: true`, kit should live on as composer updatable package
             'export_paths' => [
                 'copied.md',
             ],
@@ -227,7 +227,7 @@ class InstallTest extends TestCase
         $this->assertFileExists(base_path('copied.md'));
         $this->assertComposerJsonDoesntHave('repositories');
 
-        // Keep addon around
+        // Keep package around
         $this->assertFileExists($this->kitVendorPath());
 
         // But ensure we still delete backup composer.json, which is only used for error handling purposes
@@ -235,10 +235,10 @@ class InstallTest extends TestCase
     }
 
     #[Test]
-    public function it_leaves_custom_repository_for_living_addon()
+    public function it_leaves_custom_repository_for_living_packages_that_need_it()
     {
         $this->setConfig([
-            'addon' => true, // With `addon: true`, kit should live on as composer updatable addon
+            'updatable' => true, // With `updatable: true`, kit should live on as composer updatable package
             'export_paths' => [
                 'copied.md',
             ],
@@ -256,7 +256,7 @@ class InstallTest extends TestCase
 
         $this->assertFileExists(base_path('copied.md'));
 
-        // Keep addon around
+        // Keep package around
         $this->assertFileExists($this->kitVendorPath());
 
         // As well as custom repository, which will be needed for composer updates, if it was needed for install

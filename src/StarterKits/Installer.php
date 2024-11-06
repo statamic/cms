@@ -548,7 +548,7 @@ EOT;
      */
     public function removeStarterKit(): self
     {
-        if ($this->isAddon() || $this->disableCleanup) {
+        if ($this->isUpdatable() || $this->disableCleanup) {
             return $this;
         }
 
@@ -589,7 +589,7 @@ EOT;
      */
     protected function removeRepository(): self
     {
-        if ($this->isAddon() || $this->fromLocalRepo || ! $this->url) {
+        if ($this->isUpdatable() || $this->fromLocalRepo || ! $this->url) {
             return $this;
         }
 
@@ -684,10 +684,10 @@ EOT;
     }
 
     /**
-     * Should starter kit be treated as a regular addon, and live on for future composer updates, etc?
+     * Should starter kit be treated as an updatable package, and live on for future composer updates, etc?
      */
-    protected function isAddon(): bool
+    protected function isUpdatable(): bool
     {
-        return (bool) $this->config('addon');
+        return (bool) $this->config('updatable');
     }
 }
