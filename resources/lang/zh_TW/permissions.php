@@ -1,18 +1,21 @@
 <?php
 
 return [
-
     'super' => '超級管理員',
     'super_desc' => '超級管理員對於控制面板的所有功能有完整的控制與存取權限。請審慎給予此角色。',
-
     'group_cp' => '控制面板',
     'access_cp' => '可存取控制面板',
     'access_cp_desc' => '允許存取控制面板，但不保證能在控制面板內能做任何操作。',
+    'configure_sites' => '配置站点',
+    'configure_sites_desc' => '当启用多站点时能够配置站点。',
     'configure_fields' => '設定欄位',
     'configure_fields_desc' => '可編輯藍圖、欄位集、及其欄位。',
     'configure_addons' => '設定附加元件',
     'configure_addons_desc' => '可存取附加元件區域以安裝或解除安裝附加元件。',
-
+    'manage_preferences' => '管理偏好设置',
+    'manage_preferences_desc' => '能够定制全局和特定角色的偏好。',
+    'group_sites' => '站点',
+    'access_{site}_site' => '访问:site',
     'group_collections' => '條目集',
     'configure_collections' => '設定條目集',
     'configure_collections_desc' => '給予存取所有與條目集相關的權限',
@@ -27,7 +30,6 @@ return [
     'edit_other_authors_{collection}_entries' => '編輯其他作者的條目',
     'publish_other_authors_{collection}_entries' => '管理其他作者條目的發表狀態',
     'delete_other_authors_{collection}_entries' => '刪除其他作者的條目',
-
     'group_taxonomies' => '分類',
     'configure_taxonomies' => '設定分類',
     'configure_taxonomies_desc' => '給予存取所有與分類相關的權限',
@@ -37,18 +39,15 @@ return [
     'delete_{taxonomy}_terms' => '刪除字詞組',
     'publish_{taxonomy}_terms' => '管理發佈狀態',
     'reorder_{taxonomy}_terms' => '重新排序字詞組',
-
     'group_navigation' => '導航',
     'configure_navs' => '設定導航',
     'configure_navs_desc' => '給予存取所有導航相關的權限',
     'view_{nav}_nav' => '檢視 :nav 導航',
     'edit_{nav}_nav' => '編輯導航',
-
     'group_globals' => '全域',
     'configure_globals' => '設定全域',
     'configure_globals_desc' => '給予存取所有全域相關的權限',
     'edit_{global}_globals' => '編輯 :global 全域',
-
     'group_assets' => '素材',
     'configure_asset_containers' => '設定素材容器',
     'configure_asset_containers_desc' => '給予存取所有素材相關的權限',
@@ -58,13 +57,13 @@ return [
     'move_{container}_assets' => '移動素材',
     'rename_{container}_assets' => '重新命名素材',
     'delete_{container}_assets' => '刪除素材',
-
     'group_forms' => '表單',
     'configure_forms' => '設定表單',
     'configure_forms_desc' => '給予存取所有表單相關的權限',
+    'configure_form_fields' => '配置表单字段',
+    'configure_form_fields_desc' => '能够编辑表单蓝图、字段集及其字段。',
     'view_{form}_form_submissions' => '檢視 :form 提交',
     'delete_{form}_form_submissions' => '刪除 :form 提交',
-
     'group_users' => '使用者',
     'view_users' => '檢視使用者',
     'edit_users' => '編輯使用者',
@@ -73,16 +72,17 @@ return [
     'change_passwords' => '更改密碼',
     'edit_user_groups' => '編輯群組',
     'edit_roles' => '編輯角色',
-
+    'assign_user_groups' => '为用户分配组',
+    'assign_roles' => '为用户分配角色',
+    'impersonate_users' => '冒充用户',
     'group_updates' => '更新',
     'view_updates' => '檢視更新',
-
     'group_utilities' => '公用程式',
     'access_utility' => ':title',
     'access_utility_desc' => '給予存取所有 :title 公用程式的權限',
-
     'group_misc' => '其他',
     'resolve_duplicate_ids' => '解析重複的 ID',
     'resolve_duplicate_ids_desc' => '給予檢視與解析重複 ID 的權限。',
-
+    'view_graphql' => '查看 GraphQL',
+    'view_graphql_desc' => '授予访问 GraphQL 查看器的能力',
 ];

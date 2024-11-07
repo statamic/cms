@@ -207,4 +207,15 @@ return [
 
     'fake_sql_queries' => config('app.debug'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Layout
+    |--------------------------------------------------------------------------
+    |
+    | Define the default layout that will be used by views.
+    |
+    */
+
+    'layout' => env('STATAMIC_LAYOUT', 'layout'),
+
 ];

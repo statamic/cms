@@ -55,7 +55,7 @@ class Sets extends Fieldtype
                         'instructions' => $set['instructions'] ?? null,
                         'icon' => $set['icon'] ?? null,
                         'hide' => $set['hide'] ?? null,
-                        'fields' => collect($set['fields'])->map(function ($field, $i) use ($setId) {
+                        'fields' => collect($set['fields'] ?? [])->map(function ($field, $i) use ($setId) {
                             return array_merge(FieldTransformer::toVue($field), ['_id' => $setId.'-'.$i]);
                         })->all(),
                     ];

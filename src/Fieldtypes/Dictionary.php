@@ -170,4 +170,15 @@ class Dictionary extends Fieldtype
     {
         GraphQL::addType($this->dictionary()->getGqlType());
     }
+
+    public function keywords(): array
+    {
+        return \Statamic\Facades\Dictionary::all()
+            ->flatMap(fn ($dictionary) => [
+                str($dictionary->handle())->replace('_', ' ')->toString(),
+                ...$dictionary->keywords(),
+            ])
+            ->merge(['select', 'option', 'choice', 'dropdown', 'list'])
+            ->unique()->values()->all();
+    }
 }

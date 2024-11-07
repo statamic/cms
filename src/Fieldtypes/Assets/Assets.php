@@ -24,6 +24,7 @@ use Statamic\Support\Str;
 class Assets extends Fieldtype
 {
     protected $categories = ['media', 'relationship'];
+    protected $keywords = ['file', 'files', 'image', 'images', 'video', 'videos', 'audio', 'upload'];
     protected $selectableInForms = true;
 
     protected function configFieldItems(): array

@@ -14,7 +14,9 @@ class AugmentedVariables extends AbstractAugmented
             return $this->cachedKeys;
         }
 
-        return $this->cachedKeys = $this->data->values()->keys()->all();
+        return $this->cachedKeys = $this->data->values()->keys()
+            ->merge($this->blueprintFields()->keys())
+            ->unique()->sort()->values()->all();
     }
 
     public function site()

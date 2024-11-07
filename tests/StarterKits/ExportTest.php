@@ -150,6 +150,45 @@ class ExportTest extends TestCase
     }
 
     #[Test]
+    public function it_can_clear_target_export_path_with_clear_option()
+    {
+        $paths = $this->cleanPaths([
+            base_path('one'),
+            base_path('two'),
+        ]);
+
+        // Imagine this exists from previous export
+        $this->files->makeDirectory($this->exportPath('one'), 0777, true, true);
+        $this->files->put($this->exportPath('one/file.md'), 'One.');
+
+        $this->files->makeDirectory(base_path('two'), 0777, true, true);
+        $this->files->put(base_path('two/file.md'), 'Two.');
+
+        $this->setExportPaths([
+            'two/file.md',
+        ]);
+
+        $this->assertFileExists($this->exportPath('one'));
+        $this->assertFileDoesNotExist($this->exportPath('two'));
+
+        $this->exportCoolRunnings();
+
+        // Our 'one' folder should exist after exporting normally
+        $this->assertFileExists($this->exportPath('one'));
+        $this->assertFileExists($this->exportPath('two'));
+
+        $this->exportCoolRunnings(['--clear' => true]);
+
+        // But 'one' folder should exist after exporting with `--clear` option
+        $this->assertFileDoesNotExist($this->exportPath('one'));
+        $this->assertFileExists($this->exportPath('two'));
+
+        $this->exportCoolRunnings();
+
+        $this->cleanPaths($paths);
+    }
+
+    #[Test]
     public function it_copies_export_config()
     {
         $this->setExportPaths([
@@ -1533,12 +1572,12 @@ EOT
         );
     }
 
-    private function exportCoolRunnings()
+    private function exportCoolRunnings($options = [])
     {
-        return $this->artisan('statamic:starter-kit:export', [
+        return $this->artisan('statamic:starter-kit:export', array_merge([
             'path' => '../cool-runnings',
             '--no-interaction' => true,
-        ]);
+        ], $options));
     }
 
     private function assertFileHasContent($expected, $path)
