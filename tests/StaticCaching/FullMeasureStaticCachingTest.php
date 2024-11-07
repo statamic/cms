@@ -5,7 +5,6 @@ namespace Tests\StaticCaching;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\File;
 use Statamic\Facades\StaticCache;
-use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\NoCache\Session;
 use Tests\FakesContent;
 use Tests\FakesViews;
@@ -136,14 +135,12 @@ class FullMeasureStaticCachingTest extends TestCase
     public function it_should_add_the_javascript_if_there_is_a_csrf_token()
     {
         $this->withFakeViews();
-        $this->viewShouldReturnRaw('layout', '<html><head></head><body>{{ template_content }}</body></html>');
+        $this->viewShouldReturnRaw('layout', '<html><body>{{ template_content }}</body></html>');
         $this->viewShouldReturnRaw('default', '{{ csrf_token }}');
 
         $this->createPage('about');
 
         StaticCache::nocacheJs('js here');
-
-        $csrfTokenScript = '<script type="text/javascript">'.app(Cacher::class)->getCsrfTokenJs().'</script>';
 
         $this->assertFalse(file_exists($this->dir.'/about_.html'));
 
@@ -152,11 +149,11 @@ class FullMeasureStaticCachingTest extends TestCase
             ->assertOk();
 
         // Initial response should be dynamic and not contain javascript.
-        $this->assertEquals('<html><head></head><body>'.csrf_token().'</body></html>', $response->getContent());
+        $this->assertEquals('<html><body>'.csrf_token().'</body></html>', $response->getContent());
 
         // The cached response should have the token placeholder, and the javascript.
         $this->assertTrue(file_exists($this->dir.'/about_.html'));
-        $this->assertEquals(vsprintf('<html><head>'.$csrfTokenScript.'</head><body>STATAMIC_CSRF_TOKEN%s</body></html>', [
+        $this->assertEquals(vsprintf('<html><body>STATAMIC_CSRF_TOKEN%s</body></html>', [
             '<script type="text/javascript">js here</script>',
         ]), file_get_contents($this->dir.'/about_.html'));
     }
