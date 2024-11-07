@@ -3,15 +3,18 @@
 namespace Statamic\Http\Controllers\CP\Collections;
 
 use Illuminate\Http\Request;
-use Statamic\Facades\Entry;
+use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\Data;
 use Statamic\Http\Controllers\CP\CpController;
 
 class EditRedirectController extends CpController
 {
     public function __invoke(Request $request)
     {
-        return redirect(
-            Entry::findOrFail($request->id)->editUrl()
-        );
+        if ($data = Data::find($request->id)) {
+            return redirect($data->editUrl());
+        }
+
+        throw new NotFoundHttpException;
     }
 }
