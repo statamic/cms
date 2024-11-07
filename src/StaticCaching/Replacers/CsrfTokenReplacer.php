@@ -68,6 +68,10 @@ class CsrfTokenReplacer implements Replacer
             return;
         }
 
+        if (! $cacher->shouldOutputDecoupledScripts()) {
+            return;
+        }
+
         $contents = $response->getContent();
 
         $insertBefore = collect([

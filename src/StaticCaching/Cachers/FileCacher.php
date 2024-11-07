@@ -251,9 +251,23 @@ EOT;
         return $this->csrfTokenJs ?? $default;
     }
 
+    public function shouldOutputDecoupledScripts(): bool
+    {
+        return config('statamic.static_caching.decouple_nocache_scripts', false);
+    }
+
     public function getNocacheJs(): string
     {
-        $default = <<<'EOT'
+        $default = $this->shouldOutputDecoupledScripts()
+            ? $this->getDecoupledNocacheJs()
+            : $this->getLegacyNocacheJs();
+
+        return $this->nocacheJs ?? $default;
+    }
+
+    protected function getDecoupledNocacheJs(): string
+    {
+        return <<<'EOT'
 (function() {
     var els = document.getElementsByClassName('nocache');
     var map = {};
@@ -281,8 +295,60 @@ EOT;
     });
 })();
 EOT;
+    }
 
-        return $this->nocacheJs ?? $default;
+    protected function getLegacyNocacheJs(): string
+    {
+        $csrfPlaceholder = CsrfTokenReplacer::REPLACEMENT;
+
+        return <<<EOT
+(function() {
+    var els = document.getElementsByClassName('nocache');
+    var map = {};
+    for (var i = 0; i < els.length; i++) {
+        var section = els[i].getAttribute('data-nocache');
+        map[section] = els[i];
+    }
+
+    fetch('/!/nocache', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            url: window.location.href.split('#')[0],
+            sections: Object.keys(map)
+        })
+    })
+    .then((response) => response.json())
+    .then((data) => {
+        const regions = data.regions;
+        for (var key in regions) {
+            if (map[key]) map[key].outerHTML = regions[key];
+        }
+
+        for (const input of document.querySelectorAll('input[value="$csrfPlaceholder"]')) {
+            input.value = data.csrf;
+        }
+
+        for (const meta of document.querySelectorAll('meta[content="$csrfPlaceholder"]')) {
+            meta.content = data.csrf;
+        }
+
+        for (const input of document.querySelectorAll('script[data-csrf="$csrfPlaceholder"]')) {
+            input.setAttribute('data-csrf', data.csrf);
+        }
+
+        if (window.hasOwnProperty('livewire_token')) {
+            window.livewire_token = data.csrf
+        }
+
+        if (window.hasOwnProperty('livewireScriptConfig')) {
+            window.livewireScriptConfig.csrf = data.csrf
+        }
+
+        document.dispatchEvent(new CustomEvent('statamic:nocache.replaced', { detail: data }));
+    });
+})();
+EOT;
     }
 
     public function shouldOutputJs(): bool

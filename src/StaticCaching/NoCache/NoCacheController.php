@@ -29,6 +29,7 @@ class NoCacheController
         $replacer = new NoCacheReplacer($session);
 
         return [
+            'csrf' => csrf_token(),
             'regions' => $session
                 ->regions()
                 ->map->render()
