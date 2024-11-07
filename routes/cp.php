@@ -28,6 +28,7 @@ use Statamic\Http\Controllers\CP\Collections\CollectionActionController;
 use Statamic\Http\Controllers\CP\Collections\CollectionBlueprintsController;
 use Statamic\Http\Controllers\CP\Collections\CollectionsController;
 use Statamic\Http\Controllers\CP\Collections\CollectionTreeController;
+use Statamic\Http\Controllers\CP\Collections\EditRedirectController;
 use Statamic\Http\Controllers\CP\Collections\EntriesController;
 use Statamic\Http\Controllers\CP\Collections\EntryActionController;
 use Statamic\Http\Controllers\CP\Collections\EntryPreviewController;
@@ -360,6 +361,8 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::get('session-timeout', SessionTimeoutController::class)->name('session.timeout');
 
     Route::view('/playground', 'statamic::playground')->name('playground');
+
+    Route::get('edit/{id}', EditRedirectController::class);
 
     Route::get('{segments}', [CpController::class, 'pageNotFound'])->where('segments', '.*')->name('404');
 });
