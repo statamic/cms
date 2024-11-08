@@ -13,7 +13,7 @@ export default {
         visibleActions() {
             return this.actions
                 .filter(action => {
-                    if (typeof action.visible === 'function') return action.visible();
+                    if (typeof action.visible === 'function') return action.visible(this.fieldActionPayload);
                     if (typeof action.visible !== 'undefined') return action.visible;
                     return true;
                 });
@@ -22,7 +22,7 @@ export default {
         visibleInternalActions() {
             return this.internalActions
                 .filter(action => {
-                    if (typeof action.visible === 'function') return action.visible();
+                    if (typeof action.visible === 'function') return action.visible(this.fieldActionPayload);
                     if (typeof action.visible !== 'undefined') return action.visible;
                     return true;
                 });
