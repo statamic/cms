@@ -5,7 +5,7 @@
             :handle="handle"
             :value="value"
             :meta="relationshipMeta"
-            :config="{ type: 'asset_folder' }"
+            :config="{ type: 'asset_folder', max_items: this.config.max_items }"
             @input="update"
         />
     </div>
