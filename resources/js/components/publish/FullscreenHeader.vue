@@ -13,7 +13,7 @@
             </dropdown-list>
             <button
                 class="btn-quick-action"
-                v-for="action, index in quickActions"
+                v-for="(action, index) in quickActions"
                 :key="index"
                 v-tooltip="action.title"
                 @click="runAction(action)">
