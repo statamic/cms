@@ -32,6 +32,7 @@ class Entries extends Relationship
     use QueriesFilters;
 
     protected $categories = ['relationship'];
+    protected $keywords = ['entry'];
     protected $canEdit = true;
     protected $canCreate = true;
     protected $canSearch = true;
@@ -45,6 +46,7 @@ class Entries extends Relationship
         'initialReference' => 'reference',
         'initialFieldset' => 'blueprint',
         'initialValues' => 'values',
+        'initialExtraValues' => 'extraValues',
         'initialLocalizedFields' => 'localizedFields',
         'initialMeta' => 'meta',
         'initialPermalink' => 'permalink',

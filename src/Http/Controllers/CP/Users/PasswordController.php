@@ -17,7 +17,7 @@ class PasswordController extends CpController
     {
         throw_unless($user = User::find($user), new NotFoundHttpException);
 
-        $updatingOwnPassword = $user->id() == $request->user()->id();
+        $updatingOwnPassword = $user->id() == User::fromUser($request->user())->id();
 
         $this->authorize('editPassword', $user);
 

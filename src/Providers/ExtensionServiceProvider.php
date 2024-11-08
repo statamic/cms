@@ -166,6 +166,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Collection\Collection::class,
         Tags\Cookie::class,
         Tags\Dd::class,
+        Tags\Dictionary\Dictionary::class,
         Tags\Dump::class,
         Tags\GetContent::class,
         Tags\GetError::class,

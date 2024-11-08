@@ -28,6 +28,7 @@ use Statamic\Http\Controllers\CP\Collections\CollectionActionController;
 use Statamic\Http\Controllers\CP\Collections\CollectionBlueprintsController;
 use Statamic\Http\Controllers\CP\Collections\CollectionsController;
 use Statamic\Http\Controllers\CP\Collections\CollectionTreeController;
+use Statamic\Http\Controllers\CP\Collections\EditRedirectController;
 use Statamic\Http\Controllers\CP\Collections\EntriesController;
 use Statamic\Http\Controllers\CP\Collections\EntryActionController;
 use Statamic\Http\Controllers\CP\Collections\EntryPreviewController;
@@ -252,6 +253,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::post('edit', [FieldsController::class, 'edit'])->name('fields.edit');
         Route::post('update', [FieldsController::class, 'update'])->name('fields.update');
         Route::get('field-meta', [MetaController::class, 'show']);
+        Route::post('field-meta', [MetaController::class, 'show']);
         Route::delete('fieldsets/{fieldset}/reset', [FieldsetController::class, 'reset'])->name('fieldsets.reset');
         Route::resource('fieldsets', FieldsetController::class)->except(['show']);
         Route::get('blueprints', [BlueprintController::class, 'index'])->name('blueprints.index');
@@ -359,6 +361,8 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::get('session-timeout', SessionTimeoutController::class)->name('session.timeout');
 
     Route::view('/playground', 'statamic::playground')->name('playground');
+
+    Route::get('edit/{id}', EditRedirectController::class);
 
     Route::get('{segments}', [CpController::class, 'pageNotFound'])->where('segments', '.*')->name('404');
 });

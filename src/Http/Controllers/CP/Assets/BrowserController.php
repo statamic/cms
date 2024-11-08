@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Assets;
 
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
+use Statamic\Assets\AssetFolder;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Exceptions\AuthorizationException;
 use Statamic\Facades\Asset;
@@ -90,10 +91,24 @@ class BrowserController extends CpController
         if ($page >= $lastFolderPage) {
             $query = $folder->queryAssets();
 
-            if ($request->sort) {
+            if ($sort = $request->sort) {
+                $sortByMethod = $request->order === 'desc' ? 'sortByDesc' : 'sortBy';
+
+                $folders = $folders->$sortByMethod(
+                    fn (AssetFolder $folder) => method_exists($folder, $sort) ? $folder->$sort() : $folder->basename()
+                );
+
                 $query->orderBy($request->sort, $request->order ?? 'asc');
             } else {
-                $query->orderBy($container->sortField(), $container->sortDirection());
+                $sort = $container->sortField();
+                $order = $container->sortDirection();
+                $sortByMethod = $request->order === 'desc' ? 'sortByDesc' : 'sortBy';
+
+                $folders = $folders->$sortByMethod(
+                    fn (AssetFolder $folder) => method_exists($folder, $sort) ? $folder->$sort() : $folder->basename()
+                );
+
+                $query->orderBy($sort, $order);
             }
 
             $this->applyQueryScopes($query, $request->all());
@@ -112,7 +127,7 @@ class BrowserController extends CpController
             'data' => [
                 'assets' => FolderAsset::collection($assets ?? collect())->resolve(),
                 'folder' => array_merge((new Folder($folder))->resolve(), [
-                    'folders' => $folders->values(),
+                    'folders' => Folder::collection($folders->values()),
                 ]),
             ],
             'links' => [

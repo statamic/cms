@@ -9,11 +9,12 @@ use Statamic\Events\UserBlueprintFound;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
 use Statamic\OAuth\Provider;
+use Statamic\Query\Scopes\AllowsScopes;
 use Statamic\Statamic;
 
 abstract class UserRepository implements RepositoryContract
 {
-    use StoresComputedFieldCallbacks;
+    use AllowsScopes, StoresComputedFieldCallbacks;
 
     public function create()
     {

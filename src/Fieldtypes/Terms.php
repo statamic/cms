@@ -207,6 +207,7 @@ class Terms extends Relationship
                 return explode('::', $id, 2)[1];
             })
                 ->unique()
+                ->values()
                 ->all();
 
             if ($this->field->get('max_items') === 1) {

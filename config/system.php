@@ -8,7 +8,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | The license key for the corresponding domain from your Statamic account.
-    | Without a key entered, your app will considered to be in Trial Mode.
+    | Without a key entered, your app will be considered to be in Trial Mode.
     |
     | https://statamic.dev/licensing#trial-mode
     |
@@ -193,5 +193,16 @@ return [
     */
 
     'fake_sql_queries' => config('app.debug'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Layout
+    |--------------------------------------------------------------------------
+    |
+    | Define the default layout that will be used by views.
+    |
+    */
+
+    'layout' => env('STATAMIC_LAYOUT', 'layout'),
 
 ];
