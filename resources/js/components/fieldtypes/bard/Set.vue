@@ -72,6 +72,7 @@ import SetField from '../replicator/Field.vue';
 import ManagesPreviewText from '../replicator/ManagesPreviewText';
 import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
 import HasFieldActions from '../../field-actions/HasFieldActions.js';
+import DropdownActions from '../../field-actions/DropdownActions.vue';
 
 export default {
 
@@ -86,7 +87,7 @@ export default {
         'deleteNode', // delete the current node
     ],
 
-    components: { NodeViewWrapper, SetField },
+    components: { NodeViewWrapper, SetField, DropdownActions },
 
     mixins: [
         ValidatesFieldConditions,

@@ -110,8 +110,13 @@
 
 <script>
 import { marked } from 'marked';
+import DropdownActions from '../field-actions/DropdownActions.vue';
 
 export default {
+
+    components: {
+        DropdownActions
+    },
 
     props: {
         config: {

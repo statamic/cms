@@ -80,10 +80,11 @@ import SetField from './Field.vue';
 import ManagesPreviewText from './ManagesPreviewText';
 import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
 import HasFieldActions from '../../field-actions/HasFieldActions.js';
+import DropdownActions from '../../field-actions/DropdownActions.vue';
 
 export default {
 
-    components: { SetField },
+    components: { SetField, DropdownActions },
 
     mixins: [
         ValidatesFieldConditions,

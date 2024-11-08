@@ -25,8 +25,13 @@
 </template>
 
 <script>
+import DropdownActions from "../field-actions/DropdownActions.vue";
 
 export default {
+
+    components: {
+        DropdownActions
+    },
 
     props: {
         field: {
