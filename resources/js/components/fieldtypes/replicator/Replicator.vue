@@ -14,8 +14,8 @@
         :config="config"
         :run-field-action="runFieldAction"
         :field-actions="visibleFieldActions"
-        @close="toggleFullscreen">
-    </publish-field-fullscreen-header>
+        @close="toggleFullscreen"
+    />
 
     <section :class="{'mt-14 p-4 bg-gray-200 dark:bg-dark-700': fullScreenMode}">
 
