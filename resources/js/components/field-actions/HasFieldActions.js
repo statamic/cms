@@ -3,7 +3,10 @@ export default {
     computed: {
 
         fieldActions() {
-            return this.$fieldActions.get(this.$options.name);
+            return [
+                ...this.$fieldActions.get(this.$options.name),
+                ...this.internalFieldActions
+            ];
         },
 
         internalFieldActions() {
@@ -17,22 +20,6 @@ export default {
                     if (typeof action.visible !== 'undefined') return action.visible;
                     return true;
                 });
-        },
-
-        visibleInternalFieldActions() {
-            return this.internalFieldActions
-                .filter(action => {
-                    if (typeof action.visible === 'function') return action.visible(this.fieldActionPayload);
-                    if (typeof action.visible !== 'undefined') return action.visible;
-                    return true;
-                });
-        },
-
-        visibleQuickFieldActions() {
-            return [
-                ...this.visibleFieldActions,
-                ...this.visibleInternalFieldActions
-            ].filter(item => item.quick);
         },
 
         fieldActionPayload() {

@@ -21,8 +21,6 @@
             :config="config"
             :run-field-action="runFieldAction"
             :field-actions="visibleFieldActions"
-            :internal-field-actions="visibleInternalFieldActions"
-            :quick-field-actions="visibleQuickFieldActions"
             @close="toggleFullscreen">
             <div class="bard-fixed-toolbar border-0" v-if="!readOnly && showFixedToolbar">
                 <div class="flex flex-wrap flex-1 items-center no-select" v-if="toolbarIsFixed">

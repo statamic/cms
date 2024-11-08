@@ -11,8 +11,6 @@
             :config="config"
             :run-field-action="runFieldAction"
             :field-actions="visibleFieldActions"
-            :internal-field-actions="visibleInternalFieldActions"
-            :quick-field-actions="visibleQuickFieldActions"
             @close="fullScreenMode = false">
         </publish-field-fullscreen-header>
 

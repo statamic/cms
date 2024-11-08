@@ -54,7 +54,7 @@
                 <div class="quick-list">
                     <div class="quick-list-content">
                         <a
-                            v-for="(action, index) in fieldQuickActions"
+                            v-for="(action, index) in fieldActions.filter(a => a.quick)"
                             :key="index"
                             @click="fieldRunAction(action)"
                             v-tooltip="action.title"
@@ -64,8 +64,6 @@
                     </div>
                     <dropdown-list placement="left-start" :offset="[7, -3]">
                         <dropdown-actions :actions="fieldActions" @run="fieldRunAction" v-if="fieldActions.length" />
-                        <div class="divider" />
-                        <dropdown-actions :actions="fieldInternalActions" @run="fieldRunAction" v-if="fieldInternalActions.length" />
                     </dropdown-list>
                 </div>
             </div>
@@ -260,16 +258,8 @@ export default {
             return this.$refs.field.visibleFieldActions;
         },
 
-        fieldInternalActions() {
-            return this.$refs.field.visibleInternalFieldActions;
-        },
-
-        fieldQuickActions() {
-            return this.$refs.field.visibleQuickFieldActions;
-        },
-
         hasDropdown() {
-            return this.fieldActions.length > 0 || this.fieldInternalActions.length > 0;;
+            return this.fieldActions.length > 0;
         },
 
     },

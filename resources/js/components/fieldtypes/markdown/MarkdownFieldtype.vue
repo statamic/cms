@@ -19,8 +19,6 @@
                     :config="config"
                     :run-field-action="runFieldAction"
                     :field-actions="visibleFieldActions"
-                    :internal-field-actions="visibleInternalFieldActions"
-                    :quick-field-actions="visibleQuickFieldActions"
                     @close="toggleFullscreen">
                     <div class="markdown-toolbar">
                         <div class="markdown-modes">

@@ -9,8 +9,6 @@
             :config="config"
             :run-field-action="runFieldAction"
             :field-actions="visibleFieldActions"
-            :internal-field-actions="visibleInternalFieldActions"
-            :quick-field-actions="visibleQuickFieldActions"
             @close="toggleFullscreen">
             <div class="code-fieldtype-toolbar-fullscreen">
                 <div>

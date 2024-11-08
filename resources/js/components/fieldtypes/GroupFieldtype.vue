@@ -15,8 +15,6 @@
                     :config="config"
                     :run-field-action="runFieldAction"
                     :field-actions="visibleFieldActions"
-                    :internal-field-actions="visibleInternalFieldActions"
-                    :quick-field-actions="visibleQuickFieldActions"
                     @close="toggleFullscreen">
                 </publish-field-fullscreen-header>
                 <section :class="{ 'mt-14 p-4': fullScreenMode }">
