@@ -13,7 +13,7 @@
             :actions="visibleActions"
             :internal-actions="visibleInternalActions"
             :quick-actions="visibleQuickActions"
-            @close="toggleFullscreen">
+            @close="fullScreenMode = false">
         </publish-field-fullscreen-header>
 
         <section :class="{'mt-14 p-4': fullScreenMode}">
