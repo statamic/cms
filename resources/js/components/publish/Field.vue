@@ -299,6 +299,7 @@ export default {
         },
 
         fieldActionIcon({ icon }) {
+            icon = icon || 'image';
             return typeof icon === 'function' ? icon({ field: this }) : icon;
         },
 
