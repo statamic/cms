@@ -13,10 +13,10 @@
                     v-if="fullScreenMode"
                     :field="_self"
                     :config="config"
-                    :run-action="runAction"
-                    :actions="visibleActions"
-                    :internal-actions="visibleInternalActions"
-                    :quick-actions="visibleQuickActions"
+                    :run-field-action="runFieldAction"
+                    :field-actions="visibleFieldActions"
+                    :internal-field-actions="visibleInternalFieldActions"
+                    :quick-field-actions="visibleQuickFieldActions"
                     @close="toggleFullscreen">
                 </publish-field-fullscreen-header>
                 <section :class="{ 'mt-14 p-4': fullScreenMode }">
@@ -92,7 +92,7 @@ export default {
 
             return Object.values(this.value).join(', ');
         },
-        internalActions() {
+        internalFieldActions() {
             return [
                 {
                     title: __('Toggle Fullscreen Mode'),

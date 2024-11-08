@@ -17,10 +17,10 @@
                     v-if="fullScreenMode"
                     :field="_self"
                     :config="config"
-                    :run-action="runAction"
-                    :actions="visibleActions"
-                    :internal-actions="visibleInternalActions"
-                    :quick-actions="visibleQuickActions"
+                    :run-field-action="runFieldAction"
+                    :field-actions="visibleFieldActions"
+                    :internal-field-actions="visibleInternalFieldActions"
+                    :quick-field-actions="visibleQuickFieldActions"
                     @close="toggleFullscreen">
                     <div class="markdown-toolbar">
                         <div class="markdown-modes">
@@ -777,7 +777,7 @@ export default {
                 .replace(/<\/?[^>]+(>|$)/g, "");
         },
 
-        internalActions() {
+        internalFieldActions() {
             return [
                 {
                     title: __('Toggle Fullscreen Mode'),

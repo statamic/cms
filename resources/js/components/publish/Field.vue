@@ -257,15 +257,15 @@ export default {
         },
 
         fieldActions() {
-            return this.$refs.field.visibleActions;
+            return this.$refs.field.visibleFieldActions;
         },
 
         fieldInternalActions() {
-            return this.$refs.field.visibleInternalActions;
+            return this.$refs.field.visibleInternalFieldActions;
         },
 
         fieldQuickActions() {
-            return this.$refs.field.visibleQuickActions;
+            return this.$refs.field.visibleQuickFieldActions;
         },
 
         hasDropdown() {
@@ -304,7 +304,7 @@ export default {
         },
 
         fieldRunAction(action) {
-            this.$refs.field.runAction(action);
+            this.$refs.field.runFieldAction(action);
         },
 
         fieldActionIcon({ icon }) {

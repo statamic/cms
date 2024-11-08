@@ -2,16 +2,16 @@ export default {
 
     computed: {
 
-        actions() {
+        fieldActions() {
             return this.$fieldActions.get(this.$options.name);
         },
 
-        internalActions() {
+        internalFieldActions() {
             return [];
         },
 
-        visibleActions() {
-            return this.actions
+        visibleFieldActions() {
+            return this.fieldActions
                 .filter(action => {
                     if (typeof action.visible === 'function') return action.visible(this.fieldActionPayload);
                     if (typeof action.visible !== 'undefined') return action.visible;
@@ -19,8 +19,8 @@ export default {
                 });
         },
 
-        visibleInternalActions() {
-            return this.internalActions
+        visibleInternalFieldActions() {
+            return this.internalFieldActions
                 .filter(action => {
                     if (typeof action.visible === 'function') return action.visible(this.fieldActionPayload);
                     if (typeof action.visible !== 'undefined') return action.visible;
@@ -28,10 +28,10 @@ export default {
                 });
         },
 
-        visibleQuickActions() {
+        visibleQuickFieldActions() {
             return [
-                ...this.visibleActions,
-                ...this.visibleInternalActions
+                ...this.visibleFieldActions,
+                ...this.visibleInternalFieldActions
             ].filter(item => item.quick);
         },
 
@@ -43,7 +43,7 @@ export default {
 
     methods: {
 
-        runAction(action) {
+        runFieldAction(action) {
             action.run(this.fieldActionPayload);
         },
 

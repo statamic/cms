@@ -6,17 +6,17 @@
             <slot />
         </div>
         <div class="w-full py-2.5 flex justify-end items-center">
-            <dropdown-list class="mr-2" v-if="actions.length || internalActions.length">
-                <dropdown-actions :actions="actions" @run="runAction" v-if="actions.length" />
+            <dropdown-list class="mr-2" v-if="fieldActions.length || internalFieldActions.length">
+                <dropdown-actions :actions="fieldActions" @run="runFieldAction" v-if="fieldActions.length" />
                 <div class="divider" />
-                <dropdown-actions :actions="internalActions" @run="runAction" v-if="internalActions.length" />
+                <dropdown-actions :actions="internalFieldActions" @run="runFieldAction" v-if="internalFieldActions.length" />
             </dropdown-list>
             <button
                 class="btn-quick-action"
-                v-for="(action, index) in quickActions"
+                v-for="(action, index) in quickFieldActions"
                 :key="index"
                 v-tooltip="action.title"
-                @click="runAction(action)">
+                @click="runFieldAction(action)">
                 <svg-icon :name="fieldActionIcon(action)" class="h-4 w-4" />
             </button>
         </div>
@@ -42,19 +42,19 @@ export default {
             type: Object,
             required: true,
         },
-        runAction: {
+        runFieldAction: {
             type: Function,
             required: true,
         },
-        actions: {
+        fieldActions: {
             type: Array,
             default: () => [],
         },
-        internalActions: {
+        internalFieldActions: {
             type: Array,
             default: () => [],
         },
-        quickActions: {
+        quickFieldActions: {
             type: Array,
             default: () => [],
         },

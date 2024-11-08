@@ -19,10 +19,10 @@
             v-if="fullScreenMode"
             :field="_self"
             :config="config"
-            :run-action="runAction"
-            :actions="visibleActions"
-            :internal-actions="visibleInternalActions"
-            :quick-actions="visibleQuickActions"
+            :run-field-action="runFieldAction"
+            :field-actions="visibleFieldActions"
+            :internal-field-actions="visibleInternalFieldActions"
+            :quick-field-actions="visibleQuickFieldActions"
             @close="toggleFullscreen">
             <div class="bard-fixed-toolbar border-0" v-if="!readOnly && showFixedToolbar">
                 <div class="flex flex-wrap flex-1 items-center no-select" v-if="toolbarIsFixed">
@@ -348,7 +348,7 @@ export default {
             return this.config.sets;
         },
 
-        internalActions() {
+        internalFieldActions() {
             return [
                 {
                     title: __('Expand All Sets'),

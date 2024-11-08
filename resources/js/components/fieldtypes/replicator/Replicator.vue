@@ -12,10 +12,10 @@
         v-if="fullScreenMode"
         :field="_self"
         :config="config"
-        :run-action="runAction"
-        :actions="visibleActions"
-        :internal-actions="visibleInternalActions"
-        :quick-actions="visibleQuickActions"
+        :run-field-action="runFieldAction"
+        :field-actions="visibleFieldActions"
+        :internal-field-actions="visibleInternalFieldActions"
+        :quick-field-actions="visibleQuickFieldActions"
         @close="toggleFullscreen">
     </publish-field-fullscreen-header>
 
@@ -160,7 +160,7 @@ export default {
             return `${__(this.config.display)}: ${__n(':count set|:count sets', this.value.length)}`;
         },
 
-        internalActions() {
+        internalFieldActions() {
             return [
                 {
                     title: __('Expand All Sets'),
