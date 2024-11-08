@@ -1,5 +1,5 @@
 <script>
-import HasActions from '../HasActions';
+import HasActions from '../field-actions/HasFieldActions';
 
 export default {
 
@@ -83,7 +83,7 @@ export default {
             return prefix+'field_'+this.config.handle;
         },
 
-        actionPayload() { 
+        fieldActionPayload() {
             return {
                 vm: this,
                 fieldPathPrefix: this.fieldPathPrefix,

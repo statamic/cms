@@ -1,6 +1,6 @@
 import uid from 'uniqid';
 
-class Actions {
+class FieldActions {
     constructor() {
         this.actions = {};
     }
@@ -18,4 +18,4 @@ class Actions {
     }
 }
 
-export default Actions;
+export default FieldActions;

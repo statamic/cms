@@ -79,7 +79,7 @@
 import SetField from './Field.vue';
 import ManagesPreviewText from './ManagesPreviewText';
 import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
-import HasActions from '../../HasActions.js';
+import HasFieldActions from '../../field-actions/HasFieldActions.js';
 
 export default {
 
@@ -88,7 +88,7 @@ export default {
     mixins: [
         ValidatesFieldConditions,
         ManagesPreviewText,
-        HasActions,
+        HasFieldActions,
     ],
 
     inject: ['replicatorSets'],
@@ -195,7 +195,7 @@ export default {
             }
         },
 
-        actionPayload() { 
+        fieldActionPayload() {
             return {
                 vm: this,
                 fieldVm: this.fieldVm,

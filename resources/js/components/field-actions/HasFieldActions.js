@@ -3,7 +3,7 @@ export default {
     computed: {
 
         actions() {
-            return this.$actions.get(this.$options.name);
+            return this.$fieldActions.get(this.$options.name);
         },
 
         internalActions() {
@@ -35,16 +35,16 @@ export default {
             ].filter(item => item.quick);
         },
 
-        actionPayload() { 
+        fieldActionPayload() {
             return {};
         },
-         
+
     },
 
     methods: {
 
         runAction(action) {
-            action.run(this.actionPayload);
+            action.run(this.fieldActionPayload);
         },
 
     }

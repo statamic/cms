@@ -67,7 +67,7 @@ Vue.prototype.$echo = Statamic.$echo;
 Vue.prototype.$bard = Statamic.$bard;
 Vue.prototype.$keys = Statamic.$keys;
 Vue.prototype.$reveal = Statamic.$reveal;
-Vue.prototype.$actions = Statamic.$actions;
+Vue.prototype.$fieldActions = Statamic.$fieldActions;
 Vue.prototype.$slug = Statamic.$slug;
 
 import Moment from 'moment';

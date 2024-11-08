@@ -71,7 +71,7 @@ import { NodeViewWrapper } from '@tiptap/vue-2';
 import SetField from '../replicator/Field.vue';
 import ManagesPreviewText from '../replicator/ManagesPreviewText';
 import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
-import HasActions from '../../HasActions.js';
+import HasFieldActions from '../../field-actions/HasFieldActions.js';
 
 export default {
 
@@ -91,7 +91,7 @@ export default {
     mixins: [
         ValidatesFieldConditions,
         ManagesPreviewText, 
-        HasActions,
+        HasFieldActions,
     ],
 
     inject: ['bard', 'bardSets'],
@@ -191,7 +191,7 @@ export default {
             return this.extension.options.bard
         },
 
-        actionPayload() { 
+        fieldActionPayload() {
             return {
                 vm: this,
                 fieldVm: this.fieldVm,
