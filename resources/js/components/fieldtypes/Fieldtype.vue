@@ -46,7 +46,7 @@ export default {
 
         updateMeta(value) {
             this.$emit('meta-updated', value);
-        },
+        }
     },
 
     computed: {
