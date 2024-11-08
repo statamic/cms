@@ -51,19 +51,23 @@
                 v-html="instructions" />
 
             <div class="field-dropdown" v-if="mounted && hasDropdown">
-                <quick-dropdown-list>
-                    <quick-dropdown-item
-                        v-for="action, index in fieldQuickActions"
-                        :key="index"
-                        :text="action.title"
-                        :icon="fieldActionIcon(action)"
-                        @click="fieldRunAction(action)" />
-                    <template #dropdown>
+                <div class="quick-list">
+                    <div class="quick-list-content">
+                        <a
+                            v-for="(action, index) in fieldQuickActions"
+                            :key="index"
+                            @click="fieldRunAction(action)"
+                            v-tooltip="action.title"
+                        >
+                            <svg-icon :name="fieldActionIcon(action)" class="h-3 w-3" />
+                        </a>
+                    </div>
+                    <dropdown-list placement="left-start" :offset="[7, -3]">
                         <dropdown-actions :actions="fieldActions" @run="fieldRunAction" v-if="fieldActions.length" />
                         <div class="divider" />
                         <dropdown-actions :actions="fieldInternalActions" @run="fieldRunAction" v-if="fieldInternalActions.length" />
-                    </template>
-                </quick-dropdown-list>
+                    </dropdown-list>
+                </div>
             </div>
 
         </div>
