@@ -2,6 +2,7 @@
 
 namespace Statamic\Fields;
 
+use Facades\Statamic\Fields\FieldRepository;
 use Statamic\Events\FieldsetCreated;
 use Statamic\Events\FieldsetCreating;
 use Statamic\Events\FieldsetDeleted;
@@ -25,6 +26,7 @@ class Fieldset
 {
     protected $handle;
     protected $contents = [];
+    protected $ensuredFields = [];
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
     protected $initialPath;
@@ -80,7 +82,99 @@ class Fieldset
 
     public function contents(): array
     {
-        return $this->contents;
+        return $this->getContents();
+    }
+
+    private function getContents()
+    {
+        $contents = $this->contents;
+
+        $contents['fields'] = $contents['fields'] ?? [];
+
+        if ($this->ensuredFields) {
+            $contents = $this->addEnsuredFieldsToContents($contents, $this->ensuredFields);
+        }
+
+        return array_filter($contents);
+    }
+
+    private function addEnsuredFieldsToContents($contents, $ensuredFields)
+    {
+        foreach ($ensuredFields as $field) {
+            $contents = $this->addEnsuredFieldToContents($contents, $field);
+        }
+
+        return $contents;
+    }
+
+    private function addEnsuredFieldToContents($contents, $ensured)
+    {
+        $imported = false;
+        $handle = $ensured['handle'];
+        $config = $ensured['config'];
+        $prepend = $ensured['prepend'];
+
+        $fields = collect($contents['fields'] ?? [])->keyBy(function ($field) {
+            return (isset($field['import'])) ? 'import:'.($field['prefix'] ?? null).$field['import'] : $field['handle'];
+        });
+
+        $importedFields = $fields->filter(function ($field, $key) {
+            return Str::startsWith($key, 'import:');
+        })->keyBy(function ($field) {
+            return ($field['prefix'] ?? null).$field['import'];
+        })->mapWithKeys(function ($field, $partial) {
+            return (new Fields([$field]))->all()->map(function ($field) use ($partial) {
+                return compact('partial', 'field');
+            });
+        });
+
+        // If a field with that handle is in the contents, its either an inline field or a referenced field...
+        $existingField = $fields->get($handle);
+
+        if ($exists = $existingField !== null) {
+            if (is_string($existingField['field'])) {
+                // If it's a string, then it's a reference field. We should merge any ensured config into the 'config'
+                // override array, but only keys that don't already exist in the actual partial field's config.
+                $referencedField = FieldRepository::find($existingField['field']);
+                $referencedFieldConfig = $referencedField->config();
+                $config = array_merge($config, $referencedFieldConfig);
+                $config = Arr::except($config, array_keys($referencedFieldConfig));
+                $field = ['handle' => $handle, 'field' => $existingField['field'], 'config' => $config];
+            } else {
+                // If it's not a string, then it's an inline field. We'll just merge the
+                // config right into the field key, with the user defined config winning.
+                $config = array_merge($config, $existingField['field']);
+                $field = ['handle' => $handle, 'field' => $config];
+            }
+        } else {
+            if ($importedField = $importedFields->get($handle)) {
+                $importKey = 'import:'.$importedField['partial'];
+                $field = $fields->get($importKey);
+                $importedConfig = $importedField['field']->config();
+                $config = array_merge($config, $importedConfig);
+                $config = Arr::except($config, array_keys($importedConfig));
+                $field['config'][$handle] = $config;
+                $fields->put($importKey, $field);
+                $imported = true;
+            } else {
+                $field = ['handle' => $handle, 'field' => $config];
+            }
+        }
+
+        // Set the field config in it's proper place.
+        if (! $imported) {
+            if ($exists) {
+                $fields->put($handle, $field);
+            } elseif (! $exists && $prepend) {
+                $fields->prepend($field);
+            } else {
+                $fields->push($field);
+            }
+        }
+
+        $contents['fields'] = $fields->values()->all();
+
+        return $contents;
     }
 
     public function title()
@@ -98,7 +192,7 @@ class Fieldset
 
     public function fields(): Fields
     {
-        $fields = Arr::get($this->contents, 'fields', []);
+        $fields = Arr::get($this->contents(), 'fields', []);
 
         return new Fields($fields);
     }
@@ -106,6 +200,11 @@ class Fieldset
     public function field(string $handle): ?Field
     {
         return $this->fields()->get($handle);
+    }
+
+    public function hasField(string $handle): bool
+    {
+        return $this->fields()->has($handle);
     }
 
     public function isNamespaced(): bool
@@ -289,6 +388,31 @@ class Fieldset
         FieldsetReset::dispatch($this);
 
         return true;
+    }
+
+    public function ensureField($handle, $config, $prepend = false)
+    {
+        if (isset($this->ensuredFields[$handle])) {
+            return $this;
+        }
+
+        $this->ensuredFields[$handle] = compact('handle', 'prepend', 'config');
+
+        return $this;
+    }
+
+    public function ensureFieldPrepended($handle, $field)
+    {
+        return $this->ensureField($handle, $field, true);
+    }
+
+    public function ensureFieldHasConfig($handle, $config)
+    {
+        if (! $this->hasField($handle)) {
+            return $this;
+        }
+
+        return $this->ensureField($handle, $config);
     }
 
     public static function __callStatic($method, $parameters)
