@@ -13,7 +13,7 @@
         >
             <div slot-scope="{ dragging }">
 
-                <publish-field-header
+                <publish-field-fullscreen-header
                     v-if="fullScreenMode"
                     :field="_self"
                     :config="config"
@@ -41,7 +41,7 @@
                             </button>
                         </div>
                     </div>
-                </publish-field-header>
+                </publish-field-fullscreen-header>
 
                 <div class="markdown-toolbar" v-if="!fullScreenMode">
                     <div class="markdown-modes">

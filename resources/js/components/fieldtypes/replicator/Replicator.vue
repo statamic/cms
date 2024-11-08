@@ -8,7 +8,7 @@
 <div :class="{ wrapperClasses: fullScreenMode }">
 <div class="replicator-fieldtype-container" :class="{'replicator-fullscreen bg-gray-200 dark:bg-dark-700': fullScreenMode }">
 
-    <publish-field-header
+    <publish-field-fullscreen-header
         v-if="fullScreenMode"
         :field="_self"
         :config="config"
@@ -17,7 +17,7 @@
         :internal-actions="visibleInternalActions"
         :quick-actions="visibleQuickActions"
         @close="toggleFullscreen">
-    </publish-field-header>
+    </publish-field-fullscreen-header>
 
     <section :class="{'mt-14 p-4 bg-gray-200 dark:bg-dark-700': fullScreenMode}">
 

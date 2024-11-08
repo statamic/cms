@@ -1,7 +1,7 @@
 <template>
     <portal name="table-fullscreen" :disabled="!fullScreenMode" target-class="table-fieldtype">
         <div class="table-fieldtype-container" :class="{'table-fullscreen bg-white dark:bg-dark-700': fullScreenMode }">
-            <publish-field-header
+            <publish-field-fullscreen-header
                 v-if="fullScreenMode"
                 :field="_self"
                 :config="config"
@@ -10,7 +10,7 @@
                 :internal-actions="visibleInternalActions"
                 :quick-actions="visibleQuickActions"
                 @close="toggleFullscreen">
-            </publish-field-header>
+            </publish-field-fullscreen-header>
 
             <section :class="{'mt-14 p-4 dark:bg-dark-700': fullScreenMode}">
                 <table class="table-fieldtype-table" v-if="rowCount">

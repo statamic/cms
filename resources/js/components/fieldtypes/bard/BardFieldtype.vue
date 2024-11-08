@@ -15,7 +15,7 @@
         @dragend="ignorePageHeader(false)"
     >
 
-        <publish-field-header
+        <publish-field-fullscreen-header
             v-if="fullScreenMode"
             :field="_self"
             :config="config"
@@ -40,7 +40,7 @@
                     </button>
                 </div>
             </div>
-        </publish-field-header>
+        </publish-field-fullscreen-header>
 
         <div class="bard-fixed-toolbar" v-if="!readOnly && showFixedToolbar && !fullScreenMode">
             <div class="flex flex-wrap flex-1 items-center no-select" v-if="toolbarIsFixed">

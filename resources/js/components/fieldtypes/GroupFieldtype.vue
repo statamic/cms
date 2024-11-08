@@ -9,7 +9,7 @@
                 class="group-fieldtype-container"
                 :class="{ 'grid-fullscreen bg-white': fullScreenMode }"
             >
-                <publish-field-header
+                <publish-field-fullscreen-header
                     v-if="fullScreenMode"
                     :field="_self"
                     :config="config"
@@ -18,7 +18,7 @@
                     :internal-actions="visibleInternalActions"
                     :quick-actions="visibleQuickActions"
                     @close="toggleFullscreen">
-                </publish-field-header>
+                </publish-field-fullscreen-header>
                 <section :class="{ 'mt-14 p-4': fullScreenMode }">
                     <div :class="{ 'border dark:border-dark-900 rounded shadow-sm replicator-set': config.border }">
                         <div class="publish-fields @container" :class="{ 'replicator-set-body': config.border, '-mx-4': !config.border }">

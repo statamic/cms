@@ -5,7 +5,7 @@
     <element-container @resized="containerWidth = $event.width">
     <div class="grid-fieldtype-container" :class="{'grid-fullscreen bg-white dark:bg-dark-600': fullScreenMode }">
 
-        <publish-field-header
+        <publish-field-fullscreen-header
             v-if="fullScreenMode"
             :field="_self"
             :config="config"
@@ -14,7 +14,7 @@
             :internal-actions="visibleInternalActions"
             :quick-actions="visibleQuickActions"
             @close="toggleFullscreen">
-        </publish-field-header>
+        </publish-field-fullscreen-header>
 
         <section :class="{'mt-14 p-4': fullScreenMode}">
 

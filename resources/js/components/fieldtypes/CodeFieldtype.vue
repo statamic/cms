@@ -3,7 +3,7 @@
 <portal name="code-fullscreen" :disabled="!fullScreenMode" target-class="code-fieldtype">
 <element-container @resized="refresh">
     <div class="code-fieldtype-container" :class="[themeClass, {'code-fullscreen': fullScreenMode }]">
-        <publish-field-header
+        <publish-field-fullscreen-header
             v-if="fullScreenMode"
             :field="_self"
             :config="config"
@@ -18,7 +18,7 @@
                     <div v-else v-text="modeLabel" class="text-xs font-mono text-gray-700"></div>
                 </div>
             </div>
-        </publish-field-header>
+        </publish-field-fullscreen-header>
         <div class="code-fieldtype-toolbar" v-if="!fullScreenMode">
             <div>
                 <select-input v-if="config.mode_selectable" :options="modes" v-model="mode" :is-read-only="isReadOnly" class="text-xs leading-none" />
