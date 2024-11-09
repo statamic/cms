@@ -338,6 +338,7 @@ final class Installer
     {
         $this->modules = $this->modules
             ->map(fn ($module) => $this->prepareInstallableRecursively($module))
+            ->pipe(fn ($module) => $this->flattenModules($module))
             ->each(fn ($module) => $module->validate());
 
         return $this;
@@ -417,6 +418,22 @@ final class Installer
         }
 
         return $module->config('options')[$choice];
+    }
+
+    /**
+     * Flatten modules.
+     */
+    public function flattenModules(Collection $modules): Collection
+    {
+        return $modules
+            ->flatMap(function ($module) {
+                return [
+                    $module->key() => $module,
+                    ...$this->flattenModules($module->config('options', collect())),
+                    ...$this->flattenModules($module->config('modules', collect())),
+                ];
+            })
+            ->filter();
     }
 
     /**
