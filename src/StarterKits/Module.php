@@ -45,10 +45,10 @@ abstract class Module
     /**
      * Get module config.
      */
-    public function config(?string $key = null): mixed
+    public function config(?string $key = null, $default = null): mixed
     {
         if ($key) {
-            return $this->config->get($key);
+            return $this->config->get($key, $default);
         }
 
         return $this->config;
