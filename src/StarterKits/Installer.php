@@ -332,7 +332,7 @@ final class Installer
             $shouldPrompt = false;
         }
 
-        $name = str_replace('_', ' ', $key);
+        $name = str_replace(['_', '.'], ' ', $key);
 
         if ($shouldPrompt && $this->isInteractive && ! confirm(Arr::get($config, 'prompt', "Would you like to install the [{$name}] module?"), false)) {
             return false;
@@ -353,7 +353,7 @@ final class Installer
             ->prepend(Arr::get($config, 'skip_option', 'No'), $skipModule = 'skip_module')
             ->all();
 
-        $name = str_replace('_', ' ', $key);
+        $name = str_replace(['_', '.'], ' ', $key);
 
         $choice = select(
             label: Arr::get($config, 'prompt', "Would you like to install one of the following [{$name}] modules?"),
@@ -375,7 +375,7 @@ final class Installer
      */
     protected function normalizeModuleKey(string $key, string $childKey): string
     {
-        return $key !== 'top_level' ? "{$key}_{$childKey}" : $childKey;
+        return $key !== 'top_level' ? "{$key}.{$childKey}" : $childKey;
     }
 
     /**
