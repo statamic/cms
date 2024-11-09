@@ -7,6 +7,7 @@ use Facades\Statamic\Console\Processes\TtyDetector;
 use Facades\Statamic\StarterKits\Hook;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use Statamic\Console\NullConsole;
 use Statamic\Console\Please\Application as PleaseApplication;
@@ -162,6 +163,7 @@ final class Installer
             ->requireStarterKit()
             ->ensureConfig()
             ->instantiateModules()
+            ->prepareInstallableModules()
             ->installModules()
             ->copyStarterKitConfig()
             ->copyStarterKitHooks()
@@ -286,88 +288,39 @@ final class Installer
     }
 
     /**
-     * Instantiate and validate modules that are to be installed.
+     * Instantiate modules.
      */
     protected function instantiateModules(): self
     {
-        $this->modules = collect(['top_level' => $this->config()->all()])
-            ->map(fn ($config, $key) => $this->instantiateModuleRecursively($config, $key))
-            ->flatten()
-            ->filter()
-            ->each(fn ($module) => $module->validate());
+        $this->modules = collect([
+            'top_level' => $this->instantiateModuleRecursively($this->config(), 'top_level'),
+        ]);
 
         return $this;
     }
 
     /**
-     * Instantiate module and check if nested modules should be recursively instantiated.
+     * Recursively instantiate module and its nested modules.
      */
-    protected function instantiateModuleRecursively(array $config, string $key): InstallableModule|array
+    protected function instantiateModuleRecursively(Collection|array $config, string $key): InstallableModule
     {
-        $instantiated = (new InstallableModule($config, $key))->installer($this);
+        if ($options = Arr::get($config, 'options')) {
+            $config['options'] = collect($options)
+                ->map(fn ($optionConfig, $optionKey) => $this->instantiateModuleRecursively(
+                    $optionConfig,
+                    $this->normalizeModuleKey($key, $optionKey),
+                ));
+        }
 
         if ($modules = Arr::get($config, 'modules')) {
-            $instantiated = collect($modules)
-                ->map(fn ($config, $childKey) => $this->instantiateModule($config, $this->normalizeModuleKey($key, $childKey)))
-                ->prepend($instantiated, $key)
-                ->filter()
-                ->all();
+            $config['modules'] = collect($modules)
+                ->map(fn ($childConfig, $childKey) => $this->instantiateModuleRecursively(
+                    $childConfig,
+                    $this->normalizeModuleKey($key, $childKey),
+                ));
         }
 
-        return $instantiated;
-    }
-
-    /**
-     * Instantiate individual module.
-     */
-    protected function instantiateModule(array $config, string $key): InstallableModule|array|bool
-    {
-        $shouldPrompt = true;
-
-        if (Arr::has($config, 'options')) {
-            return $this->instantiateSelectModule($config, $key);
-        }
-
-        if (Arr::get($config, 'prompt') === false) {
-            $shouldPrompt = false;
-        }
-
-        $name = str_replace(['_', '.'], ' ', $key);
-
-        if ($shouldPrompt && $this->isInteractive && ! confirm(Arr::get($config, 'prompt', "Would you like to install the [{$name}] module?"), false)) {
-            return false;
-        } elseif ($shouldPrompt && ! $this->isInteractive) {
-            return false;
-        }
-
-        return $this->instantiateModuleRecursively($config, $key);
-    }
-
-    /**
-     * Instantiate select module.
-     */
-    protected function instantiateSelectModule(array $config, string $key): InstallableModule|array|bool
-    {
-        $options = collect($config['options'])
-            ->map(fn ($option, $optionKey) => Arr::get($option, 'label', ucfirst($optionKey)))
-            ->prepend(Arr::get($config, 'skip_option', 'No'), $skipModule = 'skip_module')
-            ->all();
-
-        $name = str_replace(['_', '.'], ' ', $key);
-
-        $choice = select(
-            label: Arr::get($config, 'prompt', "Would you like to install one of the following [{$name}] modules?"),
-            options: $options,
-        );
-
-        if ($choice === $skipModule) {
-            return false;
-        }
-
-        $selectedKey = "{$key}_{$choice}";
-        $selectedModuleConfig = $config['options'][$choice];
-
-        return $this->instantiateModuleRecursively($selectedModuleConfig, $selectedKey);
+        return (new InstallableModule($config, $key))->installer($this);
     }
 
     /**
@@ -376,6 +329,94 @@ final class Installer
     protected function normalizeModuleKey(string $key, string $childKey): string
     {
         return $key !== 'top_level' ? "{$key}.{$childKey}" : $childKey;
+    }
+
+    /**
+     * Prompt and prepare flattened collection of installable modules.
+     */
+    protected function prepareInstallableModules(): self
+    {
+        $this->modules = $this->modules
+            ->map(fn ($module) => $this->prepareInstallableRecursively($module))
+            ->each(fn ($module) => $module->validate());
+
+        return $this;
+    }
+
+    /**
+     * Recursively prepare module and its nested modules.
+     */
+    protected function prepareInstallableRecursively(InstallableModule $installable): InstallableModule|bool
+    {
+        $module = $this->prepareInstallableModule($installable);
+
+        if ($module === false) {
+            return false;
+        }
+
+        if ($modules = $module->config('modules')) {
+            $module->setChildModules(
+                $modules
+                    ->map(fn ($childModule) => $this->prepareInstallableRecursively($childModule))
+                    ->filter()
+            );
+        }
+
+        return $module;
+    }
+
+    /**
+     * Prepare individual module.
+     */
+    protected function prepareInstallableModule(InstallableModule $module): InstallableModule|bool
+    {
+        if ($module->key() === 'top_level') {
+            return $module;
+        }
+
+        if ($module->config('options')) {
+            return $this->prepareSelectModule($module);
+        }
+
+        $shouldPrompt = true;
+
+        if ($module->config('prompt') === false) {
+            $shouldPrompt = false;
+        }
+
+        $name = str_replace(['_', '.'], ' ', $module->key());
+
+        if ($shouldPrompt && $this->isInteractive && ! confirm($module->config('prompt', "Would you like to install the [{$name}] module?"), false)) {
+            return false;
+        } elseif ($shouldPrompt && ! $this->isInteractive) {
+            return false;
+        }
+
+        return $module;
+    }
+
+    /**
+     * Prepare select module.
+     */
+    protected function prepareSelectModule(InstallableModule $module): InstallableModule|bool
+    {
+        $options = collect($module->config('options'))
+            ->map(fn ($option, $optionKey) => $option->config('label', ucfirst($optionKey)))
+            ->prepend($module->config('skip_option', 'No'), $skipModule = 'skip_module')
+            ->all();
+
+        $name = str_replace(['_', '.'], ' ', $module->key());
+
+        $choice = select(
+            label: $module->config('prompt', "Would you like to install one of the following [{$name}] modules?"),
+            options: $options,
+        );
+
+        if ($choice === $skipModule) {
+            return false;
+        }
+
+        return $module->config('options')[$choice];
     }
 
     /**
