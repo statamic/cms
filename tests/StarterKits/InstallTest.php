@@ -1218,6 +1218,84 @@ EOT;
     }
 
     #[Test]
+    public function it_requires_imported_module_folder_config()
+    {
+        $this->setConfig([
+            'modules' => [
+                'seo' => 'import',
+            ],
+        ]);
+
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+
+        $this
+            ->installCoolRunnings()
+            ->expectsOutput('Starter kit module config [modules/seo/module.yaml] does not exist.')
+            ->assertFailed();
+
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+    }
+
+    #[Test]
+    public function it_requires_nested_imported_module_folder_config()
+    {
+        $this->setConfig([
+            'modules' => [
+                'seo' => 'import',
+            ],
+        ]);
+
+        $this->setConfig(
+            path: 'modules/seo/module.yaml',
+            config: [
+                'modules' => [
+                    'js' => [
+                        'options' => [
+                            'vue' => 'import',
+                        ],
+                    ],
+                ],
+            ],
+        );
+
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+
+        $this
+            ->installCoolRunnings()
+            ->expectsOutput('Starter kit module config [modules/seo/js/vue/module.yaml] does not exist.')
+            ->assertFailed();
+
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+    }
+
+    #[Test]
+    public function it_requires_valid_imported_module_folder_config()
+    {
+        $this->setConfig([
+            'modules' => [
+                'seo' => 'import',
+            ],
+        ]);
+
+        $this->setConfig(
+            path: 'modules/seo/module.yaml',
+            config: [
+                'prompt' => false,
+                // no installable config!
+            ]
+        );
+
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+
+        $this
+            ->installCoolRunnings()
+            ->expectsOutput('Starter-kit module is missing `export_paths`, `dependencies`, or nested `modules`!')
+            ->assertFailed();
+
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+    }
+
+    #[Test]
     #[DataProvider('validModuleConfigs')]
     public function it_passes_validation_if_module_export_paths_or_dependencies_or_nested_modules_are_properly_configured($config)
     {
