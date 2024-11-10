@@ -323,8 +323,9 @@ final class Installer
         }
 
         if ($modules = $module->config('modules')) {
-            $module->setChildModules(
-                $modules
+            $module->set(
+                key: 'modules',
+                value: $modules
                     ->map(fn ($childModule) => $this->prepareInstallableRecursively($childModule))
                     ->filter()
             );

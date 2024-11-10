@@ -27,16 +27,6 @@ final class InstallableModule extends Module
     }
 
     /**
-     * Set child modules onto instance, after prompting and filtering.
-     */
-    public function setChildModules(Collection $modules): self
-    {
-        $this->config['modules'] = collect($modules);
-
-        return $this;
-    }
-
-    /**
      * Validate starter kit module is installable.
      *
      * @throws Exception|StarterKitException
