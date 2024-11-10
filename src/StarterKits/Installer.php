@@ -302,8 +302,12 @@ final class Installer
     /**
      * Recursively instantiate module and its nested modules.
      */
-    protected function instantiateModuleRecursively(Collection|array $config, string $key): InstallableModule
+    protected function instantiateModuleRecursively(Collection|array|string $config, string $key): InstallableModule
     {
+        if ($config === 'import') {
+            $config = $this->importModuleConfig($key);
+        }
+
         if ($options = Arr::get($config, 'options')) {
             $config['options'] = collect($options)
                 ->map(fn ($optionConfig, $optionKey) => $this->instantiateModuleRecursively(
@@ -321,6 +325,36 @@ final class Installer
         }
 
         return (new InstallableModule($config, $key))->installer($this);
+    }
+
+    /**
+     * Import module config from modules folder.
+     */
+    protected function importModuleConfig(string $key): Collection
+    {
+        $moduleConfig = 'modules/'.str_replace('.', '/', $key).'/module.yaml';
+
+        $absolutePath = $this->starterKitPath($moduleConfig);
+
+        if (! $this->files->exists($absolutePath)) {
+            throw new StarterKitException("Starter kit module config [$moduleConfig] does not exist.");
+        }
+
+        return collect(YAML::parse($this->files->get($absolutePath)));
+    }
+
+    /**
+     * Ensure starter kit has config.
+     *
+     * @throws StarterKitException
+     */
+    protected function ensureModuleConfig(): self
+    {
+        if (! $this->files->exists($this->starterKitPath('starter-kit.yaml'))) {
+            throw new StarterKitException('Starter kit config [starter-kit.yaml] does not exist.');
+        }
+
+        return $this;
     }
 
     /**
