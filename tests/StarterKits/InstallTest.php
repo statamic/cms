@@ -41,6 +41,10 @@ class InstallTest extends TestCase
     {
         $this->restoreSite();
 
+        if ($this->files->exists($kitRepo = $this->kitRepoPath())) {
+            $this->files->delete($kitRepo);
+        }
+
         parent::tearDown();
     }
 
@@ -926,6 +930,124 @@ EOT;
     }
 
     #[Test]
+    public function it_installs_imported_modules_confirmed_interactively_via_prompt()
+    {
+        $this->setConfig([
+            'export_paths' => [
+                'copied.md',
+            ],
+            'modules' => [
+                'seo' => 'import', // import!
+                'bobsled' => [
+                    'export_paths' => [
+                        'resources/css/bobsled.css',
+                    ],
+                    'dependencies' => [
+                        'bobsled/speed-calculator' => '^1.0.0',
+                    ],
+                ],
+                'jamaica' => [
+                    'export_as' => [
+                        'resources/css/theme.css' => 'resources/css/jamaica.css',
+                    ],
+                ],
+                'js' => 'import', // import!
+                'oldschool_js' => [
+                    'options' => [
+                        'jquery' => [
+                            'export_paths' => [
+                                'resources/js/jquery.js',
+                            ],
+                        ],
+                        'mootools' => [
+                            'export_paths' => [
+                                'resources/js/jquery.js',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->setConfig(
+            path: 'modules/seo/module.yaml',
+            config: [
+                'export_paths' => [
+                    'resources/css/seo.css',
+                ],
+                'dependencies' => [
+                    'statamic/seo-pro' => '^0.2.0',
+                ],
+            ],
+        );
+
+        $this->setConfig(
+            path: 'modules/js/module.yaml',
+            config: [
+                'options' => [
+                    'react' => [
+                        'export_paths' => [
+                            'resources/js/react.js',
+                        ],
+                    ],
+                    'vue' => 'import', // import option as separate module!
+                    'svelte' => [
+                        'export_paths' => [
+                            'resources/js/svelte.js',
+                        ],
+                    ],
+                ],
+            ],
+        );
+
+        $this->setConfig(
+            path: 'modules/js/vue/module.yaml',
+            config: [
+                'export_paths' => [
+                    'resources/js/vue.js',
+                ],
+                'dependencies' => [
+                    'bobsled/vue-components' => '^1.5',
+                ],
+            ],
+        );
+
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+        $this->assertFileDoesNotExist(base_path('resources/css/seo.css'));
+        $this->assertFileDoesNotExist(base_path('resources/css/bobsled.css'));
+        $this->assertFileDoesNotExist(base_path('resources/css/theme.css'));
+        $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/vue.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/svelte.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/jquery.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/mootools.js'));
+        $this->assertComposerJsonDoesntHave('statamic/seo-pro');
+        $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
+        $this->assertComposerJsonDoesntHave('bobsled/vue-components');
+
+        $this
+            ->installCoolRunningsModules()
+            ->expectsConfirmation('Would you like to install the [seo] module?', 'yes')
+            ->expectsConfirmation('Would you like to install the [bobsled] module?', 'no')
+            ->expectsConfirmation('Would you like to install the [jamaica] module?', 'yes')
+            ->expectsQuestion('Would you like to install one of the following [js] modules?', 'vue')
+            ->expectsQuestion('Would you like to install one of the following [oldschool js] modules?', 'skip_module');
+
+        $this->assertFileExists(base_path('copied.md'));
+        $this->assertFileExists(base_path('resources/css/seo.css'));
+        $this->assertFileDoesNotExist(base_path('resources/css/bobsled.css'));
+        $this->assertFileExists(base_path('resources/css/theme.css'));
+        $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
+        $this->assertFileExists(base_path('resources/js/vue.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/svelte.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/jquery.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/mootools.js'));
+        $this->assertComposerJsonHasPackageVersion('require', 'statamic/seo-pro', '^0.2.0');
+        $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
+        $this->assertComposerJsonHasPackageVersion('require', 'bobsled/vue-components', '^1.5');
+    }
+
+    #[Test]
     public function it_display_custom_module_prompts()
     {
         $this->setConfig([
@@ -1346,6 +1468,164 @@ EOT;
         $this->assertComposerJsonHasPackageVersion('require', 'bobsled/speed-calculator', '^1.0.0');
     }
 
+    #[Test]
+    public function it_installs_nested_imported_modules_confirmed_interactively_via_prompt()
+    {
+        $this->setConfig([
+            'export_paths' => [
+                'copied.md',
+            ],
+            'modules' => [
+                'seo' => 'import',
+                'canada' => [
+                    'export_paths' => [
+                        'resources/css/hockey.css',
+                    ],
+                    'modules' => [
+                        'hockey_players' => [
+                            'export_paths' => [
+                                'resources/dictionaries/players.yaml',
+                            ],
+                        ],
+                    ],
+                ],
+                'jamaica' => [
+                    'export_as' => [
+                        'resources/css/theme.css' => 'resources/css/jamaica.css',
+                    ],
+                    'modules' => [
+                        'bobsled' => 'import', // import nested module!
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->setConfig(
+            path: 'modules/seo/module.yaml',
+            config: [
+                'export_paths' => [
+                    'resources/css/seo.css',
+                ],
+                'dependencies' => [
+                    'statamic/seo-pro' => '^0.2.0',
+                ],
+                'modules' => [
+                    'js' => [
+                        'options' => [
+                            'react' => [
+                                'export_paths' => [
+                                    'resources/js/react.js',
+                                ],
+                                'modules' => [
+                                    'testing_tools' => [
+                                        'export_paths' => [
+                                            'resources/js/react-testing-tools.js',
+                                        ],
+                                    ],
+                                ],
+                            ],
+                            'vue' => [
+                                'export_paths' => [
+                                    'resources/js/vue.js',
+                                ],
+                                'dependencies_dev' => [
+                                    'i-love-vue/test-helpers' => '^1.5',
+                                ],
+                                'modules' => [
+                                    'testing_tools' => 'import', // import nested module!
+                                ],
+                            ],
+                            'svelte' => [
+                                'export_paths' => [
+                                    'resources/js/svelte.js',
+                                ],
+                            ],
+                        ],
+                    ],
+                    'oldschool_js' => [
+                        'options' => [
+                            'jquery' => [
+                                'export_paths' => [
+                                    'resources/js/jquery.js',
+                                ],
+                            ],
+                            'mootools' => [
+                                'export_paths' => [
+                                    'resources/js/jquery.js',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        );
+
+        $this->setConfig(
+            path: 'modules/seo/js/vue/testing_tools/module.yaml',
+            config: [
+                'export_paths' => [
+                    'resources/js/vue-testing-tools.js',
+                ],
+            ],
+        );
+
+        $this->setConfig(
+            path: 'modules/jamaica/bobsled/module.yaml',
+            config: [
+                'export_paths' => [
+                    'resources/css/bobsled.css',
+                ],
+                'dependencies' => [
+                    'bobsled/speed-calculator' => '^1.0.0',
+                ],
+            ],
+        );
+
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+        $this->assertFileDoesNotExist(base_path('resources/css/seo.css'));
+        $this->assertComposerJsonDoesntHave('statamic/seo-pro');
+        $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/react-testing-tools.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/vue.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/vue-testing-tools.js'));
+        $this->assertComposerJsonDoesntHave('i-love-vue/test-helpers');
+        $this->assertFileDoesNotExist(base_path('resources/js/svelte.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/jquery.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/mootools.js'));
+        $this->assertFileDoesNotExist(base_path('resources/css/hockey.css'));
+        $this->assertFileDoesNotExist(base_path('resources/dictionaries/players.yaml'));
+        $this->assertFileDoesNotExist(base_path('resources/css/theme.css'));
+        $this->assertFileDoesNotExist(base_path('resources/css/bobsled.css'));
+        $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
+
+        $this
+            ->installCoolRunningsModules()
+            ->expectsConfirmation('Would you like to install the [seo] module?', 'yes')
+            ->expectsQuestion('Would you like to install one of the following [seo js] modules?', 'vue')
+            ->expectsQuestion('Would you like to install the [seo js vue testing tools] module?', 'yes')
+            ->expectsQuestion('Would you like to install one of the following [seo oldschool js] modules?', 'skip_module')
+            ->expectsConfirmation('Would you like to install the [canada] module?', 'no')
+            ->expectsConfirmation('Would you like to install the [jamaica] module?', 'yes')
+            ->expectsConfirmation('Would you like to install the [jamaica bobsled] module?', 'yes');
+
+        $this->assertFileExists(base_path('copied.md'));
+        $this->assertFileExists(base_path('resources/css/seo.css'));
+        $this->assertComposerJsonHasPackageVersion('require', 'statamic/seo-pro', '^0.2.0');
+        $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/react-testing-tools.js'));
+        $this->assertFileExists(base_path('resources/js/vue.js'));
+        $this->assertFileExists(base_path('resources/js/vue-testing-tools.js'));
+        $this->assertComposerJsonHasPackageVersion('require-dev', 'i-love-vue/test-helpers', '^1.5');
+        $this->assertFileDoesNotExist(base_path('resources/js/svelte.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/jquery.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/mootools.js'));
+        $this->assertFileDoesNotExist(base_path('resources/css/hockey.css'));
+        $this->assertFileDoesNotExist(base_path('resources/dictionaries/players.yaml'));
+        $this->assertFileExists(base_path('resources/css/theme.css'));
+        $this->assertFileExists(base_path('resources/css/bobsled.css'));
+        $this->assertComposerJsonHasPackageVersion('require', 'bobsled/speed-calculator', '^1.0.0');
+    }
+
     private function kitRepoPath($path = null)
     {
         return collect([base_path('repo/cool-runnings'), $path])->filter()->implode('/');
@@ -1361,9 +1641,9 @@ EOT;
         $this->files->copyDirectory(__DIR__.'/__fixtures__/cool-runnings', $this->kitRepoPath());
     }
 
-    private function setConfig($config)
+    private function setConfig($config, $path = 'starter-kit.yaml')
     {
-        $this->files->put($this->kitRepoPath('starter-kit.yaml'), YAML::dump($config));
+        $this->files->put($this->preparePath($this->kitRepoPath($path)), YAML::dump($config));
     }
 
     private function preparePath($path)
