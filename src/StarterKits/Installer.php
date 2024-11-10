@@ -339,7 +339,7 @@ final class Installer
      */
     protected function prepareInstallableModule(InstallableModule $module): InstallableModule|bool
     {
-        if ($module->key() === 'top_level') {
+        if ($module->isTopLevelModule()) {
             return $module;
         }
 
