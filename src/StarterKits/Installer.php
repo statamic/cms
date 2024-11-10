@@ -16,7 +16,6 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\YAML;
 use Statamic\StarterKits\Concerns\InteractsWithFilesystem;
 use Statamic\StarterKits\Exceptions\StarterKitException;
-use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
@@ -292,77 +291,11 @@ final class Installer
      */
     protected function instantiateModules(): self
     {
-        $this->modules = collect([
-            'top_level' => $this->instantiateModuleRecursively($this->config(), 'top_level'),
-        ]);
+        $this->modules = (new InstallableModules($this->config(), $this->starterKitPath()))
+            ->installer($this)
+            ->instantiate();
 
         return $this;
-    }
-
-    /**
-     * Recursively instantiate module and its nested modules.
-     */
-    protected function instantiateModuleRecursively(Collection|array|string $config, string $key): InstallableModule
-    {
-        if ($config === 'import') {
-            $config = $this->importModuleConfig($key);
-        }
-
-        if ($options = Arr::get($config, 'options')) {
-            $config['options'] = collect($options)
-                ->map(fn ($optionConfig, $optionKey) => $this->instantiateModuleRecursively(
-                    $optionConfig,
-                    $this->normalizeModuleKey($key, $optionKey),
-                ));
-        }
-
-        if ($modules = Arr::get($config, 'modules')) {
-            $config['modules'] = collect($modules)
-                ->map(fn ($childConfig, $childKey) => $this->instantiateModuleRecursively(
-                    $childConfig,
-                    $this->normalizeModuleKey($key, $childKey),
-                ));
-        }
-
-        return (new InstallableModule($config, $key))->installer($this);
-    }
-
-    /**
-     * Import module config from modules folder.
-     */
-    protected function importModuleConfig(string $key): Collection
-    {
-        $moduleConfig = 'modules/'.str_replace('.', '/', $key).'/module.yaml';
-
-        $absolutePath = $this->starterKitPath($moduleConfig);
-
-        if (! $this->files->exists($absolutePath)) {
-            throw new StarterKitException("Starter kit module config [$moduleConfig] does not exist.");
-        }
-
-        return collect(YAML::parse($this->files->get($absolutePath)));
-    }
-
-    /**
-     * Ensure starter kit has config.
-     *
-     * @throws StarterKitException
-     */
-    protected function ensureModuleConfig(): self
-    {
-        if (! $this->files->exists($this->starterKitPath('starter-kit.yaml'))) {
-            throw new StarterKitException('Starter kit config [starter-kit.yaml] does not exist.');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Normalize module key.
-     */
-    protected function normalizeModuleKey(string $key, string $childKey): string
-    {
-        return $key !== 'top_level' ? "{$key}.{$childKey}" : $childKey;
     }
 
     /**
@@ -370,9 +303,9 @@ final class Installer
      */
     protected function filterInstallableModules(): self
     {
-        $this->modules = $this->modules
+        $this->modules = $this->modules->all()
             ->map(fn ($module) => $this->prepareInstallableRecursively($module))
-            ->pipe(fn ($module) => $this->flattenModules($module))
+            ->pipe(fn ($module) => InstallableModules::flattenModules($module))
             ->each(fn ($module) => $module->validate());
 
         return $this;
@@ -452,22 +385,6 @@ final class Installer
         }
 
         return $module->config('options')[$choice];
-    }
-
-    /**
-     * Flatten modules.
-     */
-    public function flattenModules(Collection $modules): Collection
-    {
-        return $modules
-            ->flatMap(function ($module) {
-                return [
-                    $module->key() => $module,
-                    ...$this->flattenModules($module->config('options', collect())),
-                    ...$this->flattenModules($module->config('modules', collect())),
-                ];
-            })
-            ->filter();
     }
 
     /**

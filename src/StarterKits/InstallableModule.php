@@ -19,7 +19,7 @@ final class InstallableModule extends Module
      *
      * @throws Exception|StarterKitException
      */
-    public function installer($installer): self
+    public function installer(?Installer $installer): self
     {
         $this->installer = $installer;
 
