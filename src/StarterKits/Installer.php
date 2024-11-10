@@ -163,7 +163,7 @@ final class Installer
             ->requireStarterKit()
             ->ensureConfig()
             ->instantiateModules()
-            ->prepareInstallableModules()
+            ->filterInstallableModules()
             ->installModules()
             ->copyStarterKitConfig()
             ->copyStarterKitHooks()
@@ -332,9 +332,9 @@ final class Installer
     }
 
     /**
-     * Prompt and prepare flattened collection of installable modules.
+     * Filter and prepare flattened collection of installable modules.
      */
-    protected function prepareInstallableModules(): self
+    protected function filterInstallableModules(): self
     {
         $this->modules = $this->modules
             ->map(fn ($module) => $this->prepareInstallableRecursively($module))
