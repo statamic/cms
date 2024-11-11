@@ -237,7 +237,7 @@ return [
     'updater_require_version_command' => 'Führe den folgenden Befehl aus, um eine bestimmte Version anzufordern',
     'updater_update_to_latest_command' => 'Führe den folgenden Befehl aus, um die aktuelle Version zu installieren',
     'uploader_append_timestamp' => 'Zeitstempel anhängen',
-    'uploader_choose_new_filename' => 'Neuer Dateinamen wählen',
+    'uploader_choose_new_filename' => 'Neuer Dateiname wählen',
     'uploader_discard_use_existing' => 'Verwerfen und bestehende Datei verwenden',
     'uploader_overwrite_existing' => 'Bestehende Datei überschreiben',
     'user_activation_email_not_sent_error' => 'Die Aktivierungs-E-Mail konnte nicht gesendet werden. Bitte prüfe deine E-Mail-Konfiguration und versuche es erneut.',
