@@ -973,7 +973,7 @@ EOT;
             path: 'modules/seo/module.yaml',
             config: [
                 'export_paths' => [
-                    'resources/css/seo.css',
+                    $this->moveKitRepoFile('modules/seo', 'resources/css/seo.css'),
                 ],
                 'dependencies' => [
                     'statamic/seo-pro' => '^0.2.0',
@@ -987,13 +987,13 @@ EOT;
                 'options' => [
                     'react' => [
                         'export_paths' => [
-                            'resources/js/react.js',
+                            $this->moveKitRepoFile('modules/js', 'resources/js/react.js'),
                         ],
                     ],
                     'vue' => '@import', // import option as separate module!
                     'svelte' => [
                         'export_paths' => [
-                            'resources/js/svelte.js',
+                            $this->moveKitRepoFile('modules/js', 'resources/js/svelte.js'),
                         ],
                     ],
                 ],
@@ -1004,7 +1004,7 @@ EOT;
             path: 'modules/js/vue/module.yaml',
             config: [
                 'export_paths' => [
-                    'resources/js/vue.js',
+                    $this->moveKitRepoFile('modules/js/vue', 'resources/js/vue.js'),
                 ],
                 'dependencies' => [
                     'bobsled/vue-components' => '^1.5',
@@ -1154,7 +1154,7 @@ EOT;
             config: [
                 'label' => 'This should not get used, because prompt config in starter-kit.yaml takes precedence!',
                 'export_paths' => [
-                    'resources/js/react.js',
+                    $this->moveKitRepoFile('modules/js/react', 'resources/js/react.js'),
                 ],
             ],
         );
@@ -1656,7 +1656,7 @@ EOT;
             path: 'modules/seo/module.yaml',
             config: [
                 'export_paths' => [
-                    'resources/css/seo.css',
+                    $this->moveKitRepoFile('modules/seo', 'resources/css/seo.css'),
                 ],
                 'dependencies' => [
                     'statamic/seo-pro' => '^0.2.0',
@@ -1666,19 +1666,19 @@ EOT;
                         'options' => [
                             'react' => [
                                 'export_paths' => [
-                                    'resources/js/react.js',
+                                    $this->moveKitRepoFile('modules/seo', 'resources/js/react.js'),
                                 ],
                                 'modules' => [
                                     'testing_tools' => [
                                         'export_paths' => [
-                                            'resources/js/react-testing-tools.js',
+                                            $this->moveKitRepoFile('modules/seo', 'resources/js/react-testing-tools.js'),
                                         ],
                                     ],
                                 ],
                             ],
                             'vue' => [
                                 'export_paths' => [
-                                    'resources/js/vue.js',
+                                    $this->moveKitRepoFile('modules/seo', 'resources/js/vue.js'),
                                 ],
                                 'dependencies_dev' => [
                                     'i-love-vue/test-helpers' => '^1.5',
@@ -1689,7 +1689,7 @@ EOT;
                             ],
                             'svelte' => [
                                 'export_paths' => [
-                                    'resources/js/svelte.js',
+                                    $this->moveKitRepoFile('modules/seo', 'resources/js/svelte.js'),
                                 ],
                             ],
                         ],
@@ -1698,12 +1698,12 @@ EOT;
                         'options' => [
                             'jquery' => [
                                 'export_paths' => [
-                                    'resources/js/jquery.js',
+                                    $this->moveKitRepoFile('modules/seo', 'resources/js/jquery.js'),
                                 ],
                             ],
                             'mootools' => [
                                 'export_paths' => [
-                                    'resources/js/jquery.js',
+                                    $this->moveKitRepoFile('modules/seo', 'resources/js/mootools.js'),
                                 ],
                             ],
                         ],
@@ -1716,7 +1716,7 @@ EOT;
             path: 'modules/seo/js/vue/testing_tools/module.yaml',
             config: [
                 'export_paths' => [
-                    'resources/js/vue-testing-tools.js',
+                    $this->moveKitRepoFile('modules/seo/js/vue/testing_tools', 'resources/js/vue-testing-tools.js'),
                 ],
             ],
         );
@@ -1725,7 +1725,7 @@ EOT;
             path: 'modules/jamaica/bobsled/module.yaml',
             config: [
                 'export_paths' => [
-                    'resources/css/bobsled.css',
+                    $this->moveKitRepoFile('modules/jamaica/bobsled', 'resources/css/bobsled.css'),
                 ],
                 'dependencies' => [
                     'bobsled/speed-calculator' => '^1.0.0',
@@ -1796,6 +1796,16 @@ EOT;
     private function setConfig($config, $path = 'starter-kit.yaml')
     {
         $this->files->put($this->preparePath($this->kitRepoPath($path)), YAML::dump($config));
+    }
+
+    private function moveKitRepoFile($relativeModulePath, $relativeFilePath)
+    {
+        $this->files->move(
+            $this->kitRepoPath($relativeFilePath),
+            $this->preparePath($this->kitRepoPath(Str::ensureRight($relativeModulePath, '/').$relativeFilePath)),
+        );
+
+        return $relativeFilePath;
     }
 
     private function preparePath($path)

@@ -7,7 +7,6 @@ use Facades\Statamic\Console\Processes\TtyDetector;
 use Facades\Statamic\StarterKits\Hook;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use Statamic\Console\NullConsole;
 use Statamic\Console\Please\Application as PleaseApplication;

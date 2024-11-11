@@ -73,21 +73,22 @@ final class InstallableModules
     /**
      * Recursively instantiate module and its nested modules.
      */
-    protected function instantiateModuleRecursively(Collection|array|string $config, string $key): InstallableModule
+    protected function instantiateModuleRecursively(Collection|array|string $config, string $key, ?string $moduleScope = null): InstallableModule
     {
-        if ($config === '@import') {
+        if ($imported = $config === '@import') {
             $config = $this->importModuleConfig($key);
-        }
-
-        if (Arr::get($config, 'import') === '@config') {
+        } elseif ($imported = Arr::get($config, 'import') === '@config') {
             $config = $this->importModuleConfig($key)->merge($config);
         }
+
+        $moduleScope = $imported ? $key : $moduleScope;
 
         if ($options = Arr::get($config, 'options')) {
             $config['options'] = collect($options)
                 ->map(fn ($optionConfig, $optionKey) => $this->instantiateModuleRecursively(
                     $optionConfig,
                     $this->normalizeModuleKey($key, $optionKey),
+                    $moduleScope,
                 ));
         }
 
@@ -96,10 +97,17 @@ final class InstallableModules
                 ->map(fn ($childConfig, $childKey) => $this->instantiateModuleRecursively(
                     $childConfig,
                     $this->normalizeModuleKey($key, $childKey),
+                    $moduleScope,
                 ));
         }
 
-        return (new InstallableModule($config, $key))->installer($this->installer);
+        $module = (new InstallableModule($config, $key))->installer($this->installer);
+
+        if ($moduleScope) {
+            $this->scopeInstallableFiles($module, $moduleScope);
+        }
+
+        return $module;
     }
 
     /**
@@ -109,7 +117,7 @@ final class InstallableModules
      */
     protected function importModuleConfig(string $key): Collection
     {
-        $moduleConfig = $this->relativeModulePath('module.yaml', $key);
+        $moduleConfig = $this->relativeModulePath($key, 'module.yaml');
 
         $absolutePath = $this->starterKitPath($moduleConfig);
 
@@ -117,11 +125,7 @@ final class InstallableModules
             throw new StarterKitException("Starter kit module config [$moduleConfig] does not exist.");
         }
 
-        $config = collect(YAML::parse($this->files->get($absolutePath)));
-
-        // TODO: prefix from in export paths
-
-        return $config;
+        return collect(YAML::parse($this->files->get($absolutePath)));
     }
 
     /**
@@ -157,9 +161,21 @@ final class InstallableModules
     /**
      * Assemble relative imported module path.
      */
-    protected function relativeModulePath(string $path, string $key): string
+    protected function relativeModulePath(string $key, ?string $path = null): string
     {
-        return 'modules/'.str_replace('.', '/', $key).Str::ensureLeft($path, '/');
+        $base = 'modules/'.str_replace('.', '/', $key);
+
+        return $path
+            ? $base.Str::ensureLeft($path, '/')
+            : $base;
+    }
+
+    /**
+     * Scope installable files to imported module.
+     */
+    protected function scopeInstallableFiles(InstallableModule $module, string $scope): void
+    {
+        $module->setRelativePath($this->relativeModulePath($scope));
     }
 
     /**
