@@ -79,6 +79,10 @@ final class InstallableModules
             $config = $this->importModuleConfig($key);
         }
 
+        if (Arr::get($config, 'import') === '@config') {
+            $config = $this->importModuleConfig($key)->merge($config);
+        }
+
         if ($options = Arr::get($config, 'options')) {
             $config['options'] = collect($options)
                 ->map(fn ($optionConfig, $optionKey) => $this->instantiateModuleRecursively(

@@ -1048,7 +1048,7 @@ EOT;
     }
 
     #[Test]
-    public function it_display_custom_module_prompts()
+    public function it_displays_custom_module_prompts()
     {
         $this->setConfig([
             'modules' => [
@@ -1111,6 +1111,80 @@ EOT;
         $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
         $this->assertFileDoesNotExist(base_path('resources/js/vue.js'));
         $this->assertFileExists(base_path('resources/js/svelte.js'));
+    }
+
+    #[Test]
+    public function it_can_merge_imported_module_config_with_starter_kit_config()
+    {
+        $this->setConfig([
+            'modules' => [
+                'seo' => [
+                    'prompt' => 'Want some extra SEO magic?', // handle prompt flow here
+                    'import' => '@config', // but import and merge rest of config
+                ],
+                'js' => [
+                    'prompt' => 'Want one of these fancy JS options?',
+                    'options' => [
+                        'react' => [
+                            'label' => 'React JS', // handle prompt option label here
+                            'import' => '@config', // but import and merge rest of config
+                        ],
+                        'svelte' => [
+                            'export_paths' => [
+                                'resources/js/svelte.js',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->setConfig(
+            path: 'modules/seo/module.yaml',
+            config: [
+                'prompt' => 'This should not get used, because prompt config in starter-kit.yaml takes precedence!',
+                'dependencies' => [
+                    'statamic/seo-pro' => '^0.2.0', // but this should still be imported and installed
+                ],
+            ],
+        );
+
+        $this->setConfig(
+            path: 'modules/js/react/module.yaml',
+            config: [
+                'label' => 'This should not get used, because prompt config in starter-kit.yaml takes precedence!',
+                'export_paths' => [
+                    'resources/js/react.js',
+                ],
+            ],
+        );
+
+        $this->assertComposerJsonDoesntHave('statamic/seo-pro');
+        $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/vue.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/svelte.js'));
+
+        $command = $this
+            ->installCoolRunningsModules()
+            ->expectsConfirmation('Want some extra SEO magic?', 'yes');
+
+        // Some fixes to `expectsChoice()` were merged for us, but are not available on 11.20.0 and below
+        // See: https://github.com/laravel/framework/pull/52408
+        if (version_compare(app()->version(), '11.20.0', '>')) {
+            $command->expectsChoice('Want one of these fancy JS options?', 'react', [
+                'skip_module' => 'No',
+                'react' => 'React JS',
+                'svelte' => 'Svelte',
+            ]);
+        } else {
+            $command->expectsQuestion('Want one of these fancy JS options?', 'react');
+        }
+
+        $command->run();
+
+        $this->assertComposerJsonHasPackageVersion('require', 'statamic/seo-pro', '^0.2.0');
+        $this->assertFileExists(base_path('resources/js/react.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/svelte.js'));
     }
 
     #[Test]
