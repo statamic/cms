@@ -5,6 +5,10 @@
     @apply flex-wrap;
 }
 
+.button-group-fieldtype-wrapper .btn-group {
+    @apply cursor-default;
+}
+
 .btn-group.btn-vertical {
     @apply flex-col items-stretch justify-start p-0 h-auto;
 
