@@ -15,7 +15,6 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\YAML;
 use Statamic\StarterKits\Concerns\InteractsWithFilesystem;
 use Statamic\StarterKits\Exceptions\StarterKitException;
-use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
@@ -152,6 +151,7 @@ final class Installer
             ->requireStarterKit()
             ->ensureConfig()
             ->instantiateModules()
+            ->filterInstallableModules()
             ->installModules()
             ->copyStarterKitConfig()
             ->copyStarterKitHooks()
@@ -276,77 +276,97 @@ final class Installer
     }
 
     /**
-     * Instantiate and validate modules that are to be installed.
+     * Instantiate modules.
      */
     protected function instantiateModules(): self
     {
-        $this->modules = collect(['top_level' => $this->config()->all()])
-            ->map(fn ($config, $key) => $this->instantiateModuleRecursively($config, $key))
-            ->flatten()
-            ->filter()
+        $this->modules = (new InstallableModules($this->config(), $this->starterKitPath()))
+            ->installer($this)
+            ->instantiate();
+
+        return $this;
+    }
+
+    /**
+     * Filter and prepare flattened collection of installable modules.
+     */
+    protected function filterInstallableModules(): self
+    {
+        $this->modules = $this->modules->all()
+            ->map(fn ($module) => $this->prepareInstallableRecursively($module))
+            ->pipe(fn ($module) => InstallableModules::flattenModules($module))
             ->each(fn ($module) => $module->validate());
 
         return $this;
     }
 
     /**
-     * Instantiate module and check if nested modules should be recursively instantiated.
+     * Recursively prepare module and its nested modules.
      */
-    protected function instantiateModuleRecursively(array $config, string $key): InstallableModule|array
+    protected function prepareInstallableRecursively(InstallableModule $installable): InstallableModule|bool
     {
-        $instantiated = (new InstallableModule($config, $key))->installer($this);
+        $module = $this->prepareInstallableModule($installable);
 
-        if ($modules = Arr::get($config, 'modules')) {
-            $instantiated = collect($modules)
-                ->map(fn ($config, $childKey) => $this->instantiateModule($config, $this->normalizeModuleKey($key, $childKey)))
-                ->prepend($instantiated, $key)
-                ->filter()
-                ->all();
+        if ($module === false) {
+            return false;
         }
 
-        return $instantiated;
+        if ($modules = $module->config('modules')) {
+            $module->set(
+                key: 'modules',
+                value: $modules
+                    ->map(fn ($childModule) => $this->prepareInstallableRecursively($childModule))
+                    ->filter()
+            );
+        }
+
+        return $module;
     }
 
     /**
-     * Instantiate individual module.
+     * Prepare individual module.
      */
-    protected function instantiateModule(array $config, string $key): InstallableModule|array|bool
+    protected function prepareInstallableModule(InstallableModule $module): InstallableModule|bool
     {
-        $shouldPrompt = true;
-
-        if (Arr::has($config, 'options')) {
-            return $this->instantiateSelectModule($config, $key);
+        if ($module->isTopLevelModule()) {
+            return $module;
         }
 
-        if (Arr::get($config, 'prompt') === false) {
+        if ($module->config('options')) {
+            return $this->prepareSelectModule($module);
+        }
+
+        $shouldPrompt = true;
+
+        if ($module->config('prompt') === false) {
             $shouldPrompt = false;
         }
 
-        $name = str_replace('_', ' ', $key);
+        $name = str_replace(['_', '.'], ' ', $module->key());
 
-        if ($shouldPrompt && $this->isInteractive && ! confirm(Arr::get($config, 'prompt', "Would you like to install the [{$name}] module?"), false)) {
+        if ($shouldPrompt && $this->isInteractive && ! confirm($module->config('prompt', "Would you like to install the [{$name}] module?"), false)) {
             return false;
         } elseif ($shouldPrompt && ! $this->isInteractive) {
             return false;
         }
 
-        return $this->instantiateModuleRecursively($config, $key);
+        return $module;
     }
 
     /**
-     * Instantiate select module.
+     * Prepare select module.
      */
-    protected function instantiateSelectModule(array $config, string $key): InstallableModule|array|bool
+    protected function prepareSelectModule(InstallableModule $module): InstallableModule|bool
     {
-        $options = collect($config['options'])
-            ->map(fn ($option, $optionKey) => Arr::get($option, 'label', ucfirst($optionKey)))
-            ->prepend(Arr::get($config, 'skip_option', 'No'), $skipModule = 'skip_module')
+        $options = collect($module->config('options'))
+            ->map(fn ($option, $optionKey) => $option->config('label', ucfirst($optionKey)))
+            ->prepend($module->config('skip_option', 'No'), $skipModule = 'skip_module')
             ->all();
 
-        $name = str_replace('_', ' ', $key);
+        $name = str_replace(['_', '.'], ' ', $module->key());
 
         $choice = select(
-            label: Arr::get($config, 'prompt', "Would you like to install one of the following [{$name}] modules?"),
+            label: $module->config('prompt', "Would you like to install one of the following [{$name}] modules?"),
             options: $options,
         );
 
@@ -354,18 +374,7 @@ final class Installer
             return false;
         }
 
-        $selectedKey = "{$key}_{$choice}";
-        $selectedModuleConfig = $config['options'][$choice];
-
-        return $this->instantiateModuleRecursively($selectedModuleConfig, $selectedKey);
-    }
-
-    /**
-     * Normalize module key.
-     */
-    protected function normalizeModuleKey(string $key, string $childKey): string
-    {
-        return $key !== 'top_level' ? "{$key}_{$childKey}" : $childKey;
+        return $module->config('options')[$choice];
     }
 
     /**
