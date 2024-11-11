@@ -937,7 +937,7 @@ EOT;
                 'copied.md',
             ],
             'modules' => [
-                'seo' => 'import', // import!
+                'seo' => '@import', // import!
                 'bobsled' => [
                     'export_paths' => [
                         'resources/css/bobsled.css',
@@ -951,7 +951,7 @@ EOT;
                         'resources/css/theme.css' => 'resources/css/jamaica.css',
                     ],
                 ],
-                'js' => 'import', // import!
+                'js' => '@import', // import!
                 'oldschool_js' => [
                     'options' => [
                         'jquery' => [
@@ -990,7 +990,7 @@ EOT;
                             'resources/js/react.js',
                         ],
                     ],
-                    'vue' => 'import', // import option as separate module!
+                    'vue' => '@import', // import option as separate module!
                     'svelte' => [
                         'export_paths' => [
                             'resources/js/svelte.js',
@@ -1222,7 +1222,7 @@ EOT;
     {
         $this->setConfig([
             'modules' => [
-                'seo' => 'import',
+                'seo' => '@import',
             ],
         ]);
 
@@ -1241,7 +1241,7 @@ EOT;
     {
         $this->setConfig([
             'modules' => [
-                'seo' => 'import',
+                'seo' => '@import',
             ],
         ]);
 
@@ -1251,7 +1251,7 @@ EOT;
                 'modules' => [
                     'js' => [
                         'options' => [
-                            'vue' => 'import',
+                            'vue' => '@import',
                         ],
                     ],
                 ],
@@ -1273,7 +1273,7 @@ EOT;
     {
         $this->setConfig([
             'modules' => [
-                'seo' => 'import',
+                'seo' => '@import',
             ],
         ]);
 
@@ -1554,7 +1554,7 @@ EOT;
                 'copied.md',
             ],
             'modules' => [
-                'seo' => 'import',
+                'seo' => '@import',
                 'canada' => [
                     'export_paths' => [
                         'resources/css/hockey.css',
@@ -1572,7 +1572,7 @@ EOT;
                         'resources/css/theme.css' => 'resources/css/jamaica.css',
                     ],
                     'modules' => [
-                        'bobsled' => 'import', // import nested module!
+                        'bobsled' => '@import', // import nested module!
                     ],
                 ],
             ],
@@ -1610,7 +1610,7 @@ EOT;
                                     'i-love-vue/test-helpers' => '^1.5',
                                 ],
                                 'modules' => [
-                                    'testing_tools' => 'import', // import nested module!
+                                    'testing_tools' => '@import', // import nested module!
                                 ],
                             ],
                             'svelte' => [

@@ -75,7 +75,7 @@ final class InstallableModules
      */
     protected function instantiateModuleRecursively(Collection|array|string $config, string $key): InstallableModule
     {
-        if ($config === 'import') {
+        if ($config === '@import') {
             $config = $this->importModuleConfig($key);
         }
 
