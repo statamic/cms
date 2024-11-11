@@ -1120,14 +1120,14 @@ EOT;
             'modules' => [
                 'seo' => [
                     'prompt' => 'Want some extra SEO magic?', // handle prompt flow here
-                    'import' => '@config', // but import and merge rest of config
+                    // implicitly import and merge rest of config in here
                 ],
                 'js' => [
                     'prompt' => 'Want one of these fancy JS options?',
                     'options' => [
                         'react' => [
                             'label' => 'React JS', // handle prompt option label here
-                            'import' => '@config', // but import and merge rest of config
+                            // implicitly import and merge rest of config in here
                         ],
                         'svelte' => [
                             'export_paths' => [
@@ -1154,7 +1154,7 @@ EOT;
             config: [
                 'label' => 'This should not get used, because prompt config in starter-kit.yaml takes precedence!',
                 'export_paths' => [
-                    $this->moveKitRepoFile('modules/js/react', 'resources/js/react.js'),
+                    $this->moveKitRepoFile('modules/js/react', 'resources/js/react.js'), // but this should still be imported and installed
                 ],
             ],
         );

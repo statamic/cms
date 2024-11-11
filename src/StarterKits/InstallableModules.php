@@ -77,7 +77,7 @@ final class InstallableModules
     {
         if ($imported = $config === '@import') {
             $config = $this->importModuleConfig($key);
-        } elseif ($imported = Arr::get($config, 'import') === '@config') {
+        } elseif ($imported = $this->moduleConfigExists($key)) {
             $config = $this->importModuleConfig($key)->merge($config);
         }
 
@@ -168,6 +168,16 @@ final class InstallableModules
         return $path
             ? $base.Str::ensureLeft($path, '/')
             : $base;
+    }
+
+    /**
+     * Determine whether module config exists.
+     */
+    protected function moduleConfigExists(string $key): bool
+    {
+        return $this->files->exists(
+            $this->starterKitPath($this->relativeModulePath($key, 'module.yaml'))
+        );
     }
 
     /**
