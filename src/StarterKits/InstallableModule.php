@@ -113,7 +113,7 @@ final class InstallableModule extends Module
     /**
      * Get installable files.
      */
-    protected function installableFiles(): Collection
+    public function installableFiles(): Collection
     {
         $installableFromExportPaths = $this
             ->exportPaths()
