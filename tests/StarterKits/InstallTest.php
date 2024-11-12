@@ -41,6 +41,10 @@ class InstallTest extends TestCase
     {
         $this->restoreSite();
 
+        if ($this->files->exists($kitRepo = $this->kitRepoPath())) {
+            $this->files->deleteDirectory($kitRepo);
+        }
+
         parent::tearDown();
     }
 
@@ -50,6 +54,31 @@ class InstallTest extends TestCase
         $this->assertFileDoesNotExist($this->kitVendorPath());
         $this->assertComposerJsonDoesntHave('repositories');
         $this->assertFileDoesNotExist(base_path('copied.md'));
+
+        $this->installCoolRunnings();
+
+        $this->assertFalse(Blink::has('starter-kit-repository-added'));
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertFileDoesNotExist(base_path('composer.json.bak'));
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileExists(base_path('copied.md'));
+    }
+
+    #[Test]
+    public function it_installs_starter_kit_from_updatable_package_with_export_directory()
+    {
+        // Move everything in the kit repo's `export` folder, except for `composer.json` and `starter-kit.yaml`
+        collect($this->files->allFiles($this->kitRepoPath()))
+            ->reject(fn ($file) => in_array($file->getRelativePathname(), ['composer.json', 'starter-kit.yaml']))
+            ->each(fn ($file) => $this->files->move(
+                $this->kitRepoPath($file->getRelativePathname()),
+                $this->preparePath($this->kitRepoPath('export/'.$file->getRelativePathname())),
+            ));
+
+        $this->assertFileDoesNotExist($this->kitRepoPath('copied.md'));
+        $this->assertFileExists($this->kitRepoPath('export/copied.md'));
+        $this->assertFileExists($this->kitRepoPath('composer.json'));
+        $this->assertFileExists($this->kitRepoPath('starter-kit.yaml'));
 
         $this->installCoolRunnings();
 
