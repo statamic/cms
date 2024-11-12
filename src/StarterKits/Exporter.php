@@ -54,7 +54,7 @@ class Exporter
             ->exportModules()
             ->exportConfig()
             ->exportHooks()
-            ->exportComposerJson();
+            ->exportPackage();
     }
 
     /**
@@ -266,6 +266,23 @@ class Exporter
                 from: $hook,
                 starterKitPath: $this->exportPath,
             ));
+
+        return $this;
+    }
+
+    /**
+     * Export package folder.
+     */
+    protected function exportPackage(): self
+    {
+        if (! $this->files->exists($packageFolder = base_path('package'))) {
+            return $this->exportComposerJson();
+        }
+
+        collect($this->files->allFiles($packageFolder))
+            ->mapWithKeys(fn ($file) => [$packageFolder.'/'.$file->getRelativePathname() => $this->exportPath.'/'.$file->getRelativePathname()])
+            ->each(fn ($file) => $this->preparePath($file))
+            ->each(fn ($to, $from) => $this->files->copy($from, $to));
 
         return $this;
     }
