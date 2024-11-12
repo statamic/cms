@@ -190,7 +190,7 @@ button {
   ========================================================================== */
 
 .btn-group {
-    @apply flex items-center justify-start p-0;
+    @apply flex items-center justify-start p-0 cursor-auto;
     height: 2.375rem;
 
     button {
