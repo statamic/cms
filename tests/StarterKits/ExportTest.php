@@ -15,6 +15,7 @@ class ExportTest extends TestCase
 
     protected $files;
     protected $configPath;
+    protected $packagePath;
     protected $exportPath;
     protected $postInstallHookPath;
 
@@ -24,34 +25,40 @@ class ExportTest extends TestCase
 
         $this->files = app(Filesystem::class);
         $this->configPath = base_path('starter-kit.yaml');
+        $this->packagePath = base_path('package');
         $this->postInstallHookPath = base_path('StarterKitPostInstall.php');
         $this->exportPath = base_path('../cool-runnings');
 
-        if ($this->files->exists($this->configPath)) {
-            $this->files->delete($this->configPath);
-        }
-
-        if ($this->files->exists($this->exportPath)) {
-            $this->files->deleteDirectory($this->exportPath);
-        }
-
+        $this->cleanUp();
         $this->restoreComposerJson();
         $this->backupComposerJson();
     }
 
     public function tearDown(): void
     {
+        $this->cleanUp();
+        $this->restoreComposerJson();
+
+        parent::tearDown();
+    }
+
+    private function cleanUp()
+    {
         if ($this->files->exists($this->configPath)) {
             $this->files->delete($this->configPath);
+        }
+
+        if ($this->files->exists($this->packagePath)) {
+            $this->files->deleteDirectory($this->packagePath);
+        }
+
+        if ($this->files->exists($this->exportPath)) {
+            $this->files->deleteDirectory($this->exportPath);
         }
 
         if ($this->files->exists($this->postInstallHookPath)) {
             $this->files->delete($this->postInstallHookPath);
         }
-
-        $this->restoreComposerJson();
-
-        parent::tearDown();
     }
 
     #[Test]
@@ -629,6 +636,31 @@ EOT
 
 EOT
             , $this->files->get($this->exportPath('composer.json')));
+    }
+
+    #[Test]
+    public function it_exports_whole_package_folder_instead_of_composer_json_file_if_it_exists()
+    {
+        $this->files->makeDirectory(base_path('package/src'), 0777, true, true);
+        $this->files->put(base_path('package/src/ServiceProvider.php'), 'I am a service provider!');
+        $this->files->put(base_path('package/composer.json'), 'I am a composer.json!');
+
+        $this->setExportPaths([
+            'config',
+        ]);
+
+        $this->assertFileDoesNotExist($this->exportPath('package'));
+        $this->assertFileDoesNotExist($this->exportPath('src'));
+        $this->assertFileDoesNotExist($this->exportPath('composer.json'));
+
+        $this->exportCoolRunnings();
+
+        $this->assertFileDoesNotExist($this->exportPath('package'));
+        $this->assertFileExists($this->exportPath('src'));
+        $this->assertFileExists($this->exportPath('composer.json'));
+
+        $this->assertEquals('I am a service provider!', $this->files->get($this->exportPath('src/ServiceProvider.php')));
+        $this->assertEquals('I am a composer.json!', $this->files->get($this->exportPath('composer.json')));
     }
 
     #[Test]
