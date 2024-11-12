@@ -179,7 +179,11 @@ class Exporter
      */
     protected function exportModules(): self
     {
-        $this->modules->each(fn ($module) => $module->export($this->exportPath));
+        $exportPath = $this->files->exists(base_path('package'))
+            ? $this->exportPath.'/export'
+            : $this->exportPath;
+
+        $this->modules->each(fn ($module) => $module->export($exportPath));
 
         return $this;
     }
