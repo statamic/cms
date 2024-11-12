@@ -204,6 +204,30 @@ abstract class EloquentQueryBuilder implements Builder
         return $this->whereJsonLength($column, $operator, $value, 'or');
     }
 
+    public function whereJsonOverlaps($column, $values, $boolean = 'and')
+    {
+        $this->builder->whereJsonOverlaps($this->column($column), $values, $boolean);
+
+        return $this;
+    }
+
+    public function orWhereJsonOverlaps($column, $values)
+    {
+        return $this->whereJsonOverlaps($column, $values, 'or');
+    }
+
+    public function whereJsonDoesntOverlap($column, $values, $boolean = 'and')
+    {
+        $this->builder->whereJsonDoesntOverlap($this->column($column), $values, $boolean);
+
+        return $this;
+    }
+
+    public function orWhereJsonDoesntOverlap($column, $values)
+    {
+        return $this->whereJsonDoesntOverlap($column, $values, 'or');
+    }
+
     public function whereNull($column, $boolean = 'and', $not = false)
     {
         $this->builder->whereNull($this->column($column), $boolean, $not);
