@@ -441,6 +441,19 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
             ->args(func_get_args());
     }
 
+    public function createLabel()
+    {
+        $key = "messages.{$this->handle()}_taxonomy_create_term";
+
+        $translation = __($key);
+
+        if ($translation === $key) {
+            return __('Create Term');
+        }
+
+        return $translation;
+    }
+
     public function searchIndex($index = null)
     {
         return $this
