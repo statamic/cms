@@ -292,7 +292,7 @@ class Exporter
     }
 
     /**
-     * Export package folder.
+     * Export package config & other misc vendor files.
      */
     protected function exportPackage(): self
     {
