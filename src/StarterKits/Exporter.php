@@ -49,6 +49,7 @@ class Exporter
         $this
             ->validateExportPath()
             ->validateConfig()
+            ->validatePackage()
             ->instantiateModules()
             ->clearExportPath()
             ->exportModules()
@@ -76,6 +77,22 @@ class Exporter
     {
         if (! $this->files->exists(base_path('starter-kit.yaml'))) {
             throw new StarterKitException('Export config [starter-kit.yaml] does not exist.');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Validate package folder, if it exists.
+     */
+    protected function validatePackage(): self
+    {
+        if (! $this->files->exists(base_path('package'))) {
+            return $this;
+        }
+
+        if (! $this->files->exists(base_path('package/composer.json'))) {
+            throw new StarterKitException('Package config [package/composer.json] does not exist.');
         }
 
         return $this;
