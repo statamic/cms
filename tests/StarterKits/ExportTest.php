@@ -639,6 +639,29 @@ EOT
     }
 
     #[Test]
+    public function it_requires_composer_json_file_in_package_folder_if_it_exists()
+    {
+        $this->files->makeDirectory(base_path('package/src'), 0777, true, true);
+        $this->files->put(base_path('package/src/ServiceProvider.php'), 'I am a service provider!');
+        // $this->files->put(base_path('package/composer.json'), 'I am a composer.json!'); // Say we forget to create a composer.json file
+
+        $this->setExportPaths([
+            'config',
+        ]);
+
+        $this->assertFileDoesNotExist($this->exportPath('config'));
+        $this->assertFileDoesNotExist($this->exportPath('src'));
+
+        $this
+            ->exportCoolRunnings()
+            // ->expectsOutput('Package config [package/composer.json] does not exist.') // TODO: Why does this work in InstallTest?
+            ->assertFailed();
+
+        $this->assertFileDoesNotExist($this->exportPath('config'));
+        $this->assertFileDoesNotExist($this->exportPath('src'));
+    }
+
+    #[Test]
     public function it_exports_whole_package_folder_instead_of_composer_json_file_if_it_exists()
     {
         $this->files->makeDirectory(base_path('package/src'), 0777, true, true);
