@@ -689,11 +689,15 @@ EOT
         $this->assertFileExists($this->exportPath('src'));
         $this->assertFileExists($this->exportPath('composer.json'));
 
-        // Notice `export_paths` should get exported to `export` folder now...
+        // Notice `export_paths` should not get exported to starter kit root anymore...
+        $this->assertFileDoesNotExist($this->exportPath('config/filesystems.php'));
+        $this->assertFileDoesNotExist($this->exportPath('resources/views/welcome.blade.php'));
+
+        // Rather, they should go to the `export` folder now...
         $this->assertFileExists($this->exportPath('export/config/filesystems.php'));
         $this->assertFileExists($this->exportPath('export/resources/views/welcome.blade.php'));
 
-        // And vendor stuff in `package` should get exported to target starter kit root...
+        // And all vendor stuff in `package` should get exported to target starter kit root...
         $this->assertEquals('I am a service provider!', $this->files->get($this->exportPath('src/ServiceProvider.php')));
         $this->assertEquals('I am a vendor view!', $this->files->get($this->exportPath('resources/views/widget.blade.php')));
         $this->assertEquals('I am a composer.json!', $this->files->get($this->exportPath('composer.json')));
