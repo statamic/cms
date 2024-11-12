@@ -662,19 +662,26 @@ EOT
     }
 
     #[Test]
-    public function it_exports_whole_package_folder_instead_of_composer_json_file_if_it_exists()
+    public function it_exports_package_and_export_folders_instead_of_composer_json_stub_when_package_folder_exists()
     {
         $this->files->makeDirectory(base_path('package/src'), 0777, true, true);
         $this->files->put(base_path('package/src/ServiceProvider.php'), 'I am a service provider!');
+
+        $this->files->makeDirectory(base_path('package/resources/views'), 0777, true, true);
+        $this->files->put(base_path('package/resources/views/widget.blade.php'), 'I am a vendor view!');
+
         $this->files->put(base_path('package/composer.json'), 'I am a composer.json!');
 
         $this->setExportPaths([
             'config',
+            'resources/views',
         ]);
 
         $this->assertFileDoesNotExist($this->exportPath('package'));
         $this->assertFileDoesNotExist($this->exportPath('src'));
         $this->assertFileDoesNotExist($this->exportPath('composer.json'));
+        $this->assertFileDoesNotExist($this->exportPath('config'));
+        $this->assertFileDoesNotExist($this->exportPath('resources/views'));
 
         $this->exportCoolRunnings();
 
@@ -682,7 +689,13 @@ EOT
         $this->assertFileExists($this->exportPath('src'));
         $this->assertFileExists($this->exportPath('composer.json'));
 
+        // Notice `export_paths` should get exported to `export` folder now...
+        $this->assertFileExists($this->exportPath('export/config/filesystems.php'));
+        $this->assertFileExists($this->exportPath('export/resources/views/welcome.blade.php'));
+
+        // And vendor stuff in `package` should get exported to target starter kit root...
         $this->assertEquals('I am a service provider!', $this->files->get($this->exportPath('src/ServiceProvider.php')));
+        $this->assertEquals('I am a vendor view!', $this->files->get($this->exportPath('resources/views/widget.blade.php')));
         $this->assertEquals('I am a composer.json!', $this->files->get($this->exportPath('composer.json')));
     }
 
