@@ -365,10 +365,10 @@ class QueryBuilderTest extends TestCase
             ['reference' => 'e', 'test_taxonomy' => ['taxonomy-5']],
         ]);
 
-        $results = (new FakeQueryBuilder($items))->withoutData()->whereJsonContains('test_taxonomy', ['taxonomy-1', 'taxonomy-5'])->get();
+        $results = (new FakeQueryBuilder($items))->withoutData()->whereJsonContains('test_taxonomy', ['taxonomy-1', 'taxonomy-3'])->get();
 
-        $this->assertCount(3, $results);
-        $this->assertEquals(['a', 'c', 'e'], $results->map->reference->all());
+        $this->assertCount(1, $results);
+        $this->assertEquals(['c'], $results->map->reference->all());
 
         $results = (new FakeQueryBuilder($items))->withoutData()->whereJsonContains('test_taxonomy', 'taxonomy-1')->get();
 
