@@ -55,7 +55,7 @@ abstract class QueryBuilder extends BaseQueryBuilder
         return $this->transformResults($results);
     }
 
-    public function transformResults()
+    public function transformResults($results)
     {
         if (! $this->withData) {
             return $this->collect($results)
