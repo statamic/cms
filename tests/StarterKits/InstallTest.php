@@ -13,6 +13,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Console\Commands\StarterKitInstall as InstallCommand;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Config;
+use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
 use Statamic\Support\Str;
 use Tests\Fakes\Composer\FakeComposer;
@@ -1403,7 +1404,7 @@ EOT;
             $this->files->makeDirectory($folder, 0755, true);
         }
 
-        return $path;
+        return Path::tidy($path);
     }
 
     private function installCoolRunnings($options = [], $customHttpFake = null)
