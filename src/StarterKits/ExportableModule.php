@@ -32,14 +32,14 @@ class ExportableModule extends Module
     {
         $this
             ->exportPaths()
-            ->each(fn ($path) => $this->exportPath(
+            ->each(fn ($path) => $this->exportRelativePath(
                 from: $path,
                 starterKitPath: $starterKitPath,
             ));
 
         $this
             ->exportAsPaths()
-            ->each(fn ($to, $from) => $this->exportPath(
+            ->each(fn ($to, $from) => $this->exportRelativePath(
                 from: $from,
                 to: $to,
                 starterKitPath: $starterKitPath,

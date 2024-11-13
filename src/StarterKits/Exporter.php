@@ -4,6 +4,7 @@ namespace Statamic\StarterKits;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
+use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
 use Statamic\StarterKits\Concerns\InteractsWithFilesystem;
 use Statamic\StarterKits\Exceptions\StarterKitException;
@@ -283,7 +284,7 @@ class Exporter
 
         collect($hooks)
             ->filter(fn ($hook) => $this->files->exists(base_path($hook)))
-            ->each(fn ($hook) => $this->exportPath(
+            ->each(fn ($hook) => $this->exportRelativePath(
                 from: $hook,
                 starterKitPath: $this->exportPath,
             ));
@@ -300,10 +301,7 @@ class Exporter
             return $this->exportComposerJson();
         }
 
-        collect($this->files->allFiles($packageFolder))
-            ->mapWithKeys(fn ($file) => [$packageFolder.'/'.$file->getRelativePathname() => $this->exportPath.'/'.$file->getRelativePathname()])
-            ->each(fn ($file) => $this->preparePath($file))
-            ->each(fn ($to, $from) => $this->files->copy($from, $to));
+        $this->copyDirectoryContentsInto($packageFolder, $this->exportPath);
 
         return $this;
     }

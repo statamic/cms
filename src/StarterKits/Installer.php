@@ -12,6 +12,7 @@ use Statamic\Console\NullConsole;
 use Statamic\Console\Please\Application as PleaseApplication;
 use Statamic\Console\Processes\Exceptions\ProcessException;
 use Statamic\Facades\Blink;
+use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
 use Statamic\StarterKits\Concerns\InteractsWithFilesystem;
 use Statamic\StarterKits\Exceptions\StarterKitException;
@@ -654,7 +655,7 @@ EOT;
      */
     protected function starterKitPath(?string $path = null): string
     {
-        return collect([base_path("vendor/{$this->package}"), $path])->filter()->implode('/');
+        return Path::tidy(collect([base_path("vendor/{$this->package}"), $path])->filter()->implode('/'));
     }
 
     /**
