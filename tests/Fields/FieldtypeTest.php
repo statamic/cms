@@ -157,6 +157,7 @@ class FieldtypeTest extends TestCase
             'validatable' => true,
             'defaultable' => true,
             'categories' => [],
+            'keywords' => [],
             'icon' => 'test',
             'config' => [],
         ], $fieldtype->toArray());

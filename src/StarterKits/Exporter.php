@@ -9,12 +9,14 @@ use Statamic\StarterKits\Concerns\InteractsWithFilesystem;
 use Statamic\StarterKits\Exceptions\StarterKitException;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Exporter
 {
-    use InteractsWithFilesystem;
+    use FluentlyGetsAndSets, InteractsWithFilesystem;
 
     protected $exportPath;
+    protected $clear;
     protected $files;
     protected $vendorName;
     protected $modules;
@@ -30,6 +32,14 @@ class Exporter
     }
 
     /**
+     * Get or set whether to clear out everything at target export path before exporting.
+     */
+    public function clear(bool $clear = false): self|bool|null
+    {
+        return $this->fluentlyGetOrSet('clear')->args(func_get_args());
+    }
+
+    /**
      * Export starter kit.
      *
      * @throws StarterKitException
@@ -40,6 +50,7 @@ class Exporter
             ->validateExportPath()
             ->validateConfig()
             ->instantiateModules()
+            ->clearExportPath()
             ->exportModules()
             ->exportConfig()
             ->exportHooks()
@@ -130,6 +141,20 @@ class Exporter
     protected function normalizeModuleKey(string $key, string $childKey): string
     {
         return $key !== 'top_level' ? "{$key}.modules.{$childKey}" : $childKey;
+    }
+
+    /**
+     * Optionally clear out everything at target export path before exporting.
+     */
+    protected function clearExportPath()
+    {
+        if (! $this->clear) {
+            return $this;
+        }
+
+        $this->files->cleanDirectory($this->exportPath);
+
+        return $this;
     }
 
     /**

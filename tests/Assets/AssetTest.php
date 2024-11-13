@@ -601,7 +601,7 @@ class AssetTest extends TestCase
     #[Test]
     public function it_checks_if_its_an_image_file()
     {
-        $extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        $extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif'];
 
         foreach ($extensions as $ext) {
             $this->assertTrue((new Asset)->path("path/to/asset.$ext")->isImage());
@@ -2042,6 +2042,8 @@ class AssetTest extends TestCase
         Storage::disk('test')->assertExists('path/to/asset.jpg');
         $originalFileContents = Storage::disk('test')->get('path/to/asset.jpg');
         $this->assertEquals('path/to/asset.jpg', $asset->path());
+        $asset->set('alt', 'Original alt text');
+        $asset->save();
         $meta = $asset->meta();
         $this->assertEquals(13, $meta['width']);
         $this->assertEquals(15, $meta['height']);
@@ -2061,6 +2063,7 @@ class AssetTest extends TestCase
         $meta = $asset->meta();
         $this->assertEquals(40, $meta['width']);
         $this->assertEquals(25, $meta['height']);
+        $this->assertEquals('Original alt text', $asset->get('alt'));
         Storage::disk('test')->assertExists('path/to/asset.jpg');
         Storage::disk('test')->assertMissing('path/to/different-filename.jpg');
         $this->assertNotEquals($originalFileContents, Storage::disk('test')->get('path/to/asset.jpg'));
@@ -2069,7 +2072,7 @@ class AssetTest extends TestCase
         Event::assertDispatched(AssetReuploaded::class, function ($event) use ($asset) {
             return $event->asset->id() === $asset->id();
         });
-        Event::assertDispatched(AssetSaved::class, 1); // Once during the initial upload, but not again for the reupload.
+        Event::assertDispatched(AssetSaved::class, 2); // Once during the initial upload, again when we save the alt text, but not for the reupload.
 
         // Assertions that the Glide cache is cleared and the presets
         // are regenerated for this asset are in ReuploadAssetTest.

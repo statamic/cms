@@ -10,6 +10,7 @@
         :collection-has-routes="{{ Statamic\Support\Str::bool($collectionHasRoutes) }}"
         :fieldset="{{ json_encode($blueprint) }}"
         :values="{{ json_encode($values) }}"
+        :extra-values="{{ json_encode($extraValues) }}"
         :meta="{{ json_encode($meta) }}"
         :published="{{ json_encode($published) }}"
         :localizations="{{ json_encode($localizations) }}"

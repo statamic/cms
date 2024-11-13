@@ -1,5 +1,5 @@
 @foreach (Statamic::availableExternalScripts(request()) as $url)
-    <script src="{{ $url }}" defer></script>
+    <script src="{!! $url !!}" defer></script>
 @endforeach
 
 @foreach (Statamic::availableScripts(request()) as $package => $paths)
