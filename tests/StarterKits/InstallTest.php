@@ -1378,12 +1378,12 @@ EOT;
 
     private function kitRepoPath($path = null)
     {
-        return collect([base_path('repo/cool-runnings'), $path])->filter()->implode('/');
+        return Path::tidy(collect([base_path('repo/cool-runnings'), $path])->filter()->implode('/'));
     }
 
     protected function kitVendorPath($path = null)
     {
-        return collect([base_path('vendor/statamic/cool-runnings'), $path])->filter()->implode('/');
+        return Path::tidy(collect([base_path('vendor/statamic/cool-runnings'), $path])->filter()->implode('/'));
     }
 
     private function prepareRepo()
