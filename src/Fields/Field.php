@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Lang;
 use Rebing\GraphQL\Support\Field as GqlField;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Facades\GraphQL;
-use Statamic\Fields\FieldtypeRepository;
 use Statamic\Rules\Handle;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
