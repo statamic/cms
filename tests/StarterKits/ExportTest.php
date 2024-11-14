@@ -114,7 +114,7 @@ class ExportTest extends TestCase
     }
 
     #[Test]
-    public function it_can_export_as_to_different_destination_path()
+    public function it_can_still_export_as_to_different_destination_path_for_backwards_compatibility()
     {
         $paths = $this->cleanPaths([
             base_path('README.md'),
@@ -126,23 +126,16 @@ class ExportTest extends TestCase
         $this->files->put(base_path('test-folder/one.txt'), 'One.');
         $this->files->put(base_path('test-folder/two.txt'), 'Two.');
 
-        $this->setExportPaths([
-            'config/filesystems.php',
-            'resources/views',
-        ], [
+        $this->setExportPaths([], [
             'README.md' => 'README-new-site.md',
             'test-folder' => 'test-renamed-folder',
         ]);
 
-        $this->assertFileDoesNotExist($filesystemsConfig = $this->exportPath('config/filesystems.php'));
-        $this->assertFileDoesNotExist($errorsFolder = $this->exportPath('resources/views/errors'));
         $this->assertFileDoesNotExist($renamedFile = $this->exportPath('README-new-site.md'));
         $this->assertFileDoesNotExist($renamedFolder = $this->exportPath('test-renamed-folder'));
 
         $this->exportCoolRunnings();
 
-        $this->assertFileExists($filesystemsConfig);
-        $this->assertFileExists($errorsFolder);
         $this->assertFileExists($renamedFile);
         $this->assertFileExists($renamedFolder);
 

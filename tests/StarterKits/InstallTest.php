@@ -91,13 +91,34 @@ class InstallTest extends TestCase
     }
 
     #[Test]
-    public function it_installs_from_custom_export_paths()
+    public function it_installs_from_export_paths()
     {
         $this->setConfig([
             'export_paths' => [
                 'config',
                 'copied.md',
             ],
+        ]);
+
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+
+        $this->installCoolRunnings();
+
+        $this->assertFalse(Blink::has('starter-kit-repository-added'));
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertFileDoesNotExist(base_path('composer.json.bak'));
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileExists(base_path('copied.md'));
+        $this->assertFileExists(config_path('filesystems.php'));
+        $this->assertFileHasContent('bobsled_pics', config_path('filesystems.php'));
+    }
+
+    #[Test]
+    public function it_still_installs_from_export_as_paths_for_backwards_compatibility()
+    {
+        $this->setConfig([
             'export_as' => [
                 'README.md' => 'README-for-new-site.md',
                 'original-dir' => 'renamed-dir',
@@ -106,7 +127,6 @@ class InstallTest extends TestCase
 
         $this->assertFileDoesNotExist($this->kitVendorPath());
         $this->assertComposerJsonDoesntHave('repositories');
-        $this->assertFileDoesNotExist(base_path('copied.md'));
         $this->assertFileDoesNotExist($renamedFile = base_path('README.md'));
         $this->assertFileDoesNotExist($renamedFolder = base_path('original-dir'));
 
@@ -116,7 +136,6 @@ class InstallTest extends TestCase
         $this->assertFileDoesNotExist($this->kitVendorPath());
         $this->assertFileDoesNotExist(base_path('composer.json.bak'));
         $this->assertComposerJsonDoesntHave('repositories');
-        $this->assertFileExists(base_path('copied.md'));
         $this->assertFileExists($renamedFile);
         $this->assertFileExists($renamedFolder);
 
