@@ -3,7 +3,7 @@
         <button
             v-for="action in actions"
             @click="run(action)"
-            v-text="action.display || action.title" />
+            v-text="action.title" />
     </div>
 </template>
 
