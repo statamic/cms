@@ -3,9 +3,7 @@
         <button
             v-for="action in actions"
             @click="run(action)"
-        >
-            {{ action.display || action.title }}
-        </button>
+            v-text="action.display || action.title" />
     </div>
 </template>
 
