@@ -12,7 +12,7 @@
                 <publish-field-fullscreen-header
                     v-if="fullScreenMode"
                     :title="config.title"
-                    :field-actions="visibleFieldActions"
+                    :field-actions="fieldActions"
                     @close="toggleFullscreen">
                 </publish-field-fullscreen-header>
                 <section :class="{ 'mt-14 p-4': fullScreenMode }">

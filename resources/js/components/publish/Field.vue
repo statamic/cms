@@ -255,7 +255,7 @@ export default {
         },
 
         fieldActions() {
-            return this.$refs.field.visibleFieldActions;
+            return this.$refs.field.fieldActions;
         },
 
         hasDropdown() {

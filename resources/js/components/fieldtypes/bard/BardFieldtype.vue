@@ -18,7 +18,7 @@
         <publish-field-fullscreen-header
             v-if="fullScreenMode"
             :title="config.title"
-            :field-actions="visibleFieldActions"
+            :field-actions="fieldActions"
             @close="toggleFullscreen">
             <div class="bard-fixed-toolbar border-0" v-if="!readOnly && showFixedToolbar">
                 <div class="flex flex-wrap flex-1 items-center no-select" v-if="toolbarIsFixed">

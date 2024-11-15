@@ -8,15 +8,13 @@ export default {
             return [
                 ...this.$fieldActions.get(this.$options.name),
                 ...this.internalFieldActions
-            ].map(action => new FieldAction(action, this.fieldActionPayload));
+            ]
+            .map(action => new FieldAction(action, this.fieldActionPayload))
+            .filter(action => action.visible);
         },
 
         internalFieldActions() {
             return [];
-        },
-
-        visibleFieldActions() {
-            return this.fieldActions.filter(action => action.visible);
         },
 
         fieldActionPayload() {

@@ -16,7 +16,7 @@
                 <publish-field-fullscreen-header
                     v-if="fullScreenMode"
                     :title="config.title"
-                    :field-actions="visibleFieldActions"
+                    :field-actions="fieldActions"
                     @close="toggleFullscreen">
                     <div class="markdown-toolbar">
                         <div class="markdown-modes">
