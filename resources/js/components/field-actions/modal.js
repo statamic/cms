@@ -7,21 +7,15 @@ export default function(props) {
 
         component.on('confirm', (data = {}) => {
             if (props.keepOpen) {
-                resolve({
-                    ...data,
-                    confirmed: true,
-                    close,
-                });
+                resolve({ ...data, confirmed: true, close });
             } else {
-                resolve({...data, confirmed: true});
+                resolve({ ...data, confirmed: true });
                 close();
             }
         });
 
         component.on('cancel', () => {
-            resolve({
-                confirmed: false,
-            });
+            resolve({ confirmed: false });
             close();
         });
     });
