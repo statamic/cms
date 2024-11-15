@@ -12,7 +12,7 @@ export default function(props) {
                     close: () => Statamic.$components.destroy(component.id),
                 });
             } else {
-                resolve(data);
+                resolve({...data, confirmed: true});
                 Statamic.$components.destroy(component.id);
             }
         });
