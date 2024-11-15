@@ -798,7 +798,7 @@ abstract class AddonServiceProvider extends ServiceProvider
             }
 
             $class = $file->getBasename('.php');
-            $fqcn = $this->namespace().'\\'.str_replace('/', '\\', $folder).'\\'.$class;
+            $fqcn = $reflection->getNamespaceName().'\\'.str_replace('/', '\\', $folder).'\\'.$class;
 
             if ((new \ReflectionClass($fqcn))->isAbstract() || (new \ReflectionClass($fqcn))->isInterface()) {
                 continue;
