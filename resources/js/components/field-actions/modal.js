@@ -3,17 +3,18 @@ export default function(props) {
 
     return new Promise((resolve) => {
         const component = Statamic.$components.append(name, { props });
+        const close = () => Statamic.$components.destroy(component.id);
 
         component.on('confirm', (data = {}) => {
             if (props.keepOpen) {
                 resolve({
                     ...data,
                     confirmed: true,
-                    close: () => Statamic.$components.destroy(component.id),
+                    close,
                 });
             } else {
                 resolve({...data, confirmed: true});
-                Statamic.$components.destroy(component.id);
+                close();
             }
         });
 
@@ -21,7 +22,7 @@ export default function(props) {
             resolve({
                 confirmed: false,
             });
-            Statamic.$components.destroy(component.id);
+            close();
         });
     });
 }
