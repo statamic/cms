@@ -182,6 +182,8 @@ abstract class AddonServiceProvider extends ServiceProvider
      */
     protected $translations = true;
 
+    protected static array $autoloaded = [];
+
     public function boot()
     {
         Statamic::booted(function () {
@@ -805,10 +807,15 @@ abstract class AddonServiceProvider extends ServiceProvider
             }
 
             if ($requiredClass && ! is_subclass_of($fqcn, $requiredClass)) {
-                return;
+                continue;
+            }
+
+            if (in_array($fqcn, static::$autoloaded)) {
+                continue;
             }
 
             $autoloadable[] = $fqcn;
+            static::$autoloaded[] = $fqcn;
         }
 
         return $autoloadable;
