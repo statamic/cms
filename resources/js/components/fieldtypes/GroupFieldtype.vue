@@ -11,7 +11,7 @@
             >
                 <publish-field-fullscreen-header
                     v-if="fullScreenMode"
-                    :title="config.title"
+                    :title="config.display"
                     :field-actions="fieldActions"
                     @close="toggleFullscreen">
                 </publish-field-fullscreen-header>

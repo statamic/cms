@@ -17,7 +17,7 @@
 
         <publish-field-fullscreen-header
             v-if="fullScreenMode"
-            :title="config.title"
+            :title="config.display"
             :field-actions="fieldActions"
             @close="toggleFullscreen">
             <div class="bard-fixed-toolbar border-0" v-if="!readOnly && showFixedToolbar">

@@ -5,7 +5,7 @@
     <div class="code-fieldtype-container" :class="[themeClass, {'code-fullscreen': fullScreenMode }]">
         <publish-field-fullscreen-header
             v-if="fullScreenMode"
-            :title="config.title"
+            :title="config.display"
             :field-actions="fieldActions"
             @close="toggleFullscreen">
             <div class="code-fieldtype-toolbar-fullscreen">
