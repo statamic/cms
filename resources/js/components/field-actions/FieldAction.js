@@ -1,3 +1,5 @@
+import modal from './modal';
+
 export default class FieldAction {
     #payload;
     #run;
@@ -27,6 +29,6 @@ export default class FieldAction {
     }
 
     async run() {
-        this.#run(this.#payload);
+        this.#run({...this.#payload, modal});
     }
 }
