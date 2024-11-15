@@ -783,7 +783,8 @@ abstract class AddonServiceProvider extends ServiceProvider
             return [];
         }
 
-        $path = $addon->directory().$addon->autoload().'/'.$folder;
+        $reflection = new \ReflectionClass(static::class);
+        $path = dirname($reflection->getFileName()).'/'.$folder;
 
         if (! $this->app['files']->exists($path)) {
             return [];
