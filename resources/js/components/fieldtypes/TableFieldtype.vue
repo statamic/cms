@@ -3,7 +3,7 @@
         <div class="table-fieldtype-container" :class="{'table-fullscreen bg-white dark:bg-dark-700': fullScreenMode }">
             <publish-field-fullscreen-header
                 v-if="fullScreenMode"
-                :config="config"
+                :title="config.title"
                 :field-actions="visibleFieldActions"
                 @close="toggleFullscreen">
             </publish-field-fullscreen-header>

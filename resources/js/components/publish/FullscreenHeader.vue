@@ -1,7 +1,7 @@
 <template>
 
     <header class="bg-white dark:bg-dark-550 fixed top-0 inset-x-0 px-4 flex items-center justify-between shadow z-max">
-        <h2 class="w-full" v-text="__(config.display)" />
+        <h2 class="w-full" v-text="__(title)" />
         <div class="grow-1 min-w-max flex gap-4 items-center">
             <slot />
         </div>
@@ -32,8 +32,8 @@ export default {
     },
 
     props: {
-        config: {
-            type: Object,
+        title: {
+            type: String,
             required: true,
         },
         fieldActions: {
