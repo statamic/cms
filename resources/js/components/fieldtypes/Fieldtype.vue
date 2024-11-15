@@ -1,10 +1,10 @@
 <script>
-import HasActions from '../field-actions/HasFieldActions';
+import HasFieldActions from '../field-actions/HasFieldActions';
 
 export default {
 
     mixins: [
-        HasActions,
+        HasFieldActions,
     ],
 
     props: {
