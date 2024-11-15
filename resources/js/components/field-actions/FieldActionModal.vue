@@ -11,11 +11,9 @@
         >
             <div class="min-h-20">
 
-                <div v-if="confirmationText" v-text="confirmationText" :class="{ 'mb-4': warningText || showDirtyWarning || hasFields }" />
+                <div v-if="confirmationText" v-text="confirmationText" :class="{ 'mb-4': warningText || hasFields }" />
 
-                <div v-if="warningText" v-text="warningText" class="text-red-500" :class="{ 'mb-4': showDirtyWarning || hasFields }" />
-
-                <div v-if="showDirtyWarning" v-text="dirtyText" class="text-red-500" :class="{ 'mb-4': hasFields }" />
+                <div v-if="warningText" v-text="warningText" class="text-red-500" :class="{ 'mb-4': hasFields }" />
 
                 <publish-container
                     v-if="hasFields && !resolving"
@@ -59,17 +57,7 @@ export default {
         warningText: {
             type: String,
         },
-        dirtyText: {
-            type: String,
-        },
-        dirtyWarningText: {
-            type: String,
-        },
         dangerous: {
-            type: Boolean,
-            default: false,
-        },
-        bypassesDirtyWarning: {
             type: Boolean,
             default: false,
         },
@@ -88,7 +76,6 @@ export default {
             meta: {},
             error: null,
             errors: {},
-            isDirty: false,
         }
     },
 
@@ -100,11 +87,7 @@ export default {
 
         hasFields() {
             return Object.keys(this.fields).length > 0;
-        },
-
-        showDirtyWarning() {
-            return this.isDirty && this.dirtyWarningText && ! this.bypassesDirtyWarning;
-        },
+        }
 
     },
 
