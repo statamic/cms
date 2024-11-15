@@ -1,3 +1,5 @@
+import FieldAction from './FieldAction';
+
 export default {
 
     computed: {
@@ -6,7 +8,7 @@ export default {
             return [
                 ...this.$fieldActions.get(this.$options.name),
                 ...this.internalFieldActions
-            ];
+            ].map(action => new FieldAction(action, this.fieldActionPayload));
         },
 
         internalFieldActions() {
@@ -14,24 +16,11 @@ export default {
         },
 
         visibleFieldActions() {
-            return this.fieldActions
-                .filter(action => {
-                    if (typeof action.visible === 'function') return action.visible(this.fieldActionPayload);
-                    if (typeof action.visible !== 'undefined') return action.visible;
-                    return true;
-                });
+            return this.fieldActions.filter(action => action.visible);
         },
 
         fieldActionPayload() {
             return {};
-        },
-
-    },
-
-    methods: {
-
-        runFieldAction(action) {
-            action.run(this.fieldActionPayload);
         },
 
     }

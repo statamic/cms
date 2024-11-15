@@ -19,7 +19,7 @@ export default {
     methods: {
 
         run(action) {
-            this.$emit('run', action);
+            action.run();
 
             this.popover.vm.close();
         },

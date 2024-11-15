@@ -56,14 +56,14 @@
                         <a
                             v-for="(action, index) in fieldActions.filter(a => a.quick)"
                             :key="index"
-                            @click="fieldRunAction(action)"
+                            @click="action.run()"
                             v-tooltip="action.title"
                         >
-                            <svg-icon :name="fieldActionIcon(action)" class="h-3 w-3" />
+                            <svg-icon :name="action.icon" class="h-3 w-3" />
                         </a>
                     </div>
                     <dropdown-list placement="left-start" :offset="[7, -3]">
-                        <dropdown-actions :actions="fieldActions" @run="fieldRunAction" v-if="fieldActions.length" />
+                        <dropdown-actions :actions="fieldActions" v-if="fieldActions.length" />
                     </dropdown-list>
                 </div>
             </div>
@@ -291,16 +291,7 @@ export default {
             });
 
             return marked(text);
-        },
-
-        fieldRunAction(action) {
-            this.$refs.field.runFieldAction(action);
-        },
-
-        fieldActionIcon({ icon }) {
-            icon = icon || 'image';
-            return typeof icon === 'function' ? icon({ field: this }) : icon;
-        },
+        }
 
     }
 }

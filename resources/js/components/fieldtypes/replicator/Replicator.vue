@@ -10,9 +10,7 @@
 
     <publish-field-fullscreen-header
         v-if="fullScreenMode"
-        :field="_self"
         :config="config"
-        :run-field-action="runFieldAction"
         :field-actions="visibleFieldActions"
         @close="toggleFullscreen"
     />
@@ -174,7 +172,7 @@ export default {
                 },
                 {
                     title: __('Toggle Fullscreen Mode'),
-                    icon: ({ field }) => field.fullScreenMode ? 'shrink-all' : 'expand-bold',
+                    icon: ({ vm }) => vm.fullScreenMode ? 'shrink-all' : 'expand-bold',
                     quick: true,
                     run: this.toggleFullscreen,
                 },

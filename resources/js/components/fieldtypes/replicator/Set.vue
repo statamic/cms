@@ -31,7 +31,7 @@
                         :value="values.enabled"
                         v-tooltip.top="(values.enabled) ? __('Included in output') : __('Hidden from output')" />
                     <dropdown-list>
-                        <dropdown-actions :actions="visibleFieldActions" @run="runFieldAction" v-if="visibleFieldActions.length" />
+                        <dropdown-actions :actions="visibleFieldActions" v-if="visibleFieldActions.length" />
                         <div class="divider" />
                         <dropdown-item :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))" @click="toggleCollapsedState" />
                         <dropdown-item :text="__('Duplicate Set')" @click="duplicate" v-if="canAddSet" />
