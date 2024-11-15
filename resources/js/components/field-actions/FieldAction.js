@@ -26,7 +26,7 @@ export default class FieldAction {
         return typeof this.#icon === 'function' ? this.#icon(this.#payload) : this.#icon;
     }
 
-    run() {
+    async run() {
         this.#run(this.#payload);
     }
 }

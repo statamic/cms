@@ -57,6 +57,7 @@ import Modal from '../components/Modal.vue';
 import ConfirmationModal from '../components/modals/ConfirmationModal.vue';
 import FavoriteCreator from '../components/FavoriteCreator.vue';
 import KeyboardShortcutsModal from '../components/modals/KeyboardShortcutsModal.vue';
+import FieldActionModal from '../components/field-actions/FieldActionModal.vue';
 import ResourceDeleter from '../components/ResourceDeleter.vue';
 import Stack from '../components/stacks/Stack.vue';
 import StackTest from '../components/stacks/StackTest.vue';
@@ -142,6 +143,7 @@ Vue.component('confirmation-modal', ConfirmationModal);
 Vue.component('favorite-creator', FavoriteCreator);
 Vue.component('keyboard-shortcuts-modal', KeyboardShortcutsModal);
 Vue.component('resource-deleter', ResourceDeleter);
+Vue.component('field-action-modal', FieldActionModal);
 
 Vue.component('stack', Stack);
 Vue.component('stack-test', StackTest);
