@@ -113,6 +113,10 @@ class Arr extends Fieldtype
                 ->all();
         }
 
+        if ($this->isKeyed()) {
+            return collect($data)->filter()->all();
+        }
+
         return $data;
     }
 
