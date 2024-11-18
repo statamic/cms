@@ -41,6 +41,8 @@ class AssetFolder implements Arrayable, Contract
                 if (str_contains($path, '..')) {
                     throw PathTraversalDetected::forPath($path);
                 }
+
+                return $path;
             })
             ->args(func_get_args());
     }
