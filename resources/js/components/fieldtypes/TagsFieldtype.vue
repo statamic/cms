@@ -9,7 +9,7 @@
         :multiple="true"
         :placeholder="__(config.placeholder)"
         :searchable="true"
-        :select-on-key-codes="[9, 13, 188]"
+        :select-on-key-codes="keyCodes"
         :taggable="true"
         :append-to-body="true"
         :value="value"
@@ -71,6 +71,18 @@ export default {
     },
 
     mixins: [Fieldtype, HasInputOptions],
+
+    computed: {
+        keyCodes() {
+            let keyCodes = [9, 13];
+
+            if (this.config.select_on_commas) {
+                keyCodes.push(188);
+            }
+
+            return keyCodes;
+        },
+    },
 
     methods: {
         focus() {

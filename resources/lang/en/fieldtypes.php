@@ -172,6 +172,7 @@ return [
     'table.title' => 'Table',
     'taggable.config.options' => 'Provide pre-defined tags that can be selected.',
     'taggable.config.placeholder' => 'Type and press ↩ Enter',
+    'taggable.config.select_on_commas' => 'Should a comma automatically select the tag?',
     'taggable.title' => 'Taggable',
     'taxonomies.title' => 'Taxonomies',
     'template.config.blueprint' => 'Adds a "map to blueprint" option. Learn more in the [documentation](https://statamic.dev/views#inferring-templates-from-entry-blueprints).',

@@ -26,6 +26,12 @@ class Taggable extends Fieldtype
                 'type' => 'list',
                 'add_button' => __('Add Option'),
             ],
+            'select_on_commas' => [
+                'display' => __('Select on Commas'),
+                'instructions' => __('statamic::fieldtypes.taggable.config.select_on_commas'),
+                'type' => 'toggle',
+                'default' => true,
+            ],
         ];
     }
 
