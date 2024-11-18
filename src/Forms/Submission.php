@@ -268,6 +268,11 @@ class Submission implements Augmentable, SubmissionContract
         return $this->data()->all();
     }
 
+    public function reference()
+    {
+        return "submission::{$this->id()}";
+    }
+
     public function __get($key)
     {
         return $this->get($key);

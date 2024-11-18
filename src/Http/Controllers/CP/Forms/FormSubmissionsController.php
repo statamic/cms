@@ -91,6 +91,7 @@ class FormSubmissionsController extends CpController
             'values' => $fields->values(),
             'meta' => $fields->meta(),
             'title' => $submission->formattedDate(),
+            'reference' => $submission->reference(),
         ]);
     }
 }

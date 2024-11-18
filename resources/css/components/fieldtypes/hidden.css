@@ -2,6 +2,6 @@
    HIDDEN FIELDTYPE
    ========================================================================== */
 
-.hidden-fieldtype {
+.hidden-fieldtype:not(.form-submission-field) {
     display: none; /*  So fancy */
 }
