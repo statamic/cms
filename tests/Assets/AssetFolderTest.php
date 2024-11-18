@@ -57,12 +57,22 @@ class AssetFolderTest extends TestCase
     }
 
     #[Test]
-    public function path_traversal_not_allowed()
+    public function it_cannot_use_traversal_in_path()
     {
-        $this->expectException(PathTraversalDetected::class);
-        $this->expectExceptionMessage('Path traversal detected: path/to/../folder');
+        $folder = (new Folder)->path('path/to/folder');
 
-        (new Folder)->path('path/to/../folder');
+        try {
+            $folder->path('path/to/../folder');
+        } catch (PathTraversalDetected $e) {
+            $this->assertEquals('Path traversal detected: path/to/../folder', $e->getMessage());
+
+            // Even if exception was thrown, make sure that the path didn't somehow get updated.
+            $this->assertEquals('path/to/folder', $folder->path());
+
+            return;
+        }
+
+        $this->fail('Exception was not thrown.');
     }
 
     #[Test]
