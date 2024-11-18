@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use League\Flysystem\PathTraversalDetected;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\Asset;
 use Statamic\Assets\AssetContainerContents;
@@ -53,6 +54,15 @@ class AssetFolderTest extends TestCase
         $this->assertEquals($folder, $return);
         $this->assertEquals('path/to/folder', $folder->path());
         $this->assertEquals('folder', $folder->basename());
+    }
+
+    #[Test]
+    public function path_traversal_not_allowed()
+    {
+        $this->expectException(PathTraversalDetected::class);
+        $this->expectExceptionMessage('Path traversal detected: path/to/../folder');
+
+        (new Folder)->path('path/to/../folder');
     }
 
     #[Test]

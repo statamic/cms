@@ -2,7 +2,9 @@
 
 namespace Statamic\Http\Controllers\CP\Assets;
 
+use League\Flysystem\PathTraversalDetected;
 use Statamic\Assets\AssetFolder;
+use Statamic\Exceptions\ValidationException;
 use Statamic\Http\Controllers\CP\ActionController as Controller;
 
 class FolderActionController extends Controller
@@ -12,7 +14,11 @@ class FolderActionController extends Controller
     protected function getSelectedItems($items, $context)
     {
         return $items->map(function ($path) use ($context) {
-            return AssetFolder::find("{$context['container']}::{$path}");
+            try {
+                return AssetFolder::find("{$context['container']}::{$path}");
+            } catch (PathTraversalDetected $e) {
+                throw ValidationException::withMessages(['selections' => $e->getMessage()]);
+            }
         });
     }
 }
