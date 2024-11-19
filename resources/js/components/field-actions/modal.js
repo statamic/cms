@@ -4,12 +4,8 @@ export default function(props) {
         const close = () => Statamic.$components.destroy(component.id);
 
         component.on('confirm', (data = {}) => {
-            if (props.keepOpen) {
-                resolve({ ...data, confirmed: true, close });
-            } else {
-                resolve({ ...data, confirmed: true });
-                close();
-            }
+            resolve({ ...data, confirmed: true });
+            close();
         });
 
         component.on('cancel', () => {

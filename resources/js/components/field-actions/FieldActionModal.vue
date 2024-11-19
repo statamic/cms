@@ -61,10 +61,6 @@ export default {
             type: Boolean,
             default: false,
         },
-        keepOpen: {
-            type: Boolean,
-            default: false,
-        },
     },
 
     data() {
@@ -118,10 +114,8 @@ export default {
                 fields: this.fields,
                 values: this.values,
             }).then(response => {
-                this.processing = this.keepOpen;
                 this.$emit('confirm', response.data);
             }).catch(e => {
-                this.processing = false;
                 if (e.response && e.response.status === 422) {
                     const { message, errors } = e.response.data;
                     this.error = message;
@@ -132,7 +126,7 @@ export default {
                 } else {
                     this.$toast.error(__('Something went wrong'));
                 }
-            });
+            }).finally(() => this.processing = false);
         },
 
         cancel() {
