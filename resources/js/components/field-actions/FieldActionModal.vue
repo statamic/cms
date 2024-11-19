@@ -51,7 +51,7 @@ export default {
         buttonText: {
             type: String,
         },
-        confirmationText: {
+        text: {
             type: String,
         },
         warningText: {
@@ -137,7 +137,7 @@ export default {
         },
 
         initializeBodyText() {
-            if (this.confirmationText) return this.confirmationText;
+            if (this.text) return this.text;
 
             if (this.warningText || this.hasFields) return null;
 
