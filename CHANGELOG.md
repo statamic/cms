@@ -1,5 +1,19 @@
 # Release Notes
 
+## 5.38.1 (2024-11-19)
+
+### What's fixed
+- Fix issue when preprocessing dictionary config [#11133](https://github.com/statamic/cms/issues/11133) by @duncanmcclean
+- Prevent unnecessary requests to the Outpost when PHP version is different [#11137](https://github.com/statamic/cms/issues/11137) by @duncanmcclean
+- Fix bard text trimming when CP is on root URL [#11127](https://github.com/statamic/cms/issues/11127) by @jacksleight
+- Hide "Localizable" button in asset blueprints [#11118](https://github.com/statamic/cms/issues/11118) by @duncanmcclean
+- Add upload path traversal tests [#11139](https://github.com/statamic/cms/issues/11139) by @jasonvarga
+- Prevent asset folder path traversal [#11136](https://github.com/statamic/cms/issues/11136) by @jasonvarga
+- More path traversal fixes [#11140](https://github.com/statamic/cms/issues/11140) by @jasonvarga
+- Italian translations [#11145](https://github.com/statamic/cms/issues/11145) by @gioppy
+
+
+
 ## 5.38.0 (2024-11-12)
 
 ### What's new
