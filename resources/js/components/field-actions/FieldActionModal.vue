@@ -86,7 +86,7 @@ export default {
     computed: {
 
         hasFields() {
-            return Object.keys(this.fields).length > 0;
+            return this.fields && Object.keys(this.fields).length > 0;
         }
 
     },
