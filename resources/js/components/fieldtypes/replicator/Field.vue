@@ -1,20 +1,24 @@
 <template>
 
     <div class="p-4 m-0 @container" :class="classes">
+        <div class="field-inner">
+            <label class="block" :for="fieldId" v-if="showLabel">
+                <span v-if="showLabelText" v-tooltip="{content: field.handle, delay: 500, autoHide: false}">{{ display }}</span>
+                <i class="required" v-if="field.required">*</i>
+                <span v-if="isReadOnly" class="text-gray-500 font-normal text-2xs mx-1" v-text="__('Read Only')" />
+            </label>
 
-        <label class="block" :for="fieldId" v-if="showLabel">
-            <span v-if="showLabelText" v-tooltip="{content: field.handle, delay: 500, autoHide: false}">{{ display }}</span>
-            <i class="required" v-if="field.required">*</i>
-            <span v-if="isReadOnly" class="text-gray-500 font-normal text-2xs mx-1" v-text="__('Read Only')" />
-        </label>
+            <div
+                class="help-block" :class="{ '-mt-2': showLabel }"
+                v-if="instructions && field.instructions_position !== 'below'"
+                v-html="instructions" />
 
-        <div
-            class="help-block" :class="{ '-mt-2': showLabel }"
-            v-if="instructions && field.instructions_position !== 'below'"
-            v-html="instructions" />
+            <publish-field-actions v-if="mounted && fieldActions.length" :actions="fieldActions" />
+        </div>
 
         <component
             :is="fieldtypeComponent"
+            ref="field"
             :config="field"
             :meta="meta"
             :value="value"
@@ -74,6 +78,16 @@ export default {
     },
 
     inject: ['storeName'],
+
+    data() {
+        return {
+            mounted: false,
+        }
+    },
+
+    mounted() {
+        this.mounted = true;
+    },
 
     computed: {
 
@@ -141,6 +155,10 @@ export default {
         fieldId() {
             let prefix = this.fieldPath ? this.fieldPath+'.' : '';
             return prefix+'field_'+this.field.handle;
+        },
+
+        fieldActions() {
+            return this.$refs.field.fieldActions;
         }
 
     }

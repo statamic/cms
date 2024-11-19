@@ -50,24 +50,7 @@
                 v-if="instructions && config.instructions_position !== 'below'"
                 v-html="instructions" />
 
-            <div class="field-dropdown" v-if="mounted && hasDropdown">
-                <div class="quick-list">
-                    <div class="quick-list-content">
-                        <a
-                            v-for="(action, index) in fieldActions.filter(a => a.quick)"
-                            :key="index"
-                            @click="action.run()"
-                            v-tooltip="action.title"
-                        >
-                            <svg-icon :name="action.icon" class="h-3 w-3" />
-                        </a>
-                    </div>
-                    <dropdown-list placement="left-start" :offset="[7, -3]">
-                        <dropdown-actions :actions="fieldActions" v-if="fieldActions.length" />
-                    </dropdown-list>
-                </div>
-            </div>
-
+            <publish-field-actions v-if="mounted && hasDropdown" :actions="fieldActions" />
         </div>
 
         <loading-graphic v-if="loadingMeta" :size="16" :inline="true" />
@@ -108,13 +91,8 @@
 
 <script>
 import { marked } from 'marked';
-import DropdownActions from '../field-actions/DropdownActions.vue';
 
 export default {
-
-    components: {
-        DropdownActions
-    },
 
     props: {
         config: {
