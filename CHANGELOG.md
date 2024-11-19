@@ -1,5 +1,31 @@
 # Release Notes
 
+## 5.38.0 (2024-11-12)
+
+### What's new
+- Extra values for nav field conditions, including depth [#11106](https://github.com/statamic/cms/issues/11106) by @duncanmcclean
+- Make button groups clearable [#11110](https://github.com/statamic/cms/issues/11110) by @caseydwyer
+- Allow transformResults to be called separately from getBaseItems [#11115](https://github.com/statamic/cms/issues/11115) by @ryanmitchell
+- Allow customizing term create label [#11103](https://github.com/statamic/cms/issues/11103) by @daun
+- Accept collections in ampersand list modifier [#11102](https://github.com/statamic/cms/issues/11102) by @daun
+- Add "Container" option to Asset Folders fieldtype [#11099](https://github.com/statamic/cms/issues/11099) by @duncanmcclean
+- Add `fullyQualifiedHandle` method to `Blueprint` [#11096](https://github.com/statamic/cms/issues/11096) by @duncanmcclean
+- Create edit/{id} route for control panel access [#11092](https://github.com/statamic/cms/issues/11092) by @aaronbushnell
+
+### What's fixed
+- Fix wrong blueprint parent after revision publish [#11116](https://github.com/statamic/cms/issues/11116) by @jacksleight
+- Prevent duplicate nocache regions in session [#11109](https://github.com/statamic/cms/issues/11109) by @duncanmcclean
+- Hide "Localizable" button on non-localizable blueprints [#11107](https://github.com/statamic/cms/issues/11107) by @duncanmcclean
+- Fix error after deleting role when storing users in the database [#11069](https://github.com/statamic/cms/issues/11069) by @duncanmcclean
+- Render HTML for dictionary fields in listings [#11088](https://github.com/statamic/cms/issues/11088) by @jasonvarga
+- Use layout config in errors too [#11083](https://github.com/statamic/cms/issues/11083) by @ryanmitchell
+- French translations [#11093](https://github.com/statamic/cms/issues/11093) by @ebeauchamps
+- French translations [#11100](https://github.com/statamic/cms/issues/11100) by @ebeauchamps
+- French translations [#11108](https://github.com/statamic/cms/issues/11108) by @jasonvarga
+- German translations [#11098](https://github.com/statamic/cms/issues/11098) by @helloDanuk
+
+
+
 ## 5.37.0 (2024-11-06)
 
 ### What's new
