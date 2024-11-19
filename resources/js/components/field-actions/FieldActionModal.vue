@@ -18,7 +18,7 @@
                 <publish-container
                     v-if="hasFields && !resolving"
                     name="confirm-action"
-                    :blueprint="fieldset"
+                    :blueprint="blueprint"
                     :values="values"
                     :meta="meta"
                     :errors="errors"
@@ -26,7 +26,7 @@
                 >
                     <publish-fields
                         slot-scope="{ setFieldValue, setFieldMeta }"
-                        :fields="fieldset.tabs[0].fields"
+                        :fields="blueprint.tabs[0].fields"
                         @updated="setFieldValue"
                         @meta-updated="setFieldMeta"
                     />
@@ -67,7 +67,7 @@ export default {
         return {
             resolving: this.hasFields,
             processing: false,
-            fieldset: [],
+            blueprint: [],
             values: {},
             meta: {},
             error: null,
@@ -98,7 +98,7 @@ export default {
             this.$axios.post(cp_url(`field-action-modal/resolve`), {
                 fields: this.fields,
             }).then(response => {
-                this.fieldset = { tabs: [{ fields: response.data.fieldset }]};
+                this.blueprint = { tabs: [{ fields: response.data.fields }]};
                 this.values = response.data.values;
                 this.meta = response.data.meta;
                 this.resolving = false;

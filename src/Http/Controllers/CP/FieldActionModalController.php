@@ -14,7 +14,7 @@ class FieldActionModalController extends CpController
             ->preProcess();
 
         return [
-            'fieldset' => $fields->toPublishArray(),
+            'fields' => $fields->toPublishArray(),
             'values' => $fields->values(),
             'meta' => $fields->meta(),
         ];
