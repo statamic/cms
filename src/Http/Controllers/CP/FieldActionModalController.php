@@ -9,7 +9,8 @@ class FieldActionModalController extends CpController
 {
     public function resolve(Request $request)
     {
-        $fields = $this->getFields($request->fields)
+        $fields = $this
+            ->getFields($request->fields)
             ->preProcess();
 
         return [
@@ -21,7 +22,8 @@ class FieldActionModalController extends CpController
 
     public function process(Request $request)
     {
-        $fields = $this->getFields($request->fields)
+        $fields = $this
+            ->getFields($request->fields)
             ->addValues($request->values);
 
         $fields->validate();
@@ -39,10 +41,8 @@ class FieldActionModalController extends CpController
 
     protected function getFields($fieldItems)
     {
-        $fields = collect($fieldItems)->map(function ($field, $handle) {
-            return compact('handle', 'field');
-        });
-
-        return new Fields($fields);
+        return new Fields(
+            collect($fieldItems)->map(fn ($field, $handle) => compact('handle', 'field'))
+        );
     }
 }
