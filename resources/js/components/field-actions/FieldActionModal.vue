@@ -107,8 +107,10 @@ export default {
 
         confirm() {
             if (!this.hasFields) {
+                this.$emit('confirm');
                 return;
             }
+
             this.processing = true;
             this.$axios.post(cp_url('field-action-modal/process'), {
                 fields: this.fields,
