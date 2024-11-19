@@ -68,7 +68,7 @@ class FileCacher extends AbstractCacher
         $content = $this->normalizeContent($content);
 
         $path = $this->getFilePath($url);
-
+        
         if (! $this->writer->write($path, $content, $this->config('lock_hold_length'))) {
             return;
         }
@@ -300,6 +300,15 @@ EOT;
         }
 
         $qs = HeaderUtils::parseQuery($qs);
+
+        if ($allowedQueryStrings = $this->config('allowed_query_strings')) {
+            $qs = array_intersect_key($qs, array_flip($allowedQueryStrings));
+        }
+
+        if ($disallowedQueryStrings = $this->config('disallowed_query_strings')) {
+            $disallowedQueryStrings = array_flip($disallowedQueryStrings);
+            $qs = array_diff_key($qs, $disallowedQueryStrings);
+        }
 
         return $url.'?'.http_build_query($qs, '', '&', \PHP_QUERY_RFC3986);
     }
