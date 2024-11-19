@@ -39,6 +39,13 @@ export default class FieldAction {
             payload = {...payload, confirmation};
         }
 
-        this.#run(payload);
+        const response = this.#run(payload);
+
+        if (response instanceof Promise) {
+            const progress = this.#payload.vm.$progress;
+            const name = this.#payload.fieldPathPrefix ?? this.#payload.handle;
+            progress.loading(name, true);
+            response.then(() => progress.loading(name, false));
+        }
     }
 }
