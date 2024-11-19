@@ -45,7 +45,7 @@ export default class FieldAction {
             const progress = this.#payload.vm.$progress;
             const name = this.#payload.fieldPathPrefix ?? this.#payload.handle;
             progress.loading(name, true);
-            response.then(() => progress.loading(name, false));
+            response.finally(() => progress.loading(name, false));
         }
     }
 }
