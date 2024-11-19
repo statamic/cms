@@ -72,12 +72,13 @@ export default {
             meta: {},
             error: null,
             errors: {},
-            bodyText: (!this.confirmationText && this.warningText) ? null : (this.confirmationText ?? __('Are you sure?')),
+            bodyText: null,
         }
     },
 
     mounted() {
-        this.initialize()
+        this.initializeBodyText();
+        this.initialize();
     },
 
     computed: {
@@ -134,6 +135,14 @@ export default {
         cancel() {
             this.$emit('cancel')
         },
+
+        initializeBodyText() {
+            if (this.confirmationText) return this.confirmationText;
+
+            if (this.warningText || this.hasFields) return null;
+
+            this.bodyText = __('Are you sure?');
+        }
 
     },
 }
