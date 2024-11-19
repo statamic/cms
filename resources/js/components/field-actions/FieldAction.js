@@ -6,10 +6,12 @@ export default class FieldAction {
     #visible;
     #icon;
     #quick;
+    #confirm;
 
     constructor(action, payload) {
         this.#payload = payload;
         this.#run = action.run;
+        this.#confirm = action.confirm;
         this.#visible = action.visible ?? true;
         this.#icon = action.icon ?? 'image';
         this.#quick = action.quick ?? false;
@@ -29,6 +31,14 @@ export default class FieldAction {
     }
 
     async run() {
-        this.#run({...this.#payload, modal});
+        let payload = {...this.#payload};
+
+        if (this.#confirm) {
+            const confirmation = await modal(this.#confirm);
+            if (!confirmation.confirmed) return;
+            payload = {...payload, confirmation};
+        }
+
+        this.#run(payload);
     }
 }
