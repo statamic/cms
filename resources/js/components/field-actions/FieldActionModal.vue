@@ -11,7 +11,7 @@
         >
             <div class="min-h-20">
 
-                <div v-if="confirmationText" v-text="confirmationText" :class="{ 'mb-4': warningText || hasFields }" />
+                <div v-if="bodyText" v-text="bodyText" :class="{ 'mb-4': warningText || hasFields }" />
 
                 <div v-if="warningText" v-text="warningText" class="text-red-500" :class="{ 'mb-4': hasFields }" />
 
@@ -76,6 +76,7 @@ export default {
             meta: {},
             error: null,
             errors: {},
+            bodyText: (!this.confirmationText && this.warningText) ? null : (this.confirmationText ?? __('Are you sure?')),
         }
     },
 
