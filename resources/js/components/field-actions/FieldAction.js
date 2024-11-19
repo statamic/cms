@@ -11,7 +11,7 @@ export default class FieldAction {
     constructor(action, payload) {
         this.#payload = payload;
         this.#run = action.run;
-        this.#confirm = action.confirm === true ? {} : action.confirm;
+        this.#confirm = action.confirm;
         this.#visible = action.visible ?? true;
         this.#icon = action.icon ?? 'image';
         this.#quick = action.quick ?? false;
@@ -34,7 +34,7 @@ export default class FieldAction {
         let payload = {...this.#payload};
 
         if (this.#confirm) {
-            const confirmation = await modal(this.#confirm);
+            const confirmation = await modal(this.#modalProps());
             if (!confirmation.confirmed) return;
             payload = {...payload, confirmation};
         }
@@ -47,5 +47,15 @@ export default class FieldAction {
             progress.loading(name, true);
             response.finally(() => progress.loading(name, false));
         }
+    }
+
+    #modalProps() {
+        let props = this.#confirm === true ? {} : {...this.#confirm};
+
+        if (! props.title) {
+            props.title = this.title;
+        }
+
+        return props;
     }
 }
