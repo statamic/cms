@@ -14,7 +14,7 @@
         "composer/semver": "^3.4",
         "guzzlehttp/guzzle": "^6.3 || ^7.0",
         "james-heinrich/getid3": "^1.9.21",
-        "laravel/framework": "^10.40 || ^11.32",
+        "laravel/framework": "^10.40 || ^11.3",
         "laravel/prompts": "^0.1.16",
         "league/commonmark": "^2.2",
         "league/csv": "^9.0",
