@@ -100,7 +100,7 @@ jobs:
 
       - name: Execute tests
         if: steps.should-run-tests.outputs.result == 'true'
-        run: vendor/bin/phpunit --display-deprecation
+        run: vendor/bin/phpunit
 
   js-tests:
     runs-on: ubuntu-20.04
