@@ -230,7 +230,7 @@ class Assets extends Fieldtype
         $action = Action::for($assetFolder, [
             'container' => $container->handle(),
             'folder' => $folder,
-        ])->first(fn ($action) => get_class($action) === RenameAssetFolder::class)->toArray();
+        ])->first(fn ($action) => get_class($action) === RenameAssetFolder::class)?->toArray();
 
         return [
             'url' => cp_route('assets.folders.actions.run', $container),
