@@ -68,7 +68,7 @@ class FileCacher extends AbstractCacher
         $content = $this->normalizeContent($content);
 
         $path = $this->getFilePath($url);
-        
+
         if (! $this->writer->write($path, $content, $this->config('lock_hold_length'))) {
             return;
         }
