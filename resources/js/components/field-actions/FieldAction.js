@@ -11,7 +11,7 @@ export default class FieldAction {
     constructor(action, payload) {
         this.#payload = payload;
         this.#run = action.run;
-        this.#confirm = action.confirm;
+        this.#confirm = action.confirm === true ? {} : action.confirm;
         this.#visible = action.visible ?? true;
         this.#icon = action.icon ?? 'image';
         this.#quick = action.quick ?? false;
