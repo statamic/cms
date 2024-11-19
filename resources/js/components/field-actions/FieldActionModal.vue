@@ -77,7 +77,7 @@ export default {
     },
 
     mounted() {
-        this.initializeBodyText();
+        this.bodyText = this.initializeBodyText();
         this.initialize();
     },
 
@@ -141,7 +141,7 @@ export default {
 
             if (this.warningText || this.hasFields) return null;
 
-            this.bodyText = __('Are you sure?');
+            return __('Are you sure?');
         }
 
     },
