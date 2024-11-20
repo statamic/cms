@@ -71,9 +71,6 @@ code.parent-url {
         z-index: 100;
     }
 
-    .field-dropdown {
-        @apply hidden;
-    }
     .has-dropdown {
         .field-inner {
             @apply pr-6;

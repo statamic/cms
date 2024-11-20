@@ -77,7 +77,10 @@ export default {
         showFieldPreviews: Boolean,
     },
 
-    inject: ['storeName'],
+    inject: {
+        storeName: { default: null },
+        isInsideConfigFields: { default: false },
+    },
 
     data() {
         return {
@@ -154,7 +157,7 @@ export default {
         },
 
         shouldShowFieldActions() {
-            return this.fieldActions.length > 0;
+            return !this.isInsideConfigFields && this.fieldActions.length > 0;
         }
 
     },
