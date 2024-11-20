@@ -4,6 +4,7 @@
         :config="config"
         :initial-value="value"
         :initial-meta="meta"
+        @loaded="metaLoaded"
     >
     <div slot-scope="{ meta, value, loading: loadingMeta }" :class="classes">
         <div class="field-inner">
@@ -50,7 +51,7 @@
                 v-if="instructions && config.instructions_position !== 'below'"
                 v-html="instructions" />
 
-            <publish-field-actions v-if="mounted && hasDropdown" :actions="fieldActions" />
+            <publish-field-actions v-if="shouldShowFieldActions" :actions="fieldActions" />
         </div>
 
         <loading-graphic v-if="loadingMeta" :size="16" :inline="true" />
@@ -120,12 +121,8 @@ export default {
 
     data() {
         return {
-            mounted: false,
+            fieldActions: [],
         }
-    },
-
-    mounted() {
-        this.mounted = true;
     },
 
     computed: {
@@ -173,7 +170,7 @@ export default {
                 `${this.config.component || this.config.type}-fieldtype`,,
                 this.isReadOnly ? 'read-only-field' : '',
                 this.isInsideConfigFields ? 'config-field' : `${tailwind_width_class(this.config.width)}`,
-                this.mounted && this.hasDropdown && !this.isInsideConfigFields ? 'has-dropdown' : '',
+                this.shouldShowFieldActions && !this.isInsideConfigFields ? 'has-dropdown' : '',
                 this.config.classes || '',
                 this.config.full_width_setting ? 'full-width-setting' : '',
                 { 'has-error': this.hasError || this.hasNestedError }
@@ -232,14 +229,14 @@ export default {
                 || this.syncable // Need to see the icon
         },
 
-        fieldActions() {
-            return this.$refs.field.fieldActions;
-        },
-
-        hasDropdown() {
+        shouldShowFieldActions() {
             return this.fieldActions.length > 0;
         },
 
+    },
+
+    mounted() {
+        if (this.$refs.field) this.fieldActions = this.$refs.field.fieldActions;
     },
 
     methods: {
@@ -269,6 +266,10 @@ export default {
             });
 
             return marked(text);
+        },
+
+        metaLoaded() {
+            this.$nextTick(() => this.fieldActions = this.$refs.field.fieldActions);
         }
 
     }
