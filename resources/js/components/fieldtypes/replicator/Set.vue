@@ -207,6 +207,7 @@ export default {
                 meta: this.meta,
                 update: (handle, value) => this.updated(handle, value),
                 updateMeta: (handle, value) => this.metaUpdated(handle, value),
+                isReadOnly: this.isReadOnly,
             };
         },
 

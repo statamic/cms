@@ -4,6 +4,7 @@ export default class FieldAction {
     #payload;
     #run;
     #visible;
+    #visibleWhenReadOnly;
     #icon;
     #quick;
     #confirm;
@@ -13,12 +14,17 @@ export default class FieldAction {
         this.#run = action.run;
         this.#confirm = action.confirm;
         this.#visible = action.visible ?? true;
+        this.#visibleWhenReadOnly = action.visibleWhenReadOnly ?? false;
         this.#icon = action.icon ?? 'image';
         this.#quick = action.quick ?? false;
         this.title = action.title;
     }
 
     get visible() {
+        if (this.#payload.isReadOnly && !this.#visibleWhenReadOnly) {
+            return false;
+        }
+
         return typeof this.#visible === 'function' ? this.#visible(this.#payload) : this.#visible;
     }
 
