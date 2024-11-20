@@ -2,6 +2,7 @@
 
 namespace Tests\Routing;
 
+use Closure;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Contracts\Routing\BindingRegistrar;
 use Illuminate\Routing\Middleware\SubstituteBindings;
