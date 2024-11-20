@@ -121,7 +121,7 @@ export default {
 
     data() {
         return {
-            fieldActions: [],
+            hasField: false,
         }
     },
 
@@ -233,10 +233,14 @@ export default {
             return !this.isInsideConfigFields && this.fieldActions.length > 0;
         },
 
+        fieldActions() {
+            return this.hasField ? this.$refs.field.fieldActions : [];
+        },
+
     },
 
     mounted() {
-        if (this.$refs.field) this.fieldActions = this.$refs.field.fieldActions;
+        if (this.$refs.field) this.hasField = true;
     },
 
     methods: {
@@ -269,7 +273,7 @@ export default {
         },
 
         metaLoaded() {
-            this.$nextTick(() => this.fieldActions = this.$refs.field.fieldActions);
+            this.$nextTick(() => this.hasField = true);
         }
 
     }
