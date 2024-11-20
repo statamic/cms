@@ -39,7 +39,7 @@ class FieldActionModalController extends CpController
         ];
     }
 
-    protected function getFields($fieldItems)
+    private function getFields($fieldItems)
     {
         return new Fields(
             collect($fieldItems)->map(fn ($field, $handle) => compact('handle', 'field'))
