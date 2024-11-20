@@ -485,11 +485,11 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             }
         }
 
+        Facades\Collection::save($this);
+
         if ($this->isDirty('route')) {
             Facades\Entry::updateUris($this);
         }
-
-        Facades\Collection::save($this);
 
         Blink::forget('collection-handles');
         Blink::forget('mounted-collections');
