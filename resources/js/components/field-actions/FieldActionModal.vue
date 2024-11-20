@@ -17,7 +17,7 @@
 
                 <publish-container
                     v-if="hasFields && !resolving"
-                    name="confirm-action"
+                    :name="containerName"
                     :blueprint="blueprint"
                     :values="values"
                     :meta="meta"
@@ -39,6 +39,8 @@
 </template>
 
 <script>
+import uniqid from "uniqid";
+
 export default {
 
     props: {
@@ -73,6 +75,7 @@ export default {
             error: null,
             errors: {},
             bodyText: null,
+            containerName: `field-action-modal-${uniqid()}`,
         }
     },
 
