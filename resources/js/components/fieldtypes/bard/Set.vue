@@ -32,7 +32,9 @@
                         class="toggle-sm rtl:ml-4 ltr:mr-4"
                         v-model="enabled"
                         v-tooltip.top="(enabled) ? __('Included in output') : __('Hidden from output')" />
-                    <dropdown-list class="-mt-1">
+                    <dropdown-list>
+                        <dropdown-actions :actions="fieldActions" v-if="fieldActions.length" />
+                        <div class="divider" />
                         <dropdown-item :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))" @click="toggleCollapsedState" />
                         <dropdown-item :text="__('Duplicate Set')" @click="duplicate" />
                         <dropdown-item :text="__('Delete Set')" class="warning" @click="deleteNode" />
@@ -69,6 +71,8 @@ import { NodeViewWrapper } from '@tiptap/vue-2';
 import SetField from '../replicator/Field.vue';
 import ManagesPreviewText from '../replicator/ManagesPreviewText';
 import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
+import HasFieldActions from '../../field-actions/HasFieldActions.js';
+import DropdownActions from '../../field-actions/DropdownActions.vue';
 
 export default {
 
@@ -83,9 +87,13 @@ export default {
         'deleteNode', // delete the current node
     ],
 
-    components: { NodeViewWrapper, SetField },
+    components: { NodeViewWrapper, SetField, DropdownActions },
 
-    mixins: [ValidatesFieldConditions, ManagesPreviewText],
+    mixins: [
+        ValidatesFieldConditions,
+        ManagesPreviewText, 
+        HasFieldActions,
+    ],
 
     inject: ['bard', 'bardSets'],
 
@@ -178,6 +186,25 @@ export default {
 
         withinSelection() {
             return this.decorationSpecs.withinSelection;
+        },
+
+        fieldVm() {
+            return this.extension.options.bard
+        },
+
+        fieldActionPayload() {
+            return {
+                vm: this,
+                fieldVm: this.fieldVm,
+                fieldPathPrefix: this.fieldVm.fieldPathPrefix || this.fieldVm.handle,
+                index: this.index,
+                values: this.values,
+                config: this.config,
+                meta: this.meta,
+                update: (handle, value) => this.updated(handle, value),
+                updateMeta: (handle, value) => this.metaUpdated(handle, value),
+                isReadOnly: this.isReadOnly
+            };
         },
 
     },

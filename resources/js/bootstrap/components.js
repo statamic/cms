@@ -8,7 +8,9 @@ import PublishForm from '../components/publish/PublishForm.vue';
 import Fields from '../components/publish/Fields.vue';
 import FieldsContainer from '../components/publish/FieldsContainer.vue'; // deprecated
 import Field from '../components/publish/Field.vue';
+import FullscreenHeader from '../components/publish/FullscreenHeader.vue';
 import FieldMeta from '../components/publish/FieldMeta.vue';
+import FieldActions from '../components/field-actions/FieldActions.vue';
 import ConfigureTabs from '../components/configure/Tabs.vue';
 import PublishTabs from '../components/publish/Tabs.vue';
 import PublishSections from '../components/publish/Sections.vue';
@@ -77,6 +79,8 @@ Vue.component('publish-fields', Fields);
 Vue.component('publish-fields-container', FieldsContainer);
 Vue.component('publish-field', Field);
 Vue.component('publish-field-meta', FieldMeta);
+Vue.component('publish-field-actions', FieldActions);
+Vue.component('publish-field-fullscreen-header', FullscreenHeader);
 Vue.component('configure-tabs', ConfigureTabs);
 Vue.component('publish-tabs', PublishTabs);
 Vue.component('publish-sections', PublishSections);
