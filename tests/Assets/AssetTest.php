@@ -11,6 +11,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
+use League\Flysystem\PathTraversalDetected;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -480,6 +481,25 @@ class AssetTest extends TestCase
         $this->assertEquals('asset.jpg', $asset->path('/asset.jpg')->path());
         $this->assertEquals('asset.jpg', $asset->path('//asset.jpg')->path());
         $this->assertEquals('asset.jpg', $asset->path('asset.jpg')->path());
+    }
+
+    #[Test]
+    public function it_cannot_use_traversal_in_path()
+    {
+        $asset = (new Asset)->path('path/to/asset.jpg');
+
+        try {
+            $asset->path('foo/../test.jpg');
+        } catch (PathTraversalDetected $e) {
+            $this->assertEquals('Path traversal detected: foo/../test.jpg', $e->getMessage());
+
+            // Even if exception was thrown, make sure that the path didn't somehow get updated.
+            $this->assertEquals('path/to/asset.jpg', $asset->path());
+
+            return;
+        }
+
+        $this->fail('Exception was not thrown.');
     }
 
     #[Test]
