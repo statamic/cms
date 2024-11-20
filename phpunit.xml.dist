@@ -7,8 +7,7 @@
          colors="true"
          processIsolation="false"
          cacheDirectory=".phpunit.cache"
-         stopOnFailure="false"
-         displayDetailsOnTestsThatTriggerDeprecations="true">
+         stopOnFailure="false">
     <testsuites>
         <testsuite name="Tests">
             <directory suffix="Test.php">./tests</directory>
