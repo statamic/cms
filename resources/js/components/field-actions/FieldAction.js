@@ -1,3 +1,5 @@
+import modal from './modal';
+
 export default class FieldAction {
     #payload;
     #run;
@@ -5,10 +7,12 @@ export default class FieldAction {
     #visibleWhenReadOnly;
     #icon;
     #quick;
+    #confirm;
 
     constructor(action, payload) {
         this.#payload = payload;
         this.#run = action.run;
+        this.#confirm = action.confirm;
         this.#visible = action.visible ?? true;
         this.#visibleWhenReadOnly = action.visibleWhenReadOnly ?? false;
         this.#icon = action.icon ?? 'image';
@@ -32,7 +36,32 @@ export default class FieldAction {
         return typeof this.#icon === 'function' ? this.#icon(this.#payload) : this.#icon;
     }
 
-    run() {
-        this.#run(this.#payload);
+    async run() {
+        let payload = {...this.#payload};
+
+        if (this.#confirm) {
+            const confirmation = await modal(this.#modalProps());
+            if (!confirmation.confirmed) return;
+            payload = {...payload, confirmation};
+        }
+
+        const response = this.#run(payload);
+
+        if (response instanceof Promise) {
+            const progress = this.#payload.vm.$progress;
+            const name = this.#payload.fieldPathPrefix ?? this.#payload.handle;
+            progress.loading(name, true);
+            response.finally(() => progress.loading(name, false));
+        }
+    }
+
+    #modalProps() {
+        let props = this.#confirm === true ? {} : {...this.#confirm};
+
+        if (! props.title) {
+            props.title = this.title;
+        }
+
+        return props;
     }
 }
