@@ -10,6 +10,7 @@ use Statamic\Contracts\Entries\Collection as Contract;
 use Statamic\Data\ContainsCascadingData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
+use Statamic\Data\HasDirtyState;
 use Statamic\Events\CollectionCreated;
 use Statamic\Events\CollectionCreating;
 use Statamic\Events\CollectionDeleted;
@@ -34,7 +35,7 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contract
 {
-    use ContainsCascadingData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedData;
+    use ContainsCascadingData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedData, HasDirtyState;
 
     protected $handle;
     protected $routes = [];
@@ -484,6 +485,10 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             }
         }
 
+        if ($this->isDirty('route')) {
+            Facades\Entry::updateUris($this);
+        }
+
         Facades\Collection::save($this);
 
         Blink::forget('collection-handles');
@@ -497,6 +502,8 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
             CollectionSaved::dispatch($this);
         }
+
+        $this->syncOriginal();
 
         return $this;
     }
@@ -927,5 +934,10 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             'title' => $this->title(),
             'handle' => $this->handle(),
         ];
+    }
+
+    public function getCurrentDirtyStateAttributes(): array
+    {
+        return $this->fileData();
     }
 }
