@@ -44,7 +44,8 @@
         "mockery/mockery": "^1.6.10",
         "orchestra/testbench": "^8.14 || ^9.0",
         "phpunit/phpunit": "^10.5.35",
-        "spatie/laravel-ray": "^1.37"
+        "spatie/laravel-ray": "^1.37",
+        "spatie/ray": "^1.41.2"
     },
     "config": {
         "optimize-autoloader": true,
