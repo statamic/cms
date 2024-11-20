@@ -350,12 +350,14 @@ export default {
                     title: __('Expand All Sets'),
                     icon: 'arrows-horizontal-expand',
                     quick: true,
+                    visibleWhenReadOnly: true,
                     run: this.expandAll,
                 },
                 {
                     title: __('Collapse All Sets'),
                     icon: 'arrows-horizontal-collapse',
                     quick: true,
+                    visibleWhenReadOnly: true,
                     run: this.collapseAll,
                 },
                 {
@@ -363,6 +365,7 @@ export default {
                     icon: ({ vm }) => vm.fullScreenMode ? 'shrink-all' : 'expand-bold',
                     quick: true,
                     run: this.toggleFullscreen,
+                    visibleWhenReadOnly: true,
                     visible: this.config.fullscreen,
                 },
             ];

@@ -96,6 +96,7 @@ export default {
                     quick: true,
                     run: this.toggleFullscreen,
                     visible: this.config.fullscreen,
+                    visibleWhenReadOnly: true,
                 },
             ];
         },

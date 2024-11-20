@@ -149,6 +149,7 @@ export default {
                     title: __('Toggle Fullscreen Mode'),
                     icon: ({ vm }) => vm.fullScreenMode ? 'shrink-all' : 'expand-bold',
                     quick: true,
+                    visibleWhenReadOnly: true,
                     run: this.toggleFullScreen,
                 },
             ];

@@ -162,18 +162,21 @@ export default {
                     title: __('Expand All Sets'),
                     icon: 'arrows-horizontal-expand',
                     quick: true,
+                    visibleWhenReadOnly: true,
                     run: this.expandAll,
                 },
                 {
                     title: __('Collapse All Sets'),
                     icon: 'arrows-horizontal-collapse',
                     quick: true,
+                    visibleWhenReadOnly: true,
                     run: this.collapseAll,
                 },
                 {
                     title: __('Toggle Fullscreen Mode'),
                     icon: ({ vm }) => vm.fullScreenMode ? 'shrink-all' : 'expand-bold',
                     quick: true,
+                    visibleWhenReadOnly: true,
                     run: this.toggleFullscreen,
                 },
             ];
