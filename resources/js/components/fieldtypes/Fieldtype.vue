@@ -93,6 +93,7 @@ export default {
                 meta: this.meta,
                 update: this.update,
                 updateMeta: this.updateMeta,
+                isReadOnly: this.isReadOnly,
             };
         },
 
