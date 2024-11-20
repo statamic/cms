@@ -13,7 +13,7 @@
                 v-if="instructions && field.instructions_position !== 'below'"
                 v-html="instructions" />
 
-            <publish-field-actions v-if="mounted && fieldActions.length" :actions="fieldActions" />
+            <publish-field-actions v-if="shouldShowFieldActions" :actions="fieldActions" />
         </div>
 
         <component
@@ -77,16 +77,15 @@ export default {
         showFieldPreviews: Boolean,
     },
 
-    inject: ['storeName'],
+    inject: {
+        storeName: { default: null },
+        isInsideConfigFields: { default: false },
+    },
 
     data() {
         return {
-            mounted: false,
+            fieldActions: [],
         }
-    },
-
-    mounted() {
-        this.mounted = true;
     },
 
     computed: {
@@ -157,11 +156,15 @@ export default {
             return prefix+'field_'+this.field.handle;
         },
 
-        fieldActions() {
-            return this.$refs.field.fieldActions;
+        shouldShowFieldActions() {
+            return !this.isInsideConfigFields && this.fieldActions.length > 0;
         }
 
-    }
+    },
+
+    mounted() {
+        if (this.$refs.field) this.fieldActions = this.$refs.field.fieldActions;
+    },
 
 }
 </script>
