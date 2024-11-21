@@ -34,6 +34,8 @@ jobs:
             laravel: 11.*
           - php: 8.4
             laravel: 10.*
+          - php: 8.4
+            stability: prefer-lowest
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
 
