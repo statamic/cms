@@ -14,7 +14,7 @@
         "composer/semver": "^3.4",
         "guzzlehttp/guzzle": "^6.3 || ^7.0",
         "james-heinrich/getid3": "^1.9.21",
-        "laravel/framework": "^10.40 || ^11.0",
+        "laravel/framework": "^10.40 || ^11.3",
         "laravel/prompts": "^0.1.16",
         "league/commonmark": "^2.2",
         "league/csv": "^9.0",
@@ -44,7 +44,8 @@
         "mockery/mockery": "^1.6.10",
         "orchestra/testbench": "^8.14 || ^9.0",
         "phpunit/phpunit": "^10.5.35",
-        "spatie/laravel-ray": "^1.37"
+        "spatie/laravel-ray": "^1.37",
+        "spatie/ray": "^1.41.2"
     },
     "config": {
         "optimize-autoloader": true,
