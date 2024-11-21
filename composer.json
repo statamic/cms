@@ -44,7 +44,7 @@
         "google/cloud-translate": "^1.6",
         "laravel/pint": "1.16.0",
         "mockery/mockery": "^1.6.10",
-        "orchestra/testbench": "^8.14 || ^9.8",
+        "orchestra/testbench": "^8.14 || ^9.0",
         "phpunit/phpunit": "^10.5.35",
         "spatie/laravel-ray": "^1.37",
         "spatie/ray": "^1.41.2"
