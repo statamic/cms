@@ -12,13 +12,14 @@
     }
 }
 
-.code-fieldtype-toolbar select {
+.code-fieldtype-toolbar select,
+.code-fieldtype-toolbar-fullscreen select {
     @apply h-8 text-sm leading-none;
 }
 
 
 .code-fieldtype-container.code-fullscreen {
-    @apply fixed bg-gray-200 dark:bg-dark-600 inset-0 min-h-screen overflow-scroll rounded-none pt-12;
+    @apply fixed bg-gray-200 dark:bg-dark-600 inset-0 min-h-screen overflow-scroll rounded-none pt-14;
 
     .code-fieldtype-toolbar {
         @apply fixed z-2 top-0 w-full px-6 py-2 h-12 shadow dark:shadow-dark text-base rounded-none bg-gradient-to-b from-white to-gray-100 dark:from-dark-550 dark:to-dark-600;
