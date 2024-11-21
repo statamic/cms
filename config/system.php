@@ -173,9 +173,9 @@ return [
     | Always Augment to Query
     |--------------------------------------------------------------------------
     |
-    | With this enabled, Statamic will always augment relationship fields to
-    | query builders. With it disabled `max_items: 1` fields are augmented to the
-    | referenced entry object.
+    | By default, Statamic will augment relationship fields with max_items: 1
+    | to the result of a query, for example an Entry instance. Setting this
+    | to true will augment to the query builder instead of the result.
     |
     */
 
