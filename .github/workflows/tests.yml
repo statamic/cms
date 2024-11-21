@@ -100,7 +100,7 @@ jobs:
 
       - name: Execute tests
         if: steps.should-run-tests.outputs.result == 'true'
-        run: vendor/bin/phpunit
+        run: vendor/bin/phpunit  --display-deprecation ${{ matrix.stability == 'prefer-stable' && '--fail-on-deprecation' || '' }}
 
   js-tests:
     runs-on: ubuntu-20.04
