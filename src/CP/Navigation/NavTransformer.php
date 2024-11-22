@@ -60,8 +60,8 @@ class NavTransformer
     protected function transform()
     {
         $this->config['reorder'] = $this->getReorderedItems(
-            $this->coreNav->map(fn ($section) => $this->transformSectionKey($section)),
-            collect($this->submitted)->map(fn ($section) => $this->transformSectionKey($section)),
+            $this->transformReorderableSections($this->coreNav),
+            $this->transformReorderableSections($this->submitted),
         );
 
         $this->config['sections'] = collect($this->submitted)
@@ -70,6 +70,16 @@ class NavTransformer
             ->all();
 
         return $this;
+    }
+
+    /**
+     * Transform reorderable sections list.
+     */
+    protected function transformReorderableSections(Collection|array $reorderableSections): Collection
+    {
+        return collect($reorderableSections)
+            ->map(fn ($section) => $this->transformSectionKey($section))
+            ->reject(fn ($section) => $section === 'top_level');
     }
 
     /**
@@ -281,24 +291,27 @@ class NavTransformer
      */
     protected function calculateMinimumItemsForReorder(Collection $originalList, Collection $newList): int
     {
-        $continueFiltering = true;
+        $originalList = $originalList->filter();
 
-        $newList = $this->rejectNewItemsFromEndOfNewList($originalList, $newList);
+        $newList = $this->rejectNewItemsFromEndOfNewList($originalList, $newList)->filter();
 
-        $redundantTailItems = $originalList
-            ->filter()
-            ->values()
-            ->reverse()
-            ->zip($newList->reverse())
-            ->filter(function ($pair) use (&$continueFiltering) {
-                if ($continueFiltering && $pair->first() === $pair->last()) {
-                    return true;
-                }
+        $minimumItemsCount = 0;
 
-                return $continueFiltering = false;
-            });
+        while (true) {
+            if ($originalList->all() == $newList->all()) {
+                break;
+            }
 
-        return max(1, $newList->count() - $redundantTailItems->count() - 1);
+            $originalList = $originalList
+                ->reject(fn ($item) => $item === $newList->first())
+                ->values();
+
+            $newList->shift();
+
+            $minimumItemsCount++;
+        }
+
+        return $minimumItemsCount;
     }
 
     /**
@@ -348,7 +361,6 @@ class NavTransformer
             ->pipe(fn ($sections) => $this->rejectInherits($sections));
 
         $reorder = collect(Arr::get($this->config, 'reorder') ?: [])
-            ->reject(fn ($section) => $section === 'top_level')
             ->values()
             ->all();
 
