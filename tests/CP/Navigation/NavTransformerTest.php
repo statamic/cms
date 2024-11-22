@@ -22,6 +22,9 @@ class NavTransformerTest extends TestCase
     {
         parent::setUp();
 
+        Facades\Collection::make('pages')->title('Pages')->save();
+        Facades\Collection::make('articles')->title('Articles')->save();
+
         // TODO: Other tests are leaving behind forms without titles that are causing failures here?
         Facades\Form::shouldReceive('all')->andReturn(collect());
     }
@@ -504,18 +507,18 @@ class NavTransformerTest extends TestCase
                         ],
                         'children' => [
                             [
-                                'id' => 'content::collections::pages',
-                                'manipulations' => [
-                                    'action' => '@modify',
-                                    'display' => 'Pagerinos',
-                                ],
-                            ],
-                            [
                                 'id' => 'content::collections::articles',
                                 'manipulations' => [
                                     'action' => '@modify',
                                     'url' => '/modified-articles-url',
                                     'icon' => 'custom-svg', // This should get stripped out, because icons cannot be on children
+                                ],
+                            ],
+                            [
+                                'id' => 'content::collections::pages',
+                                'manipulations' => [
+                                    'action' => '@modify',
+                                    'display' => 'Pagerinos',
                                 ],
                             ],
                         ],
@@ -839,7 +842,15 @@ class NavTransformerTest extends TestCase
             [
                 'display' => 'Content',
                 'items' => [
+                    ['id' => 'content::collections'],
                     ['id' => 'content::navigation'],
+                    [
+                        'id' => 'content::custom_item_one',
+                        'manipulations' => [
+                            'action' => '@create',
+                            'display' => 'Custom Item One',
+                        ],
+                    ],
                     [
                         'id' => 'content::taxonomies',
                         'manipulations' => [
@@ -848,14 +859,6 @@ class NavTransformerTest extends TestCase
                         ],
                     ],
                     ['id' => 'content::assets'],
-                    [
-                        'id' => 'content::custom_item_one',
-                        'manipulations' => [
-                            'action' => '@create',
-                            'display' => 'Custom Item One',
-                        ],
-                    ],
-                    ['id' => 'content::collections'],
                     ['id' => 'content::globals'],
                     [
                         'id' => 'content::custom_item_two',
@@ -871,13 +874,10 @@ class NavTransformerTest extends TestCase
         $expected = [
             'content' => [
                 'reorder' => [
+                    'content::collections',
                     'content::navigation',
-                    'content::taxonomies',
-                    'content::assets',
                     'content::custom_item_one',
-                    // `Collections` and `Taxnomies` are omitted because they are left over items in the same order they originally were, therefore redundant
-                    // Our new `Custom Item Two` is omitted because it's a new item at the end of the list, so it doesn't need to be in the order
-                    // But `Custom Item One` still needs to be in the order, because it's not just appended to the end of the list
+                    // The rest should omitted because they're left in same order at the end of the list, therefore redundant
                 ],
                 'items' => [
                     'content::taxonomies' => [
@@ -891,6 +891,56 @@ class NavTransformerTest extends TestCase
                     'content::custom_item_two' => [
                         'action' => '@create',
                         'display' => 'Custom Item Two',
+                    ],
+                ],
+            ],
+        ];
+
+        $this->assertEquals($expected, $transformed);
+    }
+
+    #[Test]
+    public function it_can_reorder_child_items()
+    {
+        $transformed = $this->transform([
+            [
+                'display' => 'Content',
+                'items' => [
+                    [
+                        'id' => 'content::collections',
+                        'manipulations' => [
+                            'action' => '@modify',
+                        ],
+                        'children' => [
+                            ['id' => 'content::collections::new_item', 'manipulations' => ['action' => '@create', 'display' => 'New Item']],
+                            ['id' => 'content::collections::pages'],
+                            ['id' => 'content::collections::articles'],
+                            ['id' => 'content::taxonomies::topics', 'manipulations' => ['action' => '@move']],
+                            ['id' => 'content::collections::new_item_at_end', 'manipulations' => ['action' => '@create', 'display' => 'New Item At End']],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $expected = [
+            'content' => [
+                'content::collections' => [
+                    'action' => '@modify',
+                    'reorder' => [
+                        'content::collections::new_item',
+                        'content::collections::pages',
+                    ],
+                    'children' => [
+                        'content::collections::new_item' => [
+                            'action' => '@create',
+                            'display' => 'New Item',
+                        ],
+                        'content::taxonomies::topics' => '@move',
+                        'content::collections::new_item_at_end' => [
+                            'action' => '@create',
+                            'display' => 'New Item At End',
+                        ],
                     ],
                 ],
             ],
@@ -1069,7 +1119,9 @@ class NavTransformerTest extends TestCase
     {
         $transformed = $this->transform([
             ['display_original' => 'Top Level'],
+            ['display_original' => 'Content'],
             [
+                'display' => 'Fields Customized',
                 'display_original' => 'Fields',
                 'items' => [
                     [
@@ -1080,9 +1132,6 @@ class NavTransformerTest extends TestCase
                     ],
                 ],
             ],
-            ['display_original' => 'Tools'],
-            ['display_original' => 'Content'],
-            ['display_original' => 'Users'],
             [
                 'display' => 'Custom Section',
                 'action' => '@create',
@@ -1095,24 +1144,46 @@ class NavTransformerTest extends TestCase
                     ],
                 ],
             ],
+            ['display_original' => 'Tools'],
             ['display_original' => 'Settings'],
+            ['display_original' => 'Users'],
+            [
+                'display' => 'Custom Section At End',
+                'action' => '@create',
+                'items' => [
+                    [
+                        'id' => 'content::collections::pages',
+                        'manipulations' => [
+                            'action' => '@alias',
+                        ],
+                    ],
+                ],
+            ],
         ]);
 
         $expected = [
             'reorder' => [
-                'fields',
-                'tools',
                 'content',
-                'users',
+                'fields',
                 'custom_section',
-                // `Settings` is omitted because it's the only one left over at the end of the list, therefore redundant
+                // The rest should omitted because they're left in same order at the end of the list, therefore redundant
             ],
             'sections' => [
                 'fields' => [
-                    'content::collections' => '@alias',
+                    'display' => 'Fields Customized',
+                    'items' => [
+                        'content::collections' => '@alias',
+                    ],
                 ],
                 'custom_section' => [
                     'display' => 'Custom Section',
+                    'action' => '@create',
+                    'items' => [
+                        'content::collections::pages' => '@alias',
+                    ],
+                ],
+                'custom_section_at_end' => [
+                    'display' => 'Custom Section At End',
                     'action' => '@create',
                     'items' => [
                         'content::collections::pages' => '@alias',
@@ -1207,15 +1278,15 @@ class NavTransformerTest extends TestCase
                         ],
                         'children' => [
                             [
+                                'id' => 'content::collections::articles',
+                                'manipulations' => [], // This item should be ignored
+                            ],
+                            [
                                 'id' => 'content::collections::pages', // This is the only item we're actually modifying
                                 'manipulations' => [
                                     'action' => '@modify',
                                     'display' => 'Pagerinos',
                                 ],
-                            ],
-                            [
-                                'id' => 'content::collections::articles',
-                                'manipulations' => [], // This item should be ignored
                             ],
                         ],
                     ],
@@ -1321,20 +1392,17 @@ class NavTransformerTest extends TestCase
     #[Test]
     public function it_can_transform_complex_json_payload_copied_from_actual_vue_submission()
     {
-        // TODO: Re-do JSON payload example after this PR is finished.
-        $this->markTestSkipped();
-
-        $transformed = $this->transform(json_decode('[{"display":"Top Level","display_original":"Top Level","action":false,"items":[{"id":"top_level::dashboard","manipulations":[],"children":[]},{"id":"content::collections::posts","manipulations":{"action":"@alias"},"children":[]},{"id":"tools::updates","manipulations":{"action":"@move"},"children":[]},{"id":"new_top_level_item","manipulations":{"action":"@create","display":"New Top Level Item","url":"\/new-top-level-item"},"children":[{"id":"new_child_item","manipulations":{"action":"@create","display":"New Child Item","url":"\/new-child-item"},"children":[]}]}]},{"display":"Fields","display_original":"Fields","action":false,"items":[{"id":"fields::blueprints","manipulations":{"display":"Blueprints Renamed","action":"@modify"},"children":[]},{"id":"fields::fieldsets","manipulations":[],"children":[]}]},{"display":"Content Renamed","display_original":"Content","action":false,"items":[{"id":"content::collections::pages","manipulations":{"action":"@move"},"children":[]},{"id":"content::collections","manipulations":{"action":"@modify"},"children":[{"id":"content::collections::posts","manipulations":{"display":"Posterinos","action":"@modify"},"children":[]}]},{"id":"content::navigation","manipulations":[],"children":[{"id":"content::navigation::nav_test","manipulations":[],"children":[]}]},{"id":"content::taxonomies","manipulations":[],"children":[]},{"id":"content::assets","manipulations":[],"children":[{"id":"content::assets::assets","manipulations":[],"children":[]},{"id":"content::assets::essthree","manipulations":[],"children":[]}]}]},{"display":"Custom Section","display_original":"Custom Section","action":"@create","items":[{"id":"custom_section::new_item","manipulations":{"action":"@create","display":"New Item","url":"\/new-item"},"children":[]},{"id":"content::taxonomies::tags","manipulations":{"action":"@move"},"children":[]},{"id":"content::globals","manipulations":{"action":"@move"},"children":[{"id":"content::globals::global","manipulations":[],"children":[]}]}]},{"display":"Tools","display_original":"Tools","action":false,"items":[{"id":"tools::forms","manipulations":[],"children":[{"id":"tools::forms::test","manipulations":[],"children":[]}]},{"id":"tools::addons","manipulations":[],"children":[]},{"id":"tools::utilities","manipulations":[],"children":[{"id":"tools::utilities::cache","manipulations":[],"children":[]},{"id":"tools::utilities::email","manipulations":[],"children":[]},{"id":"tools::utilities::licensing","manipulations":[],"children":[]},{"id":"tools::utilities::php_info","manipulations":[],"children":[]},{"id":"tools::utilities::search","manipulations":[],"children":[]}]}]},{"display":"Users","display_original":"Users","action":false,"items":[{"id":"users::users","manipulations":[],"children":[]},{"id":"users::groups","manipulations":[],"children":[]},{"id":"users::permissions","manipulations":[],"children":[{"id":"users::permissions::author","manipulations":[],"children":[]},{"id":"users::permissions::not_social_media_manager","manipulations":[],"children":[]},{"id":"users::permissions::social_media_manager","manipulations":[],"children":[]}]}]}]', true));
+        $transformed = $this->transform(json_decode('[{"display":"Top Level","display_original":"Top Level","action":false,"items":[{"id":"top_level::dashboard","manipulations":[],"children":[]},{"id":"content::collections::pages","manipulations":{"action":"@alias"},"children":[]},{"id":"tools::updates","manipulations":{"action":"@move"},"children":[]},{"id":"new_top_level_item","manipulations":{"action":"@create","display":"New Top Level Item","url":"\/new-top-level-item","icon":null},"children":[{"id":"new_child_item","manipulations":{"action":"@create","display":"New Child Item","url":"\/new-child-item","icon":null},"children":[]}]}]},{"display":"Content","display_original":"Content","action":false,"items":[{"id":"content::collections","manipulations":{"action":"@modify","reorder":["content::collections::new_item","content::collections::pages"]},"children":[{"id":"content::collections::new_item","manipulations":{"action":"@create","display":"New Item","url":"\/new"},"children":[]},{"id":"content::collections::pages","manipulations":[],"children":[]},{"id":"content::collections::articles","manipulations":[],"children":[]},{"id":"content::taxonomies::topics","manipulations":{"action":"@move"},"children":[]},{"id":"content::collections::new_item_at_end","manipulations":{"action":"@create","display":"New Item At End","url":"\/new"},"children":[]}]},{"id":"content::navigation","manipulations":{"action":"@hide"},"children":[]},{"id":"content::new_item","manipulations":{"action":"@create","display":"New Item","url":"\/new"},"children":[]},{"id":"content::taxonomies","manipulations":[],"children":[]},{"id":"content::assets","manipulations":[],"children":[{"id":"content::assets::assets","manipulations":[],"children":[]}]},{"id":"content::globals","manipulations":[],"children":[{"id":"content::globals::pricing","manipulations":[],"children":[]},{"id":"content::globals::settings","manipulations":[],"children":[]}]},{"id":"content::new_item_at_end","manipulations":{"action":"@create","display":"New Item At End","url":"\/end"},"children":[]}]},{"display":"Fieldsss","display_original":"Fields","action":false,"items":[{"id":"fields::fieldsets","manipulations":[],"children":[]},{"id":"fields::blueprints","manipulations":[],"children":[]}]},{"display":"Custom Section","display_original":"My Section","action":"@create","items":[{"id":"my_section::my_item","manipulations":{"action":"@create","display":"Custom item","url":"\/url","icon":null},"children":[]}]},{"display":"Tools","display_original":"Tools","action":false,"items":[{"id":"tools::forms","manipulations":[],"children":[]},{"id":"tools::addons","manipulations":[],"children":[]},{"id":"tools::utilities","manipulations":[],"children":[{"id":"tools::utilities::cache","manipulations":[],"children":[]},{"id":"tools::utilities::email","manipulations":[],"children":[]},{"id":"tools::utilities::licensing","manipulations":[],"children":[]},{"id":"tools::utilities::php_info","manipulations":[],"children":[]},{"id":"tools::utilities::search","manipulations":[],"children":[]}]}]},{"display":"Settings","display_original":"Settings","action":false,"items":[{"id":"settings::site","manipulations":[],"children":[]},{"id":"settings::preferences","manipulations":[],"children":[{"id":"settings::preferences::general","manipulations":[],"children":[]},{"id":"settings::preferences::cp_nav","manipulations":[],"children":[]}]}]},{"display":"Users","display_original":"Users","action":false,"items":[{"id":"users::users","manipulations":[],"children":[]},{"id":"users::groups","manipulations":[],"children":[]}]},{"display":"Custom Section At End","display_original":"Another section","action":"@create","items":[{"id":"users::permissions","manipulations":{"action":"@move"},"children":[{"id":"users::permissions::author","manipulations":[],"children":[]}]}]}]', true));
 
         $expected = [
             'reorder' => [
-                'fields',
                 'content',
+                'fields',
                 'custom_section',
             ],
             'sections' => [
                 'top_level' => [
-                    'content::collections::posts' => '@alias',
+                    'content::collections::pages' => '@alias',
                     'tools::updates' => '@move',
                     'top_level::new_top_level_item' => [
                         'action' => '@create',
@@ -1349,44 +1417,68 @@ class NavTransformerTest extends TestCase
                         ],
                     ],
                 ],
-                'fields' => [
-                    'fields::blueprints' => [
-                        'action' => '@modify',
-                        'display' => 'Blueprints Renamed',
-                    ],
-                ],
                 'content' => [
-                    'display' => 'Content Renamed',
                     'reorder' => [
-                        'content::collections::pages',
                         'content::collections',
                         'content::navigation',
-                        'content::taxonomies',
+                        'content::new_item',
                     ],
                     'items' => [
-                        'content::collections::pages' => '@move',
                         'content::collections' => [
                             'action' => '@modify',
+                            'reorder' => [
+                                'content::collections::new_item',
+                                'content::collections::pages',
+                            ],
                             'children' => [
-                                'content::collections::posts' => [
-                                    'action' => '@modify',
-                                    'display' => 'Posterinos',
+                                'content::collections::new_item' => [
+                                    'action' => '@create',
+                                    'display' => 'New Item',
+                                    'url' => '/new',
+                                ],
+                                'content::taxonomies::topics' => '@move',
+                                'content::collections::new_item_at_end' => [
+                                    'action' => '@create',
+                                    'display' => 'New Item At End',
+                                    'url' => '/new',
                                 ],
                             ],
                         ],
+                        'content::navigation' => '@hide',
+                        'content::new_item' => [
+                            'action' => '@create',
+                            'display' => 'New Item',
+                            'url' => '/new',
+                        ],
+                        'content::new_item_at_end' => [
+                            'action' => '@create',
+                            'display' => 'New Item At End',
+                            'url' => '/end',
+                        ],
+                    ],
+                ],
+                'fields' => [
+                    'display' => 'Fieldsss',
+                    'reorder' => [
+                        'fields::fieldsets',
                     ],
                 ],
                 'custom_section' => [
-                    'display' => 'Custom Section',
                     'action' => '@create',
+                    'display' => 'Custom Section',
                     'items' => [
-                        'custom_section::new_item' => [
+                        'custom_section::custom_item' => [
                             'action' => '@create',
-                            'display' => 'New Item',
-                            'url' => '/new-item',
+                            'display' => 'Custom item',
+                            'url' => '/url',
                         ],
-                        'content::taxonomies::tags' => '@move',
-                        'content::globals' => '@move',
+                    ],
+                ],
+                'custom_section_at_end' => [
+                    'action' => '@create',
+                    'display' => 'Custom Section At End',
+                    'items' => [
+                        'users::permissions' => '@move',
                     ],
                 ],
             ],
