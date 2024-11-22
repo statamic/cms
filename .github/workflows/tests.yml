@@ -84,6 +84,15 @@ jobs:
           ini-values: short_open_tag=on
           coverage: none
 
+      - name: Set Minimum PHP 8.4 Versions
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer require nesbot/carbon:^3.4 --no-interaction --no-update
+          shell: bash
+        if: matrix.php >= 8.4
+
       - name: Install dependencies
         uses: nick-invision/retry@v3
         if: steps.should-run-tests.outputs.result == 'true'
