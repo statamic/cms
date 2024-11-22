@@ -1,5 +1,23 @@
 # Release Notes
 
+## 5.39.0 (2024-11-22)
+
+### What's new
+- Field actions [#10352](https://github.com/statamic/cms/issues/10352) by @jacksleight
+- Field action modals [#11129](https://github.com/statamic/cms/issues/11129) by @jacksleight
+- Add ArrayableString to Blade value helper [#11041](https://github.com/statamic/cms/issues/11041) by @ajnsn
+- Add `always_augment_to_query` option [#11086](https://github.com/statamic/cms/issues/11086) by @jacksleight
+
+### What's fixed
+- Fix multisite command not moving directories [#11105](https://github.com/statamic/cms/issues/11105) by @duncanmcclean
+- Fix asset folder sort across pages [#11130](https://github.com/statamic/cms/issues/11130) by @daun
+- Avoid creation of duplicate terms in typeahead input [#11060](https://github.com/statamic/cms/issues/11060) by @daun
+- Fix error when using user ID as folder name for avatar asset field in non-admin context [#11141](https://github.com/statamic/cms/issues/11141) by @jonasemde
+- Fix incorrect namespaces in tests [#11149](https://github.com/statamic/cms/issues/11149) by @duncanmcclean
+- Prevent `str_replace` warning when using Debugbar [#11148](https://github.com/statamic/cms/issues/11148) by @duncanmcclean
+
+
+
 ## 5.38.1 (2024-11-19)
 
 ### What's fixed
