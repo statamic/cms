@@ -23,6 +23,9 @@ class EntrySaved extends Event implements ProvidesCommitMessage
 
     public function isInitial()
     {
+        if (! $this->entry || ! $this->initiator) {
+            return false;
+        }
         return $this->entry->id() === $this->initiator->id();
     }
 }
