@@ -362,6 +362,7 @@ final class Installer
             $choice = select(
                 label: Arr::get($config, 'prompt', "Would you like to install one of the following [{$name}] modules?"),
                 options: $options,
+                default: Arr::get($config, 'default'),
             );
         } elseif (! $this->isInteractive && ! $choice = Arr::get($config, 'default')) {
             return false;
