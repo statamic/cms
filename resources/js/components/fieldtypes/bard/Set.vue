@@ -95,7 +95,7 @@ export default {
         HasFieldActions,
     ],
 
-    inject: ['bard', 'bardSets'],
+    inject: ['bard', 'bardSets', 'storeName'],
 
     computed: {
 
@@ -203,7 +203,9 @@ export default {
                 meta: this.meta,
                 update: (handle, value) => this.updated(handle, value),
                 updateMeta: (handle, value) => this.metaUpdated(handle, value),
-                isReadOnly: this.isReadOnly
+                isReadOnly: this.isReadOnly,
+                store: this.$store,
+                storeName: this.storeName,
             };
         },
 
