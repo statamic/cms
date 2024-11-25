@@ -36,10 +36,6 @@ class StarterKitExport extends Command
      */
     public function handle()
     {
-        if (! File::exists(base_path('starter-kit.yaml'))) {
-            return $this->askToStubStarterKitConfig();
-        }
-
         if (! File::exists($path = $this->getAbsolutePath())) {
             $this->askToCreateExportPath($path);
         }
@@ -56,26 +52,6 @@ class StarterKitExport extends Command
         }
 
         $this->components->info("Starter kit was successfully exported to [$path].");
-    }
-
-    /**
-     * Ask to stub out starter kit config.
-     */
-    protected function askToStubStarterKitConfig(): void
-    {
-        $stubPath = __DIR__.'/stubs/starter-kits/starter-kit.yaml.stub';
-        $newPath = base_path($config = 'starter-kit.yaml');
-
-        if ($this->input->isInteractive()) {
-            if (! confirm("Config [{$config}] does not exist. Would you like to create it now?", true)) {
-                return;
-            }
-        }
-
-        File::copy($stubPath, $newPath);
-
-        $this->comment("A new config has been created at [{$config}].");
-        $this->comment('Please configure your `export_paths` and re-run to begin your export!');
     }
 
     /**

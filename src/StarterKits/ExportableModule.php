@@ -112,6 +112,10 @@ class ExportableModule extends Module
             ->merge($this->exportAsPaths())
             ->merge($this->exportAsPaths()->keys());
 
+        if ($flattenedExportPaths->contains('starter-kit.yaml')) {
+            throw new StarterKitException('Cannot export [starter-kit.yaml] config.');
+        }
+
         if ($flattenedExportPaths->contains('composer.json')) {
             throw new StarterKitException('Cannot export [composer.json]. Please use `dependencies` array!');
         }
