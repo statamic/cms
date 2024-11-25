@@ -14,7 +14,7 @@
         "composer/semver": "^3.4",
         "guzzlehttp/guzzle": "^6.3 || ^7.0",
         "james-heinrich/getid3": "^1.9.21",
-        "laravel/framework": "^10.40 || ^11.3",
+        "laravel/framework": "^10.40 || ^11.34",
         "laravel/prompts": "^0.1.16",
         "league/commonmark": "^2.2",
         "league/csv": "^9.0",
@@ -34,8 +34,7 @@
         "symfony/yaml": "^6.0 || ^7.0",
         "ueberdosis/tiptap-php": "^1.4",
         "voku/portable-ascii": "^2.0.2",
-        "wilderborn/partyline": "^1.0",
-        "vlucas/phpdotenv": "^5.6.1"
+        "wilderborn/partyline": "^1.0"
     },
     "require-dev": {
         "doctrine/dbal": "^3.6",
