@@ -429,6 +429,23 @@ class ArrayTest extends TestCase
                     'side' => 'fries',
                 ],
             ],
+            'associative array options, associative array value, with nulls' => [
+                false,
+                [
+                    'food' => 'Food',
+                    'drink' => 'Drink',
+                    'side' => 'Side',
+                ],
+                [
+                    'food' => 'burger',
+                    'drink' => 'coke',
+                    'side' => null,
+                ],
+                [
+                    'food' => 'burger',
+                    'drink' => 'coke',
+                ],
+            ],
             'associative array options, associative array value with expanded setting' => [
                 true,
                 [
@@ -445,6 +462,23 @@ class ArrayTest extends TestCase
                     ['key' => 'food', 'value' => 'burger'],
                     ['key' => 'drink', 'value' => 'coke'],
                     ['key' => 'side', 'value' => 'fries'],
+                ],
+            ],
+            'associative array options, associative array value with expanded setting, with nulls' => [
+                true,
+                [
+                    'food' => 'Food',
+                    'drink' => 'Drink',
+                    'side' => 'Side',
+                ],
+                [
+                    'food' => 'burger',
+                    'drink' => 'coke',
+                    'side' => null,
+                ],
+                [
+                    ['key' => 'food', 'value' => 'burger'],
+                    ['key' => 'drink', 'value' => 'coke'],
                 ],
             ],
             'multidimensional array options, associative array value' => [
@@ -465,6 +499,23 @@ class ArrayTest extends TestCase
                     'side' => 'fries',
                 ],
             ],
+            'multidimensional array options, associative array value, with nulls' => [
+                false,
+                [
+                    ['key' => 'food', 'value' => 'Food'],
+                    ['key' => 'drink', 'value' => 'Drink'],
+                    ['key' => 'side', 'value' => 'Side'],
+                ],
+                [
+                    'food' => 'burger',
+                    'drink' => 'coke',
+                    'side' => null,
+                ],
+                [
+                    'food' => 'burger',
+                    'drink' => 'coke',
+                ],
+            ],
             'multidimensional array options, associative array value with expanded setting' => [
                 true,
                 [
@@ -483,6 +534,23 @@ class ArrayTest extends TestCase
                     ['key' => 'side', 'value' => 'fries'],
                 ],
             ],
+            'multidimensional array options, associative array value with expanded setting, with nulls' => [
+                true,
+                [
+                    ['key' => 'food', 'value' => 'Food'],
+                    ['key' => 'drink', 'value' => 'Drink'],
+                    ['key' => 'side', 'value' => 'Side'],
+                ],
+                [
+                    'food' => 'burger',
+                    'drink' => 'coke',
+                    'side' => null,
+                ],
+                [
+                    ['key' => 'food', 'value' => 'burger'],
+                    ['key' => 'drink', 'value' => 'coke'],
+                ],
+            ],
             'multidimensional array with numbers' => [
                 false,
                 [
@@ -498,6 +566,23 @@ class ArrayTest extends TestCase
                 [
                     0 => 'none',
                     1 => 'some',
+                    2 => 'more',
+                ],
+            ],
+            'multidimensional array with numbers, with nulls' => [
+                false,
+                [
+                    ['key' => 0, 'value' => 'Zero'],
+                    ['key' => 1, 'value' => 'One'],
+                    ['key' => 2, 'value' => 'Two'],
+                ],
+                [
+                    0 => 'none',
+                    1 => null,
+                    2 => 'more',
+                ],
+                [
+                    0 => 'none',
                     2 => 'more',
                 ],
             ],
@@ -519,6 +604,23 @@ class ArrayTest extends TestCase
                     ['key' => 2, 'value' => 'more'],
                 ],
             ],
+            'multidimensional array with numbers with expanded setting, with nulls' => [
+                true,
+                [
+                    ['key' => 0, 'value' => 'Zero'],
+                    ['key' => 1, 'value' => 'One'],
+                    ['key' => 2, 'value' => 'Two'],
+                ],
+                [
+                    0 => 'none',
+                    1 => null,
+                    2 => 'more',
+                ],
+                [
+                    ['key' => 0, 'value' => 'none'],
+                    ['key' => 2, 'value' => 'more'],
+                ],
+            ],
             'multidimensional array with non-sequential numbers' => [
                 false,
                 [
@@ -537,6 +639,23 @@ class ArrayTest extends TestCase
                     0 => 'none',
                 ],
             ],
+            'multidimensional array with non-sequential numbers, with nulls' => [
+                false,
+                [
+                    ['key' => 0, 'value' => 'Zero'],
+                    ['key' => 1, 'value' => 'One'],
+                    ['key' => 2, 'value' => 'Two'],
+                ],
+                [
+                    2 => 'some',
+                    1 => null,
+                    0 => 'none',
+                ],
+                [
+                    2 => 'some',
+                    0 => 'none',
+                ],
+            ],
             'multidimensional array with non-sequential numbers with expanded setting' => [
                 true,
                 [
@@ -552,6 +671,23 @@ class ArrayTest extends TestCase
                 [
                     ['key' => 2, 'value' => 'some'],
                     ['key' => 1, 'value' => 'one'],
+                    ['key' => 0, 'value' => 'none'],
+                ],
+            ],
+            'multidimensional array with non-sequential numbers with expanded setting, with nulls' => [
+                true,
+                [
+                    ['key' => 0, 'value' => 'Zero'],
+                    ['key' => 1, 'value' => 'One'],
+                    ['key' => 2, 'value' => 'Two'],
+                ],
+                [
+                    2 => 'some',
+                    1 => null,
+                    0 => 'none',
+                ],
+                [
+                    ['key' => 2, 'value' => 'some'],
                     ['key' => 0, 'value' => 'none'],
                 ],
             ],
