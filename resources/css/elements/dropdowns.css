@@ -59,7 +59,7 @@
     @apply relative;
 
     .quick-list-content {
-        @apply absolute top-1/2 right-full mr-[8px] -translate-y-1/2 min-w-max transition origin-right flex bg-white shadow-quick rounded-full p-0.5;
+        @apply absolute top-1/2 right-full mr-[8px] -translate-y-1/2 min-w-max transition origin-right flex bg-white dark:bg-dark-550 shadow-quick rounded-full p-0.5;
         &::before {
             content: '';
             position: absolute;
@@ -67,7 +67,7 @@
             z-index: -1;
         }
         button, a {
-            @apply rounded-full p-1.5 text-gray-800 flex shrink-0;
+            @apply rounded-full p-1.5 text-gray-800 dark:text-dark-100 flex shrink-0;
             &:hover {
                 @apply bg-blue text-white;
             }
