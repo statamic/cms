@@ -29,14 +29,12 @@
         "spatie/ignition": "^1.15",
         "statamic/stringy": "^3.1.2",
         "stillat/blade-parser": "^1.10.1",
-        "symfony/console": "^6.4.3 || ^7.0.3",
         "symfony/lock": "^6.4",
         "symfony/var-exporter": "^6.0",
         "symfony/yaml": "^6.0 || ^7.0",
         "ueberdosis/tiptap-php": "^1.4",
         "voku/portable-ascii": "^2.0.2",
-        "wilderborn/partyline": "^1.0",
-        "vlucas/phpdotenv": "^5.6.1"
+        "wilderborn/partyline": "^1.0"
     },
     "require-dev": {
         "doctrine/dbal": "^3.6",
@@ -46,8 +44,7 @@
         "mockery/mockery": "^1.6.10",
         "orchestra/testbench": "^8.14 || ^9.0",
         "phpunit/phpunit": "^10.5.35",
-        "spatie/laravel-ray": "^1.37",
-        "spatie/ray": "^1.41.2"
+        "spatie/laravel-ray": "^1.37"
     },
     "config": {
         "optimize-autoloader": true,
