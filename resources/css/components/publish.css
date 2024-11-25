@@ -76,7 +76,12 @@ code.parent-url {
             @apply pr-6;
         }
         .field-dropdown {
-            @apply block absolute bottom-0 right-0;
+            @apply block absolute bottom-[-3px] right-0;
+        }
+        &:not(.has-field-label) {
+            .field-inner {
+                @apply min-h-[19.5px] mb-2;
+            }
         }
     }
 }

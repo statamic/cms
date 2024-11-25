@@ -170,6 +170,7 @@ export default {
                 `${this.config.component || this.config.type}-fieldtype`,,
                 this.isReadOnly ? 'read-only-field' : '',
                 this.isInsideConfigFields ? 'config-field' : `${tailwind_width_class(this.config.width)}`,
+                this.showLabel ? 'has-field-label' : '',
                 this.shouldShowFieldActions ? 'has-field-dropdown' : '',
                 this.config.classes || '',
                 this.config.full_width_setting ? 'full-width-setting' : '',
@@ -230,7 +231,7 @@ export default {
         },
 
         shouldShowFieldActions() {
-            return !this.isInsideConfigFields && this.showLabel && this.fieldActions.length > 0;
+            return !this.isInsideConfigFields && this.fieldActions.length > 0;
         },
 
         fieldActions() {
