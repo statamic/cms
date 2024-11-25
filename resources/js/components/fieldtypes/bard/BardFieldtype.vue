@@ -352,6 +352,7 @@ export default {
                     quick: true,
                     visibleWhenReadOnly: true,
                     run: this.expandAll,
+                    visible: this.setConfigs.length > 0,
                 },
                 {
                     title: __('Collapse All Sets'),
@@ -359,6 +360,7 @@ export default {
                     quick: true,
                     visibleWhenReadOnly: true,
                     run: this.collapseAll,
+                    visible: this.setConfigs.length > 0,
                 },
                 {
                     title: __('Toggle Fullscreen Mode'),
