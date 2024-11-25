@@ -573,10 +573,12 @@ EOT
         $this->files->put(base_path('package/composer.json'), $composerJson = 'custom composer.json!');
 
         $this->assertFileExists(base_path('composer.json'));
+        $this->assertFileDoesNotExist($filesystemsConfig = $this->exportPath('config/filesystems.php'));
 
         $this->exportCoolRunnings();
 
         $this->assertEquals($composerJson, $this->files->get($this->targetPath('composer.json')));
+        $this->assertFileExists($filesystemsConfig);
     }
 
     #[Test]
@@ -1556,6 +1558,43 @@ EOT
         ]);
 
         $this->cleanPaths($paths);
+    }
+
+    #[Test]
+    public function it_can_help_migrate_to_new_package_folder_convention()
+    {
+        $this->setExportPaths([
+            'config',
+        ]);
+
+        $this->files->move(base_path('package/starter-kit.yaml'), base_path('starter-kit.yaml'));
+        $this->files->put($this->targetPath('starter-kit.yaml'), 'this should get stomped!');
+        $this->files->put($this->targetPath('composer.json'), $packageComposerJson = 'custom composer.json!');
+        $this->files->deleteDirectory(base_path('package'));
+
+        $this->assertFileDoesNotExist(base_path('package'));
+        $this->assertFileDoesNotExist($filesystemsConfig = $this->exportPath('config/filesystems.php'));
+
+        $this->exportCoolRunnings()
+            // ->expectsOutput('Starter kit config moved to [package/starter-kit.yaml].') // TODO: Why does this work in InstallTest?
+            // ->expectsOutput('Composer package config moved to [package/composer.json].') // TODO: Why does this work in InstallTest?
+            ->assertSuccessful();
+
+        $this->assertFileDoesNotExist(base_path('starter-kit.yaml'));
+        $this->assertFileExists(base_path('package/starter-kit.yaml'));
+
+        $expectedConfig = [
+            'export_paths' => [
+                'config',
+            ],
+        ];
+
+        $this->assertEquals($expectedConfig, YAML::parse($this->files->get(base_path('package/starter-kit.yaml'))));
+        $this->assertEquals($expectedConfig, YAML::parse($this->files->get($this->targetPath('starter-kit.yaml'))));
+
+        $this->assertEquals($packageComposerJson, $this->files->get($this->targetPath('composer.json')));
+
+        $this->assertFileExists($filesystemsConfig);
     }
 
     private function targetPath($path = null)
