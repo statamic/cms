@@ -7,6 +7,13 @@ export default {
         HasFieldActions,
     ],
 
+    inject: {
+        fieldActionStoreName: {
+            from: 'storeName',
+            default: null,
+        }
+    },
+
     props: {
         value: {
             required: true
@@ -94,6 +101,8 @@ export default {
                 update: this.update,
                 updateMeta: this.updateMeta,
                 isReadOnly: this.isReadOnly,
+                store: this.$store,
+                storeName: this.fieldActionStoreName,
             };
         },
 

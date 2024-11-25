@@ -92,7 +92,7 @@ export default {
         HasFieldActions,
     ],
 
-    inject: ['replicatorSets'],
+    inject: ['replicatorSets', 'storeName'],
 
     props: {
         config: {
@@ -208,6 +208,8 @@ export default {
                 update: (handle, value) => this.updated(handle, value),
                 updateMeta: (handle, value) => this.metaUpdated(handle, value),
                 isReadOnly: this.isReadOnly,
+                store: this.$store,
+                storeName: this.storeName,
             };
         },
 
