@@ -135,6 +135,7 @@ export default {
                 'form-group publish-field',
                 `${this.field.type}-fieldtype`,
                 `${tailwind_width_class(this.field.width)}`,
+                this.showLabel ? 'has-field-label' : '',
                 this.shouldShowFieldActions ? 'has-field-dropdown' : '',
                 this.isReadOnly ? 'read-only-field' : '',
                 this.field.classes || '',
