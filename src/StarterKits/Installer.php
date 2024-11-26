@@ -334,7 +334,9 @@ final class Installer
 
         $name = str_replace('_', ' ', $key);
 
-        if ($shouldPrompt && $this->isInteractive && ! confirm(Arr::get($config, 'prompt', "Would you like to install the [{$name}] module?"), false)) {
+        $default = Arr::get($config, 'default', false);
+
+        if ($shouldPrompt && $this->isInteractive && ! confirm(Arr::get($config, 'prompt', "Would you like to install the [{$name}] module?"), $default)) {
             return false;
         } elseif ($shouldPrompt && ! $this->isInteractive) {
             return false;
