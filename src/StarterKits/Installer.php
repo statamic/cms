@@ -338,7 +338,7 @@ final class Installer
 
         if ($shouldPrompt && $this->isInteractive && ! confirm(Arr::get($config, 'prompt', "Would you like to install the [{$name}] module?"), $default)) {
             return false;
-        } elseif ($shouldPrompt && ! $this->isInteractive) {
+        } elseif ($shouldPrompt && ! $this->isInteractive && ! $default) {
             return false;
         }
 
