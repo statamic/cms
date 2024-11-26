@@ -754,8 +754,8 @@ EOT;
         ]);
 
         // Ensure `Composer::requireDev()` gets called with `package:branch`
-        $this->assertEquals(Blink::get('composer-require-dev-package'), 'statamic/cool-runnings');
-        $this->assertEquals(Blink::get('composer-require-dev-branch'), 'dev-custom-branch');
+        $this->assertEquals(Blink::get('composer-require-package'), 'statamic/cool-runnings');
+        $this->assertEquals(Blink::get('composer-require-branch'), 'dev-custom-branch');
 
         // But ensure the rest of the installer handles parsed `package` without branch messing things up
         $this->assertFalse(Blink::has('starter-kit-repository-added'));
@@ -777,8 +777,8 @@ EOT;
         ]);
 
         // Ensure `Composer::requireDev()` gets called with `package:branch`
-        $this->assertEquals(Blink::get('composer-require-dev-package'), 'statamic/cool-runnings');
-        $this->assertEquals(Blink::get('composer-require-dev-branch'), 'dev-feature/custom-branch');
+        $this->assertEquals(Blink::get('composer-require-package'), 'statamic/cool-runnings');
+        $this->assertEquals(Blink::get('composer-require-branch'), 'dev-feature/custom-branch');
 
         // But ensure the rest of the installer handles parsed `package` without branch messing things up
         $this->assertFalse(Blink::has('starter-kit-repository-added'));
