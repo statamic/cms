@@ -14,6 +14,7 @@ use Statamic\Console\Commands\StarterKitInstall as InstallCommand;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Config;
 use Statamic\Facades\YAML;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Tests\Fakes\Composer\FakeComposer;
 use Tests\TestCase;
@@ -56,6 +57,7 @@ class InstallTest extends TestCase
         $this->assertFalse(Blink::has('starter-kit-repository-added'));
         $this->assertFileDoesNotExist($this->kitVendorPath());
         $this->assertFileDoesNotExist(base_path('composer.json.bak'));
+        $this->assertComposerJsonDoesntHavePackage('statamic/cool-runnings');
         $this->assertComposerJsonDoesntHave('repositories');
         $this->assertFileExists(base_path('copied.md'));
     }
@@ -229,6 +231,7 @@ class InstallTest extends TestCase
 
         // Keep package around
         $this->assertFileExists($this->kitVendorPath());
+        $this->assertComposerJsonHasPackage('require', 'statamic/cool-runnings');
 
         // But ensure we still delete backup composer.json, which is only used for error handling purposes
         $this->assertFileDoesNotExist(base_path('composer.json.bak'));
@@ -258,6 +261,7 @@ class InstallTest extends TestCase
 
         // Keep package around
         $this->assertFileExists($this->kitVendorPath());
+        $this->assertComposerJsonHasPackage('require', 'statamic/cool-runnings');
 
         // As well as custom repository, which will be needed for composer updates, if it was needed for install
         $composerJson = json_decode($this->files->get(base_path('composer.json')), true);
@@ -1663,6 +1667,21 @@ EOT;
         $this->assertFileExists($path);
 
         $this->assertStringNotContainsString($expected, $this->files->get($path));
+    }
+
+    private function assertComposerJsonHasPackage($requireKey, $package)
+    {
+        $composerJson = json_decode($this->files->get(base_path('composer.json')), true);
+
+        $this->assertTrue(Arr::has($composerJson, "{$requireKey}.{$package}"));
+    }
+
+    private function assertComposerJsonDoesntHavePackage($package)
+    {
+        $composerJson = json_decode($this->files->get(base_path('composer.json')), true);
+
+        $this->assertFalse(Arr::has($composerJson, "require.{$package}"));
+        $this->assertFalse(Arr::has($composerJson, "require-dev.{$package}"));
     }
 
     private function assertComposerJsonHasPackageVersion($requireKey, $package, $version)
