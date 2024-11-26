@@ -325,9 +325,11 @@ final class Installer
 
         $name = str_replace('_', ' ', $key);
 
-        if ($shouldPrompt && $this->isInteractive && ! confirm(Arr::get($config, 'prompt', "Would you like to install the [{$name}] module?"), false)) {
+        $default = Arr::get($config, 'default', false);
+
+        if ($shouldPrompt && $this->isInteractive && ! confirm(Arr::get($config, 'prompt', "Would you like to install the [{$name}] module?"), $default)) {
             return false;
-        } elseif ($shouldPrompt && ! $this->isInteractive) {
+        } elseif ($shouldPrompt && ! $this->isInteractive && ! $default) {
             return false;
         }
 
@@ -339,19 +341,27 @@ final class Installer
      */
     protected function instantiateSelectModule(array $config, string $key): InstallableModule|array|bool
     {
+        $skipOptionLabel = Arr::get($config, 'skip_option', 'No');
+        $skipModuleValue = 'skip_module';
+
         $options = collect($config['options'])
             ->map(fn ($option, $optionKey) => Arr::get($option, 'label', ucfirst($optionKey)))
-            ->prepend(Arr::get($config, 'skip_option', 'No'), $skipModule = 'skip_module')
+            ->when($skipOptionLabel !== false, fn ($c) => $c->prepend($skipOptionLabel, $skipModuleValue))
             ->all();
 
         $name = str_replace('_', ' ', $key);
 
-        $choice = select(
-            label: Arr::get($config, 'prompt', "Would you like to install one of the following [{$name}] modules?"),
-            options: $options,
-        );
+        if ($this->isInteractive) {
+            $choice = select(
+                label: Arr::get($config, 'prompt', "Would you like to install one of the following [{$name}] modules?"),
+                options: $options,
+                default: Arr::get($config, 'default'),
+            );
+        } elseif (! $this->isInteractive && ! $choice = Arr::get($config, 'default')) {
+            return false;
+        }
 
-        if ($choice === $skipModule) {
+        if ($choice === $skipModuleValue) {
             return false;
         }
 
