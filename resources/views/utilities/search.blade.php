@@ -42,7 +42,7 @@
                 @foreach (\Statamic\Facades\Search::indexes() as $index)
                     <tr>
                         <td class="flex items-center">
-                            @cp_svg('search-drivers/' . $index->config()['driver'], 'w-6 h-6 rtl:ml-2 ltr:mr-2', 'unknown')
+                            @cp_svg('search-drivers/' . $index->config()['driver'], 'w-6 h-6 rtl:ml-2 ltr:mr-2 shrink-0', 'unknown')
                             <div class="text-gray-800 dark:text-dark-150 leading-none">{{ $index->title() }}</div>
                         </td>
                         <td>
