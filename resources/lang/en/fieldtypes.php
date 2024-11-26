@@ -22,6 +22,7 @@ return [
     'assets.dynamic_folder_pending_field' => 'This field will be available once :field is set.',
     'assets.dynamic_folder_pending_save' => 'This field will be available after saving.',
     'assets.title' => 'Assets',
+    'asset_folders.config.container' => 'Choose which asset container to use for this field.',
     'bard.config.allow_source' => 'Enable to view the HTML source code while writing.',
     'bard.config.always_show_set_button' => 'Enable to always show the "Add Set" button.',
     'bard.config.buttons' => 'Choose which buttons to show in the toolbar.',

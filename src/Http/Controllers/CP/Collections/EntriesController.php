@@ -101,7 +101,7 @@ class EntriesController extends CpController
             $blueprint->ensureFieldHasConfig('author', ['visibility' => 'read_only']);
         }
 
-        [$values, $meta] = $this->extractFromFields($entry, $blueprint);
+        [$values, $meta, $extraValues] = $this->extractFromFields($entry, $blueprint);
 
         if ($hasOrigin = $entry->hasOrigin()) {
             [$originValues, $originMeta] = $this->extractFromFields($entry->origin(), $blueprint);
@@ -121,6 +121,7 @@ class EntriesController extends CpController
                 'editBlueprint' => cp_route('collections.blueprints.edit', [$collection, $blueprint]),
             ],
             'values' => array_merge($values, ['id' => $entry->id()]),
+            'extraValues' => $extraValues,
             'meta' => $meta,
             'collection' => $collection->handle(),
             'collectionHasRoutes' => ! is_null($collection->route($entry->locale())),
@@ -270,11 +271,12 @@ class EntriesController extends CpController
             $saved = $entry->updateLastModified(User::current())->save();
         }
 
-        [$values] = $this->extractFromFields($entry, $blueprint);
+        [$values, $meta, $extraValues] = $this->extractFromFields($entry, $blueprint);
 
         return [
             'data' => array_merge((new EntryResource($entry->fresh()))->resolve()['data'], [
                 'values' => $values,
+                'extraValues' => $extraValues,
             ]),
             'saved' => $saved,
         ];
@@ -321,6 +323,9 @@ class EntriesController extends CpController
                 'save' => cp_route('collections.entries.store', [$collection->handle(), $site->handle()]),
             ],
             'values' => $values->all(),
+            'extraValues' => [
+                'depth' => 1,
+            ],
             'meta' => $fields->meta(),
             'collection' => $collection->handle(),
             'collectionCreateLabel' => $collection->createLabel(),

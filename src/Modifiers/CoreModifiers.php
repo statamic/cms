@@ -96,6 +96,10 @@ class CoreModifiers extends Modifier
      */
     public function ampersandList($value, $params)
     {
+        if ($value instanceof Collection) {
+            $value = $value->all();
+        }
+
         if (! is_array($value)) {
             return $value;
         }

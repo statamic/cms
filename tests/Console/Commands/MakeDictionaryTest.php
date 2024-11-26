@@ -1,11 +1,10 @@
 <?php
 
-namespace Console\Commands;
+namespace Tests\Console\Commands;
 
 use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Filesystem\Filesystem;
 use PHPUnit\Framework\Attributes\Test;
-use Tests\Console\Commands\Concerns;
 use Tests\TestCase;
 
 class MakeDictionaryTest extends TestCase
