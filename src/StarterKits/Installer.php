@@ -250,7 +250,7 @@ final class Installer
                     : $this->package;
 
                 try {
-                    Composer::withoutQueue()->throwOnFailure()->requireDev($package);
+                    Composer::withoutQueue()->throwOnFailure()->require($package);
                 } catch (ProcessException $exception) {
                     $this->rollbackWithError("Error installing starter kit [{$package}].", $exception->getMessage());
                 }
@@ -555,7 +555,7 @@ EOT;
         spin(
             function () {
                 if (Composer::isInstalled($this->package)) {
-                    Composer::withoutQueue()->throwOnFailure(false)->removeDev($this->package);
+                    Composer::withoutQueue()->throwOnFailure(false)->remove($this->package);
                 }
             },
             'Cleaning up temporary files...'
