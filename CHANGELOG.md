@@ -1,5 +1,23 @@
 # Release Notes
 
+## 5.40.0 (2024-11-26)
+
+### What's new
+- Add `default` config for select starter kit modules [#11045](https://github.com/statamic/cms/issues/11045) by @jesseleite
+- Include store in field action payload [#11161](https://github.com/statamic/cms/issues/11161) by @jacksleight
+
+### What's fixed
+- Slight adjustments to the search index table [#11171](https://github.com/statamic/cms/issues/11171) by @daun
+- Fix translations of Statamic [#11175](https://github.com/statamic/cms/issues/11175) by @jasonvarga
+- Dutch translations [#11174](https://github.com/statamic/cms/issues/11174) by @Pluuk
+- Filter out empty values in keyed array field [#11138](https://github.com/statamic/cms/issues/11138) by @duncanmcclean
+- Fix field actions dark mode [#11167](https://github.com/statamic/cms/issues/11167) by @jacksleight
+- Fix field action nested alignment [#11165](https://github.com/statamic/cms/issues/11165) by @jacksleight
+- Fix inline bard expand/collapse actions [#11166](https://github.com/statamic/cms/issues/11166) by @jacksleight
+- Fix field actions when display is hidden [#11158](https://github.com/statamic/cms/issues/11158) by @jacksleight
+
+
+
 ## 5.39.0 (2024-11-22)
 
 ### What's new
