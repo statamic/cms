@@ -780,12 +780,18 @@ EOT;
             ],
             'modules' => [
                 'seo' => [
-                    'prompt' => false, // Setting `prompt: false` skips confirmation, so this module should still get installed
+                    'prompt' => false, // Setting `prompt: false` normally skips confirmation and ensures it always gets installed
                     'export_paths' => [
                         'resources/css/seo.css',
                     ],
                     'dependencies' => [
                         'statamic/seo-pro' => '^0.2.0',
+                    ],
+                ],
+                'hockey' => [
+                    'default' => true, // Setting `default: true` will still ask user for confirmation, but should still get installed non-interactively
+                    'export_paths' => [
+                        'resources/css/hockey.css',
                     ],
                 ],
                 'bobsled' => [
@@ -797,13 +803,13 @@ EOT;
                     ],
                 ],
                 'jamaica' => [
-                    'prompt' => false, // Setting `prompt: false` skips confirmation, so this module should still get installed
+                    'prompt' => false, // Setting `prompt: false` normally skips confirmation and ensures it always gets installed
                     'export_as' => [
                         'resources/css/theme.css' => 'resources/css/jamaica.css',
                     ],
                 ],
                 'js' => [
-                    'default' => 'vue', // Setting a `default` option, so this module should still get installed
+                    'default' => 'vue', // Setting a `default` option will still ask user for confirmation, but should still get installed non-interactively
                     'options' => [
                         'react' => [
                             'label' => 'React JS',
@@ -834,6 +840,7 @@ EOT;
 
         $this->assertFileDoesNotExist(base_path('copied.md'));
         $this->assertFileDoesNotExist(base_path('resources/css/seo.css'));
+        $this->assertFileDoesNotExist(base_path('resources/css/hockey.css'));
         $this->assertFileDoesNotExist(base_path('resources/css/bobsled.css'));
         $this->assertFileDoesNotExist(base_path('resources/css/theme.css'));
         $this->assertComposerJsonDoesntHave('statamic/seo-pro');
@@ -846,6 +853,7 @@ EOT;
 
         $this->assertFileExists(base_path('copied.md'));
         $this->assertFileExists(base_path('resources/css/seo.css'));
+        $this->assertFileExists(base_path('resources/css/hockey.css'));
         $this->assertFileDoesNotExist(base_path('resources/css/bobsled.css'));
         $this->assertFileExists(base_path('resources/css/theme.css'));
         $this->assertComposerJsonHasPackageVersion('require', 'statamic/seo-pro', '^0.2.0');
