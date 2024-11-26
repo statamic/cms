@@ -40,10 +40,10 @@
             </thead>
             <tbody>
                 @foreach (\Statamic\Facades\Search::indexes() as $index)
-                    <tr>
-                        <td class="flex items-center">
+                    <tr class="align-top">
+                        <td class="flex items-start">
                             @cp_svg('search-drivers/' . $index->config()['driver'], 'w-6 h-6 rtl:ml-2 ltr:mr-2 shrink-0', 'unknown')
-                            <div class="text-gray-800 dark:text-dark-150 leading-none">{{ $index->title() }}</div>
+                            <div class="text-gray-800 dark:text-dark-150 mt-1 leading-none">{{ $index->title() }}</div>
                         </td>
                         <td>
                             {{ ucwords($index->config()['driver']) }}
@@ -64,7 +64,7 @@
                         <td>
                             <div class="text-sm text-gray flex flex-wrap">
                                 @foreach($index->config()['fields'] as $field)
-                                    <div class="rtl:ml-2 ltr:mr-2 badge-pill-sm">
+                                    <div class="rtl:ml-2 ltr:mr-2 mb-1 badge-pill-sm">
                                         {{ $field }}
                                     </div>
                                 @endforeach
