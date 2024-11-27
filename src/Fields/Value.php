@@ -11,6 +11,7 @@ use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\Facades\Compare;
 use Statamic\Support\Str;
 use Statamic\View\Antlers\Language\Parser\DocumentTransformer;
+use Traversable;
 
 class Value implements IteratorAggregate, JsonSerializable
 {
@@ -111,7 +112,9 @@ class Value implements IteratorAggregate, JsonSerializable
     #[\ReturnTypeWillChange]
     public function getIterator()
     {
-        return new ArrayIterator($this->value());
+        $value = $this->value();
+
+        return $value instanceof Traversable ? $value : new ArrayIterator($value);
     }
 
     public function shouldParseAntlers()

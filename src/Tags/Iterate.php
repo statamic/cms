@@ -39,8 +39,6 @@ class Iterate extends Tags
     {
         [$keyKey, $valueKey] = $this->getKeyNames();
 
-        $items = $items instanceof Value ? $items->value() : $items;
-
         $items = collect($items)
             ->map(function ($value, $key) use ($keyKey, $valueKey) {
                 return [$keyKey => $key, $valueKey => $value];
