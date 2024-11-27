@@ -213,6 +213,36 @@ class ValueTest extends TestCase
             $this->assertSame(false, $value->value());
         });
     }
+
+    #[Test]
+    public function it_can_iterate()
+    {
+        $value = new Value(['alfa' => 'one', 'bravo' => 'two']);
+
+        $result = [];
+
+        foreach ($value as $key => $item) {
+            $result[] = $key.','.$item;
+        }
+
+        $this->assertEquals(['alfa,one', 'bravo,two'], $result);
+    }
+
+    #[Test]
+    public function it_can_iterate_if_value_is_already_iterable()
+    {
+        $value = new Value(
+            collect(['alfa' => 'one', 'bravo' => 'two'])
+        );
+
+        $result = [];
+
+        foreach ($value as $key => $item) {
+            $result[] = $key.','.$item;
+        }
+
+        $this->assertEquals(['alfa,one', 'bravo,two'], $result);
+    }
 }
 
 class DummyAugmentable implements \Statamic\Contracts\Data\Augmentable
