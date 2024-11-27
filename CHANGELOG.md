@@ -1,5 +1,12 @@
 # Release Notes
 
+## 5.41.0 (2024-11-27)
+
+### What's new
+- PHP 8.4 Support [#11114](https://github.com/statamic/cms/issues/11114) by @duncanmcclean
+
+
+
 ## 5.40.0 (2024-11-26)
 
 ### What's new
