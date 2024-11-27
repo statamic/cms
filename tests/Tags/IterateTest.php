@@ -9,37 +9,14 @@ use Tests\TestCase;
 class IterateTest extends TestCase
 {
     #[Test]
-    public function arrays_work()
+    public function it_iterates()
     {
-        $template = '{{ foreach:group_field }}{{ key }} - {{ value }} {{ /foreach:group_field }}';
+        $template = '{{ foreach:fieldname }}<{{ key }},{{ value }}>{{ /foreach:fieldname }}';
 
-        $this->assertSame(
-            'first - One second - Two ',
-            $this->tag($template, [
-                'group_field' => [
-                    'first' => 'One',
-                    'second' => 'Two',
-                ],
-            ])
-        );
-    }
-
-    #[Test]
-    public function values_work()
-    {
-        $this->markTestSkipped('needs implementation');
-
-        $template = '{{ foreach:group_field }}{{ key }} - {{ value }} {{ /foreach:group_field }}';
-
-        $this->assertSame(
-            'first - One second - Two ',
-            $this->tag($template, [
-                'group_field' => [
-                    'first' => 'One',
-                    'second' => 'Two',
-                ],
-            ])
-        );
+        $this->assertSame('<alfa,one><bravo,two>', $this->tag($template, ['fieldname' => [
+            'alfa' => 'one',
+            'bravo' => 'two',
+        ]]));
     }
 
     private function tag($tag, $context = [])
