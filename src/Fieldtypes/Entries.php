@@ -18,6 +18,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Resources\CP\Entries\EntriesFieldtypeEntries;
 use Statamic\Http\Resources\CP\Entries\EntriesFieldtypeEntry as EntryResource;
+use Statamic\Query\EmptyQueryBuilder;
 use Statamic\Query\OrderedQueryBuilder;
 use Statamic\Query\Scopes\Filter;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
@@ -337,6 +338,10 @@ class Entries extends Relationship
 
     private function queryBuilder($values)
     {
+        if (! $values) {
+            return new StatusQueryBuilder(new EmptyQueryBuilder());
+        }
+
         $site = Site::current()->handle();
         if (($parent = $this->field()->parent()) && $parent instanceof Localization) {
             $site = $parent->locale();

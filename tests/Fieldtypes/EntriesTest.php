@@ -15,6 +15,7 @@ use Statamic\Facades;
 use Statamic\Facades\Site;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Entries;
+use Statamic\Query\EmptyQueryBuilder;
 use Tests\Fieldtypes\Concerns\TestsQueryableValueWithMaxItems;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -79,6 +80,11 @@ class EntriesTest extends TestCase
     public function it_augments_to_a_query_builder_when_theres_no_value()
     {
         $augmented = $this->fieldtype()->augment(null);
+
+        $this->assertInstanceOf(Builder::class, $augmented);
+        $this->assertCount(0, $augmented->get());
+
+        $augmented = $this->fieldtype()->augment([]);
 
         $this->assertInstanceOf(Builder::class, $augmented);
         $this->assertCount(0, $augmented->get());
