@@ -4,10 +4,12 @@ namespace Tests\Console\Commands;
 
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Facades\Queue;
+use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Console\Commands\StaticWarmJob;
 use Statamic\Facades\Collection;
+use Statamic\StaticCaching\Cacher;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -38,6 +40,21 @@ class StaticWarmTest extends TestCase
 
         $this->artisan('statamic:static:warm')
             ->expectsOutput('Visiting 2 URLs...')
+            ->assertExitCode(0);
+    }
+
+    #[Test]
+    public function it_only_visits_uncached_urls_when_the_eco_option_is_used()
+    {
+        $mock = Mockery::mock(Cacher::class);
+        $mock->shouldReceive('hasCachedPage')->times(2)->andReturn(true, false);
+        $mock->allows('isExcluded')->andReturn(false);
+        app()->instance(Cacher::class, $mock);
+
+        config(['statamic.static_caching.strategy' => 'half']);
+
+        $this->artisan('statamic:static:warm', ['--eco' => true])
+            ->expectsOutput('Visiting 1 URLs...')
             ->assertExitCode(0);
     }
 
