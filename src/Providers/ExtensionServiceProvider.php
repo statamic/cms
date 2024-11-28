@@ -336,7 +336,7 @@ class ExtensionServiceProvider extends ServiceProvider
         }
 
         foreach ($this->app['files']->allFiles($path) as $file) {
-            $relativePathOfFolder = str_replace(app_path('/'),'' ,$file->getPath());
+            $relativePathOfFolder = str_replace(app_path('/'), '', $file->getPath());
             $namespace = str_replace('/', '\\', $relativePathOfFolder);
             $class = $file->getBasename('.php');
 
