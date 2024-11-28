@@ -91,7 +91,7 @@ class Tags extends BaseTags
         }
 
         $knownParams = array_merge(static::HANDLE_PARAM, [
-            'redirect', 'error_redirect', 'allow_request_redirect', 'csrf', 'files', 'js',
+            'redirect', 'error_redirect', 'allow_request_redirect', 'csrf', 'files', 'js', 'original_url',
         ]);
 
         $action = $this->params->get('action', $form->actionUrl());
@@ -104,7 +104,9 @@ class Tags extends BaseTags
         }
         $attrs = $this->runHooks('attrs', ['attrs' => $attrs, 'data' => $data])['attrs'];
 
-        $params = [];
+        $params = [
+            'original_url' => request()->url(),
+        ];
 
         if ($redirect = $this->getRedirectUrl()) {
             $params['redirect'] = $this->parseRedirect($redirect);
