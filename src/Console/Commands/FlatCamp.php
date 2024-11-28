@@ -40,7 +40,7 @@ class FlatCamp extends Command
 {
     use RunsInPlease;
 
-    protected $signature = 'flat:camp';
+    protected $signature = 'statamic:flat:camp';
     protected $description = 'Flat Camp';
 
     protected $quotes = [
