@@ -4,11 +4,13 @@ namespace Tests\Tags\Form;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Form;
+use Statamic\Facades\Site;
 use Statamic\Statamic;
 
 class FormCreateTest extends FormTestCase
@@ -51,6 +53,16 @@ class FormCreateTest extends FormTestCase
 
         $this->assertStringContainsString('<input type="hidden" name="_redirect" value="http://localhost#form" />', $output);
         $this->assertStringContainsString('<input type="hidden" name="_error_redirect" value="http://localhost#form" />', $output);
+    }
+
+    #[Test]
+    public function it_renders_original_url()
+    {
+        Request::swap(Request::create('http://localhost/contact'));
+
+        $output = $this->tag('{{ form:contact }}');
+
+        $this->assertStringContainsString('<input type="hidden" name="_original_url" value="http://localhost/contact" />', $output);
     }
 
     #[Test]
@@ -802,6 +814,53 @@ EOT
 
         $this->assertEquals($expected, $errors[1]);
         $this->assertEquals($expectedInline, $inlineErrors[1]);
+    }
+
+    #[Test]
+    public function it_uses_original_url_to_localize_error_messages()
+    {
+        trans()->addLines([
+            'validation.required' => 'Das :attribute Feld ist erforderlich.',
+        ], 'de');
+
+        Site::setSites([
+            'default' => [
+                'name' => 'English',
+                'url' => '/',
+                'locale' => 'en_US',
+            ],
+            'german' => [
+                'name' => 'German',
+                'url' => '/de/',
+                'locale' => 'de_DE',
+            ],
+        ]);
+
+        $this->assertEmpty(Form::find('contact')->submissions());
+
+        $this
+            ->post('/!/forms/contact', [
+                '_original_url' => 'http://localhost/de/contact',
+                'email' => 'san@holo.com',
+                'message' => '',
+            ])
+            ->assertSessionHasErrors(['message'], null, 'form.contact')
+            ->assertLocation('/');
+
+        $this->assertEmpty(Form::find('contact')->submissions());
+
+        $output = $this->tag(<<<'EOT'
+{{ form:contact }}
+    {{ errors }}
+        <p class="error">{{ value }}</p>
+    {{ /errors }}
+    <p class="inline-error">{{ error:name }}</p>
+{{ /form:contact }}
+EOT
+        );
+
+        $this->assertStringContainsString('<p class="error">Das Message Feld ist erforderlich.</p>', $output);
+        $this->assertStringNotContainsString('<p class="error">The Message field is required.</p>', $output);
     }
 
     #[Test]
