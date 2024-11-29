@@ -1,5 +1,7 @@
 <?php
 
+namespace Tests\Validation;
+
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Facades\Validator;
 use PHPUnit\Framework\Attributes\Test;
