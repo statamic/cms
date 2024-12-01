@@ -28,7 +28,7 @@ class StacheUserRepositoryTest extends TestCase
     #[Test]
     public function it_gets_the_custom_class()
     {
-        Config::set('statamic.users.repositories.file.class', CustomFileUser::class);
+        Config::set('statamic.users.class', CustomFileUser::class);
         $this->assertInstanceOf(CustomFileUser::class, User::make());
     }
 }
