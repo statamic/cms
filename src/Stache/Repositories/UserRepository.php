@@ -15,13 +15,9 @@ use Statamic\Stache\Stache;
 class UserRepository extends BaseRepository
 {
     protected $stache;
-
     protected $store;
-
     protected $config;
-
     protected $roleRepository = RoleRepository::class;
-
     protected $userGroupRepository = UserGroupRepository::class;
 
     public function __construct(Stache $stache, array $config = [])
