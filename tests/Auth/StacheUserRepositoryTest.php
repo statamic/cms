@@ -2,7 +2,9 @@
 
 namespace Tests\Auth;
 
+use Illuminate\Support\Facades\Config;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\File\User;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -22,7 +24,16 @@ class StacheUserRepositoryTest extends TestCase
     {
         return FakeStacheUser::class;
     }
+
+    #[Test]
+    public function it_gets_the_custom_class()
+    {
+        Config::set('statamic.users.repositories.file.class', CustomFileUser::class);
+        $this->assertInstanceOf(CustomFileUser::class, User::make());
+    }
 }
+
+class CustomFileUser extends \Statamic\Auth\File\User {}
 
 class FakeStacheUser extends \Statamic\Auth\File\User
 {
