@@ -28,12 +28,10 @@ class StacheUserRepositoryTest extends TestCase
     #[Test]
     public function it_gets_the_custom_class()
     {
-        Config::set('statamic.users.class', CustomFileUser::class);
-        $this->assertInstanceOf(CustomFileUser::class, User::make());
+        Config::set('statamic.users.class', FakeStacheUser::class);
+        $this->assertInstanceOf(FakeStacheUser::class, User::make());
     }
 }
-
-class CustomFileUser extends \Statamic\Auth\File\User {}
 
 class FakeStacheUser extends \Statamic\Auth\File\User
 {

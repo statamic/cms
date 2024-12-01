@@ -110,7 +110,7 @@ class UserRepository extends BaseRepository
     public static function bindings(): array
     {
         return [
-            UserContract::class => User::class,
+            UserContract::class => config('statamic.users.class', User::class),
         ];
     }
 
