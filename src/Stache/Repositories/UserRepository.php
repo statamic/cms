@@ -84,7 +84,7 @@ class UserRepository extends BaseRepository
     public static function bindings(): array
     {
         return [
-            User::class => FileUser::class,
+            User::class => config('statamic.users.repositories.file.class', FileUser::class),
         ];
     }
 }
