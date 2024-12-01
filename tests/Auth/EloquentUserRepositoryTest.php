@@ -2,6 +2,7 @@
 
 namespace Tests\Auth;
 
+use Illuminate\Support\Facades\Config;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\User;
