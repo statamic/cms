@@ -9,6 +9,7 @@ use GuzzleHttp\Psr7\Message;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Console\Command;
+use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Collection;
 use Statamic\Console\EnhancesCommands;
@@ -179,9 +180,7 @@ class StaticWarm extends Command
             ->merge($this->additionalUris())
             ->unique()
             ->reject(function ($uri) use ($cacher) {
-                if ($this->option('uncached') &&
-                    $cacher->hasCachedPage(\Illuminate\Http\Request::create($uri))
-                ) {
+                if ($this->option('uncached') && $cacher->hasCachedPage(HttpRequest::create($uri))) {
                     return true;
                 }
 
