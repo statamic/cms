@@ -15,6 +15,7 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Config;
 use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Tests\Fakes\Composer\FakeComposer;
 use Tests\TestCase;
@@ -61,6 +62,7 @@ class InstallTest extends TestCase
         $this->assertFalse(Blink::has('starter-kit-repository-added'));
         $this->assertFileDoesNotExist($this->kitVendorPath());
         $this->assertFileDoesNotExist(base_path('composer.json.bak'));
+        $this->assertComposerJsonDoesntHavePackage('statamic/cool-runnings');
         $this->assertComposerJsonDoesntHave('repositories');
         $this->assertFileExists(base_path('copied.md'));
     }
@@ -256,6 +258,70 @@ class InstallTest extends TestCase
 
         $this->assertCount(2, $composerJson['repositories']);
         $this->assertEquals($expectedRepositories, $composerJson['repositories']);
+    }
+
+    #[Test]
+    public function it_installs_as_living_package_with_custom_config()
+    {
+        $this->setConfig([
+            'updatable' => true, // With `updatable: true`, kit should live on as composer updatable package
+            'export_paths' => [
+                'copied.md',
+            ],
+        ]);
+
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+
+        $this->installCoolRunnings();
+
+        $this->assertFileExists(base_path('copied.md'));
+        $this->assertComposerJsonDoesntHave('repositories');
+
+        // Keep package around
+        $this->assertFileExists($this->kitVendorPath());
+        $this->assertComposerJsonHasPackage('require', 'statamic/cool-runnings');
+
+        // But ensure we still delete backup composer.json, which is only used for error handling purposes
+        $this->assertFileDoesNotExist(base_path('composer.json.bak'));
+    }
+
+    #[Test]
+    public function it_leaves_custom_repository_for_living_packages_that_need_it()
+    {
+        $this->setConfig([
+            'updatable' => true, // With `updatable: true`, kit should live on as composer updatable package
+            'export_paths' => [
+                'copied.md',
+            ],
+        ]);
+
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertComposerJsonDoesntHave('repositories');
+
+        $this->installCoolRunnings([], [
+            'outpost.*' => Http::response(['data' => ['price' => null]], 200),
+            'github.com/*' => Http::response('', 200),
+            '*' => Http::response('', 404),
+        ]);
+
+        $this->assertFileExists(base_path('copied.md'));
+
+        // Keep package around
+        $this->assertFileExists($this->kitVendorPath());
+        $this->assertComposerJsonHasPackage('require', 'statamic/cool-runnings');
+
+        // As well as custom repository, which will be needed for composer updates, if it was needed for install
+        $composerJson = json_decode($this->files->get(base_path('composer.json')), true);
+        $this->assertCount(1, $composerJson['repositories']);
+        $this->assertEquals([[
+            'type' => 'vcs',
+            'url' => 'https://github.com/statamic/cool-runnings',
+        ]], $composerJson['repositories']);
+
+        // But delete backup composer.json, which is only used for error handling purposes
+        $this->assertFileDoesNotExist(base_path('composer.json.bak'));
     }
 
     #[Test]
@@ -737,8 +803,8 @@ EOT;
         ]);
 
         // Ensure `Composer::requireDev()` gets called with `package:branch`
-        $this->assertEquals(Blink::get('composer-require-dev-package'), 'statamic/cool-runnings');
-        $this->assertEquals(Blink::get('composer-require-dev-branch'), 'dev-custom-branch');
+        $this->assertEquals(Blink::get('composer-require-package'), 'statamic/cool-runnings');
+        $this->assertEquals(Blink::get('composer-require-branch'), 'dev-custom-branch');
 
         // But ensure the rest of the installer handles parsed `package` without branch messing things up
         $this->assertFalse(Blink::has('starter-kit-repository-added'));
@@ -760,8 +826,8 @@ EOT;
         ]);
 
         // Ensure `Composer::requireDev()` gets called with `package:branch`
-        $this->assertEquals(Blink::get('composer-require-dev-package'), 'statamic/cool-runnings');
-        $this->assertEquals(Blink::get('composer-require-dev-branch'), 'dev-feature/custom-branch');
+        $this->assertEquals(Blink::get('composer-require-package'), 'statamic/cool-runnings');
+        $this->assertEquals(Blink::get('composer-require-branch'), 'dev-feature/custom-branch');
 
         // But ensure the rest of the installer handles parsed `package` without branch messing things up
         $this->assertFalse(Blink::has('starter-kit-repository-added'));
@@ -1650,6 +1716,21 @@ EOT;
         $this->assertFileExists($path);
 
         $this->assertStringNotContainsString($expected, $this->files->get($path));
+    }
+
+    private function assertComposerJsonHasPackage($requireKey, $package)
+    {
+        $composerJson = json_decode($this->files->get(base_path('composer.json')), true);
+
+        $this->assertTrue(Arr::has($composerJson, "{$requireKey}.{$package}"));
+    }
+
+    private function assertComposerJsonDoesntHavePackage($package)
+    {
+        $composerJson = json_decode($this->files->get(base_path('composer.json')), true);
+
+        $this->assertFalse(Arr::has($composerJson, "require.{$package}"));
+        $this->assertFalse(Arr::has($composerJson, "require-dev.{$package}"));
     }
 
     private function assertComposerJsonHasPackageVersion($requireKey, $package, $version)

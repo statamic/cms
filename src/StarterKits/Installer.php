@@ -251,7 +251,7 @@ final class Installer
                     : $this->package;
 
                 try {
-                    Composer::withoutQueue()->throwOnFailure()->requireDev($package);
+                    Composer::withoutQueue()->throwOnFailure()->require($package);
                 } catch (ProcessException $exception) {
                     $this->rollbackWithError("Error installing starter kit [{$package}].", $exception->getMessage());
                 }
@@ -549,14 +549,14 @@ EOT;
      */
     public function removeStarterKit(): self
     {
-        if ($this->disableCleanup) {
+        if ($this->isUpdatable() || $this->disableCleanup) {
             return $this;
         }
 
         spin(
             function () {
                 if (Composer::isInstalled($this->package)) {
-                    Composer::withoutQueue()->throwOnFailure(false)->removeDev($this->package);
+                    Composer::withoutQueue()->throwOnFailure(false)->remove($this->package);
                 }
             },
             'Cleaning up temporary files...'
@@ -590,7 +590,7 @@ EOT;
      */
     protected function removeRepository(): self
     {
-        if ($this->fromLocalRepo || ! $this->url) {
+        if ($this->isUpdatable() || $this->fromLocalRepo || ! $this->url) {
             return $this;
         }
 
@@ -673,12 +673,22 @@ EOT;
      */
     protected function config(?string $key = null): mixed
     {
-        $config = collect(YAML::parse($this->files->get($this->starterKitPath('starter-kit.yaml'))));
+        $config = Blink::once('starter-kit-config', function () {
+            return collect(YAML::parse($this->files->get($this->starterKitPath('starter-kit.yaml'))));
+        });
 
         if ($key) {
             return $config->get($key);
         }
 
         return $config;
+    }
+
+    /**
+     * Should starter kit be treated as an updatable package, and live on for future composer updates, etc?
+     */
+    protected function isUpdatable(): bool
+    {
+        return (bool) $this->config('updatable');
     }
 }
