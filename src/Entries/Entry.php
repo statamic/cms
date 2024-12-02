@@ -142,9 +142,16 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         }
 
         $this->computedCallbackCache = null;
-        $this->collection = $collection instanceof \Statamic\Contracts\Entries\Collection ? $collection->handle() : $collection;
 
-        if (is_null($customClass = Collection::findByHandle($this->collection)->class())) {
+        if ($collection instanceof \Statamic\Contracts\Entries\Collection) {
+            $this->collection = $collection->handle();
+            $customClass = $collection->class();
+        } else {
+            $this->collection = $collection;
+            $customClass = Collection::findByHandle($this->collection)->class();
+        }
+
+        if (is_null($customClass)) {
             return $this;
         }
 
