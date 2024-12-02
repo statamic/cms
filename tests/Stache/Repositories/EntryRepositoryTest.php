@@ -261,4 +261,6 @@ class EntryRepositoryTest extends TestCase
     }
 }
 
-class CustomEntry extends \Statamic\Entries\Entry {}
+class CustomEntry extends \Statamic\Entries\Entry
+{
+}
