@@ -36,7 +36,7 @@ class StaticWarm extends Command
         {--u|user= : HTTP authentication user}
         {--p|password= : HTTP authentication password}
         {--insecure : Skip SSL verification}
-        {--eco : Only warm uncached URLs}
+        {--uncached : Only warm uncached URLs}
     ';
 
     protected $description = 'Warms the static cache by visiting all URLs';
@@ -179,7 +179,7 @@ class StaticWarm extends Command
             ->merge($this->additionalUris())
             ->unique()
             ->reject(function ($uri) use ($cacher) {
-                if ($this->option('eco') &&
+                if ($this->option('uncached') &&
                     $cacher->hasCachedPage(\Illuminate\Http\Request::create($uri))
                 ) {
                     return true;

@@ -53,7 +53,7 @@ class StaticWarmTest extends TestCase
 
         config(['statamic.static_caching.strategy' => 'half']);
 
-        $this->artisan('statamic:static:warm', ['--eco' => true])
+        $this->artisan('statamic:static:warm', ['--uncached' => true])
             ->expectsOutput('Visiting 1 URLs...')
             ->assertExitCode(0);
     }
