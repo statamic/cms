@@ -115,8 +115,14 @@ class EntryRepository implements RepositoryContract
         return app(QueryBuilder::class);
     }
 
-    public function make(): Entry
+    public function make(string $collectionHandle): Entry
     {
+        $collection = Collection::findByHandle($collectionHandle);
+
+        if ($customClass = $collection->class()) {
+            return app($customClass)->collection($collectionHandle);
+        }
+
         return app(Entry::class);
     }
 
