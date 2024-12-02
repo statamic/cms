@@ -2573,4 +2573,28 @@ class EntryTest extends TestCase
             ['7', '7'],
         ], $events->map(fn ($event) => [$event->entry->id(), $event->initiator->id()])->all());
     }
+
+    #[Test]
+    public function creates_custom_entry_class() {
+        $collection = tap(Collection::make('custom')->class(CustomEntry::class))->save();
+
+        $one = Facades\Entry::make()->slug('one')->collection($collection);
+        $two = Facades\Entry::make()->collection($collection)->slug('two');
+
+        $this->assertInstanceOf(CustomEntry::class, $one);
+        $this->assertInstanceOf(CustomEntry::class, $two);
+    }
+    #[Test]
+    public function hydrates_custom_entry() {
+        $collection = tap(Collection::make('custom')->class(CustomEntry::class))->save();
+        $entry = tap(Facades\Entry::make()->collection($collection))->save();
+
+        dd($entry->collection());
+        // Facades\Entry::find
+
+        // $this->assertInstanceOf(CustomEntry::class, $one);
+        // $this->assertInstanceOf(CustomEntry::class, $two);
+    }
 }
+
+class CustomEntry extends Entry {}
