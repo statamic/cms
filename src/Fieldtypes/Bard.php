@@ -370,7 +370,7 @@ class Bard extends Replicator
         }
 
         if (is_string($value)) {
-            $value = str_replace('statamic://', '', $value);
+            $value = str_replace('src="statamic://', 'src="', $value);
             $doc = (new Augmentor($this))->renderHtmlToProsemirror($value);
             $value = $doc['content'];
         } elseif ($this->isLegacyData($value)) {

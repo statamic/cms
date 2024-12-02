@@ -230,7 +230,7 @@ class Assets extends Fieldtype
         $action = Action::for($assetFolder, [
             'container' => $container->handle(),
             'folder' => $folder,
-        ])->first(fn ($action) => get_class($action) === RenameAssetFolder::class)->toArray();
+        ])->first(fn ($action) => get_class($action) === RenameAssetFolder::class)?->toArray();
 
         return [
             'url' => cp_route('assets.folders.actions.run', $container),
@@ -265,7 +265,9 @@ class Assets extends Fieldtype
 
         $query = new OrderedQueryBuilder($query, $ids);
 
-        return $single ? Blink::once($key, fn () => $query->first()) : $query;
+        return $single && ! config('statamic.system.always_augment_to_query', false)
+            ? Blink::once($key, fn () => $query->first())
+            : $query;
     }
 
     public function shallowAugment($values)

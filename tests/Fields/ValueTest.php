@@ -8,6 +8,7 @@ use Statamic\Facades\Blueprint;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
+use Statamic\Fields\Values;
 use Statamic\Query\Builder;
 use Tests\TestCase;
 
@@ -288,6 +289,26 @@ class ValueTest extends TestCase
         ]));
 
         $val = new Value($builder);
+
+        $arr = [];
+
+        foreach ($val as $key => $value) {
+            $arr[$key] = $value;
+        }
+
+        $this->assertEquals([
+            'a' => 'alfa',
+            'b' => 'bravo',
+        ], $arr);
+    }
+
+    #[Test]
+    public function it_can_iterate_over_values()
+    {
+        $val = new Value(new Values([
+            'a' => 'alfa',
+            'b' => 'bravo',
+        ]));
 
         $arr = [];
 

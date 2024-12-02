@@ -42,6 +42,7 @@ use Statamic\Http\Controllers\CP\Collections\ScaffoldCollectionController;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Controllers\CP\DashboardController;
 use Statamic\Http\Controllers\CP\DuplicatesController;
+use Statamic\Http\Controllers\CP\FieldActionModalController;
 use Statamic\Http\Controllers\CP\Fields\BlueprintController;
 use Statamic\Http\Controllers\CP\Fields\FieldsController;
 use Statamic\Http\Controllers\CP\Fields\FieldsetController;
@@ -317,6 +318,11 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::post('markdown', [MarkdownFieldtypeController::class, 'preview'])->name('markdown.preview');
         Route::post('files/upload', [FilesFieldtypeController::class, 'upload'])->name('files.upload');
         Route::get('dictionaries/{dictionary}', DictionaryFieldtypeController::class)->name('dictionary-fieldtype');
+    });
+
+    Route::group(['prefix' => 'field-action-modal'], function () {
+        Route::post('resolve', [FieldActionModalController::class, 'resolve'])->name('resolve');
+        Route::post('process', [FieldActionModalController::class, 'process'])->name('process');
     });
 
     Route::group(['prefix' => 'api', 'as' => 'api.'], function () {

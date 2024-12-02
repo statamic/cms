@@ -321,7 +321,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
     {
         $this->parent = $parent;
 
-        $this->resetFieldsCache();
+        $this->resetBlueprintCache()->resetFieldsCache();
 
         return $this;
     }

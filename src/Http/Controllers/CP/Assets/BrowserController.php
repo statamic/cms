@@ -82,35 +82,30 @@ class BrowserController extends CpController
 
         $folders = $folder->assetFolders();
         $totalFolders = $folders->count();
-        $folders = $folders->slice(($page - 1) * $perPage, $perPage);
         $lastFolderPage = (int) ceil($totalFolders / $perPage) ?: 1;
 
         $totalAssets = $folder->queryAssets()->count();
         $totalItems = $totalAssets + $totalFolders;
 
+        if ($request->sort) {
+            $sort = $request->sort;
+            $order = $request->order ?? 'asc';
+        } else {
+            $sort = $container->sortField();
+            $order = $container->sortDirection();
+        }
+
+        $sortByMethod = $order === 'desc' ? 'sortByDesc' : 'sortBy';
+
+        $folders = $folders->$sortByMethod(
+            fn (AssetFolder $folder) => method_exists($folder, $sort) ? $folder->$sort() : $folder->basename()
+        );
+
+        $folders = $folders->slice(($page - 1) * $perPage, $perPage);
+
         if ($page >= $lastFolderPage) {
             $query = $folder->queryAssets();
-
-            if ($sort = $request->sort) {
-                $sortByMethod = $request->order === 'desc' ? 'sortByDesc' : 'sortBy';
-
-                $folders = $folders->$sortByMethod(
-                    fn (AssetFolder $folder) => method_exists($folder, $sort) ? $folder->$sort() : $folder->basename()
-                );
-
-                $query->orderBy($request->sort, $request->order ?? 'asc');
-            } else {
-                $sort = $container->sortField();
-                $order = $container->sortDirection();
-                $sortByMethod = $request->order === 'desc' ? 'sortByDesc' : 'sortBy';
-
-                $folders = $folders->$sortByMethod(
-                    fn (AssetFolder $folder) => method_exists($folder, $sort) ? $folder->$sort() : $folder->basename()
-                );
-
-                $query->orderBy($sort, $order);
-            }
-
+            $query->orderBy($sort, $order);
             $this->applyQueryScopes($query, $request->all());
 
             $offset = $page === $lastFolderPage

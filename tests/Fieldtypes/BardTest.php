@@ -413,7 +413,7 @@ class BardTest extends TestCase
                 'content' => [
                     ['type' => 'text', 'text' => 'Second '],
                     ['type' => 'text', 'text' => 'paragraph', 'marks' => [
-                        ['type' => 'link', 'attrs' => ['href' => 'entry::foo']],
+                        ['type' => 'link', 'attrs' => ['href' => 'statamic://entry::foo']],
                     ]],
                     ['type' => 'text', 'text' => '. '],
                     ['type' => 'image', 'attrs' => [

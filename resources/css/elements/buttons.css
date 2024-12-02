@@ -190,7 +190,7 @@ button {
   ========================================================================== */
 
 .btn-group {
-    @apply flex items-center justify-start p-0;
+    @apply flex items-center justify-start p-0 cursor-auto;
     height: 2.375rem;
 
     button {
@@ -280,6 +280,19 @@ td .btn-icon {
 
 .btn-close {
     @apply rtl:mr-4 ltr:ml-4 text-center p-0 text-xl text-gray-600 dark:text-dark-150 rounded-full w-8 h-8 outline-none shrink-0 leading-none inline-flex items-center justify-center;
+
+    &:hover {
+        @apply bg-gray-400 dark:bg-dark-700;
+    }
+
+    &:active, &:focus:hover {
+        outline: none;
+        @apply bg-gray-500 dark:bg-dark-750;
+    }
+}
+
+.btn-quick-action {
+    @apply text-center p-0 text-xl text-gray-600 dark:text-dark-150 rounded-full w-8 h-8 outline-none shrink-0 leading-none inline-flex items-center justify-center;
 
     &:hover {
         @apply bg-gray-400 dark:bg-dark-700;
