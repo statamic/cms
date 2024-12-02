@@ -88,7 +88,7 @@ abstract class Module
             || $this->config()->has('modules');
 
         if (! $hasConfig) {
-            throw new StarterKitException('Starter-kit module is missing `export_paths`, `dependencies`, or nested `modules`!');
+            throw new StarterKitException('Starter-kit module is missing `export_paths`, `dependencies`, or nested `modules`.');
         }
 
         return $this;
