@@ -9,6 +9,7 @@ use GuzzleHttp\Psr7\Message;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Console\Command;
+use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Collection;
 use Statamic\Console\EnhancesCommands;
@@ -36,6 +37,7 @@ class StaticWarm extends Command
         {--u|user= : HTTP authentication user}
         {--p|password= : HTTP authentication password}
         {--insecure : Skip SSL verification}
+        {--uncached : Only warm uncached URLs}
     ';
 
     protected $description = 'Warms the static cache by visiting all URLs';
@@ -178,6 +180,10 @@ class StaticWarm extends Command
             ->merge($this->additionalUris())
             ->unique()
             ->reject(function ($uri) use ($cacher) {
+                if ($this->option('uncached') && $cacher->hasCachedPage(HttpRequest::create($uri))) {
+                    return true;
+                }
+
                 Site::resolveCurrentUrlUsing(fn () => $uri);
 
                 return $cacher->isExcluded($uri);
