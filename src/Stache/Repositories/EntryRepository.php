@@ -21,11 +21,8 @@ class EntryRepository implements RepositoryContract
     use AllowsScopes;
 
     protected $stache;
-
     protected $store;
-
     protected $substitutionsById = [];
-
     protected $substitutionsByUri = [];
 
     public function __construct(Stache $stache)
