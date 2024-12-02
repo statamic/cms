@@ -20,7 +20,6 @@ use Statamic\Facades\Term;
 use Statamic\Facades\User;
 use Statamic\GraphQL\Types\TermInterface;
 use Statamic\Http\Resources\CP\Taxonomies\TermsFieldtypeTerms as TermsResource;
-use Statamic\Query\EmptyQueryBuilder;
 use Statamic\Query\OrderedQueryBuilder;
 use Statamic\Query\Scopes\Filter;
 use Statamic\Query\Scopes\Filters\Fields\Terms as TermsFilter;
@@ -131,10 +130,6 @@ class Terms extends Relationship
 
     private function queryBuilder($values)
     {
-        if (! $values) {
-            return new EmptyQueryBuilder();
-        }
-
         // The parent is the item this terms fieldtype exists on. Most commonly an
         // entry, but could also be something else, like another taxonomy term.
         $parent = $this->field->parent();

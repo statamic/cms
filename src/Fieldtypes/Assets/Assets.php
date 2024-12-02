@@ -17,7 +17,6 @@ use Statamic\Facades\User;
 use Statamic\Fields\Fieldtype;
 use Statamic\GraphQL\Types\AssetInterface;
 use Statamic\Http\Resources\CP\Assets\Asset as AssetResource;
-use Statamic\Query\EmptyQueryBuilder;
 use Statamic\Query\Scopes\Filter;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -258,17 +257,13 @@ class Assets extends Fieldtype
             return Blink::get($key);
         }
 
-        if (! $values) {
-            $query = new EmptyQueryBuilder();
-        } else {
-            $ids = collect($values)
-                ->map(fn ($value) => $this->container()->handle().'::'.$value)
-                ->all();
+        $ids = collect($values)
+            ->map(fn ($value) => $this->container()->handle().'::'.$value)
+            ->all();
 
-            $query = $this->container()->queryAssets()->whereIn('path', $values);
+        $query = $this->container()->queryAssets()->whereIn('path', $values);
 
-            $query = new OrderedQueryBuilder($query, $ids);
-        }
+        $query = new OrderedQueryBuilder($query, $ids);
 
         return $single && ! config('statamic.system.always_augment_to_query', false)
             ? Blink::once($key, fn () => $query->first())
