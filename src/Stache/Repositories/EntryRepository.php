@@ -21,8 +21,11 @@ class EntryRepository implements RepositoryContract
     use AllowsScopes;
 
     protected $stache;
+
     protected $store;
+
     protected $substitutionsById = [];
+
     protected $substitutionsByUri = [];
 
     public function __construct(Stache $stache)
@@ -115,14 +118,8 @@ class EntryRepository implements RepositoryContract
         return app(QueryBuilder::class);
     }
 
-    public function make(string $collectionHandle): Entry
+    public function make(): Entry
     {
-        $collection = Collection::findByHandle($collectionHandle);
-
-        if ($customClass = $collection->class()) {
-            return app($customClass)->collection($collectionHandle);
-        }
-
         return app(Entry::class);
     }
 
