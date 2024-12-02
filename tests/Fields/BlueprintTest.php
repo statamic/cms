@@ -20,6 +20,7 @@ use Statamic\Events\BlueprintDeleting;
 use Statamic\Events\BlueprintSaved;
 use Statamic\Events\BlueprintSaving;
 use Statamic\Facades;
+use Statamic\Facades\Collection as StatamicCollection;
 use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\Field;
@@ -30,6 +31,8 @@ use Tests\TestCase;
 
 class BlueprintTest extends TestCase
 {
+    use \Tests\PreventSavingStacheItemsToDisk;
+
     #[Test]
     public function it_gets_the_handle()
     {
@@ -817,7 +820,7 @@ class BlueprintTest extends TestCase
             ->setHandle('blueprint_one');
 
         $entry = (new Entry)
-            ->collection('collection_one')
+            ->collection(tap(StatamicCollection::make('collection_one'))->save())
             ->blueprint($blueprint);
 
         $blueprint->setParent($entry);

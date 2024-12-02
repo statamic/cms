@@ -1253,8 +1253,9 @@ class EntryTest extends TestCase
     #[Test]
     public function the_blueprint_is_blinked_when_getting_and_flushed_when_setting()
     {
+        $c = tap(Collection::make('blog'))->save();
         $entry = (new Entry)->collection('blog');
-        $collection = Mockery::mock(Collection::make('blog'));
+        $collection = Mockery::mock($c);
         $collection->shouldReceive('entryBlueprint')->with(null, $entry)->once()->andReturn('the old blueprint');
         $collection->shouldReceive('entryBlueprint')->with('new', $entry)->once()->andReturn('the new blueprint');
         Collection::shouldReceive('findByHandle')->with('blog')->andReturn($collection);
