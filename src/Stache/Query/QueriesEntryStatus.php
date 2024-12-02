@@ -3,6 +3,8 @@
 namespace Statamic\Stache\Query;
 
 use Illuminate\Support\Collection;
+use Statamic\Exceptions\InvalidQueryDateException;
+use Statamic\Query\EmptyQueryBuilder;
 
 trait QueriesEntryStatus
 {
@@ -26,7 +28,14 @@ trait QueriesEntryStatus
 
         return $this->where(fn ($query) => $this
             ->getCollectionsForStatusQuery()
-            ->each(fn ($collection) => $query->orWhere(fn ($q) => $this->addCollectionStatusLogicToQuery($q, $status, $collection))));
+            ->each(function ($collection) use ($query, $status) {
+                try {
+                    return $query->orWhere(fn ($q) => $this->addCollectionStatusLogicToQuery($q, $status, $collection));
+                } catch (InvalidQueryDateException $e) {
+                    return new EmptyQueryBuilder();
+                }
+            })
+        );
     }
 
     private function addCollectionStatusLogicToQuery($query, $status, $collection): void
@@ -35,7 +44,7 @@ trait QueriesEntryStatus
 
         if (! $collection->dated() || ($collection->futureDateBehavior() === 'public' && $collection->pastDateBehavior() === 'public')) {
             if ($status === 'scheduled' || $status === 'expired') {
-                $query->where('date', 'invalid'); // intentionally trigger no results.
+                throw new InvalidQueryDateException(); // intentionally trigger no results.
             }
 
             return;
@@ -47,7 +56,7 @@ trait QueriesEntryStatus
                 : $query->where('date', '<', now());
 
             if ($status === 'expired') {
-                $query->where('date', 'invalid'); // intentionally trigger no results.
+                throw new InvalidQueryDateException(); // intentionally trigger no results.
             }
         }
 
@@ -57,7 +66,7 @@ trait QueriesEntryStatus
                 : $query->where('date', '>', now());
 
             if ($status === 'scheduled') {
-                $query->where('date', 'invalid'); // intentionally trigger no results.
+                throw new InvalidQueryDateException(); // intentionally trigger no results.
             }
         }
     }
