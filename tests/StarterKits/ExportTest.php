@@ -63,7 +63,7 @@ class ExportTest extends TestCase
 
         $this
             ->exportCoolRunnings()
-            // ->expectsOutput('Starter kit config [package/starter-kit.yaml] does not exist.') // TODO: Why does this work in InstallTest?
+            ->expectsOutputToContain('Starter kit config [package/starter-kit.yaml] does not exist.')
             ->assertFailed();
 
         $this->assertFileDoesNotExist($source);
@@ -87,7 +87,7 @@ class ExportTest extends TestCase
 
         $this
             ->exportCoolRunnings()
-            // ->expectsOutput('Package config [package/composer.json] does not exist.') // TODO: Why does this work in InstallTest?
+            ->expectsOutputToContain('Package config [package/composer.json] does not exist.')
             ->assertFailed();
 
         $this->assertFileDoesNotExist($source);
@@ -949,7 +949,7 @@ EOT
 
         $this
             ->exportCoolRunnings()
-            // ->expectsOutput('Starter-kit module is missing `export_paths` or `dependencies`!') // TODO: Why does this work in InstallTest?
+            ->expectsOutputToContain('Starter-kit module is missing `export_paths`, `dependencies`, or nested `modules`.')
             ->assertFailed();
 
         $this->assertFileDoesNotExist($welcomeView);
@@ -970,7 +970,7 @@ EOT
 
         $this
             ->exportCoolRunnings()
-            // ->expectsOutput('Starter-kit module is missing `export_paths` or `dependencies`!') // TODO: Why does this work in InstallTest?
+            ->expectsOutputToContain('Starter-kit module is missing `export_paths`, `dependencies`, or nested `modules`.')
             ->assertFailed();
 
         $this->assertFileDoesNotExist($welcomeView);
@@ -1078,7 +1078,7 @@ EOT
 
         $this
             ->exportCoolRunnings()
-            // ->expectsOutput('Cannot export [non-existent.txt], because it does not exist in your app!') // TODO: Why does this work in InstallTest?
+            ->expectsOutputToContain('Cannot export [non-existent.txt], because it does not exist in your app.')
             ->assertFailed();
     }
 
@@ -1150,7 +1150,7 @@ EOT
 
         $this
             ->exportCoolRunnings()
-            // ->expectsOutput('Cannot export [non-existent.txt], because it does not exist in your app!') // TODO: Why does this work in InstallTest?
+            ->expectsOutputToContain('Cannot export [non/existent], because it does not exist in your composer.json.')
             ->assertFailed();
     }
 
@@ -1222,7 +1222,7 @@ EOT
 
         $this
             ->exportCoolRunnings()
-            // ->expectsOutput('Cannot export [starter-kit.yaml] config!') // TODO: Why does this work in InstallTest?
+            ->expectsOutputToContain('Cannot export [starter-kit.yaml] config.')
             ->assertFailed();
     }
 
@@ -1321,7 +1321,7 @@ EOT
 
         $this
             ->exportCoolRunnings()
-            // ->expectsOutput('Cannot export [composer.json]. Please use `dependencies` array!') // TODO: Why does this work in InstallTest?
+            ->expectsOutputToContain('Cannot export [composer.json]. Please use `dependencies` array.')
             ->assertFailed();
     }
 
@@ -1576,8 +1576,8 @@ EOT
         $this->assertFileDoesNotExist($filesystemsConfig = $this->exportPath('config/filesystems.php'));
 
         $this->exportCoolRunnings()
-            // ->expectsOutput('Starter kit config moved to [package/starter-kit.yaml].') // TODO: Why does this work in InstallTest?
-            // ->expectsOutput('Composer package config moved to [package/composer.json].') // TODO: Why does this work in InstallTest?
+            ->expectsOutputToContain('Starter kit config moved to [package/starter-kit.yaml].')
+            ->expectsOutputToContain('Composer package config moved to [package/composer.json].')
             ->assertSuccessful();
 
         $this->assertFileDoesNotExist(base_path('starter-kit.yaml'));

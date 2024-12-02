@@ -1243,7 +1243,7 @@ EOT;
 
         $this
             ->installCoolRunnings()
-            ->expectsOutput('Starter-kit module is missing `export_paths`, `dependencies`, or nested `modules`!')
+            ->expectsOutputToContain('Starter-kit module is missing `export_paths`, `dependencies`, or nested `modules`.')
             ->assertFailed();
 
         $this->assertFileDoesNotExist(base_path('copied.md'));
@@ -1265,7 +1265,7 @@ EOT;
 
         $this
             ->installCoolRunnings()
-            ->expectsOutput('Starter-kit module is missing `export_paths`, `dependencies`, or nested `modules`!')
+            ->expectsOutputToContain('Starter-kit module is missing `export_paths`, `dependencies`, or nested `modules`.')
             ->assertFailed();
 
         $this->assertFileDoesNotExist(base_path('copied.md'));
