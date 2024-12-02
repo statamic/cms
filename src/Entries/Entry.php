@@ -159,14 +159,19 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             return $this;
         }
 
-        return app($customClass)
+        $entry = app($customClass)
             ->blueprint($this->blueprint())
             ->data($this->data())
-            ->date($this->date())
             ->origin($this->origin())
             ->locale($this->site())
             ->published($this->published())
             ->slug($this->slug());
+
+        if ($this->hasDate()) {
+            $entry->date($this->date());
+        }
+
+        return $entry;
     }
 
     public function blueprint($blueprint = null)
