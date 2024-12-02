@@ -66,7 +66,7 @@ class LinkMark extends Link
         }
 
         if ($item instanceof Entry) {
-            return ($item->in(Site::current()->handle()) ?? $item)->url();
+            return $item->url();
         }
 
         return $item->url();
