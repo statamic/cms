@@ -245,4 +245,20 @@ class EntryRepositoryTest extends TestCase
         $this->assertNull($item = $this->repo->find('test-blog-entry'));
         $this->assertFileDoesNotExist($path);
     }
+
+    #[Test]
+    public function it_gets_custom_entry_class()
+    {
+        $temp = EntryAPI::make()
+            ->id('custom')
+            ->collection(Collection::findByHandle('custom_class'))
+            ->slug('custom');
+
+        $this->repo->save($temp);
+        $entry = $this->repo->find('custom');
+
+        $this->assertInstanceOf(CustomEntry::class, $entry);
+    }
 }
+
+class CustomEntry extends \Statamic\Entries\Entry {}

@@ -161,7 +161,9 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
         $entry = app($customClass)
             ->blueprint($this->blueprint())
+            ->collection($this->collection())
             ->data($this->data())
+            ->id($this->id())
             ->origin($this->origin())
             ->locale($this->site())
             ->published($this->published())
