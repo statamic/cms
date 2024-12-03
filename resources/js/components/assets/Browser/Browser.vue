@@ -105,13 +105,15 @@
                                     </tr>
                                     <tr v-for="(folder, i) in folders" :key="folder.path" v-if="!restrictFolderNavigation">
                                         <td />
-                                        <td @click="selectFolder(folder.path)">
-                                            <a class="flex items-center cursor-pointer group">
-                                                <file-icon extension="folder" class="w-8 h-8 rtl:ml-2 ltr:mr-2 inline-block text-blue-400 group-hover:text-blue" />
-                                                {{ folder.basename }}
-                                            </a>
+
+                                        <td v-for="column in visibleColumns">
+                                            <template v-if="column.field === 'basename'">
+                                                <a class="w-full flex items-center cursor-pointer group" @click="selectFolder(folder.path)">
+                                                    <file-icon extension="folder" class="w-8 h-8 rtl:ml-2 ltr:mr-2 inline-block text-blue-400 group-hover:text-blue" />
+                                                    {{ folder.basename }}
+                                                </a>
+                                            </template>
                                         </td>
-                                        <td v-for="n in (visibleColumns.length - 1)" />
 
                                         <th class="actions-column" :colspan="columns.length">
                                             <dropdown-list placement="left-start" v-if="folderActions(folder).length">
