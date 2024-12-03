@@ -27,8 +27,9 @@ class PleaseTest extends TestCase
     #[Test]
     public function statamic_prefixed_commands_will_throw_exception_when_running_in_artisan_without_prefix()
     {
+        Stache::shouldReceive('clear')->never();
         $this->expectException(CommandNotFoundException::class);
-        $this->artisan('flat:camp');
+        $this->artisan('stache:clear');
     }
 
     #[Test]
