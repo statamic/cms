@@ -51,7 +51,6 @@ class Exporter
             ->instantiateModules()
             ->clearExportPath()
             ->exportModules()
-            ->exportHooks()
             ->exportPackage();
     }
 
@@ -241,23 +240,6 @@ class Exporter
         }
 
         return 'modules.'.$module->key().'.'.$key;
-    }
-
-    /**
-     * Export starter kit hooks.
-     */
-    protected function exportHooks(): self
-    {
-        $hooks = ['StarterKitPostInstall.php'];
-
-        collect($hooks)
-            ->filter(fn ($hook) => $this->files->exists(base_path($hook)))
-            ->each(fn ($hook) => $this->exportRelativePath(
-                from: $hook,
-                starterKitPath: $this->exportPath,
-            ));
-
-        return $this;
     }
 
     /**
