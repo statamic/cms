@@ -68,6 +68,8 @@ class BrowserController extends CpController
 
         $this->authorize('view', $asset);
 
+        $this->setColumns($container);
+
         return view('statamic::assets.browse', [
             'container' => [
                 'id' => $container->id(),
@@ -76,6 +78,7 @@ class BrowserController extends CpController
             ],
             'folder' => $asset->folder(),
             'editing' => $asset->id(),
+            'columns' => $this->columns,
         ]);
     }
 
