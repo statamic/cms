@@ -59,8 +59,7 @@
                                         </button>
                                     </div>
 
-                                    <data-list-column-picker v-if="mode === 'table'" class="rtl:mr-3 ltr:ml-3" :preferences-key="preferencesKey('columns')" />
-
+                                    <data-list-column-picker class="rtl:mr-3 ltr:ml-3" :preferences-key="preferencesKey('columns')" :disabled="mode !== 'table'" />
                                 </div>
 
                                 <breadcrumbs v-if="!restrictFolderNavigation" :path="path" @navigated="selectFolder" />

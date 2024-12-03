@@ -4,6 +4,7 @@
             @click="open = true"
             v-tooltip="__('Customize Columns')"
             class="btn py-1 px-1 h-8 w-8 flex items-center justify-center"
+            :disabled="disabled"
         >
             <svg-icon name="light/settings-horizontal" class="w-4 h-4" />
         </button>
@@ -77,7 +78,8 @@ export default {
     },
 
     props: {
-        preferencesKey: String
+        preferencesKey: String,
+        disabled: Boolean,
     },
 
     inject: ['sharedState'],
