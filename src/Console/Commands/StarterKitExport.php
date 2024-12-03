@@ -114,6 +114,11 @@ class StarterKitExport extends Command
             $this->components->info('Starter kit config moved to [package/starter-kit.yaml].');
         }
 
+        if (File::exists($postInstallHook = base_path('StarterKitPostInstall.php'))) {
+            File::move($postInstallHook, base_path('package/StarterKitPostInstall.php'));
+            $this->components->info('Starter kit post-install hook moved to [package/StarterKitPostInstall.php].');
+        }
+
         if (File::exists($packageComposerJson = $this->getAbsolutePath().'/composer.json')) {
             File::move($packageComposerJson, base_path('package/composer.json'));
             $this->components->info('Composer package config moved to [package/composer.json].');
