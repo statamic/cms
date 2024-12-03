@@ -181,7 +181,7 @@ class Assets extends Fieldtype
 
     protected function getColumns()
     {
-        $columns = $this->container()->blueprint()->columns();
+        $columns = $this->container()->blueprint()->columns()->map(fn ($column) => clone $column);
 
         $basename = Column::make('basename')
             ->label(__('File'))
