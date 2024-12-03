@@ -246,6 +246,8 @@ final class InstallableModule extends Module
     {
         $package = $this->installer->package();
 
+        // Scope to new `export` folder if it exists, otherwise we'll
+        // look in starter kit root for backwards compatibility
         $scope = $this->files->exists(base_path("vendor/{$package}/export"))
             ? 'export'
             : null;
