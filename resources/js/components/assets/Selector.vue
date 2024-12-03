@@ -6,6 +6,7 @@
                 <asset-browser
                     :initial-container="container"
                     :initial-per-page="$config.get('paginationSize')"
+                    :initial-columns="columns"
                     :selected-path="folder"
                     :selected-assets="browserSelections"
                     :restrict-folder-navigation="restrictFolderNavigation"
@@ -60,6 +61,7 @@ export default {
         selected: Array,
         maxFiles: Number,
         queryScopes: Array,
+        columns: Array,
         restrictFolderNavigation: {
             type: Boolean,
             default() {

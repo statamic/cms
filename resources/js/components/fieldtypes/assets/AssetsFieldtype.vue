@@ -137,6 +137,7 @@
                 :view-mode="selectorViewMode"
                 :max-files="maxFiles"
                 :query-scopes="queryScopes"
+                :columns="columns"
                 @selected="assetsSelected"
                 @closed="closeSelector">
             </selector>
@@ -261,6 +262,10 @@ export default {
 
             // If value is an array (e.g. a users fieldtype), get the first item.
             return Array.isArray(value) ? value[0] : value;
+        },
+
+        columns() {
+            return this.meta.columns;
         },
 
         store() {

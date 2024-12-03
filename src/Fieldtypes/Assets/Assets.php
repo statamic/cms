@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use Statamic\Actions\RenameAssetFolder;
 use Statamic\Assets\OrderedQueryBuilder;
 use Statamic\Contracts\Entries\Entry;
+use Statamic\CP\Column;
 use Statamic\Exceptions\AssetContainerNotFoundException;
 use Statamic\Facades\Action;
 use Statamic\Facades\Asset;
@@ -174,7 +175,41 @@ class Assets extends Fieldtype
             'container' => $container = $this->container()->handle(),
             'dynamicFolder' => $dynamicFolder = $this->dynamicFolder(),
             'rename_folder' => $this->renameFolderAction($dynamicFolder),
+            'columns' => $this->getColumns(),
         ];
+    }
+
+    protected function getColumns()
+    {
+        $columns = $this->container()->blueprint()->columns();
+
+        $basename = Column::make('basename')
+            ->label(__('File'))
+            ->visible(true)
+            ->defaultVisibility(true)
+            ->sortable(true);
+
+        $size = Column::make('size')
+            ->label(__('Size'))
+            ->value('size_formatted')
+            ->visible(true)
+            ->defaultVisibility(true)
+            ->sortable(true);
+
+        $lastModified = Column::make('last_modified')
+            ->label(__('Last Modified'))
+            ->value('last_modified_relative')
+            ->visible(true)
+            ->defaultVisibility(true)
+            ->sortable(true);
+
+        $columns->put('basename', $basename);
+        $columns->put('size', $size);
+        $columns->put('last_modified', $lastModified);
+
+        $columns->setPreferred("assets.{$this->container()->handle()}.columns");
+
+        return $columns->rejectUnlisted()->values();
     }
 
     private function dynamicFolder()
