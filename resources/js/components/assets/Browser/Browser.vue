@@ -321,7 +321,7 @@ export default {
         initialEditingAssetId: String,
         autoselectUploads: Boolean,
         autofocusSearch: Boolean,
-        allowSelectingExistingUpload: Boolean
+        allowSelectingExistingUpload: Boolean,
         initialColumns: {
             type: Array,
             default: () => [],
