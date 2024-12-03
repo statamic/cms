@@ -95,7 +95,7 @@ class DataResponse implements Responsable
 
         $protection->protect();
 
-        if ($protection->scheme() && ! $protection->driver()?->cacheable()) {
+        if ($protection->scheme() && ! $protection->cacheable()) {
             $this->headers['X-Statamic-Protected'] = true;
         }
 

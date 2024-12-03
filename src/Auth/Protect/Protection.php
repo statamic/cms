@@ -69,6 +69,12 @@ class Protection
             ->protect();
     }
 
+    public function cacheable()
+    {
+        $this->driver()
+            ->cacheable();
+    }
+
     protected function url()
     {
         return URL::tidy(request()->fullUrl());
