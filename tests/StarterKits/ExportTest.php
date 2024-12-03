@@ -15,8 +15,7 @@ class ExportTest extends TestCase
 
     protected $files;
     protected $packagePath;
-    protected $exportPath;
-    protected $postInstallHookPath;
+    protected $targetPath;
 
     public function setUp(): void
     {
@@ -24,7 +23,6 @@ class ExportTest extends TestCase
 
         $this->files = app(Filesystem::class);
         $this->packagePath = base_path('package');
-        $this->postInstallHookPath = base_path('StarterKitPostInstall.php');
         $this->targetPath = base_path('../cool-runnings');
 
         $this->cleanUp();
@@ -48,10 +46,6 @@ class ExportTest extends TestCase
 
         if ($this->files->exists($this->targetPath)) {
             $this->files->deleteDirectory($this->targetPath);
-        }
-
-        if ($this->files->exists($this->postInstallHookPath)) {
-            $this->files->delete($this->postInstallHookPath);
         }
     }
 
@@ -234,7 +228,7 @@ class ExportTest extends TestCase
 
         $this->assertFileDoesNotExist($postInstallHook = $this->targetPath('StarterKitPostInstall.php'));
 
-        $this->files->put(base_path('StarterKitPostInstall.php'), '<?php');
+        $this->files->put(base_path('package/StarterKitPostInstall.php'), '<?php');
 
         $this->exportCoolRunnings();
 
@@ -1568,6 +1562,7 @@ EOT
         ]);
 
         $this->files->move(base_path('package/starter-kit.yaml'), base_path('starter-kit.yaml'));
+        $this->files->put(base_path('StarterKitPostInstall.php'), $postInstallHook = 'post install hook!');
         $this->files->put($this->targetPath('starter-kit.yaml'), 'this should get stomped!');
         $this->files->put($this->targetPath('composer.json'), $packageComposerJson = 'custom composer.json!');
         $this->files->deleteDirectory(base_path('package'));
@@ -1577,11 +1572,9 @@ EOT
 
         $this->exportCoolRunnings()
             ->expectsOutputToContain('Starter kit config moved to [package/starter-kit.yaml].')
+            ->expectsOutputToContain('Starter kit post-install hook moved to [package/StarterKitPostInstall.php].')
             ->expectsOutputToContain('Composer package config moved to [package/composer.json].')
             ->assertSuccessful();
-
-        $this->assertFileDoesNotExist(base_path('starter-kit.yaml'));
-        $this->assertFileExists(base_path('package/starter-kit.yaml'));
 
         $expectedConfig = [
             'export_paths' => [
@@ -1589,12 +1582,61 @@ EOT
             ],
         ];
 
+        $this->assertFileDoesNotExist(base_path('starter-kit.yaml'));
+        $this->assertFileExists(base_path('package/starter-kit.yaml'));
         $this->assertEquals($expectedConfig, YAML::parse($this->files->get(base_path('package/starter-kit.yaml'))));
         $this->assertEquals($expectedConfig, YAML::parse($this->files->get($this->targetPath('starter-kit.yaml'))));
 
+        $this->assertFileDoesNotExist(base_path('StarterKitPostInstall.php'));
+        $this->assertFileExists(base_path('package/StarterKitPostInstall.php'));
+        $this->assertEquals($postInstallHook, $this->files->get(base_path('package/StarterKitPostInstall.php')));
+        $this->assertEquals($postInstallHook, $this->files->get($this->targetPath('StarterKitPostInstall.php')));
+
+        $this->assertFileExists(base_path('package/composer.json'));
+        $this->assertEquals($packageComposerJson, $this->files->get(base_path('package/composer.json')));
         $this->assertEquals($packageComposerJson, $this->files->get($this->targetPath('composer.json')));
 
         $this->assertFileExists($filesystemsConfig);
+    }
+
+    #[Test]
+    public function it_can_help_migrate_starter_kit_config_to_new_package_folder_but_requires_composer_json_to_actually_export()
+    {
+        $this->setExportPaths([
+            'config',
+        ]);
+
+        $this->files->move(base_path('package/starter-kit.yaml'), base_path('starter-kit.yaml'));
+        $this->files->deleteDirectory(base_path('package'));
+        $this->files->deleteDirectory($this->targetPath());
+
+        $this->assertFileDoesNotExist(base_path('package'));
+        $this->assertFileDoesNotExist($filesystemsConfig = $this->exportPath('config/filesystems.php'));
+
+        $this->exportCoolRunnings()
+            ->expectsOutputToContain('Starter kit config moved to [package/starter-kit.yaml].')
+            ->doesntExpectOutputToContain('Starter kit post-install hook moved to [package/StarterKitPostInstall.php].')
+            ->doesntExpectOutputToContain('Composer package config moved to [package/composer.json].')
+            ->expectsOutputToContain('Package config [package/composer.json] does not exist.')
+            ->assertFailed();
+
+        $expectedConfig = [
+            'export_paths' => [
+                'config',
+            ],
+        ];
+
+        $this->assertFileDoesNotExist(base_path('starter-kit.yaml'));
+        $this->assertFileExists(base_path('package/starter-kit.yaml'));
+        $this->assertEquals($expectedConfig, YAML::parse($this->files->get(base_path('package/starter-kit.yaml'))));
+
+        $this->assertFileDoesNotExist(base_path('package/StarterKitPostInstall.php'));
+        $this->assertFileDoesNotExist($this->targetPath('StarterKitPostInstall.php'));
+
+        $this->assertFileDoesNotExist(base_path('package/composer.json'));
+        $this->assertFileDoesNotExist($this->targetPath('composer.json'));
+
+        $this->assertFileDoesNotExist($filesystemsConfig);
     }
 
     private function targetPath($path = null)
