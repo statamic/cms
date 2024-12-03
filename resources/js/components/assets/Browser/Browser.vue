@@ -50,8 +50,6 @@
                                         <span>{{ __('Upload') }}</span>
                                     </button>
 
-                                    <data-list-column-picker v-if="mode === 'table'" class="rtl:mr-3 ltr:ml-3" :preferences-key="preferencesKey('columns')" />
-
                                     <div class="btn-group rtl:mr-3 ltr:ml-3">
                                         <button class="btn btn-sm" @click="setMode('grid')" :class="{'active': mode === 'grid'}">
                                             <svg-icon name="assets-mode-grid" class="h-4 w-4"/>
@@ -60,6 +58,9 @@
                                             <svg-icon name="assets-mode-table" class="h-4 w-4" />
                                         </button>
                                     </div>
+
+                                    <data-list-column-picker v-if="mode === 'table'" class="rtl:mr-3 ltr:ml-3" :preferences-key="preferencesKey('columns')" />
+
                                 </div>
 
                                 <breadcrumbs v-if="!restrictFolderNavigation" :path="path" @navigated="selectFolder" />
