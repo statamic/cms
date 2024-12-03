@@ -72,7 +72,7 @@ class Protection
     public function cacheable()
     {
         return $this->driver()
-                    ->cacheable();
+            ->cacheable();
     }
 
     protected function url()
