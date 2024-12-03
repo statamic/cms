@@ -4,6 +4,7 @@ namespace Statamic\Fieldtypes\Bard;
 
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\Data;
+use Statamic\Facades\Site;
 use Statamic\Support\Str;
 use Tiptap\Marks\Link;
 
@@ -64,8 +65,13 @@ class LinkMark extends Link
             return '';
         }
 
-        if ($item instanceof Entry) {
-            return $item->url();
+        $isRestApi = config('statamic.api.enabled', false) && Str::startsWith(request()->path(), config('statamic.api.route', 'api'));
+        $isGraphqlApi = config('statamic.graphql.enabled', false) && Str::startsWith(request()->path(), 'graphql');
+
+        $isApi = $isRestApi || $isGraphqlApi;
+
+        if (! $isApi && $item instanceof Entry) {
+            return ($item->in(Site::current()->handle()) ?? $item)->url();
         }
 
         return $item->url();
