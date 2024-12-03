@@ -36,7 +36,7 @@ class StaticClear extends Command
         if (! config('statamic.static_caching.strategy')) {
             $this->components->error('Static caching is not enabled.');
 
-            return 1;
+            return 0;
         }
 
         spin(callback: fn () => StaticCache::flush(), message: 'Clearing the static page cache...');
