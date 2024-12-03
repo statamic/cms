@@ -374,6 +374,48 @@ class FrontendTest extends TestCase
     }
 
     #[Test]
+    public function header_is_not_added_to_cacheable_protected_responses()
+    {
+        config()->set('statamic.protect.cacheable', true);
+
+        $page = $this->createPage('about');
+
+        $this
+            ->get('/about')
+            ->assertOk()
+            ->assertHeaderMissing('X-Statamic-Protected');
+
+        $page->set('protect', 'logged_in')->save();
+
+        $this
+            ->actingAs(User::make())
+            ->get('/about')
+            ->assertOk()
+            ->assertHeaderMissing('X-Statamic-Protected');
+    }
+
+    #[Test]
+    public function header_is_not_added_to_cacheable_protected_responses_for_driver()
+    {
+        config()->set('statamic.protect.schemes.logged_in.cacheable', true);
+
+        $page = $this->createPage('about');
+
+        $this
+            ->get('/about')
+            ->assertOk()
+            ->assertHeaderMissing('X-Statamic-Protected');
+
+        $page->set('protect', 'logged_in')->save();
+
+        $this
+            ->actingAs(User::make())
+            ->get('/about')
+            ->assertOk()
+            ->assertHeaderMissing('X-Statamic-Protected');
+    }
+
+    #[Test]
     public function key_variables_key_added()
     {
         $page = $this->createPage('about');
