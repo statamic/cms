@@ -36,4 +36,9 @@ abstract class Protector
 
         return $this;
     }
+
+    public function cacheable()
+    {
+        return $this->config['cacheable'] ?? config('statamic.protect.cacheable', false);
+    }
 }
