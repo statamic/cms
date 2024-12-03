@@ -46,7 +46,9 @@ class CollectionTreeController extends CpController
         // if somehow the root would end up having child pages, which isn't allowed.
         $contents = $structure->validateTree($contents, $request->site);
 
-        $tree->tree($contents)->save();
+        return [
+            'saved' => $tree->tree($contents)->save(),
+        ];
     }
 
     private function toTree($items)

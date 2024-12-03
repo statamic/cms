@@ -2,6 +2,8 @@
 
 namespace Statamic\Policies;
 
+use Illuminate\Support\Facades\Gate;
+use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Facades\User;
 
 class AssetFolderPolicy
@@ -25,10 +27,14 @@ class AssetFolderPolicy
             return false;
         }
 
-        return $assetFolder
-            ->assets(true)
-            ->reject(fn ($asset) => $user->can('move', $asset))
-            ->isEmpty();
+        if ($this->isUsingCustomAssetPolicy()) {
+            return $assetFolder
+                ->assets(true)
+                ->reject(fn ($asset) => $user->can('move', $asset))
+                ->isEmpty();
+        }
+
+        return $assetFolder->container()->allowMoving();
     }
 
     public function rename($user, $assetFolder)
@@ -39,10 +45,14 @@ class AssetFolderPolicy
             return false;
         }
 
-        return $assetFolder
-            ->assets(true)
-            ->reject(fn ($asset) => $user->can('rename', $asset))
-            ->isEmpty();
+        if ($this->isUsingCustomAssetPolicy()) {
+            return $assetFolder
+                ->assets(true)
+                ->reject(fn ($asset) => $user->can('rename', $asset))
+                ->isEmpty();
+        }
+
+        return $assetFolder->container()->allowRenaming();
     }
 
     public function delete($user, $assetFolder)
@@ -53,9 +63,18 @@ class AssetFolderPolicy
             return false;
         }
 
-        return $assetFolder
-            ->assets(true)
-            ->reject(fn ($asset) => $user->can('delete', $asset))
-            ->isEmpty();
+        if ($this->isUsingCustomAssetPolicy()) {
+            return $assetFolder
+                ->assets(true)
+                ->reject(fn ($asset) => $user->can('delete', $asset))
+                ->isEmpty();
+        }
+
+        return true;
+    }
+
+    protected function isUsingCustomAssetPolicy()
+    {
+        return Gate::policies()[AssetContract::class] !== AssetPolicy::class;
     }
 }

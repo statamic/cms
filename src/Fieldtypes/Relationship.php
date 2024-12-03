@@ -130,7 +130,7 @@ abstract class Relationship extends Fieldtype
             'canCreate' => $this->canCreate(),
             'canSearch' => $this->canSearch(),
             'statusIcons' => $this->statusIcons(),
-            'creatables' => $this->getCreatables(),
+            'creatables' => $this->canCreate() ? $this->getCreatables() : [],
             'formComponent' => $this->getFormComponent(),
             'formComponentProps' => $this->getFormComponentProps(),
             'taggable' => $this->getTaggable(),

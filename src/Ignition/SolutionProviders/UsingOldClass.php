@@ -2,7 +2,7 @@
 
 namespace Statamic\Ignition\SolutionProviders;
 
-use Spatie\Ignition\Contracts\HasSolutionsForThrowable;
+use Spatie\ErrorSolutions\Contracts\HasSolutionsForThrowable;
 use Statamic\Ignition\Solutions\UpdateClassReference;
 use Statamic\Statamic;
 use Statamic\Support\Arr;

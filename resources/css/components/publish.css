@@ -70,6 +70,20 @@ code.parent-url {
         @apply absolute inset-0 cursor-not-allowed bg-white/25;
         z-index: 100;
     }
+
+    .has-field-dropdown {
+        .field-inner {
+            @apply pr-6;
+        }
+        .field-dropdown {
+            @apply block absolute bottom-[-3px] right-0;
+        }
+        &:not(.has-field-label) {
+            .field-inner {
+                @apply min-h-[19.5px] mb-2;
+            }
+        }
+    }
 }
 
 .publish-field {

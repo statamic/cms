@@ -772,7 +772,7 @@ EOT;
     }
 
     #[Test]
-    public function it_installs_modules_with_prompt_false_config_by_default_when_running_non_interactively()
+    public function it_can_still_install_modules_with_prompt_false_or_default_config()
     {
         $this->setConfig([
             'export_paths' => [
@@ -780,12 +780,18 @@ EOT;
             ],
             'modules' => [
                 'seo' => [
-                    'prompt' => false, // Setting prompt to false skips confirmation, so this module should still get installed non-interactively
+                    'prompt' => false, // Setting `prompt: false` normally skips confirmation and ensures it always gets installed
                     'export_paths' => [
                         'resources/css/seo.css',
                     ],
                     'dependencies' => [
                         'statamic/seo-pro' => '^0.2.0',
+                    ],
+                ],
+                'hockey' => [
+                    'default' => true, // Setting `default: true` will still ask user for confirmation, but should still get installed non-interactively
+                    'export_paths' => [
+                        'resources/css/hockey.css',
                     ],
                 ],
                 'bobsled' => [
@@ -797,9 +803,36 @@ EOT;
                     ],
                 ],
                 'jamaica' => [
-                    'prompt' => false, // Setting prompt to false skips confirmation, so this module should still get installed non-interactively
+                    'prompt' => false, // Setting `prompt: false` normally skips confirmation and ensures it always gets installed
                     'export_as' => [
                         'resources/css/theme.css' => 'resources/css/jamaica.css',
+                    ],
+                ],
+                'js' => [
+                    'default' => 'vue', // Setting a `default` option will still ask user for confirmation, but should still get installed non-interactively
+                    'options' => [
+                        'react' => [
+                            'label' => 'React JS',
+                            'export_paths' => [
+                                'resources/js/react.js',
+                            ],
+                        ],
+                        'vue' => [
+                            'label' => 'Vue JS',
+                            'export_paths' => [
+                                'resources/js/vue.js',
+                            ],
+                        ],
+                    ],
+                ],
+                'js_invalid' => [
+                    'prompt' => false, // Setting `prompt: false` doesn't do anything for select modules, should use `default` like above
+                    'options' => [
+                        'svelte' => [
+                            'export_paths' => [
+                                'resources/js/svelte.js',
+                            ],
+                        ],
                     ],
                 ],
             ],
@@ -807,19 +840,27 @@ EOT;
 
         $this->assertFileDoesNotExist(base_path('copied.md'));
         $this->assertFileDoesNotExist(base_path('resources/css/seo.css'));
+        $this->assertFileDoesNotExist(base_path('resources/css/hockey.css'));
         $this->assertFileDoesNotExist(base_path('resources/css/bobsled.css'));
         $this->assertFileDoesNotExist(base_path('resources/css/theme.css'));
         $this->assertComposerJsonDoesntHave('statamic/seo-pro');
         $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
+        $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/vue.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/svelte.js'));
 
         $this->installCoolRunnings();
 
         $this->assertFileExists(base_path('copied.md'));
         $this->assertFileExists(base_path('resources/css/seo.css'));
+        $this->assertFileExists(base_path('resources/css/hockey.css'));
         $this->assertFileDoesNotExist(base_path('resources/css/bobsled.css'));
         $this->assertFileExists(base_path('resources/css/theme.css'));
         $this->assertComposerJsonHasPackageVersion('require', 'statamic/seo-pro', '^0.2.0');
         $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
+        $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
+        $this->assertFileExists(base_path('resources/js/vue.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/svelte.js'));
     }
 
     #[Test]
@@ -926,7 +967,120 @@ EOT;
     }
 
     #[Test]
-    public function it_display_custom_module_prompts()
+    public function it_allows_user_to_skip_in_select_module_prompts()
+    {
+        $this->setConfig([
+            'modules' => [
+                'js' => [
+                    'prompt' => 'Want one of these fancy JS options?',
+                    'options' => [
+                        'react' => [
+                            'label' => 'React JS',
+                            'export_paths' => [
+                                'resources/js/react.js',
+                            ],
+                        ],
+                        'vue' => [
+                            'label' => 'Vue JS',
+                            'export_paths' => [
+                                'resources/js/vue.js',
+                            ],
+                        ],
+                        'svelte' => [
+                            'export_paths' => [
+                                'resources/js/svelte.js',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/vue.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/svelte.js'));
+
+        $command = $this->installCoolRunningsModules();
+
+        // Some fixes to `expectsChoice()` were merged for us, but are not available on 11.20.0 and below
+        // See: https://github.com/laravel/framework/pull/52408
+        if (version_compare(app()->version(), '11.20.0', '>')) {
+            $command->expectsChoice('Want one of these fancy JS options?', 'skip_module', [
+                'skip_module' => 'No',
+                'react' => 'React JS',
+                'vue' => 'Vue JS',
+                'svelte' => 'Svelte',
+            ]);
+        } else {
+            $command->expectsQuestion('Want one of these fancy JS options?', 'skip_module');
+        }
+
+        $command->run();
+
+        $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/vue.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/svelte.js'));
+    }
+
+    #[Test]
+    public function it_can_disable_skip_option_in_select_module_prompts()
+    {
+        $this->setConfig([
+            'modules' => [
+                'js' => [
+                    'prompt' => 'Want one of these fancy JS options?',
+                    'skip_option' => false,
+                    'options' => [
+                        'react' => [
+                            'label' => 'React JS',
+                            'export_paths' => [
+                                'resources/js/react.js',
+                            ],
+                        ],
+                        'vue' => [
+                            'label' => 'Vue JS',
+                            'export_paths' => [
+                                'resources/js/vue.js',
+                            ],
+                        ],
+                        'svelte' => [
+                            'export_paths' => [
+                                'resources/js/svelte.js',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/vue.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/svelte.js'));
+
+        $command = $this->installCoolRunningsModules();
+
+        // Some fixes to `expectsChoice()` were merged for us, but are not available on 11.20.0 and below
+        // See: https://github.com/laravel/framework/pull/52408
+        if (version_compare(app()->version(), '11.20.0', '>')) {
+            $command->expectsChoice('Want one of these fancy JS options?', 'svelte', [
+                // 'skip_module' => 'No', // This should not be here anymore, because of `skip_option: false`
+                'react' => 'React JS',
+                'vue' => 'Vue JS',
+                'svelte' => 'Svelte',
+            ]);
+        } else {
+            $command->expectsQuestion('Want one of these fancy JS options?', 'svelte');
+        }
+
+        $command->run();
+
+        $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/vue.js'));
+        $this->assertFileExists(base_path('resources/js/svelte.js'));
+    }
+
+    #[Test]
+    public function it_display_custom_module_prompts_and_option_labels()
     {
         $this->setConfig([
             'modules' => [
@@ -938,6 +1092,7 @@ EOT;
                 ],
                 'js' => [
                     'prompt' => 'Want one of these fancy JS options?',
+                    'skip_option' => 'No, thank you!',
                     'options' => [
                         'react' => [
                             'label' => 'React JS',
@@ -974,7 +1129,7 @@ EOT;
         // See: https://github.com/laravel/framework/pull/52408
         if (version_compare(app()->version(), '11.20.0', '>')) {
             $command->expectsChoice('Want one of these fancy JS options?', 'svelte', [
-                'skip_module' => 'No',
+                'skip_module' => 'No, thank you!',
                 'react' => 'React JS',
                 'vue' => 'Vue JS',
                 'svelte' => 'Svelte',
@@ -1146,7 +1301,7 @@ EOT;
     }
 
     #[Test]
-    public function it_installs_nested_modules_with_prompt_false_config_by_default_when_running_non_interactively()
+    public function it_can_still_install_nested_modules_with_prompt_false_or_default_config()
     {
         $this->setConfig([
             'export_paths' => [
@@ -1154,13 +1309,13 @@ EOT;
             ],
             'modules' => [
                 'canada' => [
-                    'prompt' => false, // Setting prompt to false skips confirmation, so this module should still get installed non-interactively
+                    'prompt' => false, // Setting `prompt: false` skips confirmation, so this module should still get installed
                     'export_paths' => [
                         'resources/css/hockey.css',
                     ],
                     'modules' => [
                         'hockey_players' => [
-                            'prompt' => false, // Setting prompt to false skips confirmation, so this module should still get installed non-interactively
+                            'prompt' => false, // Setting `prompt: false` skips confirmation, so this module should still get installed
                             'export_paths' => [
                                 'resources/dictionaries/players.yaml',
                             ],
@@ -1174,9 +1329,26 @@ EOT;
                                     ],
                                 ],
                                 'hockey_night_in_canada' => [
-                                    'prompt' => false, // Setting prompt to false skips confirmation, so this module should still get installed non-interactively
+                                    'prompt' => false, // Setting `prompt: false` skips confirmation, so this module should still get installed
                                     'export_paths' => [
                                         'resources/dictionaries/canadian_players.yaml',
+                                    ],
+                                ],
+                                'js' => [
+                                    'default' => 'vue', // Setting a `default` option, so this module should still get installed
+                                    'options' => [
+                                        'react' => [
+                                            'label' => 'React JS',
+                                            'export_paths' => [
+                                                'resources/js/react.js',
+                                            ],
+                                        ],
+                                        'vue' => [
+                                            'label' => 'Vue JS',
+                                            'export_paths' => [
+                                                'resources/js/vue.js',
+                                            ],
+                                        ],
                                     ],
                                 ],
                             ],
@@ -1192,6 +1364,8 @@ EOT;
         $this->assertFileDoesNotExist(base_path('resources/dictionaries/players.yaml'));
         $this->assertFileDoesNotExist(base_path('resources/dictionaries/american_players.yaml'));
         $this->assertFileDoesNotExist(base_path('resources/dictionaries/canadian_players.yaml'));
+        $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
+        $this->assertFileDoesNotExist(base_path('resources/js/vue.js'));
 
         $this->installCoolRunnings();
 
@@ -1201,6 +1375,8 @@ EOT;
         $this->assertFileExists(base_path('resources/dictionaries/players.yaml'));
         $this->assertFileDoesNotExist(base_path('resources/dictionaries/american_players.yaml'));
         $this->assertFileExists(base_path('resources/dictionaries/canadian_players.yaml'));
+        $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
+        $this->assertFileExists(base_path('resources/js/vue.js'));
     }
 
     #[Test]

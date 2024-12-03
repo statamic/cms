@@ -362,7 +362,7 @@ class AntlersNode extends AbstractNode
         foreach ($this->parameters as $param) {
             $value = $this->getSingleParameterValue($param, $processor, $data);
 
-            if ($this->isVoidValue($value)) {
+            if (self::isVoidValue($value)) {
                 continue;
             }
 
@@ -376,7 +376,7 @@ class AntlersNode extends AbstractNode
         return $values;
     }
 
-    protected function isVoidValue($value)
+    public static function isVoidValue($value)
     {
         return is_string($value) && $value == 'void::'.GlobalRuntimeState::$environmentId;
     }
@@ -398,7 +398,7 @@ class AntlersNode extends AbstractNode
             if ($param->name == $parameterName) {
                 $value = $this->getSingleParameterValue($param, $processor, $data);
 
-                if ($this->isVoidValue($value)) {
+                if (self::isVoidValue($value)) {
                     break;
                 }
 

@@ -31,6 +31,7 @@ class PasswordProtectionTest extends PageProtectionTestCase
             ->assertSessionHas('statamic:protect:password.tokens.test-token', [
                 'scheme' => 'password-scheme',
                 'url' => 'http://localhost/test',
+                'reference' => 'entry::test',
             ]);
     }
 
@@ -58,7 +59,7 @@ class PasswordProtectionTest extends PageProtectionTestCase
             'allowed' => ['the-password'],
         ]]);
 
-        session()->put('statamic:protect:password.passwords.password-scheme', 'the-password');
+        session()->put('statamic:protect:password.passwords.scheme.password-scheme', 'the-password');
 
         $this
             ->requestPageProtectedBy('password-scheme')
