@@ -111,7 +111,7 @@
                                                 {{ folder.basename }}
                                             </a>
                                         </td>
-                                        <td v-for="n in (columns.length - 2)" />
+                                        <td v-for="n in (visibleColumns.length - 1)" />
 
                                         <th class="actions-column" :colspan="columns.length">
                                             <dropdown-list placement="left-start" v-if="folderActions(folder).length">
