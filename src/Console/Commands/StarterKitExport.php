@@ -3,6 +3,7 @@
 namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
+use Statamic\Console\Commands\Concerns\MigratesLegacyStarterKitConfig;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
@@ -13,7 +14,7 @@ use function Laravel\Prompts\confirm;
 
 class StarterKitExport extends Command
 {
-    use RunsInPlease;
+    use MigratesLegacyStarterKitConfig, RunsInPlease;
 
     /**
      * The name and signature of the console command.
@@ -36,9 +37,7 @@ class StarterKitExport extends Command
      */
     public function handle()
     {
-        if ($this->isUsingLegacyExporterConventions()) {
-            $this->askToMigrateToPackageFolder();
-        }
+        $this->migrateLegacyStarterKitConfig();
 
         if (! File::exists($path = $this->getAbsolutePath())) {
             $this->askToCreateExportPath($path);
@@ -84,44 +83,5 @@ class StarterKitExport extends Command
         File::makeDirectory($path, 0755, true);
 
         $this->components->info("A new directory has been created at [{$path}].");
-    }
-
-    /**
-     * Determine if dev sandbox has starter-kit.yaml at root and/or customized composer.json at target path.
-     */
-    protected function isUsingLegacyExporterConventions(): bool
-    {
-        return File::exists(base_path('starter-kit.yaml'));
-    }
-
-    /**
-     * Determine if dev sandbox has starter-kit.yaml at root and/or customized composer.json at target path.
-     */
-    protected function askToMigrateToPackageFolder(): void
-    {
-        if ($this->input->isInteractive()) {
-            if (! confirm('Config should now live in the [package] folder. Would you like Statamic to move it for you?', true)) {
-                return;
-            }
-        }
-
-        if (! File::exists($dir = base_path('package'))) {
-            File::makeDirectory($dir, 0755, true);
-        }
-
-        if (File::exists($starterKitConfig = base_path('starter-kit.yaml'))) {
-            File::move($starterKitConfig, base_path('package/starter-kit.yaml'));
-            $this->components->info('Starter kit config moved to [package/starter-kit.yaml].');
-        }
-
-        if (File::exists($postInstallHook = base_path('StarterKitPostInstall.php'))) {
-            File::move($postInstallHook, base_path('package/StarterKitPostInstall.php'));
-            $this->components->info('Starter kit post-install hook moved to [package/StarterKitPostInstall.php].');
-        }
-
-        if (File::exists($packageComposerJson = $this->getAbsolutePath().'/composer.json')) {
-            File::move($packageComposerJson, base_path('package/composer.json'));
-            $this->components->info('Composer package config moved to [package/composer.json].');
-        }
     }
 }
