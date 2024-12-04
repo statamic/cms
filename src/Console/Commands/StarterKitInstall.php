@@ -52,7 +52,7 @@ class StarterKitInstall extends Command
             return;
         }
 
-        $licenseManager = StarterKitLicenseManager::validate($package, $this->option('license'), $this);
+        $licenseManager = StarterKitLicenseManager::validate($package, $this->option('license'), $this, $this->input->isInteractive());
 
         if (! $licenseManager->isValid()) {
             return;
@@ -75,7 +75,7 @@ class StarterKitInstall extends Command
         try {
             $installer->install();
         } catch (StarterKitException $exception) {
-            $this->error($exception->getMessage());
+            $this->components->error($exception->getMessage());
 
             return 1;
         }

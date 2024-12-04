@@ -37,6 +37,11 @@ class FileCacher extends AbstractCacher
     private $nocachePlaceholder;
 
     /**
+     * @var bool
+     */
+    private $logRewriteWarning = true;
+
+    /**
      * @param  array  $config
      */
     public function __construct(Writer $writer, Repository $cache, $config)
@@ -71,6 +76,11 @@ class FileCacher extends AbstractCacher
         $this->cacheUrl($this->makeHash($url), ...$this->getPathAndDomain($url));
     }
 
+    public function preventLoggingRewriteWarning()
+    {
+        $this->logRewriteWarning = false;
+    }
+
     /**
      * @return Page
      */
@@ -80,7 +90,7 @@ class FileCacher extends AbstractCacher
 
         $path = $this->getFilePath($url);
 
-        if (! $this->isLongQueryStringPath($path)) {
+        if ($this->logRewriteWarning && ! $this->isLongQueryStringPath($path)) {
             Log::debug('Static cache loaded ['.$url.'] If you are seeing this, your server rewrite rules have not been set up correctly.');
         }
 

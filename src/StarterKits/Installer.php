@@ -12,6 +12,7 @@ use Statamic\Console\NullConsole;
 use Statamic\Console\Please\Application as PleaseApplication;
 use Statamic\Console\Processes\Exceptions\ProcessException;
 use Statamic\Facades\Blink;
+use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
 use Statamic\StarterKits\Concerns\InteractsWithFilesystem;
 use Statamic\StarterKits\Exceptions\StarterKitException;
@@ -63,8 +64,6 @@ final class Installer
     public function branch(?string $branch = null): self|bool|null
     {
         return $this->fluentlyGetOrSet('branch')->args(func_get_args());
-
-        return $this;
     }
 
     /**
@@ -73,8 +72,6 @@ final class Installer
     public function fromLocalRepo(bool $fromLocalRepo = false): self|bool|null
     {
         return $this->fluentlyGetOrSet('fromLocalRepo')->args(func_get_args());
-
-        return $this;
     }
 
     /**
@@ -83,8 +80,6 @@ final class Installer
     public function withConfig(bool $withConfig = false): self|bool|null
     {
         return $this->fluentlyGetOrSet('withConfig')->args(func_get_args());
-
-        return $this;
     }
 
     /**
@@ -101,8 +96,6 @@ final class Installer
     public function withUserPrompt(bool $withUserPrompt = false): self|bool|null
     {
         return $this->fluentlyGetOrSet('withUserPrompt')->args(func_get_args());
-
-        return $this;
     }
 
     /**
@@ -119,8 +112,6 @@ final class Installer
     public function usingSubProcess(bool $usingSubProcess = false): self|bool|null
     {
         return $this->fluentlyGetOrSet('usingSubProcess')->args(func_get_args());
-
-        return $this;
     }
 
     /**
@@ -260,7 +251,7 @@ final class Installer
                     : $this->package;
 
                 try {
-                    Composer::withoutQueue()->throwOnFailure()->requireDev($package);
+                    Composer::withoutQueue()->throwOnFailure()->require($package);
                 } catch (ProcessException $exception) {
                     $this->rollbackWithError("Error installing starter kit [{$package}].", $exception->getMessage());
                 }
@@ -334,9 +325,11 @@ final class Installer
 
         $name = str_replace('_', ' ', $key);
 
-        if ($shouldPrompt && $this->isInteractive && ! confirm(Arr::get($config, 'prompt', "Would you like to install the [{$name}] module?"), false)) {
+        $default = Arr::get($config, 'default', false);
+
+        if ($shouldPrompt && $this->isInteractive && ! confirm(Arr::get($config, 'prompt', "Would you like to install the [{$name}] module?"), $default)) {
             return false;
-        } elseif ($shouldPrompt && ! $this->isInteractive) {
+        } elseif ($shouldPrompt && ! $this->isInteractive && ! $default) {
             return false;
         }
 
@@ -348,19 +341,27 @@ final class Installer
      */
     protected function instantiateSelectModule(array $config, string $key): InstallableModule|array|bool
     {
+        $skipOptionLabel = Arr::get($config, 'skip_option', 'No');
+        $skipModuleValue = 'skip_module';
+
         $options = collect($config['options'])
             ->map(fn ($option, $optionKey) => Arr::get($option, 'label', ucfirst($optionKey)))
-            ->prepend(Arr::get($config, 'skip_option', 'No'), $skipModule = 'skip_module')
+            ->when($skipOptionLabel !== false, fn ($c) => $c->prepend($skipOptionLabel, $skipModuleValue))
             ->all();
 
         $name = str_replace('_', ' ', $key);
 
-        $choice = select(
-            label: Arr::get($config, 'prompt', "Would you like to install one of the following [{$name}] modules?"),
-            options: $options,
-        );
+        if ($this->isInteractive) {
+            $choice = select(
+                label: Arr::get($config, 'prompt', "Would you like to install one of the following [{$name}] modules?"),
+                options: $options,
+                default: Arr::get($config, 'default'),
+            );
+        } elseif (! $this->isInteractive && ! $choice = Arr::get($config, 'default')) {
+            return false;
+        }
 
-        if ($choice === $skipModule) {
+        if ($choice === $skipModuleValue) {
             return false;
         }
 
@@ -548,14 +549,14 @@ EOT;
      */
     public function removeStarterKit(): self
     {
-        if ($this->disableCleanup) {
+        if ($this->isUpdatable() || $this->disableCleanup) {
             return $this;
         }
 
         spin(
             function () {
                 if (Composer::isInstalled($this->package)) {
-                    Composer::withoutQueue()->throwOnFailure(false)->removeDev($this->package);
+                    Composer::withoutQueue()->throwOnFailure(false)->remove($this->package);
                 }
             },
             'Cleaning up temporary files...'
@@ -589,7 +590,7 @@ EOT;
      */
     protected function removeRepository(): self
     {
-        if ($this->fromLocalRepo || ! $this->url) {
+        if ($this->isUpdatable() || $this->fromLocalRepo || ! $this->url) {
             return $this;
         }
 
@@ -664,7 +665,7 @@ EOT;
      */
     protected function starterKitPath(?string $path = null): string
     {
-        return collect([base_path("vendor/{$this->package}"), $path])->filter()->implode('/');
+        return Path::tidy(collect([base_path("vendor/{$this->package}"), $path])->filter()->implode('/'));
     }
 
     /**
@@ -672,12 +673,22 @@ EOT;
      */
     protected function config(?string $key = null): mixed
     {
-        $config = collect(YAML::parse($this->files->get($this->starterKitPath('starter-kit.yaml'))));
+        $config = Blink::once('starter-kit-config', function () {
+            return collect(YAML::parse($this->files->get($this->starterKitPath('starter-kit.yaml'))));
+        });
 
         if ($key) {
             return $config->get($key);
         }
 
         return $config;
+    }
+
+    /**
+     * Should starter kit be treated as an updatable package, and live on for future composer updates, etc?
+     */
+    protected function isUpdatable(): bool
+    {
+        return (bool) $this->config('updatable');
     }
 }

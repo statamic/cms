@@ -8,6 +8,7 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Reflector;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Actions\Action;
 use Statamic\Dictionaries\Dictionary;
@@ -225,17 +226,62 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     public function bootEvents()
     {
-        foreach ($this->listen as $event => $listeners) {
+        $this->getEventListeners()->each(function ($listeners, $event) {
             foreach ($listeners as $listener) {
                 Event::listen($event, $listener);
             }
-        }
+        });
 
-        foreach ($this->subscribe as $subscriber) {
+        $subscribers = collect($this->subscribe)
+            ->merge($this->autoloadFilesFromFolder('Subscribers'))
+            ->unique();
+
+        foreach ($subscribers as $subscriber) {
             Event::subscribe($subscriber);
         }
 
         return $this;
+    }
+
+    private function getEventListeners()
+    {
+        $arr = [];
+
+        foreach ($this->discoverListenerEvents() as $listener => $events) {
+            foreach ($events as $event) {
+                $arr[$event][] = $listener;
+            }
+        }
+
+        foreach ($this->listen as $event => $listeners) {
+            foreach ($listeners as $listener) {
+                if (! in_array($listener, $arr[$event] ?? [])) {
+                    $arr[$event][] = $listener;
+                }
+            }
+        }
+
+        return collect($arr);
+    }
+
+    private function discoverListenerEvents()
+    {
+        return collect($this->autoloadFilesFromFolder('Listeners'))->mapWithKeys(function ($class) {
+            $listener = new \ReflectionClass($class);
+            $events = [];
+
+            foreach ($listener->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
+                if ((! Str::is('handle*', $method->name) && ! Str::is('__invoke', $method->name)) || ! isset($method->getParameters()[0])) {
+                    continue;
+                }
+
+                $key = Str::is(['__invoke', 'handle'], $method->name) ? $class : $class.'@'.$method->name;
+
+                $events[$key] = Reflector::getParameterClassNames($method->getParameters()[0]);
+            }
+
+            return $events;
+        });
     }
 
     protected function bootTags()
@@ -279,7 +325,11 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootDictionaries()
     {
-        foreach ($this->dictionaries as $class) {
+        $dictionaries = collect($this->dictionaries)
+            ->merge($this->autoloadFilesFromFolder('Dictionaries', Dictionary::class))
+            ->unique();
+
+        foreach ($dictionaries as $class) {
             $class::register();
         }
 
@@ -463,15 +513,35 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootRoutes()
     {
-        if ($web = Arr::get($this->routes, 'web')) {
+        $directory = $this->getAddon()->directory();
+
+        $web = Arr::get(
+            array: $this->routes,
+            key: 'web',
+            default: $this->app['files']->exists($path = $directory.'routes/web.php') ? $path : null
+        );
+
+        if ($web) {
             $this->registerWebRoutes($web);
         }
 
-        if ($cp = Arr::get($this->routes, 'cp')) {
+        $cp = Arr::get(
+            array: $this->routes,
+            key: 'cp',
+            default: $this->app['files']->exists($path = $directory.'routes/cp.php') ? $path : null
+        );
+
+        if ($cp) {
             $this->registerCpRoutes($cp);
         }
 
-        if ($actions = Arr::get($this->routes, 'actions')) {
+        $actions = Arr::get(
+            array: $this->routes,
+            key: 'actions',
+            default: $this->app['files']->exists($path = $directory.'routes/actions.php') ? $path : null
+        );
+
+        if ($actions) {
             $this->registerActionRoutes($actions);
         }
 
@@ -702,9 +772,17 @@ abstract class AddonServiceProvider extends ServiceProvider
         return $this;
     }
 
-    protected function autoloadFilesFromFolder($folder, $requiredClass)
+    protected function autoloadFilesFromFolder($folder, $requiredClass = null)
     {
-        $addon = $this->getAddon();
+        try {
+            $addon = $this->getAddon();
+        } catch (NotBootedException $e) {
+            // This would be thrown if a developer has tried to call a method
+            // that triggers autoloading before Statamic has booted. Perhaps
+            // they have placed it in the boot method instead of bootAddon.
+            return [];
+        }
+
         $path = $addon->directory().$addon->autoload().'/'.$folder;
 
         if (! $this->app['files']->exists($path)) {
@@ -714,11 +792,22 @@ abstract class AddonServiceProvider extends ServiceProvider
         $autoloadable = [];
 
         foreach ($this->app['files']->files($path) as $file) {
+            if ($file->getExtension() !== 'php') {
+                continue;
+            }
+
             $class = $file->getBasename('.php');
             $fqcn = $this->namespace().'\\'.str_replace('/', '\\', $folder).'\\'.$class;
-            if (is_subclass_of($fqcn, $requiredClass)) {
-                $autoloadable[] = $fqcn;
+
+            if ((new \ReflectionClass($fqcn))->isAbstract() || (new \ReflectionClass($fqcn))->isInterface()) {
+                continue;
             }
+
+            if ($requiredClass && ! is_subclass_of($fqcn, $requiredClass)) {
+                return;
+            }
+
+            $autoloadable[] = $fqcn;
         }
 
         return $autoloadable;

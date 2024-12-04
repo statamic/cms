@@ -11,6 +11,7 @@ use Statamic\Extensions\Translation\Loader;
 use Statamic\Extensions\Translation\Translator;
 use Statamic\Facades\User;
 use Statamic\Fieldtypes\Sets;
+use Statamic\Http\Middleware\CP\StartSession;
 use Statamic\Http\View\Composers\CustomLogoComposer;
 use Statamic\Http\View\Composers\FieldComposer;
 use Statamic\Http\View\Composers\JavascriptComposer;
@@ -65,6 +66,12 @@ class CpServiceProvider extends ServiceProvider
 
         $this->app->singleton(LicenseManager::class, function ($app) {
             return new LicenseManager($app[Outpost::class]);
+        });
+
+        $this->app->singleton(StartSession::class, function ($app) {
+            return new StartSession($app->make('session'), function () use ($app) {
+                return $app->make('cache');
+            });
         });
     }
 

@@ -341,4 +341,16 @@ class RoutesTest extends TestCase
         $this->get('/bindings/term/title/Blog2')
             ->assertNotFound();
     }
+
+    #[Test]
+    public function it_uses_a_non_default_layout()
+    {
+        config()->set('statamic.system.layout', 'custom-layout');
+        $this->viewShouldReturnRaw('custom-layout', 'Custom layout {{ template_content }}');
+        $this->viewShouldReturnRaw('test', 'Hello {{ hello }}');
+
+        $this->get('/basic-route-with-data')
+            ->assertOk()
+            ->assertSee('Custom layout');
+    }
 }

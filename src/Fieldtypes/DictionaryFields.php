@@ -51,7 +51,7 @@ class DictionaryFields extends Fieldtype
         }
 
         if (is_string($data)) {
-            return ['type' => $data];
+            $data = ['type' => $data];
         }
 
         $dictionary = Dictionary::find($data['type']);

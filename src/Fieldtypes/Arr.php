@@ -108,9 +108,14 @@ class Arr extends Fieldtype
 
         if ($this->config('expand')) {
             return collect($data)
+                ->when($this->isKeyed(), fn ($items) => $items->filter())
                 ->map(fn ($value, $key) => ['key' => $key, 'value' => $value])
                 ->values()
                 ->all();
+        }
+
+        if ($this->isKeyed()) {
+            return collect($data)->filter()->all();
         }
 
         return $data;

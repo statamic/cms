@@ -19,7 +19,7 @@ class UpdaterController extends CpController
     {
         $this->authorize('view updates');
 
-        $addons = $this->getUpdatableAddons();
+        $addons = Addon::all();
 
         if ($addons->isEmpty()) {
             return redirect()->route('statamic.cp.updater.product', Statamic::CORE_SLUG);
@@ -28,8 +28,8 @@ class UpdaterController extends CpController
         return view('statamic::updater.index', [
             'requestError' => $licenses->requestFailed(),
             'statamic' => Marketplace::statamic()->changelog(),
-            'addons' => Addon::all()->filter->existsOnMarketplace(),
-            'unlistedAddons' => Addon::all()->reject->existsOnMarketplace(),
+            'addons' => $addons->filter->existsOnMarketplace(),
+            'unlistedAddons' => $addons->reject->existsOnMarketplace(),
         ]);
     }
 
@@ -41,15 +41,5 @@ class UpdaterController extends CpController
         $this->authorize('view updates');
 
         return UpdatesOverview::count();
-    }
-
-    /**
-     * Get updatable addons.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    private function getUpdatableAddons()
-    {
-        return Addon::all()->filter->marketplaceSlug();
     }
 }
