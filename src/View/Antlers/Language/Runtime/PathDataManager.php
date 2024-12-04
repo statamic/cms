@@ -4,7 +4,6 @@ namespace Statamic\View\Antlers\Language\Runtime;
 
 use Exception;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -696,7 +695,11 @@ class PathDataManager
                     $wasBuilderGoingIntoLast = true;
                 }
 
-                $this->reduceVar($pathItem, $data);
+                if ($this->reducedVar instanceof Model) {
+                    $this->reducedVar = $this->reducedVar->{$pathItem->name};
+                } else {
+                    $this->reduceVar($pathItem, $data);
+                }
 
                 $this->collapseValues($pathItem->isFinal);
 
@@ -960,6 +963,10 @@ class PathDataManager
         $reductionStack = [$value];
         $returnValue = $value;
 
+        if ($value instanceof Model) {
+            return $value;
+        }
+
         while (! empty($reductionStack)) {
             $reductionValue = array_pop($reductionStack);
 
@@ -1014,26 +1021,6 @@ class PathDataManager
             } elseif ($reductionValue instanceof Collection) {
                 GlobalRuntimeState::$isEvaluatingData = true;
                 $reductionStack[] = $reductionValue->all();
-                GlobalRuntimeState::$isEvaluatingData = false;
-
-                continue;
-            } elseif ($reductionValue instanceof Model) {
-                GlobalRuntimeState::$isEvaluatingData = true;
-                $data = $reductionValue->toArray();
-
-                foreach (get_class_methods($reductionValue) as $method) {
-                    if ((new \ReflectionMethod($reductionValue, $method))->getReturnType()?->getName() === Attribute::class) {
-                        $method = Str::snake($method);
-                        $data[$method] = $reductionValue->$method;
-                    }
-
-                    if (Str::startsWith($method, 'get') && Str::endsWith($method, 'Attribute')) {
-                        $method = Str::of($method)->after('get')->before('Attribute')->snake()->__toString();
-                        $data[$method] = $reductionValue->getAttribute($method);
-                    }
-                }
-
-                $reductionStack[] = $data;
                 GlobalRuntimeState::$isEvaluatingData = false;
 
                 continue;
