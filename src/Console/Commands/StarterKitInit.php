@@ -169,6 +169,8 @@ class StarterKitInit extends Command
             $contents = str_replace('A description of your starter kit', $description, $contents);
         }
 
+        // TODO: PSR-4 autoload `src`? Does dir have to exist first?
+
         File::put($targetPath, $contents);
 
         return $this;
