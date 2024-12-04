@@ -24,7 +24,8 @@ class StarterKitInit extends Command
     protected $signature = 'statamic:starter-kit:init
         { package? : Specify a package for the starter kit (ie. vendor/starter-kit) }
         { --name : Specify a name for the starter kit }
-        { --description : Specify a description of the starter kit }';
+        { --description : Specify a description of the starter kit }
+        { --force : Force overwrite if files already exist }';
 
     /**
      * The console command description.
@@ -120,7 +121,7 @@ class StarterKitInit extends Command
 
         $targetPath = base_path('package/starter-kit.yaml');
 
-        if (File::exists($targetPath) && $this->input->isInteractive()) {
+        if (File::exists($targetPath) && $this->input->isInteractive() && ! $this->option('force')) {
             if (! confirm('A [starter-kit.yaml] config already exists. Would you like to overwrite it?', false)) {
                 return $this;
             }
@@ -142,7 +143,7 @@ class StarterKitInit extends Command
 
         $targetPath = base_path('package/composer.json');
 
-        if (File::exists($targetPath) && $this->input->isInteractive()) {
+        if (File::exists($targetPath) && $this->input->isInteractive() && ! $this->option('force')) {
             if (! confirm('A [composer.json] config already exists. Would you like to overwrite it?', false)) {
                 return $this;
             }
