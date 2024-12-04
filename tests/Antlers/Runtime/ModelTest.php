@@ -3,54 +3,42 @@
 namespace Tests\Antlers\Runtime;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\Antlers\ParserTestCase;
 
 class ModelTest extends ParserTestCase
 {
-    public function test_model_attributes_are_returned()
+    #[Test, DataProvider('modelProvider')]
+    public function attributes_are_returned($attribute, $expected)
     {
-        $model = FakeModel::make();
-        $model->title = 'Title';
+        $model = new FakeModel;
+        $model->title = 'foo';
 
-        $data = [
-            'model' => $model,
-        ];
-
-        $template = <<<'EOT'
-{{ model:title }}{{ model:foo_bar }}
-EOT;
-
-        $this->assertSame('TitleFooBar', $this->renderString($template, $data));
+        $this->assertSame($expected, $this->renderString("{{ model:$attribute }}", ['model' => $model]));
     }
 
-    public function test_legacy_model_attributes_are_returned()
+    public static function modelProvider()
     {
-        $model = FakeModel::make();
-        $model->title = 'Title';
-
-        $data = [
-            'model' => $model,
+        return [
+            'column' => ['title', 'foo'],
+            'accessor' => ['alfa_bravo', 'charlie'],
+            'old accessor' => ['delta_echo', 'foxtrot'],
         ];
-
-        $template = <<<'EOT'
-{{ model:title }}{{ model:bar_baz }}
-EOT;
-
-        $this->assertSame('TitleBarBaz', $this->renderString($template, $data));
     }
 }
 
 class FakeModel extends \Illuminate\Database\Eloquent\Model
 {
-    public function fooBar(): Attribute
+    public function alfaBravo(): Attribute
     {
         return Attribute::make(
-            get: fn () => 'FooBar',
+            get: fn () => 'charlie',
         );
     }
 
-    public function getBarBazAttribute()
+    public function getDeltaEchoAttribute()
     {
-        return 'BarBaz';
+        return 'foxtrot';
     }
 }
