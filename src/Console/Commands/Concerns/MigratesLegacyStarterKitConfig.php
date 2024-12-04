@@ -8,6 +8,8 @@ use function Laravel\Prompts\confirm;
 
 trait MigratesLegacyStarterKitConfig
 {
+    protected $migrated = false;
+
     /**
      * Determine if dev sandbox has starter-kit.yaml at root and/or customized composer.json at target path.
      */
@@ -19,7 +21,7 @@ trait MigratesLegacyStarterKitConfig
     /**
      * Determine if dev sandbox has starter-kit.yaml at root and/or customized composer.json at target path.
      */
-    protected function migrateLegacyStarterKitConfig(): self
+    protected function migrateLegacyConfig(?string $exportPath = null): self
     {
         if (! $this->isUsingLegacyExporterConventions()) {
             return $this;
@@ -45,11 +47,21 @@ trait MigratesLegacyStarterKitConfig
             $this->components->info('Starter kit post-install hook moved to [package/StarterKitPostInstall.php].');
         }
 
-        if (File::exists($packageComposerJson = $this->getAbsolutePath().'/composer.json')) {
+        if ($exportPath && File::exists($packageComposerJson = $exportPath.'/composer.json')) {
             File::move($packageComposerJson, base_path('package/composer.json'));
             $this->components->info('Composer package config moved to [package/composer.json].');
         }
 
+        $this->migrated = true;
+
         return $this;
+    }
+
+    /**
+     * Check if migration logic was ran.
+     */
+    protected function migratedLegacyConfig(): bool
+    {
+        return $this->migrated;
     }
 }

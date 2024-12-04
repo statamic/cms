@@ -37,9 +37,11 @@ class StarterKitExport extends Command
      */
     public function handle()
     {
-        $this->migrateLegacyStarterKitConfig();
+        $path = $this->getAbsolutePath();
 
-        if (! File::exists($path = $this->getAbsolutePath())) {
+        $this->migrateLegacyConfig($path);
+
+        if (! File::exists($path)) {
             $this->askToCreateExportPath($path);
         }
 
