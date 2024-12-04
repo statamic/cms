@@ -3,6 +3,7 @@
 namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
+use Statamic\Console\Commands\Concerns\MigratesLegacyStarterKitConfig;
 use Statamic\Console\RunsInPlease;
 use Statamic\Console\ValidatesInput;
 use Statamic\Facades\File;
@@ -13,7 +14,7 @@ use function Laravel\Prompts\text;
 
 class StarterKitInit extends Command
 {
-    use RunsInPlease, ValidatesInput;
+    use MigratesLegacyStarterKitConfig, RunsInPlease, ValidatesInput;
 
     /**
      * The name and signature of the console command.
@@ -46,8 +47,8 @@ class StarterKitInit extends Command
         }
 
         $this
+            ->migrateLegacyConfig()
             ->createFolder()
-            // ->migrateLegacy() // TODO: Consolidate logic to trait from other PR
             ->createConfig()
             ->createComposerJson($package, $name, $description);
 
@@ -111,6 +112,10 @@ class StarterKitInit extends Command
      */
     protected function createConfig(): self
     {
+        if ($this->migratedLegacyConfig()) {
+            return $this;
+        }
+
         $contents = File::get(__DIR__.'/stubs/starter-kits/starter-kit.yaml.stub');
 
         $targetPath = base_path('package/starter-kit.yaml');
