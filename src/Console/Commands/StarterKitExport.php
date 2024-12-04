@@ -55,7 +55,7 @@ class StarterKitExport extends Command
             return 1;
         }
 
-        $this->components->info("Starter kit was successfully exported to [$path].");
+        $this->components->success("Starter kit was successfully exported to [$path].");
     }
 
     /**

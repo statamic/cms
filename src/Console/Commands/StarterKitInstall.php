@@ -49,7 +49,7 @@ class StarterKitInstall extends Command
         [$package, $branch] = $this->getPackageAndBranch();
 
         if ($this->validationFails($package, new ComposerPackage)) {
-            return;
+            return 1;
         }
 
         $licenseManager = StarterKitLicenseManager::validate($package, $this->option('license'), $this, $this->input->isInteractive());
@@ -90,7 +90,7 @@ class StarterKitInstall extends Command
             $this->comment('composer global update statamic/cli'.PHP_EOL);
         }
 
-        $this->components->info("Starter kit [$package] was successfully installed.");
+        $this->components->success("Starter kit [$package] was successfully installed.");
     }
 
     /**
