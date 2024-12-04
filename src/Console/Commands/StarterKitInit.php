@@ -121,13 +121,21 @@ class StarterKitInit extends Command
 
         $targetPath = base_path('package/starter-kit.yaml');
 
-        if (File::exists($targetPath) && $this->input->isInteractive() && ! $this->option('force')) {
+        if ($this->input->isInteractive() && File::exists($targetPath) && ! $this->option('force')) {
             if (! confirm('A [starter-kit.yaml] config already exists. Would you like to overwrite it?', false)) {
                 return $this;
             }
         }
 
-        // TODO: Ask if updatable, and if so prepend `updatable: true` to yaml and create service provider too?
+        if ($this->input->isInteractive()) {
+            if (confirm(
+                label: 'Would you like to make this starter-kit updatable?',
+                default: false,
+                hint: 'Read more: https://statamic.dev/starter-kits/creating-a-starter-kit#making-starter-kits-updatable',
+            )) {
+                $contents = "updatable: true\n".$contents;
+            }
+        }
 
         File::put($targetPath, $contents);
 
@@ -143,7 +151,7 @@ class StarterKitInit extends Command
 
         $targetPath = base_path('package/composer.json');
 
-        if (File::exists($targetPath) && $this->input->isInteractive() && ! $this->option('force')) {
+        if ($this->input->isInteractive() && File::exists($targetPath) && ! $this->option('force')) {
             if (! confirm('A [composer.json] config already exists. Would you like to overwrite it?', false)) {
                 return $this;
             }
