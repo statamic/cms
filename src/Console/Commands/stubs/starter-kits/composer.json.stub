@@ -1,9 +1,9 @@
 {
-    "name": "dummy/package",
+    "name": "example/starter-kit-package",
     "extra": {
         "statamic": {
-            "name": "DummyTitle",
-            "description": "DummyTitle starter kit"
+            "name": "Example Name",
+            "description": "A description of your starter kit"
         }
     }
 }
