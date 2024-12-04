@@ -21,9 +21,9 @@ class StarterKitInit extends Command
      * @var string
      */
     protected $signature = 'statamic:starter-kit:init
-        { name? : Specify a name for the starter kit }
-        { description? : Specify a description of the starter kit }
-        { package? : Specify a package for the starter kit (ie. vendor/starter-kit) }';
+        { package? : Specify a package for the starter kit (ie. vendor/starter-kit) }
+        { --name : Specify a name for the starter kit }
+        { --description : Specify a description of the starter kit }';
 
     /**
      * The console command description.
@@ -37,11 +37,11 @@ class StarterKitInit extends Command
      */
     public function handle()
     {
+        $package = $this->getKitPackage();
         $name = $this->getKitName();
         $description = $this->getKitDescription();
-        $package = $this->getKitPackage();
 
-        if (! $name || ! $package || ! $description) {
+        if (! $package || ! $name || ! $description) {
             $this->components->info('You can manage your starter kit\'s package config in [package/composer.json] at any time.');
         }
 
@@ -49,25 +49,9 @@ class StarterKitInit extends Command
             ->createFolder()
             // ->migrateLegacy() // TODO: Consolidate logic to trait from other PR
             ->createConfig()
-            ->createComposerJson($name, $description, $package);
+            ->createComposerJson($package, $name, $description);
 
-        $this->components->success('Starter kit config was successfully created in [package/] folder.');
-    }
-
-    /**
-     * Get starter kit name for composer.json (optional).
-     */
-    protected function getKitName(): ?string
-    {
-        return $this->argument('name') ?: text('Starter Kit Name');
-    }
-
-    /**
-     * Get starter kit description for composer.json (optional).
-     */
-    protected function getKitDescription(): ?string
-    {
-        return $this->argument('description') ?: text('Starter Kit Description');
+        $this->components->success('Your starter kit config was successfully created in your project\'s [package] folder.');
     }
 
     /**
@@ -92,6 +76,22 @@ class StarterKitInit extends Command
         }
 
         return $package;
+    }
+
+    /**
+     * Get starter kit name for composer.json (optional).
+     */
+    protected function getKitName(): ?string
+    {
+        return $this->option('name') ?: text('Starter Kit Name (eg. Kung Fury)');
+    }
+
+    /**
+     * Get starter kit description for composer.json (optional).
+     */
+    protected function getKitDescription(): ?string
+    {
+        return $this->option('description') ?: text('Starter Kit Description');
     }
 
     /**
@@ -131,7 +131,7 @@ class StarterKitInit extends Command
     /**
      * Create composer.json config from stub.
      */
-    protected function createComposerJson(?string $name, ?string $description, ?string $package): self
+    protected function createComposerJson(?string $package, ?string $name, ?string $description): self
     {
         $contents = File::get(__DIR__.'/stubs/starter-kits/composer.json.stub');
 
@@ -143,16 +143,16 @@ class StarterKitInit extends Command
             }
         }
 
+        if ($package) {
+            $contents = str_replace('example/starter-kit-package', $package, $contents);
+        }
+
         if ($name) {
             $contents = str_replace('Example Name', $name, $contents);
         }
 
         if ($description) {
             $contents = str_replace('A description of your starter kit', $description, $contents);
-        }
-
-        if ($package) {
-            $contents = str_replace('example/starter-kit-package', $package, $contents);
         }
 
         File::put($targetPath, $contents);
