@@ -8,6 +8,8 @@ use Statamic\Console\RunsInPlease;
 use Statamic\Console\ValidatesInput;
 use Statamic\Facades\File;
 use Statamic\Rules\ComposerPackage;
+use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\text;
@@ -59,7 +61,7 @@ class StarterKitInit extends Command
     }
 
     /**
-     * Get starter kit package for composer.json (optional).
+     * Get starter kit package (optional).
      */
     protected function getKitPackage(bool $promptingAgain = false): ?string
     {
@@ -83,7 +85,7 @@ class StarterKitInit extends Command
     }
 
     /**
-     * Get starter kit name for composer.json (optional).
+     * Get starter kit name (optional).
      */
     protected function getKitName(): ?string
     {
@@ -91,7 +93,7 @@ class StarterKitInit extends Command
     }
 
     /**
-     * Get starter kit description for composer.json (optional).
+     * Get starter kit description (optional).
      */
     protected function getKitDescription(): ?string
     {
@@ -151,12 +153,10 @@ class StarterKitInit extends Command
     }
 
     /**
-     * Create composer.json config from stub.
+     * Create composer.json config.
      */
     protected function createComposerJson(?string $package, ?string $name, ?string $description, bool $updatable): self
     {
-        $contents = File::get(__DIR__.'/stubs/starter-kits/composer.json.stub');
-
         $targetPath = base_path('package/composer.json');
 
         if ($this->input->isInteractive() && File::exists($targetPath) && ! $this->option('force')) {
@@ -165,22 +165,55 @@ class StarterKitInit extends Command
             }
         }
 
+        $json = [
+            'name' => 'example/starter-kit-package',
+            'extra' => [
+                'statamic' => [
+                    'name' => 'Example Name',
+                    'description' => 'A description of your starter kit',
+                ],
+            ],
+        ];
+
         if ($package) {
-            $contents = str_replace('example/starter-kit-package', $package, $contents);
+            Arr::set($json, 'name', $package);
         }
 
         if ($name) {
-            $contents = str_replace('Example Name', $name, $contents);
+            Arr::set($json, 'extra.statamic.name', $name);
         }
 
         if ($description) {
-            $contents = str_replace('A description of your starter kit', $description, $contents);
+            Arr::set($json, 'extra.statamic.description', $description);
         }
 
-        // TODO: PSR-4 autoload `src`? Does dir have to exist first?
+        if ($updatable && $namespace = static::createKitNamespace($package, $name)) {
+            Arr::set($json, 'autoload.psr-4', [$namespace.'\\' => 'src']);
+            Arr::set($json, 'autoload-dev.psr-4', ['Tests\\' => 'tests']);
+            Arr::set($json, 'extra.laravel.providers', [$namespace.'\\ServiceProvider']);
+        }
 
-        File::put($targetPath, $contents);
+        File::put($targetPath, json_encode($json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 
         return $this;
+    }
+
+    /**
+     * Create kit namespace from name and input if possible.
+     */
+    public static function createKitNamespace(?string $package, ?string $name): string
+    {
+        $vendor = 'Example';
+        $namespace = 'StarterKitNamespace';
+
+        if ($package) {
+            [$vendor, $namespace] = explode('/', $package);
+        }
+
+        if ($name) {
+            $namespace = $name;
+        }
+
+        return Str::upperCamelize($vendor).'\\'.Str::upperCamelize($namespace);
     }
 }
