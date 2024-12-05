@@ -8,6 +8,7 @@ use Statamic\Console\RunsInPlease;
 use Statamic\Console\ValidatesInput;
 use Statamic\Facades\File;
 use Statamic\Rules\ComposerPackage;
+use Statamic\StarterKits\Exceptions\StarterKitException;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -42,10 +43,14 @@ class StarterKitInit extends Command
      */
     public function handle()
     {
-        $package = $this->getKitPackage();
-        $name = $this->getKitName();
-        $description = $this->getKitDescription();
-        $updatable = $this->getKitUpdatable();
+        try {
+            $package = $this->getKitPackage();
+            $name = $this->getKitName();
+            $description = $this->getKitDescription();
+            $updatable = $this->getKitUpdatable();
+        } catch (StarterKitException $exception) {
+            return 1;
+        }
 
         if (! $package || ! $name || ! $description) {
             $this->components->info('You can manage your starter kit\'s package config in [package/composer.json] at any time.');
@@ -82,7 +87,7 @@ class StarterKitInit extends Command
         if ($package && $fails && $this->input->isInteractive()) {
             return $this->getKitPackage(true);
         } elseif ($package && $fails) {
-            exit;
+            throw new StarterKitException;
         }
 
         return $package;
