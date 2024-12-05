@@ -54,7 +54,7 @@ class InitTest extends TestCase
         $this->assertFileExists($configPath = $this->packagePath('starter-kit.yaml'));
         $this->assertFileExists($composerJsonPath = $this->packagePath('composer.json'));
 
-        $this->assertEquals(<<<'YAML'
+        $this->assertStringEqualsStringIgnoringLineEndings(<<<'YAML'
 # export_paths:
 #   - content
 #   - config/filesystems.php
@@ -68,7 +68,7 @@ class InitTest extends TestCase
 #   - vite.config.js
 YAML, trim($this->files->get($configPath)));
 
-        $this->assertEquals(<<<'JSON'
+        $this->assertStringEqualsStringIgnoringLineEndings(<<<'JSON'
 {
     "name": "example/starter-kit-package",
     "extra": {
@@ -101,7 +101,7 @@ JSON, trim($this->files->get($composerJsonPath)));
         $this->assertFileExists($configPath = $this->packagePath('starter-kit.yaml'));
         $this->assertFileExists($composerJsonPath = $this->packagePath('composer.json'));
 
-        $this->assertEquals(<<<'YAML'
+        $this->assertStringEqualsStringIgnoringLineEndings(<<<'YAML'
 # export_paths:
 #   - content
 #   - config/filesystems.php
@@ -115,7 +115,7 @@ JSON, trim($this->files->get($composerJsonPath)));
 #   - vite.config.js
 YAML, trim($this->files->get($configPath)));
 
-        $this->assertEquals(<<<'JSON'
+        $this->assertStringEqualsStringIgnoringLineEndings(<<<'JSON'
 {
     "name": "example/starter-kit-package",
     "extra": {
@@ -147,7 +147,7 @@ JSON, trim($this->files->get($composerJsonPath)));
         $this->assertFileExists($configPath = $this->packagePath('starter-kit.yaml'));
         $this->assertFileExists($composerJsonPath = $this->packagePath('composer.json'));
 
-        $this->assertEquals(<<<'JSON'
+        $this->assertStringEqualsStringIgnoringLineEndings(<<<'JSON'
 {
     "name": "statamic/starter-kit-cool-writings",
     "extra": {
@@ -195,7 +195,7 @@ JSON, trim($this->files->get($composerJsonPath)));
         $this->assertFileExists($configPath = $this->packagePath('starter-kit.yaml'));
         $this->assertFileExists($composerJsonPath = $this->packagePath('composer.json'));
 
-        $this->assertEquals(<<<'JSON'
+        $this->assertStringEqualsStringIgnoringLineEndings(<<<'JSON'
 {
     "name": "statamic/starter-kit-cool-writings",
     "extra": {
@@ -224,7 +224,7 @@ JSON, trim($this->files->get($composerJsonPath)));
         $this->assertFileExists($composerJsonPath = $this->packagePath('composer.json'));
         $this->assertFileExists($serviceProviderPath = $this->packagePath('src/ServiceProvider.php'));
 
-        $this->assertEquals(<<<'YAML'
+        $this->assertStringEqualsStringIgnoringLineEndings(<<<'YAML'
 updatable: true
 # export_paths:
 #   - content
@@ -239,7 +239,7 @@ updatable: true
 #   - vite.config.js
 YAML, trim($this->files->get($configPath)));
 
-        $this->assertEquals(<<<'JSON'
+        $this->assertStringEqualsStringIgnoringLineEndings(<<<'JSON'
 {
     "name": "example/starter-kit-package",
     "extra": {
@@ -266,7 +266,7 @@ YAML, trim($this->files->get($configPath)));
 }
 JSON, trim($this->files->get($composerJsonPath)));
 
-        $this->assertEquals(<<<'PHP'
+        $this->assertStringEqualsStringIgnoringLineEndings(<<<'PHP'
 <?php
 
 namespace Example\StarterKitNamespace;
@@ -303,7 +303,7 @@ PHP, trim($this->files->get($serviceProviderPath)));
         $this->assertFileExists($composerJsonPath = $this->packagePath('composer.json'));
         $this->assertFileExists($serviceProviderPath = $this->packagePath('src/ServiceProvider.php'));
 
-        $this->assertEquals(<<<'YAML'
+        $this->assertStringEqualsStringIgnoringLineEndings(<<<'YAML'
 updatable: true
 # export_paths:
 #   - content
@@ -318,7 +318,7 @@ updatable: true
 #   - vite.config.js
 YAML, trim($this->files->get($configPath)));
 
-        $this->assertEquals(<<<'JSON'
+        $this->assertStringEqualsStringIgnoringLineEndings(<<<'JSON'
 {
     "name": "example/starter-kit-package",
     "extra": {
@@ -345,7 +345,7 @@ YAML, trim($this->files->get($configPath)));
 }
 JSON, trim($this->files->get($composerJsonPath)));
 
-        $this->assertEquals(<<<'PHP'
+        $this->assertStringEqualsStringIgnoringLineEndings(<<<'PHP'
 <?php
 
 namespace Example\StarterKitNamespace;
@@ -383,7 +383,7 @@ PHP, trim($this->files->get($serviceProviderPath)));
         $this->assertFileExists($composerJsonPath = $this->packagePath('composer.json'));
         $this->assertFileExists($serviceProviderPath = $this->packagePath('src/ServiceProvider.php'));
 
-        $this->assertEquals(<<<'JSON'
+        $this->assertStringEqualsStringIgnoringLineEndings(<<<'JSON'
 {
     "name": "statamic-rad-pack/starter-kit-cool-writings",
     "extra": {
@@ -410,7 +410,7 @@ PHP, trim($this->files->get($serviceProviderPath)));
 }
 JSON, trim($this->files->get($composerJsonPath)));
 
-        $this->assertEquals(<<<'PHP'
+        $this->assertStringEqualsStringIgnoringLineEndings(<<<'PHP'
 <?php
 
 namespace StatamicRadPack\CoolWritings;
@@ -447,7 +447,7 @@ PHP, trim($this->files->get($serviceProviderPath)));
         $this->assertFileExists($composerJsonPath = $this->packagePath('composer.json'));
         $this->assertFileExists($serviceProviderPath = $this->packagePath('src/ServiceProvider.php'));
 
-        $this->assertEquals(<<<'JSON'
+        $this->assertStringEqualsStringIgnoringLineEndings(<<<'JSON'
 {
     "name": "statamic-rad-pack/starter-kit-cool-writings",
     "extra": {
@@ -474,7 +474,7 @@ PHP, trim($this->files->get($serviceProviderPath)));
 }
 JSON, trim($this->files->get($composerJsonPath)));
 
-        $this->assertEquals(<<<'PHP'
+        $this->assertStringEqualsStringIgnoringLineEndings(<<<'PHP'
 <?php
 
 namespace StatamicRadPack\CoolWritings;
@@ -564,7 +564,7 @@ PHP, trim($this->files->get($serviceProviderPath)));
         $this->assertFileExists($configPath = $this->packagePath('starter-kit.yaml'));
         $this->assertFileExists($composerJsonPath = $this->packagePath('composer.json'));
 
-        $this->assertEquals(<<<'YAML'
+        $this->assertStringEqualsStringIgnoringLineEndings(<<<'YAML'
 # export_paths:
 #   - content
 #   - config/filesystems.php
@@ -578,7 +578,7 @@ PHP, trim($this->files->get($serviceProviderPath)));
 #   - vite.config.js
 YAML, trim($this->files->get($configPath)));
 
-        $this->assertEquals(<<<'JSON'
+        $this->assertStringEqualsStringIgnoringLineEndings(<<<'JSON'
 {
     "name": "statamic/starter-kit-cool-writings",
     "extra": {
@@ -608,7 +608,7 @@ JSON, trim($this->files->get($composerJsonPath)));
         $this->assertFileExists($configPath = $this->packagePath('starter-kit.yaml'));
         $this->assertFileExists($composerJsonPath = $this->packagePath('composer.json'));
 
-        $this->assertEquals(<<<'YAML'
+        $this->assertStringEqualsStringIgnoringLineEndings(<<<'YAML'
 # export_paths:
 #   - content
 #   - config/filesystems.php
@@ -622,7 +622,7 @@ JSON, trim($this->files->get($composerJsonPath)));
 #   - vite.config.js
 YAML, trim($this->files->get($configPath)));
 
-        $this->assertEquals(<<<'JSON'
+        $this->assertStringEqualsStringIgnoringLineEndings(<<<'JSON'
 {
     "name": "statamic/starter-kit-cool-writings",
     "extra": {
