@@ -1,9 +1,0 @@
-{
-    "name": "example/starter-kit-package",
-    "extra": {
-        "statamic": {
-            "name": "Example Name",
-            "description": "A description of your starter kit"
-        }
-    }
-}
