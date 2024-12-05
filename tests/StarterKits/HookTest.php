@@ -3,11 +3,12 @@
 namespace Tests\StarterKits;
 
 use Facades\Statamic\StarterKits\Hook;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class HookTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_can_find_and_return_hook_instance_from_class_path()
     {
         $this->assertFalse(class_exists('StarterKitHook'));
@@ -18,7 +19,7 @@ class HookTest extends TestCase
         $this->assertInstanceOf('StarterKitHook', $hook);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_null_when_hook_class_doesnt_exist()
     {
         $hook = Hook::find(__DIR__.'/__fixtures__/NonExistent.php');

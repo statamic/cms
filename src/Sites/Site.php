@@ -4,6 +4,7 @@ namespace Statamic\Sites;
 
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\HasAugmentedData;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\TextDirection;
 use Statamic\View\Antlers\Language\Runtime\RuntimeParser;
@@ -67,6 +68,11 @@ class Site implements Augmentable
     public function attributes()
     {
         return $this->config['attributes'] ?? [];
+    }
+
+    public function attribute($key, $default = null)
+    {
+        return Arr::get($this->attributes(), $key, $default);
     }
 
     public function absoluteUrl()

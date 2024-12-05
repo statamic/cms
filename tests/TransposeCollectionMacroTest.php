@@ -2,9 +2,11 @@
 
 namespace Tests;
 
+use PHPUnit\Framework\Attributes\Test;
+
 class TransposeCollectionMacroTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_transposes()
     {
         $before = [

@@ -3,12 +3,13 @@
 namespace Tests\Permissions;
 
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\Permissions;
 use Tests\TestCase;
 
 class PermissionsTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_registers_a_permission()
     {
         $permissions = new Permissions;
@@ -23,7 +24,7 @@ class PermissionsTest extends TestCase
         $this->assertEquals($permission, $permissions->get('one'));
     }
 
-    /** @test */
+    #[Test]
     public function it_registers_a_permission_with_a_closure()
     {
         $permissions = new Permissions;
@@ -42,7 +43,7 @@ class PermissionsTest extends TestCase
         ], $permissions->all()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_registers_a_permission_via_a_string()
     {
         $permissions = new Permissions;
@@ -54,7 +55,7 @@ class PermissionsTest extends TestCase
         $this->assertCount(0, $permissions->all()->first()->children());
     }
 
-    /** @test */
+    #[Test]
     public function it_registers_a_permission_via_a_string_and_closure()
     {
         $permissions = new Permissions;
@@ -71,7 +72,7 @@ class PermissionsTest extends TestCase
         $this->assertEquals('two', $permissions->all()->first()->children()->first()->value());
     }
 
-    /** @test */
+    #[Test]
     public function any_permissions_registered_within_a_group_callback_will_belong_to_that_group()
     {
         $permissions = new Permissions;
@@ -99,7 +100,7 @@ class PermissionsTest extends TestCase
         $this->assertEquals('foo', $four->group());
     }
 
-    /** @test */
+    #[Test]
     public function it_defers_registration_until_boot_using_extend_method()
     {
         $permissions = new Permissions;
@@ -117,7 +118,7 @@ class PermissionsTest extends TestCase
         $this->assertTrue($callbackRan);
     }
 
-    /** @test */
+    #[Test]
     public function it_places_any_permissions_registered_early_without_extend_callback_at_the_end()
     {
         $permissions = new Permissions;
@@ -135,7 +136,7 @@ class PermissionsTest extends TestCase
         $this->assertEquals(['three', 'one', 'two'], $names);
     }
 
-    /** @test */
+    #[Test]
     public function it_makes_a_tree()
     {
         $this->setupComplicatedTest($permissions = new Permissions);
@@ -260,7 +261,7 @@ class PermissionsTest extends TestCase
         ], $permissions->tree()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_all_permissions_in_a_flattened_structure()
     {
         $this->setupComplicatedTest($permissions = new Permissions);
@@ -284,7 +285,7 @@ class PermissionsTest extends TestCase
         ])->sort()->values()->all(), $all->keys()->sort()->values()->all());
     }
 
-    /** @test */
+    #[Test]
     public function existing_permissions_can_be_modified()
     {
         $permissions = new Permissions;

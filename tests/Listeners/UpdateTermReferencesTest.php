@@ -2,6 +2,8 @@
 
 namespace Tests\Listeners;
 
+use Orchestra\Testbench\Attributes\DefineEnvironment;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Support\Arr;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -35,7 +37,7 @@ class UpdateTermReferencesTest extends TestCase
         $app['config']->set('statamic.system.update_references', false);
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_single_term_fields()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -77,7 +79,7 @@ class UpdateTermReferencesTest extends TestCase
         $this->assertEquals('norris', $entry->fresh()->get('non_favourite'));
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_multi_terms_fields()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -106,7 +108,7 @@ class UpdateTermReferencesTest extends TestCase
         $this->assertEquals(['hoff-new', 'norris'], $entry->fresh()->get('favourites'));
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_terms_fields_regardless_of_max_items_setting()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -147,7 +149,7 @@ class UpdateTermReferencesTest extends TestCase
         $this->assertEquals('norris', $entry->fresh()->get('non_favourites'));
     }
 
-    /** @test */
+    #[Test]
     public function it_nullifies_references_when_deleting_a_term()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -205,7 +207,7 @@ class UpdateTermReferencesTest extends TestCase
         $this->assertFalse($entry->fresh()->has('favourites'));
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_scoped_single_term_fields()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -245,7 +247,7 @@ class UpdateTermReferencesTest extends TestCase
         $this->assertEquals('topics::norris', $entry->fresh()->get('non_favourite'));
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_scoped_multi_terms_fields()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -273,7 +275,7 @@ class UpdateTermReferencesTest extends TestCase
         $this->assertEquals(['topics::hoff-new', 'topics::norris'], $entry->fresh()->get('favourites'));
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_scoped_term_fields_regardless_of_max_items_setting()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -312,7 +314,7 @@ class UpdateTermReferencesTest extends TestCase
         $this->assertEquals('topics::norris', $entry->fresh()->get('non_favourites'));
     }
 
-    /** @test */
+    #[Test]
     public function it_nullifies_references_when_deleting_a_scoped_term()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -367,11 +369,8 @@ class UpdateTermReferencesTest extends TestCase
         $this->assertFalse($entry->fresh()->has('favourites'));
     }
 
-    /**
-     * @test
-     *
-     * @environment-setup disableUpdateReferences
-     **/
+    #[Test]
+    #[DefineEnvironment('disableUpdateReferences')]
     public function it_can_be_disabled()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -425,7 +424,7 @@ class UpdateTermReferencesTest extends TestCase
         $this->assertEquals(['hoff', 'norris'], $entry->fresh()->get('favourites'));
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_nested_term_fields_within_replicator_fields()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -511,7 +510,7 @@ class UpdateTermReferencesTest extends TestCase
         $this->assertEquals(['norris-new', 'lee'], Arr::get($entry->fresh()->data(), 'reppy.2.favourites'));
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_nested_term_fields_within_legacy_replicator_configs()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -593,7 +592,7 @@ class UpdateTermReferencesTest extends TestCase
         $this->assertEquals(['norris-new', 'lee'], Arr::get($entry->fresh()->data(), 'reppy.2.favourites'));
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_nested_term_fields_within_grid_fields()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -653,7 +652,7 @@ class UpdateTermReferencesTest extends TestCase
         $this->assertEquals(['norris-new', 'lee'], Arr::get($entry->fresh()->data(), 'griddy.1.favourites'));
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_nested_term_fields_within_bard_fields()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -749,7 +748,7 @@ class UpdateTermReferencesTest extends TestCase
         $this->assertEquals(['norris-new', 'lee'], Arr::get($entry->fresh()->data(), 'bardo.2.attrs.values.favourites'));
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_nested_term_fields_within_legacy_bard_config()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -841,7 +840,7 @@ class UpdateTermReferencesTest extends TestCase
         $this->assertEquals(['norris-new', 'lee'], Arr::get($entry->fresh()->data(), 'bardo.2.attrs.values.favourites'));
     }
 
-    /** @test */
+    #[Test]
     public function it_recursively_updates_nested_term_fields()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -970,7 +969,7 @@ class UpdateTermReferencesTest extends TestCase
         $this->assertEquals(['norris-new', 'lee'], Arr::get($entry->fresh()->data(), 'reppy.1.bard_within_reppy.0.attrs.values.griddy.0.favourites'));
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_update_terms_from_another_taxonomy()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -1049,7 +1048,7 @@ class UpdateTermReferencesTest extends TestCase
         $this->assertEquals(['topics::hoff', 'wrong_topics::hoff'], $entry->fresh()->get('wrong_mixed_terms'));
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_entries()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -1078,7 +1077,7 @@ class UpdateTermReferencesTest extends TestCase
         $this->assertEquals('hoff-new', $entry->fresh()->get('favourite'));
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_terms_on_terms()
     {
         $taxonomy = tap(Facades\Taxonomy::make('tags')->sites(['en', 'fr']))->save();
@@ -1118,7 +1117,7 @@ class UpdateTermReferencesTest extends TestCase
         $this->assertEquals('hoff-new', $term->in('fr')->fresh()->get('favourite'));
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_global_sets()
     {
         $set = Facades\GlobalSet::make('default');
@@ -1151,7 +1150,7 @@ class UpdateTermReferencesTest extends TestCase
         $this->assertEquals('hoff-new', $set->in('fr')->fresh()->get('favourite'));
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_users()
     {
         $user = tap(Facades\User::make()->email('hoff@example.com')->data(['favourite' => 'hoff']))->save();
@@ -1176,7 +1175,7 @@ class UpdateTermReferencesTest extends TestCase
         $this->assertEquals('hoff-new', $user->fresh()->get('favourite'));
     }
 
-    /** @test */
+    #[Test]
     public function it_only_saves_items_when_there_is_something_to_update()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();

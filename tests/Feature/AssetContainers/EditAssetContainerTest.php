@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\AssetContainers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
@@ -13,7 +14,7 @@ class EditAssetContainerTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_shows_the_form()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure asset containers']]);
@@ -26,7 +27,7 @@ class EditAssetContainerTest extends TestCase
             ->assertSuccessful();
     }
 
-    /** @test */
+    #[Test]
     public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);

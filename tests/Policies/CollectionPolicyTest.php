@@ -2,12 +2,13 @@
 
 namespace Tests\Policies;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Entries\Collection as CollectionContract;
 use Statamic\Facades\Collection;
 
 class CollectionPolicyTest extends PolicyTestCase
 {
-    /** @test */
+    #[Test]
     public function index_is_allowed_if_any_collection_is_viewable()
     {
         $userWithAlfaPermission = $this->userWithPermissions(['view alfa entries']);
@@ -24,7 +25,7 @@ class CollectionPolicyTest extends PolicyTestCase
         $this->assertFalse($userWithoutPermission->can('index', CollectionContract::class));
     }
 
-    /** @test */
+    #[Test]
     public function index_is_allowed_if_any_collection_is_viewable_with_site_permissions()
     {
         $this->withSites(['en', 'fr', 'de']);
@@ -44,7 +45,7 @@ class CollectionPolicyTest extends PolicyTestCase
         $this->assertFalse($userWithDePermission->can('index', CollectionContract::class));
     }
 
-    /** @test */
+    #[Test]
     public function collections_are_viewable_with_view_permissions()
     {
         $user = $this->userWithPermissions(['view alfa entries']);
@@ -58,7 +59,7 @@ class CollectionPolicyTest extends PolicyTestCase
         $this->assertFalse($user->can('edit', $collectionB));
     }
 
-    /** @test */
+    #[Test]
     public function collections_are_editable_with_configure_permissions()
     {
         $authorizedUser = $this->userWithPermissions(['configure collections']);
@@ -70,7 +71,7 @@ class CollectionPolicyTest extends PolicyTestCase
         $this->assertFalse($forbiddenUser->can('edit', $collection));
     }
 
-    /** @test */
+    #[Test]
     public function collections_can_be_created_with_configure_permission()
     {
         $forbiddenUser = $this->userWithPermissions([]);
@@ -80,7 +81,7 @@ class CollectionPolicyTest extends PolicyTestCase
         $this->assertFalse($forbiddenUser->can('create', CollectionContract::class));
     }
 
-    /** @test */
+    #[Test]
     public function collections_can_be_deleted_with_configure_permission()
     {
         $forbiddenUser = $this->userWithPermissions([]);

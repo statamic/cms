@@ -206,7 +206,7 @@
    ========================================================================== */
 
 .bard-fullscreen {
-    @apply fixed bg-gray-200 dark:bg-dark-700 inset-0 min-h-screen overflow-scroll rounded-none pt-16;
+    @apply fixed bg-gray-200 dark:bg-dark-700 inset-0 min-h-screen overflow-scroll rounded-none pt-14;
 
     & > .bard-editor {
         @apply bg-white dark:bg-dark-800 shadow dark:shadow-dark max-w-xl mx-auto rounded relative my-6 px-8;
@@ -266,7 +266,6 @@
 .bard-fieldtype .bard-content > {
     p {
         @apply text-gray-800 dark:text-dark-150;
-        word-break: break-all;
         word-break: break-word;
 
         line-height: 1.7;
@@ -336,7 +335,23 @@
     h1, h2, h3, h4, h5, h6 {
         margin-top: 1.275em;
         margin-bottom: .85em;
-        font-weight: 700
+        font-weight: 700;
+
+        b,
+        strong {
+            font-weight: 900;
+        }
+
+        a {
+            @apply text-blue dark:text-dark-blue-100 underline break-words;
+        }
+
+        a:active,
+        a:focus,
+        a:hover {
+            outline: 0;
+            text-decoration: underline;
+        }
     }
 
     h1 { font-size: 2em }
@@ -379,17 +394,18 @@
     ul,
     blockquote ol,
     blockquote ul {
-        padding: 0;
-        margin: 0;
-        margin-bottom: .85em;
-        padding-left: 2em ; [dir="rtl"] & { padding-right: 2em ; padding-left: 0 ; }
+        margin: 0 0 .85em;
+        padding: 0 0 0 2em;
+
+        [dir="rtl"] & { padding-right: 2em ; padding-left: 0 ; }
     }
 
     .tableWrapper table ol,
     .tableWrapper table ul {
-        padding: 0;
         margin: 0;
-        padding-left: 2em ; [dir="rtl"] & { padding-right: 2em ; padding-left: 0 ; }
+        padding: 0 0 0 2em;
+
+        [dir="rtl"] & { padding-right: 2em ; padding-left: 0 ; }
     }
 
     ol ol,

@@ -4,13 +4,14 @@ namespace Tests\StaticCaching;
 
 use Illuminate\Support\Facades\Cache;
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\StaticCache;
 use Statamic\StaticCaching\Cacher;
 use Tests\TestCase;
 
 class ManagerTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_flushes()
     {
         config([
@@ -31,7 +32,7 @@ class ManagerTest extends TestCase
         StaticCache::flush();
     }
 
-    /** @test */
+    #[Test]
     public function it_flushes_without_static_cache_store()
     {
         config([

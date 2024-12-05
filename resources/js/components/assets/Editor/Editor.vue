@@ -29,7 +29,7 @@
                 <div class="editor-preview bg-gray-800 dark:bg-dark-950 rtl:md:rounded-tl-md ltr:md:rounded-tr-md flex flex-col justify-between flex-1 min-h-[45vh] md:min-h-auto md:flex-auto md:grow w-full md:w-1/2 lg:w-2/3 shadow-[inset_0px_4px_3px_0px_black]">
 
                     <!-- Toolbar -->
-                    <div id="asset-editor-toolbar" class="@container/toolbar flex items-center justify-center py-4 px-2 text-2xs text-white dark:text-dark-100 text-center space-x-1 sm:space-x-3" v-if="isToolbarVisible">
+                    <div id="asset-editor-toolbar" class="@container/toolbar flex items-center justify-center py-4 px-2 text-2xs text-white dark:text-dark-100 text-center space-x-1 sm:space-x-3 rtl:space-x-reverse " v-if="isToolbarVisible">
                         <button v-if="isImage && isFocalPointEditorEnabled" type="button" class="flex bg-gray-750 dark:bg-dark-400 hover:bg-gray-900 dark:hover:bg-dark-600 hover:text-yellow-light dark:hover:text-yellow-dark rounded items-center justify-center px-3 py-1.5" @click.prevent="openFocalPointEditor">
                             <svg-icon name="focal-point" class="h-4" />
                             <span class="rtl:mr-2 ltr:ml-2 hidden @3xl/toolbar:inline-block">{{ __('Focal Point') }}</span>
@@ -126,6 +126,7 @@
                     :name="publishContainer"
                     :blueprint="fieldset"
                     :values="values"
+                    :extra-values="extraValues"
                     :meta="meta"
                     :errors="errors"
                     @updated="values = { ...$event, focus: values.focus }"
@@ -150,7 +151,7 @@
             </div>
 
             <div class="bg-gray-200 dark:bg-dark-550 w-full border-t dark:border-dark-200 flex items-center justify-end py-3 px-4 rounded-b">
-                <div id="asset-meta-data" class="flex-1 hidden sm:flex space-x-3 py-1 h-full text-xs text-gray-800 dark:text-dark-150">
+                <div id="asset-meta-data" class="flex-1 hidden sm:flex space-x-3 rtl:space-x-reverse py-1 h-full text-xs text-gray-800 dark:text-dark-150">
                     <div class="flex items-center bg-gray-400 dark:bg-dark-600 rounded py-1 rtl:pr-2 ltr:pl-2 rtl:pl-3 ltr:pr-3" v-if="isImage">
                         <svg-icon name="image-picture" class="h-3 rtl:ml-2 ltr:mr-2" />
                         <div class="">{{ __('messages.width_x_height', { width: asset.width, height: asset.height }) }}</div>
@@ -164,7 +165,7 @@
                         <div class="" :title="asset.lastModified">{{ asset.lastModifiedRelative }}</div>
                     </div>
                 </div>
-                <div class="flex items-center space-x-3">
+                <div class="flex items-center space-x-3 rtl:space-x-reverse">
                     <button type="button" class="btn" @click="close">
                         {{ __('Cancel') }}
                     </button>
@@ -204,6 +205,7 @@ import FocalPointEditor from './FocalPointEditor.vue';
 import PdfViewer from './PdfViewer.vue';
 import PublishFields from '../../publish/Fields.vue';
 import HasHiddenFields from '../../publish/HasHiddenFields';
+import pick from 'underscore/modules/pick';
 
 export default {
 
@@ -245,6 +247,7 @@ export default {
             asset: null,
             publishContainer: 'asset',
             values: {},
+            extraValues: {},
             meta: {},
             fields: null,
             fieldset: null,
@@ -346,6 +349,8 @@ export default {
                     .map(section => section.fields)
                     .flatten(true)
                     .value();
+
+                this.extraValues = pick(this.asset, ['filename', 'basename', 'extension', 'path', 'mimeType', 'width', 'height', 'duration']);
 
                 this.loading = false;
             });

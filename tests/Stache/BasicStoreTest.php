@@ -3,6 +3,7 @@
 namespace Tests\Stache;
 
 use Illuminate\Filesystem\Filesystem;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
 use Statamic\Stache\Stores\BasicStore;
@@ -28,7 +29,7 @@ class BasicStoreTest extends TestCase
         (new Filesystem)->deleteDirectory($this->tempDir);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_an_item_by_key()
     {
         file_put_contents($this->tempDir.'/foo.yaml', '');
@@ -39,7 +40,7 @@ class BasicStoreTest extends TestCase
         $this->assertNull($this->store->getItem('unknown'));
     }
 
-    /** @test */
+    #[Test]
     public function items_are_different_instances_every_time()
     {
         config(['cache.default' => 'file']); // Doesn't work when they're arrays since the object is stored in memory.
@@ -52,19 +53,19 @@ class BasicStoreTest extends TestCase
         $this->assertNotSame($one, $two);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_an_item_by_path()
     {
         $this->markTestIncomplete();
     }
 
-    /** @test */
+    #[Test]
     public function it_forgets_an_item_by_key()
     {
         $this->markTestIncomplete();
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_an_item()
     {
         $this->markTestIncomplete();

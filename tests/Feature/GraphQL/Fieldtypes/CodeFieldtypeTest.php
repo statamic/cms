@@ -2,20 +2,23 @@
 
 namespace Tests\Feature\GraphQL\Fieldtypes;
 
-/** @group graphql */
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
+
+#[Group('graphql')]
 class CodeFieldtypeTest extends FieldtypeTestCase
 {
-    /** @test */
+    #[Test]
     public function it_gets_code()
     {
         $this->createEntryWithFields([
             'filled' => [
                 'value' => 'bar',
-                'field' => ['type' => 'code'],
+                'field' => ['type' => 'code', 'mode_selectable' => false],
             ],
             'undefined' => [
                 'value' => null,
-                'field' => ['type' => 'code'],
+                'field' => ['type' => 'code', 'mode_selectable' => false],
             ],
             'selectable_string' => [
                 'value' => 'bar',

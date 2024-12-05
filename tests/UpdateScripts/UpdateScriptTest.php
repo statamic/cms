@@ -6,6 +6,7 @@ use Facades\Statamic\UpdateScripts\Manager;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\UserCollection;
 use Statamic\Facades;
 use Statamic\Support\Str;
@@ -40,7 +41,7 @@ class UpdateScriptTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function it_can_register_itself_with_statamic()
     {
         PackToTheFuture::generateComposerLock('statamic/cms', '3.0.25', $this->previousLockPath);
@@ -60,7 +61,7 @@ class UpdateScriptTest extends TestCase
         $this->assertContains(UpdateTrees::class, $registered);
     }
 
-    /** @test */
+    #[Test]
     public function it_silently_fails_to_register_on_older_statamic_versions()
     {
         PackToTheFuture::generateComposerLock('statamic/cms', '3.0.25', $this->previousLockPath);
@@ -71,7 +72,7 @@ class UpdateScriptTest extends TestCase
         $this->assertNull($this->register(UpdatePermissions::class));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_check_if_package_is_updating_to_specific_version()
     {
         PackToTheFuture::generateComposerLock('statamic/cms', '3.0.25', $this->previousLockPath);
@@ -84,7 +85,7 @@ class UpdateScriptTest extends TestCase
         $this->assertFalse($script->isUpdatingTo('2.0'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_check_if_package_is_updating_past_a_specific_version()
     {
         PackToTheFuture::generateComposerLock('statamic/cms', '3.0.25', $this->previousLockPath);
@@ -109,7 +110,7 @@ class UpdateScriptTest extends TestCase
         $this->assertFalse($script->isUpdatingTo('3.2.0-beta.1'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_check_if_package_is_updating_past_a_specific_beta_version()
     {
         PackToTheFuture::generateComposerLock('statamic/cms', '3.0.25', $this->previousLockPath);
@@ -127,7 +128,7 @@ class UpdateScriptTest extends TestCase
         $this->assertFalse($script->isUpdatingTo('3.1.0'));
     }
 
-    /** @test */
+    #[Test]
     public function it_properly_normalizes_the_version_you_pass_in_when_checking_for_updating_to_a_version()
     {
         PackToTheFuture::generateComposerLock('statamic/cms', '3.1.0-beta.1', $this->previousLockPath);
@@ -140,7 +141,7 @@ class UpdateScriptTest extends TestCase
         $this->assertFalse($script->isUpdatingTo('3.1.1'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_check_if_version_is_normalized_when_user_overrides_lock_version()
     {
         PackToTheFuture::generateComposerLock('statamic/cms', '3.0', $this->previousLockPath);
@@ -153,7 +154,7 @@ class UpdateScriptTest extends TestCase
         $this->assertFalse($script->isUpdatingTo('3.0.0'));
     }
 
-    /** @test */
+    #[Test]
     public function it_runs_update_scripts()
     {
         PackToTheFuture::generateComposerLock('statamic/cms', '3.0.25', $this->previousLockPath);
@@ -175,7 +176,7 @@ class UpdateScriptTest extends TestCase
         $this->assertTrue(cache()->has('taxonomies-update-successful'));
     }
 
-    /** @test */
+    #[Test]
     public function it_passes_normalized_versions_into_shouldUpdate()
     {
         PackToTheFuture::generateComposerLock('statamic/cms', 'v3.0.25-alpha.2', $this->previousLockPath);
@@ -196,7 +197,7 @@ class UpdateScriptTest extends TestCase
         $this->assertTrue($callbackRan);
     }
 
-    /** @test */
+    #[Test]
     public function it_deletes_previous_lock_file_after_running_update_scripts()
     {
         PackToTheFuture::generateComposerLock('statamic/cms', '3.0.25', $this->previousLockPath);
@@ -209,7 +210,7 @@ class UpdateScriptTest extends TestCase
         $this->assertFileDoesNotExist($this->previousLockPath);
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_error_when_attempting_to_run_update_scripts_with_no_lock_file()
     {
         PackToTheFuture::generateComposerLock('statamic/cms', '3.1.0', $this->lockPath);
@@ -233,7 +234,7 @@ class UpdateScriptTest extends TestCase
         $this->assertFalse(cache()->has('seo-pro-update-successful'));
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_error_when_attempting_to_run_update_scripts_with_no_previous_lock_file()
     {
         PackToTheFuture::generateComposerLock('statamic/cms', '3.1.0', $this->previousLockPath);
@@ -257,7 +258,7 @@ class UpdateScriptTest extends TestCase
         $this->assertFalse(cache()->has('seo-pro-update-successful'));
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_error_when_attempting_to_update_on_a_package_doesnt_exist_in_lock_file()
     {
         PackToTheFuture::generateComposerLock('statamic/cms', '3.0.25', $this->previousLockPath);
@@ -282,7 +283,7 @@ class UpdateScriptTest extends TestCase
         $this->assertFalse(cache()->has('seo-pro-update-successful'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_write_to_console_from_update_method()
     {
         PackToTheFuture::generateComposerLock('statamic/cms', '3.0.25', $this->previousLockPath);
@@ -305,7 +306,7 @@ class UpdateScriptTest extends TestCase
         Manager::runAll($console);
     }
 
-    /** @test */
+    #[Test]
     public function it_runs_scripts_forspecific_package_versions()
     {
         PackToTheFuture::generateComposerLockForMultiple([

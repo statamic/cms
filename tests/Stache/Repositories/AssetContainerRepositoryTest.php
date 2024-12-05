@@ -3,6 +3,7 @@
 namespace Tests\Stache\Repositories;
 
 use Illuminate\Support\Collection as IlluminateCollection;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Assets\AssetContainer;
 use Statamic\Exceptions\AssetContainerNotFoundException;
 use Statamic\Facades;
@@ -28,7 +29,7 @@ class AssetContainerRepositoryTest extends TestCase
         $this->repo = new AssetContainerRepository($stache);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_all_asset_containers()
     {
         $containers = $this->repo->all();
@@ -43,7 +44,7 @@ class AssetContainerRepositoryTest extends TestCase
         $this->assertEquals(['Another Asset Container', 'Main Assets'], $ordered->map->title()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_an_asset_container_by_handle()
     {
         tap($this->repo->findByHandle('main'), function ($container) {
@@ -63,7 +64,7 @@ class AssetContainerRepositoryTest extends TestCase
         $this->assertNull($this->repo->findByHandle('unknown'));
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_a_container_to_the_stache_and_to_a_file()
     {
         $container = Facades\AssetContainer::make('new');
@@ -77,7 +78,7 @@ class AssetContainerRepositoryTest extends TestCase
         @unlink($this->directory.'/new.yaml');
     }
 
-    /** @test */
+    #[Test]
     public function test_find_or_fail_gets_container()
     {
         $container = $this->repo->findOrFail('main');
@@ -86,7 +87,7 @@ class AssetContainerRepositoryTest extends TestCase
         $this->assertEquals('Main Assets', $container->title());
     }
 
-    /** @test */
+    #[Test]
     public function test_find_or_fail_throws_exception_when_container_does_not_exist()
     {
         $this->expectException(AssetContainerNotFoundException::class);

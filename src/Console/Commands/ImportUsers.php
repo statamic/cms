@@ -47,7 +47,7 @@ class ImportUsers extends Command
         if (config('statamic.users.repository') !== 'eloquent') {
             error('Your site is not using the eloquent user repository.');
 
-            return 0;
+            return 1;
         }
 
         $this->importUsers();
@@ -64,7 +64,7 @@ class ImportUsers extends Command
         if (! in_array(HasUuids::class, class_uses_recursive($model))) {
             error('Please add the HasUuids trait to your '.$model.' model in order to run this importer.');
 
-            return;
+            return 1;
         }
 
         $store = app(UsersStore::class)->directory(config('statamic.stache.stores.users.directory', base_path('users')));
@@ -74,6 +74,12 @@ class ImportUsers extends Command
         app()->bind(UserRepositoryContract::class, FileRepository::class);
 
         $users = User::all();
+
+        if ($users->isEmpty()) {
+            error('No users to import!');
+
+            return 1;
+        }
 
         app()->bind(UserContract::class, EloquentUser::class);
 

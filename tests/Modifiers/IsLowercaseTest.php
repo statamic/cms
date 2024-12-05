@@ -2,6 +2,8 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
@@ -18,11 +20,8 @@ class IsLowercaseTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider stringsProvider
-     */
+    #[Test]
+    #[DataProvider('stringsProvider')]
     public function it_returns_true_if_string_has_only_lowercase_chars($expected, $input): void
     {
         $modified = $this->modify($input);

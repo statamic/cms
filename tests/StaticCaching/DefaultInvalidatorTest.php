@@ -3,6 +3,7 @@
 namespace Tests\StaticCaching;
 
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Assets\AssetContainer;
 use Statamic\Contracts\Entries\Collection;
@@ -22,7 +23,7 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
         Mockery::close();
     }
 
-    /** @test */
+    #[Test]
     public function specifying_all_as_invalidation_rule_will_just_flush_the_cache()
     {
         $cacher = Mockery::mock(Cacher::class)->shouldReceive('flush')->once()->getMock();
@@ -33,7 +34,7 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($invalidator->invalidate($item));
     }
 
-    /** @test */
+    #[Test]
     public function assets_can_trigger_url_invalidation()
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
@@ -62,7 +63,7 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($invalidator->invalidate($asset));
     }
 
-    /** @test */
+    #[Test]
     public function collection_urls_can_be_invalidated()
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
@@ -89,7 +90,7 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($invalidator->invalidate($collection));
     }
 
-    /** @test */
+    #[Test]
     public function collection_urls_can_be_invalidated_by_an_entry()
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
@@ -118,7 +119,7 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($invalidator->invalidate($entry));
     }
 
-    /** @test */
+    #[Test]
     public function entry_urls_are_not_invalidated_by_an_entry_with_a_redirect()
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
@@ -147,7 +148,7 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($invalidator->invalidate($entry));
     }
 
-    /** @test */
+    #[Test]
     public function taxonomy_urls_can_be_invalidated()
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
@@ -183,7 +184,7 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($invalidator->invalidate($term));
     }
 
-    /** @test */
+    #[Test]
     public function navigation_urls_can_be_invalidated()
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
@@ -208,7 +209,7 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($invalidator->invalidate($nav));
     }
 
-    /** @test */
+    #[Test]
     public function globals_urls_can_be_invalidated()
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
@@ -233,7 +234,7 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($invalidator->invalidate($set));
     }
 
-    /** @test */
+    #[Test]
     public function form_urls_can_be_invalidated()
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {

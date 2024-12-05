@@ -4,6 +4,7 @@ namespace Tests\Auth\Protect;
 
 use Facades\Statamic\Auth\Protect\Protectors\Password\Token;
 use Illuminate\Support\Facades\Route;
+use PHPUnit\Framework\Attributes\Test;
 
 class PasswordProtectionTest extends PageProtectionTestCase
 {
@@ -14,7 +15,7 @@ class PasswordProtectionTest extends PageProtectionTestCase
         Route::view('/password-entry', 'password-entry');
     }
 
-    /** @test */
+    #[Test]
     public function redirects_to_password_form_url_and_generates_token()
     {
         config(['statamic.protect.schemes.password-scheme' => [
@@ -30,10 +31,11 @@ class PasswordProtectionTest extends PageProtectionTestCase
             ->assertSessionHas('statamic:protect:password.tokens.test-token', [
                 'scheme' => 'password-scheme',
                 'url' => 'http://localhost/test',
+                'reference' => 'entry::test',
             ]);
     }
 
-    /** @test */
+    #[Test]
     public function password_form_url_can_be_overridden()
     {
         config(['statamic.protect.schemes.password-scheme' => [
@@ -49,7 +51,7 @@ class PasswordProtectionTest extends PageProtectionTestCase
             ->assertRedirect('http://localhost/password-entry?token=test-token');
     }
 
-    /** @test */
+    #[Test]
     public function allow_access_if_password_has_been_entered_for_that_scheme()
     {
         config(['statamic.protect.schemes.password-scheme' => [
@@ -57,14 +59,14 @@ class PasswordProtectionTest extends PageProtectionTestCase
             'allowed' => ['the-password'],
         ]]);
 
-        session()->put('statamic:protect:password.passwords.password-scheme', 'the-password');
+        session()->put('statamic:protect:password.passwords.scheme.password-scheme', 'the-password');
 
         $this
             ->requestPageProtectedBy('password-scheme')
             ->assertOk();
     }
 
-    /** @test */
+    #[Test]
     public function default_password_form_url_is_unprotected()
     {
         $this->viewShouldReturnRendered('statamic::auth.protect.password', '');
@@ -82,7 +84,7 @@ class PasswordProtectionTest extends PageProtectionTestCase
             ->assertOk();
     }
 
-    /** @test */
+    #[Test]
     public function custom_password_form_url_is_unprotected()
     {
         $this->viewShouldReturnRendered('password-entry', 'Password form template');

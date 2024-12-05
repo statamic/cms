@@ -2,12 +2,13 @@
 
 namespace Tests\Data;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Data\ExistsAsFile;
 use Tests\TestCase;
 
 class ExistsAsFileTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_dumps_yaml_without_front_matter_when_the_file_extension_is_yaml()
     {
         $item = $this->makeItem([
@@ -27,7 +28,7 @@ EOT;
         $this->assertEquals($expected, trim($item->fileContents()));
     }
 
-    /** @test */
+    #[Test]
     public function it_dumps_yaml_with_front_matter_when_theres_content()
     {
         $item = $this->makeItem([
@@ -49,7 +50,7 @@ EOT;
         $this->assertStringEqualsStringIgnoringLineEndings($expected, trim($item->fileContents()));
     }
 
-    /** @test */
+    #[Test]
     public function it_dumps_yaml_with_front_matter_when_content_is_missing()
     {
         $item = $this->makeItem([
@@ -69,7 +70,7 @@ EOT;
         $this->assertStringEqualsStringIgnoringLineEndings($expected, trim($item->fileContents()));
     }
 
-    /** @test */
+    #[Test]
     public function it_dumps_yaml_without_front_matter_when_content_is_literally_null()
     {
         $item = $this->makeItem([

@@ -2,13 +2,14 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modifier;
 use Tests\TestCase;
 use Tests\TestDependency;
 
 class ModifierTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function tags_get_initialized_correctly()
     {
         $class = app(TestModifier::class);

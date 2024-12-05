@@ -23,7 +23,6 @@ abstract class Relationship extends Fieldtype
     protected $canSearch = false;
     protected $statusIcons = false;
     protected $taggable = false;
-    protected $defaultValue = [];
     protected $formComponentProps = [
         '_' => '_', // forces an object in js
     ];
@@ -75,7 +74,7 @@ abstract class Relationship extends Fieldtype
                 'id' => method_exists($item, 'id') ? $item->id() : $item->handle(),
                 'title' => method_exists($item, 'title') ? $item->title() : $item->value('title'),
                 'edit_url' => $item->editUrl(),
-                'published' => $this->statusIcons ? $item->published() : null,
+                'published' => $this->statusIcons() ? $item->published() : null,
             ];
         });
     }
@@ -130,8 +129,8 @@ abstract class Relationship extends Fieldtype
             'canEdit' => $this->canEdit(),
             'canCreate' => $this->canCreate(),
             'canSearch' => $this->canSearch(),
-            'statusIcons' => $this->statusIcons,
-            'creatables' => $this->getCreatables(),
+            'statusIcons' => $this->statusIcons(),
+            'creatables' => $this->canCreate() ? $this->getCreatables() : [],
             'formComponent' => $this->getFormComponent(),
             'formComponentProps' => $this->getFormComponentProps(),
             'taggable' => $this->getTaggable(),
@@ -161,6 +160,11 @@ abstract class Relationship extends Fieldtype
     protected function canSearch()
     {
         return $this->canSearch;
+    }
+
+    protected function statusIcons()
+    {
+        return $this->statusIcons;
     }
 
     protected function getItemComponent()
@@ -225,6 +229,11 @@ abstract class Relationship extends Fieldtype
         return collect($values)->map(function ($id) {
             return $this->toItemArray($id);
         })->values();
+    }
+
+    public function getItemHint($item): ?string
+    {
+        return null;
     }
 
     abstract protected function toItemArray($id);

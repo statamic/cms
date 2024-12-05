@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Collections;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
@@ -13,7 +14,7 @@ class StoreCollectionTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_denies_access_if_you_dont_have_permission()
     {
         $this
@@ -24,7 +25,7 @@ class StoreCollectionTest extends TestCase
             ->assertSessionHas('error', 'You are not authorized to create collections.');
     }
 
-    /** @test */
+    #[Test]
     public function it_stores_a_collection()
     {
         $this->assertCount(0, Collection::all());
@@ -43,7 +44,7 @@ class StoreCollectionTest extends TestCase
         $this->assertEquals('private', $collection->futureDateBehavior());
     }
 
-    /** @test */
+    #[Test]
     public function title_is_required()
     {
         $this->assertCount(0, Collection::all());
@@ -60,7 +61,7 @@ class StoreCollectionTest extends TestCase
         $this->assertCount(0, Collection::all());
     }
 
-    /** @test */
+    #[Test]
     public function handle_must_be_alpha_dash()
     {
         $this->assertCount(0, Collection::all());
@@ -77,7 +78,7 @@ class StoreCollectionTest extends TestCase
         $this->assertCount(0, Collection::all());
     }
 
-    /** @test */
+    #[Test]
     public function handle_is_a_slugified_title_if_not_provided()
     {
         $this->assertCount(0, Collection::all());

@@ -6,6 +6,7 @@ use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Extend\HasHandle;
 use Statamic\Extend\RegistersItself;
+use Statamic\Facades\Blink;
 use Statamic\Facades\GraphQL;
 use Statamic\Query\Scopes\Filters\Fields\FieldtypeFilter;
 use Statamic\Statamic;
@@ -28,6 +29,7 @@ abstract class Fieldtype implements Arrayable
     protected $selectableInForms = false;
     protected $relationship = false;
     protected $categories = [];
+    protected $keywords = [];
     protected $rules = [];
     protected $extraRules = [];
     protected $defaultValue;
@@ -112,6 +114,11 @@ abstract class Fieldtype implements Arrayable
         return $this->categories;
     }
 
+    public function keywords(): array
+    {
+        return $this->keywords;
+    }
+
     public function filter()
     {
         return new FieldtypeFilter($this);
@@ -166,6 +173,7 @@ abstract class Fieldtype implements Arrayable
             'validatable' => $this->validatable(),
             'defaultable' => $this->defaultable(),
             'categories' => $this->categories(),
+            'keywords' => $this->keywords(),
             'icon' => $this->icon(),
             'config' => $this->configFields()->toPublishArray(),
         ];
@@ -238,6 +246,10 @@ abstract class Fieldtype implements Arrayable
 
     public function configFields(): Fields
     {
+        if ($cached = Blink::get($blink = 'config-fields-'.$this->handle())) {
+            return $cached;
+        }
+
         $fields = collect($this->configFieldItems());
 
         if ($this->configFieldsUseSections()) {
@@ -250,7 +262,11 @@ abstract class Fieldtype implements Arrayable
                 return compact('handle', 'field');
             });
 
-        return new ConfigFields($fields);
+        $fields = new ConfigFields($fields);
+
+        Blink::put($blink, $fields);
+
+        return $fields;
     }
 
     protected function configFieldItems(): array
@@ -315,9 +331,13 @@ abstract class Fieldtype implements Arrayable
             return $fallback;
         }
 
+        $config = $this->configFields()->all()
+            ->map->defaultValue()
+            ->merge($this->field->config());
+
         return $key
-            ? $this->field->get($key, $fallback)
-            : $this->field->config();
+            ? ($config->get($key) ?? $fallback)
+            : $config->all();
     }
 
     public function preload()

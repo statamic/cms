@@ -3,12 +3,13 @@
 namespace Tests\Macros;
 
 use Illuminate\Contracts\Support\Arrayable;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Data\Augmentable;
 use Tests\TestCase;
 
 class CollectionMacrosTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function to_augmented_array()
     {
         $one = tap($this->mock(Augmentable::class), function ($m) {
@@ -32,7 +33,7 @@ class CollectionMacrosTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function to_augmented_array_with_selected_keys()
     {
         $one = tap($this->mock(Augmentable::class), function ($m) {

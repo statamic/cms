@@ -2,13 +2,14 @@
 
 namespace Tests\Facades;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Config;
 use Statamic\Sites\Site;
 use Tests\TestCase;
 
 class ConfigTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function gets_config_var()
     {
         config(['foo' => 'bar']);
@@ -17,7 +18,7 @@ class ConfigTest extends TestCase
         $this->assertEquals('fallback', Config::get('nonexistant_variable', 'fallback'));
     }
 
-    /** @test */
+    #[Test]
     public function gets_scoped_var()
     {
         config(['myscope' => ['baz' => 'qux']]);
@@ -25,7 +26,7 @@ class ConfigTest extends TestCase
         $this->assertEquals('qux', Config::get('myscope.baz'));
     }
 
-    /** @test */
+    #[Test]
     public function sets_var()
     {
         $this->assertEquals('doesnt exist', Config::get('foo', 'doesnt exist'));
@@ -35,7 +36,7 @@ class ConfigTest extends TestCase
         $this->assertEquals('bar', Config::get('foo'));
     }
 
-    /** @test */
+    #[Test]
     public function gets_all_variables()
     {
         $this->app->instance('config', new \Illuminate\Config\Repository(['foo' => 'bar']));
@@ -43,7 +44,7 @@ class ConfigTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], Config::all());
     }
 
-    /** @test */
+    #[Test]
     public function gets_app_key()
     {
         config(['app.key' => '123']);
@@ -51,7 +52,7 @@ class ConfigTest extends TestCase
         $this->assertEquals('123', Config::getAppKey());
     }
 
-    /** @test */
+    #[Test]
     public function gets_license_key()
     {
         config(['statamic.system.license_key' => '123']);
@@ -64,7 +65,7 @@ class ConfigTest extends TestCase
         $this->assertNull(Config::getLicenseKey());
     }
 
-    /** @test */
+    #[Test]
     public function gets_site()
     {
         $this->fakeSiteConfig();
@@ -75,7 +76,7 @@ class ConfigTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function gets_full_locale()
     {
         $this->fakeSiteConfig();
@@ -86,7 +87,7 @@ class ConfigTest extends TestCase
         $this->assertEquals('de_DE', Config::getFullLocale('de'));
     }
 
-    /** @test */
+    #[Test]
     public function gets_short_locale()
     {
         $this->fakeSiteConfig();
@@ -97,7 +98,7 @@ class ConfigTest extends TestCase
         $this->assertEquals('de', Config::getShortLocale('de'));
     }
 
-    /** @test */
+    #[Test]
     public function gets_locale_name()
     {
         $this->fakeSiteConfig();
@@ -108,7 +109,7 @@ class ConfigTest extends TestCase
         $this->assertEquals('German', Config::getLocaleName('de'));
     }
 
-    /** @test */
+    #[Test]
     public function gets_locale_handles()
     {
         $this->fakeSiteConfig();
@@ -116,7 +117,7 @@ class ConfigTest extends TestCase
         $this->assertEquals(['en', 'fr', 'de'], Config::getLocales());
     }
 
-    /** @test */
+    #[Test]
     public function gets_default_locale()
     {
         $this->fakeSiteConfig();
@@ -124,7 +125,7 @@ class ConfigTest extends TestCase
         $this->assertEquals('en', Config::getDefaultLocale());
     }
 
-    /** @test */
+    #[Test]
     public function gets_other_locale_handles()
     {
         $this->fakeSiteConfig();
@@ -132,7 +133,7 @@ class ConfigTest extends TestCase
         $this->assertEquals(['fr', 'de'], Config::getOtherLocales());
     }
 
-    /** @test */
+    #[Test]
     public function gets_site_url()
     {
         $this->fakeSiteConfig();

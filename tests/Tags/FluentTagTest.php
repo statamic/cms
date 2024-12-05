@@ -4,6 +4,8 @@ namespace Tests\Tags;
 
 use Facades\Tests\Factories\EntryFactory;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Support\Arr;
 use Statamic\Tags\FluentTag;
@@ -32,11 +34,8 @@ class FluentTagTest extends TestCase
         });
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider fluentTagProvider
-     **/
+    #[Test]
+    #[DataProvider('fluentTagProvider')]
     public function it_handles_params_fluently($usedTag, $expectedTagName, $expectedTag, $expectedTagMethod, $expectedClassMethod)
     {
         $tag = Mockery::mock(Tags::class);
@@ -90,7 +89,28 @@ class FluentTagTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
+    public function it_handles_content_fluently()
+    {
+        $tag = Mockery::mock(Tags::class)->makePartial();
+        $tag->shouldReceive('index')->andReturn('the content');
+
+        $this->mock(Loader::class)
+            ->shouldReceive('load')
+            ->withArgs(
+                fn ($arg1, $arg2) => $arg1 === 'foo' && Arr::get($arg2, 'content') === 'the content'
+            )
+            ->once()
+            ->andReturn($tag);
+
+        $fluentTag = FluentTag::make('foo')->withContent('the content');
+
+        $this->assertInstanceOf(FluentTag::class, $fluentTag);
+
+        $this->assertEquals('the content', $fluentTag->fetch());
+    }
+
+    #[Test]
     public function it_can_iterate_over_tag_results()
     {
         $this->mockTagThatReturns(collect([
@@ -112,7 +132,7 @@ class FluentTagTest extends TestCase
         $this->assertEquals($expected, $slugs);
     }
 
-    /** @test */
+    #[Test]
     public function it_allows_array_access()
     {
         $this->mockTagThatReturns([
@@ -126,7 +146,7 @@ class FluentTagTest extends TestCase
         $this->assertEquals('bar', $result->foo);
     }
 
-    /** @test */
+    #[Test]
     public function it_casts_string_results_to_string()
     {
         $this->mockTagThatReturns('/fanny-packs');

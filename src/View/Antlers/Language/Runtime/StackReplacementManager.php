@@ -88,7 +88,7 @@ class StackReplacementManager
         return $name.$contentHash;
     }
 
-    public static function prependStack($stackName, $content, $trimContentWhitespace = false)
+    public static function prependStack($stackName, $content, $trimContentWhitespace = false, $isBlade = false)
     {
         $name = self::getStackReplacement($stackName);
 
@@ -104,7 +104,9 @@ class StackReplacementManager
             $content = trim($content);
         }
 
-        Stacks::prependToBladeStack($stackName, $content);
+        if (! $isBlade) {
+            Stacks::prependToBladeStack($stackName, $content);
+        }
 
         if (GlobalRuntimeState::$isCacheEnabled) {
             self::$cachedStacks[] = $stackName;
@@ -113,7 +115,7 @@ class StackReplacementManager
         array_unshift(self::$stackContents[GlobalRuntimeState::$environmentId][$name], $content);
     }
 
-    public static function pushStack($stackName, $content, $trimContentWhitespace = true)
+    public static function pushStack($stackName, $content, $trimContentWhitespace = true, $isBlade = false)
     {
         $name = self::getStackReplacement($stackName);
 
@@ -129,7 +131,9 @@ class StackReplacementManager
             $content = trim($content);
         }
 
-        Stacks::pushToBladeStack($stackName, $content);
+        if (! $isBlade) {
+            Stacks::pushToBladeStack($stackName, $content);
+        }
 
         if (GlobalRuntimeState::$isCacheEnabled) {
             self::$cachedStacks[] = $stackName;

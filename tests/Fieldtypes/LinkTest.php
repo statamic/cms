@@ -4,6 +4,7 @@ namespace Tests\Fieldtypes;
 
 use Facades\Statamic\Routing\ResolveRedirect;
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Entries\Entry;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Field;
@@ -12,7 +13,7 @@ use Tests\TestCase;
 
 class LinkTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_augments_string_to_string()
     {
         ResolveRedirect::shouldReceive('item')
@@ -30,7 +31,7 @@ class LinkTest extends TestCase
         $this->assertEquals(['url' => '/foo'], $augmented->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_reference_to_object()
     {
         $entry = Mockery::mock();
@@ -53,7 +54,7 @@ class LinkTest extends TestCase
         $this->assertEquals('augmented entry array', $augmented->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_invalid_object_to_null()
     {
         ResolveRedirect::shouldReceive('item')
@@ -71,7 +72,7 @@ class LinkTest extends TestCase
         $this->assertEquals(['url' => null], $augmented->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_null_to_null()
     {
         // null could technically be passed to the ResolveRedirect class, where it would

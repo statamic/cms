@@ -5,6 +5,7 @@ namespace Tests\Feature\Entries;
 use Facades\Statamic\CP\LivePreview;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Facades\Route;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Token;
 use Statamic\View\View;
@@ -49,7 +50,7 @@ EOT;
         Route::get('/test', fn () => View::make('test'))->middleware('statamic.web');
     }
 
-    /** @test */
+    #[Test]
     public function it_substitutes()
     {
         $substitute = EntryFactory::collection('test')->id('2')->slug('charlie')->data(['title' => 'Substituted title', 'foo' => 'Substituted foo'])->make();
@@ -69,7 +70,7 @@ EOT;
             ->assertHeader('X-Statamic-Live-Preview', true);
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_substitute()
     {
         Token::shouldReceive('find')->with('invalid-token')->andReturnNull();

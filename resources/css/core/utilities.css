@@ -56,9 +56,18 @@
     width: fit-content;
 }
 
+.break-overflowing-words {
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
 .saving-overlay {
     @apply absolute inset-0 z-200 flex items-center rounded;
     background: rgba(255, 255, 255, .9);
+
+    .dark & {
+        @apply bg-dark-600/90;
+    }
 
     .inner {
         @apply p-10 text-center mx-auto;
@@ -75,7 +84,7 @@
     background-color: #FFF;
     background-image: linear-gradient(45deg, #EDF2F6 25%, transparent 25%), linear-gradient(-45deg, #EDF2F6 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #EDF2F6 75%), linear-gradient(-45deg, transparent 75%, #EDF2F6 75%);
     background-size: 16px 16px;
-    background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+    background-position: 0 0, 0 8px, 8px -8px, -8px 0;
 
     .dark & {
         background-color: theme(colors.dark.600);

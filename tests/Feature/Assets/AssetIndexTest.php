@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Assets;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
@@ -13,7 +14,7 @@ class AssetIndexTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_redirects_to_the_first_authorized_containers_browse_url()
     {
         $this->setTestRoles(['test' => ['access cp', 'view two assets']]);
@@ -27,7 +28,7 @@ class AssetIndexTest extends TestCase
             ->assertRedirect($containerTwo->showUrl());
     }
 
-    /** @test */
+    #[Test]
     public function it_shows_the_empty_state_if_there_are_no_containers_and_you_have_permission_to_create()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure asset containers']]);
@@ -40,7 +41,7 @@ class AssetIndexTest extends TestCase
             ->assertSee(cp_route('asset-containers.create'));
     }
 
-    /** @test */
+    #[Test]
     public function it_denies_access_if_there_are_no_containers_and_you_dont_have_permission_to_create()
     {
         $this->setTestRoles(['test' => ['access cp']]);

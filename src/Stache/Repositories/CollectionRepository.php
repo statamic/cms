@@ -8,6 +8,7 @@ use Statamic\Contracts\Entries\CollectionRepository as RepositoryContract;
 use Statamic\Data\StoresScopedComputedFieldCallbacks;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades\Blink;
+use Statamic\Facades\Entry;
 use Statamic\Stache\Stache;
 
 class CollectionRepository implements RepositoryContract
@@ -96,19 +97,24 @@ class CollectionRepository implements RepositoryContract
         $this->store->delete($collection);
     }
 
+    /**
+     * @deprecated Use Entry::updateUris($collection, $ids)
+     */
     public function updateEntryUris(Collection $collection, $ids = null)
     {
-        $this->store->updateEntryUris($collection, $ids);
+        Entry::updateUris($collection, $ids);
     }
 
+    /** @deprecated Use Entry::updateOrders($collection, $ids) */
     public function updateEntryOrder(Collection $collection, $ids = null)
     {
-        $this->store->updateEntryOrder($collection, $ids);
+        Entry::updateOrders($collection, $ids);
     }
 
+    /** @deprecated Use Entry::updateParents($collection, $ids) */
     public function updateEntryParent(Collection $collection, $ids = null)
     {
-        $this->store->updateEntryParent($collection, $ids);
+        Entry::updateParents($collection, $ids);
     }
 
     public function whereStructured(): IlluminateCollection

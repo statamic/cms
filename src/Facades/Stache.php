@@ -7,10 +7,11 @@ use Illuminate\Support\Facades\Facade;
 /**
  * @method static self sites($sites = null)
  * @method static mixed defaultSite()
- * @method static self registerStore(Store $store)
- * @method static self registerStores($stores)
+ * @method static self registerStore(\Statamic\Stache\Stores\Store $store)
+ * @method static self registerStores(array $stores)
  * @method static mixed stores()
  * @method static mixed store($key)
+ * @method static \Illuminate\Contracts\Cache\Store cacheStore()
  * @method static string generateId()
  * @method static self clear()
  * @method static void refresh()
@@ -24,6 +25,10 @@ use Illuminate\Support\Facades\Facade;
  * @method static mixed|null buildDate()
  * @method static self disableUpdatingIndexes()
  * @method static bool shouldUpdateIndexes()
+ * @method static self setLockFactory(\Symfony\Component\Lock\LockFactory $lockFactory)
+ * @method static \Symfony\Component\Lock\LockInterface lock()
+ * @method static \Statamic\Stache\Duplicates duplicates()
+ * @method static bool isWatcherEnabled()
  *
  * @see \Statamic\Stache\Stache
  */

@@ -2,6 +2,7 @@
 
 namespace Statamic\View\Debugbar;
 
+use Illuminate\Database\Eloquent\Model;
 use Statamic\Routing\Route;
 use Statamic\View\Events\ViewRendered;
 
@@ -31,6 +32,10 @@ class AddRequestMessage
     {
         if ($item instanceof Route) {
             return 'Route '.$item->url();
+        }
+
+        if ($item instanceof Model) {
+            return class_basename($item).' '.$item->getKey();
         }
 
         return class_basename($item).' '.$item->id();

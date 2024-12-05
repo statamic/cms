@@ -2,6 +2,7 @@
 
 namespace Tests\Tags;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Antlers;
 use Statamic\Tags\Context;
 use Statamic\Tags\Parameters;
@@ -11,7 +12,7 @@ use Tests\TestDependency;
 
 class TagsTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function tags_get_initialized_correctly()
     {
         $class = app(TestTags::class);

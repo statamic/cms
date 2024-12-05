@@ -6,13 +6,16 @@ use Facades\Statamic\API\FilterAuthorizer;
 use Facades\Statamic\API\ResourceAuthorizer;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
 use Statamic\Facades\GraphQL;
 use Statamic\Structures\CollectionStructure;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-/** @group graphql */
+#[Group('graphql')]
 class EntryTest extends TestCase
 {
     use CreatesQueryableTestEntries;
@@ -30,7 +33,7 @@ class EntryTest extends TestCase
         $this->createEntries();
     }
 
-    /** @test */
+    #[Test]
     public function query_only_works_if_enabled()
     {
         ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'collections')->andReturnFalse()->once();
@@ -43,7 +46,7 @@ class EntryTest extends TestCase
             ->assertSee('Cannot query field \"entry\" on type \"Query\"', false);
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_query_against_non_allowed_sub_resource_with_collection_arg()
     {
         $query = <<<'GQL'
@@ -85,11 +88,8 @@ GQL;
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider findEventOneByArgProvider
-     */
+    #[Test]
+    #[DataProvider('findEventOneByArgProvider')]
     public function it_cannot_query_against_non_allowed_sub_resource_with_other_args($arg)
     {
         $query = <<<"GQL"
@@ -123,7 +123,7 @@ GQL;
             ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_an_entry_by_id()
     {
         $query = <<<'GQL'
@@ -191,7 +191,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_an_entry_by_slug()
     {
         EntryFactory::collection('blog')->id('123')->slug('foo')->create();
@@ -220,7 +220,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_an_entry_by_slug_and_collection()
     {
         EntryFactory::collection('blog')->id('123')->slug('foo')->create();
@@ -245,7 +245,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_an_entry_by_uri()
     {
         $query = <<<'GQL'
@@ -267,7 +267,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_an_entry_in_a_specific_site()
     {
         $this->setSites([
@@ -298,7 +298,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_an_existing_entry_parent()
     {
         $this->createStructuredCollection();
@@ -326,7 +326,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_a_non_existing_entry_parent()
     {
         $this->createStructuredCollection();
@@ -352,7 +352,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_filter_entry_by_default()
     {
         EntryFactory::collection('blog')
@@ -393,7 +393,7 @@ GQL;
             ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_filter_entry_when_configuration_allows_for_it()
     {
         EntryFactory::collection('blog')
@@ -425,7 +425,7 @@ GQL;
             ]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_entries_with_equalto_shorthand()
     {
         EntryFactory::collection('blog')
@@ -457,7 +457,7 @@ GQL;
             ]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_entries_with_multiple_conditions_of_the_same_type()
     {
         EntryFactory::collection('blog')
@@ -494,7 +494,7 @@ GQL;
             ]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_add_custom_fields_to_interface()
     {
         GraphQL::addField('EntryInterface', 'one', function () {
@@ -549,7 +549,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_add_custom_fields_to_an_implementation()
     {
         GraphQL::addField('Entry_Blog_ArtDirected', 'one', function () {
@@ -595,7 +595,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function adding_custom_field_to_an_implementation_does_not_add_it_to_the_interface()
     {
         GraphQL::addField('Entry_Blog_ArtDirected', 'one', function () {
@@ -637,7 +637,7 @@ GQL;
         ])->save();
     }
 
-    /** @test */
+    #[Test]
     public function it_only_shows_published_entries_by_default()
     {
         FilterAuthorizer::shouldReceive('allowedForSubResources')

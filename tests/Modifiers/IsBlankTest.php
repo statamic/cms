@@ -2,19 +2,20 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class IsBlankTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_returns_true_if_input_is_blank(): void
     {
         $modified = $this->modify('');
         $this->assertTrue($modified);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_false_if_input_is_not_blank(): void
     {
         $modified = $this->modify('BRAINSSSS');

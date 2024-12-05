@@ -3,12 +3,17 @@
 namespace Statamic\Fieldtypes\Assets;
 
 use Illuminate\Support\Collection;
+use Statamic\Actions\RenameAssetFolder;
 use Statamic\Assets\OrderedQueryBuilder;
+use Statamic\Contracts\Entries\Entry;
 use Statamic\Exceptions\AssetContainerNotFoundException;
+use Statamic\Facades\Action;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Blink;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Scope;
+use Statamic\Facades\User;
 use Statamic\Fields\Fieldtype;
 use Statamic\GraphQL\Types\AssetInterface;
 use Statamic\Http\Resources\CP\Assets\Asset as AssetResource;
@@ -19,7 +24,7 @@ use Statamic\Support\Str;
 class Assets extends Fieldtype
 {
     protected $categories = ['media', 'relationship'];
-    protected $defaultValue = [];
+    protected $keywords = ['file', 'files', 'image', 'images', 'video', 'videos', 'audio', 'upload'];
     protected $selectableInForms = true;
 
     protected function configFieldItems(): array
@@ -69,12 +74,28 @@ class Assets extends Fieldtype
                             'container' => 'not empty',
                         ],
                     ],
+                    'dynamic' => [
+                        'display' => __('Dynamic Folder'),
+                        'instructions' => __('statamic::fieldtypes.assets.config.dynamic'),
+                        'type' => 'select',
+                        'clearable' => true,
+                        'options' => [
+                            'id' => __('ID'),
+                            'slug' => __('Slug'),
+                            'author' => __('Author'),
+                        ],
+                        'validate' => 'in:id,slug,author',
+                        'if' => [
+                            'container' => 'not empty',
+                        ],
+                    ],
                     'restrict' => [
                         'display' => __('Restrict to Folder'),
                         'instructions' => __('statamic::fieldtypes.assets.config.restrict'),
                         'type' => 'toggle',
                         'if' => [
                             'container' => 'not empty',
+                            'dynamic' => 'not true',
                         ],
                     ],
                     'allow_uploads' => [
@@ -150,7 +171,70 @@ class Assets extends Fieldtype
     {
         return [
             'data' => $this->getItemData($this->field->value() ?? $this->defaultValue),
-            'container' => $this->container()->handle(),
+            'container' => $container = $this->container()->handle(),
+            'dynamicFolder' => $dynamicFolder = $this->dynamicFolder(),
+            'rename_folder' => $this->renameFolderAction($dynamicFolder),
+        ];
+    }
+
+    private function dynamicFolder()
+    {
+        if (! $this->config('dynamic')) {
+            return null;
+        }
+
+        // If there's already a value, get the folder from the first asset.
+        // The user may have renamed the directory to differ from the entry slug.
+        if (! empty($value = $this->field->value())) {
+            $folder = ($folder = $this->config('folder')) ? $folder.'/' : '';
+            $prefix = $this->container()->handle().'::'.$folder;
+            $file = Str::after($value[0], $prefix);
+
+            return Str::beforeLast($file, '/');
+        }
+
+        // Otherwise, use a given field's value as the folder.
+        if (! in_array($field = $this->config('dynamic'), ['id', 'slug', 'author'])) {
+            throw new \Exception("Dynamic folder field [$field] is invalid. Must be one of: id, slug, author");
+        }
+
+        $parent = $this->field->parent();
+
+        if ($parent instanceof Entry) {
+            $value = $parent->$field;
+
+            // If the author field doesn't have a max_items of 1, it'll be a collection, so grab the first one.
+            if ($value instanceof Collection) {
+                $value = $value->first();
+            }
+
+            // If the author field had max_items 1 it would be a user, or since we got it above, use its id.
+            if (is_object($value)) {
+                $value = $value->id();
+            }
+
+            return $value;
+        }
+    }
+
+    private function renameFolderAction($dynamicFolder)
+    {
+        if (! $dynamicFolder) {
+            return null;
+        }
+
+        $container = $this->container();
+        $folder = (($folder = $this->config('folder')) ? $folder.'/' : '').$dynamicFolder;
+        $assetFolder = $container->assetFolder($folder);
+
+        $action = Action::for($assetFolder, [
+            'container' => $container->handle(),
+            'folder' => $folder,
+        ])->first(fn ($action) => get_class($action) === RenameAssetFolder::class)?->toArray();
+
+        return [
+            'url' => cp_route('assets.folders.actions.run', $container),
+            'action' => $action,
         ];
     }
 
@@ -167,6 +251,12 @@ class Assets extends Fieldtype
     {
         $values = Arr::wrap($values);
 
+        $single = $this->config('max_files') === 1;
+
+        if ($single && Blink::has($key = 'assets-augment-'.json_encode($values))) {
+            return Blink::get($key);
+        }
+
         $ids = collect($values)
             ->map(fn ($value) => $this->container()->handle().'::'.$value)
             ->all();
@@ -175,7 +265,9 @@ class Assets extends Fieldtype
 
         $query = new OrderedQueryBuilder($query, $ids);
 
-        return $this->config('max_files') === 1 ? $query->first() : $query;
+        return $single && ! config('statamic.system.always_augment_to_query', false)
+            ? Blink::once($key, fn () => $query->first())
+            : $query;
     }
 
     public function shallowAugment($values)

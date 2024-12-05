@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Taxonomies;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\User;
@@ -14,7 +15,7 @@ class UpdateTaxonomyTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_denies_access_if_you_dont_have_permission()
     {
         $taxonomy = tap(Taxonomy::make('test'))->save();
@@ -27,7 +28,7 @@ class UpdateTaxonomyTest extends TestCase
             ->assertSessionHas('error');
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_a_taxonomy()
     {
         $taxonomy = tap(
@@ -48,7 +49,7 @@ class UpdateTaxonomyTest extends TestCase
         $this->assertEquals('Updated title', $taxonomy->title());
     }
 
-    /** @test */
+    #[Test]
     public function it_associates_taxonomies_with_collections()
     {
         $taxonomy = tap(Taxonomy::make('test'))->save();

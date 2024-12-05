@@ -25,7 +25,7 @@ class Fields extends Filter
             ->map(function ($field) {
                 return [
                     'handle' => $field->handle(),
-                    'display' => $field->display(),
+                    'display' => __($field->display()),
                     'fields' => $field->fieldtype()->filter()->fields()->toPublishArray(),
                 ];
             })

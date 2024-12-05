@@ -2,12 +2,13 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class IsLeapYearTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_returns_true_if_date_is_in_a_leap_year(): void
     {
         $leapYear = 'November 2016';
@@ -15,7 +16,7 @@ class IsLeapYearTest extends TestCase
         $this->assertTrue($modified);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_false_if_date_is_not_in_a_leap_year(): void
     {
         $leapYear = 'November 2017';

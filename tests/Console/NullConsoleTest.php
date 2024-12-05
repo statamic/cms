@@ -2,12 +2,13 @@
 
 namespace Tests\Console;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Console\NullConsole;
 use Tests\TestCase;
 
 class NullConsoleTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_can_run_and_chain_methods_without_error()
     {
         $console = (new NullConsole)->info('info')->comment('comment');
@@ -15,7 +16,7 @@ class NullConsoleTest extends TestCase
         $this->assertInstanceOf(NullConsole::class, $console);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_store_and_get_console_error_output()
     {
         $console = (new NullConsole)->error('one')->error('two');

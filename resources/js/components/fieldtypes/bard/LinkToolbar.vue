@@ -117,7 +117,7 @@
                 </label>
             </div>
 
-            <footer class="bg-gray-100 dark:bg-dark-575 rounded-b-md flex items-center justify-end space-x-3 font-normal p-2">
+            <footer class="bg-gray-100 dark:bg-dark-575 rounded-b-md flex items-center justify-end space-x-3 rtl:space-x-reverse font-normal p-2">
                 <button @click="$emit('canceled')" class="text-xs text-gray-600 dark:text-dark-175 hover:text-gray-800 dark:hover-text-dark-100">
                     {{ __('Cancel') }}
                 </button>
@@ -168,7 +168,6 @@
             <asset-selector
                 :container="config.container"
                 :folder="config.folder || '/'"
-                :restrict-container-navigation="true"
                 :restrict-folder-navigation="config.restrict_assets"
                 :selected="[]"
                 :view-mode="'grid'"
@@ -301,6 +300,14 @@ export default {
             return ['url', 'entry', 'asset'].includes(this.linkType);
         },
 
+        selectedTextIsEmail() {
+            const { view, state } = this.bard.editor
+            const { from, to } = view.state.selection
+            const text = state.doc.textBetween(from, to, '')
+
+            return text.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
+        },
+
     },
 
     watch: {
@@ -328,6 +335,11 @@ export default {
 
         this.bard.$on('link-selected', this.applyAttrs);
         this.bard.$on('link-deselected', () => this.$emit('deselected'));
+
+        if (_.isEmpty(this.linkAttrs) && this.selectedTextIsEmail) {
+            this.linkType = 'mailto'
+            this.urlData = { mailto: this.selectedTextIsEmail }
+        }
     },
 
     mounted() {

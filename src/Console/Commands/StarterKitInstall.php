@@ -3,6 +3,7 @@
 namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
+use Laravel\Prompts\Prompt;
 use Statamic\Console\RunsInPlease;
 use Statamic\Console\ValidatesInput;
 use Statamic\Rules\ComposerPackage;
@@ -28,6 +29,7 @@ class StarterKitInstall extends Command
         { --local : Install from local repo configured in composer config.json }
         { --with-config : Copy starter-kit.yaml config for local development }
         { --without-dependencies : Install without dependencies }
+        { --without-user : Install without creating user }
         { --force : Force install and allow dependency errors }
         { --cli-install : Installing from CLI Tool }
         { --clear-site : Clear site before installing }';
@@ -50,30 +52,30 @@ class StarterKitInstall extends Command
             return;
         }
 
-        $licenseManager = StarterKitLicenseManager::validate($package, $this->option('license'), $this);
+        $licenseManager = StarterKitLicenseManager::validate($package, $this->option('license'), $this, $this->input->isInteractive());
 
         if (! $licenseManager->isValid()) {
             return;
         }
 
-        if ($cleared = $this->shouldClear()) {
-            $this->call('statamic:site:clear', ['--no-interaction' => true]);
+        if ($cleared = $this->shouldClearSite()) {
+            $this->clearSite();
         }
 
-        $installer = StarterKitInstaller::package($package, $this, $licenseManager)
+        $installer = (new StarterKitInstaller($package, $this, $licenseManager))
             ->branch($branch)
             ->fromLocalRepo($this->option('local'))
             ->withConfig($this->option('with-config'))
             ->withoutDependencies($this->option('without-dependencies'))
-            ->isInteractive($isInteractive = $this->input->isInteractive())
-            ->withUser($cleared && $isInteractive && ! $this->option('cli-install'))
+            ->withUserPrompt($cleared && $this->input->isInteractive() && ! $this->option('without-user') && ! $this->option('cli-install'))
+            ->isInteractive($this->input->isInteractive())
             ->usingSubProcess($this->option('cli-install'))
             ->force($this->option('force'));
 
         try {
             $installer->install();
         } catch (StarterKitException $exception) {
-            $this->error($exception->getMessage());
+            $this->components->error($exception->getMessage());
 
             return 1;
         }
@@ -93,10 +95,8 @@ class StarterKitInstall extends Command
 
     /**
      * Get composer package (and optional branch).
-     *
-     * @return string
      */
-    protected function getPackageAndBranch()
+    protected function getPackageAndBranch(): array
     {
         $package = $this->argument('package') ?: text('Package');
 
@@ -111,10 +111,8 @@ class StarterKitInstall extends Command
 
     /**
      * Check if should clear site first.
-     *
-     * @return bool
      */
-    protected function shouldClear()
+    protected function shouldClearSite(): bool
     {
         if ($this->option('clear-site')) {
             return true;
@@ -125,7 +123,22 @@ class StarterKitInstall extends Command
         return false;
     }
 
-    private function oldCliToolInstallationDetected()
+    /**
+     * Clear site, and re-set prompt interactivity for future prompts.
+     *
+     * See: https://github.com/statamic/cli/issues/62
+     */
+    protected function clearSite(): void
+    {
+        $this->call('statamic:site:clear', ['--no-interaction' => true]);
+
+        Prompt::interactive($this->input->isInteractive());
+    }
+
+    /**
+     * Detect older Statamic CLI installation.
+     */
+    private function oldCliToolInstallationDetected(): bool
     {
         return (! $this->input->isInteractive()) // CLI tool never runs interactively.
             && (! $this->option('cli-install'))  // Updated CLI tool passes this option.

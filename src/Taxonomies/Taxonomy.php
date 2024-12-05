@@ -166,6 +166,11 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
         return $blueprint;
     }
 
+    public function hasVisibleTermBlueprint()
+    {
+        return $this->termBlueprints()->reject->hidden()->isNotEmpty();
+    }
+
     public function sortField()
     {
         return 'title'; // todo
@@ -368,9 +373,17 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
             throw new NotFoundHttpException;
         }
 
+        if (! $this->sites()->contains($site = Site::current())) {
+            throw new NotFoundHttpException;
+        }
+
+        if ($this->collection() && ! $this->collection()->sites()->contains($site)) {
+            throw new NotFoundHttpException;
+        }
+
         return (new \Statamic\Http\Responses\DataResponse($this))
             ->with([
-                'terms' => $termQuery = $this->queryTerms(),
+                'terms' => $termQuery = $this->queryTerms()->where('site', $site),
                 $this->handle() => $termQuery,
             ])
             ->toResponse($request);
@@ -423,9 +436,22 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
         return $this
             ->fluentlyGetOrSet('layout')
             ->getter(function ($layout) {
-                return $layout ?? 'layout';
+                return $layout ?? config('statamic.system.layout', 'layout');
             })
             ->args(func_get_args());
+    }
+
+    public function createLabel()
+    {
+        $key = "messages.{$this->handle()}_taxonomy_create_term";
+
+        $translation = __($key);
+
+        if ($translation === $key) {
+            return __('Create Term');
+        }
+
+        return $translation;
     }
 
     public function searchIndex($index = null)

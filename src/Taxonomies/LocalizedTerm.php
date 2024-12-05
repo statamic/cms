@@ -22,6 +22,8 @@ use Statamic\Data\Publishable;
 use Statamic\Data\TracksLastModified;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
+use Statamic\Events\LocalizedTermDeleted;
+use Statamic\Events\LocalizedTermSaved;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades;
 use Statamic\Facades\Antlers;
@@ -430,7 +432,11 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
 
     public function save()
     {
-        return $this->term->save();
+        $save = $this->term->save();
+
+        LocalizedTermSaved::dispatch($this);
+
+        return $save;
     }
 
     public function deleteQuietly()
@@ -440,7 +446,11 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
 
     public function delete()
     {
-        return $this->term->delete();
+        $delete = $this->term->delete();
+
+        LocalizedTermDeleted::dispatch($this);
+
+        return $delete;
     }
 
     public function private()

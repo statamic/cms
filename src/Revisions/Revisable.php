@@ -3,6 +3,7 @@
 namespace Statamic\Revisions;
 
 use Illuminate\Support\Carbon;
+use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\Revision as Revisions;
 use Statamic\Statamic;
 
@@ -71,16 +72,22 @@ trait Revisable
     {
         $item = $this->fromWorkingCopy();
 
-        $parent = $item->get('parent');
+        if ($item instanceof Entry) {
+            $parent = $item->get('parent');
 
-        $item->remove('parent');
+            $item->remove('parent');
+        }
 
-        $item
+        $saved = $item
             ->published(true)
             ->updateLastModified($user = $options['user'] ?? false)
             ->save();
 
-        if ($item->collection()->hasStructure() && $parent) {
+        if (! $saved) {
+            return false;
+        }
+
+        if ($item instanceof Entry && $item->collection()->hasStructure() && $parent) {
             $tree = $item->collection()->structure()->in($item->locale());
 
             if (optional($tree->find($parent))->isRoot()) {
@@ -101,6 +108,10 @@ trait Revisable
 
         $item->deleteWorkingCopy();
 
+        if ($item instanceof Entry) {
+            $item->blueprint()->setParent($item);
+        }
+
         return $item;
     }
 
@@ -108,10 +119,14 @@ trait Revisable
     {
         $item = $this->fromWorkingCopy();
 
-        $item
+        $saved = $item
             ->published(false)
             ->updateLastModified($user = $options['user'] ?? false)
             ->save();
+
+        if (! $saved) {
+            return false;
+        }
 
         $item
             ->makeRevision()
@@ -121,6 +136,10 @@ trait Revisable
             ->save();
 
         $item->deleteWorkingCopy();
+
+        if ($item instanceof Entry) {
+            $item->blueprint()->setParent($item);
+        }
 
         return $item;
     }

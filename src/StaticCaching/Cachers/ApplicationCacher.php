@@ -52,6 +52,7 @@ class ApplicationCacher extends AbstractCacher
             $cacheValue = [
                 'content' => $value,
                 'headers' => $headers,
+                'status' => $event->response->getStatusCode(),
             ];
 
             $this->getDefaultExpiration()
@@ -79,7 +80,7 @@ class ApplicationCacher extends AbstractCacher
     {
         $cachedPage = $this->cached ?? $this->getFromCache($request);
 
-        return new Page($cachedPage['content'], $cachedPage['headers']);
+        return new Page($cachedPage['content'], $cachedPage['headers'], $cachedPage['status'] ?? 200);
     }
 
     private function getFromCache(Request $request)

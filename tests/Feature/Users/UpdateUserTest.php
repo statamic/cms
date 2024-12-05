@@ -1,5 +1,8 @@
 <?php
 
+namespace Tests\Feature\Users;
+
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -10,7 +13,7 @@ class UpdateUserTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_saves_a_user()
     {
         $this->setTestRoles(['test' => ['access cp', 'edit users']]);
@@ -29,7 +32,7 @@ class UpdateUserTest extends TestCase
         $this->assertEquals('Jonathan Smith', User::find($user->id())->name);
     }
 
-    /** @test */
+    #[Test]
     public function super_users_can_promote_others_to_super()
     {
         $this->setTestRoles(['test' => ['access cp', 'edit users']]);
@@ -49,7 +52,7 @@ class UpdateUserTest extends TestCase
         $this->assertTrue(User::find($user->id())->isSuper());
     }
 
-    /** @test */
+    #[Test]
     public function non_super_users_cannot_promote_others_to_super()
     {
         $this->setTestRoles(['test' => ['access cp', 'edit users']]);
@@ -69,7 +72,7 @@ class UpdateUserTest extends TestCase
         $this->assertFalse(User::find($user->id())->isSuper());
     }
 
-    /** @test */
+    #[Test]
     public function super_users_can_demote_other_from_super()
     {
         $this->setTestRoles(['test' => ['access cp', 'edit users']]);
@@ -89,7 +92,7 @@ class UpdateUserTest extends TestCase
         $this->assertFalse(User::find($user->id())->isSuper());
     }
 
-    /** @test */
+    #[Test]
     public function non_super_users_cannot_demote_others_from_super()
     {
         $this->setTestRoles(['test' => ['access cp', 'edit users']]);

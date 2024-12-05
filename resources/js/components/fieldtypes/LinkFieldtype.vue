@@ -83,6 +83,23 @@ export default {
             return this.selectedAssets.length
                 ? `asset::${this.selectedAssets[0]}`
                 : null
+        },
+
+        replicatorPreview() {
+            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+
+            switch (this.option) {
+                case 'url':
+                    return this.urlValue;
+                case 'first-child':
+                    return __('First child');
+                case 'entry':
+                    return data_get(this.meta, 'entry.meta.data.0.title', this.entryValue);
+                case 'asset':
+                    return data_get(this.meta, 'asset.meta.data.0.basename', this.assetValue);
+            }
+
+            return this.value;
         }
 
     },

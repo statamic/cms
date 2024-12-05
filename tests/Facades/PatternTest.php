@@ -2,16 +2,15 @@
 
 namespace Tests\Facades;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Pattern;
 use Tests\TestCase;
 
 class PatternTest extends TestCase
 {
-    /**
-     * @test
-     *
-     * @dataProvider likeProvider
-     */
+    #[Test]
+    #[DataProvider('likeProvider')]
     public function it_escapes_sql_like_syntax($string, $expected)
     {
         $this->assertEquals($expected, Pattern::sqlLikeQuote($string));
@@ -31,11 +30,8 @@ class PatternTest extends TestCase
         ])->mapWithKeys(fn ($expected, $string) => [$string => [$string, $expected]])->all();
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider likeRegexProvider
-     */
+    #[Test]
+    #[DataProvider('likeRegexProvider')]
     public function it_converts_sql_like_syntax_to_regex($string, $expected)
     {
         $this->assertEquals($expected, Pattern::sqlLikeToRegex($string));

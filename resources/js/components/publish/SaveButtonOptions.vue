@@ -13,8 +13,8 @@
                 </button>
             </template>
             <h6 v-text="__('After Saving')" class="p-2" />
-            <div class="publish-fields px-2">
-                <div class="publish-field save-and-continue-options">
+            <div class="publish-fields px-2 py-1">
+                <div class="publish-field save-and-continue-options radio-fieldtype">
                     <radio-fieldtype
                         handle="save_and_continue_options"
                         :config="options"

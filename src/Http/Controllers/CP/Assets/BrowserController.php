@@ -3,13 +3,16 @@
 namespace Statamic\Http\Controllers\CP\Assets;
 
 use Illuminate\Http\Request;
+use Illuminate\Pagination\Paginator;
+use Statamic\Assets\AssetFolder;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Exceptions\AuthorizationException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Scope;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
-use Statamic\Http\Resources\CP\Assets\FolderAssetsCollection;
+use Statamic\Http\Resources\CP\Assets\Folder;
+use Statamic\Http\Resources\CP\Assets\FolderAsset;
 use Statamic\Http\Resources\CP\Assets\SearchedAssetsCollection;
 use Statamic\Support\Arr;
 
@@ -74,20 +77,68 @@ class BrowserController extends CpController
         $this->authorize('view', $container);
 
         $folder = $container->assetFolder($path);
+        $perPage = $request->perPage ?? config('statamic.cp.pagination_size');
+        $page = Paginator::resolveCurrentPage();
 
-        $query = $folder->queryAssets();
+        $folders = $folder->assetFolders();
+        $totalFolders = $folders->count();
+        $lastFolderPage = (int) ceil($totalFolders / $perPage) ?: 1;
+
+        $totalAssets = $folder->queryAssets()->count();
+        $totalItems = $totalAssets + $totalFolders;
 
         if ($request->sort) {
-            $query->orderBy($request->sort, $request->order ?? 'asc');
+            $sort = $request->sort;
+            $order = $request->order ?? 'asc';
         } else {
-            $query->orderBy($container->sortField(), $container->sortDirection());
+            $sort = $container->sortField();
+            $order = $container->sortDirection();
         }
 
-        $this->applyQueryScopes($query, $request->all());
+        $sortByMethod = $order === 'desc' ? 'sortByDesc' : 'sortBy';
 
-        $assets = $query->paginate(request('perPage'));
+        $folders = $folders->$sortByMethod(
+            fn (AssetFolder $folder) => method_exists($folder, $sort) ? $folder->$sort() : $folder->basename()
+        );
 
-        return (new FolderAssetsCollection($assets))->folder($folder);
+        $folders = $folders->slice(($page - 1) * $perPage, $perPage);
+
+        if ($page >= $lastFolderPage) {
+            $query = $folder->queryAssets();
+            $query->orderBy($sort, $order);
+            $this->applyQueryScopes($query, $request->all());
+
+            $offset = $page === $lastFolderPage
+                ? 0
+                : $perPage * ($page - $lastFolderPage) - ($totalFolders % $perPage);
+
+            $assets = $query
+                ->offset($offset)
+                ->limit($perPage - $folders->count())
+                ->get();
+        }
+
+        return [
+            'data' => [
+                'assets' => FolderAsset::collection($assets ?? collect())->resolve(),
+                'folder' => array_merge((new Folder($folder))->resolve(), [
+                    'folders' => Folder::collection($folders->values()),
+                ]),
+            ],
+            'links' => [
+                'asset_action' => cp_route('assets.actions.run'),
+                'folder_action' => cp_route('assets.folders.actions.run', $container->id()),
+            ],
+            'meta' => [
+                'current_page' => $page,
+                'from' => $totalItems > 0 ? ($page - 1) * $perPage + 1 : null,
+                'last_page' => $totalItems > 0 ? max((int) ceil($totalItems / $perPage), 1) : null,
+                'path' => Paginator::resolveCurrentPath(),
+                'per_page' => $perPage,
+                'to' => $totalItems > 0 ? $page * $perPage : null,
+                'total' => $totalItems,
+            ],
+        ];
     }
 
     public function search(Request $request, $container, $path = null)
@@ -100,6 +151,10 @@ class BrowserController extends CpController
 
         if ($path) {
             $query->where('folder', $path);
+        }
+
+        if ($request->sort) {
+            $query->orderBy($request->sort, $request->order ?? 'asc');
         }
 
         $this->applyQueryScopes($query, $request->all());

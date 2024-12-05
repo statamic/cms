@@ -3,6 +3,7 @@
 namespace Tests\Feature\Globals;
 
 use Facades\Tests\Factories\GlobalFactory;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -13,7 +14,7 @@ class ConfigureGlobalsTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
@@ -28,7 +29,7 @@ class ConfigureGlobalsTest extends TestCase
             ->assertSessionHas('error');
     }
 
-    /** @test */
+    #[Test]
     public function it_shows_the_form()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure globals']]);

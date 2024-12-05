@@ -2,12 +2,13 @@
 
 namespace Tests\Tags;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Antlers;
 use Tests\TestCase;
 
 class SessionTagTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_gets_session_value()
     {
         session()->put('nineties', 'rad');
@@ -15,7 +16,7 @@ class SessionTagTest extends TestCase
         $this->assertEquals('rad', Antlers::parse('{{ session:value key="nineties" }}'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_session_array_value()
     {
         session()->put('things', ['nineties' => 'rad']);
@@ -24,7 +25,7 @@ class SessionTagTest extends TestCase
         $this->assertEquals('rad', Antlers::parse('{{ session:value key="things:nineties" }}'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_session_value_using_wildcard()
     {
         session()->put('nineties', 'rad');
@@ -34,7 +35,7 @@ class SessionTagTest extends TestCase
         $this->assertEquals('rad', Antlers::parse('{{ session:key }}', ['key' => 'nineties']));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_session_array_value_using_wildcard()
     {
         session()->put('things', ['nineties' => 'rad']);

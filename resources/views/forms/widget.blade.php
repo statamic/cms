@@ -2,7 +2,7 @@
 @php use Statamic\Support\Arr; @endphp
 
 <div class="card p-0 overflow-hidden">
-    <div class="flex justify-between items-center p-4 dark:bg-dark-650 dark:border-b dark:border-dark-900">
+    <div class="flex justify-between items-center p-4 border-b dark:bg-dark-650 dark:border-b dark:border-dark-900">
         <h2>
             <a class="flex items-center" href="{{ $form->showUrl() }}">
                 <div class="h-6 w-6 rtl:ml-2 ltr:mr-2 text-gray-800 dark:text-dark-200">
@@ -14,7 +14,7 @@
     </div>
     <div>
         @if ( ! $submissions)
-            <p class="p-4 pt-2 text-sm text-gray-600">{{ __('This form is awaiting responses') }}</p>
+            <p class="p-4 text-sm text-gray-600">{{ __('This form is awaiting responses') }}</p>
         @else
             <table class="data-table">
                 @foreach($submissions as $submission)

@@ -2,19 +2,20 @@
 
 namespace Tests\Query;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Query\OrderedQueryBuilder;
 use Tests\TestCase;
 
 class OrderedQueryBuilderTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_implements_query_builder()
     {
         $this->assertInstanceOf(Builder::class, new OrderedQueryBuilder($this->mock(Builder::class)));
     }
 
-    /** @test */
+    #[Test]
     public function it_proxies_methods_onto_the_builder()
     {
         $builder = $this->mock(Builder::class);
@@ -36,7 +37,7 @@ class OrderedQueryBuilderTest extends TestCase
         $this->assertEquals($expected, $results);
     }
 
-    /** @test */
+    #[Test]
     public function it_orders_the_items_after_getting_them()
     {
         $builder = $this->mock(Builder::class);
@@ -59,7 +60,7 @@ class OrderedQueryBuilderTest extends TestCase
         ], $results->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_wont_order_the_items_after_getting_them_if_the_builder_is_manually_ordered()
     {
         $builder = $this->mock(Builder::class);
@@ -79,7 +80,7 @@ class OrderedQueryBuilderTest extends TestCase
         ], $results->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_wont_order_the_items_after_getting_them_if_the_builder_is_manually_randomly_ordered()
     {
         $builder = $this->mock(Builder::class);
@@ -99,7 +100,7 @@ class OrderedQueryBuilderTest extends TestCase
         ], $results->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_wont_order_the_items_when_using_pagination()
     {
         // This will just be a known limitation.
@@ -113,7 +114,7 @@ class OrderedQueryBuilderTest extends TestCase
         $this->assertEquals('paginator', $results);
     }
 
-    /** @test */
+    #[Test]
     public function it_limits_after_the_results_have_been_retrieved()
     {
         $builder = $this->mock(Builder::class);
@@ -135,7 +136,7 @@ class OrderedQueryBuilderTest extends TestCase
         ], $results->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_offsets_after_the_results_have_been_retrieved()
     {
         $builder = $this->mock(Builder::class);

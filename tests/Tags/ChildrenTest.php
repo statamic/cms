@@ -4,6 +4,7 @@ namespace Tests\Tags;
 
 use Facades\Tests\Factories\EntryFactory;
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Parse;
 use Statamic\Tags\Children;
@@ -64,7 +65,7 @@ class ChildrenTest extends TestCase
         ])->save();
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_children_data()
     {
         $this->setUpEntries();
@@ -73,7 +74,7 @@ class ChildrenTest extends TestCase
         $this->assertEquals('the bar entry', $this->tag('{{ children }}{{ title }}{{ /children }}', ['collection' => $this->collection]));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_children_data_when_in_another_site()
     {
         $this->setUpEntries();
@@ -83,7 +84,7 @@ class ChildrenTest extends TestCase
         $this->assertEquals('the french bar entry', $this->tag('{{ children }}{{ title }}{{ /children }}', ['collection' => $this->collection]));
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_affect_children_in_nav()
     {
         $this->setUpEntries();

@@ -4,6 +4,7 @@ namespace Tests\Fields;
 
 use Illuminate\Support\Collection;
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Validator;
@@ -11,7 +12,7 @@ use Tests\TestCase;
 
 class ValidatorTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_explodes_pipe_style_rules_into_arrays()
     {
         $this->assertEquals(['foo'], Validator::explodeRules('foo'));
@@ -23,7 +24,7 @@ class ValidatorTest extends TestCase
         $this->assertEquals(['foo', 'bar'], Validator::explodeRules(['foo', 'bar']));
     }
 
-    /** @test */
+    #[Test]
     public function it_merges_rules()
     {
         $original = [
@@ -46,7 +47,7 @@ class ValidatorTest extends TestCase
         ], $merged->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_compiles_field_rules()
     {
         $fieldWithItsOwnRules = Mockery::mock(Field::class);
@@ -76,7 +77,7 @@ class ValidatorTest extends TestCase
         ], $validation->rules());
     }
 
-    /** @test */
+    #[Test]
     public function it_adds_additional_rules()
     {
         $fields = Mockery::mock(Fields::class);
@@ -94,7 +95,7 @@ class ValidatorTest extends TestCase
         ], $validation->rules());
     }
 
-    /** @test */
+    #[Test]
     public function it_merges_additional_rules_into_field_rules()
     {
         $field = Mockery::mock(Field::class);
@@ -120,7 +121,7 @@ class ValidatorTest extends TestCase
         ], $validation->rules());
     }
 
-    /** @test */
+    #[Test]
     public function it_compiles_field_attributes()
     {
         $fieldWithNoExtraAttributes = Mockery::mock(Field::class);
@@ -150,7 +151,7 @@ class ValidatorTest extends TestCase
         ], $validation->attributes());
     }
 
-    /** @test */
+    #[Test]
     public function it_makes_string_based_replacements()
     {
         $field = Mockery::mock(Field::class);
@@ -179,7 +180,7 @@ class ValidatorTest extends TestCase
         ], $validation->rules());
     }
 
-    /** @test */
+    #[Test]
     public function it_makes_class_based_replacements()
     {
         $field = Mockery::mock(Field::class);
@@ -211,7 +212,7 @@ class ValidatorTest extends TestCase
         $this->assertSame(null, $rule->null);
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_make_replacements_in_regex_rules()
     {
         $field = Mockery::mock(Field::class);
@@ -240,7 +241,7 @@ class ValidatorTest extends TestCase
         ], $validation->rules());
     }
 
-    /** @test */
+    #[Test]
     public function it_replaces_this_in_sets()
     {
         $replicator = [
@@ -474,7 +475,7 @@ class ValidatorTest extends TestCase
         ], $validator->attributes());
     }
 
-    /** @test */
+    #[Test]
     public function it_discards_this_at_top_level()
     {
         $fields = new Fields([

@@ -65,6 +65,7 @@ class AssetContainersController extends CpController
             'source_preset' => $container->sourcePreset(),
             'warm_intelligent' => $intelligent = $container->warmsPresetsIntelligently(),
             'warm_presets' => $intelligent ? [] : $container->warmPresets(),
+            'validation' => $container->validationRules(),
         ];
 
         $fields = ($blueprint = $this->formBlueprint($container))
@@ -99,7 +100,8 @@ class AssetContainersController extends CpController
             ->allowUploads($values['allow_uploads'])
             ->createFolders($values['create_folders'])
             ->sourcePreset($values['source_preset'])
-            ->warmPresets($values['warm_intelligent'] ? null : $values['warm_presets']);
+            ->warmPresets($values['warm_intelligent'] ? null : $values['warm_presets'])
+            ->validationRules($values['validation'] ?? null);
 
         $container->save();
 
@@ -265,6 +267,11 @@ class AssetContainersController extends CpController
                         'instructions' => __('statamic::messages.asset_container_quick_download_instructions'),
                         'default' => true,
                     ],
+                    'validation' => [
+                        'type' => 'taggable',
+                        'display' => __('Validation Rules'),
+                        'instructions' => __('statamic::messages.asset_container_validation_rules_instructions'),
+                    ],
                 ],
             ],
         ]);
@@ -310,7 +317,7 @@ class AssetContainersController extends CpController
         return collect(config('statamic.assets.image_manipulation.presets'))
             ->mapWithKeys(function ($params, $handle) {
                 return [$handle => $this->expandedGlidePresetLabel($handle, $params)];
-            });
+            })->all();
     }
 
     private function expandedGlidePresetLabel($handle, $params)

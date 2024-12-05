@@ -2,12 +2,13 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class HexToRgbTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_converts_hex_values_to_rgb(): void
     {
         $modified = $this->modify('#FF269E');

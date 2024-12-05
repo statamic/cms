@@ -2,13 +2,14 @@
 
 namespace Tests\Data\Structures;
 
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 abstract class StructureTestCase extends TestCase
 {
     abstract public function structure($handle = null);
 
-    /** @test */
+    #[Test]
     public function the_tree_root_cannot_have_children_when_expecting_root()
     {
         $this->expectException(\Exception::class);
@@ -26,7 +27,7 @@ abstract class StructureTestCase extends TestCase
         ], 'en');
     }
 
-    /** @test */
+    #[Test]
     public function the_tree_root_can_have_children_when_not_expecting_root()
     {
         $tree = [
@@ -43,7 +44,7 @@ abstract class StructureTestCase extends TestCase
         $this->assertEquals($tree, $this->structure('test')->expectsRoot(false)->validateTree($tree, 'en'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_evaluated_augmented_value_using_magic_property()
     {
         $structure = $this->structure('test');

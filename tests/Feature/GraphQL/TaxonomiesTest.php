@@ -3,11 +3,13 @@
 namespace Tests\Feature\GraphQL;
 
 use Facades\Statamic\API\ResourceAuthorizer;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Taxonomy;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-/** @group graphql */
+#[Group('graphql')]
 class TaxonomiesTest extends TestCase
 {
     use EnablesQueries;
@@ -23,7 +25,7 @@ class TaxonomiesTest extends TestCase
         Taxonomy::make('categories')->title('Categories')->save();
     }
 
-    /** @test */
+    #[Test]
     public function query_only_works_if_enabled()
     {
         ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'taxonomies')->andReturnFalse()->once();
@@ -36,7 +38,7 @@ class TaxonomiesTest extends TestCase
             ->assertSee('Cannot query field \"taxonomies\" on type \"Query\"', false);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_taxonomies()
     {
         $query = <<<'GQL'
@@ -62,7 +64,7 @@ GQL;
             ]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_only_allowed_sub_resources()
     {
         $query = <<<'GQL'

@@ -2,6 +2,7 @@
 
 namespace Tests\Rules;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Rules\ComposerPackage;
 use Tests\TestCase;
 
@@ -11,7 +12,7 @@ class ComposerPackageTest extends TestCase
 
     protected static $customRule = ComposerPackage::class;
 
-    /** @test */
+    #[Test]
     public function it_validates_handles()
     {
         $this->assertPasses('the-hasselhoff/kung-fury');
@@ -25,7 +26,7 @@ class ComposerPackageTest extends TestCase
         $this->assertFails('vendor/ not-a-package');
     }
 
-    /** @test */
+    #[Test]
     public function it_outputs_helpful_validation_error()
     {
         $this->assertValidationErrorOutput(trans('statamic::validation.composer_package'), 'not-a-package');

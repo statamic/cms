@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use League\Flysystem\PathTraversalDetected;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\Asset;
 use Statamic\Assets\AssetContainerContents;
 use Statamic\Assets\AssetFolder as Folder;
@@ -31,7 +33,7 @@ class AssetFolderTest extends TestCase
         Cache::clear();
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_sets_the_container()
     {
         $folder = new Folder;
@@ -42,7 +44,7 @@ class AssetFolderTest extends TestCase
         $this->assertEquals($container, $folder->container());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_sets_the_path()
     {
         $folder = new Folder;
@@ -54,7 +56,26 @@ class AssetFolderTest extends TestCase
         $this->assertEquals('folder', $folder->basename());
     }
 
-    /** @test */
+    #[Test]
+    public function it_cannot_use_traversal_in_path()
+    {
+        $folder = (new Folder)->path('path/to/folder');
+
+        try {
+            $folder->path('path/to/../folder');
+        } catch (PathTraversalDetected $e) {
+            $this->assertEquals('Path traversal detected: path/to/../folder', $e->getMessage());
+
+            // Even if exception was thrown, make sure that the path didn't somehow get updated.
+            $this->assertEquals('path/to/folder', $folder->path());
+
+            return;
+        }
+
+        $this->fail('Exception was not thrown.');
+    }
+
+    #[Test]
     public function it_gets_the_disk_from_the_container()
     {
         $container = $this->mock(AssetContainer::class);
@@ -65,14 +86,14 @@ class AssetFolderTest extends TestCase
         $this->assertEquals($disk, $folder->disk());
     }
 
-    /** @test */
+    #[Test]
     public function the_title_is_the_folder_name()
     {
         $folder = (new Folder)->path('path/to/somewhere');
         $this->assertEquals('somewhere', $folder->title());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_resolved_path()
     {
         $container = $this->mock(AssetContainer::class);
@@ -83,7 +104,7 @@ class AssetFolderTest extends TestCase
         $this->assertEquals('path/to/container/path/to/folder', $folder->resolvedPath());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_assets_in_this_folder()
     {
         $container = $this->mock(AssetContainer::class);
@@ -100,7 +121,7 @@ class AssetFolderTest extends TestCase
         $this->assertEquals($assets, $folder->assets());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_assets_in_this_folder_recursively()
     {
         $container = $this->mock(AssetContainer::class);
@@ -117,7 +138,7 @@ class AssetFolderTest extends TestCase
         $this->assertEquals($assets, $folder->assets(true));
     }
 
-    /** @test */
+    #[Test]
     public function it_counts_assets_non_recursively()
     {
         $container = $this->mock(AssetContainer::class);
@@ -134,7 +155,7 @@ class AssetFolderTest extends TestCase
         $this->assertEquals(2, $folder->count());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_subfolders_in_this_folder_non_recursively()
     {
         $container = $this->mock(AssetContainer::class);
@@ -157,7 +178,7 @@ class AssetFolderTest extends TestCase
         ], $folder->assetFolders()->map->path()->values()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_last_modified_date_by_aggregating_all_files()
     {
         Carbon::setTestNow(now());
@@ -186,7 +207,7 @@ class AssetFolderTest extends TestCase
         $this->assertEquals(Carbon::now()->subMinutes(5), $folder->lastModified());
     }
 
-    /** @test */
+    #[Test]
     public function it_creates_directory_when_saving()
     {
         Storage::fake('local');
@@ -210,7 +231,7 @@ class AssetFolderTest extends TestCase
         $disk->assertExists($path);
     }
 
-    /** @test */
+    #[Test]
     public function it_adds_a_gitkeep_file_when_saving()
     {
         Storage::fake('local');
@@ -232,7 +253,7 @@ class AssetFolderTest extends TestCase
         $disk->assertExists($path.'/.gitkeep');
     }
 
-    /** @test */
+    #[Test]
     public function deleting_a_folder_deletes_the_assets_and_directory()
     {
         $container = $this->containerWithDisk();
@@ -284,7 +305,7 @@ class AssetFolderTest extends TestCase
         // TODO: assert about event
     }
 
-    /** @test */
+    #[Test]
     public function deleting_a_folder_doesnt_overzealously_delete_from_cache()
     {
         $container = $this->containerWithDisk();
@@ -331,7 +352,7 @@ class AssetFolderTest extends TestCase
         ], $container->contents()->cached()->keys()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_be_moved_to_another_folder()
     {
         $container = $this->containerWithDisk();
@@ -432,7 +453,7 @@ class AssetFolderTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_can_be_moved_to_another_folder_with_a_new_folder_name()
     {
         $container = $this->containerWithDisk();
@@ -535,7 +556,7 @@ class AssetFolderTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_lowercases_when_moving_to_another_foldre_with_a_new_folder_name()
     {
         $container = $this->containerWithDisk();
@@ -620,7 +641,7 @@ class AssetFolderTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_lowercase_moved_folders_when_configured()
     {
         config(['statamic.assets.lowercase' => false]);
@@ -707,7 +728,92 @@ class AssetFolderTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
+    public function it_sanitizes_when_moving_to_another_folder_with_a_new_folder_name()
+    {
+        $container = $this->containerWithDisk();
+        $disk = $container->disk()->filesystem();
+
+        $paths = collect([
+            'move/one.txt',
+            'move/two.txt',
+            'move/sub/three.txt',
+            'move/sub/subsub/four.txt',
+            'destination/folder/five.txt',
+        ]);
+
+        $paths->each(function ($path) use ($disk, $container) {
+            $disk->put($path, '');
+            $container->makeAsset($path)->save();
+        });
+
+        $folder = (new Folder)->container($container)->path('move');
+
+        Event::fake();
+
+        $folder->move('destination/folder', 'new move');
+
+        $disk->assertMissing('move');
+        $disk->assertMissing('move/sub');
+        $disk->assertMissing('move/sub/subsub');
+
+        $disk->assertExists('destination/folder/new-move');
+        $disk->assertExists('destination/folder/new-move/sub');
+        $disk->assertExists('destination/folder/new-move/sub/subsub');
+
+        $this->assertEquals([
+            'destination',
+            'destination/folder',
+            'destination/folder/new-move',
+            'destination/folder/new-move/sub',
+            'destination/folder/new-move/sub/subsub',
+        ], $container->folders()->all());
+
+        $this->assertEquals([
+            'destination',
+            'destination/folder',
+            'destination/folder/five.txt',
+            'destination/folder/new-move',
+            'destination/folder/new-move/sub',
+            'destination/folder/new-move/sub/subsub',
+            'destination/folder/new-move/sub/subsub/four.txt',
+            'destination/folder/new-move/sub/three.txt',
+            'destination/folder/new-move/one.txt',
+            'destination/folder/new-move/two.txt',
+        ], $container->contents()->cached()->keys()->all());
+
+        // Assert asset folder events.
+        $paths = ['move', 'move/sub', 'move/sub/subsub'];
+        Event::assertDispatchedTimes(AssetFolderDeleted::class, count($paths));
+        Event::assertDispatchedTimes(AssetFolderSaved::class, count($paths));
+        foreach ($paths as $path) {
+            Event::assertDispatched(AssetFolderDeleted::class, function (AssetFolderDeleted $event) use ($path) {
+                return $event->folder->path() === $path;
+            });
+        }
+        $paths = ['new-move', 'new-move/sub', 'new-move/sub/subsub'];
+        foreach ($paths as $path) {
+            Event::assertDispatched(AssetFolderSaved::class, function (AssetFolderSaved $event) use ($path) {
+                return $event->folder->path() === 'destination/folder/'.$path;
+            });
+        }
+
+        // Assert asset events.
+        $paths = [
+            'destination/folder/new-move/one.txt',
+            'destination/folder/new-move/two.txt',
+            'destination/folder/new-move/sub/three.txt',
+            'destination/folder/new-move/sub/subsub/four.txt',
+        ];
+        Event::assertDispatchedTimes(AssetSaved::class, count($paths));
+        foreach ($paths as $path) {
+            Event::assertDispatched(AssetSaved::class, function (AssetSaved $event) use ($path) {
+                return $event->asset->path() === $path;
+            });
+        }
+    }
+
+    #[Test]
     public function it_cannot_be_moved_to_its_own_subfolder()
     {
         $container = $this->containerWithDisk();
@@ -745,7 +851,7 @@ class AssetFolderTest extends TestCase
         ], $container->contents()->cached()->keys()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_be_moved_if_the_destination_already_exists()
     {
         $container = $this->containerWithDisk();
@@ -791,7 +897,7 @@ class AssetFolderTest extends TestCase
         ], $container->contents()->cached()->keys()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_be_renamed()
     {
         $container = $this->containerWithDisk();
@@ -858,7 +964,7 @@ class AssetFolderTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_be_renamed_if_the_destination_exists()
     {
         $container = $this->containerWithDisk();
@@ -898,7 +1004,7 @@ class AssetFolderTest extends TestCase
         ], $container->contents()->cached()->keys()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_lowercases_when_renaming_by_default()
     {
         $container = $this->containerWithDisk();
@@ -944,7 +1050,7 @@ class AssetFolderTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_lowercase_renamed_folder_when_configured()
     {
         config(['statamic.assets.lowercase' => false]);
@@ -992,7 +1098,7 @@ class AssetFolderTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_parent_folder()
     {
         $container = $this->mock(AssetContainer::class);
@@ -1014,7 +1120,7 @@ class AssetFolderTest extends TestCase
         $this->assertNotEquals($folder, $parent);
     }
 
-    /** @test */
+    #[Test]
     public function the_root_has_no_parent()
     {
         $folder = (new Folder)
@@ -1024,7 +1130,7 @@ class AssetFolderTest extends TestCase
         $this->assertNull($folder->parent());
     }
 
-    /** @test */
+    #[Test]
     public function it_converts_to_an_array()
     {
         $container = $this->mock(AssetContainer::class);

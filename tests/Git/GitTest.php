@@ -4,6 +4,7 @@ namespace Tests\Git;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Queue;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Console\Processes\Git as GitProcess;
 use Statamic\Console\Processes\Process;
 use Statamic\Facades\Config;
@@ -54,7 +55,7 @@ class GitTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function it_wont_run_if_git_integration_is_not_enabled()
     {
         Config::set('statamic.git.enabled', false);
@@ -64,7 +65,7 @@ class GitTest extends TestCase
         Git::anything();
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_tracked_statuses()
     {
         $this->files->put(base_path('content/collections/pages.yaml'), 'title: Pages Title Changed');
@@ -99,13 +100,13 @@ EOT;
         $this->assertEquals(0, $assetsStatus->deletedCount);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_null_when_statuses_are_clean()
     {
         $this->assertNull(Git::statuses());
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_out_external_paths_that_are_not_separate_repos()
     {
         $notARepoPath = Path::resolve(base_path('../../../../..'));
@@ -136,7 +137,7 @@ EOT;
         $this->assertEquals(0, $contentStatus->deletedCount);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_handle_configured_paths_that_are_symlinks()
     {
         $externalPath = Path::resolve(base_path('../assets-external'));
@@ -165,7 +166,7 @@ EOT;
         $this->assertEquals(0, $status->deletedCount);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_git_user_info()
     {
         $this->assertEquals('Spock', Git::gitUserName());
@@ -197,7 +198,7 @@ EOT;
         $this->assertEquals('spock@example.com', Git::gitUserEmail());
     }
 
-    /** @test */
+    #[Test]
     public function it_commits_tracked_content()
     {
         $this->files->put(base_path('content/collections/pages.yaml'), 'title: Pages Title Changed');
@@ -233,7 +234,7 @@ EOT;
         $this->assertStringContainsString('statement.txt', $commit);
     }
 
-    /** @test */
+    #[Test]
     public function it_shell_escapes_git_user_name_and_email()
     {
         Config::set('statamic.git.user.name', 'Jimmy"; echo "deleting all your files now"; #');
@@ -265,7 +266,7 @@ EOT;
         $this->assertStringContainsString($expectedMessage, $lastCommit);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_commit_with_custom_commit_message()
     {
         $this->files->put(base_path('content/collections/pages.yaml'), 'title: Pages Title Changed');
@@ -276,7 +277,7 @@ EOT;
         $this->assertStringContainsString('collections/pages.yaml', $commit);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_run_custom_commands()
     {
         $this->markTestSkippedInWindows();
@@ -303,7 +304,7 @@ EOT;
         $this->assertEquals($expectedLog, $this->files->get($logFile));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_run_custom_commands_with_custom_git_binary()
     {
         $this->markTestSkippedInWindows();
@@ -330,7 +331,7 @@ EOT;
         $this->assertEquals($expectedLog, $this->files->get($logFile));
     }
 
-    /** @test */
+    #[Test]
     public function it_dispatches_commit_job()
     {
         Queue::fake();
@@ -340,7 +341,7 @@ EOT;
         Queue::assertPushed(\Statamic\Git\CommitJob::class, 1);
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_push_by_default()
     {
         Git::shouldReceive('push')->never();
@@ -349,7 +350,7 @@ EOT;
         Git::commit();
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_push_when_there_was_nothing_to_commit()
     {
         Git::shouldReceive('push')->never();
@@ -360,7 +361,7 @@ EOT;
         Git::commit();
     }
 
-    /** @test */
+    #[Test]
     public function it_can_push_after_a_commit()
     {
         Git::shouldReceive('push')->once();

@@ -2,16 +2,15 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class FlattenTest extends TestCase
 {
-    /**
-     * @test
-     *
-     * @dataProvider flattenProvider
-     */
+    #[Test]
+    #[DataProvider('flattenProvider')]
     public function it_flattens_an_array($depth, $expected): void
     {
         $input = [
@@ -42,11 +41,8 @@ class FlattenTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider flattenWithKeysProvider
-     */
+    #[Test]
+    #[DataProvider('flattenWithKeysProvider')]
     public function it_flattens_an_array_with_keys($depth, $expected): void
     {
         $input = [

@@ -18,7 +18,6 @@ class Grid extends Fieldtype
 
     protected $categories = ['structured'];
     protected $defaultable = false;
-    protected $defaultValue = [];
 
     protected function configFieldItems(): array
     {

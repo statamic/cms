@@ -3,6 +3,7 @@
 namespace Tests\Feature\Taxonomies;
 
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
@@ -13,7 +14,7 @@ class TermEntriesTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_gets_and_counts_entries_for_a_term_across_collections()
     {
         Taxonomy::make('colors')->save();
@@ -48,7 +49,7 @@ class TermEntriesTest extends TestCase
         $this->assertEquals(['cheetah'], Term::find('colors::yellow')->term()->entries()->map->slug()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_counts_entries_for_a_term_for_a_single_collection()
     {
         Taxonomy::make('colors')->save();
@@ -95,7 +96,7 @@ class TermEntriesTest extends TestCase
         $this->assertEquals([], Term::find('colors::yellow')->term()->collection($clothes)->entries()->map->slug()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_counts_entries_for_a_localized_term_across_collections()
     {
         $this->setSites([
@@ -159,7 +160,7 @@ class TermEntriesTest extends TestCase
         $this->assertEquals(['cheetah', 'guepard'], Term::find('colors::yellow')->term()->entries()->map->slug()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_counts_entries_for_a_localized_term_for_a_single_collection()
     {
         $this->setSites([

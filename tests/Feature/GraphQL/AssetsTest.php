@@ -6,13 +6,15 @@ use Facades\Statamic\API\FilterAuthorizer;
 use Facades\Statamic\API\ResourceAuthorizer;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\YAML;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-/** @group graphql */
+#[Group('graphql')]
 class AssetsTest extends TestCase
 {
     use EnablesQueries;
@@ -26,7 +28,7 @@ class AssetsTest extends TestCase
         BlueprintRepository::partialMock();
     }
 
-    /** @test */
+    #[Test]
     public function query_only_works_if_enabled()
     {
         ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'assets')->andReturnFalse()->once();
@@ -39,7 +41,7 @@ class AssetsTest extends TestCase
             ->assertSee('Cannot query field \"assets\" on type \"Query\"', false);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_assets()
     {
         Storage::fake('test', ['url' => '/assets']);
@@ -71,7 +73,7 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_query_against_non_allowed_sub_resource()
     {
         Storage::fake('test', ['url' => '/assets']);
@@ -112,7 +114,7 @@ GQL;
             ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_paginates_assets()
     {
         Storage::fake('test', ['url' => '/assets']);
@@ -161,7 +163,7 @@ GQL;
             ]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_blueprint_specific_fields()
     {
         Storage::fake('test', ['url' => '/assets']);
@@ -220,7 +222,7 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_filter_assets_by_default()
     {
         Storage::fake('test', ['url' => '/assets']);
@@ -270,7 +272,7 @@ GQL;
             ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_filter_assets_when_configuration_allows_for_it()
     {
         Storage::fake('test', ['url' => '/assets']);
@@ -311,7 +313,7 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_assets_with_equalto_shorthand()
     {
         Storage::fake('test', ['url' => '/assets']);
@@ -350,7 +352,7 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_assets_with_multiple_conditions_of_the_same_type()
     {
         Storage::fake('test', ['url' => '/assets']);
@@ -391,7 +393,7 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_sorts_assets()
     {
         Storage::fake('test', ['url' => '/assets']);
@@ -425,7 +427,7 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_sorts_assets_descending()
     {
         Storage::fake('test', ['url' => '/assets']);
@@ -459,7 +461,7 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_sorts_assets_on_multiple_fields()
     {
         Storage::fake('test', ['url' => '/assets']);

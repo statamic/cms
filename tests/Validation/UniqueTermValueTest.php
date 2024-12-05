@@ -1,6 +1,9 @@
 <?php
 
+namespace Tests\Validation;
+
 use Illuminate\Support\Facades\Validator;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Rules\UniqueTermValue;
@@ -11,7 +14,7 @@ class UniqueTermValueTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_fails_when_theres_a_duplicate_term_entry_value_in_across_all_taxonomies()
     {
         Taxonomy::make('taxonomy-one')->save();
@@ -31,7 +34,7 @@ class UniqueTermValueTest extends TestCase
         )->passes());
     }
 
-    /** @test */
+    #[Test]
     public function it_fails_when_theres_a_duplicate_term_entry_value_in_a_specific_taxonomy()
     {
         Taxonomy::make('taxonomy-one')->save();
@@ -51,7 +54,7 @@ class UniqueTermValueTest extends TestCase
         )->passes());
     }
 
-    /** @test */
+    #[Test]
     public function it_passes_duplicate_slug_validation_when_updating_in_a_single_taxonomy()
     {
         Taxonomy::make('taxonomy-one')->save();
@@ -70,7 +73,7 @@ class UniqueTermValueTest extends TestCase
         )->fails());
     }
 
-    /** @test */
+    #[Test]
     public function it_passes_when_theres_a_duplicate_term_value_in_a_different_site()
     {
         $this->setSites([

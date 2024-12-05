@@ -5,6 +5,8 @@ namespace Tests\Feature\GraphQL;
 use Facades\Statamic\API\ResourceAuthorizer;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Taxonomy;
@@ -12,7 +14,7 @@ use Statamic\Facades\Term;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-/** @group graphql */
+#[Group('graphql')]
 class TermTest extends TestCase
 {
     use EnablesQueries;
@@ -20,7 +22,7 @@ class TermTest extends TestCase
 
     protected $enabledQueries = ['taxonomies'];
 
-    /** @test */
+    #[Test]
     public function query_only_works_if_enabled()
     {
         ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'taxonomies')->andReturnFalse()->once();
@@ -33,7 +35,7 @@ class TermTest extends TestCase
             ->assertSee('Cannot query field \"terms\" on type \"Query\"', false);
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_query_against_non_allowed_sub_resource()
     {
         Taxonomy::make('tags')->save();
@@ -72,7 +74,7 @@ GQL;
             ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_a_term_by_id()
     {
         Taxonomy::make('tags')->save();
@@ -123,7 +125,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_add_custom_fields_to_interface()
     {
         GraphQL::addField('TermInterface', 'one', function () {
@@ -181,7 +183,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_add_custom_fields_to_an_implementation()
     {
         GraphQL::addField('Term_Tags_Tag', 'one', function () {
@@ -230,7 +232,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function adding_custom_field_to_an_implementation_does_not_add_it_to_the_interface()
     {
         GraphQL::addField('Term_Tags_Tag', 'one', function () {
@@ -262,7 +264,7 @@ GQL;
             ]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_resolves_query_builders()
     {
         BlueprintRepository::partialMock();

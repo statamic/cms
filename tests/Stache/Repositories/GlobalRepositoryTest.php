@@ -2,6 +2,7 @@
 
 namespace Tests\Stache\Repositories;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Globals\GlobalSet;
 use Statamic\Exceptions\GlobalSetNotFoundException;
 use Statamic\Facades\GlobalSet as GlobalSetAPI;
@@ -30,7 +31,7 @@ class GlobalRepositoryTest extends TestCase
         $this->repo = new GlobalRepository($stache);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_all_global_sets()
     {
         $sets = $this->repo->all();
@@ -45,7 +46,7 @@ class GlobalRepositoryTest extends TestCase
         $this->assertEquals(['Contact Details', 'General'], $ordered->map->title()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_global_set_by_id()
     {
         tap($this->repo->find('global'), function ($set) {
@@ -65,7 +66,7 @@ class GlobalRepositoryTest extends TestCase
         $this->assertNull($this->repo->find('unknown'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_global_set_by_handle()
     {
         tap($this->repo->findByHandle('global'), function ($set) {
@@ -85,7 +86,7 @@ class GlobalRepositoryTest extends TestCase
         $this->assertNull($this->repo->findByHandle('unknown'));
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_a_global_to_the_stache_and_to_a_file()
     {
         $global = GlobalSetAPI::make('new');
@@ -104,7 +105,7 @@ class GlobalRepositoryTest extends TestCase
         @unlink($this->directory.'/new.yaml');
     }
 
-    /** @test */
+    #[Test]
     public function test_find_or_fail_gets_global()
     {
         $set = $this->repo->findOrFail('contact');
@@ -113,7 +114,7 @@ class GlobalRepositoryTest extends TestCase
         $this->assertEquals('Contact Details', $set->title());
     }
 
-    /** @test */
+    #[Test]
     public function test_find_or_fail_throws_exception_when_global_does_not_exist()
     {
         $this->expectException(GlobalSetNotFoundException::class);

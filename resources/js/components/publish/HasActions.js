@@ -1,7 +1,7 @@
 export default {
 
     props: {
-        initialItemActions: Array,
+        initialItemActions: { type: Array, default: () => [] },
         itemActionUrl: String,
     },
 
@@ -9,6 +9,14 @@ export default {
         return {
             itemActions: this.initialItemActions,
         }
+    },
+
+    computed: { 
+
+        hasItemActions() {
+            return this.itemActions.length > 0;
+        },
+
     },
 
     methods: {
@@ -24,7 +32,9 @@ export default {
 
             this.$events.$emit('reset-action-modals');
 
-            if (response.message !== false) {
+            if (response.success === false) {
+                this.$toast.error(response.message || __("Action failed"));
+            } else {
                 this.$toast.success(response.message || __("Action completed"));
             }
             

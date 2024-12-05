@@ -2,6 +2,7 @@
 
 namespace Tests\Data\Structures;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Structures\Structure as StructureContract;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Nav;
@@ -20,7 +21,7 @@ class StructureRepositoryTest extends TestCase
         $this->repo = new StructureRepository;
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_all_structures()
     {
         $navs = collect([
@@ -51,7 +52,7 @@ class StructureRepositoryTest extends TestCase
         ], $structures->map->handle()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_nav_structure_by_handle()
     {
         $nav = Nav::make();
@@ -61,7 +62,7 @@ class StructureRepositoryTest extends TestCase
         $this->assertSame($nav, $this->repo->find('test'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_collection_structure_by_handle()
     {
         $structure = new CollectionStructure;
@@ -72,7 +73,7 @@ class StructureRepositoryTest extends TestCase
         $this->assertSame($structure, $this->repo->find('collection::test'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_an_entry_by_uri()
     {
         $this->markTestIncomplete();

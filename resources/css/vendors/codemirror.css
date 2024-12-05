@@ -342,7 +342,7 @@
 
 
   .CodeMirror-fullscreen {
-      @apply fixed h-auto inset-0 top-12 rounded-none;
+      @apply fixed h-auto inset-0 pt-14 rounded-none;
   }
 
   .CodeMirror-rulers {
@@ -362,10 +362,6 @@
 
     .CodeMirror {
         @apply border p-0
-    }
-
-    CodeMirror-scroll {
-        min-height: 80px;
     }
   }
 

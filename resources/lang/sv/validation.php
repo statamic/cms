@@ -1,19 +1,8 @@
 <?php
 
 return [
-
-    /*
-    |--------------------------------------------------------------------------
-    | Validation Language Lines
-    |--------------------------------------------------------------------------
-    |
-    | The following language lines contain the default error messages used by
-    | the validator class. Some of these rules have multiple versions such
-    | as the size rules. Feel free to tweak each of these messages here.
-    |
-    */
-
     'accepted' => 'Måste accepteras.',
+    'accepted_if' => 'Måste accepteras när :other är :value .',
     'active_url' => 'Detta är inte en giltig URL.',
     'after' => 'Måste vara ett datum efter :date .',
     'after_or_equal' => 'Måste vara ett datum efter eller lika med :date .',
@@ -21,34 +10,44 @@ return [
     'alpha_dash' => 'Får endast innehålla bokstäver, siffror, bindestreck och understreck.',
     'alpha_num' => 'Får endast innehålla bokstäver och siffror.',
     'array' => 'Måste vara en array.',
+    'ascii' => 'Får endast innehålla enbyte alfanumeriska tecken och symboler.',
     'before' => 'Måste vara ett datum före :date .',
     'before_or_equal' => 'Måste vara ett datum före eller lika med :date .',
-    'between.numeric' => 'Måste vara mellan :min och :max .',
-    'between.file' => 'Måste vara mellan :min och :max kilobyte.',
-    'between.string' => 'Måste vara mellan :min och :max tecken.',
     'between.array' => 'Måste ha mellan :min och :max artiklar.',
+    'between.file' => 'Måste vara mellan :min och :max kilobyte.',
+    'between.numeric' => 'Måste vara mellan :min och :max .',
+    'between.string' => 'Måste vara mellan :min och :max tecken.',
     'boolean' => 'Måste vara sant eller falskt.',
+    'can' => 'Innehåller ett obehörigt värde.',
     'confirmed' => 'Bekräftelsen stämmer inte.',
     'current_password' => 'Lösenordet är felaktigt.',
     'date' => 'Inte ett giltigt datum.',
+    'date_equals' => 'Måste vara ett datum lika med :date .',
     'date_format' => 'Matchar inte formatet :format .',
+    'decimal' => 'Måste ha :decimal .',
+    'declined' => 'Måste avvisas.',
+    'declined_if' => 'Måste avvisas när :other är :value .',
     'different' => 'Detta fält och :other måste vara olika.',
     'digits' => 'Måste vara :digits siffror.',
     'digits_between' => 'Måste vara mellan :min och :max siffror.',
     'dimensions' => 'Ogiltiga bildmått.',
     'distinct' => 'Det här fältet har ett dubblettvärde.',
+    'doesnt_end_with' => 'Får inte sluta med något av följande: :values .',
+    'doesnt_start_with' => 'Får inte börja med något av följande: :values .',
     'email' => 'Måste vara en giltig e-postadress.',
+    'ends_with' => 'Måste sluta med :values',
+    'enum' => 'Det valda :attribute är ogiltigt.',
     'exists' => 'Detta är ogiltigt.',
     'file' => 'Måste vara en fil.',
     'filled' => 'Måste ha ett värde.',
-    'gt.numeric' => 'Måste vara större än :value .',
-    'gt.file' => 'Måste vara större än :value kilobyte.',
-    'gt.string' => 'Måste vara större än :value tecken.',
     'gt.array' => 'Måste ha mer än :value .',
-    'gte.numeric' => 'Måste vara större än eller lika med :value .',
-    'gte.file' => 'Måste vara större än eller lika med :value kilobyte.',
-    'gte.string' => 'Måste vara större än eller lika med :value tecken.',
+    'gt.file' => 'Måste vara större än :value kilobyte.',
+    'gt.numeric' => 'Måste vara större än :value .',
+    'gt.string' => 'Måste vara större än :value tecken.',
     'gte.array' => 'Måste ha :value eller mer.',
+    'gte.file' => 'Måste vara större än eller lika med :value kilobyte.',
+    'gte.numeric' => 'Måste vara större än eller lika med :value .',
+    'gte.string' => 'Måste vara större än eller lika med :value tecken.',
     'image' => 'Måste vara en bild.',
     'in' => 'Detta är ogiltigt.',
     'in_array' => 'Det här fältet finns inte i :other .',
@@ -57,89 +56,100 @@ return [
     'ipv4' => 'Måste vara en giltig IPv4-adress.',
     'ipv6' => 'Måste vara en giltig IPv6-adress.',
     'json' => 'Måste vara en giltig JSON-sträng.',
-    'lt.numeric' => 'Måste vara mindre än :value .',
-    'lt.file' => 'Måste vara mindre än :value kilobyte.',
-    'lt.string' => 'Måste vara mindre än :value tecken.',
+    'lowercase' => 'Måste vara gemener.',
     'lt.array' => 'Måste ha mindre än :value objekt.',
-    'lte.numeric' => 'Måste vara mindre än eller lika med :value .',
-    'lte.file' => 'Måste vara mindre än eller lika med :value kilobyte.',
-    'lte.string' => 'Måste vara mindre än eller lika med :value tecken.',
+    'lt.file' => 'Måste vara mindre än :value kilobyte.',
+    'lt.numeric' => 'Måste vara mindre än :value .',
+    'lt.string' => 'Måste vara mindre än :value tecken.',
     'lte.array' => 'Får inte ha mer än :value objekt.',
-    'max.numeric' => 'Får inte vara större än :max .',
-    'max.file' => 'Får inte vara större än :max kilobyte.',
-    'max.string' => 'Får inte vara större än :max tecken.',
+    'lte.file' => 'Måste vara mindre än eller lika med :value kilobyte.',
+    'lte.numeric' => 'Måste vara mindre än eller lika med :value .',
+    'lte.string' => 'Måste vara mindre än eller lika med :value tecken.',
+    'mac_address' => 'Måste vara en giltig MAC-adress.',
     'max.array' => 'Får inte ha fler än :max artiklar.',
+    'max.file' => 'Får inte vara större än :max kilobyte.',
+    'max.numeric' => 'Får inte vara större än :max .',
+    'max.string' => 'Får inte vara större än :max tecken.',
+    'max_digits' => 'Får inte ha fler än :max siffror.',
     'mimes' => 'Måste vara en fil av typen: :values .',
     'mimetypes' => 'Måste vara en fil av typen: :values .',
-    'min.numeric' => 'Måste vara minst :min .',
-    'min.file' => 'Måste vara minst :min kilobyte.',
-    'min.string' => 'Måste vara minst :min tecken.',
     'min.array' => 'Måste ha minst :min objekt.',
+    'min.file' => 'Måste vara minst :min kilobyte.',
+    'min.numeric' => 'Måste vara minst :min .',
+    'min.string' => 'Måste vara minst :min tecken.',
+    'min_digits' => 'Måste ha minst :min siffror.',
+    'missing' => 'Måste saknas.',
+    'missing_if' => 'Måste saknas när :other är :value .',
+    'missing_unless' => 'Måste saknas om inte :other är :value .',
+    'missing_with' => 'Måste saknas när :values finns.',
+    'missing_with_all' => 'Måste saknas när :values finns.',
+    'multiple_of' => 'Måste vara en multipel av :value .',
     'not_in' => 'Detta är ogiltigt.',
     'not_regex' => 'Formatet är ogiltigt.',
     'numeric' => 'Måste vara en siffra.',
     'present' => 'Måste vara närvarande.',
+    'prohibited' => 'Förbjuden.',
+    'prohibited_if' => 'Förbjudet när :other är :value .',
+    'prohibited_unless' => 'Förbjudet om inte :other finns i :values .',
+    'prohibits' => 'Förbjuder :other att vara närvarande.',
     'regex' => 'Formatet är ogiltigt.',
     'required' => 'Detta fält är obligatoriskt.',
+    'required_array_keys' => 'Måste innehålla poster för: :values .',
     'required_if' => 'Detta fält är obligatoriskt när :other är :value .',
+    'required_if_accepted' => 'Detta fält är obligatoriskt när :other accepteras.',
     'required_unless' => 'Detta fält är obligatoriskt om inte :other finns i :values .',
     'required_with' => 'Detta fält är obligatoriskt när :values finns.',
     'required_with_all' => 'Detta fält är obligatoriskt när :values finns.',
     'required_without' => 'Detta fält är obligatoriskt när :values inte finns.',
     'required_without_all' => 'Detta fält är obligatoriskt när inget av :values finns.',
     'same' => 'Detta fält och :other måste matcha.',
-    'size.numeric' => 'Måste vara :size .',
-    'size.file' => 'Måste vara :size kilobyte.',
-    'size.string' => 'Måste vara :size tecken.',
     'size.array' => 'Måste innehålla :size objekt.',
+    'size.file' => 'Måste vara :size kilobyte.',
+    'size.numeric' => 'Måste vara :size .',
+    'size.string' => 'Måste vara :size tecken.',
+    'starts_with' => 'Måste börja med :values',
     'string' => 'Måste vara ett snöre.',
     'timezone' => 'Måste vara en giltig zon.',
+    'ulid' => 'Måste vara ett giltigt ULID.',
     'unique' => 'Detta värde har redan tagits.',
     'uploaded' => 'Det gick inte att ladda upp.',
+    'uppercase' => 'Måste vara versaler.',
     'url' => 'Formatet är ogiltigt.',
-
-    /*
-    |--------------------------------------------------------------------------
-    | Custom Statamic Validation Language Lines
-    |--------------------------------------------------------------------------
-    |
-    | Here you may validation messages for the custom rules provided by Statamic.
-    |
-    */
-
+    'uuid' => 'Måste vara ett giltigt UUID.',
+    'arr_fieldtype' => 'Detta är ogiltigt.',
+    'handle' => 'Får endast innehålla små bokstäver och siffror med understreck som avgränsare.',
+    'slug' => 'Får endast innehålla bokstäver och siffror med bindestreck eller understreck som avgränsare.',
+    'code_fieldtype_rulers' => 'Detta är ogiltigt.',
+    'composer_package' => 'Måste vara ett giltigt kompositörspaketnamn (t.ex. hasselhoff/kung-fury).',
+    'date_fieldtype_date_required' => 'Datum krävs.',
+    'date_fieldtype_end_date_invalid' => 'Inte ett giltigt slutdatum.',
+    'date_fieldtype_end_date_required' => 'Slutdatum krävs.',
+    'date_fieldtype_only_single_mode_allowed' => 'Du kan bara använda &quot;Singel&quot;-läget när fälthandtaget är datum.',
+    'date_fieldtype_start_date_invalid' => 'Inte ett giltigt startdatum.',
+    'date_fieldtype_start_date_required' => 'Startdatum krävs.',
+    'date_fieldtype_time_required' => 'Tid krävs.',
+    'duplicate_field_handle' => 'Fält med ett handtag på :handle kan inte användas mer än en gång.',
+    'duplicate_uri' => 'Dubblett URI :value',
+    'email_available' => 'En användare med denna e-postadress finns redan.',
+    'fieldset_imported_recursively' => 'Fältuppsättning :handle importeras rekursivt.',
+    'one_site_without_origin' => 'Minst en webbplats får inte ha ett ursprung.',
+    'options_require_keys' => 'Alla alternativ måste ha nycklar.',
+    'origin_cannot_be_disabled' => 'Det går inte att välja ett inaktiverat ursprung.',
+    'parent_cannot_be_itself' => 'Kan inte vara sin egen förälder.',
+    'parent_causes_root_children' => 'Detta skulle göra att rotsidan får barn.',
+    'parent_exceeds_max_depth' => 'Detta skulle överskrida det maximala djupet.',
+    'reserved' => 'Detta är ett reserverat ord.',
+    'reserved_field_handle' => 'Fält med handtaget :handle är ett reserverat ord.',
     'unique_entry_value' => 'Detta värde har redan tagits.',
+    'unique_form_handle' => 'Detta värde har redan tagits.',
     'unique_term_value' => 'Detta värde har redan tagits.',
     'unique_user_value' => 'Detta värde har redan tagits.',
-    'duplicate_field_handle' => 'Fält med ett handtag på :handle kan inte användas mer än en gång.',
-    'one_site_without_origin' => 'Minst en webbplats får inte ha ett ursprung.',
-    'origin_cannot_be_disabled' => 'Det går inte att välja ett inaktiverat ursprung.',
     'unique_uri' => 'Denna URI har redan tagits.',
-    'duplicate_uri' => 'Dubblett URI :value',
-    'reserved' => 'Detta är ett reserverat ord.',
-
-    /*
-    |--------------------------------------------------------------------------
-    | Custom Validation Language Lines
-    |--------------------------------------------------------------------------
-    |
-    | Here you may specify custom validation messages for attributes using the
-    | convention "attribute.rule" to name the lines. This makes it quick to
-    | specify a specific custom language line for a given attribute rule.
-    |
-    */
-
+    'time' => 'Inte en giltig tid.',
+    'asset_current_filename' => 'Detta är det aktuella filnamnet.',
+    'asset_file_exists' => 'Det finns redan en fil med detta namn.',
+    'asset_file_exists_same_content' => 'Det finns redan en fil med detta namn och har samma innehåll. Du kanske vill ta bort detta istället för att byta namn på det.',
+    'asset_file_exists_different_content' => 'Det finns redan en fil med detta namn men har annat innehåll. Du kanske vill ersätta den andra filen med den här istället.',
     'custom.attribute-name.rule-name' => 'anpassat meddelande',
-
-    /*
-    |--------------------------------------------------------------------------
-    | Custom Validation Attributes
-    |--------------------------------------------------------------------------
-    |
-    | The following language lines are used to swap attribute place-holders
-    | with something more reader friendly such as E-Mail Address instead
-    | of "email". This simply helps us make messages a little cleaner.
-    |
-    */
-
     'attributes' => [],
 ];

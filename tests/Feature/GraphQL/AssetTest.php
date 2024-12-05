@@ -8,13 +8,15 @@ use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\GraphQL;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-/** @group graphql */
+#[Group('graphql')]
 class AssetTest extends TestCase
 {
     use EnablesQueries;
@@ -29,7 +31,7 @@ class AssetTest extends TestCase
         BlueprintRepository::partialMock();
     }
 
-    /** @test */
+    #[Test]
     public function query_only_works_if_enabled()
     {
         ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'assets')->andReturnFalse()->once();
@@ -42,7 +44,7 @@ class AssetTest extends TestCase
             ->assertSee('Cannot query field \"asset\" on type \"Query\"', false);
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_query_against_non_allowed_sub_resource_with_container_arg()
     {
         Carbon::setTestNow(Carbon::parse('2012-01-02 5:00pm'));
@@ -86,7 +88,7 @@ GQL;
             ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_query_against_non_allowed_sub_resource_with_id_arg()
     {
         Carbon::setTestNow(Carbon::parse('2012-01-02 5:00pm'));
@@ -130,7 +132,7 @@ GQL;
             ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_an_asset_by_id()
     {
         Carbon::setTestNow(Carbon::parse('2012-01-02 5:00pm'));
@@ -226,7 +228,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_an_asset_by_container_and_path()
     {
         Storage::fake('test', ['url' => '/assets']);
@@ -258,7 +260,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_add_custom_fields_to_interface()
     {
         GraphQL::addField('AssetInterface', 'one', function () {
@@ -317,7 +319,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_add_custom_fields_to_an_implementation()
     {
         GraphQL::addField('Asset_Test', 'one', function () {
@@ -367,7 +369,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function adding_custom_field_to_an_implementation_does_not_add_it_to_the_interface()
     {
         GraphQL::addField('Asset_Test', 'one', function () {
@@ -400,7 +402,7 @@ GQL;
             ]]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_resolves_query_builders()
     {
         config(['app.debug' => true]);

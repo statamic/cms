@@ -5,6 +5,7 @@ namespace Tests\Stache\Stores;
 use Facades\Statamic\Stache\Traverser;
 use Illuminate\Filesystem\Filesystem;
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Globals\GlobalSet;
 use Statamic\Facades\GlobalSet as GlobalsAPI;
 use Statamic\Facades\Path;
@@ -36,7 +37,7 @@ class GlobalsStoreTest extends TestCase
         (new Filesystem)->deleteDirectory($this->tempDir);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_yaml_files_from_the_root()
     {
         touch($this->tempDir.'/one.yaml', 1234567890);
@@ -60,7 +61,7 @@ class GlobalsStoreTest extends TestCase
         $this->assertTrue(file_exists($dir.'/three.txt'));
     }
 
-    /** @test */
+    #[Test]
     public function it_makes_global_set_instances_from_files()
     {
         $item = $this->store->makeItemFromFile(Path::tidy($this->tempDir.'/example.yaml'), "title: Example\ndata:\n  foo: bar");
@@ -71,7 +72,7 @@ class GlobalsStoreTest extends TestCase
         $this->assertEquals('Example', $item->title());
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_the_id_as_the_item_key()
     {
         $set = Mockery::mock();
@@ -83,7 +84,7 @@ class GlobalsStoreTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_to_disk()
     {
         $set = GlobalsAPI::make('test');
@@ -94,7 +95,7 @@ class GlobalsStoreTest extends TestCase
         $this->assertStringEqualsFile($this->tempDir.'/test.yaml', $set->fileContents());
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_to_disk_with_multiple_sites()
     {
         $this->markTestIncomplete();

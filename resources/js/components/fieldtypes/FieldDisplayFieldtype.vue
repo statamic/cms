@@ -20,7 +20,8 @@
                 v-tooltip="hidden ? __('Hidden') : __('Visible')"
                 @click="toggleHidden"
             >
-                <svg-icon name="light/hidden" class="w-5 h-5" :class="{ 'text-gray-500': !hidden }" />
+                <svg-icon v-show="hidden" name="light/hidden" class="w-5 h-5 text-gray-600 dark:text-dark-200" />
+                <svg-icon v-show="!hidden" name="light/eye" class="w-5 h-5 " />
             </button>
         </div>
     </div>

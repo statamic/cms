@@ -12,7 +12,34 @@
             @upload-complete="uploadComplete"
         >
             <div slot-scope="{ dragging }">
-                <div class="markdown-toolbar">
+
+                <publish-field-fullscreen-header
+                    v-if="fullScreenMode"
+                    :title="config.display"
+                    :field-actions="fieldActions"
+                    @close="toggleFullscreen">
+                    <div class="markdown-toolbar">
+                        <div class="markdown-modes">
+                            <button @click="mode = 'write'" :class="{ 'active': mode == 'write' }" v-text=" __('Write')" :aria-pressed="mode === 'write' ? 'true' : 'false'" />
+                            <button @click="mode = 'preview'" :class="{ 'active': mode == 'preview' }" v-text=" __('Preview')" :aria-pressed="mode === 'preview' ? 'true' : 'false'" />
+                        </div>
+                        <div class="markdown-buttons" v-if="! isReadOnly">
+                            <button
+                                v-for="button in buttons"
+                                v-tooltip="button.text"
+                                :aria-label="button.text"
+                                @click="button.command(editor)"
+                            >
+                                <svg-icon :name="button.svg" class="w-4 h-4" />
+                            </button>
+                            <button @click="toggleDarkMode" v-tooltip="darkMode ? __('Light Mode') : __('Dark Mode')" :aria-label="__('Toggle Dark Mode')" v-if="fullScreenMode">
+                                <svg-icon name="dark-mode" class="w-4 h-4" />
+                            </button>
+                        </div>
+                    </div>
+                </publish-field-fullscreen-header>
+
+                <div class="markdown-toolbar" v-if="!fullScreenMode">
                     <div class="markdown-modes">
                         <button @click="mode = 'write'" :class="{ 'active': mode == 'write' }" v-text=" __('Write')" :aria-pressed="mode === 'write' ? 'true' : 'false'" />
                         <button @click="mode = 'preview'" :class="{ 'active': mode == 'preview' }" v-text=" __('Preview')" :aria-pressed="mode === 'preview' ? 'true' : 'false'" />
@@ -28,10 +55,6 @@
                         </button>
                         <button @click="toggleDarkMode" v-tooltip="darkMode ? __('Light Mode') : __('Dark Mode')" :aria-label="__('Toggle Dark Mode')" v-if="fullScreenMode">
                             <svg-icon name="dark-mode" class="w-4 h-4" />
-                        </button>
-                        <button @click="toggleFullScreen" v-tooltip="__('Toggle Fullscreen')" :aria-label="__('Toggle Fullscreen Mode')">
-                            <svg-icon name="expand-bold" class="w-4 h-4" v-show="!fullScreenMode" />
-                            <svg-icon name="arrows-shrink" class="w-4 h-4" v-show="fullScreenMode" />
                         </button>
                     </div>
                 </div>
@@ -89,7 +112,6 @@
                   :container="container"
                   :folder="folder"
                   :selected="selectedAssets"
-                  :restrict-container-navigation="restrictAssetNavigation"
                   :restrict-folder-navigation="restrictAssetNavigation"
                   @selected="assetsSelected"
                   @closed="closeAssetSelector"
@@ -105,8 +127,6 @@
                 </div>
             </div>
         </stack>
-
-        <vue-countable :text="data" :elementId="'myId'" @change="change"></vue-countable>
 
     </div>
 </element-container>
@@ -136,10 +156,48 @@ import { availableButtons } from './buttons';
 import Selector from '../../assets/Selector.vue';
 import Uploader from '../../assets/Uploader.vue';
 import Uploads from '../../assets/Uploads.vue';
-import VueCountable from 'vue-countable'
-
 // Keymaps
 import 'codemirror/keymap/sublime'
+
+/**
+ * `ucs2decode` function from the punycode.js library.
+ *
+ * Creates an array containing the decimal code points of each Unicode
+ * character in the string. While JavaScript uses UCS-2 internally, this
+ * function will convert a pair of surrogate halves (each of which UCS-2
+ * exposes as separate characters) into a single code point, matching
+ * UTF-16.
+ *
+ * @see     <http://goo.gl/8M09r>
+ * @see     <http://goo.gl/u4UUC>
+ *
+ * @param   {String}  string   The Unicode input string (UCS-2).
+ *
+ * @return  {Array}   The new array of code points.
+ */
+function ucs2decode(string) {
+    const output = [];
+    let counter = 0;
+    const length = string.length;
+    while (counter < length) {
+        const value = string.charCodeAt(counter++);
+        if (value >= 0xD800 && value <= 0xDBFF && counter < length) {
+            // It's a high surrogate, and there is a next character.
+            const extra = string.charCodeAt(counter++);
+            if ((extra & 0xFC00) == 0xDC00) { // Low surrogate.
+                output.push(((value & 0x3FF) << 10) + (extra & 0x3FF) + 0x10000);
+            } else {
+                // It's an unmatched surrogate; only append this code unit, in case the
+                // next code unit is the high surrogate of a surrogate pair.
+                output.push(value);
+                counter--;
+            }
+        } else {
+            output.push(value);
+        }
+    }
+    return output;
+}
 
 export default {
 
@@ -149,7 +207,6 @@ export default {
         Selector,
         Uploader,
         Uploads,
-        VueCountable
     },
 
     data: function() {
@@ -167,7 +224,10 @@ export default {
             darkMode: false,
             codemirror: null,
             uploads: [],
-            count: {},
+            count: {
+                characters: 0,
+                words: 0,
+            },
             escBinding: null,
             markdownPreviewText: null
         };
@@ -177,6 +237,7 @@ export default {
 
         data(data) {
             this.updateDebounced(data);
+            this.updateCount(data);
         },
 
         fullScreenMode: {
@@ -200,6 +261,10 @@ export default {
 
     mounted() {
         this.initToolbarButtons();
+
+        if (this.data) {
+            this.updateCount(this.data);
+        }
 
         let el = document.querySelector(`label[for="${this.fieldId}"]`);
         if (el) {
@@ -582,10 +647,6 @@ export default {
             this.codemirror.focus();
         },
 
-        change(event) {
-            this.count = event;
-        },
-
         trackHeightUpdates() {
             const update = () => { window.dispatchEvent(new Event('resize')) };
             const throttled = _.throttle(update, 100);
@@ -670,8 +731,18 @@ export default {
             });
 
             this.buttons = buttons;
-        }
+        },
 
+        updateCount(data) {
+            let trimmed = data.trim();
+
+            this.count.characters = ucs2decode(trimmed.replace(/\s/g, '')).length;
+            this.count.words = trimmed.split(/\s+/).filter(word => word.length > 0).length;
+        },
+
+        toggleFullscreen() {
+            this.fullScreenMode = !this.fullScreenMode;
+        },
     },
 
     computed: {
@@ -700,7 +771,19 @@ export default {
 
             return marked(this.data || '', { renderer: new PlainTextRenderer })
                 .replace(/<\/?[^>]+(>|$)/g, "");
-        }
+        },
+
+        internalFieldActions() {
+            return [
+                {
+                    title: __('Toggle Fullscreen Mode'),
+                    icon: ({ vm }) => vm.fullScreenMode ? 'shrink-all' : 'expand-bold',
+                    quick: true,
+                    visibleWhenReadOnly: true,
+                    run: this.toggleFullscreen,
+                },
+            ];
+        },
     }
 
 };

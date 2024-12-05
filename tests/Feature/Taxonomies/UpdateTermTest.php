@@ -1,5 +1,8 @@
 <?php
 
+namespace Tests\Feature\Taxonomies;
+
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Facades\User;
@@ -11,7 +14,7 @@ class UpdateTermTest extends TestCase
 {
     use FakesRoles, PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_denies_access_if_you_dont_have_edit_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
@@ -29,7 +32,7 @@ class UpdateTermTest extends TestCase
         $this->assertEquals('alfa', $term->title);
     }
 
-    /** @test */
+    #[Test]
     public function it_denies_access_if_you_dont_have_site_permission()
     {
         $this->setSites([
@@ -56,7 +59,7 @@ class UpdateTermTest extends TestCase
         $this->assertEquals('le alfa', $term->title);
     }
 
-    /** @test */
+    #[Test]
     public function term_gets_updated()
     {
         $this->setTestRoles(['test' => ['access cp', 'edit tags terms']]);

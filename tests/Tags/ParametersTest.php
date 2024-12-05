@@ -2,6 +2,7 @@
 
 namespace Tests\Tags;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Field;
 use Statamic\Fields\Value;
 use Statamic\Tags\Context;
@@ -64,7 +65,7 @@ class ParametersTest extends TestCase
         ], $context);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_all_parameters()
     {
         $this->assertSame([
@@ -89,7 +90,7 @@ class ParametersTest extends TestCase
         ], $this->params->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_parameter()
     {
         $this->assertEquals('hello', $this->params->get('string'));
@@ -109,14 +110,14 @@ class ParametersTest extends TestCase
         $this->assertSame('augmented dont parse {{ string }} antlers', $this->params->get('nonAntlersValue'));
     }
 
-    /** @test */
+    #[Test]
     public function unknown_keys_use_a_default_value()
     {
         $this->assertNull($this->params->get('unknown'));
         $this->assertEquals('fallback', $this->params->get('unknown', 'fallback'));
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_existence()
     {
         $this->assertTrue($this->params->has('string'));
@@ -126,7 +127,7 @@ class ParametersTest extends TestCase
         $this->assertFalse($this->params->hasAny(['unknown', 'another_unknown']));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_first_parameter_that_exists()
     {
         $this->assertEquals('hello', $this->params->get(['string']));
@@ -135,7 +136,7 @@ class ParametersTest extends TestCase
         $this->assertEquals('fallback', $this->params->get(['unknown', 'another_unknown'], 'fallback'));
     }
 
-    /** @test */
+    #[Test]
     public function it_forgets_keys()
     {
         $this->assertEquals('hello', $this->params->get('string'));
@@ -145,7 +146,7 @@ class ParametersTest extends TestCase
         $this->assertNull($this->params->get('string'));
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_array_access()
     {
         $this->assertEquals('hello', $this->params->get('string'));
@@ -163,7 +164,7 @@ class ParametersTest extends TestCase
         $this->assertNull($this->params->get('new'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_an_exploded_list()
     {
         $this->assertEquals(['one', 'two'], $this->params->explode('list'));
@@ -172,7 +173,7 @@ class ParametersTest extends TestCase
         $this->assertEquals('fallback', $this->params->explode('unknown', 'fallback'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_boolean()
     {
         $this->assertTrue($this->params->bool('true'));
@@ -185,7 +186,7 @@ class ParametersTest extends TestCase
         $this->assertEquals('fallback', $this->params->bool('unknown', 'fallback'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_an_integer()
     {
         $this->assertEquals(7, $this->params->int('integer'));
@@ -197,7 +198,7 @@ class ParametersTest extends TestCase
         $this->assertEquals('fallback', $this->params->int('unknown', 'fallback'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_float()
     {
         $this->assertSame(123.456, $this->params->float('float'));
@@ -208,10 +209,9 @@ class ParametersTest extends TestCase
     }
 
     /**
-     * @test
-     *
      * @see https://github.com/statamic/cms/issues/3248
      */
+    #[Test]
     public function it_gets_nested_values()
     {
         $augmentable = new class implements \Statamic\Contracts\Data\Augmentable
@@ -240,7 +240,7 @@ class ParametersTest extends TestCase
         $this->assertSame('a', $params->get('obj'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_use_modifiers()
     {
         $context = new Context(['foo' => 'bar']);
@@ -260,7 +260,7 @@ class ParametersTest extends TestCase
         $this->assertSame('ELGNIS', $params->get('single_quotes_with_spaces'));
     }
 
-    /** @test */
+    #[Test]
     public function it_is_iterable()
     {
         $expected = [

@@ -19,7 +19,7 @@
 	background: rgba(0, 0, 0, 0.1);
 	font-size: 15px;
 	line-height: 1;
-	padding: 0px 4px 2px;
+	padding: 0 4px 2px;
 	border-radius: 50%;
 	color: #777;
     height: 18px;
@@ -39,6 +39,10 @@
 /* Remove style from datepicker in popover since the popover has them. */
 .popover-content .vc-container {
     @apply border-none bg-none;
+}
+
+.vc-container.vc-is-dark {
+    @apply dark:bg-transparent;
 }
 
 /* Time Field

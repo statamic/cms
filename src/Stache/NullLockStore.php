@@ -7,27 +7,27 @@ use Symfony\Component\Lock\Key;
 
 class NullLockStore implements BlockingStoreInterface
 {
-    public function save(Key $key)
+    public function save(Key $key): void
     {
         //
     }
 
-    public function delete(Key $key)
+    public function delete(Key $key): void
     {
         //
     }
 
-    public function exists(Key $key)
+    public function exists(Key $key): bool
+    {
+        return false;
+    }
+
+    public function putOffExpiration(Key $key, float $ttl): void
     {
         //
     }
 
-    public function putOffExpiration(Key $key, float $ttl)
-    {
-        //
-    }
-
-    public function waitAndSave(Key $key)
+    public function waitAndSave(Key $key): void
     {
         //
     }

@@ -2,6 +2,7 @@
 
 namespace Tests\Antlers\Runtime;
 
+use PHPUnit\Framework\Attributes\Test;
 use Tests\Antlers\ParserTestCase;
 
 class ArraysTest extends ParserTestCase

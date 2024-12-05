@@ -2,6 +2,7 @@
 
 namespace Tests\Forms;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Exceptions\FormNotFoundException;
 use Statamic\Forms\FormRepository;
@@ -22,7 +23,7 @@ class FormRepositoryTest extends TestCase
         $this->repo = new FormRepository($stache);
     }
 
-    /** @test */
+    #[Test]
     public function test_find_or_fail_gets_form()
     {
         $this->repo->make('test_form')->title('Test')->save();
@@ -33,12 +34,50 @@ class FormRepositoryTest extends TestCase
         $this->assertEquals('Test', $form->title());
     }
 
-    /** @test */
+    #[Test]
     public function test_find_or_fail_throws_exception_when_form_does_not_exist()
     {
         $this->expectException(FormNotFoundException::class);
         $this->expectExceptionMessage('Form [does-not-exist] not found');
 
         $this->repo->findOrFail('does-not-exist');
+    }
+
+    /** @test */
+    public function it_registers_config()
+    {
+        $this->repo->appendConfigFields('test_form', 'Test Config', [
+            'alfa' => ['type' => 'text'],
+            'bravo' => ['type' => 'text'],
+        ]);
+
+        $this->repo->appendConfigFields('*', 'This Goes Everywhere', [
+            ['charlie' => ['type' => 'text']],
+        ]);
+
+        $this->assertEquals([
+            'test_config' => [
+                'display' => 'Test Config',
+                'fields' => [
+                    'alfa' => ['type' => 'text'],
+                    'bravo' => ['type' => 'text'],
+                ],
+            ],
+            'this_goes_everywhere' => [
+                'display' => 'This Goes Everywhere',
+                'fields' => [
+                    ['charlie' => ['type' => 'text']],
+                ],
+            ],
+        ], $this->repo->extraConfigFor('test_form'));
+
+        $this->assertEquals([
+            'this_goes_everywhere' => [
+                'display' => 'This Goes Everywhere',
+                'fields' => [
+                    ['charlie' => ['type' => 'text']],
+                ],
+            ],
+        ], $this->repo->extraConfigFor('another_form'));
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Tests\Stache\Stores;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Facades\Path;
 use Statamic\Facades\Stache;
@@ -29,7 +30,7 @@ class TermsStoreTest extends TestCase
         Stache::store('taxonomies')->directory($this->directory);
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_to_disk()
     {
         $term = Facades\Term::make('test')->taxonomy('tags');

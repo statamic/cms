@@ -18,8 +18,8 @@ trait GetsItemsContainingData
     {
         return collect()
             ->merge(Entry::all())
-            ->merge(Term::all()->map->term()->flatMap->localizations()) // See issue #3274
-            ->merge(GlobalSet::all()->flatMap->localizations())
+            ->merge(Term::all())
+            ->merge(GlobalSet::all()->flatMap(fn ($set) => $set->localizations()->values()))
             ->merge(User::all());
     }
 }

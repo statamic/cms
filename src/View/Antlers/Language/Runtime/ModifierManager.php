@@ -16,6 +16,7 @@ use Statamic\View\Antlers\Language\Runtime\Sandbox\Environment;
 class ModifierManager
 {
     public static $statamicModifiers = null;
+    public static $lastModifierName = null;
     const METHOD_MODIFIER = '{__method_args}';
 
     public static function isModifier(ParameterNode $node)
@@ -27,8 +28,15 @@ class ModifierManager
         return array_key_exists($node->name, self::$statamicModifiers);
     }
 
+    public static function clearModifierState()
+    {
+        self::$lastModifierName = null;
+    }
+
     public static function guardRuntimeModifier($modifierName)
     {
+        self::$lastModifierName = $modifierName;
+
         if (GlobalRuntimeState::$isEvaluatingUserData) {
             $guardList = GlobalRuntimeState::$bannedContentModifierPaths;
         } else {
@@ -62,6 +70,8 @@ class ModifierManager
 
     public static function evaluate($value, Environment $env, ModifierChainNode $modifierChain, $context)
     {
+        self::clearModifierState();
+
         if (count($modifierChain->modifierChain) == 0) {
             return $value;
         }

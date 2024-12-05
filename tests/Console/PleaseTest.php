@@ -2,8 +2,9 @@
 
 namespace Tests\Console;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Console\Please\Kernel;
-use Statamic\Facades\StaticCache;
+use Statamic\Facades\Stache;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Tests\TestCase;
 
@@ -16,33 +17,33 @@ class PleaseTest extends TestCase
         parent::setUp();
     }
 
-    /** @test */
+    #[Test]
     public function it_can_run_an_artisan_command_with_statamic_prefix()
     {
-        StaticCache::shouldReceive('flush')->once();
-        $this->artisan('statamic:static:clear');
+        Stache::shouldReceive('clear')->once();
+        $this->artisan('statamic:stache:clear');
     }
 
-    /** @test */
+    #[Test]
     public function statamic_prefixed_commands_will_throw_exception_when_running_in_artisan_without_prefix()
     {
-        StaticCache::shouldReceive('flush')->never();
+        Stache::shouldReceive('clear')->never();
         $this->expectException(CommandNotFoundException::class);
-        $this->artisan('static:clear');
+        $this->artisan('stache:clear');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_run_a_please_command_without_statamic_prefix()
     {
-        StaticCache::shouldReceive('flush')->once();
-        $this->please('static:clear');
+        Stache::shouldReceive('clear')->once();
+        $this->please('stache:clear');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_run_a_please_command_with_statamic_prefix()
     {
-        StaticCache::shouldReceive('flush')->once();
-        $this->please('statamic:static:clear');
+        Stache::shouldReceive('clear')->once();
+        $this->please('statamic:stache:clear');
     }
 
     public function please($command, $parameters = [])

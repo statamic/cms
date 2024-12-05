@@ -3,6 +3,7 @@
 namespace Tests\Feature\Taxonomies\Blueprints;
 
 use Facades\Statamic\Fields\BlueprintRepository;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Facades\Taxonomy;
 use Tests\Fakes\FakeBlueprintRepository;
@@ -22,7 +23,7 @@ class StoreBlueprintTest extends TestCase
         BlueprintRepository::swap(new FakeBlueprintRepository(BlueprintRepository::getFacadeRoot()));
     }
 
-    /** @test */
+    #[Test]
     public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
@@ -40,7 +41,7 @@ class StoreBlueprintTest extends TestCase
         $this->assertCount(0, Facades\Blueprint::in('taxonomies/test'));
     }
 
-    /** @test */
+    #[Test]
     public function blueprint_gets_created()
     {
         $this->withoutExceptionHandling();
@@ -70,7 +71,7 @@ class StoreBlueprintTest extends TestCase
         ], $blueprint->contents());
     }
 
-    /** @test */
+    #[Test]
     public function when_creating_the_first_blueprint_the_default_one_is_also_created()
     {
         // If there are no user-defined blueprints, save the default one.
@@ -95,7 +96,7 @@ class StoreBlueprintTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function title_is_required()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure fields']]);

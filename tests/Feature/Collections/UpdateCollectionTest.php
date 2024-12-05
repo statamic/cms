@@ -3,6 +3,7 @@
 namespace Tests\Feature\Collections;
 
 use Facades\Statamic\Fields\BlueprintRepository;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\User;
@@ -16,7 +17,7 @@ class UpdateCollectionTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_denies_access_if_you_dont_have_permission()
     {
         $collection = Collection::make('test')->save();
@@ -29,7 +30,7 @@ class UpdateCollectionTest extends TestCase
             ->assertSessionHas('error');
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_a_collection()
     {
         $this->withoutExceptionHandling();
@@ -81,7 +82,7 @@ class UpdateCollectionTest extends TestCase
         // structure
     }
 
-    /** @test */
+    #[Test]
     public function setting_links_to_true_will_create_a_blueprint_if_it_doesnt_already_exist()
     {
         BlueprintRepository::swap(new FakeBlueprintRepository(BlueprintRepository::getFacadeRoot()));
@@ -98,7 +99,7 @@ class UpdateCollectionTest extends TestCase
         $this->assertCount(2, Blueprint::in('collections.test'));
     }
 
-    /** @test */
+    #[Test]
     public function setting_links_to_true_will_do_nothing_if_an_existing_link_blueprint_already_exists()
     {
         BlueprintRepository::swap(new FakeBlueprintRepository(BlueprintRepository::getFacadeRoot()));
@@ -116,7 +117,7 @@ class UpdateCollectionTest extends TestCase
         $this->assertEquals('Existing', Blueprint::find('collections.test.link')->title());
     }
 
-    /** @test */
+    #[Test]
     public function setting_links_to_false_will_delete_the_blueprint_if_exists()
     {
         BlueprintRepository::swap(new FakeBlueprintRepository(BlueprintRepository::getFacadeRoot()));
@@ -133,7 +134,7 @@ class UpdateCollectionTest extends TestCase
         $this->assertCount(0, Blueprint::in('collections.test'));
     }
 
-    /** @test */
+    #[Test]
     public function settings_links_to_true_will_also_create_the_default_blueprint_if_none_exist()
     {
         // this is so that you aren't left in awkward situation where there's only a links blueprint.

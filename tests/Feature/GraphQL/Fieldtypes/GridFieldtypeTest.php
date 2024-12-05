@@ -4,12 +4,14 @@ namespace Tests\Feature\GraphQL\Fieldtypes;
 
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Tests\Feature\GraphQL\EnablesQueries;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-/** @group graphql */
+#[Group('graphql')]
 class GridFieldtypeTest extends TestCase
 {
     use EnablesQueries;
@@ -23,7 +25,7 @@ class GridFieldtypeTest extends TestCase
         BlueprintRepository::partialMock();
     }
 
-    /** @test */
+    #[Test]
     public function it_outputs_grid_fields()
     {
         $article = Blueprint::makeFromFields([
@@ -92,10 +94,9 @@ GQL;
     }
 
     /**
-     * @test
-     *
      * @see https://github.com/statamic/cms/issues/3200
      **/
+    #[Test]
     public function it_outputs_nested_grid_fields()
     {
         $article = Blueprint::makeFromFields([
@@ -198,7 +199,7 @@ GQL;
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_outputs_grid_fields_with_value_based_subfields()
     {
         // Using an `entries` field set to max_items 1, which would augment

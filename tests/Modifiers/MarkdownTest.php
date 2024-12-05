@@ -2,13 +2,14 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Markdown;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class MarkdownTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_converts_to_markdown()
     {
         $markdown = '**bold** ~~strike~~';
@@ -25,7 +26,7 @@ class MarkdownTest extends TestCase
         $this->assertEquals("<p><strong>bold</strong> ~~strike~~</p>\n", $this->modify($markdown, 'custom'));
     }
 
-    /** @test */
+    #[Test]
     public function using_an_unknown_parser_throws_exception()
     {
         $this->expectExceptionMessage('Markdown parser [foo] is not defined.');

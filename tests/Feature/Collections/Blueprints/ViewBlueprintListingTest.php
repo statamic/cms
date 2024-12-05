@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Collections\Blueprints;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Facades\Collection;
 use Statamic\Fields\Blueprint;
@@ -14,7 +15,7 @@ class ViewBlueprintListingTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_shows_a_list_of_blueprints()
     {
         // When the CP header loads the avatar it reaches for the user blueprint.
@@ -58,7 +59,7 @@ class ViewBlueprintListingTest extends TestCase
             ->assertDontSee('no-results');
     }
 
-    /** @test */
+    #[Test]
     public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);

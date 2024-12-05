@@ -2,6 +2,8 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
@@ -17,11 +19,8 @@ class IsEmbeddableTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider embeddablesProvider
-     */
+    #[Test]
+    #[DataProvider('embeddablesProvider')]
     public function it_checks_if_an_url_is_embeddable($expected, $input): void
     {
         $modified = $this->modify($input);

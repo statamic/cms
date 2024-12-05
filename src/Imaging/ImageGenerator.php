@@ -11,7 +11,6 @@ use League\Glide\Manipulators\Watermark;
 use League\Glide\Server;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Events\GlideImageGenerated;
-use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Asset as Assets;
 use Statamic\Facades\Config;
 use Statamic\Facades\File;
@@ -258,7 +257,7 @@ class ImageGenerator
         try {
             $path = $this->server->makeImage($image, $this->params);
         } catch (GlideFileNotFoundException $e) {
-            throw new NotFoundHttpException;
+            throw UnableToReadFile::fromLocation($image);
         }
 
         GlideImageGenerated::dispatch($path, $this->params);

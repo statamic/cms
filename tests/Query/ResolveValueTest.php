@@ -2,6 +2,8 @@
 
 namespace Tests\Query;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Contracts\Query\QueryableValue;
 use Statamic\Query\ResolveValue;
@@ -9,11 +11,8 @@ use Tests\TestCase;
 
 class ResolveValueTest extends TestCase
 {
-    /**
-     * @test
-     *
-     * @dataProvider resolvesValueProvider
-     **/
+    #[Test]
+    #[DataProvider('resolvesValueProvider')]
     public function it_resolves_values($item, $field, $expected)
     {
         $value = (new ResolveValue)($item, $field);
@@ -64,11 +63,8 @@ class ResolveValueTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider delegatesToClassProvider
-     **/
+    #[Test]
+    #[DataProvider('delegatesToClassProvider')]
     public function it_delegates_resolving_to_the_queryable_class($field, $expected)
     {
         $item = new ItemThatContainsQueryableValues([
@@ -91,7 +87,7 @@ class ResolveValueTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function self_resolving_values_will_resolve_themselves()
     {
         $item = new ContainsData([

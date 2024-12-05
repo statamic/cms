@@ -2,6 +2,7 @@
 
 namespace Tests\Stache;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Data;
@@ -43,13 +44,13 @@ class FeatureTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_all_collections()
     {
         $this->assertEquals(4, Collection::all()->count());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_all_entries()
     {
         $this->assertEquals(14, Entry::all()->count());
@@ -60,7 +61,7 @@ class FeatureTest extends TestCase
         $this->assertEquals(5, Entry::whereInCollection(['alphabetical', 'blog'])->count());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_entry()
     {
         $entry = Entry::find('blog-christmas');
@@ -72,19 +73,19 @@ class FeatureTest extends TestCase
         $this->assertNull(Entry::find('users-john'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_all_taxonomies()
     {
         $this->assertEquals(2, Taxonomy::all()->count());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_all_globals()
     {
         $this->assertEquals(2, GlobalSet::all()->count());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_globals()
     {
         $global = GlobalSet::find('global');
@@ -94,26 +95,26 @@ class FeatureTest extends TestCase
         $this->assertEquals('555-1234', GlobalSet::find('contact')->in('en')->get('phone'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_asset_containers()
     {
         $this->assertEquals(2, AssetContainer::all()->count());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_an_asset_container()
     {
         $this->assertEquals('Main Assets', AssetContainer::find('main')->title());
         $this->assertEquals('Another Asset Container', AssetContainer::find('another')->title());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_users()
     {
         $this->assertEquals(2, User::all()->count());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_user()
     {
         $user = User::find('users-john');
@@ -124,7 +125,7 @@ class FeatureTest extends TestCase
         $this->assertEquals($user, Data::find('users-john'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_an_entry_by_uri()
     {
         $entry = Entry::findByUri('/numeric/two');
@@ -135,7 +136,7 @@ class FeatureTest extends TestCase
         $this->assertNull(Entry::findByUri('/unknown'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_an_entry_in_structure_by_uri()
     {
         $entry = Entry::findByUri('/about/board/directors');
@@ -144,19 +145,19 @@ class FeatureTest extends TestCase
         $this->assertEquals('Directors', $entry->title());
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_null_when_cannot_find_entry_by_uri()
     {
         $this->assertNull(Entry::findByUri('/unknown'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_structures()
     {
         $this->assertEquals(3, Structure::all()->count());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_structure()
     {
         $structure = Structure::find('footer');
@@ -164,13 +165,13 @@ class FeatureTest extends TestCase
         // TODO: Some more assertions
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_navs()
     {
         $this->assertEquals(2, Nav::all()->count());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_nav()
     {
         $structure = Nav::find('footer');
@@ -182,7 +183,7 @@ class FeatureTest extends TestCase
         ], $structure->in('en')->tree());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_collection_structure()
     {
         $structure = Structure::find('collection::pages');
@@ -199,17 +200,18 @@ class FeatureTest extends TestCase
         ], $structure->in('en')->tree());
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_structures()
     {
         $structure = Structure::find('footer');
 
+        NavRepository::shouldReceive('find')->with('footer');
         NavRepository::shouldReceive('save')->with($structure)->once();
 
         $structure->save();
     }
 
-    /** @test */
+    #[Test]
     public function saving_a_collection_writes_it_to_file()
     {
         Collection::make('new')
@@ -227,7 +229,7 @@ class FeatureTest extends TestCase
         @unlink($path);
     }
 
-    /** @test */
+    #[Test]
     public function saving_an_asset_container_writes_it_to_file()
     {
         AssetContainer::make('new')->title('New Container')->save();
@@ -239,7 +241,7 @@ class FeatureTest extends TestCase
         @unlink($path);
     }
 
-    /** @test */
+    #[Test]
     public function saving_a_taxonomy_writes_it_to_file()
     {
         Taxonomy::make('new')->title('New Taxonomy')->save();
@@ -251,7 +253,7 @@ class FeatureTest extends TestCase
         @unlink($path);
     }
 
-    /** @test */
+    #[Test]
     public function saving_a_global_set_writes_it_to_file()
     {
         $global = GlobalSet::make('new')->title('New Global Set');
@@ -269,7 +271,7 @@ class FeatureTest extends TestCase
         @unlink($path);
     }
 
-    /** @test */
+    #[Test]
     public function saving_an_entry_writes_it_to_file()
     {
         $entry = tap(Entry::make()
@@ -286,7 +288,7 @@ class FeatureTest extends TestCase
         $entry->delete();
     }
 
-    /** @test */
+    #[Test]
     public function saving_an_entry_with_a_closure_based_slug_resolves_it_before_writing_to_file()
     {
         $entry = tap(Entry::make()

@@ -3,6 +3,10 @@
 namespace Statamic\Sites;
 
 use Closure;
+use Illuminate\Support\Collection;
+use Statamic\Events\SiteCreated;
+use Statamic\Events\SiteDeleted;
+use Statamic\Events\SiteSaved;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\File;
 use Statamic\Facades\User;
@@ -100,7 +104,7 @@ class Sites
     {
         $sites ??= $this->getSavedSites();
 
-        $this->sites = collect($sites)->map(fn ($site, $handle) => new Site($handle, $site));
+        $this->sites = $this->hydrateConfig($sites);
 
         return $this;
     }
@@ -123,20 +127,40 @@ class Sites
 
     protected function getSavedSites()
     {
-        $default = [
+        return File::exists($sitesPath = $this->path())
+            ? YAML::file($sitesPath)->parse()
+            : $this->getFallbackConfig();
+    }
+
+    protected function getFallbackConfig()
+    {
+        return [
             'default' => [
                 'name' => '{{ config:app:name }}',
                 'url' => '/',
                 'locale' => 'en_US',
             ],
         ];
-
-        return File::exists($sitesPath = $this->path())
-            ? YAML::file($sitesPath)->parse()
-            : $default;
     }
 
     public function save()
+    {
+        // Track for `SiteCreated` and `SiteDeleted` events, before saving to file
+        $newSites = $this->getNewSites();
+        $deletedSites = $this->getDeletedSites();
+
+        // Save sites to store
+        $this->saveToStore();
+
+        // Dispatch our tracked `SiteCreated` and `SiteDeleted` events
+        $newSites->each(fn ($site) => SiteCreated::dispatch($site));
+        $deletedSites->each(fn ($site) => SiteDeleted::dispatch($site));
+
+        // Dispatch `SiteSaved` events
+        $this->sites->each(fn ($site) => SiteSaved::dispatch($site));
+    }
+
+    protected function saveToStore()
     {
         File::put($this->path(), YAML::dump($this->config()));
     }
@@ -170,6 +194,7 @@ class Sites
                 'handle' => 'url',
                 'field' => [
                     'type' => 'text',
+                    'display' => __('URL'),
                     'instructions' => __('statamic::messages.site_configure_url_instructions'),
                     'required' => true,
                     'width' => 33,
@@ -180,6 +205,7 @@ class Sites
                 'handle' => 'locale',
                 'field' => [
                     'type' => 'text',
+                    'display' => __('Locale'),
                     'instructions' => __('statamic::messages.site_configure_locale_instructions'),
                     'required' => true,
                     'width' => 33,
@@ -190,6 +216,7 @@ class Sites
                 'handle' => 'lang',
                 'field' => [
                     'type' => 'text',
+                    'display' => __('Language'),
                     'instructions' => __('statamic::messages.site_configure_lang_instructions'),
                     'width' => 33,
                     'direction' => 'ltr',
@@ -237,6 +264,31 @@ class Sites
             ->map
             ->rawConfig()
             ->all();
+    }
+
+    protected function hydrateConfig($config): Collection
+    {
+        return collect($config)->map(fn ($site, $handle) => new Site($handle, $site));
+    }
+
+    protected function getNewSites(): Collection
+    {
+        $currentSites = $this->getSavedSites();
+        $newSites = $this->config();
+
+        return $this->hydrateConfig(
+            collect($newSites)->diffKeys($currentSites)
+        );
+    }
+
+    protected function getDeletedSites(): Collection
+    {
+        $currentSites = $this->getSavedSites();
+        $newSites = $this->config();
+
+        return $this->hydrateConfig(
+            collect($currentSites)->diffKeys($newSites)
+        );
     }
 
     /**

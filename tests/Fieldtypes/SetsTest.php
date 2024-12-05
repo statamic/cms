@@ -2,6 +2,7 @@
 
 namespace Tests\Fieldtypes;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\ConfigField;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Sets;
@@ -10,7 +11,7 @@ use Tests\TestCase;
 
 class SetsTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_preprocesses_with_groups()
     {
         $field = (new Field('test', [
@@ -25,6 +26,7 @@ class SetsTest extends TestCase
                         'display' => 'One',
                         'instructions' => 'One instructions',
                         'icon' => 'one-icon',
+                        'hide' => true,
                         'fields' => [
                             ['handle' => 'field_one', 'field' => ['type' => 'text']],
                         ],
@@ -57,6 +59,7 @@ class SetsTest extends TestCase
                         'display' => 'One',
                         'instructions' => 'One instructions',
                         'icon' => 'one-icon',
+                        'hide' => true,
                         'fields' => [
                             [
                                 '_id' => 'group-alfa-section-one-0',
@@ -87,6 +90,7 @@ class SetsTest extends TestCase
                         'display' => null,
                         'instructions' => null,
                         'icon' => null,
+                        'hide' => null,
                         'fields' => [
                             [
                                 '_id' => 'group-bravo-section-two-0',
@@ -107,7 +111,7 @@ class SetsTest extends TestCase
         ], $field->preProcess()->value());
     }
 
-    /** @test */
+    #[Test]
     public function it_preprocesses_without_groups()
     {
         $field = (new Field('test', [
@@ -137,6 +141,7 @@ class SetsTest extends TestCase
                         'display' => 'One',
                         'instructions' => 'One instructions',
                         'icon' => 'one-icon',
+                        'hide' => null,
                         'fields' => [
                             [
                                 '_id' => 'group-main-section-one-0',
@@ -157,7 +162,7 @@ class SetsTest extends TestCase
         ], $field->preProcess()->value());
     }
 
-    /** @test */
+    #[Test]
     public function it_preprocesses_with_empty_value()
     {
         $field = (new Field('test', [
@@ -167,7 +172,7 @@ class SetsTest extends TestCase
         $this->assertEquals([], $field->preProcess()->value());
     }
 
-    /** @test */
+    #[Test]
     public function it_preprocesses_for_config_with_groups()
     {
         $field = (new ConfigField('test', [
@@ -200,79 +205,91 @@ class SetsTest extends TestCase
             ],
         ]);
 
-        $this->assertEquals([
+        $this->assertSame([
             [
-                'handle' => 'alfa',
                 'display' => 'Alfa',
                 'instructions' => 'Alfa instructions',
                 'icon' => 'alfa-icon',
                 'sets' => [
                     [
-                        'id' => 'one',
-                        'handle' => 'one',
                         'display' => 'One',
                         'instructions' => 'One instructions',
                         'icon' => 'one-icon',
                         'fields' => [
                             [
                                 'display' => 'Field One',
+                                'hide_display' => false,
                                 'handle' => 'field_one',
+                                'instructions' => null,
+                                'instructions_position' => 'above',
+                                'listable' => 'hidden',
+                                'sortable' => true,
+                                'visibility' => 'visible',
+                                'replicator_preview' => true,
+                                'duplicate' => true,
                                 'type' => 'text',
                                 'input_type' => 'text',
                                 'placeholder' => null,
                                 'default' => null,
                                 'character_limit' => 0,
+                                'autocomplete' => null,
                                 'prepend' => null,
                                 'append' => null,
                                 'antlers' => false,
                                 'component' => 'text',
                                 'prefix' => null,
-                                'instructions' => null,
                                 'required' => false,
-                                'visibility' => 'visible',
                                 'read_only' => false,
                                 'always_save' => false,
-                                'autocomplete' => null,
                             ],
                         ],
+                        'handle' => 'one',
+                        'id' => 'one',
                     ],
                 ],
+                'handle' => 'alfa',
             ],
             [
-                'handle' => 'bravo',
                 'sets' => [
                     [
-                        'id' => 'two',
-                        'handle' => 'two',
                         'fields' => [
                             [
                                 'display' => 'Field Two',
+                                'hide_display' => false,
                                 'handle' => 'field_two',
+                                'instructions' => null,
+                                'instructions_position' => 'above',
+                                'listable' => 'hidden',
+                                'sortable' => true,
+                                'visibility' => 'visible',
+                                'replicator_preview' => true,
+                                'duplicate' => true,
                                 'type' => 'text',
                                 'input_type' => 'text',
                                 'placeholder' => null,
                                 'default' => null,
                                 'character_limit' => 0,
+                                'autocomplete' => null,
                                 'prepend' => null,
                                 'append' => null,
                                 'antlers' => false,
                                 'component' => 'text',
                                 'prefix' => null,
-                                'instructions' => null,
                                 'required' => false,
-                                'visibility' => 'visible',
                                 'read_only' => false,
                                 'always_save' => false,
-                                'autocomplete' => null,
                             ],
                         ],
+                        'handle' => 'two',
+                        'id' => 'two',
                     ],
                 ],
+                'handle' => 'bravo',
             ],
         ], $field->preProcess()->value());
     }
 
-    /** @test */
+    #[Test]
     public function it_preprocesses_for_config_without_groups()
     {
         $field = (new ConfigField('test', [
@@ -288,45 +305,51 @@ class SetsTest extends TestCase
             ],
         ]);
 
-        $this->assertEquals([
+        $this->assertSame([
             [
-                'handle' => 'main',
                 'sets' => [
                     [
-                        'id' => 'one',
-                        'handle' => 'one',
                         'display' => 'One',
                         'instructions' => 'One instructions',
                         'icon' => 'one-icon',
                         'fields' => [
                             [
                                 'display' => 'Field One',
+                                'hide_display' => false,
                                 'handle' => 'field_one',
+                                'instructions' => null,
+                                'instructions_position' => 'above',
+                                'listable' => 'hidden',
+                                'sortable' => true,
+                                'visibility' => 'visible',
+                                'replicator_preview' => true,
+                                'duplicate' => true,
                                 'type' => 'text',
                                 'input_type' => 'text',
                                 'placeholder' => null,
                                 'default' => null,
                                 'character_limit' => 0,
+                                'autocomplete' => null,
                                 'prepend' => null,
                                 'append' => null,
                                 'antlers' => false,
                                 'component' => 'text',
                                 'prefix' => null,
-                                'instructions' => null,
                                 'required' => false,
-                                'visibility' => 'visible',
                                 'read_only' => false,
                                 'always_save' => false,
-                                'autocomplete' => null,
                             ],
                         ],
+                        'handle' => 'one',
+                        'id' => 'one',
                     ],
                 ],
+                'handle' => 'main',
             ],
         ], $field->preProcess()->value());
     }
 
-    /** @test */
+    #[Test]
     public function it_preprocesses_for_config_with_empty_value()
     {
         $field = (new ConfigField('test', [
@@ -336,7 +359,7 @@ class SetsTest extends TestCase
         $this->assertEquals([], $field->preProcess()->value());
     }
 
-    /** @test */
+    #[Test]
     public function it_processes()
     {
         $field = (new Field('test', [
@@ -353,6 +376,7 @@ class SetsTest extends TestCase
                         'display' => 'One',
                         'instructions' => 'One Instructions',
                         'icon' => 'one-icon',
+                        'hide' => false,
                         'fields' => [
                             [
                                 'handle' => 'field_one',
@@ -378,6 +402,7 @@ class SetsTest extends TestCase
                         'display' => 'One',
                         'instructions' => 'One Instructions',
                         'icon' => 'one-icon',
+                        'hide' => false,
                         'fields' => [
                             [
                                 'handle' => 'field_one',
@@ -393,7 +418,7 @@ class SetsTest extends TestCase
         ], $field->process()->value());
     }
 
-    /** @test */
+    #[Test]
     public function it_provides_statamic_plump_icons_to_script_by_default()
     {
         $jsonVariables = Statamic::jsonVariables(request());
@@ -402,7 +427,7 @@ class SetsTest extends TestCase
         $this->assertEquals('plump', $jsonVariables['setIconsFolder']);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_provide_custom_user_icons_subfolder()
     {
         Sets::setIconsDirectory(folder: 'light');
@@ -413,7 +438,7 @@ class SetsTest extends TestCase
         $this->assertEquals('light', $jsonVariables['setIconsFolder']);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_provide_custom_user_icons_directory()
     {
         Sets::setIconsDirectory($customDir = resource_path());
@@ -424,7 +449,7 @@ class SetsTest extends TestCase
         $this->assertEquals(null, $jsonVariables['setIconsFolder']);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_provide_custom_user_icons_directory_and_sub_folder()
     {
         Sets::setIconsDirectory($customDir = base_path(), $customSubFolder = 'resources');

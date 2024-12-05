@@ -3,6 +3,7 @@
 namespace Tests\Stache;
 
 use Illuminate\Support\Facades\Cache;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Stache\Duplicates;
 use Statamic\Stache\Stache;
@@ -13,7 +14,7 @@ use Tests\TestCase;
 
 class DuplicatesTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_tracks_duplicates()
     {
         $original = $this->mock(Entry::class);
@@ -102,7 +103,7 @@ class DuplicatesTest extends TestCase
         $this->assertEquals(4, $duplicates->count());
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_to_the_cache()
     {
         $store = $this->mock(Store::class);
@@ -110,6 +111,7 @@ class DuplicatesTest extends TestCase
 
         $stache = $this->mock(Stache::class);
         $stache->shouldReceive('store')->with('test-store')->andReturn($store);
+        $stache->shouldReceive('cacheStore')->andReturn(Cache::store());
 
         $duplicates = new Duplicates($stache);
 
@@ -128,7 +130,7 @@ class DuplicatesTest extends TestCase
         ], Cache::get('stache::duplicates'));
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_save_if_there_are_no_changes()
     {
         $duplicates = new Duplicates($this->mock(Stache::class));
@@ -140,12 +142,14 @@ class DuplicatesTest extends TestCase
         $this->assertNull(Cache::get('stache::duplicates'));
     }
 
-    /** @test */
+    #[Test]
     public function it_loads_from_cache()
     {
         Cache::forever('stache::duplicates', ['foo' => 'bar']);
 
-        $duplicates = new Duplicates($this->mock(Stache::class));
+        $stache = $this->mock(Stache::class);
+        $stache->shouldReceive('cacheStore')->andReturn(Cache::store());
+        $duplicates = new Duplicates($stache);
 
         $return = $duplicates->load();
 
@@ -153,12 +157,14 @@ class DuplicatesTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $duplicates->getItems());
     }
 
-    /** @test */
+    #[Test]
     public function it_clears_the_cache()
     {
         Cache::forever('stache::duplicates', ['foo' => 'bar']);
 
-        $duplicates = new Duplicates($this->mock(Stache::class));
+        $stache = $this->mock(Stache::class);
+        $stache->shouldReceive('cacheStore')->andReturn(Cache::store());
+        $duplicates = new Duplicates($stache);
 
         $this->assertNotNull(Cache::get('stache::duplicates'));
 
@@ -168,7 +174,7 @@ class DuplicatesTest extends TestCase
         $this->assertNull(Cache::get('stache::duplicates'));
     }
 
-    /** @test */
+    #[Test]
     public function it_finds_all_the_duplicates()
     {
         $store1 = $this->mock(Store::class);
@@ -196,7 +202,7 @@ class DuplicatesTest extends TestCase
         $this->assertEquals($duplicates, $return);
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_if_a_duplicate_exists()
     {
         $stache = $this->mock(Stache::class);

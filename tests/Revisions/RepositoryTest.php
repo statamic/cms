@@ -3,6 +3,7 @@
 namespace Tests\Revisions;
 
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Revisions\Revision;
 use Statamic\Revisions\RevisionRepository;
 use Tests\TestCase;
@@ -18,7 +19,7 @@ class RepositoryTest extends TestCase
         $this->repo = (new RevisionRepository);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_revisions_and_excludes_working_copies()
     {
         $revisions = $this->repo->whereKey('123');

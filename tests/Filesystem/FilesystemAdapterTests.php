@@ -3,6 +3,7 @@
 namespace Tests\Filesystem;
 
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\Test;
 use RuntimeException;
 use Statamic\Support\FileCollection;
 
@@ -10,7 +11,7 @@ trait FilesystemAdapterTests
 {
     private $adapter;
 
-    /** @test */
+    #[Test]
     public function it_makes_a_file_collection()
     {
         $collection = $this->adapter->collection(['one', 'two']);
@@ -18,20 +19,20 @@ trait FilesystemAdapterTests
         $this->assertEquals(2, $collection->count());
     }
 
-    /** @test */
+    #[Test]
     public function gets_file_contents()
     {
         file_put_contents($this->tempDir.'/filename.txt', 'Hello World');
         $this->assertEquals('Hello World', $this->adapter->get('filename.txt'));
     }
 
-    /** @test */
+    #[Test]
     public function gets_fallback_if_file_doesnt_exist()
     {
         $this->assertEquals('Hello World', $this->adapter->get('filename.txt', 'Hello World'));
     }
 
-    /** @test */
+    #[Test]
     public function checks_if_file_exists()
     {
         file_put_contents($this->tempDir.'/filename.txt', 'Hello World');
@@ -39,7 +40,7 @@ trait FilesystemAdapterTests
         $this->assertFalse($this->adapter->exists('another.txt'));
     }
 
-    /** @test */
+    #[Test]
     public function cannot_check_if_null_exists()
     {
         $this->expectException(RuntimeException::class);
@@ -47,21 +48,21 @@ trait FilesystemAdapterTests
         $this->adapter->exists(null);
     }
 
-    /** @test */
+    #[Test]
     public function puts_contents_into_a_file()
     {
         $this->adapter->put('filename.txt', 'Hello World');
         $this->assertStringEqualsFile($this->tempDir.'/filename.txt', 'Hello World');
     }
 
-    /** @test */
+    #[Test]
     public function puts_content_into_a_file_in_a_subdirectory()
     {
         $this->adapter->put('subdir/filename.txt', 'Hello World');
         $this->assertStringEqualsFile($this->tempDir.'/subdir/filename.txt', 'Hello World');
     }
 
-    /** @test */
+    #[Test]
     public function deletes_files()
     {
         file_put_contents($this->tempDir.'/filename.txt', 'Hello World');
@@ -69,7 +70,7 @@ trait FilesystemAdapterTests
         $this->assertFileDoesNotExist($this->tempDir.'/filename.txt');
     }
 
-    /** @test */
+    #[Test]
     public function cannot_delete_null()
     {
         $this->expectException(RuntimeException::class);
@@ -77,7 +78,7 @@ trait FilesystemAdapterTests
         $this->adapter->delete(null);
     }
 
-    /** @test */
+    #[Test]
     public function copies_files()
     {
         file_put_contents($this->tempDir.'/src.txt', 'Hello World');
@@ -86,7 +87,7 @@ trait FilesystemAdapterTests
         $this->assertFileExists($this->tempDir.'/src.txt');
     }
 
-    /** @test */
+    #[Test]
     public function copies_files_and_overwrites()
     {
         file_put_contents($this->tempDir.'/src.txt', 'Hello World');
@@ -96,7 +97,7 @@ trait FilesystemAdapterTests
         $this->assertStringEqualsFile($this->tempDir.'/dest.txt', 'Hello World');
     }
 
-    /** @test */
+    #[Test]
     public function moves_files()
     {
         file_put_contents($this->tempDir.'/src.txt', 'Hello World');
@@ -105,7 +106,7 @@ trait FilesystemAdapterTests
         $this->assertFileDoesNotExist($this->tempDir.'/src.txt');
     }
 
-    /** @test */
+    #[Test]
     public function moves_files_and_overwrites()
     {
         file_put_contents($this->tempDir.'/src.txt', 'Hello World');
@@ -115,7 +116,7 @@ trait FilesystemAdapterTests
         $this->assertFileDoesNotExist($this->tempDir.'/src.txt');
     }
 
-    /** @test */
+    #[Test]
     public function renames_a_file()
     {
         file_put_contents($this->tempDir.'/src.txt', 'Hello World');
@@ -124,20 +125,20 @@ trait FilesystemAdapterTests
         $this->assertStringEqualsFile($this->tempDir.'/dest.txt', 'Hello World');
     }
 
-    /** @test */
+    #[Test]
     public function gets_file_extension()
     {
         $this->assertEquals('jpg', $this->adapter->extension('photo.jpg'));
     }
 
-    /** @test */
+    #[Test]
     public function gets_mime_type()
     {
         file_put_contents($this->tempDir.'/filename.txt', 'Hello World');
         $this->assertEquals('text/plain', $this->adapter->mimeType('filename.txt'));
     }
 
-    /** @test */
+    #[Test]
     public function gets_last_modified()
     {
         file_put_contents($this->tempDir.'/filename.txt', 'Hello World');
@@ -145,20 +146,20 @@ trait FilesystemAdapterTests
         $this->assertEquals($time, $this->adapter->lastModified('filename.txt'));
     }
 
-    /** @test */
+    #[Test]
     public function gets_file_size()
     {
         file_put_contents($this->tempDir.'/filename.txt', 'Hello World');
         $this->assertEquals(11, $this->adapter->size('filename.txt'));
     }
 
-    // /** @test */
+    // #[Test]
     // function gets_file_size_for_humans()
     // {
     //     // todo
     // }
 
-    /** @test */
+    #[Test]
     public function checks_if_a_file_is_an_image()
     {
         $this->assertTrue($this->adapter->isImage('test.jpg'));
@@ -169,17 +170,21 @@ trait FilesystemAdapterTests
         $this->assertTrue($this->adapter->isImage('test.JPEG'));
         $this->assertTrue($this->adapter->isImage('test.PNG'));
         $this->assertTrue($this->adapter->isImage('test.GIF'));
+        $this->assertTrue($this->adapter->isImage('test.webp'));
+        $this->assertTrue($this->adapter->isImage('test.WEBP'));
+        $this->assertTrue($this->adapter->isImage('test.avif'));
+        $this->assertTrue($this->adapter->isImage('test.AVIF'));
         $this->assertFalse($this->adapter->isImage('test.txt'));
     }
 
-    /** @test */
+    #[Test]
     public function makes_a_directory()
     {
         $this->assertTrue($this->adapter->makeDirectory('directory'));
         $this->assertDirectoryExists($this->tempDir.'/directory');
     }
 
-    /** @test */
+    #[Test]
     public function gets_files_from_a_directory()
     {
         mkdir($this->tempDir.'/sub/sub', 0755, true);
@@ -200,7 +205,7 @@ trait FilesystemAdapterTests
         $this->assertEquals([], $files->all());
     }
 
-    /** @test */
+    #[Test]
     public function gets_files_from_a_directory_recursively()
     {
         mkdir($this->tempDir.'/sub/sub', 0755, true);
@@ -220,7 +225,7 @@ trait FilesystemAdapterTests
         $this->assertArraysHaveSameValues($expected, $files->all());
     }
 
-    /** @test */
+    #[Test]
     public function gets_files_recursively_with_directory_exceptions()
     {
         mkdir($this->tempDir.'/sub/sub', 0755, true);
@@ -239,7 +244,7 @@ trait FilesystemAdapterTests
         );
     }
 
-    /** @test */
+    #[Test]
     public function gets_folders()
     {
         mkdir($this->tempDir.'/foo');
@@ -257,7 +262,7 @@ trait FilesystemAdapterTests
         );
     }
 
-    /** @test */
+    #[Test]
     public function gets_folders_recursively()
     {
         mkdir($this->tempDir.'/foo');
@@ -275,7 +280,7 @@ trait FilesystemAdapterTests
         );
     }
 
-    /** @test */
+    #[Test]
     public function gets_files_by_type()
     {
         mkdir($this->tempDir.'/docs');
@@ -311,7 +316,7 @@ trait FilesystemAdapterTests
         );
     }
 
-    /** @test */
+    #[Test]
     public function checks_for_empty_directories()
     {
         mkdir($this->tempDir.'/empty');
@@ -321,7 +326,7 @@ trait FilesystemAdapterTests
         $this->assertFalse($this->adapter->isEmpty('full'));
     }
 
-    /** @test */
+    #[Test]
     public function checks_for_directories()
     {
         mkdir($this->tempDir.'/directory');
@@ -330,7 +335,7 @@ trait FilesystemAdapterTests
         $this->assertFalse($this->adapter->isDirectory('filename.txt'));
     }
 
-    /** @test */
+    #[Test]
     public function copies_directories()
     {
         mkdir($this->tempDir.'/src');
@@ -345,7 +350,7 @@ trait FilesystemAdapterTests
         $this->assertStringEqualsFile($this->tempDir.'/dest/two.txt', 'Two');
     }
 
-    /** @test */
+    #[Test]
     public function moves_directories()
     {
         mkdir($this->tempDir.'/src');
@@ -360,7 +365,7 @@ trait FilesystemAdapterTests
         $this->assertStringEqualsFile($this->tempDir.'/dest/two.txt', 'Two');
     }
 
-    /** @test */
+    #[Test]
     public function deletes_empty_subdirectories()
     {
         mkdir($this->tempDir.'/one/two', 0755, true);
@@ -379,7 +384,7 @@ trait FilesystemAdapterTests
         $this->assertDirectoryDoesNotExist($this->tempDir.'/three/five/six');
     }
 
-    /** @test */
+    #[Test]
     public function gets_filesystem()
     {
         $this->assertEquals($this->filesystem, $this->adapter->filesystem());

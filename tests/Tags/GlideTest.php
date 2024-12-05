@@ -3,17 +3,16 @@
 namespace Tests\Tags;
 
 use Illuminate\Http\UploadedFile;
+use Orchestra\Testbench\Attributes\DefineEnvironment;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\File;
 use Statamic\Facades\Parse;
 use Tests\TestCase;
 
 class GlideTest extends TestCase
 {
-    /**
-     * @test
-     *
-     * @define-env relativeRouteUrl
-     */
+    #[Test]
+    #[DefineEnvironment('relativeRouteUrl')]
     public function it_outputs_a_relative_url_by_default_when_the_glide_route_is_relative()
     {
         $this->createImageInPublicDirectory();
@@ -23,11 +22,8 @@ class GlideTest extends TestCase
         $this->assertEquals('http://localhost/glide/paths/bar.jpg/689e9cd88cc1d852c9a4d3a1e27d68c2/bar.jpg', $this->absoluteTestTag(true));
     }
 
-    /**
-     * @test
-     *
-     * @define-env absoluteHttpRouteUrl
-     */
+    #[Test]
+    #[DefineEnvironment('absoluteHttpRouteUrl')]
     public function it_outputs_an_absolute_url_by_default_when_the_glide_route_is_absolute_http()
     {
         $this->createImageInPublicDirectory();
@@ -37,11 +33,8 @@ class GlideTest extends TestCase
         $this->assertEquals('http://localhost/glide/paths/bar.jpg/689e9cd88cc1d852c9a4d3a1e27d68c2/bar.jpg', $this->absoluteTestTag(true));
     }
 
-    /**
-     * @test
-     *
-     * @define-env absoluteHttpsRouteUrl
-     */
+    #[Test]
+    #[DefineEnvironment('absoluteHttpsRouteUrl')]
     public function it_outputs_an_absolute_url_by_default_when_the_glide_route_is_absolute_https()
     {
         $this->createImageInPublicDirectory();
@@ -51,8 +44,8 @@ class GlideTest extends TestCase
         $this->assertEquals('https://localhost/glide/paths/bar.jpg/689e9cd88cc1d852c9a4d3a1e27d68c2/bar.jpg', $this->absoluteTestTag(true));
     }
 
+    #[Test]
     /**
-     * @test
      * https://github.com/statamic/cms/pull/9031
      */
     public function it_outputs_an_absolute_url_when_the_url_does_not_have_a_valid_extension()
@@ -62,9 +55,7 @@ class GlideTest extends TestCase
         $this->assertSame('https://statamic.com/foo', $parse);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_outputs_a_data_url()
     {
         $this->createImageInPublicDirectory();

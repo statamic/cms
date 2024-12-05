@@ -3,6 +3,7 @@
 namespace Tests\Auth;
 
 use Carbon\Carbon;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\AugmentedUser;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\User;
@@ -15,7 +16,7 @@ class AugmentedUserTest extends AugmentedTestCase
     use FakesRoles;
     use FakesUserGroups;
 
-    /** @test */
+    #[Test]
     public function it_gets_values()
     {
         Carbon::setTestNow('2020-04-15 13:00:00');

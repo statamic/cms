@@ -14,7 +14,7 @@
                         'cursor-not-allowed': !sortable,
                         'rtl:text-left ltr:text-right rtl:pl-8 ltr:pr-8': column.numeric,
                     }"
-                    class="group"
+                    class="group rounded-none"
                     @click.prevent="changeSortColumn(column.field)"
                 >
                     <span v-text="__(column.label)" />

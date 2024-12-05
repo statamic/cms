@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Navigation;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Facades\Nav;
 use Tests\FakesRoles;
@@ -14,7 +15,7 @@ class EditNavigationTest extends TestCase
     use MocksStructures;
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_shows_the_edit_form_if_user_has_configure_permission()
     {
         $nav = $this->createNav('foo');
@@ -31,7 +32,7 @@ class EditNavigationTest extends TestCase
             ->assertViewHas('nav', $nav);
     }
 
-    /** @test */
+    #[Test]
     public function it_denies_access_if_user_doesnt_have_configure_permission()
     {
         $nav = $this->createNav('foo');
