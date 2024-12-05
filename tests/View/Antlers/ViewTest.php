@@ -138,7 +138,6 @@ class ViewTest extends TestCase
         $this->assertEquals('Hello World', $view->render());
     }
 
-
     #[Test]
     public function gets_first()
     {
