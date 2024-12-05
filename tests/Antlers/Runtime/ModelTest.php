@@ -18,6 +18,15 @@ class ModelTest extends ParserTestCase
         $this->assertSame($expected, $this->renderString("{{ model:$attribute }}", ['model' => $model]));
     }
 
+    #[Test, DataProvider('modelProvider')]
+    public function attributes_are_returned_in_tag_pair($attribute, $expected)
+    {
+        $model = new FakeModel;
+        $model->title = 'foo';
+
+        $this->assertSame($expected, $this->renderString("{{ model }}{{ $attribute }}{{ /model }}", ['model' => $model]));
+    }
+
     public static function modelProvider()
     {
         return [
