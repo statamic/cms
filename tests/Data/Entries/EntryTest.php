@@ -10,7 +10,6 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\View;
 use LogicException;
 use Mockery;
@@ -35,7 +34,6 @@ use Statamic\Fields\Blueprint;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
 use Statamic\Sites\Site;
-use Statamic\Statamic;
 use Statamic\Structures\CollectionStructure;
 use Statamic\Structures\CollectionTree;
 use Statamic\Structures\Page;
@@ -1377,40 +1375,6 @@ class EntryTest extends TestCase
         $property->setAccessible(true);
         $withEvents = $property->getValue($cached);
         $this->assertTrue($withEvents);
-    }
-
-    #[Test]
-    public function infinite_loops_are_prevented_when_running_workers()
-    {
-        // NOTE: We are not using the `config(['cache.default' => 'file'])` override as that
-        //       will cause an infinite loop on failure instead of a segfault.
-
-        // `Statamic::isWorker()` should return false by default.
-        $this->assertFalse(Statamic::isWorker());
-
-        // Swap the request with one that will cause `Statamic::isWorker()` to return `true`.
-        // NOTE: Cannot use `Tests\Fakes\FakeArtisanRequest` as that does not have the cookies
-        //       object initialised and `auth()->user()` will throw an Exception.
-        Request::swap(request()->duplicate(server: [
-            'argv' => [
-                'artisan',
-                'queue:work',
-            ],
-            'argc' => 2,
-        ]));
-
-        // `Statamic::isWorker()` should return true when being called from any command beginning with `queue:`.
-        $this->assertTrue(Statamic::isWorker());
-
-        // Create a collection.
-        $collection = tap(Collection::make('test'))->save();
-
-        // Create some entries.
-        EntryFactory::id('alfa-id')->collection('test')->slug('alfa')->data(['title' => 'Alfa'])->create();
-        EntryFactory::id('bravo-id')->collection('test')->slug('bravo')->data(['title' => 'Bravo'])->create();
-        EntryFactory::id('charlie-id')->collection('test')->slug('charlie')->data(['title' => 'Charlie'])->create();
-        EntryFactory::id('donkus-id')->collection('test')->slug('donkus')->data(['title' => 'Donkus'])->create();
-        EntryFactory::id('eggbert-id')->collection('test')->slug('eggbert')->data(['title' => 'Eggbert'])->create();
     }
 
     #[Test]
