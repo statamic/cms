@@ -25,8 +25,8 @@ class StarterKitInit extends Command
      */
     protected $signature = 'statamic:starter-kit:init
         { package? : Specify a package for the starter kit (ie. vendor/starter-kit) }
-        { --name : Specify a name for the starter kit }
-        { --description : Specify a description of the starter kit }
+        { --name= : Specify a name for the starter kit }
+        { --description= : Specify a description of the starter kit }
         { --updatable : Specify whether the starter kit is to be updatable }
         { --force : Force overwrite if files already exist }';
 
@@ -69,8 +69,10 @@ class StarterKitInit extends Command
 
         if ($promptingAgain) {
             $package = text($promptText);
-        } else {
+        } elseif ($this->input->isInteractive()) {
             $package = $this->argument('package') ?: text($promptText);
+        } else {
+            $package = $this->argument('package');
         }
 
         $fails = $this->validationFails($package, new ComposerPackage);
@@ -89,6 +91,10 @@ class StarterKitInit extends Command
      */
     protected function getKitName(): ?string
     {
+        if (! $this->input->isInteractive()) {
+            return $this->option('name');
+        }
+
         return $this->option('name') ?: text('Starter Kit Name (eg. Kung Fury)');
     }
 
@@ -97,6 +103,10 @@ class StarterKitInit extends Command
      */
     protected function getKitDescription(): ?string
     {
+        if (! $this->input->isInteractive()) {
+            return $this->option('description');
+        }
+
         return $this->option('description') ?: text('Starter Kit Description');
     }
 
@@ -105,6 +115,10 @@ class StarterKitInit extends Command
      */
     protected function getKitUpdatable(): bool
     {
+        if (! $this->input->isInteractive()) {
+            return $this->option('updatable');
+        }
+
         return $this->option('updatable') ?: confirm(
             label: 'Would you like to make this starter-kit updatable?',
             default: false,
