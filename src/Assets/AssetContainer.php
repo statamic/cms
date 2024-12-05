@@ -45,6 +45,7 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     protected $sourcePreset;
     protected $warmPresets;
     protected $searchIndex;
+    protected $imageManipulator;
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
     protected $sortField;
@@ -672,6 +673,14 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
             ->getter(function ($index) {
                 return $index ? Search::index($index) : null;
             })
+            ->args(func_get_args());
+    }
+
+    public function imageManipulator($manipulator = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('imageManipulator')
+            ->getter(fn ($manipulator) => Image::driver($manipulator))
             ->args(func_get_args());
     }
 

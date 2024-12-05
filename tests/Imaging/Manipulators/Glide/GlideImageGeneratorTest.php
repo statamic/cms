@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Imaging;
+namespace Tests\Imaging\Manipulators\Glide;
 
 use Facades\Statamic\Imaging\ImageValidator;
 use GuzzleHttp\Client;
@@ -11,27 +11,31 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use League\Glide\Manipulators\Watermark;
-use League\Glide\Server;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\GlideImageGenerated;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\File;
 use Statamic\Facades\Glide;
 use Statamic\Imaging\GuzzleAdapter;
-use Statamic\Imaging\ImageGenerator;
+use Statamic\Imaging\Manipulators\Glide\ImageGenerator;
+use Statamic\Imaging\Manipulators\GlideManipulator;
 use Statamic\Support\Str;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-/** @deprecated */
-class ImageGeneratorTest extends TestCase
+class GlideImageGeneratorTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+
+    private GlideManipulator $manipulator;
 
     public function setUp(): void
     {
         parent::setUp();
+
+        $this->manipulator = new GlideManipulator([
+            'cache' => public_path('img'),
+        ]);
 
         $this->clearGlideCache();
     }
@@ -277,8 +281,11 @@ class ImageGeneratorTest extends TestCase
         $this->assertEquals(['mark' => 'foo/hoff.jpg'], $generator->getParams());
     }
 
-    #[Test]
-    #[DataProvider('guzzleWatermarkProvider')]
+    /**
+     * @test
+     *
+     * @dataProvider guzzleWatermarkProvider
+     */
     public function the_watermark_disk_is_a_guzzle_adapter_when_a_url_is_provided($protocol)
     {
         $generator = $this->makeGenerator();
@@ -307,7 +314,7 @@ class ImageGeneratorTest extends TestCase
 
     private function makeGenerator()
     {
-        return new ImageGenerator($this->app->make(Server::class));
+        return new ImageGenerator($this->manipulator->getServer());
     }
 
     private function clearGlideCache()
@@ -318,7 +325,7 @@ class ImageGeneratorTest extends TestCase
 
     private function glideCachePath()
     {
-        return 'storage/statamic/glide';
+        return 'public/img';
     }
 
     private function generatedImagePaths()

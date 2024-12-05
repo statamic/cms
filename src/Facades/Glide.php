@@ -4,6 +4,7 @@ namespace Statamic\Facades;
 
 use Illuminate\Support\Facades\Facade;
 use Statamic\Imaging\GlideManager;
+use Statamic\Imaging\Manipulators\GlideManipulator;
 
 /**
  * @method static \League\Glide\Server server(array $config = [])
@@ -17,7 +18,9 @@ use Statamic\Imaging\GlideManager;
  * @method static array normalizeParameters($params)
  * @method static void generateHashUsing(\Closure $callback)
  *
- * @see \Statamic\Imaging\GlideManager
+ * @deprecated Glide should be accessed through its manipulation class.
+ * @see GlideManipulator
+ * @see GlideManager
  */
 class Glide extends Facade
 {

@@ -26,7 +26,7 @@ class AppServiceProvider extends ServiceProvider
     protected $root = __DIR__.'/../..';
 
     protected $configFiles = [
-        'antlers', 'api', 'assets', 'autosave', 'cp', 'editions', 'forms', 'git', 'graphql', 'live_preview', 'markdown', 'oauth', 'protect', 'revisions',
+        'antlers', 'api', 'assets', 'autosave', 'cp', 'editions', 'forms', 'git', 'graphql', 'image_manipulation', 'live_preview', 'markdown', 'oauth', 'protect', 'revisions',
         'routes', 'search', 'static_caching', 'stache', 'system', 'users',
     ];
 

@@ -13,6 +13,7 @@
         "ajthinking/archetype": "^1.0.3 || ^2.0",
         "composer/semver": "^3.4",
         "guzzlehttp/guzzle": "^6.3 || ^7.0",
+        "imgix/imgix-php": "^4.1",
         "james-heinrich/getid3": "^1.9.21",
         "laravel/framework": "^10.40 || ^11.34",
         "laravel/prompts": "^0.1.16",

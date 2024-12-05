@@ -29,6 +29,7 @@ class AssetContainersStore extends BasicStore
             ->sourcePreset(Arr::get($data, 'source_preset'))
             ->warmPresets(Arr::get($data, 'warm_presets'))
             ->searchIndex(Arr::get($data, 'search_index'))
+            ->imageManipulator(Arr::get($data, 'image_manipulator'))
             ->sortField(Arr::get($data, 'sort_by'))
             ->sortDirection(Arr::get($data, 'sort_dir'))
             ->validationRules(Arr::get($data, 'validate'));
