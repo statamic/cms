@@ -90,6 +90,10 @@ class StarterKitInstall extends Command
             $this->comment('composer global update statamic/cli'.PHP_EOL);
         }
 
+        if (version_compare(app()->version(), '11', '<')) {
+            return $this->components->info("Starter kit [$package] was successfully installed.");
+        }
+
         $this->components->success("Starter kit [$package] was successfully installed.");
     }
 

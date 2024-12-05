@@ -91,6 +91,10 @@ class StarterKitInit extends Command
             ->createComposerJson()
             ->createServiceProvider();
 
+        if (version_compare(app()->version(), '11', '<')) {
+            return $this->components->info('Your starter kit config was successfully created in your project\'s [package] folder.');
+        }
+
         $this->components->success('Your starter kit config was successfully created in your project\'s [package] folder.');
     }
 

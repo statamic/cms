@@ -56,6 +56,10 @@ class StarterKitExport extends Command
             return 1;
         }
 
+        if (version_compare(app()->version(), '11', '<')) {
+            return $this->components->info("Starter kit was successfully exported to [$path].");
+        }
+
         $this->components->success("Starter kit was successfully exported to [$path].");
     }
 
