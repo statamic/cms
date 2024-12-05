@@ -145,7 +145,7 @@ class Date extends Fieldtype
             $value = $value['start'];
         }
 
-        $date = $this->parseSaved($value);
+        $date = $this->parseSaved($value, true);
 
         return $this->splitDateTimeForPreProcessSingle($date);
     }
@@ -168,8 +168,8 @@ class Date extends Fieldtype
         }
 
         return $this->splitDateTimeForPreProcessRange([
-            'start' => $this->parseSaved($value['start'])->format($vueFormat),
-            'end' => $this->parseSaved($value['end'])->format($vueFormat),
+            'start' => $this->parseSaved($value['start'], true)->format($vueFormat),
+            'end' => $this->parseSaved($value['end'], true)->format($vueFormat),
         ]);
     }
 
@@ -221,14 +221,28 @@ class Date extends Fieldtype
     {
         $date = Carbon::parse($value);
 
-        return $this->formatAndCast($date, $this->saveFormat());
+        return $this->formatAndCast($this->convertTimezoneForSave($date), $this->saveFormat());
     }
 
     private function processDateTimeEndOfDay($value)
     {
         $date = Carbon::parse($value)->endOfDay();
 
-        return $this->formatAndCast($date, $this->saveFormat());
+        return $this->formatAndCast($this->convertTimezoneForSave($date), $this->saveFormat());
+    }
+
+    private function convertTimezoneForSave(Carbon $date): Carbon
+    {
+        $clientTimezone = config('statamic.system.client_timezone');
+        $appTimezone = config('app.timezone');
+        if (! $clientTimezone || $clientTimezone === $appTimezone) {
+            return $date;
+        }
+
+        // Date has the app timezone set, so we need to shift that to the CP timezone first without modifying the time.
+        return $date
+            ->shiftTimezone($clientTimezone)
+            ->setTimezone($appTimezone);
     }
 
     public function preProcessIndex($value)
@@ -244,8 +258,8 @@ class Date extends Fieldtype
                 $value = ['start' => $value, 'end' => $value];
             }
 
-            $start = $this->parseSaved($value['start'])->format($this->indexDisplayFormat());
-            $end = $this->parseSaved($value['end'])->format($this->indexDisplayFormat());
+            $start = $this->parseSaved($value['start'], true)->format($this->indexDisplayFormat());
+            $end = $this->parseSaved($value['end'], true)->format($this->indexDisplayFormat());
 
             return $start.' - '.$end;
         }
@@ -255,7 +269,7 @@ class Date extends Fieldtype
             $value = $value['start'];
         }
 
-        return $this->parseSaved($value)->format($this->indexDisplayFormat());
+        return $this->parseSaved($value, true)->format($this->indexDisplayFormat());
     }
 
     private function saveFormat()
@@ -346,13 +360,20 @@ class Date extends Fieldtype
         return $this->augment($value);
     }
 
-    private function parseSaved($value)
+    private function parseSaved($value, $convertTz = false)
     {
         try {
-            return Carbon::createFromFormat($this->saveFormat(), $value);
+            $carbon = Carbon::createFromFormat($this->saveFormat(), $value);
         } catch (InvalidFormatException|InvalidArgumentException $e) {
-            return Carbon::parse($value);
+            $carbon = Carbon::parse($value);
         }
+
+        $clientTimezone = config('statamic.system.client_timezone');
+        if ($convertTz && $clientTimezone && $clientTimezone !== config('app.timezone')) {
+            $carbon->setTimezone($clientTimezone);
+        }
+
+        return $carbon;
     }
 
     public function timeEnabled()
