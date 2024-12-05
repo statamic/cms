@@ -39,28 +39,56 @@ class StarterKitInit extends Command
     protected $description = 'Create a new starter kit config';
 
     /**
+     * The installable package.
+     *
+     * @var ?string
+     */
+    protected $package;
+
+    /**
+     * The name of the starter kit.
+     *
+     * @var ?string
+     */
+    protected $kitName;
+
+    /**
+     * The description of the starter kit.
+     *
+     * @var ?string
+     */
+    protected $kitDescription;
+
+    /**
+     * Whether or not the kit should be updatable.
+     *
+     * @var bool
+     */
+    protected $updatable = false;
+
+    /**
      * Execute the console command.
      */
     public function handle()
     {
         try {
-            $package = $this->getKitPackage();
-            $name = $this->getKitName();
-            $description = $this->getKitDescription();
-            $updatable = $this->getKitUpdatable();
+            $this->package = $this->getKitPackage();
+            $this->kitName = $this->getKitName();
+            $this->kitDescription = $this->getKitDescription();
+            $this->updatable = $this->getKitUpdatable();
         } catch (StarterKitException $exception) {
             return 1;
         }
 
-        if (! $package || ! $name || ! $description) {
+        if (! $this->package || ! $this->kitName || ! $this->kitDescription) {
             $this->components->info('You can manage your starter kit\'s package config in [package/composer.json] at any time.');
         }
 
         $this
             ->migrateLegacyConfig()
             ->createFolder()
-            ->createConfig($updatable)
-            ->createComposerJson($package, $name, $description, $updatable);
+            ->createConfig()
+            ->createComposerJson();
 
         $this->components->success('Your starter kit config was successfully created in your project\'s [package] folder.');
     }
@@ -136,9 +164,11 @@ class StarterKitInit extends Command
     /**
      * Create composer.json config from stub.
      */
-    protected function createFolder(): self
+    protected function createFolder($dir = null): self
     {
-        if (! File::exists($dir = base_path('package'))) {
+        $dir ??= base_path('package');
+
+        if (! File::exists($dir)) {
             File::makeDirectory($dir, 0755, true);
         }
 
@@ -148,7 +178,7 @@ class StarterKitInit extends Command
     /**
      * Create starter-kit.yaml config from stub.
      */
-    protected function createConfig(bool $updatable): self
+    protected function createConfig(): self
     {
         if ($this->migratedLegacyConfig()) {
             return $this;
@@ -164,7 +194,7 @@ class StarterKitInit extends Command
             }
         }
 
-        if ($updatable) {
+        if ($this->updatable) {
             $contents = "updatable: true\n".$contents;
         }
 
@@ -176,7 +206,7 @@ class StarterKitInit extends Command
     /**
      * Create composer.json config.
      */
-    protected function createComposerJson(?string $package, ?string $name, ?string $description, bool $updatable): self
+    protected function createComposerJson(): self
     {
         $targetPath = base_path('package/composer.json');
 
@@ -196,19 +226,19 @@ class StarterKitInit extends Command
             ],
         ];
 
-        if ($package) {
-            Arr::set($json, 'name', $package);
+        if ($this->package) {
+            Arr::set($json, 'name', $this->package);
         }
 
-        if ($name) {
-            Arr::set($json, 'extra.statamic.name', $name);
+        if ($this->kitName) {
+            Arr::set($json, 'extra.statamic.name', $this->kitName);
         }
 
-        if ($description) {
-            Arr::set($json, 'extra.statamic.description', $description);
+        if ($this->kitDescription) {
+            Arr::set($json, 'extra.statamic.description', $this->kitDescription);
         }
 
-        if ($updatable && $namespace = static::createKitNamespace($package, $name)) {
+        if ($this->updatable && $namespace = $this->kitNamespace()) {
             Arr::set($json, 'autoload.psr-4', [$namespace.'\\' => 'src']);
             Arr::set($json, 'autoload-dev.psr-4', ['Tests\\' => 'tests']);
             Arr::set($json, 'extra.laravel.providers', [$namespace.'\\ServiceProvider']);
@@ -222,17 +252,17 @@ class StarterKitInit extends Command
     /**
      * Create kit namespace from name and input if possible.
      */
-    public static function createKitNamespace(?string $package, ?string $name): string
+    public function kitNamespace(): string
     {
         $vendor = 'Example';
         $namespace = 'StarterKitNamespace';
 
-        if ($package) {
-            [$vendor, $namespace] = explode('/', $package);
+        if ($this->package) {
+            [$vendor, $namespace] = explode('/', $this->package);
         }
 
-        if ($name) {
-            $namespace = $name;
+        if ($this->kitName) {
+            $namespace = $this->kitName;
         }
 
         return Str::upperCamelize($vendor).'\\'.Str::upperCamelize($namespace);
