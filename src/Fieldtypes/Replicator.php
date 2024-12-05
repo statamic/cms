@@ -16,7 +16,7 @@ use Statamic\Support\Str;
 
 class Replicator extends Fieldtype
 {
-    use AddValidationReplacements;
+    use AddsEntryValidationReplacements;
 
     protected $categories = ['structured'];
     protected $keywords = ['builder', 'page builder', 'content'];

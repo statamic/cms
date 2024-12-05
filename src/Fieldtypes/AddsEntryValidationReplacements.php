@@ -6,7 +6,7 @@ use Statamic\Entries\Entry;
 use Statamic\Fields\Field;
 use Statamic\Fields\Validator;
 
-trait AddValidationReplacements
+trait AddsEntryValidationReplacements
 {
     protected function addEntryValidationReplacements(Field $field, Validator $rules): Validator
     {

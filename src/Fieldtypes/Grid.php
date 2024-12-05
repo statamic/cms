@@ -14,7 +14,7 @@ use Statamic\Support\Str;
 
 class Grid extends Fieldtype
 {
-    use AddValidationReplacements;
+    use AddsEntryValidationReplacements;
 
     protected $categories = ['structured'];
     protected $defaultable = false;
