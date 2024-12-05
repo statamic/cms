@@ -25,6 +25,7 @@ class StarterKitInit extends Command
         { package? : Specify a package for the starter kit (ie. vendor/starter-kit) }
         { --name : Specify a name for the starter kit }
         { --description : Specify a description of the starter kit }
+        { --updatable : Specify whether the starter kit is to be updatable }
         { --force : Force overwrite if files already exist }';
 
     /**
@@ -42,6 +43,7 @@ class StarterKitInit extends Command
         $package = $this->getKitPackage();
         $name = $this->getKitName();
         $description = $this->getKitDescription();
+        $updatable = $this->getKitUpdatable();
 
         if (! $package || ! $name || ! $description) {
             $this->components->info('You can manage your starter kit\'s package config in [package/composer.json] at any time.');
@@ -50,8 +52,8 @@ class StarterKitInit extends Command
         $this
             ->migrateLegacyConfig()
             ->createFolder()
-            ->createConfig()
-            ->createComposerJson($package, $name, $description);
+            ->createConfig($updatable)
+            ->createComposerJson($package, $name, $description, $updatable);
 
         $this->components->success('Your starter kit config was successfully created in your project\'s [package] folder.');
     }
@@ -97,6 +99,18 @@ class StarterKitInit extends Command
     }
 
     /**
+     * Get whether the starter kit is to be updatable (optional).
+     */
+    protected function getKitUpdatable(): bool
+    {
+        return $this->option('updatable') ?: confirm(
+            label: 'Would you like to make this starter-kit updatable?',
+            default: false,
+            hint: 'Read more: https://statamic.dev/starter-kits/creating-a-starter-kit#making-starter-kits-updatable',
+        );
+    }
+
+    /**
      * Create composer.json config from stub.
      */
     protected function createFolder(): self
@@ -111,7 +125,7 @@ class StarterKitInit extends Command
     /**
      * Create starter-kit.yaml config from stub.
      */
-    protected function createConfig(): self
+    protected function createConfig(bool $updatable): self
     {
         if ($this->migratedLegacyConfig()) {
             return $this;
@@ -127,14 +141,8 @@ class StarterKitInit extends Command
             }
         }
 
-        if ($this->input->isInteractive()) {
-            if (confirm(
-                label: 'Would you like to make this starter-kit updatable?',
-                default: false,
-                hint: 'Read more: https://statamic.dev/starter-kits/creating-a-starter-kit#making-starter-kits-updatable',
-            )) {
-                $contents = "updatable: true\n".$contents;
-            }
+        if ($updatable) {
+            $contents = "updatable: true\n".$contents;
         }
 
         File::put($targetPath, $contents);
@@ -145,7 +153,7 @@ class StarterKitInit extends Command
     /**
      * Create composer.json config from stub.
      */
-    protected function createComposerJson(?string $package, ?string $name, ?string $description): self
+    protected function createComposerJson(?string $package, ?string $name, ?string $description, bool $updatable): self
     {
         $contents = File::get(__DIR__.'/stubs/starter-kits/composer.json.stub');
 
