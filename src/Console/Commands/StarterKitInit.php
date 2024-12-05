@@ -88,7 +88,8 @@ class StarterKitInit extends Command
             ->migrateLegacyConfig()
             ->createFolder()
             ->createConfig()
-            ->createComposerJson();
+            ->createComposerJson()
+            ->createServiceProvider();
 
         $this->components->success('Your starter kit config was successfully created in your project\'s [package] folder.');
     }
@@ -245,6 +246,34 @@ class StarterKitInit extends Command
         }
 
         File::put($targetPath, json_encode($json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+
+        return $this;
+    }
+
+    /**
+     * Create service provider.
+     */
+    protected function createServiceProvider(): self
+    {
+        if (! $this->updatable) {
+            return $this;
+        }
+
+        $this->createFolder(base_path('package/src'));
+
+        $contents = File::get(__DIR__.'/stubs/starter-kits/ServiceProvider.php.stub');
+
+        $targetPath = base_path('package/src/ServiceProvider.php');
+
+        if ($this->input->isInteractive() && File::exists($targetPath) && ! $this->option('force')) {
+            if (! confirm('A service provider already exists at [src/ServiceProvider.php]. Would you like to overwrite it?', false)) {
+                return $this;
+            }
+        }
+
+        $contents = str_replace('DummyNamespace', $this->kitNamespace(), $contents);
+
+        File::put($targetPath, $contents);
 
         return $this;
     }
