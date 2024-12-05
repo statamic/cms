@@ -218,10 +218,11 @@ JSON, trim($this->files->get($composerJsonPath)));
             ->expectsOutputToContain('Your starter kit config was successfully created in your project\'s [package] folder.')
             ->assertOk();
 
-        $this->assertCount(2, $this->files->allFiles($this->packagePath()));
+        $this->assertCount(3, $this->files->allFiles($this->packagePath()));
 
         $this->assertFileExists($configPath = $this->packagePath('starter-kit.yaml'));
         $this->assertFileExists($composerJsonPath = $this->packagePath('composer.json'));
+        $this->assertFileExists($serviceProviderPath = $this->packagePath('src/ServiceProvider.php'));
 
         $this->assertEquals(<<<'YAML'
 updatable: true
@@ -264,6 +265,22 @@ YAML, trim($this->files->get($configPath)));
     }
 }
 JSON, trim($this->files->get($composerJsonPath)));
+
+        $this->assertEquals(<<<'PHP'
+<?php
+
+namespace Example\StarterKitNamespace;
+
+use Statamic\Providers\AddonServiceProvider;
+
+class ServiceProvider extends AddonServiceProvider
+{
+    public function bootAddon()
+    {
+        //
+    }
+}
+PHP, trim($this->files->get($serviceProviderPath)));
     }
 
     #[Test]
@@ -280,10 +297,11 @@ JSON, trim($this->files->get($composerJsonPath)));
             ->expectsOutputToContain('Your starter kit config was successfully created in your project\'s [package] folder.')
             ->assertOk();
 
-        $this->assertCount(2, $this->files->allFiles($this->packagePath()));
+        $this->assertCount(3, $this->files->allFiles($this->packagePath()));
 
         $this->assertFileExists($configPath = $this->packagePath('starter-kit.yaml'));
         $this->assertFileExists($composerJsonPath = $this->packagePath('composer.json'));
+        $this->assertFileExists($serviceProviderPath = $this->packagePath('src/ServiceProvider.php'));
 
         $this->assertEquals(<<<'YAML'
 updatable: true
@@ -326,6 +344,22 @@ YAML, trim($this->files->get($configPath)));
     }
 }
 JSON, trim($this->files->get($composerJsonPath)));
+
+        $this->assertEquals(<<<'PHP'
+<?php
+
+namespace Example\StarterKitNamespace;
+
+use Statamic\Providers\AddonServiceProvider;
+
+class ServiceProvider extends AddonServiceProvider
+{
+    public function bootAddon()
+    {
+        //
+    }
+}
+PHP, trim($this->files->get($serviceProviderPath)));
     }
 
     #[Test]
@@ -343,10 +377,11 @@ JSON, trim($this->files->get($composerJsonPath)));
             ->expectsOutputToContain('Your starter kit config was successfully created in your project\'s [package] folder.')
             ->assertOk();
 
-        $this->assertCount(2, $this->files->allFiles($this->packagePath()));
+        $this->assertCount(3, $this->files->allFiles($this->packagePath()));
 
         $this->assertFileExists($configPath = $this->packagePath('starter-kit.yaml'));
         $this->assertFileExists($composerJsonPath = $this->packagePath('composer.json'));
+        $this->assertFileExists($serviceProviderPath = $this->packagePath('src/ServiceProvider.php'));
 
         $this->assertEquals(<<<'JSON'
 {
@@ -374,6 +409,22 @@ JSON, trim($this->files->get($composerJsonPath)));
     }
 }
 JSON, trim($this->files->get($composerJsonPath)));
+
+        $this->assertEquals(<<<'PHP'
+<?php
+
+namespace StatamicRadPack\CoolWritings;
+
+use Statamic\Providers\AddonServiceProvider;
+
+class ServiceProvider extends AddonServiceProvider
+{
+    public function bootAddon()
+    {
+        //
+    }
+}
+PHP, trim($this->files->get($serviceProviderPath)));
     }
 
     #[Test]
@@ -390,10 +441,11 @@ JSON, trim($this->files->get($composerJsonPath)));
             ->expectsOutputToContain('Your starter kit config was successfully created in your project\'s [package] folder.')
             ->assertOk();
 
-        $this->assertCount(2, $this->files->allFiles($this->packagePath()));
+        $this->assertCount(3, $this->files->allFiles($this->packagePath()));
 
         $this->assertFileExists($configPath = $this->packagePath('starter-kit.yaml'));
         $this->assertFileExists($composerJsonPath = $this->packagePath('composer.json'));
+        $this->assertFileExists($serviceProviderPath = $this->packagePath('src/ServiceProvider.php'));
 
         $this->assertEquals(<<<'JSON'
 {
@@ -421,6 +473,22 @@ JSON, trim($this->files->get($composerJsonPath)));
     }
 }
 JSON, trim($this->files->get($composerJsonPath)));
+
+        $this->assertEquals(<<<'PHP'
+<?php
+
+namespace StatamicRadPack\CoolWritings;
+
+use Statamic\Providers\AddonServiceProvider;
+
+class ServiceProvider extends AddonServiceProvider
+{
+    public function bootAddon()
+    {
+        //
+    }
+}
+PHP, trim($this->files->get($serviceProviderPath)));
     }
 
     #[Test]
@@ -436,12 +504,14 @@ JSON, trim($this->files->get($composerJsonPath)));
             ->expectsOutputToContain('Your starter kit config was successfully created in your project\'s [package] folder.')
             ->assertOk();
 
-        $this->assertCount(2, $this->files->allFiles($this->packagePath()));
+        $this->assertCount(3, $this->files->allFiles($this->packagePath()));
 
         $this->assertFileExists($composerJsonPath = $this->packagePath('composer.json'));
+        $this->assertFileExists($serviceProviderPath = $this->packagePath('src/ServiceProvider.php'));
 
         $this->assertStringContainsString('"Example\\\\CoolWritingsKitABC\\\\": "src"', $this->files->get($composerJsonPath));
         $this->assertStringContainsString('"Example\\\\CoolWritingsKitABC\\\\ServiceProvider"', $this->files->get($composerJsonPath));
+        $this->assertStringContainsString('namespace Example\\CoolWritingsKitABC;', $this->files->get($serviceProviderPath));
     }
 
     #[Test]
