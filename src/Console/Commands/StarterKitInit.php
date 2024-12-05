@@ -75,12 +75,14 @@ class StarterKitInit extends Command
             $package = $this->argument('package');
         }
 
-        $fails = $this->validationFails($package, new ComposerPackage);
+        if ($package) {
+            $fails = $this->validationFails($package, new ComposerPackage);
+        }
 
         if ($package && $fails && $this->input->isInteractive()) {
             return $this->getKitPackage(true);
         } elseif ($package && $fails) {
-            return null;
+            exit;
         }
 
         return $package;
