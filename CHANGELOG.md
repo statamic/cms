@@ -1,5 +1,31 @@
 # Release Notes
 
+## 5.42.0 (2024-12-05)
+
+### What's new
+- Add new `updatable` and `package` starter kit conventions [#11119](https://github.com/statamic/cms/issues/11119) by @jesseleite
+- Add new `starter-kit:init` command [#11215](https://github.com/statamic/cms/issues/11215) by @jesseleite
+- Register App extensions also for Classes in Subfolders [#11046](https://github.com/statamic/cms/issues/11046) by @benatoff
+- Support rendering model attributes in Antlers [#10869](https://github.com/statamic/cms/issues/10869) by @ryanmitchell
+- Add an `--uncached` option to the static warm command [#11188](https://github.com/statamic/cms/issues/11188) by @arthurperton
+
+### What's fixed
+- Fixed an issue where stache indexing can cause an infinite loop for workers [#11185](https://github.com/statamic/cms/issues/11185) by @kingsven
+- Add validation replacements to replicator and grid field types [#10255](https://github.com/statamic/cms/issues/10255) by @florianbrinkmann
+- Fix localized error messages on forms when previous URL is incorrect [#11219](https://github.com/statamic/cms/issues/11219) by @jasonvarga
+- Fix null coalescence operator evaluation [#11221](https://github.com/statamic/cms/issues/11221) by @godismyjudge95
+- Fix wrong url on the link mark node in bard fieldtype [#11207](https://github.com/statamic/cms/issues/11207) by @christophstockinger
+- Fix REST API errors when CP route is empty [#11213](https://github.com/statamic/cms/issues/11213) by @duncanmcclean
+- Throw an error when running `static:clear` when static caching is disabled [#11193](https://github.com/statamic/cms/issues/11193) by @duncanmcclean
+- Fix entry links when Bard value is HTML [#11192](https://github.com/statamic/cms/issues/11192) by @duncanmcclean
+- Ensure updating references gets all global variables [#11186](https://github.com/statamic/cms/issues/11186) by @ryanmitchell
+- Ensure cache factory is passed to the `StartSession` middleware. [#11191](https://github.com/statamic/cms/issues/11191) by @duncanmcclean
+- Fix search query orderBy [#11210](https://github.com/statamic/cms/issues/11210) by @jasonvarga
+- Allow Values object and Group fieldtype to be iterated [#11182](https://github.com/statamic/cms/issues/11182) by @jasonvarga
+- French translations [#11196](https://github.com/statamic/cms/issues/11196) by @ebeauchamps
+
+
+
 ## 5.41.0 (2024-11-27)
 
 ### What's new
