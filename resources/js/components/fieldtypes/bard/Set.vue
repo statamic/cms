@@ -3,6 +3,7 @@
     <node-view-wrapper>
         <div class="bard-set whitespace-normal my-6 rounded bg-white dark:bg-dark-500 border dark:border-dark-900 shadow-md"
             :class="{ 'border-blue-400 dark:border-dark-blue-100': selected || withinSelection, 'has-error': hasError }"
+            :data-type="config.handle"
             contenteditable="false" @copy.stop @paste.stop @cut.stop
         >
             <div ref="content" hidden />
@@ -11,7 +12,7 @@
                 <div class="flex items-center flex-1 p-2 replicator-set-header-inner cursor-pointer" :class="{'flex items-center': collapsed}" @click="toggleCollapsedState">
                     <label class="text-xs rtl:ml-2 ltr:mr-2">
                         <span v-if="isSetGroupVisible">
-                            {{ setGroup.display }}
+                            {{ __(setGroup.display) }}
                             <svg-icon name="micro/chevron-right" class="w-4" />
                         </span>
                         {{ display || config.handle }}
@@ -31,7 +32,9 @@
                         class="toggle-sm rtl:ml-4 ltr:mr-4"
                         v-model="enabled"
                         v-tooltip.top="(enabled) ? __('Included in output') : __('Hidden from output')" />
-                    <dropdown-list class="-mt-1">
+                    <dropdown-list>
+                        <dropdown-actions :actions="fieldActions" v-if="fieldActions.length" />
+                        <div class="divider" />
                         <dropdown-item :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))" @click="toggleCollapsedState" />
                         <dropdown-item :text="__('Duplicate Set')" @click="duplicate" />
                         <dropdown-item :text="__('Delete Set')" class="warning" @click="deleteNode" />
@@ -68,6 +71,8 @@ import { NodeViewWrapper } from '@tiptap/vue-2';
 import SetField from '../replicator/Field.vue';
 import ManagesPreviewText from '../replicator/ManagesPreviewText';
 import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
+import HasFieldActions from '../../field-actions/HasFieldActions.js';
+import DropdownActions from '../../field-actions/DropdownActions.vue';
 
 export default {
 
@@ -82,11 +87,15 @@ export default {
         'deleteNode', // delete the current node
     ],
 
-    components: { NodeViewWrapper, SetField },
+    components: { NodeViewWrapper, SetField, DropdownActions },
 
-    mixins: [ValidatesFieldConditions, ManagesPreviewText],
+    mixins: [
+        ValidatesFieldConditions,
+        ManagesPreviewText, 
+        HasFieldActions,
+    ],
 
-    inject: ['bard', 'bardSets'],
+    inject: ['bard', 'bardSets', 'storeName'],
 
     computed: {
 
@@ -177,6 +186,27 @@ export default {
 
         withinSelection() {
             return this.decorationSpecs.withinSelection;
+        },
+
+        fieldVm() {
+            return this.extension.options.bard
+        },
+
+        fieldActionPayload() {
+            return {
+                vm: this,
+                fieldVm: this.fieldVm,
+                fieldPathPrefix: this.fieldVm.fieldPathPrefix || this.fieldVm.handle,
+                index: this.index,
+                values: this.values,
+                config: this.config,
+                meta: this.meta,
+                update: (handle, value) => this.updated(handle, value),
+                updateMeta: (handle, value) => this.metaUpdated(handle, value),
+                isReadOnly: this.isReadOnly,
+                store: this.$store,
+                storeName: this.storeName,
+            };
         },
 
     },

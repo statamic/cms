@@ -5,6 +5,7 @@ namespace Tests\Stache\Stores;
 use Facades\Statamic\Stache\Traverser;
 use Illuminate\Filesystem\Filesystem;
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Globals\Variables;
 use Statamic\Facades\Path;
 use Statamic\Stache\Stache;
@@ -35,7 +36,7 @@ class GlobalVariablesStoreTest extends TestCase
         (new Filesystem)->deleteDirectory($this->tempDir);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_yaml_files_from_the_root()
     {
         touch($this->tempDir.'/one.yaml', 1234567890);
@@ -59,7 +60,7 @@ class GlobalVariablesStoreTest extends TestCase
         $this->assertTrue(file_exists($dir.'/three.txt'));
     }
 
-    /** @test */
+    #[Test]
     public function it_makes_global_variable_instances_from_files()
     {
         $item = $this->store->makeItemFromFile(Path::tidy($this->tempDir.'/example.yaml'), "title: Example\ndata:\n  foo: bar");
@@ -69,7 +70,7 @@ class GlobalVariablesStoreTest extends TestCase
         $this->assertEquals('example', $item->handle());
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_the_id_as_the_item_key()
     {
         $set = Mockery::mock();

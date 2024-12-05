@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Roles;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Role;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -39,7 +40,7 @@ class StoreRoleTest extends TestCase
         return tap(User::make()->assignRole('user'))->save();
     }
 
-    /** @test */
+    #[Test]
     public function it_denies_access_without_permission_to_create_roles()
     {
         $this
@@ -49,7 +50,7 @@ class StoreRoleTest extends TestCase
             ->assertRedirect('/original');
     }
 
-    /** @test */
+    #[Test]
     public function it_stores_a_role()
     {
         $this
@@ -68,7 +69,7 @@ class StoreRoleTest extends TestCase
         $this->assertFalse($role->isSuper());
     }
 
-    /** @test */
+    #[Test]
     public function super_users_can_mark_a_role_as_super()
     {
         $this
@@ -82,7 +83,7 @@ class StoreRoleTest extends TestCase
         $this->assertTrue($role->isSuper());
     }
 
-    /** @test */
+    #[Test]
     public function non_super_users_may_not_mark_a_role_as_super()
     {
         $this
@@ -96,7 +97,7 @@ class StoreRoleTest extends TestCase
         $this->assertFalse($role->isSuper());
     }
 
-    /** @test */
+    #[Test]
     public function cannot_sneak_a_super_into_permissions_array()
     {
         $this

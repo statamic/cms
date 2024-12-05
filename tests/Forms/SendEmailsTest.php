@@ -3,6 +3,8 @@
 namespace Tests\Forms;
 
 use Illuminate\Support\Facades\Bus;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Form as FacadesForm;
 use Statamic\Facades\Site;
 use Statamic\Forms\DeleteTemporaryAttachments;
@@ -15,7 +17,7 @@ class SendEmailsTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_queues_email_jobs()
     {
         Bus::fake();
@@ -55,7 +57,7 @@ class SendEmailsTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_queues_email_jobs_when_config_contains_single_email()
     {
         // The email config should be an array of email configs.
@@ -85,7 +87,7 @@ class SendEmailsTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_dispatches_delete_attachments_job_after_dispatching_email_jobs()
     {
         Bus::fake();
@@ -113,11 +115,8 @@ class SendEmailsTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider noEmailsProvider
-     */
+    #[Test]
+    #[DataProvider('noEmailsProvider')]
     public function no_email_jobs_are_queued_if_none_are_configured($emailConfig)
     {
         Bus::fake();

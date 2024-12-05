@@ -2,6 +2,7 @@
 
 namespace Tests\Preferences;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Preference;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -11,7 +12,7 @@ class EndpointsTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_can_set_a_preference()
     {
         $user = User::make()->makeSuper()->save();
@@ -39,7 +40,7 @@ class EndpointsTest extends TestCase
         $this->assertEquals($expected, Preference::all());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_append_a_preference()
     {
         $user = User::make()
@@ -69,7 +70,7 @@ class EndpointsTest extends TestCase
         $this->assertEquals($expected, Preference::all());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_remove_a_preference()
     {
         $user = User::make()
@@ -92,7 +93,7 @@ class EndpointsTest extends TestCase
         $this->assertEquals($expected, Preference::all());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_remove_a_preference_array_value()
     {
         $user = User::make()

@@ -3,12 +3,13 @@
 namespace Tests\Events;
 
 use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\Event as StatamicEvent;
 use Tests\TestCase;
 
 class MacroTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_can_forget_a_listener_using_string_notation()
     {
         Event::listen(JokeSaved::class, 'Listener@handle');
@@ -22,7 +23,7 @@ class MacroTest extends TestCase
         $this->assertNoRegisteredListenersForEvent(JokeSaved::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_forget_a_listener_using_array_notation()
     {
         Event::listen(JokeSaved::class, ['Listener', 'handle']);
@@ -36,7 +37,7 @@ class MacroTest extends TestCase
         $this->assertNoRegisteredListenersForEvent(JokeSaved::class);
     }
 
-    /** @test */
+    #[Test]
     public function forgetting_a_listener_doesnt_affect_other_events_or_listeners()
     {
         Event::listen(JokeSaved::class, 'SubscriberOne@handle');

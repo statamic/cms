@@ -130,7 +130,7 @@ abstract class Relationship extends Fieldtype
             'canCreate' => $this->canCreate(),
             'canSearch' => $this->canSearch(),
             'statusIcons' => $this->statusIcons(),
-            'creatables' => $this->getCreatables(),
+            'creatables' => $this->canCreate() ? $this->getCreatables() : [],
             'formComponent' => $this->getFormComponent(),
             'formComponentProps' => $this->getFormComponentProps(),
             'taggable' => $this->getTaggable(),
@@ -229,6 +229,11 @@ abstract class Relationship extends Fieldtype
         return collect($values)->map(function ($id) {
             return $this->toItemArray($id);
         })->values();
+    }
+
+    public function getItemHint($item): ?string
+    {
+        return null;
     }
 
     abstract protected function toItemArray($id);

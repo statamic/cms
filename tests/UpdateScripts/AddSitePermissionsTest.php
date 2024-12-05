@@ -2,6 +2,7 @@
 
 namespace Tests\UpdateScripts;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Role;
 use Statamic\UpdateScripts\AddSitePermissions;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -12,13 +13,13 @@ class AddSitePermissionsTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk, RunsUpdateScripts;
 
-    /** @test */
+    #[Test]
     public function it_is_registered()
     {
         $this->assertUpdateScriptRegistered(AddSitePermissions::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_add_site_permissions()
     {
         $this->setSites([

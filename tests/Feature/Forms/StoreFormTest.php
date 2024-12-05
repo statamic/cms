@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Forms;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Form;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
@@ -20,7 +21,7 @@ class StoreFormTest extends TestCase
         $app['config']['statamic.forms.forms'] = $this->fakeStacheDirectory.'/forms';
     }
 
-    /** @test */
+    #[Test]
     public function it_denies_access_if_you_dont_have_permission()
     {
         $this
@@ -31,7 +32,7 @@ class StoreFormTest extends TestCase
             ->assertSessionHas('error', 'You are not authorized to create forms.');
     }
 
-    /** @test */
+    #[Test]
     public function it_stores_a_form()
     {
         $this->assertCount(0, Form::all());
@@ -48,7 +49,7 @@ class StoreFormTest extends TestCase
         $this->assertEquals('Test Form', $form->title());
     }
 
-    /** @test */
+    #[Test]
     public function title_is_required()
     {
         $this->assertCount(0, Form::all());
@@ -65,7 +66,7 @@ class StoreFormTest extends TestCase
         $this->assertCount(0, Form::all());
     }
 
-    /** @test */
+    #[Test]
     public function handle_must_be_alpha_dash()
     {
         $this->assertCount(0, Form::all());
@@ -82,7 +83,7 @@ class StoreFormTest extends TestCase
         $this->assertCount(0, Form::all());
     }
 
-    /** @test */
+    #[Test]
     public function handle_is_a_slugified_title_if_not_provided()
     {
         $this->assertCount(0, Form::all());

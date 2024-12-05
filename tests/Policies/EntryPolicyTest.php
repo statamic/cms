@@ -3,13 +3,14 @@
 namespace Tests\Policies;
 
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 
 class EntryPolicyTest extends PolicyTestCase
 {
-    /** @test */
+    #[Test]
     public function entry_is_viewable_with_view_permissions()
     {
         $user = $this->userWithPermissions(['view alfa entries']);
@@ -25,7 +26,7 @@ class EntryPolicyTest extends PolicyTestCase
         $this->assertFalse($user->can('edit', $entryB));
     }
 
-    /** @test */
+    #[Test]
     public function entry_is_viewable_with_view_and_site_permissions()
     {
         $this->withSites(['en', 'fr', 'de', 'es']);
@@ -48,7 +49,7 @@ class EntryPolicyTest extends PolicyTestCase
         $this->assertTrue($user->can('view', $entryDe));
     }
 
-    /** @test */
+    #[Test]
     public function entry_is_viewable_and_editable_with_edit_permissions()
     {
         $user = $this->userWithPermissions(['edit alfa entries']);
@@ -64,7 +65,7 @@ class EntryPolicyTest extends PolicyTestCase
         $this->assertFalse($user->can('edit', $entryB));
     }
 
-    /** @test */
+    #[Test]
     public function entry_is_editable_with_edit_and_site_permissions()
     {
         $this->withSites(['en', 'fr', 'de', 'es']);
@@ -89,7 +90,7 @@ class EntryPolicyTest extends PolicyTestCase
         $this->assertTrue($user->can('edit', $entryDe));
     }
 
-    /** @test */
+    #[Test]
     public function entry_is_creatable_with_create_permissions()
     {
         $user = $this->userWithPermissions(['create alfa entries']);
@@ -103,7 +104,7 @@ class EntryPolicyTest extends PolicyTestCase
         $this->assertFalse($user->can('store', [Entry::class, $collectionB]));
     }
 
-    /** @test */
+    #[Test]
     public function entry_is_creatable_with_create_and_site_permissions()
     {
         $this->withSites(['en', 'fr', 'de', 'es']);
@@ -127,7 +128,7 @@ class EntryPolicyTest extends PolicyTestCase
         $this->assertTrue($user->can('create', [Entry::class, $collection]));
     }
 
-    /** @test */
+    #[Test]
     public function entry_is_not_creatable_without_create_and_site_permissions()
     {
         $this->withSites(['en', 'fr', 'de', 'es']);
@@ -150,13 +151,13 @@ class EntryPolicyTest extends PolicyTestCase
         $this->assertFalse($user->can('create', [Entry::class, $collection]));
     }
 
-    /** @test */
+    #[Test]
     public function another_authors_entry_is_editable()
     {
         $this->markTestIncomplete();
     }
 
-    /** @test */
+    #[Test]
     public function another_authors_entry_is_editable_with_site_permission()
     {
         $this->markTestIncomplete();

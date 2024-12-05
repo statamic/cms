@@ -4,12 +4,15 @@ namespace Statamic\View\Antlers\Language\Runtime;
 
 use Exception;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Query\Builder;
+use Statamic\Contracts\Support\Boolable;
 use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Value;
@@ -89,6 +92,8 @@ class PathDataManager
      */
     private $reduceFinal = true;
 
+    private $isReturningForConditions = false;
+
     /**
      * @var Parser|null
      */
@@ -163,6 +168,17 @@ class PathDataManager
         if ($this->nodeProcessor != null) {
             $this->nodeProcessor->restoreLockedData();
         }
+    }
+
+    /**
+     * Reset state for things that should not persist
+     * across repeated calls to getData and friends.
+     *
+     * @return void
+     */
+    private function resetInternalState()
+    {
+        $this->isReturningForConditions = false;
     }
 
     /**
@@ -296,6 +312,13 @@ class PathDataManager
     public function setReduceFinal($reduceFinal)
     {
         $this->reduceFinal = $reduceFinal;
+
+        return $this;
+    }
+
+    public function setIsReturningForConditions($isCondition)
+    {
+        $this->isReturningForConditions = $isCondition;
 
         return $this;
     }
@@ -523,6 +546,8 @@ class PathDataManager
             $path = $tempPathParser->parse($dynamicPath);
 
             if (! $this->guardRuntimeAccess($path->normalizedReference)) {
+                $this->resetInternalState();
+
                 return null;
             }
         }
@@ -555,6 +580,8 @@ class PathDataManager
                 }
 
                 if ($pathItem->name == 'void' && count($path->pathParts) == 1) {
+                    $this->resetInternalState();
+
                     return 'void::'.GlobalRuntimeState::$environmentId;
                 }
 
@@ -616,10 +643,12 @@ class PathDataManager
                             }
                         }
 
-                        if (count($path->pathParts) > 1 && $this->isPair == false) {
+                        if (count($path->pathParts) > 1 && $this->isPair == false && ! $this->reducedVar instanceof Model) {
                             // If we have more steps in the path to take, but we are
                             // not a tag pair, we need to reduce anyway so we
                             // can descend further into the nested values.
+                            // We skip this step for Models to prevent
+                            // some of the reflection stuff below.
                             $this->lockData();
                             $this->reducedVar = self::reduce($this->reducedVar, true, $this->shouldDoValueIntercept);
                             $this->unlockData();
@@ -669,7 +698,11 @@ class PathDataManager
                     $wasBuilderGoingIntoLast = true;
                 }
 
-                $this->reduceVar($pathItem, $data);
+                if ($this->reducedVar instanceof Model) {
+                    $this->reducedVar = $this->reducedVar->{$pathItem->name};
+                } else {
+                    $this->reduceVar($pathItem, $data);
+                }
 
                 $this->collapseValues($pathItem->isFinal);
 
@@ -749,7 +782,12 @@ class PathDataManager
             $this->compact(true);
         }
 
+        if ($this->reducedVar instanceof Model && $this->isPair) {
+            $this->reducedVar = self::reduce($this->reducedVar, true, true, false);
+        }
+
         $this->namedSlotsInScope = false;
+        $this->resetInternalState();
 
         return $this->reducedVar;
     }
@@ -883,8 +921,18 @@ class PathDataManager
      */
     private function compact($isFinal)
     {
+        if (! $isFinal && $this->reducedVar instanceof Model) {
+            return;
+        }
+
         if ($this->isForArrayIndex && $isFinal && is_object($this->reducedVar) && method_exists($this->reducedVar, '__toString')) {
             $this->reducedVar = (string) $this->reducedVar;
+
+            return;
+        }
+
+        if ($this->isReturningForConditions && $isFinal && $this->reducedVar instanceof Boolable) {
+            $this->reducedVar = $this->reducedVar->toBool();
 
             return;
         }
@@ -919,12 +967,17 @@ class PathDataManager
      * @param  mixed  $value  The value to reduce.
      * @param  bool  $isPair  Indicates if the path belongs to a node pair.
      * @param  bool  $reduceBuildersAndAugmentables  Indicates if Builder and Augmentable instances should be resolved.
+     * @param  bool  $leaveModelsAlone
      * @return array|string
      */
-    public static function reduce($value, $isPair = true, $reduceBuildersAndAugmentables = true)
+    public static function reduce($value, $isPair = true, $reduceBuildersAndAugmentables = true, $leaveModelsAlone = true)
     {
         $reductionStack = [$value];
         $returnValue = $value;
+
+        if ($value instanceof Model && $leaveModelsAlone) {
+            return $value;
+        }
 
         while (! empty($reductionStack)) {
             $reductionValue = array_pop($reductionStack);
@@ -983,6 +1036,26 @@ class PathDataManager
                 GlobalRuntimeState::$isEvaluatingData = false;
 
                 continue;
+            } elseif ($reductionValue instanceof Model) {
+                GlobalRuntimeState::$isEvaluatingData = true;
+                $data = $reductionValue->toArray();
+
+                foreach (get_class_methods($reductionValue) as $method) {
+                    if ((new \ReflectionMethod($reductionValue, $method))->getReturnType()?->getName() === Attribute::class) {
+                        $method = Str::snake($method);
+                        $data[$method] = $reductionValue->$method;
+                    }
+
+                    if (Str::startsWith($method, 'get') && Str::endsWith($method, 'Attribute')) {
+                        $method = Str::of($method)->after('get')->before('Attribute')->snake()->__toString();
+                        $data[$method] = $reductionValue->getAttribute($method);
+                    }
+                }
+
+                $reductionStack[] = $data;
+                GlobalRuntimeState::$isEvaluatingData = false;
+
+                continue;
             } elseif ($reductionValue instanceof Arrayable) {
                 GlobalRuntimeState::$isEvaluatingData = true;
                 $reductionStack[] = $reductionValue->toArray();
@@ -1016,6 +1089,10 @@ class PathDataManager
     {
         GlobalRuntimeState::$isEvaluatingUserData = true;
         GlobalRuntimeState::$isEvaluatingData = true;
+
+        if ($value instanceof Model) {
+            return $value;
+        }
 
         if ($value instanceof Collection) {
             $value = $value->all();

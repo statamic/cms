@@ -3,12 +3,13 @@
 namespace Tests\Modifiers;
 
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class ValuesTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_gets_the_values_of_an_array(): void
     {
         $input = [
@@ -20,7 +21,7 @@ class ValuesTest extends TestCase
         $this->assertEquals(['nuggets', 'Denver'], $modified);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_values_of_a_collection(): void
     {
         $input = collect([

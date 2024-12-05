@@ -3,16 +3,18 @@
 namespace Tests\Search;
 
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Search\Algolia\Index;
 use Statamic\Search\Algolia\Query;
 use Tests\TestCase;
 
 class AlgoliaQueryTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_adds_scores()
     {
         $index = Mockery::mock(Index::class);
+        $index->shouldReceive('name');
         $index->shouldReceive('searchUsingApi')->with('foo')->once()->andReturn(collect([
             ['reference' => 'a'],
             ['reference' => 'b'],

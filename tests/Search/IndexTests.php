@@ -3,11 +3,12 @@
 namespace Tests\Search;
 
 use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\SearchQueryPerformed;
 
 trait IndexTests
 {
-    /** @test */
+    #[Test]
     public function search_event_gets_emitted()
     {
         $this->markTestSkipped();

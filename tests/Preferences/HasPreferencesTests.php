@@ -2,9 +2,11 @@
 
 namespace Tests\Preferences;
 
+use PHPUnit\Framework\Attributes\Test;
+
 trait HasPreferencesTests
 {
-    /** @test */
+    #[Test]
     public function it_can_get_and_set_array_of_preferences()
     {
         $preferences = ['language' => 'english'];
@@ -18,7 +20,7 @@ trait HasPreferencesTests
         $this->assertEquals($preferences, $user->preferences());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_set_array_of_preferences()
     {
         $user = $this->makeUser();
@@ -41,7 +43,7 @@ trait HasPreferencesTests
         $this->assertEquals($expected, $user->preferences());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_merge_array_of_preferences()
     {
         $user = $this->makeUser();
@@ -65,7 +67,7 @@ trait HasPreferencesTests
         $this->assertEquals($expected, $user->preferences());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_set_a_single_preference()
     {
         $user = $this->makeUser();
@@ -84,7 +86,7 @@ trait HasPreferencesTests
         $this->assertEquals($expected, $user->preferences());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_remove_a_single_preference()
     {
         $user = $this->makeUser();
@@ -114,7 +116,7 @@ trait HasPreferencesTests
         $this->assertEquals($expected, $user->preferences());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_remove_a_single_preference_array_value()
     {
         $user = $this->makeUser();
@@ -163,7 +165,7 @@ trait HasPreferencesTests
         $this->assertEquals($expected, $user->preferences());
     }
 
-    /** @test */
+    #[Test]
     public function it_cleans_up_by_default_after_removing()
     {
         $user = $this->makeUser();
@@ -185,7 +187,7 @@ trait HasPreferencesTests
         $this->assertEquals([], $user->preferences());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_remove_with_cleanup_disabled()
     {
         $user = $this->makeUser();
@@ -211,7 +213,7 @@ trait HasPreferencesTests
         $this->assertEquals($expected, $user->preferences());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_a_single_preference()
     {
         $user = $this->makeUser();
@@ -229,7 +231,7 @@ trait HasPreferencesTests
         $this->assertEquals(null, $user->getPreference('language'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_check_if_a_single_preference_exists()
     {
         $user = $this->makeUser();
@@ -247,7 +249,7 @@ trait HasPreferencesTests
         $this->assertFalse($user->hasPreference('language'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_modify_a_preference()
     {
         $user = $this->makeUser();
@@ -261,7 +263,7 @@ trait HasPreferencesTests
         $this->assertEquals('PIZZA', $user->getPreference('favorite'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_append_to_a_preference()
     {
         $user = $this->makeUser();
@@ -278,7 +280,7 @@ trait HasPreferencesTests
         $this->assertEquals($expected, $user->getPreference('favorite'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_cleanup_a_preference()
     {
         $user = $this->makeUser();

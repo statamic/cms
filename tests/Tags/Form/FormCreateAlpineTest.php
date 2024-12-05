@@ -2,6 +2,7 @@
 
 namespace Tests\Tags\Form;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Statamic;
 
 class FormCreateAlpineTest extends FormTestCase
@@ -71,7 +72,7 @@ class FormCreateAlpineTest extends FormTestCase
         ],
     ];
 
-    /** @test */
+    #[Test]
     public function it_shows_js_driver_in_form_data()
     {
         $this->assertStringContainsString(
@@ -85,7 +86,7 @@ class FormCreateAlpineTest extends FormTestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_x_data_on_form_tag()
     {
         $output = $this->tag('{{ form:contact js="alpine" }}{{ /form:contact }}');
@@ -105,7 +106,7 @@ class FormCreateAlpineTest extends FormTestCase
         $this->assertStringContainsString($expected, $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_x_data_with_old_data_on_form_tag()
     {
         $this
@@ -131,7 +132,7 @@ class FormCreateAlpineTest extends FormTestCase
         $this->assertStringContainsString($expected, $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_scoped_x_data_on_form_tag()
     {
         $output = $this->tag('{{ form:contact js="alpine:my_form" }}{{ /form:contact }}');
@@ -153,7 +154,7 @@ class FormCreateAlpineTest extends FormTestCase
         $this->assertStringContainsString($expected, $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_scoped_x_data_with_old_data_on_form_tag()
     {
         $this
@@ -182,7 +183,7 @@ class FormCreateAlpineTest extends FormTestCase
         $this->assertStringContainsString($expected, $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_proper_x_data_for_multiple_select_field()
     {
         $config = [
@@ -203,7 +204,7 @@ class FormCreateAlpineTest extends FormTestCase
         $this->assertFieldRendersHtml($expected, $config, [], ['js' => 'alpine']);
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_proper_x_data_for_multiple_assets_field()
     {
         $config = [
@@ -220,7 +221,7 @@ class FormCreateAlpineTest extends FormTestCase
         $this->assertFieldRendersHtml($expected, $config, [], ['js' => 'alpine']);
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_show_field_js()
     {
         $outputWithJsDisabled = $this->tag('{{ form:contact }}{{ /form:contact }}');
@@ -253,7 +254,7 @@ EOT
         $this->assertEquals($expected, $js[1]);
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_scoped_show_field_js()
     {
         $outputWithJsDisabled = $this->tag('{{ form:contact }}{{ /form:contact }}');
@@ -286,7 +287,7 @@ EOT
         $this->assertEquals($expected, $js[1]);
     }
 
-    /** @test */
+    #[Test]
     public function it_dynamically_renders_text_field_x_model()
     {
         $config = [
@@ -300,7 +301,7 @@ EOT
         $this->assertFieldRendersHtml(['<input type="text" name="name" value="" x-model="my_form.name">'], $config, [], ['js' => 'alpine:my_form']);
     }
 
-    /** @test */
+    #[Test]
     public function it_dynamically_renders_textarea_field_x_model()
     {
         $config = [
@@ -314,7 +315,7 @@ EOT
         $this->assertFieldRendersHtml(['<textarea name="comment" rows="5" x-model="my_form.comment"></textarea>'], $config, [], ['js' => 'alpine:my_form']);
     }
 
-    /** @test */
+    #[Test]
     public function it_dynamically_renders_checkboxes_field_x_model()
     {
         $config = [
@@ -338,7 +339,7 @@ EOT
         $this->assertFieldRendersHtml(['<input type="checkbox" name="fav_animals[]" value="armadillo" x-model="my_form.fav_animals">'], $config, [], ['js' => 'alpine:my_form']);
     }
 
-    /** @test */
+    #[Test]
     public function it_dynamically_renders_radio_field_x_model()
     {
         $config = [
@@ -362,7 +363,7 @@ EOT
         $this->assertFieldRendersHtml(['<input type="radio" name="fav_animal" value="armadillo" x-model="my_form.fav_animal">'], $config, [], ['js' => 'alpine:my_form']);
     }
 
-    /** @test */
+    #[Test]
     public function it_dynamically_renders_select_field_x_model()
     {
         $config = [
@@ -400,7 +401,7 @@ EOT
         $this->assertFieldRendersHtml($expectedScoped, $config, [], ['js' => 'alpine:my_form']);
     }
 
-    /** @test */
+    #[Test]
     public function it_dynamically_renders_asset_field_x_model()
     {
         $config = [
@@ -416,7 +417,7 @@ EOT
         $this->assertFieldRendersHtml('<input type="file" name="cat_selfie" x-model="my_form.cat_selfie">', $config, [], ['js' => 'alpine:my_form']);
     }
 
-    /** @test */
+    #[Test]
     public function it_dynamically_renders_field_with_fallback_to_default_partial_x_model()
     {
         $config = [
@@ -430,7 +431,7 @@ EOT
         $this->assertFieldRendersHtml('<input type="text" name="custom" value="" x-model="my_form.custom">', $config, [], ['js' => 'alpine:my_form']);
     }
 
-    /** @test */
+    #[Test]
     public function it_merges_any_x_data_passed_to_the_tag()
     {
         $output = $this->tag('{{ form:contact js="alpine:my_form" \x-data=\'{"extra":"yes"}\' }}{{ /form:contact }}');

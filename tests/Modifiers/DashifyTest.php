@@ -2,6 +2,8 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
@@ -17,11 +19,8 @@ class DashifyTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider undashyThingsProvider
-     */
+    #[Test]
+    #[DataProvider('undashyThingsProvider')]
     public function it_returns_a_lowercase_and_trimmed_string_separated_by_dashes($expected, $input): void
     {
         $modified = $this->modify($input);

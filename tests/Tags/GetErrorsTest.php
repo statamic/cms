@@ -4,6 +4,8 @@ namespace Tests\Tags;
 
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Parse;
 use Tests\TestCase;
 
@@ -14,11 +16,8 @@ class GetErrorsTest extends TestCase
         return (string) Parse::template($tag, $data);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider organizedProvider
-     */
+    #[Test]
+    #[DataProvider('organizedProvider')]
     public function it_gets_errors_organized_into_fields($params, $bag, $errors, $expected)
     {
         view()->share('errors', (new ViewErrorBag())->put($bag, new MessageBag($errors)));
@@ -88,11 +87,8 @@ EOT;
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider allProvider
-     */
+    #[Test]
+    #[DataProvider('allProvider')]
     public function it_gets_errors_for_all_fields_together($params, $bag, $errors, $expected)
     {
         view()->share('errors', (new ViewErrorBag())->put($bag, new MessageBag($errors)));
@@ -153,11 +149,8 @@ EOT;
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider fieldProvider
-     */
+    #[Test]
+    #[DataProvider('fieldProvider')]
     public function it_gets_errors_for_a_single_field($params, $bag, $errors, $expected)
     {
         view()->share('errors', (new ViewErrorBag())->put($bag, new MessageBag($errors)));

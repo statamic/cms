@@ -2,12 +2,13 @@
 
 namespace Tests\CP;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\CP\Column;
 use Tests\TestCase;
 
 class ColumnTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_can_make_a_basic_column()
     {
         $column = Column::make('first_name');
@@ -17,7 +18,7 @@ class ColumnTest extends TestCase
         $this->assertTrue($column->visible());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_explicitly_set_data_and_serialize_to_json()
     {
         $column = Column::make()
@@ -40,7 +41,7 @@ class ColumnTest extends TestCase
         $this->assertEquals(true, $json->numeric);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_set_a_value_field()
     {
         $column = Column::make()->field('date');

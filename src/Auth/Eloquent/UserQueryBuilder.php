@@ -16,7 +16,7 @@ class UserQueryBuilder extends EloquentQueryBuilder
             $query->select(DB::raw(1))
                 ->from($this->groupsTable())
                 ->where('group_id', $operator, $value)
-                ->whereColumn($this->groupsTable().'.user_id', 'users.id');
+                ->whereColumn($this->groupsTable().'.user_id', $this->usersTable().'.id');
         });
 
         return $this;
@@ -36,7 +36,7 @@ class UserQueryBuilder extends EloquentQueryBuilder
             $query->select(DB::raw(1))
                 ->from($this->groupsTable())
                 ->whereIn('group_id', $groups)
-                ->whereColumn($this->groupsTable().'.user_id', 'users.id');
+                ->whereColumn($this->groupsTable().'.user_id', $this->usersTable().'.id');
         });
 
         return $this;
@@ -56,7 +56,7 @@ class UserQueryBuilder extends EloquentQueryBuilder
             $query->select(DB::raw(1))
                 ->from($this->rolesTable())
                 ->where('role_id', $operator, $value)
-                ->whereColumn($this->rolesTable().'.user_id', 'users.id');
+                ->whereColumn($this->rolesTable().'.user_id', $this->usersTable().'.id');
         });
 
         return $this;
@@ -76,7 +76,7 @@ class UserQueryBuilder extends EloquentQueryBuilder
             $query->select(DB::raw(1))
                 ->from($this->rolesTable())
                 ->whereIn('role_id', $roles)
-                ->whereColumn($this->rolesTable().'.user_id', 'users.id');
+                ->whereColumn($this->rolesTable().'.user_id', $this->usersTable().'.id');
         });
 
         return $this;
@@ -94,6 +94,11 @@ class UserQueryBuilder extends EloquentQueryBuilder
         return UserCollection::make($items)->map(function ($model) {
             return User::make()->model($model);
         });
+    }
+
+    private function usersTable()
+    {
+        return config('statamic.users.tables.users', 'users');
     }
 
     private function groupsTable()

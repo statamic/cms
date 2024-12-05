@@ -2,12 +2,13 @@
 
 namespace Tests\Antlers\Parser;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\View\Antlers\Language\Parser\IdentifierFinder;
 use Tests\Antlers\ParserTestCase;
 
 class IdentifierFinderTest extends ParserTestCase
 {
-    /** @test */
+    #[Test]
     public function it_finds_identifiers()
     {
         $template = <<<'EOT'

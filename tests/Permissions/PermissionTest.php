@@ -3,12 +3,13 @@
 namespace Tests\Permissions;
 
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\Permission;
 use Tests\TestCase;
 
 class PermissionTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_makes_a_tree()
     {
         $permission = (new Permission)->value('one');
@@ -24,7 +25,7 @@ class PermissionTest extends TestCase
         ], $permission->toTree());
     }
 
-    /** @test */
+    #[Test]
     public function it_makes_tree_with_children()
     {
         $permission = (new Permission)
@@ -54,7 +55,7 @@ class PermissionTest extends TestCase
         ], $permission->toTree());
     }
 
-    /** @test */
+    #[Test]
     public function it_adds_a_child()
     {
         $permission = (new Permission)->value('test')->group('testgroup');
@@ -70,7 +71,7 @@ class PermissionTest extends TestCase
         $this->assertEquals('testgroup', $children[0]->group());
     }
 
-    /** @test */
+    #[Test]
     public function it_adds_a_label()
     {
         $permission = (new Permission)->value('test');
@@ -84,7 +85,7 @@ class PermissionTest extends TestCase
         $this->assertEquals('The label', $permission->toTree()[0]['label']);
     }
 
-    /** @test */
+    #[Test]
     public function it_adds_a_description()
     {
         $permission = (new Permission)->value('test');
@@ -98,7 +99,7 @@ class PermissionTest extends TestCase
         $this->assertEquals('The description', $permission->toTree()[0]['description']);
     }
 
-    /** @test */
+    #[Test]
     public function it_adds_a_group()
     {
         $permission = (new Permission)->value('test');
@@ -112,7 +113,7 @@ class PermissionTest extends TestCase
         $this->assertEquals('the-group', $permission->toTree()[0]['group']);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_its_permissions_when_replacements_are_not_defined()
     {
         $permission = (new Permission)->value('test');
@@ -121,7 +122,7 @@ class PermissionTest extends TestCase
         $this->assertEquals([$permission], $permission->permissions()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_its_permissions_when_replacements_are_defined()
     {
         $permission = (new Permission)
@@ -152,7 +153,7 @@ class PermissionTest extends TestCase
         $this->assertEquals(['Viewable FIRST', 'Viewable SECOND'], $permission->permissions()->map->label()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_combines_replacements_and_children()
     {
         $permission = (new Permission)

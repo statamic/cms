@@ -7,6 +7,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Mockery;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
@@ -43,7 +44,7 @@ class SearchablesTest extends TestCase
         AssetContainer::make('audio')->disk('audio')->save();
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_all_providers_for_whether_an_item_is_searchable()
     {
         app(Providers::class)->register($entries = Mockery::mock(Entries::class)->makePartial());
@@ -67,7 +68,7 @@ class SearchablesTest extends TestCase
         $this->assertTrue($searchables->contains($searchable));
     }
 
-    /** @test */
+    #[Test]
     public function all_searchables_include_entries_terms_assets_and_users()
     {
         app(Providers::class)->register($entries = Mockery::mock(Entries::class)->makePartial());
@@ -98,7 +99,7 @@ class SearchablesTest extends TestCase
         $this->assertEquals($everything, $items->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_searchables_from_specific_providers()
     {
         app(Providers::class)->register($entries = Mockery::mock(Entries::class)->makePartial());
@@ -114,7 +115,7 @@ class SearchablesTest extends TestCase
         $this->assertEquals([$entryA, $entryB, $userA, $userB], $searchables->all()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_transforms_values_set_in_the_config_file()
     {
         config()->set('statamic.search.indexes.default', [
@@ -146,7 +147,7 @@ class SearchablesTest extends TestCase
         ], $searchables->fields($searchable));
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_regular_value_if_theres_not_a_corresponding_transformer()
     {
         config()->set('statamic.search.indexes.default', [
@@ -168,7 +169,7 @@ class SearchablesTest extends TestCase
         ], $searchables->fields($searchable));
     }
 
-    /** @test */
+    #[Test]
     public function it_transforms_by_a_class_set_in_the_config_file()
     {
         config()->set('statamic.search.indexes.default', [
@@ -194,7 +195,7 @@ class SearchablesTest extends TestCase
         ], $searchables->fields($searchable));
     }
 
-    /** @test */
+    #[Test]
     public function if_transformed_value_is_a_string_without_a_matching_class_it_throws_exception()
     {
         $this->expectExceptionMessage('Search transformer [foo] not found.');
@@ -219,7 +220,7 @@ class SearchablesTest extends TestCase
         $searchables->fields($searchable);
     }
 
-    /** @test */
+    #[Test]
     public function if_a_closure_based_transformer_returns_an_array_it_gets_combined_into_the_results()
     {
         config()->set('statamic.search.indexes.default', [
@@ -251,7 +252,7 @@ class SearchablesTest extends TestCase
         ], $searchables->fields($searchable));
     }
 
-    /** @test */
+    #[Test]
     public function if_a_class_based_transformer_returns_an_array_it_gets_combined_into_the_results()
     {
         config()->set('statamic.search.indexes.default', [
@@ -278,7 +279,7 @@ class SearchablesTest extends TestCase
         ], $searchables->fields($searchable));
     }
 
-    /** @test */
+    #[Test]
     public function can_register_a_custom_searchable_and_get_results()
     {
         $a = new TestCustomSearchable(['title' => 'Custom 1']);
@@ -296,7 +297,7 @@ class SearchablesTest extends TestCase
         $this->assertFalse($searchables->contains($c));
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_exception_when_using_unknown_searchable()
     {
         $this->expectExceptionMessage('Unknown searchable [test]');

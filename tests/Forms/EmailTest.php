@@ -5,6 +5,8 @@ namespace Tests\Forms;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\GlobalFactory;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\GlobalSet;
@@ -18,11 +20,8 @@ class EmailTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /**
-     * @test
-     *
-     * @dataProvider multipleAddressProvider
-     */
+    #[Test]
+    #[DataProvider('multipleAddressProvider')]
     public function it_adds_recipient_from_the_config($address, $expected)
     {
         $email = $this->makeEmailWithConfig(['to' => $address]);
@@ -30,11 +29,8 @@ class EmailTest extends TestCase
         $this->assertEquals($expected, $email->to);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider singleAddressProvider
-     */
+    #[Test]
+    #[DataProvider('singleAddressProvider')]
     public function it_adds_sender_from_the_config($address, $expected)
     {
         $email = $this->makeEmailWithConfig(['from' => $address]);
@@ -42,11 +38,8 @@ class EmailTest extends TestCase
         $this->assertEquals($expected, $email->from);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider multipleAddressProvider
-     */
+    #[Test]
+    #[DataProvider('multipleAddressProvider')]
     public function it_adds_reply_to_from_the_config($address, $expected)
     {
         $email = $this->makeEmailWithConfig(['reply_to' => $address]);
@@ -54,11 +47,8 @@ class EmailTest extends TestCase
         $this->assertEquals($expected, $email->replyTo);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider multipleAddressProvider
-     */
+    #[Test]
+    #[DataProvider('multipleAddressProvider')]
     public function it_adds_cc_from_the_config($address, $expected)
     {
         $email = $this->makeEmailWithConfig(['cc' => $address]);
@@ -66,11 +56,8 @@ class EmailTest extends TestCase
         $this->assertEquals($expected, $email->cc);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider multipleAddressProvider
-     */
+    #[Test]
+    #[DataProvider('multipleAddressProvider')]
     public function it_adds_bcc_from_the_config($address, $expected)
     {
         $email = $this->makeEmailWithConfig(['bcc' => $address]);
@@ -124,7 +111,7 @@ class EmailTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_adds_subject_from_the_config()
     {
         $email = $this->makeEmailWithConfig(['subject' => 'A nice form subject']);
@@ -132,7 +119,7 @@ class EmailTest extends TestCase
         $this->assertEquals('A nice form subject', $email->subject);
     }
 
-    /** @test */
+    #[Test]
     public function it_adds_data_to_the_view()
     {
         $social = Blueprint::makeFromFields(['twitter' => ['type' => 'text']])->setHandle('social')->setNamespace('globals');
@@ -162,6 +149,7 @@ class EmailTest extends TestCase
             'social',
 
             // manual "system" vars added to email
+            'email_config',
             'config',
             'date',
             'fields',
@@ -178,13 +166,13 @@ class EmailTest extends TestCase
         $this->assertEquals('Statamic', (string) $email->viewData['company']['company_name']);
     }
 
-    /** @test */
+    #[Test]
     public function attachments_are_added()
     {
         $this->markTestIncomplete();
     }
 
-    /** @test */
+    #[Test]
     public function it_adds_renderable_fields()
     {
         $this->markTestIncomplete();
@@ -231,7 +219,7 @@ class EmailTest extends TestCase
         ))->build();
     }
 
-    /** @test */
+    #[Test]
     public function the_sites_locale_gets_used_on_the_mailable()
     {
         $this->setSites([

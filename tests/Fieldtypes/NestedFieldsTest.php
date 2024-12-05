@@ -4,6 +4,7 @@ namespace Tests\Fieldtypes;
 
 use Facades\Statamic\Fields\FieldRepository;
 use Facades\Statamic\Fields\FieldtypeRepository;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Fieldset;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
@@ -12,7 +13,7 @@ use Tests\TestCase;
 
 class NestedFieldsTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_preprocesses_each_value_when_used_for_config()
     {
         FieldtypeRepository::partialMock();
@@ -79,6 +80,7 @@ class NestedFieldsTest extends TestCase
                 'instructions' => 'Some instructions',
                 'instructions_position' => 'above',
                 'listable' => 'hidden',
+                'sortable' => true,
                 'visibility' => 'visible',
                 'replicator_preview' => true,
                 'duplicate' => true,
@@ -96,7 +98,7 @@ class NestedFieldsTest extends TestCase
         ], $actual);
     }
 
-    /** @test */
+    #[Test]
     public function it_preprocesses_from_blueprint_format_to_vue()
     {
         $testFieldset = Fieldset::make('test')->setContents(['fields' => [
@@ -173,7 +175,7 @@ class NestedFieldsTest extends TestCase
         ], $actual);
     }
 
-    /** @test */
+    #[Test]
     public function it_processes_from_vue_to_blueprint_format()
     {
         $actual = (new NestedFields)->process([

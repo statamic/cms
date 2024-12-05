@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Navigation;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -12,7 +13,7 @@ class CreateNavigationTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_shows_the_create_page_if_you_have_permission()
     {
         $this->withoutExceptionHandling();
@@ -27,7 +28,7 @@ class CreateNavigationTest extends TestCase
             ->assertSee('Create Navigation');
     }
 
-    /** @test */
+    #[Test]
     public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);

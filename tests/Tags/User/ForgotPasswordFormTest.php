@@ -3,6 +3,7 @@
 namespace Tests\Tags\User;
 
 use Illuminate\Support\Facades\Password;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Parse;
 use Statamic\Facades\User;
 use Statamic\Statamic;
@@ -18,7 +19,7 @@ class ForgotPasswordFormTest extends TestCase
         return Parse::template($tag, []);
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_form()
     {
         $output = $this->tag('{{ user:forgot_password_form }}{{ /user:forgot_password_form }}');
@@ -28,7 +29,7 @@ class ForgotPasswordFormTest extends TestCase
         $this->assertStringEndsWith('</form>', $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_form_with_params()
     {
         $output = $this->tag('{{ user:forgot_password_form redirect="/submitted" error_redirect="/errors" reset_url="/resetting" class="form" id="form" }}{{ /user:forgot_password_form }}');
@@ -39,7 +40,7 @@ class ForgotPasswordFormTest extends TestCase
         $this->assertStringContainsString('<input type="hidden" name="_reset_url" value="/resetting" />', $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_form_with_redirects_to_anchor()
     {
         $output = $this->tag('{{ user:forgot_password_form redirect="#form" error_redirect="#form" }}{{ /user:forgot_password_form }}');
@@ -48,7 +49,7 @@ class ForgotPasswordFormTest extends TestCase
         $this->assertStringContainsString('<input type="hidden" name="_error_redirect" value="http://localhost#form" />', $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_wont_send_reset_link_for_non_existent_user_and_renders_errors()
     {
         $this
@@ -77,7 +78,7 @@ EOT
         $this->assertEmpty($emailSent[1]);
     }
 
-    /** @test */
+    #[Test]
     public function it_wont_send_reset_link_for_invalid_email_and_renders_errors()
     {
         $this
@@ -106,7 +107,7 @@ EOT
         $this->assertEmpty($emailSent[1]);
     }
 
-    /** @test */
+    #[Test]
     public function it_will_send_password_reset_email_and_render_success()
     {
         $this->simulateSuccessfulPasswordResetEmail();
@@ -143,7 +144,7 @@ EOT
         $this->assertEquals([__(Password::RESET_LINK_SENT)], $emailSent[1]);
     }
 
-    /** @test */
+    #[Test]
     public function it_will_send_password_reset_email_and_follow_custom_redirect_with_success()
     {
         $this->simulateSuccessfulPasswordResetEmail();
@@ -181,7 +182,7 @@ EOT
         $this->assertEquals([__(Password::RESET_LINK_SENT)], $emailSent[1]);
     }
 
-    /** @test */
+    #[Test]
     public function it_wont_log_user_in_and_follow_custom_error_redirect_with_errors()
     {
         $this
@@ -211,7 +212,7 @@ EOT
         $this->assertEmpty($emailSent[1]);
     }
 
-    /** @test */
+    #[Test]
     public function it_will_use_redirect_query_param_off_url()
     {
         $this->get('/?redirect=password-reset-successful&error_redirect=password-reset-failure');
@@ -243,7 +244,7 @@ EOT
         Password::shouldReceive('broker')->andReturn($success);
     }
 
-    /** @test */
+    #[Test]
     public function it_fetches_form_data()
     {
         $form = Statamic::tag('user:forgot_password_form')->fetch();

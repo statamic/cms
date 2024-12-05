@@ -2,13 +2,14 @@
 
 namespace Tests\Support;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Support\Traits\Hookable;
 use Tests\TestCase;
 use Tests\TestDependency;
 
 class HookableTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function hooks_can_be_run()
     {
         $test = $this;
@@ -36,7 +37,7 @@ class HookableTest extends TestCase
         $this->assertEquals('barbaz', $class->foo);
     }
 
-    /** @test */
+    #[Test]
     public function hooks_from_one_class_dont_happen_on_another()
     {
         $hooksRan = 0;

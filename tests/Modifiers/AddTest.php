@@ -2,6 +2,7 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Value;
 use Statamic\Fieldtypes\Integer;
 use Statamic\Modifiers\Modify;
@@ -9,14 +10,14 @@ use Tests\TestCase;
 
 class AddTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_adds_a_number(): void
     {
         $modified = $this->modify(5, [5], []);
         $this->assertEquals(10, $modified);
     }
 
-    /** @test */
+    #[Test]
     public function it_adds_a_variable(): void
     {
         $context = [

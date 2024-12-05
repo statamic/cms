@@ -8,14 +8,15 @@
                     :initial-per-page="$config.get('paginationSize')"
                     :selected-path="folder"
                     :selected-assets="browserSelections"
-                    :restrict-container-navigation="restrictContainerNavigation"
                     :restrict-folder-navigation="restrictFolderNavigation"
                     :max-files="maxFiles"
                     :query-scopes="queryScopes"
                     :autoselect-uploads="true"
                     :autofocus-search="true"
+                    allow-selecting-existing-upload
                     @selections-updated="selectionsUpdated"
-                    @asset-doubleclicked="select">
+                    @asset-doubleclicked="select"
+                >
 
                     <template slot="contextual-actions" v-if="browserSelections.length">
                         <button class="btn action mb-6" @click="browserSelections = []">{{ __('Uncheck All') }}</button>
@@ -59,12 +60,6 @@ export default {
         selected: Array,
         maxFiles: Number,
         queryScopes: Array,
-        restrictContainerNavigation: {
-            type: Boolean,
-            default() {
-                return false;
-            }
-        },
         restrictFolderNavigation: {
             type: Boolean,
             default() {

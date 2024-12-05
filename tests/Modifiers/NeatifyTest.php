@@ -2,12 +2,13 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class NeatifyTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function its_kinda_neat(): void
     {
         $modified = $this->modify('Statamic');

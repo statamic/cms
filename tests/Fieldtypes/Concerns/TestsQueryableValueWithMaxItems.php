@@ -2,6 +2,9 @@
 
 namespace Tests\Fieldtypes\Concerns;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
+
 trait TestsQueryableValueWithMaxItems
 {
     public static function maxItemsProvider()
@@ -29,11 +32,8 @@ trait TestsQueryableValueWithMaxItems
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider maxItemsProvider
-     **/
+    #[Test]
+    #[DataProvider('maxItemsProvider')]
     public function it_normalizes_queryable_value($maxItems, $value, $expectedValue)
     {
         $config = [];

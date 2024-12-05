@@ -5,6 +5,8 @@ namespace Tests\Data\Taxonomies;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Events\TaxonomyCreated;
 use Statamic\Events\TaxonomyCreating;
@@ -29,7 +31,7 @@ class TaxonomyTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_stores_cascading_data_in_a_collection()
     {
         $taxonomy = new Taxonomy;
@@ -42,7 +44,7 @@ class TaxonomyTest extends TestCase
         $this->assertEquals('bar', $taxonomy->cascade()->get('foo'));
     }
 
-    /** @test */
+    #[Test]
     public function it_sets_all_the_cascade_data_when_passing_an_array()
     {
         $taxonomy = new Taxonomy;
@@ -57,7 +59,7 @@ class TaxonomyTest extends TestCase
         $this->assertEquals([], $taxonomy->cascade()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_values_from_the_cascade_with_fallbacks()
     {
         $taxonomy = new Taxonomy;
@@ -68,7 +70,7 @@ class TaxonomyTest extends TestCase
         $this->assertEquals('qux', $taxonomy->cascade('baz', 'qux'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_term_blueprints()
     {
         $taxonomy = (new Taxonomy)->handle('tags');
@@ -89,7 +91,7 @@ class TaxonomyTest extends TestCase
         $this->assertNull($taxonomy->termBlueprint('three'));
     }
 
-    /** @test */
+    #[Test]
     public function no_existing_blueprints_will_fall_back_to_a_default_named_after_the_singular_taxonomy()
     {
         $taxonomy = (new Taxonomy)->handle('tags');
@@ -120,7 +122,7 @@ class TaxonomyTest extends TestCase
         $this->assertNull($taxonomy->termBlueprint('two'));
     }
 
-    /** @test */
+    #[Test]
     public function it_dispatches_an_event_when_getting_entry_blueprint()
     {
         Event::fake();
@@ -142,7 +144,7 @@ class TaxonomyTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_url()
     {
         $taxonomy = (new Taxonomy)->handle('tags');
@@ -152,7 +154,7 @@ class TaxonomyTest extends TestCase
         $this->assertEquals('http://localhost/tags', $taxonomy->absoluteUrl());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_url_when_the_site_is_using_a_subdirectory()
     {
         $this->setSiteValue('en', 'url', '/subdirectory/');
@@ -164,7 +166,7 @@ class TaxonomyTest extends TestCase
         $this->assertEquals('http://localhost/subdirectory/tags', $taxonomy->absoluteUrl());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_url_with_a_collection()
     {
         $entry = $this->mock(EntryContract::class);
@@ -181,7 +183,7 @@ class TaxonomyTest extends TestCase
         $this->assertEquals('http://localhost/blog/tags', $taxonomy->absoluteUrl());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_evaluated_augmented_value_using_magic_property()
     {
         $taxonomy = (new Taxonomy)->handle('tags');
@@ -192,7 +194,7 @@ class TaxonomyTest extends TestCase
             ->each(fn ($value, $key) => $this->assertEquals($value->value(), $taxonomy[$key]));
     }
 
-    /** @test */
+    #[Test]
     public function it_is_arrayable()
     {
         $taxonomy = (new Taxonomy)->handle('tags');
@@ -204,11 +206,8 @@ class TaxonomyTest extends TestCase
             ->each(fn ($value, $key) => $this->assertEquals($value, $taxonomy[$key]));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider additionalPreviewTargetProvider
-     */
+    #[Test]
+    #[DataProvider('additionalPreviewTargetProvider')]
     public function it_gets_and_sets_preview_targets($throughFacade)
     {
         $taxonomy = (new Taxonomy)->handle('test');
@@ -277,7 +276,7 @@ class TaxonomyTest extends TestCase
         ], $taxonomy->additionalPreviewTargets()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_trucates_terms()
     {
         $taxonomy = tap(Facades\Taxonomy::make('tags'))->save();
@@ -292,7 +291,7 @@ class TaxonomyTest extends TestCase
         $this->assertCount(0, $taxonomy->queryTerms()->get());
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_through_the_api()
     {
         Event::fake();
@@ -320,7 +319,7 @@ class TaxonomyTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_dispatches_taxonomy_created_only_once()
     {
         Event::fake();
@@ -338,7 +337,7 @@ class TaxonomyTest extends TestCase
         Event::assertDispatched(TaxonomyCreated::class, 1);
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_quietly()
     {
         Event::fake();
@@ -355,7 +354,7 @@ class TaxonomyTest extends TestCase
         Event::assertNotDispatched(TaxonomyCreated::class);
     }
 
-    /** @test */
+    #[Test]
     public function if_creating_event_returns_false_the_taxonomy_doesnt_save()
     {
         Event::fake([TaxonomyCreated::class]);
@@ -373,7 +372,7 @@ class TaxonomyTest extends TestCase
         Event::assertNotDispatched(TaxonomyCreated::class);
     }
 
-    /** @test */
+    #[Test]
     public function if_saving_event_returns_false_the_taxonomy_doesnt_save()
     {
         Event::fake([TaxonomySaved::class]);
@@ -391,7 +390,7 @@ class TaxonomyTest extends TestCase
         Event::assertNotDispatched(TaxonomySaved::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_sets_the_layout()
     {
         $taxonomy = (new Taxonomy)->handle('tags');
@@ -404,7 +403,7 @@ class TaxonomyTest extends TestCase
         $this->assertEquals('foo', $taxonomy->layout());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_sets_the_template()
     {
         $taxonomy = (new Taxonomy)->handle('tags');
@@ -417,7 +416,7 @@ class TaxonomyTest extends TestCase
         $this->assertEquals('foo', $taxonomy->template());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_sets_the_term_template()
     {
         $taxonomy = (new Taxonomy)->handle('tags');
@@ -430,7 +429,14 @@ class TaxonomyTest extends TestCase
         $this->assertEquals('foo', $taxonomy->termTemplate());
     }
 
-    /** @test */
+    #[Test]
+    public function it_gets_and_sets_the_create_label()
+    {
+        $taxonomy = (new Taxonomy)->handle('tags');
+        $this->assertEquals('Create Term', $taxonomy->createLabel());
+    }
+
+    #[Test]
     public function it_cannot_view_taxonomies_from_sites_that_the_user_is_not_authorized_to_see()
     {
         $this->setSites([
@@ -467,7 +473,7 @@ class TaxonomyTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function it_fires_a_deleting_event()
     {
         Event::fake();
@@ -481,7 +487,7 @@ class TaxonomyTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_delete_when_a_deleting_event_returns_false()
     {
         Facades\Taxonomy::spy();
@@ -500,7 +506,7 @@ class TaxonomyTest extends TestCase
         Event::assertNotDispatched(TaxonomyDeleted::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_deletes_quietly()
     {
         Event::fake();

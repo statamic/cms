@@ -3,6 +3,7 @@
 namespace Tests\Data\Taxonomies;
 
 use Carbon\Carbon;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Contracts\Entries\Collection as CollectionContract;
 use Statamic\Contracts\Query\Builder as BuilderContract;
@@ -18,7 +19,7 @@ use Tests\Data\AugmentedTestCase;
 
 class AugmentedTermTest extends AugmentedTestCase
 {
-    /** @test */
+    #[Test]
     public function it_gets_values()
     {
         Carbon::setTestNow('2020-04-15 13:00:00');
@@ -74,7 +75,7 @@ class AugmentedTermTest extends AugmentedTestCase
         $this->assertAugmentedCorrectly($expectations, $augmented);
     }
 
-    /** @test */
+    #[Test]
     public function supplemented_title_is_used()
     {
         tap(Taxonomy::make('test'))->save();
@@ -94,7 +95,7 @@ class AugmentedTermTest extends AugmentedTestCase
         $this->assertEquals('Supplemented Title', $title->value());
     }
 
-    /** @test */
+    #[Test]
     public function collection_is_present_when_set()
     {
         $collection = tap(Collection::make('test'))->save();

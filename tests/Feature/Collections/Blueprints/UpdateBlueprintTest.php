@@ -3,6 +3,7 @@
 namespace Tests\Feature\Collections\Blueprints;
 
 use Facades\Statamic\Fields\BlueprintRepository;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Facades\Collection;
 use Statamic\Fields\Blueprint;
@@ -24,7 +25,7 @@ class UpdateBlueprintTest extends TestCase
         BlueprintRepository::swap(new FakeBlueprintRepository(BlueprintRepository::getFacadeRoot()));
     }
 
-    /** @test */
+    #[Test]
     public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
@@ -43,7 +44,7 @@ class UpdateBlueprintTest extends TestCase
         $this->assertEquals('Test', $blueprint->title());
     }
 
-    /** @test */
+    #[Test]
     public function blueprint_gets_saved()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure fields']]);
@@ -162,7 +163,7 @@ class UpdateBlueprintTest extends TestCase
         ], Facades\Blueprint::find('collections.test.test')->contents());
     }
 
-    /** @test */
+    #[Test]
     public function title_is_required()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure fields']]);
@@ -181,7 +182,7 @@ class UpdateBlueprintTest extends TestCase
         $this->assertEquals('Test', Facades\Blueprint::find('collections.test.test')->title());
     }
 
-    /** @test */
+    #[Test]
     public function tabs_are_required()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure fields']]);
@@ -201,7 +202,7 @@ class UpdateBlueprintTest extends TestCase
         $this->assertEquals($originalContents, Facades\Blueprint::find('collections.test.test')->contents());
     }
 
-    /** @test */
+    #[Test]
     public function tabs_must_be_an_array()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure fields']]);
@@ -221,7 +222,7 @@ class UpdateBlueprintTest extends TestCase
         $this->assertEquals($originalContents, Facades\Blueprint::find('collections.test.test')->contents());
     }
 
-    /** @test */
+    #[Test]
     public function width_of_100_gets_stripped_out_for_inline_fields_but_left_in_for_reference_fields_with_config_overrides()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure fields']]);
@@ -351,7 +352,7 @@ class UpdateBlueprintTest extends TestCase
         ], Facades\Blueprint::find('collections.test.test')->contents());
     }
 
-    /** @test */
+    #[Test]
     public function localizable_of_false_gets_stripped_out_for_inline_fields_but_left_in_for_reference_fields_with_config_overrides()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure fields']]);

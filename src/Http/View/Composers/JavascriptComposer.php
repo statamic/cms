@@ -61,6 +61,7 @@ class JavascriptComposer
             'googleDocsViewer' => config('statamic.assets.google_docs_viewer'),
             'focalPointEditorEnabled' => config('statamic.assets.focal_point_editor'),
             'user' => $this->user($user),
+            'defaultPreferences' => Preference::default()->all(),
             'paginationSize' => config('statamic.cp.pagination_size'),
             'paginationSizeOptions' => config('statamic.cp.pagination_size_options'),
             'multisiteEnabled' => Site::multiEnabled(),

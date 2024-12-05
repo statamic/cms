@@ -2,17 +2,16 @@
 
 namespace Tests\Fieldtypes;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Code;
 use Tests\TestCase;
 
 class CodeTest extends TestCase
 {
-    /**
-     * @test
-     *
-     * @dataProvider processValuesProvider
-     **/
+    #[Test]
+    #[DataProvider('processValuesProvider')]
     public function it_processes_values($isSelectable, $value, $expected)
     {
         $field = (new Code)->setField(new Field('test', [
@@ -31,11 +30,8 @@ class CodeTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider preProcessValuesProvider
-     **/
+    #[Test]
+    #[DataProvider('preProcessValuesProvider')]
     public function it_preprocesses_values($value, $expected)
     {
         $field = (new Code)->setField(new Field('test', ['type' => 'code']));
@@ -52,7 +48,7 @@ class CodeTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_do_any_preprocessing_for_config()
     {
         $field = (new Code)->setField(new Field('test', ['type' => 'code']));

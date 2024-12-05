@@ -3,6 +3,7 @@
 namespace Tests\Feature\Globals;
 
 use Facades\Tests\Factories\GlobalFactory;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
@@ -14,7 +15,7 @@ class EditGlobalVariablesTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
@@ -29,7 +30,7 @@ class EditGlobalVariablesTest extends TestCase
             ->assertSessionHas('error');
     }
 
-    /** @test */
+    #[Test]
     public function it_shows_the_form()
     {
         $blueprint = Blueprint::make()->setContents(['fields' => [

@@ -2,6 +2,8 @@
 
 namespace Tests;
 
+use PHPUnit\Framework\Attributes\Test;
+
 trait UnlinksPaths
 {
     protected $unlinkablePaths = [];

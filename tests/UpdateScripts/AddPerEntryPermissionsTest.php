@@ -2,6 +2,7 @@
 
 namespace Tests\UpdateScripts;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Role;
 use Statamic\UpdateScripts\AddPerEntryPermissions;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -12,7 +13,7 @@ class AddPerEntryPermissionsTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk, RunsUpdateScripts;
 
-    /** @test */
+    #[Test]
     public function it_can_add_new_per_entry_permissions()
     {
         Role::make()

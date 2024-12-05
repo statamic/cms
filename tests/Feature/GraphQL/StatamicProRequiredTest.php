@@ -2,10 +2,12 @@
 
 namespace Tests\Feature\GraphQL;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Exceptions\StatamicProAuthorizationException;
 use Tests\TestCase;
 
-/** @group graphql */
+#[Group('graphql')]
 class StatamicProRequiredTest extends TestCase
 {
     protected function getEnvironmentSetUp($app)
@@ -15,7 +17,7 @@ class StatamicProRequiredTest extends TestCase
         $app['config']->set('statamic.editions.pro', false);
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_exception_if_pro_is_disabled()
     {
         $this->expectException(StatamicProAuthorizationException::class);

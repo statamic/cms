@@ -2,6 +2,7 @@
 
 namespace Tests\Stache\Repositories;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\UserCollection;
 use Statamic\Contracts\Auth\User;
 use Statamic\Stache\Repositories\UserRepository;
@@ -23,7 +24,7 @@ class UserRepositoryTest extends TestCase
         $this->repo = new UserRepository($stache);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_all_users()
     {
         $users = $this->repo->all();
@@ -38,7 +39,7 @@ class UserRepositoryTest extends TestCase
         $this->assertEquals(['Jane Doe', 'John Smith'], $ordered->map->get('name')->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_user_by_id()
     {
         tap($this->repo->find('users-john'), function ($user) {

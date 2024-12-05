@@ -17,6 +17,7 @@ class SessionExpiryComposer
             'lifetime' => config('session.lifetime') * 60,
             'warnAt' => 60,
             'oauth' => $this->oauth(),
+            'auth' => config('statamic.cp.auth'),
         ]);
     }
 

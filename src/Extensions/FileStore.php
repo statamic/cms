@@ -8,6 +8,8 @@ use Statamic\Support\Str;
 
 class FileStore extends LaravelFileStore implements Store
 {
+    private ?string $dir = null;
+
     public function path($key)
     {
         if (! Str::startsWith($key, 'stache::')) {
@@ -16,6 +18,17 @@ class FileStore extends LaravelFileStore implements Store
 
         $key = Str::after($key, 'stache::');
 
-        return $this->directory.'/stache/'.str_replace('::', '/', $key);
+        return $this->dir().str_replace('::', '/', $key);
+    }
+
+    private function dir()
+    {
+        if ($this->dir) {
+            return $this->dir;
+        }
+
+        return $this->dir = Str::endsWith($this->directory, '/stache')
+            ? $this->directory.'/'
+            : $this->directory.'/stache/';
     }
 }

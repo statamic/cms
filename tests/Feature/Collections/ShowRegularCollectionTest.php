@@ -3,6 +3,7 @@
 namespace Tests\Feature\Collections;
 
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -16,7 +17,7 @@ class ShowRegularCollectionTest extends ShowCollectionTestCase
         return tap(Collection::make('test'))->save();
     }
 
-    /** @test */
+    #[Test]
     public function it_shows_the_entry_listing_page_if_you_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp', 'view test entries']]);

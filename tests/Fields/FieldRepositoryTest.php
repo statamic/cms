@@ -3,6 +3,7 @@
 namespace Tests\Fields;
 
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Field;
 use Statamic\Fields\FieldRepository;
 use Statamic\Fields\Fieldset;
@@ -36,7 +37,7 @@ class FieldRepositoryTest extends TestCase
         $this->repo = new FieldRepository($fieldsets);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_field_within_a_fieldset()
     {
         $field = $this->repo->find('test.one');
@@ -47,19 +48,19 @@ class FieldRepositoryTest extends TestCase
         $this->assertEquals('textarea', $field->type());
     }
 
-    /** @test */
+    #[Test]
     public function unknown_field_in_valid_fieldset_returns_null()
     {
         $this->assertNull($this->repo->find('test.unknown'));
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_null_if_fieldset_doesnt_exist()
     {
         $this->assertNull($this->repo->find('unknown.test'));
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_null_if_fieldset_and_field_are_not_both_provided()
     {
         $this->assertNull($this->repo->find('test'));

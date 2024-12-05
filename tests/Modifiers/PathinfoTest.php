@@ -2,12 +2,13 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class PathinfoTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_extracts_pathinfo()
     {
         $path = '/directory/file.pdf';
@@ -20,7 +21,7 @@ class PathinfoTest extends TestCase
         ], $this->modify($path));
     }
 
-    /** @test */
+    #[Test]
     public function it_extracts_pathinfo_components()
     {
         $path = '/directory/file.pdf';

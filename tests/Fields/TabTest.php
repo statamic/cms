@@ -3,6 +3,7 @@
 namespace Tests\Fields;
 
 use Facades\Statamic\Fields\FieldRepository;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Tab;
@@ -10,7 +11,7 @@ use Tests\TestCase;
 
 class TabTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_gets_the_handle()
     {
         $tab = new Tab('test');
@@ -18,7 +19,7 @@ class TabTest extends TestCase
         $this->assertEquals('test', $tab->handle());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_contents()
     {
         $tab = new Tab('test');
@@ -34,7 +35,7 @@ class TabTest extends TestCase
         $this->assertEquals($contents, $tab->contents());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_display_text()
     {
         $tab = (new Tab('test'))->setContents([
@@ -44,7 +45,7 @@ class TabTest extends TestCase
         $this->assertEquals('The Display Text', $tab->display());
     }
 
-    /** @test */
+    #[Test]
     public function the_display_text_falls_back_to_a_humanized_handle()
     {
         $tab = new Tab('the_tab_handle');
@@ -52,7 +53,7 @@ class TabTest extends TestCase
         $this->assertEquals('The tab handle', $tab->display());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_fields()
     {
         $tab = new Tab('test');
@@ -92,7 +93,7 @@ class TabTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function converts_to_array_suitable_for_rendering_fields_in_publish_component()
     {
         FieldRepository::shouldReceive('find')
@@ -145,6 +146,7 @@ class TabTest extends TestCase
                             'instructions' => 'One instructions',
                             'instructions_position' => 'above',
                             'listable' => 'hidden',
+                            'sortable' => true,
                             'visibility' => 'visible',
                             'replicator_preview' => true,
                             'duplicate' => true,
@@ -171,13 +173,14 @@ class TabTest extends TestCase
                             'instructions' => 'Two instructions',
                             'instructions_position' => 'above',
                             'listable' => 'hidden',
+                            'sortable' => true,
                             'visibility' => 'visible',
                             'replicator_preview' => true,
                             'duplicate' => true,
                             'type' => 'textarea',
                             'validate' => 'min:2',
                             'placeholder' => null,
-                            'character_limit' => null,
+                            'character_limit' => 0,
                             'default' => null,
                             'antlers' => false,
                             'component' => 'textarea',

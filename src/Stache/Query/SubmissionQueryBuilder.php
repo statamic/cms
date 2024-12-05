@@ -2,8 +2,8 @@
 
 namespace Statamic\Stache\Query;
 
-use Illuminate\Support\Collection;
 use Statamic\Contracts\Forms\SubmissionQueryBuilder as QueryBuilderContract;
+use Statamic\Data\DataCollection;
 use Statamic\Facades;
 use Statamic\Query\OrderBy;
 
@@ -46,7 +46,7 @@ class SubmissionQueryBuilder extends Builder implements QueryBuilderContract
 
     protected function collect($items = [])
     {
-        return Collection::make($items);
+        return DataCollection::make($items);
     }
 
     protected function getFilteredKeys()

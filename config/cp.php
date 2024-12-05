@@ -17,6 +17,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Authentication
+    |--------------------------------------------------------------------------
+    |
+    | Whether the Control Panel's authentication pages should be enabled,
+    | and where users should be redirected in order to authenticate.
+    |
+    */
+
+    'auth' => [
+        'enabled' => true,
+        'redirect_to' => null,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Start Page
     |--------------------------------------------------------------------------
     |
@@ -123,6 +138,8 @@ return [
     'custom_logo_url' => env('STATAMIC_CUSTOM_LOGO_URL', null),
 
     'custom_dark_logo_url' => env('STATAMIC_CUSTOM_DARK_LOGO_URL', null),
+
+    'custom_logo_text' => env('STATAMIC_CUSTOM_LOGO_TEXT', null),
 
     'custom_favicon_url' => env('STATAMIC_CUSTOM_FAVICON_URL', null),
 

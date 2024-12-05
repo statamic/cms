@@ -4,6 +4,7 @@ namespace Tests\Actions;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Actions\DuplicateAsset;
 use Statamic\Assets\AssetContainer;
 use Statamic\Facades\Asset;
@@ -50,7 +51,7 @@ class DuplicateAssetTest extends TestCase
         $this->assertNull($this->container->asset($file));
     }
 
-    /** @test */
+    #[Test]
     public function it_duplicates_an_asset()
     {
         $this->createAsset('alfa.jpg', 'The alfa alt text');
@@ -85,7 +86,7 @@ class DuplicateAssetTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_increments_the_number_if_duplicate_already_exists()
     {
         $this->createAsset('alfa.jpg', 'The alfa alt text');
@@ -100,7 +101,7 @@ class DuplicateAssetTest extends TestCase
         $this->assertAssetExistsAndHasData('alfa-2.jpg', ['alt' => 'The alfa alt text', 'duplicated_from' => 'test_container::path/to/alfa.jpg']);
     }
 
-    /** @test */
+    #[Test]
     public function user_with_create_permission_is_authorized()
     {
         $this->setTestRoles([

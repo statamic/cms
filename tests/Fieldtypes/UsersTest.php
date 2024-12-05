@@ -3,6 +3,7 @@
 namespace Tests\Fieldtypes;
 
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\UserCollection;
 use Statamic\Contracts\Auth\User;
 use Statamic\Contracts\Query\Builder;
@@ -27,7 +28,7 @@ class UsersTest extends TestCase
         Facades\User::make()->id('456')->set('name', 'Two')->email('two@domain.com')->save();
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_to_a_query_builder()
     {
         $augmented = $this->fieldtype()->augment([456, '123']);
@@ -37,7 +38,7 @@ class UsersTest extends TestCase
         $this->assertEquals(['456', '123'], $augmented->get()->map->id()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_to_a_query_builder_when_theres_no_value()
     {
         $augmented = $this->fieldtype()->augment(null);
@@ -46,7 +47,7 @@ class UsersTest extends TestCase
         $this->assertCount(0, $augmented->get());
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_to_a_single_user_when_max_items_is_one()
     {
         $augmented = $this->fieldtype(['max_items' => 1])->augment(['123']);
@@ -55,7 +56,7 @@ class UsersTest extends TestCase
         $this->assertEquals('one@domain.com', $augmented->email());
     }
 
-    /** @test */
+    #[Test]
     public function it_shallow_augments_to_a_collection_of_users()
     {
         $augmented = $this->fieldtype()->shallowAugment(['123', 456]);
@@ -79,7 +80,7 @@ class UsersTest extends TestCase
         ], $augmented->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function it_shallow_augments_to_a_single_user_when_max_items_is_one()
     {
         $augmented = $this->fieldtype(['max_items' => 1])->shallowAugment(['123']);

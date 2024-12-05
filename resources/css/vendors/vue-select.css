@@ -17,7 +17,6 @@
 }
 
 .vs--disabled .vs__clear,
-.vs--disabled .vs__deselect,
 .vs--disabled .vs__dropdown-toggle,
 .vs--disabled .vs__open-indicator,
 .vs--disabled .vs__search,
@@ -172,7 +171,14 @@
 	@apply clickable;
 	@apply flex items-center text-sm rounded py-0 px-2 rtl:ml-2 ltr:mr-2;
 
-    &.sortable-item { @apply cursor-grab; }
+    &.sortable-item { @apply !cursor-grab; }
+
+    &.invalid {
+        @apply border-red-300 dark:border-dark-red bg-red-100 dark:bg-red-400 text-red-500 dark:text-red-950;
+        background-image: none;
+
+        .vs__deselect { @apply text-red-500 dark:text-red-950 }
+    }
 }
 
 .vs__deselect {

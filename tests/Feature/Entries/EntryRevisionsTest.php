@@ -5,6 +5,7 @@ namespace Tests\Feature\Entries;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Folder;
@@ -39,7 +40,7 @@ class EntryRevisionsTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_revisions()
     {
         $now = Carbon::parse('2017-02-03');
@@ -96,7 +97,7 @@ class EntryRevisionsTest extends TestCase
             ->assertJsonPath('1.revisions.1.attributes.item_url', 'http://localhost/cp/collections/blog/entries/1/revisions/'.Carbon::parse('2017-02-03')->timestamp);
     }
 
-    /** @test */
+    #[Test]
     public function it_publishes_an_entry()
     {
         $now = Carbon::parse('2017-02-03');
@@ -160,7 +161,7 @@ class EntryRevisionsTest extends TestCase
         $this->assertFalse($entry->hasWorkingCopy());
     }
 
-    /** @test */
+    #[Test]
     public function it_unpublishes_an_entry()
     {
         $now = Carbon::parse('2017-02-03');
@@ -215,7 +216,7 @@ class EntryRevisionsTest extends TestCase
         $this->assertEquals('unpublish', $revision->action());
     }
 
-    /** @test */
+    #[Test]
     public function it_creates_a_revision()
     {
         $this->setTestBlueprint('test', ['foo' => ['type' => 'text']]);
@@ -273,7 +274,7 @@ class EntryRevisionsTest extends TestCase
         $this->assertTrue($entry->hasWorkingCopy());
     }
 
-    /** @test */
+    #[Test]
     public function it_restores_a_published_entrys_working_copy_to_another_revision()
     {
         $this->setTestBlueprint('test', ['foo' => ['type' => 'text']]);
@@ -335,7 +336,7 @@ class EntryRevisionsTest extends TestCase
         $this->assertCount(1, $entry->revisions());
     }
 
-    /** @test */
+    #[Test]
     public function it_restores_an_unpublished_entrys_contents_to_another_revision()
     {
         $this->setTestBlueprint('test', ['foo' => ['type' => 'text']]);

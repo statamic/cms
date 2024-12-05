@@ -7,6 +7,7 @@ use Facades\Statamic\Fields\FieldRepository;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Query\QueryableValue;
 use Statamic\CP\Column;
@@ -29,7 +30,7 @@ use Tests\TestCase;
 
 class BlueprintTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_gets_the_handle()
     {
         $blueprint = new Blueprint;
@@ -41,7 +42,7 @@ class BlueprintTest extends TestCase
         $this->assertEquals('test', $blueprint->handle());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_contents()
     {
         $blueprint = new Blueprint;
@@ -63,7 +64,7 @@ class BlueprintTest extends TestCase
         $this->assertEquals($contents, $blueprint->contents());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_title()
     {
         $blueprint = (new Blueprint)->setContents([
@@ -73,7 +74,7 @@ class BlueprintTest extends TestCase
         $this->assertEquals('Test', $blueprint->title());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_hidden_property_which_is_false_by_default()
     {
         $blueprint = new Blueprint;
@@ -89,7 +90,7 @@ class BlueprintTest extends TestCase
         $this->assertSame(false, $blueprint->hidden());
     }
 
-    /** @test */
+    #[Test]
     public function the_title_falls_back_to_a_humanized_handle()
     {
         $blueprint = (new Blueprint)->setHandle('the_blueprint_handle');
@@ -97,7 +98,7 @@ class BlueprintTest extends TestCase
         $this->assertEquals('The blueprint handle', $blueprint->title());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_tabs()
     {
         $blueprint = new Blueprint;
@@ -126,7 +127,7 @@ class BlueprintTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_puts_top_level_fields_into_a_main_tab()
     {
         $blueprint = new Blueprint;
@@ -159,7 +160,7 @@ class BlueprintTest extends TestCase
         ], $blueprint->contents());
     }
 
-    /** @test */
+    #[Test]
     public function it_converts_top_level_sections_into_tabs()
     {
         $blueprint = new Blueprint;
@@ -218,7 +219,7 @@ class BlueprintTest extends TestCase
         ], $blueprint->contents());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_check_if_has_field()
     {
         FieldsetRepository::shouldReceive('find')
@@ -262,7 +263,7 @@ class BlueprintTest extends TestCase
         $this->assertFalse($blueprint->hasFieldInTab('four', 'tab_two')); // Doesnt exist
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_fields()
     {
         $blueprint = new Blueprint;
@@ -317,7 +318,7 @@ class BlueprintTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_columns()
     {
         $blueprint = new Blueprint;
@@ -361,7 +362,7 @@ class BlueprintTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function converts_to_array_suitable_for_rendering_fields_in_publish_component()
     {
         FieldRepository::shouldReceive('find')
@@ -431,6 +432,7 @@ class BlueprintTest extends TestCase
                                     'instructions' => 'One instructions',
                                     'instructions_position' => 'above',
                                     'listable' => 'hidden',
+                                    'sortable' => true,
                                     'visibility' => 'visible',
                                     'replicator_preview' => true,
                                     'duplicate' => true,
@@ -468,13 +470,14 @@ class BlueprintTest extends TestCase
                                     'instructions' => 'Two instructions',
                                     'instructions_position' => 'above',
                                     'listable' => 'hidden',
+                                    'sortable' => true,
                                     'visibility' => 'visible',
                                     'replicator_preview' => true,
                                     'duplicate' => true,
                                     'type' => 'textarea',
                                     'placeholder' => null,
                                     'validate' => 'min:2',
-                                    'character_limit' => null,
+                                    'character_limit' => 0,
                                     'default' => null,
                                     'antlers' => false,
                                     'component' => 'textarea',
@@ -492,7 +495,7 @@ class BlueprintTest extends TestCase
         ], $blueprint->toPublishArray());
     }
 
-    /** @test */
+    #[Test]
     public function converts_to_array_suitable_for_rendering_prefixed_conditional_fields_in_publish_component()
     {
         FieldsetRepository::shouldReceive('find')
@@ -556,6 +559,7 @@ class BlueprintTest extends TestCase
                                     'instructions' => null,
                                     'instructions_position' => 'above',
                                     'listable' => 'hidden',
+                                    'sortable' => true,
                                     'visibility' => 'visible',
                                     'replicator_preview' => true,
                                     'duplicate' => true,
@@ -581,6 +585,7 @@ class BlueprintTest extends TestCase
                                     'instructions' => null,
                                     'instructions_position' => 'above',
                                     'listable' => 'hidden',
+                                    'sortable' => true,
                                     'visibility' => 'visible',
                                     'replicator_preview' => true,
                                     'duplicate' => true,
@@ -608,7 +613,7 @@ class BlueprintTest extends TestCase
         ], $blueprint->toPublishArray());
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_through_the_repository()
     {
         Event::fake();
@@ -639,7 +644,7 @@ class BlueprintTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_dispatches_blueprint_created_only_once()
     {
         Event::fake();
@@ -657,7 +662,7 @@ class BlueprintTest extends TestCase
         Event::assertDispatched(BlueprintCreated::class, 1);
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_quietly()
     {
         Event::fake();
@@ -677,7 +682,7 @@ class BlueprintTest extends TestCase
         Event::assertNotDispatched(BlueprintCreated::class);
     }
 
-    /** @test */
+    #[Test]
     public function if_creating_event_returns_false_the_blueprint_doesnt_save()
     {
         Event::fake([BlueprintCreated::class]);
@@ -694,7 +699,7 @@ class BlueprintTest extends TestCase
         Event::assertNotDispatched(BlueprintCreated::class);
     }
 
-    /** @test */
+    #[Test]
     public function if_saving_event_returns_false_the_blueprint_doesnt_save()
     {
         Event::fake([BlueprintSaved::class]);
@@ -715,7 +720,7 @@ class BlueprintTest extends TestCase
         Event::assertNotDispatched(BlueprintSaved::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_ensures_a_field_exists()
     {
         $blueprint = (new Blueprint)->setContents(['tabs' => [
@@ -761,7 +766,7 @@ class BlueprintTest extends TestCase
         $this->assertEquals(['type' => 'textarea'], $blueprint->fields()->get('new')->config());
     }
 
-    /** @test */
+    #[Test]
     public function it_ensures_a_field_exists_in_a_specific_tab()
     {
         $blueprint = (new Blueprint)->setContents(['tabs' => [
@@ -804,7 +809,7 @@ class BlueprintTest extends TestCase
         $this->assertEquals(['type' => 'textarea'], $blueprint->fields()->get('new')->config());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_add_fields_multiple_times()
     {
         $blueprint = (new Blueprint)
@@ -827,7 +832,7 @@ class BlueprintTest extends TestCase
 
     }
 
-    /** @test */
+    #[Test]
     public function it_ensures_a_field_has_config()
     {
         FieldsetRepository::shouldReceive('find')->with('the_partial')->andReturn(
@@ -890,7 +895,7 @@ class BlueprintTest extends TestCase
 
     // todo: duplicate or tweak above test but make the target field not in the first section.
 
-    /** @test */
+    #[Test]
     public function it_merges_previously_undefined_keys_into_the_config_when_ensuring_a_field_exists_and_it_already_exists()
     {
         $blueprint = (new Blueprint)->setContents(['tabs' => [
@@ -923,7 +928,7 @@ class BlueprintTest extends TestCase
         $this->assertEquals(['type' => 'text', 'foo' => 'bar'], $blueprint->fields()->get('existing')->config());
     }
 
-    /** @test */
+    #[Test]
     public function it_merges_previously_undefined_keys_into_the_config_when_ensuring_prepended_a_field_exists_and_it_already_exists()
     {
         $blueprint = (new Blueprint)->setContents(['tabs' => [
@@ -958,7 +963,7 @@ class BlueprintTest extends TestCase
         $this->assertEquals(['type' => 'text', 'foo' => 'bar'], $blueprint->fields()->get('existing')->config());
     }
 
-    /** @test */
+    #[Test]
     public function it_merges_previously_undefined_keys_into_the_config_when_ensuring_a_field_exists_and_it_already_exists_in_a_specific_tab()
     {
         $blueprint = (new Blueprint)->setContents(['tabs' => [
@@ -991,7 +996,7 @@ class BlueprintTest extends TestCase
         $this->assertEquals(['type' => 'text', 'foo' => 'bar'], $blueprint->fields()->get('existing')->config());
     }
 
-    /** @test */
+    #[Test]
     public function it_merges_config_overrides_for_previously_undefined_keys_when_ensuring_a_field_and_it_already_exists_as_a_reference()
     {
         FieldsetRepository::shouldReceive('find')->with('the_partial')->andReturn(
@@ -1033,7 +1038,7 @@ class BlueprintTest extends TestCase
         $this->assertEquals(['type' => 'text', 'foo' => 'bar'], $blueprint->fields()->get('from_partial')->config());
     }
 
-    /** @test */
+    #[Test]
     public function it_merges_undefined_config_overrides_when_ensuring_a_field_that_already_exists_inside_an_imported_fieldset()
     {
         FieldsetRepository::shouldReceive('find')->with('the_partial')->andReturn(
@@ -1080,7 +1085,7 @@ class BlueprintTest extends TestCase
         $this->assertEquals(['type' => 'text', 'foo' => 'bar'], $blueprint->fields()->get('one')->config());
     }
 
-    /** @test */
+    #[Test]
     public function it_ensures_a_field_exists_if_it_doesnt_and_prepends_it()
     {
         $blueprint = (new Blueprint)->setHandle('test')->setContents($contents = [
@@ -1121,7 +1126,7 @@ class BlueprintTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_ensures_a_field_exists_in_a_given_tab_if_it_doesnt_exist_at_all()
     {
         $blueprint = (new Blueprint)->setHandle('test')->setContents($contents = [
@@ -1172,7 +1177,7 @@ class BlueprintTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_removes_a_field()
     {
         $blueprint = (new Blueprint)->setHandle('test')->setContents($contents = [
@@ -1216,7 +1221,7 @@ class BlueprintTest extends TestCase
         $this->assertFalse($blueprint->hasField('three'));
     }
 
-    /** @test */
+    #[Test]
     public function it_removes_a_field_from_a_specific_tab()
     {
         $blueprint = (new Blueprint)->setHandle('test')->setContents($contents = [
@@ -1266,7 +1271,7 @@ class BlueprintTest extends TestCase
         $this->assertTrue($blueprint->hasField('four'));
     }
 
-    /** @test */
+    #[Test]
     public function it_removes_a_specific_tab()
     {
         $blueprint = (new Blueprint)->setHandle('test')->setContents($contents = [
@@ -1314,7 +1319,7 @@ class BlueprintTest extends TestCase
         $this->assertFalse($blueprint->hasField('four'));
     }
 
-    /** @test */
+    #[Test]
     public function it_validates_unique_handles()
     {
         $blueprint = (new Blueprint)->setHandle('test')->setContents($contents = [
@@ -1347,7 +1352,7 @@ class BlueprintTest extends TestCase
         $blueprint->fields();
     }
 
-    /** @test */
+    #[Test]
     public function it_validates_unique_handles_between_blueprint_and_imported_fieldset()
     {
         $fieldset = (new Fieldset)->setContents([
@@ -1390,7 +1395,7 @@ class BlueprintTest extends TestCase
         $blueprint->fields();
     }
 
-    /** @test */
+    #[Test]
     public function it_can_import_the_same_fieldset_twice_with_different_prefixes()
     {
         $fieldset = (new Fieldset)->setContents([
@@ -1425,7 +1430,7 @@ class BlueprintTest extends TestCase
         $this->assertTrue($blueprint->hasField('second_one'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_handle_when_casting_to_a_string()
     {
         $blueprint = (new Blueprint)->setHandle('test');
@@ -1433,7 +1438,7 @@ class BlueprintTest extends TestCase
         $this->assertEquals('test', (string) $blueprint);
     }
 
-    /** @test */
+    #[Test]
     public function it_augments()
     {
         $blueprint = (new Blueprint)->setHandle('test');
@@ -1445,7 +1450,7 @@ class BlueprintTest extends TestCase
         ], $blueprint->toAugmentedArray());
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_in_the_parser()
     {
         $blueprint = (new Blueprint)->setHandle('test');
@@ -1465,7 +1470,7 @@ class BlueprintTest extends TestCase
             ->each(fn ($value, $key) => $this->assertEquals($value->value(), $blueprint[$key]));
     }
 
-    /** @test */
+    #[Test]
     public function it_is_arrayable()
     {
         $blueprint = (new Blueprint)->setHandle('test');
@@ -1477,7 +1482,7 @@ class BlueprintTest extends TestCase
             ->each(fn ($value, $key) => $this->assertEquals($value, $blueprint[$key]));
     }
 
-    /** @test */
+    #[Test]
     public function it_resolves_itself_to_a_queryable_value()
     {
         $blueprint = (new Blueprint)->setHandle('test');
@@ -1485,7 +1490,7 @@ class BlueprintTest extends TestCase
         $this->assertEquals('test', $blueprint->toQueryableValue());
     }
 
-    /** @test */
+    #[Test]
     public function it_fires_a_deleting_event()
     {
         Event::fake();
@@ -1499,7 +1504,7 @@ class BlueprintTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_delete_when_a_deleting_event_returns_false()
     {
         Facades\Blueprint::spy();
@@ -1517,7 +1522,7 @@ class BlueprintTest extends TestCase
         Event::assertNotDispatched(BlueprintDeleted::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_deletes_quietly()
     {
         Event::fake();

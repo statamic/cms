@@ -5,6 +5,7 @@ namespace Tests\Stache\Stores;
 use Facades\Statamic\Stache\Traverser;
 use Illuminate\Support\Carbon;
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades;
 use Statamic\Facades\Path;
@@ -33,7 +34,7 @@ class EntriesStoreTest extends TestCase
         Stache::store('collections')->directory($this->directory);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_nested_files()
     {
         $dir = Path::tidy($this->directory);
@@ -81,7 +82,7 @@ class EntriesStoreTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_makes_entry_instances_from_files()
     {
         Facades\Collection::shouldReceive('findByHandle')->with('blog')->andReturn(
@@ -102,7 +103,7 @@ class EntriesStoreTest extends TestCase
         $this->assertTrue($item->published());
     }
 
-    /** @test */
+    #[Test]
     public function if_slugs_are_not_required_the_filename_still_becomes_the_slug()
     {
         Facades\Collection::shouldReceive('findByHandle')->with('blog')->andReturn(
@@ -118,7 +119,7 @@ class EntriesStoreTest extends TestCase
         $this->assertEquals('the-slug', $item->slug());
     }
 
-    /** @test */
+    #[Test]
     public function if_slugs_are_not_required_and_the_filename_is_the_same_as_the_id_then_slug_is_null()
     {
         Facades\Collection::shouldReceive('findByHandle')->with('blog')->andReturn(
@@ -134,7 +135,7 @@ class EntriesStoreTest extends TestCase
         $this->assertNull($item->slug());
     }
 
-    /** @test */
+    #[Test]
     public function if_slugs_are_required_and_the_filename_is_the_same_as_the_id_then_slug_is_the_id()
     {
         Facades\Collection::shouldReceive('findByHandle')->with('blog')->andReturn(
@@ -150,7 +151,7 @@ class EntriesStoreTest extends TestCase
         $this->assertEquals('123', $item->slug());
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_the_id_of_the_entry_as_the_item_key()
     {
         $entry = Mockery::mock();
@@ -163,7 +164,7 @@ class EntriesStoreTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_to_disk()
     {
         $entry = Facades\Entry::make()
@@ -181,7 +182,7 @@ class EntriesStoreTest extends TestCase
         $this->assertEquals($path, $this->parent->store('blog')->paths()->get('123'));
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_to_disk_with_modified_path()
     {
         $entry = Facades\Entry::make()
@@ -205,7 +206,7 @@ class EntriesStoreTest extends TestCase
         @unlink($path);
     }
 
-    /** @test */
+    #[Test]
     public function it_appends_suffix_to_the_filename_if_one_already_exists()
     {
         $existingPath = $this->directory.'/blog/2017-07-04.test.md';
@@ -234,7 +235,7 @@ class EntriesStoreTest extends TestCase
         $this->assertFileDoesNotExist($existingPath);
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_append_the_suffix_to_the_filename_if_it_is_itself()
     {
         $existingPath = $this->directory.'/blog/2017-07-04.test.md';
@@ -257,7 +258,7 @@ class EntriesStoreTest extends TestCase
         $this->assertFileDoesNotExist($existingPath);
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_append_the_suffix_to_an_already_suffixed_filename_if_it_is_itself()
     {
         $suffixlessExistingPath = $this->directory.'/blog/2017-07-04.test.md';
@@ -282,7 +283,7 @@ class EntriesStoreTest extends TestCase
         $this->assertEquals($suffixedExistingPath, $this->parent->store('blog')->paths()->get('another-id'));
     }
 
-    /** @test */
+    #[Test]
     public function it_keeps_the_suffix_even_if_the_suffixless_path_is_available()
     {
         $existingPath = $this->directory.'/blog/2017-07-04.test.1.md';
@@ -302,7 +303,7 @@ class EntriesStoreTest extends TestCase
         $this->assertFileDoesNotExist($existingPath);
     }
 
-    /** @test */
+    #[Test]
     public function it_removes_the_suffix_if_it_previously_had_one_but_needs_a_new_path_anyway()
     {
         // eg. if the slug is changing, and the filename would be changing anyway,
@@ -327,7 +328,7 @@ class EntriesStoreTest extends TestCase
         $this->assertFileDoesNotExist($newPath);
     }
 
-    /** @test */
+    #[Test]
     public function it_ignores_entries_in_a_site_subdirectory_where_the_collection_doesnt_have_that_site_enabled()
     {
         $this->markTestIncomplete();

@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use League\Glide\Server;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Imaging\UrlBuilder;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
@@ -33,7 +34,7 @@ class GlideTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function cache_false_will_make_a_filesystem_in_the_storage_directory()
     {
         config([
@@ -51,7 +52,7 @@ class GlideTest extends TestCase
         $this->assertEquals('/imgs', Glide::url());
     }
 
-    /** @test */
+    #[Test]
     public function cache_true_will_make_a_filesystem_using_the_cache_path_location()
     {
         config([
@@ -69,7 +70,7 @@ class GlideTest extends TestCase
         $this->assertEquals('/imgs', Glide::url());
     }
 
-    /** @test */
+    #[Test]
     public function cache_true_without_cache_path_will_throw_exception()
     {
         $this->expectException(\Exception::class);
@@ -84,7 +85,7 @@ class GlideTest extends TestCase
         Glide::server()->getCache();
     }
 
-    /** @test */
+    #[Test]
     public function cache_string_will_use_a_corresponding_filesystem()
     {
         config([
@@ -105,7 +106,7 @@ class GlideTest extends TestCase
         $this->assertEquals('http://the-glide-url', Glide::url());
     }
 
-    /** @test */
+    #[Test]
     public function invalid_cache_string_will_throw_exception()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -116,7 +117,7 @@ class GlideTest extends TestCase
         Glide::server()->getCache();
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_glide_cache_store()
     {
         config(['cache.stores.glide' => [
@@ -131,7 +132,7 @@ class GlideTest extends TestCase
         $this->assertEquals($path, $cache->getStore()->getDirectory());
     }
 
-    /** @test */
+    #[Test]
     public function it_creates_a_glide_cache_store_on_the_fly_if_undefined()
     {
         $cache = Glide::cacheStore();
@@ -141,7 +142,7 @@ class GlideTest extends TestCase
         $this->assertEquals(storage_path('framework/cache/glide'), $cache->getStore()->getDirectory());
     }
 
-    /** @test */
+    #[Test]
     public function it_deletes_glide_cache_for_an_asset()
     {
         // Should return manifest cache key for an asset, along with 3 manipulation cache keys.

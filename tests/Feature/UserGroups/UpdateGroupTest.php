@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\UserGroups;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Role;
 use Statamic\Facades\User;
 use Statamic\Facades\UserGroup;
@@ -44,7 +45,7 @@ class UpdateGroupTest extends TestCase
         return tap(User::make()->assignRole('user'))->save();
     }
 
-    /** @test */
+    #[Test]
     public function it_denies_access_without_permission_to_edit_groups()
     {
         $role = tap(Role::make('test'))->save();
@@ -56,7 +57,7 @@ class UpdateGroupTest extends TestCase
             ->assertRedirect('/original');
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_a_group()
     {
         $group = tap(
@@ -84,7 +85,7 @@ class UpdateGroupTest extends TestCase
         ], $group->roles()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_assigns_roles_with_permission()
     {
         $group = tap(
@@ -109,7 +110,7 @@ class UpdateGroupTest extends TestCase
         ], $group->roles()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_discards_roles_without_permission()
     {
         $group = tap(

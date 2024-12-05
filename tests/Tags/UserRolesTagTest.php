@@ -2,6 +2,7 @@
 
 namespace Tests\Tags;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Parse;
 use Statamic\Facades\Role;
 use Tests\TestCase;
@@ -15,13 +16,13 @@ class UserRolesTagTest extends TestCase
         Role::all()->each->delete();
     }
 
-    /** @test */
+    #[Test]
     public function it_outputs_no_results()
     {
         $this->assertEquals('nothing', $this->tag('{{ user_roles }}{{ if no_results }}nothing{{ else }}something{{ /if }}{{ /user_roles }}'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_all_roles()
     {
         Role::make()->handle('test')->title('Test')->save();
@@ -31,7 +32,7 @@ class UserRolesTagTest extends TestCase
         $this->assertEquals('test|test2|test3|', $this->tag('{{ user_roles }}{{ handle }}|{{ /user_roles }}'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_role()
     {
         Role::make()->handle('test')->title('Test')->save();
@@ -41,7 +42,7 @@ class UserRolesTagTest extends TestCase
         $this->assertEquals('test2', $this->tag('{{ user_roles handle="test2" }}{{ handle }}{{ /user_roles }}'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_multiple_roles()
     {
         Role::make()->handle('test')->title('Test')->save();
@@ -52,7 +53,7 @@ class UserRolesTagTest extends TestCase
         $this->assertEquals('test2|test3|', $this->tag('{{ user_roles :handle="roles" }}{{ handle }}|{{ /user_roles }}', ['roles' => ['test2', 'test3']]));
     }
 
-    /** @test */
+    #[Test]
     public function it_outputs_no_results_when_finding_multiple_roles()
     {
         $this->assertEquals('nothing', $this->tag('{{ user_roles handle="test2|test3" }}{{ if no_results }}nothing{{ else }}something{{ /if }}{{ /user_roles }}'));

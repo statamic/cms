@@ -3,6 +3,7 @@
 namespace Tests\Console\Commands;
 
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\AssetContainer;
 use Statamic\Facades\AssetContainer as AssetContainerFacade;
 use Statamic\Facades\YAML;
@@ -57,7 +58,7 @@ class AssetsMetaTest extends TestCase
         return $container;
     }
 
-    /** @test */
+    #[Test]
     public function it_generates_one_asset_meta_file_for_asset_with_no_meta_file()
     {
         $this->containerWithDisk();
@@ -78,7 +79,7 @@ class AssetsMetaTest extends TestCase
         Storage::disk('test')->assertExists('foo/.meta/bar.txt.yaml');
     }
 
-    /** @test */
+    #[Test]
     public function it_preserves_data_property_in_meta_data_file()
     {
         $this->containerWithDisk();

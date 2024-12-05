@@ -2,6 +2,8 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
@@ -25,11 +27,8 @@ class IsNumberwangTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider numbersProvider
-     */
+    #[Test]
+    #[DataProvider('numbersProvider')]
     public function is_it_or_is_not_numberwang($expected, $input): void
     {
         $modified = $this->modify($input);

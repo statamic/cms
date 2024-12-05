@@ -16,7 +16,7 @@ jobs:
 
     strategy:
       matrix:
-        php: [8.1, 8.2, 8.3]
+        php: [8.1, 8.2, 8.3, 8.4]
         laravel: [10.*, 11.*]
         stability: [prefer-lowest, prefer-stable]
         os: [ubuntu-latest]
@@ -32,6 +32,8 @@ jobs:
         exclude:
           - php: 8.1
             laravel: 11.*
+          - php: 8.4
+            laravel: 10.*
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
 
@@ -79,6 +81,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           extensions: fileinfo, exif, gd, pdo, sqlite, pdo_sqlite
+          ini-values: short_open_tag=on
           coverage: none
 
       - name: Install dependencies
@@ -114,7 +117,7 @@ jobs:
         uses: tj-actions/changed-files@v44
         with:
           files: |
-            **.{js,vue,ts}
+            **/*.{js,vue,ts}
             package.json
             .github/workflows/tests.yml
 

@@ -3,6 +3,7 @@
 namespace Tests\Auth\Protect;
 
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\Protect\Protection;
 use Statamic\Auth\Protect\ProtectorManager;
 use Statamic\Auth\Protect\Protectors\Authenticated;
@@ -27,7 +28,7 @@ class ProtectionTest extends TestCase
         $this->protection = app(Protection::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_sets_and_gets_the_data()
     {
         $this->assertNull($this->protection->data());
@@ -38,7 +39,7 @@ class ProtectionTest extends TestCase
         $this->assertEquals($entry, $this->protection->data());
     }
 
-    /** @test */
+    #[Test]
     public function scheme_comes_from_data()
     {
         $this->assertNull($this->protection->scheme());
@@ -48,7 +49,7 @@ class ProtectionTest extends TestCase
         $this->assertEquals('logged_in', $this->protection->scheme());
     }
 
-    /** @test */
+    #[Test]
     public function scheme_comes_from_data_even_when_sitewide_scheme_is_defined()
     {
         config(['statamic.protect.default' => 'logged_in']);
@@ -62,7 +63,7 @@ class ProtectionTest extends TestCase
         $this->assertEquals('password', $this->protection->scheme());
     }
 
-    /** @test */
+    #[Test]
     public function if_the_data_isnt_protectable_it_doesnt_get_a_scheme()
     {
         $this->assertNull($this->protection->scheme());
@@ -75,7 +76,7 @@ class ProtectionTest extends TestCase
         $this->assertNull($this->protection->scheme());
     }
 
-    /** @test */
+    #[Test]
     public function sitewide_scheme_comes_from_the_default_setting()
     {
         config(['statamic.protect.default' => 'logged_in']);
@@ -87,7 +88,7 @@ class ProtectionTest extends TestCase
         $this->assertEquals('logged_in', $this->protection->scheme());
     }
 
-    /** @test */
+    #[Test]
     public function driver_comes_from_schemes_driver_key()
     {
         config(['statamic.protect.schemes.custom_auth_scheme' => [
@@ -99,13 +100,13 @@ class ProtectionTest extends TestCase
         $this->assertInstanceOf(Authenticated::class, $this->protection->driver());
     }
 
-    /** @test */
+    #[Test]
     public function no_scheme_returns_a_null_driver()
     {
         $this->assertInstanceOf(NullProtector::class, $this->protection->driver());
     }
 
-    /** @test */
+    #[Test]
     public function invalid_driver_returns_a_fallback_driver()
     {
         $this->protection->setData($this->createEntryWithScheme('invalid'));
@@ -113,7 +114,7 @@ class ProtectionTest extends TestCase
         $this->assertInstanceOf(Fallback::class, $this->protection->driver());
     }
 
-    /** @test */
+    #[Test]
     public function it_protects_through_the_driver()
     {
         config(['statamic.protect.schemes.test' => [

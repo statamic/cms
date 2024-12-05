@@ -16,7 +16,7 @@ class PasswordProtector extends Protector
      */
     public function protect()
     {
-        if (empty(Arr::get($this->config, 'allowed', []))) {
+        if (empty($this->schemePasswords()) && ! $this->localPasswords()) {
             throw new ForbiddenHttpException();
         }
 
@@ -33,11 +33,52 @@ class PasswordProtector extends Protector
         }
     }
 
+    protected function schemePasswords()
+    {
+        return Arr::get($this->config, 'allowed', []);
+    }
+
+    public function localPasswords()
+    {
+        if (! $field = Arr::get($this->config, 'field')) {
+            return [];
+        }
+
+        return Arr::wrap($this->data->$field);
+    }
+
     public function hasEnteredValidPassword()
     {
-        return (new Guard($this->scheme))->check(
-            session("statamic:protect:password.passwords.{$this->scheme}")
-        );
+        if (
+            ($password = session("statamic:protect:password.passwords.scheme.{$this->scheme}"))
+            && $this->isValidSchemePassword($password)
+        ) {
+            return true;
+        }
+
+        if (
+            ($password = session("statamic:protect:password.passwords.ref.{$this->data->reference()}"))
+            && $this->isValidLocalPassword($password)
+        ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function isValidPassword(string $password): bool
+    {
+        return $this->isValidSchemePassword($password) || $this->isValidLocalPassword($password);
+    }
+
+    public function isValidSchemePassword(string $password): bool
+    {
+        return in_array($password, $this->schemePasswords());
+    }
+
+    public function isValidLocalPassword(string $password): bool
+    {
+        return in_array($password, $this->localPasswords());
     }
 
     protected function isPasswordFormUrl()
@@ -64,6 +105,7 @@ class PasswordProtector extends Protector
         session()->put("statamic:protect:password.tokens.$token", [
             'scheme' => $this->scheme,
             'url' => $this->url,
+            'reference' => $this->data->reference(),
         ]);
 
         return $token;

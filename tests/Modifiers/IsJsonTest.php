@@ -2,6 +2,8 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
@@ -16,11 +18,8 @@ class IsJsonTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider bourneJsonBourneProvider
-     */
+    #[Test]
+    #[DataProvider('bourneJsonBourneProvider')]
     public function it_returns_true_if_string_is_valid_json($expected, $input): void
     {
         $modified = $this->modify($input);

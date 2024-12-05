@@ -3,6 +3,7 @@
 namespace Tests\Tags\User;
 
 use Illuminate\Http\Exceptions\HttpResponseException;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Parse;
 use Statamic\Facades\Role;
 use Statamic\Facades\User;
@@ -22,7 +23,7 @@ class UserTagsTest extends TestCase
         return Parse::template($tag, $params);
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_user_can_tag_content()
     {
         $this->setTestRoles([
@@ -51,7 +52,7 @@ class UserTagsTest extends TestCase
         $this->assertEquals('', $this->tag('{{ user:cant do="access cp|configure collections" }}yes{{ /user:cant }}'));
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_user_is_tag_content()
     {
         $this->setTestRoles([
@@ -75,7 +76,7 @@ class UserTagsTest extends TestCase
         $this->assertEquals('', $this->tag('{{ user:isnt :roles="roles" }}yes{{ /user:isnt }}', ['roles' => Role::all()]));
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_user_in_tag_content()
     {
         $this->setTestRoles([
@@ -99,7 +100,7 @@ class UserTagsTest extends TestCase
         $this->assertEquals('', $this->tag('{{ user:not_in group="favourite|non_favourite" }}yes{{ /user:not_in }}'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_logout_user()
     {
         $this->actingAs(User::make()->save());
@@ -116,7 +117,7 @@ class UserTagsTest extends TestCase
         $this->assertEquals(url('/'), $exception->getResponse()->getTargetUrl());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_logout_user_with_custom_redirect()
     {
         $this->actingAs(User::make()->save());
@@ -133,7 +134,7 @@ class UserTagsTest extends TestCase
         $this->assertEquals(url('home'), $exception->getResponse()->getTargetUrl());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_render_logout_url()
     {
         $this->assertEquals(route('statamic.logout'), $this->tag('{{ user:logout_url }}'));
@@ -141,7 +142,7 @@ class UserTagsTest extends TestCase
         $this->assertEquals(route('statamic.logout', ['redirect' => 'home']), $this->tag('{{ user:logout_url redirect="home" }}'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_load_user_by_email()
     {
         User::make()->email('foo@bar.com')->save();
@@ -149,7 +150,7 @@ class UserTagsTest extends TestCase
         $this->assertEquals('foo@bar.com', $this->tag('{{ user email="foo@bar.com" }}{{email}}{{ /user }}'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_load_user_by_field()
     {
         User::make()

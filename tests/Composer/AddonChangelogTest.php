@@ -4,6 +4,7 @@ namespace Tests\Composer;
 
 use Facades\GuzzleHttp\Client;
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Extend\Addon;
 use Statamic\Updater\AddonChangelog;
 use Tests\TestCase;
@@ -22,7 +23,7 @@ class AddonChangelogTest extends TestCase
         return new AddonChangelog($addon);
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_for_licensing_limits()
     {
         Client::shouldReceive('request')
@@ -36,7 +37,7 @@ class AddonChangelogTest extends TestCase
         $this->assertEquals([false, true, true, true, true], $contents->map->licensed->all());
     }
 
-    /** @test */
+    #[Test]
     public function release_is_always_licensed_if_theres_no_license_limit()
     {
         Client::shouldReceive('request')

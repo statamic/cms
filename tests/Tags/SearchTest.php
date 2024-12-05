@@ -3,6 +3,7 @@
 namespace Tests\Tags;
 
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Parse;
 use Statamic\Facades\Search;
 use Statamic\Search\QueryBuilder;
@@ -18,7 +19,7 @@ class SearchTest extends TestCase
         return (string) Parse::template($tag, $data);
     }
 
-    /** @test */
+    #[Test]
     public function it_outputs_results()
     {
         $entryA = EntryFactory::id('a')->collection('test')->data(['title' => 'entry a'])->create();
@@ -40,7 +41,7 @@ class SearchTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_outputs_results_using_alias()
     {
         $entryA = EntryFactory::id('a')->collection('test')->data(['title' => 'entry a'])->create();

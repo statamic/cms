@@ -5,6 +5,7 @@ namespace Tests\Tokens;
 use Facades\Statamic\Tokens\Generator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Tokens\Token;
 use Statamic\Facades\File;
 use Statamic\Tokens\FileTokenRepository;
@@ -21,7 +22,7 @@ class TokenRepositoryTest extends TestCase
         $this->tokens = new FileTokenRepository;
     }
 
-    /** @test */
+    #[Test]
     public function it_makes_a_token()
     {
         Generator::shouldReceive('generate')->never();
@@ -37,7 +38,7 @@ class TokenRepositoryTest extends TestCase
         $this->assertEquals('test-token', $token->token());
     }
 
-    /** @test */
+    #[Test]
     public function it_generates_a_token_string_if_passing_in_null_when_making_a_token()
     {
         Generator::shouldReceive('generate')->once()->andReturn('test-token');
@@ -47,7 +48,7 @@ class TokenRepositoryTest extends TestCase
         $this->assertEquals('test-token', $token->token());
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_a_token()
     {
         Carbon::setTestNow(Carbon::create(2020, 1, 1, 0, 0, 0));
@@ -69,7 +70,7 @@ YAML;
         $this->assertTrue($return);
     }
 
-    /** @test */
+    #[Test]
     public function it_deletes_a_token()
     {
         $token = tap($this->tokens->make('test-token', 'The\\Test\\Class', ['foo' => 'bar', 'baz' => 'qux']))->save();
@@ -83,7 +84,7 @@ YAML;
         $this->assertTrue($return);
     }
 
-    /** @test */
+    #[Test]
     public function it_finds_a_token()
     {
         $contents = <<<YAML
@@ -108,13 +109,13 @@ YAML;
         $this->assertTrue($token->expiry()->eq(Carbon::create(2020, 1, 1, 3, 35)));
     }
 
-    /** @test */
+    #[Test]
     public function attempting_to_find_a_non_existent_token_returns_null()
     {
         $this->assertNull($this->tokens->find('missing-token'));
     }
 
-    /** @test */
+    #[Test]
     public function it_deletes_expired_tokens()
     {
         Carbon::setTestNow(Carbon::create(2020, 1, 1, 3, 0, 0));

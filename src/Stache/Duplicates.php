@@ -2,7 +2,6 @@
 
 namespace Statamic\Stache;
 
-use Illuminate\Support\Facades\Cache;
 use Statamic\Stache\Stores\AggregateStore;
 use Statamic\Stache\Stores\Store;
 
@@ -49,19 +48,19 @@ class Duplicates
             return;
         }
 
-        Cache::forever('stache::duplicates', $this->items);
+        $this->stache->cacheStore()->forever('stache::duplicates', $this->items);
     }
 
     public function load()
     {
-        $this->items = Cache::get('stache::duplicates', []);
+        $this->items = $this->stache->cacheStore()->get('stache::duplicates', []);
 
         return $this;
     }
 
     public function clear()
     {
-        Cache::forget('stache::duplicates');
+        $this->stache->cacheStore()->forget('stache::duplicates');
 
         return $this;
     }

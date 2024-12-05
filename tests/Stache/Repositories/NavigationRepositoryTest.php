@@ -3,6 +3,7 @@
 namespace Tests\Stache\Repositories;
 
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Structures\Structure;
 use Statamic\Exceptions\NavigationNotFoundException;
 use Statamic\Stache\Repositories\NavigationRepository;
@@ -33,7 +34,7 @@ class NavigationRepositoryTest extends TestCase
         $this->repo = new NavigationRepository($stache);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_all_navs()
     {
         $navs = $this->repo->all();
@@ -47,7 +48,7 @@ class NavigationRepositoryTest extends TestCase
         $this->assertEquals(['Footer', 'Sidebar'], $ordered->map->title()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_nav_by_handle()
     {
         tap($this->repo->findByHandle('sidebar'), function ($nav) {
@@ -65,7 +66,7 @@ class NavigationRepositoryTest extends TestCase
         $this->assertNull($this->repo->findByHandle('unknown'));
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_a_nav_to_the_stache_and_to_a_file()
     {
         $structure = (new \Statamic\Structures\Nav)->handle('new');
@@ -79,7 +80,7 @@ class NavigationRepositoryTest extends TestCase
         @unlink($this->directory.'/new.yaml');
     }
 
-    /** @test */
+    #[Test]
     public function test_find_or_fail_gets_nav()
     {
         $nav = $this->repo->findOrFail('footer');
@@ -88,7 +89,7 @@ class NavigationRepositoryTest extends TestCase
         $this->assertEquals('Footer', $nav->title());
     }
 
-    /** @test */
+    #[Test]
     public function test_find_or_fail_throws_exception_when_nav_does_not_exist()
     {
         $this->expectException(NavigationNotFoundException::class);

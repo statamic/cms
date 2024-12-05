@@ -2,9 +2,11 @@
 
 namespace Tests\Fieldtypes;
 
+use PHPUnit\Framework\Attributes\Test;
+
 trait CastsMultipleBooleansTests
 {
-    /** @test */
+    #[Test]
     public function it_casts_multiple_booleans_during_processing_when_enabled()
     {
         $field = $this->field([
@@ -38,7 +40,7 @@ trait CastsMultipleBooleansTests
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_cast_multiple_booleans_during_processing_when_disabled()
     {
         $field = $this->field([

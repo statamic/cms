@@ -11,6 +11,8 @@
             :add-section-text="addSectionText"
             :edit-section-text="editSectionText"
             :show-section-handle-field="showSectionHandleField"
+            :show-section-hide-field="showSectionHideField"
+            :can-define-localizable="canDefineLocalizable"
             @updated="sectionsUpdated($event)"
         />
     </div>
@@ -18,8 +20,11 @@
 
 <script>
 import Sections from './Sections.vue';
+import CanDefineLocalizable from "../fields/CanDefineLocalizable";
 
 export default {
+
+    mixins: [CanDefineLocalizable],
 
     components: {
         Sections,
@@ -30,6 +35,10 @@ export default {
             type: Object,
         },
         showSectionHandleField: {
+            type: Boolean,
+            default: false,
+        },
+        showSectionHideField: {
             type: Boolean,
             default: false,
         },

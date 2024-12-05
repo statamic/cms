@@ -14,7 +14,7 @@
         "composer/semver": "^3.4",
         "guzzlehttp/guzzle": "^6.3 || ^7.0",
         "james-heinrich/getid3": "^1.9.21",
-        "laravel/framework": "^10.40 || ^11.0",
+        "laravel/framework": "^10.40 || ^11.34",
         "laravel/prompts": "^0.1.16",
         "league/commonmark": "^2.2",
         "league/csv": "^9.0",
@@ -23,16 +23,17 @@
         "michelf/php-smartypants": "^1.8.1",
         "nesbot/carbon": "^2.62.1",
         "pixelfear/composer-dist-plugin": "^0.1.4",
-        "rebing/graphql-laravel": "^9.5",
+        "rebing/graphql-laravel": "^9.7",
         "rhukster/dom-sanitizer": "^1.0.6",
         "spatie/blink": "^1.3",
-        "spatie/ignition": "^1.12",
+        "spatie/ignition": "^1.15",
         "statamic/stringy": "^3.1.2",
+        "stillat/blade-parser": "^1.10.1",
         "symfony/lock": "^6.4",
         "symfony/var-exporter": "^6.0",
         "symfony/yaml": "^6.0 || ^7.0",
-        "ueberdosis/tiptap-php": "^1.1",
-        "voku/portable-ascii": "^2.0",
+        "ueberdosis/tiptap-php": "^1.4",
+        "voku/portable-ascii": "^2.0.2",
         "wilderborn/partyline": "^1.0"
     },
     "require-dev": {
@@ -40,9 +41,10 @@
         "fakerphp/faker": "~1.10",
         "google/cloud-translate": "^1.6",
         "laravel/pint": "1.16.0",
-        "mockery/mockery": "^1.3.3",
-        "orchestra/testbench": "^8.0 || ^9.0",
-        "phpunit/phpunit": "^10.0"
+        "mockery/mockery": "^1.6.10",
+        "orchestra/testbench": "^8.14 || ^9.2",
+        "phpunit/phpunit": "^10.5.35",
+        "spatie/laravel-ray": "^1.37"
     },
     "config": {
         "optimize-autoloader": true,
@@ -79,7 +81,8 @@
         },
         "files": [
             "src/helpers.php",
-            "src/namespaced_helpers.php"
+            "src/namespaced_helpers.php",
+            "src/View/Blade/helpers.php"
         ]
     },
     "autoload-dev": {

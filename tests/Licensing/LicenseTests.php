@@ -2,9 +2,11 @@
 
 namespace Tests\Licensing;
 
+use PHPUnit\Framework\Attributes\Test;
+
 trait LicenseTests
 {
-    /** @test */
+    #[Test]
     public function it_gets_the_response()
     {
         $license = $this->license(['foo' => 'bar']);
@@ -12,14 +14,14 @@ trait LicenseTests
         $this->assertEquals(['foo' => 'bar'], $license->response());
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_if_its_valid()
     {
         $this->assertTrue($this->license(['valid' => true])->valid());
         $this->assertFalse($this->license(['valid' => false])->valid());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_invalid_reason()
     {
         $license = $this->license(['reason' => 'nope']);
@@ -30,7 +32,7 @@ trait LicenseTests
         );
     }
 
-    /** @test */
+    #[Test]
     public function invalid_reason_is_null_if_there_isnt_one()
     {
         $license = $this->license(['foo' => 'bar']);

@@ -9,6 +9,7 @@ use Statamic\Facades\Config;
 use Statamic\Facades\File;
 use Statamic\Facades\Site;
 use Statamic\Facades\YAML;
+use Statamic\Http\Middleware\CP\AuthenticateSession;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
@@ -23,6 +24,8 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         parent::setUp();
 
         $this->withoutVite();
+
+        $this->withoutMiddleware(AuthenticateSession::class);
 
         $uses = array_flip(class_uses_recursive(static::class));
 
@@ -70,6 +73,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             \Rebing\GraphQL\GraphQLServiceProvider::class,
             \Wilderborn\Partyline\ServiceProvider::class,
             \Archetype\ServiceProvider::class,
+            \Spatie\LaravelRay\RayServiceProvider::class,
         ];
     }
 

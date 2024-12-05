@@ -2,6 +2,12 @@
 
 namespace Tests\Sites;
 
+use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
+use Statamic\Events\SiteCreated;
+use Statamic\Events\SiteDeleted;
+use Statamic\Events\SiteSaved;
 use Statamic\Facades\Config;
 use Statamic\Facades\File;
 use Statamic\Facades\Site;
@@ -38,7 +44,7 @@ class SitesConfigTest extends TestCase
         Site::swap(new Sites);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_sites_from_yaml()
     {
         $this->assertCount(2, Site::all());
@@ -56,7 +62,7 @@ class SitesConfigTest extends TestCase
         $this->assertSame('fr', Site::get('french')->lang());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_default_site_without_yaml()
     {
         File::delete($this->yamlPath);
@@ -75,7 +81,7 @@ class SitesConfigTest extends TestCase
         $this->assertSame('en', Site::default()->lang());
     }
 
-    /** @test */
+    #[Test]
     public function it_sets_sites_at_runtime()
     {
         Site::setSites([
@@ -114,7 +120,7 @@ class SitesConfigTest extends TestCase
         $this->assertSame(['theme' => 'standard'], Site::get('arabic')->attributes());
     }
 
-    /** @test */
+    #[Test]
     public function it_resolves_antlers_when_resolving_sites()
     {
         Config::set('app', [
@@ -146,7 +152,7 @@ class SitesConfigTest extends TestCase
         $this->assertSame(['theme' => 'sunset'], Site::default()->attributes());
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_single_site_back_to_yaml_in_normalized_sites_array()
     {
         Site::setSites([
@@ -168,7 +174,7 @@ class SitesConfigTest extends TestCase
         $this->assertSame($expected, YAML::file($this->yamlPath)->parse());
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_multiple_sites_back_to_yaml()
     {
         Site::setSites([
@@ -208,7 +214,7 @@ class SitesConfigTest extends TestCase
         $this->assertSame($expected, YAML::file($this->yamlPath)->parse());
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_single_site_back_to_yaml_with_unresolved_antlers()
     {
         Site::setSites([
@@ -238,7 +244,7 @@ class SitesConfigTest extends TestCase
         $this->assertSame($expected, YAML::file($this->yamlPath)->parse());
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_multiple_sites_back_to_yaml_with_unresolved_antlers()
     {
         Site::setSites([
@@ -286,7 +292,7 @@ class SitesConfigTest extends TestCase
         $this->assertSame($expected, YAML::file($this->yamlPath)->parse());
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_site_through_cp_endpoint()
     {
         $this
@@ -310,7 +316,7 @@ class SitesConfigTest extends TestCase
         $this->assertSame($expected, YAML::file($this->yamlPath)->parse());
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_multiple_sites_through_cp_endpoint()
     {
         // Multisite requires this config
@@ -362,7 +368,7 @@ class SitesConfigTest extends TestCase
         $this->assertSame($expected, YAML::file($this->yamlPath)->parse());
     }
 
-    /** @test */
+    #[Test]
     public function it_validates_required_fields_for_site_through_cp_endpoint()
     {
         $this
@@ -378,7 +384,7 @@ class SitesConfigTest extends TestCase
             ]]);
     }
 
-    /** @test */
+    #[Test]
     public function it_validates_required_fields_for_multiple_sites_through_cp_endpoint()
     {
         // Multisite requires this config
@@ -418,11 +424,8 @@ class SitesConfigTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider submitsNoSites
-     */
+    #[Test]
+    #[DataProvider('submitsNoSites')]
     public function it_validates_at_least_one_site_is_required_for_multiple_sites_through_cp_endpoint($data)
     {
         // Multisite requires this config
@@ -436,5 +439,76 @@ class SitesConfigTest extends TestCase
             ->assertJson(['errors' => [
                 'sites' => ['This field is required.'],
             ]]);
+    }
+
+    #[Test]
+    public function it_dispatches_site_saved_events()
+    {
+        Event::fake();
+
+        Site::save();
+
+        Event::assertDispatched(SiteSaved::class, 2);
+
+        Event::assertDispatched(function (SiteSaved $event) {
+            return $event->site->handle() === 'english';
+        });
+
+        Event::assertDispatched(function (SiteSaved $event) {
+            return $event->site->handle() === 'french';
+        });
+    }
+
+    #[Test]
+    public function it_dispatches_site_created_events()
+    {
+        Event::fake();
+
+        Site::setSites(
+            collect(Site::config())
+                ->put('german', ['name' => 'German', 'url' => '/de/'])
+                ->put('polish', ['name' => 'Polish', 'url' => '/pl/'])
+                ->all()
+        )->save();
+
+        Event::assertDispatched(SiteCreated::class, 2);
+
+        Event::assertDispatched(function (SiteCreated $event) {
+            return $event->site->handle() === 'german';
+        });
+
+        Event::assertDispatched(function (SiteCreated $event) {
+            return $event->site->handle() === 'polish';
+        });
+
+        // We're saving a total of 4 sites to yaml after the above changes, so we should see 4 `SiteSaved` events as well
+        Event::assertDispatched(SiteSaved::class, 4);
+    }
+
+    #[Test]
+    public function it_dispatches_site_deleted_events()
+    {
+        Event::fake();
+
+        Site::setSites(
+            collect(Site::config())
+                ->put('german', ['name' => 'German', 'url' => '/de/'])
+                ->forget('english')
+                ->forget('french')
+                ->all()
+        )->save();
+
+        Event::assertDispatched(SiteDeleted::class, 2);
+
+        Event::assertDispatched(function (SiteDeleted $event) {
+            return $event->site->handle() === 'english';
+        });
+
+        Event::assertDispatched(function (SiteDeleted $event) {
+            return $event->site->handle() === 'french';
+        });
+
+        // We're saving a total of 1 site to yaml after the above changes, so we should see 1 `SiteSaved` event as well
+        Event::assertDispatched(SiteSaved::class, 1);
     }
 }

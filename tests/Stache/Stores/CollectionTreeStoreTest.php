@@ -4,6 +4,7 @@ namespace Tests\Stache\Stores;
 
 use Facades\Statamic\Stache\Traverser;
 use Illuminate\Filesystem\Filesystem;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Facades;
 use Statamic\Facades\Path;
@@ -35,7 +36,7 @@ class CollectionTreeStoreTest extends TestCase
         (new Filesystem)->deleteDirectory($this->tempDir);
     }
 
-    /** @test */
+    #[Test]
     public function it_only_gets_yaml_files()
     {
         touch($this->tempDir.'/one.yaml', 1234567890);
@@ -60,7 +61,7 @@ class CollectionTreeStoreTest extends TestCase
         $this->assertTrue(file_exists($dir.'/non-yaml-file.md'));
     }
 
-    /** @test */
+    #[Test]
     public function it_only_gets_files_for_trees_with_a_structured_collection()
     {
         touch($this->tempDir.'/totally-cool.yaml', 1234567890);
@@ -89,7 +90,7 @@ class CollectionTreeStoreTest extends TestCase
         $this->assertTrue(file_exists($dir.'/no-structure.yaml'));
     }
 
-    /** @test */
+    #[Test]
     public function it_makes_collection_tree_instances_from_files()
     {
         $contents = <<<'YAML'
@@ -109,7 +110,7 @@ YAML;
         ], $item);
     }
 
-    /** @test */
+    #[Test]
     public function it_makes_nav_tree_instances_from_files_when_using_multisite()
     {
         $this->setSites([
@@ -134,7 +135,7 @@ YAML;
         ], $item);
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_the_handle_and_locale_as_the_item_key_for_nav_trees()
     {
         $collection = Facades\Collection::make('pages')->structureContents(['root' => true]);
@@ -146,7 +147,7 @@ YAML;
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_to_disk()
     {
         $collection = Facades\Collection::make('pages')->structureContents(['root' => true]);

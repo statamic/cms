@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\View;
 use LogicException;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use ReflectionClass;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\AugmentedCollection;
@@ -44,7 +46,7 @@ class EntryTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_sets_and_gets_the_locale()
     {
         $this->setSites([
@@ -61,7 +63,7 @@ class EntryTest extends TestCase
         $this->assertEquals('bar', $entry->locale());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_site()
     {
         $this->setSites([
@@ -75,7 +77,7 @@ class EntryTest extends TestCase
         $this->assertEquals('en_US', $site->locale());
     }
 
-    /** @test */
+    #[Test]
     public function it_sets_and_gets_the_slug()
     {
         $entry = new Entry;
@@ -87,7 +89,7 @@ class EntryTest extends TestCase
         $this->assertEquals('foo', $entry->slug());
     }
 
-    /** @test */
+    #[Test]
     public function the_slug_gets_slugified()
     {
         $this->setSites([
@@ -103,7 +105,7 @@ class EntryTest extends TestCase
         $this->assertEquals('foo-bar-aeoeaa', $entry->slug()); // danish replaces æøå with aeoeaa
     }
 
-    /** @test */
+    #[Test]
     public function explicitly_setting_slug_to_null_will_return_null()
     {
         $entry = new Entry;
@@ -111,7 +113,7 @@ class EntryTest extends TestCase
         $this->assertNull($entry->slug());
     }
 
-    /** @test */
+    #[Test]
     public function if_the_slug_is_a_function_it_will_resolve_it()
     {
         $entry = new Entry;
@@ -122,7 +124,7 @@ class EntryTest extends TestCase
         $this->assertEquals('foo-bar', $entry->slug());
     }
 
-    /** @test */
+    #[Test]
     public function if_the_slug_is_a_function_it_will_only_resolve_it_once()
     {
         $count = 0;
@@ -146,7 +148,7 @@ class EntryTest extends TestCase
         $this->assertEquals('the-slug', $entry->slug());
     }
 
-    /** @test */
+    #[Test]
     public function it_resolves_the_slug_when_serializing()
     {
         $entry = new Entry;
@@ -158,7 +160,7 @@ class EntryTest extends TestCase
         $this->assertEquals('the-slug', unserialize($serialized)->slug());
     }
 
-    /** @test */
+    #[Test]
     public function it_sets_gets_and_removes_data_values()
     {
         $collection = tap(Collection::make('test'))->save();
@@ -179,7 +181,7 @@ class EntryTest extends TestCase
         $this->assertFalse($entry->has('foo'));
     }
 
-    /** @test */
+    #[Test]
     public function it_sets_data_values_using_magic_properties()
     {
         $entry = new Entry;
@@ -191,7 +193,7 @@ class EntryTest extends TestCase
         $this->assertEquals('bar', $entry->get('foo'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_evaluated_augmented_value_using_magic_property()
     {
         (new class extends Fieldtype
@@ -220,11 +222,8 @@ class EntryTest extends TestCase
         $this->assertEquals('delta (augmented)', $entry['charlie']);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider queryBuilderProvider
-     **/
+    #[Test]
+    #[DataProvider('queryBuilderProvider')]
     public function it_has_magic_property_and_methods_for_fields_that_augment_to_query_builders($builder)
     {
         $builder->shouldReceive('get')->times(2)->andReturn('query builder results');
@@ -261,7 +260,7 @@ class EntryTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function calling_unknown_method_throws_exception()
     {
         $this->expectException(BadMethodCallException::class);
@@ -271,7 +270,7 @@ class EntryTest extends TestCase
         (new Entry)->collection('blog')->thisFieldDoesntExist();
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_sets_all_data()
     {
         $entry = new Entry;
@@ -283,7 +282,7 @@ class EntryTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $entry->data()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_merges_in_additional_data()
     {
         $entry = (new Entry)->data([
@@ -306,7 +305,7 @@ class EntryTest extends TestCase
         ], $entry->data()->all());
     }
 
-    /** @test */
+    #[Test]
     public function values_fall_back_to_the_origin_then_the_collection()
     {
         $collection = tap(Collection::make('test'))->save();
@@ -322,7 +321,7 @@ class EntryTest extends TestCase
         $this->assertEquals('from origin', $entry->value('test'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_values_from_origin_and_collection()
     {
         tap(Collection::make('test')->cascade([
@@ -351,7 +350,7 @@ class EntryTest extends TestCase
         $this->assertEquals('three in entry', $entry->value('three'));
     }
 
-    /** @test */
+    #[Test]
     public function if_the_value_is_explicitly_set_to_null_then_it_should_not_fall_back()
     {
         tap(Collection::make('test')->cascade([
@@ -385,7 +384,7 @@ class EntryTest extends TestCase
         $this->assertEquals('four in entry', $entry->value('four'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_custom_computed_data()
     {
         Facades\Collection::computed('articles', 'description', function ($entry) {
@@ -412,7 +411,7 @@ class EntryTest extends TestCase
         $this->assertEquals($expectedValues['description'], $entry->value('description'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_empty_computed_data_by_default()
     {
         $collection = tap(Collection::make('test'))->save();
@@ -421,7 +420,7 @@ class EntryTest extends TestCase
         $this->assertEquals([], $entry->computedData()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_recursively_get_computed_data_when_callback_uses_value_methods()
     {
         Facades\Collection::computed('articles', 'description', function ($entry) {
@@ -434,7 +433,7 @@ class EntryTest extends TestCase
         $this->assertEquals('Pop Rocks AND MORE!', $entry->value('description'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_use_actual_data_to_compose_computed_data()
     {
         Facades\Collection::computed('articles', 'description', function ($entry, $value) {
@@ -452,7 +451,7 @@ class EntryTest extends TestCase
         $this->assertEquals('Raddest article ever!', $entry->value('description'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_use_origin_data_to_compose_computed_data()
     {
         Facades\Collection::computed('articles', 'description', function ($entry, $value) {
@@ -476,7 +475,7 @@ class EntryTest extends TestCase
         $this->assertEquals('Raddest article ever!', $entry->value('description'));
     }
 
-    /** @test */
+    #[Test]
     public function it_properly_scopes_custom_computed_data_by_collection_handle()
     {
         Facades\Collection::computed('articles', 'description', function ($entry) {
@@ -497,7 +496,7 @@ class EntryTest extends TestCase
         $this->assertEquals('Jazz Concert ET PLUS!', $eventEntry->value('french_description'));
     }
 
-    /** @test */
+    #[Test]
     public function it_only_evaluates_computed_data_closures_when_getting_values()
     {
         $count = 0;
@@ -516,7 +515,7 @@ class EntryTest extends TestCase
         $this->assertEquals(1, $count);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_url_from_the_collection()
     {
         $this->setSites([
@@ -573,7 +572,7 @@ class EntryTest extends TestCase
         $this->assertEquals(404, $redirect404Entry->redirectUrl());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_uri_from_the_structure()
     {
         $structure = $this->partialMock(CollectionStructure::class);
@@ -584,7 +583,7 @@ class EntryTest extends TestCase
         $this->assertEquals('/structured-uri', $entry->uri());
     }
 
-    /** @test */
+    #[Test]
     public function entries_in_a_collection_without_a_route_dont_have_a_uri()
     {
         $collection = tap((new Collection)->handle('test'))->save();
@@ -594,7 +593,7 @@ class EntryTest extends TestCase
         $this->assertNull($entry->url());
     }
 
-    /** @test */
+    #[Test]
     public function a_localized_entry_without_a_route_for_that_site_doesnt_have_a_uri()
     {
         $collection = tap((new Collection)->handle('test')->routes([
@@ -606,7 +605,7 @@ class EntryTest extends TestCase
         $this->assertNull($entry->url());
     }
 
-    /** @test */
+    #[Test]
     public function entries_in_a_structured_collection_without_a_route_dont_have_a_uri()
     {
         $structure = $this->partialMock(CollectionStructure::class);
@@ -617,7 +616,7 @@ class EntryTest extends TestCase
         $this->assertNull($entry->url());
     }
 
-    /** @test */
+    #[Test]
     public function a_localized_entry_in_a_structured_collection_without_a_route_for_that_site_doesnt_have_a_uri()
     {
         $structure = $this->partialMock(CollectionStructure::class);
@@ -630,11 +629,8 @@ class EntryTest extends TestCase
         $this->assertNull($entry->url());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider firstChildRedirectProvider
-     */
+    #[Test]
+    #[DataProvider('firstChildRedirectProvider')]
     public function it_gets_urls_for_first_child_redirects($value)
     {
         $this->setSites([
@@ -694,7 +690,7 @@ class EntryTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_sets_supplemental_data()
     {
         $entry = new Entry;
@@ -712,7 +708,7 @@ class EntryTest extends TestCase
         $this->assertEquals(['foo' => 'bar', 'baz' => null], $entry->supplements()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_compiles_augmented_array_data()
     {
         // The values of the augmented array are tested in AugmentedEntryTest
@@ -725,7 +721,7 @@ class EntryTest extends TestCase
         $this->assertInstanceOf(AugmentedCollection::class, $entry->toAugmentedCollection());
     }
 
-    /** @test */
+    #[Test]
     public function setting_queried_keys_will_filter_the_arrayable_array()
     {
         $entry = (new Entry)
@@ -753,7 +749,7 @@ class EntryTest extends TestCase
         ], $entry->toAugmentedArray());
     }
 
-    /** @test */
+    #[Test]
     public function it_converts_to_an_array()
     {
         $fieldtype = new class extends Fieldtype
@@ -811,7 +807,7 @@ class EntryTest extends TestCase
         $this->assertEquals($keys, array_keys($array), 'toArray keys differ from selectedQueryColumns');
     }
 
-    /** @test */
+    #[Test]
     public function only_requested_relationship_fields_are_included_in_to_array()
     {
         $regularFieldtype = new class extends Fieldtype
@@ -862,7 +858,7 @@ class EntryTest extends TestCase
         ], Arr::only($entry->selectedQueryRelations(['charlie'])->toArray(), ['alfa', 'bravo', 'charlie']));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_sets_initial_path()
     {
         $entry = new Entry;
@@ -874,7 +870,7 @@ class EntryTest extends TestCase
         $this->assertEquals('123', $entry->initialPath());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_path_and_excludes_locale_when_theres_a_single_site()
     {
         $this->setSites([
@@ -888,7 +884,7 @@ class EntryTest extends TestCase
         $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/2018-01-02.post.md', $entry->date('2018-01-02')->path());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_path_and_includes_locale_when_theres_multiple_sites()
     {
         $this->setSites([
@@ -903,7 +899,7 @@ class EntryTest extends TestCase
         $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/en/2018-01-02.post.md', $entry->date('2018-01-02')->path());
     }
 
-    /** @test */
+    #[Test]
     public function the_path_uses_the_slug_if_set_even_if_slugs_arent_required()
     {
         $collection = tap(Facades\Collection::make('blog')->requiresSlugs(false))->save();
@@ -912,7 +908,7 @@ class EntryTest extends TestCase
         $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/post.md', $entry->path());
     }
 
-    /** @test */
+    #[Test]
     public function the_path_uses_the_id_if_slug_is_not_set()
     {
         $collection = tap(Facades\Collection::make('blog')->requiresSlugs(false))->save();
@@ -921,11 +917,8 @@ class EntryTest extends TestCase
         $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/123.md', $entry->path());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider dateCollectionEntriesProvider
-     */
+    #[Test]
+    #[DataProvider('dateCollectionEntriesProvider')]
     public function it_gets_dates_for_dated_collection_entries(
         $setDate,
         $enableTimeInBlueprint,
@@ -993,13 +986,13 @@ class EntryTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function date_is_null_if_a_collection_hasnt_been_set()
     {
         $this->assertNull((new Entry)->date());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_dates_for_non_dated_collection_entries()
     {
         Carbon::setTestNow(Carbon::parse('2015-09-24 13:45:23'));
@@ -1034,7 +1027,7 @@ class EntryTest extends TestCase
         $this->assertEquals('2023-04-19', $entry->value('date'));
     }
 
-    /** @test */
+    #[Test]
     public function setting_date_on_non_dated_collection_throws_exception()
     {
         $this->expectException(LogicException::class);
@@ -1045,7 +1038,7 @@ class EntryTest extends TestCase
         (new Entry)->collection($collection)->date('2023-04-19');
     }
 
-    /** @test */
+    #[Test]
     public function setting_date_on_entry_that_doesnt_have_a_collection_set_throws_exception()
     {
         $this->expectException(LogicException::class);
@@ -1054,7 +1047,29 @@ class EntryTest extends TestCase
         (new Entry)->date('2023-04-19');
     }
 
-    /** @test */
+    #[Test]
+    public function it_falls_back_to_the_origin_for_the_date()
+    {
+        Collection::make('dated')->dated(true)->save();
+
+        $origin = tap((new Entry)->collection('dated')->id('origin')->date('2024-06-10'))->save();
+        $descendant = tap((new Entry)->collection('dated')->id('descendant')->origin($origin))->save();
+        $this->assertTrue(Carbon::createFromFormat('Y-m-d', '2024-06-10')->startOfDay()->eq($descendant->date()));
+
+        $origin->date('2024-06-11')->save();
+        $this->assertTrue(Carbon::createFromFormat('Y-m-d', '2024-06-11')->startOfDay()->eq($descendant->date()));
+
+        $descendant->date('2024-06-12')->save();
+        $this->assertTrue(Carbon::createFromFormat('Y-m-d', '2024-06-12')->startOfDay()->eq($descendant->date()));
+
+        $origin->date('2024-06-13')->save();
+        $this->assertTrue(Carbon::createFromFormat('Y-m-d', '2024-06-12')->startOfDay()->eq($descendant->date()));
+
+        $descendant->date(null)->save();
+        $this->assertTrue(Carbon::createFromFormat('Y-m-d', '2024-06-13')->startOfDay()->eq($descendant->date()));
+    }
+
+    #[Test]
     public function it_gets_the_order_from_the_collections_structure()
     {
         $collection = tap(Collection::make('ordered'))->save();
@@ -1088,7 +1103,7 @@ class EntryTest extends TestCase
         $this->assertEquals(3, $four->order());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_order_from_the_data_if_not_structured()
     {
         $collection = tap(Collection::make('test'))->save();
@@ -1106,7 +1121,7 @@ class EntryTest extends TestCase
         $this->assertEquals(24, $five->order());
     }
 
-    /** @test */
+    #[Test]
     public function future_dated_entries_are_private_when_configured_in_the_collection()
     {
         Carbon::setTestNow('2019-01-01');
@@ -1122,7 +1137,7 @@ class EntryTest extends TestCase
         $this->assertTrue($entry->private());
     }
 
-    /** @test */
+    #[Test]
     public function past_dated_entries_are_private_when_configured_in_the_collection()
     {
         Carbon::setTestNow('2019-01-01');
@@ -1138,7 +1153,7 @@ class EntryTest extends TestCase
         $this->assertTrue($entry->private());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_sets_the_published_state()
     {
         $entry = new Entry;
@@ -1150,7 +1165,7 @@ class EntryTest extends TestCase
         $this->assertFalse($entry->published());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_blueprint_when_defined_on_itself()
     {
         BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
@@ -1164,7 +1179,7 @@ class EntryTest extends TestCase
         $this->assertNotSame($first, $second);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_set_a_blueprint_using_an_instance()
     {
         BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
@@ -1177,7 +1192,7 @@ class EntryTest extends TestCase
         $this->assertSame($second, $entry->blueprint());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_blueprint_when_defined_in_a_value()
     {
         BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
@@ -1191,7 +1206,7 @@ class EntryTest extends TestCase
         $this->assertNotSame($first, $second);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_blueprint_when_defined_in_an_origin_value()
     {
         BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
@@ -1206,7 +1221,7 @@ class EntryTest extends TestCase
         $this->assertNotSame($first, $second);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_blueprint_when_defined_in_an_origin_property()
     {
         BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
@@ -1221,7 +1236,7 @@ class EntryTest extends TestCase
         $this->assertNotSame($first, $second);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_default_collection_blueprint_when_undefined()
     {
         BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
@@ -1235,7 +1250,7 @@ class EntryTest extends TestCase
         $this->assertNotSame($first, $second);
     }
 
-    /** @test */
+    #[Test]
     public function the_blueprint_is_blinked_when_getting_and_flushed_when_setting()
     {
         $entry = (new Entry)->collection('blog');
@@ -1253,7 +1268,7 @@ class EntryTest extends TestCase
         $this->assertEquals('the new blueprint', $entry->blueprint());
     }
 
-    /** @test */
+    #[Test]
     public function it_dispatches_an_event_when_getting_blueprint()
     {
         Event::fake();
@@ -1275,7 +1290,7 @@ class EntryTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_through_the_api()
     {
         Event::fake();
@@ -1304,7 +1319,7 @@ class EntryTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_dispatches_entry_created_only_once()
     {
         Event::fake();
@@ -1324,7 +1339,7 @@ class EntryTest extends TestCase
         Event::assertDispatched(EntryCreated::class, 1);
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_quietly()
     {
         Event::fake();
@@ -1345,7 +1360,7 @@ class EntryTest extends TestCase
         Event::assertNotDispatched(EntryCreated::class);
     }
 
-    /** @test */
+    #[Test]
     public function when_saving_quietly_the_cached_entrys_withEvents_flag_will_be_set_back_to_true()
     {
         config(['cache.default' => 'file']); // Doesn't work when they're arrays since the object is stored in memory.
@@ -1362,7 +1377,7 @@ class EntryTest extends TestCase
         $this->assertTrue($withEvents);
     }
 
-    /** @test */
+    #[Test]
     public function it_clears_blink_caches_when_saving()
     {
         $collection = tap(Collection::make('test')->structure(new CollectionStructure))->save();
@@ -1383,7 +1398,7 @@ class EntryTest extends TestCase
         $entry->save();
     }
 
-    /** @test */
+    #[Test]
     public function it_performs_callbacks_after_saving_but_before_the_saved_event_and_only_once()
     {
         Event::fake();
@@ -1417,7 +1432,7 @@ class EntryTest extends TestCase
         // TODO: How to test that the callbacks are run *before* the EntrySaved event?
     }
 
-    /** @test */
+    #[Test]
     public function it_propagates_entry_if_configured()
     {
         Event::fake();
@@ -1480,7 +1495,7 @@ class EntryTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_propagates_entry_from_non_default_site_if_configured()
     {
         Event::fake();
@@ -1508,7 +1523,7 @@ class EntryTest extends TestCase
         $this->assertIsObject($entry->descendants()->get('de'));
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_propagate_if_not_configured()
     {
         Event::fake();
@@ -1535,7 +1550,7 @@ class EntryTest extends TestCase
         $this->assertNull($entry->descendants()->get('de'));
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_propagate_existing_entries()
     {
         Event::fake();
@@ -1567,7 +1582,7 @@ class EntryTest extends TestCase
         $this->assertCount(1, Entry::all());
     }
 
-    /** @test */
+    #[Test]
     public function if_creating_event_returns_false_the_entry_doesnt_save()
     {
         Facades\Entry::spy();
@@ -1587,7 +1602,7 @@ class EntryTest extends TestCase
         Event::assertNotDispatched(EntryCreated::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_adds_propagated_entry_to_structure()
     {
         Event::fake();
@@ -1652,7 +1667,7 @@ class EntryTest extends TestCase
         ], $collection->structure()->in('es')->tree());
     }
 
-    /** @test */
+    #[Test]
     public function if_saving_event_returns_false_the_entry_doesnt_save()
     {
         Facades\Entry::spy();
@@ -1672,7 +1687,7 @@ class EntryTest extends TestCase
         Event::assertNotDispatched(EntrySaved::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_file_contents_for_saving()
     {
         tap(Collection::make('test')->dated(true))->save();
@@ -1704,7 +1719,7 @@ class EntryTest extends TestCase
         ], $entry->fileData());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_file_contents_for_saving_a_localized_entry()
     {
         tap(Collection::make('test')->dated(true))->save();
@@ -1748,7 +1763,7 @@ class EntryTest extends TestCase
         ], $entry->fileData());
     }
 
-    /** @test */
+    #[Test]
     public function the_default_blueprint_is_added_to_the_file_contents_when_one_hasnt_been_explicitly_defined()
     {
         BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect([
@@ -1763,7 +1778,7 @@ class EntryTest extends TestCase
         $this->assertEquals('default', $entry->fileData()['blueprint']);
     }
 
-    /** @test */
+    #[Test]
     public function the_explicit_blueprint_is_added_to_the_file_contents()
     {
         BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect([
@@ -1778,7 +1793,7 @@ class EntryTest extends TestCase
         $this->assertEquals('another', $entry->fileData()['blueprint']);
     }
 
-    /** @test */
+    #[Test]
     public function the_blueprint_is_not_added_to_the_localized_file_contents()
     {
         BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect([
@@ -1804,7 +1819,7 @@ class EntryTest extends TestCase
         $this->assertArrayNotHasKey('blueprint', $entry->fileData());
     }
 
-    /** @test */
+    #[Test]
     public function the_blueprint_is_added_to_the_localized_file_contents_if_explicitly_different_from_the_origin()
     {
         BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect([
@@ -1831,7 +1846,7 @@ class EntryTest extends TestCase
         $this->assertEquals('default', $entry->fileData()['blueprint']);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_sets_the_template()
     {
         $collection = tap(Collection::make('test'))->save();
@@ -1855,7 +1870,7 @@ class EntryTest extends TestCase
         $this->assertEquals('baz', $entry->template());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_sets_an_inferred_template_from_blueprint()
     {
         $collection = tap(Collection::make('articles')->template('@blueprint'))->save();
@@ -1875,7 +1890,7 @@ class EntryTest extends TestCase
         $this->assertEquals('articles.custom', $entry->template());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_sets_the_layout()
     {
         $collection = tap(Collection::make('test'))->save();
@@ -1899,7 +1914,7 @@ class EntryTest extends TestCase
         $this->assertEquals('baz', $entry->layout());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_last_modified_time()
     {
         $collection = tap(Collection::make('test'))->save();
@@ -1919,7 +1934,7 @@ class EntryTest extends TestCase
         @unlink($path);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_sets_the_collection()
     {
         $entry = new Entry;
@@ -1933,7 +1948,7 @@ class EntryTest extends TestCase
         $this->assertEquals('foo', $entry->collectionHandle());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_sets_the_id()
     {
         $entry = new Entry;
@@ -1946,7 +1961,7 @@ class EntryTest extends TestCase
         // $this->assertEquals('entry::123', $entry->reference()); // TODO, implementation works but test needs to be adjusted
     }
 
-    /** @test */
+    #[Test]
     public function it_deletes_through_the_api()
     {
         Event::fake();
@@ -1961,7 +1976,7 @@ class EntryTest extends TestCase
         $this->assertTrue($return);
     }
 
-    /** @test */
+    #[Test]
     public function it_fires_a_deleting_event()
     {
         Event::fake();
@@ -1975,7 +1990,7 @@ class EntryTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_deletes_quietly()
     {
         Event::fake();
@@ -1990,7 +2005,7 @@ class EntryTest extends TestCase
         $this->assertTrue($return);
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_delete_when_a_deleting_event_returns_false()
     {
         Facades\Entry::spy();
@@ -2010,7 +2025,7 @@ class EntryTest extends TestCase
         Event::assertNotDispatched(EntryDeleted::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_prevents_deleting_if_there_are_descendants()
     {
         $this->expectExceptionMessage('Cannot delete an entry with localizations.');
@@ -2021,7 +2036,7 @@ class EntryTest extends TestCase
         $entry->delete();
     }
 
-    /** @test */
+    #[Test]
     public function it_deletes_descendants()
     {
         Event::fake();
@@ -2051,7 +2066,7 @@ class EntryTest extends TestCase
         Event::assertDispatched(EntryDeleted::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_deletes_descendants_quietly()
     {
         Event::fake();
@@ -2080,7 +2095,7 @@ class EntryTest extends TestCase
         Event::assertNotDispatched(EntryDeleted::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_detaches_localizations()
     {
         Event::fake();
@@ -2166,7 +2181,7 @@ class EntryTest extends TestCase
         ], $frenchCanadian->data()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_corresponding_page_from_the_collections_structure()
     {
         $parentPage = $this->mock(Page::class);
@@ -2186,7 +2201,7 @@ class EntryTest extends TestCase
         $this->assertSame($parentPage, $entry->parent());
     }
 
-    /** @test */
+    #[Test]
     public function no_page_is_returned_when_the_collection_isnt_using_a_structure()
     {
         $collection = tap(Collection::make('test'))->save();
@@ -2196,11 +2211,8 @@ class EntryTest extends TestCase
         $this->assertNull($entry->parent());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider autoGeneratedTitleProvider
-     */
+    #[Test]
+    #[DataProvider('autoGeneratedTitleProvider')]
     public function it_gets_the_auto_generated_title($format)
     {
         $other = EntryFactory::collection('products')
@@ -2237,7 +2249,7 @@ class EntryTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_preview_targets()
     {
         $this->setSites([
@@ -2312,9 +2324,7 @@ class EntryTest extends TestCase
         ], $entryDe->previewTargets()->all());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_has_a_dirty_state()
     {
         $collection = tap(Collection::make('test'))->save();
@@ -2353,7 +2363,7 @@ class EntryTest extends TestCase
         $this->assertFalse($entry->isClean(['title', 'food']));
     }
 
-    /** @test */
+    #[Test]
     public function it_syncs_original_at_the_right_time()
     {
         $eventsHandled = 0;
@@ -2383,7 +2393,7 @@ class EntryTest extends TestCase
         $this->assertEquals(4, $eventsHandled);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_all_descendants()
     {
         $this->setSites([
@@ -2406,7 +2416,7 @@ class EntryTest extends TestCase
         $this->assertEquals([], $four->descendants()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_direct_descendants()
     {
         $this->setSites([
@@ -2429,7 +2439,7 @@ class EntryTest extends TestCase
         $this->assertEquals([], $four->directDescendants()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_ancestors()
     {
         $this->setSites([
@@ -2452,7 +2462,7 @@ class EntryTest extends TestCase
 
     // todo: add tests for localization things. in(), addLocalization(), etc
 
-    /** @test */
+    #[Test]
     public function it_updates_the_origin_of_descendants_when_saving_an_entry_with_localizations()
     {
         // The issue this test is covering doesn't happen when using the
@@ -2516,7 +2526,7 @@ class EntryTest extends TestCase
         $this->assertCount(2, $fakeBlink->calls['origin-Entry-3']);
     }
 
-    /** @test */
+    #[Test]
     public function initially_saved_entry_gets_put_into_events()
     {
         $this->setSites([

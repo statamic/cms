@@ -35,11 +35,11 @@ class GlideController extends Controller
     /**
      * GlideController constructor.
      */
-    public function __construct(Server $server, Request $request)
+    public function __construct(Server $server, Request $request, ImageGenerator $generator)
     {
         $this->server = $server;
         $this->request = $request;
-        $this->generator = new ImageGenerator($server);
+        $this->generator = $generator;
     }
 
     /**

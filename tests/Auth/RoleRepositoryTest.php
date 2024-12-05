@@ -3,6 +3,7 @@
 namespace Tests\Auth;
 
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\File\RoleRepository;
 use Statamic\Contracts\Auth\Role;
 use Statamic\Facades\File;
@@ -19,7 +20,7 @@ class RoleRepositoryTest extends TestCase
         $this->repo = (new RoleRepository)->path(__DIR__.'/__fixtures__/roles.yaml');
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_roles()
     {
         $roles = $this->repo->all();
@@ -29,7 +30,7 @@ class RoleRepositoryTest extends TestCase
         $this->assertEveryItemIsInstanceOf(Role::class, $roles);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_role()
     {
         tap($this->repo->find('one'), function ($role) {
@@ -59,7 +60,7 @@ class RoleRepositoryTest extends TestCase
         $this->assertNull($this->repo->find('unknown'));
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_if_a_role_exists()
     {
         $this->assertTrue($this->repo->exists('one'));
@@ -68,7 +69,7 @@ class RoleRepositoryTest extends TestCase
         $this->assertFalse($this->repo->exists('unknown'));
     }
 
-    /** @test */
+    #[Test]
     public function it_works_with_an_empty_file()
     {
         File::shouldReceive('exists')->andReturnTrue();
@@ -83,7 +84,7 @@ class RoleRepositoryTest extends TestCase
         $this->assertFalse($this->repo->exists('test'));
     }
 
-    /** @test */
+    #[Test]
     public function it_works_with_no_file()
     {
         File::shouldReceive('exists')->andReturnFalse();

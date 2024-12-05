@@ -4,6 +4,8 @@ namespace Tests\Fieldtypes;
 
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\ValidationException;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Preference;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
@@ -22,11 +24,8 @@ class DateTest extends TestCase
         Carbon::setTestNow(Carbon::createFromFormat('Y-m-d H:i', '2010-12-25 13:43'));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider augmentProvider
-     */
+    #[Test]
+    #[DataProvider('augmentProvider')]
     public function it_augments($config, $value, $expected)
     {
         $augmented = $this->fieldtype($config)->augment($value);
@@ -71,7 +70,7 @@ class DateTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_null()
     {
         $augmented = $this->fieldtype()->augment(null);
@@ -79,7 +78,7 @@ class DateTest extends TestCase
         $this->assertNull($augmented);
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_a_carbon_instance()
     {
         // Could happen if you are using the date fieldtype to augment a manually provided value.
@@ -90,7 +89,7 @@ class DateTest extends TestCase
         $this->assertSame($instance, $augmented);
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_a_range()
     {
         $augmented = $this->fieldtype(['mode' => 'range'])->augment([
@@ -106,7 +105,7 @@ class DateTest extends TestCase
         $this->assertEquals('2013 Feb 06 00:00', $augmented['end']->format('Y M d H:i'));
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_a_null_range()
     {
         $augmented = $this->fieldtype(['mode' => 'range'])->augment(null);
@@ -114,11 +113,8 @@ class DateTest extends TestCase
         $this->assertNull($augmented);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider processProvider
-     */
+    #[Test]
+    #[DataProvider('processProvider')]
     public function it_processes_on_save($config, $value, $expected)
     {
         $this->assertSame($expected, $this->fieldtype($config)->process($value));
@@ -190,13 +186,13 @@ class DateTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_date_as_integer_if_format_results_in_a_number()
     {
         $this->assertSame(20120829, $this->fieldtype(['format' => 'Ymd'])->process(['date' => '2012-08-29', 'time' => null]));
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_ranges_as_integers_if_format_results_in_a_number()
     {
         $fieldtype = $this->fieldtype(['mode' => 'range', 'format' => 'Ymd']);
@@ -207,11 +203,8 @@ class DateTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider preProcessProvider
-     */
+    #[Test]
+    #[DataProvider('preProcessProvider')]
     public function it_preprocesses($config, $value, $expected)
     {
         $this->assertSame($expected, $this->fieldtype($config)->preProcess($value));
@@ -306,11 +299,8 @@ class DateTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider preProcessIndexProvider
-     */
+    #[Test]
+    #[DataProvider('preProcessIndexProvider')]
     public function it_preprocesses_for_index($config, $value, $expected)
     {
         // Show that the date format from the preference is being used, and
@@ -395,7 +385,7 @@ class DateTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_display_format_when_time_is_disabled()
     {
         $fieldtype = $this->fieldtype();
@@ -404,7 +394,7 @@ class DateTest extends TestCase
         $this->assertEquals('Y-m-d', $fieldtype->fieldDisplayFormat());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_display_format_when_time_is_enabled()
     {
         $fieldtype = $this->fieldtype(['time_enabled' => true]);
@@ -414,7 +404,7 @@ class DateTest extends TestCase
         $this->assertEquals('Y-m-d', $fieldtype->fieldDisplayFormat());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_display_format_for_ranges()
     {
         $fieldtype = $this->fieldtype(['mode' => 'range']);
@@ -423,7 +413,7 @@ class DateTest extends TestCase
         $this->assertEquals('Y-m-d', $fieldtype->fieldDisplayFormat());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_display_format_when_time_is_disabled_with_custom_format()
     {
         $fieldtype = $this->fieldtype(['format' => 'U']);
@@ -432,7 +422,7 @@ class DateTest extends TestCase
         $this->assertEquals('Y-m-d', $fieldtype->fieldDisplayFormat());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_display_format_when_time_is_enabled_with_custom_format()
     {
         $fieldtype = $this->fieldtype(['time_enabled' => true, 'format' => 'U']);
@@ -441,7 +431,7 @@ class DateTest extends TestCase
         $this->assertEquals('Y-m-d', $fieldtype->fieldDisplayFormat());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_display_format_for_ranges_with_custom_format()
     {
         $fieldtype = $this->fieldtype(['mode' => 'range', 'format' => 'U']);
@@ -450,11 +440,8 @@ class DateTest extends TestCase
         $this->assertEquals('Y-m-d', $fieldtype->fieldDisplayFormat());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider validatablesProvider
-     */
+    #[Test]
+    #[DataProvider('validatablesProvider')]
     public function it_preprocess_validatables($config, $input, $expected)
     {
         $fieldtype = $this->fieldtype($config);
@@ -513,11 +500,8 @@ class DateTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider rangeValidatablesProvider
-     */
+    #[Test]
+    #[DataProvider('rangeValidatablesProvider')]
     public function it_preprocess_range_validatables($config, $input, $expected)
     {
         $fieldtype = $this->fieldtype($config);
@@ -576,11 +560,8 @@ class DateTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider validationProvider
-     */
+    #[Test]
+    #[DataProvider('validationProvider')]
     public function it_validates($config, $input, $expected)
     {
         $messages = [];

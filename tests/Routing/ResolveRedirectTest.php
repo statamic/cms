@@ -3,6 +3,7 @@
 namespace Tests\Routing;
 
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades;
@@ -17,7 +18,7 @@ use Tests\TestCase;
 
 class ResolveRedirectTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_resolves_standard_redirects()
     {
         $resolver = new ResolveRedirect;
@@ -32,7 +33,7 @@ class ResolveRedirectTest extends TestCase
         $this->assertNull($resolver(null));
     }
 
-    /** @test */
+    #[Test]
     public function it_cant_resolve_a_first_child_without_a_parent()
     {
         $this->expectException(\Exception::class);
@@ -43,7 +44,7 @@ class ResolveRedirectTest extends TestCase
         $this->assertEquals('/page/child', $resolver('@child'));
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_resolve_a_first_child_redirect_if_the_parent_is_not_a_page()
     {
         $this->expectException(\Exception::class);
@@ -54,7 +55,7 @@ class ResolveRedirectTest extends TestCase
         $this->assertEquals('/page/child', $resolver('@child', 'not a page object'));
     }
 
-    /** @test */
+    #[Test]
     public function it_resolves_first_child()
     {
         $resolver = new ResolveRedirect;
@@ -73,7 +74,7 @@ class ResolveRedirectTest extends TestCase
         $this->assertEquals($child, $resolver->item('@child', $parent));
     }
 
-    /** @test */
+    #[Test]
     public function it_resolves_first_child_through_an_entry()
     {
         $resolver = new ResolveRedirect;
@@ -95,7 +96,7 @@ class ResolveRedirectTest extends TestCase
         $this->assertEquals($child, $resolver->item('@child', $parent));
     }
 
-    /** @test */
+    #[Test]
     public function it_resolves_a_first_child_redirect_when_its_a_root_page()
     {
         // When the parent is a root page of a structure, the first child should
@@ -125,7 +126,7 @@ class ResolveRedirectTest extends TestCase
         $this->assertEquals($child, $resolver->item('@child', $root));
     }
 
-    /** @test */
+    #[Test]
     public function a_parent_without_a_child_resolves_to_a_404()
     {
         $resolver = new ResolveRedirect;
@@ -141,7 +142,7 @@ class ResolveRedirectTest extends TestCase
         $this->assertSame(null, $resolver->item('@child', $parent));
     }
 
-    /** @test */
+    #[Test]
     public function it_resolves_references_to_entries()
     {
         $resolver = new ResolveRedirect;
@@ -153,7 +154,7 @@ class ResolveRedirectTest extends TestCase
         $this->assertEquals($entry, $resolver->item('entry::123'));
     }
 
-    /** @test */
+    #[Test]
     public function it_resolves_references_to_entries_localized()
     {
         $resolver = new ResolveRedirect;
@@ -167,7 +168,7 @@ class ResolveRedirectTest extends TestCase
         $this->assertEquals($frenchEntry, $resolver->item('entry::123', $parentEntry, true));
     }
 
-    /** @test */
+    #[Test]
     public function it_resolves_references_to_entries_localized_with_fallback()
     {
         $resolver = new ResolveRedirect;
@@ -182,7 +183,7 @@ class ResolveRedirectTest extends TestCase
         $this->assertEquals($entry, $resolver->item('entry::123', $parentEntry, true));
     }
 
-    /** @test */
+    #[Test]
     public function it_resolves_references_to_assets()
     {
         $resolver = new ResolveRedirect;
@@ -194,7 +195,7 @@ class ResolveRedirectTest extends TestCase
         $this->assertEquals($asset, $resolver->item('asset::foo::bar/baz.jpg'));
     }
 
-    /** @test */
+    #[Test]
     public function unknown_entry_ids_resolve_to_404()
     {
         $resolver = new ResolveRedirect;
@@ -205,7 +206,7 @@ class ResolveRedirectTest extends TestCase
         $this->assertSame(null, $resolver->item('entry::123'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_invoke_the_class_or_call_resolve()
     {
         $resolve = $this->partialMock(ResolveRedirect::class);
@@ -215,7 +216,7 @@ class ResolveRedirectTest extends TestCase
         $this->assertEquals('hello', $resolve('foo', 'bar'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_resolve_a_group_field_with_url()
     {
         // When using the "Link" blueprint, the `redirect` field would be a `group` type
@@ -236,7 +237,7 @@ class ResolveRedirectTest extends TestCase
         $this->assertEquals('/test', $resolver->item($value));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_resolve_a_group_field_with_entry()
     {
         // Same as above, but in this case, an entry was selected in the nested link field.
@@ -256,7 +257,7 @@ class ResolveRedirectTest extends TestCase
         $this->assertEquals($entry, $resolver->item($value));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_resolve_arrays_with_url_and_code()
     {
         // Same as above, but without a blueprint field.

@@ -3,6 +3,8 @@
 namespace Tests\API;
 
 use Facades\Statamic\API\FilterAuthorizer;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Facades\Config;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -43,11 +45,8 @@ class FilterAuthorizerTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider configFileProvider
-     */
+    #[Test]
+    #[DataProvider('configFileProvider')]
     public function no_sub_resource_filters_are_allowed_by_default_when_resource_is_disabled($configFile)
     {
         Config::set("statamic.{$configFile}.resources", [
@@ -84,11 +83,8 @@ class FilterAuthorizerTest extends TestCase
         $this->assertEqualsCanonicalizing([], FilterAuthorizer::allowedForSubResources($configFile, 'forms', '*'));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider configFileProvider
-     */
+    #[Test]
+    #[DataProvider('configFileProvider')]
     public function no_sub_resource_filters_are_allowed_by_default_when_resource_is_enabled($configFile)
     {
         Config::set("statamic.{$configFile}.resources", [
@@ -125,11 +121,8 @@ class FilterAuthorizerTest extends TestCase
         $this->assertEqualsCanonicalizing([], FilterAuthorizer::allowedForSubResources($configFile, 'forms', '*'));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider configFileProvider
-     */
+    #[Test]
+    #[DataProvider('configFileProvider')]
     public function it_allows_filters_when_configured_using_wildcard_sub_resources($configFile)
     {
         Config::set("statamic.{$configFile}.resources", [
@@ -196,11 +189,8 @@ class FilterAuthorizerTest extends TestCase
         $this->assertEqualsCanonicalizing(['title'], FilterAuthorizer::allowedForSubResources($configFile, 'forms', '*'));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider configFileProvider
-     */
+    #[Test]
+    #[DataProvider('configFileProvider')]
     public function it_allows_filters_when_configured_on_specific_sub_resources($configFile)
     {
         Config::set("statamic.{$configFile}.resources", [
@@ -255,11 +245,8 @@ class FilterAuthorizerTest extends TestCase
         $this->assertEqualsCanonicalizing([], FilterAuthorizer::allowedForSubResources($configFile, 'forms', '*'));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider configFileProvider
-     */
+    #[Test]
+    #[DataProvider('configFileProvider')]
     public function it_allows_filters_that_are_common_to_all_selected_sub_resources($configFile)
     {
         Config::set("statamic.{$configFile}.resources.collections", [
@@ -277,11 +264,8 @@ class FilterAuthorizerTest extends TestCase
         $this->assertEqualsCanonicalizing(['title'], FilterAuthorizer::allowedForSubResources($configFile, 'collections', '*'));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider configFileProvider
-     */
+    #[Test]
+    #[DataProvider('configFileProvider')]
     public function it_merges_sub_resources_filters_with_wildcard_sub_resources_config($configFile)
     {
         Config::set("statamic.{$configFile}.resources.collections", [
@@ -300,11 +284,8 @@ class FilterAuthorizerTest extends TestCase
         $this->assertEqualsCanonicalizing(['title'], FilterAuthorizer::allowedForSubResources($configFile, 'collections', '*'));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider configFileProvider
-     */
+    #[Test]
+    #[DataProvider('configFileProvider')]
     public function it_properly_handles_disabled_sub_resources_when_merging_filters($configFile)
     {
         // Add a third collection, but do not enable it as sub-resource in config...
@@ -329,11 +310,8 @@ class FilterAuthorizerTest extends TestCase
         $this->assertEqualsCanonicalizing(['title'], FilterAuthorizer::allowedForSubResources($configFile, 'collections', '*'));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider configFileProvider
-     */
+    #[Test]
+    #[DataProvider('configFileProvider')]
     public function it_allows_disabling_filters_on_specific_sub_resources_when_using_wildcard_config($configFile)
     {
         Config::set("statamic.{$configFile}.resources.collections", [
@@ -351,11 +329,8 @@ class FilterAuthorizerTest extends TestCase
         $this->assertEqualsCanonicalizing([], FilterAuthorizer::allowedForSubResources($configFile, 'collections', '*'));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider configFileProvider
-     */
+    #[Test]
+    #[DataProvider('configFileProvider')]
     public function no_user_filters_are_allowed_by_default($configFile)
     {
         Config::set("statamic.{$configFile}.resources.users", false);
@@ -367,11 +342,8 @@ class FilterAuthorizerTest extends TestCase
         $this->assertEqualsCanonicalizing([], FilterAuthorizer::allowedForResource($configFile, 'users'));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider configFileProvider
-     */
+    #[Test]
+    #[DataProvider('configFileProvider')]
     public function it_allows_user_filters_when_configured($configFile)
     {
         Config::set("statamic.{$configFile}.resources.users.allowed_filters", [

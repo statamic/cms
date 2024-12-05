@@ -2,12 +2,13 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class AntlersTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_parses_as_antlers(): void
     {
         $modified = $this->modify('foo {{ foo }} bar {{ bar }}', ['foo' => 'alfa', 'bar' => 'bravo']);

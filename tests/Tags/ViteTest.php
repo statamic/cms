@@ -3,6 +3,7 @@
 namespace Tests\Tags;
 
 use Illuminate\Foundation\Vite;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Parse;
 use Tests\TestCase;
 
@@ -21,7 +22,7 @@ class ViteTest extends TestCase
         return (string) Parse::template($tag, $data);
     }
 
-    /** @test */
+    #[Test]
     public function it_outputs_script()
     {
         $output = $this->tag('{{ vite src="test.js" }}');
@@ -34,7 +35,7 @@ HTML;
         $this->assertEqualsIgnoringLineBreaks($expected, $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_outputs_stylesheet()
     {
 
@@ -48,7 +49,7 @@ HTML;
         $this->assertEqualsIgnoringLineBreaks($expected, $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_outputs_multiple_entry_points()
     {
         $output = $this->tag('{{ vite src="test.js|test.css" }}');
@@ -63,7 +64,7 @@ HTML;
         $this->assertEqualsIgnoringLineBreaks($expected, $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_includes_attributes()
     {
         $output = $this->tag('{{ vite src="test.js|test.css" alfa="bravo" attr:charlie="delta" }}');
@@ -78,7 +79,7 @@ HTML;
         $this->assertEqualsIgnoringLineBreaks($expected, $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_includes_tag_specific_attributes()
     {
         $output = $this->tag('{{ vite src="test.js|test.css" alfa="bravo" attr:charlie="delta" attr:script:echo="foxtrot" attr:style:golf="hotel" }}');

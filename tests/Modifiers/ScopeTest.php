@@ -4,6 +4,7 @@ namespace Tests\Modifiers;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Contracts\Support\Arrayable;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Fields\Blueprint;
@@ -14,7 +15,7 @@ use Tests\TestCase;
 
 class ScopeTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_requires_a_scope_name()
     {
         $this->expectExceptionMessage('Scope modifier requires a name.');
@@ -22,7 +23,7 @@ class ScopeTest extends TestCase
         $this->modify([], null);
     }
 
-    /** @test */
+    #[Test]
     public function it_requires_an_associative_array()
     {
         $this->expectExceptionMessage('Scopes can only be added to associative or multidimensional arrays.');
@@ -30,7 +31,7 @@ class ScopeTest extends TestCase
         $this->modify(['one', 'two'], 'test');
     }
 
-    /** @test */
+    #[Test]
     public function it_adds_scopes()
     {
         $arr = [
@@ -50,7 +51,7 @@ class ScopeTest extends TestCase
         $this->assertEquals($expected, $this->modify($arr, 'test'));
     }
 
-    /** @test */
+    #[Test]
     public function it_adds_scopes_to_collections()
     {
         $arr = collect([
@@ -70,7 +71,7 @@ class ScopeTest extends TestCase
         $this->assertEquals($expected, $this->modify($arr, 'test'));
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_when_adding_scope()
     {
         $arr = collect([
@@ -90,7 +91,7 @@ class ScopeTest extends TestCase
         $this->assertEquals($expected, $this->modify($arr, 'test'));
     }
 
-    /** @test */
+    #[Test]
     public function it_resolves_values_value_when_adding_scope()
     {
         $arr = [

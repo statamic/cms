@@ -2,9 +2,11 @@
 
 namespace Tests\Data\Users;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Role;
 use Statamic\Facades\User;
 use Statamic\Facades\UserGroup;
+use Statamic\Query\Scopes\Scope;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -12,7 +14,7 @@ class UserQueryBuilderTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /** @test **/
+    #[Test]
     public function users_are_found_using_or_where()
     {
         User::make()->email('gandalf@precious.com')->data(['name' => 'Gandalf'])->save();
@@ -25,7 +27,7 @@ class UserQueryBuilderTest extends TestCase
         $this->assertEquals(['Gandalf', 'Frodo'], $users->map->name->all());
     }
 
-    /** @test **/
+    #[Test]
     public function users_are_found_using_or_where_in()
     {
         User::make()->email('gandalf@precious.com')->data(['name' => 'Gandalf'])->save();
@@ -40,7 +42,7 @@ class UserQueryBuilderTest extends TestCase
         $this->assertEquals(['Gandalf', 'Frodo', 'Aragorn', 'Tommy'], $users->map->name->all());
     }
 
-    /** @test **/
+    #[Test]
     public function users_are_found_using_or_where_not_in()
     {
         User::make()->email('gandalf@precious.com')->data(['name' => 'Gandalf'])->save();
@@ -56,7 +58,7 @@ class UserQueryBuilderTest extends TestCase
         $this->assertEquals(['Smeagol', 'Aragorn', 'Tommy'], $users->map->name->all());
     }
 
-    /** @test **/
+    #[Test]
     public function users_are_found_using_nested_where()
     {
         User::make()->email('gandalf@precious.com')->data(['name' => 'Gandalf'])->save();
@@ -80,7 +82,7 @@ class UserQueryBuilderTest extends TestCase
         $this->assertEquals(['Gandalf', 'Frodo', 'Aragorn', 'Sauron'], $users->map->name->all());
     }
 
-    /** @test **/
+    #[Test]
     public function users_are_found_using_nested_where_in()
     {
         User::make()->email('gandalf@precious.com')->data(['name' => 'Gandalf'])->save();
@@ -104,7 +106,7 @@ class UserQueryBuilderTest extends TestCase
         $this->assertEquals(['Gandalf', 'Frodo', 'Aragorn', 'Sauron'], $users->map->name->all());
     }
 
-    /** @test **/
+    #[Test]
     public function users_are_found_using_where_with_json_value()
     {
         User::make()->email('gandalf@precious.com')->data(['name' => 'Gandalf', 'content' => ['value' => 1]])->save();
@@ -132,7 +134,7 @@ class UserQueryBuilderTest extends TestCase
         $this->assertEquals(['Smeagol', 'Frodo', 'Tommy', 'Sauron', 'Arwen', 'Bilbo'], $users->map->name->all());
     }
 
-    /** @test **/
+    #[Test]
     public function users_are_found_using_where_column()
     {
         User::make()->email('1@test.com')->data(['foo' => 'Post 1', 'other_foo' => 'Not Post 1'])->save();
@@ -152,7 +154,7 @@ class UserQueryBuilderTest extends TestCase
         $this->assertEquals(['Post 1', 'Post 2', 'Post 5'], $entries->map->foo->all());
     }
 
-    /** @test **/
+    #[Test]
     public function users_are_found_using_when()
     {
         User::make()->email('gandalf@precious.com')->data(['name' => 'Gandalf'])->save();
@@ -174,7 +176,7 @@ class UserQueryBuilderTest extends TestCase
         $this->assertEquals(['Gandalf', 'Smeagol', 'Frodo'], $users->map->name->all());
     }
 
-    /** @test **/
+    #[Test]
     public function users_are_found_using_unless()
     {
         User::make()->email('gandalf@precious.com')->data(['name' => 'Gandalf'])->save();
@@ -196,7 +198,7 @@ class UserQueryBuilderTest extends TestCase
         $this->assertEquals(['Gandalf'], $users->map->name->all());
     }
 
-    /** @test **/
+    #[Test]
     public function users_are_found_using_tap()
     {
         User::make()->email('gandalf@precious.com')->data(['name' => 'Gandalf'])->save();
@@ -211,7 +213,7 @@ class UserQueryBuilderTest extends TestCase
         $this->assertEquals(['Gandalf'], $users->map->name->all());
     }
 
-    /** @test **/
+    #[Test]
     public function users_are_found_using_where_group()
     {
         $groupOne = tap(UserGroup::make()->handle('one'))->save();
@@ -236,7 +238,7 @@ class UserQueryBuilderTest extends TestCase
         $this->assertEquals(['Frodo'], $users->map->name->all());
     }
 
-    /** @test **/
+    #[Test]
     public function users_are_found_using_where_group_in()
     {
         $groupOne = tap(UserGroup::make()->handle('one'))->save();
@@ -267,7 +269,7 @@ class UserQueryBuilderTest extends TestCase
         $this->assertEquals(['Gandalf', 'Frodo', 'Smeagol'], $users->map->name->all());
     }
 
-    /** @test **/
+    #[Test]
     public function users_are_found_using_or_where_group()
     {
         $groupOne = tap(UserGroup::make()->handle('one'))->save();
@@ -288,7 +290,7 @@ class UserQueryBuilderTest extends TestCase
         $this->assertEquals(['Gandalf', 'Smeagol'], $users->map->name->all());
     }
 
-    /** @test **/
+    #[Test]
     public function users_are_found_using_where_role()
     {
         $roleOne = tap(Role::make()->handle('one'))->save();
@@ -313,7 +315,7 @@ class UserQueryBuilderTest extends TestCase
         $this->assertEquals(['Frodo'], $users->map->name->all());
     }
 
-    /** @test **/
+    #[Test]
     public function users_are_found_using_where_role_in()
     {
         $roleOne = tap(Role::make()->handle('one'))->save();
@@ -344,7 +346,7 @@ class UserQueryBuilderTest extends TestCase
         $this->assertEquals(['Gandalf', 'Frodo', 'Smeagol'], $users->map->name->all());
     }
 
-    /** @test **/
+    #[Test]
     public function users_are_found_using_or_where_role()
     {
         $roleOne = tap(Role::make()->handle('one'))->save();
@@ -365,7 +367,7 @@ class UserQueryBuilderTest extends TestCase
         $this->assertEquals(['Gandalf', 'Smeagol'], $users->map->name->all());
     }
 
-    /** @test */
+    #[Test]
     public function values_can_be_plucked()
     {
         User::make()->email('gandalf@precious.com')->data(['name' => 'Gandalf', 'type' => 'a'])->save();
@@ -389,5 +391,27 @@ class UserQueryBuilderTest extends TestCase
             'Smeagol',
             'Frodo',
         ], User::query()->where('type', 'b')->pluck('name')->all());
+    }
+
+    /** @test **/
+    public function users_are_found_using_scopes()
+    {
+        CustomScope::register();
+        User::allowQueryScope(CustomScope::class);
+        User::allowQueryScope(CustomScope::class, 'whereCustom');
+
+        User::make()->email('gandalf@precious.com')->data(['name' => 'Gandalf'])->save();
+        User::make()->email('smeagol@precious.com')->data(['name' => 'Smeagol'])->save();
+
+        $this->assertCount(1, User::query()->customScope(['email' => 'gandalf@precious.com'])->get());
+        $this->assertCount(1, User::query()->whereCustom(['email' => 'gandalf@precious.com'])->get());
+    }
+}
+
+class CustomScope extends Scope
+{
+    public function apply($query, $params)
+    {
+        $query->where('email', $params['email']);
     }
 }

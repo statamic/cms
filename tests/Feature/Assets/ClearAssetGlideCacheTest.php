@@ -4,6 +4,7 @@ namespace Tests\Feature\Assets;
 
 use Illuminate\Contracts\Events\Dispatcher;
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Events\AssetDeleted;
 use Statamic\Events\AssetReuploaded;
@@ -15,7 +16,7 @@ use Tests\TestCase;
 
 class ClearAssetGlideCacheTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_subscribes()
     {
         $events = Mockery::mock(Dispatcher::class);
@@ -26,7 +27,7 @@ class ClearAssetGlideCacheTest extends TestCase
         app(ClearAssetGlideCache::class)->subscribe($events);
     }
 
-    /** @test */
+    #[Test]
     public function it_clears_when_deleting()
     {
         $asset = Mockery::mock(Asset::class);
@@ -35,7 +36,7 @@ class ClearAssetGlideCacheTest extends TestCase
         app(ClearAssetGlideCache::class)->handleDeleted(new AssetDeleted($asset));
     }
 
-    /** @test */
+    #[Test]
     public function it_clears_when_reuploading()
     {
         $asset = Mockery::mock(Asset::class);
@@ -44,7 +45,7 @@ class ClearAssetGlideCacheTest extends TestCase
         app(ClearAssetGlideCache::class)->handleReuploaded(new AssetReuploaded($asset));
     }
 
-    /** @test */
+    #[Test]
     public function it_clears_when_focus_is_added()
     {
         $asset = Mockery::mock(Asset::class);
@@ -58,7 +59,7 @@ class ClearAssetGlideCacheTest extends TestCase
         app(ClearAssetGlideCache::class)->handleSaved(new AssetSaved($asset));
     }
 
-    /** @test */
+    #[Test]
     public function it_clears_when_focus_changes()
     {
         $asset = Mockery::mock(Asset::class);
@@ -72,7 +73,7 @@ class ClearAssetGlideCacheTest extends TestCase
         app(ClearAssetGlideCache::class)->handleSaved(new AssetSaved($asset));
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_clear_focus_stays_the_same()
     {
         $asset = Mockery::mock(Asset::class);
@@ -85,7 +86,7 @@ class ClearAssetGlideCacheTest extends TestCase
         app(ClearAssetGlideCache::class)->handleSaved(new AssetSaved($asset));
     }
 
-    /** @test */
+    #[Test]
     public function it_clears_when_focus_is_removed()
     {
         $asset = Mockery::mock(Asset::class);

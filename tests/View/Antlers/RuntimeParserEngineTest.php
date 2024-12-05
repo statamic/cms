@@ -4,6 +4,7 @@ namespace Tests\View\Antlers;
 
 use Illuminate\Filesystem\Filesystem;
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\View\Antlers\Engine;
 use Tests\TestCase;
@@ -23,7 +24,7 @@ class RuntimeParserEngineTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function parses_a_basic_template()
     {
         $this->files
@@ -37,7 +38,7 @@ class RuntimeParserEngineTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function parses_a_template_with_noparse_tags()
     {
         $this->files
@@ -51,7 +52,7 @@ class RuntimeParserEngineTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function php_is_not_executed_if_the_filename_is_html()
     {
         $this->files
@@ -65,7 +66,7 @@ class RuntimeParserEngineTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function php_is_executed_if_the_filename_is_php()
     {
         $this->files

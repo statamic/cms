@@ -5,6 +5,8 @@ namespace Tests\Feature\Fieldtypes;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\AssetContainer;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -31,11 +33,8 @@ class FilesTest extends TestCase
         AssetContainer::make('with_preset')->disk('with_preset')->sourcePreset('upload')->save();
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider uploadProvider
-     */
+    #[Test]
+    #[DataProvider('uploadProvider')]
     public function it_uploads_a_file($container, $isImage, $expectedPath, $expectedWidth, $expectedHeight)
     {
         $glideDir = storage_path('statamic/glide/tmp');

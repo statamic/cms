@@ -3,6 +3,7 @@
 namespace Tests\Feature\Fieldsets;
 
 use Facades\Statamic\Fields\FieldRepository;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Fields\Field;
@@ -24,7 +25,7 @@ class UpdateFieldsetTest extends TestCase
         FieldsetRepository::swap(new FakeFieldsetRepository);
     }
 
-    /** @test */
+    #[Test]
     public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
@@ -42,7 +43,7 @@ class UpdateFieldsetTest extends TestCase
         $this->assertEquals('Test', $fieldset->title());
     }
 
-    /** @test */
+    #[Test]
     public function fieldset_gets_saved()
     {
         $this->withoutExceptionHandling();
@@ -104,7 +105,7 @@ class UpdateFieldsetTest extends TestCase
         ], Facades\Fieldset::find('test')->contents());
     }
 
-    /** @test */
+    #[Test]
     public function title_is_required()
     {
         $user = tap(Facades\User::make()->makeSuper())->save();
@@ -121,7 +122,7 @@ class UpdateFieldsetTest extends TestCase
         $this->assertEquals('Test', Facades\Fieldset::find('test')->title());
     }
 
-    /** @test */
+    #[Test]
     public function fields_are_required()
     {
         $user = tap(Facades\User::make()->makeSuper())->save();
@@ -143,7 +144,7 @@ class UpdateFieldsetTest extends TestCase
         $this->assertEquals($originalContents, Facades\Fieldset::find('test')->contents());
     }
 
-    /** @test */
+    #[Test]
     public function fields_must_be_an_array()
     {
         $user = tap(Facades\User::make()->makeSuper())->save();

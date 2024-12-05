@@ -4,6 +4,8 @@ namespace Tests\Routing;
 
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Facades\Route;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Config;
 use Statamic\Facades\Taxonomy;
@@ -101,7 +103,7 @@ class RoutesTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_a_view()
     {
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
@@ -112,7 +114,7 @@ class RoutesTest extends TestCase
             ->assertSee('Hello world');
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_a_view_with_data_from_a_closure()
     {
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
@@ -123,7 +125,7 @@ class RoutesTest extends TestCase
             ->assertSee('Hello world');
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_a_view_without_data()
     {
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
@@ -134,7 +136,7 @@ class RoutesTest extends TestCase
             ->assertSee('Hello ');
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_a_view_with_placeholders()
     {
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
@@ -145,7 +147,7 @@ class RoutesTest extends TestCase
             ->assertSee('Hello one two three');
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_a_view_with_placeholders_and_data_from_a_closure()
     {
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
@@ -156,7 +158,7 @@ class RoutesTest extends TestCase
             ->assertSee('Hello one two three');
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_a_view_with_custom_layout()
     {
         $this->viewShouldReturnRaw('custom-layout', 'Custom layout {{ template_content }}');
@@ -168,11 +170,8 @@ class RoutesTest extends TestCase
             ->assertSee('Custom layout Hello world');
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider undefinedLayoutRouteProvider
-     **/
+    #[Test]
+    #[DataProvider('undefinedLayoutRouteProvider')]
     public function it_renders_a_view_without_a_layout($route)
     {
         $this->withoutExceptionHandling();
@@ -193,7 +192,7 @@ class RoutesTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function it_loads_content()
     {
         EntryFactory::id('pages-blog')->collection('pages')->data(['title' => 'Blog'])->create();
@@ -206,7 +205,7 @@ class RoutesTest extends TestCase
             ->assertSee('Hello world Blog pages-blog');
     }
 
-    /** @test */
+    #[Test]
     public function it_loads_content_by_uri()
     {
         $collection = Collection::make('pages')->routes('/{slug}')->save();
@@ -220,7 +219,7 @@ class RoutesTest extends TestCase
             ->assertSee('Hello world Blog pages-blog');
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_a_view_with_custom_content_type()
     {
         $this->withoutExceptionHandling();
@@ -233,7 +232,7 @@ class RoutesTest extends TestCase
             ->assertExactJson(['hello' => 'world']);
     }
 
-    /** @test */
+    #[Test]
     public function xml_antlers_template_with_xml_layout_will_use_both_and_change_the_content_type()
     {
         $this->withFakeViews();
@@ -247,7 +246,7 @@ class RoutesTest extends TestCase
         $this->assertEquals('<?xml ?><foo></foo>', $response->getContent());
     }
 
-    /** @test */
+    #[Test]
     public function xml_antlers_template_with_non_xml_layout_will_change_content_type_but_avoid_using_the_layout()
     {
         $this->withFakeViews();
@@ -261,7 +260,7 @@ class RoutesTest extends TestCase
         $this->assertEquals('<foo></foo>', $response->getContent());
     }
 
-    /** @test */
+    #[Test]
     public function xml_antlers_layout_will_change_the_content_type()
     {
         $this->withFakeViews();
@@ -275,7 +274,7 @@ class RoutesTest extends TestCase
         $this->assertEquals('<?xml ?><foo></foo>', $response->getContent());
     }
 
-    /** @test */
+    #[Test]
     public function xml_blade_template_will_not_change_content_type()
     {
         // Blade doesnt support xml files, but even if it did,
@@ -291,7 +290,7 @@ class RoutesTest extends TestCase
         $this->assertEquals('<foo></foo>', $response->getContent());
     }
 
-    /** @test */
+    #[Test]
     public function xml_template_with_custom_content_type_does_not_change_to_xml()
     {
         $this->withFakeViews();
@@ -303,7 +302,7 @@ class RoutesTest extends TestCase
             ->assertHeader('Content-Type', 'application/json');
     }
 
-    /** @test */
+    #[Test]
     public function it_loads_entry_by_binding()
     {
         Config::set('statamic.routes.bindings', true);
@@ -323,7 +322,7 @@ class RoutesTest extends TestCase
             ->assertNotFound();
     }
 
-    /** @test */
+    #[Test]
     public function it_loads_term_by_binding()
     {
         Config::set('statamic.routes.bindings', true);
@@ -341,5 +340,17 @@ class RoutesTest extends TestCase
 
         $this->get('/bindings/term/title/Blog2')
             ->assertNotFound();
+    }
+
+    #[Test]
+    public function it_uses_a_non_default_layout()
+    {
+        config()->set('statamic.system.layout', 'custom-layout');
+        $this->viewShouldReturnRaw('custom-layout', 'Custom layout {{ template_content }}');
+        $this->viewShouldReturnRaw('test', 'Hello {{ hello }}');
+
+        $this->get('/basic-route-with-data')
+            ->assertOk()
+            ->assertSee('Custom layout');
     }
 }

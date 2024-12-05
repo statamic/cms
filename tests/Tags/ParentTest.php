@@ -3,6 +3,7 @@
 namespace Tests\Tags;
 
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Parse;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -42,7 +43,7 @@ class ParentTest extends TestCase
         ])->create();
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_parent_data()
     {
         $this->setUpEntries();
@@ -55,7 +56,7 @@ class ParentTest extends TestCase
         $this->assertEquals('<alfa><bravo>', $this->tag('{{ parent:arr }}<{{ a }}><{{ b }}>{{ /parent:arr }}'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_parent_data_when_in_another_site()
     {
         $this->setUpEntries();

@@ -2,6 +2,7 @@
 
 namespace Tests\Fields;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Exceptions\FieldtypeNotFoundException;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\FieldtypeRepository;
@@ -18,7 +19,7 @@ class FieldtypeRepositoryTest extends TestCase
         $this->repo = new FieldtypeRepository;
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_fieldtype()
     {
         FooFieldtype::register();
@@ -32,7 +33,7 @@ class FieldtypeRepositoryTest extends TestCase
         $this->assertNotSame($found, $second);
     }
 
-    /** @test */
+    #[Test]
     public function it_caches_and_clones_existing_instances()
     {
         FooFieldtype::register();
@@ -54,7 +55,7 @@ class FieldtypeRepositoryTest extends TestCase
         $this->assertNotSame($found, $second);
     }
 
-    /** @test */
+    #[Test]
     public function it_throw_exception_when_finding_invalid_fieldtype()
     {
         $this->expectException(FieldtypeNotFoundException::class);

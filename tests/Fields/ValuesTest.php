@@ -8,6 +8,8 @@ use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Entries\EntryCollection;
@@ -40,7 +42,7 @@ class ValuesTest extends TestCase
         $this->fieldtype->register();
     }
 
-    /** @test */
+    #[Test]
     public function array_is_converted_to_a_collection()
     {
         $values = new Values(['foo' => 'bar']);
@@ -49,7 +51,7 @@ class ValuesTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $collection->all());
     }
 
-    /** @test */
+    #[Test]
     public function collection_is_not_converted()
     {
         $values = new Values(collect(['foo' => 'bar']));
@@ -58,7 +60,7 @@ class ValuesTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $collection->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_itself_as_an_array()
     {
         $values = new Values(collect(['foo' => 'bar']));
@@ -66,7 +68,7 @@ class ValuesTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $values->all());
     }
 
-    /** @test */
+    #[Test]
     public function its_arrayable()
     {
         $mockOne = Mockery::mock(Collection::class)->shouldReceive('toArray')->andReturn(['title' => 'first'])->getMock();
@@ -94,7 +96,7 @@ class ValuesTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function array_access()
     {
         $values = new Values([
@@ -110,7 +112,7 @@ class ValuesTest extends TestCase
         $this->assertNull($values['missing']);
     }
 
-    /** @test */
+    #[Test]
     public function setting_by_array_access_is_not_supported()
     {
         $this->expectException(Exception::class);
@@ -124,7 +126,7 @@ class ValuesTest extends TestCase
         $values['echo'] = 'foxtrot';
     }
 
-    /** @test */
+    #[Test]
     public function unsetting_by_array_access_is_not_supported()
     {
         $this->expectException(Exception::class);
@@ -138,7 +140,7 @@ class ValuesTest extends TestCase
         unset($values['charlie']);
     }
 
-    /** @test */
+    #[Test]
     public function property_access()
     {
         $values = new Values([
@@ -152,7 +154,7 @@ class ValuesTest extends TestCase
         $this->assertNull($values->missing);
     }
 
-    /** @test */
+    #[Test]
     public function setting_by_property_access_is_not_supported()
     {
         $this->expectException(Exception::class);
@@ -166,7 +168,7 @@ class ValuesTest extends TestCase
         $values->echo = 'foxtrot';
     }
 
-    /** @test */
+    #[Test]
     public function raw_values()
     {
         $values = new Values([
@@ -180,11 +182,8 @@ class ValuesTest extends TestCase
         $this->assertNull($values->raw('missing'));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider queryBuilderProvider
-     **/
+    #[Test]
+    #[DataProvider('queryBuilderProvider')]
     public function it_gets_a_query($builder)
     {
         $values = new Values(['the_query_field' => $builder]);
@@ -192,7 +191,7 @@ class ValuesTest extends TestCase
         $this->assertSame($builder, $values->the_query_field());
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_exception_if_trying_to_get_query_for_field_that_isnt_a_query()
     {
         $this->expectException(BadMethodCallException::class);
@@ -203,7 +202,7 @@ class ValuesTest extends TestCase
         $values->not_a_query();
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_exception_if_trying_to_get_query_for_missing_field()
     {
         $this->expectException(BadMethodCallException::class);
@@ -214,11 +213,8 @@ class ValuesTest extends TestCase
         $values->missing();
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider queryBuilderProvider
-     */
+    #[Test]
+    #[DataProvider('queryBuilderProvider')]
     public function completes_a_query($builder)
     {
         $builder->shouldReceive('get')->andReturn($queryResults = EntryCollection::make([
@@ -236,7 +232,7 @@ class ValuesTest extends TestCase
         $this->assertSame($queryResults, $values['related_entries']);
     }
 
-    /** @test */
+    #[Test]
     public function its_iterable()
     {
         $values = new Values(['foo' => 'bar', 'baz' => 'qux']);
@@ -249,7 +245,7 @@ class ValuesTest extends TestCase
         $this->assertEquals(['foo', 'bar', 'baz', 'qux'], $results);
     }
 
-    /** @test */
+    #[Test]
     public function its_json_serializable()
     {
         $values = new Values(['foo' => 'bar', 'baz' => 'qux']);
