@@ -4,7 +4,7 @@ namespace Statamic\Stache\Query;
 
 use Illuminate\Support\Collection;
 use Statamic\Exceptions\InvalidQueryDateException;
-use Statamic\Query\EmptyQueryBuilder;
+use Statamic\Query\EmptyEntryQueryBuilder;
 
 trait QueriesEntryStatus
 {
@@ -32,7 +32,7 @@ trait QueriesEntryStatus
                 try {
                     return $query->orWhere(fn ($q) => $this->addCollectionStatusLogicToQuery($q, $status, $collection));
                 } catch (InvalidQueryDateException $e) {
-                    return new EmptyQueryBuilder();
+                    return new EmptyEntryQueryBuilder();
                 }
             })
         );

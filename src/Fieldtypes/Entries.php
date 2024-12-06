@@ -18,7 +18,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Resources\CP\Entries\EntriesFieldtypeEntries;
 use Statamic\Http\Resources\CP\Entries\EntriesFieldtypeEntry as EntryResource;
-use Statamic\Query\EmptyQueryBuilder;
+use Statamic\Query\EmptyEntryQueryBuilder;
 use Statamic\Query\OrderedQueryBuilder;
 use Statamic\Query\Scopes\Filter;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
@@ -339,7 +339,7 @@ class Entries extends Relationship
     private function queryBuilder($values)
     {
         if (! $values) {
-            return new StatusQueryBuilder(new EmptyQueryBuilder());
+            return new StatusQueryBuilder(new EmptyEntryQueryBuilder());
         }
 
         $site = Site::current()->handle();

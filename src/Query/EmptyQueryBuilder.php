@@ -8,9 +8,4 @@ class EmptyQueryBuilder extends IteratorBuilder
     {
         return collect([]);
     }
-
-    public function whereStatus($status)
-    {
-        return $this;
-    }
 }
