@@ -27,6 +27,11 @@
     pointer-events: none;
     z-index: 1049;
     background: rgba(255, 255, 255, .9);
+
+    .dark & {
+        @apply bg-dark-900/90;
+        border-color: theme('colors.dark.600');
+    }
 }
 
 
@@ -52,6 +57,10 @@
         @apply p-2;
     }
 
+}
+
+.assets-fieldtype-picker + .asset-table-listing {
+    @apply rounded-t-none;
 }
 
 .asset-listing .actions {
@@ -93,7 +102,7 @@
    ========================================================================== */
 
 .asset-tile {
-    @apply bg-white dark:bg-dark-500 relative min-w-0 flex items-center flex-col justify-between cursor-pointer border rounded dark:border-dark-200;
+    @apply bg-white dark:bg-dark-600 relative min-w-0 flex items-center flex-col justify-between cursor-pointer border rounded dark:border-dark-300;
 
     .asset-thumb {
         @apply flex justify-center items-center w-full h-full rounded;
@@ -113,6 +122,10 @@
 
     .asset-meta {
         @apply border-t dark:border-dark-200 w-full text-2xs text-gray-700 dark:text-dark-100;
+    }
+
+    .asset-meta-btn {
+        @apply text-blue rtl:border-r ltr:border-l px-2 py-1 hover:bg-gray-200 dark:hover:bg-dark-800 dark:border-dark-300;
     }
 
     .asset-filename {

@@ -12,7 +12,7 @@
                         @unless ($item->view())
                             <li class="{{ $item->isActive() ? 'current' : '' }}" v-pre>
                                 <a href="{{ $item->url() }}" {{ $item->attributes() }}>
-                                    <i>{!! $item->icon() !!}</i><span>{{ __($item->name()) }}</span>
+                                    <i>{!! $item->svg() !!}</i><span>{{ __($item->name()) }}</span>
                                 </a>
                                 @if ($item->children() && $item->isActive())
                                     <ul>

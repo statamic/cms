@@ -44,7 +44,7 @@ class Index extends BaseIndex
 
     protected function data()
     {
-        return collect(json_decode($this->raw(), true));
+        return collect(json_decode($this->raw(), true, flags: JSON_THROW_ON_ERROR));
     }
 
     protected function settings()
@@ -73,7 +73,7 @@ class Index extends BaseIndex
             throw new IndexNotFoundException;
         }
 
-        return File::get($this->path());
+        return app('files')->get($this->path(), lock: true);
     }
 
     public function exists()
@@ -117,7 +117,9 @@ class Index extends BaseIndex
 
     protected function save($documents)
     {
-        File::put($this->path(), $documents->toJson());
+        app('files')->ensureDirectoryExists(pathinfo($this->path())['dirname']);
+
+        app('files')->put($this->path(), $documents->toJson(), lock: true);
     }
 
     public function extraAugmentedResultData(Result $result)

@@ -95,8 +95,7 @@ class EntriesTest extends TestCase
 
         $this->assertCount(5, $this->getEntries());
         $this->assertCount(3, $this->getEntries(['paginate' => 3])); // recommended v3 style
-        $this->assertCount(4, $this->getEntries(['paginate' => true, 'limit' => 4])); // v2 style
-        $this->assertCount(3, $this->getEntries(['paginate' => 3, 'limit' => 4])); // precedence test
+        $this->assertCount(4, $this->getEntries(['paginate' => true, 'limit' => 4])); // v2 style pagination limiting
         $this->assertCount(5, $this->getEntries(['paginate' => true])); // ignore if no perPage set
 
         $this->assertEquals(['a', 'b', 'c'], $this->getEntryIds(['paginate' => 3]));
@@ -126,6 +125,51 @@ class EntriesTest extends TestCase
         });
 
         $this->assertEquals(['f', 'g'], $this->getEntryIds(['paginate' => 3, 'offset' => 2]));
+    }
+
+    #[Test]
+    public function it_should_throw_exception_if_trying_to_paginate_and_limit_at_same_time()
+    {
+        $this->makeEntry('a')->save();
+        $this->makeEntry('b')->save();
+        $this->makeEntry('c')->save();
+        $this->makeEntry('d')->save();
+        $this->makeEntry('e')->save();
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Cannot use [paginate] integer in combination with [limit] param.');
+
+        $this->assertCount(3, $this->getEntries(['paginate' => 3, 'limit' => 4]));
+    }
+
+    #[Test]
+    public function it_should_throw_exception_if_trying_to_paginate_and_chunk_at_same_time()
+    {
+        $this->makeEntry('a')->save();
+        $this->makeEntry('b')->save();
+        $this->makeEntry('c')->save();
+        $this->makeEntry('d')->save();
+        $this->makeEntry('e')->save();
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Cannot use [paginate] in combination with [chunk] param.');
+
+        $this->assertCount(3, $this->getEntries(['paginate' => true, 'chunk' => 2]));
+    }
+
+    #[Test]
+    public function it_should_throw_exception_if_trying_to_paginate_with_integer_and_chunk_at_same_time()
+    {
+        $this->makeEntry('a')->save();
+        $this->makeEntry('b')->save();
+        $this->makeEntry('c')->save();
+        $this->makeEntry('d')->save();
+        $this->makeEntry('e')->save();
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Cannot use [paginate] in combination with [chunk] param.');
+
+        $this->assertCount(3, $this->getEntries(['paginate' => 3, 'chunk' => 2]));
     }
 
     #[Test]
@@ -298,6 +342,7 @@ class EntriesTest extends TestCase
         $this->assertCount(1, $this->getEntries(['status:is' => 'published']));
         $this->assertCount(3, $this->getEntries(['status:not' => 'published']));
         $this->assertCount(3, $this->getEntries(['status:in' => 'published|draft']));
+        $this->assertCount(4, $this->getEntries(['status:is' => 'any']));
     }
 
     #[Test]

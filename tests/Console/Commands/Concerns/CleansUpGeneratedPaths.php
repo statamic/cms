@@ -11,6 +11,7 @@ trait CleansUpGeneratedPaths
         $dirs = [
             base_path('addons'),
             base_path('app/Actions'),
+            base_path('app/Dictionaries'),
             base_path('app/Fieldtypes'),
             base_path('app/Modifiers'),
             base_path('app/Scopes'),

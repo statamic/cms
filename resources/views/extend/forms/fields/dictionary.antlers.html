@@ -1,0 +1,21 @@
+<select
+    name="{{ handle }}{{ multiple ?= "[]" }}"
+    {{ if js_driver }}{{ js_attributes }}{{ /if }}
+    {{ if multiple }}multiple{{ /if }}
+    {{ if validate|contains:required }}required{{ /if }}
+>
+    {{ unless multiple }}
+        <option value>
+            {{ if placeholder }}
+                {{ placeholder }}
+            {{ else }}
+                {{ trans key="Please select..." }}
+            {{ /if }}
+        </option>
+    {{ /unless }}
+    {{ foreach:options as="option|label" }}
+        <option value="{{ option }}"{{ if multiple }}{{ if value|in_array:option }} selected{{ /if }}{{ else }}{{ if option == value }} selected{{ /if }}{{ /if }}>
+            {{ label !== null ? label : option }}
+        </option>
+    {{ /foreach:options }}
+</select>

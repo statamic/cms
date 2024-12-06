@@ -29,7 +29,11 @@ class UniqueTermValue implements ValidationRule
         }
 
         $existing = $query
-            ->where($attribute, $value)
+            ->when(
+                is_array($value),
+                fn ($query) => $query->whereIn($attribute, $value),
+                fn ($query) => $query->where($attribute, $value)
+            )
             ->first();
 
         if (! $existing) {

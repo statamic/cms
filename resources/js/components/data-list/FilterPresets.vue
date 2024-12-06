@@ -16,7 +16,7 @@
                         <dropdown-item :text="__('Duplicate')" @click="createPreset" />
                         <dropdown-item v-if="canRenamePreset(handle)" :text="__('Rename')" @click="renamePreset" />
                         <div class="divider" />
-                        <dropdown-item v-if="canDeletePreset(handle)" :text="__('Delete')" class="warning" @click="deletePreset" />
+                        <dropdown-item v-if="canDeletePreset(handle)" :text="__('Delete')" class="warning" @click="showDeleteModal = true" />
                     </dropdown-list>
                 </button>
                 <button class="pill-tab rtl:ml-1 ltr:mr-1" v-else @click="viewPreset(handle)">
@@ -218,11 +218,6 @@ export default {
         },
 
         deletePreset() {
-            if (! this.showDeleteModal) {
-                this.showDeleteModal = true;
-                return;
-            }
-
             this.$preferences.remove(`${this.preferencesKey}.${this.activePreset}`)
                 .then(response => {
                     this.$emit('deleted', this.activePreset);

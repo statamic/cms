@@ -16,7 +16,10 @@ use Statamic\Support\Str;
 
 class Replicator extends Fieldtype
 {
+    use AddsEntryValidationReplacements;
+
     protected $categories = ['structured'];
+    protected $keywords = ['builder', 'page builder', 'content'];
     protected $rules = ['array'];
 
     protected function configFieldItems(): array
@@ -150,7 +153,10 @@ class Replicator extends Fieldtype
             ->validator()
             ->withContext([
                 'prefix' => $this->field->validationContext('prefix').$this->setRuleFieldPrefix($index).'.',
-            ])
+            ]);
+
+        $rules = $this
+            ->addEntryValidationReplacements($this->field, $rules)
             ->rules();
 
         return collect($rules)->mapWithKeys(function ($rules, $handle) use ($index) {

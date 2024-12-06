@@ -1,6 +1,6 @@
 <?php
 
-namespace Feature;
+namespace Tests\Feature;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -34,7 +34,8 @@ class SlugTest extends TestCase
             'multiple words' => ['one two three', '-', 'en', 'one-two-three'],
             'apples' => ["Apple's", '-', 'en', 'apples'],
             'smart quotes' => ['Statamic’s latest feature: “Duplicator”', '-', 'en', 'statamics-latest-feature-duplicator'],
-            'hyphens separated by spaces' => ['Block - Hero', '-', 'en', 'block-hero'],
+            'dashes using underscore separator' => ['JSON-LD Document', '_', 'en', 'json_ld_document'],
+            'dashes separated by spaces' => ['Block - Hero', '-', 'en', 'block-hero'],
             'chinese characters' => ['你好，世界', '-', 'ch', 'ni-hao-shi-jie'],
             'german characters' => ['Björn Müller', '-', 'de', 'bjoern-mueller'],
             'arabic characters' => ['صباح الخير', '-', 'ar', 'sbah-alkhyr'],

@@ -442,7 +442,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         return $this
             ->fluentlyGetOrSet('layout')
             ->getter(function ($layout) {
-                return $layout ?? 'layout';
+                return $layout ?? config('statamic.system.layout', 'layout');
             })
             ->args(func_get_args());
     }
@@ -503,21 +503,21 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
     public function updateEntryUris($ids = null)
     {
-        Facades\Collection::updateEntryUris($this, $ids);
+        Facades\Entry::updateUris($this, $ids);
 
         return $this;
     }
 
     public function updateEntryOrder($ids = null)
     {
-        Facades\Collection::updateEntryOrder($this, $ids);
+        Facades\Entry::updateOrders($this, $ids);
 
         return $this;
     }
 
     public function updateEntryParent($ids = null)
     {
-        Facades\Collection::updateEntryParent($this, $ids);
+        Facades\Entry::updateParents($this, $ids);
 
         return $this;
     }

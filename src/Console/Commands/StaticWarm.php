@@ -9,6 +9,7 @@ use GuzzleHttp\Psr7\Message;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Console\Command;
+use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Collection;
 use Statamic\Console\EnhancesCommands;
@@ -36,11 +37,13 @@ class StaticWarm extends Command
         {--u|user= : HTTP authentication user}
         {--p|password= : HTTP authentication password}
         {--insecure : Skip SSL verification}
+        {--uncached : Only warm uncached URLs}
     ';
 
     protected $description = 'Warms the static cache by visiting all URLs';
 
     protected $shouldQueue = false;
+    protected $queueConnection;
 
     private $uris;
 
@@ -53,8 +56,9 @@ class StaticWarm extends Command
         }
 
         $this->shouldQueue = $this->option('queue');
+        $this->queueConnection = config('statamic.static_caching.warm_queue_connection') ?? config('queue.default');
 
-        if ($this->shouldQueue && config('queue.default') === 'sync') {
+        if ($this->shouldQueue && $this->queueConnection === 'sync') {
             $this->components->error('The queue connection is set to "sync". Queueing will be disabled.');
             $this->shouldQueue = false;
         }
@@ -74,12 +78,7 @@ class StaticWarm extends Command
 
     private function warm(): void
     {
-        $client = new Client([
-            'verify' => $this->shouldVerifySsl(),
-            'auth' => $this->option('user') && $this->option('password')
-                ? [$this->option('user'), $this->option('password')]
-                : null,
-        ]);
+        $client = new Client($this->clientConfig());
 
         $this->output->newLine();
         $this->line('Compiling URLs...');
@@ -93,7 +92,9 @@ class StaticWarm extends Command
             $this->line(sprintf('Adding %s requests onto %squeue...', count($requests), $queue ? $queue.' ' : ''));
 
             foreach ($requests as $request) {
-                StaticWarmJob::dispatch($request)->onQueue($queue);
+                StaticWarmJob::dispatch($request, $this->clientConfig())
+                    ->onConnection($this->queueConnection)
+                    ->onQueue($queue);
             }
         } else {
             $this->line('Visiting '.count($requests).' URLs...');
@@ -115,6 +116,16 @@ class StaticWarm extends Command
         $strategy = config('statamic.static_caching.strategy');
 
         return config("statamic.static_caching.strategies.$strategy.warm_concurrency", 25);
+    }
+
+    private function clientConfig(): array
+    {
+        return [
+            'verify' => $this->shouldVerifySsl(),
+            'auth' => $this->option('user') && $this->option('password')
+                ? [$this->option('user'), $this->option('password')]
+                : null,
+        ];
     }
 
     public function outputSuccessLine(Response $response, $index): void
@@ -169,6 +180,10 @@ class StaticWarm extends Command
             ->merge($this->additionalUris())
             ->unique()
             ->reject(function ($uri) use ($cacher) {
+                if ($this->option('uncached') && $cacher->hasCachedPage(HttpRequest::create($uri))) {
+                    return true;
+                }
+
                 Site::resolveCurrentUrlUsing(fn () => $uri);
 
                 return $cacher->isExcluded($uri);
@@ -189,6 +204,9 @@ class StaticWarm extends Command
     protected function entryUris(): Collection
     {
         $this->line('[ ] Entries...');
+
+        // "Warm" the structure trees
+        Facades\Collection::whereStructured()->each(fn ($collection) => $collection->structure()->trees()->each->tree());
 
         $entries = Facades\Entry::all()->map(function (Entry $entry) {
             if (! $entry->published() || $entry->private()) {

@@ -67,6 +67,7 @@ Vue.prototype.$echo = Statamic.$echo;
 Vue.prototype.$bard = Statamic.$bard;
 Vue.prototype.$keys = Statamic.$keys;
 Vue.prototype.$reveal = Statamic.$reveal;
+Vue.prototype.$fieldActions = Statamic.$fieldActions;
 Vue.prototype.$slug = Statamic.$slug;
 
 import Moment from 'moment';
@@ -211,6 +212,8 @@ Statamic.app({
         showBanner: true,
         portals: [],
         appendedComponents: [],
+        isLicensingBannerSnoozed: localStorage.getItem(`statamic.snooze_license_banner`) > new Date().valueOf(),
+        copyToClipboardModalUrl: null,
     },
 
     computed: {
@@ -243,12 +246,13 @@ Statamic.app({
 
         this.fixAutofocus();
 
-        this.showBanner = Statamic.$config.get('hasLicenseBanner');
+        this.showBanner = !this.isLicensingBannerSnoozed && Statamic.$config.get('hasLicenseBanner');
 
         this.$toast.intercept();
     },
 
     created() {
+        const app = this;
         const state = localStorage.getItem('statamic.nav') || 'open';
         this.navOpen = state === 'open';
 
@@ -257,7 +261,7 @@ Statamic.app({
                 await navigator.clipboard.writeText(url);
                 Statamic.$toast.success(__('Copied to clipboard'));
             } catch (err) {
-                await alert(url);
+                app.copyToClipboardModalUrl = url;
             }
         });
 
@@ -293,6 +297,7 @@ Statamic.app({
 
         hideBanner() {
             this.showBanner = false;
+            localStorage.setItem(`statamic.snooze_license_banner`, new Date(Date.now() + 5 * 60 * 1000).valueOf());
         },
 
         fixAutofocus() {

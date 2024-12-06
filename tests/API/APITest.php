@@ -8,6 +8,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Token;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -152,6 +153,7 @@ class APITest extends TestCase
         $this->assertEndpointDataCount('/api/collections/pages/entries?filter[status:is]=draft', 2);
         $this->assertEndpointDataCount('/api/collections/pages/entries?filter[published:is]=true', 1);
         $this->assertEndpointDataCount('/api/collections/pages/entries?filter[published:is]=false', 2);
+        $this->assertEndpointDataCount('/api/collections/pages/entries?filter[status:is]=any', 3);
     }
 
     #[Test]
@@ -382,6 +384,22 @@ class APITest extends TestCase
     }
 
     #[Test]
+    public function can_view_entries_when_cp_route_is_empty()
+    {
+        Facades\Config::set('statamic.cp.route', '');
+        Facades\Config::set('statamic.api.resources.collections', true);
+
+        Facades\Collection::make('pages')->save();
+        Facades\Entry::make()->collection('pages')->id('home')->data(['title' => 'Home'])->save();
+
+        $this->get('/api/collections/pages/entries/home')->assertJson([
+            'data' => [
+                'title' => 'Home',
+            ],
+        ]);
+    }
+
+    #[Test]
     #[DataProvider('userPasswordFilterProvider')]
     public function it_never_allows_filtering_users_by_password($filter)
     {
@@ -422,6 +440,44 @@ class APITest extends TestCase
             'data' => [
                 'title' => 'Dance modified in live preview',
             ],
+        ]);
+    }
+
+    #[Test]
+    public function live_preview_token_bypasses_entry_status_check()
+    {
+        Facades\Config::set('statamic.api.resources.collections', true);
+        Facades\Collection::make('pages')->save();
+        $entry = tap(Facades\Entry::make()->collection('pages')->id('dance')->published(false)->set('title', 'Dance')->slug('dance'))->save();
+
+        $this->get('/api/collections/pages/entries/dance')->assertJson([
+            'message' => 'Not found.',
+        ]);
+
+        LivePreview::tokenize('test-token', $entry);
+
+        $this->get('/api/collections/pages/entries/dance?token=test-token')->assertJson([
+            'data' => [
+                'title' => 'Dance',
+            ],
+        ]);
+    }
+
+    #[Test]
+    public function non_live_preview_tokens_doesnt_bypass_entry_status_check()
+    {
+        Facades\Config::set('statamic.api.resources.collections', true);
+        Facades\Collection::make('pages')->save();
+        $entry = tap(Facades\Entry::make()->collection('pages')->id('dance')->published(false)->set('title', 'Dance')->slug('dance'))->save();
+
+        $this->get('/api/collections/pages/entries/dance')->assertJson([
+            'message' => 'Not found.',
+        ]);
+
+        Token::make('test-token', FakeTokenHandler::class)->save();
+
+        $this->get('/api/collections/pages/entries/dance?token=test-token')->assertJson([
+            'message' => 'Not found.',
         ]);
     }
 
@@ -488,6 +544,22 @@ class APITest extends TestCase
         ];
     }
 
+    #[Test]
+    public function can_view_terms_when_cp_route_is_empty()
+    {
+        Facades\Config::set('statamic.cp.route', '');
+        Facades\Config::set('statamic.api.resources.taxonomies', true);
+
+        Facades\Taxonomy::make('topics')->save();
+        Facades\Term::make()->taxonomy('topics')->inDefaultLocale()->slug('dance')->data(['title' => 'Dance'])->save();
+
+        $this->get('/api/taxonomies/topics/terms/dance')->assertJson([
+            'data' => [
+                'title' => 'Dance',
+            ],
+        ]);
+    }
+
     private function makeCollection($handle)
     {
         return Facades\Collection::make($handle);
@@ -542,5 +614,13 @@ class APITest extends TestCase
             ->get($endpoint)
             ->assertNotFound()
             ->assertJson(['message' => 'Not found.']);
+    }
+}
+
+class FakeTokenHandler
+{
+    public function handle(\Statamic\Contracts\Tokens\Token $token, \Illuminate\Http\Request $request, \Closure $next)
+    {
+        return $next($token);
     }
 }

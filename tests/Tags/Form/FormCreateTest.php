@@ -932,4 +932,64 @@ EOT
 
         Storage::disk('avatars')->assertMissing('avatar.jpg');
     }
+
+    #[Test]
+    public function it_renders_exceptions_thrown_during_json_requests_as_standard_laravel_errors()
+    {
+        Event::listen(function (\Statamic\Events\FormSubmitted $event) {
+            throw ValidationException::withMessages(['some' => 'error']);
+        });
+
+        $response = $this
+            ->postJson('/!/forms/contact', [
+                'name' => 'Name',
+                'email' => 'test@test.com',
+                'message' => 'This is a message',
+            ]);
+
+        $json = $response->json();
+
+        $this->assertArrayHasKey('message', $json);
+        $this->assertArrayHasKey('errors', $json);
+        $this->assertSame($json['errors'], ['some' => ['error']]);
+    }
+
+    #[Test]
+    public function it_renders_exceptions_thrown_during_xml_http_requests_in_statamic_error_format()
+    {
+        Event::listen(function (\Statamic\Events\FormSubmitted $event) {
+            throw ValidationException::withMessages(['some' => 'error']);
+        });
+
+        $response = $this
+            ->withHeaders([
+                'X-Requested-With' => 'XMLHttpRequest',
+            ])
+            ->postJson('/!/forms/contact', [
+                'name' => 'Name',
+                'email' => 'test@test.com',
+                'message' => 'This is a message',
+            ]);
+
+        $json = $response->json();
+
+        $this->assertArrayHasKey('error', $json);
+        $this->assertArrayHasKey('errors', $json);
+        $this->assertSame($json['error'], ['some' => 'error']);
+    }
+
+    #[Test]
+    public function it_adds_appended_config_fields()
+    {
+        Form::appendConfigFields('*', 'Fields', [
+            'test_config' => ['type' => 'text', 'display' => 'First injected into fields section'],
+        ]);
+
+        tap(Form::find('contact')->data(['test_config' => 'This is a test config value']))->save();
+
+        $output = $this->tag('{{ form:contact redirect="/submitted" error_redirect="/errors" class="form" id="form" }}{{ form_config:test_config }}{{ /form:contact }}');
+
+        $this->assertStringStartsWith('<form method="POST" action="http://localhost/!/forms/contact" class="form" id="form">', $output);
+        $this->assertStringContainsString('This is a test config value', $output);
+    }
 }

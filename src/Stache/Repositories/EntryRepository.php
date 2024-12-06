@@ -10,6 +10,7 @@ use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Exceptions\EntryNotFoundException;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
+use Statamic\Query\Scopes\AllowsScopes;
 use Statamic\Rules\Slug;
 use Statamic\Stache\Query\EntryQueryBuilder;
 use Statamic\Stache\Stache;
@@ -17,6 +18,8 @@ use Statamic\Support\Arr;
 
 class EntryRepository implements RepositoryContract
 {
+    use AllowsScopes;
+
     protected $stache;
     protected $store;
     protected $substitutionsById = [];
@@ -162,5 +165,20 @@ class EntryRepository implements RepositoryContract
         return $items->map(function ($item) {
             return $this->substitutionsById[$item->id()] ?? $item;
         });
+    }
+
+    public function updateUris($collection, $ids = null)
+    {
+        $this->store->store($collection->handle())->updateUris($ids);
+    }
+
+    public function updateOrders($collection, $ids = null)
+    {
+        $this->store->store($collection->handle())->updateOrders($ids);
+    }
+
+    public function updateParents($collection, $ids = null)
+    {
+        $this->store->store($collection->handle())->updateParents($ids);
     }
 }

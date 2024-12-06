@@ -1,11 +1,5 @@
 <template>
 <div>
-    <div class="flex justify-end absolute top-3 rtl:left-3 ltr:right-3 @md:rtl:left-6 @md:ltr:right-6" v-if="! grid.fullScreenMode">
-        <button v-if="allowFullscreen" @click="grid.toggleFullScreen" class="btn btn-icon flex items-center" v-tooltip="__('Toggle Fullscreen Mode')">
-            <svg-icon name="expand-bold" class="h-3.5 px-0.5 text-gray-750 dark:text-dark-175" v-show="! grid.fullScreenMode" />
-            <svg-icon name="shrink-all" class="h-3.5 px-0.5 text-gray-750 dark:text-dark-175" v-show="grid.fullScreenMode" />
-        </button>
-    </div>
 
     <sortable-list
         :value="rows"
@@ -39,6 +33,7 @@
                 :can-delete="canDeleteRows"
                 :can-add-rows="canAddRows"
                 @updated="(row, value) => $emit('updated', row, value)"
+                @duplicate="(row) => $emit('duplicate', row)"
                 @meta-updated="$emit('meta-updated', row._id, $event)"
                 @removed="(row) => $emit('removed', row)"
                 @focus="$emit('focus')"

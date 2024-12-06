@@ -68,6 +68,28 @@ class KeysTest extends TestCase
     }
 
     #[Test]
+    public function it_can_use_a_different_cache_store()
+    {
+        config()->set('statamic.stache.cache_store', 'stache');
+        config()->set('cache.stores.stache', [
+            'driver' => 'array',
+        ]);
+
+        $store = $this->mock(Store::class);
+        $store->shouldReceive('key')->andReturn('test-store');
+
+        $keys = (new Keys($store))->setKeys(['foo' => 'bar']);
+
+        $this->assertNull(Cache::get('stache::keys/test-store'));
+        $this->assertNull(Cache::store('stache')->get('stache::keys/test-store'));
+
+        $keys->cache();
+
+        $this->assertNull(Cache::get('stache::keys/test-store'));
+        $this->assertEquals(['foo' => 'bar'], Cache::store('stache')->get('stache::keys/test-store'));
+    }
+
+    #[Test]
     public function it_loads_from_cache()
     {
         Cache::forever('stache::keys/test-store', ['foo' => 'bar']);

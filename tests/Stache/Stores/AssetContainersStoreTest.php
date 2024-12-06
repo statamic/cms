@@ -4,6 +4,7 @@ namespace Tests\Stache\Stores;
 
 use Facades\Statamic\Stache\Traverser;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Cache;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\Asset;
 use Statamic\Contracts\Assets\AssetContainer;
@@ -114,6 +115,8 @@ EOL;
         Facades\Stache::shouldReceive('shouldUpdateIndexes')->andReturnTrue();
         Facades\Stache::shouldReceive('duplicates')->andReturn(optional());
         Facades\Stache::shouldReceive('store')->with('users')->andReturn((new UsersStore((new Stache)->sites(['en']), app('files')))->directory($this->tempDir));
+        Facades\Stache::shouldReceive('isWatcherEnabled')->andReturnTrue();
+        Facades\Stache::shouldReceive('cacheStore')->andReturn(Cache::store());
 
         $container = Facades\AssetContainer::make('new')
             ->title('New Container');

@@ -53,7 +53,7 @@
             <div class="prose">
                 <p v-text="`${__('messages.updater_update_to_latest_command')}:`" />
                 <code-block copyable :text="`composer update ${package}`" />
-                <p>{{ __('Learn more about') }} <a href="https://statamic.dev/updating" target="_blank">{{ __('Updates') }}</a>.</p>
+                <p v-html="link"></p>
             </div>
         </confirmation-modal>
     </div>
@@ -112,6 +112,10 @@
 
             latestVersion() {
                 return this.latestRelease && this.latestRelease.version;
+            },
+
+            link() {
+                return __('Learn more about :link', { link: `<a href="https://statamic.dev/updating" target="_blank">${__('Updates')}</a>`}) + '.';
             },
         },
 

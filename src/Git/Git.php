@@ -177,7 +177,7 @@ class Git
      */
     protected function statusWithFileCounts($status)
     {
-        $lines = collect(explode("\n", $status))->filter();
+        $lines = collect(explode("\n", $status ?? ''))->filter();
 
         $totalCount = $lines->count();
 

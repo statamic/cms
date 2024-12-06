@@ -83,9 +83,49 @@ class BardTextTest extends TestCase
     }
 
     #[Test]
+    public function it_extracts_bard_text_from_string()
+    {
+        $data = 'This <b>is a</b> paragraph.';
+
+        $expected = 'This is a paragraph.';
+
+        $this->assertEquals($expected, $this->modify($data));
+    }
+
+    #[Test]
     public function it_handles_null()
     {
         $this->assertEquals('', $this->modify(null));
+    }
+
+    #[Test]
+    public function it_skips_nodes_with_no_type()
+    {
+        $data = [
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    ['type' => 'text', 'text' => 'This is a paragraph with '],
+                    ['type' => 'text', 'marks' => [['type' => 'bold']], 'text' => 'bold'],
+                    ['type' => 'text', 'text' => ' and '],
+                    ['type' => 'text', 'marks' => [['type' => 'italic']], 'text' => 'italic'],
+                    ['type' => 'text', 'text' => ' text.'],
+                ],
+            ],
+            [
+                // no type
+            ],
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    ['type' => 'text', 'text' => 'Another paragraph.'],
+                ],
+            ],
+        ];
+
+        $expected = 'This is a paragraph with bold and italic text. Another paragraph.';
+
+        $this->assertEquals($expected, $this->modify($data));
     }
 
     public function modify($arr, ...$args)

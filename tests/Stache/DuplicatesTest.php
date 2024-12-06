@@ -111,6 +111,7 @@ class DuplicatesTest extends TestCase
 
         $stache = $this->mock(Stache::class);
         $stache->shouldReceive('store')->with('test-store')->andReturn($store);
+        $stache->shouldReceive('cacheStore')->andReturn(Cache::store());
 
         $duplicates = new Duplicates($stache);
 
@@ -146,7 +147,9 @@ class DuplicatesTest extends TestCase
     {
         Cache::forever('stache::duplicates', ['foo' => 'bar']);
 
-        $duplicates = new Duplicates($this->mock(Stache::class));
+        $stache = $this->mock(Stache::class);
+        $stache->shouldReceive('cacheStore')->andReturn(Cache::store());
+        $duplicates = new Duplicates($stache);
 
         $return = $duplicates->load();
 
@@ -159,7 +162,9 @@ class DuplicatesTest extends TestCase
     {
         Cache::forever('stache::duplicates', ['foo' => 'bar']);
 
-        $duplicates = new Duplicates($this->mock(Stache::class));
+        $stache = $this->mock(Stache::class);
+        $stache->shouldReceive('cacheStore')->andReturn(Cache::store());
+        $duplicates = new Duplicates($stache);
 
         $this->assertNotNull(Cache::get('stache::duplicates'));
 

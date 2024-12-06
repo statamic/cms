@@ -26,6 +26,47 @@ class NocacheTagsTest extends TestCase
     }
 
     #[Test]
+    public function it_can_nest_nocache_tags()
+    {
+        $this->withStandardFakeViews();
+
+        $template = <<<'EOT'
+{{ title }}
+{{ nocache }}
+    {{ title }}
+    {{ nocache }}
+        {{ title }}
+        {{ nocache }}{{ title }}{{ /nocache }}
+    {{ /nocache }}
+{{ /nocache }}
+EOT;
+
+        $this->viewShouldReturnRaw('default', $template);
+
+        $page = $this->createPage('about', [
+            'with' => [
+                'title' => 'Existing',
+            ],
+        ]);
+
+        $this
+            ->get('/about')
+            ->assertOk()
+            ->assertSeeInOrder(['Existing', 'Existing', 'Existing', 'Existing']);
+
+        $page
+            ->set('title', 'Updated')
+            ->saveQuietly(); // Save quietly to prevent the invalidator from clearing the statically cached page.
+
+        $this->app->make(Session::class)->reset();
+
+        $this
+            ->get('/about')
+            ->assertOk()
+            ->assertSeeInOrder(['Updated', 'Updated', 'Updated', 'Updated']);
+    }
+
+    #[Test]
     public function it_can_keep_nocache_tags_dynamic_inside_cache_tags()
     {
         $this->withStandardFakeViews();
@@ -107,6 +148,9 @@ EOT;
     #[Test]
     public function it_only_adds_appropriate_fields_of_context_to_session()
     {
+        // The tag won't do anything if it's not being used on a request with the cache middleware.
+        $this->get('/');
+
         $expectedFields = [
             'foo', // By adding @auto it will be picked up from the template.
             'baz', // Explicitly selected
@@ -133,6 +177,9 @@ EOT;
     #[Test]
     public function it_only_adds_explicitly_defined_fields_of_context_to_session()
     {
+        // The tag won't do anything if it's not being used on a request with the cache middleware.
+        $this->get('/');
+
         // We will not add `bar` to the session because it is not explicitly defined.
         // We will not add `nope` to the session because it is not in the context.
         $expectedFields = ['foo', 'baz'];

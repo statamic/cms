@@ -34,7 +34,7 @@ class LocalizeEntryTest extends TestCase
     public function it_localizes_an_entry()
     {
         $user = $this->user();
-        $entry = EntryFactory::collection(tap(Collection::make('blog')->revisionsEnabled(false))->save())->slug('test')->create();
+        $entry = EntryFactory::collection(tap(Collection::make('blog')->dated(true)->revisionsEnabled(false))->save())->slug('test')->date('2013-08-24')->create();
         $this->assertNull($entry->in('fr'));
 
         $response = $this
@@ -45,6 +45,7 @@ class LocalizeEntryTest extends TestCase
         $localized = $entry->fresh()->in('fr');
         $this->assertNotNull($localized);
         $this->assertEquals($user, $localized->lastModifiedBy());
+        $this->assertEquals('2013-08-24', $localized->date()->format('Y-m-d'));
         $response->assertJson(['handle' => 'fr', 'url' => $localized->editUrl()]);
 
         $this->assertCount(0, $entry->in('fr')->revisions());

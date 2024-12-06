@@ -1,30 +1,9 @@
 [dir='rtl'] {
-    .space-x-1>:not([hidden])~:not([hidden]) {
-        margin-left: calc(.25rem * var(--tw-space-x-reverse)) !important;
-        margin-right: calc(.25rem * calc(1 - var(--tw-space-x-reverse))) !important;
-    }
-    .space-x-2>:not([hidden])~:not([hidden]) {
-        margin-left: calc(.5rem * var(--tw-space-x-reverse)) !important;
-        margin-right: calc(.5rem * calc(1 - var(--tw-space-x-reverse))) !important;
-    }
-    .space-x-3>:not([hidden])~:not([hidden]) {
-        margin-left: calc(.75rem * var(--tw-space-x-reverse))!important;
-        margin-right: calc(.75rem * calc(1 - var(--tw-space-x-reverse)))!important;
-    }
-
     input[name='url'] {
         direction: ltr;
     }
 
     .vc-arrow {
         transform: rotate(180deg);
-    }
-}
-@media (min-width: 576px) {
-    [dir='rtl'] {
-        .sm\:space-x-3 > :not([hidden]) ~ :not([hidden]) {
-            margin-left: calc(.75rem * var(--tw-space-x-reverse)) !important;
-            margin-right: calc(.75rem * calc(1 - var(--tw-space-x-reverse))) !important;
-        }
     }
 }

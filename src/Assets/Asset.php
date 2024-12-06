@@ -7,6 +7,7 @@ use Facades\Statamic\Assets\Attributes;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use League\Flysystem\PathTraversalDetected;
 use Statamic\Assets\AssetUploader as Uploader;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
@@ -367,6 +368,13 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
     {
         return $this
             ->fluentlyGetOrSet('path')
+            ->setter(function ($path) {
+                if (str_contains($path, '../')) {
+                    throw PathTraversalDetected::forPath($path);
+                }
+
+                return $path;
+            })
             ->getter(function ($path) {
                 return $path ? ltrim($path, '/') : null;
             })
@@ -488,7 +496,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     public function isImage()
     {
-        return $this->extensionIsOneOf(['jpg', 'jpeg', 'png', 'gif', 'webp']);
+        return $this->extensionIsOneOf(['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif']);
     }
 
     /**
@@ -678,7 +686,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
     /**
      * Clear meta and filesystem listing caches.
      */
-    private function clearCaches()
+    protected function clearCaches()
     {
         $this->meta = null;
         Cache::forget($this->metaCacheKey());
@@ -1071,12 +1079,12 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         return $this->selectedQueryRelations;
     }
 
-    private function hasDimensions()
+    public function hasDimensions()
     {
         return $this->isImage() || $this->isSvg() || $this->isVideo();
     }
 
-    private function hasDuration()
+    public function hasDuration()
     {
         return $this->isAudio() || $this->isVideo();
     }

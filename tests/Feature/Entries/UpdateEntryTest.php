@@ -96,6 +96,79 @@ class UpdateEntryTest extends TestCase
     }
 
     #[Test]
+    public function date_gets_set_in_origin()
+    {
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->dated(true)->save();
+
+        $entry = EntryFactory::collection($collection)
+            ->slug('existing-entry')
+            ->data(['title' => 'Existing Entry'])
+            ->date('2021-01-01')
+            ->create();
+
+        $this
+            ->actingAs($user)
+            ->update($entry, [
+                'title' => 'Updated Entry',
+                'slug' => 'updated-entry',
+                'date' => ['date' => '2021-02-02'],
+                '_localized' => [], // empty to show that date doesn't need to be in here.
+            ])
+            ->assertOk();
+
+        $entry = $entry->fresh();
+        $this->assertEquals('2021-02-02', $entry->date()->format('Y-m-d'));
+    }
+
+    #[Test]
+    #[DataProvider('savesDateProvider')]
+    public function date_gets_set_in_localization_when_contained_in_localized_array($shouldBeInArray, $expectedDate)
+    {
+        $this->setSites([
+            'en' => ['url' => '/', 'locale' => 'en'],
+            'fr' => ['url' => '/two/', 'locale' => 'fr'],
+        ]);
+
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->dated(true)->save();
+
+        $entry = EntryFactory::collection($collection)
+            ->slug('existing-entry')
+            ->data(['title' => 'Existing Entry'])
+            ->date('2021-01-01')
+            ->create();
+
+        $localized = EntryFactory::collection($collection)
+            ->slug('existing-entry')
+            ->data(['title' => 'Existing Entry'])
+            ->origin($entry->id())
+            ->locale('fr')
+            ->create();
+
+        $this
+            ->actingAs($user)
+            ->update($localized, [
+                'title' => 'Updated Entry',
+                'slug' => 'updated-entry',
+                'date' => ['date' => '2021-02-02'],
+                '_localized' => $shouldBeInArray ? ['date'] : [],
+            ])
+            ->assertOk();
+
+        $localized = $localized->fresh();
+        $this->assertEquals($expectedDate, $localized->date()->format('Y-m-d'));
+    }
+
+    public static function savesDateProvider()
+    {
+        return [
+            'date is in localized array' => [true, '2021-02-02'],
+            'date is not in localized array' => [false, '2021-01-01'],
+        ];
+    }
+
+    #[Test]
     public function slug_is_not_required_and_will_get_created_from_the_submitted_title_if_slug_is_in_the_blueprint_and_the_submitted_slug_was_empty()
     {
         [$user, $collection] = $this->seedUserAndCollection();

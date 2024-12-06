@@ -26,6 +26,7 @@ class SetsTest extends TestCase
                         'display' => 'One',
                         'instructions' => 'One instructions',
                         'icon' => 'one-icon',
+                        'hide' => true,
                         'fields' => [
                             ['handle' => 'field_one', 'field' => ['type' => 'text']],
                         ],
@@ -58,6 +59,7 @@ class SetsTest extends TestCase
                         'display' => 'One',
                         'instructions' => 'One instructions',
                         'icon' => 'one-icon',
+                        'hide' => true,
                         'fields' => [
                             [
                                 '_id' => 'group-alfa-section-one-0',
@@ -88,6 +90,7 @@ class SetsTest extends TestCase
                         'display' => null,
                         'instructions' => null,
                         'icon' => null,
+                        'hide' => null,
                         'fields' => [
                             [
                                 '_id' => 'group-bravo-section-two-0',
@@ -138,6 +141,7 @@ class SetsTest extends TestCase
                         'display' => 'One',
                         'instructions' => 'One instructions',
                         'icon' => 'one-icon',
+                        'hide' => null,
                         'fields' => [
                             [
                                 '_id' => 'group-main-section-one-0',
@@ -219,6 +223,7 @@ class SetsTest extends TestCase
                                 'instructions' => null,
                                 'instructions_position' => 'above',
                                 'listable' => 'hidden',
+                                'sortable' => true,
                                 'visibility' => 'visible',
                                 'replicator_preview' => true,
                                 'duplicate' => true,
@@ -255,6 +260,7 @@ class SetsTest extends TestCase
                                 'instructions' => null,
                                 'instructions_position' => 'above',
                                 'listable' => 'hidden',
+                                'sortable' => true,
                                 'visibility' => 'visible',
                                 'replicator_preview' => true,
                                 'duplicate' => true,
@@ -314,6 +320,7 @@ class SetsTest extends TestCase
                                 'instructions' => null,
                                 'instructions_position' => 'above',
                                 'listable' => 'hidden',
+                                'sortable' => true,
                                 'visibility' => 'visible',
                                 'replicator_preview' => true,
                                 'duplicate' => true,
@@ -369,6 +376,7 @@ class SetsTest extends TestCase
                         'display' => 'One',
                         'instructions' => 'One Instructions',
                         'icon' => 'one-icon',
+                        'hide' => false,
                         'fields' => [
                             [
                                 'handle' => 'field_one',
@@ -394,6 +402,7 @@ class SetsTest extends TestCase
                         'display' => 'One',
                         'instructions' => 'One Instructions',
                         'icon' => 'one-icon',
+                        'hide' => false,
                         'fields' => [
                             [
                                 'handle' => 'field_one',

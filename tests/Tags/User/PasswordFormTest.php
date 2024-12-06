@@ -2,6 +2,7 @@
 
 namespace Tests\Tags\User;
 
+use Illuminate\Support\Facades\Password;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Parse;
 use Statamic\Facades\User;
@@ -311,5 +312,26 @@ EOT
             ]);
 
         $response->assertStatus(422);
+    }
+
+    #[Test]
+    public function it_will_delete_any_password_reset_tokens_when_updating_password()
+    {
+        $user = tap(User::make()->email('hoff@statamic.com')->password('mypassword'))->save();
+
+        $token = Password::createToken($user);
+
+        $this->assertTrue(Password::tokenExists($user, $token));
+
+        $this
+            ->actingAs($user)
+            ->post('/!/auth/password', [
+                'current_password' => 'mypassword',
+                'password' => 'newpassword',
+                'password_confirmation' => 'newpassword',
+            ])
+            ->assertSessionHasNoErrors();
+
+        $this->assertFalse(Password::tokenExists($user, $token));
     }
 }
