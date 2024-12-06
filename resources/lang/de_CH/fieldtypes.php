@@ -22,7 +22,6 @@ return [
     'assets.dynamic_folder_pending_field' => 'Dieses Feld ist verfügbar, sobald :field festgelegt ist.',
     'assets.dynamic_folder_pending_save' => 'Dieses Feld ist nach dem Speichern verfügbar.',
     'assets.title' => 'Dateien',
-    'bard.config.allow_source' => 'Ermöglicht beim Schreiben das Anzeigen des HTML-Quellcodes.',
     'bard.config.always_show_set_button' => 'Ermöglicht das ständige Anzeigen des «Set hinzufügen»-Buttons.',
     'bard.config.buttons' => 'Auswählen, welche Buttons in der Symbolleiste angezeigt werden sollen.',
     'bard.config.container' => 'Datei-Container für dieses Feld auswählen.',

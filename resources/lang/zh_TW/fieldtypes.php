@@ -22,7 +22,6 @@ return [
     'assets.dynamic_folder_pending_field' => '一旦设置了:field该字段将可用。',
     'assets.dynamic_folder_pending_save' => '保存后此字段可用。',
     'assets.title' => '素材',
-    'bard.config.allow_source' => '啟用以在撰寫時檢視 HTML 原始碼。',
     'bard.config.always_show_set_button' => '啟用以總是顯示「新增集合」按鈕。',
     'bard.config.buttons' => '選擇要在工具列的按鈕。',
     'bard.config.container' => '選擇用於該欄位的素材容器。',

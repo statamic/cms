@@ -22,7 +22,6 @@ return [
     'assets.dynamic_folder_pending_field' => 'Bidang ini akan tersedia setelah :field ditetapkan.',
     'assets.dynamic_folder_pending_save' => 'Kolom ini akan tersedia setelah disimpan.',
     'assets.title' => 'Assets',
-    'bard.config.allow_source' => 'Aktifkan untuk melihat kode sumber HTML saat menulis.',
     'bard.config.always_show_set_button' => 'Aktifkan untuk selalu menampilkan tombol "Tambahkan Set".',
     'bard.config.buttons' => 'Pilih tombol mana yang akan ditampilkan di toolbar.',
     'bard.config.container' => 'Pilih penampung aset mana yang akan digunakan untuk bidang ini.',

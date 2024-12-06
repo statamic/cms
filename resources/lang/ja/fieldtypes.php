@@ -22,7 +22,6 @@ return [
     'assets.dynamic_folder_pending_field' => 'このフィールドは:fieldが設定されると使用可能になります。',
     'assets.dynamic_folder_pending_save' => 'このフィールドは保存後に使用可能になります。',
     'assets.title' => '資産',
-    'bard.config.allow_source' => '書き込み中に HTML ソース コードを表示できるようにします。',
     'bard.config.always_show_set_button' => '有効にすると、「セット追加」ボタンが常に表示されます。',
     'bard.config.buttons' => 'ツールバーに表示するボタンを選択します。',
     'bard.config.container' => 'このフィールドに使用するアセット コンテナを選択します。',

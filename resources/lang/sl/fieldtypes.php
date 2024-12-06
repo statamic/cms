@@ -22,7 +22,6 @@ return [
     'assets.dynamic_folder_pending_field' => 'To polje bo na voljo :field .',
     'assets.dynamic_folder_pending_save' => 'To polje bo na voljo po shranjevanju.',
     'assets.title' => 'Assets',
-    'bard.config.allow_source' => 'Omogoči ogled izvorne kode HTML med pisanjem.',
     'bard.config.always_show_set_button' => 'Omogoči, da bo vedno prikazan gumb »Dodaj nastavitev«.',
     'bard.config.buttons' => 'Izberite gumbe za prikaz v orodni vrstici.',
     'bard.config.container' => 'Izberite vsebnik sredstva, ki ga želite uporabiti za to polje.',

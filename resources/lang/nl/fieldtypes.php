@@ -22,7 +22,6 @@ return [
     'assets.dynamic_folder_pending_field' => 'Dit veld is beschikbaar zodra :field is ingesteld.',
     'assets.dynamic_folder_pending_save' => 'Dit veld is beschikbaar na het opslaan.',
     'assets.title' => 'Assets',
-    'bard.config.allow_source' => 'Schakel de optie in dat gebruikers de HTML-broncode kunnen bekijken tijdens het schrijven.',
     'bard.config.always_show_set_button' => 'Schakel in om altijd de voeg-set-knop-toe te tonen.',
     'bard.config.buttons' => 'Kies welke knoppen er in de toolbar zitten.',
     'bard.config.container' => 'Kies welke asset-container er voor dit veld gebruikt moet worden.',

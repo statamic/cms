@@ -22,7 +22,6 @@ return [
     'assets.dynamic_folder_pending_field' => 'Medan ini akan tersedia setelah :field ditetapkan.',
     'assets.dynamic_folder_pending_save' => 'Medan ini akan tersedia selepas disimpan.',
     'assets.title' => 'Aset',
-    'bard.config.allow_source' => 'Dayakan untuk melihat kod sumber HTML semasa menulis.',
     'bard.config.always_show_set_button' => 'Dayakan untuk sentiasa menunjukkan butang "Tambah Set".',
     'bard.config.buttons' => 'Pilih butang yang hendak ditunjukkan dalam bar alat.',
     'bard.config.container' => 'Pilih penampung aset yang hendak digunakan untuk bidang ini.',

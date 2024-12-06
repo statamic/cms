@@ -22,7 +22,6 @@ return [
     'assets.dynamic_folder_pending_field' => 'Dette feltet vil være tilgjengelig når :field er satt.',
     'assets.dynamic_folder_pending_save' => 'Dette feltet vil være tilgjengelig etter lagring.',
     'assets.title' => 'Filer',
-    'bard.config.allow_source' => 'Aktiver for å vise HTML-kildekoden under skriving.',
     'bard.config.always_show_set_button' => 'Aktiver for alltid å vise knappen "Legg til sett".',
     'bard.config.buttons' => 'Velg knappene som skal vises på verktøylinjen.',
     'bard.config.container' => 'Velg filbeholderen som skal brukes for dette feltet.',

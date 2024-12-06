@@ -22,7 +22,6 @@ return [
     'assets.dynamic_folder_pending_field' => 'Dette felt vil være tilgængeligt, når :field er indstillet.',
     'assets.dynamic_folder_pending_save' => 'Dette felt vil være tilgængeligt efter lagring.',
     'assets.title' => 'Assets',
-    'bard.config.allow_source' => 'Aktiver for at få vist HTML-kildekoden under skrivning.',
     'bard.config.always_show_set_button' => 'Aktiver for altid at vise knappen "Tilføj sæt".',
     'bard.config.buttons' => 'Vælg hvilke knapper der skal vises på værktøjslinjen.',
     'bard.config.container' => 'Vælg hvilken aktiv-beholder, der skal bruges til dette felt.',

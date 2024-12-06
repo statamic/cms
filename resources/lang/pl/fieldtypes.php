@@ -22,7 +22,6 @@ return [
     'assets.dynamic_folder_pending_field' => 'To pole będzie dostępne po ustawieniu opcji :field .',
     'assets.dynamic_folder_pending_save' => 'To pole będzie dostępne po zapisaniu.',
     'assets.title' => 'Zasoby',
-    'bard.config.allow_source' => 'Włącz, aby móc zobaczyć kod źródłowy HTML podczas pisania.',
     'bard.config.always_show_set_button' => 'Włącz, aby zawsze pokazywać przycisk &quot;Dodaj zestaw&quot;.',
     'bard.config.buttons' => 'Wybierz, które przyciski pokazać na pasku narzędzi.',
     'bard.config.container' => 'Wybierz, który kontener zasobów użyć dla tego pola.',
