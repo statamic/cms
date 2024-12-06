@@ -68,6 +68,15 @@ export default {
     },
 
 
+    computed: {
+
+        activeUploads() {
+            return this.uploads.filter(u => u.instance.state === 'started');
+        }
+
+    },
+
+
     methods: {
 
         browse() {
@@ -230,6 +239,9 @@ export default {
         },
 
         processUploadQueue() {
+            // If we're already uploading, don't start another
+            if (this.activeUploads.length) return;
+
             // Make sure we're not grabbing a running or failed upload
             const upload = this.uploads.find(u => u.instance.state === 'new' && !u.errorMessage);
             if (!upload) return;
@@ -248,6 +260,8 @@ export default {
                 response.status === 200
                     ? this.handleUploadSuccess(id, json)
                     : this.handleUploadError(id, response.status, json);
+
+                this.processUploadQueue();
             });
         },
 
