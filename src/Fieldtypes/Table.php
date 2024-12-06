@@ -18,6 +18,16 @@ class Table extends Fieldtype
                 'instructions' => __('statamic::messages.fields_default_instructions'),
                 'type' => 'table',
             ],
+            'max_rows' => [
+                'display' => __('Max Columns'),
+                'instructions' => __('statamic::fieldtypes.table.config.max_rows'),
+                'type' => 'integer',
+            ],
+            'max_columns' => [
+                'display' => __('Max Columns'),
+                'instructions' => __('statamic::fieldtypes.table.config.max_columns'),
+                'type' => 'integer',
+            ],
         ];
     }
 
