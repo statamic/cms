@@ -22,7 +22,6 @@ return [
     'assets.dynamic_folder_pending_field' => 'Це поле стане доступним після встановлення :field .',
     'assets.dynamic_folder_pending_save' => 'Це поле стане доступним після збереження.',
     'assets.title' => 'Ресурси',
-    'bard.config.allow_source' => 'Дозволити перегляд HTML-коду під час написання.',
     'bard.config.always_show_set_button' => 'Дозволити завжди показувати кнопку "Додати набір".',
     'bard.config.buttons' => 'Виберіть, які кнопки будуть відображатися на панелі інструментів.',
     'bard.config.container' => 'Виберіть контейнер ресурсів для використання в цьому полі.',

@@ -22,7 +22,6 @@ return [
     'assets.dynamic_folder_pending_field' => 'Bu alan :field ayarlandığında kullanılabilir olacaktır.',
     'assets.dynamic_folder_pending_save' => 'Bu alan kaydedildikten sonra kullanılabilir olacaktır.',
     'assets.title' => 'Varlıklar',
-    'bard.config.allow_source' => 'Yazarken HTML kaynak kodunu görüntülemeyi etkinleştirin.',
     'bard.config.always_show_set_button' => 'Her zaman "Set Ekle" düğmesini göstermek için etkinleştirin.',
     'bard.config.buttons' => 'Araç çubuğunda hangi düğmelerin gösterileceğini seçin.',
     'bard.config.container' => 'Bu alan için hangi varlık kapsayıcısının kullanılacağını seçin.',
