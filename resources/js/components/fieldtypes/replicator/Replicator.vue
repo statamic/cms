@@ -65,9 +65,9 @@
                             :sets="setConfigs"
                             :index="index"
                             :enabled="canAddSet"
-                            :paste-enabled="canPasteSet"
+                            :paste-enabled="canPasteSets"
                             @added="addSet"
-                            @pasted="pasteSet" />
+                            @pasted="pasteSets" />
                     </template>
                 </replicator-set>
             </div>
@@ -80,9 +80,9 @@
             :sets="setConfigs"
             :index="value.length"
             :label="config.button_label"
-            :paste-enabled="canPasteSet"
+            :paste-enabled="canPasteSets"
             @added="addSet"
-            @pasted="pasteSet" />
+            @pasted="pasteSets" />
 
     </section>
 
@@ -134,9 +134,17 @@ export default {
             return !this.config.max_sets || this.value.length < this.config.max_sets;
         },
 
-        canPasteSet() {
+        canPasteSets() {
+            if (!this.canAddSet) {
+                return false;
+            }
             const data = this.$clipboard.get();
-            return this.canAddSet && data?.type === 'replicator' && Object.values(this.setConfigHashes).includes(data?.configHash);
+            if (data?.type !== 'replicator') {  
+                return false;
+            }
+            const itemConfigHashes = data.items.map(item => item.configHash);
+            const setConfigHashes = Object.values(this.setConfigHashes);
+            return itemConfigHashes.every(hash => setConfigHashes.includes(hash));
         },
 
         setConfigs() {
@@ -186,6 +194,14 @@ export default {
                     quick: true,
                     visibleWhenReadOnly: true,
                     run: this.collapseAll,
+                },
+                {
+                    title: __('Cut All Sets'),
+                    run: () => this.copySets(true),
+                },
+                {
+                    title: __('Copy All Sets'),
+                    run: () => this.copySets(),
                 },
                 {
                     title: __('Toggle Fullscreen Mode'),
@@ -271,38 +287,72 @@ export default {
 
             this.$clipboard.set({
                 type: 'replicator',
-                configHash: this.setConfigHash(value.type),
-                value,
-                meta,
+                items: [{
+                    configHash: this.setConfigHash(value.type),
+                    value: value,
+                    meta: meta,
+                }],
             });
 
             if (cut) {
-                this.removed(value, index);                
+                this.removed(value, index);
             }
         },
 
-        pasteSet(index) {
+        copySets(cut = false) {
+            this.$clipboard.set({
+                type: 'replicator',
+                items: this.value.map((value) => ({
+                    configHash: this.setConfigHash(value.type),
+                    value: value,
+                    meta: this.meta.existing[value._id],
+                })),
+            });
+
+            if (cut) {
+                this.update([]);
+                this.updateMeta({ ...this.meta, existing: {} });
+            }
+        },
+
+        pasteSets(index) {
             const data = this.$clipboard.get();
             if (!data || data.type !== 'replicator') {
                 return;
             }
 
-            const set = {
-                ...data.value,
-                _id: uniqid(),
+            const value = [];
+            const meta = {};
+            const previews = {};
+            data.items.forEach((item) => {
+                const set = { ...item.value, _id: uniqid() };
+                value.push(set);
+                meta[set._id] = item.meta;
+                previews[set._id] = {};
+            });
+
+            this.previews = {
+                ...this.previews,
+                ...previews,
             };
 
-            this.updateSetPreviews(set._id, {});
-
-            this.updateSetMeta(set._id, data.meta);
+            this.updateMeta({
+                ...this.meta,
+                existing: {
+                    ...this.meta.existing,
+                    ...meta,
+                },
+            });
 
             this.update([
                 ...this.value.slice(0, index),
-                set,
+                ...value,
                 ...this.value.slice(index)
             ]);
 
-            this.expandSet(set._id);
+            value.forEach((set) => {
+                this.expandSet(set._id);
+            });
         },
 
         updateSetPreviews(id, previews) {
