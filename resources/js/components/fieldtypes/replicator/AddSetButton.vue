@@ -25,9 +25,9 @@
         </set-picker>
         <button
             v-if="enabled && pasteEnabled"
-            v-tooltip="__('Paste Set')"
+            v-tooltip="__('Paste Sets')"
             class="btn-round flex items-center justify-center h-5 w-5 ml-1"
-            @click="pasteSet">
+            @click="pasteSets">
             <svg-icon name="regular/paragraph-align-justified"
                 :class="{
                     'w-2 h-2 text-gray-800 group-hover:text-black': last,
@@ -69,7 +69,7 @@ export default {
             }
         },
 
-        pasteSet() {
+        pasteSets() {
             this.$emit('pasted', this.index);
         },
 
