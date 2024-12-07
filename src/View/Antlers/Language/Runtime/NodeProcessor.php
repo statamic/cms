@@ -2550,6 +2550,7 @@ class NodeProcessor
             $value['count'] = $index + 1;
             $value['index'] = $index;
             $value['total_results'] = $total;
+            $value['no_results'] = false;
             $value['first'] = $index === 0;
             $value['last'] = $index === $lastIndex;
 
