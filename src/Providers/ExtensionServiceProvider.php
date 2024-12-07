@@ -4,6 +4,7 @@ namespace Statamic\Providers;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
+use SplFileInfo;
 use Statamic\Actions;
 use Statamic\Actions\Action;
 use Statamic\Dictionaries;
@@ -329,6 +330,36 @@ class ExtensionServiceProvider extends ServiceProvider
         }
     }
 
+    public static function getNamespaceFromFile(SplFileInfo $file, string $basePath, string $appNamespace): ?string
+    {
+        // Normalize some things.
+        $basePath = realpath($basePath);
+        $filePath = realpath($file->getPath()); // Note: Not using getRealPath() to avoid the filename at this point.
+
+        // Bail.
+        if (! $basePath || ! $filePath) {
+            return null;
+        }
+
+        // More separator normalization.
+        $basePath = str_replace('\\', '/', $basePath);
+        $filePath = str_replace('\\', '/', $filePath);
+
+        $basePath = Str::finish($basePath, '/');
+
+        $namespace = str_replace('/', '\\', mb_substr($filePath, mb_strlen($basePath)));
+        $class = $file->getBasename('.php');
+        $namespace = ltrim($namespace, '\\');
+
+        // Cleanup the app namespace.
+        $appNamespace = str_replace('/', '\\', $appNamespace);
+        $appNamespace = str_replace('\\\\', '\\', $appNamespace);
+        $appNamespace = ltrim($appNamespace, '\\');
+        $appNamespace = Str::finish($appNamespace, '\\');
+
+        return "{$appNamespace}{$namespace}\\{$class}";
+    }
+
     protected function registerAppExtensions($folder, $requiredClass)
     {
         if (! $this->app['files']->exists($path = app_path($folder))) {
@@ -336,11 +367,10 @@ class ExtensionServiceProvider extends ServiceProvider
         }
 
         foreach ($this->app['files']->allFiles($path) as $file) {
-            $relativePathOfFolder = str_replace(app_path('/'), '', $file->getPath());
-            $namespace = str_replace('/', '\\', $relativePathOfFolder);
-            $class = $file->getBasename('.php');
+            if (! $fqcn = self::getNamespaceFromFile($file, app_path(), $this->app->getNamespace())) {
+                continue;
+            }
 
-            $fqcn = $this->app->getNamespace()."{$namespace}\\{$class}";
             if (is_subclass_of($fqcn, $requiredClass)) {
                 $fqcn::register();
             }
