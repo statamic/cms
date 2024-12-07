@@ -1488,6 +1488,30 @@ class AssetTest extends TestCase
     }
 
     #[Test]
+    public function it_doesnt_delete_original_asset_when_replacing_with_same_asset()
+    {
+        $this->fakeEventWithMacros();
+        $disk = Storage::fake('local');
+        $disk->put('some/asset.txt', 'asset contents');
+        $container = Facades\AssetContainer::make('test')->disk('local');
+        Facades\AssetContainer::shouldReceive('save')->with($container);
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        $oldAsset = tap($container->makeAsset('some/asset.txt')->data(['foo' => 'bar']))->saveQuietly();
+        $sameAsset = $container->makeAsset('some/asset.txt')->data(['foo' => 'bar']);
+
+        // Replace with `$deleteOriginal = true`
+        $return = $sameAsset->replace($oldAsset, true);
+
+        Event::assertDispatched(AssetDeleted::class, 0); // because we passed the flag, the original asset should be deleted
+        Event::assertDispatched(AssetSaved::class, 0); // by default, the new asset is not renamed
+        Event::assertDispatched(AssetReplaced::class, 0); // our `UpdateAssetReferencesTest` covers what happens _after_ an asset is replaced
+
+        $this->assertEquals($sameAsset, $return);
+        $disk->assertExists('some/asset.txt');
+        $disk->assertExists('some/.meta/asset.txt.yaml');
+    }
+
+    #[Test]
     public function it_gets_dimensions()
     {
         $file = UploadedFile::fake()->image('image.jpg', 30, 60);

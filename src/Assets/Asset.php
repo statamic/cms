@@ -777,6 +777,10 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     public function replace(Asset $originalAsset, $deleteOriginal = false)
     {
+        if ($this->path() == $originalAsset->path()) {
+            return $this;
+        }
+
         // Temporarily disable the reference updater to avoid triggering reference updates
         // until after the `AssetReplaced` event is fired. We still want to fire events
         // like `AssetDeleted` and `AssetSaved` though, so that other listeners will
