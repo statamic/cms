@@ -333,6 +333,7 @@ class ExtensionServiceProvider extends ServiceProvider
     public static function getNamespaceFromFile(SplFileInfo $file, string $basePath, string $appNamespace): ?string
     {
         // Normalize some things.
+        $basePath = str_replace('\\', '/', $basePath);
         $basePath = realpath($basePath);
         $filePath = realpath($file->getPath()); // Note: Not using getRealPath() to avoid the filename at this point.
 
