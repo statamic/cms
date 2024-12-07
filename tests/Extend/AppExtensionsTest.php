@@ -51,7 +51,8 @@ class AppExtensionsTest extends TestCase
                     foreach ($appVariations as $variation) {
                         $this->assertSame(
                             $expectedNamespace,
-                            ExtensionServiceProvider::getNamespaceFromFile($file, $basePath, $variation)
+                            ExtensionServiceProvider::getNamespaceFromFile($file, $basePath, $variation),
+                            "App Namespace: {$appNamespace} Variation: {$variation} Base Path: {$basePath}"
                         );
                     }
                 }
