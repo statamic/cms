@@ -51,7 +51,7 @@ class Tags extends BaseTags
     {
         $this->context['form'] = $this->params->get(static::HANDLE_PARAM);
 
-        return [];
+        return $this->parse();
     }
 
     /**
@@ -102,6 +102,7 @@ class Tags extends BaseTags
         if ($jsDriver) {
             $attrs = array_merge($attrs, $jsDriver->addToFormAttributes($form));
         }
+        $attrs = $this->runHooks('attrs', ['attrs' => $attrs, 'data' => $data])['attrs'];
 
         $params = [];
 
@@ -113,7 +114,7 @@ class Tags extends BaseTags
             $params['error_redirect'] = $this->parseRedirect($errorRedirect);
         }
 
-        if (! $this->parser) {
+        if (! $this->canParseContents()) {
             return array_merge([
                 'attrs' => $this->formAttrs($action, $method, $knownParams, $attrs),
                 'params' => $this->formMetaPrefix($this->formParams($method, $params)),
@@ -121,11 +122,13 @@ class Tags extends BaseTags
         }
 
         $html = $this->formOpen($action, $method, $knownParams, $attrs);
+        $html = $this->runHooks('after-open', ['html' => $html, 'data' => $data])['html'];
 
         $html .= $this->formMetaFields($params);
 
         $html .= $this->parse($data);
 
+        $html = $this->runHooks('before-close', ['html' => $html, 'data' => $data])['html'];
         $html .= $this->formClose();
 
         if ($jsDriver) {
@@ -164,9 +167,13 @@ class Tags extends BaseTags
     public function success()
     {
         $sessionHandle = $this->sessionHandle();
+        $successMessage = $this->getFromFormSession($sessionHandle, 'success');
 
-        // TODO: Should probably output success string instead of `true` boolean for consistency.
-        return $this->getFromFormSession($sessionHandle, 'success');
+        if ($this->isAntlersBladeComponent() && $this->isPair) {
+            return str($successMessage)->length() > 0;
+        }
+
+        return $successMessage;
     }
 
     /**
@@ -177,7 +184,7 @@ class Tags extends BaseTags
     public function submission()
     {
         if ($this->success()) {
-            return session('submission')->toArray();
+            return $this->aliasedResult(session('submission')->toArray());
         }
     }
 

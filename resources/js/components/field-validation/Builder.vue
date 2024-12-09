@@ -176,7 +176,7 @@ export default {
                 return false;
             }
 
-            let rule = _.chain(RULES)
+            let rule = _.chain(this.allRules)
                 .filter(rule => rule.value === this.selectedLaravelRule)
                 .first()
                 .value();

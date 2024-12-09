@@ -25,6 +25,7 @@
                     :name="publishContainer"
                     :blueprint="adjustedBlueprint"
                     :values="values"
+                    :extra-values="extraValues"
                     :meta="meta"
                     :errors="errors"
                     :localized-fields="localizedFields"
@@ -94,6 +95,7 @@ export default {
             meta: null,
             originValues: null,
             originMeta: null,
+            extraValues: null,
             localizedFields: null,
             syncableFields: null,
             loading: true,
@@ -275,6 +277,7 @@ export default {
             this.originValues = info.originValues;
             this.meta = info.meta;
             this.originMeta = info.originMeta;
+            this.extraValues = info.extraValues;
             this.localizedFields = info.localizedFields;
             this.syncableFields = info.syncableFields;
         },
@@ -285,6 +288,7 @@ export default {
                 originValues: this.originValues,
                 meta: this.meta,
                 originMeta: this.originMeta,
+                extraValues: this.extraValues,
                 localizedFields: this.localizedFields,
                 syncableFields: this.syncableFields,
                 entry: this.entry,

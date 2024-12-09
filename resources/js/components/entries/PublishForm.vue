@@ -3,11 +3,11 @@
     <div>
         <breadcrumb v-if="breadcrumbs" :url="breadcrumbs[1].url" :title="breadcrumbs[1].text" />
 
-        <div class="flex items-center mb-6">
-            <h1 class="flex-1">
-                <div class="flex items-center">
-                    <span v-if="! isCreating" class="little-dot rtl:ml-2 ltr:mr-2" :class="activeLocalization.status" v-tooltip="__(activeLocalization.status)" />
-                    <span v-html="$options.filters.striptags(__(title))" />
+        <div class="flex items-baseline mb-6">
+            <h1 class="flex-1 self-start rtl:ml-4 ltr:mr-4">
+                <div class="flex items-baseline">
+                    <span v-if="! isCreating" class="little-dot rtl:ml-2 ltr:mr-2 -top-1" :class="activeLocalization.status" v-tooltip="__(activeLocalization.status)" />
+                    <span class="break-overflowing-words" v-html="$options.filters.striptags(__(title))" />
                 </div>
             </h1>
 
@@ -68,6 +68,7 @@
             :name="publishContainer"
             :blueprint="fieldset"
             :values="values"
+            :extra-values="extraValues"
             :reference="initialReference"
             :meta="meta"
             :errors="errors"
@@ -335,6 +336,7 @@ export default {
         initialReference: String,
         initialFieldset: Object,
         initialValues: Object,
+        initialExtraValues: Object,
         initialMeta: Object,
         initialTitle: String,
         initialLocalizations: Array,
@@ -375,6 +377,7 @@ export default {
             title: this.initialTitle,
             values: _.clone(this.initialValues),
             meta: _.clone(this.initialMeta),
+            extraValues: _.clone(this.initialExtraValues),
             localizations: _.clone(this.initialLocalizations),
             localizedFields: this.initialLocalizedFields,
             hasOrigin: this.initialHasOrigin,
@@ -606,6 +609,7 @@ export default {
                         clearTimeout(this.trackDirtyStateTimeout)
                         this.trackDirtyState = false
                         this.values = this.resetValuesFromResponse(response.data.data.values);
+                        this.extraValues = response.data.data.extraValues;
                         this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500)
                         this.$nextTick(() => this.$emit('saved', response));
                         return;
@@ -630,6 +634,7 @@ export default {
                         clearTimeout(this.trackDirtyStateTimeout);
                         this.trackDirtyState = false;
                         this.values = this.resetValuesFromResponse(response.data.data.values);
+                        this.extraValues = response.data.data.extraValues;
                         this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500);
                         this.initialPublished = response.data.data.published;
                         this.activeLocalization.published = response.data.data.published;

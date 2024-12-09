@@ -18,9 +18,9 @@ class UserRoles extends Tags
         }
 
         if (empty($handles)) {
-            return $roles->values();
+            return $this->aliasedResult($roles->values());
         }
 
-        return $roles->filter(fn ($role) => in_array($role->handle(), $handles))->values();
+        return $this->aliasedResult($roles->filter(fn ($role) => in_array($role->handle(), $handles))->values());
     }
 }

@@ -1,4 +1,5 @@
 import Converter from './Converter.js';
+import ParentResolver from './ParentResolver.js';
 import { KEYS } from './Constants.js';
 import { data_get } from  '../../bootstrap/globals.js'
 import isString from 'underscore/modules/isString.js'
@@ -20,12 +21,13 @@ const NUMBER_SPECIFIC_COMPARISONS = [
 ];
 
 export default class {
-    constructor(field, values, store, storeName) {
+    constructor(field, values, dottedFieldPath, store, storeName) {
         this.field = field;
         this.values = values;
-        this.rootValues = store ? store.state.publish[storeName].values : false;
+        this.dottedFieldPath = dottedFieldPath;
         this.store = store;
         this.storeName = storeName;
+        this.rootValues = store ? store.state.publish[storeName].values : false;
         this.passOnAny = false;
         this.showOnPass = true;
         this.converter = new Converter;
@@ -204,9 +206,15 @@ export default class {
     }
 
     getFieldValue(field) {
-        return field.startsWith('root.')
-            ?  data_get(this.rootValues, field.replace(new RegExp('^root.'), ''))
-            :  data_get(this.values, field);
+        if (field.startsWith('$parent.')) {
+            field = new ParentResolver(this.dottedFieldPath).resolve(field);
+        }
+
+        if (field.startsWith('$root.') || field.startsWith('root.')) {
+            return data_get(this.rootValues, field.replace(new RegExp('^\\$?root\\.'), ''));
+        }
+
+        return data_get(this.values, field);
     }
 
     passesCondition(condition) {
@@ -264,6 +272,7 @@ export default class {
             root: this.rootValues,
             store: this.store,
             storeName: this.storeName,
+            fieldPath: this.dottedFieldPath,
         });
 
         return this.showOnPass ? passes : ! passes;
@@ -286,12 +295,16 @@ export default class {
     }
 
     relativeLhsToAbsoluteFieldPath(lhs, dottedPrefix) {
-        if (! dottedPrefix) {
-            return lhs;
+        if (lhs.startsWith('$parent.')) {
+            lhs = new ParentResolver(this.dottedFieldPath).resolve(lhs);
         }
 
-        return lhs.startsWith('root.')
-            ? lhs.replace(/^root\./, '')
-            : dottedPrefix + '.' + lhs;
+        if (lhs.startsWith('$root.') || lhs.startsWith('root.')) {
+            return lhs.replace(new RegExp('^\\$?root\\.'), '');
+        }
+
+        return dottedPrefix
+            ? dottedPrefix + '.' + lhs
+            : lhs;
     }
 }

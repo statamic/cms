@@ -71,6 +71,19 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
         return $this->namespace;
     }
 
+    public function fullyQualifiedHandle(): string
+    {
+        $handle = $this->handle();
+
+        if ($this->namespace()) {
+            $handle = $this->isNamespaced()
+                ? $this->namespace().'::'.$handle
+                : $this->namespace().'.'.$handle;
+        }
+
+        return $handle;
+    }
+
     public function setOrder($order)
     {
         if (! is_null($order)) {
@@ -308,7 +321,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
     {
         $this->parent = $parent;
 
-        $this->resetFieldsCache();
+        $this->resetBlueprintCache()->resetFieldsCache();
 
         return $this;
     }

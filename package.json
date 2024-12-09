@@ -52,7 +52,7 @@
     "codemirror": "^5.58.2",
     "cookies-js": "^1.2.2",
     "floating-vue": "^1.0.0-beta.19",
-    "fuse.js": "^3.4.6",
+    "fuse.js": "^7.0.0",
     "highlight.js": "^11.7.0",
     "imask": "^6.6.0-alpha.0",
     "laravel-echo": "^1.16.0",

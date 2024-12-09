@@ -93,21 +93,21 @@ class Multisite extends Command
             return false;
         }
 
-        $directory = Config::get('statamic.stache.stores.entries.directory').DIRECTORY_SEPARATOR.$collection->handle().DIRECTORY_SEPARATOR.$siteHandle;
+        $directory = Stache::store('entries')->directory().DIRECTORY_SEPARATOR.$collection->handle().DIRECTORY_SEPARATOR.$siteHandle;
 
         return File::isDirectory($directory);
     }
 
     private function globalsHaveBeenMoved(string $siteHandle): bool
     {
-        $directory = Config::get('statamic.stache.stores.globals.directory').DIRECTORY_SEPARATOR.$siteHandle;
+        $directory = Stache::store('globals')->directory().DIRECTORY_SEPARATOR.$siteHandle;
 
         return File::isDirectory($directory);
     }
 
     private function navsHaveBeenMoved(string $siteHandle): bool
     {
-        $directory = Config::get('statamic.stache.stores.navigation.directory').DIRECTORY_SEPARATOR.$siteHandle;
+        $directory = Stache::store('navigation')->directory().DIRECTORY_SEPARATOR.$siteHandle;
 
         return File::isDirectory($directory);
     }
@@ -233,7 +233,7 @@ class Multisite extends Command
     {
         Config::set('statamic.system.multisite', false);
 
-        $base = Config::get('statamic.stache.stores.entries.directory').DIRECTORY_SEPARATOR.$collection->handle();
+        $base = Stache::store('entries')->directory().DIRECTORY_SEPARATOR.$collection->handle();
 
         File::makeDirectory("{$base}/{$this->siteHandle}");
 

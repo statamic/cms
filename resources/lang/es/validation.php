@@ -1,18 +1,8 @@
 <?php
 
 return [
-
-    /*
-    |--------------------------------------------------------------------------
-    | Líneas de lenguaje de validación
-    |--------------------------------------------------------------------------
-    |
-    | Las siguientes líneas de contienen los mensajes de error predeterminados
-    | utilizados por la clase de validador. Algunas de estas reglas tienen
-    | varias versiones, como las reglas del tamaño. Puedes modificarlos aquí.
-    */
-
     'accepted' => 'Debes aceptar esto',
+    'accepted_if' => 'Debe aceptarse cuando :other es :value .',
     'active_url' => 'Este no es un URL válido.',
     'after' => 'Debe ser una fecha posterior a :date.',
     'after_or_equal' => 'Debe ser una fecha posterior o igual a :date.',
@@ -20,41 +10,44 @@ return [
     'alpha_dash' => 'Solo puede contener letras, números y guiones medios o bajos.',
     'alpha_num' => 'Solo puede contener letras y números.',
     'array' => 'Debe ser un arreglo.',
+    'ascii' => 'Solo debe contener caracteres alfanuméricos y símbolos de un solo byte.',
     'before' => 'Debe ser una fecha anterior a :date.',
     'before_or_equal' => 'Debe ser una fecha anterior o igual a :date.',
-    'between' => [
-        'numeric' => 'Debe estar entre :min y :max.',
-        'file' => 'Debe tener entre :min y :max kb.',
-        'string' => 'Debe tener entre :min y :max caracteres.',
-        'array' => 'Debe tener entre :min y :max elementos.',
-    ],
+    'between.array' => 'Debe tener entre :min y :max elementos.',
+    'between.file' => 'Debe estar entre :min y :max kilobytes.',
+    'between.numeric' => 'Debe estar entre :min y :max .',
+    'between.string' => 'Debe tener entre :min y :max caracteres.',
     'boolean' => 'Debe ser verdadero o falso.',
+    'can' => 'Contiene un valor no autorizado.',
     'confirmed' => 'La confirmación no coincide.',
     'current_password' => 'La contraseña es incorrecta.',
     'date' => 'No es una fecha válida.',
+    'date_equals' => 'Debe ser una fecha igual a :date .',
     'date_format' => 'No coincide con el formato :format.',
+    'decimal' => 'Debe tener :decimal .',
+    'declined' => 'Debe ser rechazado.',
+    'declined_if' => 'Debe rechazarse cuando :other es :value .',
     'different' => 'Este campo y :other deben ser diferentes.',
     'digits' => 'Debe tener :digits dígitos.',
     'digits_between' => 'Debe tener entre :min y :max dígitos.',
     'dimensions' => 'Dimensiones de imagen inválidas',
     'distinct' => 'Este campo tiene un valor duplicado.',
+    'doesnt_end_with' => 'No debe terminar con uno de los siguientes: :values .',
+    'doesnt_start_with' => 'No debe comenzar con uno de los siguientes: :values .',
     'email' => 'Debe ser una dirección de email válida.',
+    'ends_with' => 'Debe terminar con :values',
+    'enum' => 'El :attribute seleccionado no es válido.',
     'exists' => 'Esto no es válido.',
     'file' => 'Debe ser un archivo.',
     'filled' => 'No puede estar vacío.',
-    'gt' => [
-        'numeric' => 'Debe ser mayor a :value.',
-        'file' => 'Debe ser mayor a :value kb.',
-        'string' => 'Debe tener más de :value caracteres.',
-        'array' => 'Debe tener más de :value elementos.',
-    ],
-    'gte' => [
-        'numeric' => 'Debe ser mayor o igual a :value.',
-        'file' => 'Debe ser mayor o igual a :value kb.',
-        'string' => 'Debe tener al menos :value catacteres.',
-        'array' => 'Debe tener al menos :value elementos.',
-    ],
-
+    'gt.array' => 'Debe tener más de :value elementos.',
+    'gt.file' => 'Debe ser mayor que :value kilobytes.',
+    'gt.numeric' => 'Debe ser mayor que :value .',
+    'gt.string' => 'Debe ser mayor que :value caracteres.',
+    'gte.array' => 'Debe tener :value o más.',
+    'gte.file' => 'Debe ser mayor o igual a :value kilobytes.',
+    'gte.numeric' => 'Debe ser mayor o igual que :value .',
+    'gte.string' => 'Debe ser mayor o igual a :value caracteres.',
     'image' => 'Debe ser una imagen.',
     'in' => 'Esto no es valido.',
     'in_array' => 'Este campo no existe en :other.',
@@ -63,103 +56,100 @@ return [
     'ipv4' => 'Debe ser una dirección IPv4 válida.',
     'ipv6' => 'Debe ser una dirección IPv6 válida.',
     'json' => 'Debe ser una cadena de JSON válida.',
-    'lt' => [
-        'numeric' => 'Debe ser menor a :value.',
-        'file' => 'Debe ser menor a :value kb.',
-        'string' => 'Debe tener menos de :value caracteres.',
-        'array' => 'Debe tener menos de :value elementos.',
-    ],
-    'lte' => [
-        'numeric' => 'Debe ser menor o igual a :value.',
-        'file' => 'Debe ser menor o igual a :value kb.',
-        'string' => 'Debe tener :value caracteres o menos.',
-        'array' => 'Debe tener :value elementos o menos.',
-    ],
-    'max' => [
-        'numeric' => 'Debe ser menor a :max.',
-        'file' => 'Debe ser menor a :max kb.',
-        'string' => 'Debe tener menos de :max caracteres.',
-        'array' => 'Debe tener menos de :max elementos.',
-    ],
+    'lowercase' => 'Debe estar en minúsculas.',
+    'lt.array' => 'Debe tener menos de :value elementos.',
+    'lt.file' => 'Debe ser menor que :value kilobytes.',
+    'lt.numeric' => 'Debe ser menor que :value .',
+    'lt.string' => 'Debe tener menos de :value caracteres.',
+    'lte.array' => 'No debe tener más de :value elementos.',
+    'lte.file' => 'Debe ser menor o igual :value kilobytes.',
+    'lte.numeric' => 'Debe ser menor o igual que :value .',
+    'lte.string' => 'Debe ser menor o igual a :value caracteres.',
+    'mac_address' => 'Debe ser una dirección MAC válida.',
+    'max.array' => 'No puede tener más de :max elementos.',
+    'max.file' => 'No puede ser mayor que :max kilobytes.',
+    'max.numeric' => 'No puede ser mayor que :max .',
+    'max.string' => 'No puede tener más de :max caracteres.',
+    'max_digits' => 'No debe tener más de :max dígitos.',
     'mimes' => 'Debe ser un archivo de tipo :values.',
     'mimetypes' => 'Debe ser un archivo de tipo :values.',
-    'min' => [
-        'numeric' => 'Debe ser al menos :min.',
-        'file' => 'Debe pesar al menos :min kb.',
-        'string' => 'Debe ser de al menos :min caracteres.',
-        'array' => 'Debe tener al menos :min elementos.',
-    ],
+    'min.array' => 'Debe tener al menos :min elementos.',
+    'min.file' => 'Debe tener al menos :min kilobytes.',
+    'min.numeric' => 'Debe ser al menos :min .',
+    'min.string' => 'Debe tener al menos :min caracteres.',
+    'min_digits' => 'Debe tener al menos :min dígitos.',
+    'missing' => 'Debe faltar.',
+    'missing_if' => 'Debe faltar cuando :other es :value .',
+    'missing_unless' => 'Debe faltar a menos que :other sea :value .',
+    'missing_with' => 'Debe faltar cuando :values está presente.',
+    'missing_with_all' => 'Debe faltar cuando :values están presentes.',
+    'multiple_of' => 'Debe ser un múltiplo de :value .',
     'not_in' => 'Esto no es valido.',
     'not_regex' => 'El formato es inválido',
     'numeric' => 'Tiene que ser un número.',
     'present' => 'Debe estar presente.',
+    'prohibited' => 'Prohibido.',
+    'prohibited_if' => 'Prohibido cuando :other es :value .',
+    'prohibited_unless' => 'Prohibido a menos que :other esté en :values .',
+    'prohibits' => 'Prohíbe :other estén presentes.',
     'regex' => 'El formato es inválido',
     'required' => 'Este campo es obligatorio.',
+    'required_array_keys' => 'Debe contener entradas para: :values .',
     'required_if' => 'Este campo es obligatorio cuando :other es :value.',
+    'required_if_accepted' => 'Este campo es obligatorio cuando se acepta :other .',
     'required_unless' => 'Este campo es obligatorio a menos que :other esté en :values.',
     'required_with' => 'Este campo es obligatorio cuando :values está presente.',
     'required_with_all' => 'Este campo es obligatorio cuando :values está presente.',
     'required_without' => 'Este campo es obligatorio cuando :values no está presente.',
     'required_without_all' => 'Este campo es obligatorio cuando :values no está presente.',
     'same' => 'Este campo y :other deben coincidir.',
-    'size' => [
-        'numeric' => 'Debe ser :size.',
-        'file' => 'Debe pesar :size kb.',
-        'string' => 'Debe tener :size caracteres.',
-        'array' => 'Debe tener :size elementos.',
-    ],
+    'size.array' => 'Debe contener elementos :size .',
+    'size.file' => 'Debe ser :size kilobytes.',
+    'size.numeric' => 'Debe ser :size .',
+    'size.string' => 'Debe tener :size caracteres.',
+    'starts_with' => 'Debe comenzar con :values',
     'string' => 'Debe ser un texto.',
     'timezone' => 'Debe ser una zona horaria válida.',
+    'ulid' => 'Debe ser un ULID válido.',
     'unique' => 'Este valor ya ha sido tomado.',
     'uploaded' => 'Error al cargar',
+    'uppercase' => 'Debe estar en mayúsculas.',
     'url' => 'El formato es inválido',
-
-    /*
-    |--------------------------------------------------------------------------
-    | Líneas personalizadas de lenguaje para validación de Statamic
-    |--------------------------------------------------------------------------
-    |
-    | Aquí puedes editar los mensajes de las reglas de validación de Statamic.
-    |
-    */
-
+    'uuid' => 'Debe ser un UUID válido.',
+    'arr_fieldtype' => 'Esto no es válido.',
+    'handle' => 'Debe contener únicamente letras minúsculas y números con guiones bajos como separadores.',
+    'slug' => 'Debe contener únicamente letras y números con guiones o guiones bajos como separadores.',
+    'code_fieldtype_rulers' => 'Esto no es válido.',
+    'composer_package' => 'Debe ser un nombre de paquete de compositor válido (por ejemplo, hasselhoff/kung-fury).',
+    'date_fieldtype_date_required' => 'La fecha es obligatoria.',
+    'date_fieldtype_end_date_invalid' => 'No es una fecha final válida.',
+    'date_fieldtype_end_date_required' => 'La fecha de finalización es obligatoria.',
+    'date_fieldtype_only_single_mode_allowed' => 'Solo puedes usar el modo &quot;Único&quot; cuando el identificador del campo es fecha.',
+    'date_fieldtype_start_date_invalid' => 'No es una fecha de inicio válida.',
+    'date_fieldtype_start_date_required' => 'La fecha de inicio es obligatoria.',
+    'date_fieldtype_time_required' => 'Se requiere tiempo.',
+    'duplicate_field_handle' => 'El campo con un identificador de :handle no se puede usar más de una vez.',
+    'duplicate_uri' => 'URI duplicada :value',
+    'email_available' => 'Ya existe un usuario con este correo electrónico.',
+    'fieldset_imported_recursively' => 'El conjunto de campos :handle se está importando de forma recursiva.',
+    'one_site_without_origin' => 'Al menos un sitio no debe tener un origen.',
+    'options_require_keys' => 'Todas las opciones deben tener claves.',
+    'origin_cannot_be_disabled' => 'No se puede seleccionar un origen inhabilitado.',
+    'parent_cannot_be_itself' => 'No puede ser su propio padre.',
+    'parent_causes_root_children' => 'Esto provocaría que la página raíz tuviera hijas.',
+    'parent_exceeds_max_depth' => 'Esto excedería la profundidad máxima.',
+    'reserved' => 'Esta es una palabra reservada.',
+    'reserved_field_handle' => 'El campo con un identificador :handle es una palabra reservada.',
     'unique_entry_value' => 'Este valor ya ha sido tomado.',
+    'unique_form_handle' => 'Este valor ya ha sido tomado.',
     'unique_term_value' => 'Este valor ya ha sido tomado.',
     'unique_user_value' => 'Este valor ya ha sido tomado.',
-    'duplicate_field_handle' => 'El campo con un identificador de :handle no se puede usar más de una vez.',
-    'one_site_without_origin' => 'Al menos un sitio no debe tener un origen.',
-    'origin_cannot_be_disabled' => 'No se puede seleccionar un origen inhabilitado.',
     'unique_uri' => 'Este URI ya se ha tomado.',
-    'duplicate_uri' => 'URI duplicada :value',
-    'reserved' => 'Esta es una palabra reservada.',
-
-    /*
-    |--------------------------------------------------------------------------
-    | Líneas de lenguaje de validación personalizadas
-    |--------------------------------------------------------------------------
-    |
-    | Aquí puedes especificar mensajes personalizados de validación usando
-    | la convención "atributo.regla" para nombrar cada fila. Esto facilita
-    | especificar una línea específica para alguna regla de un atributo.
-    */
-
-    'custom' => [
-        'nombre-de-atributo' => [
-            'nombre-de-regla' => 'mensaje-personalizado',
-        ],
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Atributos de validación personalizados
-    |--------------------------------------------------------------------------
-    |
-    | Las siguientes líneas son para cambiar los nombres de atributos por
-    | otros más legibles, como "Dirección de email" en vez de "email".
-    | Esto simplemente hace los mensajes un poco más limpios.
-    |
-    */
-
+    'time' => 'No es una hora válida.',
+    'asset_current_filename' => 'Este es el nombre del archivo actual.',
+    'asset_file_exists' => 'Ya existe un archivo con este nombre.',
+    'asset_file_exists_same_content' => 'Ya existe un archivo con este nombre y tiene el mismo contenido. Es posible que prefieras eliminarlo en lugar de cambiarle el nombre.',
+    'asset_file_exists_different_content' => 'Ya existe un archivo con este nombre pero con un contenido diferente. Es posible que quieras reemplazar el otro archivo con este.',
+    'custom.attribute-name.rule-name' => 'mensaje personalizado',
     'attributes' => [],
-
 ];

@@ -7,7 +7,7 @@
                 ref="button"
                 type="button"
                 :name="name"
-                @click="update($event.target.value)"
+                @click="updateSelectedOption($event.target.value)"
                 :value="option.value"
                 :disabled="isReadOnly"
                 :class="{'active': value === option.value}"
@@ -52,6 +52,10 @@ export default {
     },
 
     methods: {
+
+        updateSelectedOption(newValue) {
+            this.update(this.value == newValue && this.config.clearable ? null : newValue);
+        },
 
         setupResizeObserver() {
             this.resizeObserver = new ResizeObserver(() => {

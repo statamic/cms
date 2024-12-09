@@ -25,7 +25,7 @@
                 v-text="__('Apply')"
             ></button>
         </header>
-        <section class="py-4 px-3 md:px-8">
+        <section class="isolate py-4 px-3 md:px-8">
             <div class="tabs-container">
                 <div class="publish-tabs tabs">
                     <button class="tab-button"

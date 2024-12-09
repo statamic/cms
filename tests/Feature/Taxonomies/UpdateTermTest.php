@@ -1,5 +1,7 @@
 <?php
 
+namespace Tests\Feature\Taxonomies;
+
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;

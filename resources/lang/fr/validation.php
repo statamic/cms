@@ -146,6 +146,10 @@ return [
     'unique_user_value' => 'Cette valeur a déjà été prise.',
     'unique_uri' => 'Cette URI est déjà prise.',
     'time' => 'N’est pas un horaire valide.',
+    'asset_current_filename' => 'Ceci est le nom actuel du fichier.',
+    'asset_file_exists' => 'Un fichier portant ce nom existe déjà.',
+    'asset_file_exists_same_content' => 'Un fichier existe déjà avec ce nom et a le même contenu. Vous souhaiterez peut-être supprimer ceci plutôt que le renommer.',
+    'asset_file_exists_different_content' => 'Un fichier existe déjà avec ce nom mais son contenu est différent. Vous pouvez remplacer l’autre fichier par celui-ci.',
     'custom.attribute-name.rule-name' => 'message personnalisé',
     'attributes' => [],
 ];

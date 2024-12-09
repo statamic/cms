@@ -10,6 +10,7 @@
         :collection-has-routes="collectionHasRoutes"
         :initial-fieldset="fieldset"
         :initial-values="values"
+        :initial-extra-values="extraValues"
         :initial-meta="meta"
         :initial-localizations="localizations"
         :initial-has-origin="false"
@@ -37,6 +38,7 @@ export default {
         'collectionHasRoutes',
         'fieldset',
         'values',
+        'extraValues',
         'meta',
         'localizations',
         'revisions',

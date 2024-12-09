@@ -12,7 +12,7 @@
             :options="options"
             :get-option-key="(option) => option.id"
             :get-option-label="(option) => __(option.title)"
-            :create-option="(value) => ({ title: value, id: value })"
+            :create-option="(value) => createOption(value)"
             :placeholder="__(config.placeholder) || __('Choose...')"
             :searchable="true"
             :taggable="isTaggable"
@@ -138,6 +138,11 @@ export default {
             }
 
             this.$emit('input', items);
+        },
+
+        createOption(value) {
+            const existing = this.options.find((option) => option.title === value);
+            return existing || { id: value, title: value };
         },
 
     }

@@ -8,13 +8,14 @@ use Statamic\Facades\YAML;
 use Statamic\StarterKits\Concerns\InteractsWithFilesystem;
 use Statamic\StarterKits\Exceptions\StarterKitException;
 use Statamic\Support\Arr;
-use Statamic\Support\Str;
+use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Exporter
 {
-    use InteractsWithFilesystem;
+    use FluentlyGetsAndSets, InteractsWithFilesystem;
 
     protected $exportPath;
+    protected $clear;
     protected $files;
     protected $vendorName;
     protected $modules;
@@ -30,6 +31,14 @@ class Exporter
     }
 
     /**
+     * Get or set whether to clear out everything at target export path before exporting.
+     */
+    public function clear(bool $clear = false): self|bool|null
+    {
+        return $this->fluentlyGetOrSet('clear')->args(func_get_args());
+    }
+
+    /**
      * Export starter kit.
      *
      * @throws StarterKitException
@@ -40,10 +49,9 @@ class Exporter
             ->validateExportPath()
             ->validateConfig()
             ->instantiateModules()
+            ->clearExportPath()
             ->exportModules()
-            ->exportConfig()
-            ->exportHooks()
-            ->exportComposerJson();
+            ->exportPackage();
     }
 
     /**
@@ -63,8 +71,12 @@ class Exporter
      */
     protected function validateConfig(): self
     {
-        if (! $this->files->exists(base_path('starter-kit.yaml'))) {
-            throw new StarterKitException('Export config [starter-kit.yaml] does not exist.');
+        if (! $this->files->exists(base_path('package/starter-kit.yaml'))) {
+            throw new StarterKitException('Starter kit config [package/starter-kit.yaml] does not exist.');
+        }
+
+        if (! $this->files->exists(base_path('package/composer.json'))) {
+            throw new StarterKitException('Package config [package/composer.json] does not exist.');
         }
 
         return $this;
@@ -133,11 +145,27 @@ class Exporter
     }
 
     /**
+     * Optionally clear out everything at target export path before exporting.
+     */
+    protected function clearExportPath()
+    {
+        if (! $this->clear) {
+            return $this;
+        }
+
+        $this->files->cleanDirectory($this->exportPath);
+
+        return $this;
+    }
+
+    /**
      * Export all the modules.
      */
     protected function exportModules(): self
     {
-        $this->modules->each(fn ($module) => $module->export($this->exportPath));
+        $exportPath = $this->exportPath.'/export';
+
+        $this->modules->each(fn ($module) => $module->export($exportPath));
 
         return $this;
     }
@@ -147,27 +175,13 @@ class Exporter
      */
     protected function config(?string $key = null): mixed
     {
-        $config = collect(YAML::parse($this->files->get(base_path('starter-kit.yaml'))));
+        $config = collect(YAML::parse($this->files->get(base_path('package/starter-kit.yaml'))));
 
         if ($key) {
             return $config->get($key);
         }
 
         return $config;
-    }
-
-    /**
-     * Export starter kit config.
-     */
-    protected function exportConfig(): self
-    {
-        $config = $this
-            ->versionModuleDependencies()
-            ->syncConfigWithModules();
-
-        $this->files->put("{$this->exportPath}/starter-kit.yaml", YAML::dump($config->all()));
-
-        return $this;
     }
 
     /**
@@ -229,69 +243,18 @@ class Exporter
     }
 
     /**
-     * Export starter kit hooks.
+     * Export package config & other misc vendor files.
      */
-    protected function exportHooks(): self
+    protected function exportPackage(): self
     {
-        $hooks = ['StarterKitPostInstall.php'];
+        $this->copyDirectoryContentsInto(base_path('package'), $this->exportPath);
 
-        collect($hooks)
-            ->filter(fn ($hook) => $this->files->exists(base_path($hook)))
-            ->each(fn ($hook) => $this->exportPath(
-                from: $hook,
-                starterKitPath: $this->exportPath,
-            ));
+        $config = $this
+            ->versionModuleDependencies()
+            ->syncConfigWithModules();
+
+        $this->files->put("{$this->exportPath}/starter-kit.yaml", YAML::dump($config->all()));
 
         return $this;
-    }
-
-    /**
-     * Export composer.json.
-     */
-    protected function exportComposerJson(): self
-    {
-        $composerJson = $this->prepareComposerJsonFromStub()->all();
-
-        $this->files->put(
-            "{$this->exportPath}/composer.json",
-            json_encode($composerJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n"
-        );
-
-        return $this;
-    }
-
-    /**
-     * Prepare composer.json from stub.
-     */
-    protected function prepareComposerJsonFromStub(): Collection
-    {
-        $stub = $this->getComposerJsonStub();
-
-        $directory = preg_replace('/.*\/([^\/]*)/', '$1', $this->exportPath);
-        $vendorName = $this->vendorName ?? 'my-vendor-name';
-        $repoName = Str::slug($directory);
-        $package = "{$vendorName}/{$repoName}";
-        $title = Str::slugToTitle($repoName);
-
-        $stub = str_replace('dummy/package', $package, $stub);
-        $stub = str_replace('DummyTitle', $title, $stub);
-
-        return collect(json_decode($stub, true));
-    }
-
-    /**
-     * Get composer.json stub.
-     */
-    protected function getComposerJsonStub(): string
-    {
-        $stubPath = __DIR__.'/../Console/Commands/stubs/starter-kits/composer.json.stub';
-
-        $existingComposerJsonPath = "{$this->exportPath}/composer.json";
-
-        if ($this->files->exists($existingComposerJsonPath)) {
-            return $this->files->get($existingComposerJsonPath);
-        }
-
-        return $this->files->get($stubPath);
     }
 }

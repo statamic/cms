@@ -8,6 +8,7 @@ use Illuminate\Support\Carbon;
 class Timezones extends BasicDictionary
 {
     protected string $valueKey = 'name';
+    protected array $keywords = ['timezone', 'tz', 'zone', 'time', 'date'];
 
     protected function getItemLabel(array $item): string
     {

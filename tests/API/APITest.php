@@ -384,6 +384,22 @@ class APITest extends TestCase
     }
 
     #[Test]
+    public function can_view_entries_when_cp_route_is_empty()
+    {
+        Facades\Config::set('statamic.cp.route', '');
+        Facades\Config::set('statamic.api.resources.collections', true);
+
+        Facades\Collection::make('pages')->save();
+        Facades\Entry::make()->collection('pages')->id('home')->data(['title' => 'Home'])->save();
+
+        $this->get('/api/collections/pages/entries/home')->assertJson([
+            'data' => [
+                'title' => 'Home',
+            ],
+        ]);
+    }
+
+    #[Test]
     #[DataProvider('userPasswordFilterProvider')]
     public function it_never_allows_filtering_users_by_password($filter)
     {
@@ -526,6 +542,22 @@ class APITest extends TestCase
             'invalid term id' => ['/api/taxonomies/tags/terms/missing', false],
             'valid term id but wrong collection' => ['/api/taxonomies/categories/terms/test', false],
         ];
+    }
+
+    #[Test]
+    public function can_view_terms_when_cp_route_is_empty()
+    {
+        Facades\Config::set('statamic.cp.route', '');
+        Facades\Config::set('statamic.api.resources.taxonomies', true);
+
+        Facades\Taxonomy::make('topics')->save();
+        Facades\Term::make()->taxonomy('topics')->inDefaultLocale()->slug('dance')->data(['title' => 'Dance'])->save();
+
+        $this->get('/api/taxonomies/topics/terms/dance')->assertJson([
+            'data' => [
+                'title' => 'Dance',
+            ],
+        ]);
     }
 
     private function makeCollection($handle)

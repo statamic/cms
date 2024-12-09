@@ -14,6 +14,11 @@ class FluentTag implements \ArrayAccess, \IteratorAggregate
     protected $name;
 
     /**
+     * @var string
+     */
+    protected $content = '';
+
+    /**
      * @var array
      */
     protected $context = [];
@@ -68,6 +73,19 @@ class FluentTag implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
+     * Set the content between tag pairs.
+     *
+     * @param  string  $content
+     * @return $this
+     */
+    public function withContent($content)
+    {
+        $this->content = $content;
+
+        return $this;
+    }
+
+    /**
      * Set the context.
      *
      * @param  array  $context
@@ -109,7 +127,7 @@ class FluentTag implements \ArrayAccess, \IteratorAggregate
         $tag = app(Loader::class)->load($name, [
             'parser' => null,
             'params' => $this->params,
-            'content' => '',
+            'content' => $this->content,
             'context' => $this->context,
             'tag' => $tagName,
             'tag_method' => $originalMethod,

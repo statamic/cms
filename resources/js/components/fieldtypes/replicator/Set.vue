@@ -31,6 +31,8 @@
                         :value="values.enabled"
                         v-tooltip.top="(values.enabled) ? __('Included in output') : __('Hidden from output')" />
                     <dropdown-list>
+                        <dropdown-actions :actions="fieldActions" v-if="fieldActions.length" />
+                        <div class="divider" />
                         <dropdown-item :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))" @click="toggleCollapsedState" />
                         <dropdown-item :text="__('Duplicate Set')" @click="duplicate" v-if="canAddSet" />
                         <dropdown-item :text="__('Delete Set')" class="warning" @click="destroy" />
@@ -77,14 +79,20 @@
 import SetField from './Field.vue';
 import ManagesPreviewText from './ManagesPreviewText';
 import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
+import HasFieldActions from '../../field-actions/HasFieldActions.js';
+import DropdownActions from '../../field-actions/DropdownActions.vue';
 
 export default {
 
-    components: { SetField },
+    components: { SetField, DropdownActions },
 
-    mixins: [ValidatesFieldConditions, ManagesPreviewText],
+    mixins: [
+        ValidatesFieldConditions,
+        ManagesPreviewText,
+        HasFieldActions,
+    ],
 
-    inject: ['replicatorSets'],
+    inject: ['replicatorSets', 'storeName'],
 
     props: {
         config: {
@@ -178,6 +186,31 @@ export default {
 
         isInvalid() {
             return Object.keys(this.config).length === 0;
+        },
+
+        fieldVm() {
+            let vm = this;
+            while (vm !== vm.$root) {
+                if (vm.$options.name === 'replicator-fieldtype') return vm;
+                vm = vm.$parent;
+            }
+        },
+
+        fieldActionPayload() {
+            return {
+                vm: this,
+                fieldVm: this.fieldVm,
+                fieldPathPrefix: this.fieldPathPrefix,
+                index: this.index,
+                values: this.values,
+                config: this.config,
+                meta: this.meta,
+                update: (handle, value) => this.updated(handle, value),
+                updateMeta: (handle, value) => this.metaUpdated(handle, value),
+                isReadOnly: this.isReadOnly,
+                store: this.$store,
+                storeName: this.storeName,
+            };
         },
 
     },

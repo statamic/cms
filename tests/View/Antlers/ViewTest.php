@@ -69,7 +69,7 @@ class ViewTest extends TestCase
     public function a_non_antlers_template_will_not_attempt_to_load_the_layout()
     {
         Event::fake();
-        $this->viewShouldReturnRaw('template', file_get_contents(__DIR__.'/fixtures/template.antlers.html'), 'blade.php');
+        $this->viewShouldReturnRaw('template', 'Template: {{ $foo }}', 'blade.php');
         $this->viewShouldReturnRaw('layout', file_get_contents(__DIR__.'/fixtures/layout.antlers.html'));
 
         $view = (new View)
@@ -126,6 +126,16 @@ class ViewTest extends TestCase
             ->with(['foo' => 'bar']);
 
         $this->assertEquals('Layout: {{ foo }} | Template: {{ foo }} | Partial: {{ foo }}', $view->render());
+    }
+
+    #[Test]
+    public function uses_proper_evaluation_order_for_null_coalescing_operator()
+    {
+        $this->viewShouldReturnRaw('template', file_get_contents(__DIR__.'/fixtures/template-with-null-coalescence-opperator.antlers.html'));
+
+        $view = (new View)->template('template');
+
+        $this->assertEquals('Hello World', $view->render());
     }
 
     #[Test]

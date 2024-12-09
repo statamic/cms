@@ -1,5 +1,7 @@
 <?php
 
+namespace Tests\Feature\Users;
+
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\User;
 use Tests\FakesRoles;

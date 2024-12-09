@@ -1,6 +1,6 @@
 <?php
 
-namespace Modifiers;
+namespace Tests\Modifiers;
 
 use Facades\Tests\Factories\EntryFactory;
 use PHPUnit\Framework\Attributes\DataProvider;

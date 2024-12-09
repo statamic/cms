@@ -1,11 +1,12 @@
 @extends('statamic::layout')
-@section('title', $breadcrumbs->title('Create Term'))
+@section('title', $breadcrumbs->title($taxonomyCreateLabel))
 @section('wrapper_class', 'max-w-3xl')
 
 @section('content')
     <base-term-create-form
         :actions="{{ json_encode($actions) }}"
         taxonomy-handle="{{ $taxonomy }}"
+        taxonomy-create-label="{{ $taxonomyCreateLabel }}"
         :breadcrumbs="{{ $breadcrumbs->toJson() }}"
         :fieldset="{{ json_encode($blueprint) }}"
         :values="{{ json_encode($values) }}"

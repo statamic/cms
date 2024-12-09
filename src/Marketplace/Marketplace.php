@@ -20,10 +20,16 @@ class Marketplace
         }
 
         return Cache::rememberWithExpiration("marketplace-$uri", function () use ($uri) {
+            $fallback = [5 => null];
+
             try {
-                return [60 => Client::get($uri)['data']];
+                if (! $response = Client::get($uri)) {
+                    return $fallback;
+                }
+
+                return [60 => $response['data']];
             } catch (RequestException $e) {
-                return [5 => null];
+                return $fallback;
             }
         });
     }
@@ -33,10 +39,16 @@ class Marketplace
         $uri = "packages/$package/releases";
 
         return Cache::rememberWithExpiration("marketplace-$uri", function () use ($uri) {
+            $fallback = [5 => collect()];
+
             try {
-                return [60 => collect(Client::get($uri)['data'])];
+                if (! $response = Client::get($uri)) {
+                    return $fallback;
+                }
+
+                return [60 => collect($response['data'])];
             } catch (RequestException $e) {
-                return [5 => collect()];
+                return $fallback;
             }
         });
     }

@@ -2,6 +2,7 @@
 
 namespace Statamic\Fields;
 
+use ArrayAccess;
 use ArrayIterator;
 use Illuminate\Support\Collection;
 use IteratorAggregate;
@@ -11,8 +12,9 @@ use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\Facades\Compare;
 use Statamic\Support\Str;
 use Statamic\View\Antlers\Language\Parser\DocumentTransformer;
+use Traversable;
 
-class Value implements IteratorAggregate, JsonSerializable
+class Value implements ArrayAccess, IteratorAggregate, JsonSerializable
 {
     private $resolver;
     protected $raw;
@@ -87,6 +89,17 @@ class Value implements IteratorAggregate, JsonSerializable
         return $value;
     }
 
+    private function iteratorValue()
+    {
+        $value = $this->value();
+
+        if (Compare::isQueryBuilder($value)) {
+            $value = $value->get();
+        }
+
+        return $value;
+    }
+
     public function __toString()
     {
         return (string) $this->value();
@@ -111,7 +124,9 @@ class Value implements IteratorAggregate, JsonSerializable
     #[\ReturnTypeWillChange]
     public function getIterator()
     {
-        return new ArrayIterator($this->value());
+        $value = $this->iteratorValue();
+
+        return $value instanceof Traversable ? $value : new ArrayIterator($value);
     }
 
     public function shouldParseAntlers()
@@ -202,5 +217,44 @@ class Value implements IteratorAggregate, JsonSerializable
         $this->resolve();
 
         return get_object_vars($this);
+    }
+
+    public function __call(string $name, array $arguments)
+    {
+        return $this->value()->{$name}(...$arguments);
+    }
+
+    public function __get($key)
+    {
+        return $this->value()?->{$key} ?? null;
+    }
+
+    #[\ReturnTypeWillChange]
+    public function offsetExists(mixed $offset)
+    {
+        $value = $this->value();
+
+        if (! is_array($value)) {
+            return false;
+        }
+
+        return array_key_exists($offset, $value);
+    }
+
+    #[\ReturnTypeWillChange]
+    public function offsetGet(mixed $offset)
+    {
+        return $this->value()[$offset];
+    }
+
+    #[\ReturnTypeWillChange]
+    public function offsetSet(mixed $offset, mixed $value)
+    {
+
+    }
+
+    #[\ReturnTypeWillChange]
+    public function offsetUnset(mixed $offset)
+    {
     }
 }

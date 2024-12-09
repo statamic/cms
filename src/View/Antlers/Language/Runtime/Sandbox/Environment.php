@@ -1167,7 +1167,6 @@ class Environment
     private function evaluateNullCoalescence(NullCoalescenceGroup $group)
     {
         $leftVal = $this->getValue($group->left);
-        $rightVal = $this->getValue($group->right);
 
         if ($leftVal instanceof ArrayableString) {
             $leftVal = $leftVal->value();
@@ -1177,7 +1176,7 @@ class Environment
             return $leftVal;
         }
 
-        return $rightVal;
+        return $this->getValue($group->right);
     }
 
     /**

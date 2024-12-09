@@ -1,11 +1,10 @@
 <?php
 
-namespace Feature\GraphQL\Fieldtypes;
+namespace Tests\Feature\GraphQL\Fieldtypes;
 
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
-use Tests\Feature\GraphQL\Fieldtypes\FieldtypeTestCase;
 
 #[Group('graphql')]
 class DictionaryFieldtypeTest extends FieldtypeTestCase

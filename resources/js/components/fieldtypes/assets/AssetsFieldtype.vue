@@ -4,7 +4,7 @@
         <div
             v-if="hasPendingDynamicFolder"
             class="py-3 px-4 text-sm w-full rounded-md border border-dashed text-gray-700 dark:text-dark-175 dark:border-dark-200"
-            v-html="__('statamic::fieldtypes.assets.dynamic_folder_pending', {field: `<code>${config.dynamic}</code>`})"
+            v-html="pendingText"
         />
 
         <uploader
@@ -62,6 +62,8 @@
                 <uploads
                     v-if="uploads.length"
                     :uploads="uploads"
+                    allow-selecting-existing
+                    @existing-selected="uploadSelected"
                 />
 
                 <template v-if="expanded">
@@ -436,6 +438,12 @@ export default {
             return ! this.hasPendingDynamicFolder;
         },
 
+        pendingText() {
+            return this.config.dynamic === 'id'
+                ? __('statamic::fieldtypes.assets.dynamic_folder_pending_save')
+                : __('statamic::fieldtypes.assets.dynamic_folder_pending_field', {field: `<code>${this.config.dynamic}</code>`});
+        }
+
     },
 
     events: {
@@ -599,6 +607,22 @@ export default {
             const newFolder = response[0].path;
             this.update(this.value.map(id => id.replace(`::${this.folder}`, `::${newFolder}`)));
             this.lockedDynamicFolder = this.configuredFolder ? newFolder.replace(`${this.configuredFolder}/`, '') : newFolder;
+        },
+
+        uploadSelected(upload) {
+            const path = `${this.folder}/${upload.basename}`.replace(/^\/+/, '');
+            const id = `${this.container}::${path}`;
+
+            this.uploads.splice(this.uploads.indexOf(upload), 1);
+
+            if (this.value.includes(id)) return;
+
+            if (this.maxFiles === 1) {
+                this.loadAssets([id]);
+            } else {
+                this.loadAssets([...this.value, id]);
+            }
+
         }
     },
 

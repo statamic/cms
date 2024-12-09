@@ -20,7 +20,7 @@ class ImageValidatorTest extends TestCase
         ]]);
 
         // We'll test `isValidExtension()` functionality separately below, and just mock here...
-        ImageValidator::shouldReceive('isValidExtension')->andReturnTrue()->times(23);
+        ImageValidator::shouldReceive('isValidExtension')->andReturnTrue()->times(24);
         ImageValidator::makePartial();
 
         $this->assertTrue(ImageValidator::isValidImage('jpg', 'image/jpeg'));
@@ -30,6 +30,7 @@ class ImageValidatorTest extends TestCase
         $this->assertTrue(ImageValidator::isValidImage('png', 'image/png'));
         $this->assertTrue(ImageValidator::isValidImage('gif', 'image/gif'));
         $this->assertTrue(ImageValidator::isValidImage('webp', 'image/webp'));
+        $this->assertTrue(ImageValidator::isValidImage('avif', 'image/avif'));
         $this->assertTrue(ImageValidator::isValidImage('tif', 'image/tiff'));
         $this->assertTrue(ImageValidator::isValidImage('bmp', 'image/bmp'));
         $this->assertTrue(ImageValidator::isValidImage('bmp', 'image/x-bmp'));
@@ -90,6 +91,7 @@ class ImageValidatorTest extends TestCase
         $this->assertFalse(ImageValidator::isValidExtension('svg'));
         $this->assertFalse(ImageValidator::isValidExtension('pdf'));
         $this->assertFalse(ImageValidator::isValidExtension('eps'));
+        $this->assertFalse(ImageValidator::isValidExtension('avif'));
     }
 
     #[Test]
@@ -101,6 +103,7 @@ class ImageValidatorTest extends TestCase
             'svg',
             'pdf',
             'eps',
+            'avif',
         ]]);
 
         $this->assertTrue(ImageValidator::isValidExtension('jpeg'));
@@ -116,6 +119,7 @@ class ImageValidatorTest extends TestCase
         $this->assertTrue(ImageValidator::isValidExtension('svg'));
         $this->assertTrue(ImageValidator::isValidExtension('pdf'));
         $this->assertTrue(ImageValidator::isValidExtension('eps'));
+        $this->assertTrue(ImageValidator::isValidExtension('avif'));
 
         // Not configured, should still be false...
         $this->assertFalse(ImageValidator::isValidExtension('exe'));

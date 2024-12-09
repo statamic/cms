@@ -84,6 +84,7 @@ class DictionaryFieldsTest extends TestCase
 
         $this->assertEquals([
             'type' => 'fake_dictionary',
+            'category' => null,
         ], $preProcess);
     }
 

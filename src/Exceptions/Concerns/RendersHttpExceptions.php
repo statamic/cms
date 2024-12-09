@@ -48,7 +48,7 @@ trait RendersHttpExceptions
         $layouts = collect([
             'errors.layout',
             'layouts.layout',
-            'layout',
+            config('statamic.system.layout', 'layout'),
             'statamic::blank',
         ]);
 

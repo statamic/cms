@@ -430,6 +430,13 @@ class TaxonomyTest extends TestCase
     }
 
     #[Test]
+    public function it_gets_and_sets_the_create_label()
+    {
+        $taxonomy = (new Taxonomy)->handle('tags');
+        $this->assertEquals('Create Term', $taxonomy->createLabel());
+    }
+
+    #[Test]
     public function it_cannot_view_taxonomies_from_sites_that_the_user_is_not_authorized_to_see()
     {
         $this->setSites([

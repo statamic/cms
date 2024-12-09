@@ -47,7 +47,7 @@ export default {
 
         searchPlaceholder() {
             if (this.activePreset) {
-                return __('Searching in: ') + this.activePresetPayload.display;
+                return `${__('Searching in:')} ${this.activePresetPayload.display}`;
             }
 
             return __('Search');

@@ -123,7 +123,7 @@ class Session
     {
         $session = StaticCache::cacheStore()->get('nocache::session.'.md5($this->url));
 
-        $this->regions = $this->regions->merge($session['regions'] ?? []);
+        $this->regions = $this->regions->merge($session['regions'] ?? [])->unique()->values();
         $this->cascade = $this->restoreCascade();
 
         $this->resolvePageAndPathForPagination();
