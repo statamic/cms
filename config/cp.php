@@ -171,6 +171,6 @@ return [
     */
 
     'breadcrumbs' => [
-        'add_filters_from_overview' => false
+        'add_filters_from_overview' => false,
     ],
 ];
