@@ -3,8 +3,11 @@
 namespace Statamic\CP;
 
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Route;
 use JsonSerializable;
 use Statamic\Statamic;
+use Statamic\Support\Str;
 
 class Breadcrumbs implements Arrayable, JsonSerializable
 {
@@ -47,5 +50,32 @@ class Breadcrumbs implements Arrayable, JsonSerializable
         $arrow = Statamic::cpDirection() === 'ltr' ? ' ‹ ' : ' › ';
 
         return $crumbs->reverse()->join($arrow);
+    }
+
+    public static function addFiltersFromReferer(string $validRefererRoute, string $handle)
+    {
+        if (! config('statamic.cp.breadcrumbs.add_filters_from_overview')) {
+            return false;
+        }
+
+        $referer = request()->headers->get('referer');
+        if (! $referer) {
+            return false;
+        }
+
+        $refererRequest = Request::create($referer);
+        if (Route::getRoutes()->match($refererRequest)?->uri() !== $validRefererRoute) {
+            return false;
+        }
+
+        if (! Str::contains($refererRequest->getPathInfo(), $handle)) {
+            return false;
+        }
+
+        if (! $refererRequest->hasAny(['sort', 'order', 'filters', 'search'])) {
+            return false;
+        }
+
+        return true;
     }
 }

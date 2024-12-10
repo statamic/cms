@@ -4,9 +4,11 @@ namespace Statamic\Entries;
 
 use ArrayAccess;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Facades\Request;
 use InvalidArgumentException;
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Contracts\Entries\Collection as Contract;
+use Statamic\CP\Breadcrumbs;
 use Statamic\Data\ContainsCascadingData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
@@ -263,6 +265,28 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
     public function showUrl()
     {
         return cp_route('collections.show', $this->handle());
+    }
+
+    public function breadcrumbUrl()
+    {
+        $cpRoute = config('statamic.cp.route');
+        if (! Breadcrumbs::addFiltersFromReferer("{$cpRoute}/collections/{collection}", $this->handle())) {
+            return $this->showUrl();
+        }
+
+        $refererRequest = Request::create(request()->headers->get('referer'));
+
+        $search = $refererRequest->input('search');
+        $sort = $refererRequest->input('sort');
+        $order = $refererRequest->input('order');
+        $filters = $refererRequest->input('filters');
+
+        return cp_route('collections.show', array_merge((array) $this->handle(), [
+            'sort' => $sort,
+            'order' => $order,
+            'filters' => $filters,
+            'search' => $search,
+        ]));
     }
 
     public function editUrl()
