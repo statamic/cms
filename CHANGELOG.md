@@ -1,5 +1,15 @@
 # Release Notes
 
+## 5.42.1 (2024-12-11)
+
+### What's fixed
+- Fix asset upload concurrency on folder upload [#11225](https://github.com/statamic/cms/issues/11225) by @daun
+- Fix subdirectory autodiscovery on Windows [#11246](https://github.com/statamic/cms/issues/11246) by @jasonvarga
+- Fix type error in `HandleEntrySchedule` job [#11244](https://github.com/statamic/cms/issues/11244) by @duncanmcclean
+- Fix `no_results` cascade [#11234](https://github.com/statamic/cms/issues/11234) by @JohnathonKoster
+
+
+
 ## 5.42.0 (2024-12-05)
 
 ### What's new
