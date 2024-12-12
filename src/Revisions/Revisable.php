@@ -177,6 +177,8 @@ trait Revisable
         return config('statamic.revisions.enabled') && Statamic::pro();
     }
 
+    abstract protected function nonRevisableFields(): array;
+
     abstract protected function revisionKey();
 
     abstract protected function revisionAttributes();

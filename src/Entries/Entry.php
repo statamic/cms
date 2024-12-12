@@ -666,6 +666,11 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         ]);
     }
 
+    protected function nonRevisableFields(): array
+    {
+        return [];
+    }
+
     protected function revisionAttributes()
     {
         $nonRevisableFields = ['updated_by', 'updated_at'];
@@ -675,7 +680,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             'slug' => $this->slug(),
             'published' => $this->published(),
             'date' => $this->collection()->dated() ? $this->date()->timestamp : null,
-            'data' => $this->data()->except($nonRevisableFields)->all(),
+            'data' => $this->data()->except(array_merge($nonRevisableFields, $this->nonRevisableFields()))->all(),
         ];
     }
 
