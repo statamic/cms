@@ -142,12 +142,22 @@ trait RendersForms
             ->filter()->all();
 
         $data = array_merge($configDefaults, $field->toArray(), [
+            'handle' => $field->handle(),
+            'name' => $this->convertDottedHandleToInputName($field->handle()),
             'instructions' => $field->instructions(),
             'error' => $errors->first($field->handle()) ?: null,
             'default' => $field->value() ?? $field->defaultValue(),
-            'old' => old($field->handle()),
+            'old' => old($field->handle()), // TODO: Ensure dotted path for old input works here.
             'value' => $value,
         ], $field->fieldtype()->extraRenderableFieldData());
+
+        if ($field->fieldtype()->handle() === 'group') {
+            $data['fields'] = collect($field->fieldtype()->fields()->all())
+                ->map(fn ($child) => $child->setHandle($field->handle().'.'.$child->handle()))
+                ->map(fn ($child) => $this->getRenderableField($child, $errorBag, $manipulateDataCallback))
+                ->values()
+                ->all();
+        }
 
         if ($manipulateDataCallback instanceof Closure) {
             $data = $manipulateDataCallback($data, $field);
@@ -156,6 +166,17 @@ trait RendersForms
         $data['field'] = $this->minifyFieldHtml(view($field->fieldtype()->view(), $data)->render());
 
         return $data;
+    }
+
+    protected function convertDottedHandleToInputName(string $handle): string
+    {
+        $parts = collect(explode('.', $handle));
+
+        $first = $parts->pull(0);
+
+        return $first.$parts
+            ->map(fn ($part) => '['.$part.']')
+            ->join('');
     }
 
     /**
