@@ -19,7 +19,7 @@ class Table extends Fieldtype
                 'type' => 'table',
             ],
             'max_rows' => [
-                'display' => __('Max Columns'),
+                'display' => __('Max Rows'),
                 'instructions' => __('statamic::fieldtypes.table.config.max_rows'),
                 'type' => 'integer',
             ],
