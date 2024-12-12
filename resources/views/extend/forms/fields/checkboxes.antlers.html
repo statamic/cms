@@ -2,12 +2,18 @@
 {{ foreach:options as="option|label" }}
     <label>
         <input
+            id="{{ id }}-{{ option | slugify }}-option"
             type="checkbox"
             name="{{ handle }}[]"
             value="{{ option }}"
             {{ if js_driver }}{{ js_attributes }}{{ /if }}
             {{ if value|in_array:option }}checked{{ /if }}
             {{ if validate|contains:required }}required{{ /if }}
+            {{ if error }}
+                aria-invalid="true" aria-describedby="{{ id }}-error"
+            {{ elseif instructions }}
+                aria-describedby="{{ id }}-instructions"
+            {{ /if }}
         >
         {{ label !== null ? label : option }}
     </label>
