@@ -354,7 +354,7 @@ class TermsController extends CpController
             ],
             [
                 'text' => $taxonomy->title(),
-                'url' => $taxonomy->showUrl(),
+                'url' => $taxonomy->breadcrumbUrl(),
             ],
         ]);
     }
