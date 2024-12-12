@@ -118,8 +118,8 @@ class ImageGenerator
         $this->skip_validation = true;
         $this->setParams($params);
 
-        $qs = Str::contains($url, '?') ? Str::after($url, '?') : null;
         $parsed = $this->parseUrl($url);
+        $qs = $parsed['query'];
 
         $this->server->setSource($this->guzzleSourceFilesystem($parsed['base']));
         $this->server->setSourcePathPrefix('/');
@@ -331,6 +331,7 @@ class ImageGenerator
         return [
             'path' => Str::after($parsed['path'], '/'),
             'base' => $parsed['scheme'].'://'.$parsed['host'],
+            'query' => $parsed['query'] ?? null,
         ];
     }
 }
