@@ -673,14 +673,14 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
     protected function revisionAttributes()
     {
-        $nonRevisableFields = ['updated_by', 'updated_at'];
+        $nonRevisableFields = ['updated_by', 'updated_at', ...$this->nonRevisableFields()];
 
         return [
             'id' => $this->id(),
             'slug' => $this->slug(),
             'published' => $this->published(),
             'date' => $this->collection()->dated() ? $this->date()->timestamp : null,
-            'data' => $this->data()->except(array_merge($nonRevisableFields, $this->nonRevisableFields()))->all(),
+            'data' => $this->data()->except($nonRevisableFields)->all(),
         ];
     }
 
