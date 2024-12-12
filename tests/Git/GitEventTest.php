@@ -488,8 +488,8 @@ class GitEventTest extends TestCase
 
         Git::shouldReceive('dispatchCommit')->with('Asset saved')->once();
 
-        $newAsset = $this->makeAsset()->upload(
-            UploadedFile::fake()->create('asset.txt')
+        $newAsset = $this->makeAsset('new-asset.txt')->upload(
+            UploadedFile::fake()->create('new-asset.txt')
         );
 
         Git::shouldReceive('dispatchCommit')->with('Asset deleted')->once();
