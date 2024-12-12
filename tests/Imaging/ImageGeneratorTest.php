@@ -381,7 +381,7 @@ class ImageGeneratorTest extends TestCase
     {
         ksort($params);
 
-        return md5($basename.(str_contains($basename, '?') ? '&' : '?').http_build_query($params));
+        return md5($basename.'?'.http_build_query($params));
     }
 
     private function assertLocalAdapter($adapter)
