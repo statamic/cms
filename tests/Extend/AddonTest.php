@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Testing\Extend;
+namespace Tests\Extend;
 
 use Facades\Statamic\Licensing\LicenseManager;
 use Foo\Bar\TestAddonServiceProvider;
