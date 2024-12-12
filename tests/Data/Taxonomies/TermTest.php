@@ -74,7 +74,6 @@ class TermTest extends TestCase
         $taxonomy = Mockery::mock(Taxonomy::make('tags'));
         $taxonomy->shouldReceive('termBlueprint')->with(null, $term)->once()->andReturn('the old blueprint');
         $taxonomy->shouldReceive('termBlueprint')->with('new', $term)->once()->andReturn('the new blueprint');
-        $taxonomy->shouldReceive('collection')->with(null)->andReturn($taxonomy);
         Taxonomy::shouldReceive('findByHandle')->with('tags')->andReturn($taxonomy);
 
         $this->assertEquals('the old blueprint', $term->blueprint());
