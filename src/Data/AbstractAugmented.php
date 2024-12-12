@@ -99,7 +99,7 @@ abstract class AbstractAugmented implements Augmented
     {
         return method_exists($this->data, $method)
             && collect($this->keys())->contains(Str::snake($handle))
-            && ! in_array($handle, ['hook']);
+            && ! in_array($handle, ['hook', 'value', 'entry']);
     }
 
     protected function getFromData($handle)

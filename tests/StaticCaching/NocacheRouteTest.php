@@ -37,26 +37,10 @@ class NocacheRouteTest extends TestCase
 
         $this->createPage('test', ['with' => ['title' => 'Test']]);
 
-        $secondTemplate = <<<'EOT'
-Second {{ example_count }} {{ name }} {{ title }}
-{{ nocache }}
-    Nested {{ example_count }} {{ name }} {{ title }}
-    {{ nocache }}
-        Double nested {{ example_count }} {{ name }} {{ title }}
-    {{ /nocache }}
-{{ /nocache }}
-EOT;
-
         $session = new Session('http://localhost/test');
         $regionOne = $session->pushRegion('First {{ example_count }} {{ name }} {{ title }}', ['name' => 'Dustin'], 'antlers.html');
-        $regionTwo = $session->pushRegion($secondTemplate, ['name' => 'Will'], 'antlers.html');
+        $regionTwo = $session->pushRegion('Second {{ example_count }} {{ name }} {{ title }}', ['name' => 'Will'], 'antlers.html');
         $session->write();
-
-        $secondExpectation = <<<'EOT'
-Second 2 Will Test
-Nested 3 Will Test
-    Double nested 4 Will Test
-EOT;
 
         $this
             ->postJson('/!/nocache', ['url' => 'http://localhost/test'])
@@ -65,7 +49,7 @@ EOT;
                 'csrf' => csrf_token(),
                 'regions' => [
                     $regionOne->key() => 'First 1 Dustin Test',
-                    $regionTwo->key() => $secondExpectation,
+                    $regionTwo->key() => 'Second 2 Will Test',
                 ],
             ]);
     }

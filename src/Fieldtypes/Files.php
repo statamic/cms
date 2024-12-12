@@ -29,6 +29,11 @@ class Files extends Fieldtype
         ];
     }
 
+    public function preProcess($data)
+    {
+        return $data ?? [];
+    }
+
     public function process($values)
     {
         return $this->config('max_files') === 1 ? collect($values)->first() : $values;

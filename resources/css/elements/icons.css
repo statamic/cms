@@ -70,7 +70,7 @@ svg {
     flex-shrink: 0;
 
     &.published { @apply bg-green-600 }
-    &.draft, &.expired { @apply bg-gray-600 }
+    &.draft, &.expired { @apply bg-gray-600 dark:bg-dark-200 }
     &.scheduled, &.hollow { @apply bg-transparent border border-gray-600 }
 }
 

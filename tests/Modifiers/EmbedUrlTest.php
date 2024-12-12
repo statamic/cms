@@ -43,6 +43,20 @@ class EmbedUrlTest extends TestCase
     }
 
     #[Test]
+    public function it_transforms_vimeo_file_links()
+    {
+        $embedUrl = 'https://player.vimeo.com/progressive_redirect/playback/990169258/rendition/1080p/file.mp4?dnt=1&loc=external&log_user=0&signature=275be15f3630d1ca3e7a51456a911e11e3ba9fddf89911f49140f6de95357e05';
+
+        $this->assertEquals($embedUrl, $this->embed('https://player.vimeo.com/progressive_redirect/playback/990169258/rendition/1080p/file.mp4?loc=external&log_user=0&signature=275be15f3630d1ca3e7a51456a911e11e3ba9fddf89911f49140f6de95357e05'));
+
+        $this->assertEquals(
+            $embedUrl.'&foo=bar',
+            $this->embed('https://player.vimeo.com/progressive_redirect/playback/990169258/rendition/1080p/file.mp4?loc=external&log_user=0&signature=275be15f3630d1ca3e7a51456a911e11e3ba9fddf89911f49140f6de95357e05&foo=bar'),
+            'It appends the do not track query param if a query string already exists.'
+        );
+    }
+
+    #[Test]
     public function it_transforms_youtube_urls()
     {
         $embedUrl = 'https://www.youtube-nocookie.com/embed/s72r_wu_NVY';

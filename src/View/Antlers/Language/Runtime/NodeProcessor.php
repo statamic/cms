@@ -788,6 +788,15 @@ class NodeProcessor
         return false;
     }
 
+    private function shouldReportArrayToStringWarning(): bool
+    {
+        if (ModifierManager::$lastModifierName === 'ray') {
+            return false;
+        }
+
+        return true;
+    }
+
     /**
      * Tests if the runtime should continue processing the node/value combination.
      *
@@ -810,8 +819,10 @@ class NodeProcessor
 
             return false;
         } elseif ($this->isInterpolationProcessor == false && $this->isLoopable($value) && $node->isClosedBy == null) {
-            $varName = $node->name->getContent();
-            Log::debug("Cannot render an array variable as a string: {{ {$varName} }}", $this->getErrorLogContext($node));
+            if ($this->shouldReportArrayToStringWarning()) {
+                $varName = $node->name->getContent();
+                Log::debug("Cannot render an array variable as a string: {{ {$varName} }}", $this->getErrorLogContext($node));
+            }
 
             return false;
         } elseif (is_object($value) && $node->isClosedBy == null) {
@@ -1399,7 +1410,7 @@ class NodeProcessor
                                 if (! empty($recursiveParent->parameters)) {
                                     $lockData = $this->data;
                                     foreach ($recursiveParent->parameters as $param) {
-                                        if (ModifierManager::isModifier($param)) {
+                                        if ($param->name === 'scope') {
                                             $childDataToUse = $this->runModifier($param->name, $parentParameterValues, $childDataToUse, $rootData);
                                         }
                                     }
@@ -2539,6 +2550,7 @@ class NodeProcessor
             $value['count'] = $index + 1;
             $value['index'] = $index;
             $value['total_results'] = $total;
+            $value['no_results'] = false;
             $value['first'] = $index === 0;
             $value['last'] = $index === $lastIndex;
 

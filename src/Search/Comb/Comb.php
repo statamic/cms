@@ -465,7 +465,7 @@ class Comb
         $output = '';
 
         if (! is_array($item)) {
-            return preg_replace('#\s+#ism', ' ', $item);
+            return preg_replace('#\s+#ism', ' ', (string) $item);
         }
 
         foreach ($item as $part) {
@@ -834,7 +834,7 @@ class Comb
     {
         $length = strlen($query);
 
-        if ($length === 0) {
+        if ($length === 0 && $this->min_characters > 0) {
             throw new NoQuery('No query given.');
         }
 

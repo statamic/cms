@@ -105,7 +105,7 @@ class User extends BaseUser
         return $this->roles = $this->roles
             ?? (new Roles($this))->all()->map(function ($row) {
                 return Role::find($row->role_id);
-            })->keyBy->handle();
+            })->filter()->keyBy->handle();
     }
 
     protected function saveRoles()

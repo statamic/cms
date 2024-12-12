@@ -69,10 +69,10 @@ class Multisite extends Command
             return false;
         }
 
-        if (Site::multiEnabled() && $this->commandMayHaveBeenRan()) {
-            $site = Site::default()->handle();
+        $siteHandle = Site::default()->handle();
 
-            $this->components->error("Command may have already been run. Site directories for site [{$site}] already exist!");
+        if (Site::multiEnabled() && $this->commandMayHaveBeenRan($siteHandle)) {
+            $this->components->error("Command may have already been run. Site directories for site [{$siteHandle}] already exist!");
 
             return false;
         }
@@ -80,30 +80,36 @@ class Multisite extends Command
         return true;
     }
 
-    private function commandMayHaveBeenRan(): bool
+    private function commandMayHaveBeenRan(string $siteHandle): bool
     {
-        return $this->collectionsHaveBeenMoved()
-            || $this->globalsHaveBeenMoved()
-            || $this->navsHaveBeenMoved();
+        return $this->collectionsHaveBeenMoved($siteHandle)
+            || $this->globalsHaveBeenMoved($siteHandle)
+            || $this->navsHaveBeenMoved($siteHandle);
     }
 
-    private function collectionsHaveBeenMoved(): bool
+    private function collectionsHaveBeenMoved(string $siteHandle): bool
     {
         if (! $collection = Collection::all()->first()) {
             return false;
         }
 
-        return File::isDirectory("content/collections/{$collection->handle()}/{$this->siteHandle}");
+        $directory = Stache::store('entries')->directory().DIRECTORY_SEPARATOR.$collection->handle().DIRECTORY_SEPARATOR.$siteHandle;
+
+        return File::isDirectory($directory);
     }
 
-    private function globalsHaveBeenMoved(): bool
+    private function globalsHaveBeenMoved(string $siteHandle): bool
     {
-        return File::isDirectory("content/globals/{$this->siteHandle}");
+        $directory = Stache::store('globals')->directory().DIRECTORY_SEPARATOR.$siteHandle;
+
+        return File::isDirectory($directory);
     }
 
-    private function navsHaveBeenMoved(): bool
+    private function navsHaveBeenMoved(string $siteHandle): bool
     {
-        return File::isDirectory("content/navigation/{$this->siteHandle}");
+        $directory = Stache::store('navigation')->directory().DIRECTORY_SEPARATOR.$siteHandle;
+
+        return File::isDirectory($directory);
     }
 
     private function promptForSiteHandle(): bool
@@ -194,6 +200,8 @@ class Multisite extends Command
 
     private function clearStache(): self
     {
+        Config::set('statamic.system.multisite', false);
+
         $this->components->task(
             description: 'Clearing Stache...',
             task: function () {
@@ -225,9 +233,7 @@ class Multisite extends Command
     {
         Config::set('statamic.system.multisite', false);
 
-        $handle = $collection->handle();
-
-        $base = "content/collections/{$handle}";
+        $base = Stache::store('entries')->directory().DIRECTORY_SEPARATOR.$collection->handle();
 
         File::makeDirectory("{$base}/{$this->siteHandle}");
 

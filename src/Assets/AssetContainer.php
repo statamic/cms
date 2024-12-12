@@ -134,6 +134,10 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
      */
     public function url()
     {
+        if ($this->private()) {
+            return null;
+        }
+
         $url = rtrim($this->disk()->url('/'), '/');
 
         return ($url === '') ? '/' : $url;

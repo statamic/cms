@@ -112,7 +112,7 @@ button {
 
 /*  Earth isn't flat but these buttons are */
 .btn-flat {
-    @apply text-white text-gray-800 dark:text-dark-150 bg-gray-300 dark:bg-dark-700 flex items-center;
+    @apply text-gray-800 dark:text-dark-150 bg-gray-300 dark:bg-dark-700 flex items-center;
     position: inherit;
 
     &:hover:not(:disabled), &:active:not(:disabled), &.active {
@@ -190,7 +190,7 @@ button {
   ========================================================================== */
 
 .btn-group {
-    @apply flex items-center justify-start p-0;
+    @apply flex items-center justify-start p-0 cursor-auto;
     height: 2.375rem;
 
     button {
@@ -291,12 +291,25 @@ td .btn-icon {
     }
 }
 
+.btn-quick-action {
+    @apply text-center p-0 text-xl text-gray-600 dark:text-dark-150 rounded-full w-8 h-8 outline-none shrink-0 leading-none inline-flex items-center justify-center;
+
+    &:hover {
+        @apply bg-gray-400 dark:bg-dark-700;
+    }
+
+    &:active, &:focus:hover {
+        outline: none;
+        @apply bg-gray-500 dark:bg-dark-750;
+    }
+}
+
 .super-btn {
-    @apply p-4 flex items-start hover:bg-gray-200 border border-transparent rounded-md space-x-4;
+    @apply p-4 flex items-start hover:bg-gray-200 border border-transparent rounded-md space-x-4 rtl:space-x-reverse;
     @apply dark:hover:bg-dark-575 dark:hover:border-dark-400;
 
     svg {
-        @apply h-8 w-8 text-gray-800 dark:text-dark-175;
+        @apply h-8 w-8 text-gray-800 dark:text-dark-200;
     }
 
     h3 {

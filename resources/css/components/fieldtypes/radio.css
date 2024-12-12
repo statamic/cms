@@ -1,0 +1,21 @@
+.radio-fieldtype label {
+    @apply flex;
+}
+
+.radio-fieldtype input[type="radio"] {
+    @apply m-0 min-w-0 absolute opacity-0 -z-1 w-1 h-px w-px overflow-hidden;
+}
+
+.radio-fieldtype .radio-icon {
+    @apply cursor-pointer h-4 w-4 ltr:mr-2 rtl:ml-2 block;
+}
+
+.radio-fieldtype .option.disabled {
+    .radio-icon {
+        @apply cursor-not-allowed opacity-25;
+    }
+    label {
+        @apply cursor-text;
+    }
+}
+

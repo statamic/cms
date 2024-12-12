@@ -16,6 +16,7 @@
 
             <li
                 v-for="(page, i) in pages"
+                v-if="showPageLinks"
                 :key="i"
                 :class="{ 'current': page == currentPage }"
             >
@@ -71,6 +72,10 @@ export default {
             required: true
         },
         scrollToTop: {
+            type: Boolean,
+            default: true,
+        },
+        showPageLinks: {
             type: Boolean,
             default: true,
         }

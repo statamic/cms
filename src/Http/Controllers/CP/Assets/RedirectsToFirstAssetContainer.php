@@ -13,7 +13,7 @@ trait RedirectsToFirstAssetContainer
     {
         $firstContainerInNav = Nav::build()->pluck('items')->flatten()
             ->filter(fn (NavItem $navItem) => $navItem->url() === cp_route('assets.index'))
-            ->map(fn (NavItem $navItem) => $navItem->children()?->first())
+            ->map(fn (NavItem $navItem) => $navItem->resolveChildren()->children()?->first())
             ->first();
 
         if ($firstContainerInNav) {

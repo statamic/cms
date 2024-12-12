@@ -7,8 +7,12 @@ use Illuminate\Support\Collection as LaravelCollection;
 use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Entries\Collection as StatamicCollection;
+use Statamic\Events\NavCreated;
+use Statamic\Events\NavCreating;
 use Statamic\Events\NavDeleted;
 use Statamic\Events\NavDeleting;
+use Statamic\Events\NavSaved;
+use Statamic\Events\NavSaving;
 use Statamic\Facades;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
@@ -101,11 +105,84 @@ class NavTest extends StructureTestCase
     #[Test]
     public function it_saves_the_nav_through_the_api()
     {
-        $nav = $this->structure();
+        $nav = $this->structure('test');
 
+        Facades\Nav::shouldReceive('find')->with('test');
         Facades\Nav::shouldReceive('save')->with($nav)->once();
 
         $this->assertTrue($nav->save());
+    }
+
+    #[Test]
+    public function it_dispatches_nav_creating()
+    {
+        Event::fake();
+
+        $nav = $this->structure('test');
+
+        Facades\Nav::shouldReceive('find')->with('test')->once();
+        Facades\Nav::shouldReceive('save')->with($nav)->once();
+
+        $this->assertTrue($nav->save());
+
+        Event::assertDispatched(NavCreating::class, function ($event) use ($nav) {
+            return $event->nav === $nav;
+        });
+    }
+
+    #[Test]
+    public function if_creating_event_returns_false_the_nav_doesnt_save()
+    {
+        Event::fake([NavCreated::class]);
+
+        Event::listen(NavCreating::class, function () {
+            return false;
+        });
+
+        $nav = $this->structure('test');
+
+        Facades\Nav::shouldReceive('find')->with('test')->once();
+        Facades\Nav::shouldReceive('save')->with($nav)->never();
+
+        $this->assertFalse($nav->save());
+
+        Event::assertNotDispatched(NavCreated::class);
+    }
+
+    #[Test]
+    public function it_dispatches_nav_saving()
+    {
+        Event::fake();
+
+        $nav = $this->structure('test');
+
+        Facades\Nav::shouldReceive('find')->with('test')->once();
+        Facades\Nav::shouldReceive('save')->with($nav)->once();
+
+        $this->assertTrue($nav->save());
+
+        Event::assertDispatched(NavSaving::class, function ($event) use ($nav) {
+            return $event->nav === $nav;
+        });
+    }
+
+    #[Test]
+    public function if_saving_event_returns_false_the_nav_doesnt_save()
+    {
+        Event::fake([NavSaved::class]);
+
+        Event::listen(NavSaving::class, function () {
+            return false;
+        });
+
+        $nav = $this->structure('test');
+
+        Facades\Nav::shouldReceive('find')->with('test')->once();
+        Facades\Nav::shouldReceive('save')->with($nav)->never();
+
+        $this->assertFalse($nav->save());
+
+        Event::assertNotDispatched(NavSaved::class);
     }
 
     #[Test]

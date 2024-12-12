@@ -22,6 +22,7 @@ class HandleTest extends TestCase
         $this->assertPasses('foo1');
         $this->assertPasses('foo123');
         $this->assertPasses('foo123_20bar');
+        $this->assertPasses('FooBar');
 
         $this->assertFails('foo-bar');
         $this->assertFails('_foo');

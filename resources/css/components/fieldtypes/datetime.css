@@ -41,6 +41,10 @@
     @apply border-none bg-none;
 }
 
+.vc-container.vc-is-dark {
+    @apply dark:bg-transparent;
+}
+
 /* Time Field
   ========================================================================== */
 

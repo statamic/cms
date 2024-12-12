@@ -5,9 +5,12 @@ namespace Tests\Data\Taxonomies;
 use BadMethodCallException;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Facades\Event;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Events\LocalizedTermDeleted;
+use Statamic\Events\LocalizedTermSaved;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Taxonomy;
@@ -266,5 +269,33 @@ class LocalizedTermTest extends TestCase
             'bravo' => ['a', 'b'],
             'charlie' => ['augmented c', 'augmented d'],
         ], Arr::only($term->selectedQueryRelations(['charlie'])->toArray(), ['alfa', 'bravo', 'charlie']));
+    }
+
+    #[Test]
+    public function it_dispatches_localized_term_saved_event()
+    {
+        Event::fake();
+
+        Taxonomy::make('tags')->save();
+
+        $term = Facades\Term::make()->taxonomy('tags')->slug('foo');
+        $localized = tap($term->in('en')->set('title', 'foo'))->save();
+
+        Event::assertDispatched(LocalizedTermSaved::class, fn ($event) => $event->term === $localized);
+    }
+
+    #[Test]
+    public function it_dispatches_localized_term_deleted_event()
+    {
+        Event::fake();
+
+        Taxonomy::make('tags')->save();
+
+        $term = Facades\Term::make()->taxonomy('tags')->slug('foo');
+        $localized = tap($term->in('en')->set('title', 'foo'))->save();
+
+        $localized->delete();
+
+        Event::assertDispatched(LocalizedTermDeleted::class, fn ($event) => $event->term === $localized);
     }
 }

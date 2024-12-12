@@ -82,6 +82,79 @@ EOT;
     }
 
     #[Test]
+    public function it_renders_a_nav_with_selected_fields()
+    {
+        $this->createCollectionAndNav();
+
+        // The html uses <i> tags (could be any tag, but i is short) to prevent whitespace comparison issues in the assertion.
+        $template = <<<'EOT'
+<ul>
+{{ nav:test select="title" }}
+    <li>
+        <i>{{ title }} {{ foo }}</i>
+        {{ if children }}
+        <ul>
+            {{ *recursive children* }}
+        </ul>
+        {{ /if }}
+    </li>
+{{ /nav:test }}
+</ul>
+EOT;
+
+        $expected = <<<'EOT'
+<ul>
+    <li>
+        <i>One bar</i>
+        <ul>
+            <li>
+                <i>One One bar</i>
+            </li>
+            <li>
+                <i>URL and title bar</i>
+            </li>
+        </ul>
+    </li>
+    <li>
+        <i>Two bar</i>
+    </li>
+    <li>
+        <i>Three bar</i>
+        <ul>
+            <li>
+                <i>Three One bar</i>
+            </li>
+            <li>
+                <i>Three Two bar</i>
+            </li>
+        </ul>
+    </li>
+    <li>
+        <i>Title only bar</i>
+        <ul>
+            <li>
+                <i>URL only bar</i>
+           </li>
+        </ul>
+    </li>
+</ul>
+EOT;
+
+        $parsed = (string) Antlers::parse($template, [
+            'foo' => 'bar', // to test that cascade is inherited.
+            'title' => 'outer title', // to test that cascade the page's data takes precedence over the cascading data.
+        ]);
+
+        // This is really what we're interested in testing. The "Two" entry has a foo value
+        // of "notbar", but we're only selecting the title, so we shouldn't get the real value.
+        if (str_contains($parsed, 'Two notbar')) {
+            $this->fail('The "Two" entry\'s "foo" value was included.');
+        }
+
+        $this->assertXmlStringEqualsXmlString($expected, $parsed);
+    }
+
+    #[Test]
     public function it_renders_a_nav_with_scope()
     {
         $this->createCollectionAndNav();

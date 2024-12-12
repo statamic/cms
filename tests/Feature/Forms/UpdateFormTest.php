@@ -108,6 +108,39 @@ class UpdateFormTest extends TestCase
         ], $updated->email());
     }
 
+    /** @test */
+    public function it_updates_data()
+    {
+        $form = tap(Form::make('test'))->save();
+        $this->assertNull($form->email());
+
+        Form::appendConfigFields('*', 'Test Config', [
+            'another_config' => [
+                'handle' => 'another_config',
+                'field' => [
+                    'type' => 'text',
+                ],
+            ],
+            'some_config' => [
+                'handle' => 'some_config',
+                'field' => [
+                    'type' => 'text',
+                ],
+            ],
+        ]);
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($form, ['some_config' => 'foo', 'another_config' => 'bar'])
+            ->assertOk();
+
+        $updated = Form::all()->first();
+        $this->assertEquals([
+            'another_config' => 'bar',
+            'some_config' => 'foo',
+        ], $updated->data()->all());
+    }
+
     private function userWithoutPermission()
     {
         $this->setTestRoles(['test' => ['access cp']]);

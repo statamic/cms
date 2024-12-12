@@ -5,6 +5,7 @@ namespace Statamic\Providers;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View as ViewFactory;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Statamic\Contracts\View\Antlers\Parser as ParserContract;
 use Statamic\Facades\Site;
@@ -20,6 +21,7 @@ use Statamic\View\Antlers\Language\Runtime\RuntimeParser;
 use Statamic\View\Antlers\Language\Runtime\Tracing\TraceManager;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Statamic\View\Blade\AntlersBladePrecompiler;
+use Statamic\View\Blade\StatamicTagCompiler;
 use Statamic\View\Cascade;
 use Statamic\View\Debugbar\AntlersProfiler\PerformanceCollector;
 use Statamic\View\Debugbar\AntlersProfiler\PerformanceTracer;
@@ -160,6 +162,36 @@ class ViewServiceProvider extends ServiceProvider
         Blade::directive('tags', function ($expression) {
             return "<?php extract(\Statamic\View\Blade\TagsDirective::handle($expression)) ?>";
         });
+        Blade::directive('cascade', function ($expression) {
+            return "<?php extract(\Statamic\View\Blade\CascadeDirective::handle($expression)) ?>";
+        });
+        Blade::directive('frontmatter', function ($exp) {
+            return "<?php
+if (! isset(\$view)) { \$view = []; }
+\$view = array_merge({$exp}, \$view ?? [], \$__frontmatter ?? []);
+?>";
+        });
+        Blade::directive('recursive_children', function ($exp) {
+            $nested = $exp ?? '$children';
+
+            if (! $nested) {
+                $nested = '$children';
+            }
+
+            $recursiveChildren = <<<'PHP'
+@include('compiled__views::'.$__currentStatamicNavView, array_merge(get_defined_vars(), [
+    'depth' => ($depth ?? 0) + 1,
+    '__statamicOverrideTagResultValue' => #varName#,
+]))
+PHP;
+
+            $recursiveChildren = Str::swap([
+                '#varName#' => $nested,
+            ], $recursiveChildren);
+
+            return Blade::compileString($recursiveChildren);
+        });
+
     }
 
     public function boot()
@@ -167,6 +199,10 @@ class ViewServiceProvider extends ServiceProvider
         ViewFactory::addNamespace('compiled__views', storage_path('framework/views'));
 
         $this->registerBladeDirectives();
+
+        Blade::precompiler(function ($content) {
+            return (new StatamicTagCompiler())->compile($content);
+        });
 
         Blade::precompiler(function ($content) {
             return AntlersBladePrecompiler::compile($content);

@@ -118,6 +118,7 @@ class UpdateNavigationTest extends TestCase
             'collections' => ['pages'],
             'root' => true,
             'max_depth' => 2,
+            'select_across_sites' => false,
         ], $overrides);
     }
 

@@ -54,6 +54,7 @@ class FieldsController extends CpController
             'type' => 'required',
             'values' => 'required|array',
             'fields' => 'sometimes|array',
+            'isInsideSet' => 'sometimes|boolean',
         ]);
 
         $fieldtype = FieldtypeRepository::find($request->type);
@@ -94,6 +95,10 @@ class FieldsController extends CpController
 
         if (Str::contains($referer, 'forms/') && Str::contains($referer, '/blueprint') && $request->values['handle'] === 'date') {
             $extraRules['handle'][] = 'not_in:date';
+        }
+
+        if ($request->isInsideSet) {
+            $extraRules['handle'][] = 'not_in:type';
         }
 
         if ($request->type === 'date' && $request->values['handle'] === 'date') {

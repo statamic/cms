@@ -472,7 +472,6 @@ class Field implements Arrayable
             'resource',
             'status',
             'unless',
-            'value', // todo: can be removed when https://github.com/statamic/cms/issues/2495 is resolved
             'views',
         ];
 
@@ -538,6 +537,9 @@ class Field implements Arrayable
                 'instructions' => __('statamic::messages.fields_sortable_instructions'),
                 'type' => 'toggle',
                 'default' => true,
+                'unless' => [
+                    'visibility' => 'equals computed',
+                ],
             ],
             'visibility' => [
                 'display' => __('Visibility'),
