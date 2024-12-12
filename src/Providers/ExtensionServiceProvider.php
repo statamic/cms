@@ -206,6 +206,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Taxonomy\Taxonomy::class,
         Tags\Theme::class,
         Tags\Trans::class,
+        Tags\Render::class,
         Tags\TransChoice::class,
         Tags\UserGroups::class,
         Tags\Users::class,

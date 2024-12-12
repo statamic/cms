@@ -4,27 +4,16 @@ namespace Statamic\Http\Controllers\CP\Assets;
 
 use Illuminate\Support\Facades\Cache;
 use League\Flysystem\UnableToReadFile;
-use League\Glide\Server;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Config;
 use Statamic\Facades\Image;
 use Statamic\Http\Controllers\Controller;
-use Statamic\Imaging\ImageGenerator;
+use Statamic\Imaging\Manipulators\Sources\Source;
 use Statamic\Statamic;
 
 class ThumbnailController extends Controller
 {
-    /**
-     * @var Server
-     */
-    protected $server;
-
-    /**
-     * @var ImageGenerator
-     */
-    protected $generator;
-
     /**
      * @var \Statamic\Contracts\Assets\Asset
      */
@@ -45,12 +34,6 @@ class ThumbnailController extends Controller
      */
     protected $mutex;
 
-    public function __construct(Server $server, ImageGenerator $generator)
-    {
-        $this->server = $server;
-        $this->generator = $generator;
-    }
-
     /**
      * Display the thumbnail.
      *
@@ -69,10 +52,7 @@ class ThumbnailController extends Controller
             return $placeholder;
         }
 
-        return $this->server->getResponseFactory()->create(
-            $this->server->getCache(),
-            $this->generate()
-        );
+        return redirect($this->generate());
     }
 
     /**
@@ -108,10 +88,10 @@ class ThumbnailController extends Controller
                 throw new \Exception('Invalid preset');
             }
 
-            $path = $this->generator->generateByAsset(
-                $this->asset,
-                $preset ? ['p' => $preset] : []
-            );
+            $path = $this->asset->container()->imageManipulator()
+                ->setSource(Source::from($this->asset))
+                ->setParams($preset ? ['p' => $preset] : [])
+                ->getUrl();
         } catch (UnableToReadFile $e) {
             throw new NotFoundHttpException;
         } finally {

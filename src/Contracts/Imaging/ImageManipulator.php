@@ -4,6 +4,10 @@ namespace Statamic\Contracts\Imaging;
 
 use Statamic\Contracts\Assets\Asset;
 
+/**
+ * @deprecated New image manipulation methods have been introduced.
+ * @see Manipulator
+ */
 interface ImageManipulator
 {
     /**

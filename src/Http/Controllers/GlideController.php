@@ -15,6 +15,9 @@ use Statamic\Facades\Site;
 use Statamic\Imaging\ImageGenerator;
 use Statamic\Support\Str;
 
+/**
+ * @deprecated The new Glide implementation does not use the HTTP API.
+ */
 class GlideController extends Controller
 {
     /**

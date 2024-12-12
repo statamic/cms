@@ -4,7 +4,9 @@ namespace Tests\Imaging;
 
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Imaging\ImageManipulator;
+use Statamic\Contracts\Imaging\Manipulator;
 use Statamic\Imaging\Manager;
+use Statamic\Imaging\Manipulators\Manager as ManipulationManager;
 use Tests\TestCase;
 
 class ManagerTest extends TestCase
@@ -78,5 +80,25 @@ class ManagerTest extends TestCase
             'cp_thumbnail_small_portrait' => ['h' => '400', 'fit' => 'contain'],
             'cp_thumbnail_small_square' => ['w' => '400', 'h' => '400'],
         ], $this->manager->manipulationPresets());
+    }
+
+    #[Test]
+    public function it_gets_the_default_manipulator()
+    {
+        $manipulator = \Mockery::mock(Manipulator::class);
+
+        $this->mock(ManipulationManager::class, fn ($m) => $m->shouldReceive('manipulator')->with(null)->andReturn($manipulator));
+
+        $this->assertEquals($manipulator, $this->manager->driver());
+    }
+
+    #[Test]
+    public function it_gets_a_specific_manipulator()
+    {
+        $manipulator = \Mockery::mock(Manipulator::class);
+
+        $this->mock(ManipulationManager::class, fn ($m) => $m->shouldReceive('manipulator')->with('foo')->andReturn($manipulator));
+
+        $this->assertEquals($manipulator, $this->manager->driver('foo'));
     }
 }

@@ -7,7 +7,12 @@ use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Imaging\ImageManipulator;
 use Statamic\Contracts\Imaging\UrlBuilder;
 use Statamic\Facades\Asset as AssetAPI;
+use Statamic\Imaging\Manipulators\GlideManipulator;
 
+/**
+ * @deprecated New image manipulation methods have been introduced.
+ * @see GlideManipulator
+ */
 class GlideImageManipulator implements ImageManipulator
 {
     /**
