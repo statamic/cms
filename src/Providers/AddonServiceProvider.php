@@ -182,6 +182,8 @@ abstract class AddonServiceProvider extends ServiceProvider
      */
     protected $translations = true;
 
+    protected static array $autoloaded = [];
+
     public function boot()
     {
         Statamic::booted(function () {
@@ -783,7 +785,8 @@ abstract class AddonServiceProvider extends ServiceProvider
             return [];
         }
 
-        $path = $addon->directory().$addon->autoload().'/'.$folder;
+        $reflection = new \ReflectionClass(static::class);
+        $path = dirname($reflection->getFileName()).'/'.$folder;
 
         if (! $this->app['files']->exists($path)) {
             return [];
@@ -797,17 +800,22 @@ abstract class AddonServiceProvider extends ServiceProvider
             }
 
             $class = $file->getBasename('.php');
-            $fqcn = $this->namespace().'\\'.str_replace('/', '\\', $folder).'\\'.$class;
+            $fqcn = $reflection->getNamespaceName().'\\'.str_replace('/', '\\', $folder).'\\'.$class;
 
             if ((new \ReflectionClass($fqcn))->isAbstract() || (new \ReflectionClass($fqcn))->isInterface()) {
                 continue;
             }
 
             if ($requiredClass && ! is_subclass_of($fqcn, $requiredClass)) {
-                return;
+                continue;
+            }
+
+            if (in_array($fqcn, static::$autoloaded)) {
+                continue;
             }
 
             $autoloadable[] = $fqcn;
+            static::$autoloaded[] = $fqcn;
         }
 
         return $autoloadable;
