@@ -7,7 +7,6 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Entries\Entry;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
-use Statamic\Revisions\RevisionRepository;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -15,17 +14,8 @@ class RevisableTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    private $entry;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        // $this->repo = (new RevisionRepository);
-    }
-
     #[Test]
-    public function it_gets_revisions_and_excludes_working_copies()
+    public function it_gets_non_revisable_fields()
     {
         $blueprint = Blueprint::makeFromFields([
             'revisable' => ['type' => 'text'],
