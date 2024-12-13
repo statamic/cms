@@ -182,7 +182,9 @@ abstract class AddonServiceProvider extends ServiceProvider
      */
     protected $translations = true;
 
-    protected static array $autoloaded = [];
+    private static array $autoloaded = [];
+
+    private static array $bootedAddons = [];
 
     public function boot()
     {
@@ -218,6 +220,8 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootFieldsets()
                 ->bootPublishAfterInstall()
                 ->bootAddon();
+
+            static::$bootedAddons[] = $this->getAddon()->id();
         });
     }
 
@@ -456,6 +460,10 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootConfig()
     {
+        if (! $this->shouldBootRootItems()) {
+            return $this;
+        }
+
         $filename = $this->getAddon()->slug();
         $directory = $this->getAddon()->directory();
         $origin = "{$directory}config/{$filename}.php";
@@ -475,6 +483,10 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootTranslations()
     {
+        if (! $this->shouldBootRootItems()) {
+            return $this;
+        }
+
         $slug = $this->getAddon()->slug();
         $directory = $this->getAddon()->directory();
         $origin = "{$directory}lang";
@@ -515,6 +527,10 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootRoutes()
     {
+        if (! $this->shouldBootRootItems()) {
+            return $this;
+        }
+
         $directory = $this->getAddon()->directory();
 
         $web = Arr::get(
@@ -622,6 +638,10 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootViews()
     {
+        if (! $this->shouldBootRootItems()) {
+            return $this;
+        }
+
         if (file_exists($this->getAddon()->directory().'resources/views')) {
             $this->loadViewsFrom(
                 $this->getAddon()->directory().'resources/views',
@@ -634,6 +654,10 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     public function registerScript(string $path)
     {
+        if (! $this->shouldBootRootItems()) {
+            return;
+        }
+
         $name = $this->getAddon()->packageName();
         $version = $this->getAddon()->version();
         $filename = pathinfo($path, PATHINFO_FILENAME);
@@ -748,6 +772,10 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootBlueprints()
     {
+        if (! $this->shouldBootRootItems()) {
+            return $this;
+        }
+
         if (! file_exists($path = "{$this->getAddon()->directory()}resources/blueprints")) {
             return $this;
         }
@@ -762,6 +790,10 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootFieldsets()
     {
+        if (! $this->shouldBootRootItems()) {
+            return $this;
+        }
+
         if (! file_exists($path = "{$this->getAddon()->directory()}resources/fieldsets")) {
             return $this;
         }
@@ -819,5 +851,23 @@ abstract class AddonServiceProvider extends ServiceProvider
         }
 
         return $autoloadable;
+    }
+
+    private function shouldBootRootItems()
+    {
+        $addon = $this->getAddon();
+
+        // We'll keep track of addons that have been booted to ensure that multiple
+        // providers don't try to boot things twice. This could happen if there are
+        // multiple providers in the root autoload directory (src) of an addon.
+        if (in_array($addon->id(), static::$bootedAddons)) {
+            return false;
+        }
+
+        // We only want to boot root items if the provider is in the autoloaded directory.
+        // i.e. It's the "root" provider. If it's in a subdirectory maybe the developer
+        // is organizing their providers. Things like tags etc. can be autoloaded but
+        // root level things like routes, views, config, blueprints, etc. will not.
+        return dirname((new \ReflectionClass(static::class))->getFileName()) === $addon->directory().$addon->autoload();
     }
 }
