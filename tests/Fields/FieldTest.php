@@ -342,6 +342,7 @@ class FieldTest extends TestCase
             'visibility' => 'visible',
             'replicator_preview' => true,
             'duplicate' => true,
+            'revisable' => true,
             'type' => 'example',
             'validate' => 'required',
             'foo' => 'bar',
@@ -646,5 +647,21 @@ class FieldTest extends TestCase
 
         $this->assertEquals($field, $return);
         $this->assertEquals($form, $field->form());
+    }
+
+    #[Test]
+    public function it_defaults_to_revisable()
+    {
+        $field = new Field('test', ['type' => 'text']);
+
+        $this->assertTrue($field->isRevisable());
+    }
+
+    #[Test]
+    public function it_gets_revisable()
+    {
+        $field = new Field('test', ['type' => 'text', 'revisable' => false]);
+
+        $this->assertFalse($field->isRevisable());
     }
 }
