@@ -701,7 +701,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
         $entry
             ->published($attrs['published'])
-            ->data(array_merge($this->data()->all(), $attrs['data']))
+            ->data($this->data()->merge($attrs['data']))
             ->slug($attrs['slug']);
 
         if ($this->collection()->dated() && ($date = Arr::get($attrs, 'date'))) {
