@@ -666,16 +666,6 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         ]);
     }
 
-    protected function nonRevisableFields(): array
-    {
-        return $this->blueprint()
-            ->fields()
-            ->all()
-            ->reject(fn ($field) => $field->isRevisable())
-            ->keys()
-            ->all();
-    }
-
     protected function revisionAttributes()
     {
         return [
