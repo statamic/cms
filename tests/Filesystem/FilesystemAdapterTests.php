@@ -170,6 +170,10 @@ trait FilesystemAdapterTests
         $this->assertTrue($this->adapter->isImage('test.JPEG'));
         $this->assertTrue($this->adapter->isImage('test.PNG'));
         $this->assertTrue($this->adapter->isImage('test.GIF'));
+        $this->assertTrue($this->adapter->isImage('test.webp'));
+        $this->assertTrue($this->adapter->isImage('test.WEBP'));
+        $this->assertTrue($this->adapter->isImage('test.avif'));
+        $this->assertTrue($this->adapter->isImage('test.AVIF'));
         $this->assertFalse($this->adapter->isImage('test.txt'));
     }
 

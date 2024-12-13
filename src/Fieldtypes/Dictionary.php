@@ -15,7 +15,6 @@ class Dictionary extends Fieldtype
 {
     protected $categories = ['controls', 'relationship'];
     protected $selectableInForms = true;
-    protected $indexComponent = 'tags';
 
     protected function configFieldItems(): array
     {
@@ -169,5 +168,16 @@ class Dictionary extends Fieldtype
     public function addGqlTypes()
     {
         GraphQL::addType($this->dictionary()->getGqlType());
+    }
+
+    public function keywords(): array
+    {
+        return \Statamic\Facades\Dictionary::all()
+            ->flatMap(fn ($dictionary) => [
+                str($dictionary->handle())->replace('_', ' ')->toString(),
+                ...$dictionary->keywords(),
+            ])
+            ->merge(['select', 'option', 'choice', 'dropdown', 'list'])
+            ->unique()->values()->all();
     }
 }

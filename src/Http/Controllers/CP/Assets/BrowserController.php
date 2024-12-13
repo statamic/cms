@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Assets;
 
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
+use Statamic\Assets\AssetFolder;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Exceptions\AuthorizationException;
 use Statamic\Facades\Asset;
@@ -81,21 +82,30 @@ class BrowserController extends CpController
 
         $folders = $folder->assetFolders();
         $totalFolders = $folders->count();
-        $folders = $folders->slice(($page - 1) * $perPage, $perPage);
         $lastFolderPage = (int) ceil($totalFolders / $perPage) ?: 1;
 
         $totalAssets = $folder->queryAssets()->count();
         $totalItems = $totalAssets + $totalFolders;
 
+        if ($request->sort) {
+            $sort = $request->sort;
+            $order = $request->order ?? 'asc';
+        } else {
+            $sort = $container->sortField();
+            $order = $container->sortDirection();
+        }
+
+        $sortByMethod = $order === 'desc' ? 'sortByDesc' : 'sortBy';
+
+        $folders = $folders->$sortByMethod(
+            fn (AssetFolder $folder) => method_exists($folder, $sort) ? $folder->$sort() : $folder->basename()
+        );
+
+        $folders = $folders->slice(($page - 1) * $perPage, $perPage);
+
         if ($page >= $lastFolderPage) {
             $query = $folder->queryAssets();
-
-            if ($request->sort) {
-                $query->orderBy($request->sort, $request->order ?? 'asc');
-            } else {
-                $query->orderBy($container->sortField(), $container->sortDirection());
-            }
-
+            $query->orderBy($sort, $order);
             $this->applyQueryScopes($query, $request->all());
 
             $offset = $page === $lastFolderPage
@@ -112,7 +122,7 @@ class BrowserController extends CpController
             'data' => [
                 'assets' => FolderAsset::collection($assets ?? collect())->resolve(),
                 'folder' => array_merge((new Folder($folder))->resolve(), [
-                    'folders' => $folders->values(),
+                    'folders' => Folder::collection($folders->values()),
                 ]),
             ],
             'links' => [

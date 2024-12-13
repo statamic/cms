@@ -166,6 +166,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Collection\Collection::class,
         Tags\Cookie::class,
         Tags\Dd::class,
+        Tags\Dictionary\Dictionary::class,
         Tags\Dump::class,
         Tags\GetContent::class,
         Tags\GetError::class,
@@ -334,9 +335,12 @@ class ExtensionServiceProvider extends ServiceProvider
             return;
         }
 
-        foreach ($this->app['files']->files($path) as $file) {
+        foreach ($this->app['files']->allFiles($path) as $file) {
+            $relativePathOfFolder = str_replace(app_path(DIRECTORY_SEPARATOR), '', $file->getPath());
+            $namespace = str_replace('/', '\\', $relativePathOfFolder);
             $class = $file->getBasename('.php');
-            $fqcn = $this->app->getNamespace()."{$folder}\\{$class}";
+
+            $fqcn = $this->app->getNamespace()."{$namespace}\\{$class}";
             if (is_subclass_of($fqcn, $requiredClass)) {
                 $fqcn::register();
             }

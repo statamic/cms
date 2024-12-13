@@ -1,19 +1,8 @@
 <?php
 
 return [
-
-    /*
-    |--------------------------------------------------------------------------
-    | Validation Language Lines
-    |--------------------------------------------------------------------------
-    |
-    | The following language lines contain the default error messages used by
-    | the validator class. Some of these rules have multiple versions such
-    | as the size rules. Feel free to tweak each of these messages here.
-    |
-    */
-
     'accepted' => '必须接受。',
+    'accepted_if' => '当:other是:value时必须接受。',
     'active_url' => '这不是有效的URL。',
     'after' => '必须为 :date 之后的日期。',
     'after_or_equal' => '必须为 :date 或之后的日期。',
@@ -21,40 +10,44 @@ return [
     'alpha_dash' => '只能包含字母，数字，破折号和下划线。',
     'alpha_num' => '只能包含字母和数字。',
     'array' => '必须是一个数组。',
+    'ascii' => '只能包含单字节字母数字字符和符号。',
     'before' => '必须为 :date 之前的日期。',
     'before_or_equal' => '必须为 :date 或之前的日期。',
-    'between' => [
-        'numeric' => '必须介于 :min 和 :max 之间。',
-        'file' => '必须介于 :min 和 :max Kb之间。',
-        'string' => '必须介于 :min 和 :max 个字符之间。',
-        'array' => '必须包含 :min 和 :max 之间的项目。',
-    ],
+    'between.array' => '必须包含:min和:max之间的项目。',
+    'between.file' => '必须介于:min和:max千字节之间。',
+    'between.numeric' => '必须介于:min和:max之间。',
+    'between.string' => '必须介于:min和:max字符之间。',
     'boolean' => '必须为真或假。',
+    'can' => '包含未经授权的值。',
     'confirmed' => '确认不匹配。',
     'current_password' => '密码错误。',
     'date' => '无效日期',
+    'date_equals' => '必须是等于:date日期。',
     'date_format' => '与格式 :format 不匹配',
+    'decimal' => '必须有:decimal小数位。',
+    'declined' => '必須拒絕。',
+    'declined_if' => '当:other为:value时必须拒绝。',
     'different' => '此字段和 :other 必须不同。',
     'digits' => '必须为 :digits 位数。',
     'digits_between' => '必须介于 :min 和 :max 位数之间。',
     'dimensions' => '无效的图像尺寸。',
     'distinct' => '该字段具有重复值。',
+    'doesnt_end_with' => '不能以下列之一结尾： :values 。',
+    'doesnt_start_with' => '不能以下列之一开头： :values 。',
     'email' => '必须是有效的电子邮件地址。',
+    'ends_with' => '必须以:values结尾',
+    'enum' => '选定的:attribute无效。',
     'exists' => '这是无效的。',
     'file' => '必须是一个文件。',
     'filled' => '必须具有一个值。',
-    'gt' => [
-        'numeric' => '必须大于 :value。',
-        'file' => '必须大于 :value kb。',
-        'string' => '必须大于 :value 个字符。',
-        'array' => '必须包含多于 :value 项。',
-    ],
-    'gte' => [
-        'numeric' => '必须大于或等于 :value。',
-        'file' => '必须大于或等于 :valuekb。',
-        'string' => '必须大于或等于 :value 个字符。',
-        'array' => '必须具有 :value 项或更多。',
-    ],
+    'gt.array' => '必须有超过:value个项目。',
+    'gt.file' => '必须大于:value千字节。',
+    'gt.numeric' => '必须大于:value 。',
+    'gt.string' => '必须大于:value个字符。',
+    'gte.array' => '必须具有:value项或更多。',
+    'gte.file' => '必须大于或等于:value千字节。',
+    'gte.numeric' => '必须大于或等于:value 。',
+    'gte.string' => '必须大于或等于:value字符。',
     'image' => '必须是一张图像',
     'in' => '这是无效的。',
     'in_array' => '此字段在 :other 中不存在。',
@@ -63,104 +56,100 @@ return [
     'ipv4' => '必须是有效的 IPv4 地址。',
     'ipv6' => '必须是有效的 IPv6 地址。',
     'json' => '必须是有效的 JSON 字符串。',
-    'lt' => [
-        'numeric' => '必须小于 :value。',
-        'file' => '必须小于 :value kb。',
-        'string' => '必须小于 :value 个字符。',
-        'array' => '必须小于 :value 项。',
-    ],
-    'lte' => [
-        'numeric' => '必须小于或等于:value。',
-        'file' => '必须小于或等于:valueKb。',
-        'string' => '必须小于或等于:value个字符。',
-        'array' => '不得超过 :value 项。',
-    ],
-    'max' => [
-        'numeric' => '不得大于 :max。',
-        'file' => '不得大于 :max Kb。',
-        'string' => '不得大于 :max 个字符。',
-        'array' => '最多只能包含 :max 项。',
-    ],
+    'lowercase' => '必须是小写。',
+    'lt.array' => '必须少于:value个项目。',
+    'lt.file' => '必须小于:value千字节。',
+    'lt.numeric' => '必须小于:value 。',
+    'lt.string' => '必须少于:value个字符。',
+    'lte.array' => '不得超过:value个项目。',
+    'lte.file' => '必须小于或等于:value千字节。',
+    'lte.numeric' => '必须小于或等于:value 。',
+    'lte.string' => '必须小于或等于:value字符。',
+    'mac_address' => '必须是有效的 MAC 地址。',
+    'max.array' => '项目数不得超过:max 。',
+    'max.file' => '不能大于:max千字节。',
+    'max.numeric' => '不能大于:max 。',
+    'max.string' => '不得大于:max字符。',
+    'max_digits' => '不得超过:max位数字。',
     'mimes' => '必须是以下类型的文件：:values。',
     'mimetypes' => '必须是以下类型的文件：:values。',
-    'min' => [
-        'numeric' => '必须至少为 :min。',
-        'file' => '必须至少为 :minKb。',
-        'string' => '必须至少为 :min 个字符。',
-        'array' => '必须至少包含 :min 项。',
-    ],
+    'min.array' => '必须至少包含:min项目。',
+    'min.file' => '必须至少为:min千字节。',
+    'min.numeric' => '必须至少为:min 。',
+    'min.string' => '必须至少有:min字符。',
+    'min_digits' => '必须至少有:min位数字。',
+    'missing' => '一定失踪了。',
+    'missing_if' => '当:other为:value时一定缺失。',
+    'missing_unless' => '必须缺失，除非:other是:value 。',
+    'missing_with' => '当:values存在时一定缺失。',
+    'missing_with_all' => '当:values存在时一定缺失。',
+    'multiple_of' => '必须是:value的倍数。',
     'not_in' => '这是无效的。',
     'not_regex' => '格式无效。',
     'numeric' => '必须是数字。',
     'present' => '必须存在。',
+    'prohibited' => '禁止。',
+    'prohibited_if' => '当:other为:value时禁止。',
+    'prohibited_unless' => '除非:other在:values中，否则禁止。',
+    'prohibits' => '禁止:other存在。',
     'regex' => '格式无效。',
     'required' => '此字段必填。',
+    'required_array_keys' => '必须包含以下条目:values 。',
     'required_if' => '当 :other 为 :value 时此字段必填。',
+    'required_if_accepted' => '当接受:other时，此字段为必填项。',
     'required_unless' => '除非 :other 在 :values 中，否则此字段必填。',
     'required_with' => '当 :values 存在时，此字段必填。',
     'required_with_all' => '当 :values 存在时，此字段必填。',
     'required_without' => '当 :values 不存在时，此字段必填。',
     'required_without_all' => '当不存在 :values 时，此字段必填。',
     'same' => '此字段和 :other 必须匹配。',
-    'size' => [
-        'numeric' => '必须为 :size。',
-        'file' => '必须为 :sizekb。',
-        'string' => '必须为 :size 个字符。',
-        'array' => '必须包含 :size 项。',
-    ],
+    'size.array' => '必须包含:size项目。',
+    'size.file' => '必须是:size千字节。',
+    'size.numeric' => '必须是:size 。',
+    'size.string' => '必须是:size字符。',
+    'starts_with' => '必须以:values开头',
     'string' => '必须是一个字符串。',
     'timezone' => '必须为有效区域。',
+    'ulid' => '必须是有效的 ULID。',
     'unique' => '该值已被使用。',
     'uploaded' => '上传失败。',
+    'uppercase' => '必须是大写。',
     'url' => '格式无效。',
-
-    /*
-    |--------------------------------------------------------------------------
-    | Custom Statamic Validation Language Lines
-    |--------------------------------------------------------------------------
-    |
-    | Here you may validation messages for the custom rules provided by Statamic.
-    |
-    */
-
+    'uuid' => '必须是有效的 UUID。',
+    'arr_fieldtype' => '这是无效的。',
+    'handle' => '必须仅包含小写字母和数字并以下划线作为分隔符。',
+    'slug' => '必须仅包含字母和数字，并以破折号或下划线作为分隔符。',
+    'code_fieldtype_rulers' => '这是无效的。',
+    'composer_package' => '必须是有效的作曲家包名称（例如 hassselhoff/kung-fury）。',
+    'date_fieldtype_date_required' => '需要日期。',
+    'date_fieldtype_end_date_invalid' => '结束日期无效。',
+    'date_fieldtype_end_date_required' => '需要结束日期。',
+    'date_fieldtype_only_single_mode_allowed' => '当字段句柄为日期时，仅可以使用“单一”模式。',
+    'date_fieldtype_start_date_invalid' => '开始日期无效。',
+    'date_fieldtype_start_date_required' => '需要开始日期。',
+    'date_fieldtype_time_required' => '需要时间。',
+    'duplicate_field_handle' => '句柄为 :handle 的字段不能多次使用。',
+    'duplicate_uri' => '重复的 URI :value',
+    'email_available' => '使用该电子邮件的用户已存在。',
+    'fieldset_imported_recursively' => 'Fieldset :handle正在递归导入。',
+    'one_site_without_origin' => '至少必须有一个站点无来源。',
+    'options_require_keys' => '所有选项都必须有键。',
+    'origin_cannot_be_disabled' => '无法选择一个禁用的来源。',
+    'parent_cannot_be_itself' => '不能是其自己的父级。',
+    'parent_causes_root_children' => '这将导致根页面拥有子页面。',
+    'parent_exceeds_max_depth' => '这将超出最大深度。',
+    'reserved' => '输入值为保留字',
+    'reserved_field_handle' => '句柄为:handle的字段是保留字。',
     'unique_entry_value' => '该值已被使用。',
+    'unique_form_handle' => '该值已被占用。',
     'unique_term_value' => '该值已被使用。',
     'unique_user_value' => '该值已被使用。',
-    'duplicate_field_handle' => '句柄为 :handle 的字段不能多次使用。',
-    'one_site_without_origin' => '至少必须有一个站点无来源。',
-    'origin_cannot_be_disabled' => '无法选择一个禁用的来源。',
     'unique_uri' => '该 URI 已被使用。',
-    'duplicate_uri' => '重复的 URI :value',
-    'reserved' => '输入值为保留字',
-
-    /*
-    |--------------------------------------------------------------------------
-    | Custom Validation Language Lines
-    |--------------------------------------------------------------------------
-    |
-    | Here you may specify custom validation messages for attributes using the
-    | convention "attribute.rule" to name the lines. This makes it quick to
-    | specify a specific custom language line for a given attribute rule.
-    |
-    */
-
-    'custom' => [
-        'attribute-name' => [
-            'rule-name' => 'custom-message',
-        ],
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Custom Validation Attributes
-    |--------------------------------------------------------------------------
-    |
-    | The following language lines are used to swap attribute place-holders
-    | with something more reader friendly such as E-Mail Address instead
-    | of "email". This simply helps us make messages a little cleaner.
-    |
-    */
-
+    'time' => '时间无效。',
+    'asset_current_filename' => '这是当前文件名。',
+    'asset_file_exists' => '同名文件已存在。',
+    'asset_file_exists_same_content' => '已存在同名文件，且内容相同。您可能希望删除该文件，而不是重命名它。',
+    'asset_file_exists_different_content' => '已存在一个同名文件，但内容不同。您可能希望用该文件替换另一个文件。',
+    'custom.attribute-name.rule-name' => '自定义消息',
     'attributes' => [],
-
 ];

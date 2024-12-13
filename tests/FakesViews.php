@@ -2,6 +2,8 @@
 
 namespace Tests;
 
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Str;
 use Illuminate\View\Factory;
 use Illuminate\View\View;
 
@@ -90,6 +92,10 @@ class FakeViewEngine extends \Statamic\View\Antlers\Engine
     {
         if (isset($this->renderedContents[$path])) {
             return $this->renderedContents[$path];
+        }
+
+        if (Str::endsWith($path, '.blade.php')) {
+            return Blade::render($this->rawContents[$path], $data);
         }
 
         return parent::get($path, $data);
