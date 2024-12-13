@@ -244,23 +244,23 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
             'id' => $this->id(),
             'slug' => $this->slug(),
             'published' => $this->published(),
-            'data' => $this->data()->except(['updated_by', 'updated_at'])->all(),
+            'data' => $this->data()->except(['updated_by', 'updated_at', ...$this->nonRevisableFields()])->all(),
         ];
     }
 
     public function makeFromRevision($revision)
     {
-        $entry = clone $this;
+        $term = clone $this;
 
         if (! $revision) {
-            return $entry;
+            return $term;
         }
 
         $attrs = $revision->attributes();
 
-        return $entry
+        return $term
             ->published($attrs['published'])
-            ->data($attrs['data'])
+            ->data($this->data()->merge($attrs['data']))
             ->slug($attrs['slug']);
     }
 
