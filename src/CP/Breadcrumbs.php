@@ -54,10 +54,6 @@ class Breadcrumbs implements Arrayable, JsonSerializable
 
     public static function addFiltersFromReferer(string $validRefererRoute, string $handle)
     {
-        if (! config('statamic.cp.breadcrumbs.add_filters_from_overview')) {
-            return false;
-        }
-
         $referer = request()->headers->get('referer');
         if (! $referer) {
             return false;
@@ -72,7 +68,7 @@ class Breadcrumbs implements Arrayable, JsonSerializable
             return false;
         }
 
-        if (! $refererRequest->hasAny(['sort', 'order', 'filters', 'search'])) {
+        if (! $refererRequest->hasAny(['sort', 'order', 'filters', 'search', 'page'])) {
             return false;
         }
 

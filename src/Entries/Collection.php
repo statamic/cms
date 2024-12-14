@@ -280,12 +280,14 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         $sort = $refererRequest->input('sort');
         $order = $refererRequest->input('order');
         $filters = $refererRequest->input('filters');
+        $page = $refererRequest->input('page');
 
         return cp_route('collections.show', array_merge((array) $this->handle(), [
             'sort' => $sort,
             'order' => $order,
             'filters' => $filters,
             'search' => $search,
+            'page' => $page,
         ]));
     }
 

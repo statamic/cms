@@ -96,12 +96,14 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
         $sort = $refererRequest->input('sort');
         $order = $refererRequest->input('order');
         $filters = $refererRequest->input('filters');
+        $page = $refererRequest->input('page');
 
         return cp_route('taxonomies.show', array_merge((array) $this->handle(), [
             'sort' => $sort,
             'order' => $order,
             'filters' => $filters,
             'search' => $search,
+            'page' => $page,
         ]));
     }
 
