@@ -11,9 +11,9 @@ trait HasSelectOptionsTests
     #[DataProvider('optionsProvider')]
     public function it_preloads_options($options, $expected)
     {
-        $fieldType = $this->field(['options' => $options]);
+        $field = $this->field(['options' => $options]);
 
-        $this->assertArrayHasKey('options', $preloaded = $fieldType->preload());
+        $this->assertArrayHasKey('options', $preloaded = $field->preload());
 
         // Use json_encode data to strictly check all data types as well, which assertEquals ignores.
         $this->assertJsonStringEqualsJsonString(json_encode($expected), json_encode($preloaded['options']));
