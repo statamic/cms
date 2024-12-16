@@ -51,9 +51,9 @@ class OAuthController
                 ->login($user, config('statamic.oauth.remember_me', true));
 
             return redirect()->to($this->successRedirectUrl());
-        } else {
-            return redirect()->to($this->unauthorizedRedirectUrl());
         }
+
+        return redirect()->to($this->unauthorizedRedirectUrl());
     }
 
     protected function successRedirectUrl()
