@@ -47,7 +47,9 @@ class Provider
     public function findOrCreateUser($socialite): StatamicUser
     {
         if ($user = $this->findUser($socialite)) {
-            return $this->mergeUser($user, $socialite);
+            return config('statamic.oauth.merge_user_data', true)
+                ? $this->mergeUser($user, $socialite)
+                : $user;
         }
 
         return $this->createUser($socialite);

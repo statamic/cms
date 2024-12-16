@@ -74,6 +74,8 @@ class ProviderTest extends TestCase
 
         $user = $this->user()->save();
 
+        $this->assertEquals(['name' => 'foo', 'extra' => 'bar'], $user->data()->all());
+
         $provider->mergeUser($user, $this->socialite());
 
         $this->assertEquals(['name' => 'Foo Bar', 'extra' => 'bar'], $user->data()->all());
@@ -162,12 +164,35 @@ class ProviderTest extends TestCase
 
         $this->assertCount(1, UserFacade::all());
         $this->assertEquals([$savedUser], UserFacade::all()->all());
+        $this->assertEquals('foo', $savedUser->name);
 
         $foundUser = $provider->findOrCreateUser($this->socialite());
 
         $this->assertCount(1, UserFacade::all());
         $this->assertEquals([$savedUser], UserFacade::all()->all());
         $this->assertEquals($savedUser, $foundUser);
+        $this->assertEquals('Foo Bar', $savedUser->name);
+    }
+
+    #[Test]
+    public function it_finds_an_existing_user_via_find_or_create_user_method_but_doesnt_merge_data()
+    {
+        config(['statamic.oauth.merge_user_data' => false]);
+
+        $provider = $this->provider();
+
+        $savedUser = $this->user()->save();
+
+        $this->assertCount(1, UserFacade::all());
+        $this->assertEquals([$savedUser], UserFacade::all()->all());
+        $this->assertEquals('foo', $savedUser->name);
+
+        $foundUser = $provider->findOrCreateUser($this->socialite());
+
+        $this->assertCount(1, UserFacade::all());
+        $this->assertEquals([$savedUser], UserFacade::all()->all());
+        $this->assertEquals($savedUser, $foundUser);
+        $this->assertEquals('foo', $savedUser->name);
     }
 
     #[Test]
