@@ -73,6 +73,28 @@ class OAuthController
 
     protected function unauthorizedRedirectUrl()
     {
-        return config('statamic.oauth.unauthorized_redirect', '/cp/auth/unauthorized');
+        // If a URL has been explicitly defined, use that.
+        if ($url = config('statamic.oauth.unauthorized_redirect')) {
+            return $url;
+        }
+
+        // We'll check the redirect to see if they were intending on
+        // accessing the CP. If they were, we'll redirect them to
+        // the unauthorized page in the CP. Otherwise, to home.
+
+        $default = '/';
+        $previous = session('_previous.url');
+
+        if (! $query = Arr::get(parse_url($previous), 'query')) {
+            return $default;
+        }
+
+        parse_str($query, $query);
+
+        if (! $redirect = Arr::get($query, 'redirect')) {
+            return $default;
+        }
+
+        return $redirect === '/'.config('statamic.cp.route') ? cp_route('unauthorized') : $default;
     }
 }
