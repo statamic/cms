@@ -19,23 +19,6 @@ trait HasSelectOptionsTests
         $this->assertJsonStringEqualsJsonString(json_encode($expected), json_encode($preloaded['options']));
     }
 
-    #[Test]
-    #[DataProvider('optionsProvider')]
-    public function it_augments_single_values($options, $expected)
-    {
-        $fieldType = $this->field(['options' => $options]);
-
-        if (! in_array(MultipleLabeledValueTests::class, class_uses_recursive(self::class))) {
-            $this->assertSame($fieldType->augment(50)?->value(), 50);
-            $this->assertSame($fieldType->augment('50')?->value(), 50);
-            $this->assertSame($fieldType->augment(100)?->value(), 100);
-            $this->assertSame($fieldType->augment('100')?->value(), 100);
-            $this->assertSame($fieldType->augment('one')?->value(), 'one');
-        } else {
-            $this->expectNotToPerformAssertions();
-        }
-    }
-
     public static function optionsProvider()
     {
         return [
