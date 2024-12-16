@@ -12,6 +12,7 @@ use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\Facades\Compare;
 use Statamic\Support\Str;
 use Statamic\View\Antlers\Language\Parser\DocumentTransformer;
+use Traversable;
 
 class Value implements ArrayAccess, IteratorAggregate, JsonSerializable
 {
@@ -96,10 +97,6 @@ class Value implements ArrayAccess, IteratorAggregate, JsonSerializable
             $value = $value->get();
         }
 
-        if ($value instanceof Collection) {
-            $value = $value->all();
-        }
-
         return $value;
     }
 
@@ -127,7 +124,9 @@ class Value implements ArrayAccess, IteratorAggregate, JsonSerializable
     #[\ReturnTypeWillChange]
     public function getIterator()
     {
-        return new ArrayIterator($this->iteratorValue());
+        $value = $this->iteratorValue();
+
+        return $value instanceof Traversable ? $value : new ArrayIterator($value);
     }
 
     public function shouldParseAntlers()

@@ -7,6 +7,8 @@ use Closure;
 use Illuminate\Support\Collection as IlluminateCollection;
 use Statamic\Exceptions\MethodNotFoundException;
 use Statamic\Facades\Compare;
+use Statamic\Search\PlainResult;
+use Statamic\Search\Result;
 use Statamic\Support\Str;
 
 /**
@@ -95,6 +97,10 @@ class DataCollection extends IlluminateCollection
         }
 
         $method = Str::camel($sort);
+
+        if ($item instanceof Result && ! $item instanceof PlainResult) {
+            $item = $item->getSearchable() ?? $item;
+        }
 
         $value = (method_exists($item, $method))
             ? call_user_func([$item, $method])

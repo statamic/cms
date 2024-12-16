@@ -129,6 +129,16 @@ class ViewTest extends TestCase
     }
 
     #[Test]
+    public function uses_proper_evaluation_order_for_null_coalescing_operator()
+    {
+        $this->viewShouldReturnRaw('template', file_get_contents(__DIR__.'/fixtures/template-with-null-coalescence-opperator.antlers.html'));
+
+        $view = (new View)->template('template');
+
+        $this->assertEquals('Hello World', $view->render());
+    }
+
+    #[Test]
     public function gets_first()
     {
         $this->viewShouldReturnRaw('template', file_get_contents(__DIR__.'/fixtures/template-with-noparse.antlers.html'));
