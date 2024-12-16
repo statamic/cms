@@ -14,9 +14,7 @@ trait HasSelectOptionsTests
         $field = $this->field(['options' => $options]);
 
         $this->assertArrayHasKey('options', $preloaded = $field->preload());
-
-        // Use json_encode data to strictly check all data types as well, which assertEquals ignores.
-        $this->assertJsonStringEqualsJsonString(json_encode($expected), json_encode($preloaded['options']));
+        $this->assertSame($expected, $preloaded['options']);
     }
 
     public static function optionsProvider()
