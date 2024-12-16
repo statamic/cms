@@ -36,14 +36,24 @@ class OAuthController
             return $this->redirectToProvider($request, $provider);
         }
 
-        $user = $oauth->findOrCreateUser($providerUser);
+        if ($user = $oauth->findUser($providerUser)) {
+            if (config('statamic.oauth.merge_user_data', true)) {
+                $user = $oauth->mergeUser($user, $providerUser);
+            }
+        } elseif (config('statamic.oauth.create_user', true)) {
+            $user = $oauth->createUser($providerUser);
+        }
 
-        session()->put('oauth-provider', $provider);
+        if ($user) {
+            session()->put('oauth-provider', $provider);
 
-        Auth::guard($request->session()->get('statamic.oauth.guard'))
-            ->login($user, config('statamic.oauth.remember_me', true));
+            Auth::guard($request->session()->get('statamic.oauth.guard'))
+                ->login($user, config('statamic.oauth.remember_me', true));
 
-        return redirect()->to($this->successRedirectUrl());
+            return redirect()->to($this->successRedirectUrl());
+        }
+
+        return redirect()->to($this->unauthorizedRedirectUrl());
     }
 
     protected function successRedirectUrl()
@@ -59,5 +69,32 @@ class OAuthController
         parse_str($query, $query);
 
         return Arr::get($query, 'redirect', $default);
+    }
+
+    protected function unauthorizedRedirectUrl()
+    {
+        // If a URL has been explicitly defined, use that.
+        if ($url = config('statamic.oauth.unauthorized_redirect')) {
+            return $url;
+        }
+
+        // We'll check the redirect to see if they were intending on
+        // accessing the CP. If they were, we'll redirect them to
+        // the unauthorized page in the CP. Otherwise, to home.
+
+        $default = '/';
+        $previous = session('_previous.url');
+
+        if (! $query = Arr::get(parse_url($previous), 'query')) {
+            return $default;
+        }
+
+        parse_str($query, $query);
+
+        if (! $redirect = Arr::get($query, 'redirect')) {
+            return $default;
+        }
+
+        return $redirect === '/'.config('statamic.cp.route') ? cp_route('unauthorized') : $default;
     }
 }
