@@ -33,6 +33,7 @@
                     :read-only="readOnly"
                     :form-component="formComponent"
                     :form-component-props="formComponentProps"
+                    :form-stack-size="formStackSize"
                     class="item outline-none"
                     @removed="remove(i)"
                 />
@@ -51,6 +52,7 @@
                             :site="site"
                             :component="formComponent"
                             :component-props="formComponentProps"
+                            :stack-size="formStackSize"
                             @created="itemCreated"
                         />
                     </div>
@@ -122,6 +124,7 @@ export default {
         creatables: Array,
         formComponent: String,
         formComponentProps: Object,
+        formStackSize: String,
         mode: {
             type: String,
             default: 'default',
