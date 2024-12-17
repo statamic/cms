@@ -527,16 +527,12 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootRoutes()
     {
-        if (! $this->shouldBootRootItems()) {
-            return $this;
-        }
-
         $directory = $this->getAddon()->directory();
 
         $web = Arr::get(
             array: $this->routes,
             key: 'web',
-            default: $this->app['files']->exists($path = $directory.'routes/web.php') ? $path : null
+            default: $this->shouldBootRootItems() && $this->app['files']->exists($path = $directory.'routes/web.php') ? $path : null
         );
 
         if ($web) {
@@ -546,7 +542,7 @@ abstract class AddonServiceProvider extends ServiceProvider
         $cp = Arr::get(
             array: $this->routes,
             key: 'cp',
-            default: $this->app['files']->exists($path = $directory.'routes/cp.php') ? $path : null
+            default: $this->shouldBootRootItems() && $this->app['files']->exists($path = $directory.'routes/cp.php') ? $path : null
         );
 
         if ($cp) {
@@ -556,7 +552,7 @@ abstract class AddonServiceProvider extends ServiceProvider
         $actions = Arr::get(
             array: $this->routes,
             key: 'actions',
-            default: $this->app['files']->exists($path = $directory.'routes/actions.php') ? $path : null
+            default: $this->shouldBootRootItems() && $this->app['files']->exists($path = $directory.'routes/actions.php') ? $path : null
         );
 
         if ($actions) {
