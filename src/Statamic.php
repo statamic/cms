@@ -468,4 +468,6 @@ class Statamic
     {
         return TextDirection::of(static::cpLocale());
     }
+
+    // boop
 }
