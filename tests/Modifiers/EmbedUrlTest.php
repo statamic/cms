@@ -113,7 +113,7 @@ class EmbedUrlTest extends TestCase
         );
     }
 
-        public function embed($url)
+    public function embed($url)
     {
         return Modify::value($url)->embedUrl()->fetch();
     }
