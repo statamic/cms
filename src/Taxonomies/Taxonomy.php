@@ -5,10 +5,8 @@ namespace Statamic\Taxonomies;
 use ArrayAccess;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Support\Facades\Request;
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Contracts\Taxonomies\Taxonomy as Contract;
-use Statamic\CP\Breadcrumbs;
 use Statamic\Data\ContainsCascadingData;
 use Statamic\Data\ContainsSupplementalData;
 use Statamic\Data\ExistsAsFile;
@@ -85,24 +83,10 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
 
     public function breadcrumbUrl()
     {
-        $cpRoute = config('statamic.cp.route');
-        if (! Breadcrumbs::addFiltersFromReferer("{$cpRoute}/taxonomies/{taxonomy}", $this->handle())) {
-            return $this->showUrl();
-        }
+        $referer = request()->header('referer');
+        $showUrl = $this->showUrl();
 
-        $refererRequest = Request::create(request()->headers->get('referer'));
-
-        $search = $refererRequest->input('search');
-        $sort = $refererRequest->input('sort');
-        $order = $refererRequest->input('order');
-        $filters = $refererRequest->input('filters');
-
-        return cp_route('taxonomies.show', array_merge((array) $this->handle(), [
-            'sort' => $sort,
-            'order' => $order,
-            'filters' => $filters,
-            'search' => $search,
-        ]));
+        return $referer && Str::before($referer, '?') === $showUrl ? $referer : $showUrl;
     }
 
     public function editUrl()
