@@ -8,6 +8,7 @@ use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Console\Commands\StaticWarmJob;
+use Statamic\Console\Commands\StaticWarmUncachedJob;
 use Statamic\Facades\Collection;
 use Statamic\StaticCaching\Cacher;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -169,6 +170,59 @@ class StaticWarmTest extends TestCase
             return $job->request->getUri()->getPath() === '/about';
         });
         Queue::assertPushed(StaticWarmJob::class, function ($job) {
+            return $job->request->getUri()->getPath() === '/contact';
+        });
+    }
+
+    #[Test]
+    public function it_queues_the_request_when_the_uncached_option_is_used()
+    {
+        config([
+            'statamic.static_caching.strategy' => 'half',
+            'queue.default' => 'redis',
+        ]);
+
+        Queue::fake();
+
+        $this->artisan('statamic:static:warm', ['--queue' => true, '--uncached' => true])
+            ->expectsOutputToContain('Adding 2 requests')
+            ->assertExitCode(0);
+
+        Queue::assertCount(2);
+
+        Queue::assertPushed(StaticWarmUncachedJob::class, function ($job) {
+            return $job->request->getUri()->getPath() === '/about';
+        });
+        Queue::assertPushed(StaticWarmUncachedJob::class, function ($job) {
+            return $job->request->getUri()->getPath() === '/contact';
+        });
+    }
+
+    #[Test]
+    public function it_doesnt_queue_the_request_when_the_uncached_option_is_used_and_the_page_is_cached()
+    {
+        config([
+            'statamic.static_caching.strategy' => 'half',
+            'queue.default' => 'redis',
+        ]);
+
+        $mock = Mockery::mock(Cacher::class);
+        $mock->shouldReceive('hasCachedPage')->times(2)->andReturn(true, false);
+        $mock->allows('isExcluded')->andReturn(false);
+        app()->instance(Cacher::class, $mock);
+
+        Queue::fake();
+
+        $this->artisan('statamic:static:warm', ['--queue' => true, '--uncached' => true])
+            ->expectsOutputToContain('Adding 1 requests')
+            ->assertExitCode(0);
+
+        Queue::assertCount(1);
+
+        Queue::assertNotPushed(StaticWarmUncachedJob::class, function ($job) {
+            return $job->request->getUri()->getPath() === '/about';
+        });
+        Queue::assertPushed(StaticWarmUncachedJob::class, function ($job) {
             return $job->request->getUri()->getPath() === '/contact';
         });
     }

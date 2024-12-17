@@ -94,8 +94,12 @@ class StaticWarm extends Command
             $queue = config('statamic.static_caching.warm_queue');
             $this->line(sprintf('Adding %s requests onto %squeue...', count($requests), $queue ? $queue.' ' : ''));
 
+            $jobClass = $this->option('uncached')
+                ? StaticWarmUncachedJob::class
+                : StaticWarmJob::class;
+
             foreach ($requests as $request) {
-                StaticWarmJob::dispatch($request, $this->clientConfig())
+                $jobClass::dispatch($request, $this->clientConfig())
                     ->onConnection($this->queueConnection)
                     ->onQueue($queue);
             }
