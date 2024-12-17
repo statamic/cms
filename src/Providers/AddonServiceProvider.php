@@ -182,6 +182,10 @@ abstract class AddonServiceProvider extends ServiceProvider
      */
     protected $translations = true;
 
+    private static array $autoloaded = [];
+
+    private static array $bootedAddons = [];
+
     public function boot()
     {
         Statamic::booted(function () {
@@ -216,6 +220,8 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootFieldsets()
                 ->bootPublishAfterInstall()
                 ->bootAddon();
+
+            static::$bootedAddons[] = $this->getAddon()->id();
         });
     }
 
@@ -454,6 +460,10 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootConfig()
     {
+        if (! $this->shouldBootRootItems()) {
+            return $this;
+        }
+
         $filename = $this->getAddon()->slug();
         $directory = $this->getAddon()->directory();
         $origin = "{$directory}config/{$filename}.php";
@@ -473,6 +483,10 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootTranslations()
     {
+        if (! $this->shouldBootRootItems()) {
+            return $this;
+        }
+
         $slug = $this->getAddon()->slug();
         $directory = $this->getAddon()->directory();
         $origin = "{$directory}lang";
@@ -518,7 +532,7 @@ abstract class AddonServiceProvider extends ServiceProvider
         $web = Arr::get(
             array: $this->routes,
             key: 'web',
-            default: $this->app['files']->exists($path = $directory.'routes/web.php') ? $path : null
+            default: $this->shouldBootRootItems() && $this->app['files']->exists($path = $directory.'routes/web.php') ? $path : null
         );
 
         if ($web) {
@@ -528,7 +542,7 @@ abstract class AddonServiceProvider extends ServiceProvider
         $cp = Arr::get(
             array: $this->routes,
             key: 'cp',
-            default: $this->app['files']->exists($path = $directory.'routes/cp.php') ? $path : null
+            default: $this->shouldBootRootItems() && $this->app['files']->exists($path = $directory.'routes/cp.php') ? $path : null
         );
 
         if ($cp) {
@@ -538,7 +552,7 @@ abstract class AddonServiceProvider extends ServiceProvider
         $actions = Arr::get(
             array: $this->routes,
             key: 'actions',
-            default: $this->app['files']->exists($path = $directory.'routes/actions.php') ? $path : null
+            default: $this->shouldBootRootItems() && $this->app['files']->exists($path = $directory.'routes/actions.php') ? $path : null
         );
 
         if ($actions) {
@@ -620,6 +634,10 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootViews()
     {
+        if (! $this->shouldBootRootItems()) {
+            return $this;
+        }
+
         if (file_exists($this->getAddon()->directory().'resources/views')) {
             $this->loadViewsFrom(
                 $this->getAddon()->directory().'resources/views',
@@ -746,6 +764,10 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootBlueprints()
     {
+        if (! $this->shouldBootRootItems()) {
+            return $this;
+        }
+
         if (! file_exists($path = "{$this->getAddon()->directory()}resources/blueprints")) {
             return $this;
         }
@@ -760,6 +782,10 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootFieldsets()
     {
+        if (! $this->shouldBootRootItems()) {
+            return $this;
+        }
+
         if (! file_exists($path = "{$this->getAddon()->directory()}resources/fieldsets")) {
             return $this;
         }
@@ -783,7 +809,8 @@ abstract class AddonServiceProvider extends ServiceProvider
             return [];
         }
 
-        $path = $addon->directory().$addon->autoload().'/'.$folder;
+        $reflection = new \ReflectionClass(static::class);
+        $path = dirname($reflection->getFileName()).'/'.$folder;
 
         if (! $this->app['files']->exists($path)) {
             return [];
@@ -797,19 +824,42 @@ abstract class AddonServiceProvider extends ServiceProvider
             }
 
             $class = $file->getBasename('.php');
-            $fqcn = $this->namespace().'\\'.str_replace('/', '\\', $folder).'\\'.$class;
+            $fqcn = $reflection->getNamespaceName().'\\'.str_replace('/', '\\', $folder).'\\'.$class;
 
             if ((new \ReflectionClass($fqcn))->isAbstract() || (new \ReflectionClass($fqcn))->isInterface()) {
                 continue;
             }
 
             if ($requiredClass && ! is_subclass_of($fqcn, $requiredClass)) {
-                return;
+                continue;
+            }
+
+            if (in_array($fqcn, static::$autoloaded)) {
+                continue;
             }
 
             $autoloadable[] = $fqcn;
+            static::$autoloaded[] = $fqcn;
         }
 
         return $autoloadable;
+    }
+
+    private function shouldBootRootItems()
+    {
+        $addon = $this->getAddon();
+
+        // We'll keep track of addons that have been booted to ensure that multiple
+        // providers don't try to boot things twice. This could happen if there are
+        // multiple providers in the root autoload directory (src) of an addon.
+        if (in_array($addon->id(), static::$bootedAddons)) {
+            return false;
+        }
+
+        // We only want to boot root items if the provider is in the autoloaded directory.
+        // i.e. It's the "root" provider. If it's in a subdirectory maybe the developer
+        // is organizing their providers. Things like tags etc. can be autoloaded but
+        // root level things like routes, views, config, blueprints, etc. will not.
+        return dirname((new \ReflectionClass(static::class))->getFileName()) === $addon->directory().$addon->autoload();
     }
 }
