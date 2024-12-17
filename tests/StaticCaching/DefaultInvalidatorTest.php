@@ -15,8 +15,9 @@ use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\DefaultInvalidator as Invalidator;
+use Tests\TestCase;
 
-class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
+class DefaultInvalidatorTest extends TestCase
 {
     public function tearDown(): void
     {
@@ -95,7 +96,7 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
             $cacher->shouldReceive('invalidateUrl')->with('/my/test/entry', 'http://test.com')->once();
-            $cacher->shouldReceive('invalidateUrls')->once()->with(['/blog/one', '/blog/two']);
+            $cacher->shouldReceive('invalidateUrls')->once()->with(['/blog/one', '/blog/two', '/my/test', '/test/foo', '/purple']);
         });
 
         $entry = tap(Mockery::mock(Entry::class), function ($m) {
@@ -103,6 +104,15 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
             $m->shouldReceive('absoluteUrl')->andReturn('http://test.com/my/test/entry');
             $m->shouldReceive('collectionHandle')->andReturn('blog');
             $m->shouldReceive('descendants')->andReturn(collect());
+            $m->shouldReceive('parent')->andReturnNull();
+            $m->shouldReceive('toAugmentedCollection')
+                ->andReturnSelf()
+                ->shouldReceive('merge')
+                ->andReturn(collect([
+                    'parent_uri' => '/my/test',
+                    'test' => 'foo',
+                    'favourite_color' => 'purple',
+                ]));
         });
 
         $invalidator = new Invalidator($cacher, [
@@ -111,6 +121,10 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
                     'urls' => [
                         '/blog/one',
                         '/blog/two',
+                        '{parent_uri}',
+                        '/test/{test}',
+                        '{{ if favourite_color == "purple" }}/purple{{ /if }}',
+                        '{{ if favourite_color == "red" }}/red{{ /if }}',
                     ],
                 ],
             ],
@@ -132,6 +146,13 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
             $m->shouldReceive('absoluteUrl')->andReturn('http://test.com/my/test/entry');
             $m->shouldReceive('collectionHandle')->andReturn('blog');
             $m->shouldReceive('descendants')->andReturn(collect());
+            $m->shouldReceive('parent')->andReturnNull();
+            $m->shouldReceive('toAugmentedCollection')
+                ->andReturnSelf()
+                ->shouldReceive('merge')
+                ->andReturn(collect([
+                    'parent_uri' => null,
+                ]));
         });
 
         $invalidator = new Invalidator($cacher, [
@@ -154,7 +175,7 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
             $cacher->shouldReceive('invalidateUrl')->with('/my/test/term', 'http://test.com')->once();
             $cacher->shouldReceive('invalidateUrl')->with('/my/collection/tags/term', 'http://test.com')->once();
-            $cacher->shouldReceive('invalidateUrls')->once()->with(['/tags/one', '/tags/two']);
+            $cacher->shouldReceive('invalidateUrls')->once()->with(['/tags/one', '/tags/two', '/test/foo', '/purple']);
         });
 
         $collection = Mockery::mock(Collection::class);
@@ -168,6 +189,11 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
             $m->shouldReceive('taxonomyHandle')->andReturn('tags');
             $m->shouldReceive('taxonomy')->andReturn($taxonomy);
             $m->shouldReceive('collection')->andReturn($m);
+            $m->shouldReceive('toAugmentedCollection')
+                ->andReturn(collect([
+                    'test' => 'foo',
+                    'favourite_color' => 'purple',
+                ]));
         });
 
         $invalidator = new Invalidator($cacher, [
@@ -176,6 +202,9 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
                     'urls' => [
                         '/tags/one',
                         '/tags/two',
+                        '/test/{test}',
+                        '{{ if favourite_color == "purple" }}/purple{{ /if }}',
+                        '{{ if favourite_color == "red" }}/red{{ /if }}',
                     ],
                 ],
             ],
@@ -188,11 +217,16 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
     public function navigation_urls_can_be_invalidated()
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
-            $cacher->shouldReceive('invalidateUrls')->once()->with(['/one', '/two']);
+            $cacher->shouldReceive('invalidateUrls')->once()->with(['/one', '/two', '/test/foo', '/purple']);
         });
 
         $nav = tap(Mockery::mock(Nav::class), function ($m) {
             $m->shouldReceive('handle')->andReturn('links');
+            $m->shouldReceive('toAugmentedCollection')
+                ->andReturn(collect([
+                    'test' => 'foo',
+                    'favourite_color' => 'purple',
+                ]));
         });
 
         $invalidator = new Invalidator($cacher, [
@@ -201,6 +235,9 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
                     'urls' => [
                         '/one',
                         '/two',
+                        '/test/{test}',
+                        '{{ if favourite_color == "purple" }}/purple{{ /if }}',
+                        '{{ if favourite_color == "red" }}/red{{ /if }}',
                     ],
                 ],
             ],
@@ -213,11 +250,16 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
     public function globals_urls_can_be_invalidated()
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
-            $cacher->shouldReceive('invalidateUrls')->once()->with(['/one', '/two']);
+            $cacher->shouldReceive('invalidateUrls')->once()->with(['/one', '/two', '/test/foo', '/purple']);
         });
 
         $set = tap(Mockery::mock(GlobalSet::class), function ($m) {
             $m->shouldReceive('handle')->andReturn('social');
+            $m->shouldReceive('toAugmentedCollection')
+                ->andReturn(collect([
+                    'test' => 'foo',
+                    'favourite_color' => 'purple',
+                ]));
         });
 
         $invalidator = new Invalidator($cacher, [
@@ -226,6 +268,9 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
                     'urls' => [
                         '/one',
                         '/two',
+                        '/test/{test}',
+                        '{{ if favourite_color == "purple" }}/purple{{ /if }}',
+                        '{{ if favourite_color == "red" }}/red{{ /if }}',
                     ],
                 ],
             ],
