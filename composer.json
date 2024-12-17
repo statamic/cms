@@ -15,7 +15,7 @@
         "guzzlehttp/guzzle": "^6.3 || ^7.0",
         "james-heinrich/getid3": "^1.9.21",
         "laravel/framework": "^10.40 || ^11.34",
-        "laravel/prompts": "^0.3.0",
+        "laravel/prompts": "^0.1.16 || ^0.2.0 || ^0.3.0",
         "league/commonmark": "^2.2",
         "league/csv": "^9.0",
         "league/glide": "^2.3",
