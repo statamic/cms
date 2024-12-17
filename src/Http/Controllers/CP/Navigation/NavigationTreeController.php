@@ -66,7 +66,8 @@ class NavigationTreeController extends CpController
                 ->addValues($branch['values'] ?? [])
                 ->process()
                 ->values()
-                ->only($branch['localizedFields'] ?? []);
+                ->only($branch['localizedFields'] ?? [])
+                ->filter();
 
             if ($branch['new'] ?? false) {
                 $newId = BranchIdGenerator::generate();
