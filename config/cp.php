@@ -157,20 +157,4 @@ return [
     'thumbnail_presets' => [
         // 'medium' => 800,
     ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Breadcrumbs
-    |--------------------------------------------------------------------------
-    |
-    | Here you can define if the breadcrumb on a collection entry or
-    | taxonomy term single view that points back to the list view should
-    | contain the filters that were used on that list before entering
-    | the single view.
-    |
-    */
-
-    'breadcrumbs' => [
-        'add_filters_from_overview' => false,
-    ],
 ];
