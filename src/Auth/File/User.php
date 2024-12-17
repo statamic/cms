@@ -171,9 +171,9 @@ class User extends BaseUser
 
     public function assignRole($role)
     {
-        $roles = collect(Arr::wrap($role))
+        $roles = collect($this->get('roles', []))
+            ->merge(Arr::wrap($role))
             ->map(fn ($role) => is_string($role) ? $role : $role->handle())
-            ->merge($this->get('roles', []))
             ->unique()
             ->all();
 
@@ -200,9 +200,9 @@ class User extends BaseUser
 
     public function addToGroup($group)
     {
-        $groups = collect(Arr::wrap($group))
+        $groups = collect($this->get('groups', []))
+            ->merge(Arr::wrap($group))
             ->map(fn ($group) => is_string($group) ? $group : $group->handle())
-            ->merge($this->get('groups', []))
             ->unique()
             ->all();
 
