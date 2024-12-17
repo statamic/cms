@@ -650,10 +650,6 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     public function registerScript(string $path)
     {
-        if (! $this->shouldBootRootItems()) {
-            return;
-        }
-
         $name = $this->getAddon()->packageName();
         $version = $this->getAddon()->version();
         $filename = pathinfo($path, PATHINFO_FILENAME);
