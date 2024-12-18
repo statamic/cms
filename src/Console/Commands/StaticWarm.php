@@ -176,7 +176,7 @@ class StaticWarm extends Command
 
         $cacher = app(StaticCacher::class);
 
-        $this->uris = collect()
+        return $this->uris = collect()
             ->merge($this->entryUris())
             ->merge($this->taxonomyUris())
             ->merge($this->termUris())
@@ -196,13 +196,8 @@ class StaticWarm extends Command
                 return $cacher->isExcluded($uri);
             })
             ->sort()
-            ->values();
-
-        if ($max = $this->option('max-requests')) {
-            $this->uris = $this->uris->take($max);
-        }
-
-        return $this->uris;
+            ->values()
+            ->when($this->option('max-requests'), fn ($uris, $max) => $uris->take($max));
     }
 
     private function shouldInclude($uri): bool
