@@ -1,5 +1,13 @@
 # Release Notes
 
+## 5.43.1 (2024-12-18)
+
+### What's fixed
+- Fix autoload error on Windows [#11282](https://github.com/statamic/cms/issues/11282) by @jasonvarga
+- Improve starter kit installer error handling [#11281](https://github.com/statamic/cms/issues/11281) by @jesseleite
+
+
+
 ## 5.43.0 (2024-12-17)
 
 ### What's new
