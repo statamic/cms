@@ -142,6 +142,16 @@ class StaticWarmTest extends TestCase
     }
 
     #[Test]
+    public function it_limits_the_number_of_requests_when_max_requests_is_set()
+    {
+        config(['statamic.static_caching.strategy' => 'half']);
+
+        $this->artisan('statamic:static:warm', ['--max-requests' => 1])
+            ->expectsOutput('Visiting 1 URLs...')
+            ->assertExitCode(0);
+    }
+
+    #[Test]
     public function it_doesnt_queue_the_requests_when_connection_is_set_to_sync()
     {
         config(['statamic.static_caching.strategy' => 'half']);

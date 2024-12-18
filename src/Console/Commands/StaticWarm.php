@@ -41,6 +41,7 @@ class StaticWarm extends Command
         {--max-depth= : Maximum depth of URLs to warm}
         {--include= : Only warm specific URLs}
         {--exclude= : Exclude specific URLs}
+        {--max-requests= : Maximum number of requests to warm}
     ';
 
     protected $description = 'Warms the static cache by visiting all URLs';
@@ -175,7 +176,7 @@ class StaticWarm extends Command
 
         $cacher = app(StaticCacher::class);
 
-        return $this->uris = collect()
+        $this->uris = collect()
             ->merge($this->entryUris())
             ->merge($this->taxonomyUris())
             ->merge($this->termUris())
@@ -196,6 +197,12 @@ class StaticWarm extends Command
             })
             ->sort()
             ->values();
+
+        if ($max = $this->option('max-requests')) {
+            $this->uris = $this->uris->take($max);
+        }
+
+        return $this->uris;
     }
 
     private function shouldInclude($uri): bool
