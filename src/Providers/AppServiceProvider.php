@@ -105,9 +105,6 @@ class AppServiceProvider extends ServiceProvider
         $this->addAboutCommandInfo();
 
         $this->app->make(Schedule::class)->job(new HandleEntrySchedule)->everyMinute();
-
-        $this->app->instance('statamic.booted-addons', collect());
-        $this->app->instance('statamic.autoloaded-addon-classes', collect());
     }
 
     public function register()

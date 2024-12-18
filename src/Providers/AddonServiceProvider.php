@@ -189,9 +189,6 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        $this->bootedAddons = $this->app->make('statamic.booted-addons');
-        $this->autoloadedClasses = $this->app->make('statamic.autoloaded-addon-classes');
-
         Statamic::booted(function () {
             if (! $this->getAddon()) {
                 return;
@@ -225,7 +222,7 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootPublishAfterInstall()
                 ->bootAddon();
 
-            $this->bootedAddons[] = $this->getAddon()->id();
+            $this->bootedAddons()->push($this->getAddon()->id());
         });
     }
 
@@ -838,12 +835,12 @@ abstract class AddonServiceProvider extends ServiceProvider
                 continue;
             }
 
-            if ($this->autoloadedClasses->contains($fqcn)) {
+            if ($this->autoloadedClasses()->contains($fqcn)) {
                 continue;
             }
 
             $autoloadable[] = $fqcn;
-            $this->autoloadedClasses[] = $fqcn;
+            $this->autoloadedClasses()->push($fqcn);
         }
 
         return $autoloadable;
@@ -856,7 +853,7 @@ abstract class AddonServiceProvider extends ServiceProvider
         // We'll keep track of addons that have been booted to ensure that multiple
         // providers don't try to boot things twice. This could happen if there are
         // multiple providers in the root autoload directory (src) of an addon.
-        if ($this->bootedAddons->contains($addon->id())) {
+        if ($this->bootedAddons()->contains($addon->id())) {
             return false;
         }
 
@@ -868,5 +865,31 @@ abstract class AddonServiceProvider extends ServiceProvider
         $autoloadDir = $addon->directory().$addon->autoload();
 
         return $thisDir === $autoloadDir;
+    }
+
+    private function autoloadedClasses()
+    {
+        if ($this->autoloadedClasses) {
+            return $this->autoloadedClasses;
+        }
+
+        if (! $this->app->bound($autoloaded = 'statamic.autoloaded-addon-classes')) {
+            $this->app->instance($autoloaded, collect());
+        }
+
+        return $this->autoloadedClasses = $this->app->make($autoloaded);
+    }
+
+    private function bootedAddons()
+    {
+        if ($this->bootedAddons) {
+            return $this->bootedAddons;
+        }
+
+        if (! $this->app->bound($booted = 'statamic.booted-addons')) {
+            $this->app->instance($booted, collect());
+        }
+
+        return $this->bootedAddons = $this->app->make($booted);
     }
 }
