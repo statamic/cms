@@ -17,6 +17,7 @@ use Statamic\Extend\Manifest;
 use Statamic\Facades\Addon;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Fieldset;
+use Statamic\Facades\Path;
 use Statamic\Fields\Fieldtype;
 use Statamic\Forms\JsDrivers\JsDriver;
 use Statamic\Modifiers\Modifier;
@@ -860,6 +861,9 @@ abstract class AddonServiceProvider extends ServiceProvider
         // i.e. It's the "root" provider. If it's in a subdirectory maybe the developer
         // is organizing their providers. Things like tags etc. can be autoloaded but
         // root level things like routes, views, config, blueprints, etc. will not.
-        return dirname((new \ReflectionClass(static::class))->getFileName()) === $addon->directory().$addon->autoload();
+        $thisDir = Path::tidy(dirname((new \ReflectionClass(static::class))->getFileName()));
+        $autoloadDir = $addon->directory().$addon->autoload();
+
+        return $thisDir === $autoloadDir;
     }
 }
