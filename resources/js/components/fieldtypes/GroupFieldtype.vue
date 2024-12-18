@@ -91,7 +91,7 @@ export default {
         replicatorPreview() {
             if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
 
-            return this.previewText;
+            return replicatorPreviewHtml(this.previewText);
         },
         internalFieldActions() {
             return [
