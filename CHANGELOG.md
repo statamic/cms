@@ -1,5 +1,12 @@
 # Release Notes
 
+## 5.43.2 (2024-12-18)
+
+### What's fixed
+- Fix static properties in addon providers [#11283](https://github.com/statamic/cms/issues/11283) by @jasonvarga
+
+
+
 ## 5.43.1 (2024-12-18)
 
 ### What's fixed
