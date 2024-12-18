@@ -183,12 +183,15 @@ abstract class AddonServiceProvider extends ServiceProvider
      */
     protected $translations = true;
 
-    private static array $autoloaded = [];
+    private $autoloadedClasses;
 
-    private static array $bootedAddons = [];
+    private $bootedAddons;
 
     public function boot()
     {
+        $this->bootedAddons = $this->app->make('statamic.booted-addons');
+        $this->autoloadedClasses = $this->app->make('statamic.autoloaded-addon-classes');
+
         Statamic::booted(function () {
             if (! $this->getAddon()) {
                 return;
@@ -222,7 +225,7 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootPublishAfterInstall()
                 ->bootAddon();
 
-            static::$bootedAddons[] = $this->getAddon()->id();
+            $this->bootedAddons[] = $this->getAddon()->id();
         });
     }
 
@@ -835,12 +838,12 @@ abstract class AddonServiceProvider extends ServiceProvider
                 continue;
             }
 
-            if (in_array($fqcn, static::$autoloaded)) {
+            if ($this->autoloadedClasses->contains($fqcn)) {
                 continue;
             }
 
             $autoloadable[] = $fqcn;
-            static::$autoloaded[] = $fqcn;
+            $this->autoloadedClasses[] = $fqcn;
         }
 
         return $autoloadable;
@@ -853,7 +856,7 @@ abstract class AddonServiceProvider extends ServiceProvider
         // We'll keep track of addons that have been booted to ensure that multiple
         // providers don't try to boot things twice. This could happen if there are
         // multiple providers in the root autoload directory (src) of an addon.
-        if (in_array($addon->id(), static::$bootedAddons)) {
+        if ($this->bootedAddons->contains($addon->id())) {
             return false;
         }
 
