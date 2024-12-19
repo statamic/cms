@@ -227,6 +227,8 @@ export default {
             } else {
                 this.$toast.error(e || 'Something went wrong');
             }
+
+            this.saving = false;
         }
 
     }
