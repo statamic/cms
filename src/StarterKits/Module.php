@@ -35,6 +35,14 @@ abstract class Module
     }
 
     /**
+     * Get readable module key for default prompt display text.
+     */
+    public function keyReadable(): string
+    {
+        return str_replace(['_', '.'], ' ', $this->key);
+    }
+
+    /**
      * Check if this is a top level module.
      */
     public function isTopLevelModule(): bool

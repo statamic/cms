@@ -343,8 +343,7 @@ final class Installer
             $shouldPrompt = false;
         }
 
-        $name = str_replace(['_', '.'], ' ', $module->key());
-
+        $name = $module->keyReadable();
         $default = $module->config('default', false);
 
         if ($shouldPrompt && $this->isInteractive && ! confirm($module->config('prompt', "Would you like to install the [{$name}] module?"), $default)) {
@@ -369,7 +368,7 @@ final class Installer
             ->when($skipOptionLabel !== false, fn ($c) => $c->prepend($skipOptionLabel, $skipModuleValue))
             ->all();
 
-        $name = str_replace(['_', '.'], ' ', $module->key());
+        $name = $module->keyReadable();
 
         if ($this->isInteractive) {
             $choice = select(
