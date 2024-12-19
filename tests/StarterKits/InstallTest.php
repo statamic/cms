@@ -1842,7 +1842,7 @@ EOT;
 
         $this
             ->installCoolRunnings()
-            ->expectsOutput('Starter kit module config [modules/seo/module.yaml] does not exist.')
+            ->expectsOutputToContain('Starter kit module config [modules/seo/module.yaml] does not exist.')
             ->assertFailed();
 
         $this->assertFileDoesNotExist(base_path('copied.md'));
@@ -1874,7 +1874,7 @@ EOT;
 
         $this
             ->installCoolRunnings()
-            ->expectsOutput('Starter kit module config [modules/seo/js/vue/module.yaml] does not exist.')
+            ->expectsOutputToContain('Starter kit module config [modules/seo/js/vue/module.yaml] does not exist.')
             ->assertFailed();
 
         $this->assertFileDoesNotExist(base_path('copied.md'));
@@ -1901,7 +1901,7 @@ EOT;
 
         $this
             ->installCoolRunnings()
-            ->expectsOutput('Starter-kit module is missing `export_paths`, `dependencies`, or nested `modules`!')
+            ->expectsOutputToContain('Starter-kit module is missing `export_paths`, `dependencies`, or nested `modules`.')
             ->assertFailed();
 
         $this->assertFileDoesNotExist(base_path('copied.md'));

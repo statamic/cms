@@ -209,7 +209,7 @@ final class InstallableModule extends Module
     {
         $this
             ->installableFiles()
-            ->reject(fn ($path) => $this->files->exists($this->installableFilesPath($path)))
+            ->reject(fn ($to, $from) => $this->files->exists($from))
             ->each(function ($path) {
                 throw new StarterKitException("Starter kit path [{$path}] does not exist.");
             });

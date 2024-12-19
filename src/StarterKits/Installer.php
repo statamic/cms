@@ -16,7 +16,6 @@ use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
 use Statamic\StarterKits\Concerns\InteractsWithFilesystem;
 use Statamic\StarterKits\Exceptions\StarterKitException;
-use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
@@ -365,8 +364,8 @@ final class Installer
         $skipOptionLabel = $module->config('skip_option', 'No');
         $skipModuleValue = 'skip_module';
 
-        $options = collect($config['options'])
-            ->map(fn ($option, $optionKey) => Arr::get($option, 'label', ucfirst($optionKey)))
+        $options = collect($module->config('options'))
+            ->map(fn ($option, $optionKey) => $option->config('label', ucfirst($optionKey)))
             ->when($skipOptionLabel !== false, fn ($c) => $c->prepend($skipOptionLabel, $skipModuleValue))
             ->all();
 
@@ -374,11 +373,11 @@ final class Installer
 
         if ($this->isInteractive) {
             $choice = select(
-                label: Arr::get($config, 'prompt', "Would you like to install one of the following [{$name}] modules?"),
+                label: $module->config('prompt', "Would you like to install one of the following [{$name}] modules?"),
                 options: $options,
-                default: Arr::get($config, 'default'),
+                default: $module->config('default'),
             );
-        } elseif (! $this->isInteractive && ! $choice = Arr::get($config, 'default')) {
+        } elseif (! $this->isInteractive && ! $choice = $module->config('default')) {
             return false;
         }
 
