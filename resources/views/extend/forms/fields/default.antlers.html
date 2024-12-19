@@ -1,4 +1,5 @@
 <input
+    id="{{ id }}"
     type="{{ input_type ?? 'text' }}"
     name="{{ handle }}"
     value="{{ value }}"
@@ -6,4 +7,9 @@
     {{ if character_limit }}maxlength="{{ character_limit }}"{{ /if }}
     {{ if js_driver }}{{ js_attributes }}{{ /if }}
     {{ if validate|contains:required }}required{{ /if }}
+    {{ if error }}
+        aria-invalid="true" aria-describedby="{{ id }}-error"
+    {{ elseif instructions }}
+        aria-describedby="{{ id }}-instructions"
+    {{ /if }}
 >

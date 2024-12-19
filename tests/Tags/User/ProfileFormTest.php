@@ -74,8 +74,8 @@ EOT
         preg_match_all('/<label>.+<\/label><input.+>/U', $output, $actual);
 
         $expected = [
-            '<label>Name</label><input type="text" name="name" value="Test User">',
-            '<label>Email Address</label><input type="email" name="email" value="test@example.com">',
+            '<label>Name</label><input id="userprofile-form-name-field" type="text" name="name" value="Test User">',
+            '<label>Email Address</label><input id="userprofile-form-email-field" type="email" name="email" value="test@example.com">',
         ];
 
         $this->assertEquals($expected, $actual[0]);
@@ -103,10 +103,10 @@ EOT
         preg_match_all('/<label>.+<\/label><input.+>/U', $output, $actual);
 
         $expected = [
-            '<label>Full Name</label><input type="text" name="name" value="Test User">',
-            '<label>Email Address</label><input type="email" name="email" value="test@example.com">',
-            '<label>Phone Number</label><input type="text" name="phone" value="12345">',
-            '<label>Over 18 years of age?</label><input type="text" name="age" value="" required>',
+            '<label>Full Name</label><input id="userprofile-form-name-field" type="text" name="name" value="Test User">',
+            '<label>Email Address</label><input id="userprofile-form-email-field" type="email" name="email" value="test@example.com">',
+            '<label>Phone Number</label><input id="userprofile-form-phone-field" type="text" name="phone" value="12345">',
+            '<label>Over 18 years of age?</label><input id="userprofile-form-age-field" type="text" name="age" value="" required>',
         ];
 
         $this->assertEquals($expected, $actual[0]);
