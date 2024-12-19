@@ -50,7 +50,8 @@ class Exporter
             ->validateConfig()
             ->instantiateModules()
             ->clearExportPath()
-            ->exportModules()
+            ->exportInlineModules()
+            ->exportModulesFolder()
             ->exportPackage();
     }
 
@@ -159,13 +160,23 @@ class Exporter
     }
 
     /**
-     * Export all the modules.
+     * Export all inline modules.
      */
-    protected function exportModules(): self
+    protected function exportInlineModules(): self
     {
         $exportPath = $this->exportPath.'/export';
 
         $this->modules->each(fn ($module) => $module->export($exportPath));
+
+        return $this;
+    }
+
+    /**
+     * Export modules folder.
+     */
+    protected function exportModulesFolder(): self
+    {
+        $this->files->copyDirectory(base_path('modules'), "{$this->exportPath}/modules");
 
         return $this;
     }

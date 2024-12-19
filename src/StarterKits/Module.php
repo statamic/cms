@@ -35,6 +35,14 @@ abstract class Module
     }
 
     /**
+     * Get readable module key for default prompt display text.
+     */
+    public function keyReadable(): string
+    {
+        return str_replace(['_', '.'], ' ', $this->key);
+    }
+
+    /**
      * Check if this is a top level module.
      */
     public function isTopLevelModule(): bool
@@ -43,12 +51,22 @@ abstract class Module
     }
 
     /**
+     * Set config.
+     */
+    public function set(string $key, mixed $value): self
+    {
+        $this->config[$key] = $value;
+
+        return $this;
+    }
+
+    /**
      * Get module config.
      */
-    public function config(?string $key = null): mixed
+    public function config(?string $key = null, $default = null): mixed
     {
         if ($key) {
-            return $this->config->get($key);
+            return $this->config->get($key, $default);
         }
 
         return $this->config;
