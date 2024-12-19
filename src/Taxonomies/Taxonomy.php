@@ -81,6 +81,14 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
         return cp_route('taxonomies.show', $this->handle());
     }
 
+    public function breadcrumbUrl()
+    {
+        $referer = request()->header('referer');
+        $showUrl = $this->showUrl();
+
+        return $referer && Str::before($referer, '?') === $showUrl ? $referer : $showUrl;
+    }
+
     public function editUrl()
     {
         return cp_route('taxonomies.edit', $this->handle());
@@ -378,6 +386,10 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
         }
 
         if ($this->collection() && ! $this->collection()->sites()->contains($site)) {
+            throw new NotFoundHttpException;
+        }
+
+        if ($this->collection() && ! $this->collections()->contains($this->collection())) {
             throw new NotFoundHttpException;
         }
 

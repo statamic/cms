@@ -1,5 +1,68 @@
 # Release Notes
 
+## 5.44.0 (2024-12-18)
+
+### What's new
+- Static warm command will recheck whether page is cached when using queue [#11273](https://github.com/statamic/cms/issues/11273) by @arthurperton
+- Add `--max-requests` option to the static warm command [#11278](https://github.com/statamic/cms/issues/11278) by @arthurperton
+- Add formStackSize option for inline publish form stacks [#11274](https://github.com/statamic/cms/issues/11274) by @duncanmcclean
+
+### What's fixed
+- Fix addon service provider autoloading [#11285](https://github.com/statamic/cms/issues/11285) by @jasonvarga
+- Fix CP thumbnail placeholder [#11279](https://github.com/statamic/cms/issues/11279) by @duncanmcclean
+- Fix replicator preview for Group fields [#11280](https://github.com/statamic/cms/issues/11280) by @duncanmcclean
+
+
+
+## 5.43.2 (2024-12-18)
+
+### What's fixed
+- Fix static properties in addon providers [#11283](https://github.com/statamic/cms/issues/11283) by @jasonvarga
+
+
+
+## 5.43.1 (2024-12-18)
+
+### What's fixed
+- Fix autoload error on Windows [#11282](https://github.com/statamic/cms/issues/11282) by @jasonvarga
+- Improve starter kit installer error handling [#11281](https://github.com/statamic/cms/issues/11281) by @jesseleite
+
+
+
+## 5.43.0 (2024-12-17)
+
+### What's new
+- Add filters from collection/taxonomy list to breadcrumb back link [#11243](https://github.com/statamic/cms/issues/11243) by @florianbrinkmann
+- OAuth: option not to create or update user during authentication [#10853](https://github.com/statamic/cms/issues/10853) by @miloslavkostir
+- Add some options to the static warm command to limit the number of requests [#11258](https://github.com/statamic/cms/issues/11258) by @arthurperton
+- Table Fieldtype: Add `max_columns` and `max_rows` options [#11224](https://github.com/statamic/cms/issues/11224) by @duncanmcclean
+
+### What's fixed
+- Handle hidden fields on nav page edit form [#11272](https://github.com/statamic/cms/issues/11272) by @duncanmcclean
+- Support Laravel Prompts 0.3+ [#11267](https://github.com/statamic/cms/issues/11267) by @duncanmcclean
+- Update `embed_url` and `trackable_embed_url` modifiers to be valid with additional query strings [#11265](https://github.com/statamic/cms/issues/11265) by @martyf
+- Fix term filter on entries listing [#11268](https://github.com/statamic/cms/issues/11268) by @duncanmcclean
+- Prevent "Set Alt" button from running Replace Asset action prematurely [#11269](https://github.com/statamic/cms/issues/11269) by @duncanmcclean
+- Fix autoloading when addon has multiple service providers [#11128](https://github.com/statamic/cms/issues/11128) by @duncanmcclean
+- Fix ButtonGroup not showing active state if value are numbers [#10916](https://github.com/statamic/cms/issues/10916) by @morhi
+- Support glide urls with URL params [#11003](https://github.com/statamic/cms/issues/11003) by @ryanmitchell
+- Throw 404 on collection routes if taxonomy isn’t assigned to collection [#10438](https://github.com/statamic/cms/issues/10438) by @aerni
+- Move bard source button into field actions [#11250](https://github.com/statamic/cms/issues/11250) by @jasonvarga
+- Fix collection title format when using translations [#11248](https://github.com/statamic/cms/issues/11248) by @ajnsn
+- Bump nanoid from 3.3.6 to 3.3.8 [#11251](https://github.com/statamic/cms/issues/11251) by @dependabot
+
+
+
+## 5.42.1 (2024-12-11)
+
+### What's fixed
+- Fix asset upload concurrency on folder upload [#11225](https://github.com/statamic/cms/issues/11225) by @daun
+- Fix subdirectory autodiscovery on Windows [#11246](https://github.com/statamic/cms/issues/11246) by @jasonvarga
+- Fix type error in `HandleEntrySchedule` job [#11244](https://github.com/statamic/cms/issues/11244) by @duncanmcclean
+- Fix `no_results` cascade [#11234](https://github.com/statamic/cms/issues/11234) by @JohnathonKoster
+
+
+
 ## 5.42.0 (2024-12-05)
 
 ### What's new
