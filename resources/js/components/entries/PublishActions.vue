@@ -229,6 +229,8 @@ export default {
             }
 
             this.saving = false;
+
+            this.$progress.complete()
         }
 
     }
