@@ -229,8 +229,7 @@ export default {
             }
 
             this.saving = false;
-
-            this.$progress.complete()
+            this.$emit('failed');
         }
 
     }
