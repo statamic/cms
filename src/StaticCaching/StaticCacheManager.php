@@ -101,6 +101,11 @@ class StaticCacheManager extends Manager
         $this->cacheStore()->forget('nocache::urls');
     }
 
+    public function csrfTokenJs(string $js)
+    {
+        $this->fileDriver()->setCsrfTokenJs($js);
+    }
+
     public function nocacheJs(string $js)
     {
         $this->fileDriver()->setNocacheJs($js);
