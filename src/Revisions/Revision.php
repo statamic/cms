@@ -6,6 +6,8 @@ use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Contracts\Auth\User;
 use Statamic\Contracts\Revisions\Revision as Contract;
 use Statamic\Data\ExistsAsFile;
+use Statamic\Data\TracksQueriedColumns;
+use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\RevisionDeleted;
 use Statamic\Events\RevisionSaved;
 use Statamic\Events\RevisionSaving;
@@ -15,7 +17,7 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Revision implements Arrayable, Contract
 {
-    use ExistsAsFile, FluentlyGetsAndSets;
+    use ExistsAsFile, FluentlyGetsAndSets, TracksQueriedColumns, TracksQueriedRelations;
 
     protected $id;
     protected $key;
