@@ -74,6 +74,10 @@ abstract class Module
 
     /**
      * Get `export_as` paths (to be renamed on install) as collection from config.
+     *
+     * This is only here for backwards compatibility. Use new `export` folder convention instead.
+     *
+     * @deprecated
      */
     protected function exportAsPaths(): Collection
     {
@@ -94,7 +98,7 @@ abstract class Module
             || $this->config()->has('modules');
 
         if (! $hasConfig) {
-            throw new StarterKitException('Starter-kit module is missing `export_paths`, `dependencies`, or nested `modules`!');
+            throw new StarterKitException('Starter-kit module is missing `export_paths`, `dependencies`, or nested `modules`.');
         }
 
         return $this;

@@ -1,5 +1,7 @@
 <?php
 
+namespace Tests\Validation;
+
 use Illuminate\Support\Facades\Validator;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\User;

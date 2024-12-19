@@ -43,6 +43,7 @@
             :single-tab="!useTabs"
             :initial-tabs="tabs"
             :errors="errors.tabs"
+            :can-define-localizable="canDefineLocalizable"
             @updated="tabsUpdated"
         />
 
@@ -53,10 +54,11 @@
 <script>
 import SuggestsConditionalFields from './SuggestsConditionalFields';
 import Tabs from './Tabs.vue';
+import CanDefineLocalizable from "../fields/CanDefineLocalizable";
 
 export default {
 
-    mixins: [SuggestsConditionalFields],
+    mixins: [SuggestsConditionalFields, CanDefineLocalizable],
 
     components: {
         Tabs,

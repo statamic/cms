@@ -8,6 +8,7 @@ return [
     'array.config.keys' => 'Définissez les clés du tableau (les variables) et leurs étiquettes facultatives.',
     'array.config.mode' => 'Le mode dynamique donne à l’utilisateur le contrôle des données, contrairement au mode à clé.',
     'array.title' => 'Array',
+    'asset_folders.config.container' => 'Choisir le conteneur de ressources à utiliser pour ce champ.',
     'assets.config.allow_uploads' => 'Autorisez le téléversement de nouveaux fichiers.',
     'assets.config.container' => 'Choisissez quel conteneur de ressources à utiliser pour ce champ.',
     'assets.config.dynamic' => 'Les ressources seront placées dans un sous-dossier qui prend en compte la valeur de ce champ.',
