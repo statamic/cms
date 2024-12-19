@@ -1,5 +1,19 @@
 # Release Notes
 
+## 5.44.0 (2024-12-18)
+
+### What's new
+- Static warm command will recheck whether page is cached when using queue [#11273](https://github.com/statamic/cms/issues/11273) by @arthurperton
+- Add `--max-requests` option to the static warm command [#11278](https://github.com/statamic/cms/issues/11278) by @arthurperton
+- Add formStackSize option for inline publish form stacks [#11274](https://github.com/statamic/cms/issues/11274) by @duncanmcclean
+
+### What's fixed
+- Fix addon service provider autoloading [#11285](https://github.com/statamic/cms/issues/11285) by @jasonvarga
+- Fix CP thumbnail placeholder [#11279](https://github.com/statamic/cms/issues/11279) by @duncanmcclean
+- Fix replicator preview for Group fields [#11280](https://github.com/statamic/cms/issues/11280) by @duncanmcclean
+
+
+
 ## 5.43.2 (2024-12-18)
 
 ### What's fixed
