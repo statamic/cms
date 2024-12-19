@@ -180,7 +180,7 @@ trait RendersForms
     /**
      * Generate a field id to associate input with label.
      */
-    protected function generateFieldId(string $fieldHandle, ?string $formName = null): string
+    private function generateFieldId(string $fieldHandle, ?string $formName = null): string
     {
         return ($formName ?? 'default').'-form-'.$fieldHandle.'-field';
     }
