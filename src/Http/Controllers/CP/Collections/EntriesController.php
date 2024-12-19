@@ -262,7 +262,8 @@ class EntriesController extends CpController
                 ->save();
 
             // catch any changes through RevisionSaving event
-            $entry = $entry->fromWorkingCopy();
+            // have to save in case there are non-revisable fields
+            $entry = tap($entry->fromWorkingCopy())->save();
         } else {
             if (! $entry->revisionsEnabled() && User::current()->can('publish', $entry)) {
                 $entry->published($request->published);
