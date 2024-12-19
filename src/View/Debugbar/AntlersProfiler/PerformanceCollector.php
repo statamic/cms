@@ -75,6 +75,10 @@ class PerformanceCollector extends DataCollector implements AssetProvider, Rende
      */
     protected function replaceSitesPath($filePath)
     {
+        if (! config('debugbar.remote_sites_path')) {
+            return $filePath;
+        }
+
         return str_replace(config('debugbar.remote_sites_path'), config('debugbar.local_sites_path'), $filePath);
     }
 

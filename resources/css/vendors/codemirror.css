@@ -270,6 +270,8 @@
 
   .CodeMirror-widget {}
 
+  .CodeMirror-rtl pre { direction: ltr; }
+
   .CodeMirror-code {
     outline: none;
   }
@@ -340,7 +342,7 @@
 
 
   .CodeMirror-fullscreen {
-      @apply fixed h-auto inset-0 top-12 rounded-none;
+      @apply fixed h-auto inset-0 pt-14 rounded-none;
   }
 
   .CodeMirror-rulers {

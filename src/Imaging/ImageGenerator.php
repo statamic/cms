@@ -119,12 +119,13 @@ class ImageGenerator
         $this->setParams($params);
 
         $parsed = $this->parseUrl($url);
+        $qs = $parsed['query'];
 
         $this->server->setSource($this->guzzleSourceFilesystem($parsed['base']));
         $this->server->setSourcePathPrefix('/');
         $this->server->setCachePathPrefix('http');
 
-        return $this->generate($parsed['path']);
+        return $this->generate($parsed['path'].($qs ? '?'.$qs : ''));
     }
 
     /**
@@ -330,6 +331,7 @@ class ImageGenerator
         return [
             'path' => Str::after($parsed['path'], '/'),
             'base' => $parsed['scheme'].'://'.$parsed['host'],
+            'query' => $parsed['query'] ?? null,
         ];
     }
 }

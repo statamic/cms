@@ -34,6 +34,7 @@
         <td class="w-24" v-if="showSetAlt">
             <button
                 class="asset-set-alt text-blue dark:text-dark-blue-100 px-4 text-sm hover:text-black dark:hover:text-dark-100"
+                type="button"
                 @click="editOrOpen"
                 v-if="needsAlt"
             >
