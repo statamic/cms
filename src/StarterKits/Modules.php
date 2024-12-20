@@ -174,7 +174,7 @@ abstract class Modules
      */
     protected function relativeModulePath(string $key, ?string $path = null): string
     {
-        $base = 'modules/'.str_replace('.', '/', $key);
+        $base = Str::ensureLeft(str_replace('.', '/', $key), 'modules/');
 
         return $path
             ? $base.Str::ensureLeft($path, '/')
