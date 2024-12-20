@@ -5,10 +5,13 @@ namespace Tests\Tags\Form;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Testing\Assert as PHPUnit;
+use Illuminate\Testing\Constraints\SeeInOrder;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Form;
+use Statamic\Forms\FieldsVariable;
 use Statamic\Statamic;
 
 class FormCreateTest extends FormTestCase
@@ -72,6 +75,26 @@ EOT
         preg_match_all('/<label>(.+)<\/label>/U', $output, $fieldOrder);
 
         $this->assertEquals(['Full Name', 'Email Address', 'Message'], $fieldOrder[1]);
+    }
+
+    #[Test]
+    public function it_dynamically_renders_fields_view_using_single_tag()
+    {
+        $output = $this->normalizeHtml($this->tag(<<<'EOT'
+{{ form:contact }}
+    {{ fields }}
+{{ /form:contact }}
+EOT
+        ));
+
+        PHPUnit::assertThat([
+            '<label for="contact-form-name-field">Full Name </label>',
+            '<input id="contact-form-name-field" type="text" name="name" value="">',
+            '<label for="contact-form-email-field">Email Address <sup aria-label="Required">*</sup></label>',
+            '<input id="contact-form-email-field" type="email" name="email" value="" required>',
+            '<label for="contact-form-message-field">Message<sup aria-label="Required">*</sup></label>',
+            '<textarea id="contact-form-message-field" name="message" rows="5" required></textarea>',
+        ], new SeeInOrder($output));
     }
 
     #[Test]
@@ -504,20 +527,20 @@ EOT
         $output = $this->normalizeHtml($this->tag(<<<'EOT'
 {{ form:survey }}
     {{ sections }}
-        <div class="section">{{ if display}}{{ display }} - {{ /if }}{{ if instructions }}{{ instructions }} - {{ /if }}{{ fields | pluck('handle') | join(',') }}</div>
+        <div class="section">{{ if display}}{{ display }} - {{ /if }}{{ if instructions }}{{ instructions }} - {{ /if }}{{ fields }}[{{ handle }}]{{ /fields }}</div>
     {{ /sections }}
-    <div class="fields">{{ fields | pluck('handle') | join(',') }}</div>
+    <div class="fields">{{ fields }}[{{ handle }}]{{ /fields }}</div>
 {{ /form:survey }}
 EOT
         ));
 
-        $this->assertStringContainsString('<div class="section">One - One Instructions - alpha,bravo</div>', $output);
-        $this->assertStringContainsString('<div class="section">Two - Two Instructions - charlie,delta</div>', $output);
-        $this->assertStringContainsString('<div class="section">echo,fox</div>', $output);
+        $this->assertStringContainsString('<div class="section">One - One Instructions - [alpha][bravo]</div>', $output);
+        $this->assertStringContainsString('<div class="section">Two - Two Instructions - [charlie][delta]</div>', $output);
+        $this->assertStringContainsString('<div class="section">[echo][fox]</div>', $output);
 
         // Even though the fields are all nested within sections,
         // we should still be able to get them via `{{ fields }}` array at top level...
-        $this->assertStringContainsString('<div class="fields">alpha,bravo,charlie,delta,echo,fox</div>', $output);
+        $this->assertStringContainsString('<div class="fields">[alpha][bravo][charlie][delta][echo][fox]</div>', $output);
     }
 
     #[Test]
@@ -835,7 +858,7 @@ EOT
         $this->assertArrayHasKey('_token', $form['params']);
 
         $this->assertIsArray($form['errors']);
-        $this->assertIsArray($form['fields']);
+        $this->assertInstanceOf(FieldsVariable::class, $form['fields']);
 
         $this->assertEquals($form['honeypot'], 'winnie');
         $this->assertEquals($form['js_driver'], 'alpine');
