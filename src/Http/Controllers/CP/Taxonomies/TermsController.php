@@ -200,6 +200,9 @@ class TermsController extends CpController
                 ->makeWorkingCopy()
                 ->user(User::current())
                 ->save();
+
+            // have to save in case there are non-revisable fields
+            $term = tap($term->fromWorkingCopy())->save();
         } else {
             if (! $term->revisionsEnabled()) {
                 $term->published($request->published);
