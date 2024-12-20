@@ -108,12 +108,13 @@ abstract class Module
      *
      * @throws StarterKitException
      */
-    protected function ensureModuleConfigNotEmpty(): self
+    protected function ensureModuleConfigNotEmpty(): static
     {
         $hasConfig = $this->config()->has('export_paths')
             || $this->config()->has('export_as')
             || $this->config()->has('dependencies')
             || $this->config()->has('dependencies_dev')
+            || $this->config()->has('options')
             || $this->config()->has('modules');
 
         if (! $hasConfig) {

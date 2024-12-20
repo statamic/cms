@@ -50,8 +50,7 @@ class Exporter
             ->validateConfig()
             ->instantiateModules()
             ->clearExportPath()
-            ->exportInlineModules()
-            ->exportModulesFolder()
+            ->exportModules()
             ->exportPackage();
     }
 
@@ -84,65 +83,21 @@ class Exporter
     }
 
     /**
-     * Instantiate and validate modules that are to be installed.
+     * Instantiate and prepare flattened modules that are to be exported.
      */
     protected function instantiateModules(): self
     {
-        $this->modules = collect(['top_level' => $this->config()->all()])
-            ->map(fn ($config, $key) => $this->instantiateModuleRecursively($config, $key))
-            ->flatten()
-            ->filter()
+        ray('instantiating')->purple();
+        $this->modules = (new ExportableModules($this->config(), $this->exportPath))
+            ->instantiate()
+            ->all()
+            ->pipe(fn ($module) => ExportableModules::flattenModules($module))
             ->each(fn ($module) => $module->validate());
+        ray('instantiated')->purple();
+
+        ray($this->modules)->purple();
 
         return $this;
-    }
-
-    /**
-     * Instantiate module and check if nested modules should be recursively instantiated.
-     */
-    protected function instantiateModuleRecursively(array $config, string $key): ExportableModule|array
-    {
-        $instantiated = new ExportableModule($config, $key);
-
-        if ($modules = Arr::get($config, 'modules')) {
-            $instantiated = collect($modules)
-                ->map(fn ($config, $childKey) => $this->instantiateModule($config, $this->normalizeModuleKey($key, $childKey)))
-                ->prepend($instantiated, $key)
-                ->filter()
-                ->all();
-        }
-
-        return $instantiated;
-    }
-
-    /**
-     * Instantiate individual module.
-     */
-    protected function instantiateModule(array $config, string $key): ExportableModule|array
-    {
-        if (Arr::has($config, 'options') && $key !== 'top_level') {
-            return $this->instantiateSelectModule($config, $key);
-        }
-
-        return $this->instantiateModuleRecursively($config, $key);
-    }
-
-    /**
-     * Instantiate select module.
-     */
-    protected function instantiateSelectModule(array $config, string $key): ExportableModule|array
-    {
-        return collect($config['options'])
-            ->map(fn ($option, $optionKey) => $this->instantiateModuleRecursively($option, "{$key}.options.{$optionKey}"))
-            ->all();
-    }
-
-    /**
-     * Normalize module key, as dotted array key for location in starter-kit.yaml.
-     */
-    protected function normalizeModuleKey(string $key, string $childKey): string
-    {
-        return $key !== 'top_level' ? "{$key}.modules.{$childKey}" : $childKey;
     }
 
     /**
@@ -162,21 +117,9 @@ class Exporter
     /**
      * Export all inline modules.
      */
-    protected function exportInlineModules(): self
+    protected function exportModules(): self
     {
-        $exportPath = $this->exportPath.'/export';
-
-        $this->modules->each(fn ($module) => $module->export($exportPath));
-
-        return $this;
-    }
-
-    /**
-     * Export modules folder.
-     */
-    protected function exportModulesFolder(): self
-    {
-        $this->files->copyDirectory(base_path('modules'), "{$this->exportPath}/modules");
+        $this->modules->each(fn ($module) => $module->export($this->exportPath.'/export'));
 
         return $this;
     }
@@ -213,6 +156,10 @@ class Exporter
         $config = $this->config()->all();
 
         $normalizedModuleKeyOrder = [
+            'prompt',
+            'label',
+            'skip_option',
+            'options',
             'export_paths',
             'export_as',
             'dependencies',
@@ -250,7 +197,7 @@ class Exporter
             return $key;
         }
 
-        return 'modules.'.$module->key().'.'.$key;
+        return $module->key().'.'.$key;
     }
 
     /**
