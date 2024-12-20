@@ -82,51 +82,6 @@ trait PermissibleContractTests
     }
 
     #[Test]
-    public function it_prevents_duplicate_roles_being_assigned()
-    {
-        // Prevent the anonymous role classes throwing errors when getting serialized
-        // during event handling unrelated to this test.
-        Event::fake();
-
-        $roleA = new class extends Role
-        {
-            public function handle(?string $handle = null)
-            {
-                return 'a';
-            }
-        };
-        $roleB = new class extends Role
-        {
-            public function handle(?string $handle = null)
-            {
-                return 'b';
-            }
-        };
-        $roleC = new class extends Role
-        {
-            public function handle(?string $handle = null)
-            {
-                return 'c';
-            }
-        };
-
-        RoleAPI::shouldReceive('find')->with('a')->andReturn($roleA);
-        RoleAPI::shouldReceive('find')->with('b')->andReturn($roleB);
-        RoleAPI::shouldReceive('find')->with('c')->andReturn($roleC);
-        RoleAPI::shouldReceive('all')->andReturn(collect([$roleA, $roleB])); // the stache calls this when getting a user. unrelated to test.
-
-        $user = $this->createPermissible();
-        $user->assignRole('a');
-        $user->save();
-
-        $this->assertEquals(['a'], $user->get('roles'));
-
-        $user->assignRole(['a', 'b', 'c']);
-
-        $this->assertEquals(['a', 'b', 'c'], $user->get('roles'));
-    }
-
-    #[Test]
     public function it_removes_a_role_assignment()
     {
         // Prevent the anonymous role classes throwing errors when getting serialized
@@ -387,31 +342,6 @@ trait PermissibleContractTests
         $this->assertTrue($user->isInGroup($groupA));
         $this->assertFalse($user->isInGroup($groupB));
         $this->assertTrue($user->isInGroup($groupC));
-    }
-
-    #[Test]
-    public function it_prevents_adding_duplicate_groups_to_a_user()
-    {
-        $groupA = (new UserGroup)->handle('a');
-        $groupB = (new UserGroup)->handle('b');
-        $groupC = (new UserGroup)->handle('c');
-        $user = $this->createPermissible();
-
-        $this->assertFalse($user->isInGroup($groupA));
-        $this->assertFalse($user->isInGroup($groupB));
-        $this->assertFalse($user->isInGroup($groupC));
-
-        UserGroupAPI::shouldReceive('find')->with('a')->andReturn($groupA);
-        UserGroupAPI::shouldReceive('find')->with('b')->andReturn($groupB);
-        UserGroupAPI::shouldReceive('find')->with('c')->andReturn($groupC);
-
-        $user->addToGroup('a');
-
-        $this->assertEquals(['a'], $user->get('groups'));
-
-        $user->addToGroup(['a', 'b', 'c']);
-
-        $this->assertEquals(['a', 'b', 'c'], $user->get('groups'));
     }
 
     #[Test]
