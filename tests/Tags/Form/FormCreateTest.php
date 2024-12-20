@@ -5,6 +5,8 @@ namespace Tests\Tags\Form;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Testing\Assert as PHPUnit;
+use Illuminate\Testing\Constraints\SeeInOrder;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\AssetContainer;
@@ -73,6 +75,26 @@ EOT
         preg_match_all('/<label>(.+)<\/label>/U', $output, $fieldOrder);
 
         $this->assertEquals(['Full Name', 'Email Address', 'Message'], $fieldOrder[1]);
+    }
+
+    #[Test]
+    public function it_dynamically_renders_fields_view_using_single_tag()
+    {
+        $output = $this->normalizeHtml($this->tag(<<<'EOT'
+{{ form:contact }}
+    {{ fields }}
+{{ /form:contact }}
+EOT
+        ));
+
+        PHPUnit::assertThat([
+            '<label for="contact-form-name-field">Full Name </label>',
+            '<input id="contact-form-name-field" type="text" name="name" value="">',
+            '<label for="contact-form-email-field">Email Address <sup aria-label="Required">*</sup></label>',
+            '<input id="contact-form-email-field" type="email" name="email" value="" required>',
+            '<label for="contact-form-message-field">Message<sup aria-label="Required">*</sup></label>',
+            '<textarea id="contact-form-message-field" name="message" rows="5" required></textarea>',
+        ], new SeeInOrder($output));
     }
 
     #[Test]
