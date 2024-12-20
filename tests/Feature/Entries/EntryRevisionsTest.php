@@ -135,7 +135,7 @@ class EntryRevisionsTest extends TestCase
                 'blueprint' => 'test',
                 'title' => 'Title',
                 'foo' => 'bar',
-                'bar' => 'foo'
+                'bar' => 'foo',
             ])->create();
 
         tap($entry->makeWorkingCopy(), function ($copy) {
@@ -210,7 +210,7 @@ class EntryRevisionsTest extends TestCase
                 'blueprint' => 'test',
                 'title' => 'Title',
                 'foo' => 'bar',
-                'bar' => 'foo'
+                'bar' => 'foo',
             ])->create();
 
         $this->assertTrue($entry->published());
@@ -274,7 +274,7 @@ class EntryRevisionsTest extends TestCase
                 'blueprint' => 'test',
                 'title' => 'Title',
                 'foo' => 'bar',
-                'bar' => 'foo'
+                'bar' => 'foo',
             ])->create();
 
         tap($entry->makeWorkingCopy(), function ($copy) {
@@ -296,7 +296,7 @@ class EntryRevisionsTest extends TestCase
             'blueprint' => 'test',
             'title' => 'Title',
             'foo' => 'bar',
-            'bar' => 'foo'
+            'bar' => 'foo',
         ], $entry->data()->all());
         $this->assertFalse($entry->published());
         $this->assertCount(1, $entry->revisions());
