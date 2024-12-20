@@ -13,6 +13,7 @@ abstract class Module
     protected $files;
     protected $config;
     protected $key;
+    protected $relativePath;
 
     /**
      * Instantiate starter kit module.
@@ -24,6 +25,16 @@ abstract class Module
         $this->config = collect($config);
 
         $this->key = $key;
+    }
+
+    /**
+     * Set relative module path.
+     */
+    public function setRelativePath(string $path): self
+    {
+        $this->relativePath = $path;
+
+        return $this;
     }
 
     /**

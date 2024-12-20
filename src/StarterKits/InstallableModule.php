@@ -13,7 +13,6 @@ use Statamic\Support\Str;
 final class InstallableModule extends Module
 {
     protected $installer;
-    protected $relativePath;
 
     /**
      * Set installer instance.
@@ -23,16 +22,6 @@ final class InstallableModule extends Module
     public function installer(?Installer $installer): self
     {
         $this->installer = $installer;
-
-        return $this;
-    }
-
-    /**
-     * Set relative module path.
-     */
-    public function setRelativePath(string $path): self
-    {
-        $this->relativePath = $path;
 
         return $this;
     }
