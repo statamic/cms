@@ -6,8 +6,11 @@
                 <sup aria-label="{{ trans:Required }}">*</sup>
             {{ /if }}
         </label>
-        <div class="p-2">{{ field }}</div>
-        {{ if instructions }}
+        {{ if instructions && instructions_position == "above" }}
+            <p class="text-gray-500" id="{{ id }}-instructions">{{ instructions }}</p>
+        {{ /if }}
+        <div class="py-2">{{ field }}</div>
+        {{ if instructions && instructions_position == "below" }}
             <p class="text-gray-500" id="{{ id }}-instructions">{{ instructions }}</p>
         {{ /if }}
         {{ if error }}
