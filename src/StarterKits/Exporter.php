@@ -87,15 +87,11 @@ class Exporter
      */
     protected function instantiateModules(): self
     {
-        ray('instantiating')->purple();
         $this->modules = (new ExportableModules($this->config(), $this->exportPath))
             ->instantiate()
             ->all()
             ->pipe(fn ($module) => ExportableModules::flattenModules($module))
             ->each(fn ($module) => $module->validate());
-        ray('instantiated')->purple();
-
-        ray($this->modules)->purple();
 
         return $this;
     }
