@@ -31,6 +31,7 @@
                     :sort-column="sortColumn"
                     :sort-direction="sortDirection"
                     @selections-updated="(ids) => $emit('selections-updated', ids)"
+                    @visible-columns-updated="visibleColumns = $event"
                 >
                     <div slot-scope="{ filteredRows: rows }" :class="modeClass">
                         <div class="card overflow-hidden p-0" :class="{ 'select-none' : shifting }">
@@ -58,6 +59,7 @@
                                         </button>
                                     </div>
 
+                                    <data-list-column-picker class="rtl:mr-3 ltr:ml-3" :preferences-key="preferencesKey('columns')" :disabled="mode !== 'table'" />
                                 </div>
 
                                 <breadcrumbs v-if="!restrictFolderNavigation" :path="path" @navigated="selectFolder" />
@@ -102,14 +104,15 @@
                                     </tr>
                                     <tr v-for="(folder, i) in folders" :key="folder.path" v-if="!restrictFolderNavigation">
                                         <td />
-                                        <td @click="selectFolder(folder.path)">
-                                            <a class="flex items-center cursor-pointer group">
-                                                <file-icon extension="folder" class="w-8 h-8 rtl:ml-2 ltr:mr-2 inline-block text-blue-400 group-hover:text-blue" />
-                                                {{ folder.basename }}
-                                            </a>
+
+                                        <td v-for="column in visibleColumns">
+                                            <template v-if="column.field === 'basename'">
+                                                <a class="w-full flex items-center cursor-pointer group" @click="selectFolder(folder.path)">
+                                                    <file-icon extension="folder" class="w-8 h-8 rtl:ml-2 ltr:mr-2 inline-block text-blue-400 group-hover:text-blue" />
+                                                    {{ folder.basename }}
+                                                </a>
+                                            </template>
                                         </td>
-                                        <td />
-                                        <td />
 
                                         <th class="actions-column" :colspan="columns.length">
                                             <dropdown-list placement="left-start" v-if="folderActions(folder).length">
@@ -319,16 +322,17 @@ export default {
         initialEditingAssetId: String,
         autoselectUploads: Boolean,
         autofocusSearch: Boolean,
-        allowSelectingExistingUpload: Boolean
+        allowSelectingExistingUpload: Boolean,
+        initialColumns: {
+            type: Array,
+            default: () => [],
+        },
     },
 
     data() {
         return {
-            columns: [
-                { label: __('File'), field: 'basename', visible: true, sortable: true },
-                { label: __('Size'), field: 'size', value: 'size_formatted', visible: true, sortable: true },
-                { label: __('Last Modified'), field: 'last_modified', value: 'last_modified_relative', visible: true, sortable: true },
-            ],
+            columns: this.initialColumns,
+            visibleColumns: this.initialColumns.filter(column => column.visible),
             containers: [],
             container: {},
             initializing: true,
@@ -391,7 +395,20 @@ export default {
                 order: this.sortDirection,
                 search: this.searchQuery,
                 queryScopes: this.queryScopes,
+                columns: this.visibleColumnParameters,
             }
+        },
+
+        visibleColumnParameters: {
+            get() {
+                if (_.isEmpty(this.visibleColumns)) {
+                    return null;
+                }
+                return this.visibleColumns.map(column => column.field).join(',');
+            },
+            set(value) {
+                this.visibleColumns = value.split(',').map(field => this.columns.find(column => column.field === field));
+            },
         },
 
         hasMaxFiles() {
@@ -420,7 +437,11 @@ export default {
 
         modeClass() {
             return 'mode-' + this.mode;
-        }
+        },
+
+        columnShowing(column) {
+            return this.visibleColumns.find(c => c.field === column);
+        },
 
     },
 
@@ -516,6 +537,7 @@ export default {
                 const data = response.data;
                 this.assets = data.data.assets;
                 this.meta = data.meta;
+                this.columns = data.meta.columns;
 
                 if (this.searchQuery) {
                     this.folder = null;
