@@ -125,7 +125,7 @@ return [
 
     'nocache' => 'cache',
 
-    'nocache_js_position' => 'body',
+    'decouple_nocache_scripts' => false,
 
     /*
     |--------------------------------------------------------------------------
