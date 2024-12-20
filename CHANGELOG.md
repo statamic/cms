@@ -1,5 +1,17 @@
 # Release Notes
 
+## 5.45.0 (2024-12-20)
+
+### What's new
+- Allow form fields view to be rendered with single tag [#11293](https://github.com/statamic/cms/issues/11293) by @jasonvarga
+- Improve form field accessibility [#10993](https://github.com/statamic/cms/issues/10993) by @daun
+
+### What's fixed
+- Prevent duplicate roles & groups [#11270](https://github.com/statamic/cms/issues/11270) by @duncanmcclean
+- Improve error handling when using entry publish actions [#11289](https://github.com/statamic/cms/issues/11289) by @ryanmitchell
+
+
+
 ## 5.44.0 (2024-12-18)
 
 ### What's new
