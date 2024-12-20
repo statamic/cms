@@ -175,6 +175,7 @@ class User extends BaseUser
             ->merge(Arr::wrap($role))
             ->map(fn ($role) => is_string($role) ? $role : $role->handle())
             ->unique()
+            ->values()
             ->all();
 
         $this->set('roles', $roles);
@@ -204,6 +205,7 @@ class User extends BaseUser
             ->merge(Arr::wrap($group))
             ->map(fn ($group) => is_string($group) ? $group : $group->handle())
             ->unique()
+            ->values()
             ->all();
 
         $this->set('groups', $groups);
