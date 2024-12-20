@@ -1894,7 +1894,7 @@ EOT;
             config: [
                 'prompt' => false,
                 // no installable config!
-            ]
+            ],
         );
 
         $this->assertFileDoesNotExist(base_path('copied.md'));
