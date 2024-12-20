@@ -358,6 +358,80 @@ class SubmissionQueryBuilderTest extends TestCase
     }
 
     #[Test]
+    public function submissions_are_found_using_where_json_overlaps()
+    {
+        $form = tap(Form::make('test'))->save();
+        FormSubmission::make()->form($form)->data(['id' => '1', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->save();
+        FormSubmission::make()->form($form)->data(['id' => '2', 'test_taxonomy' => ['taxonomy-3']])->save();
+        FormSubmission::make()->form($form)->data(['id' => '3', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->save();
+        FormSubmission::make()->form($form)->data(['id' => '4', 'test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->save();
+        FormSubmission::make()->form($form)->data(['id' => '5', 'test_taxonomy' => ['taxonomy-5']])->save();
+
+        $entries = FormSubmission::query()->whereJsonOverlaps('test_taxonomy', ['taxonomy-1', 'taxonomy-5'])->get();
+
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['1', '3', '5'], $entries->map->get('id')->all());
+
+        $entries = FormSubmission::query()->whereJsonOverlaps('test_taxonomy', 'taxonomy-1')->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['1', '3'], $entries->map->get('id')->all());
+    }
+
+    #[Test]
+    public function submissions_are_found_using_where_json_doesnt_overlap()
+    {
+        $form = tap(Form::make('test'))->save();
+        FormSubmission::make()->form($form)->data(['id' => '1', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->save();
+        FormSubmission::make()->form($form)->data(['id' => '2', 'test_taxonomy' => ['taxonomy-3']])->save();
+        FormSubmission::make()->form($form)->data(['id' => '3', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->save();
+        FormSubmission::make()->form($form)->data(['id' => '4', 'test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->save();
+        FormSubmission::make()->form($form)->data(['id' => '5', 'test_taxonomy' => ['taxonomy-5']])->save();
+
+        $entries = FormSubmission::query()->whereJsonDoesntOverlap('test_taxonomy', ['taxonomy-1'])->get();
+
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['2', '4', '5'], $entries->map->get('id')->all());
+
+        $entries = FormSubmission::query()->whereJsonDoesntOverlap('test_taxonomy', 'taxonomy-1')->get();
+
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['2', '4', '5'], $entries->map->get('id')->all());
+    }
+
+    #[Test]
+    public function submissions_are_found_using_or_where_json_overlaps()
+    {
+        $form = tap(Form::make('test'))->save();
+        FormSubmission::make()->form($form)->data(['id' => '1', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->save();
+        FormSubmission::make()->form($form)->data(['id' => '2', 'test_taxonomy' => ['taxonomy-3']])->save();
+        FormSubmission::make()->form($form)->data(['id' => '3', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->save();
+        FormSubmission::make()->form($form)->data(['id' => '4', 'test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->save();
+        FormSubmission::make()->form($form)->data(['id' => '5', 'test_taxonomy' => ['taxonomy-5']])->save();
+
+        $entries = FormSubmission::query()->whereJsonOverlaps('test_taxonomy', ['taxonomy-1'])->orWhereJsonOverlaps('test_taxonomy', ['taxonomy-5'])->get();
+
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['1', '3', '5'], $entries->map->get('id')->all());
+    }
+
+    #[Test]
+    public function submissions_are_found_using_or_where_json_doesnt_overlap()
+    {
+        $form = tap(Form::make('test'))->save();
+        FormSubmission::make()->form($form)->data(['id' => '1', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->save();
+        FormSubmission::make()->form($form)->data(['id' => '2', 'test_taxonomy' => ['taxonomy-3']])->save();
+        FormSubmission::make()->form($form)->data(['id' => '3', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->save();
+        FormSubmission::make()->form($form)->data(['id' => '4', 'test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->save();
+        FormSubmission::make()->form($form)->data(['id' => '5', 'test_taxonomy' => ['taxonomy-5']])->save();
+
+        $entries = FormSubmission::query()->whereJsonOverlaps('test_taxonomy', ['taxonomy-1'])->orWhereJsonDoesntOverlap('test_taxonomy', ['taxonomy-5'])->get();
+
+        $this->assertCount(4, $entries);
+        $this->assertEquals(['1', '3', '2', '4'], $entries->map->get('id')->all());
+    }
+
+    #[Test]
     public function submissions_are_found_using_where_json_length()
     {
         $form = tap(Form::make('test'))->save();
