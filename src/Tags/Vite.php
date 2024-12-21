@@ -8,12 +8,24 @@ use Statamic\Support\Str;
 class Vite extends Tags
 {
     /**
+     * Static flag to ensure assets are rendered only once per request.
+     */
+    private static $hasRendered = false; // Add this static flag
+
+    /**
      * The {{ vite }} tag.
      *
      * @return string|array
      */
     public function index()
     {
+        // Check if the Vite tag has already been rendered
+        if (self::$hasRendered) {
+            return ''; // Prevent further rendering
+        }
+
+        self::$hasRendered = true; // Set the flag to true after first render
+
         if (! $src = $this->params->explode('src')) {
             throw new \Exception('Please provide a source file.');
         }
