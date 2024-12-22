@@ -73,7 +73,7 @@ class GlideController extends Controller
     {
         $this->validateSignature();
 
-        $url = base64_decode($url);
+        $url = Str::fromBase64Url($url);
 
         return $this->createResponse($this->generateBy('url', $url));
     }
@@ -90,7 +90,7 @@ class GlideController extends Controller
     {
         $this->validateSignature();
 
-        $decoded = base64_decode($encoded);
+        $decoded = Str::fromBase64Url($encoded);
 
         // The string before the first slash is the container
         [$container, $path] = explode('/', $decoded, 2);
