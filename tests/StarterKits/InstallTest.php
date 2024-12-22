@@ -55,6 +55,8 @@ class InstallTest extends TestCase
     {
         $this->assertFileDoesNotExist($this->kitVendorPath());
         $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileExists($this->kitRepoPath('export/copied.md'));
+        $this->assertFileDoesNotExist($this->kitRepoPath('copied.md'));
         $this->assertFileDoesNotExist(base_path('copied.md'));
 
         $this->installCoolRunnings();
@@ -68,18 +70,20 @@ class InstallTest extends TestCase
     }
 
     #[Test]
-    public function it_installs_starter_kit_from_updatable_package_with_export_directory()
+    public function it_installs_export_paths_from_root_of_starter_kit_for_backwards_compatibility()
     {
-        // Move everything in the kit repo's `export` folder, except for `composer.json` and `starter-kit.yaml`
-        collect($this->files->allFiles($this->kitRepoPath()))
-            ->reject(fn ($file) => in_array($file->getRelativePathname(), ['composer.json', 'starter-kit.yaml']))
+        // Move files from `export` folder to root of starter kit, like old times
+        collect($this->files->allFiles($this->kitRepoPath('export')))
             ->each(fn ($file) => $this->files->move(
-                $this->kitRepoPath($file->getRelativePathname()),
-                $this->preparePath($this->kitRepoPath('export/'.$file->getRelativePathname())),
+                $this->kitRepoPath('export/'.$file->getRelativePathname()),
+                $this->preparePath($this->kitRepoPath($file->getRelativePathname())),
             ));
 
-        $this->assertFileDoesNotExist($this->kitRepoPath('copied.md'));
-        $this->assertFileExists($this->kitRepoPath('export/copied.md'));
+        // Make sure `export` folder does not exist at all
+        $this->files->deleteDirectory($this->kitRepoPath('export'));
+
+        $this->assertFileDoesNotExist($this->kitRepoPath('export/copied.md'));
+        $this->assertFileExists($this->kitRepoPath('copied.md'));
         $this->assertFileExists($this->kitRepoPath('composer.json'));
         $this->assertFileExists($this->kitRepoPath('starter-kit.yaml'));
 
@@ -129,6 +133,50 @@ class InstallTest extends TestCase
 
         $this->assertFileDoesNotExist($this->kitVendorPath());
         $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileDoesNotExist($renamedFile = base_path('README.md'));
+        $this->assertFileDoesNotExist($renamedFolder = base_path('original-dir'));
+
+        $this->installCoolRunnings();
+
+        $this->assertFalse(Blink::has('starter-kit-repository-added'));
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertFileDoesNotExist(base_path('composer.json.bak'));
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileExists($renamedFile);
+        $this->assertFileExists($renamedFolder);
+
+        $this->assertFileDoesNotExist(base_path('README-for-new-site.md')); // This was renamed back to original path on install
+        $this->assertFileDoesNotExist(base_path('renamed-dir')); // This was renamed back to original path on install
+
+        $this->assertFileHasContent('This readme should get installed to README.md.', $renamedFile);
+        $this->assertFileHasContent('One.', $renamedFolder.'/one.txt');
+        $this->assertFileHasContent('Two.', $renamedFolder.'/two.txt');
+    }
+
+    #[Test]
+    public function it_still_installs_from_export_as_paths_from_root_of_starter_kit_for_backwards_compatibility()
+    {
+        // Move files from `export` folder to root of starter kit, like old times
+        collect($this->files->allFiles($this->kitRepoPath('export')))
+            ->each(fn ($file) => $this->files->move(
+                $this->kitRepoPath('export/'.$file->getRelativePathname()),
+                $this->preparePath($this->kitRepoPath($file->getRelativePathname())),
+            ));
+
+        // Make sure `export` folder does not exist at all
+        $this->files->deleteDirectory($this->kitRepoPath('export'));
+
+        $this->setConfig([
+            'export_as' => [
+                'README.md' => 'README-for-new-site.md',
+                'original-dir' => 'renamed-dir',
+            ],
+        ]);
+
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertComposerJsonDoesntHave('repositories');
+        $this->assertFileDoesNotExist($this->kitRepoPath('export/README-for-new-site.md'));
+        $this->assertFileExists($this->kitRepoPath('README-for-new-site.md'));
         $this->assertFileDoesNotExist($renamedFile = base_path('README.md'));
         $this->assertFileDoesNotExist($renamedFolder = base_path('original-dir'));
 
