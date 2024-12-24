@@ -153,7 +153,10 @@ final class InstallableModule extends Module
     {
         $package = $this->installer->package();
 
-        $path = str_replace("/vendor/{$package}/export", '', $path);
+        $path = preg_replace("#vendor/{$package}.*/export/#", '', $path);
+
+        // Older kits may not be using new `export` folder convention, so
+        // we'll convert from the kit root for backwards compatibility
         $path = str_replace("/vendor/{$package}", '', $path);
 
         return $path;
@@ -247,9 +250,10 @@ final class InstallableModule extends Module
     {
         $package = $this->installer->package();
 
-        // Scope to new `export` folder if it exists, otherwise we'll
-        // look in starter kit root for backwards compatibility
-        $scope = $this->files->exists(base_path("vendor/{$package}/export"))
+        // Older kits may not be using new `export` folder convention at the top level,
+        // so for backwards compatibility we'll dynamically scope to `export` folder,
+        // but we don't need to worry about this with newer folder based modules.
+        $scope = $this->files->exists(base_path("vendor/{$package}/export")) && ! $this->isFolderBasedModule()
             ? 'export'
             : null;
 
@@ -265,7 +269,7 @@ final class InstallableModule extends Module
             return $path;
         }
 
-        return Str::ensureRight($this->relativePath, '/').$path;
+        return Str::ensureRight($this->relativePath, '/export/').$path;
     }
 
     /**

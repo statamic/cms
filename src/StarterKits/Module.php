@@ -38,6 +38,14 @@ abstract class Module
     }
 
     /**
+     * Check if current module is folder based module.
+     */
+    public function isFolderBasedModule(): bool
+    {
+        return (bool) $this->relativePath;
+    }
+
+    /**
      * Get module key.
      */
     public function key(): string
