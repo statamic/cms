@@ -11,6 +11,7 @@ use Statamic\Events\EntrySaving;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
+use Statamic\Facades\Folder;
 use Statamic\Facades\Role;
 use Statamic\Facades\User;
 use Statamic\Structures\CollectionStructure;
@@ -22,6 +23,24 @@ class UpdateEntryTest extends TestCase
 {
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->dir = __DIR__.'/tmp';
+
+        config([
+            'statamic.revisions.path' => $this->dir,
+            'statamic.revisions.enable' => true,
+        ]);
+    }
+
+    public function tearDown(): void
+    {
+        Folder::delete($this->dir);
+        parent::tearDown();
+    }
 
     #[Test]
     public function it_denies_access_if_you_dont_have_edit_permission()
