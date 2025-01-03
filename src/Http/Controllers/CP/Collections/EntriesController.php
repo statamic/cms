@@ -546,7 +546,7 @@ class EntriesController extends CpController
             ],
             [
                 'text' => $collection->title(),
-                'url' => $collection->showUrl(),
+                'url' => $collection->breadcrumbUrl(),
             ],
         ]);
     }

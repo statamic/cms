@@ -85,6 +85,7 @@
             </div>
             <button
                 class="asset-meta-btn"
+                type="button"
                 @click="edit"
                 v-if="showSetAlt && needsAlt"
             >
