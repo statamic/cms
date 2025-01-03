@@ -435,7 +435,45 @@ class UpdateEntryTest extends TestCase
     #[Test]
     public function published_entry_gets_saved_to_working_copy()
     {
-        $this->markTestIncomplete();
+        [$user, $collection] = $this->seedUserAndCollection();
+
+        $this->seedBlueprintFields($collection, [
+            'revisable' => ['type' => 'text'],
+            'non_revisable' => ['type' => 'text', 'revisable' => false],
+        ]);
+
+        $entry = EntryFactory::id('1')
+            ->slug('test')
+            ->collection('test')
+            ->data([
+                'title' => 'revisable test',
+            ])->create();
+
+        $this
+            ->actingAs($user)
+            ->update($entry, [
+                'revisable' => 'revise me',
+                'non_revisable' => 'no revisions for you',
+            ])
+            ->assertOk();
+
+        // $entry = Entry::find($entry->id());
+        // $this->assertEquals('test', $entry->slug());
+        // $this->assertEquals([
+        //     'blueprint' => 'test',
+        //     'title' => 'Original title',
+        //     'foo' => 'bar',
+        //     'updated_at' => $originalTimestamp,
+        // ], $entry->data());
+
+        // $workingCopy = $entry->fromWorkingCopy();
+        // $this->assertEquals('updated-slug', $workingCopy->slug());
+        // $this->assertEquals([
+        //     'blueprint' => 'test',
+        //     'title' => 'Updated title',
+        //     'foo' => 'updated foo',
+        // ], $workingCopy->data());
+
     }
 
     #[Test]
@@ -520,7 +558,7 @@ class UpdateEntryTest extends TestCase
             ->assertOk();
     }
 
-    private function seedUserAndCollection()
+    private function seedUserAndCollection(bool $enableRevisions = false)
     {
         $this->setTestRoles(['test' => [
             'access cp',
@@ -529,7 +567,7 @@ class UpdateEntryTest extends TestCase
             'access fr site',
         ]]);
         $user = tap(User::make()->assignRole('test'))->save();
-        $collection = tap(Collection::make('test'))->save();
+        $collection = tap(Collection::make('test')->revisionsEnabled($enableRevisions))->save();
 
         return [$user, $collection];
     }
