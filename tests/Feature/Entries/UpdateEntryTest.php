@@ -31,8 +31,9 @@ class UpdateEntryTest extends TestCase
         $this->dir = __DIR__.'/tmp';
 
         config([
+            'statamic.editions.pro' => true,
             'statamic.revisions.path' => $this->dir,
-            'statamic.revisions.enable' => true,
+            'statamic.revisions.enabled' => true,
         ]);
     }
 
@@ -435,7 +436,7 @@ class UpdateEntryTest extends TestCase
     #[Test]
     public function published_entry_gets_saved_to_working_copy()
     {
-        [$user, $collection] = $this->seedUserAndCollection();
+        [$user, $collection] = $this->seedUserAndCollection(true);
 
         $this->seedBlueprintFields($collection, [
             'revisable' => ['type' => 'text'],
@@ -445,9 +446,8 @@ class UpdateEntryTest extends TestCase
         $entry = EntryFactory::id('1')
             ->slug('test')
             ->collection('test')
-            ->data([
-                'title' => 'revisable test',
-            ])->create();
+            ->data(['title' => 'Revisable Test', 'published' => true])
+            ->create();
 
         $this
             ->actingAs($user)
@@ -457,23 +457,20 @@ class UpdateEntryTest extends TestCase
             ])
             ->assertOk();
 
-        // $entry = Entry::find($entry->id());
-        // $this->assertEquals('test', $entry->slug());
-        // $this->assertEquals([
-        //     'blueprint' => 'test',
-        //     'title' => 'Original title',
-        //     'foo' => 'bar',
-        //     'updated_at' => $originalTimestamp,
-        // ], $entry->data());
+        $entry = Entry::find($entry->id());
+        $this->assertEquals('no revisions for you', $entry->non_revisable);
+        $this->assertEquals('Revisable Test', $entry->title);
+        $this->assertEquals('test', $entry->slug());
+        $this->assertNull($entry->revisable);
 
-        // $workingCopy = $entry->fromWorkingCopy();
-        // $this->assertEquals('updated-slug', $workingCopy->slug());
-        // $this->assertEquals([
-        //     'blueprint' => 'test',
-        //     'title' => 'Updated title',
-        //     'foo' => 'updated foo',
-        // ], $workingCopy->data());
-
+        $workingCopy = $entry->fromWorkingCopy();
+        $this->assertEquals('updated-entry', $workingCopy->slug());
+        $this->assertEquals([
+            'title' => 'Updated entry',
+            'revisable' => 'revise me',
+            'non_revisable' => 'no revisions for you',
+            'published' => true
+        ], $workingCopy->data()->all());
     }
 
     #[Test]
