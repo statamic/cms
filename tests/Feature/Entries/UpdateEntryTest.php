@@ -469,7 +469,7 @@ class UpdateEntryTest extends TestCase
             'title' => 'Updated entry',
             'revisable' => 'revise me',
             'non_revisable' => 'no revisions for you',
-            'published' => true
+            'published' => true,
         ], $workingCopy->data()->all());
     }
 
