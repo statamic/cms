@@ -169,6 +169,8 @@ return [
     'slug.config.show_regenerate' => 'Affiche le bouton pour régénérer l’identifiant à partir du champ cible.',
     'slug.title' => 'Slug',
     'structures.title' => 'Structures',
+    'table.config.max_columns' => 'Définissez un nombre maxi de colonnes.',
+    'table.config.max_rows' => 'Définissez un nombre maxi de rangées.',
     'table.title' => 'Table',
     'taggable.config.options' => 'Fournit des balises pré-définies qui peuvent être sélectionnées.',
     'taggable.config.placeholder' => 'Saisissez et appuyez sur ↩ Entrée',
