@@ -51,7 +51,8 @@ class Exporter
             ->instantiateModules()
             ->clearExportPath()
             ->exportModules()
-            ->exportPackage();
+            ->exportConfig()
+            ->exportPostInstallHook();
     }
 
     /**
@@ -197,17 +198,31 @@ class Exporter
     }
 
     /**
-     * Export package config & other misc vendor files.
+     * Export package config.
      */
-    protected function exportPackage(): self
+    protected function exportConfig(): self
     {
-        $this->copyDirectoryContentsInto(base_path('package'), $this->exportPath);
+        $this->files->copy(base_path('package/composer.json'), "{$this->exportPath}/composer.json");
 
         $config = $this
             ->versionModuleDependencies()
             ->syncConfigWithModules();
 
         $this->files->put("{$this->exportPath}/starter-kit.yaml", YAML::dump($config->all()));
+
+        return $this;
+    }
+
+    /**
+     * Export top level post install hook, if one exists.
+     */
+    protected function exportPostInstallHook(): self
+    {
+        if (! $this->files->exists(base_path('package/StarterKitPostInstall.php'))) {
+            return $this;
+        }
+
+        $this->files->copy(base_path('package/StarterKitPostInstall.php'), "{$this->exportPath}/StarterKitPostInstall.php");
 
         return $this;
     }
