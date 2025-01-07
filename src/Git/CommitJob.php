@@ -14,6 +14,11 @@ class CommitJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable;
 
     /**
+     * @var int
+     */
+    public $tries = 3;
+
+    /**
      * Create a new job instance.
      */
     public function __construct(public $message = null, public $committer = null)
