@@ -1,5 +1,17 @@
 # Release Notes
 
+## 5.45.1 (2024-12-20)
+
+### What's fixed
+- Throw better exception when asset isn't found [#11321](https://github.com/statamic/cms/issues/11321) by @edalzell
+- Add url friendly base64 en/decoding for Glide [#11299](https://github.com/statamic/cms/issues/11299) by @marcorieser
+- Update make:fieldtype console message [#11309](https://github.com/statamic/cms/issues/11309) by @Technobabble17
+- Make set button label clickable [#11313](https://github.com/statamic/cms/issues/11313) by @carstenjaksch
+- French translations [#11297](https://github.com/statamic/cms/issues/11297) by @ebeauchamps
+- Fix markdown test [#11315](https://github.com/statamic/cms/issues/11315) by @jasonvarga
+
+
+
 ## 5.45.0 (2024-12-20)
 
 ### What's new
