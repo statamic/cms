@@ -38,6 +38,6 @@ class CommitJob implements ShouldQueue
      */
     public function middleware(): array
     {
-        return [(new WithoutOverlapping('git'))->expireAfter(60)->releaseAfter(30)];
+        return [(new WithoutOverlapping('statamic-git'))->expireAfter(60)->releaseAfter(30)];
     }
 }
