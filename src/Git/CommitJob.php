@@ -16,7 +16,10 @@ class CommitJob implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(public $message = null, public $committer = null) {}
+    public function __construct(public $message = null, public $committer = null)
+    {
+
+    }
 
     /**
      * Execute the job.
