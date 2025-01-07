@@ -18,7 +18,6 @@ class CommitJob implements ShouldQueue
      */
     public function __construct(public $message = null, public $committer = null)
     {
-
     }
 
     /**
