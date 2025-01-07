@@ -1,6 +1,6 @@
 # Release Notes
 
-## 5.45.1 (2024-12-20)
+## 5.45.1 (2025-01-07)
 
 ### What's fixed
 - Throw better exception when asset isn't found [#11321](https://github.com/statamic/cms/issues/11321) by @edalzell
