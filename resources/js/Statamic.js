@@ -180,6 +180,7 @@ export default {
         this.$app.config.globalProperties.$echo = this.$echo;
         this.$app.config.globalProperties.$bard = this.$bard;
         this.$app.config.globalProperties.$keys = this.$keys;
+        this.$app.config.globalProperties.$fieldActions = this.$fieldActions;
         this.$app.config.globalProperties.$reveal = this.$reveal;
         this.$app.config.globalProperties.$slug = this.$slug;
         this.$app.config.globalProperties.$preferences = new Preferences(http, store);
