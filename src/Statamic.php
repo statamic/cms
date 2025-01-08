@@ -286,7 +286,7 @@ class Statamic
     public static function cpViteScripts()
     {
         return static::cpVite()->withEntryPoints([
-            'resources/js/app.js',
+            'resources/js/index.js',
             'resources/css/tailwind.css',
         ]);
     }
