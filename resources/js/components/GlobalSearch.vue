@@ -1,5 +1,5 @@
 <template>
-    <div class="global-search" :class="{'dirty': isDirty}" v-on-clickaway="reset" v-cloak>
+    <div class="global-search" :class="{'dirty': isDirty}" v-click-away="reset" v-cloak>
         <div class="state-container w-4 h-4 text-gray-500 flex items-center" @click="focus">
             <svg-icon name="light/magnifying-glass" class="w-4 h-4"></svg-icon>
         </div>
@@ -53,11 +53,7 @@
 
 
 <script>
-import { mixin as clickaway } from 'vue-clickaway';
-
 export default {
-    mixins: [ clickaway ],
-
     props: {
         endpoint: String,
         placeholder: String
