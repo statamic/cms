@@ -14,7 +14,7 @@
         :name="name"
         :id="fieldId"
         :direction="config.direction"
-        :model-value="modelValue"
+        :model-value="value"
         @update:model-value="inputUpdated"
         @focus="$emit('focus')"
         @blur="$emit('blur')"

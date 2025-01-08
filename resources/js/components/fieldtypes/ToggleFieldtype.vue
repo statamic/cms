@@ -1,7 +1,7 @@
 <template>
     <div class="toggle-fieldtype-wrapper">
         <toggle-input
-            :model-value="modelValue"
+            :model-value="value"
             @update:model-value="update"
             :read-only="isReadOnly"
             :id="fieldId"
@@ -18,12 +18,12 @@ export default {
 
     computed: {
         inlineLabel() {
-            return this.modelValue ? (this.config.inline_label_when_true || this.config.inline_label) : this.config.inline_label;
+            return this.value ? (this.config.inline_label_when_true || this.config.inline_label) : this.config.inline_label;
         },
         replicatorPreview() {
             if (!this.showFieldPreviews || !this.config.replicator_preview) return;
 
-            return (this.modelValue ? '✓' : '✗') + ' ' + __(this.config.display);
+            return (this.value ? '✓' : '✗') + ' ' + __(this.config.display);
         }
     }
 };

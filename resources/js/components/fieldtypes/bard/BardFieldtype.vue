@@ -333,7 +333,7 @@ export default {
 
         replicatorPreview() {
             if (!this.showFieldPreviews || !this.config.replicator_preview) return;
-            const stack = [...this.modelValue];
+            const stack = [...this.value];
             let text = '';
             while (stack.length) {
                 const node = stack.shift();
@@ -452,7 +452,7 @@ export default {
             this.updateDebounced(json);
         },
 
-        modelValue(value, oldValue) {
+        value(value, oldValue) {
             const oldContent = this.editor.getJSON();
             const content = this.valueToContent(value);
 
@@ -753,7 +753,7 @@ export default {
                 this.editor.destroy();
             }
 
-            const content = this.valueToContent(clone(this.modelValue));
+            const content = this.valueToContent(clone(this.value));
 
             this.editor = new Editor({
                 extensions: this.getExtensions(),

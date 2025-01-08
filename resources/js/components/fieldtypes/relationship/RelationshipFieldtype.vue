@@ -27,7 +27,7 @@
         :tree="meta.tree"
         :initial-sort-column="meta.initialSortColumn"
         :initial-sort-direction="meta.initialSortDirection"
-        :model-value="modelValue"
+        :model-value="value"
         @update:modelValue="update"
         @focus="$emit('focus')"
         @blur="$emit('blur')"
@@ -145,7 +145,7 @@ export default {
         replicatorPreview() {
             if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
 
-            return this.modelValue.map(id => {
+            return this.value.map(id => {
                 const item = _.findWhere(this.meta.data, { id });
                 return item ? item.title : id;
             });

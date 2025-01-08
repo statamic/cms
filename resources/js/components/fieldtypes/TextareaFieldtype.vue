@@ -6,7 +6,7 @@
         :limit="config.character_limit || null"
         :placeholder="__(config.placeholder)"
         :id="fieldId"
-        :model-value="modelValue"
+        :model-value="value"
         @update:model-value="updateDebounced"
         @blur="$emit('blur')"
         @focus="$emit('focus')"

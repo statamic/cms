@@ -11,7 +11,7 @@
                 @click="updateSelectedOption(option.value)"
                 :value="option.value"
                 :disabled="isReadOnly"
-                :class="{'active': modelValue == option.value}"
+                :class="{'active': value == option.value}"
                 v-text="option.label || option.value"
             />
         </div>
@@ -48,9 +48,9 @@ export default {
         replicatorPreview() {
             if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
 
-            var option = _.findWhere(this.options, { value: this.modelValue });
+            var option = _.findWhere(this.options, { value: this.value });
 
-            return (option) ? option.label : this.modelValue;
+            return (option) ? option.label : this.value;
         },
     },
 

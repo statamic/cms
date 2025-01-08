@@ -5,8 +5,8 @@
             <div class="radio-fieldtype mb-2">
                 <radio-fieldtype
                     :handle="`${handle}_mode`"
-                    :model-value="mode"
-                    @update:model-value="setMode"
+                    :value="mode"
+                    @input="setMode"
                     :config="{
                         inline: true,
                         options: {

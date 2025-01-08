@@ -5,7 +5,7 @@
             :key="$index"
             class="option"
             :class="{
-                'selected': modelValue === option.value,
+                'selected': value === option.value,
                 'disabled': isReadOnly
             }"
         >
@@ -13,17 +13,17 @@
                 <svg-icon
                     name="regular/radio-deselected"
                     class="radio-icon"
-                    :aria-hidden="modelValue === option.value"
+                    :aria-hidden="value === option.value"
                     @click="update($event.target.value)"
-                    v-show="modelValue !== option.value"
+                    v-show="value !== option.value"
                     v-cloak
                 />
                 <svg-icon
                     name="regular/radio-selected"
                     class="radio-icon"
-                    :aria-hidden="modelValue !== option.value"
+                    :aria-hidden="value !== option.value"
                     @click="update($event.target.value)"
-                    v-show="modelValue === option.value"
+                    v-show="value === option.value"
                     v-cloak
                 />
                 <input
@@ -33,7 +33,7 @@
                     @input="update($event.target.value)"
                     :value="option.value"
                     :disabled="isReadOnly"
-                    :checked="modelValue === option.value"
+                    :checked="value === option.value"
                 />
                 {{ option.label || option.value }}
             </label>
@@ -56,9 +56,9 @@ export default {
         replicatorPreview() {
             if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
 
-            var option = _.findWhere(this.options, { value: this.modelValue });
+            var option = _.findWhere(this.options, { value: this.value });
 
-            return (option) ? option.label : this.modelValue;
+            return (option) ? option.label : this.value;
         },
     },
 

@@ -2,7 +2,7 @@
 import HasFieldActions from '../field-actions/HasFieldActions';
 
 export default {
-    emits: ['update:model-value', 'meta-updated', 'replicator-preview-updated'],
+    emits: ['input', 'meta-updated', 'replicator-preview-updated'],
 
     mixins: [
         HasFieldActions,
@@ -16,7 +16,7 @@ export default {
     },
 
     props: {
-        modelValue: {
+        value: {
             required: true
         },
         config: {
@@ -45,7 +45,7 @@ export default {
 
     methods: {
         update(value) {
-            this.$emit('update:model-value', value);
+            this.$emit('input', value);
         },
 
         updateDebounced: _.debounce(function (value) {
@@ -76,7 +76,7 @@ export default {
         replicatorPreview() {
             if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
 
-            return this.modelValue;
+            return this.value;
         },
 
         fieldPathKeys() {

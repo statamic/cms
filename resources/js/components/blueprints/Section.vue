@@ -75,8 +75,8 @@
                                 v-if="!loading"
                                 handle="icon"
                                 :meta="meta"
-                                :model-value="modelValue"
-                                @update:model-value="editingSection.icon = $event"
+                                :value="modelValue"
+                                @input="editingSection.icon = $event"
                             />
                         </publish-field-meta>
                     </div>

@@ -91,7 +91,7 @@ export default {
         },
 
         hasDate() {
-            return this.config.required || this.modelValue.date;
+            return this.config.required || this.value.date;
         },
 
         hasTime() {
@@ -126,14 +126,14 @@ export default {
         },
 
         datePickerValue() {
-            if (this.isRange) return this.modelValue.date;
+            if (this.isRange) return this.value.date;
 
             // The calendar component will do `new Date(datePickerValue)` under the hood.
             // If you pass a date without a time, it will treat it as UTC. By adding a time,
             // it will behave as local time. The date that comes from the server will be what
             // we expect. The time is handled separately by the nested time fieldtype.
             // https://github.com/statamic/cms/pull/6688
-            return this.modelValue.date+'T00:00:00';
+            return this.value.date+'T00:00:00';
         },
 
         commonDatePickerBindings() {
@@ -187,16 +187,16 @@ export default {
 
         replicatorPreview() {
             if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
-            if (! this.modelValue.date) return;
+            if (! this.value.date) return;
 
             if (this.isRange) {
-                return this.$moment(this.modelValue.date.start).format(this.displayFormat) + ' – ' + this.$moment(this.modelValue.date.end).format(this.displayFormat);
+                return this.$moment(this.value.date.start).format(this.displayFormat) + ' – ' + this.$moment(this.value.date.end).format(this.displayFormat);
             }
 
-            let preview = this.$moment(this.modelValue.date).format(this.displayFormat);
+            let preview = this.$moment(this.value.date).format(this.displayFormat);
 
-            if (this.hasTime && this.modelValue.time) {
-                preview += ` ${this.modelValue.time}`;
+            if (this.hasTime && this.value.time) {
+                preview += ` ${this.value.time}`;
             }
 
             return preview;
@@ -205,10 +205,10 @@ export default {
     },
 
     created() {
-        if (this.modelValue.time === 'now') {
+        if (this.value.time === 'now') {
             // Probably shouldn't be modifying a prop, but luckily it all works nicely, without
             // needing to create an "update value without triggering dirty state" flow yet.
-            this.modelValue.time = this.$moment().format(this.hasSeconds ? 'HH:mm:ss' : 'HH:mm');
+            this.value.time = this.$moment().format(this.hasSeconds ? 'HH:mm:ss' : 'HH:mm');
         }
 
         this.$events.$on(`container.${this.storeName}.saving`, this.triggerChangeOnFocusedField);
@@ -233,11 +233,11 @@ export default {
                 return;
             }
 
-            this.update({ ...this.modelValue, date });
+            this.update({ ...this.value, date });
         },
 
         setTime(time) {
-            this.update({ ...this.modelValue, time });
+            this.update({ ...this.value, time });
         },
 
         addDate() {
