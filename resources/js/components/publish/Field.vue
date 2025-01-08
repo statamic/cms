@@ -4,6 +4,7 @@
             :config="config"
             :initial-value="modelValue"
             :initial-meta="meta"
+            @loaded="metaLoaded"
         >
             <template #default="{ meta, loading: loadingMeta }">
                 <div class="field-inner">
@@ -67,6 +68,8 @@
                         v-if="instructions && config.instructions_position !== 'below'"
                         v-html="instructions"
                     />
+
+                    <publish-field-actions v-if="shouldShowFieldActions" :actions="fieldActions" />
                 </div>
 
                 <loading-graphic v-if="loadingMeta" :size="16" :inline="true" />
@@ -77,6 +80,7 @@
                     </div>
                     <component
                         v-else
+                        ref="field"
                         :is="fieldtypeComponent"
                         :config="config"
                         :meta="meta"
@@ -141,6 +145,12 @@ export default {
         isInsideConfigFields: { default: false },
     },
 
+    data() {
+        return {
+            hasField: false,
+        }
+    },
+
     computed: {
 
         fieldtypeComponent() {
@@ -190,6 +200,7 @@ export default {
                 `${this.config.component || this.config.type}-fieldtype`,
                 this.isReadOnly ? 'read-only-field' : '',
                 this.isInsideConfigFields ? 'config-field' : `${tailwind_width_class(this.config.width)}`,
+                this.shouldShowFieldActions ? 'has-field-dropdown' : '',
                 this.config.classes || '',
                 this.config.full_width_setting ? 'full-width-setting' : '',
                 { 'has-error': this.hasError || this.hasNestedError }
@@ -246,8 +257,19 @@ export default {
                 || this.isLocked // Need to see the avatar
                 || this.isLocalizable // Need to see the icon
                 || this.syncable; // Need to see the icon
-        }
+        },
 
+        shouldShowFieldActions() {
+            return !this.isInsideConfigFields && this.showLabel && this.fieldActions.length > 0;
+        },
+
+        fieldActions() {
+            return this.hasField ? this.$refs.field.fieldActions : [];
+        },
+    },
+
+    mounted() {
+        if (this.$refs.field) this.hasField = true;
     },
 
     methods: {
@@ -277,6 +299,10 @@ export default {
             });
 
             return marked(text);
+        },
+
+        metaLoaded() {
+            this.$nextTick(() => this.hasField = true);
         }
 
     }

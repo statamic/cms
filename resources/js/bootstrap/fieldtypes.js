@@ -25,6 +25,7 @@ import TitleFormats from '../components/collections/TitleFormats.vue';
 import ColorFieldtype from '../components/fieldtypes/ColorFieldtype.vue';
 import DateFieldtype from '../components/fieldtypes/DateFieldtype.vue';
 import DictionaryFieldtype from '../components/fieldtypes/DictionaryFieldtype.vue';
+import DictionaryIndexFieldtype from '../components/fieldtypes/DictionaryIndexFieldtype.vue';
 import DictionaryFields from '../components/fieldtypes/DictionaryFields.vue';
 import FieldDisplayFieldtype from '../components/fieldtypes/FieldDisplayFieldtype.vue';
 // import FieldsFieldtype from '../components/fieldtypes/grid/FieldsFieldtype.vue';
@@ -92,6 +93,7 @@ export default function registerFieldTypes(app) {
     app.component('color-fieldtype', ColorFieldtype);
     app.component('date-fieldtype', DateFieldtype);
     app.component('dictionary-fieldtype', DictionaryFieldtype);
+    app.component('dictionary-fieldtype-index', DictionaryIndexFieldtype);
     app.component('dictionary_fields-fieldtype', DictionaryFields);
     app.component('field_display-fieldtype', FieldDisplayFieldtype);
     // app.component('fields-fieldtype', FieldsFieldtype);

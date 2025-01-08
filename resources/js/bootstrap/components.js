@@ -10,7 +10,9 @@ export { default as PublishForm } from '../components/publish/PublishForm.vue';
 export { default as PublishFields } from '../components/publish/Fields.vue';
 export { default as PublishFieldsContainer } from '../components/publish/FieldsContainer.vue'; // deprecated
 export { default as PublishField } from '../components/publish/Field.vue';
+export { default as PublishFieldFullscreenHeader } from '../components/publish/FullscreenHeader.vue';
 export { default as PublishFieldMeta } from '../components/publish/FieldMeta.vue';
+export { default as PublishFieldActions } from '../components/field-actions/FieldActions.vue';
 export { default as ConfigureTabs } from '../components/configure/Tabs.vue';
 export { default as PublishTabs } from '../components/publish/Tabs.vue';
 export { default as PublishSections } from '../components/publish/Sections.vue';
@@ -74,6 +76,7 @@ export { default as Modal } from '../components/Modal.vue';
 export { default as ConfirmationModal } from '../components/modals/ConfirmationModal.vue';
 export { default as FavoriteCreator } from '../components/FavoriteCreator.vue';
 export { default as KeyboardShortcutsModal } from '../components/modals/KeyboardShortcutsModal.vue';
+export { default as FieldActionModal } from '../components/field-actions/FieldActionModal.vue';
 export { default as ResourceDeleter } from '../components/ResourceDeleter.vue';
 
 export { default as Stack } from '../components/stacks/Stack.vue';

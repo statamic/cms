@@ -28,6 +28,7 @@ import Echo from './components/Echo';
 import Bard from './components/Bard';
 import Keys from './components/keys/Keys';
 import Hooks from './components/Hooks';
+import FieldActions from './components/field-actions/FieldActions';
 import Reveal from './components/Reveal';
 import Components from './components/Components';
 import FieldConditions from './components/FieldConditions';
@@ -47,6 +48,7 @@ const echo = new Echo;
 const bard = new Bard;
 const keys = new Keys;
 const hooks = new Hooks;
+const fieldActions = new FieldActions;
 const reveal = new Reveal;
 const conditions = new FieldConditions;
 const callbacks = new Callbacks;
@@ -81,6 +83,10 @@ export default {
 
     get $hooks() {
         return hooks;
+    },
+
+    get $fieldActions() {
+        return fieldActions;
     },
 
     get $reveal() {

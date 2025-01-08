@@ -1,6 +1,19 @@
 <script>
+import HasFieldActions from '../field-actions/HasFieldActions';
+
 export default {
     emits: ['update:model-value', 'meta-updated', 'replicator-preview-updated'],
+
+    mixins: [
+        HasFieldActions,
+    ],
+
+    inject: {
+        fieldActionStoreName: {
+            from: 'storeName',
+            default: null,
+        }
+    },
 
     props: {
         modelValue: {
@@ -76,7 +89,24 @@ export default {
             let prefix = this.fieldPathPrefix ? this.fieldPathPrefix+'.' : '';
 
             return prefix+'field_'+this.config.handle;
-        }
+        },
+
+        fieldActionPayload() {
+            return {
+                vm: this,
+                fieldPathPrefix: this.fieldPathPrefix,
+                handle: this.handle,
+                value: this.value,
+                config: this.config,
+                meta: this.meta,
+                update: this.update,
+                updateMeta: this.updateMeta,
+                isReadOnly: this.isReadOnly,
+                store: this.$store,
+                storeName: this.fieldActionStoreName,
+            };
+        },
+
     },
 
     watch: {

@@ -18,6 +18,7 @@
         :creatables="creatables"
         :form-component="formComponent"
         :form-component-props="formComponentProps"
+        :form-stack-size="formStackSize"
         :status-icons="statusIcons"
         :columns="columns"
         :search="canSearch"
@@ -131,6 +132,10 @@ export default {
 
         formComponentProps() {
             return this.meta.formComponentProps;
+        },
+
+        formStackSize() {
+            return this.meta.formStackSize;
         },
 
         taggable() {

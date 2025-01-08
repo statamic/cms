@@ -40,6 +40,7 @@
             :new-section-text="newSectionText"
             :edit-section-text="editSectionText"
             :add-section-text="addSectionText"
+            :can-define-localizable="canDefineLocalizable"
             @updated="updateTab(tab._id, $event)"
         />
     </div>
@@ -50,8 +51,11 @@ import {Sortable, Plugins} from '@shopify/draggable';
 import uniqid from 'uniqid';
 import Tab from './Tab.vue';
 import TabContent from './TabContent.vue';
+import CanDefineLocalizable from "../fields/CanDefineLocalizable";
 
 export default {
+
+    mixins: [CanDefineLocalizable],
 
     components: {
         Tab,

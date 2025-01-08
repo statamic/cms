@@ -95,7 +95,7 @@ export default {
             if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
 
             return this.modelValue
-                ? `<span class="little-dot" style="background-color:${this.modelValue}"></span>`
+                ? replicatorPreviewHtml(`<span class="little-dot" style="background-color:${this.modelValue}"></span>`)
                 : null;
         }
     },

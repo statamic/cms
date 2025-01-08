@@ -26,7 +26,7 @@
                         />
                     </button>
 
-                    <span class="text-sm dark:text-dark-175">{{ __(label) }}</span>
+                    <span @click="addSetButtonClicked" class="cursor-pointer text-sm dark:text-dark-175">{{ __(label) }}</span>
                 </div>
             </template>
         </set-picker>

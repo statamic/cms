@@ -97,7 +97,7 @@ export default {
             if (!this.fieldtypesLoaded) return [];
 
             let options = this.fieldtypes.map(fieldtype => {
-                return {text: fieldtype.title, value: fieldtype.handle, categories: fieldtype.categories, icon: fieldtype.icon};
+                return {text: fieldtype.title, value: fieldtype.handle, categories: fieldtype.categories, keywords: fieldtype.keywords, icon: fieldtype.icon};
             });
 
             if (this.allowDate) options.unshift({text: __('Publish Date'), value: 'date', categories: ['system'], isMeta: true, icon: 'date'});
@@ -129,8 +129,11 @@ export default {
                 const fuse = new Fuse(options, {
                     findAllMatches: true,
                     threshold: 0.1,
-                    minMatchCharLength: 2,
-                    keys: ['text'],
+                    keys: [
+                        {name: 'text', weight: 1},
+                        {name: 'categories', weight: 0.1},
+                        {name: 'keywords', weight: 0.4},
+                    ],
                 });
 
                 options = fuse.search(this.search).map(result => result.item);

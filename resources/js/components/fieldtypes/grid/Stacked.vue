@@ -1,28 +1,5 @@
 <template>
     <div>
-        <div
-            v-if="! grid.fullScreenMode"
-            class="flex justify-end absolute top-3 rtl:left-3 ltr:right-3 @md:rtl:left-6 @md:ltr:right-6"
-        >
-            <button
-                v-if="allowFullscreen"
-                @click="grid.toggleFullScreen"
-                class="btn btn-icon flex items-center"
-                v-tooltip="__('Toggle Fullscreen Mode')"
-            >
-                <svg-icon
-                    v-show="! grid.fullScreenMode"
-                    name="expand-bold"
-                    class="h-3.5 px-0.5 text-gray-750 dark:text-dark-175"
-                />
-                <svg-icon
-                    v-show="grid.fullScreenMode"
-                    name="shrink-all"
-                    class="h-3.5 px-0.5 text-gray-750 dark:text-dark-175"
-                />
-            </button>
-        </div>
-
         <sortable-list
             :vertical="true"
             :item-class="sortableItemClass"

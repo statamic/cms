@@ -4,7 +4,7 @@
         publish-container="base"
         :initial-actions="actions"
         method="post"
-        :initial-title="__('Create')"
+        :initial-title="taxonomyCreateLabel"
         :taxonomy-handle="taxonomyHandle"
         :breadcrumbs="breadcrumbs"
         :initial-fieldset="fieldset"
@@ -28,6 +28,7 @@ export default {
     props: [
         'actions',
         'taxonomyHandle',
+        'taxonomyCreateLabel',
         'breadcrumbs',
         'fieldset',
         'values',

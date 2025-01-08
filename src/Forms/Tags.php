@@ -51,7 +51,7 @@ class Tags extends BaseTags
     {
         $this->context['form'] = $this->params->get(static::HANDLE_PARAM);
 
-        return [];
+        return $this->parse();
     }
 
     /**
@@ -74,7 +74,7 @@ class Tags extends BaseTags
 
         $data['sections'] = $this->getSections($this->sessionHandle(), $jsDriver);
 
-        $data['fields'] = collect($data['sections'])->flatMap->fields->all();
+        $data['fields'] = new FieldsVariable(collect($data['sections'])->flatMap->fields->all());
 
         $data['honeypot'] = $form->honeypot();
 
@@ -114,7 +114,7 @@ class Tags extends BaseTags
             $params['error_redirect'] = $this->parseRedirect($errorRedirect);
         }
 
-        if (! $this->parser) {
+        if (! $this->canParseContents()) {
             return array_merge([
                 'attrs' => $this->formAttrs($action, $method, $knownParams, $attrs),
                 'params' => $this->formMetaPrefix($this->formParams($method, $params)),
@@ -167,9 +167,13 @@ class Tags extends BaseTags
     public function success()
     {
         $sessionHandle = $this->sessionHandle();
+        $successMessage = $this->getFromFormSession($sessionHandle, 'success');
 
-        // TODO: Should probably output success string instead of `true` boolean for consistency.
-        return $this->getFromFormSession($sessionHandle, 'success');
+        if ($this->isAntlersBladeComponent() && $this->isPair) {
+            return str($successMessage)->length() > 0;
+        }
+
+        return $successMessage;
     }
 
     /**
@@ -180,7 +184,7 @@ class Tags extends BaseTags
     public function submission()
     {
         if ($this->success()) {
-            return session('submission')->toArray();
+            return $this->aliasedResult(session('submission')->toArray());
         }
     }
 

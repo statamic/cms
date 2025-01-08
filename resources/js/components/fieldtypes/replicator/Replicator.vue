@@ -13,97 +13,14 @@
                     class="replicator-fieldtype-container"
                     :class="{'replicator-fullscreen bg-gray-200 dark:bg-dark-700': fullScreenMode }"
                 >
-                    <header
+                    <publish-field-fullscreen-header
                         v-if="fullScreenMode"
-                        class="bg-white dark:bg-dark-550 fixed top-0 inset-x-0 border-b dark:border-dark-900 p-3 rtl:pr-4 ltr:pl-4 flex items-center justify-between shadow z-max"
-                    >
-                        <h2 v-text="__(config.display)" class="flex-1" />
-                        <div class="flex items-center">
-                            <div class="btn-group">
-                                <button
-                                    @click="expandAll"
-                                    class="btn btn-icon flex items-center"
-                                    v-tooltip="__('Expand Sets')"
-                                    v-if="config.collapse !== 'accordion' && modelValue.length > 0"
-                                >
-                                    <svg-icon
-                                        name="arrows-horizontal-expand"
-                                        class="h-3.5 px-1 text-gray-750 dark:text-dark-175"
-                                    />
-                                </button>
+                        :title="config.display"
+                        :field-actions="fieldActions"
+                        @close="toggleFullscreen"
+                    />
 
-                                <button
-                                    @click="collapseAll"
-                                    class="btn btn-icon flex items-center"
-                                    v-tooltip="__('Collapse Sets')"
-                                    v-if="config.collapse !== 'accordion' && modelValue.length > 0"
-                                >
-                                    <svg-icon
-                                        name="arrows-horizontal-collapse"
-                                        class="h-3.5 px-1 text-gray-750 dark:text-dark-175"
-                                    />
-                                </button>
-                            </div>
-
-                            <button
-                                class="btn-close rtl:mr-2 ltr:ml-2"
-                                @click="fullScreenMode = false"
-                                :aria-label="__('Exit Fullscreen Mode')"
-                            >&times;
-                            </button>
-                        </div>
-                    </header>
-
-                    <section :class="{'mt-12 p-4 bg-gray-200 dark:bg-dark-700': fullScreenMode}">
-                        <div
-                            v-if="! fullScreenMode"
-                            class="flex justify-end"
-                            :class="{'absolute top-3 rtl:left-3 ltr:right-3 @md:right-6': !config.hide_display}"
-                        >
-                            <div class="btn-group">
-                                <button
-                                    @click="expandAll"
-                                    class="btn btn-icon flex items-center"
-                                    v-tooltip="__('Expand Sets')"
-                                    v-if="config.collapse !== 'accordion' && modelValue.length > 0"
-                                >
-                                    <svg-icon
-                                        name="arrows-horizontal-expand"
-                                        class="h-3.5 px-0.5 text-gray-750 dark:text-dark-175"
-                                    />
-                                </button>
-
-                                <button
-                                    @click="collapseAll"
-                                    class="btn btn-icon flex items-center"
-                                    v-tooltip="__('Collapse Sets')"
-                                    v-if="config.collapse !== 'accordion' && modelValue.length > 0"
-                                >
-                                    <svg-icon
-                                        name="arrows-horizontal-collapse"
-                                        class="h-3.5 px-0.5 text-gray-750 dark:text-dark-175"
-                                    />
-                                </button>
-
-                                <button
-                                    v-if="config.fullscreen"
-                                    @click="fullScreenMode = !fullScreenMode"
-                                    class="btn btn-icon flex items-center"
-                                    v-tooltip="__('Toggle Fullscreen Mode')"
-                                >
-                                    <svg-icon
-                                        name="expand-bold"
-                                        class="h-3.5 px-0.5 text-gray-750 dark:text-dark-175"
-                                        v-show="! fullScreenMode"
-                                    />
-                                    <svg-icon
-                                        name="shrink-all"
-                                        class="h-3.5 px-0.5 text-gray-750 dark:text-dark-175"
-                                        v-show="fullScreenMode"
-                                    />
-                                </button>
-                            </div>
-                        </div>
+                    <section :class="{'mt-14 p-4 bg-gray-200 dark:bg-dark-700': fullScreenMode}">
 
                         <sortable-list
                             :vertical="true"
@@ -246,7 +163,33 @@ export default {
             if (!this.showFieldPreviews || !this.config.replicator_preview) return;
 
             return `${__(this.config.display)}: ${__n(':count set|:count sets', this.modelValue.length)}`;
-        }
+        },
+
+        internalFieldActions() {
+            return [
+                {
+                    title: __('Expand All Sets'),
+                    icon: 'arrows-horizontal-expand',
+                    quick: true,
+                    visibleWhenReadOnly: true,
+                    run: this.expandAll,
+                },
+                {
+                    title: __('Collapse All Sets'),
+                    icon: 'arrows-horizontal-collapse',
+                    quick: true,
+                    visibleWhenReadOnly: true,
+                    run: this.collapseAll,
+                },
+                {
+                    title: __('Toggle Fullscreen Mode'),
+                    icon: ({ vm }) => vm.fullScreenMode ? 'shrink-all' : 'expand-bold',
+                    quick: true,
+                    visibleWhenReadOnly: true,
+                    run: this.toggleFullscreen,
+                },
+            ];
+        },
     },
 
     methods: {
@@ -345,6 +288,10 @@ export default {
 
         expandAll() {
             this.collapsed = [];
+        },
+
+        toggleFullscreen() {
+            this.fullScreenMode = !this.fullScreenMode;
         },
 
         blurred() {

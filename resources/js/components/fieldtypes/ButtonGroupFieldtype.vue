@@ -8,10 +8,10 @@
                 ref="button"
                 type="button"
                 :name="name"
-                @click="update($event.target.value)"
+                @click="updateSelectedOption(option.value)"
                 :value="option.value"
                 :disabled="isReadOnly"
-                :class="{'active': modelValue === option.value}"
+                :class="{'active': modelValue == option.value}"
                 v-text="option.label || option.value"
             />
         </div>
@@ -55,6 +55,9 @@ export default {
     },
 
     methods: {
+        updateSelectedOption(newValue) {
+            this.update(this.value == newValue && this.config.clearable ? null : newValue);
+        },
 
         setupResizeObserver() {
             this.resizeObserver = new ResizeObserver(() => {

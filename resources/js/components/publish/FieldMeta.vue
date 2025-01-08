@@ -61,6 +61,7 @@ export default {
                 this.meta = response.data.meta;
                 this.modelValue = response.data.value;
                 this.loading = false;
+                this.$emit('loaded');
             });
         },
 

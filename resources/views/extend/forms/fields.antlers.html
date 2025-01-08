@@ -1,9 +1,20 @@
 {{ fields }}
     <div class="p-4">
-        <label>{{ display }}</label>
-        <div class="p-2">{{ field }}</div>
+        <label for="{{ id }}">
+            {{ display }}
+            {{ if validate | contains:required }}
+                <sup aria-label="{{ trans:Required }}">*</sup>
+            {{ /if }}
+        </label>
+        {{ if instructions && instructions_position == "above" }}
+            <p class="text-gray-500" id="{{ id }}-instructions">{{ instructions }}</p>
+        {{ /if }}
+        <div class="py-2">{{ field }}</div>
+        {{ if instructions && instructions_position == "below" }}
+            <p class="text-gray-500" id="{{ id }}-instructions">{{ instructions }}</p>
+        {{ /if }}
         {{ if error }}
-            <p class="text-gray-500">{{ error }}</p>
+            <p class="text-red-700" id="{{ id }}-error">{{ error }}</p>
         {{ /if }}
     </div>
 {{ /fields }}
