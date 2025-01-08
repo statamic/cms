@@ -30,7 +30,7 @@
                                     :button="button"
                                     :active="buttonIsActive(button)"
                                     :config="config"
-                                    :bard="_self"
+                                    :bard="thisVueComponent"
                                     :editor="editor" />
                             </div>
                         </div>
@@ -406,6 +406,10 @@ export default {
                 },
             ];
         },
+
+        thisVueComponent() {
+            return this;
+        }
     },
 
     mounted() {
