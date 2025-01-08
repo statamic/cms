@@ -1,25 +1,8 @@
 import Vue from 'vue';
 import Toast from './mixins/Toast.js';
-import Statamic from './components/Statamic.js';
-import Alpine from 'alpinejs'
-import * as Globals from './bootstrap/globals'
-import { default as underscore } from 'underscore'
-import Cookies from 'cookies-js';
 
-import.meta.glob(['../img/**']);
 
-let global_functions = Object.keys(Globals)
-global_functions.forEach(fnName => { window[fnName] = Globals[fnName] })
-
-Vue.config.silent = false;
-Vue.config.devtools = true;
-Vue.config.productionTip = false
-
-window.Cookies = Cookies;
-window.Alpine = Alpine
 window.Vue = Vue;
-window.Statamic = Statamic;
-window._ = underscore;
 
 import './bootstrap/polyfills';
 import './bootstrap/underscore-mixins';
