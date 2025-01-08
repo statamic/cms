@@ -16,6 +16,8 @@ export default {
 
         this.$app.config.silent = false;
         this.$app.config.devtools = true;
+
+        this.$app.mount('#statamic');
     }
 
 }

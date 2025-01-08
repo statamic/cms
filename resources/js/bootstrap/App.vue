@@ -48,7 +48,6 @@ import PortalTargets from '../components/portals/PortalTargets.vue';
 import SitesEditForm from '../components/sites/EditForm.vue';
 
 export default {
-    el: '#statamic',
 
     mixins: [Toast],
 
