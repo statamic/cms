@@ -103,7 +103,7 @@ export default {
 
         labelText() {
             return this.field.config.display
-                || Vue.options.filters.titleize(Vue.options.filters.deslugify(this.field.handle));
+                || this.$filters.titleize(this.$filters.deslugify(this.field.handle));
         },
 
         width: {

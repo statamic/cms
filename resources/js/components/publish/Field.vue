@@ -132,7 +132,11 @@ export default {
         },
 
         fieldtypeComponentExists() {
-            return Vue.options.components[this.fieldtypeComponent] !== undefined;
+            if (! Statamic.$app.component(this.fieldtypeComponent)) {
+                console.warn('unsupported fieldtype: ' + this.fieldtypeComponent);
+            }
+
+            return Statamic.$app.component(this.fieldtypeComponent) !== undefined;
         },
 
         instructions() {
@@ -214,7 +218,7 @@ export default {
 
         labelText() {
              return this.config.display
-                 || Vue.$options.filters.titleize(Vue.$options.filters.deslugify(this.config.handle));
+                 || this.$filters.titleize(this.$filters.deslugify(this.config.handle));
          },
 
         showLabelText() {

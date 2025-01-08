@@ -71,7 +71,7 @@ export default {
             errors: {},
             password: null,
             pinging: false,
-            lastCount: Vue.moment(),
+            lastCount: moment(),
             isPageHidden: false,
         }
     },
@@ -113,14 +113,14 @@ export default {
             // Javascript is being executed, but the count will have stopped if the computer
             // has been put to sleep. If it's been a while since the last count, we'll
             // also perform a timeout check. This will let things recalibrate.
-            const secondsSinceLastCount = Vue.moment().diff(this.lastCount, 'seconds');
+            const secondsSinceLastCount = moment().diff(this.lastCount, 'seconds');
             const itsBeenAWhile = secondsSinceLastCount > 10;
 
             if (withinWarningPeriod || itsBeenAWhile) {
                 this.ping().catch(e => {});
             }
 
-            this.lastCount = Vue.moment();
+            this.lastCount = moment();
         },
 
         isShowingLogin(showing, wasShowing) {

@@ -38,7 +38,7 @@ export default {
 
     mounted() {
         this.$http.get(cp_url('auth/token')).success(response => {
-            Vue.http.headers.common['X-CSRF-TOKEN'] = response;
+            this.$http.headers.common['X-CSRF-TOKEN'] = response;
         });
 
         this.$refs.password.focus();

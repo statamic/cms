@@ -214,8 +214,7 @@ export default {
         setupMoment() {
             const locale = Statamic.$config.get('locale');
             window.moment.locale(locale);
-            Vue.moment.locale(locale);
-            Vue.prototype.$moment.locale(locale);
+            this.$moment.locale(locale);
 
             const spec = {
                 relativeTime: {
@@ -236,8 +235,7 @@ export default {
                 }
             };
             window.moment.updateLocale(locale, spec);
-            Vue.moment.updateLocale(locale, spec);
-            Vue.prototype.$moment.updateLocale(locale, spec);
+            this.$moment.updateLocale(locale, spec);
         }
     }
 

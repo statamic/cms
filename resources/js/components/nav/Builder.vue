@@ -553,7 +553,7 @@ export default {
             if (currentAction === '@create' || value !== data_get(item.original, key)) {
                 item.manipulations[key] = value;
             } else {
-                Vue.delete(item.manipulations, key);
+                delete item.manipulations[key];
             }
         },
 
@@ -567,7 +567,7 @@ export default {
             if (detectedAction) {
                 item.manipulations.action = detectedAction;
             } else {
-                Vue.delete(item.manipulations, 'action');
+                delete item.manipulations['action'];
             }
 
             if (this.isChildItemNode(item)) {
@@ -749,7 +749,7 @@ export default {
         },
 
         hideItem(item) {
-            Vue.set(item.manipulations, 'action', '@hide');
+            item.manipulations['action'] = '@hide';
 
             this.updateItemAction(item);
 
@@ -757,7 +757,7 @@ export default {
         },
 
         showItem(item) {
-            Vue.delete(item.manipulations, 'action');
+            delete item.manipulations['action'];
 
             this.updateItemAction(item);
 
