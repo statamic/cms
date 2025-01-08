@@ -1,5 +1,7 @@
 <script>
 export default {
+    emits: ['loaded'],
+
     props: {
         config: Object,
         initialValue: {},

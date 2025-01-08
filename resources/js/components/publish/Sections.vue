@@ -54,6 +54,10 @@ export default {
             return this.state.values;
         },
 
+        extraValues() {
+            return this.state.extraValues;
+        },
+
         visibleSections() {
             return this.sections.filter(section => this.sectionHasVisibleFields(section));
         },

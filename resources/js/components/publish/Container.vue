@@ -34,7 +34,7 @@ export default {
         },
         extraValues: {
             type: Object,
-            default: () => {}
+            default: () => ({})
         },
         meta: {
             type: Object,

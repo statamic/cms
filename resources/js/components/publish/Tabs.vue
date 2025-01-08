@@ -215,6 +215,10 @@ export default {
         values() {
             return this.state.values;
         },
+
+        extraValues() {
+            return this.state.extraValues;
+        },
     },
 
     beforeUpdate() {
