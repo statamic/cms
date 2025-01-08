@@ -228,19 +228,19 @@
 </template>
 
 <script>
-import {DraggableTree} from 'vue-draggable-nested-tree/dist/vue-draggable-nested-tree';
-import TreeBranch from './Branch.vue';
-import ItemEditor from './ItemEditor.vue';
-import SectionEditor from './SectionEditor.vue';
-import { data_get } from  '../../bootstrap/globals.js'
+// import {DraggableTree} from 'vue-draggable-nested-tree/dist/vue-draggable-nested-tree';
+// import TreeBranch from './Branch.vue';
+// import ItemEditor from './ItemEditor.vue';
+// import SectionEditor from './SectionEditor.vue';
+// import { data_get } from  '../../bootstrap/globals.js'
 
 export default {
 
     components: {
-        DraggableTree,
-        TreeBranch,
-        ItemEditor,
-        SectionEditor,
+        // DraggableTree,
+        // TreeBranch,
+        // ItemEditor,
+        // SectionEditor,
     },
 
     props: {

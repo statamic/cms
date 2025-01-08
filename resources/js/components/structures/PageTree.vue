@@ -1,6 +1,6 @@
 <template>
     <div>
-
+<!--
         <div class="mb-2 flex justify-end">
             <a
                 class="text-2xs text-blue rtl:ml-4 ltr:mr-4 underline"
@@ -67,21 +67,21 @@
             </draggable-tree>
 
         </div>
-
+-->
     </div>
 </template>
 
 
 <script>
-import * as th from 'tree-helper';
-import {DraggableTree} from 'vue-draggable-nested-tree/dist/vue-draggable-nested-tree';
-import TreeBranch from './Branch.vue';
+// import * as th from 'tree-helper';
+// import {DraggableTree} from 'vue-draggable-nested-tree/dist/vue-draggable-nested-tree';
+// import TreeBranch from './Branch.vue';
 
 export default {
 
     components: {
-        DraggableTree,
-        TreeBranch,
+        // DraggableTree,
+        // TreeBranch,
     },
 
     props: {

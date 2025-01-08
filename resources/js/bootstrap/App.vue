@@ -49,9 +49,9 @@ import SitesEditForm from '../components/sites/EditForm.vue';
 
 export default {
 
-    mixins: [Toast],
+    // mixins: [Toast],
 
-    store: Statamic.$store,
+    // store: Statamic.$store,
 
     components: {
         GlobalSearch,
