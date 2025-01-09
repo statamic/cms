@@ -51,8 +51,6 @@ export default {
 
     // mixins: [Toast],
 
-    // store: Statamic.$store,
-
     components: {
         GlobalSearch,
         GlobalSiteSelector,
