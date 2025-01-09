@@ -11,7 +11,11 @@
 <div class="max-w-xs rounded shadow-lg flex items-center justify-center relative mx-auto">
     <div class="outside-shadow absolute inset-0"></div>
     <div class="card auth-card">
-        <login inline-template :show-email-login="!{{ $str::bool($oauth) }}" :has-error="{{ $str::bool(count($errors) > 0) }}">
+        <login
+            :show-email-login="!{{ $str::bool($oauth) }}"
+            :has-error="{{ $str::bool(count($errors) > 0) }}"
+            v-slot="{ showEmailLogin, busy, hasError }"
+        >
         <div>
             @if ($oauth)
                 <div class="login-oauth-providers">
