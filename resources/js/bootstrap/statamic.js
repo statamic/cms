@@ -4,6 +4,7 @@ import { store } from '../store/store';
 import Config from '../components/Config';
 import * as GlobalComponents from './components.js';
 import useGlobalEventBus from '../composables/global-event-bus';
+import VueClickAway from 'vue3-click-away';
 
 export default {
 
@@ -30,6 +31,7 @@ export default {
         this.$app.config.devtools = true;
 
         this.$app.use(store);
+        this.$app.use(VueClickAway);
 
         Object.assign(this.$app.config.globalProperties, {
             $moment: window.moment,
