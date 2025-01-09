@@ -203,8 +203,10 @@ class Glide extends Tags
      */
     private function generateGlideUrl($item)
     {
+        $options = $this->params->get('options', []);
+
         try {
-            $url = $this->isValidExtension($item) ? $this->getManipulator($item)->build() : $this->normalizeItem($item);
+            $url = $this->isValidExtension($item) ? $this->getManipulator($item)->build($options) : $this->normalizeItem($item);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
 
@@ -313,7 +315,7 @@ class Glide extends Tags
         $params = collect();
 
         foreach (collect($this->params)->except('as') as $param => $value) {
-            if (! in_array($param, ['src', 'id', 'path', 'tag', 'alt', 'absolute'])) {
+            if (! in_array($param, ['src', 'id', 'path', 'tag', 'alt', 'absolute', 'options'])) {
                 $params->put($param, $value);
             }
         }
