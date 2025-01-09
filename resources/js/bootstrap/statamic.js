@@ -6,6 +6,7 @@ import Config from '../components/Config';
 import Preferences from '../components/Preference';
 import * as GlobalComponents from './components.js';
 import useGlobalEventBus from '../composables/global-event-bus';
+import useProgressBar from '../composables/progress-bar';
 import VueClickAway from 'vue3-click-away';
 import FloatingVue from 'floating-vue';
 import 'floating-vue/dist/style.css';
@@ -44,6 +45,7 @@ export default {
             $moment: window.moment,
             $events: useGlobalEventBus(),
             $preferences: new Preferences(http, store),
+            $progress: useProgressBar(),
             $config: this.$config,
             $keys: new Keys,
         });
