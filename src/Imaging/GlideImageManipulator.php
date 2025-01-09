@@ -97,9 +97,9 @@ class GlideImageManipulator implements ImageManipulator
      *
      * @return mixed
      */
-    public function build()
+    public function build(array $options = [])
     {
-        return $this->builder->build($this->item, $this->params);
+        return $this->builder->options($options)->build($this->item, $this->params);
     }
 
     /**

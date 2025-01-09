@@ -66,4 +66,11 @@ class GlideUrlBuilder extends ImageUrlBuilder
 
         return URL::prependSiteRoot($builder->getUrl($path, $params));
     }
+
+    public function options(array $options = []): self
+    {
+        $this->options = array_merge($this->options, $options);
+
+        return $this;
+    }
 }
