@@ -2,6 +2,7 @@ import { createApp } from 'vue';
 import App from './App.vue';
 import { store } from '../store/store';
 import Config from '../components/Config';
+import * as GlobalComponents from './components.js';
 import useGlobalEventBus from '../composables/global-event-bus';
 
 export default {
@@ -35,6 +36,8 @@ export default {
             $events: useGlobalEventBus(),
             $config: this.$config,
         });
+        
+        Object.keys(GlobalComponents).forEach(key => this.$app.component(key, GlobalComponents[key]));
 
         this.$app.mount('#statamic');
     }
