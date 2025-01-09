@@ -5,6 +5,8 @@ import Config from '../components/Config';
 import * as GlobalComponents from './components.js';
 import useGlobalEventBus from '../composables/global-event-bus';
 import VueClickAway from 'vue3-click-away';
+import FloatingVue from 'floating-vue';
+import 'floating-vue/dist/style.css';
 
 export default {
 
@@ -32,6 +34,7 @@ export default {
 
         this.$app.use(store);
         this.$app.use(VueClickAway);
+        this.$app.use(FloatingVue, { disposeTimeout: 30000, distance: 10 });
 
         Object.assign(this.$app.config.globalProperties, {
             $moment: window.moment,

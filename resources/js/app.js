@@ -12,7 +12,6 @@ import './bootstrap/mixins';
 import './bootstrap/components';
 import './bootstrap/fieldtypes';
 import './bootstrap/directives';
-import './bootstrap/tooltips';
 
 import axios from 'axios';
 import PortalVue from "portal-vue";
