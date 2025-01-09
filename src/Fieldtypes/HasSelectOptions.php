@@ -52,7 +52,7 @@ trait HasSelectOptions
     {
         $values = $this->preProcess($value);
 
-        $values = collect(is_array($values) ? $values : [$values]);
+        $values = collect($values)->toArray();
 
         return $values->map(function ($value) {
             return $this->getLabel($value);
@@ -67,7 +67,7 @@ trait HasSelectOptions
             return [];
         }
 
-        $value = is_array($value) ? $value : [$value];
+        $value = collect($value)->toArray();
 
         $values = collect($value)->map(function ($value) {
             return $this->config('cast_booleans') ? $this->castFromBoolean($value) : $value;
