@@ -17,7 +17,6 @@ import './bootstrap/tooltips';
 import axios from 'axios';
 import PortalVue from "portal-vue";
 import VModal from "vue-js-modal";
-import Vuex from 'vuex';
 import vSelect from 'vue-select'
 import VCalendar from 'v-calendar';
 
@@ -54,19 +53,9 @@ Vue.prototype.$slug = Statamic.$slug;
 
 Vue.use(PortalVue, { portalName: 'v-portal' })
 Vue.use(VModal, { componentName: 'v-modal' })
-Vue.use(Vuex);
 Vue.use(VCalendar);
 
 Vue.component(vSelect)
-
-Statamic.$store = new Vuex.Store({
-    modules: {
-        statamic: StatamicStore,
-        publish: {
-            namespaced: true
-        }
-    }
-});
 
 import './components/ToastBus';
 import './components/portals/Portals';
