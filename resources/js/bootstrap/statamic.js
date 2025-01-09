@@ -4,7 +4,7 @@ import { store } from '../store/store';
 import http from '../components/http';
 import Config from '../components/Config';
 import Preferences from '../components/Preference';
-import * as GlobalComponents from './components.js';
+import registerGlobalComponents from './components.js';
 import registerFieldtypes from './fieldtypes.js';
 import useGlobalEventBus from '../composables/global-event-bus';
 import useProgressBar from '../composables/progress-bar';
@@ -50,9 +50,8 @@ export default {
             $config: this.$config,
             $keys: new Keys,
         });
-        
-        Object.keys(GlobalComponents).forEach(key => this.$app.component(key, GlobalComponents[key]));
 
+        registerGlobalComponents(this.$app);
         registerFieldtypes(this.$app);
 
         this.$app.mount('#statamic');

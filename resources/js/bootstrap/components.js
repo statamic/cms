@@ -1,65 +1,154 @@
-// import vSelect from 'vue-select'
-// export { default as AssetManager } from '../components/assets/AssetManager.vue';
-export { default as AssetBrowser } from '../components/assets/Browser/Browser.vue';
-export { default as UpdatesBadge } from '../components/UpdatesBadge.vue';
-export { default as PublishContainer } from '../components/publish/Container.vue';
-export { default as PublishForm } from '../components/publish/PublishForm.vue';
-export { default as PublishFields } from '../components/publish/Fields.vue';
-export { default as PublishFieldsContainer } from '../components/publish/FieldsContainer.vue'; // deprecated
-export { default as PublishField } from '../components/publish/Field.vue';
-export { default as PublishFieldFullscreenHeader } from '../components/publish/FullscreenHeader.vue';
-export { default as PublishFieldMeta } from '../components/publish/FieldMeta.vue';
-export { default as PublishFieldActions } from '../components/field-actions/FieldActions.vue';
-export { default as ConfigureTabs } from '../components/configure/Tabs.vue';
-export { default as PublishTabs } from '../components/publish/Tabs.vue';
-export { default as PublishSections } from '../components/publish/Sections.vue';
-export { default as PublishValidationErrors } from '../components/publish/ValidationErrors.vue';
-export { default as FormGroup } from '../components/publish/FormGroup.vue';
-export { default as LivePreview } from '../components/live-preview/LivePreview.vue';
-export { default as LivePreviewPopout } from '../components/live-preview/Popout.vue';
-export { default as EntryPublishForm } from '../components/entries/PublishForm.vue';
-export { default as TermPublishForm } from '../components/terms/PublishForm.vue';
-export { default as UserPublishForm } from '../components/users/PublishForm.vue';
-export { default as DataList } from '../components/data-list/DataList.vue';
-export { default as DataListTable } from '../components/data-list/Table.vue';
-export { default as DataListSearch } from '../components/data-list/Search.vue';
-export { default as DataListBulkActions } from '../components/data-list/BulkActions.vue';
-export { default as DataListInlineActions } from '../components/data-list/InlineActions.vue';
-export { default as DataListColumnPicker } from '../components/data-list/ColumnPicker.vue';
-export { default as DataListToggleAll } from '../components/data-list/ToggleAll.vue';
-export { default as DataListPagination } from '../components/data-list/Pagination.vue';
-// export { default as DataListFilters } from '../components/data-list/Filters.vue';
-export { default as DataListFilterPresets } from '../components/data-list/FilterPresets.vue';
-export { default as EntryList } from '../components/entries/Listing.vue';
-export { default as CollectionList } from '../components/collections/Listing.vue';
-export { default as TaxonomyList } from '../components/taxonomies/Listing.vue';
-export { default as TermList } from '../components/terms/Listing.vue';
-export { default as AssetContainerList } from '../components/AssetContainerList.vue';
-export { default as AddonList } from '../components/AddonList.vue';
-export { default as AddonDetails } from '../components/AddonDetails.vue';
-export { default as CollectionWidget } from '../components/entries/Widget.vue';
-export { default as SvgIcon } from '../components/SvgIcon.vue';
-export { default as FileIcon } from '../components/FileIcon.vue';
-export { default as LoadingGraphic } from '../components/LoadingGraphic.vue';
-export { default as DropdownList } from '../components/DropdownList.vue';
-export { default as DropdownItem } from '../components/DropdownItem.vue';
-export { default as ValidationErrors } from '../components/ValidationErrors.vue';
-export { default as Slugify } from '../components/slugs/Slugify.vue';
-export { default as ElementContainer } from '../components/ElementContainer.vue';
-export { default as Avatar } from '../components/Avatar.vue';
-export { default as Breadcrumb } from '../components/Breadcrumb.vue';
-export { default as Breadcrumbs } from '../components/Breadcrumbs.vue';
-export { default as CreateEntryButton } from '../components/entries/CreateEntryButton.vue';
-// export { default as Popover } from '../components/Popover.vue';
-export { default as Portal } from '../components/portals/Portal.vue';
-export { default as RolePermissionTree } from '../components/roles/PermissionTree.vue';
-export { default as Modal } from '../components/Modal.vue';
-export { default as ConfirmationModal } from '../components/modals/ConfirmationModal.vue';
-export { default as FavoriteCreator } from '../components/FavoriteCreator.vue';
-export { default as KeyboardShortcutsModal } from '../components/modals/KeyboardShortcutsModal.vue';
-export { default as FieldActionModal } from '../components/field-actions/FieldActionModal.vue';
-export { default as ResourceDeleter } from '../components/ResourceDeleter.vue';
-export { default as Stack } from '../components/stacks/Stack.vue';
-export { default as StackTest } from '../components/stacks/StackTest.vue';
-export { default as CodeBlock } from '../components/CodeBlock.vue';
-export { default as BlueprintResetter } from '../components/blueprints/BlueprintResetter.vue';
+import vSelect from 'vue-select'
+// import AssetManager from '../components/assets/AssetManager.vue';
+import Browser from '../components/assets/Browser/Browser.vue';
+import UpdatesBadge from '../components/UpdatesBadge.vue';
+import Container from '../components/publish/Container.vue';
+import PublishForm from '../components/publish/PublishForm.vue';
+import Fields from '../components/publish/Fields.vue';
+import FieldsContainer from '../components/publish/FieldsContainer.vue'; // deprecated
+import Field from '../components/publish/Field.vue';
+import FullscreenHeader from '../components/publish/FullscreenHeader.vue';
+import FieldMeta from '../components/publish/FieldMeta.vue';
+import FieldActions from '../components/field-actions/FieldActions.vue';
+import ConfigureTabs from '../components/configure/Tabs.vue';
+import PublishTabs from '../components/publish/Tabs.vue';
+import PublishSections from '../components/publish/Sections.vue';
+import PublishValidationErrors from '../components/publish/ValidationErrors.vue';
+import FormGroup from '../components/publish/FormGroup.vue';
+import LivePreview from '../components/live-preview/LivePreview.vue';
+import Popout from '../components/live-preview/Popout.vue';
+import EntryPublishForm from '../components/entries/PublishForm.vue';
+import TermPublishForm from '../components/terms/PublishForm.vue';
+import UserPublishForm from '../components/users/PublishForm.vue';
+import DataList from '../components/data-list/DataList.vue';
+import Table from '../components/data-list/Table.vue';
+import Search from '../components/data-list/Search.vue';
+import BulkActions from '../components/data-list/BulkActions.vue';
+import InlineActions from '../components/data-list/InlineActions.vue';
+import ColumnPicker from '../components/data-list/ColumnPicker.vue';
+import ToggleAll from '../components/data-list/ToggleAll.vue';
+import Pagination from '../components/data-list/Pagination.vue';
+// import Filters from '../components/data-list/Filters.vue';
+import FilterPresets from '../components/data-list/FilterPresets.vue';
+import EntryListing from '../components/entries/Listing.vue';
+import CollectionListing from '../components/collections/Listing.vue';
+import TaxonomyListing from '../components/taxonomies/Listing.vue';
+import TermListing from '../components/terms/Listing.vue';
+import AssetContainerList from '../components/AssetContainerList.vue';
+import AddonList from '../components/AddonList.vue';
+import AddonDetails from '../components/AddonDetails.vue';
+import CollectionWidget from '../components/entries/Widget.vue';
+import SvgIcon from '../components/SvgIcon.vue';
+import FileIcon from '../components/FileIcon.vue';
+import LoadingGraphic from '../components/LoadingGraphic.vue';
+import DropdownList from '../components/DropdownList.vue';
+import DropdownItem from '../components/DropdownItem.vue';
+import ValidationErrors from '../components/ValidationErrors.vue';
+import Slugify from '../components/slugs/Slugify.vue';
+import ElementContainer from '../components/ElementContainer.vue';
+import Avatar from '../components/Avatar.vue';
+import Breadcrumb from '../components/Breadcrumb.vue';
+import Breadcrumbs from '../components/Breadcrumbs.vue';
+import CreateEntryButton from '../components/entries/CreateEntryButton.vue';
+// import Popover from '../components/Popover.vue';
+import Portal from '../components/portals/Portal.vue';
+import PermissionTree from '../components/roles/PermissionTree.vue';
+import Modal from '../components/Modal.vue';
+import ConfirmationModal from '../components/modals/ConfirmationModal.vue';
+import FavoriteCreator from '../components/FavoriteCreator.vue';
+import KeyboardShortcutsModal from '../components/modals/KeyboardShortcutsModal.vue';
+import FieldActionModal from '../components/field-actions/FieldActionModal.vue';
+import ResourceDeleter from '../components/ResourceDeleter.vue';
+import Stack from '../components/stacks/Stack.vue';
+import StackTest from '../components/stacks/StackTest.vue';
+import CodeBlock from '../components/CodeBlock.vue';
+import BlueprintResetter from '../components/blueprints/BlueprintResetter.vue';
+
+export default function registerGlobalComponents(app) {
+    // Third Party
+    app.component('v-select', vSelect)
+
+    // Core
+    // app.component('asset-manager', AssetManager);
+    app.component('asset-browser', Browser);
+    app.component('updates-badge', UpdatesBadge);
+
+    // Publish
+    app.component('publish-container', Container);
+    app.component('publish-form', PublishForm);
+    app.component('publish-fields', Fields);
+    app.component('publish-fields-container', FieldsContainer);
+    app.component('publish-field', Field);
+    app.component('publish-field-meta', FieldMeta);
+    app.component('publish-field-actions', FieldActions);
+    app.component('publish-field-fullscreen-header', FullscreenHeader);
+    app.component('configure-tabs', ConfigureTabs);
+    app.component('publish-tabs', PublishTabs);
+    app.component('publish-sections', PublishSections);
+    app.component('publish-validation-errors', PublishValidationErrors);
+    app.component('form-group', FormGroup);
+
+    app.component('live-preview', LivePreview);
+    app.component('live-preview-popout', Popout);
+
+    app.component('EntryPublishForm', EntryPublishForm);
+    app.component('TermPublishForm', TermPublishForm);
+    app.component('UserPublishForm', UserPublishForm);
+
+    // Data List
+    app.component('data-list', DataList);
+    app.component('data-list-table', Table);
+    app.component('data-list-search', Search);
+    app.component('data-list-bulk-actions', BulkActions);
+    app.component('data-list-inline-actions', InlineActions);
+    app.component('data-list-column-picker', ColumnPicker);
+    app.component('data-list-toggle-all', ToggleAll);
+    app.component('data-list-pagination', Pagination);
+    // app.component('data-list-filters', Filters);
+    app.component('data-list-filter-presets', FilterPresets);
+
+    // Resource Type Lists
+    app.component('entry-list', EntryListing);
+    app.component('collection-list', CollectionListing);
+    app.component('taxonomy-list', TaxonomyListing);
+    app.component('term-list', TermListing);
+    app.component('asset-container-list', AssetContainerList);
+    app.component('addon-list', AddonList);
+    app.component('addon-details', AddonDetails);
+
+    // Widgets
+    app.component('collection-widget', CollectionWidget);
+
+    // Reusable
+    app.component('svg-icon', SvgIcon);
+    app.component('file-icon', FileIcon);
+    app.component('loading-graphic', LoadingGraphic);
+    app.component('dropdown-list', DropdownList);
+    app.component('dropdown-item', DropdownItem);
+    app.component('validation-errors', ValidationErrors);
+    app.component('slugify', Slugify);
+    app.component('element-container', ElementContainer);
+    app.component('avatar', Avatar);
+    app.component('breadcrumb', Breadcrumb);
+    app.component('breadcrumbs', Breadcrumbs);
+    app.component('create-entry-button', CreateEntryButton);
+    // app.component('popover', Popover);
+    app.component('portal', Portal);
+    app.component('code-block', CodeBlock);
+
+    // Recursive
+    app.component('role-permission-tree', PermissionTree);
+
+    // Modals
+    app.component('modal', Modal);
+    app.component('confirmation-modal', ConfirmationModal);
+    app.component('favorite-creator', FavoriteCreator);
+    app.component('keyboard-shortcuts-modal', KeyboardShortcutsModal);
+    app.component('resource-deleter', ResourceDeleter);
+    app.component('field-action-modal', FieldActionModal);
+
+    app.component('stack', Stack);
+    app.component('stack-test', StackTest);
+
+    app.component('blueprint-resetter', BlueprintResetter);
+};
