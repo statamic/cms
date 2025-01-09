@@ -2,7 +2,7 @@
 <div>
 
     <sortable-list
-        :value="rows"
+        :model-value="rows"
         :vertical="true"
         :item-class="sortableItemClass"
         :handle-class="sortableHandleClass"
@@ -10,7 +10,7 @@
         constrain-dimensions
         @dragstart="$emit('focus')"
         @dragend="$emit('blur')"
-        @input="(rows) => $emit('sorted', rows)"
+        @update:model-value="(rows) => $emit('sorted', rows)"
     >
         <div
             class="grid-stacked"

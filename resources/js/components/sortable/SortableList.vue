@@ -15,9 +15,10 @@ function move(items, oldIndex, newIndex) {
 }
 
 export default {
+    emits: ['dragstart', 'dragend', 'update:model-value'],
 
     props: {
-        value: {
+        modelValue: {
             required: true,
         },
         itemClass: {
@@ -106,8 +107,8 @@ export default {
 
     render() {
         return this.$slots.default({
-            items: this.value,
-        })
+            items: this.modelValue,
+        })[0];
     },
 
     mounted() {
@@ -118,6 +119,10 @@ export default {
         this.setupSortableList();
     },
 
+    unmounted() {
+        this.destroySortableList();
+    },
+
     methods: {
         setupSortableList() {
             this.sortable = new Sortable(this.$el, this.computedOptions);
@@ -126,11 +131,7 @@ export default {
             this.sortable.on('drag:stop', () => this.$emit('dragend'));
 
             this.sortable.on('sortable:stop', ({ oldIndex, newIndex }) => {
-                this.$emit('input', move(this.value, oldIndex, newIndex))
-            })
-
-            this.$on('hook:destroyed', () => {
-                this.sortable.destroy()
+                this.$emit('update:model-value', move(this.modelValue, oldIndex, newIndex))
             })
 
             if (this.mirror === false) {

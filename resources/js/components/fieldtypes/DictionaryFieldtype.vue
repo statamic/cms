@@ -43,10 +43,10 @@
                 <sortable-list
                     item-class="sortable-item"
                     handle-class="sortable-item"
-                    :value="value"
+                    :model-value="value"
                     :distance="5"
                     :mirror="false"
-                    @input="update"
+                    @update:model-value="update"
                 >
                     <div class="vs__selected-options-outside flex flex-wrap">
                         <span v-for="option in selectedOptions" :key="option.value" class="vs__selected mt-2 sortable-item" :class="{'invalid': option.invalid}">

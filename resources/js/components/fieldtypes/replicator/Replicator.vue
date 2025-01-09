@@ -18,13 +18,13 @@
     <section :class="{'mt-14 p-4 bg-gray-200 dark:bg-dark-700': fullScreenMode}">
 
         <sortable-list
-            :value="value"
+            :model-value="value"
             :vertical="true"
             :item-class="sortableItemClass"
             :handle-class="sortableHandleClass"
             append-to="body"
             constrain-dimensions
-            @input="sorted($event)"
+            @update:model-value="sorted($event)"
             @dragstart="$emit('focus')"
             @dragend="$emit('blur')"
         >
