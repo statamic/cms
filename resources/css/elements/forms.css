@@ -213,6 +213,7 @@ input.input-text-minimal:read-only,
         @apply select-none rounded leading-normal align-middle whitespace-nowrap appearance-none subpixel-antialiased;
 
         background: linear-gradient(180deg, #fff, #f9fafb);
+        background-clip: padding-box;
         border: 1px solid #c4cdd6;
         height: 2.375rem; /*  38px */
         letter-spacing: -0.01em;
