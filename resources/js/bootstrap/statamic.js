@@ -30,9 +30,11 @@ export default {
 
         this.$app.use(store);
 
-        this.$app.config.globalProperties.$moment = window.moment;
-        this.$app.config.globalProperties.$events = useGlobalEventBus();
-        this.$app.config.globalProperties.$config = this.$config;
+        Object.assign(this.$app.config.globalProperties, {
+            $moment: window.moment,
+            $events: useGlobalEventBus(),
+            $config: this.$config,
+        });
 
         this.$app.mount('#statamic');
     }
