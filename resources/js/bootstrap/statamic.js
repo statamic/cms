@@ -57,6 +57,11 @@ export default {
             },
             $markdown(value) {
                 return markdown(value);
+            },
+            can(permission) {
+                const permissions = JSON.parse(atob(Statamic.$config.get('permissions')));
+
+                return permissions.includes('super') || permissions.includes(permission);
             }
         });
 
