@@ -11,7 +11,7 @@ interface ImageManipulator
      *
      * @return mixed
      */
-    public function build(array $options = []);
+    public function build();
 
     /**
      * Set the item to be manipulated.
