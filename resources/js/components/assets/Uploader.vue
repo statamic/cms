@@ -1,10 +1,11 @@
 <script>
 import { Upload } from 'upload';
 import uniqid from 'uniqid';
+import { h } from 'vue';
 
 export default {
 
-    render(h) {
+    render() {
         const fileField = h('input', {
             class: { hidden: true },
             attrs: { type: 'file', multiple: true },
