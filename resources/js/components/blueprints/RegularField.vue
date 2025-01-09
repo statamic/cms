@@ -103,7 +103,7 @@ export default {
 
         labelText() {
             return this.field.config.display
-                || this.$filters.titleize(this.$filters.deslugify(this.field.handle));
+                || this.$options.filters.titleize(this.$options.filters.deslugify(this.field.handle));
         },
 
         width: {
