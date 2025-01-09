@@ -12,6 +12,7 @@ import VueClickAway from 'vue3-click-away';
 import FloatingVue from 'floating-vue';
 import 'floating-vue/dist/style.css';
 import Keys from '../components/keys/Keys';
+import FieldActions from "../components/field-actions/FieldActions.js";
 
 export default {
 
@@ -49,6 +50,7 @@ export default {
             $progress: useProgressBar(),
             $config: this.$config,
             $keys: new Keys,
+            $fieldActions: new FieldActions,
         });
 
         Object.assign(this.$app.config.globalProperties, {
