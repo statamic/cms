@@ -20,6 +20,7 @@
 </template>
 
 <script>
+import Fieldtype from './Fieldtype.vue';
 import IMask from 'imask';
 
 export default {

@@ -10,6 +10,7 @@
 </template>
 
 <script>
+import Fieldtype from './Fieldtype.vue';
 import WidthSelector from '../fields/WidthSelector.vue';
 
 export default {

@@ -170,6 +170,7 @@
 
 
 <script>
+import Fieldtype from '../Fieldtype.vue';
 import AssetRow from './AssetRow.vue';
 import AssetTile from './AssetTile.vue';
 import Selector from '../../assets/Selector.vue';

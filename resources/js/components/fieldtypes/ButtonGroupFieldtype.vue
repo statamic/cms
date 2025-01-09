@@ -18,6 +18,7 @@
 </template>
 
 <script>
+import Fieldtype from './Fieldtype.vue';
 import HasInputOptions from './HasInputOptions.js'
 import ResizeObserver from 'resize-observer-polyfill';
 

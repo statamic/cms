@@ -36,6 +36,7 @@
 </template>
 
 <script>
+import Fieldtype from './Fieldtype.vue';
 import SinglePopover from './date/SinglePopover.vue';
 import SingleInline from './date/SingleInline.vue';
 import RangePopover from './date/RangePopover.vue';

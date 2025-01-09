@@ -88,6 +88,7 @@
 </template>
 
 <script>
+import Fieldtype from '../Fieldtype.vue';
 import uniqid from 'uniqid';
 import ReplicatorSet from './Set.vue';
 import AddSetButton from './AddSetButton.vue';

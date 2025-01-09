@@ -60,6 +60,7 @@
 </style>
 
 <script>
+import Fieldtype from './Fieldtype.vue';
 import HasInputOptions from './HasInputOptions.js'
 import { SortableList, SortableItem } from '../sortable/Sortable';
 

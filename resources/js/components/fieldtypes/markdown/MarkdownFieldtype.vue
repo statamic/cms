@@ -134,6 +134,7 @@
 </template>
 
 <script>
+import Fieldtype from '../Fieldtype.vue';
 import { marked } from 'marked';
 import PlainTextRenderer from 'marked-plaintext';
 

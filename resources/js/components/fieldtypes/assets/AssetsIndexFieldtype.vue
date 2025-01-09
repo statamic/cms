@@ -14,6 +14,7 @@
 </template>
 
 <script>
+import IndexFieldtype from '../IndexFieldtype.vue';
 import AssetThumbnail from '../../assets/Browser/Thumbnail.vue';
 
 export default {

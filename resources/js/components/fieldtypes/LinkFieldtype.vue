@@ -52,6 +52,7 @@
 </template>
 
 <script>
+import Fieldtype from './Fieldtype.vue';
 import PositionsSelectOptions from '../../mixins/PositionsSelectOptions';
 
 export default {

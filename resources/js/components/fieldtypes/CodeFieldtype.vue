@@ -29,6 +29,7 @@
 </template>
 
 <script>
+import Fieldtype from './Fieldtype.vue';
 import CodeMirror from 'codemirror'
 
 // Addons

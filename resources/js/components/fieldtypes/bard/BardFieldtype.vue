@@ -110,6 +110,7 @@
 </template>
 
 <script>
+import Fieldtype from '../Fieldtype.vue';
 import uniqid from 'uniqid';
 import reduce from 'underscore/modules/reduce';
 import { BubbleMenu, Editor, EditorContent } from '@tiptap/vue-2';

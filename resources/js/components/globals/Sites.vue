@@ -33,6 +33,8 @@
 </template>
 
 <script>
+import Fieldtype from '../fieldtypes/Fieldtype.vue';
+
 export default {
 
     mixins: [Fieldtype],

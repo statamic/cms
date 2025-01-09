@@ -75,6 +75,7 @@
 </style>
 
 <script>
+import Fieldtype from './Fieldtype.vue';
 import HasInputOptions from './HasInputOptions.js'
 import { SortableList } from '../sortable/Sortable';
 import PositionsSelectOptions from '../../mixins/PositionsSelectOptions';
