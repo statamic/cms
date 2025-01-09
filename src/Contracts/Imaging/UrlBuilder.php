@@ -12,6 +12,4 @@ interface UrlBuilder
      * @return string
      */
     public function build($item, $params);
-
-    public function options(array $options = []): self;
 }
