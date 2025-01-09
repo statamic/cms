@@ -9,6 +9,7 @@ import useGlobalEventBus from '../composables/global-event-bus';
 import VueClickAway from 'vue3-click-away';
 import FloatingVue from 'floating-vue';
 import 'floating-vue/dist/style.css';
+import Keys from '../components/keys/Keys';
 
 export default {
 
@@ -44,6 +45,7 @@ export default {
             $events: useGlobalEventBus(),
             $preferences: new Preferences(http, store),
             $config: this.$config,
+            $keys: new Keys,
         });
         
         Object.keys(GlobalComponents).forEach(key => this.$app.component(key, GlobalComponents[key]));
