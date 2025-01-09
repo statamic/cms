@@ -18,7 +18,7 @@
                         {{ display || config.handle }}
                     </label>
                     <div class="flex items-center" v-if="config.instructions && !collapsed">
-                        <svg-icon name="micro/circle-help" class="text-gray-700 dark:text-dark-175 hover:text-gray-800 dark:hover:text-dark-100 h-3 w-3 text-xs" v-tooltip="{ content: $options.filters.markdown(__(config.instructions)), html:true }" />
+                        <svg-icon name="micro/circle-help" class="text-gray-700 dark:text-dark-175 hover:text-gray-800 dark:hover:text-dark-100 h-3 w-3 text-xs" v-tooltip="{ content: $markdown(__(config.instructions)), html:true }" />
                     </div>
                     <div v-show="collapsed" class="flex-1 min-w-0 w-1 rtl:pl-8 ltr:pr-8">
                         <div

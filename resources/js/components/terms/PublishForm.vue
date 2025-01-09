@@ -9,7 +9,7 @@
                     <span v-if="! isCreating"
                         class="little-dot rtl:ml-2 ltr:mr-2 -top-1"
                         :class="{ 'bg-green-600': published, 'bg-gray-600': !published }" />
-                    <span class="break-overflowing-words" v-html="$options.filters.striptags(title)" />
+                    <span class="break-overflowing-words" v-html="formattedTitle" />
                 </div>
             </h1>
 
@@ -254,6 +254,7 @@ import RevisionHistory from '../revision-history/History.vue';
 import HasPreferences from '../data-list/HasPreferences';
 import HasHiddenFields from '../publish/HasHiddenFields';
 import HasActions from '../publish/HasActions';
+import striptags from 'striptags';
 
 export default {
 
@@ -338,6 +339,10 @@ export default {
     },
 
     computed: {
+
+        formattedTitle() {
+            return striptags(__(this.title));
+        },
 
         hasErrors() {
             return this.error || Object.keys(this.errors).length;

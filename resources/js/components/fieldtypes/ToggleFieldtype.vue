@@ -1,7 +1,7 @@
 <template>
     <div class="toggle-fieldtype-wrapper">
         <toggle-input :value="value" @input="update" :read-only="isReadOnly" :id="fieldId" />
-        <label v-if="inlineLabel" class="inline-label" v-html="$options.filters.markdown(__(inlineLabel))"></label>
+        <label v-if="inlineLabel" class="inline-label" v-html="$markdown(__(inlineLabel))"></label>
     </div>
 </template>
 

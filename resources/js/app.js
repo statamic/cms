@@ -7,7 +7,6 @@ window.Vue = Vue;
 import './bootstrap/polyfills';
 import './bootstrap/underscore-mixins';
 import './bootstrap/plugins';
-import './bootstrap/filters';
 import './bootstrap/mixins';
 import './bootstrap/components';
 import './bootstrap/fieldtypes';

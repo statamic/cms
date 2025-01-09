@@ -54,6 +54,9 @@ export default {
         Object.assign(this.$app.config.globalProperties, {
             __(key, replacements) {
                 return __(key, replacements);
+            },
+            $markdown(value) {
+                return markdown(value);
             }
         });
 

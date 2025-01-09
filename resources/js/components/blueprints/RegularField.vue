@@ -57,6 +57,8 @@ import Field from './Field.vue';
 import FieldSettings from '../fields/Settings.vue';
 import WidthSelector from '../fields/WidthSelector.vue';
 import CanDefineLocalizable from '../fields/CanDefineLocalizable';
+import titleize from '../../util/titleize';
+import deslugify from '../../util/deslugify';
 
 export default {
 
@@ -103,7 +105,7 @@ export default {
 
         labelText() {
             return this.field.config.display
-                || this.$options.filters.titleize(this.$options.filters.deslugify(this.field.handle));
+                || titleize(deslugify(this.field.handle));
         },
 
         width: {
