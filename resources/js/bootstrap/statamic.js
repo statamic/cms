@@ -51,6 +51,12 @@ export default {
             $keys: new Keys,
         });
 
+        Object.assign(this.$app.config.globalProperties, {
+            __(key, replacements) {
+                return __(key, replacements);
+            }
+        });
+
         registerGlobalComponents(this.$app);
         registerFieldtypes(this.$app);
 
