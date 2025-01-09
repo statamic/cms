@@ -93,6 +93,7 @@ input.input-text-minimal:read-only,
     .input-group-prepend, .input-group-append, .input-group-item {
         @apply rtl:rounded-r ltr:rounded-l px-2 border dark:border-dark-900 text-sm text-gray-800 dark:text-dark-150 select-none;
         background: linear-gradient(180deg, #fff, #f9fafb);
+        background-clip: padding-box;
         border: 1px solid #c4cdd6;
         box-shadow: 0 1px 0 0 rgba(25,30,35,.05);
         height: 2.375rem;
@@ -100,6 +101,7 @@ input.input-text-minimal:read-only,
 
         .dark & {
             background: linear-gradient(180deg, theme(colors.dark.500), theme(colors.dark.600));
+            background-clip: padding-box;
             border-color: theme(colors.dark.900);
             box-shadow: 0 1px 0 0 rgba(0,0,0,.05);
         }
@@ -133,10 +135,12 @@ input.input-text-minimal:read-only,
     button.input-group-append:hover:not(:disabled),
     button.input-group-append:active:not(:disabled) {
         background: linear-gradient(180deg, #f9fafb, #f4f6f8);
+        background-clip: padding-box;
         border-color: #c4cdd5;
 
         .dark & {
             background: linear-gradient(180deg, theme(colors.dark.550), theme(colors.dark.600));
+            background-clip: padding-box;
             border-color: theme(colors.dark.900);
         }
     }
@@ -221,15 +225,18 @@ input.input-text-minimal:read-only,
 
         .dark & {
             background: linear-gradient(180deg, theme(colors.dark.500), theme(colors.dark.600));
+            background-clip: padding-box;
             border-color: theme(colors.dark.800);
         }
 
         &:hover:not(:disabled), &:active:not(:disabled) {
             background: linear-gradient(180deg, #f9fafb, #f4f6f8);
+            background-clip: padding-box;
             border-color: #c4cdd5;
 
             .dark & {
                 background: linear-gradient(180deg, theme(colors.dark.700), theme(colors.dark.750));
+                background-clip: padding-box;
                 border-color: theme(colors.dark.900);
             }
         }

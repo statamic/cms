@@ -163,6 +163,7 @@ button {
 .btn-round {
     @apply rounded-full flex items-center text-center p-0;
     background: linear-gradient(180deg, #fff, #f9fafb);
+    background-clip: padding-box;
     border: 1px solid #c4cdd6;
     box-shadow: 0 1px 0 0 rgba(25,30,35,.05);
     height: 32px;
@@ -170,15 +171,18 @@ button {
 
     .dark & {
         background: linear-gradient(180deg, theme(colors.dark.500), theme(colors.dark.550));
+        background-clip: padding-box;
         border-color: theme(colors.dark.400);
     }
 
     &:hover:not(:disabled), &:active:not(:disabled) {
         background: linear-gradient(180deg, #f9fafb, #f4f6f8);
+        background-clip: padding-box;
         border-color: #c4cdd5;
 
         .dark & {
             background: linear-gradient(180deg, theme(colors.dark.550), theme(colors.dark.600));
+            background-clip: padding-box;
             border-color: theme(colors.dark.500);
         }
     }
