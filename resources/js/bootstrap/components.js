@@ -56,7 +56,7 @@ export { default as RolePermissionTree } from '../components/roles/PermissionTre
 export { default as Modal } from '../components/Modal.vue';
 export { default as ConfirmationModal } from '../components/modals/ConfirmationModal.vue';
 export { default as FavoriteCreator } from '../components/FavoriteCreator.vue';
-// export { default as KeyboardShortcutsModal } from '../components/modals/KeyboardShortcutsModal.vue';
+export { default as KeyboardShortcutsModal } from '../components/modals/KeyboardShortcutsModal.vue';
 export { default as FieldActionModal } from '../components/field-actions/FieldActionModal.vue';
 export { default as ResourceDeleter } from '../components/ResourceDeleter.vue';
 export { default as Stack } from '../components/stacks/Stack.vue';
