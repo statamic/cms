@@ -18,7 +18,6 @@ import axios from 'axios';
 import PortalVue from "portal-vue";
 import VModal from "vue-js-modal";
 import Vuex from 'vuex';
-import StatamicStore from './store';
 import vSelect from 'vue-select'
 import VCalendar from 'v-calendar';
 
@@ -45,7 +44,6 @@ Statamic.booting(Statamic => {
 Alpine.start()
 
 Vue.prototype.$axios = axios;
-Vue.prototype.$events = new Vue();
 Vue.prototype.$echo = Statamic.$echo;
 Vue.prototype.$bard = Statamic.$bard;
 Vue.prototype.$keys = Statamic.$keys;
@@ -75,6 +73,5 @@ import './components/portals/Portals';
 import './components/stacks/Stacks';
 import './components/ProgressBar';
 import './components/DirtyState';
-import './components/Config';
 import './components/Preference';
 import './components/Permission';
