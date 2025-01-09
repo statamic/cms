@@ -53,8 +53,6 @@ Vue.prototype.$reveal = Statamic.$reveal;
 Vue.prototype.$fieldActions = Statamic.$fieldActions;
 Vue.prototype.$slug = Statamic.$slug;
 
-import Moment from 'moment';
-window.moment = Vue.moment = Vue.prototype.$moment = Moment;
 
 Vue.use(PortalVue, { portalName: 'v-portal' })
 Vue.use(VModal, { componentName: 'v-modal' })

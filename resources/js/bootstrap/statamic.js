@@ -17,6 +17,8 @@ export default {
         this.$app.config.silent = false;
         this.$app.config.devtools = true;
 
+        this.$app.config.globalProperties.$moment = window.moment;
+
         this.$app.mount('#statamic');
     }
 
