@@ -160,7 +160,7 @@ export default {
     },
 
     render() {
-        return this.$scopedSlots.default({
+        return this.$slots.default({
             rows: this.filteredRows,
             hasSelections: this.sharedState.selections.length > 0,
         });

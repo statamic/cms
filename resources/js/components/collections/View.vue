@@ -9,7 +9,7 @@
             <div class="flex items-center">
                 <h1 class="flex-1" v-text="__(title)" />
 
-                <dropdown-list class="rtl:ml-2 ltr:mr-2" v-if="!!this.$scopedSlots.twirldown">
+                <dropdown-list class="rtl:ml-2 ltr:mr-2" v-if="!!this.$slots.twirldown">
                     <slot name="twirldown" :actionCompleted="actionCompleted" />
                 </dropdown-list>
 
