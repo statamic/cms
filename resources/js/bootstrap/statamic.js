@@ -3,6 +3,7 @@ import App from './App.vue';
 import { store } from '../store/store';
 import http from '../components/http';
 import Config from '../components/Config';
+import Preferences from '../components/Preference';
 import * as GlobalComponents from './components.js';
 import useGlobalEventBus from '../composables/global-event-bus';
 import VueClickAway from 'vue3-click-away';
@@ -41,6 +42,7 @@ export default {
             $axios: http,
             $moment: window.moment,
             $events: useGlobalEventBus(),
+            $preferences: new Preferences(http, store),
             $config: this.$config,
         });
         

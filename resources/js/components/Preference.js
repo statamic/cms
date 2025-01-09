@@ -1,13 +1,12 @@
-import Vue from 'vue';
-
-class Preference {
-    constructor(instance) {
-        this.instance = instance;
+export default class Preference {
+    constructor(http, store) {
+        this.http = http;
+        this.store = store;
         this.url = cp_url('preferences/js');
     }
 
     all() {
-        return this.instance.$store.state.statamic.config.user.preferences;
+        return this.store.state.statamic.config.user.preferences;
     }
 
     get(key, fallback) {
@@ -16,19 +15,19 @@ class Preference {
 
     set(key, value) {
         return this.commitOnSuccessAndReturnPromise(
-            this.instance.$axios.post(this.url, {key, value})
+            this.http.post(this.url, {key, value})
         );
     }
 
     append(key, value) {
         return this.commitOnSuccessAndReturnPromise(
-            this.instance.$axios.post(this.url, {key, value, append: true})
+            this.http.post(this.url, {key, value, append: true})
         );
     }
 
     remove(key, value=null, cleanup=true) {
         return this.commitOnSuccessAndReturnPromise(
-            this.instance.$axios.delete(`${this.url}/${key}`, { data: { value, cleanup } })
+            this.http.delete(`${this.url}/${key}`, { data: { value, cleanup } })
         );
     }
 
@@ -38,7 +37,7 @@ class Preference {
 
     commitOnSuccessAndReturnPromise(promise) {
         promise.then(response => {
-            this.instance.$store.commit('statamic/preferences', response.data);
+            this.store.commit('statamic/preferences', response.data);
         });
 
         return promise;
@@ -56,11 +55,3 @@ class Preference {
         return this.getDefault(key) !== null;
     }
 }
-
-Object.defineProperties(Vue.prototype, {
-    $preferences: {
-        get() {
-            return new Preference(this);
-        }
-    }
-});
