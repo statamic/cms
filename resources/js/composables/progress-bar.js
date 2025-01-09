@@ -1,11 +1,9 @@
-import { computed, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 import progress from 'nprogress';
 
 const progressing = ref(false);
 const names = ref([]);
 const timer = ref(null);
-const count = computed(() => names.value.length);
-const isComplete = computed(() => count.value === 0)
 
 function start() {
     progressing.value = true;
@@ -36,6 +34,14 @@ function remove(name) {
 
 function loading(name, loading) {
     loading ? add(name) : remove(name);
+}
+
+function count() {
+    return names.value.length;
+}
+
+function isComplete() {
+    return count() === 0;
 }
 
 watch(names, (newNames) => {
