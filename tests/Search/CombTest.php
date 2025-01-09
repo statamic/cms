@@ -239,6 +239,24 @@ EOT;
         $this->assertSame(1, $result['info']['total_results']);
     }
 
+    #[Test]
+    public function it_filters_out_results_with_disallowed_words()
+    {
+        $comb = new Comb([
+            ['title' => 'Pizza', 'ingredients' => ['Tomato', 'Cheese', 'Bread']],
+            ['title' => 'Tomato Soup', 'ingredients' => ['Tomato', 'Water', 'Salt']],
+            ['title' => 'Chicken & Sweetcorn Soup', 'ingredients' => ['Chicken', 'Sweetcorn', 'Water']],
+        ]);
+
+        try {
+            $results = $comb->lookUp('soup -tomato');
+        } catch (NoResultsFound $e) {
+            $results = [];
+        }
+
+        $this->assertEquals(['Chicken & Sweetcorn Soup'], collect($results['data'] ?? [])->pluck('data.title')->all());
+    }
+
     public static function searchesProvider()
     {
         return [
