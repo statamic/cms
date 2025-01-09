@@ -41,7 +41,6 @@ Statamic.booting(Statamic => {
 
 Alpine.start()
 
-Vue.prototype.$axios = axios;
 Vue.prototype.$echo = Statamic.$echo;
 Vue.prototype.$bard = Statamic.$bard;
 Vue.prototype.$keys = Statamic.$keys;
