@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Ignition\Solutions;
+namespace Statamic\ErrorSolutions\Solutions;
 
 use Spatie\ErrorSolutions\Contracts\Solution;
 

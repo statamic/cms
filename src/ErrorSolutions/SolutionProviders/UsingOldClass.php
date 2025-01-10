@@ -1,9 +1,9 @@
 <?php
 
-namespace Statamic\Ignition\SolutionProviders;
+namespace Statamic\ErrorSolutions\SolutionProviders;
 
 use Spatie\ErrorSolutions\Contracts\HasSolutionsForThrowable;
-use Statamic\Ignition\Solutions\UpdateClassReference;
+use Statamic\ErrorSolutions\Solutions\UpdateClassReference;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Throwable;
