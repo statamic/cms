@@ -37,7 +37,7 @@ export default {
     },
 
     render() {
-        return h('div', { domProps: { innerHTML: this.text }});
+        return h('div', { innerHTML: this.text });
     }
 
 }
