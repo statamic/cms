@@ -12,7 +12,7 @@
             <component
                 :is="pickerComponent"
                 v-bind="pickerProps"
-                @input="setDate"
+                @update:model-value="setDate"
                 @focus="focusedField = $event"
                 @blur="focusedField = null"
             />
@@ -41,6 +41,7 @@ import SinglePopover from './date/SinglePopover.vue';
 import SingleInline from './date/SingleInline.vue';
 import RangePopover from './date/RangePopover.vue';
 import RangeInline from './date/RangeInline.vue';
+import { useScreens } from 'vue-screen-utils';
 
 export default {
 
@@ -54,6 +55,17 @@ export default {
     mixins: [Fieldtype],
 
     inject: ['storeName'],
+
+    setup() {
+        const { mapCurrent } = useScreens({
+            xs: '0px',
+            sm: '640px',
+            md: '768px',
+            lg: '1024px',
+        });
+
+        return { screens: mapCurrent };
+    },
 
     data() {
         return {
@@ -130,23 +142,18 @@ export default {
                         dates: new Date()
                     }
                 ],
-                columns: this.$screens({ default: 1, lg: this.config.columns }),
-                rows: this.$screens({ default: 1, lg: this.config.rows }),
-                isExpanded: this.name === 'date' || this.config.full_width,
+                columns: this.screens({ default: 1, lg: this.config.columns }).value,
+                rows: this.screens({ default: 1, lg: this.config.rows }).value,
+                expanded: this.name === 'date' || this.config.full_width,
                 isRequired: this.config.required,
                 locale: this.$config.get('locale').replace('_', '-'),
-                masks: { input: [this.displayFormat] },
+                masks: { input: [this.displayFormat], modelValue: this.format },
                 minDate: this.config.earliest_date.date,
                 maxDate: this.config.latest_date.date,
-                modelConfig: { type: 'string', mask: this.format },
                 updateOnInput: false,
-                value: this.datePickerValue,
-            };
-        },
-
-        datePickerEvents() {
-            return {
-                input: this.setDate
+                modelValue: this.datePickerValue,
+                modelModifiers: { string: true, range: this.isRange },
+                popover: { visibility: 'click' },
             };
         },
 

@@ -16,7 +16,6 @@ import axios from 'axios';
 import PortalVue from "portal-vue";
 import VModal from "vue-js-modal";
 import vSelect from 'vue-select'
-import VCalendar from 'v-calendar';
 
 // Customize vSelect UI components
 vSelect.props.components.default = () => ({
@@ -50,7 +49,6 @@ Vue.prototype.$slug = Statamic.$slug;
 
 Vue.use(PortalVue, { portalName: 'v-portal' })
 Vue.use(VModal, { componentName: 'v-modal' })
-Vue.use(VCalendar);
 
 Vue.component(vSelect)
 

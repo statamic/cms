@@ -12,6 +12,8 @@ import useDirtyState from '../composables/dirty-state';
 import VueClickAway from 'vue3-click-away';
 import FloatingVue from 'floating-vue';
 import 'floating-vue/dist/style.css';
+import VCalendar from 'v-calendar';
+import 'v-calendar/style.css';
 import Keys from '../components/keys/Keys';
 import FieldActions from "../components/field-actions/FieldActions.js";
 import Callbacks from '../components/Callbacks';
@@ -65,6 +67,7 @@ export default {
         this.$app.use(store);
         this.$app.use(VueClickAway);
         this.$app.use(FloatingVue, { disposeTimeout: 30000, distance: 10 });
+        this.$app.use(VCalendar);
 
         Object.assign(this.$app.config.globalProperties, {
             $axios: http,
