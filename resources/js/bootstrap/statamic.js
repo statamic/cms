@@ -30,6 +30,10 @@ export default {
         return new Config(store);
     },
 
+    get $preferences() {
+        return this.$app.config.globalProperties.$preferences;
+    },
+
     get $callbacks() {
         return this.$app.config.globalProperties.$callbacks;
     },
