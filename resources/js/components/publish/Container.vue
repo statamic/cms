@@ -1,8 +1,10 @@
 <script>
 import uniqid from 'uniqid';
 import Component from '../Component';
+import { getCurrentInstance } from 'vue';
 
 export default {
+    emits: ['updated'],
 
     model: {
         prop: 'values',
@@ -326,7 +328,7 @@ export default {
     render() {
         return this.$slots.default({
             values: this.$store.state.publish[this.name].values,
-            container: this._self,
+            container: getCurrentInstance(),
             components: this.components,
             setFieldValue: this.setFieldValue,
             setFieldMeta: this.setFieldMeta,

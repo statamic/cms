@@ -29,6 +29,8 @@
 import { ValidatesFieldConditions } from '../field-conditions/FieldConditions.js';
 
 export default {
+    emits: ['updated', 'meta-updated', 'synced', 'desynced', 'focus', 'blur'],
+
     mixins: [ValidatesFieldConditions],
 
     props: {
@@ -49,6 +51,10 @@ export default {
 
         values() {
             return this.state.values;
+        },
+
+        extraValues() {
+            return this.state.extraValues;
         },
 
         visibleSections() {

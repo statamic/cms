@@ -5,8 +5,9 @@
         :initial-value="value"
         :initial-meta="meta"
         @loaded="metaLoaded"
+        v-slot="{ meta, value, loading: loadingMeta }"
     >
-    <div slot-scope="{ meta, value, loading: loadingMeta }" :class="classes">
+    <div :class="classes">
         <div class="field-inner">
             <label v-if="showLabel" class="publish-field-label" :class="{'font-bold': config.bold}" :for="fieldId">
                 <span

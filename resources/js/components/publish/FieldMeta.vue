@@ -1,5 +1,6 @@
 <script>
 export default {
+    emits: ['loaded'],
 
     props: {
         config: Object,
@@ -29,7 +30,7 @@ export default {
             value: this.value,
             loading: this.loading,
             updateMeta: this.updateMeta,
-        });
+        })[0];
     },
 
     created() {

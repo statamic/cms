@@ -26,6 +26,7 @@
 
 <script>
 export default {
+    emits: ['updated', 'meta-updated', 'synced', 'desynced', 'focus', 'blur'],
 
     inject: ['storeName'],
 
