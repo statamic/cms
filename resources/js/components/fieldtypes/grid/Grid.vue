@@ -155,6 +155,10 @@ export default {
             ];
         },
 
+        storeState() {
+            return this.$store.state.publish[this.storeName] || {};
+        },
+
     },
 
     watch: {
@@ -206,6 +210,30 @@ export default {
 
         removed(index) {
             if (! confirm(__('Are you sure?'))) return;
+
+            let errors = this.storeState.errors || {};
+
+            errors = Object.keys(errors).reduce((acc, key) => {
+                if (key.startsWith(`${this.fieldPathPrefix || this.handle}.${index}.`)) {
+                    return acc;
+                }
+
+                if (key.startsWith(`${this.fieldPathPrefix || this.handle}.`)) {
+                    const parts = key.split('.');
+                    const rowIndex = parseInt(parts[1], 10);
+
+                    if (rowIndex > index) {
+                        parts[1] = (rowIndex - 1).toString();
+                        acc[parts.join('.')] = errors[key];
+                    } else {
+                        acc[key] = errors[key];
+                    }
+                }
+
+                return acc;
+            }, {});
+
+            this.$store.commit(`publish/${this.storeName}/setErrors`, errors);
 
             this.update([
                 ...this.value.slice(0, index),
