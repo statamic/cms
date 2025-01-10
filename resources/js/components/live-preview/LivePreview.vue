@@ -355,7 +355,7 @@ export default {
         },
 
         componentUpdated(handle, value) {
-            Vue.set(this.extras, handle, value);
+            this.extras[handle] = value;
         }
     }
 
