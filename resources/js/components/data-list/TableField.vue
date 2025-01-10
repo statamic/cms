@@ -24,7 +24,7 @@ export default {
 
             if (!this.fieldtype) return fallback;
 
-            return Vue.options.components[custom] ? custom : fallback;
+            return Statamic.$app.component(custom) ? custom : fallback;
         },
 
         cssClass() {
