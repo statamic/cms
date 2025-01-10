@@ -17,6 +17,7 @@ import 'v-calendar/style.css';
 import Keys from '../components/keys/Keys';
 import FieldActions from "../components/field-actions/FieldActions.js";
 import Callbacks from '../components/Callbacks';
+import Slugs from '../components/slugs/Manager';
 
 const darkMode = ref(null);
 
@@ -80,6 +81,7 @@ export default {
             $fieldActions: new FieldActions,
             $callbacks: new Callbacks,
             $dirty: useDirtyState(),
+            $slug: new Slugs,
         });
 
         Object.assign(this.$app.config.globalProperties, {
