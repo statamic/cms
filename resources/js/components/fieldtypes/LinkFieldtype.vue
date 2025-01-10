@@ -59,6 +59,10 @@ export default {
 
     mixins: [Fieldtype, PositionsSelectOptions],
 
+    provide: {
+        isInLinkField: true,
+    },
+
     data() {
 
         return {

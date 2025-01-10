@@ -193,6 +193,22 @@ export default {
     mixins: [Fieldtype],
 
 
+    inject: {
+        isInBardField: {
+            name: 'isInBardField',
+            default: false,
+        },
+        isInGridField: {
+            name: 'isInGridField',
+            default: false,
+        },
+        isInLinkField: {
+            name: 'isInLinkField',
+            default: false,
+        }
+    },
+
+
     data() {
         return {
             assets: [],
@@ -345,54 +361,6 @@ export default {
          */
         queryScopes() {
             return this.config.query_scopes || [];
-        },
-
-        isInBardField() {
-            let vm = this;
-
-            while (true) {
-                let parent = vm.$parent;
-
-                if (! parent) return false;
-
-                if (parent.constructor.name === 'BardFieldtype') {
-                    return true;
-                }
-
-                vm = parent;
-            }
-        },
-
-        isInGridField() {
-            let vm = this;
-
-            while (true) {
-                let parent = vm.$parent;
-
-                if (! parent) return false;
-
-                if (parent.grid) {
-                    return true;
-                }
-
-                vm = parent;
-            }
-        },
-
-        isInLinkField() {
-            let vm = this;
-
-            while (true) {
-                let parent = vm.$parent;
-
-                if (! parent) return false;
-
-                if (parent.$options.name === 'link-fieldtype') {
-                    return true;
-                }
-
-                vm = parent;
-            }
         },
 
         replicatorPreview() {

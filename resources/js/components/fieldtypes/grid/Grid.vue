@@ -88,6 +88,10 @@ export default {
 
     inject: ['storeName'],
 
+    provide: {
+        isInGridField: true,
+    },
+
     computed: {
 
         component() {
