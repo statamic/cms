@@ -13,6 +13,7 @@ import FloatingVue from 'floating-vue';
 import 'floating-vue/dist/style.css';
 import Keys from '../components/keys/Keys';
 import FieldActions from "../components/field-actions/FieldActions.js";
+import Callbacks from '../components/Callbacks';
 
 export default {
 
@@ -26,6 +27,10 @@ export default {
 
     get $config() {
         return new Config(store);
+    },
+
+    get $callbacks() {
+        return this.$app.config.globalProperties.$callbacks;
     },
 
     config(config) {
@@ -51,6 +56,7 @@ export default {
             $config: this.$config,
             $keys: new Keys,
             $fieldActions: new FieldActions,
+            $callbacks: new Callbacks,
         });
 
         Object.assign(this.$app.config.globalProperties, {
