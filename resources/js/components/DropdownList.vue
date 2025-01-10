@@ -1,4 +1,5 @@
 <template>
+    <div><!--
     <popover class="dropdown-list" :disabled="disabled" :placement="placement" :autoclose="autoclose" :offset="offset" @opened="$emit('opened')" @closed="$emit('closed')">
         <template #trigger>
             <slot name="trigger">
@@ -9,6 +10,7 @@
         </template>
         <template #default><slot /></template>
     </popover>
+    --></div>
 </template>
 
 <script>
