@@ -163,10 +163,10 @@ export default {
             if (! this.value.date) return;
 
             if (this.isRange) {
-                return Vue.moment(this.value.date.start).format(this.displayFormat) + ' – ' + Vue.moment(this.value.date.end).format(this.displayFormat);
+                return this.$moment(this.value.date.start).format(this.displayFormat) + ' – ' + this.$moment(this.value.date.end).format(this.displayFormat);
             }
 
-            let preview = Vue.moment(this.value.date).format(this.displayFormat);
+            let preview = this.$moment(this.value.date).format(this.displayFormat);
 
             if (this.hasTime && this.value.time) {
                 preview += ` ${this.value.time}`;
@@ -181,7 +181,7 @@ export default {
         if (this.value.time === 'now') {
             // Probably shouldn't be modifying a prop, but luckily it all works nicely, without
             // needing to create an "update value without triggering dirty state" flow yet.
-            this.value.time = Vue.moment().format(this.hasSeconds ? 'HH:mm:ss' : 'HH:mm');
+            this.value.time = this.$moment().format(this.hasSeconds ? 'HH:mm:ss' : 'HH:mm');
         }
 
         this.$events.$on(`container.${this.storeName}.saving`, this.triggerChangeOnFocusedField);
@@ -214,7 +214,7 @@ export default {
         },
 
         addDate() {
-            const now = Vue.moment().format(this.format);
+            const now = this.$moment().format(this.format);
             const date = this.isRange ? { start: now, end: now } : now;
             this.update({ date, time: null });
         },
