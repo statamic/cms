@@ -1,4 +1,4 @@
-import { createApp } from 'vue';
+import { createApp, ref } from 'vue';
 import App from './App.vue';
 import { store } from '../store/store';
 import http from '../components/http';
@@ -15,6 +15,8 @@ import 'floating-vue/dist/style.css';
 import Keys from '../components/keys/Keys';
 import FieldActions from "../components/field-actions/FieldActions.js";
 import Callbacks from '../components/Callbacks';
+
+const darkMode = ref(null);
 
 export default {
 
@@ -36,6 +38,14 @@ export default {
 
     get $callbacks() {
         return this.$app.config.globalProperties.$callbacks;
+    },
+
+    get darkMode() {
+        return darkMode;
+    },
+
+    set darkMode(value) {
+        darkMode.value = value;
     },
 
     user() {
