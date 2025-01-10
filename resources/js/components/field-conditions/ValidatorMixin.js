@@ -15,7 +15,7 @@ export default {
 
             // If we know the field is to permanently hidden, bypass validation.
             if (field.visibility === 'hidden' || this.shouldForceHiddenField(dottedFieldPath)) {
-                this.$store.commit(`publish/${this.storeName}/setHiddenField`, {
+                this.setHiddenFieldState({
                     dottedKey: dottedFieldPath,
                     hidden: 'force',
                     omitValue: false,
@@ -30,7 +30,7 @@ export default {
 
             // If the field is configured to always save, never omit value.
             if (field.always_save === true) {
-                this.$store.commit(`publish/${this.storeName}/setHiddenField`, {
+                this.setHiddenFieldState({
                     dottedKey: dottedFieldPath,
                     hidden: ! passes,
                     omitValue: false,
@@ -41,7 +41,7 @@ export default {
 
             // Ensure DOM is updated to ensure all revealers are properly loaded and tracked before committing to store.
             this.$nextTick(() => {
-                this.$store.commit(`publish/${this.storeName}/setHiddenField`, {
+                this.setHiddenFieldState({
                     dottedKey: dottedFieldPath,
                     hidden: ! passes,
                     omitValue: field.type === 'revealer' || ! validator.passesNonRevealerConditions(dottedPrefix),
@@ -49,6 +49,24 @@ export default {
             });
 
             return passes;
+        },
+
+        setHiddenFieldState({ dottedKey, hidden, omitValue }) {
+            const currentValue = this.$store.state.publish[this.storeName].hiddenFields[dottedKey]
+
+            // Prevent infinite loops
+            if (currentValue
+                && currentValue.hidden === hidden
+                && currentValue.omitValue === omitValue
+            ) {
+                return;
+            }
+
+            this.$store.commit(`publish/${this.storeName}/setHiddenField`, {
+                dottedKey,
+                hidden,
+                omitValue
+            })
         },
 
         shouldForceHiddenField(dottedFieldPath) {
