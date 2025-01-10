@@ -57,5 +57,4 @@ Vue.component(vSelect)
 import './components/ToastBus';
 import './components/portals/Portals';
 import './components/stacks/Stacks';
-import './components/DirtyState';
 import './components/Permission';

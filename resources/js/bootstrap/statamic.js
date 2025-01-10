@@ -8,6 +8,7 @@ import registerGlobalComponents from './components.js';
 import registerFieldtypes from './fieldtypes.js';
 import useGlobalEventBus from '../composables/global-event-bus';
 import useProgressBar from '../composables/progress-bar';
+import useDirtyState from '../composables/dirty-state';
 import VueClickAway from 'vue3-click-away';
 import FloatingVue from 'floating-vue';
 import 'floating-vue/dist/style.css';
@@ -57,6 +58,7 @@ export default {
             $keys: new Keys,
             $fieldActions: new FieldActions,
             $callbacks: new Callbacks,
+            $dirty: useDirtyState(),
         });
 
         Object.assign(this.$app.config.globalProperties, {
