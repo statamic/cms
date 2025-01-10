@@ -38,6 +38,10 @@ export default {
         return this.$app.config.globalProperties.$callbacks;
     },
 
+    user() {
+        return this.$config.get('user');
+    },
+
     config(config) {
         store.commit('statamic/config', config);
     },
