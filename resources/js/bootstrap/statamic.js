@@ -101,6 +101,14 @@ export default {
         registerGlobalComponents(this.$app);
         registerFieldtypes(this.$app);
 
+        // Suppress the translation warnings
+        this.$app.config.warnHandler = (msg, vm, trace) => {
+            if (msg.includes('Property "__" should not start with _ which is a reserved prefix for Vue internals')) {
+                return;
+            }
+            console.warn(msg, vm, trace);
+        };
+
         this.$app.mount('#statamic');
     }
 
