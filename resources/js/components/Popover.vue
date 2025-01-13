@@ -1,5 +1,5 @@
 <template>
-    <div :class="{'popover-open': isOpen}" @mouseleave="leave">
+    <div :class="[triggerClass, {'popover-open': isOpen}]" @mouseleave="leave">
 
         <div @click="toggle" ref="trigger" aria-haspopup="true" :aria-expanded="isOpen" v-if="$slots.default">
             <slot name="trigger"></slot>
@@ -48,10 +48,12 @@ export default {
             type: String,
             default: 'bottom-end',
         },
-        class: {
+        class: { // Gets applied to the popover content.
             type: String,
-            default: '',
         },
+        triggerClass: { // Gets applied to the trigger.
+            type: String,
+        }
     },
 
     data() {
