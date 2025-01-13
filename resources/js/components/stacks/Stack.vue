@@ -1,6 +1,7 @@
 <template>
 
-    <v-portal :to="portal" :order="depth" target-class="stack">
+    <v-portal :to="portal" :order="depth">
+        <div class="vue-portal-target stack">
         <div class="stack-container"
             :class="{ 'stack-is-current': isTopStack, 'hovering': isHovering, 'p-2 shadow-lg': full }"
             :style="direction === 'ltr' ? { left: `${leftOffset}px` } : { right: `${leftOffset}px` }"
@@ -16,6 +17,7 @@
                     <slot name="default" :depth="depth" :close="close" />
                 </div>
             </transition>
+        </div>
         </div>
     </v-portal>
 

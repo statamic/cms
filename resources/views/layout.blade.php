@@ -52,7 +52,7 @@
 
         <keyboard-shortcuts-modal></keyboard-shortcuts-modal>
 
-{{--        <portal-targets></portal-targets>--}}
+        <portal-targets></portal-targets>
 
     </div>
 

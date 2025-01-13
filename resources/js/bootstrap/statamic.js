@@ -14,10 +14,13 @@ import FloatingVue from 'floating-vue';
 import 'floating-vue/dist/style.css';
 import VCalendar from 'v-calendar';
 import 'v-calendar/style.css';
+import PortalVue from 'portal-vue';
 import Keys from '../components/keys/Keys';
 import FieldActions from "../components/field-actions/FieldActions.js";
 import Callbacks from '../components/Callbacks';
 import Slugs from '../components/slugs/Manager';
+import Portals from '../components/portals/Portals';
+import Stacks from '../components/stacks/Stacks';
 
 const darkMode = ref(null);
 
@@ -66,9 +69,12 @@ export default {
         this.$app.config.devtools = true;
 
         this.$app.use(store);
+        this.$app.use(PortalVue, { portalName: 'v-portal' });
         this.$app.use(VueClickAway);
         this.$app.use(FloatingVue, { disposeTimeout: 30000, distance: 10 });
         this.$app.use(VCalendar);
+
+        const portals = new Portals;
 
         Object.assign(this.$app.config.globalProperties, {
             $axios: http,
@@ -82,6 +88,8 @@ export default {
             $callbacks: new Callbacks,
             $dirty: useDirtyState(),
             $slug: new Slugs,
+            $portals: portals,
+            $stacks: new Stacks(portals),
         });
 
         Object.assign(this.$app.config.globalProperties, {
@@ -95,6 +103,11 @@ export default {
                 const permissions = JSON.parse(atob(Statamic.$config.get('permissions')));
 
                 return permissions.includes('super') || permissions.includes(permission);
+            },
+            $wait(ms) {
+                return new Promise(resolve => {
+                    setTimeout(resolve, ms);
+                });
             }
         });
 

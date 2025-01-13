@@ -106,7 +106,6 @@ export default {
             navOpen: true,
             mobileNavOpen: false,
             showBanner: true,
-            portals: [],
             appendedComponents: [],
             isLicensingBannerSnoozed: localStorage.getItem(`statamic.snooze_license_banner`) > new Date().valueOf(),
             copyToClipboardModalUrl: null,

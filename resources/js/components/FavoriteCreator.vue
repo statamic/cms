@@ -1,7 +1,7 @@
 <template>
     <div>
         <popover v-if="isNotYetFavorited" ref="popper" placement="bottom-end" :offset="[10, 28]">
-            <template slot="trigger">
+            <template #trigger>
                 <button @click="shown" slot="reference" class="global-header-icon-button" v-tooltip="__('Pin to Favorites')" :aria-label="__('Pin to Favorites')">
                     <svg-icon name="light/pin"></svg-icon>
                 </button>

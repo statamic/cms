@@ -3,12 +3,13 @@
     <v-portal
         name="popover"
         :to="portal.id"
-        :target-class="targetClass"
         :disabled="disabled"
     >
-        <provider :variables="provide">
-           <slot />
-        </provider>
+        <div class="vue-portal-target" :class="targetClass">
+            <provider :variables="provide">
+               <slot />
+            </provider>
+        </div>
     </v-portal>
 
 </template>
@@ -27,7 +28,8 @@ export default {
             required: true
         },
         provide: {
-            type: Object
+            type: Object,
+            default: () => ({})
         },
         targetClass: {
             type: String
