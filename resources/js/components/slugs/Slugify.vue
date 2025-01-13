@@ -1,10 +1,6 @@
 <script>
 export default {
-
-    model: {
-        prop: 'to',
-        event: 'slugified'
-    },
+    emits: ['slugified', 'slugifying'],
 
     props: {
         from: String,
@@ -61,7 +57,7 @@ export default {
     },
 
     render() {
-        return this.$slots.default({});
+        return this.$slots.default({})[0];
     },
 
     methods: {

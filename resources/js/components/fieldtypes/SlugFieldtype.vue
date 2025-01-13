@@ -3,12 +3,12 @@
         ref="slugify"
         :enabled="generate"
         :from="source"
+        :to="slug"
         :separator="separator"
         :language="language"
         :async="config.async"
         @slugifying="syncing = true"
-        @slugified="syncing = false"
-        v-model="slug"
+        @slugified="syncing = false; slug = $event"
     >
         <div>
             <text-input
@@ -42,6 +42,8 @@ export default {
 
     mixins: [Fieldtype],
 
+    inject: ['storeName'],
+
     data() {
         return {
             slug: this.value,
@@ -57,16 +59,7 @@ export default {
         },
 
         store() {
-            let store;
-            let parent = this;
-
-            while (! parent.storeName) {
-                parent = parent.$parent;
-                store = parent.storeName;
-                if (parent === this.$root) return null;
-            }
-
-            return store;
+            return this.storeName;
         },
 
         source() {
