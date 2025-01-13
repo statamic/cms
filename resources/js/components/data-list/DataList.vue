@@ -164,7 +164,7 @@ export default {
         return this.$slots.default({
             rows: this.filteredRows,
             hasSelections: this.sharedState.selections.length > 0,
-        });
+        })[0];
     }
 
 }
