@@ -3,15 +3,15 @@
         <textarea
             class="input-text"
             ref="textarea"
-            :value="value"
+            :value="modelValue"
             :id="id"
             :disabled="disabled"
             :readonly="isReadOnly"
             :placeholder="placeholder"
             :autofocus="focus"
-            @input="$emit('input', $event.target.value)"
-            @focus="$emit('focus')"
-            @blur="$emit('blur')"
+            @input.stop="$emit('updated:model-value', $event.target.value)"
+            @focus.stop="$emit('focus')"
+            @blur.stop="$emit('blur')"
         />
         <div class="rtl:text-left ltr:text-right text-xs -mb-3 @sm:-mb-5 @lg:-mb-5" :class="limitIndicatorColor" v-if="limit">
             <span v-text="currentLength"></span>/<span v-text="limit"></span>
@@ -31,7 +31,7 @@ export default {
         disabled: { default: false },
         isReadOnly: { type: Boolean, default: false },
         placeholder: { required: false },
-        value: { required: true },
+        modelValue: { required: true },
         id: { default: null },
         focus: { type: Boolean, default: false }
 

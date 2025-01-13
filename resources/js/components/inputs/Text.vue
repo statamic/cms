@@ -12,7 +12,7 @@
                 :class="classes"
                 :id="id"
                 :name="name"
-                :value="value"
+                :value="modelValue"
                 :type="type"
                 :step="step"
                 :disabled="disabled"
@@ -22,10 +22,10 @@
                 :autofocus="focus"
                 :min="min"
                 :dir="direction"
-                @input="$emit('input', $event.target.value)"
-                @keydown="$emit('keydown', $event)"
-                @focus="$emit('focus')"
-                @blur="$emit('blur')"
+                @input.stop="$emit('updated:model-value', $event.target.value)"
+                @keydown.stop="$emit('keydown', $event)"
+                @focus.stop="$emit('focus')"
+                @blur.stop="$emit('blur')"
             >
             <slot name="append" v-if="append">
                 <div class="input-group-append">
@@ -43,6 +43,7 @@
 import LengthLimiter from '../LengthLimiter.vue'
 
 export default {
+    emits: ['updated:model-value', 'keydown', 'focus', 'blur'],
     mixins: [LengthLimiter],
     props: {
         name: {},
@@ -53,7 +54,7 @@ export default {
         placeholder: { required: false },
         type: { default: "text" },
         step: {},
-        value: { required: true },
+        modelValue: { required: true },
         prepend: { default: null },
         append: { default: null },
         focus: { type: Boolean },
