@@ -17,7 +17,7 @@ class DateFieldtypeTest extends FieldtypeTestCase
 
         Carbon::macro('getToStringFormat', function () {
             // Carbon 2.x
-            if (isset(static::$toStringFormat)) {
+            if (property_exists(static::this(), 'toStringFormat')) {
                 return static::$toStringFormat;
             }
 
