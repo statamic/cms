@@ -5,8 +5,10 @@ namespace Statamic\Http\Middleware;
 use Carbon\Carbon;
 use Closure;
 use Illuminate\Support\Facades\Date;
+use ReflectionClass;
 use Statamic\Facades\Site;
 use Statamic\Statamic;
+use Statamic\Support\Arr;
 
 class Localize
 {
@@ -30,9 +32,8 @@ class Localize
 
         // Get original Carbon format so it can be restored later.
         // There's no getter for it, so we'll use reflection.
-        $format = (new \ReflectionClass(Carbon::class))->getProperty('toStringFormat');
-        $format->setAccessible(true);
-        $originalToStringFormat = $format->getValue();
+        $reflection = (new ReflectionClass($date = Date::now()))->getMethod('getFactory');
+        $originalToStringFormat = Arr::get($reflection->invoke($date)->getSettings(), 'toStringFormat');
         Date::setToStringFormat(Statamic::dateFormat());
 
         $response = $next($request);
