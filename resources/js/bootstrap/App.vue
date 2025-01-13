@@ -144,7 +144,8 @@ export default {
 
         this.showBanner = !this.isLicensingBannerSnoozed && Statamic.$config.get('hasLicenseBanner');
 
-        // this.$toast.intercept();
+        this.$toast.registerInterceptor(this.$axios);
+        this.$toast.displayInitialToasts();
     },
 
     created() {

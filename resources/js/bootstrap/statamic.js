@@ -14,6 +14,10 @@ import FloatingVue from 'floating-vue';
 import 'floating-vue/dist/style.css';
 import VCalendar from 'v-calendar';
 import 'v-calendar/style.css';
+import Toasts from '../components/Toasts';
+import Toasted from '@hoppscotch/vue-toasted';
+import { useToasted } from '@hoppscotch/vue-toasted';
+import '@hoppscotch/vue-toasted/style.css';
 import PortalVue from 'portal-vue';
 import Keys from '../components/keys/Keys';
 import FieldActions from "../components/field-actions/FieldActions.js";
@@ -46,6 +50,10 @@ export default {
         return this.$app.config.globalProperties.$callbacks;
     },
 
+    get $toast() {
+        return this.$app.config.globalProperties.$toast;
+    },
+
     get darkMode() {
         return darkMode;
     },
@@ -73,6 +81,17 @@ export default {
         this.$app.use(VueClickAway);
         this.$app.use(FloatingVue, { disposeTimeout: 30000, distance: 10 });
         this.$app.use(VCalendar);
+        this.$app.use(Toasted, {
+            position: 'bottom-left',
+            duration: 3500,
+            theme: 'statamic',
+            action: {
+                text: '×',
+                onClick: (e, toastObject) => {
+                    toastObject.goAway(0);
+                }
+            }
+        })
 
         const portals = new Portals;
 
@@ -90,6 +109,7 @@ export default {
             $slug: new Slugs,
             $portals: portals,
             $stacks: new Stacks(portals),
+            $toast: new Toasts(useToasted()),
         });
 
         Object.assign(this.$app.config.globalProperties, {
