@@ -31,9 +31,7 @@ class Localize
         app()->setLocale($site->lang());
 
         // Get original Carbon format so it can be restored later.
-        // There's no getter for it, so we'll use reflection.
-        $reflection = (new ReflectionClass($date = Date::now()))->getMethod('getFactory');
-        $originalToStringFormat = Arr::get($reflection->invoke($date)->getSettings(), 'toStringFormat');
+        $originalToStringFormat = $this->getToStringFormat();
         Date::setToStringFormat(Statamic::dateFormat());
 
         $response = $next($request);
@@ -45,5 +43,30 @@ class Localize
         Date::setToStringFormat($originalToStringFormat);
 
         return $response;
+    }
+
+    /**
+     * This method is used to get the current toStringFormat for Carbon, in order for us
+     * to restore it later. There's no getter for it, so we need to use reflection.
+     *
+     * @throws \ReflectionException
+     */
+    private function getToStringFormat(): ?string
+    {
+        $reflection = new ReflectionClass($date = Date::now());
+
+        // Carbon 2.x
+        if ($reflection->hasProperty('toStringFormat')) {
+            $format = $reflection->getProperty('toStringFormat');
+            $format->setAccessible(true);
+
+            return $format->getValue();
+        }
+
+        // Carbon 3.x
+        $factory = $reflection->getMethod('getFactory');
+        $factory->setAccessible(true);
+
+        return Arr::get($factory->invoke($date)->getSettings(), 'toStringFormat');
     }
 }
