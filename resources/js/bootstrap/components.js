@@ -1,4 +1,4 @@
-// import AssetManager from '../components/assets/AssetManager.vue';
+import AssetManager from '../components/assets/AssetManager.vue';
 import Browser from '../components/assets/Browser/Browser.vue';
 import UpdatesBadge from '../components/UpdatesBadge.vue';
 import Container from '../components/publish/Container.vue';
@@ -65,7 +65,7 @@ import BlueprintResetter from '../components/blueprints/BlueprintResetter.vue';
 
 export default function registerGlobalComponents(app) {
     // Core
-    // app.component('asset-manager', AssetManager);
+    app.component('asset-manager', AssetManager);
     app.component('asset-browser', Browser);
     app.component('updates-badge', UpdatesBadge);
 

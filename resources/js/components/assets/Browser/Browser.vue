@@ -14,8 +14,9 @@
             @updated="uploadsUpdated"
             @upload-complete="uploadCompleted"
             @error="uploadError"
+            v-slot="{ dragging }"
         >
-            <div slot-scope="{ dragging }" class="min-h-screen">
+            <div class="min-h-screen">
                 <div class="drag-notification" v-show="dragging">
                     <svg-icon name="upload" class="h-12 w-12 m-4" />
                     <span>{{ __('Drop File to Upload') }}</span>
@@ -31,8 +32,9 @@
                     :sort-column="sortColumn"
                     :sort-direction="sortDirection"
                     @selections-updated="(ids) => $emit('selections-updated', ids)"
+                    v-slot="{ filteredRows: rows }"
                 >
-                    <div slot-scope="{ filteredRows: rows }" :class="modeClass">
+                    <div :class="modeClass">
                         <div class="card overflow-hidden p-0" :class="{ 'select-none' : shifting }">
                             <div class="relative w-full">
 
@@ -84,12 +86,11 @@
                                 v-if="mode === 'table' && ! containerIsEmpty"
                                 :allow-bulk-actions="true"
                                 :loading="loading"
-                                :rows="rows"
                                 :toggle-selection-on-row-click="true"
                                 @sorted="sorted"
                             >
 
-                                <template slot="tbody-start">
+                                <template #tbody-start>
                                     <tr v-if="folder && folder.parent_path && !restrictFolderNavigation">
                                         <td />
                                         <td @click="selectFolder(folder.parent_path)">
@@ -125,7 +126,7 @@
                                     </tr>
                                 </template>
 
-                                <template slot="cell-basename" slot-scope="{ row: asset, checkboxId }">
+                                <template #cell-basename="{ row: asset, checkboxId }">
                                     <div class="flex items-center w-fit-content group">
                                         <asset-thumbnail :asset="asset" :square="true" class="w-8 h-8 rtl:ml-2 ltr:mr-2 cursor-pointer" @click.native.stop="$emit('edit-asset', asset)" />
                                         <label :for="checkboxId" class="cursor-pointer select-none group-hover:text-blue normal-nums" @click.stop="$emit('edit-asset', asset)">
@@ -134,7 +135,7 @@
                                     </div>
                                 </template>
 
-                                <template slot="actions" slot-scope="{ row: asset }">
+                                <template #actions="{ row: asset }">
                                     <dropdown-list placement="left-start">
                                         <dropdown-item :text="__(canEdit ? 'Edit' : 'View')" @click="edit(asset.id)" />
                                         <div class="divider" v-if="asset.actions.length" />
