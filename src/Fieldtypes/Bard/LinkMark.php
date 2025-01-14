@@ -25,13 +25,12 @@ class LinkMark extends Link
         return [
             'href' => [
                 'renderHTML' => function ($attributes) {
-                    $href = $attributes->href;
-                    if (! isset($href)) {
+                    if (! isset($attributes->href)) {
                         return null;
                     }
 
                     return [
-                        'href' => $this->convertHref($href) ?? '',
+                        'href' => $this->convertHref($attributes->href) ?? '',
                     ];
                 },
             ],
