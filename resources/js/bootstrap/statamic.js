@@ -19,6 +19,7 @@ import Toasts from '../components/Toasts';
 import Toasted from '@hoppscotch/vue-toasted';
 import { useToasted } from '@hoppscotch/vue-toasted';
 import '@hoppscotch/vue-toasted/style.css';
+import 'vue-final-modal/style.css';
 import PortalVue from 'portal-vue';
 import Keys from '../components/keys/Keys';
 import FieldActions from "../components/field-actions/FieldActions.js";

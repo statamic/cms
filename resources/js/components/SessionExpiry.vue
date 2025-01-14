@@ -4,7 +4,7 @@
 
         <button v-if="isWarning" class="session-expiry-stripe" @click="extend" v-text="warningText" />
 
-        <modal name="session-timeout-login" v-if="isShowingLogin" height="auto" width="500px" :adaptive="true">
+        <modal name="session-timeout-login" v-if="isShowingLogin" height="auto" :width="500">
             <div class="-max-h-screen-px">
             <div class="text-lg font-semibold px-5 py-3 bg-gray-200 dark:bg-dark-550 rounded-t-lg flex items-center justify-between border-b dark:border-dark-900">
                 {{ __('Resume Your Session') }}

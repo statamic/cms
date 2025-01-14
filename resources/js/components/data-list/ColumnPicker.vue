@@ -8,12 +8,12 @@
             <svg-icon name="light/settings-horizontal" class="w-4 h-4" />
         </button>
 
-        <modal v-if="open" name="column-picker" @closed="open = false" draggable=".modal-drag-handle" click-to-close>
+        <modal v-if="open" name="column-picker" @closed="open = false" draggable=".modal-drag-handle" click-to-close v-slot="{ close }">
             <div class="flex flex-col h-full -max-h-screen-px">
 
                 <header class="modal-drag-handle p-4 bg-gray-200 dark:bg-dark-650 border-b dark:border-dark-900 flex items-center justify-between cursor-grab active:cursor-grabbing">
                     <h2>{{ __('Customize Columns') }}</h2>
-                    <button class="btn-close" @click="open = false" :aria-label="__('Close Editor')">&times;</button>
+                    <button class="btn-close" @click="close" :aria-label="__('Close Editor')">&times;</button>
                 </header>
 
                 <div class="flex grow min-h-0 rounded-t-md bg-gray-100 dark:bg-dark-600">
