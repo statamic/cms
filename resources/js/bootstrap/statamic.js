@@ -25,6 +25,7 @@ import Callbacks from '../components/Callbacks';
 import Slugs from '../components/slugs/Manager';
 import Portals from '../components/portals/Portals';
 import Stacks from '../components/stacks/Stacks';
+import Hooks from '../components/Hooks';
 
 const darkMode = ref(null);
 
@@ -48,6 +49,10 @@ export default {
 
     get $callbacks() {
         return this.$app.config.globalProperties.$callbacks;
+    },
+
+    get $hooks() {
+        return this.$app.config.globalProperties.$hooks;
     },
 
     get $toast() {
@@ -109,6 +114,7 @@ export default {
             $slug: new Slugs,
             $portals: portals,
             $stacks: new Stacks(portals),
+            $hooks: new Hooks,
             $toast: new Toasts(useToasted()),
         });
 
