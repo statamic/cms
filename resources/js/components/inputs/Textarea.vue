@@ -9,7 +9,7 @@
             :readonly="isReadOnly"
             :placeholder="placeholder"
             :autofocus="focus"
-            @input.stop="$emit('updated:model-value', $event.target.value)"
+            @input.stop="$emit('update:model-value', $event.target.value)"
             @focus.stop="$emit('focus')"
             @blur.stop="$emit('blur')"
         />

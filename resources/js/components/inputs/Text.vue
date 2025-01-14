@@ -22,7 +22,7 @@
                 :autofocus="focus"
                 :min="min"
                 :dir="direction"
-                @input.stop="$emit('updated:model-value', $event.target.value)"
+                @input.stop="$emit('update:model-value', $event.target.value)"
                 @keydown.stop="$emit('keydown', $event)"
                 @focus.stop="$emit('focus')"
                 @blur.stop="$emit('blur')"
@@ -43,7 +43,7 @@
 import LengthLimiter from '../LengthLimiter.vue'
 
 export default {
-    emits: ['updated:model-value', 'keydown', 'focus', 'blur'],
+    emits: ['update:model-value', 'keydown', 'focus', 'blur'],
     mixins: [LengthLimiter],
     props: {
         name: {},

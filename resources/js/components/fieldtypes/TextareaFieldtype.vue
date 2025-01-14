@@ -9,7 +9,7 @@
         :id="fieldId"
         @blur="$emit('blur')"
         @focus="$emit('focus')"
-        @updated:model-value="updateDebounced" />
+        @update:model-value="updateDebounced" />
 </template>
 
 <script>
