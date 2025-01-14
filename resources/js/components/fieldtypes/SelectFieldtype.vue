@@ -17,9 +17,9 @@
             :multiple="config.multiple"
             :reset-on-options-change="resetOnOptionsChange"
             :close-on-select="true"
-            :value="selectedOptions"
+            :model-value="selectedOptions"
             :create-option="(value) => ({ value, label: value })"
-            @input="vueSelectUpdated"
+            @update:model-value="vueSelectUpdated"
             @focus="$emit('focus')"
             @search:focus="$emit('focus')"
             @search:blur="$emit('blur')">
