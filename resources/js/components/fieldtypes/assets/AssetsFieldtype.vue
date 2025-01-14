@@ -612,7 +612,7 @@ export default {
         },
 
         loading(loading) {
-            this.$progress.loading(`assets-fieldtype-${this._uid}`, loading);
+            this.$progress.loading(`assets-fieldtype-${this.$.uid}`, loading);
         },
 
         value(value) {

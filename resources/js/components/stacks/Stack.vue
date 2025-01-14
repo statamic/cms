@@ -66,7 +66,7 @@ export default {
         },
 
         id() {
-            return `${this.name}-${this._uid}`;
+            return `${this.name}-${this.$.uid}`;
         },
 
         offset() {

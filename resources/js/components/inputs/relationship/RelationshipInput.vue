@@ -306,7 +306,7 @@ export default {
         },
 
         setLoadingProgress(state) {
-            this.$progress.loading(`relationship-fieldtype-${this._uid}`, state);
+            this.$progress.loading(`relationship-fieldtype-${this.$.uid}`, state);
         }
 
     }

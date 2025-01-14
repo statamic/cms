@@ -147,7 +147,7 @@ export default {
 
     computed: {
         publishContainer() {
-            return `field-settings-${this._uid}`;
+            return `field-settings-${this.$.uid}`;
         },
 
         selectedWidth: function() {
