@@ -2,8 +2,8 @@
 
 namespace Statamic\Query\Scopes\Filters\Fields;
 
-use Statamic\Support\Str;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class Replicator extends FieldtypeFilter
 {
