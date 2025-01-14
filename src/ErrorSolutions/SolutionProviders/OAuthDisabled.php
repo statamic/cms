@@ -1,9 +1,9 @@
 <?php
 
-namespace Statamic\Ignition\SolutionProviders;
+namespace Statamic\ErrorSolutions\SolutionProviders;
 
 use Spatie\ErrorSolutions\Contracts\HasSolutionsForThrowable;
-use Statamic\Ignition\Solutions\EnableOAuth;
+use Statamic\ErrorSolutions\Solutions\EnableOAuth;
 use Throwable;
 
 class OAuthDisabled implements HasSolutionsForThrowable

@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Ignition\Solutions;
+namespace Statamic\ErrorSolutions\Solutions;
 
 use Exception;
 use Facades\Statamic\UpdateScripts\Manager as UpdateScriptManager;
