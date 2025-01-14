@@ -29,7 +29,7 @@
                 <input type="radio"
                     ref="radio"
                     :name="name"
-                    @input="update($event.target.value)"
+                    @input.stop="update($event.target.value)"
                     :value="option.value"
                     :disabled="isReadOnly"
                     :checked="value == option.value"
