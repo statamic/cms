@@ -1,8 +1,8 @@
 <template>
     <width-selector
         :name="name"
-        :value="value"
-        @input="updateDebounced"
+        :model-value="value"
+        @update:model-value="updateDebounced"
         @focus="$emit('focus')"
         @blur="$emit('blur')"
         :initial-widths="config.options"
