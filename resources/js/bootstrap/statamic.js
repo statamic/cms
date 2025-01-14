@@ -6,6 +6,7 @@ import Config from '../components/Config';
 import Preferences from '../components/Preference';
 import registerGlobalComponents from './components.js';
 import registerFieldtypes from './fieldtypes.js';
+import registerVueSelect from './vue-select/vue-select';
 import useGlobalEventBus from '../composables/global-event-bus';
 import useProgressBar from '../composables/progress-bar';
 import useDirtyState from '../composables/dirty-state';
@@ -143,6 +144,7 @@ export default {
 
         registerGlobalComponents(this.$app);
         registerFieldtypes(this.$app);
+        registerVueSelect(this.$app);
 
         // Suppress the translation warnings
         this.$app.config.warnHandler = (msg, vm, trace) => {

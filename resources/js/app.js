@@ -14,22 +14,6 @@ import './bootstrap/directives';
 import axios from 'axios';
 import PortalVue from "portal-vue";
 import VModal from "vue-js-modal";
-import vSelect from 'vue-select'
-
-// Customize vSelect UI components
-vSelect.props.components.default = () => ({
-    Deselect: {
-        render: createElement => createElement('span', __('×')),
-    },
-    OpenIndicator: {
-        render: createElement => createElement('span', {
-            class: { 'toggle': true },
-            domProps: {
-                innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 20 20"><path fill="currentColor" d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>'
-            }
-        })
-    }
-});
 
 Statamic.booting(Statamic => {
     axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
@@ -48,8 +32,6 @@ Vue.prototype.$slug = Statamic.$slug;
 
 Vue.use(PortalVue, { portalName: 'v-portal' })
 Vue.use(VModal, { componentName: 'v-modal' })
-
-Vue.component(vSelect)
 
 import './components/portals/Portals';
 import './components/stacks/Stacks';
