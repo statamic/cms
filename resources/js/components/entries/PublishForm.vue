@@ -77,9 +77,9 @@
             :is-root="isRoot"
             :track-dirty-state="trackDirtyState"
             @updated="values = $event"
+            v-slot="{ container, components, setFieldMeta }"
         >
             <live-preview
-                slot-scope="{ container, components, setFieldMeta }"
                 :name="publishContainer"
                 :url="livePreviewUrl"
                 :previewing="isPreviewing"
@@ -259,9 +259,8 @@
             </button>
         </div>
 
-        <stack name="revision-history" v-if="showRevisionHistory" @closed="showRevisionHistory = false" :narrow="true">
+        <stack name="revision-history" v-if="showRevisionHistory" @closed="showRevisionHistory = false" :narrow="true" v-slot="{ close }">
             <revision-history
-                slot-scope="{ close }"
                 :index-url="actions.revisions"
                 :restore-url="actions.restore"
                 :reference="initialReference"

@@ -4,7 +4,7 @@ import Component from '../Component';
 import { getCurrentInstance } from 'vue';
 
 export default {
-    emits: ['updated'],
+    emits: ['updated', 'focus', 'blur'],
 
     model: {
         prop: 'values',
@@ -328,7 +328,7 @@ export default {
     render() {
         return this.$slots.default({
             values: this.$store.state.publish[this.name].values,
-            container: getCurrentInstance(),
+            container: this,
             components: this.components,
             setFieldValue: this.setFieldValue,
             setFieldMeta: this.setFieldMeta,

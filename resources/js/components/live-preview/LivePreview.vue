@@ -165,7 +165,7 @@ export default {
         },
 
         livePreviewFieldsPortal() {
-            return `live-preview-fields-${this.storeName}`;
+            return `live-preview-fields-${this.name}`;
         },
 
         canPopOut() {
@@ -239,12 +239,12 @@ export default {
     methods: {
 
         update: _.debounce(function () {
-            if (source) source.cancel();
-            source = this.$axios.CancelToken.source();
+            if (source) source.abort();
+            source = new AbortController();
 
             this.loading = true;
 
-            this.$axios.post(this.tokenizedUrl, this.payload, { cancelToken: source.token }).then(response => {
+            this.$axios.post(this.tokenizedUrl, this.payload, { signal: source.signal }).then(response => {
                 this.token = response.data.token;
                 const url = response.data.url;
                 const target = this.targets[this.target];
@@ -254,7 +254,7 @@ export default {
                     : this.updateIframeContents(url, target, payload);
                 this.loading = false;
             }).catch(e => {
-                if (this.$axios.isCancel(e)) return;
+                if (e.code === 'ERR_CANCELED') return;
                 throw e;
             });
         }, 150),
