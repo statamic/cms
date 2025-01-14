@@ -2,6 +2,7 @@
 import HasFieldActions from '../field-actions/HasFieldActions';
 
 export default {
+    emits: ['input', 'focus', 'blur', 'meta-updated', 'replicator-preview-updated'],
 
     mixins: [
         HasFieldActions,
