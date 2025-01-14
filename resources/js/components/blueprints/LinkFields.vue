@@ -32,7 +32,7 @@
                             :searchable="true"
                             :reduce="(opt) => opt.value"
                             v-model="reference">
-                            <template slot="option" slot-scope="option">
+                            <template v-slot:option="option">
                                 <div class="flex items-center">
                                     <span v-text="option.fieldset" class="text-2xs text-gray-500 dark:text-dark-150 rtl:ml-2 ltr:mr-2" />
                                     <span v-text="option.label" />

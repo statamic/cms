@@ -53,12 +53,12 @@
                     :blueprint="blueprint"
                     :values="values"
                     :meta="meta"
-                    :is-config="true"
                     :errors="errors"
                     :is-root="true"
                     @updated="values = $event"
+                    v-slot="{ setFieldValue, setFieldMeta }"
                 >
-                    <div v-show="activeTab === 'settings'" slot-scope="{ setFieldValue, setFieldMeta }">
+                    <div v-show="activeTab === 'settings'">
 
                         <publish-sections
                             :sections="blueprint.tabs[0].sections"
@@ -138,7 +138,6 @@ export default {
             errors: {},
             editedFields: clone(this.overrides),
             activeTab: 'settings',
-            storeName: 'base',
             fieldtype: null,
             loading: true,
             blueprint: null,

@@ -59,6 +59,10 @@ export default {
         return this.$app.config.globalProperties.$toast;
     },
 
+    get $slug() {
+        return this.$app.config.globalProperties.$slug;
+    },
+
     get darkMode() {
         return darkMode;
     },
