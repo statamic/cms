@@ -11,22 +11,3 @@ window.IndexFieldtype = IndexFieldtype;
 window.BardToolbarButton = BardToolbarButton;
 window.Listing = Listing;
 window.FieldConditions = FieldConditions;
-
-Vue.mixin({
-    methods: {
-        __(key, replacements) {
-            return __(key, replacements);
-        },
-        __n(key, number, replacements) {
-            return __n(key, number, replacements);
-        },
-        translate(key, replacements) { // TODO: Remove
-            return __(key, replacements);
-        },
-        $wait(ms) {
-            return new Promise(resolve => {
-                setTimeout(resolve, ms);
-            });
-        },
-    }
-})

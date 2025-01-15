@@ -128,6 +128,9 @@ export default {
             __(key, replacements) {
                 return __(key, replacements);
             },
+            __n(key, number, replacements) {
+                return __n(key, number, replacements);
+            },
             $markdown(value) {
                 return markdown(value);
             },
