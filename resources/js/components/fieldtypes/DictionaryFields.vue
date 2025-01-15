@@ -4,7 +4,6 @@
         :blueprint="blueprint"
         :values="value"
         :meta="publishMeta"
-        :is-config="true"
         :errors="errors"
         @updated="update"
         v-slot="{ setFieldValue, setFieldMeta }"
