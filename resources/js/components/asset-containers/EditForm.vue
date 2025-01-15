@@ -10,8 +10,9 @@
         :meta="meta"
         :errors="errors"
         @updated="values = $event"
+        v-slot="{ setFieldValue }"
     >
-        <div slot-scope="{ setFieldValue }">
+        <div>
             <configure-tabs @updated="setFieldValue" :enable-sidebar="false"/>
             <div class="py-4 border-t dark:border-dark-950 flex justify-between">
                 <a :href="url" class="btn" v-text="__('Cancel') "/>

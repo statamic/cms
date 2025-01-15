@@ -1,7 +1,7 @@
 <template>
 
-    <stack narrow name="page-tree-linker" :before-close="shouldClose" @closed="$emit('closed')">
-        <div slot-scope="{ close }" class="bg-gray-100 dark:bg-dark-700 h-full flex flex-col">
+    <stack narrow name="page-tree-linker" :before-close="shouldClose" @closed="$emit('closed')" v-slot="{ close }">
+        <div class="bg-gray-100 dark:bg-dark-700 h-full flex flex-col">
 
             <header class="bg-white dark:bg-dark-550 rtl:pr-6 ltr:pl-6 rtl:pl-3 ltr:pr-3 py-2 mb-4 border-b dark:border-dark-950 shadow-md text-lg font-medium flex items-center justify-between">
                 {{ headerText }}
@@ -32,8 +32,9 @@
                     :site="site"
                     class="px-2"
                     @updated="values = $event"
+                    v-slot="{ container, setFieldMeta }"
                 >
-                    <div slot-scope="{ container, setFieldMeta }">
+                    <div>
                         <div v-if="validating" class="absolute inset-0 z-10 bg-white dark:bg-dark-500 bg-opacity-75 flex items-center justify-center">
                             <loading-graphic text="" />
                         </div>

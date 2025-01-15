@@ -21,8 +21,9 @@
             @dragstart="$emit('focus')"
             @dragend="$emit('blur')"
             @update:model-value="(rows) => $emit('sorted', rows)"
+            v-slot="{}"
         >
-            <tbody slot-scope="{}">
+            <tbody>
                 <grid-row
                     v-for="(row, index) in rows"
                     :key="`row-${row._id}`"

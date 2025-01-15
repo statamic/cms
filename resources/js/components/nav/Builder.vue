@@ -78,9 +78,9 @@
                 @change="changed = true"
                 @drag="treeDrag"
                 @drop="treeDrop"
+                v-slot="{ data: item, store, vm }"
             >
                 <tree-branch
-                    slot-scope="{ data: item, store, vm }"
                     :item="item"
                     :depth="vm.level"
                     :vm="vm"
@@ -129,9 +129,9 @@
                 @change="changed = true"
                 @drag="treeDrag"
                 @drop="treeDrop"
+                v-slot="{ data: item, store, vm }"
             >
                 <tree-branch
-                    slot-scope="{ data: item, store, vm }"
                     :item="item"
                     :parent-section="getParentSectionNode(item)"
                     :depth="vm.level"

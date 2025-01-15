@@ -22,9 +22,8 @@
             <loading-graphic  />
         </div>
 
-        <data-list :rows="rows" v-if="!initializing && !showingAddon">
-            <div class="" slot-scope="{ rows: addons }">
-
+        <data-list :rows="rows" v-if="!initializing && !showingAddon" v-slot="{ rows: addons }">
+            <div class="">
                 <div class="card p-0">
                     <div class="border-b dark:border-dark-900 px-4 text-sm">
                         <button

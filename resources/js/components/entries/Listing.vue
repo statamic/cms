@@ -14,7 +14,7 @@
             :sort-direction="sortDirection"
             @visible-columns-updated="visibleColumns = $event"
         >
-            <div slot-scope="{ hasSelections }">
+            <div>
                 <div class="card overflow-hidden p-0 relative">
                     <div v-if="!reordering" class="flex flex-wrap items-center justify-between px-2 pb-2 text-sm border-b dark:border-dark-900">
 

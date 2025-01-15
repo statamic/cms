@@ -24,8 +24,9 @@
                 :track-dirty-state="false"
                 class="max-w-md mx-auto -mt-6 py-0 px-4 pb-20"
                 @updated="values = $event"
+                v-slot="{ setFieldValue, setFieldMeta }"
             >
-                <div slot-scope="{ setFieldValue, setFieldMeta }">
+                <div>
                     <div class="-mx-6">
                         <publish-fields
                             :fields="fields"
@@ -62,8 +63,9 @@
                 <publish-field-meta
                     :config="{ handle: 'user.roles', type: 'user_roles' }"
                     :initial-value="user.roles"
+                    v-slot="{ meta, value, loading, updateMeta }"
                 >
-                    <div slot-scope="{ meta, value, loading, updateMeta }">
+                    <div>
                         <relationship-fieldtype
                             v-if="!loading"
                             handle="user.roles"
@@ -82,8 +84,9 @@
                 <publish-field-meta
                     :config="{ handle: 'user.groups', type: 'user_groups' }"
                     :initial-value="user.groups"
+                    v-slot="{ meta, value, loading, updateMeta }"
                 >
-                    <div slot-scope="{ meta, value, loading, updateMeta }">
+                    <div>
                         <relationship-fieldtype
                             v-if="!loading"
                             handle="user.groups"

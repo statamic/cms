@@ -18,14 +18,14 @@
             @input="vueSelectUpdated"
             @search:focus="$emit('focus')"
             @search:blur="$emit('blur')">
-            <template slot="option" slot-scope="option">
+            <template #option="option">
                 <div class="flex items-center">
                     <svg-icon v-if="!option.html" :name="`${meta.set}/${option.label}`" class="w-5 h-5" />
                     <div v-if="option.html" v-html="option.html" class="w-5 h-5" />
                     <span class="text-xs rtl:mr-4 ltr:ml-4 text-gray-800 dark:text-dark-150 truncate">{{ __(option.label) }}</span>
                 </div>
             </template>
-            <template slot="selected-option" slot-scope="option">
+            <template #selected-option="option">
                 <div class="flex items-center">
                     <svg-icon v-if="!option.html" :name="`${meta.set}/${option.label}`" class="w-5 h-5 flex items-center" />
                     <div v-if="option.html" v-html="option.html" class="w-5 h-5" />

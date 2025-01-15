@@ -15,8 +15,9 @@
             @updated="uploadsUpdated"
             @upload-complete="uploadComplete"
             @error="uploadError"
+            v-slot="{ dragging }"
         >
-            <div slot-scope="{ dragging }" class="assets-fieldtype-drag-container">
+            <div class="assets-fieldtype-drag-container">
 
                 <div class="drag-notification" v-if="config.allow_uploads" v-show="dragging && !showSelector">
                     <svg-icon name="upload" class="h-6 @md:h-8 w-6 @md:w-8 rtl:ml-2 ltr:mr-2 @md:mr-6" />

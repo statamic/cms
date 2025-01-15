@@ -27,8 +27,9 @@
             @update:model-value="sorted($event)"
             @dragstart="$emit('focus')"
             @dragend="$emit('blur')"
+            v-slot="{}"
         >
-            <div slot-scope="{}" class="replicator-set-container">
+            <div class="replicator-set-container">
                 <replicator-set
                     v-for="(set, index) in value"
                     :key="set._id"

@@ -29,8 +29,9 @@
             :meta="meta"
             :errors="errors"
             @updated="values = $event"
+            v-slot="{ container, setFieldValue, setFieldMeta }"
         >
-            <div slot-scope="{ container, setFieldValue, setFieldMeta }">
+            <div>
                 <publish-tabs
                     :enable-sidebar="false"
                     @updated="setFieldValue"

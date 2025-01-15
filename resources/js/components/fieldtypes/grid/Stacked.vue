@@ -11,6 +11,7 @@
         @dragstart="$emit('focus')"
         @dragend="$emit('blur')"
         @update:model-value="(rows) => $emit('sorted', rows)"
+        v-slot="{}"
     >
         <div
             class="grid-stacked"
@@ -19,7 +20,6 @@
                 'mt-4': !hideDisplay,
                 'mt-10': allowFullscreen,
             }"
-            slot-scope="{}"
         >
             <stacked-row
                 v-for="(row, index) in rows"

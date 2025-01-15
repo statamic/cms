@@ -23,9 +23,9 @@
                     :meta="meta"
                     :errors="errors"
                     @updated="values = $event"
+                    v-slot="{ setFieldValue, setFieldMeta }"
                 >
                     <publish-fields
-                        slot-scope="{ setFieldValue, setFieldMeta }"
                         :fields="blueprint.tabs[0].fields"
                         @updated="setFieldValue"
                         @meta-updated="setFieldMeta"

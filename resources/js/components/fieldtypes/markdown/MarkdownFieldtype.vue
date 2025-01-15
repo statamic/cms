@@ -10,8 +10,9 @@
             :path="folder"
             @updated="uploadsUpdated"
             @upload-complete="uploadComplete"
+            v-slot="{ dragging }"
         >
-            <div slot-scope="{ dragging }">
+            <div>
 
                 <publish-field-fullscreen-header
                     v-if="fullScreenMode"

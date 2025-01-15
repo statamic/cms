@@ -33,10 +33,10 @@
                 @change="treeChanged"
                 @drag="treeDragstart"
                 @nodeOpenChanged="saveTreeState"
+                v-slot="{ data: page, store, vm }"
             >
                 <tree-branch
                     :ref="`branch-${page.id}`"
-                    slot-scope="{ data: page, store, vm }"
                     :page="page"
                     :depth="vm.level"
                     :vm="vm"

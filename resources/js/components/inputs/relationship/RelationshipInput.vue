@@ -64,9 +64,8 @@
                 </div>
             </div>
 
-            <stack name="item-selector" v-if="isSelecting" @closed="isSelecting = false">
+            <stack name="item-selector" v-if="isSelecting" @closed="isSelecting = false" v-slot="{ close }">
                 <item-selector
-                    slot-scope="{ close }"
                     :name="name"
                     :filters-url="filtersUrl"
                     :selections-url="selectionsUrl"

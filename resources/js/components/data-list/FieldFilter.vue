@@ -20,10 +20,10 @@
                     :track-dirty-state="false"
                     class="filter-fields mt-2"
                     @updated="updateValues"
+                    v-slot="{ setFieldValue, setFieldMeta }"
                 >
                     <!-- TODO: handle showing/hiding of labels more elegantly -->
                     <publish-fields
-                        slot-scope="{ setFieldValue, setFieldMeta }"
                         :fields="filter.fields"
                         name-prefix="filter-field"
                         class="w-full no-label"
