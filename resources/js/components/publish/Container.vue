@@ -332,7 +332,7 @@ export default {
             components: this.components,
             setFieldValue: this.setFieldValue,
             setFieldMeta: this.setFieldMeta,
-        });
+        })[0];
     }
 
 }
