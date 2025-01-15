@@ -17,13 +17,6 @@
         @apply dark:mt-1;
     }
 
-    .draggable-placeholder-inner {
-        border: 1px dashed #0088F8;
-        background: rgba(0, 136, 249, 0.09);
-
-        * { display: none; }
-    }
-
     .page-move {
         @apply w-6 rtl:border-l ltr:border-r rtl:rounded-r ltr:rounded-l dark:text-dark-175 dark:border-dark-900;
         cursor: grab;
