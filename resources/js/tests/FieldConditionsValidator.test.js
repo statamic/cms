@@ -64,7 +64,8 @@ const Fields = new Vue({
     data() {
         return {
             storeName: 'base',
-            values: {}
+            values: {},
+            extraValues: {},
         }
     },
     methods: {
@@ -77,6 +78,9 @@ const Fields = new Vue({
                 storeValues = values;
             }
             Store.commit('publish/base/setValues', storeValues);
+        },
+        setExtraValues(values) {
+            this.extraValues = values;
         },
         setStoreValues(values) {
             Store.commit('publish/base/setValues', values);
@@ -106,6 +110,7 @@ let showFieldIf = function (conditions=null, dottedFieldPath=null) {
 
 afterEach(() => {
     Fields.values = {};
+    Fields.extraValues = {};
     Store.commit('publish/base/reset');
 });
 
@@ -1009,4 +1014,12 @@ test('it properly omits nested revealer-hidden fields when multiple conditions a
 
     // Though this third venue is hidden by a revealer, it's also disabled by a regular toggle condition, so it should actually be omitted...
     expect(Store.state.publish.base.hiddenFields['nested.event_venue_three'].omitValue).toBe(true);
+});
+
+test('it can use extra values in conditions', () => {
+    Fields.setValues({});
+    Fields.setExtraValues({hello: 'world'});
+
+    expect(showFieldIf({hello: 'world'})).toBe(true);
+    expect(showFieldIf({hello: 'there'})).toBe(false);
 });

@@ -141,9 +141,12 @@ trait RendersForms
             ->map->get('default')
             ->filter()->all();
 
+        $formHandle = $field->form()?->handle() ?? Str::slug($errorBag);
+
         $data = array_merge($configDefaults, $field->toArray(), [
             'handle' => $field->handle(),
             'name' => $this->convertDottedHandleToInputName($field->handle()),
+            'id' => $this->generateFieldId($field->handle(), $formHandle),
             'instructions' => $field->instructions(),
             'error' => $errors->first($field->handle()) ?: null,
             'default' => $field->value() ?? $field->defaultValue(),
@@ -168,17 +171,6 @@ trait RendersForms
         return $data;
     }
 
-    protected function convertDottedHandleToInputName(string $handle): string
-    {
-        $parts = collect(explode('.', $handle));
-
-        $first = $parts->pull(0);
-
-        return $first.$parts
-            ->map(fn ($part) => '['.$part.']')
-            ->join('');
-    }
-
     /**
      * Minify field html.
      *
@@ -194,5 +186,27 @@ trait RendersForms
         $html = preg_replace('/\s*(<(?!\/*('.$ignoredHtmlElements.'))[^>]+>)\s*/', '$1', $html);
 
         return $html;
+    }
+
+    /**
+     * Generate a field id to associate input with label.
+     */
+    private function generateFieldId(string $fieldHandle, ?string $formName = null): string
+    {
+        return ($formName ?? 'default').'-form-'.$fieldHandle.'-field';
+    }
+
+    /**
+     * Convert dotted handle to input name that can be submitted as array value in form html.
+     */
+    protected function convertDottedHandleToInputName(string $handle): string
+    {
+        $parts = collect(explode('.', $handle));
+
+        $first = $parts->pull(0);
+
+        return $first.$parts
+            ->map(fn ($part) => '['.$part.']')
+            ->join('');
     }
 }

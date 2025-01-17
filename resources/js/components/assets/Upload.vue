@@ -21,7 +21,7 @@
 
         <div class="ml-4 px-2 flex items-center gap-2" v-if="status === 'error'">
             {{ error }}
-            <dropdown-list v-if="errorStatus === 422">
+            <dropdown-list v-if="errorStatus === 409">
                 <template #trigger>
                     <button class="ml-4 btn btn-xs" v-text="`${__('Fix')}...`" />
                 </template>
