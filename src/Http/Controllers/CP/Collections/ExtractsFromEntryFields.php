@@ -43,7 +43,6 @@ trait ExtractsFromEntryFields
 
         $extraValues = [
             'depth' => $entry->page()?->depth(),
-            'has-children' => $entry->page()?->hasChildren(),
         ];
 
         return [$values->all(), $fields->meta(), $extraValues];

@@ -284,11 +284,6 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Entr
         return $this;
     }
 
-    public function hasChildren()
-    {
-        return !! $this->children;
-    }
-
     public function setPageData(array $data): self
     {
         $this->data = $data;
