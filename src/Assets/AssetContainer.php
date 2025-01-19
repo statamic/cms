@@ -140,7 +140,10 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
         }
 
         $url = rtrim($this->disk()->url('/'), '/');
-        $url = Str::chopStart($url, config('app.url'));
+
+        if (str_starts_with($url, config('app.url'))) {
+            $url = substr($url, strlen(config('app.url')));
+        }
 
         return ($url === '') ? '/' : $url;
     }
