@@ -4,6 +4,7 @@ namespace Tests\Fieldtypes;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Assets\QueryBuilder;
 use Statamic\Data\AugmentedCollection;
@@ -36,7 +37,7 @@ class AssetsTest extends TestCase
         AssetContainer::make('test')->disk('test')->save();
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_to_a_query_builder()
     {
         $augmented = $this->fieldtype()->augment(['foo/one.txt', 'bar/two.txt', 'unknown.txt']);
@@ -47,7 +48,7 @@ class AssetsTest extends TestCase
         $this->assertEquals(['one.txt', 'two.txt'], $augmented->get()->map->basename()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_to_a_query_builder_when_theres_no_value()
     {
         $augmented = $this->fieldtype()->augment(null);
@@ -56,7 +57,7 @@ class AssetsTest extends TestCase
         $this->assertCount(0, $augmented->get());
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_to_a_single_asset_when_max_files_is_one()
     {
         $augmented = $this->fieldtype(['max_files' => 1])->augment(['foo/one.txt']);
@@ -66,9 +67,23 @@ class AssetsTest extends TestCase
         $this->assertEquals('one.txt', $augmented->basename());
     }
 
-    /** @test */
+    #[Test]
     public function it_shallow_augments_to_a_collection_of_assets()
     {
+        AssetContainer::find('test')
+            ->queryAssets()
+            ->where('path', 'foo/one.txt')
+            ->first()
+            ->set('alt', 'Alt text for one')
+            ->save();
+
+        AssetContainer::find('test')
+            ->queryAssets()
+            ->where('path', 'bar/two.txt')
+            ->first()
+            ->set('alt', 'Alt text for two')
+            ->save();
+
         $augmented = $this->fieldtype()->shallowAugment(['foo/one.txt', 'bar/two.txt', 'unknown.txt']);
 
         $this->assertInstanceOf(Collection::class, $augmented);
@@ -79,19 +94,28 @@ class AssetsTest extends TestCase
                 'url' => '/assets/foo/one.txt',
                 'permalink' => 'http://localhost/assets/foo/one.txt',
                 'api_url' => 'http://localhost/api/assets/test/foo/one.txt',
+                'alt' => 'Alt text for one',
             ],
             [
                 'id' => 'test::bar/two.txt',
                 'url' => '/assets/bar/two.txt',
                 'permalink' => 'http://localhost/assets/bar/two.txt',
                 'api_url' => 'http://localhost/api/assets/test/bar/two.txt',
+                'alt' => 'Alt text for two',
             ],
         ], $augmented->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function it_shallow_augments_to_a_single_asset_when_max_files_is_one()
     {
+        AssetContainer::find('test')
+            ->queryAssets()
+            ->where('path', 'foo/one.txt')
+            ->first()
+            ->set('alt', 'Alt text for one')
+            ->save();
+
         $augmented = $this->fieldtype(['max_files' => 1])->shallowAugment(['foo/one.txt']);
 
         $this->assertInstanceOf(AugmentedCollection::class, $augmented);
@@ -100,10 +124,11 @@ class AssetsTest extends TestCase
             'url' => '/assets/foo/one.txt',
             'permalink' => 'http://localhost/assets/foo/one.txt',
             'api_url' => 'http://localhost/api/assets/test/foo/one.txt',
+            'alt' => 'Alt text for one',
         ], $augmented->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function it_replaces_dimensions_rule()
     {
         config()->set('statamic.cp.route', '/');
@@ -116,7 +141,7 @@ class AssetsTest extends TestCase
         $this->assertEquals(__('statamic::validation.dimensions'), $replaced[0]->message());
     }
 
-    /** @test */
+    #[Test]
     public function it_replaces_image_rule()
     {
         config()->set('statamic.cp.route', '/');
@@ -129,7 +154,7 @@ class AssetsTest extends TestCase
         $this->assertEquals(__('statamic::validation.image'), $replaced[0]->message());
     }
 
-    /** @test */
+    #[Test]
     public function it_replaces_mimes_rule()
     {
         config()->set('statamic.cp.route', '/');
@@ -142,7 +167,7 @@ class AssetsTest extends TestCase
         $this->assertEquals(__('statamic::validation.mimes', ['values' => 'jpg, png, jpeg']), $replaced[0]->message());
     }
 
-    /** @test */
+    #[Test]
     public function it_replaces_mimestypes_rule()
     {
         config()->set('statamic.cp.route', '/');
@@ -155,7 +180,7 @@ class AssetsTest extends TestCase
         $this->assertEquals(__('statamic::validation.mimetypes', ['values' => 'image/jpg, image/png']), $replaced[0]->message());
     }
 
-    /** @test */
+    #[Test]
     public function it_replaces_min_filesize_rule()
     {
         config()->set('statamic.cp.route', '/');
@@ -168,7 +193,7 @@ class AssetsTest extends TestCase
         $this->assertEquals(__('statamic::validation.min.file', ['min' => '100']), $replaced[0]->message());
     }
 
-    /** @test */
+    #[Test]
     public function it_replaces_max_filesize_rule()
     {
         config()->set('statamic.cp.route', '/');
@@ -181,7 +206,7 @@ class AssetsTest extends TestCase
         $this->assertEquals(__('statamic::validation.max.file', ['max' => '100']), $replaced[0]->message());
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_replace_non_image_related_rule()
     {
         config()->set('statamic.cp.route', '/');

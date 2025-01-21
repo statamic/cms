@@ -5,6 +5,8 @@ namespace Tests\StaticCaching;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\UrlInvalidated;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\Cachers\ApplicationCacher;
@@ -12,12 +14,12 @@ use Tests\TestCase;
 
 class ApplicationCacherTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_checks_if_a_page_is_cached()
     {
         $key = 'static-cache:responses:'.md5('http://example.com/test?foo=bar');
         $cache = $this->mock(Repository::class);
-        $cache->shouldReceive('get')->with($key)->times(2)->andReturn(null, 'html content');
+        $cache->shouldReceive('get')->with($key)->times(2)->andReturn(null, ['content' => 'html content', 'headers' => []]);
         $cache->shouldNotReceive('has');
 
         $cacher = new ApplicationCacher($cache, []);
@@ -27,35 +29,45 @@ class ApplicationCacherTest extends TestCase
         $this->assertTrue($cacher->hasCachedPage($request));
     }
 
-    /** @test */
+    #[Test]
     public function gets_cached_page()
     {
         $key = 'static-cache:responses:'.md5('http://example.com/test?foo=bar');
         $cache = $this->mock(Repository::class);
-        $cache->shouldReceive('get')->with($key)->once()->andReturn('html content');
+        $cache->shouldReceive('get')->with($key)->once()->andReturn(['content' => 'html content', 'headers' => [
+            'Content-Type' => 'application/html',
+        ]]);
 
         $cacher = new ApplicationCacher($cache, []);
         $request = Request::create('http://example.com/test', 'GET', ['foo' => 'bar']);
 
-        $this->assertEquals('html content', $cacher->getCachedPage($request));
+        $cachedPage = $cacher->getCachedPage($request);
+        $this->assertEquals('html content', $cachedPage->content);
+        $this->assertEquals('application/html', $cachedPage->headers['Content-Type']);
+        $this->assertEquals(200, $cachedPage->status);
     }
 
-    /** @test */
+    #[Test]
     public function checking_if_page_is_cached_then_retrieving_it_will_only_hit_the_cache_once()
     {
         $key = 'static-cache:responses:'.md5('http://example.com/test?foo=bar');
         $cache = $this->mock(Repository::class);
-        $cache->shouldReceive('get')->with($key)->once()->andReturn('html content');
+        $cache->shouldReceive('get')->with($key)->once()->andReturn(['content' => 'html content', 'headers' => [
+            'Content-Type' => 'application/html',
+        ]]);
         $cache->shouldNotReceive('has');
 
         $cacher = new ApplicationCacher($cache, []);
         $request = Request::create('http://example.com/test', 'GET', ['foo' => 'bar']);
 
         $this->assertTrue($cacher->hasCachedPage($request));
-        $this->assertEquals('html content', $cacher->getCachedPage($request));
+
+        $cachedPage = $cacher->getCachedPage($request);
+        $this->assertEquals('html content', $cachedPage->content);
+        $this->assertEquals('application/html', $cachedPage->headers['Content-Type']);
     }
 
-    /** @test */
+    #[Test]
     public function invalidating_a_url_removes_the_html_and_the_url()
     {
         $cache = app(Repository::class);
@@ -80,7 +92,7 @@ class ApplicationCacherTest extends TestCase
         $this->assertNotNull($cache->get('static-cache:responses:two'));
     }
 
-    /** @test */
+    #[Test]
     public function invalidating_a_url_will_invalidate_all_query_string_versions_too()
     {
         $cache = app(Repository::class);
@@ -108,11 +120,8 @@ class ApplicationCacherTest extends TestCase
         $this->assertNotNull($cache->get('static-cache:responses:two'));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider invalidateEventProvider
-     */
+    #[Test]
+    #[DataProvider('invalidateEventProvider')]
     public function invalidating_a_url_dispatches_event($domain, $expectedUrl)
     {
         Event::fake();
@@ -139,7 +148,7 @@ class ApplicationCacherTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function it_flushes()
     {
         $cache = app(Repository::class);
@@ -167,5 +176,58 @@ class ApplicationCacherTest extends TestCase
         $this->assertNull($cache->get('static-cache:responses:four'));
         $this->assertEquals([], $cacher->getUrls('http://example.com')->all());
         $this->assertEquals([], $cacher->getUrls('http://another.com')->all());
+    }
+
+    #[Test]
+    #[DataProvider('currentUrlProvider')]
+    public function it_gets_the_current_url(
+        array $query,
+        array $config,
+        string $expectedUrl
+    ) {
+        $request = Request::create('http://example.com/test', 'GET', $query);
+
+        $cacher = new ApplicationCacher(app(Repository::class), $config);
+
+        $this->assertEquals($expectedUrl, $cacher->getUrl($request));
+    }
+
+    public static function currentUrlProvider()
+    {
+        return [
+            'no query' => [
+                [],
+                [],
+                'http://example.com/test',
+            ],
+            'with query' => [
+                ['bravo' => 'b', 'charlie' => 'c', 'alfa' => 'a'],
+                [],
+                'http://example.com/test?alfa=a&bravo=b&charlie=c',
+            ],
+            'with query, ignoring query' => [
+                ['bravo' => 'b', 'charlie' => 'c', 'alfa' => 'a'],
+                ['ignore_query_strings' => true],
+                'http://example.com/test',
+            ],
+            'with query, allowed query' => [
+                ['bravo' => 'b', 'charlie' => 'c', 'alfa' => 'a'],
+                ['allowed_query_strings' => ['alfa', 'bravo']],
+                'http://example.com/test?alfa=a&bravo=b',
+            ],
+            'with query, disallowed query' => [
+                ['bravo' => 'b', 'charlie' => 'c', 'alfa' => 'a'],
+                ['disallowed_query_strings' => ['charlie']],
+                'http://example.com/test?alfa=a&bravo=b',
+            ],
+            'with query, allowed and disallowed' => [
+                ['bravo' => 'b', 'charlie' => 'c', 'alfa' => 'a'],
+                [
+                    'allowed_query_strings' => ['alfa', 'bravo'],
+                    'disallowed_query_strings' => ['bravo'],
+                ],
+                'http://example.com/test?alfa=a',
+            ],
+        ];
     }
 }

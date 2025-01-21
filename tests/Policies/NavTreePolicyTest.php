@@ -2,11 +2,12 @@
 
 namespace Tests\Policies;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Nav;
 
 class NavTreePolicyTest extends PolicyTestCase
 {
-    /** @test */
+    #[Test]
     public function trees_are_viewable_with_view_permissions()
     {
         $user = $this->userWithPermissions(['view test nav']);
@@ -18,7 +19,7 @@ class NavTreePolicyTest extends PolicyTestCase
         $this->assertFalse($user->can('edit', $tree));
     }
 
-    /** @test */
+    #[Test]
     public function trees_are_viewable_with_view_and_site_permissions()
     {
         $this->withSites(['en', 'fr', 'de']);
@@ -36,7 +37,7 @@ class NavTreePolicyTest extends PolicyTestCase
         $this->assertTrue($user->can('view', $nav->makeTree('de')));
     }
 
-    /** @test */
+    #[Test]
     public function navs_are_editable_with_edit_permissions()
     {
         $user = $this->userWithPermissions(['edit alfa nav']);
@@ -50,7 +51,7 @@ class NavTreePolicyTest extends PolicyTestCase
         $this->assertFalse($user->can('edit', $navB));
     }
 
-    /** @test */
+    #[Test]
     public function navs_are_editable_with_edit_and_site_permissions()
     {
         $this->withSites(['en', 'fr', 'de']);

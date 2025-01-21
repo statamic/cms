@@ -69,7 +69,7 @@ class DataResponse implements Responsable
 
     protected function getRedirect()
     {
-        if (! $this->data->get('redirect')) {
+        if (! $raw = (method_exists($this->data, 'value') ? $this->data->value('redirect') : $this->data->get('redirect'))) {
             return;
         }
 
@@ -86,14 +86,18 @@ class DataResponse implements Responsable
             throw new NotFoundHttpException;
         }
 
-        return redirect($redirect);
+        return redirect($redirect, $raw['status'] ?? 302);
     }
 
     protected function protect()
     {
-        app(Protection::class)
-            ->setData($this->data)
-            ->protect();
+        $protection = app(Protection::class)->setData($this->data);
+
+        $protection->protect();
+
+        if ($protection->scheme()) {
+            $this->headers['X-Statamic-Protected'] = true;
+        }
 
         return $this;
     }

@@ -42,7 +42,7 @@
                     <template v-else v-text="label"></template>
                 </template>
                 <template #no-options>
-                    <div class="text-sm text-gray-700 text-left py-2 px-4" v-text="__('No options to choose from.')" />
+                    <div class="text-sm text-gray-700 rtl:text-right ltr:text-left py-2 px-4" v-text="__('No options to choose from.')" />
                 </template>
                 <template #footer="{ deselect }" v-if="config.multiple">
                     <sortable-list
@@ -68,7 +68,7 @@
                     </sortable-list>
                 </template>
         </v-select>
-        <div class="text-xs ml-2 mt-3" :class="limitIndicatorColor" v-if="config.max_items">
+        <div class="text-xs rtl:mr-2 ltr:ml-2 mt-3" :class="limitIndicatorColor" v-if="config.max_items">
             <span v-text="currentLength"></span>/<span v-text="config.max_items"></span>
         </div>
     </div>
@@ -96,7 +96,7 @@ export default {
 
     computed: {
         selectedOptions() {
-            let selections = this.value || [];
+            let selections = this.value === null ? [] : this.value;
             if (typeof selections === 'string' || typeof selections === 'number') {
                 selections = [selections];
             }
@@ -106,7 +106,7 @@ export default {
         },
 
         options() {
-            return this.normalizeInputOptions(this.config.options);
+            return this.normalizeInputOptions(this.meta.options || this.config.options);
         },
 
         replicatorPreview() {

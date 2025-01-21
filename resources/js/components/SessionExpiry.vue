@@ -5,11 +5,12 @@
         <button v-if="isWarning" class="session-expiry-stripe" @click="extend" v-text="warningText" />
 
         <modal name="session-timeout-login" v-if="isShowingLogin" height="auto" width="500px" :adaptive="true">
-            <div class="flex items-center p-6 bg-gray-200 border-b text-center">
+            <div class="-max-h-screen-px">
+            <div class="text-lg font-semibold px-5 py-3 bg-gray-200 dark:bg-dark-550 rounded-t-lg flex items-center justify-between border-b dark:border-dark-900">
                 {{ __('Resume Your Session') }}
             </div>
 
-            <div v-if="isUsingOauth" class="p-6">
+            <div v-if="isUsingOauth" class="p-5">
                 <a :href="oauthProvider.loginUrl" target="_blank" class="btn-primary">
                     {{ __('Log in with :provider', {provider: oauthProvider.label}) }}
                 </a>
@@ -18,7 +19,7 @@
                 </div>
             </div>
 
-            <div v-if="!isUsingOauth" class="publish-fields">
+            <div v-if="!isUsingOauth" class="publish-fields p-2">
                 <div class="form-group w-full">
                     <label v-text="__('messages.session_expiry_enter_password')" />
                     <small
@@ -38,9 +39,10 @@
                             tabindex="1"
                             autofocus
                             @keydown.enter.prevent="submit" />
-                        <button @click="submit" class="btn-primary ml-2" v-text="__('Log in')" />
+                        <button @click="submit" class="btn-primary rtl:mr-2 ltr:ml-2" v-text="__('Log in')" />
                     </div>
                 </div>
+            </div>
             </div>
         </modal>
 
@@ -57,7 +59,8 @@ export default {
         warnAt: Number,
         lifetime: Number,
         email: String,
-        oauthProvider: String
+        oauthProvider: String,
+        auth: Object,
     },
 
     data() {
@@ -100,7 +103,7 @@ export default {
     watch: {
 
         count(count) {
-            this.isShowingLogin = this.remaining <= 0;
+            this.isShowingLogin = this.auth.enabled && this.remaining <= 0;
 
             // While we're in the warning period, we'll check every second so that any
             // activity in another tab is picked up and the count will get restarted.
@@ -118,6 +121,10 @@ export default {
             }
 
             this.lastCount = Vue.moment();
+        },
+
+        isShowingLogin(showing, wasShowing) {
+            if (showing && !wasShowing) this.updateCsrfToken();
         }
 
     },
@@ -143,7 +150,10 @@ export default {
             return this.$axios.get(cp_url('session-timeout')).then(response => {
                 this.count = this.remaining = response.data;
             }).catch(e => {
-                if (e.response.status === 401) this.remaining = 0;
+                if (e.response.status === 401) {
+                    this.remaining = 0;
+                    if (!this.auth.enabled) window.location = this.auth.redirect_to || '/';
+                }
                 throw e;
             }).finally(response => {
                 this.pinging = false;

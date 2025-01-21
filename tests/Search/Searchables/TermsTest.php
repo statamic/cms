@@ -2,7 +2,8 @@
 
 namespace Tests\Search\Searchables;
 
-use Statamic\Facades\Site;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Search\Searchables\Terms;
@@ -13,13 +14,13 @@ class TermsTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_finds_terms_from_references()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => '/'],
             'fr' => ['url' => '/fr/'],
-        ]]);
+        ]);
 
         Taxonomy::make('tags')->sites(['en', 'fr'])->save();
         Term::make('alfa')->taxonomy('tags')->dataForLocale('en', [])->dataForLocale('fr', [])->save();
@@ -41,17 +42,14 @@ class TermsTest extends TestCase
         ], $found->map->reference()->all());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider termsProvider
-     */
+    #[Test]
+    #[DataProvider('termsProvider')]
     public function it_gets_terms($locale, $config, $expected)
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => '/', 'locale' => 'en'],
             'fr' => ['url' => '/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         Taxonomy::make('tags')->sites(['en', 'fr'])->save();
         Taxonomy::make('categories')->sites(['en'])->save();
@@ -191,11 +189,8 @@ class TermsTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider indexFilterProvider
-     */
+    #[Test]
+    #[DataProvider('indexFilterProvider')]
     public function it_can_use_a_custom_filter($filter)
     {
         Taxonomy::make('tags')->sites(['en'])->save();

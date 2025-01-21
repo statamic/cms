@@ -1,9 +1,9 @@
 <template>
 
     <stack narrow name="page-tree-linker" :before-close="shouldClose" @closed="$emit('closed')">
-        <div slot-scope="{ close }" class="bg-gray-100 h-full flex flex-col">
+        <div slot-scope="{ close }" class="bg-gray-100 dark:bg-dark-700 h-full flex flex-col">
 
-            <header class="bg-white pl-6 pr-3 py-2 mb-4 border-b shadow-md text-lg font-medium flex items-center justify-between">
+            <header class="bg-white dark:bg-dark-550 rtl:pr-6 ltr:pl-6 rtl:pl-3 ltr:pr-3 py-2 mb-4 border-b dark:border-dark-950 shadow-md text-lg font-medium flex items-center justify-between">
                 {{ headerText }}
                 <button
                     type="button"
@@ -13,7 +13,7 @@
             </header>
 
             <div v-if="loading" class="flex-1 overflow-auto relative">
-                <div class="absolute inset-0 z-10 bg-white bg-opacity-75 flex items-center justify-center text-center">
+                <div class="absolute inset-0 z-10 bg-white dark:bg-dark-700 bg-opacity-75 flex items-center justify-center text-center">
                     <loading-graphic />
                 </div>
             </div>
@@ -25,6 +25,7 @@
                     :name="publishContainer"
                     :blueprint="adjustedBlueprint"
                     :values="values"
+                    :extra-values="extraValues"
                     :meta="meta"
                     :errors="errors"
                     :localized-fields="localizedFields"
@@ -33,7 +34,7 @@
                     @updated="values = $event"
                 >
                     <div slot-scope="{ container, setFieldMeta }">
-                        <div v-if="validating" class="absolute inset-0 z-10 bg-white bg-opacity-75 flex items-center justify-center">
+                        <div v-if="validating" class="absolute inset-0 z-10 bg-white dark:bg-dark-500 bg-opacity-75 flex items-center justify-center">
                             <loading-graphic text="" />
                         </div>
 
@@ -54,14 +55,14 @@
 
             </div>
 
-            <div v-if="!loading && (!readOnly || type === 'entry')" class="bg-gray-200 p-4 border-t flex items-center justify-between flex-row-reverse">
+            <div v-if="!loading && (!readOnly || type === 'entry')" class="bg-gray-200 dark:bg-dark-500 p-4 border-t dark:border-dark-900 flex items-center justify-between flex-row-reverse">
                 <div v-if="!readOnly">
-                    <button @click="confirmClose(close)" class="btn mr-2">{{ __('Cancel') }}</button>
+                    <button @click="confirmClose(close)" class="btn rtl:ml-2 ltr:mr-2">{{ __('Cancel') }}</button>
                     <button @click="submit" class="btn-primary">{{ __('Submit') }}</button>
                 </div>
                 <div v-if="type === 'entry'">
-                    <a :href="editEntryUrl" target="_blank" class="text-xs flex items-center justify-center text-blue hover:text-blue underline mr-4">
-                        <svg-icon name="light/external-link" class="w-4 h-4 mr-2" />
+                    <a :href="editEntryUrl" target="_blank" class="text-xs flex items-center justify-center text-blue hover:text-blue underline rtl:ml-4 ltr:mr-4">
+                        <svg-icon name="light/external-link" class="w-4 h-4 rtl:ml-2 ltr:mr-2" />
                         {{ __('Edit Entry') }}
                     </a>
                 </div>
@@ -73,7 +74,13 @@
 </template>
 
 <script>
+import HasHiddenFields from "../publish/HasHiddenFields";
+
 export default {
+
+    mixins: [
+        HasHiddenFields,
+    ],
 
     props: {
         id: String,
@@ -94,6 +101,7 @@ export default {
             meta: null,
             originValues: null,
             originMeta: null,
+            extraValues: null,
             localizedFields: null,
             syncableFields: null,
             loading: true,
@@ -184,9 +192,9 @@ export default {
 
             this.$axios.post(postUrl, {
                 type: this.type,
-                values: this.values
+                values: this.visibleValues
             }).then(response => {
-                this.$emit('submitted', this.values);
+                this.$emit('submitted', this.visibleValues);
             }).catch(e => {
                 this.validating = false;
                 if (e.response && e.response.status === 422) {
@@ -275,6 +283,7 @@ export default {
             this.originValues = info.originValues;
             this.meta = info.meta;
             this.originMeta = info.originMeta;
+            this.extraValues = info.extraValues;
             this.localizedFields = info.localizedFields;
             this.syncableFields = info.syncableFields;
         },
@@ -285,6 +294,7 @@ export default {
                 originValues: this.originValues,
                 meta: this.meta,
                 originMeta: this.originMeta,
+                extraValues: this.extraValues,
                 localizedFields: this.localizedFields,
                 syncableFields: this.syncableFields,
                 entry: this.entry,

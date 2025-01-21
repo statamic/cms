@@ -12,4 +12,9 @@ class ConfigField extends Field
 
         return $this->newInstance()->setValue($value);
     }
+
+    public function mustRemainInConfig(): bool
+    {
+        return $this->get('force_in_config') === true;
+    }
 }

@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP\Taxonomies;
 use Illuminate\Http\Request;
 use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\CP\Breadcrumbs;
+use Statamic\Facades\Action;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Site;
 use Statamic\Facades\Term;
@@ -14,10 +15,13 @@ use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Taxonomies\Term as TermResource;
 use Statamic\Http\Resources\CP\Taxonomies\Terms;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
+use Statamic\Rules\Slug;
+use Statamic\Rules\UniqueTermValue;
 
 class TermsController extends CpController
 {
-    use QueriesFilters;
+    use ExtractsFromTermFields,
+        QueriesFilters;
 
     public function index(FilteredRequest $request, $taxonomy)
     {
@@ -139,6 +143,8 @@ class TermsController extends CpController
             'revisionsEnabled' => $term->revisionsEnabled(),
             'breadcrumbs' => $this->breadcrumbs($taxonomy),
             'previewTargets' => $taxonomy->previewTargets()->all(),
+            'itemActions' => Action::for($term, ['taxonomy' => $taxonomy->handle(), 'view' => 'form']),
+            'hasTemplate' => view()->exists($term->template()),
         ];
 
         if ($request->wantsJson()) {
@@ -166,7 +172,11 @@ class TermsController extends CpController
 
         $fields->validate([
             'title' => 'required',
-            'slug' => 'required|alpha_dash|unique_term_value:'.$taxonomy->handle().','.$term->id().','.$site->handle(),
+            'slug' => [
+                'required',
+                new Slug,
+                new UniqueTermValue(taxonomy: $taxonomy->handle(), except: $term->id(), site: $site->handle()),
+            ],
         ]);
 
         $values = $fields->process()->values();
@@ -198,8 +208,15 @@ class TermsController extends CpController
             $saved = $term->updateLastModified(User::current())->save();
         }
 
+        [$values] = $this->extractFromFields($term, $term->blueprint());
+
         return (new TermResource($term))
-            ->additional(['saved' => $saved]);
+            ->additional([
+                'saved' => $saved,
+                'data' => [
+                    'values' => $values,
+                ],
+            ]);
     }
 
     public function create(Request $request, $taxonomy, $site)
@@ -223,13 +240,14 @@ class TermsController extends CpController
         ]);
 
         $viewData = [
-            'title' => __('Create Term'),
+            'title' => $taxonomy->createLabel(),
             'actions' => [
                 'save' => cp_route('taxonomies.terms.store', [$taxonomy->handle(), $site->handle()]),
             ],
             'values' => $values,
             'meta' => $fields->meta(),
             'taxonomy' => $taxonomy->handle(),
+            'taxonomyCreateLabel' => $taxonomy->createLabel(),
             'blueprint' => $blueprint->toPublishArray(),
             'published' => $taxonomy->defaultPublishState(),
             'locale' => $site->handle(),
@@ -265,7 +283,7 @@ class TermsController extends CpController
 
         $fields->validate([
             'title' => 'required',
-            'slug' => 'required|unique_term_value:'.$taxonomy->handle().',null,'.$site->handle(),
+            'slug' => ['required', new UniqueTermValue(taxonomy: $taxonomy->handle(), site: $site->handle())],
         ]);
 
         $values = $fields->process()->values()->except(['slug', 'blueprint']);
@@ -307,27 +325,6 @@ class TermsController extends CpController
             ->additional(['saved' => $saved]);
     }
 
-    protected function extractFromFields($term, $blueprint)
-    {
-        // The values should only be data merged with the origin data.
-        // We don't want injected taxonomy values, which $term->values() would have given us.
-        $values = $term->inDefaultLocale()->data()->merge(
-            $term->data()
-        );
-
-        $fields = $blueprint
-            ->fields()
-            ->addValues($values->all())
-            ->preProcess();
-
-        $values = $fields->values()->merge([
-            'title' => $term->value('title'),
-            'slug' => $term->slug(),
-        ]);
-
-        return [$values->all(), $fields->meta()];
-    }
-
     protected function extractAssetsFromValues($values)
     {
         return collect($values)
@@ -357,7 +354,7 @@ class TermsController extends CpController
             ],
             [
                 'text' => $taxonomy->title(),
-                'url' => $taxonomy->showUrl(),
+                'url' => $taxonomy->breadcrumbUrl(),
             ],
         ]);
     }

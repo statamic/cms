@@ -177,7 +177,7 @@ class Git
      */
     protected function statusWithFileCounts($status)
     {
-        $lines = collect(explode("\n", $status))->filter();
+        $lines = collect(explode("\n", $status ?? ''))->filter();
 
         $totalCount = $lines->count();
 
@@ -254,6 +254,7 @@ class Git
     protected function getCommandContext($paths, $message)
     {
         return [
+            'git' => config('statamic.git.binary'),
             'paths' => collect($paths)->implode(' '),
             'message' => $this->shellEscape($message),
             'name' => $this->shellEscape($this->gitUserName()),

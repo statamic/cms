@@ -2,7 +2,7 @@
 
 namespace Statamic\Ignition\Solutions;
 
-use Facade\IgnitionContracts\RunnableSolution;
+use Spatie\ErrorSolutions\Contracts\RunnableSolution;
 use Statamic\Statamic;
 
 class EnableStatamicPro implements RunnableSolution
@@ -34,7 +34,7 @@ class EnableStatamicPro implements RunnableSolution
         return 'Enable Statamic Pro';
     }
 
-    public function run(array $parameters = [])
+    public function run(array $parameters = []): void
     {
         Statamic::enablePro();
     }

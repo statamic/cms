@@ -2,6 +2,7 @@
 
 namespace Tests\Markdown;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Markdown;
 use Tests\TestCase;
 
@@ -16,13 +17,13 @@ class ParserTest extends TestCase
         $this->parser = new Markdown\Parser;
     }
 
-    /** @test */
+    #[Test]
     public function it_parses_markdown()
     {
         $this->assertEquals("<h1>Heading One</h1>\n", $this->parser->parse('# Heading One'));
     }
 
-    /** @test */
+    #[Test]
     public function it_adds_an_extension()
     {
         $this->assertEquals("<p>smile :)</p>\n", $this->parser->parse('smile :)'));
@@ -34,7 +35,7 @@ class ParserTest extends TestCase
         $this->assertEquals("<p>smile 😀</p>\n", $this->parser->parse('smile :)'));
     }
 
-    /** @test */
+    #[Test]
     public function it_adds_extensions_using_an_array()
     {
         $this->assertEquals("<p>smile :) frown :(</p>\n", $this->parser->parse('smile :) frown :('));
@@ -46,7 +47,7 @@ class ParserTest extends TestCase
         $this->assertEquals("<p>smile 😀 frown 🙁</p>\n", $this->parser->parse('smile :) frown :('));
     }
 
-    /** @test */
+    #[Test]
     public function it_creates_a_new_instance_based_on_the_current_instance()
     {
         $this->parser->addExtension(function () {

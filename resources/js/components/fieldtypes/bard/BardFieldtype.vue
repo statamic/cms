@@ -15,8 +15,28 @@
         @dragend="ignorePageHeader(false)"
     >
 
-        <div class="bard-fixed-toolbar" v-if="!readOnly && showFixedToolbar">
-            <div class="flex flex-wrap flex-1 items-center no-select" v-if="toolbarIsFixed" :class="{'justify-center': fullScreenMode}">
+        <publish-field-fullscreen-header
+            v-if="fullScreenMode"
+            :title="config.display"
+            :field-actions="fieldActions"
+            @close="toggleFullscreen">
+            <div class="bard-fixed-toolbar border-0" v-if="!readOnly && showFixedToolbar">
+                <div class="flex flex-wrap flex-1 items-center no-select" v-if="toolbarIsFixed">
+                    <component
+                        v-for="button in visibleButtons(buttons)"
+                        :key="button.name"
+                        :is="button.component || 'BardToolbarButton'"
+                        :button="button"
+                        :active="buttonIsActive(button)"
+                        :config="config"
+                        :bard="_self"
+                        :editor="editor" />
+                </div>
+            </div>
+        </publish-field-fullscreen-header>
+
+        <div class="bard-fixed-toolbar" v-if="!readOnly && showFixedToolbar && !fullScreenMode">
+            <div class="flex flex-wrap flex-1 items-center no-select" v-if="toolbarIsFixed">
                 <component
                     v-for="button in visibleButtons(buttons)"
                     :key="button.name"
@@ -26,16 +46,6 @@
                     :config="config"
                     :bard="_self"
                     :editor="editor" />
-                    <button class="bard-toolbar-button" @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')" :aria-label="__('Show HTML Source')">
-                        <svg-icon name="show-source" class="w-4 h-4 "/>
-                    </button>
-                    <button class="bard-toolbar-button" @click="toggleCollapseSets" v-tooltip="__('Expand/Collapse Sets')" :aria-label="__('Expand/Collapse Sets')" v-if="config.collapse !== 'accordion' && setConfigs.length > 0">
-                        <svg-icon name="expand-collapse-vertical-2" class="w-4 h-4" />
-                    </button>
-                    <button class="bard-toolbar-button" @click="toggleFullscreen" v-tooltip="__('Toggle Fullscreen Mode')" :aria-label="__('Toggle Fullscreen Mode')" v-if="config.fullscreen">
-                        <svg-icon name="arrows-shrink" class="w-4 h-4" v-show="fullScreenMode" />
-                        <svg-icon name="expand-bold" class="w-4 h-4" v-show="!fullScreenMode" />
-                    </button>
             </div>
         </div>
 
@@ -77,7 +87,7 @@
                             v-tooltip="__('Add Set')"
                             @click="addSetButtonClicked"
                         >
-                            <svg-icon name="micro/plus" class="w-3 h-3 text-gray-800 group-hover:text-black" />
+                            <svg-icon name="micro/plus" class="w-3 h-3 text-gray-800 dark:text-dark-175 group-hover:text-black dark:group-hover:dark-text-100" />
                         </button>
                     </template>
                 </set-picker>
@@ -180,7 +190,8 @@ export default {
             showAddSetButton: false,
             provide: {
                 bard: this.makeBardProvide(),
-                storeName: this.storeName
+                storeName: this.storeName,
+                bardSets: this.config.sets
             }
         }
     },
@@ -288,8 +299,7 @@ export default {
 
         replicatorPreview() {
             if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
-
-            const stack = JSON.parse(this.value);
+            const stack = [...this.value];
             let text = '';
             while (stack.length) {
                 const node = stack.shift();
@@ -328,6 +338,41 @@ export default {
             return this.config.sets;
         },
 
+        internalFieldActions() {
+            return [
+                {
+                    title: __('Expand All Sets'),
+                    icon: 'arrows-horizontal-expand',
+                    quick: true,
+                    visibleWhenReadOnly: true,
+                    run: this.expandAll,
+                    visible: this.setConfigs.length > 0,
+                },
+                {
+                    title: __('Collapse All Sets'),
+                    icon: 'arrows-horizontal-collapse',
+                    quick: true,
+                    visibleWhenReadOnly: true,
+                    run: this.collapseAll,
+                    visible: this.setConfigs.length > 0,
+                },
+                {
+                    title: __('Toggle Fullscreen Mode'),
+                    icon: ({ vm }) => vm.fullScreenMode ? 'shrink-all' : 'expand-bold',
+                    quick: true,
+                    run: this.toggleFullscreen,
+                    visibleWhenReadOnly: true,
+                    visible: this.config.fullscreen,
+                },
+                {
+                    title: __('Show HTML Source'),
+                    run: () => this.showSource = !this.showSource,
+                    visibleWhenReadOnly: true,
+                    visible: this.allowSource,
+                },
+            ];
+        },
+
     },
 
     mounted() {
@@ -346,8 +391,6 @@ export default {
 
         this.pageHeader = document.querySelector('.global-header');
 
-        this.$store.commit(`publish/${this.storeName}/setFieldSubmitsJson`, this.fieldPathPrefix || this.handle);
-
         this.$nextTick(() => {
             let el = document.querySelector(`label[for="${this.fieldId}"]`);
             if (el) {
@@ -361,31 +404,19 @@ export default {
     beforeDestroy() {
         this.editor.destroy();
         this.escBinding.destroy();
-
-        this.$store.commit(`publish/${this.storeName}/unsetFieldSubmitsJson`, this.fieldPathPrefix || this.handle);
     },
 
     watch: {
 
-        json(json) {
+        json(json, oldJson) {
             if (!this.mounted) return;
+                        
+            if (json === oldJson) return;
 
-            let jsonValue = JSON.stringify(json);
-
-            if (jsonValue === this.value) return;
-
-            // Prosemirror's JSON will include spaces between tags.
-            // For example (this is not the actual json)...
-            // "<p>One <b>two</b> three</p>" becomes ['OneSPACE', '<b>two</b>', 'SPACEthree']
-            // But, Laravel's TrimStrings middleware would remove them.
-            // Those spaces need to be there, otherwise it would be rendered as <p>One<b>two</b>three</p>
-            // To combat this, we submit the JSON string instead of an object.
-            this.updateDebounced(jsonValue);
+            this.updateDebounced(json);
         },
 
-        value(value, oldValue) {
-            if (value === oldValue) return;
-
+        value(value, oldValue) {    
             const oldContent = this.editor.getJSON();
             const content = this.valueToContent(value);
 
@@ -415,13 +446,6 @@ export default {
                 meta.previews = value;
                 this.updateMeta(meta);
             }
-        },
-
-        fieldPathPrefix(fieldPathPrefix, oldFieldPathPrefix) {
-            this.$store.commit(`publish/${this.storeName}/unsetFieldSubmitsJson`, oldFieldPathPrefix);
-            this.$nextTick(() => {
-                this.$store.commit(`publish/${this.storeName}/setFieldSubmitsJson`, fieldPathPrefix);
-            });
         },
 
         fullScreenMode() {
@@ -653,7 +677,7 @@ export default {
                     }, 1);
                 },
                 onUpdate: () => {
-                    this.json = this.editor.getJSON().content;
+                    this.json = clone(this.editor.getJSON().content);
                     this.html = this.editor.getHTML();
                 },
                 onCreate: ({ editor }) => {
@@ -696,9 +720,6 @@ export default {
         },
 
         valueToContent(value) {
-            // A json string is passed from PHP since that's what's submitted.
-            value = JSON.parse(value);
-
             return value.length
                 ? { type: 'doc', content: value }
                 : null;

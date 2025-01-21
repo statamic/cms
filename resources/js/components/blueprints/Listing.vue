@@ -7,7 +7,7 @@
             >
                 <template slot="cell-title" slot-scope="{ row: blueprint }">
                     <div class="flex items-center">
-                        <div class="little-dot mr-2" :class="[blueprint.hidden ? 'hollow' : 'bg-green-600']" />
+                        <div class="little-dot rtl:ml-2 ltr:mr-2" :class="[blueprint.hidden ? 'hollow' : 'bg-green-600']" />
                         <a :href="blueprint.edit_url">{{ __(blueprint.title) }}</a>
                     </div>
                 </template>

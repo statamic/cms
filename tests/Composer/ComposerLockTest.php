@@ -3,6 +3,7 @@
 namespace Tests\Composer;
 
 use Illuminate\Filesystem\Filesystem;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Console\Composer\Lock;
 use Statamic\Exceptions\ComposerLockFileNotFoundException;
 use Statamic\Exceptions\ComposerLockPackageNotFoundException;
@@ -35,7 +36,7 @@ class ComposerLockTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function it_can_check_if_lock_file_exists()
     {
         $this->assertFalse(Lock::file()->exists());
@@ -45,7 +46,7 @@ class ComposerLockTest extends TestCase
         $this->assertTrue(Lock::file()->exists());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_check_if_custom_lock_file_exists()
     {
         $this->assertFalse(Lock::file($this->previousLockPath)->exists());
@@ -55,7 +56,7 @@ class ComposerLockTest extends TestCase
         $this->assertTrue(Lock::file($this->previousLockPath)->exists());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_ensure_lock_file_exists()
     {
         $this->expectException(ComposerLockFileNotFoundException::class);
@@ -64,7 +65,7 @@ class ComposerLockTest extends TestCase
         Lock::file()->ensureExists();
     }
 
-    /** @test */
+    #[Test]
     public function it_can_ensure_custom_lock_file_exists()
     {
         $this->expectException(ComposerLockFileNotFoundException::class);
@@ -73,7 +74,7 @@ class ComposerLockTest extends TestCase
         Lock::file($this->previousLockPath)->ensureExists();
     }
 
-    /** @test */
+    #[Test]
     public function it_can_delete_lock_file()
     {
         $this->assertFalse(Lock::file($this->previousLockPath)->exists());
@@ -87,7 +88,7 @@ class ComposerLockTest extends TestCase
         $this->assertFalse(Lock::file($this->previousLockPath)->exists());
     }
 
-    /** @test */
+    #[Test]
     public function it_errors_when_composer_lock_file_is_not_found()
     {
         $this->expectException(ComposerLockFileNotFoundException::class);
@@ -96,7 +97,7 @@ class ComposerLockTest extends TestCase
         Lock::file()->getInstalledVersion('package/two');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_check_if_package_is_installed()
     {
         PackToTheFuture::generateComposerLock('package/one', '1.0.0', $this->lockPath);
@@ -105,7 +106,7 @@ class ComposerLockTest extends TestCase
         $this->assertFalse(Lock::file()->isDevPackageInstalled('package/one'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_check_if_package_is_installed_as_dev_dependency()
     {
         PackToTheFuture::generateComposerLock('package/one', '1.0.0', $this->lockPath, true);
@@ -114,7 +115,7 @@ class ComposerLockTest extends TestCase
         $this->assertTrue(Lock::file()->isDevPackageInstalled('package/one'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_installed_version_of_a_package_from_composer_lock()
     {
         PackToTheFuture::generateComposerLock('package/one', '1.0.0', $this->lockPath);
@@ -126,7 +127,7 @@ class ComposerLockTest extends TestCase
         $this->assertEquals('1.1.0', Lock::file()->getInstalledVersion('package/one'));
     }
 
-    /** @test */
+    #[Test]
     public function it_errors_when_package_is_not_found()
     {
         PackToTheFuture::generateComposerLock('package/one', '1.0.0', $this->lockPath);
@@ -137,7 +138,7 @@ class ComposerLockTest extends TestCase
         Lock::file()->getInstalledVersion('package/two');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_gets_normalized_version_of_a_package_from_composer_lock()
     {
         PackToTheFuture::generateComposerLockForMultiple([
@@ -161,7 +162,7 @@ class ComposerLockTest extends TestCase
         $this->assertEquals('8.1.0.0-beta1', Lock::file()->getNormalizedInstalledVersion('package/eight'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_installed_version_of_a_package_from_multiple_composer_lock_files()
     {
         PackToTheFuture::generateComposerLock('package/one', '2.0.0', $this->lockPath);
@@ -171,7 +172,7 @@ class ComposerLockTest extends TestCase
         $this->assertEquals('1.0.0', Lock::file($this->previousLockPath)->getInstalledVersion('package/one'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_override_package_version()
     {
         PackToTheFuture::generateComposerLockForMultiple([

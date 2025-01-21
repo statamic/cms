@@ -2,6 +2,7 @@
 
 namespace Tests\Policies;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
@@ -9,7 +10,7 @@ use Statamic\Facades\Term;
 
 class TermPolicyTest extends PolicyTestCase
 {
-    /** @test */
+    #[Test]
     public function term_is_viewable_with_view_permissions()
     {
         $user = $this->userWithPermissions(['view tags terms']);
@@ -28,7 +29,7 @@ class TermPolicyTest extends PolicyTestCase
         $this->assertFalse($user->can('edit', $termB));
     }
 
-    /** @test */
+    #[Test]
     public function term_is_viewable_and_editable_with_edit_permissions()
     {
         $user = $this->userWithPermissions(['edit tags terms']);
@@ -44,7 +45,7 @@ class TermPolicyTest extends PolicyTestCase
         $this->assertFalse($user->can('edit', $termB));
     }
 
-    /** @test */
+    #[Test]
     public function term_is_creatable_with_create_permissions()
     {
         $user = $this->userWithPermissions(['create alfa terms']);
@@ -58,7 +59,7 @@ class TermPolicyTest extends PolicyTestCase
         $this->assertFalse($user->can('store', [TermContract::class, $taxonomyB]));
     }
 
-    /** @test */
+    #[Test]
     public function term_is_creatable_with_create_and_site_permissions()
     {
         $this->withSites(['en', 'fr', 'de', 'es']);
@@ -82,7 +83,7 @@ class TermPolicyTest extends PolicyTestCase
         $this->assertTrue($user->can('create', [TermContract::class, $taxonomy]));
     }
 
-    /** @test */
+    #[Test]
     public function term_is_not_creatable_without_create_and_site_permissions()
     {
         $this->withSites(['en', 'fr', 'de', 'es']);

@@ -9,27 +9,27 @@
                     <tr>
                         <td class="checkbox-column border-r" @click="selected.index = ! selected.index">
                             <div class="flex items-center h-full">
-                                <input type="checkbox" v-model="selected.index" class="mr-4" id="field_index" />
+                                <input type="checkbox" v-model="selected.index" class="rtl:ml-4 ltr:mr-4" id="field_index" />
                             </div>
                         </td>
                         <td class="border-r">
                             <label for="field_index" v-text="__('Index Template')" />
                         </td>
                         <td :class="{'opacity-25': ! selected.index }">
-                            <input type="text" v-model="index" class="input-text font-mono">
+                            <input type="text" v-model="index" class="input-text font-mono" dir="ltr">
                         </td>
                     </tr>
                     <tr>
                         <td class="checkbox-column border-r" @click="selected.show = ! selected.show">
                             <div class="flex items-center h-full">
-                                <input type="checkbox" v-model="selected.show" class="mr-4" id="field_template" />
+                                <input type="checkbox" v-model="selected.show" class="rtl:ml-4 ltr:mr-4" id="field_template" />
                             </div>
                         </td>
                         <td class="border-r">
                             <label for="field_template" v-text="__('Show Template')" />
                         </td>
                         <td :class="{'opacity-25': ! selected.show }">
-                            <input type="text" v-model="show" class="input-text font-mono">
+                            <input type="text" v-model="show" class="input-text font-mono" dir="ltr">
                         </td>
                     </tr>
                 </tbody>

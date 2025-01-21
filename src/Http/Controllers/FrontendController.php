@@ -41,11 +41,11 @@ class FrontendController extends Controller
         $params = $request->route()->parameters();
         $view = Arr::pull($params, 'view');
         $data = Arr::pull($params, 'data');
-        $data = array_merge($params, $data);
+        $data = array_merge($params, is_callable($data) ? $data(...$params) : $data);
 
         $view = app(View::class)
             ->template($view)
-            ->layout(Arr::get($data, 'layout', 'layout'))
+            ->layout(Arr::get($data, 'layout', config('statamic.system.layout', 'layout')))
             ->with($data)
             ->cascadeContent($this->getLoadedRouteItem($data));
 

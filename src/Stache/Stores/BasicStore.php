@@ -2,8 +2,8 @@
 
 namespace Statamic\Stache\Stores;
 
-use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\File;
+use Statamic\Facades\Stache;
 use Symfony\Component\Finder\SplFileInfo;
 
 abstract class BasicStore extends Store
@@ -24,6 +24,10 @@ abstract class BasicStore extends Store
         }
 
         if ($item = $this->getCachedItem($key)) {
+            if (method_exists($item, 'syncOriginal')) {
+                $item->syncOriginal();
+            }
+
             return $item;
         }
 
@@ -31,14 +35,49 @@ abstract class BasicStore extends Store
 
         $this->cacheItem($item);
 
+        if (method_exists($item, 'syncOriginal')) {
+            $item->syncOriginal();
+        }
+
         return $item;
+    }
+
+    public function getItemValues($keys, $valueIndex, $keyIndex)
+    {
+        // This is for performance. There's no need to resolve anything
+        // else if we're looking for the keys. We have them already.
+        if ($valueIndex === 'id' && ! $keyIndex) {
+            return $keys;
+        }
+
+        $values = $this->getIndexedValues($valueIndex, $keys);
+
+        if (! $keyIndex) {
+            return $values->values();
+        }
+
+        $keyValues = $this->getIndexedValues($keyIndex, $keys);
+
+        return $keys->mapWithKeys(fn ($key) => [$keyValues[$key] => $values[$key]]);
+    }
+
+    private function getIndexedValues($name, $only)
+    {
+        // We don't want *all* the values in the index. We only want the requested keys. They are
+        // provided as an array of IDs. It's faster to do has() than contains() so we'll flip them.
+        $only = $only->flip();
+
+        return $this->resolveIndex($name)
+            ->load()
+            ->items()
+            ->filter(fn ($value, $key) => $only->has($key));
     }
 
     protected function getCachedItem($key)
     {
         $cacheKey = $this->getItemCacheKey($key);
 
-        return Cache::get($cacheKey);
+        return Stache::cacheStore()->get($cacheKey);
     }
 
     protected function cacheItem($item)
@@ -47,12 +86,12 @@ abstract class BasicStore extends Store
 
         $cacheKey = $this->getItemCacheKey($key);
 
-        Cache::forever($cacheKey, $item);
+        Stache::cacheStore()->forever($cacheKey, $item);
     }
 
     public function forgetItem($key)
     {
-        Cache::forget($this->getItemCacheKey($key));
+        Stache::cacheStore()->forget($this->getItemCacheKey($key));
     }
 
     protected function getItemCacheKey($key)

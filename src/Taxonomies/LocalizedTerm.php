@@ -9,6 +9,8 @@ use Illuminate\Support\Carbon;
 use Statamic\Contracts\Auth\Protect\Protectable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
+use Statamic\Contracts\Data\BulkAugmentable;
+use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
 use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Contracts\Search\Searchable as SearchableContract;
@@ -20,6 +22,8 @@ use Statamic\Data\Publishable;
 use Statamic\Data\TracksLastModified;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
+use Statamic\Events\LocalizedTermDeleted;
+use Statamic\Events\LocalizedTermSaved;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades;
 use Statamic\Facades\Antlers;
@@ -33,12 +37,13 @@ use Statamic\Search\Searchable;
 use Statamic\Statamic;
 use Statamic\Support\Str;
 
-class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableValues, Protectable, ResolvesValuesContract, Responsable, SearchableContract, Term
+class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, ContainsQueryableValues, Localization, Protectable, ResolvesValuesContract, Responsable, SearchableContract, Term
 {
     use ContainsSupplementalData, HasAugmentedInstance, Publishable, ResolvesValues, Revisable, Routable, Searchable, TracksLastModified, TracksQueriedColumns, TracksQueriedRelations;
 
     protected $locale;
     protected $term;
+    private $augmentationReferenceKey;
 
     public function __construct($term, $locale)
     {
@@ -269,8 +274,12 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, ContainsQuer
         return $this->isDefaultLocale();
     }
 
-    public function locale()
+    public function locale($locale = null)
     {
+        if (func_num_args() === 1) {
+            throw new \Exception('The locale cannot be set on a LocalizedTerm.');
+        }
+
         return $this->locale;
     }
 
@@ -366,6 +375,10 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, ContainsQuer
             throw new NotFoundHttpException;
         }
 
+        if ($this->collection() && ! $this->taxonomy()->collections()->contains($this->collection())) {
+            throw new NotFoundHttpException;
+        }
+
         return (new DataResponse($this))->toResponse($request);
     }
 
@@ -423,12 +436,25 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, ContainsQuer
 
     public function save()
     {
-        return $this->term->save();
+        $save = $this->term->save();
+
+        LocalizedTermSaved::dispatch($this);
+
+        return $save;
+    }
+
+    public function deleteQuietly()
+    {
+        return $this->term->deleteQuietly();
     }
 
     public function delete()
     {
-        return $this->term->delete();
+        $delete = $this->term->delete();
+
+        LocalizedTermDeleted::dispatch($this);
+
+        return $delete;
     }
 
     public function private()
@@ -523,5 +549,16 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, ContainsQuer
     public function getCpSearchResultBadge()
     {
         return $this->taxonomy()->title();
+    }
+
+    public function getBulkAugmentationReferenceKey(): ?string
+    {
+        if ($this->augmentationReferenceKey) {
+            return $this->augmentationReferenceKey;
+        }
+
+        $dataPart = implode('|', $this->data()->keys()->sort()->all());
+
+        return $this->augmentationReferenceKey = 'LocalizedTerm::'.$this->blueprint()->namespace().'::'.$dataPart;
     }
 }

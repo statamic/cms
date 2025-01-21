@@ -6,6 +6,7 @@ use Exception;
 use ReflectionProperty;
 use Statamic\Facades\File;
 use Statamic\Facades\Pattern;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Yaml\ParseException as StatamicParseException;
 use Symfony\Component\Yaml\Yaml as SymfonyYaml;
@@ -53,7 +54,7 @@ class Yaml
         if (Pattern::startsWith($str, '---')) {
             $split = preg_split("/\n---/", $str, 2, PREG_SPLIT_NO_EMPTY);
             $str = $split[0];
-            if (empty($content = ltrim(array_get($split, 1, '')))) {
+            if (empty($content = ltrim(Arr::get($split, 1, '')))) {
                 $content = null;
             }
         }

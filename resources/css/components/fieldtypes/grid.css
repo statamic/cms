@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .grid-table {
-    @apply w-full text-left border text-gray relative mb-4 outline-none shadow-sm rounded;
+    @apply w-full rtl:text-right ltr:text-left border dark:border-dark-900 text-gray dark:text-dark-150 relative mb-4 outline-none shadow-sm rounded;
     border-collapse: separate;
     border-spacing: 0;
     table-layout: auto;
@@ -11,14 +11,14 @@
 
 .grid-table thead {
     th {
-        @apply font-medium px-2 py-2 border-b z-10 bg-gray-200 text-gray-900 text-sm;
+        @apply font-medium px-2 py-2 border-b dark:border-dark-900 z-10 bg-gray-200 dark:bg-dark-650 text-gray-900 dark:text-dark-150 text-sm;
         display: table-cell;
         position: sticky;
         top: -1px;
         z-index: auto;
 
-        &:first-child { @apply rounded-tl pl-3; }
-        &:last-child { @apply rounded-tr; }
+        &:first-child { @apply rtl:rounded-tr ltr:rounded-tl rtl:pr-3 ltr:pl-3; }
+        &:last-child { @apply rtl:rounded-tl ltr:rounded-tr; }
         &.grid-drag-handle-header {
             @apply w-3;
         }
@@ -37,26 +37,30 @@
     }
 
     > tr > td {
-        @apply border-b px-2 py-3 align-top;
+        @apply border-b dark:border-dark-900 px-2 py-3 align-top;
 
         &:first-child.grid-cell {
-            @apply pl-3;
+            @apply rtl:pr-3 ltr:pl-3;
         }
 
         &.drag-handle {
-            @apply border-r h-full p-2;
+            @apply rtl:border-l ltr:border-r h-full p-2;
             width: 1%;
             cursor: grab;
             background: theme('colors.gray.200') url('../../../svg/icons/light/drag-dots.svg') center center no-repeat;
             background-size: 7px 17px;
             &:hover { @apply bg-gray-300; }
+
+            .dark & {
+                background-color: theme('colors.dark.700');
+            }
         }
     }
 
     tr:last-child td {
         @apply border-b-0;
-        &:first-child { @apply rounded-bl; }
-        &:last-child { @apply rounded-br; }
+        &:first-child { @apply rtl:rounded-br ltr:rounded-bl; }
+        &:last-child { @apply rtl:rounded-bl ltr:rounded-br; }
     }
 
     tr.draggable-source--is-dragging td {
@@ -64,8 +68,8 @@
     }
 }
 
-.grid-table tbody .row-controls {
-    @apply pl-0 text-center;
+.grid-table tbody .grid-row-controls {
+    @apply rtl:pr-0 ltr:pl-0 text-center;
     width: 1%;
     padding-top: 21px; /*  pseudo-center for text/select fields */
 }

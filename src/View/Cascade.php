@@ -66,12 +66,12 @@ class Cascade
 
     public function get($key)
     {
-        return array_get($this->data, $key);
+        return Arr::get($this->data, $key);
     }
 
     public function set($key, $value)
     {
-        array_set($this->data, $key, $value);
+        Arr::set($this->data, $key, $value);
     }
 
     public function data($data)
@@ -138,17 +138,13 @@ class Cascade
     protected function hydrateGlobals()
     {
         foreach (GlobalSet::all() as $global) {
-            if (! $global->existsIn($this->site->handle())) {
-                continue;
+            if ($global = $global->in($this->site->handle())) {
+                $this->set($global->handle(), $global);
             }
-
-            $global = $global->in($this->site->handle());
-
-            $this->set($global->handle(), $global);
         }
 
         if ($mainGlobal = $this->get('global')) {
-            foreach ($mainGlobal->toAugmentedCollection() as $key => $value) {
+            foreach ($mainGlobal->toDeferredAugmentedArray() as $key => $value) {
                 $this->set($key, $value);
             }
         }
@@ -163,7 +159,7 @@ class Cascade
         }
 
         $variables = $this->content instanceof Augmentable
-            ? $this->content->toAugmentedArray()
+            ? $this->content->toDeferredAugmentedArray()
             : $this->content->toArray();
 
         foreach ($variables as $key => $value) {

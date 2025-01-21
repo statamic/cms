@@ -2,15 +2,16 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
+use Statamic\Contracts\Query\Builder;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
-/**
- * @group array
- */
+#[Group('array')]
 class SortTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_sorts_primitive_arrays()
     {
         $arr = ['beta', 'zeta', 'alpha'];
@@ -26,7 +27,7 @@ class SortTest extends TestCase
         $this->assertEquals($expected, $this->modify(collect($arr), ['true', 'asc']));
     }
 
-    /** @test */
+    #[Test]
     public function it_sorts_primitive_arrays_descending()
     {
         $arr = ['beta', 'zeta', 'alpha'];
@@ -36,7 +37,7 @@ class SortTest extends TestCase
         $this->assertEquals($expected, $this->modify(collect($arr), ['true', 'desc']));
     }
 
-    /** @test */
+    #[Test]
     public function it_sorts_multidimensional_arrays_by_a_key()
     {
         $arr = [
@@ -55,7 +56,7 @@ class SortTest extends TestCase
         $this->assertEquals($expected, $this->modify(collect($arr), 'value'));
     }
 
-    /** @test */
+    #[Test]
     public function it_sorts_multidimensional_arrays_by_a_key_descending()
     {
         $arr = [
@@ -74,13 +75,13 @@ class SortTest extends TestCase
         $this->assertEquals($expected, $this->modify(collect($arr), ['value', 'desc']));
     }
 
-    /** @test */
+    #[Test]
     public function it_sorts_primitive_arrays_randomly()
     {
         $this->assertSortsRandomly(['alpha', 'beta', 'zeta']);
     }
 
-    /** @test */
+    #[Test]
     public function it_sorts_multidimensional_arrays_randomly()
     {
         $this->assertSortsRandomly([
@@ -107,11 +108,29 @@ class SortTest extends TestCase
         $this->assertNotCount(1, $combinations);
     }
 
-    public function modify($arr, $args = [])
+    #[Test]
+    public function it_sorts_builders(): void
     {
-        $modified = Modify::value($arr)->sort($args)->fetch();
+        $query = \Mockery::mock(Builder::class);
+
+        $query->shouldReceive('inRandomOrder')->once()->andReturnSelf();
+        $limited = $this->modify($query, 'random');
+        $this->assertSame($query, $limited);
+
+        $query->shouldReceive('orderBy')->with('title', 'asc')->once()->andReturnSelf();
+        $limited = $this->modify($query, 'title');
+        $this->assertSame($query, $limited);
+
+        $query->shouldReceive('orderBy')->with('title', 'desc')->once()->andReturnSelf();
+        $limited = $this->modify($query, ['title', 'desc']);
+        $this->assertSame($query, $limited);
+    }
+
+    public function modify($value, $args = [])
+    {
+        $modified = Modify::value($value)->sort($args)->fetch();
 
         // It gets modified to a Collection, but it's easier to write tests as arrays.
-        return $modified->all();
+        return $value instanceof Builder ? $modified : $modified->all();
     }
 }

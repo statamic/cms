@@ -8,6 +8,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use InvalidArgumentException;
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
@@ -40,18 +41,10 @@ class EntriesTest extends TestCase
 
         app('statamic.scopes')[PostType::handle()] = PostType::class;
         app('statamic.scopes')[PostAnimal::handle()] = PostAnimal::class;
-    }
 
-    protected function getEnvironmentSetUp($app)
-    {
-        parent::getEnvironmentSetUp($app);
-
-        $app['config']->set('statamic.sites', [
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://localhost/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://localhost/fr/'],
-            ],
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://localhost/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://localhost/fr/'],
         ]);
     }
 
@@ -81,7 +74,7 @@ class EntriesTest extends TestCase
         return collect($this->getEntries($params))->map->id()->all();
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_entries_in_a_collection()
     {
         $this->assertCount(0, $this->getEntries());
@@ -91,7 +84,7 @@ class EntriesTest extends TestCase
         $this->assertCount(1, $this->getEntries());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_paginated_entries_in_a_collection()
     {
         $this->makeEntry('a')->save();
@@ -102,8 +95,7 @@ class EntriesTest extends TestCase
 
         $this->assertCount(5, $this->getEntries());
         $this->assertCount(3, $this->getEntries(['paginate' => 3])); // recommended v3 style
-        $this->assertCount(4, $this->getEntries(['paginate' => true, 'limit' => 4])); // v2 style
-        $this->assertCount(3, $this->getEntries(['paginate' => 3, 'limit' => 4])); // precedence test
+        $this->assertCount(4, $this->getEntries(['paginate' => true, 'limit' => 4])); // v2 style pagination limiting
         $this->assertCount(5, $this->getEntries(['paginate' => true])); // ignore if no perPage set
 
         $this->assertEquals(['a', 'b', 'c'], $this->getEntryIds(['paginate' => 3]));
@@ -115,7 +107,7 @@ class EntriesTest extends TestCase
         $this->assertEquals(['d', 'e'], $this->getEntryIds(['paginate' => 3]));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_offset_paginated_entries_in_a_collection()
     {
         $this->makeEntry('a')->save();
@@ -135,7 +127,52 @@ class EntriesTest extends TestCase
         $this->assertEquals(['f', 'g'], $this->getEntryIds(['paginate' => 3, 'offset' => 2]));
     }
 
-    /** @test */
+    #[Test]
+    public function it_should_throw_exception_if_trying_to_paginate_and_limit_at_same_time()
+    {
+        $this->makeEntry('a')->save();
+        $this->makeEntry('b')->save();
+        $this->makeEntry('c')->save();
+        $this->makeEntry('d')->save();
+        $this->makeEntry('e')->save();
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Cannot use [paginate] integer in combination with [limit] param.');
+
+        $this->assertCount(3, $this->getEntries(['paginate' => 3, 'limit' => 4]));
+    }
+
+    #[Test]
+    public function it_should_throw_exception_if_trying_to_paginate_and_chunk_at_same_time()
+    {
+        $this->makeEntry('a')->save();
+        $this->makeEntry('b')->save();
+        $this->makeEntry('c')->save();
+        $this->makeEntry('d')->save();
+        $this->makeEntry('e')->save();
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Cannot use [paginate] in combination with [chunk] param.');
+
+        $this->assertCount(3, $this->getEntries(['paginate' => true, 'chunk' => 2]));
+    }
+
+    #[Test]
+    public function it_should_throw_exception_if_trying_to_paginate_with_integer_and_chunk_at_same_time()
+    {
+        $this->makeEntry('a')->save();
+        $this->makeEntry('b')->save();
+        $this->makeEntry('c')->save();
+        $this->makeEntry('d')->save();
+        $this->makeEntry('e')->save();
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Cannot use [paginate] in combination with [chunk] param.');
+
+        $this->assertCount(3, $this->getEntries(['paginate' => 3, 'chunk' => 2]));
+    }
+
+    #[Test]
     public function it_gets_localized_site_entries_in_a_collection()
     {
         Event::fake();
@@ -158,7 +195,7 @@ class EntriesTest extends TestCase
         $this->assertCount(2, $this->getEntries());
     }
 
-    /** @test */
+    #[Test]
     public function it_limits_entries_with_offset()
     {
         $this->makeEntry('a')->set('title', 'A')->save();
@@ -180,7 +217,7 @@ class EntriesTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_limits_entries_with_offset_using_value_objects()
     {
         $this->makeEntry('a')->set('title', 'A')->save();
@@ -202,7 +239,7 @@ class EntriesTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_by_future_and_past()
     {
         Carbon::setTestNow(Carbon::parse('2019-03-10 13:00:12'));
@@ -263,7 +300,7 @@ class EntriesTest extends TestCase
         $this->assertCount(3, $this->getEntries(['show_past' => false, 'show_future' => true]));
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_by_since_and_until()
     {
         $this->collection->dated(true)->save();
@@ -290,7 +327,7 @@ class EntriesTest extends TestCase
         $this->assertCount(8, $this->getEntries(['show_future' => true, 'until' => 'tomorrow']));
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_by_status()
     {
         $this->collection->dated(true)->futureDateBehavior('private')->pastDateBehavior('public')->save();
@@ -305,9 +342,10 @@ class EntriesTest extends TestCase
         $this->assertCount(1, $this->getEntries(['status:is' => 'published']));
         $this->assertCount(3, $this->getEntries(['status:not' => 'published']));
         $this->assertCount(3, $this->getEntries(['status:in' => 'published|draft']));
+        $this->assertCount(4, $this->getEntries(['status:is' => 'any']));
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_by_published_boolean()
     {
         $this->collection->dated(true)->futureDateBehavior('private')->pastDateBehavior('public')->save();
@@ -323,7 +361,7 @@ class EntriesTest extends TestCase
         $this->assertCount(2, $this->getEntries(['published:not' => true]));
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_by_custom_query_scopes()
     {
         $this->makeEntry('a')->set('title', 'Cat Stories')->save();
@@ -344,7 +382,7 @@ class EntriesTest extends TestCase
         ]));
     }
 
-    /** @test */
+    #[Test]
     public function it_sorts_entries()
     {
         $this->collection->dated(true)->save();
@@ -370,7 +408,7 @@ class EntriesTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_sorts_entries_by_multiple_columns()
     {
         $this->collection->dated(true)->save();
@@ -392,7 +430,7 @@ class EntriesTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_sorts_entries_randomly()
     {
         $this->makeEntry('a')->set('number', '1')->save();
@@ -408,7 +446,7 @@ class EntriesTest extends TestCase
         $this->assertTrue($orders->unique()->count() > 1);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_sort_a_nested_structured_collection()
     {
         $this->makeEntry('a')->save();
@@ -437,7 +475,7 @@ class EntriesTest extends TestCase
         $this->assertEquals(['b', 'b1', 'b2', 'c', 'c2', 'c1', 'a'], $this->getEntries(['sort' => 'order|title'])->map->id()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_sort_a_linear_structured_collection()
     {
         $this->makeEntry('a')->save();
@@ -456,7 +494,7 @@ class EntriesTest extends TestCase
         $this->assertEquals(['b', 'c', 'a'], $this->getEntries(['sort' => 'order|title'])->map->id()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_by_taxonomy_terms()
     {
         $this->makeEntry('1')->data(['tags' => ['rad'], 'categories' => ['news']])->save();
@@ -510,7 +548,7 @@ class EntriesTest extends TestCase
         $this->assertEquals([1, 3], $this->getEntryIds(['taxonomy:tags:in' => Term::find('tags::rad')]));
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_an_exception_when_using_an_unknown_taxonomy_query_modifier()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -519,7 +557,7 @@ class EntriesTest extends TestCase
         $this->getEntries(['taxonomy:tags:xyz' => 'test']);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_all_entries_where_taxonomy_parameter_value_is_empty()
     {
         $this->makeEntry('1')->save();
@@ -531,7 +569,7 @@ class EntriesTest extends TestCase
         $this->assertEquals([1, 2, 3], $this->getEntries(['taxonomy:tags' => []])->map->slug()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_accepts_a_term_collection_to_filter_by_taxonomy()
     {
         $this->makeEntry('1')->data(['tags' => ['rad']])->save();
@@ -541,7 +579,7 @@ class EntriesTest extends TestCase
         $this->assertEquals([1, 2], $this->getEntries(['taxonomy:tags' => TermCollection::make([Term::make('rad')->taxonomy('tags')])])->map->slug()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_accepts_a_query_builder_to_filter_by_taxonomy()
     {
         $this->makeEntry('1')->data(['tags' => ['rad'], 'categories' => ['news']])->save();
@@ -556,6 +594,19 @@ class EntriesTest extends TestCase
         ]));
 
         $this->assertEquals([3], $this->getEntries(['taxonomy:tags:all' => $builder])->map->slug()->all());
+    }
+
+    #[Test]
+    public function it_chunks_entries()
+    {
+        $this->makeEntry('1')->save();
+        $this->makeEntry('2')->save();
+        $this->makeEntry('3')->save();
+
+        $entries = $this->getEntries(['chunk' => 2]);
+
+        $this->assertEquals([1, 2], $entries->first()->map->slug()->all());
+        $this->assertEquals([3], $entries->last()->map->slug()->all());
     }
 }
 

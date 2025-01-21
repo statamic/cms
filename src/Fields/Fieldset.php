@@ -6,15 +6,19 @@ use Statamic\Events\FieldsetCreated;
 use Statamic\Events\FieldsetCreating;
 use Statamic\Events\FieldsetDeleted;
 use Statamic\Events\FieldsetDeleting;
+use Statamic\Events\FieldsetReset;
 use Statamic\Events\FieldsetSaved;
 use Statamic\Events\FieldsetSaving;
+use Statamic\Exceptions\FieldsetRecursionException;
 use Statamic\Facades;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Fieldset as FieldsetRepository;
+use Statamic\Facades\File;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Path;
 use Statamic\Facades\Taxonomy;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class Fieldset
@@ -58,7 +62,7 @@ class Fieldset
 
     public function setContents(array $contents)
     {
-        $fields = array_get($contents, 'fields', []);
+        $fields = Arr::get($contents, 'fields', []);
 
         // Support legacy syntax
         if (! empty($fields) && array_keys($fields)[0] !== 0) {
@@ -84,9 +88,17 @@ class Fieldset
         return $this->contents['title'] ?? Str::humanize(Str::of($this->handle)->after('::')->afterLast('.'));
     }
 
+    /**
+     * @throws FieldsetRecursionException
+     */
+    public function validateRecursion()
+    {
+        $this->fields();
+    }
+
     public function fields(): Fields
     {
-        $fields = array_get($this->contents, 'fields', []);
+        $fields = Arr::get($this->contents, 'fields', []);
 
         return new Fields($fields);
     }
@@ -114,6 +126,11 @@ class Fieldset
     public function deleteUrl()
     {
         return cp_route('fieldsets.destroy', $this->handle());
+    }
+
+    public function resetUrl()
+    {
+        return cp_route('fieldsets.reset', $this->handle());
     }
 
     public function importedBy(): array
@@ -183,6 +200,12 @@ class Fieldset
         return ! $this->isNamespaced();
     }
 
+    public function isResettable()
+    {
+        return $this->isNamespaced()
+            && File::exists(FieldsetRepository::overriddenNamespacedFieldsetPath($this->handle));
+    }
+
     public function afterSave($callback)
     {
         $this->afterSaveCallbacks[] = $callback;
@@ -234,15 +257,36 @@ class Fieldset
         return $this;
     }
 
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
+    }
+
     public function delete()
     {
-        if (FieldsetDeleting::dispatch($this) === false) {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        if ($withEvents && FieldsetDeleting::dispatch($this) === false) {
             return false;
         }
 
         FieldsetRepository::delete($this);
 
-        FieldsetDeleted::dispatch($this);
+        if ($withEvents) {
+            FieldsetDeleted::dispatch($this);
+        }
+
+        return true;
+    }
+
+    public function reset()
+    {
+        FieldsetRepository::reset($this);
+
+        FieldsetReset::dispatch($this);
 
         return true;
     }

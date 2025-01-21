@@ -16,6 +16,7 @@ use Statamic\Contracts\Assets\QueryBuilder;
  * @method static AssetContract|null findByUrl(string $url)
  * @method static AssetContract|null findById(string $id)
  * @method static AssetContract|null findByPath(string $path)
+ * @method static AssetContract findOrFail(string $asset)
  * @method static AssetContract make()
  * @method static QueryBuilder query()
  * @method static void save($asset)

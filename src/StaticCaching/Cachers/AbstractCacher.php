@@ -3,6 +3,7 @@
 namespace Statamic\StaticCaching\Cachers;
 
 use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Statamic\Facades\Site;
@@ -74,7 +75,7 @@ abstract class AbstractCacher implements Cacher
      */
     protected function normalizeContent($content)
     {
-        if ($content instanceof Response) {
+        if ($content instanceof Response || $content instanceof JsonResponse) {
             $content = $content->content();
         }
 
@@ -130,22 +131,6 @@ abstract class AbstractCacher implements Cacher
     }
 
     /**
-     * Get the URL from a request.
-     *
-     * @return string
-     */
-    public function getUrl(Request $request)
-    {
-        $url = $request->getUri();
-
-        if ($this->config('ignore_query_strings')) {
-            $url = explode('?', $url)[0];
-        }
-
-        return $url;
-    }
-
-    /**
      * Get all the URLs that have been cached.
      *
      * @param  string|null  $domain
@@ -153,11 +138,9 @@ abstract class AbstractCacher implements Cacher
      */
     public function getUrls($domain = null)
     {
-        $domain = $domain ?: $this->getBaseUrl();
+        $key = $this->getUrlsCacheKey($domain);
 
-        $domain = $this->makeHash($domain);
-
-        return collect($this->cache->get($this->normalizeKey($domain.'.urls'), []));
+        return collect($this->cache->get($key, []));
     }
 
     /**
@@ -293,5 +276,41 @@ abstract class AbstractCacher implements Cacher
             $path.$query,
             $parsed['scheme'].'://'.$parsed['host'],
         ];
+    }
+
+    public function getUrl(Request $request)
+    {
+        $url = $request->getUri();
+
+        if ($this->isExcluded($url)) {
+            return $url;
+        }
+
+        if ($this->config('ignore_query_strings', false)) {
+            $url = explode('?', $url)[0];
+        }
+
+        $parts = parse_url($url);
+
+        if (isset($parts['query'])) {
+            parse_str($parts['query'], $query);
+
+            if ($allowedQueryStrings = $this->config('allowed_query_strings')) {
+                $query = array_intersect_key($query, array_flip($allowedQueryStrings));
+            }
+
+            if ($disallowedQueryStrings = $this->config('disallowed_query_strings')) {
+                $disallowedQueryStrings = array_flip($disallowedQueryStrings);
+                $query = array_diff_key($query, $disallowedQueryStrings);
+            }
+
+            $url = $parts['scheme'].'://'.$parts['host'].$parts['path'];
+
+            if ($query) {
+                $url .= '?'.http_build_query($query);
+            }
+        }
+
+        return $url;
     }
 }

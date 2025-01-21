@@ -32,13 +32,6 @@ class GlideImageManipulator implements ImageManipulator
     protected $item_type;
 
     /**
-     * A custom filename.
-     *
-     * @var string|null
-     */
-    protected $filename;
-
-    /**
      * Methods available in Glide's API.
      *
      * @var array
@@ -106,20 +99,7 @@ class GlideImageManipulator implements ImageManipulator
      */
     public function build()
     {
-        return $this->builder->build($this->item, $this->params, $this->filename);
-    }
-
-    /**
-     * Set a custom filename.
-     *
-     * @param  string  $filename
-     * @return $this
-     */
-    public function filename($filename)
-    {
-        $this->filename = $filename;
-
-        return $this;
+        return $this->builder->build($this->item, $this->params);
     }
 
     /**

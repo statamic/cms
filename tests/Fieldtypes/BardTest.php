@@ -6,6 +6,8 @@ use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Mockery\MockInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
@@ -30,7 +32,7 @@ class BardTest extends TestCase
         static::$functions = null;
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_prosemirror_structure_to_a_template_friendly_array()
     {
         (new class extends Fieldtype
@@ -125,7 +127,7 @@ class BardTest extends TestCase
         $this->assertEquals($expected, collect($augmented)->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_ids_and_sets_id_correctly_with_a_custom_id_handle()
     {
         config()->set('statamic.system.row_id_handle', '_id');
@@ -178,13 +180,13 @@ class BardTest extends TestCase
         $this->assertEquals($expected, collect($augmented)->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_augment_when_saved_as_html()
     {
         $this->assertEquals('<p>Paragraph</p>', $this->bard()->augment('<p>Paragraph</p>'));
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_tiptap_v1_snake_case_types_to_v2_camel_case_types()
     {
         Augmentor::addExtension('customNode', new class extends Node
@@ -289,7 +291,7 @@ class BardTest extends TestCase
         $this->assertEquals($expected, collect($augmented)->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_to_html_when_there_are_no_sets()
     {
         $data = [
@@ -311,19 +313,19 @@ class BardTest extends TestCase
         $this->assertEquals($expected, $this->bard(['sets' => null])->augment($data));
     }
 
-    /** @test */
+    #[Test]
     public function augmenting_an_empty_value_when_not_using_sets_returns_null()
     {
         $this->assertNull($this->bard(['sets' => null])->augment(null));
     }
 
-    /** @test */
+    #[Test]
     public function augmenting_an_empty_value_when_using_sets_returns_an_empty_array()
     {
         $this->assertSame([], $this->bard(['sets' => ['one' => []]])->augment(null));
     }
 
-    /** @test */
+    #[Test]
     public function augmenting_an_empty_value_when_saving_as_html_returns_null()
     {
         $bard = $this->bard(['save_html' => true, 'sets' => null]);
@@ -331,7 +333,7 @@ class BardTest extends TestCase
         $this->assertNull($bard->augment(null));
     }
 
-    /** @test */
+    #[Test]
     public function it_removes_disabled_sets()
     {
         $data = [
@@ -390,7 +392,7 @@ class BardTest extends TestCase
         $this->assertEquals($expected, collect($augmented)->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function it_converts_plain_html_into_prosemirror_structure()
     {
         $data = '<p>This is a paragraph with <strong>bold</strong> text.</p><p>Second <a href="statamic://entry::foo">paragraph</a>. <img src="statamic://asset::assets::lagoa.jpg"></p>';
@@ -411,7 +413,7 @@ class BardTest extends TestCase
                 'content' => [
                     ['type' => 'text', 'text' => 'Second '],
                     ['type' => 'text', 'text' => 'paragraph', 'marks' => [
-                        ['type' => 'link', 'attrs' => ['href' => 'entry::foo']],
+                        ['type' => 'link', 'attrs' => ['href' => 'statamic://entry::foo']],
                     ]],
                     ['type' => 'text', 'text' => '. '],
                     ['type' => 'image', 'attrs' => [
@@ -421,10 +423,10 @@ class BardTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expected, json_decode($this->bard()->preProcess($data), true));
+        $this->assertEquals($expected, $this->bard()->preProcess($data));
     }
 
-    /** @test */
+    #[Test]
     public function it_detects_v2_formatted_content()
     {
         $textOnly = [
@@ -478,7 +480,7 @@ class BardTest extends TestCase
         $this->assertFalse($bard->isLegacyData($prosemirrorSetsOnly));
     }
 
-    /** @test */
+    #[Test]
     public function it_transforms_v2_formatted_content_into_prosemirror_structure()
     {
         $this->partialMock(RowId::class, function (MockInterface $mock) {
@@ -535,10 +537,10 @@ class BardTest extends TestCase
             ],
         ]);
 
-        $this->assertEquals($expected, json_decode($bard->preProcess($data), true));
+        $this->assertEquals($expected, $bard->preProcess($data));
     }
 
-    /** @test */
+    #[Test]
     public function it_transforms_v2_formatted_content_with_only_sets_into_prosemirror_structure()
     {
         $this->partialMock(RowId::class, function (MockInterface $mock) {
@@ -571,33 +573,33 @@ class BardTest extends TestCase
             ],
         ]));
 
-        $this->assertEquals($expected, json_decode($bard->preProcess($data), true));
+        $this->assertEquals($expected, $bard->preProcess($data));
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_an_empty_field_as_null()
     {
         // When a Bard field is emptied and submitted, it's not actually null, it's a single empty paragraph.
         $bard = new Bard;
-        $this->assertNull($bard->process('[{"type":"paragraph"}]'));
+        $this->assertNull($bard->process([['type' => 'paragraph']]));
 
         // When it is actually null (eg. when it was not in the front matter to begin with, and was never touched), it's an empty array.
-        $this->assertNull($bard->process('[]'));
+        $this->assertNull($bard->process([]));
     }
 
-    /** @test */
+    #[Test]
     public function it_removes_empty_nodes()
     {
-        $content = '[
-            {"type":"paragraph"},
-            {"type":"heading"},
-            {"type":"paragraph", "content": "foo"},
-            {"type":"heading"},
-            {"type":"paragraph"},
-            {"type":"heading", "content": "foo"},
-            {"type":"paragraph"},
-            {"type":"heading"}
-        ]';
+        $content = [
+            ['type' => 'paragraph'],
+            ['type' => 'heading'],
+            ['type' => 'paragraph', 'content' => 'foo'],
+            ['type' => 'heading'],
+            ['type' => 'paragraph'],
+            ['type' => 'heading', 'content' => 'foo'],
+            ['type' => 'paragraph'],
+            ['type' => 'heading'],
+        ];
 
         $containsAllEmptyNodes = $this->bard(['remove_empty_nodes' => false])->process($content);
 
@@ -629,11 +631,8 @@ class BardTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider groupedSetsProvider
-     */
+    #[Test]
+    #[DataProvider('groupedSetsProvider')]
     public function it_preloads($areSetsGrouped)
     {
         $this->partialMock(RowId::class, function (MockInterface $mock) {
@@ -783,7 +782,7 @@ class BardTest extends TestCase
         ], $meta['new']['main']);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_link_data()
     {
         tap(Facades\Collection::make('pages')->routes('/{slug}'))->save();
@@ -816,14 +815,14 @@ EOT;
         ], $bard->getLinkData($prosemirror));
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_convert_statamic_asset_urls_when_saving_as_html()
     {
-        $content = '[
-            {"type":"text","text":"one","marks":[{"type":"link","attrs":{"target":"_blank","href":"http://google.com"}}]},
-            {"type":"text","text":"two","marks":[{"type":"link","attrs":{"href":"entry::8e4b4e60-5dfb-47b0-a2d7-a904d64aeb80"}}]},
-            {"type":"text","text":"three","marks":[{"type":"link","attrs":{"target":"_blank","href":"statamic://asset::assets::myst.jpeg"}}]}
-        ]';
+        $content = [
+            ['type' => 'text', 'text' => 'one', 'marks' => [['type' => 'link', 'attrs' => ['target' => '_blank', 'href' => 'http://google.com']]]],
+            ['type' => 'text', 'text' => 'two', 'marks' => [['type' => 'link', 'attrs' => ['href' => 'entry::8e4b4e60-5dfb-47b0-a2d7-a904d64aeb80']]]],
+            ['type' => 'text', 'text' => 'three', 'marks' => [['type' => 'link', 'attrs' => ['target' => '_blank', 'href' => 'statamic://asset::assets::myst.jpeg']]]],
+        ];
 
         $expected = <<<'EOT'
 <a target="_blank" href="http://google.com">one</a><a href="entry::8e4b4e60-5dfb-47b0-a2d7-a904d64aeb80">two</a><a target="_blank" href="statamic://asset::assets::myst.jpeg">three</a>
@@ -832,7 +831,7 @@ EOT;
         $this->assertEquals($expected, $this->bard(['save_html' => true, 'sets' => null])->process($content));
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_statamic_asset_urls_when_stored_as_html()
     {
         Storage::fake('test', ['url' => '/assets']);
@@ -871,7 +870,7 @@ EOT;
         $this->assertEquals($expected, $bard->augment($html));
     }
 
-    /** @test */
+    #[Test]
     public function it_converts_a_queryable_value()
     {
         $this->assertNull((new Bard)->toQueryableValue(null));
@@ -879,11 +878,8 @@ EOT;
         $this->assertEquals([['foo' => 'bar']], (new Bard)->toQueryableValue([['foo' => 'bar']]));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider inlineProvider
-     */
+    #[Test]
+    #[DataProvider('inlineProvider')]
     public function it_augments_inline_value($config)
     {
         $data = [
@@ -908,10 +904,15 @@ EOT;
         ];
     }
 
-    /** @test */
+    #[Test]
     public function it_processes_inline_value()
     {
-        $data = '[{"type":"paragraph","content":[{"type":"text","text":"This is inline text."}]}]';
+        $data = [[
+            'type' => 'paragraph',
+            'content' => [
+                ['type' => 'text', 'text' => 'This is inline text.'],
+            ],
+        ]];
 
         $expected = [
             ['type' => 'text', 'text' => 'This is inline text.'],
@@ -920,31 +921,79 @@ EOT;
         $this->assertEquals($expected, $this->bard(['inline' => true, 'sets' => null])->process($data));
     }
 
-    /** @test */
+    #[Test]
     public function it_preprocesses_inline_value()
     {
         $data = [
             ['type' => 'text', 'text' => 'This is inline text.'],
         ];
 
-        $expected = '[{"type":"paragraph","content":[{"type":"text","text":"This is inline text."}]}]';
+        $expected = [[
+            'type' => 'paragraph',
+            'content' => [
+                ['type' => 'text', 'text' => 'This is inline text.'],
+            ],
+        ]];
 
         $this->assertEquals($expected, $this->bard(['inline' => true, 'sets' => null])->preProcess($data));
     }
 
-    /** @test */
+    #[Test]
+    public function it_preprocesses_inline_value_with_break()
+    {
+        $data = [
+            ['type' => 'hardBreak'],
+            ['type' => 'text', 'text' => 'This is inline text.'],
+        ];
+
+        $expected = [[
+            'type' => 'paragraph',
+            'content' => [
+                ['type' => 'hardBreak'],
+                ['type' => 'text', 'text' => 'This is inline text.'],
+            ],
+        ]];
+
+        $this->assertEquals($expected, $this->bard(['inline' => 'break', 'sets' => null])->preProcess($data));
+    }
+
+    #[Test]
     public function it_preprocesses_inline_value_to_block_value()
     {
         $data = [
             ['type' => 'text', 'text' => 'This is inline text.'],
         ];
 
-        $expected = '[{"type":"paragraph","content":[{"type":"text","text":"This is inline text."}]}]';
+        $expected = [[
+            'type' => 'paragraph',
+            'content' => [
+                ['type' => 'text', 'text' => 'This is inline text.'],
+            ],
+        ]];
 
         $this->assertEquals($expected, $this->bard(['input_mode' => 'block', 'sets' => null])->preProcess($data));
     }
 
-    /** @test */
+    #[Test]
+    public function it_preprocesses_inline_value_with_break_to_block_value()
+    {
+        $data = [
+            ['type' => 'hardBreak'],
+            ['type' => 'text', 'text' => 'This is inline text.'],
+        ];
+
+        $expected = [[
+            'type' => 'paragraph',
+            'content' => [
+                ['type' => 'hardBreak'],
+                ['type' => 'text', 'text' => 'This is inline text.'],
+            ],
+        ]];
+
+        $this->assertEquals($expected, $this->bard(['input_mode' => 'block', 'sets' => null])->preProcess($data));
+    }
+
+    #[Test]
     public function it_preprocesses_block_value_to_inline_value()
     {
         $data = [
@@ -962,12 +1011,17 @@ EOT;
             ],
         ];
 
-        $expected = '[{"type":"paragraph","content":[{"type":"text","text":"This is block text."}]}]';
+        $expected = [[
+            'type' => 'paragraph',
+            'content' => [
+                ['type' => 'text', 'text' => 'This is block text.'],
+            ],
+        ]];
 
         $this->assertEquals($expected, $this->bard(['inline' => true, 'sets' => null])->preProcess($data));
     }
 
-    /** @test */
+    #[Test]
     public function it_converts_tiptap_v1_snake_case_types_to_v2_camel_case_types()
     {
         $data = [
@@ -1088,14 +1142,11 @@ EOT;
             ],
         ];
 
-        $this->assertEquals($expected, json_decode($this->bard()->preProcess($data), true));
+        $this->assertEquals($expected, $this->bard()->preProcess($data));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider groupedSetsProvider
-     */
+    #[Test]
+    #[DataProvider('groupedSetsProvider')]
     public function it_generates_field_path_prefix($areSetsGrouped)
     {
         $fieldtype = new class extends Fieldtype
@@ -1164,7 +1215,7 @@ EOT;
         $this->assertEquals('test.0.words', $value[0]['words']);
         $this->assertEquals('test.1.words', $value[1]['words']);
 
-        $value = json_decode($field->preProcess()->value(), true);
+        $value = $field->preProcess()->value();
         $this->assertEquals('test.0.words', $value[0]['attrs']['values']['words']);
         $this->assertEquals('test.1.words', $value[1]['attrs']['values']['words']);
 
@@ -1177,7 +1228,7 @@ EOT;
                     ],
                 ],
             ]),
-        ]))->setValue(json_encode([
+        ]))->setValue([
             [
                 'type' => 'set',
                 'attrs' => [
@@ -1198,7 +1249,7 @@ EOT;
                     ],
                 ],
             ],
-        ]));
+        ]);
 
         $value = $field->process()->value();
         $this->assertEquals('test.0.words', $value[0]['attrs']['values']['words']);
@@ -1209,6 +1260,82 @@ EOT;
         $this->assertEquals('test.1.words', $value['existing']['set-id-2']['words']['fieldPathPrefix']);
         $this->assertEquals('test.-1.words', $value['new']['one']['words']['fieldPathPrefix']);
         $this->assertEquals('test.-1.words', $value['defaults']['one']['words']);
+    }
+
+    #[Test]
+    public function it_filters_away_bad_nodes()
+    {
+        $data = [
+            [],
+            ['type' => 'text', 'text' => 'This is inline text.'],
+            ['text' => 'I have no type'],
+        ];
+
+        $expected = [['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'This is inline text.']]]];
+
+        $this->assertEquals($expected, $this->bard(['input_mode' => 'block', 'sets' => null])->preProcess($data));
+    }
+
+    #[Test]
+    public function it_calls_hooks()
+    {
+        Bard::hook('augment', function ($payload, $next) {
+            return $next(array_reverse($payload));
+        });
+        Bard::hook('process', function ($payload, $next) {
+            return $next(array_reverse($payload));
+        });
+        Bard::hook('pre-process', function ($payload, $next) {
+            return $next(array_reverse($payload));
+        });
+        Bard::hook('pre-process-index', function ($payload, $next) {
+            return $next(array_reverse($payload));
+        });
+        Bard::hook('pre-process-validatable', function ($payload, $next) {
+            return $next(array_reverse($payload));
+        });
+        Bard::hook('preload', function ($payload, $next) {
+            return $next(array_merge($payload, [
+                'customData' => 'some custom data',
+            ]));
+        });
+        Bard::hook('extra-rules', function ($payload, $next) {
+            return $next(array_merge($payload, [
+                'custom_field' => ['required'],
+            ]));
+        });
+        Bard::hook('extra-validation-attributes', function ($payload, $next) {
+            return $next(array_merge($payload, [
+                'custom_field' => 'Custom Field',
+            ]));
+        });
+
+        $bard = $this->bard(['sets' => null]);
+
+        $data = [
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    ['type' => 'text', 'text' => 'First'],
+                ],
+            ],
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    ['type' => 'text', 'text' => 'Second'],
+                ],
+            ],
+        ];
+        $expectedData = array_reverse($data);
+        $expectedHtml = '<p>Second</p><p>First</p>';
+
+        $this->assertEquals($expectedHtml, $bard->augment($data));
+        $this->assertEquals($expectedData, $bard->process($data));
+        $this->assertEquals($expectedData, $bard->preProcess($data));
+        $this->assertEquals($expectedHtml, $bard->preProcessIndex($data));
+        $this->assertArrayHasKey('customData', $bard->preload($data));
+        $this->assertArrayHasKey('custom_field', $bard->extraRules($data));
+        $this->assertArrayHasKey('custom_field', $bard->extraValidationAttributes($data));
     }
 
     private function bard($config = [])

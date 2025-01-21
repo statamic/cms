@@ -2,6 +2,9 @@ name: Run Tests
 
 on:
   push:
+    branches:
+      - master
+      - '*.x'
   pull_request:
   schedule:
     - cron: '0 0 * * *'
@@ -13,34 +16,34 @@ jobs:
 
     strategy:
       matrix:
-        php: [8.0, 8.1, 8.2, 8.3]
-        laravel: [9.*, 10.*]
+        php: [8.1, 8.2, 8.3, 8.4]
+        laravel: [10.*, 11.*]
         stability: [prefer-lowest, prefer-stable]
         os: [ubuntu-latest]
         include:
           - os: windows-latest
-            php: 8.1
-            laravel: 9.*
+            php: 8.3
+            laravel: 10.*
             stability: prefer-stable
           - os: windows-latest
-            php: 8.1
-            laravel: 10.*
+            php: 8.3
+            laravel: 11.*
             stability: prefer-stable
         exclude:
-          - php: 8.0
+          - php: 8.1
+            laravel: 11.*
+          - php: 8.4
             laravel: 10.*
-          - php: 8.3
-            laravel: 9.*
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v4
 
       - name: Get changed files
         id: changed-files
-        uses: tj-actions/changed-files@v42
+        uses: tj-actions/changed-files@v44
         with:
           files: |
             config
@@ -77,11 +80,12 @@ jobs:
         if: steps.should-run-tests.outputs.result == 'true'
         with:
           php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, fileinfo
+          extensions: fileinfo, exif, gd, pdo, sqlite, pdo_sqlite
+          ini-values: short_open_tag=on
           coverage: none
 
       - name: Install dependencies
-        uses: nick-invision/retry@v2
+        uses: nick-invision/retry@v3
         if: steps.should-run-tests.outputs.result == 'true'
         with:
           timeout_minutes: 5
@@ -106,14 +110,14 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v4
 
       - name: Get changed files
         id: changed-files
-        uses: tj-actions/changed-files@v42
+        uses: tj-actions/changed-files@v44
         with:
           files: |
-            **.{js,vue,ts}
+            **/*.{js,vue,ts}
             package.json
             .github/workflows/tests.yml
 
@@ -123,6 +127,11 @@ jobs:
         run: |
           echo "result=true" >> $GITHUB_OUTPUT
           echo "result=true" >> $env:GITHUB_OUTPUT
+
+      - name: Use Node.js 16.13.0
+        uses: actions/setup-node@v4
+        with:
+          node-version: 16.13.0
 
       - name: Install required npm version
         if: steps.should-run-tests.outputs.result == 'true'
@@ -142,12 +151,13 @@ jobs:
     needs: [php-tests, js-tests]
     if: always()
     steps:
-      - uses: technote-space/workflow-conclusion-action@v1
+      - uses: technote-space/workflow-conclusion-action@v3
       - name: Send Slack notification
-        uses: 8398a7/action-slack@v2
-        if: env.WORKFLOW_CONCLUSION == 'failure'
+        uses: 8398a7/action-slack@v3
+        if: env.WORKFLOW_CONCLUSION == 'failure' && github.event_name == 'schedule'
         with:
           status: failure
+          fields: repo,message,commit,author,action,eventName,ref,workflow
           author_name: ${{ github.actor }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}

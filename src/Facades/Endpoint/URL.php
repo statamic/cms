@@ -14,6 +14,8 @@ use Statamic\Support\Str;
  */
 class URL
 {
+    private static $externalUriCache = [];
+
     /**
      * Removes occurrences of "//" in a $path (except when part of a protocol)
      * Alias of Path::tidy().
@@ -221,14 +223,31 @@ class URL
      */
     public function isExternal($url)
     {
-        if (! $url || Str::startsWith($url, ['/', '#'])) {
+        if (isset(self::$externalUriCache[$url])) {
+            return self::$externalUriCache[$url];
+        }
+
+        if (! $url) {
             return false;
         }
 
-        return ! Pattern::startsWith(
+        if (Str::startsWith($url, ['/', '#'])) {
+            return self::$externalUriCache[$url] = false;
+        }
+
+        $isExternal = ! Pattern::startsWith(
             Str::ensureRight($url, '/'),
             Site::current()->absoluteUrl()
         );
+
+        self::$externalUriCache[$url] = $isExternal;
+
+        return $isExternal;
+    }
+
+    public function clearExternalUrlCache()
+    {
+        self::$externalUriCache = [];
     }
 
     /**

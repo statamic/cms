@@ -10,6 +10,7 @@
         :min="config.min"
         :prepend="__(config.prepend)"
         :append="__(config.append)"
+        :placeholder="__(config.placeholder)"
         @input="updateDebounced"
         @focus="$emit('focus')"
         @blur="$emit('blur')"

@@ -5,6 +5,8 @@ namespace Tests\Data\Entries;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Entries\Collection;
@@ -31,7 +33,7 @@ class CollectionTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_gets_and_sets_the_handle()
     {
         $collection = new Collection;
@@ -43,14 +45,14 @@ class CollectionTest extends TestCase
         $this->assertEquals('foo', $collection->handle());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_sets_the_routes()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://domain.com/'],
             'fr' => ['url' => 'http://domain.com/fr/'],
             'de' => ['url' => 'http://domain.com/de/'],
-        ]]);
+        ]);
 
         // A collection with no sites uses the default site.
         $collection = new Collection;
@@ -85,14 +87,14 @@ class CollectionTest extends TestCase
         $this->assertNull($collection->route('unknown'));
     }
 
-    /** @test */
+    #[Test]
     public function it_sets_all_the_routes_identically()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://domain.com/'],
             'fr' => ['url' => 'http://domain.com/fr/'],
             'de' => ['url' => 'http://domain.com/de/'],
-        ]]);
+        ]);
 
         $collection = (new Collection)->sites(['en', 'fr']);
 
@@ -109,14 +111,14 @@ class CollectionTest extends TestCase
         $this->assertNull($collection->route('unknown'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_sets_the_title_formats()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://domain.com/'],
             'fr' => ['url' => 'http://domain.com/fr/'],
             'de' => ['url' => 'http://domain.com/de/'],
-        ]]);
+        ]);
 
         // A collection with no sites uses the default site.
         $collection = new Collection;
@@ -156,14 +158,14 @@ class CollectionTest extends TestCase
         $this->assertNull($collection->titleFormat('unknown'));
     }
 
-    /** @test */
+    #[Test]
     public function it_sets_all_the_title_formats_identically()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://domain.com/'],
             'fr' => ['url' => 'http://domain.com/fr/'],
             'de' => ['url' => 'http://domain.com/de/'],
-        ]]);
+        ]);
 
         $collection = (new Collection)->sites(['en', 'fr']);
 
@@ -180,7 +182,7 @@ class CollectionTest extends TestCase
         $this->assertNull($collection->titleFormat('unknown'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_sets_the_template()
     {
         $collection = new Collection;
@@ -192,7 +194,7 @@ class CollectionTest extends TestCase
         $this->assertEquals('foo', $collection->template());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_sets_the_layout()
     {
         $collection = new Collection;
@@ -204,14 +206,14 @@ class CollectionTest extends TestCase
         $this->assertEquals('foo', $collection->layout());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_sets_the_create_label()
     {
         $collection = new Collection;
         $this->assertEquals('Create Entry', $collection->createLabel());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_sets_the_title()
     {
         $collection = (new Collection)->handle('blog');
@@ -223,13 +225,13 @@ class CollectionTest extends TestCase
         $this->assertEquals('The Blog', $collection->title());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_sets_the_sites_it_can_be_used_in_when_using_multiple_sites()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://domain.com/'],
             'fr' => ['url' => 'http://domain.com/fr/'],
-        ]]);
+        ]);
 
         $collection = new Collection;
 
@@ -243,7 +245,7 @@ class CollectionTest extends TestCase
         $this->assertEquals(['en', 'fr'], $collection->sites()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_default_site_when_in_single_site_mode()
     {
         $collection = new Collection;
@@ -258,7 +260,7 @@ class CollectionTest extends TestCase
         $this->assertEquals(['en'], $collection->sites()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_sets_propagation_setting()
     {
         $collection = new Collection;
@@ -271,7 +273,7 @@ class CollectionTest extends TestCase
         $this->assertTrue($collection->propagate());
     }
 
-    /** @test */
+    #[Test]
     public function it_stores_cascading_data_in_a_collection()
     {
         $collection = new Collection;
@@ -284,7 +286,7 @@ class CollectionTest extends TestCase
         $this->assertEquals('bar', $collection->cascade()->get('foo'));
     }
 
-    /** @test */
+    #[Test]
     public function it_sets_all_the_cascade_data_when_passing_an_array()
     {
         $collection = new Collection;
@@ -299,7 +301,7 @@ class CollectionTest extends TestCase
         $this->assertEquals([], $collection->cascade()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_values_from_the_cascade_with_fallbacks()
     {
         $collection = new Collection;
@@ -310,7 +312,7 @@ class CollectionTest extends TestCase
         $this->assertEquals('qux', $collection->cascade('baz', 'qux'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_entry_blueprints()
     {
         $collection = (new Collection)->handle('blog');
@@ -329,9 +331,11 @@ class CollectionTest extends TestCase
         $this->assertEquals($blueprintOne, $collection->entryBlueprint('one'));
         $this->assertEquals($blueprintTwo, $collection->entryBlueprint('two'));
         $this->assertNull($collection->entryBlueprint('three'));
+
+        $this->assertTrue($collection->hasVisibleEntryBlueprint());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_first_non_hidden_entry_blueprint()
     {
         $collection = (new Collection)->handle('blog');
@@ -351,9 +355,30 @@ class CollectionTest extends TestCase
 
         // But assert that it can still get a specific blueprint for editing the blueprint, etc.
         $this->assertEquals($blueprintThree, $collection->entryBlueprint('cherry'));
+
+        $this->assertTrue($collection->hasVisibleEntryBlueprint());
     }
 
-    /** @test */
+    #[Test]
+    public function it_gets_first_entry_blueprint_when_they_are_all_hidden()
+    {
+        $collection = (new Collection)->handle('blog');
+
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
+            'apple' => $blueprintOne = (new Blueprint)->setHandle('apple')->setHidden(true),
+            'berry' => $blueprintTwo = (new Blueprint)->setHandle('berry')->setHidden(true),
+            'cherry' => $blueprintThree = (new Blueprint)->setHandle('cherry')->setHidden(true),
+        ]));
+
+        $blueprints = $collection->entryBlueprints();
+
+        $this->assertCount(3, $blueprints);
+        $this->assertEquals($blueprintOne, $collection->entryBlueprint());
+        $this->assertEquals($blueprintThree, $collection->entryBlueprint('cherry'));
+        $this->assertFalse($collection->hasVisibleEntryBlueprint());
+    }
+
+    #[Test]
     public function no_existing_blueprints_will_fall_back_to_a_default_named_after_the_singular_collection()
     {
         $collection = (new Collection)->handle('articles');
@@ -384,7 +409,7 @@ class CollectionTest extends TestCase
         $this->assertNull($collection->entryBlueprint('two'));
     }
 
-    /** @test */
+    #[Test]
     public function it_dispatches_an_event_when_getting_entry_blueprint()
     {
         Event::fake();
@@ -406,7 +431,7 @@ class CollectionTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_sort_field_and_direction()
     {
         $alpha = new Collection;
@@ -434,10 +459,10 @@ class CollectionTest extends TestCase
         $this->assertNull($datedAndOrdered->customSortDirection());
 
         $alpha->structureContents(['max_depth' => 99]);
-        $this->assertEquals('title', $alpha->sortField());
+        $this->assertEquals('order', $alpha->sortField());
         $this->assertEquals('asc', $alpha->sortDirection());
         $dated->structureContents(['max_depth' => 99]);
-        $this->assertEquals('date', $dated->sortField());
+        $this->assertEquals('order', $dated->sortField());
         $this->assertEquals('desc', $dated->sortDirection());
 
         // Custom sort field and direction should override any other logic.
@@ -453,7 +478,7 @@ class CollectionTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function setting_custom_sort_field_will_set_the_sort_direction_to_asc_when_not_explicitly_set()
     {
         // Use a date collection to test this because its default sort direction is desc.
@@ -469,7 +494,7 @@ class CollectionTest extends TestCase
         $this->assertEquals('foo', $dated->customSortField());
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_the_collection_through_the_api()
     {
         $collection = (new Collection)->handle('test');
@@ -477,6 +502,7 @@ class CollectionTest extends TestCase
         Facades\Collection::shouldReceive('save')->with($collection)->once();
         Facades\Collection::shouldReceive('handleExists')->with('test')->once();
         Facades\Blink::shouldReceive('forget')->with('collection-handles')->once();
+        Facades\Blink::shouldReceive('forget')->with('mounted-collections')->once();
         Facades\Blink::shouldReceive('flushStartingWith')->with('collection-test')->once();
 
         $return = $collection->save();
@@ -484,7 +510,19 @@ class CollectionTest extends TestCase
         $this->assertEquals($collection, $return);
     }
 
-    /** @test */
+    #[Test]
+    public function it_saves_quietly()
+    {
+        Event::fake();
+
+        $collection = (new Collection)->handle('test');
+        $collection->saveQuietly();
+
+        Event::assertNotDispatched(CollectionSaved::class);
+        Event::assertNotDispatched(CollectionSaving::class);
+    }
+
+    #[Test]
     public function it_dispatches_collection_saved()
     {
         Event::fake();
@@ -497,7 +535,7 @@ class CollectionTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_dispatches_collection_saving()
     {
         Event::fake();
@@ -510,7 +548,7 @@ class CollectionTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_dispatches_collection_creating()
     {
         Event::fake();
@@ -523,7 +561,7 @@ class CollectionTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_dispatches_collection_created_only_once()
     {
         Event::fake();
@@ -539,7 +577,7 @@ class CollectionTest extends TestCase
         Event::assertDispatched(CollectionCreated::class, 1);
     }
 
-    /** @test */
+    #[Test]
     public function if_creating_event_returns_false_the_collection_doesnt_save()
     {
         Event::fake([CollectionCreated::class]);
@@ -557,7 +595,7 @@ class CollectionTest extends TestCase
         Event::assertNotDispatched(CollectionCreated::class);
     }
 
-    /** @test */
+    #[Test]
     public function if_saving_event_returns_false_the_collection_doesnt_save()
     {
         Event::fake([CollectionSaved::class]);
@@ -575,7 +613,7 @@ class CollectionTest extends TestCase
         Event::assertNotDispatched(CollectionSaved::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_sets_future_date_behavior()
     {
         $collection = (new Collection)->handle('test');
@@ -590,7 +628,7 @@ class CollectionTest extends TestCase
         $this->assertEquals('public', $collection->futureDateBehavior());
     }
 
-    /** @test */
+    #[Test]
     public function it_sets_past_date_behavior()
     {
         $collection = (new Collection)->handle('test');
@@ -605,7 +643,7 @@ class CollectionTest extends TestCase
         $this->assertEquals('public', $collection->pastDateBehavior());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_sets_the_default_publish_state()
     {
         $collection = (new Collection)->handle('test');
@@ -620,7 +658,7 @@ class CollectionTest extends TestCase
         $this->assertFalse($collection->defaultPublishState());
     }
 
-    /** @test */
+    #[Test]
     public function default_publish_state_is_always_false_when_using_revisions()
     {
         config(['statamic.revisions.enabled' => true]);
@@ -638,7 +676,7 @@ class CollectionTest extends TestCase
         $this->assertFalse($collection->defaultPublishState());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_sets_the_origin_behavior()
     {
         $collection = (new Collection)->handle('test');
@@ -657,7 +695,7 @@ class CollectionTest extends TestCase
         $this->assertEquals('select', $collection->originBehavior());
     }
 
-    /** @test */
+    #[Test]
     public function it_throw_exception_when_setting_invalid_origin_behavior()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -667,7 +705,7 @@ class CollectionTest extends TestCase
         $collection->originBehavior('nope');
     }
 
-    /** @test */
+    #[Test]
     public function it_sets_and_gets_structure()
     {
         $structure = new CollectionStructure;
@@ -686,7 +724,7 @@ class CollectionTest extends TestCase
         $this->assertEquals('Test', $structure->title());
     }
 
-    /** @test */
+    #[Test]
     public function setting_a_structure_overrides_the_existing_inline_structure()
     {
         $collection = (new Collection)->handle('test');
@@ -699,7 +737,7 @@ class CollectionTest extends TestCase
         $this->assertSame($structure, $collection->structure());
     }
 
-    /** @test */
+    #[Test]
     public function setting_an_inline_structure_removes_the_existing_structure()
     {
         $collection = (new Collection)->handle('test');
@@ -714,7 +752,7 @@ class CollectionTest extends TestCase
         $this->assertEquals(13, $collection->structure()->maxDepth());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_handle_when_casting_to_a_string()
     {
         $collection = (new Collection)->handle('test');
@@ -722,7 +760,7 @@ class CollectionTest extends TestCase
         $this->assertEquals('test', (string) $collection);
     }
 
-    /** @test */
+    #[Test]
     public function it_augments()
     {
         $collection = (new Collection)->handle('test');
@@ -734,7 +772,7 @@ class CollectionTest extends TestCase
         ], $collection->toAugmentedArray());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_evaluated_augmented_value_using_magic_property()
     {
         $collection = (new Collection)->handle('test');
@@ -745,7 +783,7 @@ class CollectionTest extends TestCase
             ->each(fn ($value, $key) => $this->assertEquals($value->value(), $collection[$key]));
     }
 
-    /** @test */
+    #[Test]
     public function it_is_arrayable()
     {
         $collection = (new Collection)->handle('tags');
@@ -766,7 +804,7 @@ class CollectionTest extends TestCase
             });
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_in_the_parser()
     {
         $collection = (new Collection)->handle('test');
@@ -785,7 +823,7 @@ class CollectionTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_uri_and_url_from_the_mounted_entry()
     {
         $mount = $this->mock(Entry::class);
@@ -826,23 +864,44 @@ class CollectionTest extends TestCase
         $this->assertEquals('http://site2.com/fr/le-blog', $collection->absoluteUrl('fr'));
     }
 
-    /** @test */
-    public function it_updates_entry_uris_through_the_repository()
+    #[Test]
+    public function it_updates_entry_uris_through_the_entry_repository()
     {
         $collection = (new Collection)->handle('test');
 
-        Facades\Collection::shouldReceive('updateEntryUris')->with($collection, null)->once()->ordered();
-        Facades\Collection::shouldReceive('updateEntryUris')->with($collection, ['one', 'two'])->once()->ordered();
+        Facades\Entry::shouldReceive('updateUris')->with($collection, null)->once()->ordered();
+        Facades\Entry::shouldReceive('updateUris')->with($collection, ['one', 'two'])->once()->ordered();
 
         $collection->updateEntryUris();
         $collection->updateEntryUris(['one', 'two']);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider additionalPreviewTargetProvider
-     */
+    #[Test]
+    public function it_updates_entry_orders_through_the_entry_repository()
+    {
+        $collection = (new Collection)->handle('test');
+
+        Facades\Entry::shouldReceive('updateOrders')->with($collection, null)->once()->ordered();
+        Facades\Entry::shouldReceive('updateOrders')->with($collection, ['one', 'two'])->once()->ordered();
+
+        $collection->updateEntryOrder();
+        $collection->updateEntryOrder(['one', 'two']);
+    }
+
+    #[Test]
+    public function it_updates_entry_parents_through_the_entry_repository()
+    {
+        $collection = (new Collection)->handle('test');
+
+        Facades\Entry::shouldReceive('updateParents')->with($collection, null)->once()->ordered();
+        Facades\Entry::shouldReceive('updateParents')->with($collection, ['one', 'two'])->once()->ordered();
+
+        $collection->updateEntryParent();
+        $collection->updateEntryParent(['one', 'two']);
+    }
+
+    #[Test]
+    #[DataProvider('additionalPreviewTargetProvider')]
     public function it_gets_and_sets_preview_targets($throughFacade)
     {
         $collection = (new Collection)->handle('test');
@@ -911,7 +970,7 @@ class CollectionTest extends TestCase
         ], $collection->additionalPreviewTargets()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_trucates_entries()
     {
         $collection = Facades\Collection::make('test')->save();
@@ -934,16 +993,13 @@ class CollectionTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_view_collections_from_sites_that_the_user_is_not_authorized_to_see()
     {
-        Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
-                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
-            ],
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
         ]);
 
         $collection1 = tap(Facades\Collection::make('has_some_french')->sites(['en', 'fr', 'de']))->save();
@@ -966,7 +1022,7 @@ class CollectionTest extends TestCase
         $this->assertFalse($user->can('view', $collection3));
     }
 
-    /** @test */
+    #[Test]
     public function it_fires_a_deleting_event()
     {
         Event::fake();
@@ -980,7 +1036,7 @@ class CollectionTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_delete_when_a_deleting_event_returns_false()
     {
         Facades\Collection::spy();
@@ -997,5 +1053,20 @@ class CollectionTest extends TestCase
         $this->assertFalse($return);
         Facades\Collection::shouldNotHaveReceived('delete');
         Event::assertNotDispatched(CollectionDeleted::class);
+    }
+
+    #[Test]
+    public function it_deletes_quietly()
+    {
+        Event::fake();
+
+        $collection = Facades\Collection::make('test')->save();
+
+        $return = $collection->deleteQuietly();
+
+        Event::assertNotDispatched(CollectionDeleting::class);
+        Event::assertNotDispatched(CollectionDeleted::class);
+
+        $this->assertTrue($return);
     }
 }

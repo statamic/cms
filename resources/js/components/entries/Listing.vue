@@ -16,7 +16,7 @@
         >
             <div slot-scope="{ hasSelections }">
                 <div class="card overflow-hidden p-0 relative">
-                    <div v-if="!reordering" class="flex flex-wrap items-center justify-between px-2 pb-2 text-sm border-b">
+                    <div v-if="!reordering" class="flex flex-wrap items-center justify-between px-2 pb-2 text-sm border-b dark:border-dark-900">
 
                         <data-list-filter-presets
                             ref="presets"
@@ -32,9 +32,9 @@
 
                         <data-list-search class="h-8 mt-2 min-w-[240px] w-full" ref="search" v-model="searchQuery" :placeholder="searchPlaceholder" />
 
-                        <div class="flex space-x-2 mt-2">
-                            <button class="btn btn-sm ml-2" v-text="__('Reset')" v-show="isDirty" @click="$refs.presets.refreshPreset()" />
-                            <button class="btn btn-sm ml-2" v-text="__('Save')" v-show="isDirty" @click="$refs.presets.savePreset()" />
+                        <div class="flex space-x-2 rtl:space-x-reverse mt-2">
+                            <button class="btn btn-sm rtl:mr-2 ltr:ml-2" v-text="__('Reset')" v-show="isDirty" @click="$refs.presets.refreshPreset()" />
+                            <button class="btn btn-sm rtl:mr-2 ltr:ml-2" v-text="__('Save')" v-show="isDirty" @click="$refs.presets.savePreset()" />
                             <data-list-column-picker :preferences-key="preferencesKey('columns')" />
                         </div>
                     </div>
@@ -78,7 +78,7 @@
                         >
                             <template slot="cell-title" slot-scope="{ row: entry }">
                                 <a class="title-index-field inline-flex items-center" :href="entry.edit_url" @click.stop>
-                                    <span class="little-dot mr-2" v-tooltip="getStatusLabel(entry)" :class="getStatusClass(entry)" v-if="! columnShowing('status')" />
+                                    <span class="little-dot rtl:ml-2 ltr:mr-2" v-tooltip="getStatusLabel(entry)" :class="getStatusClass(entry)" v-if="! columnShowing('status')" />
                                     <span v-text="entry.title" />
                                 </a>
                             </template>
@@ -139,6 +139,8 @@ export default {
             requestUrl: cp_url(`collections/${this.collection}/entries`),
             currentSite: this.site,
             initialSite: this.site,
+            pushQuery: true,
+            previousFilters: null,
         }
     },
 
@@ -182,7 +184,7 @@ export default {
             } else if (entry.published) {
                 return 'bg-green-600';
             } else {
-                return 'bg-gray-400';
+                return 'bg-gray-400 dark:bg-dark-200';
             }
         },
 
@@ -213,6 +215,7 @@ export default {
         },
 
         reorder() {
+            this.previousFilters = this.activeFilters;
             this.filtersReset();
 
             // When reordering, we *need* a site, since mixing them up would be awkward.
@@ -226,6 +229,8 @@ export default {
         },
 
         cancelReordering() {
+            this.resetToPreviousFilters();
+
             this.request();
         },
 
@@ -259,6 +264,14 @@ export default {
                     this.$toast.error(__('Something went wrong'));
                 });
         },
+
+        resetToPreviousFilters() {
+            this.filtersReset();
+
+            if (this.previousFilters) this.filtersChanged(this.previousFilters);
+
+            this.previousFilters = null;
+        }
     }
 
 }

@@ -92,7 +92,7 @@ class Str
         $string = $language ? static::ascii($string, $language) : $string;
 
         // Statamic is a-OK with underscores in slugs.
-        $string = str_replace('_', $placeholder = strtolower(str_random(16)), $string);
+        $string = str_replace('_', $placeholder = strtolower(Str::random(16)), $string);
 
         $slug = IlluminateStr::slug($string, $separator, $language, $dictionary);
 
@@ -279,6 +279,35 @@ class Str
         return IlluminateStr::reverse(StaticStringy::safeTruncate(IlluminateStr::reverse($string), $length, $substring));
     }
 
+    public static function removeRight($string, $cap)
+    {
+        if (str_ends_with($string, $cap)) {
+            return mb_substr($string, 0, mb_strlen($string) - mb_strlen($cap));
+        }
+
+        return $string;
+    }
+
+    public static function ensureLeft($string, $start)
+    {
+        return IlluminateStr::start($string, $start);
+    }
+
+    public static function ensureRight($string, $cap)
+    {
+        return IlluminateStr::finish($string, $cap);
+    }
+
+    public static function toBase64Url($url): string
+    {
+        return rtrim(strtr(base64_encode($url), '+/', '-_'), '=');
+    }
+
+    public static function fromBase64Url($url, $strict = false)
+    {
+        return base64_decode(strtr($url, '-_', '+/'), $strict);
+    }
+
     /**
      * Implicitly defer all other method calls to either \Stringy\StaticStringy or \Illuminate\Support\Str.
      *
@@ -290,12 +319,12 @@ class Str
     {
         $deferToStringy = [
             'append', 'at', 'camelize', 'chars', 'collapseWhitespace', 'containsAny', 'count', 'countSubstr',
-            'dasherize', 'delimit', 'endsWithAny', 'ensureLeft', 'ensureRight', 'first', 'getEncoding', 'getIterator',
+            'dasherize', 'delimit', 'endsWithAny', 'first', 'getEncoding', 'getIterator',
             'hasLowerCase', 'hasUpperCase', 'htmlDecode', 'htmlEncode', 'humanize', 'indexOf', 'indexOfLast', 'insert',
             'isAlpha', 'isAlphanumeric', 'isBase64', 'isBlank', 'isHexadecimal', 'isLowerCase', 'isSerialized',
             'isUpperCase', 'last', 'lines', 'longestCommonPrefix', 'longestCommonSubstring', 'longestCommonSuffix',
             'lowerCaseFirst', 'offsetExists', 'offsetGet', 'offsetSet', 'offsetUnset', 'pad', 'prepend', 'regexReplace',
-            'removeLeft', 'removeRight', 'safeTruncate', 'shuffle', 'slice', 'slugify', 'split', 'startsWithAny',
+            'removeLeft', 'safeTruncate', 'shuffle', 'slice', 'slugify', 'split', 'startsWithAny',
             'stripWhitespace', 'surround', 'swapCase', 'tidy', 'titleize', 'toAscii', 'toBoolean', 'toLowerCase',
             'toSpaces', 'toTabs', 'toTitleCase', 'toUpperCase', 'trim', 'trimLeft', 'trimRight', 'truncate',
             'underscored', 'upperCamelize', 'upperCaseFirst',

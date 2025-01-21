@@ -6,6 +6,8 @@ use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\StaticCache;
 
+use function Laravel\Prompts\spin;
+
 class StaticClear extends Command
 {
     use RunsInPlease;
@@ -31,8 +33,14 @@ class StaticClear extends Command
      */
     public function handle()
     {
-        StaticCache::flush();
+        if (! config('statamic.static_caching.strategy')) {
+            $this->components->error('Static caching is not enabled.');
 
-        $this->info('Your static page cache is now so very, very empty.');
+            return 0;
+        }
+
+        spin(callback: fn () => StaticCache::flush(), message: 'Clearing the static page cache...');
+
+        $this->components->info('Your static page cache is now so very, very empty.');
     }
 }

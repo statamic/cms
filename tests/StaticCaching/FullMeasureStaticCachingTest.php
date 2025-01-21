@@ -2,6 +2,7 @@
 
 namespace Tests\StaticCaching;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\File;
 use Statamic\Facades\StaticCache;
 use Statamic\StaticCaching\NoCache\Session;
@@ -34,7 +35,7 @@ class FullMeasureStaticCachingTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function it_can_keep_parts_dynamic_using_nocache_tags()
     {
         // Use a tag that outputs something dynamic.
@@ -81,11 +82,11 @@ class FullMeasureStaticCachingTest extends TestCase
         $this->assertEquals(vsprintf('<html><body>1 <span class="nocache" data-nocache="%s">%s</span>%s</body></html>', [
             $region->key(),
             '<svg>Loading...</svg>',
-            '<script type="text/javascript">js here</script>',
+            '<script>js here</script>',
         ]), file_get_contents($this->dir.'/about_.html'));
     }
 
-    /** @test */
+    #[Test]
     public function javascript_doesnt_get_output_if_there_are_no_nocache_tags()
     {
         // Use a tag that outputs something dynamic.
@@ -130,7 +131,7 @@ class FullMeasureStaticCachingTest extends TestCase
         $this->assertEquals('<html><body>1</body></html>', file_get_contents($this->dir.'/about_.html'));
     }
 
-    /** @test */
+    #[Test]
     public function it_should_add_the_javascript_if_there_is_a_csrf_token()
     {
         $this->withFakeViews();
@@ -153,7 +154,7 @@ class FullMeasureStaticCachingTest extends TestCase
         // The cached response should have the token placeholder, and the javascript.
         $this->assertTrue(file_exists($this->dir.'/about_.html'));
         $this->assertEquals(vsprintf('<html><body>STATAMIC_CSRF_TOKEN%s</body></html>', [
-            '<script type="text/javascript">js here</script>',
+            '<script>js here</script>',
         ]), file_get_contents($this->dir.'/about_.html'));
     }
 }

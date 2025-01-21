@@ -4,8 +4,17 @@
 
 .card {
     @apply shadow bg-white rounded-md p-2;
+    @apply dark:bg-dark-600 dark:shadow-dark;
 }
 
 @screen md {
     .card { @apply p-4; }
+}
+
+.card-lg {
+    @apply rounded-lg;
+}
+
+.card-lg header {
+    @apply py-6 px-8 border-b dark:bg-dark-650 rounded-t-lg dark:border-dark-800;
 }

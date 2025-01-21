@@ -3,8 +3,8 @@
 namespace Statamic\Console\Commands;
 
 use Archetype\Facades\PHPFile;
-use PhpParser\BuilderFactory;
 use Statamic\Console\RunsInPlease;
+use Statamic\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
 
 class MakeFieldtype extends GeneratorCommand
@@ -23,7 +23,7 @@ class MakeFieldtype extends GeneratorCommand
      *
      * @var string
      */
-    protected $description = 'Create a new fieldtype addon';
+    protected $description = 'Create a new fieldtype';
 
     /**
      * The type of class being generated.
@@ -75,8 +75,14 @@ class MakeFieldtype extends GeneratorCommand
         if ($addon = $this->argument('addon')) {
             $this->wireUpAddonJs($addon);
         } else {
-            $this->line("Your {$this->typeLower} Vue component awaits: <comment>{$relativePath}</comment>");
-            $this->comment("Don't forget to import and register your Fieldtype component in resources/js/addon.js");
+            $this->components->info("Fieldtype Vue component [{$relativePath}] created successfully.");
+
+            $this->components->bulletList([
+                "Don't forget to import and register your fieldtype's Vue component in resources/js/cp.js",
+                'For more information, see the documentation: <comment>https://statamic.dev/fieldtypes#vue-components</comment>',
+            ]);
+
+            $this->newLine();
         }
     }
 
@@ -97,7 +103,7 @@ class MakeFieldtype extends GeneratorCommand
         $component = $this->files->get($this->getStub('fieldtype.vue.stub'));
 
         $component = str_replace('DummyName', $name, $component);
-        $component = str_replace('dummy_name', snake_case($name), $component);
+        $component = str_replace('dummy_name', Str::snake($name), $component);
 
         return $component;
     }
@@ -141,20 +147,15 @@ class MakeFieldtype extends GeneratorCommand
      */
     protected function updateServiceProvider()
     {
-        $factory = new BuilderFactory();
-
-        $fieldtypeClassValue = $factory->classConstFetch('Fieldtypes\\'.$this->getNameInput(), 'class');
-
         try {
             PHPFile::load("addons/{$this->package}/src/ServiceProvider.php")
                 ->add()->protected()->property('vite', [
                     'input' => ['resources/js/addon.js'],
                     'publicDirectory' => 'resources/dist',
                 ])
-                ->add()->protected()->property('fieldtypes', $fieldtypeClassValue)
                 ->save();
         } catch (\Exception $e) {
-            $this->comment("Don't forget to register the Fieldtype class and scripts in your addon's service provider.");
+            $this->comment("Don't forget to configure Vite in your addon's service provider.");
         }
     }
 

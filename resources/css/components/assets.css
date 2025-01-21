@@ -16,7 +16,7 @@
 		i {
 			position: relative;
 			top: -1px;
-			margin-right: 10px;
+			margin-right: 10px ; [dir="rtl"] & { margin-left: 10px ; margin-right: 0 ; }
 		}
 	}
 }
@@ -27,6 +27,11 @@
     pointer-events: none;
     z-index: 1049;
     background: rgba(255, 255, 255, .9);
+
+    .dark & {
+        @apply bg-dark-900/90;
+        border-color: theme('colors.dark.600');
+    }
 }
 
 
@@ -34,7 +39,7 @@
    ========================================================================== */
 
 .asset-table-listing {
-    @apply border rounded relative overflow-hidden;
+    @apply border dark:border-dark-900 rounded relative overflow-hidden;
 
 
     table {
@@ -45,7 +50,7 @@
     }
 
     tbody tr:not(:last-child) {
-        @apply border-b;
+        @apply border-b dark:border-dark-900;
     }
 
     tbody tr td {
@@ -54,18 +59,22 @@
 
 }
 
+.assets-fieldtype-picker + .asset-table-listing {
+    @apply rounded-t-none;
+}
+
 .asset-listing .actions {
     margin-bottom: 15px;
     display: flex;
 
     .search {
         flex: 1;
-        margin-right: 15px;
-        margin-left: 0;
+        margin-right: 15px ; [dir="rtl"] & { margin-left: 15px ; margin-right: 0 ; }
+        margin-left: 0 ; [dir="rtl"] & { margin-right: 0 ; margin-left: 0 ; }
     }
 
     > .btn {
-        margin-right: 15px;
+        margin-right: 15px ; [dir="rtl"] & { margin-left: 15px ; margin-right: 0 ; }
     }
 }
 
@@ -84,7 +93,7 @@
   ========================================================================== */
 
 .asset-grid-listing {
-    @apply bg-white grid relative p-4 gap-4;
+    @apply bg-white dark:bg-dark-800 grid relative p-4 gap-4;
     grid-template-columns: repeat(auto-fill, minmax(125px, 1fr));
 }
 
@@ -93,7 +102,7 @@
    ========================================================================== */
 
 .asset-tile {
-    @apply bg-white relative min-w-0 flex items-center flex-col justify-between cursor-pointer border rounded;
+    @apply bg-white dark:bg-dark-600 relative min-w-0 flex items-center flex-col justify-between cursor-pointer border rounded dark:border-dark-300;
 
     .asset-thumb {
         @apply flex justify-center items-center w-full h-full rounded;
@@ -112,7 +121,11 @@
     }
 
     .asset-meta {
-        @apply border-t w-full text-2xs text-gray-700;
+        @apply border-t dark:border-dark-200 w-full text-2xs text-gray-700 dark:text-dark-100;
+    }
+
+    .asset-meta-btn {
+        @apply text-blue rtl:border-r ltr:border-l px-2 py-1 hover:bg-gray-200 dark:hover:bg-dark-800 dark:border-dark-300;
     }
 
     .asset-filename {
@@ -125,12 +138,12 @@
 }
 
 .asset-tile.selected {
-    @apply border-blue;
+    @apply border-blue dark:border-dark-blue-100;
     box-shadow: 0 0 0 1px theme('colors.blue.DEFAULT');
 }
 
 .asset-thumbnail {
-    @apply border border-white;
+    @apply border border-white dark:border-dark-950;
 }
 
 /* The Asset Editor
@@ -148,9 +161,9 @@
 
             > * {
                 @apply absolute w-auto h-auto max-w-full max-h-full;
-                left: 50%;
+                left: 50% ; [dir="rtl"] & { left: auto ; right: 50% ; }
                 top: 50%;
-                transform: translate(-50%, -50%);
+                transform: translate(-50%, -50%) ; [dir="rtl"] & { transform: translate(50%, -50%); }
                 box-shadow: 0 0 32px rgba(0, 0, 0, .35);
             }
         }

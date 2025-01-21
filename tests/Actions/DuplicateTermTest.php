@@ -2,6 +2,7 @@
 
 namespace Tests\Actions;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Actions\DuplicateTerm;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
@@ -15,7 +16,7 @@ class DuplicateTermTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_duplicates_a_term()
     {
         Taxonomy::make('tags')->save();
@@ -43,7 +44,7 @@ class DuplicateTermTest extends TestCase
         ], $this->termData());
     }
 
-    /** @test */
+    #[Test]
     public function it_increments_the_number_if_duplicate_already_exists()
     {
         Taxonomy::make('tags')->save();
@@ -61,7 +62,7 @@ class DuplicateTermTest extends TestCase
         ], $this->termData());
     }
 
-    /** @test */
+    #[Test]
     public function user_with_create_permission_is_authorized()
     {
         $this->setTestRoles([

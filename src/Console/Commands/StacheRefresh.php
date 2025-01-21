@@ -5,7 +5,8 @@ namespace Statamic\Console\Commands;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\Stache;
-use Wilderborn\Partyline\Facade as Partyline;
+
+use function Laravel\Prompts\spin;
 
 class StacheRefresh extends Command
 {
@@ -16,12 +17,9 @@ class StacheRefresh extends Command
 
     public function handle()
     {
-        Partyline::bind($this);
+        spin(callback: fn () => Stache::clear(), message: 'Clearing the Stache...');
+        spin(callback: fn () => Stache::warm(), message: 'Warming the Stache...');
 
-        $this->line('Please wait. This may take a while if you have a lot of content.');
-
-        Stache::refresh();
-
-        $this->info('You have trimmed and polished the Stache. It is handsome, warm, and ready.');
+        $this->components->info('You have trimmed and polished the Stache. It is handsome, warm, and ready.');
     }
 }

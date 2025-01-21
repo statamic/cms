@@ -4,8 +4,10 @@ namespace Statamic\Auth\Eloquent;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 use Statamic\Auth\User as BaseUser;
+use Statamic\Contracts\Auth\Role as RoleContract;
 use Statamic\Data\ContainsSupplementalData;
 use Statamic\Facades\Role;
 use Statamic\Facades\UserGroup;
@@ -45,7 +47,7 @@ class User extends BaseUser
                 'groups' => $this->groups()->map->handle()->values()->all(),
             ]);
 
-            return collect(array_except($data, ['id', 'email']));
+            return collect(Arr::except($data, ['id', 'email']));
         }
 
         foreach ($data as $key => $value) {
@@ -84,28 +86,26 @@ class User extends BaseUser
         // TODO
     }
 
-    public function roles($roles = null)
+    public function roles(): Collection
     {
-        return is_null($roles)
-            ? $this->getRoles()
-            : $this->setRoles($roles);
+        return $this->explicitRoles()
+            ->merge($this->groups()->flatMap->roles()->keyBy->handle());
     }
 
-    protected function getRoles()
+    public function explicitRoles($roles = null)
     {
+        if (func_num_args() === 1) {
+            $this->roles = collect();
+
+            $this->assignRole($roles);
+
+            return $this;
+        }
+
         return $this->roles = $this->roles
             ?? (new Roles($this))->all()->map(function ($row) {
                 return Role::find($row->role_id);
-            })->keyBy->handle();
-    }
-
-    protected function setRoles($roles)
-    {
-        $this->roles = collect();
-
-        $this->assignRole($roles);
-
-        return $this;
+            })->filter()->keyBy->handle();
     }
 
     protected function saveRoles()
@@ -117,7 +117,7 @@ class User extends BaseUser
 
     public function assignRole($role)
     {
-        $roles = collect(array_wrap($role))->map(function ($role) {
+        $roles = collect(Arr::wrap($role))->map(function ($role) {
             return is_string($role) ? Role::find($role) : $role;
         })->filter();
 
@@ -132,7 +132,7 @@ class User extends BaseUser
 
     public function removeRole($role)
     {
-        $roles = collect(array_wrap($role))->map(function ($role) {
+        $roles = collect(Arr::wrap($role))->map(function ($role) {
             return is_string($role) ? Role::find($role) : $role;
         })->filter();
 
@@ -143,18 +143,18 @@ class User extends BaseUser
         return $this;
     }
 
-    public function hasRole($role)
-    {
-        return $this->roles()->has(
-            is_string($role) ? $role : $role->handle()
-        );
-    }
-
     public function groups($groups = null)
     {
         return is_null($groups)
             ? $this->getGroups()
             : $this->setGroups($groups);
+    }
+
+    public function hasRole($role)
+    {
+        $role = $role instanceof RoleContract ? $role->handle() : $role;
+
+        return $this->roles()->has($role);
     }
 
     protected function getGroups()
@@ -183,7 +183,7 @@ class User extends BaseUser
 
     public function addToGroup($group)
     {
-        $groups = collect(array_wrap($group))->map(function ($group) {
+        $groups = collect(Arr::wrap($group))->map(function ($group) {
             return is_string($group) ? UserGroup::find($group) : $group;
         })->filter();
 
@@ -198,7 +198,7 @@ class User extends BaseUser
 
     public function removeFromGroup($group)
     {
-        $groups = collect(array_wrap($group))->map(function ($group) {
+        $groups = collect(Arr::wrap($group))->map(function ($group) {
             return is_string($group) ? UserGroup::find($group) : $group;
         })->filter();
 
@@ -294,6 +294,13 @@ class User extends BaseUser
         return $this;
     }
 
+    public function merge($data)
+    {
+        $this->data($this->data()->merge($data));
+
+        return $this;
+    }
+
     public function getRememberToken()
     {
         return $this->model()->getRememberToken();
@@ -363,5 +370,12 @@ class User extends BaseUser
         }
 
         return $this->$key = $value;
+    }
+
+    public function getCurrentDirtyStateAttributes(): array
+    {
+        return array_merge([
+            'email' => $this->email(),
+        ], $this->model()->attributesToArray());
     }
 }

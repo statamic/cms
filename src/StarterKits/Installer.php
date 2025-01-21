@@ -5,6 +5,7 @@ namespace Statamic\StarterKits;
 use Facades\Statamic\Console\Processes\Composer;
 use Facades\Statamic\Console\Processes\TtyDetector;
 use Facades\Statamic\StarterKits\Hook;
+use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Http;
 use Statamic\Console\NullConsole;
@@ -13,125 +14,128 @@ use Statamic\Console\Processes\Exceptions\ProcessException;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
+use Statamic\StarterKits\Concerns\InteractsWithFilesystem;
 use Statamic\StarterKits\Exceptions\StarterKitException;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use Statamic\Support\Traits\FluentlyGetsAndSets;
+
+use function Laravel\Prompts\confirm;
+use function Laravel\Prompts\select;
+use function Laravel\Prompts\spin;
 
 final class Installer
 {
+    use FluentlyGetsAndSets, InteractsWithFilesystem;
+
     protected $package;
+    protected $branch;
     protected $licenseManager;
     protected $files;
     protected $fromLocalRepo;
     protected $withConfig;
     protected $withoutDependencies;
-    protected $withUser;
+    protected $withUserPrompt;
+    protected $isInteractive;
     protected $usingSubProcess;
     protected $force;
     protected $console;
     protected $url;
+    protected $modules;
     protected $disableCleanup;
 
     /**
      * Instantiate starter kit installer.
-     *
-     * @param  mixed  $console
      */
-    public function __construct(string $package, $console = null, ?LicenseManager $licenseManager = null)
+    public function __construct(string $package, ?Command $console = null, ?LicenseManager $licenseManager = null)
     {
         $this->package = $package;
+
         $this->licenseManager = $licenseManager;
-        $this->console = $console ?? new Nullconsole;
+
+        $this->console = $console ?? new NullConsole;
 
         $this->files = app(Filesystem::class);
     }
 
     /**
-     * Instantiate starter kit installer.
-     *
-     * @param  mixed  $console
-     * @return static
+     * Get or set whether to install from specific branch.
      */
-    public static function package(string $package, $console = null, ?LicenseManager $licenseManager = null)
+    public function branch(?string $branch = null): self|bool|null
     {
-        return new self($package, $console, $licenseManager);
+        return $this->fluentlyGetOrSet('branch')->args(func_get_args());
     }
 
     /**
-     * Install from local repo configured in composer config.json.
-     *
-     * @param  bool  $fromLocalRepo
-     * @return $this
+     * Get or set whether to install from local repo configured in composer config.json.
      */
-    public function fromLocalRepo($fromLocalRepo = false)
+    public function fromLocalRepo(bool $fromLocalRepo = false): self|bool|null
     {
-        $this->fromLocalRepo = $fromLocalRepo;
-
-        return $this;
+        return $this->fluentlyGetOrSet('fromLocalRepo')->args(func_get_args());
     }
 
     /**
-     * Install with starter-kit config for local development purposes.
-     *
-     * @param  bool  $withConfig
-     * @return $this
+     * Get or set whether to install with starter-kit config for local development purposes.
      */
-    public function withConfig($withConfig = false)
+    public function withConfig(bool $withConfig = false): self|bool|null
     {
-        $this->withConfig = $withConfig;
-
-        return $this;
+        return $this->fluentlyGetOrSet('withConfig')->args(func_get_args());
     }
 
     /**
-     * Install without dependencies.
-     *
-     * @param  bool  $withoutDependencies
-     * @return $this
+     * Get or set whether to install without dependencies.
      */
-    public function withoutDependencies($withoutDependencies = false)
+    public function withoutDependencies(?bool $withoutDependencies = false): self|bool|null
     {
-        $this->withoutDependencies = $withoutDependencies;
-
-        return $this;
+        return $this->fluentlyGetOrSet('withoutDependencies')->args(func_get_args());
     }
 
     /**
-     * Install with super user.
-     *
-     * @param  bool  $withUser
-     * @return $this
+     * Get or set whether to install with super user prompt.
      */
-    public function withUser($withUser = false)
+    public function withUserPrompt(bool $withUserPrompt = false): self|bool|null
     {
-        $this->withUser = $withUser;
-
-        return $this;
+        return $this->fluentlyGetOrSet('withUserPrompt')->args(func_get_args());
     }
 
     /**
-     * Install using sub-process.
-     *
-     * @param  bool  $usingSubProcess
-     * @return $this
+     * Get or set whether command is being run interactively.
      */
-    public function usingSubProcess($usingSubProcess = false)
+    public function isInteractive($isInteractive = false): self|bool|null
     {
-        $this->usingSubProcess = $usingSubProcess;
-
-        return $this;
+        return $this->fluentlyGetOrSet('isInteractive')->args(func_get_args());
     }
 
     /**
-     * Force install and allow dependency errors.
-     *
-     * @param  bool  $force
-     * @return $this
+     * Get or set whether to install using sub-process.
      */
-    public function force($force = false)
+    public function usingSubProcess(bool $usingSubProcess = false): self|bool|null
     {
-        $this->force = $force;
+        return $this->fluentlyGetOrSet('usingSubProcess')->args(func_get_args());
+    }
 
-        return $this;
+    /**
+     * Get or set whether to force install and allow dependency errors.
+     */
+    public function force(bool $force = false): self|bool|null
+    {
+        return $this->fluentlyGetOrSet('force')->args(func_get_args());
+    }
+
+    /**
+     * Get starter kit package.
+     */
+    public function package(): string
+    {
+        return $this->package;
+    }
+
+    /**
+     * Get console command instance.
+     */
+    public function console(): Command|NullConsole
+    {
+        return $this->console;
     }
 
     /**
@@ -139,7 +143,7 @@ final class Installer
      *
      * @throws StarterKitException
      */
-    public function install()
+    public function install(): void
     {
         $this
             ->validateLicense()
@@ -148,12 +152,12 @@ final class Installer
             ->prepareRepository()
             ->requireStarterKit()
             ->ensureConfig()
-            ->ensureExportPathsExist()
-            ->ensureCompatibleDependencies()
-            ->installFiles()
-            ->installDependencies()
+            ->instantiateModules()
+            ->installModules()
+            ->copyStarterKitConfig()
+            ->copyStarterKitHooks()
             ->makeSuperUser()
-            ->runPostInstallHook()
+            ->runPostInstallHooks()
             ->reticulateSplines()
             ->removeStarterKit()
             ->removeRepository()
@@ -164,9 +168,9 @@ final class Installer
     /**
      * Check with license manager to determine whether or not to continue with installation.
      *
-     * @return $this
+     * @throws StarterKitException
      */
-    protected function validateLicense()
+    protected function validateLicense(): self
     {
         if (! $this->licenseManager->isValid()) {
             throw new StarterKitException;
@@ -177,10 +181,8 @@ final class Installer
 
     /**
      * Backup composer.json file.
-     *
-     * @return $this
      */
-    protected function backupComposerJson()
+    protected function backupComposerJson(): self
     {
         $this->files->copy(base_path('composer.json'), base_path('composer.json.bak'));
 
@@ -189,10 +191,8 @@ final class Installer
 
     /**
      * Detect repository url.
-     *
-     * @return $this
      */
-    protected function detectRepositoryUrl()
+    protected function detectRepositoryUrl(): self
     {
         if ($this->fromLocalRepo) {
             return $this;
@@ -215,10 +215,8 @@ final class Installer
 
     /**
      * Prepare repository.
-     *
-     * @return $this
      */
-    protected function prepareRepository()
+    protected function prepareRepository(): self
     {
         if ($this->fromLocalRepo || ! $this->url) {
             return $this;
@@ -243,18 +241,23 @@ final class Installer
 
     /**
      * Require starter kit dependency.
-     *
-     * @return $this
      */
-    protected function requireStarterKit()
+    protected function requireStarterKit(): self
     {
-        $this->console->info("Preparing starter kit [{$this->package}]...");
+        spin(
+            function () {
+                $package = $this->branch
+                    ? "{$this->package}:{$this->branch}"
+                    : $this->package;
 
-        try {
-            Composer::withoutQueue()->throwOnFailure()->requireDev($this->package);
-        } catch (ProcessException $exception) {
-            $this->rollbackWithError("Error installing starter kit [{$this->package}].", $exception->getMessage());
-        }
+                try {
+                    Composer::withoutQueue()->throwOnFailure()->require($package);
+                } catch (ProcessException $exception) {
+                    $this->rollbackWithError("Error installing starter kit [{$package}].", $exception->getMessage());
+                }
+            },
+            "Preparing starter kit [{$this->package}]..."
+        );
 
         return $this;
     }
@@ -262,11 +265,9 @@ final class Installer
     /**
      * Ensure starter kit has config.
      *
-     * @return $this
-     *
      * @throws StarterKitException
      */
-    protected function ensureConfig()
+    protected function ensureConfig(): self
     {
         if (! $this->files->exists($this->starterKitPath('starter-kit.yaml'))) {
             throw new StarterKitException('Starter kit config [starter-kit.yaml] does not exist.');
@@ -276,100 +277,136 @@ final class Installer
     }
 
     /**
-     * Ensure export paths exist.
-     *
-     * @return $this
-     *
-     * @throws StarterKitException
+     * Instantiate and validate modules that are to be installed.
      */
-    protected function ensureExportPathsExist()
+    protected function instantiateModules(): self
     {
-        $this
-            ->exportPaths()
-            ->reject(function ($path) {
-                return $this->files->exists($this->starterKitPath($path));
-            })
-            ->each(function ($path) {
-                throw new StarterKitException("Starter kit path [{$path}] does not exist.");
-            });
+        $this->modules = collect(['top_level' => $this->config()->all()])
+            ->map(fn ($config, $key) => $this->instantiateModuleRecursively($config, $key))
+            ->flatten()
+            ->filter()
+            ->each(fn ($module) => $module->validate());
 
         return $this;
     }
 
     /**
-     * Ensure compatible dependencies by performing a dry-run.
-     *
-     * @return $this
+     * Instantiate module and check if nested modules should be recursively instantiated.
      */
-    protected function ensureCompatibleDependencies()
+    protected function instantiateModuleRecursively(array $config, string $key): InstallableModule|array
     {
-        if ($this->withoutDependencies || $this->force) {
-            return $this;
+        $instantiated = (new InstallableModule($config, $key))->installer($this);
+
+        if ($modules = Arr::get($config, 'modules')) {
+            $instantiated = collect($modules)
+                ->map(fn ($config, $childKey) => $this->instantiateModule($config, $this->normalizeModuleKey($key, $childKey)))
+                ->prepend($instantiated, $key)
+                ->filter()
+                ->all();
         }
 
-        if ($packages = $this->installableDependencies('dependencies')) {
-            $this->ensureCanRequireDependencies($packages);
-        }
-
-        if ($packages = $this->installableDependencies('dependencies_dev')) {
-            $this->ensureCanRequireDependencies($packages, true);
-        }
-
-        return $this;
+        return $instantiated;
     }
 
     /**
-     * Install starter kit files.
-     *
-     * @return $this
+     * Instantiate individual module.
      */
-    protected function installFiles()
+    protected function instantiateModule(array $config, string $key): InstallableModule|array|bool
     {
-        $this->console->info('Installing files...');
+        $shouldPrompt = true;
 
-        $this->installableFiles()->each(function ($toPath, $fromPath) {
-            $this->copyFile($fromPath, $toPath);
-        });
-
-        if ($this->withConfig) {
-            $this->copyStarterKitConfig();
-            $this->copyStarterKitHooks();
+        if (Arr::has($config, 'options')) {
+            return $this->instantiateSelectModule($config, $key);
         }
 
-        return $this;
+        if (Arr::get($config, 'prompt') === false) {
+            $shouldPrompt = false;
+        }
+
+        $name = str_replace('_', ' ', $key);
+
+        $default = Arr::get($config, 'default', false);
+
+        if ($shouldPrompt && $this->isInteractive && ! confirm(Arr::get($config, 'prompt', "Would you like to install the [{$name}] module?"), $default)) {
+            return false;
+        } elseif ($shouldPrompt && ! $this->isInteractive && ! $default) {
+            return false;
+        }
+
+        return $this->instantiateModuleRecursively($config, $key);
     }
 
     /**
-     * Copy starter kit file.
-     *
-     * @param  mixed  $fromPath
-     * @param  mixed  $toPath
+     * Instantiate select module.
      */
-    protected function copyFile($fromPath, $toPath)
+    protected function instantiateSelectModule(array $config, string $key): InstallableModule|array|bool
     {
-        $displayPath = str_replace(Path::tidy(base_path().'/'), '', $toPath);
+        $skipOptionLabel = Arr::get($config, 'skip_option', 'No');
+        $skipModuleValue = 'skip_module';
 
-        $this->console->line("Installing file [{$displayPath}]");
+        $options = collect($config['options'])
+            ->map(fn ($option, $optionKey) => Arr::get($option, 'label', ucfirst($optionKey)))
+            ->when($skipOptionLabel !== false, fn ($c) => $c->prepend($skipOptionLabel, $skipModuleValue))
+            ->all();
 
-        $this->files->copy($fromPath, $this->preparePath($toPath));
+        $name = str_replace('_', ' ', $key);
+
+        if ($this->isInteractive) {
+            $choice = select(
+                label: Arr::get($config, 'prompt', "Would you like to install one of the following [{$name}] modules?"),
+                options: $options,
+                default: Arr::get($config, 'default'),
+            );
+        } elseif (! $this->isInteractive && ! $choice = Arr::get($config, 'default')) {
+            return false;
+        }
+
+        if ($choice === $skipModuleValue) {
+            return false;
+        }
+
+        $selectedKey = "{$key}_{$choice}";
+        $selectedModuleConfig = $config['options'][$choice];
+
+        return $this->instantiateModuleRecursively($selectedModuleConfig, $selectedKey);
+    }
+
+    /**
+     * Normalize module key.
+     */
+    protected function normalizeModuleKey(string $key, string $childKey): string
+    {
+        return $key !== 'top_level' ? "{$key}_{$childKey}" : $childKey;
+    }
+
+    /**
+     * Install all the modules.
+     */
+    protected function installModules(): self
+    {
+        $this->console->info('Installing starter kit...');
+
+        $this->modules->each(fn ($module) => $module->install());
+
+        return $this;
     }
 
     /**
      * Copy starter kit config without versions, to encourage dependency management using composer.
      */
-    protected function copyStarterKitConfig()
+    protected function copyStarterKitConfig(): self
     {
         if (! $this->withConfig) {
-            return;
+            return $this;
         }
 
         if ($this->withoutDependencies) {
-            return $this->copyFile($this->starterKitPath('starter-kit.yaml'), base_path('starter-kit.yaml'));
+            return $this->installFile($this->starterKitPath('starter-kit.yaml'), base_path('starter-kit.yaml'), $this->console());
         }
 
         $this->console->line('Installing file [starter-kit.yaml]');
 
-        $config = collect(YAML::parse($this->files->get($this->starterKitPath('starter-kit.yaml'))));
+        $config = $this->config();
 
         $dependencies = collect()
             ->merge($config->get('dependencies'))
@@ -384,104 +421,38 @@ final class Installer
         }
 
         $this->files->put(base_path('starter-kit.yaml'), YAML::dump($config->all()));
+
+        return $this;
     }
 
     /**
      * Copy starter kit hook scripts.
      */
-    protected function copyStarterKitHooks()
+    protected function copyStarterKitHooks(): self
     {
         if (! $this->withConfig) {
-            return;
+            return $this;
         }
 
         $hooks = ['StarterKitPostInstall.php'];
 
         collect($hooks)
             ->filter(fn ($hook) => $this->files->exists($this->starterKitPath($hook)))
-            ->each(fn ($hook) => $this->copyFile($this->starterKitPath($hook), base_path($hook)));
-    }
-
-    /**
-     * Install starter kit dependencies.
-     *
-     * @return $this
-     */
-    protected function installDependencies()
-    {
-        if ($this->withoutDependencies) {
-            return $this;
-        }
-
-        if ($packages = $this->installableDependencies('dependencies')) {
-            $this->requireDependencies($packages);
-        }
-
-        if ($packages = $this->installableDependencies('dependencies_dev')) {
-            $this->requireDependencies($packages, true);
-        }
+            ->each(fn ($hook) => $this->installFile($this->starterKitPath($hook), base_path($hook), $this->console()));
 
         return $this;
     }
 
     /**
-     * Ensure dependencies are installable by performing a dry-run.
-     *
-     * @param  array  $packages
-     * @param  bool  $dev
-     */
-    protected function ensureCanRequireDependencies($packages, $dev = false)
-    {
-        $requireMethod = $dev ? 'requireMultipleDev' : 'requireMultiple';
-
-        try {
-            Composer::withoutQueue()->throwOnFailure()->{$requireMethod}($packages, '--dry-run');
-        } catch (ProcessException $exception) {
-            $this->rollbackWithError('Cannot install due to dependency conflict.', $exception->getMessage());
-        }
-    }
-
-    /**
-     * Install starter kit dependency permanently into app.
-     *
-     * @param  array  $packages
-     * @param  bool  $dev
-     */
-    protected function requireDependencies($packages, $dev = false)
-    {
-        if ($dev) {
-            $this->console->info('Installing development dependencies...');
-        } else {
-            $this->console->info('Installing dependencies...');
-        }
-
-        $args = array_merge(['require'], $this->normalizePackagesArrayToRequireArgs($packages));
-
-        if ($dev) {
-            $args[] = '--dev';
-        }
-
-        try {
-            Composer::withoutQueue()->throwOnFailure()->runAndOperateOnOutput($args, function ($output) {
-                return $this->outputFromSymfonyProcess($output);
-            });
-        } catch (ProcessException $exception) {
-            $this->console->error('Error installing dependencies.');
-        }
-    }
-
-    /**
      * Make super user.
-     *
-     * @return $this
      */
-    public function makeSuperUser()
+    public function makeSuperUser(): self
     {
-        if (! $this->withUser) {
+        if (! $this->withUserPrompt) {
             return $this;
         }
 
-        if ($this->console->confirm('Create a super user?', false)) {
+        if (confirm('Create a super user?', false)) {
             $this->console->call('make:user', ['--super' => true]);
         }
 
@@ -491,11 +462,9 @@ final class Installer
     /**
      * Run post-install hook, if one exists in the starter kit.
      *
-     * @return $this
-     *
      * @throws StarterKitException
      */
-    public function runPostInstallHook($throwExceptions = false)
+    public function runPostInstallHooks(bool $throwExceptions = false): self
     {
         $postInstallHook = Hook::find($this->starterKitPath('StarterKitPostInstall.php'));
 
@@ -522,10 +491,8 @@ final class Installer
 
     /**
      * Cache post install instructions for parent process (ie. statamic/cli installer).
-     *
-     * @return $this
      */
-    protected function cachePostInstallInstructions()
+    protected function cachePostInstallInstructions(): self
     {
         $path = $this->preparePath(storage_path('statamic/tmp/cli/post-install-instructions.txt'));
 
@@ -544,10 +511,8 @@ EOT;
 
     /**
      * Register starter kit installed command for post install hook.
-     *
-     * @param  string  $commandClass
      */
-    protected function registerInstalledCommand($commandClass)
+    protected function registerInstalledCommand(string $commandClass): void
     {
         $app = $this->console->getApplication();
 
@@ -563,47 +528,47 @@ EOT;
     }
 
     /**
-     * Reticulate splines.
-     *
-     * @return $this
+     * Reticulate splines, to prevent multiple Bézier curves from conjoining at the Maxis point of the starter kit install.
      */
-    protected function reticulateSplines()
+    protected function reticulateSplines(): self
     {
-        $this->console->info('Reticulating splines...');
-
-        if (config('app.env') !== 'testing') {
-            usleep(500000);
-        }
+        spin(
+            function () {
+                if (config('app.env') !== 'testing') {
+                    usleep(500000);
+                }
+            },
+            'Reticulating splines...'
+        );
 
         return $this;
     }
 
     /**
      * Remove starter kit dependency.
-     *
-     * @return $this
      */
-    public function removeStarterKit()
+    public function removeStarterKit(): self
     {
-        if ($this->disableCleanup) {
+        if ($this->isUpdatable() || $this->disableCleanup) {
             return $this;
         }
 
-        $this->console->info('Cleaning up temporary files...');
-
-        if (Composer::isInstalled($this->package)) {
-            Composer::withoutQueue()->throwOnFailure(false)->removeDev($this->package);
-        }
+        spin(
+            function () {
+                if (Composer::isInstalled($this->package)) {
+                    Composer::withoutQueue()->throwOnFailure(false)->remove($this->package);
+                }
+            },
+            'Cleaning up temporary files...'
+        );
 
         return $this;
     }
 
     /**
      * Remove composer.json backup.
-     *
-     * @return $this
      */
-    protected function removeComposerJsonBackup()
+    protected function removeComposerJsonBackup(): self
     {
         $this->files->delete(base_path('composer.json.bak'));
 
@@ -612,10 +577,8 @@ EOT;
 
     /**
      * Complete starter kit install, expiring license key and/or incrementing install count.
-     *
-     * @return $this
      */
-    protected function completeInstall()
+    protected function completeInstall(): self
     {
         $this->licenseManager->completeInstall();
 
@@ -624,12 +587,10 @@ EOT;
 
     /**
      * Remove repository.
-     *
-     * @return $this
      */
-    protected function removeRepository()
+    protected function removeRepository(): self
     {
-        if ($this->fromLocalRepo || ! $this->url) {
+        if ($this->isUpdatable() || $this->fromLocalRepo || ! $this->url) {
             return $this;
         }
 
@@ -655,10 +616,8 @@ EOT;
 
     /**
      * Restore composer.json file.
-     *
-     * @return $this
      */
-    protected function restoreComposerJson()
+    protected function restoreComposerJson(): self
     {
         $this->files->copy(base_path('composer.json.bak'), base_path('composer.json'));
 
@@ -668,32 +627,26 @@ EOT;
     /**
      * Rollback with error.
      *
-     * @param  string  $error
-     * @param  string|null  $output
-     *
      * @throws StarterKitException
      */
-    protected function rollbackWithError($error, $output = null)
+    public function rollbackWithError(string $error, ?string $output = null): void
     {
+        if ($output) {
+            $this->console->line($this->tidyComposerErrorOutput($output));
+        }
+
         $this
             ->removeStarterKit()
             ->restoreComposerJson()
             ->removeComposerJsonBackup();
-
-        if ($output) {
-            $this->console->line($this->tidyComposerErrorOutput($output));
-        }
 
         throw new StarterKitException($error);
     }
 
     /**
      * Remove the `require [--dev] [--dry-run] [--prefer-source]...` stuff from the end of composer error output.
-     *
-     * @param  string  $output
-     * @return string
      */
-    protected function tidyComposerErrorOutput($output)
+    protected function tidyComposerErrorOutput(string $output): string
     {
         if (Str::contains($output, 'github.com') && Str::contains($output, ['access', 'permission', 'credential', 'authenticate'])) {
             return collect([
@@ -709,140 +662,20 @@ EOT;
 
     /**
      * Get starter kit vendor path.
-     *
-     * @return string
      */
-    protected function starterKitPath($path = null)
+    protected function starterKitPath(?string $path = null): string
     {
-        return collect([base_path("vendor/{$this->package}"), $path])->filter()->implode('/');
-    }
-
-    /**
-     * Clean up symfony process output and output to cli.
-     *
-     * TODO: Move to trait and reuse in MakeAddon?
-     *
-     * @return string
-     */
-    private function outputFromSymfonyProcess(string $output)
-    {
-        // Remove terminal color codes.
-        $output = preg_replace('/\\e\[[0-9]+m/', '', $output);
-
-        // Remove new lines.
-        $output = preg_replace('/[\r\n]+$/', '', $output);
-
-        // If not a blank line, output to terminal.
-        if (! empty(trim($output))) {
-            $this->console->line($output);
-        }
-
-        return $output;
-    }
-
-    /**
-     * Get `export_paths` paths from config.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    protected function exportPaths()
-    {
-        $config = YAML::parse($this->files->get($this->starterKitPath('starter-kit.yaml')));
-
-        return collect($config['export_paths'] ?? []);
-    }
-
-    /**
-     * Get `export_as` paths (to be renamed on install) from config.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    protected function exportAsPaths()
-    {
-        $config = YAML::parse($this->files->get($this->starterKitPath('starter-kit.yaml')));
-
-        return collect($config['export_as'] ?? []);
-    }
-
-    /**
-     * Get installable files.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    protected function installableFiles()
-    {
-        $installableFromExportPaths = $this
-            ->exportPaths()
-            ->flatMap(function ($path) {
-                return $this->expandConfigExportPaths($path);
-            });
-
-        $installableFromExportAsPaths = $this
-            ->exportAsPaths()
-            ->flip()
-            ->flatMap(function ($to, $from) {
-                return $this->expandConfigExportPaths($to, $from);
-            });
-
-        return collect()
-            ->merge($installableFromExportPaths)
-            ->merge($installableFromExportAsPaths);
-    }
-
-    /**
-     * Expand config export path to `[$from => $to]` array format, normalizing directories to files.
-     *
-     * @param  string  $to
-     * @param  string  $from
-     * @return \Illuminate\Support\Collection
-     */
-    protected function expandConfigExportPaths($to, $from = null)
-    {
-        $to = Path::tidy($this->starterKitPath($to));
-        $from = Path::tidy($from ? $this->starterKitPath($from) : $to);
-
-        $paths = collect([$from => $to]);
-
-        if ($this->files->isDirectory($from)) {
-            $paths = collect($this->files->allFiles($from))
-                ->map->getPathname()
-                ->mapWithKeys(function ($path) use ($from, $to) {
-                    return [$path => str_replace($from, $to, $path)];
-                });
-        }
-
-        return $paths->mapWithKeys(function ($to, $from) {
-            return [Path::tidy($from) => Path::tidy(str_replace("/vendor/{$this->package}", '', $to))];
-        });
-    }
-
-    /**
-     * Prepare path directory.
-     *
-     * @param  string  $path
-     * @return string
-     */
-    protected function preparePath($path)
-    {
-        $directory = $this->files->isDirectory($path)
-            ? $path
-            : preg_replace('/(.*)\/[^\/]*/', '$1', Path::tidy($path));
-
-        if (! $this->files->exists($directory)) {
-            $this->files->makeDirectory($directory, 0755, true);
-        }
-
-        return Path::tidy($path);
+        return Path::tidy(collect([base_path("vendor/{$this->package}"), $path])->filter()->implode('/'));
     }
 
     /**
      * Get starter kit config.
-     *
-     * @return mixed
      */
-    protected function config($key = null)
+    protected function config(?string $key = null): mixed
     {
-        $config = collect(YAML::parse($this->files->get($this->starterKitPath('starter-kit.yaml'))));
+        $config = Blink::once('starter-kit-config', function () {
+            return collect(YAML::parse($this->files->get($this->starterKitPath('starter-kit.yaml'))));
+        });
 
         if ($key) {
             return $config->get($key);
@@ -852,32 +685,10 @@ EOT;
     }
 
     /**
-     * Get installable dependencies from appropriate require key in composer.json.
-     *
-     * @param  string  $configKey
-     * @return array
+     * Should starter kit be treated as an updatable package, and live on for future composer updates, etc?
      */
-    protected function installableDependencies($configKey)
+    protected function isUpdatable(): bool
     {
-        return collect($this->config($configKey))->filter(function ($version, $package) {
-            return Str::contains($package, '/');
-        })->all();
-    }
-
-    /**
-     * Normalize packages array to require args, with version handling if `package => version` array structure is passed.
-     *
-     * @return array
-     */
-    private function normalizePackagesArrayToRequireArgs(array $packages)
-    {
-        return collect($packages)
-            ->map(function ($value, $key) {
-                return Str::contains($key, '/')
-                    ? "{$key}:{$value}"
-                    : "{$value}";
-            })
-            ->values()
-            ->all();
+        return (bool) $this->config('updatable');
     }
 }

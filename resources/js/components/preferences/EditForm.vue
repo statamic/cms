@@ -16,24 +16,24 @@
             <div class="flex items-center mb-6">
                 <h1 class="flex-1">{{ title }}</h1>
 
-                <div class="ml-4 text-left" :class="{ 'btn-group': hasSaveAsOptions }">
+                <div class="rtl:mr-4 ltr:ml-4 rtl:text-right ltr:text-left" :class="{ 'btn-group': hasSaveAsOptions }">
                     <button
-                        class="btn-primary pl-4"
+                        class="btn-primary rtl:pr-4 ltr:pl-4"
                         :class="{ 'disabled': !isDirty }"
                         :disabled="!isDirty"
                         @click="save"
                         v-text="__('Save')" />
 
-                    <dropdown-list v-if="hasSaveAsOptions" class="ml-0">
+                    <dropdown-list v-if="hasSaveAsOptions" class="rtl:mr-0 ltr:ml-0">
                         <template #trigger>
-                            <button class="btn-primary rounded-l-none flex items-center">
+                            <button class="btn-primary rtl:rounded-r-none ltr:rounded-l-none flex items-center">
                                 <svg-icon name="micro/chevron-down-xs" class="w-2" />
                             </button>
                         </template>
                         <h6 class="p-2">{{ __('Save to') }}...</h6>
                         <dropdown-item v-for="option in saveAsOptions" :key="option.url" @click="saveAs(option.url)">
-                            <div class="flex items-start pr-4">
-                                <svg-icon :name="option.icon" class="text-gray shrink-0 mr-2 w-4 group-hover:text-white" />
+                            <div class="flex items-start rtl:pl-4 ltr:pr-4">
+                                <svg-icon :name="option.icon" class="text-gray shrink-0 rtl:ml-2 ltr:mr-2 w-4 group-hover:text-white" />
                                 <span class="whitespace-normal">{{ option.label }}</span>
                             </div>
                         </dropdown-item>

@@ -8,8 +8,11 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\File;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Addon;
 use Statamic\Licensing\Outpost;
 use Tests\TestCase;
@@ -23,15 +26,15 @@ class OutpostTest extends TestCase
         Cache::store('outpost')->flush();
     }
 
-    /** @test */
+    #[Test]
     public function it_builds_the_request_payload()
     {
         config(['statamic.system.license_key' => 'test-key']);
         config(['statamic.editions.pro' => true]);
 
         Addon::shouldReceive('all')->once()->andReturn(collect([
-            new FakeOutpostAddon('foo/bar', '1.2.3', null),
-            new FakeOutpostAddon('baz/qux', '4.5.6', 'example'),
+            new FakeOutpostAddon('foo/bar', '1.2.3', null, true, true),
+            new FakeOutpostAddon('baz/qux', '4.5.6', 'example', true, true),
         ]));
 
         request()->server->set('SERVER_ADDR', '123.123.123.123');
@@ -45,6 +48,7 @@ class OutpostTest extends TestCase
             'statamic_version' => '3.0.0-testing',
             'statamic_pro' => true,
             'php_version' => PHP_VERSION,
+            'laravel_version' => app()->version(),
             'packages' => [
                 'foo/bar' => ['version' => '1.2.3', 'edition' => null],
                 'baz/qux' => ['version' => '4.5.6', 'edition' => 'example'],
@@ -52,7 +56,7 @@ class OutpostTest extends TestCase
         ], $this->outpost()->payload());
     }
 
-    /** @test */
+    #[Test]
     public function it_contacts_the_outpost_and_caches_the_response()
     {
         $outpost = $this->outpostWithJsonResponse(['foo' => 'bar']);
@@ -70,7 +74,7 @@ class OutpostTest extends TestCase
         $this->assertResponseNotCached();
     }
 
-    /** @test */
+    #[Test]
     public function the_cached_response_is_used()
     {
         $outpost = $this->outpostWithJsonResponse(['newer' => 'response']);
@@ -87,7 +91,75 @@ class OutpostTest extends TestCase
         $this->assertSame($first, $second);
     }
 
-    /** @test */
+    #[Test]
+    public function license_key_file_is_used_when_it_exists()
+    {
+        config(['statamic.system.license_key' => 'testsitekey12345']);
+
+        $encrypter = new Encrypter('testsitekey12345');
+        $encryptedKeyFile = $encrypter->encrypt(json_encode([
+            'foo' => 'bar',
+            'packages' => [],
+        ]));
+
+        File::shouldReceive('exists')
+            ->with(storage_path('license.key'))
+            ->once()
+            ->andReturnTrue();
+
+        File::shouldReceive('get')
+            ->with(storage_path('license.key'))
+            ->once()
+            ->andReturn($encryptedKeyFile);
+
+        $outpost = $this->outpostWithJsonResponse(['newer' => 'response']);
+        $response = $outpost->response();
+
+        $this->assertArraySubset([
+            'foo' => 'bar',
+            'packages' => [],
+        ], $response);
+    }
+
+    #[Test]
+    public function license_key_file_response_merges_installed_addons_into_response()
+    {
+        config(['statamic.system.license_key' => 'testsitekey12345']);
+
+        $encrypter = new Encrypter('testsitekey12345');
+        $encryptedKeyFile = $encrypter->encrypt(json_encode(['packages' => [
+            'foo/bar' => ['valid' => true, 'exists' => true, 'version_limit' => null],
+        ]]));
+
+        File::shouldReceive('exists')
+            ->with(storage_path('license.key'))
+            ->once()
+            ->andReturnTrue();
+
+        File::shouldReceive('get')
+            ->with(storage_path('license.key'))
+            ->once()
+            ->andReturn($encryptedKeyFile);
+
+        Addon::shouldReceive('all')->andReturn(collect([
+            (new FakeOutpostAddon('foo/bar', '1.2.3', null, true, true)),
+            (new FakeOutpostAddon('bar/baz', '1.2.3', null, true, true)),
+            (new FakeOutpostAddon('private/addon', '1.2.3', null, false, false)),
+        ]));
+
+        $outpost = $this->outpostWithJsonResponse(['newer' => 'response']);
+        $response = $outpost->response();
+
+        $this->assertArraySubset([
+            'packages' => [
+                'foo/bar' => ['valid' => true, 'exists' => true, 'version_limit' => null],
+                'bar/baz' => ['valid' => false, 'exists' => true, 'version_limit' => null],
+                'private/addon' => ['valid' => true, 'exists' => false, 'version_limit' => null],
+            ],
+        ], $response);
+    }
+
+    #[Test]
     public function the_cached_response_is_ignored_if_the_payload_is_different()
     {
         $this->setCachedResponse(['payload' => ['old' => 'stuff']]);
@@ -106,7 +178,7 @@ class OutpostTest extends TestCase
         $this->assertResponseNotCached();
     }
 
-    /** @test */
+    #[Test]
     public function it_clears_the_cached_response()
     {
         Cache::shouldReceive('store')->andReturn(
@@ -117,7 +189,7 @@ class OutpostTest extends TestCase
         $this->outpost()->clearCachedResponse();
     }
 
-    /** @test */
+    #[Test]
     public function it_caches_a_timed_out_request_for_5_minutes()
     {
         $outpost = $this->outpostWithResponse(
@@ -137,7 +209,7 @@ class OutpostTest extends TestCase
         $this->assertResponseNotCached();
     }
 
-    /** @test */
+    #[Test]
     public function it_caches_a_500_error_for_5_minutes()
     {
         $outpost = $this->outpostWithErrorResponse(500);
@@ -155,7 +227,7 @@ class OutpostTest extends TestCase
         $this->assertResponseNotCached();
     }
 
-    /** @test */
+    #[Test]
     public function it_caches_a_429_too_many_requests_error_for_the_length_described_in_the_retry_after_header()
     {
         $retryAfter = 23; // arbitrary number
@@ -177,7 +249,7 @@ class OutpostTest extends TestCase
         $this->assertResponseNotCached();
     }
 
-    /** @test */
+    #[Test]
     public function it_caches_a_422_validation_error_for_an_hour()
     {
         $outpost = $this->outpostWithErrorResponse(422, [], [
@@ -256,12 +328,16 @@ class FakeOutpostAddon
     protected $package;
     protected $version;
     protected $edition;
+    protected $existsOnMarketplace;
+    protected $isCommercial;
 
-    public function __construct($package, $version, $edition)
+    public function __construct($package, $version, $edition, $existsOnMarketplace, $isCommercial)
     {
         $this->package = $package;
         $this->version = $version;
         $this->edition = $edition;
+        $this->existsOnMarketplace = $existsOnMarketplace;
+        $this->isCommercial = $isCommercial;
     }
 
     public function package()
@@ -277,5 +353,15 @@ class FakeOutpostAddon
     public function edition()
     {
         return $this->edition;
+    }
+
+    public function existsOnMarketplace()
+    {
+        return $this->existsOnMarketplace;
+    }
+
+    public function isCommercial()
+    {
+        return $this->isCommercial;
     }
 }

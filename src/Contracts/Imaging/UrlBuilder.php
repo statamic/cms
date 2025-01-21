@@ -9,8 +9,7 @@ interface UrlBuilder
      *
      * @param  \Statamic\Contracts\Assets\Asset|string  $item
      * @param  array  $params
-     * @param  string|null  $filename
      * @return string
      */
-    public function build($item, $params, $filename = null);
+    public function build($item, $params);
 }

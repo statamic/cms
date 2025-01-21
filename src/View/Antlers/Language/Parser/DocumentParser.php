@@ -108,6 +108,10 @@ class DocumentParser
     private $threeCharCollisionCount = -1;
     private $threeCharCollisions = [];
     private $isVirtual = false;
+    private $mayBeStartingEscapedContent = false;
+    private $isParsingEscapedContent = false;
+    private $escapedContentEndSymbol = null;
+    private $escapedContentSymbolEncountered = 0;
 
     /**
      * A list of node visitors.
@@ -991,8 +995,18 @@ class DocumentParser
         return str_split(self::getRightBraceEscape());
     }
 
+    private function resetEscapedContentState()
+    {
+        $this->mayBeStartingEscapedContent = false;
+        $this->isParsingEscapedContent = false;
+        $this->escapedContentEndSymbol = null;
+        $this->escapedContentSymbolEncountered = 0;
+    }
+
     private function scanToEndOfAntlersRegion()
     {
+        $this->resetEscapedContentState();
+
         for ($this->currentIndex; $this->currentIndex < $this->inputLen; $this->currentIndex += 1) {
             $this->checkCurrentOffsets();
 
@@ -1017,7 +1031,42 @@ class DocumentParser
                 continue;
             }
 
-            if ($this->cur == self::LeftBrace) {
+            if ($this->isParsingEscapedContent && $this->cur == $this->escapedContentEndSymbol && $this->prev != self::String_EscapeCharacter) {
+                $this->escapedContentSymbolEncountered++;
+
+                if ($this->escapedContentSymbolEncountered >= 2) {
+                    $this->resetEscapedContentState();
+                }
+            }
+
+            if ($this->mayBeStartingEscapedContent) {
+                if ($this->cur != null && ctype_space($this->cur) || $this->next == null) {
+                    $this->resetEscapedContentState();
+                } else {
+                    if ($this->cur == self::Punctuation_Equals && ($this->next == self::String_Terminator_SingleQuote || $this->next == self::String_Terminator_DoubleQuote)) {
+                        $this->mayBeStartingEscapedContent = false;
+                        $this->isParsingEscapedContent = true;
+                        $this->escapedContentEndSymbol = $this->next;
+
+                        // We'll use this counter to track the number of
+                        // times we've seen the end symbol. We will do
+                        // it this way to avoid modifying the logic
+                        // below, which is already a bit complex.
+                        $this->escapedContentSymbolEncountered = 0;
+                    }
+                }
+            }
+
+            if ($this->cur == self::String_EscapeCharacter && ($this->prev != null && ctype_space($this->prev))) {
+                if ($this->next != null && (ctype_alpha($this->next) || $this->next == self::Punctuation_Underscore || $this->next == self::AtChar)) {
+                    // It is possible that we might be starting some escaped content.
+                    // We will need more information to determine this, but let's
+                    // flag that it is currently a possibility and handle it.
+                    $this->mayBeStartingEscapedContent = true;
+                }
+            }
+
+            if (! $this->isParsingEscapedContent && $this->cur == self::LeftBrace) {
                 $results = $this->scanToEndOfInterpolatedRegion();
                 GlobalRuntimeState::$interpolatedVariables[] = $results[2];
 
@@ -1027,7 +1076,7 @@ class DocumentParser
                 continue;
             }
 
-            if ($this->cur == self::RightBrace && $this->next != null && $this->next == self::RightBrace) {
+            if (! $this->isParsingEscapedContent && $this->cur == self::RightBrace && $this->next != null && $this->next == self::RightBrace) {
                 $node = $this->makeAntlersTagNode($this->currentIndex, false);
 
                 if ($node->name != null && $node->name->name == 'noparse') {

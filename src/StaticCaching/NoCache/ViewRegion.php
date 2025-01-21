@@ -11,7 +11,7 @@ class ViewRegion extends Region
         $this->session = $session;
         $this->view = $view;
         $this->context = $this->filterContext($context);
-        $this->key = str_random(32);
+        $this->key = sha1($view).$session->getRegionId();
     }
 
     public function key(): string

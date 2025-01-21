@@ -17,6 +17,7 @@ button {
     padding: .475rem 1.25rem;
 
     &:focus {
+        /* @apply ring-2 outline-none dark:outline-2 dark:outline-dark-blue-100; */
         @apply ring-2 outline-none;
     }
 
@@ -31,41 +32,62 @@ button {
 
 /*  Default, non-primary action button */
 .btn, .btn-default {
-    @apply text-gray-800 shadow-button;
+    @apply text-gray-800 dark:text-dark-150 shadow-button;
     background: linear-gradient(180deg, #fff, #f9fafb);
     border: 1px solid #D3DDE7;
     border-bottom: 1px solid #c4cdd6;
     box-shadow: inset 0 1px 0 0 #fff, 0 1px 0 0 rgba(0, 0, 0,.05), 0 2px 1px 0 theme(colors.gray.600 / .15), 0 0 0 0 transparent;
 
+    .dark & {
+        background: linear-gradient(180deg, theme(colors.dark.550), theme(colors.dark.600));
+        border-color: theme(colors.dark.700);
+        box-shadow: inset 0 1px 0 0 theme(colors.dark.300), 0 1px 0 0 rgba(200, 200, 200,.05), 0 2px 1px 0 theme(colors.dark.900 / .15), 0 0 0 0 transparent;
+    }
+
     &:hover:not(:disabled), &:active:not(:disabled) {
-        @apply text-gray-800;
+        @apply text-gray-800 dark:text-dark-150;
         background: linear-gradient(180deg, #f9fafb, #f4f6f8);
         border-bottom: 1px solid #BFC7D0;
+
+        .dark & {
+            background: linear-gradient(180deg, theme(colors.dark.600), theme(colors.dark.700));
+            border-color: theme(colors.dark.800);
+        }
+    }
+
+    &:focus {
+        @apply ring-2 dark:ring-dark-blue-100;
     }
 
     &.active, &.active:hover {
-        box-shadow: inset 2px 2px 3px 0px rgba(25,30,35,.1);
+        box-shadow: inset 2px 2px 3px 0 rgba(25,30,35,.1);
         background: theme('colors.gray.400');
         border-color: #aeb9c3 !important;
+
+        .dark & {
+            @apply shadow-inner-dark;
+            background: theme('colors.dark.400');
+            border-color: theme(colors.dark.700) !important;
+        }
     }
 
     &:disabled {
-        @apply text-gray-700 opacity-75;
+        @apply text-gray-700 dark:text-dark-200 opacity-75;
     }
 }
 
 /*  Primary action button */
 .btn-primary {
-    @apply text-white bg-gradient-to-b from-blue-500 to-blue-600 border border-blue-700 border-b-blue-800 !important;
+    @apply text-white bg-gradient-to-b from-blue-500 to-blue-600 dark:from-dark-blue-100 dark:to-dark-blue-150 border border-blue-700 dark:border-blue-900 border-b-blue-800 dark:border-b-dark-blue-200 !important;
     box-shadow: inset 0 1px 0 0 theme('colors.blue.400'), 0 1px 0 0 rgba(25,30,35,.05), 0 3px 2px -1px theme(colors.blue.900 / .15), 0 0 0 0 transparent;
 
     &:hover:not(:disabled), :active:not(:disabled) {
-        @apply from-blue-600 to-blue-700 border-blue-800 border-b-blue-900 !important;
+        @apply from-blue-600 to-blue-700 dark:from-dark-blue-125 dark:to-dark-blue-175 border-blue-800 dark:border-blue-900 border-b-blue-900 dark:border-b-dark-blue-200 !important;
         box-shadow: inset 0 1px 0 0 theme('colors.blue.500'), 0 1px 0 0 rgba(25,30,35,.05), 0 3px 2px -1px theme(colors.blue.900 / .15), 0 0 0 0 transparent;
     }
 
     &:disabled {
-        @apply text-blue-200 opacity-75;
+        @apply text-blue-200 dark:text-dark-blue-200 opacity-75 !important;
     }
 }
 
@@ -90,11 +112,11 @@ button {
 
 /*  Earth isn't flat but these buttons are */
 .btn-flat {
-    @apply text-white text-gray-800 bg-gray-300 flex items-center;
+    @apply text-gray-800 dark:text-dark-150 bg-gray-300 dark:bg-dark-700 flex items-center;
     position: inherit;
 
     &:hover:not(:disabled), &:active:not(:disabled), &.active {
-        @apply bg-gray-400;
+        @apply bg-gray-400 dark:bg-dark-750;
     }
 
     &:focus {
@@ -102,11 +124,11 @@ button {
     }
 
     &:active, &:focus:active {
-        @apply bg-gray-500;
+        @apply bg-gray-500 dark:bg-dark-800;
     }
 
     &:disabled {
-        @apply text-gray-600 opacity-75;
+        @apply text-gray-600 dark:text-dark-200 opacity-75;
     }
 }
 
@@ -142,9 +164,19 @@ button {
     height: 32px;
     width: 32px;
 
+    .dark & {
+        background: linear-gradient(180deg, theme(colors.dark.500), theme(colors.dark.550));
+        border-color: theme(colors.dark.400);
+    }
+
     &:hover:not(:disabled), &:active:not(:disabled) {
         background: linear-gradient(180deg, #f9fafb, #f4f6f8);
         border-color: #c4cdd5;
+
+        .dark & {
+            background: linear-gradient(180deg, theme(colors.dark.550), theme(colors.dark.600));
+            border-color: theme(colors.dark.500);
+        }
     }
 
     span {
@@ -158,7 +190,7 @@ button {
   ========================================================================== */
 
 .btn-group {
-    @apply flex items-center justify-start p-0;
+    @apply flex items-center justify-start p-0 cursor-auto;
     height: 2.375rem;
 
     button {
@@ -166,15 +198,15 @@ button {
     }
 
     button:not(:last-child):not(.active) {
-        @apply border-r-0;
+        @apply rtl:border-l-0 ltr:border-r-0;
     }
 
     button.active + button {
-        @apply border-l-0;
+        @apply rtl:border-r-0 ltr:border-l-0;
     }
 
     button:first-child {
-        @apply rounded-l;
+        @apply rtl:rounded-r ltr:rounded-l;
     }
 
     button.disabled {
@@ -182,9 +214,9 @@ button {
     }
 
     button:last-child {
-        @apply rounded-r border-l;
+        @apply rtl:rounded-l ltr:rounded-r rtl:border-r ltr:border-l;
         padding: .475rem .5rem;
-        &.btn-flat { @apply border-r-0; }
+        &.btn-flat { @apply rtl:border-l-0 ltr:border-r-0; }
     }
     .btn:focus {
         @apply ring-inset;
@@ -215,7 +247,7 @@ td .btn-icon {
 }
 
 .btn-with-icon .icon {
-    margin: -5px 7px 0 -3px;
+    margin: -5px 7px 0 -3px ; [dir="rtl"] & { margin: -5px -3px 0 7px ; }
     position: relative;
     top: 1px;
 }
@@ -224,7 +256,7 @@ td .btn-icon {
     @apply flex items-center;
 
     svg {
-        margin: 0 8px 0 -4px;
+        margin: 0 8px 0 -4px ; [dir="rtl"] & { margin: 0 -4px 0 8px ; }
         height: 16px;
         width: 16px;
 
@@ -247,14 +279,40 @@ td .btn-icon {
   ========================================================================== */
 
 .btn-close {
-    @apply ml-4 text-center p-0 text-xl text-gray-600 rounded-full w-8 h-8 outline-none shrink-0 leading-none inline-flex items-center justify-center;
+    @apply rtl:mr-4 ltr:ml-4 text-center p-0 text-xl text-gray-600 dark:text-dark-150 rounded-full w-8 h-8 outline-none shrink-0 leading-none inline-flex items-center justify-center;
 
     &:hover {
-        @apply bg-gray-400;
+        @apply bg-gray-400 dark:bg-dark-700;
     }
 
     &:active, &:focus:hover {
         outline: none;
-        @apply bg-gray-500;
+        @apply bg-gray-500 dark:bg-dark-750;
+    }
+}
+
+.btn-quick-action {
+    @apply text-center p-0 text-xl text-gray-600 dark:text-dark-150 rounded-full w-8 h-8 outline-none shrink-0 leading-none inline-flex items-center justify-center;
+
+    &:hover {
+        @apply bg-gray-400 dark:bg-dark-700;
+    }
+
+    &:active, &:focus:hover {
+        outline: none;
+        @apply bg-gray-500 dark:bg-dark-750;
+    }
+}
+
+.super-btn {
+    @apply p-4 flex items-start hover:bg-gray-200 border border-transparent rounded-md space-x-4 rtl:space-x-reverse;
+    @apply dark:hover:bg-dark-575 dark:hover:border-dark-400;
+
+    svg {
+        @apply h-8 w-8 text-gray-800 dark:text-dark-200;
+    }
+
+    h3 {
+        @apply mb-2 text-blue dark:text-blue-600;
     }
 }

@@ -4,7 +4,7 @@ namespace Statamic\Taxonomies;
 
 use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\Data\ExistsAsFile;
-use Statamic\Data\SyncsOriginalState;
+use Statamic\Data\HasDirtyState;
 use Statamic\Events\TermBlueprintFound;
 use Statamic\Events\TermCreated;
 use Statamic\Events\TermCreating;
@@ -22,7 +22,7 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Term implements TermContract
 {
-    use ExistsAsFile, FluentlyGetsAndSets, SyncsOriginalState;
+    use ExistsAsFile, FluentlyGetsAndSets, HasDirtyState;
 
     protected $taxonomy;
     protected $slug;
@@ -31,7 +31,6 @@ class Term implements TermContract
     protected $data;
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
-    protected $syncOriginalProperties = ['slug'];
 
     public function __construct()
     {
@@ -241,15 +240,27 @@ class Term implements TermContract
         return true;
     }
 
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
+    }
+
     public function delete()
     {
-        if (TermDeleting::dispatch($this) === false) {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        if ($withEvents && TermDeleting::dispatch($this) === false) {
             return false;
         }
 
         Facades\Term::delete($this);
 
-        TermDeleted::dispatch($this);
+        if ($withEvents) {
+            TermDeleted::dispatch($this);
+        }
 
         return true;
     }
@@ -280,6 +291,14 @@ class Term implements TermContract
         $this->inDefaultLocale()->set($key, $value);
 
         return $this;
+    }
+
+    public function getCurrentDirtyStateAttributes(): array
+    {
+        return array_merge([
+            'slug' => $this->slug(),
+            'taxonomy' => $this->taxonomyHandle(),
+        ], $this->data()->except(['updated_at'])->toArray());
     }
 
     public function __call($method, $args)

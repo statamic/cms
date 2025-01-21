@@ -23,10 +23,10 @@ abstract class Relationship extends Fieldtype
     protected $canSearch = false;
     protected $statusIcons = false;
     protected $taggable = false;
-    protected $defaultValue = [];
     protected $formComponentProps = [
         '_' => '_', // forces an object in js
     ];
+    protected $formStackSize;
 
     protected function configFieldItems(): array
     {
@@ -75,7 +75,7 @@ abstract class Relationship extends Fieldtype
                 'id' => method_exists($item, 'id') ? $item->id() : $item->handle(),
                 'title' => method_exists($item, 'title') ? $item->title() : $item->value('title'),
                 'edit_url' => $item->editUrl(),
-                'published' => $this->statusIcons ? $item->published() : null,
+                'published' => $this->statusIcons() ? $item->published() : null,
             ];
         });
     }
@@ -130,10 +130,11 @@ abstract class Relationship extends Fieldtype
             'canEdit' => $this->canEdit(),
             'canCreate' => $this->canCreate(),
             'canSearch' => $this->canSearch(),
-            'statusIcons' => $this->statusIcons,
-            'creatables' => $this->getCreatables(),
+            'statusIcons' => $this->statusIcons(),
+            'creatables' => $this->canCreate() ? $this->getCreatables() : [],
             'formComponent' => $this->getFormComponent(),
             'formComponentProps' => $this->getFormComponentProps(),
+            'formStackSize' => $this->getFormStackSize(),
             'taggable' => $this->getTaggable(),
             'initialSortColumn' => $this->initialSortColumn(),
             'initialSortDirection' => $this->initialSortDirection(),
@@ -163,6 +164,11 @@ abstract class Relationship extends Fieldtype
         return $this->canSearch;
     }
 
+    protected function statusIcons()
+    {
+        return $this->statusIcons;
+    }
+
     protected function getItemComponent()
     {
         return $this->itemComponent;
@@ -176,6 +182,11 @@ abstract class Relationship extends Fieldtype
     protected function getFormComponentProps()
     {
         return $this->formComponentProps;
+    }
+
+    protected function getFormStackSize()
+    {
+        return $this->formStackSize;
     }
 
     protected function getColumns()
@@ -225,6 +236,11 @@ abstract class Relationship extends Fieldtype
         return collect($values)->map(function ($id) {
             return $this->toItemArray($id);
         })->values();
+    }
+
+    public function getItemHint($item): ?string
+    {
+        return null;
     }
 
     abstract protected function toItemArray($id);

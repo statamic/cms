@@ -3,6 +3,7 @@
 namespace Tests\Data;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Data\ContainsData;
@@ -14,7 +15,7 @@ use Tests\TestCase;
 
 class HasAugmentedDataTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_makes_an_augmented_instance()
     {
         FieldtypeRepository::shouldReceive('find')->with('test')->andReturn($fieldtype = new class extends Fieldtype

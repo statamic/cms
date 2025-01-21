@@ -6,6 +6,7 @@ use ArrayObject;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Support\Arr;
 use stdClass;
 
@@ -831,12 +832,33 @@ trait TestsIlluminateArr
         $this->assertEquals([1 => 'hAz'], Arr::set($array, 1, 'hAz'));
     }
 
-    public function testShuffleWithSeed()
+    public function testShuffleProducesDifferentShuffles()
     {
-        $this->assertEquals(
-            Arr::shuffle(range(0, 100, 10), 1234),
-            Arr::shuffle(range(0, 100, 10), 1234)
+        $input = range('a', 'z');
+
+        $this->assertFalse(
+            Arr::shuffle($input) === Arr::shuffle($input) && Arr::shuffle($input) === Arr::shuffle($input),
+            "The shuffles produced the same output each time, which shouldn't happen."
         );
+    }
+
+    public function testShuffleActuallyShuffles()
+    {
+        $input = range('a', 'z');
+
+        $this->assertFalse(
+            Arr::shuffle($input) === $input && Arr::shuffle($input) === $input,
+            "The shuffles were unshuffled each time, which shouldn't happen."
+        );
+    }
+
+    public function testShuffleKeepsSameValues()
+    {
+        $input = range('a', 'z');
+        $shuffled = Arr::shuffle($input);
+        sort($shuffled);
+
+        $this->assertEquals($input, $shuffled);
     }
 
     public function testEmptyShuffle()

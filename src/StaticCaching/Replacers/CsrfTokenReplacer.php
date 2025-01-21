@@ -5,6 +5,7 @@ namespace Statamic\StaticCaching\Replacers;
 use Illuminate\Http\Response;
 use Statamic\Facades\StaticCache;
 use Statamic\StaticCaching\Replacer;
+use Statamic\Support\Str;
 
 class CsrfTokenReplacer implements Replacer
 {
@@ -20,7 +21,7 @@ class CsrfTokenReplacer implements Replacer
             return;
         }
 
-        if (! str_contains($content, $token)) {
+        if (! Str::contains($content, $token)) {
             return;
         }
 

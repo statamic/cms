@@ -2,23 +2,28 @@
 
 namespace Statamic\Console\Commands;
 
-use Facades\Statamic\StarterKits\Exporter as StarterKitExporter;
 use Illuminate\Console\Command;
+use Statamic\Console\Commands\Concerns\MigratesLegacyStarterKitConfig;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\StarterKits\Exceptions\StarterKitException;
+use Statamic\StarterKits\Exporter as StarterKitExporter;
+
+use function Laravel\Prompts\confirm;
 
 class StarterKitExport extends Command
 {
-    use RunsInPlease;
+    use MigratesLegacyStarterKitConfig, RunsInPlease;
 
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'statamic:starter-kit:export { path : Specify the path you are exporting to }';
+    protected $signature = 'statamic:starter-kit:export
+        { path : Specify the path you are exporting to }
+        { --clear : Clear out everything at target export path before exporting }';
 
     /**
      * The console command description.
@@ -32,51 +37,36 @@ class StarterKitExport extends Command
      */
     public function handle()
     {
-        if (! File::exists(base_path('starter-kit.yaml'))) {
-            return $this->askToStubStarterKitConfig();
-        }
+        $path = $this->getAbsolutePath();
 
-        if (! File::exists($path = $this->getAbsolutePath())) {
+        $this->migrateLegacyConfig($path);
+
+        if (! File::exists($path)) {
             $this->askToCreateExportPath($path);
         }
 
+        $exporter = (new StarterKitExporter($path))
+            ->clear($this->option('clear'));
+
         try {
-            StarterKitExporter::export($path);
+            $exporter->export();
         } catch (StarterKitException $exception) {
-            $this->error($exception->getMessage());
+            $this->components->error($exception->getMessage());
 
             return 1;
         }
 
-        $this->info("Starter kit was successfully exported to [$path].");
-    }
-
-    /**
-     * Ask to stub out starter kit config.
-     */
-    protected function askToStubStarterKitConfig()
-    {
-        $stubPath = __DIR__.'/stubs/starter-kits/starter-kit.yaml.stub';
-        $newPath = base_path($config = 'starter-kit.yaml');
-
-        if ($this->input->isInteractive()) {
-            if (! $this->confirm("Config [{$config}] does not exist. Would you like to create it now?", true)) {
-                return;
-            }
+        if (version_compare(app()->version(), '11', '<')) {
+            return $this->components->info("Starter kit was successfully exported to [$path].");
         }
 
-        File::copy($stubPath, $newPath);
-
-        $this->comment("A new config has been created at [{$config}].");
-        $this->comment('Please configure your `export_paths` and re-run to begin your export!');
+        $this->components->success("Starter kit was successfully exported to [$path].");
     }
 
     /**
      * Get absolute path.
-     *
-     * @return string
      */
-    protected function getAbsolutePath()
+    protected function getAbsolutePath(): string
     {
         $path = $this->argument('path');
 
@@ -87,19 +77,17 @@ class StarterKitExport extends Command
 
     /**
      * Ask to create export path.
-     *
-     * @param  string  $path
      */
-    protected function askToCreateExportPath($path)
+    protected function askToCreateExportPath(string $path): void
     {
         if ($this->input->isInteractive()) {
-            if (! $this->confirm("Path [{$path}] does not exist. Would you like to create it now?", true)) {
+            if (! confirm("Path [{$path}] does not exist. Would you like to create it now?", true)) {
                 return;
             }
         }
 
         File::makeDirectory($path, 0755, true);
 
-        $this->comment("A new directory has been created at [{$path}].");
+        $this->components->info("A new directory has been created at [{$path}].");
     }
 }

@@ -3,8 +3,8 @@
 namespace Tests\Feature\Taxonomies;
 
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -14,7 +14,7 @@ class TermEntriesTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_gets_and_counts_entries_for_a_term_across_collections()
     {
         Taxonomy::make('colors')->save();
@@ -49,7 +49,7 @@ class TermEntriesTest extends TestCase
         $this->assertEquals(['cheetah'], Term::find('colors::yellow')->term()->entries()->map->slug()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_counts_entries_for_a_term_for_a_single_collection()
     {
         Taxonomy::make('colors')->save();
@@ -96,13 +96,13 @@ class TermEntriesTest extends TestCase
         $this->assertEquals([], Term::find('colors::yellow')->term()->collection($clothes)->entries()->map->slug()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_counts_entries_for_a_localized_term_across_collections()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['locale' => 'en_US', 'name' => 'English', 'url' => '/'],
             'fr' => ['locale' => 'fr_FR', 'name' => 'French', 'url' => '/fr/'],
-        ]]);
+        ]);
 
         Taxonomy::make('colors')->save();
         tap(Term::make()->taxonomy('colors'), function ($term) {
@@ -160,13 +160,13 @@ class TermEntriesTest extends TestCase
         $this->assertEquals(['cheetah', 'guepard'], Term::find('colors::yellow')->term()->entries()->map->slug()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_counts_entries_for_a_localized_term_for_a_single_collection()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['locale' => 'en_US', 'name' => 'English', 'url' => '/'],
             'fr' => ['locale' => 'fr_FR', 'name' => 'French', 'url' => '/fr/'],
-        ]]);
+        ]);
 
         Taxonomy::make('colors')->save();
         tap(Term::make()->taxonomy('colors'), function ($term) {

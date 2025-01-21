@@ -2,42 +2,45 @@
 
     <div class="blueprint-section-field" :class="widthClass">
         <div class="blueprint-section-field-inner">
-            <div class="blueprint-drag-handle w-4 border-r"></div>
+            <div class="blueprint-drag-handle"></div>
             <div class="flex flex-1 items-center justify-between">
-                <div class="flex items-center flex-1 pr-4 py-2 pl-2">
-                    <svg-icon class="text-gray-800 mr-2 h-4 w-4 flex-none" :name="field.icon.startsWith('<svg') ? field.icon : `light/${field.icon}`" v-tooltip="tooltipText" default="light/generic-field" />
+                <div class="flex items-center flex-1 rtl:pl-4 ltr:pr-4 py-2 rtl:pr-2 ltr:pl-2">
+                    <svg-icon class="text-gray-800 dark:text-dark-150 rtl:ml-2 ltr:mr-2 h-4 w-4 flex-none" :name="field.icon.startsWith('<svg') ? field.icon : `light/${field.icon}`" v-tooltip="tooltipText" default="light/generic-field" />
                     <a class="break-all" v-text="__(labelText)" @click="$emit('edit')" />
-                    <svg-icon name="light/hyperlink" v-if="isReferenceField" class="text-gray-600 text-3xs ml-2 h-4 w-4" v-tooltip="__('Imported from fieldset') + ': ' + field.field_reference" />
+                    <svg-icon name="light/hyperlink" v-if="isReferenceField" class="text-gray-600 dark:text-dark-175 text-3xs rtl:mr-2 ltr:ml-2 h-4 w-4" v-tooltip="__('Imported from fieldset') + ': ' + field.field_reference" />
                 </div>
-                <div class="flex-none pr-2 flex">
-                    <width-selector v-if="!isHidden" v-model="width" class="mr-2" />
+                <div class="flex-none rtl:pl-2 ltr:pr-2 flex">
+                    <width-selector v-if="!isHidden" v-model="width" class="rtl:ml-2 ltr:mr-2" />
 
-                    <div v-else class="relative border border-gray-400 opacity-50 w-12 flex items-center justify-center mr-2">
+                    <div v-else class="relative border border-gray-400 dark:border-dark-200 opacity-50 w-12 flex items-center justify-center rtl:ml-2 ltr:mr-2">
                         <svg-icon name="regular/hidden" class="h-4 w-4 opacity-50"></svg-icon>
                     </div>
 
                     <button v-if="canDefineLocalizable"
-                        class="hover:text-gray-950 mr-2 flex items-center"
-                        :class="{ 'text-gray-950': localizable, 'text-gray-600': !localizable }"
+                        class="hover:text-gray-950 dark:hover:text-dark-100 rtl:ml-2 ltr:mr-2 flex items-center"
+                        :class="{ 'text-gray-950 dark:text-dark-150': localizable, 'text-gray-600 dark:text-dark-200': !localizable }"
                         v-tooltip="__('Localizable')"
                         @click="localizable = !localizable"
                     >
                         <svg-icon name="light/earth" class="h-4 w-4" />
                     </button>
-                    <button @click.prevent="$emit('duplicate')" class="text-gray-600 hover:text-gray-950 flex items-center mr-2" v-tooltip="__('Duplicate')">
+                    <button @click.prevent="$emit('duplicate')" class="text-gray-600 dark:text-dark-150 hover:text-gray-950 dark:hover:text-dark-100 flex items-center rtl:ml-2 ltr:mr-2" v-tooltip="__('Duplicate')">
                         <svg-icon name="light/duplicate" class="h-4 w-4" />
                     </button>
-                    <button @click.prevent="$emit('deleted')" class="text-gray-600 hover:text-gray-950 flex items-center" v-tooltip="__('Remove')">
+                    <button @click.prevent="$emit('deleted')" class="text-gray-600 dark:text-dark-150 hover:text-gray-950 dark:hover:text-dark-100 flex items-center" v-tooltip="__('Remove')">
                         <svg-icon name="micro/trash" class="h-4 w-4" />
                     </button>
                     <stack name="field-settings" v-if="isEditing" @closed="editorClosed">
                         <field-settings
                             ref="settings"
+                            :id="field._id"
                             :type="field.fieldtype"
                             :root="isRoot"
+                            :fields="fields"
                             :config="fieldConfig"
                             :overrides="field.config_overrides || []"
                             :suggestable-condition-fields="suggestableConditionFields"
+                            :is-inside-set="isInsideSet"
                             @committed="settingsUpdated"
                             @closed="editorClosed"
                         />
@@ -67,6 +70,10 @@ export default {
     props: [
         'suggestableConditionFields'
     ],
+
+    inject: {
+        isInsideSet: { default: false },
+    },
 
      data() {
         return {

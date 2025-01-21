@@ -2,6 +2,7 @@
 
 namespace Tests\Stache;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Stache\Stache;
 use Statamic\Stache\Stores\AggregateStore;
 use Statamic\Stache\Stores\ChildStore;
@@ -22,7 +23,7 @@ class AggregateStoreTest extends TestCase
         $this->store = new TestAggregateStore;
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_sets_child_stores()
     {
         $this->assertEquals([], $this->store->stores()->all());

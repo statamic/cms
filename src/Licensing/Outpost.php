@@ -9,10 +9,15 @@ use GuzzleHttp\Exception\RequestException;
 use Illuminate\Cache\NoLock;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\LockTimeoutException;
+use Illuminate\Contracts\Encryption\DecryptException;
+use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
+use RuntimeException;
 use Statamic\Facades;
+use Statamic\Facades\Addon;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 
@@ -72,6 +77,10 @@ class Outpost
 
     private function performRequest()
     {
+        if ($this->usingLicenseKeyFile()) {
+            return $this->licenseKeyFileResponse();
+        }
+
         $response = $this->client->request('POST', self::ENDPOINT, [
             'headers' => ['accept' => 'application/json'],
             'json' => $this->payload(),
@@ -79,6 +88,27 @@ class Outpost
         ]);
 
         return json_decode($response->getBody()->getContents(), true);
+    }
+
+    private function licenseKeyFileResponse()
+    {
+        try {
+            $encrypter = new Encrypter(config('statamic.system.license_key'));
+            $decrypted = $encrypter->decrypt(File::get($this->licenseKeyPath()));
+            $response = collect(json_decode($decrypted, true));
+        } catch (DecryptException|RuntimeException $e) {
+            return ['error' => 500];
+        }
+
+        return $response->put('packages', collect($response['packages'])->merge(
+            Addon::all()
+                ->reject(fn ($addon) => array_key_exists($addon->package(), $response['packages']))
+                ->mapWithKeys(fn ($addon) => [$addon->package() => [
+                    'valid' => ! $addon->isCommercial(),
+                    'exists' => $addon->existsOnMarketplace(),
+                    'version_limit' => null,
+                ]])
+        ))->toArray();
     }
 
     public function payload()
@@ -91,6 +121,7 @@ class Outpost
             'statamic_version' => Statamic::version(),
             'statamic_pro' => Statamic::pro(),
             'php_version' => PHP_VERSION,
+            'laravel_version' => app()->version(),
             'packages' => $this->packagePayload(),
         ];
     }
@@ -128,7 +159,7 @@ class Outpost
 
     private function payloadHasChanged($previous, $current)
     {
-        $exclude = ['ip'];
+        $exclude = ['ip', 'php_version'];
 
         return Arr::except($previous, $exclude) !== Arr::except($current, $exclude);
     }
@@ -200,5 +231,15 @@ class Outpost
         return $this->cache()->getStore() instanceof LockProvider
             ? $this->cache()->lock($key, $seconds)
             : new NoLock($key, $seconds);
+    }
+
+    public function usingLicenseKeyFile()
+    {
+        return File::exists($this->licenseKeyPath());
+    }
+
+    private function licenseKeyPath()
+    {
+        return storage_path('license.key');
     }
 }

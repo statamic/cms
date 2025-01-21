@@ -5,6 +5,7 @@ namespace Statamic;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Vite;
 use Laravel\Nova\Nova;
@@ -15,6 +16,7 @@ use Statamic\Modifiers\Modify;
 use Statamic\Support\Arr;
 use Statamic\Support\DateFormat;
 use Statamic\Support\Str;
+use Statamic\Support\TextDirection;
 use Statamic\Tags\FluentTag;
 use Stringy\StaticStringy;
 
@@ -48,17 +50,7 @@ class Statamic
 
     public static function enablePro()
     {
-        $path = config_path('statamic/editions.php');
-
-        $contents = File::get($path);
-
-        if (! Str::contains($contents, "'pro' => false,")) {
-            throw new \Exception('Could not reliably update the config file.');
-        }
-
-        $contents = str_replace("'pro' => false,", "'pro' => true,", $contents);
-
-        File::put($path, $contents);
+        Artisan::call('statamic:pro:enable', ['--update-config' => true]);
     }
 
     public static function availableScripts(Request $request)
@@ -217,7 +209,7 @@ class Statamic
             return false;
         }
 
-        return starts_with(request()->path(), config('statamic.api.route'));
+        return Str::startsWith(request()->path(), config('statamic.api.route'));
     }
 
     public static function apiRoute($route, $params = [])
@@ -250,15 +242,18 @@ class Statamic
         return new static;
     }
 
-    public static function svg($name, $attrs = null)
+    public static function svg($name, $attrs = null, $fallback = null)
     {
         if ($attrs) {
             $attrs = " class=\"{$attrs}\"";
         }
 
-        $svg = StaticStringy::collapseWhitespace(
-            File::get(statamic_path("resources/svg/{$name}.svg"))
-        );
+        $path = statamic_path("resources/svg/{$name}.svg");
+        if ($fallback && ! File::exists($path)) {
+            $path = statamic_path("resources/svg/{$fallback}.svg");
+        }
+
+        $svg = StaticStringy::collapseWhitespace(File::get($path));
 
         return str_replace('<svg', sprintf('<svg%s', $attrs), $svg);
     }
@@ -346,7 +341,9 @@ class Statamic
 
     public static function crumb(...$values)
     {
-        return implode(' ‹ ', array_map(fn ($str) => Statamic::trans($str), $values));
+        $arrow = Statamic::cpDirection() === 'ltr' ? ' ‹ ' : ' › ';
+
+        return implode($arrow, array_map(fn ($str) => Statamic::trans($str), $values));
     }
 
     public static function docsUrl($url)
@@ -449,16 +446,26 @@ class Statamic
             // In case a file without any version will be passed,
             // a random version number will be created.
             if (! Str::contains($path, '?v=')) {
-                $version = str_random();
+                $version = Str::random();
 
                 // Add the file extension if not provided.
-                $path = str_finish($path, ".{$extension}");
+                $path = Str::finish($path, ".{$extension}");
 
                 // Add the version to the path.
-                $path = str_finish($path, "?v={$version}");
+                $path = Str::finish($path, "?v={$version}");
             }
 
             return $path;
         });
+    }
+
+    public static function cpLocale(): string
+    {
+        return config('app.locale');
+    }
+
+    public static function cpDirection()
+    {
+        return TextDirection::of(static::cpLocale());
     }
 }

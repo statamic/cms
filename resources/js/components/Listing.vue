@@ -35,25 +35,71 @@ export default {
             sortColumn: this.initialSortColumn,
             sortDirection: this.initialSortDirection,
             meta: null,
+            pushQuery: false,
+            popping: false,
         }
     },
 
     computed: {
 
-        parameters() {
-            return Object.assign({
-                sort: this.sortColumn,
-                order: this.sortDirection,
-                page: this.page,
-                perPage: this.perPage,
-                search: this.searchQuery,
-                filters: this.activeFilterParameters,
-                columns: this.visibleColumns.map(column => column.field).join(','),
-            }, this.additionalParameters);
+        parameterMap()  {
+            return {
+                sort: 'sortColumn',
+                order: 'sortDirection',
+                page: 'page',
+                perPage: 'perPage',
+                search: 'searchQuery',
+                filters: 'activeFilterParameters',
+                columns: 'visibleColumnParameters',
+            };
         },
 
-        activeFilterParameters() {
-            return utf8btoa(JSON.stringify(this.activeFilters));
+        parameters:  {
+            get() {
+                const parameters = Object.fromEntries(Object.entries(this.parameterMap)
+                    .map(([key, prop]) => {
+                        return [key, this[prop]];
+                    })
+                    .filter(([key, value]) => {
+                        return value !== null && value !== undefined && value !== '';
+                    }));
+                return {
+                    ...parameters,
+                    ...this.additionalParameters,
+                };
+            },
+            set(value) {
+                Object.entries(this.parameterMap)
+                    .forEach(([key, prop]) => {
+                        if (value.hasOwnProperty(key)) {
+                            this[prop] = value[key];
+                        }
+                    });
+            },
+        },
+
+        activeFilterParameters: {
+            get() {
+                if (_.isEmpty(this.activeFilters)) {
+                    return null;
+                }
+                return utf8btoa(JSON.stringify(this.activeFilters));
+            },
+            set(value) {
+                this.activeFilters = JSON.parse(utf8atob(value));
+            },
+        },
+
+        visibleColumnParameters: {
+            get() {
+                if (_.isEmpty(this.visibleColumns)) {
+                    return null;
+                }
+                return this.visibleColumns.map(column => column.field).join(',');
+            },
+            set(value) {
+                this.visibleColumns = value.split(',').map(field => this.columns.find(column => column.field === field));
+            },
         },
 
         additionalParameters() {
@@ -73,7 +119,21 @@ export default {
 
     created() {
         this.autoApplyFilters(this.filters);
+        this.autoApplyState();
         this.request();
+    },
+
+    mounted() {
+        if (this.pushQuery) {
+            window.history.replaceState({ parameters: this.parameters }, '');
+            window.addEventListener('popstate', this.popState);
+        }
+    },
+
+    beforeDestroy() {
+        if (this.pushQuery) {
+            window.removeEventListener('popstate', this.popState);
+        }
     },
 
     watch: {
@@ -87,6 +147,7 @@ export default {
 
                 if (JSON.stringify(before) === JSON.stringify(after)) return;
                 this.request();
+                this.pushState();
             }
         },
 
@@ -102,6 +163,7 @@ export default {
             this.sortDirection = null;
             this.resetPage();
             this.request();
+            this.pushState();
         }
 
     },
@@ -154,6 +216,43 @@ export default {
             let i = _.indexOf(this.rows, _.findWhere(this.rows, { id }));
             this.rows.splice(i, 1);
             if (this.rows.length === 0) location.reload();
+        },
+
+        popState(event) {
+            if (!this.pushQuery || !event.state) {
+                return;
+            }
+            this.popping = true;
+            this.parameters = event.state.parameters;
+            this.$nextTick(() => {
+                this.popping = false;
+            });
+        },
+
+        pushState() {
+            if (!this.pushQuery || this.popping) {
+                return;
+            }
+            const parameters = this.parameters;
+            const keys = Object.keys(this.parameterMap);
+            // This ensures no additionalParameters are added to the URL
+            const searchParams = new URLSearchParams(Object.fromEntries(keys
+                .filter(key => parameters.hasOwnProperty(key))
+                .map(key => [key, parameters[key]])));
+            window.history.pushState({ parameters }, '', '?' + searchParams.toString());
+        },
+
+        autoApplyState() {
+            if (!this.pushQuery || !window.location.search) {
+                return;
+            }
+            const searchParams = new URLSearchParams(window.location.search);
+            const parameters = Object.fromEntries(searchParams.entries());
+            this.popping = true;
+            this.parameters = parameters;
+            this.$nextTick(() => {
+                this.popping = false;
+            });
         },
 
     }

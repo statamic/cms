@@ -1,5 +1,9 @@
 .v-select {
 	@apply rounded min-w-0 relative font-sans;
+
+    [dir='rtl'] & {
+        direction: rtl;
+    }
 }
 
 .vs__fade-enter-active,
@@ -13,7 +17,6 @@
 }
 
 .vs--disabled .vs__clear,
-.vs--disabled .vs__deselect,
 .vs--disabled .vs__dropdown-toggle,
 .vs--disabled .vs__open-indicator,
 .vs--disabled .vs__search,
@@ -22,7 +25,7 @@
 }
 
 .vs--disabled .vs__dropdown-toggle {
-	@apply bg-gray-200;
+	@apply bg-gray-200 dark:bg-dark-550;
 }
 
 .v-select[dir=rtl] .vs__actions {
@@ -44,7 +47,8 @@
 }
 
 .vs__dropdown-toggle {
-	@apply appearance-none text-gray-800 w-full p-0 rounded flex items-center bg-gray-100 shadow-inner border border-gray-500;
+	@apply appearance-none text-gray-800  w-full p-0 rounded flex items-center bg-gray-100 shadow-inner border border-gray-500;
+    @apply dark:text-dark-150 dark:bg-dark-650 dark:border-dark-900 dark:shadow-inner-dark;
     height: 2.375rem;
     transition: border-color .15s ease-in-out,
                 box-shadow .15s ease-in-out;
@@ -67,8 +71,8 @@
 }
 
 .v-select .vs__selected-options {
-	@apply appearance-none text-gray-800 text-sm;
-	@apply flex basis-1 grow rounded-l relative h-full py-1 pl-2 leading-normal;
+	@apply appearance-none text-gray-800 dark:text-dark-150 text-sm;
+    @apply flex basis-1 grow rounded-s relative h-full py-1 rtl:pr-2 ltr:pl-2 leading-normal;
 	width: calc(100% - 32px);
 
     transition: border-color .15s ease-in-out,
@@ -81,12 +85,12 @@
 
 .vs--single.vs--unsearchable .vs__selected-options {
 	@apply clickable;
-	@apply flex flex-1 rounded-l relative h-full border-0;
+    @apply flex flex-1 rounded-s relative h-full border-0;
 	width: calc(100% - 34px);
 }
 
 .vs__actions {
-	@apply flex items-center rounded-r;
+    @apply flex items-center rounded-e;
     height: 2.375rem;
 }
 
@@ -100,12 +104,12 @@
 
 .vs__open-indicator {
 	@apply clickable;
-	@apply flex items-center rounded-r px-2 text-sm shrink-0 h-full border-r-0;
+    @apply flex items-center rounded-e px-2 text-sm shrink-0 h-full border-e-0 dark:border-dark-800;
 	/* height: 2.375rem; */
 }
 
 .vs__open-indicator svg {
-	@apply flex items-center text-gray-900 relative w-4 h-4;
+	@apply flex items-center text-gray-900 dark:text-dark-100 relative w-4 h-4;
 	transform: translateY(1px) scale(1);
 	transition: -webkit-transform .15s cubic-bezier(1, -.115, .975, .855);
 	transition: transform .15s cubic-bezier(1, -.115, .975, .855);
@@ -123,7 +127,7 @@
 }
 
 .vs__clear {
-	@apply text-gray-900 pr-2 pl-px @xs:pl-2 cursor-pointer text-base bg-transparent shadow-none;
+	@apply text-gray-900 dark:text-dark-100 rtl:pl-2 ltr:pr-2 rtl:pr-px ltr:pl-px rtl:@xs:pr-2 ltr:@xs:pl-2 cursor-pointer text-base bg-transparent shadow-none;
 	&:hover {
 		@apply text-blue;
 	}
@@ -131,15 +135,18 @@
 
 .vs__dropdown-menu {
 	@apply block absolute z-top m-0 w-full;
-	@apply bg-white flex flex-col shadow-popover block p-4 rounded-md text-left;
+	@apply bg-white dark:bg-dark-550 flex flex-col shadow-popover dark:shadow-dark-popover block p-4 rounded-md rtl:text-right ltr:text-left;
 	top: 46px;
-	left: 0;
 	padding: 0;
 	max-height: 350px;
 	min-width: 160px;
 	overflow-y: auto;
-	text-align: left;
+	@apply ltr:text-left rtl:text-right;
 	list-style: none;
+
+    .v-select & {
+        @apply ltr:left-0 rtl:right-0;
+    }
 }
 
 .vs__no-options {
@@ -147,12 +154,12 @@
 }
 
 .vs__dropdown-option {
-    @apply block text-sm text-gray-800 cursor-pointer;
+    @apply block text-sm text-gray-800 dark:text-dark-100 cursor-pointer;
 	padding: 6px 12px;
 }
 
 .vs__dropdown-option--highlight {
-    @apply bg-gray-300;
+    @apply bg-gray-300 dark:bg-dark-blue-200;
 }
 
 .vs__dropdown-option--selected {
@@ -162,16 +169,23 @@
 
 .v-select:not(.vs--single) .vs__selected {
 	@apply clickable;
-	@apply flex items-center text-sm rounded py-0 px-2 mr-2;
+	@apply flex items-center text-sm rounded py-0 px-2 rtl:ml-2 ltr:mr-2;
 
-    &.sortable-item { @apply cursor-grab; }
+    &.sortable-item { @apply !cursor-grab; }
+
+    &.invalid {
+        @apply border-red-300 dark:border-dark-red bg-red-100 dark:bg-red-400 text-red-500 dark:text-red-950;
+        background-image: none;
+
+        .vs__deselect { @apply text-red-500 dark:text-red-950 }
+    }
 }
 
 .vs__deselect {
-	@apply flex items-center cursor-pointer text-gray-600 ml-1 p-0 outline-none;
+	@apply flex items-center cursor-pointer text-gray-600 dark:text-dark-175 rtl:mr-1 ltr:ml-1 p-0 outline-none;
 
 	&:hover {
-		@apply text-gray-700;
+		@apply text-gray-700 dark:text-dark-100;
 	}
 
 	&:focus {
@@ -212,7 +226,7 @@
 
 .vs__search,
 .vs__search:focus {
-	@apply appearance-none text-sm text-gray-800 pr-2 border-transparent outline-none m-0 p-0 bg-transparent max-w-full;
+	@apply appearance-none text-sm text-gray-800 dark:text-dark-150 rtl:pl-2 ltr:pr-2 border-transparent outline-none m-0 p-0 bg-transparent max-w-full;
 	line-height: 1.4;
 	border-left: none;
 	box-shadow: none;

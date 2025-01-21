@@ -2,6 +2,7 @@
 
 namespace Tests\Tags;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Field;
 use Statamic\Fields\Value;
 use Statamic\Tags\Context;
@@ -48,7 +49,7 @@ class ContextTest extends TestCase
         ]));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_all_items()
     {
         $this->assertSame([
@@ -65,7 +66,7 @@ class ContextTest extends TestCase
         ], $this->context->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_value()
     {
         $this->assertEquals('hello', $this->context->get('string'));
@@ -93,7 +94,7 @@ class ContextTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_raw_values()
     {
         $this->assertSame('hello', $this->context->raw('string'));
@@ -104,7 +105,7 @@ class ContextTest extends TestCase
         $this->assertSame('fallback', $this->context->raw('unknown', 'fallback'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_an_augmented_value()
     {
         $this->assertSame('hello', $this->context->value('string'));
@@ -113,21 +114,21 @@ class ContextTest extends TestCase
         $this->assertSame('augmented dont parse {{ string }} antlers', $this->context->value('nonAntlersValue'));
     }
 
-    /** @test */
+    #[Test]
     public function unknown_keys_use_a_default_value()
     {
         $this->assertNull($this->context->get('unknown'));
         $this->assertEquals('fallback', $this->context->get('unknown', 'fallback'));
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_existence()
     {
         $this->assertTrue($this->context->has('string'));
         $this->assertFalse($this->context->has('unknown'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_first_parameter_that_exists()
     {
         $this->assertEquals('hello', $this->context->get(['string']));
@@ -136,7 +137,7 @@ class ContextTest extends TestCase
         $this->assertEquals('fallback', $this->context->get(['unknown', 'another_unknown'], 'fallback'));
     }
 
-    /** @test */
+    #[Test]
     public function it_forgets_keys()
     {
         $this->assertEquals('hello', $this->context->get('string'));
@@ -146,7 +147,7 @@ class ContextTest extends TestCase
         $this->assertNull($this->context->get('string'));
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_array_access()
     {
         $this->assertEquals('hello', $this->context->get('string'));
@@ -164,7 +165,7 @@ class ContextTest extends TestCase
         $this->assertNull($this->context->get('new'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_an_exploded_list()
     {
         $this->assertEquals(['one', 'two'], $this->context->explode('list'));
@@ -173,7 +174,7 @@ class ContextTest extends TestCase
         $this->assertEquals('fallback', $this->context->explode('unknown', 'fallback'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_boolean()
     {
         $this->assertTrue($this->context->bool('true'));
@@ -184,7 +185,7 @@ class ContextTest extends TestCase
         $this->assertEquals('fallback', $this->context->bool('unknown', 'fallback'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_an_integer()
     {
         $this->assertEquals(7, $this->context->int('integer'));
@@ -194,7 +195,7 @@ class ContextTest extends TestCase
         $this->assertEquals('fallback', $this->context->int('unknown', 'fallback'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_float()
     {
         $this->assertSame(123.456, $this->context->float('float'));
@@ -204,7 +205,7 @@ class ContextTest extends TestCase
         $this->assertSame('fallback', $this->context->float('unknown', 'fallback'));
     }
 
-    /** @test */
+    #[Test]
     public function it_is_iterable()
     {
         $expected = [

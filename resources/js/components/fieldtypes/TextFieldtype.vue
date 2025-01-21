@@ -14,6 +14,7 @@
         :placeholder="__(config.placeholder)"
         :name="name"
         :id="fieldId"
+        :direction="config.direction"
         @input="inputUpdated"
         @focus="$emit('focus')"
         @blur="$emit('blur')"

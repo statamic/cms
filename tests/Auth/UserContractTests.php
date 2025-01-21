@@ -5,10 +5,15 @@ namespace Tests\Auth;
 use BadMethodCallException;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\File\Role;
 use Statamic\Auth\File\UserGroup;
+use Statamic\Events\UserSaved;
+use Statamic\Events\UserSaving;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
 use Statamic\Fields\Fieldtype;
@@ -42,19 +47,19 @@ trait UserContractTests
         return $user;
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_email()
     {
         $this->assertEquals('john@example.com', $this->user()->email());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_email_as_property()
     {
         $this->assertEquals('john@example.com', $this->user()->email);
     }
 
-    /** @test */
+    #[Test]
     public function gets_the_name()
     {
         $this->assertEquals('John', $this->makeUser()->set('name', 'John')->name());
@@ -64,7 +69,7 @@ trait UserContractTests
         $this->assertEquals('john@example.com', $this->makeUser()->remove('name')->email('john@example.com')->name());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_data()
     {
         $this->assertEquals(array_merge([
@@ -82,7 +87,7 @@ trait UserContractTests
         ], $this->additionalDataValues()), $this->user()->data()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_custom_computed_data()
     {
         Facades\User::computed('balance', function ($user) {
@@ -107,13 +112,13 @@ trait UserContractTests
         $this->assertEquals($expectedValues['balance'], $user->value('balance'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_empty_computed_data_by_default()
     {
         $this->assertEquals([], $this->user()->computedData()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_recursively_get_computed_data_when_callback_uses_value_method()
     {
         Facades\User::computed('balance', function ($user) {
@@ -125,7 +130,7 @@ trait UserContractTests
         $this->assertEquals('Han Solo\'s balance is $25 owing.', $user->value('balance'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_use_actual_data_to_compose_computed_data()
     {
         Facades\User::computed('nickname', function ($user, $value) {
@@ -146,11 +151,8 @@ trait UserContractTests
         return [];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider queryBuilderProvider
-     **/
+    #[Test]
+    #[DataProvider('queryBuilderProvider')]
     public function it_has_magic_property_and_methods_for_fields_that_augment_to_query_builders($builder)
     {
         $builder->shouldReceive('get')->times(2)->andReturn('query builder results');
@@ -186,7 +188,7 @@ trait UserContractTests
         ];
     }
 
-    /** @test */
+    #[Test]
     public function calling_unknown_method_throws_exception()
     {
         $this->expectException(BadMethodCallException::class);
@@ -195,7 +197,7 @@ trait UserContractTests
         $this->user()->thisFieldDoesntExist();
     }
 
-    /** @test */
+    #[Test]
     public function it_converts_to_an_array()
     {
         $fieldtype = new class extends Fieldtype
@@ -247,7 +249,7 @@ trait UserContractTests
         $this->assertEquals($keys, array_keys($array), 'toArray keys differ from selectedQueryColumns');
     }
 
-    /** @test */
+    #[Test]
     public function only_requested_relationship_fields_are_included_in_to_array()
     {
         $regularFieldtype = new class extends Fieldtype
@@ -292,25 +294,25 @@ trait UserContractTests
         ], Arr::only($user->selectedQueryRelations(['charlie'])->toArray(), ['alfa', 'bravo', 'charlie']));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_id()
     {
         $this->assertEquals('123', $this->user()->id());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_initials_from_name()
     {
         $this->assertEquals('JS', $this->user()->initials());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_initials_from_name_with_no_surname()
     {
         $this->assertEquals('J', $this->user()->set('name', 'John')->initials());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_initials_from_email_if_name_doesnt_exist()
     {
         $user = $this->user()->remove('name');
@@ -318,7 +320,7 @@ trait UserContractTests
         $this->assertEquals('J', $user->initials());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_avatar_from_gravatar_if_config_allows()
     {
         config(['statamic.users.avatars' => 'gravatar']);
@@ -337,13 +339,13 @@ trait UserContractTests
         $this->assertNull($this->user()->avatar());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_preferred_locale()
     {
         $this->assertEquals('en', $this->user()->preferredLocale());
     }
 
-    /** @test */
+    #[Test]
     public function it_encrypts_a_password()
     {
         $user = $this->user();
@@ -357,7 +359,7 @@ trait UserContractTests
         $this->assertTrue(Hash::check('secret', $user->password()));
     }
 
-    /** @test */
+    #[Test]
     public function it_encrypts_a_password_when_set_through_data()
     {
         $user = $this->user();
@@ -375,7 +377,7 @@ trait UserContractTests
         $this->assertArrayNotHasKey('password', $user->data());
     }
 
-    /** @test */
+    #[Test]
     public function it_provides_email_field_fallback_in_blueprint()
     {
         $blueprint = Blueprint::make();
@@ -386,7 +388,7 @@ trait UserContractTests
         $this->assertEquals('email', $this->user()->blueprint()->fields()->get('email')->get('input_type'));
     }
 
-    /** @test */
+    #[Test]
     public function it_allows_email_field_customizations_in_blueprint()
     {
         $blueprint = Blueprint::makeFromFields(['email' => ['display' => 'Custom Email Display']]);
@@ -397,7 +399,7 @@ trait UserContractTests
         $this->assertEquals('email', $this->user()->blueprint()->fields()->get('email')->get('input_type'));
     }
 
-    /** @test */
+    #[Test]
     public function it_provides_roles_and_groups_field_fallbacks_in_blueprint()
     {
         $blueprint = Blueprint::make();
@@ -412,7 +414,7 @@ trait UserContractTests
         $this->assertEquals('user_groups', $this->user()->blueprint()->fields()->get('groups')->type());
     }
 
-    /** @test */
+    #[Test]
     public function it_allows_roles_and_groups_field_customizations_in_blueprint()
     {
         $blueprint = Blueprint::makeFromFields([
@@ -430,7 +432,7 @@ trait UserContractTests
         $this->assertEquals('user_groups', $this->user()->blueprint()->fields()->get('groups')->type());
     }
 
-    /** @test */
+    #[Test]
     public function it_removes_roles_and_groups_field_fallbacks_in_blueprint_when_pro_is_disabled()
     {
         config(['statamic.editions.pro' => false]);
@@ -441,7 +443,7 @@ trait UserContractTests
         $this->assertFalse($this->user()->blueprint()->hasField('groups'));
     }
 
-    /** @test */
+    #[Test]
     public function it_removes_roles_and_groups_event_when_explicitly_defined_in_blueprint_when_pro_is_disabled()
     {
         config(['statamic.editions.pro' => false]);
@@ -455,7 +457,7 @@ trait UserContractTests
         $this->assertFalse($this->user()->blueprint()->hasField('groups'));
     }
 
-    /** @test */
+    #[Test]
     public function converts_to_array()
     {
         Role::shouldReceive('all')->andReturn(collect([
@@ -511,6 +513,64 @@ trait UserContractTests
     public function additionalToArrayValues()
     {
         return [];
+    }
+
+    #[Test]
+    public function it_has_a_dirty_state()
+    {
+        $user = $this->makeUser();
+        $user->email('test@test.com');
+        $user->save();
+
+        $this->assertFalse($user->isDirty());
+        $this->assertFalse($user->isDirty('email'));
+        $this->assertFalse($user->isDirty('name'));
+        $this->assertFalse($user->isDirty(['email']));
+        $this->assertFalse($user->isDirty(['name']));
+        $this->assertFalse($user->isDirty(['email', 'name']));
+        $this->assertTrue($user->isClean());
+        $this->assertTrue($user->isClean('email'));
+        $this->assertTrue($user->isClean('name'));
+        $this->assertTrue($user->isClean(['email']));
+        $this->assertTrue($user->isClean(['name']));
+        $this->assertTrue($user->isClean(['email', 'name']));
+
+        $user->email('test@tester.com');
+
+        $this->assertTrue($user->isDirty());
+        $this->assertTrue($user->isDirty('email'));
+        $this->assertFalse($user->isDirty('name'));
+        $this->assertTrue($user->isDirty(['email']));
+        $this->assertFalse($user->isDirty(['name']));
+        $this->assertTrue($user->isDirty(['email', 'name']));
+        $this->assertFalse($user->isClean());
+        $this->assertFalse($user->isClean('email'));
+        $this->assertTrue($user->isClean('name'));
+        $this->assertFalse($user->isClean(['email']));
+        $this->assertTrue($user->isClean(['name']));
+        $this->assertFalse($user->isClean(['email', 'name']));
+    }
+
+    #[Test]
+    public function it_syncs_original_at_the_right_time()
+    {
+        $eventsHandled = 0;
+
+        Event::listen(function (UserSaving $event) use (&$eventsHandled) {
+            $eventsHandled++;
+            $this->assertTrue($event->user->isDirty());
+        });
+        Event::listen(function (UserSaved $event) use (&$eventsHandled) {
+            $eventsHandled++;
+            $this->assertTrue($event->user->isDirty());
+        });
+
+        $user = $this->makeUser();
+        $user->email('test@test.com');
+        $user->save();
+
+        $this->assertFalse($user->isDirty());
+        $this->assertEquals(2, $eventsHandled);
     }
 
     private function createRole($handle)

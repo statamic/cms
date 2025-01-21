@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Storage;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use League\Glide\Manipulators\Watermark;
 use League\Glide\Server;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\GlideImageGenerated;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\File;
@@ -33,7 +35,7 @@ class ImageGeneratorTest extends TestCase
         $this->clearGlideCache();
     }
 
-    /** @test */
+    #[Test]
     public function it_generates_an_image_by_asset()
     {
         Event::fake();
@@ -71,7 +73,7 @@ class ImageGeneratorTest extends TestCase
 
         $expectedCacheManifest = [$manipulationCacheKey];
         $expectedPathPrefix = 'containers/test_container';
-        $expectedPath = "{$expectedPathPrefix}/foo/hoff.jpg/{$md5}.jpg";
+        $expectedPath = "{$expectedPathPrefix}/foo/hoff.jpg/{$md5}/hoff.jpg";
 
         $this->assertEquals($manifestCacheKey, ImageGenerator::assetCacheManifestKey($asset));
         $this->assertEquals($expectedPathPrefix, ImageGenerator::assetCachePathPrefix($asset));
@@ -83,7 +85,7 @@ class ImageGeneratorTest extends TestCase
         Event::assertDispatchedTimes(GlideImageGenerated::class, 1);
     }
 
-    /** @test */
+    #[Test]
     public function it_generates_cache_manifest_for_multiple_asset_manipulations()
     {
         Event::fake();
@@ -119,7 +121,7 @@ class ImageGeneratorTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_generates_an_image_by_local_path()
     {
         Event::fake();
@@ -152,7 +154,7 @@ class ImageGeneratorTest extends TestCase
         // way it does. It will not include the fit parameter since it's not an asset.
         $md5 = $this->getGlideMd5($imagePath, $userParams);
 
-        $expectedPath = "paths/testimages/foo/hoff.jpg/{$md5}.jpg";
+        $expectedPath = "paths/testimages/foo/hoff.jpg/{$md5}/hoff.jpg";
 
         $this->assertEquals($expectedPath, $path);
         $this->assertCount(1, $paths = $this->generatedImagePaths());
@@ -161,7 +163,7 @@ class ImageGeneratorTest extends TestCase
         Event::assertDispatchedTimes(GlideImageGenerated::class, 1);
     }
 
-    /** @test */
+    #[Test]
     public function it_generates_an_image_by_external_url()
     {
         Event::fake();
@@ -200,7 +202,7 @@ class ImageGeneratorTest extends TestCase
         // While writing this test I noticed that we don't include the domain in the
         // cache path, so the same file path on two different domains will conflict.
         // TODO: Fix this.
-        $expectedPath = "http/foo/hoff.jpg/{$md5}.jpg";
+        $expectedPath = "http/foo/hoff.jpg/{$md5}/hoff.jpg";
 
         $this->assertEquals($expectedPath, $path);
         $this->assertCount(1, $paths = $this->generatedImagePaths());
@@ -209,7 +211,57 @@ class ImageGeneratorTest extends TestCase
         Event::assertDispatchedTimes(GlideImageGenerated::class, 1);
     }
 
-    /** @test */
+    #[Test]
+    public function it_generates_an_image_by_external_url_with_query_string()
+    {
+        Event::fake();
+
+        $cacheKey = 'url::https://example.com/foo/hoff.jpg?query=david::4dbc41d8e3ba1ccd302641e509b48768';
+        $this->assertNull(Glide::cacheStore()->get($cacheKey));
+
+        $this->assertCount(0, $this->generatedImagePaths());
+
+        $this->app->bind('statamic.imaging.guzzle', function () {
+            $file = UploadedFile::fake()->image('', 30, 60);
+            $contents = file_get_contents($file->getPathname());
+
+            $response = new Response(200, [], $contents);
+
+            // Glide, Flysystem, or the Guzzle adapter will try to perform the requests
+            // at different points to check if the file exists or to get the content
+            // of it. Here we'll just mock the same response multiple times.
+            return new Client(['handler' => new MockHandler([
+                $response, $response, $response,
+            ])]);
+        });
+
+        // Generate the image twice to make sure it's cached.
+        foreach (range(1, 2) as $i) {
+            $path = $this->makeGenerator()->generateByUrl(
+                'https://example.com/foo/hoff.jpg?query=david',
+                $userParams = ['w' => 100, 'h' => 100]
+            );
+        }
+
+        $qsHash = md5('query=david');
+
+        // Since we can't really mock the server, we'll generate the md5 hash the same
+        // way it does. It will not include the fit parameter since it's not an asset.
+        $md5 = $this->getGlideMd5("foo/hoff-{$qsHash}.jpg", $userParams);
+
+        // While writing this test I noticed that we don't include the domain in the
+        // cache path, so the same file path on two different domains will conflict.
+        // TODO: Fix this.
+        $expectedPath = "http/foo/hoff-{$qsHash}.jpg/{$md5}/hoff-{$qsHash}.jpg";
+
+        $this->assertEquals($expectedPath, $path);
+        $this->assertCount(1, $paths = $this->generatedImagePaths());
+        $this->assertContains($expectedPath, $paths);
+        $this->assertEquals($expectedPath, Glide::cacheStore()->get($cacheKey));
+        Event::assertDispatchedTimes(GlideImageGenerated::class, 1);
+    }
+
+    #[Test]
     public function the_watermark_disk_is_the_public_directory_by_default()
     {
         $generator = $this->makeGenerator();
@@ -220,7 +272,7 @@ class ImageGeneratorTest extends TestCase
         $this->assertEquals(public_path().DIRECTORY_SEPARATOR, $this->getRootFromLocalAdapter($adapter));
     }
 
-    /** @test */
+    #[Test]
     public function the_watermark_disk_is_the_container_when_an_asset_is_provided()
     {
         // Make the asset to be used as the watermark.
@@ -240,7 +292,7 @@ class ImageGeneratorTest extends TestCase
         $this->assertEquals(['mark' => 'foo/hoff.jpg'], $generator->getParams());
     }
 
-    /** @test */
+    #[Test]
     public function the_watermark_disk_is_the_container_when_an_asset_encoded_url_string_is_provided()
     {
         // Make the asset to be used as the watermark.
@@ -260,7 +312,7 @@ class ImageGeneratorTest extends TestCase
         $this->assertEquals(['mark' => 'foo/hoff.jpg'], $generator->getParams());
     }
 
-    /** @test */
+    #[Test]
     public function the_watermark_disk_is_a_local_adapter_when_a_path_is_provided()
     {
         $generator = $this->makeGenerator();
@@ -274,11 +326,8 @@ class ImageGeneratorTest extends TestCase
         $this->assertEquals(['mark' => 'foo/hoff.jpg'], $generator->getParams());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider guzzleWatermarkProvider
-     */
+    #[Test]
+    #[DataProvider('guzzleWatermarkProvider')]
     public function the_watermark_disk_is_a_guzzle_adapter_when_a_url_is_provided($protocol)
     {
         $generator = $this->makeGenerator();

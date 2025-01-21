@@ -12,9 +12,9 @@
             'title' => __('Taxonomies')
         ])
         <div class="flex items-center">
-            <h1 class="flex-1">{{ __($taxonomy->title()) }}</h1>
+            <h1 v-pre class="flex-1">{{ __($taxonomy->title()) }}</h1>
 
-            <dropdown-list class="mr-2">
+            <dropdown-list class="rtl:ml-2 ltr:mr-2">
                 @can('edit', $taxonomy)
                     <dropdown-item :text="__('Edit Taxonomy')" redirect="{{ $taxonomy->editUrl() }}"></dropdown-item>
                 @endcan
@@ -33,12 +33,13 @@
                 @endcan
             </dropdown-list>
 
-            @can('create', ['Statamic\Contracts\Taxonomies\Term', $taxonomy])
+            @if($canCreate)
                 <create-term-button
                     url="{{ cp_route('taxonomies.terms.create', [$taxonomy->handle(), $site]) }}"
+                    text="{{ $taxonomy->createLabel() }}"
                     :blueprints="{{ $blueprints->toJson() }}">
                 </create-term-button>
-            @endcan
+            @endif
         </div>
     </header>
 

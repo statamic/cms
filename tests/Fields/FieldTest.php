@@ -3,6 +3,8 @@
 namespace Tests\Fields;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
@@ -11,7 +13,7 @@ use Tests\TestCase;
 
 class FieldTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_gets_the_display_value()
     {
         $this->assertEquals(
@@ -30,7 +32,7 @@ class FieldTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_instructions()
     {
         $this->assertEquals(
@@ -41,7 +43,7 @@ class FieldTest extends TestCase
         $this->assertNull((new Field('test', []))->instructions());
     }
 
-    /** @test */
+    #[Test]
     public function it_determines_if_localizable()
     {
         $this->assertFalse((new Field('test', []))->isLocalizable());
@@ -49,7 +51,7 @@ class FieldTest extends TestCase
         $this->assertTrue((new Field('test', ['localizable' => true]))->isLocalizable());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_fieldtype()
     {
         $fieldtype = new class extends Fieldtype
@@ -58,14 +60,22 @@ class FieldTest extends TestCase
 
         FieldtypeRepository::shouldReceive('find')
             ->with('the_fieldtype')
-            ->andReturn($fieldtype);
+            ->andReturnUsing(fn () => clone $fieldtype);
+        $field = new Field('test', $config = ['type' => 'the_fieldtype', 'foo' => 'bar']);
 
-        $field = new Field('test', ['type' => 'the_fieldtype']);
+        // The fieldtype from the repository should not have the field attached.
+        $this->assertNull($fieldtype->field());
 
-        $this->assertEquals($fieldtype, $field->fieldtype());
+        // The fieldtype from the field should be an instance of that
+        // fieldtype class, and should have the field attached.
+        $this->assertInstanceOf(get_class($fieldtype), $field->fieldtype());
+        $this->assertEquals($field->config(), $field->fieldtype()->field()->config());
+
+        // Double check that the fieldtype from the repository still doesn't somehow have the field attached.
+        $this->assertNull(FieldtypeRepository::find('the_fieldtype')->field());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_validation_rules_from_field()
     {
         $fieldtype = new class extends Fieldtype
@@ -87,7 +97,7 @@ class FieldTest extends TestCase
         ], $field->rules());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_validation_rules_from_fieldtype()
     {
         $fieldtype = new class extends Fieldtype
@@ -106,7 +116,7 @@ class FieldTest extends TestCase
         ], $field->rules());
     }
 
-    /** @test */
+    #[Test]
     public function it_merges_validation_rules_from_field_with_fieldtype()
     {
         $fieldtype = new class extends Fieldtype
@@ -128,7 +138,7 @@ class FieldTest extends TestCase
         ], $field->rules());
     }
 
-    /** @test */
+    #[Test]
     public function it_merges_extra_fieldtype_rules()
     {
         $fieldtype = new class extends Fieldtype
@@ -155,7 +165,7 @@ class FieldTest extends TestCase
         ], $field->rules());
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_if_a_field_is_required_when_defined_in_field()
     {
         $fieldtype = new class extends Fieldtype
@@ -181,7 +191,7 @@ class FieldTest extends TestCase
         $this->assertFalse($optionalField->isRequired());
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_if_a_field_is_required_when_defined_in_fieldtype()
     {
         $fieldtype = new class extends Fieldtype
@@ -201,7 +211,7 @@ class FieldTest extends TestCase
         $this->assertTrue($field->isRequired());
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_if_a_field_is_required_when_defined_as_its_own_field_property()
     {
         $fieldtype = new class extends Fieldtype
@@ -235,7 +245,7 @@ class FieldTest extends TestCase
         $this->assertFalse($explicitlyOptionalField->isRequired());
     }
 
-    /** @test */
+    #[Test]
     public function it_adds_nullable_rule_when_not_required()
     {
         $fieldtype = new class extends Fieldtype
@@ -274,9 +284,11 @@ class FieldTest extends TestCase
         $this->assertEquals(['test' => ['required_if:foo', 'min:2']], $validateRequiredIfField->rules());
     }
 
-    /** @test */
+    #[Test]
     public function converts_to_array_suitable_for_rendering_fields_in_publish_component()
     {
+        FieldtypeRepository::partialMock();
+
         FieldtypeRepository::shouldReceive('find')
             ->with('example')
             ->andReturn(new class extends Fieldtype
@@ -312,29 +324,38 @@ class FieldTest extends TestCase
             'type' => 'example',
             'display' => 'Test Field',
             'instructions' => 'Test instructions',
+            'instructions_position' => 'below',
             'validate' => 'required',
+            'foo' => 'bar',
             'a_config_field_with_pre_processing' => 'foo',
             'a_config_field_without_pre_processing' => 'foo',
         ]);
 
-        $this->assertEquals([
-            'handle' => 'test',
-            'prefix' => null,
-            'type' => 'example',
+        $this->assertSame([
             'display' => 'Test Field',
+            'hide_display' => false,
+            'handle' => 'test',
             'instructions' => 'Test instructions',
-            'required' => true,
-            'validate' => 'required',
+            'instructions_position' => 'below',
+            'listable' => 'hidden',
+            'sortable' => true,
             'visibility' => 'visible',
-            'read_only' => false, // deprecated
-            'always_save' => false,
-            'component' => 'example',
+            'replicator_preview' => true,
+            'duplicate' => true,
+            'type' => 'example',
+            'validate' => 'required',
+            'foo' => 'bar',
             'a_config_field_with_pre_processing' => 'foo preprocessed',
             'a_config_field_without_pre_processing' => 'foo',
+            'component' => 'example',
+            'prefix' => null,
+            'required' => true,
+            'read_only' => false, // deprecated
+            'always_save' => false,
         ], $field->toPublishArray());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_value()
     {
         $field = (new Field('test', ['type' => 'fieldtype']));
@@ -346,7 +367,7 @@ class FieldTest extends TestCase
         $this->assertEquals('foo', $field->value());
     }
 
-    /** @test */
+    #[Test]
     public function it_processes_the_value_through_its_fieldtype()
     {
         FieldtypeRepository::shouldReceive('find')
@@ -367,7 +388,7 @@ class FieldTest extends TestCase
         $this->assertEquals('foo processed', $processed->value());
     }
 
-    /** @test */
+    #[Test]
     public function it_preprocesses_the_value_through_its_fieldtype()
     {
         FieldtypeRepository::shouldReceive('find')
@@ -388,7 +409,7 @@ class FieldTest extends TestCase
         $this->assertEquals('foo preprocessed', $preProcessed->value());
     }
 
-    /** @test */
+    #[Test]
     public function it_preprocesses_the_value_through_its_fieldtype_for_the_index()
     {
         FieldtypeRepository::shouldReceive('find')
@@ -409,7 +430,7 @@ class FieldTest extends TestCase
         $this->assertEquals('foo preprocessed for index', $preProcessed->value());
     }
 
-    /** @test */
+    #[Test]
     public function preprocessing_a_field_with_no_value_will_take_the_default_from_the_field()
     {
         FieldtypeRepository::shouldReceive('find')
@@ -430,7 +451,7 @@ class FieldTest extends TestCase
         $this->assertEquals('field defined default preprocessed', $field->preProcess()->value());
     }
 
-    /** @test */
+    #[Test]
     public function preprocessing_a_field_with_no_value_and_no_field_defined_default_value_will_take_the_default_from_the_fieldtype()
     {
         FieldtypeRepository::shouldReceive('find')
@@ -453,7 +474,7 @@ class FieldTest extends TestCase
         $this->assertEquals('fieldtype defined default preprocessed', $field->preProcess()->value());
     }
 
-    /** @test */
+    #[Test]
     public function converting_to_an_array_will_inline_the_handle()
     {
         $field = new Field('the_handle', ['foo' => 'bar']);
@@ -465,7 +486,7 @@ class FieldTest extends TestCase
         ], $field->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_sets_the_config()
     {
         $field = new Field('the_handle', ['foo' => 'bar']);
@@ -477,7 +498,7 @@ class FieldTest extends TestCase
         $this->assertEquals(['bar' => 'baz'], $field->config());
     }
 
-    /** @test */
+    #[Test]
     public function it_makes_a_new_instance()
     {
         $field = new Field('test', ['foo' => 'bar']);
@@ -491,7 +512,7 @@ class FieldTest extends TestCase
         $this->assertSame($field->value(), $newField->value());
     }
 
-    /** @test */
+    #[Test]
     public function it_augments_the_value_through_its_fieldtype()
     {
         $fieldtype = new class extends Fieldtype
@@ -534,11 +555,8 @@ class FieldTest extends TestCase
         });
     }
 
-    /**
-     * @test
-     *
-     * @group graphql
-     **/
+    #[Test]
+    #[Group('graphql')]
     public function it_gets_the_graphql_type()
     {
         $fieldtype = new class extends Fieldtype
@@ -562,11 +580,8 @@ class FieldTest extends TestCase
         $this->assertInstanceOf(\GraphQL\Type\Definition\FloatType::class, $type['type']);
     }
 
-    /**
-     * @test
-     *
-     * @group graphql
-     **/
+    #[Test]
+    #[Group('graphql')]
     public function it_makes_the_graphql_type_non_nullable_if_its_required()
     {
         $fieldtype = new class extends Fieldtype
@@ -590,7 +605,7 @@ class FieldTest extends TestCase
         $this->assertInstanceOf(\GraphQL\Type\Definition\FloatType::class, $type['type']->getWrappedType());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_path_of_handles_for_nested_fields()
     {
         $top = (new Field('a', ['type' => 'text']));
@@ -602,7 +617,7 @@ class FieldTest extends TestCase
         $this->assertEquals(['a', 'b', 'c'], $third->handlePath());
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_if_its_a_relationship_through_the_fieldtype()
     {
         FieldtypeRepository::shouldReceive('find')
@@ -620,7 +635,7 @@ class FieldTest extends TestCase
         $this->assertTrue($field->isRelationship());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_sets_the_form()
     {
         $field = new Field('test', ['type' => 'text']);

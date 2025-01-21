@@ -4,6 +4,7 @@ namespace Statamic\Forms\Metrics;
 
 use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Forms\Metric;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 abstract class AbstractMetric implements Metric
@@ -48,7 +49,7 @@ abstract class AbstractMetric implements Metric
      */
     public function get($key, $default = null)
     {
-        return array_get($this->config(), $key, $default);
+        return Arr::get($this->config(), $key, $default);
     }
 
     /**

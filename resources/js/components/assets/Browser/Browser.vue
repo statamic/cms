@@ -21,17 +21,6 @@
                     <span>{{ __('Drop File to Upload') }}</span>
                 </div>
 
-                <div class="publish-tabs tabs rounded-none rounded-t mb-3 shadow-none" v-if="showContainerTabs">
-                    <button class="tab-button" v-for="item in containers" :key="item.id"
-                        v-text="__(item.title)"
-                        :class="{
-                            active: item.id === container.id,
-                            'border-b border-gray-300': item.id !== container.id
-                        }"
-                        @click="selectContainer(item.id)"
-                    />
-                </div>
-
                 <data-list
                     v-if="!initializing"
                     :rows="assets"
@@ -50,17 +39,17 @@
                                 <div class="flex items-center justify-between p-2 text-sm">
                                     <data-list-search class="h-8" ref="search" v-model="searchQuery" />
 
-                                    <button v-if="canCreateFolders" class="btn btn-sm ml-3" @click="creatingFolder = true">
-                                        <svg-icon name="folder-add" class="h-4 w-4 mr-2" />
+                                    <button v-if="canCreateFolders" class="btn btn-sm rtl:mr-3 ltr:ml-3" @click="creatingFolder = true">
+                                        <svg-icon name="folder-add" class="h-4 w-4 rtl:ml-2 ltr:mr-2" />
                                         <span>{{ __('Create Folder') }}</span>
                                     </button>
 
-                                    <button v-if="canUpload" class="btn btn-sm ml-3" @click="openFileBrowser">
-                                        <svg-icon name="upload" class="h-4 w-4 mr-2 text-current" />
+                                    <button v-if="canUpload" class="btn btn-sm rtl:mr-3 ltr:ml-3" @click="openFileBrowser">
+                                        <svg-icon name="upload" class="h-4 w-4 rtl:ml-2 ltr:mr-2 text-current" />
                                         <span>{{ __('Upload') }}</span>
                                     </button>
 
-                                    <div class="btn-group ml-3">
+                                    <div class="btn-group rtl:mr-3 ltr:ml-3">
                                         <button class="btn btn-sm" @click="setMode('grid')" :class="{'active': mode === 'grid'}">
                                             <svg-icon name="assets-mode-grid" class="h-4 w-4"/>
                                         </button>
@@ -85,7 +74,9 @@
                             <uploads
                                 v-if="uploads.length"
                                 :uploads="uploads"
-                                class="-mt-px"
+                                :allow-selecting-existing="allowSelectingExistingUpload"
+                                :class="{ '-mt-px': !hasSelections, 'mt-10': hasSelections }"
+                                @existing-selected="existingUploadSelected"
                             />
 
                             <div class="overflow-x-auto overflow-y-hidden">
@@ -103,17 +94,17 @@
                                         <td />
                                         <td @click="selectFolder(folder.parent_path)">
                                             <a class="flex items-center cursor-pointer group">
-                                                <file-icon extension="folder" class="w-8 h-8 mr-2 inline-block text-blue-400 group-hover:text-blue" />
+                                                <file-icon extension="folder" class="w-8 h-8 rtl:ml-2 ltr:mr-2 inline-block text-blue-400 group-hover:text-blue" />
                                                 ..
                                             </a>
                                         </td>
                                         <td :colspan="columns.length" />
                                     </tr>
-                                    <tr v-for="(folder, i) in folders" :key="folder.path" v-if="!restrictFolderNavigation && page === 1">
+                                    <tr v-for="(folder, i) in folders" :key="folder.path" v-if="!restrictFolderNavigation">
                                         <td />
                                         <td @click="selectFolder(folder.path)">
                                             <a class="flex items-center cursor-pointer group">
-                                                <file-icon extension="folder" class="w-8 h-8 mr-2 inline-block text-blue-400 group-hover:text-blue" />
+                                                <file-icon extension="folder" class="w-8 h-8 rtl:ml-2 ltr:mr-2 inline-block text-blue-400 group-hover:text-blue" />
                                                 {{ folder.basename }}
                                             </a>
                                         </td>
@@ -136,7 +127,7 @@
 
                                 <template slot="cell-basename" slot-scope="{ row: asset, checkboxId }">
                                     <div class="flex items-center w-fit-content group">
-                                        <asset-thumbnail :asset="asset" :square="true" class="w-8 h-8 mr-2 cursor-pointer" @click.native.stop="$emit('edit-asset', asset)" />
+                                        <asset-thumbnail :asset="asset" :square="true" class="w-8 h-8 rtl:ml-2 ltr:mr-2 cursor-pointer" @click.native.stop="$emit('edit-asset', asset)" />
                                         <label :for="checkboxId" class="cursor-pointer select-none group-hover:text-blue normal-nums" @click.stop="$emit('edit-asset', asset)">
                                             {{ asset.basename }}
                                         </label>
@@ -189,7 +180,7 @@
                                             <div class="asset-filename text-center w-full px-2 py-1" v-text="folder.basename" :title="folder.basename" />
                                         </div>
                                         <dropdown-list v-if="folderActions(folder).length"
-                                            class="absolute top-1 right-2 opacity-0 group-hover:opacity-100"
+                                            class="absolute top-1 rtl:left-2 ltr:right-2 opacity-0 group-hover:opacity-100"
                                             :class="{ 'opacity-100': actionOpened === folder.path }"
                                             @opened="actionOpened = folder.path"
                                             @closed="actionOpened = null"
@@ -230,7 +221,7 @@
                                             </div>
                                         </div>
                                         <dropdown-list
-                                            class="absolute top-1 right-2 opacity-0 group-hover:opacity-100"
+                                            class="absolute top-1 rtl:left-2 ltr:right-2 opacity-0 group-hover:opacity-100"
                                             :class="{ 'opacity-100': actionOpened === asset.id }"
                                             @opened="actionOpened = asset.id"
                                             @closed="actionOpened = null"
@@ -321,7 +312,6 @@ export default {
         // Either the ID, or the whole container object.
         initialContainer: {},
         selectedPath: String,        // The path to display, determined by a parent component.
-        restrictContainerNavigation: Boolean,  // Whether to restrict to a single container and prevent navigation.
         restrictFolderNavigation: Boolean,  // Whether to restrict to a single folder and prevent navigation.
         selectedAssets: Array,
         maxFiles: Number,
@@ -329,6 +319,7 @@ export default {
         initialEditingAssetId: String,
         autoselectUploads: Boolean,
         autofocusSearch: Boolean,
+        allowSelectingExistingUpload: Boolean
     },
 
     data() {
@@ -374,10 +365,6 @@ export default {
 
         actionContext() {
             return {container: this.selectedContainer};
-        },
-
-        showContainerTabs() {
-            return !this.restrictContainerNavigation && Object.keys(this.containers).length > 1
         },
 
         showAssetEditor() {
@@ -469,6 +456,13 @@ export default {
             this.loadAssets();
         },
 
+        selectedPath(selectedPath) {
+            // The selected path might change from outside due to a popstate navigation
+            if (!selectedPath.endsWith('/edit')) {
+                this.path = selectedPath;
+            }
+        },
+
         parameters(after, before) {
             if (this.initializing || JSON.stringify(before) === JSON.stringify(after)) return;
             this.loadAssets();
@@ -552,14 +546,6 @@ export default {
             this.$emit('navigated', this.container, this.path);
         },
 
-        selectContainer(id) {
-            this.container = this.containers[id];
-            this.path = '/';
-            this.page = 1;
-
-            this.$emit('navigated', this.container, this.path);
-        },
-
         setMode(mode) {
             this.mode = mode;
             this.setPreference('mode', mode == 'table' ? null : mode);
@@ -605,6 +591,14 @@ export default {
             this.$toast.error(upload.errorMessage);
         },
 
+        existingUploadSelected(upload) {
+            const path = `${this.folder.path}/${upload.basename}`.replace(/^\/+/, '');
+            const id = `${this.container.id}::${path}`;
+
+            this.selectedAssets.push(id);
+            this.$emit('selections-updated', this.selectedAssets);
+        },
+
         openFileBrowser() {
             this.$refs.uploader.browse();
         },
@@ -628,7 +622,9 @@ export default {
             const i = this.selectedAssets.indexOf(id);
             this.$refs.browser.focus()
 
-            if (i != -1) {
+            if (this.maxFiles === 1) {
+                this.selectedAssets = [id];
+            } else if (i != -1) {
                 this.selectedAssets.splice(i, 1);
             } else if (! this.reachedSelectionLimit) {
                 if ($event.shiftKey && this.lastItemClicked !== null) {

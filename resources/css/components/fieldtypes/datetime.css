@@ -5,7 +5,7 @@
 .daterange {
 	outline: none;
 	width: 100%;
-	.icon-remove { right: 32px; }
+	.icon-remove { right: 32px ; [dir="rtl"] & { right: auto ; left: 32px ; } }
 
     .dr-calendar { max-width: 250px; }
 
@@ -19,12 +19,12 @@
 	background: rgba(0, 0, 0, 0.1);
 	font-size: 15px;
 	line-height: 1;
-	padding: 0px 4px 2px;
+	padding: 0 4px 2px;
 	border-radius: 50%;
 	color: #777;
     height: 18px;
     width: 18px;
-    margin-right: 8px;
+    margin-right: 8px ; [dir="rtl"] & { margin-left: 8px ; margin-right: 0 ; }
 	text-shadow: 0 1px 1px #FFF;
 }
 
@@ -41,6 +41,10 @@
     @apply border-none bg-none;
 }
 
+.vc-container.vc-is-dark {
+    @apply dark:bg-transparent;
+}
+
 /* Time Field
   ========================================================================== */
 
@@ -48,7 +52,6 @@
 	.time-fieldtype-container {
 		@apply flex items-center;
 		min-width: max-content;
-		max-width: 140px;
 	}
 
 	.input-time {

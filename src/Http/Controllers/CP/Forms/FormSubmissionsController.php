@@ -2,15 +2,17 @@
 
 namespace Statamic\Http\Controllers\CP\Forms;
 
-use Statamic\Extensions\Pagination\LengthAwarePaginator;
-use Statamic\Facades\Config;
+use Statamic\Fields\Field;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Submissions\Submissions;
-use Statamic\Support\Str;
+use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 
 class FormSubmissionsController extends CpController
 {
-    public function index($form)
+    use QueriesFilters;
+
+    public function index(FilteredRequest $request, $form)
     {
         $this->authorize('view', $form);
 
@@ -18,52 +20,46 @@ class FormSubmissionsController extends CpController
             return ['data' => [], 'meta' => ['columns' => []]];
         }
 
-        $submissions = $form->submissions()->values();
+        $query = $this->indexQuery($form);
 
-        // Search submissions.
-        if ($search = $this->request->search) {
-            $submissions = $this->searchSubmissions($submissions);
+        $activeFilterBadges = $this->queryFilters($query, $request->filters, [
+            'form' => $form->handle(),
+        ]);
+
+        $sortField = request('sort', 'date');
+        $sortDirection = request('order', $sortField === 'date' ? 'desc' : 'asc');
+
+        if ($sortField) {
+            $query->orderBy($sortField, $sortDirection);
         }
 
-        // Sort submissions.
-        $sort = $this->request->sort ?? 'datestamp';
-        $order = $this->request->order ?? ($sort === 'datestamp' ? 'desc' : 'asc');
-        $submissions = $this->sortSubmissions($submissions, $sort, $order);
+        $submissions = $query->paginate(request('perPage'));
 
-        // Paginate submissions.
-        $totalSubmissionCount = $submissions->count();
-        $perPage = request('perPage') ?? Config::get('statamic.cp.pagination_size');
-        $currentPage = (int) $this->request->page ?: 1;
-        $offset = ($currentPage - 1) * $perPage;
-        $submissions = $submissions->slice($offset, $perPage);
-        $paginator = new LengthAwarePaginator($submissions, $totalSubmissionCount, $perPage, $currentPage);
-
-        return (new Submissions($paginator))
+        return (new Submissions($submissions))
             ->blueprint($form->blueprint())
-            ->columnPreferenceKey("forms.{$form->handle()}.columns");
+            ->columnPreferenceKey("forms.{$form->handle()}.columns")
+            ->additional(['meta' => [
+                'activeFilterBadges' => $activeFilterBadges,
+            ]]);
     }
 
-    private function searchSubmissions($submissions)
+    protected function indexQuery($form)
     {
-        return $submissions->filter(function ($submission) {
-            return collect($submission->data())
-                ->filter(function ($value) {
-                    return $value && is_string($value);
-                })
-                ->filter(function ($value) {
-                    return Str::contains(strtolower($value), strtolower($this->request->search));
-                })
-                ->isNotEmpty();
-        })->values();
-    }
+        $query = $form->querySubmissions();
 
-    private function sortSubmissions($submissions, $sortBy, $sortOrder)
-    {
-        return $submissions->sortBy(function ($submission) use ($sortBy) {
-            return $sortBy === 'datestamp'
-                ? $submission->date()->timestamp
-                : $submission->get($sortBy);
-        }, null, $sortOrder === 'desc')->values();
+        if ($search = request('search')) {
+            $query->where('date', 'like', '%'.$search.'%');
+
+            $form->blueprint()->fields()->all()
+                ->filter(function (Field $field): bool {
+                    return in_array($field->type(), ['text', 'textarea', 'integer']);
+                })
+                ->each(function (Field $field) use ($query, $search): void {
+                    $query->orWhere($field->handle(), 'like', '%'.$search.'%');
+                });
+        }
+
+        return $query;
     }
 
     public function destroy($form, $id)

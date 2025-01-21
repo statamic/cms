@@ -4,7 +4,7 @@
         <template v-if="isToggleMode">
             <div class="toggle-fieldtype-wrapper">
                 <toggle-input :value="isRevealed" @input="update" :read-only="isReadOnly" />
-                <label v-if="config.input_label" class="ml-2 font-normal">{{ __(config.input_label) }}</label>
+                <label v-if="config.input_label" class="rtl:mr-2 ltr:ml-2 font-normal">{{ __(config.input_label) }}</label>
             </div>
         </template>
 

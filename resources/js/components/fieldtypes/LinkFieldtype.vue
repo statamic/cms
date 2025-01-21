@@ -2,7 +2,7 @@
     <div class="flex items-center">
 
         <!-- Link type selector -->
-        <div class="w-28 mr-4">
+        <div class="w-28 rtl:ml-4 ltr:mr-4">
             <v-select
                 v-model="option"
                 append-to-body
@@ -83,6 +83,23 @@ export default {
             return this.selectedAssets.length
                 ? `asset::${this.selectedAssets[0]}`
                 : null
+        },
+
+        replicatorPreview() {
+            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+
+            switch (this.option) {
+                case 'url':
+                    return this.urlValue;
+                case 'first-child':
+                    return __('First child');
+                case 'entry':
+                    return data_get(this.meta, 'entry.meta.data.0.title', this.entryValue);
+                case 'asset':
+                    return data_get(this.meta, 'asset.meta.data.0.basename', this.assetValue);
+            }
+
+            return this.value;
         }
 
     },
@@ -111,12 +128,15 @@ export default {
                     setTimeout(() => this.$refs.assets.openSelector(), 0);
                 }
             }
+
+            this.updateMeta({...this.meta, initialOption: option});
         },
 
         urlValue(url) {
             if (this.metaChanging) return;
 
             this.update(url);
+            this.updateMeta({...this.meta, initialUrl: url});
         },
 
         meta(meta, oldMeta) {
@@ -159,11 +179,13 @@ export default {
         entriesSelected(entries) {
             this.selectedEntries = entries;
             this.update(this.entryValue);
+            this.updateMeta({...this.meta, initialSelectedEntries: entries});
         },
 
         assetsSelected(assets) {
             this.selectedAssets = assets;
             this.update(this.assetValue);
+            this.updateMeta({...this.meta, initialSelectedAssets: assets});
         }
 
     }

@@ -20,6 +20,19 @@ class Taggable extends Fieldtype
                 'type' => 'text',
                 'default' => __('statamic::fieldtypes.taggable.config.placeholder'),
             ],
+            'options' => [
+                'display' => __('Options'),
+                'instructions' => __('statamic::fieldtypes.taggable.config.options'),
+                'type' => 'list',
+                'add_button' => __('Add Option'),
+            ],
+        ];
+    }
+
+    public function preload()
+    {
+        return [
+            'options' => $this->config('options', []),
         ];
     }
 

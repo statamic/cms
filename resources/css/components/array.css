@@ -7,25 +7,25 @@
 }
 
 .array-table-wrapper {
-    @apply border rounded overflow-hidden;
+    @apply border dark:border-dark-900 rounded overflow-hidden;
     &:focus-within {
-        @apply ring-2 ring-blue-300;
+        @apply ring-2 ring-blue-300 dark:ring-dark-blue-100;
     }
 }
 .array-table {
-    @apply rounded text-sm text-left w-full;
+    @apply rounded text-sm rtl:text-right ltr:text-left w-full;
     &:focus {
         @apply outline-none;
     }
 
     tr:not(:last-child) {
         th, td {
-            @apply border-b;
+            @apply border-b dark:border-dark-900;
         }
     }
 
     th {
-        @apply border-r p-2 bg-gray-300;
+        @apply rtl:border-l ltr:border-r dark:border-dark-900 p-2 bg-gray-300 dark:bg-dark-500;
     }
 
     td {
@@ -33,20 +33,20 @@
     }
 
     tr:first-child th {
-        @apply rounded-tl;
+        @apply rtl:rounded-tr ltr:rounded-tl;
     }
 
     tr:first-child td,
     tr:first-child .input-text-minimal {
-        @apply rounded-tr;
+        @apply rtl:rounded-tl ltr:rounded-tr;
     }
 
     tr:last-child th {
-        @apply rounded-bl;
+        @apply rtl:rounded-br ltr:rounded-bl;
     }
     tr:last-child td:last-child,
-    tr:last-child .input-minimal {
-        @apply rounded-br;
+    tr:last-child .input-text-minimal {
+        @apply rtl:rounded-bl ltr:rounded-br;
     }
 
     &:focus-within {
@@ -54,12 +54,12 @@
     }
 
     td:focus-within {
-        @apply bg-gray-200;
+        @apply bg-gray-200 dark:bg-dark-600;
     }
 
     /* Read Only */
     .read-only-field & {
-        th { @apply text-gray-500; }
-        tr td { @apply bg-gray-200; }
+        th { @apply text-gray-500 dark:text-dark-150; }
+        tr td { @apply bg-gray-200 dark:bg-dark-600; }
     }
 }

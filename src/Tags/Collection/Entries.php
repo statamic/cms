@@ -184,14 +184,14 @@ class Entries
 
         $this->querySelect($query);
         $this->querySite($query);
-        $this->queryStatus($query);
+        $this->queryPublished($query);
         $this->queryPastFuture($query);
         $this->querySinceUntil($query);
         $this->queryTaxonomies($query);
         $this->queryRedirects($query);
         $this->queryConditions($query);
-        $this->queryScopes($query);
         $this->queryOrderBys($query);
+        $this->queryScopes($query);
 
         return $query;
     }
@@ -270,13 +270,13 @@ class Entries
         return $query->where('site', $site);
     }
 
-    protected function queryStatus($query)
+    protected function queryPublished($query)
     {
         if ($this->isQueryingCondition('status') || $this->isQueryingCondition('published')) {
             return;
         }
 
-        return $query->where('status', 'published');
+        return $query->where('published', true);
     }
 
     protected function queryPastFuture($query)
@@ -384,7 +384,7 @@ class Entries
         }
 
         if (! $this->params->bool(['redirects', 'links'], false)) {
-            $query->where('redirect', '=', null);
+            $query->whereNull('redirect');
         }
     }
 

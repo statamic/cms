@@ -13,6 +13,8 @@ class Svg extends Tags
 {
     use Concerns\RendersAttributes;
 
+    private static $shouldSanitize = true;
+
     public function wildcard($src)
     {
         $this->params['src'] = $src;
@@ -48,19 +50,23 @@ class Svg extends Tags
             $svg = $this->params->get('src');
         }
 
-        $attributes = $this->renderAttributesFromParams(['src', 'title', 'desc']);
+        if (empty($svg)) {
+            return '';
+        }
 
         if ($this->params->get('title') || $this->params->get('desc')) {
             $svg = $this->setTitleAndDesc($svg);
         }
 
-        $svg = str_replace(
+        $svg = $this->sanitize($svg);
+
+        $attributes = $this->renderAttributesFromParams(except: ['src', 'title', 'desc', 'sanitize', 'allow_tags', 'allow_attrs']);
+
+        return str_replace(
             '<svg',
             collect(['<svg', $attributes])->filter()->implode(' '),
             $svg
         );
-
-        return $this->sanitize($svg);
     }
 
     private function setTitleAndDesc($svg)
@@ -91,7 +97,7 @@ class Svg extends Tags
 
     private function sanitize($svg)
     {
-        if ($this->params->bool('sanitize') === false) {
+        if ($this->params->bool('sanitize', static::$shouldSanitize) === false) {
             return $svg;
         }
 
@@ -121,5 +127,15 @@ class Svg extends Tags
         $disallowed = array_diff($sanitizer->getDisallowedTags(), $tags);
         $sanitizer->setAllowedTags($allowed);
         $sanitizer->setDisallowedTags($disallowed);
+    }
+
+    public static function disableSanitization()
+    {
+        static::$shouldSanitize = false;
+    }
+
+    public static function enableSanitization()
+    {
+        static::$shouldSanitize = true;
     }
 }

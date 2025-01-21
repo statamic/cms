@@ -94,7 +94,7 @@ class DefaultCacher extends AbstractCacher
         $domain = $request->root();
         $fullUrl = $request->fullUrl();
 
-        $key = str_replace($domain, '', $fullUrl);
+        $key = md5(str_replace($domain, '', $fullUrl));
 
         return $this->normalizeKey($key);
     }

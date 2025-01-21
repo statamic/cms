@@ -2,8 +2,8 @@
 
 namespace Statamic\Stache\Stores;
 
-use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Stache;
 use Statamic\Statamic;
 use Statamic\Support\Str;
 
@@ -25,7 +25,7 @@ class ContainerAssetsStore extends ChildStore
 
         $this->fileChangesHandled = true;
 
-        if (! config('statamic.stache.watcher')) {
+        if (! Stache::isWatcherEnabled()) {
             return;
         }
 
@@ -58,7 +58,7 @@ class ContainerAssetsStore extends ChildStore
             return $this->paths;
         }
 
-        if ($paths = Cache::get($this->pathsCacheKey())) {
+        if ($paths = Stache::cacheStore()->get($this->pathsCacheKey())) {
             return $this->paths = collect($paths);
         }
 
@@ -81,7 +81,8 @@ class ContainerAssetsStore extends ChildStore
     private function getFiles()
     {
         return $this->container()->listContents()->reject(function ($file) {
-            return $file['type'] !== 'file'
+            return ! isset($file['type'])
+                || $file['type'] !== 'file'
                 || $file['path'] === ''
                 || $file['dirname'] === '.meta'
                 || Str::contains($file['path'], '/.meta/')

@@ -5,6 +5,8 @@ namespace Tests\Fieldtypes;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Time;
 use Tests\TestCase;
@@ -21,11 +23,8 @@ class TimeTest extends TestCase
         Carbon::setTestNow(Carbon::createFromFormat('Y-m-d H:i', '2010-12-25 13:43'));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider processProvider
-     */
+    #[Test]
+    #[DataProvider('processProvider')]
     public function it_processes_on_save($config, $value, $expected)
     {
         $this->assertSame($expected, $this->fieldtype($config)->process($value));
@@ -57,23 +56,24 @@ class TimeTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider validationProvider
-     */
-    public function it_validates($config, $input, $expected)
+    #[Test]
+    #[DataProvider('validationProvider')]
+    public function it_validates($config, $input, $passes)
     {
         $field = $this->fieldtype($config)->field();
-        $messages = [];
+        $messages = collect();
 
         try {
             Validator::validate(['test' => $input], $field->rules(), [], $field->validationAttributes());
         } catch (ValidationException $e) {
-            $messages = $e->validator->errors()->all();
+            $messages = $e->validator->errors();
         }
 
-        $this->assertEquals($expected, $messages);
+        if ($passes) {
+            $this->assertCount(0, $messages);
+        } else {
+            $this->assertEquals(__('statamic::validation.time'), $messages->first());
+        }
     }
 
     public static function validationProvider()
@@ -82,37 +82,37 @@ class TimeTest extends TestCase
             'valid time' => [
                 [],
                 '14:00',
-                [],
+                true,
             ],
             'valid time with seconds' => [
                 ['seconds_enabled' => true],
                 '14:00:00',
-                [],
+                true,
             ],
             'invalid time format' => [
                 [],
                 'not formatted like a time',
-                ['Not a valid time.'],
+                false,
             ],
             '12 hour time' => [
                 [],
                 '1:00',
-                ['Not a valid time.'],
+                false,
             ],
             'invalid hour' => [
                 [],
                 '25:00',
-                ['Not a valid time.'],
+                false,
             ],
             'invalid minute' => [
                 [],
                 '14:65',
-                ['Not a valid time.'],
+                false,
             ],
             'invalid second' => [
                 ['seconds_enabled' => true],
                 '13:00:60',
-                ['Not a valid time.'],
+                false,
             ],
         ];
     }

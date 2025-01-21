@@ -16,6 +16,7 @@
                 :can-define-localizable="canDefineLocalizable"
                 :tab-id="tabId"
                 :show-handle-field="showSectionHandleField"
+                :show-hide-field="showSectionHideField"
                 :edit-text="editSectionText"
                 @updated="updateSection(i, $event)"
                 @deleted="deleteSection(i)"
@@ -24,7 +25,7 @@
             <div class="blueprint-add-section-container w-full">
                 <button class="blueprint-add-section-button outline-none" @click="addAndEditSection">
                     <div class="text-center flex items-center leading-none">
-                        <svg-icon name="micro/plus" class="h-3 w-3 mr-2" />
+                        <svg-icon name="micro/plus" class="h-3 w-3 rtl:ml-2 ltr:mr-2" />
                         <div v-text="addSectionText" />
                     </div>
 
@@ -85,6 +86,10 @@ export default {
         showSectionHandleField: {
             type: Boolean,
             default: false
+        },
+        showSectionHideField: {
+            type: Boolean,
+            default: false
         }
     },
 
@@ -110,7 +115,8 @@ export default {
                 display: this.newSectionText,
                 instructions: null,
                 icon: null,
-                handle: this.$slugify(this.newSectionText, '_'),
+                hide: null,
+                handle: snake_case(this.newSectionText),
                 fields: []
             };
 

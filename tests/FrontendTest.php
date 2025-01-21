@@ -9,11 +9,13 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\ResponseCreated;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Cascade;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Site;
+use Statamic\Facades\Entry;
 use Statamic\Facades\User;
 use Statamic\Tags\Tags;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
@@ -38,7 +40,7 @@ class FrontendTest extends TestCase
         Blueprint::shouldReceive('in')->withAnyArgs()->zeroOrMoreTimes()->andReturn(collect([new \Statamic\Fields\Blueprint]));
     }
 
-    /** @test */
+    #[Test]
     public function page_is_displayed()
     {
         $this->withStandardBlueprints();
@@ -62,7 +64,7 @@ class FrontendTest extends TestCase
         $this->assertEquals('<h1>The About Page</h1> <p>This is the about page.</p>', trim($response->content()));
     }
 
-    /** @test */
+    #[Test]
     public function page_is_displayed_with_query_string()
     {
         $this->withStandardBlueprints();
@@ -83,7 +85,7 @@ class FrontendTest extends TestCase
         $this->assertEquals('<h1>The About Page</h1> <p>This is the about page.</p>', trim($response->content()));
     }
 
-    /** @test */
+    #[Test]
     public function page_is_displayed_with_ending_slash()
     {
         $this->withStandardBlueprints();
@@ -104,7 +106,7 @@ class FrontendTest extends TestCase
         $this->assertEquals('<h1>The About Page</h1> <p>This is the about page.</p>', trim($response->content()));
     }
 
-    /** @test */
+    #[Test]
     public function page_is_displayed_with_query_string_and_ending_slash()
     {
         $this->withStandardBlueprints();
@@ -125,7 +127,7 @@ class FrontendTest extends TestCase
         $this->assertEquals('<h1>The About Page</h1> <p>This is the about page.</p>', trim($response->content()));
     }
 
-    /** @test */
+    #[Test]
     public function page_with_no_explicit_layout_will_not_use_a_layout()
     {
         $this->withStandardBlueprints();
@@ -149,13 +151,13 @@ class FrontendTest extends TestCase
         $response->assertDontSee('Layout');
     }
 
-    /** @test */
+    #[Test]
     public function home_page_on_second_subdirectory_based_site_is_displayed()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         $this->createHomePagesForTwoSites();
 
@@ -164,13 +166,13 @@ class FrontendTest extends TestCase
         $this->assertEquals('French Home', trim($response->content()));
     }
 
-    /** @test */
+    #[Test]
     public function home_page_on_second_subdirectory_based_site_is_displayed_with_ending_slash()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         $this->createHomePagesForTwoSites();
 
@@ -179,13 +181,13 @@ class FrontendTest extends TestCase
         $this->assertEquals('French Home', trim($response->content()));
     }
 
-    /** @test */
+    #[Test]
     public function home_page_on_second_domain_site_is_displayed()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'french' => ['url' => 'http://anotherhost.com/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         $this->createHomePagesForTwoSites();
 
@@ -194,13 +196,13 @@ class FrontendTest extends TestCase
         $this->assertEquals('French Home', trim($response->content()));
     }
 
-    /** @test */
+    #[Test]
     public function home_page_on_second_domain_site_is_displayed_with_ending_slash()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'french' => ['url' => 'http://anotherhost.com/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         $this->createHomePagesForTwoSites();
 
@@ -224,7 +226,7 @@ class FrontendTest extends TestCase
         $c->structure()->in('french')->tree([['entry' => '2']])->save();
     }
 
-    /** @test */
+    #[Test]
     public function drafts_are_not_visible()
     {
         $this->withStandardFakeErrorViews();
@@ -233,7 +235,7 @@ class FrontendTest extends TestCase
         $this->get('/about')->assertStatus(404);
     }
 
-    /** @test */
+    #[Test]
     public function drafts_are_visible_if_using_live_preview()
     {
         $this->withStandardBlueprints();
@@ -250,13 +252,13 @@ class FrontendTest extends TestCase
         $this->assertEquals('Testing 123', $response->content());
     }
 
-    /** @test */
+    #[Test]
     public function drafts_dont_get_statically_cached()
     {
         $this->markTestIncomplete();
     }
 
-    /** @test */
+    #[Test]
     public function future_private_entries_are_not_viewable()
     {
         Carbon::setTestNow(Carbon::parse('2019-01-01'));
@@ -279,7 +281,7 @@ class FrontendTest extends TestCase
             ->assertStatus(404);
     }
 
-    /** @test */
+    #[Test]
     public function future_private_entries_viewable_in_live_preview()
     {
         Carbon::setTestNow(Carbon::parse('2019-01-01'));
@@ -298,13 +300,13 @@ class FrontendTest extends TestCase
             ->assertHeader('X-Statamic-Private', true);
     }
 
-    /** @test */
+    #[Test]
     public function future_private_entries_dont_get_statically_cached()
     {
         $this->markTestIncomplete();
     }
 
-    /** @test */
+    #[Test]
     public function past_private_entries_are_not_viewable()
     {
         Carbon::setTestNow(Carbon::parse('2019-01-01'));
@@ -327,7 +329,7 @@ class FrontendTest extends TestCase
             ->assertStatus(404);
     }
 
-    /** @test */
+    #[Test]
     public function past_private_entries_are_viewable_in_live_preview()
     {
         Carbon::setTestNow(Carbon::parse('2019-01-01'));
@@ -346,13 +348,32 @@ class FrontendTest extends TestCase
             ->assertHeader('X-Statamic-Private', true);
     }
 
-    /** @test */
+    #[Test]
     public function past_private_entries_dont_get_statically_cached()
     {
         $this->markTestIncomplete();
     }
 
-    /** @test */
+    #[Test]
+    public function header_is_added_to_protected_responses()
+    {
+        $page = $this->createPage('about');
+
+        $this
+            ->get('/about')
+            ->assertOk()
+            ->assertHeaderMissing('X-Statamic-Protected');
+
+        $page->set('protect', 'logged_in')->save();
+
+        $this
+            ->actingAs(User::make())
+            ->get('/about')
+            ->assertOk()
+            ->assertHeader('X-Statamic-Protected', true);
+    }
+
+    #[Test]
     public function key_variables_key_added()
     {
         $page = $this->createPage('about');
@@ -372,7 +393,7 @@ class FrontendTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function fields_gets_augmented()
     {
         $this->withoutExceptionHandling();
@@ -397,7 +418,7 @@ class FrontendTest extends TestCase
         $this->assertEquals("<h1>Foo <em>Bar</em></h1>\n# Foo *Bar*", StringUtilities::normalizeLineEndings(trim($response->content())));
     }
 
-    /** @test */
+    #[Test]
     public function changes_content_type_to_xml()
     {
         $this->createPage('about', ['with' => ['content_type' => 'xml']]);
@@ -406,7 +427,7 @@ class FrontendTest extends TestCase
         $this->get('about')->assertHeader('Content-Type', 'text/xml; charset=UTF-8');
     }
 
-    /** @test */
+    #[Test]
     public function changes_content_type_to_atom()
     {
         $this->createPage('about', ['with' => ['content_type' => 'atom']]);
@@ -415,7 +436,7 @@ class FrontendTest extends TestCase
         $this->get('about')->assertHeader('Content-Type', 'application/atom+xml; charset=UTF-8');
     }
 
-    /** @test */
+    #[Test]
     public function changes_content_type_to_json()
     {
         $this->createPage('about', ['with' => ['content_type' => 'json']]);
@@ -423,7 +444,7 @@ class FrontendTest extends TestCase
         $this->get('about')->assertHeader('Content-Type', 'application/json');
     }
 
-    /** @test */
+    #[Test]
     public function changes_content_type_to_text()
     {
         $this->createPage('about', ['with' => ['content_type' => 'text']]);
@@ -432,7 +453,7 @@ class FrontendTest extends TestCase
         $this->get('about')->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
     }
 
-    /** @test */
+    #[Test]
     public function xml_antlers_template_with_xml_layout_will_use_both_and_change_the_content_type()
     {
         $this->withFakeViews();
@@ -447,7 +468,7 @@ class FrontendTest extends TestCase
         $this->assertEquals('<?xml ?><foo></foo>', $response->getContent());
     }
 
-    /** @test */
+    #[Test]
     public function xml_antlers_template_with_non_xml_layout_will_change_content_type_but_avoid_using_the_layout()
     {
         $this->withFakeViews();
@@ -462,7 +483,7 @@ class FrontendTest extends TestCase
         $this->assertEquals('<foo></foo>', $response->getContent());
     }
 
-    /** @test */
+    #[Test]
     public function xml_antlers_layout_will_change_the_content_type()
     {
         $this->withFakeViews();
@@ -477,7 +498,7 @@ class FrontendTest extends TestCase
         $this->assertEquals('<?xml ?><foo></foo>', $response->getContent());
     }
 
-    /** @test */
+    #[Test]
     public function xml_blade_template_will_not_change_content_type()
     {
         // Blade doesnt support xml files, but even if it did,
@@ -494,7 +515,7 @@ class FrontendTest extends TestCase
         $this->assertEquals('<foo></foo>', $response->getContent());
     }
 
-    /** @test */
+    #[Test]
     public function xml_template_with_custom_content_type_does_not_change_to_xml()
     {
         $this->withFakeViews();
@@ -507,7 +528,7 @@ class FrontendTest extends TestCase
             ->assertHeader('Content-Type', 'application/json');
     }
 
-    /** @test */
+    #[Test]
     public function sends_powered_by_header_if_enabled()
     {
         config(['statamic.system.send_powered_by_header' => true]);
@@ -516,7 +537,7 @@ class FrontendTest extends TestCase
         $this->get('about')->assertHeader('X-Powered-By', 'Statamic');
     }
 
-    /** @test */
+    #[Test]
     public function doesnt_send_powered_by_header_if_disabled()
     {
         config(['statamic.system.send_powered_by_header' => false]);
@@ -525,7 +546,7 @@ class FrontendTest extends TestCase
         $this->get('about')->assertHeaderMissing('X-Powered-By', 'Statamic');
     }
 
-    /** @test */
+    #[Test]
     public function disables_floc_through_header_by_default()
     {
         $this->createPage('about');
@@ -533,7 +554,7 @@ class FrontendTest extends TestCase
         $this->get('about')->assertHeader('Permissions-Policy', 'interest-cohort=()');
     }
 
-    /** @test */
+    #[Test]
     public function doesnt_disable_floc_through_header_if_disabled()
     {
         config(['statamic.system.disable_floc' => false]);
@@ -542,7 +563,7 @@ class FrontendTest extends TestCase
         $this->get('about')->assertHeaderMissing('Permissions-Policy', 'interest-cohort=()');
     }
 
-    /** @test */
+    #[Test]
     public function headers_can_be_set_in_content()
     {
         $page = $this->createPage('about', ['with' => [
@@ -557,7 +578,7 @@ class FrontendTest extends TestCase
             ->assertHeader('X-Another-Header', 'Bar');
     }
 
-    /** @test */
+    #[Test]
     public function event_is_emitted_when_response_is_created()
     {
         Event::fake([ResponseCreated::class]);
@@ -572,61 +593,61 @@ class FrontendTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function amp_requests_load_their_amp_directory_counterparts()
     {
         $this->markTestIncomplete();
     }
 
-    /** @test */
+    #[Test]
     public function amp_requests_without_an_amp_template_result_in_a_404()
     {
         $this->markTestIncomplete();
     }
 
-    /** @test */
+    #[Test]
     public function routes_pointing_to_controllers_should_render()
     {
         $this->markTestIncomplete();
     }
 
-    /** @test */
+    #[Test]
     public function routes_pointing_to_invalid_controller_should_render_404()
     {
         $this->markTestIncomplete();
     }
 
-    /** @test */
+    #[Test]
     public function a_redirect_key_in_the_page_data_should_redirect()
     {
         $this->markTestIncomplete();
     }
 
-    /** @test */
+    #[Test]
     public function a_redirect_key_with_a_404_value_should_404()
     {
         $this->markTestIncomplete();
     }
 
-    /** @test */
+    #[Test]
     public function a_redirect_key_with_an_entry_should_redirect_to_the_entry()
     {
         $this->markTestIncomplete();
     }
 
-    /** @test */
+    #[Test]
     public function a_redirect_key_with_an_unknown_entry_should_404()
     {
         $this->markTestIncomplete();
     }
 
-    /** @test */
+    #[Test]
     public function debug_bar_shows_cascade_variables_if_enabled()
     {
         $this->markTestIncomplete();
     }
 
-    /** @test */
+    #[Test]
     public function the_404_page_is_treated_like_a_template()
     {
         $this->withFakeViews();
@@ -640,15 +661,15 @@ class FrontendTest extends TestCase
         // todo: test cascade vars are in the debugbar
     }
 
-    /** @test */
+    #[Test]
     public function it_sets_the_translation_locale_based_on_site()
     {
         app('translator')->addNamespace('test', __DIR__.'/__fixtures__/lang');
 
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
         $this->viewShouldReturnRaw('some_template', '<p>{{ trans key="test::messages.hello" }}</p>');
@@ -661,7 +682,7 @@ class FrontendTest extends TestCase
         $this->get('/fr/le-about')->assertSee('Bonjour');
     }
 
-    /** @test */
+    #[Test]
     public function it_sets_the_carbon_to_string_format()
     {
         config(['statamic.system.date_format' => 'd/m/Y']);
@@ -678,7 +699,7 @@ class FrontendTest extends TestCase
         $this->assertDefaultCarbonFormat();
     }
 
-    /** @test */
+    #[Test]
     public function it_sets_the_locale()
     {
         // You can only set the locale to one that is actually installed on the server.
@@ -691,10 +712,10 @@ class FrontendTest extends TestCase
         $frLocale = setlocale(LC_TIME, 0);
         setlocale(LC_TIME, $originalLocale);
 
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'english' => ['url' => 'http://localhost/', 'locale' => 'en', 'lang' => 'en'],
             'french' => ['url' => 'http://localhost/fr/', 'locale' => $frLocale, 'lang' => 'fr'],
-        ]]);
+        ]);
 
         (new class extends Tags
         {
@@ -745,10 +766,9 @@ class FrontendTest extends TestCase
     }
 
     /**
-     * @test
-     *
      * @see https://github.com/statamic/cms/issues/1537
      **/
+    #[Test]
     public function home_page_is_not_overridden_by_entries_in_another_structured_collection_with_no_url()
     {
         $this->withFakeViews();
@@ -771,11 +791,8 @@ class FrontendTest extends TestCase
         $this->get('/')->assertSee('Home');
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider redirectProvider
-     */
+    #[Test]
+    #[DataProvider('redirectProvider')]
     public function redirect_is_followed($dataValue, $augmentedValue, $expectedStatus, $expectedLocation)
     {
         // Making a fake fieldtype to test that the augmented value is used for the redirect.
@@ -841,11 +858,8 @@ class FrontendTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider redirectProviderNoBlueprintProvider
-     */
+    #[Test]
+    #[DataProvider('redirectProviderNoBlueprintProvider')]
     public function redirect_is_followed_when_no_field_is_present_in_blueprint(
         $dataValue,
         $shouldResolve,
@@ -910,7 +924,92 @@ class FrontendTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
+    public function redirect_is_followed_when_value_is_inherited_from_origin()
+    {
+        $this->setSites([
+            'en' => ['url' => '/', 'locale' => 'en'],
+            'fr' => ['url' => '/fr/', 'locale' => 'fr'],
+        ]);
+
+        $blueprint = Blueprint::makeFromFields([
+            'redirect' => [
+                'type' => 'group',
+                'fields' => [
+                    ['handle' => 'url', 'field' => ['type' => 'link']],
+                    ['handle' => 'status', 'field' => ['type' => 'radio', 'options' => [301, 302]]],
+                ],
+            ]]);
+        Blueprint::shouldReceive('in')->with('collections/pages')->andReturn(collect([$blueprint]));
+
+        Collection::make('pages')->sites(['en', 'fr'])->routes(['en' => '{slug}', 'fr' => '{slug}'])->save();
+
+        $entry = tap($this->createPage('about', [
+            'with' => [
+                'title' => 'About',
+                'redirect' => [
+                    'url' => '/test',
+                    'status' => 301,
+                ],
+            ],
+        ]))->save();
+        tap($entry->makeLocalization('fr'))->save();
+
+        $response = $this->get('/fr/about');
+
+        $response->assertRedirect('/test');
+        $response->assertStatus(301);
+    }
+
+    #[Test]
+    public function redirect_http_status_is_applied_when_present_in_blueprint()
+    {
+        $blueprint = Blueprint::makeFromFields([
+            'redirect' => [
+                'type' => 'group',
+                'fields' => [
+                    ['handle' => 'url', 'field' => ['type' => 'link']],
+                    ['handle' => 'status', 'field' => ['type' => 'radio', 'options' => [301, 302]]],
+                ],
+            ]]);
+        Blueprint::shouldReceive('in')->with('collections/pages')->andReturn(collect([$blueprint]));
+
+        tap($this->createPage('about', [
+            'with' => [
+                'title' => 'About',
+                'redirect' => [
+                    'url' => '/test',
+                    'status' => 301,
+                ],
+            ],
+        ]))->save();
+
+        $response = $this->get('/about');
+
+        $response->assertRedirect('/test');
+        $response->assertStatus(301);
+    }
+
+    #[Test]
+    public function redirect_http_status_is_applied_when_missing_from_blueprint()
+    {
+        tap($this->createPage('about', [
+            'with' => [
+                'title' => 'About',
+                'redirect' => [
+                    'url' => '/test',
+                    'status' => 301,
+                ],
+            ],
+        ]))->save();
+
+        $response = $this->get('/about');
+
+        $response->assertRedirect('/test');
+        $response->assertStatus(301);
+    }
+
+    #[Test]
     public function it_protects_404_pages()
     {
         $this->get('/does-not-exist')->assertStatus(404);

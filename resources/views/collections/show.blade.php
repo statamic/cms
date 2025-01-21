@@ -8,7 +8,7 @@
         title="{{ $collection->title() }}"
         handle="{{ $collection->handle() }}"
         breadcrumb-url="{{ cp_route('collections.index') }}"
-        :can-create="@can('create', ['Statamic\Contracts\Entries\Entry', $collection]) true @else false @endcan"
+        :can-create="{{ Statamic\Support\Str::bool($canCreate) }}"
         :create-urls='@json($createUrls)'
         create-label="{{ $collection->createLabel() }}"
         :blueprints='@json($blueprints)'
@@ -20,6 +20,7 @@
         reorder-url="{{ cp_route('collections.entries.reorder', $collection->handle()) }}"
         initial-site="{{ $site }}"
         :sites="{{ json_encode($sites) }}"
+        :can-change-localization-delete-behavior="{{ Statamic\Support\Str::bool($canChangeLocalizationDeleteBehavior) }}"
 
         @if ($collection->hasStructure())
         :structured="{{ Statamic\Support\Str::bool($user->can('reorder', $collection)) }}"
@@ -34,8 +35,9 @@
             auth()->user()->can('edit', $collection)
             || auth()->user()->can('delete', $collection)
             || auth()->user()->can('configure fields')
+            || $actions->isNotEmpty()
         )
-        <template #twirldown>
+        <template #twirldown="{ actionCompleted }">
             @can('edit', $collection)
                 <dropdown-item :text="__('Edit Collection')" redirect="{{ $collection->editUrl() }}"></dropdown-item>
             @endcan
@@ -45,16 +47,12 @@
             @can('edit', $collection)
                 <dropdown-item :text="__('Scaffold Views')" redirect="{{ cp_route('collections.scaffold', $collection->handle()) }}"></dropdown-item>
             @endcan
-            @can('delete', $collection)
-                <dropdown-item :text="__('Delete Collection')" class="warning" @click="$refs.deleter.confirm()">
-                    <resource-deleter
-                        ref="deleter"
-                        resource-title="{{ $collection->title() }}"
-                        route="{{ cp_route('collections.destroy', $collection->handle()) }}"
-                        redirect="{{ cp_route('collections.index') }}"
-                    ></resource-deleter>
-                </dropdown-item>
-            @endcan
+            <data-list-inline-actions
+                item="{{ $collection->handle() }}"
+                url="{{ cp_route('collections.actions.run', ['collection' => $collection->handle()]) }}"
+                :actions="{{ $actions }}"
+                @completed="actionCompleted"
+            ></data-list-inline-actions>
         </template>
         @endif
     </collection-view>

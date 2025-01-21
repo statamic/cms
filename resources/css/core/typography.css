@@ -3,7 +3,7 @@
    ========================================================================== */
 
 body {
-    @apply font-sans text-gray-900 text-base tracking-normal;
+    @apply font-sans text-gray-900 text-base tracking-normal dark:text-dark-100;
     font-variant: common-ligatures tabular-nums;
     font-feature-settings: "zero", "ss01", "calt" off;
 
@@ -42,10 +42,10 @@ h6 {
 }
 
 a:not([class^="btn"]) {
-    @apply text-gray-800 cursor-pointer;
+    @apply text-gray-800 dark:text-dark-150 cursor-pointer;
 
     &:hover {
-        @apply text-blue;
+        @apply text-blue dark:text-blue-300;
     }
 }
 
@@ -59,7 +59,7 @@ a:not([class^="btn"]) {
     }
 
     p, ol, ul, pre {
-        @apply text-gray-700 text-sm leading-normal mb-2;
+        @apply text-gray-700 text-sm leading-normal mb-2 dark:text-dark-150;
 
         a {
             @apply text-blue;
@@ -77,6 +77,7 @@ a:not([class^="btn"]) {
 
     pre {
         background-color: #f9f2f4;
+        overflow: auto;
         @apply p-2;
 
         code {
@@ -110,7 +111,7 @@ sup {
 .little-heading {
     font-size: 11px;
     font-weight: bold;
-    padding: 15px 0 0 20px;
+    padding: 15px 0 0 20px ; [dir="rtl"] & { padding: 15px 20px 0 0 ; }
     letter-spacing: 1px;
     text-transform: uppercase;
 }
@@ -120,10 +121,9 @@ sup {
 }
 
 code {
-    @apply font-mono rounded;
+    @apply font-mono rounded text-[#c7254e] dark:text-blue-400 dark:bg-dark-700;
     padding: 2px 4px;
     font-size: 90%;
-    color: #c7254e;
     background-color: #f9f2f4;
 }
 

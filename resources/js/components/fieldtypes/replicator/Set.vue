@@ -2,16 +2,22 @@
 
     <div :class="sortableItemClass">
         <slot name="picker" />
-        <div class="replicator-set" :class="{ 'has-error': this.hasError }">
+        <div class="replicator-set" :class="{ 'has-error': this.hasError }" :data-type="config.handle">
 
             <div class="replicator-set-header" :class="{ 'p-2': isReadOnly, 'collapsed': collapsed, 'invalid': isInvalid }">
                 <div class="item-move sortable-handle" :class="sortableHandleClass" v-if="!isReadOnly"></div>
                 <div class="flex items-center flex-1 p-2 replicator-set-header-inner cursor-pointer" :class="{'flex items-center': collapsed}" @click="toggleCollapsedState">
-                    <label v-text="display || config.handle" class="text-xs whitespace-nowrap mr-2 cursor-pointer"/>
+                    <label class="text-xs rtl:ml-2 ltr:mr-2 cursor-pointer">
+                        <span v-if="isSetGroupVisible">
+                            {{ __(setGroup.display) }}
+                            <svg-icon name="micro/chevron-right" class="w-4" />
+                        </span>
+                        {{ display || config.handle }}
+                    </label>
                     <div class="flex items-center" v-if="config.instructions && !collapsed">
                         <svg-icon name="micro/circle-help" class="text-gray-700 hover:text-gray-800 h-3 w-3 text-xs" v-tooltip="{ content: $options.filters.markdown(__(config.instructions)), html:true }" />
                     </div>
-                    <div v-show="collapsed" class="flex-1 min-w-0 w-1 pr-8">
+                    <div v-show="collapsed" class="flex-1 min-w-0 w-1 rtl:pl-8 ltr:pr-8">
                         <div
                             v-html="previewText"
                             class="help-block mb-0 whitespace-nowrap overflow-hidden text-ellipsis" />
@@ -20,11 +26,13 @@
                 <div class="replicator-set-controls" v-if="!isReadOnly">
                     <toggle-fieldtype
                         handle="set-enabled"
-                        class="toggle-sm mr-2"
+                        class="toggle-sm rtl:ml-2 ltr:mr-2"
                         @input="toggleEnabledState"
                         :value="values.enabled"
                         v-tooltip.top="(values.enabled) ? __('Included in output') : __('Hidden from output')" />
                     <dropdown-list>
+                        <dropdown-actions :actions="fieldActions" v-if="fieldActions.length" />
+                        <div class="divider" />
                         <dropdown-item :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))" @click="toggleCollapsedState" />
                         <dropdown-item :text="__('Duplicate Set')" @click="duplicate" v-if="canAddSet" />
                         <dropdown-item :text="__('Delete Set')" class="warning" @click="destroy" />
@@ -71,12 +79,20 @@
 import SetField from './Field.vue';
 import ManagesPreviewText from './ManagesPreviewText';
 import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
+import HasFieldActions from '../../field-actions/HasFieldActions.js';
+import DropdownActions from '../../field-actions/DropdownActions.vue';
 
 export default {
 
-    components: { SetField },
+    components: { SetField, DropdownActions },
 
-    mixins: [ValidatesFieldConditions, ManagesPreviewText],
+    mixins: [
+        ValidatesFieldConditions,
+        ManagesPreviewText,
+        HasFieldActions,
+    ],
+
+    inject: ['replicatorSets', 'storeName'],
 
     props: {
         config: {
@@ -148,8 +164,20 @@ export default {
             return this.config.instructions ? markdown(__(this.config.instructions)) : null;
         },
 
+        setGroup() {
+            if (this.replicatorSets.length < 1) return null;
+
+            return this.replicatorSets.find((group) => {
+                return group.sets.filter((set) => set.handle === this.config.handle).length > 0;
+            });
+        },
+
         hasMultipleFields() {
             return this.fields.length > 1;
+        },
+
+        isSetGroupVisible() {
+            return this.replicatorSets.length > 1 && this.setGroup?.display;
         },
 
         isHidden() {
@@ -158,6 +186,31 @@ export default {
 
         isInvalid() {
             return Object.keys(this.config).length === 0;
+        },
+
+        fieldVm() {
+            let vm = this;
+            while (vm !== vm.$root) {
+                if (vm.$options.name === 'replicator-fieldtype') return vm;
+                vm = vm.$parent;
+            }
+        },
+
+        fieldActionPayload() {
+            return {
+                vm: this,
+                fieldVm: this.fieldVm,
+                fieldPathPrefix: this.fieldPathPrefix,
+                index: this.index,
+                values: this.values,
+                config: this.config,
+                meta: this.meta,
+                update: (handle, value) => this.updated(handle, value),
+                updateMeta: (handle, value) => this.metaUpdated(handle, value),
+                isReadOnly: this.isReadOnly,
+                store: this.$store,
+                storeName: this.storeName,
+            };
         },
 
     },

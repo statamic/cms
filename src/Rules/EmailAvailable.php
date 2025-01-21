@@ -2,30 +2,16 @@
 
 namespace Statamic\Rules;
 
-use Illuminate\Contracts\Validation\Rule;
+use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Statamic\Facades\User;
 
-class EmailAvailable implements Rule
+class EmailAvailable implements ValidationRule
 {
-    /**
-     * Determine if the validation rule passes.
-     *
-     * @param  string  $attribute
-     * @param  mixed  $value
-     * @return bool
-     */
-    public function passes($attribute, $value)
+    public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        return User::query()->where('email', trim($value))->count() === 0;
-    }
-
-    /**
-     * Get the validation error message.
-     *
-     * @return string
-     */
-    public function message()
-    {
-        return 'A user with this email already exists.';
+        if (User::query()->where('email', trim($value))->count() !== 0) {
+            $fail('statamic::validation.email_available')->translate();
+        }
     }
 }

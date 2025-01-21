@@ -8,13 +8,16 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Reflector;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Actions\Action;
+use Statamic\Dictionaries\Dictionary;
 use Statamic\Exceptions\NotBootedException;
 use Statamic\Extend\Manifest;
 use Statamic\Facades\Addon;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Fieldset;
+use Statamic\Facades\Path;
 use Statamic\Fields\Fieldtype;
 use Statamic\Forms\JsDrivers\JsDriver;
 use Statamic\Modifiers\Modifier;
@@ -54,6 +57,11 @@ abstract class AddonServiceProvider extends ServiceProvider
      * @var list<class-string<Action>>
      */
     protected $actions = [];
+
+    /**
+     * @var list<class-string<Dictionary>>
+     */
+    protected $dictionaries = [];
 
     /**
      * @var list<class-string<Fieldtype>>
@@ -175,6 +183,10 @@ abstract class AddonServiceProvider extends ServiceProvider
      */
     protected $translations = true;
 
+    private $autoloadedClasses;
+
+    private $bootedAddons;
+
     public function boot()
     {
         Statamic::booted(function () {
@@ -187,6 +199,7 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootTags()
                 ->bootScopes()
                 ->bootActions()
+                ->bootDictionaries()
                 ->bootFieldtypes()
                 ->bootModifiers()
                 ->bootWidgets()
@@ -208,6 +221,8 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootFieldsets()
                 ->bootPublishAfterInstall()
                 ->bootAddon();
+
+            $this->bootedAddons()->push($this->getAddon()->id());
         });
     }
 
@@ -218,22 +233,71 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     public function bootEvents()
     {
-        foreach ($this->listen as $event => $listeners) {
+        $this->getEventListeners()->each(function ($listeners, $event) {
             foreach ($listeners as $listener) {
                 Event::listen($event, $listener);
             }
-        }
+        });
 
-        foreach ($this->subscribe as $subscriber) {
+        $subscribers = collect($this->subscribe)
+            ->merge($this->autoloadFilesFromFolder('Subscribers'))
+            ->unique();
+
+        foreach ($subscribers as $subscriber) {
             Event::subscribe($subscriber);
         }
 
         return $this;
     }
 
+    private function getEventListeners()
+    {
+        $arr = [];
+
+        foreach ($this->discoverListenerEvents() as $listener => $events) {
+            foreach ($events as $event) {
+                $arr[$event][] = $listener;
+            }
+        }
+
+        foreach ($this->listen as $event => $listeners) {
+            foreach ($listeners as $listener) {
+                if (! in_array($listener, $arr[$event] ?? [])) {
+                    $arr[$event][] = $listener;
+                }
+            }
+        }
+
+        return collect($arr);
+    }
+
+    private function discoverListenerEvents()
+    {
+        return collect($this->autoloadFilesFromFolder('Listeners'))->mapWithKeys(function ($class) {
+            $listener = new \ReflectionClass($class);
+            $events = [];
+
+            foreach ($listener->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
+                if ((! Str::is('handle*', $method->name) && ! Str::is('__invoke', $method->name)) || ! isset($method->getParameters()[0])) {
+                    continue;
+                }
+
+                $key = Str::is(['__invoke', 'handle'], $method->name) ? $class : $class.'@'.$method->name;
+
+                $events[$key] = Reflector::getParameterClassNames($method->getParameters()[0]);
+            }
+
+            return $events;
+        });
+    }
+
     protected function bootTags()
     {
-        foreach ($this->tags as $class) {
+        $tags = collect($this->tags)
+            ->merge($this->autoloadFilesFromFolder('Tags', Tags::class))
+            ->unique();
+
+        foreach ($tags as $class) {
             $class::register();
         }
 
@@ -242,7 +306,11 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootScopes()
     {
-        foreach ($this->scopes as $class) {
+        $scopes = collect($this->scopes)
+            ->merge($this->autoloadFilesFromFolder('Scopes', Scope::class))
+            ->unique();
+
+        foreach ($scopes as $class) {
             $class::register();
         }
 
@@ -251,7 +319,24 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootActions()
     {
-        foreach ($this->actions as $class) {
+        $actions = collect($this->actions)
+            ->merge($this->autoloadFilesFromFolder('Actions', Action::class))
+            ->unique();
+
+        foreach ($actions as $class) {
+            $class::register();
+        }
+
+        return $this;
+    }
+
+    protected function bootDictionaries()
+    {
+        $dictionaries = collect($this->dictionaries)
+            ->merge($this->autoloadFilesFromFolder('Dictionaries', Dictionary::class))
+            ->unique();
+
+        foreach ($dictionaries as $class) {
             $class::register();
         }
 
@@ -260,7 +345,11 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootFieldtypes()
     {
-        foreach ($this->fieldtypes as $class) {
+        $fieldtypes = collect($this->fieldtypes)
+            ->merge($this->autoloadFilesFromFolder('Fieldtypes', Fieldtype::class))
+            ->unique();
+
+        foreach ($fieldtypes as $class) {
             $class::register();
         }
 
@@ -269,7 +358,11 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootModifiers()
     {
-        foreach ($this->modifiers as $class) {
+        $modifiers = collect($this->modifiers)
+            ->merge($this->autoloadFilesFromFolder('Modifiers', Modifier::class))
+            ->unique();
+
+        foreach ($modifiers as $class) {
             $class::register();
         }
 
@@ -278,7 +371,11 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootWidgets()
     {
-        foreach ($this->widgets as $class) {
+        $widgets = collect($this->widgets)
+            ->merge($this->autoloadFilesFromFolder('Widgets', Widget::class))
+            ->unique();
+
+        foreach ($widgets as $class) {
             $class::register();
         }
 
@@ -306,7 +403,13 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected function bootCommands()
     {
         if ($this->app->runningInConsole()) {
-            $this->commands($this->commands);
+            $commands = collect($this->commands)
+                ->merge($this->autoloadFilesFromFolder('Commands', Command::class))
+                ->merge($this->autoloadFilesFromFolder('Console/Commands', Command::class))
+                ->unique()
+                ->all();
+
+            $this->commands($commands);
         }
 
         return $this;
@@ -358,6 +461,10 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootConfig()
     {
+        if (! $this->shouldBootRootItems()) {
+            return $this;
+        }
+
         $filename = $this->getAddon()->slug();
         $directory = $this->getAddon()->directory();
         $origin = "{$directory}config/{$filename}.php";
@@ -377,6 +484,10 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootTranslations()
     {
+        if (! $this->shouldBootRootItems()) {
+            return $this;
+        }
+
         $slug = $this->getAddon()->slug();
         $directory = $this->getAddon()->directory();
         $origin = "{$directory}lang";
@@ -417,15 +528,35 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootRoutes()
     {
-        if ($web = array_get($this->routes, 'web')) {
+        $directory = $this->getAddon()->directory();
+
+        $web = Arr::get(
+            array: $this->routes,
+            key: 'web',
+            default: $this->shouldBootRootItems() && $this->app['files']->exists($path = $directory.'routes/web.php') ? $path : null
+        );
+
+        if ($web) {
             $this->registerWebRoutes($web);
         }
 
-        if ($cp = array_get($this->routes, 'cp')) {
+        $cp = Arr::get(
+            array: $this->routes,
+            key: 'cp',
+            default: $this->shouldBootRootItems() && $this->app['files']->exists($path = $directory.'routes/cp.php') ? $path : null
+        );
+
+        if ($cp) {
             $this->registerCpRoutes($cp);
         }
 
-        if ($actions = array_get($this->routes, 'actions')) {
+        $actions = Arr::get(
+            array: $this->routes,
+            key: 'actions',
+            default: $this->shouldBootRootItems() && $this->app['files']->exists($path = $directory.'routes/actions.php') ? $path : null
+        );
+
+        if ($actions) {
             $this->registerActionRoutes($actions);
         }
 
@@ -491,7 +622,11 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootUpdateScripts()
     {
-        foreach ($this->updateScripts as $class) {
+        $scripts = collect($this->updateScripts)
+            ->merge($this->autoloadFilesFromFolder('UpdateScripts', UpdateScript::class))
+            ->unique();
+
+        foreach ($scripts as $class) {
             $class::register($this->getAddon()->package());
         }
 
@@ -500,6 +635,10 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootViews()
     {
+        if (! $this->shouldBootRootItems()) {
+            return $this;
+        }
+
         if (file_exists($this->getAddon()->directory().'resources/views')) {
             $this->loadViewsFrom(
                 $this->getAddon()->directory().'resources/views',
@@ -626,6 +765,10 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootBlueprints()
     {
+        if (! $this->shouldBootRootItems()) {
+            return $this;
+        }
+
         if (! file_exists($path = "{$this->getAddon()->directory()}resources/blueprints")) {
             return $this;
         }
@@ -640,6 +783,10 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootFieldsets()
     {
+        if (! $this->shouldBootRootItems()) {
+            return $this;
+        }
+
         if (! file_exists($path = "{$this->getAddon()->directory()}resources/fieldsets")) {
             return $this;
         }
@@ -650,5 +797,99 @@ abstract class AddonServiceProvider extends ServiceProvider
         );
 
         return $this;
+    }
+
+    protected function autoloadFilesFromFolder($folder, $requiredClass = null)
+    {
+        try {
+            $addon = $this->getAddon();
+        } catch (NotBootedException $e) {
+            // This would be thrown if a developer has tried to call a method
+            // that triggers autoloading before Statamic has booted. Perhaps
+            // they have placed it in the boot method instead of bootAddon.
+            return [];
+        }
+
+        $reflection = new \ReflectionClass(static::class);
+        $path = dirname($reflection->getFileName()).'/'.$folder;
+
+        if (! $this->app['files']->exists($path)) {
+            return [];
+        }
+
+        $autoloadable = [];
+
+        foreach ($this->app['files']->files($path) as $file) {
+            if ($file->getExtension() !== 'php') {
+                continue;
+            }
+
+            $class = $file->getBasename('.php');
+            $fqcn = $reflection->getNamespaceName().'\\'.str_replace('/', '\\', $folder).'\\'.$class;
+
+            if ((new \ReflectionClass($fqcn))->isAbstract() || (new \ReflectionClass($fqcn))->isInterface()) {
+                continue;
+            }
+
+            if ($requiredClass && ! is_subclass_of($fqcn, $requiredClass)) {
+                continue;
+            }
+
+            if ($this->autoloadedClasses()->contains($fqcn)) {
+                continue;
+            }
+
+            $autoloadable[] = $fqcn;
+            $this->autoloadedClasses()->push($fqcn);
+        }
+
+        return $autoloadable;
+    }
+
+    private function shouldBootRootItems()
+    {
+        $addon = $this->getAddon();
+
+        // We'll keep track of addons that have been booted to ensure that multiple
+        // providers don't try to boot things twice. This could happen if there are
+        // multiple providers in the root autoload directory (src) of an addon.
+        if ($this->bootedAddons()->contains($addon->id())) {
+            return false;
+        }
+
+        // We only want to boot root items if the provider is in the autoloaded directory.
+        // i.e. It's the "root" provider. If it's in a subdirectory maybe the developer
+        // is organizing their providers. Things like tags etc. can be autoloaded but
+        // root level things like routes, views, config, blueprints, etc. will not.
+        $thisDir = Path::tidy(dirname((new \ReflectionClass(static::class))->getFileName()));
+        $autoloadDir = $addon->directory().$addon->autoload();
+
+        return $thisDir === $autoloadDir;
+    }
+
+    private function autoloadedClasses()
+    {
+        if ($this->autoloadedClasses) {
+            return $this->autoloadedClasses;
+        }
+
+        if (! $this->app->bound($autoloaded = 'statamic.autoloaded-addon-classes')) {
+            $this->app->instance($autoloaded, collect());
+        }
+
+        return $this->autoloadedClasses = $this->app->make($autoloaded);
+    }
+
+    private function bootedAddons()
+    {
+        if ($this->bootedAddons) {
+            return $this->bootedAddons;
+        }
+
+        if (! $this->app->bound($booted = 'statamic.booted-addons')) {
+            $this->app->instance($booted, collect());
+        }
+
+        return $this->bootedAddons = $this->app->make($booted);
     }
 }

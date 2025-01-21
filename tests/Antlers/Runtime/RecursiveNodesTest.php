@@ -2,6 +2,7 @@
 
 namespace Tests\Antlers\Runtime;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Nav;
 use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 use Statamic\View\Antlers\Language\Runtime\NodeProcessor;

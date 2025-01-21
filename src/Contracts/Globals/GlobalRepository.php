@@ -12,5 +12,7 @@ interface GlobalRepository
 
     public function findByHandle($handle): ?GlobalSet;
 
+    public function findOrFail($id): GlobalSet;
+
     public function save($global);
 }

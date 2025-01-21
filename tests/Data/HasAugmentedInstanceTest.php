@@ -3,6 +3,7 @@
 namespace Tests\Data;
 
 use ArrayAccess;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Data\AugmentedCollection;
 use Statamic\Data\HasAugmentedInstance;
@@ -11,7 +12,7 @@ use Tests\TestCase;
 
 class HasAugmentedInstanceTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_makes_an_augmented_instance()
     {
         $augmentedCollection = new AugmentedCollection(['foo', 'bar', 'baz']);
@@ -20,6 +21,7 @@ class HasAugmentedInstanceTest extends TestCase
 
         $mock = $this->mock(Augmented::class);
         $mock->shouldReceive('withRelations')->with([])->andReturnSelf();
+        $mock->shouldReceive('withBlueprintFields')->with([])->andReturnSelf();
         $mock->shouldReceive('get')->with('foo')->once()->andReturn(new Value('bar'));
         $mock->shouldReceive('select')->with(null)->times(2)->andReturn($augmentedCollection);
         $mock->shouldReceive('select')->with(['one'])->times(2)->andReturn($filteredAugmentedCollection);
@@ -57,11 +59,48 @@ class HasAugmentedInstanceTest extends TestCase
         $this->assertTrue($collection->hasShallowNesting());
     }
 
-    /** @test */
+    #[Test]
+    public function instance_runs_through_hook()
+    {
+        $mock = $this->mock(Augmented::class);
+        $mock->shouldReceive('testing')->once();
+
+        $mock2 = $this->mock(Augmented::class);
+
+        $thing = new class($mock)
+        {
+            use HasAugmentedInstance;
+
+            private $mock;
+
+            public function __construct($mock)
+            {
+                $this->mock = $mock;
+            }
+
+            public function newAugmentedInstance(): Augmented
+            {
+                return $this->mock;
+            }
+        };
+
+        // Call a method on the payload to make sure the payload is being passed in.
+        // A different payload is intentionally being returned so that we can test the new value gets used.
+        $thing::hook('augmented', function ($payload, $next) use ($mock2) {
+            $payload->testing();
+
+            return $next($mock2);
+        });
+
+        $this->assertSame($mock2, $thing->augmented());
+    }
+
+    #[Test]
     public function augmented_thing_can_define_the_default_array_keys()
     {
         $mock = $this->mock(Augmented::class);
         $mock->shouldReceive('withRelations')->with([])->andReturnSelf();
+        $mock->shouldReceive('withBlueprintFields')->with([])->andReturnSelf();
         $mock->shouldReceive('select')->with(['foo', 'bar'])->once()->andReturn(new AugmentedCollection(['foo', 'bar']));
 
         $thing = new class($mock)
@@ -89,11 +128,12 @@ class HasAugmentedInstanceTest extends TestCase
         $this->assertEquals(['foo', 'bar'], $thing->toAugmentedArray());
     }
 
-    /** @test */
+    #[Test]
     public function augmented_thing_can_define_the_default_relations()
     {
         $mock = $this->mock(Augmented::class);
         $mock->shouldReceive('withRelations')->with(['baz', 'qux'])->andReturnSelf();
+        $mock->shouldReceive('withBlueprintFields')->with([])->andReturnSelf();
         $mock->shouldReceive('select')->with(null)->once()->andReturn(new AugmentedCollection(['foo', 'bar']));
 
         $thing = new class($mock)
@@ -121,7 +161,7 @@ class HasAugmentedInstanceTest extends TestCase
         $this->assertEquals(['foo', 'bar'], $thing->toAugmentedArray());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_check_for_array_key_existence()
     {
         $mock = $this->mock(Augmented::class);

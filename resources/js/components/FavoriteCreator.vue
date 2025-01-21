@@ -2,7 +2,7 @@
     <div>
         <popover v-if="isNotYetFavorited" ref="popper" placement="bottom-end" :offset="[10, 28]">
             <template slot="trigger">
-                <button @click="shown" slot="reference" class="h-6 w-6 block outline-none p-1 text-gray hover:text-gray-800" v-tooltip="__('Pin to Favorites')" :aria-label="__('Pin to Favorites')">
+                <button @click="shown" slot="reference" class="global-header-icon-button" v-tooltip="__('Pin to Favorites')" :aria-label="__('Pin to Favorites')">
                     <svg-icon name="light/pin"></svg-icon>
                 </button>
             </template>
@@ -10,13 +10,13 @@
                 <h6 class="mb-2">{{ __('Pin to Favorites') }}</h6>
                 <div class="flex items-center">
                     <input type="text" class="input-text w-auto" ref="fave" v-model="name" @keydown.enter="save" />
-                    <button @click="save" class="btn-primary ml-2">{{ __('Save') }}</button>
+                    <button @click="save" class="btn-primary rtl:mr-2 ltr:ml-2">{{ __('Save') }}</button>
                 </div>
-                <button @click="makeStartPage" class="mt-2 text-xs text-blue outline-none hover:text-blue-800">{{ __('Set as start page') }} &rarr;</button>
+                <button @click="makeStartPage" class="mt-2 text-xs text-blue outline-none hover:text-blue-800">{{ __('Set as start page') }} <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span></button>
             </div>
         </popover>
         <div v-else>
-            <button @click="remove" class="h-6 w-6 block outline-none p-1 text-gray hover:text-gray-800" v-tooltip="__('Unpin from Favorites')" :aria-label="__('Unpin from Favorites')">
+            <button @click="remove" class="global-header-icon-button" v-tooltip="__('Unpin from Favorites')" :aria-label="__('Unpin from Favorites')">
                 <svg-icon name="light/pin" class="text-green-600"></svg-icon>
             </button>
         </div>
@@ -29,7 +29,7 @@ export default {
 
     data() {
         return {
-            name: document.title.replace(' ‹ Statamic', ''),
+            name: document.title.replace(` ${this.$config.get('direction', 'ltr') === 'ltr' ? '‹' : '›'} ${__('Statamic')}`, ''),
             currentUrl: this.$config.get('urlPath')
         }
     },
@@ -50,7 +50,11 @@ export default {
 
         isNotYetFavorited() {
             return this.persistedFavorite === undefined;
-        }
+        },
+
+        direction() {
+            return this.$config.get('direction', 'ltr');
+        },
     },
 
     methods: {

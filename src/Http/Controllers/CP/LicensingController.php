@@ -16,6 +16,7 @@ class LicensingController extends CpController
             'unlistedAddons' => $licenses->addons()->reject->existsOnMarketplace(),
             'configCached' => app()->configurationIsCached(),
             'addToCartUrl' => $this->addToCartUrl($site, $statamic, $addons),
+            'usingLicenseKeyFile' => $licenses->usingLicenseKeyFile(),
         ]);
     }
 

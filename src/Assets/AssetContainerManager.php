@@ -6,6 +6,7 @@ use Illuminate\Filesystem\FilesystemManager;
 use Statamic\Facades\Parse;
 use Statamic\Facades\Path;
 use Statamic\Facades\URL;
+use Statamic\Support\Arr;
 
 class AssetContainerManager
 {
@@ -69,7 +70,7 @@ class AssetContainerManager
     {
         $config = $this->parseEnv($config);
 
-        $config['root'] = array_get($config, 'path');
+        $config['root'] = Arr::get($config, 'path');
 
         return $this->filesystem->createS3Driver($config);
     }

@@ -3,11 +3,12 @@
 namespace Statamic\Stache\Stores;
 
 use Statamic\Facades\Collection;
-use Statamic\Facades\Entry;
 use Statamic\Facades\Path;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\YAML;
+use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Symfony\Component\Finder\SplFileInfo;
 
 class CollectionsStore extends BasicStore
@@ -24,8 +25,8 @@ class CollectionsStore extends BasicStore
 
     public function getItemFilter(SplFileInfo $file)
     {
-        $dir = str_finish($this->directory, '/');
-        $relative = str_after(Path::tidy($file->getPathname()), $dir);
+        $dir = Str::finish($this->directory, '/');
+        $relative = Str::after(Path::tidy($file->getPathname()), $dir);
 
         return $file->getExtension() === 'yaml' && substr_count($relative, '/') === 0;
     }
@@ -35,32 +36,32 @@ class CollectionsStore extends BasicStore
         $handle = pathinfo($path, PATHINFO_FILENAME);
         $data = YAML::file($path)->parse($contents);
 
-        $sites = array_get($data, 'sites', Site::hasMultiple() ? [] : [Site::default()->handle()]);
+        $sites = Arr::get($data, 'sites', Site::multiEnabled() ? [] : [Site::default()->handle()]);
 
         $collection = Collection::make($handle)
-            ->title(array_get($data, 'title'))
-            ->routes(array_get($data, 'route'))
-            ->requiresSlugs(array_get($data, 'slugs', true))
-            ->titleFormats(array_get($data, 'title_format'))
-            ->mount(array_get($data, 'mount'))
-            ->dated(array_get($data, 'date', false))
+            ->title(Arr::get($data, 'title'))
+            ->routes(Arr::get($data, 'route'))
+            ->requiresSlugs(Arr::get($data, 'slugs', true))
+            ->titleFormats(Arr::get($data, 'title_format'))
+            ->mount(Arr::get($data, 'mount'))
+            ->dated(Arr::get($data, 'date', false))
             ->sites($sites)
-            ->template(array_get($data, 'template'))
-            ->layout(array_get($data, 'layout'))
-            ->cascade(array_get($data, 'inject', []))
-            ->searchIndex(array_get($data, 'search_index'))
-            ->revisionsEnabled(array_get($data, 'revisions', false))
+            ->template(Arr::get($data, 'template'))
+            ->layout(Arr::get($data, 'layout'))
+            ->cascade(Arr::get($data, 'inject', []))
+            ->searchIndex(Arr::get($data, 'search_index'))
+            ->revisionsEnabled(Arr::get($data, 'revisions', false))
             ->defaultPublishState($this->getDefaultPublishState($data))
-            ->originBehavior(array_get($data, 'origin_behavior', 'select'))
-            ->structureContents(array_get($data, 'structure'))
-            ->sortField(array_get($data, 'sort_by'))
-            ->sortDirection(array_get($data, 'sort_dir'))
-            ->taxonomies(array_get($data, 'taxonomies'))
-            ->propagate(array_get($data, 'propagate'))
-            ->previewTargets($this->normalizePreviewTargets(array_get($data, 'preview_targets', [])))
-            ->autosaveInterval(array_get($data, 'autosave'));
+            ->originBehavior(Arr::get($data, 'origin_behavior', 'select'))
+            ->structureContents(Arr::get($data, 'structure'))
+            ->sortField(Arr::get($data, 'sort_by'))
+            ->sortDirection(Arr::get($data, 'sort_dir'))
+            ->taxonomies(Arr::get($data, 'taxonomies'))
+            ->propagate(Arr::get($data, 'propagate'))
+            ->previewTargets($this->normalizePreviewTargets(Arr::get($data, 'preview_targets', [])))
+            ->autosaveInterval(Arr::get($data, 'autosave'));
 
-        if ($dateBehavior = array_get($data, 'date_behavior')) {
+        if ($dateBehavior = Arr::get($data, 'date_behavior')) {
             $collection
                 ->futureDateBehavior($dateBehavior['future'] ?? null)
                 ->pastDateBehavior($dateBehavior['past'] ?? null);
@@ -71,7 +72,7 @@ class CollectionsStore extends BasicStore
 
     protected function getDefaultPublishState($data)
     {
-        $value = array_get($data, 'default_status', 'published');
+        $value = Arr::get($data, 'default_status', 'published');
 
         if (! in_array($value, ['published', 'draft'])) {
             throw new \Exception('Invalid collection default_status value. Must be "published" or "draft".');
@@ -80,39 +81,9 @@ class CollectionsStore extends BasicStore
         return $value === 'published';
     }
 
-    public function updateEntryUris($collection, $ids = null)
-    {
-        $index = Stache::store('entries')
-            ->store($collection->handle())
-            ->index('uri');
-
-        $this->updateEntriesWithinIndex($index, $ids);
-    }
-
-    public function updateEntryOrder($collection, $ids = null)
-    {
-        $index = Stache::store('entries')
-            ->store($collection->handle())
-            ->index('order');
-
-        $this->updateEntriesWithinIndex($index, $ids);
-    }
-
-    private function updateEntriesWithinIndex($index, $ids)
-    {
-        if (empty($ids)) {
-            return $index->update();
-        }
-
-        collect($ids)
-            ->map(fn ($id) => Entry::find($id))
-            ->filter()
-            ->each(fn ($entry) => $index->updateItem($entry));
-    }
-
     public function handleFileChanges()
     {
-        if ($this->fileChangesHandled || ! config('statamic.stache.watcher')) {
+        if ($this->fileChangesHandled || ! Stache::isWatcherEnabled()) {
             return;
         }
 

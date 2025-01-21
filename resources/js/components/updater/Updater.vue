@@ -3,9 +3,9 @@
         <div class="flex items-center mb-6">
             <h1 class="flex-1">
                 <span v-text="name" />
-                <span v-if="currentVersion" class="font-normal text-gray-700 ml-2">{{ currentVersion }}</span>
+                <span v-if="currentVersion" class="font-normal text-gray-700 rtl:mr-2 ltr:ml-2">{{ currentVersion }}</span>
             </h1>
-            <button v-if="!onLatestVersion" class="btn-primary ml-4" @click="modalOpen = true">{{ __('Update') }}</button>
+            <button v-if="!onLatestVersion" class="btn-primary rtl:mr-4 ltr:ml-4" @click="modalOpen = true">{{ __('Update') }}</button>
             <div v-if="onLatestVersion" v-text="__('Up to date')" />
         </div>
 
@@ -53,7 +53,7 @@
             <div class="prose">
                 <p v-text="`${__('messages.updater_update_to_latest_command')}:`" />
                 <code-block copyable :text="`composer update ${package}`" />
-                <p>{{ __('Learn more about') }} <a href="https://statamic.dev/updating" target="_blank">{{ __('Updates') }}</a>.</p>
+                <p v-html="link"></p>
             </div>
         </confirmation-modal>
     </div>
@@ -112,6 +112,10 @@
 
             latestVersion() {
                 return this.latestRelease && this.latestRelease.version;
+            },
+
+            link() {
+                return __('Learn more about :link', { link: `<a href="https://statamic.dev/updating" target="_blank">${__('Updates')}</a>`}) + '.';
             },
         },
 

@@ -13,9 +13,9 @@
                 <p class="mb-2">{{ __(`Before you can delete this fieldset, you need to remove references to it in blueprints and fieldsets:`) }}</p>
 
                 <div v-for="(items, group) in resource.imported_by">
-                    <h3 class="little-heading pl-0 mb-2">{{ group }}</h3>
+                    <h3 class="little-heading rtl:pr-0 ltr:pl-0 mb-2">{{ group }}</h3>
 
-                    <ul class="list-disc pl-4">
+                    <ul class="list-disc rtl:pr-4 ltr:pl-4">
                         <li
                             v-for="item in items"
                             :key="item.handle"

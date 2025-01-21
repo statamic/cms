@@ -4,21 +4,24 @@ namespace Statamic\Forms\JsDrivers;
 
 use Statamic\Forms\Form;
 use Statamic\Support\Str;
+use Statamic\Tags\Parameters;
 
 abstract class AbstractJsDriver implements JsDriver
 {
     protected $form;
     protected $options;
+    protected $params;
 
     /**
      * Instantiate JS driver.
      *
      * @param  array  $options
      */
-    public function __construct(Form $form, $options = [])
+    public function __construct(Form $form, $options = [], ?Parameters $params = null)
     {
         $this->form = $form;
         $this->options = $options;
+        $this->params = $params;
 
         if (method_exists($this, 'parseOptions')) {
             $this->parseOptions($options);

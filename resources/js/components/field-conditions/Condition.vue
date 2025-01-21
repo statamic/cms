@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-wrap items-center py-4 border-t">
+    <div class="flex flex-wrap items-center py-4 border-t dark:border-dark-900">
         <div v-if="index === 0" class="help-block" v-text="__('messages.field_conditions_field_instructions')" />
 
         <v-select
@@ -19,7 +19,7 @@
             <template slot="option" slot-scope="option">
                 <div class="flex items-center">
                     <span v-text="option.label" />
-                    <span v-text="option.value" class="font-mono text-2xs text-gray-500" :class="{ 'ml-2': option.label }" />
+                    <span v-text="option.value" class="font-mono text-2xs text-gray-500 dark:text-dark-150" :class="{ 'ml-2': option.label }" />
                 </div>
             </template>
         </v-select>
@@ -28,12 +28,12 @@
             :value="condition.operator"
             :options="operatorOptions"
             :placeholder="false"
-            class="md:ml-4"
+            class="rtl:md:mr-4 ltr:md:ml-4"
             @input="operatorSelected" />
 
         <toggle-input
             v-if="showValueToggle"
-            class="ml-4"
+            class="rtl:mr-4 ltr:ml-4"
             :value="condition.value === 'true'"
             @input="valueUpdated" />
 
@@ -41,7 +41,7 @@
             v-else-if="showValueDropdown"
             ref="valueSelect"
             :value="condition.value"
-            class="ml-4 w-full md:w-52 mb-2 md:mb-0"
+            class="rtl:mr-4 ltr:ml-4 w-full md:w-52 mb-2 md:mb-0"
             :options="valueOptions"
             :placeholder="__('Option')"
             :taggable="false"
@@ -57,10 +57,10 @@
         <text-input
             v-else
             :value="condition.value"
-            class="ml-4"
+            class="rtl:mr-4 ltr:ml-4"
             @input="valueUpdated" />
 
-        <button @click="remove" class="btn-close ml-2 group">
+        <button @click="remove" class="btn-close rtl:mr-2 ltr:ml-2 group">
             <svg-icon name="micro/trash" class="w-4 h-4 group-hover:text-red-500" />
         </button>
     </div>
@@ -82,6 +82,10 @@ export default {
             type: Object,
             required: true
         },
+        conditions: {
+            type: Array,
+            required: true
+        },
         index: {
             type: Number,
             required: true
@@ -99,7 +103,7 @@ export default {
 
         showValueToggle() {
             return this.field
-                && ['toggle'].includes(this.field.config.type)
+                && ['toggle', 'revealer'].includes(this.field.config.type)
                 && ['equals', 'not', '===', '!=='].includes(this.condition.operator);
         },
 
@@ -116,8 +120,14 @@ export default {
         },
 
         fieldOptions() {
+            const conditions = this.conditions.map(condition => condition.field);
+
             return _(this.suggestableFields)
-                .reject(field => field.handle === this.config.handle || this.condition.field === field.handle)
+                .reject(field => {
+                    return field.handle === this.config.handle // Exclude the field you're adding a condition to.
+                        || this.condition.field === field.handle // Exclude the field being used in the current condition.
+                        || conditions.includes(field.handle); // Exclude fields already used in other conditions.
+                })
                 .map(field => {
                     let display = field.config.display;
 

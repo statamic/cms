@@ -6,9 +6,17 @@ use Statamic\Data\AbstractAugmented;
 
 class AugmentedVariables extends AbstractAugmented
 {
+    private $cachedKeys;
+
     public function keys()
     {
-        return $this->data->values()->keys()->all();
+        if ($this->cachedKeys) {
+            return $this->cachedKeys;
+        }
+
+        return $this->cachedKeys = $this->data->values()->keys()
+            ->merge($this->blueprintFields()->keys())
+            ->unique()->sort()->values()->all();
     }
 
     public function site()

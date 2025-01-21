@@ -5,6 +5,7 @@
         <uploader
             ref="uploader"
             :url="meta.uploadUrl"
+            :extra-data="{ config: configParameter }"
             :container="config.container"
             @updated="uploadsUpdated"
             @upload-complete="uploadComplete"
@@ -13,12 +14,12 @@
             <div slot-scope="{ dragging }" class="assets-fieldtype-drag-container">
 
                 <div class="drag-notification" v-show="dragging">
-                    <svg-icon name="upload" class="h-8 w-8 mr-6" />
+                    <svg-icon name="upload" class="h-8 w-8 rtl:ml-6 ltr:mr-6" />
                     <span>{{ __('Drop File to Upload') }}</span>
                 </div>
 
                 <div class="assets-fieldtype-picker py-4" :class="{ 'is-expanded': value.length }">
-                    <p class="asset-upload-control text-xs text-gray-600 ml-0">
+                    <p class="asset-upload-control text-xs text-gray-600 rtl:mr-0 ltr:ml-0">
                         <button type="button" class="upload-text-button" @click.prevent="uploadFile">
                             {{ __('Upload file') }}
                         </button>
@@ -37,7 +38,7 @@
                             <tr
                                 v-for="(file, i) in value"
                                 :key="file"
-                                class="asset-row bg-white hover:bg-gray-100"
+                                class="asset-row bg-white dark:bg-dark-600 hover:bg-gray-100"
                             >
                                 <td class="flex items-center">
                                     <div
@@ -46,14 +47,14 @@
                                         <file-icon :extension="getExtension(file)" />
                                     </div>
                                     <div
-                                        class="flex items-center flex-1 ml-2 text-xs text-left truncate"
-                                        v-text="file.slice(11)"
+                                        class="flex items-center flex-1 rtl:mr-2 ltr:ml-2 text-xs rtl:text-right ltr:text-left truncate"
+                                        v-text="file"
                                     />
                                 </td>
-                                <td class="p-0 w-8 text-right align-middle">
+                                <td class="p-0 w-8 rtl:text-left ltr:text-right align-middle">
                                     <button
                                         @click="remove(i)"
-                                        class="flex items-center p-2 w-full h-full text-gray-600 hover:text-gray-900"
+                                        class="flex items-center p-2 w-full h-full text-gray-600 dark:text-dark-150 hover:text-gray-950 dark:hover:text-dark-100"
                                     >
                                         <svg-icon name="micro/trash" class="w-6 h-6" />
                                     </button>
@@ -85,6 +86,12 @@ export default {
         return {
             uploads: [],
         }
+    },
+
+    computed: {
+        configParameter() {
+            return utf8btoa(JSON.stringify(this.config));
+        },
     },
 
     methods: {

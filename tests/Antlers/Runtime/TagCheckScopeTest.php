@@ -132,9 +132,6 @@ EOT;
 
     public function test_condition_augmentation_doesnt_reset_up_the_scope()
     {
-        $this->createData();
-        $this->withFakeViews();
-
         (new class extends Tags
         {
             public static $handle = 'just_a_tag';
@@ -144,6 +141,10 @@ EOT;
                 return [];
             }
         })::register();
+
+        $this->createData();
+        $this->withFakeViews();
+
         $template = <<<'EOT'
 
 {{ just_a_tag }}

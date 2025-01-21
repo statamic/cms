@@ -1,7 +1,7 @@
 <template>
 
-    <div class="h-full bg-gray-100 overflow-auto">
-        <div class="bg-gray-300 px-6 py-2 border-b text-lg font-medium flex items-center justify-between">
+    <div class="h-full bg-gray-100 dark:bg-dark-600 overflow-auto">
+        <div class="bg-gray-300 dark:bg-dark-600 px-6 py-2 border-b dark:border-dark-900 text-lg font-medium flex items-center justify-between">
             {{ __('Fieldtypes') }}
             <button type="button" class="btn-close" @click="close">×</button>
         </div>
@@ -10,23 +10,23 @@
             <loading-graphic />
         </div>
 
-        <div class="py-4 px-6 border-b bg-white flex items-center" v-if="fieldtypesLoaded">
-            <input type="text" class="input-text flex-1 bg-white text-sm w-full" autofocus v-model="search" ref="search" @keydown.esc="cancelSearch" :placeholder="`${__('Search')}...`" />
+        <div class="py-4 px-6 border-b dark:border-dark-900 bg-white dark:bg-dark-550 flex items-center" v-if="fieldtypesLoaded">
+            <input type="text" class="input-text flex-1 text-sm w-full" autofocus v-model="search" ref="search" @keydown.esc="cancelSearch" :placeholder="`${__('Search')}...`" />
         </div>
 
         <div class="p-4" v-if="fieldtypesLoaded">
             <div v-for="group in displayedFieldtypes" :key="group.handle" v-show="group.fieldtypes.length > 0" class="mb-8">
                 <h2 v-if="group.title" v-text="group.title" class="px-2 mb-1" />
-                <p v-if="group.description" v-text="group.description" class="px-2 mb-2 text-gray-700 text-sm"/>
+                <p v-if="group.description" v-text="group.description" class="px-2 mb-2 text-gray-700 dark:text-dark-150 text-sm"/>
                 <div class="fieldtype-selector">
                     <div class="fieldtype-list">
                         <div class="p-2" v-for="fieldtype in group.fieldtypes" :key="fieldtype.handle">
-                            <button class="bg-white border border-gray-500 flex items-center group w-full rounded hover:border-gray-600 shadow-sm hover:shadow-md pr-3"
+                            <button class="bg-white dark:bg-dark-700 border border-gray-500 dark:shadow-dark-sm dark:border-dark-900 flex items-center group w-full rounded hover:border-gray-600 dark:hover:border-dark-950 shadow-sm hover:shadow-md rtl:pl-3 ltr:pr-3"
                                 @click="select(fieldtype)">
-                                <div class="p-2 flex items-center border-r border-gray-500 group-hover:border-gray-600 bg-gray-200 rounded-l">
-                                    <svg-icon class="h-5 w-5 text-gray-800" :name="fieldtype.icon.startsWith('<svg') ? fieldtype.icon : `light/${fieldtype.icon}`" default="light/generic-field"></svg-icon>
+                                <div class="p-2 flex items-center rtl:border-l ltr:border-r border-gray-500 dark:border-dark-900 group-hover:border-gray-600 dark:group-hover:border-dark-950 bg-gray-200 dark:bg-dark-600 rtl:rounded-r ltr:rounded-l">
+                                    <svg-icon class="h-5 w-5 text-gray-800 dark:text-dark-150" :name="fieldtype.icon.startsWith('<svg') ? fieldtype.icon : `light/${fieldtype.icon}`" default="light/generic-field"></svg-icon>
                                 </div>
-                                <span class="pl-3 text-gray-800 text-md group-hover:text-gray-900">{{ fieldtype.text }}</span>
+                                <span class="rtl:pr-3 ltr:pl-3 text-gray-800 dark:text-dark-150 text-md group-hover:text-gray-900 dark:group-hover:text-dark-100">{{ fieldtype.text }}</span>
                             </button>
                         </div>
                     </div>
@@ -99,7 +99,7 @@ export default {
             if (!this.fieldtypesLoaded) return [];
 
             let options = this.fieldtypes.map(fieldtype => {
-                return {text: fieldtype.title, value: fieldtype.handle, categories: fieldtype.categories, icon: fieldtype.icon};
+                return {text: fieldtype.title, value: fieldtype.handle, categories: fieldtype.categories, keywords: fieldtype.keywords, icon: fieldtype.icon};
             });
 
             if (this.allowDate) options.unshift({text: __('Publish Date'), value: 'date', categories: ['system'], isMeta: true, icon: 'date'});
@@ -131,11 +131,14 @@ export default {
                 const fuse = new Fuse(options, {
                     findAllMatches: true,
                     threshold: 0.1,
-                    minMatchCharLength: 2,
-                    keys: ['text'],
+                    keys: [
+                        {name: 'text', weight: 1},
+                        {name: 'categories', weight: 0.1},
+                        {name: 'keywords', weight: 0.4},
+                    ],
                 });
 
-                options = fuse.search(this.search);
+                options = fuse.search(this.search).map(result => result.item);
             }
 
             return options;

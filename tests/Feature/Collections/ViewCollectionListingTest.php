@@ -3,6 +3,7 @@
 namespace Tests\Feature\Collections;
 
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\User;
 use Statamic\Entries\Collection;
 use Statamic\Facades;
@@ -15,7 +16,7 @@ class ViewCollectionListingTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_shows_a_list_of_collections()
     {
         $collectionA = $this->createCollection('foo');
@@ -42,6 +43,9 @@ class ViewCollectionListingTest extends TestCase
                     'deleteable' => true,
                     'editable' => true,
                     'blueprint_editable' => true,
+                    'available_in_selected_site' => true,
+                    'actions' => Facades\Action::for($collectionA, ['view' => 'list']),
+                    'actions_url' => 'http://localhost/cp/collections/foo/actions',
                 ],
                 [
                     'id' => 'bar',
@@ -56,12 +60,15 @@ class ViewCollectionListingTest extends TestCase
                     'deleteable' => true,
                     'editable' => true,
                     'blueprint_editable' => true,
+                    'available_in_selected_site' => true,
+                    'actions' => Facades\Action::for($collectionB, ['view' => 'list']),
+                    'actions_url' => 'http://localhost/cp/collections/bar/actions',
                 ],
             ]))
             ->assertDontSee('no-results');
     }
 
-    /** @test */
+    #[Test]
     public function it_shows_no_results_when_there_are_no_collections()
     {
         $user = tap(User::make()->makeSuper())->save();
@@ -74,7 +81,7 @@ class ViewCollectionListingTest extends TestCase
             ->assertSee('no-results');
     }
 
-    /** @test */
+    #[Test]
     public function it_filters_out_collections_the_user_cannot_access()
     {
         $collectionA = $this->createCollection('foo');
@@ -92,7 +99,7 @@ class ViewCollectionListingTest extends TestCase
             ->assertDontSee('no-results');
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_filter_out_collections_if_they_have_permission_to_configure()
     {
         $collectionA = $this->createCollection('foo');
@@ -110,7 +117,7 @@ class ViewCollectionListingTest extends TestCase
             ->assertDontSee('no-results');
     }
 
-    /** @test */
+    #[Test]
     public function it_denies_access_when_there_are_no_permitted_collections()
     {
         $collectionA = $this->createCollection('foo');
@@ -125,7 +132,7 @@ class ViewCollectionListingTest extends TestCase
             ->assertRedirect('/cp/original');
     }
 
-    /** @test */
+    #[Test]
     public function create_collection_button_is_visible_with_permission_to_configure()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure collections']]);
@@ -137,7 +144,7 @@ class ViewCollectionListingTest extends TestCase
             ->assertSee('Create Collection');
     }
 
-    /** @test */
+    #[Test]
     public function create_collection_button_is_not_visible_without_permission_to_configure()
     {
         $collectionA = $this->createCollection('foo');

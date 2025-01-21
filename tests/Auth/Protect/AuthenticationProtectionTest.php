@@ -2,9 +2,11 @@
 
 namespace Tests\Auth\Protect;
 
+use PHPUnit\Framework\Attributes\Test;
+
 class AuthenticationProtectionTest extends PageProtectionTestCase
 {
-    /** @test */
+    #[Test]
     public function redirects_to_login_page()
     {
         config(['statamic.protect.schemes.logged_in' => [
@@ -18,7 +20,7 @@ class AuthenticationProtectionTest extends PageProtectionTestCase
             ->assertRedirect('http://localhost/login?redirect=http://localhost/test');
     }
 
-    /** @test */
+    #[Test]
     public function redirects_to_login_page_without_appending()
     {
         config(['statamic.protect.schemes.logged_in' => [
@@ -32,7 +34,7 @@ class AuthenticationProtectionTest extends PageProtectionTestCase
             ->assertRedirect('http://localhost/login');
     }
 
-    /** @test */
+    #[Test]
     public function it_denies_if_no_login_url_is_defined()
     {
         config(['statamic.protect.schemes.logged_in' => [

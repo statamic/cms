@@ -3,6 +3,7 @@
 namespace Tests\Preferences;
 
 use Illuminate\Filesystem\Filesystem;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Preference;
 use Statamic\Facades\Role;
 use Statamic\Facades\User;
@@ -31,7 +32,7 @@ class PrecedenceTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_user_preferences()
     {
         $preferences = [
@@ -53,7 +54,7 @@ class PrecedenceTest extends TestCase
         $this->assertEquals($preferences, Preference::all());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_fallback_when_preference_doesnt_exist()
     {
         $this->actingAs(User::make()->makeSuper());
@@ -61,7 +62,7 @@ class PrecedenceTest extends TestCase
         $this->assertEquals('saints', Preference::get('nfl.teams.favorite', 'saints'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_user_role_preferences()
     {
         $preferences = [
@@ -84,7 +85,7 @@ class PrecedenceTest extends TestCase
         $this->assertEquals($preferences, Preference::all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gives_precedence_to_role_order_assigned_on_user()
     {
         $this->setTestRoles([
@@ -92,7 +93,7 @@ class PrecedenceTest extends TestCase
             'pleb' => Role::make()->permissions('super')->preferences(['alpha' => 'bar', 'charlie' => 'charlie']),
         ]);
 
-        $this->actingAs(User::make()->roles(['author', 'pleb']));
+        $this->actingAs(User::make()->explicitRoles(['author', 'pleb']));
 
         $expected = [
             'alpha' => 'foo', // This should be `foo`, because the `author` role is set first
@@ -103,7 +104,7 @@ class PrecedenceTest extends TestCase
         $this->assertEquals($expected, Preference::all());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_default_preferences()
     {
         $this->actingAs(User::make()->assignRole('author'));
@@ -127,7 +128,7 @@ class PrecedenceTest extends TestCase
         $this->assertEquals($preferences, Preference::all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gives_precedence_to_higher_roles_over_lower_roles_as_defined_on_user()
     {
         $this->setTestRoles([
@@ -152,7 +153,7 @@ class PrecedenceTest extends TestCase
         $this->assertTrue(Preference::get('actions.hops'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gives_precedence_to_user_preferences_over_role_preferences()
     {
         $this->setTestRoles([
@@ -181,7 +182,7 @@ class PrecedenceTest extends TestCase
         $this->assertTrue(Preference::get('actions.hops'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gives_precedence_to_user_and_role_preferences_over_default_preferences()
     {
         $this->actingAs(User::make()->assignRole('rabbit')->assignRole('bear')->preferences([
@@ -244,7 +245,7 @@ class PrecedenceTest extends TestCase
         $this->assertTrue(Preference::get('deeply.nested.default'));
     }
 
-    /** @test */
+    #[Test]
     public function it_merges_preferences_at_every_level_unless_otherwise_configured()
     {
         $this->actingAs(User::make()->assignRole('rabbit')->assignRole('bear')->preferences([
@@ -298,7 +299,7 @@ class PrecedenceTest extends TestCase
         $this->assertNull(Preference::get('deeply.nested.default'));
     }
 
-    /** @test */
+    #[Test]
     public function it_overrides_preferences_at_role_level_using_an_empty_array()
     {
         $this->actingAs(User::make()->assignRole('rabbit')->assignRole('bear'));
@@ -339,7 +340,7 @@ class PrecedenceTest extends TestCase
         $this->assertNull(Preference::get('deeply.nested.default'));
     }
 
-    /** @test */
+    #[Test]
     public function it_overrides_preferences_at_user_level_using_an_empty_array()
     {
         $this->actingAs(User::make()->preferences([

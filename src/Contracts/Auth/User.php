@@ -2,6 +2,8 @@
 
 namespace Statamic\Contracts\Auth;
 
+use Illuminate\Support\Collection;
+
 interface User
 {
     /**
@@ -20,7 +22,9 @@ interface User
      */
     public function password($password = null);
 
-    public function roles();
+    public function roles(): Collection;
+
+    public function explicitRoles($roles = null);
 
     public function assignRole($role);
 

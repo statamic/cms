@@ -5,6 +5,7 @@ namespace Statamic\Fields;
 class FieldtypeRepository
 {
     protected $madeSelectableInForms = [];
+    private $fieldtypes = [];
 
     public function preloadable()
     {
@@ -15,11 +16,15 @@ class FieldtypeRepository
 
     public function find($handle)
     {
+        if (isset($this->fieldtypes[$handle])) {
+            return clone $this->fieldtypes[$handle];
+        }
+
         if (! ($fieldtypes = $this->classes())->has($handle)) {
             throw new \Statamic\Exceptions\FieldtypeNotFoundException($handle);
         }
 
-        return app($fieldtypes->get($handle));
+        return $this->fieldtypes[$handle] = app($fieldtypes->get($handle));
     }
 
     public function classes()

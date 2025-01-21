@@ -7,6 +7,7 @@
             :action="action"
             :selections="1"
             :errors="errors"
+            :is-dirty="isDirty"
             @selected="run"
         >
             <div slot-scope="{ action, select }">
@@ -30,7 +31,8 @@ export default {
 
     props: {
         actions: Array,
-        item: { required: true }
+        item: { required: true },
+        isDirty: { type: Boolean, default: false },
     },
 
     computed: {

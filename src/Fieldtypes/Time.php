@@ -3,7 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\Fields\Fieldtype;
-use Statamic\Validation\TimeFieldtype as ValidationRule;
+use Statamic\Rules\TimeFieldtype as ValidationRule;
 
 class Time extends Fieldtype
 {

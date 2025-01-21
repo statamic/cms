@@ -4,6 +4,8 @@ namespace Statamic\Tags\Concerns;
 
 use Closure;
 use Illuminate\Support\MessageBag;
+use Statamic\Fields\Field;
+use Statamic\Support\Str;
 
 trait RendersForms
 {
@@ -69,10 +71,12 @@ trait RendersForms
             $attrs['enctype'] = 'multipart/form-data';
         }
 
-        $attrs = $this->renderAttributes($attrs);
-        $paramAttrs = $this->renderAttributesFromParams(array_merge(['method', 'action'], $knownTagParams));
+        $attrs = $this->renderAttributesFromParamsWith(
+            $attrs,
+            except: array_merge(['method', 'action'], $knownTagParams)
+        );
 
-        $html = collect(['<form', $attrs, $paramAttrs])->filter()->implode(' ').'>';
+        $html = collect(['<form', $attrs])->filter()->implode(' ').'>';
 
         if ($this->params->bool('csrf', true)) {
             $html .= csrf_field();
@@ -127,12 +131,19 @@ trait RendersForms
     {
         $errors = session('errors') ? session('errors')->getBag($errorBag) : new MessageBag;
 
-        $missing = str_random();
+        $missing = Str::random();
         $old = old($field->handle(), $missing);
         $default = $field->value() ?? $field->defaultValue();
         $value = $old === $missing ? $default : $old;
 
-        $data = array_merge($field->toArray(), [
+        $configDefaults = Field::commonFieldOptions()->all()
+            ->merge($field->fieldtype()->configFields()->all())
+            ->map->get('default')
+            ->filter()->all();
+
+        $formHandle = $field->form()?->handle() ?? Str::slug($errorBag);
+        $data = array_merge($configDefaults, $field->toArray(), [
+            'id' => $this->generateFieldId($field->handle(), $formHandle),
             'instructions' => $field->instructions(),
             'error' => $errors->first($field->handle()) ?: null,
             'default' => $field->value() ?? $field->defaultValue(),
@@ -164,5 +175,13 @@ trait RendersForms
         $html = preg_replace('/\s*(<(?!\/*('.$ignoredHtmlElements.'))[^>]+>)\s*/', '$1', $html);
 
         return $html;
+    }
+
+    /**
+     * Generate a field id to associate input with label.
+     */
+    private function generateFieldId(string $fieldHandle, ?string $formName = null): string
+    {
+        return ($formName ?? 'default').'-form-'.$fieldHandle.'-field';
     }
 }

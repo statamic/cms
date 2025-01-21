@@ -5,6 +5,8 @@ namespace Statamic\Http\Controllers\CP;
 use Facades\Statamic\CP\LivePreview;
 use Illuminate\Http\Request;
 use Statamic\Facades\URL;
+use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class PreviewController extends CpController
 {
@@ -22,7 +24,7 @@ class PreviewController extends CpController
             ->addValues($request->input('preview', []))
             ->process();
 
-        foreach (array_except($fields->values()->all(), ['slug']) as $key => $value) {
+        foreach (Arr::except($fields->values()->all(), ['slug']) as $key => $value) {
             $data->setSupplement($key, $value);
         }
 
@@ -46,7 +48,7 @@ class PreviewController extends CpController
         return vsprintf('%s%slive-preview=%s&token=%s', [
             $url,
             strpos($url, '?') === false ? '?' : '&',
-            str_random(), // random string to prevent caching
+            Str::random(), // random string to prevent caching
             $token,
         ]);
     }

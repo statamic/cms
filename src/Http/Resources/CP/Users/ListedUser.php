@@ -49,10 +49,11 @@ class ListedUser extends JsonResource
     {
         return $this->columns->mapWithKeys(function ($column) use ($extra) {
             $key = $column->field;
+            $field = $this->blueprint->field($key);
 
-            $value = $extra[$key] ?? $this->resource->value($key);
+            $value = $extra[$key] ?? $this->resource->value($key) ?? $field?->defaultValue();
 
-            if ($field = $this->blueprint->field($key)) {
+            if ($field) {
                 $value = $field->setValue($value)->preProcessIndex()->value();
             }
 

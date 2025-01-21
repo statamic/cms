@@ -2,11 +2,11 @@
 
     <div class="bard-link-toolbar">
         <div>
-            <div class="px-4 py-4 border-b">
+            <div class="px-4 py-4 border-b dark:border-dark-900">
 
                 <div class="flex">
 
-                    <div class="h-8 mb-4 bg-gray-100 text-gray-800 border rounded shadow-inner flex items-center mr-1">
+                    <div class="h-8 mb-4 bg-gray-100 dark:bg-dark-600 text-gray-800 dark:text-dark-150 border dark:border-dark-200 rounded shadow-inner flex items-center rtl:ml-1 ltr:mr-1">
                         <select
                             class="input w-auto text-sm px-1"
                             v-model="linkType">
@@ -19,8 +19,8 @@
                         </select>
                     </div>
 
-                    <div class="h-8 mb-4 p-2 bg-gray-100 text-gray-800 w-full border rounded shadow-inner placeholder:text-gray-600 flex items-center">
-    
+                    <div class="h-8 mb-4 p-2 bg-gray-100 dark:bg-dark-600 text-gray-800 dark:text-dark-150 w-full border dark:border-dark-200 rounded shadow-inner placeholder:text-gray-600 dark:placeholder:dark-text-dark-175 flex items-center">
+
                         <!-- URL input -->
                         <input
                             v-if="linkType === 'url'"
@@ -31,7 +31,7 @@
                             :placeholder="__('URL')"
                             @keydown.enter.prevent="commit"
                         />
-    
+
                         <!-- Email input -->
                         <input
                             v-else-if="linkType === 'mailto'"
@@ -42,7 +42,7 @@
                             :placeholder="__('Email Address')"
                             @keydown.enter.prevent="commit"
                         />
-    
+
                         <!-- Phone input -->
                         <input
                             v-else-if="linkType === 'tel'"
@@ -53,25 +53,25 @@
                             placeholder="Phone Number"
                             @keydown.enter.prevent="commit"
                         />
-    
+
                         <!-- Data input -->
                         <div
                             v-else
                             class="w-full flex items-center justify-between cursor-pointer"
                             @click="openSelector"
                         >
-    
+
                             <loading-graphic v-if="isLoading" :inline="true" />
-    
-                            <div v-else class="flex-1 flex items-center mr-2 truncate">
+
+                            <div v-else class="flex-1 flex items-center rtl:ml-2 ltr:mr-2 truncate">
                                 <img
                                     v-if="linkType === 'asset' && itemData.asset && itemData.isImage"
                                     :src="itemData.asset.thumbnail || itemData.asset.url"
-                                    class="asset-thumbnail max-h-full max-w-full rounded w-6 h-6 mr-2 object-cover lazyloaded"
+                                    class="asset-thumbnail max-h-full max-w-full rounded w-6 h-6 rtl:ml-2 ltr:mr-2 object-cover lazyloaded"
                                 >
                                 {{ displayValue }}
                             </div>
-    
+
                             <button
                             class="flex items-center"
                                 v-tooltip="`${__('Browse')}...`"
@@ -81,16 +81,16 @@
                                 <svg-icon v-show="linkType === 'asset'" name="folder-image" class="h-4 w-4" />
                                 <svg-icon v-show="linkType !== 'asset'" name="folder-generic" class="h-4 w-4" />
                             </button>
-    
+
                         </div>
-    
+
                     </div>
-                    
+
                 </div>
 
 
                 <!-- Title attribute -->
-                <div class="h-8 mb-4 p-2 bg-gray-100 text-gray-800 w-full border rounded shadow-inner placeholder:text-gray-600 flex items-center" >
+                <div class="h-8 mb-4 p-2 bg-gray-100 dark:bg-dark-600 text-gray-800 dark:text-dark-150 w-full border dark:border-dark-200 rounded shadow-inner placeholder:text-gray-600 dark:placeholder:dark-text-dark-175 flex items-center" >
                     <input
                         type="text"
                         ref="input"
@@ -101,7 +101,7 @@
                 </div>
 
                 <!-- Rel attribute -->
-                <div class="h-8 p-2 bg-gray-100 text-gray-800 w-full border rounded shadow-inner placeholder:text-gray-600 flex items-center" >
+                <div class="h-8 p-2 bg-gray-100 dark:bg-dark-600 text-gray-800 dark:text-dark-150 w-full border dark:border-dark-200 rounded shadow-inner placeholder:text-gray-600 dark:placeholder:dark-text-dark-175 flex items-center" >
                     <input
                         type="text"
                         ref="input"
@@ -111,14 +111,14 @@
                     />
                 </div>
 
-                <label for="target-blank" class="mt-4 flex items-center font-normal cursor-pointer text-gray-800 hover:text-black" v-if="canHaveTarget">
-                    <input class="checkbox mr-2" type="checkbox" v-model="targetBlank" id="target-blank">
+                <label for="target-blank" class="mt-4 flex items-center font-normal cursor-pointer text-gray-800 dark:text-dark-150 hover:text-black dark:hover:text-dark-100" v-if="canHaveTarget">
+                    <input class="checkbox rtl:ml-2 ltr:mr-2" type="checkbox" v-model="targetBlank" id="target-blank">
                     {{ __('Open in new window') }}
                 </label>
             </div>
 
-            <footer class="bg-gray-100 rounded-b-md flex items-center justify-end space-x-3 font-normal p-2">
-                <button @click="$emit('canceled')" class="text-xs text-gray-600 hover:text-gray-800">
+            <footer class="bg-gray-100 dark:bg-dark-575 rounded-b-md flex items-center justify-end space-x-3 rtl:space-x-reverse font-normal p-2">
+                <button @click="$emit('canceled')" class="text-xs text-gray-600 dark:text-dark-175 hover:text-gray-800 dark:hover-text-dark-100">
                     {{ __('Cancel') }}
                 </button>
                 <button
@@ -168,7 +168,6 @@
             <asset-selector
                 :container="config.container"
                 :folder="config.folder || '/'"
-                :restrict-container-navigation="true"
                 :restrict-folder-navigation="config.restrict_assets"
                 :selected="[]"
                 :view-mode="'grid'"
@@ -301,6 +300,14 @@ export default {
             return ['url', 'entry', 'asset'].includes(this.linkType);
         },
 
+        selectedTextIsEmail() {
+            const { view, state } = this.bard.editor
+            const { from, to } = view.state.selection
+            const text = state.doc.textBetween(from, to, '')
+
+            return text.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
+        },
+
     },
 
     watch: {
@@ -328,6 +335,11 @@ export default {
 
         this.bard.$on('link-selected', this.applyAttrs);
         this.bard.$on('link-deselected', () => this.$emit('deselected'));
+
+        if (_.isEmpty(this.linkAttrs) && this.selectedTextIsEmail) {
+            this.linkType = 'mailto'
+            this.urlData = { mailto: this.selectedTextIsEmail }
+        }
     },
 
     mounted() {
@@ -349,7 +361,7 @@ export default {
             this.itemData = { [this.linkType]: this.getItemDataForUrl(attrs.href) };
 
             this.title = attrs.title;
-            this.rel = attrs.href 
+            this.rel = attrs.href
                 ? attrs.rel
                 : this.defaultRel;
             this.targetBlank = attrs.href

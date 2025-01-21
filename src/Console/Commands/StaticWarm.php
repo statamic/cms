@@ -9,6 +9,7 @@ use GuzzleHttp\Psr7\Message;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Console\Command;
+use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Collection;
 use Statamic\Console\EnhancesCommands;
@@ -16,16 +17,19 @@ use Statamic\Console\RunsInPlease;
 use Statamic\Entries\Collection as EntriesCollection;
 use Statamic\Entries\Entry;
 use Statamic\Facades;
+use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Http\Controllers\FrontendController;
 use Statamic\StaticCaching\Cacher as StaticCacher;
 use Statamic\Support\Str;
+use Statamic\Support\Traits\Hookable;
 use Statamic\Taxonomies\LocalizedTerm;
 use Statamic\Taxonomies\Taxonomy;
 
 class StaticWarm extends Command
 {
     use EnhancesCommands;
+    use Hookable;
     use RunsInPlease;
 
     protected $signature = 'statamic:static:warm
@@ -33,26 +37,33 @@ class StaticWarm extends Command
         {--u|user= : HTTP authentication user}
         {--p|password= : HTTP authentication password}
         {--insecure : Skip SSL verification}
+        {--uncached : Only warm uncached URLs}
+        {--max-depth= : Maximum depth of URLs to warm}
+        {--include= : Only warm specific URLs}
+        {--exclude= : Exclude specific URLs}
+        {--max-requests= : Maximum number of requests to warm}
     ';
 
     protected $description = 'Warms the static cache by visiting all URLs';
 
     protected $shouldQueue = false;
+    protected $queueConnection;
 
     private $uris;
 
     public function handle()
     {
         if (! config('statamic.static_caching.strategy')) {
-            $this->error('Static caching is not enabled.');
+            $this->components->error('Static caching is not enabled.');
 
             return 1;
         }
 
         $this->shouldQueue = $this->option('queue');
+        $this->queueConnection = config('statamic.static_caching.warm_queue_connection') ?? config('queue.default');
 
-        if ($this->shouldQueue && config('queue.default') === 'sync') {
-            $this->error('The queue connection is set to "sync". Queueing will be disabled.');
+        if ($this->shouldQueue && $this->queueConnection === 'sync') {
+            $this->components->error('The queue connection is set to "sync". Queueing will be disabled.');
             $this->shouldQueue = false;
         }
 
@@ -60,10 +71,10 @@ class StaticWarm extends Command
 
         $this->warm();
 
-        $this->output->newLine();
-        $this->info($this->shouldQueue
-            ? 'All requests to warm the static cache have been added to the queue.'
-            : 'The static cache has been warmed.'
+        $this->components->info(
+            $this->shouldQueue
+                ? 'All requests to warm the static cache have been added to the queue.'
+                : 'The static cache has been warmed.'
         );
 
         return 0;
@@ -71,12 +82,7 @@ class StaticWarm extends Command
 
     private function warm(): void
     {
-        $client = new Client([
-            'verify' => $this->shouldVerifySsl(),
-            'auth' => $this->option('user') && $this->option('password')
-                ? [$this->option('user'), $this->option('password')]
-                : null,
-        ]);
+        $client = new Client($this->clientConfig());
 
         $this->output->newLine();
         $this->line('Compiling URLs...');
@@ -89,8 +95,14 @@ class StaticWarm extends Command
             $queue = config('statamic.static_caching.warm_queue');
             $this->line(sprintf('Adding %s requests onto %squeue...', count($requests), $queue ? $queue.' ' : ''));
 
+            $jobClass = $this->option('uncached')
+                ? StaticWarmUncachedJob::class
+                : StaticWarmJob::class;
+
             foreach ($requests as $request) {
-                StaticWarmJob::dispatch($request)->onQueue($queue);
+                $jobClass::dispatch($request, $this->clientConfig())
+                    ->onConnection($this->queueConnection)
+                    ->onQueue($queue);
             }
         } else {
             $this->line('Visiting '.count($requests).' URLs...');
@@ -114,9 +126,19 @@ class StaticWarm extends Command
         return config("statamic.static_caching.strategies.$strategy.warm_concurrency", 25);
     }
 
+    private function clientConfig(): array
+    {
+        return [
+            'verify' => $this->shouldVerifySsl(),
+            'auth' => $this->option('user') && $this->option('password')
+                ? [$this->option('user'), $this->option('password')]
+                : null,
+        ];
+    }
+
     public function outputSuccessLine(Response $response, $index): void
     {
-        $this->checkLine($this->getRelativeUri($index));
+        $this->components->twoColumnDetail($this->getRelativeUri($index), '<info>✓ Cached</info>');
     }
 
     public function outputFailureLine($exception, $index): void
@@ -135,7 +157,7 @@ class StaticWarm extends Command
             $message = $exception->getMessage();
         }
 
-        $this->crossLine("$uri → <fg=cyan>$message</fg=cyan>");
+        $this->components->twoColumnDetail($uri, "<fg=cyan>$message</fg=cyan>");
     }
 
     private function getRelativeUri(int $index): string
@@ -163,12 +185,71 @@ class StaticWarm extends Command
             ->merge($this->taxonomyUris())
             ->merge($this->termUris())
             ->merge($this->customRouteUris())
+            ->merge($this->additionalUris())
             ->unique()
+            ->filter(fn ($uri) => $this->shouldInclude($uri))
+            ->reject(fn ($uri) => $this->shouldExclude($uri))
+            ->reject(fn ($uri) => $this->exceedsMaxDepth($uri))
             ->reject(function ($uri) use ($cacher) {
+                if ($this->option('uncached') && $cacher->hasCachedPage(HttpRequest::create($uri))) {
+                    return true;
+                }
+
+                Site::resolveCurrentUrlUsing(fn () => $uri);
+
                 return $cacher->isExcluded($uri);
             })
             ->sort()
-            ->values();
+            ->values()
+            ->when($this->option('max-requests'), fn ($uris, $max) => $uris->take($max));
+    }
+
+    private function shouldInclude($uri): bool
+    {
+        if (! $inclusions = $this->option('include')) {
+            return true;
+        }
+
+        $inclusions = explode(',', $inclusions);
+
+        return collect($inclusions)->contains(fn ($included) => $this->uriMatches($uri, $included));
+    }
+
+    private function shouldExclude($uri): bool
+    {
+        if (! $exclusions = $this->option('exclude')) {
+            return false;
+        }
+
+        $exclusions = explode(',', $exclusions);
+
+        return collect($exclusions)->contains(fn ($excluded) => $this->uriMatches($uri, $excluded));
+    }
+
+    private function uriMatches($uri, $pattern): bool
+    {
+        $uri = URL::makeRelative($uri);
+
+        if (Str::endsWith($pattern, '*')) {
+            $prefix = Str::removeRight($pattern, '*');
+
+            if (Str::startsWith($uri, $prefix) && ! (Str::endsWith($prefix, '/') && $uri === $prefix)) {
+                return true;
+            }
+        } elseif (Str::removeRight($uri, '/') === Str::removeRight($pattern, '/')) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private function exceedsMaxDepth($uri): bool
+    {
+        if (! $max = $this->option('max-depth')) {
+            return false;
+        }
+
+        return count(explode('/', trim(URL::makeRelative($uri), '/'))) > $max;
     }
 
     private function shouldVerifySsl(): bool
@@ -183,6 +264,9 @@ class StaticWarm extends Command
     protected function entryUris(): Collection
     {
         $this->line('[ ] Entries...');
+
+        // "Warm" the structure trees
+        Facades\Collection::whereStructured()->each(fn ($collection) => $collection->structure()->trees()->each->tree());
 
         $entries = Facades\Entry::all()->map(function (Entry $entry) {
             if (! $entry->published() || $entry->private()) {
@@ -213,7 +297,7 @@ class StaticWarm extends Command
                 return $taxonomy->sites()->map(function ($site) use ($taxonomy) {
                     // Needed because Taxonomy uses the current site. If the Taxonomy
                     // class ever gets its own localization logic we can remove this.
-                    Facades\Site::setCurrent($site);
+                    Site::setCurrent($site);
 
                     return $taxonomy->absoluteUrl();
                 });
@@ -278,5 +362,16 @@ class StaticWarm extends Command
         $this->line("\x1B[1A\x1B[2K<info>[✔]</info> Custom routes");
 
         return $routes;
+    }
+
+    protected function additionalUris(): Collection
+    {
+        $this->line('[ ] Additional...');
+
+        $uris = $this->runHooks('additional', collect());
+
+        $this->line("\x1B[1A\x1B[2K<info>[✔]</info> Additional");
+
+        return $uris->map(fn ($uri) => URL::makeAbsolute($uri));
     }
 }

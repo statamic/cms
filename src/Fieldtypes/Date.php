@@ -4,20 +4,21 @@ namespace Statamic\Fieldtypes;
 
 use Carbon\Exceptions\InvalidFormatException;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Validator;
 use InvalidArgumentException;
-use Statamic\Exceptions\ValidationException;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 use Statamic\GraphQL\Fields\DateField;
 use Statamic\GraphQL\Types\DateRangeType;
 use Statamic\Query\Scopes\Filters\Fields\Date as DateFilter;
+use Statamic\Rules\DateFieldtype as ValidationRule;
 use Statamic\Statamic;
 use Statamic\Support\DateFormat;
-use Statamic\Validation\DateFieldtype as ValidationRule;
 
 class Date extends Fieldtype
 {
     protected $categories = ['special'];
+    protected $keywords = ['datetime', 'time'];
 
     const DEFAULT_DATE_FORMAT = 'Y-m-d';
     const DEFAULT_DATETIME_FORMAT = 'Y-m-d H:i';
@@ -366,11 +367,10 @@ class Date extends Fieldtype
 
     public function preProcessValidatable($value)
     {
-        if ($error = (new ValidationRule($this))($value)) {
-            throw ValidationException::withMessages([
-                $this->field->handle() => $error,
-            ]);
-        }
+        Validator::make(
+            [$this->field->handle() => $value],
+            [$this->field->handle() => [new ValidationRule($this)]],
+        )->validate();
 
         if ($value === null) {
             return null;

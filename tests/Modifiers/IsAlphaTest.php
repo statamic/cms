@@ -2,6 +2,8 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
@@ -19,11 +21,8 @@ class IsAlphaTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider stringsProvider
-     */
+    #[Test]
+    #[DataProvider('stringsProvider')]
     public function it_returns_true_if_the_string_contains_only_alphabetical_chars($expected, $input): void
     {
         $modified = $this->modify($input);

@@ -5,9 +5,9 @@ namespace Tests\Feature\Navigation;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Facades\Statamic\Structures\BranchIdGenerator;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Nav;
-use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Fields\Fieldtype;
 use Tests\FakesRoles;
@@ -35,7 +35,7 @@ class UpdateNavigationTreeTest extends TestCase
             });
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_the_tree()
     {
         $this->withoutExceptionHandling();
@@ -145,7 +145,7 @@ class UpdateNavigationTreeTest extends TestCase
         ], $nav->in('en')->tree());
     }
 
-    /** @test */
+    #[Test]
     public function it_denies_access_if_you_dont_have_permission_to_reorder()
     {
         $this->setTestRoles(['test' => ['access cp']]);
@@ -159,13 +159,13 @@ class UpdateNavigationTreeTest extends TestCase
             ->assertForbidden();
     }
 
-    /** @test */
+    #[Test]
     public function it_denies_access_if_you_dont_have_site_permission()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['locale' => 'en', 'url' => '/'],
             'fr' => ['locale' => 'fr', 'url' => '/fr'],
-        ]]);
+        ]);
         $this->setTestRoles(['test' => ['access cp', 'edit test nav']]);
         $user = tap(User::make()->assignRole('test'))->save();
         $nav = tap(Nav::make('test'))->save();
@@ -177,14 +177,14 @@ class UpdateNavigationTreeTest extends TestCase
             ->assertForbidden();
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_a_specific_sites_tree()
     {
         $this->withoutExceptionHandling();
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['locale' => 'en', 'url' => '/'],
             'fr' => ['locale' => 'fr', 'url' => '/fr'],
-        ]]);
+        ]);
         $this->setTestRoles(['test' => ['access cp', 'edit test nav', 'access fr site']]);
         $user = tap(User::make()->assignRole('test'))->save();
         $nav = tap(Nav::make('test'))->save();

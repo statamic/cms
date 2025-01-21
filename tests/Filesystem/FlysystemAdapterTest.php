@@ -4,6 +4,7 @@ namespace Tests\Filesystem;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Filesystem\FlysystemAdapter;
 use Tests\TestCase;
 
@@ -40,7 +41,7 @@ class FlysystemAdapterTest extends TestCase
         return new FlysystemAdapter($this->filesystem);
     }
 
-    /** @test */
+    #[Test]
     public function it_normalizes_relative_paths()
     {
         $this->assertEquals('bar.txt', $this->adapter->normalizePath('bar.txt'));
@@ -50,7 +51,7 @@ class FlysystemAdapterTest extends TestCase
         $this->assertEquals('/', $this->adapter->normalizePath('.'));
     }
 
-    /** @test */
+    #[Test]
     public function it_normalizes_absolute_paths()
     {
         $this->assertEquals('bar.txt', $this->adapter->normalizePath($this->tempDir.'/bar.txt'));
@@ -59,7 +60,7 @@ class FlysystemAdapterTest extends TestCase
         $this->assertEquals('foo/bar.txt', $this->adapter->normalizePath($this->tempDir.'\foo\bar.txt'));
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_an_exception_when_normalizing_a_path_outside_the_root()
     {
         $this->expectException(\LogicException::class);
@@ -67,13 +68,13 @@ class FlysystemAdapterTest extends TestCase
         $this->adapter->normalizePath('/not/the/temp/dir/bar.txt');
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_exception_when_normalizing_an_absolute_path_on_a_non_local_adapter()
     {
         $this->markTestIncomplete();
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_an_exception_when_requesting_absolute_paths()
     {
         $this->expectException(\LogicException::class);

@@ -4,12 +4,13 @@ namespace Statamic\StaticCaching;
 
 use Illuminate\Cache\Repository;
 use Illuminate\Support\Facades\Cache;
-use InvalidArgumentException;
+use Statamic\Events\StaticCacheCleared;
 use Statamic\Facades\Site;
 use Statamic\StaticCaching\Cachers\ApplicationCacher;
 use Statamic\StaticCaching\Cachers\FileCacher;
 use Statamic\StaticCaching\Cachers\NullCacher;
 use Statamic\StaticCaching\Cachers\Writer;
+use Statamic\StaticCaching\NoCache\DatabaseRegion;
 use Statamic\Support\Manager;
 
 class StaticCacheManager extends Manager
@@ -31,18 +32,22 @@ class StaticCacheManager extends Manager
 
     public function createFileDriver(array $config)
     {
-        try {
-            $store = Cache::store('static_cache');
-        } catch (InvalidArgumentException $e) {
-            $store = Cache::store();
-        }
-
-        return new FileCacher(new Writer, $store, $config);
+        return new FileCacher(new Writer($config['permissions'] ?? []), $this->cacheStore(), $config);
     }
 
     public function createApplicationDriver(array $config)
     {
         return new ApplicationCacher($this->app[Repository::class], $config);
+    }
+
+    public function cacheStore()
+    {
+        return Cache::store($this->hasCustomStore() ? 'static_cache' : null);
+    }
+
+    private function hasCustomStore(): bool
+    {
+        return config()->has('cache.stores.static_cache');
     }
 
     protected function getConfig($name)
@@ -54,6 +59,8 @@ class StaticCacheManager extends Manager
         return array_merge($config, [
             'exclude' => $this->app['config']['statamic.static_caching.exclude'] ?? [],
             'ignore_query_strings' => $this->app['config']['statamic.static_caching.ignore_query_strings'] ?? false,
+            'allowed_query_strings' => $this->app['config']['statamic.static_caching.allowed_query_strings'] ?? [],
+            'disallowed_query_strings' => $this->app['config']['statamic.static_caching.disallowed_query_strings'] ?? [],
             'locale' => Site::current()->handle(),
         ]);
     }
@@ -62,13 +69,36 @@ class StaticCacheManager extends Manager
     {
         $this->driver()->flush();
 
-        collect(Cache::get('nocache::urls', []))->each(function ($url) {
-            $session = Cache::get($sessionKey = 'nocache::session.'.md5($url));
-            collect($session['regions'] ?? [])->each(fn ($region) => Cache::forget('nocache::region.'.$region));
-            Cache::forget($sessionKey);
+        $this->flushNocache();
+
+        if ($this->hasCustomStore()) {
+            $this->cacheStore()->flush();
+        }
+
+        StaticCacheCleared::dispatch();
+    }
+
+    private function flushNocache()
+    {
+        if (config('statamic.static_caching.nocache', 'cache') === 'database') {
+            DatabaseRegion::truncate();
+
+            return;
+        }
+
+        // No need to do any looping if there's a custom
+        // store because the entire store will be flushed.
+        if ($this->hasCustomStore()) {
+            return;
+        }
+
+        collect($this->cacheStore()->get('nocache::urls', []))->each(function ($url) {
+            $session = $this->cacheStore()->get($sessionKey = 'nocache::session.'.md5($url));
+            collect($session['regions'] ?? [])->each(fn ($region) => $this->cacheStore()->forget('nocache::region.'.$region));
+            $this->cacheStore()->forget($sessionKey);
         });
 
-        Cache::forget('nocache::urls');
+        $this->cacheStore()->forget('nocache::urls');
     }
 
     public function nocacheJs(string $js)

@@ -36,7 +36,7 @@ class ListedEntry extends JsonResource
             'status' => $entry->status(),
             'private' => $entry->private(),
             'date' => $this->when($collection->dated(), function () {
-                return $this->resource->date()->inPreferredFormat();
+                return $this->resource->blueprint()->field('date')->fieldtype()->preProcessIndex($this->resource->date());
             }),
 
             $this->merge($this->values(['slug' => $entry->slug()])),
@@ -54,14 +54,13 @@ class ListedEntry extends JsonResource
     {
         return $this->columns->mapWithKeys(function ($column) use ($extra) {
             $key = $column->field;
+            $field = $this->blueprint->field($key);
 
             if ($key === 'site') {
                 $value = $this->resource->locale();
             } else {
-                $value = $extra[$key] ?? $this->resource->value($key);
+                $value = $extra[$key] ?? $this->resource->value($key) ?? $field?->defaultValue();
             }
-
-            $field = $this->blueprint->field($key);
 
             if (! $field) {
                 return [$key => $value];

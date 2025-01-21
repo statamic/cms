@@ -98,7 +98,9 @@ class Preferences
      */
     protected function mergeDottedRolePreferences()
     {
-        foreach (User::current()->roles() as $role) {
+        $roles = User::current()->roles()->merge(User::current()->groups()->map->roles()->flatten());
+
+        foreach ($roles as $role) {
             $this->dotted += $this->arrayDotPreferences($role->preferences());
         }
 

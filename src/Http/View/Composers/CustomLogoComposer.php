@@ -16,15 +16,23 @@ class CustomLogoComposer
     public function compose(View $view)
     {
         $view->with('customLogo', $this->customLogo($view));
+        $view->with('customDarkLogo', $this->customLogo($view, dark: true));
+        $view->with('customLogoText', $this->customLogo($view, text: true));
     }
 
-    protected function customLogo($view)
+    protected function customLogo($view, bool $dark = false, bool $text = false)
     {
         if (! Statamic::pro()) {
             return false;
         }
 
         $config = config('statamic.cp.custom_logo_url');
+        if ($dark && config('statamic.cp.custom_dark_logo_url')) {
+            $config = config('statamic.cp.custom_dark_logo_url');
+        }
+        if ($text && config('statamic.cp.custom_logo_text')) {
+            $config = config('statamic.cp.custom_logo_text');
+        }
 
         switch ($view->name()) {
             case 'statamic::partials.outside-logo':

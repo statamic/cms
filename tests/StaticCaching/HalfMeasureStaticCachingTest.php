@@ -2,7 +2,10 @@
 
 namespace Tests\StaticCaching;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Orchestra\Testbench\Attributes\DefineEnvironment;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\StaticCaching\Replacer;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\FakesContent;
@@ -30,7 +33,7 @@ class HalfMeasureStaticCachingTest extends TestCase
         ]));
     }
 
-    /** @test */
+    #[Test]
     public function it_statically_caches()
     {
         $this->withStandardFakeViews();
@@ -40,25 +43,34 @@ class HalfMeasureStaticCachingTest extends TestCase
             'with' => [
                 'title' => 'The About Page',
                 'content' => 'This is the about page.',
+                'headers' => [
+                    'foo' => 'bar',
+                    'alfa' => ['bravo', 'charlie'],
+                ],
             ],
         ]);
 
-        $this
+        $response = $this
             ->get('/about')
             ->assertOk()
             ->assertSee('<h1>The About Page</h1> <p>This is the about page.</p>', false);
+        $this->assertEquals(['bar'], $response->headers->all('foo'));
+        $this->assertEquals(['bravo', 'charlie'], $response->headers->all('alfa'));
 
         $page
             ->set('content', 'Updated content')
+            ->set('headers', ['foo' => 'updated', 'alfa' => ['updated1', 'updated2']])
             ->saveQuietly(); // Save quietly to prevent the invalidator from clearing the statically cached page.
 
-        $this
+        $response = $this
             ->get('/about')
             ->assertOk()
             ->assertSee('<h1>The About Page</h1> <p>This is the about page.</p>', false);
+        $this->assertEquals(['bar'], $response->headers->all('foo'));
+        $this->assertEquals(['bravo', 'charlie'], $response->headers->all('alfa'));
     }
 
-    /** @test */
+    #[Test]
     public function it_performs_replacements()
     {
         Carbon::setTestNow(Carbon::parse('2019-01-01'));
@@ -76,7 +88,7 @@ class HalfMeasureStaticCachingTest extends TestCase
         $this->assertSame('2019-01-01 SUBSEQUENT-2020-05-23', $response->getContent());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_keep_parts_dynamic_using_nocache_tags()
     {
         // Use a tag that outputs something dynamic.
@@ -114,7 +126,7 @@ class HalfMeasureStaticCachingTest extends TestCase
             ->assertSee('1 3', false);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_keep_parts_dynamic_using_nocache_tags_in_loops()
     {
         // Use a tag that outputs something dynamic but consistent.
@@ -178,7 +190,7 @@ class HalfMeasureStaticCachingTest extends TestCase
             ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_keep_the_cascade_parts_dynamic_using_nocache_tags()
     {
         // The "now" variable is generated in the cascade on every request.
@@ -203,7 +215,7 @@ class HalfMeasureStaticCachingTest extends TestCase
             ->assertSee('2019-01-01 2020-05-23', false);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_keep_the_urls_page_parts_dynamic_using_nocache_tags()
     {
         // The "page" variable (i.e. the about entry) is inserted into the cascade on every request.
@@ -233,7 +245,7 @@ class HalfMeasureStaticCachingTest extends TestCase
             ->assertSee('<h1>The About Page</h1> This is the about page. Updated text', false);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_keep_parts_dynamic_using_nested_nocache_tags()
     {
         // Use a tag that outputs something dynamic.
@@ -281,7 +293,7 @@ EOT;
             ->assertSeeInOrder([1, 4, 5]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_keep_parts_dynamic_using_nocache_tags_with_view_front_matter()
     {
         $template = <<<'EOT'
@@ -315,11 +327,8 @@ EOT;
         ]);
     }
 
-    /**
-     * @test
-     *
-     * @define-env bladeViewPaths
-     */
+    #[Test]
+    #[DefineEnvironment('bladeViewPaths')]
     public function it_can_keep_parts_dynamic_using_blade()
     {
         // Use a tag that outputs something dynamic.

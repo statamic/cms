@@ -3,8 +3,8 @@
 namespace Statamic\Ignition\Solutions;
 
 use Exception;
-use Facade\IgnitionContracts\RunnableSolution;
 use Facades\Statamic\UpdateScripts\Manager as UpdateScriptManager;
+use Spatie\ErrorSolutions\Contracts\RunnableSolution;
 use Statamic\Console\Composer\Json as ComposerJson;
 use Statamic\Console\NullConsole;
 use Statamic\Statamic;
@@ -13,7 +13,7 @@ class EnableComposerUpdateScripts implements RunnableSolution
 {
     public function getSolutionTitle(): string
     {
-        return 'Your composer.json is not properly configured for Statamic update scripts';
+        return 'Your composer.json is missing configuration';
     }
 
     public function getSolutionDescription(): string
@@ -30,7 +30,7 @@ class EnableComposerUpdateScripts implements RunnableSolution
 
     public function getSolutionActionDescription(): string
     {
-        return 'Statamic can attempt to configure and run update scripts for you.';
+        return 'Your composer.json is not properly configured for Statamic update scripts. Statamic can attempt to configure and run update scripts for you.';
     }
 
     public function getRunButtonText(): string
@@ -38,7 +38,7 @@ class EnableComposerUpdateScripts implements RunnableSolution
         return 'Configure & Run Update Scripts';
     }
 
-    public function run(array $parameters = [])
+    public function run(array $parameters = []): void
     {
         // Setup null console so we can detect console error output.
         $console = new NullConsole;

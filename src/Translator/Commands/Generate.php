@@ -49,7 +49,7 @@ class Generate extends Command
             ->addOption('key', null, InputOption::VALUE_REQUIRED, 'Google Translate API Key');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->input = $input;
         $this->output = $output;

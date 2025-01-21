@@ -26,8 +26,7 @@ class NavTreeStore extends BasicStore
     {
         return $this
             ->newTreeClassByPath($path)
-            ->tree(YAML::file($path)->parse($contents)['tree'] ?? [])
-            ->syncOriginal();
+            ->tree(YAML::file($path)->parse($contents)['tree'] ?? []);
     }
 
     protected function newTreeClassByPath($path)

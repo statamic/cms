@@ -2,7 +2,6 @@
 
 namespace Statamic\Stache\Indexes;
 
-use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\Stache;
 use Statamic\Statamic;
 
@@ -12,6 +11,7 @@ abstract class Index
     protected $name;
     protected $items = [];
     protected $loaded = false;
+    private static ?string $currentlyLoading = null;
 
     public function __construct($store, $name)
     {
@@ -65,21 +65,28 @@ abstract class Index
             return $this;
         }
 
+        $loadingKey = $this->store->key().'/'.$this->name;
+        $currentlyLoadingThis = static::$currentlyLoading === $loadingKey;
+
+        static::$currentlyLoading = $loadingKey;
+
         $this->loaded = true;
 
-        if (Statamic::isWorker()) {
+        if (Statamic::isWorker() && ! $currentlyLoadingThis) {
             $this->loaded = false;
         }
 
-        debugbar()->addMessage("Loading index: {$this->store->key()}/{$this->name}", 'stache');
+        debugbar()->addMessage("Loading index: {$loadingKey}", 'stache');
 
-        $this->items = Cache::get($this->cacheKey());
+        $this->items = Stache::cacheStore()->get($this->cacheKey());
 
         if ($this->items === null) {
             $this->update();
         }
 
         $this->store->cacheIndexUsage($this);
+
+        static::$currentlyLoading = null;
 
         return $this;
     }
@@ -101,12 +108,12 @@ abstract class Index
 
     public function isCached()
     {
-        return Cache::has($this->cacheKey());
+        return Stache::cacheStore()->has($this->cacheKey());
     }
 
     public function cache()
     {
-        Cache::forever($this->cacheKey(), $this->items);
+        Stache::cacheStore()->forever($this->cacheKey(), $this->items);
     }
 
     public function updateItem($item)
@@ -131,15 +138,18 @@ abstract class Index
 
     public function cacheKey()
     {
+        $searches = ['.', '/'];
         $replacements = ['::', '->'];
 
         if (windows_os()) {
             $replacements[1] = '-]';
+            $searches[] = '->';
+            $replacements[] = '-]';
         }
 
         return vsprintf('stache::indexes::%s::%s', [
             $this->store->key(),
-            str_replace(['.', '/'], $replacements, $this->name),
+            str_replace($searches, $replacements, $this->name),
         ]);
     }
 
@@ -148,6 +158,11 @@ abstract class Index
         $this->loaded = false;
         $this->items = null;
 
-        Cache::forget($this->cacheKey());
+        Stache::cacheStore()->forget($this->cacheKey());
+    }
+
+    public static function currentlyLoading()
+    {
+        return static::$currentlyLoading;
     }
 }

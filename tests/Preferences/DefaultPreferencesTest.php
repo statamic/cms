@@ -3,6 +3,7 @@
 namespace Tests\Preferences;
 
 use Illuminate\Filesystem\Filesystem;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Preference;
 use Tests\TestCase;
 
@@ -26,14 +27,14 @@ class DefaultPreferencesTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_empty_array_by_default()
     {
         $this->assertFileDoesNotExist(resource_path('preferences.yaml'));
         $this->assertEquals([], Preference::default()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_preferences_from_yaml()
     {
         $this->files->put(resource_path('preferences.yaml'), <<<'EOT'
@@ -61,7 +62,7 @@ EOT
         $this->assertEquals($expected, Preference::default()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_preference_by_key()
     {
         Preference::default()->set([
@@ -72,7 +73,7 @@ EOT
         $this->assertEquals('bar', Preference::default()->get('foo'));
     }
 
-    /** @test */
+    #[Test]
     public function it_removes_a_preference_by_key()
     {
         Preference::default()->set([
@@ -85,7 +86,7 @@ EOT
         $this->assertEquals(['bar' => 'baz'], Preference::default()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_preferences_to_file()
     {
         $this->assertFileDoesNotExist(resource_path('preferences.yaml'));
@@ -107,7 +108,7 @@ EOT
         $this->assertEquals($preferences, Preference::default()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_merges_preferences_to_file()
     {
         $this->assertFileDoesNotExist(resource_path('preferences.yaml'));
@@ -133,7 +134,7 @@ EOT
         $this->assertEquals($expected, Preference::default()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_sets_a_single_preference_key()
     {
         Preference::default()->set([

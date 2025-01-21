@@ -6,13 +6,14 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\Eloquent\User as EloquentUser;
 use Statamic\Auth\File\Role;
 use Statamic\Auth\File\UserGroup;
 use Statamic\Contracts\Auth\Role as RoleContract;
 use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
 use Statamic\Facades;
+use Statamic\Support\Str;
 use Tests\Auth\PermissibleContractTests;
 use Tests\Auth\UserContractTests;
 use Tests\Preferences\HasPreferencesTests;
@@ -43,10 +44,6 @@ class EloquentUserTest extends TestCase
         }
 
         $this->loadMigrationsFrom($tmpDir);
-
-        // Prevent the anonymous role classes throwing errors when getting serialized
-        // during event handling unrelated to these tests.
-        Event::fake();
     }
 
     private static function migrationsDir()
@@ -70,7 +67,7 @@ class EloquentUserTest extends TestCase
         parent::tearDownAfterClass();
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_roles_already_in_the_db_without_explicitly_assigning_them()
     {
         $roleA = new class extends Role
@@ -153,7 +150,7 @@ class EloquentUserTest extends TestCase
         $this->assertSame([$user->email(), $userTwo->email(), $userThree->email(), $userFour->email()], Facades\User::query()->whereRoleIn(['a', 'b'])->orWhereRoleIn(['c'])->get()->map->email()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_groups_already_in_the_db_without_explicitly_assigning_them()
     {
         $roleA = new class extends UserGroup
@@ -243,7 +240,7 @@ class EloquentUserTest extends TestCase
                 'name' => $this->faker->name(),
                 'email' => $this->faker->unique()->safeEmail(),
                 // 'password' => '$2y$10$TKh8H1.PfQx37YgCzwiKb.KjNyWgaHb9cbcoQgdIVFlYg7B77UdFm', // secret
-                'remember_token' => str_random(10),
+                'remember_token' => Str::random(10),
             ])
             );
     }
@@ -275,7 +272,7 @@ class EloquentUserTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_timestamps_property_from_the_model()
     {
         $user = $this->user();
@@ -287,7 +284,7 @@ class EloquentUserTest extends TestCase
         $this->assertFalse($user->timestamps);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_super_correctly_on_the_model()
     {
         $user = $this->makeUser();

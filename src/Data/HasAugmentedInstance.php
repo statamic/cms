@@ -6,24 +6,43 @@ use BadMethodCallException;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Facades\Compare;
 use Statamic\Fields\Value;
+use Statamic\Support\Traits\Hookable;
 
 trait HasAugmentedInstance
 {
+    use Hookable;
+
     public function augmentedValue($key)
     {
         return $this->augmented()->get($key);
     }
 
-    public function toAugmentedCollection($keys = null)
+    private function toAugmentedCollectionWithFields($keys, $fields = null)
     {
         return $this->augmented()
             ->withRelations($this->defaultAugmentedRelations())
+            ->withBlueprintFields($fields)
             ->select($keys ?? $this->defaultAugmentedArrayKeys());
+    }
+
+    public function toAugmentedCollection($keys = null)
+    {
+        return $this->toAugmentedCollectionWithFields($keys);
     }
 
     public function toAugmentedArray($keys = null)
     {
         return $this->toAugmentedCollection($keys)->all();
+    }
+
+    public function toDeferredAugmentedArray($keys = null)
+    {
+        return $this->toAugmentedCollectionWithFields($keys)->deferredAll();
+    }
+
+    public function toDeferredAugmentedArrayUsingFields($keys, $fields)
+    {
+        return $this->toAugmentedCollectionWithFields($keys, $fields)->deferredAll();
     }
 
     public function toShallowAugmentedCollection()
@@ -36,9 +55,9 @@ trait HasAugmentedInstance
         return $this->toShallowAugmentedCollection()->all();
     }
 
-    public function augmented()
+    public function augmented(): Augmented
     {
-        return $this->newAugmentedInstance();
+        return $this->runHooks('augmented', $this->newAugmentedInstance());
     }
 
     abstract public function newAugmentedInstance(): Augmented;
@@ -81,6 +100,11 @@ trait HasAugmentedInstance
     public function toArray()
     {
         return $this->toEvaluatedAugmentedArray();
+    }
+
+    public function jsonSerialize(): mixed
+    {
+        return $this->toArray();
     }
 
     public function __get($key)

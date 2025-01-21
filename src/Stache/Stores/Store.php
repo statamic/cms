@@ -12,6 +12,7 @@ use Statamic\Stache\Indexes;
 use Statamic\Stache\Indexes\Index;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 abstract class Store
 {
@@ -34,7 +35,7 @@ abstract class Store
             return $this->directory;
         }
 
-        $this->directory = str_finish(Path::tidy($directory), '/');
+        $this->directory = Str::finish(Path::tidy($directory), '/');
 
         return $this;
     }
@@ -90,11 +91,13 @@ abstract class Store
 
     abstract public function getItem($key);
 
+    abstract public function getItemValues($keys, $valueIndex, $keyIndex);
+
     public function indexUsage()
     {
         $key = $this->indexUsageCacheKey();
 
-        return $this->usedIndexes = $this->usedIndexes ?? collect(Cache::get($key, []));
+        return $this->usedIndexes = $this->usedIndexes ?? collect(Stache::cacheStore()->get($key, []));
     }
 
     public function cacheIndexUsage($index)
@@ -113,7 +116,7 @@ abstract class Store
 
         $this->usedIndexes = $indexes;
 
-        Cache::put($this->indexUsageCacheKey(), $indexes->all());
+        Stache::cacheStore()->put($this->indexUsageCacheKey(), $indexes->all());
     }
 
     protected function indexUsageCacheKey()
@@ -171,20 +174,20 @@ abstract class Store
         // This whole process can be disabled to save overhead, at the expense of needing to update
         // the cache manually. If the Control Panel is being used, or the cache is cleared when
         // deployed, for example, this will happen naturally and disabling is a good idea.
-        if (! config('statamic.stache.watcher')) {
+        if (! Stache::isWatcherEnabled()) {
             return;
         }
 
         // Get the existing files and timestamps from the cache.
         $cacheKey = "stache::timestamps::{$this->key()}";
-        $existing = collect(Cache::get($cacheKey, []));
+        $existing = collect(Stache::cacheStore()->get($cacheKey, []));
 
         // Get the files and timestamps from the filesystem right now.
         $files = Traverser::filter([$this, 'getItemFilter'])->traverse($this);
 
         // Cache the files and timestamps, ready for comparisons on the next request.
         // We'll do it now since there are multiple early returns coming up.
-        Cache::forever($cacheKey, $files->all());
+        Stache::cacheStore()->forever($cacheKey, $files->all());
 
         // If there are no existing file timestamps in the cache, there's nothing to update.
         if ($existing->isEmpty()) {
@@ -288,7 +291,7 @@ abstract class Store
             return $this->paths;
         }
 
-        if ($paths = Cache::get($this->pathsCacheKey())) {
+        if ($paths = Stache::cacheStore()->get($this->pathsCacheKey())) {
             return $this->paths = collect($paths);
         }
 
@@ -348,7 +351,7 @@ abstract class Store
 
     protected function cachePaths($paths)
     {
-        Cache::forever($this->pathsCacheKey(), $paths->all());
+        Stache::cacheStore()->forever($this->pathsCacheKey(), $paths->all());
 
         $this->paths = $paths;
 
@@ -358,7 +361,7 @@ abstract class Store
     public function clearCachedPaths()
     {
         $this->paths = null;
-        Cache::forget($this->pathsCacheKey());
+        Stache::cacheStore()->forget($this->pathsCacheKey());
     }
 
     protected function pathsCacheKey()
@@ -378,13 +381,13 @@ abstract class Store
         });
 
         $this->usedIndexes = collect();
-        Cache::forget($this->indexUsageCacheKey());
+        Stache::cacheStore()->forget($this->indexUsageCacheKey());
 
         $this->clearCachedPaths();
 
         $this->keys()->clear();
 
-        Cache::forget("stache::timestamps::{$this->key()}");
+        Stache::cacheStore()->forget("stache::timestamps::{$this->key()}");
     }
 
     public function warm()

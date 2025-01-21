@@ -54,7 +54,8 @@ class Sets extends Fieldtype
                         'display' => $set['display'] ?? null,
                         'instructions' => $set['instructions'] ?? null,
                         'icon' => $set['icon'] ?? null,
-                        'fields' => collect($set['fields'])->map(function ($field, $i) use ($setId) {
+                        'hide' => $set['hide'] ?? null,
+                        'fields' => collect($set['fields'] ?? [])->map(function ($field, $i) use ($setId) {
                             return array_merge(FieldTransformer::toVue($field), ['_id' => $setId.'-'.$i]);
                         })->all(),
                     ];
@@ -93,7 +94,7 @@ class Sets extends Fieldtype
                         return array_merge($config, [
                             'handle' => $name,
                             'id' => $name,
-                            'fields' => (new NestedFields)->preProcessConfig(array_get($config, 'fields', [])),
+                            'fields' => (new NestedFields)->preProcessConfig(Arr::get($config, 'fields', [])),
                         ]);
                     })
                     ->values()
@@ -121,6 +122,7 @@ class Sets extends Fieldtype
                                 'display' => $section['display'],
                                 'instructions' => $section['instructions'] ?? null,
                                 'icon' => $section['icon'] ?? null,
+                                'hide' => $section['hide'] ?? null,
                                 'fields' => collect($section['fields'])->map(function ($field) {
                                     return FieldTransformer::fromVue($field);
                                 })->all(),

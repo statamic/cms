@@ -3,7 +3,9 @@
 namespace Tests\Stache\Repositories;
 
 use Illuminate\Support\Collection as IlluminateCollection;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Entries\Collection;
+use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades\Collection as CollectionAPI;
 use Statamic\Stache\Repositories\CollectionRepository;
 use Statamic\Stache\Stache;
@@ -33,7 +35,7 @@ class CollectionRepositoryTest extends TestCase
         $this->repo = new CollectionRepository($stache);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_all_collections()
     {
         $collections = $this->repo->all();
@@ -47,7 +49,7 @@ class CollectionRepositoryTest extends TestCase
         $this->assertEquals(['Alphabetical', 'Blog', 'Numeric', 'Pages'], $ordered->map->title()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_collection_by_handle()
     {
         tap($this->repo->findByHandle('alphabetical'), function ($collection) {
@@ -77,7 +79,7 @@ class CollectionRepositoryTest extends TestCase
         $this->assertNull($this->repo->findByHandle('unknown'));
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_a_collection_to_the_stache_and_to_a_file()
     {
         $collection = CollectionAPI::make('new');
@@ -92,7 +94,7 @@ class CollectionRepositoryTest extends TestCase
         @unlink($this->directory.'/new.yaml');
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_additional_preview_targets()
     {
         $collection1 = (new Collection)->handle('test');
@@ -115,5 +117,23 @@ class CollectionRepositoryTest extends TestCase
         $this->assertEquals($previewTargetsCollection1, $previewTargetsTest->all());
         $this->assertEquals($previewTargetsCollection2, $previewTargetsTest2->all());
         $this->assertNotEquals($previewTargetsTest->all(), $previewTargetsTest2->all());
+    }
+
+    #[Test]
+    public function test_find_or_fail_gets_collection()
+    {
+        $collection = $this->repo->findOrFail('blog');
+
+        $this->assertInstanceOf(Collection::class, $collection);
+        $this->assertEquals('Blog', $collection->title());
+    }
+
+    #[Test]
+    public function test_find_or_fail_throws_exception_when_collection_does_not_exist()
+    {
+        $this->expectException(CollectionNotFoundException::class);
+        $this->expectExceptionMessage('Collection [does-not-exist] not found');
+
+        $this->repo->findOrFail('does-not-exist');
     }
 }

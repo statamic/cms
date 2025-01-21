@@ -3,10 +3,10 @@
 namespace Statamic\Auth\File;
 
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 use Statamic\Auth\PermissionCache;
 use Statamic\Auth\User as BaseUser;
-use Statamic\Contracts\Auth\Role as RoleContract;
 use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
 use Statamic\Data\ContainsData;
 use Statamic\Data\Data;
@@ -16,6 +16,7 @@ use Statamic\Facades\File;
 use Statamic\Facades\Stache;
 use Statamic\Facades\YAML;
 use Statamic\Preferences\HasPreferencesInProperty;
+use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 /**
@@ -46,11 +47,11 @@ class User extends BaseUser
 
         $this->traitData($data);
 
-        if (array_has($data, 'password')) {
+        if (Arr::has($data, 'password')) {
             $this->remove('password')->password($data['password']);
         }
 
-        if (array_has($data, 'password_hash')) {
+        if (Arr::has($data, 'password_hash')) {
             $this->remove('password_hash')->passwordHash($data['password_hash']);
         }
 
@@ -150,16 +151,19 @@ class User extends BaseUser
         return 'remember_token';
     }
 
-    public function roles($roles = null)
+    public function roles(): Collection
     {
-        return is_null($roles)
-            ? $this->getRoles()
-            : $this->set('roles', $roles);
+        return $this->explicitRoles()
+            ->merge($this->groups()->flatMap->roles()->keyBy->handle());
     }
 
-    protected function getRoles()
+    public function explicitRoles($roles = null)
     {
-        return collect($this->get('roles', []))
+        if (func_num_args() === 1) {
+            return $this->set('roles', $roles);
+        }
+
+        return collect($this->get('roles'))
             ->map(function ($role) {
                 return Facades\Role::find($role);
             })->filter()->keyBy->handle();
@@ -167,18 +171,21 @@ class User extends BaseUser
 
     public function assignRole($role)
     {
-        $roles = collect(array_wrap($role))->map(function ($role) {
-            return is_string($role) ? $role : $role->handle();
-        })->all();
+        $roles = collect($this->get('roles', []))
+            ->merge(Arr::wrap($role))
+            ->map(fn ($role) => is_string($role) ? $role : $role->handle())
+            ->unique()
+            ->values()
+            ->all();
 
-        $this->set('roles', array_merge($this->get('roles', []), $roles));
+        $this->set('roles', $roles);
 
         return $this;
     }
 
     public function removeRole($role)
     {
-        $toBeRemoved = collect(array_wrap($role))->map(function ($role) {
+        $toBeRemoved = collect(Arr::wrap($role))->map(function ($role) {
             return is_string($role) ? $role : $role->handle();
         });
 
@@ -192,27 +199,23 @@ class User extends BaseUser
         return $this;
     }
 
-    public function hasRole($role)
-    {
-        $role = $role instanceof RoleContract ? $role->handle() : $role;
-
-        return $this->roles()->has($role);
-    }
-
     public function addToGroup($group)
     {
-        $groups = collect(array_wrap($group))->map(function ($group) {
-            return is_string($group) ? $group : $group->handle();
-        })->all();
+        $groups = collect($this->get('groups', []))
+            ->merge(Arr::wrap($group))
+            ->map(fn ($group) => is_string($group) ? $group : $group->handle())
+            ->unique()
+            ->values()
+            ->all();
 
-        $this->set('groups', array_merge($this->get('groups', []), $groups));
+        $this->set('groups', $groups);
 
         return $this;
     }
 
     public function removeFromGroup($group)
     {
-        $toBeRemoved = collect(array_wrap($group))->map(function ($group) {
+        $toBeRemoved = collect(Arr::wrap($group))->map(function ($group) {
             return is_string($group) ? $group : $group->handle();
         });
 
@@ -314,7 +317,7 @@ class User extends BaseUser
     {
         $yaml = YAML::file($this->metaPath())->parse();
 
-        return array_get($yaml, $key, $default);
+        return Arr::get($yaml, $key, $default);
     }
 
     /**
@@ -355,5 +358,17 @@ class User extends BaseUser
     public function fresh()
     {
         return Facades\User::find($this->id);
+    }
+
+    public function getCurrentDirtyStateAttributes(): array
+    {
+        return array_merge([
+            'email' => $this->email(),
+            'groups' => $this->get('groups', []),
+            'password_hash' => $this->passwordHash(),
+            'permissions' => $this->get('permissions', []),
+            'roles' => $this->get('roles', []),
+            'super' => $this->get('super', false),
+        ], $this->data()->toArray());
     }
 }

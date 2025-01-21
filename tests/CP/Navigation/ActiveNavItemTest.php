@@ -7,6 +7,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\CP\Navigation\NavBuilder;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
@@ -49,7 +50,7 @@ class ActiveNavItemTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_resolves_all_children_only_once_to_build_caches_for_is_active_checks()
     {
         Facades\Collection::make('pages')->title('Pages')->save();
@@ -84,7 +85,7 @@ class ActiveNavItemTest extends TestCase
         $this->assertInstanceOf(Closure::class, $this->getItemByDisplay($nav->get('Content'), 'Taxonomies')->children());
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_caches_when_new_child_urls_are_detected_after_resolving_children()
     {
         Facades\Collection::make('pages')->title('Pages')->save();
@@ -140,7 +141,7 @@ class ActiveNavItemTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_builds_core_children_closure_when_not_active()
     {
         Facades\Collection::make('pages')->title('Pages')->save();
@@ -157,7 +158,7 @@ class ActiveNavItemTest extends TestCase
         $this->assertInstanceOf(Closure::class, $collections->children());
     }
 
-    /** @test */
+    #[Test]
     public function it_resolves_core_children_closure_and_can_check_when_parent_item_is_active()
     {
         Facades\Collection::make('pages')->title('Pages')->save();
@@ -176,7 +177,7 @@ class ActiveNavItemTest extends TestCase
         $this->assertFalse($this->getItemByDisplay($collections->children(), 'Articles')->isActive());
     }
 
-    /** @test */
+    #[Test]
     public function it_resolves_core_children_closure_and_can_check_when_parent_and_child_item_are_active()
     {
         Facades\Collection::make('pages')->title('Pages')->save();
@@ -195,7 +196,7 @@ class ActiveNavItemTest extends TestCase
         $this->assertTrue($this->getItemByDisplay($collections->children(), 'Articles')->isActive());
     }
 
-    /** @test */
+    #[Test]
     public function it_resolves_core_children_closure_and_can_check_when_parent_and_descendant_of_child_item_is_active()
     {
         Facades\Collection::make('pages')->title('Pages')->save();
@@ -214,7 +215,7 @@ class ActiveNavItemTest extends TestCase
         $this->assertTrue($collections->children()->keyBy->display()->get('Articles')->isActive());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_check_if_parent_extension_with_array_based_children_item_is_active()
     {
         Facades\CP\Nav::extend(function ($nav) {
@@ -239,7 +240,7 @@ class ActiveNavItemTest extends TestCase
         $this->assertFalse($this->getItemByDisplay($seoPro->children(), 'Section Defaults')->isActive());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_check_when_parent_and_array_based_child_extension_items_are_active()
     {
         Facades\CP\Nav::extend(function ($nav) {
@@ -264,7 +265,7 @@ class ActiveNavItemTest extends TestCase
         $this->assertTrue($this->getItemByDisplay($seoPro->children(), 'Section Defaults')->isActive());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_check_when_parent_and_array_based_descendant_of_child_extension_item_is_active()
     {
         Facades\CP\Nav::extend(function ($nav) {
@@ -289,7 +290,7 @@ class ActiveNavItemTest extends TestCase
         $this->assertTrue($this->getItemByDisplay($seoPro->children(), 'Section Defaults')->isActive());
     }
 
-    /** @test */
+    #[Test]
     public function it_builds_extension_children_closure_when_not_active()
     {
         Facades\CP\Nav::extend(function ($nav) {
@@ -315,7 +316,7 @@ class ActiveNavItemTest extends TestCase
         $this->assertInstanceOf(Closure::class, $seoPro->children());
     }
 
-    /** @test */
+    #[Test]
     public function it_resolves_extension_children_closure_and_can_check_when_parent_item_is_active()
     {
         Facades\CP\Nav::extend(function ($nav) {
@@ -342,7 +343,7 @@ class ActiveNavItemTest extends TestCase
         $this->assertFalse($this->getItemByDisplay($seoPro->children(), 'Section Defaults')->isActive());
     }
 
-    /** @test */
+    #[Test]
     public function it_resolves_extension_children_closure_and_can_check_when_parent_and_child_item_are_active()
     {
         Facades\CP\Nav::extend(function ($nav) {
@@ -369,7 +370,7 @@ class ActiveNavItemTest extends TestCase
         $this->assertTrue($this->getItemByDisplay($seoPro->children(), 'Section Defaults')->isActive());
     }
 
-    /** @test */
+    #[Test]
     public function it_resolves_extension_children_closure_and_can_check_when_parent_and_descendant_of_child_item_is_active()
     {
         Facades\CP\Nav::extend(function ($nav) {
@@ -396,7 +397,7 @@ class ActiveNavItemTest extends TestCase
         $this->assertTrue($this->getItemByDisplay($seoPro->children(), 'Section Defaults')->isActive());
     }
 
-    /** @test */
+    #[Test]
     public function it_properly_handles_various_edge_cases_when_checking_is_active_on_descendants_of_nav_children()
     {
         // Ensure urls are not cached so that we can test regex based isActive() checks
@@ -516,7 +517,7 @@ class ActiveNavItemTest extends TestCase
         $this->assertFalse($externalSecure->isActive());
     }
 
-    /** @test */
+    #[Test]
     public function active_nav_check_still_functions_properly_when_custom_nav_extension_hijacks_a_core_item_child()
     {
         Facades\Collection::make('pages')->title('Pages')->save();
@@ -569,7 +570,7 @@ class ActiveNavItemTest extends TestCase
         $this->assertEquals(['Tags'], $taxonomies->children()->map->display()->all());
     }
 
-    /** @test */
+    #[Test]
     public function active_nav_descendant_check_still_functions_properly_when_custom_nav_extension_hijacks_a_core_item_child()
     {
         Facades\Collection::make('pages')->title('Pages')->save();
@@ -616,7 +617,7 @@ class ActiveNavItemTest extends TestCase
         $this->assertFalse($this->getItemByDisplay($schopify->children(), 'Categories')->isActive());
     }
 
-    /** @test */
+    #[Test]
     public function active_nav_descendant_with_unrelated_url_still_functions_properly_when_custom_nav_extension_hijacks_a_core_item_child()
     {
         Facades\Collection::make('pages')->title('Pages')->save();
@@ -659,7 +660,7 @@ class ActiveNavItemTest extends TestCase
         $this->assertTrue($this->getItemByDisplay($schopify->children(), 'Unrelated')->isActive());
     }
 
-    /** @test */
+    #[Test]
     public function active_nav_check_still_functions_properly_on_moved_items()
     {
         Facades\Collection::make('pages')->title('Pages')->save();
@@ -700,7 +701,7 @@ class ActiveNavItemTest extends TestCase
         $this->assertFalse($categories->isActive());
     }
 
-    /** @test */
+    #[Test]
     public function active_nav_check_still_functions_properly_on_explicit_child_within_moved_items()
     {
         Facades\Collection::make('pages')->title('Pages')->save();
@@ -741,7 +742,7 @@ class ActiveNavItemTest extends TestCase
         $this->assertTrue($categories->isActive());
     }
 
-    /** @test */
+    #[Test]
     public function active_nav_check_still_functions_properly_on_descendant_of_moved_items()
     {
         Facades\Collection::make('pages')->title('Pages')->save();
@@ -782,7 +783,7 @@ class ActiveNavItemTest extends TestCase
         $this->assertFalse($categories->isActive());
     }
 
-    /** @test */
+    #[Test]
     public function active_nav_check_still_functions_properly_on_descendant_of_child_within_moved_item()
     {
         Facades\Collection::make('pages')->title('Pages')->save();

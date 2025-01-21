@@ -3,9 +3,11 @@
 namespace Tests\Feature\GraphQL;
 
 use Facades\Statamic\API\ResourceAuthorizer;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-/** @group graphql */
+#[Group('graphql')]
 class SitesTest extends TestCase
 {
     use EnablesQueries {
@@ -17,18 +19,20 @@ class SitesTest extends TestCase
     public function getEnvironmentSetUp($app)
     {
         $this->enableQueryEnvironmentSetup($app);
+    }
 
-        $app['config']->set('statamic.sites', [
-            'default' => 'en',
-            'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
-                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
-            ],
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->setSites([
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function query_only_works_if_enabled()
     {
         ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'sites')->andReturnFalse()->once();
@@ -41,7 +45,7 @@ class SitesTest extends TestCase
             ->assertSee('Cannot query field \"entries\" on type \"Query\"', false);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_global_sets()
     {
         $query = <<<'GQL'

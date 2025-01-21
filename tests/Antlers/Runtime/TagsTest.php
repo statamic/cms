@@ -31,4 +31,19 @@ class TagsTest extends ParserTestCase
 
         $this->assertSame('Test: test valuetest value - ', $result);
     }
+
+    public function test_collections_returned_from_tags()
+    {
+        (new class extends Tags
+        {
+            public static $handle = 'test_tag';
+
+            public function index()
+            {
+                return collect(['a' => 'b']);
+            }
+        })::register();
+
+        $this->assertSame('b', $this->renderString('{{ test_tag }}{{ a }}{{ /test_tag }}', [], true));
+    }
 }

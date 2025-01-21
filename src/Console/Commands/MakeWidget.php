@@ -2,9 +2,8 @@
 
 namespace Statamic\Console\Commands;
 
-use Archetype\Facades\PHPFile;
-use PhpParser\BuilderFactory;
 use Statamic\Console\RunsInPlease;
+use Statamic\Support\Str;
 
 class MakeWidget extends GeneratorCommand
 {
@@ -22,7 +21,7 @@ class MakeWidget extends GeneratorCommand
      *
      * @var string
      */
-    protected $description = 'Create a new widget addon';
+    protected $description = 'Create a new widget';
 
     /**
      * The type of class being generated.
@@ -50,10 +49,6 @@ class MakeWidget extends GeneratorCommand
         }
 
         $this->generateWidgetView();
-
-        if ($this->argument('addon')) {
-            $this->updateServiceProvider();
-        }
     }
 
     /**
@@ -70,31 +65,13 @@ class MakeWidget extends GeneratorCommand
             'name' => $this->getNameInput(),
         ];
 
-        $filename = str_slug(snake_case($this->getNameInput()));
+        $filename = Str::slug(Str::snake($this->getNameInput()));
 
         $this->createFromStub(
             'widget.blade.php.stub',
             $path."/resources/views/widgets/{$filename}.blade.php",
             $data
         );
-    }
-
-    /**
-     * Update the Service Provider to register the widget component.
-     */
-    protected function updateServiceProvider()
-    {
-        $factory = new BuilderFactory();
-
-        $widgetClassValue = $factory->classConstFetch('Widgets\\'.$this->getNameInput(), 'class');
-
-        try {
-            PHPFile::load("addons/{$this->package}/src/ServiceProvider.php")
-                ->add()->protected()->property('widgets', $widgetClassValue)
-                ->save();
-        } catch (\Exception $e) {
-            $this->info("Don't forget to register the Widget class in your addon's service provider.");
-        }
     }
 
     /**
@@ -107,7 +84,7 @@ class MakeWidget extends GeneratorCommand
     {
         $class = parent::buildClass($name);
 
-        $name = str_slug(snake_case($this->getNameInput()));
+        $name = Str::slug(Str::snake($this->getNameInput()));
         $viewPath = 'widgets.'.$name;
 
         if ($this->argument('addon')) {

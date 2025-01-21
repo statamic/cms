@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Log;
 use Statamic\Console\Processes\Exceptions\ProcessException;
 use Statamic\Facades\Path;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process as SymfonyProcess;
 
@@ -57,7 +58,7 @@ class Process
      */
     public function __construct($basePath = null)
     {
-        $this->basePath = str_finish($basePath ?? base_path(), '/');
+        $this->basePath = Str::finish($basePath ?? base_path(), '/');
 
         $this->env = $this->constructEnv();
     }
@@ -449,7 +450,7 @@ class Process
     {
         $that = clone $this;
 
-        $that->basePath = str_finish(Path::resolve($this->basePath.'/../'), '/');
+        $that->basePath = Str::finish(Path::resolve($this->basePath.'/../'), '/');
 
         return $that;
     }

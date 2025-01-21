@@ -4,6 +4,7 @@ namespace Statamic\Search;
 
 use Statamic\Contracts\Search\Searchable;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 abstract class Index
 {
@@ -35,7 +36,7 @@ abstract class Index
 
     public function title()
     {
-        return $this->config['title'] ?? title_case($this->name);
+        return $this->config['title'] ?? Str::title($this->name);
     }
 
     public function config()

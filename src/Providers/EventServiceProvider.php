@@ -2,8 +2,8 @@
 
 namespace Statamic\Providers;
 
-use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\ServiceProvider;
 use Statamic\Support\Arr;
 
 class EventServiceProvider extends ServiceProvider
@@ -18,16 +18,16 @@ class EventServiceProvider extends ServiceProvider
         ],
         \Statamic\Events\CollectionTreeSaved::class => [
             \Statamic\Entries\UpdateStructuredEntryUris::class,
-            \Statamic\Entries\UpdateStructuredEntryOrder::class,
+            \Statamic\Entries\UpdateStructuredEntryOrderAndParent::class,
         ],
         \Statamic\Events\EntryBlueprintFound::class => [
             \Statamic\Entries\AddSiteColumnToBlueprint::class,
         ],
         \Statamic\Events\ResponseCreated::class => [
-            \Statamic\View\State\ClearState::class,
+            \Statamic\Listeners\ClearState::class,
         ],
         \Illuminate\Foundation\Http\Events\RequestHandled::class => [
-            \Statamic\View\State\ClearState::class,
+            \Statamic\Listeners\ClearState::class,
         ],
     ];
 
@@ -38,6 +38,21 @@ class EventServiceProvider extends ServiceProvider
         \Statamic\Listeners\UpdateAssetReferences::class,
         \Statamic\Listeners\UpdateTermReferences::class,
     ];
+
+    public function register()
+    {
+        $this->booting(function () {
+            foreach ($this->listen as $event => $listeners) {
+                foreach (array_unique($listeners, SORT_REGULAR) as $listener) {
+                    Event::listen($event, $listener);
+                }
+            }
+
+            foreach ($this->subscribe as $subscriber) {
+                Event::subscribe($subscriber);
+            }
+        });
+    }
 
     public function boot()
     {

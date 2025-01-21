@@ -199,4 +199,25 @@ EOT;
         $this->assertSame('No', $this->renderString('{{ if 0 }}Yes{{ else }}No{{ /if }}'));
         $this->assertSame('No', $this->renderString('{{ if 0.0 }}Yes{{ else }}No{{ /if }}'));
     }
+
+    public function test_interpolations_inside_conditions_are_evaluated_using_conditional_mode()
+    {
+        (new class extends Tags
+        {
+            protected static $handle = 'the_tag';
+
+            public function wildcard($method)
+            {
+                return true;
+            }
+        })::register();
+
+        $template = <<<'EOT'
+{{ if {the_tag:has:some:nested:stuff} === true }}
+Yes
+{{ /if }}
+EOT;
+
+        $this->assertSame('Yes', trim($this->renderString($template, [], true)));
+    }
 }

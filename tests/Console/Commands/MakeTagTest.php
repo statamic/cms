@@ -4,11 +4,13 @@ namespace Tests\Console\Commands;
 
 use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Filesystem\Filesystem;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class MakeTagTest extends TestCase
 {
-    use Concerns\CleansUpGeneratedPaths;
+    use Concerns\CleansUpGeneratedPaths,
+        Concerns\FakesComposerInstalls;
 
     private $files;
 
@@ -17,6 +19,7 @@ class MakeTagTest extends TestCase
         parent::setUp();
 
         $this->files = app(Filesystem::class);
+        $this->fakeSuccessfulComposerRequire();
     }
 
     public function tearDown(): void
@@ -26,7 +29,7 @@ class MakeTagTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function it_can_make_a_tag()
     {
         $path = base_path('app/Tags/Donkey.php');
@@ -39,7 +42,7 @@ class MakeTagTest extends TestCase
         $this->assertStringContainsString('namespace App\Tags;', $this->files->get($path));
     }
 
-    /** @test */
+    #[Test]
     public function it_will_not_overwrite_an_existing_tag()
     {
         $path = base_path('app/Tags/Donkey.php');
@@ -56,7 +59,7 @@ class MakeTagTest extends TestCase
         $this->assertStringContainsString('overwritten tag', $this->files->get($path));
     }
 
-    /** @test */
+    #[Test]
     public function using_force_option_will_overwrite_original_tag()
     {
         $path = base_path('app/Tags/Donkey.php');
@@ -71,7 +74,7 @@ class MakeTagTest extends TestCase
         $this->assertStringNotContainsString('overwritten tag', $this->files->get($path));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_make_a_tag_into_an_addon()
     {
         $path = base_path('addons/yoda/bag-odah');

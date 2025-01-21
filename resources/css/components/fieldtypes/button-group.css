@@ -1,6 +1,31 @@
-/* Inside a Grid field
+/* Vertical alignment of btn groups when overflowing
   ========================================================================== */
 
-.grid-table td.button_group-fieldtype {
-    width: 1%;
+.button-group-fieldtype-wrapper .btn-group:not(.btn-vertical) {
+    @apply flex-wrap;
+}
+
+.btn-group.btn-vertical {
+    @apply flex-col items-stretch justify-start p-0 h-auto;
+
+    button {
+        @apply border-b border-t-0 rounded-none border-l border-r ;
+        height: 2.375rem; /*  38px */
+    }
+
+    :is(.btn-group button:not(:last-child):not(.active)) {
+        @apply border-r border-l;
+    }
+
+    button.active+button {
+        @apply border-l border-r;
+    }
+
+    button:first-child {
+        @apply rounded-t rounded-b-none border-t;
+    }
+
+    button:last-child {
+        @apply rounded-t-none rounded-b border-b;
+    }
 }

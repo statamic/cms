@@ -43,6 +43,18 @@ class Preference {
 
         return promise;
     }
+
+    defaults() {
+        return Statamic.$config.get('defaultPreferences');
+    }
+
+    getDefault(key, fallback) {
+        return data_get(this.defaults(), key, fallback);
+    }
+
+    hasDefault(key) {
+        return this.getDefault(key) !== null;
+    }
 }
 
 Object.defineProperties(Vue.prototype, {

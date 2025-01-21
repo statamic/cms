@@ -43,7 +43,7 @@ abstract class Manager
         if (isset($this->customCreators[$config['driver']])) {
             return $this->callCustomCreator($config, $name);
         } else {
-            $driverMethod = 'create'.camel_case($config['driver']).'Driver';
+            $driverMethod = 'create'.Str::camel($config['driver']).'Driver';
 
             if (method_exists($this, $driverMethod)) {
                 return $this->{$driverMethod}($config, $name);

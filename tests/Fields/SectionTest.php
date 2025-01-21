@@ -3,6 +3,7 @@
 namespace Tests\Fields;
 
 use Facades\Statamic\Fields\FieldRepository;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Section;
@@ -10,7 +11,7 @@ use Tests\TestCase;
 
 class SectionTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_gets_the_display()
     {
         $this->assertNull((new Section([]))->display());
@@ -18,7 +19,7 @@ class SectionTest extends TestCase
         $this->assertEquals('Test', (new Section(['display' => 'Test']))->display());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_instructions()
     {
         $this->assertNull((new Section([]))->instructions());
@@ -26,7 +27,7 @@ class SectionTest extends TestCase
         $this->assertEquals('Test', (new Section(['instructions' => 'Test']))->instructions());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_contents()
     {
         $section = new Section($contents = ['foo' => 'bar']);
@@ -34,7 +35,7 @@ class SectionTest extends TestCase
         $this->assertEquals($contents, $section->contents());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_fields()
     {
         $section = new Section([]);
@@ -74,7 +75,7 @@ class SectionTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function converts_to_array_suitable_for_rendering_fields_in_publish_component()
     {
         FieldRepository::shouldReceive('find')
@@ -109,45 +110,57 @@ class SectionTest extends TestCase
             ],
         ]);
 
-        $this->assertEquals([
+        $this->assertSame([
             'display' => 'Test Section',
             'instructions' => 'Does stuff',
             'fields' => [
                 [
-                    'handle' => 'one',
-                    'prefix' => null,
-                    'type' => 'text',
                     'display' => 'One',
+                    'hide_display' => false,
+                    'handle' => 'one',
                     'instructions' => 'One instructions',
-                    'required' => true,
+                    'instructions_position' => 'above',
+                    'listable' => 'hidden',
+                    'sortable' => true,
+                    'visibility' => 'visible',
+                    'replicator_preview' => true,
+                    'duplicate' => true,
+                    'type' => 'text',
                     'validate' => 'required|min:2',
-                    'component' => 'text',
-                    'placeholder' => null,
                     'input_type' => 'text',
+                    'placeholder' => null,
+                    'default' => null,
                     'character_limit' => 0,
+                    'autocomplete' => null,
                     'prepend' => null,
                     'append' => null,
                     'antlers' => false,
-                    'default' => null,
-                    'visibility' => 'visible',
+                    'component' => 'text',
+                    'prefix' => null,
+                    'required' => true,
                     'read_only' => false, // deprecated
                     'always_save' => false,
-                    'autocomplete' => null,
                 ],
                 [
-                    'handle' => 'two',
-                    'prefix' => null,
-                    'type' => 'textarea',
                     'display' => 'Two',
+                    'hide_display' => false,
+                    'handle' => 'two',
                     'instructions' => 'Two instructions',
-                    'required' => false,
-                    'validate' => 'min:2',
-                    'character_limit' => null,
-                    'component' => 'textarea',
-                    'antlers' => false,
-                    'placeholder' => null,
-                    'default' => null,
+                    'instructions_position' => 'above',
+                    'listable' => 'hidden',
+                    'sortable' => true,
                     'visibility' => 'visible',
+                    'replicator_preview' => true,
+                    'duplicate' => true,
+                    'type' => 'textarea',
+                    'validate' => 'min:2',
+                    'placeholder' => null,
+                    'character_limit' => 0,
+                    'default' => null,
+                    'antlers' => false,
+                    'component' => 'textarea',
+                    'prefix' => null,
+                    'required' => false,
                     'read_only' => false, // deprecated
                     'always_save' => false,
                 ],

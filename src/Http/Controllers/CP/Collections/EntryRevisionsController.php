@@ -15,6 +15,11 @@ class EntryRevisionsController extends CpController
         $revisions = $entry
             ->revisions()
             ->reverse()
+            ->each(fn ($revision) => $revision->attribute('item_url', cp_route('collections.entries.revisions.show', [
+                'collection' => $collection,
+                'entry' => $entry->id(),
+                'revision' => $revision->id(),
+            ])))
             ->prepend($this->workingCopy($entry))
             ->filter();
 

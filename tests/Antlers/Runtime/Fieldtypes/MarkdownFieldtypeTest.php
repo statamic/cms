@@ -56,10 +56,10 @@ EOT;
         $this->assertSame('<p>2019</p>', trim((string) $this->parser()->cascade($cascade)->render('{{ settings:field_name }}', $data)));
 
         $expected = <<<'EOT'
-<p>No.
-Yes.
-3 is bigger
-2019
+<p>No.<br />
+Yes.<br />
+3 is bigger<br />
+2019<br />
 Just some content</p>
 EOT;
 

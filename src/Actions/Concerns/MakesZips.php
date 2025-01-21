@@ -3,18 +3,19 @@
 namespace Statamic\Actions\Concerns;
 
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use ZipStream\Option\Archive;
 use ZipStream\ZipStream;
 
 trait MakesZips
 {
     protected function makeZip($name, $files)
     {
-        $options = new Archive;
-        $options->setZeroHeader(true);
-        $options->setSendHttpHeaders(true);
+        $zip = new ZipStream(
+            outputName: $name,
+            defaultEnableZeroHeader: true,
+            sendHttpHeaders: true,
+        );
 
-        return tap(new ZipStream($name, $options), function ($zip) use ($files) {
+        return tap($zip, function ($zip) use ($files) {
             $files->each(fn ($stream, $path) => $zip->addFileFromStream($path, $stream));
         });
     }

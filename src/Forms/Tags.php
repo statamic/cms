@@ -6,6 +6,7 @@ use DebugBar\DataCollector\ConfigCollector;
 use DebugBar\DebugBarException;
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\Facades\Blink;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\URL;
 use Statamic\Forms\JsDrivers\JsDriver;
@@ -17,8 +18,12 @@ use Statamic\Tags\Tags as BaseTags;
 class Tags extends BaseTags
 {
     use Concerns\GetsFormSession,
+        Concerns\GetsQueryResults,
         Concerns\GetsRedirects,
         Concerns\OutputsItems,
+        Concerns\QueriesConditions,
+        Concerns\QueriesOrderBys,
+        Concerns\QueriesScopes,
         Concerns\RendersForms;
 
     const HANDLE_PARAM = ['handle', 'is', 'in', 'form', 'formset'];
@@ -46,7 +51,7 @@ class Tags extends BaseTags
     {
         $this->context['form'] = $this->params->get(static::HANDLE_PARAM);
 
-        return [];
+        return $this->parse();
     }
 
     /**
@@ -62,6 +67,10 @@ class Tags extends BaseTags
         $data = $this->getFormSession($this->sessionHandle());
 
         $jsDriver = $this->parseJsParamDriverAndOptions($this->params->get('js'), $form);
+
+        $data['form_config'] = ($configFields = Form::extraConfigFor($form->handle()))
+            ? Blueprint::makeFromTabs($configFields)->fields()->addValues($form->data()->all())->values()->all()
+            : [];
 
         $data['sections'] = $this->getSections($this->sessionHandle(), $jsDriver);
 
@@ -93,6 +102,7 @@ class Tags extends BaseTags
         if ($jsDriver) {
             $attrs = array_merge($attrs, $jsDriver->addToFormAttributes($form));
         }
+        $attrs = $this->runHooks('attrs', ['attrs' => $attrs, 'data' => $data])['attrs'];
 
         $params = [];
 
@@ -104,7 +114,7 @@ class Tags extends BaseTags
             $params['error_redirect'] = $this->parseRedirect($errorRedirect);
         }
 
-        if (! $this->parser) {
+        if (! $this->canParseContents()) {
             return array_merge([
                 'attrs' => $this->formAttrs($action, $method, $knownParams, $attrs),
                 'params' => $this->formMetaPrefix($this->formParams($method, $params)),
@@ -112,11 +122,13 @@ class Tags extends BaseTags
         }
 
         $html = $this->formOpen($action, $method, $knownParams, $attrs);
+        $html = $this->runHooks('after-open', ['html' => $html, 'data' => $data])['html'];
 
         $html .= $this->formMetaFields($params);
 
         $html .= $this->parse($data);
 
+        $html = $this->runHooks('before-close', ['html' => $html, 'data' => $data])['html'];
         $html .= $this->formClose();
 
         if ($jsDriver) {
@@ -155,9 +167,13 @@ class Tags extends BaseTags
     public function success()
     {
         $sessionHandle = $this->sessionHandle();
+        $successMessage = $this->getFromFormSession($sessionHandle, 'success');
 
-        // TODO: Should probably output success string instead of `true` boolean for consistency.
-        return $this->getFromFormSession($sessionHandle, 'success');
+        if ($this->isAntlersBladeComponent() && $this->isPair) {
+            return str($successMessage)->length() > 0;
+        }
+
+        return $successMessage;
     }
 
     /**
@@ -168,7 +184,7 @@ class Tags extends BaseTags
     public function submission()
     {
         if ($this->success()) {
-            return session('submission')->toArray();
+            return $this->aliasedResult(session('submission')->toArray());
         }
     }
 
@@ -179,9 +195,13 @@ class Tags extends BaseTags
      */
     public function submissions()
     {
-        $submissions = $this->form()->submissions();
+        $query = $this->form()->querySubmissions();
 
-        return $this->output($submissions);
+        $this->queryConditions($query);
+        $this->queryScopes($query);
+        $this->queryOrderBys($query);
+
+        return $this->output($this->results($query));
     }
 
     /**
@@ -300,7 +320,7 @@ class Tags extends BaseTags
             throw new \Exception("Cannot find JS driver class for [{$handle}]!");
         }
 
-        $instance = new $class($form, $options);
+        $instance = new $class($form, $options, $this->params);
 
         if (! $instance instanceof JsDriver) {
             throw new \Exception("JS driver must implement [Statamic\Forms\JsDrivers\JsDriver] interface!");

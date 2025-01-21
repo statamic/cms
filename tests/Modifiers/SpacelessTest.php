@@ -2,6 +2,8 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
@@ -19,11 +21,8 @@ class SpacelessTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider stringsWithSpacesProvider
-     */
+    #[Test]
+    #[DataProvider('stringsWithSpacesProvider')]
     public function it_removes_excess_whitespace_and_linebreaks_from_string($expected, $input): void
     {
         $modified = $this->modify($input);

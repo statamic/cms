@@ -2,9 +2,9 @@
 
 namespace Statamic\Providers;
 
-use Facade\IgnitionContracts\SolutionProviderRepository;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\ServiceProvider;
+use Spatie\ErrorSolutions\Contracts\SolutionProviderRepository;
 use Statamic\Ignition\SolutionProviders\OAuthDisabled;
 use Statamic\Ignition\SolutionProviders\UsingOldClass;
 

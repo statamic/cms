@@ -11,9 +11,15 @@ use Statamic\Support\Str;
 
 class AugmentedUser extends AbstractAugmented
 {
+    private $cachedKeys;
+
     public function keys()
     {
-        return $this->data->data()->keys()
+        if ($this->cachedKeys) {
+            return $this->cachedKeys;
+        }
+
+        return $this->cachedKeys = $this->data->data()->keys()
             ->merge(collect($this->data->supplements() ?? [])->keys())
             ->merge($this->commonKeys())
             ->merge($this->roleHandles())
@@ -106,5 +112,10 @@ class AugmentedUser extends AbstractAugmented
     protected function preferredLocale()
     {
         return $this->data->preferredLocale();
+    }
+
+    public function notifications()
+    {
+        return $this->data->get('notifications');
     }
 }

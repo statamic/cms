@@ -3,6 +3,7 @@
 namespace Tests\Feature\Entries;
 
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Taxonomy;
@@ -13,7 +14,7 @@ class GetByTaxonomyTermsTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_gets_entries_by_a_single_taxonomy_term()
     {
         Taxonomy::make('tags')->save();
@@ -26,7 +27,7 @@ class GetByTaxonomyTermsTest extends TestCase
         $this->assertEquals([1, 2], Entry::query()->whereTaxonomy('tags::rad')->get()->map->id()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_entries_in_multiple_taxonomy_terms()
     {
         Taxonomy::make('tags')->save();

@@ -30,8 +30,7 @@ export default {
     },
 
     methods: {
-
-        run(action, values) {
+        run(action, values, done) {
             this.$emit('started');
 
             this.errors = {};
@@ -43,17 +42,26 @@ export default {
                 values
             };
 
-            this.$axios.post(this.url, payload, { responseType: 'blob' }).then(response => {
-                response.headers['content-disposition']
-                    ? this.handleFileDownload(response) // Pass blob response for downloads
-                    : this.handleActionSuccess(response); // Otherwise handle as normal, converting from JSON
-            }).catch(error => this.handleActionError(error.response));
+            this.$axios
+                .post(this.url, payload, { responseType: 'blob' })
+                .then((response) => {
+                    response.headers['content-disposition']
+                        ? this.handleFileDownload(response) // Pass blob response for downloads
+                        : this.handleActionSuccess(response); // Otherwise handle as normal, converting from JSON
+                })
+                .catch((error) => this.handleActionError(error.response))
+                .finally(() => {
+                    if (done) done()
+                });
         },
 
         handleActionSuccess(response) {
             response.data.text().then(data => {
                 data = JSON.parse(data);
-                if (data.redirect) window.location = data.redirect;
+                if (data.redirect) {
+                    if (data.bypassesDirtyWarning) this.$dirty.disableWarning();
+                    window.location = data.redirect;
+                }
                 if (data.callback) Statamic.$callbacks.call(data.callback[0], ...data.callback.slice(1));
                 this.$emit('completed', true, data);
             });

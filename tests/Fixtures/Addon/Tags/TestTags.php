@@ -2,6 +2,7 @@
 
 namespace Tests\Fixtures\Addon\Tags;
 
+use Statamic\Support\Arr;
 use Statamic\Tags\Tags;
 
 class TestTags extends Tags
@@ -22,7 +23,7 @@ class TestTags extends Tags
     {
         $var = $this->params->get('var');
 
-        $val = array_get($this->context, $var);
+        $val = Arr::get($this->context, $var);
 
         return $this->parse([$var => $val]);
     }

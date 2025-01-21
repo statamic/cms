@@ -3,10 +3,15 @@
 }
 
 .live-preview-header {
-    @apply relative pr-4 pl-6 py-2 h-13 shadow-md flex items-center justify-between;
+    @apply relative rtl:pl-4 ltr:pr-4 rtl:pr-6 ltr:pl-6 py-2 h-13 shadow-md flex items-center justify-between;
     background: linear-gradient(180deg, #fff, #f9fafb);
     border-bottom: 1px solid #c4cdd6;
     z-index: 2;
+
+    .dark & {
+        background: linear-gradient(180deg, theme(colors.dark.500), theme(colors.dark.550));
+        border-color: theme(colors.dark.900);
+    }
 }
 
 
@@ -16,7 +21,7 @@
 }
 
 .live-preview-editor {
-    @apply flex relative bg-gray-200 h-full;
+    @apply flex relative bg-gray-200 dark:bg-dark-800 h-full;
     z-index: 3;
 }
 
@@ -35,12 +40,12 @@
 }
 
 .live-preview .tabs-container {
-    @apply bg-gray-300 mb-0;
+    @apply bg-gray-300 dark:bg-dark-550 mb-0;
     @apply @4xl/live-preview:mb-6;
 }
 
 .live-preview .publish-tabs {
-    @apply pl-4 @4xl/live-preview:pl-6;
+    @apply rtl:pr-4 ltr:pl-4 rtl:@4xl/live-preview:pr-6 ltr:@4xl/live-preview:pl-6;
 }
 
 .live-preview .publish-sections-section {
@@ -66,11 +71,15 @@
 }
 
 .live-preview-resizer {
-    @apply w-4 border-l border-r border-gray-400 shadow-sm;
+    @apply w-4 rtl:border-r ltr:border-l rtl:border-l ltr:border-r border-gray-400 dark:border-dark-900 shadow-sm;
     z-index: 1;
     cursor: ew-resize;
     background: theme('colors.gray.100') url('../../svg/icons/light/drag-dots.svg') center center no-repeat;
     background-size: 7px 17px;
+
+    .dark & {
+        background-color: theme('colors.dark.500');
+    }
 }
 
 

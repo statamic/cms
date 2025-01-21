@@ -1,6 +1,6 @@
 <template>
 
-    <div class="h-full bg-white">
+    <div class="h-full bg-white dark:bg-dark-800">
 
         <div v-if="initializing" class="absolute inset-0 z-200 flex items-center justify-center text-center">
             <loading-graphic />
@@ -19,10 +19,10 @@
             @selections-updated="selectionsUpdated"
         >
             <div slot-scope="{}" class="flex flex-col h-full">
-                <div class="bg-white z-1">
+                <div class="bg-white dark:bg-dark-800 z-1">
                     <div class="py-2 px-4 flex items-center justify-between">
                         <data-list-search class="h-8 min-w-[240px] w-full" ref="search" v-model="searchQuery" :placeholder="searchPlaceholder" />
-                        <div class="btn-group ml-4" v-if="canUseTree">
+                        <div class="btn-group rtl:mr-4 ltr:ml-4" v-if="canUseTree">
                             <button class="btn flex items-center px-4" @click="view = 'tree'" :class="{'active': view === 'tree'}" v-tooltip="__('Tree')">
                                 <svg-icon name="light/structures" class="h-4 w-4"/>
                             </button>
@@ -57,7 +57,7 @@
                             >
                                 <template slot="cell-title" slot-scope="{ row: entry }">
                                     <div class="flex items-center">
-                                        <div class="little-dot mr-2" v-tooltip="getStatusLabel(entry)" :class="getStatusClass(entry)" v-if="entry.status && ! columnShowing('status')" />
+                                        <div class="little-dot rtl:ml-2 ltr:mr-2" v-tooltip="getStatusLabel(entry)" :class="getStatusClass(entry)" v-if="entry.status && ! columnShowing('status')" />
                                         {{ entry.title }}
                                     </div>
                                 </template>
@@ -78,8 +78,8 @@
                             :scroll-to-top="false"
                             @page-selected="setPage" />
 
-                        <div class="p-4 border-t flex items-center justify-between bg-gray-200">
-                            <div class="text-sm text-gray-700"
+                        <div class="p-4 border-t dark:border-dark-200 flex items-center justify-between bg-gray-200 dark:bg-dark-500">
+                            <div class="text-sm text-gray-700 dark:text-dark-150"
                                 v-text="hasMaxSelections
                                     ? __n(':count/:max selected', selections, { max: maxSelections })
                                     : __n(':count item selected|:count items selected', selections)" />
@@ -95,7 +95,7 @@
                                 <button
                                     v-if="! hasMaxSelections || maxSelections > 1"
                                     type="button"
-                                    class="btn-primary ml-2"
+                                    class="btn-primary rtl:mr-2 ltr:ml-2"
                                     @click="select">
                                     {{ __('Select') }}
                                 </button>
@@ -109,9 +109,9 @@
 
         <template v-if="!initializing && canUseTree && view === 'tree'">
             <div class="flex flex-col h-full">
-                <div class="bg-white bg-gray-200 shadow px-4 py-2 z-1 h-13 flex items-center justify-end">
+                <div class="bg-white dark:bg-dark-550 shadow px-4 py-2 z-1 h-13 flex items-center justify-end">
                     <h1 class="flex-1 flex items-center text-xl">{{ tree.title }}</h1>
-                    <div class="btn-group ml-4">
+                    <div class="btn-group rtl:mr-4 ltr:ml-4">
                         <button class="btn flex items-center px-4" @click="view = 'tree'" :class="{'active': view === 'tree'}" v-tooltip="__('Tree')">
                             <svg-icon name="light/structures" class="h-4 w-4"/>
                         </button>
@@ -123,11 +123,12 @@
 
                 <div class="flex-1 flex flex-col min-h-0">
                     <div class="flex flex-col h-full justify-start">
-                        <div class="flex-1 overflow-scroll bg-gray-200 p-4">
+                        <div class="flex-1 overflow-scroll bg-gray-200 dark:bg-dark-800 p-4">
                             <page-tree
                                 ref="tree"
                                 :pages-url="tree.url"
                                 :show-slugs="tree.showSlugs"
+                                :blueprints="tree.blueprints"
                                 :expects-root="tree.expectsRoot"
                                 :site="site"
                                 :preferences-prefix="`selector-field.${name}`"
@@ -139,7 +140,7 @@
                                         <input
                                             :ref="`tree-branch-${branch.id}`"
                                             type="checkbox"
-                                            class="mt-3 ml-3"
+                                            class="mt-3 rtl:mr-3 ltr:ml-3"
                                             :value="branch.id"
                                             :checked="isSelected(branch.id)"
                                             :disabled="reachedSelectionLimit && !singleSelect && !isSelected(branch.id)"
@@ -151,14 +152,14 @@
 
                                 <template #branch-icon="{ branch }">
                                     <svg-icon v-if="isRedirectBranch(branch)"
-                                        class="inline-block w-4 h-4 text-gray-500"
+                                        class="inline-block w-4 h-4 text-gray-500 dark:text-dark-175"
                                         name="light/external-link"
                                         v-tooltip="__('Redirect')" />
                                 </template>
                             </page-tree>
                         </div>
 
-                        <div class="p-4 border-t flex items-center justify-between bg-gray-200">
+                        <div class="p-4 border-t dark:border-dark-200 flex items-center justify-between bg-gray-200 dark:bg-dark-500">
                             <div class="text-sm text-gray-700"
                                 v-text="hasMaxSelections
                                     ? __n(':count/:max selected', selections, { max: maxSelections })
@@ -175,7 +176,7 @@
                                 <button
                                     v-if="! hasMaxSelections || maxSelections > 1"
                                     type="button"
-                                    class="btn-primary ml-2"
+                                    class="btn-primary rtl:mr-2 ltr:ml-2"
                                     @click="select">
                                     {{ __('Select') }}
                                 </button>

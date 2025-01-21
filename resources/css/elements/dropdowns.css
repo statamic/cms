@@ -6,22 +6,22 @@
     @apply p-2;
 
     button, a {
-        @apply block w-full text-left rounded-sm text-xs font-normal px-2 py-1 text-gray-800;
+        @apply block w-full rtl:text-right ltr:text-left rounded-sm text-xs font-normal px-2 py-1 text-gray-800 dark:text-dark-100;
         line-height: 1.4;
         white-space: nowrap;
 
         &:hover {
-            @apply bg-blue text-white;
+            @apply bg-blue dark:bg-dark-600 text-white;
         }
 
         .icon {
             color: #d0d4d7 !important;
-            margin-right: 6px;
-            margin-left: -4px;
+            margin-right: 6px ; [dir="rtl"] & { margin-left: 6px ; margin-right: 0 ; }
+            margin-left: -4px ; [dir="rtl"] & { margin-right: -4px ; margin-left: 0 ; }
             font-size: 12px;
             width: 20px;
             display: block;
-            float: left;
+            float: left ; [dir="rtl"] & { float: right ; }
             position: relative;
             top: 2px;
             line-height: inherit;
@@ -38,11 +38,57 @@
     }
 
     .divider {
-        @apply h-px bg-gray-400 overflow-hidden;
+        @apply h-px bg-gray-400 dark:bg-dark-900 overflow-hidden;
         margin: 6px -8px;
+        /* Hide dividers that come first, last or immediately after another (due to v-if) */
+        & + &,
+        &:first-child,
+        &:last-child {
+            display: none;
+        }
     }
 
     .align-left & {
-        right: auto;
+        right: auto ; [dir="rtl"] & { right: auto ; left: auto ; }
     }
+
+}
+
+.quick-list {
+
+    @apply relative;
+
+    .quick-list-content {
+        @apply absolute top-1/2 right-full mr-[8px] -translate-y-1/2 min-w-max transition origin-right flex bg-white dark:bg-dark-550 shadow-quick rounded-full p-0.5;
+        &::before {
+            content: '';
+            position: absolute;
+            inset: -8px -8px -8px -20px;
+            z-index: -1;
+        }
+        button, a {
+            @apply rounded-full p-1.5 text-gray-800 dark:text-dark-100 flex shrink-0;
+            &:hover {
+                @apply bg-blue text-white;
+            }
+        }
+        &:empty {
+            @apply hidden;
+        }
+    }
+
+    button.warning, a.warning {
+        @apply text-red-500;
+
+        &:hover {
+            @apply bg-red-500 text-white;
+        }
+    }
+
+    &:not(:hover) {
+        .quick-list-content {
+            @apply opacity-0 pointer-events-none scale-[0.85];
+        }
+    }
+
 }

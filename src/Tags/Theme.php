@@ -20,7 +20,7 @@ class Theme extends Tags
      * @param  array  $arguments  Unused
      * @return string
      */
-    public function __call($method, $arguments)
+    public function wildcard($method)
     {
         return $this->path($method);
     }

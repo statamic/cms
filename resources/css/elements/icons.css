@@ -9,6 +9,54 @@ svg {
     vertical-align: baseline;
 }
 
+.dark svg {
+    [fill="#EAEEF9"] {
+        fill: theme(colors.dark.575);
+    }
+    [fill="#989FB0"] {
+        fill: theme(colors.dark.700);
+    }
+    [stroke="#EAEEF9"] {
+        stroke: theme(colors.dark.200);
+    }
+    [stroke="#C2C8D6"] {
+        stroke: theme(colors.dark.700);
+    }
+    [fill="white"] {
+        fill: theme(colors.dark.200);
+    }
+    [stop-color="#B0BACC"] {
+        stop-color: theme(colors.dark.800);
+    }
+    [stop-color="#969EAE"] {
+        stop-color: theme(colors.dark.950);
+    }
+    [stop-color="#FDFEFF"] {
+        stop-color: theme(colors.dark.200);
+    }
+    [stop-color="#ECF0F5"] {
+        stop-color: theme(colors.dark.250);
+    }
+    [fill="#D6DCE8"] {
+        fill: theme(colors.dark.300);
+    }
+    [stroke="#AAB2C5"] {
+        stroke: theme(colors.dark.950);
+    }
+    [fill="#AAB2C5"] {
+        fill: theme(colors.dark.950);
+    }
+    [fill="#D5DDEA"] {
+        fill: theme(colors.dark.700)
+    }
+    [fill="#C2C8D6"] {
+        fill: theme(colors.black)
+    }
+    [stroke="#989FB0"] {
+        stroke: theme(colors.dark.200);
+    }
+}
+
 .heroicon-component-accent {
     fill: theme('colors.blue.DEFAULT');
 }
@@ -22,15 +70,15 @@ svg {
     flex-shrink: 0;
 
     &.published { @apply bg-green-600 }
-    &.draft, &.expired { @apply bg-gray-600 }
+    &.draft, &.expired { @apply bg-gray-600 dark:bg-dark-200 }
     &.scheduled, &.hollow { @apply bg-transparent border border-gray-600 }
 }
 
 .icon-header-avatar {
+    @apply rounded-full shadow overflow-hidden flex-shrink-0;
     height: 32px;
     width: 32px;
     line-height: 32px;
-    @apply rounded-full shadow overflow-hidden;
 }
 
 .icon-user-initials {

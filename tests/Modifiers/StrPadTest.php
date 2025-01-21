@@ -2,6 +2,8 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
@@ -18,11 +20,8 @@ class StrPadTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider padProvider
-     */
+    #[Test]
+    #[DataProvider('padProvider')]
     public function it_pads_a_string(string $expected, string $input, array $params): void
     {
         $modified = $this->modify($input, $params);

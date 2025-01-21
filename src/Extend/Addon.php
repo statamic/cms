@@ -2,7 +2,7 @@
 
 namespace Statamic\Extend;
 
-use Composer\Package\Version\VersionParser;
+use Composer\Semver\VersionParser;
 use Facades\Statamic\Licensing\LicenseManager;
 use ReflectionClass;
 use Statamic\Facades\File;
@@ -371,6 +371,10 @@ final class Addon
 
     public function isLatestVersion()
     {
+        if (Str::startsWith($this->version, 'dev-') || Str::endsWith($this->version, '-dev')) {
+            return true;
+        }
+
         if (! $this->latestVersion) {
             return true;
         }

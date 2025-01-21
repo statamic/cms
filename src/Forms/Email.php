@@ -62,21 +62,21 @@ class Email extends Mailable
 
     protected function addAddresses()
     {
-        $this->to($this->addresses(array_get($this->config, 'to')));
+        $this->to($this->addresses(Arr::get($this->config, 'to')));
 
-        if ($from = array_get($this->config, 'from')) {
+        if ($from = Arr::get($this->config, 'from')) {
             $this->from($this->addresses($from));
         }
 
-        if ($replyTo = array_get($this->config, 'reply_to')) {
+        if ($replyTo = Arr::get($this->config, 'reply_to')) {
             $this->replyTo($this->addresses($replyTo));
         }
 
-        if ($cc = array_get($this->config, 'cc')) {
+        if ($cc = Arr::get($this->config, 'cc')) {
             $this->cc($this->addresses($cc));
         }
 
-        if ($bcc = array_get($this->config, 'bcc')) {
+        if ($bcc = Arr::get($this->config, 'bcc')) {
             $this->bcc($this->addresses($bcc));
         }
 
@@ -85,8 +85,8 @@ class Email extends Mailable
 
     protected function addViews()
     {
-        $html = array_get($this->config, 'html');
-        $text = array_get($this->config, 'text');
+        $html = Arr::get($this->config, 'html');
+        $text = Arr::get($this->config, 'text');
 
         if (! $text && ! $html) {
             return $this->view('statamic::forms.automagic-email');
@@ -97,7 +97,7 @@ class Email extends Mailable
         }
 
         if ($html) {
-            $method = array_get($this->config, 'markdown') ? 'markdown' : 'view';
+            $method = Arr::get($this->config, 'markdown') ? 'markdown' : 'view';
             $this->$method($html);
         }
 
@@ -106,36 +106,63 @@ class Email extends Mailable
 
     protected function addAttachments()
     {
-        if (! array_get($this->config, 'attachments')) {
+        if (! Arr::get($this->config, 'attachments')) {
             return $this;
         }
 
         $this->getRenderableFieldData(Arr::except($this->submissionData, ['id', 'date', 'form']))
-            ->filter(function ($field) {
-                return $field['fieldtype'] === 'assets';
-            })
+            ->filter(fn ($field) => in_array($field['fieldtype'], ['assets', 'files']))
             ->each(function ($field) {
-                $value = $field['value']->value();
-
-                $value = array_get($field, 'config.max_files') === 1
-                    ? collect([$value])->filter()
-                    : $value->get();
-
-                foreach ($value as $file) {
-                    $this->attachFromStorageDisk($file->container()->diskHandle(), $file->path());
-                }
+                $field['value'] = $field['value']->value();
+                $field['fieldtype'] === 'assets' ? $this->attachAssets($field) : $this->attachFiles($field);
             });
 
         return $this;
     }
 
+    private function attachAssets($field)
+    {
+        $value = $field['value'];
+
+        $value = Arr::get($field, 'config.max_files') === 1
+            ? collect([$value])->filter()
+            : $value->get();
+
+        foreach ($value as $asset) {
+            $this->attachFromStorageDisk($asset->container()->diskHandle(), $asset->path());
+        }
+    }
+
+    private function attachFiles($field)
+    {
+        $value = $field['value'];
+
+        $value = Arr::get($field, 'config.max_files') === 1
+            ? collect([$value])->filter()
+            : $value;
+
+        if (! $value) {
+            return;
+        }
+
+        foreach ($value as $file) {
+            $this->attachFromStorageDisk('local', 'statamic/file-uploads/'.$file);
+        }
+    }
+
     protected function addData()
     {
         $augmented = $this->submission->toAugmentedArray();
+        $fields = $this->getRenderableFieldData(Arr::except($augmented, ['id', 'date', 'form']))
+            ->reject(fn ($field) => $field['fieldtype'] === 'spacer')
+            ->when(Arr::has($this->config, 'attachments'), function ($fields) {
+                return $fields->reject(fn ($field) => in_array($field['fieldtype'], ['assets', 'files']));
+            });
 
         $data = array_merge($augmented, $this->getGlobalsData(), [
+            'email_config' => $this->config,
             'config' => config()->all(),
-            'fields' => $this->getRenderableFieldData(Arr::except($augmented, ['id', 'date', 'form'])),
+            'fields' => $fields,
             'site_url' => Config::getSiteUrl(),
             'date' => now(),
             'now' => now(),
@@ -208,7 +235,11 @@ class Email extends Mailable
         return collect($config)->map(function ($value) {
             $value = Parse::env($value); // deprecated
 
-            return (string) Antlers::parse($value, array_merge($this->submissionData, $this->getGlobalsData()));
+            return (string) Antlers::parse($value, array_merge(
+                ['config' => config()->all()],
+                $this->getGlobalsData(),
+                $this->submissionData,
+            ));
         });
     }
 }

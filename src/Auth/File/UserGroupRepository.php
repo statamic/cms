@@ -8,6 +8,7 @@ use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
 use Statamic\Facades;
 use Statamic\Facades\File;
 use Statamic\Facades\YAML;
+use Statamic\Support\Arr;
 
 class UserGroupRepository extends BaseRepository
 {
@@ -30,7 +31,7 @@ class UserGroupRepository extends BaseRepository
         return $this->groups = $this->raw()->map(function ($data, $handle) {
             $group = Facades\UserGroup::make()
                 ->handle($handle)
-                ->title(array_get($data, 'title'))
+                ->title(Arr::get($data, 'title'))
                 ->data($data);
 
             foreach ($data['roles'] ?? [] as $role) {

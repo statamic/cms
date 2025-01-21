@@ -1,11 +1,11 @@
 .bard-fieldtype-wrapper {
-    @apply border rounded relative outline-none;
+    @apply border dark:border-dark-900 rounded relative outline-none;
 
     * { outline: none; }
 }
 
 .bard-editor {
-    @apply text-gray-800 bg-gray-100 shadow-inner p-0 relative rounded;
+    @apply text-gray-800 dark:text-dark-150 bg-gray-100 dark:bg-dark-650 shadow-inner p-0 relative rounded;
 }
 
 .bard-editor .ProseMirror {
@@ -13,7 +13,7 @@
     @apply @md/bard:p-2 text-md leading-normal;
     @apply @lg/bard:p-4;
     &:focus {
-        @apply ring-2 ring-inset ring-blue-200;
+        @apply ring-2 ring-inset ring-blue-200 dark:ring-blue-600;
     }
 }
 
@@ -23,7 +23,7 @@
 
 /*  Modes */
 .bard-editor.mode\:read-only .ProseMirror {
-    @apply bg-gray-300 text-gray-700;
+    @apply bg-gray-300 dark:bg-dark-600 text-gray-700 dark:text-dark-175;
 }
 
 .bard-editor.mode\:minimal .ProseMirror {
@@ -39,21 +39,21 @@
 }
 
 .bard-fixed-toolbar {
-    @apply bg-white shadow-none rounded-t border-b text-sm flex items-start justify-between p-1 z-5 top-0;
+    @apply bg-white dark:bg-dark-800 shadow-none rounded-t border-b dark:border-dark-900 text-sm flex items-start justify-between p-1 z-5 top-0;
 
     .bard-toolbar-button {
-        @apply text-gray-800 rounded px-1 flex text-center justify-center items-center text-base h-8 w-8 m-0;
+        @apply text-gray-800 dark:text-dark-150 rounded px-1 flex text-center justify-center items-center text-base h-8 w-8 m-0;
         svg {
             @apply w-auto h-4;
         }
     }
 
     .bard-toolbar-button:hover {
-        @apply bg-gray-200;
+        @apply bg-gray-200 dark:bg-dark-700;
     }
 
     .bard-toolbar-button.active {
-        @apply bg-gray-300 text-black;
+        @apply bg-gray-300 dark:bg-dark-800 text-black dark:text-dark-100;
     }
 
     .bard-toolbar-button:focus {
@@ -63,7 +63,7 @@
     .bard-toolbar-button:disabled {
         @apply opacity-50;
         &:hover {
-            @apply text-gray-800;
+            @apply text-gray-800 dark:text-dark-100;
         }
     }
 
@@ -125,7 +125,7 @@
         border-top-color: black;
         position: absolute;
         top: 100%;
-        left: 50%;
+        left: 50% ; [dir="rtl"] & { left: auto ; right: 50% ; }
         margin-left: -3px
     }
 
@@ -163,11 +163,11 @@
 }
 
 .bard-add-set-button {
-    @apply flex items-center justify-center absolute -left-4 top-[-6px] z-1;
+    @apply flex items-center justify-center absolute rtl:-right-4 ltr:-left-4 top-[-6px] z-1;
 }
 
 .bard-footer-toolbar {
-    @apply bg-white shadow-none text-gray-700 rounded-b border-t text-xs p-2 flex items-center justify-between;
+    @apply bg-white dark:bg-dark-550 shadow-none text-gray-700 dark:text-dark-175 rounded-b border-t dark:border-dark-300 text-xs p-2 flex items-center justify-between;
     padding: 8px 12px;
 
     .bard-fullscreen & {
@@ -192,8 +192,8 @@
     /*  transition: all .15s ease-in-out; */
 
     .dropdown-menu {
-        left: -5px;
-        right: auto;
+        left: -5px ; [dir="rtl"] & { left: auto ; right: -5px ; }
+        right: auto ; [dir="rtl"] & { right: auto ; left: auto ; }
     }
 }
 
@@ -206,14 +206,14 @@
    ========================================================================== */
 
 .bard-fullscreen {
-    @apply fixed bg-gray-200 inset-0 min-h-screen overflow-scroll rounded-none pt-16;
+    @apply fixed bg-gray-200 dark:bg-dark-700 inset-0 min-h-screen overflow-scroll rounded-none pt-14;
 
     & > .bard-editor {
-        @apply bg-white shadow max-w-xl mx-auto rounded relative my-6 px-8;
+        @apply bg-white dark:bg-dark-800 shadow dark:shadow-dark max-w-xl mx-auto rounded relative my-6 px-8;
     }
 
     & > .bard-fixed-toolbar {
-        @apply shadow h-12 fixed w-full bg-gradient-to-b from-white to-gray-100;
+        @apply shadow dark:shadow-dark h-12 fixed w-full bg-gradient-to-b from-white to-gray-100 dark:from-dark-400 dark:to-dark-500;
         padding: 7px 8px;
         top: 0;
         z-index: 999;
@@ -240,16 +240,16 @@
     }
 
     .bard-set-selector {
-        @apply ml-6;
+        @apply rtl:mr-6 ltr:ml-6;
     }
 
     .bard-field-options {
         @apply fixed top-0 inset-x-0 bg-gray-700 p-4 w-full;
-        text-align: right;
+        @apply ltr:text-right rtl:text-left;
         z-index: 1; /*  to appear over the top of .bard-editor */
 
         .icon { font-size: 24px; }
-        a { margin-left: 16px; color: #fff; opacity: 1; }
+        a { margin-left: 16px ; [dir="rtl"] & { margin-right: 16px ; margin-left: 0 ; } color: #fff; opacity: 1; }
     }
 }
 
@@ -265,8 +265,7 @@
 
 .bard-fieldtype .bard-content > {
     p {
-        @apply text-gray-800;
-        word-break: break-all;
+        @apply text-gray-800 dark:text-dark-150;
         word-break: break-word;
 
         line-height: 1.7;
@@ -287,7 +286,7 @@
         em, i { font-style: italic }
 
         a {
-            @apply text-blue underline break-words;
+            @apply text-blue dark:text-dark-blue-100 underline break-words;
         }
 
         a:active,
@@ -315,7 +314,7 @@
     }
 
     hr {
-        @apply bg-gray-600;
+        @apply bg-gray-600 dark:bg-dark-300;
         height: 4px;
         padding: 0;
         margin: 1.7em 0;
@@ -336,7 +335,23 @@
     h1, h2, h3, h4, h5, h6 {
         margin-top: 1.275em;
         margin-bottom: .85em;
-        font-weight: 700
+        font-weight: 700;
+
+        b,
+        strong {
+            font-weight: 900;
+        }
+
+        a {
+            @apply text-blue dark:text-dark-blue-100 underline break-words;
+        }
+
+        a:active,
+        a:focus,
+        a:hover {
+            outline: 0;
+            text-decoration: underline;
+        }
     }
 
     h1 { font-size: 2em }
@@ -379,17 +394,18 @@
     ul,
     blockquote ol,
     blockquote ul {
-        padding: 0;
-        margin: 0;
-        margin-bottom: .85em;
-        padding-left: 2em;
+        margin: 0 0 .85em;
+        padding: 0 0 0 2em;
+
+        [dir="rtl"] & { padding-right: 2em ; padding-left: 0 ; }
     }
 
     .tableWrapper table ol,
     .tableWrapper table ul {
-        padding: 0;
         margin: 0;
-        padding-left: 2em;
+        padding: 0 0 0 2em;
+
+        [dir="rtl"] & { padding-right: 2em ; padding-left: 0 ; }
     }
 
     ol ol,
@@ -398,7 +414,7 @@
     ul ul {
         margin-top: 0;
         margin-bottom: 0;
-        padding-left: 2em;
+        padding-left: 2em ; [dir="rtl"] & { padding-right: 2em ; padding-left: 0 ; }
     }
 
     ul ul {
@@ -418,7 +434,7 @@
     }
 
     blockquote {
-        @apply text-gray-800 border-l-4 border-blue px-4;
+        @apply text-gray-800 dark:text-dark-150 rtl:border-r-4 ltr:border-l-4 border-blue dark:border-dark-blue-100 px-4;
         margin: 0 0 .85em;
     }
 
@@ -434,16 +450,16 @@
     blockquote > .tableWrapper table,
     ol li > .tableWrapper table,
     ul li > .tableWrapper table {
-        @apply w-full overflow-hidden m-0 mb-4 bg-white text-sm ;
+        @apply w-full overflow-hidden m-0 mb-4 bg-white dark:bg-dark-500 text-sm ;
         border-collapse: collapse;
         table-layout: fixed;
 
         th {
-            @apply font-bold text-left bg-gray-200;
+            @apply font-bold rtl:text-right ltr:text-left bg-gray-200 dark:bg-dark-575;
         }
 
         td, th {
-            @apply border align-top relative py-1 px-2;
+            @apply border dark:border-dark-200 align-top relative py-1 px-2;
             min-width: 1em;
         }
 
@@ -451,13 +467,13 @@
             @apply relative;
 
             &:after {
-                @apply bg-gray-400 absolute inset-0 pointer-events-none opacity-25;
+                @apply bg-gray-400 dark:bg-dark-200 absolute inset-0 pointer-events-none opacity-25;
                 content: '';
             }
         }
 
         a {
-            @apply text-blue underline break-words;
+            @apply text-blue dark:text-dark-blue-100 underline break-words;
         }
 
         a:active,
@@ -469,7 +485,7 @@
     }
 
     p > code {
-        @apply font-mono bg-gray-400 rounded-sm text-xs;
+        @apply font-mono bg-gray-400 dark:bg-dark-750 rounded-sm text-xs;
         padding: 2px 4px;
         top: -1px;
     }
@@ -479,7 +495,7 @@
     }
 
     pre code {
-        @apply font-mono bg-gray-400 text-xs p-4 block w-full rounded;
+        @apply font-mono bg-gray-400 dark:bg-dark-950 dark:text-dark-100 text-xs p-4 block w-full rounded;
         line-height: 1.8;
     }
 }
@@ -488,9 +504,9 @@
 ========================================================================== */
 
 .bard-fieldtype .ProseMirror > p.is-editor-empty:first-child::before {
-    @apply text-gray-600;
+    @apply text-gray-600 dark:text-dark-200;
     content: attr(data-placeholder);
-    float: left;
+    float: left ; [dir="rtl"] & { float: right ; }
     height: 0;
     pointer-events: none;
 }
@@ -517,7 +533,7 @@
 }
 
 .bard-inline-image-container {
-    @apply relative bg-white border rounded whitespace-normal mb-6;
+    @apply relative bg-white dark:bg-dark-600 border dark:border-dark-900 rounded whitespace-normal mb-6;
     &:hover {
         cursor: grab;
     }
@@ -538,6 +554,6 @@
     table .column-resize-handle {
         @apply absolute top-0 bottom-0 pointer-events-none bg-blue-200;
         width: 3px;
-        right: -2px;
+        right: -2px ; [dir="rtl"] & { right: auto ; left: -2px ; }
     }
 }

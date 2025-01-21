@@ -41,6 +41,11 @@ class NavPolicy
         // handled by before()
     }
 
+    public function configure($user)
+    {
+        // handled by before()
+    }
+
     public function view($user, $nav)
     {
         $user = User::fromUser($user);

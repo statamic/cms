@@ -2,6 +2,7 @@
 
 namespace Statamic\Tags;
 
+use Statamic\Support\Arr;
 use Statamic\Support\Html;
 
 class Markdown extends Tags
@@ -30,7 +31,7 @@ class Markdown extends Tags
         // Count the number of whitespace characters at the beginning of the
         // first line to prevent over-trimming.
         preg_match($regex, $lines[$firstLine], $matches, PREG_OFFSET_CAPTURE);
-        $maxTrim = array_get($matches, '0.1');
+        $maxTrim = Arr::get($matches, '0.1');
 
         $md = $lines->map(function ($line) use ($maxTrim) {
             // Trim the appropriate amount of whitespace at the start of

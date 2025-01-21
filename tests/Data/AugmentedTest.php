@@ -3,6 +3,7 @@
 namespace Tests\Data;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Data\AbstractAugmented;
 use Statamic\Data\AugmentedCollection;
 use Statamic\Data\ContainsData;
@@ -40,7 +41,7 @@ class AugmentedTest extends TestCase
         $this->assertNull($actual->value());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_single_value_by_key()
     {
         $augmented = new class($this->thing) extends BaseAugmentedThing
@@ -52,7 +53,7 @@ class AugmentedTest extends TestCase
         $this->assertNullValue($augmented->get('unknown'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_use_null_as_a_supplement_value()
     {
         $augmented = new class($this->thing) extends BaseAugmentedThing
@@ -67,7 +68,7 @@ class AugmentedTest extends TestCase
         $this->assertNullValue($augmented->get('foo'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_single_value_by_key_using_the_value_method_if_it_exists()
     {
         $thingWithValueMethod = new class($this->thing->data()) extends Thing
@@ -87,7 +88,7 @@ class AugmentedTest extends TestCase
         $this->assertNullValue($augmented->get('unknown'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_value_from_the_thing_if_theres_a_corresponding_method_for_a_key()
     {
         $augmented = new class($this->thing) extends BaseAugmentedThing
@@ -105,7 +106,7 @@ class AugmentedTest extends TestCase
         $this->assertNullValue($augmented->get('cantCallMe'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_value_from_the_augmented_thing_if_theres_a_method()
     {
         $augmented = new class($this->thing) extends BaseAugmentedThing
@@ -126,7 +127,7 @@ class AugmentedTest extends TestCase
         $this->assertEqualsValue('the-augmented-thing', $augmented->get('theSlug'));
     }
 
-    /** @test */
+    #[Test]
     public function if_an_augmented_things_method_returns_a_value_instance_then_use_it()
     {
         // An example of this would be the AugmentedEntry::authors() method.
@@ -141,10 +142,11 @@ class AugmentedTest extends TestCase
             }
         };
 
-        $this->assertSame($valueInstance, $augmented->get('foo'));
+        // Don't really care if it's literally the same object, just that it's the appropriate result.
+        $this->assertEquals($valueInstance->value(), $augmented->get('foo')->value());
     }
 
-    /** @test */
+    #[Test]
     public function the_value_object_returned_contains_appropriate_fieldtype_if_the_thing_has_a_blueprint_and_theres_a_matching_field()
     {
         FieldtypeRepository::shouldReceive('find')->with('test')
@@ -224,7 +226,7 @@ class AugmentedTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function if_the_augmented_thing_has_a_method_with_a_corresponding_blueprint_field_it_will_not_use_that_fieldtype()
     {
         FieldtypeRepository::shouldReceive('find')->with('test')
@@ -254,7 +256,7 @@ class AugmentedTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_can_select_multiple_keys()
     {
         FieldtypeRepository::shouldReceive('find')->with('test')
@@ -317,7 +319,7 @@ class AugmentedTest extends TestCase
         ], $augmented->except('hello')->all());
     }
 
-    /** @test */
+    #[Test]
     public function no_infinite_loop_when_getting_keys_that_match_methods()
     {
         $thing = new Thing([

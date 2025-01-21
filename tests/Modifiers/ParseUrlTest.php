@@ -2,12 +2,13 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class ParseUrlTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_extracts_parseurl()
     {
         $path = 'http://admin:password@example.com:8080/path?query=1#hash';
@@ -24,7 +25,7 @@ class ParseUrlTest extends TestCase
         ], $this->modify($path));
     }
 
-    /** @test */
+    #[Test]
     public function it_extracts_parseurl_components()
     {
         $url = 'http://admin:password@example.com:8080/path?query=1#hash';

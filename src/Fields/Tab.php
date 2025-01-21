@@ -85,11 +85,11 @@ class Tab
 
     public function display()
     {
-        return array_get($this->contents, 'display', __(Str::humanize($this->handle)));
+        return Arr::get($this->contents, 'display', __(Str::humanize($this->handle)));
     }
 
     public function instructions()
     {
-        return array_get($this->contents, 'instructions');
+        return Arr::get($this->contents, 'instructions');
     }
 }

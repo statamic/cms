@@ -5,6 +5,7 @@ namespace Tests\Antlers\Runtime;
 use Carbon\Carbon;
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Contracts\Support\Arrayable;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
@@ -579,6 +580,11 @@ class SimpleEntryObject implements Arrayable
             'date' => $this->date,
             'title_length' => strlen($this->title),
         ];
+    }
+
+    public function toDeferredAugmentedArray()
+    {
+        return $this->toAugmentedArray();
     }
 
     public function toArray()

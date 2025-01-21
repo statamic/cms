@@ -2,12 +2,13 @@
 
 namespace Tests\Data\Structures;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Structures\CollectionTreeDiff;
 use Tests\TestCase;
 
 class CollectionTreeDiffTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_sees_no_changes()
     {
         $old = [];
@@ -23,7 +24,7 @@ class CollectionTreeDiffTest extends TestCase
         $this->assertEquals([], $analyzer->ancestryChanged());
     }
 
-    /** @test */
+    #[Test]
     public function it_sees_additions()
     {
         $old = [];
@@ -41,7 +42,7 @@ class CollectionTreeDiffTest extends TestCase
         $this->assertEquals([], $analyzer->ancestryChanged());
     }
 
-    /** @test */
+    #[Test]
     public function it_sees_removals()
     {
         $old = [
@@ -59,7 +60,7 @@ class CollectionTreeDiffTest extends TestCase
         $this->assertEquals([], $analyzer->ancestryChanged());
     }
 
-    /** @test */
+    #[Test]
     public function it_sees_moves()
     {
         // Simply moving 2 after 4 will consider 2,3,4 all moved because their indexes change.
@@ -89,7 +90,7 @@ class CollectionTreeDiffTest extends TestCase
         $this->assertEquals([], $analyzer->ancestryChanged());
     }
 
-    /** @test */
+    #[Test]
     public function it_sees_moves_within_a_branch()
     {
         // Simply moving 12 after 14 will consider 12,13,14 all moved because their indexes change.
@@ -127,7 +128,7 @@ class CollectionTreeDiffTest extends TestCase
         $this->assertEquals([], $analyzer->ancestryChanged());
     }
 
-    /** @test */
+    #[Test]
     public function it_sees_additions_and_removals()
     {
         $old = [
@@ -146,7 +147,7 @@ class CollectionTreeDiffTest extends TestCase
         $this->assertEquals([], $analyzer->ancestryChanged());
     }
 
-    /** @test */
+    #[Test]
     public function it_sees_multilevel_changes()
     {
         $old = [
@@ -188,7 +189,7 @@ class CollectionTreeDiffTest extends TestCase
         $this->assertEquals(['10'], $analyzer->ancestryChanged());
     }
 
-    /** @test */
+    #[Test]
     public function movement_of_an_ancestor_does_not_cause_a_child_to_be_considered_moved()
     {
         // Entry 5 is what this test is really all about.
@@ -228,7 +229,7 @@ class CollectionTreeDiffTest extends TestCase
         $this->assertEquals([2], $analyzer->ancestryChanged());
     }
 
-    /** @test */
+    #[Test]
     public function moving_a_top_level_item_to_the_start_while_expecting_a_root_will_consider_it_an_ancestry_change()
     {
         $old = [
@@ -253,7 +254,7 @@ class CollectionTreeDiffTest extends TestCase
         $this->assertEquals([1, 2], $analyzer->ancestryChanged());
     }
 
-    /** @test */
+    #[Test]
     public function moving_a_top_level_item_to_the_start_while_not_expecting_a_root_will_not_consider_it_an_ancestry_change()
     {
         $old = [
@@ -278,7 +279,7 @@ class CollectionTreeDiffTest extends TestCase
         $this->assertEquals([], $analyzer->ancestryChanged());
     }
 
-    /** @test */
+    #[Test]
     public function moving_a_nested_item_to_the_start_while_expecting_a_root_will_not_consider_it_an_ancestry_change()
     {
         $old = [
@@ -305,7 +306,7 @@ class CollectionTreeDiffTest extends TestCase
         $this->assertEquals([], $analyzer->ancestryChanged());
     }
 
-    /** @test */
+    #[Test]
     public function moving_a_nested_item_to_the_start_while_not_expecting_a_root_will_not_consider_it_an_ancestry_change()
     {
         $old = [

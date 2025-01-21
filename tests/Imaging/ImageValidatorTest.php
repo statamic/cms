@@ -3,11 +3,12 @@
 namespace Tests\Imaging;
 
 use Facades\Statamic\Imaging\ImageValidator;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class ImageValidatorTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_checks_if_image_has_valid_extension_and_mimetype()
     {
         config(['statamic.assets.image_manipulation.driver' => 'imagick']);
@@ -19,7 +20,7 @@ class ImageValidatorTest extends TestCase
         ]]);
 
         // We'll test `isValidExtension()` functionality separately below, and just mock here...
-        ImageValidator::shouldReceive('isValidExtension')->andReturnTrue()->times(23);
+        ImageValidator::shouldReceive('isValidExtension')->andReturnTrue()->times(24);
         ImageValidator::makePartial();
 
         $this->assertTrue(ImageValidator::isValidImage('jpg', 'image/jpeg'));
@@ -29,6 +30,7 @@ class ImageValidatorTest extends TestCase
         $this->assertTrue(ImageValidator::isValidImage('png', 'image/png'));
         $this->assertTrue(ImageValidator::isValidImage('gif', 'image/gif'));
         $this->assertTrue(ImageValidator::isValidImage('webp', 'image/webp'));
+        $this->assertTrue(ImageValidator::isValidImage('avif', 'image/avif'));
         $this->assertTrue(ImageValidator::isValidImage('tif', 'image/tiff'));
         $this->assertTrue(ImageValidator::isValidImage('bmp', 'image/bmp'));
         $this->assertTrue(ImageValidator::isValidImage('bmp', 'image/x-bmp'));
@@ -49,7 +51,7 @@ class ImageValidatorTest extends TestCase
         $this->assertFalse(ImageValidator::isValidImage('jpg', 'application/vnd.microsoft.portable-executable')); // exe file
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_if_image_extension_is_allowed_for_manipulation_with_gd_driver()
     {
         config(['statamic.assets.image_manipulation.driver' => 'gd']);
@@ -71,7 +73,7 @@ class ImageValidatorTest extends TestCase
         $this->assertFalse(ImageValidator::isValidExtension('eps'));
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_if_image_extension_is_allowed_for_manipulation_with_imagick_driver()
     {
         config(['statamic.assets.image_manipulation.driver' => 'imagick']);
@@ -89,9 +91,10 @@ class ImageValidatorTest extends TestCase
         $this->assertFalse(ImageValidator::isValidExtension('svg'));
         $this->assertFalse(ImageValidator::isValidExtension('pdf'));
         $this->assertFalse(ImageValidator::isValidExtension('eps'));
+        $this->assertFalse(ImageValidator::isValidExtension('avif'));
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_if_custom_image_extension_is_allowed_for_manipulation_with_proper_config()
     {
         config(['statamic.assets.image_manipulation.driver' => 'imagick']);
@@ -100,6 +103,7 @@ class ImageValidatorTest extends TestCase
             'svg',
             'pdf',
             'eps',
+            'avif',
         ]]);
 
         $this->assertTrue(ImageValidator::isValidExtension('jpeg'));
@@ -115,6 +119,7 @@ class ImageValidatorTest extends TestCase
         $this->assertTrue(ImageValidator::isValidExtension('svg'));
         $this->assertTrue(ImageValidator::isValidExtension('pdf'));
         $this->assertTrue(ImageValidator::isValidExtension('eps'));
+        $this->assertTrue(ImageValidator::isValidExtension('avif'));
 
         // Not configured, should still be false...
         $this->assertFalse(ImageValidator::isValidExtension('exe'));

@@ -58,7 +58,7 @@ abstract class Uploader
     {
         $stream = fopen($sourcePath, 'r');
 
-        if (Str::endsWith($destinationPath, '.svg')) {
+        if (config('statamic.assets.svg_sanitization_on_upload', true) && Str::endsWith($destinationPath, '.svg')) {
             $sanitizer = new DOMSanitizer(DOMSanitizer::SVG);
             $stream = $sanitizer->sanitize($svg = stream_get_contents($stream), [
                 'remove-xml-tags' => ! Str::startsWith($svg, '<?xml'),

@@ -2,12 +2,13 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class ConsoleLogTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_wraps_the_content_into_JS_console_log_statement(): void
     {
         $arr = [

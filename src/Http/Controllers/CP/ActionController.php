@@ -2,9 +2,11 @@
 
 namespace Statamic\Http\Controllers\CP;
 
+use Exception;
 use Illuminate\Http\Request;
 use Statamic\Facades\Action;
 use Statamic\Facades\User;
+use Statamic\Support\Arr;
 use Symfony\Component\HttpFoundation\Response;
 
 abstract class ActionController extends CpController
@@ -34,20 +36,36 @@ abstract class ActionController extends CpController
         abort_unless($unauthorized->isEmpty(), 403, __('You are not authorized to run this action.'));
 
         $values = $action->fields()->addValues($request->all())->process()->values()->all();
+        $successful = true;
 
-        $response = $action->run($items, $values);
+        try {
+            $response = $action->run($items, $values);
+        } catch (Exception $e) {
+            $response = empty($msg = $e->getMessage()) ? __('Action failed') : $msg;
+            $successful = false;
+        }
 
         if ($redirect = $action->redirect($items, $values)) {
-            return ['redirect' => $redirect];
+            return [
+                'redirect' => $redirect,
+                'bypassesDirtyWarning' => $action->bypassesDirtyWarning(),
+            ];
         } elseif ($download = $action->download($items, $values)) {
             return $download instanceof Response ? $download : response()->download($download);
         }
 
         if (is_string($response)) {
-            return ['message' => $response];
+            $response = ['message' => $response];
         }
 
-        return $response ?: [];
+        $response = $response ?: [];
+        $response['success'] = $successful;
+
+        if (Arr::get($context, 'view') === 'form') {
+            $response['data'] = $this->getItemData($items->first(), $context);
+        }
+
+        return $response;
     }
 
     public function bulkActions(Request $request)
@@ -65,4 +83,9 @@ abstract class ActionController extends CpController
     }
 
     abstract protected function getSelectedItems($items, $context);
+
+    protected function getItemData($item, $context): array
+    {
+        return [];
+    }
 }

@@ -23,6 +23,7 @@ class Asset extends JsonResource
             'size' => Str::fileSizeForHumans($this->size()),
             'lastModified' => $this->lastModified()->inPreferredFormat(),
             'lastModifiedRelative' => $this->lastModified()->diffForHumans(),
+            'mimeType' => $this->mimeType(),
             'isImage' => $this->isImage(),
             'isSvg' => $this->isSvg(),
             'isAudio' => $this->isAudio(),
@@ -31,10 +32,21 @@ class Asset extends JsonResource
             'isPdf' => $this->isPdf(),
             'isPreviewable' => $this->isPreviewable(),
 
-            $this->mergeWhen($this->isImage() || $this->isSvg(), function () {
+            $this->mergeWhen($this->hasDimensions(), function () {
                 return [
                     'width' => $this->width(),
                     'height' => $this->height(),
+                ];
+            }),
+
+            $this->mergeWhen($this->hasDuration(), function () {
+                return [
+                    'duration' => $this->duration(),
+                ];
+            }),
+
+            $this->mergeWhen($this->isImage() || $this->isSvg(), function () {
+                return [
                     'preview' => $this->previewUrl(),
                     'thumbnail' => $this->thumbnailUrl('small'),
                 ];
@@ -53,6 +65,7 @@ class Asset extends JsonResource
             'actions' => Action::for($this->resource, [
                 'container' => $this->container()->handle(),
                 'folder' => $this->folder(),
+                'view' => 'form',
             ]),
 
             'blueprint' => $this->blueprint()->toPublishArray(),

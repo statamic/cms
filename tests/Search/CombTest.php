@@ -2,17 +2,16 @@
 
 namespace Tests\Search;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Search\Comb\Comb;
 use Statamic\Search\Comb\Exceptions\NoResultsFound;
 use Tests\TestCase;
 
 class CombTest extends TestCase
 {
-    /**
-     * @test
-     *
-     * @dataProvider searchesProvider
-     **/
+    #[Test]
+    #[DataProvider('searchesProvider')]
     public function it_searches($term, $expected)
     {
         $comb = new Comb([
@@ -29,9 +28,7 @@ class CombTest extends TestCase
         $this->assertEquals($expected, collect($results['data'] ?? [])->pluck('data.title')->all());
     }
 
-    /**
-     * @test
-     **/
+    #[Test]
     public function it_extracts_snippets()
     {
         $content = <<<'EOT'
@@ -61,9 +58,7 @@ EOT;
         $this->assertEquals($expected, collect($results['data'] ?? [])->pluck('snippets.content')->all());
     }
 
-    /**
-     * @test
-     **/
+    #[Test]
     public function it_extracts_snippets_from_a_bard_field()
     {
         $content = [
@@ -207,9 +202,7 @@ EOT;
         $this->assertEquals($expected, collect($results['data'] ?? [])->pluck('snippets.content')->all());
     }
 
-    /**
-     * @test
-     **/
+    #[Test]
     public function it_can_search_for_plus_signs()
     {
         $comb = new Comb([
@@ -217,6 +210,30 @@ EOT;
         ]);
 
         $result = $comb->lookUp('+');
+        $this->assertIsArray($result);
+        $this->assertCount(2, $result);
+        $this->assertSame(1, $result['info']['total_results']);
+    }
+
+    #[Test]
+    public function it_can_search_for_slashes()
+    {
+        $comb = new Comb([
+            ['content' => 'Cont\ent'],
+            ['content' => 'Cont/ent'],
+        ]);
+
+        $result = $comb->lookUp('\\');
+        $this->assertIsArray($result);
+        $this->assertCount(2, $result);
+        $this->assertSame(1, $result['info']['total_results']);
+
+        $result = $comb->lookUp('/');
+        $this->assertIsArray($result);
+        $this->assertCount(2, $result);
+        $this->assertSame(1, $result['info']['total_results']);
+
+        $result = $comb->lookUp('Cont\\e');
         $this->assertIsArray($result);
         $this->assertCount(2, $result);
         $this->assertSame(1, $result['info']['total_results']);

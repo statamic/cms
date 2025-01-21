@@ -1,6 +1,6 @@
 <template>
 
-        <div class="flex flex-col justify-end h-full bg-white">
+        <div class="flex flex-col justify-end h-full bg-white dark:bg-dark-800">
 
             <div class="flex-1 overflow-scroll">
                 <asset-browser
@@ -8,14 +8,15 @@
                     :initial-per-page="$config.get('paginationSize')"
                     :selected-path="folder"
                     :selected-assets="browserSelections"
-                    :restrict-container-navigation="restrictContainerNavigation"
                     :restrict-folder-navigation="restrictFolderNavigation"
                     :max-files="maxFiles"
                     :query-scopes="queryScopes"
                     :autoselect-uploads="true"
                     :autofocus-search="true"
+                    allow-selecting-existing-upload
                     @selections-updated="selectionsUpdated"
-                    @asset-doubleclicked="select">
+                    @asset-doubleclicked="select"
+                >
 
                     <template slot="contextual-actions" v-if="browserSelections.length">
                         <button class="btn action mb-6" @click="browserSelections = []">{{ __('Uncheck All') }}</button>
@@ -24,7 +25,7 @@
                 </asset-browser>
             </div>
 
-            <div class="p-4 border-t flex items-center justify-between bg-gray-200">
+            <div class="p-4 border-t dark:border-dark-200 flex items-center justify-between bg-gray-200 dark:bg-dark-500">
                 <div class="text-sm text-gray-700"
                     v-text="hasMaxFiles
                         ? __n(':count/:max selected', browserSelections, { max: maxFiles })
@@ -40,7 +41,7 @@
 
                     <button
                         type="button"
-                        class="btn-primary ml-2"
+                        class="btn-primary rtl:mr-2 ltr:ml-2"
                         @click="select">
                         {{ __('Select') }}
                     </button>
@@ -59,12 +60,6 @@ export default {
         selected: Array,
         maxFiles: Number,
         queryScopes: Array,
-        restrictContainerNavigation: {
-            type: Boolean,
-            default() {
-                return false;
-            }
-        },
         restrictFolderNavigation: {
             type: Boolean,
             default() {

@@ -2,6 +2,7 @@
 
 namespace Statamic\Imaging;
 
+use Closure;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use League\Glide\ServerFactory;
@@ -12,6 +13,8 @@ use Statamic\Support\Str;
 
 class GlideManager
 {
+    private Closure $customHashCallable;
+
     /**
      * Create glide server.
      *
@@ -30,30 +33,7 @@ class GlideManager
             'watermarks' => public_path(),
         ], $config));
 
-        if (config('statamic.assets.image_manipulation.append_original_filename', false)) {
-            $server
-                ->setCachePathCallable(function ($path, $params) {
-                    // to avoid having to recreate the getCachePath method from glide server
-                    // we run getCachePath again without this callback function
-                    $customCallable = $this->getCachePathCallable();
-
-                    $this->setCachePathCallable(null);
-                    $cachePath = $this->getCachePath($path, $params);
-                    $this->setCachePathCallable($customCallable);
-
-                    // then we append our original filename to the end
-                    $filename = Str::afterLast($cachePath, '/');
-                    $cachePath = Str::beforeLast($cachePath, '/');
-
-                    $cachePath .= '/'.Str::beforeLast($filename, '.').'/'.Str::of($path)->after('/');
-
-                    if ($extension = ($params['fm'] ?? false)) {
-                        $cachePath = Str::beforeLast($cachePath, '.').'.'.$extension;
-                    }
-
-                    return $cachePath;
-                });
-        }
+        $server->setCachePathCallable($this->getCachePathCallable());
 
         return $server;
     }
@@ -142,7 +122,13 @@ class GlideManager
         $manifestKey = ImageGenerator::assetCacheManifestKey($asset);
 
         // Delete generated glide cache for asset.
-        $this->server()->deleteCache($pathPrefix.'/'.$asset->path());
+        // Make sure to use the default cache path when clearing the cache
+        tap($this->server(), function ($server) use ($pathPrefix, $asset) {
+            $customCallable = $server->getCachePathCallable();
+            $server->setCachePathCallable(null);
+            $server->deleteCache($pathPrefix.'/'.$asset->path());
+            $server->setCachePathCallable($customCallable);
+        });
 
         // Use manifest to clear each manipulation key from cache store.
         collect($this->cacheStore()->get($manifestKey, []))->each(function ($manipulationKey) {
@@ -174,5 +160,53 @@ class GlideManager
         return collect($params)->mapWithKeys(function ($value, $param) use ($legend) {
             return [$legend[$param] ?? $param => $value];
         })->all();
+    }
+
+    private function getCachePathCallable()
+    {
+        $hashCallable = $this->getHashCallable();
+
+        return function ($path, $params) use ($hashCallable) {
+            $qs = Str::contains($path, '?') ? Str::after($path, '?') : null;
+            $path = Str::before($path, '?');
+
+            if ($qs) {
+                $path = Str::replaceLast('.', '-'.md5($qs).'.', $path);
+            }
+
+            $sourcePath = $this->getSourcePath($path);
+
+            if ($this->sourcePathPrefix) {
+                $sourcePath = substr($sourcePath, strlen($this->sourcePathPrefix) + 1);
+            }
+
+            $params = $this->getAllParams($params);
+            unset($params['s'], $params['p']);
+            ksort($params);
+
+            $ext = $params['fm'] ?? pathinfo($path, PATHINFO_EXTENSION);
+            $ext = $ext === 'pjpg' ? 'jpg' : $ext;
+            $ext = $ext ? ".$ext" : '';
+
+            return vsprintf('%s/%s/%s/%s%s', [
+                $this->cachePathPrefix,
+                $sourcePath,
+                $hashCallable($sourcePath, $params),
+                pathinfo($path, PATHINFO_FILENAME),
+                $ext,
+            ]);
+        };
+    }
+
+    private function getHashCallable()
+    {
+        return $this->customHashCallable ?? function (string $source, array $params) {
+            return md5($source.'?'.http_build_query($params));
+        };
+    }
+
+    public function generateHashUsing(Closure $callback)
+    {
+        $this->customHashCallable = $callback;
     }
 }

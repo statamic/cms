@@ -84,18 +84,23 @@ class TreeBuilder
         return collect($tree)->map(function ($item) {
             $page = $item['page'];
             $collection = $page->collection();
+            $referenceExists = $page->referenceExists();
 
             return [
                 'id' => $page->id(),
                 'entry' => $page->reference(),
                 'title' => $page->hasCustomTitle() ? $page->title() : null,
-                'entry_title' => $page->referenceExists() ? $page->entry()->value('title') : null,
-                'url' => $page->referenceExists() ? null : $page->url(),
+                'entry_title' => $referenceExists ? $page->entry()->value('title') : null,
+                'entry_blueprint' => $referenceExists ? [
+                    'handle' => $page->entry()->blueprint()->handle(),
+                    'title' => $page->entry()->blueprint()->title(),
+                ] : null,
+                'url' => $referenceExists ? $page->url() : null,
                 'edit_url' => $page->editUrl(),
-                'can_delete' => $page->referenceExists() ? User::current()->can('delete', $page->entry()) : true,
+                'can_delete' => $referenceExists ? User::current()->can('delete', $page->entry()) : true,
                 'slug' => $page->slug(),
-                'status' => $page->referenceExists() ? $page->status() : null,
-                'redirect' => $page->referenceExists() ? $page->entry()->get('redirect') : null,
+                'status' => $referenceExists ? $page->status() : null,
+                'redirect' => $referenceExists ? $page->entry()->get('redirect') : null,
                 'collection' => ! $collection ? null : [
                     'handle' => $collection->handle(),
                     'title' => $collection->title(),

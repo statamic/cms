@@ -2,8 +2,11 @@
 
 namespace Tests\Stache\Repositories;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Entries\EntryCollection;
+use Statamic\Exceptions\EntryNotFoundException;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry as EntryAPI;
 use Statamic\Stache\Repositories\EntryRepository;
@@ -42,7 +45,7 @@ class EntryRepositoryTest extends TestCase
         $this->repo = new EntryRepository($this->stache);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_all_entries()
     {
         $entries = $this->repo->all();
@@ -68,7 +71,7 @@ class EntryRepositoryTest extends TestCase
         ], $entries->map->id()->sort()->values()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_entries_from_a_collection()
     {
         tap($this->repo->whereCollection('alphabetical'), function ($entries) {
@@ -108,7 +111,7 @@ class EntryRepositoryTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_entries_from_multiple_collections()
     {
         $entries = $this->repo->whereInCollection(['alphabetical', 'blog']);
@@ -125,7 +128,7 @@ class EntryRepositoryTest extends TestCase
         ], $entries->map->id()->sort()->values()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_entry_by_id()
     {
         $entry = $this->repo->find('alphabetical-bravo');
@@ -136,11 +139,26 @@ class EntryRepositoryTest extends TestCase
         $this->assertNull($this->repo->find('unknown'));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider entryByUriProvider
-     */
+    #[Test]
+    public function test_find_or_fail_gets_entry()
+    {
+        $entry = $this->repo->findOrFail('alphabetical-bravo');
+
+        $this->assertInstanceOf(Entry::class, $entry);
+        $this->assertEquals('Bravo', $entry->get('title'));
+    }
+
+    #[Test]
+    public function test_find_or_fail_throws_exception_when_entry_does_not_exist()
+    {
+        $this->expectException(EntryNotFoundException::class);
+        $this->expectExceptionMessage('Entry [does-not-exist] not found');
+
+        $this->repo->findOrFail('does-not-exist');
+    }
+
+    #[Test]
+    #[DataProvider('entryByUriProvider')]
     public function it_gets_entry_by_uri($uri, $expectedTitle)
     {
         $entry = $this->repo->findByUri($uri);
@@ -162,7 +180,7 @@ class EntryRepositoryTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_entry_by_structure_uri()
     {
         $entry = $this->repo->findByUri('/about/board/directors');
@@ -172,7 +190,7 @@ class EntryRepositoryTest extends TestCase
         $this->assertEquals('Directors', $entry->title());
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_an_entry_to_the_stache_and_to_a_file()
     {
         $entry = EntryAPI::make()
@@ -198,7 +216,7 @@ class EntryRepositoryTest extends TestCase
         $this->assertFileExists($path);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_delete()
     {
         $entry = EntryAPI::make()

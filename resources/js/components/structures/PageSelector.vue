@@ -14,6 +14,7 @@
             :columns="columns"
             :can-create="false"
             :can-reorder="false"
+            :max-items="maxItems"
             @item-data-updated="itemDataUpdated"
         />
 
@@ -27,6 +28,11 @@ export default {
     props: {
         site: String,
         collections: Array,
+        canSelectAcrossSites: Boolean,
+        maxItems: {
+            type: Number,
+            required: false,
+        },
     },
 
     data() {
@@ -34,6 +40,7 @@ export default {
             config: {
                 type: 'entries',
                 collections: this.collections,
+                select_across_sites: this.canSelectAcrossSites,
             },
             columns: [
                 { label: __('Title'), field: 'title' },

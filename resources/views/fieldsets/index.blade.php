@@ -14,7 +14,7 @@
 
         @foreach ($fieldsets as $key => $f)
             <div class="mb-4">
-                @if ($fieldsets->count() > 1)<h3 class="pl-0 mb-2 little-heading">{{ $key }}</h3>@endif
+                @if ($fieldsets->count() > 1)<h3 class="rtl:pr-0 ltr:pl-0 mb-2 little-heading">{{ $key }}</h3>@endif
                 <fieldset-listing :initial-rows="{{ json_encode($f) }}"></fieldset-listing>
             </div>
         @endforeach

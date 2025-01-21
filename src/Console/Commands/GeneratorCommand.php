@@ -28,15 +28,7 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
                 : $addon;
         }
 
-        if (parent::handle() === false) {
-            return false;
-        }
-
-        $relativePath = $this->getRelativePath($this->getPath($this->qualifyClass($this->getNameInput())));
-
-        if (! $addon) {
-            $this->line("Your {$this->typeLower} class awaits: <comment>{$relativePath}</comment>");
-        }
+        return parent::handle();
     }
 
     /**
@@ -59,7 +51,7 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
      */
     protected function getNameInput()
     {
-        return studly_case(parent::getNameInput());
+        return Str::studly(parent::getNameInput());
     }
 
     /**
@@ -126,7 +118,7 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
     {
         // If explicitly setting addon path from an external command like `make:addon`,
         // use explicit path and allow external command to handle path output.
-        if (starts_with($addon, '/') && $this->files->exists($addon)) {
+        if (Str::startsWith($addon, '/') && $this->files->exists($addon)) {
             return $addon;
         }
 
@@ -273,7 +265,7 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
      */
     public function __get($attribute)
     {
-        $words = explode('_', snake_case($attribute));
+        $words = explode('_', Str::snake($attribute));
 
         // If trying to access `type` attribute, allow dynamic string manipulation like `typeLowerPlural`.
         if ($words[0] === 'type') {

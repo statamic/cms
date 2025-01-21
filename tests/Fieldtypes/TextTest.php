@@ -2,17 +2,16 @@
 
 namespace Tests\Fieldtypes;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Text;
 use Tests\TestCase;
 
 class TextTest extends TestCase
 {
-    /**
-     * @test
-     *
-     * @dataProvider processValuesProvider
-     **/
+    #[Test]
+    #[DataProvider('processValuesProvider')]
     public function it_processes_values($mode, $values)
     {
         $field = (new Text)->setField(new Field('test', [

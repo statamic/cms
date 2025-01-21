@@ -1,9 +1,20 @@
 const colors = require('tailwindcss/colors')
 
 module.exports = {
+    darkMode: 'class',
     content: [
         './resources/**/*.{html,js,vue,blade.php}',
         './tests/**/*.{html,vue,blade.php}'
+    ],
+    safelist: [
+        {
+            pattern: /m[l|r]-(?:[0-9]|10|11|12|14|16)$/,
+            variants: ['md', 'lg', 'xl']
+        },
+        {
+            pattern: /p[x|y]-(?:[0-9]|10|11|12|14|16)$/,
+            variants: ['md', 'lg', 'xl']
+        },
     ],
     theme: {
         colors: {
@@ -38,6 +49,35 @@ module.exports = {
                 950: '#141a1f',
                 DEFAULT: '#73808c',
             },
+            dark: {
+                100: '#dfe1e5',
+                150: '#bbbdc0',
+                175: '#93979a',
+                200: '#5f6163',
+                250: '#555759',
+                275: '#515356',
+                300: '#4e5157',
+                350: '#43454a',
+                400: '#414245',
+                500: '#404143',
+                550: '#3b3f41',
+                575: '#393b40',
+                600: '#2b2d30',
+                650: '#242628',
+                700: '#212223',
+                750: '#22242a',
+                800: '#1e1f22',
+                900: '#171717',
+                950: '#161616',
+                975: '#131314',
+            },
+            'dark-blue': {
+                100: '#2870F5',
+                125: '#1e68f1',
+                150: '#1f67ec',
+                175: '#1560ec',
+                200: '#2a4270',
+            },
             orange: {
                 light: '#fcc062',
                 DEFAULT: '#f5a82f',
@@ -61,6 +101,7 @@ module.exports = {
             amber: colors.amber,
             green: colors.green,
             red: colors.red,
+            'dark-red': '#900000'
         },
         screens: {
             'sm': '576px',
@@ -85,9 +126,16 @@ module.exports = {
                 lg: '0 7px 14px 0 rgba(50,50,93,.1), 0 2px 8px 0 rgba(0,0,0,.075)',
                 xl: '0 12px 24px 0 rgba(50, 50, 93, .1), 0 10px 20px 0 rgba(0, 0, 0, .075)',
                 popover: '0 0 0 1px rgba(40,45,50,0.05), 0 0 0 1px rgba(40,45,50,0.05), 0 2px 7px 1px rgba(40,45,50,0.16)',
+                quick: '0 0 0 1px rgba(40,45,50,0.075), 0 0 0 1px rgba(40,45,50,0.075)',
                 set: 'rgba(50,50,93,.15) 0 0 0 1px, rgba(50,50,93,.08) 0 2px 5px, rgba(0,0,0,.07) 0 1px 1.5px,rgba(0,0,0,.08) 0 1px 2px 0, transparent 0 0 0 0',
                 button: '0 1px 0 0 rgba(25,30,35,.05)',
                 inner: 'inset 0px 1px 1px 0px rgba(0,0,0,.05)',
+                'inner-dark': 'inset 0px 2px 1px 0px rgba(0,0,0,.15)',
+                dark: '0 20px 35px 0 rgba(22,22,22,.45), 0 10px 23px 0 rgba(23,23,23,.65), 0 0 0 1px rgba(85,87,89,.80)',
+                'dark-lg': '0 40px 78px 0 rgba(22,22,22,.45), 0 15px 28px 0 rgba(23,23,23,.85), 0 0 0 1px rgba(85,87,89,.85)',
+                'dark-sm': '0 3px 3px 0 rgba(22,22,22,.15), 0 1px 2px 0 rgba(23,23,23,.1)',
+                'dark-popover': '0 10px 17px 10px rgb(31 33 36 / 76%), 0 2px 1px 1px rgb(31 33 36 / 76%), 0 0 0 1px rgb(109 118 118 / 41%), 0 0 0 1px rgb(110 125 140 / 61%)',
+                'dark-set': 'rgba(0,0,0,.25) 0 0 0 1px, rgba(0,0,0,.08) 0 2px 5px, rgba(0,0,0,.17) 0 1px 1.5px,rgba(0,0,0,.18) 0 1px 2px 0, transparent 0 0 0 0',
             },
             fontFamily: {
                 serif: ['Georgia', 'serif'],

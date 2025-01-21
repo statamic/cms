@@ -24,9 +24,11 @@ use Statamic\Http\Controllers\CP\Auth\ImpersonationController;
 use Statamic\Http\Controllers\CP\Auth\LoginController;
 use Statamic\Http\Controllers\CP\Auth\ResetPasswordController;
 use Statamic\Http\Controllers\CP\Auth\UnauthorizedController;
+use Statamic\Http\Controllers\CP\Collections\CollectionActionController;
 use Statamic\Http\Controllers\CP\Collections\CollectionBlueprintsController;
 use Statamic\Http\Controllers\CP\Collections\CollectionsController;
 use Statamic\Http\Controllers\CP\Collections\CollectionTreeController;
+use Statamic\Http\Controllers\CP\Collections\EditRedirectController;
 use Statamic\Http\Controllers\CP\Collections\EntriesController;
 use Statamic\Http\Controllers\CP\Collections\EntryActionController;
 use Statamic\Http\Controllers\CP\Collections\EntryPreviewController;
@@ -40,11 +42,13 @@ use Statamic\Http\Controllers\CP\Collections\ScaffoldCollectionController;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Controllers\CP\DashboardController;
 use Statamic\Http\Controllers\CP\DuplicatesController;
+use Statamic\Http\Controllers\CP\FieldActionModalController;
 use Statamic\Http\Controllers\CP\Fields\BlueprintController;
 use Statamic\Http\Controllers\CP\Fields\FieldsController;
 use Statamic\Http\Controllers\CP\Fields\FieldsetController;
 use Statamic\Http\Controllers\CP\Fields\FieldtypesController;
 use Statamic\Http\Controllers\CP\Fields\MetaController;
+use Statamic\Http\Controllers\CP\Fieldtypes\DictionaryFieldtypeController;
 use Statamic\Http\Controllers\CP\Fieldtypes\FilesFieldtypeController;
 use Statamic\Http\Controllers\CP\Fieldtypes\MarkdownFieldtypeController;
 use Statamic\Http\Controllers\CP\Fieldtypes\RelationshipFieldtypeController;
@@ -73,6 +77,8 @@ use Statamic\Http\Controllers\CP\Preferences\UserPreferenceController;
 use Statamic\Http\Controllers\CP\SearchController;
 use Statamic\Http\Controllers\CP\SelectSiteController;
 use Statamic\Http\Controllers\CP\SessionTimeoutController;
+use Statamic\Http\Controllers\CP\Sites\SitesController;
+use Statamic\Http\Controllers\CP\SlugController;
 use Statamic\Http\Controllers\CP\StartPageController;
 use Statamic\Http\Controllers\CP\Taxonomies\PublishedTermsController;
 use Statamic\Http\Controllers\CP\Taxonomies\ReorderTaxonomyBlueprintsController;
@@ -99,14 +105,17 @@ use Statamic\Http\Middleware\RequireStatamicPro;
 use Statamic\Statamic;
 
 Route::group(['prefix' => 'auth'], function () {
-    Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
-    Route::post('login', [LoginController::class, 'login']);
-    Route::get('logout', [LoginController::class, 'logout'])->name('logout');
+    if (config('statamic.cp.auth.enabled', true)) {
+        Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
+        Route::post('login', [LoginController::class, 'login']);
 
-    Route::get('password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
-    Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
-    Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
-    Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.reset.action');
+        Route::get('password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+        Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+        Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+        Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.reset.action');
+    }
+
+    Route::get('logout', [LoginController::class, 'logout'])->name('logout');
 
     Route::get('token', CsrfTokenController::class)->name('token');
     Route::get('extend', ExtendSessionController::class)->name('extend');
@@ -141,6 +150,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     Route::get('collections/{collection}/tree', [CollectionTreeController::class, 'index'])->name('collections.tree.index');
     Route::patch('collections/{collection}/tree', [CollectionTreeController::class, 'update'])->name('collections.tree.update');
+    Route::post('collections/{collection}/actions', [CollectionActionController::class, 'run'])->name('collections.actions.run');
 
     Route::group(['prefix' => 'collections/{collection}/entries'], function () {
         Route::get('/', [EntriesController::class, 'index'])->name('collections.entries.index');
@@ -160,6 +170,10 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
             Route::resource('revisions', EntryRevisionsController::class, [
                 'as' => 'collections.entries',
                 'only' => ['index', 'store', 'show'],
+            ])->names([
+                'index' => 'collections.entries.revisions.index',
+                'store' => 'collections.entries.revisions.store',
+                'show' => 'collections.entries.revisions.show',
             ]);
 
             Route::post('restore-revision', RestoreEntryRevisionController::class)->name('collections.entries.restore-revision');
@@ -226,21 +240,27 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::get('assets/browse/{asset_container}/{path?}/edit', [BrowserController::class, 'edit'])->where('path', '.*')->name('assets.browse.edit');
     Route::get('assets/browse/{asset_container}/{path?}', [BrowserController::class, 'show'])->where('path', '.*')->name('assets.browse.show');
     Route::post('assets-fieldtype', [FieldtypeController::class, 'index']);
-    Route::resource('assets', AssetsController::class)->parameters(['assets' => 'encoded_asset']);
+    Route::resource('assets', AssetsController::class)->parameters(['assets' => 'encoded_asset'])->except('destroy');
     Route::get('assets/{encoded_asset}/download', [AssetsController::class, 'download'])->name('assets.download');
     Route::get('thumbnails/{encoded_asset}/{size?}/{orientation?}', [ThumbnailController::class, 'show'])->name('assets.thumbnails.show');
     Route::get('svgs/{encoded_asset}', [SvgController::class, 'show'])->name('assets.svgs.show');
     Route::get('pdfs/{encoded_asset}', [PdfController::class, 'show'])->name('assets.pdfs.show');
+
+    Route::get('sites', [SitesController::class, 'edit'])->name('sites.edit');
+    Route::patch('sites', [SitesController::class, 'update'])->name('sites.update');
 
     Route::group(['prefix' => 'fields'], function () {
         Route::get('/', [FieldsController::class, 'index'])->name('fields.index');
         Route::post('edit', [FieldsController::class, 'edit'])->name('fields.edit');
         Route::post('update', [FieldsController::class, 'update'])->name('fields.update');
         Route::get('field-meta', [MetaController::class, 'show']);
+        Route::post('field-meta', [MetaController::class, 'show']);
+        Route::delete('fieldsets/{fieldset}/reset', [FieldsetController::class, 'reset'])->name('fieldsets.reset');
         Route::resource('fieldsets', FieldsetController::class)->except(['show']);
         Route::get('blueprints', [BlueprintController::class, 'index'])->name('blueprints.index');
         Route::get('blueprints/{namespace}/{handle}', [BlueprintController::class, 'edit'])->name('blueprints.edit');
         Route::patch('blueprints/{namespace}/{handle}', [BlueprintController::class, 'update'])->name('blueprints.update');
+        Route::delete('blueprints/{namespace}/{handle}/reset', [BlueprintController::class, 'reset'])->name('blueprints.reset');
         Route::get('fieldtypes', [FieldtypesController::class, 'index']);
     });
 
@@ -271,7 +291,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::post('users/actions/list', [UserActionController::class, 'bulkActions'])->name('users.actions.bulk');
     Route::get('users/blueprint', [UserBlueprintController::class, 'edit'])->name('users.blueprint.edit');
     Route::patch('users/blueprint', [UserBlueprintController::class, 'update'])->name('users.blueprint.update');
-    Route::resource('users', UsersController::class);
+    Route::resource('users', UsersController::class)->except('destroy');
     Route::patch('users/{user}/password', [PasswordController::class, 'update'])->name('users.password.update');
     Route::get('account', AccountController::class)->name('account');
     Route::get('user-groups/blueprint', [UserGroupBlueprintController::class, 'edit'])->name('user-groups.blueprint.edit');
@@ -297,6 +317,12 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::get('relationship/filters', [RelationshipFieldtypeController::class, 'filters'])->name('relationship.filters');
         Route::post('markdown', [MarkdownFieldtypeController::class, 'preview'])->name('markdown.preview');
         Route::post('files/upload', [FilesFieldtypeController::class, 'upload'])->name('files.upload');
+        Route::get('dictionaries/{dictionary}', DictionaryFieldtypeController::class)->name('dictionary-fieldtype');
+    });
+
+    Route::group(['prefix' => 'field-action-modal'], function () {
+        Route::post('resolve', [FieldActionModalController::class, 'resolve'])->name('resolve');
+        Route::post('process', [FieldActionModalController::class, 'process'])->name('process');
     });
 
     Route::group(['prefix' => 'api', 'as' => 'api.'], function () {
@@ -319,26 +345,30 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::post('js', [PreferenceController::class, 'store'])->name('store');
         Route::delete('js/{key}', [PreferenceController::class, 'destroy'])->name('destroy');
 
-        Route::group(['prefix' => 'nav', 'as' => 'nav.'], function () {
-            Route::get('/', [NavController::class, 'index'])->name('index');
-            Route::get('edit', [UserNavController::class, 'edit'])->name('user.edit');
-            Route::patch('/', [UserNavController::class, 'update'])->name('user.update');
-            Route::delete('/', [UserNavController::class, 'destroy'])->name('user.destroy');
+    });
 
-            Route::middleware([RequireStatamicPro::class, 'can:manage preferences'])->group(function () {
-                Route::get('roles/{role}/edit', [RoleNavController::class, 'edit'])->name('role.edit');
-                Route::patch('roles/{role}', [RoleNavController::class, 'update'])->name('role.update');
-                Route::delete('roles/{role}', [RoleNavController::class, 'destroy'])->name('role.destroy');
-                Route::get('default/edit', [DefaultNavController::class, 'edit'])->name('default.edit');
-                Route::patch('default', [DefaultNavController::class, 'update'])->name('default.update');
-                Route::delete('default', [DefaultNavController::class, 'destroy'])->name('default.destroy');
-            });
+    Route::group(['prefix' => 'nav', 'as' => 'preferences.nav.'], function () {
+        Route::get('/', [NavController::class, 'index'])->name('index');
+        Route::get('edit', [UserNavController::class, 'edit'])->name('user.edit');
+        Route::patch('/', [UserNavController::class, 'update'])->name('user.update');
+        Route::delete('/', [UserNavController::class, 'destroy'])->name('user.destroy');
+
+        Route::middleware([RequireStatamicPro::class, 'can:manage preferences'])->group(function () {
+            Route::get('roles/{role}/edit', [RoleNavController::class, 'edit'])->name('role.edit');
+            Route::patch('roles/{role}', [RoleNavController::class, 'update'])->name('role.update');
+            Route::delete('roles/{role}', [RoleNavController::class, 'destroy'])->name('role.destroy');
+            Route::get('default/edit', [DefaultNavController::class, 'edit'])->name('default.edit');
+            Route::patch('default', [DefaultNavController::class, 'update'])->name('default.update');
+            Route::delete('default', [DefaultNavController::class, 'destroy'])->name('default.destroy');
         });
     });
 
+    Route::post('slug', SlugController::class);
     Route::get('session-timeout', SessionTimeoutController::class)->name('session.timeout');
 
     Route::view('/playground', 'statamic::playground')->name('playground');
+
+    Route::get('edit/{id}', EditRedirectController::class);
 
     Route::get('{segments}', [CpController::class, 'pageNotFound'])->where('segments', '.*')->name('404');
 });

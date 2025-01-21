@@ -5,6 +5,7 @@ namespace Tests\Licensing;
 use Illuminate\Contracts\Support\MessageBag;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Licensing\AddonLicense;
 use Statamic\Licensing\LicenseManager;
 use Statamic\Licensing\Outpost;
@@ -14,7 +15,7 @@ use Tests\TestCase;
 
 class LicenseManagerTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_gets_the_outpost_response()
     {
         $manager = $this->managerWithResponse(['the' => 'response']);
@@ -22,7 +23,7 @@ class LicenseManagerTest extends TestCase
         $this->assertEquals(['the' => 'response'], $manager->response());
     }
 
-    /** @test */
+    #[Test]
     public function it_clears_the_outpost_response()
     {
         $outpost = $this->mock(Outpost::class);
@@ -31,21 +32,21 @@ class LicenseManagerTest extends TestCase
         (new LicenseManager($outpost))->refresh();
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_for_public_domains()
     {
         $this->assertTrue($this->managerWithResponse(['public' => true])->isOnPublicDomain());
         $this->assertFalse($this->managerWithResponse(['public' => false])->isOnPublicDomain());
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_for_test_domains()
     {
         $this->assertFalse($this->managerWithResponse(['public' => true])->isOnTestDomain());
         $this->assertTrue($this->managerWithResponse(['public' => false])->isOnTestDomain());
     }
 
-    /** @test */
+    #[Test]
     public function licenses_are_valid_if_statamic_and_all_addons_are_valid()
     {
         $licenses = $this->managerWithResponse([
@@ -60,7 +61,7 @@ class LicenseManagerTest extends TestCase
         $this->assertFalse($licenses->invalid());
     }
 
-    /** @test */
+    #[Test]
     public function licenses_are_invalid_if_statamic_is_invalid_but_addons_are_valid()
     {
         $licenses = $this->managerWithResponse([
@@ -75,7 +76,7 @@ class LicenseManagerTest extends TestCase
         $this->assertTrue($licenses->invalid());
     }
 
-    /** @test */
+    #[Test]
     public function licenses_are_invalid_if_statamic_is_valid_but_any_addons_are_invalid()
     {
         $licenses = $this->managerWithResponse([
@@ -90,7 +91,7 @@ class LicenseManagerTest extends TestCase
         $this->assertTrue($licenses->invalid());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_site_license()
     {
         $licenses = $this->managerWithResponse(['site' => 'test-response']);
@@ -101,7 +102,7 @@ class LicenseManagerTest extends TestCase
         $this->assertEquals('test-response', $site->response());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_statamic_license()
     {
         $licenses = $this->managerWithResponse(['statamic' => 'test-response']);
@@ -112,7 +113,7 @@ class LicenseManagerTest extends TestCase
         $this->assertEquals('test-response', $statamic->response());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_addon_licenses()
     {
         $licenses = $this->managerWithResponse([
@@ -131,7 +132,7 @@ class LicenseManagerTest extends TestCase
         $this->assertEquals('the baz/qux response', $addons['baz/qux']->response());
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_if_statamic_license_needs_renewal()
     {
         $this->assertFalse($this->managerWithResponse([
@@ -147,7 +148,7 @@ class LicenseManagerTest extends TestCase
         ])->statamicNeedsRenewal());
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_for_request_failures()
     {
         Carbon::setTestNow(now()->startOfMinute());

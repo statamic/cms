@@ -8,7 +8,9 @@ import PublishForm from '../components/publish/PublishForm.vue';
 import Fields from '../components/publish/Fields.vue';
 import FieldsContainer from '../components/publish/FieldsContainer.vue'; // deprecated
 import Field from '../components/publish/Field.vue';
+import FullscreenHeader from '../components/publish/FullscreenHeader.vue';
 import FieldMeta from '../components/publish/FieldMeta.vue';
+import FieldActions from '../components/field-actions/FieldActions.vue';
 import ConfigureTabs from '../components/configure/Tabs.vue';
 import PublishTabs from '../components/publish/Tabs.vue';
 import PublishSections from '../components/publish/Sections.vue';
@@ -43,7 +45,7 @@ import LoadingGraphic from '../components/LoadingGraphic.vue';
 import DropdownList from '../components/DropdownList.vue';
 import DropdownItem from '../components/DropdownItem.vue';
 import ValidationErrors from '../components/ValidationErrors.vue';
-import Slugify from '../components/Slugify.vue';
+import Slugify from '../components/slugs/Slugify.vue';
 import ElementContainer from '../components/ElementContainer.vue';
 import Avatar from '../components/Avatar.vue';
 import Breadcrumb from '../components/Breadcrumb.vue';
@@ -56,10 +58,12 @@ import Modal from '../components/Modal.vue';
 import ConfirmationModal from '../components/modals/ConfirmationModal.vue';
 import FavoriteCreator from '../components/FavoriteCreator.vue';
 import KeyboardShortcutsModal from '../components/modals/KeyboardShortcutsModal.vue';
+import FieldActionModal from '../components/field-actions/FieldActionModal.vue';
 import ResourceDeleter from '../components/ResourceDeleter.vue';
 import Stack from '../components/stacks/Stack.vue';
 import StackTest from '../components/stacks/StackTest.vue';
 import CodeBlock from '../components/CodeBlock.vue';
+import BlueprintResetter from '../components/blueprints/BlueprintResetter.vue';
 
 // Third Party
 Vue.component('v-select', vSelect)
@@ -76,6 +80,8 @@ Vue.component('publish-fields', Fields);
 Vue.component('publish-fields-container', FieldsContainer);
 Vue.component('publish-field', Field);
 Vue.component('publish-field-meta', FieldMeta);
+Vue.component('publish-field-actions', FieldActions);
+Vue.component('publish-field-fullscreen-header', FullscreenHeader);
 Vue.component('configure-tabs', ConfigureTabs);
 Vue.component('publish-tabs', PublishTabs);
 Vue.component('publish-sections', PublishSections);
@@ -139,6 +145,9 @@ Vue.component('confirmation-modal', ConfirmationModal);
 Vue.component('favorite-creator', FavoriteCreator);
 Vue.component('keyboard-shortcuts-modal', KeyboardShortcutsModal);
 Vue.component('resource-deleter', ResourceDeleter);
+Vue.component('field-action-modal', FieldActionModal);
 
 Vue.component('stack', Stack);
 Vue.component('stack-test', StackTest);
+
+Vue.component('blueprint-resetter', BlueprintResetter);

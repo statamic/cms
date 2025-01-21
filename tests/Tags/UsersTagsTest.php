@@ -2,6 +2,7 @@
 
 namespace Tests\Tags;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Parse;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
@@ -20,7 +21,7 @@ class UsersTagsTest extends TestCase
         return Parse::template($tag, []);
     }
 
-    /** @test */
+    #[Test]
     public function it_renders()
     {
         $user = User::make()->email('foo@bar.com')->save();
@@ -28,7 +29,7 @@ class UsersTagsTest extends TestCase
         $this->assertEquals('foo@bar.com', $this->tag('{{ users }}{{email}}{{ /users }}'));
     }
 
-    /** @test */
+    #[Test]
     public function it_only_shows_users_in_groups()
     {
         $this->setTestRoles([
@@ -50,7 +51,7 @@ class UsersTagsTest extends TestCase
         $this->assertEquals('', $this->tag('{{ users group="non_favourite|another_non_favourite" }}{{ email }}{{ /users }}'));
     }
 
-    /** @test */
+    #[Test]
     public function it_only_shows_users_in_roles()
     {
         $this->setTestRoles([

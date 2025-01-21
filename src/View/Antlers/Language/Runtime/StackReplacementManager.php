@@ -4,6 +4,7 @@ namespace Statamic\View\Antlers\Language\Runtime;
 
 use Statamic\View\Antlers\Language\Nodes\AntlersNode;
 use Statamic\View\Antlers\Language\Nodes\Position;
+use Statamic\View\Interop\Stacks;
 
 class StackReplacementManager
 {
@@ -13,16 +14,48 @@ class StackReplacementManager
 
     protected static $cachedStacks = [];
 
+    protected static $stackNames = [];
+
     public static function clearStackState()
     {
         self::$stackContents = [];
         self::$arrayStacks = [];
         self::$stacks = [];
+        self::$stackNames = [];
+    }
+
+    public static function getStacks()
+    {
+        $stacks = [];
+
+        if (! array_key_exists(GlobalRuntimeState::$environmentId, self::$stackContents)) {
+            return $stacks;
+        }
+
+        $currentStacks = self::$stackContents[GlobalRuntimeState::$environmentId];
+
+        foreach (self::$stackNames as $replacement => $realName) {
+            if (! array_key_exists($replacement, $currentStacks)) {
+                continue;
+            }
+
+            $stacks[$realName] = [];
+
+            foreach ($currentStacks[$replacement] as $replacement) {
+                $stacks[$realName][] = $replacement;
+            }
+        }
+
+        return $stacks;
     }
 
     protected static function getStackReplacement($name)
     {
-        return '__stackReplacement::_'.md5($name);
+        $replacement = '__stackReplacement::_'.md5($name);
+
+        self::$stackNames[$replacement] = $name;
+
+        return $replacement;
     }
 
     public static function registerStack($name)
@@ -55,7 +88,7 @@ class StackReplacementManager
         return $name.$contentHash;
     }
 
-    public static function prependStack($stackName, $content, $trimContentWhitespace = false)
+    public static function prependStack($stackName, $content, $trimContentWhitespace = false, $isBlade = false)
     {
         $name = self::getStackReplacement($stackName);
 
@@ -69,6 +102,10 @@ class StackReplacementManager
 
         if ($trimContentWhitespace) {
             $content = trim($content);
+        }
+
+        if (! $isBlade) {
+            Stacks::prependToBladeStack($stackName, $content);
         }
 
         if (GlobalRuntimeState::$isCacheEnabled) {
@@ -78,7 +115,7 @@ class StackReplacementManager
         array_unshift(self::$stackContents[GlobalRuntimeState::$environmentId][$name], $content);
     }
 
-    public static function pushStack($stackName, $content, $trimContentWhitespace = true)
+    public static function pushStack($stackName, $content, $trimContentWhitespace = true, $isBlade = false)
     {
         $name = self::getStackReplacement($stackName);
 
@@ -92,6 +129,10 @@ class StackReplacementManager
 
         if ($trimContentWhitespace) {
             $content = trim($content);
+        }
+
+        if (! $isBlade) {
+            Stacks::pushToBladeStack($stackName, $content);
         }
 
         if (GlobalRuntimeState::$isCacheEnabled) {

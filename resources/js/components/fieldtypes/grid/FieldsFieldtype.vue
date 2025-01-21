@@ -4,6 +4,7 @@
         :fields="fields"
         :editing-field="editingField"
         :can-define-localizable="false"
+        :suggestable-condition-fields="suggestableConditionFields(this)"
         @field-created="fieldCreated"
         @field-updated="fieldUpdated"
         @field-linked="fieldLinked"
@@ -17,10 +18,15 @@
 <script>
 import Fields from '../../blueprints/Fields.vue';
 import {Sortable, Plugins} from '@shopify/draggable';
+import SuggestsConditionalFields from '../../blueprints/SuggestsConditionalFields';
 
 export default {
 
-    mixins: [Fieldtype],
+    mixins: [Fieldtype, SuggestsConditionalFields],
+
+    inject: {
+        suggestableConditionFieldsProvider: { default: null }
+    },
 
     components: {
         Fields,
@@ -31,6 +37,12 @@ export default {
             fields: this.value,
             editingField: null,
         }
+    },
+
+    computed: {
+        fieldsForConditionSuggestions() {
+            return this.fields;
+        },
     },
 
     mounted() {

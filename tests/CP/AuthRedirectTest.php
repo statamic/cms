@@ -3,6 +3,7 @@
 namespace Tests\CP;
 
 use Illuminate\Support\Facades\Route;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Exceptions\AuthorizationException;
 use Statamic\Facades\User;
 use Statamic\Statamic;
@@ -26,7 +27,7 @@ class AuthRedirectTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_redirects_back_to_referrer()
     {
         $this->setTestRoles(['test' => ['access cp']]);
@@ -40,7 +41,7 @@ class AuthRedirectTest extends TestCase
             ->assertSessionHas(['error' => "Can't touch this."]);
     }
 
-    /** @test */
+    #[Test]
     public function it_redirects_to_cp_index_without_referrer()
     {
         $this->setTestRoles(['test' => ['access cp']]);
@@ -53,7 +54,7 @@ class AuthRedirectTest extends TestCase
             ->assertSessionHas(['error' => "Can't touch this."]);
     }
 
-    /** @test */
+    #[Test]
     public function it_redirects_somewhere_if_the_referrer_was_the_login_page()
     {
         $this->setTestRoles(['test' => ['access cp']]);
@@ -67,7 +68,7 @@ class AuthRedirectTest extends TestCase
             ->assertSessionHas(['error' => "Can't touch this."]);
     }
 
-    /** @test */
+    #[Test]
     public function it_redirects_to_unauthorized_view_if_there_would_be_a_redirect_loop()
     {
         $this->setTestRoles(['undashboardable' => ['access cp']]);

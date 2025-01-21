@@ -3,11 +3,7 @@
 namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Foundation\Application;
-use Illuminate\Foundation\Console\AboutCommand;
 use Statamic\Console\RunsInPlease;
-use Statamic\Facades\Addon;
-use Statamic\Statamic;
 
 class SupportDetails extends Command
 {
@@ -17,38 +13,6 @@ class SupportDetails extends Command
     protected $description = 'Outputs details helpful for support requests';
 
     public function handle()
-    {
-        return class_exists(AboutCommand::class)
-            ? $this->handleUsingAboutCommand()
-            : $this->handleUsingStatamic();
-    }
-
-    private function handleUsingStatamic()
-    {
-        $this->line(sprintf('<info>Statamic</info> %s %s', Statamic::version(), Statamic::pro() ? 'Pro' : 'Solo'));
-        $this->line('<info>Laravel</info> '.Application::VERSION);
-        $this->line('<info>PHP</info> '.phpversion());
-        $this->line(sprintf('<info>Stache Watcher</info> %s', config('statamic.stache.watcher') ? 'Enabled' : 'Disabled'));
-        $this->line(sprintf('<info>Static Caching</info> %s', config('statamic.static_caching.strategy') ?: 'Disabled'));
-        $this->addons();
-
-        return static::SUCCESS;
-    }
-
-    private function addons()
-    {
-        $addons = Addon::all();
-
-        if ($addons->isEmpty()) {
-            return $this->line('No addons installed');
-        }
-
-        foreach ($addons as $addon) {
-            $this->line(sprintf('<info>%s</info> %s', $addon->package(), $addon->version()));
-        }
-    }
-
-    private function handleUsingAboutCommand()
     {
         $this->replaceView();
 

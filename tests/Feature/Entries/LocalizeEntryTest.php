@@ -3,8 +3,8 @@
 namespace Tests\Feature\Entries;
 
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -24,17 +24,17 @@ class LocalizeEntryTest extends TestCase
         config(['cache.default' => 'file']);
         \Illuminate\Support\Facades\Cache::clear();
 
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_localizes_an_entry()
     {
         $user = $this->user();
-        $entry = EntryFactory::collection(tap(Collection::make('blog')->revisionsEnabled(false))->save())->slug('test')->create();
+        $entry = EntryFactory::collection(tap(Collection::make('blog')->dated(true)->revisionsEnabled(false))->save())->slug('test')->date('2013-08-24')->create();
         $this->assertNull($entry->in('fr'));
 
         $response = $this
@@ -45,12 +45,13 @@ class LocalizeEntryTest extends TestCase
         $localized = $entry->fresh()->in('fr');
         $this->assertNotNull($localized);
         $this->assertEquals($user, $localized->lastModifiedBy());
+        $this->assertEquals('2013-08-24', $localized->date()->format('Y-m-d'));
         $response->assertJson(['handle' => 'fr', 'url' => $localized->editUrl()]);
 
         $this->assertCount(0, $entry->in('fr')->revisions());
     }
 
-    /** @test */
+    #[Test]
     public function site_is_required()
     {
         $entry = EntryFactory::collection('blog')->slug('test')->create();
@@ -63,7 +64,25 @@ class LocalizeEntryTest extends TestCase
             ->assertSessionHasErrors('site');
     }
 
-    /** @test */
+    #[Test]
+    public function cant_localize_entry_without_edit_permissions()
+    {
+        $user = $this->user();
+        $this->setTestRoles(['test' => ['access cp', 'access en site', 'access fr site', 'view blog entries']]);
+
+        $entry = EntryFactory::collection(tap(Collection::make('blog')->revisionsEnabled(false))->save())->slug('test')->create();
+        $this->assertNull($entry->in('fr'));
+
+        $this
+            ->actingAs($user->fresh())
+            ->localize($entry, ['site' => 'fr'])
+            ->assertRedirect();
+
+        $localized = $entry->fresh()->in('fr');
+        $this->assertNull($localized);
+    }
+
+    #[Test]
     public function it_adds_an_entry_to_the_structure_tree_if_its_nested()
     {
         $collection = tap(Collection::make('pages')->sites(['en', 'fr']))->save();
@@ -110,7 +129,7 @@ class LocalizeEntryTest extends TestCase
         ], Collection::findByHandle('pages')->structure()->in('fr')->tree());
     }
 
-    /** @test */
+    #[Test]
     public function it_adds_an_entry_to_the_end_of_the_structure_tree_if_the_parent_is_the_root()
     {
         $collection = tap(Collection::make('pages')->sites(['en', 'fr']))->save();
@@ -155,7 +174,7 @@ class LocalizeEntryTest extends TestCase
         ], Collection::findByHandle('pages')->structure()->in('fr')->tree());
     }
 
-    /** @test */
+    #[Test]
     public function it_adds_an_entry_to_the_end_of_the_structure_tree_if_the_parent_doesnt_exist_in_that_site()
     {
         $collection = tap(Collection::make('pages')->sites(['en', 'fr']))->save();
@@ -197,7 +216,7 @@ class LocalizeEntryTest extends TestCase
         ], Collection::findByHandle('pages')->structure()->in('fr')->tree());
     }
 
-    /** @test */
+    #[Test]
     public function it_localizes_an_entry_with_revisions()
     {
         config(['statamic.revisions.enabled' => true]);
@@ -232,7 +251,15 @@ class LocalizeEntryTest extends TestCase
 
     private function user()
     {
-        $this->setTestRoles(['test' => ['access cp']]);
+        $this->setTestRoles(['test' => [
+            'access cp',
+            'access en site',
+            'access fr site',
+            'view blog entries',
+            'edit blog entries',
+            'view pages entries',
+            'edit pages entries',
+        ]]);
 
         return User::make()->assignRole('test')->save();
     }

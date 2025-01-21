@@ -3,6 +3,7 @@
 namespace Statamic\Auth\Protect\Protectors;
 
 use Statamic\Exceptions\ForbiddenHttpException;
+use Statamic\Support\Arr;
 
 class Authenticated extends Protector
 {
@@ -25,7 +26,7 @@ class Authenticated extends Protector
 
     protected function getLoginUrl()
     {
-        if (! $url = array_get($this->config, 'login_url')) {
+        if (! $url = Arr::get($this->config, 'login_url')) {
             return null;
         }
 
@@ -35,7 +36,7 @@ class Authenticated extends Protector
 
         $url = parse_url($url);
 
-        if ($query = array_get($url, 'query')) {
+        if ($query = Arr::get($url, 'query')) {
             $query .= '&';
         }
 
@@ -49,6 +50,6 @@ class Authenticated extends Protector
 
     protected function shouldAppendRedirect()
     {
-        return array_get($this->config, 'append_redirect', false);
+        return Arr::get($this->config, 'append_redirect', false);
     }
 }

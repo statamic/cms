@@ -8,6 +8,7 @@ use Illuminate\Cache\Events\KeyWritten;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Cascade;
 use Statamic\Facades\Config;
 use Statamic\Facades\Parse;
@@ -22,7 +23,7 @@ class CacheTagTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_caches_its_contents_the_first_time()
     {
         $template = '{{ cache }}expensive{{ /cache }}';
@@ -34,7 +35,21 @@ class CacheTagTest extends TestCase
         $this->assertMissed();
     }
 
-    /** @test */
+    #[Test]
+    public function it_can_use_a_custom_cache_store()
+    {
+        config()->set('cache.stores.statamic', ['driver' => 'array']);
+
+        $template = '{{ cache store="statamic" }}expensive{{ /cache }}';
+
+        Event::fake();
+
+        $this->assertEquals('expensive', $this->tag($template));
+
+        $this->assertMissed();
+    }
+
+    #[Test]
     public function it_skips_the_cache_if_cache_tags_are_not_enabled()
     {
         Config::set('statamic.system.cache_tags_enabled', false);
@@ -44,7 +59,7 @@ class CacheTagTest extends TestCase
         $this->assertEquals('expensive', $this->tag('{{ cache }}expensive{{ /cache }}'));
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_the_cached_content_for_the_same_user_when_using_scope_user()
     {
         $template = '{{ cache scope="user" }}expensive{{ /cache }}';
@@ -66,7 +81,7 @@ class CacheTagTest extends TestCase
         $this->assertHit();
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_use_the_cached_content_for_a_different_user_when_using_scope_user()
     {
         $template = '{{ cache scope="user" }}expensive{{ /cache }}';
@@ -88,7 +103,7 @@ class CacheTagTest extends TestCase
         $this->assertMissed();
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_the_cached_content_for_the_same_page_when_using_scope_page()
     {
         $template = '{{ cache scope="page" }}expensive{{ /cache }}';
@@ -113,7 +128,7 @@ class CacheTagTest extends TestCase
         $this->assertHit();
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_use_the_cached_content_for_a_different_page_when_using_scope_page()
     {
         $template = '{{ cache scope="page" }}expensive{{ /cache }}';
@@ -138,7 +153,7 @@ class CacheTagTest extends TestCase
         $this->assertMissed();
     }
 
-    /** @test */
+    #[Test]
     public function it_restores_section_contents_after()
     {
         $mock = \Mockery::mock(URL::getFacadeRoot())->makePartial();
@@ -179,7 +194,7 @@ EXP;
         $this->assertHit('Cached content.');
     }
 
-    /** @test */
+    #[Test]
     public function it_restores_stack_contents_after()
     {
         $mock = \Mockery::mock(URL::getFacadeRoot())->makePartial();
@@ -222,17 +237,14 @@ EXP;
         $this->assertHit('Cached content.');
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_the_cached_content_for_the_same_site_when_using_scope_site()
     {
         $template = '{{ cache scope="site" }}expensive{{ /cache }}';
 
-        Site::setConfig([
-            'default' => 'default',
-            'sites' => [
-                'default' => [],
-                'other' => [],
-            ],
+        $this->setSites([
+            'default' => [],
+            'other' => [],
         ]);
 
         Site::setCurrent('default');
@@ -252,17 +264,14 @@ EXP;
         $this->assertHit();
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_use_the_cached_content_for_a_different_site_when_using_scope_site()
     {
         $template = '{{ cache scope="site" }}expensive{{ /cache }}';
 
-        Site::setConfig([
-            'default' => 'default',
-            'sites' => [
-                'default' => [],
-                'other' => [],
-            ],
+        $this->setSites([
+            'default' => [],
+            'other' => [],
         ]);
 
         Site::setCurrent('default');
@@ -282,7 +291,7 @@ EXP;
         $this->assertMissed();
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_the_cached_content_for_a_different_site_when_using_scope_global()
     {
         $template = '{{ cache scope="global" }}expensive{{ /cache }}';

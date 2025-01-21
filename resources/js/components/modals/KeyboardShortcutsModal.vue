@@ -1,6 +1,7 @@
 <template>
     <modal v-if="open" name="keyboard-shortcuts" width="380" height="auto" :adaptive="true" @closed="open = false" click-to-close>
-        <h1 class="p-4 bg-gray-200 border-b text-center">
+        <div class="-max-h-screen-px">
+        <h1 class="p-4 bg-gray-200 dark:bg-dark-700 border-b dark:border-dark-900 text-center">
             {{ __('Keyboard Shortcuts') }}
         </h1>
         <div class="p-6 relative">
@@ -46,6 +47,7 @@
                 </span>
                 <span class="shortcut-value">{{ __('Close Modal') }}</span>
             </div>
+        </div>
         </div>
     </modal>
 </template>

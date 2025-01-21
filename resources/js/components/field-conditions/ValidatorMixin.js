@@ -25,7 +25,7 @@ export default {
             }
 
             // Use validation to determine whether field should be shown.
-            let validator = new Validator(field, this.values, this.$store, this.storeName);
+            let validator = new Validator(field, {...this.values, ...this.extraValues}, dottedFieldPath, this.$store, this.storeName);
             let passes = validator.passesConditions();
 
             // If the field is configured to always save, never omit value.

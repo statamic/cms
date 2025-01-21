@@ -7,6 +7,7 @@ use Statamic\Facades\Path;
 use Statamic\Facades\Site;
 use Statamic\Facades\YAML;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Symfony\Component\Finder\SplFileInfo;
 
 class GlobalVariablesStore extends BasicStore
@@ -22,9 +23,9 @@ class GlobalVariablesStore extends BasicStore
             return false;
         }
 
-        $filename = str_after(Path::tidy($file->getPathName()), $this->directory);
+        $filename = Str::after(Path::tidy($file->getPathName()), $this->directory);
 
-        if (! Site::hasMultiple()) {
+        if (! Site::multiEnabled()) {
             return substr_count($filename, '/') === 0;
         }
 
@@ -33,12 +34,12 @@ class GlobalVariablesStore extends BasicStore
 
     public function makeItemFromFile($path, $contents)
     {
-        $relative = str_after($path, $this->directory);
-        $handle = str_before($relative, '.yaml');
+        $relative = Str::after($path, $this->directory);
+        $handle = Str::before($relative, '.yaml');
 
         $data = YAML::file($path)->parse($contents);
 
-        if (! Site::hasMultiple()) {
+        if (! Site::multiEnabled()) {
             $data = $data['data'] ?? [];
         }
 
@@ -69,7 +70,7 @@ class GlobalVariablesStore extends BasicStore
 
     protected function writeItemToDisk($item)
     {
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             $item->writeFile();
         } else {
             $item->globalSet()->writeFile();
@@ -78,10 +79,17 @@ class GlobalVariablesStore extends BasicStore
 
     protected function deleteItemFromDisk($item)
     {
-        if (Site::hasMultiple()) {
+        if (Site::multiEnabled()) {
             $item->deleteFile();
         } else {
             $item->globalSet()->removeLocalization($item)->writeFile();
         }
+    }
+
+    protected function storeIndexes()
+    {
+        return [
+            'handle',
+        ];
     }
 }

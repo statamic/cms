@@ -3,6 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Facades\Statamic\Fieldtypes\RowId;
+use Statamic\Facades\Blink;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
@@ -15,8 +16,10 @@ use Statamic\Support\Str;
 
 class Replicator extends Fieldtype
 {
+    use AddsEntryValidationReplacements;
+
     protected $categories = ['structured'];
-    protected $defaultValue = [];
+    protected $keywords = ['builder', 'page builder', 'content'];
     protected $rules = ['array'];
 
     protected function configFieldItems(): array
@@ -53,6 +56,12 @@ class Replicator extends Fieldtype
                         'instructions' => __('statamic::fieldtypes.replicator.config.fullscreen'),
                         'type' => 'toggle',
                         'default' => true,
+                    ],
+                    'button_label' => [
+                        'display' => __('Add Set Label'),
+                        'instructions' => __('statamic::fieldtypes.replicator.config.button_label'),
+                        'type' => 'text',
+                        'default' => '',
                     ],
                 ],
             ],
@@ -113,12 +122,17 @@ class Replicator extends Fieldtype
 
     public function fields($set, $index = -1)
     {
-        return new Fields(
-            Arr::get($this->flattenedSetsConfig(), "$set.fields"),
-            $this->field()->parent(),
-            $this->field(),
-            $index
-        );
+        $config = Arr::get($this->flattenedSetsConfig(), "$set.fields");
+        $hash = md5($this->field->fieldPathPrefix().$index.json_encode($config));
+
+        return Blink::once($hash, function () use ($config, $index) {
+            return new Fields(
+                $config,
+                $this->field()->parent(),
+                $this->field(),
+                $index
+            );
+        });
     }
 
     public function extraRules(): array
@@ -138,7 +152,10 @@ class Replicator extends Fieldtype
             ->validator()
             ->withContext([
                 'prefix' => $this->field->validationContext('prefix').$this->setRuleFieldPrefix($index).'.',
-            ])
+            ]);
+
+        $rules = $this
+            ->addEntryValidationReplacements($this->field, $rules)
             ->rules();
 
         return collect($rules)->mapWithKeys(function ($rules, $handle) use ($index) {
@@ -182,7 +199,7 @@ class Replicator extends Fieldtype
     protected function performAugmentation($values, $shallow)
     {
         return collect($values)->reject(function ($set, $key) {
-            return array_get($set, 'enabled', true) === false;
+            return Arr::get($set, 'enabled', true) === false;
         })->map(function ($set, $index) use ($shallow) {
             if (! Arr::get($this->flattenedSetsConfig(), "{$set['type']}.fields")) {
                 return $set;
@@ -202,15 +219,21 @@ class Replicator extends Fieldtype
             return [$set['_id'] => $this->fields($set['type'], $index)->addValues($set)->meta()->put('_', '_')];
         })->toArray();
 
-        $defaults = collect($this->flattenedSetsConfig())->map(function ($set, $handle) {
-            return $this->fields($handle)->all()->map(function ($field) {
-                return $field->fieldtype()->preProcess($field->defaultValue());
-            })->all();
-        })->all();
+        $blink = md5(json_encode($this->flattenedSetsConfig()));
 
-        $new = collect($this->flattenedSetsConfig())->map(function ($set, $handle) use ($defaults) {
-            return $this->fields($handle)->addValues($defaults[$handle])->meta()->put('_', '_');
-        })->toArray();
+        $defaults = Blink::once($blink.'-defaults', function () {
+            return collect($this->flattenedSetsConfig())->map(function ($set, $handle) {
+                return $this->fields($handle)->all()->map(function ($field) {
+                    return $field->fieldtype()->preProcess($field->defaultValue());
+                })->all();
+            })->all();
+        });
+
+        $new = Blink::once($blink.'-new', function () use ($defaults) {
+            return collect($this->flattenedSetsConfig())->map(function ($set, $handle) use ($defaults) {
+                return $this->fields($handle)->addValues($defaults[$handle])->meta()->put('_', '_');
+            })->toArray();
+        });
 
         $previews = collect($existing)->map(function ($fields) {
             return collect($fields)->map(function () {
@@ -229,21 +252,25 @@ class Replicator extends Fieldtype
 
     public function flattenedSetsConfig()
     {
-        $sets = collect($this->config('sets'));
+        $blink = md5($this->field?->handle().json_encode($this->field?->config()));
 
-        // If the first set doesn't have a nested "set" key, it would be the legacy format.
-        // We'll put it in a "main" group so it's compatible with the new format.
-        // This also happens in the "sets" fieldtype.
-        if (! Arr::has($sets->first(), 'sets')) {
-            $sets = collect([
-                'main' => [
-                    'sets' => $sets->all(),
-                ],
-            ]);
-        }
+        return Blink::once($blink, function () {
+            $sets = collect($this->config('sets'));
 
-        return $sets->flatMap(function ($section) {
-            return $section['sets'];
+            // If the first set doesn't have a nested "set" key, it would be the legacy format.
+            // We'll put it in a "main" group so it's compatible with the new format.
+            // This also happens in the "sets" fieldtype.
+            if (! Arr::has($sets->first(), 'sets')) {
+                $sets = collect([
+                    'main' => [
+                        'sets' => $sets->all(),
+                    ],
+                ]);
+            }
+
+            return $sets->flatMap(function ($section) {
+                return $section['sets'];
+            });
         });
     }
 

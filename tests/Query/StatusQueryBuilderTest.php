@@ -2,19 +2,21 @@
 
 namespace Tests\Query;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Query\StatusQueryBuilder;
 use Tests\TestCase;
 
 class StatusQueryBuilderTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_implements_query_builder()
     {
         $this->assertInstanceOf(Builder::class, new StatusQueryBuilder($this->mock(Builder::class)));
     }
 
-    /** @test */
+    #[Test]
     public function it_proxies_methods_onto_the_builder()
     {
         $builder = $this->mock(Builder::class);
@@ -36,11 +38,11 @@ class StatusQueryBuilderTest extends TestCase
         $this->assertEquals($expected, $results);
     }
 
-    /** @test */
+    #[Test]
     public function it_queries_status_by_default()
     {
         $builder = $this->mock(Builder::class);
-        $builder->shouldReceive('where')->with('status', 'published')->once()->andReturnSelf();
+        $builder->shouldReceive('whereStatus')->with('published')->once()->andReturnSelf();
         $builder->shouldReceive('get')->once()->andReturn('results');
 
         $results = (new StatusQueryBuilder($builder))->get();
@@ -48,11 +50,11 @@ class StatusQueryBuilderTest extends TestCase
         $this->assertEquals('results', $results);
     }
 
-    /** @test */
+    #[Test]
     public function the_fallback_query_status_value_can_be_set_in_the_constructor()
     {
         $builder = $this->mock(Builder::class);
-        $builder->shouldReceive('where')->with('status', 'potato')->once()->andReturnSelf();
+        $builder->shouldReceive('whereStatus')->with('potato')->once()->andReturnSelf();
         $builder->shouldReceive('get')->once()->andReturn('results');
 
         $results = (new StatusQueryBuilder($builder, 'potato'))->get();
@@ -60,11 +62,8 @@ class StatusQueryBuilderTest extends TestCase
         $this->assertEquals('results', $results);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider statusQueryMethodProvider
-     */
+    #[Test]
+    #[DataProvider('statusQueryMethodProvider')]
     public function it_doesnt_perform_fallback_status_query_when_status_is_explicitly_queried($method)
     {
         $builder = $this->mock(Builder::class);
@@ -78,11 +77,22 @@ class StatusQueryBuilderTest extends TestCase
         $this->assertEquals('results', $query->get());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider statusQueryMethodProvider
-     */
+    #[Test]
+    public function it_doesnt_perform_fallback_status_query_when_wherestatus_is_explicitly_queried()
+    {
+        $builder = $this->mock(Builder::class);
+        $builder->shouldReceive('whereStatus')->with('foo')->once()->andReturnSelf();
+        $builder->shouldReceive('get')->once()->andReturn('results');
+
+        $query = (new StatusQueryBuilder($builder));
+
+        $query->whereStatus('foo');
+
+        $this->assertEquals('results', $query->get());
+    }
+
+    #[Test]
+    #[DataProvider('statusQueryMethodProvider')]
     public function it_doesnt_perform_fallback_status_query_when_published_is_explicitly_queried($method)
     {
         $builder = $this->mock(Builder::class);

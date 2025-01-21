@@ -1,10 +1,12 @@
 <?php
 
-namespace Statamic\Testing\Extend;
+namespace Tests\Extend;
 
 use Facades\Statamic\Licensing\LicenseManager;
 use Foo\Bar\TestAddonServiceProvider;
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Extend\Addon;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
@@ -20,13 +22,13 @@ class AddonTest extends TestCase
         $this->addonFixtureDir = Path::tidy(realpath(__DIR__.'/../Fixtures/Addon').'/');
     }
 
-    /** @test */
+    #[Test]
     public function it_creates_an_instance_with_a_name()
     {
         $this->assertInstanceOf(Addon::class, Addon::make('TestAddon'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_id()
     {
         $this->assertEquals(
@@ -35,7 +37,7 @@ class AddonTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_handle()
     {
         $this->assertEquals(
@@ -44,7 +46,7 @@ class AddonTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_slug()
     {
         $this->assertEquals(
@@ -53,7 +55,7 @@ class AddonTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_vendor_name()
     {
         $this->assertEquals(
@@ -62,7 +64,7 @@ class AddonTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_package_name()
     {
         $this->assertEquals(
@@ -71,7 +73,7 @@ class AddonTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_editions()
     {
         $addon = Addon::make('foo/bar');
@@ -90,7 +92,7 @@ class AddonTest extends TestCase
         $this->assertEquals('pro', $addon->edition());
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_exception_for_invalid_edition()
     {
         $this->expectExceptionMessage('Invalid edition [rad] for addon foo/bar');
@@ -100,7 +102,7 @@ class AddonTest extends TestCase
         $this->makeFromPackage(['id' => 'foo/bar', 'editions' => []])->edition();
     }
 
-    /** @test */
+    #[Test]
     public function it_creates_an_instance_from_a_package()
     {
         $addon = $this->makeFromPackage([]);
@@ -119,7 +121,7 @@ class AddonTest extends TestCase
         $this->assertEquals(['foo', 'bar'], $addon->editions()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_if_a_file_exists()
     {
         $addon = $this->makeFromPackage();
@@ -131,7 +133,7 @@ class AddonTest extends TestCase
         $this->assertFalse($addon->hasFile('notfound.txt'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_file_contents()
     {
         $addon = $this->makeFromPackage();
@@ -141,7 +143,7 @@ class AddonTest extends TestCase
         $this->assertEquals('the file contents', $addon->getFile('test.txt'));
     }
 
-    /** @test */
+    #[Test]
     public function it_writes_file_contents()
     {
         $addon = $this->makeFromPackage();
@@ -151,7 +153,7 @@ class AddonTest extends TestCase
         $addon->putFile('test.txt', 'the file contents');
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_allow_getting_files_if_no_provider_is_set()
     {
         File::spy();
@@ -169,7 +171,7 @@ class AddonTest extends TestCase
         $this->fail('Exception was not thrown.');
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_allow_checking_for_files_if_no_provider_is_set()
     {
         File::spy();
@@ -187,7 +189,7 @@ class AddonTest extends TestCase
         $this->fail('Exception was not thrown.');
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_allow_writing_files_if_no_provider_is_set()
     {
         File::spy();
@@ -205,7 +207,7 @@ class AddonTest extends TestCase
         $this->fail('Exception was not thrown.');
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_name_from_id_if_it_wasnt_specified()
     {
         $addon = $this->makeFromPackage([
@@ -216,7 +218,7 @@ class AddonTest extends TestCase
         $this->assertEquals('BarBaz', $addon->name());
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_if_commercial()
     {
         $this->assertTrue($this->makeFromPackage(['isCommercial' => true])->isCommercial());
@@ -231,7 +233,7 @@ class AddonTest extends TestCase
         $this->assertEquals('src', $addon->autoload());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_license()
     {
         LicenseManager::shouldReceive('addons')->once()->andReturn(collect([
@@ -241,11 +243,8 @@ class AddonTest extends TestCase
         $this->assertEquals('the license', Addon::make('foo/bar')->license());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider isLatestVersionProvider
-     **/
+    #[Test]
+    #[DataProvider('isLatestVersionProvider')]
     public function it_checks_if_its_the_latest_version($version, $latest, $isLatest)
     {
         $this->assertEquals($isLatest, $this->makeFromPackage([

@@ -28,7 +28,7 @@ class Glide extends Tags
      * @param  array  $args
      * @return string
      */
-    public function __call($method, $args)
+    public function wildcard($method)
     {
         $tag = explode(':', $this->tag, 2)[1];
 
@@ -119,7 +119,7 @@ class Glide extends Tags
      *
      * Generates the image and makes variables available within the pair.
      *
-     * @return string
+     * @return string|array
      */
     public function generate($items = null)
     {
@@ -131,7 +131,7 @@ class Glide extends Tags
 
         $items = is_iterable($items) ? collect($items) : collect([$items]);
 
-        return $items->map(function ($item) {
+        $items = $items->map(function ($item) {
             try {
                 $data = ['url' => $this->generateGlideUrl($item)];
 
@@ -150,6 +150,14 @@ class Glide extends Tags
                 \Log::error($e->getMessage());
             }
         })->filter()->all();
+
+        if ($alias = $this->params->get('as')) {
+            return [
+                $alias => $items,
+            ];
+        }
+
+        return $items;
     }
 
     /**
@@ -304,7 +312,7 @@ class Glide extends Tags
     {
         $params = collect();
 
-        foreach ($this->params as $param => $value) {
+        foreach (collect($this->params)->except('as') as $param => $value) {
             if (! in_array($param, ['src', 'id', 'path', 'tag', 'alt', 'absolute'])) {
                 $params->put($param, $value);
             }

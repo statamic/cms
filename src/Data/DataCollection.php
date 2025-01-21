@@ -7,6 +7,8 @@ use Closure;
 use Illuminate\Support\Collection as IlluminateCollection;
 use Statamic\Exceptions\MethodNotFoundException;
 use Statamic\Facades\Compare;
+use Statamic\Search\PlainResult;
+use Statamic\Search\Result;
 use Statamic\Support\Str;
 
 /**
@@ -41,21 +43,28 @@ class DataCollection extends IlluminateCollection
         }
 
         $sorts = explode('|', $sort);
+        $preparedSorts = [];
+
+        foreach ($sorts as $sort) {
+            $bits = explode(':', $sort);
+            $sortBy = $bits[0];
+            $sortDir = $bits[1] ?? null;
+
+            $preparedSorts[$sortBy] = $sortDir === 'desc';
+        }
 
         $arr = $this->all();
 
-        uasort($arr, function ($a, $b) use ($sorts) {
-            foreach ($sorts as $sort) {
-                $bits = explode(':', $sort);
-                $sort_by = $bits[0];
-                $sort_dir = array_get($bits, 1);
+        $comparator = Compare::getFacadeRoot();
 
-                [$one, $two] = $this->getSortableValues($sort_by, $a, $b);
+        uasort($arr, function ($a, $b) use ($comparator, $preparedSorts) {
+            foreach ($preparedSorts as $sortBy => $sortDir) {
+                [$one, $two] = $this->getSortableValues($sortBy, $a, $b);
 
-                $result = Compare::values($one, $two);
+                $result = $comparator->values($one, $two);
 
                 if ($result !== 0) {
-                    return ($sort_dir === 'desc') ? $result * -1 : $result;
+                    return ($sortDir === true) ? $result * -1 : $result;
                 }
             }
 
@@ -88,6 +97,10 @@ class DataCollection extends IlluminateCollection
         }
 
         $method = Str::camel($sort);
+
+        if ($item instanceof Result && ! $item instanceof PlainResult) {
+            $item = $item->getSearchable() ?? $item;
+        }
 
         $value = (method_exists($item, $method))
             ? call_user_func([$item, $method])

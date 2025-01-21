@@ -9,11 +9,11 @@
             <div class="flex items-center">
                 <h1 class="flex-1" v-text="__(title)" />
 
-                <dropdown-list class="mr-2" v-if="!!this.$scopedSlots.twirldown">
-                    <slot name="twirldown" />
+                <dropdown-list class="rtl:ml-2 ltr:mr-2" v-if="!!this.$scopedSlots.twirldown">
+                    <slot name="twirldown" :actionCompleted="actionCompleted" />
                 </dropdown-list>
 
-                <div class="btn-group mr-4" v-if="canUseStructureTree && !treeIsDirty">
+                <div class="btn-group rtl:ml-4 ltr:mr-4" v-if="canUseStructureTree && !treeIsDirty">
                     <button class="btn flex items-center px-4" @click="view = 'tree'" :class="{'active': view === 'tree'}" v-tooltip="__('Tree')">
                         <svg-icon name="light/structures" class="h-4 w-4"/>
                     </button>
@@ -25,7 +25,7 @@
                 <template v-if="view === 'tree'">
 
                     <a
-                        class="text-2xs text-blue mr-4 underline"
+                        class="text-2xs text-blue rtl:ml-4 ltr:mr-4 underline"
                         v-if="treeIsDirty"
                         v-text="__('Discard changes')"
                         @click="cancelTreeProgress"
@@ -33,14 +33,14 @@
 
                     <site-selector
                         v-if="sites.length > 1"
-                        class="mr-4"
+                        class="rtl:ml-4 ltr:mr-4"
                         :sites="sites"
                         :value="site"
                         @input="site = $event.handle"
                     />
 
                     <button
-                        class="btn mr-4"
+                        class="btn rtl:ml-4 ltr:mr-4"
                         :class="{ 'disabled': !treeIsDirty, 'btn-danger': deletedEntries.length }"
                         :disabled="!treeIsDirty"
                         @click="saveTree"
@@ -52,23 +52,23 @@
                 <template v-if="view === 'list' && reorderable">
                     <site-selector
                         v-if="sites.length > 1 && reordering && site"
-                        class="mr-4"
+                        class="rtl:ml-4 ltr:mr-4"
                         :sites="sites"
                         :value="site"
                         @input="site = $event.handle"
                     />
 
-                    <button class="btn mr-4"
+                    <button class="btn rtl:ml-4 ltr:mr-4"
                         v-if="!reordering"
                         @click="reordering = true"
                         v-text="__('Reorder')" />
 
                     <template v-if="reordering">
-                        <button class="btn ml-2"
+                        <button class="btn rtl:mr-2 ltr:ml-2"
                             @click="reordering = false"
                             v-text="__('Cancel')" />
 
-                        <button class="btn-primary ml-2"
+                        <button class="btn-primary rtl:mr-2 ltr:ml-2"
                             @click="$refs.list.saveOrder"
                             v-text="__('Save Order')" />
                     </template>
@@ -104,6 +104,7 @@
             v-if="canUseStructureTree && view === 'tree'"
             ref="tree"
             :collections="[handle]"
+            :blueprints="blueprints"
             :create-url="createUrl"
             :pages-url="structurePagesUrl"
             :submit-url="structureSubmitUrl"
@@ -167,8 +168,11 @@ import PageTree from '../structures/PageTree.vue';
 import DeleteEntryConfirmation from './DeleteEntryConfirmation.vue';
 import DeleteLocalizationConfirmation from './DeleteLocalizationConfirmation.vue';
 import SiteSelector from '../SiteSelector.vue';
+import HasActions from '../publish/HasActions';
 
 export default {
+
+    mixins: [HasActions],
 
     components: {
         PageTree,
@@ -194,6 +198,8 @@ export default {
         reorderUrl: { type: String, required: true },
         initialSite: { type: String, required: true },
         sites: { type: Array },
+        totalSitesCount: { type: Number },
+        canChangeLocalizationDeleteBehavior: { type: Boolean },
         structurePagesUrl: { type: String },
         structureSubmitUrl: { type: String },
         structureMaxDepth: { type: Number, default: Infinity },
@@ -275,9 +281,17 @@ export default {
         },
 
         saveTree() {
-            if (this.sites.length === 1 || this.deletedEntries.length === 0) {
+            if (this.deletedEntries.length === 0) {
                 this.performTreeSaving();
                 return;
+            }
+
+            // When the user doesn't have permission to access the sites the entry is localized in,
+            // we should use the "copy" behavior to detach the entry from the site.
+            if (! this.canChangeLocalizationDeleteBehavior) {
+                this.deleteLocalizationBehavior = 'copy';
+                this.$nextTick(() => this.performTreeSaving());
+                return
             }
 
             this.showLocalizationDeleteBehaviorConfirmation = true;
@@ -347,6 +361,10 @@ export default {
         editPage(page, vm, store, $event) {
             const url = page.edit_url;
             $event.metaKey ? window.open(url) : window.location = url;
+        },
+
+        afterActionSuccessfullyCompleted(response) {
+            if (!response.redirect) window.location.reload();
         }
 
     }

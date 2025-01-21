@@ -2,15 +2,15 @@
 
 namespace Tests\Modifiers;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
-/**
- * @group array
- */
+#[Group('array')]
 class UniqueTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_returns_the_unique_items_in_an_array(): void
     {
         $checklist = [

@@ -6,6 +6,9 @@ use Closure;
 use InvalidArgumentException;
 use UnexpectedValueException;
 
+/**
+ * @mixin \Statamic\Markdown\Parser
+ */
 class Manager
 {
     protected $parsers = [];

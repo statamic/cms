@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Facades\Entry;
 use Statamic\Http\Controllers\CP\PreviewController;
+use Statamic\Support\Arr;
 
 class EntryPreviewController extends PreviewController
 {
@@ -18,7 +19,7 @@ class EntryPreviewController extends PreviewController
             ->addValues($preview = $request->preview)
             ->process();
 
-        $values = array_except($fields->values()->all(), ['slug']);
+        $values = Arr::except($fields->values()->all(), ['slug']);
 
         $entry = Entry::make()
             ->slug($preview['slug'] ?? 'slug')

@@ -4,23 +4,24 @@
         :config="config"
         :initial-value="value"
         :initial-meta="meta"
+        @loaded="metaLoaded"
     >
     <div slot-scope="{ meta, value, loading: loadingMeta }" :class="classes">
         <div class="field-inner">
             <label v-if="showLabel" class="publish-field-label" :class="{'font-bold': config.bold}" :for="fieldId">
                 <span
                     v-if="showLabelText"
-                    class="mr-1"
+                    class="rtl:ml-1 ltr:mr-1"
                     :class="{ 'text-gray-600': syncable && isSynced }"
                     v-text="__(labelText)"
                     v-tooltip="{content: config.handle, delay: 500, autoHide: false}"
                 />
-                <i class="required mr-1" v-if="config.required">*</i>
-                <avatar v-if="isLocked" :user="lockingUser" class="w-4 rounded-full -mt-px ml-2 mr-2" v-tooltip="lockingUser.name" />
-                <span v-if="isReadOnly && !isTab && !isSection" class="text-gray-500 font-normal text-2xs mr-1">
+                <i class="required rtl:ml-1 ltr:mr-1" v-if="showLabelText && config.required">*</i>
+                <avatar v-if="isLocked" :user="lockingUser" class="w-6 h-6 rounded-full -mt-px rtl:mr-2 ltr:ml-2 rtl:ml-2 ltr:mr-2" v-tooltip="lockingUser.name" />
+                <span v-if="isReadOnly && !isTab && !isSection" class="text-gray-500 dark:text-dark-200 font-normal text-2xs rtl:ml-1 ltr:mr-1 mt-0.5">
                     {{ isLocked ? __('Locked') : __('Read Only') }}
                 </span>
-                <svg-icon name="translate" class="h-4 mr-1 w-4 text-gray-600" v-if="isLocalizable && !isTab" v-tooltip.top="__('Localizable field')" />
+                <svg-icon name="translate" class="h-4 rtl:ml-1 ltr:mr-1 w-4 text-gray-600" v-if="isLocalizable && !isTab" v-tooltip.top="__('Localizable field')" />
 
                 <button
                     v-if="!isReadOnly && !isTab"
@@ -29,7 +30,7 @@
                     :class="{ flex: syncable && isSynced }"
                     @click="$emit('desynced')"
                 >
-                    <svg-icon name="light/hyperlink" class="h-4 w-4 mr-1.5 mb-1 text-gray-600"
+                    <svg-icon name="light/hyperlink" class="h-4 w-4 rtl:ml-1.5 ltr:mr-1.5 mb-1 text-gray-600"
                         v-tooltip.top="__('messages.field_synced_with_origin')" />
                 </button>
 
@@ -40,7 +41,7 @@
                     :class="{ flex: syncable && !isSynced }"
                     @click="$emit('synced')"
                 >
-                    <svg-icon name="light/hyperlink-broken" class="h-4 w-4 mr-1.5 mb-1 text-gray-600"
+                    <svg-icon name="light/hyperlink-broken" class="h-4 w-4 rtl:ml-1.5 ltr:mr-1.5 mb-1 text-gray-600"
                         v-tooltip.top="__('messages.field_desynced_from_origin')" />
                 </button>
             </label>
@@ -49,6 +50,8 @@
                 class="help-block" :class="{ '-mt-2': showLabel }"
                 v-if="instructions && config.instructions_position !== 'below'"
                 v-html="instructions" />
+
+            <publish-field-actions v-if="shouldShowFieldActions" :actions="fieldActions" />
         </div>
 
         <loading-graphic v-if="loadingMeta" :size="16" :inline="true" />
@@ -57,6 +60,7 @@
             <div class="text-xs text-red-500" v-if="!fieldtypeComponentExists">Component <code v-text="fieldtypeComponent"></code> does not exist.</div>
             <component
                 v-else
+                ref="field"
                 :is="fieldtypeComponent"
                 :config="config"
                 :value="value"
@@ -80,6 +84,7 @@
         <div v-if="hasError">
             <small class="help-block text-red-500 mt-2 mb-0" v-for="(error, i) in errors" :key="i" v-text="error" />
         </div>
+
     </div>
     </publish-field-meta>
 
@@ -112,6 +117,12 @@ export default {
     inject: {
         storeName: { default: null },
         isInsideConfigFields: { default: false },
+    },
+
+    data() {
+        return {
+            hasField: false,
+        }
     },
 
     computed: {
@@ -159,6 +170,8 @@ export default {
                 `${this.config.component || this.config.type}-fieldtype`,,
                 this.isReadOnly ? 'read-only-field' : '',
                 this.isInsideConfigFields ? 'config-field' : `${tailwind_width_class(this.config.width)}`,
+                this.showLabel ? 'has-field-label' : '',
+                this.shouldShowFieldActions ? 'has-field-dropdown' : '',
                 this.config.classes || '',
                 this.config.full_width_setting ? 'full-width-setting' : '',
                 { 'has-error': this.hasError || this.hasNestedError }
@@ -204,19 +217,31 @@ export default {
                  || Vue.$options.filters.titleize(Vue.$options.filters.deslugify(this.config.handle));
          },
 
-         showLabelText() {
+        showLabelText() {
             return !this.config.hide_display;
-         },
+        },
 
-         showLabel() {
+        showLabel() {
             return this.showLabelText // Need to see the text
                 || this.isReadOnly // Need to see the "Read Only" text
                 || this.config.required // Need to see the asterisk
                 || this.isLocked // Need to see the avatar
                 || this.isLocalizable // Need to see the icon
                 || this.syncable // Need to see the icon
-         }
+        },
 
+        shouldShowFieldActions() {
+            return !this.isInsideConfigFields && this.fieldActions.length > 0;
+        },
+
+        fieldActions() {
+            return this.hasField ? this.$refs.field.fieldActions : [];
+        },
+
+    },
+
+    mounted() {
+        if (this.$refs.field) this.hasField = true;
     },
 
     methods: {
@@ -246,6 +271,10 @@ export default {
             });
 
             return marked(text);
+        },
+
+        metaLoaded() {
+            this.$nextTick(() => this.hasField = true);
         }
 
     }

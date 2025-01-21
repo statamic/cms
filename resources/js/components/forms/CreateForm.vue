@@ -1,7 +1,7 @@
 <template>
     <div class="max-w-lg mt-4 mx-auto">
 
-        <div class="rounded p-6 lg:px-20 lg:py-10 shadow bg-white">
+        <div class="rounded p-6 lg:px-20 lg:py-10 shadow bg-white dark:bg-dark-600 dark:shadow-dark">
             <header class="text-center mb-16">
                 <h1 class="mb-6">{{ __('Create Form') }}</h1>
                 <p class="text-gray" v-text="__('messages.form_configure_intro')" />
@@ -15,7 +15,10 @@
             </div>
             <div class="mb-4">
                 <label class="font-bold text-base mb-1" for="name">{{ __('Handle') }}</label>
-                <input type="text" v-model="handle" class="input-text" tabindex="2">
+                <div class="relative">
+                    <loading-graphic inline text="" v-if="slug.busy" class="absolute top-3 right-3"/>
+                    <input type="text" v-model="handle" class="input-text" tabindex="2">
+                </div>
                 <div class="text-2xs text-gray-600 mt-2 flex items-center">
                     {{ __('messages.form_configure_handle_instructions') }}
                 </div>
@@ -43,19 +46,20 @@ export default {
     data() {
         return {
             title: null,
-            handle: null
+            handle: null,
+            slug: this.$slug.async().separatedBy('_'),
         }
     },
 
     watch: {
-        'title': function(val) {
-            this.handle = this.$slugify(val, '_');
+        title(title) {
+            this.slug.create(title).then(slug => this.handle = slug);
         }
     },
 
     computed: {
         canSubmit() {
-            return Boolean(this.title && this.handle);
+            return Boolean(this.title && this.handle && !this.slug.busy);
         },
     },
 

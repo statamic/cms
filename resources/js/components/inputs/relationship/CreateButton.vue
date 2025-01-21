@@ -4,10 +4,10 @@
         <dropdown-list :disabled="creatables.length === 1">
             <template #trigger>
                 <button
-                    class="text-button text-blue hover:text-gray-800 mr-6 flex items-center outline-none"
+                    class="text-button text-blue dark:text-dark-blue-100 hover:text-gray-800 dark:hover:text-dark-100 rtl:ml-6 ltr:mr-6 flex items-center outline-none"
                     @click="create"
                 >
-                    <svg-icon name="light/content-writing" class="mr-1 h-4 w-4 flex items-center"></svg-icon>
+                    <svg-icon name="light/content-writing" class="rtl:ml-1 ltr:mr-1 h-4 w-4 flex items-center"></svg-icon>
                     <span class="hidden @sm:block" v-text="__('Create & Link Item')" />
                     <span class="@sm:hidden" v-text="__('Create')" />
                 </button>
@@ -26,6 +26,7 @@
             :item-url="creatable.url"
             :component="component"
             :component-props="componentProps"
+            :stack-size="stackSize"
             @created="itemCreated"
             @closed="stopCreating"
         />
@@ -47,6 +48,7 @@ export default {
         creatables: Array,
         component: String,
         componentProps: Object,
+        stackSize: String,
     },
 
     data() {

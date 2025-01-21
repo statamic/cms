@@ -5,6 +5,7 @@ namespace Tests\Auth;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\User;
@@ -71,7 +72,7 @@ class HasAvatarTest extends TestCase
         return User::make()->email('john@example.com');
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_avatar_if_theres_a_field_defined_in_the_blueprint_and_one_has_been_uploaded()
     {
         $user = $this->withAvatarField()->withGravatar()->userWithUploadedAvatar();
@@ -86,10 +87,9 @@ class HasAvatarTest extends TestCase
     }
 
     /**
-     * @test
-     *
      * @see https://github.com/statamic/cms/issues/3207
      **/
+    #[Test]
     public function it_gets_the_gravatar_if_theres_a_field_defined_in_the_blueprint_and_an_uploaded_asset_was_deleted()
     {
         $user = $this->withAvatarField()->withGravatar()->user()->set('avatar', 'john.jpg');
@@ -102,7 +102,7 @@ class HasAvatarTest extends TestCase
         $this->assertEquals('https://www.gravatar.com/avatar/d4c74594d841139328695756648b6bd6?s=128', $user->gravatarUrl(128));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_gravatar_if_theres_a_field_defined_but_nothing_has_been_uploaded()
     {
         $user = $this->withAvatarField()->withGravatar()->userWithoutUploadedAvatar();
@@ -115,7 +115,7 @@ class HasAvatarTest extends TestCase
         $this->assertEquals('https://www.gravatar.com/avatar/d4c74594d841139328695756648b6bd6?s=128', $user->gravatarUrl(128));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_gravatar_if_theres_an_avatar_value_but_not_a_field_in_the_blueprint()
     {
         $user = $this->withoutAvatarField()->withGravatar()->userWithUploadedAvatar();
@@ -128,7 +128,7 @@ class HasAvatarTest extends TestCase
         $this->assertEquals('https://www.gravatar.com/avatar/d4c74594d841139328695756648b6bd6?s=128', $user->gravatarUrl(128));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_null_if_theres_a_field_defined_but_nothing_has_been_uploaded_and_gravatar_is_disabled()
     {
         $user = $this->withAvatarField()->withoutGravatar()->userWithoutUploadedAvatar();
@@ -139,7 +139,7 @@ class HasAvatarTest extends TestCase
         $this->assertNull($user->gravatarUrl(128));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_null_if_theres_an_avatar_value_but_not_a_field_in_the_blueprint_and_gravatar_is_disabled()
     {
         $user = $this->withoutAvatarField()->withoutGravatar()->userWithUploadedAvatar();

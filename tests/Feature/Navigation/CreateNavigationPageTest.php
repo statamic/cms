@@ -5,6 +5,7 @@ namespace Tests\Feature\Navigation;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Nav;
@@ -49,7 +50,7 @@ class CreateNavigationPageTest extends TestCase
             });
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_values_for_a_regular_nav_item()
     {
         $this->withoutExceptionHandling();
@@ -82,7 +83,7 @@ class CreateNavigationPageTest extends TestCase
             ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_the_values_for_an_entry_nav_item()
     {
         $this->withoutExceptionHandling();

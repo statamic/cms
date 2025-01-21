@@ -22,7 +22,7 @@ class ParentTags extends Tags
      * @param  array  $args
      * @return mixed
      */
-    public function __call($method, $args)
+    public function wildcard($method)
     {
         $var_name = Stringy::removeLeft($this->tag, 'parent:');
 
@@ -55,7 +55,7 @@ class ParentTags extends Tags
     {
         $parent = $this->getParent();
 
-        return array_get($parent, 'url');
+        return Arr::get($parent, 'url');
     }
 
     /**
@@ -85,7 +85,7 @@ class ParentTags extends Tags
         // Find the parent by stripping away URL segments
         foreach ($segment_urls as $segment_url) {
             if ($content = Entry::findByUri($segment_url, Site::current())) {
-                return $content->toAugmentedArray();
+                return $this->aliasedResult($content->toAugmentedArray());
             }
         }
 

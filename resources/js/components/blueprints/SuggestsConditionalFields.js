@@ -14,10 +14,14 @@ export default {
                     return fields.concat(section.fields);
                 }, []));
             }, []);
-        },
+        }
 
-        suggestableConditionFields() {
-            let fields = this.fieldsForConditionSuggestions.reduce((fields, field) => {
+    },
+
+    methods: {
+
+        suggestableConditionFields(section = null) {
+            let fields = this.getSectionFieldsForConditionSuggestions(section).reduce((fields, field) => {
                 return fields.concat(
                     field.type === 'import'
                         ? this.getFieldsFromImportedFieldset(field.fieldset, field.prefix)
@@ -28,15 +32,10 @@ export default {
             return _.unique(fields);
         },
 
-    },
-
-    methods: {
-
         makeConditionsProvider() {
-            const provide = {};
-            Object.defineProperties(provide, {
-                suggestableFields: { get: () => this.suggestableConditionFields },
-            });
+            const provide = {
+                suggestableFields: (vm) => this.suggestableConditionFields(vm),
+            };
             return provide;
         },
 
@@ -49,7 +48,11 @@ export default {
                             : [field]
                     );
                 }, [])
-                .map(handle => prefix ? `${prefix}${handle}` : handle);
+                .map(field => prefix ? { ...field, handle: prefix + field.handle } : field);
+        },
+
+        getSectionFieldsForConditionSuggestions(vm = null) {
+            return this.fieldsForConditionSuggestions;
         }
 
     }

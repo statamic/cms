@@ -3,24 +3,33 @@
     <div>
         <breadcrumb v-if="breadcrumbs" :url="breadcrumbs[1].url" :title="breadcrumbs[1].text" />
 
-        <div class="flex items-center mb-6">
-            <h1 class="flex-1">
-                <div class="flex items-center">
-                    <span v-if="! isCreating" class="little-dot mr-2" :class="activeLocalization.status" v-tooltip="__(activeLocalization.status)" />
-                    <span v-html="$options.filters.striptags(__(title))" />
+        <div class="flex items-baseline mb-6">
+            <h1 class="flex-1 self-start rtl:ml-4 ltr:mr-4">
+                <div class="flex items-baseline">
+                    <span v-if="! isCreating" class="little-dot rtl:ml-2 ltr:mr-2 -top-1" :class="activeLocalization.status" v-tooltip="__(activeLocalization.status)" />
+                    <span class="break-overflowing-words" v-html="$options.filters.striptags(__(title))" />
                 </div>
             </h1>
 
-            <dropdown-list class="mr-4" v-if="canEditBlueprint">
-                <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
+            <dropdown-list class="rtl:ml-4 ltr:mr-4" v-if="canEditBlueprint || hasItemActions">
+                <dropdown-item :text="__('Edit Blueprint')" v-if="canEditBlueprint" :redirect="actions.editBlueprint" />
+                <li class="divider" />
+                <data-list-inline-actions
+                    v-if="!isCreating && hasItemActions"
+                    :item="values.id"
+                    :url="itemActionUrl"
+                    :actions="itemActions"
+                    :is-dirty="isDirty"
+                    @started="actionStarted"
+                    @completed="actionCompleted"
+                />
             </dropdown-list>
 
-            <div class="pt-px text-2xs text-gray-600 flex mr-4" v-if="readOnly">
-                <svg-icon name="light/lock" class="w-4 mr-1 -mt-1" /> {{ __('Read Only') }}
+            <div class="pt-px text-2xs text-gray-600 flex rtl:ml-4 ltr:mr-4" v-if="readOnly">
+                <svg-icon name="light/lock" class="w-4 rtl:ml-1 ltr:mr-1 -mt-1" /> {{ __('Read Only') }}
             </div>
 
             <div class="hidden md:flex items-center">
-
                 <save-button-options
                     v-if="!readOnly"
                     :show-options="!revisionsEnabled && !isInline"
@@ -35,13 +44,19 @@
                     />
                 </save-button-options>
 
-                <button
+                <save-button-options
                     v-if="revisionsEnabled && !isCreating"
-                    class="ml-4 btn-primary flex items-center"
-                    :disabled="!canPublish"
-                    @click="confirmingPublish = true">
-                    <span>{{ __('Publish') }}…</span>
-                </button>
+                    :show-options="!isInline"
+                    button-class="btn-primary"
+                    :preferences-prefix="preferencesPrefix"
+                >
+                    <button
+                        class="rtl:mr-4 ltr:ml-4 btn-primary flex items-center"
+                        :disabled="!canPublish"
+                        @click="confirmingPublish = true"
+                        v-text="publishButtonText"
+                    />
+                </save-button-options>
             </div>
 
             <slot name="action-buttons-right" />
@@ -53,6 +68,7 @@
             :name="publishContainer"
             :blueprint="fieldset"
             :values="values"
+            :extra-values="extraValues"
             :reference="initialReference"
             :meta="meta"
             :errors="errors"
@@ -102,12 +118,12 @@
 
                                 <div v-if="collectionHasRoutes" :class="{ 'hi': !shouldShowSidebar }">
 
-                                    <div class="p-3 flex items-center space-x-2" v-if="showLivePreviewButton || showVisitUrlButton">
+                                    <div class="p-3 flex items-center space-x-2 rtl:space-x-reverse" v-if="showLivePreviewButton || showVisitUrlButton">
                                         <button
                                             class="flex items-center justify-center btn w-full"
                                             v-if="showLivePreviewButton"
                                             @click="openLivePreview">
-                                            <svg-icon name="light/synchronize" class="h-4 w-4 mr-2 shrink-0" />
+                                            <svg-icon name="light/synchronize" class="h-4 w-4 rtl:ml-2 ltr:mr-2 shrink-0" />
                                             <span>{{ __('Live Preview') }}</span>
                                         </button>
                                         <a
@@ -115,7 +131,7 @@
                                             v-if="showVisitUrlButton"
                                             :href="permalink"
                                             target="_blank">
-                                            <svg-icon name="light/external-link" class="w-4 h-4 mr-2 shrink-0" />
+                                            <svg-icon name="light/external-link" class="w-4 h-4 rtl:ml-2 ltr:mr-2 shrink-0" />
                                             <span>{{ __('Visit URL') }}</span>
                                         </a>
                                     </div>
@@ -124,7 +140,7 @@
                                 <div
                                     v-if="!revisionsEnabled"
                                     class="flex items-center justify-between px-4 py-2"
-                                    :class="{ 'border-t': showLivePreviewButton || showVisitUrlButton }"
+                                    :class="{ 'border-t dark:border-dark-900': showLivePreviewButton || showVisitUrlButton }"
                                 >
                                     <label v-text="__('Published')" class="publish-field-label font-medium" />
                                     <toggle-input :value="published" :read-only="!canManagePublishState" @input="setFieldValue('published', $event)" />
@@ -133,7 +149,7 @@
                                 <div
                                     v-if="revisionsEnabled && !isCreating"
                                     class="p-4"
-                                    :class="{ 'border-t': showLivePreviewButton || showVisitUrlButton }"
+                                    :class="{ 'border-t dark:border-dark-900': showLivePreviewButton || showVisitUrlButton }"
                                 >
                                     <label class="publish-field-label font-medium mb-2" v-text="__('Revisions')"/>
                                     <div class="mb-1 flex items-center" v-if="published">
@@ -156,22 +172,25 @@
                                             class="flex items-center justify-center mt-4 btn-flat px-2 w-full"
                                             v-if="!isCreating && revisionsEnabled"
                                             @click="showRevisionHistory = true">
-                                            <svg-icon name="light/history" class="h-4 w-4 mr-2" />
+                                            <svg-icon name="light/history" class="h-4 w-4 rtl:ml-2 ltr:mr-2" />
                                             <span>{{ __('View History') }}</span>
                                         </button>
                                 </div>
 
-                                <div class="p-4 border-t" v-if="localizations.length > 1">
+                                <div class="p-4 border-t dark:border-dark-900" v-if="localizations.length > 1">
                                     <label class="publish-field-label font-medium mb-2" v-text="__('Sites')" />
                                     <div
                                         v-for="option in localizations"
                                         :key="option.handle"
-                                        class="text-sm flex items-center -mx-4 px-4 py-2 cursor-pointer"
-                                        :class="option.active ? 'bg-blue-100' : 'hover:bg-gray-200'"
+                                        class="text-sm flex items-center -mx-4 px-4 py-2"
+                                        :class="[
+                                            option.active ? 'bg-blue-100 dark:bg-dark-300' : 'hover:bg-gray-200 dark:hover:bg-dark-400',
+                                            !canSave && !option.exists ? 'cursor-not-allowed' : 'cursor-pointer',
+                                        ]"
                                         @click="localizationSelected(option)"
                                     >
                                         <div class="flex-1 flex items-center" :class="{ 'line-through': !option.exists }">
-                                            <span class="little-dot mr-2" :class="{
+                                            <span class="little-dot rtl:ml-2 ltr:mr-2" :class="{
                                                 'bg-green-600': option.published,
                                                 'bg-gray-500': !option.published,
                                                 'bg-red-500': !option.exists
@@ -180,12 +199,12 @@
                                             <loading-graphic
                                                 :size="14"
                                                 text=""
-                                                class="ml-2"
+                                                class="rtl:mr-2 ltr:ml-2"
                                                 v-if="localizing && localizing.handle === option.handle" />
                                         </div>
-                                        <div class="badge-sm bg-orange" v-if="option.origin" v-text="__('Origin')" />
-                                        <div class="badge-sm bg-blue" v-if="option.active" v-text="__('Active')" />
-                                        <div class="badge-sm bg-purple" v-if="option.root && !option.origin && !option.active" v-text="__('Root')" />
+                                        <div class="badge-sm bg-orange dark:bg-orange-dark" v-if="option.origin" v-text="__('Origin')" />
+                                        <div class="badge-sm bg-blue dark:bg-dark-blue-175" v-if="option.active" v-text="__('Active')" />
+                                        <div class="badge-sm bg-purple dark:bg-purple-dark" v-if="option.root && !option.origin && !option.active" v-text="__('Root')" />
                                     </div>
                                 </div>
                             </div>
@@ -196,7 +215,7 @@
                 <template v-slot:buttons>
                    <button
                         v-if="!readOnly"
-                        class="ml-4"
+                        class="rtl:mr-4 ltr:ml-4"
                         :class="{
                             'btn': revisionsEnabled,
                             'btn-primary': isCreating || !revisionsEnabled,
@@ -208,11 +227,11 @@
 
                     <button
                         v-if="revisionsEnabled && !isCreating"
-                        class="ml-4 btn-primary flex items-center"
+                        class="rtl:mr-4 ltr:ml-4 btn-primary flex items-center"
                         :disabled="!canPublish"
                         @click="confirmingPublish = true">
-                        <span v-text="__('Publish')" />
-                        <svg-icon name="micro/chevron-down-xs" class="ml-2 w-2" />
+                        <span v-text="publishButtonText" />
+                        <svg-icon name="micro/chevron-down-xs" class="rtl:mr-2 ltr:ml-2 w-2" />
                     </button>
                 </template>
             </live-preview>
@@ -224,7 +243,7 @@
                 class="btn-lg"
                 :class="{
                     'btn-primary w-full': ! revisionsEnabled,
-                    'btn w-1/2 mr-4': revisionsEnabled,
+                    'btn w-1/2 rtl:ml-4 ltr:mr-4': revisionsEnabled,
                 }"
                 :disabled="!canSave"
                 @click.prevent="save"
@@ -232,11 +251,11 @@
 
             <button
                 v-if="revisionsEnabled"
-                class="ml-2 btn btn-lg justify-center btn-primary flex items-center w-1/2"
+                class="rtl:mr-2 ltr:ml-2 btn btn-lg justify-center btn-primary flex items-center w-1/2"
                 :disabled="!canPublish"
                 @click="confirmingPublish = true">
-                <span v-text="__('Publish')" />
-                <svg-icon name="micro/chevron-down-xs" class="ml-2 w-2" />
+                <span v-text="publishButtonText" />
+                <svg-icon name="micro/chevron-down-xs" class="rtl:mr-2 ltr:ml-2 w-2" />
             </button>
         </div>
 
@@ -246,6 +265,7 @@
                 :index-url="actions.revisions"
                 :restore-url="actions.restore"
                 :reference="initialReference"
+                :can-restore-revisions="!readOnly"
                 @closed="close"
             />
         </stack>
@@ -261,6 +281,7 @@
             @closed="confirmingPublish = false"
             @saving="saving = true"
             @saved="publishActionCompleted"
+            @failed="publishActionFailed"
         />
 
         <confirmation-modal
@@ -294,12 +315,14 @@ import SaveButtonOptions from '../publish/SaveButtonOptions.vue';
 import RevisionHistory from '../revision-history/History.vue';
 import HasPreferences from '../data-list/HasPreferences';
 import HasHiddenFields from '../publish/HasHiddenFields';
+import HasActions from '../publish/HasActions';
 
 export default {
 
     mixins: [
         HasPreferences,
         HasHiddenFields,
+        HasActions,
     ],
 
     components: {
@@ -313,6 +336,7 @@ export default {
         initialReference: String,
         initialFieldset: Object,
         initialValues: Object,
+        initialExtraValues: Object,
         initialMeta: Object,
         initialTitle: String,
         initialLocalizations: Array,
@@ -353,6 +377,7 @@ export default {
             title: this.initialTitle,
             values: _.clone(this.initialValues),
             meta: _.clone(this.initialMeta),
+            extraValues: _.clone(this.initialExtraValues),
             localizations: _.clone(this.initialLocalizations),
             localizedFields: this.initialLocalizedFields,
             hasOrigin: this.initialHasOrigin,
@@ -455,6 +480,14 @@ export default {
             }
         },
 
+        publishButtonText() {
+            if (this.canManagePublishState) {
+                return `${__('Publish')}…`
+            }
+
+            return `${__('Create Revision')}…`
+        },
+
         isUnpublishing() {
             return this.initialPublished && ! this.published && ! this.isCreating;
         },
@@ -483,13 +516,24 @@ export default {
                 }));
         },
 
+        direction() {
+            return this.$config.get('direction', 'ltr');
+        },
+
     },
 
     watch: {
 
         saving(saving) {
             this.$progress.loading(`${this.publishContainer}-entry-publish-form`, saving);
-        }
+        },
+
+        title(title) {
+            if (this.isBase) {
+                const arrow = this.direction === 'ltr' ? '‹' : '›';
+                document.title = `${title} ${arrow} ${this.breadcrumbs[1].text} ${arrow} ${this.breadcrumbs[0].text} ${arrow} ${__('Statamic')}`;
+            }
+        },
 
     },
 
@@ -543,9 +587,6 @@ export default {
                 }
                 this.title = response.data.data.title;
                 this.isWorkingCopy = true;
-                if (this.isBase) {
-                    document.title = this.title + ' ‹ ' + this.breadcrumbs[1].text + ' ‹ ' + this.breadcrumbs[0].text + ' ‹ Statamic';
-                }
                 if (!this.revisionsEnabled) this.permalink = response.data.data.permalink;
                 if (!this.isCreating && !this.isAutosave) this.$toast.success(__('Saved'));
                 this.$refs.container.saved();
@@ -568,7 +609,8 @@ export default {
                         clearTimeout(this.trackDirtyStateTimeout)
                         this.trackDirtyState = false
                         this.values = this.resetValuesFromResponse(response.data.data.values);
-                        this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 350)
+                        this.extraValues = response.data.data.extraValues;
+                        this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500)
                         this.$nextTick(() => this.$emit('saved', response));
                         return;
                     }
@@ -592,7 +634,8 @@ export default {
                         clearTimeout(this.trackDirtyStateTimeout);
                         this.trackDirtyState = false;
                         this.values = this.resetValuesFromResponse(response.data.data.values);
-                        this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 350);
+                        this.extraValues = response.data.data.extraValues;
+                        this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500);
                         this.initialPublished = response.data.data.published;
                         this.activeLocalization.published = response.data.data.published;
                         this.activeLocalization.status = response.data.data.status;
@@ -617,6 +660,7 @@ export default {
                 this.error = message;
                 this.errors = errors;
                 this.$toast.error(message);
+                this.$reveal.invalid();
             } else if (e.response) {
                 this.$toast.error(e.response.data.message);
             } else {
@@ -625,6 +669,11 @@ export default {
         },
 
         localizationSelected(localization) {
+            if (!this.canSave) {
+                if (localization.exists) this.editLocalization(localization);
+                return;
+            }
+
             if (localization.active) return;
 
             if (this.isDirty) {
@@ -675,7 +724,7 @@ export default {
                 this.initialPublished = data.values.published;
                 this.readOnly = data.readOnly;
 
-                this.trackDirtyStateTimeout = setTimeout(() => this.trackDirtyState = true, 300); // after any fieldtypes do a debounced update
+                this.trackDirtyStateTimeout = setTimeout(() => this.trackDirtyState = true, 500); // after any fieldtypes do a debounced update
             })
         },
 
@@ -737,12 +786,39 @@ export default {
             this.$refs.container.saved();
             this.isWorkingCopy = isWorkingCopy;
             this.confirmingPublish = false;
-            this.title = response.data.data.title;
-            this.activeLocalization.title = response.data.data.title;
-            this.activeLocalization.published = response.data.data.published;
-            this.activeLocalization.status = response.data.data.status;
-            this.permalink = response.data.data.permalink
-            this.$nextTick(() => this.$emit('saved', response));
+
+            let nextAction = this.quickSave || this.isAutosave ? 'continue_editing' : this.afterSaveOption;
+
+            // If the user has opted to create another entry, redirect them to create page.
+            if (!this.isInline && nextAction === 'create_another') {
+                window.location = this.createAnotherUrl;
+            }
+
+            // If the user has opted to go to listing (default/null option), redirect them there.
+            else if (!this.isInline && nextAction === null) {
+                window.location = this.listingUrl;
+            }
+
+            // Otherwise, leave them on the edit form and emit an event. We need to wait until after
+            // the hooks are resolved because if this form is being shown in a stack, we only
+            // want to close it once everything's done.
+            else {
+                this.title = response.data.data.title;
+                clearTimeout(this.trackDirtyStateTimeout);
+                this.trackDirtyState = false;
+                this.values = this.resetValuesFromResponse(response.data.data.values);
+                this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500);
+                this.activeLocalization.title = response.data.data.title;
+                this.activeLocalization.published = response.data.data.published;
+                this.activeLocalization.status = response.data.data.status;
+                this.permalink = response.data.data.permalink
+                this.$nextTick(() => this.$emit('saved', response));
+            }
+        },
+
+        publishActionFailed() {
+            this.confirmPublish = false;
+            this.saving = false;
         },
 
         setFieldValue(handle, value) {
@@ -779,7 +855,23 @@ export default {
             }, this.autosaveInterval);
 
             this.$store.commit(`publish/${this.publishContainer}/setAutosaveInterval`, interval);
-        }
+        },
+
+        afterActionSuccessfullyCompleted(response) {
+            if (response.data) {
+                this.title = response.data.title;
+                if (!this.revisionsEnabled) this.permalink = response.data.permalink;
+                clearTimeout(this.trackDirtyStateTimeout);
+                this.trackDirtyState = false;
+                this.values = this.resetValuesFromResponse(response.data.values);
+                this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500);
+                this.initialPublished = response.data.published;
+                this.activeLocalization.published = response.data.published;
+                this.activeLocalization.status = response.data.status;
+                this.itemActions = response.data.itemActions;
+            }
+        },
+
     },
 
     mounted() {

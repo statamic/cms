@@ -4,8 +4,8 @@ namespace Tests\Imaging;
 
 use Statamic\Assets\Asset;
 use Statamic\Assets\AssetContainer;
-use Statamic\Facades\Config;
 use Statamic\Imaging\GlideUrlBuilder;
+use Statamic\Support\Str;
 use Tests\TestCase;
 
 class GlideUrlBuilderTest extends TestCase
@@ -44,7 +44,7 @@ class GlideUrlBuilderTest extends TestCase
     public function testExternal()
     {
         $this->assertEquals(
-            '/img/http/'.base64_encode('http://example.com').'?w=100',
+            '/img/http/'.base64_encode('http://example.com').'/example.com?w=100',
             $this->builder->build('http://example.com', ['w' => '100'])
         );
     }
@@ -55,17 +55,17 @@ class GlideUrlBuilderTest extends TestCase
         $asset->container((new AssetContainer)->handle('main'));
         $asset->path('img/foo.jpg');
 
-        $encoded = base64_encode('main/img/foo.jpg');
+        $encoded = Str::toBase64Url('main/img/foo.jpg');
 
         $this->assertEquals(
-            "/img/asset/$encoded?w=100",
+            "/img/asset/$encoded/foo.jpg?w=100",
             $this->builder->build($asset, ['w' => '100'])
         );
     }
 
     public function testId()
     {
-        $encoded = base64_encode('main/img/foo.jpg');
+        $encoded = Str::toBase64Url('main/img/foo.jpg');
 
         $this->assertEquals(
             "/img/asset/$encoded?w=100",
@@ -73,23 +73,13 @@ class GlideUrlBuilderTest extends TestCase
         );
     }
 
-    public function testFilename()
-    {
-        $this->assertEquals(
-            '/img/foo.jpg/custom.png?w=100',
-            $this->builder->build('/foo.jpg', ['w' => '100'], 'custom.png')
-        );
-    }
-
     public function testConfigAddsFilename()
     {
-        Config::set('statamic.assets.image_manipulation.append_original_filename', true);
-
         $asset = new Asset;
         $asset->container((new AssetContainer)->handle('main'));
         $asset->path('img/foo.jpg');
 
-        $encoded = base64_encode('main/img/foo.jpg');
+        $encoded = Str::toBase64Url('main/img/foo.jpg');
 
         $this->assertEquals(
             "/img/asset/$encoded/foo.jpg?w=100",
@@ -103,7 +93,7 @@ class GlideUrlBuilderTest extends TestCase
         $asset->container((new AssetContainer)->handle('main'));
         $asset->path('img/foo.jpg');
 
-        $encoded = rawurlencode(base64_encode('main/img/foo.jpg'));
+        $encoded = rawurlencode(Str::toBase64Url('main/img/foo.jpg'));
 
         $this->assertEquals(
             "/img/foo.jpg?w=100&mark=asset%3A%3A$encoded",

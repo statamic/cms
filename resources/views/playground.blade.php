@@ -1,6 +1,7 @@
 @php use function Statamic\trans as __; @endphp
 
 @extends('statamic::layout')
+@section('wrapper_class', 'max-w-7xl')
 
 @section('nontent')
 
@@ -26,14 +27,14 @@
         </div>
         <div class="mb-4 flex">
             <input type="text" class="input-text" placeholder="v3 style">
-            <select class="ml-2" name="" id="">
+            <select class="rtl:mr-2 ltr:ml-2" name="" id="">
                 <option value="">Oh hai Mark</option>
             </select>
         </div>
         <div class="mb-4 flex">
             <input type="text" class="input-text" placeholder="v3 style">
-            <button class="btn ml-2">Default Button</button>
-            <button class="btn-primary ml-2">Primary Button</button>
+            <button class="btn rtl:mr-2 ltr:ml-2">Default Button</button>
+            <button class="btn-primary rtl:mr-2 ltr:ml-2">Primary Button</button>
         </div>
         <div class="mb-4">
             <textarea name="" class="input-text" placeholder="v3 style"></textarea>
@@ -69,14 +70,14 @@
     <div class="shadow bg-white p-8 rounded-lg mb-16">
         <h6 class="mb-4">Flavors</h6>
         <div class="mb-8 flex">
-            <button class="mr-4 btn">Default Button</button>
-            <button class="mr-4 btn-primary">Primary Button</button>
-            <button class="mr-4 btn-danger">Danger Button</button>
+            <button class="rtl:ml-4 ltr:mr-4 btn">Default Button</button>
+            <button class="rtl:ml-4 ltr:mr-4 btn-primary">Primary Button</button>
+            <button class="rtl:ml-4 ltr:mr-4 btn-danger">Danger Button</button>
             <button class="btn-flat">Flat Button</button>
         </div>
         <h6 class="mb-4">With Dropdowns</h6>
         <div class="mb-8 flex">
-            <div class="btn-group mr-4">
+            <div class="btn-group rtl:ml-4 ltr:mr-4">
                 <button class="btn">Default Button</button>
                 <dropdown-list>
                     <template v-slot:trigger>
@@ -90,7 +91,7 @@
                     </li>
                 </dropdown-list>
             </div>
-            <div class="btn-group mr-4">
+            <div class="btn-group rtl:ml-4 ltr:mr-4">
                 <button class="btn-primary">Default Button</button>
                 <dropdown-list>
                     <template v-slot:trigger>
@@ -104,7 +105,7 @@
                     </li>
                 </dropdown-list>
             </div>
-            <div class="btn-group mr-4">
+            <div class="btn-group rtl:ml-4 ltr:mr-4">
                 <button class="btn-danger">Default Button</button>
                 <dropdown-list>
                     <template v-slot:trigger>
@@ -118,7 +119,7 @@
                     </li>
                 </dropdown-list>
             </div>
-            <div class="btn-group mr-4">
+            <div class="btn-group rtl:ml-4 ltr:mr-4">
                 <button class="btn-flat">Default Button</button>
                 <dropdown-list>
                     <template v-slot:trigger>
@@ -135,31 +136,31 @@
         </div>
         <h6 class="mb-4">Disabled States</h6>
         <div class="mb-8 flex">
-            <button disabled class="mr-4 btn disabled">Default Button</button>
-            <button disabled class="mr-4 btn-primary disabled">Primary Button</button>
-            <button disabled class="mr-4 btn-danger disabled">Danger Button</button>
+            <button disabled class="rtl:ml-4 ltr:mr-4 btn disabled">Default Button</button>
+            <button disabled class="rtl:ml-4 ltr:mr-4 btn-primary disabled">Primary Button</button>
+            <button disabled class="rtl:ml-4 ltr:mr-4 btn-danger disabled">Danger Button</button>
             <button disabled class="btn-flat disabled">Flat Button</button>
         </div>
 
         <h6 class="mb-4">Large</h6>
         <div class="mb-8 flex">
-            <button class="mr-4 btn btn-lg">Default Button</button>
-            <button class="mr-4 btn-primary btn-lg">Primary Button</button>
-            <button class="mr-4 btn-danger btn-lg">Danger Button</button>
+            <button class="rtl:ml-4 ltr:mr-4 btn btn-lg">Default Button</button>
+            <button class="rtl:ml-4 ltr:mr-4 btn-primary btn-lg">Primary Button</button>
+            <button class="rtl:ml-4 ltr:mr-4 btn-danger btn-lg">Danger Button</button>
             <button class="btn-flat btn-lg">Flat Button</button>
         </div>
 
         <h6 class="mb-4">Small</h6>
         <div class="flex">
-            <button class="mr-4 btn btn-xs">Default Button</button>
-            <button class="mr-4 btn-primary btn-xs">Primary Button</button>
-            <button class="mr-4 btn-danger btn-xs">Danger Button</button>
+            <button class="rtl:ml-4 ltr:mr-4 btn btn-xs">Default Button</button>
+            <button class="rtl:ml-4 ltr:mr-4 btn-primary btn-xs">Primary Button</button>
+            <button class="rtl:ml-4 ltr:mr-4 btn-danger btn-xs">Danger Button</button>
             <button class="btn-flat btn-xs">Flat Button</button>
         </div>
     </div>
 
     <h2 class="mb-2">Colors</h2>
-    <div class="bg-white p-10 shadow rounded-lg overflow-hidden mb-16">
+    <div class="bg-white dark:bg-black p-10 shadow rounded-lg overflow-hidden mb-16">
 
         <h6 class="mb-4">grays</h6>
         {{-- <div class="p-4" style="background: #48606f"></div> --}}
@@ -204,6 +205,32 @@
             <div class="text-white bg-black p-4 flex-1">Black</div>
         </div>
 
+         <h6 class="mb-4">dark mode</h6>
+        <div class="flex flex-row-reverse overflow-x-auto text-sm text-center mb-8">
+            <div class="text-black bg-white p-4 flex-1">White</div>
+            <div class="text-black bg-dark-100 p-4 flex-1">100</div>
+            <div class="text-black bg-dark-150 p-4 flex-1">150</div>
+            <div class="text-black bg-dark-175 p-4 flex-1">175</div>
+            <div class="text-black bg-dark-200 p-4 flex-1">200</div>
+            <div class="text-black bg-dark-250 p-4 flex-1">250</div>
+            <div class="text-black bg-dark-275 p-4 flex-1">275</div>
+            <div class="text-black bg-dark-300 p-4 flex-1">300</div>
+            <div class="text-black bg-dark-350 p-4 flex-1">350</div>
+            <div class="text-black bg-dark-400 p-4 flex-1">400</div>
+            <div class="text-black bg-dark-500 p-4 flex-1">500</div>
+            <div class="text-black bg-dark-550 p-4 flex-1">550</div>
+            <div class="text-black bg-dark-575 p-4 flex-1">575</div>
+            <div class="text-black bg-dark-600 p-4 flex-1">600</div>
+            <div class="text-black bg-dark-650 p-4 flex-1">650</div>
+            <div class="text-black bg-dark-700 p-4 flex-1">700</div>
+            <div class="text-black bg-dark-750 p-4 flex-1">750</div>
+            <div class="text-white bg-dark-800 p-4 flex-1">800</div>
+            <div class="text-white bg-dark-900 p-4 flex-1">900</div>
+            <div class="text-white bg-dark-950 p-4 flex-1">950</div>
+            <div class="text-white bg-dark-975 p-4 flex-1">975</div>
+            <div class="text-white bg-black p-4 flex-1">Black</div>
+        </div>
+
         <h6 class="mb-4">Other Colors (needs simplifying)</h6>
         <div class="flex text-sm text-center">
             <div class="text-black bg-blue p-6 flex-1">Blue</div>
@@ -216,7 +243,7 @@
         </div>
 
         <h6 class="my-4">Reds</h6>
-        <div class="flex text-sm text-center space-x-1">
+        <div class="flex text-sm text-center space-x-1 rtl:space-x-reverse">
             <div class="text-black bg-red-100 border border-red-200 p-6 flex-1">Red Lighter</div>
             <div class="text-black bg-red-400 p-6 flex-1">Red Light</div>
             <div class="text-black bg-red-500 p-6 flex-1">Red</div>
@@ -236,7 +263,7 @@
                 </div>
                 <div class="text-4xl mb-4">89</div>
                 <div class="flex items-center ">
-                    <span class="w-4 h-4 text-green-500 mr-2">@cp_svg('icons/light/performance-increase')</span>
+                    <span class="w-4 h-4 text-green-500 rtl:ml-2 ltr:mr-2">@cp_svg('icons/light/performance-increase')</span>
                     <span class="leading-none text-sm">8.54% Increase</span>
                 </div>
             </div>
@@ -251,7 +278,7 @@
                 </div>
                 <div class="text-4xl mb-4">35</div>
                 <div class="flex items-center ">
-                    <span class="w-4 h-4 text-green-500 mr-2">@cp_svg('icons/light/performance-increase')</span>
+                    <span class="w-4 h-4 text-green-500 rtl:ml-2 ltr:mr-2">@cp_svg('icons/light/performance-increase')</span>
                     <span class="leading-none text-sm">2.15% Increase</span>
                 </div>
             </div>
@@ -266,7 +293,7 @@
                 </div>
                 <div class="text-4xl mb-4 text-gray-400">251</div>
                 <div class="flex items-center ">
-                    <span class="w-4 h-4 text-green-500 mr-2">@cp_svg('icons/light/performance-increase')</span>
+                    <span class="w-4 h-4 text-green-500 rtl:ml-2 ltr:mr-2">@cp_svg('icons/light/performance-increase')</span>
                     <span class="leading-none text-gray-400 text-sm">8.54% Increase</span>
                 </div>
             </div>

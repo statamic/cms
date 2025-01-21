@@ -12,6 +12,11 @@ use Statamic\Statamic;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
+use function Laravel\Prompts\confirm;
+use function Laravel\Prompts\error;
+use function Laravel\Prompts\password;
+use function Laravel\Prompts\text;
+
 class MakeUser extends Command
 {
     use RunsInPlease, ValidatesInput;
@@ -38,6 +43,13 @@ class MakeUser extends Command
     protected $email;
 
     /**
+     * The user's password.
+     *
+     * @var string
+     */
+    protected $password;
+
+    /**
      * The user's data.
      *
      * @var array
@@ -59,7 +71,17 @@ class MakeUser extends Command
     public function handle()
     {
         if (! Statamic::pro() && User::query()->count() > 0) {
-            return $this->error(__('Statamic Pro is required.'));
+            error(__('Statamic Pro is required.'));
+
+            if (confirm(__('Enable Statamic Pro?'))) {
+                $this->call('statamic:pro:enable');
+            } else {
+                return self::SUCCESS;
+            }
+        }
+
+        if ($password = $this->option('password')) {
+            $this->password = $password;
         }
 
         // If email argument exists, non-interactively create user.
@@ -83,7 +105,7 @@ class MakeUser extends Command
      */
     protected function promptEmail()
     {
-        $this->email = $this->ask('Email');
+        $this->email = text(label: 'Email', required: true);
 
         if ($this->emailValidationFails()) {
             return $this->promptEmail();
@@ -103,7 +125,7 @@ class MakeUser extends Command
             return $this->promptSeparateNameFields();
         }
 
-        $this->data['name'] = $this->ask('Name', false);
+        $this->data['name'] = text(label: 'Name');
 
         return $this;
     }
@@ -115,8 +137,8 @@ class MakeUser extends Command
      */
     protected function promptSeparateNameFields()
     {
-        $this->data['first_name'] = $this->ask('First Name', false);
-        $this->data['last_name'] = $this->ask('Last Name', false);
+        $this->data['first_name'] = text(label: 'First Name');
+        $this->data['last_name'] = text(label: 'Last Name');
 
         return $this;
     }
@@ -128,7 +150,11 @@ class MakeUser extends Command
      */
     protected function promptPassword()
     {
-        $this->data['password'] = $this->secret('Password (Your input will be hidden)');
+        if ($this->password) {
+            return $this;
+        }
+
+        $this->password = password(label: 'Password', required: true);
 
         if ($this->passwordValidationFails()) {
             return $this->promptPassword();
@@ -148,7 +174,7 @@ class MakeUser extends Command
             return $this;
         }
 
-        if ($this->confirm('Super user', false)) {
+        if (confirm('Super user?', false)) {
             $this->super = true;
         }
 
@@ -167,7 +193,8 @@ class MakeUser extends Command
 
         $user = User::make()
             ->email($this->email)
-            ->data($this->data);
+            ->data($this->data)
+            ->password($this->password);
 
         if ($this->super || $this->option('super')) {
             $user->makeSuper();
@@ -175,7 +202,7 @@ class MakeUser extends Command
 
         $user->save();
 
-        $this->info('User created successfully.');
+        $this->components->info('User created successfully.');
     }
 
     /**
@@ -196,7 +223,7 @@ class MakeUser extends Command
     protected function passwordValidationFails()
     {
         return $this->validationFails(
-            $this->data['password'],
+            $this->password,
             ['required', Password::default()]
         );
     }
@@ -236,6 +263,7 @@ class MakeUser extends Command
     {
         return array_merge(parent::getOptions(), [
             ['super', '', InputOption::VALUE_NONE, 'Generate a super user with permission to do everything'],
+            ['password', '', InputOption::VALUE_OPTIONAL, 'Generate a user with given password'],
         ]);
     }
 }

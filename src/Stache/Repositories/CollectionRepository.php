@@ -6,7 +6,9 @@ use Illuminate\Support\Collection as IlluminateCollection;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\CollectionRepository as RepositoryContract;
 use Statamic\Data\StoresScopedComputedFieldCallbacks;
+use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades\Blink;
+use Statamic\Facades\Entry;
 use Statamic\Stache\Stache;
 
 class CollectionRepository implements RepositoryContract
@@ -46,9 +48,22 @@ class CollectionRepository implements RepositoryContract
             return null;
         }
 
-        return $this->all()->first(function ($collection) use ($mount) {
-            return optional($collection->mount())->id() === $mount->id();
-        });
+        return Blink::once('mounted-collections', fn () => $this
+            ->all()
+            ->keyBy(fn ($collection) => $collection->mount()?->id())
+            ->filter()
+        )->get($mount->id());
+    }
+
+    public function findOrFail($id): Collection
+    {
+        $collection = $this->find($id);
+
+        if (! $collection) {
+            throw new CollectionNotFoundException($id);
+        }
+
+        return $collection;
     }
 
     public function make(?string $handle = null): Collection
@@ -82,14 +97,24 @@ class CollectionRepository implements RepositoryContract
         $this->store->delete($collection);
     }
 
+    /**
+     * @deprecated Use Entry::updateUris($collection, $ids)
+     */
     public function updateEntryUris(Collection $collection, $ids = null)
     {
-        $this->store->updateEntryUris($collection, $ids);
+        Entry::updateUris($collection, $ids);
     }
 
+    /** @deprecated Use Entry::updateOrders($collection, $ids) */
     public function updateEntryOrder(Collection $collection, $ids = null)
     {
-        $this->store->updateEntryOrder($collection, $ids);
+        Entry::updateOrders($collection, $ids);
+    }
+
+    /** @deprecated Use Entry::updateParents($collection, $ids) */
+    public function updateEntryParent(Collection $collection, $ids = null)
+    {
+        Entry::updateParents($collection, $ids);
     }
 
     public function whereStructured(): IlluminateCollection

@@ -2,6 +2,7 @@
 
 namespace Tests\Tags\User;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Parse;
 use Statamic\Facades\User;
 use Statamic\Statamic;
@@ -17,7 +18,7 @@ class LoginFormTest extends TestCase
         return Parse::template($tag, []);
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_form()
     {
         $output = $this->tag('{{ user:login_form }}{{ /user:login_form }}');
@@ -27,7 +28,7 @@ class LoginFormTest extends TestCase
         $this->assertStringEndsWith('</form>', $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_form_with_params()
     {
         $output = $this->tag('{{ user:login_form redirect="/submitted" error_redirect="/errors" class="form" id="form" }}{{ /user:login_form }}');
@@ -37,7 +38,7 @@ class LoginFormTest extends TestCase
         $this->assertStringContainsString('<input type="hidden" name="_error_redirect" value="/errors" />', $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_form_with_redirects_to_anchor()
     {
         $output = $this->tag('{{ user:login_form redirect="#form" error_redirect="#form" }}{{ /user:login_form }}');
@@ -46,7 +47,7 @@ class LoginFormTest extends TestCase
         $this->assertStringContainsString('<input type="hidden" name="_error_redirect" value="http://localhost#form" />', $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_wont_log_user_in_and_renders_errors()
     {
         User::make()
@@ -81,7 +82,7 @@ EOT
         $this->assertEmpty($success[1]);
     }
 
-    /** @test */
+    #[Test]
     public function it_will_log_user_in_and_render_success()
     {
         $this->assertFalse(auth()->check());
@@ -119,7 +120,7 @@ EOT
         $this->assertEquals(['Login successful.'], $success[1]);
     }
 
-    /** @test */
+    #[Test]
     public function it_will_log_user_in_and_follow_custom_redirect_with_success()
     {
         $this->assertFalse(auth()->check());
@@ -157,7 +158,7 @@ EOT
         $this->assertEquals(['Login successful.'], $success[1]);
     }
 
-    /** @test */
+    #[Test]
     public function it_wont_log_user_in_and_follow_custom_error_redirect_with_errors()
     {
         $this->assertFalse(auth()->check());
@@ -195,7 +196,7 @@ EOT
         $this->assertEmpty($success[1]);
     }
 
-    /** @test */
+    #[Test]
     public function it_will_use_redirect_query_param_off_url()
     {
         $this->get('/?redirect=login-successful&error_redirect=login-failure');
@@ -214,7 +215,7 @@ EOT
         $this->assertStringContainsString($expectedErrorRedirect, $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_fetches_form_data()
     {
         $form = Statamic::tag('user:login_form')->fetch();
@@ -223,5 +224,23 @@ EOT
         $this->assertEquals($form['attrs']['method'], 'POST');
 
         $this->assertArrayHasKey('_token', $form['params']);
+    }
+
+    #[Test]
+    public function it_handles_precognitive_requests()
+    {
+        if (! method_exists($this, 'withPrecognition')) {
+            $this->markTestSkipped();
+        }
+
+        $response = $this
+            ->withPrecognition()
+            ->postJson('/!/auth/login', [
+                'token' => 'test-token',
+                'email' => 'san@holo.com',
+                '_error_redirect' => '/login-error',
+            ]);
+
+        $response->assertStatus(422);
     }
 }

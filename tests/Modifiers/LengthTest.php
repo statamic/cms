@@ -4,13 +4,14 @@ namespace Tests\Modifiers;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class LengthTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_returns_the_numbers_of_items_in_array(): void
     {
         $arr = [
@@ -22,7 +23,7 @@ class LengthTest extends TestCase
         $this->assertSame(3, $modified);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_the_numbers_of_items_in_collection(): void
     {
         $arr = collect([
@@ -34,7 +35,7 @@ class LengthTest extends TestCase
         $this->assertSame(3, $modified);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_the_number_of_items_in_a_query()
     {
         $builder = Mockery::mock(Builder::class);
@@ -43,7 +44,7 @@ class LengthTest extends TestCase
         $this->assertSame(3, $modified);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_the_number_of_items_in_an_arrayable()
     {
         $arrayable = Mockery::mock(Arrayable::class)->shouldReceive('toArray')->andReturn(['one', 'two'])->getMock();
@@ -52,7 +53,7 @@ class LengthTest extends TestCase
         $this->assertSame(2, $modified);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_the_numbers_of_chars_in_string(): void
     {
         $string = 'LEEEEROOOYYYY JEEENKINNNSS!';
@@ -60,7 +61,7 @@ class LengthTest extends TestCase
         $this->assertSame(27, $modified);
     }
 
-    /** @test */
+    #[Test]
     public function it_counts_a_collection_instead_of_toarraying_it(): void
     {
         $itemOne = Mockery::mock(Arrayable::class)->shouldNotReceive('toArray')->getMock();

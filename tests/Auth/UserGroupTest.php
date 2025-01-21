@@ -4,6 +4,7 @@ namespace Tests\Auth;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\File\Role;
 use Statamic\Facades;
 use Statamic\Facades\Role as RoleAPI;
@@ -16,11 +17,12 @@ class UserGroupTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function it_gets_and_sets_the_title()
     {
         $group = UserGroup::make();
-        $this->assertNull($group->title());
+        $group->handle('testing');
+        $this->assertEquals('Testing', $group->title());
 
         $return = $group->title('Test');
 
@@ -28,7 +30,7 @@ class UserGroupTest extends TestCase
         $this->assertEquals($group, $return);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_sets_the_handle()
     {
         $group = UserGroup::make();
@@ -46,7 +48,7 @@ class UserGroupTest extends TestCase
         $this->assertEquals('test', $group->originalHandle());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_all_the_users()
     {
         config(['statamic.users.repositories.file.paths.groups' => __DIR__.'/../__fixtures__/dev-null/groups.yaml']);
@@ -73,7 +75,7 @@ class UserGroupTest extends TestCase
         $this->assertTrue($group->hasUser($userB));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_and_sets_roles()
     {
         $group = UserGroup::make();
@@ -93,7 +95,7 @@ class UserGroupTest extends TestCase
         $this->assertCount(1, $group->roles());
     }
 
-    /** @test */
+    #[Test]
     public function it_adds_a_role()
     {
         $role = new class extends Role
@@ -130,7 +132,7 @@ class UserGroupTest extends TestCase
         $this->assertEquals($group, $return);
     }
 
-    /** @test */
+    #[Test]
     public function it_sets_all_roles()
     {
         RoleAPI::shouldReceive('find')->with('one')->andReturn($roleOne = new class extends Role
@@ -165,7 +167,7 @@ class UserGroupTest extends TestCase
         $this->assertEquals($group, $return);
     }
 
-    /** @test */
+    #[Test]
     public function it_removes_a_role()
     {
         $role = new class extends Role
@@ -184,7 +186,7 @@ class UserGroupTest extends TestCase
         $this->assertCount(0, $group->roles());
     }
 
-    /** @test */
+    #[Test]
     public function it_removes_a_role_by_handle()
     {
         $role = new class extends Role
@@ -204,7 +206,7 @@ class UserGroupTest extends TestCase
         $this->assertCount(0, $group->roles());
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_if_it_has_a_role()
     {
         $roleA = new class extends Role
@@ -228,7 +230,7 @@ class UserGroupTest extends TestCase
         $this->assertFalse($group->hasRole($roleB));
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_if_it_has_a_role_by_handle()
     {
         $roleA = new class extends Role
@@ -252,7 +254,7 @@ class UserGroupTest extends TestCase
         $this->assertFalse($group->hasRole('b'));
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_if_it_has_permission()
     {
         $role = new class extends Role
@@ -269,7 +271,7 @@ class UserGroupTest extends TestCase
         $this->assertFalse($group->hasPermission('two'));
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_if_it_has_super_permissions()
     {
         $superRole = new class extends Role
@@ -294,7 +296,7 @@ class UserGroupTest extends TestCase
         $this->assertFalse($nonSuperGroup->isSuper());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_be_saved()
     {
         $group = UserGroup::make();
@@ -302,7 +304,7 @@ class UserGroupTest extends TestCase
         $this->assertTrue($group->save());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_be_deleted()
     {
         $group = UserGroup::make();
@@ -310,7 +312,7 @@ class UserGroupTest extends TestCase
         $this->assertTrue($group->delete());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_evaluated_augmented_value_using_magic_property()
     {
         $group = UserGroup::make()->handle('test')->title('Test');
@@ -321,7 +323,7 @@ class UserGroupTest extends TestCase
             ->each(fn ($value, $key) => $this->assertEquals($value->value(), $group[$key]));
     }
 
-    /** @test */
+    #[Test]
     public function it_is_arrayable()
     {
         $group = UserGroup::make()->handle('test')->title('Test');
@@ -333,7 +335,7 @@ class UserGroupTest extends TestCase
             ->each(fn ($value, $key) => $this->assertEquals($value, $group[$key]));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_data()
     {
         $group = UserGroup::make()->handle('test')->data([
@@ -347,7 +349,7 @@ class UserGroupTest extends TestCase
         ], $group->data()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_blueprint_values()
     {
         $blueprint = Facades\UserGroup::blueprint();

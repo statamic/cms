@@ -11,10 +11,13 @@ use InvalidArgumentException;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Blink;
+use Statamic\Query\Scopes\AppliesScopes;
 use Statamic\Support\Arr;
 
 abstract class EloquentQueryBuilder implements Builder
 {
+    use AppliesScopes;
+
     protected $builder;
     protected $columns;
 
@@ -39,6 +42,12 @@ abstract class EloquentQueryBuilder implements Builder
 
     public function __call($method, $args)
     {
+        if ($this->canApplyScope($method)) {
+            $this->applyScope($method, $args[0] ?? []);
+
+            return $this;
+        }
+
         $response = $this->builder->$method(...$args);
 
         return $response instanceof EloquentBuilder ? $this : $response;
@@ -386,6 +395,19 @@ abstract class EloquentQueryBuilder implements Builder
         return $this;
     }
 
+    public function reorder($column = null, $direction = 'asc')
+    {
+        if ($column) {
+            $this->builder->reorder($this->column($column), $direction);
+
+            return $this;
+        }
+
+        $this->builder->reorder();
+
+        return $this;
+    }
+
     protected function column($column)
     {
         return $column;
@@ -440,6 +462,8 @@ abstract class EloquentQueryBuilder implements Builder
      */
     public function chunk($count, callable $callback)
     {
+        $this->enforceOrderBy();
+
         $page = 1;
 
         do {
@@ -483,6 +507,8 @@ abstract class EloquentQueryBuilder implements Builder
             throw new InvalidArgumentException('The chunk size should be at least 1');
         }
 
+        $this->enforceOrderBy();
+
         return LazyCollection::make(function () use ($chunkSize) {
             $page = 1;
 
@@ -498,5 +524,35 @@ abstract class EloquentQueryBuilder implements Builder
                 }
             }
         });
+    }
+
+    /**
+     * Add a generic "order by" clause if the query doesn't already have one.
+     *
+     * @return void
+     */
+    protected function enforceOrderBy()
+    {
+        if (empty($this->builder->getQuery()->orders) && empty($this->builder->getQuery()->unionOrders)) {
+            $this->orderBy($this->builder->getModel()->getQualifiedKeyName(), 'asc');
+        }
+    }
+
+    public function __serialize(): array
+    {
+        $this->builder->getQuery()->connection = null;
+        $this->builder->getQuery()->grammar = null;
+
+        return get_object_vars($this);
+    }
+
+    public function __unserialize($data): void
+    {
+        foreach ($data as $key => $value) {
+            $this->$key = $value;
+        }
+
+        $this->builder->getQuery()->connection = $this->builder->getModel()->getConnection();
+        $this->builder->getQuery()->grammar = $this->builder->getQuery()->connection->getQueryGrammar();
     }
 }

@@ -163,6 +163,16 @@ class CollectionsServiceProvider extends ServiceProvider
             }, $this->items);
         });
 
+        Collection::macro('toDeferredAugmentedArray', function ($keys = null) {
+            return array_map(function ($value) use ($keys) {
+                if ($value instanceof Augmentable) {
+                    return $value->toDeferredAugmentedArray($keys);
+                }
+
+                return $value instanceof Arrayable ? $value->toArray() : $value;
+            }, $this->items);
+        });
+
         Collection::macro('toAugmentedCollection', function ($keys = null) {
             return array_map(function ($value) use ($keys) {
                 if ($value instanceof Augmentable) {

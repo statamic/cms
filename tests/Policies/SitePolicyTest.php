@@ -2,6 +2,7 @@
 
 namespace Tests\Policies;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
@@ -12,13 +13,13 @@ class SitePolicyTest extends TestCase
 {
     use FakesRoles, PreventSavingStacheItemsToDisk;
 
-    /** @test */
+    #[Test]
     public function site_is_viewable_with_permission()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'first' => ['name' => 'First', 'locale' => 'en_US', 'url' => '/'],
             'second' => ['name' => 'Second', 'locale' => 'en_US', 'url' => '/'],
-        ]]);
+        ]);
 
         $this->setTestRoles(['test' => [
             'access second site',
@@ -31,12 +32,12 @@ class SitePolicyTest extends TestCase
         $this->assertTrue($user->can('view', Site::get('second')));
     }
 
-    /** @test */
+    #[Test]
     public function site_is_viewable_without_permission_if_theres_a_single_site()
     {
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'default' => ['name' => 'Default', 'locale' => 'en_US', 'url' => '/'],
-        ]]);
+        ]);
 
         $this->setTestRoles(['test' => [
             //

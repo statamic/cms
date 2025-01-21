@@ -2,6 +2,7 @@
 
 namespace Tests\Stache\Repositories;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Structures\Tree;
 use Statamic\Stache\Repositories\CollectionTreeRepository;
@@ -27,7 +28,7 @@ class CollectionTreeRepositoryTest extends TestCase
         $this->repo = new CollectionTreeRepository($stache);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_collection_tree()
     {
         $this->store
@@ -38,7 +39,7 @@ class CollectionTreeRepositoryTest extends TestCase
         $this->assertSame($tree, $this->repo->find('pages', 'en'));
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_a_nav_tree_through_the_store()
     {
         $tree = $this->mock(Tree::class);
@@ -52,7 +53,7 @@ class CollectionTreeRepositoryTest extends TestCase
         $this->assertTrue($this->repo->save($tree));
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_the_order_index_for_entries_when_saving()
     {
         $this->markTestIncomplete();

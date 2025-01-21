@@ -1,5 +1,5 @@
 <template>
-    <div class="max-w-xl mx-auto rounded shadow bg-white">
+    <div class="max-w-xl mx-auto card">
         <div v-if="steps.length > 1" class="max-w-lg mx-auto pt-16 relative">
             <div class="wizard-steps">
                 <a class="step" :class="{'complete': currentStep >= index}" v-for="(step, index) in steps" @click="goToStep(index)">
@@ -13,7 +13,7 @@
         <div v-if="!completed && onUserInfoStep">
             <div class="max-w-md mx-auto px-4 py-16 text-center">
                 <h1 class="mb-6">{{ __('Create User') }}</h1>
-                <p class="text-gray" v-text="__('messages.user_wizard_intro')" />
+                <p class="text-gray dark:text-dark-150" v-text="__('messages.user_wizard_intro')" />
             </div>
 
             <publish-container
@@ -41,18 +41,18 @@
         <div v-if="!completed && onPermissionStep" class="max-w-md mx-auto px-4 pb-4">
             <div class="py-16 text-center">
                 <h1 class="mb-6">{{ __('Roles & Groups') }}</h1>
-                <p class="text-gray" v-text="__('messages.user_wizard_roles_groups_intro')" />
+                <p class="text-gray dark:text-dark-150" v-text="__('messages.user_wizard_roles_groups_intro')" />
             </div>
 
             <!-- Super Admin -->
              <div class="pb-10" v-if="canCreateSupers">
                 <div class="flex items-center">
-                    <toggle-input v-model="user.super" />
-                    <label class="font-bold ml-2">{{ __('Super Admin') }}</label>
+                    <toggle-input v-model="user.super" id="super" />
+                    <label class="font-bold rtl:mr-2 ltr:ml-2" for="super">{{ __('Super Admin') }}</label>
                 </div>
-                <div class="text-2xs text-gray-600 mt-2 flex items-center">
-                    <svg-icon name="info-circle" class="h-4 w-4 mr-1 flex items-center mb-px"></svg-icon>
-                    {{ __('messages.user_wizard_super_admin_instructions') }}
+                <div class="text-2xs text-gray-600 dark:text-dark-150 mt-2 flex items-center space-x-1 rtl:space-x-reverse">
+                    <svg-icon name="info-circle" class="h-4 w-4 flex items-center mb-px"></svg-icon>
+                    <span>{{ __('messages.user_wizard_super_admin_instructions') }}</span>
                 </div>
             </div>
 
@@ -61,15 +61,17 @@
                 <label class="font-bold text-base mb-1" for="role">{{ __('Roles') }}</label>
                 <publish-field-meta
                     :config="{ handle: 'user.roles', type: 'user_roles' }"
-                    :initial-value="user.roles">
-                    <div slot-scope="{ meta, value, loading }">
+                    :initial-value="user.roles"
+                >
+                    <div slot-scope="{ meta, value, loading, updateMeta }">
                         <relationship-fieldtype
                             v-if="!loading"
                             handle="user.roles"
                             :config="{ type: 'user_roles', mode: 'select' }"
                             :value="value"
                             :meta="meta"
-                            @input="user.roles = $event" />
+                            @input="user.roles = $event"
+                            @meta-updated="updateMeta" />
                     </div>
                 </publish-field-meta>
             </div>
@@ -79,15 +81,17 @@
                 <label class="font-bold text-base mb-1" for="group">{{ __('Groups') }}</label>
                 <publish-field-meta
                     :config="{ handle: 'user.groups', type: 'user_groups' }"
-                    :initial-value="user.groups">
-                    <div slot-scope="{ meta, value, loading }">
+                    :initial-value="user.groups"
+                >
+                    <div slot-scope="{ meta, value, loading, updateMeta }">
                         <relationship-fieldtype
                             v-if="!loading"
                             handle="user.groups"
                             :config="{ type: 'user_groups', mode: 'select' }"
                             :value="value"
                             :meta="meta"
-                            @input="user.groups = $event" />
+                            @input="user.groups = $event"
+                            @meta-updated="updateMeta"/>
                     </div>
                 </publish-field-meta>
             </div>
@@ -97,27 +101,28 @@
         <div v-if="!completed && onInvitationStep">
             <div class="max-w-md mx-auto px-4 py-16 text-center">
                 <h1 class="mb-6">{{ __('Invitation') }}</h1>
-                <p class="text-gray" v-text="__('messages.user_wizard_invitation_intro')" />
+                <p class="text-gray dark:text-dark-150" v-text="__('messages.user_wizard_invitation_intro')" />
             </div>
 
             <!-- Send Email? -->
             <div class="max-w-md mx-auto px-4 mb-6 flex items-center">
-                <toggle-input v-model="invitation.send" />
-                <label class="font-bold ml-2">{{ __('Send Email Invitation') }}</label>
+                <toggle-input v-model="invitation.send" id="send_email_invitation" />
+                <label class="font-bold rtl:mr-2 ltr:ml-2" for="send_email_invitation">{{ __('Send Email Invitation') }}</label>
             </div>
 
-            <div class="max-w-lg mx-auto bg-gray-100 py-10 mb-20 border rounded-lg " v-if="invitation.send">
+            <div class="max-w-lg mx-auto bg-gray-100 dark:bg-dark-650 py-10 mb-20 border dark:border-dark-900 rounded-lg " v-if="invitation.send">
                 <!-- Subject Line -->
                 <div class="max-w-md mx-auto px-4 pb-10">
-                    <label class="font-bold text-base mb-1" for="email">{{ __('Email Subject') }}</label>
-                    <input type="text" v-model="invitation.subject" class="input-text bg-white">
+                    <label class="font-bold text-base mb-1" for="invitation_subject">{{ __('Email Subject') }}</label>
+                    <input type="text" v-model="invitation.subject" class="input-text bg-white dark:bg-dark-700" id="invitation_subject">
                 </div>
 
                 <!-- Email Content -->
                 <div class="max-w-md mx-auto px-4">
-                    <label class="font-bold text-base mb-1" for="email">{{ __('Email Content') }}</label>
+                    <label class="font-bold text-base mb-1" for="invitation_message">{{ __('Email Content') }}</label>
                     <textarea
-                        class="input-text min-h-40 p-4 bg-white"
+                        class="input-text min-h-40 p-4 bg-white dark:bg-dark-700"
+                        id="invitation_message"
                         v-model="invitation.message"
                         v-elastic
                     />
@@ -142,25 +147,25 @@
                 <p class="mb-2" v-html="__('messages.user_wizard_invitation_share', { email: values.email })" />
             </div>
             <div class="max-w-md mx-auto px-4 pb-10">
-                <label class="font-bold text-base mb-1" for="email">{{ __('Activation URL') }}</label>
-                <input type="text" readonly class="input-text" onclick="this.select()" :value="activationUrl" />
+                <label class="font-bold text-base mb-1" for="activation_url">{{ __('Activation URL') }}</label>
+                <input type="text" readonly class="input-text" onclick="this.select()" :value="activationUrl" id="activation_url" />
             </div>
             <div class="max-w-md mx-auto px-4 pb-20">
                 <label class="font-bold text-base mb-1" for="email">{{ __('Email Address') }}</label>
-                <input type="text" readonly class="input-text" onclick="this.select()" :value="values.email" />
+                <input type="text" readonly class="input-text" onclick="this.select()" :value="values.email" id="email" />
             </div>
         </div>
 
-        <div class="border-t p-4">
+        <div class="border-t dark:border-dark-900 p-4">
             <div class="max-w-md mx-auto flex items-center justify-center">
                 <button tabindex="3" class="btn mx-4 w-32" @click="previous" v-if="! completed && ! onFirstStep">
-                    &larr; {{ __('Previous')}}
+                    <span v-html="direction === 'ltr' ? '&larr;' : '&rarr;'"></span> {{ __('Previous')}}
                 </button>
                 <button tabindex="4" class="btn mx-4 w-32" @click="nextStep" v-if="onUserInfoStep">
-                    {{ __('Next')}} &rarr;
+                    {{ __('Next')}} <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span>
                 </button>
                 <button tabindex="4" class="btn mx-4 w-32" :disabled="! canContinue" @click="nextStep" v-if="!onUserInfoStep && ! completed && ! onLastStep">
-                    {{ __('Next')}} &rarr;
+                    {{ __('Next')}} <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span>
                 </button>
                 <button tabindex="4" class="btn-primary mx-4" @click="submit" v-if="! completed && onLastStep">
                     {{ finishButtonText }}
@@ -220,7 +225,7 @@ export default {
             invitation: {
                 send: this.canSendInvitation,
                 subject: __('messages.user_wizard_invitation_subject', { site: window.location.hostname }),
-                message: __('messages.user_wizard_invitation_body', { site: window.location.hostname, expiry: this.activationExpiry }),
+                message: __n('messages.user_wizard_invitation_body', this.activationExpiry, { site: window.location.hostname, expiry: this.activationExpiry }),
             },
             userExists: false,
             completed: false,
@@ -255,7 +260,10 @@ export default {
         },
         finishButtonText() {
             return this.invitation.send ? __('Create and Send Email') : __('Create User');
-        }
+        },
+        direction() {
+            return this.$config.get('direction', 'ltr');
+        },
     },
 
     methods: {

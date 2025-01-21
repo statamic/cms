@@ -3,6 +3,8 @@
 namespace Tests\Stache\Repositories;
 
 use Illuminate\Support\Collection as IlluminateCollection;
+use PHPUnit\Framework\Attributes\Test;
+use Statamic\Exceptions\TaxonomyNotFoundException;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Taxonomy as TaxonomyAPI;
 use Statamic\Stache\Repositories\TaxonomyRepository;
@@ -32,7 +34,7 @@ class TaxonomyRepositoryTest extends TestCase
         $this->repo = new TaxonomyRepository($stache);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_all_taxonomies()
     {
         $taxonomies = $this->repo->all();
@@ -46,7 +48,7 @@ class TaxonomyRepositoryTest extends TestCase
         $this->assertEquals(['Categories', 'Tags'], $ordered->map->title()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_taxonomy_by_handle()
     {
         tap($this->repo->findByHandle('categories'), function ($taxonomy) {
@@ -64,7 +66,7 @@ class TaxonomyRepositoryTest extends TestCase
         $this->assertNull($this->repo->findByHandle('unknown'));
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_taxonomy_by_uri()
     {
         tap($this->repo->findByUri('/categories'), function ($taxonomy) {
@@ -75,7 +77,7 @@ class TaxonomyRepositoryTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_a_taxonomy_by_uri_with_collection()
     {
         tap($this->repo->findByUri('/blog/categories'), function ($taxonomy) {
@@ -86,7 +88,7 @@ class TaxonomyRepositoryTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_a_taxonomy_to_the_stache_and_to_a_file()
     {
         $taxonomy = TaxonomyAPI::make('new');
@@ -101,7 +103,7 @@ class TaxonomyRepositoryTest extends TestCase
         @unlink($this->directory.'/new.yaml');
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_additional_preview_targets()
     {
         $taxonomy1 = (new Taxonomy)->handle('test');
@@ -124,5 +126,23 @@ class TaxonomyRepositoryTest extends TestCase
         $this->assertEquals($previewTargetsTaxonomy1, $previewTargetsTest->all());
         $this->assertEquals($previewTargetsTaxonomy2, $previewTargetsTest2->all());
         $this->assertNotEquals($previewTargetsTest->all(), $previewTargetsTest2->all());
+    }
+
+    #[Test]
+    public function test_find_or_fail_gets_taxonomy()
+    {
+        $taxonomy = $this->repo->findOrFail('tags');
+
+        $this->assertInstanceOf(Taxonomy::class, $taxonomy);
+        $this->assertEquals('Tags', $taxonomy->title());
+    }
+
+    #[Test]
+    public function test_find_or_fail_throws_exception_when_taxonomy_does_not_exist()
+    {
+        $this->expectException(TaxonomyNotFoundException::class);
+        $this->expectExceptionMessage('Taxonomy [does-not-exist] not found');
+
+        $this->repo->findOrFail('does-not-exist');
     }
 }

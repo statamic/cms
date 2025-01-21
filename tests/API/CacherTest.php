@@ -7,6 +7,9 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Orchestra\Testbench\Attributes\DefineEnvironment;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\API\AbstractCacher;
 use Statamic\Events\EntrySaved;
 use Statamic\Events\Event;
@@ -36,7 +39,7 @@ class CacherTest extends TestCase
         return EntryFactory::id($slug)->slug($slug)->collection($this->collection)->make();
     }
 
-    /** @test */
+    #[Test]
     public function it_caches_endpoint_using_default_cacher()
     {
         $this->makeEntry('apple')->save();
@@ -47,7 +50,8 @@ class CacherTest extends TestCase
                 ['id' => 'apple'],
             ]]);
 
-        $cacheKey = "api-cache:$endpoint";
+        $hash = md5($endpoint);
+        $cacheKey = "api-cache:$hash";
 
         $this->assertTrue(Cache::has($cacheKey));
         $this->assertEquals([$cacheKey], Cache::get('api-cache:tracked-responses'));
@@ -60,11 +64,8 @@ class CacherTest extends TestCase
             ->assertJson(['foo' => 'bar']);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider bypassCacheProvider
-     */
+    #[Test]
+    #[DataProvider('bypassCacheProvider')]
     public function it_bypasses_cache_when_using_a_valid_token($endpoint, $headers)
     {
         optional(Token::find('test-token'))->delete(); // garbage collection
@@ -78,15 +79,13 @@ class CacherTest extends TestCase
                 ['id' => 'apple'],
             ]]);
 
-        $this->assertFalse(Cache::has("api-cache:$endpoint"));
+        $hash = md5($endpoint);
+        $this->assertFalse(Cache::has("api-cache:$hash"));
         $this->assertNull(Cache::get('api-cache:tracked-responses'));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider bypassCacheProvider
-     */
+    #[Test]
+    #[DataProvider('bypassCacheProvider')]
     public function it_doesnt_bypass_cache_when_using_an_invalid_token($endpoint, $headers)
     {
         // No token should exist, but do garbage collection.
@@ -101,7 +100,8 @@ class CacherTest extends TestCase
                 ['id' => 'apple'],
             ]]);
 
-        $this->assertTrue(Cache::has($cacheKey = "api-cache:$endpoint"));
+        $hash = md5($endpoint);
+        $this->assertTrue(Cache::has($cacheKey = "api-cache:$hash"));
         $this->assertEquals([$cacheKey], Cache::get('api-cache:tracked-responses'));
     }
 
@@ -115,17 +115,15 @@ class CacherTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @environment-setup setCustomExpiry
-     */
+    #[Test]
+    #[DefineEnvironment('setCustomExpiry')]
     public function it_caches_endpoint_using_configured_expiry()
     {
         $this->makeEntry('apple')->save();
 
         $endpoint = '/api/collections/articles/entries';
-        $cacheKey = "api-cache:$endpoint";
+        $hash = md5($endpoint);
+        $cacheKey = "api-cache:$hash";
 
         Carbon::setTestNow(now());
 
@@ -138,7 +136,7 @@ class CacherTest extends TestCase
         $this->assertFalse(Cache::has($cacheKey));
     }
 
-    /** @test */
+    #[Test]
     public function it_caches_endpoint_with_query_params()
     {
         $this->makeEntry('apple')->save();
@@ -149,13 +147,14 @@ class CacherTest extends TestCase
                 ['id' => 'apple'],
             ]]);
 
-        $cacheKey = "api-cache:$endpoint";
+        $hash = md5($endpoint);
+        $cacheKey = "api-cache:$hash";
 
         $this->assertTrue(Cache::has($cacheKey));
         $this->assertEquals([$cacheKey], Cache::get('api-cache:tracked-responses'));
     }
 
-    /** @test */
+    #[Test]
     public function it_caches_multiple_endpoints()
     {
         $this->makeEntry('apple')->save();
@@ -172,18 +171,20 @@ class CacherTest extends TestCase
                 ['id' => 'apple'],
             ]]);
 
-        $this->assertTrue(Cache::has("api-cache:$endpointOne"));
-        $this->assertTrue(Cache::has("api-cache:$endpointTwo"));
+        $hashOne = md5($endpointOne);
+        $hashTwo = md5($endpointTwo);
+        $this->assertTrue(Cache::has("api-cache:$hashOne"));
+        $this->assertTrue(Cache::has("api-cache:$hashTwo"));
 
         $cachedResponses = [
-            "api-cache:$endpointOne",
-            "api-cache:$endpointTwo",
+            "api-cache:$hashOne",
+            "api-cache:$hashTwo",
         ];
 
         $this->assertEquals($cachedResponses, Cache::get('api-cache:tracked-responses'));
     }
 
-    /** @test */
+    #[Test]
     public function it_busts_whole_cache_when_content_is_saved()
     {
         $entry = $this->makeEntry('apple');
@@ -201,18 +202,20 @@ class CacherTest extends TestCase
                 ['id' => 'apple'],
             ]]);
 
-        $this->assertTrue(Cache::has("api-cache:$endpointOne"));
-        $this->assertTrue(Cache::has("api-cache:$endpointTwo"));
+        $hashOne = md5($endpointOne);
+        $hashTwo = md5($endpointTwo);
+        $this->assertTrue(Cache::has("api-cache:$hashOne"));
+        $this->assertTrue(Cache::has("api-cache:$hashTwo"));
         $this->assertCount(2, Cache::get('api-cache:tracked-responses'));
 
         $entry->save();
 
-        $this->assertFalse(Cache::has("api-cache:$endpointOne"));
-        $this->assertFalse(Cache::has("api-cache:$endpointTwo"));
+        $this->assertFalse(Cache::has("api-cache:$hashOne"));
+        $this->assertFalse(Cache::has("api-cache:$hashTwo"));
         $this->assertFalse(Cache::has('api-cache:tracked-responses'));
     }
 
-    /** @test */
+    #[Test]
     public function it_busts_whole_cache_when_unrelated_content_is_saved()
     {
         $this->makeEntry('apple')->save();
@@ -229,18 +232,21 @@ class CacherTest extends TestCase
                 ['id' => 'apple'],
             ]]);
 
-        $this->assertTrue(Cache::has("api-cache:$endpointOne"));
-        $this->assertTrue(Cache::has("api-cache:$endpointTwo"));
+        $hashOne = md5($endpointOne);
+        $hashTwo = md5($endpointTwo);
+
+        $this->assertTrue(Cache::has("api-cache:$hashOne"));
+        $this->assertTrue(Cache::has("api-cache:$hashTwo"));
         $this->assertCount(2, Cache::get('api-cache:tracked-responses'));
 
         Facades\Form::make('contact')->save();
 
-        $this->assertFalse(Cache::has("api-cache:$endpointOne"));
-        $this->assertFalse(Cache::has("api-cache:$endpointTwo"));
+        $this->assertFalse(Cache::has("api-cache:$hashOne"));
+        $this->assertFalse(Cache::has("api-cache:$hashTwo"));
         $this->assertFalse(Cache::has('api-cache:tracked-responses'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_disable_default_cacher_by_setting_false_on_parent_cache_config()
     {
         Facades\Config::set('statamic.api.cache', false);
@@ -253,13 +259,14 @@ class CacherTest extends TestCase
                 ['id' => 'apple'],
             ]]);
 
-        $cacheKey = "api-cache:$endpoint";
+        $hash = md5($endpoint);
+        $cacheKey = "api-cache:$hash";
 
         $this->assertFalse(Cache::has($cacheKey));
         $this->assertFalse(Cache::has('api-cache:tracked-responses'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_disable_default_cacher_by_setting_false_on_child_class_config()
     {
         Facades\Config::set('statamic.api.cache.class', false);
@@ -272,13 +279,14 @@ class CacherTest extends TestCase
                 ['id' => 'apple'],
             ]]);
 
-        $cacheKey = "api-cache:$endpoint";
+        $hash = md5($endpoint);
+        $cacheKey = "api-cache:$hash";
 
         $this->assertFalse(Cache::has($cacheKey));
         $this->assertFalse(Cache::has('api-cache:tracked-responses'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_use_custom_cacher()
     {
         Facades\Config::set('statamic.api.cache.class', CustomCacher::class);
@@ -292,7 +300,8 @@ class CacherTest extends TestCase
                 ['id' => 'apple'],
             ]]);
 
-        $cacheKey = "api-cache:$endpoint";
+        $hash = md5($endpoint);
+        $cacheKey = "api-cache:$hash";
 
         $this->assertFalse(Cache::has($cacheKey));
         $this->assertFalse(Cache::has('api-cache:tracked-responses'));

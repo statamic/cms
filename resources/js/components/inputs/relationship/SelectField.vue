@@ -12,7 +12,7 @@
             :options="options"
             :get-option-key="(option) => option.id"
             :get-option-label="(option) => __(option.title)"
-            :create-option="(value) => ({ title: value, id: value })"
+            :create-option="(value) => createOption(value)"
             :placeholder="__(config.placeholder) || __('Choose...')"
             :searchable="true"
             :taggable="isTaggable"
@@ -22,6 +22,15 @@
             @search:focus="$emit('focus')"
             @search:blur="$emit('blur')"
         >
+            <template #option="{ title, hint, status }">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center">
+                        <div v-if="status" class="little-dot rtl:ml-2 ltr:mr-2 hidden@sm:block" :class="status" />
+                        <div v-text="title" />
+                    </div>
+                    <div v-if="hint" class="text-4xs text-gray-600 uppercase whitespace-nowrap" v-text="hint" />
+                </div>
+            </template>
             <template #selected-option-container v-if="multiple"><i class="hidden"></i></template>
             <template #search="{ events, attributes }" v-if="multiple">
                 <input
@@ -33,29 +42,7 @@
                 >
             </template>
              <template #no-options>
-                <div class="text-sm text-gray-700 text-left py-2 px-4" v-text="__('No options to choose from.')" />
-            </template>
-            <template #footer="{ deselect }" v-if="multiple">
-                <sortable-list
-                    item-class="sortable-item"
-                    handle-class="sortable-item"
-                    :value="items"
-                    :distance="5"
-                    :mirror="false"
-                    @input="input"
-                >
-                    <div class="vs__selected-options-outside flex flex-wrap">
-                        <span v-for="item in items" :key="item.id" class="vs__selected mt-2" :class="{ 'sortable-item': !readOnly }">
-                            {{ __(item.title) }}
-                            <button v-if="!readOnly" @click="deselect(item)" type="button" :aria-label="__('Deselect option')" class="vs__deselect">
-                                <span>×</span>
-                            </button>
-                            <button v-else type="button" class="vs__deselect">
-                                <span class="opacity-50">×</span>
-                            </button>
-                        </span>
-                    </div>
-                </sortable-list>
+                <div class="text-sm text-gray-700 rtl:text-right ltr:text-left py-2 px-4" v-text="__('No options to choose from.')" />
             </template>
         </v-select>
     </div>
@@ -151,6 +138,11 @@ export default {
             }
 
             this.$emit('input', items);
+        },
+
+        createOption(value) {
+            const existing = this.options.find((option) => option.title === value);
+            return existing || { id: value, title: value };
         },
 
     }

@@ -6,13 +6,14 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Form;
 use Statamic\Statamic;
 
 class FormCreateTest extends FormTestCase
 {
-    /** @test */
+    #[Test]
     public function it_renders_form()
     {
         $forms = [
@@ -33,7 +34,7 @@ class FormCreateTest extends FormTestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_form_with_params()
     {
         $output = $this->tag('{{ form:contact redirect="/submitted" error_redirect="/errors" class="form" id="form" }}{{ /form:contact }}');
@@ -43,7 +44,7 @@ class FormCreateTest extends FormTestCase
         $this->assertStringContainsString('<input type="hidden" name="_error_redirect" value="/errors" />', $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_form_with_redirects_to_anchor()
     {
         $output = $this->tag('{{ form:contact redirect="#form" error_redirect="#form" }}{{ /form:contact }}');
@@ -52,7 +53,7 @@ class FormCreateTest extends FormTestCase
         $this->assertStringContainsString('<input type="hidden" name="_error_redirect" value="http://localhost#form" />', $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_dynamically_renders_fields_array()
     {
         $output = $this->normalizeHtml($this->tag(<<<'EOT'
@@ -64,20 +65,32 @@ class FormCreateTest extends FormTestCase
 EOT
         ));
 
-        $this->assertStringContainsString('<label>Full Name</label><input type="text" name="name" value="">', $output);
-        $this->assertStringContainsString('<label>Email Address</label><input type="email" name="email" value="" required>', $output);
-        $this->assertStringContainsString('<label>Message</label><textarea name="message" rows="5" required></textarea>', $output);
+        $this->assertStringContainsString('<label>Full Name</label><input id="contact-form-name-field" type="text" name="name" value="">', $output);
+        $this->assertStringContainsString('<label>Email Address</label><input id="contact-form-email-field" type="email" name="email" value="" required>', $output);
+        $this->assertStringContainsString('<label>Message</label><textarea id="contact-form-message-field" name="message" rows="5" required></textarea>', $output);
 
         preg_match_all('/<label>(.+)<\/label>/U', $output, $fieldOrder);
 
         $this->assertEquals(['Full Name', 'Email Address', 'Message'], $fieldOrder[1]);
     }
 
-    /** @test */
+    #[Test]
+    public function it_dynamically_renders_with_form_handle()
+    {
+        foreach (['contact', 'contact-form', 'kontakt_formular'] as $handle) {
+            $this->createForm(handle: $handle);
+            $output = $this->normalizeHtml($this->tag('{{ form in="'.$handle.'" }}{{ fields }}{{ field }}{{ /fields }}{{ /form }}'));
+            $this->assertStringContainsString('<input id="'.$handle.'-form-name-field"', $output);
+            $this->assertStringContainsString('<input id="'.$handle.'-form-email-field"', $output);
+            $this->assertStringContainsString('<textarea id="'.$handle.'-form-message-field"', $output);
+        }
+    }
+
+    #[Test]
     public function it_dynamically_renders_text_field()
     {
         $this->assertFieldRendersHtml([
-            '<input type="text" name="favourite_animal" value="">',
+            '<input id="[[form-handle]]-form-favourite_animal-field" type="text" name="favourite_animal" value="">',
         ], [
             'handle' => 'favourite_animal',
             'field' => [
@@ -86,7 +99,7 @@ EOT
         ]);
 
         $this->assertFieldRendersHtml([
-            '<input type="text" name="favourite_animal" value="buffalo">',
+            '<input id="[[form-handle]]-form-favourite_animal-field" type="text" name="favourite_animal" value="buffalo">',
         ], [
             'handle' => 'favourite_animal',
             'field' => [
@@ -97,11 +110,11 @@ EOT
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_dynamically_renders_text_field_with_custom_input_type()
     {
         $this->assertFieldRendersHtml([
-            '<input type="number" name="age" value="">',
+            '<input id="[[form-handle]]-form-age-field" type="number" name="age" value="">',
         ], [
             'handle' => 'age',
             'field' => [
@@ -111,7 +124,7 @@ EOT
         ]);
 
         $this->assertFieldRendersHtml([
-            '<input type="number" name="age" value="24">',
+            '<input id="[[form-handle]]-form-age-field" type="number" name="age" value="24">',
         ], [
             'handle' => 'age',
             'field' => [
@@ -123,11 +136,11 @@ EOT
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_dynamically_renders_textarea_field()
     {
         $this->assertFieldRendersHtml([
-            '<textarea name="comment" rows="5"></textarea>',
+            '<textarea id="[[form-handle]]-form-comment-field" name="comment" rows="5"></textarea>',
         ], [
             'handle' => 'comment',
             'field' => [
@@ -136,7 +149,7 @@ EOT
         ]);
 
         $this->assertFieldRendersHtml([
-            '<textarea name="comment" rows="5">Hey hoser!</textarea>',
+            '<textarea id="[[form-handle]]-form-comment-field" name="comment" rows="5">Hey hoser!</textarea>',
         ], [
             'handle' => 'comment',
             'field' => [
@@ -147,15 +160,15 @@ EOT
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_dynamically_renders_checkboxes_field()
     {
         $this->assertFieldRendersHtml([
-            '<label><input type="checkbox" name="favourite_animals[]" value="cat">Cat</label>',
+            '<label><input id="[[form-handle]]-form-favourite_animals-field-cat-option" type="checkbox" name="favourite_animals[]" value="cat">Cat</label>',
             '<br>',
-            '<label><input type="checkbox" name="favourite_animals[]" value="armadillo">Armadillo</label>',
+            '<label><input id="[[form-handle]]-form-favourite_animals-field-armadillo-option" type="checkbox" name="favourite_animals[]" value="armadillo">Armadillo</label>',
             '<br>',
-            '<label><input type="checkbox" name="favourite_animals[]" value="rat">rat</label>',
+            '<label><input id="[[form-handle]]-form-favourite_animals-field-rat-option" type="checkbox" name="favourite_animals[]" value="rat">rat</label>',
         ], [
             'handle' => 'favourite_animals',
             'field' => [
@@ -169,11 +182,11 @@ EOT
         ]);
 
         $this->assertFieldRendersHtml([
-            '<label><input type="checkbox" name="favourite_animals[]" value="cat" checked>Cat</label>',
+            '<label><input id="[[form-handle]]-form-favourite_animals-field-cat-option" type="checkbox" name="favourite_animals[]" value="cat" checked>Cat</label>',
             '<br>',
-            '<label><input type="checkbox" name="favourite_animals[]" value="armadillo">Armadillo</label>',
+            '<label><input id="[[form-handle]]-form-favourite_animals-field-armadillo-option" type="checkbox" name="favourite_animals[]" value="armadillo">Armadillo</label>',
             '<br>',
-            '<label><input type="checkbox" name="favourite_animals[]" value="rat" checked>rat</label>',
+            '<label><input id="[[form-handle]]-form-favourite_animals-field-rat-option" type="checkbox" name="favourite_animals[]" value="rat" checked>rat</label>',
         ], [
             'handle' => 'favourite_animals',
             'field' => [
@@ -189,13 +202,13 @@ EOT
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_dynamically_renders_inline_checkboxes_field()
     {
         $this->assertFieldRendersHtml([
-            '<label><input type="checkbox" name="favourite_animals[]" value="cat">Cat</label>',
-            '<label><input type="checkbox" name="favourite_animals[]" value="armadillo">Armadillo</label>',
-            '<label><input type="checkbox" name="favourite_animals[]" value="rat">rat</label>',
+            '<label><input id="[[form-handle]]-form-favourite_animals-field-cat-option" type="checkbox" name="favourite_animals[]" value="cat">Cat</label>',
+            '<label><input id="[[form-handle]]-form-favourite_animals-field-armadillo-option" type="checkbox" name="favourite_animals[]" value="armadillo">Armadillo</label>',
+            '<label><input id="[[form-handle]]-form-favourite_animals-field-rat-option" type="checkbox" name="favourite_animals[]" value="rat">rat</label>',
         ], [
             'handle' => 'favourite_animals',
             'field' => [
@@ -210,9 +223,9 @@ EOT
         ]);
 
         $this->assertFieldRendersHtml([
-            '<label><input type="checkbox" name="favourite_animals[]" value="cat" checked>Cat</label>',
-            '<label><input type="checkbox" name="favourite_animals[]" value="armadillo">Armadillo</label>',
-            '<label><input type="checkbox" name="favourite_animals[]" value="rat" checked>rat</label>',
+            '<label><input id="[[form-handle]]-form-favourite_animals-field-cat-option" type="checkbox" name="favourite_animals[]" value="cat" checked>Cat</label>',
+            '<label><input id="[[form-handle]]-form-favourite_animals-field-armadillo-option" type="checkbox" name="favourite_animals[]" value="armadillo">Armadillo</label>',
+            '<label><input id="[[form-handle]]-form-favourite_animals-field-rat-option" type="checkbox" name="favourite_animals[]" value="rat" checked>rat</label>',
         ], [
             'handle' => 'favourite_animals',
             'field' => [
@@ -229,15 +242,15 @@ EOT
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_dynamically_renders_radio_field()
     {
         $this->assertFieldRendersHtml([
-            '<label><input type="radio" name="favourite_animal" value="cat">Cat</label>',
+            '<label><input id="[[form-handle]]-form-favourite_animal-field-cat-option" type="radio" name="favourite_animal" value="cat">Cat</label>',
             '<br>',
-            '<label><input type="radio" name="favourite_animal" value="armadillo">Armadillo</label>',
+            '<label><input id="[[form-handle]]-form-favourite_animal-field-armadillo-option" type="radio" name="favourite_animal" value="armadillo">Armadillo</label>',
             '<br>',
-            '<label><input type="radio" name="favourite_animal" value="rat">rat</label>',
+            '<label><input id="[[form-handle]]-form-favourite_animal-field-rat-option" type="radio" name="favourite_animal" value="rat">rat</label>',
         ], [
             'handle' => 'favourite_animal',
             'field' => [
@@ -251,11 +264,11 @@ EOT
         ]);
 
         $this->assertFieldRendersHtml([
-            '<label><input type="radio" name="favourite_animal" value="cat">Cat</label>',
+            '<label><input id="[[form-handle]]-form-favourite_animal-field-cat-option" type="radio" name="favourite_animal" value="cat">Cat</label>',
             '<br>',
-            '<label><input type="radio" name="favourite_animal" value="armadillo" checked>Armadillo</label>',
+            '<label><input id="[[form-handle]]-form-favourite_animal-field-armadillo-option" type="radio" name="favourite_animal" value="armadillo" checked>Armadillo</label>',
             '<br>',
-            '<label><input type="radio" name="favourite_animal" value="rat">rat</label>',
+            '<label><input id="[[form-handle]]-form-favourite_animal-field-rat-option" type="radio" name="favourite_animal" value="rat">rat</label>',
         ], [
             'handle' => 'favourite_animal',
             'field' => [
@@ -271,13 +284,13 @@ EOT
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_dynamically_renders_inline_radio_field()
     {
         $this->assertFieldRendersHtml([
-            '<label><input type="radio" name="favourite_animal" value="cat">Cat</label>',
-            '<label><input type="radio" name="favourite_animal" value="armadillo">Armadillo</label>',
-            '<label><input type="radio" name="favourite_animal" value="rat">rat</label>',
+            '<label><input id="[[form-handle]]-form-favourite_animal-field-cat-option" type="radio" name="favourite_animal" value="cat">Cat</label>',
+            '<label><input id="[[form-handle]]-form-favourite_animal-field-armadillo-option" type="radio" name="favourite_animal" value="armadillo">Armadillo</label>',
+            '<label><input id="[[form-handle]]-form-favourite_animal-field-rat-option" type="radio" name="favourite_animal" value="rat">rat</label>',
         ], [
             'handle' => 'favourite_animal',
             'field' => [
@@ -292,9 +305,9 @@ EOT
         ]);
 
         $this->assertFieldRendersHtml([
-            '<label><input type="radio" name="favourite_animal" value="cat">Cat</label>',
-            '<label><input type="radio" name="favourite_animal" value="armadillo" checked>Armadillo</label>',
-            '<label><input type="radio" name="favourite_animal" value="rat">rat</label>',
+            '<label><input id="[[form-handle]]-form-favourite_animal-field-cat-option" type="radio" name="favourite_animal" value="cat">Cat</label>',
+            '<label><input id="[[form-handle]]-form-favourite_animal-field-armadillo-option" type="radio" name="favourite_animal" value="armadillo" checked>Armadillo</label>',
+            '<label><input id="[[form-handle]]-form-favourite_animal-field-rat-option" type="radio" name="favourite_animal" value="rat">rat</label>',
         ], [
             'handle' => 'favourite_animal',
             'field' => [
@@ -311,11 +324,11 @@ EOT
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_dynamically_renders_select_field()
     {
         $this->assertFieldRendersHtml([
-            '<select name="favourite_animal">',
+            '<select id="[[form-handle]]-form-favourite_animal-field" name="favourite_animal">',
             '<option value>Please select...</option>',
             '<option value="cat">Cat</option>',
             '<option value="armadillo">Armadillo</option>',
@@ -334,7 +347,7 @@ EOT
         ]);
 
         $this->assertFieldRendersHtml([
-            '<select name="favourite_animal">',
+            '<select id="[[form-handle]]-form-favourite_animal-field" name="favourite_animal">',
             '<option value>Please select...</option>',
             '<option value="cat" selected>Cat</option>',
             '<option value="armadillo">Armadillo</option>',
@@ -355,11 +368,11 @@ EOT
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_dynamically_renders_multiple_select_field()
     {
         $this->assertFieldRendersHtml([
-            '<select name="favourite_animals[]" multiple>',
+            '<select id="[[form-handle]]-form-favourite_animals-field" name="favourite_animals[]" multiple>',
             '<option value="cat">Cat</option>',
             '<option value="armadillo">Armadillo</option>',
             '<option value="rat">rat</option>',
@@ -378,7 +391,7 @@ EOT
         ]);
 
         $this->assertFieldRendersHtml([
-            '<select name="favourite_animals[]" multiple>',
+            '<select id="[[form-handle]]-form-favourite_animals-field" name="favourite_animals[]" multiple>',
             '<option value="cat" selected>Cat</option>',
             '<option value="armadillo">Armadillo</option>',
             '<option value="rat" selected>rat</option>',
@@ -399,11 +412,11 @@ EOT
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_dynamically_renders_asset_field()
     {
         $this->assertFieldRendersHtml([
-            '<input type="file" name="cat_selfie">',
+            '<input id="[[form-handle]]-form-cat_selfie-field" type="file" name="cat_selfie">',
         ], [
             'handle' => 'cat_selfie',
             'field' => [
@@ -414,11 +427,11 @@ EOT
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_dynamically_renders_multiple_assets_field()
     {
         $this->assertFieldRendersHtml([
-            '<input type="file" name="cat_selfies[]" multiple>',
+            '<input id="[[form-handle]]-form-cat_selfies-field" type="file" name="cat_selfies[]" multiple>',
         ], [
             'handle' => 'cat_selfies',
             'field' => [
@@ -428,11 +441,11 @@ EOT
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_dynamically_renders_field_with_fallback_to_default_partial()
     {
         $this->assertFieldRendersHtml([
-            '<input type="text" name="custom" value="">',
+            '<input id="[[form-handle]]-form-custom-field" type="text" name="custom" value="">',
         ], [
             'handle' => 'custom',
             'field' => [
@@ -441,7 +454,7 @@ EOT
         ]);
 
         $this->assertFieldRendersHtml([
-            '<input type="text" name="custom" value="fall back to default partial">',
+            '<input id="[[form-handle]]-form-custom-field" type="text" name="custom" value="fall back to default partial">',
         ], [
             'handle' => 'custom',
             'field' => [
@@ -452,7 +465,7 @@ EOT
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_dynamically_renders_sections_array()
     {
         $this->createForm([
@@ -507,7 +520,7 @@ EOT
         $this->assertStringContainsString('<div class="fields">alpha,bravo,charlie,delta,echo,fox</div>', $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_renders_section_instructions_without_cascading_into_field_instructions()
     {
         $this->createForm([
@@ -554,7 +567,7 @@ EOT
         $this->assertStringContainsString('<div class="field-by-itself">bravo (This field has instructions!)</div>', $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_wont_submit_form_and_renders_errors()
     {
         $this->assertEmpty(Form::find('contact')->submissions());
@@ -595,7 +608,7 @@ EOT
         $this->assertEmpty($success[1]);
     }
 
-    /** @test */
+    #[Test]
     public function it_will_submit_form_and_render_success()
     {
         $this->assertEmpty(Form::find('contact')->submissions());
@@ -627,7 +640,7 @@ EOT
         $this->assertEquals(['Submission successful.'], $success[1]);
     }
 
-    /** @test */
+    #[Test]
     public function it_will_submit_form_and_follow_custom_redirect_with_success()
     {
         $this->assertEmpty(Form::find('contact')->submissions());
@@ -664,7 +677,7 @@ EOT
         $this->assertStringContainsString('<div class="analytics"></div>', $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_will_submit_form_with_honeypot_filled_and_render_fake_success()
     {
         $this->assertEmpty(Form::find('contact')->submissions());
@@ -701,7 +714,7 @@ EOT
         $this->assertStringNotContainsString('<div class="analytics"></div>', $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_wont_submit_form_and_follow_custom_redirect_with_errors()
     {
         $this->assertEmpty(Form::find('contact')->submissions());
@@ -740,7 +753,7 @@ EOT
         $this->assertEmpty($success[1]);
     }
 
-    /** @test */
+    #[Test]
     public function it_will_use_redirect_query_param_off_url()
     {
         $this->get('/?redirect=submission-successful&error_redirect=submission-failure');
@@ -759,7 +772,7 @@ EOT
         $this->assertStringContainsString($expectedErrorRedirect, $output);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_render_an_inline_error_when_multiple_rules_fail()
     {
         $this->assertEmpty(Form::find('contact')->submissions());
@@ -803,7 +816,7 @@ EOT
         $this->assertEquals($expectedInline, $inlineErrors[1]);
     }
 
-    /** @test */
+    #[Test]
     public function it_fetches_form_data()
     {
         $form = Statamic::tag('form:contact')->params([
@@ -828,7 +841,7 @@ EOT
         $this->assertEquals($form['js_driver'], 'alpine');
     }
 
-    /** @test */
+    #[Test]
     public function it_uploads_assets()
     {
         Storage::fake('avatars');
@@ -860,7 +873,7 @@ EOT
         Storage::disk('avatars')->assertExists('avatar.jpg');
     }
 
-    /** @test */
+    #[Test]
     public function it_removes_any_uploaded_assets_when_a_submission_silently_fails()
     {
         Storage::fake('avatars');
@@ -896,7 +909,7 @@ EOT
         Storage::disk('avatars')->assertMissing('avatar.jpg');
     }
 
-    /** @test */
+    #[Test]
     public function it_removes_any_uploaded_assets_when_a_listener_throws_a_validation_exception()
     {
         Storage::fake('avatars');
@@ -930,5 +943,65 @@ EOT
             ]);
 
         Storage::disk('avatars')->assertMissing('avatar.jpg');
+    }
+
+    #[Test]
+    public function it_renders_exceptions_thrown_during_json_requests_as_standard_laravel_errors()
+    {
+        Event::listen(function (\Statamic\Events\FormSubmitted $event) {
+            throw ValidationException::withMessages(['some' => 'error']);
+        });
+
+        $response = $this
+            ->postJson('/!/forms/contact', [
+                'name' => 'Name',
+                'email' => 'test@test.com',
+                'message' => 'This is a message',
+            ]);
+
+        $json = $response->json();
+
+        $this->assertArrayHasKey('message', $json);
+        $this->assertArrayHasKey('errors', $json);
+        $this->assertSame($json['errors'], ['some' => ['error']]);
+    }
+
+    #[Test]
+    public function it_renders_exceptions_thrown_during_xml_http_requests_in_statamic_error_format()
+    {
+        Event::listen(function (\Statamic\Events\FormSubmitted $event) {
+            throw ValidationException::withMessages(['some' => 'error']);
+        });
+
+        $response = $this
+            ->withHeaders([
+                'X-Requested-With' => 'XMLHttpRequest',
+            ])
+            ->postJson('/!/forms/contact', [
+                'name' => 'Name',
+                'email' => 'test@test.com',
+                'message' => 'This is a message',
+            ]);
+
+        $json = $response->json();
+
+        $this->assertArrayHasKey('error', $json);
+        $this->assertArrayHasKey('errors', $json);
+        $this->assertSame($json['error'], ['some' => 'error']);
+    }
+
+    #[Test]
+    public function it_adds_appended_config_fields()
+    {
+        Form::appendConfigFields('*', 'Fields', [
+            'test_config' => ['type' => 'text', 'display' => 'First injected into fields section'],
+        ]);
+
+        tap(Form::find('contact')->data(['test_config' => 'This is a test config value']))->save();
+
+        $output = $this->tag('{{ form:contact redirect="/submitted" error_redirect="/errors" class="form" id="form" }}{{ form_config:test_config }}{{ /form:contact }}');
+
+        $this->assertStringStartsWith('<form method="POST" action="http://localhost/!/forms/contact" class="form" id="form">', $output);
+        $this->assertStringContainsString('This is a test config value', $output);
     }
 }

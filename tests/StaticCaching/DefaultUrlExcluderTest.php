@@ -2,6 +2,7 @@
 
 namespace Tests\StaticCaching;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\StaticCaching\DefaultUrlExcluder;
 
 class DefaultUrlExcluderTest extends \PHPUnit\Framework\TestCase
@@ -11,7 +12,7 @@ class DefaultUrlExcluderTest extends \PHPUnit\Framework\TestCase
         return new DefaultUrlExcluder($baseUrl, $urls);
     }
 
-    /** @test */
+    #[Test]
     public function excludes_urls()
     {
         $excluder = $this->excluder(['/blog', '/events/', '/']);
@@ -26,7 +27,7 @@ class DefaultUrlExcluderTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($excluder->isExcluded(''));
     }
 
-    /** @test */
+    #[Test]
     public function excludes_wildcard_urls()
     {
         $excluder = $this->excluder([
@@ -47,7 +48,7 @@ class DefaultUrlExcluderTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($excluder->isExcluded('/newspaper/'));
     }
 
-    /** @test */
+    #[Test]
     public function url_exclusions_ignore_query_strings()
     {
         $excluder = $this->excluder(['/blog']);
@@ -56,7 +57,7 @@ class DefaultUrlExcluderTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($excluder->isExcluded('/blog/?page=1'));
     }
 
-    /** @test */
+    #[Test]
     public function url_exclusions_trim_the_base_url()
     {
         $excluder = $this->excluder(['/blog'], 'http://example.com');

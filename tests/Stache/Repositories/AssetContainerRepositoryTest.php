@@ -3,7 +3,9 @@
 namespace Tests\Stache\Repositories;
 
 use Illuminate\Support\Collection as IlluminateCollection;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Assets\AssetContainer;
+use Statamic\Exceptions\AssetContainerNotFoundException;
 use Statamic\Facades;
 use Statamic\Stache\Repositories\AssetContainerRepository;
 use Statamic\Stache\Stache;
@@ -27,7 +29,7 @@ class AssetContainerRepositoryTest extends TestCase
         $this->repo = new AssetContainerRepository($stache);
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_all_asset_containers()
     {
         $containers = $this->repo->all();
@@ -42,7 +44,7 @@ class AssetContainerRepositoryTest extends TestCase
         $this->assertEquals(['Another Asset Container', 'Main Assets'], $ordered->map->title()->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_gets_an_asset_container_by_handle()
     {
         tap($this->repo->findByHandle('main'), function ($container) {
@@ -62,7 +64,7 @@ class AssetContainerRepositoryTest extends TestCase
         $this->assertNull($this->repo->findByHandle('unknown'));
     }
 
-    /** @test */
+    #[Test]
     public function it_saves_a_container_to_the_stache_and_to_a_file()
     {
         $container = Facades\AssetContainer::make('new');
@@ -74,5 +76,23 @@ class AssetContainerRepositoryTest extends TestCase
         $this->assertEquals($container, $item);
         $this->assertTrue(file_exists($this->directory.'/new.yaml'));
         @unlink($this->directory.'/new.yaml');
+    }
+
+    #[Test]
+    public function test_find_or_fail_gets_container()
+    {
+        $container = $this->repo->findOrFail('main');
+
+        $this->assertInstanceOf(AssetContainer::class, $container);
+        $this->assertEquals('Main Assets', $container->title());
+    }
+
+    #[Test]
+    public function test_find_or_fail_throws_exception_when_container_does_not_exist()
+    {
+        $this->expectException(AssetContainerNotFoundException::class);
+        $this->expectExceptionMessage('Asset Container [does-not-exist] not found');
+
+        $this->repo->findOrFail('does-not-exist');
     }
 }

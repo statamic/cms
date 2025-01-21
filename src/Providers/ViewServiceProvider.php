@@ -5,6 +5,7 @@ namespace Statamic\Providers;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View as ViewFactory;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Statamic\Contracts\View\Antlers\Parser as ParserContract;
 use Statamic\Facades\Site;
@@ -19,11 +20,12 @@ use Statamic\View\Antlers\Language\Runtime\RuntimeConfiguration;
 use Statamic\View\Antlers\Language\Runtime\RuntimeParser;
 use Statamic\View\Antlers\Language\Runtime\Tracing\TraceManager;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
-use Statamic\View\Antlers\Parser;
 use Statamic\View\Blade\AntlersBladePrecompiler;
+use Statamic\View\Blade\StatamicTagCompiler;
 use Statamic\View\Cascade;
 use Statamic\View\Debugbar\AntlersProfiler\PerformanceCollector;
 use Statamic\View\Debugbar\AntlersProfiler\PerformanceTracer;
+use Statamic\View\Interop\Stacks;
 use Statamic\View\Store;
 
 class ViewServiceProvider extends ServiceProvider
@@ -41,33 +43,16 @@ class ViewServiceProvider extends ServiceProvider
             return new Cascade($app['request'], Site::current());
         });
 
-        $this->registerRuntimeAntlers();
-        $this->registerRegexAntlers();
-
-        $this->app->bind(ParserContract::class, function ($app) {
-            return config('statamic.antlers.version', 'regex') === 'regex'
-                ? $app->make('antlers.regex')
-                : $app->make('antlers.runtime');
-        });
+        $this->registerAntlers();
 
         $this->app->singleton(Engine::class, function ($app) {
             return new Engine($app['files'], $app[ParserContract::class]);
         });
     }
 
-    private function registerRegexAntlers()
+    private function registerAntlers()
     {
-        $this->app->bind('antlers.regex', function ($app) {
-            return (new Parser)
-                ->callback([Engine::class, 'renderTag'])
-                ->cascade($app[Cascade::class]);
-        });
-
-        $this->app->bind(Parser::class, fn ($app) => $app['antlers.regex']);
-    }
-
-    private function registerRuntimeAntlers()
-    {
+        Stacks::register();
         GlobalRuntimeState::$environmentId = StringUtilities::uuidv4();
 
         // Set the debug mode before anything else starts.
@@ -100,7 +85,7 @@ class ViewServiceProvider extends ServiceProvider
             return new PerformanceTracer();
         });
 
-        $this->app->bind('antlers.runtime', function ($app) {
+        $this->app->bind(ParserContract::class, function ($app) {
             /** @var RuntimeParser $parser */
             $parser = $app->make(RuntimeParser::class)->cascade($app[Cascade::class]);
             $runtimeConfig = new RuntimeConfiguration();
@@ -172,9 +157,52 @@ class ViewServiceProvider extends ServiceProvider
         });
     }
 
+    public function registerBladeDirectives()
+    {
+        Blade::directive('tags', function ($expression) {
+            return "<?php extract(\Statamic\View\Blade\TagsDirective::handle($expression)) ?>";
+        });
+        Blade::directive('cascade', function ($expression) {
+            return "<?php extract(\Statamic\View\Blade\CascadeDirective::handle($expression)) ?>";
+        });
+        Blade::directive('frontmatter', function ($exp) {
+            return "<?php
+if (! isset(\$view)) { \$view = []; }
+\$view = array_merge({$exp}, \$view ?? [], \$__frontmatter ?? []);
+?>";
+        });
+        Blade::directive('recursive_children', function ($exp) {
+            $nested = $exp ?? '$children';
+
+            if (! $nested) {
+                $nested = '$children';
+            }
+
+            $recursiveChildren = <<<'PHP'
+@include('compiled__views::'.$__currentStatamicNavView, array_merge(get_defined_vars(), [
+    'depth' => ($depth ?? 0) + 1,
+    '__statamicOverrideTagResultValue' => #varName#,
+]))
+PHP;
+
+            $recursiveChildren = Str::swap([
+                '#varName#' => $nested,
+            ], $recursiveChildren);
+
+            return Blade::compileString($recursiveChildren);
+        });
+
+    }
+
     public function boot()
     {
         ViewFactory::addNamespace('compiled__views', storage_path('framework/views'));
+
+        $this->registerBladeDirectives();
+
+        Blade::precompiler(function ($content) {
+            return (new StatamicTagCompiler())->compile($content);
+        });
 
         Blade::precompiler(function ($content) {
             return AntlersBladePrecompiler::compile($content);

@@ -6,7 +6,7 @@ use Statamic\Facades\Cascade;
 
 class Section extends Tags
 {
-    public function __call($method, $args)
+    public function wildcard($method)
     {
         $name = explode(':', $this->tag)[1];
 

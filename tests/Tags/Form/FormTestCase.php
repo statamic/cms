@@ -67,9 +67,9 @@ abstract class FormTestCase extends TestCase
         ], $headers));
     }
 
-    protected function tag($tag)
+    protected function tag($tag, $params = [])
     {
-        return Parse::template($tag, []);
+        return Parse::template($tag, $params);
     }
 
     protected function createForm($blueprintContents = null, $handle = null)
@@ -115,7 +115,9 @@ abstract class FormTestCase extends TestCase
             $this->tag("{{ form:{$handle} {$extraParams}}}{{ fields }}{{ field}}{{ /fields }}{{ /form:{$handle} }}", $oldData)
         );
 
-        $expected = collect(Arr::wrap($expectedHtmlParts))->implode('');
+        $expected = collect(Arr::wrap($expectedHtmlParts))
+            ->map(fn ($html) => str_replace('[[form-handle]]', $handle, $html)) // allow testing against dynamic form handle
+            ->implode('');
 
         $this->assertStringContainsString($expected, $output);
     }

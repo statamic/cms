@@ -10,6 +10,7 @@ use Statamic\Search\Documents;
 use Statamic\Search\Index as BaseIndex;
 use Statamic\Search\IndexNotFoundException;
 use Statamic\Search\Result;
+use Statamic\Support\Arr;
 
 class Index extends BaseIndex
 {
@@ -37,13 +38,13 @@ class Index extends BaseIndex
             $data['search_score'] = $result['score'];
             $data['search_snippets'] = $result['snippets'];
 
-            return array_except($data, '_category');
+            return Arr::except($data, '_category');
         });
     }
 
     protected function data()
     {
-        return collect(json_decode($this->raw(), true));
+        return collect(json_decode($this->raw(), true, flags: JSON_THROW_ON_ERROR));
     }
 
     protected function settings()
@@ -72,7 +73,7 @@ class Index extends BaseIndex
             throw new IndexNotFoundException;
         }
 
-        return File::get($this->path());
+        return app('files')->get($this->path(), lock: true);
     }
 
     public function exists()
@@ -116,7 +117,9 @@ class Index extends BaseIndex
 
     protected function save($documents)
     {
-        File::put($this->path(), $documents->toJson());
+        app('files')->ensureDirectoryExists(pathinfo($this->path())['dirname']);
+
+        app('files')->put($this->path(), $documents->toJson(), lock: true);
     }
 
     public function extraAugmentedResultData(Result $result)

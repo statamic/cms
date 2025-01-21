@@ -53,14 +53,19 @@ class ListedTerm extends JsonResource
     {
         return $this->columns->mapWithKeys(function ($column) use ($extra) {
             $key = $column->field;
+            $field = $this->blueprint->field($key);
 
             if ($key == 'taxonomy') {
                 return [$key => $this->resource->taxonomy()->title()];
+            } else {
+                $value = $extra[$key] ?? $this->resource->value($key) ?? $field?->defaultValue();
             }
 
-            $value = $this->blueprint
-                ->field($key)
-                ->setValue($extra[$key] ?? $this->resource->value($key))
+            if (! $field) {
+                return [$key => $value];
+            }
+
+            $value = $field->setValue($value)
                 ->setParent($this->resource)
                 ->preProcessIndex()
                 ->value();

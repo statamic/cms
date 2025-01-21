@@ -15,6 +15,8 @@ trait RunsUpdateScripts
         $script = new $fqcn($package);
 
         $script->update();
+
+        return $script;
     }
 
     protected function assertUpdateScriptRegistered($class)

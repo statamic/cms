@@ -161,11 +161,11 @@ class Engine implements EngineInterface
             }
 
             if ($output instanceof Collection) {
-                $output = $output->toAugmentedArray();
+                $output = $output->toDeferredAugmentedArray();
             }
 
             if ($output instanceof Augmentable) {
-                $output = $output->toAugmentedArray();
+                $output = $output->toDeferredAugmentedArray();
             }
 
             // Allow tags to return an array. We'll parse it for them.

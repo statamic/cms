@@ -4,6 +4,7 @@ namespace Statamic\Data;
 
 use Closure;
 use Illuminate\Support\Collection;
+use Statamic\Facades\Blink;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -23,8 +24,10 @@ trait StoresScopedComputedFieldCallbacks
 
     public function getComputedCallbacks(string $scope): Collection
     {
-        return collect($this->computedFieldCallbacks)
-            ->filter(fn ($_, $key) => Str::startsWith($key, "{$scope}."))
-            ->keyBy(fn ($_, $key) => Str::after($key, "{$scope}."));
+        return Blink::once(__CLASS__.'::getComputedCallbacks'.$scope, function () use ($scope) {
+            return collect($this->computedFieldCallbacks)
+                ->filter(fn ($_, $key) => Str::startsWith($key, "{$scope}."))
+                ->keyBy(fn ($_, $key) => Str::after($key, "{$scope}."));
+        });
     }
 }

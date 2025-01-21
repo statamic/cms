@@ -2,12 +2,13 @@
 
 namespace Tests\Data;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Data\StoresScopedComputedFieldCallbacks;
 use Tests\TestCase;
 
 class StoresScopedComputedFieldCallbacksTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_can_store_scoped_computed_callbacks()
     {
         $repository = new FakeRepositoryWithScopedCallbacks;
@@ -36,7 +37,7 @@ class StoresScopedComputedFieldCallbacksTest extends TestCase
         $this->assertEquals([], $repository->getComputedCallbacks('products')->all());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_store_scoped_computed_callbacks_for_multiple_scopes()
     {
         $repository = new FakeRepositoryWithScopedCallbacks;

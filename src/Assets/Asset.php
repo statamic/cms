@@ -7,6 +7,7 @@ use Facades\Statamic\Assets\Attributes;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use League\Flysystem\PathTraversalDetected;
 use Statamic\Assets\AssetUploader as Uploader;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
@@ -17,14 +18,18 @@ use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Contracts\Search\Searchable as SearchableContract;
 use Statamic\Data\ContainsData;
 use Statamic\Data\HasAugmentedInstance;
+use Statamic\Data\HasDirtyState;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\AssetContainerBlueprintFound;
+use Statamic\Events\AssetCreated;
+use Statamic\Events\AssetCreating;
 use Statamic\Events\AssetDeleted;
 use Statamic\Events\AssetDeleting;
 use Statamic\Events\AssetReplaced;
 use Statamic\Events\AssetReuploaded;
 use Statamic\Events\AssetSaved;
+use Statamic\Events\AssetSaving;
 use Statamic\Events\AssetUploaded;
 use Statamic\Exceptions\FileExtensionMismatch;
 use Statamic\Facades;
@@ -46,7 +51,7 @@ use Symfony\Component\Mime\MimeTypes;
 
 class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, ContainsQueryableValues, ResolvesValuesContract, SearchableContract
 {
-    use ContainsData, FluentlyGetsAndSets, HasAugmentedInstance,
+    use ContainsData, FluentlyGetsAndSets, HasAugmentedInstance, HasDirtyState,
         Searchable,
         TracksQueriedColumns, TracksQueriedRelations {
             set as traitSet;
@@ -65,7 +70,6 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
     protected $withEvents = true;
     protected $shouldHydrate = true;
     protected $removedData = [];
-    protected $original = [];
 
     public function syncOriginal()
     {
@@ -364,6 +368,13 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
     {
         return $this
             ->fluentlyGetOrSet('path')
+            ->setter(function ($path) {
+                if (str_contains($path, '../')) {
+                    throw PathTraversalDetected::forPath($path);
+                }
+
+                return $path;
+            })
             ->getter(function ($path) {
                 return $path ? ltrim($path, '/') : null;
             })
@@ -485,7 +496,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     public function isImage()
     {
-        return $this->extensionIsOneOf(['jpg', 'jpeg', 'png', 'gif', 'webp']);
+        return $this->extensionIsOneOf(['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif']);
     }
 
     /**
@@ -600,14 +611,30 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     public function save()
     {
+        $isNew = is_null($this->container()->asset($this->path()));
+
         $withEvents = $this->withEvents;
         $this->withEvents = true;
+
+        if ($withEvents) {
+            if ($isNew && AssetCreating::dispatch($this) === false) {
+                return false;
+            }
+
+            if (AssetSaving::dispatch($this) === false) {
+                return false;
+            }
+        }
 
         Facades\Asset::save($this);
 
         $this->clearCaches();
 
         if ($withEvents) {
+            if ($isNew) {
+                AssetCreated::dispatch($this);
+            }
+
             AssetSaved::dispatch($this);
         }
 
@@ -617,13 +644,28 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
     }
 
     /**
+     * Delete quietly without firing events.
+     *
+     * @return bool
+     */
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
+    }
+
+    /**
      * Delete the asset.
      *
      * @return $this
      */
     public function delete()
     {
-        if (AssetDeleting::dispatch($this) === false) {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        if ($withEvents && AssetDeleting::dispatch($this) === false) {
             return false;
         }
 
@@ -634,7 +676,9 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
         $this->clearCaches();
 
-        AssetDeleted::dispatch($this);
+        if ($withEvents) {
+            AssetDeleted::dispatch($this);
+        }
 
         return $this;
     }
@@ -642,7 +686,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
     /**
      * Clear meta and filesystem listing caches.
      */
-    private function clearCaches()
+    protected function clearCaches()
     {
         $this->meta = null;
         Cache::forget($this->metaCacheKey());
@@ -862,6 +906,10 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     public function upload(UploadedFile $file)
     {
+        if (AssetCreating::dispatch($this) === false) {
+            return false;
+        }
+
         $path = Uploader::asset($this)->upload($file);
 
         $this
@@ -870,6 +918,8 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
             ->save();
 
         AssetUploaded::dispatch($this);
+
+        AssetCreated::dispatch($this);
 
         return $this;
     }
@@ -1021,7 +1071,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
     public function shallowAugmentedArrayKeys()
     {
-        return ['id', 'url', 'permalink', 'api_url'];
+        return ['id', 'url', 'permalink', 'api_url', 'alt'];
     }
 
     protected function defaultAugmentedRelations()
@@ -1029,12 +1079,12 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         return $this->selectedQueryRelations;
     }
 
-    private function hasDimensions()
+    public function hasDimensions()
     {
         return $this->isImage() || $this->isSvg() || $this->isVideo();
     }
 
-    private function hasDuration()
+    public function hasDuration()
     {
         return $this->isAudio() || $this->isVideo();
     }
@@ -1052,6 +1102,14 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         }
 
         return $field->fieldtype()->toQueryableValue($value);
+    }
+
+    public function getCurrentDirtyStateAttributes(): array
+    {
+        return array_merge([
+            'path' => $this->path(),
+            'data' => $this->data()->toArray(),
+        ]);
     }
 
     public function getCpSearchResultBadge(): string

@@ -8,8 +8,14 @@ use Statamic\Support\Str;
 
 class AugmentedAsset extends AbstractAugmented
 {
+    private $cachedKeys;
+
     public function keys()
     {
+        if ($this->cachedKeys) {
+            return $this->cachedKeys;
+        }
+
         $keys = $this->data->data()->keys()
             ->merge($this->data->supplements()->keys())
             ->merge([
@@ -65,7 +71,7 @@ class AugmentedAsset extends AbstractAugmented
             ]);
         }
 
-        return $keys->merge($this->blueprintFields()->keys())->unique()->all();
+        return $this->cachedKeys = $keys->merge($this->blueprintFields()->keys())->unique()->all();
     }
 
     protected function isAsset()

@@ -9,7 +9,7 @@
             >
                 <div class="flex items-center shrink">
                     <div v-if="item.hasOwnProperty('published') && item.published !== null"
-                        class="little-dot h-1 w-1 mr-1" :class="[item.published ? 'bg-green-600' : 'bg-gray-400']" />
+                        class="little-dot h-1 w-1 rtl:ml-1 ltr:mr-1" :class="[item.published ? 'bg-green-600' : 'bg-gray-400 dark:bg-dark-200']" />
                     <a :href="item.edit_url" :title="item.title" v-text="item.title" />
                 </div>
             </div>

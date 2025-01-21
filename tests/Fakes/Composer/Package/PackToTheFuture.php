@@ -2,6 +2,7 @@
 
 namespace Tests\Fakes\Composer\Package;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Path;
 
 class PackToTheFuture

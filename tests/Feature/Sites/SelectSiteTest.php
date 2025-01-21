@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Sites;
 
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
@@ -16,10 +17,10 @@ class SelectSiteTest extends TestCase
     {
         parent::setUp();
 
-        Site::setConfig(['sites' => [
+        $this->setSites([
             'en' => ['url' => '/', 'locale' => 'en'],
             'fr' => ['url' => '/fr/', 'locale' => 'fr'],
-        ]]);
+        ]);
 
         $this->setTestRoles([
             'can_access_fr' => [
@@ -34,7 +35,7 @@ class SelectSiteTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function site_can_be_selected()
     {
         $this->assertEquals('en', Site::selected()->handle());
@@ -49,7 +50,7 @@ class SelectSiteTest extends TestCase
         $this->assertEquals('fr', Site::selected()->handle());
     }
 
-    /** @test */
+    #[Test]
     public function invalid_site_cannot_be_selected()
     {
         $this->assertEquals('en', Site::selected()->handle());
@@ -64,7 +65,7 @@ class SelectSiteTest extends TestCase
         $this->assertEquals('en', Site::selected()->handle());
     }
 
-    /** @test */
+    #[Test]
     public function site_cannot_be_selected_without_permission()
     {
         $this->assertEquals('en', Site::selected()->handle());
