@@ -1,5 +1,17 @@
 # Release Notes
 
+## 5.45.2 (2025-01-21)
+
+### What's fixed
+- Revert "Allow form fields view to be rendered with single tag" [#11374](https://github.com/statamic/cms/issues/11374) by @duncanmcclean
+- Remove `type` attribute in nocache replacer [#11373](https://github.com/statamic/cms/issues/11373) by @marcorieser
+- Fix deprecation warning from regex operator [#11337](https://github.com/statamic/cms/issues/11337) by @duncanmcclean
+- Fix bug report link in Contribution Guide [#11367](https://github.com/statamic/cms/issues/11367) by @duncanmcclean
+- Fix bard undefined href error [#11351](https://github.com/statamic/cms/issues/11351) by @jacksleight
+- Suppress “packing” git message [#11326](https://github.com/statamic/cms/issues/11326) by @edalzell
+
+
+
 ## 5.45.1 (2025-01-07)
 
 ### What's fixed
