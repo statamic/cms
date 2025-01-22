@@ -74,7 +74,7 @@ class Tags extends BaseTags
 
         $data['sections'] = $this->getSections($this->sessionHandle(), $jsDriver);
 
-        $data['fields'] = new FieldsVariable(collect($data['sections'])->flatMap->fields->all());
+        $data['fields'] = collect($data['sections'])->flatMap->fields->all();
 
         $data['honeypot'] = $form->honeypot();
 

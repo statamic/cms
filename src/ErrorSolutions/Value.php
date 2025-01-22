@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Ignition;
+namespace Statamic\ErrorSolutions;
 
 use Statamic\Fields\Value as FieldValue;
 
