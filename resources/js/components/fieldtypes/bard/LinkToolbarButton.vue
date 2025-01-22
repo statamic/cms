@@ -79,7 +79,7 @@ export default {
         });
     },
 
-    beforeDestroy() {
+    beforeUnmount() {
         this.bard.$off('link-toggle');
     }
 }

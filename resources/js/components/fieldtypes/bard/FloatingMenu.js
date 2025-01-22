@@ -65,7 +65,7 @@ export const FloatingMenu = {
         });
     },
 
-    beforeDestroy() {
+    beforeUnmount() {
         this.editor.unregisterPlugin('floatingMenu')
     },
 }

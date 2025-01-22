@@ -87,7 +87,7 @@ export default {
         this.escBinding = this.$keys.bind('esc', this.dismiss)
     },
 
-    beforeDestroy() {
+    beforeUnmount() {
         this.escBinding.destroy()
     },
 }

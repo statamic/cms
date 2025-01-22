@@ -63,7 +63,7 @@ export default {
         this.keybinding = this.$keys.bind('esc', this.dismiss)
     },
 
-    destroyed() {
+    unmounted() {
         this.keybinding.destroy();
     },
 

@@ -54,7 +54,7 @@ export default {
     },
 
 
-    beforeDestroy() {
+    beforeUnmount() {
         this.$refs.nativeFileField.removeEventListener('change', this.addNativeFileFieldSelections);
     },
 

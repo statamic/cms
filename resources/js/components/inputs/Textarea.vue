@@ -49,7 +49,7 @@ export default {
         this.$events.$on('tab-switched', this.updateSize);
     },
 
-    beforeDestroy() {
+    beforeUnmount() {
         autosize.destroy(this.$refs.textarea);
     },
 

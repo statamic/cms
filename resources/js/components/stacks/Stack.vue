@@ -114,7 +114,7 @@ export default {
         this.escBinding = this.$keys.bindGlobal('esc', this.close);
     },
 
-    destroyed() {
+    unmounted() {
         this.stack.destroy();
         this.$events.$off(`stacks.${this.depth}.hit-area-mouseenter`);
         this.$events.$off(`stacks.${this.depth}.hit-area-mouseout`);

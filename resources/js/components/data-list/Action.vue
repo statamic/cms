@@ -110,7 +110,7 @@ export default {
         this.$events.$on('reset-action-modals', this.reset);
     },
 
-    destroyed() {
+    unmounted() {
         this.$events.$off('reset-action-modals', this.reset);
     },
 

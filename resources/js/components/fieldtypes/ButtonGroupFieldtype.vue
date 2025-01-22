@@ -35,7 +35,7 @@ export default {
         this.setupResizeObserver();
     },
 
-    beforeDestroy() {
+    beforeUnmount() {
         this.resizeObserver.disconnect();
     },
 

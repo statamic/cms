@@ -911,11 +911,11 @@ export default {
         clearTimeout(this.trackDirtyStateTimeout);
     },
 
-    beforeDestroy() {
+    beforeUnmount() {
         this.$store.commit(`publish/${this.publishContainer}/clearAutosaveInterval`);
     },
 
-    destroyed() {
+    unmounted() {
         this.saveKeyBinding.destroy();
         this.quickSaveKeyBinding.destroy();
     }

@@ -228,11 +228,11 @@ export default {
         });
     },
 
-    beforeDestroy() {
+    beforeUnmount() {
         this.closePopout();
     },
 
-    destroyed() {
+    unmounted() {
         this.keybinding.destroy();
     },
 

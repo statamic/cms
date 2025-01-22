@@ -50,7 +50,7 @@ export default {
         this.portal = this.$portals.create(this.name);
     },
 
-    beforeDestroy() {
+    beforeUnmount() {
         this.portal.destroy();
     }
 

@@ -194,7 +194,7 @@ export default {
         this.$events.$on(`container.${this.storeName}.saving`, this.triggerChangeOnFocusedField);
     },
 
-    destroyed() {
+    unmounted() {
         this.$events.$off(`container.${this.storeName}.saving`, this.triggerChangeOnFocusedField);
     },
 

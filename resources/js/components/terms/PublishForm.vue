@@ -672,7 +672,7 @@ export default {
         window.history.replaceState({}, document.title, document.location.href.replace('created=true', ''));
     },
 
-    destroyed() {
+    unmounted() {
         this.saveKeyBinding.destroy();
         this.quickSaveKeyBinding.destroy();
     }

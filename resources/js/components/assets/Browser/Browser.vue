@@ -434,7 +434,7 @@ export default {
         this.$events.$on('editor-action-completed', this.actionCompleted);
     },
 
-    destroyed() {
+    unmounted() {
         this.$events.$off('editor-action-started', this.actionStarted);
         this.$events.$off('editor-action-completed', this.actionCompleted);
     },

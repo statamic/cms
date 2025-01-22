@@ -346,7 +346,7 @@ export default {
         this.autofocus();
     },
 
-    beforeDestroy() {
+    beforeUnmount() {
         this.bard.$off('link-selected');
         this.bard.$off('link-deselected');
     },

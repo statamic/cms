@@ -110,7 +110,7 @@ export default {
         this.$events.$on('clear-selections', this.clearSelections);
     },
 
-    destroyed() {
+    unmounted() {
         this.$events.$off('clear-selections', this.clearSelections);
     },
 

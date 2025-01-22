@@ -100,7 +100,7 @@ export default {
         this.$events.$on('localization.created', this.handleLocalizationCreated);
     },
 
-    destroyed() {
+    unmounted() {
         this.$events.$off('localization.created', this.handleLocalizationCreated);
     },
 
