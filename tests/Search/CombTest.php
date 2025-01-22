@@ -240,6 +240,20 @@ EOT;
     }
 
     #[Test]
+    public function it_can_search_for_umlauts()
+    {
+        $comb = new Comb([
+            ['content' => 'Üppercase umlaut'],
+            ['content' => 'Lowercase ümlaut'],
+        ]);
+
+        $result = $comb->lookUp('ü');
+        $this->assertIsArray($result);
+        $this->assertCount(2, $result);
+        $this->assertSame(2, $result['info']['total_results']);
+    }
+
+    #[Test]
     public function it_filters_out_results_with_disallowed_words()
     {
         $comb = new Comb([

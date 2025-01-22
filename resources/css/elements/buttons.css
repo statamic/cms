@@ -34,12 +34,14 @@ button {
 .btn, .btn-default {
     @apply text-gray-800 dark:text-dark-150 shadow-button;
     background: linear-gradient(180deg, #fff, #f9fafb);
+    background-clip: padding-box;
     border: 1px solid #D3DDE7;
     border-bottom: 1px solid #c4cdd6;
     box-shadow: inset 0 1px 0 0 #fff, 0 1px 0 0 rgba(0, 0, 0,.05), 0 2px 1px 0 theme(colors.gray.600 / .15), 0 0 0 0 transparent;
 
     .dark & {
         background: linear-gradient(180deg, theme(colors.dark.550), theme(colors.dark.600));
+        background-clip: padding-box;
         border-color: theme(colors.dark.700);
         box-shadow: inset 0 1px 0 0 theme(colors.dark.300), 0 1px 0 0 rgba(200, 200, 200,.05), 0 2px 1px 0 theme(colors.dark.900 / .15), 0 0 0 0 transparent;
     }
@@ -47,10 +49,12 @@ button {
     &:hover:not(:disabled), &:active:not(:disabled) {
         @apply text-gray-800 dark:text-dark-150;
         background: linear-gradient(180deg, #f9fafb, #f4f6f8);
+        background-clip: padding-box;
         border-bottom: 1px solid #BFC7D0;
 
         .dark & {
             background: linear-gradient(180deg, theme(colors.dark.600), theme(colors.dark.700));
+            background-clip: padding-box;
             border-color: theme(colors.dark.800);
         }
     }
@@ -78,7 +82,7 @@ button {
 
 /*  Primary action button */
 .btn-primary {
-    @apply text-white bg-gradient-to-b from-blue-500 to-blue-600 dark:from-dark-blue-100 dark:to-dark-blue-150 border border-blue-700 dark:border-blue-900 border-b-blue-800 dark:border-b-dark-blue-200 !important;
+    @apply text-white bg-gradient-to-b from-blue-500 to-blue-600 dark:from-dark-blue-100 dark:to-dark-blue-150 bg-clip-padding border border-blue-700 dark:border-blue-900 border-b-blue-800 dark:border-b-dark-blue-200 !important;
     box-shadow: inset 0 1px 0 0 theme('colors.blue.400'), 0 1px 0 0 rgba(25,30,35,.05), 0 3px 2px -1px theme(colors.blue.900 / .15), 0 0 0 0 transparent;
 
     &:hover:not(:disabled), :active:not(:disabled) {
@@ -93,11 +97,11 @@ button {
 
 /*  Danger/delete button */
 .btn-danger {
-    @apply text-white bg-gradient-to-b from-red-500 to-red-600 border border-red-600 border-b-red-900;
+    @apply text-white bg-gradient-to-b from-red-500 to-red-600 bg-clip-padding border border-red-600 border-b-red-900;
     box-shadow: inset 0 1px 0 0 theme('colors.red.400'), 0 1px 0 0 rgba(0, 0, 0,.05), 0 3px 2px -1px theme(colors.red.900 / .15), 0 0 0 0 transparent;
 
     &:hover:not(:disabled), &:active:not(:disabled) {
-        @apply bg-gradient-to-b from-red-600 to-red-700 border border-red-700 border-b-red-900;
+        @apply bg-gradient-to-b from-red-600 to-red-700 bg-clip-padding border border-red-700 border-b-red-900;
     }
 
     &:disabled {
@@ -159,6 +163,7 @@ button {
 .btn-round {
     @apply rounded-full flex items-center text-center p-0;
     background: linear-gradient(180deg, #fff, #f9fafb);
+    background-clip: padding-box;
     border: 1px solid #c4cdd6;
     box-shadow: 0 1px 0 0 rgba(25,30,35,.05);
     height: 32px;
@@ -166,15 +171,18 @@ button {
 
     .dark & {
         background: linear-gradient(180deg, theme(colors.dark.500), theme(colors.dark.550));
+        background-clip: padding-box;
         border-color: theme(colors.dark.400);
     }
 
     &:hover:not(:disabled), &:active:not(:disabled) {
         background: linear-gradient(180deg, #f9fafb, #f4f6f8);
+        background-clip: padding-box;
         border-color: #c4cdd5;
 
         .dark & {
             background: linear-gradient(180deg, theme(colors.dark.550), theme(colors.dark.600));
+            background-clip: padding-box;
             border-color: theme(colors.dark.500);
         }
     }

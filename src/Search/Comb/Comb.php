@@ -539,11 +539,11 @@ class Comb
                 $escaped_chunk = preg_quote($chunk, '#');
                 $chunk_is_word = ! preg_match('#\s#', $chunk);
                 $regex = [
-                    'partial_anywhere' => '#'.$escaped_chunk.'#i',
-                    'partial_from_start_anywhere' => '#(^|\s)'.$escaped_chunk.'#i',
-                    'whole_anywhere' => '#(^|\s)'.$escaped_chunk.'($|\s)#i',
-                    'partial_from_start' => '#^'.$escaped_chunk.'#i',
-                    'whole' => '#^'.$escaped_chunk.'$#i',
+                    'partial_anywhere' => '#'.$escaped_chunk.'#iu',
+                    'partial_from_start_anywhere' => '#(^|\s)'.$escaped_chunk.'#iu',
+                    'whole_anywhere' => '#(^|\s)'.$escaped_chunk.'($|\s)#iu',
+                    'partial_from_start' => '#^'.$escaped_chunk.'#iu',
+                    'whole' => '#^'.$escaped_chunk.'$#iu',
                 ];
 
                 // loop over each data property
@@ -710,8 +710,8 @@ class Comb
      */
     private function removeDisallowedMatches($params)
     {
-        $disallowed = '#'.implode('|', $params['disallowed']).'#i';
-        $required = '#(?=.*'.implode(')(?=.*', $params['required']).')#i';
+        $disallowed = '#'.implode('|', $params['disallowed']).'#iu';
+        $required = '#(?=.*'.implode(')(?=.*', $params['required']).')#iu';
         $new_data = [];
 
         // this only applies to boolean mode
@@ -1062,7 +1062,7 @@ class Comb
         $escaped_chunks = collect($chunks)
             ->map(fn ($chunk) => preg_quote($chunk, '#'))
             ->join('|');
-        $regex = '#(.*?)('.$escaped_chunks.')(.{0,'.$length.'}(?:\s|$))#i';
+        $regex = '#(.*?)('.$escaped_chunks.')(.{0,'.$length.'}(?:\s|$))#iu';
         if (! preg_match_all($regex, $value, $matches, PREG_SET_ORDER)) {
             return [];
         }
@@ -1085,7 +1085,7 @@ class Comb
             }
             $snippets[] = trim($snippet);
         }
-        if (preg_match('#('.$escaped_chunks.')#i', $surplus)) {
+        if (preg_match('#('.$escaped_chunks.')#iu', $surplus)) {
             $snippets[] = trim($surplus);
         }
 
