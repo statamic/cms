@@ -64,7 +64,7 @@ export default {
         this.$events.$emit('publish-container-created', this);
     },
 
-    destroyed() {
+    unmounted() {
         this.removeVuexModule();
         this.clearDirtyState();
         this.$events.$emit('publish-container-destroyed', this);
