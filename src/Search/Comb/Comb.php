@@ -726,7 +726,11 @@ class Comb
 
                 // string pruned results together
                 foreach ($item['pruned'] as $pruned) {
-                    $record .= ' '.$pruned;
+                    if (is_array($pruned)) {
+                        $record .= ' '.$this->flattenArray($pruned);
+                    } else {
+                        $record .= ' '.$pruned;
+                    }
                 }
 
                 // check for disallowed
