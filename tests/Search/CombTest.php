@@ -262,11 +262,7 @@ EOT;
             ['title' => 'Chicken & Sweetcorn Soup', 'ingredients' => ['Chicken', 'Sweetcorn', 'Water']],
         ]);
 
-        try {
-            $results = $comb->lookUp('soup -tomato');
-        } catch (NoResultsFound $e) {
-            $results = [];
-        }
+        $results = $comb->lookUp('soup -tomato');
 
         $this->assertEquals(['Chicken & Sweetcorn Soup'], collect($results['data'] ?? [])->pluck('data.title')->all());
     }
