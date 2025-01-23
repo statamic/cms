@@ -313,6 +313,7 @@ export default {
     watch: {
 
         linkType() {
+            this.setTarget();
             this.autofocus();
         },
 
@@ -364,9 +365,7 @@ export default {
             this.rel = attrs.href
                 ? attrs.rel
                 : this.defaultRel;
-            this.targetBlank = attrs.href
-                ? attrs.target === '_blank'
-                : this.config.target_blank;
+            this.targetBlank = true;
         },
 
         autofocus() {
@@ -377,6 +376,18 @@ export default {
                     }, 50);
                 });
             }
+        },
+
+        setTarget() {
+            if (this.linkType === 'url') {
+                this.targetBlank = true;
+                this.title = 'Open in new window';
+
+                return;
+            }
+
+            this.targetBlank = this.config.target_blank;
+            this.title = null;
         },
 
         setUrl(type, url) {
