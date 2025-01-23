@@ -1,4 +1,4 @@
-import { createApp, ref } from 'vue';
+import { createApp, ref, markRaw } from 'vue';
 import App from './App.vue';
 import { store } from '../store/store';
 import http from '../components/http';
@@ -104,7 +104,7 @@ export default {
             }
         })
 
-        const portals = new Portals;
+        const portals = markRaw(new Portals);
 
         Object.assign(this.$app.config.globalProperties, {
             $axios: http,
