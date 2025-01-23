@@ -30,6 +30,7 @@ class InstallEloquentDriver extends Command
      */
     protected $signature = 'statamic:install:eloquent-driver
         { --all : Configures all repositories to use the database }
+        { --repositories= : Comma separated list of repositories to migrate }
         { --import : Whether existing data should be imported }
         { --without-messages : Disables output messages }';
 
@@ -84,6 +85,31 @@ class InstallEloquentDriver extends Command
     {
         if ($this->option('all')) {
             return $this->availableRepositories()->keys()->all();
+        }
+
+        if ($repositories = $this->option('repositories')) {
+            $requestedRepositories = collect(explode(',', $repositories))
+                ->map(fn($repo) => trim(strtolower($repo)))
+                ->unique();
+
+            $availableRepositories = $this->availableRepositories();
+
+            $validRepositories = $requestedRepositories->filter(
+                fn($repo) => $availableRepositories->has($repo)
+            );
+
+            $invalidRepositories = $requestedRepositories->diff($validRepositories);
+
+            if ($invalidRepositories->isNotEmpty()) {
+                $this->components->warn(
+                    "The following repositories are invalid: " .
+                    $invalidRepositories->implode(', ')
+                );
+            }
+
+            return $validRepositories
+                ->values()
+                ->all();
         }
 
         return multiselect(
