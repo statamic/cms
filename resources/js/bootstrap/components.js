@@ -27,7 +27,7 @@ import InlineActions from '../components/data-list/InlineActions.vue';
 import ColumnPicker from '../components/data-list/ColumnPicker.vue';
 import ToggleAll from '../components/data-list/ToggleAll.vue';
 import Pagination from '../components/data-list/Pagination.vue';
-// import Filters from '../components/data-list/Filters.vue';
+import Filters from '../components/data-list/Filters.vue';
 import FilterPresets from '../components/data-list/FilterPresets.vue';
 import EntryListing from '../components/entries/Listing.vue';
 import CollectionListing from '../components/collections/Listing.vue';
@@ -100,7 +100,7 @@ export default function registerGlobalComponents(app) {
     app.component('data-list-column-picker', ColumnPicker);
     app.component('data-list-toggle-all', ToggleAll);
     app.component('data-list-pagination', Pagination);
-    // app.component('data-list-filters', Filters);
+    app.component('data-list-filters', Filters);
     app.component('data-list-filter-presets', FilterPresets);
 
     // Resource Type Lists

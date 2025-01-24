@@ -8,8 +8,8 @@
                     :placeholder="__('Field')"
                     :options="fieldOptions"
                     :reduce="option => option.value"
-                    :value="field"
-                    @input="createFilter"
+                    :model-value="field"
+                    @update:model-value="createFilter"
                 />
 
                 <publish-container
@@ -22,7 +22,6 @@
                     @updated="updateValues"
                     v-slot="{ setFieldValue, setFieldMeta }"
                 >
-                    <!-- TODO: handle showing/hiding of labels more elegantly -->
                     <publish-fields
                         :fields="filter.fields"
                         name-prefix="filter-field"
@@ -30,6 +29,7 @@
                         @updated="setFieldValue"
                         @meta-updated="setFieldMeta"
                     />
+                    <!-- TODO: handle showing/hiding of labels more elegantly -->
                 </publish-container>
 
             </div>
