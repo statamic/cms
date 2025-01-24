@@ -91,7 +91,7 @@ return [
         'CIV' => 'Cote D\'Ivoire (Ivory Coast)',
         'HRV' => 'Croatia',
         'CUB' => 'Cuba',
-        'CUW' => 'Cura\\u00e7ao',
+        'CUW' => 'Curaçao',
         'CYP' => 'Cyprus',
         'CZE' => 'Czech Republic',
         'COD' => 'Democratic Republic of the Congo',
