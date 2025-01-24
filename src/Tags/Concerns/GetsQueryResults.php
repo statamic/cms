@@ -76,7 +76,7 @@ trait GetsQueryResults
         $offsetIds = (clone $query)
             ->limit($offset)
             ->get('id')
-            ->map->id
+            ->map->id()
             ->all();
 
         $query->whereNotin('id', $offsetIds);
