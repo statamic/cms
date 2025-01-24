@@ -1,7 +1,7 @@
 import { createApp, ref, markRaw } from 'vue';
 import App from './App.vue';
 import { store } from '../store/store';
-import http from '../components/http';
+import axios from 'axios';
 import Config from '../components/Config';
 import Preferences from '../components/Preference';
 import registerGlobalComponents from './components.js';
@@ -107,10 +107,10 @@ export default {
         const portals = markRaw(new Portals);
 
         Object.assign(this.$app.config.globalProperties, {
-            $axios: http,
+            $axios: axios,
             $moment: window.moment,
             $events: useGlobalEventBus(),
-            $preferences: new Preferences(http, store),
+            $preferences: new Preferences(store),
             $progress: useProgressBar(),
             $config: this.$config,
             $keys: new Keys,

@@ -1,6 +1,7 @@
+import axios from 'axios';
+
 export default class Preference {
-    constructor(http, store) {
-        this.http = http;
+    constructor(store) {
         this.store = store;
         this.url = cp_url('preferences/js');
     }
@@ -15,19 +16,19 @@ export default class Preference {
 
     set(key, value) {
         return this.commitOnSuccessAndReturnPromise(
-            this.http.post(this.url, {key, value})
+            axios.post(this.url, {key, value})
         );
     }
 
     append(key, value) {
         return this.commitOnSuccessAndReturnPromise(
-            this.http.post(this.url, {key, value, append: true})
+            axios.post(this.url, {key, value, append: true})
         );
     }
 
     remove(key, value=null, cleanup=true) {
         return this.commitOnSuccessAndReturnPromise(
-            this.http.delete(`${this.url}/${key}`, { data: { value, cleanup } })
+            axios.delete(`${this.url}/${key}`, { data: { value, cleanup } })
         );
     }
 
