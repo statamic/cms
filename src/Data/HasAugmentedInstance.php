@@ -97,6 +97,11 @@ trait HasAugmentedInstance
         return null;
     }
 
+    public function formatForTelescope(): array
+    {
+        return $this->toShallowAugmentedArray();
+    }
+
     public function toArray()
     {
         return $this->toEvaluatedAugmentedArray();
