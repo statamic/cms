@@ -366,7 +366,7 @@ export default {
 
         selectFocalPoint(point) {
             point = (point === '50-50-1') ? null : point;
-            this.$set(this.values, 'focus', point);
+            this.values['focus'] = point;
             this.$dirty.add(this.publishContainer);
         },
 

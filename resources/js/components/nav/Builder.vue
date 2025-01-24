@@ -397,10 +397,10 @@ export default {
             });
 
             // Ensure you can only drop nav item nodes into top level tree root
-            this.$set(this.$refs.topLevelTree.rootData, 'droppable', ! this.isSectionNode(node));
+            this.$refs.topLevelTree.rootData.droppable = ! this.isSectionNode(node);
 
             // Ensure you can only drop section nodes to main tree root
-            this.$set(this.$refs.mainTree.rootData, 'droppable', this.isSectionNode(node));
+            this.$refs.mainTree.rootData.droppable = this.isSectionNode(node);
 
             // Hardcode max depths
             const topLevelTreeMaxDepth = 2 - nodeDepth; // 2 for nav items, and one level of nav item children
@@ -409,14 +409,14 @@ export default {
             // Ensure max depth for top level tree
             this.traverseTree(this.topLevelTreeData, (childNode, { depth }) => {
                 if (childNode !== node) {
-                    this.$set(childNode, 'droppable', depth <= topLevelTreeMaxDepth && ! this.isSectionNode(node));
+                    childNode.droppable = depth <= topLevelTreeMaxDepth && ! this.isSectionNode(node);
                 }
             });
 
             // Ensure max depth for main tree
             this.traverseTree(this.mainTreeData, (childNode, { depth }) => {
                 if (childNode !== node) {
-                    this.$set(childNode, 'droppable', depth <= mainTreeMaxDepth && ! this.isSectionNode(node));
+                    childNode.droppable = depth <= mainTreeMaxDepth && ! this.isSectionNode(node);
                 }
             });
         },
@@ -659,13 +659,13 @@ export default {
         expandAll() {
             this.traverseTree(this.topLevelTreeData, (node) => {
                 if (! this.isSectionNode(node)) {
-                    this.$set(node, 'open', true);
+                    node.open = true;
                 }
             });
 
             this.traverseTree(this.mainTreeData, (node) => {
                 if (! this.isSectionNode(node)) {
-                    this.$set(node, 'open', true);
+                    node.open = true;
                 }
             });
         },
@@ -673,13 +673,13 @@ export default {
         collapseAll() {
             this.traverseTree(this.topLevelTreeData, (node) => {
                 if (! this.isSectionNode(node)) {
-                    this.$set(node, 'open', false);
+                    node.open = false;
                 }
             });
 
             this.traverseTree(this.mainTreeData, (node) => {
                 if (! this.isSectionNode(node)) {
-                    this.$set(node, 'open', false);
+                    node.open = false;
                 }
             });
         },
