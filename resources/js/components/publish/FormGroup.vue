@@ -2,9 +2,9 @@
 
     <publish-field
         :config="fieldConfig"
-        :value="value"
+        :value="modelValue"
         :errors="fieldErrors"
-        @input="$emit('input', $event)"
+        @input="$emit('update:model-value', $event)"
     />
 
 </template>
@@ -13,12 +13,13 @@
 import PublishField from './Field.vue';
 
 export default {
+    emits: ['update:model-value'],
 
     components: { PublishField },
 
     props: {
 
-        value: {},
+        modelValue: {},
 
         fieldtype: {
             type: String,
