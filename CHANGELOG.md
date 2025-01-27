@@ -1,5 +1,45 @@
 # Release Notes
 
+## 5.46.0 (2025-01-22)
+
+### What's new
+- Add empty/not empty filters for replicator, bard and grid [#11354](https://github.com/statamic/cms/issues/11354) by @jacksleight
+- Page children as value for field conditions [#11368](https://github.com/statamic/cms/issues/11368) by @heidkaemper
+- Allow addons cache path to be set by an environment variable [#11365](https://github.com/statamic/cms/issues/11365) by @ryanmitchell
+
+### What's fixed
+- Fix error with disallowed words in Comb search driver [#11336](https://github.com/statamic/cms/issues/11336) by @duncanmcclean
+- Fixed ordering search results by origin value [#11334](https://github.com/statamic/cms/issues/11334) by @duncanmcclean
+- Fix case insensitive Comb search for UTF-8 characters [#11363](https://github.com/statamic/cms/issues/11363) by @heidkaemper
+- Translate name in user group fieldtype [#11343](https://github.com/statamic/cms/issues/11343) by @duncanmcclean
+- Fix UI bugs in Safari 18.2 [#11335](https://github.com/statamic/cms/issues/11335) by @marcorieser
+
+
+
+## 5.45.2 (2025-01-21)
+
+### What's fixed
+- Revert "Allow form fields view to be rendered with single tag" [#11374](https://github.com/statamic/cms/issues/11374) by @duncanmcclean
+- Remove `type` attribute in nocache replacer [#11373](https://github.com/statamic/cms/issues/11373) by @marcorieser
+- Fix deprecation warning from regex operator [#11337](https://github.com/statamic/cms/issues/11337) by @duncanmcclean
+- Fix bug report link in Contribution Guide [#11367](https://github.com/statamic/cms/issues/11367) by @duncanmcclean
+- Fix bard undefined href error [#11351](https://github.com/statamic/cms/issues/11351) by @jacksleight
+- Suppress “packing” git message [#11326](https://github.com/statamic/cms/issues/11326) by @edalzell
+
+
+
+## 5.45.1 (2025-01-07)
+
+### What's fixed
+- Throw better exception when asset isn't found [#11321](https://github.com/statamic/cms/issues/11321) by @edalzell
+- Add url friendly base64 en/decoding for Glide [#11299](https://github.com/statamic/cms/issues/11299) by @marcorieser
+- Update make:fieldtype console message [#11309](https://github.com/statamic/cms/issues/11309) by @Technobabble17
+- Make set button label clickable [#11313](https://github.com/statamic/cms/issues/11313) by @carstenjaksch
+- French translations [#11297](https://github.com/statamic/cms/issues/11297) by @ebeauchamps
+- Fix markdown test [#11315](https://github.com/statamic/cms/issues/11315) by @jasonvarga
+
+
+
 ## 5.45.0 (2024-12-20)
 
 ### What's new

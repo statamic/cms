@@ -199,7 +199,7 @@ class ImageGenerator
     private function getWatermarkFilesystemAndParam($item)
     {
         if (is_string($item) && Str::startsWith($item, 'asset::')) {
-            $decoded = base64_decode(Str::after($item, 'asset::'));
+            $decoded = Str::fromBase64Url(Str::after($item, 'asset::'));
             [$container, $path] = explode('/', $decoded, 2);
             $item = Assets::find($container.'::'.$path);
         }

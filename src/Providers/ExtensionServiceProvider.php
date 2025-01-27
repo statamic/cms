@@ -3,6 +3,7 @@
 namespace Statamic\Providers;
 
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Env;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Actions;
 use Statamic\Actions\Action;
@@ -258,10 +259,16 @@ class ExtensionServiceProvider extends ServiceProvider
 
     protected function registerAddonManifest()
     {
+        $cachePath = $this->app->bootstrapPath().'/cache/addons.php';
+
+        if (! is_null($env = Env::get('STATAMIC_ADDONS_CACHE'))) {
+            $cachePath = Str::startsWith($env, ['/', '\\']) ? $env : $this->app->basePath($env);
+        }
+
         $this->app->instance(Manifest::class, new Manifest(
             new Filesystem,
             $this->app->basePath(),
-            $this->app->bootstrapPath().'/cache/addons.php'
+            $cachePath
         ));
     }
 

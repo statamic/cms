@@ -4,11 +4,8 @@ namespace Statamic\Events;
 
 class RevisionSaving extends Event
 {
-    public $revision;
-
-    public function __construct($revision)
+    public function __construct(public $revision)
     {
-        $this->revision = $revision;
     }
 
     /**
