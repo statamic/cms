@@ -31,11 +31,17 @@ import Hooks from '../components/Hooks';
 import Bard from '../components/Bard';
 
 const darkMode = ref(null);
+let bootingCallbacks = [];
+let bootedCallbacks = [];
 
 export default {
 
-    booting() {
+    booting(callback) {
+        bootingCallbacks.push(callback);
+    },
 
+    booted(callback) {
+        bootedCallbacks.push(callback);
     },
 
     get $store() {
@@ -164,7 +170,13 @@ export default {
             console.warn(msg, vm, trace);
         };
 
+        bootingCallbacks.forEach(callback => callback(this));
+        bootingCallbacks = [];
+
         this.$app.mount('#statamic');
+
+        bootedCallbacks.forEach(callback => callback(this));
+        bootedCallbacks = [];
     }
 
 }
