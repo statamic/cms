@@ -29,7 +29,7 @@
                         :button="button"
                         :active="buttonIsActive(button)"
                         :config="config"
-                        :bard="_self"
+                        :bard="this"
                         :editor="editor" />
                 </div>
             </div>
@@ -44,7 +44,7 @@
                     :button="button"
                     :active="buttonIsActive(button)"
                     :config="config"
-                    :bard="_self"
+                    :bard="this"
                     :editor="editor" />
             </div>
         </div>
@@ -57,13 +57,12 @@
                     :is="button.component || 'BardToolbarButton'"
                     :button="button"
                     :active="buttonIsActive(button)"
-                    :bard="_self"
+                    :bard="this"
                     :config="config"
                     :editor="editor" />
             </bubble-menu>
 
             <floating-menu
-                class="bard-set-selector"
                 :editor="editor"
                 :should-show="shouldShowSetButton"
                 :is-showing="showAddSetButton"
@@ -75,6 +74,7 @@
                 <set-picker
                     v-if="showAddSetButton"
                     :sets="groupConfigs"
+                    class="bard-set-selector"
                     @added="addSet"
                     @clicked-away="clickedAwayFromSetPicker"
                 >
@@ -113,7 +113,8 @@
 import Fieldtype from '../Fieldtype.vue';
 import uniqid from 'uniqid';
 import reduce from 'underscore/modules/reduce';
-import { BubbleMenu, Editor, EditorContent } from '@tiptap/vue-2';
+import Emitter from 'tiny-emitter';
+import { BubbleMenu, Editor, EditorContent } from '@tiptap/vue-3';
 import { Extension } from '@tiptap/core';
 import { FloatingMenu } from './FloatingMenu';
 import Blockquote from '@tiptap/extension-blockquote';
@@ -152,11 +153,14 @@ import { Small } from './Small';
 import { Image } from './Image';
 import { Link } from './Link';
 import LinkToolbarButton from './LinkToolbarButton.vue';
+import BardToolbarButton from './ToolbarButton.vue';
 import ManagesSetMeta from '../replicator/ManagesSetMeta';
 import { availableButtons, addButtonHtml } from '../bard/buttons';
 import readTimeEstimate from 'read-time-estimate';
-import { lowlight } from 'lowlight/lib/common.js';
+import { common, createLowlight } from 'lowlight';
 import 'highlight.js/styles/github.css';
+
+const lowlight = createLowlight(common);
 
 export default {
 
@@ -180,6 +184,7 @@ export default {
 
     data() {
         return {
+            events: new Emitter(),
             editor: null,
             html: null,
             json: [],

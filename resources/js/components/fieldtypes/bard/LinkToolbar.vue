@@ -333,8 +333,8 @@ export default {
     created() {
         this.applyAttrs(this.linkAttrs);
 
-        this.bard.$on('link-selected', this.applyAttrs);
-        this.bard.$on('link-deselected', () => this.$emit('deselected'));
+        this.bard.events.on('link-selected', this.applyAttrs);
+        this.bard.events.on('link-deselected', () => this.$emit('deselected'));
 
         if (_.isEmpty(this.linkAttrs) && this.selectedTextIsEmail) {
             this.linkType = 'mailto'
@@ -347,8 +347,8 @@ export default {
     },
 
     beforeUnmount() {
-        this.bard.$off('link-selected');
-        this.bard.$off('link-deselected');
+        this.bard.events.off('link-selected');
+        this.bard.events.off('link-deselected');
     },
 
     methods: {

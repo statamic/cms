@@ -1,6 +1,8 @@
 import { FloatingMenuPlugin } from './FloatingMenuPlugin'
 
 export const FloatingMenu = {
+    emits: ['shown', 'hidden'],
+
     name: 'FloatingMenu',
 
     props: {

@@ -30,7 +30,7 @@
                     <toggle-fieldtype
                         handle="set-enabled"
                         class="toggle-sm rtl:ml-4 ltr:mr-4"
-                        v-model="enabled"
+                        v-model:value="enabled"
                         v-tooltip.top="(enabled) ? __('Included in output') : __('Hidden from output')" />
                     <dropdown-list>
                         <dropdown-actions :actions="fieldActions" v-if="fieldActions.length" />
@@ -67,7 +67,7 @@
 </template>
 
 <script>
-import { NodeViewWrapper } from '@tiptap/vue-2';
+import { NodeViewWrapper } from '@tiptap/vue-3';
 import SetField from '../replicator/Field.vue';
 import ManagesPreviewText from '../replicator/ManagesPreviewText';
 import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
@@ -109,6 +109,10 @@ export default {
 
         values() {
             return this.node.attrs.values;
+        },
+
+        extraValues() {
+            return {};
         },
 
         meta() {

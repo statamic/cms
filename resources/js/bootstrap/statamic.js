@@ -28,6 +28,7 @@ import Slugs from '../components/slugs/Manager';
 import Portals from '../components/portals/Portals';
 import Stacks from '../components/stacks/Stacks';
 import Hooks from '../components/Hooks';
+import Bard from '../components/Bard';
 
 const darkMode = ref(null);
 
@@ -63,6 +64,10 @@ export default {
 
     get $slug() {
         return this.$app.config.globalProperties.$slug;
+    },
+
+    get $bard() {
+        return this.$app.config.globalProperties.$bard;
     },
 
     get darkMode() {
@@ -122,6 +127,7 @@ export default {
             $stacks: new Stacks(portals),
             $hooks: new Hooks,
             $toast: new Toasts(useToasted()),
+            $bard: new Bard,
         });
 
         Object.assign(this.$app.config.globalProperties, {
