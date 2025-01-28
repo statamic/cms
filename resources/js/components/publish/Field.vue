@@ -133,10 +133,6 @@ export default {
         },
 
         fieldtypeComponentExists() {
-            if (! Statamic.$app.component(this.fieldtypeComponent)) {
-                console.warn('unsupported fieldtype: ' + this.fieldtypeComponent);
-            }
-
             return Statamic.$app.component(this.fieldtypeComponent) !== undefined;
         },
 
