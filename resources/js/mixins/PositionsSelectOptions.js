@@ -13,7 +13,6 @@ export default {
             dropdownList.style.width = width;
 
             function updatePosition() {
-                console.log('updating position');
                 computePosition(component.$refs.toggle, dropdownList, {
                     placement: 'bottom',
                     middleware: [
