@@ -12,9 +12,9 @@
         :select-on-key-codes="[9, 13, 188]"
         :taggable="true"
         :append-to-body="true"
-        :value="value"
+        :model-value="value"
         :dropdown-should-open="({ open }) => open && config.options.length > 0"
-        @input="update"
+        @update:model-value="update"
         @search:focus="$emit('focus')"
         @search:blur="$emit('blur')">
             <template #selected-option-container><i class="hidden"></i></template>

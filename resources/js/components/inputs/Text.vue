@@ -22,10 +22,10 @@
                 :autofocus="focus"
                 :min="min"
                 :dir="direction"
-                @input.stop="$emit('update:model-value', $event.target.value)"
-                @keydown.stop="$emit('keydown', $event)"
-                @focus.stop="$emit('focus')"
-                @blur.stop="$emit('blur')"
+                @input="$emit('update:model-value', $event.target.value)"
+                @keydown="$emit('keydown', $event)"
+                @focus="$emit('focus')"
+                @blur="$emit('blur')"
             >
             <slot name="append" v-if="append">
                 <div class="input-group-append">

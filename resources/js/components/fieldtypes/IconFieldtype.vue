@@ -13,9 +13,9 @@
             :searchable="true"
             :multiple="false"
             :close-on-select="true"
-            :value="selectedOption"
+            :model-value="selectedOption"
             :create-option="(value) => ({ value, label: value })"
-            @input="vueSelectUpdated"
+            @update:model-value="vueSelectUpdated"
             @search:focus="$emit('focus')"
             @search:blur="$emit('blur')">
             <template #option="option">

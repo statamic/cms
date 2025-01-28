@@ -2,7 +2,7 @@
 
     <publish-field-meta
         :config="config"
-        :initial-value="value"
+        :initial-value="modelValue"
         :initial-meta="meta"
         @loaded="metaLoaded"
         v-slot="{ meta, value, loading: loadingMeta }"
@@ -70,7 +70,7 @@
                 :name-prefix="namePrefix"
                 :field-path-prefix="fieldPathPrefix"
                 :read-only="isReadOnly"
-                @input="$emit('input', $event)"
+                @update:value="$emit('update:model-value', $event)"
                 @meta-updated="$emit('meta-updated', $event)"
                 @focus="focused"
                 @blur="blurred"
@@ -101,7 +101,7 @@ export default {
             type: Object,
             required: true
         },
-        value: {
+        modelValue: {
             required: true
         },
         meta: {

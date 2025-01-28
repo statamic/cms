@@ -11,7 +11,7 @@
                 :name-prefix="namePrefix"
                 :field-path-prefix="fieldPath"
                 :read-only="grid.isReadOnly"
-                @input="$emit('updated', $event)"
+                @update:value="$emit('updated', $event)"
                 @meta-updated="$emit('meta-updated', $event)"
                 @focus="$emit('focus')"
                 @blur="$emit('blur')"

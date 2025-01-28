@@ -28,7 +28,7 @@
             :has-error="hasError || hasNestedError"
             :read-only="isReadOnly"
             :show-field-previews="showFieldPreviews"
-            @input="$emit('updated', $event)"
+            @update:value="$emit('updated', $event)"
             @meta-updated="$emit('meta-updated', $event)"
             @focus="$emit('focus')"
             @blur="$emit('blur')"

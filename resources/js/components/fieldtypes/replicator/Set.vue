@@ -147,6 +147,7 @@ export default {
     data() {
         return {
             fieldPreviews: this.previews,
+            extraValues: {},
         }
     },
 
