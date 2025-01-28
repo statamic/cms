@@ -576,7 +576,6 @@ class EntriesController extends CpController
 
         $entry->blueprint()->fields()->all()
             ->reject(fn (Field $field) => $field->isRevisable())
-            ->each(fn ($ignore, string $fieldHandle) => ray($fieldHandle))
             ->each(fn ($ignore, string $fieldHandle) => $savedVersion->set($fieldHandle, $entry->{$fieldHandle}));
 
         $savedVersion->save();
