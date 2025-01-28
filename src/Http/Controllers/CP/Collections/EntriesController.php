@@ -263,9 +263,11 @@ class EntriesController extends CpController
                 ->user(User::current())
                 ->save();
 
-            // catch any changes through RevisionSaving event
             // have to save in case there are non-revisable fields
-            $entry = $this->saveNonRevisableFields($entry);
+            $this->saveNonRevisableFields($entry);
+
+            // catch any changes through RevisionSaving event
+            $entry = $entry->fromWorkingCopy();
         } else {
             if (! $entry->revisionsEnabled() && User::current()->can('publish', $entry)) {
                 $entry->published($request->published);
@@ -567,17 +569,16 @@ class EntriesController extends CpController
         }
     }
 
-    private function saveNonRevisableFields(EntriesEntry $entry): EntriesEntry
+    private function saveNonRevisableFields(EntriesEntry $entry): void
     {
         /** @var EntriesEntry */
         $savedVersion = $entry->fresh();
 
         $entry->blueprint()->fields()->all()
             ->reject(fn (Field $field) => $field->isRevisable())
+            ->each(fn ($ignore, string $fieldHandle) => ray($fieldHandle))
             ->each(fn ($ignore, string $fieldHandle) => $savedVersion->set($fieldHandle, $entry->{$fieldHandle}));
 
         $savedVersion->save();
-
-        return $savedVersion;
     }
 }
