@@ -27,7 +27,7 @@
                     <toggle-fieldtype
                         handle="set-enabled"
                         class="toggle-sm rtl:ml-2 ltr:mr-2"
-                        @input="toggleEnabledState"
+                        @update:value="toggleEnabledState"
                         :value="values.enabled"
                         v-tooltip.top="(values.enabled) ? __('Included in output') : __('Hidden from output')" />
                     <dropdown-list>
