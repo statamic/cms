@@ -31,6 +31,7 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 import CodeMirror from 'codemirror'
+import { markRaw } from 'vue'
 
 // Addons
 import 'codemirror/addon/edit/matchbrackets'
@@ -167,14 +168,10 @@ export default {
             this.codemirror.setOption('mode', mode);
             this.updateDebounced({code: this.value.code, mode: this.mode});
         },
-        fullScreenMode: {
-            immediate: true,
-            handler: function (fullscreen) {
-                this.$nextTick(() => {
-                    this.$nextTick(() => this.initCodeMirror());
-                });
-            }
-        },
+    },
+
+    mounted() {
+        this.$nextTick(() => this.initCodeMirror());
     },
 
     methods: {
@@ -187,7 +184,7 @@ export default {
             })
         },
         initCodeMirror() {
-            this.codemirror = CodeMirror(this.$refs.codemirror, {
+            this.codemirror = markRaw(CodeMirror(this.$refs.codemirror, {
                 value: this.value.code || '',
                 mode: this.mode,
                 direction: document.querySelector('html').getAttribute('dir') ?? 'ltr',
@@ -202,7 +199,7 @@ export default {
                 theme: this.exactTheme,
                 inputStyle: 'contenteditable',
                 rulers: this.rulers,
-            });
+            }));
 
             this.codemirror.on('change', (cm) => {
                 this.updateDebounced({code: cm.doc.getValue(), mode: this.mode});
