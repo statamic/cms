@@ -109,7 +109,7 @@
                                 :mirror="false"
                             >
                                 <tbody ref="assets">
-                                    <tr is="assetRow"
+                                    <component is="assetRow"
                                         class="asset-row"
                                         v-for="asset in assets"
                                         :key="asset.id"
@@ -119,8 +119,7 @@
                                         :show-set-alt="showSetAlt"
                                         @updated="assetUpdated"
                                         @removed="assetRemoved"
-                                        @id-changed="idChanged(asset.id, $event)">
-                                    </tr>
+                                        @id-changed="idChanged(asset.id, $event)" />
                                 </tbody>
                             </sortable-list>
                         </table>
