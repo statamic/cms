@@ -1,16 +1,16 @@
 <template>
 
-    <v-portal
-        name="popover"
-        :to="portal.id"
+    <teleport
+        :to="`#portal-target-${portal.id}`"
         :disabled="disabled"
+        v-if="mounted"
     >
         <div class="vue-portal-target" :class="targetClass">
             <provider :variables="provide">
                <slot />
             </provider>
         </div>
-    </v-portal>
+    </teleport>
 
 </template>
 
@@ -43,11 +43,16 @@ export default {
     data() {
         return {
             portal: null,
+            mounted: false,
         }
     },
 
     created() {
         this.portal = this.$portals.create(this.name);
+    },
+
+    mounted() {
+        this.mounted = true;
     },
 
     beforeUnmount() {

@@ -1,6 +1,6 @@
 <template>
 
-    <v-portal :to="portal" :order="depth">
+    <teleport :to="portal" :order="depth" v-if="visible">
         <div class="vue-portal-target stack">
         <div class="stack-container"
             :class="{ 'stack-is-current': isTopStack, 'hovering': isHovering, 'p-2 shadow-lg': full }"
@@ -19,12 +19,14 @@
             </transition>
         </div>
         </div>
-    </v-portal>
+    </teleport>
 
 </template>
 
 <script>
 export default {
+
+    emits: ['closed'],
 
     props: {
         name: {
@@ -58,7 +60,7 @@ export default {
     computed: {
 
         portal() {
-            return this.stack ? this.stack.id : null;
+            return this.stack ? `#portal-target-${this.stack.id}` : null;
         },
 
         depth() {
