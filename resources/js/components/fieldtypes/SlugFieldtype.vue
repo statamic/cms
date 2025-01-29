@@ -42,7 +42,9 @@ export default {
 
     mixins: [Fieldtype],
 
-    inject: ['storeName'],
+    inject: {
+        storeName: {default: null},
+    },
 
     data() {
         return {
