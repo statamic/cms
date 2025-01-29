@@ -103,6 +103,10 @@ export default {
         store.commit('statamic/config', config);
     },
 
+    component(name, component) {
+        this.$components.register(name, component);
+    },
+
     start() {
         this.$app = createApp(App);
 
