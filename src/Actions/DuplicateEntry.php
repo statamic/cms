@@ -88,7 +88,7 @@ class DuplicateEntry extends Action
             $entry->slug($slug);
         }
 
-        if ($original->hasDate()) {
+        if ($original->hasExplicitDate()) {
             $entry->date($original->date());
         }
 
