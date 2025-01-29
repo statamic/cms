@@ -30,6 +30,7 @@ import Stacks from '../components/stacks/Stacks';
 import Hooks from '../components/Hooks';
 import Bard from '../components/Bard';
 import Components from '../components/Components';
+import FieldConditions from '../components/FieldConditions';
 
 const darkMode = ref(null);
 let bootingCallbacks = [];
@@ -68,6 +69,10 @@ export default {
 
     get $toast() {
         return this.$app.config.globalProperties.$toast;
+    },
+
+    get $conditions() {
+        return this.$app.config.globalProperties.$conditions;
     },
 
     get $slug() {
@@ -134,6 +139,7 @@ export default {
             $config: this.$config,
             $keys: new Keys,
             $fieldActions: new FieldActions,
+            $conditions: new FieldConditions,
             $callbacks: new Callbacks,
             $dirty: useDirtyState(),
             $slug: new Slugs,
