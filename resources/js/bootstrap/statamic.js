@@ -31,6 +31,7 @@ import Hooks from '../components/Hooks';
 import Bard from '../components/Bard';
 import Components from '../components/Components';
 import FieldConditions from '../components/FieldConditions';
+import Reveal from '../components/Reveal';
 
 const darkMode = ref(null);
 let bootingCallbacks = [];
@@ -152,6 +153,7 @@ export default {
             $hooks: new Hooks,
             $toast: new Toasts(useToasted()),
             $bard: new Bard,
+            $reveal: new Reveal,
         });
 
         Object.assign(this.$app.config.globalProperties, {
