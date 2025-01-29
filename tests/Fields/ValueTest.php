@@ -323,6 +323,18 @@ class ValueTest extends TestCase
     }
 
     #[Test]
+    public function it_can_check_emptiness_on_properties()
+    {
+        $val = new Value((object) [
+            'a' => 'alfa',
+            'b' => '',
+        ]);
+
+        $this->assertNotTrue(empty($val->a));
+        $this->assertTrue(empty($val->b));
+    }
+
+    #[Test]
     public function it_can_proxy_methods_to_value()
     {
         // This is useful when the value is an object like an Entry, you could
