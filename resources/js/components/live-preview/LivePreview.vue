@@ -149,7 +149,7 @@ export default {
                 return { value: device, label: __(device) };
             }));
 
-            if (! options.filter((option) => option.label === __('Responsive'))) {
+            if (options.filter((option) => option.label === __('Responsive')).length === 0) {
                 options.unshift({ value: null, label: __('Responsive') });
             }
 
