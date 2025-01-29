@@ -32,6 +32,7 @@ import Bard from '../components/Bard';
 import Components from '../components/Components';
 import FieldConditions from '../components/FieldConditions';
 import Reveal from '../components/Reveal';
+import Echo from '../components/Echo';
 
 const darkMode = ref(null);
 let bootingCallbacks = [];
@@ -82,6 +83,10 @@ export default {
 
     get $bard() {
         return this.$app.config.globalProperties.$bard;
+    },
+
+    get $echo() {
+        return this.$app.config.globalProperties.$echo;
     },
 
     get $components() {
@@ -154,6 +159,7 @@ export default {
             $toast: new Toasts(useToasted()),
             $bard: new Bard,
             $reveal: new Reveal,
+            $echo: new Echo,
         });
 
         Object.assign(this.$app.config.globalProperties, {
