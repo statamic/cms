@@ -2,9 +2,9 @@
 
     <publish-field
         :config="fieldConfig"
-        :value="modelValue"
+        :model-value="modelValue"
         :errors="fieldErrors"
-        @input="$emit('update:model-value', $event)"
+        @update:model-value="$emit('update:model-value', $event)"
     />
 
 </template>
