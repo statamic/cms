@@ -2,13 +2,11 @@ import Vue from 'vue';
 import Hooks from '../components/Hooks.js';
 const hooks = new Hooks;
 
-const Statamic = new Vue({
-    computed: {
-        $hooks() {
-            return hooks;
-        }
+const Statamic = {
+    get $hooks() {
+        return hooks;
     }
-});
+};
 
 afterEach(() => {
     Statamic.$hooks.hooks = {}
