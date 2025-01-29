@@ -95,7 +95,7 @@ export default {
         darkMode.value = value;
     },
 
-    user() {
+    get user() {
         return this.$config.get('user');
     },
 
