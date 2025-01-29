@@ -29,10 +29,12 @@ import Portals from '../components/portals/Portals';
 import Stacks from '../components/stacks/Stacks';
 import Hooks from '../components/Hooks';
 import Bard from '../components/Bard';
+import Components from '../components/Components';
 
 const darkMode = ref(null);
 let bootingCallbacks = [];
 let bootedCallbacks = [];
+let components;
 
 export default {
 
@@ -76,6 +78,10 @@ export default {
         return this.$app.config.globalProperties.$bard;
     },
 
+    get $components() {
+        return components;
+    },
+
     get darkMode() {
         return darkMode;
     },
@@ -116,6 +122,8 @@ export default {
         })
 
         const portals = markRaw(new Portals);
+
+        components = new Components(this.$app);
 
         Object.assign(this.$app.config.globalProperties, {
             $axios: axios,

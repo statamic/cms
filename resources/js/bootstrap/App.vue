@@ -106,7 +106,7 @@ export default {
             navOpen: true,
             mobileNavOpen: false,
             showBanner: true,
-            appendedComponents: [],
+            appendedComponents: Statamic.$components.components,
             isLicensingBannerSnoozed: localStorage.getItem(`statamic.snooze_license_banner`) > new Date().valueOf(),
             copyToClipboardModalUrl: null,
         }
