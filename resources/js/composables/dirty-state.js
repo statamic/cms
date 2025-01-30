@@ -1,19 +1,23 @@
 import { ref, watch } from 'vue';
 
-const names = ref([]);
+const dirty = ref([]);
+
+function names() {
+    return dirty.value;
+}
 
 function count() {
-    return names.value.length;
+    return dirty.value.length;
 }
 
 function add(name) {
-    if (names.value.indexOf(name) == -1) {
-        names.value = [...names.value, name];
+    if (dirty.value.indexOf(name) == -1) {
+        dirty.value = [...dirty.value, name];
     }
 }
 
 function remove(name) {
-    names.value = names.value.filter(n => n !== name);
+    dirty.value = dirty.value.filter(n => n !== name);
 }
 
 function enableWarning() {
@@ -31,10 +35,10 @@ function state(name, state) {
 }
 
 function has(name) {
-    return names.value.includes(name)
+    return dirty.value.includes(name)
 }
 
-watch(names, (newNames) => {
+watch(dirty, (newNames) => {
     newNames.length ? enableWarning() : disableWarning();
 }, { immediate: true })
 

@@ -2,8 +2,12 @@ import { ref, watch } from 'vue';
 import progress from 'nprogress';
 
 const progressing = ref(false);
-const names = ref([]);
+const progressNames = ref([]);
 const timer = ref(null);
+
+function names() {
+    return progressNames.value;
+}
 
 function start() {
     progressing.value = true;
@@ -17,19 +21,19 @@ function stop() {
 }
 
 function add(name) {
-    if (names.value.indexOf(name) == -1) {
-        names.value = [...names.value, name];
+    if (progressNames.value.indexOf(name) == -1) {
+        progressNames.value = [...progressNames.value, name];
     }
 }
 
 function remove(name) {
-    const newValues = [...names.value]
+    const newValues = [...progressNames.value]
     const i = newValues.indexOf(name);
 
     if (i === -1) return;
 
     newValues.splice(i, 1);
-    names.value = newValues;
+    progressNames.value = newValues;
 }
 
 function loading(name, loading) {
@@ -37,7 +41,7 @@ function loading(name, loading) {
 }
 
 function count() {
-    return names.value.length;
+    return progressNames.value.length;
 }
 
 function isComplete() {
