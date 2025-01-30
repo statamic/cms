@@ -25,8 +25,6 @@ class ConvertDatesToUtc extends UpdateScript
             return;
         }
 
-        // TODO: Improve performance (rather than collecting Repo::all() results, can we use chunking or lazy loading?)
-
         $this
             ->getItemsContainingData()
             ->each(function ($item) {
