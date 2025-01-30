@@ -3,6 +3,7 @@
 namespace Tests\Tags\User;
 
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Support\Facades\Gate;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Parse;
 use Statamic\Facades\Role;
@@ -50,6 +51,22 @@ class UserTagsTest extends TestCase
         // Test if user has any of these permissions
         $this->assertEquals('yes', $this->tag('{{ user:can do="access cp|configure collections" }}yes{{ /user:can }}'));
         $this->assertEquals('', $this->tag('{{ user:cant do="access cp|configure collections" }}yes{{ /user:cant }}'));
+    }
+
+    #[Test]
+    public function it_renders_user_can_with_aurguments_tag_content()
+    {
+        $this->actingAs(User::make()->save());
+
+        Gate::define('test gate', function ($user, $value) {
+            return $value === 'foo';
+        });
+
+        $this->assertEquals('yes', $this->tag('{{ user:can do="test gate" value="foo" }}yes{{ /user:can }}'));
+        $this->assertEquals('', $this->tag('{{ user:cant do="test gate" value="foo" }}yes{{ /user:cant }}'));
+        
+        $this->assertEquals('', $this->tag('{{ user:can do="test gate" value="bar" }}yes{{ /user:can }}'));
+        $this->assertEquals('yes', $this->tag('{{ user:cant do="test gate" value="bar" }}yes{{ /user:cant }}'));
     }
 
     #[Test]
