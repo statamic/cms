@@ -64,7 +64,7 @@ class UserTagsTest extends TestCase
 
         $this->assertEquals('yes', $this->tag('{{ user:can do="test gate" value="foo" }}yes{{ /user:can }}'));
         $this->assertEquals('', $this->tag('{{ user:cant do="test gate" value="foo" }}yes{{ /user:cant }}'));
-        
+
         $this->assertEquals('', $this->tag('{{ user:can do="test gate" value="bar" }}yes{{ /user:can }}'));
         $this->assertEquals('yes', $this->tag('{{ user:cant do="test gate" value="bar" }}yes{{ /user:cant }}'));
     }
