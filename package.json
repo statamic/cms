@@ -64,7 +64,6 @@
     "lowlight": "^3.1.0",
     "marked": "^13.0.0",
     "marked-plaintext": "0.0.2",
-    "mitt": "^3.0.1",
     "moment": "^2.29.4",
     "mousetrap": "~1.6.5",
     "nprogress": "^0.2.0",
