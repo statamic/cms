@@ -277,7 +277,7 @@ export default {
     watch: {
 
         changed(changed) {
-            // this.$dirty.state('page-tree', changed);
+            this.$dirty.state('page-tree', changed);
         }
 
     },
@@ -343,7 +343,6 @@ export default {
         },
 
         updatePage(values) {
-            console.log('update page', values);
             this.editingPage.page.url = values.url;
             this.editingPage.page.title = values.title;
             this.editingPage.page.values = values;
@@ -439,7 +438,6 @@ export default {
                 // Replace the ID in the branch within the tree.
                 // Same as above, but in the tree itself.
                 let branch = this.$refs.tree.getNodeByBranchId(oldId);
-                console.log('replacing id', oldId, newId, branch);
                 branch.id = newId;
                 this.$refs.tree.pageUpdated();
             }
