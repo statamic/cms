@@ -185,7 +185,7 @@
 </template>
 
 <style scoped>
->>> .publish-fields .form-group .field-inner > label {
+:deep(.publish-fields .form-group .field-inner > label) {
     @apply text-base font-bold mb-1;
     & + .help-block { @apply -mt-1 !important; }
 }
