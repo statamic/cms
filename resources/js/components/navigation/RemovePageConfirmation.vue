@@ -29,6 +29,8 @@
 <script>
 export default {
 
+    emits: ['confirm', 'cancel'],
+
     props: {
         children: Number
     },
