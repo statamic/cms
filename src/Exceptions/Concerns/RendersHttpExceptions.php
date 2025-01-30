@@ -12,7 +12,9 @@ use Statamic\View\View;
 
 trait RendersHttpExceptions
 {
-    public function render()
+    public static ?\Closure $renderCallback = null;
+
+    public function render(Request $request)
     {
         if (Statamic::isCpRoute()) {
             return response()->view('statamic::errors.'.$this->getStatusCode(), [], $this->getStatusCode());
@@ -20,6 +22,10 @@ trait RendersHttpExceptions
 
         if (Statamic::isApiRoute()) {
             return response()->json(['message' => $this->getApiMessage()], $this->getStatusCode());
+        }
+
+        if (static::$renderCallback && ($response = call_user_func(static::$renderCallback, $request))) {
+            return $response;
         }
 
         if ($cached = $this->getCachedError()) {
