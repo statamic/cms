@@ -17,3 +17,5 @@ window.Alpine = Alpine
 window.Statamic = Statamic;
 window._ = underscore;
 window.moment = Moment;
+
+Alpine.start();
