@@ -50,7 +50,7 @@ class ConvertDatesToUtcTest extends TestCase
 
     #[Test]
     #[DataProvider('dateFieldsProvider')]
-    public function it_can_convert_date_fields_in_entries(string $fieldHandle, array $field, $original, $expected)
+    public function it_converts_date_fields_in_entries(string $fieldHandle, array $field, $original, $expected)
     {
         config()->set('app.timezone', 'America/New_York'); // -05:00
         date_default_timezone_set('America/New_York');
@@ -65,6 +65,30 @@ class ConvertDatesToUtcTest extends TestCase
         $this->runUpdateScript(ConvertDatesToUtc::class);
 
         $this->assertEquals($expected, $entry->fresh()->get($fieldHandle));
+    }
+
+    #[Test]
+    public function it_converts_entry_date_field_in_entries()
+    {
+        config()->set('app.timezone', 'America/New_York'); // -05:00
+        date_default_timezone_set('America/New_York');
+
+        $collection = tap(Collection::make('articles')->dated(true))->save();
+
+        $collection->entryBlueprint()->setContents([
+            'fields' => [
+                ['handle' => 'date', 'field' => ['type' => 'date', 'time_enabled' => true]],
+            ],
+        ])->save();
+
+        $entry = Entry::make()->collection('articles')->date('2025-01-01-1200');
+        $entry->save();
+
+        $this->runUpdateScript(ConvertDatesToUtc::class);
+
+        $entry->fresh();
+
+        $this->assertEquals('2025-01-01 17:00', $entry->date()->format('Y-m-d H:i'));
     }
 
     public static function dateFieldsProvider(): array
