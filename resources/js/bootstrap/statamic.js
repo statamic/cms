@@ -33,6 +33,7 @@ import Components from '../components/Components';
 import FieldConditions from '../components/FieldConditions';
 import Reveal from '../components/Reveal';
 import Echo from '../components/Echo';
+import Permission from '../components/Permission';
 
 const darkMode = ref(null);
 let bootingCallbacks = [];
@@ -87,6 +88,10 @@ export default {
 
     get $echo() {
         return this.$app.config.globalProperties.$echo;
+    },
+
+    get $permissions() {
+        return this.$app.config.globalProperties.$permissions;
     },
 
     get $components() {
@@ -160,6 +165,7 @@ export default {
             $bard: new Bard,
             $reveal: new Reveal,
             $echo: new Echo,
+            $permissions: new Permission,
         });
 
         Object.assign(this.$app.config.globalProperties, {
