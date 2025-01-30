@@ -6,11 +6,6 @@ import { getCurrentInstance } from 'vue';
 export default {
     emits: ['updated', 'focus', 'blur'],
 
-    model: {
-        prop: 'values',
-        event: 'updated',
-    },
-
     props: {
         reference: {
             type: String
