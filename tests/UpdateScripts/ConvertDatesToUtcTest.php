@@ -5,6 +5,7 @@ namespace Tests\UpdateScripts;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
+use Statamic\Facades\Fieldset;
 use Statamic\UpdateScripts\ConvertDatesToUtc;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -33,6 +34,10 @@ class ConvertDatesToUtcTest extends TestCase
         date_default_timezone_set('America/New_York');
 
         $collection = tap(Collection::make('articles')->dated(true))->save();
+
+        Fieldset::make('date_fieldset')->setContents(['fields' => [
+            ['handle' => 'fieldset_date', 'field' => ['type' => 'date', 'time_enabled' => true]],
+        ]])->save();
 
         $collection->entryBlueprint()->setContents([
             'fields' => [
@@ -70,6 +75,9 @@ class ConvertDatesToUtcTest extends TestCase
                         ]],
                     ]],
                 ]]],
+                ['import' => 'date_fieldset'],
+                ['import' => 'date_fieldset', 'prefix' => 'prefixed_'],
+                ['handle' => 'date_fieldset_single_field', 'field' => 'date_fieldset.fieldset_date'],
             ],
         ])->save();
 
@@ -98,6 +106,9 @@ class ConvertDatesToUtcTest extends TestCase
                         'date_range' => ['start' => '2025-01-01', 'end' => '2025-01-07'],
                     ]]],
                 ],
+                'fieldset_date' => '2025-01-01 12:00',
+                'prefixed_fieldset_date' => '2025-01-01 12:00',
+                'date_fieldset_single_field' => '2025-01-01 12:00',
             ]);
 
         $entry->save();
@@ -134,9 +145,12 @@ class ConvertDatesToUtcTest extends TestCase
                 'date_range' => ['start' => '2025-01-01', 'end' => '2025-01-07'],
             ]]],
         ], $entry->get('bard_field'));
+
+        $this->assertEquals('2025-01-01 17:00', $entry->get('fieldset_date'));
+        $this->assertEquals('2025-01-01 17:00', $entry->get('prefixed_fieldset_date'));
+        $this->assertEquals('2025-01-01 17:00', $entry->get('date_fieldset_single_field'));
     }
 
-    // todo: ensure fields inside fieldsets are updated
     // TODO: Refactor test to use data provider
     // TODO: Add tests for other content types (terms, globals, users)
 }
