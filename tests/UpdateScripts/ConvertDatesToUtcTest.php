@@ -91,6 +91,37 @@ class ConvertDatesToUtcTest extends TestCase
         $this->assertEquals('2025-01-01 17:00', $entry->date()->format('Y-m-d H:i'));
     }
 
+    #[Test]
+    #[DataProvider('dateFieldsProvider')]
+    public function it_converts_entry_date_field_in_terms()
+    {
+        $this->markTestIncomplete();
+    }
+
+    #[Test]
+    #[DataProvider('dateFieldsProvider')]
+    public function it_converts_entry_date_field_in_globals()
+    {
+        $this->markTestIncomplete();
+    }
+
+    #[Test]
+    #[DataProvider('dateFieldsProvider')]
+    public function it_converts_date_fields_in_users(string $fieldHandle, array $field, $original, $expected)
+    {
+        config()->set('app.timezone', 'America/New_York'); // -05:00
+        date_default_timezone_set('America/New_York');
+
+        User::blueprint()->setContents(['fields' => [$field]])->save();
+
+        $user = User::make()->data([$fieldHandle => $original]);
+        $user->save();
+
+        $this->runUpdateScript(ConvertDatesToUtc::class);
+
+        $this->assertEquals($expected, $user->fresh()->get($fieldHandle));
+    }
+
     public static function dateFieldsProvider(): array
     {
         return [
@@ -205,6 +236,4 @@ class ConvertDatesToUtcTest extends TestCase
             ],
         ];
     }
-
-    // TODO: Add tests for other content types (terms, globals, users)
 }
