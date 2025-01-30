@@ -26,8 +26,6 @@ class ConvertDatesToUtc extends UpdateScript
 
         $this
             ->getItemsContainingData()
-            // todo: code needs abstracting for all types of content
-            ->filter(fn ($item) => $item instanceof EntryContract)
             ->each(function ($item) {
                 /** @var Fields $fields */
                 $fields = $item->blueprint()->fields();
