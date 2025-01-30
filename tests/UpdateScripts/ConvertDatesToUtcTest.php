@@ -7,6 +7,9 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Fieldset;
+use Statamic\Facades\GlobalSet;
+use Statamic\Facades\Term;
+use Statamic\Facades\User;
 use Statamic\UpdateScripts\ConvertDatesToUtc;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -34,7 +37,15 @@ class ConvertDatesToUtcTest extends TestCase
     #[Test]
     public function is_skipped_when_application_timezone_is_utc()
     {
-        $this->markTestIncomplete();
+        Entry::shouldReceive('all')->never();
+        Term::shouldReceive('all')->never();
+        GlobalSet::shouldReceive('all')->never();
+        User::shouldReceive('all')->never();
+
+        config()->set('app.timezone', 'UTC');
+        date_default_timezone_set('UTC');
+
+        $this->runUpdateScript(ConvertDatesToUtc::class);
     }
 
     #[Test]

@@ -21,7 +21,10 @@ class ConvertDatesToUtc extends UpdateScript
 
     public function update()
     {
-        // TODO: Bail out early if the app's timezone is UTC (and therefore all the dates will already be in UTC)
+        if (config('app.timezone') === 'UTC') {
+            return;
+        }
+
         // TODO: Improve performance (rather than collecting Repo::all() results, can we use chunking or lazy loading?)
 
         $this
