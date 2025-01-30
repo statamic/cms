@@ -20,6 +20,7 @@ import uniqid from 'uniqid';
 import { VueFinalModal } from 'vue-final-modal';
 
 export default {
+    emits: ['opened', 'closed'],
 
     components: {
         VueFinalModal,
