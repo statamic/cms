@@ -210,6 +210,8 @@ import pick from 'underscore/modules/pick';
 
 export default {
 
+    emits: ['saved', 'closed', 'action-completed'],
+
     mixins: [
         HasHiddenFields,
     ],
