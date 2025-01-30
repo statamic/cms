@@ -213,6 +213,9 @@ export default {
             console.warn(msg, vm, trace);
         };
 
+        axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+        axios.defaults.headers.common['X-CSRF-TOKEN'] = Statamic.$config.get('csrfToken');
+
         bootingCallbacks.forEach(callback => callback(this));
         bootingCallbacks = [];
 

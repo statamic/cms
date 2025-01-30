@@ -15,10 +15,6 @@ import axios from 'axios';
 import PortalVue from "portal-vue";
 import VModal from "vue-js-modal";
 
-Statamic.booting(Statamic => {
-    axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-    axios.defaults.headers.common['X-CSRF-TOKEN'] = Statamic.$config.get('csrfToken');
-});
 
 Alpine.start()
 
