@@ -17,6 +17,7 @@
 </template>
 
 <script>
+import Fieldtype from '../Fieldtype.vue';
 import {Sortable, Plugins} from '@shopify/draggable';
 import { availableButtons } from './buttons';
 

@@ -15,8 +15,9 @@
             @updated="uploadsUpdated"
             @upload-complete="uploadComplete"
             @error="uploadError"
+            v-slot="{ dragging }"
         >
-            <div slot-scope="{ dragging }" class="assets-fieldtype-drag-container">
+            <div class="assets-fieldtype-drag-container">
 
                 <div class="drag-notification" v-if="config.allow_uploads" v-show="dragging && !showSelector">
                     <svg-icon name="upload" class="h-6 @md:h-8 w-6 @md:w-8 rtl:ml-2 ltr:mr-2 @md:mr-6" />
@@ -108,7 +109,7 @@
                                 :mirror="false"
                             >
                                 <tbody ref="assets">
-                                    <tr is="assetRow"
+                                    <component is="assetRow"
                                         class="asset-row"
                                         v-for="asset in assets"
                                         :key="asset.id"
@@ -118,8 +119,7 @@
                                         :show-set-alt="showSetAlt"
                                         @updated="assetUpdated"
                                         @removed="assetRemoved"
-                                        @id-changed="idChanged(asset.id, $event)">
-                                    </tr>
+                                        @id-changed="idChanged(asset.id, $event)" />
                                 </tbody>
                             </sortable-list>
                         </table>
@@ -170,6 +170,7 @@
 
 
 <script>
+import Fieldtype from '../Fieldtype.vue';
 import AssetRow from './AssetRow.vue';
 import AssetTile from './AssetTile.vue';
 import Selector from '../../assets/Selector.vue';
@@ -190,6 +191,22 @@ export default {
 
 
     mixins: [Fieldtype],
+
+
+    inject: {
+        isInBardField: {
+            name: 'isInBardField',
+            default: false,
+        },
+        isInGridField: {
+            name: 'isInGridField',
+            default: false,
+        },
+        isInLinkField: {
+            name: 'isInLinkField',
+            default: false,
+        }
+    },
 
 
     data() {
@@ -344,54 +361,6 @@ export default {
          */
         queryScopes() {
             return this.config.query_scopes || [];
-        },
-
-        isInBardField() {
-            let vm = this;
-
-            while (true) {
-                let parent = vm.$parent;
-
-                if (! parent) return false;
-
-                if (parent.constructor.name === 'BardFieldtype') {
-                    return true;
-                }
-
-                vm = parent;
-            }
-        },
-
-        isInGridField() {
-            let vm = this;
-
-            while (true) {
-                let parent = vm.$parent;
-
-                if (! parent) return false;
-
-                if (parent.grid) {
-                    return true;
-                }
-
-                vm = parent;
-            }
-        },
-
-        isInLinkField() {
-            let vm = this;
-
-            while (true) {
-                let parent = vm.$parent;
-
-                if (! parent) return false;
-
-                if (parent.$options.name === 'link-fieldtype') {
-                    return true;
-                }
-
-                vm = parent;
-            }
         },
 
         replicatorPreview() {
@@ -643,7 +612,7 @@ export default {
         },
 
         loading(loading) {
-            this.$progress.loading(`assets-fieldtype-${this._uid}`, loading);
+            this.$progress.loading(`assets-fieldtype-${this.$.uid}`, loading);
         },
 
         value(value) {

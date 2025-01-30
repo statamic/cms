@@ -13,8 +13,9 @@
             :sort-column="sortColumn"
             :sort-direction="sortDirection"
             @visible-columns-updated="visibleColumns = $event"
+            v-slot="{ hasSelections }"
         >
-            <div slot-scope="{ hasSelections }">
+            <div>
                 <div class="card p-0 relative">
                     <div class="flex flex-wrap items-center justify-between px-2 pb-2 text-sm border-b dark:border-dark-900">
                         <data-list-filter-presets
@@ -72,10 +73,10 @@
                             :column-preferences-key="preferencesKey('columns')"
                             @sorted="sorted"
                         >
-                            <template slot="cell-datestamp" slot-scope="{ row: submission, value }">
+                            <template #cell-datestamp="{ row: submission, value }">
                                 <a :href="submission.url" class="text-blue">{{ value }}</a>
                             </template>
-                            <template slot="actions" slot-scope="{ row: submission, index }">
+                            <template #actions="{ row: submission, index }">
                                 <dropdown-list>
                                     <dropdown-item :text="__('View')" :redirect="submission.url" />
                                     <data-list-inline-actions

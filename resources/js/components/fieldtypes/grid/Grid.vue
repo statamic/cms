@@ -56,6 +56,7 @@
 </template>
 
 <script>
+import Fieldtype from '../Fieldtype.vue';
 import uniqid from 'uniqid';
 import GridTable from './Table.vue';
 import GridStacked from './Stacked.vue';
@@ -86,6 +87,10 @@ export default {
     },
 
     inject: ['storeName'],
+
+    provide: {
+        isInGridField: true,
+    },
 
     computed: {
 

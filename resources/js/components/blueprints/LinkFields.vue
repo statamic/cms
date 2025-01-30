@@ -7,8 +7,8 @@
             <span>{{ __('Link Existing') }}</span>
         </button>
 
-        <stack narrow v-if="open" @closed="open = false" name="field-linker">
-            <div slot-scope="{ close }" class="bg-white dark:bg-dark-800 h-full flex flex-col">
+        <stack narrow v-if="open" @closed="open = false" name="field-linker" v-slot="{ close }">
+            <div class="bg-white dark:bg-dark-800 h-full flex flex-col">
 
                 <div class="bg-gray-200 dark:bg-dark-600 px-6 py-2 border-b border-gray-300 dark:border-dark-900 text-lg font-medium flex items-center justify-between">
                     {{ __('Link Fields') }}
@@ -32,7 +32,7 @@
                             :searchable="true"
                             :reduce="(opt) => opt.value"
                             v-model="reference">
-                            <template slot="option" slot-scope="option">
+                            <template v-slot:option="option">
                                 <div class="flex items-center">
                                     <span v-text="option.fieldset" class="text-2xs text-gray-500 dark:text-dark-150 rtl:ml-2 ltr:mr-2" />
                                     <span v-text="option.label" />

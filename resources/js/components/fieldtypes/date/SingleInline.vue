@@ -3,7 +3,7 @@
     <div class="relative w-full">
         <v-date-picker
             v-bind="pickerBindings"
-            @input="$emit('input', $event)"
+            @update:model-value="$emit('update:model-value', $event)"
             :is-dark="darkMode"
         />
         <div class="absolute inset-0 z-1 cursor-not-allowed" v-if="isReadOnly" />
@@ -15,6 +15,7 @@
 import Picker from './Picker';
 
 export default {
+    emits: ['update:model-value'],
 
     mixins: [Picker],
 

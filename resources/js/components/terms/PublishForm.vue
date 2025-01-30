@@ -9,7 +9,7 @@
                     <span v-if="! isCreating"
                         class="little-dot rtl:ml-2 ltr:mr-2 -top-1"
                         :class="{ 'bg-green-600': published, 'bg-gray-600': !published }" />
-                    <span class="break-overflowing-words" v-html="$options.filters.striptags(title)" />
+                    <span class="break-overflowing-words" v-html="formattedTitle" />
                 </div>
             </h1>
 
@@ -73,9 +73,9 @@
             :localized-fields="localizedFields"
             :is-root="isRoot"
             @updated="values = $event"
+            v-slot="{ container, components, setFieldMeta }"
         >
             <live-preview
-                slot-scope="{ container, components, setFieldMeta }"
                 :name="publishContainer"
                 :url="livePreviewUrl"
                 :previewing="isPreviewing"
@@ -224,9 +224,8 @@
             </button>
         </div>
 
-        <stack name="revision-history" v-if="showRevisionHistory" @closed="showRevisionHistory = false" :narrow="true">
+        <stack name="revision-history" v-if="showRevisionHistory" @closed="showRevisionHistory = false" :narrow="true" v-slot="{ close }">
             <revision-history
-                slot-scope="{ close }"
                 :index-url="actions.revisions"
                 :restore-url="actions.restore"
                 @closed="close"
@@ -254,6 +253,7 @@ import RevisionHistory from '../revision-history/History.vue';
 import HasPreferences from '../data-list/HasPreferences';
 import HasHiddenFields from '../publish/HasHiddenFields';
 import HasActions from '../publish/HasActions';
+import striptags from 'striptags';
 
 export default {
 
@@ -338,6 +338,10 @@ export default {
     },
 
     computed: {
+
+        formattedTitle() {
+            return striptags(__(this.title));
+        },
 
         hasErrors() {
             return this.error || Object.keys(this.errors).length;
@@ -668,7 +672,7 @@ export default {
         window.history.replaceState({}, document.title, document.location.href.replace('created=true', ''));
     },
 
-    destroyed() {
+    unmounted() {
         this.saveKeyBinding.destroy();
         this.quickSaveKeyBinding.destroy();
     }

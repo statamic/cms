@@ -16,9 +16,9 @@
                 :selections="selections.length"
                 :errors="errors"
                 @selected="run"
+                v-slot="{ action, select }"
             >
                 <button
-                    slot-scope="{ action, select }"
                     class="input-group-item"
                     :class="{'text-red-500': action.dangerous, 'ltr:rounded-r rtl:rounded-l': index + 1 === sortedActions.length }"
                     @click="select"

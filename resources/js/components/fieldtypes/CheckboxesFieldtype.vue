@@ -16,6 +16,7 @@
 </template>
 
 <script>
+import Fieldtype from './Fieldtype.vue';
 import HasInputOptions from './HasInputOptions.js'
 
 export default {

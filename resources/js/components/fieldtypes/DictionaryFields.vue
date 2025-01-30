@@ -4,12 +4,11 @@
         :blueprint="blueprint"
         :values="value"
         :meta="publishMeta"
-        :is-config="true"
         :errors="errors"
         @updated="update"
+        v-slot="{ setFieldValue, setFieldMeta }"
     >
         <publish-fields
-            slot-scope="{ setFieldValue, setFieldMeta }"
             :fields="fields"
             @updated="setFieldValue"
             @meta-updated="setFieldMeta"

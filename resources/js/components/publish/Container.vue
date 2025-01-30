@@ -1,13 +1,10 @@
 <script>
 import uniqid from 'uniqid';
 import Component from '../Component';
+import { getCurrentInstance } from 'vue';
 
 export default {
-
-    model: {
-        prop: 'values',
-        event: 'updated',
-    },
+    emits: ['updated', 'focus', 'blur'],
 
     props: {
         reference: {
@@ -62,7 +59,7 @@ export default {
         this.$events.$emit('publish-container-created', this);
     },
 
-    destroyed() {
+    unmounted() {
         this.removeVuexModule();
         this.clearDirtyState();
         this.$events.$emit('publish-container-destroyed', this);
@@ -178,10 +175,10 @@ export default {
                         state.localizedFields = fields;
                     },
                     lockField(state, { handle, user }) {
-                        Vue.set(state.fieldLocks, handle, user || true);
+                        state.fieldLocks[handle] = user || true;
                     },
                     unlockField(state, handle) {
-                        Vue.delete(state.fieldLocks, handle);
+                        delete state.fieldLocks[handle];
                     },
                     initialize(state, payload) {
                         state.blueprint = payload.blueprint;
@@ -324,13 +321,13 @@ export default {
     },
 
     render() {
-        return this.$scopedSlots.default({
+        return this.$slots.default({
             values: this.$store.state.publish[this.name].values,
-            container: this._self,
+            container: this,
             components: this.components,
             setFieldValue: this.setFieldValue,
             setFieldMeta: this.setFieldMeta,
-        });
+        })[0];
     }
 
 }

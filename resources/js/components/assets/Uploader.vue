@@ -1,10 +1,11 @@
 <script>
 import { Upload } from 'upload';
 import uniqid from 'uniqid';
+import { h } from 'vue';
 
 export default {
 
-    render(h) {
+    render() {
         const fileField = h('input', {
             class: { hidden: true },
             attrs: { type: 'file', multiple: true },
@@ -19,7 +20,7 @@ export default {
         }}, [
             h('div', { class: { 'pointer-events-none': this.dragging }}, [
                 fileField,
-                ...this.$scopedSlots.default({ dragging: this.enabled ? this.dragging : false })
+                ...this.$slots.default({ dragging: this.enabled ? this.dragging : false })
             ])
         ]);
     },
@@ -53,7 +54,7 @@ export default {
     },
 
 
-    beforeDestroy() {
+    beforeUnmount() {
         this.$refs.nativeFileField.removeEventListener('change', this.addNativeFileFieldSelections);
     },
 

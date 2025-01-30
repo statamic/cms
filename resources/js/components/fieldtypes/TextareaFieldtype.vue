@@ -5,11 +5,11 @@
         :isReadOnly="isReadOnly"
         :limit="config.character_limit || null"
         :placeholder="__(config.placeholder)"
-        :value="value"
+        :model-value="value"
         :id="fieldId"
         @blur="$emit('blur')"
         @focus="$emit('focus')"
-        @input="updateDebounced" />
+        @update:model-value="updateDebounced" />
 </template>
 
 <script>

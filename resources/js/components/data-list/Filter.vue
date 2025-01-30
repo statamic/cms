@@ -9,9 +9,9 @@
             :values="containerValues"
             :track-dirty-state="false"
             @updated="updateValues"
+            v-slot="{ setFieldValue }"
         >
             <publish-fields
-                slot-scope="{ setFieldValue }"
                 :fields="filter.fields"
                 :name-prefix="`filter-${filter.handle}`"
                 @updated="setFieldValue"

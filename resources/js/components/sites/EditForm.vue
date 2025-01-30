@@ -10,8 +10,9 @@
         :meta="meta"
         :errors="errors"
         @updated="values = $event"
+        v-slot="{ setFieldValue, setFieldMeta }"
     >
-        <div slot-scope="{ setFieldValue, setFieldMeta }">
+        <div>
             <header class="mb-6">
                 <div class="flex items-center">
                     <h1 class="flex-1" v-text="pageTitle" />

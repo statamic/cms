@@ -139,7 +139,7 @@ export default {
         this.makeSortable();
     },
 
-    destroyed() {
+    unmounted() {
         if (this.sortableTabs) this.sortableTabs.destroy();
         if (this.sortableSections) this.sortableSections.destroy();
         if (this.sortableFields) this.sortableFields.destroy();

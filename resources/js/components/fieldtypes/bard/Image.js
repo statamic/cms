@@ -1,5 +1,5 @@
 import { Node } from '@tiptap/core';
-import { VueNodeViewRenderer } from '@tiptap/vue-2'
+import { VueNodeViewRenderer } from '@tiptap/vue-3'
 import ImageComponent from './Image.vue';
 
 export const Image = Node.create({

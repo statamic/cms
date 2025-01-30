@@ -14,8 +14,9 @@
             :sort-column="sortColumn"
             :sort-direction="sortDirection"
             @visible-columns-updated="visibleColumns = $event"
+            v-slot="{ hasSelections }"
         >
-            <div slot-scope="{ hasSelections }">
+            <div>
                 <div class="card overflow-hidden p-0 relative">
                     <div class="flex flex-wrap items-center justify-between px-2 pb-2 text-sm border-b dark:border-dark-900">
 
@@ -74,15 +75,15 @@
                         :column-preferences-key="preferencesKey('columns')"
                         @sorted="sorted"
                     >
-                        <template slot="cell-title" slot-scope="{ row: term }">
+                        <template #cell-title="{ row: term }">
                             <div class="flex items-center">
                                 <a :href="term.edit_url">{{ term.title }}</a>
                             </div>
                         </template>
-                        <template slot="cell-slug" slot-scope="{ row: term }">
+                        <template #cell-slug="{ row: term }">
                             <span class="font-mono text-2xs">{{ term.slug }}</span>
                         </template>
-                        <template slot="actions" slot-scope="{ row: term, index }">
+                        <template #actions="{ row: term, index }">
                             <dropdown-list placement="left-start">
                                 <dropdown-item :text="__('View')" :redirect="term.permalink" />
                                 <dropdown-item :text="__('Edit')" :redirect="term.edit_url" />

@@ -1,15 +1,16 @@
 <template>
 
-    <v-portal
-        name="popover"
-        :to="portal.id"
-        :target-class="targetClass"
+    <teleport
+        :to="`#portal-target-${portal.id}`"
         :disabled="disabled"
+        v-if="mounted"
     >
-        <provider :variables="provide">
-           <slot />
-        </provider>
-    </v-portal>
+        <div class="vue-portal-target" :class="targetClass">
+            <provider :variables="provide">
+               <slot />
+            </provider>
+        </div>
+    </teleport>
 
 </template>
 
@@ -27,7 +28,8 @@ export default {
             required: true
         },
         provide: {
-            type: Object
+            type: Object,
+            default: () => ({})
         },
         targetClass: {
             type: String
@@ -41,6 +43,7 @@ export default {
     data() {
         return {
             portal: null,
+            mounted: false,
         }
     },
 
@@ -48,7 +51,11 @@ export default {
         this.portal = this.$portals.create(this.name);
     },
 
-    beforeDestroy() {
+    mounted() {
+        this.mounted = true;
+    },
+
+    beforeUnmount() {
         this.portal.destroy();
     }
 

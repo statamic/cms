@@ -26,9 +26,9 @@
                 :meta="action.meta"
                 :errors="errors"
                 @updated="values = $event"
+                v-slot="{ setFieldValue, setFieldMeta }"
             >
                 <publish-fields
-                    slot-scope="{ setFieldValue, setFieldMeta }"
                     :fields="action.fields"
                     @updated="setFieldValue"
                     @meta-updated="setFieldMeta"
@@ -110,7 +110,7 @@ export default {
         this.$events.$on('reset-action-modals', this.reset);
     },
 
-    destroyed() {
+    unmounted() {
         this.$events.$off('reset-action-modals', this.reset);
     },
 

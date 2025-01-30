@@ -1,4 +1,5 @@
 import { closestVm } from '../bootstrap/globals';
+import { nextTick } from 'vue';
 
 class Reveal {
     element(el) {
@@ -16,7 +17,7 @@ class Reveal {
             }
             parent = parent.parentElement;
         }
-        Vue.nextTick(() => {
+        nextTick(() => {
             el.scrollIntoView({
                 block: 'center',
             });
@@ -24,7 +25,9 @@ class Reveal {
     }
 
     invalid() {
-        Vue.nextTick(() => {
+        return; // TODO
+
+        nextTick(() => {
             const el = document.querySelector('.publish-field.has-error:not(:has(.publish-field.has-error))');
             if (!el) return;
             this.element(el);

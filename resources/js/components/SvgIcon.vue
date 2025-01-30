@@ -2,87 +2,69 @@
     <component v-if="icon" :is="icon" />
 </template>
 
-<script>
-import { defineAsyncComponent } from 'vue';
+<script setup>
+import { defineAsyncComponent, shallowRef, computed, watch } from 'vue';
 import { data_get } from  '../bootstrap/globals.js'
 
-export default {
+const props = defineProps({
+    name: String,
+    default: String,
+    directory: String,
+})
 
-    props: {
-        name: String,
-        default: String,
-        directory: String,
-    },
+const icon = shallowRef(null);
 
-    data() {
-        return {
-            icon: null,
-        }
-    },
+const customIcon = computed(() => {
+    if (! props.directory) return;
 
-    mounted() {
-        this.icon = this.evaluateIcon();
-    },
+    let directory = props.directory;
+    let folder = null;
+    let file = props.name;
 
-    watch: {
-        name() {
-            this.icon = this.evaluateIcon();
-        }
-    },
-
-    computed: {
-        customIcon() {
-            if (! this.directory) return;
-
-            let directory = this.directory;
-            let folder = null;
-            let file = this.name;
-
-            if (this.name.includes('/')) {
-                [folder, file] = this.name.split('/');
-                directory = directory+'/'+folder;
-            }
-
-            return data_get(this.$config.get('customSvgIcons') || {}, `${directory}.${file}`);
-        },
-    },
-
-    methods: {
-        evaluateIcon() {
-            if (this.customIcon) {
-                return defineAsyncComponent(() => {
-                    return new Promise(resolve => resolve({ template: this.customIcon }));
-                });
-            }
-
-            if (this.name.startsWith('<svg')) {
-                return defineAsyncComponent(() => {
-                    return new Promise(resolve => resolve({ template: this.name }));
-                });
-            }
-
-            return defineAsyncComponent(() => {
-                const [set, file] = this.splitIcon(this.name);
-
-                return import(`./../../svg/icons/${set}/${file}.svg`)
-                    .catch(e => {
-                        if (! this.default) return this.fallbackIconImport();
-                        const [set, file] = this.splitIcon(this.default);
-                        return import(`./../../svg/icons/${set}/${file}.svg`).catch(e => this.fallbackIconImport());
-                    });
-            });
-        },
-
-        splitIcon(icon) {
-            if (! icon.includes('/')) icon = 'regular/' + icon;
-
-            return icon.split('/');
-        },
-
-        fallbackIconImport() {
-            return import('./../../svg/icons/regular/image.svg');
-        },
-
+    if (props.name.includes('/')) {
+        [folder, file] = props.name.split('/');
+        directory = directory+'/'+folder;
     }
-}
+
+    return data_get(this.$config.get('customSvgIcons') || {}, `${directory}.${file}`);
+});
+
+const evaluateIcon = () => {
+    if (customIcon.value) {
+        return defineAsyncComponent(() => {
+            return new Promise(resolve => resolve({ template: customIcon.value }));
+        });
+    }
+
+    if (props.name.startsWith('<svg')) {
+        return defineAsyncComponent(() => {
+            return new Promise(resolve => resolve({ template: props.name }));
+        });
+    }
+
+    return defineAsyncComponent(() => {
+        const [set, file] = splitIcon(props.name);
+
+        return import(`./../../svg/icons/${set}/${file}.svg`)
+            .catch(e => {
+                if (! props.default) return fallbackIconImport();
+                const [set, file] = splitIcon(props.default);
+                return import(`./../../svg/icons/${set}/${file}.svg`).catch(e => fallbackIconImport());
+            });
+    });
+};
+
+const splitIcon = (icon) => {
+    if (! icon.includes('/')) icon = 'regular/' + icon;
+
+    return icon.split('/');
+};
+
+const fallbackIconImport = () => {
+    return import('./../../svg/icons/regular/image.svg');
+};
+
+watch(() => props.name, () => {
+    icon.value = evaluateIcon();
+}, { immediate: true });
 </script>

@@ -16,6 +16,7 @@
 </template>
 
 <script>
+import Fieldtype from '../Fieldtype.vue';
 import Fields from '../../blueprints/Fields.vue';
 import {Sortable, Plugins} from '@shopify/draggable';
 import SuggestsConditionalFields from '../../blueprints/SuggestsConditionalFields';

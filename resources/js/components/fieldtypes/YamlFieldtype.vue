@@ -6,6 +6,7 @@
 </template>
 
 <script>
+import Fieldtype from './Fieldtype.vue';
 import CodeMirror from 'codemirror'
 import 'codemirror/mode/yaml/yaml'
 

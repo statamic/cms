@@ -13,15 +13,15 @@
             :sort-direction="sortDirection"
             class="h-full flex flex-col justify-between"
         >
-            <div slot-scope="{ }">
+            <div>
                 <data-list-table :loading="loading">
-                    <template slot="cell-title" slot-scope="{ row: entry }">
+                    <template #cell-title="{ row: entry }">
                         <div class="flex items-center">
                             <span class="little-dot rtl:ml-2 ltr:mr-2" v-tooltip="getStatusLabel(entry)" :class="getStatusClass(entry)" v-if="! columnShowing('status')" />
                             <a :href="entry.edit_url">{{ entry.title }}</a>
                         </div>
                     </template>
-                    <template slot="cell-status" slot-scope="{ row: entry }">
+                    <template #cell-status="{ row: entry }">
                         <div class="status-index-field select-none" v-tooltip="getStatusTooltip(entry)" :class="`status-${entry.status}`" v-text="getStatusLabel(entry)" />
                     </template>
                 </data-list-table>

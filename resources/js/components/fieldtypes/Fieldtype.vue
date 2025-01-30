@@ -2,6 +2,7 @@
 import HasFieldActions from '../field-actions/HasFieldActions';
 
 export default {
+    emits: ['update:value', 'focus', 'blur', 'meta-updated', 'replicator-preview-updated'],
 
     mixins: [
         HasFieldActions,
@@ -44,7 +45,7 @@ export default {
 
     methods: {
         update(value) {
-            this.$emit('input', value);
+            this.$emit('update:value', value);
         },
 
         updateDebounced: _.debounce(function (value) {

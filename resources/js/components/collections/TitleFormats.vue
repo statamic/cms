@@ -9,6 +9,7 @@
 </template>
 
 <script>
+import Fieldtype from '../fieldtypes/Fieldtype.vue';
 import OneOrManySitesField from './OneOrManySitesField.vue'
 
 export default {

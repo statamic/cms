@@ -1,9 +1,8 @@
 <template>
     <div class="portal-targets" :class="{ 'stacks-on-stacks': hasStacks }">
-        <portal-target
+        <div
             v-for="(portal, i) in portals"
-            :key="portal.id"
-            :name="portal.id"
+            :id="`portal-target-${portal.id}`"
         />
     </div>
 </template>

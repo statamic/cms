@@ -2,7 +2,7 @@
 <div>
 
     <sortable-list
-        :value="rows"
+        :model-value="rows"
         :vertical="true"
         :item-class="sortableItemClass"
         :handle-class="sortableHandleClass"
@@ -10,7 +10,8 @@
         constrain-dimensions
         @dragstart="$emit('focus')"
         @dragend="$emit('blur')"
-        @input="(rows) => $emit('sorted', rows)"
+        @update:model-value="(rows) => $emit('sorted', rows)"
+        v-slot="{}"
     >
         <div
             class="grid-stacked"
@@ -19,7 +20,6 @@
                 'mt-4': !hideDisplay,
                 'mt-10': allowFullscreen,
             }"
-            slot-scope="{}"
         >
             <stacked-row
                 v-for="(row, index) in rows"

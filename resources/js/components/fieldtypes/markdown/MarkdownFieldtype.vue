@@ -10,8 +10,9 @@
             :path="folder"
             @updated="uploadsUpdated"
             @upload-complete="uploadComplete"
+            v-slot="{ dragging }"
         >
-            <div slot-scope="{ dragging }">
+            <div>
 
                 <publish-field-fullscreen-header
                     v-if="fullScreenMode"
@@ -134,7 +135,9 @@
 </template>
 
 <script>
+import Fieldtype from '../Fieldtype.vue';
 import { marked } from 'marked';
+import { markRaw } from 'vue';
 import PlainTextRenderer from 'marked-plaintext';
 
 import CodeMirror from 'codemirror/lib/codemirror';
@@ -240,15 +243,6 @@ export default {
             this.updateCount(data);
         },
 
-        fullScreenMode: {
-            immediate: true,
-            handler: function (fullscreen) {
-                this.$nextTick(() => {
-                    this.$nextTick(() => this.initCodeMirror());
-                });
-            }
-        },
-
         mode(mode) {
             if (mode === 'preview') this.updateMarkdownPreview();
         },
@@ -261,6 +255,7 @@ export default {
 
     mounted() {
         this.initToolbarButtons();
+        this.$nextTick(() => this.initCodeMirror());
 
         if (this.data) {
             this.updateCount(this.data);
@@ -272,6 +267,12 @@ export default {
                 this.codemirror.focus();
             });
         }
+    },
+
+    beforeUnmount() {
+        this.$events.$off('livepreview.opened', this.throttledResizeEvent);
+        this.$events.$off('livepreview.closed', this.throttledResizeEvent);
+        this.$events.$off('livepreview.resizing', this.throttledResizeEvent);
     },
 
     methods: {
@@ -648,19 +649,14 @@ export default {
         },
 
         trackHeightUpdates() {
-            const update = () => { window.dispatchEvent(new Event('resize')) };
-            const throttled = _.throttle(update, 100);
-
-            this.$root.$on('livepreview.opened', throttled);
-            this.$root.$on('livepreview.closed', throttled);
-            this.$root.$on('livepreview.resizing', throttled);
-
-            this.$once('hook:beforeDestroy', () => {
-                this.$root.$off('livepreview.opened', throttled);
-                this.$root.$off('livepreview.closed', throttled);
-                this.$root.$off('livepreview.resizing', throttled);
-            });
+            this.$events.$on('livepreview.opened', this.throttledResizeEvent);
+            this.$events.$on('livepreview.closed', this.throttledResizeEvent);
+            this.$events.$on('livepreview.resizing', this.throttledResizeEvent);
         },
+
+        throttledResizeEvent: _.throttle(function () {
+            window.dispatchEvent(new Event('resize'));
+        }, 100),
 
         updateMarkdownPreview() {
             this.$axios
@@ -672,7 +668,7 @@ export default {
         initCodeMirror() {
             var self = this;
 
-            self.codemirror = CodeMirror(this.$refs.codemirror, {
+            self.codemirror = markRaw(CodeMirror(this.$refs.codemirror, {
                 value: self.data,
                 mode: 'gfm',
                 dragDrop: false,
@@ -689,7 +685,7 @@ export default {
                     "Enter": "newlineAndIndentContinueMarkdownList",
                     "Cmd-Left": "goLineLeftSmart"
                 }
-            });
+            }));
 
             self.codemirror.on('change', function (cm) {
                 self.data = cm.doc.getValue();

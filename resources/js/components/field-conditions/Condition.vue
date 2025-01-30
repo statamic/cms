@@ -4,7 +4,7 @@
 
         <v-select
             ref="fieldSelect"
-            :value="condition.field"
+            :model-value="condition.field"
             class="w-full md:w-1/3 mb-2 md:mb-0"
             :options="fieldOptions"
             :placeholder="__('Field')"
@@ -12,11 +12,11 @@
             :push-tags="true"
             :reduce="field => field.value"
             :create-option="field => ({value: field, label: field })"
-            @input="fieldSelected"
+            @update:model-value="fieldSelected"
             @search:blur="fieldSelectBlur"
         >
             <template #no-options><div class="hidden" /></template>
-            <template slot="option" slot-scope="option">
+            <template #option="option">
                 <div class="flex items-center">
                     <span v-text="option.label" />
                     <span v-text="option.value" class="font-mono text-2xs text-gray-500 dark:text-dark-150" :class="{ 'ml-2': option.label }" />
@@ -25,22 +25,22 @@
         </v-select>
 
         <select-input
-            :value="condition.operator"
+            :model-value="condition.operator"
             :options="operatorOptions"
             :placeholder="false"
             class="rtl:md:mr-4 ltr:md:ml-4"
-            @input="operatorSelected" />
+            @update:model-value="operatorSelected" />
 
         <toggle-input
             v-if="showValueToggle"
             class="rtl:mr-4 ltr:ml-4"
-            :value="condition.value === 'true'"
-            @input="valueUpdated" />
+            :model-value="condition.value === 'true'"
+            @update:model-value="valueUpdated" />
 
         <v-select
             v-else-if="showValueDropdown"
             ref="valueSelect"
-            :value="condition.value"
+            :model-value="condition.value"
             class="rtl:mr-4 ltr:ml-4 w-full md:w-52 mb-2 md:mb-0"
             :options="valueOptions"
             :placeholder="__('Option')"
@@ -48,7 +48,7 @@
             :push-tags="true"
             :reduce="field => field.value"
             :create-option="field => ({value: field, label: field })"
-            @input="valueUpdated"
+            @update:model-value="valueUpdated"
             @search:blur="valueSelectBlur"
         >
             <template #no-options><div class="hidden" /></template>
@@ -56,9 +56,9 @@
 
         <text-input
             v-else
-            :value="condition.value"
+            :model-value="condition.value"
             class="rtl:mr-4 ltr:ml-4"
-            @input="valueUpdated" />
+            @update:model-value="valueUpdated" />
 
         <button @click="remove" class="btn-close rtl:mr-2 ltr:ml-2 group">
             <svg-icon name="micro/trash" class="w-4 h-4 group-hover:text-red-500" />

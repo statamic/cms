@@ -17,10 +17,10 @@
                 </dropdown-item>
                 <dropdown-item
                     v-if="container.can_delete"
-                    v-text="__('Delete Container')"
                     class="warning"
                     @click="$refs.deleter.confirm()"
                 >
+                    {{ __('Delete Container') }}
                     <resource-deleter
                         ref="deleter"
                         :resource-title="__(container.title)"
@@ -81,7 +81,7 @@ export default {
          * navigation back and forth through folders using browser buttons.
          */
         bindBrowserNavigation() {
-            window.history.replaceState({ container: this.container, path: this.path }, '');
+            window.history.replaceState({ container: { ...this.container }, path: this.path }, '');
 
             window.onpopstate = (e) => {
                 this.container = e.state.container;
@@ -100,7 +100,7 @@ export default {
             }
 
             window.history.pushState({
-                container: this.container, path: this.path
+                container: { ...this.container }, path: this.path
             }, '', url);
         },
 

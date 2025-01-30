@@ -61,7 +61,7 @@ export default {
     computed: {
 
         publishContainer() {
-            return `relate-fieldtype-inline-${this._uid}`;
+            return `relate-fieldtype-inline-${this.$.uid}`;
         }
 
     },
@@ -77,7 +77,7 @@ export default {
                 .then(response => {
                     for (const prop in this.componentProps) {
                         const value = data_get(response.data, this.componentProps[prop]);
-                        this.$set(this.componentPropValues, prop, value);
+                        this.componentPropValues[prop] = value;
                     }
 
                     this.loading = false;

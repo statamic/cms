@@ -1,15 +1,15 @@
 <template>
-    <data-list :visible-columns="columns" :columns="columns" :rows="rows">
-        <div class="card overflow-hidden p-0 relative" slot-scope="{ filteredRows: rows }">
+    <data-list :visible-columns="columns" :columns="columns" :rows="rows" v-slot="{ filteredRows: rows }">
+        <div class="card overflow-hidden p-0 relative">
             <div class="overflow-x-auto overflow-y-hidden">
                 <data-list-table>
-                    <template slot="cell-title" slot-scope="{ row: fieldset }">
+                    <template #cell-title="{ row: fieldset }">
                         <a :href="fieldset.edit_url">{{ __(fieldset.title) }}</a>
                     </template>
-                    <template slot="cell-handle" slot-scope="{ value }">
+                    <template #cell-handle="{ value }">
                         <span class="font-mono text-xs">{{ value }}</span>
                     </template>
-                    <template slot="actions" slot-scope="{ row: fieldset, index }">
+                    <template #actions="{ row: fieldset, index }">
                         <dropdown-list>
                             <dropdown-item :text="__('Edit')" :redirect="fieldset.edit_url" />
                             <dropdown-item

@@ -35,30 +35,15 @@ export default {
 
     mixins: [Fieldtype],
 
-    inject: ['storeName'],
+    inject: [
+        'getFieldSettingsValue',
+        'updateFieldSettingsValue',
+    ],
 
     computed: {
 
-        nearestPublishContainer() {
-            let parent = this;
-            while (parent.$options.name !== 'publish-container') {
-                parent = parent.$parent;
-                if (parent === this.$root) return null;
-            }
-            return parent;
-        },
-
-        nearestFieldSettings() {
-            let parent = this;
-            while (parent.$options._componentTag !== 'field-settings') {
-                parent = parent.$parent;
-                if (parent === this.$root) return null;
-            }
-            return parent;
-        },
-
         hidden() {
-            return this.nearestFieldSettings.values.hide_display;
+            return this.getFieldSettingsValue('hide_display');
         }
 
     },
@@ -70,7 +55,7 @@ export default {
     methods: {
 
         toggleHidden() {
-            this.nearestFieldSettings.updateField('hide_display', ! this.hidden)
+            this.updateFieldSettingsValue('hide_display', ! this.hidden)
         }
 
     }

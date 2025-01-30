@@ -18,7 +18,7 @@
         <collection-list
             :initial-rows="{{ json_encode($collections) }}"
             :initial-columns="{{ json_encode($columns) }}"
-            :endpoints="{}">
+        >
         </collection-list>
 
     @else

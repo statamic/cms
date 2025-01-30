@@ -56,8 +56,9 @@
             :localized-fields="localizedFields"
             :is-root="isRoot"
             @updated="values = $event"
+            v-slot="{ container, components, setFieldMeta }"
         >
-            <div slot-scope="{ container, components, setFieldMeta }">
+            <div>
                 <component
                     v-for="component in components"
                     :key="component.name"

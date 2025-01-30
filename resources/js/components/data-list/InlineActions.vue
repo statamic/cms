@@ -9,8 +9,9 @@
             :errors="errors"
             :is-dirty="isDirty"
             @selected="run"
+            v-slot="{ action, select }"
         >
-            <div slot-scope="{ action, select }">
+            <div>
                 <button
                     v-text="__(action.title)"
                     :class="{ warning: action.dangerous }"

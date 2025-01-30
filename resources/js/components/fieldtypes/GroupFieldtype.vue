@@ -85,6 +85,9 @@ export default {
         values() {
             return this.value;
         },
+        extraValues() {
+            return {};
+        },
         fields() {
             return this.config.fields;
         },

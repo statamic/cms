@@ -7,7 +7,7 @@
             class="select-input"
             :name="name"
             @change="change"
-            :value="value"
+            :value="modelValue"
             :disabled="isReadOnly"
             @focus="$emit('focus')"
             @blur="$emit('blur')"
@@ -18,7 +18,7 @@
                 v-text="__(placeholder)"
                 value=""
                 disabled
-                :selected="value === null" />
+                :selected="modelValue === null" />
 
             <option
                 v-for="option in options"
@@ -51,7 +51,7 @@ export default {
             required: false,
             default: () => __('Choose...')
         },
-        value: {},
+        modelValue: {},
         isReadOnly: { type: Boolean },
         resetOnChange: { default: false }
     },
@@ -65,9 +65,9 @@ export default {
     methods: {
 
         isOptionSelected(option) {
-            return this.placeholder === false && this.value === undefined
+            return this.placeholder === false && this.modelValue === undefined
                 ? option.value == this.options[0].value
-                : option.value == this.value;
+                : option.value == this.modelValue;
         },
 
         change(event) {
@@ -75,7 +75,7 @@ export default {
                 this.reset();
             }
 
-            this.$emit('input', event.target.value)
+            this.$emit('update:model-value', event.target.value)
         },
 
         reset() {

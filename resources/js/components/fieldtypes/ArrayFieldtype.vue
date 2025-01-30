@@ -95,6 +95,7 @@
 </template>
 
 <script>
+import Fieldtype from './Fieldtype.vue';
 import { SortableList, SortableItem, SortableHelpers } from '../sortable/Sortable';
 
 export default {

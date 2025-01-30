@@ -12,9 +12,9 @@
         :select-on-key-codes="[9, 13, 188]"
         :taggable="true"
         :append-to-body="true"
-        :value="value"
+        :model-value="value"
         :dropdown-should-open="({ open }) => open && config.options.length > 0"
-        @input="update"
+        @update:model-value="update"
         @search:focus="$emit('focus')"
         @search:blur="$emit('blur')">
             <template #selected-option-container><i class="hidden"></i></template>
@@ -35,10 +35,10 @@
                 <sortable-list
                     item-class="sortable-item"
                     handle-class="sortable-item"
-                    :value="value"
+                    :model-value="value"
                     :distance="5"
                     :mirror="false"
-                    @input="update"
+                    @update:model-value="update"
                 >
                     <div class="vs__selected-options-outside flex flex-wrap">
                         <span v-for="tag in value" :key="tag" class="vs__selected mt-2 sortable-item">
@@ -60,6 +60,7 @@
 </style>
 
 <script>
+import Fieldtype from './Fieldtype.vue';
 import HasInputOptions from './HasInputOptions.js'
 import { SortableList, SortableItem } from '../sortable/Sortable';
 

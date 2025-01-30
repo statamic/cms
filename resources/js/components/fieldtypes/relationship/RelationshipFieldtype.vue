@@ -37,6 +37,7 @@
 </template>
 
 <script>
+import Fieldtype from '../Fieldtype.vue';
 import qs from 'qs';
 
 export default {

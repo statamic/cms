@@ -130,7 +130,7 @@ export default {
         }
     },
 
-    beforeDestroy() {
+    beforeUnmount() {
         if (this.pushQuery) {
             window.removeEventListener('popstate', this.popState);
         }
@@ -178,12 +178,12 @@ export default {
 
             this.loading = true;
 
-            if (this.source) this.source.cancel();
-            this.source = this.$axios.CancelToken.source();
+            if (this.source) this.source.abort();
+            this.source = new AbortController();
 
             this.$axios.get(this.requestUrl, {
                 params: this.parameters,
-                cancelToken: this.source.token
+                signal: this.source.signal
             }).then(response => {
                 this.columns = response.data.meta.columns;
                 this.activeFilterBadges = {...response.data.meta.activeFilterBadges};

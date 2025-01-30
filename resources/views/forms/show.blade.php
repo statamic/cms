@@ -39,7 +39,9 @@
 
             @if (($exporters = $form->exporters()) && $exporters->isNotEmpty())
             <dropdown-list>
-                <button class="btn" slot="trigger">{{ __('Export Submissions') }}</button>
+                <template v-slot:trigger>
+                    <button class="btn" slot="trigger">{{ __('Export Submissions') }}</button>
+                </template>
                 @foreach ($exporters as $exporter)
                     <dropdown-item
                         text="{{ $exporter->title() }}"

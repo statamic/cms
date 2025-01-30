@@ -30,16 +30,16 @@
                     :display="__('Fieldset')"
                     :instructions="__('messages.fieldset_import_fieldset_instructions')"
                     autofocus
-                    :value="config.fieldset"
-                    @input="updateField('fieldset', $event)"
+                    :model-value="config.fieldset"
+                    @update:model-value="updateField('fieldset', $event)"
                 />
 
                 <form-group
                     handle="prefix"
                     :display="__('Prefix')"
                     :instructions="__('messages.fieldset_import_prefix_instructions')"
-                    :value="config.prefix"
-                    @input="updateField('prefix', $event)"
+                    :model-value="config.prefix"
+                    @update:model-value="updateField('prefix', $event)"
                 />
 
             </div>

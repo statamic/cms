@@ -1,6 +1,7 @@
 <template>
 
-    <v-portal :to="portal" :order="depth" target-class="stack">
+    <teleport :to="portal" :order="depth" v-if="visible">
+        <div class="vue-portal-target stack">
         <div class="stack-container"
             :class="{ 'stack-is-current': isTopStack, 'hovering': isHovering, 'p-2 shadow-lg': full }"
             :style="direction === 'ltr' ? { left: `${leftOffset}px` } : { right: `${leftOffset}px` }"
@@ -17,12 +18,15 @@
                 </div>
             </transition>
         </div>
-    </v-portal>
+        </div>
+    </teleport>
 
 </template>
 
 <script>
 export default {
+
+    emits: ['closed'],
 
     props: {
         name: {
@@ -56,7 +60,7 @@ export default {
     computed: {
 
         portal() {
-            return this.stack ? this.stack.id : null;
+            return this.stack ? `#portal-target-${this.stack.id}` : null;
         },
 
         depth() {
@@ -64,7 +68,7 @@ export default {
         },
 
         id() {
-            return `${this.name}-${this._uid}`;
+            return `${this.name}-${this.$.uid}`;
         },
 
         offset() {
@@ -112,7 +116,7 @@ export default {
         this.escBinding = this.$keys.bindGlobal('esc', this.close);
     },
 
-    destroyed() {
+    unmounted() {
         this.stack.destroy();
         this.$events.$off(`stacks.${this.depth}.hit-area-mouseenter`);
         this.$events.$off(`stacks.${this.depth}.hit-area-mouseout`);

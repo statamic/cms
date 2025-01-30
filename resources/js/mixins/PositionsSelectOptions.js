@@ -1,6 +1,13 @@
 import { computePosition, offset, flip, autoUpdate } from '@floating-ui/dom';
 
 export default {
+
+    data() {
+        return {
+            cleanupPositionOptions: null
+        }
+    },
+
     methods: {
         positionOptions(dropdownList, component, {width}) {
             dropdownList.style.width = width;
@@ -21,13 +28,17 @@ export default {
                 });
             }
 
-            const cleanup = autoUpdate(
+            this.cleanupPositionOptions = autoUpdate(
                 component.$refs.toggle,
                 dropdownList,
                 updatePosition
             );
+        }
+    },
 
-            this.$once('hook:destroyed', cleanup);
+    beforeUnmount() {
+        if (this.cleanupPositionOptions) {
+            this.cleanupPositionOptions();
         }
     }
 }

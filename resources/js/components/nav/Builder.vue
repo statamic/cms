@@ -78,9 +78,9 @@
                 @change="changed = true"
                 @drag="treeDrag"
                 @drop="treeDrop"
+                v-slot="{ data: item, store, vm }"
             >
                 <tree-branch
-                    slot-scope="{ data: item, store, vm }"
                     :item="item"
                     :depth="vm.level"
                     :vm="vm"
@@ -129,9 +129,9 @@
                 @change="changed = true"
                 @drag="treeDrag"
                 @drop="treeDrop"
+                v-slot="{ data: item, store, vm }"
             >
                 <tree-branch
-                    slot-scope="{ data: item, store, vm }"
                     :item="item"
                     :parent-section="getParentSectionNode(item)"
                     :depth="vm.level"
@@ -228,19 +228,19 @@
 </template>
 
 <script>
-import {DraggableTree} from 'vue-draggable-nested-tree/dist/vue-draggable-nested-tree';
-import TreeBranch from './Branch.vue';
-import ItemEditor from './ItemEditor.vue';
-import SectionEditor from './SectionEditor.vue';
-import { data_get } from  '../../bootstrap/globals.js'
+// import {DraggableTree} from 'vue-draggable-nested-tree/dist/vue-draggable-nested-tree';
+// import TreeBranch from './Branch.vue';
+// import ItemEditor from './ItemEditor.vue';
+// import SectionEditor from './SectionEditor.vue';
+// import { data_get } from  '../../bootstrap/globals.js'
 
 export default {
 
     components: {
-        DraggableTree,
-        TreeBranch,
-        ItemEditor,
-        SectionEditor,
+        // DraggableTree,
+        // TreeBranch,
+        // ItemEditor,
+        // SectionEditor,
     },
 
     props: {
@@ -397,10 +397,10 @@ export default {
             });
 
             // Ensure you can only drop nav item nodes into top level tree root
-            this.$set(this.$refs.topLevelTree.rootData, 'droppable', ! this.isSectionNode(node));
+            this.$refs.topLevelTree.rootData.droppable = ! this.isSectionNode(node);
 
             // Ensure you can only drop section nodes to main tree root
-            this.$set(this.$refs.mainTree.rootData, 'droppable', this.isSectionNode(node));
+            this.$refs.mainTree.rootData.droppable = this.isSectionNode(node);
 
             // Hardcode max depths
             const topLevelTreeMaxDepth = 2 - nodeDepth; // 2 for nav items, and one level of nav item children
@@ -409,14 +409,14 @@ export default {
             // Ensure max depth for top level tree
             this.traverseTree(this.topLevelTreeData, (childNode, { depth }) => {
                 if (childNode !== node) {
-                    this.$set(childNode, 'droppable', depth <= topLevelTreeMaxDepth && ! this.isSectionNode(node));
+                    childNode.droppable = depth <= topLevelTreeMaxDepth && ! this.isSectionNode(node);
                 }
             });
 
             // Ensure max depth for main tree
             this.traverseTree(this.mainTreeData, (childNode, { depth }) => {
                 if (childNode !== node) {
-                    this.$set(childNode, 'droppable', depth <= mainTreeMaxDepth && ! this.isSectionNode(node));
+                    childNode.droppable = depth <= mainTreeMaxDepth && ! this.isSectionNode(node);
                 }
             });
         },
@@ -553,7 +553,7 @@ export default {
             if (currentAction === '@create' || value !== data_get(item.original, key)) {
                 item.manipulations[key] = value;
             } else {
-                Vue.delete(item.manipulations, key);
+                delete item.manipulations[key];
             }
         },
 
@@ -567,7 +567,7 @@ export default {
             if (detectedAction) {
                 item.manipulations.action = detectedAction;
             } else {
-                Vue.delete(item.manipulations, 'action');
+                delete item.manipulations['action'];
             }
 
             if (this.isChildItemNode(item)) {
@@ -659,13 +659,13 @@ export default {
         expandAll() {
             this.traverseTree(this.topLevelTreeData, (node) => {
                 if (! this.isSectionNode(node)) {
-                    this.$set(node, 'open', true);
+                    node.open = true;
                 }
             });
 
             this.traverseTree(this.mainTreeData, (node) => {
                 if (! this.isSectionNode(node)) {
-                    this.$set(node, 'open', true);
+                    node.open = true;
                 }
             });
         },
@@ -673,13 +673,13 @@ export default {
         collapseAll() {
             this.traverseTree(this.topLevelTreeData, (node) => {
                 if (! this.isSectionNode(node)) {
-                    this.$set(node, 'open', false);
+                    node.open = false;
                 }
             });
 
             this.traverseTree(this.mainTreeData, (node) => {
                 if (! this.isSectionNode(node)) {
-                    this.$set(node, 'open', false);
+                    node.open = false;
                 }
             });
         },
@@ -749,7 +749,7 @@ export default {
         },
 
         hideItem(item) {
-            Vue.set(item.manipulations, 'action', '@hide');
+            item.manipulations['action'] = '@hide';
 
             this.updateItemAction(item);
 
@@ -757,7 +757,7 @@ export default {
         },
 
         showItem(item) {
-            Vue.delete(item.manipulations, 'action');
+            delete item.manipulations['action'];
 
             this.updateItemAction(item);
 

@@ -12,7 +12,7 @@ class Component {
     }
 
     on(event, handler) {
-        Vue.set(this.events, event, handler);
+        this.events[event] = handler;
     }
 
     destroy() {

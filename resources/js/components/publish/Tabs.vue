@@ -22,7 +22,7 @@
             >
                 <button v-for="tab in mainTabs"
                     class="tab-button"
-                    :ref="tab.handle + '-tab'"
+                    ref="tab"
                     :key="tab.handle"
                     :class="{
                         'active': isActive(tab.handle),
@@ -108,7 +108,9 @@
             </div>
         </div>
 
-        <portal-target :name="actionsPortal" class="publish-tab publish-tab-actions-footer" />
+        <div class="publish-tab publish-tab-actions-footer">
+            <portal-target :name="actionsPortal" />
+        </div>
 
     </div>
     </element-container>
@@ -212,6 +214,10 @@ export default {
 
         values() {
             return this.state.values;
+        },
+
+        extraValues() {
+            return this.state.extraValues;
         },
     },
 
@@ -336,7 +342,7 @@ export default {
         },
 
         getTabNode(handle) {
-            return this.$refs.tabs.childNodes[this.tabIndex(handle)];
+            return this.$refs.tab[this.tabIndex(handle)];
         },
 
         scrollTabs(event) {
@@ -398,7 +404,7 @@ export default {
 
             const hidden = [];
 
-            this.$refs.tabs.childNodes.forEach((tab, index) => {
+            this.$refs.tab.forEach((tab, index) => {
                 if (this.tabIsOutsideView(tab, 20)) {
                     hidden.push(index);
                 }

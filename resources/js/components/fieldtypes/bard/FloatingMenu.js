@@ -1,6 +1,8 @@
 import { FloatingMenuPlugin } from './FloatingMenuPlugin'
 
 export const FloatingMenu = {
+    emits: ['shown', 'hidden'],
+
     name: 'FloatingMenu',
 
     props: {
@@ -59,13 +61,13 @@ export const FloatingMenu = {
     },
 
     render() {
-        return this.$scopedSlots.default({
+        return this.$slots.default({
             x: this.x,
             y: this.y,
         });
     },
 
-    beforeDestroy() {
+    beforeUnmount() {
         this.editor.unregisterPlugin('floatingMenu')
     },
 }

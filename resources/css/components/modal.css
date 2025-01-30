@@ -1,19 +1,20 @@
 /* ==========================================================================
    MODALS
    ========================================================================== */
-.vm--container {
+.vfm {
     direction: ltr;
 }
 
-.vm--modal {
+.vfm__content {
     @apply rounded-lg dark:bg-dark-600 dark:shadow-dark !important;
+    @apply bg-white shadow-2xl overflow-clip;
 
     [dir='rtl'] & {
         direction: rtl;
     }
 }
 
-.vm--overlay {
+.vfm__overlay {
     background: hsla(210, 20%, 10%, .15) !important;
 }
 

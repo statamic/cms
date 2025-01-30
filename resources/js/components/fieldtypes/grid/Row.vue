@@ -87,6 +87,12 @@ export default {
         'storeName',
     ],
 
+    data() {
+        return {
+            extraValues: {}
+        }
+    },
+
     computed: {
         isExcessive() {
             const max = this.grid.config.max_rows;

@@ -2,7 +2,7 @@ import { Node } from '@tiptap/core';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
 import { Slice, Fragment } from '@tiptap/pm/model';
 import { Decoration, DecorationSet } from "@tiptap/pm/view";
-import { VueNodeViewRenderer } from '@tiptap/vue-2'
+import { VueNodeViewRenderer } from '@tiptap/vue-3'
 import SetComponent from './Set.vue';
 import { TextSelection } from '@tiptap/pm/state';
 

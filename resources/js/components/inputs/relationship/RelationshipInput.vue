@@ -64,9 +64,8 @@
                 </div>
             </div>
 
-            <stack name="item-selector" v-if="isSelecting" @closed="isSelecting = false">
+            <stack name="item-selector" v-if="isSelecting" @closed="isSelecting = false" v-slot="{ close }">
                 <item-selector
-                    slot-scope="{ close }"
                     :name="name"
                     :filters-url="filtersUrl"
                     :selections-url="selectionsUrl"
@@ -209,7 +208,7 @@ export default {
         });
     },
 
-    beforeDestroy() {
+    beforeUnmount() {
         if (this.sortable) {
             this.sortable.destroy();
             this.sortable = null;
@@ -306,7 +305,7 @@ export default {
         },
 
         setLoadingProgress(state) {
-            this.$progress.loading(`relationship-fieldtype-${this._uid}`, state);
+            this.$progress.loading(`relationship-fieldtype-${this.$.uid}`, state);
         }
 
     }

@@ -107,7 +107,7 @@ import AddonEditions from './addons/Editions.vue';
             this.getDownloadCount();
         },
 
-        destroyed() {
+        unmounted() {
             this.$events.$off('addon-refreshed', this.addonRefreshed);
         },
 

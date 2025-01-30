@@ -1,12 +1,17 @@
 <template>
 
     <div>
-        <text-input :value="value" @input="update" />
+        <text-input
+            :model-value="value"
+            @update:model-value="update"
+        />
     </div>
 
 </template>
 
 <script>
+import { Fieldtype } from 'statamic';
+
 export default {
 
     mixins: [Fieldtype],

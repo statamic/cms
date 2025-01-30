@@ -10,8 +10,9 @@
         :meta="meta"
         :errors="errors"
         @updated="values = $event"
+        v-slot="{ setFieldValue, setFieldMeta }"
     >
-        <div slot-scope="{ setFieldValue, setFieldMeta }">
+        <div>
             <configure-tabs
                 @updated="setFieldValue"
                 @meta-updated="setFieldMeta"

@@ -1,5 +1,6 @@
 <script>
 export default {
+    emits: ['loaded'],
 
     props: {
         config: Object,
@@ -23,13 +24,13 @@ export default {
 
     },
 
-    render(h) {
-        return this.$scopedSlots.default({
+    render() {
+        return this.$slots.default({
             meta: this.meta,
             value: this.value,
             loading: this.loading,
             updateMeta: this.updateMeta,
-        });
+        })[0];
     },
 
     created() {

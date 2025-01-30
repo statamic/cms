@@ -12,7 +12,7 @@
             <component
                 :is="pickerComponent"
                 v-bind="pickerProps"
-                @input="setDate"
+                @update:model-value="setDate"
                 @focus="focusedField = $event"
                 @blur="focusedField = null"
             />
@@ -36,10 +36,12 @@
 </template>
 
 <script>
+import Fieldtype from './Fieldtype.vue';
 import SinglePopover from './date/SinglePopover.vue';
 import SingleInline from './date/SingleInline.vue';
 import RangePopover from './date/RangePopover.vue';
 import RangeInline from './date/RangeInline.vue';
+import { useScreens } from 'vue-screen-utils';
 
 export default {
 
@@ -53,6 +55,17 @@ export default {
     mixins: [Fieldtype],
 
     inject: ['storeName'],
+
+    setup() {
+        const { mapCurrent } = useScreens({
+            xs: '0px',
+            sm: '640px',
+            md: '768px',
+            lg: '1024px',
+        });
+
+        return { screens: mapCurrent };
+    },
 
     data() {
         return {
@@ -129,23 +142,18 @@ export default {
                         dates: new Date()
                     }
                 ],
-                columns: this.$screens({ default: 1, lg: this.config.columns }),
-                rows: this.$screens({ default: 1, lg: this.config.rows }),
-                isExpanded: this.name === 'date' || this.config.full_width,
+                columns: this.screens({ default: 1, lg: this.config.columns }).value,
+                rows: this.screens({ default: 1, lg: this.config.rows }).value,
+                expanded: this.name === 'date' || this.config.full_width,
                 isRequired: this.config.required,
                 locale: this.$config.get('locale').replace('_', '-'),
-                masks: { input: [this.displayFormat] },
+                masks: { input: [this.displayFormat], modelValue: this.format },
                 minDate: this.config.earliest_date.date,
                 maxDate: this.config.latest_date.date,
-                modelConfig: { type: 'string', mask: this.format },
                 updateOnInput: false,
-                value: this.datePickerValue,
-            };
-        },
-
-        datePickerEvents() {
-            return {
-                input: this.setDate
+                modelValue: this.datePickerValue,
+                modelModifiers: { string: true, range: this.isRange },
+                popover: { visibility: 'click' },
             };
         },
 
@@ -162,10 +170,10 @@ export default {
             if (! this.value.date) return;
 
             if (this.isRange) {
-                return Vue.moment(this.value.date.start).format(this.displayFormat) + ' – ' + Vue.moment(this.value.date.end).format(this.displayFormat);
+                return this.$moment(this.value.date.start).format(this.displayFormat) + ' – ' + this.$moment(this.value.date.end).format(this.displayFormat);
             }
 
-            let preview = Vue.moment(this.value.date).format(this.displayFormat);
+            let preview = this.$moment(this.value.date).format(this.displayFormat);
 
             if (this.hasTime && this.value.time) {
                 preview += ` ${this.value.time}`;
@@ -180,13 +188,13 @@ export default {
         if (this.value.time === 'now') {
             // Probably shouldn't be modifying a prop, but luckily it all works nicely, without
             // needing to create an "update value without triggering dirty state" flow yet.
-            this.value.time = Vue.moment().format(this.hasSeconds ? 'HH:mm:ss' : 'HH:mm');
+            this.value.time = this.$moment().format(this.hasSeconds ? 'HH:mm:ss' : 'HH:mm');
         }
 
         this.$events.$on(`container.${this.storeName}.saving`, this.triggerChangeOnFocusedField);
     },
 
-    destroyed() {
+    unmounted() {
         this.$events.$off(`container.${this.storeName}.saving`, this.triggerChangeOnFocusedField);
     },
 
@@ -213,7 +221,7 @@ export default {
         },
 
         addDate() {
-            const now = Vue.moment().format(this.format);
+            const now = this.$moment().format(this.format);
             const date = this.isRange ? { start: now, end: now } : now;
             this.update({ date, time: null });
         },

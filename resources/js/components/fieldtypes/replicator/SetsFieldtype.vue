@@ -23,6 +23,7 @@
 </template>
 
 <script>
+import Fieldtype from '../Fieldtype.vue';
 import SuggestsConditionalFields from '../../blueprints/SuggestsConditionalFields';
 import Tabs from '../../blueprints/Tabs.vue';
 

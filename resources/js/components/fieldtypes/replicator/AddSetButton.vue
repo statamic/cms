@@ -11,7 +11,7 @@
                             'h-5 w-5': ! last,
                             'mr-2': label?.length > 0,
                         }"
-                        @click="addSetButtonClicked"
+                        @click.stop="addSetButtonClicked"
                     >
                         <svg-icon name="micro/plus"
                             :class="{
@@ -19,7 +19,7 @@
                                 'w-2 h-2 text-gray-700 dark:text-dark-200 group-hover:text-black dark:group-hover:dark-text-100 transition duration-150': !last
                             }" />
                     </button>
-                    <span @click="addSetButtonClicked" class="cursor-pointer text-sm dark:text-dark-175">{{ __(label) }}</span>
+                    <span @click.stop="addSetButtonClicked" class="cursor-pointer text-sm dark:text-dark-175">{{ __(label) }}</span>
                 </div>
             </template>
         </set-picker>

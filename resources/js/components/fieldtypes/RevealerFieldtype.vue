@@ -21,6 +21,8 @@
 </template>
 
 <script>
+import Fieldtype from './Fieldtype.vue';
+
 export default {
 
     mixins: [Fieldtype],
@@ -47,7 +49,7 @@ export default {
         this.$store.commit(`publish/${this.storeName}/setRevealerField`, this.fieldPath);
     },
 
-    beforeDestroy() {
+    beforeUnmount() {
         this.$store.commit(`publish/${this.storeName}/unsetRevealerField`, this.fieldPath);
     },
 
