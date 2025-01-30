@@ -453,9 +453,10 @@ class UserTags extends Tags
         }
 
         $permissions = Arr::wrap($this->params->explode(['permission', 'do']));
+        $arguments = $this->params->except(['permission', 'do'])->all();
 
         foreach ($permissions as $permission) {
-            if ($user->can($permission)) {
+            if ($user->can($permission, $arguments)) {
                 return $this->parser ? $this->parse() : true;
             }
         }
@@ -477,11 +478,12 @@ class UserTags extends Tags
         }
 
         $permissions = Arr::wrap($this->params->explode(['permission', 'do']));
+        $arguments = $this->params->except(['permission', 'do'])->all();
 
         $can = false;
 
         foreach ($permissions as $permission) {
-            if ($user->can($permission)) {
+            if ($user->can($permission, $arguments)) {
                 $can = true;
                 break;
             }
