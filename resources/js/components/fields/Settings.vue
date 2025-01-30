@@ -121,8 +121,12 @@ export default {
         isInsideSet: Boolean,
     },
 
-    provide: {
-        isInsideConfigFields: true,
+    provide() {
+        return {
+            isInsideConfigFields: true,
+            updateFieldSettingsValue: this.updateField,
+            getFieldSettingsValue: this.getFieldValue,
+        }
     },
 
     model: {
@@ -199,6 +203,10 @@ export default {
                 `form-group p-4 m-0 ${field.type}-fieldtype`,
                 tailwind_width_class(field.width)
             ];
+        },
+
+        getFieldValue(handle) {
+            return this.values[handle];
         },
 
         updateField(handle, value, setStoreValue=null) {
