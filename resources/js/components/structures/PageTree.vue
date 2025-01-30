@@ -33,9 +33,10 @@
                 :each-droppable="eachDroppable"
                 :root-droppable="rootDroppable"
                 :max-level="maxDepth"
+                :stat-handler="statHandler"
                 @after-drop="treeUpdated"
-                @open:node="saveTreeState"
-                @close:node="saveTreeState"
+                @open:node="nodeOpened"
+                @close:node="nodeClosed"
             >
                 <template #placeholder>
                     <div class="w-full bg-blue-500/10 rounded p-2 border border-blue-400 border-dashed">
@@ -82,7 +83,7 @@
 
 
 <script>
-import { dragContext, Draggable } from '@he-tree/vue';
+import { dragContext, Draggable, walkTreeData } from '@he-tree/vue';
 import TreeBranch from './Branch.vue';
 
 export default {
@@ -113,6 +114,7 @@ export default {
             saving: false,
             pages: [],
             treeData: [],
+            collapsedState: [],
         }
     },
 
@@ -136,10 +138,21 @@ export default {
 
         site(site) {
             this.getPages();
+        },
+
+        collapsedState: {
+            deep: true,
+            handler(state) {
+                if (this.preferencesKey) {
+                    localStorage.setItem(this.preferencesKey, JSON.stringify(state));
+                }
+            }
         }
     },
 
     created() {
+        this.collapsedState = this.getCollapsedState();
+
         this.getPages().then(() => {
             this.initialPages = this.pages;
         })
@@ -166,7 +179,6 @@ export default {
 
             return this.$axios.get(url).then(response => {
                 this.pages = response.data.pages;
-                this.loadTreeState(this.pages);
                 this.updateTreeData();
                 this.loading = false;
             });
@@ -206,7 +218,6 @@ export default {
                 this.$emit('saved', response);
                 this.$toast.success(__('Saved'));
                 this.initialPages = this.pages;
-                this.saveTreeState();
                 return response;
             }).catch(e => {
                 let message = e.response ? e.response.data.message : __('Something went wrong');
@@ -229,7 +240,7 @@ export default {
         },
 
         updateTreeData() {
-            this.treeData = clone(this.pages);
+            this.treeData = [...this.pages];
         },
 
         pageRemoved(stat, deleteChildren) {
@@ -244,7 +255,7 @@ export default {
                 if (children.length) this.$refs.tree.addMulti(children, stat.parent);
             });
 
-            this.$emit('changed');
+            this.treeUpdated();
         },
 
         localizationSelected(localization) {
@@ -302,76 +313,35 @@ export default {
             this.$refs.tree.closeAll();
         },
 
-        loadTreeState(treeData) {
-            if (! this.preferencesKey) {
-                return;
-            }
-
-            const closed = JSON.parse(localStorage.getItem(this.preferencesKey) || '[]');
-            this.applyTreeState(closed, treeData);
-        },
-
-        saveTreeState() {
-            if (! this.preferencesKey) {
-                return;
-            }
-
-            const closed = this.getTreeState(this.treeData);
-            return localStorage.setItem(this.preferencesKey, JSON.stringify(closed));
-        },
-
-        getTreeState(nodes) {
-            const closed = [];
-
-            this.traverseTree(nodes, (node, { path }) => {
-                if (node.children.length && ! node.open) {
-                    closed.push(path);
-                }
-            });
-
-            return closed;
-        },
-
-        applyTreeState(closed, nodes) {
-            this.traverseTree(nodes, (node, { path }) => {
-                if (node.children.length) {
-                    node.open = ! closed.includes(path);
-                }
-            });
-        },
-
-        traverseTree(nodes, callback, parentPath = []) {
-            const nodesArray = Array.isArray(nodes) ? nodes : [nodes];
-            nodesArray.every((node, index) => {
-                const nodePath = [...parentPath, index];
-                const path = nodePath.join('.');
-                const depth = nodePath.length;
-                const isRoot = this.expectsRoot && depth === 1 && index === 0;
-
-                if (false === callback(node, { path, depth, index, isRoot })) {
-                    return false;
-                }
-
-                if (node.children?.length) {
-                    this.traverseTree(node.children, callback, nodePath);
-                }
-
-                return true;
-            });
-        },
-
         getNodeByBranchId(id) {
             let branch;
-
-            th.breadthFirstSearch(this.treeData, (node) => {
+            walkTreeData(this.treeData, (node) => {
                 if (node.id === id) {
                     branch = node
                     return false
                 }
             });
-
             return branch;
-        }
+        },
+
+        getCollapsedState() {
+            if (! this.preferencesKey) return [];
+
+            return JSON.parse(localStorage.getItem(this.preferencesKey) || '[]');
+        },
+
+        nodeOpened(node) {
+            this.collapsedState.splice(this.collapsedState.indexOf(node.data.id), 1);
+        },
+
+        nodeClosed(node) {
+            this.collapsedState.push(node.data.id);
+        },
+
+        statHandler(stat) {
+            stat.open = ! this.collapsedState.includes(stat.data.id);
+            return stat;
+        },
 
     }
 }
