@@ -3,7 +3,6 @@ import GlobalSearch from '../components/GlobalSearch.vue';
 import GlobalSiteSelector from '../components/GlobalSiteSelector.vue';
 import DarkModeToggle from '../components/DarkModeToggle.vue';
 import Login from '../components/login/Login.vue';
-import LoginModal from '../components/login/LoginModal.vue';
 import BaseEntryCreateForm from '../components/entries/BaseCreateForm.vue';
 import BaseTermCreateForm from '../components/terms/BaseCreateForm.vue';
 import CreateTermButton from '../components/terms/CreateTermButton.vue';
@@ -56,7 +55,6 @@ export default {
         GlobalSiteSelector,
         DarkModeToggle,
         Login,
-        LoginModal,
         BaseEntryCreateForm,
         BaseTermCreateForm,
         CreateTermButton,
