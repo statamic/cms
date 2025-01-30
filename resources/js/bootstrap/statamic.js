@@ -34,6 +34,7 @@ import FieldConditions from '../components/FieldConditions';
 import Reveal from '../components/Reveal';
 import Echo from '../components/Echo';
 import Permission from '../components/Permission';
+import autosize from 'autosize';
 
 const darkMode = ref(null);
 let bootingCallbacks = [];
@@ -178,6 +179,12 @@ export default {
             $markdown(value) {
                 return markdown(value);
             },
+            cp_url(url) {
+                return cp_url(url);
+            },
+            docs_url(url) {
+                return docs_url(url);
+            },
             can(permission) {
                 const permissions = JSON.parse(atob(Statamic.$config.get('permissions')));
 
@@ -188,6 +195,10 @@ export default {
                     setTimeout(resolve, ms);
                 });
             }
+        });
+
+        this.$app.directive('elastic', {
+            mounted: (el) => autosize(el)
         });
 
         registerGlobalComponents(this.$app);
