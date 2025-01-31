@@ -26,8 +26,10 @@ class DateTest extends TestCase
 
     #[Test]
     #[DataProvider('augmentProvider')]
-    public function it_augments($config, $value, $expected)
+    public function it_augments(string $displayTimezone, array $config, string $value, string $expected)
     {
+        config()->set('statamic.system.display_timezone', $displayTimezone);
+
         $augmented = $this->fieldtype($config)->augment($value);
 
         $this->assertInstanceOf(Carbon::class, $augmented);
@@ -38,34 +40,51 @@ class DateTest extends TestCase
     {
         return [
             'date' => [
+                'UTC',
                 [],
                 '2012-01-04',
                 '2012 Jan 04 00:00:00',
             ],
             'date with custom format' => [
+                'UTC',
                 ['format' => 'Y--m--d'],
                 '2012--01--04',
                 '2012 Jan 04 00:00:00',
             ],
+            'date with display timezone' => [
+                'America/New_York',
+                [],
+                '2012-01-04',
+                '2012 Jan 04 00:00:00',
+            ],
 
             // The time and seconds configs are important, otherwise
-            // when when parsing dates without times, the time would inherit from "now".
+            // when parsing dates without times, the time would inherit from "now".
             // We need to rely on the configs to know when or when not to reset the time.
 
             'date with time' => [
+                'UTC',
                 ['time_enabled' => true],
                 '2012-01-04 15:32',
                 '2012 Jan 04 15:32:00',
             ],
             'date with time but seconds disabled' => [
+                'UTC',
                 ['time_enabled' => true],
                 '2012-01-04 15:32:54',
                 '2012 Jan 04 15:32:00',
             ],
             'date with time and seconds' => [
+                'UTC',
                 ['time_enabled' => true, 'time_seconds_enabled' => true],
                 '2012-01-04 15:32:54',
                 '2012 Jan 04 15:32:54',
+            ],
+            'date with time and display timezone' => [
+                'America/New_York',
+                ['time_enabled' => true],
+                '2012-01-04 15:32',
+                '2012 Jan 04 10:32:00', // -5 hours
             ],
         ];
     }
@@ -87,6 +106,21 @@ class DateTest extends TestCase
         $augmented = $this->fieldtype()->augment($instance);
 
         $this->assertSame($instance, $augmented);
+    }
+
+    #[Test]
+    public function it_augments_a_carbon_instance_using_display_timezone_config()
+    {
+        // Could happen if you are using the date fieldtype to augment a manually provided value.
+
+        config()->set('statamic.system.display_timezone', 'America/New_York'); // -5 hours
+
+        $instance = new Carbon('2025-01-01 12:00:00');
+        $augmented = $this->fieldtype()->augment($instance);
+
+        $this->assertInstanceOf(Carbon::class, $augmented);
+        $this->assertEquals('America/New_York', $augmented->getTimezone()->getName());
+        $this->assertEquals(7, $instance->hour); // 12pm in UTC is 7am in New York
     }
 
     #[Test]
