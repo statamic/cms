@@ -48,8 +48,6 @@ import SitesEditForm from '../components/sites/EditForm.vue';
 
 export default {
 
-    // mixins: [Toast],
-
     components: {
         GlobalSearch,
         GlobalSiteSelector,
