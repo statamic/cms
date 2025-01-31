@@ -33,9 +33,7 @@ class ConvertDatesToUtc extends UpdateScript
 
                 $this->recursivelyUpdateFields($item, $fields);
 
-                if ($item->isDirty()) {
-                    $item->saveQuietly();
-                }
+                $item->saveQuietly();
             });
     }
 

@@ -4,10 +4,12 @@ namespace Tests\UpdateScripts;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Fieldset;
 use Statamic\Facades\GlobalSet;
+use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Facades\User;
 use Statamic\UpdateScripts\ConvertDatesToUtc;
@@ -56,7 +58,6 @@ class ConvertDatesToUtcTest extends TestCase
         date_default_timezone_set('America/New_York');
 
         $collection = tap(Collection::make('articles'))->save();
-
         $collection->entryBlueprint()->setContents(['fields' => [$field]])->save();
 
         $entry = Entry::make()->collection('articles')->data([$fieldHandle => $original]);
@@ -93,16 +94,42 @@ class ConvertDatesToUtcTest extends TestCase
 
     #[Test]
     #[DataProvider('dateFieldsProvider')]
-    public function it_converts_entry_date_field_in_terms()
+    public function it_converts_date_fields_in_terms(string $fieldHandle, array $field, $original, $expected)
     {
-        $this->markTestIncomplete();
+        config()->set('app.timezone', 'America/New_York'); // -05:00
+        date_default_timezone_set('America/New_York');
+
+        $taxonomy = tap(Taxonomy::make('tags'))->save();
+        $taxonomy->termBlueprint()->setContents(['fields' => [$field]])->save();
+
+        $term = Term::make()->taxonomy('tags')->data([$fieldHandle => $original]);
+        $term->save();
+
+        $this->runUpdateScript(ConvertDatesToUtc::class);
+
+        $this->assertEquals($expected, $term->fresh()->get($fieldHandle));
     }
 
     #[Test]
     #[DataProvider('dateFieldsProvider')]
-    public function it_converts_entry_date_field_in_globals()
+    public function it_converts_date_fields_in_globals(string $fieldHandle, array $field, $original, $expected)
     {
-        $this->markTestIncomplete();
+        config()->set('app.timezone', 'America/New_York'); // -05:00
+        date_default_timezone_set('America/New_York');
+
+        $globalSet = tap(GlobalSet::make('settings'))->save();
+        $globalSet->addLocalization(
+            $globalSet->makeLocalization('en')->data([$fieldHandle => $original])
+        );
+        $globalSet->save();
+
+        Blueprint::make('settings')->setNamespace('globals')->setContents(['fields' => [$field]])->save();
+
+        $this->runUpdateScript(ConvertDatesToUtc::class);
+
+        $globalSet = GlobalSet::find('settings');
+
+        $this->assertEquals($expected, $globalSet->inDefaultSite()->get($fieldHandle));
     }
 
     #[Test]
