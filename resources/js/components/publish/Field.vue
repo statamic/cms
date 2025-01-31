@@ -93,6 +93,8 @@
 
 <script>
 import { marked } from 'marked';
+import titleize from '../../util/titleize';
+import deslugify from '../../util/deslugify';
 
 export default {
 
@@ -215,7 +217,7 @@ export default {
 
         labelText() {
              return this.config.display
-                 || this.$filters.titleize(this.$filters.deslugify(this.config.handle));
+                 || titleize(deslugify(this.config.handle));
          },
 
         showLabelText() {
