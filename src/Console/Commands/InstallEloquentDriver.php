@@ -76,6 +76,12 @@ class InstallEloquentDriver extends Command
         $repositories = $this->repositories();
 
         foreach ($repositories as $repository) {
+            if (! $this->availableRepositories()->has($repository)) {
+                $this->components->warn("Skipping. The {$repository} repository is already using the Eloquent Driver.");
+
+                continue;
+            }
+
             $method = 'migrate'.Str::studly($repository);
             $this->$method();
         }
