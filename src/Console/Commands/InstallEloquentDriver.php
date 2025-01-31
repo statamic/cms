@@ -88,26 +88,22 @@ class InstallEloquentDriver extends Command
         }
 
         if ($repositories = $this->option('repositories')) {
-            $requestedRepositories = collect(explode(',', $repositories))
+            $repositories = collect(explode(',', $repositories))
                 ->map(fn ($repo) => trim(strtolower($repo)))
                 ->unique();
 
             $availableRepositories = $this->availableRepositories();
 
-            $validRepositories = $requestedRepositories->filter(
-                fn ($repo) => $availableRepositories->has($repo)
-            );
-
-            $invalidRepositories = $requestedRepositories->diff($validRepositories);
+            $invalidRepositories = $repositories->reject(fn ($repo) => $availableRepositories->has($repo));
 
             if ($invalidRepositories->isNotEmpty()) {
-                $this->components->warn(
-                    'The following repositories are invalid: '.
-                    $invalidRepositories->implode(', ')
-                );
+                $this->components->error("Some of the repositories you provided are invalid: {$invalidRepositories->implode(', ')}");
+
+                exit(1);
             }
 
-            return $validRepositories
+            return $repositories
+                ->filter(fn ($repo) => $availableRepositories->has($repo))
                 ->values()
                 ->all();
         }
