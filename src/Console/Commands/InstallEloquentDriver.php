@@ -69,14 +69,14 @@ class InstallEloquentDriver extends Command
             return $this->components->error('Failed to connect to the configured database. Please check your database configuration and try again.');
         }
 
-        if ($this->availableRepositories()->isEmpty()) {
+        if ($this->allRepositories()->reject(fn ($value, $key) => $this->repositoryHasBeenMigrated($key))->isEmpty()) {
             return $this->components->warn("No repositories left to migrate. You're already using the Eloquent Driver for all repositories.");
         }
 
         $repositories = $this->repositories();
 
         foreach ($repositories as $repository) {
-            if (! $this->availableRepositories()->has($repository)) {
+            if ($this->repositoryHasBeenMigrated($repository)) {
                 $this->components->warn("Skipping. The {$repository} repository is already using the Eloquent Driver.");
 
                 continue;
@@ -114,7 +114,9 @@ class InstallEloquentDriver extends Command
 
         return multiselect(
             label: 'Which repositories would you like to migrate?',
-            options: $this->availableRepositories()->all(),
+            options: $this->allRepositories()
+                ->reject(fn ($value, $key) => $this->repositoryHasBeenMigrated($key))
+                ->all(),
             validate: fn (array $values) => count($values) === 0
                 ? 'You must select at least one repository to migrate.'
                 : null,
@@ -146,66 +148,64 @@ class InstallEloquentDriver extends Command
         ]);
     }
 
-    protected function availableRepositories(): Collection
+    protected function repositoryHasBeenMigrated(string $repository): bool
     {
-        return $this->allRepositories()->reject(function ($value, $key) {
-            switch ($key) {
-                case 'asset_containers':
-                    return config('statamic.eloquent-driver.asset_containers.driver') === 'eloquent';
+        switch ($repository) {
+            case 'asset_containers':
+                return config('statamic.eloquent-driver.asset_containers.driver') === 'eloquent';
 
-                case 'assets':
-                    return config('statamic.eloquent-driver.assets.driver') === 'eloquent';
+            case 'assets':
+                return config('statamic.eloquent-driver.assets.driver') === 'eloquent';
 
-                case 'blueprints':
-                    return config('statamic.eloquent-driver.blueprints.driver') === 'eloquent';
+            case 'blueprints':
+                return config('statamic.eloquent-driver.blueprints.driver') === 'eloquent';
 
-                case 'collections':
-                    return config('statamic.eloquent-driver.collections.driver') === 'eloquent';
+            case 'collections':
+                return config('statamic.eloquent-driver.collections.driver') === 'eloquent';
 
-                case 'collection_trees':
-                    return config('statamic.eloquent-driver.collection_trees.driver') === 'eloquent';
+            case 'collection_trees':
+                return config('statamic.eloquent-driver.collection_trees.driver') === 'eloquent';
 
-                case 'entries':
-                    return config('statamic.eloquent-driver.entries.driver') === 'eloquent';
+            case 'entries':
+                return config('statamic.eloquent-driver.entries.driver') === 'eloquent';
 
-                case 'fieldsets':
-                    return config('statamic.eloquent-driver.fieldsets.driver') === 'eloquent';
+            case 'fieldsets':
+                return config('statamic.eloquent-driver.fieldsets.driver') === 'eloquent';
 
-                case 'forms':
-                    return config('statamic.eloquent-driver.forms.driver') === 'eloquent';
+            case 'forms':
+                return config('statamic.eloquent-driver.forms.driver') === 'eloquent';
 
-                case 'form_submissions':
-                    return config('statamic.eloquent-driver.form_submissions.driver') === 'eloquent';
+            case 'form_submissions':
+                return config('statamic.eloquent-driver.form_submissions.driver') === 'eloquent';
 
-                case 'globals':
-                    return config('statamic.eloquent-driver.global_sets.driver') === 'eloquent';
+            case 'globals':
+                return config('statamic.eloquent-driver.global_sets.driver') === 'eloquent';
 
-                case 'global_variables':
-                    return config('statamic.eloquent-driver.global_set_variables.driver') === 'eloquent';
+            case 'global_variables':
+                return config('statamic.eloquent-driver.global_set_variables.driver') === 'eloquent';
 
-                case 'navs':
-                    return config('statamic.eloquent-driver.navigations.driver') === 'eloquent';
+            case 'navs':
+                return config('statamic.eloquent-driver.navigations.driver') === 'eloquent';
 
-                case 'nav_trees':
-                    return config('statamic.eloquent-driver.navigation_trees.driver') === 'eloquent';
+            case 'nav_trees':
+                return config('statamic.eloquent-driver.navigation_trees.driver') === 'eloquent';
 
-                case 'revisions':
-                    return ! config('statamic.revisions.enabled')
-                        || config('statamic.eloquent-driver.revisions.driver') === 'eloquent';
+            case 'revisions':
+                return ! config('statamic.revisions.enabled')
+                    || config('statamic.eloquent-driver.revisions.driver') === 'eloquent';
 
-                case 'sites':
-                    return config('statamic.eloquent-driver.sites.driver') === 'eloquent';
+            case 'sites':
+                return config('statamic.eloquent-driver.sites.driver') === 'eloquent';
 
-                case 'taxonomies':
-                    return config('statamic.eloquent-driver.taxonomies.driver') === 'eloquent';
+            case 'taxonomies':
+                return config('statamic.eloquent-driver.taxonomies.driver') === 'eloquent';
 
-                case 'terms':
-                    return config('statamic.eloquent-driver.terms.driver') === 'eloquent';
+            case 'terms':
+                return config('statamic.eloquent-driver.terms.driver') === 'eloquent';
 
-                case 'tokens':
-                    return config('statamic.eloquent-driver.tokens.driver') === 'eloquent';
-            }
-        });
+            case 'tokens':
+                return config('statamic.eloquent-driver.tokens.driver') === 'eloquent';
+        }
     }
 
     protected function migrateAssetContainers(): void
