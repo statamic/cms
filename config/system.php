@@ -76,6 +76,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Display Timezone
+    |--------------------------------------------------------------------------
+    |
+    | Dates and times are stored in UTC. This setting allows you to determine which
+    | timezone dates and times are displayed in. For a full list of supported timezones,
+    | please see the PHP documentation.
+    |
+    | https://www.php.net/manual/en/timezones.php
+    |
+    */
+
+    'display_timezone' => 'UTC',
+
+    /*
+    |--------------------------------------------------------------------------
     | Default Character Set
     |--------------------------------------------------------------------------
     |
