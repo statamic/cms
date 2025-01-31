@@ -58,9 +58,7 @@ class ConvertDatesToUtc extends UpdateScript
                     && empty($dottedPrefix)
                     && $field->handle() === 'date'
                 ) {
-                    $format = $this->formatForEntryDateField($field);
-
-                    $item->date($item->date()->setTimezone('UTC')->format($format));
+                    $item->date($item->date());
 
                     return;
                 }
