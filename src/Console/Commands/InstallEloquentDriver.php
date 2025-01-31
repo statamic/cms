@@ -92,9 +92,7 @@ class InstallEloquentDriver extends Command
                 ->map(fn ($repo) => trim(strtolower($repo)))
                 ->unique();
 
-            $availableRepositories = $this->availableRepositories();
-
-            $invalidRepositories = $repositories->reject(fn ($repo) => $availableRepositories->has($repo));
+            $invalidRepositories = $repositories->reject(fn ($repo) => $this->allRepositories()->has($repo));
 
             if ($invalidRepositories->isNotEmpty()) {
                 $this->components->error("Some of the repositories you provided are invalid: {$invalidRepositories->implode(', ')}");
@@ -103,7 +101,7 @@ class InstallEloquentDriver extends Command
             }
 
             return $repositories
-                ->filter(fn ($repo) => $availableRepositories->has($repo))
+                ->filter(fn ($repo) => $this->allRepositories()->has($repo))
                 ->values()
                 ->all();
         }
@@ -118,7 +116,7 @@ class InstallEloquentDriver extends Command
         );
     }
 
-    protected function availableRepositories(): Collection
+    protected function allRepositories(): Collection
     {
         return collect([
             'asset_containers' => 'Asset Containers',
@@ -139,7 +137,12 @@ class InstallEloquentDriver extends Command
             'taxonomies' => 'Taxonomies',
             'terms' => 'Terms',
             'tokens' => 'Tokens',
-        ])->reject(function ($value, $key) {
+        ]);
+    }
+
+    protected function availableRepositories(): Collection
+    {
+        return $this->allRepositories()->reject(function ($value, $key) {
             switch ($key) {
                 case 'asset_containers':
                     return config('statamic.eloquent-driver.asset_containers.driver') === 'eloquent';
