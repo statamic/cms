@@ -42,9 +42,8 @@
 </template>
 
 <script>
-import { data_get } from  '../../bootstrap/globals.js'
-
 export default {
+    emits: ['closed', 'updated'],
 
     props: {
         creating: false,
@@ -53,7 +52,7 @@ export default {
 
     data() {
         return {
-            section: data_get(this.sectionItem, 'text') || '',
+            section: this.sectionItem.data.text || '',
             saveKeyBinding: null,
             validate: false,
         }

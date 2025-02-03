@@ -4,7 +4,7 @@
         @apply dark:mb-1;
     }
 
-    .tree-node-inner {
+    .page-tree-branch {
         @apply relative text-xs bg-white shadow rounded;
         @apply dark:bg-dark-600 dark:shadow-dark;
 
@@ -35,18 +35,5 @@
     .page-root {
         background-color: hsla(210, 30%, 95%, .5);
         @apply flex w-6 rtl:rounded-r ltr:rounded-l items-center rtl:border-l ltr:border-r dark:border-dark-900;
-    }
-}
-
-.page-tree-with-sections {
-    > .tree-node > .tree-node-children > .tree-node {
-        @apply mb-8;
-    }
-
-    .section-placeholder-inner {
-        @apply rounded;
-        border: 1px dashed #0088F8;
-        background: rgba(0, 136, 249, 0.09);
-        min-height: 42px;
     }
 }

@@ -43,7 +43,7 @@
                                     :initial-value="config.icon"
                                     v-slot="{ meta, value, loading }"
                                 >
-                                    <icon-fieldtype v-if="!loading" handle="icon" :meta="meta" :value="value" @input="config.icon = $event" />
+                                    <icon-fieldtype v-if="!loading" handle="icon" :meta="meta" :value="value" @update:value="config.icon = $event" />
                                 </publish-field-meta>
                             </div>
                         </div>
@@ -70,16 +70,17 @@
 import { data_get } from  '../../bootstrap/globals.js'
 
 export default {
+    emits: ['closed', 'updated'],
 
     props: {
         creating: false,
-        item: {},
+        item: null,
         isChild: false,
     },
 
     data() {
         return {
-            config: clone(data_get(this.item, 'config', this.createNewItem())),
+            config: {...(this.item?.data?.config || this.createNewItem())},
             saveKeyBinding: null,
             validateDisplay: false,
             validateUrl: false,
