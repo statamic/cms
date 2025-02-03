@@ -107,7 +107,7 @@
                             <div class="w-full shadow-none" v-else-if="asset.isAudio"><audio :src="asset.url" class="w-full" controls preload="auto"></audio></div>
 
                             <!-- Video -->
-                            <div class="w-full shadow-none" v-else-if="asset.isVideo"><video :src="asset.url" class="w-full" controls></video></div>
+                            <video :src="asset.url" class="asset-thumb" controls v-else-if="asset.isVideo"></video>
                         </div>
                     </div>
 
