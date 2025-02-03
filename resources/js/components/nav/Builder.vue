@@ -21,7 +21,7 @@
                             <svg-icon name="micro/chevron-down-xs" class="w-2 rtl:mr-4 ltr:ml-4" />
                         </button>
                     </template>
-                    <dropdown-item :text="__('Add Nav Item')" @click="addItem($refs.mainTree.rootChildren[0])" />
+                    <dropdown-item :text="__('Add Nav Item')" @click="addItem($refs.tree.rootChildren[0])" />
                     <dropdown-item :text="__('Add Section')" @click="addSection" />
                 </dropdown-list>
 
@@ -67,8 +67,8 @@
         <div v-if="!loading" class="page-tree w-full">
 
             <Draggable
-                ref="mainTree"
-                v-model="mainTreeData"
+                ref="tree"
+                v-model="treeData"
                 :node-key="(stat) => stat.data.id"
                 :space="1"
                 :indent="24"
@@ -245,7 +245,7 @@ export default {
         return {
             initialNav: clone(this.nav),
             loading: false,
-            mainTreeData: [],
+            treeData: [],
             originalSectionItems: {},
             changed: false,
             targetStat: null,
@@ -295,7 +295,7 @@ export default {
 
             this.setOriginalSectionItems(navConfig);
 
-            this.mainTreeData = _.chain(navConfig)
+            this.treeData = _.chain(navConfig)
                 .mapObject(section => this.normalizeNavConfig(section))
                 .values()
                 .value();
@@ -427,7 +427,7 @@ export default {
                 icon: createdConfig.icon,
             };
 
-            this.$refs.mainTree.add(item, this.targetStat);
+            this.$refs.tree.add(item, this.targetStat);
             this.resetItemEditor();
             this.changed = true;
         },
@@ -439,7 +439,7 @@ export default {
                 display_original: false,
             });
 
-            this.mainTreeData.push(item);
+            this.treeData.push(item);
             this.resetSectionEditor();
             this.changed = true;
         },
@@ -585,7 +585,7 @@ export default {
         },
 
         expandAll() {
-            walkTreeData(this.$refs.mainTree.rootChildren, (stat) => {
+            walkTreeData(this.$refs.tree.rootChildren, (stat) => {
                 if (! this.isSectionNode(stat)) {
                     stat.open = true;
                 }
@@ -593,7 +593,7 @@ export default {
         },
 
         collapseAll() {
-            walkTreeData(this.$refs.mainTree.rootChildren, (stat) => {
+            walkTreeData(this.$refs.tree.rootChildren, (stat) => {
                 if (! this.isSectionNode(stat)) {
                     stat.open = false;
                 }
@@ -613,7 +613,7 @@ export default {
         },
 
         pinItem(stat) {
-            this.aliasItem(stat, this.$refs.mainTree.rootChildren[0]);
+            this.aliasItem(stat, this.$refs.tree.rootChildren[0]);
         },
 
         aliasItem(stat, parentStat) {
@@ -634,7 +634,7 @@ export default {
 
             parentStat = parentStat || stat.parent;
 
-            this.$refs.mainTree.add(newItem, parentStat);
+            this.$refs.tree.add(newItem, parentStat);
 
             this.changed = true;
         },
@@ -658,7 +658,7 @@ export default {
                 return this.confirmingRemoval = stat;
             }
 
-            this.$refs.mainTree.remove(stat);
+            this.$refs.tree.remove(stat);
 
             this.changed = true;
             this.confirmingRemoval = false;
@@ -708,7 +708,7 @@ export default {
         preparePreferencesSubmission() {
             let tree = [];
 
-            this.mainTreeData.forEach(section => {
+            this.treeData.forEach(section => {
                 tree.push({
                     'display': section.text,
                     'display_original': section.config.display_original || section.text,
