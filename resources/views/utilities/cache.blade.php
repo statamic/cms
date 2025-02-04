@@ -63,7 +63,7 @@
                         @csrf
                         <button class="btn">{{ __('Clear') }}</button>
                     </form>
-                @endunless
+                @endif
             </div>
             <div class="text-sm text-gray dark:text-dark-150 flex">
                 <div class="rtl:ml-4 ltr:mr-4 badge-pill-sm bg-white dark:bg-dark-700 border dark:border-dark-900"><span class="text-gray-800 dark:text-dark-150 font-medium">{{ __('Strategy') }}:</span> {{ $static['strategy'] }}</div>

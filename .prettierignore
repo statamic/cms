@@ -6,3 +6,5 @@ vendor/
 **/.git
 package-lock.json
 composer.lock
+
+resources/views/blueprints/index.blade.php
