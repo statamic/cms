@@ -66,7 +66,7 @@ export const Link = Mark.create({
 
     addKeyboardShortcuts() {
         return {
-            'Mod-k': () => this.options.vm.$emit('link-toggle'),
+            'Mod-k': () => this.options.vm.events.emit('link-toggle'),
         }
     },
 
@@ -90,9 +90,9 @@ export const Link = Mark.create({
                             const attrs = getAttributes(view.state, schema.marks.link);
 
                             view.dispatch(transaction);
-                            vm.$emit('link-selected', attrs);
+                            vm.events.emit('link-selected', attrs);
                         } else {
-                            vm.$emit('link-deselected');
+                            vm.events.emit('link-deselected');
                         }
                     },
                 },

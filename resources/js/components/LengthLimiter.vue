@@ -13,7 +13,7 @@ export default {
             return this.currentLength > this.limit;
         },
         currentLength() {
-            return (this.value) ? this.value.length : 0
+            return (this.modelValue) ? this.modelValue.length : 0
         },
         limitIndicatorColor() {
             return this.limitReached ? 'text-red-500' : 'text-gray'

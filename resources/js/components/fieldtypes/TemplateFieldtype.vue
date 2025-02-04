@@ -3,7 +3,7 @@
         <v-select
             ref="input"
             :name="name"
-            @input="update"
+            @update:model-value="update"
             append-to-body
             :calculate-position="positionOptions"
             :clearable="config.clearable"
@@ -14,7 +14,7 @@
             :searchable="true"
             :push-tags="false"
             :multiple="false"
-            :value="value">
+            :model-value="value">
             <template #no-options>
                 <div class="text-sm text-gray-700 rtl:text-right ltr:text-left py-2 px-4" v-text="__('No templates to choose from.')" />
             </template>
@@ -23,6 +23,7 @@
 </template>
 
 <script>
+import Fieldtype from './Fieldtype.vue';
 import PositionsSelectOptions from '../../mixins/PositionsSelectOptions';
 
 

@@ -18,6 +18,7 @@
 </template>
 
 <script>
+import Fieldtype from './Fieldtype.vue';
 import HasInputOptions from './HasInputOptions.js'
 import ResizeObserver from 'resize-observer-polyfill';
 
@@ -34,7 +35,7 @@ export default {
         this.setupResizeObserver();
     },
 
-    beforeDestroy() {
+    beforeUnmount() {
         this.resizeObserver.disconnect();
     },
 

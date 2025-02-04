@@ -20,6 +20,7 @@
 </template>
 
 <script>
+import Fieldtype from './Fieldtype.vue';
 import IMask from 'imask';
 
 export default {
@@ -83,7 +84,7 @@ export default {
         this.mask.on('accept', e => this.inputValue = this.mask.value);
     },
 
-    destroyed() {
+    unmounted() {
         this.$events.$off(`container.${this.storeName}.saving`, this.updateActualValue);
         this.mask.destroy();
     },

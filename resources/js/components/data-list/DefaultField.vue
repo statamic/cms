@@ -1,4 +1,6 @@
 <script>
+import { h } from 'vue';
+
 export default {
 
     props: {
@@ -34,8 +36,8 @@ export default {
 
     },
 
-    render(h) {
-        return h('div', { domProps: { innerHTML: this.text }});
+    render() {
+        return h('div', { innerHTML: this.text });
     }
 
 }

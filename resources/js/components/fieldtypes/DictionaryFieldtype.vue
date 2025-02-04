@@ -13,9 +13,9 @@
             :options="normalizeInputOptions(options)"
             :placeholder="__(config.placeholder)"
             :multiple="multiple"
-            :value="selectedOptions"
+            :model-value="selectedOptions"
             :get-option-key="(option) => option.value"
-            @input="vueSelectUpdated"
+            @update:model-value="vueSelectUpdated"
             @focus="$emit('focus')"
             @search="search"
             @search:focus="$emit('focus')"
@@ -43,10 +43,10 @@
                 <sortable-list
                     item-class="sortable-item"
                     handle-class="sortable-item"
-                    :value="value"
+                    :model-value="value"
                     :distance="5"
                     :mirror="false"
-                    @input="update"
+                    @update:model-value="update"
                 >
                     <div class="vs__selected-options-outside flex flex-wrap">
                         <span v-for="option in selectedOptions" :key="option.value" class="vs__selected mt-2 sortable-item" :class="{'invalid': option.invalid}">
@@ -75,6 +75,7 @@
 </style>
 
 <script>
+import Fieldtype from './Fieldtype.vue';
 import HasInputOptions from './HasInputOptions.js'
 import { SortableList } from '../sortable/Sortable';
 import PositionsSelectOptions from '../../mixins/PositionsSelectOptions';

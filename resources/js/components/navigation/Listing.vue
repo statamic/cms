@@ -1,11 +1,11 @@
 <template>
-    <data-list :columns="columns" :rows="rows">
-        <div class="card p-0" slot-scope="{ filteredRows: rows }">
-            <data-list-table :rows="rows">
-                <template slot="cell-title" slot-scope="{ row: structure }">
+    <data-list :columns="columns" :rows="rows" v-slot="{ filteredRows: rows }">
+        <div class="card p-0">
+            <data-list-table>
+                <template #cell-title="{ row: structure }">
                     <a :href="structure.available_in_selected_site ? structure.show_url : structure.edit_url" class="flex items-center" v-text="__(structure.title)" />
                 </template>
-                <template slot="actions" slot-scope="{ row: structure, index }">
+                <template #actions="{ row: structure, index }">
                     <dropdown-list>
                         <dropdown-item :text="__('Edit')" :redirect="structure.edit_url" />
                         <dropdown-item

@@ -9,7 +9,7 @@
             <div class="flex items-center">
                 <h1 class="flex-1" v-text="__(title)" />
 
-                <dropdown-list class="rtl:ml-2 ltr:mr-2" v-if="!!this.$scopedSlots.twirldown">
+                <dropdown-list class="rtl:ml-2 ltr:mr-2" v-if="!!this.$slots.twirldown">
                     <slot name="twirldown" :actionCompleted="actionCompleted" />
                 </dropdown-list>
 
@@ -126,7 +126,7 @@
                     v-tooltip="__('Redirect')" />
             </template>
 
-            <template #branch-options="{ branch, removeBranch, orphanChildren, depth }">
+            <template #branch-options="{ branch, removeBranch, depth }">
                 <template v-if="depth < structureMaxDepth">
                     <h6 class="px-2" v-text="__('Create Child Entry')" v-if="blueprints.length > 1" />
                     <li class="divider" v-if="blueprints.length > 1" />
@@ -141,7 +141,7 @@
                     <dropdown-item
                         :text="__('Delete')"
                         class="warning"
-                        @click="deleteTreeBranch(branch, removeBranch, orphanChildren)" />
+                        @click="deleteTreeBranch(branch, removeBranch)" />
                 </template>
             </template>
         </page-tree>
@@ -325,13 +325,13 @@ export default {
             return localStorage.getItem('statamic.collection-view.'+this.handle) || fallback;
         },
 
-        deleteTreeBranch(branch, removeFromUi, orphanChildren) {
+        deleteTreeBranch(branch, removeFromUi) {
             this.showEntryDeletionConfirmation = true;
             this.entryBeingDeleted = branch;
             this.entryDeletionConfirmCallback = (shouldDeleteChildren) => {
                 this.deletedEntries.push(branch.id);
-                shouldDeleteChildren ? this.markEntriesForDeletion(branch) : orphanChildren();
-                removeFromUi();
+                if (shouldDeleteChildren) this.markEntriesForDeletion(branch);
+                removeFromUi(shouldDeleteChildren);
                 this.showEntryDeletionConfirmation = false;
                 this.entryBeingDeleted = false;
             }

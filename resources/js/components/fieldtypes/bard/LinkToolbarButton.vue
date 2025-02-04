@@ -28,6 +28,7 @@
 
 <script>
 import LinkToolbar from './LinkToolbar.vue';
+import BardToolbarButton from './ToolbarButton.vue';
 
 export default {
 
@@ -73,14 +74,14 @@ export default {
     },
 
     created() {
-        this.bard.$on('link-toggle', () => {
+        this.bard.events.on('link-toggle', () => {
             this.toggleLinkToolbar();
             this.$refs.popover.toggle();
         });
     },
 
-    beforeDestroy() {
-        this.bard.$off('link-toggle');
+    beforeUnmount() {
+        this.bard.events.off('link-toggle');
     }
 }
 </script>

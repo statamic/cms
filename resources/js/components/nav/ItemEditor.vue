@@ -1,7 +1,7 @@
 <template>
 
-    <stack narrow name="nav-item-editor" @closed="$emit('closed')">
-        <div slot-scope="{ close }" class="bg-white dark:bg-dark-800 h-full flex flex-col">
+    <stack narrow name="nav-item-editor" @closed="$emit('closed')" v-slot="{ close }">
+        <div class="bg-white dark:bg-dark-800 h-full flex flex-col">
 
             <div class="bg-gray-200 dark:bg-dark-600 px-6 py-2 border-b border-gray-300 dark:border-dark-900 text-lg font-medium flex items-center justify-between">
                 {{ creating ? __('Add Nav Item') : __('Edit Nav Item') }}
@@ -43,7 +43,7 @@
                                     :initial-value="config.icon"
                                     v-slot="{ meta, value, loading }"
                                 >
-                                    <icon-fieldtype v-if="!loading" handle="icon" :meta="meta" :value="value" @input="config.icon = $event" />
+                                    <icon-fieldtype v-if="!loading" handle="icon" :meta="meta" :value="value" @update:value="config.icon = $event" />
                                 </publish-field-meta>
                             </div>
                         </div>
@@ -70,16 +70,17 @@
 import { data_get } from  '../../bootstrap/globals.js'
 
 export default {
+    emits: ['closed', 'updated'],
 
     props: {
         creating: false,
-        item: {},
+        item: null,
         isChild: false,
     },
 
     data() {
         return {
-            config: clone(data_get(this.item, 'config', this.createNewItem())),
+            config: {...(this.item?.data?.config || this.createNewItem())},
             saveKeyBinding: null,
             validateDisplay: false,
             validateUrl: false,
@@ -93,7 +94,7 @@ export default {
         });
     },
 
-    destroyed() {
+    unmounted() {
         this.saveKeyBinding.destroy();
     },
 

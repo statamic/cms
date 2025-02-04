@@ -8,6 +8,7 @@
 
 <script>
 export default {
+    emits: ['click'],
 
     props: ['text', 'redirect', 'externalLink'],
 

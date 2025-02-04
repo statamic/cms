@@ -1,7 +1,7 @@
 <template>
 
-    <stack narrow name="nav-item-editor" @closed="$emit('closed')">
-        <div slot-scope="{ close }" class="bg-white dark:bg-dark-800 h-full flex flex-col">
+    <stack narrow name="nav-item-editor" @closed="$emit('closed')" v-slot="{ close }">
+        <div class="bg-white dark:bg-dark-800 h-full flex flex-col">
 
             <div class="bg-gray-200 dark:bg-dark-600 px-6 py-2 border-b border-gray-300 dark:border-dark-900 text-lg font-medium flex items-center justify-between">
                 {{ creating ? __('Add Section') : __('Edit Section') }}
@@ -42,9 +42,8 @@
 </template>
 
 <script>
-import { data_get } from  '../../bootstrap/globals.js'
-
 export default {
+    emits: ['closed', 'updated'],
 
     props: {
         creating: false,
@@ -53,7 +52,7 @@ export default {
 
     data() {
         return {
-            section: data_get(this.sectionItem, 'text') || '',
+            section: this.sectionItem?.data?.text || '',
             saveKeyBinding: null,
             validate: false,
         }
@@ -66,7 +65,7 @@ export default {
         });
     },
 
-    destroyed() {
+    unmounted() {
         this.saveKeyBinding.destroy();
     },
 

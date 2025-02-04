@@ -2,6 +2,7 @@
 import ResizeObserver from 'resize-observer-polyfill';
 
 export default {
+    emits: ['resized'],
 
     data() {
         return {
@@ -10,7 +11,7 @@ export default {
     },
 
     render() {
-        return this.$scopedSlots.default({});
+        return this.$slots.default({})[0];
     },
 
     mounted() {

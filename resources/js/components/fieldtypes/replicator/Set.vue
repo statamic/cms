@@ -15,7 +15,7 @@
                         {{ display || config.handle }}
                     </label>
                     <div class="flex items-center" v-if="config.instructions && !collapsed">
-                        <svg-icon name="micro/circle-help" class="text-gray-700 hover:text-gray-800 h-3 w-3 text-xs" v-tooltip="{ content: $options.filters.markdown(__(config.instructions)), html:true }" />
+                        <svg-icon name="micro/circle-help" class="text-gray-700 hover:text-gray-800 h-3 w-3 text-xs" v-tooltip="{ content: $markdown(__(config.instructions)), html:true }" />
                     </div>
                     <div v-show="collapsed" class="flex-1 min-w-0 w-1 rtl:pl-8 ltr:pr-8">
                         <div
@@ -27,7 +27,7 @@
                     <toggle-fieldtype
                         handle="set-enabled"
                         class="toggle-sm rtl:ml-2 ltr:mr-2"
-                        @input="toggleEnabledState"
+                        @update:value="toggleEnabledState"
                         :value="values.enabled"
                         v-tooltip.top="(values.enabled) ? __('Included in output') : __('Hidden from output')" />
                     <dropdown-list>
@@ -147,6 +147,7 @@ export default {
     data() {
         return {
             fieldPreviews: this.previews,
+            extraValues: {},
         }
     },
 

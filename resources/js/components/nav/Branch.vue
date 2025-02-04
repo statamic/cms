@@ -1,6 +1,6 @@
 <template>
 
-    <div class="flex">
+    <div class="flex page-tree-branch" :class="{ 'ml-[-24px]': isTopLevel }">
         <div class="page-move w-6" />
         <div class="flex items-center flex-1 p-2 rtl:mr-2 ltr:ml-2 text-xs leading-normal">
             <div class="flex items-center flex-1" :class="{ 'opacity-50': isHidden || isInHiddenSection }">
@@ -22,15 +22,6 @@
                 >
                     <svg-icon name="micro/chevron-down-xs" class="h-1.5" />
                 </button>
-
-                <div v-if="item.collection" class="rtl:mr-4 ltr:ml-4 flex items-center">
-                    <svg-icon name="light/content-writing" class="w-4 h-4" />
-                    <div class="rtl:mr-1 ltr:ml-1">
-                        <a :href="item.collection.create_url" v-text="__('Add')" />
-                        <span class="text-gray">/</span>
-                        <a :href="item.collection.edit_url" v-text="__('Edit')" />
-                    </div>
-                </div>
             </div>
 
             <div class="rtl:pl-2 ltr:pr-2 flex items-center">
@@ -49,6 +40,7 @@
                         :item="item"
                         :depth="depth"
                         :remove-branch="remove"
+                        :is-top-level="isTopLevel"
                     />
                 </dropdown-list>
             </div>
@@ -68,12 +60,11 @@ export default {
         parentSection: Object,
         depth: Number,
         root: Boolean,
-        vm: Object,
+        stat: Object,
         isOpen: Boolean,
         isChild: Boolean,
         hasChildren: Boolean,
         disableSections: Boolean,
-        topLevel: Boolean,
     },
 
     data() {
@@ -115,11 +106,11 @@ export default {
         },
 
         isInHiddenSection() {
-            return data_get(this.parentSection, 'manipulations.action') === '@hide';
+            return this.parentSection && this.parentSection.data.manipulations.action === '@hide';
         },
 
         isPinnedAlias() {
-            return data_get(this.item, 'manipulations.action') === '@alias' && this.topLevel;
+            return data_get(this.item, 'manipulations.action') === '@alias' && this.isTopLevel;
         },
 
         isAlias() {
@@ -137,6 +128,11 @@ export default {
         isCustom() {
             return data_get(this.item, 'manipulations.action') === '@create';
         },
+
+        isTopLevel() {
+            return this.stat.data?.text === 'Top Level'
+                || this.stat.parent?.data?.text === 'Top Level';
+        }
 
     },
 

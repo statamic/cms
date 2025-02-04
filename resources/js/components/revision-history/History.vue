@@ -82,7 +82,7 @@ export default {
         });
     },
 
-    beforeDestroy() {
+    beforeUnmount() {
         this.escBinding.destroy();
     },
 

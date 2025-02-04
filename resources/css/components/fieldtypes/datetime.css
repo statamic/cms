@@ -36,13 +36,14 @@
 	@apply flex;
 }
 
-/* Remove style from datepicker in popover since the popover has them. */
-.popover-content .vc-container {
-    @apply border-none bg-none;
+/* VCalendar dark mode background */
+.vc-container, .vc-date-picker-content {
+    @apply dark:bg-dark-500 dark:border-dark-700;
 }
 
-.vc-container.vc-is-dark {
-    @apply dark:bg-transparent;
+/* VCalendar dark mode year/month popover */
+.vc-nav-popover-container {
+    @apply dark:bg-dark-700 dark:border-dark-900;
 }
 
 /* Time Field

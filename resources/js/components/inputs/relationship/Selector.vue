@@ -17,8 +17,9 @@
             :selections="selections"
             :max-selections="maxSelections"
             @selections-updated="selectionsUpdated"
+            v-slot="{}"
         >
-            <div slot-scope="{}" class="flex flex-col h-full">
+            <div class="flex flex-col h-full">
                 <div class="bg-white dark:bg-dark-800 z-1">
                     <div class="py-2 px-4 flex items-center justify-between">
                         <data-list-search class="h-8 min-w-[240px] w-full" ref="search" v-model="searchQuery" :placeholder="searchPlaceholder" />
@@ -55,16 +56,16 @@
                                 @sorted="sorted"
                                 class="cursor-pointer"
                             >
-                                <template slot="cell-title" slot-scope="{ row: entry }">
+                                <template #cell-title="{ row: entry }">
                                     <div class="flex items-center">
                                         <div class="little-dot rtl:ml-2 ltr:mr-2" v-tooltip="getStatusLabel(entry)" :class="getStatusClass(entry)" v-if="entry.status && ! columnShowing('status')" />
                                         {{ entry.title }}
                                     </div>
                                 </template>
-                                <template slot="cell-status" slot-scope="{ row: entry }">
+                                <template #cell-status="{ row: entry }">
                                     <div class="status-index-field select-none" v-tooltip="getStatusTooltip(entry)" :class="`status-${entry.status}`" v-text="getStatusLabel(entry)" />
                                 </template>
-                                <template slot="cell-url" slot-scope="{ row: entry }">
+                                <template #cell-url="{ row: entry }">
                                     <span class="text-2xs">{{ entry.url }}</span>
                                 </template>
                             </data-list-table>

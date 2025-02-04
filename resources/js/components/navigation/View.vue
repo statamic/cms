@@ -103,23 +103,23 @@
                 <svg-icon v-if="isTextBranch(branch)" class="inline-block w-4 h-4 text-gray-500" name="light/file-text" v-tooltip="__('Text')" />
             </template>
 
-            <template v-if="canEdit" #branch-options="{ branch, removeBranch, orphanChildren, vm, depth }">
+            <template v-if="canEdit" #branch-options="{ branch, removeBranch, stat, depth }">
                 <dropdown-item
-                    v-if="isEntryBranch(branch)"
+                    v-if="isEntryBranch(stat)"
                     :text="__('Edit Entry')"
                     :redirect="branch.edit_url" />
                 <dropdown-item
                     v-if="depth < maxDepth"
                     :text="__('Add child nav item')"
-                    @click="linkPage(vm)" />
+                    @click="linkPage(stat)" />
                 <dropdown-item
                     v-if="depth < maxDepth && hasCollections"
                     :text="__('Add child link to entry')"
-                    @click="linkEntries(vm)" />
+                    @click="linkEntries(stat)" />
                 <dropdown-item
                     :text="__('Remove')"
                     class="warning"
-                    @click="deleteTreeBranch(branch, removeBranch, orphanChildren)" />
+                    @click="deleteTreeBranch(branch, removeBranch)" />
             </template>
         </page-tree>
 
@@ -346,7 +346,7 @@ export default {
             this.editingPage.page.url = values.url;
             this.editingPage.page.title = values.title;
             this.editingPage.page.values = values;
-            this.$refs.tree.pageUpdated(this.editingPage.store);
+            this.$refs.tree.pageUpdated();
             this.publishInfo[this.editingPage.page.id].values = values;
 
             this.editingPage = false;
@@ -374,27 +374,25 @@ export default {
                 id: uniqid(),
                 title: values.title,
                 url: values.url,
-                children: []
             };
 
-            this.$set(this.publishInfo, page.id, {
+            this.publishInfo[page.id] = {
                 ...this.creatingPage.info,
                 values,
                 entry: null,
                 new: true,
-            });
+            };
 
             this.$refs.tree.addPages([page], this.targetParent);
 
             this.closePageCreator();
         },
 
-        deleteTreeBranch(branch, removeFromUi, orphanChildren) {
+        deleteTreeBranch(branch, removeFromUi) {
             this.showPageDeletionConfirmation = true;
             this.pageBeingDeleted = branch;
             this.pageDeletionConfirmCallback = (shouldDeleteChildren) => {
-                if (!shouldDeleteChildren) orphanChildren();
-                removeFromUi();
+                removeFromUi(shouldDeleteChildren);
                 this.showPageDeletionConfirmation = false;
                 this.pageBeingDeleted = branch;
             }
@@ -434,14 +432,14 @@ export default {
             for (let [oldId, newId] of Object.entries(ids)) {
                 // Replace the ID in the publishInfo so if the tree is saved again, its
                 // data will be submitted using the real ID, and now the temp JS one.
-                this.$set(this.publishInfo, newId, { ...this.publishInfo[oldId], new: false });
-                this.$delete(this.publishInfo, oldId);
+                this.publishInfo[newId] = { ...this.publishInfo[oldId], new: false };
+                delete this.publishInfo[oldId];
 
                 // Replace the ID in the branch within the tree.
                 // Same as above, but in the tree itself.
                 let branch = this.$refs.tree.getNodeByBranchId(oldId);
                 branch.id = newId;
-                this.$refs.tree.pageUpdated(branch._vm.store);
+                this.$refs.tree.pageUpdated();
             }
         }
 

@@ -4,7 +4,7 @@
 
         <button v-if="isWarning" class="session-expiry-stripe" @click="extend" v-text="warningText" />
 
-        <modal name="session-timeout-login" v-if="isShowingLogin" height="auto" width="500px" :adaptive="true">
+        <modal name="session-timeout-login" v-if="isShowingLogin" height="auto" :width="500">
             <div class="-max-h-screen-px">
             <div class="text-lg font-semibold px-5 py-3 bg-gray-200 dark:bg-dark-550 rounded-t-lg flex items-center justify-between border-b dark:border-dark-900">
                 {{ __('Resume Your Session') }}
@@ -71,7 +71,7 @@ export default {
             errors: {},
             password: null,
             pinging: false,
-            lastCount: Vue.moment(),
+            lastCount: moment(),
             isPageHidden: false,
         }
     },
@@ -113,14 +113,14 @@ export default {
             // Javascript is being executed, but the count will have stopped if the computer
             // has been put to sleep. If it's been a while since the last count, we'll
             // also perform a timeout check. This will let things recalibrate.
-            const secondsSinceLastCount = Vue.moment().diff(this.lastCount, 'seconds');
+            const secondsSinceLastCount = moment().diff(this.lastCount, 'seconds');
             const itsBeenAWhile = secondsSinceLastCount > 10;
 
             if (withinWarningPeriod || itsBeenAWhile) {
                 this.ping().catch(e => {});
             }
 
-            this.lastCount = Vue.moment();
+            this.lastCount = moment();
         },
 
         isShowingLogin(showing, wasShowing) {

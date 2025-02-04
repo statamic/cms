@@ -18,7 +18,8 @@
                     <radio-fieldtype
                         handle="save_and_continue_options"
                         :config="options"
-                        v-model="currentOption"
+                        :value="currentOption"
+                        @input="currentOption = $event"
                     />
                 </div>
             </div>

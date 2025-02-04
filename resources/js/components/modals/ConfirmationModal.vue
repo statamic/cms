@@ -25,6 +25,7 @@
 
 <script>
 export default {
+    emits: ['opened', 'confirm', 'cancel'],
     props: {
         title: {
             type: String
@@ -87,7 +88,7 @@ export default {
         this.escBinding = this.$keys.bind('esc', this.dismiss)
     },
 
-    beforeDestroy() {
+    beforeUnmount() {
         this.escBinding.destroy()
     },
 }

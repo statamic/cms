@@ -7,7 +7,7 @@
             <h1 class="flex-1 self-start rtl:ml-4 ltr:mr-4">
                 <div class="flex items-baseline">
                     <span v-if="! isCreating" class="little-dot rtl:ml-2 ltr:mr-2 -top-1" :class="activeLocalization.status" v-tooltip="__(activeLocalization.status)" />
-                    <span class="break-overflowing-words" v-html="$options.filters.striptags(__(title))" />
+                    <span class="break-overflowing-words" v-html="formattedTitle" />
                 </div>
             </h1>
 
@@ -77,9 +77,9 @@
             :is-root="isRoot"
             :track-dirty-state="trackDirtyState"
             @updated="values = $event"
+            v-slot="{ container, components, setFieldMeta }"
         >
             <live-preview
-                slot-scope="{ container, components, setFieldMeta }"
                 :name="publishContainer"
                 :url="livePreviewUrl"
                 :previewing="isPreviewing"
@@ -259,9 +259,8 @@
             </button>
         </div>
 
-        <stack name="revision-history" v-if="showRevisionHistory" @closed="showRevisionHistory = false" :narrow="true">
+        <stack name="revision-history" v-if="showRevisionHistory" @closed="showRevisionHistory = false" :narrow="true" v-slot="{ close }">
             <revision-history
-                slot-scope="{ close }"
                 :index-url="actions.revisions"
                 :restore-url="actions.restore"
                 :reference="initialReference"
@@ -316,6 +315,7 @@ import RevisionHistory from '../revision-history/History.vue';
 import HasPreferences from '../data-list/HasPreferences';
 import HasHiddenFields from '../publish/HasHiddenFields';
 import HasActions from '../publish/HasActions';
+import striptags from 'striptags';
 
 export default {
 
@@ -414,6 +414,10 @@ export default {
     },
 
     computed: {
+
+        formattedTitle() {
+            return striptags(__(this.title));
+        },
 
         hasErrors() {
             return this.error || Object.keys(this.errors).length;
@@ -907,11 +911,11 @@ export default {
         clearTimeout(this.trackDirtyStateTimeout);
     },
 
-    beforeDestroy() {
+    beforeUnmount() {
         this.$store.commit(`publish/${this.publishContainer}/clearAutosaveInterval`);
     },
 
-    destroyed() {
+    unmounted() {
         this.saveKeyBinding.destroy();
         this.quickSaveKeyBinding.destroy();
     }

@@ -2,24 +2,13 @@
 
     <div class="flex-1">
 
-        <v-portal :disabled="!open" :to="portalTarget">
-            <v-date-picker
+        <v-date-picker
                 ref="picker"
                 v-bind="bindings"
-                v-show="open"
-                @input="dateSelected"
+                @update:model-value="dateSelected"
                 :is-dark="darkMode"
-            />
-        </v-portal>
-
-        <popover
-            ref="popover"
-            placement="bottom-start"
-            :disabled="isReadOnly"
-            @opened="open = true"
-            @closed="open = false"
         >
-            <template #trigger>
+            <template #default="{ inputValue, inputEvents }">
                 <div class="input-group">
                     <div class="input-group-prepend flex items-center">
                         <svg-icon name="light/calendar" class="w-4 h-4" />
@@ -39,8 +28,7 @@
                     </div>
                 </div>
             </template>
-            <portal-target :name="portalTarget" @change="resetPicker" />
-        </popover>
+        </v-date-picker>
 
     </div>
 
@@ -50,17 +38,9 @@
 import Picker from './Picker';
 
 export default {
+    emits: ['update:model-value', 'focus', 'blur'],
 
     mixins: [Picker],
-
-    data() {
-        return {
-            open: false,
-            picker: null,
-            portalTarget: `date-picker-${this._uid}`,
-            inputValue: null
-        }
-    },
 
     computed: {
 
@@ -68,54 +48,18 @@ export default {
             return Statamic.darkMode;
         },
 
-        inputEvents() {
-            return {
-                // Handle changing the date when typing.
-                change: (e) => this.picker.onInputUpdate(e.target.value, true, { formatInput: true }),
-                // Allows hitting escape to cancel any changes, and close the popover.
-                keyup: (e) => {
-                    this.picker.onInputKeyup(e);
-                    if (e.key === 'Escape') this.$refs.popover?.close();
-                }
-            }
-        },
-
     },
-
-    watch: {
-
-        'bindings.value': function () {
-            this.$nextTick(() => this.updateInputValue());
-        },
-
-    },
-
     methods: {
 
-        updateInputValue() {
-            this.inputValue = this.picker.inputValues[0];
-        },
-
         dateSelected(date) {
-            this.$emit('input', date)
+            this.$emit('update:model-value', date)
             this.$nextTick(() => this.$refs.popover?.close());
         },
 
         clear() {
-            this.$emit('input', null)
-        },
-
-        resetPicker() {
-            this.picker = this.$refs.picker;
+            this.$emit('update:model-value', null)
         }
 
-    },
-
-    mounted() {
-        this.$nextTick(() => {
-            this.resetPicker();
-            this.updateInputValue();
-        });
     }
 
 }

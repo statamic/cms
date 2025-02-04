@@ -10,8 +10,9 @@
             @updated="uploadsUpdated"
             @upload-complete="uploadComplete"
             @error="uploadError"
+            v-slot="{ dragging }"
         >
-            <div slot-scope="{ dragging }" class="assets-fieldtype-drag-container">
+            <div class="assets-fieldtype-drag-container">
 
                 <div class="drag-notification" v-show="dragging">
                     <svg-icon name="upload" class="h-8 w-8 rtl:ml-6 ltr:mr-6" />
@@ -70,6 +71,7 @@
 </template>
 
 <script>
+import Fieldtype from './Fieldtype.vue';
 import Uploader from '../assets/Uploader.vue';
 import Uploads from '../assets/Uploads.vue';
 

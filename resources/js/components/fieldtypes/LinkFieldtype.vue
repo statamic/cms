@@ -52,11 +52,16 @@
 </template>
 
 <script>
+import Fieldtype from './Fieldtype.vue';
 import PositionsSelectOptions from '../../mixins/PositionsSelectOptions';
 
 export default {
 
     mixins: [Fieldtype, PositionsSelectOptions],
+
+    provide: {
+        isInLinkField: true,
+    },
 
     data() {
 

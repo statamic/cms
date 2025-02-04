@@ -2,6 +2,7 @@
 import Fuse from 'fuse.js';
 
 export default {
+    emits: ['selections-updated', 'visible-columns-updated'],
     props: {
         columns: {
             type: Array,
@@ -109,7 +110,7 @@ export default {
         this.$events.$on('clear-selections', this.clearSelections);
     },
 
-    destroyed() {
+    unmounted() {
         this.$events.$off('clear-selections', this.clearSelections);
     },
 
@@ -160,10 +161,10 @@ export default {
     },
 
     render() {
-        return this.$scopedSlots.default({
+        return this.$slots.default({
             rows: this.filteredRows,
             hasSelections: this.sharedState.selections.length > 0,
-        });
+        })[0];
     }
 
 }

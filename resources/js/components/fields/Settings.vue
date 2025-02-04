@@ -53,12 +53,12 @@
                     :blueprint="blueprint"
                     :values="values"
                     :meta="meta"
-                    :is-config="true"
                     :errors="errors"
                     :is-root="true"
                     @updated="values = $event"
+                    v-slot="{ setFieldValue, setFieldMeta }"
                 >
-                    <div v-show="activeTab === 'settings'" slot-scope="{ setFieldValue, setFieldMeta }">
+                    <div v-show="activeTab === 'settings'">
 
                         <publish-sections
                             :sections="blueprint.tabs[0].sections"
@@ -121,8 +121,12 @@ export default {
         isInsideSet: Boolean,
     },
 
-    provide: {
-        isInsideConfigFields: true,
+    provide() {
+        return {
+            isInsideConfigFields: true,
+            updateFieldSettingsValue: this.updateField,
+            getFieldSettingsValue: this.getFieldValue,
+        }
     },
 
     model: {
@@ -138,7 +142,6 @@ export default {
             errors: {},
             editedFields: clone(this.overrides),
             activeTab: 'settings',
-            storeName: 'base',
             fieldtype: null,
             loading: true,
             blueprint: null,
@@ -147,7 +150,7 @@ export default {
 
     computed: {
         publishContainer() {
-            return `field-settings-${this._uid}`;
+            return `field-settings-${this.$.uid}`;
         },
 
         selectedWidth: function() {
@@ -200,6 +203,10 @@ export default {
                 `form-group p-4 m-0 ${field.type}-fieldtype`,
                 tailwind_width_class(field.width)
             ];
+        },
+
+        getFieldValue(handle) {
+            return this.values[handle];
         },
 
         updateField(handle, value, setStoreValue=null) {

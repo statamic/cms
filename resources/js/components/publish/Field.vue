@@ -2,11 +2,12 @@
 
     <publish-field-meta
         :config="config"
-        :initial-value="value"
+        :initial-value="modelValue"
         :initial-meta="meta"
         @loaded="metaLoaded"
+        v-slot="{ meta, value, loading: loadingMeta }"
     >
-    <div slot-scope="{ meta, value, loading: loadingMeta }" :class="classes">
+    <div :class="classes">
         <div class="field-inner">
             <label v-if="showLabel" class="publish-field-label" :class="{'font-bold': config.bold}" :for="fieldId">
                 <span
@@ -69,7 +70,7 @@
                 :name-prefix="namePrefix"
                 :field-path-prefix="fieldPathPrefix"
                 :read-only="isReadOnly"
-                @input="$emit('input', $event)"
+                @update:value="$emit('update:model-value', $event)"
                 @meta-updated="$emit('meta-updated', $event)"
                 @focus="focused"
                 @blur="blurred"
@@ -92,6 +93,8 @@
 
 <script>
 import { marked } from 'marked';
+import titleize from '../../util/titleize';
+import deslugify from '../../util/deslugify';
 
 export default {
 
@@ -100,7 +103,7 @@ export default {
             type: Object,
             required: true
         },
-        value: {
+        modelValue: {
             required: true
         },
         meta: {
@@ -132,7 +135,7 @@ export default {
         },
 
         fieldtypeComponentExists() {
-            return Vue.options.components[this.fieldtypeComponent] !== undefined;
+            return Statamic.$app.component(this.fieldtypeComponent) !== undefined;
         },
 
         instructions() {
@@ -214,7 +217,7 @@ export default {
 
         labelText() {
              return this.config.display
-                 || Vue.$options.filters.titleize(Vue.$options.filters.deslugify(this.config.handle));
+                 || titleize(deslugify(this.config.handle));
          },
 
         showLabelText() {

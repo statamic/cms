@@ -1,9 +1,10 @@
 import Slug from './Slug';
+import { markRaw } from 'vue';
 
 class Manager {
 
     make() {
-        return new Slug;
+        return markRaw(new Slug);
     }
 
     create(string) {

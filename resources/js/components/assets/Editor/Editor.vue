@@ -130,8 +130,9 @@
                     :meta="meta"
                     :errors="errors"
                     @updated="values = { ...$event, focus: values.focus }"
+                    v-slot="{ setFieldValue, setFieldMeta }"
                 >
-                    <div class="w-full sm:p-4 md:pt-px md:w-1/3 md:grow h-1/2 md:h-full overflow-scroll" slot-scope="{ setFieldValue, setFieldMeta }">
+                    <div class="w-full sm:p-4 md:pt-px md:w-1/3 md:grow h-1/2 md:h-full overflow-scroll">
 
                         <div v-if="saving" class="loading">
                             <loading-graphic text="Saving" />
@@ -208,6 +209,8 @@ import HasHiddenFields from '../../publish/HasHiddenFields';
 import pick from 'underscore/modules/pick';
 
 export default {
+
+    emits: ['saved', 'closed', 'action-completed'],
 
     mixins: [
         HasHiddenFields,
@@ -305,7 +308,6 @@ export default {
     },
 
     mounted() {
-        this.$modal.show('asset-editor');
         this.load();
     },
 
@@ -366,7 +368,7 @@ export default {
 
         selectFocalPoint(point) {
             point = (point === '50-50-1') ? null : point;
-            this.$set(this.values, 'focus', point);
+            this.values['focus'] = point;
             this.$dirty.add(this.publishContainer);
         },
 
@@ -401,7 +403,6 @@ export default {
         },
 
         close() {
-            this.$modal.hide('asset-editor');
             this.$emit('closed');
         },
 

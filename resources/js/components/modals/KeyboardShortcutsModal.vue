@@ -1,5 +1,5 @@
 <template>
-    <modal v-if="open" name="keyboard-shortcuts" width="380" height="auto" :adaptive="true" @closed="open = false" click-to-close>
+    <modal v-if="open" name="keyboard-shortcuts" :width="380" @closed="open = false" click-to-close>
         <div class="-max-h-screen-px">
         <h1 class="p-4 bg-gray-200 dark:bg-dark-700 border-b dark:border-dark-900 text-center">
             {{ __('Keyboard Shortcuts') }}
@@ -53,11 +53,7 @@
 </template>
 
 <script>
-import { mixin as clickaway } from 'vue-clickaway';
-
 export default {
-    mixins: [ clickaway ],
-
     data() {
         return {
             open: false,

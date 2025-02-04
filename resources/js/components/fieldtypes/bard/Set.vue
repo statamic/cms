@@ -18,7 +18,7 @@
                         {{ display || config.handle }}
                     </label>
                     <div class="flex items-center" v-if="config.instructions && !collapsed">
-                        <svg-icon name="micro/circle-help" class="text-gray-700 dark:text-dark-175 hover:text-gray-800 dark:hover:text-dark-100 h-3 w-3 text-xs" v-tooltip="{ content: $options.filters.markdown(__(config.instructions)), html:true }" />
+                        <svg-icon name="micro/circle-help" class="text-gray-700 dark:text-dark-175 hover:text-gray-800 dark:hover:text-dark-100 h-3 w-3 text-xs" v-tooltip="{ content: $markdown(__(config.instructions)), html:true }" />
                     </div>
                     <div v-show="collapsed" class="flex-1 min-w-0 w-1 rtl:pl-8 ltr:pr-8">
                         <div
@@ -30,7 +30,7 @@
                     <toggle-fieldtype
                         handle="set-enabled"
                         class="toggle-sm rtl:ml-4 ltr:mr-4"
-                        v-model="enabled"
+                        v-model:value="enabled"
                         v-tooltip.top="(enabled) ? __('Included in output') : __('Hidden from output')" />
                     <dropdown-list>
                         <dropdown-actions :actions="fieldActions" v-if="fieldActions.length" />
@@ -67,7 +67,7 @@
 </template>
 
 <script>
-import { NodeViewWrapper } from '@tiptap/vue-2';
+import { NodeViewWrapper } from '@tiptap/vue-3';
 import SetField from '../replicator/Field.vue';
 import ManagesPreviewText from '../replicator/ManagesPreviewText';
 import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
@@ -109,6 +109,10 @@ export default {
 
         values() {
             return this.node.attrs.values;
+        },
+
+        extraValues() {
+            return {};
         },
 
         meta() {

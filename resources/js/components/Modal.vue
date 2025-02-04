@@ -1,34 +1,45 @@
 <template>
 
     <portal name="modal">
-        <v-modal v-bind="modalProps" :delay="25" @opened="modalOpened" @closed="modalClosed">
-            <slot :close="close" />
-        </v-modal>
+        <VueFinalModal
+            v-model="open"
+            v-bind="modalProps"
+            @opened="modalOpened"
+            @closed="modalClosed"
+        >
+            <div :style="styling" class="max-h-[90vh]">
+                <slot :close="close" />
+            </div>
+        </VueFinalModal>
     </portal>
 
 </template>
 
 <script>
 import uniqid from 'uniqid';
-import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
+import { VueFinalModal } from 'vue-final-modal';
 
 export default {
+    emits: ['opened', 'closed'],
+
+    components: {
+        VueFinalModal,
+    },
 
     props: {
         adaptive: { type: Boolean, default: true },
         draggable: { default: false },
         clickToClose: { type: Boolean, default: false },
-        shiftY: { type: Number, default: 0.1 },
         focusTrap: {type: Boolean, default: true},
         height: { default: 'auto' },
-        width: {},
-        scrollable: { type: Boolean, default: false}
+        width: { default: 600 },
     },
 
     data() {
         return {
             modal: null,
             name: uniqid(),
+            open: true,
         }
     },
 
@@ -36,27 +47,26 @@ export default {
 
         modalProps() {
             return {
-                name: this.name,
-                adaptive: this.adaptive,
+                modalId: this.name,
                 clickToClose: this.clickToClose,
-                draggable: this.draggable,
-                height: this.height,
-                shiftY: this.shiftY,
                 focusTrap: this.focusTrap,
-                width: this.width,
-                scrollable: this.scrollable,
+                teleportTo: false,
+                class: 'flex items-start justify-center pt-[5%]',
+                overlayTransition: 'vfm-fade',
+                contentTransition: 'vfm-slide-up'
             }
         },
 
+        styling() {
+            return {
+                width: typeof(this.width) === 'number' ? `${this.width}px` : this.width,
+                height: typeof(this.height) === 'number' ? `${this.height}px` : this.height,
+            }
+        }
+
     },
 
-    mounted() {
-        this.$nextTick(() => this.$modal.show(this.name));
-        if (!this.scrollable) disableBodyScroll(this.$el);
-    },
-
-    beforeDestroy() {
-        enableBodyScroll(this.$el);
+    beforeUnmount() {
         this.close();
     },
 
@@ -71,8 +81,8 @@ export default {
         },
 
         close() {
-            this.$modal.hide(this.name);
-            this.$emit('closed');
+            this.open = false;
+            this.$wait(300).then(() => this.$emit('closed'));
         }
 
     }

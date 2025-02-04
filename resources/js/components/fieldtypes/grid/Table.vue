@@ -13,16 +13,17 @@
             </tr>
         </thead>
         <sortable-list
-            :value="rows"
+            :model-value="rows"
             :vertical="true"
             :item-class="sortableItemClass"
             :handle-class="sortableHandleClass"
             append-to="body"
             @dragstart="$emit('focus')"
             @dragend="$emit('blur')"
-            @input="(rows) => $emit('sorted', rows)"
+            @update:model-value="(rows) => $emit('sorted', rows)"
+            v-slot="{}"
         >
-            <tbody slot-scope="{}">
+            <tbody>
                 <grid-row
                     v-for="(row, index) in rows"
                     :key="`row-${row._id}`"

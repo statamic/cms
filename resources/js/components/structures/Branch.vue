@@ -47,7 +47,6 @@
                         :branch="page"
                         :depth="depth"
                         :remove-branch="remove"
-                        :orphan-children="orphanChildren"
                     />
                 </dropdown-list>
             </div>
@@ -58,21 +57,19 @@
 </template>
 
 <script>
-import * as th from 'tree-helper';
-
 export default {
 
     props: {
         page: Object,
         depth: Number,
         root: Boolean,
-        vm: Object,
         firstPageIsRoot: Boolean,
         isOpen: Boolean,
         hasChildren: Boolean,
         showSlugs: Boolean,
         showBlueprint: Boolean,
-        editable: Boolean,
+        editable: { type: Boolean, default: true },
+        stat: Object,
     },
 
     data() {
@@ -88,11 +85,7 @@ export default {
         },
 
         isRoot() {
-            if (!this.firstPageIsRoot) return false;
-            if (!this.isTopLevel) return false;
-
-            const firstNodeId = this.vm.data.parent.children[0].id;
-            return this.page.id === firstNodeId;
+            return this.root;
         },
 
         isEntry() {
@@ -132,21 +125,9 @@ export default {
             return label[0].toUpperCase() + label.slice(1);
         },
 
-        remove() {
-            const store = this.page._vm.store;
-            store.deleteNode(this.page);
-            this.$emit('removed', store);
+        remove(deleteChildren) {
+            this.$emit('removed', this.stat, deleteChildren);
         },
-
-        orphanChildren() {
-            const store = this.page._vm.store;
-
-            this.vm.data.children.slice().forEach((child) =>
-                th.insertBefore(child, this.vm.data)
-            );
-
-            this.$emit('children-orphaned', store);
-        }
 
     }
 

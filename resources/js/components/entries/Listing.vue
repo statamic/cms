@@ -14,7 +14,7 @@
             :sort-direction="sortDirection"
             @visible-columns-updated="visibleColumns = $event"
         >
-            <div slot-scope="{ hasSelections }">
+            <div>
                 <div class="card overflow-hidden p-0 relative">
                     <div v-if="!reordering" class="flex flex-wrap items-center justify-between px-2 pb-2 text-sm border-b dark:border-dark-900">
 
@@ -76,19 +76,19 @@
                             @sorted="sorted"
                             @reordered="reordered"
                         >
-                            <template slot="cell-title" slot-scope="{ row: entry }">
+                            <template #cell-title="{ row: entry }">
                                 <a class="title-index-field inline-flex items-center" :href="entry.edit_url" @click.stop>
                                     <span class="little-dot rtl:ml-2 ltr:mr-2" v-tooltip="getStatusLabel(entry)" :class="getStatusClass(entry)" v-if="! columnShowing('status')" />
                                     <span v-text="entry.title" />
                                 </a>
                             </template>
-                            <template slot="cell-status" slot-scope="{ row: entry }">
+                            <template #cell-status="{ row: entry }">
                                 <div class="status-index-field select-none" v-tooltip="getStatusTooltip(entry)" :class="`status-${entry.status}`" v-text="getStatusLabel(entry)" />
                             </template>
-                            <template slot="cell-slug" slot-scope="{ row: entry }">
+                            <template #cell-slug="{ row: entry }">
                                 <div class="slug-index-field" :title="entry.slug">{{ entry.slug }}</div>
                             </template>
-                            <template slot="actions" slot-scope="{ row: entry, index }">
+                            <template #actions="{ row: entry, index }">
                                 <dropdown-list placement="left-start">
                                     <dropdown-item :text="__('View')" :external-link="entry.permalink" v-if="entry.viewable && entry.permalink" />
                                     <dropdown-item :text="__('Edit')" :redirect="entry.edit_url" v-if="entry.editable" />

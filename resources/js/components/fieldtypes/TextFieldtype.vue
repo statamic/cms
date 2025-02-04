@@ -1,7 +1,7 @@
 <template>
     <text-input
         ref="input"
-        :value="value"
+        :model-value="value"
         :classes="config.classes"
         :focus="config.focus || name === 'title' || name === 'alt'"
         :autocomplete="config.autocomplete"
@@ -15,7 +15,7 @@
         :name="name"
         :id="fieldId"
         :direction="config.direction"
-        @input="inputUpdated"
+        @update:model-value="inputUpdated"
         @focus="$emit('focus')"
         @blur="$emit('blur')"
     />
