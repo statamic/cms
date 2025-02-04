@@ -26,7 +26,6 @@
             </div>
         </a>
         @endcan
-        {{-- format-ignore-start --}}
         @can('create', ['Statamic\Contracts\Entries\Entry', $collection, \Statamic\Facades\Site::get($site)])
         <?php $multipleBlueprints = $collection->entryBlueprints()->count() > 1 ?>
         @if ($multipleBlueprints)<div
@@ -48,7 +47,6 @@
                 @endif
             </div>
         @if ($multipleBlueprints)</div>@else</a>@endif
-        {{-- format-ignore-end --}}
         @endcan
         @can('configure fields')
         <a href="{{ cp_route('collections.blueprints.index', $collection->handle()) }}" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
