@@ -1,15 +1,13 @@
-name: Fix PHP code style issues
+name: Fix code style issues
 
 on:
   push:
-    paths:
-      - '**.php'
 
 permissions:
   contents: write
 
 jobs:
-  fix-php-code-styling:
+  fix-code-styling:
     runs-on: ubuntu-latest
     if: github.repository_owner == 'statamic'
 
@@ -24,6 +22,15 @@ jobs:
         uses: aglipanci/laravel-pint-action@v2
         with:
           pintVersion: 1.16.0
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Fix formatting with Prettier
+        run: npm run prettier:format
 
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v5
