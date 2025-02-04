@@ -14,9 +14,9 @@
 
     <preferences-edit-form
         title="{{ $title }}"
-        :blueprint='@json($blueprint)'
-        :meta='@json($meta)'
-        :values='@json($values)'
+        :blueprint="{{ Js::from($blueprint) }}"
+        :meta="{{ Js::from($meta) }}"
+        :values="{{ Js::from($values) }}"
         action="{{ $actionUrl }}"
         :save-as-options="{{ json_encode($saveAsOptions) }}"
     ></preferences-edit-form>

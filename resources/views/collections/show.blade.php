@@ -9,9 +9,9 @@
         handle="{{ $collection->handle() }}"
         breadcrumb-url="{{ cp_route('collections.index') }}"
         :can-create="{{ Statamic\Support\Str::bool($canCreate) }}"
-        :create-urls='@json($createUrls)'
+        :create-urls="{{ Js::from($createUrls) }}"
         create-label="{{ $collection->createLabel() }}"
-        :blueprints='@json($blueprints)'
+        :blueprints="{{ Js::from($blueprints) }}"
         sort-column="{{ $collection->sortField() }}"
         sort-direction="{{ $collection->sortDirection() }}"
         :columns="{{ $columns->toJson() }}"
