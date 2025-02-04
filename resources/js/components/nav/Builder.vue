@@ -321,7 +321,7 @@ export default {
                 open: isSectionNode,
             };
 
-            let children = config.items || config.children;
+            let children = config.items || config.children || [];
 
             if (children) {
                 item.children = children.map(childItem => {
@@ -439,7 +439,7 @@ export default {
                 display_original: false,
             });
 
-            this.treeData.push(item);
+            this.$refs.tree.add(item);
             this.resetSectionEditor();
             this.changed = true;
         },

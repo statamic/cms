@@ -52,7 +52,7 @@ export default {
 
     data() {
         return {
-            section: this.sectionItem.data.text || '',
+            section: this.sectionItem?.data?.text || '',
             saveKeyBinding: null,
             validate: false,
         }
