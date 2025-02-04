@@ -1,4 +1,4 @@
 {
     "useLaravelPint": true,
-    "pintCommand": "pint {file}"
+    "pintCommand": "/tmp/vendor/bin/pint {file}"
 }
