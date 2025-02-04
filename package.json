@@ -10,8 +10,8 @@
     "test-watch": "npm run test -- --watch --notify",
     "frontend-dev": "vite -c vite-frontend.config.js",
     "frontend-build": "vite build -c vite-frontend.config.js",
-    "prettier:format": "prettier --write \"**/*.{js,ts,jsx,tsx,cjs,cts,mjs,mts,vue,blade.php,css}\"",
-    "prettier:check": "prettier --check \"**/*.{js,ts,jsx,tsx,cjs,cts,mjs,mts,vue,blade.php,css}\""
+    "prettier:format": "prettier --write \"**/*.{js,ts,jsx,tsx,cjs,cts,mjs,mts,vue,blade.php,antlers.html,css}\"",
+    "prettier:check": "prettier --check \"**/*.{js,ts,jsx,tsx,cjs,cts,mjs,mts,vue,blade.php,antlers.html,css}\""
   },
   "dependencies": {
     "@floating-ui/dom": "^1.2.5",
