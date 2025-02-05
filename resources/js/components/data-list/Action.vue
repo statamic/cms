@@ -1,5 +1,4 @@
 <template>
-
     <span>
         <slot :action="action" :select="select" />
 
@@ -12,11 +11,25 @@
             @confirm="confirm"
             @cancel="reset"
         >
-            <div v-if="confirmationText" v-text="confirmationText" :class="{ 'mb-4': warningText || showDirtyWarning || action.fields.length }" />
+            <div
+                v-if="confirmationText"
+                v-text="confirmationText"
+                :class="{ 'mb-4': warningText || showDirtyWarning || action.fields.length }"
+            />
 
-            <div v-if="warningText" v-text="warningText" class="text-red-500" :class="{ 'mb-4': showDirtyWarning || action.fields.length }" />
+            <div
+                v-if="warningText"
+                v-text="warningText"
+                class="text-red-500"
+                :class="{ 'mb-4': showDirtyWarning || action.fields.length }"
+            />
 
-            <div v-if="showDirtyWarning" v-text="dirtyText" class="text-red-500" :class="{ 'mb-4': action.fields.length }" />
+            <div
+                v-if="showDirtyWarning"
+                v-text="dirtyText"
+                class="text-red-500"
+                :class="{ 'mb-4': action.fields.length }"
+            />
 
             <publish-container
                 v-if="action.fields.length"
@@ -28,23 +41,16 @@
                 @updated="values = $event"
                 v-slot="{ setFieldValue, setFieldMeta }"
             >
-                <publish-fields
-                    :fields="action.fields"
-                    @updated="setFieldValue"
-                    @meta-updated="setFieldMeta"
-                />
+                <publish-fields :fields="action.fields" @updated="setFieldValue" @meta-updated="setFieldMeta" />
             </publish-container>
         </confirmation-modal>
     </span>
-
 </template>
-
 
 <script>
 import PublishFields from '../publish/Fields.vue';
 
 export default {
-
     components: {
         PublishFields,
     },
@@ -59,51 +65,49 @@ export default {
             required: true,
         },
         errors: {
-            type: Object
+            type: Object,
         },
         isDirty: {
             type: Boolean,
             default: false,
-        }
+        },
     },
 
     data() {
         return {
             confirming: false,
-            fieldset: {tabs:[{fields:this.action.fields}]},
+            fieldset: { tabs: [{ fields: this.action.fields }] },
             values: this.action.values,
             running: false,
-        }
+        };
     },
 
     computed: {
-
         confirmationText() {
-            if (! this.action.confirmationText) return;
+            if (!this.action.confirmationText) return;
 
             return __n(this.action.confirmationText, this.selections);
         },
 
         warningText() {
-            if (! this.action.warningText) return;
+            if (!this.action.warningText) return;
 
             return __n(this.action.warningText, this.selections);
         },
 
         dirtyText() {
-            if (! this.isDirty) return;
+            if (!this.isDirty) return;
 
             return __(this.action.dirtyWarningText);
         },
 
         showDirtyWarning() {
-            return this.isDirty && this.action.dirtyWarningText && ! this.action.bypassesDirtyWarning;
+            return this.isDirty && this.action.dirtyWarningText && !this.action.bypassesDirtyWarning;
         },
 
         runButtonText() {
             return __n(this.action.buttonText, this.selections);
-        }
-
+        },
     },
 
     created() {
@@ -139,8 +143,6 @@ export default {
 
             this.values = clone(this.action.values);
         },
-
-    }
-
-}
+    },
+};
 </script>

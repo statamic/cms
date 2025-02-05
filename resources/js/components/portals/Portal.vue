@@ -1,17 +1,11 @@
 <template>
-
-    <teleport
-        :to="`#portal-target-${portal.id}`"
-        :disabled="disabled"
-        v-if="mounted"
-    >
+    <teleport :to="`#portal-target-${portal.id}`" :disabled="disabled" v-if="mounted">
         <div class="vue-portal-target" :class="targetClass">
             <provider :variables="provide">
-               <slot />
+                <slot />
             </provider>
         </div>
     </teleport>
-
 </template>
 
 <script>
@@ -19,32 +13,32 @@ import Provider from './Provider.vue';
 
 export default {
     components: {
-        Provider
+        Provider,
     },
 
     props: {
         name: {
             type: String,
-            required: true
+            required: true,
         },
         provide: {
             type: Object,
-            default: () => ({})
+            default: () => ({}),
         },
         targetClass: {
-            type: String
+            type: String,
         },
         disabled: {
             type: Boolean,
-            default: false
-        }
+            default: false,
+        },
     },
 
     data() {
         return {
             portal: null,
             mounted: false,
-        }
+        };
     },
 
     created() {
@@ -57,7 +51,6 @@ export default {
 
     beforeUnmount() {
         this.portal.destroy();
-    }
-
-}
+    },
+};
 </script>

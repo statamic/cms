@@ -1,5 +1,4 @@
 export default {
-
     data() {
         return {
             activeFilterBadges: {},
@@ -7,16 +6,15 @@ export default {
             activePreset: null,
             activePresetPayload: {},
             searchQuery: '',
-        }
+        };
     },
 
     computed: {
-
         activeFilterCount() {
             let count = Object.keys(this.activeFilters).length;
 
             if (this.activeFilters.hasOwnProperty('fields')) {
-                count = count + Object.keys(this.activeFilters.fields).filter(field => field != 'badge').length - 1;
+                count = count + Object.keys(this.activeFilters.fields).filter((field) => field != 'badge').length - 1;
             }
 
             return count;
@@ -27,18 +25,20 @@ export default {
         },
 
         isDirty() {
-            if (! this.isFiltering) return false;
+            if (!this.isFiltering) return false;
 
             if (this.activePreset) {
-                return this.activePresetPayload.query != this.searchQuery
-                    || ! _.isEqual(this.activePresetPayload.filters || {}, this.activeFilters);
+                return (
+                    this.activePresetPayload.query != this.searchQuery ||
+                    !_.isEqual(this.activePresetPayload.filters || {}, this.activeFilters)
+                );
             }
 
             return true;
         },
 
         isFiltering() {
-            return ! _.isEmpty(this.activeFilters) || this.searchQuery || this.activePreset;
+            return !_.isEmpty(this.activeFilters) || this.searchQuery || this.activePreset;
         },
 
         hasActiveFilters() {
@@ -52,11 +52,9 @@ export default {
 
             return __('Search');
         },
-
     },
 
     methods: {
-
         searchChanged(query) {
             this.searchQuery = query;
         },
@@ -102,7 +100,7 @@ export default {
             }
         },
 
-        selectPreset(handle, preset)  {
+        selectPreset(handle, preset) {
             this.activePreset = handle;
             this.activePresetPayload = preset;
             this.searchQuery = preset.query;
@@ -111,17 +109,17 @@ export default {
         },
 
         autoApplyFilters(filters) {
-            if (! filters) return;
+            if (!filters) return;
 
             let values = {};
 
-            filters.filter(filter => ! _.isEmpty(filter.auto_apply)).forEach(filter => {
-                values[filter.handle] = filter.auto_apply;
-            });
+            filters
+                .filter((filter) => !_.isEmpty(filter.auto_apply))
+                .forEach((filter) => {
+                    values[filter.handle] = filter.auto_apply;
+                });
 
             this.activeFilters = values;
         },
-
-    }
-
-}
+    },
+};

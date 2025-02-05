@@ -1,5 +1,4 @@
 export default {
-
     namespaced: true,
 
     state: {
@@ -11,7 +10,6 @@ export default {
     },
 
     mutations: {
-
         windowWidth(state, width) {
             state.windowWidth = width;
         },
@@ -38,8 +36,6 @@ export default {
 
         condition(state, payload) {
             state.conditions[payload.name] = payload.condition;
-        }
-
-    }
-
+        },
+    },
 };

@@ -4,27 +4,25 @@
 
 <script>
 export default {
-
     props: {
         showEmailLogin: {
-            default: false
+            default: false,
         },
         hasError: {
-            default: false
-        }
+            default: false,
+        },
     },
 
     data() {
         return {
-            busy: false
-        }
+            busy: false,
+        };
     },
 
     mounted() {
         if (this.hasError) {
             this.$el.parentElement.parentElement.classList.add('animation-shake');
         }
-    }
-
+    },
 };
 </script>

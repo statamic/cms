@@ -1,28 +1,23 @@
 <template>
-
     <div class="live-preview-contents min-h-screen" ref="contents" />
-
 </template>
 
 <script>
 import UpdatesIframe from './UpdatesIframe';
 
 export default {
-
-    mixins: [
-        UpdatesIframe
-    ],
+    mixins: [UpdatesIframe],
 
     data() {
         return {
-            channel: null
-        }
+            channel: null,
+        };
     },
 
     created() {
         this.channel = new BroadcastChannel('livepreview');
 
-        this.channel.onmessage = e => {
+        this.channel.onmessage = (e) => {
             switch (e.data.event) {
                 case 'updated':
                     this.updateIframeContents(e.data.url, e.data.target, e.data.payload);
@@ -41,7 +36,7 @@ export default {
     methods: {
         setIframeAttributes(iframe) {
             iframe.setAttribute('class', 'min-h-screen');
-        }
-    }
-}
+        },
+    },
+};
 </script>

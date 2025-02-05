@@ -1,16 +1,18 @@
 .bard-fieldtype-wrapper {
-    @apply border dark:border-dark-900 rounded relative outline-none;
+    @apply relative rounded border outline-none dark:border-dark-900;
 
-    * { outline: none; }
+    * {
+        outline: none;
+    }
 }
 
 .bard-editor {
-    @apply text-gray-800 dark:text-dark-150 bg-gray-100 dark:bg-dark-650 shadow-inner p-0 relative rounded;
+    @apply relative rounded bg-gray-100 p-0 text-gray-800 shadow-inner dark:bg-dark-650 dark:text-dark-150;
 }
 
 .bard-editor .ProseMirror {
-    @apply p-2 min-h-40 text-sm leading-tight;
-    @apply @md/bard:p-2 text-md leading-normal;
+    @apply min-h-40 p-2 text-sm leading-tight;
+    @apply text-md leading-normal @md/bard:p-2;
     @apply @lg/bard:p-4;
     &:focus {
         @apply ring-2 ring-inset ring-blue-200 dark:ring-blue-600;
@@ -18,12 +20,12 @@
 }
 
 .bard-editor .bard-error {
-    @apply p-2 @lg:px-4 bg-red-100 text-red-500 text-xs whitespace-nowrap;
+    @apply whitespace-nowrap bg-red-100 p-2 text-xs text-red-500 @lg:px-4;
 }
 
 /*  Modes */
 .bard-editor.mode\:read-only .ProseMirror {
-    @apply bg-gray-300 dark:bg-dark-600 text-gray-700 dark:text-dark-175;
+    @apply bg-gray-300 text-gray-700 dark:bg-dark-600 dark:text-dark-175;
 }
 
 .bard-editor.mode\:minimal .ProseMirror {
@@ -34,17 +36,17 @@
     @apply p-2;
     min-height: 38px;
     p {
-        @apply leading-normal mb-0;
+        @apply mb-0 leading-normal;
     }
 }
 
 .bard-fixed-toolbar {
-    @apply bg-white dark:bg-dark-800 shadow-none rounded-t border-b dark:border-dark-900 text-sm flex items-start justify-between p-1 z-5 top-0;
+    @apply top-0 z-5 flex items-start justify-between rounded-t border-b bg-white p-1 text-sm shadow-none dark:border-dark-900 dark:bg-dark-800;
 
     .bard-toolbar-button {
-        @apply text-gray-800 dark:text-dark-150 rounded px-1 flex text-center justify-center items-center text-base h-8 w-8 m-0;
+        @apply m-0 flex h-8 w-8 items-center justify-center rounded px-1 text-center text-base text-gray-800 dark:text-dark-150;
         svg {
-            @apply w-auto h-4;
+            @apply h-4 w-auto;
         }
     }
 
@@ -53,7 +55,7 @@
     }
 
     .bard-toolbar-button.active {
-        @apply bg-gray-300 dark:bg-dark-800 text-black dark:text-dark-100;
+        @apply bg-gray-300 text-black dark:bg-dark-800 dark:text-dark-100;
     }
 
     .bard-toolbar-button:focus {
@@ -79,12 +81,12 @@
 }
 
 .bard-fixed-toolbar.dark {
-    @apply bg-black rounded-full shadow-lg px-4;
+    @apply rounded-full bg-black px-4 shadow-lg;
 
     button {
-        @apply text-gray-700 rounded px-1 flex items-center justify-center text-base text-center bg-transparent h-8 w-8 my-0 mx-0.5 outline-none;
+        @apply mx-0.5 my-0 flex h-8 w-8 items-center justify-center rounded bg-transparent px-1 text-center text-base text-gray-700 outline-none;
         svg {
-            @apply w-auto h-4;
+            @apply h-4 w-auto;
         }
     }
 
@@ -100,23 +102,33 @@
 }
 
 /*  Fixed toolbar inside a stack */
-.stack-content .bard-fixed-toolbar { top: -24px; }
+.stack-content .bard-fixed-toolbar {
+    top: -24px;
+}
 
 /*  Responive Wangjangling */
 @screen md {
     /*  Fixed toolbar below fixed global header */
-    .bard-fixed-toolbar { top: 52px; }
-    .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar { top: 92px; }
+    .bard-fixed-toolbar {
+        top: 52px;
+    }
+    .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar {
+        top: 92px;
+    }
 
     /*  Fixed toolbar inside a stack */
-    .stack-content .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar { top: 16px; }
+    .stack-content .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar {
+        top: 16px;
+    }
 
     /* We don't need the `top` when in Live Preview */
-    .live-preview .bard-fixed-toolbar { top: 0; }
+    .live-preview .bard-fixed-toolbar {
+        top: 0;
+    }
 }
 
 .bard-floating-toolbar {
-    @apply flex bg-black rounded-full shadow-lg px-0;
+    @apply flex rounded-full bg-black px-0 shadow-lg;
     white-space: nowrap;
 
     &:before {
@@ -125,16 +137,20 @@
         border-top-color: black;
         position: absolute;
         top: 100%;
-        left: 50% ; [dir="rtl"] & { left: auto ; right: 50% ; }
-        margin-left: -3px
+        left: 50%;
+        [dir='rtl'] & {
+            left: auto;
+            right: 50%;
+        }
+        margin-left: -3px;
     }
 
     .bard-toolbar-button {
-        @apply text-gray-200 h-10 w-10 text-center bg-black rounded-lg flex items-center justify-center;
+        @apply flex h-10 w-10 items-center justify-center rounded-lg bg-black text-center text-gray-200;
         font-size: 16px;
-        transition: all .1s ease-in-out;
+        transition: all 0.1s ease-in-out;
         svg {
-            @apply w-4 h-4;
+            @apply h-4 w-4;
         }
     }
 
@@ -163,11 +179,11 @@
 }
 
 .bard-add-set-button {
-    @apply flex items-center justify-center absolute rtl:-right-4 ltr:-left-4 top-[-6px] z-1;
+    @apply absolute top-[-6px] z-1 flex items-center justify-center ltr:-left-4 rtl:-right-4;
 }
 
 .bard-footer-toolbar {
-    @apply bg-white dark:bg-dark-550 shadow-none text-gray-700 dark:text-dark-175 rounded-b border-t dark:border-dark-300 text-xs p-2 flex items-center justify-between;
+    @apply flex items-center justify-between rounded-b border-t bg-white p-2 text-xs text-gray-700 shadow-none dark:border-dark-300 dark:bg-dark-550 dark:text-dark-175;
     padding: 8px 12px;
 
     .bard-fullscreen & {
@@ -192,8 +208,16 @@
     /*  transition: all .15s ease-in-out; */
 
     .dropdown-menu {
-        left: -5px ; [dir="rtl"] & { left: auto ; right: -5px ; }
-        right: auto ; [dir="rtl"] & { right: auto ; left: auto ; }
+        left: -5px;
+        [dir='rtl'] & {
+            left: auto;
+            right: -5px;
+        }
+        right: auto;
+        [dir='rtl'] & {
+            right: auto;
+            left: auto;
+        }
     }
 }
 
@@ -201,19 +225,18 @@
     min-width: 320px !important;
 }
 
-
 /* Fullscreen mode
    ========================================================================== */
 
 .bard-fullscreen {
-    @apply fixed bg-gray-200 dark:bg-dark-700 inset-0 min-h-screen overflow-scroll rounded-none pt-14;
+    @apply fixed inset-0 min-h-screen overflow-scroll rounded-none bg-gray-200 pt-14 dark:bg-dark-700;
 
     & > .bard-editor {
-        @apply bg-white dark:bg-dark-800 shadow dark:shadow-dark max-w-xl mx-auto rounded relative my-6 px-8;
+        @apply relative mx-auto my-6 max-w-xl rounded bg-white px-8 shadow dark:bg-dark-800 dark:shadow-dark;
     }
 
     & > .bard-fixed-toolbar {
-        @apply shadow dark:shadow-dark h-12 fixed w-full bg-gradient-to-b from-white to-gray-100 dark:from-dark-400 dark:to-dark-500;
+        @apply fixed h-12 w-full bg-gradient-to-b from-white to-gray-100 shadow dark:from-dark-400 dark:to-dark-500 dark:shadow-dark;
         padding: 7px 8px;
         top: 0;
         z-index: 999;
@@ -240,19 +263,28 @@
     }
 
     .bard-set-selector {
-        @apply rtl:mr-6 ltr:ml-6;
+        @apply ltr:ml-6 rtl:mr-6;
     }
 
     .bard-field-options {
-        @apply fixed top-0 inset-x-0 bg-gray-700 p-4 w-full;
+        @apply fixed inset-x-0 top-0 w-full bg-gray-700 p-4;
         @apply ltr:text-right rtl:text-left;
         z-index: 1; /*  to appear over the top of .bard-editor */
 
-        .icon { font-size: 24px; }
-        a { margin-left: 16px ; [dir="rtl"] & { margin-right: 16px ; margin-left: 0 ; } color: #fff; opacity: 1; }
+        .icon {
+            font-size: 24px;
+        }
+        a {
+            margin-left: 16px;
+            [dir='rtl'] & {
+                margin-right: 16px;
+                margin-left: 0;
+            }
+            color: #fff;
+            opacity: 1;
+        }
     }
 }
-
 
 /* Typography
    -
@@ -272,21 +304,25 @@
         text-size-adjust: 100%;
     }
 
-
     blockquote,
     ol,
     p,
     ul {
         margin-top: 0;
-        margin-bottom: .85em;
+        margin-bottom: 0.85em;
 
         b,
-        strong { font-weight: 700; }
+        strong {
+            font-weight: 700;
+        }
 
-        em, i { font-style: italic }
+        em,
+        i {
+            font-style: italic;
+        }
 
         a {
-            @apply text-blue dark:text-dark-blue-100 underline break-words;
+            @apply break-words text-blue underline dark:text-dark-blue-100;
         }
 
         a:active,
@@ -309,7 +345,7 @@
     ul li {
         > p {
             margin-top: 0;
-            margin-bottom: .85em;
+            margin-bottom: 0.85em;
         }
     }
 
@@ -325,16 +361,21 @@
     hr:after,
     hr:before {
         display: table;
-        content: " ";
+        content: ' ';
     }
 
     hr:after {
-        clear: both
+        clear: both;
     }
 
-    h1, h2, h3, h4, h5, h6 {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
         margin-top: 1.275em;
-        margin-bottom: .85em;
+        margin-bottom: 0.85em;
         font-weight: 700;
 
         b,
@@ -343,7 +384,7 @@
         }
 
         a {
-            @apply text-blue dark:text-dark-blue-100 underline break-words;
+            @apply break-words text-blue underline dark:text-dark-blue-100;
         }
 
         a:active,
@@ -354,15 +395,25 @@
         }
     }
 
-    h1 { font-size: 2em }
+    h1 {
+        font-size: 2em;
+    }
 
-    h2 { font-size: 1.75em }
+    h2 {
+        font-size: 1.75em;
+    }
 
-    h3 { font-size: 1.5em }
+    h3 {
+        font-size: 1.5em;
+    }
 
-    h4 { font-size: 1.25em }
+    h4 {
+        font-size: 1.25em;
+    }
 
-    h5 { font-size: 1em }
+    h5 {
+        font-size: 1em;
+    }
 
     h6 {
         font-size: 1em;
@@ -394,10 +445,13 @@
     ul,
     blockquote ol,
     blockquote ul {
-        margin: 0 0 .85em;
+        margin: 0 0 0.85em;
         padding: 0 0 0 2em;
 
-        [dir="rtl"] & { padding-right: 2em ; padding-left: 0 ; }
+        [dir='rtl'] & {
+            padding-right: 2em;
+            padding-left: 0;
+        }
     }
 
     .tableWrapper table ol,
@@ -405,7 +459,10 @@
         margin: 0;
         padding: 0 0 0 2em;
 
-        [dir="rtl"] & { padding-right: 2em ; padding-left: 0 ; }
+        [dir='rtl'] & {
+            padding-right: 2em;
+            padding-left: 0;
+        }
     }
 
     ol ol,
@@ -414,7 +471,11 @@
     ul ul {
         margin-top: 0;
         margin-bottom: 0;
-        padding-left: 2em ; [dir="rtl"] & { padding-right: 2em ; padding-left: 0 ; }
+        padding-left: 2em;
+        [dir='rtl'] & {
+            padding-right: 2em;
+            padding-left: 0;
+        }
     }
 
     ul ul {
@@ -434,8 +495,8 @@
     }
 
     blockquote {
-        @apply text-gray-800 dark:text-dark-150 rtl:border-r-4 ltr:border-l-4 border-blue dark:border-dark-blue-100 px-4;
-        margin: 0 0 .85em;
+        @apply border-blue px-4 text-gray-800 dark:border-dark-blue-100 dark:text-dark-150 ltr:border-l-4 rtl:border-r-4;
+        margin: 0 0 0.85em;
     }
 
     blockquote:first-child {
@@ -450,16 +511,17 @@
     blockquote > .tableWrapper table,
     ol li > .tableWrapper table,
     ul li > .tableWrapper table {
-        @apply w-full overflow-hidden m-0 mb-4 bg-white dark:bg-dark-500 text-sm ;
+        @apply m-0 mb-4 w-full overflow-hidden bg-white text-sm dark:bg-dark-500;
         border-collapse: collapse;
         table-layout: fixed;
 
         th {
-            @apply font-bold rtl:text-right ltr:text-left bg-gray-200 dark:bg-dark-575;
+            @apply bg-gray-200 font-bold dark:bg-dark-575 ltr:text-left rtl:text-right;
         }
 
-        td, th {
-            @apply border dark:border-dark-200 align-top relative py-1 px-2;
+        td,
+        th {
+            @apply relative border px-2 py-1 align-top dark:border-dark-200;
             min-width: 1em;
         }
 
@@ -467,13 +529,13 @@
             @apply relative;
 
             &:after {
-                @apply bg-gray-400 dark:bg-dark-200 absolute inset-0 pointer-events-none opacity-25;
+                @apply pointer-events-none absolute inset-0 bg-gray-400 opacity-25 dark:bg-dark-200;
                 content: '';
             }
         }
 
         a {
-            @apply text-blue dark:text-dark-blue-100 underline break-words;
+            @apply break-words text-blue underline dark:text-dark-blue-100;
         }
 
         a:active,
@@ -485,17 +547,17 @@
     }
 
     p > code {
-        @apply font-mono bg-gray-400 dark:bg-dark-750 rounded-sm text-xs;
+        @apply rounded-sm bg-gray-400 font-mono text-xs dark:bg-dark-750;
         padding: 2px 4px;
         top: -1px;
     }
 
     pre {
-        margin-bottom: .85em;
+        margin-bottom: 0.85em;
     }
 
     pre code {
-        @apply font-mono bg-gray-400 dark:bg-dark-950 dark:text-dark-100 text-xs p-4 block w-full rounded;
+        @apply block w-full rounded bg-gray-400 p-4 font-mono text-xs dark:bg-dark-950 dark:text-dark-100;
         line-height: 1.8;
     }
 }
@@ -506,7 +568,10 @@
 .bard-fieldtype .ProseMirror > p.is-editor-empty:first-child::before {
     @apply text-gray-600 dark:text-dark-200;
     content: attr(data-placeholder);
-    float: left ; [dir="rtl"] & { float: right ; }
+    float: left;
+    [dir='rtl'] & {
+        float: right;
+    }
     height: 0;
     pointer-events: none;
 }
@@ -514,10 +579,9 @@
 /* Link toolbar
   ========================================================================== */
 
-  .bard-link-toolbar {
-
+.bard-link-toolbar {
     .input {
-        @apply p-0 text-xs h-8 bg-transparent shadow-none border-none;
+        @apply h-8 border-none bg-transparent p-0 text-xs shadow-none;
         width: 240px;
         outline: none;
     }
@@ -533,7 +597,7 @@
 }
 
 .bard-inline-image-container {
-    @apply relative bg-white dark:bg-dark-600 border dark:border-dark-900 rounded whitespace-normal mb-6;
+    @apply relative mb-6 whitespace-normal rounded border bg-white dark:border-dark-900 dark:bg-dark-600;
     &:hover {
         cursor: grab;
     }
@@ -552,8 +616,12 @@
     }
 
     table .column-resize-handle {
-        @apply absolute top-0 bottom-0 pointer-events-none bg-blue-200;
+        @apply pointer-events-none absolute bottom-0 top-0 bg-blue-200;
         width: 3px;
-        right: -2px ; [dir="rtl"] & { right: auto ; left: -2px ; }
+        right: -2px;
+        [dir='rtl'] & {
+            right: auto;
+            left: -2px;
+        }
     }
 }

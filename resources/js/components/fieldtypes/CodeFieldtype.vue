@@ -1,72 +1,82 @@
 <template>
-
-<portal name="code-fullscreen" :disabled="!fullScreenMode" target-class="code-fieldtype">
-<element-container @resized="refresh">
-    <div class="code-fieldtype-container" :class="[themeClass, {'code-fullscreen': fullScreenMode }]">
-        <publish-field-fullscreen-header
-            v-if="fullScreenMode"
-            :title="config.display"
-            :field-actions="fieldActions"
-            @close="toggleFullscreen">
-            <div class="code-fieldtype-toolbar-fullscreen">
-                <div>
-                    <select-input v-if="config.mode_selectable" :options="modes" v-model="mode" :is-read-only="isReadOnly" class="text-xs leading-none" />
-                    <div v-else v-text="modeLabel" class="text-xs font-mono text-gray-700"></div>
+    <portal name="code-fullscreen" :disabled="!fullScreenMode" target-class="code-fieldtype">
+        <element-container @resized="refresh">
+            <div class="code-fieldtype-container" :class="[themeClass, { 'code-fullscreen': fullScreenMode }]">
+                <publish-field-fullscreen-header
+                    v-if="fullScreenMode"
+                    :title="config.display"
+                    :field-actions="fieldActions"
+                    @close="toggleFullscreen"
+                >
+                    <div class="code-fieldtype-toolbar-fullscreen">
+                        <div>
+                            <select-input
+                                v-if="config.mode_selectable"
+                                :options="modes"
+                                v-model="mode"
+                                :is-read-only="isReadOnly"
+                                class="text-xs leading-none"
+                            />
+                            <div v-else v-text="modeLabel" class="font-mono text-xs text-gray-700"></div>
+                        </div>
+                    </div>
+                </publish-field-fullscreen-header>
+                <div class="code-fieldtype-toolbar" v-if="!fullScreenMode">
+                    <div>
+                        <select-input
+                            v-if="config.mode_selectable"
+                            :options="modes"
+                            v-model="mode"
+                            :is-read-only="isReadOnly"
+                            class="text-xs leading-none"
+                        />
+                        <div v-else v-text="modeLabel" class="font-mono text-xs text-gray-700"></div>
+                    </div>
                 </div>
+                <div ref="codemirror"></div>
             </div>
-        </publish-field-fullscreen-header>
-        <div class="code-fieldtype-toolbar" v-if="!fullScreenMode">
-            <div>
-                <select-input v-if="config.mode_selectable" :options="modes" v-model="mode" :is-read-only="isReadOnly" class="text-xs leading-none" />
-                <div v-else v-text="modeLabel" class="text-xs font-mono text-gray-700"></div>
-            </div>
-        </div>
-        <div ref="codemirror"></div>
-    </div>
-</element-container>
-</portal>
-
+        </element-container>
+    </portal>
 </template>
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import CodeMirror from 'codemirror'
-import { markRaw } from 'vue'
+import CodeMirror from 'codemirror';
+import { markRaw } from 'vue';
 
 // Addons
-import 'codemirror/addon/edit/matchbrackets'
-import 'codemirror/addon/display/fullscreen'
-import 'codemirror/addon/display/rulers'
+import 'codemirror/addon/edit/matchbrackets';
+import 'codemirror/addon/display/fullscreen';
+import 'codemirror/addon/display/rulers';
 
 // Keymaps
-import 'codemirror/keymap/sublime'
-import 'codemirror/keymap/vim'
+import 'codemirror/keymap/sublime';
+import 'codemirror/keymap/vim';
 
 // Modes
-import 'codemirror/mode/css/css'
-import 'codemirror/mode/clike/clike'
-import 'codemirror/mode/diff/diff'
-import 'codemirror/mode/go/go'
-import 'codemirror/mode/gfm/gfm'
-import 'codemirror/mode/handlebars/handlebars'
-import 'codemirror/mode/haml/haml'
-import 'codemirror/mode/htmlmixed/htmlmixed'
-import 'codemirror/mode/javascript/javascript'
-import 'codemirror/mode/markdown/markdown'
-import 'codemirror/mode/nginx/nginx'
-import 'codemirror/mode/php/php'
-import 'codemirror/mode/python/python'
-import 'codemirror/mode/ruby/ruby'
-import 'codemirror/mode/shell/shell'
-import 'codemirror/mode/sql/sql'
-import 'codemirror/mode/twig/twig'
-import 'codemirror/mode/vue/vue'
-import 'codemirror/mode/xml/xml'
-import 'codemirror/mode/yaml/yaml'
-import 'codemirror/mode/yaml-frontmatter/yaml-frontmatter'
+import 'codemirror/mode/css/css';
+import 'codemirror/mode/clike/clike';
+import 'codemirror/mode/diff/diff';
+import 'codemirror/mode/go/go';
+import 'codemirror/mode/gfm/gfm';
+import 'codemirror/mode/handlebars/handlebars';
+import 'codemirror/mode/haml/haml';
+import 'codemirror/mode/htmlmixed/htmlmixed';
+import 'codemirror/mode/javascript/javascript';
+import 'codemirror/mode/markdown/markdown';
+import 'codemirror/mode/nginx/nginx';
+import 'codemirror/mode/php/php';
+import 'codemirror/mode/python/python';
+import 'codemirror/mode/ruby/ruby';
+import 'codemirror/mode/shell/shell';
+import 'codemirror/mode/sql/sql';
+import 'codemirror/mode/twig/twig';
+import 'codemirror/mode/vue/vue';
+import 'codemirror/mode/xml/xml';
+import 'codemirror/mode/yaml/yaml';
+import 'codemirror/mode/yaml-frontmatter/yaml-frontmatter';
 
 export default {
-
     mixins: [Fieldtype],
 
     data() {
@@ -101,7 +111,7 @@ export default {
             ],
             mode: this.value.mode || this.config.mode,
             fullScreenMode: false,
-        }
+        };
     },
 
     computed: {
@@ -109,13 +119,13 @@ export default {
             return _.findWhere(this.modes, { value: this.mode }).label || this.mode;
         },
         exactTheme() {
-            return (this.config.theme === 'light') ? 'default' : 'material'
+            return this.config.theme === 'light' ? 'default' : 'material';
         },
         themeClass() {
             return 'theme-' + this.config.theme;
         },
         replicatorPreview() {
-            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
 
             return this.value.code ? truncate(this.value.code, 60) : '';
         },
@@ -127,9 +137,7 @@ export default {
                 return [];
             }
 
-            let rulerColor = (this.config.theme === 'light')
-                ? '#d1d5db'
-                : '#546e7a';
+            let rulerColor = this.config.theme === 'light' ? '#d1d5db' : '#546e7a';
 
             return Object.entries(this.config.rulers).map(([column, style]) => {
                 let lineStyle = style === 'dashed' ? 'dashed' : 'solid';
@@ -145,7 +153,7 @@ export default {
             return [
                 {
                     title: __('Toggle Fullscreen Mode'),
-                    icon: ({ vm }) => vm.fullScreenMode ? 'shrink-all' : 'expand-bold',
+                    icon: ({ vm }) => (vm.fullScreenMode ? 'shrink-all' : 'expand-bold'),
                     quick: true,
                     visibleWhenReadOnly: true,
                     run: this.toggleFullscreen,
@@ -157,7 +165,7 @@ export default {
     watch: {
         value(value, oldValue) {
             if (value.code == this.codemirror.doc.getValue()) return;
-            if (! value.code) value.code = '';
+            if (!value.code) value.code = '';
 
             this.codemirror.doc.setValue(value.code);
         },
@@ -166,7 +174,7 @@ export default {
         },
         mode(mode) {
             this.codemirror.setOption('mode', mode);
-            this.updateDebounced({code: this.value.code, mode: this.mode});
+            this.updateDebounced({ code: this.value.code, mode: this.mode });
         },
     },
 
@@ -179,35 +187,36 @@ export default {
             this.codemirror.focus();
         },
         refresh() {
-            this.$nextTick(function() {
+            this.$nextTick(function () {
                 this.codemirror.refresh();
-            })
+            });
         },
         initCodeMirror() {
-            this.codemirror = markRaw(CodeMirror(this.$refs.codemirror, {
-                value: this.value.code || '',
-                mode: this.mode,
-                direction: document.querySelector('html').getAttribute('dir') ?? 'ltr',
-                addModeClass: true,
-                keyMap: this.config.key_map,
-                tabSize: this.config.indent_size,
-                indentWithTabs: this.config.indent_type !== 'spaces',
-                lineNumbers: this.config.line_numbers,
-                lineWrapping: this.config.line_wrapping,
-                matchBrackets: true,
-                readOnly: this.readOnlyOption,
-                theme: this.exactTheme,
-                inputStyle: 'contenteditable',
-                rulers: this.rulers,
-            }));
+            this.codemirror = markRaw(
+                CodeMirror(this.$refs.codemirror, {
+                    value: this.value.code || '',
+                    mode: this.mode,
+                    direction: document.querySelector('html').getAttribute('dir') ?? 'ltr',
+                    addModeClass: true,
+                    keyMap: this.config.key_map,
+                    tabSize: this.config.indent_size,
+                    indentWithTabs: this.config.indent_type !== 'spaces',
+                    lineNumbers: this.config.line_numbers,
+                    lineWrapping: this.config.line_wrapping,
+                    matchBrackets: true,
+                    readOnly: this.readOnlyOption,
+                    theme: this.exactTheme,
+                    inputStyle: 'contenteditable',
+                    rulers: this.rulers,
+                }),
+            );
 
             this.codemirror.on('change', (cm) => {
-                this.updateDebounced({code: cm.doc.getValue(), mode: this.mode});
+                this.updateDebounced({ code: cm.doc.getValue(), mode: this.mode });
             });
 
             this.codemirror.on('focus', () => this.$emit('focus'));
             this.codemirror.on('blur', () => this.$emit('blur'));
-
 
             // Refresh to ensure CodeMirror visible and the proper size
             // Most applicable when loaded by another field like Bard
@@ -225,6 +234,6 @@ export default {
         toggleFullscreen() {
             this.fullScreenMode = !this.fullScreenMode;
         },
-    }
+    },
 };
 </script>

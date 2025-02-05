@@ -2,7 +2,6 @@ import Portal from './Portal';
 import { ref } from 'vue';
 
 export default class Portals {
-
     constructor() {
         this.portals = ref([]);
     }
@@ -26,6 +25,6 @@ export default class Portals {
     }
 
     stacks() {
-        return this.portals.value.filter(portal => portal.data?.type === 'stack');
+        return this.portals.value.filter((portal) => portal.data?.type === 'stack');
     }
 }

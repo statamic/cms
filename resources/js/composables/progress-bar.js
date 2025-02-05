@@ -27,7 +27,7 @@ function add(name) {
 }
 
 function remove(name) {
-    const newValues = [...progressNames.value]
+    const newValues = [...progressNames.value];
     const i = newValues.indexOf(name);
 
     if (i === -1) return;
@@ -48,15 +48,19 @@ function isComplete() {
     return count() === 0;
 }
 
-watch(names, (newNames) => {
-    if (newNames.length > 0 && !progressing.value) {
-        start();
-    }
+watch(
+    names,
+    (newNames) => {
+        if (newNames.length > 0 && !progressing.value) {
+            start();
+        }
 
-    if (newNames.length === 0 && progressing.value) {
-        stop();
-    }
-}, { immediate: true })
+        if (newNames.length === 0 && progressing.value) {
+            stop();
+        }
+    },
+    { immediate: true },
+);
 
 export default function useProgressBar() {
     return {
@@ -66,5 +70,5 @@ export default function useProgressBar() {
         names,
         count,
         isComplete,
-    }
+    };
 }

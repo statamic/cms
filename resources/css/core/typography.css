@@ -3,13 +3,20 @@
    ========================================================================== */
 
 body {
-    @apply font-sans text-gray-900 text-base tracking-normal dark:text-dark-100;
+    @apply font-sans text-base tracking-normal text-gray-900 dark:text-dark-100;
     font-variant: common-ligatures tabular-nums;
-    font-feature-settings: "zero", "ss01", "calt" off;
-
+    font-feature-settings:
+        'zero',
+        'ss01',
+        'calt' off;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     @apply m-0 antialiased;
 }
 
@@ -41,8 +48,8 @@ h6 {
     @apply text-3xs font-bold uppercase tracking-widest;
 }
 
-a:not([class^="btn"]) {
-    @apply text-gray-800 dark:text-dark-150 cursor-pointer;
+a:not([class^='btn']) {
+    @apply cursor-pointer text-gray-800 dark:text-dark-150;
 
     &:hover {
         @apply text-blue dark:text-blue-300;
@@ -54,12 +61,19 @@ a:not([class^="btn"]) {
         @apply mb-2 font-medium;
     }
 
-    h2, h3, h4, h5, h6 {
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
         @apply mb-2 font-bold;
     }
 
-    p, ol, ul, pre {
-        @apply text-gray-700 text-sm leading-normal mb-2 dark:text-dark-150;
+    p,
+    ol,
+    ul,
+    pre {
+        @apply mb-2 text-sm leading-normal text-gray-700 dark:text-dark-150;
 
         a {
             @apply text-blue;
@@ -100,7 +114,7 @@ a:focus {
 
 .subhead {
     font-size: 11px;
-    letter-spacing: .1em;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
 }
 
@@ -111,7 +125,10 @@ sup {
 .little-heading {
     font-size: 11px;
     font-weight: bold;
-    padding: 15px 0 0 20px ; [dir="rtl"] & { padding: 15px 20px 0 0 ; }
+    padding: 15px 0 0 20px;
+    [dir='rtl'] & {
+        padding: 15px 20px 0 0;
+    }
     letter-spacing: 1px;
     text-transform: uppercase;
 }
@@ -121,7 +138,7 @@ sup {
 }
 
 code {
-    @apply font-mono rounded text-[#c7254e] dark:text-blue-400 dark:bg-dark-700;
+    @apply rounded font-mono text-[#c7254e] dark:bg-dark-700 dark:text-blue-400;
     padding: 2px 4px;
     font-size: 90%;
     background-color: #f9f2f4;
@@ -129,5 +146,7 @@ code {
 
 .help-block {
     width: 100%;
-    p { @apply mb-2 }
+    p {
+        @apply mb-2;
+    }
 }

@@ -9,14 +9,15 @@ export default function registerVueSelect(app) {
             render: () => h('span', __('×')),
         },
         OpenIndicator: {
-            render: () => h(
-                'span',
-                {
-                    class: { 'toggle': true },
-                },
-                h(OpenChevron)
-            )
-        }
+            render: () =>
+                h(
+                    'span',
+                    {
+                        class: { toggle: true },
+                    },
+                    h(OpenChevron),
+                ),
+        },
     });
 
     app.component('v-select', VueSelect);

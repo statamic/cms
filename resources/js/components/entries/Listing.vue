@@ -15,9 +15,11 @@
             @visible-columns-updated="visibleColumns = $event"
         >
             <div>
-                <div class="card overflow-hidden p-0 relative">
-                    <div v-if="!reordering" class="flex flex-wrap items-center justify-between px-2 pb-2 text-sm border-b dark:border-dark-900">
-
+                <div class="card relative overflow-hidden p-0">
+                    <div
+                        v-if="!reordering"
+                        class="flex flex-wrap items-center justify-between border-b px-2 pb-2 text-sm dark:border-dark-900"
+                    >
                         <data-list-filter-presets
                             ref="presets"
                             :active-preset="activePreset"
@@ -30,11 +32,26 @@
                             @reset="filtersReset"
                         />
 
-                        <data-list-search class="h-8 mt-2 min-w-[240px] w-full" ref="search" v-model="searchQuery" :placeholder="searchPlaceholder" />
+                        <data-list-search
+                            class="mt-2 h-8 w-full min-w-[240px]"
+                            ref="search"
+                            v-model="searchQuery"
+                            :placeholder="searchPlaceholder"
+                        />
 
-                        <div class="flex space-x-2 rtl:space-x-reverse mt-2">
-                            <button class="btn btn-sm rtl:mr-2 ltr:ml-2" v-text="__('Reset')" v-show="isDirty" @click="$refs.presets.refreshPreset()" />
-                            <button class="btn btn-sm rtl:mr-2 ltr:ml-2" v-text="__('Save')" v-show="isDirty" @click="$refs.presets.savePreset()" />
+                        <div class="mt-2 flex space-x-2 rtl:space-x-reverse">
+                            <button
+                                class="btn btn-sm ltr:ml-2 rtl:mr-2"
+                                v-text="__('Reset')"
+                                v-show="isDirty"
+                                @click="$refs.presets.refreshPreset()"
+                            />
+                            <button
+                                class="btn btn-sm ltr:ml-2 rtl:mr-2"
+                                v-text="__('Save')"
+                                v-show="isDirty"
+                                @click="$refs.presets.savePreset()"
+                            />
                             <data-list-column-picker :preferences-key="preferencesKey('columns')" />
                         </div>
                     </div>
@@ -77,21 +94,43 @@
                             @reordered="reordered"
                         >
                             <template #cell-title="{ row: entry }">
-                                <a class="title-index-field inline-flex items-center" :href="entry.edit_url" @click.stop>
-                                    <span class="little-dot rtl:ml-2 ltr:mr-2" v-tooltip="getStatusLabel(entry)" :class="getStatusClass(entry)" v-if="! columnShowing('status')" />
+                                <a
+                                    class="title-index-field inline-flex items-center"
+                                    :href="entry.edit_url"
+                                    @click.stop
+                                >
+                                    <span
+                                        class="little-dot ltr:mr-2 rtl:ml-2"
+                                        v-tooltip="getStatusLabel(entry)"
+                                        :class="getStatusClass(entry)"
+                                        v-if="!columnShowing('status')"
+                                    />
                                     <span v-text="entry.title" />
                                 </a>
                             </template>
                             <template #cell-status="{ row: entry }">
-                                <div class="status-index-field select-none" v-tooltip="getStatusTooltip(entry)" :class="`status-${entry.status}`" v-text="getStatusLabel(entry)" />
+                                <div
+                                    class="status-index-field select-none"
+                                    v-tooltip="getStatusTooltip(entry)"
+                                    :class="`status-${entry.status}`"
+                                    v-text="getStatusLabel(entry)"
+                                />
                             </template>
                             <template #cell-slug="{ row: entry }">
                                 <div class="slug-index-field" :title="entry.slug">{{ entry.slug }}</div>
                             </template>
                             <template #actions="{ row: entry, index }">
                                 <dropdown-list placement="left-start">
-                                    <dropdown-item :text="__('View')" :external-link="entry.permalink" v-if="entry.viewable && entry.permalink" />
-                                    <dropdown-item :text="__('Edit')" :redirect="entry.edit_url" v-if="entry.editable" />
+                                    <dropdown-item
+                                        :text="__('View')"
+                                        :external-link="entry.permalink"
+                                        v-if="entry.viewable && entry.permalink"
+                                    />
+                                    <dropdown-item
+                                        :text="__('Edit')"
+                                        :redirect="entry.edit_url"
+                                        v-if="entry.editable"
+                                    />
                                     <div class="divider" v-if="entry.actions.length" />
                                     <data-list-inline-actions
                                         :item="entry.id"
@@ -122,7 +161,6 @@
 import Listing from '../Listing.vue';
 
 export default {
-
     mixins: [Listing],
 
     props: {
@@ -141,17 +179,16 @@ export default {
             initialSite: this.site,
             pushQuery: true,
             previousFilters: null,
-        }
+        };
     },
 
     computed: {
         actionContext() {
-            return {collection: this.collection};
+            return { collection: this.collection };
         },
     },
 
     watch: {
-
         reordering(reordering, wasReordering) {
             if (reordering === wasReordering) return;
             reordering ? this.reorder() : this.cancelReordering();
@@ -161,7 +198,7 @@ export default {
             deep: true,
             handler(filters) {
                 this.currentSite = filters.site ? filters.site.site : null;
-            }
+            },
         },
 
         site(site) {
@@ -171,12 +208,10 @@ export default {
         currentSite(site) {
             this.setSiteFilter(site);
             this.$emit('site-changed', site);
-        }
-
+        },
     },
 
     methods: {
-
         getStatusClass(entry) {
             // TODO: Replace with `entry.status` (will need to pass down)
             if (entry.published && entry.private) {
@@ -202,13 +237,11 @@ export default {
 
         getStatusTooltip(entry) {
             if (entry.status === 'published') {
-                return entry.collection.dated
-                    ? __('messages.status_published_with_date', {date: entry.date})
-                    : null; // The label is sufficient.
+                return entry.collection.dated ? __('messages.status_published_with_date', { date: entry.date }) : null; // The label is sufficient.
             } else if (entry.status === 'scheduled') {
-                return __('messages.status_scheduled_with_date', {date: entry.date})
+                return __('messages.status_scheduled_with_date', { date: entry.date });
             } else if (entry.status === 'expired') {
-                return __('messages.status_expired_with_date', {date: entry.date})
+                return __('messages.status_expired_with_date', { date: entry.date });
             } else if (entry.status === 'draft') {
                 return null; // The label is sufficient.
             }
@@ -235,7 +268,7 @@ export default {
         },
 
         columnShowing(column) {
-            return this.visibleColumns.find(c => c.field === column);
+            return this.visibleColumns.find((c) => c.field === column);
         },
 
         reordered(items) {
@@ -243,23 +276,24 @@ export default {
         },
 
         setSiteFilter(site) {
-            this.filterChanged({ handle: 'site', values: { site }});
+            this.filterChanged({ handle: 'site', values: { site } });
         },
 
         saveOrder() {
             const payload = {
-                ids: this.items.map(item => item.id),
+                ids: this.items.map((item) => item.id),
                 page: this.page,
                 perPage: this.perPage,
-                site: this.currentSite
+                site: this.currentSite,
             };
 
-            this.$axios.post(this.reorderUrl, payload)
-                .then(response => {
+            this.$axios
+                .post(this.reorderUrl, payload)
+                .then((response) => {
                     this.$emit('reordered');
-                    this.$toast.success(__('Entries successfully reordered'))
+                    this.$toast.success(__('Entries successfully reordered'));
                 })
-                .catch(e => {
+                .catch((e) => {
                     console.log(e);
                     this.$toast.error(__('Something went wrong'));
                 });
@@ -271,8 +305,7 @@ export default {
             if (this.previousFilters) this.filtersChanged(this.previousFilters);
 
             this.previousFilters = null;
-        }
-    }
-
-}
+        },
+    },
+};
 </script>

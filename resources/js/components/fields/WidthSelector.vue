@@ -1,10 +1,6 @@
 <template>
-    <div
-        class="field-width field-width-selector"
-        @mouseenter="isHovering = true"
-        @mouseleave="isHovering = false"
-    >
-        <div class="w-full flex">
+    <div class="field-width field-width-selector" @mouseenter="isHovering = true" @mouseleave="isHovering = false">
+        <div class="flex w-full">
             <div
                 v-for="width in widths"
                 :key="width"
@@ -13,7 +9,7 @@
                 :class="[
                     'field-width-notch',
                     'notch-' + width,
-                    { 'filled': selected >= width, 'selected': selected == width }
+                    { filled: selected >= width, selected: selected == width },
                 ]"
             />
         </div>
@@ -25,30 +21,24 @@
 export default {
     emits: ['update:model-value'],
 
-    props: [
-        'modelValue',
-        'initialWidths'
-    ],
+    props: ['modelValue', 'initialWidths'],
 
     data() {
         return {
             isHovering: false,
             hoveringOver: null,
-            widths: this.initialWidths ?? [25, 33, 50, 66, 75, 100]
-        }
+            widths: this.initialWidths ?? [25, 33, 50, 66, 75, 100],
+        };
     },
 
     computed: {
-
         selected() {
             if (this.isHovering) {
                 return this.hoveringOver;
             }
 
             return this.modelValue;
-        }
-
-    }
-
-}
+        },
+    },
+};
 </script>

@@ -1,5 +1,4 @@
 <template>
-
     <publish-container
         ref="container"
         :name="name"
@@ -14,27 +13,31 @@
         <div>
             <breadcrumbs v-if="breadcrumbs" :crumbs="breadcrumbs" />
 
-            <div class="flex items-center mb-6">
+            <div class="mb-6 flex items-center">
                 <h1 class="flex-1">{{ title }}</h1>
 
-                <div class="rtl:mr-4 ltr:ml-4 rtl:text-right ltr:text-left" :class="{ 'btn-group': hasSaveAsOptions }">
+                <div class="ltr:ml-4 ltr:text-left rtl:mr-4 rtl:text-right" :class="{ 'btn-group': hasSaveAsOptions }">
                     <button
-                        class="btn-primary rtl:pr-4 ltr:pl-4"
-                        :class="{ 'disabled': !isDirty }"
+                        class="btn-primary ltr:pl-4 rtl:pr-4"
+                        :class="{ disabled: !isDirty }"
                         :disabled="!isDirty"
                         @click="save"
-                        v-text="__('Save')" />
+                        v-text="__('Save')"
+                    />
 
-                    <dropdown-list v-if="hasSaveAsOptions" class="rtl:mr-0 ltr:ml-0">
+                    <dropdown-list v-if="hasSaveAsOptions" class="ltr:ml-0 rtl:mr-0">
                         <template #trigger>
-                            <button class="btn-primary rtl:rounded-r-none ltr:rounded-l-none flex items-center">
+                            <button class="btn-primary flex items-center ltr:rounded-l-none rtl:rounded-r-none">
                                 <svg-icon name="micro/chevron-down-xs" class="w-2" />
                             </button>
                         </template>
                         <h6 class="p-2">{{ __('Save to') }}...</h6>
                         <dropdown-item v-for="option in saveAsOptions" :key="option.url" @click="saveAs(option.url)">
-                            <div class="flex items-start rtl:pl-4 ltr:pr-4">
-                                <svg-icon :name="option.icon" class="text-gray shrink-0 rtl:ml-2 ltr:mr-2 w-4 group-hover:text-white" />
+                            <div class="flex items-start ltr:pr-4 rtl:pl-4">
+                                <svg-icon
+                                    :name="option.icon"
+                                    class="w-4 shrink-0 text-gray group-hover:text-white ltr:mr-2 rtl:ml-2"
+                                />
                                 <span class="whitespace-normal">{{ option.label }}</span>
                             </div>
                         </dropdown-item>
@@ -46,15 +49,14 @@
                 @updated="setFieldValue"
                 @meta-updated="setFieldMeta"
                 :enable-sidebar="hasSidebar"
-                :read-only="readOnly" />
+                :read-only="readOnly"
+            />
         </div>
     </publish-container>
-
 </template>
 
 <script>
 export default {
-
     props: {
         blueprint: { required: true, type: Object },
         meta: { required: true, type: Object },
@@ -74,24 +76,21 @@ export default {
             currentValues: this.values,
             error: null,
             errors: {},
-            hasSidebar: this.blueprint.tabs.map(tab => tab.handle).includes('sidebar'),
-        }
+            hasSidebar: this.blueprint.tabs.map((tab) => tab.handle).includes('sidebar'),
+        };
     },
 
     computed: {
-
         hasSaveAsOptions() {
             return this.saveAsOptions.length;
         },
 
         isDirty() {
             return this.$dirty.has(this.name);
-        }
-
+        },
     },
 
     methods: {
-
         clearErrors() {
             this.error = null;
             this.errors = {};
@@ -111,7 +110,7 @@ export default {
                     this.$refs.container.saved();
                     location.reload();
                 })
-                .catch(e => this.handleAxiosError(e));
+                .catch((e) => this.handleAxiosError(e));
         },
 
         handleAxiosError(e) {
@@ -127,23 +126,19 @@ export default {
                 console.log(e);
             }
         },
-
     },
 
     created() {
-        this.$keys.bindGlobal(['mod+s'], e => {
+        this.$keys.bindGlobal(['mod+s'], (e) => {
             e.preventDefault();
             this.save();
         });
     },
 
     watch: {
-
         saving(saving) {
             this.$progress.loading('preferences-edit-form', saving);
-        }
-
+        },
     },
-
-}
+};
 </script>

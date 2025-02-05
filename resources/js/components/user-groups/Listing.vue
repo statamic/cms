@@ -1,5 +1,5 @@
 <template>
-    <data-list :rows="rows" :columns="columns" v-slot="{ }">
+    <data-list :rows="rows" :columns="columns" v-slot="{}">
         <div class="card p-0">
             <data-list-table>
                 <template #cell-title="{ row: group, index }">
@@ -19,7 +19,8 @@
                             <resource-deleter
                                 :ref="`deleter_${group.id}`"
                                 :resource="group"
-                                @deleted="removeRow(group)">
+                                @deleted="removeRow(group)"
+                            >
                             </resource-deleter>
                         </dropdown-item>
                     </dropdown-list>
@@ -30,10 +31,9 @@
 </template>
 
 <script>
-import Listing from '../Listing.vue'
+import Listing from '../Listing.vue';
 
 export default {
-
     mixins: [Listing],
 
     props: {
@@ -48,9 +48,8 @@ export default {
                 { label: __('Handle'), field: 'handle' },
                 { label: __('Users'), field: 'users' },
                 { label: __('Roles'), field: 'roles' },
-            ]
-        }
-    }
-
-}
+            ],
+        };
+    },
+};
 </script>

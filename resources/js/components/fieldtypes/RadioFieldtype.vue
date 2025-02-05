@@ -1,12 +1,12 @@
 <template>
-    <div class="radio-fieldtype-wrapper" :class="{'inline-mode': config.inline}">
+    <div class="radio-fieldtype-wrapper" :class="{ 'inline-mode': config.inline }">
         <div
             v-for="(option, $index) in options"
             :key="$index"
             class="option"
             :class="{
-                'selected': value === option.value,
-                'disabled': isReadOnly
+                selected: value === option.value,
+                disabled: isReadOnly,
             }"
         >
             <label>
@@ -26,7 +26,8 @@
                     v-show="value == option.value"
                     v-cloak
                 />
-                <input type="radio"
+                <input
+                    type="radio"
                     ref="radio"
                     :name="name"
                     @input.stop="update($event.target.value)"
@@ -42,7 +43,7 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import HasInputOptions from './HasInputOptions.js'
+import HasInputOptions from './HasInputOptions.js';
 
 export default {
     mixins: [Fieldtype, HasInputOptions],
@@ -53,19 +54,17 @@ export default {
         },
 
         replicatorPreview() {
-            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
 
-            var option = _.findWhere(this.options, {value: this.value});
-            return (option) ? option.label : this.value;
+            var option = _.findWhere(this.options, { value: this.value });
+            return option ? option.label : this.value;
         },
     },
 
     methods: {
-
         focus() {
             this.$refs.radio[0].focus();
-        }
-
-    }
+        },
+    },
 };
 </script>

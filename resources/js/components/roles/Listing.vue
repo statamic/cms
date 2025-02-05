@@ -1,5 +1,5 @@
 <template>
-    <data-list :rows="rows" :columns="columns" v-slot="{ }">
+    <data-list :rows="rows" :columns="columns" v-slot="{}">
         <div class="card p-0">
             <data-list-table>
                 <template #cell-title="{ row: role, index }">
@@ -16,10 +16,7 @@
                             class="warning"
                             @click="$refs[`deleter_${role.id}`].confirm()"
                         >
-                            <resource-deleter
-                                :ref="`deleter_${role.id}`"
-                                :resource="role"
-                                @deleted="removeRow(role)">
+                            <resource-deleter :ref="`deleter_${role.id}`" :resource="role" @deleted="removeRow(role)">
                             </resource-deleter>
                         </dropdown-item>
                     </dropdown-list>
@@ -30,23 +27,18 @@
 </template>
 
 <script>
-import Listing from '../Listing.vue'
+import Listing from '../Listing.vue';
 
 export default {
-
     mixins: [Listing],
 
-    props: [
-        'initialRows',
-        'initialColumns',
-    ],
+    props: ['initialRows', 'initialColumns'],
 
     data() {
         return {
             rows: this.initialRows,
-            columns: this.initialColumns
-        }
-    }
-
-}
+            columns: this.initialColumns,
+        };
+    },
+};
 </script>

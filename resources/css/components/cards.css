@@ -3,12 +3,14 @@
    ========================================================================== */
 
 .card {
-    @apply shadow bg-white rounded-md p-2;
+    @apply rounded-md bg-white p-2 shadow;
     @apply dark:bg-dark-600 dark:shadow-dark;
 }
 
 @screen md {
-    .card { @apply p-4; }
+    .card {
+        @apply p-4;
+    }
 }
 
 .card-lg {
@@ -16,5 +18,5 @@
 }
 
 .card-lg header {
-    @apply py-6 px-8 border-b dark:bg-dark-650 rounded-t-lg dark:border-dark-800;
+    @apply rounded-t-lg border-b px-8 py-6 dark:border-dark-800 dark:bg-dark-650;
 }

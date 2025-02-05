@@ -1,10 +1,11 @@
-@php use function Statamic\trans as __; @endphp
+@php
+    use function Statamic\trans as __;
+@endphp
 
 @extends('statamic::layout')
 @section('title', __('Edit User'))
 
 @section('content')
-
     <user-publish-form
         :actions="{{ json_encode($actions) }}"
         method="patch"
@@ -20,5 +21,4 @@
         :initial-item-actions="{{ json_encode($itemActions) }}"
         item-action-url="{{ cp_route('users.actions.run') }}"
     ></user-publish-form>
-
 @endsection

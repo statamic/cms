@@ -7,23 +7,22 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import CodeMirror from 'codemirror'
-import 'codemirror/mode/yaml/yaml'
+import CodeMirror from 'codemirror';
+import 'codemirror/mode/yaml/yaml';
 
 export default {
-
     mixins: [Fieldtype],
 
     data() {
         return {
-            codemirror: null
-        }
+            codemirror: null,
+        };
     },
 
     computed: {
         readOnlyOption() {
             return this.isReadOnly ? 'nocursor' : false;
-        }
+        },
     },
 
     mounted() {
@@ -50,14 +49,13 @@ export default {
     watch: {
         readOnlyOption(val) {
             this.codemirror.setOption('readOnly', val);
-        }
+        },
     },
 
     methods: {
         focus() {
             this.codemirror.focus();
-        }
-    }
-
+        },
+    },
 };
 </script>

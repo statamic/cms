@@ -1,5 +1,4 @@
 <template>
-
     <publish-container
         v-if="blueprint"
         ref="container"
@@ -13,8 +12,7 @@
         v-slot="{ setFieldValue }"
     >
         <div>
-
-            <div class="flex items-center mb-6">
+            <div class="mb-6 flex items-center">
                 <h1 class="flex-1">
                     <small class="subhead block">
                         <a :href="listingUrl" v-text="__('Assets')" />
@@ -24,15 +22,13 @@
                 <button type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
             </div>
 
-            <configure-tabs @updated="setFieldValue" :enable-sidebar="false"/>
+            <configure-tabs @updated="setFieldValue" :enable-sidebar="false" />
         </div>
     </publish-container>
-
 </template>
 
 <script>
 export default {
-
     props: {
         blueprint: Object,
         initialValues: Object,
@@ -48,11 +44,10 @@ export default {
             values: this.initialValues,
             error: null,
             errors: {},
-        }
+        };
     },
 
     methods: {
-
         clearErrors() {
             this.error = null;
             this.errors = {};
@@ -62,10 +57,13 @@ export default {
             this.saving = true;
             this.clearErrors();
 
-            this.$axios.post(this.url, this.values).then(response => {
-                this.$refs.container.saved();
-                this.$nextTick(() => window.location = response.data.redirect);
-            }).catch(e => this.handleAxiosError(e));
+            this.$axios
+                .post(this.url, this.values)
+                .then((response) => {
+                    this.$refs.container.saved();
+                    this.$nextTick(() => (window.location = response.data.redirect));
+                })
+                .catch((e) => this.handleAxiosError(e));
         },
 
         handleAxiosError(e) {
@@ -79,8 +77,6 @@ export default {
                 this.$toast.error(__('Something went wrong'));
             }
         },
-
-    }
-
-}
+    },
+};
 </script>

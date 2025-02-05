@@ -1,10 +1,11 @@
 <template>
-    <div class="global-search" :class="{'dirty': isDirty}" v-click-away="reset" v-cloak>
-        <div class="state-container w-4 h-4 text-gray-500 flex items-center" @click="focus">
-            <svg-icon name="light/magnifying-glass" class="w-4 h-4"></svg-icon>
+    <div class="global-search" :class="{ dirty: isDirty }" v-click-away="reset" v-cloak>
+        <div class="state-container flex h-4 w-4 items-center text-gray-500" @click="focus">
+            <svg-icon name="light/magnifying-glass" class="h-4 w-4"></svg-icon>
         </div>
         <label class="sr-only" v-text="__('Global Search')" for="global-search" />
-        <input type="text"
+        <input
+            type="text"
             autocomplete="off"
             class="search-input"
             ref="input"
@@ -20,30 +21,45 @@
             tabindex="-1"
         />
 
-        <span v-if="! (isDirty || searching)" class="rounded px-1 pb-px text-2xs border dark:border-dark-300 text-gray-600 dark:text-dark-200">/</span>
+        <span
+            v-if="!(isDirty || searching)"
+            class="rounded border px-1 pb-px text-2xs text-gray-600 dark:border-dark-300 dark:text-dark-200"
+            >/</span
+        >
         <loading-graphic v-if="searching" :size="14" :inline="true" text="" class="global-search-loading-indicator" />
 
         <div v-show="focused && (hasResults || hasFavorites)" class="global-search-results">
-
-            <div v-if="hasResults" v-for="(result, index) in results" class="global-search-result-item break-overflowing-words p-2 flex items-start" :class="{ 'active': current == index }" @click="hit" @mousemove="setActive(index)">
+            <div
+                v-if="hasResults"
+                v-for="(result, index) in results"
+                class="global-search-result-item break-overflowing-words flex items-start p-2"
+                :class="{ active: current == index }"
+                @click="hit"
+                @mousemove="setActive(index)"
+            >
                 <svg-icon :name="`light/${getResultIcon(result)}`" class="icon"></svg-icon>
-                <div class="flex-1 rtl:mr-2 ltr:ml-2 title" v-html="result.title"></div>
+                <div class="title flex-1 ltr:ml-2 rtl:mr-2" v-html="result.title"></div>
                 <span class="global-search-result-badge" v-text="result.badge" />
             </div>
 
-            <div v-if="! hasResults && hasFavorites">
-                <div class="px-3 py-2 text-gray dark:text-dark-200 uppercase text-3xs">{{ __('Your Favorites') }}</div>
+            <div v-if="!hasResults && hasFavorites">
+                <div class="px-3 py-2 text-3xs uppercase text-gray dark:text-dark-200">{{ __('Your Favorites') }}</div>
 
-                <div v-for="(favorite, index) in favorites" class="global-search-result-item flex items-center" :class="{ 'active': current == index }" @mousemove="setActive(index)">
-                    <div class="flex items-center flex-1 p-2" @click="hit">
-                        <svg-icon name="light/pin" class="w-4 h-4"></svg-icon>
-                        <div class="rtl:mr-2 ltr:ml-2 title" v-text="favorite.name"></div>
+                <div
+                    v-for="(favorite, index) in favorites"
+                    class="global-search-result-item flex items-center"
+                    :class="{ active: current == index }"
+                    @mousemove="setActive(index)"
+                >
+                    <div class="flex flex-1 items-center p-2" @click="hit">
+                        <svg-icon name="light/pin" class="h-4 w-4"></svg-icon>
+                        <div class="title ltr:ml-2 rtl:mr-2" v-text="favorite.name"></div>
                     </div>
                     <div class="p-2 text-gray-600 hover:text-gray-800" @click="removeFavorite(favorite)">&times;</div>
                 </div>
 
-                <div class="text-gray text-xs px-3 py-2 border-t dark:border-dark-900 dark:text-dark-200 text-center">
-                    <b class="tracking-widest uppercase text-3xs">{{ __('Pro Tip')}}:</b>
+                <div class="border-t px-3 py-2 text-center text-xs text-gray dark:border-dark-900 dark:text-dark-200">
+                    <b class="text-3xs uppercase tracking-widest">{{ __('Pro Tip') }}:</b>
                     <span v-html="__('messages.global_search_open_using_slash')" />
                 </div>
             </div>
@@ -51,12 +67,11 @@
     </div>
 </template>
 
-
 <script>
 export default {
     props: {
         endpoint: String,
-        placeholder: String
+        placeholder: String,
     },
 
     data() {
@@ -65,8 +80,8 @@ export default {
             query: '',
             current: -1,
             searching: false,
-            focused: false
-        }
+            focused: false,
+        };
     },
 
     computed: {
@@ -99,14 +114,13 @@ export default {
                 return;
             }
 
-            let payload = {params: { q: this.query }};
+            let payload = { params: { q: this.query } };
 
-            this.$axios.get(this.endpoint, payload)
-                .then(response => {
-                    this.results = response.data;
-                    this.current = -1;
-                    this.searching = false;
-                });
+            this.$axios.get(this.endpoint, payload).then((response) => {
+                this.results = response.data;
+                this.current = -1;
+                this.searching = false;
+            });
         }, 300),
 
         reset() {
@@ -132,7 +146,7 @@ export default {
 
             const url = this.hasResults ? item.url : `${this.$config.get('cpRoot')}/${item.url}`;
 
-            $event.metaKey ? window.open(url) : window.location = url;
+            $event.metaKey ? window.open(url) : (window.location = url);
         },
 
         moveUp() {
@@ -141,9 +155,9 @@ export default {
 
         moveDown() {
             if (this.hasResults) {
-                if (this.current < this.results.length-1) this.current++;
+                if (this.current < this.results.length - 1) this.current++;
             } else {
-                if (this.current < this.favorites.length-1) this.current++;
+                if (this.current < this.favorites.length - 1) this.current++;
             }
         },
 
@@ -158,10 +172,10 @@ export default {
         },
 
         removeFavorite(favorite) {
-            this.$preferences.remove('favorites', favorite).then(response => {
+            this.$preferences.remove('favorites', favorite).then((response) => {
                 this.$toast.success(__('Favorite removed'));
             });
-        }
+        },
     },
 
     watch: {
@@ -172,7 +186,7 @@ export default {
 
         searching(searching) {
             // this.$progress.loading('global-search', searching);
-        }
+        },
     },
 
     created() {
@@ -180,10 +194,10 @@ export default {
     },
 
     mounted() {
-        this.$keys.bind('/', e => {
+        this.$keys.bind('/', (e) => {
             e.preventDefault();
             this.focus();
         });
-    }
+    },
 };
 </script>

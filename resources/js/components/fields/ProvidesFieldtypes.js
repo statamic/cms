@@ -1,7 +1,5 @@
 export default {
-
     computed: {
-
         fieldtypes() {
             if (this.fieldtypesLoading) return;
 
@@ -14,8 +12,7 @@ export default {
 
         fieldtypesLoaded() {
             return Array.isArray(this.fieldtypes);
-        }
-
+        },
     },
 
     created() {
@@ -27,7 +24,6 @@ export default {
 
         if (this.$config.get('isFormBlueprint')) url += '&forms=true';
 
-        this.$axios.get(url).then(response => this.$store.commit('statamic/fieldtypes', response.data));
-    }
-
-}
+        this.$axios.get(url).then((response) => this.$store.commit('statamic/fieldtypes', response.data));
+    },
+};

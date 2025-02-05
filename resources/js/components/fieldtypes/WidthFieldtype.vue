@@ -20,8 +20,6 @@ export default {
         WidthSelector,
     },
 
-    methods: {
-
-    }
+    methods: {},
 };
 </script>

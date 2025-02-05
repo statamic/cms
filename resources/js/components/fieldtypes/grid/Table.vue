@@ -1,14 +1,9 @@
 <template>
-
     <table class="grid-table" v-if="rows.length > 0">
         <thead>
             <tr>
                 <th class="grid-drag-handle-header" v-if="grid.isReorderable"></th>
-                <grid-header-cell
-                    v-for="field in fields"
-                    :key="field.handle"
-                    :field="field"
-                />
+                <grid-header-cell v-for="field in fields" :key="field.handle" :field="field" />
                 <th class="grid-row-controls row-controls"></th>
             </tr>
         </thead>
@@ -45,7 +40,6 @@
             </tbody>
         </sortable-list>
     </table>
-
 </template>
 
 <script>
@@ -55,15 +49,13 @@ import GridHeaderCell from './HeaderCell.vue';
 import { SortableList, SortableItem } from '../../sortable/Sortable';
 
 export default {
-
     mixins: [View],
 
     components: {
         GridRow,
         GridHeaderCell,
         SortableList,
-        SortableItem
-    }
-
-}
+        SortableItem,
+    },
+};
 </script>

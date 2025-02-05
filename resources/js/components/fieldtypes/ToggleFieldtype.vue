@@ -12,17 +12,17 @@ export default {
     mixins: [Fieldtype],
 
     computed: {
-
-        inlineLabel(){
-            return this.value ? (this.config.inline_label_when_true || this.config.inline_label) : this.config.inline_label;
+        inlineLabel() {
+            return this.value
+                ? this.config.inline_label_when_true || this.config.inline_label
+                : this.config.inline_label;
         },
 
         replicatorPreview() {
-            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
 
             return (this.value ? '✓' : '✗') + ' ' + __(this.config.display);
-        }
-
-    }
+        },
+    },
 };
 </script>

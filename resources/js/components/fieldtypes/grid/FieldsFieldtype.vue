@@ -1,5 +1,4 @@
 <template>
-
     <fields
         :fields="fields"
         :editing-field="editingField"
@@ -12,21 +11,19 @@
         @field-editing="editingField = $event"
         @editor-closed="editingField = null"
     />
-
 </template>
 
 <script>
 import Fieldtype from '../Fieldtype.vue';
 import Fields from '../../blueprints/Fields.vue';
-import {Sortable, Plugins} from '@shopify/draggable';
+import { Sortable, Plugins } from '@shopify/draggable';
 import SuggestsConditionalFields from '../../blueprints/SuggestsConditionalFields';
 
 export default {
-
     mixins: [Fieldtype, SuggestsConditionalFields],
 
     inject: {
-        suggestableConditionFieldsProvider: { default: null }
+        suggestableConditionFieldsProvider: { default: null },
     },
 
     components: {
@@ -37,7 +34,7 @@ export default {
         return {
             fields: this.value,
             editingField: null,
-        }
+        };
     },
 
     computed: {
@@ -51,7 +48,6 @@ export default {
     },
 
     methods: {
-
         fieldCreated(field) {
             this.fields.push(field);
             this.update(this.fields);
@@ -72,7 +68,7 @@ export default {
             this.$toast.success(__('Field added'));
 
             if (field.type === 'reference') {
-                this.$nextTick(() => this.editingField = field._id);
+                this.$nextTick(() => (this.editingField = field._id));
             }
         },
 
@@ -81,13 +77,12 @@ export default {
                 draggable: '.blueprint-section-field',
                 handle: '.blueprint-drag-handle',
                 mirror: { constrainDimensions: true },
-                plugins: [Plugins.SwapAnimation]
-            }).on('sortable:stop', e => {
+                plugins: [Plugins.SwapAnimation],
+            }).on('sortable:stop', (e) => {
                 this.fields.splice(e.newIndex, 0, this.fields.splice(e.oldIndex, 1)[0]);
                 this.update(this.fields);
             });
-        }
-    }
-
-}
+        },
+    },
+};
 </script>

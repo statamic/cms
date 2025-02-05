@@ -1,5 +1,4 @@
 <template>
-
     <div class="relative w-full">
         <v-date-picker
             v-bind="pickerBindings"
@@ -8,7 +7,6 @@
         />
         <div class="absolute inset-0 z-1 cursor-not-allowed" v-if="isReadOnly" />
     </div>
-
 </template>
 
 <script>
@@ -20,7 +18,6 @@ export default {
     mixins: [Picker],
 
     computed: {
-
         darkMode() {
             return Statamic.darkMode;
         },
@@ -28,11 +25,9 @@ export default {
         pickerBindings() {
             return {
                 ...this.bindings,
-                disabledDates: this.isReadOnly ? { weekdays: [1, 2, 3, 4, 5, 6, 7] } : null
-            }
+                disabledDates: this.isReadOnly ? { weekdays: [1, 2, 3, 4, 5, 6, 7] } : null,
+            };
         },
-
-    }
-
-}
+    },
+};
 </script>

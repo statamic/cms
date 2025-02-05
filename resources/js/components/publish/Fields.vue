@@ -1,7 +1,5 @@
 <template>
-
     <div class="publish-fields @container">
-
         <publish-field
             v-for="field in fields"
             v-show="showField(field)"
@@ -20,9 +18,7 @@
             @focus="$emit('focus', field.handle)"
             @blur="$emit('blur', field.handle)"
         />
-
     </div>
-
 </template>
 
 <script>
@@ -41,7 +37,7 @@ export default {
     props: {
         fields: {
             type: Array,
-            required: true
+            required: true,
         },
         readOnly: Boolean,
         syncable: Boolean,
@@ -50,7 +46,6 @@ export default {
     },
 
     computed: {
-
         state() {
             return this.$store.state.publish[this.storeName];
         },
@@ -69,21 +64,17 @@ export default {
 
         errors() {
             return this.state.errors;
-        }
-
+        },
     },
 
     methods: {
-
         isSyncableField(field) {
-            if (! this.syncable) return false;
+            if (!this.syncable) return false;
 
-            if (! this.syncableFields) return true;
+            if (!this.syncableFields) return true;
 
             return this.syncableFields.includes(field.handle);
-        }
-
-    }
-
-}
+        },
+    },
+};
 </script>

@@ -1,7 +1,7 @@
-@import "tailwindcss/base";
-@import "cp";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
-@import "core/utilities";
-@import "rtl";
-@import "dark";
+@import 'tailwindcss/base';
+@import 'cp';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+@import 'core/utilities';
+@import 'rtl';
+@import 'dark';

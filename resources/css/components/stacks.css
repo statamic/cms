@@ -4,7 +4,7 @@
 
 .portal-targets {
     /* position on top of global header (z-index 3) but ignore clicks */
-    @apply fixed inset-0 pointer-events-none;
+    @apply pointer-events-none fixed inset-0;
     z-index: 4;
 
     .vue-portal-target {
@@ -16,18 +16,18 @@
 .stacks-on-stacks {
     .stack-container {
         @apply absolute inset-0;
-        transition: left .3s ease;
+        transition: left 0.3s ease;
 
         [dir='rtl'] & {
-            transition: right .3s ease;
+            transition: right 0.3s ease;
         }
     }
 
     .stack-overlay {
-        @apply bg-black absolute inset-0;
+        @apply absolute inset-0 bg-black;
         opacity: 0.2;
         pointer-events: none;
-        transition: all .3s ease;
+        transition: all 0.3s ease;
 
         &.stack-overlay-fade-enter,
         &.stack-overlay-fade-leave-to {
@@ -35,13 +35,12 @@
         }
     }
 
-
     .stack-hit-area {
         @apply absolute inset-0 cursor-pointer;
     }
 
     .stack-content {
-        @apply h-full relative shadow-lg;
+        @apply relative h-full shadow-lg;
         transition: all 0.2s ease;
 
         &.stack-slide-enter,
@@ -54,7 +53,6 @@
             }
         }
     }
-
 
     .hovering .stack-content {
         transform: translateX(-16px);

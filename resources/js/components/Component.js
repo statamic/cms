@@ -1,5 +1,4 @@
 class Component {
-
     constructor(id, name, props) {
         this.id = id;
         this.name = name;
@@ -18,7 +17,6 @@ class Component {
     destroy() {
         Statamic.$components.destroy(this.id);
     }
-
 }
 
 export default Component;

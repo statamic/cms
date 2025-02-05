@@ -4,18 +4,18 @@
 
 <script setup>
 import { defineAsyncComponent, shallowRef, computed, watch } from 'vue';
-import { data_get } from  '../bootstrap/globals.js'
+import { data_get } from '../bootstrap/globals.js';
 
 const props = defineProps({
     name: String,
     default: String,
     directory: String,
-})
+});
 
 const icon = shallowRef(null);
 
 const customIcon = computed(() => {
-    if (! props.directory) return;
+    if (!props.directory) return;
 
     let directory = props.directory;
     let folder = null;
@@ -23,7 +23,7 @@ const customIcon = computed(() => {
 
     if (props.name.includes('/')) {
         [folder, file] = props.name.split('/');
-        directory = directory+'/'+folder;
+        directory = directory + '/' + folder;
     }
 
     return data_get(this.$config.get('customSvgIcons') || {}, `${directory}.${file}`);
@@ -32,30 +32,29 @@ const customIcon = computed(() => {
 const evaluateIcon = () => {
     if (customIcon.value) {
         return defineAsyncComponent(() => {
-            return new Promise(resolve => resolve({ template: customIcon.value }));
+            return new Promise((resolve) => resolve({ template: customIcon.value }));
         });
     }
 
     if (props.name.startsWith('<svg')) {
         return defineAsyncComponent(() => {
-            return new Promise(resolve => resolve({ template: props.name }));
+            return new Promise((resolve) => resolve({ template: props.name }));
         });
     }
 
     return defineAsyncComponent(() => {
         const [set, file] = splitIcon(props.name);
 
-        return import(`./../../svg/icons/${set}/${file}.svg`)
-            .catch(e => {
-                if (! props.default) return fallbackIconImport();
-                const [set, file] = splitIcon(props.default);
-                return import(`./../../svg/icons/${set}/${file}.svg`).catch(e => fallbackIconImport());
-            });
+        return import(`./../../svg/icons/${set}/${file}.svg`).catch((e) => {
+            if (!props.default) return fallbackIconImport();
+            const [set, file] = splitIcon(props.default);
+            return import(`./../../svg/icons/${set}/${file}.svg`).catch((e) => fallbackIconImport());
+        });
     });
 };
 
 const splitIcon = (icon) => {
-    if (! icon.includes('/')) icon = 'regular/' + icon;
+    if (!icon.includes('/')) icon = 'regular/' + icon;
 
     return icon.split('/');
 };
@@ -64,7 +63,11 @@ const fallbackIconImport = () => {
     return import('./../../svg/icons/regular/image.svg');
 };
 
-watch(() => props.name, () => {
-    icon.value = evaluateIcon();
-}, { immediate: true });
+watch(
+    () => props.name,
+    () => {
+        icon.value = evaluateIcon();
+    },
+    { immediate: true },
+);
 </script>

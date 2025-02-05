@@ -9,8 +9,6 @@
 import IndexFieldtype from './IndexFieldtype.vue';
 
 export default {
-
     mixins: [IndexFieldtype],
-
 };
 </script>

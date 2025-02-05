@@ -1,17 +1,21 @@
 <template>
-
     <div>
         <breadcrumb v-if="breadcrumbs" :url="breadcrumbs[1].url" :title="breadcrumbs[1].text" />
 
-        <div class="flex items-baseline mb-6">
-            <h1 class="flex-1 self-start rtl:ml-4 ltr:mr-4">
+        <div class="mb-6 flex items-baseline">
+            <h1 class="flex-1 self-start ltr:mr-4 rtl:ml-4">
                 <div class="flex items-baseline">
-                    <span v-if="! isCreating" class="little-dot rtl:ml-2 ltr:mr-2 -top-1" :class="activeLocalization.status" v-tooltip="__(activeLocalization.status)" />
+                    <span
+                        v-if="!isCreating"
+                        class="little-dot -top-1 ltr:mr-2 rtl:ml-2"
+                        :class="activeLocalization.status"
+                        v-tooltip="__(activeLocalization.status)"
+                    />
                     <span class="break-overflowing-words" v-html="formattedTitle" />
                 </div>
             </h1>
 
-            <dropdown-list class="rtl:ml-4 ltr:mr-4" v-if="canEditBlueprint || hasItemActions">
+            <dropdown-list class="ltr:mr-4 rtl:ml-4" v-if="canEditBlueprint || hasItemActions">
                 <dropdown-item :text="__('Edit Blueprint')" v-if="canEditBlueprint" :redirect="actions.editBlueprint" />
                 <li class="divider" />
                 <data-list-inline-actions
@@ -25,23 +29,18 @@
                 />
             </dropdown-list>
 
-            <div class="pt-px text-2xs text-gray-600 flex rtl:ml-4 ltr:mr-4" v-if="readOnly">
-                <svg-icon name="light/lock" class="w-4 rtl:ml-1 ltr:mr-1 -mt-1" /> {{ __('Read Only') }}
+            <div class="flex pt-px text-2xs text-gray-600 ltr:mr-4 rtl:ml-4" v-if="readOnly">
+                <svg-icon name="light/lock" class="-mt-1 w-4 ltr:mr-1 rtl:ml-1" /> {{ __('Read Only') }}
             </div>
 
-            <div class="hidden md:flex items-center">
+            <div class="hidden items-center md:flex">
                 <save-button-options
                     v-if="!readOnly"
                     :show-options="!revisionsEnabled && !isInline"
                     :button-class="saveButtonClass"
                     :preferences-prefix="preferencesPrefix"
                 >
-                    <button
-                        :class="saveButtonClass"
-                        :disabled="!canSave"
-                        @click.prevent="save"
-                        v-text="saveText"
-                    />
+                    <button :class="saveButtonClass" :disabled="!canSave" @click.prevent="save" v-text="saveText" />
                 </save-button-options>
 
                 <save-button-options
@@ -51,7 +50,7 @@
                     :preferences-prefix="preferencesPrefix"
                 >
                     <button
-                        class="rtl:mr-4 ltr:ml-4 btn-primary flex items-center"
+                        class="btn-primary flex items-center ltr:ml-4 rtl:mr-4"
                         :disabled="!canPublish"
                         @click="confirmingPublish = true"
                         v-text="publishButtonText"
@@ -90,7 +89,6 @@
                 @opened-via-keyboard="openLivePreview"
                 @closed="closeLivePreview"
             >
-
                 <div>
                     <component
                         v-for="component in components"
@@ -114,152 +112,202 @@
                             @blur="container.$emit('blur', $event)"
                         >
                             <template #actions="{ shouldShowSidebar }">
-                            <div class="card p-0 mb-5">
+                                <div class="card mb-5 p-0">
+                                    <div v-if="collectionHasRoutes" :class="{ hi: !shouldShowSidebar }">
+                                        <div
+                                            class="flex items-center space-x-2 p-3 rtl:space-x-reverse"
+                                            v-if="showLivePreviewButton || showVisitUrlButton"
+                                        >
+                                            <button
+                                                class="btn flex w-full items-center justify-center"
+                                                v-if="showLivePreviewButton"
+                                                @click="openLivePreview"
+                                            >
+                                                <svg-icon
+                                                    name="light/synchronize"
+                                                    class="h-4 w-4 shrink-0 ltr:mr-2 rtl:ml-2"
+                                                />
+                                                <span>{{ __('Live Preview') }}</span>
+                                            </button>
+                                            <a
+                                                class="btn flex w-full items-center justify-center"
+                                                v-if="showVisitUrlButton"
+                                                :href="permalink"
+                                                target="_blank"
+                                            >
+                                                <svg-icon
+                                                    name="light/external-link"
+                                                    class="h-4 w-4 shrink-0 ltr:mr-2 rtl:ml-2"
+                                                />
+                                                <span>{{ __('Visit URL') }}</span>
+                                            </a>
+                                        </div>
+                                    </div>
 
-                                <div v-if="collectionHasRoutes" :class="{ 'hi': !shouldShowSidebar }">
+                                    <div
+                                        v-if="!revisionsEnabled"
+                                        class="flex items-center justify-between px-4 py-2"
+                                        :class="{
+                                            'border-t dark:border-dark-900':
+                                                showLivePreviewButton || showVisitUrlButton,
+                                        }"
+                                    >
+                                        <label v-text="__('Published')" class="publish-field-label font-medium" />
+                                        <toggle-input
+                                            :value="published"
+                                            :read-only="!canManagePublishState"
+                                            @input="setFieldValue('published', $event)"
+                                        />
+                                    </div>
 
-                                    <div class="p-3 flex items-center space-x-2 rtl:space-x-reverse" v-if="showLivePreviewButton || showVisitUrlButton">
+                                    <div
+                                        v-if="revisionsEnabled && !isCreating"
+                                        class="p-4"
+                                        :class="{
+                                            'border-t dark:border-dark-900':
+                                                showLivePreviewButton || showVisitUrlButton,
+                                        }"
+                                    >
+                                        <label class="publish-field-label mb-2 font-medium" v-text="__('Revisions')" />
+                                        <div class="mb-1 flex items-center" v-if="published">
+                                            <span class="w-6 text-center text-green-600">&check;</span>
+                                            <span class="text-2xs" v-text="__('Entry has a published version')"></span>
+                                        </div>
+                                        <div class="mb-1 flex items-center" v-else>
+                                            <span class="w-6 text-center text-orange">!</span>
+                                            <span class="text-2xs" v-text="__('Entry has not been published')"></span>
+                                        </div>
+                                        <div class="mb-1 flex items-center" v-if="!isWorkingCopy && published">
+                                            <span class="w-6 text-center text-green-600">&check;</span>
+                                            <span class="text-2xs" v-text="__('This is the published version')"></span>
+                                        </div>
+                                        <div class="mb-1 flex items-center" v-if="isDirty">
+                                            <span class="w-6 text-center text-orange">!</span>
+                                            <span class="text-2xs" v-text="__('Unsaved changes')"></span>
+                                        </div>
                                         <button
-                                            class="flex items-center justify-center btn w-full"
-                                            v-if="showLivePreviewButton"
-                                            @click="openLivePreview">
-                                            <svg-icon name="light/synchronize" class="h-4 w-4 rtl:ml-2 ltr:mr-2 shrink-0" />
-                                            <span>{{ __('Live Preview') }}</span>
-                                        </button>
-                                        <a
-                                            class="flex items-center justify-center btn w-full"
-                                            v-if="showVisitUrlButton"
-                                            :href="permalink"
-                                            target="_blank">
-                                            <svg-icon name="light/external-link" class="w-4 h-4 rtl:ml-2 ltr:mr-2 shrink-0" />
-                                            <span>{{ __('Visit URL') }}</span>
-                                        </a>
-                                    </div>
-                                </div>
-
-                                <div
-                                    v-if="!revisionsEnabled"
-                                    class="flex items-center justify-between px-4 py-2"
-                                    :class="{ 'border-t dark:border-dark-900': showLivePreviewButton || showVisitUrlButton }"
-                                >
-                                    <label v-text="__('Published')" class="publish-field-label font-medium" />
-                                    <toggle-input :value="published" :read-only="!canManagePublishState" @input="setFieldValue('published', $event)" />
-                                </div>
-
-                                <div
-                                    v-if="revisionsEnabled && !isCreating"
-                                    class="p-4"
-                                    :class="{ 'border-t dark:border-dark-900': showLivePreviewButton || showVisitUrlButton }"
-                                >
-                                    <label class="publish-field-label font-medium mb-2" v-text="__('Revisions')"/>
-                                    <div class="mb-1 flex items-center" v-if="published">
-                                        <span class="text-green-600 w-6 text-center">&check;</span>
-                                        <span class="text-2xs" v-text="__('Entry has a published version')"></span>
-                                    </div>
-                                    <div class="mb-1 flex items-center" v-else>
-                                        <span class="text-orange w-6 text-center">!</span>
-                                        <span class="text-2xs" v-text="__('Entry has not been published')"></span>
-                                    </div>
-                                    <div class="mb-1 flex items-center" v-if="!isWorkingCopy && published">
-                                        <span class="text-green-600 w-6 text-center">&check;</span>
-                                        <span class="text-2xs" v-text="__('This is the published version')"></span>
-                                    </div>
-                                    <div class="mb-1 flex items-center" v-if="isDirty">
-                                        <span class="text-orange w-6 text-center">!</span>
-                                        <span class="text-2xs" v-text="__('Unsaved changes')"></span>
-                                    </div>
-                                    <button
-                                            class="flex items-center justify-center mt-4 btn-flat px-2 w-full"
+                                            class="btn-flat mt-4 flex w-full items-center justify-center px-2"
                                             v-if="!isCreating && revisionsEnabled"
-                                            @click="showRevisionHistory = true">
-                                            <svg-icon name="light/history" class="h-4 w-4 rtl:ml-2 ltr:mr-2" />
+                                            @click="showRevisionHistory = true"
+                                        >
+                                            <svg-icon name="light/history" class="h-4 w-4 ltr:mr-2 rtl:ml-2" />
                                             <span>{{ __('View History') }}</span>
                                         </button>
-                                </div>
+                                    </div>
 
-                                <div class="p-4 border-t dark:border-dark-900" v-if="localizations.length > 1">
-                                    <label class="publish-field-label font-medium mb-2" v-text="__('Sites')" />
-                                    <div
-                                        v-for="option in localizations"
-                                        :key="option.handle"
-                                        class="text-sm flex items-center -mx-4 px-4 py-2"
-                                        :class="[
-                                            option.active ? 'bg-blue-100 dark:bg-dark-300' : 'hover:bg-gray-200 dark:hover:bg-dark-400',
-                                            !canSave && !option.exists ? 'cursor-not-allowed' : 'cursor-pointer',
-                                        ]"
-                                        @click="localizationSelected(option)"
-                                    >
-                                        <div class="flex-1 flex items-center" :class="{ 'line-through': !option.exists }">
-                                            <span class="little-dot rtl:ml-2 ltr:mr-2" :class="{
-                                                'bg-green-600': option.published,
-                                                'bg-gray-500': !option.published,
-                                                'bg-red-500': !option.exists
-                                            }" />
-                                            {{ __(option.name) }}
-                                            <loading-graphic
-                                                :size="14"
-                                                text=""
-                                                class="rtl:mr-2 ltr:ml-2"
-                                                v-if="localizing && localizing.handle === option.handle" />
+                                    <div class="border-t p-4 dark:border-dark-900" v-if="localizations.length > 1">
+                                        <label class="publish-field-label mb-2 font-medium" v-text="__('Sites')" />
+                                        <div
+                                            v-for="option in localizations"
+                                            :key="option.handle"
+                                            class="-mx-4 flex items-center px-4 py-2 text-sm"
+                                            :class="[
+                                                option.active
+                                                    ? 'bg-blue-100 dark:bg-dark-300'
+                                                    : 'hover:bg-gray-200 dark:hover:bg-dark-400',
+                                                !canSave && !option.exists ? 'cursor-not-allowed' : 'cursor-pointer',
+                                            ]"
+                                            @click="localizationSelected(option)"
+                                        >
+                                            <div
+                                                class="flex flex-1 items-center"
+                                                :class="{ 'line-through': !option.exists }"
+                                            >
+                                                <span
+                                                    class="little-dot ltr:mr-2 rtl:ml-2"
+                                                    :class="{
+                                                        'bg-green-600': option.published,
+                                                        'bg-gray-500': !option.published,
+                                                        'bg-red-500': !option.exists,
+                                                    }"
+                                                />
+                                                {{ __(option.name) }}
+                                                <loading-graphic
+                                                    :size="14"
+                                                    text=""
+                                                    class="ltr:ml-2 rtl:mr-2"
+                                                    v-if="localizing && localizing.handle === option.handle"
+                                                />
+                                            </div>
+                                            <div
+                                                class="badge-sm bg-orange dark:bg-orange-dark"
+                                                v-if="option.origin"
+                                                v-text="__('Origin')"
+                                            />
+                                            <div
+                                                class="badge-sm bg-blue dark:bg-dark-blue-175"
+                                                v-if="option.active"
+                                                v-text="__('Active')"
+                                            />
+                                            <div
+                                                class="badge-sm bg-purple dark:bg-purple-dark"
+                                                v-if="option.root && !option.origin && !option.active"
+                                                v-text="__('Root')"
+                                            />
                                         </div>
-                                        <div class="badge-sm bg-orange dark:bg-orange-dark" v-if="option.origin" v-text="__('Origin')" />
-                                        <div class="badge-sm bg-blue dark:bg-dark-blue-175" v-if="option.active" v-text="__('Active')" />
-                                        <div class="badge-sm bg-purple dark:bg-purple-dark" v-if="option.root && !option.origin && !option.active" v-text="__('Root')" />
                                     </div>
                                 </div>
-                            </div>
                             </template>
                         </publish-tabs>
                     </transition>
                 </div>
                 <template v-slot:buttons>
-                   <button
+                    <button
                         v-if="!readOnly"
-                        class="rtl:mr-4 ltr:ml-4"
+                        class="ltr:ml-4 rtl:mr-4"
                         :class="{
-                            'btn': revisionsEnabled,
+                            btn: revisionsEnabled,
                             'btn-primary': isCreating || !revisionsEnabled,
                         }"
                         :disabled="!canSave"
                         @click.prevent="save"
-                        v-text="saveText">
-                    </button>
+                        v-text="saveText"
+                    ></button>
 
                     <button
                         v-if="revisionsEnabled && !isCreating"
-                        class="rtl:mr-4 ltr:ml-4 btn-primary flex items-center"
+                        class="btn-primary flex items-center ltr:ml-4 rtl:mr-4"
                         :disabled="!canPublish"
-                        @click="confirmingPublish = true">
+                        @click="confirmingPublish = true"
+                    >
                         <span v-text="publishButtonText" />
-                        <svg-icon name="micro/chevron-down-xs" class="rtl:mr-2 ltr:ml-2 w-2" />
+                        <svg-icon name="micro/chevron-down-xs" class="w-2 ltr:ml-2 rtl:mr-2" />
                     </button>
                 </template>
             </live-preview>
         </publish-container>
 
-        <div class="md:hidden mt-6 flex items-center">
+        <div class="mt-6 flex items-center md:hidden">
             <button
                 v-if="!readOnly"
                 class="btn-lg"
                 :class="{
-                    'btn-primary w-full': ! revisionsEnabled,
-                    'btn w-1/2 rtl:ml-4 ltr:mr-4': revisionsEnabled,
+                    'btn-primary w-full': !revisionsEnabled,
+                    'btn w-1/2 ltr:mr-4 rtl:ml-4': revisionsEnabled,
                 }"
                 :disabled="!canSave"
                 @click.prevent="save"
-                v-text="__(revisionsEnabled ? 'Save Changes' : 'Save')" />
+                v-text="__(revisionsEnabled ? 'Save Changes' : 'Save')"
+            />
 
             <button
                 v-if="revisionsEnabled"
-                class="rtl:mr-2 ltr:ml-2 btn btn-lg justify-center btn-primary flex items-center w-1/2"
+                class="btn btn-lg btn-primary flex w-1/2 items-center justify-center ltr:ml-2 rtl:mr-2"
                 :disabled="!canPublish"
-                @click="confirmingPublish = true">
+                @click="confirmingPublish = true"
+            >
                 <span v-text="publishButtonText" />
-                <svg-icon name="micro/chevron-down-xs" class="rtl:mr-2 ltr:ml-2 w-2" />
+                <svg-icon name="micro/chevron-down-xs" class="w-2 ltr:ml-2 rtl:mr-2" />
             </button>
         </div>
 
-        <stack name="revision-history" v-if="showRevisionHistory" @closed="showRevisionHistory = false" :narrow="true" v-slot="{ close }">
+        <stack
+            name="revision-history"
+            v-if="showRevisionHistory"
+            @closed="showRevisionHistory = false"
+            :narrow="true"
+            v-slot="{ close }"
+        >
             <revision-history
                 :index-url="actions.revisions"
                 :restore-url="actions.restore"
@@ -294,19 +342,12 @@
                 <div class="form-group publish-field field-w-full">
                     <label v-text="__('Origin')" />
                     <div class="help-block -mt-2" v-text="__('messages.entry_origin_instructions')"></div>
-                    <select-input
-                        v-model="selectedOrigin"
-                        :options="originOptions"
-                        :placeholder="false"
-                    />
+                    <select-input v-model="selectedOrigin" :options="originOptions" :placeholder="false" />
                 </div>
             </div>
-
         </confirmation-modal>
     </div>
-
 </template>
-
 
 <script>
 import PublishActions from './PublishActions.vue';
@@ -318,12 +359,7 @@ import HasActions from '../publish/HasActions';
 import striptags from 'striptags';
 
 export default {
-
-    mixins: [
-        HasPreferences,
-        HasHiddenFields,
-        HasActions,
-    ],
+    mixins: [HasPreferences, HasHiddenFields, HasActions],
 
     components: {
         PublishActions,
@@ -410,11 +446,10 @@ export default {
             quickSaveKeyBinding: null,
             quickSave: false,
             isAutosave: false,
-        }
+        };
     },
 
     computed: {
-
         formattedTitle() {
             return striptags(__(this.title));
         },
@@ -424,7 +459,7 @@ export default {
         },
 
         somethingIsLoading() {
-            return ! this.$progress.isComplete();
+            return !this.$progress.isComplete();
         },
 
         canSave() {
@@ -472,7 +507,7 @@ export default {
         },
 
         saveText() {
-            switch(true) {
+            switch (true) {
                 case this.revisionsEnabled:
                     return __('Save Changes');
                 case this.isUnpublishing:
@@ -486,24 +521,24 @@ export default {
 
         publishButtonText() {
             if (this.canManagePublishState) {
-                return `${__('Publish')}…`
+                return `${__('Publish')}…`;
             }
 
-            return `${__('Create Revision')}…`
+            return `${__('Create Revision')}…`;
         },
 
         isUnpublishing() {
-            return this.initialPublished && ! this.published && ! this.isCreating;
+            return this.initialPublished && !this.published && !this.isCreating;
         },
 
         isDraft() {
-            return ! this.published;
+            return !this.published;
         },
 
         saveButtonClass() {
             return {
-                'btn': this.revisionsEnabled,
-                'btn-primary': this.isCreating || ! this.revisionsEnabled,
+                btn: this.revisionsEnabled,
+                'btn-primary': this.isCreating || !this.revisionsEnabled,
             };
         },
 
@@ -513,8 +548,8 @@ export default {
 
         originOptions() {
             return this.localizations
-                .filter(localization => localization.exists)
-                .map(localization => ({
+                .filter((localization) => localization.exists)
+                .map((localization) => ({
                     value: localization.handle,
                     label: localization.name,
                 }));
@@ -523,11 +558,9 @@ export default {
         direction() {
             return this.$config.get('direction', 'ltr');
         },
-
     },
 
     watch: {
-
         saving(saving) {
             this.$progress.loading(`${this.publishContainer}-entry-publish-form`, saving);
         },
@@ -538,18 +571,16 @@ export default {
                 document.title = `${title} ${arrow} ${this.breadcrumbs[1].text} ${arrow} ${this.breadcrumbs[0].text} ${arrow} ${__('Statamic')}`;
             }
         },
-
     },
 
     methods: {
-
         clearErrors() {
             this.error = null;
             this.errors = {};
         },
 
         save() {
-            if (! this.canSave) {
+            if (!this.canSave) {
                 this.quickSave = false;
                 return;
             }
@@ -563,39 +594,45 @@ export default {
         runBeforeSaveHook() {
             this.$refs.container.saving();
 
-            Statamic.$hooks.run('entry.saving', {
-                collection: this.collectionHandle,
-                values: this.values,
-                container: this.$refs.container,
-                storeName: this.publishContainer,
-            })
-            .then(this.performSaveRequest)
-            .catch(error => {
-                this.saving = false;
-                this.$toast.error(error || 'Something went wrong');
-            });
+            Statamic.$hooks
+                .run('entry.saving', {
+                    collection: this.collectionHandle,
+                    values: this.values,
+                    container: this.$refs.container,
+                    storeName: this.publishContainer,
+                })
+                .then(this.performSaveRequest)
+                .catch((error) => {
+                    this.saving = false;
+                    this.$toast.error(error || 'Something went wrong');
+                });
         },
 
         performSaveRequest() {
             // Once the hook has completed, we need to make the actual request.
             // We build the payload here because the before hook may have modified values.
-            const payload = { ...this.visibleValues, ...{
-                _blueprint: this.fieldset.handle,
-                _localized: this.localizedFields,
-            }};
+            const payload = {
+                ...this.visibleValues,
+                ...{
+                    _blueprint: this.fieldset.handle,
+                    _localized: this.localizedFields,
+                },
+            };
 
-            this.$axios[this.method](this.actions.save, payload).then(response => {
-                this.saving = false;
-                if (! response.data.saved) {
-                    return this.$toast.error(__(`Couldn't save entry`));
-                }
-                this.title = response.data.data.title;
-                this.isWorkingCopy = true;
-                if (!this.revisionsEnabled) this.permalink = response.data.data.permalink;
-                if (!this.isCreating && !this.isAutosave) this.$toast.success(__('Saved'));
-                this.$refs.container.saved();
-                this.runAfterSaveHook(response);
-            }).catch(error => this.handleAxiosError(error));
+            this.$axios[this.method](this.actions.save, payload)
+                .then((response) => {
+                    this.saving = false;
+                    if (!response.data.saved) {
+                        return this.$toast.error(__(`Couldn't save entry`));
+                    }
+                    this.title = response.data.data.title;
+                    this.isWorkingCopy = true;
+                    if (!this.revisionsEnabled) this.permalink = response.data.data.permalink;
+                    if (!this.isCreating && !this.isAutosave) this.$toast.success(__('Saved'));
+                    this.$refs.container.saved();
+                    this.runAfterSaveHook(response);
+                })
+                .catch((error) => this.handleAxiosError(error));
         },
 
         runAfterSaveHook(response) {
@@ -605,16 +642,16 @@ export default {
                 .run('entry.saved', {
                     collection: this.collectionHandle,
                     reference: this.initialReference,
-                    response
+                    response,
                 })
                 .then(() => {
                     // If revisions are enabled, just emit event.
                     if (this.revisionsEnabled) {
-                        clearTimeout(this.trackDirtyStateTimeout)
-                        this.trackDirtyState = false
+                        clearTimeout(this.trackDirtyStateTimeout);
+                        this.trackDirtyState = false;
                         this.values = this.resetValuesFromResponse(response.data.data.values);
                         this.extraValues = response.data.data.extraValues;
-                        this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500)
+                        this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500);
                         this.$nextTick(() => this.$emit('saved', response));
                         return;
                     }
@@ -648,7 +685,8 @@ export default {
 
                     this.quickSave = false;
                     this.isAutosave = false;
-                }).catch(e => console.error(e));
+                })
+                .catch((e) => console.error(e));
         },
 
         confirmPublish() {
@@ -681,7 +719,7 @@ export default {
             if (localization.active) return;
 
             if (this.isDirty) {
-                if (! confirm(__('Are you sure? Unsaved changes will be lost.'))) {
+                if (!confirm(__('Are you sure? Unsaved changes will be lost.'))) {
                     return;
                 }
             }
@@ -704,7 +742,7 @@ export default {
         },
 
         editLocalization(localization) {
-            return this.$axios.get(localization.url).then(response => {
+            return this.$axios.get(localization.url).then((response) => {
                 clearTimeout(this.trackDirtyStateTimeout);
                 this.trackDirtyState = false;
 
@@ -728,21 +766,21 @@ export default {
                 this.initialPublished = data.values.published;
                 this.readOnly = data.readOnly;
 
-                this.trackDirtyStateTimeout = setTimeout(() => this.trackDirtyState = true, 500); // after any fieldtypes do a debounced update
-            })
+                this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500); // after any fieldtypes do a debounced update
+            });
         },
 
         createLocalization(localization) {
             this.selectingOrigin = false;
 
             if (this.isCreating) {
-                this.$nextTick(() => window.location = localization.url);
+                this.$nextTick(() => (window.location = localization.url));
                 return;
             }
 
-            const originLocalization = this.localizations.find(e => e.handle === this.selectedOrigin);
+            const originLocalization = this.localizations.find((e) => e.handle === this.selectedOrigin);
             const url = originLocalization.url + '/localize';
-            this.$axios.post(url, { site: localization.handle }).then(response => {
+            this.$axios.post(url, { site: localization.handle }).then((response) => {
                 this.editLocalization(response.data).then(() => {
                     this.$events.$emit('localization.created', { store: this.publishContainer });
 
@@ -759,7 +797,7 @@ export default {
         },
 
         localizationStatusText(localization) {
-            if (! localization.exists) return 'This entry does not exist for this site.';
+            if (!localization.exists) return 'This entry does not exist for this site.';
 
             return localization.published
                 ? 'This entry exists in this site, and is published.'
@@ -773,7 +811,7 @@ export default {
                     this.isPreviewing = true;
                     return this.$wait(300);
                 })
-                .then(() => this.tabsVisible = true);
+                .then(() => (this.tabsVisible = true));
         },
 
         closeLivePreview() {
@@ -815,7 +853,7 @@ export default {
                 this.activeLocalization.title = response.data.data.title;
                 this.activeLocalization.published = response.data.data.published;
                 this.activeLocalization.status = response.data.data.status;
-                this.permalink = response.data.data.permalink
+                this.permalink = response.data.data.permalink;
                 this.$nextTick(() => this.$emit('saved', response));
             }
         },
@@ -832,10 +870,10 @@ export default {
         },
 
         syncField(handle) {
-            if (! confirm('Are you sure? This field\'s value will be replaced by the value in the original entry.'))
+            if (!confirm("Are you sure? This field's value will be replaced by the value in the original entry."))
                 return;
 
-            this.localizedFields = this.localizedFields.filter(field => field !== handle);
+            this.localizedFields = this.localizedFields.filter((field) => field !== handle);
             this.$refs.container.setFieldValue(handle, this.originValues[handle]);
 
             // Update the meta for this field. For instance, a relationship field would have its data preloaded into it.
@@ -844,8 +882,7 @@ export default {
         },
 
         desyncField(handle) {
-            if (!this.localizedFields.includes(handle))
-                this.localizedFields.push(handle);
+            if (!this.localizedFields.includes(handle)) this.localizedFields.push(handle);
 
             this.$refs.container.dirty();
         },
@@ -875,17 +912,16 @@ export default {
                 this.itemActions = response.data.itemActions;
             }
         },
-
     },
 
     mounted() {
-        this.saveKeyBinding = this.$keys.bindGlobal(['mod+return'], e => {
+        this.saveKeyBinding = this.$keys.bindGlobal(['mod+return'], (e) => {
             e.preventDefault();
             if (this.confirmingPublish) return;
             this.save();
         });
 
-        this.quickSaveKeyBinding = this.$keys.bindGlobal(['mod+s'], e => {
+        this.quickSaveKeyBinding = this.$keys.bindGlobal(['mod+s'], (e) => {
             e.preventDefault();
             if (this.confirmingPublish) return;
             this.quickSave = true;
@@ -902,9 +938,10 @@ export default {
     created() {
         window.history.replaceState({}, document.title, document.location.href.replace('created=true', ''));
 
-        this.selectedOrigin = this.originBehavior === 'active'
-            ? this.localizations.find(l => l.active)?.handle
-            : this.localizations.find(l => l.root)?.handle;
+        this.selectedOrigin =
+            this.originBehavior === 'active'
+                ? this.localizations.find((l) => l.active)?.handle
+                : this.localizations.find((l) => l.root)?.handle;
     },
 
     unmounted() {
@@ -918,7 +955,6 @@ export default {
     unmounted() {
         this.saveKeyBinding.destroy();
         this.quickSaveKeyBinding.destroy();
-    }
-
-}
+    },
+};
 </script>

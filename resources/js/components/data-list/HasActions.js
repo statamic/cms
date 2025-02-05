@@ -1,12 +1,10 @@
 export default {
-
     methods: {
-
         actionStarted() {
             this.loading = true;
         },
 
-        actionCompleted(successful=null, response={}) {
+        actionCompleted(successful = null, response = {}) {
             this.loading = false;
 
             if (successful === false) return;
@@ -15,9 +13,9 @@ export default {
             this.$events.$emit('reset-action-modals');
 
             if (response.success === false) {
-                this.$toast.error(response.message || __("Action failed"));
+                this.$toast.error(response.message || __('Action failed'));
             } else {
-                this.$toast.success(response.message || __("Action completed"));
+                this.$toast.success(response.message || __('Action completed'));
             }
 
             this.afterActionSuccessfullyCompleted();
@@ -25,8 +23,6 @@ export default {
 
         afterActionSuccessfullyCompleted() {
             this.request();
-        }
-
-    }
-
-}
+        },
+    },
+};

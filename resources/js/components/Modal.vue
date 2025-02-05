@@ -1,18 +1,11 @@
 <template>
-
     <portal name="modal">
-        <VueFinalModal
-            v-model="open"
-            v-bind="modalProps"
-            @opened="modalOpened"
-            @closed="modalClosed"
-        >
+        <VueFinalModal v-model="open" v-bind="modalProps" @opened="modalOpened" @closed="modalClosed">
             <div :style="styling" class="max-h-[90vh]">
                 <slot :close="close" />
             </div>
         </VueFinalModal>
     </portal>
-
 </template>
 
 <script>
@@ -30,7 +23,7 @@ export default {
         adaptive: { type: Boolean, default: true },
         draggable: { default: false },
         clickToClose: { type: Boolean, default: false },
-        focusTrap: {type: Boolean, default: true},
+        focusTrap: { type: Boolean, default: true },
         height: { default: 'auto' },
         width: { default: 600 },
     },
@@ -40,11 +33,10 @@ export default {
             modal: null,
             name: uniqid(),
             open: true,
-        }
+        };
     },
 
     computed: {
-
         modalProps() {
             return {
                 modalId: this.name,
@@ -53,17 +45,16 @@ export default {
                 teleportTo: false,
                 class: 'flex items-start justify-center pt-[5%]',
                 overlayTransition: 'vfm-fade',
-                contentTransition: 'vfm-slide-up'
-            }
+                contentTransition: 'vfm-slide-up',
+            };
         },
 
         styling() {
             return {
-                width: typeof(this.width) === 'number' ? `${this.width}px` : this.width,
-                height: typeof(this.height) === 'number' ? `${this.height}px` : this.height,
-            }
-        }
-
+                width: typeof this.width === 'number' ? `${this.width}px` : this.width,
+                height: typeof this.height === 'number' ? `${this.height}px` : this.height,
+            };
+        },
     },
 
     beforeUnmount() {
@@ -71,7 +62,6 @@ export default {
     },
 
     methods: {
-
         modalOpened(event) {
             this.$emit('opened');
         },
@@ -83,9 +73,7 @@ export default {
         close() {
             this.open = false;
             this.$wait(300).then(() => this.$emit('closed'));
-        }
-
-    }
-
-}
+        },
+    },
+};
 </script>

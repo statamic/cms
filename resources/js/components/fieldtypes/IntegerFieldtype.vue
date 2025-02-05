@@ -21,11 +21,10 @@
 import Fieldtype from './Fieldtype.vue';
 
 export default {
-
     mixins: [Fieldtype],
     props: {
         prepend: { default: null },
         append: { default: null },
-    }
+    },
 };
 </script>

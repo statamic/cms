@@ -2,20 +2,28 @@
     @apply flex justify-between;
 
     .step {
-        @apply text-center relative text-xs flex-1 mx-auto;
+        @apply relative mx-auto flex-1 text-center text-xs;
     }
 
     .step:not(:first-child):before {
         @apply absolute h-1 w-1/2 bg-gray-300;
         content: '';
-        left: 0 ; [dir="rtl"] & { left: auto ; right: 0 ; }
+        left: 0;
+        [dir='rtl'] & {
+            left: auto;
+            right: 0;
+        }
         top: 18px;
     }
 
     .step:not(:last-child):after {
         @apply absolute h-1 w-1/2 bg-gray-300;
         content: '';
-        left: 50% ; [dir="rtl"] & { left: auto ; right: 50% ; }
+        left: 50%;
+        [dir='rtl'] & {
+            left: auto;
+            right: 50%;
+        }
         top: 18px;
     }
 
@@ -25,12 +33,12 @@
     }
 
     .ball {
-        @apply h-10 w-10 bg-gray-300 dark:bg-dark-800 text-gray dark:text-dark-150 text-base rounded-full text-center z-10 mx-auto relative;
+        @apply relative z-10 mx-auto h-10 w-10 rounded-full bg-gray-300 text-center text-base text-gray dark:bg-dark-800 dark:text-dark-150;
         line-height: 40px;
     }
 
     .label {
-        @apply text-xs mt-1 text-gray dark:text-dark-175;
+        @apply mt-1 text-xs text-gray dark:text-dark-175;
     }
 
     .complete {

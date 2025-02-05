@@ -1,25 +1,22 @@
 <template>
-
     <stack narrow name="page-tree-linker" :before-close="shouldClose" @closed="$emit('closed')" v-slot="{ close }">
-        <div class="bg-gray-100 dark:bg-dark-700 h-full flex flex-col">
-
-            <header class="bg-white dark:bg-dark-550 rtl:pr-6 ltr:pl-6 rtl:pl-3 ltr:pr-3 py-2 mb-4 border-b dark:border-dark-950 shadow-md text-lg font-medium flex items-center justify-between">
+        <div class="flex h-full flex-col bg-gray-100 dark:bg-dark-700">
+            <header
+                class="mb-4 flex items-center justify-between border-b bg-white py-2 text-lg font-medium shadow-md dark:border-dark-950 dark:bg-dark-550 ltr:pl-6 ltr:pr-3 rtl:pl-3 rtl:pr-6"
+            >
                 {{ headerText }}
-                <button
-                    type="button"
-                    class="btn-close"
-                    @click="confirmClose(close)"
-                    v-html="'&times'" />
+                <button type="button" class="btn-close" @click="confirmClose(close)" v-html="'&times'" />
             </header>
 
-            <div v-if="loading" class="flex-1 overflow-auto relative">
-                <div class="absolute inset-0 z-10 bg-white dark:bg-dark-700 bg-opacity-75 flex items-center justify-center text-center">
+            <div v-if="loading" class="relative flex-1 overflow-auto">
+                <div
+                    class="absolute inset-0 z-10 flex items-center justify-center bg-white bg-opacity-75 text-center dark:bg-dark-700"
+                >
                     <loading-graphic />
                 </div>
             </div>
 
             <div v-if="!loading" class="flex-1 overflow-auto px-1">
-
                 <publish-container
                     ref="container"
                     :name="publishContainer"
@@ -35,7 +32,10 @@
                     v-slot="{ container, setFieldMeta }"
                 >
                     <div>
-                        <div v-if="validating" class="absolute inset-0 z-10 bg-white dark:bg-dark-500 bg-opacity-75 flex items-center justify-center">
+                        <div
+                            v-if="validating"
+                            class="absolute inset-0 z-10 flex items-center justify-center bg-white bg-opacity-75 dark:bg-dark-500"
+                        >
                             <loading-graphic text="" />
                         </div>
 
@@ -53,35 +53,36 @@
                         />
                     </div>
                 </publish-container>
-
             </div>
 
-            <div v-if="!loading && (!readOnly || type === 'entry')" class="bg-gray-200 dark:bg-dark-500 p-4 border-t dark:border-dark-900 flex items-center justify-between flex-row-reverse">
+            <div
+                v-if="!loading && (!readOnly || type === 'entry')"
+                class="flex flex-row-reverse items-center justify-between border-t bg-gray-200 p-4 dark:border-dark-900 dark:bg-dark-500"
+            >
                 <div v-if="!readOnly">
-                    <button @click="confirmClose(close)" class="btn rtl:ml-2 ltr:mr-2">{{ __('Cancel') }}</button>
+                    <button @click="confirmClose(close)" class="btn ltr:mr-2 rtl:ml-2">{{ __('Cancel') }}</button>
                     <button @click="submit" class="btn-primary">{{ __('Submit') }}</button>
                 </div>
                 <div v-if="type === 'entry'">
-                    <a :href="editEntryUrl" target="_blank" class="text-xs flex items-center justify-center text-blue hover:text-blue underline rtl:ml-4 ltr:mr-4">
-                        <svg-icon name="light/external-link" class="w-4 h-4 rtl:ml-2 ltr:mr-2" />
+                    <a
+                        :href="editEntryUrl"
+                        target="_blank"
+                        class="flex items-center justify-center text-xs text-blue underline hover:text-blue ltr:mr-4 rtl:ml-4"
+                    >
+                        <svg-icon name="light/external-link" class="h-4 w-4 ltr:mr-2 rtl:ml-2" />
                         {{ __('Edit Entry') }}
                     </a>
                 </div>
             </div>
-
         </div>
     </stack>
-
 </template>
 
 <script>
-import HasHiddenFields from "../publish/HasHiddenFields";
+import HasHiddenFields from '../publish/HasHiddenFields';
 
 export default {
-
-    mixins: [
-        HasHiddenFields,
-    ],
+    mixins: [HasHiddenFields],
 
     props: {
         id: String,
@@ -110,8 +111,8 @@ export default {
             errors: {},
             validating: false,
             saveKeyBinding: null,
-            publishContainer: 'tree-page'
-        }
+            publishContainer: 'tree-page',
+        };
     },
 
     computed: {
@@ -122,15 +123,15 @@ export default {
         adjustedBlueprint() {
             function getFields(blueprint) {
                 return _.chain(blueprint.tabs[0].sections)
-                    .map(sections => sections.fields)
+                    .map((sections) => sections.fields)
                     .flatten(true)
                     .value();
             }
             function isMissingField(blueprint, handle) {
-                return ! getFields(blueprint).some(field => field.handle === handle);
+                return !getFields(blueprint).some((field) => field.handle === handle);
             }
             function hasField(blueprint, handle) {
-                return ! isMissingField(blueprint, handle);
+                return !isMissingField(blueprint, handle);
             }
             function getField(handle) {
                 for (let sectionIndex = 0; sectionIndex < blueprint.tabs[0].sections.length; sectionIndex++) {
@@ -161,7 +162,7 @@ export default {
             // Remove the "url" field if it's been added to the blueprint by the user.
             // URL fields only make sense for URL type pages. Entries will have their own URLs.
             if (this.type == 'entry' && hasField(blueprint, 'url')) {
-                const {section, field} = getField('url');
+                const { section, field } = getField('url');
                 blueprint.tabs[0].sections[section].fields.splice(field, 1);
             }
 
@@ -169,7 +170,7 @@ export default {
                 blueprint.tabs[0].sections[0].fields.unshift({
                     handle: 'title',
                     type: 'text',
-                    display: __('Title')
+                    display: __('Title'),
                 });
             }
 
@@ -182,7 +183,7 @@ export default {
             if (this.loading) return;
 
             this.$emit('localized-fields-updated', fields);
-        }
+        },
     },
 
     methods: {
@@ -191,30 +192,33 @@ export default {
 
             const postUrl = cp_url(`navigation/${this.handle}/pages`);
 
-            this.$axios.post(postUrl, {
-                type: this.type,
-                values: this.visibleValues
-            }).then(response => {
-                this.$emit('submitted', this.visibleValues);
-            }).catch(e => {
-                this.validating = false;
-                if (e.response && e.response.status === 422) {
-                    const { message, errors } = e.response.data;
-                    this.error = message;
-                    this.errors = errors;
-                    this.$toast.error(message);
-                } else if (e.response) {
-                    this.$toast.error(e.response.data.message);
-                } else {
-                    console.error(e);
-                    this.$toast.error(e || 'Something went wrong');
-                }
-            });
+            this.$axios
+                .post(postUrl, {
+                    type: this.type,
+                    values: this.visibleValues,
+                })
+                .then((response) => {
+                    this.$emit('submitted', this.visibleValues);
+                })
+                .catch((e) => {
+                    this.validating = false;
+                    if (e.response && e.response.status === 422) {
+                        const { message, errors } = e.response.data;
+                        this.error = message;
+                        this.errors = errors;
+                        this.$toast.error(message);
+                    } else if (e.response) {
+                        this.$toast.error(e.response.data.message);
+                    } else {
+                        console.error(e);
+                        this.$toast.error(e || 'Something went wrong');
+                    }
+                });
         },
 
         shouldClose() {
             if (this.$dirty.has(this.publishContainer)) {
-                if (! confirm(__('Are you sure? Unsaved changes will be lost.'))) {
+                if (!confirm(__('Are you sure? Unsaved changes will be lost.'))) {
                     return false;
                 }
             }
@@ -227,10 +231,10 @@ export default {
         },
 
         syncField(handle) {
-            if (! confirm('Are you sure? This field\'s value will be replaced by the value in the original entry.'))
+            if (!confirm("Are you sure? This field's value will be replaced by the value in the original entry."))
                 return;
 
-            this.localizedFields = this.localizedFields.filter(field => field !== handle);
+            this.localizedFields = this.localizedFields.filter((field) => field !== handle);
             this.$refs.container.setFieldValue(handle, this.originValues[handle]);
 
             // Update the meta for this field. For instance, a relationship field would have its data preloaded into it.
@@ -239,8 +243,7 @@ export default {
         },
 
         desyncField(handle) {
-            if (!this.localizedFields.includes(handle))
-                this.localizedFields.push(handle);
+            if (!this.localizedFields.includes(handle)) this.localizedFields.push(handle);
 
             this.$refs.container.dirty();
         },
@@ -273,7 +276,7 @@ export default {
                 url += `&entry=${this.entry}`;
             }
 
-            this.$axios.get(url).then(response => {
+            this.$axios.get(url).then((response) => {
                 this.updatePublishInfo(response.data);
                 this.emitPublishInfoUpdated(hasPublishInfo && this.publishInfo.new);
                 this.loading = false;
@@ -300,13 +303,13 @@ export default {
                 localizedFields: this.localizedFields,
                 syncableFields: this.syncableFields,
                 entry: this.entry,
-                new: isNew
+                new: isNew,
             });
-        }
+        },
     },
 
     created() {
-        this.saveKeyBinding = this.$keys.bindGlobal(['mod+enter', 'mod+s'], e => {
+        this.saveKeyBinding = this.$keys.bindGlobal(['mod+enter', 'mod+s'], (e) => {
             e.preventDefault();
             this.submit();
         });
@@ -316,7 +319,6 @@ export default {
 
     unmounted() {
         this.saveKeyBinding.destroy();
-    }
-
-}
+    },
+};
 </script>

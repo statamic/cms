@@ -1,15 +1,19 @@
-@php use function Statamic\trans as __; @endphp
+@php
+    use function Statamic\trans as __;
+@endphp
 
 @extends('statamic::layout')
 @section('title', __('Edit Navigation'))
 
 @section('content')
-
     <header class="mb-6">
-        @include('statamic::partials.breadcrumb', [
-            'url' => cp_route('navigation.show', $nav->handle()),
-            'title' => $nav->title()
-        ])
+        @include(
+            'statamic::partials.breadcrumb',
+            [
+                'url' => cp_route('navigation.show', $nav->handle()),
+                'title' => $nav->title(),
+            ]
+        )
         <h1>@yield('title')</h1>
     </header>
 
@@ -19,5 +23,4 @@
         :meta="{{ json_encode($meta) }}"
         url="{{ $nav->showUrl() }}"
     ></navigation-edit-form>
-
 @endsection

@@ -18,7 +18,8 @@
                             <resource-deleter
                                 :ref="`deleter_${taxonomy.id}`"
                                 :resource="taxonomy"
-                                @deleted="removeRow(taxonomy)">
+                                @deleted="removeRow(taxonomy)"
+                            >
                             </resource-deleter>
                         </dropdown-item>
                     </dropdown-list>
@@ -29,23 +30,18 @@
 </template>
 
 <script>
-import Listing from '../Listing.vue'
+import Listing from '../Listing.vue';
 
 export default {
-
     mixins: [Listing],
 
-    props: [
-        'initial-rows',
-        'initial-columns',
-    ],
+    props: ['initial-rows', 'initial-columns'],
 
     data() {
         return {
             rows: this.initialRows,
-            columns: this.initialColumns
-        }
-    }
-
-}
+            columns: this.initialColumns,
+        };
+    },
+};
 </script>

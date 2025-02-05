@@ -1,10 +1,9 @@
 <template>
-
     <div>
         <small class="text-gray">Collections > Blog ></small>
-        <h1 class="mt-2 mb-6">Fire!</h1>
+        <h1 class="mb-6 mt-2">Fire!</h1>
 
-        {{ depth === 0 ? 'Base' : `Stack ${depth}` }}<br><br>
+        {{ depth === 0 ? 'Base' : `Stack ${depth}` }}<br /><br />
 
         <button @click="show = true" class="btn">Open Stack {{ depth + 1 }}</button>
 
@@ -14,19 +13,16 @@
             </div>
         </stack>
     </div>
-
 </template>
 
 <script>
 export default {
-
     props: ['depth'],
 
     data() {
         return {
-            show: false
-        }
-    }
-
-}
+            show: false,
+        };
+    },
+};
 </script>

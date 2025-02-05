@@ -12,6 +12,6 @@ export default class Config {
     }
 
     set(key, value) {
-        this.store.commit('statamic/configValue', {key, value});
+        this.store.commit('statamic/configValue', { key, value });
     }
 }

@@ -7,22 +7,24 @@
 }
 
 .replicator-set {
-    @apply shadow-set dark:shadow-dark-set rounded bg-white dark:bg-dark-800 outline-none relative;
+    @apply relative rounded bg-white shadow-set outline-none dark:bg-dark-800 dark:shadow-dark-set;
 }
 
 .replicator-set-header {
-    @apply bg-gray-300 dark:bg-dark-650 border-b dark:border-dark-900 rounded-t rtl:pl-3 ltr:pr-3 flex select-none;
+    @apply flex select-none rounded-t border-b bg-gray-300 dark:border-dark-900 dark:bg-dark-650 ltr:pr-3 rtl:pl-3;
 
     &.collapsed {
         @apply rounded border-b-0;
     }
 
     .sortable-handle {
-        @apply w-4 rtl:border-l ltr:border-r dark:border-dark-900 rtl:rounded-tr ltr:rounded-tl p-2;
+        @apply w-4 p-2 dark:border-dark-900 ltr:rounded-tl ltr:border-r rtl:rounded-tr rtl:border-l;
         cursor: grab;
         background: transparent url('../../../svg/icons/light/drag-dots.svg') center center no-repeat;
         background-size: 7px 17px;
-        &:hover { @apply bg-gray-200 dark:bg-dark-700; }
+        &:hover {
+            @apply bg-gray-200 dark:bg-dark-700;
+        }
     }
 
     img {
@@ -58,7 +60,9 @@
 .replicator-set-picker.between {
     @apply opacity-0 hover:opacity-100;
     transform: translateX(-8px);
-    transition: opacity 100ms ease, transform 100ms ease;
+    transition:
+        opacity 100ms ease,
+        transform 100ms ease;
 }
 
 .replicator-set-picker.between:hover {
@@ -78,5 +82,5 @@
 }
 
 .replicator-fullscreen {
-    @apply fixed bg-gray-200 inset-0 min-h-screen overflow-scroll rounded-none;
+    @apply fixed inset-0 min-h-screen overflow-scroll rounded-none bg-gray-200;
 }

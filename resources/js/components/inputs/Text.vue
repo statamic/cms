@@ -26,21 +26,21 @@
                 @keydown="$emit('keydown', $event)"
                 @focus="$emit('focus')"
                 @blur="$emit('blur')"
-            >
+            />
             <slot name="append" v-if="append">
                 <div class="input-group-append">
                     {{ __(append) }}
                 </div>
             </slot>
         </div>
-        <div class="text-xs rtl:mr-2 ltr:ml-2" :class="limitIndicatorColor" v-if="limit">
+        <div class="text-xs ltr:ml-2 rtl:mr-2" :class="limitIndicatorColor" v-if="limit">
             <span v-text="currentLength"></span>/<span v-text="limit"></span>
         </div>
     </div>
 </template>
 
 <script>
-import LengthLimiter from '../LengthLimiter.vue'
+import LengthLimiter from '../LengthLimiter.vue';
 
 export default {
     emits: ['update:model-value', 'keydown', 'focus', 'blur'],
@@ -52,7 +52,7 @@ export default {
         id: { default: null },
         isReadOnly: { type: Boolean, default: false },
         placeholder: { required: false },
-        type: { default: "text" },
+        type: { default: 'text' },
         step: {},
         modelValue: { required: true },
         prepend: { default: null },
@@ -61,7 +61,7 @@ export default {
         autocomplete: { default: null },
         autoselect: { type: Boolean },
         min: { type: Number, default: undefined },
-        direction: { type: String }
+        direction: { type: String },
     },
     mounted() {
         if (this.autoselect) {
@@ -70,6 +70,6 @@ export default {
         if (this.focus) {
             this.$refs.input.focus();
         }
-    }
-}
+    },
+};
 </script>

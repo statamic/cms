@@ -1,5 +1,7 @@
-export const intervalRegexp = /^({\s*(\-?\d+(\.\d+)?[\s*,\s*\-?\d+(\.\d+)?]*)\s*})|([\[\]])\s*(-Inf|\*|\-?\d+(\.\d+)?)\s*,\s*(\+?Inf|\*|\-?\d+(\.\d+)?)\s*([\[\]])$/;
-export const anyIntervalRegexp = /({\s*(\-?\d+(\.\d+)?[\s*,\s*\-?\d+(\.\d+)?]*)\s*})|([\[\]])\s*(-Inf|\*|\-?\d+(\.\d+)?)\s*,\s*(\+?Inf|\*|\-?\d+(\.\d+)?)\s*([\[\]])/;
+export const intervalRegexp =
+    /^({\s*(\-?\d+(\.\d+)?[\s*,\s*\-?\d+(\.\d+)?]*)\s*})|([\[\]])\s*(-Inf|\*|\-?\d+(\.\d+)?)\s*,\s*(\+?Inf|\*|\-?\d+(\.\d+)?)\s*([\[\]])$/;
+export const anyIntervalRegexp =
+    /({\s*(\-?\d+(\.\d+)?[\s*,\s*\-?\d+(\.\d+)?]*)\s*})|([\[\]])\s*(-Inf|\*|\-?\d+(\.\d+)?)\s*,\s*(\+?Inf|\*|\-?\d+(\.\d+)?)\s*([\[\]])/;
 
 export const testInterval = function (count, interval) {
     /**
@@ -41,7 +43,7 @@ export const testInterval = function (count, interval) {
         }
     } else {
         // Remove falsy values.
-        matches = matches.filter(function(match) {
+        matches = matches.filter(function (match) {
             return !!match;
         });
 
@@ -53,12 +55,14 @@ export const testInterval = function (count, interval) {
         var rightNumber = convertNumber(matches[3]);
         var rightDelimiter = matches[4];
 
-        return (leftDelimiter === '[' ? count >= leftNumber : count > leftNumber)
-            && (rightDelimiter === ']' ? count <= rightNumber : count < rightNumber);
+        return (
+            (leftDelimiter === '[' ? count >= leftNumber : count > leftNumber) &&
+            (rightDelimiter === ']' ? count <= rightNumber : count < rightNumber)
+        );
     }
 
     return false;
-}
+};
 
 function convertNumber(str) {
     if (str === '-Inf') {
