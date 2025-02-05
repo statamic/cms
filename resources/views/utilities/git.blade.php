@@ -23,7 +23,9 @@
             @csrf
 
             <div class="flex items-center">
-                <button type="submit" class="btn-primary" {{ $statuses ? '' : 'disabled' }}>{{ __('Commit') }}</button>
+                <button type="submit" class="btn-primary" {{ $statuses ? '' : 'disabled' }}>
+                    {{ __('Commit') }}
+                </button>
             </div>
         </form>
     </div>

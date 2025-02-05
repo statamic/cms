@@ -89,6 +89,7 @@
                         class="little-dot {{ $statamic->valid() ? 'bg-green-600' : 'bg-red-500' }} ltr:mr-2 rtl:ml-2"
                     ></span>
                     {{ __('Statamic') }}
+
                     @if ($statamic->pro())
                         <span class="text-pink">{{ __('Pro') }}</span>
                     @else
