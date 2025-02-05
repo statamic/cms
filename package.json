@@ -11,7 +11,8 @@
     "frontend-dev": "vite -c vite-frontend.config.js",
     "frontend-build": "vite build -c vite-frontend.config.js",
     "prettier:format": "prettier --write \"**/*.{js,ts,jsx,tsx,cjs,cts,mjs,mts,vue,blade.php,antlers.html,css}\"",
-    "prettier:check": "prettier --check \"**/*.{js,ts,jsx,tsx,cjs,cts,mjs,mts,vue,blade.php,antlers.html,css}\""
+    "prettier:check": "prettier --check \"**/*.{js,ts,jsx,tsx,cjs,cts,mjs,mts,vue,blade.php,antlers.html,css}\"",
+    "knip": "knip"
   },
   "dependencies": {
     "@floating-ui/dom": "^1.2.5",
@@ -104,6 +105,7 @@
     "cross-env": "^7.0.3",
     "jest": "^29.4.2",
     "jest-environment-jsdom": "^29.4.2",
+    "knip": "^5.43.6",
     "laravel-vite-plugin": "^1.2.0",
     "postcss": "^8.4.31",
     "prettier": "^3.4.2",
