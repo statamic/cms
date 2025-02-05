@@ -161,12 +161,12 @@ class Email extends Mailable
             ->when(Arr::has($this->config, 'attachments'), function ($fields) {
                 return $fields->reject(fn ($field) => in_array($field['fieldtype'], ['assets', 'files']));
             });
-        $form_config = ($configFields = Form::extraConfigFor($form->handle()))
+        $formConfig = ($configFields = Form::extraConfigFor($form->handle()))
             ? Blueprint::makeFromTabs($configFields)->fields()->addValues($form->data()->all())->values()->all()
             : [];
 
         $data = array_merge($augmented, $this->getGlobalsData(), [
-            'form_config' => $form_config,
+            'form_config' => $formConfig,
             'email_config' => $this->config,
             'config' => config()->all(),
             'fields' => $fields,
