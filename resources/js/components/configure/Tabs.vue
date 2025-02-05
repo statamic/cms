@@ -2,7 +2,7 @@
     <element-container @resized="containerWidth = $event.width">
         <div>
             <div v-for="tab in tabs" :key="tab.handle">
-                <div class="mb-2 content">
+                <div class="content mb-2">
                     <h2 v-text="tab.display" class="text-base" />
                     <p v-html="tab.instructions" />
                 </div>
@@ -32,7 +32,7 @@ export default {
 
     props: {
         readOnly: Boolean,
-        syncable: Boolean
+        syncable: Boolean,
     },
 
     data() {
@@ -40,12 +40,11 @@ export default {
 
         return {
             active: state.blueprint.tabs[0].handle,
-            containerWidth: null
-        }
+            containerWidth: null,
+        };
     },
 
     computed: {
-
         state() {
             return this.$store.state.publish[this.storeName];
         },
@@ -56,9 +55,7 @@ export default {
 
         actionsPortal() {
             return `publish-actions-${this.storeName}`;
-        }
-
-    }
-
-}
+        },
+    },
+};
 </script>

@@ -3,7 +3,6 @@ import uniqid from 'uniqid';
 import Component from './Component';
 
 class Components {
-
     constructor(app) {
         this.app = app;
         this.components = ref([]);
@@ -37,7 +36,6 @@ class Components {
             this.components.value.splice(index, 1);
         }
     }
-
 }
 
 export default Components;

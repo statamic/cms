@@ -1,9 +1,7 @@
 import Values from './Values.js';
 
 export default {
-
     computed: {
-
         hiddenFields() {
             return this.$store.state.publish[this.publishContainer].hiddenFields;
         },
@@ -18,17 +16,15 @@ export default {
 
         visibleValues() {
             let omittableFields = _.chain(this.hiddenFields)
-                .pick(field => field.omitValue)
+                .pick((field) => field.omitValue)
                 .keys()
                 .value();
 
             return new Values(this.values, this.jsonSubmittingFields).except(omittableFields);
         },
-
     },
 
     methods: {
-
         resetValuesFromResponse(responseValues) {
             if (!responseValues) return this.values;
 
@@ -40,7 +36,5 @@ export default {
 
             return newValues.all();
         },
-
     },
-
-}
+};

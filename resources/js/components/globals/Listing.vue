@@ -20,7 +20,8 @@
                             <resource-deleter
                                 :ref="`deleter_${global.id}`"
                                 :resource="global"
-                                @deleted="removeRow(global)">
+                                @deleted="removeRow(global)"
+                            >
                             </resource-deleter>
                         </dropdown-item>
                     </dropdown-list>
@@ -31,10 +32,9 @@
 </template>
 
 <script>
-import Listing from '../Listing.vue'
+import Listing from '../Listing.vue';
 
 export default {
-
     mixins: [Listing],
 
     props: ['globals'],
@@ -45,9 +45,8 @@ export default {
             columns: [
                 { label: __('Title'), field: 'title' },
                 { label: __('Handle'), field: 'handle' },
-            ]
-        }
-    }
-
-}
+            ],
+        };
+    },
+};
 </script>

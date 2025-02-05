@@ -147,4 +147,4 @@ export default function registerGlobalComponents(app) {
     app.component('stack-test', StackTest);
 
     app.component('blueprint-resetter', BlueprintResetter);
-};
+}

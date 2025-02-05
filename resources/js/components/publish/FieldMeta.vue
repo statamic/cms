@@ -13,15 +13,13 @@ export default {
             meta: this.initialMeta,
             value: this.initialValue,
             loading: false,
-        }
+        };
     },
 
     computed: {
-
         isPreloadable() {
             return this.$config.get('preloadableFieldtypes').includes(this.config.type);
-        }
-
+        },
     },
 
     render() {
@@ -34,7 +32,7 @@ export default {
     },
 
     created() {
-        if (! this.isPreloadable) return;
+        if (!this.isPreloadable) return;
 
         // For hardcoded field components (ie. when used inside a custom form, without being generated from
         // a blueprint) the developer wouldn't pass in a `meta` prop to the `form-group` component. In
@@ -43,19 +41,16 @@ export default {
     },
 
     watch: {
-
         initialValue(value) {
             this.value = value;
         },
 
         initialMeta(meta) {
             this.meta = meta;
-        }
-
+        },
     },
 
     methods: {
-
         load() {
             this.loading = true;
 
@@ -64,7 +59,7 @@ export default {
                 value: this.value,
             };
 
-            this.$axios.post(cp_url('fields/field-meta'), params).then(response => {
+            this.$axios.post(cp_url('fields/field-meta'), params).then((response) => {
                 this.meta = response.data.meta;
                 this.value = response.data.value;
                 this.loading = false;
@@ -74,9 +69,7 @@ export default {
 
         updateMeta(value) {
             this.meta = value;
-        }
-
-    }
-
-}
+        },
+    },
+};
 </script>

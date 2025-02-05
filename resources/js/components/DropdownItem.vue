@@ -15,7 +15,6 @@ export default {
     inject: ['popover'],
 
     computed: {
-
         href() {
             return this.redirect || this.externalLink;
         },
@@ -23,11 +22,9 @@ export default {
         target() {
             return this.externalLink ? '_blank' : null;
         },
-
     },
 
     methods: {
-
         selectAndClose($event) {
             if (this.href) {
                 return;
@@ -37,8 +34,6 @@ export default {
 
             this.popover.vm.close();
         },
-
-    }
-
-}
+    },
+};
 </script>

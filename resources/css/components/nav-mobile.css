@@ -3,17 +3,29 @@
    ========================================================================== */
 
 .nav-main.nav-mobile {
-    left: -110% ; [dir="rtl"] & { left: auto ; right: -110% ; }
+    left: -110%;
+    [dir='rtl'] & {
+        left: auto;
+        right: -110%;
+    }
     display: block;
     z-index: 996;
     .nav-main-inner {
-        padding-left: 12px ; [dir="rtl"] & { padding-right: 12px ; padding-left: 0 ; }
+        padding-left: 12px;
+        [dir='rtl'] & {
+            padding-right: 12px;
+            padding-left: 0;
+        }
     }
 }
 
 .nav-mobile-open {
     .nav-main.nav-mobile {
-        left: 0 ; [dir="rtl"] & { left: auto ; right: 0 ; }
+        left: 0;
+        [dir='rtl'] & {
+            left: auto;
+            right: 0;
+        }
     }
 }
 

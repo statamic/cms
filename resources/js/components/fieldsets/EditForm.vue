@@ -1,7 +1,5 @@
 <template>
-
     <div>
-
         <header class="mb-6">
             <breadcrumb :url="breadcrumbUrl" :title="__('Fieldsets')" />
             <div class="flex items-center justify-between">
@@ -10,25 +8,35 @@
             </div>
         </header>
 
-        <div class="publish-form card p-0 @container mb-8">
+        <div class="publish-form card mb-8 p-0 @container">
             <div class="publish-fields">
                 <div class="form-group w-full">
                     <div class="field-inner">
                         <label class="block">{{ __('Title') }}</label>
                         <small class="help-block -mt-2">{{ __('messages.fieldsets_title_instructions') }}</small>
                         <div v-if="errors.title">
-                            <small class="help-block text-red-500" v-for="(error, i) in errors.title" :key="i" v-text="error" />
+                            <small
+                                class="help-block text-red-500"
+                                v-for="(error, i) in errors.title"
+                                :key="i"
+                                v-text="error"
+                            />
                         </div>
                     </div>
                     <div>
-                        <input type="text" name="title" class="input-text" v-model="fieldset.title" autofocus="autofocus">
+                        <input
+                            type="text"
+                            name="title"
+                            class="input-text"
+                            v-model="fieldset.title"
+                            autofocus="autofocus"
+                        />
                     </div>
                 </div>
             </div>
-
         </div>
 
-        <div class="content mt-10 mb-4">
+        <div class="content mb-4 mt-10">
             <h2 v-text="__('Fields')" />
         </div>
 
@@ -46,22 +54,19 @@
                 @editor-closed="editingField = null"
             />
         </div>
-
     </div>
-
 </template>
 
 <script>
 import Fields from '../blueprints/Fields.vue';
-import {Sortable, Plugins} from '@shopify/draggable';
+import { Sortable, Plugins } from '@shopify/draggable';
 import SuggestsConditionalFields from '../blueprints/SuggestsConditionalFields';
 
 export default {
-
     mixins: [SuggestsConditionalFields],
 
     components: {
-        Fields
+        Fields,
     },
 
     props: ['action', 'initialFieldset', 'breadcrumbUrl'],
@@ -73,24 +78,22 @@ export default {
             fieldset: clone(this.initialFieldset),
             errors: {},
             editingField: null,
-        }
+        };
     },
 
     computed: {
-
         fields: {
             get() {
                 return this.fieldset.fields;
             },
             set(fields) {
                 this.fieldset.fields = fields;
-            }
+            },
         },
 
         fieldsForConditionSuggestions() {
             return this.fields;
-        }
-
+        },
     },
 
     mounted() {
@@ -98,17 +101,16 @@ export default {
     },
 
     methods: {
-
         save() {
             this.$axios[this.method](this.action, this.fieldset)
-                .then(response => {
+                .then((response) => {
                     this.$toast.success(__('Saved'));
                     this.errors = {};
                 })
-                .catch(e => {
+                .catch((e) => {
                     this.$toast.error(e.response.data.message);
                     this.errors = e.response.data.errors;
-                })
+                });
         },
 
         fieldCreated(field) {
@@ -128,7 +130,7 @@ export default {
             this.$toast.success(__('Field added'));
 
             if (field.type === 'reference') {
-                this.$nextTick(() => this.editingField = field._id);
+                this.$nextTick(() => (this.editingField = field._id));
             }
         },
 
@@ -137,19 +139,18 @@ export default {
                 draggable: '.blueprint-section-field',
                 handle: '.blueprint-drag-handle',
                 mirror: { constrainDimensions: true, appendTo: 'body' },
-                plugins: [Plugins.SwapAnimation]
-            }).on('sortable:stop', e => {
+                plugins: [Plugins.SwapAnimation],
+            }).on('sortable:stop', (e) => {
                 this.fieldset.fields.splice(e.newIndex, 0, this.fieldset.fields.splice(e.oldIndex, 1)[0]);
             });
-        }
+        },
     },
 
     created() {
-        this.$keys.bindGlobal(['mod+s'], e => {
+        this.$keys.bindGlobal(['mod+s'], (e) => {
             e.preventDefault();
             this.save();
         });
     },
-
-}
+};
 </script>

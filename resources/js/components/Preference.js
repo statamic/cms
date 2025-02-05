@@ -15,21 +15,15 @@ export default class Preference {
     }
 
     set(key, value) {
-        return this.commitOnSuccessAndReturnPromise(
-            axios.post(this.url, {key, value})
-        );
+        return this.commitOnSuccessAndReturnPromise(axios.post(this.url, { key, value }));
     }
 
     append(key, value) {
-        return this.commitOnSuccessAndReturnPromise(
-            axios.post(this.url, {key, value, append: true})
-        );
+        return this.commitOnSuccessAndReturnPromise(axios.post(this.url, { key, value, append: true }));
     }
 
-    remove(key, value=null, cleanup=true) {
-        return this.commitOnSuccessAndReturnPromise(
-            axios.delete(`${this.url}/${key}`, { data: { value, cleanup } })
-        );
+    remove(key, value = null, cleanup = true) {
+        return this.commitOnSuccessAndReturnPromise(axios.delete(`${this.url}/${key}`, { data: { value, cleanup } }));
     }
 
     removeValue(key, value) {
@@ -37,7 +31,7 @@ export default class Preference {
     }
 
     commitOnSuccessAndReturnPromise(promise) {
-        promise.then(response => {
+        promise.then((response) => {
             this.store.commit('statamic/preferences', response.data);
         });
 

@@ -1,24 +1,20 @@
 <template>
-    <div :class="[triggerClass, {'popover-open': isOpen}]" @mouseleave="leave">
-
+    <div :class="[triggerClass, { 'popover-open': isOpen }]" @mouseleave="leave">
         <div @click="toggle" ref="trigger" aria-haspopup="true" :aria-expanded="isOpen" v-if="$slots.default">
             <slot name="trigger"></slot>
         </div>
 
-        <portal
-            name="popover"
-            :target-class="`popover-container ${targetClass || ''}`"
-            :provide="provide"
-        >
+        <portal name="popover" :target-class="`popover-container ${targetClass || ''}`" :provide="provide">
             <div :class="`${isOpen ? 'popover-open' : ''}`">
                 <div ref="popover" class="popover" v-if="!disabled" v-click-away="clickawayClose">
-                    <div class="popover-content bg-white dark:bg-dark-550 shadow-popover dark:shadow-dark-popover rounded-md">
+                    <div
+                        class="popover-content rounded-md bg-white shadow-popover dark:bg-dark-550 dark:shadow-dark-popover"
+                    >
                         <slot :close="close" />
                     </div>
                 </div>
             </div>
         </portal>
-
     </div>
 </template>
 
@@ -26,34 +22,35 @@
 import { computePosition, flip, shift, offset, autoUpdate } from '@floating-ui/dom';
 
 export default {
-
     props: {
         autoclose: {
             type: Boolean,
-            default: false
+            default: false,
         },
         clickaway: {
             type: Boolean,
-            default: true
+            default: true,
         },
         disabled: {
             type: Boolean,
-            default: false
+            default: false,
         },
         offset: {
             type: Array,
-            default: () => [10, 0]
+            default: () => [10, 0],
         },
         placement: {
             type: String,
             default: 'bottom-end',
         },
-        class: { // Gets applied to the popover content.
+        class: {
+            // Gets applied to the popover content.
             type: String,
         },
-        triggerClass: { // Gets applied to the trigger.
+        triggerClass: {
+            // Gets applied to the trigger.
             type: String,
-        }
+        },
     },
 
     data() {
@@ -65,21 +62,18 @@ export default {
             provide: {
                 popover: this.makeProvide(),
             },
-        }
+        };
     },
 
     computed: {
-
         targetClass() {
             return this.class;
-        }
-
+        },
     },
 
     methods: {
-
         computePosition() {
-            if (! this.$refs.trigger) return;
+            if (!this.$refs.trigger) return;
 
             computePosition(this.$refs.trigger.firstElementChild, this.$refs.popover, {
                 placement: this.placement,
@@ -103,19 +97,27 @@ export default {
             if (this.disabled) return;
 
             this.isOpen = true;
-            this.escBinding = this.$keys.bindGlobal('esc', e => this.close());
+            this.escBinding = this.$keys.bindGlobal('esc', (e) => this.close());
             this.$nextTick(() => {
-                this.cleanupAutoUpdater = autoUpdate(this.$refs.trigger.firstElementChild, this.$refs.popover, this.computePosition);
+                this.cleanupAutoUpdater = autoUpdate(
+                    this.$refs.trigger.firstElementChild,
+                    this.$refs.popover,
+                    this.computePosition,
+                );
 
-                this.$refs.popover.addEventListener('transitionend', () => {
-                    this.$emit('opened');
-                }, { once: true });
+                this.$refs.popover.addEventListener(
+                    'transitionend',
+                    () => {
+                        this.$emit('opened');
+                    },
+                    { once: true },
+                );
             });
         },
 
         clickawayClose(e) {
             // If disabled or closed, do nothing.
-            if (! this.clickaway || ! this.isOpen) return;
+            if (!this.clickaway || !this.isOpen) return;
 
             // If clicking within the popover, or inside the trigger, do nothing.
             // These need to be checked separately, because the popover contents away.
@@ -126,7 +128,7 @@ export default {
         },
 
         close() {
-            if (! this.isOpen) return;
+            if (!this.isOpen) return;
 
             this.isOpen = false;
             this.$emit('closed');
@@ -145,7 +147,7 @@ export default {
                 vm: { get: () => this },
             });
             return provide;
-        }
-    }
-}
+        },
+    },
+};
 </script>

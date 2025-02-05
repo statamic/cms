@@ -1,10 +1,11 @@
-@php use function Statamic\trans as __; @endphp
+@php
+    use function Statamic\trans as __;
+@endphp
 
 @extends('statamic::layout')
 @section('title', __('Create Asset Container'))
 
 @section('content')
-
     <asset-container-create-form
         initial-title="{{ __('Create Asset Container') }}"
         :blueprint="{{ json_encode($blueprint) }}"
@@ -14,5 +15,4 @@
         listing-url="{{ cp_route('assets.browse.index') }}"
         action="post"
     ></asset-container-create-form>
-
 @endsection

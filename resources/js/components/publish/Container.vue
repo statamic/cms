@@ -8,36 +8,36 @@ export default {
 
     props: {
         reference: {
-            type: String
+            type: String,
         },
         name: {
             type: String,
-            required: true
+            required: true,
         },
         blueprint: {
             type: Object,
-            default: () => {}
+            default: () => {},
         },
         values: {
             type: Object,
-            default: () => {}
+            default: () => {},
         },
         extraValues: {
             type: Object,
-            default: () => {}
+            default: () => {},
         },
         meta: {
             type: Object,
-            default: () => {}
+            default: () => {},
         },
         errors: {
-            type: Object
+            type: Object,
         },
         site: {
-            type: String
+            type: String,
         },
         localizedFields: {
-            type: Array
+            type: Array,
         },
         isRoot: {
             // intentionally not a boolean. we rely on it being undefined in places.
@@ -51,7 +51,7 @@ export default {
     data() {
         return {
             components: [], // extra components to be injected
-        }
+        };
     },
 
     created() {
@@ -67,12 +67,11 @@ export default {
 
     provide() {
         return {
-            storeName: this.name
-        }
+            storeName: this.name,
+        };
     },
 
     methods: {
-
         registerVuexModule() {
             const vm = this;
 
@@ -88,8 +87,7 @@ export default {
             };
 
             // If the store already exists, just reinitialize the state.
-            if (this.$store.state.hasOwnProperty('publish')
-            && this.$store.state.publish.hasOwnProperty(this.name)) {
+            if (this.$store.state.hasOwnProperty('publish') && this.$store.state.publish.hasOwnProperty(this.name)) {
                 this.$store.commit(`publish/${this.name}/initialize`, initial);
                 return;
             }
@@ -197,7 +195,7 @@ export default {
                     },
                     clearAutosaveInterval(state) {
                         clearInterval(state.autosaveInterval);
-                    }
+                    },
                 },
                 actions: {
                     setFieldValue(context, payload) {
@@ -216,8 +214,8 @@ export default {
                     },
                     setMeta(context, payload) {
                         context.commit('setMeta', payload);
-                    }
-                }
+                    },
+                },
             });
         },
 
@@ -251,32 +249,32 @@ export default {
 
         setFieldValue(handle, value) {
             this.$store.dispatch(`publish/${this.name}/setFieldValue`, {
-                handle, value,
-                user: Statamic.user.id
+                handle,
+                value,
+                user: Statamic.user.id,
             });
         },
 
         setFieldMeta(handle, value) {
             this.$store.dispatch(`publish/${this.name}/setFieldMeta`, {
-                handle, value,
-                user: Statamic.user.id
+                handle,
+                value,
+                user: Statamic.user.id,
             });
         },
 
         dirty() {
             if (this.trackDirtyState) this.$dirty.add(this.name);
-        }
-
+        },
     },
 
     watch: {
-
         values: {
             deep: true,
             handler(after, before) {
                 if (_.isEqual(before, after)) return;
                 this.$store.commit(`publish/${this.name}/setValues`, after);
-            }
+            },
         },
 
         extraValues: {
@@ -284,7 +282,7 @@ export default {
             handler(after, before) {
                 if (_.isEqual(before, after)) return;
                 this.$store.commit(`publish/${this.name}/setExtraValues`, after);
-            }
+            },
         },
 
         meta: {
@@ -292,7 +290,7 @@ export default {
             handler(after, before) {
                 if (_.isEqual(before, after)) return;
                 this.$store.commit(`publish/${this.name}/setMeta`, after);
-            }
+            },
         },
 
         isRoot(isRoot) {
@@ -303,7 +301,7 @@ export default {
             deep: true,
             handler(blueprint) {
                 this.$store.commit(`publish/${this.name}/setBlueprint`, blueprint);
-            }
+            },
         },
 
         site(site) {
@@ -316,8 +314,7 @@ export default {
 
         localizedFields(fields) {
             this.$store.commit(`publish/${this.name}/setLocalizedFields`, fields);
-        }
-
+        },
     },
 
     render() {
@@ -328,7 +325,6 @@ export default {
             setFieldValue: this.setFieldValue,
             setFieldMeta: this.setFieldMeta,
         })[0];
-    }
-
-}
+    },
+};
 </script>

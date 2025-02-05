@@ -1,4 +1,4 @@
-<input type="hidden" name="{{ handle }}[]">
+<input type="hidden" name="{{ handle }}[]" />
 {{ foreach:options as="option|label" }}
     <label>
         <input
@@ -14,10 +14,10 @@
             {{ elseif instructions }}
                 aria-describedby="{{ id }}-instructions"
             {{ /if }}
-        >
+        />
         {{ label !== null ? label : option }}
     </label>
     {{ unless inline }}
-        <br>
+        <br />
     {{ /unless }}
 {{ /foreach:options }}

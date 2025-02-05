@@ -1,13 +1,9 @@
 <template>
     <div>
         <div class="mb-2 flex justify-end">
+            <a class="text-2xs text-blue underline ltr:mr-4 rtl:ml-4" v-text="__('Expand All')" @click="expandAll" />
             <a
-                class="text-2xs text-blue rtl:ml-4 ltr:mr-4 underline"
-                v-text="__('Expand All')"
-                @click="expandAll"
-            />
-            <a
-                class="text-2xs text-blue rtl:ml-2 ltr:mr-2 underline"
+                class="text-2xs text-blue underline ltr:mr-2 rtl:ml-2"
                 v-text="__('Collapse All')"
                 @click="collapseAll"
             />
@@ -17,7 +13,7 @@
             <loading-graphic />
         </div>
 
-        <div v-if="!loading && pages.length == 0" class="no-results w-full flex items-center">
+        <div v-if="!loading && pages.length == 0" class="no-results flex w-full items-center">
             <slot name="empty" />
         </div>
 
@@ -39,9 +35,7 @@
                 @close:node="nodeClosed"
             >
                 <template #placeholder>
-                    <div class="w-full bg-blue-500/10 rounded p-2 border border-blue-400 border-dashed">
-                        &nbsp;
-                    </div>
+                    <div class="w-full rounded border border-dashed border-blue-400 bg-blue-500/10 p-2">&nbsp;</div>
                 </template>
 
                 <template #default="{ node, stat }">
@@ -81,13 +75,11 @@
     </div>
 </template>
 
-
 <script>
 import { dragContext, Draggable, walkTreeData } from '@he-tree/vue';
 import TreeBranch from './Branch.vue';
 
 export default {
-
     components: {
         Draggable,
         TreeBranch,
@@ -100,7 +92,7 @@ export default {
         createUrl: { type: String },
         site: { type: String, required: true },
         localizations: { type: Array },
-        maxDepth: { type: Number, default: Infinity, },
+        maxDepth: { type: Number, default: Infinity },
         expectsRoot: { type: Boolean, required: true },
         showSlugs: { type: Boolean, default: false },
         preferencesPrefix: { type: String },
@@ -115,11 +107,10 @@ export default {
             pages: [],
             treeData: [],
             collapsedState: [],
-        }
+        };
     },
 
     computed: {
-
         activeLocalization() {
             return _.findWhere(this.localizations, { active: true });
         },
@@ -131,11 +122,9 @@ export default {
         direction() {
             return this.$config.get('direction', 'ltr');
         },
-
     },
 
     watch: {
-
         site(site) {
             this.getPages();
         },
@@ -146,8 +135,8 @@ export default {
                 if (this.preferencesKey) {
                     localStorage.setItem(this.preferencesKey, JSON.stringify(state));
                 }
-            }
-        }
+            },
+        },
     },
 
     created() {
@@ -155,29 +144,28 @@ export default {
 
         this.getPages().then(() => {
             this.initialPages = this.pages;
-        })
+        });
 
-        this.$keys.bindGlobal(['mod+s'], e => {
+        this.$keys.bindGlobal(['mod+s'], (e) => {
             e.preventDefault();
             this.save();
         });
     },
 
     methods: {
-
         isRoot(stat) {
             if (!this.expectsRoot) {
-                return false
+                return false;
             }
 
-            return stat.level === 1 && stat.data.id === this.treeData[0]?.id
+            return stat.level === 1 && stat.data.id === this.treeData[0]?.id;
         },
 
         getPages() {
             this.loading = true;
             const url = `${this.pagesUrl}?site=${this.site}`;
 
-            return this.$axios.get(url).then(response => {
+            return this.$axios.get(url).then((response) => {
                 this.pages = response.data.pages;
                 this.updateTreeData();
                 this.loading = false;
@@ -190,14 +178,14 @@ export default {
         },
 
         cleanPagesForSubmission(pages) {
-            return _.map(pages, page => ({
+            return _.map(pages, (page) => ({
                 id: page.id,
-                children: this.cleanPagesForSubmission(page.children)
+                children: this.cleanPagesForSubmission(page.children),
             }));
         },
 
         save() {
-            if (! this.editable) {
+            if (!this.editable) {
                 return;
             }
 
@@ -207,30 +195,34 @@ export default {
                 pages: this.cleanPagesForSubmission(this.pages),
                 site: this.site,
                 expectsRoot: this.expectsRoot,
-                ...this.submitParameters
+                ...this.submitParameters,
             };
 
-            return this.$axios.patch(this.submitUrl, payload).then(response => {
-                if (! response.data.saved) {
-                    return this.$toast.error(`Couldn't save tree`)
-                }
+            return this.$axios
+                .patch(this.submitUrl, payload)
+                .then((response) => {
+                    if (!response.data.saved) {
+                        return this.$toast.error(`Couldn't save tree`);
+                    }
 
-                this.$emit('saved', response);
-                this.$toast.success(__('Saved'));
-                this.initialPages = this.pages;
-                return response;
-            }).catch(e => {
-                let message = e.response ? e.response.data.message : __('Something went wrong');
+                    this.$emit('saved', response);
+                    this.$toast.success(__('Saved'));
+                    this.initialPages = this.pages;
+                    return response;
+                })
+                .catch((e) => {
+                    let message = e.response ? e.response.data.message : __('Something went wrong');
 
-                // For a validation error, show the first message from any field in the toast.
-                if (e.response && e.response.status === 422) {
-                    const { errors } = e.response.data;
-                    message = errors[Object.keys(errors)[0]][0];
-                }
+                    // For a validation error, show the first message from any field in the toast.
+                    if (e.response && e.response.status === 422) {
+                        const { errors } = e.response.data;
+                        message = errors[Object.keys(errors)[0]][0];
+                    }
 
-                this.$toast.error(message);
-                return Promise.reject(e);
-            }).finally(() => this.saving = false);
+                    this.$toast.error(message);
+                    return Promise.reject(e);
+                })
+                .finally(() => (this.saving = false));
         },
 
         addPages(pages, targetParent) {
@@ -248,7 +240,7 @@ export default {
             // the parent. The tree.move() API wasn't working, so instead
             // we're removing the child data and re-adding them as new ones.
             const children = [];
-            if (! deleteChildren) stat.children.forEach(child => children.push({...child.data}));
+            if (!deleteChildren) stat.children.forEach((child) => children.push({ ...child.data }));
 
             this.$refs.tree.batchUpdate(() => {
                 this.$refs.tree.remove(stat);
@@ -277,7 +269,7 @@ export default {
         },
 
         cancel() {
-            if (! confirm(__('Are you sure?'))) return;
+            if (!confirm(__('Are you sure?'))) return;
 
             this.pages = this.initialPages;
             this.updateTreeData();
@@ -286,18 +278,18 @@ export default {
 
         rootDroppable() {
             if (!this.expectsRoot) {
-                return true
+                return true;
             }
 
-            return dragContext.dragNode.children.length === 0
+            return dragContext.dragNode.children.length === 0;
         },
 
         eachDroppable(targetStat) {
             if (!this.expectsRoot) {
-                return true
+                return true;
             }
 
-            return !this.isRoot(targetStat)
+            return !this.isRoot(targetStat);
         },
 
         pageUpdated() {
@@ -317,15 +309,15 @@ export default {
             let branch;
             walkTreeData(this.treeData, (node) => {
                 if (node.id === id) {
-                    branch = node
-                    return false
+                    branch = node;
+                    return false;
                 }
             });
             return branch;
         },
 
         getCollapsedState() {
-            if (! this.preferencesKey) return [];
+            if (!this.preferencesKey) return [];
 
             return JSON.parse(localStorage.getItem(this.preferencesKey) || '[]');
         },
@@ -339,10 +331,9 @@ export default {
         },
 
         statHandler(stat) {
-            stat.open = ! this.collapsedState.includes(stat.data.id);
+            stat.open = !this.collapsedState.includes(stat.data.id);
             return stat;
         },
-
-    }
-}
+    },
+};
 </script>

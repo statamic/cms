@@ -1,50 +1,58 @@
 <template>
-
     <teleport :to="portal" :order="depth" v-if="visible">
         <div class="vue-portal-target stack">
-        <div class="stack-container"
-            :class="{ 'stack-is-current': isTopStack, 'hovering': isHovering, 'p-2 shadow-lg': full }"
-            :style="direction === 'ltr' ? { left: `${leftOffset}px` } : { right: `${leftOffset}px` }"
-        >
-            <transition name="stack-overlay-fade">
-                <div class="stack-overlay" v-if="visible" :style="direction === 'ltr' ? { left: `-${leftOffset}px` } : { right: `-${leftOffset}px` }" />
-            </transition>
+            <div
+                class="stack-container"
+                :class="{ 'stack-is-current': isTopStack, hovering: isHovering, 'p-2 shadow-lg': full }"
+                :style="direction === 'ltr' ? { left: `${leftOffset}px` } : { right: `${leftOffset}px` }"
+            >
+                <transition name="stack-overlay-fade">
+                    <div
+                        class="stack-overlay"
+                        v-if="visible"
+                        :style="direction === 'ltr' ? { left: `-${leftOffset}px` } : { right: `-${leftOffset}px` }"
+                    />
+                </transition>
 
-            <div class="stack-hit-area" :style="direction === 'ltr' ? { left: `-${offset}px` } : { right: `-${offset}px` }" @click="clickedHitArea" @mouseenter="mouseEnterHitArea" @mouseout="mouseOutHitArea" />
+                <div
+                    class="stack-hit-area"
+                    :style="direction === 'ltr' ? { left: `-${offset}px` } : { right: `-${offset}px` }"
+                    @click="clickedHitArea"
+                    @mouseenter="mouseEnterHitArea"
+                    @mouseout="mouseOutHitArea"
+                />
 
-            <transition name="stack-slide">
-                <div class="stack-content" v-if="visible">
-                    <slot name="default" :depth="depth" :close="close" />
-                </div>
-            </transition>
-        </div>
+                <transition name="stack-slide">
+                    <div class="stack-content" v-if="visible">
+                        <slot name="default" :depth="depth" :close="close" />
+                    </div>
+                </transition>
+            </div>
         </div>
     </teleport>
-
 </template>
 
 <script>
 export default {
-
     emits: ['closed'],
 
     props: {
         name: {
             type: String,
-            required: true
+            required: true,
         },
         beforeClose: {
             type: Function,
-            default: () => true
+            default: () => true,
         },
         narrow: {
-            type: Boolean
+            type: Boolean,
         },
         half: {
-            type: Boolean
+            type: Boolean,
         },
         full: {
-            type: Boolean
+            type: Boolean,
         },
     },
 
@@ -54,11 +62,10 @@ export default {
             visible: false,
             isHovering: false,
             escBinding: null,
-        }
+        };
     },
 
     computed: {
-
         portal() {
             return this.stack ? `#portal-target-${this.stack.id}` : null;
         },
@@ -75,11 +82,11 @@ export default {
             if (this.isTopStack && this.narrow) {
                 return window.innerWidth - 400;
             } else if (this.isTopStack && this.half) {
-                return window.innerWidth/ 2 ;
+                return window.innerWidth / 2;
             }
 
             // max of 200px, min of 80px
-            return Math.max(400 / (this.$stacks.count() + 1), 80)
+            return Math.max(400 / (this.$stacks.count() + 1), 80);
         },
 
         leftOffset() {
@@ -104,15 +111,14 @@ export default {
 
         direction() {
             return this.$config.get('direction', 'ltr');
-        }
-
+        },
     },
 
     created() {
         this.stack = this.$stacks.add(this);
 
-        this.$events.$on(`stacks.${this.depth}.hit-area-mouseenter`, () => this.isHovering = true);
-        this.$events.$on(`stacks.${this.depth}.hit-area-mouseout`, () => this.isHovering = false);
+        this.$events.$on(`stacks.${this.depth}.hit-area-mouseenter`, () => (this.isHovering = true));
+        this.$events.$on(`stacks.${this.depth}.hit-area-mouseout`, () => (this.isHovering = false));
         this.escBinding = this.$keys.bindGlobal('esc', this.close);
     },
 
@@ -124,7 +130,6 @@ export default {
     },
 
     methods: {
-
         clickedHitArea() {
             if (!this.visible) {
                 return;
@@ -150,7 +155,7 @@ export default {
         runCloseCallback() {
             const shouldClose = this.beforeClose();
 
-            if (! shouldClose) return false;
+            if (!shouldClose) return false;
 
             this.close();
 
@@ -159,15 +164,14 @@ export default {
 
         close() {
             this.visible = false;
-            this.$wait(300).then(() => { this.$emit('closed') });
+            this.$wait(300).then(() => {
+                this.$emit('closed');
+            });
         },
     },
 
     mounted() {
         this.visible = true;
     },
-
-
-
-}
+};
 </script>

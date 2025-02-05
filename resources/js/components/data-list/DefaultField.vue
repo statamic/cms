@@ -2,19 +2,17 @@
 import { h } from 'vue';
 
 export default {
-
     props: {
-        value: { required: true }
+        value: { required: true },
     },
 
     data() {
         return {
-            truncateAt: 50
-        }
+            truncateAt: 50,
+        };
     },
 
     computed: {
-
         text() {
             let value = this.value;
 
@@ -32,13 +30,11 @@ export default {
             }
 
             return value;
-        }
-
+        },
     },
 
     render() {
         return h('div', { innerHTML: this.text });
-    }
-
-}
+    },
+};
 </script>

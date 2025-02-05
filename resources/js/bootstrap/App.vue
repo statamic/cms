@@ -47,7 +47,6 @@ import PortalTargets from '../components/portals/PortalTargets.vue';
 import SitesEditForm from '../components/sites/EditForm.vue';
 
 export default {
-
     components: {
         GlobalSearch,
         GlobalSiteSelector,
@@ -105,11 +104,10 @@ export default {
             appendedComponents: Statamic.$components.components,
             isLicensingBannerSnoozed: localStorage.getItem(`statamic.snooze_license_banner`) > new Date().valueOf(),
             copyToClipboardModalUrl: null,
-        }
+        };
     },
 
     computed: {
-
         version() {
             return Statamic.$config.get('version');
         },
@@ -120,14 +118,13 @@ export default {
 
         wrapperClass() {
             return this.$config.get('wrapperClass', 'max-w-xl');
-        }
-
+        },
     },
 
     mounted() {
         this.bindWindowResizeListener();
 
-        this.$keys.bind(['command+\\'], e => {
+        this.$keys.bind(['command+\\'], (e) => {
             e.preventDefault();
             this.toggleNav();
         });
@@ -159,11 +156,9 @@ export default {
         });
 
         Statamic.$callbacks.add('bustAndReloadImageCaches', function (urls) {
-            urls.forEach(async url => {
+            urls.forEach(async (url) => {
                 await fetch(url, { cache: 'reload', mode: 'no-cors' });
-                document.body
-                    .querySelectorAll(`img[src='${url}']`)
-                    .forEach(img => img.src = url);
+                document.body.querySelectorAll(`img[src='${url}']`).forEach((img) => (img.src = url));
             });
         });
 
@@ -171,7 +166,6 @@ export default {
     },
 
     methods: {
-
         bindWindowResizeListener() {
             window.addEventListener('resize', () => {
                 this.$store.commit('statamic/windowWidth', document.documentElement.clientWidth);
@@ -180,12 +174,12 @@ export default {
         },
 
         toggleNav() {
-            this.navOpen = ! this.navOpen;
+            this.navOpen = !this.navOpen;
             localStorage.setItem('statamic.nav', this.navOpen ? 'open' : 'closed');
         },
 
         toggleMobileNav() {
-            this.mobileNavOpen = ! this.mobileNavOpen;
+            this.mobileNavOpen = !this.mobileNavOpen;
         },
 
         hideBanner() {
@@ -227,12 +221,11 @@ export default {
                     MM: __('moment.relativeTime.MM'),
                     y: __('moment.relativeTime.y'),
                     yy: __('moment.relativeTime.yy'),
-                }
+                },
             };
             window.moment.updateLocale(locale, spec);
             this.$moment.updateLocale(locale, spec);
-        }
-    }
-
-}
+        },
+    },
+};
 </script>

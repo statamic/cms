@@ -13,15 +13,18 @@
             @focus.stop="$emit('focus')"
             @blur.stop="$emit('blur')"
         />
-        <div class="rtl:text-left ltr:text-right text-xs -mb-3 @sm:-mb-5 @lg:-mb-5" :class="limitIndicatorColor" v-if="limit">
+        <div
+            class="-mb-3 text-xs @sm:-mb-5 @lg:-mb-5 ltr:text-right rtl:text-left"
+            :class="limitIndicatorColor"
+            v-if="limit"
+        >
             <span v-text="currentLength"></span>/<span v-text="limit"></span>
         </div>
     </div>
-
 </template>
 
 <script>
-import LengthLimiter from '../LengthLimiter.vue'
+import LengthLimiter from '../LengthLimiter.vue';
 import autosize from 'autosize';
 
 export default {
@@ -33,8 +36,7 @@ export default {
         placeholder: { required: false },
         modelValue: { required: true },
         id: { default: null },
-        focus: { type: Boolean, default: false }
-
+        focus: { type: Boolean, default: false },
     },
     mounted() {
         autosize(this.$refs.textarea);
@@ -55,10 +57,10 @@ export default {
 
     methods: {
         updateSize() {
-            this.$nextTick(function() {
-                autosize.update(this.$refs.textarea)
-            })
-        }
-    }
-}
+            this.$nextTick(function () {
+                autosize.update(this.$refs.textarea);
+            });
+        },
+    },
+};
 </script>

@@ -7,7 +7,7 @@
 
 .vfm__content {
     @apply rounded-lg dark:bg-dark-600 dark:shadow-dark !important;
-    @apply bg-white shadow-2xl overflow-clip;
+    @apply overflow-clip bg-white shadow-2xl;
 
     [dir='rtl'] & {
         direction: rtl;
@@ -15,9 +15,9 @@
 }
 
 .vfm__overlay {
-    background: hsla(210, 20%, 10%, .15) !important;
+    background: hsla(210, 20%, 10%, 0.15) !important;
 }
 
 .confirmation-modal .publish-fields .form-group {
-    @apply p-0 mb-6;
+    @apply mb-6 p-0;
 }

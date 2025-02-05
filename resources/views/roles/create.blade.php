@@ -1,10 +1,11 @@
-@php use function Statamic\trans as __; @endphp
+@php
+    use function Statamic\trans as __;
+@endphp
 
 @extends('statamic::layout')
 @section('title', Statamic::crumb(__('Create Role'), __('Roles & Permissions')))
 
 @section('content')
-
     <role-publish-form
         action="{{ cp_route('roles.store') }}"
         method="post"
@@ -14,5 +15,4 @@
         index-url="{{ cp_route('roles.index') }}"
         v-cloak
     ></role-publish-form>
-
 @endsection

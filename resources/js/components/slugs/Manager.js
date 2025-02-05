@@ -2,9 +2,8 @@ import Slug from './Slug';
 import { markRaw } from 'vue';
 
 class Manager {
-
     make() {
-        return markRaw(new Slug);
+        return markRaw(new Slug());
     }
 
     create(string) {
@@ -22,7 +21,6 @@ class Manager {
     async() {
         return this.make().async();
     }
-
 }
 
 export default Manager;

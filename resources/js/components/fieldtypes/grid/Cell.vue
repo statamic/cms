@@ -1,5 +1,4 @@
 <template>
-
     <td class="grid-cell" :class="classes" :width="width">
         <div v-show="showInner" class="@container">
             <component
@@ -19,56 +18,53 @@
         </div>
 
         <div v-if="hasError">
-            <small class="help-block text-red-500 mt-2 mb-0" v-for="(error, i) in errors" :key="i" v-text="error" />
+            <small class="help-block mb-0 mt-2 text-red-500" v-for="(error, i) in errors" :key="i" v-text="error" />
         </div>
     </td>
-
 </template>
 
 <script>
 export default {
-
     props: {
         field: {
             type: Object,
-            required: true
+            required: true,
         },
         value: {
-            required: true
+            required: true,
         },
         meta: {
-            required: true
+            required: true,
         },
         index: {
             type: Number,
-            required: true
+            required: true,
         },
         rowIndex: {
             type: Number,
-            required: true
+            required: true,
         },
         gridName: {
             type: String,
-            required: true
+            required: true,
         },
         showInner: {
             type: Boolean,
-            required: true
+            required: true,
         },
         errors: {
             type: Array,
-            required: true
+            required: true,
         },
         fieldPath: {
             type: String,
-            required: true
-        }
+            required: true,
+        },
     },
 
     inject: ['grid'],
 
     computed: {
-
         classes() {
             return [this.fieldtypeComponent, this.field.classes];
         },
@@ -89,11 +85,9 @@ export default {
             if (this.field.width) {
                 return this.field.width + '%';
             }
-        }
-
-    }
-
-}
+        },
+    },
+};
 
 // TODO: Cell widths
 </script>

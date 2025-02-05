@@ -1,13 +1,13 @@
-@php use function Statamic\trans as __; @endphp
+@php
+    use function Statamic\trans as __;
+@endphp
 
 @extends('statamic::layout')
 @section('title', __('Navigation'))
 
 @section('content')
-
-    @unless($navs->isEmpty())
-
-        <header class="flex items-center justify-between mb-6">
+    @unless ($navs->isEmpty())
+        <header class="mb-6 flex items-center justify-between">
             <h1>{{ __('Navigation') }}</h1>
 
             @can('create', 'Statamic\Contracts\Structures\Nav')
@@ -15,26 +15,26 @@
             @endcan
         </header>
 
-        <navigation-listing
-            :initial-rows="{{ json_encode($navs) }}">
-        </navigation-listing>
-
+        <navigation-listing :initial-rows="{{ json_encode($navs) }}"></navigation-listing>
     @else
-
-        @include('statamic::partials.empty-state', [
-            'title' => __('Navigation'),
-            'description' => __('statamic::messages.navigation_configure_intro'),
-            'svg' => 'empty/navigation',
-            'button_text' => __('Create Navigation'),
-            'button_url' => cp_route('navigation.create'),
-            'can' => $user->can('create', 'Statamic\Contracts\Structures\Nav')
-        ])
-
+        @include(
+            'statamic::partials.empty-state',
+            [
+                'title' => __('Navigation'),
+                'description' => __('statamic::messages.navigation_configure_intro'),
+                'svg' => 'empty/navigation',
+                'button_text' => __('Create Navigation'),
+                'button_url' => cp_route('navigation.create'),
+                'can' => $user->can('create', 'Statamic\Contracts\Structures\Nav'),
+            ]
+        )
     @endunless
 
-    @include('statamic::partials.docs-callout', [
-        'topic' => __('Navigation'),
-        'url' => Statamic::docsUrl('navigation')
-    ])
-
+    @include(
+        'statamic::partials.docs-callout',
+        [
+            'topic' => __('Navigation'),
+            'url' => Statamic::docsUrl('navigation'),
+        ]
+    )
 @endsection

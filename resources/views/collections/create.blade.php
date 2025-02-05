@@ -1,10 +1,10 @@
-@php use function Statamic\trans as __; @endphp
+@php
+    use function Statamic\trans as __;
+@endphp
 
 @extends('statamic::layout')
 @section('title', __('Create Collection'))
 
 @section('content')
-    <collection-create-form
-        route="{{ cp_route('collections.store') }}">
-    </collection-create-form>
+<collection-create-form route="{{ cp_route('collections.store') }}"></collection-create-form>
 @stop

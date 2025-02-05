@@ -3,7 +3,7 @@
         <div class="quick-list">
             <div class="quick-list-content">
                 <a
-                    v-for="(action, index) in actions.filter(a => a.quick)"
+                    v-for="(action, index) in actions.filter((a) => a.quick)"
                     :key="index"
                     @click="action.run()"
                     v-tooltip="action.title"
@@ -22,15 +22,14 @@
 import DropdownActions from '../field-actions/DropdownActions.vue';
 
 export default {
-
     components: {
-        DropdownActions
+        DropdownActions,
     },
 
     props: {
         actions: {
-            type: Array
-        }
-    }
-}
+            type: Array,
+        },
+    },
+};
 </script>

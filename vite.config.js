@@ -12,10 +12,7 @@ export default defineConfig(({ mode }) => {
         plugins: [
             laravel({
                 valetTls: env.VALET_TLS,
-                input: [
-                    'resources/css/tailwind.css',
-                    'resources/js/index.js'
-                ],
+                input: ['resources/css/tailwind.css', 'resources/js/index.js'],
                 refresh: true,
                 publicDirectory: 'resources/dist',
                 hotFile: 'resources/dist/hot',
@@ -25,18 +22,16 @@ export default defineConfig(({ mode }) => {
             inject({
                 Vue: 'vue',
                 _: 'underscore',
-                include: 'resources/js/**'
-            })
+                include: 'resources/js/**',
+            }),
         ],
         resolve: {
             alias: {
                 vue: 'vue/dist/vue.esm-bundler.js',
-            }
+            },
         },
         optimizeDeps: {
-            include: [
-                'vue'
-            ]
-        }
-    }
+            include: ['vue'],
+        },
+    };
 });

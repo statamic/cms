@@ -25,18 +25,16 @@
 import Fieldtype from './Fieldtype.vue';
 
 export default {
-
     mixins: [Fieldtype],
 
     methods: {
         inputUpdated(value) {
-            if (! this.config.debounce) {
-                return this.update(value)
+            if (!this.config.debounce) {
+                return this.update(value);
             }
 
-            this.updateDebounced(value)
-        }
-    }
-
-}
+            this.updateDebounced(value);
+        },
+    },
+};
 </script>

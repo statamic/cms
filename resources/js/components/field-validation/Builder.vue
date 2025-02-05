@@ -1,9 +1,6 @@
 <template>
-
     <div class="w-full">
-
         <div class="flex">
-
             <div class="form-group publish-field select-fieldtype field-w-full">
                 <label class="publish-field-label">{{ __('Required') }}</label>
                 <div class="help-block -mt-2">
@@ -19,7 +16,6 @@
                 </div>
                 <toggle-input v-model="sometimesValidate" />
             </div>
-
         </div>
 
         <div class="form-group publish-field select-fieldtype field-w-full">
@@ -40,7 +36,7 @@
                 ref="rulesSelect"
                 name="rules"
                 :options="allRules"
-                :reduce="rule => rule.value"
+                :reduce="(rule) => rule.value"
                 :placeholder="__('Add Rule')"
                 :multiple="false"
                 :searchable="true"
@@ -59,10 +55,12 @@
                     />
                 </template>
                 <template #option="{ value, display }">
-                    {{ __(display) }} <code class="rtl:mr-2 ltr:ml-2">{{ valueWithoutTrailingColon(value) }}</code>
+                    {{ __(display) }} <code class="ltr:ml-2 rtl:mr-2">{{ valueWithoutTrailingColon(value) }}</code>
                 </template>
                 <template #no-options="{ search }">
-                    <div class="vs__dropdown-option rtl:text-right ltr:text-left">{{ __('Add') }} <code class="rtl:mr-2 ltr:ml-2">{{ search }}</code></div>
+                    <div class="vs__dropdown-option ltr:text-left rtl:text-right">
+                        {{ __('Add') }} <code class="ltr:ml-2 rtl:mr-2">{{ search }}</code>
+                    </div>
                 </template>
             </v-select>
 
@@ -83,34 +81,36 @@
                     v-model="rules"
                 >
                     <div class="vs__selected-options-outside flex flex-wrap outline-none">
-                        <span v-for="rule in rules" :key="rule" class="vs__selected mt-2 sortable-item">
+                        <span v-for="rule in rules" :key="rule" class="vs__selected sortable-item mt-2">
                             {{ rule }}
-                            <button @click="remove(rule)" type="button" :aria-label="__('Delete Rule')" class="vs__deselect">
+                            <button
+                                @click="remove(rule)"
+                                type="button"
+                                :aria-label="__('Delete Rule')"
+                                class="vs__deselect"
+                            >
                                 <span>×</span>
                             </button>
                         </span>
                     </div>
                 </sortable-list>
             </div>
-
         </div>
     </div>
-
 </template>
 
 <style scoped>
-    .draggable-source--is-dragging {
-        @apply opacity-75 bg-transparent border-dashed
-    }
+.draggable-source--is-dragging {
+    @apply border-dashed bg-transparent opacity-75;
+}
 </style>
 
 <script>
 import RULES from './Rules.js';
-import SemVer from 'semver'
+import SemVer from 'semver';
 import { SortableList, SortableItem, SortableHelpers } from '../sortable/Sortable';
 
 export default {
-
     components: {
         SortableList,
         SortableItem,
@@ -118,7 +118,7 @@ export default {
 
     props: {
         config: {
-            required: true
+            required: true,
         },
     },
 
@@ -129,11 +129,10 @@ export default {
             rules: [],
             selectedLaravelRule: null,
             customRule: null,
-        }
+        };
     },
 
     computed: {
-
         laravelVersion() {
             return this.$store.state.statamic.config.laravelVersion;
         },
@@ -151,9 +150,9 @@ export default {
 
         laravelRules() {
             return _.chain(clone(RULES))
-                .filter(rule => rule.minVersion ? SemVer.gte(this.laravelVersion, rule.minVersion) : true)
-                .filter(rule => rule.maxVersion ? SemVer.lte(this.laravelVersion, rule.maxVersion) : true)
-                .map(rule => {
+                .filter((rule) => (rule.minVersion ? SemVer.gte(this.laravelVersion, rule.minVersion) : true))
+                .filter((rule) => (rule.maxVersion ? SemVer.lte(this.laravelVersion, rule.maxVersion) : true))
+                .map((rule) => {
                     return this.prepareRenderableRule(rule);
                 })
                 .value();
@@ -161,7 +160,7 @@ export default {
 
         extensionRules() {
             return _.chain(clone(Statamic.$config.get('extensionRules')))
-                .map(rule => {
+                .map((rule) => {
                     return this.prepareRenderableRule(rule);
                 })
                 .value();
@@ -172,22 +171,20 @@ export default {
         },
 
         helpBlock() {
-            if (! this.selectedLaravelRule) {
+            if (!this.selectedLaravelRule) {
                 return false;
             }
 
             let rule = _.chain(this.allRules)
-                .filter(rule => rule.value === this.selectedLaravelRule)
+                .filter((rule) => rule.value === this.selectedLaravelRule)
                 .first()
                 .value();
 
             return rule.example || false;
         },
-
     },
 
     watch: {
-
         isRequired(value) {
             if (value === true) {
                 this.ensureToggleableRule('required');
@@ -209,7 +206,6 @@ export default {
 
             this.$emit('updated', value);
         },
-
     },
 
     created() {
@@ -217,11 +213,8 @@ export default {
     },
 
     methods: {
-
         getInitial() {
-            this.rules = this.config.validate
-                ? this.explodeRules(this.config.validate)
-                : [];
+            this.rules = this.config.validate ? this.explodeRules(this.config.validate) : [];
         },
 
         resetState() {
@@ -232,9 +225,7 @@ export default {
         },
 
         explodeRules(rules) {
-            return typeof rules === 'string'
-                ? rules.split('|').map(rule => rule.trim())
-                : rules;
+            return typeof rules === 'string' ? rules.split('|').map((rule) => rule.trim()) : rules;
         },
 
         prepareRenderableRule(rule) {
@@ -248,7 +239,7 @@ export default {
         },
 
         ensureToggleableRule(rule) {
-            if (! this.rules.includes(rule)) {
+            if (!this.rules.includes(rule)) {
                 this.rules.unshift(rule);
             }
         },
@@ -256,7 +247,7 @@ export default {
         ensure(rule) {
             this.resetState();
 
-            if (! this.rules.includes(rule)) {
+            if (!this.rules.includes(rule)) {
                 this.rules.push(rule);
             }
         },
@@ -284,7 +275,7 @@ export default {
         },
 
         remove(rule) {
-            this.rules = this.rules.filter(value => value !== rule);
+            this.rules = this.rules.filter((value) => value !== rule);
         },
 
         hasUnfinishedParameters(rule) {
@@ -301,8 +292,7 @@ export default {
 
         valueWithoutTrailingColon(value) {
             return this.hasUnfinishedParameters(value) ? value.replace(':', '') : value;
-        }
-
-    }
-}
+        },
+    },
+};
 </script>

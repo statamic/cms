@@ -10,11 +10,11 @@
 
 <script>
 import Fieldtype from '../fieldtypes/Fieldtype.vue';
-import OneOrManySitesField from './OneOrManySitesField.vue'
+import OneOrManySitesField from './OneOrManySitesField.vue';
 
 export default {
     mixins: [Fieldtype],
     inject: ['storeName'],
-    components: { OneOrManySitesField }
-}
+    components: { OneOrManySitesField },
+};
 </script>

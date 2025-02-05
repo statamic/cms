@@ -1,14 +1,10 @@
 <template>
-
     <div class="live-preview-resizer" @mousedown="resizeStart" />
-
 </template>
 
 <script>
 export default {
-
     methods: {
-
         resizeStart() {
             this.$emit('resize-start');
             window.addEventListener('mousemove', this.resizing);
@@ -29,12 +25,10 @@ export default {
             if (width < 16) return this.$emit('collapsed');
 
             // Prevent the width being too narrow.
-            width = (width < 350) ? 350 : width;
+            width = width < 350 ? 350 : width;
 
             this.$emit('resized', width);
-        }
-
-    }
-
-}
+        },
+    },
+};
 </script>

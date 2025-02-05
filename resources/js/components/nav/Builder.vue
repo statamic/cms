@@ -1,48 +1,64 @@
 <template>
-
     <div>
-
         <header class="mb-6">
             <breadcrumb v-if="indexUrl" :url="indexUrl" :title="__('CP Nav Preferences')" />
 
             <div class="flex items-center">
                 <h1 class="flex-1">{{ __(title) }}</h1>
 
-                <dropdown-list class="rtl:ml-2 ltr:mr-2">
-                    <dropdown-item :text="__('Reset Nav Customizations')" class="warning" @click="confirmingReset = true"></dropdown-item>
+                <dropdown-list class="ltr:mr-2 rtl:ml-2">
+                    <dropdown-item
+                        :text="__('Reset Nav Customizations')"
+                        class="warning"
+                        @click="confirmingReset = true"
+                    ></dropdown-item>
                 </dropdown-list>
 
-                <a @click="discardChanges" class="text-2xs text-blue rtl:ml-4 ltr:mr-4 underline" v-if="isDirty" v-text="__('Discard changes')" />
+                <a
+                    @click="discardChanges"
+                    class="text-2xs text-blue underline ltr:mr-4 rtl:ml-4"
+                    v-if="isDirty"
+                    v-text="__('Discard changes')"
+                />
 
                 <dropdown-list>
                     <template #trigger>
-                        <button class="btn flex items-center rtl:pl-4 ltr:pr-4">
+                        <button class="btn flex items-center ltr:pr-4 rtl:pl-4">
                             {{ __('Add Item') }}
-                            <svg-icon name="micro/chevron-down-xs" class="w-2 rtl:mr-4 ltr:ml-4" />
+                            <svg-icon name="micro/chevron-down-xs" class="w-2 ltr:ml-4 rtl:mr-4" />
                         </button>
                     </template>
                     <dropdown-item :text="__('Add Nav Item')" @click="addItem($refs.tree.rootChildren[0])" />
                     <dropdown-item :text="__('Add Section')" @click="addSection" />
                 </dropdown-list>
 
-                <div class="rtl:mr-4 ltr:ml-4 rtl:text-right ltr:text-left" :class="{ 'btn-group': hasSaveAsOptions }">
+                <div class="ltr:ml-4 ltr:text-left rtl:mr-4 rtl:text-right" :class="{ 'btn-group': hasSaveAsOptions }">
                     <button
-                        class="btn-primary rtl:pr-4 ltr:pl-4"
-                        :class="{ 'disabled': !changed }"
+                        class="btn-primary ltr:pl-4 rtl:pr-4"
+                        :class="{ disabled: !changed }"
                         :disabled="!changed"
                         @click="save"
-                        v-text="__('Save Changes')" />
+                        v-text="__('Save Changes')"
+                    />
 
-                    <dropdown-list v-if="hasSaveAsOptions" class="rtl:mr-0 ltr:ml-0">
+                    <dropdown-list v-if="hasSaveAsOptions" class="ltr:ml-0 rtl:mr-0">
                         <template #trigger>
-                            <button class="btn-primary rtl:rounded-r-none ltr:rounded-l-none flex items-center">
+                            <button class="btn-primary flex items-center ltr:rounded-l-none rtl:rounded-r-none">
                                 <svg-icon name="micro/chevron-down-xs" class="w-2" />
                             </button>
                         </template>
                         <h6 class="p-2">{{ __('Save to') }}...</h6>
-                        <dropdown-item v-for="option in saveAsOptions" :key="option.url" @click="saveAs(option.url)" class="group">
-                            <div class="flex items-start rtl:pl-4 ltr:pr-4">
-                                <svg-icon :name="option.icon" class="text-gray shrink-0 rtl:ml-2 ltr:mr-2 w-4 group-hover:text-white" />
+                        <dropdown-item
+                            v-for="option in saveAsOptions"
+                            :key="option.url"
+                            @click="saveAs(option.url)"
+                            class="group"
+                        >
+                            <div class="flex items-start ltr:pr-4 rtl:pl-4">
+                                <svg-icon
+                                    :name="option.icon"
+                                    class="w-4 shrink-0 text-gray group-hover:text-white ltr:mr-2 rtl:ml-2"
+                                />
                                 <span class="whitespace-normal">{{ __(option.label) }}</span>
                             </div>
                         </dropdown-item>
@@ -52,20 +68,15 @@
         </header>
 
         <div class="mb-2 flex justify-end">
+            <a class="text-2xs text-blue underline ltr:mr-4 rtl:ml-4" v-text="__('Expand All')" @click="expandAll" />
             <a
-                class="text-2xs text-blue rtl:ml-4 ltr:mr-4 underline"
-                v-text="__('Expand All')"
-                @click="expandAll"
-            />
-            <a
-                class="text-2xs text-blue rtl:ml-2 ltr:mr-2 underline"
+                class="text-2xs text-blue underline ltr:mr-2 rtl:ml-2"
                 v-text="__('Collapse All')"
                 @click="collapseAll"
             />
         </div>
 
         <div v-if="!loading" class="page-tree w-full">
-
             <Draggable
                 ref="tree"
                 v-model="treeData"
@@ -84,19 +95,19 @@
                 @before-drag-start="beforeDragStart"
                 @after-drop="afterDrop"
             >
-
                 <template #placeholder>
-                    <div class="w-full bg-blue-500/10 rounded p-2 border border-blue-400 border-dashed"
-                         :class="{
-                        'mt-8': isSectionNode(draggingStat),
-                        'ml-[-24px]': isDraggingIntoTopLevel
-                    }">&nbsp;</div>
+                    <div
+                        class="w-full rounded border border-dashed border-blue-400 bg-blue-500/10 p-2"
+                        :class="{
+                            'mt-8': isSectionNode(draggingStat),
+                            'ml-[-24px]': isDraggingIntoTopLevel,
+                        }"
+                    >
+                        &nbsp;
+                    </div>
                 </template>
                 <template #default="{ node, stat }">
-                    <top-level-tree-branch
-                        v-if="stat.level === 1 && stat.data?.text === 'Top Level'"
-                        :stat="stat"
-                    />
+                    <top-level-tree-branch v-if="stat.level === 1 && stat.data?.text === 'Top Level'" :stat="stat" />
                     <tree-branch
                         v-else
                         :item="node"
@@ -112,31 +123,26 @@
                         @toggle-open="stat.open = !stat.open"
                     >
                         <template #branch-options="{ isTopLevel }">
+                            <dropdown-item v-if="stat.level < 3" :text="__('Add Item')" @click="addItem(stat)" />
+                            <dropdown-item :text="__('Edit')" @click="editItem(stat)" />
                             <dropdown-item
-                                v-if="stat.level < 3"
-                                :text="__('Add Item')"
-                                @click="addItem(stat)" />
-                            <dropdown-item
-                                :text="__('Edit')"
-                                @click="editItem(stat)" />
-                            <dropdown-item
-                                v-if="! isSectionNode(stat) && !isTopLevel"
+                                v-if="!isSectionNode(stat) && !isTopLevel"
                                 :text="__('Pin to Top Level')"
-                                @click="pinItem(stat)" />
+                                @click="pinItem(stat)"
+                            />
                             <dropdown-item
-                                v-if="! isSectionNode(stat)"
+                                v-if="!isSectionNode(stat)"
                                 :text="__('Duplicate')"
-                                @click="aliasItem(stat)" />
+                                @click="aliasItem(stat)"
+                            />
                             <li class="divider" />
                             <dropdown-item
                                 v-if="itemIsVisible(stat)"
                                 :text="isHideable(stat) ? __('Hide') : __('Remove')"
                                 class="warning"
-                                @click="isHideable(stat) ? hideItem(stat) : removeItem(stat)" />
-                            <dropdown-item
-                                v-else
-                                :text="__('Show')"
-                                @click="showItem(stat)" />
+                                @click="isHideable(stat) ? hideItem(stat) : removeItem(stat)"
+                            />
+                            <dropdown-item v-else :text="__('Show')" @click="showItem(stat)" />
                         </template>
                     </tree-branch>
                 </template>
@@ -159,12 +165,7 @@
             @updated="itemUpdated"
         />
 
-        <section-editor
-            v-if="creatingSection"
-            :creating="true"
-            @closed="resetSectionEditor"
-            @updated="sectionAdded"
-        />
+        <section-editor v-if="creatingSection" :creating="true" @closed="resetSectionEditor" @updated="sectionAdded" />
 
         <section-editor
             v-if="editingSection"
@@ -192,9 +193,7 @@
             @confirm="removeItem(confirmingRemoval, true)"
             @cancel="confirmingReset = false"
         />
-
     </div>
-
 </template>
 
 <script>
@@ -203,16 +202,15 @@ import TreeBranch from './Branch.vue';
 import TopLevelTreeBranch from './TopLevelBranch.vue';
 import ItemEditor from './ItemEditor.vue';
 import SectionEditor from './SectionEditor.vue';
-import { data_get } from  '../../bootstrap/globals.js'
+import { data_get } from '../../bootstrap/globals.js';
 
 export default {
-
     components: {
         Draggable,
         TreeBranch,
         ItemEditor,
         SectionEditor,
-        TopLevelTreeBranch
+        TopLevelTreeBranch,
     },
 
     props: {
@@ -258,11 +256,11 @@ export default {
             confirmingRemoval: false,
             draggingStat: false,
             isDraggingIntoTopLevel: false,
-        }
+        };
     },
 
     created() {
-        this.$keys.bindGlobal(['mod+s'], e => {
+        this.$keys.bindGlobal(['mod+s'], (e) => {
             e.preventDefault();
             this.save();
         });
@@ -273,7 +271,6 @@ export default {
     },
 
     computed: {
-
         isDirty() {
             return this.changed;
         },
@@ -285,24 +282,24 @@ export default {
         direction() {
             return this.$config.get('direction', 'ltr');
         },
-
     },
 
     methods: {
-
         setInitialNav(nav) {
             let navConfig = clone(nav);
 
             this.setOriginalSectionItems(navConfig);
 
             this.treeData = _.chain(navConfig)
-                .mapObject(section => this.normalizeNavConfig(section))
+                .mapObject((section) => this.normalizeNavConfig(section))
                 .values()
                 .value();
         },
 
         setOriginalSectionItems(nav) {
-            nav.forEach(section => this.originalSectionItems[section.display_original] = section.items_original || []);
+            nav.forEach(
+                (section) => (this.originalSectionItems[section.display_original] = section.items_original || []),
+            );
         },
 
         discardChanges() {
@@ -324,10 +321,12 @@ export default {
             let children = config.items || config.children || [];
 
             if (children) {
-                item.children = children.map(childItem => {
+                item.children = children.map((childItem) => {
                     return {
                         text: childItem.display,
-                        children: childItem.children.map(childChildItem => this.normalizeNavConfig(childChildItem, false)),
+                        children: childItem.children.map((childChildItem) =>
+                            this.normalizeNavConfig(childChildItem, false),
+                        ),
                         open: false,
                         config: childItem,
                         original: childItem.original,
@@ -386,13 +385,13 @@ export default {
         },
 
         isParentItemNode(stat) {
-            return ! this.isSectionNode(stat) && ! this.isChildItemNode(stat);
+            return !this.isSectionNode(stat) && !this.isChildItemNode(stat);
         },
 
         isChildItemNode(stat) {
             if (!stat.parent) return false;
 
-            return ! this.isSectionNode(stat.parent);
+            return !this.isSectionNode(stat.parent);
         },
 
         isCustomSectionNode(stat) {
@@ -400,7 +399,7 @@ export default {
         },
 
         getParentSectionNode(stat) {
-            if (! this.isSectionNode(stat) && stat !== undefined) {
+            if (!this.isSectionNode(stat) && stat !== undefined) {
                 return this.getParentSectionNode(stat.parent);
             }
 
@@ -524,15 +523,12 @@ export default {
                 return false;
             }
 
-            return this.itemHasMovedWithinSection(stat)
-                || this.itemHasMovedToAnotherSection(stat);
+            return this.itemHasMovedWithinSection(stat) || this.itemHasMovedToAnotherSection(stat);
         },
 
         itemIsWithinOriginalParentItem(stat) {
             let parentOriginal = stat.parent.data.original || { children: [] };
-            let parentsOriginalChildIds = parentOriginal
-                .children
-                .map(child => child.id);
+            let parentsOriginalChildIds = parentOriginal.children.map((child) => child.id);
 
             return this.isChildItemNode(stat) && parentsOriginalChildIds.includes(stat.data.config.id);
         },
@@ -540,11 +536,9 @@ export default {
         itemHasMovedWithinSection(stat) {
             let parentOriginal = stat.parent.data.original || { children: [] };
 
-            let parentsOriginalChildIds = parentOriginal
-                .children
-                .map(child => child.id);
+            let parentsOriginalChildIds = parentOriginal.children.map((child) => child.id);
 
-            if (this.isChildItemNode(stat) && ! parentsOriginalChildIds.includes(stat.data.config.id)) {
+            if (this.isChildItemNode(stat) && !parentsOriginalChildIds.includes(stat.data.config.id)) {
                 return true;
             }
 
@@ -555,7 +549,7 @@ export default {
                 return false;
             }
 
-            if (! this.isChildItemNode(stat) && ! sectionsOriginalIds.includes(stat.data.config.id)) {
+            if (!this.isChildItemNode(stat) && !sectionsOriginalIds.includes(stat.data.config.id)) {
                 return true;
             }
 
@@ -570,8 +564,7 @@ export default {
         },
 
         itemHasBeenModified(stat) {
-            return this.itemHasModifiedProperties(stat)
-                || this.itemHasModifiedChildren(stat);
+            return this.itemHasModifiedProperties(stat) || this.itemHasModifiedChildren(stat);
         },
 
         itemHasModifiedProperties(stat) {
@@ -579,14 +572,16 @@ export default {
         },
 
         itemHasModifiedChildren(stat) {
-            return stat.children.filter(childItem => {
-                return _.chain(childItem.data.manipulations).keys().value().length > 0;
-            }).length > 0;
+            return (
+                stat.children.filter((childItem) => {
+                    return _.chain(childItem.data.manipulations).keys().value().length > 0;
+                }).length > 0
+            );
         },
 
         expandAll() {
             walkTreeData(this.$refs.tree.rootChildren, (stat) => {
-                if (! this.isSectionNode(stat)) {
+                if (!this.isSectionNode(stat)) {
                     stat.open = true;
                 }
             });
@@ -594,7 +589,7 @@ export default {
 
         collapseAll() {
             walkTreeData(this.$refs.tree.rootChildren, (stat) => {
-                if (! this.isSectionNode(stat)) {
+                if (!this.isSectionNode(stat)) {
                     stat.open = false;
                 }
             });
@@ -618,10 +613,10 @@ export default {
 
         aliasItem(stat, parentStat) {
             let currentAction = stat.data.manipulations.action;
-            let newItem = this.normalizeNavConfig({...stat.data.config}, false);
+            let newItem = this.normalizeNavConfig({ ...stat.data.config }, false);
 
             if (currentAction === '@create') {
-                newItem.manipulations = {...stat.data.manipulations};
+                newItem.manipulations = { ...stat.data.manipulations };
             } else {
                 newItem.manipulations = { action: '@alias' };
             }
@@ -650,12 +645,12 @@ export default {
                 return false;
             }
 
-            return ! ['@alias', '@create'].includes(action);
+            return !['@alias', '@create'].includes(action);
         },
 
         removeItem(stat, bypassConfirmation = false) {
-            if (this.isCustomSectionNode(stat) && stat.children.length && ! bypassConfirmation) {
-                return this.confirmingRemoval = stat;
+            if (this.isCustomSectionNode(stat) && stat.children.length && !bypassConfirmation) {
+                return (this.confirmingRemoval = stat);
             }
 
             this.$refs.tree.remove(stat);
@@ -688,7 +683,7 @@ export default {
         },
 
         save() {
-            if (! this.changed) {
+            if (!this.changed) {
                 return;
             }
 
@@ -696,11 +691,10 @@ export default {
         },
 
         saveAs(url) {
-
             let tree = this.preparePreferencesSubmission();
 
             this.$axios
-                .patch(url, {tree})
+                .patch(url, { tree })
                 .then(() => location.reload())
                 .catch(() => this.$toast.error(__('Something went wrong')));
         },
@@ -708,12 +702,12 @@ export default {
         preparePreferencesSubmission() {
             let tree = [];
 
-            this.treeData.forEach(section => {
+            this.treeData.forEach((section) => {
                 tree.push({
-                    'display': section.text,
-                    'display_original': section.config.display_original || section.text,
-                    'action': section.manipulations.action || false,
-                    'items': this.prepareItemsForSubmission(section.children),
+                    display: section.text,
+                    display_original: section.config.display_original || section.text,
+                    action: section.manipulations.action || false,
+                    items: this.prepareItemsForSubmission(section.children),
                 });
             });
 
@@ -723,11 +717,11 @@ export default {
         prepareItemsForSubmission(treeItems) {
             let items = [];
 
-            treeItems.forEach(item => {
+            treeItems.forEach((item) => {
                 items.push({
-                    'id': this.prepareItemIdForSubmission(item),
-                    'manipulations': item.manipulations,
-                    'children': item.children ? this.prepareItemsForSubmission(item.children) : [],
+                    id: this.prepareItemIdForSubmission(item),
+                    manipulations: item.manipulations,
+                    children: item.children ? this.prepareItemsForSubmission(item.children) : [],
                 });
             });
 
@@ -751,9 +745,7 @@ export default {
             this.updateItemAction(this.draggingStat);
             this.draggingStat = false;
             return true;
-        }
-
+        },
     },
-
-}
+};
 </script>

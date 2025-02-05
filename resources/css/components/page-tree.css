@@ -1,11 +1,10 @@
 .page-tree {
-
     .tree-node {
         @apply dark:mb-1;
     }
 
     .page-tree-branch {
-        @apply relative text-xs bg-white shadow rounded;
+        @apply relative rounded bg-white text-xs shadow;
         @apply dark:bg-dark-600 dark:shadow-dark;
 
         &:hover {
@@ -18,14 +17,16 @@
     }
 
     .page-move {
-        @apply w-6 rtl:border-l ltr:border-r rtl:rounded-r ltr:rounded-l dark:text-dark-175 dark:border-dark-900;
+        @apply w-6 dark:border-dark-900 dark:text-dark-175 ltr:rounded-l ltr:border-r rtl:rounded-r rtl:border-l;
         cursor: grab;
-        background-color: hsla(210, 30%, 95%, .5);
+        background-color: hsla(210, 30%, 95%, 0.5);
         background-image: url('../../svg/icons/light/drag-dots.svg');
         background-size: 7px 17px;
         background-position: center center;
         background-repeat: no-repeat;
-        &:hover { @apply bg-gray-300 dark:bg-dark-700; }
+        &:hover {
+            @apply bg-gray-300 dark:bg-dark-700;
+        }
 
         .dark & {
             background-color: hsla(180, 1%, 18%, 0.5);
@@ -33,7 +34,7 @@
     }
 
     .page-root {
-        background-color: hsla(210, 30%, 95%, .5);
-        @apply flex w-6 rtl:rounded-r ltr:rounded-l items-center rtl:border-l ltr:border-r dark:border-dark-900;
+        background-color: hsla(210, 30%, 95%, 0.5);
+        @apply flex w-6 items-center dark:border-dark-900 ltr:rounded-l ltr:border-r rtl:rounded-r rtl:border-l;
     }
 }

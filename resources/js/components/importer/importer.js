@@ -1,8 +1,7 @@
 export default {
-
     props: ['importer'],
 
-    data: function() {
+    data: function () {
         return {
             exporting: false,
             exported: false,
@@ -15,13 +14,13 @@ export default {
             showCollections: [],
             showTaxonomies: [],
             showGlobals: [],
-        }
+        };
     },
 
     computed: {
         totalPages: function () {
             return Object.keys(this.summary.pages).length;
-        }
+        },
     },
 
     mounted() {
@@ -29,7 +28,6 @@ export default {
     },
 
     methods: {
-
         import: function () {
             this.importing = true;
             this.$http.post(cp_url('import/import'), { summary: this.summary }).success(function (response) {
@@ -39,15 +37,15 @@ export default {
             });
         },
 
-        hasDuplicates (collection) {
-            return !! this.duplicateCount(collection);
+        hasDuplicates(collection) {
+            return !!this.duplicateCount(collection);
         },
 
         duplicateCount: function (items) {
             let count = 0;
 
             _.each(items, (item) => {
-                if (! item.exists) {
+                if (!item.exists) {
                     return;
                 }
 
@@ -57,9 +55,9 @@ export default {
             return count;
         },
 
-        uncheckDuplicates: function(items) {
+        uncheckDuplicates: function (items) {
             _.each(items, (item) => {
-                if (! item.exists) {
+                if (!item.exists) {
                     return;
                 }
 
@@ -79,7 +77,7 @@ export default {
         hideCollection: function (hidden) {
             this.showCollections = _.reject(this.showCollections, function (c) {
                 return c === hidden;
-            })
+            });
         },
 
         shouldShowCollection: function (collection) {
@@ -94,7 +92,7 @@ export default {
         hideTaxonomy: function (hidden) {
             this.showTaxonomies = _.reject(this.showTaxonomies, function (t) {
                 return t === hidden;
-            })
+            });
         },
 
         shouldShowTaxonomy: function (taxonomy) {
@@ -109,11 +107,11 @@ export default {
         hideGlobal: function (hidden) {
             this.showGlobals = _.reject(this.showGlobals, function (g) {
                 return g === hidden;
-            })
+            });
         },
 
         shouldShowGlobal: function (global) {
             return _.contains(this.showGlobals, global);
-        }
-    }
+        },
+    },
 };

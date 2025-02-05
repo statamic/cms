@@ -1,53 +1,61 @@
 <template>
-
     <stack narrow name="nav-item-editor" @closed="$emit('closed')" v-slot="{ close }">
-        <div class="bg-white dark:bg-dark-800 h-full flex flex-col">
-
-            <div class="bg-gray-200 dark:bg-dark-600 px-6 py-2 border-b border-gray-300 dark:border-dark-900 text-lg font-medium flex items-center justify-between">
+        <div class="flex h-full flex-col bg-white dark:bg-dark-800">
+            <div
+                class="flex items-center justify-between border-b border-gray-300 bg-gray-200 px-6 py-2 text-lg font-medium dark:border-dark-900 dark:bg-dark-600"
+            >
                 {{ creating ? __('Add Nav Item') : __('Edit Nav Item') }}
-                <button
-                    type="button"
-                    class="btn-close"
-                    @click="close"
-                    v-html="'&times'" />
+                <button type="button" class="btn-close" @click="close" v-html="'&times'" />
             </div>
 
             <div class="flex-1 overflow-auto">
                 <div class="px-2">
                     <div class="publish-fields @container">
-
                         <div class="form-group publish-field w-full" :class="{ 'has-error': validateDisplay }">
                             <div class="field-inner">
-                                <label class="text-sm font-medium mb-2">{{ __('Display') }} <span class="text-red-500">*</span></label>
+                                <label class="mb-2 text-sm font-medium"
+                                    >{{ __('Display') }} <span class="text-red-500">*</span></label
+                                >
                                 <text-input v-model="config.display" :focus="true" />
-                                <div v-if="validateDisplay" class="help-block text-red-500 mt-2"><p>{{ __('statamic::validation.required') }}</p></div>
+                                <div v-if="validateDisplay" class="help-block mt-2 text-red-500">
+                                    <p>{{ __('statamic::validation.required') }}</p>
+                                </div>
                             </div>
                         </div>
 
                         <div class="form-group publish-field w-full" :class="{ 'has-error': validateUrl }">
                             <div class="field-inner">
-                                <label class="text-sm font-medium mb-2">{{ __('URL') }} <span class="text-red-500">*</span></label>
+                                <label class="mb-2 text-sm font-medium"
+                                    >{{ __('URL') }} <span class="text-red-500">*</span></label
+                                >
                                 <div class="help-block -mt-2">
                                     <p v-text="__('Enter any internal or external URL.')"></p>
                                 </div>
                                 <text-input v-model="config.url" />
-                                <div v-if="validateUrl" class="help-block text-red-500 mt-2"><p>{{ __('statamic::validation.required') }}</p></div>
+                                <div v-if="validateUrl" class="help-block mt-2 text-red-500">
+                                    <p>{{ __('statamic::validation.required') }}</p>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="form-group publish-field w-full" v-if="! isChild">
+                        <div class="form-group publish-field w-full" v-if="!isChild">
                             <div class="field-inner">
-                                <label class="text-sm font-medium mb-2">{{ __('Icon') }}</label>
+                                <label class="mb-2 text-sm font-medium">{{ __('Icon') }}</label>
                                 <publish-field-meta
                                     :config="{ handle: 'icon', type: 'icon', folder: 'light' }"
                                     :initial-value="config.icon"
                                     v-slot="{ meta, value, loading }"
                                 >
-                                    <icon-fieldtype v-if="!loading" handle="icon" :meta="meta" :value="value" @update:value="config.icon = $event" />
+                                    <icon-fieldtype
+                                        v-if="!loading"
+                                        handle="icon"
+                                        :meta="meta"
+                                        :value="value"
+                                        @update:value="config.icon = $event"
+                                    />
                                 </publish-field-meta>
                             </div>
                         </div>
-
                     </div>
                 </div>
 
@@ -57,17 +65,16 @@
                         :class="{ 'opacity-50': false }"
                         :disabled="false"
                         @click="save"
-                        v-text="__('Save')" />
+                        v-text="__('Save')"
+                    />
                 </div>
             </div>
-
         </div>
     </stack>
-
 </template>
 
 <script>
-import { data_get } from  '../../bootstrap/globals.js'
+import { data_get } from '../../bootstrap/globals.js';
 
 export default {
     emits: ['closed', 'updated'],
@@ -80,15 +87,15 @@ export default {
 
     data() {
         return {
-            config: {...(this.item?.data?.config || this.createNewItem())},
+            config: { ...(this.item?.data?.config || this.createNewItem()) },
             saveKeyBinding: null,
             validateDisplay: false,
             validateUrl: false,
-        }
+        };
     },
 
     created() {
-        this.saveKeyBinding = this.$keys.bindGlobal(['enter', 'mod+enter', 'mod+s'], e => {
+        this.saveKeyBinding = this.$keys.bindGlobal(['enter', 'mod+enter', 'mod+s'], (e) => {
             e.preventDefault();
             this.save();
         });
@@ -99,7 +106,6 @@ export default {
     },
 
     methods: {
-
         createNewItem() {
             return {
                 display: '',
@@ -112,11 +118,11 @@ export default {
             this.validateDisplay = false;
             this.validateUrl = false;
 
-            if (! this.config.display) {
+            if (!this.config.display) {
                 this.validateDisplay = true;
             }
 
-            if (! this.config.url) {
+            if (!this.config.url) {
                 this.validateUrl = true;
             }
 
@@ -128,14 +134,12 @@ export default {
 
             if (this.isChild) {
                 config.icon = null;
-            } else if (! config.icon) {
+            } else if (!config.icon) {
                 config.icon = data_get(this.item, 'original.icon');
             }
 
             this.$emit('updated', this.config, this.item);
         },
-
     },
-
-}
+};
 </script>

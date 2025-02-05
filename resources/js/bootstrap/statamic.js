@@ -22,7 +22,7 @@ import '@hoppscotch/vue-toasted/style.css';
 import 'vue-final-modal/style.css';
 import PortalVue from 'portal-vue';
 import Keys from '../components/keys/Keys';
-import FieldActions from "../components/field-actions/FieldActions.js";
+import FieldActions from '../components/field-actions/FieldActions.js';
 import Callbacks from '../components/Callbacks';
 import Slugs from '../components/slugs/Manager';
 import Portals from '../components/portals/Portals';
@@ -42,7 +42,6 @@ let bootedCallbacks = [];
 let components;
 
 export default {
-
     booting(callback) {
         bootingCallbacks.push(callback);
     },
@@ -138,11 +137,11 @@ export default {
                 text: '×',
                 onClick: (e, toastObject) => {
                     toastObject.goAway(0);
-                }
-            }
-        })
+                },
+            },
+        });
 
-        const portals = markRaw(new Portals);
+        const portals = markRaw(new Portals());
 
         components = new Components(this.$app);
 
@@ -153,20 +152,20 @@ export default {
             $preferences: new Preferences(store),
             $progress: useProgressBar(),
             $config: this.$config,
-            $keys: new Keys,
-            $fieldActions: new FieldActions,
-            $conditions: new FieldConditions,
-            $callbacks: new Callbacks,
+            $keys: new Keys(),
+            $fieldActions: new FieldActions(),
+            $conditions: new FieldConditions(),
+            $callbacks: new Callbacks(),
             $dirty: useDirtyState(),
-            $slug: new Slugs,
+            $slug: new Slugs(),
             $portals: portals,
             $stacks: new Stacks(portals),
-            $hooks: new Hooks,
+            $hooks: new Hooks(),
             $toast: new Toasts(useToasted()),
-            $bard: new Bard,
-            $reveal: new Reveal,
-            $echo: new Echo,
-            $permissions: new Permission,
+            $bard: new Bard(),
+            $reveal: new Reveal(),
+            $echo: new Echo(),
+            $permissions: new Permission(),
         });
 
         Object.assign(this.$app.config.globalProperties, {
@@ -191,14 +190,14 @@ export default {
                 return permissions.includes('super') || permissions.includes(permission);
             },
             $wait(ms) {
-                return new Promise(resolve => {
+                return new Promise((resolve) => {
                     setTimeout(resolve, ms);
                 });
-            }
+            },
         });
 
         this.$app.directive('elastic', {
-            mounted: (el) => autosize(el)
+            mounted: (el) => autosize(el),
         });
 
         registerGlobalComponents(this.$app);
@@ -216,13 +215,12 @@ export default {
         axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
         axios.defaults.headers.common['X-CSRF-TOKEN'] = Statamic.$config.get('csrfToken');
 
-        bootingCallbacks.forEach(callback => callback(this));
+        bootingCallbacks.forEach((callback) => callback(this));
         bootingCallbacks = [];
 
         this.$app.mount('#statamic');
 
-        bootedCallbacks.forEach(callback => callback(this));
+        bootedCallbacks.forEach((callback) => callback(this));
         bootedCallbacks = [];
-    }
-
-}
+    },
+};

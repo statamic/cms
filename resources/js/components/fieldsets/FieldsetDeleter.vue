@@ -10,16 +10,22 @@
     >
         <template slot="body">
             <template v-if="Object.keys(resource.imported_by).length > 0">
-                <p class="mb-2">{{ __(`Before you can delete this fieldset, you need to remove references to it in blueprints and fieldsets:`) }}</p>
+                <p class="mb-2">
+                    {{
+                        __(
+                            `Before you can delete this fieldset, you need to remove references to it in blueprints and fieldsets:`,
+                        )
+                    }}
+                </p>
 
                 <div v-for="(items, group) in resource.imported_by">
-                    <h3 class="little-heading rtl:pr-0 ltr:pl-0 mb-2">{{ group }}</h3>
+                    <h3 class="little-heading mb-2 ltr:pl-0 rtl:pr-0">{{ group }}</h3>
 
-                    <ul class="list-disc rtl:pr-4 ltr:pl-4">
+                    <ul class="list-disc ltr:pl-4 rtl:pr-4">
                         <li
                             v-for="item in items"
                             :key="item.handle"
-                            class="font-mono text-sm mb-1.5"
+                            class="mb-1.5 font-mono text-sm"
                             v-text="item.title"
                         ></li>
                     </ul>
@@ -35,30 +41,29 @@
 
 <script>
 export default {
-
     props: {
         resource: {
-            type: Object
+            type: Object,
         },
         resourceTitle: {
-            type: String
+            type: String,
         },
         route: {
             type: String,
         },
         redirect: {
-            type: String
+            type: String,
         },
         reload: {
-            type: Boolean
-        }
+            type: Boolean,
+        },
     },
 
     data() {
         return {
             deleting: false,
             redirectFromServer: null,
-        }
+        };
     },
 
     computed: {
@@ -67,12 +72,12 @@ export default {
         },
 
         modalTitle() {
-            return __('Delete :resource', {resource: __(this.title)});
+            return __('Delete :resource', { resource: __(this.title) });
         },
 
         deleteUrl() {
             let url = data_get(this.resource, 'delete_url', this.route);
-            if (! url) console.error('ResourceDeleter cannot find delete url');
+            if (!url) console.error('ResourceDeleter cannot find delete url');
             return url;
         },
 
@@ -87,8 +92,9 @@ export default {
         },
 
         confirmed() {
-            this.$axios.delete(this.deleteUrl)
-                .then(response => {
+            this.$axios
+                .delete(this.deleteUrl)
+                .then((response) => {
                     this.redirectFromServer = data_get(response, 'data.redirect');
                     this.success();
                 })
@@ -114,7 +120,7 @@ export default {
 
         cancel() {
             this.deleting = false;
-        }
-    }
-}
+        },
+    },
+};
 </script>

@@ -1,5 +1,5 @@
-import RevealerFieldtype from '../components/fieldtypes/RevealerFieldtype.vue'
-import TemplateFieldtype from '../components/fieldtypes/TemplateFieldtype.vue'
+import RevealerFieldtype from '../components/fieldtypes/RevealerFieldtype.vue';
+import TemplateFieldtype from '../components/fieldtypes/TemplateFieldtype.vue';
 import Select from '../components/inputs/Select.vue';
 import Text from '../components/inputs/Text.vue';
 import Textarea from '../components/inputs/Textarea.vue';
@@ -22,9 +22,9 @@ import Routes from '../components/collections/Routes.vue';
 import TitleFormats from '../components/collections/TitleFormats.vue';
 import ColorFieldtype from '../components/fieldtypes/ColorFieldtype.vue';
 import DateFieldtype from '../components/fieldtypes/DateFieldtype.vue';
-import DictionaryFieldtype from "../components/fieldtypes/DictionaryFieldtype.vue";
-import DictionaryIndexFieldtype from "../components/fieldtypes/DictionaryIndexFieldtype.vue";
-import DictionaryFields from "../components/fieldtypes/DictionaryFields.vue";
+import DictionaryFieldtype from '../components/fieldtypes/DictionaryFieldtype.vue';
+import DictionaryIndexFieldtype from '../components/fieldtypes/DictionaryIndexFieldtype.vue';
+import DictionaryFields from '../components/fieldtypes/DictionaryFields.vue';
 import FieldDisplayFieldtype from '../components/fieldtypes/FieldDisplayFieldtype.vue';
 import FieldsFieldtype from '../components/fieldtypes/grid/FieldsFieldtype.vue';
 import FilesFieldtype from '../components/fieldtypes/FilesFieldtype.vue';
@@ -133,4 +133,4 @@ export default function registerFieldtypes(app) {
     app.component('set-field', SetField);
     app.component('revealer-fieldtype', RevealerFieldtype);
     app.component('template-fieldtype', TemplateFieldtype);
-};
+}

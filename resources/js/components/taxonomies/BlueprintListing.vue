@@ -2,21 +2,20 @@
 import BlueprintListing from '../blueprints/Listing.vue';
 
 export default {
-
     components: {
-        BlueprintListing
+        BlueprintListing,
     },
 
     props: {
         initialRows: Array,
-        reorderUrl: String
+        reorderUrl: String,
     },
 
     data() {
         return {
             rows: this.initialRows,
-            hasBeenReordered: false
-        }
+            hasBeenReordered: false,
+        };
     },
 
     methods: {
@@ -26,14 +25,13 @@ export default {
         },
 
         saveOrder() {
-            let order = this.rows.map(blueprint => blueprint.handle);
+            let order = this.rows.map((blueprint) => blueprint.handle);
 
             this.$axios
                 .post(this.reorderUrl, { order })
-                .then(response => this.$toast.success(__('Blueprints successfully reordered')))
-                .catch(error => this.$toast.error(__('Something went wrong')))
-        }
-    }
-
-}
+                .then((response) => this.$toast.success(__('Blueprints successfully reordered')))
+                .catch((error) => this.$toast.error(__('Something went wrong')));
+        },
+    },
+};
 </script>

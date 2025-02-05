@@ -1,22 +1,31 @@
 <template>
-
-    <div class="revision-item"
+    <div
+        class="revision-item"
         :class="{
             'status-working-copy': revision.working,
-            'status-published': revision.attributes.published
+            'status-published': revision.attributes.published,
         }"
         @click="open"
     >
         <div v-if="revision.message" class="revision-item-note truncate" v-text="revision.message" />
 
         <div class="flex items-center">
-            <avatar v-if="revision.user" :user="revision.user" class="shrink-0 rtl:ml-2 ltr:mr-2 w-6" />
+            <avatar v-if="revision.user" :user="revision.user" class="w-6 shrink-0 ltr:mr-2 rtl:ml-2" />
 
-            <div class="revision-item-content w-full flex">
+            <div class="revision-item-content flex w-full">
                 <div class="flex-1">
-                    <div class="revision-author text-gray-700 dark:text-dark-150 text-2xs">
-                        <template v-if="revision.user">{{ revision.user.name || revision.user.email }} &ndash;</template>
-                        {{ date.toDate().toLocaleTimeString($config.get('locale').replace('_', '-'), { hour: 'numeric', minute: '2-digit' }) }}
+                    <div class="revision-author text-2xs text-gray-700 dark:text-dark-150">
+                        <template v-if="revision.user"
+                            >{{ revision.user.name || revision.user.email }} &ndash;</template
+                        >
+                        {{
+                            date
+                                .toDate()
+                                .toLocaleTimeString($config.get('locale').replace('_', '-'), {
+                                    hour: 'numeric',
+                                    minute: '2-digit',
+                                })
+                        }}
                     </div>
                 </div>
 
@@ -37,13 +46,13 @@
                             :revision="revision"
                             :url="restoreUrl"
                             :reference="reference"
-                            class="rtl:mr-4 ltr:ml-4" />
+                            class="ltr:ml-4 rtl:mr-4"
+                        />
                     </template>
                 </revision-preview>
             </div>
         </div>
     </div>
-
 </template>
 
 <script>
@@ -51,7 +60,6 @@ import RestoreRevision from './Restore.vue';
 import RevisionPreview from './Preview.vue';
 
 export default {
-
     components: {
         RevisionPreview,
         RestoreRevision,
@@ -87,20 +95,17 @@ export default {
                 initialIsWorkingCopy: 'hasWorkingCopy',
                 initialIsRoot: 'isRoot',
                 initialReadOnly: 'readOnly',
-            }
-        }
+            },
+        };
     },
 
     computed: {
-
         date() {
             return moment.unix(this.revision.date);
-        }
-
+        },
     },
 
     methods: {
-
         open() {
             if (this.revision.working) {
                 this.$emit('working-copy-selected');
@@ -108,9 +113,7 @@ export default {
             }
 
             this.showDetails = true;
-        }
-
-    }
-
-}
+        },
+    },
+};
 </script>

@@ -17,7 +17,7 @@ function add(name) {
 }
 
 function remove(name) {
-    dirty.value = dirty.value.filter(n => n !== name);
+    dirty.value = dirty.value.filter((n) => n !== name);
 }
 
 function enableWarning() {
@@ -35,12 +35,16 @@ function state(name, state) {
 }
 
 function has(name) {
-    return dirty.value.includes(name)
+    return dirty.value.includes(name);
 }
 
-watch(dirty, (newNames) => {
-    newNames.length ? enableWarning() : disableWarning();
-}, { immediate: true })
+watch(
+    dirty,
+    (newNames) => {
+        newNames.length ? enableWarning() : disableWarning();
+    },
+    { immediate: true },
+);
 
 export default function useDirtyState() {
     return {
@@ -51,5 +55,5 @@ export default function useDirtyState() {
         count,
         has,
         disableWarning,
-    }
+    };
 }

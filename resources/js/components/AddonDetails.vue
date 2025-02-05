@@ -1,31 +1,35 @@
 <template>
     <div>
-        <div class="flex items-center mb-6">
+        <div class="mb-6 flex items-center">
             <h1 class="flex-1" v-text="addon.name" />
             <a :href="addon.url" target="_blank" class="btn">
-                <svg-icon name="light/external-link" class="w-3 h-3 rtl:ml-2 ltr:mr-2 shrink-0" />
+                <svg-icon name="light/external-link" class="h-3 w-3 shrink-0 ltr:mr-2 rtl:ml-2" />
                 {{ __('View on Marketplace') }}
             </a>
         </div>
-        <div class="flex flex-col-reverse xl:grid xl:grid-cols-3 space-y-6 xl:space-y-0 gap-6">
+        <div class="flex flex-col-reverse gap-6 space-y-6 xl:grid xl:grid-cols-3 xl:space-y-0">
             <div class="lg:col-span-2">
                 <div class="card prose max-w-full p-6" v-html="description" />
             </div>
-            <div class="xl:col-span-1 flex flex-col space-y-6">
+            <div class="flex flex-col space-y-6 xl:col-span-1">
                 <div class="card flex flex-col space-y-6 p-6">
                     <div class="flex-1 text-lg">
-                        <div class="little-heading p-0 mb-2 text-gray-700" v-text="__('Seller')" />
+                        <div class="little-heading mb-2 p-0 text-gray-700" v-text="__('Seller')" />
                         <a :href="addon.seller.website" target="_blank" class="relative flex items-center">
-                            <img :src="addon.seller.avatar" :alt="addon.seller.name" class="rounded-full w-6 rtl:ml-2 ltr:mr-2">
+                            <img
+                                :src="addon.seller.avatar"
+                                :alt="addon.seller.name"
+                                class="w-6 rounded-full ltr:mr-2 rtl:ml-2"
+                            />
                             <span class="font-bold">{{ addon.seller.name }}</span>
                         </a>
                     </div>
                     <div class="flex-1 text-lg">
-                        <div class="little-heading p-0 mb-2 text-gray-700" v-text="__('Price')" />
+                        <div class="little-heading mb-2 p-0 text-gray-700" v-text="__('Price')" />
                         <div class="font-bold" v-text="priceRange" />
                     </div>
                     <div class="flex-1 text-lg" v-if="downloads">
-                        <div class="little-heading p-0 mb-2 text-gray-700" v-text="__('Downloads')" />
+                        <div class="little-heading mb-2 p-0 text-gray-700" v-text="__('Downloads')" />
                         <div class="font-bold">{{ downloads }}</div>
                     </div>
                 </div>
@@ -51,76 +55,78 @@
 <script>
 import AddonEditions from './addons/Editions.vue';
 
-    export default {
-        components: {
-            AddonEditions,
+export default {
+    components: {
+        AddonEditions,
+    },
+
+    props: ['addon'],
+
+    data() {
+        return {
+            waitingForRefresh: false,
+            modalOpen: false,
+            downloads: null,
+        };
+    },
+
+    computed: {
+        package() {
+            return this.addon.package;
         },
 
-        props: [
-            'addon',
-        ],
+        description() {
+            return this.addon.description;
+        },
 
-        data() {
-            return {
-                waitingForRefresh: false,
-                modalOpen: false,
-                downloads: null,
+        priceRange() {
+            let [low, high] = this.addon.price_range;
+            low = low ? `$${low}` : __('Free');
+            high = high ? `$${high}` : __('Free');
+            return low == high ? low : `${low} - ${high}`;
+        },
+
+        link() {
+            return (
+                __('Learn more about :link', {
+                    link: `<a href="https://statamic.dev/addons" target="_blank">${__('Addons')}</a>`,
+                }) + '.'
+            );
+        },
+
+        installCommand() {
+            switch (this.package) {
+                case 'statamic/collaboration':
+                    return 'php please install:collaboration';
+                case 'statamic/eloquent-driver':
+                    return 'php please install:eloquent-driver';
+                case 'statamic/ssg':
+                    return 'php please install:ssg';
+                default:
+                    return `composer require ${this.package}`;
             }
         },
+    },
 
-        computed: {
-            package() {
-                return this.addon.package;
-            },
+    created() {
+        this.$events.$on('addon-refreshed', this.addonRefreshed);
+        this.getDownloadCount();
+    },
 
-            description() {
-                return this.addon.description;
-            },
+    unmounted() {
+        this.$events.$off('addon-refreshed', this.addonRefreshed);
+    },
 
-            priceRange() {
-                let [low, high] = this.addon.price_range;
-                low = low ? `$${low}` : __('Free');
-                high = high ? `$${high}` : __('Free');
-                return (low == high) ? low : `${low} - ${high}`;
-            },
-
-            link() {
-                return __('Learn more about :link', { link: `<a href="https://statamic.dev/addons" target="_blank">${__('Addons')}</a>`}) + '.';
-            },
-
-            installCommand() {
-                switch (this.package) {
-                    case 'statamic/collaboration':
-                        return 'php please install:collaboration';
-                    case 'statamic/eloquent-driver':
-                        return 'php please install:eloquent-driver';
-                    case 'statamic/ssg':
-                        return 'php please install:ssg';
-                    default:
-                        return `composer require ${this.package}`;
-                }
-            },
+    methods: {
+        addonRefreshed() {
+            this.waitingForRefresh = false;
         },
 
-        created() {
-            this.$events.$on('addon-refreshed', this.addonRefreshed);
-            this.getDownloadCount();
+        getDownloadCount() {
+            this.$axios.get(`https://packagist.org/packages/${this.addon.package}.json`).then((response) => {
+                this.downloads = response.data.package.downloads.total;
+            });
         },
-
-        unmounted() {
-            this.$events.$off('addon-refreshed', this.addonRefreshed);
-        },
-
-        methods: {
-            addonRefreshed() {
-                this.waitingForRefresh = false;
-            },
-
-            getDownloadCount() {
-                this.$axios.get(`https://packagist.org/packages/${this.addon.package}.json`).then(response => {
-                    this.downloads = response.data.package.downloads.total;
-                });
-            },
-        }
-    }
+    },
+};
 </script>

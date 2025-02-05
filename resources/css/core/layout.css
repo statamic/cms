@@ -3,13 +3,12 @@
    ========================================================================== */
 
 body {
-    @apply w-full bg-gray-300 relative dark:bg-dark-800;
+    @apply relative w-full bg-gray-300 dark:bg-dark-800;
 }
 
 #statamic {
     min-height: 100vh;
 }
-
 
 #main {
     @apply flex;
@@ -19,7 +18,7 @@ body {
 }
 
 #main .workspace {
-    transition: padding .3s;
+    transition: padding 0.3s;
     @apply w-full;
 }
 
@@ -34,26 +33,36 @@ a {
 }
 
 @screen md {
-
     #main {
         padding-top: 52px;
     }
 
     #main .workspace {
-        padding-left: 14rem ; [dir="rtl"] & { padding-right: 14rem ; padding-left: 0 ; }
+        padding-left: 14rem;
+        [dir='rtl'] & {
+            padding-right: 14rem;
+            padding-left: 0;
+        }
     }
 
     #main.nav-closed {
         .nav-main {
-            left: -14rem ; [dir="rtl"] & { left: auto ; right: -14rem ; }
+            left: -14rem;
+            [dir='rtl'] & {
+                left: auto;
+                right: -14rem;
+            }
         }
 
         .workspace {
-            padding-left: 0 ; [dir="rtl"] & { padding-right: 0 ; padding-left: 0 ; }
+            padding-left: 0;
+            [dir='rtl'] & {
+                padding-right: 0;
+                padding-left: 0;
+            }
         }
     }
 }
-
 
 /* Page Wrapper
   ========================================================================== */
@@ -63,7 +72,7 @@ a {
 
 @screen md {
     .page-wrapper {
-        @apply px-8 max-w-xl mx-auto;
+        @apply mx-auto max-w-xl px-8;
     }
 }
 

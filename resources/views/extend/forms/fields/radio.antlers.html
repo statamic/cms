@@ -13,10 +13,10 @@
             {{ elseif instructions }}
                 aria-describedby="{{ id }}-instructions"
             {{ /if }}
-        >
+        />
         {{ label !== null ? label : option }}
     </label>
     {{ unless inline }}
-        <br>
+        <br />
     {{ /unless }}
 {{ /foreach:options }}

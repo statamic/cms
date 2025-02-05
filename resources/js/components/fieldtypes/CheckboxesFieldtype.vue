@@ -1,13 +1,14 @@
 <template>
-    <div class="checkboxes-fieldtype-wrapper"  :class="{'inline-mode': config.inline}">
+    <div class="checkboxes-fieldtype-wrapper" :class="{ 'inline-mode': config.inline }">
         <div class="option" v-for="(option, $index) in options" :key="$index">
             <label>
-                <input type="checkbox"
-                       ref="checkbox"
-                       :name="name + '[]'"
-                       :value="option.value"
-                       :disabled="isReadOnly"
-                       v-model="values"
+                <input
+                    type="checkbox"
+                    ref="checkbox"
+                    :name="name + '[]'"
+                    :value="option.value"
+                    :disabled="isReadOnly"
+                    v-model="values"
                 />
                 {{ option.label || option.value }}
             </label>
@@ -17,16 +18,15 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import HasInputOptions from './HasInputOptions.js'
+import HasInputOptions from './HasInputOptions.js';
 
 export default {
-
     mixins: [Fieldtype, HasInputOptions],
 
     data() {
         return {
-            values: this.value || []
-        }
+            values: this.value || [],
+        };
     },
 
     computed: {
@@ -35,17 +35,18 @@ export default {
         },
 
         replicatorPreview() {
-            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
 
-            return this.values.map(value => {
-                const option = _.findWhere(this.options, { value });
-                return option ? option.label : value;
-            }).join(', ');
+            return this.values
+                .map((value) => {
+                    const option = _.findWhere(this.options, { value });
+                    return option ? option.label : value;
+                })
+                .join(', ');
         },
     },
 
     watch: {
-
         values(values, oldValues) {
             values = this.sortValues(values);
 
@@ -56,12 +57,10 @@ export default {
 
         value(value) {
             this.values = this.sortValues(value);
-        }
-
+        },
     },
 
     methods: {
-
         focus() {
             this.$refs.checkbox[0].focus();
         },
@@ -69,11 +68,8 @@ export default {
         sortValues(values) {
             if (!values) return [];
 
-            return this.options
-                .filter(opt => values.includes(opt.value))
-                .map(opt => opt.value);
-        }
-
-    }
+            return this.options.filter((opt) => values.includes(opt.value)).map((opt) => opt.value);
+        },
+    },
 };
 </script>

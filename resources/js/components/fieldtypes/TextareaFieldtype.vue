@@ -9,15 +9,14 @@
         :id="fieldId"
         @blur="$emit('blur')"
         @focus="$emit('focus')"
-        @update:model-value="updateDebounced" />
+        @update:model-value="updateDebounced"
+    />
 </template>
 
 <script>
 import Fieldtype from './Fieldtype.vue';
 
 export default {
-
-    mixins: [Fieldtype]
-
-}
+    mixins: [Fieldtype],
+};
 </script>

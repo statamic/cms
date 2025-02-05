@@ -1,12 +1,12 @@
 @php
-use function Statamic\trans as __;
-$authed = \Statamic\Facades\User::current();
+    use function Statamic\trans as __;
+    $authed = \Statamic\Facades\User::current();
 @endphp
 
 @extends($authed ? 'statamic::layout' : 'statamic::outside')
 
 @section('content')
-    <div class="min-h-screen flex justify-center {{ $authed ? 'pt-30' : 'items-center' }}">
-        <h1 class="text-3xl tracking-tighter mb-10 opacity-50 text-center">{{ __('Page Not Found') }}</h1>
+    <div class="{{ $authed ? 'pt-30' : 'items-center' }} flex min-h-screen justify-center">
+        <h1 class="mb-10 text-center text-3xl tracking-tighter opacity-50">{{ __('Page Not Found') }}</h1>
     </div>
 @endsection

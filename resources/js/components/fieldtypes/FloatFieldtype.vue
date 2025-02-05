@@ -17,10 +17,8 @@
 import Fieldtype from './Fieldtype.vue';
 
 export default {
-
     mixins: [Fieldtype],
 
-    props: ['focus']
-
+    props: ['focus'],
 };
 </script>

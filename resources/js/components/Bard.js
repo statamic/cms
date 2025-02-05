@@ -31,8 +31,8 @@ class Bard {
             pm: {
                 state,
                 model,
-                view
-            }
+                view,
+            },
         };
     }
 }

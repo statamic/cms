@@ -37,12 +37,12 @@ export default class FieldAction {
     }
 
     async run() {
-        let payload = {...this.#payload};
+        let payload = { ...this.#payload };
 
         if (this.#confirm) {
             const confirmation = await modal(this.#modalProps());
             if (!confirmation.confirmed) return;
-            payload = {...payload, confirmation};
+            payload = { ...payload, confirmation };
         }
 
         const response = this.#run(payload);
@@ -56,9 +56,9 @@ export default class FieldAction {
     }
 
     #modalProps() {
-        let props = this.#confirm === true ? {} : {...this.#confirm};
+        let props = this.#confirm === true ? {} : { ...this.#confirm };
 
-        if (! props.title) {
+        if (!props.title) {
             props.title = this.title;
         }
 
