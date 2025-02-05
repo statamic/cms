@@ -10,6 +10,7 @@ composer.lock
 src/View/Debugbar/AntlersProfiler/resources/chart.js
 src/View/Debugbar/AntlersProfiler/resources/tabulator.css
 src/View/Debugbar/AntlersProfiler/resources/tabulator.min.js
+resources/views/extend/forms/fields/*.antlers.html
 
 resources/views/blueprints/index.blade.php
 resources/views/collections/empty.blade.php
