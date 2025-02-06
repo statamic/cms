@@ -1,3 +1,4 @@
+import { test, expect } from 'vitest';
 import { tidy_url } from '../bootstrap/globals'
 import { data_get } from '../bootstrap/globals'
 import { data_set } from '../bootstrap/globals'

@@ -1,3 +1,4 @@
+import { test, expect } from 'vitest';
 import ParentResolver from '../components/field-conditions/ParentResolver.js';
 
 let resolve = function (currentFieldPath, pathWithParent) {

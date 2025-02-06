@@ -33,5 +33,8 @@ export default defineConfig(({ mode }) => {
         optimizeDeps: {
             include: ['vue'],
         },
+        test: {
+            environment: 'jsdom',
+        },
     };
 });
