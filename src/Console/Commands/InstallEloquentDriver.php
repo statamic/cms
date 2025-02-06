@@ -657,7 +657,7 @@ class InstallEloquentDriver extends Command
             return;
         }
 
-        $this->components->info('Configured asset containers');
+        $this->components->info($message);
     }
 
     private function switchToEloquentDriver(string $repository): void
