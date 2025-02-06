@@ -9,21 +9,21 @@ use Statamic\Facades\Antlers;
 
 class RenderableFieldSlot
 {
-    public $context;
+    protected $context;
 
     public function __construct(protected $html, protected $isBlade)
     {
         //
     }
 
-    public function addContext($context)
+    public function addContext(array $context): self
     {
         $this->context = $context;
 
         return $this;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         if ($this->isBlade) {
             return Blade::render($this->html, ['field' => $this->context]);

@@ -6,14 +6,14 @@ use Illuminate\Contracts\Support\Htmlable;
 
 class RenderableField implements Htmlable
 {
-    public $isBlade = false;
+    protected $isBlade = false;
 
     public function __construct(protected $field, protected $data)
     {
         //
     }
 
-    public function isBlade($isBlade)
+    public function isBlade(bool $isBlade): void
     {
         $this->isBlade = $isBlade;
 
@@ -21,7 +21,7 @@ class RenderableField implements Htmlable
             ->each(fn ($field) => $field['field']->isBlade($isBlade));
     }
 
-    public function toHtml()
+    public function toHtml(): string
     {
         $data = array_merge($this->data, [
             'slot' => new RenderableFieldSlot(app('form-slot'), $this->isBlade),
@@ -32,18 +32,12 @@ class RenderableField implements Htmlable
         );
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->toHtml();
     }
 
-    /**
-     * Minify field html.
-     *
-     * @param  string  $html
-     * @return string
-     */
-    protected function minifyFieldHtml($html)
+    protected function minifyFieldHtml(string $html): string
     {
         // Leave whitespace around these html elements.
         $ignoredHtmlElements = collect(['a', 'span'])->implode('|');
