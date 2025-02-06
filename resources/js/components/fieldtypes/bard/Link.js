@@ -2,7 +2,6 @@ import { Mark, getAttributes, getMarkRange, markPasteRule } from '@tiptap/core';
 import { Plugin, PluginKey, TextSelection } from '@tiptap/pm/state';
 
 export const Link = Mark.create({
-
     name: 'link',
 
     inclusive: false,
@@ -21,35 +20,33 @@ export const Link = Mark.create({
             title: {
                 default: null,
             },
-        }
+        };
     },
 
     parseHTML() {
         return [
             {
-                tag: 'a[href]'
+                tag: 'a[href]',
             },
-        ]
+        ];
     },
 
     renderHTML({ HTMLAttributes }) {
-        return ['a', HTMLAttributes, 0]
+        return ['a', HTMLAttributes, 0];
     },
 
     addCommands() {
         return {
-            setLink: attributes => ({ chain }) => {
-                if (attributes.href) {
-                    return chain()
-                        .setMark(this.name, attributes)
-                        .run()
-                }
+            setLink:
+                (attributes) =>
+                ({ chain }) => {
+                    if (attributes.href) {
+                        return chain().setMark(this.name, attributes).run();
+                    }
 
-                return chain()
-                    .unsetMark(this.name, { extendEmptyMarkRange: true })
-                    .run()
-            },
-        }
+                    return chain().unsetMark(this.name, { extendEmptyMarkRange: true }).run();
+                },
+        };
     },
 
     addPasteRules() {
@@ -57,17 +54,17 @@ export const Link = Mark.create({
             markPasteRule({
                 find: /https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_+.~#?&//=]*)/g,
                 type: this.type,
-                getAttributes: url => ({
-                    href: url[0]
+                getAttributes: (url) => ({
+                    href: url[0],
                 }),
             }),
-        ]
+        ];
     },
 
     addKeyboardShortcuts() {
         return {
-            'Mod-k': () => this.options.vm.$emit('link-toggle'),
-        }
+            'Mod-k': () => this.options.vm.events.emit('link-toggle'),
+        };
     },
 
     addProseMirrorPlugins() {
@@ -90,14 +87,13 @@ export const Link = Mark.create({
                             const attrs = getAttributes(view.state, schema.marks.link);
 
                             view.dispatch(transaction);
-                            vm.$emit('link-selected', attrs);
+                            vm.events.emit('link-selected', attrs);
                         } else {
-                            vm.$emit('link-deselected');
+                            vm.events.emit('link-deselected');
                         }
                     },
                 },
             }),
-        ]
+        ];
     },
-
-})
+});

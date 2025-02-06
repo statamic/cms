@@ -1,35 +1,30 @@
-import Vue from 'vue'
 import Portal from './Portal';
+import { ref } from 'vue';
 
-class Portals {
-
-    constructor(instance) {
-        this.portals = instance.$root.portals;
+export default class Portals {
+    constructor() {
+        this.portals = ref([]);
     }
 
     all() {
-        return this.portals;
+        return this.portals.value;
     }
 
     create(name, data = {}) {
         let portal = new Portal(this, name, data);
 
-        this.portals.push(portal);
+        this.portals.value.push(portal);
 
         return portal;
     }
 
     destroy(id) {
-        const i = _.findIndex(this.portals, (portal) => portal.id === id);
+        const i = _.findIndex(this.portals.value, (portal) => portal.id === id);
 
-        this.portals.splice(i, 1);
+        this.portals.value.splice(i, 1);
+    }
+
+    stacks() {
+        return this.portals.value.filter((portal) => portal.data?.type === 'stack');
     }
 }
-
-Object.defineProperties(Vue.prototype, {
-    $portals: {
-        get() {
-            return new Portals(this);
-        }
-    }
-});

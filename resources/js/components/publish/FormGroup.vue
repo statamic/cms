@@ -1,24 +1,22 @@
 <template>
-
     <publish-field
         :config="fieldConfig"
-        :value="value"
+        :model-value="modelValue"
         :errors="fieldErrors"
-        @input="$emit('input', $event)"
+        @update:model-value="$emit('update:model-value', $event)"
     />
-
 </template>
 
 <script>
 import PublishField from './Field.vue';
 
 export default {
+    emits: ['update:model-value'],
 
     components: { PublishField },
 
     props: {
-
-        value: {},
+        modelValue: {},
 
         fieldtype: {
             type: String,
@@ -36,38 +34,36 @@ export default {
         },
 
         instructions: {
-            type: String
+            type: String,
         },
 
         width: {
-            default: 100
+            default: 100,
         },
 
         focus: {
-            type: Boolean
+            type: Boolean,
         },
 
         autoselect: {
-            type: Boolean
+            type: Boolean,
         },
 
         errors: {
-            type: Array
+            type: Array,
         },
 
         // A single error, useful when using this component directly in Blade views.
         error: {
-            type: String
+            type: String,
         },
 
         config: {
-            type: Object
-        }
-
+            type: Object,
+        },
     },
 
     computed: {
-
         fieldConfig() {
             return {
                 ...this.config,
@@ -83,9 +79,7 @@ export default {
 
         fieldErrors() {
             return this.error ? [this.error] : this.errors;
-        }
-
-    }
-
-}
+        },
+    },
+};
 </script>

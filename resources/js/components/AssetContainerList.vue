@@ -18,30 +18,22 @@
 
 <script>
 export default {
-
-    props: [
-        'initial-rows',
-        'columns',
-        'visible-columns'
-    ],
+    props: ['initial-rows', 'columns', 'visible-columns'],
 
     data() {
         return {
-            rows: this.initialRows
-        }
+            rows: this.initialRows,
+        };
     },
 
     methods: {
-
         destroy(container, index) {
             if (confirm(__('Are you sure?'))) {
-                this.$axios.delete(container.delete_url).then(response => {
+                this.$axios.delete(container.delete_url).then((response) => {
                     this.rows.splice(index, 1);
                 });
             }
-        }
-
-    }
-
-}
+        },
+    },
+};
 </script>

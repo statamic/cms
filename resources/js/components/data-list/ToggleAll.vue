@@ -1,6 +1,12 @@
 <template>
-    <label for="checkerOfAllBoxes" class="flex items-center justify-center relative cursor-pointer">
-        <input type="checkbox" @change="toggle" :checked="anyItemsChecked" id="checkerOfAllBoxes" class="relative top-0">
+    <label for="checkerOfAllBoxes" class="relative flex cursor-pointer items-center justify-center">
+        <input
+            type="checkbox"
+            @change="toggle"
+            :checked="anyItemsChecked"
+            id="checkerOfAllBoxes"
+            class="relative top-0"
+        />
     </label>
 </template>
 
@@ -14,19 +20,19 @@ export default {
     },
     methods: {
         toggle() {
-            this.anyItemsChecked ? this.uncheckAllItems() : this.checkMaximumAmountOfItems()
+            this.anyItemsChecked ? this.uncheckAllItems() : this.checkMaximumAmountOfItems();
         },
 
         checkMaximumAmountOfItems() {
             this.sharedState.selections = _.chain(this.sharedState.rows)
-                .map(item => item.id)
+                .map((item) => item.id)
                 .first(this.sharedState.maxSelections ?? Infinity)
-                .value()
+                .value();
         },
 
         uncheckAllItems() {
-            this.sharedState.selections = []
+            this.sharedState.selections = [];
         },
     },
-}
+};
 </script>

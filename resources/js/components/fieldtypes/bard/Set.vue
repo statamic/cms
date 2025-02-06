@@ -1,16 +1,23 @@
 <template>
-
     <node-view-wrapper>
-        <div class="bard-set whitespace-normal my-6 rounded bg-white dark:bg-dark-500 border dark:border-dark-900 shadow-md"
+        <div
+            class="bard-set my-6 whitespace-normal rounded border bg-white shadow-md dark:border-dark-900 dark:bg-dark-500"
             :class="{ 'border-blue-400 dark:border-dark-blue-100': selected || withinSelection, 'has-error': hasError }"
             :data-type="config.handle"
-            contenteditable="false" @copy.stop @paste.stop @cut.stop
+            contenteditable="false"
+            @copy.stop
+            @paste.stop
+            @cut.stop
         >
             <div ref="content" hidden />
-            <div class="replicator-set-header" :class="{'collapsed': collapsed, 'invalid': isInvalid }">
+            <div class="replicator-set-header" :class="{ collapsed: collapsed, invalid: isInvalid }">
                 <div class="item-move sortable-handle" data-drag-handle />
-                <div class="flex items-center flex-1 p-2 replicator-set-header-inner cursor-pointer" :class="{'flex items-center': collapsed}" @click="toggleCollapsedState">
-                    <label class="text-xs rtl:ml-2 ltr:mr-2">
+                <div
+                    class="replicator-set-header-inner flex flex-1 cursor-pointer items-center p-2"
+                    :class="{ 'flex items-center': collapsed }"
+                    @click="toggleCollapsedState"
+                >
+                    <label class="text-xs ltr:mr-2 rtl:ml-2">
                         <span v-if="isSetGroupVisible">
                             {{ __(setGroup.display) }}
                             <svg-icon name="micro/chevron-right" class="w-4" />
@@ -18,24 +25,33 @@
                         {{ display || config.handle }}
                     </label>
                     <div class="flex items-center" v-if="config.instructions && !collapsed">
-                        <svg-icon name="micro/circle-help" class="text-gray-700 dark:text-dark-175 hover:text-gray-800 dark:hover:text-dark-100 h-3 w-3 text-xs" v-tooltip="{ content: $options.filters.markdown(__(config.instructions)), html:true }" />
+                        <svg-icon
+                            name="micro/circle-help"
+                            class="h-3 w-3 text-xs text-gray-700 hover:text-gray-800 dark:text-dark-175 dark:hover:text-dark-100"
+                            v-tooltip="{ content: $markdown(__(config.instructions)), html: true }"
+                        />
                     </div>
-                    <div v-show="collapsed" class="flex-1 min-w-0 w-1 rtl:pl-8 ltr:pr-8">
+                    <div v-show="collapsed" class="w-1 min-w-0 flex-1 ltr:pr-8 rtl:pl-8">
                         <div
                             v-html="previewText"
-                            class="help-block mb-0 whitespace-nowrap overflow-hidden text-ellipsis" />
+                            class="help-block mb-0 overflow-hidden text-ellipsis whitespace-nowrap"
+                        />
                     </div>
                 </div>
                 <div class="replicator-set-controls">
                     <toggle-fieldtype
                         handle="set-enabled"
-                        class="toggle-sm rtl:ml-4 ltr:mr-4"
-                        v-model="enabled"
-                        v-tooltip.top="(enabled) ? __('Included in output') : __('Hidden from output')" />
+                        class="toggle-sm ltr:mr-4 rtl:ml-4"
+                        v-model:value="enabled"
+                        v-tooltip.top="enabled ? __('Included in output') : __('Hidden from output')"
+                    />
                     <dropdown-list>
                         <dropdown-actions :actions="fieldActions" v-if="fieldActions.length" />
                         <div class="divider" />
-                        <dropdown-item :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))" @click="toggleCollapsedState" />
+                        <dropdown-item
+                            :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))"
+                            @click="toggleCollapsedState"
+                        />
                         <dropdown-item :text="__('Duplicate Set')" @click="duplicate" />
                         <dropdown-item :text="__('Delete Set')" class="warning" @click="deleteNode" />
                     </dropdown-list>
@@ -63,11 +79,10 @@
             </div>
         </div>
     </node-view-wrapper>
-
 </template>
 
 <script>
-import { NodeViewWrapper } from '@tiptap/vue-2';
+import { NodeViewWrapper } from '@tiptap/vue-3';
 import SetField from '../replicator/Field.vue';
 import ManagesPreviewText from '../replicator/ManagesPreviewText';
 import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
@@ -75,7 +90,6 @@ import HasFieldActions from '../../field-actions/HasFieldActions.js';
 import DropdownActions from '../../field-actions/DropdownActions.vue';
 
 export default {
-
     props: [
         'editor', // the editor instance
         'node', // access the current node
@@ -89,16 +103,11 @@ export default {
 
     components: { NodeViewWrapper, SetField, DropdownActions },
 
-    mixins: [
-        ValidatesFieldConditions,
-        ManagesPreviewText, 
-        HasFieldActions,
-    ],
+    mixins: [ValidatesFieldConditions, ManagesPreviewText, HasFieldActions],
 
     inject: ['bard', 'bardSets', 'storeName'],
 
     computed: {
-
         fields() {
             return this.config.fields;
         },
@@ -109,6 +118,10 @@ export default {
 
         values() {
             return this.node.attrs.values;
+        },
+
+        extraValues() {
+            return {};
         },
 
         meta() {
@@ -152,8 +165,8 @@ export default {
                 return this.node.attrs.enabled;
             },
             set(enabled) {
-                return this.updateAttributes({ enabled })
-            }
+                return this.updateAttributes({ enabled });
+            },
         },
 
         parentName() {
@@ -189,7 +202,7 @@ export default {
         },
 
         fieldVm() {
-            return this.extension.options.bard
+            return this.extension.options.bard;
         },
 
         fieldActionPayload() {
@@ -208,11 +221,9 @@ export default {
                 storeName: this.storeName,
             };
         },
-
     },
 
     methods: {
-
         updated(handle, value) {
             let values = Object.assign({}, this.values);
             values.type = this.config.handle;
@@ -263,20 +274,23 @@ export default {
 
         duplicate() {
             // this.$events.$emit('duplicated', this.node.attrs.id);
-            this.extension.options.bard.duplicateSet(this.node.attrs.id, this.node.attrs, this.getPos() + this.node.nodeSize);
+            this.extension.options.bard.duplicateSet(
+                this.node.attrs.id,
+                this.node.attrs,
+                this.getPos() + this.node.nodeSize,
+            );
         },
 
         fieldPath(field) {
             let prefix = this.extension.options.bard.fieldPathPrefix || this.extension.options.bard.handle;
             return `${prefix}.${this.index}.attrs.values.${field.handle}`;
         },
-
     },
 
     updated() {
         // This is a workaround to avoid Firefox's inability to select inputs/textareas when the
         // parent element is set to draggable: https://bugzilla.mozilla.org/show_bug.cgi?id=739071
         this.$el.setAttribute('draggable', false);
-    }
-}
+    },
+};
 </script>

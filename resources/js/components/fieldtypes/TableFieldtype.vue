@@ -1,27 +1,36 @@
 <template>
     <portal name="table-fullscreen" :disabled="!fullScreenMode" target-class="table-fieldtype">
-        <div class="table-fieldtype-container" :class="{'table-fullscreen bg-white dark:bg-dark-700': fullScreenMode }">
+        <div
+            class="table-fieldtype-container"
+            :class="{ 'table-fullscreen bg-white dark:bg-dark-700': fullScreenMode }"
+        >
             <publish-field-fullscreen-header
                 v-if="fullScreenMode"
                 :title="config.display"
                 :field-actions="fieldActions"
-                @close="toggleFullscreen">
+                @close="toggleFullscreen"
+            >
             </publish-field-fullscreen-header>
 
-            <section :class="{'mt-14 p-4 dark:bg-dark-700': fullScreenMode}">
+            <section :class="{ 'mt-14 p-4 dark:bg-dark-700': fullScreenMode }">
                 <table class="table-fieldtype-table" v-if="rowCount">
                     <thead>
                         <tr>
                             <th class="grid-drag-handle-header" v-if="!isReadOnly"></th>
                             <th v-for="(column, index) in columnCount" :key="index">
-                                <div class="flex items-center justify-between h-6">
+                                <div class="flex h-6 items-center justify-between">
                                     <span class="column-count">{{ index + 1 }}</span>
-                                    <a v-show="canDeleteColumns" class="opacity-25 text-lg antialiased hover:opacity-75" @click="confirmDeleteColumn(index)" :aria-label="__('Delete Column')">
+                                    <a
+                                        v-show="canDeleteColumns"
+                                        class="text-lg antialiased opacity-25 hover:opacity-75"
+                                        @click="confirmDeleteColumn(index)"
+                                        :aria-label="__('Delete Column')"
+                                    >
                                         &times;
                                     </a>
                                 </div>
                             </th>
-                            <th class="row-controls rtl:pl-0 ltr:pr-0"></th>
+                            <th class="row-controls ltr:pr-0 rtl:pl-0"></th>
                         </tr>
                     </thead>
 
@@ -38,10 +47,23 @@
                             <tr class="sortable-row" v-for="(row, rowIndex) in data" :key="row._id">
                                 <td class="table-drag-handle" v-if="!isReadOnly"></td>
                                 <td v-for="(cell, cellIndex) in row.value.cells">
-                                    <input type="text" v-model="row.value.cells[cellIndex]" class="input-text" :readonly="isReadOnly" @focus="$emit('focus')" @blur="$emit('blur')" />
+                                    <input
+                                        type="text"
+                                        v-model="row.value.cells[cellIndex]"
+                                        class="input-text"
+                                        :readonly="isReadOnly"
+                                        @focus="$emit('focus')"
+                                        @blur="$emit('blur')"
+                                    />
                                 </td>
                                 <td class="row-controls" v-if="canDeleteRows">
-                                    <button @click="confirmDeleteRow(rowIndex)" class="inline opacity-25 text-lg antialiased hover:opacity-75" :aria-label="__('Delete Row')">&times;</button>
+                                    <button
+                                        @click="confirmDeleteRow(rowIndex)"
+                                        class="inline text-lg antialiased opacity-25 hover:opacity-75"
+                                        :aria-label="__('Delete Row')"
+                                    >
+                                        &times;
+                                    </button>
                                 </td>
                             </tr>
                         </tbody>
@@ -52,7 +74,7 @@
                     {{ __('Add Row') }}
                 </button>
 
-                <button class="btn rtl:mr-2 ltr:ml-2" @click="addColumn" :disabled="atColumnMax" v-if="canAddColumns">
+                <button class="btn ltr:ml-2 rtl:mr-2" @click="addColumn" :disabled="atColumnMax" v-if="canAddColumns">
                     {{ __('Add Column') }}
                 </button>
             </section>
@@ -83,16 +105,16 @@
 </template>
 
 <script>
+import Fieldtype from './Fieldtype.vue';
 import { SortableList, SortableItem, SortableHelpers } from '../sortable/Sortable';
 import SortableKeyValue from '../sortable/SortableKeyValue';
 
 export default {
-
     mixins: [Fieldtype, SortableHelpers],
 
     components: {
         SortableList,
-        SortableItem
+        SortableItem,
     },
 
     data: function () {
@@ -100,23 +122,23 @@ export default {
             data: this.arrayToSortable(this.value || []),
             deletingRow: false,
             deletingColumn: false,
-            fullScreenMode: false
-        }
+            fullScreenMode: false,
+        };
     },
 
     watch: {
         data: {
             deep: true,
-            handler (data) {
+            handler(data) {
                 this.updateDebounced(this.sortableToArray(data));
-            }
+            },
         },
 
         value(value, oldValue) {
             if (JSON.stringify(value) == JSON.stringify(oldValue)) return;
             if (JSON.stringify(value) == JSON.stringify(this.sortableToArray(this.data))) return;
             this.data = this.arrayToSortable(value);
-        }
+        },
     },
 
     computed: {
@@ -161,19 +183,20 @@ export default {
         },
 
         replicatorPreview() {
-            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
 
             // Join all values with commas. Exclude any empties.
             return _(this.data)
-                .map(row => row.value.cells.filter(cell => !!cell).join(', '))
-                .filter(row => !!row).join(', ');
+                .map((row) => row.value.cells.filter((cell) => !!cell).join(', '))
+                .filter((row) => !!row)
+                .join(', ');
         },
 
         internalFieldActions() {
             return [
                 {
                     title: __('Toggle Fullscreen Mode'),
-                    icon: ({ vm }) => vm.fullScreenMode ? 'shrink-all' : 'expand-bold',
+                    icon: ({ vm }) => (vm.fullScreenMode ? 'shrink-all' : 'expand-bold'),
                     quick: true,
                     visibleWhenReadOnly: true,
                     run: this.toggleFullscreen,
@@ -184,9 +207,11 @@ export default {
 
     methods: {
         addRow() {
-            this.data.push(this.newSortableValue({
-                'cells': new Array(this.columnCount || 1)
-            }));
+            this.data.push(
+                this.newSortableValue({
+                    cells: new Array(this.columnCount || 1),
+                }),
+            );
         },
 
         addColumn() {
@@ -229,7 +254,6 @@ export default {
         toggleFullscreen() {
             this.fullScreenMode = !this.fullScreenMode;
         },
-    }
-
-}
+    },
+};
 </script>

@@ -1,5 +1,4 @@
 <template>
-
     <publish-container
         v-if="blueprint"
         ref="container"
@@ -10,21 +9,20 @@
         :meta="meta"
         :errors="errors"
         @updated="values = $event"
+        v-slot="{ setFieldValue }"
     >
-        <div slot-scope="{ setFieldValue }">
-            <configure-tabs @updated="setFieldValue" :enable-sidebar="false"/>
-            <div class="py-4 border-t dark:border-dark-950 flex justify-between">
-                <a :href="url" class="btn" v-text="__('Cancel') "/>
+        <div>
+            <configure-tabs @updated="setFieldValue" :enable-sidebar="false" />
+            <div class="flex justify-between border-t py-4 dark:border-dark-950">
+                <a :href="url" class="btn" v-text="__('Cancel')" />
                 <button type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
             </div>
         </div>
     </publish-container>
-
 </template>
 
 <script>
 export default {
-
     props: {
         blueprint: Object,
         initialValues: Object,
@@ -40,11 +38,10 @@ export default {
             values: this.initialValues,
             error: null,
             errors: {},
-        }
+        };
     },
 
     methods: {
-
         clearErrors() {
             this.error = null;
             this.errors = {};
@@ -54,9 +51,12 @@ export default {
             this.saving = true;
             this.clearErrors();
 
-            this.$axios.patch(this.url, this.values).then(response => {
-                window.location = response.data.redirect;
-            }).catch(e => this.handleAxiosError(e));
+            this.$axios
+                .patch(this.url, this.values)
+                .then((response) => {
+                    window.location = response.data.redirect;
+                })
+                .catch((e) => this.handleAxiosError(e));
         },
 
         handleAxiosError(e) {
@@ -70,15 +70,13 @@ export default {
                 this.$toast.error(__('Unable to save changes'));
             }
         },
-
     },
 
     created() {
-        this.$keys.bindGlobal(['mod+s'], e => {
+        this.$keys.bindGlobal(['mod+s'], (e) => {
             e.preventDefault();
             this.submit();
         });
     },
-
-}
+};
 </script>

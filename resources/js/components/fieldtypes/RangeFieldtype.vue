@@ -1,7 +1,7 @@
 <template>
-    <div class="range-fieldtype-wrapper bg-gray-200 dark:bg-dark-700 rounded py-2 px-4 border dark:border-dark-900">
+    <div class="range-fieldtype-wrapper rounded border bg-gray-200 px-4 py-2 dark:border-dark-900 dark:bg-dark-700">
         <div class="flex items-center">
-            <div v-if="config.prepend" v-text="__(config.prepend)" class="rtl:ml-2 ltr:mr-2" />
+            <div v-if="config.prepend" v-text="__(config.prepend)" class="ltr:mr-2 rtl:ml-2" />
             <input
                 type="range"
                 v-model="val"
@@ -13,9 +13,13 @@
                 :readonly="isReadOnly"
                 :disabled="isReadOnly"
                 :id="fieldId"
-                class="flex-1 min-w-0"
+                class="min-w-0 flex-1"
             />
-            <div class="rounded border dark:border-dark-900 px-2 py-1 mx-2 bg-gray-100 dark:bg-dark-600 dark:shadow-inner-dark">{{ val }}</div>
+            <div
+                class="mx-2 rounded border bg-gray-100 px-2 py-1 dark:border-dark-900 dark:bg-dark-600 dark:shadow-inner-dark"
+            >
+                {{ val }}
+            </div>
             <div v-if="config.append" v-text="__(config.append)" />
         </div>
     </div>
@@ -25,13 +29,12 @@
 import Fieldtype from './Fieldtype.vue';
 
 export default {
-
     mixins: [Fieldtype],
 
-     data() {
+    data() {
         return {
             val: this.getValue(),
-        }
+        };
     },
 
     methods: {
@@ -50,11 +53,11 @@ export default {
         },
 
         getValue() {
-            if (typeof(this.value) === 'number') {
+            if (typeof this.value === 'number') {
                 return this.value;
             }
 
-            if (typeof(this.config.default) === 'number') {
+            if (typeof this.config.default === 'number') {
                 return this.config.default;
             }
 
@@ -62,15 +65,13 @@ export default {
         },
     },
 
-
     watch: {
         value(value) {
             this.val = value;
         },
         val(value) {
             this.updateDebounced(value);
-        }
-    }
-
-}
+        },
+    },
+};
 </script>

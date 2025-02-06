@@ -1,14 +1,18 @@
-@php use function Statamic\trans as __; @endphp
+@php
+    use function Statamic\trans as __;
+@endphp
 
 @extends('statamic::layout')
 @section('title', __('Edit Blueprint'))
 
 @section('content')
-
-    @include('statamic::partials.breadcrumb', [
-        'url' => cp_route('collections.blueprints.index', $collection),
-        'title' => __('Blueprints')
-    ])
+    @include(
+        'statamic::partials.breadcrumb',
+        [
+            'url' => cp_route('collections.blueprints.index', $collection),
+            'title' => __('Blueprints'),
+        ]
+    )
 
     <blueprint-builder
         show-title
@@ -16,9 +20,11 @@
         :initial-blueprint="{{ json_encode($blueprintVueObject) }}"
     ></blueprint-builder>
 
-    @include('statamic::partials.docs-callout', [
-        'topic' => __('Blueprints'),
-        'url' => Statamic::docsUrl('blueprints')
-    ])
-
+    @include(
+        'statamic::partials.docs-callout',
+        [
+            'topic' => __('Blueprints'),
+            'url' => Statamic::docsUrl('blueprints'),
+        ]
+    )
 @endsection

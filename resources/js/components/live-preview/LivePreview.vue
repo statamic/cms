@@ -1,5 +1,4 @@
 <template>
-
     <div>
         <v-portal :to="livePreviewFieldsPortal" :disabled="!portalEnabled">
             <provider :variables="provides">
@@ -9,15 +8,28 @@
 
         <portal v-if="previewing" name="live-preview" target-class="live-preview-portal">
             <div class="live-preview fixed flex flex-col">
-
                 <transition name="live-preview-header-slide">
                     <div v-show="headerVisible" class="live-preview-header">
-                        <div class="text-base text-gray-700 dark:text-dark-150 font-medium rtl:ml-4 ltr:mr-4">{{ __('Live Preview') }}</div>
+                        <div class="text-base font-medium text-gray-700 dark:text-dark-150 ltr:mr-4 rtl:ml-4">
+                            {{ __('Live Preview') }}
+                        </div>
                         <div class="flex items-center">
-                            <button v-if="canPopOut && !poppedOut" class="btn" @click="popout">{{ __('Pop out') }}</button>
+                            <button v-if="canPopOut && !poppedOut" class="btn" @click="popout">
+                                {{ __('Pop out') }}
+                            </button>
                             <button v-if="poppedOut" class="btn" @click="closePopout">{{ __('Pop in') }}</button>
-                            <select-input :options="deviceSelectOptions" v-model="previewDevice" v-show="!poppedOut" class="rtl:mr-4 ltr:ml-4" />
-                            <select-input :options="targetSelectOptions" v-model="target" class="rtl:mr-4 ltr:ml-4" v-if="targets.length > 1" />
+                            <select-input
+                                :options="deviceSelectOptions"
+                                v-model="previewDevice"
+                                v-show="!poppedOut"
+                                class="ltr:ml-4 rtl:mr-4"
+                            />
+                            <select-input
+                                :options="targetSelectOptions"
+                                v-model="target"
+                                class="ltr:ml-4 rtl:mr-4"
+                                v-if="targets.length > 1"
+                            />
 
                             <component
                                 v-for="(component, handle) in inputs"
@@ -26,24 +38,24 @@
                                 :value="extras[handle]"
                                 :loading="loading"
                                 @input="componentUpdated(handle, $event)"
-                                class="rtl:mr-4 ltr:ml-4" />
+                                class="ltr:ml-4 rtl:mr-4"
+                            />
 
                             <slot name="buttons" />
 
-                            <button
-                                type="button"
-                                class="btn-close"
-                                @click="close"
-                                v-html="'&times'" />
+                            <button type="button" class="btn-close" @click="close" v-html="'&times'" />
                         </div>
                     </div>
                 </transition>
 
                 <div class="live-preview-main">
-
                     <transition name="live-preview-editor-slide">
-                        <div v-show="panesVisible" class="live-preview-editor @container/live-preview" :style="{ width: poppedOut ? '100%' : `${editorWidth}px` }">
-                            <div class="live-preview-fields flex-1 h-full overflow-scroll">
+                        <div
+                            v-show="panesVisible"
+                            class="live-preview-editor @container/live-preview"
+                            :style="{ width: poppedOut ? '100%' : `${editorWidth}px` }"
+                        >
+                            <div class="live-preview-fields h-full flex-1 overflow-scroll">
                                 <portal-target :name="livePreviewFieldsPortal" />
                             </div>
 
@@ -58,16 +70,17 @@
                     </transition>
 
                     <transition name="live-preview-contents-slide">
-                        <div v-show="panesVisible" ref="contents" class="live-preview-contents items-center justify-center overflow-auto" :class="{ 'pointer-events-none': editorResizing }" />
+                        <div
+                            v-show="panesVisible"
+                            ref="contents"
+                            class="live-preview-contents items-center justify-center overflow-auto"
+                            :class="{ 'pointer-events-none': editorResizing }"
+                        />
                     </transition>
-
                 </div>
-
             </div>
         </portal>
-
     </div>
-
 </template>
 
 <script>
@@ -79,14 +92,11 @@ let source;
 const widthLocalStorageKey = 'statamic.live-preview.editor-width';
 
 export default {
-
-    mixins: [
-        UpdatesIframe
-    ],
+    mixins: [UpdatesIframe],
 
     components: {
         Provider,
-        Resizer
+        Resizer,
     },
 
     props: {
@@ -109,7 +119,7 @@ export default {
             editorCollapsed: false,
             previewDevice: null,
             provides: {
-                storeName: this.name
+                storeName: this.name,
             },
             channel: null,
             poppedOut: false,
@@ -120,31 +130,42 @@ export default {
             keybinding: null,
             token: null,
             target: 0,
-            previousUrl: null
-        }
+            previousUrl: null,
+        };
     },
 
     computed: {
-
         payload() {
             return {
                 blueprint: this.blueprint,
                 preview: this.values,
-                extras: this.extras
-            }
+                extras: this.extras,
+            };
         },
 
         targetSelectOptions() {
-            return Object.values(_.mapObject(this.targets, (target, key) => {
-                return { value: key, label: __(target.label) };
-            }));
+            return Object.values(
+                _.mapObject(this.targets, (target, key) => {
+                    return { value: key, label: __(target.label) };
+                }),
+            );
         },
 
         deviceSelectOptions() {
-            let options = Object.values(_.mapObject(this.$config.get('livePreview.devices'), (dimensions, device) => {
-                return { value: device, label: __(device) };
-            }));
-            options.unshift({ value: null, label: __('Responsive') });
+            let options = Object.values(
+                _.mapObject(this.$config.get('livePreview.devices'), (dimensions, device) => {
+                    if (device === 'Responsive') {
+                        return { value: null, label: __('Responsive') };
+                    }
+
+                    return { value: device, label: __(device) };
+                }),
+            );
+
+            if (options.filter((option) => option.label === __('Responsive')).length === 0) {
+                options.unshift({ value: null, label: __('Responsive') });
+            }
+
             return options;
         },
 
@@ -165,7 +186,7 @@ export default {
         },
 
         livePreviewFieldsPortal() {
-            return `live-preview-fields-${this.storeName}`;
+            return `live-preview-fields-${this.name}`;
         },
 
         canPopOut() {
@@ -180,15 +201,13 @@ export default {
             if (this.token) url += `&token=${this.token}`;
 
             return url;
-        }
-
+        },
     },
 
     watch: {
-
         previewing(enabled, wasEnabled) {
             if (wasEnabled && !enabled) {
-                this.$nextTick(() => this.portalEnabled = false);
+                this.$nextTick(() => (this.portalEnabled = false));
             } else {
                 this.portalEnabled = enabled;
             }
@@ -203,7 +222,7 @@ export default {
             deep: true,
             handler(payload) {
                 if (this.previewing) this.update();
-            }
+            },
         },
 
         target() {
@@ -213,11 +232,11 @@ export default {
         previewDevice() {
             this.setIframeAttributes(document.getElementById('live-preview-iframe'));
         },
-
     },
 
     created() {
-        this.editorWidth = localStorage.getItem(widthLocalStorageKey) || 400
+        this.previewDevice = this.deviceSelectOptions[0].value;
+        this.editorWidth = localStorage.getItem(widthLocalStorageKey) || 400;
 
         this.keybinding = this.$keys.bindGlobal('mod+shift+p', () => {
             this.previewing ? this.close() : this.$emit('opened-via-keyboard');
@@ -228,35 +247,37 @@ export default {
         });
     },
 
-    beforeDestroy() {
+    beforeUnmount() {
         this.closePopout();
     },
 
-    destroyed() {
+    unmounted() {
         this.keybinding.destroy();
     },
 
     methods: {
-
         update: _.debounce(function () {
-            if (source) source.cancel();
-            source = this.$axios.CancelToken.source();
+            if (source) source.abort();
+            source = new AbortController();
 
             this.loading = true;
 
-            this.$axios.post(this.tokenizedUrl, this.payload, { cancelToken: source.token }).then(response => {
-                this.token = response.data.token;
-                const url = response.data.url;
-                const target = this.targets[this.target];
-                const payload = { token: this.token, reference: this.reference };
-                this.poppedOut
-                    ? this.channel.postMessage({ event: 'updated', url, target, payload })
-                    : this.updateIframeContents(url, target, payload);
-                this.loading = false;
-            }).catch(e => {
-                if (this.$axios.isCancel(e)) return;
-                throw e;
-            });
+            this.$axios
+                .post(this.tokenizedUrl, this.payload, { signal: source.signal })
+                .then((response) => {
+                    this.token = response.data.token;
+                    const url = response.data.url;
+                    const target = this.targets[this.target];
+                    const payload = { token: this.token, reference: this.reference };
+                    this.poppedOut
+                        ? this.channel.postMessage({ event: 'updated', url, target, payload })
+                        : this.updateIframeContents(url, target, payload);
+                    this.loading = false;
+                })
+                .catch((e) => {
+                    if (e.code === 'ERR_CANCELED') return;
+                    throw e;
+                });
         }, 150),
 
         setIframeAttributes(iframe) {
@@ -276,8 +297,7 @@ export default {
         },
 
         animateIn() {
-            return this
-                .$wait(100)
+            return this.$wait(100)
                 .then(() => {
                     this.headerVisible = true;
                     return this.$wait(200);
@@ -313,7 +333,7 @@ export default {
         popout() {
             this.poppedOut = true;
             this.channel = this.channel || new BroadcastChannel('livepreview');
-            this.channel.onmessage = e => {
+            this.channel.onmessage = (e) => {
                 switch (e.data.event) {
                     case 'popout.opened':
                         this.listenForPopoutClose();
@@ -333,7 +353,11 @@ export default {
             const width = this.$refs.contents.clientWidth;
             const height = this.$refs.contents.clientHeight;
             const left = screen.width - width;
-            this.popoutWindow = window.open(this.url, 'livepreview', `width=${width},height=${height},top=0,left=${left}`);
+            this.popoutWindow = window.open(
+                this.url,
+                'livepreview',
+                `width=${width},height=${height},top=0,left=${left}`,
+            );
         },
 
         closePopout() {
@@ -355,9 +379,8 @@ export default {
         },
 
         componentUpdated(handle, value) {
-            Vue.set(this.extras, handle, value);
-        }
-    }
-
-}
+            this.extras[handle] = value;
+        },
+    },
+};
 </script>

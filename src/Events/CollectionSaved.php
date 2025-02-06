@@ -6,11 +6,8 @@ use Statamic\Contracts\Git\ProvidesCommitMessage;
 
 class CollectionSaved extends Event implements ProvidesCommitMessage
 {
-    public $collection;
-
-    public function __construct($collection)
+    public function __construct(public $collection)
     {
-        $this->collection = $collection;
     }
 
     public function commitMessage()

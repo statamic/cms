@@ -1,17 +1,20 @@
 <template>
-
-    <div class="p-4 m-0 @container" :class="classes">
+    <div class="m-0 p-4 @container" :class="classes">
         <div class="field-inner">
             <label class="block" :for="fieldId" v-if="showLabel">
-                <span v-if="showLabelText" v-tooltip="{content: field.handle, delay: 500, autoHide: false}">{{ display }}</span>
+                <span v-if="showLabelText" v-tooltip="{ content: field.handle, delay: 500, autoHide: false }">{{
+                    display
+                }}</span>
                 <i class="required" v-if="field.required">*</i>
-                <span v-if="isReadOnly" class="text-gray-500 font-normal text-2xs mx-1" v-text="__('Read Only')" />
+                <span v-if="isReadOnly" class="mx-1 text-2xs font-normal text-gray-500" v-text="__('Read Only')" />
             </label>
 
             <div
-                class="help-block" :class="{ '-mt-2': showLabel }"
+                class="help-block"
+                :class="{ '-mt-2': showLabel }"
                 v-if="instructions && field.instructions_position !== 'below'"
-                v-html="instructions" />
+                v-html="instructions"
+            />
 
             <publish-field-actions v-if="shouldShowFieldActions" :actions="fieldActions" />
         </div>
@@ -28,7 +31,7 @@
             :has-error="hasError || hasNestedError"
             :read-only="isReadOnly"
             :show-field-previews="showFieldPreviews"
-            @input="$emit('updated', $event)"
+            @update:value="$emit('updated', $event)"
             @meta-updated="$emit('meta-updated', $event)"
             @focus="$emit('focus')"
             @blur="$emit('blur')"
@@ -38,40 +41,38 @@
         <div
             class="help-block mt-2"
             v-if="instructions && field.instructions_position === 'below'"
-            v-html="instructions" />
+            v-html="instructions"
+        />
 
         <div v-if="hasError">
-            <small class="help-block text-red-500 mt-2 mb-0" v-for="(error, i) in errors" :key="i" v-text="error" />
+            <small class="help-block mb-0 mt-2 text-red-500" v-for="(error, i) in errors" :key="i" v-text="error" />
         </div>
-
     </div>
-
 </template>
 
 <script>
 export default {
-
     props: {
         field: {
             type: Object,
-            required: true
+            required: true,
         },
         meta: {
             type: Object,
         },
         value: {
-            required: true
+            required: true,
         },
         parentName: {
             type: String,
-            required: true
+            required: true,
         },
         setIndex: {
             type: Number,
-            required: true
+            required: true,
         },
         fieldPath: {
-            type: String
+            type: String,
         },
         readOnly: Boolean,
         showFieldPreviews: Boolean,
@@ -85,11 +86,10 @@ export default {
     data() {
         return {
             hasField: false,
-        }
+        };
     },
 
     computed: {
-
         fieldtypeComponent() {
             return `${this.field.component || this.field.type}-fieldtype`;
         },
@@ -99,13 +99,11 @@ export default {
         },
 
         display() {
-            return __(this.field.display || this.field.handle[0].toUpperCase() + this.field.handle.slice(1))
+            return __(this.field.display || this.field.handle[0].toUpperCase() + this.field.handle.slice(1));
         },
 
         instructions() {
-            return this.field.instructions
-                ? this.$options.filters.markdown(__(this.field.instructions))
-                : null
+            return this.field.instructions ? markdown(__(this.field.instructions)) : null;
         },
 
         storeState() {
@@ -123,7 +121,7 @@ export default {
         hasNestedError() {
             const prefix = `${this.fieldPath}.`;
 
-            return Object.keys(this.storeState.errors).some(handle => handle.startsWith(prefix));
+            return Object.keys(this.storeState.errors).some((handle) => handle.startsWith(prefix));
         },
 
         isReadOnly() {
@@ -139,14 +137,16 @@ export default {
                 this.shouldShowFieldActions ? 'has-field-dropdown' : '',
                 this.isReadOnly ? 'read-only-field' : '',
                 this.field.classes || '',
-                { 'has-error': this.hasError || this.hasNestedError }
+                { 'has-error': this.hasError || this.hasNestedError },
             ];
         },
 
         showLabel() {
-            return this.showLabelText // Need to see the label
-                || this.isReadOnly // Need to see the "Read Only" text
-                || this.field.required; // Need to see the asterisk
+            return (
+                this.showLabelText || // Need to see the label
+                this.isReadOnly || // Need to see the "Read Only" text
+                this.field.required
+            ); // Need to see the asterisk
         },
 
         showLabelText() {
@@ -154,8 +154,8 @@ export default {
         },
 
         fieldId() {
-            let prefix = this.fieldPath ? this.fieldPath+'.' : '';
-            return prefix+'field_'+this.field.handle;
+            let prefix = this.fieldPath ? this.fieldPath + '.' : '';
+            return prefix + 'field_' + this.field.handle;
         },
 
         shouldShowFieldActions() {
@@ -164,13 +164,11 @@ export default {
 
         fieldActions() {
             return this.hasField ? this.$refs.field.fieldActions : [];
-        }
-
+        },
     },
 
     mounted() {
         if (this.$refs.field) this.hasField = true;
     },
-
-}
+};
 </script>

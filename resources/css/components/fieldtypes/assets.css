@@ -7,18 +7,18 @@
 }
 
 .assets-fieldtype .assets-fieldtype-picker {
-    @apply flex items-center px-4 py-2 bg-gray-200 dark:bg-dark-650 border dark:border-dark-900 rounded;
+    @apply flex items-center rounded border bg-gray-200 px-4 py-2 dark:border-dark-900 dark:bg-dark-650;
 
     &.is-expanded {
-        @apply border-b-0 rounded-b-none;
+        @apply rounded-b-none border-b-0;
     }
 
     .asset-upload-control {
-      @apply mt-2 @sm:rtl:mr-4 @sm:ltr:ml-4 @sm:mt-0 text-xs text-gray-600 leading-tight;
+        @apply mt-2 text-xs leading-tight text-gray-600 @sm:mt-0 @sm:ltr:ml-4 @sm:rtl:mr-4;
     }
 
     .upload-text-button {
-        @apply text-blue underline whitespace-nowrap;
+        @apply whitespace-nowrap text-blue underline;
         &:hover {
             @apply text-blue-800;
         }
@@ -26,22 +26,19 @@
 }
 
 .assets-fieldtype .drag-drop-text {
-    @apply rtl:mr-1 ltr:ml-1 text-gray-700 dark:text-dark-175;
+    @apply text-gray-700 dark:text-dark-175 ltr:ml-1 rtl:mr-1;
 }
 
 .assets-fieldtype .asset-upload-control {
     @apply hidden @xs:inline-block;
 }
 
-
 /* Inside a Grid
   ========================================================================== */
 
 .grid-fieldtype .assets-fieldtype-picker {
-    @apply border-none rounded-none bg-transparent p-0;
+    @apply rounded-none border-none bg-transparent p-0;
 }
-
-
 
 /* In a Grid fieldtype
   ========================================================================== */
@@ -51,8 +48,6 @@
         padding: 4px;
     }
 }
-
-
 
 /* In a Bard fieldtype
   ========================================================================== */
@@ -70,5 +65,7 @@
 /*  Probably better as a template condition but difficult at the moment. */
 .assets-fieldtype .delete-bard-set {
     display: none;
-    .bard-set-solo & { display: block; }
+    .bard-set-solo & {
+        display: block;
+    }
 }

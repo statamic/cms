@@ -3,12 +3,15 @@
         ref="slugify"
         :enabled="generate"
         :from="source"
+        :to="slug"
         :separator="separator"
         :language="language"
         :async="config.async"
         @slugifying="syncing = true"
-        @slugified="syncing = false"
-        v-model="slug"
+        @slugified="
+            syncing = false;
+            slug = $event;
+        "
     >
         <div>
             <text-input
@@ -23,15 +26,20 @@
                 direction="ltr"
             >
                 <template v-slot:append v-if="config.show_regenerate">
-                    <button class="input-group-append items-center flex" @click="sync" v-tooltip="__('Regenerate from: :field', { 'field': config.from })">
-                        <svg-icon name="light/synchronize" class="w-5 h-5" v-show="!syncing" />
-                        <div class="w-5 h-5" v-show="syncing"><loading-graphic inline text="" class="mt-0.5 ml-0.5" /></div>
+                    <button
+                        class="input-group-append flex items-center"
+                        @click="sync"
+                        v-tooltip="__('Regenerate from: :field', { field: config.from })"
+                    >
+                        <svg-icon name="light/synchronize" class="h-5 w-5" v-show="!syncing" />
+                        <div class="h-5 w-5" v-show="syncing">
+                            <loading-graphic inline text="" class="ml-0.5 mt-0.5" />
+                        </div>
                     </button>
                 </template>
             </text-input>
         </div>
     </slugify>
-
 </template>
 
 <script>
@@ -39,44 +47,37 @@ import { data_get } from '../../bootstrap/globals';
 import Fieldtype from './Fieldtype.vue';
 
 export default {
-
     mixins: [Fieldtype],
+
+    inject: {
+        storeName: { default: null },
+    },
 
     data() {
         return {
             slug: this.value,
             generate: this.config.generate,
             syncing: false,
-        }
+        };
     },
 
     computed: {
-
         separator() {
             return this.config.separator || '-';
         },
 
         store() {
-            let store;
-            let parent = this;
-
-            while (! parent.storeName) {
-                parent = parent.$parent;
-                store = parent.storeName;
-                if (parent === this.$root) return null;
-            }
-
-            return store;
+            return this.storeName;
         },
 
         source() {
-            if (! this.generate) return;
+            if (!this.generate) return;
 
             const field = this.config.from || 'title';
             let key = field;
 
             if (this.fieldPathPrefix) {
-                let dottedPrefix = this.fieldPathPrefix.replace(new RegExp('\.'+this.handle+'$'), '');
+                let dottedPrefix = this.fieldPathPrefix.replace(new RegExp('\.' + this.handle + '$'), '');
                 key = dottedPrefix + '.' + field;
             }
 
@@ -84,30 +85,27 @@ export default {
         },
 
         language() {
-            if (! this.store) return;
+            if (!this.store) return;
             const targetSite = this.$store.state.publish[this.store].site;
-            return targetSite ? Statamic.$config.get('sites').find(site => site.handle === targetSite).lang : null;
-        }
-
+            return targetSite ? Statamic.$config.get('sites').find((site) => site.handle === targetSite).lang : null;
+        },
     },
 
     watch: {
-
         value(value) {
             this.slug = value;
         },
 
         slug(slug) {
             this.updateDebounced(slug);
-        }
-
+        },
     },
 
     created() {
         this.$events.$on('localization.created', this.handleLocalizationCreated);
     },
 
-    destroyed() {
+    unmounted() {
         this.$events.$off('localization.created', this.handleLocalizationCreated);
     },
 
@@ -116,7 +114,6 @@ export default {
     },
 
     methods: {
-
         handleLocalizationCreated({ store }) {
             // Only reset for the "slug" field in the matching store.
             // Other slug fields that aren't named "slug" should be left alone.
@@ -127,8 +124,7 @@ export default {
 
         sync() {
             this.$refs.slugify.reset();
-        }
-    }
-
-}
+        },
+    },
+};
 </script>

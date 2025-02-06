@@ -1,20 +1,21 @@
+import { ref } from 'vue';
 import uniqid from 'uniqid';
 import Component from './Component';
 
 class Components {
-
-    constructor(root) {
-        this.$root = root;
+    constructor(app) {
+        this.app = app;
+        this.components = ref([]);
     }
 
     register(name, component) {
-        Vue.component(name, component);
+        this.app.component(name, component);
     }
 
     append(name, { props }) {
         const id = `appended-${uniqid()}`;
         const component = new Component(id, name, props);
-        this.$root.appendedComponents.push(component);
+        this.components.value.push(component);
         return component;
     }
 
@@ -24,19 +25,17 @@ class Components {
     }
 
     getAppended(id) {
-        const components = this.$root.appendedComponents;
-        return _.findWhere(components, { id });
+        return _.findWhere(this.components.value, { id });
     }
 
     destroy(id) {
         let appended = this.getAppended(id);
 
         if (appended) {
-            const index = _.indexOf(this.$root.appendedComponents, appended);
-            this.$root.appendedComponents.splice(index, 1);
+            const index = _.indexOf(this.components.value, appended);
+            this.components.value.splice(index, 1);
         }
     }
-
 }
 
 export default Components;

@@ -1,34 +1,37 @@
-@php use function Statamic\trans as __; @endphp
+@php
+    use function Statamic\trans as __;
+@endphp
+
 @inject('licenses', 'Statamic\Licensing\LicenseManager')
 
 @if ($licenses->requestFailed())
-    <div class="p-2 w-full fixed bottom-0 z-20">
-        <div class="py-3 px-4 text-sm w-full rounded-md bg-yellow border border-yellow-dark dark:bg-dark-blue-100 dark:border-none">
-        @if ($licenses->usingLicenseKeyFile())
-            {{ __('statamic::messages.outpost_license_key_error') }}
-        @elseif ($licenses->requestErrorCode() === 422)
-            {{ __('statamic::messages.outpost_error_422') }}
-            {{ join(' ', $licenses->requestValidationErrors()->unique()) }}
-        @elseif ($licenses->requestErrorCode() === 429)
-            {{ __('statamic::messages.outpost_error_429') }}
-            {{ trans_choice('statamic::messages.try_again_in_seconds', $licenses->failedRequestRetrySeconds()) }}
-        @else
-            {{ __('statamic::messages.outpost_issue_try_later') }}
-        @endif
+    <div class="fixed bottom-0 z-20 w-full p-2">
+        <div
+            class="w-full rounded-md border border-yellow-dark bg-yellow px-4 py-3 text-sm dark:border-none dark:bg-dark-blue-100"
+        >
+            @if ($licenses->usingLicenseKeyFile())
+                {{ __('statamic::messages.outpost_license_key_error') }}
+            @elseif ($licenses->requestErrorCode() === 422)
+                {{ __('statamic::messages.outpost_error_422') }}
+                {{ join(' ', $licenses->requestValidationErrors()->unique()) }}
+            @elseif ($licenses->requestErrorCode() === 429)
+                {{ __('statamic::messages.outpost_error_429') }}
+                {{ trans_choice('statamic::messages.try_again_in_seconds', $licenses->failedRequestRetrySeconds()) }}
+            @else
+                {{ __('statamic::messages.outpost_issue_try_later') }}
+            @endif
         </div>
     </div>
 @else
     @if ($licenses->invalid())
-        <div class="p-2 w-full fixed bottom-0 z-2" v-cloak v-show="showBanner">
-            <div class="
-                py-3 px-4 text-sm w-full rounded-md
-                @if ($licenses->isOnTestDomain()) bg-gray-800 dark:bg-dark-500 text-gray-300 @endif
-                @if ($licenses->isOnPublicDomain()) bg-red-500 text-white @endif
-            ">
+        <div class="fixed bottom-0 z-2 w-full p-2" v-cloak v-show="showBanner">
+            <div
+                class="@if ($licenses->isOnTestDomain()) bg-gray-800 dark:bg-dark-500 text-gray-300 @endif @if ($licenses->isOnPublicDomain()) bg-red-500 text-white @endif w-full rounded-md px-4 py-3 text-sm"
+            >
                 @if ($licenses->isOnTestDomain())
                     <div class="flex items-center justify-between">
                         <span>
-                            <b class="rtl:ml-2 ltr:mr-2">{{ __('Trial Mode') }}:</b>
+                            <b class="ltr:mr-2 rtl:ml-2">{{ __('Trial Mode') }}:</b>
                             @if ($licenses->onlyAddonsAreInvalid())
                                 {{ __('statamic::messages.licensing_trial_mode_alert_addons') }}
                             @elseif ($licenses->onlyStatamicIsInvalid())
@@ -38,11 +41,18 @@
                             @endif
                         </span>
                         <div class="flex">
-                            <button @click="hideBanner" class="rtl:ml-4 ltr:mr-4 text-2xs opacity-50 hover:opacity-75">{{ __('Dismiss') }}</button>
+                            <button @click="hideBanner" class="text-2xs opacity-50 hover:opacity-75 ltr:mr-4 rtl:ml-4">
+                                {{ __('Dismiss') }}
+                            </button>
                             @can('access licensing utility')
-                            <a href="{{ cp_route('utilities.licensing') }}" class="text-2xs text-white hover:text-yellow flex items-center" aria-label="{{ __('Manage Licenses') }}">
-                                {{ __('Manage Licenses') }} @rarr
-                            </a>
+                                <a
+                                    href="{{ cp_route('utilities.licensing') }}"
+                                    class="flex items-center text-2xs text-white hover:text-yellow"
+                                    aria-label="{{ __('Manage Licenses') }}"
+                                >
+                                    {{ __('Manage Licenses') }}
+                                    @rarr
+                                </a>
                             @endcan
                         </div>
                     </div>
@@ -60,10 +70,17 @@
                             {{ __('statamic::messages.licensing_production_alert') }}
                         @endif
                         <div class="flex">
-                            <button @click="hideBanner" class="rtl:ml-4 ltr:mr-4 text-2xs opacity-50 hover:opacity-75">{{ __('Dismiss') }}</button>
+                            <button @click="hideBanner" class="text-2xs opacity-50 hover:opacity-75 ltr:mr-4 rtl:ml-4">
+                                {{ __('Dismiss') }}
+                            </button>
                             @can('access licensing utility')
-                                <a href="{{ cp_route('utilities.licensing') }}" class="text-2xs text-white hover:text-yellow flex items-center" aria-label="{{ __('Manage Licenses') }}">
-                                    {{ __('Manage Licenses') }} @rarr
+                                <a
+                                    href="{{ cp_route('utilities.licensing') }}"
+                                    class="flex items-center text-2xs text-white hover:text-yellow"
+                                    aria-label="{{ __('Manage Licenses') }}"
+                                >
+                                    {{ __('Manage Licenses') }}
+                                    @rarr
                                 </a>
                             @endcan
                         </div>

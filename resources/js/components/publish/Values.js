@@ -1,14 +1,14 @@
-import { clone } from  '../../bootstrap/globals.js'
-import { data_get } from  '../../bootstrap/globals.js'
-import { data_set } from  '../../bootstrap/globals.js'
-import isObject from 'underscore/modules/isObject.js'
+import { clone } from '../../bootstrap/globals.js';
+import { data_get } from '../../bootstrap/globals.js';
+import { data_set } from '../../bootstrap/globals.js';
+import isObject from 'underscore/modules/isObject.js';
 
 function data_delete(obj, path) {
     var parts = path.split('.');
     while (parts.length - 1) {
         var key = parts.shift();
         var shouldBeArray = parts.length ? new RegExp('^[0-9]+$').test(parts[0]) : false;
-        if (! (key in obj)) obj[key] = shouldBeArray ? [] : {};
+        if (!(key in obj)) obj[key] = shouldBeArray ? [] : {};
         obj = obj[key];
     }
     delete obj[parts[0]];
@@ -24,28 +24,22 @@ export default class Values {
     }
 
     get(dottedKey) {
-        let decodedValues = new this.constructor(clone(this.values), this.jsonFields)
-            .jsonDecode()
-            .values;
+        let decodedValues = new this.constructor(clone(this.values), this.jsonFields).jsonDecode().values;
 
         return data_get(decodedValues, dottedKey);
     }
 
-    set(dottedKey, value)  {
-        this.jsonDecode()
-            .setValue(dottedKey, value)
-            .jsonEncode();
+    set(dottedKey, value) {
+        this.jsonDecode().setValue(dottedKey, value).jsonEncode();
 
         return this;
     }
 
-    mergeDottedKeys(dottedKeys, values)  {
-        let decodedValues = new this.constructor(clone(values.values), values.jsonFields)
-            .jsonDecode()
-            .values;
+    mergeDottedKeys(dottedKeys, values) {
+        let decodedValues = new this.constructor(clone(values.values), values.jsonFields).jsonDecode().values;
 
         this.jsonDecode();
-        dottedKeys.forEach(dottedKey => {
+        dottedKeys.forEach((dottedKey) => {
             data_set(this.values, dottedKey, data_get(decodedValues, dottedKey));
         });
         this.jsonEncode();
@@ -54,10 +48,7 @@ export default class Values {
     }
 
     except(dottedKeys) {
-        return this.jsonDecode()
-            .rejectValuesByKey(dottedKeys)
-            .jsonEncode()
-            .all();
+        return this.jsonDecode().rejectValuesByKey(dottedKeys).jsonEncode().all();
     }
 
     all() {
@@ -65,7 +56,7 @@ export default class Values {
     }
 
     jsonDecode() {
-        this.jsonFields.forEach(dottedKey => {
+        this.jsonFields.forEach((dottedKey) => {
             this.jsonDecodeValue(dottedKey);
         });
 
@@ -73,16 +64,19 @@ export default class Values {
     }
 
     jsonEncode() {
-        clone(this.jsonFields).reverse().forEach(dottedKey => {
-            this.jsonEncodeValue(dottedKey);
-        });
+        clone(this.jsonFields)
+            .reverse()
+            .forEach((dottedKey) => {
+                this.jsonEncodeValue(dottedKey);
+            });
 
         return this;
     }
 
     dottedKeyToJsPath(dottedKey) {
-        return dottedKey.split('.')
-            .map(key => new RegExp(/^\d+.*/).test(key) ? '["' + key + '"]' : key)
+        return dottedKey
+            .split('.')
+            .map((key) => (new RegExp(/^\d+.*/).test(key) ? '["' + key + '"]' : key))
             .join('.')
             .replace(/\.\[/g, '[');
     }
@@ -125,7 +119,7 @@ export default class Values {
     }
 
     rejectValuesByKey(dottedKeys) {
-        dottedKeys.forEach(dottedKey => {
+        dottedKeys.forEach((dottedKey) => {
             this.forgetValue(dottedKey);
         });
 

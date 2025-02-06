@@ -1,31 +1,37 @@
 <template>
-
     <div>
-
         <header class="mb-6">
-
             <breadcrumb :url="breadcrumbUrl" :title="__('Collections')" />
 
             <div class="flex items-center">
                 <h1 class="flex-1" v-text="__(title)" />
 
-                <dropdown-list class="rtl:ml-2 ltr:mr-2" v-if="!!this.$scopedSlots.twirldown">
+                <dropdown-list class="ltr:mr-2 rtl:ml-2" v-if="!!this.$slots.twirldown">
                     <slot name="twirldown" :actionCompleted="actionCompleted" />
                 </dropdown-list>
 
-                <div class="btn-group rtl:ml-4 ltr:mr-4" v-if="canUseStructureTree && !treeIsDirty">
-                    <button class="btn flex items-center px-4" @click="view = 'tree'" :class="{'active': view === 'tree'}" v-tooltip="__('Tree')">
-                        <svg-icon name="light/structures" class="h-4 w-4"/>
+                <div class="btn-group ltr:mr-4 rtl:ml-4" v-if="canUseStructureTree && !treeIsDirty">
+                    <button
+                        class="btn flex items-center px-4"
+                        @click="view = 'tree'"
+                        :class="{ active: view === 'tree' }"
+                        v-tooltip="__('Tree')"
+                    >
+                        <svg-icon name="light/structures" class="h-4 w-4" />
                     </button>
-                    <button class="btn flex items-center px-4" @click="view = 'list'" :class="{'active': view === 'list'}" v-tooltip="__('List')">
+                    <button
+                        class="btn flex items-center px-4"
+                        @click="view = 'list'"
+                        :class="{ active: view === 'list' }"
+                        v-tooltip="__('List')"
+                    >
                         <svg-icon name="assets-mode-table" class="h-4 w-4" />
                     </button>
                 </div>
 
                 <template v-if="view === 'tree'">
-
                     <a
-                        class="text-2xs text-blue rtl:ml-4 ltr:mr-4 underline"
+                        class="text-2xs text-blue underline ltr:mr-4 rtl:ml-4"
                         v-if="treeIsDirty"
                         v-text="__('Discard changes')"
                         @click="cancelTreeProgress"
@@ -33,44 +39,50 @@
 
                     <site-selector
                         v-if="sites.length > 1"
-                        class="rtl:ml-4 ltr:mr-4"
+                        class="ltr:mr-4 rtl:ml-4"
                         :sites="sites"
                         :value="site"
                         @input="site = $event.handle"
                     />
 
                     <button
-                        class="btn rtl:ml-4 ltr:mr-4"
-                        :class="{ 'disabled': !treeIsDirty, 'btn-danger': deletedEntries.length }"
+                        class="btn ltr:mr-4 rtl:ml-4"
+                        :class="{ disabled: !treeIsDirty, 'btn-danger': deletedEntries.length }"
                         :disabled="!treeIsDirty"
                         @click="saveTree"
                         v-text="__('Save Changes')"
-                        v-tooltip="deletedEntries.length ? __n('An entry will be deleted|:count entries will be deleted', deletedEntries.length) : null" />
-
+                        v-tooltip="
+                            deletedEntries.length
+                                ? __n('An entry will be deleted|:count entries will be deleted', deletedEntries.length)
+                                : null
+                        "
+                    />
                 </template>
 
                 <template v-if="view === 'list' && reorderable">
                     <site-selector
                         v-if="sites.length > 1 && reordering && site"
-                        class="rtl:ml-4 ltr:mr-4"
+                        class="ltr:mr-4 rtl:ml-4"
                         :sites="sites"
                         :value="site"
                         @input="site = $event.handle"
                     />
 
-                    <button class="btn rtl:ml-4 ltr:mr-4"
+                    <button
+                        class="btn ltr:mr-4 rtl:ml-4"
                         v-if="!reordering"
                         @click="reordering = true"
-                        v-text="__('Reorder')" />
+                        v-text="__('Reorder')"
+                    />
 
                     <template v-if="reordering">
-                        <button class="btn rtl:mr-2 ltr:ml-2"
-                            @click="reordering = false"
-                            v-text="__('Cancel')" />
+                        <button class="btn ltr:ml-2 rtl:mr-2" @click="reordering = false" v-text="__('Cancel')" />
 
-                        <button class="btn-primary rtl:mr-2 ltr:ml-2"
+                        <button
+                            class="btn-primary ltr:ml-2 rtl:mr-2"
                             @click="$refs.list.saveOrder"
-                            v-text="__('Save Order')" />
+                            v-text="__('Save Order')"
+                        />
                     </template>
                 </template>
 
@@ -79,9 +91,9 @@
                     button-class="btn-primary"
                     :url="createUrl"
                     :blueprints="blueprints"
-                    :text="createLabel" />
+                    :text="createLabel"
+                />
             </div>
-
         </header>
 
         <entry-list
@@ -120,13 +132,15 @@
             @canceled="markTreeClean"
         >
             <template #branch-icon="{ branch }">
-                <svg-icon v-if="isRedirectBranch(branch)"
-                    class="inline-block w-4 h-4 text-gray-500"
+                <svg-icon
+                    v-if="isRedirectBranch(branch)"
+                    class="inline-block h-4 w-4 text-gray-500"
                     name="light/external-link"
-                    v-tooltip="__('Redirect')" />
+                    v-tooltip="__('Redirect')"
+                />
             </template>
 
-            <template #branch-options="{ branch, removeBranch, orphanChildren, depth }">
+            <template #branch-options="{ branch, removeBranch, depth }">
                 <template v-if="depth < structureMaxDepth">
                     <h6 class="px-2" v-text="__('Create Child Entry')" v-if="blueprints.length > 1" />
                     <li class="divider" v-if="blueprints.length > 1" />
@@ -134,14 +148,16 @@
                         v-for="blueprint in blueprints"
                         :key="blueprint.handle"
                         @click="createEntry(blueprint.handle, branch.id)"
-                        v-text="blueprints.length > 1 ? __(blueprint.title) : __('Create Child Entry')" />
+                        v-text="blueprints.length > 1 ? __(blueprint.title) : __('Create Child Entry')"
+                    />
                 </template>
                 <template v-if="branch.can_delete">
                     <li class="divider"></li>
                     <dropdown-item
                         :text="__('Delete')"
                         class="warning"
-                        @click="deleteTreeBranch(branch, removeBranch, orphanChildren)" />
+                        @click="deleteTreeBranch(branch, removeBranch)"
+                    />
                 </template>
             </template>
         </page-tree>
@@ -150,7 +166,10 @@
             v-if="showEntryDeletionConfirmation"
             :children="numberOfChildrenToBeDeleted"
             @confirm="entryDeletionConfirmCallback"
-            @cancel="showEntryDeletionConfirmation = false; entryBeingDeleted = null;"
+            @cancel="
+                showEntryDeletionConfirmation = false;
+                entryBeingDeleted = null;
+            "
         />
 
         <delete-localization-confirmation
@@ -160,7 +179,6 @@
             @cancel="showLocalizationDeleteBehaviorConfirmation = false"
         />
     </div>
-
 </template>
 
 <script>
@@ -171,14 +189,13 @@ import SiteSelector from '../SiteSelector.vue';
 import HasActions from '../publish/HasActions';
 
 export default {
-
     mixins: [HasActions],
 
     components: {
         PageTree,
         DeleteEntryConfirmation,
         DeleteLocalizationConfirmation,
-        SiteSelector
+        SiteSelector,
     },
 
     props: {
@@ -221,11 +238,10 @@ export default {
             site: this.initialSite,
             reordering: false,
             preferencesPrefix: `collections.${this.handle}`,
-        }
+        };
     },
 
     computed: {
-
         treeIsDirty() {
             return this.$dirty.has('page-tree');
         },
@@ -241,31 +257,28 @@ export default {
         numberOfChildrenToBeDeleted() {
             let children = 0;
             const countChildren = (entry) => {
-                entry.children.forEach(child => {
+                entry.children.forEach((child) => {
                     children++;
                     countChildren(child);
                 });
-            }
+            };
             countChildren(this.entryBeingDeleted);
             return children;
         },
 
         createUrl() {
             return this.createUrls[this.site || this.initialSite];
-        }
-
+        },
     },
 
     watch: {
-
         view(view) {
             this.site = this.site || this.initialSite;
 
             this.$config.set('wrapperClass', view === 'tree' ? undefined : 'max-w-full');
 
-            localStorage.setItem('statamic.collection-view.'+this.handle, view);
-        }
-
+            localStorage.setItem('statamic.collection-view.' + this.handle, view);
+        },
     },
 
     mounted() {
@@ -274,7 +287,6 @@ export default {
     },
 
     methods: {
-
         cancelTreeProgress() {
             this.$refs.tree.cancel();
             this.deletedEntries = [];
@@ -288,10 +300,10 @@ export default {
 
             // When the user doesn't have permission to access the sites the entry is localized in,
             // we should use the "copy" behavior to detach the entry from the site.
-            if (! this.canChangeLocalizationDeleteBehavior) {
+            if (!this.canChangeLocalizationDeleteBehavior) {
                 this.deleteLocalizationBehavior = 'copy';
                 this.$nextTick(() => this.performTreeSaving());
-                return
+                return;
             }
 
             this.showLocalizationDeleteBehaviorConfirmation = true;
@@ -299,7 +311,7 @@ export default {
                 this.deleteLocalizationBehavior = behavior;
                 this.showLocalizationDeleteBehaviorConfirmation = false;
                 this.$nextTick(() => this.performTreeSaving());
-            }
+            };
         },
 
         performTreeSaving() {
@@ -322,24 +334,24 @@ export default {
 
             const fallback = this.canUseStructureTree ? 'tree' : 'list';
 
-            return localStorage.getItem('statamic.collection-view.'+this.handle) || fallback;
+            return localStorage.getItem('statamic.collection-view.' + this.handle) || fallback;
         },
 
-        deleteTreeBranch(branch, removeFromUi, orphanChildren) {
+        deleteTreeBranch(branch, removeFromUi) {
             this.showEntryDeletionConfirmation = true;
             this.entryBeingDeleted = branch;
             this.entryDeletionConfirmCallback = (shouldDeleteChildren) => {
                 this.deletedEntries.push(branch.id);
-                shouldDeleteChildren ? this.markEntriesForDeletion(branch) : orphanChildren();
-                removeFromUi();
+                if (shouldDeleteChildren) this.markEntriesForDeletion(branch);
+                removeFromUi(shouldDeleteChildren);
                 this.showEntryDeletionConfirmation = false;
                 this.entryBeingDeleted = false;
-            }
+            };
         },
 
         markEntriesForDeletion(branch) {
             const addDeletableChildren = (branch) => {
-                branch.children.forEach(child => {
+                branch.children.forEach((child) => {
                     this.deletedEntries.push(child.id);
                     addDeletableChildren(child);
                 });
@@ -360,14 +372,12 @@ export default {
 
         editPage(page, vm, store, $event) {
             const url = page.edit_url;
-            $event.metaKey ? window.open(url) : window.location = url;
+            $event.metaKey ? window.open(url) : (window.location = url);
         },
 
         afterActionSuccessfullyCompleted(response) {
             if (!response.redirect) window.location.reload();
-        }
-
-    }
-
-}
+        },
+    },
+};
 </script>

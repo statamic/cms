@@ -1,31 +1,40 @@
 <template>
-    <div class="pt-2 rtl:pl-2 ltr:pr-2">
+    <div class="pt-2 ltr:pr-2 rtl:pl-2">
         <div class="flex flex-wrap items-center">
-
-            <button class="pill-tab rtl:ml-1 ltr:mr-1" :class="{ 'active': ! activePreset }" @click="viewAll" v-text="__('All')" />
+            <button
+                class="pill-tab ltr:mr-1 rtl:ml-1"
+                :class="{ active: !activePreset }"
+                @click="viewAll"
+                v-text="__('All')"
+            />
 
             <template v-for="(preset, handle) in presets">
-                <button class="pill-tab active rtl:ml-1 ltr:mr-1" v-if="handle === activePreset">
+                <button class="pill-tab active ltr:mr-1 rtl:ml-1" v-if="handle === activePreset">
                     {{ preset.display }}
-                    <dropdown-list class="rtl:mr-2 ltr:ml-2" placement="bottom-start">
+                    <dropdown-list class="ltr:ml-2 rtl:mr-2" placement="bottom-start">
                         <template v-slot:trigger>
                             <button class="opacity-50 hover:opacity-100">
-                                <svg-icon name="micro/chevron-down-xs" class="w-2 h-2" />
+                                <svg-icon name="micro/chevron-down-xs" class="h-2 w-2" />
                             </button>
                         </template>
                         <dropdown-item :text="__('Duplicate')" @click="createPreset" />
                         <dropdown-item v-if="canRenamePreset(handle)" :text="__('Rename')" @click="renamePreset" />
                         <div class="divider" />
-                        <dropdown-item v-if="canDeletePreset(handle)" :text="__('Delete')" class="warning" @click="showDeleteModal = true" />
+                        <dropdown-item
+                            v-if="canDeletePreset(handle)"
+                            :text="__('Delete')"
+                            class="warning"
+                            @click="showDeleteModal = true"
+                        />
                     </dropdown-list>
                 </button>
-                <button class="pill-tab rtl:ml-1 ltr:mr-1" v-else @click="viewPreset(handle)">
+                <button class="pill-tab ltr:mr-1 rtl:ml-1" v-else @click="viewPreset(handle)">
                     {{ preset.display }}
                 </button>
             </template>
 
             <button class="pill-tab" @click="createPreset" v-tooltip="__('Create New View')">
-                <svg-icon name="add" class="w-3 h-3"/>
+                <svg-icon name="add" class="h-3 w-3" />
             </button>
         </div>
 
@@ -39,7 +48,10 @@
             <text-input :focus="true" v-model="savingPresetName" @keydown.enter="savePreset(savingPresetSlug)" />
 
             <div v-if="presets && Object.keys(presets).includes(savingPresetSlug)">
-                <small class="help-block text-red-500 mt-2 mb-0" v-text="__('messages.filters_view_already_exists')"></small>
+                <small
+                    class="help-block mb-0 mt-2 text-red-500"
+                    v-text="__('messages.filters_view_already_exists')"
+                ></small>
             </div>
         </confirmation-modal>
 
@@ -52,8 +64,17 @@
         >
             <text-input :focus="true" v-model="savingPresetName" @keydown.enter="savePreset(savingPresetSlug)" />
 
-            <div v-if="Object.keys(presets).filter(preset => preset !== activePreset).includes(savingPresetSlug)">
-                <small class="help-block text-red-500 mt-2 mb-0" v-text="__('messages.filters_view_already_exists')"></small>
+            <div
+                v-if="
+                    Object.keys(presets)
+                        .filter((preset) => preset !== activePreset)
+                        .includes(savingPresetSlug)
+                "
+            >
+                <small
+                    class="help-block mb-0 mt-2 text-red-500"
+                    v-text="__('messages.filters_view_already_exists')"
+                ></small>
             </div>
         </confirmation-modal>
 
@@ -71,7 +92,6 @@
 
 <script>
 export default {
-
     props: {
         activeFilters: Object,
         activePreset: String,
@@ -88,8 +108,8 @@ export default {
             showRenameModal: false,
             showDeleteModal: false,
             savingPresetName: null,
-            test: 'hello!'
-        }
+            test: 'hello!',
+        };
     },
 
     computed: {
@@ -126,7 +146,7 @@ export default {
 
         setPreset(handle) {
             this.getPresets();
-            this.viewPreset(handle)
+            this.viewPreset(handle);
         },
 
         refreshPresets() {
@@ -171,7 +191,7 @@ export default {
         savePreset(handle) {
             let presetHandle = handle || this.activePreset;
 
-            if (! presetHandle) {
+            if (!presetHandle) {
                 this.showCreateModal = true;
                 return;
             }
@@ -179,22 +199,25 @@ export default {
             if (this.showRenameModal) {
                 let preference = this.$preferences.get(`${this.preferencesKey}`);
 
-                preference = Object.fromEntries(Object.entries(preference).map(([key, value]) => {
-                    if (key === this.activePreset) {
-                        return [this.savingPresetSlug, this.presetPreferencesPayload];
-                    }
+                preference = Object.fromEntries(
+                    Object.entries(preference).map(([key, value]) => {
+                        if (key === this.activePreset) {
+                            return [this.savingPresetSlug, this.presetPreferencesPayload];
+                        }
 
-                    return [key, value];
-                }));
+                        return [key, value];
+                    }),
+                );
 
-                this.$preferences.set(`${this.preferencesKey}`, preference)
-                    .then(response => {
+                this.$preferences
+                    .set(`${this.preferencesKey}`, preference)
+                    .then((response) => {
                         this.$toast.success(__('View renamed'));
                         this.$emit('deleted', this.activePreset);
                         this.showRenameModal = false;
                         this.refreshPresets();
                     })
-                    .catch(error => {
+                    .catch((error) => {
                         this.$toast.error(__('Unable to rename view'));
                         this.showRenameModal = false;
                     });
@@ -202,14 +225,15 @@ export default {
                 return;
             }
 
-            this.$preferences.set(`${this.preferencesKey}.${presetHandle}`, this.presetPreferencesPayload)
-                .then(response => {
+            this.$preferences
+                .set(`${this.preferencesKey}.${presetHandle}`, this.presetPreferencesPayload)
+                .then((response) => {
                     this.$toast.success(__('View saved'));
                     this.showCreateModal = false;
                     this.savingPresetName = null;
                     this.setPreset(presetHandle);
                 })
-                .catch(error => {
+                .catch((error) => {
                     this.$toast.error(__('Unable to save view'));
                     this.showCreateModal = false;
                     this.showRenameModal = false;
@@ -218,20 +242,19 @@ export default {
         },
 
         deletePreset() {
-            this.$preferences.remove(`${this.preferencesKey}.${this.activePreset}`)
-                .then(response => {
+            this.$preferences
+                .remove(`${this.preferencesKey}.${this.activePreset}`)
+                .then((response) => {
                     this.$emit('deleted', this.activePreset);
                     this.$toast.success(__('View deleted'));
                     this.showDeleteModal = false;
                     this.refreshPresets();
                 })
-                .catch(error => {
+                .catch((error) => {
                     this.$toast.error(__('Unable to delete view'));
                     this.showDeleteModal = false;
                 });
         },
-
     },
-
-}
+};
 </script>

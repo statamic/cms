@@ -1,0 +1,28 @@
+name: Lint code style issues
+
+on:
+  pull_request:
+
+jobs:
+  lint-code-styling:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check PHP code style issues
+        uses: aglipanci/laravel-pint-action@v2
+        with:
+          testMode: true
+          verboseMode: true
+          pintVersion: 1.16.0
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check formatting with Prettier
+        run: npm run prettier:check

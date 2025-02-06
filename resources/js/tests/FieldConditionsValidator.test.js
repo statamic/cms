@@ -1,10 +1,10 @@
-import Vue from 'vue';
-import Vuex from 'vuex';
+import { mount } from '@vue/test-utils';
+import { nextTick } from 'vue';
+import { createStore } from 'vuex';
 import ValidatesFieldConditions from '../components/field-conditions/ValidatorMixin.js';
 import { data_get } from '../bootstrap/globals'
-Vue.use(Vuex);
 
-const Store = new Vuex.Store({
+const Store = createStore({
     modules: {
         statamic: {
             namespaced: true,
@@ -58,12 +58,10 @@ const Statamic = {
     }
 };
 
-const Fields = new Vue({
+const app = {
     mixins: [ValidatesFieldConditions],
-    store: Store,
     data() {
         return {
-            storeName: 'base',
             values: {},
             extraValues: {},
         }
@@ -95,10 +93,18 @@ const Fields = new Vue({
             fieldConfigs.forEach(fieldConfig => {
                 Fields.showField(fieldConfig, dottedPrefix ? `${dottedPrefix}.${fieldConfig.handle}`: null)
             });
-            await Vue.nextTick();
+            await nextTick();
         },
     }
+};
+
+const wrapper = mount(app, {
+    global: {
+        plugins: [Store],
+    }
 });
+
+const Fields = wrapper.vm;
 
 let showFieldIf = function (conditions=null, dottedFieldPath=null) {
     if (dottedFieldPath === null && conditions && Object.keys(conditions).length === 1) {

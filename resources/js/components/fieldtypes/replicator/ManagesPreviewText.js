@@ -1,7 +1,6 @@
-import PreviewHtml from "./PreviewHtml";
+import PreviewHtml from './PreviewHtml';
 
 export default {
-
     computed: {
         previewText() {
             const previews = _(this.previews).filter((value, handle) => {
@@ -10,11 +9,11 @@ export default {
             });
 
             return Object.values(previews)
-                .filter(value => {
+                .filter((value) => {
                     if (['null', '[]', '{}', ''].includes(JSON.stringify(value))) return null;
                     return value;
                 })
-                .map(value => {
+                .map((value) => {
                     if (value instanceof PreviewHtml) return value.html;
 
                     if (typeof value === 'string') return escapeHtml(value);
@@ -26,7 +25,6 @@ export default {
                     return escapeHtml(JSON.stringify(value));
                 })
                 .join(' / ');
-        }
-    }
-
-}
+        },
+    },
+};

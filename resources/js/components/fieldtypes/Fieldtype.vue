@@ -2,41 +2,44 @@
 import HasFieldActions from '../field-actions/HasFieldActions';
 
 export default {
+    emits: ['update:value', 'focus', 'blur', 'meta-updated', 'replicator-preview-updated'],
 
-    mixins: [
-        HasFieldActions,
-    ],
+    mixins: [HasFieldActions],
 
     inject: {
         fieldActionStoreName: {
             from: 'storeName',
             default: null,
-        }
+        },
     },
 
     props: {
         value: {
-            required: true
+            required: true,
         },
         config: {
             type: Object,
-            default: () => { return {}; }
+            default: () => {
+                return {};
+            },
         },
         handle: {
             type: String,
-            required: true
+            required: true,
         },
         meta: {
             type: Object,
-            default: () => { return {}; }
+            default: () => {
+                return {};
+            },
         },
         readOnly: {
             type: Boolean,
-            default: false
+            default: false,
         },
         showFieldPreviews: {
             type: Boolean,
-            default: false
+            default: false,
         },
         namePrefix: String,
         fieldPathPrefix: String,
@@ -44,7 +47,7 @@ export default {
 
     methods: {
         update(value) {
-            this.$emit('input', value);
+            this.$emit('update:value', value);
         },
 
         updateDebounced: _.debounce(function (value) {
@@ -53,7 +56,7 @@ export default {
 
         updateMeta(value) {
             this.$emit('meta-updated', value);
-        }
+        },
     },
 
     computed: {
@@ -66,14 +69,16 @@ export default {
         },
 
         isReadOnly() {
-            return this.readOnly
-                || this.config.visibility === 'read_only'
-                || this.config.visibility === 'computed'
-                || false;
+            return (
+                this.readOnly ||
+                this.config.visibility === 'read_only' ||
+                this.config.visibility === 'computed' ||
+                false
+            );
         },
 
         replicatorPreview() {
-            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
 
             return this.value;
         },
@@ -85,9 +90,9 @@ export default {
         },
 
         fieldId() {
-            let prefix = this.fieldPathPrefix ? this.fieldPathPrefix+'.' : '';
+            let prefix = this.fieldPathPrefix ? this.fieldPathPrefix + '.' : '';
 
-            return prefix+'field_'+this.config.handle;
+            return prefix + 'field_' + this.config.handle;
         },
 
         fieldActionPayload() {
@@ -105,21 +110,17 @@ export default {
                 storeName: this.fieldActionStoreName,
             };
         },
-
     },
 
     watch: {
-
         replicatorPreview: {
             immediate: true,
             handler(text) {
-                if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+                if (!this.showFieldPreviews || !this.config.replicator_preview) return;
 
                 this.$emit('replicator-preview-updated', text);
-            }
-        }
-
-    }
-
-}
+            },
+        },
+    },
+};
 </script>

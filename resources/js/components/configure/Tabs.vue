@@ -1,8 +1,8 @@
 <template>
     <element-container @resized="containerWidth = $event.width">
         <div>
-            <div v-for="tab in mainTabs" :key="tab.handle">
-                <div class="mb-2 content">
+            <div v-for="tab in tabs" :key="tab.handle">
+                <div class="content mb-2">
                     <h2 v-text="tab.display" class="text-base" />
                     <p v-html="tab.instructions" />
                 </div>
@@ -20,20 +20,19 @@
                     />
                 </div>
             </div>
-
-            <portal-target :name="actionsPortal" class="publish-tab publish-tab-actions-footer" />
         </div>
     </element-container>
 </template>
 
 <script>
 export default {
+    emits: ['updated', 'meta-updated', 'synced', 'desynced', 'focus', 'blur'],
 
     inject: ['storeName'],
 
     props: {
         readOnly: Boolean,
-        syncable: Boolean
+        syncable: Boolean,
     },
 
     data() {
@@ -41,12 +40,11 @@ export default {
 
         return {
             active: state.blueprint.tabs[0].handle,
-            containerWidth: null
-        }
+            containerWidth: null,
+        };
     },
 
     computed: {
-
         state() {
             return this.$store.state.publish[this.storeName];
         },
@@ -55,21 +53,9 @@ export default {
             return this.state.blueprint.tabs;
         },
 
-        mainTabs() {
-            if (! this.shouldShowSidebar) return this.tabs;
-
-            if (this.active === "sidebar") {
-                this.active = this.state.blueprint.tabs[0].handle
-            }
-
-            return _.filter(this.tabs, tab => tab.handle != 'sidebar');
-        },
-
         actionsPortal() {
             return `publish-actions-${this.storeName}`;
-        }
-
-    }
-
-}
+        },
+    },
+};
 </script>

@@ -1,13 +1,13 @@
-import Vue from 'vue';
+import axios from 'axios';
 
-class Preference {
-    constructor(instance) {
-        this.instance = instance;
+export default class Preference {
+    constructor(store) {
+        this.store = store;
         this.url = cp_url('preferences/js');
     }
 
     all() {
-        return this.instance.$store.state.statamic.config.user.preferences;
+        return this.store.state.statamic.config.user.preferences;
     }
 
     get(key, fallback) {
@@ -15,21 +15,15 @@ class Preference {
     }
 
     set(key, value) {
-        return this.commitOnSuccessAndReturnPromise(
-            this.instance.$axios.post(this.url, {key, value})
-        );
+        return this.commitOnSuccessAndReturnPromise(axios.post(this.url, { key, value }));
     }
 
     append(key, value) {
-        return this.commitOnSuccessAndReturnPromise(
-            this.instance.$axios.post(this.url, {key, value, append: true})
-        );
+        return this.commitOnSuccessAndReturnPromise(axios.post(this.url, { key, value, append: true }));
     }
 
-    remove(key, value=null, cleanup=true) {
-        return this.commitOnSuccessAndReturnPromise(
-            this.instance.$axios.delete(`${this.url}/${key}`, { data: { value, cleanup } })
-        );
+    remove(key, value = null, cleanup = true) {
+        return this.commitOnSuccessAndReturnPromise(axios.delete(`${this.url}/${key}`, { data: { value, cleanup } }));
     }
 
     removeValue(key, value) {
@@ -37,8 +31,8 @@ class Preference {
     }
 
     commitOnSuccessAndReturnPromise(promise) {
-        promise.then(response => {
-            this.instance.$store.commit('statamic/preferences', response.data);
+        promise.then((response) => {
+            this.store.commit('statamic/preferences', response.data);
         });
 
         return promise;
@@ -56,11 +50,3 @@ class Preference {
         return this.getDefault(key) !== null;
     }
 }
-
-Object.defineProperties(Vue.prototype, {
-    $preferences: {
-        get() {
-            return new Preference(this);
-        }
-    }
-});

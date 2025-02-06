@@ -5,19 +5,18 @@
         :isReadOnly="isReadOnly"
         :limit="config.character_limit || null"
         :placeholder="__(config.placeholder)"
-        :value="value"
+        :model-value="value"
         :id="fieldId"
         @blur="$emit('blur')"
         @focus="$emit('focus')"
-        @input="updateDebounced" />
+        @update:model-value="updateDebounced"
+    />
 </template>
 
 <script>
 import Fieldtype from './Fieldtype.vue';
 
 export default {
-
-    mixins: [Fieldtype]
-
-}
+    mixins: [Fieldtype],
+};
 </script>

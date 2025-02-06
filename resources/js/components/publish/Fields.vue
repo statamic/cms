@@ -1,28 +1,24 @@
 <template>
-
     <div class="publish-fields @container">
-
         <publish-field
             v-for="field in fields"
             v-show="showField(field)"
             :key="field.handle"
             :config="field"
-            :value="values[field.handle]"
+            :model-value="values[field.handle]"
             :meta="meta[field.handle]"
             :errors="errors[field.handle]"
             :read-only="readOnly"
             :syncable="isSyncableField(field)"
             :name-prefix="namePrefix"
-            @input="$emit('updated', field.handle, $event)"
+            @update:model-value="$emit('updated', field.handle, $event)"
             @meta-updated="$emit('meta-updated', field.handle, $event)"
             @synced="$emit('synced', field.handle)"
             @desynced="$emit('desynced', field.handle)"
             @focus="$emit('focus', field.handle)"
             @blur="$emit('blur', field.handle)"
         />
-
     </div>
-
 </template>
 
 <script>
@@ -30,6 +26,7 @@ import PublishField from './Field.vue';
 import { ValidatesFieldConditions } from '../field-conditions/FieldConditions.js';
 
 export default {
+    emits: ['updated', 'meta-updated', 'synced', 'desynced', 'focus', 'blur'],
 
     components: { PublishField },
 
@@ -40,7 +37,7 @@ export default {
     props: {
         fields: {
             type: Array,
-            required: true
+            required: true,
         },
         readOnly: Boolean,
         syncable: Boolean,
@@ -49,7 +46,6 @@ export default {
     },
 
     computed: {
-
         state() {
             return this.$store.state.publish[this.storeName];
         },
@@ -68,21 +64,17 @@ export default {
 
         errors() {
             return this.state.errors;
-        }
-
+        },
     },
 
     methods: {
-
         isSyncableField(field) {
-            if (! this.syncable) return false;
+            if (!this.syncable) return false;
 
-            if (! this.syncableFields) return true;
+            if (!this.syncableFields) return true;
 
             return this.syncableFields.includes(field.handle);
-        }
-
-    }
-
-}
+        },
+    },
+};
 </script>

@@ -1,12 +1,10 @@
-import Vue from 'vue';
-
-class Config {
-    constructor(instance) {
-        this.instance = instance;
+export default class Config {
+    constructor(store) {
+        this.store = store;
     }
 
     all() {
-        return this.instance.$store.state.statamic.config;
+        return this.store.state.statamic.config;
     }
 
     get(key, fallback) {
@@ -14,14 +12,6 @@ class Config {
     }
 
     set(key, value) {
-        this.instance.$store.commit('statamic/configValue', {key, value});
+        this.store.commit('statamic/configValue', { key, value });
     }
 }
-
-Object.defineProperties(Vue.prototype, {
-    $config: {
-        get() {
-            return new Config(this);
-        }
-    }
-});
