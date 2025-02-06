@@ -22,7 +22,6 @@ return [
     'assets.dynamic_folder_pending_field' => 'Este campo estará disponible una vez que se configure :field .',
     'assets.dynamic_folder_pending_save' => 'Este campo estará disponible después de guardar.',
     'assets.title' => 'Assets',
-    'bard.config.allow_source' => 'Activa la opción para ver el código fuente HTML mientras escribes.',
     'bard.config.always_show_set_button' => 'Habilita para mostrar siempre el botón "Agregar conjunto".',
     'bard.config.buttons' => 'Elige qué botones mostrar en la barra de herramientas.',
     'bard.config.container' => 'Elige qué contenedor de medios usar para este campo.',
