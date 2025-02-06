@@ -146,18 +146,18 @@ class Tags extends BaseTags
      */
     public function fields()
     {
-        app()->instance('form-slot', $slot = $this->content);
-
         $isBlade = $this->isAntlersBladeComponent();
 
+        $slot = new RenderableFieldSlot($this->content, $isBlade);
+
         collect($this->context['fields'])
-            ->each(fn ($field) => $field['field']->isBlade($isBlade));
+            ->each(fn ($field) => $field['field']->slot($slot)->isBlade($isBlade));
 
         if ($isBlade) {
-            return $this->tagRenderer->render('@foreach($fields as $field)'.$slot.'@endforeach', $this->context->all());
+            return $this->tagRenderer->render('@foreach($fields as $field)'.$this->content.'@endforeach', $this->context->all());
         }
 
-        return Antlers::parse('{{ fields }}'.$slot.'{{ /fields }}', $this->context->all());
+        return Antlers::parse('{{ fields }}'.$this->content.'{{ /fields }}', $this->context->all());
     }
 
     /**
