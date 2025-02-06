@@ -41,6 +41,8 @@ class InstallEloquentDriver extends Command
      */
     protected $description = "Install & configure Statamic's Eloquent Driver package";
 
+    protected static array $additionalRepositories = [];
+
     /**
      * Execute the console command.
      *
@@ -124,6 +126,11 @@ class InstallEloquentDriver extends Command
         );
     }
 
+    public static function addRepository(string $key, array $config): void
+    {
+        self::$additionalRepositories[$key] = $config;
+    }
+
     protected function allRepositories(): Collection
     {
         return collect([
@@ -145,7 +152,9 @@ class InstallEloquentDriver extends Command
             'taxonomies' => 'Taxonomies',
             'terms' => 'Terms',
             'tokens' => 'Tokens',
-        ]);
+        ])
+            ->merge(Arr::map(self::$additionalRepositories, fn ($value) => $value['title']))
+            ->sort();
     }
 
     protected function repositoryHasBeenMigrated(string $repository): bool
@@ -205,6 +214,9 @@ class InstallEloquentDriver extends Command
 
             case 'tokens':
                 return config('statamic.eloquent-driver.tokens.driver') === 'eloquent';
+
+            case $repository:
+                return Arr::get(self::$additionalRepositories, "{$repository}.hasBeenMigrated");
         }
     }
 
