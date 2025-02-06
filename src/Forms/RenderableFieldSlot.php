@@ -2,14 +2,12 @@
 
 namespace Statamic\Forms;
 
-use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\HtmlString;
 use Statamic\Facades\Antlers;
 
 class RenderableFieldSlot
 {
-    protected $context;
+    protected $context = [];
 
     public function __construct(protected $html, protected $isBlade)
     {
