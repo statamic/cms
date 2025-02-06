@@ -108,12 +108,11 @@
 <script>
 import RULES from './Rules.js';
 import SemVer from 'semver';
-import { SortableList, SortableItem, SortableHelpers } from '../sortable/Sortable';
+import { SortableList } from '../sortable/Sortable';
 
 export default {
     components: {
         SortableList,
-        SortableItem,
     },
 
     props: {
