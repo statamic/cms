@@ -25,6 +25,8 @@ class Entries extends FieldtypeFilter
                     'like' => __('Contains'),
                     '=' => __('Is'),
                     '!=' => __('Isn\'t'),
+                    'null' => __('Empty'),
+                    'not-null' => __('Not empty'),
                 ],
                 'default' => 'like',
             ],
@@ -32,8 +34,9 @@ class Entries extends FieldtypeFilter
                 'type' => 'text',
                 'placeholder' => __('Value'),
                 'if' => [
-                    'operator' => 'not empty',
+                    'operator' => 'contains_any like, =, !=',
                 ],
+                'required' => false,
             ],
         ];
     }
@@ -44,6 +47,15 @@ class Entries extends FieldtypeFilter
         $maxItems = $config['max_items'] ?? 0;
         $operator = $values['operator'];
         $value = $values['value'];
+
+        if (in_array($operator, ['null', 'not-null'])) {
+            match ($operator) {
+                'null' => $query->whereNull($handle),
+                'not-null' => $query->whereNotNull($handle),
+            };
+
+            return;
+        }
 
         if ($operator === 'like') {
             $value = Str::ensureLeft($value, '%');
