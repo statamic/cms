@@ -2,7 +2,9 @@
 
 namespace Statamic\Forms;
 
-class RenderableField
+use Illuminate\Contracts\Support\Htmlable;
+
+class RenderableField implements Htmlable
 {
     public $isBlade = false;
 
@@ -19,7 +21,7 @@ class RenderableField
             ->each(fn ($field) => $field['field']->isBlade($isBlade));
     }
 
-    public function __toString()
+    public function toHtml()
     {
         $data = array_merge($this->data, [
             'slot' => new RenderableFieldSlot(app('form-slot'), $this->isBlade),
@@ -28,6 +30,11 @@ class RenderableField
         return $this->minifyFieldHtml(
             view($this->field->fieldtype()->view(), $data)->render(),
         );
+    }
+
+    public function __toString()
+    {
+        return $this->toHtml();
     }
 
     /**
