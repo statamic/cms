@@ -13,6 +13,7 @@ class Group extends Fieldtype
 {
     protected $categories = ['structured'];
     protected $defaultable = false;
+    protected $selectableInForms = true;
 
     protected function configFieldItems(): array
     {

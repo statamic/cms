@@ -5,8 +5,10 @@ namespace Statamic\Forms;
 use DebugBar\DataCollector\ConfigCollector;
 use DebugBar\DebugBarException;
 use Statamic\Contracts\Forms\Form as FormContract;
+use Statamic\Facades\Antlers;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Cascade;
 use Statamic\Facades\Form;
 use Statamic\Facades\URL;
 use Statamic\Forms\JsDrivers\JsDriver;
@@ -136,6 +138,18 @@ class Tags extends BaseTags
         }
 
         return $html;
+    }
+
+    /**
+     * Maps to {{ form:fields }}.
+     *
+     * @return string
+     */
+    public function fields()
+    {
+        Cascade::set('form_fields_slot', $slot = $this->content);
+
+        return Antlers::parse('{{ fields }}'.$slot.'{{ /fields }}', $this->context->all());
     }
 
     /**

@@ -5,6 +5,7 @@ namespace Statamic\Tags\Concerns;
 use Closure;
 use Illuminate\Support\MessageBag;
 use Statamic\Fields\Field;
+use Statamic\Forms\RenderableField;
 use Statamic\Support\Str;
 
 trait RendersForms
@@ -166,26 +167,9 @@ trait RendersForms
             $data = $manipulateDataCallback($data, $field);
         }
 
-        $data['field'] = $this->minifyFieldHtml(view($field->fieldtype()->view(), $data)->render());
+        $data['field'] = new RenderableField($field, $data, $this->parser);
 
         return $data;
-    }
-
-    /**
-     * Minify field html.
-     *
-     * @param  string  $html
-     * @return string
-     */
-    protected function minifyFieldHtml($html)
-    {
-        // Leave whitespace around these html elements.
-        $ignoredHtmlElements = collect(['a', 'span'])->implode('|');
-
-        // Trim whitespace between all other html elements.
-        $html = preg_replace('/\s*(<(?!\/*('.$ignoredHtmlElements.'))[^>]+>)\s*/', '$1', $html);
-
-        return $html;
     }
 
     /**

@@ -125,6 +125,11 @@ class RuntimeParser implements Parser
         $this->antlersParser = $antlersParser;
     }
 
+    public function getCascade()
+    {
+        return $this->cascade;
+    }
+
     /**
      * Sets the RuntimeConfiguration instance.
      *
