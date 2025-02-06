@@ -4,10 +4,7 @@ namespace Statamic\Events;
 
 class UserGroupBlueprintFound extends Event
 {
-    public $blueprint;
-
-    public function __construct($blueprint)
+    public function __construct(public $blueprint)
     {
-        $this->blueprint = $blueprint;
     }
 }

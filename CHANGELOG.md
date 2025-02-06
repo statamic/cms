@@ -1,5 +1,47 @@
 # Release Notes
 
+## 5.46.1 (2025-02-04)
+
+### What's fixed
+- Fix search:results tag when offset and paginate are set [#11386](https://github.com/statamic/cms/issues/11386) by @nopticon
+- Live Preview: Allow changing the position of "Responsive" device option [#11404](https://github.com/statamic/cms/issues/11404) by @duncanmcclean
+- Fix additional url segments matching taxonomy terms [#11383](https://github.com/statamic/cms/issues/11383) by @jasonvarga
+- Use constructor property promotion in events [#11380](https://github.com/statamic/cms/issues/11380) by @duncanmcclean
+- Fix "Curaçao" item in countries dictionary [#11395](https://github.com/statamic/cms/issues/11395) by @duncanmcclean
+- Remove duplicate strings from translation files [#11400](https://github.com/statamic/cms/issues/11400) by @j3ll3yfi5h
+- German translations [#11399](https://github.com/statamic/cms/issues/11399) by @helloDanuk
+- French translations [#11397](https://github.com/statamic/cms/issues/11397) by @ebeauchamps
+
+
+
+## 5.46.0 (2025-01-22)
+
+### What's new
+- Add empty/not empty filters for replicator, bard and grid [#11354](https://github.com/statamic/cms/issues/11354) by @jacksleight
+- Page children as value for field conditions [#11368](https://github.com/statamic/cms/issues/11368) by @heidkaemper
+- Allow addons cache path to be set by an environment variable [#11365](https://github.com/statamic/cms/issues/11365) by @ryanmitchell
+
+### What's fixed
+- Fix error with disallowed words in Comb search driver [#11336](https://github.com/statamic/cms/issues/11336) by @duncanmcclean
+- Fixed ordering search results by origin value [#11334](https://github.com/statamic/cms/issues/11334) by @duncanmcclean
+- Fix case insensitive Comb search for UTF-8 characters [#11363](https://github.com/statamic/cms/issues/11363) by @heidkaemper
+- Translate name in user group fieldtype [#11343](https://github.com/statamic/cms/issues/11343) by @duncanmcclean
+- Fix UI bugs in Safari 18.2 [#11335](https://github.com/statamic/cms/issues/11335) by @marcorieser
+
+
+
+## 5.45.2 (2025-01-21)
+
+### What's fixed
+- Revert "Allow form fields view to be rendered with single tag" [#11374](https://github.com/statamic/cms/issues/11374) by @duncanmcclean
+- Remove `type` attribute in nocache replacer [#11373](https://github.com/statamic/cms/issues/11373) by @marcorieser
+- Fix deprecation warning from regex operator [#11337](https://github.com/statamic/cms/issues/11337) by @duncanmcclean
+- Fix bug report link in Contribution Guide [#11367](https://github.com/statamic/cms/issues/11367) by @duncanmcclean
+- Fix bard undefined href error [#11351](https://github.com/statamic/cms/issues/11351) by @jacksleight
+- Suppress “packing” git message [#11326](https://github.com/statamic/cms/issues/11326) by @edalzell
+
+
+
 ## 5.45.1 (2025-01-07)
 
 ### What's fixed

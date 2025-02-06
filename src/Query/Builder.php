@@ -699,7 +699,7 @@ abstract class Builder implements Contract
 
     protected function filterTestLikeRegex($item, $pattern)
     {
-        return preg_match("/{$pattern}/im", $item);
+        return preg_match("/{$pattern}/im", (string) $item);
     }
 
     protected function filterTestNotLikeRegex($item, $pattern)

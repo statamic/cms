@@ -4,11 +4,8 @@ namespace Statamic\Events;
 
 class BlueprintSaving extends Event
 {
-    public $blueprint;
-
-    public function __construct($blueprint)
+    public function __construct(public $blueprint)
     {
-        $this->blueprint = $blueprint;
     }
 
     /**
