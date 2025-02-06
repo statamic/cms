@@ -22,7 +22,6 @@ return [
     'assets.dynamic_folder_pending_field' => '一旦设置了:field该字段将可用。',
     'assets.dynamic_folder_pending_save' => '保存后此字段可用。',
     'assets.title' => '资产',
-    'bard.config.allow_source' => '启用写入时查看HTML源代码的选项。',
     'bard.config.always_show_set_button' => '启用以始终显示"添加集合"按钮。',
     'bard.config.buttons' => '选择要在工具栏中显示的按钮。',
     'bard.config.container' => '选择要用于该字段的资产容器。',

@@ -22,7 +22,6 @@ return [
     'assets.dynamic_folder_pending_field' => 'Detta fält kommer att vara tillgängligt när :field är inställt.',
     'assets.dynamic_folder_pending_save' => 'Detta fält kommer att vara tillgängligt efter att du har sparat.',
     'assets.title' => 'Filer',
-    'bard.config.allow_source' => 'Aktivera för att visa HTML-källkoden medan du skriver.',
     'bard.config.always_show_set_button' => 'Aktivera för att alltid visa knappen &quot;Lägg till uppsättning&quot;.',
     'bard.config.buttons' => 'Välj vilka knappar som ska visas i verktygsfältet.',
     'bard.config.container' => 'Välj vilken tillgångsbehållare som ska användas för det här fältet.',
