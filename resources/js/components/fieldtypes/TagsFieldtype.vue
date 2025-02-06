@@ -71,12 +71,11 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 import HasInputOptions from './HasInputOptions.js';
-import { SortableList, SortableItem } from '../sortable/Sortable';
+import { SortableList } from '../sortable/Sortable';
 
 export default {
     components: {
         SortableList,
-        SortableItem,
     },
 
     mixins: [Fieldtype, HasInputOptions],

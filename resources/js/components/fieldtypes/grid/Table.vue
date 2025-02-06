@@ -46,7 +46,7 @@
 import View from './View.vue';
 import GridRow from './Row.vue';
 import GridHeaderCell from './HeaderCell.vue';
-import { SortableList, SortableItem } from '../../sortable/Sortable';
+import { SortableList } from '../../sortable/Sortable';
 
 export default {
     mixins: [View],
@@ -55,7 +55,6 @@ export default {
         GridRow,
         GridHeaderCell,
         SortableList,
-        SortableItem,
     },
 };
 </script>
