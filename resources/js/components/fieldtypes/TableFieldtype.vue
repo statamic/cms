@@ -113,7 +113,6 @@ export default {
 
     components: {
         SortableList,
-        SortableItem,
     },
 
     data: function () {
