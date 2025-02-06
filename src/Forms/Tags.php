@@ -8,7 +8,6 @@ use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
-use Statamic\Facades\Cascade;
 use Statamic\Facades\Form;
 use Statamic\Facades\URL;
 use Statamic\Forms\JsDrivers\JsDriver;
@@ -147,7 +146,16 @@ class Tags extends BaseTags
      */
     public function fields()
     {
-        Cascade::set('form_fields_slot', $slot = $this->content);
+        app()->instance('form-slot', $slot = $this->content);
+
+        $isBlade = $this->isAntlersBladeComponent();
+
+        collect($this->context['fields'])
+            ->each(fn ($field) => $field['field']->isBlade($isBlade));
+
+        if ($isBlade) {
+            return $this->tagRenderer->render('@foreach($fields as $field)'.$slot.'@endforeach', $this->context->all());
+        }
 
         return Antlers::parse('{{ fields }}'.$slot.'{{ /fields }}', $this->context->all());
     }

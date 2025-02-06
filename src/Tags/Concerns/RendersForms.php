@@ -167,7 +167,7 @@ trait RendersForms
             $data = $manipulateDataCallback($data, $field);
         }
 
-        $data['field'] = new RenderableField($field, $data, $this->parser);
+        $data['field'] = new RenderableField($field, $data);
 
         return $data;
     }

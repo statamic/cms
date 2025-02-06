@@ -4,17 +4,25 @@ namespace Statamic\Forms;
 
 class RenderableField
 {
-    public function __construct(protected $field, protected $data, protected $parser)
+    public $isBlade = false;
+
+    public function __construct(protected $field, protected $data)
     {
         //
     }
 
+    public function isBlade($isBlade)
+    {
+        $this->isBlade = $isBlade;
+
+        collect($this->data['fields'] ?? [])
+            ->each(fn ($field) => $field['field']->isBlade($isBlade));
+    }
+
     public function __toString()
     {
-        $cascade = $this->parser->getCascade()->toArray();
-
         $data = array_merge($this->data, [
-            'slot' => $cascade['form_fields_slot'],
+            'slot' => new RenderableFieldSlot(app('form-slot'), $this->isBlade),
         ]);
 
         return $this->minifyFieldHtml(
