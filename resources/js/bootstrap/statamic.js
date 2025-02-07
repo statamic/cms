@@ -149,7 +149,7 @@ export default {
             $axios: axios,
             $moment: window.moment,
             $events: useGlobalEventBus(),
-            $preferences: new Preferences(store),
+            $preferences: new Preferences(),
             $progress: useProgressBar(),
             $config: this.$config,
             $keys: new Keys(),

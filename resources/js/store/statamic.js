@@ -20,10 +20,6 @@ export default {
             state.config[payload.key] = payload.value;
         },
 
-        preferences(state, preferences) {
-            state.config.user.preferences = preferences;
-        },
-
         condition(state, payload) {
             state.conditions[payload.name] = payload.condition;
         },
