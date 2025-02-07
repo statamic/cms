@@ -3,12 +3,14 @@
 namespace Statamic\StaticCaching;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 use Statamic\Facades\Cascade;
 use Statamic\StaticCaching\NoCache\DatabaseSession;
 use Statamic\StaticCaching\NoCache\Session;
+use Illuminate\Http\Response;
 
 class ServiceProvider extends LaravelServiceProvider
 {
