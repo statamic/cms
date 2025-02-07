@@ -2,7 +2,7 @@ import { mount } from '@vue/test-utils';
 import { nextTick } from 'vue';
 import { createStore } from 'vuex';
 import ValidatesFieldConditions from '../components/field-conditions/ValidatorMixin.js';
-import { data_get } from '../bootstrap/globals'
+import { data_get } from '../bootstrap/globals';
 
 const Store = createStore({
     modules: {
@@ -45,17 +45,17 @@ const Store = createStore({
                             state.hiddenFields = {};
                             state.revealerFields = [];
                         },
-                    }
-                }
-            }
-        }
+                    },
+                },
+            },
+        },
     },
 });
 
 const Statamic = {
     $conditions: {
-        add: (name, condition) => Store.commit('statamic/setCondition', {name, condition})
-    }
+        add: (name, condition) => Store.commit('statamic/setCondition', { name, condition }),
+    },
 };
 
 const app = {
@@ -64,7 +64,7 @@ const app = {
         return {
             values: {},
             extraValues: {},
-        }
+        };
     },
     methods: {
         setValues(values, nestedKey) {
@@ -87,31 +87,36 @@ const app = {
             Store.commit('publish/base/setHiddenField', payload);
         },
         setHiddenFieldsState: async (fieldConfigs, dottedPrefix) => {
-            fieldConfigs.filter(fieldConfig => fieldConfig.type === 'revealer').forEach(fieldConfig => {
-                Store.commit('publish/base/setRevealerField', dottedPrefix ? `${dottedPrefix}.${fieldConfig.handle}`: fieldConfig.handle)
-            });
-            fieldConfigs.forEach(fieldConfig => {
-                Fields.showField(fieldConfig, dottedPrefix ? `${dottedPrefix}.${fieldConfig.handle}`: null)
+            fieldConfigs
+                .filter((fieldConfig) => fieldConfig.type === 'revealer')
+                .forEach((fieldConfig) => {
+                    Store.commit(
+                        'publish/base/setRevealerField',
+                        dottedPrefix ? `${dottedPrefix}.${fieldConfig.handle}` : fieldConfig.handle,
+                    );
+                });
+            fieldConfigs.forEach((fieldConfig) => {
+                Fields.showField(fieldConfig, dottedPrefix ? `${dottedPrefix}.${fieldConfig.handle}` : null);
             });
             await nextTick();
         },
-    }
+    },
 };
 
 const wrapper = mount(app, {
     global: {
         plugins: [Store],
-    }
+    },
 });
 
 const Fields = wrapper.vm;
 
-let showFieldIf = function (conditions=null, dottedFieldPath=null) {
+let showFieldIf = function (conditions = null, dottedFieldPath = null) {
     if (dottedFieldPath === null && conditions && Object.keys(conditions).length === 1) {
         dottedFieldPath = Object.keys(conditions)[0].replace(new RegExp('^\\$?root.'), '');
     }
 
-    return Fields.showField(conditions ? {'if': conditions} : {}, dottedFieldPath);
+    return Fields.showField(conditions ? { if: conditions } : {}, dottedFieldPath);
 };
 
 afterEach(() => {
@@ -125,103 +130,97 @@ test('it shows field by default', () => {
 });
 
 test('it shows or hides field based on shorthand equals conditions', () => {
-    Fields.setValues({first_name: 'Jesse'});
+    Fields.setValues({ first_name: 'Jesse' });
 
-    expect(showFieldIf({first_name: 'Jesse'})).toBe(true);
-    expect(showFieldIf({first_name: 'Jack'})).toBe(false);
+    expect(showFieldIf({ first_name: 'Jesse' })).toBe(true);
+    expect(showFieldIf({ first_name: 'Jack' })).toBe(false);
 });
 
 test('it can use comparison operators in conditions', () => {
     Fields.setValues({
         last_name: 'Hasselhoff',
         age: 13,
-        string_age: "3"
+        string_age: '3',
     });
 
-    expect(showFieldIf({age: '== 13'})).toBe(true);
-    expect(showFieldIf({age: '!= 5'})).toBe(true);
-    expect(showFieldIf({last_name: '=== Hasselhoff'})).toBe(true);
-    expect(showFieldIf({last_name: '!== Fischer'})).toBe(true);
-    expect(showFieldIf({age: '=== 13'})).toBe(false); // We don't cast their condition on strict equality comparisons
+    expect(showFieldIf({ age: '== 13' })).toBe(true);
+    expect(showFieldIf({ age: '!= 5' })).toBe(true);
+    expect(showFieldIf({ last_name: '=== Hasselhoff' })).toBe(true);
+    expect(showFieldIf({ last_name: '!== Fischer' })).toBe(true);
+    expect(showFieldIf({ age: '=== 13' })).toBe(false); // We don't cast their condition on strict equality comparisons
 
-    expect(showFieldIf({age: '> 5'})).toBe(true);
-    expect(showFieldIf({age: '> 13'})).toBe(false);
-    expect(showFieldIf({age: '> 20'})).toBe(false);
-    expect(showFieldIf({age: '>= 13'})).toBe(true);
+    expect(showFieldIf({ age: '> 5' })).toBe(true);
+    expect(showFieldIf({ age: '> 13' })).toBe(false);
+    expect(showFieldIf({ age: '> 20' })).toBe(false);
+    expect(showFieldIf({ age: '>= 13' })).toBe(true);
 
-    expect(showFieldIf({age: '< 5'})).toBe(false);
-    expect(showFieldIf({age: '< 13'})).toBe(false);
-    expect(showFieldIf({age: '< 20'})).toBe(true);
-    expect(showFieldIf({age: '<= 13'})).toBe(true);
-    expect(showFieldIf({string_age: '<= 13'})).toBe(true); // We cast to number when doing greater/less than comparisons
+    expect(showFieldIf({ age: '< 5' })).toBe(false);
+    expect(showFieldIf({ age: '< 13' })).toBe(false);
+    expect(showFieldIf({ age: '< 20' })).toBe(true);
+    expect(showFieldIf({ age: '<= 13' })).toBe(true);
+    expect(showFieldIf({ string_age: '<= 13' })).toBe(true); // We cast to number when doing greater/less than comparisons
 
-    expect(showFieldIf({age: 'is 13'})).toBe(true);
-    expect(showFieldIf({age: 'equals 13'})).toBe(true);
-    expect(showFieldIf({age: 'not 13'})).toBe(false);
-    expect(showFieldIf({age: 'isnt 13'})).toBe(false);
-    expect(showFieldIf({age: '¯\\_(ツ)_/¯ 13'})).toBe(false);
+    expect(showFieldIf({ age: 'is 13' })).toBe(true);
+    expect(showFieldIf({ age: 'equals 13' })).toBe(true);
+    expect(showFieldIf({ age: 'not 13' })).toBe(false);
+    expect(showFieldIf({ age: 'isnt 13' })).toBe(false);
+    expect(showFieldIf({ age: '¯\\_(ツ)_/¯ 13' })).toBe(false);
 });
 
 test('it can use includes or contains operators in conditions', () => {
     Fields.setValues({
-        cancellation_reasons: [
-            'found another service',
-            'other'
-        ],
+        cancellation_reasons: ['found another service', 'other'],
         example_string: 'The quick brown fox jumps over the lazy dog',
         age: 13,
         empty_string: '',
         null_value: null,
     });
 
-    expect(showFieldIf({cancellation_reasons: 'includes other'})).toBe(true);
-    expect(showFieldIf({cancellation_reasons: 'contains other'})).toBe(true);
-    expect(showFieldIf({cancellation_reasons: 'includes slow service'})).toBe(false);
-    expect(showFieldIf({cancellation_reasons: 'contains slow service'})).toBe(false);
+    expect(showFieldIf({ cancellation_reasons: 'includes other' })).toBe(true);
+    expect(showFieldIf({ cancellation_reasons: 'contains other' })).toBe(true);
+    expect(showFieldIf({ cancellation_reasons: 'includes slow service' })).toBe(false);
+    expect(showFieldIf({ cancellation_reasons: 'contains slow service' })).toBe(false);
 
-    expect(showFieldIf({example_string: 'includes fox jumps'})).toBe(true);
-    expect(showFieldIf({example_string: 'contains fox jumps'})).toBe(true);
-    expect(showFieldIf({example_string: 'includes dog jumps'})).toBe(false);
-    expect(showFieldIf({example_string: 'contains dog jumps'})).toBe(false);
+    expect(showFieldIf({ example_string: 'includes fox jumps' })).toBe(true);
+    expect(showFieldIf({ example_string: 'contains fox jumps' })).toBe(true);
+    expect(showFieldIf({ example_string: 'includes dog jumps' })).toBe(false);
+    expect(showFieldIf({ example_string: 'contains dog jumps' })).toBe(false);
 
-    expect(showFieldIf({age: 'includes 13'})).toBe(true);
-    expect(showFieldIf({age: 'contains 13'})).toBe(true);
-    expect(showFieldIf({age: 'includes fox'})).toBe(false);
-    expect(showFieldIf({age: 'contains fox'})).toBe(false);
+    expect(showFieldIf({ age: 'includes 13' })).toBe(true);
+    expect(showFieldIf({ age: 'contains 13' })).toBe(true);
+    expect(showFieldIf({ age: 'includes fox' })).toBe(false);
+    expect(showFieldIf({ age: 'contains fox' })).toBe(false);
 
-    expect(showFieldIf({empty_string: 'contains fox'})).toBe(false);
-    expect(showFieldIf({null_value: 'contains fox'})).toBe(false);
+    expect(showFieldIf({ empty_string: 'contains fox' })).toBe(false);
+    expect(showFieldIf({ null_value: 'contains fox' })).toBe(false);
 });
 
 test('it can use includes_any or contains_any operators in conditions', () => {
     Fields.setValues({
-        cancellation_reasons: [
-            'found another service',
-            'other'
-        ],
+        cancellation_reasons: ['found another service', 'other'],
         example_string: 'The quick brown fox jumps over the lazy dog',
         age: 13,
         empty_string: '',
         null_value: null,
     });
 
-    expect(showFieldIf({cancellation_reasons: 'includes_any sick, other'})).toBe(true);
-    expect(showFieldIf({cancellation_reasons: 'contains_any sick, other'})).toBe(true);
-    expect(showFieldIf({cancellation_reasons: 'includes_any sick, found another'})).toBe(false);
-    expect(showFieldIf({cancellation_reasons: 'contains_any sick, found another'})).toBe(false);
+    expect(showFieldIf({ cancellation_reasons: 'includes_any sick, other' })).toBe(true);
+    expect(showFieldIf({ cancellation_reasons: 'contains_any sick, other' })).toBe(true);
+    expect(showFieldIf({ cancellation_reasons: 'includes_any sick, found another' })).toBe(false);
+    expect(showFieldIf({ cancellation_reasons: 'contains_any sick, found another' })).toBe(false);
 
-    expect(showFieldIf({example_string: 'includes_any parrot, lazy dog'})).toBe(true);
-    expect(showFieldIf({example_string: 'contains_any parrot, lazy dog'})).toBe(true);
-    expect(showFieldIf({example_string: 'includes_any parrot, hops'})).toBe(false);
-    expect(showFieldIf({example_string: 'contains_any parrot, hops'})).toBe(false);
+    expect(showFieldIf({ example_string: 'includes_any parrot, lazy dog' })).toBe(true);
+    expect(showFieldIf({ example_string: 'contains_any parrot, lazy dog' })).toBe(true);
+    expect(showFieldIf({ example_string: 'includes_any parrot, hops' })).toBe(false);
+    expect(showFieldIf({ example_string: 'contains_any parrot, hops' })).toBe(false);
 
-    expect(showFieldIf({age: 'includes_any fox, 13'})).toBe(true);
-    expect(showFieldIf({age: 'contains_any fox, 13'})).toBe(true);
-    expect(showFieldIf({age: 'includes_any fox, 14'})).toBe(false);
-    expect(showFieldIf({age: 'contains_any fox, 14'})).toBe(false);
+    expect(showFieldIf({ age: 'includes_any fox, 13' })).toBe(true);
+    expect(showFieldIf({ age: 'contains_any fox, 13' })).toBe(true);
+    expect(showFieldIf({ age: 'includes_any fox, 14' })).toBe(false);
+    expect(showFieldIf({ age: 'contains_any fox, 14' })).toBe(false);
 
-    expect(showFieldIf({empty_string: 'contains_any fox, 13'})).toBe(false);
-    expect(showFieldIf({null_value: 'contains_any fox, 13'})).toBe(false);
+    expect(showFieldIf({ empty_string: 'contains_any fox, 13' })).toBe(false);
+    expect(showFieldIf({ null_value: 'contains_any fox, 13' })).toBe(false);
 });
 
 test('it handles null, true, and false in condition as literal', () => {
@@ -230,125 +229,125 @@ test('it handles null, true, and false in condition as literal', () => {
         likes_food: true,
         likes_animals: false,
         favorite_animal: null,
-        not_real_boolean: 'false'
+        not_real_boolean: 'false',
     });
 
-    expect(showFieldIf({first_name: '=== null'})).toBe(true);
-    expect(showFieldIf({last_name: '!== null'})).toBe(true);
-    expect(showFieldIf({likes_food: '=== true'})).toBe(true);
-    expect(showFieldIf({likes_animals: '=== false'})).toBe(true);
-    expect(showFieldIf({favorite_animal: '=== null'})).toBe(true);
-    expect(showFieldIf({not_real_boolean: '=== false'})).toBe(false);
+    expect(showFieldIf({ first_name: '=== null' })).toBe(true);
+    expect(showFieldIf({ last_name: '!== null' })).toBe(true);
+    expect(showFieldIf({ likes_food: '=== true' })).toBe(true);
+    expect(showFieldIf({ likes_animals: '=== false' })).toBe(true);
+    expect(showFieldIf({ favorite_animal: '=== null' })).toBe(true);
+    expect(showFieldIf({ not_real_boolean: '=== false' })).toBe(false);
 });
 
 test('it can check if value is empty', () => {
     Fields.setValues({
         last_name: 'HasselHoff',
-        user: {email: 'david@hasselhoff.com'},
+        user: { email: 'david@hasselhoff.com' },
         favorite_foods: ['lasagna'],
         empty_string: '',
         empty_array: [],
         empty_object: {},
     });
 
-    expect(showFieldIf({first_name: 'empty'})).toBe(true);
-    expect(showFieldIf({last_name: 'is empty'})).toBe(false);
-    expect(showFieldIf({last_name: 'isnt empty'})).toBe(true);
-    expect(showFieldIf({last_name: 'not empty'})).toBe(true);
-    expect(showFieldIf({user: 'empty'})).toBe(false);
-    expect(showFieldIf({favorite_foods: 'empty'})).toBe(false);
-    expect(showFieldIf({empty_string: 'empty'})).toBe(true);
-    expect(showFieldIf({empty_array: 'empty'})).toBe(true);
-    expect(showFieldIf({empty_object: 'empty'})).toBe(true);
+    expect(showFieldIf({ first_name: 'empty' })).toBe(true);
+    expect(showFieldIf({ last_name: 'is empty' })).toBe(false);
+    expect(showFieldIf({ last_name: 'isnt empty' })).toBe(true);
+    expect(showFieldIf({ last_name: 'not empty' })).toBe(true);
+    expect(showFieldIf({ user: 'empty' })).toBe(false);
+    expect(showFieldIf({ favorite_foods: 'empty' })).toBe(false);
+    expect(showFieldIf({ empty_string: 'empty' })).toBe(true);
+    expect(showFieldIf({ empty_array: 'empty' })).toBe(true);
+    expect(showFieldIf({ empty_object: 'empty' })).toBe(true);
 });
 
 test('it can use operators with multi-word values', () => {
-    Fields.setValues({ace_ventura_says: 'Allllllrighty then!'});
+    Fields.setValues({ ace_ventura_says: 'Allllllrighty then!' });
 
-    expect(showFieldIf({ace_ventura_says: 'Allllllrighty then!'})).toBe(true);
-    expect(showFieldIf({ace_ventura_says: '== Allllllrighty then!'})).toBe(true);
-    expect(showFieldIf({ace_ventura_says: 'is Allllllrighty then!'})).toBe(true);
-    expect(showFieldIf({ace_ventura_says: 'not I am your father'})).toBe(true);
+    expect(showFieldIf({ ace_ventura_says: 'Allllllrighty then!' })).toBe(true);
+    expect(showFieldIf({ ace_ventura_says: '== Allllllrighty then!' })).toBe(true);
+    expect(showFieldIf({ ace_ventura_says: 'is Allllllrighty then!' })).toBe(true);
+    expect(showFieldIf({ ace_ventura_says: 'not I am your father' })).toBe(true);
 });
 
 test('it only shows when multiple conditions are met', () => {
     Fields.setValues({
         first_name: 'San',
         last_name: 'Holo',
-        age: 22
+        age: 22,
     });
 
-    expect(showFieldIf({first_name: 'is San', last_name: 'is Holo', age: '!= 20'})).toBe(true);
-    expect(showFieldIf({first_name: 'is San', last_name: 'is Holo', age: '> 40'})).toBe(false);
+    expect(showFieldIf({ first_name: 'is San', last_name: 'is Holo', age: '!= 20' })).toBe(true);
+    expect(showFieldIf({ first_name: 'is San', last_name: 'is Holo', age: '> 40' })).toBe(false);
 });
 
 test('it shows or hides with parent key variants', () => {
     Fields.setValues({
         first_name: 'Rincess',
-        last_name: 'Pleia'
+        last_name: 'Pleia',
     });
 
-    expect(Fields.showField({if: {first_name: 'is Rincess', last_name: 'is Pleia'}})).toBe(true);
-    expect(Fields.showField({if: {first_name: 'is Rincess', last_name: 'is Holo'}})).toBe(false);
+    expect(Fields.showField({ if: { first_name: 'is Rincess', last_name: 'is Pleia' } })).toBe(true);
+    expect(Fields.showField({ if: { first_name: 'is Rincess', last_name: 'is Holo' } })).toBe(false);
 
-    expect(Fields.showField({show_when: {first_name: 'is Rincess', last_name: 'is Pleia'}})).toBe(true);
-    expect(Fields.showField({show_when: {first_name: 'is Rincess', last_name: 'is Holo'}})).toBe(false);
+    expect(Fields.showField({ show_when: { first_name: 'is Rincess', last_name: 'is Pleia' } })).toBe(true);
+    expect(Fields.showField({ show_when: { first_name: 'is Rincess', last_name: 'is Holo' } })).toBe(false);
 
-    expect(Fields.showField({unless: {first_name: 'is Rincess', last_name: 'is Pleia'}})).toBe(false);
-    expect(Fields.showField({unless: {first_name: 'is Rincess', last_name: 'is Holo'}})).toBe(true);
+    expect(Fields.showField({ unless: { first_name: 'is Rincess', last_name: 'is Pleia' } })).toBe(false);
+    expect(Fields.showField({ unless: { first_name: 'is Rincess', last_name: 'is Holo' } })).toBe(true);
 
-    expect(Fields.showField({hide_when: {first_name: 'is Rincess', last_name: 'is Pleia'}})).toBe(false);
-    expect(Fields.showField({hide_when: {first_name: 'is Rincess', last_name: 'is Holo'}})).toBe(true);
+    expect(Fields.showField({ hide_when: { first_name: 'is Rincess', last_name: 'is Pleia' } })).toBe(false);
+    expect(Fields.showField({ hide_when: { first_name: 'is Rincess', last_name: 'is Holo' } })).toBe(true);
 });
 
 test('it shows or hides when any of the conditions are met', () => {
     Fields.setValues({
         first_name: 'Rincess',
-        last_name: 'Pleia'
+        last_name: 'Pleia',
     });
 
-    expect(Fields.showField({if_any: {first_name: 'is Rincess', last_name: 'is Pleia'}})).toBe(true);
-    expect(Fields.showField({if_any: {first_name: 'is Rincess', last_name: 'is Holo'}})).toBe(true);
-    expect(Fields.showField({if_any: {first_name: 'is San', last_name: 'is Holo'}})).toBe(false);
+    expect(Fields.showField({ if_any: { first_name: 'is Rincess', last_name: 'is Pleia' } })).toBe(true);
+    expect(Fields.showField({ if_any: { first_name: 'is Rincess', last_name: 'is Holo' } })).toBe(true);
+    expect(Fields.showField({ if_any: { first_name: 'is San', last_name: 'is Holo' } })).toBe(false);
 
-    expect(Fields.showField({show_when_any: {first_name: 'is Rincess', last_name: 'is Pleia'}})).toBe(true);
-    expect(Fields.showField({show_when_any: {first_name: 'is Rincess', last_name: 'is Holo'}})).toBe(true);
-    expect(Fields.showField({show_when_any: {first_name: 'is San', last_name: 'is Holo'}})).toBe(false);
+    expect(Fields.showField({ show_when_any: { first_name: 'is Rincess', last_name: 'is Pleia' } })).toBe(true);
+    expect(Fields.showField({ show_when_any: { first_name: 'is Rincess', last_name: 'is Holo' } })).toBe(true);
+    expect(Fields.showField({ show_when_any: { first_name: 'is San', last_name: 'is Holo' } })).toBe(false);
 
-    expect(Fields.showField({unless_any: {first_name: 'is Rincess', last_name: 'is Pleia'}})).toBe(false);
-    expect(Fields.showField({unless_any: {first_name: 'is Rincess', last_name: 'is Holo'}})).toBe(false);
-    expect(Fields.showField({unless_any: {first_name: 'is San', last_name: 'is Holo'}})).toBe(true);
+    expect(Fields.showField({ unless_any: { first_name: 'is Rincess', last_name: 'is Pleia' } })).toBe(false);
+    expect(Fields.showField({ unless_any: { first_name: 'is Rincess', last_name: 'is Holo' } })).toBe(false);
+    expect(Fields.showField({ unless_any: { first_name: 'is San', last_name: 'is Holo' } })).toBe(true);
 
-    expect(Fields.showField({hide_when_any: {first_name: 'is Rincess', last_name: 'is Pleia'}})).toBe(false);
-    expect(Fields.showField({hide_when_any: {first_name: 'is Rincess', last_name: 'is Holo'}})).toBe(false);
-    expect(Fields.showField({hide_when_any: {first_name: 'is San', last_name: 'is Holo'}})).toBe(true);
+    expect(Fields.showField({ hide_when_any: { first_name: 'is Rincess', last_name: 'is Pleia' } })).toBe(false);
+    expect(Fields.showField({ hide_when_any: { first_name: 'is Rincess', last_name: 'is Holo' } })).toBe(false);
+    expect(Fields.showField({ hide_when_any: { first_name: 'is San', last_name: 'is Holo' } })).toBe(true);
 });
 
 test('it can run conditions on nested data', () => {
-    Fields.setValues({
-        name: 'Han',
-        address: {
-            country: 'Canada'
-        }
-    }, 'user');
+    Fields.setValues(
+        {
+            name: 'Han',
+            address: {
+                country: 'Canada',
+            },
+        },
+        'user',
+    );
 
-    expect(showFieldIf({'name': 'Han'})).toBe(true);
-    expect(showFieldIf({'name': 'Chewy'})).toBe(false);
-    expect(showFieldIf({'address.country': 'Canada'})).toBe(true);
-    expect(showFieldIf({'address.country': 'Australia'})).toBe(false);
-    expect(showFieldIf({'$root.user.address.country': 'Canada'})).toBe(true);
-    expect(showFieldIf({'$root.user.address.country': 'Australia'})).toBe(false);
-    expect(showFieldIf({'$parent.name': 'Han'}, 'user.address.country')).toBe(true);
-    expect(showFieldIf({'$parent.name': 'Chewy'}, 'user.address.country')).toBe(false);
+    expect(showFieldIf({ name: 'Han' })).toBe(true);
+    expect(showFieldIf({ name: 'Chewy' })).toBe(false);
+    expect(showFieldIf({ 'address.country': 'Canada' })).toBe(true);
+    expect(showFieldIf({ 'address.country': 'Australia' })).toBe(false);
+    expect(showFieldIf({ '$root.user.address.country': 'Canada' })).toBe(true);
+    expect(showFieldIf({ '$root.user.address.country': 'Australia' })).toBe(false);
+    expect(showFieldIf({ '$parent.name': 'Han' }, 'user.address.country')).toBe(true);
+    expect(showFieldIf({ '$parent.name': 'Chewy' }, 'user.address.country')).toBe(false);
 });
 
 test('it can run conditions on parent data using parent syntax', () => {
     Fields.setValues({
         name: 'Han',
-        replicator: [
-            { text: 'Foo' },
-            { text: 'Bar' },
-        ],
+        replicator: [{ text: 'Foo' }, { text: 'Bar' }],
         group: {
             name: 'Chewy',
             text: 'Foo',
@@ -357,14 +356,10 @@ test('it can run conditions on parent data using parent syntax', () => {
                 { text: 'Bar' },
                 {
                     name: 'Luke',
-                    replicator: [
-                        { text: 'Foo' },
-                    ],
+                    replicator: [{ text: 'Foo' }],
                     group: {
                         name: 'Yoda',
-                        replicator: [
-                            { text: 'Foo' },
-                        ],
+                        replicator: [{ text: 'Foo' }],
                     },
                 },
             ],
@@ -372,48 +367,59 @@ test('it can run conditions on parent data using parent syntax', () => {
     });
 
     // Test parent works from replicator to top level
-    expect(showFieldIf({'$parent.name': 'Han'}, 'replicator.0.text')).toBe(true);
-    expect(showFieldIf({'$parent.name': 'Chewy'}, 'replicator.0.text')).toBe(false);
-    expect(showFieldIf({'$parent.name': 'Han'}, 'replicator.1.text')).toBe(true);
-    expect(showFieldIf({'$parent.name': 'Chewy'}, 'replicator.1.text')).toBe(false);
+    expect(showFieldIf({ '$parent.name': 'Han' }, 'replicator.0.text')).toBe(true);
+    expect(showFieldIf({ '$parent.name': 'Chewy' }, 'replicator.0.text')).toBe(false);
+    expect(showFieldIf({ '$parent.name': 'Han' }, 'replicator.1.text')).toBe(true);
+    expect(showFieldIf({ '$parent.name': 'Chewy' }, 'replicator.1.text')).toBe(false);
 
     // Test parent works from nested field group to top level
-    expect(showFieldIf({'$parent.name': 'Han'}, 'group.text')).toBe(true);
-    expect(showFieldIf({'$parent.name': 'Chewy'}, 'group.text')).toBe(false);
+    expect(showFieldIf({ '$parent.name': 'Han' }, 'group.text')).toBe(true);
+    expect(showFieldIf({ '$parent.name': 'Chewy' }, 'group.text')).toBe(false);
 
     // Test parent works in deeply nested situations through multiple replicators and field groups
-    expect(showFieldIf({'$parent.name': 'Han'}, 'group.replicator.0.text')).toBe(false);
-    expect(showFieldIf({'$parent.name': 'Chewy'}, 'group.replicator.0.text')).toBe(true);
-    expect(showFieldIf({'$parent.name': 'Han'}, 'group.replicator.1.text')).toBe(false);
-    expect(showFieldIf({'$parent.name': 'Chewy'}, 'group.replicator.1.text')).toBe(true);
-    expect(showFieldIf({'$parent.name': 'Luke'}, 'group.replicator.2.replicator.0.text')).toBe(true);
-    expect(showFieldIf({'$parent.name': 'Leia'}, 'group.replicator.2.replicator.0.text')).toBe(false);
-    expect(showFieldIf({'$parent.name': 'Yoda'}, 'group.replicator.2.group.replicator.0.text')).toBe(true);
-    expect(showFieldIf({'$parent.name': 'Leia'}, 'group.replicator.2.group.replicator.0.text')).toBe(false);
-    expect(showFieldIf({'$parent.name': 'Luke'}, 'group.replicator.2.replicator.0.text')).toBe(true);
-    expect(showFieldIf({'$parent.name': 'Leia'}, 'group.replicator.2.replicator.0.text')).toBe(false);
+    expect(showFieldIf({ '$parent.name': 'Han' }, 'group.replicator.0.text')).toBe(false);
+    expect(showFieldIf({ '$parent.name': 'Chewy' }, 'group.replicator.0.text')).toBe(true);
+    expect(showFieldIf({ '$parent.name': 'Han' }, 'group.replicator.1.text')).toBe(false);
+    expect(showFieldIf({ '$parent.name': 'Chewy' }, 'group.replicator.1.text')).toBe(true);
+    expect(showFieldIf({ '$parent.name': 'Luke' }, 'group.replicator.2.replicator.0.text')).toBe(true);
+    expect(showFieldIf({ '$parent.name': 'Leia' }, 'group.replicator.2.replicator.0.text')).toBe(false);
+    expect(showFieldIf({ '$parent.name': 'Yoda' }, 'group.replicator.2.group.replicator.0.text')).toBe(true);
+    expect(showFieldIf({ '$parent.name': 'Leia' }, 'group.replicator.2.group.replicator.0.text')).toBe(false);
+    expect(showFieldIf({ '$parent.name': 'Luke' }, 'group.replicator.2.replicator.0.text')).toBe(true);
+    expect(showFieldIf({ '$parent.name': 'Leia' }, 'group.replicator.2.replicator.0.text')).toBe(false);
 
     // Test parent can be chained to check upwards through multiple levels of multiple replicators and field groups
-    expect(showFieldIf({'$parent.$parent.name': 'Luke'}, 'group.replicator.2.group.replicator.0.text')).toBe(true);
-    expect(showFieldIf({'$parent.$parent.name': 'Leia'}, 'group.replicator.2.group.replicator.0.text')).toBe(false);
-    expect(showFieldIf({'$parent.$parent.$parent.name': 'Chewy'}, 'group.replicator.2.group.replicator.0.text')).toBe(true);
-    expect(showFieldIf({'$parent.$parent.$parent.name': 'Leia'}, 'group.replicator.2.group.replicator.0.text')).toBe(false);
-    expect(showFieldIf({'$parent.$parent.$parent.$parent.name': 'Han'}, 'group.replicator.2.group.replicator.0.text')).toBe(true);
-    expect(showFieldIf({'$parent.$parent.$parent.$parent.name': 'Leia'}, 'group.replicator.2.group.replicator.0.text')).toBe(false);
-    expect(showFieldIf({'$parent.$parent.name': 'Chewy'}, 'group.replicator.2.replicator.0.text')).toBe(true);
-    expect(showFieldIf({'$parent.$parent.name': 'Leia'}, 'group.replicator.2.replicator.0.text')).toBe(false);
+    expect(showFieldIf({ '$parent.$parent.name': 'Luke' }, 'group.replicator.2.group.replicator.0.text')).toBe(true);
+    expect(showFieldIf({ '$parent.$parent.name': 'Leia' }, 'group.replicator.2.group.replicator.0.text')).toBe(false);
+    expect(showFieldIf({ '$parent.$parent.$parent.name': 'Chewy' }, 'group.replicator.2.group.replicator.0.text')).toBe(
+        true,
+    );
+    expect(showFieldIf({ '$parent.$parent.$parent.name': 'Leia' }, 'group.replicator.2.group.replicator.0.text')).toBe(
+        false,
+    );
+    expect(
+        showFieldIf({ '$parent.$parent.$parent.$parent.name': 'Han' }, 'group.replicator.2.group.replicator.0.text'),
+    ).toBe(true);
+    expect(
+        showFieldIf({ '$parent.$parent.$parent.$parent.name': 'Leia' }, 'group.replicator.2.group.replicator.0.text'),
+    ).toBe(false);
+    expect(showFieldIf({ '$parent.$parent.name': 'Chewy' }, 'group.replicator.2.replicator.0.text')).toBe(true);
+    expect(showFieldIf({ '$parent.$parent.name': 'Leia' }, 'group.replicator.2.replicator.0.text')).toBe(false);
 });
 
 test('it can run conditions on nested data using `root.` without `$` for backwards compatibility', () => {
-    Fields.setValues({
-        name: 'Han',
-        address: {
-            country: 'Canada'
-        }
-    }, 'user');
+    Fields.setValues(
+        {
+            name: 'Han',
+            address: {
+                country: 'Canada',
+            },
+        },
+        'user',
+    );
 
-    expect(showFieldIf({'root.user.address.country': 'Canada'})).toBe(true);
-    expect(showFieldIf({'root.user.address.country': 'Australia'})).toBe(false);
+    expect(showFieldIf({ 'root.user.address.country': 'Canada' })).toBe(true);
+    expect(showFieldIf({ 'root.user.address.country': 'Australia' })).toBe(false);
 });
 
 test('it can run conditions on root store values', () => {
@@ -421,8 +427,8 @@ test('it can run conditions on root store values', () => {
         favorite_foods: ['pizza', 'lasagna', 'asparagus', 'quinoa', 'peppers'],
     });
 
-    expect(showFieldIf({'favorite_foods': 'contains lasagna'})).toBe(false);
-    expect(showFieldIf({'$root.favorite_foods': 'contains lasagna'})).toBe(true);
+    expect(showFieldIf({ favorite_foods: 'contains lasagna' })).toBe(false);
+    expect(showFieldIf({ '$root.favorite_foods': 'contains lasagna' })).toBe(true);
 });
 
 test('it can run conditions on root store values using `root.` without `$` for backwards compatibility', () => {
@@ -430,34 +436,49 @@ test('it can run conditions on root store values using `root.` without `$` for b
         favorite_foods: ['pizza', 'lasagna', 'asparagus', 'quinoa', 'peppers'],
     });
 
-    expect(showFieldIf({'root.favorite_foods': 'contains lasagna'})).toBe(true);
+    expect(showFieldIf({ 'root.favorite_foods': 'contains lasagna' })).toBe(true);
 });
 
 test('it can run conditions on prefixed fields', async () => {
     Fields.setValues({
         prefixed_first_name: 'Rincess',
-        prefixed_last_name: 'Pleia'
+        prefixed_last_name: 'Pleia',
     });
 
-    expect(Fields.showField({prefix: 'prefixed_', if: {first_name: 'is Rincess', last_name: 'is Pleia'}})).toBe(true);
-    expect(Fields.showField({prefix: 'prefixed_', if: {first_name: 'is Rincess', last_name: 'is Holo'}})).toBe(false);
+    expect(Fields.showField({ prefix: 'prefixed_', if: { first_name: 'is Rincess', last_name: 'is Pleia' } })).toBe(
+        true,
+    );
+    expect(Fields.showField({ prefix: 'prefixed_', if: { first_name: 'is Rincess', last_name: 'is Holo' } })).toBe(
+        false,
+    );
 });
 
 test('it can run conditions on nested prefixed fields', async () => {
-    Fields.setValues({
-        prefixed_first_name: 'Rincess',
-        prefixed_last_name: 'Pleia',
-        prefixed_address: {
-            home_planet: 'Elderaan'
-        }
-    }, 'nested');
+    Fields.setValues(
+        {
+            prefixed_first_name: 'Rincess',
+            prefixed_last_name: 'Pleia',
+            prefixed_address: {
+                home_planet: 'Elderaan',
+            },
+        },
+        'nested',
+    );
 
-    expect(Fields.showField({prefix: 'prefixed_', if: {first_name: 'is Rincess', last_name: 'is Pleia'}})).toBe(true);
-    expect(Fields.showField({prefix: 'prefixed_', if: {first_name: 'is Rincess', last_name: 'is Holo'}})).toBe(false);
-    expect(Fields.showField({if: {'$root.nested.prefixed_last_name': 'is Pleia'}})).toBe(true);
-    expect(Fields.showField({if: {'$root.nested.prefixed_last_name': 'is Holo'}})).toBe(false);
-    expect(Fields.showField({if: {'$parent.prefixed_last_name': 'is Pleia'}}, 'nested.prefixed_address.home_planet')).toBe(true);
-    expect(Fields.showField({if: {'$parent.prefixed_last_name': 'is Holo'}}, 'nested.prefixed_address.home_planet')).toBe(false);
+    expect(Fields.showField({ prefix: 'prefixed_', if: { first_name: 'is Rincess', last_name: 'is Pleia' } })).toBe(
+        true,
+    );
+    expect(Fields.showField({ prefix: 'prefixed_', if: { first_name: 'is Rincess', last_name: 'is Holo' } })).toBe(
+        false,
+    );
+    expect(Fields.showField({ if: { '$root.nested.prefixed_last_name': 'is Pleia' } })).toBe(true);
+    expect(Fields.showField({ if: { '$root.nested.prefixed_last_name': 'is Holo' } })).toBe(false);
+    expect(
+        Fields.showField({ if: { '$parent.prefixed_last_name': 'is Pleia' } }, 'nested.prefixed_address.home_planet'),
+    ).toBe(true);
+    expect(
+        Fields.showField({ if: { '$parent.prefixed_last_name': 'is Holo' } }, 'nested.prefixed_address.home_planet'),
+    ).toBe(false);
 });
 
 test('it can call a custom function', () => {
@@ -473,18 +494,15 @@ test('it can call a custom function', () => {
         return values.favorite_animals.length > 3;
     });
 
-    expect(Fields.showField({if: 'reallyLovesAnimals'})).toBe(false);
-    expect(Fields.showField({if: 'custom reallyLovesAnimals'})).toBe(false);
-    expect(Fields.showField({unless: 'reallyLovesAnimals'})).toBe(true);
-    expect(Fields.showField({unless: 'custom reallyLovesAnimals'})).toBe(true);
+    expect(Fields.showField({ if: 'reallyLovesAnimals' })).toBe(false);
+    expect(Fields.showField({ if: 'custom reallyLovesAnimals' })).toBe(false);
+    expect(Fields.showField({ unless: 'reallyLovesAnimals' })).toBe(true);
+    expect(Fields.showField({ unless: 'custom reallyLovesAnimals' })).toBe(true);
 });
 
 test('it can call a custom function that uses `fieldPath` param to evaluate nested fields', () => {
-    Fields.setValues({ nested:
-        [
-            { favorite_animals: ['cats', 'dogs'] },
-            { favorite_animals: ['cats', 'dogs', 'giraffes', 'lions'] }
-        ]
+    Fields.setValues({
+        nested: [{ favorite_animals: ['cats', 'dogs'] }, { favorite_animals: ['cats', 'dogs', 'giraffes', 'lions'] }],
     });
 
     Statamic.$conditions.add('reallyLovesAnimals', function ({ target, params, store, storeName, root, fieldPath }) {
@@ -496,8 +514,8 @@ test('it can call a custom function that uses `fieldPath` param to evaluate nest
         return data_get(root, fieldPath).length > 3;
     });
 
-    expect(showFieldIf({'favorite_animals': 'custom reallyLovesAnimals'}, 'nested.0.favorite_animals')).toBe(false);
-    expect(showFieldIf({'favorite_animals': 'custom reallyLovesAnimals'}, 'nested.1.favorite_animals')).toBe(true);
+    expect(showFieldIf({ favorite_animals: 'custom reallyLovesAnimals' }, 'nested.0.favorite_animals')).toBe(false);
+    expect(showFieldIf({ favorite_animals: 'custom reallyLovesAnimals' }, 'nested.1.favorite_animals')).toBe(true);
 });
 
 test('it can call a custom function using params against root values', () => {
@@ -509,11 +527,11 @@ test('it can call a custom function using params against root values', () => {
         expect(target).toBe(null);
         expect(store).toBe(Store);
         expect(storeName).toBe('base');
-        return params.filter(food => ! root.favorite_foods.includes(food)).length === 0;
+        return params.filter((food) => !root.favorite_foods.includes(food)).length === 0;
     });
 
-    expect(Fields.showField({if: 'reallyLoves:lasagna,pizza'})).toBe(true);
-    expect(Fields.showField({if: 'reallyLoves:lasagna,pizza,sandwiches'})).toBe(false);
+    expect(Fields.showField({ if: 'reallyLoves:lasagna,pizza' })).toBe(true);
+    expect(Fields.showField({ if: 'reallyLoves:lasagna,pizza,sandwiches' })).toBe(false);
 });
 
 test('it can call a custom function on a specific field', () => {
@@ -531,7 +549,7 @@ test('it can call a custom function on a specific field', () => {
         return values.favorite_animals.length > 3;
     });
 
-    expect(showFieldIf({'favorite_animals': 'custom lovesAnimals'})).toBe(true);
+    expect(showFieldIf({ favorite_animals: 'custom lovesAnimals' })).toBe(true);
 });
 
 test('it can call a custom function on a specific field using params against a root value', () => {
@@ -548,9 +566,9 @@ test('it can call a custom function on a specific field using params against a r
         return target.length > (params[0] || 3);
     });
 
-    expect(showFieldIf({'$root.favorite_animals': 'custom lovesAnimals'})).toBe(true);
-    expect(showFieldIf({'$root.favorite_animals': 'custom lovesAnimals:2'})).toBe(true);
-    expect(showFieldIf({'$root.favorite_animals': 'custom lovesAnimals:7'})).toBe(false);
+    expect(showFieldIf({ '$root.favorite_animals': 'custom lovesAnimals' })).toBe(true);
+    expect(showFieldIf({ '$root.favorite_animals': 'custom lovesAnimals:2' })).toBe(true);
+    expect(showFieldIf({ '$root.favorite_animals': 'custom lovesAnimals:7' })).toBe(false);
 });
 
 test('it can call a custom function on a specific field using params against a root value using `root.` backwards compatibility', () => {
@@ -567,9 +585,9 @@ test('it can call a custom function on a specific field using params against a r
         return target.length > (params[0] || 3);
     });
 
-    expect(showFieldIf({'root.favorite_animals': 'custom lovesAnimals'})).toBe(true);
-    expect(showFieldIf({'root.favorite_animals': 'custom lovesAnimals:2'})).toBe(true);
-    expect(showFieldIf({'root.favorite_animals': 'custom lovesAnimals:7'})).toBe(false);
+    expect(showFieldIf({ 'root.favorite_animals': 'custom lovesAnimals' })).toBe(true);
+    expect(showFieldIf({ 'root.favorite_animals': 'custom lovesAnimals:2' })).toBe(true);
+    expect(showFieldIf({ 'root.favorite_animals': 'custom lovesAnimals:7' })).toBe(false);
 });
 
 test('it fails if the condition lhs is not evaluatable', () => {
@@ -577,8 +595,8 @@ test('it fails if the condition lhs is not evaluatable', () => {
         favorite_animals: [],
     });
 
-    expect(Fields.showField({if: {'favorite_animals': 'not null'}})).toBe(false);
-    expect(Fields.showField({unless: {'favorite_animals': 'not null'}})).toBe(true);
+    expect(Fields.showField({ if: { favorite_animals: 'not null' } })).toBe(false);
+    expect(Fields.showField({ unless: { favorite_animals: 'not null' } })).toBe(true);
 });
 
 test('it can mix custom and non-custom conditions', () => {
@@ -596,18 +614,28 @@ test('it can mix custom and non-custom conditions', () => {
         return target[0].toLowerCase() === params[0];
     });
 
-    expect(showFieldIf({first_name: 'is San', last_name: 'custom startsWith:h', age: 'custom isOlderThan:16'})).toBe(true);
-    expect(showFieldIf({first_name: 'is Feedo', last_name: 'custom startsWith:h', age: 'custom isOlderThan:16'})).toBe(false);
-    expect(showFieldIf({first_name: 'is San', last_name: 'custom startsWith:h', age: 'custom isOlderThan:40'})).toBe(false);
-    expect(showFieldIf({first_name: 'is San', last_name: 'custom startsWith:z', age: 'custom isOlderThan:16'})).toBe(false);
-    expect(showFieldIf({first_name: 'is San', last_name: 'custom startsWith:z', age: 'custom isOlderThan:40'})).toBe(false);
+    expect(showFieldIf({ first_name: 'is San', last_name: 'custom startsWith:h', age: 'custom isOlderThan:16' })).toBe(
+        true,
+    );
+    expect(
+        showFieldIf({ first_name: 'is Feedo', last_name: 'custom startsWith:h', age: 'custom isOlderThan:16' }),
+    ).toBe(false);
+    expect(showFieldIf({ first_name: 'is San', last_name: 'custom startsWith:h', age: 'custom isOlderThan:40' })).toBe(
+        false,
+    );
+    expect(showFieldIf({ first_name: 'is San', last_name: 'custom startsWith:z', age: 'custom isOlderThan:16' })).toBe(
+        false,
+    );
+    expect(showFieldIf({ first_name: 'is San', last_name: 'custom startsWith:z', age: 'custom isOlderThan:40' })).toBe(
+        false,
+    );
 });
 
 test('it can externally force hide a field before validator conditions are evaluated', () => {
-    Fields.setValues({first_name: 'Jesse'});
+    Fields.setValues({ first_name: 'Jesse' });
 
-    expect(Fields.showField({handle: 'some_field'})).toBe(true);
-    expect(Fields.showField({handle: 'last_name', if: {first_name: 'Jesse'}})).toBe(true);
+    expect(Fields.showField({ handle: 'some_field' })).toBe(true);
+    expect(Fields.showField({ handle: 'last_name', if: { first_name: 'Jesse' } })).toBe(true);
 
     Fields.setHiddenField({
         dottedKey: 'last_name',
@@ -621,8 +649,8 @@ test('it can externally force hide a field before validator conditions are evalu
         omitValue: false,
     });
 
-    expect(Fields.showField({handle: 'some_field'})).toBe(false);
-    expect(Fields.showField({handle: 'last_name', if: {first_name: 'Jesse'}})).toBe(false);
+    expect(Fields.showField({ handle: 'some_field' })).toBe(false);
+    expect(Fields.showField({ handle: 'last_name', if: { first_name: 'Jesse' } })).toBe(false);
 });
 
 test('it never omits fields with always_save config', async () => {
@@ -632,8 +660,8 @@ test('it never omits fields with always_save config', async () => {
     });
 
     await Fields.setHiddenFieldsState([
-        {handle: 'is_online_event'},
-        {handle: 'venue', if: {is_online_event: true}, always_save: true},
+        { handle: 'is_online_event' },
+        { handle: 'venue', if: { is_online_event: true }, always_save: true },
     ]);
 
     expect(Store.state.publish.base.hiddenFields['is_online_event'].hidden).toBe(false);
@@ -643,15 +671,18 @@ test('it never omits fields with always_save config', async () => {
 });
 
 test('it never omits nested fields with always_save config', async () => {
-    Fields.setValues({
-        is_online_event: false,
-        venue: false,
-    }, 'nested');
+    Fields.setValues(
+        {
+            is_online_event: false,
+            venue: false,
+        },
+        'nested',
+    );
 
-    await Fields.setHiddenFieldsState([
-        {handle: 'is_online_event'},
-        {handle: 'venue', if: {is_online_event: true}, always_save: true},
-    ], 'nested');
+    await Fields.setHiddenFieldsState(
+        [{ handle: 'is_online_event' }, { handle: 'venue', if: { is_online_event: true }, always_save: true }],
+        'nested',
+    );
 
     expect(Store.state.publish.base.hiddenFields['nested.is_online_event'].hidden).toBe(false);
     expect(Store.state.publish.base.hiddenFields['nested.venue'].hidden).toBe(true);
@@ -660,10 +691,7 @@ test('it never omits nested fields with always_save config', async () => {
 });
 
 test('it force hides fields with hidden visibility config', async () => {
-    await Fields.setHiddenFieldsState([
-        {handle: 'first_name'},
-        {handle: 'last_name', visibility: 'hidden'},
-    ]);
+    await Fields.setHiddenFieldsState([{ handle: 'first_name' }, { handle: 'last_name', visibility: 'hidden' }]);
 
     expect(Store.state.publish.base.hiddenFields['first_name'].hidden).toBe(false);
     expect(Store.state.publish.base.hiddenFields['last_name'].hidden).toBe('force');
@@ -678,8 +706,8 @@ test('it tells omitter to omit hidden fields by default', async () => {
     });
 
     await Fields.setHiddenFieldsState([
-        {handle: 'is_online_event'},
-        {handle: 'venue', if: {is_online_event: true}},
+        { handle: 'is_online_event' },
+        { handle: 'venue', if: { is_online_event: true } },
     ]);
 
     expect(Store.state.publish.base.hiddenFields['is_online_event'].hidden).toBe(false);
@@ -689,15 +717,18 @@ test('it tells omitter to omit hidden fields by default', async () => {
 });
 
 test('it tells omitter to omit nested hidden fields by default', async () => {
-    Fields.setValues({
-        is_online_event: false,
-        venue: false,
-    }, 'nested');
+    Fields.setValues(
+        {
+            is_online_event: false,
+            venue: false,
+        },
+        'nested',
+    );
 
-    await Fields.setHiddenFieldsState([
-        {handle: 'is_online_event'},
-        {handle: 'venue', if: {is_online_event: true}},
-    ], 'nested');
+    await Fields.setHiddenFieldsState(
+        [{ handle: 'is_online_event' }, { handle: 'venue', if: { is_online_event: true } }],
+        'nested',
+    );
 
     expect(Store.state.publish.base.hiddenFields['nested.is_online_event'].hidden).toBe(false);
     expect(Store.state.publish.base.hiddenFields['nested.venue'].hidden).toBe(true);
@@ -712,8 +743,8 @@ test('it tells omitter to omit revealer fields', async () => {
     });
 
     await Fields.setHiddenFieldsState([
-        {handle: 'revealer_toggle', type: 'revealer'},
-        {handle: 'regular_toggle', type: 'regular'},
+        { handle: 'revealer_toggle', type: 'revealer' },
+        { handle: 'regular_toggle', type: 'regular' },
     ]);
 
     expect(Store.state.publish.base.hiddenFields['revealer_toggle'].hidden).toBe(false);
@@ -723,15 +754,21 @@ test('it tells omitter to omit revealer fields', async () => {
 });
 
 test('it tells omitter to omit nested revealer fields', async () => {
-    Fields.setValues({
-        revealer_toggle: false,
-        regular_toggle: false,
-    }, 'nested');
+    Fields.setValues(
+        {
+            revealer_toggle: false,
+            regular_toggle: false,
+        },
+        'nested',
+    );
 
-    await Fields.setHiddenFieldsState([
-        {handle: 'revealer_toggle', type: 'revealer'},
-        {handle: 'regular_toggle', type: 'regular'},
-    ], 'nested');
+    await Fields.setHiddenFieldsState(
+        [
+            { handle: 'revealer_toggle', type: 'revealer' },
+            { handle: 'regular_toggle', type: 'regular' },
+        ],
+        'nested',
+    );
 
     expect(Store.state.publish.base.hiddenFields['nested.revealer_toggle'].hidden).toBe(false);
     expect(Store.state.publish.base.hiddenFields['nested.regular_toggle'].hidden).toBe(false);
@@ -746,8 +783,8 @@ test('it tells omitter not omit revealer-hidden fields', async () => {
     });
 
     await Fields.setHiddenFieldsState([
-        {handle: 'show_more_info', type: 'revealer'},
-        {handle: 'venue', if: {show_more_info: true}},
+        { handle: 'show_more_info', type: 'revealer' },
+        { handle: 'venue', if: { show_more_info: true } },
     ]);
 
     expect(Store.state.publish.base.hiddenFields['show_more_info'].hidden).toBe(false);
@@ -763,8 +800,8 @@ test('it tells omitter not omit revealer-hidden fields using root syntax in cond
     });
 
     await Fields.setHiddenFieldsState([
-        {handle: 'show_more_info', type: 'revealer'},
-        {handle: 'venue', if: {'$root.show_more_info': true}},
+        { handle: 'show_more_info', type: 'revealer' },
+        { handle: 'venue', if: { '$root.show_more_info': true } },
     ]);
 
     console.log(Store.state.publish.base.hiddenFields);
@@ -781,8 +818,8 @@ test('it tells omitter not omit revealer-hidden fields using legacy root syntax 
     });
 
     await Fields.setHiddenFieldsState([
-        {handle: 'show_more_info', type: 'revealer'},
-        {handle: 'venue', if: {'root.show_more_info': true}},
+        { handle: 'show_more_info', type: 'revealer' },
+        { handle: 'venue', if: { 'root.show_more_info': true } },
     ]);
 
     console.log(Store.state.publish.base.hiddenFields);
@@ -793,15 +830,21 @@ test('it tells omitter not omit revealer-hidden fields using legacy root syntax 
 });
 
 test('it tells omitter not omit nested revealer-hidden fields', async () => {
-    Fields.setValues({
-        show_more_info: false,
-        venue: false,
-    }, 'nested');
+    Fields.setValues(
+        {
+            show_more_info: false,
+            venue: false,
+        },
+        'nested',
+    );
 
-    await Fields.setHiddenFieldsState([
-        {handle: 'show_more_info', type: 'revealer'},
-        {handle: 'venue', if: {show_more_info: true}},
-    ], 'nested');
+    await Fields.setHiddenFieldsState(
+        [
+            { handle: 'show_more_info', type: 'revealer' },
+            { handle: 'venue', if: { show_more_info: true } },
+        ],
+        'nested',
+    );
 
     expect(Store.state.publish.base.hiddenFields['nested.show_more_info'].hidden).toBe(false);
     expect(Store.state.publish.base.hiddenFields['nested.venue'].hidden).toBe(true);
@@ -810,15 +853,21 @@ test('it tells omitter not omit nested revealer-hidden fields', async () => {
 });
 
 test('it tells omitter not omit nested revealer-hidden fields using root syntax in condition', async () => {
-    Fields.setValues({
-        show_more_info: false,
-        venue: false,
-    }, 'nested');
+    Fields.setValues(
+        {
+            show_more_info: false,
+            venue: false,
+        },
+        'nested',
+    );
 
-    await Fields.setHiddenFieldsState([
-        {handle: 'show_more_info', type: 'revealer'},
-        {handle: 'venue', if: {'$root.nested.show_more_info': true}},
-    ], 'nested');
+    await Fields.setHiddenFieldsState(
+        [
+            { handle: 'show_more_info', type: 'revealer' },
+            { handle: 'venue', if: { '$root.nested.show_more_info': true } },
+        ],
+        'nested',
+    );
 
     expect(Store.state.publish.base.hiddenFields['nested.show_more_info'].hidden).toBe(false);
     expect(Store.state.publish.base.hiddenFields['nested.venue'].hidden).toBe(true);
@@ -827,15 +876,21 @@ test('it tells omitter not omit nested revealer-hidden fields using root syntax 
 });
 
 test('it tells omitter not omit nested revealer-hidden fields using legacy root syntax for backwards compatibility', async () => {
-    Fields.setValues({
-        show_more_info: false,
-        venue: false,
-    }, 'nested');
+    Fields.setValues(
+        {
+            show_more_info: false,
+            venue: false,
+        },
+        'nested',
+    );
 
-    await Fields.setHiddenFieldsState([
-        {handle: 'show_more_info', type: 'revealer'},
-        {handle: 'venue', if: {'root.nested.show_more_info': true}},
-    ], 'nested');
+    await Fields.setHiddenFieldsState(
+        [
+            { handle: 'show_more_info', type: 'revealer' },
+            { handle: 'venue', if: { 'root.nested.show_more_info': true } },
+        ],
+        'nested',
+    );
 
     expect(Store.state.publish.base.hiddenFields['nested.show_more_info'].hidden).toBe(false);
     expect(Store.state.publish.base.hiddenFields['nested.venue'].hidden).toBe(true);
@@ -846,10 +901,7 @@ test('it tells omitter not omit nested revealer-hidden fields using legacy root 
 test('it tells omitter not omit nested revealer-hidden fields using parent syntax in condition', async () => {
     Fields.setValues({
         top_level_show_more_info: false,
-        replicator: [
-            { text: 'Foo' },
-            { text: 'Bar' },
-        ],
+        replicator: [{ text: 'Foo' }, { text: 'Bar' }],
         group: {
             show_more_info: false,
             replicator: [
@@ -857,14 +909,10 @@ test('it tells omitter not omit nested revealer-hidden fields using parent synta
                 { text: 'Bar' },
                 {
                     show_more_info: false,
-                    replicator: [
-                        { text: 'Foo' },
-                    ],
+                    replicator: [{ text: 'Foo' }],
                     group: {
                         show_more_info: false,
-                        replicator: [
-                            { text: 'Foo' },
-                        ],
+                        replicator: [{ text: 'Foo' }],
                     },
                 },
             ],
@@ -873,22 +921,28 @@ test('it tells omitter not omit nested revealer-hidden fields using parent synta
 
     // Track revealer toggles
     await Fields.setHiddenFieldsState([
-        {handle: 'top_level_show_more_info', type: 'revealer'},
-        {handle: 'group.show_more_info', type: 'revealer'},
-        {handle: 'group.replicator.2.show_more_info', type: 'revealer'},
-        {handle: 'group.replicator.2.group.show_more_info', type: 'revealer'},
+        { handle: 'top_level_show_more_info', type: 'revealer' },
+        { handle: 'group.show_more_info', type: 'revealer' },
+        { handle: 'group.replicator.2.show_more_info', type: 'revealer' },
+        { handle: 'group.replicator.2.group.show_more_info', type: 'revealer' },
     ]);
 
     // Set revealer hidden fields using `$parent` syntax
     await Fields.setHiddenFieldsState([
-        {handle: 'replicator.1.text', if: {'$parent.top_level_show_more_info': true}},
-        {handle: 'group.replicator.1.text', if: {'$parent.show_more_info': true}},
+        { handle: 'replicator.1.text', if: { '$parent.top_level_show_more_info': true } },
+        { handle: 'group.replicator.1.text', if: { '$parent.show_more_info': true } },
     ]);
 
     // Set revealer hidden fields using chained `$parent` syntax
     await Fields.setHiddenFieldsState([
-        {handle: 'group.replicator.2.replicator.0.text', if: {'$parent.$parent.$parent.top_level_show_more_info': true}},
-        {handle: 'group.replicator.2.group.replicator.0.text', if: {'$parent.$parent.$parent.$parent.top_level_show_more_info': true}},
+        {
+            handle: 'group.replicator.2.replicator.0.text',
+            if: { '$parent.$parent.$parent.top_level_show_more_info': true },
+        },
+        {
+            handle: 'group.replicator.2.group.replicator.0.text',
+            if: { '$parent.$parent.$parent.$parent.top_level_show_more_info': true },
+        },
     ]);
 
     // Ensure revealer toggles should definitely hidden and omited from submitted payload
@@ -923,8 +977,8 @@ test('it tells omitter not omit prefixed revealer-hidden fields', async () => {
     });
 
     await Fields.setHiddenFieldsState([
-        {handle: 'prefixed_show_more_info', prefix: 'prefixed_', type: 'revealer'},
-        {handle: 'prefixed_venue', prefix: 'prefixed_', if: {show_more_info: true}},
+        { handle: 'prefixed_show_more_info', prefix: 'prefixed_', type: 'revealer' },
+        { handle: 'prefixed_venue', prefix: 'prefixed_', if: { show_more_info: true } },
     ]);
 
     expect(Store.state.publish.base.hiddenFields['prefixed_show_more_info'].hidden).toBe(false);
@@ -934,15 +988,21 @@ test('it tells omitter not omit prefixed revealer-hidden fields', async () => {
 });
 
 test('it tells omitter not omit nested prefixed revealer-hidden fields', async () => {
-    Fields.setValues({
-        prefixed_show_more_info: false,
-        prefixed_event_venue: false,
-    }, 'nested');
+    Fields.setValues(
+        {
+            prefixed_show_more_info: false,
+            prefixed_event_venue: false,
+        },
+        'nested',
+    );
 
-    await Fields.setHiddenFieldsState([
-        {handle: 'prefixed_show_more_info', prefix: 'prefixed_', type: 'revealer'},
-        {handle: 'prefixed_venue', prefix: 'prefixed_', if: {show_more_info: true}},
-    ], 'nested');
+    await Fields.setHiddenFieldsState(
+        [
+            { handle: 'prefixed_show_more_info', prefix: 'prefixed_', type: 'revealer' },
+            { handle: 'prefixed_venue', prefix: 'prefixed_', if: { show_more_info: true } },
+        ],
+        'nested',
+    );
 
     expect(Store.state.publish.base.hiddenFields['nested.prefixed_show_more_info'].hidden).toBe(false);
     expect(Store.state.publish.base.hiddenFields['nested.prefixed_venue'].hidden).toBe(true);
@@ -961,12 +1021,12 @@ test('it properly omits revealer-hidden fields when multiple conditions are set'
     });
 
     await Fields.setHiddenFieldsState([
-        {handle: 'show_more_info', type: 'revealer'},
-        {handle: 'has_second_event_venue', type: 'toggle', if: {show_more_info: true}},
-        {handle: 'has_third_event_venue', type: 'toggle', if: {show_more_info: true}},
-        {handle: 'event_venue_one', if: {show_more_info: true}},
-        {handle: 'event_venue_two', if: {show_more_info: true, has_second_event_venue: true}},
-        {handle: 'event_venue_three', if: {show_more_info: true, has_third_event_venue: true}},
+        { handle: 'show_more_info', type: 'revealer' },
+        { handle: 'has_second_event_venue', type: 'toggle', if: { show_more_info: true } },
+        { handle: 'has_third_event_venue', type: 'toggle', if: { show_more_info: true } },
+        { handle: 'event_venue_one', if: { show_more_info: true } },
+        { handle: 'event_venue_two', if: { show_more_info: true, has_second_event_venue: true } },
+        { handle: 'event_venue_three', if: { show_more_info: true, has_third_event_venue: true } },
     ]);
 
     expect(Store.state.publish.base.hiddenFields['show_more_info'].hidden).toBe(false);
@@ -987,23 +1047,29 @@ test('it properly omits revealer-hidden fields when multiple conditions are set'
 });
 
 test('it properly omits nested revealer-hidden fields when multiple conditions are set', async () => {
-    Fields.setValues({
-        show_more_info: false,
-        has_second_event_venue: true,
-        has_third_event_venue: false,
-        event_venue_one: 'Stadium One',
-        event_venue_two: 'Stadium Two',
-        event_venue_three: false,
-    }, 'nested');
+    Fields.setValues(
+        {
+            show_more_info: false,
+            has_second_event_venue: true,
+            has_third_event_venue: false,
+            event_venue_one: 'Stadium One',
+            event_venue_two: 'Stadium Two',
+            event_venue_three: false,
+        },
+        'nested',
+    );
 
-    await Fields.setHiddenFieldsState([
-        {handle: 'show_more_info', type: 'revealer'},
-        {handle: 'has_second_event_venue', type: 'toggle', if: {show_more_info: true}},
-        {handle: 'has_third_event_venue', type: 'toggle', if: {show_more_info: true}},
-        {handle: 'event_venue_one', if: {show_more_info: true}},
-        {handle: 'event_venue_two', if: {show_more_info: true, has_second_event_venue: true}},
-        {handle: 'event_venue_three', if: {show_more_info: true, has_third_event_venue: true}},
-    ], 'nested');
+    await Fields.setHiddenFieldsState(
+        [
+            { handle: 'show_more_info', type: 'revealer' },
+            { handle: 'has_second_event_venue', type: 'toggle', if: { show_more_info: true } },
+            { handle: 'has_third_event_venue', type: 'toggle', if: { show_more_info: true } },
+            { handle: 'event_venue_one', if: { show_more_info: true } },
+            { handle: 'event_venue_two', if: { show_more_info: true, has_second_event_venue: true } },
+            { handle: 'event_venue_three', if: { show_more_info: true, has_third_event_venue: true } },
+        ],
+        'nested',
+    );
 
     expect(Store.state.publish.base.hiddenFields['nested.show_more_info'].hidden).toBe(false);
     expect(Store.state.publish.base.hiddenFields['nested.has_second_event_venue'].hidden).toBe(true);
@@ -1024,8 +1090,8 @@ test('it properly omits nested revealer-hidden fields when multiple conditions a
 
 test('it can use extra values in conditions', () => {
     Fields.setValues({});
-    Fields.setExtraValues({hello: 'world'});
+    Fields.setExtraValues({ hello: 'world' });
 
-    expect(showFieldIf({hello: 'world'})).toBe(true);
-    expect(showFieldIf({hello: 'there'})).toBe(false);
+    expect(showFieldIf({ hello: 'world' })).toBe(true);
+    expect(showFieldIf({ hello: 'there' })).toBe(false);
 });

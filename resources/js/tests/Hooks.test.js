@@ -1,19 +1,19 @@
 import Vue from 'vue';
 import Hooks from '../components/Hooks.js';
-const hooks = new Hooks;
+const hooks = new Hooks();
 
 const Statamic = {
     get $hooks() {
         return hooks;
-    }
+    },
 };
 
 afterEach(() => {
-    Statamic.$hooks.hooks = {}
+    Statamic.$hooks.hooks = {};
 });
 
 test('it runs without hooks', () => {
-    let payload = {count: 1};
+    let payload = { count: 1 };
     let promise = Statamic.$hooks.run('example.hook', payload);
 
     return promise.then(() => {
@@ -34,10 +34,10 @@ test('it sets and runs hooks', () => {
         resolve('second');
     });
 
-    let payload = {count: 1};
+    let payload = { count: 1 };
     let promise = Statamic.$hooks.run('example.hook', payload);
 
-    return promise.then(results => {
+    return promise.then((results) => {
         expect(results).toMatchObject(['first', 'second']);
         expect(payload.count).toBe(3);
     });
@@ -53,7 +53,7 @@ test('it sets and runs a failed hook', () => {
         reject('rejected!');
     });
 
-    let payload = {count: 1};
+    let payload = { count: 1 };
     let promise = Statamic.$hooks.run('example.hook', payload);
 
     return expect(promise).rejects.toMatch('rejected!');
@@ -77,10 +77,10 @@ test('a rejected hook will stop other hooks running', () => {
         resolve('third');
     });
 
-    let payload = {count: 1};
+    let payload = { count: 1 };
     let promise = Statamic.$hooks.run('example.hook', payload);
 
-    return promise.catch(error => {
+    return promise.catch((error) => {
         expect(error).toBe('second');
         expect(runHooks).toMatchObject(['first', 'second']);
     });
@@ -94,7 +94,7 @@ test('it waits for hook promise to resolve', () => {
         }, 10);
     });
 
-    let payload = {count: 1};
+    let payload = { count: 1 };
     let promise = Statamic.$hooks.run('example.hook', payload);
 
     return promise.then(() => {
@@ -104,29 +104,39 @@ test('it waits for hook promise to resolve', () => {
 
 test('it runs hooks in order by priority', () => {
     // This hook defaults to priority of 10.
-    Statamic.$hooks.on('example.hook', resolve => {
+    Statamic.$hooks.on('example.hook', (resolve) => {
         resolve('second');
     });
 
-    Statamic.$hooks.on('example.hook', resolve => {
-        resolve('fifth');
-    }, 2);
+    Statamic.$hooks.on(
+        'example.hook',
+        (resolve) => {
+            resolve('fifth');
+        },
+        2,
+    );
 
-    Statamic.$hooks.on('example.hook', resolve => {
+    Statamic.$hooks.on('example.hook', (resolve) => {
         resolve('third');
     });
 
-    Statamic.$hooks.on('example.hook', resolve => {
-        resolve('fourth');
-    }, 5);
+    Statamic.$hooks.on(
+        'example.hook',
+        (resolve) => {
+            resolve('fourth');
+        },
+        5,
+    );
 
-    Statamic.$hooks.on('example.hook', resolve => {
-        resolve('first');
-    }, 200);
+    Statamic.$hooks.on(
+        'example.hook',
+        (resolve) => {
+            resolve('first');
+        },
+        200,
+    );
 
     let promise = Statamic.$hooks.run('example.hook');
 
-    return expect(promise).resolves.toMatchObject([
-        'first', 'second', 'third', 'fourth', 'fifth'
-    ]);
+    return expect(promise).resolves.toMatchObject(['first', 'second', 'third', 'fourth', 'fifth']);
 });
