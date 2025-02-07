@@ -3,6 +3,7 @@ import laravel from 'laravel-vite-plugin';
 import vue from '@vitejs/plugin-vue';
 import inject from '@rollup/plugin-inject';
 import svgLoader from 'vite-svg-loader';
+import path from 'path';
 
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, process.cwd(), '');
@@ -28,6 +29,7 @@ export default defineConfig(({ mode }) => {
         resolve: {
             alias: {
                 vue: 'vue/dist/vue.esm-bundler.js',
+                '@': path.resolve(__dirname, 'resources/js'),
             },
         },
         optimizeDeps: {
@@ -35,6 +37,7 @@ export default defineConfig(({ mode }) => {
         },
         test: {
             environment: 'jsdom',
+            setupFiles: 'resources/js/tests/setup.js',
         },
     };
 });
