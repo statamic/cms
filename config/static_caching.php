@@ -47,6 +47,23 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Cache Control
+    |--------------------------------------------------------------------------
+    |
+    | Here you may choose what information gets sent in the cache-control
+    | header when cache gets hit in PHP.
+    | Ages are in seconds.
+    |
+    | Note that when using the "full" strategy you must also set this in
+    | Your webserver, e.g.: max-age=60, public, s-maxage=60, stale-while-revalidate=60
+    */
+
+    'max_age' => 120, // The amount of time the browser may cache this response for.
+    'shared_max_age' => null, // The amount of time a Proxy/CDN may cache this response for. null will use max_age.
+    'stale_while_revalidate' => 120, // How long may a stale cache be used while fetching fresh content in the background.
+
+    /*
+    |--------------------------------------------------------------------------
     | Exclusions
     |--------------------------------------------------------------------------
     |

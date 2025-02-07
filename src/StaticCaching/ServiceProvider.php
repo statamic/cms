@@ -91,6 +91,14 @@ class ServiceProvider extends LaravelServiceProvider
             return app(Cacher::class)->getUrl($this);
         });
 
+        Response::macro('makeCacheControlCacheable', function () {
+            $this
+                ->setMaxAge(config('statamic.static_caching.max_age', 60))
+                ->setSharedMaxAge(config('statamic.static_caching.shared_max_age', config('statamic.static_caching.max_age', 60)))
+                ->setStaleWhileRevalidate(config('statamic.static_caching.stale_while_revalidate', 60))
+                ->setEtag(md5($this->getContent() ?: ''));
+        });
+
         Request::macro('fakeStaticCacheStatus', function (int $status) {
             $url = '/__shared-errors/'.$status;
             $this->pathInfo = $url;
