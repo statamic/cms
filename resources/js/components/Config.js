@@ -1,10 +1,12 @@
+import { ref } from 'vue';
+
 export default class Config {
-    constructor(store) {
-        this.store = store;
+    constructor(initialConfig) {
+        this.config = ref(initialConfig);
     }
 
     all() {
-        return this.store.state.statamic.config;
+        return this.config.value;
     }
 
     get(key, fallback) {
@@ -12,6 +14,6 @@ export default class Config {
     }
 
     set(key, value) {
-        this.store.commit('statamic/configValue', { key, value });
+        this.config.value[key] = value;
     }
 }

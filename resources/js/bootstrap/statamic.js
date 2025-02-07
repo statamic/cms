@@ -55,7 +55,7 @@ export default {
     },
 
     get $config() {
-        return new Config(store);
+        return this.$app.config.globalProperties.$config;
     },
 
     get $preferences() {
@@ -111,7 +111,7 @@ export default {
     },
 
     config(config) {
-        store.commit('statamic/config', config);
+        this.initialConfig = config;
     },
 
     component(name, component) {
@@ -146,12 +146,15 @@ export default {
         components = new Components(this.$app);
 
         Object.assign(this.$app.config.globalProperties, {
+            $config: new Config(this.initialConfig),
+        });
+
+        Object.assign(this.$app.config.globalProperties, {
             $axios: axios,
             $moment: window.moment,
             $events: useGlobalEventBus(),
             $preferences: new Preferences(),
             $progress: useProgressBar(),
-            $config: this.$config,
             $keys: new Keys(),
             $fieldActions: new FieldActions(),
             $conditions: new FieldConditions(),
