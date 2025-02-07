@@ -2,7 +2,7 @@ import ParentResolver from '../components/field-conditions/ParentResolver.js';
 
 let resolve = function (currentFieldPath, pathWithParent) {
     return new ParentResolver(currentFieldPath).resolve(pathWithParent);
-}
+};
 
 test('it resolves from group to top level', () => {
     expect(resolve('group.field', '$parent.name')).toEqual('$root.name');
@@ -58,11 +58,25 @@ test('it resolves from deeply nested mix of everything all the way up to top lev
     let fromField = 'group.replicator.1.group.bard.4.grid.0.group.group.replicator.6.field';
 
     expect(resolve(fromField, '$parent.name')).toEqual('$root.group.replicator.1.group.bard.4.grid.0.group.group.name');
-    expect(resolve(fromField, '$parent.$parent.name')).toEqual('$root.group.replicator.1.group.bard.4.grid.0.group.name');
-    expect(resolve(fromField, '$parent.$parent.$parent.name')).toEqual('$root.group.replicator.1.group.bard.4.grid.0.name');
-    expect(resolve(fromField, '$parent.$parent.$parent.$parent.name')).toEqual('$root.group.replicator.1.group.bard.4.name');
-    expect(resolve(fromField, '$parent.$parent.$parent.$parent.$parent.name')).toEqual('$root.group.replicator.1.group.name');
-    expect(resolve(fromField, '$parent.$parent.$parent.$parent.$parent.$parent.name')).toEqual('$root.group.replicator.1.name');
-    expect(resolve(fromField, '$parent.$parent.$parent.$parent.$parent.$parent.$parent.name')).toEqual('$root.group.name');
-    expect(resolve(fromField, '$parent.$parent.$parent.$parent.$parent.$parent.$parent.$parent.name')).toEqual('$root.name');
+    expect(resolve(fromField, '$parent.$parent.name')).toEqual(
+        '$root.group.replicator.1.group.bard.4.grid.0.group.name',
+    );
+    expect(resolve(fromField, '$parent.$parent.$parent.name')).toEqual(
+        '$root.group.replicator.1.group.bard.4.grid.0.name',
+    );
+    expect(resolve(fromField, '$parent.$parent.$parent.$parent.name')).toEqual(
+        '$root.group.replicator.1.group.bard.4.name',
+    );
+    expect(resolve(fromField, '$parent.$parent.$parent.$parent.$parent.name')).toEqual(
+        '$root.group.replicator.1.group.name',
+    );
+    expect(resolve(fromField, '$parent.$parent.$parent.$parent.$parent.$parent.name')).toEqual(
+        '$root.group.replicator.1.name',
+    );
+    expect(resolve(fromField, '$parent.$parent.$parent.$parent.$parent.$parent.$parent.name')).toEqual(
+        '$root.group.name',
+    );
+    expect(resolve(fromField, '$parent.$parent.$parent.$parent.$parent.$parent.$parent.$parent.name')).toEqual(
+        '$root.name',
+    );
 });

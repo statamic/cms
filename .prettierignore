@@ -4,7 +4,7 @@ vendor/
 /vendor
 .git
 **/.git
-tests
+/tests
 package-lock.json
 composer.lock
 src/View/Debugbar/AntlersProfiler/resources/chart.js
