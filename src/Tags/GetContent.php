@@ -5,6 +5,7 @@ namespace Statamic\Tags;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
+use Statamic\Query\OrderedQueryBuilder;
 use Statamic\Support\Str;
 use Statamic\Tags\Concerns\OutputsItems;
 
@@ -57,6 +58,11 @@ class GetContent extends Tags
         $query = Entry::query()
             ->where('site', $this->params->get(['site', 'locale'], Site::current()->handle()))
             ->whereIn($usingUris ? 'uri' : 'id', $items);
+
+        // Ensure correct order of results
+        if (! $usingUris) {
+            $query = new OrderedQueryBuilder($query, $items);
+        }
 
         return $this->output($query->get());
     }
