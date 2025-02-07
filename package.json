@@ -101,7 +101,6 @@
     "@vitejs/plugin-vue": "^5.2.1",
     "@vue/test-utils": "^2.4.6",
     "autoprefixer": "^10.4.0",
-    "cross-env": "^7.0.3",
     "knip": "^5.43.6",
     "laravel-vite-plugin": "^1.2.0",
     "postcss": "^8.4.31",
