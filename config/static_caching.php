@@ -59,7 +59,7 @@ return [
     */
 
     'max_age' => 120, // The amount of time the browser may cache this response for.
-    'shared_max_age' => null, // The amount of time a Proxy/CDN may cache this response for. null will use max_age.
+    'shared_max_age' => 120, // The amount of time a Proxy/CDN may cache this response for.
     'stale_while_revalidate' => 120, // How long may a stale cache be used while fetching fresh content in the background.
 
     /*
