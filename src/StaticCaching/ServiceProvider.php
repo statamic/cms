@@ -10,7 +10,6 @@ use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 use Statamic\Facades\Cascade;
 use Statamic\StaticCaching\NoCache\DatabaseSession;
 use Statamic\StaticCaching\NoCache\Session;
-use Illuminate\Http\Response;
 
 class ServiceProvider extends LaravelServiceProvider
 {
