@@ -86,12 +86,6 @@ export default {
                 reference: this.reference,
             };
 
-            // If the store already exists, just reinitialize the state.
-            if (this.$store.state.hasOwnProperty('publish') && this.$store.state.publish.hasOwnProperty(this.name)) {
-                this.$store.commit(`publish/${this.name}/initialize`, initial);
-                return;
-            }
-
             this.$store.registerModule(['publish', this.name], {
                 namespaced: true,
                 state: {
