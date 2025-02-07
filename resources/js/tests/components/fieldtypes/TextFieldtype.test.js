@@ -3,7 +3,7 @@ import { expect, test } from 'vitest';
 import TextFieldtype from '@/components/fieldtypes/TextFieldtype.vue';
 import TextInput from '@/components/inputs/Text.vue';
 
-test('sets mode', async () => {
+test('value can be updated', async () => {
     const wrapper = mount(TextFieldtype, {
         props: {
             value: null,
