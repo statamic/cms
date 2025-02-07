@@ -1,3 +1,4 @@
+import { test, expect, afterEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { nextTick } from 'vue';
 import { createStore } from 'vuex';
@@ -101,6 +102,7 @@ const app = {
             await nextTick();
         },
     },
+    template: `<div></div>`, // Silence warning about missing template
 };
 
 const wrapper = mount(app, {
@@ -804,7 +806,6 @@ test('it tells omitter not omit revealer-hidden fields using root syntax in cond
         { handle: 'venue', if: { '$root.show_more_info': true } },
     ]);
 
-    console.log(Store.state.publish.base.hiddenFields);
     expect(Store.state.publish.base.hiddenFields['show_more_info'].hidden).toBe(false);
     expect(Store.state.publish.base.hiddenFields['venue'].hidden).toBe(true);
     expect(Store.state.publish.base.hiddenFields['show_more_info'].omitValue).toBe(true);
@@ -822,7 +823,6 @@ test('it tells omitter not omit revealer-hidden fields using legacy root syntax 
         { handle: 'venue', if: { 'root.show_more_info': true } },
     ]);
 
-    console.log(Store.state.publish.base.hiddenFields);
     expect(Store.state.publish.base.hiddenFields['show_more_info'].hidden).toBe(false);
     expect(Store.state.publish.base.hiddenFields['venue'].hidden).toBe(true);
     expect(Store.state.publish.base.hiddenFields['show_more_info'].omitValue).toBe(true);

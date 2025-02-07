@@ -1,3 +1,4 @@
+import { expect, test } from 'vitest';
 import Slug from '../components/slugs/Slug';
 
 let config = {

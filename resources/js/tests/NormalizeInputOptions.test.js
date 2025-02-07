@@ -1,10 +1,6 @@
-import _ from 'underscore';
-import { __ } from '../bootstrap/globals';
+import { it, expect } from 'vitest';
 import hasInputOptions from '../components/fieldtypes/HasInputOptions';
 const normalizeInputOptions = hasInputOptions.methods.normalizeInputOptions;
-
-window._ = _;
-window.__ = __;
 
 const config = {
     translations: {

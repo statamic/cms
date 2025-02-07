@@ -1,3 +1,5 @@
+import { __ } from '../../bootstrap/globals.js';
+
 export default {
     methods: {
         normalizeInputOptions(options) {

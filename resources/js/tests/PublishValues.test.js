@@ -1,3 +1,4 @@
+import { test, expect } from 'vitest';
 import Values from '../components/publish/Values.js';
 
 test('it gets values at top level', () => {
