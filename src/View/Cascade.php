@@ -188,7 +188,7 @@ class Cascade
             'current_user' => User::current(),
 
             // Date
-            'current_date' => $now = now(),
+            'current_date' => $now = now(tz: config('statamic.system.display_timezone')),
             'now' => $now,
             'today' => $now,
 

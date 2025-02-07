@@ -1048,6 +1048,28 @@ class EntryTest extends TestCase
     }
 
     #[Test]
+    public function setting_date_on_entry_converts_it_to_utc()
+    {
+        config()->set('app.timezone', 'America/New_York'); // -05:00
+        date_default_timezone_set('America/New_York');
+
+        $collection = tap(Collection::make('dated')->dated(true))->save();
+
+        $collection->entryBlueprint()->setContents(['fields' => [
+            ['handle' => 'date', 'field' => ['type' => 'date', 'time_enabled' => true, 'time_seconds_enabled' => true]],
+        ]]);
+
+        $entry = (new Entry)->collection('dated')->date('2025-01-01');
+        $this->assertEquals('2025-01-01', $entry->date()->format('Y-m-d'));
+
+        $entry = (new Entry)->collection('dated')->date('2025-01-01-1234');
+        $this->assertEquals('2025-01-01 17:34', $entry->date()->format('Y-m-d H:i'));
+
+        $entry = (new Entry)->collection('dated')->date('2025-01-01-123456');
+        $this->assertEquals('2025-01-01 17:34:56', $entry->date()->format('Y-m-d H:i:s'));
+    }
+
+    #[Test]
     public function it_falls_back_to_the_origin_for_the_date()
     {
         Collection::make('dated')->dated(true)->save();
