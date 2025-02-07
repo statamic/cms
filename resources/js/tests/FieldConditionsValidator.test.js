@@ -4,20 +4,10 @@ import { nextTick } from 'vue';
 import { createStore } from 'vuex';
 import ValidatesFieldConditions from '../components/field-conditions/ValidatorMixin.js';
 import { data_get } from '../bootstrap/globals';
+import FieldConditions from '@/components/FieldConditions';
 
 const Store = createStore({
     modules: {
-        statamic: {
-            namespaced: true,
-            state: {
-                conditions: {},
-            },
-            mutations: {
-                setCondition(state, payload) {
-                    state.conditions[payload.name] = payload.condition;
-                },
-            },
-        },
         publish: {
             namespaced: true,
             modules: {
@@ -54,10 +44,9 @@ const Store = createStore({
 });
 
 const Statamic = {
-    $conditions: {
-        add: (name, condition) => Store.commit('statamic/setCondition', { name, condition }),
-    },
+    $conditions: new FieldConditions(),
 };
+window.Statamic = Statamic;
 
 const app = {
     mixins: [ValidatesFieldConditions],

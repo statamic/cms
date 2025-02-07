@@ -243,7 +243,7 @@ export default class {
     }
 
     passesCustomCondition(condition) {
-        let customFunction = data_get(this.store.state.statamic.conditions, condition.functionName);
+        let customFunction = Statamic.$conditions.get(condition.functionName);
 
         if (typeof customFunction !== 'function') {
             console.error(`Statamic field condition [${condition.functionName}] was not properly defined.`);

@@ -1,13 +1,7 @@
 export default {
     namespaced: true,
 
-    state: {
-        conditions: {},
-    },
+    state: {},
 
-    mutations: {
-        condition(state, payload) {
-            state.conditions[payload.name] = payload.condition;
-        },
-    },
+    mutations: {},
 };
