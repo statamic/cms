@@ -16,6 +16,12 @@ class DateFieldtypeTest extends FieldtypeTestCase
         parent::setUp();
 
         Carbon::macro('getToStringFormat', function () {
+            // Carbon 2.x
+            if (property_exists(static::this(), 'toStringFormat')) {
+                return static::$toStringFormat;
+            }
+
+            // Carbon 3.x
             $reflection = new ReflectionClass(self::this());
             $factory = $reflection->getMethod('getFactory');
             $factory->setAccessible(true);
