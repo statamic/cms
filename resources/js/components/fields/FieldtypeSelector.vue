@@ -7,7 +7,7 @@
             <button type="button" class="btn-close" @click="close">×</button>
         </div>
 
-        <div v-if="fieldtypesLoading" class="absolute inset-0 z-200 flex items-center justify-center text-center">
+        <div v-if="!fieldtypesLoaded" class="absolute inset-0 z-200 flex items-center justify-center text-center">
             <loading-graphic />
         </div>
 
@@ -74,6 +74,8 @@
 
 <script>
 import Fuse from 'fuse.js';
+import { ref } from 'vue';
+const loadedFieldtypes = ref(null);
 
 export default {
     props: {
@@ -126,17 +128,13 @@ export default {
 
     computed: {
         fieldtypes() {
-            if (this.fieldtypesLoading) return;
+            if (!this.fieldtypesLoaded) return;
 
-            return this.$store.state.statamic.fieldtypes;
-        },
-
-        fieldtypesLoading() {
-            return this.$store.state.statamic.fieldtypes === 'loading';
+            return loadedFieldtypes.value;
         },
 
         fieldtypesLoaded() {
-            return Array.isArray(this.fieldtypes);
+            return Array.isArray(loadedFieldtypes.value);
         },
 
         allFieldtypes() {
@@ -240,15 +238,13 @@ export default {
     },
 
     created() {
-        if (this.fieldtypes || this.fieldtypesLoading) return;
-
-        this.$store.commit('statamic/fieldtypes', 'loading');
+        if (this.fieldtypesLoaded) return;
 
         let url = cp_url('fields/fieldtypes?selectable=true');
 
         if (this.$config.get('isFormBlueprint')) url += '&forms=true';
 
-        this.$axios.get(url).then((response) => this.$store.commit('statamic/fieldtypes', response.data));
+        this.$axios.get(url).then((response) => (loadedFieldtypes.value = response.data));
     },
 
     methods: {
