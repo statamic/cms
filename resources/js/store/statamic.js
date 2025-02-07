@@ -2,7 +2,6 @@ export default {
     namespaced: true,
 
     state: {
-        windowWidth: null,
         fieldtypes: null,
         composer: {},
         config: {},
@@ -10,10 +9,6 @@ export default {
     },
 
     mutations: {
-        windowWidth(state, width) {
-            state.windowWidth = width;
-        },
-
         fieldtypes(state, fieldtypes) {
             state.fieldtypes = fieldtypes;
         },

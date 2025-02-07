@@ -122,8 +122,6 @@ export default {
     },
 
     mounted() {
-        this.bindWindowResizeListener();
-
         this.$keys.bind(['command+\\'], (e) => {
             e.preventDefault();
             this.toggleNav();
@@ -166,13 +164,6 @@ export default {
     },
 
     methods: {
-        bindWindowResizeListener() {
-            window.addEventListener('resize', () => {
-                this.$store.commit('statamic/windowWidth', document.documentElement.clientWidth);
-            });
-            window.dispatchEvent(new Event('resize'));
-        },
-
         toggleNav() {
             this.navOpen = !this.navOpen;
             localStorage.setItem('statamic.nav', this.navOpen ? 'open' : 'closed');
