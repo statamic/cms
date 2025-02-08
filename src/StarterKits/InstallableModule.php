@@ -19,7 +19,7 @@ final class InstallableModule extends Module
      *
      * @throws Exception|StarterKitException
      */
-    public function installer($installer): self
+    public function installer(?Installer $installer): self
     {
         $this->installer = $installer;
 
@@ -102,7 +102,7 @@ final class InstallableModule extends Module
     /**
      * Get installable files.
      */
-    protected function installableFiles(): Collection
+    public function installableFiles(): Collection
     {
         $installableFromExportPaths = $this
             ->exportPaths()
@@ -125,8 +125,10 @@ final class InstallableModule extends Module
      */
     protected function expandExportDirectoriesToFiles(string $to, ?string $from = null): Collection
     {
+        $from = $this->relativePath($from ?? $to);
+
+        $from = Path::tidy($this->installableFilesPath($from));
         $to = Path::tidy($this->installableFilesPath($to));
-        $from = Path::tidy($from ? $this->installableFilesPath($from) : $to);
 
         $paths = collect([$from => $to]);
 
@@ -151,7 +153,10 @@ final class InstallableModule extends Module
     {
         $package = $this->installer->package();
 
-        $path = str_replace("/vendor/{$package}/export", '', $path);
+        $path = preg_replace("#vendor/{$package}.*/export/#", '', $path);
+
+        // Older kits may not be using new `export` folder convention, so
+        // we'll convert from the kit root for backwards compatibility
         $path = str_replace("/vendor/{$package}", '', $path);
 
         return $path;
@@ -195,9 +200,8 @@ final class InstallableModule extends Module
     protected function ensureInstallableFilesExist(): self
     {
         $this
-            ->exportPaths()
-            ->merge($this->exportAsPaths())
-            ->reject(fn ($path) => $this->files->exists($this->installableFilesPath($path)))
+            ->installableFiles()
+            ->reject(fn ($to, $from) => $this->files->exists($from))
             ->each(function ($path) {
                 throw new StarterKitException("Starter kit path [{$path}] does not exist.");
             });
@@ -246,13 +250,26 @@ final class InstallableModule extends Module
     {
         $package = $this->installer->package();
 
-        // Scope to new `export` folder if it exists, otherwise we'll
-        // look in starter kit root for backwards compatibility
-        $scope = $this->files->exists(base_path("vendor/{$package}/export"))
+        // Older kits may not be using new `export` folder convention at the top level,
+        // so for backwards compatibility we'll dynamically scope to `export` folder,
+        // but we don't need to worry about this with newer folder based modules.
+        $scope = $this->files->exists(base_path("vendor/{$package}/export")) && ! $this->isFolderBasedModule()
             ? 'export'
             : null;
 
         return collect([base_path("vendor/{$package}"), $scope, $path])->filter()->implode('/');
+    }
+
+    /**
+     * Get relative module path.
+     */
+    protected function relativePath(string $path): string
+    {
+        if (! $this->relativePath) {
+            return $path;
+        }
+
+        return Str::ensureRight($this->relativePath, '/export/').$path;
     }
 
     /**

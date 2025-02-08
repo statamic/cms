@@ -13,6 +13,7 @@ abstract class Module
     protected $files;
     protected $config;
     protected $key;
+    protected $relativePath;
 
     /**
      * Instantiate starter kit module.
@@ -27,11 +28,37 @@ abstract class Module
     }
 
     /**
+     * Set relative module path.
+     */
+    public function setRelativePath(string $path): self
+    {
+        $this->relativePath = $path;
+
+        return $this;
+    }
+
+    /**
+     * Check if current module is folder based module.
+     */
+    public function isFolderBasedModule(): bool
+    {
+        return (bool) $this->relativePath;
+    }
+
+    /**
      * Get module key.
      */
     public function key(): string
     {
         return $this->key;
+    }
+
+    /**
+     * Get readable module key for default prompt display text.
+     */
+    public function keyReadable(): string
+    {
+        return str_replace(['_', '.'], ' ', $this->key);
     }
 
     /**
@@ -43,12 +70,22 @@ abstract class Module
     }
 
     /**
+     * Set config.
+     */
+    public function set(string $key, mixed $value): self
+    {
+        $this->config[$key] = $value;
+
+        return $this;
+    }
+
+    /**
      * Get module config.
      */
-    public function config(?string $key = null): mixed
+    public function config(?string $key = null, $default = null): mixed
     {
         if ($key) {
-            return $this->config->get($key);
+            return $this->config->get($key, $default);
         }
 
         return $this->config;
@@ -79,12 +116,13 @@ abstract class Module
      *
      * @throws StarterKitException
      */
-    protected function ensureModuleConfigNotEmpty(): self
+    protected function ensureModuleConfigNotEmpty(): static
     {
         $hasConfig = $this->config()->has('export_paths')
             || $this->config()->has('export_as')
             || $this->config()->has('dependencies')
             || $this->config()->has('dependencies_dev')
+            || $this->config()->has('options')
             || $this->config()->has('modules');
 
         if (! $hasConfig) {
