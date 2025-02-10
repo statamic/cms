@@ -40,10 +40,11 @@
         "doctrine/dbal": "^3.6",
         "fakerphp/faker": "~1.10",
         "google/cloud-translate": "^1.6",
+        "illuminate/contracts": "12.*",
         "laravel/pint": "1.16.0",
         "mockery/mockery": "^1.6.10",
         "orchestra/testbench": "^8.14 || ^9.2 || ^10.0",
-        "phpunit/phpunit": "^10.5.35",
+        "phpunit/phpunit": "^10.5.35 || ^11.5.3",
         "spatie/laravel-ray": "^1.37"
     },
     "repositories": [
