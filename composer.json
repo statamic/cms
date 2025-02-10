@@ -49,7 +49,7 @@
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/duncanmcclean/blade-parser.git"
+            "url": "git@github.com:duncanmcclean/blade-parser.git"
         }
     ],
     "config": {
