@@ -349,7 +349,7 @@ class Date extends Fieldtype
     private function parseSaved($value)
     {
         try {
-            return Carbon::createFromFormat($this->saveFormat(), $value);
+            return Carbon::createFromFormat($this->saveFormat(), $value, 'UTC');
         } catch (InvalidFormatException|InvalidArgumentException $e) {
             return Carbon::parse($value);
         }
