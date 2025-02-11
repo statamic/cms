@@ -29,9 +29,9 @@
         "spatie/ignition": "^1.15",
         "statamic/stringy": "^3.1.2",
         "stillat/blade-parser": "^1.10.1",
-        "symfony/lock": "^6.4",
-        "symfony/var-exporter": "^6.0",
-        "symfony/yaml": "^7.0",
+        "symfony/lock": "^7.0.3",
+        "symfony/var-exporter": "^7.0.3",
+        "symfony/yaml": "^7.0.3",
         "ueberdosis/tiptap-php": "^1.4",
         "voku/portable-ascii": "^2.0.2",
         "wilderborn/partyline": "^1.0"
