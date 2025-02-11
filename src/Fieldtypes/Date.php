@@ -311,7 +311,7 @@ class Date extends Fieldtype
         }
 
         if ($value instanceof Carbon) {
-            return $value->setTimezone(config('statamic.system.display_timezone'));
+            return $value;
         }
 
         if ($this->config('mode') === 'range') {
@@ -321,8 +321,7 @@ class Date extends Fieldtype
             ];
         }
 
-        $date = $this->parseSaved($value)
-            ->setTimezone(config('statamic.system.display_timezone'));
+        $date = $this->parseSaved($value);
 
         if (! $this->config('time_enabled')) {
             $date->startOfDay();
@@ -350,7 +349,7 @@ class Date extends Fieldtype
     private function parseSaved($value)
     {
         try {
-            return Carbon::createFromFormat($this->saveFormat(), $value, 'UTC');
+            return Carbon::createFromFormat($this->saveFormat(), $value);
         } catch (InvalidFormatException|InvalidArgumentException $e) {
             return Carbon::parse($value);
         }
