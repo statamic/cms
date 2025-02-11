@@ -111,8 +111,7 @@
                         </floating-menu>
 
                         <div class="bard-error" v-if="initError" v-html="initError"></div>
-                        <editor-content :editor="editor" v-show="!showSource" :id="fieldId" />
-                        <bard-source :html="htmlWithReplacedLinks" v-if="showSource" />
+                        <editor-content :editor="editor" :id="fieldId" />
                     </div>
                     <div
                         class="bard-footer-toolbar"
@@ -164,7 +163,6 @@ import Text from '@tiptap/extension-text';
 import TextAlign from '@tiptap/extension-text-align';
 import Typography from '@tiptap/extension-typography';
 import Underline from '@tiptap/extension-underline';
-import BardSource from './Source.vue';
 import SetPicker from '../replicator/SetPicker.vue';
 import { DocumentBlock, DocumentInline } from './Document';
 import { Set } from './Set';
@@ -186,7 +184,6 @@ export default {
 
     components: {
         BubbleMenu,
-        BardSource,
         BardToolbarButton,
         SetPicker,
         EditorContent,
@@ -206,7 +203,6 @@ export default {
             editor: null,
             html: null,
             json: [],
-            showSource: false,
             fullScreenMode: false,
             buttons: [],
             collapsed: this.meta.collapsed,
@@ -225,10 +221,6 @@ export default {
     },
 
     computed: {
-        allowSource() {
-            return this.config.allow_source === undefined ? true : this.config.allow_source;
-        },
-
         toolbarIsFixed() {
             return this.config.toolbar_mode === 'fixed';
         },
@@ -238,11 +230,11 @@ export default {
         },
 
         showFixedToolbar() {
-            return this.toolbarIsFixed && (this.visibleButtons.length > 0 || this.allowSource || this.hasExtraButtons);
+            return this.toolbarIsFixed && (this.visibleButtons.length > 0 || this.hasExtraButtons);
         },
 
         hasExtraButtons() {
-            return this.allowSource || this.setConfigs.length > 0 || this.config.fullscreen;
+            return this.setConfigs.length > 0 || this.config.fullscreen;
         },
 
         readingTime() {
@@ -300,18 +292,6 @@ export default {
 
         site() {
             return this.storeState ? this.storeState.site : this.$config.get('selectedSite');
-        },
-
-        htmlWithReplacedLinks() {
-            return this.html.replaceAll(/\"statamic:\/\/(.*?)\"/g, (match, ref) => {
-                const linkData = this.meta.linkData[ref];
-                if (!linkData) {
-                    this.$toast.error(`${__('No link data found for')} ${ref}`);
-                    return '""';
-                }
-
-                return `"${linkData.permalink}"`;
-            });
         },
 
         setsWithErrors() {
@@ -394,12 +374,6 @@ export default {
                     run: this.toggleFullscreen,
                     visibleWhenReadOnly: true,
                     visible: this.config.fullscreen,
-                },
-                {
-                    title: __('Show HTML Source'),
-                    run: () => (this.showSource = !this.showSource),
-                    visibleWhenReadOnly: true,
-                    visible: this.allowSource,
                 },
             ];
         },

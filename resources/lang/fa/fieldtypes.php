@@ -22,7 +22,6 @@ return [
     'assets.dynamic_folder_pending_field' => 'پس از تنظیم :field این فیلد در دسترس خواهد بود.',
     'assets.dynamic_folder_pending_save' => 'این فیلد پس از ذخیره در دسترس خواهد بود.',
     'assets.title' => 'فایل',
-    'bard.config.allow_source' => 'امکان مشاهده‌ی سورس محتوا (HTML) را فعال سازید.',
     'bard.config.always_show_set_button' => 'همواره دکمه‌ی "افزودن مجموعه" نمایان باشد.',
     'bard.config.buttons' => 'مشخص کنید کدامین دکمه‌ها در نوار ابزار نمایان باشند.',
     'bard.config.container' => 'کانتینر فایل مورد استفاده برای این فیلد را مشخص کنید.',

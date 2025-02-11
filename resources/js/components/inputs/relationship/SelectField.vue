@@ -58,14 +58,13 @@
 
 <script>
 import PositionsSelectOptions from '../../../mixins/PositionsSelectOptions';
-import { SortableList, SortableItem } from '../../sortable/Sortable';
+import { SortableList } from '../../sortable/Sortable';
 
 export default {
     mixins: [PositionsSelectOptions],
 
     components: {
         SortableList,
-        SortableItem,
     },
 
     props: {

@@ -106,15 +106,13 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import { SortableList, SortableItem, SortableHelpers } from '../sortable/Sortable';
-import SortableKeyValue from '../sortable/SortableKeyValue';
+import { SortableList, SortableHelpers } from '../sortable/Sortable';
 
 export default {
     mixins: [Fieldtype, SortableHelpers],
 
     components: {
         SortableList,
-        SortableItem,
     },
 
     data: function () {

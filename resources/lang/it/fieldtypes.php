@@ -23,7 +23,6 @@ return [
     'assets.dynamic_folder_pending_field' => 'Questo campo sarà disponibile una volta che :field sarà impostato.',
     'assets.dynamic_folder_pending_save' => 'Questo campo sarà disponibile dopo il salvataggio.',
     'assets.title' => 'Assets',
-    'bard.config.allow_source' => 'Abilita la visualizzazione del codice sorgente HTML durante la scrittura.',
     'bard.config.always_show_set_button' => 'Abilita la visualizzazione permanente del pulsante "Aggiungi set".',
     'bard.config.buttons' => 'Scegli i pulsanti da mostrare nella barra degli strumenti.',
     'bard.config.container' => 'Scegli quale contenitore dei media utilizzare per questo campo.',

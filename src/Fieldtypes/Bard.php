@@ -106,12 +106,6 @@ class Bard extends Replicator
                         'type' => 'toggle',
                         'default' => true,
                     ],
-                    'allow_source' => [
-                        'display' => __('Allow Source Mode'),
-                        'instructions' => __('statamic::fieldtypes.bard.config.allow_source'),
-                        'type' => 'toggle',
-                        'default' => true,
-                    ],
                     'enable_input_rules' => [
                         'display' => __('Enable Input Rules'),
                         'instructions' => __('statamic::fieldtypes.bard.config.enable_input_rules'),
