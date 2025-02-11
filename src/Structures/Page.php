@@ -5,6 +5,7 @@ namespace Statamic\Structures;
 use ArrayAccess;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Traits\ForwardsCalls;
 use JsonSerializable;
 use Statamic\Contracts\Auth\Protect\Protectable;
@@ -417,7 +418,14 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Entr
     public function toResponse($request)
     {
         if ($this->reference && $this->referenceExists()) {
-            return (new \Statamic\Http\Responses\DataResponse($this))->toResponse($request);
+            $response = (new \Statamic\Http\Responses\DataResponse($this))->toResponse($request);
+
+            if ($updatedAt = $this->routeData()['updated_at'] ?? null) {
+                $response->setLastModified(Carbon::parse($updatedAt));
+            }
+
+            return $response
+                ->setEtag(md5($response->getContent() ?? ''));
         }
 
         throw new \LogicException('A page without a reference to an entry cannot be rendered.');
