@@ -31,7 +31,7 @@
         "stillat/blade-parser": "^1.10.1",
         "symfony/lock": "^6.4",
         "symfony/var-exporter": "^6.0",
-        "symfony/yaml": "^6.0 || ^7.0",
+        "symfony/yaml": "^7.0",
         "ueberdosis/tiptap-php": "^1.4",
         "voku/portable-ascii": "^2.0.2",
         "wilderborn/partyline": "^1.0"
