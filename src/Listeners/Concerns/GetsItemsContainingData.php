@@ -13,7 +13,7 @@ trait GetsItemsContainingData
     /**
      * Get items containing data.
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\LazyCollection
      */
     public function getItemsContainingData()
     {
