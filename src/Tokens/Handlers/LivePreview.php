@@ -4,8 +4,10 @@ namespace Statamic\Tokens\Handlers;
 
 use Closure;
 use Facades\Statamic\CP\LivePreview as Facade;
+use Illuminate\Support\Collection;
 use Statamic\Contracts\Tokens\Token;
-use Statamic\Facades\Site;
+use Statamic\Facades\Site as Sites;
+use Statamic\Sites\Site;
 
 class LivePreview
 {
@@ -17,20 +19,26 @@ class LivePreview
 
         $response = $next($request);
 
-        if (Site::multiEnabled()) {
-            $validURLs = Site::all()
-                ->map(function ($site) {
-                    $parts = parse_url($site->absoluteUrl());
-
-                    return $parts['scheme'].'://'.$parts['host'];
-                })->values()
+        if (Sites::multiEnabled()) {
+            /** @var Collection */
+            $siteURLs = Sites::all()
+                ->map(fn (Site $site) => $this->getSchemeAndHost($site))
+                ->values()
                 ->unique()
                 ->join(' ');
-            $response->headers->set('Content-Security-Policy "frame-ancestors '.$validURLs.'"');
+
+            $response->headers->set('Content-Security-Policy', "frame-ancestors '$siteURLs'");
         }
 
         $response->headers->set('X-Statamic-Live-Preview', true);
 
         return $response;
+    }
+
+    private function getSchemeAndHost(Site $site): string
+    {
+        $parts = parse_url($site->absoluteUrl());
+
+        return $parts['scheme'].'://'.$parts['host'];
     }
 }
