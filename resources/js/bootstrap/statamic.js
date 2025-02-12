@@ -1,6 +1,6 @@
 import { createApp, ref, markRaw } from 'vue';
 import App from './App.vue';
-import { createPinia } from 'pinia';
+import { createPinia, defineStore } from 'pinia';
 import axios from 'axios';
 import Config from '../components/Config';
 import Preferences from '../components/Preference';
@@ -84,6 +84,10 @@ export default {
 
     get $echo() {
         return this.$app.config.globalProperties.$echo;
+    },
+
+    get $pinia() {
+        return { defineStore };
     },
 
     get $permissions() {
