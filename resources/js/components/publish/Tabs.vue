@@ -117,7 +117,7 @@ import { uniq } from 'underscore';
 import { ValidatesFieldConditions } from '../field-conditions/FieldConditions.js';
 
 export default {
-    inject: ['storeName'],
+    inject: ['storeName', 'publishContainer'],
 
     mixins: [ValidatesFieldConditions],
 
@@ -131,10 +131,8 @@ export default {
     },
 
     data() {
-        const state = this.$store.state.publish[this.storeName];
-
         return {
-            active: state.blueprint.tabs[0].handle,
+            active: this.publishContainer.store.blueprint.tabs[0].handle,
             layoutReady: false,
             shouldShowSidebar: false,
             hiddenTabs: [],
@@ -146,7 +144,7 @@ export default {
 
     computed: {
         state() {
-            return this.$store.state.publish[this.storeName];
+            return this.publishContainer.store;
         },
 
         tabs() {

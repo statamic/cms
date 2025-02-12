@@ -53,7 +53,7 @@
 
             <div v-if="!loading" class="field-settings">
                 <publish-container
-                    :name="publishContainer"
+                    :name="`field-settings-${$.uid}`"
                     :blueprint="blueprint"
                     :values="values"
                     :meta="meta"
@@ -94,11 +94,7 @@
 
 <script>
 import PublishField from '../publish/Field.vue';
-import {
-    ValidatesFieldConditions,
-    FieldConditionsBuilder,
-    FIELD_CONDITIONS_KEYS,
-} from '../field-conditions/FieldConditions.js';
+import { FieldConditionsBuilder, FIELD_CONDITIONS_KEYS } from '../field-conditions/FieldConditions.js';
 import FieldValidationBuilder from '../field-validation/Builder.vue';
 
 export default {
@@ -107,8 +103,6 @@ export default {
         FieldConditionsBuilder,
         FieldValidationBuilder,
     },
-
-    mixins: [ValidatesFieldConditions],
 
     props: {
         id: String,
@@ -149,10 +143,6 @@ export default {
     },
 
     computed: {
-        publishContainer() {
-            return `field-settings-${this.$.uid}`;
-        },
-
         selectedWidth: function () {
             var width = this.config.width || 100;
             var found = _.findWhere(this.widths, { value: width });

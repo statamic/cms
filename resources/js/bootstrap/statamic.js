@@ -1,6 +1,6 @@
 import { createApp, ref, markRaw } from 'vue';
 import App from './App.vue';
-import { store } from '../store/store';
+import { createPinia, defineStore } from 'pinia';
 import axios from 'axios';
 import Config from '../components/Config';
 import Preferences from '../components/Preference';
@@ -50,12 +50,8 @@ export default {
         bootedCallbacks.push(callback);
     },
 
-    get $store() {
-        return store;
-    },
-
     get $config() {
-        return new Config(store);
+        return this.$app.config.globalProperties.$config;
     },
 
     get $preferences() {
@@ -90,6 +86,10 @@ export default {
         return this.$app.config.globalProperties.$echo;
     },
 
+    get $pinia() {
+        return { defineStore };
+    },
+
     get $permissions() {
         return this.$app.config.globalProperties.$permissions;
     },
@@ -111,7 +111,7 @@ export default {
     },
 
     config(config) {
-        store.commit('statamic/config', config);
+        this.initialConfig = config;
     },
 
     component(name, component) {
@@ -124,7 +124,7 @@ export default {
         this.$app.config.silent = false;
         this.$app.config.devtools = true;
 
-        this.$app.use(store);
+        this.$app.use(createPinia());
         this.$app.use(PortalVue, { portalName: 'v-portal' });
         this.$app.use(VueClickAway);
         this.$app.use(FloatingVue, { disposeTimeout: 30000, distance: 10 });
@@ -146,12 +146,15 @@ export default {
         components = new Components(this.$app);
 
         Object.assign(this.$app.config.globalProperties, {
+            $config: new Config(this.initialConfig),
+        });
+
+        Object.assign(this.$app.config.globalProperties, {
             $axios: axios,
             $moment: window.moment,
             $events: useGlobalEventBus(),
-            $preferences: new Preferences(store),
+            $preferences: new Preferences(),
             $progress: useProgressBar(),
-            $config: this.$config,
             $keys: new Keys(),
             $fieldActions: new FieldActions(),
             $conditions: new FieldConditions(),

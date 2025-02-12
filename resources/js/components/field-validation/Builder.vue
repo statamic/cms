@@ -133,7 +133,7 @@ export default {
 
     computed: {
         laravelVersion() {
-            return this.$store.state.statamic.config.laravelVersion;
+            return this.$config.get('laravelVersion');
         },
 
         laravelDocsLink() {

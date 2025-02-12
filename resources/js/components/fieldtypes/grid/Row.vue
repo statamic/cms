@@ -82,7 +82,7 @@ export default {
         },
     },
 
-    inject: ['grid', 'sortableItemClass', 'sortableHandleClass', 'storeName'],
+    inject: ['grid', 'sortableItemClass', 'sortableHandleClass', 'store'],
 
     data() {
         return {
@@ -116,7 +116,7 @@ export default {
         },
 
         errors(handle) {
-            const state = this.$store.state.publish[this.storeName];
+            const state = this.store;
             if (!state) return [];
             return state.errors[this.fieldPath(handle)] || [];
         },

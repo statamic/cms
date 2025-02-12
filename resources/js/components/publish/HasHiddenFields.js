@@ -3,15 +3,15 @@ import Values from './Values.js';
 export default {
     computed: {
         hiddenFields() {
-            return this.$store.state.publish[this.publishContainer].hiddenFields;
+            return this.store.hiddenFields;
         },
 
         jsonSubmittingFields() {
-            return this.$store.state.publish[this.publishContainer].jsonSubmittingFields;
+            return this.store.jsonSubmittingFields;
         },
 
         revealerFields() {
-            return this.$store.state.publish[this.publishContainer].revealerFields;
+            return this.store.revealerFields;
         },
 
         visibleValues() {

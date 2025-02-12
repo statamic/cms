@@ -7,7 +7,7 @@
             <button type="button" class="btn-close" @click="close">×</button>
         </div>
 
-        <div v-if="fieldtypesLoading" class="absolute inset-0 z-200 flex items-center justify-center text-center">
+        <div v-if="!fieldtypesLoaded" class="absolute inset-0 z-200 flex items-center justify-center text-center">
             <loading-graphic />
         </div>
 
@@ -74,11 +74,10 @@
 
 <script>
 import Fuse from 'fuse.js';
-import ProvidesFieldtypes from '../fields/ProvidesFieldtypes';
+import { ref } from 'vue';
+const loadedFieldtypes = ref(null);
 
 export default {
-    mixins: [ProvidesFieldtypes],
-
     props: {
         allowTitle: {
             default: false,
@@ -128,6 +127,16 @@ export default {
     },
 
     computed: {
+        fieldtypes() {
+            if (!this.fieldtypesLoaded) return;
+
+            return loadedFieldtypes.value;
+        },
+
+        fieldtypesLoaded() {
+            return Array.isArray(loadedFieldtypes.value);
+        },
+
         allFieldtypes() {
             if (!this.fieldtypesLoaded) return [];
 
@@ -226,6 +235,16 @@ export default {
                 });
             },
         },
+    },
+
+    created() {
+        if (this.fieldtypesLoaded) return;
+
+        let url = cp_url('fields/fieldtypes?selectable=true');
+
+        if (this.$config.get('isFormBlueprint')) url += '&forms=true';
+
+        this.$axios.get(url).then((response) => (loadedFieldtypes.value = response.data));
     },
 
     methods: {

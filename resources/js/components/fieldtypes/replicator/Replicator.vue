@@ -106,7 +106,7 @@ export default {
         AddSetButton,
     },
 
-    inject: ['storeName'],
+    inject: ['store', 'storeName'],
 
     data() {
         return {
@@ -151,7 +151,7 @@ export default {
         },
 
         storeState() {
-            return this.$store.state.publish[this.storeName] || {};
+            return this.store || {};
         },
 
         replicatorPreview() {

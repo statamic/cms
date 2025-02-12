@@ -700,7 +700,7 @@ export default {
             this.canPublish ? this.confirmPublish() : this.save();
         });
 
-        this.$store.commit(`publish/${this.publishContainer}/setPreloadedAssets`, this.preloadedAssets);
+        this.$refs.container.store.setPreloadedAssets(this.preloadedAssets);
     },
 
     created() {

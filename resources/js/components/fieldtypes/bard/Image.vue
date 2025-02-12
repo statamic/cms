@@ -98,7 +98,7 @@ export default {
         Selector,
     },
 
-    inject: ['storeName'],
+    inject: ['store'],
 
     props: [
         'editor', // the editor instance
@@ -186,10 +186,7 @@ export default {
         },
 
         loadAsset(id) {
-            let preloaded = _.find(
-                this.$store.state.publish[this.storeName].preloadedAssets,
-                (asset) => asset.id === id,
-            );
+            let preloaded = _.find(this.store.preloadedAssets, (asset) => asset.id === id);
 
             if (preloaded) {
                 // TODO

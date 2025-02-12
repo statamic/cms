@@ -4,11 +4,11 @@
 
 <script>
 export default {
-    inject: ['storeName'],
+    inject: ['store'],
 
     computed: {
         errors() {
-            return this.$store.state.publish[this.storeName].errors;
+            return this.store.errors;
         },
     },
 };

@@ -69,11 +69,10 @@ export default {
             previews: {},
             provide: {
                 group: this.makeGroupProvide(),
-                storeName: this.storeName,
             },
         };
     },
-    inject: ['storeName'],
+    inject: ['store'],
     computed: {
         values() {
             return this.value;
@@ -160,7 +159,7 @@ export default {
         },
 
         errors(handle) {
-            const state = this.$store.state.publish[this.storeName];
+            const state = this.store;
             if (!state) return [];
             return state.errors[this.fieldPath(handle)] || [];
         },

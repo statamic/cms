@@ -191,7 +191,7 @@ export default {
         LinkToolbarButton,
     },
 
-    inject: ['storeName'],
+    inject: ['store', 'storeName'],
 
     provide: {
         isInBardField: true,
@@ -285,9 +285,9 @@ export default {
         },
 
         storeState() {
-            if (!this.storeName) return undefined;
+            if (!this.store) return undefined;
 
-            return this.$store.state.publish[this.storeName];
+            return this.store;
         },
 
         site() {

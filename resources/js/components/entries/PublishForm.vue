@@ -895,7 +895,7 @@ export default {
                 this.save();
             }, this.autosaveInterval);
 
-            this.$store.commit(`publish/${this.publishContainer}/setAutosaveInterval`, interval);
+            this.$refs.container.setAutosaveInterval(interval);
         },
 
         afterActionSuccessfullyCompleted(response) {
@@ -928,7 +928,7 @@ export default {
             this.save();
         });
 
-        this.$store.commit(`publish/${this.publishContainer}/setPreloadedAssets`, this.preloadedAssets);
+        this.$refs.container.store.setPreloadedAssets(this.preloadedAssets);
 
         if (typeof this.autosaveInterval === 'number') {
             this.setAutosaveInterval();
@@ -949,7 +949,7 @@ export default {
     },
 
     beforeUnmount() {
-        this.$store.commit(`publish/${this.publishContainer}/clearAutosaveInterval`);
+        this.$refs.container.store.clearAutosaveInterval();
     },
 
     unmounted() {

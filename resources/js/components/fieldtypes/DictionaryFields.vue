@@ -18,7 +18,7 @@ import Fieldtype from './Fieldtype.vue';
 export default {
     mixins: [Fieldtype],
 
-    inject: ['storeName'],
+    inject: ['store'],
 
     computed: {
         dictionary() {
@@ -47,7 +47,7 @@ export default {
         },
 
         errors() {
-            const state = this.$store.state.publish[this.storeName];
+            const state = this.store;
 
             if (!state) {
                 return {};

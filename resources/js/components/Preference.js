@@ -1,13 +1,14 @@
 import axios from 'axios';
+import { ref } from 'vue';
 
 export default class Preference {
-    constructor(store) {
-        this.store = store;
+    constructor() {
         this.url = cp_url('preferences/js');
+        this.preferences = ref(Statamic.$config.get('user.preferences'));
     }
 
     all() {
-        return this.store.state.statamic.config.user.preferences;
+        return this.preferences.value;
     }
 
     get(key, fallback) {
@@ -32,7 +33,7 @@ export default class Preference {
 
     commitOnSuccessAndReturnPromise(promise) {
         promise.then((response) => {
-            this.store.commit('statamic/preferences', response.data);
+            this.preferences.value = response.data;
         });
 
         return promise;
