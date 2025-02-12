@@ -69,6 +69,6 @@ class AddsHeadersToLivePreviewTest extends TestCase
 
         $this->get('/test?token=test-token')
             ->assertHeader('X-Statamic-Live-Preview', true)
-            ->assertHeader('Content-Security-Policy', "frame-ancestors 'http://localhost http://third'");
+            ->assertHeader('Content-Security-Policy', 'frame-ancestors http://localhost http://third');
     }
 }

@@ -27,7 +27,7 @@ class LivePreview
                 ->unique()
                 ->join(' ');
 
-            $response->headers->set('Content-Security-Policy', "frame-ancestors '$siteURLs'");
+            $response->headers->set('Content-Security-Policy', "frame-ancestors $siteURLs");
         }
 
         $response->headers->set('X-Statamic-Live-Preview', true);
