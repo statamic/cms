@@ -125,8 +125,6 @@ return [
 
     'nocache' => 'cache',
 
-    'decouple_nocache_scripts' => false,
-
     /*
     |--------------------------------------------------------------------------
     | Replacers
