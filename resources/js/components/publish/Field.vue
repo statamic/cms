@@ -143,7 +143,7 @@ export default {
     },
 
     inject: {
-        storeName: { default: null },
+        store: {},
         isInsideConfigFields: { default: false },
     },
 
@@ -229,7 +229,7 @@ export default {
         },
 
         storeState() {
-            return this.$store.state.publish[this.storeName] || {};
+            return this.store || {};
         },
 
         hasNestedError() {

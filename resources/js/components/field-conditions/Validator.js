@@ -19,13 +19,12 @@ chainable({ chain, map, each, filter, reject, first, isEmpty });
 const NUMBER_SPECIFIC_COMPARISONS = ['>', '>=', '<', '<='];
 
 export default class {
-    constructor(field, values, dottedFieldPath, store, storeName) {
+    constructor(field, values, dottedFieldPath, store) {
         this.field = field;
         this.values = values;
         this.dottedFieldPath = dottedFieldPath;
         this.store = store;
-        this.storeName = storeName;
-        this.rootValues = store ? store.state.publish[storeName].values : false;
+        this.rootValues = store ? store.values : false;
         this.passOnAny = false;
         this.showOnPass = true;
         this.converter = new Converter();
@@ -257,7 +256,6 @@ export default class {
             values: this.values,
             root: this.rootValues,
             store: this.store,
-            storeName: this.storeName,
             fieldPath: this.dottedFieldPath,
         });
 
@@ -271,7 +269,7 @@ export default class {
             return this.passesConditions(conditions);
         }
 
-        let revealerFields = data_get(this.store.state.publish[this.storeName], 'revealerFields', []);
+        let revealerFields = this.store.revealerFields || [];
 
         let nonRevealerConditions = chain(this.getConditions())
             .reject((condition) =>

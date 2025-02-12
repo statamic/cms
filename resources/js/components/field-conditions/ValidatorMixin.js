@@ -2,11 +2,7 @@ import Validator from './Validator.js';
 import { data_get } from '../../bootstrap/globals.js';
 
 export default {
-    inject: {
-        storeName: {
-            default: 'base',
-        },
-    },
+    inject: ['publishContainer'],
 
     methods: {
         showField(field, dottedKey) {
@@ -29,8 +25,7 @@ export default {
                 field,
                 { ...this.values, ...this.extraValues },
                 dottedFieldPath,
-                this.$store,
-                this.storeName,
+                this.publishContainer.store,
             );
             let passes = validator.passesConditions();
 
@@ -58,14 +53,14 @@ export default {
         },
 
         setHiddenFieldState({ dottedKey, hidden, omitValue }) {
-            const currentValue = this.$store.state.publish[this.storeName].hiddenFields[dottedKey];
+            const currentValue = this.publishContainer.store.hiddenFields[dottedKey];
 
             // Prevent infinite loops
             if (currentValue && currentValue.hidden === hidden && currentValue.omitValue === omitValue) {
                 return;
             }
 
-            this.$store.commit(`publish/${this.storeName}/setHiddenField`, {
+            this.publishContainer.store.setHiddenField({
                 dottedKey,
                 hidden,
                 omitValue,
@@ -73,9 +68,7 @@ export default {
         },
 
         shouldForceHiddenField(dottedFieldPath) {
-            return (
-                data_get(this.$store.state.publish[this.storeName].hiddenFields[dottedFieldPath], 'hidden') === 'force'
-            );
+            return data_get(this.publishContainer.store.hiddenFields[dottedFieldPath], 'hidden') === 'force';
         },
     },
 };

@@ -70,6 +70,7 @@
     "mousetrap": "~1.6.5",
     "nprogress": "^0.2.0",
     "pdfobject": "^2.2.7",
+    "pinia": "^2.3.1",
     "portal-vue": "^3.0.0",
     "pretty": "^2.0.0",
     "pusher-js": "^8.4.0-rc2",
@@ -91,8 +92,7 @@
     "vue-final-modal": "^4.5.4",
     "vue-screen-utils": "^1.0.0-beta.13",
     "vue-select": "4.0.0-beta.6",
-    "vue3-click-away": "^1.2.4",
-    "vuex": "^4.1.0"
+    "vue3-click-away": "^1.2.4"
   },
   "devDependencies": {
     "@rollup/plugin-inject": "^5.0.3",

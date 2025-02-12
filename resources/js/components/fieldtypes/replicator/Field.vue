@@ -79,7 +79,7 @@ export default {
     },
 
     inject: {
-        storeName: { default: null },
+        store: { default: null },
         isInsideConfigFields: { default: false },
     },
 
@@ -107,7 +107,7 @@ export default {
         },
 
         storeState() {
-            return this.$store.state.publish[this.storeName] || [];
+            return this.store || [];
         },
 
         errors() {

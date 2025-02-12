@@ -47,11 +47,7 @@ export default {
         };
     },
 
-    inject: {
-        storeName: {
-            default: null,
-        },
-    },
+    inject: ['store'],
 
     computed: {
         maxItems() {
@@ -94,8 +90,8 @@ export default {
         },
 
         site() {
-            if (this.storeName) {
-                return this.$store.state.publish[this.storeName].site || this.$config.get('selectedSite');
+            if (this.store) {
+                return this.store.site || this.$config.get('selectedSite');
             }
 
             return this.$config.get('selectedSite');

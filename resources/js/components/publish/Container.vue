@@ -1,7 +1,9 @@
 <script>
+import { defineStore } from 'pinia';
 import uniqid from 'uniqid';
 import Component from '../Component';
-import { getCurrentInstance } from 'vue';
+import { getCurrentInstance, computed } from 'vue';
+import { usePublishContainerStore } from '@/stores/publish-container.js';
 
 export default {
     emits: ['updated', 'focus', 'blur'],
@@ -50,32 +52,7 @@ export default {
 
     data() {
         return {
-            components: [], // extra components to be injected
-        };
-    },
-
-    created() {
-        this.registerVuexModule();
-        this.$events.$emit('publish-container-created', this);
-    },
-
-    unmounted() {
-        this.removeVuexModule();
-        this.clearDirtyState();
-        this.$events.$emit('publish-container-destroyed', this);
-    },
-
-    provide() {
-        return {
-            storeName: this.name,
-        };
-    },
-
-    methods: {
-        registerVuexModule() {
-            const vm = this;
-
-            const initial = {
+            store: usePublishContainerStore(this.name, {
                 blueprint: _.clone(this.blueprint),
                 values: _.clone(this.values),
                 extraValues: _.clone(this.extraValues),
@@ -84,139 +61,37 @@ export default {
                 site: this.site,
                 isRoot: this.isRoot,
                 reference: this.reference,
-            };
+            }),
+            components: [], // extra components to be injected
+        };
+    },
 
-            this.$store.registerModule(['publish', this.name], {
-                namespaced: true,
-                state: {
-                    blueprint: initial.blueprint,
-                    values: initial.values,
-                    extraValues: initial.extraValues,
-                    hiddenFields: {},
-                    jsonSubmittingFields: [],
-                    revealerFields: [],
-                    meta: initial.meta,
-                    localizedFields: initial.localizedFields,
-                    site: initial.site,
-                    fieldLocks: {},
-                    errors: {},
-                    isRoot: initial.isRoot,
-                    preloadedAssets: [],
-                    autosaveInterval: null,
-                    reference: initial.reference,
-                },
-                mutations: {
-                    setFieldValue(state, payload) {
-                        const { handle, value } = payload;
-                        state.values[handle] = value;
-                    },
-                    setValues(state, values) {
-                        state.values = values;
-                    },
-                    setExtraValues(state, values) {
-                        state.extraValues = values;
-                    },
-                    setHiddenField(state, field) {
-                        state.hiddenFields[field.dottedKey] = {
-                            hidden: field.hidden,
-                            omitValue: field.omitValue,
-                        };
-                    },
-                    setFieldSubmitsJson(state, dottedKey) {
-                        if (state.jsonSubmittingFields.indexOf(dottedKey) === -1) {
-                            state.jsonSubmittingFields.push(dottedKey);
-                        }
-                    },
-                    unsetFieldSubmitsJson(state, dottedKey) {
-                        const index = state.jsonSubmittingFields.indexOf(dottedKey);
-                        if (index !== -1) {
-                            state.jsonSubmittingFields.splice(index, 1);
-                        }
-                    },
-                    setRevealerField(state, dottedKey) {
-                        if (state.revealerFields.indexOf(dottedKey) === -1) {
-                            state.revealerFields.push(dottedKey);
-                        }
-                    },
-                    unsetRevealerField(state, dottedKey) {
-                        const index = state.revealerFields.indexOf(dottedKey);
-                        if (index !== -1) {
-                            state.revealerFields.splice(index, 1);
-                        }
-                    },
-                    setMeta(state, meta) {
-                        state.meta = meta;
-                    },
-                    setFieldMeta(state, payload) {
-                        const { handle, value } = payload;
-                        state.meta[handle] = value;
-                    },
-                    setIsRoot(state, isRoot) {
-                        state.isRoot = isRoot;
-                    },
-                    setBlueprint(state, blueprint) {
-                        state.blueprint = blueprint;
-                    },
-                    setErrors(state, errors) {
-                        state.errors = errors;
-                    },
-                    setSite(state, site) {
-                        state.site = site;
-                    },
-                    setLocalizedFields(state, fields) {
-                        state.localizedFields = fields;
-                    },
-                    lockField(state, { handle, user }) {
-                        state.fieldLocks[handle] = user || true;
-                    },
-                    unlockField(state, handle) {
-                        delete state.fieldLocks[handle];
-                    },
-                    initialize(state, payload) {
-                        state.blueprint = payload.blueprint;
-                        state.values = payload.values;
-                        state.meta = payload.meta;
-                        state.site = payload.site;
-                    },
-                    setPreloadedAssets(state, assets) {
-                        state.preloadedAssets = assets;
-                    },
-                    setAutosaveInterval(state, interval) {
-                        if (state.autosaveInterval) {
-                            clearInterval(state.autosaveInterval);
-                        }
-                        state.autosaveInterval = interval;
-                    },
-                    clearAutosaveInterval(state) {
-                        clearInterval(state.autosaveInterval);
-                    },
-                },
-                actions: {
-                    setFieldValue(context, payload) {
-                        context.commit('setFieldValue', payload);
-                        vm.emitUpdatedEvent(context.state.values);
-                    },
-                    setFieldMeta(context, payload) {
-                        context.commit('setFieldMeta', payload);
-                    },
-                    setValues(context, payload) {
-                        context.commit('setValues', payload);
-                        vm.emitUpdatedEvent(context.state.values);
-                    },
-                    setExtraValues(context, payload) {
-                        context.commit('setExtraValues', payload);
-                    },
-                    setMeta(context, payload) {
-                        context.commit('setMeta', payload);
-                    },
-                },
-            });
-        },
+    created() {
+        this.$events.$emit('publish-container-created', this);
 
-        removeVuexModule() {
-            this.$store.unregisterModule(['publish', this.name]);
-        },
+        this.store.$subscribe((mutation, state) => {
+            this.emitUpdatedEvent(state.values);
+        });
+    },
 
+    beforeUnmount() {
+        this.store.$dispose();
+    },
+
+    unmounted() {
+        this.clearDirtyState();
+        this.$events.$emit('publish-container-destroyed', this);
+    },
+
+    provide() {
+        return {
+            storeName: this.name,
+            publishContainer: this,
+            store: computed(() => this.store),
+        };
+    },
+
+    methods: {
         emitUpdatedEvent(values) {
             this.$emit('updated', values);
             this.dirty();
@@ -242,7 +117,7 @@ export default {
         },
 
         setFieldValue(handle, value) {
-            this.$store.dispatch(`publish/${this.name}/setFieldValue`, {
+            this.store.setFieldValue({
                 handle,
                 value,
                 user: Statamic.user.id,
@@ -250,11 +125,19 @@ export default {
         },
 
         setFieldMeta(handle, value) {
-            this.$store.dispatch(`publish/${this.name}/setFieldMeta`, {
+            this.store.setFieldMeta({
                 handle,
                 value,
                 user: Statamic.user.id,
             });
+        },
+
+        setValues(values) {
+            this.store.values = values;
+        },
+
+        setMeta(meta) {
+            this.store.meta = meta;
         },
 
         dirty() {
@@ -265,55 +148,59 @@ export default {
     watch: {
         values: {
             deep: true,
-            handler(after, before) {
+            handler(after) {
+                const before = this.store.values;
                 if (_.isEqual(before, after)) return;
-                this.$store.commit(`publish/${this.name}/setValues`, after);
+                this.store.setValues(after);
             },
         },
 
         extraValues: {
             deep: true,
-            handler(after, before) {
+            handler(after) {
+                const before = this.store.extraValues;
                 if (_.isEqual(before, after)) return;
-                this.$store.commit(`publish/${this.name}/setExtraValues`, after);
+                this.store.setExtraValues(after);
             },
         },
 
         meta: {
             deep: true,
-            handler(after, before) {
+            handler(after) {
+                const before = this.store.meta;
                 if (_.isEqual(before, after)) return;
-                this.$store.commit(`publish/${this.name}/setMeta`, after);
+                this.store.setMeta(after);
             },
         },
 
         isRoot(isRoot) {
-            this.$store.commit(`publish/${this.name}/setIsRoot`, isRoot);
+            this.store.setIsRoot(isRoot);
         },
 
         blueprint: {
             deep: true,
             handler(blueprint) {
-                this.$store.commit(`publish/${this.name}/setBlueprint`, blueprint);
+                this.store.setBlueprint(blueprint);
             },
         },
 
         site(site) {
-            this.$store.commit(`publish/${this.name}/setSite`, site);
+            this.store.setSite(site);
         },
 
         errors(errors) {
-            this.$store.commit(`publish/${this.name}/setErrors`, errors);
+            this.store.setErrors(errors);
         },
 
         localizedFields(fields) {
-            this.$store.commit(`publish/${this.name}/setLocalizedFields`, fields);
+            this.store.setLocalizedFields(fields);
         },
     },
 
     render() {
         return this.$slots.default({
-            values: this.$store.state.publish[this.name].values,
+            values: this.store.values,
+            meta: this.store.meta,
             container: this,
             components: this.components,
             setFieldValue: this.setFieldValue,

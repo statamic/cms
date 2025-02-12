@@ -49,9 +49,7 @@ import Fieldtype from './Fieldtype.vue';
 export default {
     mixins: [Fieldtype],
 
-    inject: {
-        storeName: { default: null },
-    },
+    inject: ['store'],
 
     data() {
         return {
@@ -66,10 +64,6 @@ export default {
             return this.config.separator || '-';
         },
 
-        store() {
-            return this.storeName;
-        },
-
         source() {
             if (!this.generate) return;
 
@@ -81,12 +75,12 @@ export default {
                 key = dottedPrefix + '.' + field;
             }
 
-            return data_get(this.$store.state.publish[this.store].values, key);
+            return this.store?.values[key] || null;
         },
 
         language() {
             if (!this.store) return;
-            const targetSite = this.$store.state.publish[this.store].site;
+            const targetSite = this.store.site;
             return targetSite ? Statamic.$config.get('sites').find((site) => site.handle === targetSite).lang : null;
         },
     },

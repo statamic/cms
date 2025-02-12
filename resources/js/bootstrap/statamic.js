@@ -1,6 +1,6 @@
 import { createApp, ref, markRaw } from 'vue';
 import App from './App.vue';
-import { store } from '../store/store';
+import { createPinia } from 'pinia';
 import axios from 'axios';
 import Config from '../components/Config';
 import Preferences from '../components/Preference';
@@ -48,10 +48,6 @@ export default {
 
     booted(callback) {
         bootedCallbacks.push(callback);
-    },
-
-    get $store() {
-        return store;
     },
 
     get $config() {
@@ -124,7 +120,7 @@ export default {
         this.$app.config.silent = false;
         this.$app.config.devtools = true;
 
-        this.$app.use(store);
+        this.$app.use(createPinia());
         this.$app.use(PortalVue, { portalName: 'v-portal' });
         this.$app.use(VueClickAway);
         this.$app.use(FloatingVue, { disposeTimeout: 30000, distance: 10 });
