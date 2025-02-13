@@ -44,6 +44,8 @@ class FrontendController extends Controller
         $view = Arr::pull($params, 'view');
         $data = Arr::pull($params, 'data');
 
+        throw_if(is_callable($view) && $data, new \Exception('Parameter [$data] not supported with [$view] closure!'));
+
         if (is_callable($view)) {
             $resolvedView = $view(...$params);
         }
