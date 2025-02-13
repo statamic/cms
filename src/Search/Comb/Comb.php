@@ -605,7 +605,7 @@ class Comb
                     }
 
                     // snippet extraction (only needs to run during one chunk)
-                    if ($matched && !isset($snippets[$name])) {
+                    if ($matched && ! isset($snippets[$name])) {
                         $snippets[$name] = $this->extractSnippets($property, $params['chunks']);
                     }
                 }
