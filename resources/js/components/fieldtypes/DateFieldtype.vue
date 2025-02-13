@@ -1,5 +1,8 @@
 <template>
     <div class="datetime min-w-[145px]">
+        <p>UTC: {{ value }}</p>
+        <p>Local: {{ localValue }}</p>
+
         <button
             type="button"
             class="btn mb-2 flex items-center md:mb-0 ltr:pl-3 rtl:pr-3"
@@ -15,7 +18,7 @@
             <component
                 :is="pickerComponent"
                 v-bind="pickerProps"
-                @update:model-value="setDate"
+                @update:model-value="setLocalDate"
                 @focus="focusedField = $event"
                 @blur="focusedField = null"
             />
@@ -25,12 +28,12 @@
                     v-if="hasTime"
                     ref="time"
                     handle=""
-                    :value="value.time"
+                    :value="localValue.time"
                     :required="config.time_enabled"
                     :show-seconds="config.time_seconds_enabled"
                     :read-only="isReadOnly"
                     :config="{}"
-                    @input="setTime"
+                    @update:value="setLocalTime"
                 />
             </div>
         </div>
@@ -72,6 +75,8 @@ export default {
         return {
             containerWidth: null,
             focusedField: null,
+            localValue: null,
+            mounted: false,
         };
     },
 
@@ -93,7 +98,7 @@ export default {
         },
 
         hasSeconds() {
-            return this.config.time_has_seconds;
+            return this.config.time_seconds_enabled;
         },
 
         isSingle() {
@@ -120,6 +125,7 @@ export default {
         },
 
         datePickerValue() {
+            // todo: ranges
             if (this.isRange) return this.value.date;
 
             // The calendar component will do `new Date(datePickerValue)` under the hood.
@@ -127,7 +133,7 @@ export default {
             // it will behave as local time. The date that comes from the server will be what
             // we expect. The time is handled separately by the nested time fieldtype.
             // https://github.com/statamic/cms/pull/6688
-            return this.value.date + 'T00:00:00';
+            return this.localValue.date + 'T00:00:00';
         },
 
         commonDatePickerBindings() {
@@ -191,35 +197,102 @@ export default {
         if (this.value.time === 'now') {
             // Probably shouldn't be modifying a prop, but luckily it all works nicely, without
             // needing to create an "update value without triggering dirty state" flow yet.
-            this.value.time = this.$moment().format(this.hasSeconds ? 'HH:mm:ss' : 'HH:mm');
+            this.value.time = this.$moment().format(this.hasSeconds ? 'HH:mm:ss' : 'HH:mm'); // todo: utc me
         }
 
+        this.localValue = this.createLocalFromUtc();
+
         this.$events.$on(`container.${this.storeName}.saving`, this.triggerChangeOnFocusedField);
+    },
+
+    mounted() {
+        this.mounted = true;
     },
 
     unmounted() {
         this.$events.$off(`container.${this.storeName}.saving`, this.triggerChangeOnFocusedField);
     },
 
+    watch: {
+        localValue(value) {
+            if (! this.mounted) {
+                return;
+            }
+
+            this.update(this.createUtcFromLocal(value));
+        },
+    },
+
     methods: {
+        createLocalFromUtc() {
+            // todo: deal with ranges
+
+            const localTime = new Date(this.value.date + 'T' + (this.hasTime ? this.value.time : '00:00:00') + 'Z');
+
+            let date = localTime.getFullYear() + '-' + (localTime.getMonth() + 1).toString().padStart(2, '0') + '-' + localTime.getDate().toString().padStart(2, '0');
+            let time = null;
+
+            if (this.hasTime) {
+                time = localTime.getHours().toString().padStart(2, '0') + ':' + localTime.getMinutes().toString().padStart(2, '0');
+
+                if (this.hasSeconds) {
+                    time += ':' + localTime.getSeconds().toString().padStart(2, '0');
+                }
+            }
+
+            return { date, time };
+        },
+
+        createUtcFromLocal() {
+            // todo: ranges again
+
+            const utcTime = new Date(this.localValue.date + 'T' + (this.hasTime ? this.localValue.time : '00:00:00'));
+
+            let date = utcTime.getUTCFullYear() + '-' + (utcTime.getUTCMonth() + 1).toString().padStart(2, '0') + '-' + utcTime.getUTCDate().toString().padStart(2, '0');
+            let time = null;
+
+            if (this.hasTime) {
+                time = utcTime.getUTCHours().toString().padStart(2, '0') + ':' + utcTime.getUTCMinutes().toString().padStart(2, '0');
+
+                if (this.hasSeconds) {
+                    time += ':' + utcTime.getUTCSeconds().toString().padStart(2, '0');
+                }
+            }
+
+            return { date, time };
+        },
+
         triggerChangeOnFocusedField() {
             if (!this.focusedField) return;
 
             this.focusedField.dispatchEvent(new Event('change'));
         },
 
-        setDate(date) {
+        setLocalDate(date) {
             if (!date) {
-                this.update({ date: null, time: null });
+                this.localValue = { date: null, time: null };
                 return;
             }
 
-            this.update({ ...this.value, date });
+            this.localValue = { ...this.localValue, date };
         },
 
-        setTime(time) {
-            this.update({ ...this.value, time });
+        // setLocalDate(date) {
+        //     if (!date) {
+        //         this.update({ date: null, time: null });
+        //         return;
+        //     }
+        //
+        //     this.update({ ...this.value, date });
+        // },
+
+        setLocalTime(time) {
+            this.localValue = { ...this.localValue, time };
         },
+
+        // setTime(time) {
+        //     this.update({ ...this.value, time });
+        // },
 
         addDate() {
             const now = this.$moment().format(this.format);
