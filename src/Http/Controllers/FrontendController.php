@@ -39,9 +39,14 @@ class FrontendController extends Controller
     public function route(Request $request, ...$args)
     {
         $params = $request->route()->parameters();
+
+        $segments = Arr::except($params, ['view', 'data']);
+
         $view = Arr::pull($params, 'view');
+        $view = is_callable($view) ? $view(...$segments) : $view;
+
         $data = Arr::pull($params, 'data');
-        $data = array_merge($params, is_callable($data) ? $data(...$params) : $data);
+        $data = array_merge($params, is_callable($data) ? $data(...$segments) : $data);
 
         $view = app(View::class)
             ->template($view)
