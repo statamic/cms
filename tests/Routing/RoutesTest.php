@@ -2,6 +2,7 @@
 
 namespace Tests\Routing;
 
+use Exception;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Facades\Route;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -40,6 +41,10 @@ class RoutesTest extends TestCase
             Route::statamic('/basic-route-with-data-closure', 'test', function () {
                 return ['hello' => 'world'];
             });
+
+            Route::statamic('/you-cannot-use-data-param-with-view-closure', function () {
+                return view('test', ['hello' => 'world']);
+            }, 'hello');
 
             Route::statamic('/basic-route-without-data', 'test');
 
@@ -142,6 +147,16 @@ class RoutesTest extends TestCase
         $this->get('/basic-route-with-data-closure')
             ->assertOk()
             ->assertSee('Hello world');
+    }
+
+    #[Test]
+    public function it_throws_exception_if_you_try_to_pass_data_parameter_when_using_view_closure()
+    {
+        $this->withoutExceptionHandling();
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Parameter [$data] not supported with [$view] closure!');
+
+        $this->get('/you-cannot-use-data-param-with-view-closure');
     }
 
     #[Test]
