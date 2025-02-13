@@ -54,7 +54,7 @@ class FrontendController extends Controller
             $view = $resolvedView->name();
             $data = $resolvedView->getData();
         } elseif (isset($resolvedView)) {
-            return $view;
+            return $resolvedView;
         }
 
         $data = array_merge($params, is_callable($data) ? $data(...$params) : $data);
