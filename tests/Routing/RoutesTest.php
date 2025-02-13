@@ -38,6 +38,10 @@ class RoutesTest extends TestCase
                 return view('test', ['hello' => 'world']);
             });
 
+            Route::statamic('/basic-route-with-view-closure-and-custom-return', function () {
+                return ['message' => 'not a view instance'];
+            });
+
             Route::statamic('/basic-route-with-data-closure', 'test', function () {
                 return ['hello' => 'world'];
             });
@@ -136,6 +140,16 @@ class RoutesTest extends TestCase
         $this->get('/basic-route-with-view-closure')
             ->assertOk()
             ->assertSee('Hello world');
+    }
+
+    #[Test]
+    public function it_renders_a_view_using_a_custom_view_closure_that_does_not_return_a_view_instance()
+    {
+        $this->get('/basic-route-with-view-closure-and-custom-return')
+            ->assertOk()
+            ->assertJson([
+                'message' => 'not a view instance',
+            ]);
     }
 
     #[Test]
