@@ -214,7 +214,6 @@ class RoutesTest extends TestCase
     #[Test]
     public function it_renders_with_placeholders_using_both_view_and_data_closures()
     {
-        $this->withoutExceptionHandling();
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
         $this->viewShouldReturnRaw('test', 'Hello {{ hello }}');
 
@@ -239,7 +238,6 @@ class RoutesTest extends TestCase
     #[DataProvider('undefinedLayoutRouteProvider')]
     public function it_renders_a_view_without_a_layout($route)
     {
-        $this->withoutExceptionHandling();
         $this->viewShouldReturnRaw('layout', 'The layout {{ template_content }}');
         $this->viewShouldReturnRaw('test', 'Hello {{ hello }}');
 
@@ -287,7 +285,6 @@ class RoutesTest extends TestCase
     #[Test]
     public function it_renders_a_view_with_custom_content_type()
     {
-        $this->withoutExceptionHandling();
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
         $this->viewShouldReturnRaw('test', '{"hello":"{{ hello }}"}');
 
