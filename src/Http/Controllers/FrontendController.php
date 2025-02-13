@@ -44,7 +44,7 @@ class FrontendController extends Controller
         $view = Arr::pull($params, 'view');
         $data = Arr::pull($params, 'data');
 
-        $data = array_merge($params, ray()->pass(is_callable($data) ? $data(...$params) : $data));
+        $data = array_merge($params, is_callable($data) ? $data(...$params) : $data);
 
         if (is_callable($view)) {
             $view = $view(...$params);
