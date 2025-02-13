@@ -37,11 +37,23 @@ class RoutesTest extends TestCase
                 return ['hello' => 'world'];
             });
 
+            Route::statamic('/basic-route-with-view-and-data-closures', function () {
+                return 'test';
+            }, function () {
+                return ['hello' => 'world'];
+            });
+
             Route::statamic('/basic-route-without-data', 'test');
 
             Route::statamic('/route/with/placeholders/{foo}/{bar}/{baz}', 'test');
 
             Route::statamic('/route/with/placeholders/closure/{foo}/{bar}/{baz}', 'test', function ($foo, $bar, $baz) {
+                return ['hello' => "$foo $bar $baz"];
+            });
+
+            Route::statamic('/route/with/placeholders/both/closures/{foo}/{bar}/{baz}', function ($foo, $bar, $baz) {
+                return $foo.$bar.$baz;
+            }, function ($foo, $bar, $baz) {
                 return ['hello' => "$foo $bar $baz"];
             });
 
@@ -126,6 +138,17 @@ class RoutesTest extends TestCase
     }
 
     #[Test]
+    public function it_renders_both_view_and_data_from_closures()
+    {
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('test', 'Hello {{ hello }}');
+
+        $this->get('/basic-route-with-view-and-data-closures')
+            ->assertOk()
+            ->assertSee('Hello world');
+    }
+
+    #[Test]
     public function it_renders_a_view_without_data()
     {
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
@@ -156,6 +179,18 @@ class RoutesTest extends TestCase
         $this->get('/route/with/placeholders/closure/one/two/three')
             ->assertOk()
             ->assertSee('Hello one two three');
+    }
+
+    #[Test]
+    public function it_renders_with_placeholders_using_both_view_and_data_closures()
+    {
+        $this->withoutExceptionHandling();
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('test', 'Hello {{ hello }}');
+
+        $this->get('/route/with/placeholders/both/closures/te/s/t')
+            ->assertOk()
+            ->assertSee('Hello te s t');
     }
 
     #[Test]
