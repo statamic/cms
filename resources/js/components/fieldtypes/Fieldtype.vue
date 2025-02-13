@@ -7,6 +7,10 @@ export default {
     mixins: [HasFieldActions],
 
     inject: {
+        fieldActionStore: {
+            from: 'store',
+            default: null,
+        },
         fieldActionStoreName: {
             from: 'storeName',
             default: null,
@@ -106,7 +110,7 @@ export default {
                 update: this.update,
                 updateMeta: this.updateMeta,
                 isReadOnly: this.isReadOnly,
-                store: this.$store,
+                store: this.fieldActionStore,
                 storeName: this.fieldActionStoreName,
             };
         },

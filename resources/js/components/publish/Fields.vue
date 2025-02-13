@@ -32,7 +32,7 @@ export default {
 
     mixins: [ValidatesFieldConditions],
 
-    inject: ['storeName'],
+    inject: ['publishContainer', 'store'],
 
     props: {
         fields: {
@@ -46,24 +46,20 @@ export default {
     },
 
     computed: {
-        state() {
-            return this.$store.state.publish[this.storeName];
-        },
-
         values() {
-            return this.state.values;
+            return this.store.values || {};
         },
 
         extraValues() {
-            return this.state.extraValues || {};
+            return this.store.extraValues || {};
         },
 
         meta() {
-            return this.state.meta;
+            return this.store.meta || {};
         },
 
         errors() {
-            return this.state.errors;
+            return this.store.errors || {};
         },
     },
 

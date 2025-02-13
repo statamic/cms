@@ -46,17 +46,15 @@ export default {
         namePrefix: String,
     },
 
-    computed: {
-        state() {
-            return this.$store.state.publish[this.storeName];
-        },
+    inject: ['publishContainer'],
 
+    computed: {
         values() {
-            return this.state.values;
+            return this.publishContainer.store.values;
         },
 
         extraValues() {
-            return this.state.extraValues;
+            return this.publishContainer.store.extraValues;
         },
 
         visibleSections() {

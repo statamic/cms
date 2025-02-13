@@ -46,7 +46,7 @@
 
 <script>
 export default {
-    props: ['handle', 'value', 'state', 'columnHeader'],
+    props: ['handle', 'value', 'store', 'columnHeader'],
 
     computed: {
         mode() {
@@ -54,14 +54,12 @@ export default {
         },
 
         sites() {
-            let state = this.state;
+            if (!this.store.values.sites) return [];
 
-            if (!state.values.sites) return [];
-
-            return state.values.sites.map((handle, i) => {
+            return this.store.values.sites.map((handle, i) => {
                 return {
                     handle,
-                    name: state.meta.sites.data[i].title,
+                    name: this.store.meta.sites.data[i].title,
                 };
             });
         },

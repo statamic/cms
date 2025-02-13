@@ -105,7 +105,7 @@ export default {
 
     mixins: [ValidatesFieldConditions, ManagesPreviewText, HasFieldActions],
 
-    inject: ['bard', 'bardSets', 'storeName'],
+    inject: ['bard', 'bardSets', 'store', 'storeName'],
 
     computed: {
         fields() {
@@ -217,7 +217,7 @@ export default {
                 update: (handle, value) => this.updated(handle, value),
                 updateMeta: (handle, value) => this.metaUpdated(handle, value),
                 isReadOnly: this.isReadOnly,
-                store: this.$store,
+                store: this.store,
                 storeName: this.storeName,
             };
         },

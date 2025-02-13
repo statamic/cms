@@ -41,21 +41,21 @@ export default {
         },
     },
 
-    inject: ['storeName'],
+    inject: ['store'],
 
     mounted() {
-        this.$store.commit(`publish/${this.storeName}/setRevealerField`, this.fieldPath);
+        this.store.setRevealerField(this.fieldPath);
     },
 
     beforeUnmount() {
-        this.$store.commit(`publish/${this.storeName}/unsetRevealerField`, this.fieldPath);
+        this.store.unsetRevealerField(this.fieldPath);
     },
 
     watch: {
         fieldPath(fieldPath, oldFieldPath) {
-            this.$store.commit(`publish/${this.storeName}/unsetRevealerField`, oldFieldPath);
+            this.store.unsetRevealerField(oldFieldPath);
             this.$nextTick(() => {
-                this.$store.commit(`publish/${this.storeName}/setRevealerField`, fieldPath);
+                this.store.setRevealerField(fieldPath);
             });
         },
     },
@@ -66,7 +66,7 @@ export default {
                 return;
             }
 
-            this.$store.commit(`publish/${this.storeName}/setHiddenField`, {
+            this.store.setHiddenField({
                 dottedKey: this.fieldPath,
                 hidden: 'force',
                 omitValue: true,

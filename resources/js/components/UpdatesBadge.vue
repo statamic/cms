@@ -5,44 +5,30 @@
 </template>
 
 <script>
+import { ref } from 'vue';
+const count = ref(null);
+const requested = ref(false);
+
 export default {
     computed: {
         count() {
-            return this.$store.state.updates.count;
+            return count;
         },
     },
 
     created() {
-        this.registerVuexModule();
-
         this.getCount();
     },
 
     methods: {
-        registerVuexModule() {
-            if (this.$store.state.updates) return;
-
-            this.$store.registerModule('updates', {
-                namespaced: true,
-                state: {
-                    count: 0,
-                    requested: false,
-                },
-                mutations: {
-                    count: (state, count) => (state.count = count),
-                    requested: (state) => (state.requested = true),
-                },
-            });
-        },
-
         getCount() {
-            if (this.$store.state.updates.requested) return;
+            if (requested.value) return;
 
             this.$axios
                 .get(cp_url('updater/count'))
-                .then((response) => this.$store.commit('updates/count', !isNaN(response.data) ? response.data : 0));
+                .then((response) => (count.value = !isNaN(response.data) ? response.data : 0));
 
-            this.$store.commit('updates/requested');
+            requested.value = true;
         },
     },
 };

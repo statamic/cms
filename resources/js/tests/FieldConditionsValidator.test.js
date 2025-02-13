@@ -1,117 +1,56 @@
-import { test, expect, afterEach } from 'vitest';
+import { test, expect, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { nextTick } from 'vue';
-import { createStore } from 'vuex';
+import { createPinia } from 'pinia';
 import ValidatesFieldConditions from '../components/field-conditions/ValidatorMixin.js';
 import { data_get } from '../bootstrap/globals';
+import FieldConditions from '@/components/FieldConditions';
+import PublishContainer from '@/components/publish/Container.vue';
 
-const Store = createStore({
-    modules: {
-        statamic: {
-            namespaced: true,
-            state: {
-                conditions: {},
-            },
-            mutations: {
-                setCondition(state, payload) {
-                    state.conditions[payload.name] = payload.condition;
-                },
-            },
-        },
-        publish: {
-            namespaced: true,
-            modules: {
-                base: {
-                    namespaced: true,
-                    state: {
-                        values: {},
-                        hiddenFields: {},
-                        revealerFields: [],
-                    },
-                    mutations: {
-                        setValues(state, values) {
-                            state.values = values;
-                        },
-                        setHiddenField(state, field) {
-                            state.hiddenFields[field.dottedKey] = {
-                                hidden: field.hidden,
-                                omitValue: field.omitValue,
-                            };
-                        },
-                        setRevealerField(state, dottedKey) {
-                            state.revealerFields.push(dottedKey);
-                        },
-                        reset(state) {
-                            state.values = {};
-                            state.hiddenFields = {};
-                            state.revealerFields = [];
-                        },
-                    },
-                },
-            },
-        },
-    },
-});
+let Store;
+let Fields;
 
 const Statamic = {
-    $conditions: {
-        add: (name, condition) => Store.commit('statamic/setCondition', { name, condition }),
-    },
+    $conditions: new FieldConditions(),
+};
+window.Statamic = Statamic;
+
+const setValues = function (values, nestedKey) {
+    Fields.values = values;
+
+    let storeValues = {};
+    if (nestedKey) {
+        storeValues[nestedKey] = values;
+    } else {
+        storeValues = values;
+    }
+
+    setStoreValues(storeValues);
 };
 
-const app = {
-    mixins: [ValidatesFieldConditions],
-    data() {
-        return {
-            values: {},
-            extraValues: {},
-        };
-    },
-    methods: {
-        setValues(values, nestedKey) {
-            this.values = values;
-            let storeValues = {};
-            if (nestedKey) {
-                storeValues[nestedKey] = values;
-            } else {
-                storeValues = values;
-            }
-            Store.commit('publish/base/setValues', storeValues);
-        },
-        setExtraValues(values) {
-            this.extraValues = values;
-        },
-        setStoreValues(values) {
-            Store.commit('publish/base/setValues', values);
-        },
-        setHiddenField(payload) {
-            Store.commit('publish/base/setHiddenField', payload);
-        },
-        setHiddenFieldsState: async (fieldConfigs, dottedPrefix) => {
-            fieldConfigs
-                .filter((fieldConfig) => fieldConfig.type === 'revealer')
-                .forEach((fieldConfig) => {
-                    Store.commit(
-                        'publish/base/setRevealerField',
-                        dottedPrefix ? `${dottedPrefix}.${fieldConfig.handle}` : fieldConfig.handle,
-                    );
-                });
-            fieldConfigs.forEach((fieldConfig) => {
-                Fields.showField(fieldConfig, dottedPrefix ? `${dottedPrefix}.${fieldConfig.handle}` : null);
-            });
-            await nextTick();
-        },
-    },
-    template: `<div></div>`, // Silence warning about missing template
+const setExtraValues = function (values) {
+    Fields.extraValues = values;
 };
 
-const wrapper = mount(app, {
-    global: {
-        plugins: [Store],
-    },
-});
+const setStoreValues = function (values) {
+    Store.setValues(values);
+};
 
-const Fields = wrapper.vm;
+const setHiddenField = function (payload) {
+    Store.setHiddenField(payload);
+};
+
+const setHiddenFieldsState = async function (fieldConfigs, dottedPrefix) {
+    fieldConfigs
+        .filter((fieldConfig) => fieldConfig.type === 'revealer')
+        .forEach((fieldConfig) => {
+            Store.setRevealerField(dottedPrefix ? `${dottedPrefix}.${fieldConfig.handle}` : fieldConfig.handle);
+        });
+    fieldConfigs.forEach((fieldConfig) => {
+        Fields.showField(fieldConfig, dottedPrefix ? `${dottedPrefix}.${fieldConfig.handle}` : null);
+    });
+    await nextTick();
+};
 
 let showFieldIf = function (conditions = null, dottedFieldPath = null) {
     if (dottedFieldPath === null && conditions && Object.keys(conditions).length === 1) {
@@ -121,10 +60,49 @@ let showFieldIf = function (conditions = null, dottedFieldPath = null) {
     return Fields.showField(conditions ? { if: conditions } : {}, dottedFieldPath);
 };
 
-afterEach(() => {
-    Fields.values = {};
-    Fields.extraValues = {};
-    Store.commit('publish/base/reset');
+beforeEach(() => {
+    // The mixin is intended to be used on a component that is a descendant of a PublishContainer.
+    // The component itself should track its own values which will be used for validating conditions.
+    // It does *not* use the store's values directly, but it does have access to the store's values.
+    // This is so that the component can either be the root of a form (like the entry publish
+    // form itself) or a nested component (like a replicator set). A replicator set should
+    // be able to validate its own conditions based on its own values, but also have access to
+    // the entire store's values for conditions that need to be evaluated against $root or $parent.
+    const TestComponent = {
+        mixins: [ValidatesFieldConditions],
+        template: '<div></div>',
+        data() {
+            return {
+                values: {},
+            };
+        },
+    };
+
+    // The PublishContainer is what will be set up for the test, and the test component will be used for the slot content.
+    const publishContainer = mount(PublishContainer, {
+        global: {
+            plugins: [createPinia()],
+            mocks: {
+                $events: {
+                    $emit: () => {},
+                },
+                $dirty: {
+                    add: () => {},
+                },
+            },
+        },
+        slots: {
+            default: TestComponent,
+        },
+        props: {
+            name: 'test',
+        },
+    });
+
+    // Get an instance of the test component's instance so we can call the mixin methods on it.
+    Fields = publishContainer.findComponent(TestComponent).vm;
+
+    Store = publishContainer.vm.store;
 });
 
 test('it shows field by default', () => {
@@ -132,14 +110,14 @@ test('it shows field by default', () => {
 });
 
 test('it shows or hides field based on shorthand equals conditions', () => {
-    Fields.setValues({ first_name: 'Jesse' });
+    setValues({ first_name: 'Jesse' });
 
     expect(showFieldIf({ first_name: 'Jesse' })).toBe(true);
     expect(showFieldIf({ first_name: 'Jack' })).toBe(false);
 });
 
 test('it can use comparison operators in conditions', () => {
-    Fields.setValues({
+    setValues({
         last_name: 'Hasselhoff',
         age: 13,
         string_age: '3',
@@ -170,7 +148,7 @@ test('it can use comparison operators in conditions', () => {
 });
 
 test('it can use includes or contains operators in conditions', () => {
-    Fields.setValues({
+    setValues({
         cancellation_reasons: ['found another service', 'other'],
         example_string: 'The quick brown fox jumps over the lazy dog',
         age: 13,
@@ -198,7 +176,7 @@ test('it can use includes or contains operators in conditions', () => {
 });
 
 test('it can use includes_any or contains_any operators in conditions', () => {
-    Fields.setValues({
+    setValues({
         cancellation_reasons: ['found another service', 'other'],
         example_string: 'The quick brown fox jumps over the lazy dog',
         age: 13,
@@ -226,7 +204,7 @@ test('it can use includes_any or contains_any operators in conditions', () => {
 });
 
 test('it handles null, true, and false in condition as literal', () => {
-    Fields.setValues({
+    setValues({
         last_name: 'HasselHoff',
         likes_food: true,
         likes_animals: false,
@@ -243,7 +221,7 @@ test('it handles null, true, and false in condition as literal', () => {
 });
 
 test('it can check if value is empty', () => {
-    Fields.setValues({
+    setValues({
         last_name: 'HasselHoff',
         user: { email: 'david@hasselhoff.com' },
         favorite_foods: ['lasagna'],
@@ -264,7 +242,7 @@ test('it can check if value is empty', () => {
 });
 
 test('it can use operators with multi-word values', () => {
-    Fields.setValues({ ace_ventura_says: 'Allllllrighty then!' });
+    setValues({ ace_ventura_says: 'Allllllrighty then!' });
 
     expect(showFieldIf({ ace_ventura_says: 'Allllllrighty then!' })).toBe(true);
     expect(showFieldIf({ ace_ventura_says: '== Allllllrighty then!' })).toBe(true);
@@ -273,7 +251,7 @@ test('it can use operators with multi-word values', () => {
 });
 
 test('it only shows when multiple conditions are met', () => {
-    Fields.setValues({
+    setValues({
         first_name: 'San',
         last_name: 'Holo',
         age: 22,
@@ -284,7 +262,7 @@ test('it only shows when multiple conditions are met', () => {
 });
 
 test('it shows or hides with parent key variants', () => {
-    Fields.setValues({
+    setValues({
         first_name: 'Rincess',
         last_name: 'Pleia',
     });
@@ -303,7 +281,7 @@ test('it shows or hides with parent key variants', () => {
 });
 
 test('it shows or hides when any of the conditions are met', () => {
-    Fields.setValues({
+    setValues({
         first_name: 'Rincess',
         last_name: 'Pleia',
     });
@@ -326,7 +304,7 @@ test('it shows or hides when any of the conditions are met', () => {
 });
 
 test('it can run conditions on nested data', () => {
-    Fields.setValues(
+    setValues(
         {
             name: 'Han',
             address: {
@@ -347,7 +325,7 @@ test('it can run conditions on nested data', () => {
 });
 
 test('it can run conditions on parent data using parent syntax', () => {
-    Fields.setValues({
+    setValues({
         name: 'Han',
         replicator: [{ text: 'Foo' }, { text: 'Bar' }],
         group: {
@@ -410,7 +388,7 @@ test('it can run conditions on parent data using parent syntax', () => {
 });
 
 test('it can run conditions on nested data using `root.` without `$` for backwards compatibility', () => {
-    Fields.setValues(
+    setValues(
         {
             name: 'Han',
             address: {
@@ -425,7 +403,7 @@ test('it can run conditions on nested data using `root.` without `$` for backwar
 });
 
 test('it can run conditions on root store values', () => {
-    Fields.setStoreValues({
+    setStoreValues({
         favorite_foods: ['pizza', 'lasagna', 'asparagus', 'quinoa', 'peppers'],
     });
 
@@ -434,7 +412,7 @@ test('it can run conditions on root store values', () => {
 });
 
 test('it can run conditions on root store values using `root.` without `$` for backwards compatibility', () => {
-    Fields.setStoreValues({
+    setStoreValues({
         favorite_foods: ['pizza', 'lasagna', 'asparagus', 'quinoa', 'peppers'],
     });
 
@@ -442,7 +420,7 @@ test('it can run conditions on root store values using `root.` without `$` for b
 });
 
 test('it can run conditions on prefixed fields', async () => {
-    Fields.setValues({
+    setValues({
         prefixed_first_name: 'Rincess',
         prefixed_last_name: 'Pleia',
     });
@@ -456,7 +434,7 @@ test('it can run conditions on prefixed fields', async () => {
 });
 
 test('it can run conditions on nested prefixed fields', async () => {
-    Fields.setValues(
+    setValues(
         {
             prefixed_first_name: 'Rincess',
             prefixed_last_name: 'Pleia',
@@ -484,15 +462,14 @@ test('it can run conditions on nested prefixed fields', async () => {
 });
 
 test('it can call a custom function', () => {
-    Fields.setValues({
+    setValues({
         favorite_animals: ['cats', 'dogs'],
     });
 
-    Statamic.$conditions.add('reallyLovesAnimals', function ({ target, params, store, storeName, values }) {
+    Statamic.$conditions.add('reallyLovesAnimals', function ({ target, params, store, values }) {
         expect(target).toBe(null);
         expect(params).toEqual([]);
         expect(store).toBe(Store);
-        expect(storeName).toBe('base');
         return values.favorite_animals.length > 3;
     });
 
@@ -503,15 +480,14 @@ test('it can call a custom function', () => {
 });
 
 test('it can call a custom function that uses `fieldPath` param to evaluate nested fields', () => {
-    Fields.setValues({
+    setValues({
         nested: [{ favorite_animals: ['cats', 'dogs'] }, { favorite_animals: ['cats', 'dogs', 'giraffes', 'lions'] }],
     });
 
-    Statamic.$conditions.add('reallyLovesAnimals', function ({ target, params, store, storeName, root, fieldPath }) {
+    Statamic.$conditions.add('reallyLovesAnimals', function ({ target, params, store, root, fieldPath }) {
         expect(target).toBe(null);
         expect(params).toEqual([]);
         expect(store).toBe(Store);
-        expect(storeName).toBe('base');
 
         return data_get(root, fieldPath).length > 3;
     });
@@ -521,14 +497,13 @@ test('it can call a custom function that uses `fieldPath` param to evaluate nest
 });
 
 test('it can call a custom function using params against root values', () => {
-    Fields.setStoreValues({
+    setStoreValues({
         favorite_foods: ['pizza', 'lasagna', 'asparagus', 'quinoa', 'peppers'],
     });
 
-    Statamic.$conditions.add('reallyLoves', function ({ target, params, store, storeName, root }) {
+    Statamic.$conditions.add('reallyLoves', function ({ target, params, store, root }) {
         expect(target).toBe(null);
         expect(store).toBe(Store);
-        expect(storeName).toBe('base');
         return params.filter((food) => !root.favorite_foods.includes(food)).length === 0;
     });
 
@@ -537,16 +512,15 @@ test('it can call a custom function using params against root values', () => {
 });
 
 test('it can call a custom function on a specific field', () => {
-    Fields.setValues({
+    setValues({
         favorite_animals: ['cats', 'dogs', 'rats', 'bats'],
     });
 
-    Statamic.$conditions.add('lovesAnimals', function ({ target, params, store, storeName, values, fieldPath }) {
+    Statamic.$conditions.add('lovesAnimals', function ({ target, params, store, values, fieldPath }) {
         expect(target).toEqual(['cats', 'dogs', 'rats', 'bats']);
         expect(values.favorite_animals).toEqual(['cats', 'dogs', 'rats', 'bats']);
         expect(params).toEqual([]);
         expect(store).toBe(Store);
-        expect(storeName).toBe('base');
         expect(fieldPath).toBe('favorite_animals');
         return values.favorite_animals.length > 3;
     });
@@ -555,15 +529,14 @@ test('it can call a custom function on a specific field', () => {
 });
 
 test('it can call a custom function on a specific field using params against a root value', () => {
-    Fields.setStoreValues({
+    setStoreValues({
         favorite_animals: ['cats', 'dogs', 'rats', 'bats'],
     });
 
-    Statamic.$conditions.add('lovesAnimals', function ({ target, params, store, storeName, root, fieldPath }) {
+    Statamic.$conditions.add('lovesAnimals', function ({ target, params, store, root, fieldPath }) {
         expect(target).toEqual(['cats', 'dogs', 'rats', 'bats']);
         expect(root.favorite_animals).toEqual(['cats', 'dogs', 'rats', 'bats']);
         expect(store).toBe(Store);
-        expect(storeName).toBe('base');
         expect(fieldPath).toBe('favorite_animals');
         return target.length > (params[0] || 3);
     });
@@ -574,15 +547,14 @@ test('it can call a custom function on a specific field using params against a r
 });
 
 test('it can call a custom function on a specific field using params against a root value using `root.` backwards compatibility', () => {
-    Fields.setStoreValues({
+    setStoreValues({
         favorite_animals: ['cats', 'dogs', 'rats', 'bats'],
     });
 
-    Statamic.$conditions.add('lovesAnimals', function ({ target, params, store, storeName, root, fieldPath }) {
+    Statamic.$conditions.add('lovesAnimals', function ({ target, params, store, root, fieldPath }) {
         expect(target).toEqual(['cats', 'dogs', 'rats', 'bats']);
         expect(root.favorite_animals).toEqual(['cats', 'dogs', 'rats', 'bats']);
         expect(store).toBe(Store);
-        expect(storeName).toBe('base');
         expect(fieldPath).toBe('favorite_animals');
         return target.length > (params[0] || 3);
     });
@@ -593,7 +565,7 @@ test('it can call a custom function on a specific field using params against a r
 });
 
 test('it fails if the condition lhs is not evaluatable', () => {
-    Fields.setValues({
+    setValues({
         favorite_animals: [],
     });
 
@@ -602,7 +574,7 @@ test('it fails if the condition lhs is not evaluatable', () => {
 });
 
 test('it can mix custom and non-custom conditions', () => {
-    Fields.setValues({
+    setValues({
         first_name: 'San',
         last_name: 'Holo',
         age: 22,
@@ -634,18 +606,18 @@ test('it can mix custom and non-custom conditions', () => {
 });
 
 test('it can externally force hide a field before validator conditions are evaluated', () => {
-    Fields.setValues({ first_name: 'Jesse' });
+    setValues({ first_name: 'Jesse' });
 
     expect(Fields.showField({ handle: 'some_field' })).toBe(true);
     expect(Fields.showField({ handle: 'last_name', if: { first_name: 'Jesse' } })).toBe(true);
 
-    Fields.setHiddenField({
+    setHiddenField({
         dottedKey: 'last_name',
         hidden: 'force',
         omitValue: false,
     });
 
-    Fields.setHiddenField({
+    setHiddenField({
         dottedKey: 'some_field',
         hidden: 'force',
         omitValue: false,
@@ -656,24 +628,24 @@ test('it can externally force hide a field before validator conditions are evalu
 });
 
 test('it never omits fields with always_save config', async () => {
-    Fields.setValues({
+    setValues({
         is_online_event: false,
         venue: false,
     });
 
-    await Fields.setHiddenFieldsState([
+    await setHiddenFieldsState([
         { handle: 'is_online_event' },
         { handle: 'venue', if: { is_online_event: true }, always_save: true },
     ]);
 
-    expect(Store.state.publish.base.hiddenFields['is_online_event'].hidden).toBe(false);
-    expect(Store.state.publish.base.hiddenFields['venue'].hidden).toBe(true);
-    expect(Store.state.publish.base.hiddenFields['is_online_event'].omitValue).toBe(false);
-    expect(Store.state.publish.base.hiddenFields['venue'].omitValue).toBe(false);
+    expect(Store.hiddenFields['is_online_event'].hidden).toBe(false);
+    expect(Store.hiddenFields['venue'].hidden).toBe(true);
+    expect(Store.hiddenFields['is_online_event'].omitValue).toBe(false);
+    expect(Store.hiddenFields['venue'].omitValue).toBe(false);
 });
 
 test('it never omits nested fields with always_save config', async () => {
-    Fields.setValues(
+    setValues(
         {
             is_online_event: false,
             venue: false,
@@ -681,45 +653,42 @@ test('it never omits nested fields with always_save config', async () => {
         'nested',
     );
 
-    await Fields.setHiddenFieldsState(
+    await setHiddenFieldsState(
         [{ handle: 'is_online_event' }, { handle: 'venue', if: { is_online_event: true }, always_save: true }],
         'nested',
     );
 
-    expect(Store.state.publish.base.hiddenFields['nested.is_online_event'].hidden).toBe(false);
-    expect(Store.state.publish.base.hiddenFields['nested.venue'].hidden).toBe(true);
-    expect(Store.state.publish.base.hiddenFields['nested.is_online_event'].omitValue).toBe(false);
-    expect(Store.state.publish.base.hiddenFields['nested.venue'].omitValue).toBe(false);
+    expect(Store.hiddenFields['nested.is_online_event'].hidden).toBe(false);
+    expect(Store.hiddenFields['nested.venue'].hidden).toBe(true);
+    expect(Store.hiddenFields['nested.is_online_event'].omitValue).toBe(false);
+    expect(Store.hiddenFields['nested.venue'].omitValue).toBe(false);
 });
 
 test('it force hides fields with hidden visibility config', async () => {
-    await Fields.setHiddenFieldsState([{ handle: 'first_name' }, { handle: 'last_name', visibility: 'hidden' }]);
+    await setHiddenFieldsState([{ handle: 'first_name' }, { handle: 'last_name', visibility: 'hidden' }]);
 
-    expect(Store.state.publish.base.hiddenFields['first_name'].hidden).toBe(false);
-    expect(Store.state.publish.base.hiddenFields['last_name'].hidden).toBe('force');
-    expect(Store.state.publish.base.hiddenFields['first_name'].omitValue).toBe(false);
-    expect(Store.state.publish.base.hiddenFields['last_name'].omitValue).toBe(false);
+    expect(Store.hiddenFields['first_name'].hidden).toBe(false);
+    expect(Store.hiddenFields['last_name'].hidden).toBe('force');
+    expect(Store.hiddenFields['first_name'].omitValue).toBe(false);
+    expect(Store.hiddenFields['last_name'].omitValue).toBe(false);
 });
 
 test('it tells omitter to omit hidden fields by default', async () => {
-    Fields.setValues({
+    setValues({
         is_online_event: false,
         venue: false,
     });
 
-    await Fields.setHiddenFieldsState([
-        { handle: 'is_online_event' },
-        { handle: 'venue', if: { is_online_event: true } },
-    ]);
+    await setHiddenFieldsState([{ handle: 'is_online_event' }, { handle: 'venue', if: { is_online_event: true } }]);
 
-    expect(Store.state.publish.base.hiddenFields['is_online_event'].hidden).toBe(false);
-    expect(Store.state.publish.base.hiddenFields['venue'].hidden).toBe(true);
-    expect(Store.state.publish.base.hiddenFields['is_online_event'].omitValue).toBe(false);
-    expect(Store.state.publish.base.hiddenFields['venue'].omitValue).toBe(true);
+    expect(Store.hiddenFields['is_online_event'].hidden).toBe(false);
+    expect(Store.hiddenFields['venue'].hidden).toBe(true);
+    expect(Store.hiddenFields['is_online_event'].omitValue).toBe(false);
+    expect(Store.hiddenFields['venue'].omitValue).toBe(true);
 });
 
 test('it tells omitter to omit nested hidden fields by default', async () => {
-    Fields.setValues(
+    setValues(
         {
             is_online_event: false,
             venue: false,
@@ -727,36 +696,36 @@ test('it tells omitter to omit nested hidden fields by default', async () => {
         'nested',
     );
 
-    await Fields.setHiddenFieldsState(
+    await setHiddenFieldsState(
         [{ handle: 'is_online_event' }, { handle: 'venue', if: { is_online_event: true } }],
         'nested',
     );
 
-    expect(Store.state.publish.base.hiddenFields['nested.is_online_event'].hidden).toBe(false);
-    expect(Store.state.publish.base.hiddenFields['nested.venue'].hidden).toBe(true);
-    expect(Store.state.publish.base.hiddenFields['nested.is_online_event'].omitValue).toBe(false);
-    expect(Store.state.publish.base.hiddenFields['nested.venue'].omitValue).toBe(true);
+    expect(Store.hiddenFields['nested.is_online_event'].hidden).toBe(false);
+    expect(Store.hiddenFields['nested.venue'].hidden).toBe(true);
+    expect(Store.hiddenFields['nested.is_online_event'].omitValue).toBe(false);
+    expect(Store.hiddenFields['nested.venue'].omitValue).toBe(true);
 });
 
 test('it tells omitter to omit revealer fields', async () => {
-    Fields.setValues({
+    setValues({
         revealer_toggle: false,
         regular_toggle: false,
     });
 
-    await Fields.setHiddenFieldsState([
+    await setHiddenFieldsState([
         { handle: 'revealer_toggle', type: 'revealer' },
         { handle: 'regular_toggle', type: 'regular' },
     ]);
 
-    expect(Store.state.publish.base.hiddenFields['revealer_toggle'].hidden).toBe(false);
-    expect(Store.state.publish.base.hiddenFields['regular_toggle'].hidden).toBe(false);
-    expect(Store.state.publish.base.hiddenFields['revealer_toggle'].omitValue).toBe(true);
-    expect(Store.state.publish.base.hiddenFields['regular_toggle'].omitValue).toBe(false);
+    expect(Store.hiddenFields['revealer_toggle'].hidden).toBe(false);
+    expect(Store.hiddenFields['regular_toggle'].hidden).toBe(false);
+    expect(Store.hiddenFields['revealer_toggle'].omitValue).toBe(true);
+    expect(Store.hiddenFields['regular_toggle'].omitValue).toBe(false);
 });
 
 test('it tells omitter to omit nested revealer fields', async () => {
-    Fields.setValues(
+    setValues(
         {
             revealer_toggle: false,
             regular_toggle: false,
@@ -764,7 +733,7 @@ test('it tells omitter to omit nested revealer fields', async () => {
         'nested',
     );
 
-    await Fields.setHiddenFieldsState(
+    await setHiddenFieldsState(
         [
             { handle: 'revealer_toggle', type: 'revealer' },
             { handle: 'regular_toggle', type: 'regular' },
@@ -772,65 +741,65 @@ test('it tells omitter to omit nested revealer fields', async () => {
         'nested',
     );
 
-    expect(Store.state.publish.base.hiddenFields['nested.revealer_toggle'].hidden).toBe(false);
-    expect(Store.state.publish.base.hiddenFields['nested.regular_toggle'].hidden).toBe(false);
-    expect(Store.state.publish.base.hiddenFields['nested.revealer_toggle'].omitValue).toBe(true);
-    expect(Store.state.publish.base.hiddenFields['nested.regular_toggle'].omitValue).toBe(false);
+    expect(Store.hiddenFields['nested.revealer_toggle'].hidden).toBe(false);
+    expect(Store.hiddenFields['nested.regular_toggle'].hidden).toBe(false);
+    expect(Store.hiddenFields['nested.revealer_toggle'].omitValue).toBe(true);
+    expect(Store.hiddenFields['nested.regular_toggle'].omitValue).toBe(false);
 });
 
 test('it tells omitter not omit revealer-hidden fields', async () => {
-    Fields.setValues({
+    setValues({
         show_more_info: false,
         venue: false,
     });
 
-    await Fields.setHiddenFieldsState([
+    await setHiddenFieldsState([
         { handle: 'show_more_info', type: 'revealer' },
         { handle: 'venue', if: { show_more_info: true } },
     ]);
 
-    expect(Store.state.publish.base.hiddenFields['show_more_info'].hidden).toBe(false);
-    expect(Store.state.publish.base.hiddenFields['venue'].hidden).toBe(true);
-    expect(Store.state.publish.base.hiddenFields['show_more_info'].omitValue).toBe(true);
-    expect(Store.state.publish.base.hiddenFields['venue'].omitValue).toBe(false);
+    expect(Store.hiddenFields['show_more_info'].hidden).toBe(false);
+    expect(Store.hiddenFields['venue'].hidden).toBe(true);
+    expect(Store.hiddenFields['show_more_info'].omitValue).toBe(true);
+    expect(Store.hiddenFields['venue'].omitValue).toBe(false);
 });
 
 test('it tells omitter not omit revealer-hidden fields using root syntax in condition', async () => {
-    Fields.setValues({
+    setValues({
         show_more_info: false,
         venue: false,
     });
 
-    await Fields.setHiddenFieldsState([
+    await setHiddenFieldsState([
         { handle: 'show_more_info', type: 'revealer' },
         { handle: 'venue', if: { '$root.show_more_info': true } },
     ]);
 
-    expect(Store.state.publish.base.hiddenFields['show_more_info'].hidden).toBe(false);
-    expect(Store.state.publish.base.hiddenFields['venue'].hidden).toBe(true);
-    expect(Store.state.publish.base.hiddenFields['show_more_info'].omitValue).toBe(true);
-    expect(Store.state.publish.base.hiddenFields['venue'].omitValue).toBe(false);
+    expect(Store.hiddenFields['show_more_info'].hidden).toBe(false);
+    expect(Store.hiddenFields['venue'].hidden).toBe(true);
+    expect(Store.hiddenFields['show_more_info'].omitValue).toBe(true);
+    expect(Store.hiddenFields['venue'].omitValue).toBe(false);
 });
 
 test('it tells omitter not omit revealer-hidden fields using legacy root syntax for backwards compatibility', async () => {
-    Fields.setValues({
+    setValues({
         show_more_info: false,
         venue: false,
     });
 
-    await Fields.setHiddenFieldsState([
+    await setHiddenFieldsState([
         { handle: 'show_more_info', type: 'revealer' },
         { handle: 'venue', if: { 'root.show_more_info': true } },
     ]);
 
-    expect(Store.state.publish.base.hiddenFields['show_more_info'].hidden).toBe(false);
-    expect(Store.state.publish.base.hiddenFields['venue'].hidden).toBe(true);
-    expect(Store.state.publish.base.hiddenFields['show_more_info'].omitValue).toBe(true);
-    expect(Store.state.publish.base.hiddenFields['venue'].omitValue).toBe(false);
+    expect(Store.hiddenFields['show_more_info'].hidden).toBe(false);
+    expect(Store.hiddenFields['venue'].hidden).toBe(true);
+    expect(Store.hiddenFields['show_more_info'].omitValue).toBe(true);
+    expect(Store.hiddenFields['venue'].omitValue).toBe(false);
 });
 
 test('it tells omitter not omit nested revealer-hidden fields', async () => {
-    Fields.setValues(
+    setValues(
         {
             show_more_info: false,
             venue: false,
@@ -838,7 +807,7 @@ test('it tells omitter not omit nested revealer-hidden fields', async () => {
         'nested',
     );
 
-    await Fields.setHiddenFieldsState(
+    await setHiddenFieldsState(
         [
             { handle: 'show_more_info', type: 'revealer' },
             { handle: 'venue', if: { show_more_info: true } },
@@ -846,14 +815,14 @@ test('it tells omitter not omit nested revealer-hidden fields', async () => {
         'nested',
     );
 
-    expect(Store.state.publish.base.hiddenFields['nested.show_more_info'].hidden).toBe(false);
-    expect(Store.state.publish.base.hiddenFields['nested.venue'].hidden).toBe(true);
-    expect(Store.state.publish.base.hiddenFields['nested.show_more_info'].omitValue).toBe(true);
-    expect(Store.state.publish.base.hiddenFields['nested.venue'].omitValue).toBe(false);
+    expect(Store.hiddenFields['nested.show_more_info'].hidden).toBe(false);
+    expect(Store.hiddenFields['nested.venue'].hidden).toBe(true);
+    expect(Store.hiddenFields['nested.show_more_info'].omitValue).toBe(true);
+    expect(Store.hiddenFields['nested.venue'].omitValue).toBe(false);
 });
 
 test('it tells omitter not omit nested revealer-hidden fields using root syntax in condition', async () => {
-    Fields.setValues(
+    setValues(
         {
             show_more_info: false,
             venue: false,
@@ -861,7 +830,7 @@ test('it tells omitter not omit nested revealer-hidden fields using root syntax 
         'nested',
     );
 
-    await Fields.setHiddenFieldsState(
+    await setHiddenFieldsState(
         [
             { handle: 'show_more_info', type: 'revealer' },
             { handle: 'venue', if: { '$root.nested.show_more_info': true } },
@@ -869,14 +838,14 @@ test('it tells omitter not omit nested revealer-hidden fields using root syntax 
         'nested',
     );
 
-    expect(Store.state.publish.base.hiddenFields['nested.show_more_info'].hidden).toBe(false);
-    expect(Store.state.publish.base.hiddenFields['nested.venue'].hidden).toBe(true);
-    expect(Store.state.publish.base.hiddenFields['nested.show_more_info'].omitValue).toBe(true);
-    expect(Store.state.publish.base.hiddenFields['nested.venue'].omitValue).toBe(false);
+    expect(Store.hiddenFields['nested.show_more_info'].hidden).toBe(false);
+    expect(Store.hiddenFields['nested.venue'].hidden).toBe(true);
+    expect(Store.hiddenFields['nested.show_more_info'].omitValue).toBe(true);
+    expect(Store.hiddenFields['nested.venue'].omitValue).toBe(false);
 });
 
 test('it tells omitter not omit nested revealer-hidden fields using legacy root syntax for backwards compatibility', async () => {
-    Fields.setValues(
+    setValues(
         {
             show_more_info: false,
             venue: false,
@@ -884,7 +853,7 @@ test('it tells omitter not omit nested revealer-hidden fields using legacy root 
         'nested',
     );
 
-    await Fields.setHiddenFieldsState(
+    await setHiddenFieldsState(
         [
             { handle: 'show_more_info', type: 'revealer' },
             { handle: 'venue', if: { 'root.nested.show_more_info': true } },
@@ -892,14 +861,14 @@ test('it tells omitter not omit nested revealer-hidden fields using legacy root 
         'nested',
     );
 
-    expect(Store.state.publish.base.hiddenFields['nested.show_more_info'].hidden).toBe(false);
-    expect(Store.state.publish.base.hiddenFields['nested.venue'].hidden).toBe(true);
-    expect(Store.state.publish.base.hiddenFields['nested.show_more_info'].omitValue).toBe(true);
-    expect(Store.state.publish.base.hiddenFields['nested.venue'].omitValue).toBe(false);
+    expect(Store.hiddenFields['nested.show_more_info'].hidden).toBe(false);
+    expect(Store.hiddenFields['nested.venue'].hidden).toBe(true);
+    expect(Store.hiddenFields['nested.show_more_info'].omitValue).toBe(true);
+    expect(Store.hiddenFields['nested.venue'].omitValue).toBe(false);
 });
 
 test('it tells omitter not omit nested revealer-hidden fields using parent syntax in condition', async () => {
-    Fields.setValues({
+    setValues({
         top_level_show_more_info: false,
         replicator: [{ text: 'Foo' }, { text: 'Bar' }],
         group: {
@@ -920,7 +889,7 @@ test('it tells omitter not omit nested revealer-hidden fields using parent synta
     });
 
     // Track revealer toggles
-    await Fields.setHiddenFieldsState([
+    await setHiddenFieldsState([
         { handle: 'top_level_show_more_info', type: 'revealer' },
         { handle: 'group.show_more_info', type: 'revealer' },
         { handle: 'group.replicator.2.show_more_info', type: 'revealer' },
@@ -928,13 +897,13 @@ test('it tells omitter not omit nested revealer-hidden fields using parent synta
     ]);
 
     // Set revealer hidden fields using `$parent` syntax
-    await Fields.setHiddenFieldsState([
+    await setHiddenFieldsState([
         { handle: 'replicator.1.text', if: { '$parent.top_level_show_more_info': true } },
         { handle: 'group.replicator.1.text', if: { '$parent.show_more_info': true } },
     ]);
 
     // Set revealer hidden fields using chained `$parent` syntax
-    await Fields.setHiddenFieldsState([
+    await setHiddenFieldsState([
         {
             handle: 'group.replicator.2.replicator.0.text',
             if: { '$parent.$parent.$parent.top_level_show_more_info': true },
@@ -946,49 +915,49 @@ test('it tells omitter not omit nested revealer-hidden fields using parent synta
     ]);
 
     // Ensure revealer toggles should definitely hidden and omited from submitted payload
-    expect(Store.state.publish.base.hiddenFields['top_level_show_more_info'].hidden).toBe(false);
-    expect(Store.state.publish.base.hiddenFields['top_level_show_more_info'].omitValue).toBe(true);
-    expect(Store.state.publish.base.hiddenFields['group.show_more_info'].hidden).toBe(false);
-    expect(Store.state.publish.base.hiddenFields['group.show_more_info'].omitValue).toBe(true);
-    expect(Store.state.publish.base.hiddenFields['group.replicator.2.show_more_info'].hidden).toBe(false);
-    expect(Store.state.publish.base.hiddenFields['group.replicator.2.show_more_info'].omitValue).toBe(true);
-    expect(Store.state.publish.base.hiddenFields['group.replicator.2.group.show_more_info'].hidden).toBe(false);
-    expect(Store.state.publish.base.hiddenFields['group.replicator.2.group.show_more_info'].omitValue).toBe(true);
+    expect(Store.hiddenFields['top_level_show_more_info'].hidden).toBe(false);
+    expect(Store.hiddenFields['top_level_show_more_info'].omitValue).toBe(true);
+    expect(Store.hiddenFields['group.show_more_info'].hidden).toBe(false);
+    expect(Store.hiddenFields['group.show_more_info'].omitValue).toBe(true);
+    expect(Store.hiddenFields['group.replicator.2.show_more_info'].hidden).toBe(false);
+    expect(Store.hiddenFields['group.replicator.2.show_more_info'].omitValue).toBe(true);
+    expect(Store.hiddenFields['group.replicator.2.group.show_more_info'].hidden).toBe(false);
+    expect(Store.hiddenFields['group.replicator.2.group.show_more_info'].omitValue).toBe(true);
 
     // Ensure revealer hidden fields should be hiddden, but not omitted
-    expect(Store.state.publish.base.hiddenFields['replicator.1.text'].hidden).toBe(true);
-    expect(Store.state.publish.base.hiddenFields['replicator.1.text'].omitValue).toBe(false);
-    expect(Store.state.publish.base.hiddenFields['group.replicator.1.text'].hidden).toBe(true);
-    expect(Store.state.publish.base.hiddenFields['group.replicator.1.text'].omitValue).toBe(false);
-    expect(Store.state.publish.base.hiddenFields['group.replicator.2.replicator.0.text'].hidden).toBe(true);
-    expect(Store.state.publish.base.hiddenFields['group.replicator.2.replicator.0.text'].omitValue).toBe(false);
-    expect(Store.state.publish.base.hiddenFields['group.replicator.2.group.replicator.0.text'].hidden).toBe(true);
-    expect(Store.state.publish.base.hiddenFields['group.replicator.2.group.replicator.0.text'].omitValue).toBe(false);
+    expect(Store.hiddenFields['replicator.1.text'].hidden).toBe(true);
+    expect(Store.hiddenFields['replicator.1.text'].omitValue).toBe(false);
+    expect(Store.hiddenFields['group.replicator.1.text'].hidden).toBe(true);
+    expect(Store.hiddenFields['group.replicator.1.text'].omitValue).toBe(false);
+    expect(Store.hiddenFields['group.replicator.2.replicator.0.text'].hidden).toBe(true);
+    expect(Store.hiddenFields['group.replicator.2.replicator.0.text'].omitValue).toBe(false);
+    expect(Store.hiddenFields['group.replicator.2.group.replicator.0.text'].hidden).toBe(true);
+    expect(Store.hiddenFields['group.replicator.2.group.replicator.0.text'].omitValue).toBe(false);
 
     // Just a few extra assertions to ensure only sets with revealer conditions should be affected
-    expect('replicator.0.text' in Store.state.publish.base.hiddenFields).toBe(false);
-    expect('group.replicator.0.text' in Store.state.publish.base.hiddenFields).toBe(false);
+    expect('replicator.0.text' in Store.hiddenFields).toBe(false);
+    expect('group.replicator.0.text' in Store.hiddenFields).toBe(false);
 });
 
 test('it tells omitter not omit prefixed revealer-hidden fields', async () => {
-    Fields.setValues({
+    setValues({
         prefixed_show_more_info: false,
         prefixed_event_venue: false,
     });
 
-    await Fields.setHiddenFieldsState([
+    await setHiddenFieldsState([
         { handle: 'prefixed_show_more_info', prefix: 'prefixed_', type: 'revealer' },
         { handle: 'prefixed_venue', prefix: 'prefixed_', if: { show_more_info: true } },
     ]);
 
-    expect(Store.state.publish.base.hiddenFields['prefixed_show_more_info'].hidden).toBe(false);
-    expect(Store.state.publish.base.hiddenFields['prefixed_venue'].hidden).toBe(true);
-    expect(Store.state.publish.base.hiddenFields['prefixed_show_more_info'].omitValue).toBe(true);
-    expect(Store.state.publish.base.hiddenFields['prefixed_venue'].omitValue).toBe(false);
+    expect(Store.hiddenFields['prefixed_show_more_info'].hidden).toBe(false);
+    expect(Store.hiddenFields['prefixed_venue'].hidden).toBe(true);
+    expect(Store.hiddenFields['prefixed_show_more_info'].omitValue).toBe(true);
+    expect(Store.hiddenFields['prefixed_venue'].omitValue).toBe(false);
 });
 
 test('it tells omitter not omit nested prefixed revealer-hidden fields', async () => {
-    Fields.setValues(
+    setValues(
         {
             prefixed_show_more_info: false,
             prefixed_event_venue: false,
@@ -996,7 +965,7 @@ test('it tells omitter not omit nested prefixed revealer-hidden fields', async (
         'nested',
     );
 
-    await Fields.setHiddenFieldsState(
+    await setHiddenFieldsState(
         [
             { handle: 'prefixed_show_more_info', prefix: 'prefixed_', type: 'revealer' },
             { handle: 'prefixed_venue', prefix: 'prefixed_', if: { show_more_info: true } },
@@ -1004,14 +973,14 @@ test('it tells omitter not omit nested prefixed revealer-hidden fields', async (
         'nested',
     );
 
-    expect(Store.state.publish.base.hiddenFields['nested.prefixed_show_more_info'].hidden).toBe(false);
-    expect(Store.state.publish.base.hiddenFields['nested.prefixed_venue'].hidden).toBe(true);
-    expect(Store.state.publish.base.hiddenFields['nested.prefixed_show_more_info'].omitValue).toBe(true);
-    expect(Store.state.publish.base.hiddenFields['nested.prefixed_venue'].omitValue).toBe(false);
+    expect(Store.hiddenFields['nested.prefixed_show_more_info'].hidden).toBe(false);
+    expect(Store.hiddenFields['nested.prefixed_venue'].hidden).toBe(true);
+    expect(Store.hiddenFields['nested.prefixed_show_more_info'].omitValue).toBe(true);
+    expect(Store.hiddenFields['nested.prefixed_venue'].omitValue).toBe(false);
 });
 
 test('it properly omits revealer-hidden fields when multiple conditions are set', async () => {
-    Fields.setValues({
+    setValues({
         show_more_info: false,
         has_second_event_venue: true,
         has_third_event_venue: false,
@@ -1020,7 +989,7 @@ test('it properly omits revealer-hidden fields when multiple conditions are set'
         event_venue_three: false,
     });
 
-    await Fields.setHiddenFieldsState([
+    await setHiddenFieldsState([
         { handle: 'show_more_info', type: 'revealer' },
         { handle: 'has_second_event_venue', type: 'toggle', if: { show_more_info: true } },
         { handle: 'has_third_event_venue', type: 'toggle', if: { show_more_info: true } },
@@ -1029,25 +998,25 @@ test('it properly omits revealer-hidden fields when multiple conditions are set'
         { handle: 'event_venue_three', if: { show_more_info: true, has_third_event_venue: true } },
     ]);
 
-    expect(Store.state.publish.base.hiddenFields['show_more_info'].hidden).toBe(false);
-    expect(Store.state.publish.base.hiddenFields['has_second_event_venue'].hidden).toBe(true);
-    expect(Store.state.publish.base.hiddenFields['has_third_event_venue'].hidden).toBe(true);
-    expect(Store.state.publish.base.hiddenFields['event_venue_one'].hidden).toBe(true);
-    expect(Store.state.publish.base.hiddenFields['event_venue_two'].hidden).toBe(true);
-    expect(Store.state.publish.base.hiddenFields['event_venue_three'].hidden).toBe(true);
+    expect(Store.hiddenFields['show_more_info'].hidden).toBe(false);
+    expect(Store.hiddenFields['has_second_event_venue'].hidden).toBe(true);
+    expect(Store.hiddenFields['has_third_event_venue'].hidden).toBe(true);
+    expect(Store.hiddenFields['event_venue_one'].hidden).toBe(true);
+    expect(Store.hiddenFields['event_venue_two'].hidden).toBe(true);
+    expect(Store.hiddenFields['event_venue_three'].hidden).toBe(true);
 
-    expect(Store.state.publish.base.hiddenFields['show_more_info'].omitValue).toBe(true);
-    expect(Store.state.publish.base.hiddenFields['has_second_event_venue'].omitValue).toBe(false);
-    expect(Store.state.publish.base.hiddenFields['has_third_event_venue'].omitValue).toBe(false);
-    expect(Store.state.publish.base.hiddenFields['event_venue_one'].omitValue).toBe(false);
-    expect(Store.state.publish.base.hiddenFields['event_venue_two'].omitValue).toBe(false);
+    expect(Store.hiddenFields['show_more_info'].omitValue).toBe(true);
+    expect(Store.hiddenFields['has_second_event_venue'].omitValue).toBe(false);
+    expect(Store.hiddenFields['has_third_event_venue'].omitValue).toBe(false);
+    expect(Store.hiddenFields['event_venue_one'].omitValue).toBe(false);
+    expect(Store.hiddenFields['event_venue_two'].omitValue).toBe(false);
 
     // Though this third venue is hidden by a revealer, it's also disabled by a regular toggle condition, so it should actually be omitted...
-    expect(Store.state.publish.base.hiddenFields['event_venue_three'].omitValue).toBe(true);
+    expect(Store.hiddenFields['event_venue_three'].omitValue).toBe(true);
 });
 
 test('it properly omits nested revealer-hidden fields when multiple conditions are set', async () => {
-    Fields.setValues(
+    setValues(
         {
             show_more_info: false,
             has_second_event_venue: true,
@@ -1059,7 +1028,7 @@ test('it properly omits nested revealer-hidden fields when multiple conditions a
         'nested',
     );
 
-    await Fields.setHiddenFieldsState(
+    await setHiddenFieldsState(
         [
             { handle: 'show_more_info', type: 'revealer' },
             { handle: 'has_second_event_venue', type: 'toggle', if: { show_more_info: true } },
@@ -1071,26 +1040,26 @@ test('it properly omits nested revealer-hidden fields when multiple conditions a
         'nested',
     );
 
-    expect(Store.state.publish.base.hiddenFields['nested.show_more_info'].hidden).toBe(false);
-    expect(Store.state.publish.base.hiddenFields['nested.has_second_event_venue'].hidden).toBe(true);
-    expect(Store.state.publish.base.hiddenFields['nested.has_third_event_venue'].hidden).toBe(true);
-    expect(Store.state.publish.base.hiddenFields['nested.event_venue_one'].hidden).toBe(true);
-    expect(Store.state.publish.base.hiddenFields['nested.event_venue_two'].hidden).toBe(true);
-    expect(Store.state.publish.base.hiddenFields['nested.event_venue_three'].hidden).toBe(true);
+    expect(Store.hiddenFields['nested.show_more_info'].hidden).toBe(false);
+    expect(Store.hiddenFields['nested.has_second_event_venue'].hidden).toBe(true);
+    expect(Store.hiddenFields['nested.has_third_event_venue'].hidden).toBe(true);
+    expect(Store.hiddenFields['nested.event_venue_one'].hidden).toBe(true);
+    expect(Store.hiddenFields['nested.event_venue_two'].hidden).toBe(true);
+    expect(Store.hiddenFields['nested.event_venue_three'].hidden).toBe(true);
 
-    expect(Store.state.publish.base.hiddenFields['nested.show_more_info'].omitValue).toBe(true);
-    expect(Store.state.publish.base.hiddenFields['nested.has_second_event_venue'].omitValue).toBe(false);
-    expect(Store.state.publish.base.hiddenFields['nested.has_third_event_venue'].omitValue).toBe(false);
-    expect(Store.state.publish.base.hiddenFields['nested.event_venue_one'].omitValue).toBe(false);
-    expect(Store.state.publish.base.hiddenFields['nested.event_venue_two'].omitValue).toBe(false);
+    expect(Store.hiddenFields['nested.show_more_info'].omitValue).toBe(true);
+    expect(Store.hiddenFields['nested.has_second_event_venue'].omitValue).toBe(false);
+    expect(Store.hiddenFields['nested.has_third_event_venue'].omitValue).toBe(false);
+    expect(Store.hiddenFields['nested.event_venue_one'].omitValue).toBe(false);
+    expect(Store.hiddenFields['nested.event_venue_two'].omitValue).toBe(false);
 
     // Though this third venue is hidden by a revealer, it's also disabled by a regular toggle condition, so it should actually be omitted...
-    expect(Store.state.publish.base.hiddenFields['nested.event_venue_three'].omitValue).toBe(true);
+    expect(Store.hiddenFields['nested.event_venue_three'].omitValue).toBe(true);
 });
 
 test('it can use extra values in conditions', () => {
-    Fields.setValues({});
-    Fields.setExtraValues({ hello: 'world' });
+    setValues({});
+    setExtraValues({ hello: 'world' });
 
     expect(showFieldIf({ hello: 'world' })).toBe(true);
     expect(showFieldIf({ hello: 'there' })).toBe(false);

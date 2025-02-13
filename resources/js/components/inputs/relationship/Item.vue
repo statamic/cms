@@ -50,6 +50,7 @@
 </template>
 
 <script>
+import { getActivePinia } from 'pinia';
 import InlineEditForm from './InlineEditForm.vue';
 
 export default {
@@ -86,14 +87,14 @@ export default {
             if (!this.editable) return;
             if (this.item.invalid) return;
 
-            if (
-                this.item.reference &&
-                Object.entries(this.$store.state.publish).find(
-                    ([key, value]) => value.reference === this.item.reference,
-                )
-            ) {
-                this.$toast.error(__("You're already editing this item."));
-                return;
+            if (this.item.reference) {
+                const storeRefs = getActivePinia()
+                    ._s.values()
+                    .map((store) => store.reference);
+                if (Array.from(storeRefs).includes(this.item.reference)) {
+                    this.$toast.error(__("You're already editing this item."));
+                    return;
+                }
             }
 
             this.isEditing = true;

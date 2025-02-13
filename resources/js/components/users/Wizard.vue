@@ -22,7 +22,8 @@
             </div>
 
             <publish-container
-                :name="storeName"
+                ref="container"
+                name="userwizard"
                 :blueprint="blueprint"
                 :values="values"
                 :meta="meta"
@@ -275,7 +276,6 @@ export default {
             editUrl: null,
             errors: {},
             error: null,
-            storeName: 'userwizard',
             values: this.initialValues,
         };
     },
@@ -403,7 +403,7 @@ export default {
         },
 
         errors: function (errors) {
-            if (this.onUserInfoStep) this.$store.commit(`publish/${this.storeName}/setErrors`, errors);
+            if (this.onUserInfoStep) this.$refs.container.store.setErrors(errors);
         },
     },
 

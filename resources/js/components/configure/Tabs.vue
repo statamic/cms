@@ -28,7 +28,7 @@
 export default {
     emits: ['updated', 'meta-updated', 'synced', 'desynced', 'focus', 'blur'],
 
-    inject: ['storeName'],
+    inject: ['store', 'storeName'],
 
     props: {
         readOnly: Boolean,
@@ -36,21 +36,15 @@ export default {
     },
 
     data() {
-        const state = this.$store.state.publish[this.storeName];
-
         return {
-            active: state.blueprint.tabs[0].handle,
+            active: this.store.blueprint.tabs[0].handle,
             containerWidth: null,
         };
     },
 
     computed: {
-        state() {
-            return this.$store.state.publish[this.storeName];
-        },
-
         tabs() {
-            return this.state.blueprint.tabs;
+            return this.store.blueprint.tabs;
         },
 
         actionsPortal() {
