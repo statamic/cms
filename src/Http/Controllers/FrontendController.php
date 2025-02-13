@@ -44,18 +44,18 @@ class FrontendController extends Controller
         $view = Arr::pull($params, 'view');
         $data = Arr::pull($params, 'data');
 
-        $data = array_merge($params, is_callable($data) ? $data(...$params) : $data);
-
         if (is_callable($view)) {
-            $view = $view(...$params);
+            $resolvedView = $view(...$params);
         }
 
-        if ($view instanceof IlluminateView) {
-            $data = array_merge($view->getData(), $data);
-            $view = $view->name();
-        } elseif (! is_string($view)) {
-            // TODO: What else can they return from view closure?
+        if (isset($resolvedView) && $resolvedView instanceof IlluminateView) {
+            $view = $resolvedView->name();
+            $data = $resolvedView->getData();
+        } elseif (isset($resolvedView)) {
+            return $view;
         }
+
+        $data = array_merge($params, is_callable($data) ? $data(...$params) : $data);
 
         $view = app(View::class)
             ->template($view)
