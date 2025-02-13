@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers;
 
+use Illuminate\Contracts\View\View as IlluminateView;
 use Illuminate\Http\Request;
 use Statamic\Auth\Protect\Protection;
 use Statamic\Exceptions\NotFoundHttpException;
@@ -40,13 +41,21 @@ class FrontendController extends Controller
     {
         $params = $request->route()->parameters();
 
-        $segments = Arr::except($params, ['view', 'data']);
-
         $view = Arr::pull($params, 'view');
-        $view = is_callable($view) ? $view(...$segments) : $view;
-
         $data = Arr::pull($params, 'data');
-        $data = array_merge($params, is_callable($data) ? $data(...$segments) : $data);
+
+        $data = array_merge($params, ray()->pass(is_callable($data) ? $data(...$params) : $data));
+
+        if (is_callable($view)) {
+            $view = $view(...$params);
+        }
+
+        if ($view instanceof IlluminateView) {
+            $data = array_merge($view->getData(), $data);
+            $view = $view->name();
+        } elseif (! is_string($view)) {
+            // TODO: What else can they return from view closure?
+        }
 
         $view = app(View::class)
             ->template($view)
