@@ -33,11 +33,11 @@ class RoutesTest extends TestCase
         $app->booted(function () {
             Route::statamic('/basic-route-with-data', 'test', ['hello' => 'world']);
 
-            Route::statamic('/basic-route-with-view-from-closure', function () {
+            Route::statamic('/basic-route-with-view-closure', function () {
                 return view('test', ['hello' => 'world']);
             });
 
-            Route::statamic('/basic-route-with-data-from-closure', 'test', function () {
+            Route::statamic('/basic-route-with-data-closure', 'test', function () {
                 return ['hello' => 'world'];
             });
 
@@ -123,23 +123,23 @@ class RoutesTest extends TestCase
     }
 
     #[Test]
-    public function it_renders_a_view_using_a_closure()
+    public function it_renders_a_view_using_a_view_closure()
     {
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
         $this->viewShouldReturnRaw('test', 'Hello {{ hello }}');
 
-        $this->get('/basic-route-with-view-from-closure')
+        $this->get('/basic-route-with-view-closure')
             ->assertOk()
             ->assertSee('Hello world');
     }
 
     #[Test]
-    public function it_renders_a_view_with_data_from_a_closure()
+    public function it_renders_a_view_using_a_data_closure()
     {
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
         $this->viewShouldReturnRaw('test', 'Hello {{ hello }}');
 
-        $this->get('/basic-route-with-data-from-closure')
+        $this->get('/basic-route-with-data-closure')
             ->assertOk()
             ->assertSee('Hello world');
     }
