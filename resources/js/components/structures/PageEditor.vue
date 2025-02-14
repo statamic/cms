@@ -80,6 +80,7 @@
 
 <script>
 import HasHiddenFields from '../publish/HasHiddenFields';
+import { flatten } from 'lodash-es';
 
 export default {
     mixins: [HasHiddenFields],
@@ -122,10 +123,7 @@ export default {
 
         adjustedBlueprint() {
             function getFields(blueprint) {
-                return _.chain(blueprint.tabs[0].sections)
-                    .map((sections) => sections.fields)
-                    .flatten(true)
-                    .value();
+                return flatten(blueprint.tabs[0].sections.map((sections) => sections.fields));
             }
             function isMissingField(blueprint, handle) {
                 return !getFields(blueprint).some((field) => field.handle === handle);

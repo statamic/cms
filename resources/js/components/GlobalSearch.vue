@@ -68,6 +68,8 @@
 </template>
 
 <script>
+import { debounce } from 'lodash-es';
+
 export default {
     props: {
         endpoint: String,
@@ -107,7 +109,7 @@ export default {
     },
 
     methods: {
-        update: _.debounce(function () {
+        update: debounce(function () {
             if (!this.query) {
                 this.results = [];
                 this.searching = false;

@@ -41,6 +41,7 @@
 
 <script>
 import HasHiddenFields from '../publish/HasHiddenFields';
+import { clone } from 'lodash-es';
 
 export default {
     mixins: [HasHiddenFields],
@@ -60,9 +61,9 @@ export default {
 
     data() {
         return {
-            fieldset: _.clone(this.initialFieldset),
-            values: _.clone(this.initialValues),
-            meta: _.clone(this.initialMeta),
+            fieldset: clone(this.initialFieldset),
+            values: clone(this.initialValues),
+            meta: clone(this.initialMeta),
             error: null,
             errors: {},
             title: this.initialTitle,

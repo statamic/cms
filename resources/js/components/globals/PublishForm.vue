@@ -92,6 +92,7 @@
 <script>
 import SiteSelector from '../SiteSelector.vue';
 import HasHiddenFields from '../publish/HasHiddenFields';
+import { clone } from 'lodash-es';
 
 export default {
     mixins: [HasHiddenFields],
@@ -134,9 +135,9 @@ export default {
             localizing: false,
             fieldset: this.initialFieldset,
             title: this.initialTitle,
-            values: _.clone(this.initialValues),
-            meta: _.clone(this.initialMeta),
-            localizations: _.clone(this.initialLocalizations),
+            values: clone(this.initialValues),
+            meta: clone(this.initialMeta),
+            localizations: clone(this.initialLocalizations),
             localizedFields: this.initialLocalizedFields,
             hasOrigin: this.initialHasOrigin,
             originValues: this.initialOriginValues || {},
@@ -170,11 +171,11 @@ export default {
         },
 
         activeLocalization() {
-            return _.findWhere(this.localizations, { active: true });
+            return this.localizations.find((l) => l.active);
         },
 
         originLocalization() {
-            return _.findWhere(this.localizations, { origin: true });
+            return this.localizations.find((l) => l.origin);
         },
     },
 

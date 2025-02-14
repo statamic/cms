@@ -113,7 +113,7 @@
 </template>
 
 <script>
-import { uniq } from 'underscore';
+import { uniq } from 'lodash-es';
 import { ValidatesFieldConditions } from '../field-conditions/FieldConditions.js';
 
 export default {

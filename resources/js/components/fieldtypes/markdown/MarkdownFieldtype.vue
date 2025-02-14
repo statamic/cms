@@ -192,6 +192,7 @@ import Fieldtype from '../Fieldtype.vue';
 import { marked } from 'marked';
 import { markRaw } from 'vue';
 import PlainTextRenderer from 'marked-plaintext';
+import { indexOf, each, throttle } from 'lodash-es';
 
 import CodeMirror from 'codemirror/lib/codemirror';
 import 'codemirror/addon/edit/closebrackets';
@@ -352,7 +353,7 @@ export default {
         },
 
         getText: function (selection) {
-            var i = _.indexOf(this.selections, selection);
+            var i = indexOf(this.selections, selection);
 
             return this.codemirror.getSelections()[i];
         },
@@ -379,7 +380,7 @@ export default {
                 },
             };
 
-            _.each(self.selections, function (selection) {
+            each(self.selections, function (selection) {
                 let delimiter = elements[type]['delimiter'];
                 let replacement = self.getText(selection).match(elements[type]['pattern'])
                     ? self.removeInline(selection, elements[type]['delimiter'])
@@ -403,7 +404,7 @@ export default {
                 },
             };
 
-            _.each(self.selections, function (selection) {
+            each(self.selections, function (selection) {
                 let text = self.getText(selection);
                 let delimiter = elements[type]['delimiter'];
                 let replacement = text.match(elements[type]['pattern'])
@@ -669,7 +670,7 @@ export default {
             this.selectedAssets = [];
 
             this.$axios.post(cp_url('assets-fieldtype'), { assets }).then((response) => {
-                _(response.data).each((asset) => {
+                response.data.forEach((asset) => {
                     var alt = asset.values.alt || '';
                     var url = encodeURI('statamic://' + asset.reference);
                     if (asset.isImage) {
@@ -713,7 +714,7 @@ export default {
             this.$events.$on('livepreview.resizing', this.throttledResizeEvent);
         },
 
-        throttledResizeEvent: _.throttle(function () {
+        throttledResizeEvent: throttle(function () {
             window.dispatchEvent(new Event('resize'));
         }, 100),
 
@@ -778,7 +779,7 @@ export default {
 
         initToolbarButtons() {
             let buttons = this.config.buttons.map((button) => {
-                return _.findWhere(availableButtons(), { name: button.toLowerCase() }) || button;
+                return availableButtons().find((b) => b.name === button.toLowerCase()) || button;
             });
 
             // Remove buttons that don't pass conditions.

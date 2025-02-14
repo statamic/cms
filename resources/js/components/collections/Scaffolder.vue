@@ -55,6 +55,8 @@
 </template>
 
 <script>
+import { isEmpty } from 'lodash-es';
+
 export default {
     props: {
         route: { type: String },
@@ -76,7 +78,7 @@ export default {
 
     computed: {
         canSubmit() {
-            return !_.isEmpty(this.files);
+            return !isEmpty(this.files);
         },
 
         files() {

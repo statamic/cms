@@ -96,6 +96,7 @@
 import PublishField from '../publish/Field.vue';
 import { FieldConditionsBuilder, FIELD_CONDITIONS_KEYS } from '../field-conditions/FieldConditions.js';
 import FieldValidationBuilder from '../field-validation/Builder.vue';
+import { each } from 'lodash-es';
 
 export default {
     components: {
@@ -145,7 +146,7 @@ export default {
     computed: {
         selectedWidth: function () {
             var width = this.config.width || 100;
-            var found = _.findWhere(this.widths, { value: width });
+            var found = this.widths.find((w) => w.value === width);
             return found.text;
         },
 
@@ -173,11 +174,11 @@ export default {
 
         filteredFieldtypeConfig() {
             if (this.type === 'grid') {
-                return _.filter(this.fieldtypeConfig, (config) => config.handle !== 'fields');
+                return this.fieldtypeConfig.filter((config) => config.handle !== 'fields');
             }
 
             if (['replicator', 'bard'].includes(this.type)) {
-                return _.filter(this.fieldtypeConfig, (config) => config.handle !== 'sets');
+                return this.fieldtypeConfig.filter((config) => config.handle !== 'sets');
             }
 
             return this.fieldtypeConfig;
@@ -209,7 +210,7 @@ export default {
         updateFieldConditions(conditions) {
             let values = {};
 
-            _.each(this.values, (value, key) => {
+            each(this.values, (value, key) => {
                 if (!FIELD_CONDITIONS_KEYS.includes(key)) {
                     values[key] = value;
                 }

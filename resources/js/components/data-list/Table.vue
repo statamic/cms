@@ -125,6 +125,7 @@
 <script>
 import TableField from './TableField.vue';
 import SortableList from '../sortable/SortableList.vue';
+import { findIndex } from 'lodash-es';
 
 export default {
     components: {
@@ -232,7 +233,7 @@ export default {
         },
 
         getFieldtype(columnName) {
-            let field = _.find(this.sharedState.columns, function (field) {
+            let field = this.sharedState.columns.find(function (field) {
                 return columnName === field.field;
             });
 
@@ -240,7 +241,7 @@ export default {
         },
 
         actualIndex(row) {
-            return _.findIndex(this.sharedState.originalRows, row);
+            return findIndex(this.sharedState.originalRows, row);
         },
 
         rowClicked(row, index, $event) {

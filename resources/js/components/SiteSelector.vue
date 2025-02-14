@@ -19,7 +19,7 @@ export default {
 
     computed: {
         site() {
-            return _.findWhere(this.sites, { handle: this.value });
+            return this.sites.find((s) => s.handle === this.value);
         },
     },
 };

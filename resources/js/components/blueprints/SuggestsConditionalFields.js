@@ -1,3 +1,5 @@
+import { uniq } from 'lodash-es';
+
 export default {
     provide() {
         return {
@@ -27,7 +29,7 @@ export default {
                 );
             }, []);
 
-            return _.unique(fields);
+            return uniq(fields);
         },
 
         makeConditionsProvider() {

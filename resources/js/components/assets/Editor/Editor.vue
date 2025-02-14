@@ -292,7 +292,7 @@ import FocalPointEditor from './FocalPointEditor.vue';
 import PdfViewer from './PdfViewer.vue';
 import PublishFields from '../../publish/Fields.vue';
 import HasHiddenFields from '../../publish/HasHiddenFields';
-import pick from 'underscore/modules/pick';
+import { pick, isArray, map, flatten } from 'lodash-es';
 
 export default {
     emits: ['saved', 'closed', 'action-completed'],
@@ -415,19 +415,20 @@ export default {
 
                 // If there are no fields, it will be an empty array when PHP encodes
                 // it into JSON on the server. We'll ensure it's always an object.
-                this.values = _.isArray(data.values) ? {} : data.values;
+                this.values = isArray(data.values) ? {} : data.values;
 
                 this.meta = data.meta;
                 this.actionUrl = data.actionUrl;
                 this.actions = data.actions;
 
                 this.fieldset = data.blueprint;
-                this.fields = _.chain(this.fieldset.tabs)
-                    .map((tab) => tab.sections)
-                    .flatten(true)
-                    .map((section) => section.fields)
-                    .flatten(true)
-                    .value();
+
+                let fields = this.fields.tabs;
+                fields = map(fields, (tab) => tab.sections);
+                fields = flatten(fields);
+                fields = map(fields, (section) => section.fields);
+                fields = flatten(fields);
+                this.fields = fields;
 
                 this.extraValues = pick(this.asset, [
                     'filename',
@@ -514,7 +515,7 @@ export default {
         },
 
         canRunAction(handle) {
-            return _.find(this.actions, (action) => action.handle == handle);
+            return this.actions.find((action) => action.handle == handle);
         },
 
         runAction(handle) {

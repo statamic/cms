@@ -3,6 +3,7 @@ import HasActions from './data-list/HasActions';
 import HasFilters from './data-list/HasFilters';
 import HasPagination from './data-list/HasPagination';
 import HasPreferences from './data-list/HasPreferences';
+import { isEmpty, indexOf } from 'lodash-es';
 
 export default {
     mixins: [HasActions, HasFilters, HasPagination, HasPreferences],
@@ -74,7 +75,7 @@ export default {
 
         activeFilterParameters: {
             get() {
-                if (_.isEmpty(this.activeFilters)) {
+                if (isEmpty(this.activeFilters)) {
                     return null;
                 }
                 return utf8btoa(JSON.stringify(this.activeFilters));
@@ -86,7 +87,7 @@ export default {
 
         visibleColumnParameters: {
             get() {
-                if (_.isEmpty(this.visibleColumns)) {
+                if (isEmpty(this.visibleColumns)) {
                     return null;
                 }
                 return this.visibleColumns.map((column) => column.field).join(',');
@@ -210,7 +211,10 @@ export default {
 
         removeRow(row) {
             let id = row.id;
-            let i = _.indexOf(this.rows, _.findWhere(this.rows, { id }));
+            let i = indexOf(
+                this.rows,
+                this.rows.find((r) => r.id === id),
+            );
             this.rows.splice(i, 1);
             if (this.rows.length === 0) location.reload();
         },

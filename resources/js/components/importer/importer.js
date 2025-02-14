@@ -1,3 +1,5 @@
+import { each, size, uniq, reject, includes } from 'lodash-es';
+
 export default {
     props: ['importer'],
 
@@ -44,7 +46,7 @@ export default {
         duplicateCount: function (items) {
             let count = 0;
 
-            _.each(items, (item) => {
+            each(items, (item) => {
                 if (!item.exists) {
                     return;
                 }
@@ -56,7 +58,7 @@ export default {
         },
 
         uncheckDuplicates: function (items) {
-            _.each(items, (item) => {
+            each(items, (item) => {
                 if (!item.exists) {
                     return;
                 }
@@ -66,52 +68,52 @@ export default {
         },
 
         size: function (obj) {
-            return _.size(obj);
+            return size(obj);
         },
 
         showCollection: function (collection) {
             this.showCollections.push(collection);
-            _.uniq(this.showCollections);
+            uniq(this.showCollections);
         },
 
         hideCollection: function (hidden) {
-            this.showCollections = _.reject(this.showCollections, function (c) {
+            this.showCollections = reject(this.showCollections, function (c) {
                 return c === hidden;
             });
         },
 
         shouldShowCollection: function (collection) {
-            return _.contains(this.showCollections, collection);
+            return includes(this.showCollections, collection);
         },
 
         showTaxonomy: function (taxonomy) {
             this.showTaxonomies.push(taxonomy);
-            _.uniq(this.showTaxonomies);
+            uniq(this.showTaxonomies);
         },
 
         hideTaxonomy: function (hidden) {
-            this.showTaxonomies = _.reject(this.showTaxonomies, function (t) {
+            this.showTaxonomies = reject(this.showTaxonomies, function (t) {
                 return t === hidden;
             });
         },
 
         shouldShowTaxonomy: function (taxonomy) {
-            return _.contains(this.showTaxonomies, taxonomy);
+            return contains(this.showTaxonomies, taxonomy);
         },
 
         showGlobal: function (global) {
             this.showGlobals.push(global);
-            _.uniq(this.showGlobals);
+            uniq(this.showGlobals);
         },
 
         hideGlobal: function (hidden) {
-            this.showGlobals = _.reject(this.showGlobals, function (g) {
+            this.showGlobals = reject(this.showGlobals, function (g) {
                 return g === hidden;
             });
         },
 
         shouldShowGlobal: function (global) {
-            return _.contains(this.showGlobals, global);
+            return contains(this.showGlobals, global);
         },
     },
 };

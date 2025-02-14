@@ -36,7 +36,7 @@ export default {
         },
 
         activeName() {
-            return _.findWhere(this.sites, { handle: this.active }).name;
+            return this.sites.find((s) => s.handle === this.active).name;
         },
     },
 

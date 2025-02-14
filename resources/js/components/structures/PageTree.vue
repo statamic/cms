@@ -78,6 +78,7 @@
 <script>
 import { dragContext, Draggable, walkTreeData } from '@he-tree/vue';
 import TreeBranch from './Branch.vue';
+import { map } from 'lodash-es';
 
 export default {
     components: {
@@ -112,7 +113,7 @@ export default {
 
     computed: {
         activeLocalization() {
-            return _.findWhere(this.localizations, { active: true });
+            return this.localizations.find((l) => l.active);
         },
 
         preferencesKey() {
@@ -178,7 +179,7 @@ export default {
         },
 
         cleanPagesForSubmission(pages) {
-            return _.map(pages, (page) => ({
+            return map(pages, (page) => ({
                 id: page.id,
                 children: this.cleanPagesForSubmission(page.children),
             }));

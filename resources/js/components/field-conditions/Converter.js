@@ -1,11 +1,5 @@
 import { OPERATORS, ALIASES } from './Constants.js';
-import map from 'underscore/modules/map.js';
-import each from 'underscore/modules/each.js';
-import filter from 'underscore/modules/filter.js';
-import chain from 'underscore/modules/chain.js';
-import chainable from 'underscore/modules/mixin.js';
-
-chainable({ chain, filter, each });
+import { map, each } from 'lodash-es';
 
 export default class {
     fromBlueprint(conditions, prefix = null) {
@@ -45,9 +39,9 @@ export default class {
     getOperatorFromRhs(condition) {
         let operator = '==';
 
-        chain(this.getOperatorsAndAliases())
+        this.getOperatorsAndAliases()
             .filter((value) => new RegExp(`^${value} [^=]`).test(this.normalizeConditionString(condition)))
-            .each((value) => (operator = value));
+            .forEach((value) => (operator = value));
 
         return this.normalizeOperator(operator);
     }
@@ -59,9 +53,9 @@ export default class {
     getValueFromRhs(condition) {
         let rhs = this.normalizeConditionString(condition);
 
-        chain(this.getOperatorsAndAliases())
+        this.getOperatorsAndAliases()
             .filter((value) => new RegExp(`^${value} [^=]`).test(rhs))
-            .each((value) => (rhs = rhs.replace(new RegExp(`^${value}[ ]*`), '')));
+            .forEach((value) => (rhs = rhs.replace(new RegExp(`^${value}[ ]*`), '')));
 
         return rhs;
     }

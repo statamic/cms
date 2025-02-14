@@ -75,6 +75,7 @@
 <script>
 import Fuse from 'fuse.js';
 import { ref } from 'vue';
+import { mapValues } from 'lodash-es';
 const loadedFieldtypes = ref(null);
 
 export default {
@@ -179,7 +180,7 @@ export default {
         },
 
         groupedFieldtypes() {
-            return _.mapObject(this.categories, (category, handle) => {
+            return mapObject(this.categories, (category, handle) => {
                 category.handle = handle;
                 category.fieldtypes = [];
 
@@ -283,7 +284,7 @@ export default {
         },
 
         createField(handle) {
-            const fieldtype = _.findWhere(this.fieldtypes, { handle });
+            const fieldtype = this.fieldtypes.find((f) => f.handle === handle);
 
             // Build the initial empty field. The event listener will assign display, handle,
             // and id keys. This will be 'field_n' etc, where n would be the total root
@@ -304,7 +305,7 @@ export default {
             // We'll set up the default values for each config option. Each option might
             // have a default value defined, otherwise will just set it to null.
             let defaults = {};
-            _.each(fieldtype.config, (configField) => {
+            fieldtype.config.forEach((configField) => {
                 defaults[configField.handle] = configField.default || null;
             });
 

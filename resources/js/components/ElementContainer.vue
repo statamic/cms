@@ -1,5 +1,6 @@
 <script>
 import ResizeObserver from 'resize-observer-polyfill';
+import { throttle } from 'lodash-es';
 
 export default {
     emits: ['resized'],
@@ -16,7 +17,7 @@ export default {
 
     mounted() {
         const observer = new ResizeObserver(
-            _.throttle((entries) => {
+            throttle((entries) => {
                 this.width = entries[0].contentRect.width;
             }, 200),
         );

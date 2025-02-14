@@ -176,7 +176,7 @@ export default {
             if (this.value === null) return [];
 
             return this.value?.map((selection) => {
-                const data = _.find(this.data, (item) => item.id == selection);
+                const data = this.data.find((item) => item.id == selection);
 
                 if (!data) return { id: selection, title: selection };
 

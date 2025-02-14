@@ -123,6 +123,7 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 import { SortableList, SortableHelpers } from '../sortable/Sortable';
+import { reduce } from 'lodash-es';
 
 export default {
     mixins: [Fieldtype, SortableHelpers],
@@ -201,7 +202,7 @@ export default {
         replicatorPreview() {
             if (!this.showFieldPreviews || !this.config.replicator_preview) return;
 
-            return _.reduce(
+            return reduce(
                 this.value,
                 (carry, value, key) => {
                     let str = `${key}: ${value}`;

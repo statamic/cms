@@ -1,3 +1,5 @@
+import { omit } from 'lodash-es';
+
 export default {
     methods: {
         updateRowMeta(row, value) {
@@ -13,7 +15,7 @@ export default {
         removeRowMeta(row) {
             this.updateMeta({
                 ...this.meta,
-                existing: _.omit(this.meta.existing, row),
+                existing: omit(this.meta.existing, row),
             });
         },
     },

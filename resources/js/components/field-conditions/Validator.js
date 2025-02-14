@@ -2,19 +2,7 @@ import Converter from './Converter.js';
 import ParentResolver from './ParentResolver.js';
 import { KEYS } from './Constants.js';
 import { data_get } from '../../bootstrap/globals.js';
-import isString from 'underscore/modules/isString.js';
-import isObject from 'underscore/modules/isObject.js';
-import isEmpty from 'underscore/modules/isEmpty.js';
-import intersection from 'underscore/modules/intersection.js';
-import map from 'underscore/modules/map.js';
-import each from 'underscore/modules/each.js';
-import filter from 'underscore/modules/filter.js';
-import reject from 'underscore/modules/reject.js';
-import first from 'underscore/modules/first.js';
-import chain from 'underscore/modules/chain.js';
-import chainable from 'underscore/modules/mixin.js';
-
-chainable({ chain, map, each, filter, reject, first, isEmpty });
+import { isString, isObject, isEmpty, intersection, first } from 'lodash-es';
 
 const NUMBER_SPECIFIC_COMPARISONS = ['>', '>=', '<', '<='];
 
@@ -45,10 +33,7 @@ export default class {
     }
 
     getConditions() {
-        let key = chain(KEYS)
-            .filter((key) => this.field[key])
-            .first()
-            .value();
+        let key = first(KEYS.filter((key) => this.field[key]));
 
         if (!key) {
             return undefined;
@@ -74,19 +59,19 @@ export default class {
     }
 
     passesAllConditions(conditions) {
-        return chain(conditions)
-            .map((condition) => this.prepareCondition(condition))
-            .reject((condition) => this.passesCondition(condition))
-            .isEmpty()
-            .value();
+        return isEmpty(
+            conditions
+                .map((condition) => this.prepareCondition(condition))
+                .filter((condition) => !this.passesCondition(condition)),
+        );
     }
 
     passesAnyConditions(conditions) {
-        return !chain(conditions)
-            .map((condition) => this.prepareCondition(condition))
-            .filter((condition) => this.passesCondition(condition))
-            .isEmpty()
-            .value();
+        return !isEmpty(
+            conditions
+                .map((condition) => this.prepareCondition(condition))
+                .filter((condition) => this.passesCondition(condition)),
+        );
     }
 
     prepareCondition(condition) {
@@ -271,11 +256,9 @@ export default class {
 
         let revealerFields = this.store.revealerFields || [];
 
-        let nonRevealerConditions = chain(this.getConditions())
-            .reject((condition) =>
-                revealerFields.includes(this.relativeLhsToAbsoluteFieldPath(condition.field, dottedPrefix)),
-            )
-            .value();
+        let nonRevealerConditions = (this.getConditions() ?? []).filter(
+            (condition) => !revealerFields.includes(this.relativeLhsToAbsoluteFieldPath(condition.field, dottedPrefix)),
+        );
 
         return this.passesConditions(nonRevealerConditions);
     }

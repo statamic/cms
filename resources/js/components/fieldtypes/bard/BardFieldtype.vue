@@ -130,7 +130,7 @@
 <script>
 import Fieldtype from '../Fieldtype.vue';
 import uniqid from 'uniqid';
-import reduce from 'underscore/modules/reduce';
+import { reduce } from 'lodash-es';
 import Emitter from 'tiny-emitter';
 import { BubbleMenu, Editor, EditorContent } from '@tiptap/vue-3';
 import { Extension } from '@tiptap/core';
@@ -591,7 +591,7 @@ export default {
 
             // Get the configured buttons and swap them with corresponding objects
             let buttons = selectedButtons.map((button) => {
-                return _.findWhere(availableButtons(), { name: button.toLowerCase() }) || button;
+                return availableButtons().find((b) => b.name === button.toLowerCase()) || button;
             });
 
             // Let addons add, remove, or control the position of buttons.
@@ -626,7 +626,7 @@ export default {
                 return button.condition ? button.condition.call(null, this.config) : true;
             });
 
-            if (_.findWhere(buttons, { name: 'table' })) {
+            if (buttons.find((b) => b.name === 'table')) {
                 buttons.push(
                     {
                         name: 'deletetable',

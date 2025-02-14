@@ -177,6 +177,7 @@
 import qs from 'qs';
 import AssetSelector from '../../assets/Selector.vue';
 import SvgIcon from '../../SvgIcon.vue';
+import { isEmpty } from 'lodash-es';
 
 export default {
     components: {
@@ -337,7 +338,7 @@ export default {
         this.bard.events.on('link-selected', this.applyAttrs);
         this.bard.events.on('link-deselected', () => this.$emit('deselected'));
 
-        if (_.isEmpty(this.linkAttrs) && this.selectedTextIsEmail) {
+        if (isEmpty(this.linkAttrs) && this.selectedTextIsEmail) {
             this.linkType = 'mailto';
             this.urlData = { mailto: this.selectedTextIsEmail };
         }

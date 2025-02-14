@@ -203,6 +203,7 @@ import TopLevelTreeBranch from './TopLevelBranch.vue';
 import ItemEditor from './ItemEditor.vue';
 import SectionEditor from './SectionEditor.vue';
 import { data_get } from '../../bootstrap/globals.js';
+import { keys, omit, map, values } from 'lodash-es';
 
 export default {
     components: {
@@ -290,10 +291,7 @@ export default {
 
             this.setOriginalSectionItems(navConfig);
 
-            this.treeData = _.chain(navConfig)
-                .mapObject((section) => this.normalizeNavConfig(section))
-                .values()
-                .value();
+            this.treeData = values(map(navConfig, (section) => this.normalizeNavConfig(section)));
         },
 
         setOriginalSectionItems(nav) {
@@ -568,13 +566,13 @@ export default {
         },
 
         itemHasModifiedProperties(stat) {
-            return _.chain(stat.data.manipulations).omit(['action', 'reorder', 'children']).keys().value().length > 0;
+            return keys(omit(stat.data.manipulations, ['action', 'reorder', 'children'])).length > 0;
         },
 
         itemHasModifiedChildren(stat) {
             return (
                 stat.children.filter((childItem) => {
-                    return _.chain(childItem.data.manipulations).keys().value().length > 0;
+                    return keys(childItem.data.manipulations).length > 0;
                 }).length > 0
             );
         },

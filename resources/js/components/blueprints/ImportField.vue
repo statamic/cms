@@ -43,6 +43,7 @@
 <script>
 import Field from './Field.vue';
 import FieldSettings from '../fields/ImportSettings.vue';
+import { omit } from 'lodash-es';
 
 export default {
     mixins: [Field],
@@ -51,7 +52,7 @@ export default {
 
     computed: {
         fieldConfig() {
-            return _.omit(this.field, ['_id', 'type']);
+            return omit(this.field, ['_id', 'type']);
         },
     },
 

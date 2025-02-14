@@ -234,7 +234,7 @@
 
 import isEmail from 'validator/lib/isEmail';
 import HasWizardSteps from '../HasWizardSteps.js';
-import uniq from 'underscore/modules/uniq.js';
+import { uniq } from 'lodash-es';
 
 export default {
     mixins: [HasWizardSteps],

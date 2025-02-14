@@ -55,6 +55,7 @@ import Converter from '../field-conditions/Converter.js';
 import { KEYS, OPERATORS } from '../field-conditions/Constants.js';
 import Condition from './Condition.vue';
 import { __ } from '../../bootstrap/globals';
+import { isEmpty, reject, filter, first } from 'lodash-es';
 
 export default {
     mixins: [HasInputOptions],
@@ -114,7 +115,7 @@ export default {
             let key = this.type === 'any' ? `${this.when}_any` : this.when;
             let saveableConditions = this.prepareSaveableConditions(this.conditions);
 
-            if (this.isStandard && !_.isEmpty(saveableConditions)) {
+            if (this.isStandard && !isEmpty(saveableConditions)) {
                 conditions[key] = saveableConditions;
             } else if (this.isCustom && this.customMethod) {
                 conditions[key] = this.customMethod;
@@ -162,10 +163,7 @@ export default {
         },
 
         getInitialConditions() {
-            let key = _.chain(KEYS)
-                .filter((key) => this.config[key])
-                .first()
-                .value();
+            let key = first(filter(KEYS, (key) => this.config[key]));
 
             let conditions = this.config[key];
 
@@ -199,7 +197,7 @@ export default {
         },
 
         prepareSaveableConditions(conditions) {
-            conditions = _.reject(conditions, (condition) => {
+            conditions = reject(conditions, (condition) => {
                 return !condition.field || !condition.value;
             });
 

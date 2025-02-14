@@ -1,6 +1,7 @@
 import { ref } from 'vue';
 import uniqid from 'uniqid';
 import Component from './Component';
+import { indexOf } from 'lodash-es';
 
 class Components {
     constructor(app) {
@@ -25,14 +26,14 @@ class Components {
     }
 
     getAppended(id) {
-        return _.findWhere(this.components.value, { id });
+        return this.components.value.find((c) => c.id === id);
     }
 
     destroy(id) {
         let appended = this.getAppended(id);
 
         if (appended) {
-            const index = _.indexOf(this.components.value, appended);
+            const index = indexOf(this.components.value, appended);
             this.components.value.splice(index, 1);
         }
     }

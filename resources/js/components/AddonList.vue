@@ -200,7 +200,7 @@ export default {
         },
 
         refreshShowingAddon() {
-            this.showingAddon = _.findWhere(this.rows, { id: this.showingAddon.id });
+            this.showingAddon = this.rows.find((row) => row.id === this.showingAddon.id);
 
             this.$events.$emit('addon-refreshed');
         },
