@@ -30,10 +30,12 @@
                                 :errors="errors(field.handle)"
                                 :field-path="fieldPath(field.handle)"
                                 :read-only="isReadOnly"
+                                :show-field-previews="config.replicator_preview"
                                 @updated="updated(field.handle, $event)"
                                 @meta-updated="updateMeta(field.handle, $event)"
                                 @focus="$emit('focus')"
                                 @blur="$emit('blur')"
+                                @replicator-preview-updated="previewUpdated(field.handle, $event)"
                             />
                         </div>
                     </div>
@@ -57,11 +59,13 @@
 import Fieldtype from './Fieldtype.vue';
 import SetField from './replicator/Field.vue';
 import { ValidatesFieldConditions } from '../field-conditions/FieldConditions.js';
+import ManagesPreviewText from "./replicator/ManagesPreviewText";
 
 export default {
     mixins: [
         Fieldtype,
         ValidatesFieldConditions,
+        ManagesPreviewText,
     ],
     components: { SetField },
     data() {
@@ -69,6 +73,7 @@ export default {
             containerWidth: null,
             focused: false,
             fullScreenMode: false,
+            previews: {},
             provide: {
                 group: this.makeGroupProvide(),
                 storeName: this.storeName,
@@ -86,7 +91,7 @@ export default {
         replicatorPreview() {
             if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
 
-            return Object.values(this.value).join(', ');
+            return replicatorPreviewHtml(this.previewText);
         },
         internalFieldActions() {
             return [
@@ -148,6 +153,10 @@ export default {
 
         updateMeta(handle, value) {
             this.$emit('meta-updated', { ...this.meta, [handle]: value });
+        },
+
+        previewUpdated(handle, value) {
+            this.previews = { ...this.previews, [handle]: value };
         },
 
         fieldPath(handle) {

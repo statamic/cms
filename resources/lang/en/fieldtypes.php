@@ -169,6 +169,8 @@ return [
     'slug.config.show_regenerate' => 'Show the regenerate button to re-slugify from the target field.',
     'slug.title' => 'Slug',
     'structures.title' => 'Structures',
+    'table.config.max_columns' => 'Set a maximum number of columns.',
+    'table.config.max_rows' => 'Set a maximum number of rows.',
     'table.title' => 'Table',
     'taggable.config.options' => 'Provide pre-defined tags that can be selected.',
     'taggable.config.placeholder' => 'Type and press ↩ Enter',
