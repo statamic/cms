@@ -2,25 +2,26 @@
 
 namespace Statamic\Console\Commands;
 
-use Statamic\Facades\File;
-use Statamic\Facades\Blink;
+use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Console\Command;
-use function Laravel\Prompts\spin;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Statamic\Console\RunsInPlease;
-use Statamic\Console\EnhancesCommands;
-use function Laravel\Prompts\multiselect;
-use Facades\Statamic\Console\Processes\Composer;
 use Statamic\Console\Commands\Concerns\RunsArtisanCommand;
-use Statamic\Console\Commands\Eloquent\InstallEloquentEntries;
-use Statamic\Console\Commands\Eloquent\InstallEloquentRepository;
 use Statamic\Console\Commands\Eloquent\InstallEloquentCollections;
 use Statamic\Console\Commands\Eloquent\InstallEloquentCollectionTrees;
+use Statamic\Console\Commands\Eloquent\InstallEloquentEntries;
+use Statamic\Console\Commands\Eloquent\InstallEloquentRepository;
+use Statamic\Console\EnhancesCommands;
+use Statamic\Console\RunsInPlease;
+use Statamic\Facades\Blink;
+use Statamic\Facades\File;
+
+use function Laravel\Prompts\multiselect;
+use function Laravel\Prompts\spin;
 
 class InstallEloquent extends Command
 {
-    use EnhancesCommands, RunsInPlease, RunsArtisanCommand;
+    use EnhancesCommands, RunsArtisanCommand, RunsInPlease;
 
     /**
      * The name and signature of the console command.

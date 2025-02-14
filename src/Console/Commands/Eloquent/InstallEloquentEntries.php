@@ -2,8 +2,8 @@
 
 namespace Statamic\Console\Commands\Eloquent;
 
-use Statamic\Support\Str;
 use Statamic\Facades\File;
+use Statamic\Support\Str;
 
 use function Laravel\Prompts\spin;
 

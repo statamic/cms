@@ -3,16 +3,17 @@
 namespace Statamic\Console\Commands\Eloquent;
 
 use Illuminate\Console\Command;
-use function Laravel\Prompts\confirm;
 use Statamic\Console\Commands\Concerns\RunsArtisanCommand;
 use Statamic\Console\EnhancesCommands;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\File;
 use Statamic\Support\Str;
 
+use function Laravel\Prompts\confirm;
+
 abstract class InstallEloquentRepository extends Command
 {
-    use EnhancesCommands, RunsInPlease, RunsArtisanCommand;
+    use EnhancesCommands, RunsArtisanCommand, RunsInPlease;
 
     abstract public function hasBeenMigrated(): bool;
 
