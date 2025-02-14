@@ -47,6 +47,7 @@ import SingleInline from './date/SingleInline.vue';
 import RangePopover from './date/RangePopover.vue';
 import RangeInline from './date/RangeInline.vue';
 import { useScreens } from 'vue-screen-utils';
+import { isProxy, toRaw } from 'vue';
 
 export default {
     components: {
@@ -58,7 +59,7 @@ export default {
 
     mixins: [Fieldtype],
 
-    inject: ['storeName'],
+    inject: ['store'],
 
     setup() {
         const { mapCurrent } = useScreens({
@@ -200,8 +201,6 @@ export default {
             this.value.time = this.$moment().format(this.hasSeconds ? 'HH:mm:ss' : 'HH:mm'); // todo: utc me
         }
 
-        this.localValue = this.createLocalFromUtc(this.value);
-
         this.$events.$on(`container.${this.storeName}.saving`, this.triggerChangeOnFocusedField);
     },
 
@@ -214,25 +213,31 @@ export default {
     },
 
     watch: {
-        // value: {
-        //     immediate: true,
-        //     handler(value, oldValue) {
-        //         this.localValue = this.createLocalFromUtc(value);
-        //     },
-        // },
+        value: {
+            immediate: true,
+            handler(value, oldValue) {
+                let localValue = this.createLocalFromUtc(value);
+
+                if (JSON.stringify(toRaw(this.localValue)) === JSON.stringify(localValue)) {
+                    return;
+                }
+
+                this.localValue = localValue;
+            },
+        },
 
         localValue(value) {
             if (! this.mounted) {
                 return;
             }
 
-            this.update(this.createUtcFromLocal(this.localValue));
+            this.update(this.createUtcFromLocal(value));
         },
     },
 
     methods: {
         createLocalFromUtc(utcValue) {
-            const localTime = new Date(utcValue.date + 'T' + (this.hasTime ? utcValue.time : '00:00:00') + 'Z');
+            const localTime = new Date(utcValue.date + 'T' + (utcValue.time || '00:00:00') + 'Z');
 
             let date = localTime.getFullYear() + '-' + (localTime.getMonth() + 1).toString().padStart(2, '0') + '-' + localTime.getDate().toString().padStart(2, '0');
             let time = null;
