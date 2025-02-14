@@ -156,7 +156,7 @@ class ConvertDatesToUtcTest extends TestCase
                 'date_field',
                 ['handle' => 'date_field', 'field' => ['type' => 'date']],
                 '2025-01-01',
-                '2025-01-01',
+                '2025-01-01 05:00',
             ],
             'Date field with time enabled' => [
                 'date_field',
@@ -180,7 +180,7 @@ class ConvertDatesToUtcTest extends TestCase
                 'date_field',
                 ['handle' => 'date_field', 'field' => ['type' => 'date', 'mode' => 'range']],
                 ['start' => '2025-01-01', 'end' => '2025-01-07'],
-                ['start' => '2025-01-01', 'end' => '2025-01-07'],
+                ['start' => '2025-01-01 05:00', 'end' => '2025-01-07 05:00'],
             ],
             'Imported date field' => [
                 'fieldset_date',
@@ -200,7 +200,7 @@ class ConvertDatesToUtcTest extends TestCase
                 ],
                 [
                     'date_and_time' => '2025-01-01 17:00',
-                    'date_range' => ['start' => '2025-01-01', 'end' => '2025-01-07'],
+                    'date_range' => ['start' => '2025-01-01 05:00', 'end' => '2025-01-07 05:00'],
                 ],
             ],
             'Grid field with nested date fields' => [
@@ -210,7 +210,7 @@ class ConvertDatesToUtcTest extends TestCase
                     ['handle' => 'date_range', 'field' => ['type' => 'date', 'mode' => 'range']],
                 ]]],
                 [['date_and_time' => '2025-01-01 12:00', 'date_range' => ['start' => '2025-01-01', 'end' => '2025-01-07']]],
-                [['date_and_time' => '2025-01-01 17:00', 'date_range' => ['start' => '2025-01-01', 'end' => '2025-01-07']]],
+                [['date_and_time' => '2025-01-01 17:00', 'date_range' => ['start' => '2025-01-01 05:00', 'end' => '2025-01-07 05:00']]],
             ],
             'Replicator field with nested date fields' => [
                 'replicator_field',
@@ -223,7 +223,7 @@ class ConvertDatesToUtcTest extends TestCase
                     ]],
                 ]]],
                 [['type' => 'set_name', 'date_and_time' => '2025-01-01 12:00', 'date_range' => ['start' => '2025-01-01', 'end' => '2025-01-07']]],
-                [['type' => 'set_name', 'date_and_time' => '2025-01-01 17:00', 'date_range' => ['start' => '2025-01-01', 'end' => '2025-01-07']]],
+                [['type' => 'set_name', 'date_and_time' => '2025-01-01 17:00', 'date_range' => ['start' => '2025-01-01 05:00', 'end' => '2025-01-07 05:00']]],
             ],
             'Bard field with nested date fields' => [
                 'bard_field',
@@ -243,7 +243,7 @@ class ConvertDatesToUtcTest extends TestCase
                 [['type' => 'set', 'attrs' => ['id' => 'abc', 'values' => [
                     'type' => 'set_name',
                     'date_and_time' => '2025-01-01 17:00',
-                    'date_range' => ['start' => '2025-01-01', 'end' => '2025-01-07'],
+                    'date_range' => ['start' => '2025-01-01 05:00', 'end' => '2025-01-07 05:00'],
                 ]]]],
             ],
             'Deeply nested date fields' => [
@@ -258,7 +258,7 @@ class ConvertDatesToUtcTest extends TestCase
                     'date_and_time' => '2025-01-01 12:00', 'date_range' => ['start' => '2025-01-01', 'end' => '2025-01-07'],
                 ]]],
                 [['nested_group' => [
-                    'date_and_time' => '2025-01-01 17:00', 'date_range' => ['start' => '2025-01-01', 'end' => '2025-01-07'],
+                    'date_and_time' => '2025-01-01 17:00', 'date_range' => ['start' => '2025-01-01 05:00', 'end' => '2025-01-07 05:00'],
                 ]]],
             ],
         ];

@@ -207,12 +207,8 @@ class ConvertDatesToUtc extends UpdateScript
 
     private function defaultFormat(Field $field): string
     {
-        if ($field->get('time_enabled') && $field->get('mode', 'single') === 'single') {
-            return $field->get('time_seconds_enabled')
-                ? DateFieldtype::DEFAULT_DATETIME_WITH_SECONDS_FORMAT
-                : DateFieldtype::DEFAULT_DATETIME_FORMAT;
-        }
-
-        return DateFieldtype::DEFAULT_DATE_FORMAT;
+        return $field->get('time_seconds_enabled')
+            ? DateFieldtype::DEFAULT_DATETIME_WITH_SECONDS_FORMAT
+            : DateFieldtype::DEFAULT_DATETIME_FORMAT;
     }
 }
