@@ -177,9 +177,7 @@ class Date extends Fieldtype
     {
         return [
             'date' => $carbon->format(self::DEFAULT_DATE_FORMAT),
-            'time' => $this->config('time_enabled')
-                ? $carbon->format($this->config('time_seconds_enabled') ? 'H:i:s' : 'H:i')
-                : null,
+            'time' => $carbon->format($this->config('time_seconds_enabled') ? 'H:i:s' : 'H:i'),
         ];
     }
 
@@ -277,13 +275,9 @@ class Date extends Fieldtype
 
     private function defaultFormat()
     {
-        if ($this->config('time_enabled') && $this->config('mode', 'single') === 'single') {
-            return $this->config('time_seconds_enabled')
-                ? self::DEFAULT_DATETIME_WITH_SECONDS_FORMAT
-                : self::DEFAULT_DATETIME_FORMAT;
-        }
-
-        return self::DEFAULT_DATE_FORMAT;
+        return $this->config('time_seconds_enabled')
+            ? self::DEFAULT_DATETIME_WITH_SECONDS_FORMAT
+            : self::DEFAULT_DATETIME_FORMAT;
     }
 
     private function formatAndCast(Carbon $date, $format)
