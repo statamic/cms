@@ -27,7 +27,7 @@ use function Laravel\Prompts\text;
 
 class Multisite extends Command
 {
-    use ConfirmableTrait, EnhancesCommands, RunsInPlease, ValidatesInput, Hookable;
+    use ConfirmableTrait, EnhancesCommands, Hookable, RunsInPlease, ValidatesInput;
 
     protected $signature = 'statamic:multisite';
 
