@@ -81,6 +81,14 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
         return cp_route('taxonomies.show', $this->handle());
     }
 
+    public function breadcrumbUrl()
+    {
+        $referer = request()->header('referer');
+        $showUrl = $this->showUrl();
+
+        return $referer && Str::before($referer, '?') === $showUrl ? $referer : $showUrl;
+    }
+
     public function editUrl()
     {
         return cp_route('taxonomies.edit', $this->handle());
@@ -381,6 +389,10 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
             throw new NotFoundHttpException;
         }
 
+        if ($this->collection() && ! $this->collections()->contains($this->collection())) {
+            throw new NotFoundHttpException;
+        }
+
         return (new \Statamic\Http\Responses\DataResponse($this))
             ->with([
                 'terms' => $termQuery = $this->queryTerms()->where('site', $site),
@@ -436,9 +448,22 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
         return $this
             ->fluentlyGetOrSet('layout')
             ->getter(function ($layout) {
-                return $layout ?? 'layout';
+                return $layout ?? config('statamic.system.layout', 'layout');
             })
             ->args(func_get_args());
+    }
+
+    public function createLabel()
+    {
+        $key = "messages.{$this->handle()}_taxonomy_create_term";
+
+        $translation = __($key);
+
+        if ($translation === $key) {
+            return __('Create Term');
+        }
+
+        return $translation;
     }
 
     public function searchIndex($index = null)

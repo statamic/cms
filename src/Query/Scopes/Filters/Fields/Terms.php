@@ -3,7 +3,6 @@
 namespace Statamic\Query\Scopes\Filters\Fields;
 
 use Statamic\Facades;
-use Statamic\Support\Str;
 
 class Terms extends FieldtypeFilter
 {
@@ -21,12 +20,7 @@ class Terms extends FieldtypeFilter
 
     public function apply($query, $handle, $values)
     {
-        $term = $values['term'];
-
-        $term = Str::ensureLeft($term, '%');
-        $term = Str::ensureRight($term, '%');
-
-        $query->where($handle, 'like', $term);
+        $query->whereJsonContains($handle, $values['term']);
     }
 
     public function badge($values)

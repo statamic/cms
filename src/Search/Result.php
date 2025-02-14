@@ -143,4 +143,9 @@ class Result implements ContainsQueryableValues, Contract
     {
         $this->searchable->setSupplement($key, $value);
     }
+
+    public function __call($method, $args)
+    {
+        return $this->searchable->$method(...$args);
+    }
 }

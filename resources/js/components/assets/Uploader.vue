@@ -32,7 +32,11 @@ export default {
         },
         container: String,
         path: String,
-        url: { type: String, default: () => cp_url('assets') }
+        url: { type: String, default: () => cp_url('assets') },
+        extraData: {
+            type: Object,
+            default: () => ({})
+        }
     },
 
 
@@ -41,19 +45,6 @@ export default {
             dragging: false,
             uploads: []
         }
-    },
-
-
-    computed: {
-
-        extraData() {
-            return {
-                container: this.container,
-                folder: this.path,
-                _token: Statamic.$config.get('csrfToken')
-            };
-        }
-
     },
 
 
@@ -72,6 +63,15 @@ export default {
         uploads(uploads) {
             this.$emit('updated', uploads);
             this.processUploadQueue();
+        }
+
+    },
+
+
+    computed: {
+
+        activeUploads() {
+            return this.uploads.filter(u => u.instance.state === 'started');
         }
 
     },
@@ -112,9 +112,60 @@ export default {
             e.preventDefault();
             this.dragging = false;
 
-            for (let i = 0; i < e.dataTransfer.files.length; i++) {
-                this.addFile(e.dataTransfer.files[i]);
+            const { files, items } = e.dataTransfer;
+
+            // Handle DataTransferItems if browser supports dropping of folders
+            if (items && items.length && items[0].webkitGetAsEntry) {
+                this.addFilesFromDataTransferItems(items);
+            } else {
+                this.addFilesFromFileList(files);
             }
+        },
+
+        addFilesFromFileList(files) {
+            for (let i = 0; i < files.length; i++) {
+                this.addFile(files[i]);
+            }
+        },
+
+        addFilesFromDataTransferItems(items) {
+            for (let i = 0; i < items.length; i++) {
+                let item = items[i];
+                if (item.webkitGetAsEntry) {
+                    const entry = item.webkitGetAsEntry();
+                    if (entry?.isFile) {
+                        this.addFile(item.getAsFile());
+                    } else if (entry?.isDirectory) {
+                        this.addFilesFromDirectory(entry, entry.name);
+                    }
+                } else if (item.getAsFile) {
+                    if (item.kind === "file" || ! item.kind) {
+                        this.addFile(item.getAsFile());
+                    }
+                }
+            }
+        },
+
+        addFilesFromDirectory(directory, path) {
+            const reader = directory.createReader();
+            const readEntries = () => reader.readEntries((entries) => {
+                if (!entries.length) return;
+                for (let entry of entries) {
+                    if (entry.isFile) {
+                        entry.file((file) => {
+                            if (! file.name.startsWith('.')) {
+                                file.relativePath = path;
+                                this.addFile(file);
+                            }
+                        });
+                    } else if (entry.isDirectory) {
+                        this.addFilesFromDirectory(entry, `${path}/${entry.name}`);
+                    }
+                }
+                // Handle directories with more than 100 files in Chrome
+                readEntries();
+            }, console.error);
+            return readEntries();
         },
 
         addFile(file, data = {}) {
@@ -164,8 +215,20 @@ export default {
 
             form.append('file', file);
 
-            for (let key in this.extraData) {
-                form.append(key, this.extraData[key]);
+            // Pass along the relative path of files uploaded as a directory
+            if (file.relativePath) {
+                form.append('relativePath', file.relativePath);
+            }
+
+            let parameters = {
+                ...this.extraData,
+                container: this.container,
+                folder: this.path,
+                _token: Statamic.$config.get('csrfToken')
+            }
+
+            for (let key in parameters) {
+                form.append(key, parameters[key]);
             }
 
             for (let key in data) {
@@ -176,11 +239,13 @@ export default {
         },
 
         processUploadQueue() {
-            const uploads = this.uploads.filter(u => !u.errorMessage);
+            // If we're already uploading, don't start another
+            if (this.activeUploads.length) return;
 
-            if (uploads.length === 0) return;
+            // Make sure we're not grabbing a running or failed upload
+            const upload = this.uploads.find(u => u.instance.state === 'new' && !u.errorMessage);
+            if (!upload) return;
 
-            const upload = uploads[0];
             const id = upload.id;
 
             upload.instance.upload().then(response => {
@@ -195,6 +260,8 @@ export default {
                 response.status === 200
                     ? this.handleUploadSuccess(id, json)
                     : this.handleUploadError(id, response.status, json);
+
+                this.processUploadQueue();
             });
         },
 
