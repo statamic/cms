@@ -1,5 +1,19 @@
 # Release Notes
 
+## 5.46.1 (2025-02-04)
+
+### What's fixed
+- Fix search:results tag when offset and paginate are set [#11386](https://github.com/statamic/cms/issues/11386) by @nopticon
+- Live Preview: Allow changing the position of "Responsive" device option [#11404](https://github.com/statamic/cms/issues/11404) by @duncanmcclean
+- Fix additional url segments matching taxonomy terms [#11383](https://github.com/statamic/cms/issues/11383) by @jasonvarga
+- Use constructor property promotion in events [#11380](https://github.com/statamic/cms/issues/11380) by @duncanmcclean
+- Fix "Curaçao" item in countries dictionary [#11395](https://github.com/statamic/cms/issues/11395) by @duncanmcclean
+- Remove duplicate strings from translation files [#11400](https://github.com/statamic/cms/issues/11400) by @j3ll3yfi5h
+- German translations [#11399](https://github.com/statamic/cms/issues/11399) by @helloDanuk
+- French translations [#11397](https://github.com/statamic/cms/issues/11397) by @ebeauchamps
+
+
+
 ## 5.46.0 (2025-01-22)
 
 ### What's new
