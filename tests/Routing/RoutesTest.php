@@ -2,7 +2,6 @@
 
 namespace Tests\Routing;
 
-use Exception;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Facades\Route;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -166,11 +165,14 @@ class RoutesTest extends TestCase
     #[Test]
     public function it_throws_exception_if_you_try_to_pass_data_parameter_when_using_view_closure()
     {
-        $this->withoutExceptionHandling();
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Parameter [$data] not supported with [$view] closure!');
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('test', 'Hello {{ hello }}');
 
-        $this->get('/you-cannot-use-data-param-with-view-closure');
+        $response = $this
+            ->get('/you-cannot-use-data-param-with-view-closure')
+            ->assertInternalServerError();
+
+        $this->assertEquals('Parameter [$data] not supported with [$view] closure!', $response->exception->getMessage());
     }
 
     #[Test]
