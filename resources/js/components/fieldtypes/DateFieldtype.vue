@@ -200,7 +200,7 @@ export default {
             this.value.time = this.$moment().format(this.hasSeconds ? 'HH:mm:ss' : 'HH:mm'); // todo: utc me
         }
 
-        this.localValue = this.createLocalFromUtc();
+        this.localValue = this.createLocalFromUtc(this.value);
 
         this.$events.$on(`container.${this.storeName}.saving`, this.triggerChangeOnFocusedField);
     },
@@ -214,20 +214,25 @@ export default {
     },
 
     watch: {
+        // value: {
+        //     immediate: true,
+        //     handler(value, oldValue) {
+        //         this.localValue = this.createLocalFromUtc(value);
+        //     },
+        // },
+
         localValue(value) {
             if (! this.mounted) {
                 return;
             }
 
-            this.update(this.createUtcFromLocal(value));
+            this.update(this.createUtcFromLocal(this.localValue));
         },
     },
 
     methods: {
-        createLocalFromUtc() {
-            // todo: deal with ranges
-
-            const localTime = new Date(this.value.date + 'T' + (this.hasTime ? this.value.time : '00:00:00') + 'Z');
+        createLocalFromUtc(utcValue) {
+            const localTime = new Date(utcValue.date + 'T' + (this.hasTime ? utcValue.time : '00:00:00') + 'Z');
 
             let date = localTime.getFullYear() + '-' + (localTime.getMonth() + 1).toString().padStart(2, '0') + '-' + localTime.getDate().toString().padStart(2, '0');
             let time = null;
@@ -238,26 +243,26 @@ export default {
                 if (this.hasSeconds) {
                     time += ':' + localTime.getSeconds().toString().padStart(2, '0');
                 }
+            } else {
+                time = '00:00';
             }
 
             return { date, time };
         },
 
-        createUtcFromLocal() {
-            // todo: ranges again
-
-            const utcTime = new Date(this.localValue.date + 'T' + (this.hasTime ? this.localValue.time : '00:00:00'));
+        createUtcFromLocal(localValue) {
+            const utcTime = new Date(localValue.date + 'T' + (this.hasTime ? localValue.time : '00:00:00'));
 
             let date = utcTime.getUTCFullYear() + '-' + (utcTime.getUTCMonth() + 1).toString().padStart(2, '0') + '-' + utcTime.getUTCDate().toString().padStart(2, '0');
             let time = null;
 
-            if (this.hasTime) {
+            // if (this.hasTime) {
                 time = utcTime.getUTCHours().toString().padStart(2, '0') + ':' + utcTime.getUTCMinutes().toString().padStart(2, '0');
 
                 if (this.hasSeconds) {
                     time += ':' + utcTime.getUTCSeconds().toString().padStart(2, '0');
                 }
-            }
+            // }
 
             return { date, time };
         },
@@ -277,22 +282,9 @@ export default {
             this.localValue = { ...this.localValue, date };
         },
 
-        // setLocalDate(date) {
-        //     if (!date) {
-        //         this.update({ date: null, time: null });
-        //         return;
-        //     }
-        //
-        //     this.update({ ...this.value, date });
-        // },
-
         setLocalTime(time) {
             this.localValue = { ...this.localValue, time };
         },
-
-        // setTime(time) {
-        //     this.update({ ...this.value, time });
-        // },
 
         addDate() {
             const now = this.$moment().format(this.format);
