@@ -6,9 +6,7 @@ use Illuminate\Testing\Assert as IlluminateAssert;
 use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\Assert;
 use Statamic\Facades\Config;
-use Statamic\Facades\File;
 use Statamic\Facades\Site;
-use Statamic\Facades\YAML;
 use Statamic\Http\Middleware\CP\AuthenticateSession;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
@@ -44,17 +42,6 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         }
 
         $this->addGqlMacros();
-
-        // We changed the default sites setup but the tests assume defaults like the following.
-        File::put(resource_path('sites.yaml'), YAML::dump($sites = [
-            'en' => [
-                'name' => 'English',
-                'url' => 'http://localhost/',
-                'locale' => 'en_US',
-            ],
-        ]));
-
-        $this->setSites($sites);
     }
 
     public function tearDown(): void
@@ -135,6 +122,15 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         $viewPaths[] = __DIR__.'/__fixtures__/views/';
 
         $app['config']->set('view.paths', $viewPaths);
+
+        // We changed the default sites setup but the tests assume defaults like the following.
+        // We write the file early so its ready the first time Site facade is used.
+        $app['files']->put(resource_path('sites.yaml'), <<<'YAML'
+en:
+    name: English
+    url: http://localhost/
+    locale: en_US
+YAML);
     }
 
     protected function setSites($sites)
