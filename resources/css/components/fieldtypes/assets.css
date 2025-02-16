@@ -14,7 +14,7 @@
     }
 
     .asset-upload-control {
-      @apply @sm:rtl:mr-4 @sm:ltr:ml-4 @sm:mt-0 text-xs text-gray-600 leading-tight;
+      @apply @sm:rtl:mr-4 @sm:ltr:ml-4 text-xs text-gray-600 leading-tight;
     }
 
     .upload-text-button {
