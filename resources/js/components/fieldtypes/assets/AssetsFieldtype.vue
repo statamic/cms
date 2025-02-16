@@ -25,7 +25,7 @@
 
                 <div
                     v-if="!isReadOnly && showPicker"
-                    class="assets-fieldtype-picker space-x-4"
+                    class="assets-fieldtype-picker gap-x-4 gap-y-2"
                     :class="{
                         'is-expanded': expanded,
                         'bard-drag-handle': isInBardField
