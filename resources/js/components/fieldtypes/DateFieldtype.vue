@@ -228,26 +228,26 @@ export default {
 
     methods: {
         createLocalFromUtc(utcValue) {
-            const localTime = new Date(utcValue.date + 'T' + (utcValue.time || '00:00:00') + 'Z');
+            const dateTime = new Date(utcValue.date + 'T' + (utcValue.time || '00:00:00') + 'Z');
 
-            let date = localTime.getFullYear() + '-' + (localTime.getMonth() + 1).toString().padStart(2, '0') + '-' + localTime.getDate().toString().padStart(2, '0');
-            let time = localTime.getHours().toString().padStart(2, '0') + ':' + localTime.getMinutes().toString().padStart(2, '0');
+            let date = dateTime.getFullYear() + '-' + (dateTime.getMonth() + 1).toString().padStart(2, '0') + '-' + dateTime.getDate().toString().padStart(2, '0');
+            let time = dateTime.getHours().toString().padStart(2, '0') + ':' + dateTime.getMinutes().toString().padStart(2, '0');
 
             if (this.hasSeconds) {
-                time += ':' + localTime.getSeconds().toString().padStart(2, '0');
+                time += ':' + dateTime.getSeconds().toString().padStart(2, '0');
             }
 
             return { date, time };
         },
 
         createUtcFromLocal(localValue) {
-            const utcTime = new Date(localValue.date + 'T' + (this.hasTime ? localValue.time : '00:00:00'));
+            const dateTime = new Date(localValue.date + 'T' + (localValue.time || '00:00:00'));
 
-            let date = utcTime.getUTCFullYear() + '-' + (utcTime.getUTCMonth() + 1).toString().padStart(2, '0') + '-' + utcTime.getUTCDate().toString().padStart(2, '0');
-            let time = utcTime.getUTCHours().toString().padStart(2, '0') + ':' + utcTime.getUTCMinutes().toString().padStart(2, '0');
+            let date = dateTime.getUTCFullYear() + '-' + (dateTime.getUTCMonth() + 1).toString().padStart(2, '0') + '-' + dateTime.getUTCDate().toString().padStart(2, '0');
+            let time = dateTime.getUTCHours().toString().padStart(2, '0') + ':' + dateTime.getUTCMinutes().toString().padStart(2, '0');
 
             if (this.hasSeconds) {
-                time += ':' + utcTime.getUTCSeconds().toString().padStart(2, '0');
+                time += ':' + dateTime.getUTCSeconds().toString().padStart(2, '0');
             }
 
             return { date, time };
