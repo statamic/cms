@@ -47,7 +47,7 @@ import SingleInline from './date/SingleInline.vue';
 import RangePopover from './date/RangePopover.vue';
 import RangeInline from './date/RangeInline.vue';
 import { useScreens } from 'vue-screen-utils';
-import { isProxy, toRaw } from 'vue';
+import { toRaw } from 'vue';
 
 export default {
     components: {
@@ -77,7 +77,6 @@ export default {
             containerWidth: null,
             focusedField: null,
             localValue: null,
-            mounted: false,
         };
     },
 
@@ -204,10 +203,6 @@ export default {
         this.$events.$on(`container.${this.storeName}.saving`, this.triggerChangeOnFocusedField);
     },
 
-    mounted() {
-        this.mounted = true;
-    },
-
     unmounted() {
         this.$events.$off(`container.${this.storeName}.saving`, this.triggerChangeOnFocusedField);
     },
@@ -227,10 +222,6 @@ export default {
         },
 
         localValue(value) {
-            if (! this.mounted) {
-                return;
-            }
-
             this.update(this.createUtcFromLocal(value));
         },
     },
@@ -259,15 +250,11 @@ export default {
             const utcTime = new Date(localValue.date + 'T' + (this.hasTime ? localValue.time : '00:00:00'));
 
             let date = utcTime.getUTCFullYear() + '-' + (utcTime.getUTCMonth() + 1).toString().padStart(2, '0') + '-' + utcTime.getUTCDate().toString().padStart(2, '0');
-            let time = null;
+            let time = utcTime.getUTCHours().toString().padStart(2, '0') + ':' + utcTime.getUTCMinutes().toString().padStart(2, '0');
 
-            // if (this.hasTime) {
-                time = utcTime.getUTCHours().toString().padStart(2, '0') + ':' + utcTime.getUTCMinutes().toString().padStart(2, '0');
-
-                if (this.hasSeconds) {
-                    time += ':' + utcTime.getUTCSeconds().toString().padStart(2, '0');
-                }
-            // }
+            if (this.hasSeconds) {
+                time += ':' + utcTime.getUTCSeconds().toString().padStart(2, '0');
+            }
 
             return { date, time };
         },
