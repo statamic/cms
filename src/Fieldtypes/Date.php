@@ -133,10 +133,8 @@ class Date extends Fieldtype
 
         if ($value === 'now') {
             return [
-                // We want the current date and time to be rendered, but since we don't
-                // know the users timezone, we'll let the front-end handle it.
-                'date' => now()->startOfDay()->format(self::DEFAULT_DATE_FORMAT),
-                'time' => $this->config('time_enabled') ? 'now' : null, // This will get replaced with the current time in Vue component.
+                'date' => now(tz: 'UTC')->format(self::DEFAULT_DATE_FORMAT),
+                'time' => now(tz: 'UTC')->format($this->config('time_seconds_enabled') ? 'H:i:s' : 'H:i'),
             ];
         }
 
