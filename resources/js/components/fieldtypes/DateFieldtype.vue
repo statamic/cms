@@ -173,8 +173,9 @@ export default {
 
         replicatorPreview() {
             if (!this.showFieldPreviews || !this.config.replicator_preview) return;
-            if (!this.value.date) return;
+            if (!this.localValue?.date) return;
 
+            // todo: ranges
             if (this.isRange) {
                 return (
                     this.$moment(this.value.date.start).format(this.displayFormat) +
@@ -183,10 +184,10 @@ export default {
                 );
             }
 
-            let preview = this.$moment(this.value.date).format(this.displayFormat);
+            let preview = this.$moment(this.localValue.date).format(this.displayFormat);
 
-            if (this.hasTime && this.value.time) {
-                preview += ` ${this.value.time}`;
+            if (this.hasTime && this.localValue.time) {
+                preview += ` ${this.localValue.time}`;
             }
 
             return preview;
