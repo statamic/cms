@@ -212,6 +212,11 @@ export default {
         value: {
             immediate: true,
             handler(value, oldValue) {
+                if (! value.date) {
+                    this.localValue = {date: null, time: null};
+                    return;
+                }
+
                 let localValue = this.createLocalFromUtc(value);
 
                 if (JSON.stringify(toRaw(this.localValue)) === JSON.stringify(localValue)) {
@@ -274,9 +279,13 @@ export default {
         },
 
         addDate() {
-            const now = this.$moment().format(this.format);
-            const date = this.isRange ? { start: now, end: now } : now;
-            this.update({ date, time: null });
+            let now = new Date();
+            let [date, time] = now.toISOString().split('T');
+            time.slice(0, this.hasSeconds ? 8 : 5);
+
+            this.localValue = this.isRange
+                ? { start: { date, time }, end: { date, time } }
+                : { date, time };
         },
     },
 };
