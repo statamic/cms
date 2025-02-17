@@ -57,7 +57,7 @@ class Multisite extends Command
             ->addPermissions()
             ->clearCache();
 
-        $this->runHooks('end');
+        $this->runHooks('after');
 
         $this->components->info('Successfully converted from single to multisite installation!');
 
