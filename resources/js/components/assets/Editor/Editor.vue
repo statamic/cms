@@ -200,6 +200,7 @@
                     <!-- Fields Area -->
                     <publish-container
                         v-if="fields"
+                        ref="container"
                         :name="publishContainer"
                         :blueprint="fieldset"
                         :values="values"
@@ -344,6 +345,10 @@ export default {
     },
 
     computed: {
+        store() {
+            return this.$refs.container.store;
+        },
+
         isImage() {
             if (!this.asset) return false;
 
