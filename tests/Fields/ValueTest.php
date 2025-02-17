@@ -323,15 +323,33 @@ class ValueTest extends TestCase
     }
 
     #[Test]
+    public function it_can_check_isset_on_properties()
+    {
+        $val = new Value((object) [
+            'a' => 'alfa',
+            'b' => '',
+            'c' => null,
+        ]);
+
+        $this->assertTrue(isset($val->a));
+        $this->assertTrue(isset($val->b));
+        $this->assertFalse(isset($val->c));
+        $this->assertFalse(isset($val->d));
+    }
+
+    #[Test]
     public function it_can_check_emptiness_on_properties()
     {
         $val = new Value((object) [
             'a' => 'alfa',
             'b' => '',
+            'c' => null,
         ]);
 
-        $this->assertNotTrue(empty($val->a));
+        $this->assertFalse(empty($val->a));
         $this->assertTrue(empty($val->b));
+        $this->assertTrue(empty($val->c));
+        $this->assertTrue(empty($val->d));
     }
 
     #[Test]
