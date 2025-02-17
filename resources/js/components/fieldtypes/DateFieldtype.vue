@@ -231,16 +231,10 @@ export default {
             const localTime = new Date(utcValue.date + 'T' + (utcValue.time || '00:00:00') + 'Z');
 
             let date = localTime.getFullYear() + '-' + (localTime.getMonth() + 1).toString().padStart(2, '0') + '-' + localTime.getDate().toString().padStart(2, '0');
-            let time = null;
+            let time = localTime.getHours().toString().padStart(2, '0') + ':' + localTime.getMinutes().toString().padStart(2, '0');
 
-            if (this.hasTime) {
-                time = localTime.getHours().toString().padStart(2, '0') + ':' + localTime.getMinutes().toString().padStart(2, '0');
-
-                if (this.hasSeconds) {
-                    time += ':' + localTime.getSeconds().toString().padStart(2, '0');
-                }
-            } else {
-                time = '00:00';
+            if (this.hasSeconds) {
+                time += ':' + localTime.getSeconds().toString().padStart(2, '0');
             }
 
             return { date, time };
