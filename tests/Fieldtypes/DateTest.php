@@ -258,11 +258,6 @@ class DateTest extends TestCase
                 ['start' => '2012--08--29 00/00', 'end' => '2013--09--27 23/59'],
                 ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2013-09-27', 'time' => '23:59']],
             ],
-            // TODO: What should we so about these cases, where the string doesn't contain a time?
-            // Should we make it 00:00 UTC? That wouldn't be accurate for all timezones. Ugh. Timezones are hard.
-
-            // make this 00:00
-            // handle times in a test too
             'range where single date has been provided' => [
                 // e.g. If it was once a non-range field.
                 // Use the single date as both the start and end dates.
