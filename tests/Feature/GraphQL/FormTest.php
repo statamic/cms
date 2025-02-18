@@ -236,6 +236,13 @@ GQL;
             'message' => ['type' => 'textarea', 'width' => 33],
         ]);
 
+        // Set section display and instructions. You wouldn't really do this for a form blueprint,
+        // but this is just to test the section type which doesn't get tested anywhere else.
+        $contents = $blueprint->contents();
+        $contents['tabs']['main']['sections'][0]['display'] = 'My Section';
+        $contents['tabs']['main']['sections'][0]['instructions'] = 'The section instructions';
+        $blueprint->setContents($contents);
+
         BlueprintRepository::shouldReceive('find')->with('forms.contact')->andReturn($blueprint);
 
         $query = <<<'GQL'
@@ -265,8 +272,8 @@ GQL;
                 'form' => [
                     'sections' => [
                         [
-                            'display' => null,
-                            'instructions' => null,
+                            'display' => 'My Section',
+                            'instructions' => 'The section instructions',
                             'fields' => [
                                 [
                                     'handle' => 'name',
