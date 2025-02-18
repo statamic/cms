@@ -399,10 +399,10 @@ class EntryQueryBuilderTest extends TestCase
         EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->create();
         EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5', 'test_taxonomy' => ['taxonomy-5']])->create();
 
-        $entries = Entry::query()->whereJsonContains('test_taxonomy', ['taxonomy-1', 'taxonomy-5'])->get();
+        $entries = Entry::query()->whereJsonContains('test_taxonomy', ['taxonomy-1', 'taxonomy-3'])->get();
 
-        $this->assertCount(3, $entries);
-        $this->assertEquals(['Post 1', 'Post 3', 'Post 5'], $entries->map->title->all());
+        $this->assertCount(1, $entries);
+        $this->assertEquals(['Post 3'], $entries->map->title->all());
 
         $entries = Entry::query()->whereJsonContains('test_taxonomy', 'taxonomy-1')->get();
 
