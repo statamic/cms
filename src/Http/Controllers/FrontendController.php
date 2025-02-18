@@ -2,8 +2,10 @@
 
 namespace Statamic\Http\Controllers;
 
+use Closure;
 use Illuminate\Contracts\View\View as IlluminateView;
 use Illuminate\Http\Request;
+use ReflectionFunction;
 use Statamic\Auth\Protect\Protection;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Data;
@@ -47,7 +49,7 @@ class FrontendController extends Controller
         throw_if(is_callable($view) && $data, new \Exception('Parameter [$data] not supported with [$view] closure!'));
 
         if (is_callable($view)) {
-            $resolvedView = $view(...$params);
+            $resolvedView = $view(...static::prepareParams($params, $view, $request));
         }
 
         if (isset($resolvedView) && $resolvedView instanceof IlluminateView) {
@@ -57,7 +59,9 @@ class FrontendController extends Controller
             return $resolvedView;
         }
 
-        $data = array_merge($params, is_callable($data) ? $data(...$params) : $data);
+        $data = array_merge($params, is_callable($data)
+            ? $data(...static::prepareParams($params, $data, $request))
+            : $data);
 
         $view = app(View::class)
             ->template($view)
@@ -88,5 +92,20 @@ class FrontendController extends Controller
         if ($data = Data::findByUri($item)) {
             return $data;
         }
+    }
+
+    private function prepareParams(array $params, Closure $closure, Request $request): array
+    {
+        $reflect = new ReflectionFunction($closure);
+
+        return collect($reflect->getParameters())
+            ->map(function ($param) use ($params, $request) {
+                if ($param->hasType() && $param->getType()->getName() === Request::class) {
+                    return $request;
+                }
+
+                return $params[$param->getName()];
+            })
+            ->all();
     }
 }
