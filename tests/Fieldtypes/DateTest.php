@@ -238,16 +238,6 @@ class DateTest extends TestCase
                 null,
                 null,
             ],
-            'null range when required with boolean' => [
-                ['mode' => 'range', 'required' => true],
-                null,
-                ['start' => ['date' => '2010-12-25', 'time' => '00:00'], 'end' => ['date' => '2010-12-25', 'time' => '23:59']],
-            ],
-            'null range when required with validation' => [
-                ['mode' => 'range', 'validate' => ['required']],
-                null,
-                ['start' => ['date' => '2010-12-25', 'time' => '00:00'], 'end' => ['date' => '2010-12-25', 'time' => '23:59']],
-            ],
             'range with default format' => [
                 ['mode' => 'range'],
                 ['start' => '2012-08-29 00:00', 'end' => '2013-09-27 23:59'],

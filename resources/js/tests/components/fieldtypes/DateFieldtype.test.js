@@ -161,6 +161,25 @@ test('date range can be updated', async () => {
     });
 });
 
+test('required date range field with null value is automatically populated', async () => {
+    const dateField = makeDateField({
+        config: {
+            earliest_date: { date: null, time: null },
+            latest_date: { date: null, time: null },
+            mode: 'range',
+            required: true,
+        },
+        value: null,
+    });
+
+    const today = new Date().toISOString().split('T')[0];
+
+    expect(dateField.vm.localValue).toMatchObject({
+        start: { date: today, time: '00:00' },
+        end: { date: today, time: '23:59' },
+    });
+});
+
 test('local time is updated when value prop is updated', async () => {
     const dateField = makeDateField({
         value: { date: '2025-01-01', time: '15:00' },
