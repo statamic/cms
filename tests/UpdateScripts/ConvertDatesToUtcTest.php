@@ -182,6 +182,12 @@ class ConvertDatesToUtcTest extends TestCase
                 ['start' => '2025-01-01', 'end' => '2025-01-07'],
                 ['start' => '2025-01-01 05:00', 'end' => '2025-01-07 05:00'],
             ],
+            'Date range, but stored as a single date' => [
+                'date_field',
+                ['handle' => 'date_field', 'field' => ['type' => 'date', 'mode' => 'range']],
+                '2025-01-01',
+                ['start' => '2025-01-01 05:00', 'end' => '2025-01-01 05:00'],
+            ],
             'Imported date field' => [
                 'fieldset_date',
                 ['import' => 'date_fieldset'],

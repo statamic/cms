@@ -169,8 +169,12 @@ class ConvertDatesToUtc extends UpdateScript
         return $this;
     }
 
-    private function processRange(array $value, Field $field): array
+    private function processRange(string|array $value, Field $field): array
     {
+        if (! is_array($value)) {
+            $value = ['start' => $value, 'end' => $value];
+        }
+
         return [
             'start' => $this->processSingle($value['start'], $field),
             'end' => $this->processSingle($value['end'], $field),
