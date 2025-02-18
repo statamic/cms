@@ -90,6 +90,10 @@ export default {
         },
 
         hasDate() {
+            if (this.isRange) {
+                return this.config.required || this.value?.start || this.value?.end;
+            }
+
             return this.config.required || this.value.date;
         },
 
@@ -125,8 +129,12 @@ export default {
         },
 
         datePickerValue() {
-            // todo: ranges
-            if (this.isRange) return this.value.date;
+            if (this.isRange) {
+                return {
+                    start: this.localValue?.start?.date,
+                    end: this.localValue?.end?.date,
+                };
+            }
 
             // The calendar component will do `new Date(datePickerValue)` under the hood.
             // If you pass a date without a time, it will treat it as UTC. By adding a time,
@@ -173,16 +181,18 @@ export default {
 
         replicatorPreview() {
             if (!this.showFieldPreviews || !this.config.replicator_preview) return;
-            if (!this.localValue?.date) return;
 
-            // todo: ranges
             if (this.isRange) {
+                if (!this.localValue?.start) return;
+
                 return (
-                    this.$moment(this.value.date.start).format(this.displayFormat) +
+                    this.$moment(this.localValue.start.date).format(this.displayFormat) +
                     ' – ' +
-                    this.$moment(this.value.date.end).format(this.displayFormat)
+                    this.$moment(this.localValue.end.date).format(this.displayFormat)
                 );
             }
+
+            if (!this.localValue?.date) return;
 
             let preview = this.$moment(this.localValue.date).format(this.displayFormat);
 
@@ -206,7 +216,27 @@ export default {
         value: {
             immediate: true,
             handler(value, oldValue) {
-                if (! value.date) {
+                if (this.isRange) {
+                    if (! value || ! value.start) {
+                        this.localValue = {start: {date: null, time: null}, end: {date: null, time: null}};
+                        return;
+                    }
+
+                    let localValue = {
+                        start: this.createLocalFromUtc(value.start),
+                        end: this.createLocalFromUtc(value.end),
+                    };
+
+                    if (JSON.stringify(toRaw(this.localValue)) === JSON.stringify(localValue)) {
+                        return;
+                    }
+
+                    this.localValue = localValue;
+
+                    return;
+                }
+
+                if (! value || ! value.date) {
                     this.localValue = {date: null, time: null};
                     return;
                 }
@@ -222,6 +252,15 @@ export default {
         },
 
         localValue(value) {
+            if (this.isRange) {
+                this.update({
+                    start: this.createUtcFromLocal(value.start),
+                    end: this.createUtcFromLocal(value.end),
+                });
+
+                return;
+            }
+
             this.update(this.createUtcFromLocal(value));
         },
     },
@@ -260,6 +299,15 @@ export default {
         },
 
         setLocalDate(date) {
+            if (this.isRange) {
+                this.localValue = {
+                    start: { date: date.start, time: '00:00' },
+                    end: { date: date.end, time: '23:59' },
+                };
+
+                return;
+            }
+
             if (!date) {
                 this.localValue = { date: null, time: null };
                 return;
@@ -274,8 +322,17 @@ export default {
 
         addDate() {
             let now = new Date();
-            let [date, time] = now.toISOString().split('T');
-            time.slice(0, this.hasSeconds ? 8 : 5);
+
+            let date = now.getFullYear() + '-' +
+                String(now.getMonth() + 1).padStart(2, '0') + '-' +
+                String(now.getDate()).padStart(2, '0');
+
+            let time = now.toLocaleTimeString(undefined, {
+                hour12: false,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: this.hasSeconds ? '2-digit' : undefined
+            });
 
             this.localValue = this.isRange
                 ? { start: { date, time }, end: { date, time } }

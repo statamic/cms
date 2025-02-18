@@ -150,13 +150,11 @@ class Date extends Fieldtype
 
     private function preProcessRange($value)
     {
-        $vueFormat = $this->defaultFormat();
-
         if (! $value) {
-            return $this->splitDateTimeForPreProcessRange($this->isRequired() ? [
-                'start' => Carbon::now()->format($vueFormat),
-                'end' => Carbon::now()->format($vueFormat),
-            ] : null);
+            return $this->isRequired() ? [
+                'start' => $this->preProcessSingle('now'),
+                'end' => $this->preProcessSingle('now'),
+            ] : null;
         }
 
         // If the value is a string, this field probably used to be a single date.
@@ -165,10 +163,10 @@ class Date extends Fieldtype
             $value = ['start' => $value, 'end' => $value];
         }
 
-        return $this->splitDateTimeForPreProcessRange([
-            'start' => $this->parseSaved($value['start'])->format($vueFormat),
-            'end' => $this->parseSaved($value['end'])->format($vueFormat),
-        ]);
+        return [
+            'start' => $this->preProcessSingle($value['start']),
+            'end' => $this->preProcessSingle($value['end']),
+        ];
     }
 
     private function splitDateTimeForPreProcessSingle(Carbon $carbon)
@@ -179,11 +177,6 @@ class Date extends Fieldtype
         ];
     }
 
-    private function splitDateTimeForPreProcessRange(?array $range = null)
-    {
-        return ['date' => $range, 'time' => null];
-    }
-
     public function isRequired()
     {
         return in_array('required', $this->field->rules()[$this->field->handle()]);
@@ -191,7 +184,7 @@ class Date extends Fieldtype
 
     public function process($data)
     {
-        if (is_null($data) || is_null($data['date'])) {
+        if (is_null($data)) {
             return null;
         }
 
@@ -200,29 +193,28 @@ class Date extends Fieldtype
 
     private function processSingle($data)
     {
-        return $this->processDateTime($data['date'].' '.($data['time'] ?? '00:00'));
+        if (is_null($data['date'])) {
+            return null;
+        }
+
+        return $this->processDateTime($data['date'].' '.$data['time']);
     }
 
     private function processRange($data)
     {
-        $date = $data['date'];
+        if (is_null($data['start'])) {
+            return null;
+        }
 
         return [
-            'start' => $this->processDateTime($date['start']),
-            'end' => $this->processDateTimeEndOfDay($date['end']),
+            'start' => $this->processDateTime($data['start']['date'].' '.$data['start']['time']),
+            'end' => $this->processDateTime($data['end']['date'].' '.$data['end']['time']),
         ];
     }
 
     private function processDateTime($value)
     {
         $date = Carbon::parse($value);
-
-        return $this->formatAndCast($date, $this->saveFormat());
-    }
-
-    private function processDateTimeEndOfDay($value)
-    {
-        $date = Carbon::parse($value)->endOfDay();
 
         return $this->formatAndCast($date, $this->saveFormat());
     }
