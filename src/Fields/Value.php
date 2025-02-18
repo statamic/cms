@@ -224,6 +224,11 @@ class Value implements ArrayAccess, IteratorAggregate, JsonSerializable
         return $this->value()->{$name}(...$arguments);
     }
 
+    public function __isset($key)
+    {
+        return isset($this->value()?->{$key});
+    }
+
     public function __get($key)
     {
         return $this->value()?->{$key} ?? null;
