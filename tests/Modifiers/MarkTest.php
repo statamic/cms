@@ -3,6 +3,7 @@
 namespace Tests\Modifiers;
 
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Fields\Field;
 use Statamic\Fields\Value;
 use Statamic\Fieldtypes\Bard;
 use Statamic\Fieldtypes\Markdown;
@@ -78,7 +79,7 @@ class MarkTest extends TestCase
                     ['type' => 'text', 'text' => 'amet', 'marks' => [['type' => 'bold']]],
                 ],
             ],
-        ], 'content', new Bard());
+        ], 'content', (new Bard)->setField(new Field('test', [])));
         $words = 'elüt amet';
 
         $expected = '<p>Lorem, ipsum <mark>el&uuml;t</mark> sit <strong><mark>amet</mark></strong></p>';
