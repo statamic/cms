@@ -160,7 +160,9 @@ class Date extends Fieldtype
         // If the value is a string, this field probably used to be a single date.
         // In this case, we'll use the date for both the start and end of the range.
         if (is_string($value)) {
-            $value = ['start' => $value, 'end' => $value];
+            $carbon = $this->parseSaved($value);
+
+            $value = ['start' => $carbon->copy()->startOfDay(), 'end' => $carbon->copy()->endOfDay()];
         }
 
         return [
@@ -197,7 +199,7 @@ class Date extends Fieldtype
             return null;
         }
 
-        return $this->processDateTime($data['date'].' '.$data['time']);
+        return $this->processDateTime($data['date'].' '.($data['time'] ?? '00:00'));
     }
 
     private function processRange($data)
@@ -207,8 +209,8 @@ class Date extends Fieldtype
         }
 
         return [
-            'start' => $this->processDateTime($data['start']['date'].' '.$data['start']['time']),
-            'end' => $this->processDateTime($data['end']['date'].' '.$data['end']['time']),
+            'start' => $this->processDateTime($data['start']['date'].' '.($data['start']['time'] ?? '00:00')),
+            'end' => $this->processDateTime($data['end']['date'].' '.($data['end']['time'] ?? '23:59')),
         ];
     }
 

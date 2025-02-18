@@ -140,48 +140,38 @@ class DateTest extends TestCase
             ],
             'date with default format' => [
                 [],
-                ['date' => '2012-08-29', 'time' => null],
-                '2012-08-29',
+                ['date' => '2012-08-29', 'time' => '00:00'],
+                '2012-08-29 00:00',
             ],
             'date with custom format' => [
-                ['format' => 'Y--m--d'],
-                ['date' => '2012-08-29', 'time' => null],
-                '2012--08--29',
+                ['format' => 'Y--m--d H/i'],
+                ['date' => '2012-08-29', 'time' => '00:00'],
+                '2012--08--29 00/00',
             ],
             'date with missing time' => [
                 [],
                 ['date' => '2012-08-29'],
-                '2012-08-29',
+                '2012-08-29 00:00',
             ],
             'date with time' => [
                 ['time_enabled' => true],
                 ['date' => '2012-08-29', 'time' => '13:43'],
                 '2012-08-29 13:43',
             ],
-            'date with time and custom format' => [
-                ['time_enabled' => true, 'format' => 'Y--m--d H:i'],
-                ['date' => '2012-08-29', 'time' => '13:43'],
-                '2012--08--29 13:43',
-            ],
             'null range' => [
                 ['mode' => 'range'],
-                ['date' => null, 'time' => null],
+                ['start' => null, 'end' => null],
                 null,
             ],
             'range with default format' => [
                 ['mode' => 'range'],
-                ['date' => ['start' => '2012-08-29', 'end' => '2013-09-27'], 'time' => null],
-                ['start' => '2012-08-29', 'end' => '2013-09-27'],
+                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2013-09-27', 'time' => '23:59']],
+                ['start' => '2012-08-29 00:00', 'end' => '2013-09-27 23:59'],
             ],
             'range with custom format' => [
-                ['mode' => 'range', 'format' => 'Y--m--d'],
-                ['date' => ['start' => '2012-08-29', 'end' => '2013-09-27'], 'time' => null],
-                ['start' => '2012--08--29', 'end' => '2013--09--27'],
-            ],
-            'range with format containing time has end date at end of day' => [
-                ['mode' => 'range', 'format' => 'Y-m-d H:i:s'],
-                ['date' => ['start' => '2012-08-29', 'end' => '2013-09-27'], 'time' => null],
-                ['start' => '2012-08-29 00:00:00', 'end' => '2013-09-27 23:59:59'],
+                ['mode' => 'range', 'format' => 'Y--m--d H/i'],
+                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2013-09-27', 'time' => '23:59']],
+                ['start' => '2012--08--29 00/00', 'end' => '2013--09--27 23/59'],
             ],
         ];
     }
@@ -195,11 +185,11 @@ class DateTest extends TestCase
     #[Test]
     public function it_saves_ranges_as_integers_if_format_results_in_a_number()
     {
-        $fieldtype = $this->fieldtype(['mode' => 'range', 'format' => 'Ymd']);
+        $fieldtype = $this->fieldtype(['mode' => 'range', 'format' => 'YmdHi']);
 
         $this->assertSame(
-            ['start' => 20120829, 'end' => 20130927],
-            $fieldtype->process(['date' => ['start' => '2012-08-29', 'end' => '2013-09-27']])
+            ['start' => 201208290000, 'end' => 201309272359],
+            $fieldtype->process(['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2013-09-27', 'time' => '23:59']])
         );
     }
 
@@ -221,80 +211,80 @@ class DateTest extends TestCase
             'now' => [
                 [],
                 'now', // this would happen if the value was null, but default was "now"
-                ['date' => '2010-12-25', 'time' => null], // current date
+                ['date' => '2010-12-25', 'time' => '13:43'], // current date
             ],
-            'now, with time enabled' => [
-                ['time_enabled' => true],
-                'now', // this would happen if the value was null, but default was "now"
-                ['date' => '2010-12-25', 'time' => 'now'], // current datetime - time needs to be localized on the client side
+            'date without time' => [
+                [],
+                '2012-08-29',
+                ['date' => '2012-08-29', 'time' => '00:00'],
             ],
             'date with default format' => [
                 [],
-                '2012-08-29',
-                ['date' => '2012-08-29', 'time' => null],
+                '2012-08-29 00:00',
+                ['date' => '2012-08-29', 'time' => '00:00'],
             ],
             'date with custom format' => [
-                ['format' => 'Y--m--d'],
-                '2012--08--29',
-                ['date' => '2012-08-29', 'time' => null],
+                ['format' => 'Y--m--d H/i'],
+                '2012--08--29 00/00',
+                ['date' => '2012-08-29', 'time' => '00:00'],
             ],
             'date with time' => [
                 ['time_enabled' => true],
                 '2012-08-29 13:43',
                 ['date' => '2012-08-29', 'time' => '13:43'],
             ],
-            'date with time and custom format' => [
-                ['time_enabled' => true, 'format' => 'Y--m--d H:i'],
-                '2012--08--29 13:43',
-                ['date' => '2012-08-29', 'time' => '13:43'],
-            ],
             'null range' => [
                 ['mode' => 'range'],
                 null,
-                ['date' => null, 'time' => null],
+                null,
             ],
             'null range when required with boolean' => [
                 ['mode' => 'range', 'required' => true],
                 null,
-                ['date' => ['start' => '2010-12-25', 'end' => '2010-12-25'], 'time' => null],
+                ['start' => ['date' => '2010-12-25', 'time' => '00:00'], 'end' => ['date' => '2010-12-25', 'time' => '23:59']],
             ],
             'null range when required with validation' => [
                 ['mode' => 'range', 'validate' => ['required']],
                 null,
-                ['date' => ['start' => '2010-12-25', 'end' => '2010-12-25'], 'time' => null],
+                ['start' => ['date' => '2010-12-25', 'time' => '00:00'], 'end' => ['date' => '2010-12-25', 'time' => '23:59']],
             ],
             'range with default format' => [
                 ['mode' => 'range'],
-                ['start' => '2012-08-29', 'end' => '2013-09-27'],
-                ['date' => ['start' => '2012-08-29', 'end' => '2013-09-27'], 'time' => null],
+                ['start' => '2012-08-29 00:00', 'end' => '2013-09-27 23:59'],
+                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2013-09-27', 'time' => '23:59']],
             ],
             'range with custom format' => [
-                ['mode' => 'range', 'format' => 'Y--m--d'],
-                ['start' => '2012--08--29', 'end' => '2013--09--27'],
-                ['date' => ['start' => '2012-08-29', 'end' => '2013-09-27'], 'time' => null],
+                ['mode' => 'range', 'format' => 'Y--m--d H/i'],
+                ['start' => '2012--08--29 00/00', 'end' => '2013--09--27 23/59'],
+                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2013-09-27', 'time' => '23:59']],
             ],
+            // TODO: What should we so about these cases, where the string doesn't contain a time?
+            // Should we make it 00:00 UTC? That wouldn't be accurate for all timezones. Ugh. Timezones are hard.
+
+            // make this 00:00
+            // handle times in a test too
             'range where single date has been provided' => [
                 // e.g. If it was once a non-range field.
                 // Use the single date as both the start and end dates.
                 ['mode' => 'range'],
                 '2012-08-29',
-                ['date' => ['start' => '2012-08-29', 'end' => '2012-08-29'], 'time' => null],
+                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2012-08-29', 'time' => '23:59']],
             ],
             'range where single date has been provided with custom format' => [
                 ['mode' => 'range', 'format' => 'Y--m--d'],
                 '2012--08--29',
-                ['date' => ['start' => '2012-08-29', 'end' => '2012-08-29'], 'time' => null],
+                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2012-08-29', 'time' => '23:59']],
             ],
             'date where range has been provided' => [
                 // e.g. If it was once a range field. Use the start date.
                 [],
-                ['start' => '2012-08-29', 'end' => '2013-09-27'],
-                ['date' => '2012-08-29', 'time' => null],
+                ['start' => '2012-08-29 00:00', 'end' => '2013-09-27 23:59'],
+                ['date' => '2012-08-29', 'time' => '00:00'],
             ],
             'date where range has been provided with custom format' => [
-                ['format' => 'Y--m--d'],
-                ['start' => '2012--08--29', 'end' => '2013--09--27'],
-                ['date' => '2012-08-29', 'time' => null],
+                ['format' => 'Y--m--d H/i'],
+                ['start' => '2012--08--29 00/00', 'end' => '2013--09--27 23/59'],
+                ['date' => '2012-08-29', 'time' => '00:00'],
             ],
         ];
     }
