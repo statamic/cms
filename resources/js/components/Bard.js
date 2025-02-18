@@ -1,9 +1,3 @@
-import * as core from '@tiptap/core';
-import * as vue3 from '@tiptap/vue-3';
-import * as state from '@tiptap/pm/state';
-import * as model from '@tiptap/pm/model';
-import * as view from '@tiptap/pm/view';
-
 class Bard {
     constructor(instance) {
         this.instance = instance;
@@ -24,10 +18,18 @@ class Bard {
         this.buttonCallbacks.push(callback);
     }
 
-    get tiptap() {
+    async tiptap() {
+        const [core, vue3, state, model, view] = await Promise.all([
+            import('@tiptap/core'),
+            import('@tiptap/vue-3'),
+            import('@tiptap/pm/state'),
+            import('@tiptap/pm/model'),
+            import('@tiptap/pm/view'),
+        ]);
+
         return {
             core,
-            vue2,
+            vue3,
             pm: {
                 state,
                 model,
