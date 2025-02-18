@@ -150,11 +150,9 @@ class Date extends Fieldtype
 
     private function preProcessRange($value)
     {
+        // If there's no value, return null, so we can handle the empty state on the Vue side.
         if (! $value) {
-            return $this->isRequired() ? [
-                'start' => $this->preProcessSingle('now'),
-                'end' => $this->preProcessSingle('now'),
-            ] : null;
+            return null;
         }
 
         // If the value is a string, this field probably used to be a single date.

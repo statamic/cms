@@ -208,6 +208,12 @@ export default {
         this.$events.$on(`container.${this.storeName}.saving`, this.triggerChangeOnFocusedField);
     },
 
+    mounted() {
+        if (this.isRange && this.config.required && !this.value) {
+            this.addDate();
+        }
+    },
+
     unmounted() {
         this.$events.$off(`container.${this.storeName}.saving`, this.triggerChangeOnFocusedField);
     },
@@ -335,7 +341,7 @@ export default {
             });
 
             this.localValue = this.isRange
-                ? { start: { date, time }, end: { date, time } }
+                ? { start: { date, time: '00:00' }, end: { date, time: '23:59' } }
                 : { date, time };
         },
     },
