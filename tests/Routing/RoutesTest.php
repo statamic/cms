@@ -3,6 +3,7 @@
 namespace Tests\Routing;
 
 use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -57,8 +58,24 @@ class RoutesTest extends TestCase
                 return view('test', ['hello' => "$foo $bar $baz"]);
             });
 
+            Route::statamic('/route/with/placeholders/view/closure/request/{foo}/{bar}/{baz}', function (Request $request, $foo, $bar, $baz) {
+                return view('test', ['hello' => "$foo $bar $baz $request->val"]);
+            });
+
+            Route::statamic('/route/with/placeholders/view/closure/request-at-end/{foo}/{bar}/{baz}', function ($foo, $bar, $baz, Request $request) {
+                return view('test', ['hello' => "$foo $bar $baz $request->val"]);
+            });
+
             Route::statamic('/route/with/placeholders/data/closure/{foo}/{bar}/{baz}', 'test', function ($foo, $bar, $baz) {
                 return ['hello' => "$foo $bar $baz"];
+            });
+
+            Route::statamic('/route/with/placeholders/data/closure/request/{foo}/{bar}/{baz}', 'test', function (Request $request, $foo, $bar, $baz) {
+                return ['hello' => "$foo $bar $baz $request->val"];
+            });
+
+            Route::statamic('/route/with/placeholders/data/closure/request-at-end/{foo}/{bar}/{baz}', 'test', function ($foo, $bar, $baz, Request $request) {
+                return ['hello' => "$foo $bar $baz $request->val"];
             });
 
             Route::statamic('/route-with-custom-layout', 'test', [
@@ -209,6 +226,28 @@ class RoutesTest extends TestCase
     }
 
     #[Test]
+    public function it_renders_a_view_with_placeholders_using_a_view_closure_with_typehinted_request()
+    {
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('test', 'Hello {{ hello }}');
+
+        $this->get('/route/with/placeholders/view/closure/request/one/two/three?val=four')
+            ->assertOk()
+            ->assertSee('Hello one two three four');
+    }
+
+    #[Test]
+    public function it_renders_a_view_with_placeholders_using_a_view_closure_with_typehinted_request_at_end()
+    {
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('test', 'Hello {{ hello }}');
+
+        $this->get('/route/with/placeholders/view/closure/request-at-end/one/two/three?val=four')
+            ->assertOk()
+            ->assertSee('Hello one two three four');
+    }
+
+    #[Test]
     public function it_renders_a_view_with_placeholders_using_a_data_closure()
     {
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
@@ -217,6 +256,28 @@ class RoutesTest extends TestCase
         $this->get('/route/with/placeholders/data/closure/one/two/three')
             ->assertOk()
             ->assertSee('Hello one two three');
+    }
+
+    #[Test]
+    public function it_renders_a_view_with_placeholders_using_a_data_closure_with_typehinted_request()
+    {
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('test', 'Hello {{ hello }}');
+
+        $this->get('/route/with/placeholders/data/closure/request/one/two/three?val=four')
+            ->assertOk()
+            ->assertSee('Hello one two three four');
+    }
+
+    #[Test]
+    public function it_renders_a_view_with_placeholders_using_a_data_closure_with_typehinted_request_at_end()
+    {
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('test', 'Hello {{ hello }}');
+
+        $this->get('/route/with/placeholders/data/closure/request-at-end/one/two/three?val=four')
+            ->assertOk()
+            ->assertSee('Hello one two three four');
     }
 
     #[Test]
