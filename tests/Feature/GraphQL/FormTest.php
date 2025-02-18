@@ -217,4 +217,89 @@ GQL;
                 ],
             ]]);
     }
+
+    #[Test]
+    public function it_queries_the_sections()
+    {
+        Form::make('contact')->title('Contact Us')->save();
+
+        $blueprint = Blueprint::makeFromFields([
+            'name' => [
+                'type' => 'text',
+                'display' => 'Your Name',
+                'instructions' => 'Enter your name',
+                'placeholder' => 'Type here...',
+                'invalid' => 'This isnt in the fieldtypes config fields so it shouldnt be output',
+                'width' => 50,
+            ],
+            'subject' => ['type' => 'select', 'options' => ['disco' => 'Disco', 'house' => 'House']],
+            'message' => ['type' => 'textarea', 'width' => 33],
+        ]);
+
+        BlueprintRepository::shouldReceive('find')->with('forms.contact')->andReturn($blueprint);
+
+        $query = <<<'GQL'
+{
+    form(handle: "contact") {
+        sections {
+            display
+            instructions
+            fields {
+                handle
+                type
+                display
+                instructions
+                width
+                config
+            }
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'form' => [
+                    'sections' => [
+                        [
+                            'display' => null,
+                            'instructions' => null,
+                            'fields' => [
+                                [
+                                    'handle' => 'name',
+                                    'type' => 'text',
+                                    'display' => 'Your Name',
+                                    'instructions' => 'Enter your name',
+                                    'width' => 50,
+                                    'config' => [
+                                        'placeholder' => 'Type here...',
+                                    ],
+                                ],
+                                [
+                                    'handle' => 'subject',
+                                    'type' => 'select',
+                                    'display' => 'Subject',
+                                    'instructions' => null,
+                                    'width' => 100,
+                                    'config' => [
+                                        'options' => ['disco' => 'Disco', 'house' => 'House'],
+                                    ],
+                                ],
+                                [
+                                    'handle' => 'message',
+                                    'type' => 'textarea',
+                                    'display' => 'Message',
+                                    'instructions' => null,
+                                    'width' => 33,
+                                    'config' => [],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]]);
+    }
 }
