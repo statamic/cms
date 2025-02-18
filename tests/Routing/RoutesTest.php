@@ -33,15 +33,31 @@ class RoutesTest extends TestCase
         $app->booted(function () {
             Route::statamic('/basic-route-with-data', 'test', ['hello' => 'world']);
 
-            Route::statamic('/basic-route-with-data-from-closure', 'test', function () {
+            Route::statamic('/basic-route-with-view-closure', function () {
+                return view('test', ['hello' => 'world']);
+            });
+
+            Route::statamic('/basic-route-with-view-closure-and-custom-return', function () {
+                return ['message' => 'not a view instance'];
+            });
+
+            Route::statamic('/basic-route-with-data-closure', 'test', function () {
                 return ['hello' => 'world'];
             });
+
+            Route::statamic('/you-cannot-use-data-param-with-view-closure', function () {
+                return view('test', ['hello' => 'world']);
+            }, 'hello');
 
             Route::statamic('/basic-route-without-data', 'test');
 
             Route::statamic('/route/with/placeholders/{foo}/{bar}/{baz}', 'test');
 
-            Route::statamic('/route/with/placeholders/closure/{foo}/{bar}/{baz}', 'test', function ($foo, $bar, $baz) {
+            Route::statamic('/route/with/placeholders/view/closure/{foo}/{bar}/{baz}', function ($foo, $bar, $baz) {
+                return view('test', ['hello' => "$foo $bar $baz"]);
+            });
+
+            Route::statamic('/route/with/placeholders/data/closure/{foo}/{bar}/{baz}', 'test', function ($foo, $bar, $baz) {
                 return ['hello' => "$foo $bar $baz"];
             });
 
@@ -115,14 +131,48 @@ class RoutesTest extends TestCase
     }
 
     #[Test]
-    public function it_renders_a_view_with_data_from_a_closure()
+    public function it_renders_a_view_using_a_view_closure()
     {
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
         $this->viewShouldReturnRaw('test', 'Hello {{ hello }}');
 
-        $this->get('/basic-route-with-data-from-closure')
+        $this->get('/basic-route-with-view-closure')
             ->assertOk()
             ->assertSee('Hello world');
+    }
+
+    #[Test]
+    public function it_renders_a_view_using_a_custom_view_closure_that_does_not_return_a_view_instance()
+    {
+        $this->get('/basic-route-with-view-closure-and-custom-return')
+            ->assertOk()
+            ->assertJson([
+                'message' => 'not a view instance',
+            ]);
+    }
+
+    #[Test]
+    public function it_renders_a_view_using_a_data_closure()
+    {
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('test', 'Hello {{ hello }}');
+
+        $this->get('/basic-route-with-data-closure')
+            ->assertOk()
+            ->assertSee('Hello world');
+    }
+
+    #[Test]
+    public function it_throws_exception_if_you_try_to_pass_data_parameter_when_using_view_closure()
+    {
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('test', 'Hello {{ hello }}');
+
+        $response = $this
+            ->get('/you-cannot-use-data-param-with-view-closure')
+            ->assertInternalServerError();
+
+        $this->assertEquals('Parameter [$data] not supported with [$view] closure!', $response->exception->getMessage());
     }
 
     #[Test]
@@ -148,12 +198,23 @@ class RoutesTest extends TestCase
     }
 
     #[Test]
-    public function it_renders_a_view_with_placeholders_and_data_from_a_closure()
+    public function it_renders_a_view_with_placeholders_using_a_view_closure()
     {
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
         $this->viewShouldReturnRaw('test', 'Hello {{ hello }}');
 
-        $this->get('/route/with/placeholders/closure/one/two/three')
+        $this->get('/route/with/placeholders/view/closure/one/two/three')
+            ->assertOk()
+            ->assertSee('Hello one two three');
+    }
+
+    #[Test]
+    public function it_renders_a_view_with_placeholders_using_a_data_closure()
+    {
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('test', 'Hello {{ hello }}');
+
+        $this->get('/route/with/placeholders/data/closure/one/two/three')
             ->assertOk()
             ->assertSee('Hello one two three');
     }
@@ -174,7 +235,6 @@ class RoutesTest extends TestCase
     #[DataProvider('undefinedLayoutRouteProvider')]
     public function it_renders_a_view_without_a_layout($route)
     {
-        $this->withoutExceptionHandling();
         $this->viewShouldReturnRaw('layout', 'The layout {{ template_content }}');
         $this->viewShouldReturnRaw('test', 'Hello {{ hello }}');
 
@@ -222,7 +282,6 @@ class RoutesTest extends TestCase
     #[Test]
     public function it_renders_a_view_with_custom_content_type()
     {
-        $this->withoutExceptionHandling();
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
         $this->viewShouldReturnRaw('test', '{"hello":"{{ hello }}"}');
 

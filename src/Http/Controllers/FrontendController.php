@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers;
 
+use Illuminate\Contracts\View\View as IlluminateView;
 use Illuminate\Http\Request;
 use Statamic\Auth\Protect\Protection;
 use Statamic\Exceptions\NotFoundHttpException;
@@ -39,8 +40,23 @@ class FrontendController extends Controller
     public function route(Request $request, ...$args)
     {
         $params = $request->route()->parameters();
+
         $view = Arr::pull($params, 'view');
         $data = Arr::pull($params, 'data');
+
+        throw_if(is_callable($view) && $data, new \Exception('Parameter [$data] not supported with [$view] closure!'));
+
+        if (is_callable($view)) {
+            $resolvedView = $view(...$params);
+        }
+
+        if (isset($resolvedView) && $resolvedView instanceof IlluminateView) {
+            $view = $resolvedView->name();
+            $data = $resolvedView->getData();
+        } elseif (isset($resolvedView)) {
+            return $resolvedView;
+        }
+
         $data = array_merge($params, is_callable($data) ? $data(...$params) : $data);
 
         $view = app(View::class)
