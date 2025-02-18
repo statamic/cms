@@ -89,6 +89,20 @@
                 </div>
 
 
+                <!-- Append string -->
+                <div
+                    v-if="linkType === 'entry'"
+                    class="h-8 mb-4 p-2 bg-gray-100 dark:bg-dark-600 text-gray-800 dark:text-dark-150 w-full border dark:border-dark-200 rounded shadow-inner placeholder:text-gray-600 dark:placeholder:dark-text-dark-175 flex items-center"
+                >
+                    <input
+                        type="text"
+                        ref="input"
+                        v-model="appends"
+                        class="input h-auto text-sm placeholder-gray-50"
+                        :placeholder="`${__('Append To URL')} (${__('Optional')})`"
+                    />
+                </div>
+
                 <!-- Title attribute -->
                 <div class="h-8 mb-4 p-2 bg-gray-100 dark:bg-dark-600 text-gray-800 dark:text-dark-150 w-full border dark:border-dark-200 rounded shadow-inner placeholder:text-gray-600 dark:placeholder:dark-text-dark-175 flex items-center" >
                     <input
@@ -211,6 +225,7 @@ export default {
             url: {},
             urlData: {},
             itemData: {},
+            append: null,
             title: null,
             rel: null,
             targetBlank: null,
@@ -403,7 +418,7 @@ export default {
             }
 
             this.$emit('updated', {
-                href: this.href,
+                href: `${this.href}${this.appends}`,
                 rel: this.rel,
                 target: (this.canHaveTarget && this.targetBlank) ? '_blank' : null,
                 title: this.title,
