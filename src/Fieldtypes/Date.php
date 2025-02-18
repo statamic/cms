@@ -155,9 +155,9 @@ class Date extends Fieldtype
             return null;
         }
 
-        // If the value is a string, this field probably used to be a single date.
+        // If the value isn't an array, this field probably used to be a single date.
         // In this case, we'll use the date for both the start and end of the range.
-        if (is_string($value)) {
+        if (! is_array($value)) {
             $carbon = $this->parseSaved($value);
 
             $value = ['start' => $carbon->copy()->startOfDay(), 'end' => $carbon->copy()->endOfDay()];
