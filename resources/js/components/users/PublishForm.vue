@@ -98,6 +98,10 @@ export default {
     },
 
     computed: {
+        store() {
+            return this.$refs.container.store;
+        },
+
         hasErrors() {
             return this.error || Object.keys(this.errors).length;
         },
