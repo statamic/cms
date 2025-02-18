@@ -190,21 +190,6 @@ class ConvertDatesToUtc extends UpdateScript
         return $value;
     }
 
-    private function formatForEntryDateField(Field $field): string
-    {
-        $format = 'Y-m-d';
-
-        if ($field->get('time_enabled')) {
-            $format .= '-Hi';
-        }
-
-        if ($field->get('time_seconds_enabled')) {
-            $format .= 's';
-        }
-
-        return $format;
-    }
-
     private function defaultFormat(Field $field): string
     {
         return $field->get('time_seconds_enabled')
