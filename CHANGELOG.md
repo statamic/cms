@@ -1,5 +1,35 @@
 # Release Notes
 
+## 5.47.0 (2025-03-18)
+
+### What's new
+- Support Sections in form GraphQL queries [#11466](https://github.com/statamic/cms/issues/11466) by @ryanmitchell
+- Add empty/not empty field filters [#11389](https://github.com/statamic/cms/issues/11389) by @jacksleight
+- Support arguments in user can/cant tags [#11407](https://github.com/statamic/cms/issues/11407) by @jacksleight
+- Add hook into the `multisite` command [#11458](https://github.com/statamic/cms/issues/11458) by @duncanmcclean
+- Set the proper CSP headers for multi-domain iframe [#11447](https://github.com/statamic/cms/issues/11447) by @edalzell
+- Allow custom render callback for overridden exceptions [#11408](https://github.com/statamic/cms/issues/11408) by @FrittenKeeZ
+- Support the Group fieldtype in DataReferenceUpdater [#11410](https://github.com/statamic/cms/issues/11410) by @duncanmcclean
+
+### What's fixed
+- Fix emptiness check on Value properties [#11402](https://github.com/statamic/cms/issues/11402) by @godismyjudge95
+- Change revision whereKey to return a collection [#11463](https://github.com/statamic/cms/issues/11463) by @ryanmitchell
+- If nav:from references an invalid entry, ensure nothing is returned [#11464](https://github.com/statamic/cms/issues/11464) by @ryanmitchell
+- Improve performance of the data reference updaters [#11442](https://github.com/statamic/cms/issues/11442) by @duncanmcclean
+- Fix search results missing search_snippets [#11450](https://github.com/statamic/cms/issues/11450) by @ivang76
+- Ensure consistent order of `get_content` results [#11429](https://github.com/statamic/cms/issues/11429) by @daun
+- Fixes empty asset alt <td> element in AssetsFieldtype [#11460](https://github.com/statamic/cms/issues/11460) by @PatrickJunod
+- Fix issue with AssetsFieldtype upload controls hidden on @sm size [#11459](https://github.com/statamic/cms/issues/11459) by @PatrickJunod
+- Fix test state issues around sites cache [#11455](https://github.com/statamic/cms/issues/11455) by @jesseleite
+- Fix InstallEloquentDriver command [#11425](https://github.com/statamic/cms/issues/11425) by @aerni
+- Handle extra translation files in breadcrumbs [#11422](https://github.com/statamic/cms/issues/11422) by @jasonvarga
+- Select specific repositories for Eloquent Driver install command [#11381](https://github.com/statamic/cms/issues/11381) by @kevinmeijer97
+- Adjust video fit in asset editor [#11414](https://github.com/statamic/cms/issues/11414) by @daun
+- Dutch translations [#11448](https://github.com/statamic/cms/issues/11448) by @daronspence
+- Use `ubuntu-latest` in GitHub Actions workflows [#11443](https://github.com/statamic/cms/issues/11443) by @duncanmcclean
+
+
+
 ## 5.46.1 (2025-02-04)
 
 ### What's fixed

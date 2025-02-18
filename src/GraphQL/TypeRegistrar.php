@@ -21,6 +21,7 @@ use Statamic\GraphQL\Types\NavTreeBranchType;
 use Statamic\GraphQL\Types\NavType;
 use Statamic\GraphQL\Types\PageInterface;
 use Statamic\GraphQL\Types\RoleType;
+use Statamic\GraphQL\Types\SectionType;
 use Statamic\GraphQL\Types\SiteType;
 use Statamic\GraphQL\Types\TableRowType;
 use Statamic\GraphQL\Types\TaxonomyType;
@@ -62,6 +63,7 @@ class TypeRegistrar
         GraphQL::addType(AssetInterface::class);
         GraphQL::addType(GlobalSetInterface::class);
         GraphQL::addType(FieldType::class);
+        GraphQL::addType(SectionType::class);
 
         PageInterface::addTypes();
         EntryInterface::addTypes();

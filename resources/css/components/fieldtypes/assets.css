@@ -7,14 +7,14 @@
 }
 
 .assets-fieldtype .assets-fieldtype-picker {
-    @apply flex items-center rounded border bg-gray-200 px-4 py-2 dark:border-dark-900 dark:bg-dark-650;
+    @apply flex flex-wrap items-center rounded border bg-gray-200 px-4 py-2 dark:border-dark-900 dark:bg-dark-650;
 
     &.is-expanded {
         @apply rounded-b-none border-b-0;
     }
 
     .asset-upload-control {
-        @apply mt-2 text-xs leading-tight text-gray-600 @sm:mt-0 @sm:ltr:ml-4 @sm:rtl:mr-4;
+        @apply text-xs leading-tight text-gray-600;
     }
 
     .upload-text-button {
@@ -30,7 +30,7 @@
 }
 
 .assets-fieldtype .asset-upload-control {
-    @apply hidden @xs:inline-block;
+    @apply inline-block;
 }
 
 /* Inside a Grid
