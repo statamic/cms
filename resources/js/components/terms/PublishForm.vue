@@ -372,6 +372,10 @@ export default {
     },
 
     computed: {
+        store() {
+            return this.$refs.container.store;
+        },
+
         formattedTitle() {
             return striptags(__(this.title));
         },

@@ -29,17 +29,15 @@
             >
                 {{ asset.basename }}
             </button>
-            <div v-text="asset.size" class="asset-filesize hidden px-2 text-xs text-gray-600 @xs:inline" />
-        </td>
-        <td class="w-24" v-if="showSetAlt">
             <button
+                v-if="showSetAlt && needsAlt"
                 class="asset-set-alt px-4 text-sm text-blue hover:text-black dark:text-dark-blue-100 dark:hover:text-dark-100"
                 type="button"
                 @click="editOrOpen"
-                v-if="needsAlt"
             >
                 {{ asset.values.alt ? '✅' : __('Set Alt') }}
             </button>
+            <div v-text="asset.size" class="asset-filesize hidden px-2 text-xs text-gray-600 @xs:inline" />
         </td>
         <td class="w-8 p-0 align-middle ltr:text-right rtl:text-left" v-if="!readOnly">
             <button

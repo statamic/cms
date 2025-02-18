@@ -178,9 +178,7 @@
                                 </div>
 
                                 <!-- Video -->
-                                <div class="w-full shadow-none" v-else-if="asset.isVideo">
-                                    <video :src="asset.url" class="w-full" controls></video>
-                                </div>
+                                <video :src="asset.url" controls v-else-if="asset.isVideo"></video>
                             </div>
                         </div>
 
@@ -200,6 +198,7 @@
                     <!-- Fields Area -->
                     <publish-container
                         v-if="fields"
+                        ref="container"
                         :name="publishContainer"
                         :blueprint="fieldset"
                         :values="values"
@@ -344,6 +343,10 @@ export default {
     },
 
     computed: {
+        store() {
+            return this.$refs.container.store;
+        },
+
         isImage() {
             if (!this.asset) return false;
 

@@ -117,6 +117,10 @@ export default {
     },
 
     computed: {
+        store() {
+            return this.$refs.container.store;
+        },
+
         headerText() {
             return this.entry ? __('Link to Entry') : __('Nav Item');
         },
