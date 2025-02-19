@@ -178,9 +178,7 @@
                                 </div>
 
                                 <!-- Video -->
-                                <div class="w-full shadow-none" v-else-if="asset.isVideo">
-                                    <video :src="asset.url" class="w-full" controls></video>
-                                </div>
+                                <video :src="asset.url" controls v-else-if="asset.isVideo"></video>
                             </div>
                         </div>
 
