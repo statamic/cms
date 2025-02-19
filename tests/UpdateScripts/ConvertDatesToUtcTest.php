@@ -2,13 +2,16 @@
 
 namespace Tests\UpdateScripts;
 
+use Illuminate\Support\Carbon;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use ReflectionClass;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Fieldset;
 use Statamic\Facades\GlobalSet;
+use Statamic\Facades\Stache;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Facades\User;
@@ -68,12 +71,25 @@ class ConvertDatesToUtcTest extends TestCase
             ],
         ])->save();
 
-        $entry = Entry::make()->collection('articles')->date('2025-01-01-1200');
+        // We want to set the time to 12pm in America/New_York, which is 5pm in UTC.
+        // Since Entry::date() automatically converts the value to UTC, we need to set it directly.
+        // It's naughty, but it's the only way I could find to set the "old" value.
+        $entry = Entry::make()->id('foo')->collection('articles');
+
+        $reflection = new ReflectionClass($entry);
+        $property = $reflection->getProperty('date');
+        $property->setAccessible(true);
+        $property->setValue($entry, Carbon::parse('2025-01-01 12:00', 'America/New_York'));
+
         $entry->save();
 
         $this->runUpdateScript(ConvertDatesToUtc::class);
 
-        $entry->fresh();
+        // We're clearing the Stache here to ensure the Carbon instance above doesn't end
+        // up being the same one we're testing against below.
+        Stache::clear();
+
+        $entry = Entry::find($entry->id());
 
         $this->assertEquals('2025-01-01 17:00', $entry->date()->format('Y-m-d H:i'));
     }
