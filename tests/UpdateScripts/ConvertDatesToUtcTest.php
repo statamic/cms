@@ -37,20 +37,6 @@ class ConvertDatesToUtcTest extends TestCase
     }
 
     #[Test]
-    public function is_skipped_when_application_timezone_is_utc()
-    {
-        Entry::shouldReceive('all')->never();
-        Term::shouldReceive('all')->never();
-        GlobalSet::shouldReceive('all')->never();
-        User::shouldReceive('all')->never();
-
-        config()->set('app.timezone', 'UTC');
-        date_default_timezone_set('UTC');
-
-        $this->runUpdateScript(ConvertDatesToUtc::class);
-    }
-
-    #[Test]
     #[DataProvider('dateFieldsProvider')]
     public function it_converts_date_fields_in_entries(string $fieldHandle, array $field, $original, $expected)
     {

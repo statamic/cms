@@ -21,10 +21,6 @@ class ConvertDatesToUtc extends UpdateScript
 
     public function update()
     {
-        if (config('app.timezone') === 'UTC') {
-            return;
-        }
-
         $this
             ->getItemsContainingData()
             ->each(function ($item) {
