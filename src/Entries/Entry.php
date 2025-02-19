@@ -581,7 +581,9 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
                 }
 
                 if (strlen($date) === 10) {
-                    return Carbon::createFromFormat('Y-m-d', $date)->startOfDay();
+                    return Carbon::createFromFormat('Y-m-d', $date)
+                        ->setTimezone('UTC')
+                        ->startOfDay();
                 }
 
                 if (strlen($date) === 15) {
