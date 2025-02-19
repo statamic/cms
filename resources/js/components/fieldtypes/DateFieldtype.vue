@@ -220,8 +220,8 @@ export default {
             immediate: true,
             handler(value, oldValue) {
                 if (this.isRange) {
-                    if (! value || ! value.start) {
-                        this.localValue = {start: {date: null, time: null}, end: {date: null, time: null}};
+                    if (!value || !value.start) {
+                        this.localValue = { start: { date: null, time: null }, end: { date: null, time: null } };
                         return;
                     }
 
@@ -239,8 +239,8 @@ export default {
                     return;
                 }
 
-                if (! value || ! value.date) {
-                    this.localValue = {date: null, time: null};
+                if (!value || !value.date) {
+                    this.localValue = { date: null, time: null };
                     return;
                 }
 
@@ -272,8 +272,16 @@ export default {
         createLocalFromUtc(utcValue) {
             const dateTime = new Date(utcValue.date + 'T' + (utcValue.time || '00:00:00') + 'Z');
 
-            let date = dateTime.getFullYear() + '-' + (dateTime.getMonth() + 1).toString().padStart(2, '0') + '-' + dateTime.getDate().toString().padStart(2, '0');
-            let time = dateTime.getHours().toString().padStart(2, '0') + ':' + dateTime.getMinutes().toString().padStart(2, '0');
+            let date =
+                dateTime.getFullYear() +
+                '-' +
+                (dateTime.getMonth() + 1).toString().padStart(2, '0') +
+                '-' +
+                dateTime.getDate().toString().padStart(2, '0');
+            let time =
+                dateTime.getHours().toString().padStart(2, '0') +
+                ':' +
+                dateTime.getMinutes().toString().padStart(2, '0');
 
             if (this.hasSeconds) {
                 time += ':' + dateTime.getSeconds().toString().padStart(2, '0');
@@ -285,8 +293,16 @@ export default {
         createUtcFromLocal(localValue) {
             const dateTime = new Date(localValue.date + 'T' + (localValue.time || '00:00:00'));
 
-            let date = dateTime.getUTCFullYear() + '-' + (dateTime.getUTCMonth() + 1).toString().padStart(2, '0') + '-' + dateTime.getUTCDate().toString().padStart(2, '0');
-            let time = dateTime.getUTCHours().toString().padStart(2, '0') + ':' + dateTime.getUTCMinutes().toString().padStart(2, '0');
+            let date =
+                dateTime.getUTCFullYear() +
+                '-' +
+                (dateTime.getUTCMonth() + 1).toString().padStart(2, '0') +
+                '-' +
+                dateTime.getUTCDate().toString().padStart(2, '0');
+            let time =
+                dateTime.getUTCHours().toString().padStart(2, '0') +
+                ':' +
+                dateTime.getUTCMinutes().toString().padStart(2, '0');
 
             if (this.hasSeconds) {
                 time += ':' + dateTime.getUTCSeconds().toString().padStart(2, '0');
@@ -311,7 +327,7 @@ export default {
                 return;
             }
 
-            if (! date) {
+            if (!date) {
                 this.localValue = { date: null, time: null };
                 return;
             }
@@ -326,15 +342,18 @@ export default {
         addDate() {
             let now = new Date();
 
-            let date = now.getFullYear() + '-' +
-                String(now.getMonth() + 1).padStart(2, '0') + '-' +
+            let date =
+                now.getFullYear() +
+                '-' +
+                String(now.getMonth() + 1).padStart(2, '0') +
+                '-' +
                 String(now.getDate()).padStart(2, '0');
 
             let time = now.toLocaleTimeString(undefined, {
                 hour12: false,
                 hour: '2-digit',
                 minute: '2-digit',
-                second: this.hasSeconds ? '2-digit' : undefined
+                second: this.hasSeconds ? '2-digit' : undefined,
             });
 
             this.localValue = this.isRange
