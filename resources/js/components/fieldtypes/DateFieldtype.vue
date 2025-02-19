@@ -1,8 +1,5 @@
 <template>
     <div class="datetime min-w-[145px]">
-        <p>UTC: {{ value }}</p>
-        <p>Local: {{ localValue }}</p>
-
         <button
             type="button"
             class="btn mb-2 flex items-center md:mb-0 ltr:pl-3 rtl:pr-3"
@@ -314,7 +311,7 @@ export default {
                 return;
             }
 
-            if (!date) {
+            if (! date) {
                 this.localValue = { date: null, time: null };
                 return;
             }
