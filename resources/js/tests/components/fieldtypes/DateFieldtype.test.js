@@ -11,13 +11,7 @@ window.matchMedia = () => ({
     addEventListener: () => {},
 });
 
-Object.defineProperty(Intl, 'DateTimeFormat', {
-    value: () => ({
-        resolvedOptions: () => ({
-            timeZone: 'America/New_York', // UTC-5
-        }),
-    }),
-});
+process.env.TZ = 'America/New_York';
 
 const makeDateField = (props = {}) => {
     return mount(DateFieldtype, {
