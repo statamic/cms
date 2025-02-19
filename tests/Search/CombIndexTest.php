@@ -37,6 +37,10 @@ class CombIndexTest extends TestCase
 
     public function getIndex()
     {
-        return app(Index::class);
+        $name = 'local';
+
+        $config = [];
+
+        return new Index($name, $config);
     }
 }
