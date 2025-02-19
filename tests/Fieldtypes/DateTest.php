@@ -296,23 +296,23 @@ class DateTest extends TestCase
             ],
             'date with default format' => [
                 [],
-                '2012-08-29',
-                '2012/08/29',
+                '2012-08-29 00:00',
+                ['date' => '2012-08-29', 'time' => '00:00', 'mode' => 'single', 'display_format' => 'YYYY/MM/DD'],
             ],
             'date with custom format' => [
-                ['format' => 'Y--m--d'],
-                '2012--08--29',
-                '2012/08/29',
+                ['format' => 'Y--m--d H/i'],
+                '2012--08--29 00/00',
+                ['date' => '2012-08-29', 'time' => '00:00', 'mode' => 'single', 'display_format' => 'YYYY/MM/DD'],
             ],
             'date with time' => [
                 ['time_enabled' => true],
                 '2012-08-29 13:43',
-                '2012/08/29 13:43',
+                ['date' => '2012-08-29', 'time' => '13:43', 'mode' => 'single', 'display_format' => 'YYYY/MM/DD HH:mm'],
             ],
             'date with time and custom format' => [
                 ['time_enabled' => true, 'format' => 'Y--m--d H:i'],
                 '2012--08--29 13:43',
-                '2012/08/29 13:43',
+                ['date' => '2012-08-29', 'time' => '13:43', 'mode' => 'single', 'display_format' => 'YYYY/MM/DD HH:mm'],
             ],
             'null range' => [
                 ['mode' => 'range'],
@@ -321,41 +321,41 @@ class DateTest extends TestCase
             ],
             'range with default format' => [
                 ['mode' => 'range'],
-                ['start' => '2012-08-29', 'end' => '2013-09-27'],
-                '2012/08/29 - 2013/09/27',
+                ['start' => '2012-08-29 00:00', 'end' => '2013-09-27 00:00'],
+                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2013-09-27', 'time' => '00:00'], 'mode' => 'range', 'display_format' => 'YYYY/MM/DD'],
             ],
             'range with custom format' => [
-                ['mode' => 'range', 'format' => 'Y--m--d'],
-                ['start' => '2012--08--29', 'end' => '2013--09--27'],
-                '2012/08/29 - 2013/09/27',
+                ['mode' => 'range', 'format' => 'Y--m--d H/i'],
+                ['start' => '2012--08--29 00/00', 'end' => '2013--09--27 00/00'],
+                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2013-09-27', 'time' => '00:00'], 'mode' => 'range', 'display_format' => 'YYYY/MM/DD'],
             ],
             'range where single date has been provided' => [
                 // e.g. If it was once a non-range field.
                 // Use the single date as both the start and end dates.
                 ['mode' => 'range'],
                 '2012-08-29',
-                '2012/08/29 - 2012/08/29',
+                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2012-08-29', 'time' => '00:00'], 'mode' => 'range', 'display_format' => 'YYYY/MM/DD'],
             ],
             'range where single date has been provided with custom format' => [
-                ['mode' => 'range', 'format' => 'Y--m--d'],
-                '2012--08--29',
-                '2012/08/29 - 2012/08/29',
+                ['mode' => 'range', 'format' => 'Y--m--d H/i'],
+                '2012--08--29 00/00',
+                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2012-08-29', 'time' => '00:00'], 'mode' => 'range', 'display_format' => 'YYYY/MM/DD'],
             ],
             'date where range has been provided' => [
                 // e.g. If it was once a range field. Use the start date.
                 [],
-                ['start' => '2012-08-29', 'end' => '2013-09-27'],
-                '2012/08/29',
+                ['start' => '2012-08-29 00:00', 'end' => '2013-09-27 00:00'],
+                ['date' => '2012-08-29', 'time' => '00:00', 'mode' => 'single', 'display_format' => 'YYYY/MM/DD'],
             ],
             'date where range has been provided with custom format' => [
-                ['format' => 'Y--m--d'],
-                ['start' => '2012--08--29', 'end' => '2013--09--27'],
-                '2012/08/29',
+                ['format' => 'Y--m--d H/i'],
+                ['start' => '2012--08--29 00/00', 'end' => '2013--09--27 00/00'],
+                ['date' => '2012-08-29', 'time' => '00:00', 'mode' => 'single', 'display_format' => 'YYYY/MM/DD'],
             ],
             'range where time has been enabled' => [
                 ['mode' => 'range', 'time_enabled' => true], // enabling time should have no effect.
-                ['start' => '2012-08-29', 'end' => '2013-09-27'],
-                '2012/08/29 - 2013/09/27',
+                ['start' => '2012-08-29 00:00', 'end' => '2013-09-27 00:00'],
+                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2013-09-27', 'time' => '00:00'], 'mode' => 'range', 'display_format' => 'YYYY/MM/DD'],
             ],
         ];
     }

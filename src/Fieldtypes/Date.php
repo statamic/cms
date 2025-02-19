@@ -232,10 +232,15 @@ class Date extends Fieldtype
                 $value = ['start' => $value, 'end' => $value];
             }
 
-            $start = $this->parseSaved($value['start'])->format($this->indexDisplayFormat());
-            $end = $this->parseSaved($value['end'])->format($this->indexDisplayFormat());
+            $start = $this->parseSaved($value['start']);
+            $end = $this->parseSaved($value['end']);
 
-            return $start.' - '.$end;
+            return [
+                'start' => $this->splitDateTimeForPreProcessSingle($start),
+                'end' => $this->splitDateTimeForPreProcessSingle($end),
+                'mode' => $this->config('mode', 'single'),
+                'display_format' => DateFormat::toIso($this->indexDisplayFormat()),
+            ];
         }
 
         // If the value is an array, this field probably used to be a range. In this case, we'll use the start date.
@@ -243,7 +248,13 @@ class Date extends Fieldtype
             $value = $value['start'];
         }
 
-        return $this->parseSaved($value)->format($this->indexDisplayFormat());
+        $date = $this->parseSaved($value);
+
+        return [
+            ...$this->splitDateTimeForPreProcessSingle($date),
+            'mode' => $this->config('mode', 'single'),
+            'display_format' => DateFormat::toIso($this->indexDisplayFormat()),
+        ];
     }
 
     private function saveFormat()
