@@ -56,17 +56,6 @@ abstract class UserRepository implements RepositoryContract
         );
     }
 
-    public function passkeyRepository()
-    {
-        $repository = app($this->passkeyRepository);
-
-        foreach ($repository::bindings() as $abstract => $concrete) {
-            app()->bind($abstract, $concrete);
-        }
-
-        return $repository;
-    }
-
     public function blueprint()
     {
         if (Blink::has($blink = 'user-blueprint')) {
