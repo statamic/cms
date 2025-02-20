@@ -2,7 +2,10 @@
 
 namespace Statamic\Http\Controllers;
 
+use Closure;
+use Illuminate\Contracts\View\View as IlluminateView;
 use Illuminate\Http\Request;
+use ReflectionFunction;
 use Statamic\Auth\Protect\Protection;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Data;
@@ -39,9 +42,26 @@ class FrontendController extends Controller
     public function route(Request $request, ...$args)
     {
         $params = $request->route()->parameters();
+
         $view = Arr::pull($params, 'view');
         $data = Arr::pull($params, 'data');
-        $data = array_merge($params, is_callable($data) ? $data(...$params) : $data);
+
+        throw_if(is_callable($view) && $data, new \Exception('Parameter [$data] not supported with [$view] closure!'));
+
+        if (is_callable($view)) {
+            $resolvedView = static::resolveRouteClosure($view, $params);
+        }
+
+        if (isset($resolvedView) && $resolvedView instanceof IlluminateView) {
+            $view = $resolvedView->name();
+            $data = $resolvedView->getData();
+        } elseif (isset($resolvedView)) {
+            return $resolvedView;
+        }
+
+        $data = array_merge($params, is_callable($data)
+            ? static::resolveRouteClosure($data, $params)
+            : $data);
 
         $view = app(View::class)
             ->template($view)
@@ -72,5 +92,16 @@ class FrontendController extends Controller
         if ($data = Data::findByUri($item)) {
             return $data;
         }
+    }
+
+    private static function resolveRouteClosure(Closure $closure, array $params)
+    {
+        $reflect = new ReflectionFunction($closure);
+
+        $params = collect($reflect->getParameters())
+            ->map(fn ($param) => $param->hasType() ? app($param->getType()->getName()) : $params[$param->getName()])
+            ->all();
+
+        return $closure(...$params);
     }
 }
