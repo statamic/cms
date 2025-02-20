@@ -49,7 +49,7 @@ class FrontendController extends Controller
         throw_if(is_callable($view) && $data, new \Exception('Parameter [$data] not supported with [$view] closure!'));
 
         if (is_callable($view)) {
-            $resolvedView = $view(...static::prepareParams($params, $view, $request));
+            $resolvedView = static::resolveRouteClosure($view, $params);
         }
 
         if (isset($resolvedView) && $resolvedView instanceof IlluminateView) {
@@ -60,7 +60,7 @@ class FrontendController extends Controller
         }
 
         $data = array_merge($params, is_callable($data)
-            ? $data(...static::prepareParams($params, $data, $request))
+            ? static::resolveRouteClosure($data, $params)
             : $data);
 
         $view = app(View::class)
@@ -94,18 +94,14 @@ class FrontendController extends Controller
         }
     }
 
-    private function prepareParams(array $params, Closure $closure, Request $request): array
+    private static function resolveRouteClosure(Closure $closure, array $params)
     {
         $reflect = new ReflectionFunction($closure);
 
-        return collect($reflect->getParameters())
-            ->map(function ($param) use ($params, $request) {
-                if ($param->hasType() && $param->getType()->getName() === Request::class) {
-                    return $request;
-                }
-
-                return $params[$param->getName()];
-            })
+        $params = collect($reflect->getParameters())
+            ->map(fn ($param) => $param->hasType() ? app($param->getType()->getName()) : $params[$param->getName()])
             ->all();
+
+        return $closure(...$params);
     }
 }
