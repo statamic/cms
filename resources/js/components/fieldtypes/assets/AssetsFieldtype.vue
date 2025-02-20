@@ -450,7 +450,7 @@ export default {
                     title: __('Remove All'),
                     dangerous: true,
                     run: this.removeAll,
-                    visible: this.value.length > 0,
+                    visible: this.assets.length > 0,
                 },
             ];
         },
