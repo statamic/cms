@@ -180,7 +180,7 @@ class ConvertDatesToUtc extends UpdateScript
     private function processSingle(int|string $value, Field $field): int|string
     {
         $value = Carbon::parse($value)
-            ->setTimezone('UTC')
+            ->utc()
             ->format($field->get('format', $this->defaultFormat($field)));
 
         if (is_numeric($value)) {
