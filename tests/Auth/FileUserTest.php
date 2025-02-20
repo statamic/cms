@@ -170,7 +170,7 @@ class FileUserTest extends TestCase
 
         $this->assertCount(0, $user->fresh()->passkeys());
     }
-  
+
     #[Test]
     public function it_prevents_saving_duplicate_roles()
     {
