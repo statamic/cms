@@ -53,8 +53,8 @@ class EntriesStoreTest extends TestCase
             $files = Traverser::filter([$store, 'getItemFilter'])->traverse($store);
 
             $this->assertEquals(collect([
-                $dir.'/blog/2017-25-12.christmas.md',
-                $dir.'/blog/2018-07-04.fourth-of-july.md',
+                $dir.'/blog/2017-25-12-0000.christmas.md',
+                $dir.'/blog/2018-07-04-0000.fourth-of-july.md',
             ])->sort()->values()->all(), $files->keys()->sort()->values()->all());
         });
 
