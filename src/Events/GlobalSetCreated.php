@@ -4,10 +4,7 @@ namespace Statamic\Events;
 
 class GlobalSetCreated extends Event
 {
-    public $globals;
-
-    public function __construct($globals)
+    public function __construct(public $globals)
     {
-        $this->globals = $globals;
     }
 }

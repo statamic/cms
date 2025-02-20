@@ -105,12 +105,12 @@ class RouteServiceProvider extends ServiceProvider
             return false;
         }
 
-        if ($this->isCpRoute($route)) {
-            return true;
-        }
-
         if ($this->isApiRoute($route)) {
             return false;
+        }
+
+        if ($this->isCpRoute($route)) {
+            return true;
         }
 
         return $this->isFrontendBindingEnabled();
@@ -191,12 +191,12 @@ class RouteServiceProvider extends ServiceProvider
             return false;
         }
 
-        if ($this->isCpRoute($route)) {
-            return true;
-        }
-
         if ($this->isApiRoute($route)) {
             return false;
+        }
+
+        if ($this->isCpRoute($route)) {
+            return true;
         }
 
         return $this->isFrontendBindingEnabled();
@@ -291,7 +291,9 @@ class RouteServiceProvider extends ServiceProvider
                 ? GlobalSet::findByHandle($handle)
                 : GlobalSet::all()->first(fn ($set) => $set->$field($handle));
 
-            $site = Site::default()->handle();
+            if (! $site = ($this->isApiRoute($route) ? request()->input('site') : false)) {
+                $site = Site::default()->handle();
+            }
 
             throw_unless(
                 $globalSet = $global?->in($site),
@@ -380,12 +382,12 @@ class RouteServiceProvider extends ServiceProvider
             return false;
         }
 
-        if ($this->isCpRoute($route)) {
-            return true;
-        }
-
         if ($this->isApiRoute($route)) {
             return false;
+        }
+
+        if ($this->isCpRoute($route)) {
+            return true;
         }
 
         return $this->isFrontendBindingEnabled();

@@ -3,6 +3,7 @@
 namespace Tests\StaticCaching;
 
 use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -322,6 +323,60 @@ class FileCacherTest extends TestCase
             'no domain' => [null, 'http://base.com/foo'],
             'configured base domain' => ['http://base.com', 'http://base.com/foo'],
             'another domain' => ['http://another.com', 'http://another.com/foo'],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('currentUrlProvider')]
+    public function it_gets_the_current_url(
+        array $query,
+        array $config,
+        string $expectedUrl
+    ) {
+        $request = Request::create('http://example.com/test', 'GET', $query);
+
+        $cacher = $this->fileCacher($config);
+
+        $this->assertEquals($expectedUrl, $cacher->getUrl($request));
+    }
+
+    public static function currentUrlProvider()
+    {
+        return [
+            'no query' => [
+                [],
+                [],
+                'http://example.com/test',
+            ],
+            'with query' => [
+                ['bravo' => 'b', 'charlie' => 'c', 'alfa' => 'a'],
+                [],
+                'http://example.com/test?bravo=b&charlie=c&alfa=a',
+            ],
+            'with query, ignoring query' => [
+                ['bravo' => 'b', 'charlie' => 'c', 'alfa' => 'a'],
+                ['ignore_query_strings' => true],
+                'http://example.com/test',
+            ],
+            'with query, allowed query' => [
+                ['bravo' => 'b', 'charlie' => 'c', 'alfa' => 'a'],
+                ['allowed_query_strings' => ['alfa', 'bravo']],
+                'http://example.com/test?bravo=b&charlie=c&alfa=a', // allowed_query_strings has no effect
+            ],
+            'with query, disallowed query' => [
+                ['bravo' => 'b', 'charlie' => 'c', 'alfa' => 'a'],
+                ['disallowed_query_strings' => ['charlie']],
+                'http://example.com/test?bravo=b&charlie=c&alfa=a', // disallowed_query_strings has no effect
+
+            ],
+            'with query, allowed and disallowed' => [
+                ['bravo' => 'b', 'charlie' => 'c', 'alfa' => 'a'],
+                [
+                    'allowed_query_strings' => ['alfa', 'bravo'],
+                    'disallowed_query_strings' => ['bravo'],
+                ],
+                'http://example.com/test?bravo=b&charlie=c&alfa=a', // allowed_query_strings and disallowed_query_strings have no effect
+            ],
         ];
     }
 

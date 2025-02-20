@@ -3,10 +3,10 @@
 namespace Statamic\Exceptions;
 
 use Exception;
-use Spatie\Ignition\Contracts\BaseSolution;
-use Spatie\Ignition\Contracts\ProvidesSolution;
-use Spatie\Ignition\Contracts\Solution;
-use Spatie\LaravelIgnition\Support\StringComparator;
+use Spatie\ErrorSolutions\Contracts\BaseSolution;
+use Spatie\ErrorSolutions\Contracts\ProvidesSolution;
+use Spatie\ErrorSolutions\Contracts\Solution;
+use Spatie\ErrorSolutions\Support\Laravel\StringComparator;
 use Statamic\Facades\AssetContainer;
 use Statamic\Statamic;
 

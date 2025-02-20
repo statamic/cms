@@ -96,6 +96,10 @@ class CoreModifiers extends Modifier
      */
     public function ampersandList($value, $params)
     {
+        if ($value instanceof Collection) {
+            $value = $value->all();
+        }
+
         if (! is_array($value)) {
             return $value;
         }
@@ -281,6 +285,11 @@ class CoreModifiers extends Modifier
         $text = '';
         while (count($value)) {
             $item = array_shift($value);
+
+            if (! isset($item['type'])) {
+                continue;
+            }
+
             if ($item['type'] === 'text') {
                 $text .= ' '.($item['text'] ?? '');
             }
@@ -703,6 +712,19 @@ class CoreModifiers extends Modifier
     public function favicon($value)
     {
         return Html::favicon($value);
+    }
+
+    /**
+     * Filters out empty values from an array or collection.
+     *
+     * @param  array  $value
+     * @return array
+     */
+    public function filterEmpty($value)
+    {
+        return collect($value)
+            ->filter()
+            ->when(is_array($value), fn ($collection) => $collection->all());
     }
 
     /**
@@ -1451,6 +1473,10 @@ class CoreModifiers extends Modifier
     public function limit($value, $params)
     {
         $limit = Arr::get($params, 0, 0);
+
+        if (Compare::isQueryBuilder($value)) {
+            return $value->limit($limit);
+        }
 
         if ($value instanceof Collection) {
             return $value->take($limit);
@@ -2354,7 +2380,12 @@ class CoreModifiers extends Modifier
     public function sort($value, $params)
     {
         $key = Arr::get($params, 0, 'true');
-        $desc = strtolower(Arr::get($params, 1, 'asc')) == 'desc';
+        $order = strtolower(Arr::get($params, 1, 'asc'));
+        $desc = $order == 'desc';
+
+        if (Compare::isQueryBuilder($value)) {
+            return $key === 'random' ? $value->inRandomOrder() : $value->orderBy($key, $order);
+        }
 
         $value = $value instanceof Collection ? $value : collect($value);
 
@@ -3075,6 +3106,10 @@ class CoreModifiers extends Modifier
             $url = str_replace('//youtube-nocookie.com', '//www.youtube-nocookie.com', $url);
         }
 
+        if (Str::contains($url, '&') && ! Str::contains($url, '?')) {
+            $url = Str::replaceFirst('&', '?', $url);
+        }
+
         return $url;
     }
 
@@ -3102,6 +3137,10 @@ class CoreModifiers extends Modifier
 
         if (Str::contains($url, 'youtube.com/watch?v=')) {
             $url = str_replace('watch?v=', 'embed/', $url);
+        }
+
+        if (Str::contains($url, '&') && ! Str::contains($url, '?')) {
+            $url = Str::replaceFirst('&', '?', $url);
         }
 
         return $url;

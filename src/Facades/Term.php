@@ -12,15 +12,19 @@ use Statamic\Taxonomies\TermCollection;
  * @method static TermCollection all()
  * @method static TermCollection whereTaxonomy(string $handle)
  * @method static TermCollection whereInTaxonomy(array $handles)
- * @method static TermContract find($id)
- * @method static TermContract findByUri(string $uri, string $site = null)
+ * @method static null|TermContract find($id)
+ * @method static null|TermContract findByUri(string $uri, string $site = null)
+ * @method static TermContract findOrFail($id)
+ * @method static TermContract make(string $slug = null)
  * @method static save($term)
  * @method static delete($term)
  * @method static TermQueryBuilder query()
- * @method static TermContract make(string $slug = null)
  * @method static int entriesCount(Term $term)
+ * @method static void substitute($item)
+ * @method static \Illuminate\Support\Collection applySubstitutions($items)
  *
  * @see \Statamic\Contracts\Taxonomies\TermRepository
+ * @see \Statamic\Taxonomies\Term
  */
 class Term extends Facade
 {

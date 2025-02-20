@@ -117,6 +117,8 @@ class Index extends BaseIndex
 
     protected function save($documents)
     {
+        app('files')->ensureDirectoryExists(pathinfo($this->path())['dirname']);
+
         app('files')->put($this->path(), $documents->toJson(), lock: true);
     }
 

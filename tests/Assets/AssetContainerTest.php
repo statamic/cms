@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Storage;
 use League\Flysystem\DirectoryAttributes;
 use League\Flysystem\DirectoryListing;
 use League\Flysystem\FileAttributes;
+use League\Flysystem\PathTraversalDetected;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\Asset;
@@ -144,11 +145,13 @@ class AssetContainerTest extends TestCase
         $container = (new AssetContainer)->disk('test');
         $this->assertTrue($container->private());
         $this->assertFalse($container->accessible());
+        $this->assertNull($container->url());
 
         Storage::fake('test', ['url' => '/url']);
 
         $this->assertFalse($container->private());
         $this->assertTrue($container->accessible());
+        $this->assertEquals('/url', $container->url());
     }
 
     #[Test]
@@ -807,6 +810,16 @@ class AssetContainerTest extends TestCase
         $this->assertInstanceOf(Asset::class, $asset);
         $this->assertEquals($container, $asset->container());
         $this->assertEquals('path/to/test.txt', $asset->path());
+    }
+
+    #[Test]
+    public function it_cannot_make_an_asset_using_path_traversal()
+    {
+        $this->expectException(PathTraversalDetected::class);
+        $this->expectExceptionMessage('Path traversal detected: foo/../test.txt');
+
+        $container = $this->containerWithDisk();
+        $container->makeAsset('foo/../test.txt');
     }
 
     #[Test]

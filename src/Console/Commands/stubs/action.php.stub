@@ -9,7 +9,7 @@ class DummyClass extends Action
     /**
      * The run method
      *
-     * @return void
+     * @return mixed
      */
     public function run($items, $values)
     {

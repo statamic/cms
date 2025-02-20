@@ -13,17 +13,17 @@
                 <svg-icon
                     name="regular/radio-deselected"
                     class="radio-icon"
-                    :aria-hidden="value === option.value"
+                    :aria-hidden="value == option.value"
                     @click="update($event.target.value)"
-                    v-show="value !== option.value"
+                    v-show="value != option.value"
                     v-cloak
                 />
                 <svg-icon
                     name="regular/radio-selected"
                     class="radio-icon"
-                    :aria-hidden="value !== option.value"
+                    :aria-hidden="value != option.value"
                     @click="update($event.target.value)"
-                    v-show="value === option.value"
+                    v-show="value == option.value"
                     v-cloak
                 />
                 <input type="radio"
@@ -32,7 +32,7 @@
                     @input="update($event.target.value)"
                     :value="option.value"
                     :disabled="isReadOnly"
-                    :checked="value === option.value"
+                    :checked="value == option.value"
                 />
                 {{ option.label || option.value }}
             </label>
