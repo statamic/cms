@@ -1617,7 +1617,7 @@ class CoreModifiers extends Modifier
      */
     public function minutesAgo($value, $params)
     {
-        return $this->carbon($value)->diffInMinutes(Arr::get($params, 0));
+        return (int) $this->carbon($value)->diffInMinutes(Arr::get($params, 0));
     }
 
     /**
@@ -3045,7 +3045,7 @@ class CoreModifiers extends Modifier
      */
     public function yearsAgo($value, $params)
     {
-        return $this->carbon($value)->diffInYears(Arr::get($params, 0));
+        return (int) $this->carbon($value)->diffInYears(Arr::get($params, 0));
     }
 
     /**
