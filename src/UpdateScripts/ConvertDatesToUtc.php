@@ -54,7 +54,11 @@ class ConvertDatesToUtc extends UpdateScript
                     && empty($dottedPrefix)
                     && $field->handle() === 'date'
                 ) {
-                    $item->date($item->date());
+                    $existingDate = $item->date();
+                    $localDate = Carbon::parse($existingDate->format('Y-m-d H:i:s'), config('app.timezone'));
+                    $convertedDate = $localDate->setTimezone('UTC');
+
+                    $item->date($convertedDate);
 
                     return;
                 }
