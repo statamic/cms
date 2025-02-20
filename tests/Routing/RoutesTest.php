@@ -74,6 +74,10 @@ class RoutesTest extends TestCase
                 return view('test', ['hello' => "view closure dependencies: $request->value $foo->value $bar->value $baz $qux"]);
             });
 
+            Route::statamic('/route/with/placeholders/view/closure-primitive-type-hints/{name}/{age}', function (string $name, int $age) {
+                return view('test', ['hello' => "view closure placeholders: $name $age"]);
+            });
+
             Route::statamic('/route/with/placeholders/data/closure/{foo}/{bar}/{baz}', 'test', function ($foo, $bar, $baz) {
                 return ['hello' => "data closure placeholders: $foo $bar $baz"];
             });
@@ -84,6 +88,10 @@ class RoutesTest extends TestCase
 
             Route::statamic('/route/with/placeholders/data/closure-dependency-order-doesnt-matter/{baz}/{qux}', 'test', function (FooClass $foo, $baz, BarClass $bar, Request $request, $qux) {
                 return ['hello' => "data closure dependencies: $request->value $foo->value $bar->value $baz $qux"];
+            });
+
+            Route::statamic('/route/with/placeholders/data/closure-primitive-type-hints/{name}/{age}', 'test', function (string $name, int $age) {
+                return ['hello' => "data closure placeholders: $name $age"];
             });
 
             Route::statamic('/route-with-custom-layout', 'test', [
@@ -321,6 +329,17 @@ class RoutesTest extends TestCase
     }
 
     #[Test]
+    public function it_renders_a_view_with_placeholders_using_a_view_closure_using_primitive_type_hints()
+    {
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('test', 'Hello {{ hello }}');
+
+        $this->get('/route/with/placeholders/view/closure-primitive-type-hints/darth/42')
+            ->assertOk()
+            ->assertSee('Hello view closure placeholders: darth 42');
+    }
+
+    #[Test]
     public function it_renders_a_view_with_placeholders_using_a_data_closure()
     {
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
@@ -358,6 +377,17 @@ class RoutesTest extends TestCase
         $this->get('/route/with/placeholders/data/closure-dependency-order-doesnt-matter/one/two?value=request_value')
             ->assertOk()
             ->assertSee('Hello data closure dependencies: request_value foo_class bar_class_modified one two');
+    }
+
+    #[Test]
+    public function it_renders_a_view_with_placeholders_using_a_data_closure_using_primitive_type_hints()
+    {
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('test', 'Hello {{ hello }}');
+
+        $this->get('/route/with/placeholders/data/closure-primitive-type-hints/darth/42')
+            ->assertOk()
+            ->assertSee('Hello data closure placeholders: darth 42');
     }
 
     #[Test]
