@@ -177,6 +177,16 @@ trait Revisable
         return config('statamic.revisions.enabled') && Statamic::pro();
     }
 
+    public function nonRevisableFields(): array
+    {
+        return $this->blueprint()
+            ->fields()
+            ->all()
+            ->reject(fn ($field) => $field->isRevisable())
+            ->keys()
+            ->all();
+    }
+
     abstract protected function revisionKey();
 
     abstract protected function revisionAttributes();
