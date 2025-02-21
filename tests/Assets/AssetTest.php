@@ -2033,6 +2033,22 @@ class AssetTest extends TestCase
     }
 
     #[Test]
+    public function it_sanitizes_uploaded_filenames_but_passes_the_original_name_into_the_event()
+    {
+        Event::fake();
+        $asset = $this->container->makeAsset('path/to/Sanitize This Asset © Photographer.JPG');
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+
+        $asset->upload(UploadedFile::fake()->image('Sanitize This Asset © Photographer.JPG'));
+
+        Storage::disk('test')->assertExists('path/to/sanitize-this-asset--photographer.jpg');
+        $this->assertEquals('path/to/sanitize-this-asset--photographer.jpg', $asset->path());
+        Event::assertDispatched(AssetUploaded::class, function ($event) use ($asset) {
+            return $event->asset = $asset && $event->originalFilename === 'Sanitize This Asset © Photographer.JPG';
+        });
+    }
+
+    #[Test]
     public function it_lowercases_uploaded_filenames_by_default()
     {
         Event::fake();
