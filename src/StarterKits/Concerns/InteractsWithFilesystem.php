@@ -44,18 +44,6 @@ trait InteractsWithFilesystem
     }
 
     /**
-     * Copy directory contents into, file by file so that it does not stomp the whole target directory.
-     */
-    protected function copyDirectoryContentsInto(string $from, string $to): void
-    {
-        $files = app(Filesystem::class);
-
-        collect($files->allFiles($from))
-            ->mapWithKeys(fn ($file) => [$from.'/'.$file->getRelativePathname() => $to.'/'.$file->getRelativePathname()])
-            ->each(fn ($to, $from) => $files->copy(Path::tidy($from), $this->preparePath($to)));
-    }
-
-    /**
      * Prepare path directory.
      */
     protected function preparePath(string $path): string
