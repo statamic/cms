@@ -94,13 +94,13 @@ class Attributes
 
         // Adjust width and height if the video is rotated
         if (in_array($rotate, [90, 270, -90, -270])) {
-            list($width, $height) = [$height, $width];
+            [$width, $height] = [$height, $width];
         }
 
         return [
             'width' => $width,
             'height' => $height,
-            'duration' => Arr::get($id3, 'playtime_seconds')
+            'duration' => Arr::get($id3, 'playtime_seconds'),
         ];
     }
 }
