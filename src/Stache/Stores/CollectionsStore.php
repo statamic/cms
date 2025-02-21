@@ -59,7 +59,8 @@ class CollectionsStore extends BasicStore
             ->taxonomies(Arr::get($data, 'taxonomies'))
             ->propagate(Arr::get($data, 'propagate'))
             ->previewTargets($this->normalizePreviewTargets(Arr::get($data, 'preview_targets', [])))
-            ->autosaveInterval(Arr::get($data, 'autosave'));
+            ->autosaveInterval(Arr::get($data, 'autosave'))
+            ->class(Arr::get($data, 'class'));
 
         if ($dateBehavior = Arr::get($data, 'date_behavior')) {
             $collection
