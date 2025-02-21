@@ -99,7 +99,10 @@ class FrontendController extends Controller
         $reflect = new ReflectionFunction($closure);
 
         $params = collect($reflect->getParameters())
-            ->map(fn ($param) => $param->hasType() ? app($param->getType()->getName()) : $params[$param->getName()])
+            ->map(fn ($param) => $param->hasType() && class_exists($class = $param->getType()->getName())
+                ? app($class)
+                : $params[$param->getName()]
+            )
             ->all();
 
         return $closure(...$params);
