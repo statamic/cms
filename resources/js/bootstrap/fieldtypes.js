@@ -1,3 +1,4 @@
+import { defineAsyncComponent } from 'vue';
 import RevealerFieldtype from '../components/fieldtypes/RevealerFieldtype.vue';
 import TemplateFieldtype from '../components/fieldtypes/TemplateFieldtype.vue';
 import Select from '../components/inputs/Select.vue';
@@ -12,12 +13,9 @@ import ArrayFieldtype from '../components/fieldtypes/ArrayFieldtype.vue';
 import AssetsFieldtype from '../components/fieldtypes/assets/AssetsFieldtype.vue';
 import AssetsIndexFieldtype from '../components/fieldtypes/assets/AssetsIndexFieldtype.vue';
 import AssetFolderFieldtype from '../components/fieldtypes/AssetFolderFieldtype.vue';
-import BardFieldtype from '../components/fieldtypes/bard/BardFieldtype.vue';
-import BardSet from '../components/fieldtypes/bard/Set.vue';
 import BardButtonsSettingFieldtype from '../components/fieldtypes/bard/BardButtonsSettingFieldtype.vue';
 import ButtonGroupFieldtype from '../components/fieldtypes/ButtonGroupFieldtype.vue';
 import CheckboxesFieldtype from '../components/fieldtypes/CheckboxesFieldtype.vue';
-import CodeFieldtype from '../components/fieldtypes/CodeFieldtype.vue';
 import Routes from '../components/collections/Routes.vue';
 import TitleFormats from '../components/collections/TitleFormats.vue';
 import ColorFieldtype from '../components/fieldtypes/ColorFieldtype.vue';
@@ -40,7 +38,6 @@ import IntegerFieldtype from '../components/fieldtypes/IntegerFieldtype.vue';
 import LinkFieldtype from '../components/fieldtypes/LinkFieldtype.vue';
 import ListFieldtype from '../components/fieldtypes/ListFieldtype.vue';
 import ListIndexFieldtype from '../components/fieldtypes/ListIndexFieldtype.vue';
-import MarkdownFieldtype from '../components/fieldtypes/markdown/MarkdownFieldtype.vue';
 import MarkdownButtonsSettingFieldtype from '../components/fieldtypes/markdown/MarkdownButtonsSettingFieldtype.vue';
 import RadioFieldtype from '../components/fieldtypes/RadioFieldtype.vue';
 import RangeFieldtype from '../components/fieldtypes/RangeFieldtype.vue';
@@ -61,7 +58,6 @@ import ToggleFieldtype from '../components/fieldtypes/ToggleFieldtype.vue';
 import ToggleIndexFieldtype from '../components/fieldtypes/ToggleIndexFieldtype.vue';
 import WidthFieldtype from '../components/fieldtypes/WidthFieldtype.vue';
 import VideoFieldtype from '../components/fieldtypes/VideoFieldtype.vue';
-import YamlFieldtype from '../components/fieldtypes/YamlFieldtype.vue';
 import SetPicker from '../components/fieldtypes/replicator/SetPicker.vue';
 import SetField from '../components/fieldtypes/replicator/Field.vue';
 
@@ -78,12 +74,21 @@ export default function registerFieldtypes(app) {
     app.component('assets-fieldtype', AssetsFieldtype);
     app.component('assets-fieldtype-index', AssetsIndexFieldtype);
     app.component('asset_folder-fieldtype', AssetFolderFieldtype);
-    app.component('bard-fieldtype', BardFieldtype);
-    app.component('bard-fieldtype-set', BardSet);
+    app.component(
+        'bard-fieldtype',
+        defineAsyncComponent(() => import('../components/fieldtypes/bard/BardFieldtype.vue')),
+    );
+    app.component(
+        'bard-fieldtype-set',
+        defineAsyncComponent(() => import('../components/fieldtypes/bard/Set.vue')),
+    );
     app.component('bard_buttons_setting-fieldtype', BardButtonsSettingFieldtype);
     app.component('button_group-fieldtype', ButtonGroupFieldtype);
     app.component('checkboxes-fieldtype', CheckboxesFieldtype);
-    app.component('code-fieldtype', CodeFieldtype);
+    app.component(
+        'code-fieldtype',
+        defineAsyncComponent(() => import('../components/fieldtypes/CodeFieldtype.vue')),
+    );
     app.component('collection_routes-fieldtype', Routes);
     app.component('collection_title_formats-fieldtype', TitleFormats);
     app.component('color-fieldtype', ColorFieldtype);
@@ -106,7 +111,10 @@ export default function registerFieldtypes(app) {
     app.component('link-fieldtype', LinkFieldtype);
     app.component('list-fieldtype', ListFieldtype);
     app.component('list-fieldtype-index', ListIndexFieldtype);
-    app.component('markdown-fieldtype', MarkdownFieldtype);
+    app.component(
+        'markdown-fieldtype',
+        defineAsyncComponent(() => import('../components/fieldtypes/markdown/MarkdownFieldtype.vue')),
+    );
     app.component('markdown_buttons_setting-fieldtype', MarkdownButtonsSettingFieldtype);
     app.component('radio-fieldtype', RadioFieldtype);
     app.component('range-fieldtype', RangeFieldtype);
@@ -128,7 +136,10 @@ export default function registerFieldtypes(app) {
     app.component('toggle-fieldtype-index', ToggleIndexFieldtype);
     app.component('width-fieldtype', WidthFieldtype);
     app.component('video-fieldtype', VideoFieldtype);
-    app.component('yaml-fieldtype', YamlFieldtype);
+    app.component(
+        'yaml-fieldtype',
+        defineAsyncComponent(() => import('../components/fieldtypes/YamlFieldtype.vue')),
+    );
     app.component('set-picker', SetPicker);
     app.component('set-field', SetField);
     app.component('revealer-fieldtype', RevealerFieldtype);
