@@ -117,7 +117,15 @@ class Terms extends Relationship
     {
         $single = $this->config('max_items') === 1;
 
-        if ($single && Blink::has($key = 'terms-augment-'.json_encode($values))) {
+        // The parent is the item this terms fieldtype exists on. Most commonly an
+        // entry, but could also be something else, like another taxonomy term.
+        $parent = $this->field->parent();
+
+        $site = $parent && $parent instanceof Localization
+            ? $parent->locale()
+            : Site::current()->handle(); // Use the "current" site so this will get localized appropriately on the front-end.
+
+        if ($single && Blink::has($key = 'terms-augment-'.$site.'-'.json_encode($values))) {
             return Blink::get($key);
         }
 
