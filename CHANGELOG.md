@@ -1,6 +1,6 @@
 # Release Notes
 
-## 5.48.0 (2025-03-21)
+## 5.48.0 (2025-02-21)
 
 ### What's new
 - Carbon 3 support [#11348](https://github.com/statamic/cms/issues/11348) by @duncanmcclean
@@ -17,7 +17,7 @@
 
 
 
-## 5.47.0 (2025-03-18)
+## 5.47.0 (2025-02-18)
 
 ### What's new
 - Support Sections in form GraphQL queries [#11466](https://github.com/statamic/cms/issues/11466) by @ryanmitchell
