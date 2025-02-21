@@ -217,4 +217,96 @@ GQL;
                 ],
             ]]);
     }
+
+    #[Test]
+    public function it_queries_the_sections()
+    {
+        Form::make('contact')->title('Contact Us')->save();
+
+        $blueprint = Blueprint::makeFromFields([
+            'name' => [
+                'type' => 'text',
+                'display' => 'Your Name',
+                'instructions' => 'Enter your name',
+                'placeholder' => 'Type here...',
+                'invalid' => 'This isnt in the fieldtypes config fields so it shouldnt be output',
+                'width' => 50,
+            ],
+            'subject' => ['type' => 'select', 'options' => ['disco' => 'Disco', 'house' => 'House']],
+            'message' => ['type' => 'textarea', 'width' => 33],
+        ]);
+
+        // Set section display and instructions. You wouldn't really do this for a form blueprint,
+        // but this is just to test the section type which doesn't get tested anywhere else.
+        $contents = $blueprint->contents();
+        $contents['tabs']['main']['sections'][0]['display'] = 'My Section';
+        $contents['tabs']['main']['sections'][0]['instructions'] = 'The section instructions';
+        $blueprint->setContents($contents);
+
+        BlueprintRepository::shouldReceive('find')->with('forms.contact')->andReturn($blueprint);
+
+        $query = <<<'GQL'
+{
+    form(handle: "contact") {
+        sections {
+            display
+            instructions
+            fields {
+                handle
+                type
+                display
+                instructions
+                width
+                config
+            }
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'form' => [
+                    'sections' => [
+                        [
+                            'display' => 'My Section',
+                            'instructions' => 'The section instructions',
+                            'fields' => [
+                                [
+                                    'handle' => 'name',
+                                    'type' => 'text',
+                                    'display' => 'Your Name',
+                                    'instructions' => 'Enter your name',
+                                    'width' => 50,
+                                    'config' => [
+                                        'placeholder' => 'Type here...',
+                                    ],
+                                ],
+                                [
+                                    'handle' => 'subject',
+                                    'type' => 'select',
+                                    'display' => 'Subject',
+                                    'instructions' => null,
+                                    'width' => 100,
+                                    'config' => [
+                                        'options' => ['disco' => 'Disco', 'house' => 'House'],
+                                    ],
+                                ],
+                                [
+                                    'handle' => 'message',
+                                    'type' => 'textarea',
+                                    'display' => 'Message',
+                                    'instructions' => null,
+                                    'width' => 33,
+                                    'config' => [],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]]);
+    }
 }

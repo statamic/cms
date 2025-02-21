@@ -70,7 +70,7 @@ class TokenRepository extends DatabaseTokenRepository
         $record = $this->getResets()->get($user->email());
 
         return $record &&
-            ! $this->tokenExpired(Carbon::createFromTimestamp($record['created_at']))
+            ! $this->tokenExpired(Carbon::createFromTimestamp($record['created_at'], config('app.timezone')))
             && $this->hasher->check($token, $record['token']);
     }
 

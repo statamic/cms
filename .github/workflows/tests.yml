@@ -105,7 +105,7 @@ jobs:
         run: vendor/bin/phpunit
 
   js-tests:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, '[ci skip]')"
 
     name: JavaScript tests

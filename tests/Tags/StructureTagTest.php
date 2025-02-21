@@ -456,6 +456,41 @@ EOT;
         $this->assertEquals('[1=parent][1-1=parent][1-1-1=parent][1-1-1-1=current][2]', $result);
     }
 
+    #[Test]
+    public function it_doesnt_render_anything_when_nav_from_is_invalid()
+    {
+        $this->createCollectionAndNav();
+        Entry::shouldReceive('findByUri')->andReturn(null);
+
+        // The html uses <i> tags (could be any tag, but i is short) to prevent whitespace comparison issues in the assertion.
+        $template = <<<'EOT'
+<ul>
+{{ nav from="something-invalid" }}
+    <li>
+        <i>{{ title }}</i>
+        {{ if children }}
+        <ul>
+            {{ *recursive children* }}
+        </ul>
+        {{ /if }}
+    </li>
+{{ /nav }}
+</ul>
+EOT;
+
+        $expected = <<<'EOT'
+<ul>
+    <li>
+        <i>outer title</i>
+    </li>
+</ul>
+EOT;
+
+        $this->assertXmlStringEqualsXmlString($expected, (string) Antlers::parse($template, [
+            'title' => 'outer title', // to test that cascade the page's data takes precedence over the cascading data.
+        ]));
+    }
+
     private function makeNav($tree)
     {
         $nav = Nav::make('test');
