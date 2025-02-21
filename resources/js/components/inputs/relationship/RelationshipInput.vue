@@ -80,7 +80,6 @@
                     :exclusions="exclusions"
                     :type="config.type"
                     :tree="tree"
-                    :can-use-tree="!! tree && config.query_scopes?.length === 0"
                     @selected="selectionsUpdated"
                     @closed="close"
                 />
