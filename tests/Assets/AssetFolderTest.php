@@ -1163,9 +1163,15 @@ class AssetFolderTest extends TestCase
 
         Storage::fake('local');
 
-        $container = Facades\AssetContainer::make('test')->disk('local');
+        $store = Facades\AssetContainer::make('test')->disk('local')->contents()->cacheStore();
 
-        $this->assertSame('asset_container_contents', $container->contents()->cacheStore()->getName());
+        $obj = new \ReflectionObject($store);
+        $method = $obj->getMethod('getName');
+        $method->setAccessible(true);
+
+        $storeName = $method->invoke($store, 'getName');
+
+        $this->assertSame('asset_container_contents', $storeName);
     }
 
     private function containerWithDisk()
