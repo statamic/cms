@@ -5,6 +5,7 @@ namespace Statamic\Forms;
 use DebugBar\DataCollector\ConfigCollector;
 use DebugBar\DebugBarException;
 use Statamic\Contracts\Forms\Form as FormContract;
+use Statamic\Facades\Antlers;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
@@ -136,6 +137,27 @@ class Tags extends BaseTags
         }
 
         return $html;
+    }
+
+    /**
+     * Maps to {{ form:fields }}.
+     *
+     * @return string
+     */
+    public function fields()
+    {
+        $isBlade = $this->isAntlersBladeComponent();
+
+        $slot = new RenderableFieldSlot($this->content, $isBlade);
+
+        collect($this->context['fields'])
+            ->each(fn ($field) => $field['field']->slot($slot)->isBlade($isBlade));
+
+        if ($isBlade) {
+            return $this->tagRenderer->render('@foreach($fields as $field)'.$this->content.'@endforeach', $this->context->all());
+        }
+
+        return Antlers::parse('{{ fields }}'.$this->content.'{{ /fields }}', $this->context->all());
     }
 
     /**
