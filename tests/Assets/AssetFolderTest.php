@@ -1151,6 +1151,23 @@ class AssetFolderTest extends TestCase
         ], $folder->toArray());
     }
 
+    #[Test]
+    public function it_uses_a_custom_cache_store()
+    {
+        config([
+            'cache.stores.asset_container_contents' => [
+                'driver' => 'file',
+                'path' => storage_path('statamic/asset-container-contents'),
+            ],
+        ]);
+
+        Storage::fake('local');
+
+        $container = Facades\AssetContainer::make('test')->disk('local');
+
+        $this->assertSame('asset_container_contents', $container->contents()->cacheStore()->getName());
+    }
+
     private function containerWithDisk()
     {
         Storage::fake('local');
