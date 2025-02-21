@@ -1165,13 +1165,8 @@ class AssetFolderTest extends TestCase
 
         $store = Facades\AssetContainer::make('test')->disk('local')->contents()->cacheStore();
 
-        $obj = new \ReflectionObject($store);
-        $method = $obj->getMethod('getName');
-        $method->setAccessible(true);
-
-        $storeName = $method->invoke($store, 'getName');
-
-        $this->assertSame('asset_container_contents', $storeName);
+        // ideally we would have checked the store name, but laravel 10 doesnt give us a way to do that
+        $this->assertStringContainsString('asset-container-contents', $store->getStore()->getDirectory());
     }
 
     private function containerWithDisk()
