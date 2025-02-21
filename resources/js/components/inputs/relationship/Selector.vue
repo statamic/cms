@@ -224,6 +224,7 @@ export default {
             default: () => []
         },
         tree: Object,
+        canUseTree: Boolean,
     },
 
     data() {
@@ -269,10 +270,6 @@ export default {
 
         singleSelect() {
             return this.maxSelections === 1;
-        },
-
-        canUseTree() {
-            return !! this.tree;
         },
 
         initialView() {
