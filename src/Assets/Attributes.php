@@ -88,9 +88,18 @@ class Attributes
     {
         $id3 = ExtractInfo::fromAsset($this->asset);
 
+        $width = Arr::get($id3, 'video.resolution_x');
+        $height = Arr::get($id3, 'video.resolution_y');
+        $rotate = Arr::get($id3, 'video.rotate', 0);
+
+        // Adjust width and height if the video is rotated
+        if (in_array($rotate, [90, 270, -90, -270])) {
+            [$width, $height] = [$height, $width];
+        }
+
         return [
-            'width' => Arr::get($id3, 'video.resolution_x'),
-            'height' => Arr::get($id3, 'video.resolution_y'),
+            'width' => $width,
+            'height' => $height,
             'duration' => Arr::get($id3, 'playtime_seconds'),
         ];
     }
