@@ -22,6 +22,13 @@
 
             <!-- URL text input -->
             <text-input v-if="option === 'url'" v-model="urlValue" />
+            <v-select
+                v-if="option === 'url'"
+                multiple="true"
+                v-model="urlData"
+                :options="urlOptions"
+                :value="urlData"
+            />
 
             <!-- Entry select -->
             <relationship-fieldtype
@@ -64,6 +71,8 @@ export default {
             option: this.meta.initialOption,
             options: this.initialOptions(),
             urlValue: this.meta.initialUrl,
+            urlData: [],
+            urlOptions: ['no-follow', 'no-rel'],
             selectedEntries: this.meta.initialSelectedEntries,
             selectedAssets: this.meta.initialSelectedAssets,
             metaChanging: false,
