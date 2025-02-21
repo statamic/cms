@@ -35,7 +35,7 @@ class LicenseManager
     public function failedRequestRetrySeconds()
     {
         return $this->requestRateLimited()
-            ? (int) Carbon::createFromTimestamp($this->response('expiry'))->diffInSeconds(absolute: true)
+            ? (int) Carbon::createFromTimestamp($this->response('expiry'), config('app.timezone'))->diffInSeconds(absolute: true)
             : null;
     }
 
