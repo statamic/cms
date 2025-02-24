@@ -20,7 +20,7 @@ class PasswordBrokerManager extends BaseManager
             $this->app['hash'],
             $config['table'],
             $key,
-            $config['expire'],
+            ($config['expire'] ?? 60) * 60,
             $config['throttle'] ?? 0
         );
     }
