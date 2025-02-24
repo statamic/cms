@@ -14,7 +14,7 @@ class SessionTimeoutController extends CpController
         $lastActivity = session('last_activity', now()->timestamp);
 
         return Carbon::createFromTimestamp($lastActivity, config('app.timezone'))
-            ->addMinutes(config('session.lifetime'))
+            ->addMinutes((int) config('session.lifetime'))
             ->diffInSeconds();
     }
 }
