@@ -55,15 +55,6 @@ class Localize
     {
         $reflection = new ReflectionClass($date = Date::now());
 
-        // Carbon 2.x
-        if ($reflection->hasProperty('toStringFormat')) {
-            $format = $reflection->getProperty('toStringFormat');
-            $format->setAccessible(true);
-
-            return $format->getValue();
-        }
-
-        // Carbon 3.x
         $factory = $reflection->getMethod('getFactory');
         $factory->setAccessible(true);
 
