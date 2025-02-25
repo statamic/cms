@@ -22,7 +22,7 @@ class LivePreview
         if (Sites::multiEnabled()) {
             /** @var Collection */
             $siteURLs = Sites::all()
-                ->map(fn(Site $site) => $this->getSchemeAndHost($site))
+                ->map(fn (Site $site) => $this->getSchemeAndHost($site))
                 ->values()
                 ->unique()
                 ->join(' ');
