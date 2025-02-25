@@ -13,8 +13,8 @@ class SessionTimeoutController extends CpController
         // remember me would have already been served a 403 error and wouldn't have got this far.
         $lastActivity = session('last_activity', now()->timestamp);
 
-        return Carbon::createFromTimestamp($lastActivity, config('app.timezone'))
-            ->addMinutes(config('session.lifetime'))
-            ->diffInSeconds();
+        return abs((int) Carbon::createFromTimestamp($lastActivity, config('app.timezone'))
+            ->addMinutes((int) config('session.lifetime'))
+            ->diffInSeconds());
     }
 }
