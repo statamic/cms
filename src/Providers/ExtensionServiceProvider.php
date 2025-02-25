@@ -246,6 +246,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Updates\AddSitePermissions::class,
         Updates\UseClassBasedStatamicUniqueRules::class,
         Updates\MigrateSitesConfigToYaml::class,
+        Updates\RemoveParentField::class,
     ];
 
     public function register()
