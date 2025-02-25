@@ -58,11 +58,13 @@ class AddsHeadersToLivePreviewTest extends TestCase
     public function it_sets_header_when_multisite()
     {
         config()->set('statamic.system.multisite', true);
+
         $this->setSites([
             'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
             'third' => ['url' => 'http://third/', 'locale' => 'en'],
         ]);
+
         $substitute = EntryFactory::collection('test')->id('2')->slug('charlie')->data(['title' => 'Substituted title', 'foo' => 'Substituted foo'])->make();
 
         LivePreview::tokenize('test-token', $substitute);
@@ -70,5 +72,25 @@ class AddsHeadersToLivePreviewTest extends TestCase
         $this->get('/test?token=test-token')
             ->assertHeader('X-Statamic-Live-Preview', true)
             ->assertHeader('Content-Security-Policy', 'frame-ancestors http://localhost http://third');
+    }
+
+    #[Test]
+    public function it_includes_ports_in_csp_header()
+    {
+        config()->set('statamic.system.multisite', true);
+
+        $this->setSites([
+            'en' => ['url' => 'http://localhost:8080', 'locale' => 'en'],
+            'fr' => ['url' => 'http://localhost:8080/fr/', 'locale' => 'fr'],
+            'third' => ['url' => 'http://third/', 'locale' => 'en'],
+        ]);
+
+        $substitute = EntryFactory::collection('test')->id('2')->slug('charlie')->data(['title' => 'Substituted title', 'foo' => 'Substituted foo'])->make();
+
+        LivePreview::tokenize('test-token', $substitute);
+
+        $this->get('/test?token=test-token')
+            ->assertHeader('X-Statamic-Live-Preview', true)
+            ->assertHeader('Content-Security-Policy', 'frame-ancestors http://localhost:8080 http://third');
     }
 }
