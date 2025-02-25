@@ -39,8 +39,8 @@ class LivePreview
     {
         $parts = parse_url($site->absoluteUrl());
 
-        $port = isset($parts['port']) ? ':' . $parts['port'] : '';
+        $port = isset($parts['port']) ? ':'.$parts['port'] : '';
 
-        return $parts['scheme'] . '://' . $parts['host'] . $port;
+        return $parts['scheme'].'://'.$parts['host'].$port;
     }
 }
