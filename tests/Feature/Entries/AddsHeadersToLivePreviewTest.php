@@ -60,9 +60,12 @@ class AddsHeadersToLivePreviewTest extends TestCase
         config()->set('statamic.system.multisite', true);
 
         $this->setSites([
-            'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
-            'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
-            'third' => ['url' => 'http://third/', 'locale' => 'en'],
+            'one' => ['url' => 'http://withport.com:8080/', 'locale' => 'en'],
+            'two' => ['url' => 'http://withport.com:8080/fr/', 'locale' => 'fr'],
+            'three' => ['url' => 'http://withoutport.com/', 'locale' => 'en'],
+            'four' => ['url' => 'http://withoutport.com/fr/', 'locale' => 'fr'],
+            'five' => ['url' => 'http://third.com/', 'locale' => 'en'],
+            'six' => ['url' => 'http://third.com/fr/', 'locale' => 'fr'],
         ]);
 
         $substitute = EntryFactory::collection('test')->id('2')->slug('charlie')->data(['title' => 'Substituted title', 'foo' => 'Substituted foo'])->make();
@@ -71,26 +74,6 @@ class AddsHeadersToLivePreviewTest extends TestCase
 
         $this->get('/test?token=test-token')
             ->assertHeader('X-Statamic-Live-Preview', true)
-            ->assertHeader('Content-Security-Policy', 'frame-ancestors http://localhost http://third');
-    }
-
-    #[Test]
-    public function it_includes_ports_in_csp_header()
-    {
-        config()->set('statamic.system.multisite', true);
-
-        $this->setSites([
-            'en' => ['url' => 'http://localhost:8080', 'locale' => 'en'],
-            'fr' => ['url' => 'http://localhost:8080/fr/', 'locale' => 'fr'],
-            'third' => ['url' => 'http://third/', 'locale' => 'en'],
-        ]);
-
-        $substitute = EntryFactory::collection('test')->id('2')->slug('charlie')->data(['title' => 'Substituted title', 'foo' => 'Substituted foo'])->make();
-
-        LivePreview::tokenize('test-token', $substitute);
-
-        $this->get('/test?token=test-token')
-            ->assertHeader('X-Statamic-Live-Preview', true)
-            ->assertHeader('Content-Security-Policy', 'frame-ancestors http://localhost:8080 http://third');
+            ->assertHeader('Content-Security-Policy', 'frame-ancestors http://withport.com:8080 http://withoutport.com http://third.com');
     }
 }
