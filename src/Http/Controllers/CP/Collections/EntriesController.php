@@ -302,10 +302,6 @@ class EntriesController extends CpController
 
         $values = Entry::make()->collection($collection)->values()->all();
 
-        if ($collection->hasStructure() && $request->parent) {
-            $values['parent'] = $request->parent;
-        }
-
         $fields = $blueprint
             ->fields()
             ->addValues($values)
@@ -349,6 +345,7 @@ class EntriesController extends CpController
             'canManagePublishState' => User::current()->can('publish '.$collection->handle().' entries'),
             'previewTargets' => $collection->previewTargets()->all(),
             'autosaveInterval' => $collection->autosaveInterval(),
+            'parent' => $collection->hasStructure() ? $request->parent : null,
         ];
 
         if ($request->wantsJson()) {
@@ -403,7 +400,7 @@ class EntriesController extends CpController
         }
 
         if ($structure && ! $collection->orderable()) {
-            $parent = $values['parent'] ?? null;
+            $parent = $request->_parent;
             $entry->afterSave(function ($entry) use ($parent, $tree) {
                 if ($parent && optional($tree->find($parent))->isRoot()) {
                     $parent = null;
