@@ -22,7 +22,7 @@ class LivePreview
         if (Sites::multiEnabled()) {
             /** @var Collection */
             $siteURLs = Sites::all()
-                ->map(fn (Site $site) => $this->getSchemeAndHost($site))
+                ->map(fn(Site $site) => $this->getSchemeAndHost($site))
                 ->values()
                 ->unique()
                 ->join(' ');
@@ -39,6 +39,8 @@ class LivePreview
     {
         $parts = parse_url($site->absoluteUrl());
 
-        return $parts['scheme'].'://'.$parts['host'];
+        $port = isset($parts['port']) ? ':' . $parts['port'] : '';
+
+        return $parts['scheme'] . '://' . $parts['host'] . $port;
     }
 }
