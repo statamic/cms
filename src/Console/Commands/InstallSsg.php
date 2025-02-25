@@ -68,6 +68,7 @@ class InstallSsg extends Command
 
         if (
             ! Composer::isInstalled('spatie/fork')
+            && extension_loaded('pcntl')
             && confirm('Would you like to install spatie/fork? It allows for running multiple workers at once.')
         ) {
             spin(

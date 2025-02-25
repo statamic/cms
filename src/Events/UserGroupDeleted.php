@@ -6,11 +6,8 @@ use Statamic\Contracts\Git\ProvidesCommitMessage;
 
 class UserGroupDeleted extends Event implements ProvidesCommitMessage
 {
-    public $group;
-
-    public function __construct($group)
+    public function __construct(public $group)
     {
-        $this->group = $group;
     }
 
     public function commitMessage()

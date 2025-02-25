@@ -1,5 +1,106 @@
 # Release Notes
 
+## 5.48.1 (2025-02-25)
+
+### What's fixed
+- Fix session expiry component [#11501](https://github.com/statamic/cms/issues/11501) by @jasonvarga
+- Include port in CSP for Live Preview [#11498](https://github.com/statamic/cms/issues/11498) by @dmxmo
+- Remove duplicate translation line from `translator` command [#11494](https://github.com/statamic/cms/issues/11494) by @duncanmcclean
+- Fix carbon integer casting [#11496](https://github.com/statamic/cms/issues/11496) by @jasonvarga
+- Only show spatie/fork prompt when pcntl extension is loaded [#11493](https://github.com/statamic/cms/issues/11493) by @duncanmcclean
+- French translations [#11488](https://github.com/statamic/cms/issues/11488) by @ebeauchamps
+
+
+
+## 5.48.0 (2025-02-21)
+
+### What's new
+- Carbon 3 support [#11348](https://github.com/statamic/cms/issues/11348) by @duncanmcclean
+- Allow custom asset container contents cache store [#11481](https://github.com/statamic/cms/issues/11481) by @ryanmitchell
+- Add support for `$view` parameter closure with `Route::statamic()` [#11452](https://github.com/statamic/cms/issues/11452) by @jesseleite
+- Add Unlink All action to relationship fields [#11475](https://github.com/statamic/cms/issues/11475) by @jacksleight
+
+### What's fixed
+- Fix handle dimensions of rotated videos [#11479](https://github.com/statamic/cms/issues/11479) by @grischaerbe
+- Entries Fieldtype: Hide tree view when using query scopes [#11484](https://github.com/statamic/cms/issues/11484) by @duncanmcclean
+- Fix issue with localization files named like handles [#11482](https://github.com/statamic/cms/issues/11482) by @ChristianPraiss
+- Fix cannot use paginate/limit error when one is null [#11478](https://github.com/statamic/cms/issues/11478) by @jacksleight
+- Fix primitive type hint handling in Statamic routes [#11476](https://github.com/statamic/cms/issues/11476) by @jesseleite
+
+
+
+## 5.47.0 (2025-02-18)
+
+### What's new
+- Support Sections in form GraphQL queries [#11466](https://github.com/statamic/cms/issues/11466) by @ryanmitchell
+- Add empty/not empty field filters [#11389](https://github.com/statamic/cms/issues/11389) by @jacksleight
+- Support arguments in user can/cant tags [#11407](https://github.com/statamic/cms/issues/11407) by @jacksleight
+- Add hook into the `multisite` command [#11458](https://github.com/statamic/cms/issues/11458) by @duncanmcclean
+- Set the proper CSP headers for multi-domain iframe [#11447](https://github.com/statamic/cms/issues/11447) by @edalzell
+- Allow custom render callback for overridden exceptions [#11408](https://github.com/statamic/cms/issues/11408) by @FrittenKeeZ
+- Support the Group fieldtype in DataReferenceUpdater [#11410](https://github.com/statamic/cms/issues/11410) by @duncanmcclean
+
+### What's fixed
+- Fix emptiness check on Value properties [#11402](https://github.com/statamic/cms/issues/11402) by @godismyjudge95
+- Change revision whereKey to return a collection [#11463](https://github.com/statamic/cms/issues/11463) by @ryanmitchell
+- If nav:from references an invalid entry, ensure nothing is returned [#11464](https://github.com/statamic/cms/issues/11464) by @ryanmitchell
+- Improve performance of the data reference updaters [#11442](https://github.com/statamic/cms/issues/11442) by @duncanmcclean
+- Fix search results missing search_snippets [#11450](https://github.com/statamic/cms/issues/11450) by @ivang76
+- Ensure consistent order of `get_content` results [#11429](https://github.com/statamic/cms/issues/11429) by @daun
+- Fixes empty asset alt <td> element in AssetsFieldtype [#11460](https://github.com/statamic/cms/issues/11460) by @PatrickJunod
+- Fix issue with AssetsFieldtype upload controls hidden on @sm size [#11459](https://github.com/statamic/cms/issues/11459) by @PatrickJunod
+- Fix test state issues around sites cache [#11455](https://github.com/statamic/cms/issues/11455) by @jesseleite
+- Fix InstallEloquentDriver command [#11425](https://github.com/statamic/cms/issues/11425) by @aerni
+- Handle extra translation files in breadcrumbs [#11422](https://github.com/statamic/cms/issues/11422) by @jasonvarga
+- Select specific repositories for Eloquent Driver install command [#11381](https://github.com/statamic/cms/issues/11381) by @kevinmeijer97
+- Adjust video fit in asset editor [#11414](https://github.com/statamic/cms/issues/11414) by @daun
+- Dutch translations [#11448](https://github.com/statamic/cms/issues/11448) by @daronspence
+- Use `ubuntu-latest` in GitHub Actions workflows [#11443](https://github.com/statamic/cms/issues/11443) by @duncanmcclean
+
+
+
+## 5.46.1 (2025-02-04)
+
+### What's fixed
+- Fix search:results tag when offset and paginate are set [#11386](https://github.com/statamic/cms/issues/11386) by @nopticon
+- Live Preview: Allow changing the position of "Responsive" device option [#11404](https://github.com/statamic/cms/issues/11404) by @duncanmcclean
+- Fix additional url segments matching taxonomy terms [#11383](https://github.com/statamic/cms/issues/11383) by @jasonvarga
+- Use constructor property promotion in events [#11380](https://github.com/statamic/cms/issues/11380) by @duncanmcclean
+- Fix "Curaçao" item in countries dictionary [#11395](https://github.com/statamic/cms/issues/11395) by @duncanmcclean
+- Remove duplicate strings from translation files [#11400](https://github.com/statamic/cms/issues/11400) by @j3ll3yfi5h
+- German translations [#11399](https://github.com/statamic/cms/issues/11399) by @helloDanuk
+- French translations [#11397](https://github.com/statamic/cms/issues/11397) by @ebeauchamps
+
+
+
+## 5.46.0 (2025-01-22)
+
+### What's new
+- Add empty/not empty filters for replicator, bard and grid [#11354](https://github.com/statamic/cms/issues/11354) by @jacksleight
+- Page children as value for field conditions [#11368](https://github.com/statamic/cms/issues/11368) by @heidkaemper
+- Allow addons cache path to be set by an environment variable [#11365](https://github.com/statamic/cms/issues/11365) by @ryanmitchell
+
+### What's fixed
+- Fix error with disallowed words in Comb search driver [#11336](https://github.com/statamic/cms/issues/11336) by @duncanmcclean
+- Fixed ordering search results by origin value [#11334](https://github.com/statamic/cms/issues/11334) by @duncanmcclean
+- Fix case insensitive Comb search for UTF-8 characters [#11363](https://github.com/statamic/cms/issues/11363) by @heidkaemper
+- Translate name in user group fieldtype [#11343](https://github.com/statamic/cms/issues/11343) by @duncanmcclean
+- Fix UI bugs in Safari 18.2 [#11335](https://github.com/statamic/cms/issues/11335) by @marcorieser
+
+
+
+## 5.45.2 (2025-01-21)
+
+### What's fixed
+- Revert "Allow form fields view to be rendered with single tag" [#11374](https://github.com/statamic/cms/issues/11374) by @duncanmcclean
+- Remove `type` attribute in nocache replacer [#11373](https://github.com/statamic/cms/issues/11373) by @marcorieser
+- Fix deprecation warning from regex operator [#11337](https://github.com/statamic/cms/issues/11337) by @duncanmcclean
+- Fix bug report link in Contribution Guide [#11367](https://github.com/statamic/cms/issues/11367) by @duncanmcclean
+- Fix bard undefined href error [#11351](https://github.com/statamic/cms/issues/11351) by @jacksleight
+- Suppress “packing” git message [#11326](https://github.com/statamic/cms/issues/11326) by @edalzell
+
+
+
 ## 5.45.1 (2025-01-07)
 
 ### What's fixed

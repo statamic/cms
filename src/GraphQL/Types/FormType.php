@@ -38,6 +38,12 @@ class FormType extends \Rebing\GraphQL\Support\Type
                     return $form->blueprint()->fields()->validator()->rules();
                 },
             ],
+            'sections' => [
+                'type' => GraphQL::listOf(GraphQL::type(SectionType::NAME)),
+                'resolve' => function ($form, $args, $context, $info) {
+                    return $form->blueprint()->tabs()->first()->sections()->all();
+                },
+            ],
         ])->map(function (array $arr) {
             $arr['resolve'] = $arr['resolve'] ?? $this->resolver();
 

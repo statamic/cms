@@ -7,6 +7,7 @@ export default class FieldAction {
     #visibleWhenReadOnly;
     #icon;
     #quick;
+    #dangerous;
     #confirm;
 
     constructor(action, payload) {
@@ -17,6 +18,7 @@ export default class FieldAction {
         this.#visibleWhenReadOnly = action.visibleWhenReadOnly ?? false;
         this.#icon = action.icon ?? 'image';
         this.#quick = action.quick ?? false;
+        this.#dangerous = action.dangerous ?? false;
         this.title = action.title;
     }
 
@@ -30,6 +32,10 @@ export default class FieldAction {
 
     get quick() {
         return typeof this.#quick === 'function' ? this.#quick(this.#payload) : this.#quick;
+    }
+
+    get dangerous() {
+        return typeof this.#dangerous === 'function' ? this.#dangerous(this.#payload) : this.#dangerous;
     }
 
     get icon() {

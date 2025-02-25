@@ -55,6 +55,6 @@ abstract class AbstractCacher implements Cacher
      */
     public function cacheExpiry()
     {
-        return Carbon::now()->addMinutes($this->config('expiry'));
+        return Carbon::now()->addMinutes((int) $this->config('expiry'));
     }
 }
