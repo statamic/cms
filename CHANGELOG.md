@@ -1,5 +1,15 @@
 # Release Notes
 
+## 5.49.0 (2025-02-25)
+
+### What's new
+- Laravel 12 support [#11433](https://github.com/statamic/cms/issues/11433) by @duncanmcclean
+
+### What's fixed
+- Asset Container returns relative url for same site [#11372](https://github.com/statamic/cms/issues/11372) by @marcorieser
+
+
+
 ## 5.48.1 (2025-02-25)
 
 ### What's fixed
