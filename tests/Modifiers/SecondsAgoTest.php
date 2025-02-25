@@ -16,18 +16,22 @@ class SecondsAgoTest extends TestCase
     {
         Carbon::setTestNow(Carbon::parse('2025-02-20 13:10:30'));
 
-        $this->assertSame($expected, round($this->modify(Carbon::parse($input))));
+        $this->assertSame($expected, $this->modify(Carbon::parse($input)));
     }
 
     public static function dateProvider()
     {
         return [
-            'same second' => ['2025-02-20 13:10:30', 0.0], // 0.0
-            '1 second ago' => ['2025-02-20 13:10:29', 1.0], // 1.0
-            '2 seconds ago' => ['2025-02-20 13:10:28', 2.0], // 2.0
+            // Carbon 3 would return floats but to preserve backwards compatibility
+            // with Carbon 2 we will cast to integers.
+            'same second' => ['2025-02-20 13:10:30', 0], // 0.0
+            '1 second ago' => ['2025-02-20 13:10:29', 1], // 1.0
+            '2 seconds ago' => ['2025-02-20 13:10:28', 2], // 2.0
 
-            'one second from now' => ['2025-02-20 13:10:31', -1.0], // -1.0
-            'two seconds from now' => ['2025-02-20 13:10:32', -2.0], // -2.0
+            // Future dates would return negative numbers in Carbon 3 but to preserve
+            // backwards compatibility with Carbon 2, we keep them positive.
+            'one second from now' => ['2025-02-20 13:10:31', 1], // -1.0
+            'two seconds from now' => ['2025-02-20 13:10:32', 2], // -2.0
         ];
     }
 
