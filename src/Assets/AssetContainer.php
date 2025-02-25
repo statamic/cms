@@ -139,8 +139,9 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
             return null;
         }
 
-        $url = Str::removeRight($this->disk()->url('/'), '/');
-        $url = Str::removeLeft($url, config('app.url'));
+        $url = (string) Str::of($this->disk()->url('/'))
+            ->rtrim('/')
+            ->after(config('app.url'));
 
         return ($url === '') ? '/' : $url;
     }
