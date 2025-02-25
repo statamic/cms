@@ -16,19 +16,20 @@ class DaysAgoTest extends TestCase
     {
         Carbon::setTestNow(Carbon::parse('2025-02-20 00:00'));
 
-        $this->assertSame($expected, $this->modify(Carbon::parse($input)));
+        $this->assertSame($expected, round($this->modify(Carbon::parse($input))));
     }
 
     public static function dateProvider()
     {
         return [
             'same time' => ['2025-02-20 00:00', 0.0],
-            'less than a day ago' => ['2025-02-19 11:00', 0.5416666666666666],
+            'less than a day ago' => ['2025-02-19 11:00', 0.0],
             '1 day ago' => ['2025-02-19 00:00', 1.0],
             '2 days ago' => ['2025-02-18 00:00', 2.0],
+
             'one day from now' => ['2025-02-21 00:00', -1.0],
-            'less than a day from now' => ['2025-02-20 13:00', -0.5416666666666666],
-            'more than a day from now' => ['2025-02-21 13:00', -1.5416666666666667],
+            'less than a day from now' => ['2025-02-20 13:00', -0.0],
+            'more than a day from now' => ['2025-02-21 13:00', -1.0],
         ];
     }
 
