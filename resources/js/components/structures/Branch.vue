@@ -1,5 +1,5 @@
 <template>
-    <div class="flex">
+    <div class="page-tree-branch flex">
         <slot name="branch-action" :branch="page">
             <div v-if="editable" class="page-move w-6" />
         </slot>
