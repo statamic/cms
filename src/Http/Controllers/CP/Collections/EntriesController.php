@@ -233,7 +233,6 @@ class EntriesController extends CpController
             $tree = $entry->structure()->in($entry->locale());
         }
 
-
         $this->validateUniqueUri($entry, $tree ?? null, $parent ?? null);
 
         if ($entry->revisionsEnabled() && $entry->published()) {
