@@ -621,7 +621,7 @@ export default {
                 ...{
                     _blueprint: this.fieldset.handle,
                     _localized: this.localizedFields,
-                    _parent: this.parent, // todo: don't pass this via values
+                    _parent: this.parent,
                 },
             };
 
