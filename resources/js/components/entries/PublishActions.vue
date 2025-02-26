@@ -130,6 +130,8 @@ export default {
                     return __('messages.publish_actions_unpublish');
                 case 'revision':
                     return __('messages.publish_actions_create_revision');
+                case 'publish_later':
+                    return __('messages.publish_actions_schedule_revision');
             }
         },
 
