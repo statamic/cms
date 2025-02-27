@@ -90,7 +90,7 @@ class InstallEloquentDriver extends Command
     protected function repositories(): array
     {
         if ($this->option('all')) {
-            return $this->availableRepositories()->keys()->all();
+            return $this->allRepositories()->keys()->all();
         }
 
         if ($repositories = $this->option('repositories')) {
@@ -657,7 +657,7 @@ class InstallEloquentDriver extends Command
             return;
         }
 
-        $this->components->info('Configured asset containers');
+        $this->components->info($message);
     }
 
     private function switchToEloquentDriver(string $repository): void

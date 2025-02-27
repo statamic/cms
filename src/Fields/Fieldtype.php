@@ -12,6 +12,8 @@ use Statamic\Query\Scopes\Filters\Fields\FieldtypeFilter;
 use Statamic\Statamic;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 abstract class Fieldtype implements Arrayable
 {
     use HasHandle, RegistersItself {
