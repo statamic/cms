@@ -5,7 +5,7 @@
                 <radio-fieldtype
                     :handle="`${handle}_mode`"
                     :value="mode"
-                    @input="setMode"
+                    @update:value="setMode"
                     :config="{
                         inline: true,
                         options: {
@@ -29,8 +29,8 @@
                             <text-input
                                 dir="ltr"
                                 class="slug-field"
-                                :value="value[site.handle]"
-                                @input="updateSiteValue(site.handle, $event)"
+                                :model-value="value[site.handle]"
+                                @update:model-value="updateSiteValue(site.handle, $event)"
                             />
                         </td>
                     </tr>
@@ -39,7 +39,7 @@
         </div>
 
         <div v-if="!hasMultipleSites || !inMultipleMode">
-            <text-input :value="value" @input="update" class="slug-field" dir="ltr" />
+            <text-input :model-value="value" @update:model-value="update" class="slug-field" dir="ltr" />
         </div>
     </div>
 </template>
@@ -106,7 +106,7 @@ export default {
         },
 
         update(value) {
-            this.$emit('input', value);
+            this.$emit('update:value', value)
         },
     },
 };
