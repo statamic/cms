@@ -41,6 +41,7 @@ class EntryRevisionsController extends CpController
     {
         $entry->createRevision([
             'message' => $request->message,
+            'publish_at' => $request->publish_at,
             'user' => User::fromUser($request->user()),
         ]);
 

@@ -3,6 +3,7 @@
 namespace Statamic\Revisions;
 
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Carbon;
 use Statamic\Contracts\Auth\User;
 use Statamic\Contracts\Revisions\Revision as Contract;
 use Statamic\Data\ExistsAsFile;
@@ -23,6 +24,7 @@ class Revision implements Arrayable, Contract
     protected $user;
     protected $userId;
     protected $message;
+    protected $publishAt;
     protected $action = 'revision';
     protected $attributes = [];
 
@@ -59,6 +61,17 @@ class Revision implements Arrayable, Contract
     public function message($message = null)
     {
         return $this->fluentlyGetOrSet('message')->value($message);
+    }
+
+    public function publishAt($dateTime = null)
+    {
+        if (is_null($dateTime)) {
+            return $this;
+        }
+
+        $carbon = new Carbon($dateTime['date'].' '.$dateTime['time'] ?? '00:00');
+
+        return $this->fluentlyGetOrSet('publishAt')->value($carbon->timestamp);
     }
 
     public function attributes($attributes = null)
@@ -103,6 +116,7 @@ class Revision implements Arrayable, Contract
             'date' => $this->date->timestamp,
             'user' => $this->userId ?: null,
             'message' => $this->message ?: null,
+            'publish_at' => $this->publishAt ?: null,
             'attributes' => $this->attributes,
         ];
     }
@@ -125,6 +139,7 @@ class Revision implements Arrayable, Contract
             'date' => $this->date()->timestamp,
             'user' => $user,
             'message' => $this->message,
+            'publish_at' => $this->publishAt,
             'attributes' => $this->attributes,
         ];
     }

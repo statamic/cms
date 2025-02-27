@@ -169,6 +169,7 @@ trait Revisable
             ->makeRevision()
             ->user($options['user'] ?? false)
             ->message($options['message'] ?? false)
+            ->publishAt($options['publish_at'] ?? null)
             ->save();
     }
 

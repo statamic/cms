@@ -30,7 +30,7 @@
                                 <div v-if="action">
 
                                     <date-fieldtype
-                                        v-if="action == 'publish_later'"
+                                        v-if="action == 'publishLater'"
                                         class="mb-6"
                                         :config="config"
                                         handle="publishLaterDateTime"
@@ -108,7 +108,7 @@ export default {
 
             if (this.canManagePublishState) {
                 options.push({ value: 'publish', label: __('Publish Now') });
-                options.push({ value: 'publish_later', label: __('Publish Later') });
+                options.push({ value: 'publishLater', label: __('Publish Later') });
 
                 if (this.published) {
                     options.push({ value: 'unpublish', label: __('Unpublish') });
@@ -130,7 +130,7 @@ export default {
                     return __('messages.publish_actions_unpublish');
                 case 'revision':
                     return __('messages.publish_actions_create_revision');
-                case 'publish_later':
+                case 'publishLater':
                     return __('messages.publish_actions_schedule_revision');
             }
         },
@@ -221,8 +221,16 @@ export default {
             }).catch(e => this.handleAxiosError(e));
         },
 
-        submitRevision() {
+        submitPublishLater() {
+            this.submitRevision(this.publishRevisionAt);
+        },
+
+        submitRevision(publishRevisionAt) {
             const payload = { message: this.revisionMessage };
+
+            if (publishRevisionAt) {
+                payload.publish_at = publishRevisionAt;
+            }
 
             this.$axios.post(this.actions.createRevision, payload).then(response => {
                 this.$toast.success(__('Revision created'));
