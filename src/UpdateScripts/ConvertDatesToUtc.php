@@ -10,6 +10,8 @@ use Statamic\Fieldtypes\Date as DateFieldtype;
 use Statamic\Listeners\Concerns\GetsItemsContainingData;
 use Statamic\Support\Arr;
 
+use function Laravel\Prompts\progress;
+
 class ConvertDatesToUtc extends UpdateScript
 {
     use GetsItemsContainingData;
@@ -21,22 +23,36 @@ class ConvertDatesToUtc extends UpdateScript
 
     public function update()
     {
-        $this
-            ->getItemsContainingData()
-            ->each(function ($item) {
-                /** @var Fields $fields */
-                $fields = $item->blueprint()->fields();
+        $items = $this->getItemsContainingData();
 
-                $this->recursivelyUpdateFields($item, $fields);
+        $progress = progress(
+            label: 'Converting dates to UTC',
+            steps: $items->count(),
+            hint: 'This may take a while depending on the amount of content you have.'
+        );
 
-                if (method_exists($item, 'isDirty')) {
-                    $item->isDirty() ? $item->saveQuietly() : null;
+        $progress->start();
 
-                    return;
-                }
+        $items->each(function ($item) use ($progress) {
+            $progress->advance();
 
-                $item->saveQuietly();
-            });
+            /** @var Fields $fields */
+            $fields = $item->blueprint()->fields();
+
+            $this->recursivelyUpdateFields($item, $fields);
+
+            if (method_exists($item, 'isDirty')) {
+                $item->isDirty() ? $item->saveQuietly() : null;
+                $progress->advance();
+
+                return;
+            }
+
+            $item->saveQuietly();
+            $progress->advance();
+        });
+
+        $progress->finish();
     }
 
     private function recursivelyUpdateFields($item, Fields $fields, ?string $dottedPrefix = null): void
