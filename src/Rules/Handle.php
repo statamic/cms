@@ -12,6 +12,8 @@ class Handle implements ValidationRule
     {
         if (Str::startsWith($value, range(0, 9))) {
             $fail('statamic::validation.handle_starts_with_number')->translate();
+
+            return;
         }
 
         if (! preg_match('/^[a-zA-Z][a-zA-Z0-9]*(?:_{0,1}[a-zA-Z0-9])*$/', $value)) {
