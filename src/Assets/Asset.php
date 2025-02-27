@@ -1129,6 +1129,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
         return array_merge($this->container->warmPresets(), $cpPresets);
     }
+
     public function cacheStore()
     {
         return Cache::store($this->hasCustomStore() ? 'asset_meta' : null);
