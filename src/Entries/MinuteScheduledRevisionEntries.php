@@ -8,7 +8,9 @@ use Statamic\Facades\Entry as EntryFacade;
 
 class MinuteScheduledRevisionEntries
 {
-    public function __construct(private readonly CarbonInterface $minute) {}
+    public function __construct(private readonly CarbonInterface $minute)
+    {
+    }
 
     public function __invoke(): Collection
     {
