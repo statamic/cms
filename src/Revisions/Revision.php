@@ -65,13 +65,7 @@ class Revision implements Arrayable, Contract
 
     public function publishAt($dateTime = null)
     {
-        if (is_null($dateTime)) {
-            return $this;
-        }
-
-        $carbon = new Carbon($dateTime['date'].' '.$dateTime['time'] ?? '00:00');
-
-        return $this->fluentlyGetOrSet('publishAt')->value($carbon->timestamp);
+        return $this->fluentlyGetOrSet('publishAt')->value($dateTime);
     }
 
     public function attributes($attributes = null)
@@ -116,7 +110,7 @@ class Revision implements Arrayable, Contract
             'date' => $this->date->timestamp,
             'user' => $this->userId ?: null,
             'message' => $this->message ?: null,
-            'publish_at' => $this->publishAt ?: null,
+            'publish_at' => $this->publishAt?->timestamp,
             'attributes' => $this->attributes,
         ];
     }
