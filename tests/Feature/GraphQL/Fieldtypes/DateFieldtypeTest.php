@@ -5,6 +5,8 @@ namespace Tests\Feature\GraphQL\Fieldtypes;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
+use ReflectionClass;
+use Statamic\Support\Arr;
 
 #[Group('graphql')]
 class DateFieldtypeTest extends FieldtypeTestCase
@@ -14,7 +16,12 @@ class DateFieldtypeTest extends FieldtypeTestCase
         parent::setUp();
 
         Carbon::macro('getToStringFormat', function () {
-            return static::$toStringFormat;
+            $reflection = new ReflectionClass(self::this());
+
+            $factory = $reflection->getMethod('getFactory');
+            $factory->setAccessible(true);
+
+            return Arr::get($factory->invoke(self::this())->getSettings(), 'toStringFormat');
         });
     }
 

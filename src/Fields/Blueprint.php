@@ -28,6 +28,8 @@ use Statamic\Facades\Path;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
 {
     use ExistsAsFile, HasAugmentedData;

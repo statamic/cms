@@ -1,6 +1,11 @@
 <template>
     <div>
-        <button v-for="action in actions" @click="run(action)" v-text="action.title" />
+        <button
+            v-for="action in actions"
+            @click="run(action)"
+            :class="{ warning: action.dangerous }"
+            v-text="action.title"
+        />
     </div>
 </template>
 

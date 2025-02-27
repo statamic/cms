@@ -407,6 +407,17 @@ export default {
                       field: `<code>${this.config.dynamic}</code>`,
                   });
         },
+
+        internalFieldActions() {
+            return [
+                {
+                    title: __('Remove All'),
+                    dangerous: true,
+                    run: this.removeAll,
+                    visible: this.assets.length > 0,
+                },
+            ];
+        },
     },
 
     events: {
@@ -494,6 +505,13 @@ export default {
         assetRemoved(asset) {
             const index = _(this.assets).findIndex({ id: asset.id });
             this.assets.splice(index, 1);
+        },
+
+        /**
+         * Remove all assets from the field.
+         */
+        removeAll() {
+            this.assets = [];
         },
 
         /**

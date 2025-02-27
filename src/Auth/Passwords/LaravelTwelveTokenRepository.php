@@ -9,22 +9,19 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Carbon;
 use Statamic\Facades\YAML;
 
-class TokenRepository extends DatabaseTokenRepository
+/** @deprecated  */
+class LaravelTwelveTokenRepository extends DatabaseTokenRepository
 {
-    protected $files;
-    protected $hasher;
-    protected $hashKey;
-    protected $expires;
     protected $path;
 
-    public function __construct(Filesystem $files, HasherContract $hasher, $table, $hashKey, $expires = 60, $throttle = 60)
-    {
-        $this->files = $files;
-        $this->hasher = $hasher;
-        $this->hashKey = $hashKey;
-        $this->expires = $expires * 60;
-        $this->throttle = $throttle;
-
+    public function __construct(
+        protected Filesystem $files,
+        protected HasherContract $hasher,
+        protected string $table,
+        protected string $hashKey,
+        protected int $expires = 3600,
+        protected int $throttle = 60
+    ) {
         $this->path = storage_path("statamic/password_resets/$table.yaml");
     }
 

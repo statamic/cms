@@ -72,12 +72,6 @@ trait Revisable
     {
         $item = $this->fromWorkingCopy();
 
-        if ($item instanceof Entry) {
-            $parent = $item->get('parent');
-
-            $item->remove('parent');
-        }
-
         $saved = $item
             ->published(true)
             ->updateLastModified($user = $options['user'] ?? false)
@@ -85,18 +79,6 @@ trait Revisable
 
         if (! $saved) {
             return false;
-        }
-
-        if ($item instanceof Entry && $item->collection()->hasStructure() && $parent) {
-            $tree = $item->collection()->structure()->in($item->locale());
-
-            if (optional($tree->find($parent))->isRoot()) {
-                $parent = null;
-            }
-
-            $tree
-                ->move($this->id(), $parent)
-                ->save();
         }
 
         $item

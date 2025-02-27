@@ -438,38 +438,6 @@ class UpdateEntryTest extends TestCase
     }
 
     #[Test]
-    public function validates_max_depth()
-    {
-        [$user, $collection] = $this->seedUserAndCollection();
-
-        $structure = (new CollectionStructure)->maxDepth(2)->expectsRoot(true);
-        $collection->structure($structure)->save();
-
-        EntryFactory::collection('test')->id('home')->slug('home')->data(['title' => 'Home', 'foo' => 'bar'])->create();
-        EntryFactory::collection('test')->id('about')->slug('about')->data(['title' => 'About', 'foo' => 'baz'])->create();
-        EntryFactory::collection('test')->id('team')->slug('team')->data(['title' => 'Team'])->create();
-
-        $entry = EntryFactory::collection($collection)
-            ->id('existing-entry')
-            ->slug('existing-entry')
-            ->data(['title' => 'Existing Entry', 'foo' => 'bar'])
-            ->create();
-
-        $collection->structure()->in('en')->tree([
-            ['entry' => 'home'],
-            ['entry' => 'about', 'children' => [
-                ['entry' => 'team'],
-            ]],
-            ['entry' => 'existing-entry'],
-        ])->save();
-
-        $this
-            ->actingAs($user)
-            ->update($entry, ['title' => 'Existing Entry', 'slug' => 'existing-entry', 'parent' => ['team']]) // This would make it 3 levels deep, so it should fail.
-            ->assertUnprocessable();
-    }
-
-    #[Test]
     public function does_not_validate_max_depth_when_collection_max_depth_is_null()
     {
         [$user, $collection] = $this->seedUserAndCollection();

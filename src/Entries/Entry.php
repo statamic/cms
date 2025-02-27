@@ -687,7 +687,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             ->slug($attrs['slug']);
 
         if ($this->collection()->dated() && ($date = Arr::get($attrs, 'date'))) {
-            $entry->date(Carbon::createFromTimestamp($date));
+            $entry->date(Carbon::createFromTimestamp($date, config('app.timezone')));
         }
 
         return $entry;

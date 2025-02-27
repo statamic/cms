@@ -3045,7 +3045,7 @@ class CoreModifiers extends Modifier
      */
     public function yearsAgo($value, $params)
     {
-        return $this->carbon($value)->diffInYears(Arr::get($params, 0));
+        return (int) abs($this->carbon($value)->diffInYears(Arr::get($params, 0)));
     }
 
     /**
@@ -3210,7 +3210,7 @@ class CoreModifiers extends Modifier
     private function carbon($value)
     {
         if (! $value instanceof Carbon) {
-            $value = (is_numeric($value)) ? Date::createFromTimestamp($value) : Date::parse($value);
+            $value = (is_numeric($value)) ? Date::createFromTimestamp($value, config('app.timezone')) : Date::parse($value);
         }
 
         return $value;
