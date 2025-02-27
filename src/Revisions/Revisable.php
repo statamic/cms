@@ -167,7 +167,7 @@ trait Revisable
         return $return;
     }
 
-    public function createRevision($options = [])
+    public function createRevision($options = []): self
     {
         $this
             ->fromWorkingCopy()
@@ -176,6 +176,8 @@ trait Revisable
             ->message($options['message'] ?? false)
             ->publishAt($options['publish_at'] ?? null)
             ->save();
+
+        return $this;
     }
 
     public function revisionsEnabled()
