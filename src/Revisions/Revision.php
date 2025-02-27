@@ -3,7 +3,6 @@
 namespace Statamic\Revisions;
 
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Support\Carbon;
 use Statamic\Contracts\Auth\User;
 use Statamic\Contracts\Revisions\Revision as Contract;
 use Statamic\Data\ExistsAsFile;
