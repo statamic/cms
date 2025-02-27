@@ -9,6 +9,11 @@ use Statamic\Statamic;
 
 trait Revisable
 {
+    public function hasRevisions(): bool
+    {
+        return $this->revisions()->isNotEmpty();
+    }
+
     public function revision(string $reference)
     {
         return $this->revisions()->get($reference);
