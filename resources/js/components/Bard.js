@@ -17,26 +17,6 @@ class Bard {
     buttons(callback) {
         this.buttonCallbacks.push(callback);
     }
-
-    async tiptap() {
-        const [core, vue3, state, model, view] = await Promise.all([
-            import('@tiptap/core'),
-            import('@tiptap/vue-3'),
-            import('@tiptap/pm/state'),
-            import('@tiptap/pm/model'),
-            import('@tiptap/pm/view'),
-        ]);
-
-        return {
-            core,
-            vue3,
-            pm: {
-                state,
-                model,
-                view,
-            },
-        };
-    }
 }
 
 export default Bard;
