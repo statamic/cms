@@ -2791,7 +2791,7 @@ class CoreModifiers extends Modifier
      */
     public function timezone($value, $params)
     {
-        $timezone = Arr::get($params, 0, Config::get('app.timezone'));
+        $timezone = Arr::get($params, 0, config('statamic.system.display_timezone', 'UTC'));
 
         return $this->carbon($value)->tz($timezone);
     }
