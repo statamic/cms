@@ -18,6 +18,13 @@ class FormatTranslatedTest extends TestCase
         config()->set('statamic.system.display_timezone', 'Europe/Berlin'); // +1 hour
     }
 
+    public function tearDown(): void
+    {
+        parent::tearDown();
+
+        Carbon::setLocale('en');
+    }
+
     #[Test]
     public function it_formats_date()
     {
