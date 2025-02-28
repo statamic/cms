@@ -3218,6 +3218,10 @@ class CoreModifiers extends Modifier
             $value = (is_numeric($value)) ? Date::createFromTimestamp($value, config('app.timezone')) : Date::parse($value);
         }
 
+        if (config('statamic.system.localize_dates_in_modifiers')) {
+            $value->setTimezone(config('statamic.system.display_timezone'));
+        }
+
         return $value;
     }
 

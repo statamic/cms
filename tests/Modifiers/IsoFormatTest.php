@@ -22,6 +22,14 @@ class IsoFormatTest extends TestCase
         $this->assertSame('2025.01.01 15:45', $this->modify(Carbon::parse('2025-01-01 15:45'), 'YYYY.MM.DD HH:mm'));
     }
 
+    #[Test]
+    public function it_formats_date_and_outputs_in_display_timezone()
+    {
+        config()->set('statamic.system.localize_dates_in_modifiers', true);
+
+        $this->assertSame('2025.01.01 16:45', $this->modify(Carbon::parse('2025-01-01 15:45'), 'YYYY.MM.DD HH:mm'));
+    }
+
     public function modify($value, $format)
     {
         return Modify::value($value)->isoFormat($format)->fetch();
