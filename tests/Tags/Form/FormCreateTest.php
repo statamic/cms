@@ -75,6 +75,65 @@ EOT
     }
 
     #[Test]
+    public function it_dynamically_renders_group_fields_recursively()
+    {
+        $this->createForm([
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'display' => 'Section One',
+                            'instructions' => 'Section One Instructions',
+                            'fields' => [
+                                [
+                                    'handle' => 'group_one',
+                                    'display' => 'Group One',
+                                    'instructions' => 'Group One Instructions',
+                                    'field' => [
+                                        'type' => 'group',
+                                        'instructions' => 'Group Field Instructions',
+                                        'fields' => [
+                                            ['handle' => 'alpha', 'field' => ['type' => 'text']],
+                                            ['handle' => 'bravo', 'field' => ['type' => 'text', 'instructions' => 'This field has instructions!']],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ], 'survey');
+
+        $output = $this->normalizeHtml($this->tag(<<<'EOT'
+{{ form:survey }}
+    {{ sections }}
+        <div class="section">{{ display }}{{ if instructions }} ({{ instructions }}){{ /if }}
+            {{ form:fields }}
+                <div class="field-in-section">{{ handle }}{{ if instructions }} ({{ instructions }}){{ /if }}</div>
+            {{ /form:fields }}
+        </div>
+    {{ /sections }}
+    <div class="fields">
+        {{ form:fields }}
+            <div class="field-by-itself">{{ handle }}{{ if instructions }} ({{ instructions }}){{ /if }}</div>
+        {{ /form:fields }}contact
+    </div>
+{{ /form:survey }}
+EOT
+        ));
+
+        $this->assertStringContainsString('<div class="section">Section One (Section One Instructions)', $output);
+
+        $this->assertStringContainsString('<div class="field-in-section">Group One (Group One Instructions)', $output);
+        $this->assertStringContainsString('<div class="field-by-itself">Group One (Group One Instructions)', $output);
+        $this->assertStringContainsString('<div class="field-in-section">alpha</div>', $output);
+        $this->assertStringContainsString('<div class="field-by-itself">alpha</div>', $output);
+        $this->assertStringContainsString('<div class="field-in-section">bravo (This field has instructions!)</div>', $output);
+        $this->assertStringContainsString('<div class="field-by-itself">bravo (This field has instructions!)</div>', $output);
+    }
+
+    #[Test]
     public function it_dynamically_renders_fields_using_legacy_array()
     {
         $output = $this->normalizeHtml($this->tag(<<<'EOT'
