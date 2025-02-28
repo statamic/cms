@@ -8,13 +8,16 @@ use Statamic\Facades\User;
 
 class AssetFolderPolicy
 {
+    public function before($user)
+    {
+        if (User::fromUser($user)->isSuper()) {
+            return true;
+        }
+    }
+
     public function create($user, $assetContainer)
     {
         $user = User::fromUser($user);
-
-        if ($user->isSuper()) {
-            return true;
-        }
 
         if (! $user->hasPermission("upload {$assetContainer->handle()} assets")) {
             return false;
