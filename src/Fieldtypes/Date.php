@@ -318,9 +318,7 @@ class Date extends Fieldtype
 
         $date = $this->parseSaved($value);
 
-        if (! $this->config('time_enabled')) {
-            $date->startOfDay();
-        } elseif (! $this->config('time_seconds_enabled')) {
+        if (! $this->config('time_seconds_enabled')) {
             $date->startOfMinute();
         }
 
