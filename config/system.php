@@ -76,6 +76,33 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Timezone
+    |--------------------------------------------------------------------------
+    |
+    | Statamic will use this timezone when displaying dates on the front-end.
+    | You can use any timezone supported by PHP.
+    |
+    | https://www.php.net/manual/en/timezones.php
+    |
+    */
+
+    'display_timezone' => 'UTC',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Localize Dates in Modifiers?
+    |--------------------------------------------------------------------------
+    |
+    | Since Statamic stores dates in UTC, any modifiers you chain onto a date
+    | field will be working with the UTC value. If you'd prefer modifiers to
+    | always use your `display_timezone`, set this to `true`.
+    |
+    */
+
+    'localize_dates_in_modifiers' => false,
+
+    /*
+    |--------------------------------------------------------------------------
     | Default Character Set
     |--------------------------------------------------------------------------
     |

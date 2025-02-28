@@ -479,12 +479,10 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         $prefix = '';
 
         if ($this->hasDate() && $this->date) {
-            $format = 'Y-m-d';
-            if ($this->hasTime()) {
-                $format .= '-Hi';
-                if ($this->hasSeconds()) {
-                    $format .= 's';
-                }
+            $format = 'Y-m-d-Hi';
+
+            if ($this->hasSeconds()) {
+                $format .= 's';
             }
 
             $prefix = $this->date->format($format).'.';
@@ -563,10 +561,6 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
                 $date = $date ?? optional($this->origin())->date() ?? $this->lastModified();
 
-                if (! $this->hasTime()) {
-                    $date->startOfDay();
-                }
-
                 if (! $this->hasSeconds()) {
                     $date->startOfMinute();
                 }
@@ -587,14 +581,14 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
                 }
 
                 if (strlen($date) === 10) {
-                    return Carbon::createFromFormat('Y-m-d', $date)->startOfDay();
+                    return Carbon::createFromFormat('Y-m-d', $date, 'UTC')->startOfDay();
                 }
 
                 if (strlen($date) === 15) {
-                    return Carbon::createFromFormat('Y-m-d-Hi', $date)->startOfMinute();
+                    return Carbon::createFromFormat('Y-m-d-Hi', $date, 'UTC')->startOfMinute();
                 }
 
-                return Carbon::createFromFormat('Y-m-d-His', $date);
+                return Carbon::createFromFormat('Y-m-d-His', $date, 'UTC');
             })
             ->args(func_get_args());
     }
@@ -897,11 +891,13 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         ]);
 
         if ($this->hasDate()) {
+            $date = $this->date()->setTimezone(config('statamic.system.display_timezone'));
+
             $data = $data->merge([
-                'date' => $this->date(),
-                'year' => $this->date()->format('Y'),
-                'month' => $this->date()->format('m'),
-                'day' => $this->date()->format('d'),
+                'date' => $date,
+                'year' => $date->format('Y'),
+                'month' => $date->format('m'),
+                'day' => $date->format('d'),
             ]);
         }
 

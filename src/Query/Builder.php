@@ -384,10 +384,10 @@ abstract class Builder implements Contract
         }
 
         if (! ($value instanceof DateTimeInterface)) {
-            $value = Carbon::parse($value);
+            $value = Carbon::parse($value, 'UTC');
         }
 
-        $value = Carbon::parse($value->format('Y-m-d')); // we only care about the date part
+        $value = Carbon::parse($value->format('Y-m-d'), 'UTC'); // we only care about the date part
 
         $this->wheres[] = [
             'type' => 'Date',
@@ -510,10 +510,10 @@ abstract class Builder implements Contract
         }
 
         if (! ($value instanceof DateTimeInterface)) {
-            $value = Carbon::parse($value);
+            $value = Carbon::parse($value, 'UTC');
         }
 
-        $value = $value->format('H:i:s'); // we only care about the time part
+        $value = $value->format('H:i:s', 'UTC'); // we only care about the time part
 
         $this->wheres[] = [
             'type' => 'Time',

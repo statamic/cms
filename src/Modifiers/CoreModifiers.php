@@ -2791,9 +2791,14 @@ class CoreModifiers extends Modifier
      */
     public function timezone($value, $params)
     {
-        $timezone = Arr::get($params, 0, Config::get('app.timezone'));
+        $timezone = Arr::get($params, 0, config('statamic.system.display_timezone', 'UTC'));
 
         return $this->carbon($value)->tz($timezone);
+    }
+
+    public function tz($value, $params)
+    {
+        return $this->timezone($value, $params);
     }
 
     public function typeOf($value)
@@ -3211,6 +3216,10 @@ class CoreModifiers extends Modifier
     {
         if (! $value instanceof Carbon) {
             $value = (is_numeric($value)) ? Date::createFromTimestamp($value, config('app.timezone')) : Date::parse($value);
+        }
+
+        if (config('statamic.system.localize_dates_in_modifiers')) {
+            $value->setTimezone(config('statamic.system.display_timezone'));
         }
 
         return $value;
