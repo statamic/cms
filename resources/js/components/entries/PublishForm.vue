@@ -608,6 +608,7 @@ export default {
                     if (this.revisionsEnabled) {
                         clearTimeout(this.trackDirtyStateTimeout)
                         this.trackDirtyState = false
+                        this.meta = response.data.data.meta;
                         this.values = this.resetValuesFromResponse(response.data.data.values);
                         this.extraValues = response.data.data.extraValues;
                         this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500)
@@ -633,6 +634,7 @@ export default {
                     else {
                         clearTimeout(this.trackDirtyStateTimeout);
                         this.trackDirtyState = false;
+                        this.meta = response.data.data.meta;
                         this.values = this.resetValuesFromResponse(response.data.data.values);
                         this.extraValues = response.data.data.extraValues;
                         this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500);

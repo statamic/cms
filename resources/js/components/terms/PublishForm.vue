@@ -486,6 +486,7 @@ export default {
                 .then(() => {
                     // If revisions are enabled, just emit event.
                     if (this.revisionsEnabled) {
+                        this.meta = response.data.data.meta;
                         this.values = this.resetValuesFromResponse(response.data.data.values);
                         this.$nextTick(() => this.$emit('saved', response));
                         return;
@@ -507,6 +508,7 @@ export default {
                     // the hooks are resolved because if this form is being shown in a stack, we only
                     // want to close it once everything's done.
                     else {
+                        this.meta = response.data.data.meta;
                         this.values = this.resetValuesFromResponse(response.data.data.values);
                         this.$nextTick(() => this.$emit('saved', response));
                     }
