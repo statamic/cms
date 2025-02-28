@@ -6,11 +6,12 @@ use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Contracts\Auth\User;
 use Statamic\Contracts\Revisions\Revision as Contract;
 use Statamic\Data\ExistsAsFile;
+use Statamic\Entries\Entry;
 use Statamic\Events\RevisionDeleted;
 use Statamic\Events\RevisionSaved;
 use Statamic\Events\RevisionSaving;
 use Statamic\Facades;
-use Statamic\Facades\Entry;
+use Statamic\Facades\Entry as EntryFacade;
 use Statamic\Facades\Revision as Revisions;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
@@ -36,9 +37,9 @@ class Revision implements Arrayable, Contract
 
     protected $attributes = [];
 
-    public function currentContent()
+    public function entry(): Entry
     {
-        return Entry::find($this->attribute('id'));
+        return EntryFacade::find($this->attribute('id'));
     }
 
     public function id($id = null)

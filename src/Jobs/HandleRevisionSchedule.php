@@ -7,8 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Collection;
-use Statamic\Entries\Entry;
-use Statamic\Entries\MinuteScheduledRevisions;
+use Statamic\Entries\MinuteRevisions;
 use Statamic\Events\EntryScheduleReached;
 use Statamic\Revisions\Revision;
 
@@ -18,12 +17,11 @@ class HandleRevisionSchedule implements ShouldQueue
 
     public function handle()
     {
-        $this->revisions()->each(function (Revision $revision) {
-            $existingContent = $revision->currentContent();
-
-            $updatedContent = tap($existingContent->makeFromRevision($revision))->save();
-            // EntryScheduleReached::dispatch($updatedEntry);
-        });
+        $this
+            ->revisions()
+            ->each(fn (Revision $revision) => EntryScheduleReached::dispatch(
+                tap($revision->entry()->makeFromRevision($revision))->save()
+            ));
     }
 
     private function revisions(): Collection
@@ -34,6 +32,6 @@ class HandleRevisionSchedule implements ShouldQueue
         // same minute, it may still be considered scheduled when it gets dispatched.
         $minute = now()->subMinute();
 
-        return (new MinuteScheduledRevisions($minute))();
+        return (new MinuteRevisions($minute))();
     }
 }

@@ -78,7 +78,7 @@ class RevisionsTest extends TestCase
         $entry->save();
         $revision = $entry->makeRevision();
 
-        $this->assertEquals($entry->id(), $revision->currentContent()->id());
+        $this->assertEquals($entry->id(), $revision->entry()->id());
     }
 
     #[Test]
