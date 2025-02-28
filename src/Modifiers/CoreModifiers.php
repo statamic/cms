@@ -2796,6 +2796,11 @@ class CoreModifiers extends Modifier
         return $this->carbon($value)->tz($timezone);
     }
 
+    public function tz($value, $params)
+    {
+        return $this->timezone($value, $params);
+    }
+
     public function typeOf($value)
     {
         return gettype($value);
