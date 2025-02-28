@@ -51,4 +51,9 @@ class Checkboxes extends Fieldtype
     {
         return true;
     }
+
+    public function process($data)
+    {
+        return collect($data)->filter()->values()->all();
+    }
 }
