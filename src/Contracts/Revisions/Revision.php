@@ -2,8 +2,12 @@
 
 namespace Statamic\Contracts\Revisions;
 
+use Statamic\Revisions\Revisable;
+
 interface Revision
 {
+    public function currentContent(): Revisable;
+
     public function id($id = null);
 
     public function message($message = null);

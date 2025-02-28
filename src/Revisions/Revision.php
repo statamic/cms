@@ -10,6 +10,7 @@ use Statamic\Events\RevisionDeleted;
 use Statamic\Events\RevisionSaved;
 use Statamic\Events\RevisionSaving;
 use Statamic\Facades;
+use Statamic\Facades\Data;
 use Statamic\Facades\Revision as Revisions;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
@@ -18,14 +19,27 @@ class Revision implements Arrayable, Contract
     use ExistsAsFile, FluentlyGetsAndSets;
 
     protected $id;
+
     protected $key;
+
     protected $date;
+
     protected $user;
+
     protected $userId;
+
     protected $message;
+
     protected $publishAt;
+
     protected $action = 'revision';
+
     protected $attributes = [];
+
+    public function currentContent(): Revisable
+    {
+        return Data::find($this->attribute('id'));
+    }
 
     public function id($id = null)
     {

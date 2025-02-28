@@ -6,7 +6,7 @@ use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
 use Statamic\Facades\Entry as EntryFacade;
 
-class MinuteScheduledRevisionEntries
+class MinuteScheduledRevisions
 {
     public function __construct(private readonly CarbonInterface $minute)
     {

@@ -8,8 +8,9 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Collection;
 use Statamic\Entries\Entry;
-use Statamic\Entries\MinuteScheduledRevisionEntries;
+use Statamic\Entries\MinuteScheduledRevisions;
 use Statamic\Events\EntryScheduleReached;
+use Statamic\Revisions\Revision;
 
 class HandleRevisionSchedule implements ShouldQueue
 {
@@ -17,13 +18,15 @@ class HandleRevisionSchedule implements ShouldQueue
 
     public function handle()
     {
-        $this->entries()->each(function (Entry $entry) {
-            $updatedEntry = tap($entry->makeFromRevision($entry->latestRevision()))->save();
-            EntryScheduleReached::dispatch($updatedEntry);
+        $this->revisions()->each(function (Revision $revision) {
+            $existingContent = $revision->currentContent();
+
+            $updatedContent = tap($existingContent->makeFromRevision($revision))->save();
+            // EntryScheduleReached::dispatch($updatedEntry);
         });
     }
 
-    private function entries(): Collection
+    private function revisions(): Collection
     {
         // We want to target the PREVIOUS minute because we can be sure that any entries that
         // were scheduled for then would now be considered published. If we were targeting
@@ -31,6 +34,6 @@ class HandleRevisionSchedule implements ShouldQueue
         // same minute, it may still be considered scheduled when it gets dispatched.
         $minute = now()->subMinute();
 
-        return (new MinuteScheduledRevisionEntries($minute))();
+        return (new MinuteScheduledRevisions($minute))();
     }
 }
