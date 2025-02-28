@@ -36,7 +36,7 @@ class RevisableTest extends TestCase
             protected function revisionAttributes()
             {
                 return [
-                    'id' => 123
+                    'id' => 123,
                 ];
             }
 
