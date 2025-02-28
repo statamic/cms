@@ -891,11 +891,13 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         ]);
 
         if ($this->hasDate()) {
+            $date = $this->date()->setTimezone(config('statamic.system.display_timezone'));
+
             $data = $data->merge([
-                'date' => $this->date(),
-                'year' => $this->date()->format('Y'),
-                'month' => $this->date()->format('m'),
-                'day' => $this->date()->format('d'),
+                'date' => $date,
+                'year' => $date->format('Y'),
+                'month' => $date->format('m'),
+                'day' => $date->format('d'),
             ]);
         }
 
