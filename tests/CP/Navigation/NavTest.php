@@ -73,12 +73,14 @@ class NavTest extends TestCase
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
 
+        Facades\Permission::register('view droids');
+
         Nav::droids('C-3PO')
             ->id('some::custom::id')
             ->active('threepio*')
             ->url('/human-cyborg-relations')
             ->view('cp.nav.importer')
-            ->can('index', 'DroidsClass')
+            ->can('view droids')
             ->attributes(['target' => '_blank', 'class' => 'red']);
 
         $item = $this->build()->get('Droids')->first();
@@ -89,8 +91,7 @@ class NavTest extends TestCase
         $this->assertEquals('http://localhost/human-cyborg-relations', $item->url());
         $this->assertEquals('cp.nav.importer', $item->view());
         $this->assertEquals('threepio*', $item->active());
-        $this->assertEquals('index', $item->authorization()->ability);
-        $this->assertEquals('DroidsClass', $item->authorization()->arguments);
+        $this->assertEquals('view droids', $item->authorization()->ability);
         $this->assertEquals(' target="_blank" class="red"', $item->attributes());
     }
 
