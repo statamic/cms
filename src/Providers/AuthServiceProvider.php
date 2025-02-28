@@ -85,6 +85,8 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         Gate::before(function ($user, $ability) {
+            Permission::boot();
+
             $isStatamicPermission = Permission::all()->first(fn ($permission) => $permission->value() === $ability);
 
             if ($isStatamicPermission) {
