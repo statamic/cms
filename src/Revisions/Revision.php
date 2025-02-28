@@ -10,7 +10,7 @@ use Statamic\Events\RevisionDeleted;
 use Statamic\Events\RevisionSaved;
 use Statamic\Events\RevisionSaving;
 use Statamic\Facades;
-use Statamic\Facades\Data;
+use Statamic\Facades\Entry;
 use Statamic\Facades\Revision as Revisions;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
@@ -36,9 +36,9 @@ class Revision implements Arrayable, Contract
 
     protected $attributes = [];
 
-    public function currentContent(): Revisable
+    public function currentContent()
     {
-        return Data::find($this->attribute('id'));
+        return Entry::find($this->attribute('id'));
     }
 
     public function id($id = null)
@@ -78,7 +78,7 @@ class Revision implements Arrayable, Contract
 
     public function publishAt($dateTime = null)
     {
-        return $this->fluentlyGetOrSet('publishAt')->value($dateTime);
+        return $this->fluentlyGetOrSet('publishAt')->args(func_get_args());
     }
 
     public function attributes($attributes = null)

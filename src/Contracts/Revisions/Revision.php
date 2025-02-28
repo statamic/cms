@@ -2,11 +2,9 @@
 
 namespace Statamic\Contracts\Revisions;
 
-use Statamic\Revisions\Revisable;
-
 interface Revision
 {
-    public function currentContent(): Revisable;
+    public function currentContent();
 
     public function id($id = null);
 
