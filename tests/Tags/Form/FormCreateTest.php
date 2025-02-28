@@ -54,7 +54,28 @@ class FormCreateTest extends FormTestCase
     }
 
     #[Test]
-    public function it_dynamically_renders_fields_array()
+    public function it_dynamically_renders_fields()
+    {
+        $output = $this->normalizeHtml($this->tag(<<<'EOT'
+{{ form:contact }}
+    {{ form:fields }}
+        <label>{{ display }}</label>{{ field }}
+    {{ /form:fields }}
+{{ /form:contact }}
+EOT
+        ));
+
+        $this->assertStringContainsString('<label>Full Name</label><input id="contact-form-name-field" type="text" name="name" value="">', $output);
+        $this->assertStringContainsString('<label>Email Address</label><input id="contact-form-email-field" type="email" name="email" value="" required>', $output);
+        $this->assertStringContainsString('<label>Message</label><textarea id="contact-form-message-field" name="message" rows="5" required></textarea>', $output);
+
+        preg_match_all('/<label>(.+)<\/label>/U', $output, $fieldOrder);
+
+        $this->assertEquals(['Full Name', 'Email Address', 'Message'], $fieldOrder[1]);
+    }
+
+    #[Test]
+    public function it_dynamically_renders_fields_using_legacy_array()
     {
         $output = $this->normalizeHtml($this->tag(<<<'EOT'
 {{ form:contact }}
@@ -75,7 +96,19 @@ EOT
     }
 
     #[Test]
-    public function it_dynamically_renders_with_form_handle()
+    public function it_dynamically_renders_fields_with_form_handle()
+    {
+        foreach (['contact', 'contact-form', 'kontakt_formular'] as $handle) {
+            $this->createForm(handle: $handle);
+            $output = $this->normalizeHtml($this->tag('{{ form in="'.$handle.'" }}{{ form:fields }}{{ field }}{{ /form:fields }}{{ /form }}'));
+            $this->assertStringContainsString('<input id="'.$handle.'-form-name-field"', $output);
+            $this->assertStringContainsString('<input id="'.$handle.'-form-email-field"', $output);
+            $this->assertStringContainsString('<textarea id="'.$handle.'-form-message-field"', $output);
+        }
+    }
+
+    #[Test]
+    public function it_dynamically_renders_fields_with_form_handle_using_legacy_array_syntax()
     {
         foreach (['contact', 'contact-form', 'kontakt_formular'] as $handle) {
             $this->createForm(handle: $handle);
@@ -504,20 +537,30 @@ EOT
         $output = $this->normalizeHtml($this->tag(<<<'EOT'
 {{ form:survey }}
     {{ sections }}
-        <div class="section">{{ if display}}{{ display }} - {{ /if }}{{ if instructions }}{{ instructions }} - {{ /if }}{{ fields | pluck('handle') | join(',') }}</div>
+        <div class="section-fields-tag">{{ if display }}{{ display }} - {{ /if }}{{ if instructions }}{{ instructions }} - {{ /if }}{{ form:fields }}{{ handle }},{{ /form:fields }}</div>
+        <div class="section-fields-array">{{ if display }}{{ display }} - {{ /if }}{{ if instructions }}{{ instructions }} - {{ /if }}{{ fields }}{{ handle }},{{ /fields }}</div>
     {{ /sections }}
-    <div class="fields">{{ fields | pluck('handle') | join(',') }}</div>
+    <div class="fields-tag">{{ form:fields }}{{ handle }},{{ /form:fields }}</div>
+    <div class="fields-array">{{ fields }}{{ handle }},{{ /fields }}</div>
 {{ /form:survey }}
 EOT
         ));
 
-        $this->assertStringContainsString('<div class="section">One - One Instructions - alpha,bravo</div>', $output);
-        $this->assertStringContainsString('<div class="section">Two - Two Instructions - charlie,delta</div>', $output);
-        $this->assertStringContainsString('<div class="section">echo,fox</div>', $output);
+        // Assert this all works with suggested `{{ form:fields }}` tag
+        $this->assertStringContainsString('<div class="section-fields-tag">One - One Instructions - alpha,bravo,</div>', $output);
+        $this->assertStringContainsString('<div class="section-fields-tag">Two - Two Instructions - charlie,delta,</div>', $output);
+        $this->assertStringContainsString('<div class="section-fields-tag">echo,fox,</div>', $output);
+
+        // Assert this all works with legacy `{{ fields }}` array for backwards compatibility as well
+        // In reality, there's nothing wrong with this, but the tag supports extra sugar like recursion
+        $this->assertStringContainsString('<div class="section-fields-array">One - One Instructions - alpha,bravo,</div>', $output);
+        $this->assertStringContainsString('<div class="section-fields-array">Two - Two Instructions - charlie,delta,</div>', $output);
+        $this->assertStringContainsString('<div class="section-fields-array">echo,fox,</div>', $output);
 
         // Even though the fields are all nested within sections,
-        // we should still be able to get them via `{{ fields }}` array at top level...
-        $this->assertStringContainsString('<div class="fields">alpha,bravo,charlie,delta,echo,fox</div>', $output);
+        // we should still be able to get all of them via tag or array at top level...
+        $this->assertStringContainsString('<div class="fields-tag">alpha,bravo,charlie,delta,echo,fox,</div>', $output);
+        $this->assertStringContainsString('<div class="fields-array">alpha,bravo,charlie,delta,echo,fox,</div>', $output);
     }
 
     #[Test]
@@ -544,14 +587,20 @@ EOT
 {{ form:survey }}
     {{ sections }}
         <div class="section">{{ display }}{{ if instructions }} ({{ instructions }}){{ /if }}
+            {{ form:fields }}
+                <div class="tag-field-in-section">{{ handle }}{{ if instructions }} ({{ instructions }}){{ /if }}</div>
+            {{ /form:fields }}
             {{ fields }}
-                <div class="field-in-section">{{ handle }}{{ if instructions }} ({{ instructions }}){{ /if }}</div>
+                <div class="array-field-in-section">{{ handle }}{{ if instructions }} ({{ instructions }}){{ /if }}</div>
             {{ /fields }}
         </div>
     {{ /sections }}
     <div class="fields">
+        {{ form:fields }}
+            <div class="tag-field-by-itself">{{ handle }}{{ if instructions }} ({{ instructions }}){{ /if }}</div>
+        {{ /form:fields }}
         {{ fields }}
-            <div class="field-by-itself">{{ handle }}{{ if instructions }} ({{ instructions }}){{ /if }}</div>
+            <div class="array-field-by-itself">{{ handle }}{{ if instructions }} ({{ instructions }}){{ /if }}</div>
         {{ /fields }}
     </div>
 {{ /form:survey }}
@@ -560,11 +609,18 @@ EOT
 
         $this->assertStringContainsString('<div class="section">One (One Instructions)', $output);
 
-        // Section instructions should NOT cascade down into field instructions...
-        $this->assertStringContainsString('<div class="field-in-section">alpha</div>', $output);
-        $this->assertStringContainsString('<div class="field-by-itself">alpha</div>', $output);
-        $this->assertStringContainsString('<div class="field-in-section">bravo (This field has instructions!)</div>', $output);
-        $this->assertStringContainsString('<div class="field-by-itself">bravo (This field has instructions!)</div>', $output);
+        // Section instructions should NOT cascade down into field instructions with suggested `{{ form:fields }}` tag...
+        $this->assertStringContainsString('<div class="tag-field-in-section">alpha</div>', $output);
+        $this->assertStringContainsString('<div class="tag-field-by-itself">alpha</div>', $output);
+        $this->assertStringContainsString('<div class="tag-field-in-section">bravo (This field has instructions!)</div>', $output);
+        $this->assertStringContainsString('<div class="tag-field-by-itself">bravo (This field has instructions!)</div>', $output);
+
+        // Assert this all works with legacy `{{ fields }}` array for backwards compatibility as well
+        // In reality, there's nothing wrong with this, but the tag supports extra sugar like recursion
+        $this->assertStringContainsString('<div class="array-field-in-section">alpha</div>', $output);
+        $this->assertStringContainsString('<div class="array-field-by-itself">alpha</div>', $output);
+        $this->assertStringContainsString('<div class="array-field-in-section">bravo (This field has instructions!)</div>', $output);
+        $this->assertStringContainsString('<div class="array-field-by-itself">bravo (This field has instructions!)</div>', $output);
     }
 
     #[Test]
