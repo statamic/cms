@@ -12,6 +12,10 @@ class AssetFolderPolicy
     {
         $user = User::fromUser($user);
 
+        if ($user->isSuper()) {
+            return true;
+        }
+
         if (! $user->hasPermission("upload {$assetContainer->handle()} assets")) {
             return false;
         }

@@ -13,7 +13,10 @@ class TaxonomyPolicy
     {
         $user = User::fromUser($user);
 
-        if ($user->hasPermission('configure taxonomies')) {
+        if (
+            $user->isSuper() ||
+            $user->hasPermission('configure taxonomies')
+        ) {
             return true;
         }
     }

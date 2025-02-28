@@ -12,7 +12,10 @@ class EntryPolicy
     {
         $user = User::fromUser($user);
 
-        if ($user->hasPermission('configure collections')) {
+        if (
+            $user->isSuper() ||
+            $user->hasPermission('configure collections')
+        ) {
             return true;
         }
     }
