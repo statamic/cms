@@ -2017,7 +2017,7 @@ class AssetTest extends TestCase
     public function it_appends_timestamp_to_uploaded_files_filename_if_it_already_exists()
     {
         Event::fake();
-        Carbon::setTestNow(Carbon::createFromTimestamp(1549914700));
+        Carbon::setTestNow(Carbon::createFromTimestamp(1549914700, config('app.timezone')));
         $asset = $this->container->makeAsset('path/to/asset.jpg');
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
         Storage::disk('test')->put('path/to/asset.jpg', '');
