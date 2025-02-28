@@ -38,7 +38,9 @@ class Bard extends Replicator
     ];
 
     protected $categories = ['text', 'structured'];
+
     protected $keywords = ['rich', 'richtext', 'rich text', 'editor', 'wysiwg', 'builder', 'page builder', 'gutenberg', 'content'];
+
     protected $rules = [];
 
     protected function configFieldItems(): array
@@ -713,7 +715,9 @@ class Bard extends Replicator
 
         switch ($type) {
             case 'entry':
-                if ($entry = Entry::find($id)) {
+                $actualId = str($id)->before('#')->before('?')->before('&');
+
+                if ($entry = Entry::find($actualId->toString())) {
                     $data = [
                         'title' => $entry->get('title'),
                         'permalink' => $entry->absoluteUrl(),

@@ -34,6 +34,7 @@
                 @input="entriesSelected"
                 @meta-updated="meta.entry.meta = $event"
             />
+            <text-input v-if="option === 'entry'" v-model="anchor" />
 
             <!-- Asset select -->
             <assets-fieldtype
@@ -61,6 +62,7 @@ export default {
     data() {
 
         return {
+            anchor: null,
             option: this.meta.initialOption,
             options: this.initialOptions(),
             urlValue: this.meta.initialUrl,
