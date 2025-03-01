@@ -31,7 +31,13 @@ class TreeBuilder
 
         $tree->withEntries();
 
-        $entry = ($from && $from !== '/') ? Entry::findByUri(Str::start($from, '/'), $params['site']) : null;
+        $entry = null;
+
+        if ($from && $from !== '/') {
+            if (! $entry = Entry::findByUri(Str::start($from, '/'), $params['site'])) {
+                return [];
+            }
+        }
 
         if ($entry) {
             $page = $tree->find($entry->id());

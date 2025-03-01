@@ -85,7 +85,7 @@ class Git
     public function dispatchCommit($message = null)
     {
         if ($delay = config('statamic.git.dispatch_delay')) {
-            $delayInMinutes = now()->addMinutes($delay);
+            $delayInMinutes = now()->addMinutes((int) $delay);
             $message = null;
         }
 
