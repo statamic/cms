@@ -53,7 +53,7 @@ class Link extends Fieldtype
 
     public function preload()
     {
-        $value = $this->field->value();
+        $value = is_array($data = $this->field->value()) ? $data['value'] : $data;
 
         $showAssetOption = $this->showAssetOption();
 
