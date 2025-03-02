@@ -16,7 +16,6 @@ import 'floating-vue/dist/style.css';
 import VCalendar from 'v-calendar';
 import 'v-calendar/style.css';
 import Toasts from '../components/Toasts';
-import 'vue-final-modal/style.css';
 import PortalVue from 'portal-vue';
 import Keys from '../components/keys/Keys';
 import FieldActions from '../components/field-actions/FieldActions.js';
