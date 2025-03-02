@@ -53,7 +53,11 @@ class Link extends Fieldtype
 
     public function preload()
     {
-        $value = is_array($data = $this->field->value()) ? $data['value'] : $data;
+        $urlOptions = null;
+        if (is_array($value = $this->field->value())) {
+            $urlOptions = $value['options'];
+            $value = $value['value'];
+        }
 
         $showAssetOption = $this->showAssetOption();
 
@@ -72,6 +76,7 @@ class Link extends Fieldtype
             'initialSelectedEntries' => $selectedEntry ? [$selectedEntry] : [],
             'initialSelectedAssets' => $selectedAsset ? [$selectedAsset] : [],
             'initialOption' => $this->initialOption($value, $selectedEntry, $selectedAsset),
+            'initialUrlOptions' => $urlOptions ?? null,
             'showFirstChildOption' => $this->showFirstChildOption(),
             'showAssetOption' => $showAssetOption,
             'entry' => [
