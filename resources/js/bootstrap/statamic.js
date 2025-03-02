@@ -16,10 +16,6 @@ import 'floating-vue/dist/style.css';
 import VCalendar from 'v-calendar';
 import 'v-calendar/style.css';
 import Toasts from '../components/Toasts';
-import Toasted from '@hoppscotch/vue-toasted';
-import { useToasted } from '@hoppscotch/vue-toasted';
-import '@hoppscotch/vue-toasted/style.css';
-import 'vue-final-modal/style.css';
 import PortalVue from 'portal-vue';
 import Keys from '../components/keys/Keys';
 import FieldActions from '../components/field-actions/FieldActions.js';
@@ -129,17 +125,6 @@ export default {
         this.$app.use(VueClickAway);
         this.$app.use(FloatingVue, { disposeTimeout: 30000, distance: 10 });
         this.$app.use(VCalendar);
-        this.$app.use(Toasted, {
-            position: 'bottom-left',
-            duration: 3500,
-            theme: 'statamic',
-            action: {
-                text: '×',
-                onClick: (e, toastObject) => {
-                    toastObject.goAway(0);
-                },
-            },
-        });
 
         const portals = markRaw(new Portals());
 
@@ -164,7 +149,7 @@ export default {
             $portals: portals,
             $stacks: new Stacks(portals),
             $hooks: new Hooks(),
-            $toast: new Toasts(useToasted()),
+            $toast: new Toasts(this.$app),
             $bard: new Bard(),
             $reveal: new Reveal(),
             $echo: new Echo(),

@@ -182,17 +182,17 @@
 </template>
 
 <script>
-import PageTree from '../structures/PageTree.vue';
 import DeleteEntryConfirmation from './DeleteEntryConfirmation.vue';
 import DeleteLocalizationConfirmation from './DeleteLocalizationConfirmation.vue';
 import SiteSelector from '../SiteSelector.vue';
 import HasActions from '../publish/HasActions';
+import { defineAsyncComponent } from 'vue';
 
 export default {
     mixins: [HasActions],
 
     components: {
-        PageTree,
+        PageTree: defineAsyncComponent(() => import('../structures/PageTree.vue')),
         DeleteEntryConfirmation,
         DeleteLocalizationConfirmation,
         SiteSelector,

@@ -53,7 +53,6 @@ import TableFieldtype from '../components/fieldtypes/TableFieldtype.vue';
 import TagsFieldtype from '../components/fieldtypes/TagsFieldtype.vue';
 import TagsIndexFieldtype from '../components/fieldtypes/TagsIndexFieldtype.vue';
 import TemplateFolderFieldtype from '../components/fieldtypes/TemplateFolderFieldtype.vue';
-import TimeFieldtype from '../components/fieldtypes/TimeFieldtype.vue';
 import ToggleFieldtype from '../components/fieldtypes/ToggleFieldtype.vue';
 import ToggleIndexFieldtype from '../components/fieldtypes/ToggleIndexFieldtype.vue';
 import WidthFieldtype from '../components/fieldtypes/WidthFieldtype.vue';
@@ -131,7 +130,10 @@ export default function registerFieldtypes(app) {
     app.component('tags-fieldtype-index', TagsIndexFieldtype);
     app.component('taggable-fieldtype-index', TagsIndexFieldtype);
     app.component('template_folder-fieldtype', TemplateFolderFieldtype);
-    app.component('time-fieldtype', TimeFieldtype);
+    app.component(
+        'time-fieldtype',
+        defineAsyncComponent(() => import('../components/fieldtypes/TimeFieldtype.vue')),
+    );
     app.component('toggle-fieldtype', ToggleFieldtype);
     app.component('toggle-fieldtype-index', ToggleIndexFieldtype);
     app.component('width-fieldtype', WidthFieldtype);
