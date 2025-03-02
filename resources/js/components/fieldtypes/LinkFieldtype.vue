@@ -142,25 +142,29 @@ export default {
         },
 
         urlData(data) {
-            if (data.length > 0) {
+            if (data.length) {
                 this.update({options: this.urlData, value: this.urlValue})
                 this.updateMeta({...this.meta, initialUrlOptions: data});
-            } else {
-                this.update(this.urlValue)
-                this.updateMeta({...this.meta, initialUrlOptions: null});
+
+                return;
             }
+
+            this.update(this.urlValue)
+            this.updateMeta({...this.meta, initialUrlOptions: null});
         },
 
         urlValue(url) {
             if (this.metaChanging) return;
 
-            if (this.urlData.length > 0) {
+            this.updateMeta({...this.meta, initialUrl: url});
+
+            if (this.urlData.length) {
                 this.update({options: this.urlData, value: url});
-            } else {
-                this.update(url);
+
+                return;
             }
 
-            this.updateMeta({...this.meta, initialUrl: url});
+            this.update(url);
         },
 
         meta(meta, oldMeta) {
