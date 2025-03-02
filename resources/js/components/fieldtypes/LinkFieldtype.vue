@@ -22,6 +22,13 @@
 
             <!-- URL text input -->
             <text-input v-if="option === 'url'" v-model="urlValue" />
+            <v-select
+                v-if="option === 'url'"
+                multiple="true"
+                v-model="urlData"
+                :options="urlOptions"
+                :value="urlData"
+            />
 
             <!-- Entry select -->
             <relationship-fieldtype
@@ -64,6 +71,8 @@ export default {
             option: this.meta.initialOption,
             options: this.initialOptions(),
             urlValue: this.meta.initialUrl,
+            urlData: this.meta.initialUrlOptions,
+            urlOptions: ['no-follow', 'no-rel'],
             selectedEntries: this.meta.initialSelectedEntries,
             selectedAssets: this.meta.initialSelectedAssets,
             metaChanging: false,
@@ -132,11 +141,30 @@ export default {
             this.updateMeta({...this.meta, initialOption: option});
         },
 
+        urlData(data) {
+            if (data.length) {
+                this.update({options: this.urlData, value: this.urlValue})
+                this.updateMeta({...this.meta, initialUrlOptions: data});
+
+                return;
+            }
+
+            this.update(this.urlValue)
+            this.updateMeta({...this.meta, initialUrlOptions: null});
+        },
+
         urlValue(url) {
             if (this.metaChanging) return;
 
-            this.update(url);
             this.updateMeta({...this.meta, initialUrl: url});
+
+            if (this.urlData.length) {
+                this.update({options: this.urlData, value: url});
+
+                return;
+            }
+
+            this.update(url);
         },
 
         meta(meta, oldMeta) {
