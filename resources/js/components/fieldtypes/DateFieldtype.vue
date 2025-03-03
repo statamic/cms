@@ -342,6 +342,10 @@ export default {
         addDate() {
             let now = new Date();
 
+            if (! this.config.time_enabled) {
+                now.setHours(0, 0, 0, 0);
+            }
+
             let date =
                 now.getFullYear() +
                 '-' +
