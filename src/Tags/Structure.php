@@ -66,7 +66,7 @@ class Structure extends Tags
 
         $value = $this->toArray($tree);
 
-        if ($as = $this->params->get('as')) {
+        if ($this->parser && ($as = $this->params->get('as'))) {
             return [$as => $value];
         }
 
