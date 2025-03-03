@@ -45,7 +45,7 @@ class DateTest extends TestCase
             'date with custom format' => [
                 ['format' => 'Y--m--d'],
                 '2012--01--04',
-                '2012 Jan 04 00:00:00',
+                '2012 Jan 04 13:43:00',
             ],
 
             // The time and seconds configs are important, otherwise
