@@ -3,6 +3,8 @@
 namespace Statamic\UpdateScripts;
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
@@ -16,14 +18,25 @@ class ConvertDatesToUtc extends UpdateScript
 {
     use GetsItemsContainingData;
 
-    public function shouldUpdate($newVersion, $oldVersion)
+    public function shouldUpdate($newVersion, $oldVersion): bool
     {
         return $this->isUpdatingTo('6.0.0');
     }
 
-    public function update()
+    public function update(): void
+    {
+        $this
+            ->updateContent()
+            ->updateSystemConfig();
+    }
+
+    private function updateContent(): self
     {
         $items = $this->getItemsContainingData();
+
+        if ($items->isEmpty()) {
+            return $this;
+        }
 
         $progress = progress(
             label: 'Converting dates to UTC',
@@ -53,6 +66,39 @@ class ConvertDatesToUtc extends UpdateScript
         });
 
         $progress->finish();
+
+        return $this;
+    }
+
+    private function updateSystemConfig(): self
+    {
+        if (! File::exists($path = app()->configPath('statamic/system.php'))) {
+            return $this;
+        }
+
+        $systemConfig = File::get($path);
+
+        if (Str::contains($systemConfig, 'display_timezone')) {
+            return $this;
+        }
+
+        $lineNumberOfDateFormatOption = collect(explode("\n", $systemConfig))
+            ->filter(fn ($line) => Str::contains($line, 'date_format'))
+            ->keys()
+            ->first();
+
+        $stub = Str::of(File::get(__DIR__.'/stubs/system_timezone_config.php.stub'))
+            ->replace('TIMEZONE', config('app.timezone'))
+            ->__toString();
+
+        $systemConfig = Str::of($systemConfig)
+            ->explode("\n")
+            ->put($lineNumberOfDateFormatOption + 1, $stub)
+            ->implode("\n");
+
+        File::put(app()->configPath('statamic/system.php'), $systemConfig);
+
+        return $this;
     }
 
     private function recursivelyUpdateFields($item, Fields $fields, ?string $dottedPrefix = null): void
