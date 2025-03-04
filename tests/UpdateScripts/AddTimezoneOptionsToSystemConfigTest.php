@@ -22,7 +22,6 @@ class AddTimezoneOptionsToSystemConfigTest extends TestCase
     public function it_appends_timezone_option_to_system_config()
     {
         config()->set('app.timezone', 'America/New_York'); // -05:00
-        date_default_timezone_set('America/New_York');
 
         File::ensureDirectoryExists(app()->configPath('statamic'));
 
