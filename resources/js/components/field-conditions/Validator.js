@@ -2,7 +2,7 @@ import Converter from './Converter.js';
 import ParentResolver from './ParentResolver.js';
 import { KEYS } from './Constants.js';
 import { data_get } from '../../bootstrap/globals.js';
-import { isString, isObject, isEmpty, intersection, first } from 'lodash-es';
+import { isString, isObject, isEmpty, intersection } from 'lodash-es';
 
 const NUMBER_SPECIFIC_COMPARISONS = ['>', '>=', '<', '<='];
 
@@ -33,7 +33,7 @@ export default class {
     }
 
     getConditions() {
-        let key = first(KEYS.filter((key) => this.field[key]));
+        let key = KEYS.filter((key) => this.field[key])[0];
 
         if (!key) {
             return undefined;

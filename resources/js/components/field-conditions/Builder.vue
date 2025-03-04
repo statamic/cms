@@ -55,7 +55,7 @@ import Converter from '../field-conditions/Converter.js';
 import { KEYS, OPERATORS } from '../field-conditions/Constants.js';
 import Condition from './Condition.vue';
 import { __ } from '../../bootstrap/globals';
-import { isEmpty, first } from 'lodash-es';
+import { isEmpty } from 'lodash-es';
 
 export default {
     mixins: [HasInputOptions],
@@ -163,7 +163,7 @@ export default {
         },
 
         getInitialConditions() {
-            let key = first(KEYS.filter((key) => this.config[key]));
+            let key = KEYS.filter((key) => this.config[key])[0];
 
             let conditions = this.config[key];
 
