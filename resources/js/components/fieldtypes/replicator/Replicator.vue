@@ -95,7 +95,7 @@ import ReplicatorSet from './Set.vue';
 import AddSetButton from './AddSetButton.vue';
 import ManagesSetMeta from './ManagesSetMeta';
 import { SortableList } from '../../sortable/Sortable';
-import { map, reduce } from 'lodash-es';
+import { map } from 'lodash-es';
 
 export default {
     mixins: [Fieldtype, ManagesSetMeta],
@@ -129,13 +129,9 @@ export default {
         },
 
         setConfigs() {
-            return reduce(
-                this.groupConfigs,
-                (sets, group) => {
-                    return sets.concat(group.sets);
-                },
-                [],
-            );
+            return this.groupConfigs.reduce((sets, group) => {
+                return sets.concat(group.sets);
+            }, []);
         },
 
         groupConfigs() {

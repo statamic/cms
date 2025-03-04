@@ -130,7 +130,6 @@
 <script>
 import Fieldtype from '../Fieldtype.vue';
 import uniqid from 'uniqid';
-import { reduce } from 'lodash-es';
 import Emitter from 'tiny-emitter';
 import { BubbleMenu, Editor, EditorContent } from '@tiptap/vue-3';
 import { Extension } from '@tiptap/core';
@@ -338,13 +337,9 @@ export default {
         },
 
         setConfigs() {
-            return reduce(
-                this.groupConfigs,
-                (sets, group) => {
-                    return sets.concat(group.sets);
-                },
-                [],
-            );
+            return this.groupConfigs.reduce((sets, group) => {
+                return sets.concat(group.sets);
+            }, []);
         },
 
         groupConfigs() {
