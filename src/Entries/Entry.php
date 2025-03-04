@@ -577,18 +577,18 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
                 }
 
                 if ($date instanceof \Carbon\CarbonInterface) {
-                    return $date;
+                    return $date->utc();
                 }
 
                 if (strlen($date) === 10) {
-                    return Carbon::createFromFormat('Y-m-d', $date, 'UTC')->startOfDay();
+                    return Carbon::createFromFormat('Y-m-d', $date, config('statamic.system.timezone'))->startOfDay()->utc();
                 }
 
                 if (strlen($date) === 15) {
-                    return Carbon::createFromFormat('Y-m-d-Hi', $date, 'UTC')->startOfMinute();
+                    return Carbon::createFromFormat('Y-m-d-Hi', $date, config('statamic.system.timezone'))->startOfMinute()->utc();
                 }
 
-                return Carbon::createFromFormat('Y-m-d-His', $date, 'UTC');
+                return Carbon::createFromFormat('Y-m-d-His', $date, config('statamic.system.timezone'))->utc();
             })
             ->args(func_get_args());
     }

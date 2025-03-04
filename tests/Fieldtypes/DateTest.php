@@ -45,7 +45,7 @@ class DateTest extends TestCase
             'date with custom format' => [
                 ['format' => 'Y--m--d'],
                 '2012--01--04',
-                '2012 Jan 04 13:43:00',
+                '2012 Jan 04 00:00:00',
             ],
 
             // The time and seconds configs are important, otherwise
@@ -141,7 +141,7 @@ class DateTest extends TestCase
             'date with default format' => [
                 [],
                 ['date' => '2012-08-29', 'time' => '00:00'],
-                '2012-08-29 00:00',
+                '2012-08-29',
             ],
             'date with custom format' => [
                 ['format' => 'Y--m--d H/i'],
@@ -151,7 +151,7 @@ class DateTest extends TestCase
             'date with missing time' => [
                 [],
                 ['date' => '2012-08-29'],
-                '2012-08-29 00:00',
+                '2012-08-29',
             ],
             'date with time' => [
                 ['time_enabled' => true],

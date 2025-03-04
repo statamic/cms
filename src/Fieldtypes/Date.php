@@ -150,6 +150,9 @@ class Date extends Fieldtype
 
     private function preProcessRange($value)
     {
+        // todo: use app timezone for storage stuff
+        // todo: rename system config timezoen back to display timezone for displaying stuff
+
         // If there's no value, return null, so we can handle the empty state on the Vue side.
         if (! $value) {
             return null;
@@ -158,9 +161,12 @@ class Date extends Fieldtype
         // If the value isn't an array, this field probably used to be a single date.
         // In this case, we'll use the date for both the start and end of the range.
         if (! is_array($value)) {
-            $carbon = $this->parseSaved($value);
+            $carbon = $this->parseSavedToCarbon($value);
 
-            $value = ['start' => $carbon->copy()->startOfDay(), 'end' => $carbon->copy()->endOfDay()];
+            return [
+                'start' => $this->splitDateTimeForPreProcessSingle($carbon->copy()->startOfDay()->utc()),
+                'end' => $this->splitDateTimeForPreProcessSingle($carbon->copy()->endOfDay()->utc()),
+            ];
         }
 
         return [
@@ -214,7 +220,7 @@ class Date extends Fieldtype
 
     private function processDateTime($value)
     {
-        $date = Carbon::parse($value);
+        $date = Carbon::parse($value, 'UTC');
 
         return $this->formatAndCast($date, $this->saveFormat());
     }
@@ -276,14 +282,22 @@ class Date extends Fieldtype
 
     private function defaultFormat()
     {
-        return $this->config('time_seconds_enabled')
-            ? self::DEFAULT_DATETIME_WITH_SECONDS_FORMAT
-            : self::DEFAULT_DATETIME_FORMAT;
+        if ($this->config('time_enabled') && $this->config('mode', 'single') === 'single') {
+            return $this->config('time_seconds_enabled')
+                ? self::DEFAULT_DATETIME_WITH_SECONDS_FORMAT
+                : self::DEFAULT_DATETIME_FORMAT;
+        }
+
+        if ($this->config('mode', 'single') === 'range') {
+            return self::DEFAULT_DATETIME_FORMAT;
+        }
+
+        return self::DEFAULT_DATE_FORMAT;
     }
 
     private function formatAndCast(Carbon $date, $format)
     {
-        $formatted = $date->format($format);
+        $formatted = $date->setTimezone(config('app.timezone'))->format($format);
 
         if (is_numeric($formatted)) {
             $formatted = (int) $formatted;
@@ -341,10 +355,33 @@ class Date extends Fieldtype
 
     private function parseSaved($value)
     {
+        $hasTime = false;
+
+        if (is_int($value)) {
+            $hasTime = true;
+        } elseif (str_contains($this->saveFormat(), 'H')) {
+            $hasTime = true;
+        }
+
+        $carbon = $this->parseSavedToCarbon($value);
+
+        if (! $hasTime) {
+            $carbon = $carbon->startOfDay();
+        }
+
+        return $carbon->setTimezone('UTC');
+    }
+
+    private function parseSavedToCarbon($value): Carbon
+    {
+        if ($value instanceof Carbon) {
+            return $value;
+        }
+
         try {
-            return Carbon::createFromFormat($this->saveFormat(), $value, 'UTC');
+            return Carbon::createFromFormat($this->saveFormat(), $value, config('app.timezone'));
         } catch (InvalidFormatException|InvalidArgumentException $e) {
-            return Carbon::parse($value);
+            return Carbon::parse($value, config('app.timezone'));
         }
     }
 
