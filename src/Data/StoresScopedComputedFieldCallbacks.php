@@ -14,7 +14,7 @@ trait StoresScopedComputedFieldCallbacks
 
     /**
      * @param  string|array  $scopes
-     * @param  string|array $field
+     * @param  string|array  $field
      */
     public function computed($scopes, $field, ?Closure $callback = null)
     {
@@ -30,7 +30,6 @@ trait StoresScopedComputedFieldCallbacks
             $this->computedFieldCallbacks["$scope.$field"] = $callback;
         }
     }
-
 
     public function getComputedCallbacks(string $scope): Collection
     {
