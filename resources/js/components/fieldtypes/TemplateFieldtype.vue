@@ -29,7 +29,7 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 import PositionsSelectOptions from '../../mixins/PositionsSelectOptions';
-import { reject, filter, each } from 'lodash-es';
+import { reject, each } from 'lodash-es';
 
 export default {
     mixins: [Fieldtype, PositionsSelectOptions],
@@ -59,7 +59,7 @@ export default {
 
             // Filter templates in folder
             if (this.config.folder) {
-                templates = filter(templates, (template) => {
+                templates = templates.filter((template) => {
                     return template.startsWith(`${this.config.folder}/`);
                 });
             }
