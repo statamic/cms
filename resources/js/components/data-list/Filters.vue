@@ -111,7 +111,7 @@
 <script>
 import DataListFilter from './Filter.vue';
 import FieldFilter from './FieldFilter.vue';
-import { omit, isEmpty, isEqual } from 'lodash-es';
+import { isEmpty, isEqual } from 'lodash-es';
 
 export default {
     components: {
@@ -193,7 +193,8 @@ export default {
         },
 
         standardBadges() {
-            return omit(this.activeFilterBadges, 'fields');
+            const { fields, ...badges } = this.activeFilterBadges;
+            return badges;
         },
 
         isFiltering() {
