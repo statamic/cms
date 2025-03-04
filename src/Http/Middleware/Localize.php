@@ -53,7 +53,7 @@ class Localize
      *
      * @throws \ReflectionException
      */
-    private function getToStringFormat(): ?string
+    private function getToStringFormat(): string|\Closure|null
     {
         $reflection = new ReflectionClass($date = Date::now());
 
