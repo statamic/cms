@@ -21,7 +21,7 @@ trait StoresComputedFieldCallbacks
 
             return;
         }
-        
+
         $this->computedFieldCallbacks[$field] = $callback;
     }
 
