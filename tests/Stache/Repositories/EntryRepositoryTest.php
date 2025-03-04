@@ -202,7 +202,7 @@ class EntryRepositoryTest extends TestCase
             ->date('2017-07-04')
             ->data(['foo' => 'bar']);
 
-        $this->unlinkAfter($path = $this->directory.'/blog/2017-07-04-0000.test.md');
+        $this->unlinkAfter($path = $this->directory.'/blog/2017-07-04.test.md');
 
         $this->assertCount(14, $this->repo->all());
         $this->assertNull($this->repo->find('test-blog-entry'));
@@ -228,7 +228,7 @@ class EntryRepositoryTest extends TestCase
             ->date('2017-07-04')
             ->data(['foo' => 'bar']);
 
-        $this->unlinkAfter($path = $this->directory.'/blog/2017-07-04-0000.test.md');
+        $this->unlinkAfter($path = $this->directory.'/blog/2017-07-04.test.md');
 
         $this->assertCount(14, $this->repo->all());
         $this->assertNull($this->repo->find('test-blog-entry'));
