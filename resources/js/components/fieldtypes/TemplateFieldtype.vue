@@ -29,7 +29,7 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 import PositionsSelectOptions from '../../mixins/PositionsSelectOptions';
-import { reject, each } from 'lodash-es';
+import { each } from 'lodash-es';
 
 export default {
     mixins: [Fieldtype, PositionsSelectOptions],
@@ -47,14 +47,14 @@ export default {
 
             // Filter out partials
             if (this.config.hide_partials) {
-                templates = reject(templates, (template) => {
-                    return template.startsWith('partials/') || template.match(/(^_.*|\/_.*|\._.*)/g);
+                templates = templates.filter((template) => {
+                    return !(template.startsWith('partials/') || template.match(/(^_.*|\/_.*|\._.*)/g));
                 });
             }
 
             // Filter out error templates
-            templates = reject(templates, (template) => {
-                return template.startsWith('errors/');
+            templates = templates.filter((template) => {
+                return !template.startsWith('errors/');
             });
 
             // Filter templates in folder

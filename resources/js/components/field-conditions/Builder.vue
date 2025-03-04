@@ -55,7 +55,7 @@ import Converter from '../field-conditions/Converter.js';
 import { KEYS, OPERATORS } from '../field-conditions/Constants.js';
 import Condition from './Condition.vue';
 import { __ } from '../../bootstrap/globals';
-import { isEmpty, reject, first } from 'lodash-es';
+import { isEmpty, first } from 'lodash-es';
 
 export default {
     mixins: [HasInputOptions],
@@ -197,8 +197,8 @@ export default {
         },
 
         prepareSaveableConditions(conditions) {
-            conditions = reject(conditions, (condition) => {
-                return !condition.field || !condition.value;
+            conditions = conditions.filter((condition) => {
+                return !(!condition.field || !condition.value);
             });
 
             return new Converter().toBlueprint(conditions);

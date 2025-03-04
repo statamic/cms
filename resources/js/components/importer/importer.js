@@ -1,4 +1,4 @@
-import { each, size, uniq, reject, includes } from 'lodash-es';
+import { each, size, uniq, includes } from 'lodash-es';
 
 export default {
     props: ['importer'],
@@ -77,8 +77,8 @@ export default {
         },
 
         hideCollection: function (hidden) {
-            this.showCollections = reject(this.showCollections, function (c) {
-                return c === hidden;
+            this.showCollections = this.showCollections.filter(function (c) {
+                return c !== hidden;
             });
         },
 
@@ -92,8 +92,8 @@ export default {
         },
 
         hideTaxonomy: function (hidden) {
-            this.showTaxonomies = reject(this.showTaxonomies, function (t) {
-                return t === hidden;
+            this.showTaxonomies = this.showTaxonomies.filter(function (t) {
+                return t !== hidden;
             });
         },
 
@@ -107,8 +107,8 @@ export default {
         },
 
         hideGlobal: function (hidden) {
-            this.showGlobals = reject(this.showGlobals, function (g) {
-                return g === hidden;
+            this.showGlobals = this.showGlobals.filter(function (g) {
+                return g !== hidden;
             });
         },
 
