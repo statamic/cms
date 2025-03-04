@@ -10,7 +10,7 @@ trait StoresComputedFieldCallbacks
     protected $computedFieldCallbacks;
 
     /**
-     * @param  string|array $field
+     * @param  string|array  $field
      */
     public function computed($field, ?Closure $callback = null)
     {
