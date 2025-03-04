@@ -18,6 +18,7 @@
         :revisions-enabled="revisions"
         :breadcrumbs="breadcrumbs"
         :initial-site="site"
+        :parent="parent"
         :can-manage-publish-state="canManagePublishState"
         :create-another-url="createAnotherUrl"
         :initial-listing-url="listingUrl"
@@ -41,6 +42,7 @@ export default {
         'revisions',
         'breadcrumbs',
         'site',
+        'parent',
         'canManagePublishState',
         'createAnotherUrl',
         'listingUrl',

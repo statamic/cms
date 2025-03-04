@@ -230,17 +230,17 @@
 </template>
 
 <script>
-import PageTree from '../structures/PageTree.vue';
 import PageEditor from '../structures/PageEditor.vue';
 import PageSelector from '../structures/PageSelector.vue';
 import RemovePageConfirmation from './RemovePageConfirmation.vue';
 import SiteSelector from '../SiteSelector.vue';
 import uniqid from 'uniqid';
+import { defineAsyncComponent } from 'vue';
 import { mapValues, pick } from 'lodash-es';
 
 export default {
     components: {
-        PageTree,
+        PageTree: defineAsyncComponent(() => import('../structures/PageTree.vue')),
         PageEditor,
         PageSelector,
         RemovePageConfirmation,

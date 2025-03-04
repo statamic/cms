@@ -176,8 +176,10 @@ import { availableButtons, addButtonHtml } from '../bard/buttons';
 import readTimeEstimate from 'read-time-estimate';
 import { common, createLowlight } from 'lowlight';
 import 'highlight.js/styles/github.css';
+import importTiptap from '@/util/tiptap.js';
 
 const lowlight = createLowlight(common);
+let tiptap = null;
 
 export default {
     mixins: [Fieldtype, ManagesSetMeta],
@@ -379,7 +381,9 @@ export default {
         },
     },
 
-    mounted() {
+    async mounted() {
+        tiptap = await importTiptap();
+
         this.initToolbarButtons();
         this.initEditor();
 
@@ -882,7 +886,7 @@ export default {
             }
 
             this.$bard.extensionCallbacks.forEach((callback) => {
-                let returned = callback({ bard: this });
+                let returned = callback({ bard: this, tiptap });
                 exts = exts.concat(Array.isArray(returned) ? returned : [returned]);
             });
 

@@ -402,6 +402,7 @@ export default {
         collectionHasRoutes: Boolean,
         previewTargets: Array,
         autosaveInterval: Number,
+        parent: String,
     },
 
     data() {
@@ -621,6 +622,7 @@ export default {
                 ...{
                     _blueprint: this.fieldset.handle,
                     _localized: this.localizedFields,
+                    _parent: this.parent,
                 },
             };
 

@@ -235,14 +235,14 @@
 
 <script>
 import HasFilters from '../../data-list/HasFilters';
-import PageTree from '../../structures/PageTree.vue';
+import { defineAsyncComponent } from 'vue';
 import { clone } from 'lodash-es';
 
 export default {
     mixins: [HasFilters],
 
     components: {
-        PageTree,
+        PageTree: defineAsyncComponent(() => import('../../structures/PageTree.vue')),
     },
 
     props: {

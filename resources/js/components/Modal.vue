@@ -11,6 +11,7 @@
 <script>
 import uniqid from 'uniqid';
 import { VueFinalModal } from 'vue-final-modal';
+import 'vue-final-modal/style.css';
 
 export default {
     emits: ['opened', 'closed'],

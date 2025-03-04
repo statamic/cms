@@ -1,6 +1,45 @@
 # Release Notes
 
-## 5.47.0 (2025-03-18)
+## 5.49.0 (2025-02-25)
+
+### What's new
+- Laravel 12 support [#11433](https://github.com/statamic/cms/issues/11433) by @duncanmcclean
+
+### What's fixed
+- Asset Container returns relative url for same site [#11372](https://github.com/statamic/cms/issues/11372) by @marcorieser
+
+
+
+## 5.48.1 (2025-02-25)
+
+### What's fixed
+- Fix session expiry component [#11501](https://github.com/statamic/cms/issues/11501) by @jasonvarga
+- Include port in CSP for Live Preview [#11498](https://github.com/statamic/cms/issues/11498) by @dmxmo
+- Remove duplicate translation line from `translator` command [#11494](https://github.com/statamic/cms/issues/11494) by @duncanmcclean
+- Fix carbon integer casting [#11496](https://github.com/statamic/cms/issues/11496) by @jasonvarga
+- Only show spatie/fork prompt when pcntl extension is loaded [#11493](https://github.com/statamic/cms/issues/11493) by @duncanmcclean
+- French translations [#11488](https://github.com/statamic/cms/issues/11488) by @ebeauchamps
+
+
+
+## 5.48.0 (2025-02-21)
+
+### What's new
+- Carbon 3 support [#11348](https://github.com/statamic/cms/issues/11348) by @duncanmcclean
+- Allow custom asset container contents cache store [#11481](https://github.com/statamic/cms/issues/11481) by @ryanmitchell
+- Add support for `$view` parameter closure with `Route::statamic()` [#11452](https://github.com/statamic/cms/issues/11452) by @jesseleite
+- Add Unlink All action to relationship fields [#11475](https://github.com/statamic/cms/issues/11475) by @jacksleight
+
+### What's fixed
+- Fix handle dimensions of rotated videos [#11479](https://github.com/statamic/cms/issues/11479) by @grischaerbe
+- Entries Fieldtype: Hide tree view when using query scopes [#11484](https://github.com/statamic/cms/issues/11484) by @duncanmcclean
+- Fix issue with localization files named like handles [#11482](https://github.com/statamic/cms/issues/11482) by @ChristianPraiss
+- Fix cannot use paginate/limit error when one is null [#11478](https://github.com/statamic/cms/issues/11478) by @jacksleight
+- Fix primitive type hint handling in Statamic routes [#11476](https://github.com/statamic/cms/issues/11476) by @jesseleite
+
+
+
+## 5.47.0 (2025-02-18)
 
 ### What's new
 - Support Sections in form GraphQL queries [#11466](https://github.com/statamic/cms/issues/11466) by @ryanmitchell
