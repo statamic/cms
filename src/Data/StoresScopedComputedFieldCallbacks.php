@@ -14,13 +14,23 @@ trait StoresScopedComputedFieldCallbacks
 
     /**
      * @param  string|array  $scopes
+     * @param  string|array $field
      */
-    public function computed($scopes, string $field, Closure $callback)
+    public function computed($scopes, $field, ?Closure $callback = null)
     {
         foreach (Arr::wrap($scopes) as $scope) {
+            if (is_array($field)) {
+                foreach ($field as $field_name => $field_callback) {
+                    $this->computedFieldCallbacks["$scope.$field_name"] = $field_callback;
+                }
+
+                continue;
+            }
+
             $this->computedFieldCallbacks["$scope.$field"] = $callback;
         }
     }
+
 
     public function getComputedCallbacks(string $scope): Collection
     {
