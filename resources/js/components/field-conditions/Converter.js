@@ -1,9 +1,9 @@
 import { OPERATORS, ALIASES } from './Constants.js';
-import { map, each } from 'lodash-es';
+import { each } from 'lodash-es';
 
 export default class {
     fromBlueprint(conditions, prefix = null) {
-        return map(conditions, (condition, field) => this.splitRhs(field, condition, prefix));
+        return Object.entries(conditions).map(([field, condition]) => this.splitRhs(field, condition, prefix));
     }
 
     toBlueprint(conditions) {

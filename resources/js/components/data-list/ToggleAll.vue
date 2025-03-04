@@ -11,8 +11,6 @@
 </template>
 
 <script>
-import { map } from 'lodash-es';
-
 export default {
     inject: ['sharedState'],
     computed: {
@@ -26,7 +24,7 @@ export default {
         },
 
         checkMaximumAmountOfItems() {
-            let selections = map(this.sharedState.rows, 'id');
+            let selections = this.sharedState.rows.map((row) => row.id);
             if (this.sharedState.maxSelections) selections = selections.slice(0, this.sharedState.maxSelections);
             this.sharedState.selections = selections;
         },

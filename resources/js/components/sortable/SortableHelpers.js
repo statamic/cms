@@ -1,5 +1,5 @@
 import SortableKeyValue from './SortableKeyValue.js';
-import { map, each } from 'lodash-es';
+import { each } from 'lodash-es';
 
 export default {
     methods: {
@@ -8,11 +8,11 @@ export default {
         },
 
         objectToSortable(obj) {
-            return map(clone(obj), (value, key) => new SortableKeyValue(key, value));
+            return Object.entries(clone(obj)).map(([key, value]) => new SortableKeyValue(key, value));
         },
 
         arrayToSortable(arr) {
-            return map(clone(arr), (value) => new SortableKeyValue(null, value));
+            return clone(arr).map((value) => new SortableKeyValue(null, value));
         },
 
         sortableToObject(sortable) {

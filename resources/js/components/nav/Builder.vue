@@ -203,7 +203,7 @@ import TopLevelTreeBranch from './TopLevelBranch.vue';
 import ItemEditor from './ItemEditor.vue';
 import SectionEditor from './SectionEditor.vue';
 import { data_get } from '../../bootstrap/globals.js';
-import { keys, omit, map, values } from 'lodash-es';
+import { keys, omit, values } from 'lodash-es';
 
 export default {
     components: {
@@ -291,7 +291,7 @@ export default {
 
             this.setOriginalSectionItems(navConfig);
 
-            this.treeData = values(map(navConfig, (section) => this.normalizeNavConfig(section)));
+            this.treeData = values(navConfig.map((section) => this.normalizeNavConfig(section)));
         },
 
         setOriginalSectionItems(nav) {

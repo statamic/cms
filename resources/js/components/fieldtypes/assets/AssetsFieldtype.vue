@@ -183,7 +183,7 @@ import Selector from '../../assets/Selector.vue';
 import Uploader from '../../assets/Uploader.vue';
 import Uploads from '../../assets/Uploads.vue';
 import { SortableList } from '../../sortable/Sortable';
-import { map, isEqual } from 'lodash-es';
+import { isEqual } from 'lodash-es';
 
 export default {
     components: {
@@ -328,7 +328,7 @@ export default {
          * The IDs of the assets.
          */
         assetIds() {
-            return map(this.assets, 'id');
+            return this.assets.map((asset) => asset.id);
         },
 
         /**
@@ -356,11 +356,13 @@ export default {
             if (!this.showFieldPreviews || !this.config.replicator_preview) return;
 
             return replicatorPreviewHtml(
-                map(this.assets, (asset) => {
-                    return asset.isImage || asset.isSvg
-                        ? `<img src="${asset.thumbnail}" width="20" class="max-w-5 max-h-5" height="20" title="${asset.basename}" />`
-                        : asset.basename;
-                }).join(', '),
+                this.assets
+                    .map((asset) => {
+                        return asset.isImage || asset.isSvg
+                            ? `<img src="${asset.thumbnail}" width="20" class="max-w-5 max-h-5" height="20" title="${asset.basename}" />`
+                            : asset.basename;
+                    })
+                    .join(', '),
             );
         },
 

@@ -95,7 +95,6 @@ import ReplicatorSet from './Set.vue';
 import AddSetButton from './AddSetButton.vue';
 import ManagesSetMeta from './ManagesSetMeta';
 import { SortableList } from '../../sortable/Sortable';
-import { map } from 'lodash-es';
 
 export default {
     mixins: [Fieldtype, ManagesSetMeta],
@@ -259,7 +258,7 @@ export default {
         },
 
         collapseAll() {
-            this.collapsed = map(this.value, '_id');
+            this.collapsed = this.value.map((v) => v._id);
         },
 
         expandAll() {

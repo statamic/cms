@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import { map, flatten } from 'lodash-es';
+import { flatten } from 'lodash-es';
 
 export default {
     props: {
@@ -21,7 +21,7 @@ export default {
         },
 
         flattenedErrors() {
-            return flatten(map(this.errors, (error) => error));
+            return flatten(Object.entries(this.errors).map((error) => error));
         },
     },
 };

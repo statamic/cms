@@ -78,7 +78,6 @@
 <script>
 import { dragContext, Draggable, walkTreeData } from '@he-tree/vue';
 import TreeBranch from './Branch.vue';
-import { map } from 'lodash-es';
 
 export default {
     components: {
@@ -179,7 +178,7 @@ export default {
         },
 
         cleanPagesForSubmission(pages) {
-            return map(pages, (page) => ({
+            return pages.map((page) => ({
                 id: page.id,
                 children: this.cleanPagesForSubmission(page.children),
             }));

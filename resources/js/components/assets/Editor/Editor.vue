@@ -291,7 +291,7 @@ import FocalPointEditor from './FocalPointEditor.vue';
 import PdfViewer from './PdfViewer.vue';
 import PublishFields from '../../publish/Fields.vue';
 import HasHiddenFields from '../../publish/HasHiddenFields';
-import { pick, isArray, map, flatten } from 'lodash-es';
+import { pick, isArray, flatten } from 'lodash-es';
 
 export default {
     emits: ['saved', 'closed', 'action-completed'],
@@ -427,9 +427,9 @@ export default {
                 this.fieldset = data.blueprint;
 
                 let fields = this.fields.tabs;
-                fields = map(fields, (tab) => tab.sections);
+                fields = fields.map((tab) => tab.sections);
                 fields = flatten(fields);
-                fields = map(fields, (section) => section.fields);
+                fields = fields.map((section) => section.fields);
                 fields = flatten(fields);
                 this.fields = fields;
 
