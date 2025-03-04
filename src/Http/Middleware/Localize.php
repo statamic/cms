@@ -33,7 +33,7 @@ class Localize
         // Get original Carbon format so it can be restored later.
         $originalToStringFormat = $this->getToStringFormat();
         Date::setToStringFormat(function (Carbon $date) {
-            return $date->setTimezone(config('statamic.system.display_timezone'))->format(Statamic::dateFormat());
+            return $date->setTimezone(Statamic::displayTimezone())->format(Statamic::dateFormat());
         });
 
         $response = $next($request);

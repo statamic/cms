@@ -322,6 +322,11 @@ class Statamic
         return DateFormat::containsTime($format) ? $format : $format.' H:i';
     }
 
+    public static function displayTimezone(): string
+    {
+        return config('statamic.system.display_timezone', config('app.timezone'));
+    }
+
     public static function flash()
     {
         if ($success = session('success')) {

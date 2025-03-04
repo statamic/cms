@@ -27,6 +27,7 @@ use Statamic\Fields\Values;
 use Statamic\Fieldtypes\Bard;
 use Statamic\Fieldtypes\Bard\Augmentor;
 use Statamic\Fieldtypes\Link\ArrayableLink;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Dumper;
 use Statamic\Support\Html;
@@ -2791,7 +2792,7 @@ class CoreModifiers extends Modifier
      */
     public function timezone($value, $params)
     {
-        $timezone = Arr::get($params, 0, config('statamic.system.display_timezone', 'UTC'));
+        $timezone = Arr::get($params, 0, Statamic::displayTimezone());
 
         return $this->carbon($value)->tz($timezone);
     }
@@ -3214,7 +3215,7 @@ class CoreModifiers extends Modifier
         }
 
         if (config('statamic.system.localize_dates_in_modifiers')) {
-            $value->setTimezone(config('statamic.system.display_timezone'));
+            $value->setTimezone(Statamic::displayTimezone());
         }
 
         return $value;
