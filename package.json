@@ -7,7 +7,7 @@
     "svgo": "svgo -f ./resources/svg/  -r",
     "test": "cross-env NODE_ENV=test jest --silent",
     "test-watch": "npm run test -- --watch --notify",
-    "frontend-dev": "vite -c vite-frontend.config.js",
+    "frontend-dev": "vite build -c vite-frontend.config.js --watch",
     "frontend-build": "vite build -c vite-frontend.config.js"
   },
   "dependencies": {
