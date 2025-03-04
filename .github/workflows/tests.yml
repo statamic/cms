@@ -149,7 +149,7 @@ jobs:
 
   slack:
     name: Slack Notification
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     needs: [php-tests, js-tests]
     if: always()
     steps:
