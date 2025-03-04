@@ -203,7 +203,7 @@ import TopLevelTreeBranch from './TopLevelBranch.vue';
 import ItemEditor from './ItemEditor.vue';
 import SectionEditor from './SectionEditor.vue';
 import { data_get } from '../../bootstrap/globals.js';
-import { keys, omit, values } from 'lodash-es';
+import { omit, values } from 'lodash-es';
 
 export default {
     components: {
@@ -566,13 +566,13 @@ export default {
         },
 
         itemHasModifiedProperties(stat) {
-            return keys(omit(stat.data.manipulations, ['action', 'reorder', 'children'])).length > 0;
+            return Object.keys(omit(stat.data.manipulations, ['action', 'reorder', 'children'])).length > 0;
         },
 
         itemHasModifiedChildren(stat) {
             return (
                 stat.children.filter((childItem) => {
-                    return keys(childItem.data.manipulations).length > 0;
+                    return Object.keys(childItem.data.manipulations).length > 0;
                 }).length > 0
             );
         },
