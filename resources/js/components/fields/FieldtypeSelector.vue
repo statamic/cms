@@ -180,7 +180,7 @@ export default {
         },
 
         groupedFieldtypes() {
-            return mapObject(this.categories, (category, handle) => {
+            return mapValues(this.categories, (category, handle) => {
                 category.handle = handle;
                 category.fieldtypes = [];
 
