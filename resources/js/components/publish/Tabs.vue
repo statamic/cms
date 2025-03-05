@@ -113,7 +113,6 @@
 </template>
 
 <script>
-import { uniq } from 'lodash-es';
 import { ValidatesFieldConditions } from '../field-conditions/FieldConditions.js';
 
 export default {
@@ -196,7 +195,7 @@ export default {
                 .filter((handle) => fields[handle])
                 .map((handle) => fields[handle]);
 
-            return uniq(tabs);
+            return [...new Set(tabs)];
         },
 
         actionsPortal() {

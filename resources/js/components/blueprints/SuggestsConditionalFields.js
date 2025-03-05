@@ -1,5 +1,3 @@
-import { uniq } from 'lodash-es';
-
 export default {
     provide() {
         return {
@@ -29,7 +27,7 @@ export default {
                 );
             }, []);
 
-            return uniq(fields);
+            return [...new Set(fields)];
         },
 
         makeConditionsProvider() {
