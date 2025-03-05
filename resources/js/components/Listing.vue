@@ -3,7 +3,7 @@ import HasActions from './data-list/HasActions';
 import HasFilters from './data-list/HasFilters';
 import HasPagination from './data-list/HasPagination';
 import HasPreferences from './data-list/HasPreferences';
-import { isEmpty, indexOf } from 'lodash-es';
+import { indexOf } from 'lodash-es';
 
 export default {
     mixins: [HasActions, HasFilters, HasPagination, HasPreferences],
@@ -75,7 +75,7 @@ export default {
 
         activeFilterParameters: {
             get() {
-                if (isEmpty(this.activeFilters)) {
+                if (Object.keys(this.activeFilters).length === 0) {
                     return null;
                 }
                 return utf8btoa(JSON.stringify(this.activeFilters));
@@ -87,7 +87,7 @@ export default {
 
         visibleColumnParameters: {
             get() {
-                if (isEmpty(this.visibleColumns)) {
+                if (Object.keys(this.visibleColumns).length === 0) {
                     return null;
                 }
                 return this.visibleColumns.map((column) => column.field).join(',');

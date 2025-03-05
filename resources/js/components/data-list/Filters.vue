@@ -111,7 +111,7 @@
 <script>
 import DataListFilter from './Filter.vue';
 import FieldFilter from './FieldFilter.vue';
-import { isEmpty, isEqual } from 'lodash-es';
+import { isEqual } from 'lodash-es';
 
 export default {
     components: {
@@ -198,7 +198,7 @@ export default {
         },
 
         isFiltering() {
-            return !isEmpty(this.activeFilters) || this.searchQuery || this.activePreset;
+            return Object.keys(this.activeFilters).length || this.searchQuery || this.activePreset;
         },
 
         isDirty() {

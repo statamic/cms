@@ -2,9 +2,15 @@ import Converter from './Converter.js';
 import ParentResolver from './ParentResolver.js';
 import { KEYS } from './Constants.js';
 import { data_get } from '../../bootstrap/globals.js';
-import { isString, isObject, isEmpty, intersection } from 'lodash-es';
+import { isString, isObject, intersection } from 'lodash-es';
 
 const NUMBER_SPECIFIC_COMPARISONS = ['>', '>=', '<', '<='];
+
+const isEmpty = (value) => {
+    if (value === null || value === undefined) return true;
+
+    return Array.isArray(value) ? value.length === 0 : Object.keys(value).length === 0;
+};
 
 export default class {
     constructor(field, values, dottedFieldPath, store) {

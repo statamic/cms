@@ -1,4 +1,4 @@
-import { isEqual, isEmpty } from 'lodash-es';
+import { isEqual } from 'lodash-es';
 
 export default {
     data() {
@@ -40,7 +40,7 @@ export default {
         },
 
         isFiltering() {
-            return !isEmpty(this.activeFilters) || this.searchQuery || this.activePreset;
+            return Object.keys(this.activeFilters).length || this.searchQuery || this.activePreset;
         },
 
         hasActiveFilters() {
@@ -114,6 +114,8 @@ export default {
             if (!filters) return;
 
             let values = {};
+
+            const isEmpty = (value) => (Array.isArray(value) ? value.length === 0 : Object.keys(value).length === 0);
 
             filters
                 .filter((filter) => !isEmpty(filter.auto_apply))
