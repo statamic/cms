@@ -1,6 +1,6 @@
 <script>
 import ResizeObserver from 'resize-observer-polyfill';
-import { throttle } from 'lodash-es';
+import throttle from '@/util/throttle.js';
 
 export default {
     emits: ['resized'],
