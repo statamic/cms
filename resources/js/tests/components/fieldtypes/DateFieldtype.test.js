@@ -110,7 +110,6 @@ test('time can be updated', async () => {
             earliest_date: { date: null, time: null },
             latest_date: { date: null, time: null },
             time_enabled: true,
-            time_seconds_enabled: true,
         },
         value: { date: '2025-01-01', time: '15:00' },
     });
