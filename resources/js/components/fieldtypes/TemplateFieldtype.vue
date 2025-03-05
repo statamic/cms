@@ -29,7 +29,6 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 import PositionsSelectOptions from '../../mixins/PositionsSelectOptions';
-import { each } from 'lodash-es';
 
 export default {
     mixins: [Fieldtype, PositionsSelectOptions],
@@ -72,7 +71,7 @@ export default {
                 options.push({ label: __('Map to Blueprint'), value: '@blueprint' });
             }
 
-            each(templates, (template) => {
+            templates.forEach((template) => {
                 options.push({
                     label: this.config.folder ? template.substring(this.config.folder.length + 1) : template,
                     value: template,

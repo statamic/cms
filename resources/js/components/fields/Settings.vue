@@ -96,7 +96,6 @@
 import PublishField from '../publish/Field.vue';
 import { FieldConditionsBuilder, FIELD_CONDITIONS_KEYS } from '../field-conditions/FieldConditions.js';
 import FieldValidationBuilder from '../field-validation/Builder.vue';
-import { each } from 'lodash-es';
 
 export default {
     components: {
@@ -210,7 +209,7 @@ export default {
         updateFieldConditions(conditions) {
             let values = {};
 
-            each(this.values, (value, key) => {
+            Object.entries(this.values).forEach(([key, value]) => {
                 if (!FIELD_CONDITIONS_KEYS.includes(key)) {
                     values[key] = value;
                 }

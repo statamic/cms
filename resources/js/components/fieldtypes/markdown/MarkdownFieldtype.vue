@@ -192,7 +192,7 @@ import Fieldtype from '../Fieldtype.vue';
 import { marked } from 'marked';
 import { markRaw } from 'vue';
 import PlainTextRenderer from 'marked-plaintext';
-import { each, throttle } from 'lodash-es';
+import { throttle } from 'lodash-es';
 
 import CodeMirror from 'codemirror/lib/codemirror';
 import 'codemirror/addon/edit/closebrackets';
@@ -380,7 +380,7 @@ export default {
                 },
             };
 
-            each(self.selections, function (selection) {
+            self.selections.forEach(function (selection) {
                 let delimiter = elements[type]['delimiter'];
                 let replacement = self.getText(selection).match(elements[type]['pattern'])
                     ? self.removeInline(selection, elements[type]['delimiter'])
@@ -404,7 +404,7 @@ export default {
                 },
             };
 
-            each(self.selections, function (selection) {
+            self.selections.forEach(function (selection) {
                 let text = self.getText(selection);
                 let delimiter = elements[type]['delimiter'];
                 let replacement = text.match(elements[type]['pattern'])

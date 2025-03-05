@@ -1,5 +1,4 @@
 import SortableKeyValue from './SortableKeyValue.js';
-import { each } from 'lodash-es';
 
 export default {
     methods: {
@@ -18,7 +17,7 @@ export default {
         sortableToObject(sortable) {
             let obj = {};
 
-            each(sortable, (sortableKeyValue) => (obj[sortableKeyValue.key] = sortableKeyValue.value));
+            sortable.forEach((sortableKeyValue) => (obj[sortableKeyValue.key] = sortableKeyValue.value));
 
             return obj;
         },
@@ -26,7 +25,7 @@ export default {
         sortableToArray(sortable) {
             let arr = [];
 
-            each(sortable, (sortableKeyValue) => arr.push(sortableKeyValue.value));
+            sortable.forEach((sortableKeyValue) => arr.push(sortableKeyValue.value));
 
             return arr;
         },

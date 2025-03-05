@@ -1,5 +1,4 @@
 import { OPERATORS, ALIASES } from './Constants.js';
-import { each } from 'lodash-es';
 
 export default class {
     fromBlueprint(conditions, prefix = null) {
@@ -9,7 +8,7 @@ export default class {
     toBlueprint(conditions) {
         let converted = {};
 
-        each(conditions, (condition) => {
+        conditions.forEach((condition) => {
             converted[condition.field] = this.combineRhs(condition);
         });
 
