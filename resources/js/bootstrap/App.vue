@@ -6,7 +6,6 @@ import Login from '../components/login/Login.vue';
 import BaseEntryCreateForm from '../components/entries/BaseCreateForm.vue';
 import BaseTermCreateForm from '../components/terms/BaseCreateForm.vue';
 import CreateTermButton from '../components/terms/CreateTermButton.vue';
-import Importer from '../components/importer/importer';
 import FieldsetListing from '../components/fieldsets/Listing.vue';
 import FieldsetCreateForm from '../components/fieldsets/CreateForm.vue';
 import FieldsetEditForm from '../components/fieldsets/EditForm.vue';
@@ -55,7 +54,6 @@ export default {
         BaseEntryCreateForm,
         BaseTermCreateForm,
         CreateTermButton,
-        Importer,
         FieldsetListing,
         FieldsetCreateForm,
         FieldsetEditForm,
