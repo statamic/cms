@@ -291,7 +291,7 @@ import FocalPointEditor from './FocalPointEditor.vue';
 import PdfViewer from './PdfViewer.vue';
 import PublishFields from '../../publish/Fields.vue';
 import HasHiddenFields from '../../publish/HasHiddenFields';
-import { pick, isArray, flatten } from 'lodash-es';
+import { pick, flatten } from 'lodash-es';
 
 export default {
     emits: ['saved', 'closed', 'action-completed'],
@@ -418,7 +418,7 @@ export default {
 
                 // If there are no fields, it will be an empty array when PHP encodes
                 // it into JSON on the server. We'll ensure it's always an object.
-                this.values = isArray(data.values) ? {} : data.values;
+                this.values = Array.isArray(data.values) ? {} : data.values;
 
                 this.meta = data.meta;
                 this.actionUrl = data.actionUrl;
