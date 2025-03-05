@@ -150,9 +150,6 @@ class Date extends Fieldtype
 
     private function preProcessRange($value)
     {
-        // todo: use app timezone for storage stuff
-        // todo: rename system config timezoen back to display timezone for displaying stuff
-
         // If there's no value, return null, so we can handle the empty state on the Vue side.
         if (! $value) {
             return null;
