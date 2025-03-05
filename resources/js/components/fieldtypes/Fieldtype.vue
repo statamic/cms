@@ -1,6 +1,6 @@
 <script>
 import HasFieldActions from '../field-actions/HasFieldActions';
-import { debounce } from 'lodash-es';
+import debounce from '@/util/debounce.js';
 
 export default {
     emits: ['update:value', 'focus', 'blur', 'meta-updated', 'replicator-preview-updated'],

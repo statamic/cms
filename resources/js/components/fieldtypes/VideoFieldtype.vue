@@ -32,7 +32,7 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import { debounce } from 'lodash-es';
+import debounce from '@/util/debounce.js';
 
 export default {
     mixins: [Fieldtype],

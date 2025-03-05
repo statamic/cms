@@ -1,6 +1,6 @@
 import axios from 'axios';
 import speakingUrl from 'speakingurl';
-import { debounce } from 'lodash-es';
+import debounce from '@/util/debounce.js';
 
 export default class Slug {
     busy = false;

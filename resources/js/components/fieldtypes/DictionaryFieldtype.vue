@@ -94,7 +94,7 @@ import Fieldtype from './Fieldtype.vue';
 import HasInputOptions from './HasInputOptions.js';
 import { SortableList } from '../sortable/Sortable';
 import PositionsSelectOptions from '../../mixins/PositionsSelectOptions';
-import { debounce } from 'lodash-es';
+import debounce from '@/util/debounce.js';
 
 export default {
     mixins: [Fieldtype, HasInputOptions, PositionsSelectOptions],
