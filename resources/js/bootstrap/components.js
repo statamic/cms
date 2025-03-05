@@ -52,7 +52,6 @@ import CreateEntryButton from '../components/entries/CreateEntryButton.vue';
 import Popover from '../components/Popover.vue';
 import Portal from '../components/portals/Portal.vue';
 import PermissionTree from '../components/roles/PermissionTree.vue';
-import Modal from '../components/Modal.vue';
 import ConfirmationModal from '../components/modals/ConfirmationModal.vue';
 import FavoriteCreator from '../components/FavoriteCreator.vue';
 import KeyboardShortcutsModal from '../components/modals/KeyboardShortcutsModal.vue';
@@ -62,6 +61,7 @@ import Stack from '../components/stacks/Stack.vue';
 import StackTest from '../components/stacks/StackTest.vue';
 import CodeBlock from '../components/CodeBlock.vue';
 import BlueprintResetter from '../components/blueprints/BlueprintResetter.vue';
+import { defineAsyncComponent } from 'vue';
 
 export default function registerGlobalComponents(app) {
     // Core
@@ -136,7 +136,10 @@ export default function registerGlobalComponents(app) {
     app.component('role-permission-tree', PermissionTree);
 
     // Modals
-    app.component('modal', Modal);
+    app.component(
+        'modal',
+        defineAsyncComponent(() => import('../components/Modal.vue')),
+    );
     app.component('confirmation-modal', ConfirmationModal);
     app.component('favorite-creator', FavoriteCreator);
     app.component('keyboard-shortcuts-modal', KeyboardShortcutsModal);

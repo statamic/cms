@@ -3,7 +3,7 @@
         :handle="handle"
         :value="value"
         :store="store"
-        @input="update"
+        @update:value="update"
         :column-header="__('Format')"
     ></one-or-many-sites-field>
 </template>

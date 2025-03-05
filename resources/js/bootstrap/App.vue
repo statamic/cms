@@ -41,10 +41,10 @@ import TaxonomyEditForm from '../components/taxonomies/EditForm.vue';
 import TaxonomyBlueprintListing from '../components/taxonomies/BlueprintListing.vue';
 import AssetContainerCreateForm from '../components/asset-containers/CreateForm.vue';
 import AssetContainerEditForm from '../components/asset-containers/EditForm.vue';
-import NavBuilder from '../components/nav/Builder.vue';
 import Updater from '../components/updater/Updater.vue';
 import PortalTargets from '../components/portals/PortalTargets.vue';
 import SitesEditForm from '../components/sites/EditForm.vue';
+import { defineAsyncComponent } from 'vue';
 
 export default {
     components: {
@@ -90,7 +90,7 @@ export default {
         TaxonomyBlueprintListing,
         AssetContainerCreateForm,
         AssetContainerEditForm,
-        NavBuilder,
+        NavBuilder: defineAsyncComponent(() => import('../components/nav/Builder.vue')),
         Updater,
         PortalTargets,
         SitesEditForm,

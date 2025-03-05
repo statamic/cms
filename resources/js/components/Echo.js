@@ -1,7 +1,3 @@
-import LaravelEcho from 'laravel-echo';
-import Pusher from 'pusher-js';
-window.Pusher = Pusher;
-
 class Echo {
     constructor() {
         this.configCallbacks = [];
@@ -16,7 +12,14 @@ class Echo {
         this.bootedCallbacks.push(callback);
     }
 
-    start() {
+    async start() {
+        const [{ default: LaravelEcho }, { default: Pusher }] = await Promise.all([
+            import('laravel-echo'),
+            import('pusher-js'),
+        ]);
+
+        window.Pusher = Pusher;
+
         let config = {
             ...Statamic.$config.get('broadcasting.options'),
             csrfToken: Statamic.$config.get('csrfToken'),

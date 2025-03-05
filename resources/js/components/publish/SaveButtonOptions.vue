@@ -17,7 +17,7 @@
                         handle="save_and_continue_options"
                         :config="options"
                         :value="currentOption"
-                        @input="currentOption = $event"
+                        @update:value="currentOption = $event"
                     />
                 </div>
             </div>

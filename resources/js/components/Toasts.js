@@ -1,6 +1,9 @@
 export default class Toasts {
-    constructor(toasted) {
-        this.toasted = toasted;
+    #app;
+    #plugin;
+
+    constructor(app) {
+        this.#app = app;
     }
 
     registerInterceptor(axios) {
@@ -35,8 +38,32 @@ export default class Toasts {
         return opts;
     }
 
-    success(message, opts) {
-        this.toasted.success(
+    async #toasted() {
+        return new Promise(async (resolve) => {
+            if (!this.#plugin) {
+                const { default: Toasted, useToasted } = await import('@hoppscotch/vue-toasted');
+                import('@hoppscotch/vue-toasted/style.css');
+
+                this.#app.use(Toasted, {
+                    position: 'bottom-left',
+                    duration: 3500,
+                    theme: 'statamic',
+                    action: {
+                        text: '×',
+                        onClick: (e, toastObject) => {
+                            toastObject.goAway(0);
+                        },
+                    },
+                });
+                this.#plugin = useToasted();
+            }
+
+            resolve(this.#plugin);
+        });
+    }
+
+    async success(message, opts) {
+        (await this.#toasted()).success(
             message,
             this.#normalizeToastOptions({
                 iconPack: 'callback',
@@ -50,8 +77,8 @@ export default class Toasts {
         );
     }
 
-    info(message, opts) {
-        this.toasted.show(
+    async info(message, opts) {
+        (await this.#toasted()).show(
             message,
             this.#normalizeToastOptions({
                 iconPack: 'callback',
@@ -65,8 +92,8 @@ export default class Toasts {
         );
     }
 
-    error(message, opts) {
-        this.toasted.error(
+    async error(message, opts) {
+        (await this.#toasted()).error(
             message,
             this.#normalizeToastOptions({
                 iconPack: 'callback',
