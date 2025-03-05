@@ -192,7 +192,7 @@ import Fieldtype from '../Fieldtype.vue';
 import { marked } from 'marked';
 import { markRaw } from 'vue';
 import PlainTextRenderer from 'marked-plaintext';
-import { indexOf, each, throttle } from 'lodash-es';
+import { each, throttle } from 'lodash-es';
 
 import CodeMirror from 'codemirror/lib/codemirror';
 import 'codemirror/addon/edit/closebrackets';
@@ -353,7 +353,7 @@ export default {
         },
 
         getText: function (selection) {
-            var i = indexOf(this.selections, selection);
+            var i = this.selections.indexOf(selection);
 
             return this.codemirror.getSelections()[i];
         },

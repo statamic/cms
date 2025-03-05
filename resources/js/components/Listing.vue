@@ -3,7 +3,6 @@ import HasActions from './data-list/HasActions';
 import HasFilters from './data-list/HasFilters';
 import HasPagination from './data-list/HasPagination';
 import HasPreferences from './data-list/HasPreferences';
-import { indexOf } from 'lodash-es';
 
 export default {
     mixins: [HasActions, HasFilters, HasPagination, HasPreferences],
@@ -211,10 +210,7 @@ export default {
 
         removeRow(row) {
             let id = row.id;
-            let i = indexOf(
-                this.rows,
-                this.rows.find((r) => r.id === id),
-            );
+            let i = this.rows.indexOf(this.rows.find((r) => r.id === id));
             this.rows.splice(i, 1);
             if (this.rows.length === 0) location.reload();
         },
