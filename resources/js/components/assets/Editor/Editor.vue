@@ -426,7 +426,7 @@ export default {
 
                 this.fieldset = data.blueprint;
 
-                let fields = this.fields.tabs;
+                let fields = this.fieldset.tabs;
                 fields = fields.map((tab) => tab.sections);
                 fields = flatten(fields);
                 fields = fields.map((section) => section.fields);
