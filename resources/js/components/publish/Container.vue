@@ -4,7 +4,8 @@ import uniqid from 'uniqid';
 import Component from '../Component';
 import { getCurrentInstance, computed } from 'vue';
 import { usePublishContainerStore } from '@/stores/publish-container.js';
-import { clone, isEqual } from 'lodash-es';
+import { isEqual } from 'lodash-es';
+import clone from '@/util/clone.js';
 
 export default {
     emits: ['updated', 'focus', 'blur'],

@@ -92,7 +92,7 @@
 <script>
 import SiteSelector from '../SiteSelector.vue';
 import HasHiddenFields from '../publish/HasHiddenFields';
-import { clone } from 'lodash-es';
+import clone from '@/util/clone.js';
 
 export default {
     mixins: [HasHiddenFields],

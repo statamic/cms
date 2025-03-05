@@ -64,7 +64,7 @@
 import ChangePassword from './ChangePassword.vue';
 import HasHiddenFields from '../publish/HasHiddenFields';
 import HasActions from '../publish/HasActions';
-import { clone } from 'lodash-es';
+import clone from '@/util/clone.js';
 
 export default {
     mixins: [HasHiddenFields, HasActions],
