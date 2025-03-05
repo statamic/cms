@@ -366,7 +366,7 @@ class Date extends Fieldtype
             $carbon = $carbon->startOfDay();
         }
 
-        return $carbon->setTimezone('UTC');
+        return $carbon->utc();
     }
 
     private function parseSavedToCarbon($value): Carbon
