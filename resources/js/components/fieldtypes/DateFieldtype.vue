@@ -335,7 +335,7 @@ export default {
             this.localValue = {
                 date,
                 time: this.config.time_enabled ? this.localValue.time : '00:00',
-            }
+            };
         },
 
         setLocalTime(time) {
