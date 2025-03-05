@@ -4,7 +4,7 @@ export default {
     methods: {
         normalizeInputOptions(options) {
             if (!Array.isArray(options)) {
-                return _.map(options, (value, key) => {
+                return Object.entries(options).map(([key, value]) => {
                     return {
                         value: Array.isArray(options) ? value : key,
                         label: __(value) || key,
@@ -12,7 +12,7 @@ export default {
                 });
             }
 
-            return _.map(options, (option) => {
+            return options.map((option) => {
                 if (typeof option === 'object') {
                     let valueKey = 'value';
                     let labelKey = 'label';

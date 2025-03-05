@@ -56,7 +56,7 @@ export default {
         replicatorPreview() {
             if (!this.showFieldPreviews || !this.config.replicator_preview) return;
 
-            var option = _.findWhere(this.options, { value: this.value });
+            var option = this.options.find((o) => o.value === this.value);
             return option ? option.label : this.value;
         },
     },

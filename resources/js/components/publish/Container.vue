@@ -4,6 +4,8 @@ import uniqid from 'uniqid';
 import Component from '../Component';
 import { getCurrentInstance, computed } from 'vue';
 import { usePublishContainerStore } from '@/stores/publish-container.js';
+import { isEqual } from 'lodash-es';
+import clone from '@/util/clone.js';
 
 export default {
     emits: ['updated', 'focus', 'blur'],
@@ -53,11 +55,11 @@ export default {
     data() {
         return {
             store: usePublishContainerStore(this.name, {
-                blueprint: _.clone(this.blueprint),
-                values: _.clone(this.values),
-                extraValues: _.clone(this.extraValues),
-                meta: _.clone(this.meta),
-                localizedFields: _.clone(this.localizedFields),
+                blueprint: clone(this.blueprint),
+                values: clone(this.values),
+                extraValues: clone(this.extraValues),
+                meta: clone(this.meta),
+                localizedFields: clone(this.localizedFields),
                 site: this.site,
                 isRoot: this.isRoot,
                 reference: this.reference,
@@ -150,7 +152,7 @@ export default {
             deep: true,
             handler(after) {
                 const before = this.store.values;
-                if (_.isEqual(before, after)) return;
+                if (isEqual(before, after)) return;
                 this.store.setValues(after);
             },
         },
@@ -159,7 +161,7 @@ export default {
             deep: true,
             handler(after) {
                 const before = this.store.extraValues;
-                if (_.isEqual(before, after)) return;
+                if (isEqual(before, after)) return;
                 this.store.setExtraValues(after);
             },
         },
@@ -168,7 +170,7 @@ export default {
             deep: true,
             handler(after) {
                 const before = this.store.meta;
-                if (_.isEqual(before, after)) return;
+                if (isEqual(before, after)) return;
                 this.store.setMeta(after);
             },
         },

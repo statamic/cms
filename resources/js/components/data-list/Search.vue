@@ -12,6 +12,8 @@
 </template>
 
 <script>
+import debounce from '@/util/debounce.js';
+
 export default {
     props: ['value'],
 
@@ -27,7 +29,7 @@ export default {
     },
 
     methods: {
-        emitEvent: _.debounce(function (event) {
+        emitEvent: debounce(function (event) {
             this.$emit('input', event.target.value);
         }, 300),
 

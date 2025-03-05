@@ -46,19 +46,19 @@ export default {
 
             // Filter out partials
             if (this.config.hide_partials) {
-                templates = _.reject(templates, (template) => {
-                    return template.startsWith('partials/') || template.match(/(^_.*|\/_.*|\._.*)/g);
+                templates = templates.filter((template) => {
+                    return !(template.startsWith('partials/') || template.match(/(^_.*|\/_.*|\._.*)/g));
                 });
             }
 
             // Filter out error templates
-            templates = _.reject(templates, (template) => {
-                return template.startsWith('errors/');
+            templates = templates.filter((template) => {
+                return !template.startsWith('errors/');
             });
 
             // Filter templates in folder
             if (this.config.folder) {
-                templates = _.filter(templates, (template) => {
+                templates = templates.filter((template) => {
                     return template.startsWith(`${this.config.folder}/`);
                 });
             }
@@ -71,7 +71,7 @@ export default {
                 options.push({ label: __('Map to Blueprint'), value: '@blueprint' });
             }
 
-            _.each(templates, (template) => {
+            templates.forEach((template) => {
                 options.push({
                     label: this.config.folder ? template.substring(this.config.folder.length + 1) : template,
                     value: template,

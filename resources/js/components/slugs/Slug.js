@@ -1,5 +1,6 @@
 import axios from 'axios';
 import speakingUrl from 'speakingurl';
+import debounce from '@/util/debounce.js';
 
 export default class Slug {
     busy = false;
@@ -36,7 +37,7 @@ export default class Slug {
     async() {
         this.#async = true;
 
-        this.#debounced = _.debounce(function (resolve, reject) {
+        this.#debounced = debounce(function (resolve, reject) {
             return this.#performRequest()
                 .then((slug) => resolve(slug))
                 .catch((e) => reject(e));

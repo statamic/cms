@@ -43,6 +43,7 @@
 
 <script>
 import HasInputOptions from '../fieldtypes/HasInputOptions.js';
+import { flatten, sortBy, range } from 'lodash-es';
 
 const onEachSide = 3;
 
@@ -98,7 +99,7 @@ export default {
                 els.last,
             ].filter((i) => i !== null);
 
-            return _.flatten(pages);
+            return flatten(pages);
         },
 
         elements() {
@@ -147,7 +148,7 @@ export default {
                 label: `${defaultPaginationSize}`,
             });
 
-            return _.sortBy(options, 'value');
+            return sortBy(options, 'value');
         },
 
         isPerPageEvenUseful() {
@@ -239,7 +240,7 @@ export default {
         },
 
         getRange(start, end) {
-            return _.range(start, end + 1);
+            return range(start, end + 1);
         },
     },
 };

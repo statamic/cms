@@ -337,7 +337,7 @@ export default {
         this.bard.events.on('link-selected', this.applyAttrs);
         this.bard.events.on('link-deselected', () => this.$emit('deselected'));
 
-        if (_.isEmpty(this.linkAttrs) && this.selectedTextIsEmail) {
+        if (Object.keys(this.linkAttrs).length === 0 && this.selectedTextIsEmail) {
             this.linkType = 'mailto';
             this.urlData = { mailto: this.selectedTextIsEmail };
         }

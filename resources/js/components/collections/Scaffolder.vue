@@ -76,7 +76,7 @@ export default {
 
     computed: {
         canSubmit() {
-            return !_.isEmpty(this.files);
+            return Object.keys(this.files).length > 0;
         },
 
         files() {

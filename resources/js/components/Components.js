@@ -25,14 +25,14 @@ class Components {
     }
 
     getAppended(id) {
-        return _.findWhere(this.components.value, { id });
+        return this.components.value.find((c) => c.id === id);
     }
 
     destroy(id) {
         let appended = this.getAppended(id);
 
         if (appended) {
-            const index = _.indexOf(this.components.value, appended);
+            const index = this.components.value.indexOf(appended);
             this.components.value.splice(index, 1);
         }
     }

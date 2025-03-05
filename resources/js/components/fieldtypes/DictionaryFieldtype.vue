@@ -94,6 +94,7 @@ import Fieldtype from './Fieldtype.vue';
 import HasInputOptions from './HasInputOptions.js';
 import { SortableList } from '../sortable/Sortable';
 import PositionsSelectOptions from '../../mixins/PositionsSelectOptions';
+import debounce from '@/util/debounce.js';
 
 export default {
     mixins: [Fieldtype, HasInputOptions, PositionsSelectOptions],
@@ -206,7 +207,7 @@ export default {
             });
         },
 
-        search: _.debounce(function (search, loading) {
+        search: debounce(function (search, loading) {
             loading(true);
 
             this.request({ search }).then((response) => loading(false));

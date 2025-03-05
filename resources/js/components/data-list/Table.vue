@@ -232,7 +232,7 @@ export default {
         },
 
         getFieldtype(columnName) {
-            let field = _.find(this.sharedState.columns, function (field) {
+            let field = this.sharedState.columns.find(function (field) {
                 return columnName === field.field;
             });
 
@@ -240,7 +240,7 @@ export default {
         },
 
         actualIndex(row) {
-            return _.findIndex(this.sharedState.originalRows, row);
+            return this.sharedState.originalRows.findIndex((r) => r === row);
         },
 
         rowClicked(row, index, $event) {

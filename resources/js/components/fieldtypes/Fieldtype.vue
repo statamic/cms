@@ -1,5 +1,6 @@
 <script>
 import HasFieldActions from '../field-actions/HasFieldActions';
+import debounce from '@/util/debounce.js';
 
 export default {
     emits: ['update:value', 'focus', 'blur', 'meta-updated', 'replicator-preview-updated'],
@@ -54,7 +55,7 @@ export default {
             this.$emit('update:value', value);
         },
 
-        updateDebounced: _.debounce(function (value) {
+        updateDebounced: debounce(function (value) {
             this.update(value);
         }, 150),
 

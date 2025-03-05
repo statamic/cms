@@ -51,7 +51,8 @@ export default {
 
     computed: {
         fieldConfig() {
-            return _.omit(this.field, ['_id', 'type']);
+            const { _id, type, ...config } = this.field;
+            return config;
         },
     },
 

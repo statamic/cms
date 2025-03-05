@@ -32,6 +32,7 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
+import debounce from '@/util/debounce.js';
 
 export default {
     mixins: [Fieldtype],
@@ -44,7 +45,7 @@ export default {
     },
 
     watch: {
-        data: _.debounce(function (value) {
+        data: debounce(function (value) {
             this.update(value);
         }, 500),
 

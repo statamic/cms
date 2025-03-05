@@ -236,6 +236,7 @@
 <script>
 import HasFilters from '../../data-list/HasFilters';
 import { defineAsyncComponent } from 'vue';
+import clone from '@/util/clone.js';
 
 export default {
     mixins: [HasFilters],
@@ -277,7 +278,7 @@ export default {
             sortColumn: this.initialSortColumn,
             sortDirection: this.initialSortDirection,
             page: 1,
-            selections: _.clone(this.initialSelections),
+            selections: clone(this.initialSelections),
             columns: this.initialColumns,
             visibleColumns: this.initialColumns.filter((column) => column.visible),
             view: 'list',

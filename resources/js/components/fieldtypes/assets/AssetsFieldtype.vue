@@ -183,6 +183,7 @@ import Selector from '../../assets/Selector.vue';
 import Uploader from '../../assets/Uploader.vue';
 import Uploads from '../../assets/Uploads.vue';
 import { SortableList } from '../../sortable/Sortable';
+import { isEqual } from 'lodash-es';
 
 export default {
     components: {
@@ -327,7 +328,7 @@ export default {
          * The IDs of the assets.
          */
         assetIds() {
-            return _.pluck(this.assets, 'id');
+            return this.assets.map((asset) => asset.id);
         },
 
         /**
@@ -355,11 +356,13 @@ export default {
             if (!this.showFieldPreviews || !this.config.replicator_preview) return;
 
             return replicatorPreviewHtml(
-                _.map(this.assets, (asset) => {
-                    return asset.isImage || asset.isSvg
-                        ? `<img src="${asset.thumbnail}" width="20" class="max-w-5 max-h-5" height="20" title="${asset.basename}" />`
-                        : asset.basename;
-                }).join(', '),
+                this.assets
+                    .map((asset) => {
+                        return asset.isImage || asset.isSvg
+                            ? `<img src="${asset.thumbnail}" width="20" class="max-w-5 max-h-5" height="20" title="${asset.basename}" />`
+                            : asset.basename;
+                    })
+                    .join(', '),
             );
         },
 
@@ -495,7 +498,7 @@ export default {
          * When an asset is updated in the editor
          */
         assetUpdated(asset) {
-            const index = _(this.assets).findIndex({ id: asset.id });
+            const index = this.assets.findIndex((a) => a.id === asset.id);
             this.assets.splice(index, 1, asset);
         },
 
@@ -503,7 +506,7 @@ export default {
          * When an asset remove button was clicked.
          */
         assetRemoved(asset) {
-            const index = _(this.assets).findIndex({ id: asset.id });
+            const index = this.assets.findIndex((a) => a.id === asset.id);
             this.assets.splice(index, 1);
         },
 
@@ -628,7 +631,7 @@ export default {
         },
 
         value(value) {
-            if (_.isEqual(value, this.assetIds)) return;
+            if (isEqual(value, this.assetIds)) return;
 
             this.syncDynamicFolderFromValue(value);
 

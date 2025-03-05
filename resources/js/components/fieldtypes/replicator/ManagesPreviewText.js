@@ -3,8 +3,8 @@ import PreviewHtml from './PreviewHtml';
 export default {
     computed: {
         previewText() {
-            const previews = _(this.previews).filter((value, handle) => {
-                const config = _.findWhere(this.config.fields, { handle }) || {};
+            const previews = this.previews.filter((value, handle) => {
+                const config = this.config.fields.find((f) => f.handle === handle) || {};
                 return config.replicator_preview === undefined ? this.showFieldPreviews : config.replicator_preview;
             });
 
