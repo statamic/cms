@@ -125,7 +125,6 @@
 <script>
 import TableField from './TableField.vue';
 import SortableList from '../sortable/SortableList.vue';
-import { findIndex } from 'lodash-es';
 
 export default {
     components: {
