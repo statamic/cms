@@ -55,8 +55,8 @@ undefined
 GQL;
 
         $this->assertGqlEntryHas($query, [
-            'default' => '2017-12-25 1:29pm',
-            'formatted' => '1514208540',
+            'default' => '2017-12-25 6:29pm',
+            'formatted' => '1514226540',
             'undefined' => null,
         ]);
 
