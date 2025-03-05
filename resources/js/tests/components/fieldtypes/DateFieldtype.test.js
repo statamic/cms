@@ -61,7 +61,7 @@ test('date and time is localized to the users timezone', async () => {
 
 test('date can be updated', async () => {
     const dateField = makeDateField({
-        value: { date: '2025-01-01', time: '05:00' },
+        value: { date: '2025-01-01', time: '10:00' },
     });
 
     await dateField.vm.setLocalDate('2024-12-10');
@@ -79,8 +79,39 @@ test('date can be updated', async () => {
     });
 });
 
+test('date can be updated without resetting the time when time_enabled is true', async () => {
+    const dateField = makeDateField({
+        config: {
+            earliest_date: { date: null, time: null },
+            latest_date: { date: null, time: null },
+            time_enabled: true,
+        },
+        value: { date: '2025-01-01', time: '10:00' },
+    });
+
+    await dateField.vm.setLocalDate('2024-12-10');
+
+    expect(dateField.emitted('update:value')[0]).toEqual([
+        {
+            date: '2024-12-10',
+            time: '10:00',
+        },
+    ]);
+
+    expect(dateField.vm.localValue).toMatchObject({
+        date: '2024-12-10',
+        time: '05:00',
+    });
+});
+
 test('time can be updated', async () => {
     const dateField = makeDateField({
+        config: {
+            earliest_date: { date: null, time: null },
+            latest_date: { date: null, time: null },
+            time_enabled: true,
+            time_seconds_enabled: true,
+        },
         value: { date: '2025-01-01', time: '15:00' },
     });
 
