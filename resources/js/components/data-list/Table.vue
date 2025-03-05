@@ -241,7 +241,7 @@ export default {
         },
 
         actualIndex(row) {
-            return findIndex(this.sharedState.originalRows, row);
+            return this.sharedState.originalRows.findIndex((r) => r === row);
         },
 
         rowClicked(row, index, $event) {

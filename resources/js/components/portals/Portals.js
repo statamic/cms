@@ -1,6 +1,5 @@
 import Portal from './Portal';
 import { ref } from 'vue';
-import { findIndex } from 'lodash-es';
 
 export default class Portals {
     constructor() {
@@ -20,7 +19,7 @@ export default class Portals {
     }
 
     destroy(id) {
-        const i = findIndex(this.portals.value, (portal) => portal.id === id);
+        const i = this.portals.value.findIndex((portal) => portal.id === id);
 
         this.portals.value.splice(i, 1);
     }
