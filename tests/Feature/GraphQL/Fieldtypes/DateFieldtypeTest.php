@@ -30,7 +30,6 @@ class DateFieldtypeTest extends FieldtypeTestCase
     {
         // Set the timezone. We want to ensure the date is always returned in UTC.
         config()->set('app.timezone', 'America/New_York'); // -05:00
-        date_default_timezone_set('America/New_York');
 
         // Set the to string format so can see it uses that rather than a coincidence.
         // But reset it afterwards.
