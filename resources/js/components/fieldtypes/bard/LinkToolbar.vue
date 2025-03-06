@@ -522,7 +522,7 @@ export default {
         },
 
         getAppendsForUrl(urlString) {
-            if (! urlString) {
+            if (! urlString?.includes('statamic://entry::')) {
                 return null;
             }
 
