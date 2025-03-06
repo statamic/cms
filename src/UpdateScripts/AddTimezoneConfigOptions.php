@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Statamic\Listeners\Concerns\GetsItemsContainingData;
 
-class AddTimezoneOptionsToSystemConfig extends UpdateScript
+class AddTimezoneConfigOptions extends UpdateScript
 {
     use GetsItemsContainingData;
 

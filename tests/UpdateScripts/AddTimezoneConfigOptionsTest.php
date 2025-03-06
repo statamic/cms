@@ -4,18 +4,18 @@ namespace Tests\UpdateScripts;
 
 use Illuminate\Support\Facades\File;
 use PHPUnit\Framework\Attributes\Test;
-use Statamic\UpdateScripts\AddTimezoneOptionsToSystemConfig;
+use Statamic\UpdateScripts\AddTimezoneConfigOptions;
 use Tests\TestCase;
 use Tests\UpdateScripts\Concerns\RunsUpdateScripts;
 
-class AddTimezoneOptionsToSystemConfigTest extends TestCase
+class AddTimezoneConfigOptionsTest extends TestCase
 {
     use RunsUpdateScripts;
 
     #[Test]
     public function it_is_registered()
     {
-        $this->assertUpdateScriptRegistered(AddTimezoneOptionsToSystemConfig::class);
+        $this->assertUpdateScriptRegistered(AddTimezoneConfigOptions::class);
     }
 
     #[Test]
@@ -40,7 +40,7 @@ return [
 EOT
         );
 
-        $this->runUpdateScript(AddTimezoneOptionsToSystemConfig::class);
+        $this->runUpdateScript(AddTimezoneConfigOptions::class);
 
         $systemConfig = File::get(app()->configPath('statamic/system.php'));
 
