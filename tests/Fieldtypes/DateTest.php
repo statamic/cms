@@ -166,7 +166,7 @@ class DateTest extends TestCase
                 'UTC',
                 [],
                 ['date' => '2012-08-29', 'time' => '00:00'],
-                '2012-08-29',
+                '2012-08-29 00:00',
             ],
             'date with custom format' => [
                 'UTC',
@@ -178,13 +178,13 @@ class DateTest extends TestCase
                 'America/New_York', // -4000
                 [],
                 ['date' => '2012-08-29', 'time' => '00:00'],
-                '2012-08-28',
+                '2012-08-28 20:00',
             ],
             'date with missing time' => [
                 'UTC',
                 [],
                 ['date' => '2012-08-29'],
-                '2012-08-29',
+                '2012-08-29 00:00',
             ],
             'date with time' => [
                 'UTC',
