@@ -881,7 +881,7 @@ class EntryTest extends TestCase
         $entry = (new Entry)->collection($collection)->locale('en')->slug('post');
 
         $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/post.md', $entry->path());
-        $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/2018-01-02-0000.post.md', $entry->date('2018-01-02')->path());
+        $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/2018-01-02.post.md', $entry->date('2018-01-02')->path());
     }
 
     #[Test]
@@ -896,7 +896,7 @@ class EntryTest extends TestCase
         $entry = (new Entry)->collection($collection)->locale('en')->slug('post');
 
         $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/en/post.md', $entry->path());
-        $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/en/2018-01-02-0000.post.md', $entry->date('2018-01-02')->path());
+        $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/en/2018-01-02.post.md', $entry->date('2018-01-02')->path());
     }
 
     #[Test]
@@ -959,30 +959,30 @@ class EntryTest extends TestCase
     public static function dateCollectionEntriesProvider()
     {
         return [
-            'no date explicitly set, time not explicitly enabled' => [null, null, null, '2015-09-24 13:45:00', false, false, 'foo'], // Even though time isn't enabled, it should still be saved because of timezones.
+            'no date explicitly set, time not explicitly enabled' => [null, null, null, '2015-09-24 00:00:00', false, false, 'foo'], // By default, the date field added to dated collection blueprints does not have time enabled.
             'no date explicitly set, time enabled, seconds enabled' => [null, true, true, '2015-09-24 13:45:23', true, true, 'foo'],
             'no date explicitly set, time enabled, seconds disabled' => [null, true, false, '2015-09-24 13:45:00', true, false, 'foo'], // Seconds are disabled, so they should be zeroed out.
 
-            'date set, time not explicitly enabled' => ['2023-04-19-1425', null, null, '2023-04-19 14:25:00', false, false, '2023-04-19-1425.foo'],
+            'date set, time not explicitly enabled' => ['2023-04-19', null, null, '2023-04-19 00:00:00', false, false, '2023-04-19.foo'],
             'date set, time enabled, seconds enabled' => ['2023-04-19', true, true, '2023-04-19 00:00:00', true, true, '2023-04-19-000000.foo'],
             'date set, time enabled, seconds disabled' => ['2023-04-19', true, false, '2023-04-19 00:00:00', true, false, '2023-04-19-0000.foo'],
 
-            'datetime set, time not explicitly enabled' => ['2023-04-19-1425', null, null, '2023-04-19 14:25:00', false, false, '2023-04-19-1425.foo'], // Even though time isn't enabled, it should still be saved because of timezones.
+            'datetime set, time not explicitly enabled' => ['2023-04-19-1425', null, null, '2023-04-19 00:00:00', false, false, '2023-04-19.foo'], // Time is not enabled, so it should be zeroed out.
             'datetime set, time enabled, seconds enabled' => ['2023-04-19-1425', true, true, '2023-04-19 14:25:00', true, true, '2023-04-19-142500.foo'],
             'datetime set, time enabled, seconds disabled' => ['2023-04-19-1425', true, false, '2023-04-19 14:25:00', true, false, '2023-04-19-1425.foo'],
 
-            'datetime with seconds set, time not explicitly enabled' => ['2023-04-19-142512', null, null, '2023-04-19 14:25:00', false, false, '2023-04-19-1425.foo'], // Even though time isn't enabled, it should still be saved because of timezones.
+            'datetime with seconds set, time not explicitly enabled' => ['2023-04-19-142512', null, null, '2023-04-19 00:00:00', false, false, '2023-04-19.foo'], // Time is not enabled, so it should be zeroed out.
             'datetime with seconds set, time enabled, seconds enabled' => ['2023-04-19-142512', true, true, '2023-04-19 14:25:12', true, true, '2023-04-19-142512.foo'],
             'datetime with seconds set, time enabled, seconds disabled' => ['2023-04-19-142512', true, false, '2023-04-19 14:25:00', true, false, '2023-04-19-1425.foo'], // Seconds are disabled, so they should be zeroed out.
 
-            'date set, time disabled' => ['2023-04-19', false, null, '2023-04-19 00:00:00', false, false, '2023-04-19-0000.foo'],
-            'date set, time disabled, seconds enabled' => ['2023-04-19', false, true, '2023-04-19 00:00:00', false, false, '2023-04-19-0000.foo'], // Time is disabled, so seconds should be disabled too.
+            'date set, time disabled' => ['2023-04-19', false, null, '2023-04-19 00:00:00', false, false, '2023-04-19.foo'],
+            'date set, time disabled, seconds enabled' => ['2023-04-19', false, true, '2023-04-19 00:00:00', false, false, '2023-04-19.foo'], // Time is disabled, so seconds should be disabled too.
 
-            'datetime set, time disabled' => ['2023-04-19-1425', false, null, '2023-04-19 14:25:00', false, false, '2023-04-19-1425.foo'],
-            'datetime set, time disabled, seconds enabled' => ['2023-04-19-1425', false, true, '2023-04-19 14:25:00', false, false, '2023-04-19-1425.foo'], // Time is disabled, so seconds should be disabled too.
+            'datetime set, time disabled' => ['2023-04-19-1425', false, null, '2023-04-19 00:00:00', false, false, '2023-04-19.foo'],
+            'datetime set, time disabled, seconds enabled' => ['2023-04-19-1425', false, true, '2023-04-19 00:00:00', false, false, '2023-04-19.foo'], // Time is disabled, so seconds should be disabled too.
 
-            'datetime with seconds set, time disabled' => ['2023-04-19-142512', false, null, '2023-04-19 14:25:00', false, false, '2023-04-19-1425.foo'],
-            'datetime with seconds set, time disabled, seconds enabled' => ['2023-04-19-142512', false, true, '2023-04-19 14:25:00', false, false, '2023-04-19-1425.foo'], // Time is disabled, so seconds should be disabled too.
+            'datetime with seconds set, time disabled' => ['2023-04-19-142512', false, null, '2023-04-19 00:00:00', false, false, '2023-04-19.foo'],
+            'datetime with seconds set, time disabled, seconds enabled' => ['2023-04-19-142512', false, true, '2023-04-19 00:00:00', false, false, '2023-04-19.foo'], // Time is disabled, so seconds should be disabled too.
         ];
     }
 

@@ -479,7 +479,11 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         $prefix = '';
 
         if ($this->hasDate() && $this->date) {
-            $format = 'Y-m-d-Hi';
+            $format = 'Y-m-d';
+
+            if ($this->hasTime()) {
+                $format .= '-Hi';
+            }
 
             if ($this->hasSeconds()) {
                 $format .= 's';
@@ -560,6 +564,10 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
                 }
 
                 $date = $date ?? optional($this->origin())->date() ?? $this->lastModified();
+
+                if (! $this->hasTime()) {
+                    $date->startOfDay();
+                }
 
                 if (! $this->hasSeconds()) {
                     $date->startOfMinute();
