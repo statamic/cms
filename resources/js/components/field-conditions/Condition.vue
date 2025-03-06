@@ -74,7 +74,6 @@
 </template>
 
 <script>
-import _ from 'underscore/modules/underscore';
 import HasInputOptions from '../fieldtypes/HasInputOptions.js';
 
 export default {
@@ -133,9 +132,9 @@ export default {
         fieldOptions() {
             const conditions = this.conditions.map((condition) => condition.field);
 
-            return _(this.suggestableFields)
-                .reject((field) => {
-                    return (
+            return this.suggestableFields
+                .filter((field) => {
+                    return !(
                         field.handle === this.config.handle || // Exclude the field you're adding a condition to.
                         this.condition.field === field.handle || // Exclude the field being used in the current condition.
                         conditions.includes(field.handle)

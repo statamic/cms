@@ -1,4 +1,5 @@
 import Values from './Values.js';
+import { pick } from 'lodash-es';
 
 export default {
     computed: {
@@ -15,10 +16,7 @@ export default {
         },
 
         visibleValues() {
-            let omittableFields = _.chain(this.hiddenFields)
-                .pick((field) => field.omitValue)
-                .keys()
-                .value();
+            let omittableFields = Object.keys(pick(this.hiddenFields, (field) => field.omitValue));
 
             return new Values(this.values, this.jsonSubmittingFields).except(omittableFields);
         },

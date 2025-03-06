@@ -111,6 +111,7 @@
 <script>
 import DataListFilter from './Filter.vue';
 import FieldFilter from './FieldFilter.vue';
+import { isEqual } from 'lodash-es';
 
 export default {
     components: {
@@ -174,7 +175,7 @@ export default {
         },
 
         creatingFilter() {
-            return _.find(this.unpinnedFilters, (filter) => filter.handle === this.creating);
+            return this.unpinnedFilters.find((filter) => filter.handle === this.creating);
         },
 
         creatingFilterHeader() {
@@ -192,11 +193,12 @@ export default {
         },
 
         standardBadges() {
-            return _.omit(this.activeFilterBadges, 'fields');
+            const { fields, ...badges } = this.activeFilterBadges;
+            return badges;
         },
 
         isFiltering() {
-            return !_.isEmpty(this.activeFilters) || this.searchQuery || this.activePreset;
+            return Object.keys(this.activeFilters).length || this.searchQuery || this.activePreset;
         },
 
         isDirty() {
@@ -205,7 +207,7 @@ export default {
             if (this.activePreset) {
                 return (
                     this.activePresetPayload.query != this.searchQuery ||
-                    !_.isEqual(this.activePresetPayload.filters || {}, this.activeFilters)
+                    !isEqual(this.activePresetPayload.filters || {}, this.activeFilters)
                 );
             }
 

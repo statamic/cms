@@ -235,13 +235,14 @@
 
 <script>
 import HasFilters from '../../data-list/HasFilters';
-import PageTree from '../../structures/PageTree.vue';
+import { defineAsyncComponent } from 'vue';
+import clone from '@statamic/util/clone.js';
 
 export default {
     mixins: [HasFilters],
 
     components: {
-        PageTree,
+        PageTree: defineAsyncComponent(() => import('../../structures/PageTree.vue')),
     },
 
     props: {
@@ -277,7 +278,7 @@ export default {
             sortColumn: this.initialSortColumn,
             sortDirection: this.initialSortDirection,
             page: 1,
-            selections: _.clone(this.initialSelections),
+            selections: clone(this.initialSelections),
             columns: this.initialColumns,
             visibleColumns: this.initialColumns.filter((column) => column.visible),
             view: 'list',

@@ -186,7 +186,7 @@ export default {
         },
 
         loadAsset(id) {
-            let preloaded = _.find(this.store.preloadedAssets, (asset) => asset.id === id);
+            let preloaded = this.store.preloadedAssets.find((asset) => asset.id === id);
 
             if (preloaded) {
                 // TODO

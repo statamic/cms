@@ -87,6 +87,8 @@
 import Provider from '../portals/Provider.vue';
 import Resizer from './Resizer.vue';
 import UpdatesIframe from './UpdatesIframe';
+import { mapValues } from 'lodash-es';
+import debounce from '@statamic/util/debounce.js';
 
 let source;
 const widthLocalStorageKey = 'statamic.live-preview.editor-width';
@@ -145,7 +147,7 @@ export default {
 
         targetSelectOptions() {
             return Object.values(
-                _.mapObject(this.targets, (target, key) => {
+                mapValues(this.targets, (target, key) => {
                     return { value: key, label: __(target.label) };
                 }),
             );
@@ -153,7 +155,7 @@ export default {
 
         deviceSelectOptions() {
             let options = Object.values(
-                _.mapObject(this.$config.get('livePreview.devices'), (dimensions, device) => {
+                mapValues(this.$config.get('livePreview.devices'), (dimensions, device) => {
                     if (device === 'Responsive') {
                         return { value: null, label: __('Responsive') };
                     }
@@ -256,7 +258,7 @@ export default {
     },
 
     methods: {
-        update: _.debounce(function () {
+        update: debounce(function () {
             if (source) source.abort();
             source = new AbortController();
 

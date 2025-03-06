@@ -52,6 +52,8 @@
 <script>
 import Validator from '../field-conditions/Validator.js';
 import PublishField from '../publish/Field.vue';
+import { sortBy } from 'lodash-es';
+import debounce from '@statamic/util/debounce.js';
 
 export default {
     components: { PublishField },
@@ -91,7 +93,7 @@ export default {
                 };
             });
 
-            return _.sortBy(options, (option) => option.label);
+            return sortBy(options, (option) => option.label);
         },
 
         showFieldFilter() {
@@ -192,7 +194,7 @@ export default {
         },
 
         setFilter(field) {
-            this.filter = _.find(this.availableFieldFilters, (filter) => filter.handle === field);
+            this.filter = this.availableFieldFilters.find((filter) => filter.handle === field);
         },
 
         setDefaultValues() {
@@ -216,7 +218,7 @@ export default {
             this.containerValues = clone(values);
         },
 
-        updateFieldValues: _.debounce(function (values) {
+        updateFieldValues: debounce(function (values) {
             this.fieldValues = clone(values);
         }, 300),
 

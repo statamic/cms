@@ -114,7 +114,7 @@ export default {
                 selections = [selections];
             }
             return selections.map((value) => {
-                return _.findWhere(this.options, { value }) || { value, label: value };
+                return this.options.find((o) => o.value === value) || { value, label: value };
             });
         },
 

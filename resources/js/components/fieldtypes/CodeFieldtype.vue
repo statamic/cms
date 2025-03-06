@@ -116,7 +116,7 @@ export default {
 
     computed: {
         modeLabel() {
-            return _.findWhere(this.modes, { value: this.mode }).label || this.mode;
+            return this.modes.find((m) => m.value === this.mode).label || this.mode;
         },
         exactTheme() {
             return this.config.theme === 'light' ? 'default' : 'material';

@@ -95,7 +95,6 @@ import ReplicatorSet from './Set.vue';
 import AddSetButton from './AddSetButton.vue';
 import ManagesSetMeta from './ManagesSetMeta';
 import { SortableList } from '../../sortable/Sortable';
-import reduce from 'underscore/modules/reduce';
 
 export default {
     mixins: [Fieldtype, ManagesSetMeta],
@@ -129,13 +128,9 @@ export default {
         },
 
         setConfigs() {
-            return reduce(
-                this.groupConfigs,
-                (sets, group) => {
-                    return sets.concat(group.sets);
-                },
-                [],
-            );
+            return this.groupConfigs.reduce((sets, group) => {
+                return sets.concat(group.sets);
+            }, []);
         },
 
         groupConfigs() {
@@ -189,7 +184,7 @@ export default {
 
     methods: {
         setConfig(handle) {
-            return _.find(this.setConfigs, { handle }) || {};
+            return this.setConfigs.find((c) => c.handle === handle) || {};
         },
 
         updated(index, set) {
@@ -263,7 +258,7 @@ export default {
         },
 
         collapseAll() {
-            this.collapsed = _.pluck(this.value, '_id');
+            this.collapsed = this.value.map((v) => v._id);
         },
 
         expandAll() {

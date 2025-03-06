@@ -24,10 +24,9 @@ export default {
         },
 
         checkMaximumAmountOfItems() {
-            this.sharedState.selections = _.chain(this.sharedState.rows)
-                .map((item) => item.id)
-                .first(this.sharedState.maxSelections ?? Infinity)
-                .value();
+            let selections = this.sharedState.rows.map((row) => row.id);
+            if (this.sharedState.maxSelections) selections = selections.slice(0, this.sharedState.maxSelections);
+            this.sharedState.selections = selections;
         },
 
         uncheckAllItems() {

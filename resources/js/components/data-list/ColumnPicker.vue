@@ -115,6 +115,7 @@
 
 <script>
 import { SortableList } from '../sortable/Sortable';
+import { sortBy } from 'lodash-es';
 
 export default {
     components: {
@@ -153,7 +154,7 @@ export default {
         setLocalColumns() {
             this.selectedColumns = this.sharedState.columns.filter((column) => column.visible);
             let hiddenColumns = this.sharedState.columns.filter((column) => !column.visible);
-            this.hiddenColumns = _.sortBy(hiddenColumns, (column) => column.label.toLowerCase());
+            this.hiddenColumns = sortBy(hiddenColumns, (column) => column.label.toLowerCase());
         },
 
         setSharedStateColumns() {
@@ -163,12 +164,12 @@ export default {
         columnToggled(column) {
             let fromArray = column.visible ? this.hiddenColumns : this.selectedColumns;
             let toArray = column.visible ? this.selectedColumns : this.hiddenColumns;
-            let currentIndex = _.findIndex(fromArray, { field: column.field });
+            let currentIndex = fromArray.findIndex((c) => c.field === column.field);
 
             toArray.push(fromArray[currentIndex]);
             fromArray.splice(currentIndex, 1);
 
-            this.hiddenColumns = _.sortBy(this.hiddenColumns, (column) => column.label.toLowerCase());
+            this.hiddenColumns = sortBy(this.hiddenColumns, (column) => column.label.toLowerCase());
         },
 
         save() {
@@ -192,7 +193,7 @@ export default {
 
         reset() {
             this.sharedState.columns.forEach((column) => (column.visible = column.defaultVisibility));
-            this.sharedState.columns = _.sortBy(this.sharedState.columns, (column) => column.defaultOrder);
+            this.sharedState.columns = sortBy(this.sharedState.columns, (column) => column.defaultOrder);
             this.setLocalColumns();
 
             this.saving = true;

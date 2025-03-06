@@ -1,3 +1,5 @@
+import { isEqual } from 'lodash-es';
+
 export default {
     data() {
         return {
@@ -30,7 +32,7 @@ export default {
             if (this.activePreset) {
                 return (
                     this.activePresetPayload.query != this.searchQuery ||
-                    !_.isEqual(this.activePresetPayload.filters || {}, this.activeFilters)
+                    !isEqual(this.activePresetPayload.filters || {}, this.activeFilters)
                 );
             }
 
@@ -38,7 +40,7 @@ export default {
         },
 
         isFiltering() {
-            return !_.isEmpty(this.activeFilters) || this.searchQuery || this.activePreset;
+            return Object.keys(this.activeFilters).length || this.searchQuery || this.activePreset;
         },
 
         hasActiveFilters() {
@@ -113,8 +115,10 @@ export default {
 
             let values = {};
 
+            const isEmpty = (value) => (Array.isArray(value) ? value.length === 0 : Object.keys(value).length === 0);
+
             filters
-                .filter((filter) => !_.isEmpty(filter.auto_apply))
+                .filter((filter) => !isEmpty(filter.auto_apply))
                 .forEach((filter) => {
                     values[filter.handle] = filter.auto_apply;
                 });

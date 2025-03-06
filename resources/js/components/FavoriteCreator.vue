@@ -57,7 +57,7 @@ export default {
         },
 
         persistedFavorite() {
-            return _.find(this.$preferences.get('favorites'), (favorite) => {
+            return this.$preferences.get('favorites', []).find((favorite) => {
                 return favorite.url == this.currentUrl;
             });
         },

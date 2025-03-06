@@ -6,7 +6,6 @@ import Login from '../components/login/Login.vue';
 import BaseEntryCreateForm from '../components/entries/BaseCreateForm.vue';
 import BaseTermCreateForm from '../components/terms/BaseCreateForm.vue';
 import CreateTermButton from '../components/terms/CreateTermButton.vue';
-import Importer from '../components/importer/importer';
 import FieldsetListing from '../components/fieldsets/Listing.vue';
 import FieldsetCreateForm from '../components/fieldsets/CreateForm.vue';
 import FieldsetEditForm from '../components/fieldsets/EditForm.vue';
@@ -41,10 +40,10 @@ import TaxonomyEditForm from '../components/taxonomies/EditForm.vue';
 import TaxonomyBlueprintListing from '../components/taxonomies/BlueprintListing.vue';
 import AssetContainerCreateForm from '../components/asset-containers/CreateForm.vue';
 import AssetContainerEditForm from '../components/asset-containers/EditForm.vue';
-import NavBuilder from '../components/nav/Builder.vue';
 import Updater from '../components/updater/Updater.vue';
 import PortalTargets from '../components/portals/PortalTargets.vue';
 import SitesEditForm from '../components/sites/EditForm.vue';
+import { defineAsyncComponent } from 'vue';
 
 export default {
     components: {
@@ -55,7 +54,6 @@ export default {
         BaseEntryCreateForm,
         BaseTermCreateForm,
         CreateTermButton,
-        Importer,
         FieldsetListing,
         FieldsetCreateForm,
         FieldsetEditForm,
@@ -90,7 +88,7 @@ export default {
         TaxonomyBlueprintListing,
         AssetContainerCreateForm,
         AssetContainerEditForm,
-        NavBuilder,
+        NavBuilder: defineAsyncComponent(() => import('../components/nav/Builder.vue')),
         Updater,
         PortalTargets,
         SitesEditForm,

@@ -137,7 +137,7 @@ export default {
         },
 
         config() {
-            return _.findWhere(this.setConfigs, { handle: this.values.type }) || {};
+            return this.setConfigs.find((c) => c.handle === this.values.type) || {};
         },
 
         setConfigs() {

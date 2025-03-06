@@ -358,6 +358,7 @@ import HasPreferences from '../../data-list/HasPreferences';
 import Uploader from '../Uploader.vue';
 import Uploads from '../Uploads.vue';
 import HasActions from '../../data-list/HasActions';
+import { keyBy, sortBy } from 'lodash-es';
 
 export default {
     mixins: [HasActions, HasPagination, HasPreferences],
@@ -487,7 +488,7 @@ export default {
         },
 
         editedAssetBasename() {
-            let asset = _.find(this.assets, (asset) => asset.id == this.editedAssetId);
+            let asset = this.assets.find((asset) => asset.id == this.editedAssetId);
 
             return asset ? asset.basename : null;
         },
@@ -570,7 +571,7 @@ export default {
 
         loadContainers() {
             this.$axios.get(cp_url('asset-containers')).then((response) => {
-                this.containers = _.chain(response.data).indexBy('id').value();
+                this.containers = keyBy(response.data, 'id');
                 this.container = this.containers[this.selectedContainer];
             });
         },
@@ -680,7 +681,7 @@ export default {
 
         folderCreated(folder) {
             this.folders.push(folder);
-            this.folders = _.sortBy(this.folders, 'title');
+            this.folders = sortBy(this.folders, 'title');
             this.creatingFolder = false;
         },
 
