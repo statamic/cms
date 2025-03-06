@@ -32,13 +32,9 @@ class AddTimezoneConfigOptions extends UpdateScript
             ->keys()
             ->first();
 
-        $stub = Str::of(File::get(__DIR__.'/stubs/system_timezone_config.php.stub'))
-            ->replace('TIMEZONE', config('app.timezone'))
-            ->__toString();
-
         $systemConfig = Str::of($systemConfig)
             ->explode("\n")
-            ->put($lineNumberOfDateFormatOption + 1, $stub)
+            ->put($lineNumberOfDateFormatOption + 1, File::get(__DIR__.'/stubs/system_timezone_config.php.stub'))
             ->implode("\n");
 
         File::put(app()->configPath('statamic/system.php'), $systemConfig);

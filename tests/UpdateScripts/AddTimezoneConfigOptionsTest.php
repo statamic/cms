@@ -46,7 +46,7 @@ EOT
 
         $this->assertStringContainsString("'above' => 'this',", $systemConfig);
         $this->assertStringContainsString("'date_format' => 'F jS, Y',", $systemConfig);
-        $this->assertStringContainsString("'display_timezone' => 'America/New_York',", $systemConfig);
+        $this->assertStringContainsString("'display_timezone' => null,", $systemConfig);
         $this->assertStringContainsString("'localize_dates_in_modifiers' => true,", $systemConfig);
         $this->assertStringContainsString("'below' => 'that',", $systemConfig);
     }
