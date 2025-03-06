@@ -93,7 +93,7 @@ trait UserContractTests
         Facades\User::computed('balance', function ($user) {
             return $user->name().'\'s balance is $25 owing.';
         });
-        
+
         Facades\User::computed([
             'ocupation' => function ($user) {
                 return 'Smuggler';

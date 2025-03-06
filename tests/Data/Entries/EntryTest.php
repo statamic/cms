@@ -396,7 +396,7 @@ class EntryTest extends TestCase
             'tags' => function ($entry) {
                 return ['music', 'pop'];
             },
-           'featured' => function ($entry) {
+            'featured' => function ($entry) {
                 return true;
             },
         ]);
