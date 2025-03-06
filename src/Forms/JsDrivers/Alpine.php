@@ -101,8 +101,6 @@ class Alpine extends AbstractJsDriver
      */
     protected function renderAlpineShowFieldJs(Field $field, ?string $alpineScope): string
     {
-        $currentFieldPath = $field->handle();
-
         $conditionsObject = Statamic::modify($field->conditions())->toJson()->entities();
 
         $dataObject = '$data';
@@ -111,6 +109,8 @@ class Alpine extends AbstractJsDriver
             $dataObject .= ".{$alpineScope}";
         }
 
-        return 'Statamic.$conditions.showField('.$currentFieldPath.', '.$conditionsObject.', '.$dataObject.')';
+        $currentFieldPath = $field->handle();
+
+        return 'Statamic.$conditions.showField('.$conditionsObject.', '.$dataObject.', '.$currentFieldPath.')';
     }
 }
