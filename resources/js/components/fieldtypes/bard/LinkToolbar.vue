@@ -225,7 +225,7 @@ export default {
             url: {},
             urlData: {},
             itemData: {},
-            append: null,
+            appends: null,
             title: null,
             rel: null,
             targetBlank: null,
@@ -371,10 +371,10 @@ export default {
         applyAttrs(attrs) {
             this.linkType = this.getLinkTypeForUrl(attrs.href);
 
-            this.url = { [this.linkType]: attrs.href };
+            this.appends = this.getAppendsForUrl(attrs.href);
+            this.url = { [this.linkType]: attrs.href.replace(this.appends, '' ) };
             this.urlData = { [this.linkType]: this.getUrlDataForUrl(attrs.href) };
             this.itemData = { [this.linkType]: this.getItemDataForUrl(attrs.href) };
-
             this.title = attrs.title;
             this.rel = attrs.href
                 ? attrs.rel
@@ -521,14 +521,26 @@ export default {
             return this.bard.meta.linkData[ref];
         },
 
+        getAppendsForUrl(urlString) {
+            const url = URL.parse(urlString.replace('statamic://',''));
+            const queryParams = url.searchParams.toString();
+
+            if (queryParams) {
+                return `?${queryParams}${url.hash}`;
+            };
+
+            return url.hash;
+        },
+
         parseDataUrl(url) {
             if (! url) {
                 return {}
             }
 
+            const appends = this.getAppendsForUrl(url);
             const regex = /^statamic:\/\/((.*?)::(.*))$/;
 
-            const matches = url.match(regex);
+            const matches = url.replace(appends, '').match(regex);
             if (! matches) {
                 return {};
             }
