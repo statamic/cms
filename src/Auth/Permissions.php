@@ -10,9 +10,14 @@ class Permissions
     protected $permissions = [];
     protected $groups = [];
     protected $pendingGroup = null;
+    protected $booted = false;
 
     public function boot()
     {
+        if ($this->booted) {
+            return;
+        }
+
         $early = $this->permissions;
         $this->permissions = [];
 
@@ -23,6 +28,7 @@ class Permissions
         }
 
         $this->permissions = array_merge($this->permissions, $early);
+        $this->booted = true;
     }
 
     public function extend($callback)
