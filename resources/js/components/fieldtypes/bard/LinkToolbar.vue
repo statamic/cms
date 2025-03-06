@@ -372,7 +372,7 @@ export default {
             this.linkType = this.getLinkTypeForUrl(attrs.href);
 
             this.appends = this.getAppendsForUrl(attrs.href);
-            this.url = { [this.linkType]: attrs.href.replace(this.appends, '' ) };
+            this.url = { [this.linkType]: attrs.href?.replace(this.appends, '' ) };
             this.urlData = { [this.linkType]: this.getUrlDataForUrl(attrs.href) };
             this.itemData = { [this.linkType]: this.getItemDataForUrl(attrs.href) };
             this.title = attrs.title;
@@ -522,6 +522,10 @@ export default {
         },
 
         getAppendsForUrl(urlString) {
+            if (! urlString) {
+                return null;
+            }
+
             const url = URL.parse(urlString.replace('statamic://',''));
             const queryParams = url.searchParams.toString();
 
