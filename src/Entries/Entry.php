@@ -480,11 +480,13 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
         if ($this->hasDate() && $this->date) {
             $format = 'Y-m-d';
+
             if ($this->hasTime()) {
                 $format .= '-Hi';
-                if ($this->hasSeconds()) {
-                    $format .= 's';
-                }
+            }
+
+            if ($this->hasSeconds()) {
+                $format .= 's';
             }
 
             $prefix = $this->date->format($format).'.';
@@ -583,18 +585,18 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
                 }
 
                 if ($date instanceof \Carbon\CarbonInterface) {
-                    return $date;
+                    return $date->utc();
                 }
 
                 if (strlen($date) === 10) {
-                    return Carbon::createFromFormat('Y-m-d', $date)->startOfDay();
+                    return Carbon::createFromFormat('Y-m-d', $date, config('statamic.system.timezone'))->startOfDay()->utc();
                 }
 
                 if (strlen($date) === 15) {
-                    return Carbon::createFromFormat('Y-m-d-Hi', $date)->startOfMinute();
+                    return Carbon::createFromFormat('Y-m-d-Hi', $date, config('statamic.system.timezone'))->startOfMinute()->utc();
                 }
 
-                return Carbon::createFromFormat('Y-m-d-His', $date);
+                return Carbon::createFromFormat('Y-m-d-His', $date, config('statamic.system.timezone'))->utc();
             })
             ->args(func_get_args());
     }
@@ -897,11 +899,13 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         ]);
 
         if ($this->hasDate()) {
+            $date = $this->date()->setTimezone(Statamic::displayTimezone());
+
             $data = $data->merge([
-                'date' => $this->date(),
-                'year' => $this->date()->format('Y'),
-                'month' => $this->date()->format('m'),
-                'day' => $this->date()->format('d'),
+                'date' => $date,
+                'year' => $date->format('Y'),
+                'month' => $date->format('m'),
+                'day' => $date->format('d'),
             ]);
         }
 

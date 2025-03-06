@@ -26,8 +26,10 @@ class DateTest extends TestCase
 
     #[Test]
     #[DataProvider('augmentProvider')]
-    public function it_augments($config, $value, $expected)
+    public function it_augments($timezone, $config, $value, $expected)
     {
+        config()->set('app.timezone', $timezone);
+
         $augmented = $this->fieldtype($config)->augment($value);
 
         $this->assertInstanceOf(Carbon::class, $augmented);
@@ -38,14 +40,22 @@ class DateTest extends TestCase
     {
         return [
             'date' => [
+                'UTC',
                 [],
                 '2012-01-04',
                 '2012 Jan 04 00:00:00',
             ],
             'date with custom format' => [
+                'UTC',
                 ['format' => 'Y--m--d'],
                 '2012--01--04',
                 '2012 Jan 04 00:00:00',
+            ],
+            'date in a different timezone' => [
+                'America/New_York', // -5000
+                [],
+                '2012-01-04',
+                '2012 Jan 04 05:00:00',
             ],
 
             // The time and seconds configs are important, otherwise
@@ -53,19 +63,28 @@ class DateTest extends TestCase
             // We need to rely on the configs to know when or when not to reset the time.
 
             'date with time' => [
+                'UTC',
                 ['time_enabled' => true],
                 '2012-01-04 15:32',
                 '2012 Jan 04 15:32:00',
             ],
             'date with time but seconds disabled' => [
+                'UTC',
                 ['time_enabled' => true],
                 '2012-01-04 15:32:54',
                 '2012 Jan 04 15:32:00',
             ],
             'date with time and seconds' => [
+                'UTC',
                 ['time_enabled' => true, 'time_seconds_enabled' => true],
                 '2012-01-04 15:32:54',
                 '2012 Jan 04 15:32:54',
+            ],
+            'date with time in a different timezone' => [
+                'America/New_York', // -5000
+                ['time_enabled' => true],
+                '2012-01-04 15:32',
+                '2012 Jan 04 20:32:00',
             ],
         ];
     }
@@ -115,8 +134,10 @@ class DateTest extends TestCase
 
     #[Test]
     #[DataProvider('processProvider')]
-    public function it_processes_on_save($config, $value, $expected)
+    public function it_processes_on_save($timezone, $config, $value, $expected)
     {
+        config()->set('app.timezone', $timezone);
+
         $this->assertSame($expected, $this->fieldtype($config)->process($value));
     }
 
@@ -124,64 +145,76 @@ class DateTest extends TestCase
     {
         return [
             'null' => [
+                'UTC',
                 [],
                 null,
                 null,
             ],
             'object with nulls' => [
+                'UTC',
                 [],
                 ['date' => null, 'time' => null],
                 null,
             ],
             'object with missing time' => [
+                'UTC',
                 [],
                 ['date' => null],
                 null,
             ],
             'date with default format' => [
+                'UTC',
                 [],
-                ['date' => '2012-08-29', 'time' => null],
-                '2012-08-29',
+                ['date' => '2012-08-29', 'time' => '00:00'],
+                '2012-08-29 00:00',
             ],
             'date with custom format' => [
-                ['format' => 'Y--m--d'],
-                ['date' => '2012-08-29', 'time' => null],
-                '2012--08--29',
+                'UTC',
+                ['format' => 'Y--m--d H/i'],
+                ['date' => '2012-08-29', 'time' => '00:00'],
+                '2012--08--29 00/00',
+            ],
+            'date in a different timezone' => [
+                'America/New_York', // -4000
+                [],
+                ['date' => '2012-08-29', 'time' => '00:00'],
+                '2012-08-28 20:00',
             ],
             'date with missing time' => [
+                'UTC',
                 [],
                 ['date' => '2012-08-29'],
-                '2012-08-29',
+                '2012-08-29 00:00',
             ],
             'date with time' => [
+                'UTC',
                 ['time_enabled' => true],
                 ['date' => '2012-08-29', 'time' => '13:43'],
                 '2012-08-29 13:43',
             ],
-            'date with time and custom format' => [
-                ['time_enabled' => true, 'format' => 'Y--m--d H:i'],
-                ['date' => '2012-08-29', 'time' => '13:43'],
-                '2012--08--29 13:43',
-            ],
             'null range' => [
+                'UTC',
                 ['mode' => 'range'],
-                ['date' => null, 'time' => null],
+                ['start' => null, 'end' => null],
                 null,
             ],
             'range with default format' => [
+                'UTC',
                 ['mode' => 'range'],
-                ['date' => ['start' => '2012-08-29', 'end' => '2013-09-27'], 'time' => null],
-                ['start' => '2012-08-29', 'end' => '2013-09-27'],
+                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2013-09-27', 'time' => '23:59']],
+                ['start' => '2012-08-29 00:00', 'end' => '2013-09-27 23:59'],
             ],
             'range with custom format' => [
-                ['mode' => 'range', 'format' => 'Y--m--d'],
-                ['date' => ['start' => '2012-08-29', 'end' => '2013-09-27'], 'time' => null],
-                ['start' => '2012--08--29', 'end' => '2013--09--27'],
+                'UTC',
+                ['mode' => 'range', 'format' => 'Y--m--d H/i'],
+                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2013-09-27', 'time' => '23:59']],
+                ['start' => '2012--08--29 00/00', 'end' => '2013--09--27 23/59'],
             ],
-            'range with format containing time has end date at end of day' => [
-                ['mode' => 'range', 'format' => 'Y-m-d H:i:s'],
-                ['date' => ['start' => '2012-08-29', 'end' => '2013-09-27'], 'time' => null],
-                ['start' => '2012-08-29 00:00:00', 'end' => '2013-09-27 23:59:59'],
+            'range in a different timezone' => [
+                'America/New_York', // -4000
+                ['mode' => 'range'],
+                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2013-09-27', 'time' => '23:59']],
+                ['start' => '2012-08-28 20:00', 'end' => '2013-09-27 19:59'],
             ],
         ];
     }
@@ -195,18 +228,20 @@ class DateTest extends TestCase
     #[Test]
     public function it_saves_ranges_as_integers_if_format_results_in_a_number()
     {
-        $fieldtype = $this->fieldtype(['mode' => 'range', 'format' => 'Ymd']);
+        $fieldtype = $this->fieldtype(['mode' => 'range', 'format' => 'YmdHi']);
 
         $this->assertSame(
-            ['start' => 20120829, 'end' => 20130927],
-            $fieldtype->process(['date' => ['start' => '2012-08-29', 'end' => '2013-09-27']])
+            ['start' => 201208290000, 'end' => 201309272359],
+            $fieldtype->process(['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2013-09-27', 'time' => '23:59']])
         );
     }
 
     #[Test]
     #[DataProvider('preProcessProvider')]
-    public function it_preprocesses($config, $value, $expected)
+    public function it_preprocesses($timezone, $config, $value, $expected)
     {
+        config()->set('app.timezone', $timezone);
+
         $this->assertSame($expected, $this->fieldtype($config)->preProcess($value));
     }
 
@@ -214,95 +249,113 @@ class DateTest extends TestCase
     {
         return [
             'null' => [
+                'UTC',
                 [],
                 null,
                 ['date' => null, 'time' => null],
             ],
             'now' => [
+                'UTC',
                 [],
                 'now', // this would happen if the value was null, but default was "now"
-                ['date' => '2010-12-25', 'time' => null], // current date
+                ['date' => '2010-12-25', 'time' => '13:43'], // current date
             ],
-            'now, with time enabled' => [
-                ['time_enabled' => true],
-                'now', // this would happen if the value was null, but default was "now"
-                ['date' => '2010-12-25', 'time' => 'now'], // current datetime - time needs to be localized on the client side
-            ],
-            'date with default format' => [
+            'date without time' => [
+                'UTC',
                 [],
                 '2012-08-29',
-                ['date' => '2012-08-29', 'time' => null],
+                ['date' => '2012-08-29', 'time' => '00:00'],
+            ],
+            'date with default format' => [
+                'UTC',
+                [],
+                '2012-08-29 00:00',
+                ['date' => '2012-08-29', 'time' => '00:00'],
             ],
             'date with custom format' => [
-                ['format' => 'Y--m--d'],
-                '2012--08--29',
-                ['date' => '2012-08-29', 'time' => null],
+                'UTC',
+                ['format' => 'Y--m--d H/i'],
+                '2012--08--29 00/00',
+                ['date' => '2012-08-29', 'time' => '00:00'],
+            ],
+            'date in a different timezone' => [
+                'America/New_York', // -0400
+                [],
+                '2012-08-29 00:00',
+                ['date' => '2012-08-29', 'time' => '04:00'],
             ],
             'date with time' => [
+                'UTC',
                 ['time_enabled' => true],
                 '2012-08-29 13:43',
                 ['date' => '2012-08-29', 'time' => '13:43'],
             ],
-            'date with time and custom format' => [
-                ['time_enabled' => true, 'format' => 'Y--m--d H:i'],
-                '2012--08--29 13:43',
-                ['date' => '2012-08-29', 'time' => '13:43'],
+            'date with time in a different timezone' => [
+                'America/New_York', // -0400
+                ['time_enabled' => true],
+                '2012-08-29 13:43',
+                ['date' => '2012-08-29', 'time' => '17:43'],
             ],
             'null range' => [
+                'UTC',
                 ['mode' => 'range'],
                 null,
-                ['date' => null, 'time' => null],
-            ],
-            'null range when required with boolean' => [
-                ['mode' => 'range', 'required' => true],
                 null,
-                ['date' => ['start' => '2010-12-25', 'end' => '2010-12-25'], 'time' => null],
-            ],
-            'null range when required with validation' => [
-                ['mode' => 'range', 'validate' => ['required']],
-                null,
-                ['date' => ['start' => '2010-12-25', 'end' => '2010-12-25'], 'time' => null],
             ],
             'range with default format' => [
+                'UTC',
                 ['mode' => 'range'],
-                ['start' => '2012-08-29', 'end' => '2013-09-27'],
-                ['date' => ['start' => '2012-08-29', 'end' => '2013-09-27'], 'time' => null],
+                ['start' => '2012-08-29 00:00', 'end' => '2013-09-27 23:59'],
+                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2013-09-27', 'time' => '23:59']],
             ],
             'range with custom format' => [
-                ['mode' => 'range', 'format' => 'Y--m--d'],
-                ['start' => '2012--08--29', 'end' => '2013--09--27'],
-                ['date' => ['start' => '2012-08-29', 'end' => '2013-09-27'], 'time' => null],
+                'UTC',
+                ['mode' => 'range', 'format' => 'Y--m--d H/i'],
+                ['start' => '2012--08--29 00/00', 'end' => '2013--09--27 23/59'],
+                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2013-09-27', 'time' => '23:59']],
+            ],
+            'range in a different timezone' => [
+                'America/New_York', // -4000
+                ['mode' => 'range'],
+                ['start' => '2012-08-29 00:00', 'end' => '2013-09-27 23:59'],
+                ['start' => ['date' => '2012-08-29', 'time' => '04:00'], 'end' => ['date' => '2013-09-28', 'time' => '03:59']],
             ],
             'range where single date has been provided' => [
+                'UTC',
                 // e.g. If it was once a non-range field.
                 // Use the single date as both the start and end dates.
                 ['mode' => 'range'],
                 '2012-08-29',
-                ['date' => ['start' => '2012-08-29', 'end' => '2012-08-29'], 'time' => null],
+                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2012-08-29', 'time' => '23:59']],
             ],
             'range where single date has been provided with custom format' => [
+                'UTC',
                 ['mode' => 'range', 'format' => 'Y--m--d'],
                 '2012--08--29',
-                ['date' => ['start' => '2012-08-29', 'end' => '2012-08-29'], 'time' => null],
+                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2012-08-29', 'time' => '23:59']],
             ],
             'date where range has been provided' => [
+                'UTC',
                 // e.g. If it was once a range field. Use the start date.
                 [],
-                ['start' => '2012-08-29', 'end' => '2013-09-27'],
-                ['date' => '2012-08-29', 'time' => null],
+                ['start' => '2012-08-29 00:00', 'end' => '2013-09-27 23:59'],
+                ['date' => '2012-08-29', 'time' => '00:00'],
             ],
             'date where range has been provided with custom format' => [
-                ['format' => 'Y--m--d'],
-                ['start' => '2012--08--29', 'end' => '2013--09--27'],
-                ['date' => '2012-08-29', 'time' => null],
+                'UTC',
+                ['format' => 'Y--m--d H/i'],
+                ['start' => '2012--08--29 00/00', 'end' => '2013--09--27 23/59'],
+                ['date' => '2012-08-29', 'time' => '00:00'],
             ],
         ];
     }
 
     #[Test]
     #[DataProvider('preProcessIndexProvider')]
-    public function it_preprocesses_for_index($config, $value, $expected)
+    public function it_preprocesses_for_index($timezone, $config, $value, $expected)
     {
+        config()->set('app.timezone', $timezone);
+
         // Show that the date format from the preference is being used, and
         // that the fall back would have been the configured date format.
         config(['statamic.cp.date_format' => 'custom']);
@@ -315,72 +368,103 @@ class DateTest extends TestCase
     {
         return [
             'null' => [
+                'UTC',
                 [],
                 null,
                 null,
             ],
             'date with default format' => [
+                'UTC',
                 [],
-                '2012-08-29',
-                '2012/08/29',
+                '2012-08-29 00:00',
+                ['date' => '2012-08-29', 'time' => '00:00', 'mode' => 'single', 'display_format' => 'YYYY/MM/DD'],
             ],
             'date with custom format' => [
-                ['format' => 'Y--m--d'],
-                '2012--08--29',
-                '2012/08/29',
+                'UTC',
+                ['format' => 'Y--m--d H/i'],
+                '2012--08--29 00/00',
+                ['date' => '2012-08-29', 'time' => '00:00', 'mode' => 'single', 'display_format' => 'YYYY/MM/DD'],
+            ],
+            'date in a different timezone' => [
+                'America/New_York', // -0400
+                [],
+                '2012-08-29 00:00',
+                ['date' => '2012-08-29', 'time' => '04:00', 'mode' => 'single', 'display_format' => 'YYYY/MM/DD'],
             ],
             'date with time' => [
+                'UTC',
                 ['time_enabled' => true],
                 '2012-08-29 13:43',
-                '2012/08/29 13:43',
+                ['date' => '2012-08-29', 'time' => '13:43', 'mode' => 'single', 'display_format' => 'YYYY/MM/DD HH:mm'],
             ],
             'date with time and custom format' => [
+                'UTC',
                 ['time_enabled' => true, 'format' => 'Y--m--d H:i'],
                 '2012--08--29 13:43',
-                '2012/08/29 13:43',
+                ['date' => '2012-08-29', 'time' => '13:43', 'mode' => 'single', 'display_format' => 'YYYY/MM/DD HH:mm'],
+            ],
+            'date with time in a different timezone' => [
+                'America/New_York', // -0400
+                ['time_enabled' => true],
+                '2012-08-29 13:43',
+                ['date' => '2012-08-29', 'time' => '17:43', 'mode' => 'single', 'display_format' => 'YYYY/MM/DD HH:mm'],
             ],
             'null range' => [
+                'UTC',
                 ['mode' => 'range'],
                 null,
                 null,
             ],
             'range with default format' => [
+                'UTC',
                 ['mode' => 'range'],
-                ['start' => '2012-08-29', 'end' => '2013-09-27'],
-                '2012/08/29 - 2013/09/27',
+                ['start' => '2012-08-29 00:00', 'end' => '2013-09-27 00:00'],
+                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2013-09-27', 'time' => '00:00'], 'mode' => 'range', 'display_format' => 'YYYY/MM/DD'],
             ],
             'range with custom format' => [
-                ['mode' => 'range', 'format' => 'Y--m--d'],
-                ['start' => '2012--08--29', 'end' => '2013--09--27'],
-                '2012/08/29 - 2013/09/27',
+                'UTC',
+                ['mode' => 'range', 'format' => 'Y--m--d H/i'],
+                ['start' => '2012--08--29 00/00', 'end' => '2013--09--27 00/00'],
+                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2013-09-27', 'time' => '00:00'], 'mode' => 'range', 'display_format' => 'YYYY/MM/DD'],
+            ],
+            'range in a different timezone' => [
+                'America/New_York', // -4000
+                ['mode' => 'range'],
+                ['start' => '2012-08-29 00:00', 'end' => '2013-09-27 00:00'],
+                ['start' => ['date' => '2012-08-29', 'time' => '04:00'], 'end' => ['date' => '2013-09-27', 'time' => '04:00'], 'mode' => 'range', 'display_format' => 'YYYY/MM/DD'],
             ],
             'range where single date has been provided' => [
                 // e.g. If it was once a non-range field.
                 // Use the single date as both the start and end dates.
+                'UTC',
                 ['mode' => 'range'],
                 '2012-08-29',
-                '2012/08/29 - 2012/08/29',
+                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2012-08-29', 'time' => '00:00'], 'mode' => 'range', 'display_format' => 'YYYY/MM/DD'],
             ],
             'range where single date has been provided with custom format' => [
-                ['mode' => 'range', 'format' => 'Y--m--d'],
-                '2012--08--29',
-                '2012/08/29 - 2012/08/29',
+                'UTC',
+                ['mode' => 'range', 'format' => 'Y--m--d H/i'],
+                '2012--08--29 00/00',
+                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2012-08-29', 'time' => '00:00'], 'mode' => 'range', 'display_format' => 'YYYY/MM/DD'],
             ],
             'date where range has been provided' => [
                 // e.g. If it was once a range field. Use the start date.
+                'UTC',
                 [],
-                ['start' => '2012-08-29', 'end' => '2013-09-27'],
-                '2012/08/29',
+                ['start' => '2012-08-29 00:00', 'end' => '2013-09-27 00:00'],
+                ['date' => '2012-08-29', 'time' => '00:00', 'mode' => 'single', 'display_format' => 'YYYY/MM/DD'],
             ],
             'date where range has been provided with custom format' => [
-                ['format' => 'Y--m--d'],
-                ['start' => '2012--08--29', 'end' => '2013--09--27'],
-                '2012/08/29',
+                'UTC',
+                ['format' => 'Y--m--d H/i'],
+                ['start' => '2012--08--29 00/00', 'end' => '2013--09--27 00/00'],
+                ['date' => '2012-08-29', 'time' => '00:00', 'mode' => 'single', 'display_format' => 'YYYY/MM/DD'],
             ],
             'range where time has been enabled' => [
+                'UTC',
                 ['mode' => 'range', 'time_enabled' => true], // enabling time should have no effect.
-                ['start' => '2012-08-29', 'end' => '2013-09-27'],
-                '2012/08/29 - 2013/09/27',
+                ['start' => '2012-08-29 00:00', 'end' => '2013-09-27 00:00'],
+                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2013-09-27', 'time' => '00:00'], 'mode' => 'range', 'display_format' => 'YYYY/MM/DD'],
             ],
         ];
     }
