@@ -327,7 +327,11 @@ export default {
 
     watch: {
 
-        linkType() {
+        linkType(type) {
+            if (type != 'entry') {
+                this.appends = null;
+            }
+
             this.autofocus();
         },
 
@@ -418,7 +422,7 @@ export default {
             }
 
             this.$emit('updated', {
-                href: `${this.href}${this.appends}`,
+                href: this.href + (this.appends ?? ''),
                 rel: this.rel,
                 target: (this.canHaveTarget && this.targetBlank) ? '_blank' : null,
                 title: this.title,
