@@ -15,10 +15,10 @@ const isEmpty = (value) => {
 const isString = (str) => str != null && typeof str.valueOf() === 'string';
 
 export default class {
-    constructor(field, values, dottedFieldPath, store) {
+    constructor(field, values, currentFieldPath, store) {
         this.field = field;
         this.values = values;
-        this.dottedFieldPath = dottedFieldPath;
+        this.currentFieldPath = currentFieldPath;
         this.store = store;
         this.rootValues = store ? store.values : false;
         this.passOnAny = false;
@@ -185,7 +185,7 @@ export default class {
 
     getFieldValue(field) {
         if (field.startsWith('$parent.')) {
-            field = new ParentResolver(this.dottedFieldPath).resolve(field);
+            field = new ParentResolver(this.currentFieldPath).resolve(field);
         }
 
         if (field.startsWith('$root.') || field.startsWith('root.')) {
@@ -249,7 +249,7 @@ export default class {
             values: this.values,
             root: this.rootValues,
             store: this.store,
-            fieldPath: this.dottedFieldPath,
+            fieldPath: this.currentFieldPath,
         });
 
         return this.showOnPass ? passes : !passes;
@@ -273,7 +273,7 @@ export default class {
 
     relativeLhsToAbsoluteFieldPath(lhs, dottedPrefix) {
         if (lhs.startsWith('$parent.')) {
-            lhs = new ParentResolver(this.dottedFieldPath).resolve(lhs);
+            lhs = new ParentResolver(this.currentFieldPath).resolve(lhs);
         }
 
         if (lhs.startsWith('$root.') || lhs.startsWith('root.')) {
