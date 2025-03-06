@@ -111,6 +111,6 @@ class Alpine extends AbstractJsDriver
 
         $currentFieldPath = $field->handle();
 
-        return 'Statamic.$conditions.showField('.$conditionsObject.', '.$dataObject.', '.$currentFieldPath.')';
+        return "Statamic.\$conditions.showField({$conditionsObject}, {$dataObject}, '{$currentFieldPath}')";
     }
 }
