@@ -35,6 +35,8 @@
                         <div class="divider" />
                         <dropdown-item :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))" @click="toggleCollapsedState" />
                         <dropdown-item :text="__('Duplicate Set')" @click="duplicate" v-if="canAddSet" />
+                        <dropdown-item :text="__('Cut Set')" @click="cut" />
+                        <dropdown-item :text="__('Copy Set')" @click="copy" />
                         <dropdown-item :text="__('Delete Set')" class="warning" @click="destroy" />
                     </dropdown-list>
                 </div>
@@ -261,6 +263,14 @@ export default {
 
         duplicate() {
             this.$emit('duplicated');
+        },
+
+        cut() {
+            this.$emit('cut');
+        },
+
+        copy() {
+            this.$emit('copied');
         },
 
         fieldPath(field) {
