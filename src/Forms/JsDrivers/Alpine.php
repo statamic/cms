@@ -2,6 +2,7 @@
 
 namespace Statamic\Forms\JsDrivers;
 
+use Statamic\Fields\Field;
 use Statamic\Statamic;
 
 class Alpine extends AbstractJsDriver
@@ -46,7 +47,7 @@ class Alpine extends AbstractJsDriver
     public function addToRenderableFieldData($field, $data)
     {
         return [
-            'show_field' => $this->renderAlpineShowFieldJs($field->conditions(), $this->scope),
+            'show_field' => $this->renderAlpineShowFieldJs($field, $this->scope),
         ];
     }
 
@@ -97,14 +98,12 @@ class Alpine extends AbstractJsDriver
 
     /**
      * Render alpine `x-if` show field JS logic.
-     *
-     * @param  array  $conditions
-     * @param  string  $alpineScope
-     * @return string
      */
-    protected function renderAlpineShowFieldJs($conditions, $alpineScope)
+    protected function renderAlpineShowFieldJs(Field $field, ?string $alpineScope): string
     {
-        $conditionsObject = Statamic::modify($conditions)->toJson()->entities();
+        $currentFieldPath = $field->handle();
+
+        $conditionsObject = Statamic::modify($field->conditions())->toJson()->entities();
 
         $dataObject = '$data';
 
@@ -112,6 +111,6 @@ class Alpine extends AbstractJsDriver
             $dataObject .= ".{$alpineScope}";
         }
 
-        return 'Statamic.$conditions.showField('.$conditionsObject.', '.$dataObject.')';
+        return 'Statamic.$conditions.showField('.$currentFieldPath.', '.$conditionsObject.', '.$dataObject.')';
     }
 }
