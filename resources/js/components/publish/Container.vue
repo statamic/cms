@@ -3,9 +3,9 @@ import { defineStore } from 'pinia';
 import uniqid from 'uniqid';
 import Component from '../Component';
 import { getCurrentInstance, computed } from 'vue';
-import { usePublishContainerStore } from '@/stores/publish-container.js';
+import { usePublishContainerStore } from '@statamic/stores/publish-container.js';
 import { isEqual } from 'lodash-es';
-import clone from '@/util/clone.js';
+import clone from '@statamic/util/clone.js';
 
 export default {
     emits: ['updated', 'focus', 'blur'],

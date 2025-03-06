@@ -4,8 +4,8 @@ import { nextTick } from 'vue';
 import { createPinia } from 'pinia';
 import ValidatesFieldConditions from '../components/field-conditions/ValidatorMixin.js';
 import { data_get } from '../bootstrap/globals';
-import FieldConditions from '@/components/FieldConditions';
-import PublishContainer from '@/components/publish/Container.vue';
+import FieldConditions from '@statamic/components/FieldConditions';
+import PublishContainer from '@statamic/components/publish/Container.vue';
 
 let Store;
 let Fields;

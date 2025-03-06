@@ -41,7 +41,7 @@
 
 <script>
 import HasHiddenFields from '../publish/HasHiddenFields';
-import clone from '@/util/clone.js';
+import clone from '@statamic/util/clone.js';
 
 export default {
     mixins: [HasHiddenFields],

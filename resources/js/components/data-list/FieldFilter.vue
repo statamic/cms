@@ -53,7 +53,7 @@
 import Validator from '../field-conditions/Validator.js';
 import PublishField from '../publish/Field.vue';
 import { sortBy } from 'lodash-es';
-import debounce from '@/util/debounce.js';
+import debounce from '@statamic/util/debounce.js';
 
 export default {
     components: { PublishField },
