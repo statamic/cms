@@ -522,18 +522,13 @@ export default {
         },
 
         getAppendsForUrl(urlString) {
+
+            // appends is only relevant to entry links
             if (! urlString?.includes('statamic://entry::')) {
                 return null;
             }
 
-            const url = URL.parse(urlString.replace('statamic://',''));
-            const queryParams = url.searchParams.toString();
-
-            if (queryParams) {
-                return `?${queryParams}${url.hash}`;
-            };
-
-            return url.hash;
+            return urlString.replace(urlString.split(/[?#]/)[0], '');
         },
 
         parseDataUrl(url) {
