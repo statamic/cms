@@ -79,7 +79,7 @@
                     :search="search"
                     :exclusions="exclusions"
                     :type="config.type"
-                    :tree="tree"
+                    :tree="config.query_scopes?.length > 0 ? null : tree"
                     @selected="selectionsUpdated"
                     @closed="close"
                 />

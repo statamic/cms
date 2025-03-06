@@ -3,6 +3,7 @@
         <button
             v-for="action in actions"
             @click="run(action)"
+            :class="{ warning: action.dangerous }"
             v-text="action.title" />
     </div>
 </template>

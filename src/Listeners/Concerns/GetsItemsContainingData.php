@@ -2,6 +2,7 @@
 
 namespace Statamic\Listeners\Concerns;
 
+use Illuminate\Support\LazyCollection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Term;
@@ -12,14 +13,29 @@ trait GetsItemsContainingData
     /**
      * Get items containing data.
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\LazyCollection
      */
     public function getItemsContainingData()
     {
-        return collect()
-            ->merge(Entry::all())
-            ->merge(Term::all())
-            ->merge(GlobalSet::all()->flatMap(fn ($set) => $set->localizations()->values()))
-            ->merge(User::all());
+        $collections = [
+            LazyCollection::make(function () {
+                yield from Entry::query()->lazy();
+            }),
+            LazyCollection::make(function () {
+                yield from Term::query()->lazy();
+            }),
+            LazyCollection::make(function () {
+                yield from GlobalSet::all()->flatMap(fn ($set) => $set->localizations()->values());
+            }),
+            LazyCollection::make(function () {
+                yield from User::query()->lazy();
+            }),
+        ];
+
+        return LazyCollection::make(function () use ($collections) {
+            foreach ($collections as $collection) {
+                yield from $collection;
+            }
+        });
     }
 }

@@ -118,6 +118,7 @@ return [
     'uuid' => 'Doit être un UUID valide.',
     'arr_fieldtype' => 'Ceci est invalide.',
     'handle' => 'Peut uniquement contenir des lettres minuscules et des chiffres avec des traits de soulignement comme séparateurs.',
+    'handle_starts_with_number' => 'Ne peut pas commencer par un chiffre.',
     'slug' => 'Ne peut contenir que des lettres et des chiffres avec des tirets ou des traits de soulignement comme séparateurs.',
     'code_fieldtype_rulers' => 'Les données saisies sont invalides.',
     'composer_package' => 'Doit être un nom de paquet composer valide (ex. hasselhoff/kung-fury).',
