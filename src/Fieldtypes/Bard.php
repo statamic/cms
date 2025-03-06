@@ -708,15 +708,15 @@ class Bard extends Replicator
 
     private function getLinkDataForUrl($url)
     {
-        $ref = Str::after($url, 'statamic://');
+        $ref = str($url)->after('statamic://');
         [$type, $id] = explode('::', $ref, 2);
 
         $data = null;
 
         switch ($type) {
             case 'entry':
-                $ref = str($ref)->before('?')->before('#')->toString();
-                if ($entry = Entry::find(str($ref)->after('entry::')->toString())) {
+                $ref = $ref->before('?')->before('#');
+                if ($entry = Entry::find($ref->after('entry::'))) {
                     $data = [
                         'title' => $entry->get('title'),
                         'permalink' => $entry->absoluteUrl(),
@@ -733,7 +733,7 @@ class Bard extends Replicator
                 break;
         }
 
-        return [$ref => $data];
+        return [$ref->toString() => $data];
     }
 
     private function wrapInlineValue($value)
