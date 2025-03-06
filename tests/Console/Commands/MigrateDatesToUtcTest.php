@@ -31,6 +31,13 @@ class MigrateDatesToUtcTest extends TestCase
         ]])->save();
     }
 
+    public function tearDown(): void
+    {
+        User::blueprint()->delete();
+
+        parent::tearDown();
+    }
+
     #[Test]
     #[DataProvider('dateFieldsProvider')]
     public function it_converts_date_fields_in_entries(string $fieldHandle, array $field, $original, $expected)
