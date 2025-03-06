@@ -1,19 +1,18 @@
 export default {
-
     props: {
         initialPerPage: {
             type: Number,
             default() {
                 return Statamic.$config.get('paginationSize');
-            }
-        }
+            },
+        },
     },
 
     data() {
         return {
             perPage: this.initialPerPage,
             page: 1,
-        }
+        };
     },
 
     mounted() {
@@ -21,9 +20,8 @@ export default {
     },
 
     methods: {
-
         setInitialPerPage() {
-            if (! this.hasPreferences) {
+            if (!this.hasPreferences) {
                 return;
             }
 
@@ -37,7 +35,7 @@ export default {
                 ? this.setPreference('per_page', perPage != this.initialPerPage ? perPage : null)
                 : Promise.resolve();
 
-            promise.then(response => {
+            promise.then((response) => {
                 this.perPage = perPage;
                 this.resetPage();
             });
@@ -52,7 +50,5 @@ export default {
             this.page = 1;
             this.$events.$emit('clear-selections');
         },
-
-    }
-
-}
+    },
+};

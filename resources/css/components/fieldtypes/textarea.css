@@ -3,17 +3,18 @@
    ========================================================================== */
 
 .textarea-fieldtype textarea {
-    @apply border-gray-500 dark:border-dark-900 dark:shadow-inner-dark text-md leading-normal;
+    @apply border-gray-500 text-md leading-normal dark:border-dark-900 dark:shadow-inner-dark;
     min-height: 80px;
 
-    &:not(.focus-within-only):focus, &:not(.focus-within-only):focus-within {
-        @apply ring-2 ring-blue-300 dark:ring-blue-600 outline-none shadow-none;
+    &:not(.focus-within-only):focus,
+    &:not(.focus-within-only):focus-within {
+        @apply shadow-none outline-none ring-2 ring-blue-300 dark:ring-blue-600;
     }
 }
 
 /* Inside a Grid
   ========================================================================== */
 
- .grid-fieldtype .textarea-fieldtype textarea {
-     @apply bg-white dark:bg-dark-600;
- }
+.grid-fieldtype .textarea-fieldtype textarea {
+    @apply bg-white dark:bg-dark-600;
+}

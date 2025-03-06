@@ -1,15 +1,6 @@
 <template>
-
-    <confirmation-modal
-        name="folder-editor"
-        :title="modalTitle"
-        :busy="submitting"
-        @cancel="cancel"
-        @confirm="submit"
-    >
-
+    <confirmation-modal name="folder-editor" :title="modalTitle" :busy="submitting" @cancel="cancel" @confirm="submit">
         <div class="publish-fields @container">
-
             <form-group
                 v-if="!initialDirectory"
                 handle="directory"
@@ -21,16 +12,12 @@
                 :config="{ debounce: false }"
                 v-model="directory"
             />
-
         </div>
-
     </confirmation-modal>
-
 </template>
 
 <script>
 export default {
-
     props: {
         initialDirectory: String,
         container: Object,
@@ -44,11 +31,10 @@ export default {
             directory: this.initialDirectory,
             errors: {},
             submitting: false,
-        }
+        };
     },
 
     methods: {
-
         cancel() {
             this.$emit('closed');
         },
@@ -58,19 +44,23 @@ export default {
             const payload = {
                 path: this.path,
                 directory: this.directory,
-                title: this.title
+                title: this.title,
             };
 
             this.submitting = true;
 
-            this.$axios.post(url, payload).then(response => {
-                this.$toast.success(__('Folder created'));
-                this.$emit('created', response.data);
-            }).catch(e => {
-                this.handleErrors(e);
-            }).finally(() => {
-                this.submitting = false;
-            });
+            this.$axios
+                .post(url, payload)
+                .then((response) => {
+                    this.$toast.success(__('Folder created'));
+                    this.$emit('created', response.data);
+                })
+                .catch((e) => {
+                    this.handleErrors(e);
+                })
+                .finally(() => {
+                    this.submitting = false;
+                });
         },
 
         handleErrors(e) {
@@ -82,13 +72,11 @@ export default {
             } else {
                 this.$toast.error(__('Something went wrong'));
             }
-        }
-
+        },
     },
 
     created() {
-        this.$keys.bindGlobal('esc', this.cancel)
+        this.$keys.bindGlobal('esc', this.cancel);
     },
-
-}
+};
 </script>

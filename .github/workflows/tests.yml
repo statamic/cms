@@ -16,26 +16,15 @@ jobs:
 
     strategy:
       matrix:
-        php: [8.1, 8.2, 8.3, 8.4]
-        laravel: [10.*, 11.*, 12.*]
+        php: [8.2, 8.3, 8.4]
+        laravel: [11.*, 12.*]
         stability: [prefer-lowest, prefer-stable]
         os: [ubuntu-latest]
         include:
           - os: windows-latest
             php: 8.3
-            laravel: 10.*
-            stability: prefer-stable
-          - os: windows-latest
-            php: 8.3
             laravel: 11.*
             stability: prefer-stable
-        exclude:
-          - php: 8.1
-            laravel: 11.*
-          - php: 8.1
-            laravel: 12.*
-          - php: 8.4
-            laravel: 10.*
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
 
@@ -130,14 +119,8 @@ jobs:
           echo "result=true" >> $GITHUB_OUTPUT
           echo "result=true" >> $env:GITHUB_OUTPUT
 
-      - name: Use Node.js 16.13.0
+      - name: Use Node.js
         uses: actions/setup-node@v4
-        with:
-          node-version: 16.13.0
-
-      - name: Install required npm version
-        if: steps.should-run-tests.outputs.result == 'true'
-        run: npm -g install npm@8.5.5
 
       - name: Install dependencies
         if: steps.should-run-tests.outputs.result == 'true'
@@ -146,6 +129,9 @@ jobs:
       - name: Execute tests
         if: steps.should-run-tests.outputs.result == 'true'
         run: npm run test
+        env:
+          CI: true
+          LARAVEL_BYPASS_ENV_CHECK: 1
 
   slack:
     name: Slack Notification

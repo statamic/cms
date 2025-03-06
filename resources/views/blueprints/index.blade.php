@@ -199,7 +199,7 @@
                             <dropdown-item :text="__('Reset')" class="warning" @click="$refs[`resetter_{{ $blueprint['namespace'] }}_{{ $blueprint['handle'] }}`].confirm()">
                                 <blueprint-resetter
                                     ref="resetter_{{ $blueprint['namespace'] }}_{{ $blueprint['handle'] }}"
-                                    :resource='@json($blueprint)'
+                                    :resource="{{ Js::from($blueprint) }}"
                                     reload
                                 >
                                 </blueprint-resetter>

@@ -1,7 +1,10 @@
 <template>
     <modal name="confirmation-modal" @opened="$emit('opened')">
-        <form class="confirmation-modal flex flex-col h-full" @submit.prevent="submit">
-            <header v-if="title" class="text-lg font-semibold px-5 py-3 bg-gray-200 dark:bg-dark-550 rounded-t-lg flex items-center justify-between border-b dark:border-dark-900">
+        <form class="confirmation-modal flex h-full flex-col" @submit.prevent="submit">
+            <header
+                v-if="title"
+                class="flex items-center justify-between rounded-t-lg border-b bg-gray-200 px-5 py-3 text-lg font-semibold dark:border-dark-900 dark:bg-dark-550"
+            >
                 {{ __(title) }}
             </header>
             <div class="relative flex-1 px-5 py-6 text-gray dark:text-dark-150">
@@ -11,13 +14,30 @@
                         <p>{{ __('Are you sure?') }}</p>
                     </slot>
                 </slot>
-                <div v-if="busy" class="bg-white dark:bg-dark-700 bg-opacity-75 select-none pointer-events-none absolute inset-0 flex items-center justify-center">
+                <div
+                    v-if="busy"
+                    class="pointer-events-none absolute inset-0 flex select-none items-center justify-center bg-white bg-opacity-75 dark:bg-dark-700"
+                >
                     <loading-graphic text="" />
                 </div>
             </div>
-            <div class="px-5 py-3 bg-gray-200 dark:bg-dark-550 rounded-b-lg border-t dark:border-dark-900 flex items-center justify-end text-sm">
-                <button type="button" class="btn-flat" @click.prevent="$emit('cancel')" v-text="__(cancelText)" v-if="cancellable" :disabled="busy" />
-                <button class="rtl:mr-4 ltr:ml-4" :class="buttonClass" :disabled="disabled || busy" v-text="__(buttonText)" />
+            <div
+                class="flex items-center justify-end rounded-b-lg border-t bg-gray-200 px-5 py-3 text-sm dark:border-dark-900 dark:bg-dark-550"
+            >
+                <button
+                    type="button"
+                    class="btn-flat"
+                    @click.prevent="$emit('cancel')"
+                    v-text="__(cancelText)"
+                    v-if="cancellable"
+                    :disabled="busy"
+                />
+                <button
+                    class="ltr:ml-4 rtl:mr-4"
+                    :class="buttonClass"
+                    :disabled="disabled || busy"
+                    v-text="__(buttonText)"
+                />
             </div>
         </form>
     </modal>
@@ -25,28 +45,29 @@
 
 <script>
 export default {
+    emits: ['opened', 'confirm', 'cancel'],
     props: {
         title: {
-            type: String
+            type: String,
         },
         bodyText: {
-            type: String
+            type: String,
         },
         buttonText: {
             type: String,
-            default: 'Confirm'
+            default: 'Confirm',
         },
         cancellable: {
             type: Boolean,
-            default: true
+            default: true,
         },
         cancelText: {
             type: String,
-            default: 'Cancel'
+            default: 'Cancel',
         },
         danger: {
             type: Boolean,
-            default: false
+            default: false,
         },
         disabled: {
             type: Boolean,
@@ -55,40 +76,40 @@ export default {
         busy: {
             type: Boolean,
             default: false,
-        }
+        },
     },
 
     data() {
         return {
             escBinding: null,
-        }
+        };
     },
 
     computed: {
         buttonClass() {
             return this.danger ? 'btn-danger' : 'btn-primary';
-        }
+        },
     },
 
     methods: {
         dismiss() {
             if (this.busy) return;
 
-            this.$emit('cancel')
+            this.$emit('cancel');
         },
         submit() {
             if (this.busy) return;
 
             this.$emit('confirm');
-        }
+        },
     },
 
     created() {
-        this.escBinding = this.$keys.bind('esc', this.dismiss)
+        this.escBinding = this.$keys.bind('esc', this.dismiss);
     },
 
-    beforeDestroy() {
-        this.escBinding.destroy()
+    beforeUnmount() {
+        this.escBinding.destroy();
     },
-}
+};
 </script>

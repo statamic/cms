@@ -22,7 +22,6 @@ return [
     'assets.dynamic_folder_pending_field' => 'Ez a mező akkor lesz elérhető, ha :field be van állítva.',
     'assets.dynamic_folder_pending_save' => 'Ez a mező a mentés után lesz elérhető.',
     'assets.title' => 'Fájlok',
-    'bard.config.allow_source' => 'Engedélyezze a HTML forráskód megtekintését írás közben.',
     'bard.config.always_show_set_button' => 'Engedélyezze, hogy mindig megjelenjen a „Szett hozzáadása” gomb.',
     'bard.config.buttons' => 'Válassza ki, hogy mely gombok jelenjenek meg az eszköztárban.',
     'bard.config.container' => 'Válassza ki, hogy melyik Médiatároló kerüljön használatra ennél a mezőnél.',

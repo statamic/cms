@@ -1,11 +1,13 @@
 <script>
 import Fuse from 'fuse.js';
+import { sortBy } from 'lodash-es';
 
 export default {
+    emits: ['selections-updated', 'visible-columns-updated'],
     props: {
         columns: {
             type: Array,
-            default: () => []
+            default: () => [],
         },
         rows: {
             type: Array,
@@ -13,29 +15,29 @@ export default {
         },
         searchQuery: {
             type: String,
-            default: ''
+            default: '',
         },
         selections: {
             type: Array,
-            default: () => []
+            default: () => [],
         },
         maxSelections: {
-            type: Number
+            type: Number,
         },
         sort: {
             type: Boolean,
-            default: true
+            default: true,
         },
         sortColumn: String,
         sortDirection: {
             type: String,
-            default: 'asc'
-        }
+            default: 'asc',
+        },
     },
     provide() {
         return {
-            sharedState: this.sharedState
-        }
+            sharedState: this.sharedState,
+        };
     },
     data() {
         return {
@@ -48,12 +50,11 @@ export default {
                 originalRows: this.rows,
                 selections: this.selections,
                 maxSelections: this.maxSelections,
-            }
-        }
+            },
+        };
     },
 
     computed: {
-
         filteredRows() {
             let rows = this.rows;
             rows = this.filterBySearch(rows);
@@ -61,24 +62,22 @@ export default {
         },
 
         visibleColumns() {
-            return this.sharedState.columns.filter(column => column.visible);
+            return this.sharedState.columns.filter((column) => column.visible);
         },
 
         searchableColumns() {
             return this.visibleColumns.length
-                ? this.visibleColumns.map(column => column.field)
+                ? this.visibleColumns.map((column) => column.field)
                 : Object.keys(rows[0]);
         },
-
     },
 
     watch: {
-
         filteredRows: {
             immediate: true,
             handler: function (rows) {
                 this.sharedState.rows = rows;
-            }
+            },
         },
 
         selections(selections) {
@@ -100,7 +99,6 @@ export default {
         visibleColumns(columns) {
             this.$emit('visible-columns-updated', columns);
         },
-
     },
 
     created() {
@@ -109,12 +107,11 @@ export default {
         this.$events.$on('clear-selections', this.clearSelections);
     },
 
-    destroyed() {
+    unmounted() {
         this.$events.$off('clear-selections', this.clearSelections);
     },
 
     methods: {
-
         setInitialSortColumn() {
             const columns = this.sharedState.columns;
 
@@ -126,7 +123,7 @@ export default {
         },
 
         filterBySearch(rows) {
-            if (! this.searchQuery) return rows;
+            if (!this.searchQuery) return rows;
 
             const fuse = new Fuse(rows, {
                 findAllMatches: true,
@@ -135,16 +132,16 @@ export default {
                 keys: this.searchableColumns,
             });
 
-            return fuse.search(this.searchQuery).map(result => result.item);
+            return fuse.search(this.searchQuery).map((result) => result.item);
         },
 
         sortRows(rows) {
-            if (! this.sort) return rows;
+            if (!this.sort) return rows;
 
             // If no column is selected, don't sort.
-            if (! this.sharedState.sortColumn) return rows;
+            if (!this.sharedState.sortColumn) return rows;
 
-            rows = _.sortBy(rows, this.sharedState.sortColumn);
+            rows = sortBy(rows, this.sharedState.sortColumn);
 
             if (this.sharedState.sortDirection === 'desc') {
                 rows = rows.reverse();
@@ -156,15 +153,13 @@ export default {
         clearSelections() {
             this.sharedState.selections = [];
         },
-
     },
 
     render() {
-        return this.$scopedSlots.default({
+        return this.$slots.default({
             rows: this.filteredRows,
             hasSelections: this.sharedState.selections.length > 0,
-        });
-    }
-
-}
+        })[0];
+    },
+};
 </script>

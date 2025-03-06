@@ -13,30 +13,29 @@
 
 <script>
 export default {
-
     props: {
         resource: {
-            type: Object
+            type: Object,
         },
         resourceTitle: {
-            type: String
+            type: String,
         },
         route: {
             type: String,
         },
         redirect: {
-            type: String
+            type: String,
         },
         reload: {
-            type: Boolean
-        }
+            type: Boolean,
+        },
     },
 
     data() {
         return {
             resetting: false,
             redirectFromServer: null,
-        }
+        };
     },
 
     computed: {
@@ -45,7 +44,7 @@ export default {
         },
 
         modalTitle() {
-            return __('Reset :resource', {resource: this.title});
+            return __('Reset :resource', { resource: this.title });
         },
 
         modalBody() {
@@ -54,7 +53,7 @@ export default {
 
         resetUrl() {
             let url = data_get(this.resource, 'reset_url', this.route);
-            if (! url) console.error('FieldsetResetter cannot find reset url');
+            if (!url) console.error('FieldsetResetter cannot find reset url');
             return url;
         },
 
@@ -69,8 +68,9 @@ export default {
         },
 
         confirmed() {
-            this.$axios.delete(this.resetUrl)
-                .then(response => {
+            this.$axios
+                .delete(this.resetUrl)
+                .then((response) => {
                     this.redirectFromServer = data_get(response, 'data.redirect');
                     this.success();
                 })
@@ -96,7 +96,7 @@ export default {
 
         cancel() {
             this.resetting = false;
-        }
-    }
-}
+        },
+    },
+};
 </script>

@@ -1,8 +1,13 @@
 <template>
     <div class="time-fieldtype-container">
         <div class="input-group">
-            <button class="input-group-prepend flex items-center" v-tooltip="__('Set to now')" @click="setToNow" v-if="!isReadOnly">
-                <svg-icon name="light/time" class="w-4 h-4" />
+            <button
+                class="input-group-prepend flex items-center"
+                v-tooltip="__('Set to now')"
+                @click="setToNow"
+                v-if="!isReadOnly"
+            >
+                <svg-icon name="light/time" class="h-4 w-4" />
             </button>
             <input
                 type="time"
@@ -20,10 +25,10 @@
 </template>
 
 <script>
+import Fieldtype from './Fieldtype.vue';
 import IMask from 'imask';
 
 export default {
-
     mixins: [Fieldtype],
 
     props: {
@@ -62,7 +67,7 @@ export default {
     computed: {
         useSeconds() {
             return this.showSeconds || this.config.seconds_enabled;
-        }
+        },
     },
 
     created() {
@@ -72,7 +77,7 @@ export default {
     mounted() {
         // The mask will replace the need for binding the value to the input.
         this.mask = IMask(this.$refs.time, {
-            mask: this.useSeconds ? '0[0]:`0[0]:`00' : '0[0]:`00'
+            mask: this.useSeconds ? '0[0]:`0[0]:`00' : '0[0]:`00',
         });
 
         // Bind initial value to mask.
@@ -80,10 +85,10 @@ export default {
 
         // We use this instead of v-model or @input because input would be early and give us the raw value.
         // In this event listener, we get masked value (with colons/guides). // e.g. 032 vs. 03:2
-        this.mask.on('accept', e => this.inputValue = this.mask.value);
+        this.mask.on('accept', (e) => (this.inputValue = this.mask.value));
     },
 
-    destroyed() {
+    unmounted() {
         this.$events.$off(`container.${this.storeName}.saving`, this.updateActualValue);
         this.mask.destroy();
     },
@@ -95,7 +100,7 @@ export default {
         },
 
         focus() {
-             this.$refs.time.focus();
+            this.$refs.time.focus();
         },
 
         // This will take the value of the input, add appropriate padding, and update the actual fieldtype value.
@@ -104,7 +109,7 @@ export default {
         //      03:20:4 -> 03:20:04
         //      3:2:4   -> 03:02:04
         updateActualValue() {
-            if (! this.inputValue) {
+            if (!this.inputValue) {
                 this.update(null);
                 return;
             }
@@ -112,7 +117,7 @@ export default {
             let parts = this.inputValue.split(':');
             if (parts.length === 1) parts.push('00');
             if (parts.length === 2 && this.useSeconds) parts.push('00');
-            parts = parts.map(part => part.padStart(2, '0'));
+            parts = parts.map((part) => part.padStart(2, '0'));
 
             let newValue = parts.join(':');
 
@@ -126,9 +131,7 @@ export default {
             const minutes = String(date.getMinutes()).padStart(2, '0');
             const seconds = String(date.getSeconds()).padStart(2, '0');
 
-            this.update(this.useSeconds
-                ? `${hours}:${minutes}:${seconds}`
-                : `${hours}:${minutes}`);
+            this.update(this.useSeconds ? `${hours}:${minutes}:${seconds}` : `${hours}:${minutes}`);
         },
 
         adjustPart(e, direction, callback) {
@@ -160,7 +163,6 @@ export default {
                 e.target.selectionEnd = caretPosition;
             });
         },
-    }
-
+    },
 };
 </script>

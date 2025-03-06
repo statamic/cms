@@ -1,5 +1,4 @@
 <template>
-
     <entry-publish-form
         :is-creating="true"
         publish-container="base"
@@ -19,18 +18,17 @@
         :revisions-enabled="revisions"
         :breadcrumbs="breadcrumbs"
         :initial-site="site"
+        :parent="parent"
         :can-manage-publish-state="canManagePublishState"
         :create-another-url="createAnotherUrl"
         :initial-listing-url="listingUrl"
         :preview-targets="previewTargets"
         @saved="saved"
     ></entry-publish-form>
-
 </template>
 
 <script>
 export default {
-
     props: [
         'actions',
         'collectionHandle',
@@ -44,6 +42,7 @@ export default {
         'revisions',
         'breadcrumbs',
         'site',
+        'parent',
         'canManagePublishState',
         'createAnotherUrl',
         'listingUrl',
@@ -51,12 +50,9 @@ export default {
     ],
 
     methods: {
-
         saved(response) {
             window.location = response.data.data.edit_url + '?created=true';
-        }
-
-    }
-
-}
+        },
+    },
+};
 </script>

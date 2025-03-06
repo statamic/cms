@@ -1,6 +1,5 @@
 <template>
     <div>
-
         <div v-if="initializing" class="card loading">
             <loading-graphic />
         </div>
@@ -13,11 +12,13 @@
             :sort="false"
             :sort-column="sortColumn"
             :sort-direction="sortDirection"
+            v-slot="{ hasSelections }"
         >
-            <div slot-scope="{ hasSelections }">
-                <div class="card overflow-hidden p-0 relative">
-                    <div class="flex flex-wrap items-center justify-between px-2 pb-2 text-sm border-b dark:border-dark-900">
-
+            <div>
+                <div class="card relative overflow-hidden p-0">
+                    <div
+                        class="flex flex-wrap items-center justify-between border-b px-2 pb-2 text-sm dark:border-dark-900"
+                    >
                         <data-list-filter-presets
                             v-show="allowFilterPresets"
                             ref="presets"
@@ -31,11 +32,26 @@
                             @reset="filtersReset"
                         />
 
-                        <data-list-search class="h-8 mt-2 min-w-[240px] w-full" ref="search" v-model="searchQuery" :placeholder="searchPlaceholder" />
+                        <data-list-search
+                            class="mt-2 h-8 w-full min-w-[240px]"
+                            ref="search"
+                            v-model="searchQuery"
+                            :placeholder="searchPlaceholder"
+                        />
 
-                        <div class="flex space-x-2 rtl:space-x-reverse mt-2">
-                            <button class="btn btn-sm rtl:mr-2 ltr:ml-2" v-text="__('Reset')" v-show="isDirty" @click="$refs.presets.refreshPreset()" />
-                            <button class="btn btn-sm rtl:mr-2 ltr:ml-2" v-text="__('Save')" v-show="allowFilterPresets && isDirty" @click="$refs.presets.savePreset()" />
+                        <div class="mt-2 flex space-x-2 rtl:space-x-reverse">
+                            <button
+                                class="btn btn-sm ltr:ml-2 rtl:mr-2"
+                                v-text="__('Reset')"
+                                v-show="isDirty"
+                                @click="$refs.presets.refreshPreset()"
+                            />
+                            <button
+                                class="btn btn-sm ltr:ml-2 rtl:mr-2"
+                                v-text="__('Save')"
+                                v-show="allowFilterPresets && isDirty"
+                                @click="$refs.presets.savePreset()"
+                            />
                             <data-list-column-picker :preferences-key="preferencesKey('columns')" />
                         </div>
                     </div>
@@ -73,25 +89,37 @@
                             :column-preferences-key="preferencesKey('columns')"
                             @sorted="sorted"
                         >
-                            <template slot="cell-email" slot-scope="{ row: user, value }">
+                            <template #cell-email="{ row: user, value }">
                                 <a :href="user.edit_url" class="flex items-center">
-                                    <avatar :user="user" class="w-8 h-8 rounded-full rtl:ml-2 ltr:mr-2" />
+                                    <avatar :user="user" class="h-8 w-8 rounded-full ltr:mr-2 rtl:ml-2" />
                                     {{ value }}
                                 </a>
                             </template>
-                            <template slot="cell-roles" slot-scope="{ row: user, value: roles }">
+                            <template #cell-roles="{ row: user, value: roles }">
                                 <div class="role-index-field">
-                                    <div v-if="user.super" class="role-index-field-item rtl:ml-1 ltr:mr-1 mb-1.5">{{ __('Super Admin') }}</div>
+                                    <div v-if="user.super" class="role-index-field-item mb-1.5 ltr:mr-1 rtl:ml-1">
+                                        {{ __('Super Admin') }}
+                                    </div>
                                     <div v-if="!roles || roles.length === 0" />
-                                    <div v-for="(role, i) in (roles || [])" class="role-index-field-item rtl:ml-1 ltr:mr-1 mb-1.5">{{ __(role.title) }}</div>
+                                    <div
+                                        v-for="(role, i) in roles || []"
+                                        class="role-index-field-item mb-1.5 ltr:mr-1 rtl:ml-1"
+                                    >
+                                        {{ __(role.title) }}
+                                    </div>
                                 </div>
                             </template>
-                            <template slot="cell-groups" slot-scope="{ row: user, value: groups }">
+                            <template #cell-groups="{ row: user, value: groups }">
                                 <div class="groups-index-field">
-                                    <div v-for="group in (groups || [])" class="groups-index-field-item rtl:ml-1 ltr:mr-1 mb-1.5">{{ __(group.title) }}</div>
+                                    <div
+                                        v-for="group in groups || []"
+                                        class="groups-index-field-item mb-1.5 ltr:mr-1 rtl:ml-1"
+                                    >
+                                        {{ __(group.title) }}
+                                    </div>
                                 </div>
                             </template>
-                            <template slot="actions" slot-scope="{ row: user, index }">
+                            <template #actions="{ row: user, index }">
                                 <dropdown-list placement="right-start">
                                     <dropdown-item :text="__('Edit')" :redirect="user.edit_url" v-if="user.editable" />
                                     <dropdown-item :text="__('View')" :redirect="user.edit_url" v-else />
@@ -118,7 +146,6 @@
                 />
             </div>
         </data-list>
-
     </div>
 </template>
 
@@ -126,7 +153,6 @@
 import Listing from '../Listing.vue';
 
 export default {
-
     mixins: [Listing],
 
     props: {
@@ -142,18 +168,15 @@ export default {
             preferencesPrefix: 'users',
             requestUrl: cp_url('users'),
             pushQuery: true,
-        }
+        };
     },
 
     computed: {
-
         additionalParameters() {
             return {
                 group: this.group,
-            }
-        }
-
-    }
-
-}
+            };
+        },
+    },
+};
 </script>

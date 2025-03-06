@@ -12,25 +12,26 @@
 </template>
 
 <script>
-export default {
+import Fieldtype from './Fieldtype.vue';
 
+export default {
     mixins: [Fieldtype],
 
-    inject: ['storeName'],
+    inject: ['store'],
 
     computed: {
-
         container() {
-            return data_get(this.$store.state.publish[this.storeName].values.container, '0', this.config.container);
+            return this.store.values?.container[0] ?? this.config.container;
         },
 
         relationshipMeta() {
-            return {...this.meta, ...{
-                getBaseSelectionsUrlParameters: { container: this.container }
-            }};
-        }
-
-    }
-
+            return {
+                ...this.meta,
+                ...{
+                    getBaseSelectionsUrlParameters: { container: this.container },
+                },
+            };
+        },
+    },
 };
 </script>

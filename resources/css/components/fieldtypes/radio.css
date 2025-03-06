@@ -2,12 +2,12 @@
     @apply flex;
 }
 
-.radio-fieldtype input[type="radio"] {
-    @apply m-0 min-w-0 absolute opacity-0 -z-1 w-1 h-px w-px overflow-hidden;
+.radio-fieldtype input[type='radio'] {
+    @apply absolute -z-1 m-0 h-px w-1 w-px min-w-0 overflow-hidden opacity-0;
 }
 
 .radio-fieldtype .radio-icon {
-    @apply cursor-pointer h-4 w-4 ltr:mr-2 rtl:ml-2 block;
+    @apply block h-4 w-4 cursor-pointer ltr:mr-2 rtl:ml-2;
 }
 
 .radio-fieldtype .option.disabled {
@@ -18,4 +18,3 @@
         @apply cursor-text;
     }
 }
-

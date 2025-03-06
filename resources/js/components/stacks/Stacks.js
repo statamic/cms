@@ -1,9 +1,6 @@
-import Vue from 'vue'
-import uniqid from 'uniqid'
-
-class Stacks {
-    constructor(instance) {
-        this.portals = instance.$root.portals;
+export default class Stacks {
+    constructor(portals) {
+        this.$portals = portals;
     }
 
     count() {
@@ -11,22 +8,14 @@ class Stacks {
     }
 
     add(vm) {
-        return vm.$portals.create('stack', {
+        return this.$portals.create('stack', {
             type: 'stack',
             depth: this.count() + 1,
-            vm
+            vm,
         });
     }
 
     stacks() {
-        return this.portals.filter(portal => portal.data?.type === 'stack');
+        return this.$portals.stacks();
     }
 }
-
-Object.defineProperties(Vue.prototype, {
-    $stacks: {
-        get() {
-            return new Stacks(this);
-        }
-    }
-});

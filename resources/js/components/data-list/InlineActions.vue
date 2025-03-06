@@ -1,5 +1,4 @@
 <template>
-
     <div>
         <data-list-action
             v-for="action in sortedActions"
@@ -9,24 +8,19 @@
             :errors="errors"
             :is-dirty="isDirty"
             @selected="run"
+            v-slot="{ action, select }"
         >
-            <div slot-scope="{ action, select }">
-                <button
-                    v-text="__(action.title)"
-                    :class="{ warning: action.dangerous }"
-                    @click="select" />
+            <div>
+                <button v-text="__(action.title)" :class="{ warning: action.dangerous }" @click="select" />
             </div>
         </data-list-action>
     </div>
-
 </template>
-
 
 <script>
 import Actions from './Actions';
 
 export default {
-
     mixins: [Actions],
 
     props: {
@@ -36,12 +30,9 @@ export default {
     },
 
     computed: {
-
         selections() {
             return [this.item];
         },
-
-    }
-
-}
+    },
+};
 </script>

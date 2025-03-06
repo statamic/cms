@@ -1,11 +1,12 @@
-@php use function Statamic\trans as __; @endphp
+@php
+    use function Statamic\trans as __;
+@endphp
 
 @extends('statamic::layout')
 @section('title', Statamic::crumb('Assets', $container['title']))
 @section('wrapper_class', 'max-w-full')
 
 @section('content')
-
     <asset-manager
         :initial-container="{{ json_encode($container) }}"
         initial-path="{{ $folder }}"
@@ -14,9 +15,11 @@
         create-container-url="{{ cp_route('asset-containers.create') }}"
     ></asset-manager>
 
-    @include('statamic::partials.docs-callout', [
-        'topic' => __('Assets'),
-        'url' => Statamic::docsUrl('assets')
-    ])
-
+    @include(
+        'statamic::partials.docs-callout',
+        [
+            'topic' => __('Assets'),
+            'url' => Statamic::docsUrl('assets'),
+        ]
+    )
 @endsection

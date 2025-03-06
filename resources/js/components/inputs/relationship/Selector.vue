@@ -1,7 +1,5 @@
 <template>
-
     <div class="h-full bg-white dark:bg-dark-800">
-
         <div v-if="initializing" class="absolute inset-0 z-200 flex items-center justify-center text-center">
             <loading-graphic />
         </div>
@@ -17,16 +15,32 @@
             :selections="selections"
             :max-selections="maxSelections"
             @selections-updated="selectionsUpdated"
+            v-slot="{}"
         >
-            <div slot-scope="{}" class="flex flex-col h-full">
-                <div class="bg-white dark:bg-dark-800 z-1">
-                    <div class="py-2 px-4 flex items-center justify-between">
-                        <data-list-search class="h-8 min-w-[240px] w-full" ref="search" v-model="searchQuery" :placeholder="searchPlaceholder" />
-                        <div class="btn-group rtl:mr-4 ltr:ml-4" v-if="canUseTree">
-                            <button class="btn flex items-center px-4" @click="view = 'tree'" :class="{'active': view === 'tree'}" v-tooltip="__('Tree')">
-                                <svg-icon name="light/structures" class="h-4 w-4"/>
+            <div class="flex h-full flex-col">
+                <div class="z-1 bg-white dark:bg-dark-800">
+                    <div class="flex items-center justify-between px-4 py-2">
+                        <data-list-search
+                            class="h-8 w-full min-w-[240px]"
+                            ref="search"
+                            v-model="searchQuery"
+                            :placeholder="searchPlaceholder"
+                        />
+                        <div class="btn-group ltr:ml-4 rtl:mr-4" v-if="canUseTree">
+                            <button
+                                class="btn flex items-center px-4"
+                                @click="view = 'tree'"
+                                :class="{ active: view === 'tree' }"
+                                v-tooltip="__('Tree')"
+                            >
+                                <svg-icon name="light/structures" class="h-4 w-4" />
                             </button>
-                            <button class="btn flex items-center px-4" @click="view = 'list'" :class="{'active': view === 'list'}" v-tooltip="__('List')">
+                            <button
+                                class="btn flex items-center px-4"
+                                @click="view = 'list'"
+                                :class="{ active: view === 'list' }"
+                                v-tooltip="__('List')"
+                            >
                                 <svg-icon name="assets-mode-table" class="h-4 w-4" />
                             </button>
                         </div>
@@ -44,8 +58,8 @@
                     </div>
                 </div>
 
-                <div class="flex-1 flex flex-col min-h-0">
-                    <div class="flex flex-col h-full justify-start">
+                <div class="flex min-h-0 flex-1 flex-col">
+                    <div class="flex h-full flex-col justify-start">
                         <div class="flex-1 overflow-scroll">
                             <data-list-table
                                 :loading="loading"
@@ -55,16 +69,26 @@
                                 @sorted="sorted"
                                 class="cursor-pointer"
                             >
-                                <template slot="cell-title" slot-scope="{ row: entry }">
+                                <template #cell-title="{ row: entry }">
                                     <div class="flex items-center">
-                                        <div class="little-dot rtl:ml-2 ltr:mr-2" v-tooltip="getStatusLabel(entry)" :class="getStatusClass(entry)" v-if="entry.status && ! columnShowing('status')" />
+                                        <div
+                                            class="little-dot ltr:mr-2 rtl:ml-2"
+                                            v-tooltip="getStatusLabel(entry)"
+                                            :class="getStatusClass(entry)"
+                                            v-if="entry.status && !columnShowing('status')"
+                                        />
                                         {{ entry.title }}
                                     </div>
                                 </template>
-                                <template slot="cell-status" slot-scope="{ row: entry }">
-                                    <div class="status-index-field select-none" v-tooltip="getStatusTooltip(entry)" :class="`status-${entry.status}`" v-text="getStatusLabel(entry)" />
+                                <template #cell-status="{ row: entry }">
+                                    <div
+                                        class="status-index-field select-none"
+                                        v-tooltip="getStatusTooltip(entry)"
+                                        :class="`status-${entry.status}`"
+                                        v-text="getStatusLabel(entry)"
+                                    />
                                 </template>
-                                <template slot="cell-url" slot-scope="{ row: entry }">
+                                <template #cell-url="{ row: entry }">
                                     <span class="text-2xs">{{ entry.url }}</span>
                                 </template>
                             </data-list-table>
@@ -76,54 +100,68 @@
                             :resource-meta="meta"
                             :inline="true"
                             :scroll-to-top="false"
-                            @page-selected="setPage" />
+                            @page-selected="setPage"
+                        />
 
-                        <div class="p-4 border-t dark:border-dark-200 flex items-center justify-between bg-gray-200 dark:bg-dark-500">
-                            <div class="text-sm text-gray-700 dark:text-dark-150"
-                                v-text="hasMaxSelections
-                                    ? __n(':count/:max selected', selections, { max: maxSelections })
-                                    : __n(':count item selected|:count items selected', selections)" />
+                        <div
+                            class="flex items-center justify-between border-t bg-gray-200 p-4 dark:border-dark-200 dark:bg-dark-500"
+                        >
+                            <div
+                                class="text-sm text-gray-700 dark:text-dark-150"
+                                v-text="
+                                    hasMaxSelections
+                                        ? __n(':count/:max selected', selections, { max: maxSelections })
+                                        : __n(':count item selected|:count items selected', selections)
+                                "
+                            />
 
                             <div>
-                                <button
-                                    type="button"
-                                    class="btn"
-                                    @click="close">
+                                <button type="button" class="btn" @click="close">
                                     {{ __('Cancel') }}
                                 </button>
 
                                 <button
-                                    v-if="! hasMaxSelections || maxSelections > 1"
+                                    v-if="!hasMaxSelections || maxSelections > 1"
                                     type="button"
-                                    class="btn-primary rtl:mr-2 ltr:ml-2"
-                                    @click="select">
+                                    class="btn-primary ltr:ml-2 rtl:mr-2"
+                                    @click="select"
+                                >
                                     {{ __('Select') }}
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
-
             </div>
         </data-list>
 
         <template v-if="!initializing && canUseTree && view === 'tree'">
-            <div class="flex flex-col h-full">
-                <div class="bg-white dark:bg-dark-550 shadow px-4 py-2 z-1 h-13 flex items-center justify-end">
-                    <h1 class="flex-1 flex items-center text-xl">{{ tree.title }}</h1>
-                    <div class="btn-group rtl:mr-4 ltr:ml-4">
-                        <button class="btn flex items-center px-4" @click="view = 'tree'" :class="{'active': view === 'tree'}" v-tooltip="__('Tree')">
-                            <svg-icon name="light/structures" class="h-4 w-4"/>
+            <div class="flex h-full flex-col">
+                <div class="z-1 flex h-13 items-center justify-end bg-white px-4 py-2 shadow dark:bg-dark-550">
+                    <h1 class="flex flex-1 items-center text-xl">{{ tree.title }}</h1>
+                    <div class="btn-group ltr:ml-4 rtl:mr-4">
+                        <button
+                            class="btn flex items-center px-4"
+                            @click="view = 'tree'"
+                            :class="{ active: view === 'tree' }"
+                            v-tooltip="__('Tree')"
+                        >
+                            <svg-icon name="light/structures" class="h-4 w-4" />
                         </button>
-                        <button class="btn flex items-center px-4" @click="view = 'list'" :class="{'active': view === 'list'}" v-tooltip="__('List')">
+                        <button
+                            class="btn flex items-center px-4"
+                            @click="view = 'list'"
+                            :class="{ active: view === 'list' }"
+                            v-tooltip="__('List')"
+                        >
                             <svg-icon name="assets-mode-table" class="h-4 w-4" />
                         </button>
                     </div>
                 </div>
 
-                <div class="flex-1 flex flex-col min-h-0">
-                    <div class="flex flex-col h-full justify-start">
-                        <div class="flex-1 overflow-scroll bg-gray-200 dark:bg-dark-800 p-4">
+                <div class="flex min-h-0 flex-1 flex-col">
+                    <div class="flex h-full flex-col justify-start">
+                        <div class="flex-1 overflow-scroll bg-gray-200 p-4 dark:bg-dark-800">
                             <page-tree
                                 ref="tree"
                                 :pages-url="tree.url"
@@ -140,7 +178,7 @@
                                         <input
                                             :ref="`tree-branch-${branch.id}`"
                                             type="checkbox"
-                                            class="mt-3 rtl:mr-3 ltr:ml-3"
+                                            class="mt-3 ltr:ml-3 rtl:mr-3"
                                             :value="branch.id"
                                             :checked="isSelected(branch.id)"
                                             :disabled="reachedSelectionLimit && !singleSelect && !isSelected(branch.id)"
@@ -151,33 +189,39 @@
                                 </template>
 
                                 <template #branch-icon="{ branch }">
-                                    <svg-icon v-if="isRedirectBranch(branch)"
-                                        class="inline-block w-4 h-4 text-gray-500 dark:text-dark-175"
+                                    <svg-icon
+                                        v-if="isRedirectBranch(branch)"
+                                        class="inline-block h-4 w-4 text-gray-500 dark:text-dark-175"
                                         name="light/external-link"
-                                        v-tooltip="__('Redirect')" />
+                                        v-tooltip="__('Redirect')"
+                                    />
                                 </template>
                             </page-tree>
                         </div>
 
-                        <div class="p-4 border-t dark:border-dark-200 flex items-center justify-between bg-gray-200 dark:bg-dark-500">
-                            <div class="text-sm text-gray-700"
-                                v-text="hasMaxSelections
-                                    ? __n(':count/:max selected', selections, { max: maxSelections })
-                                    : __n(':count item selected|:count items selected', selections)" />
+                        <div
+                            class="flex items-center justify-between border-t bg-gray-200 p-4 dark:border-dark-200 dark:bg-dark-500"
+                        >
+                            <div
+                                class="text-sm text-gray-700"
+                                v-text="
+                                    hasMaxSelections
+                                        ? __n(':count/:max selected', selections, { max: maxSelections })
+                                        : __n(':count item selected|:count items selected', selections)
+                                "
+                            />
 
                             <div>
-                                <button
-                                    type="button"
-                                    class="btn"
-                                    @click="close">
+                                <button type="button" class="btn" @click="close">
                                     {{ __('Cancel') }}
                                 </button>
 
                                 <button
-                                    v-if="! hasMaxSelections || maxSelections > 1"
+                                    v-if="!hasMaxSelections || maxSelections > 1"
                                     type="button"
-                                    class="btn-primary rtl:mr-2 ltr:ml-2"
-                                    @click="select">
+                                    class="btn-primary ltr:ml-2 rtl:mr-2"
+                                    @click="select"
+                                >
                                     {{ __('Select') }}
                                 </button>
                             </div>
@@ -187,21 +231,18 @@
             </div>
         </template>
     </div>
-
 </template>
 
 <script>
 import HasFilters from '../../data-list/HasFilters';
-import PageTree from '../../structures/PageTree.vue';
+import { defineAsyncComponent } from 'vue';
+import clone from '@statamic/util/clone.js';
 
 export default {
-
-    mixins: [
-        HasFilters,
-    ],
+    mixins: [HasFilters],
 
     components: {
-        PageTree,
+        PageTree: defineAsyncComponent(() => import('../../structures/PageTree.vue')),
     },
 
     props: {
@@ -217,11 +258,11 @@ export default {
         name: String,
         exclusions: {
             type: Array,
-            default: () => []
+            default: () => [],
         },
         initialColumns: {
             type: Array,
-            default: () => []
+            default: () => [],
         },
         tree: Object,
     },
@@ -237,16 +278,15 @@ export default {
             sortColumn: this.initialSortColumn,
             sortDirection: this.initialSortDirection,
             page: 1,
-            selections: _.clone(this.initialSelections),
+            selections: clone(this.initialSelections),
             columns: this.initialColumns,
-            visibleColumns: this.initialColumns.filter(column => column.visible),
+            visibleColumns: this.initialColumns.filter((column) => column.visible),
             view: 'list',
-            lastItemClicked: null
-        }
+            lastItemClicked: null,
+        };
     },
 
     computed: {
-
         parameters() {
             return {
                 sort: this.sortColumn,
@@ -255,12 +295,12 @@ export default {
                 site: this.site,
                 exclusions: this.exclusions,
                 filters: utf8btoa(JSON.stringify(this.activeFilters)),
-                columns: this.visibleColumns.map(column => column.field).join(','),
-            }
+                columns: this.visibleColumns.map((column) => column.field).join(','),
+            };
         },
 
         hasMaxSelections() {
-            return (this.maxSelections === Infinity) ? false : Boolean(this.maxSelections);
+            return this.maxSelections === Infinity ? false : Boolean(this.maxSelections);
         },
 
         reachedSelectionLimit() {
@@ -272,7 +312,7 @@ export default {
         },
 
         canUseTree() {
-            return !! this.tree;
+            return !!this.tree;
         },
 
         initialView() {
@@ -285,8 +325,7 @@ export default {
 
         viewLocalStorageKey() {
             return `statamic.selector.field.${this.name}`;
-        }
-
+        },
     },
 
     mounted() {
@@ -299,21 +338,20 @@ export default {
     },
 
     watch: {
-
         parameters: {
             deep: true,
             handler(after, before) {
                 if (this.initializing) return;
                 if (JSON.stringify(before) === JSON.stringify(after)) return;
                 this.request();
-            }
+            },
         },
 
         loading: {
             immediate: true,
             handler(loading) {
                 this.$progress.loading('relationship-selector-listing', loading);
-            }
+            },
         },
 
         searchQuery(query) {
@@ -333,15 +371,13 @@ export default {
         view(view) {
             localStorage.setItem(this.viewLocalStorageKey, view);
         },
-
     },
 
     methods: {
-
         getFilters() {
             if (!this.filtersUrl) return Promise.resolve();
 
-            return this.$axios.get(this.filtersUrl).then(response => {
+            return this.$axios.get(this.filtersUrl).then((response) => {
                 this.filters = response.data;
             });
         },
@@ -358,23 +394,31 @@ export default {
             if (this.source) this.source.cancel();
             this.source = this.$axios.CancelToken.source();
 
-            const params = {...this.parameters, ...{
-                search: this.searchQuery,
-            }};
+            const params = {
+                ...this.parameters,
+                ...{
+                    search: this.searchQuery,
+                },
+            };
 
-            return this.$axios.get(this.selectionsUrl, { params, cancelToken: this.source.token }).then(response => {
-                this.columns = response.data.meta.columns;
-                this.items = response.data.data;
-                this.meta = response.data.meta;
-                this.activeFilterBadges = {...response.data.meta.activeFilterBadges};
-                this.loading = false;
-                this.initializing = false;
-            }).catch(e => {
-                if (this.$axios.isCancel(e)) return;
-                this.loading = false;
-                this.initializing = false;
-                this.$toast.error(e.response ? e.response.data.message : __('Something went wrong'), { duration: null });
-            });
+            return this.$axios
+                .get(this.selectionsUrl, { params, cancelToken: this.source.token })
+                .then((response) => {
+                    this.columns = response.data.meta.columns;
+                    this.items = response.data.data;
+                    this.meta = response.data.meta;
+                    this.activeFilterBadges = { ...response.data.meta.activeFilterBadges };
+                    this.loading = false;
+                    this.initializing = false;
+                })
+                .catch((e) => {
+                    if (this.$axios.isCancel(e)) return;
+                    this.loading = false;
+                    this.initializing = false;
+                    this.$toast.error(e.response ? e.response.data.message : __('Something went wrong'), {
+                        duration: null,
+                    });
+                });
         },
 
         sorted(column, direction) {
@@ -388,7 +432,7 @@ export default {
 
         select() {
             this.$emit('selected', this.selections);
-            this.close()
+            this.close();
         },
 
         close() {
@@ -423,20 +467,18 @@ export default {
 
         getStatusTooltip(entry) {
             if (entry.status === 'published') {
-                return entry.collection.dated
-                    ? __('messages.status_published_with_date', {date: entry.date})
-                    : null; // The label is sufficient.
+                return entry.collection.dated ? __('messages.status_published_with_date', { date: entry.date }) : null; // The label is sufficient.
             } else if (entry.status === 'scheduled') {
-                return __('messages.status_scheduled_with_date', {date: entry.date})
+                return __('messages.status_scheduled_with_date', { date: entry.date });
             } else if (entry.status === 'expired') {
-                return __('messages.status_expired_with_date', {date: entry.date})
+                return __('messages.status_expired_with_date', { date: entry.date });
             } else if (entry.status === 'draft') {
                 return null; // The label is sufficient.
             }
         },
 
         columnShowing(column) {
-            return this.visibleColumns.find(c => c.field === column);
+            return this.visibleColumns.find((c) => c.field === column);
         },
 
         isRedirectBranch(branch) {
@@ -460,27 +502,22 @@ export default {
                 this.selections.pop();
             }
 
-            if (! this.reachedSelectionLimit) {
+            if (!this.reachedSelectionLimit) {
                 this.selections.push(id);
             }
         },
 
         checkboxClicked(row, index, $event) {
             if ($event.shiftKey && this.lastItemClicked !== null) {
-                this.selectRange(
-                    Math.min(this.lastItemClicked, index),
-                    Math.max(this.lastItemClicked, index)
-                );
+                this.selectRange(Math.min(this.lastItemClicked, index), Math.max(this.lastItemClicked, index));
             } else {
-                this.toggleSelection(row.id, index)
+                this.toggleSelection(row.id, index);
             }
 
             if ($event.target.checked) {
-                this.lastItemClicked = index
+                this.lastItemClicked = index;
             }
         },
-
-    }
-
-}
+    },
+};
 </script>

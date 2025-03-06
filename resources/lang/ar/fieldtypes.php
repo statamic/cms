@@ -22,7 +22,6 @@ return [
     'assets.dynamic_folder_pending_field' => 'سيكون هذا الحقل متاحًا بمجرد تعيين :field .',
     'assets.dynamic_folder_pending_save' => 'سيكون هذا المجال متاحًا بعد الحفظ.',
     'assets.title' => 'أصول',
-    'bard.config.allow_source' => 'تمكين عرض كود HTML المصدر أثناء الكتابة.',
     'bard.config.always_show_set_button' => 'تمكين عرض زر "إضافة مجموعة" دائمًا.',
     'bard.config.buttons' => 'اختر الأزرار التي تظهر في شريط الأدوات.',
     'bard.config.container' => 'اختر حاوية الأصول التي تريد استخدامها لهذا الحقل.',

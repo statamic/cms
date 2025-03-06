@@ -1,26 +1,21 @@
 <template>
-
     <div class="bard-link-toolbar">
         <div>
-            <div class="px-4 py-4 border-b dark:border-dark-900">
-
+            <div class="border-b px-4 py-4 dark:border-dark-900">
                 <div class="flex">
-
-                    <div class="h-8 mb-4 bg-gray-100 dark:bg-dark-600 text-gray-800 dark:text-dark-150 border dark:border-dark-200 rounded shadow-inner flex items-center rtl:ml-1 ltr:mr-1">
-                        <select
-                            class="input w-auto text-sm px-1"
-                            v-model="linkType">
-                            <option
-                                v-for="visibleLinkType in visibleLinkTypes"
-                                :value="visibleLinkType.type"
-                            >
+                    <div
+                        class="mb-4 flex h-8 items-center rounded border bg-gray-100 text-gray-800 shadow-inner dark:border-dark-200 dark:bg-dark-600 dark:text-dark-150 ltr:mr-1 rtl:ml-1"
+                    >
+                        <select class="input w-auto px-1 text-sm" v-model="linkType">
+                            <option v-for="visibleLinkType in visibleLinkTypes" :value="visibleLinkType.type">
                                 {{ visibleLinkType.title }}
                             </option>
                         </select>
                     </div>
 
-                    <div class="h-8 mb-4 p-2 bg-gray-100 dark:bg-dark-600 text-gray-800 dark:text-dark-150 w-full border dark:border-dark-200 rounded shadow-inner placeholder:text-gray-600 dark:placeholder:dark-text-dark-175 flex items-center">
-
+                    <div
+                        class="dark:placeholder:dark-text-dark-175 mb-4 flex h-8 w-full items-center rounded border bg-gray-100 p-2 text-gray-800 shadow-inner placeholder:text-gray-600 dark:border-dark-200 dark:bg-dark-600 dark:text-dark-150"
+                    >
                         <!-- URL input -->
                         <input
                             v-if="linkType === 'url'"
@@ -57,23 +52,22 @@
                         <!-- Data input -->
                         <div
                             v-else
-                            class="w-full flex items-center justify-between cursor-pointer"
+                            class="flex w-full cursor-pointer items-center justify-between"
                             @click="openSelector"
                         >
-
                             <loading-graphic v-if="isLoading" :inline="true" />
 
-                            <div v-else class="flex-1 flex items-center rtl:ml-2 ltr:mr-2 truncate">
+                            <div v-else class="flex flex-1 items-center truncate ltr:mr-2 rtl:ml-2">
                                 <img
                                     v-if="linkType === 'asset' && itemData.asset && itemData.isImage"
                                     :src="itemData.asset.thumbnail || itemData.asset.url"
-                                    class="asset-thumbnail max-h-full max-w-full rounded w-6 h-6 rtl:ml-2 ltr:mr-2 object-cover lazyloaded"
-                                >
+                                    class="asset-thumbnail lazyloaded h-6 max-h-full w-6 max-w-full rounded object-cover ltr:mr-2 rtl:ml-2"
+                                />
                                 {{ displayValue }}
                             </div>
 
                             <button
-                            class="flex items-center"
+                                class="flex items-center"
                                 v-tooltip="`${__('Browse')}...`"
                                 :aria-label="`${__('Browse')}...`"
                                 @click="openSelector"
@@ -81,55 +75,60 @@
                                 <svg-icon v-show="linkType === 'asset'" name="folder-image" class="h-4 w-4" />
                                 <svg-icon v-show="linkType !== 'asset'" name="folder-generic" class="h-4 w-4" />
                             </button>
-
                         </div>
-
                     </div>
-
                 </div>
 
-
                 <!-- Title attribute -->
-                <div class="h-8 mb-4 p-2 bg-gray-100 dark:bg-dark-600 text-gray-800 dark:text-dark-150 w-full border dark:border-dark-200 rounded shadow-inner placeholder:text-gray-600 dark:placeholder:dark-text-dark-175 flex items-center" >
+                <div
+                    class="dark:placeholder:dark-text-dark-175 mb-4 flex h-8 w-full items-center rounded border bg-gray-100 p-2 text-gray-800 shadow-inner placeholder:text-gray-600 dark:border-dark-200 dark:bg-dark-600 dark:text-dark-150"
+                >
                     <input
                         type="text"
                         ref="input"
                         v-model="title"
-                        class="input h-auto text-sm placeholder-gray-50"
+                        class="input placeholder-gray-50 h-auto text-sm"
                         :placeholder="`${__('Label')} (${__('Optional')})`"
                     />
                 </div>
 
                 <!-- Rel attribute -->
-                <div class="h-8 p-2 bg-gray-100 dark:bg-dark-600 text-gray-800 dark:text-dark-150 w-full border dark:border-dark-200 rounded shadow-inner placeholder:text-gray-600 dark:placeholder:dark-text-dark-175 flex items-center" >
+                <div
+                    class="dark:placeholder:dark-text-dark-175 flex h-8 w-full items-center rounded border bg-gray-100 p-2 text-gray-800 shadow-inner placeholder:text-gray-600 dark:border-dark-200 dark:bg-dark-600 dark:text-dark-150"
+                >
                     <input
                         type="text"
                         ref="input"
                         v-model="rel"
-                        class="input h-auto text-sm placeholder-gray-50"
+                        class="input placeholder-gray-50 h-auto text-sm"
                         :placeholder="`${__('Relationship')} (${__('Optional')})`"
                     />
                 </div>
 
-                <label for="target-blank" class="mt-4 flex items-center font-normal cursor-pointer text-gray-800 dark:text-dark-150 hover:text-black dark:hover:text-dark-100" v-if="canHaveTarget">
-                    <input class="checkbox rtl:ml-2 ltr:mr-2" type="checkbox" v-model="targetBlank" id="target-blank">
+                <label
+                    for="target-blank"
+                    class="mt-4 flex cursor-pointer items-center font-normal text-gray-800 hover:text-black dark:text-dark-150 dark:hover:text-dark-100"
+                    v-if="canHaveTarget"
+                >
+                    <input class="checkbox ltr:mr-2 rtl:ml-2" type="checkbox" v-model="targetBlank" id="target-blank" />
                     {{ __('Open in new window') }}
                 </label>
             </div>
 
-            <footer class="bg-gray-100 dark:bg-dark-575 rounded-b-md flex items-center justify-end space-x-3 rtl:space-x-reverse font-normal p-2">
-                <button @click="$emit('canceled')" class="text-xs text-gray-600 dark:text-dark-175 hover:text-gray-800 dark:hover-text-dark-100">
+            <footer
+                class="flex items-center justify-end space-x-3 rounded-b-md bg-gray-100 p-2 font-normal dark:bg-dark-575 rtl:space-x-reverse"
+            >
+                <button
+                    @click="$emit('canceled')"
+                    class="dark:hover-text-dark-100 text-xs text-gray-600 hover:text-gray-800 dark:text-dark-175"
+                >
                     {{ __('Cancel') }}
                 </button>
-                <button
-                    :aria-label="__('Remove Link')"
-                    @click="remove"
-                    class="btn btn-sm"
-                >
+                <button :aria-label="__('Remove Link')" @click="remove" class="btn btn-sm">
                     {{ __('Remove Link') }}
                 </button>
                 <button
-                    :disabled="! canCommit"
+                    :disabled="!canCommit"
                     v-tooltip="__('Apply Link')"
                     :aria-label="__('Apply Link')"
                     @click="commit"
@@ -138,7 +137,6 @@
                     {{ __('Save') }}
                 </button>
             </footer>
-
         </div>
 
         <!-- Selectors -->
@@ -160,11 +158,7 @@
             @item-data-updated="entrySelected"
         />
 
-         <stack
-            v-if="showAssetSelector"
-            name="asset-selector"
-            @closed="closeAssetSelector"
-        >
+        <stack v-if="showAssetSelector" name="asset-selector" @closed="closeAssetSelector">
             <asset-selector
                 :container="config.container"
                 :folder="config.folder || '/'"
@@ -177,7 +171,6 @@
             />
         </stack>
     </div>
-
 </template>
 
 <script>
@@ -186,10 +179,9 @@ import AssetSelector from '../../assets/Selector.vue';
 import SvgIcon from '../../SvgIcon.vue';
 
 export default {
-
     components: {
         AssetSelector,
-        SvgIcon
+        SvgIcon,
     },
 
     props: {
@@ -216,14 +208,13 @@ export default {
             targetBlank: null,
             showAssetSelector: false,
             isLoading: false,
-        }
+        };
     },
 
     computed: {
-
         visibleLinkTypes() {
             return this.linkTypes.filter((type) => {
-                if (type.type === 'asset' && ! this.config.container) {
+                if (type.type === 'asset' && !this.config.container) {
                     return false;
                 }
                 return true;
@@ -246,7 +237,7 @@ export default {
         },
 
         canCommit() {
-            return !! this.url[this.linkType];
+            return !!this.url[this.linkType];
         },
 
         href() {
@@ -269,23 +260,35 @@ export default {
         },
 
         itemDataUrl() {
-            return cp_url('fieldtypes/relationship/data') + '?' + qs.stringify({
-                config: this.configParameter
-            });
+            return (
+                cp_url('fieldtypes/relationship/data') +
+                '?' +
+                qs.stringify({
+                    config: this.configParameter,
+                })
+            );
         },
 
         selectionsUrl() {
-            return cp_url('fieldtypes/relationship') + '?' + qs.stringify({
-                config: this.configParameter,
-                collections: this.collections,
-            });
+            return (
+                cp_url('fieldtypes/relationship') +
+                '?' +
+                qs.stringify({
+                    config: this.configParameter,
+                    collections: this.collections,
+                })
+            );
         },
 
         filtersUrl() {
-            return cp_url('fieldtypes/relationship/filters') + '?' + qs.stringify({
-                config: this.configParameter,
-                collections: this.collections,
-            });
+            return (
+                cp_url('fieldtypes/relationship/filters') +
+                '?' +
+                qs.stringify({
+                    config: this.configParameter,
+                    collections: this.collections,
+                })
+            );
         },
 
         configParameter() {
@@ -301,17 +304,15 @@ export default {
         },
 
         selectedTextIsEmail() {
-            const { view, state } = this.bard.editor
-            const { from, to } = view.state.selection
-            const text = state.doc.textBetween(from, to, '')
+            const { view, state } = this.bard.editor;
+            const { from, to } = view.state.selection;
+            const text = state.doc.textBetween(from, to, '');
 
-            return text.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
+            return text.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/);
         },
-
     },
 
     watch: {
-
         linkType() {
             this.autofocus();
         },
@@ -322,23 +323,23 @@ export default {
                 if (!['mailto', 'tel'].includes(this.linkType)) {
                     return;
                 }
-                this.setUrl(this.linkType, this.urlData[this.linkType]
-                    ? `${this.linkType}:${this.urlData[this.linkType]}`
-                    : null);
+                this.setUrl(
+                    this.linkType,
+                    this.urlData[this.linkType] ? `${this.linkType}:${this.urlData[this.linkType]}` : null,
+                );
             },
         },
-
     },
 
     created() {
         this.applyAttrs(this.linkAttrs);
 
-        this.bard.$on('link-selected', this.applyAttrs);
-        this.bard.$on('link-deselected', () => this.$emit('deselected'));
+        this.bard.events.on('link-selected', this.applyAttrs);
+        this.bard.events.on('link-deselected', () => this.$emit('deselected'));
 
-        if (_.isEmpty(this.linkAttrs) && this.selectedTextIsEmail) {
-            this.linkType = 'mailto'
-            this.urlData = { mailto: this.selectedTextIsEmail }
+        if (Object.keys(this.linkAttrs).length === 0 && this.selectedTextIsEmail) {
+            this.linkType = 'mailto';
+            this.urlData = { mailto: this.selectedTextIsEmail };
         }
     },
 
@@ -346,13 +347,12 @@ export default {
         this.autofocus();
     },
 
-    beforeDestroy() {
-        this.bard.$off('link-selected');
-        this.bard.$off('link-deselected');
+    beforeUnmount() {
+        this.bard.events.off('link-selected');
+        this.bard.events.off('link-deselected');
     },
 
     methods: {
-
         applyAttrs(attrs) {
             this.linkType = this.getLinkTypeForUrl(attrs.href);
 
@@ -361,12 +361,8 @@ export default {
             this.itemData = { [this.linkType]: this.getItemDataForUrl(attrs.href) };
 
             this.title = attrs.title;
-            this.rel = attrs.href
-                ? attrs.rel
-                : this.defaultRel;
-            this.targetBlank = attrs.href
-                ? attrs.target === '_blank'
-                : this.config.target_blank;
+            this.rel = attrs.href ? attrs.rel : this.defaultRel;
+            this.targetBlank = attrs.href ? attrs.target === '_blank' : this.config.target_blank;
         },
 
         autofocus() {
@@ -383,14 +379,14 @@ export default {
             this.url = {
                 ...this.url,
                 [type]: url,
-            }
+            };
         },
 
         setItemData(type, itemData) {
             this.itemData = {
                 ...this.itemData,
                 [type]: itemData,
-            }
+            };
         },
 
         remove() {
@@ -405,7 +401,7 @@ export default {
             this.$emit('updated', {
                 href: this.href,
                 rel: this.rel,
-                target: (this.canHaveTarget && this.targetBlank) ? '_blank' : null,
+                target: this.canHaveTarget && this.targetBlank ? '_blank' : null,
                 title: this.title,
             });
         },
@@ -415,7 +411,7 @@ export default {
 
             return str.match(/^\w[\w\-_\.]+\.(co|uk|com|org|net|gov|biz|info|us|eu|de|fr|it|es|pl|nz)/i)
                 ? `https://${str}`
-                : str
+                : str;
         },
 
         openSelector() {
@@ -445,12 +441,14 @@ export default {
         },
 
         loadAssetData(url) {
-            this.$axios.post(cp_url('assets-fieldtype'), {
-                assets: [url],
-            }).then(response => {
-                this.selectItem('asset', response.data[0])
-                this.isLoading = false;
-            });
+            this.$axios
+                .post(cp_url('assets-fieldtype'), {
+                    assets: [url],
+                })
+                .then((response) => {
+                    this.selectItem('asset', response.data[0]);
+                    this.isLoading = false;
+                });
         },
 
         entrySelected(data) {
@@ -490,7 +488,7 @@ export default {
 
         getUrlDataForUrl(url) {
             const matches = url ? url.match(/^(mailto|tel):(.*)$/) : null;
-            if (! matches) {
+            if (!matches) {
                 return null;
             }
 
@@ -499,7 +497,7 @@ export default {
 
         getItemDataForUrl(url) {
             const { ref } = this.parseDataUrl(url);
-            if (! ref) {
+            if (!ref) {
                 return null;
             }
 
@@ -507,22 +505,21 @@ export default {
         },
 
         parseDataUrl(url) {
-            if (! url) {
-                return {}
+            if (!url) {
+                return {};
             }
 
             const regex = /^statamic:\/\/((.*?)::(.*))$/;
 
             const matches = url.match(regex);
-            if (! matches) {
+            if (!matches) {
                 return {};
             }
 
             const [_, ref, type, id] = matches;
 
-            return { ref, type, id};
-        }
-    }
-
-}
+            return { ref, type, id };
+        },
+    },
+};
 </script>

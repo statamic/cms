@@ -1,4 +1,6 @@
-@php use function Statamic\trans as __; @endphp
+@php
+    use function Statamic\trans as __;
+@endphp
 
 @inject('str', 'Statamic\Support\Str')
 @extends('statamic::layout')
@@ -6,7 +8,6 @@
 @section('wrapper_class', 'max-w-3xl')
 
 @section('content')
-
     <term-publish-form
         publish-container="base"
         :initial-actions="{{ json_encode($actions) }}"
@@ -40,5 +41,4 @@
         item-action-url="{{ cp_route('taxonomies.terms.actions.run', $taxonomy) }}"
         :has-template="{{ $str::bool($hasTemplate) }}"
     ></term-publish-form>
-
 @endsection

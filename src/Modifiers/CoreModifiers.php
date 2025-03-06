@@ -546,7 +546,7 @@ class CoreModifiers extends Modifier
      */
     public function daysAgo($value, $params)
     {
-        return (int) abs($this->carbon($value)->diffInDays(Arr::get($params, 0)));
+        return $this->carbon($value)->diffInDays(Arr::get($params, 0));
     }
 
     /**
@@ -1055,7 +1055,7 @@ class CoreModifiers extends Modifier
      */
     public function hoursAgo($value, $params)
     {
-        return (int) abs($this->carbon($value)->diffInHours(Arr::get($params, 0)));
+        return $this->carbon($value)->diffInHours(Arr::get($params, 0));
     }
 
     /**
@@ -1617,7 +1617,7 @@ class CoreModifiers extends Modifier
      */
     public function minutesAgo($value, $params)
     {
-        return (int) abs($this->carbon($value)->diffInMinutes(Arr::get($params, 0)));
+        return $this->carbon($value)->diffInMinutes(Arr::get($params, 0));
     }
 
     /**
@@ -1652,7 +1652,7 @@ class CoreModifiers extends Modifier
      */
     public function monthsAgo($value, $params)
     {
-        return (int) abs($this->carbon($value)->diffInMonths(Arr::get($params, 0)));
+        return $this->carbon($value)->diffInMonths(Arr::get($params, 0));
     }
 
     /**
@@ -2234,7 +2234,7 @@ class CoreModifiers extends Modifier
      */
     public function secondsAgo($value, $params)
     {
-        return (int) abs($this->carbon($value)->diffInSeconds(Arr::get($params, 0)));
+        return $this->carbon($value)->diffInSeconds(Arr::get($params, 0));
     }
 
     /**
@@ -2933,7 +2933,7 @@ class CoreModifiers extends Modifier
      */
     public function weeksAgo($value, $params)
     {
-        return (int) abs($this->carbon($value)->diffInWeeks(Arr::get($params, 0)));
+        return $this->carbon($value)->diffInWeeks(Arr::get($params, 0));
     }
 
     /**

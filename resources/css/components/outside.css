@@ -1,18 +1,18 @@
 /* Outside the Control Panel
   ========================================================================== */
 .outside {
-    @apply bg-gray-300 px-2 min-h-screen;
+    @apply min-h-screen bg-gray-300 px-2;
 
     label {
         @apply text-[#596498] dark:text-dark-175;
     }
 
     .logo svg {
-        @apply h-6 block mx-auto mb-20 mb-8 w-auto text-black/25 dark:text-white/60;
+        @apply mx-auto mb-20 mb-8 block h-6 w-auto text-black/25 dark:text-white/60;
     }
 }
 
- /*  Alternate rad mode for a more playful vibe */
+/*  Alternate rad mode for a more playful vibe */
 .outside.rad-theme {
     background: #12c2e9;
     background: linear-gradient(45deg, #f64f59, #c471ed, #12c2e9);
@@ -20,11 +20,21 @@
 
 .dark .outside.rad-theme {
     background: #212223;
-    background-image: radial-gradient(at 32.6% 91.5%, #142038 0px, transparent 50%), radial-gradient(at 87.4% 39.4%, #353945 0px, transparent 50%), radial-gradient(at 84.6% 52.5%, #171717 0px, transparent 50%);
+    background-image: radial-gradient(at 32.6% 91.5%, #142038 0px, transparent 50%),
+        radial-gradient(at 87.4% 39.4%, #353945 0px, transparent 50%),
+        radial-gradient(at 84.6% 52.5%, #171717 0px, transparent 50%);
 }
 
 .dark .outside-shadow {
-    background: conic-gradient(from 230.29deg at 51.63% 52.16%, rgb(36, 0, 255) 0deg, rgb(0, 135, 255) 67.5deg, rgb(108, 39, 157) 198.75deg, rgb(24, 38, 163) 251.25deg, rgb(54, 103, 196) 301.88deg, rgb(105, 30, 255) 360deg);
+    background: conic-gradient(
+        from 230.29deg at 51.63% 52.16%,
+        rgb(36, 0, 255) 0deg,
+        rgb(0, 135, 255) 67.5deg,
+        rgb(108, 39, 157) 198.75deg,
+        rgb(24, 38, 163) 251.25deg,
+        rgb(54, 103, 196) 301.88deg,
+        rgb(105, 30, 255) 360deg
+    );
     filter: blur(160px);
     transform: translateZ(0px);
     @apply absolute inset-0;
@@ -35,16 +45,14 @@
    ========================================================================== */
 
 .auth-card {
-    @apply p-6 mx-auto relative z-10 w-full;
-    transition: .12s ease-out;
+    @apply relative z-10 mx-auto w-full p-6;
+    transition: 0.12s ease-out;
 }
 
 .outside .white-label-logo {
     @apply mx-auto mb-8;
     max-width: 300px;
 }
-
-
 
 /* Rad Mode Stylez
   ========================================================================== */
@@ -53,38 +61,38 @@ html:not(.dark) .outside.rad-theme {
     .auth-card {
         @apply rounded-lg;
         box-shadow:
-            rgba(50, 50, 93, .4) 0 12px 34px,
-            rgba(0, 0, 0, .1) 0 3px 4px,
-            inset rgba(108, 167, 234, .2) -5px 5px 30px,
-            inset rgba(241, 84, 106, .2) 5px -5px 30px;
-        &:hover, &:focus-within {
+            rgba(50, 50, 93, 0.4) 0 12px 34px,
+            rgba(0, 0, 0, 0.1) 0 3px 4px,
+            inset rgba(108, 167, 234, 0.2) -5px 5px 30px,
+            inset rgba(241, 84, 106, 0.2) 5px -5px 30px;
+        &:hover,
+        &:focus-within {
             transform: translateY(-2px);
             box-shadow:
-                rgba(50, 50, 93, .5) 0 35px 78px 0,
-                rgba(0, 0, 0, .15) 0 4px 5px,
-                inset rgba(108, 167, 234, .15) -3px 3px 25px,
-                inset rgba(241, 84, 106, .15) 3px -3px 25px;
+                rgba(50, 50, 93, 0.5) 0 35px 78px 0,
+                rgba(0, 0, 0, 0.15) 0 4px 5px,
+                inset rgba(108, 167, 234, 0.15) -3px 3px 25px,
+                inset rgba(241, 84, 106, 0.15) 3px -3px 25px;
         }
     }
-
 
     .input-text {
         @apply rounded-lg;
     }
 
     .btn-primary {
-        @apply text-shadow text-white border-0 rounded-md !important;
+        @apply text-shadow rounded-md border-0 text-white !important;
         background: linear-gradient(45deg, #f64f59, #c471ed) !important;
         box-shadow: 0 2px 5px rgba(246, 79, 89, 0.3) !important;
         &:hover {
-            background: linear-gradient(45deg, #DA464F, #AD64D1) !important;
+            background: linear-gradient(45deg, #da464f, #ad64d1) !important;
             color: #fff;
             box-shadow: 0 2px 5px rgba(246, 79, 89, 0.3) !important;
         }
     }
 
     .forgot-password-link {
-        @apply text-white text-shadow;
+        @apply text-shadow text-white;
     }
 }
 

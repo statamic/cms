@@ -1,24 +1,28 @@
-@php use function Statamic\trans as __; @endphp
+@php
+    use function Statamic\trans as __;
+@endphp
 
 @extends('statamic::layout')
 @section('title', __('Users'))
 @section('wrapper_class', 'max-w-full')
 
 @section('content')
-
-    <header class="flex items-center mb-6">
+    <header class="mb-6 flex items-center">
         <h1 class="flex-1">
             {{ __('Users') }}
         </h1>
 
         @can('configure fields')
-            <dropdown-list class="rtl:ml-2 ltr:mr-2">
-                <dropdown-item :text="__('Edit Blueprint')" redirect="{{ cp_route('users.blueprint.edit') }}"></dropdown-item>
+            <dropdown-list class="ltr:mr-2 rtl:ml-2">
+                <dropdown-item
+                    :text="__('Edit Blueprint')"
+                    redirect="{{ cp_route('users.blueprint.edit') }}"
+                ></dropdown-item>
             </dropdown-list>
         @endcan
 
         @if (Statamic::pro() && $user->can('create', 'Statamic\Contracts\Auth\User'))
-            <a href="{{ cp_route('users.create') }}" class="btn-primary rtl:mr-4 ltr:ml-4">{{ __('Create User') }}</a>
+            <a href="{{ cp_route('users.create') }}" class="btn-primary ltr:ml-4 rtl:mr-4">{{ __('Create User') }}</a>
         @endif
     </header>
 
@@ -30,9 +34,11 @@
         action-url="{{ cp_route('users.actions.run') }}"
     ></user-listing>
 
-    @include('statamic::partials.docs-callout', [
-        'topic' => __('Users'),
-        'url' => Statamic::docsUrl('users')
-    ])
-
+    @include(
+        'statamic::partials.docs-callout',
+        [
+            'topic' => __('Users'),
+            'url' => Statamic::docsUrl('users'),
+        ]
+    )
 @endsection

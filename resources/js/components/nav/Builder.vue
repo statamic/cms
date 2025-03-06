@@ -1,48 +1,64 @@
 <template>
-
     <div>
-
         <header class="mb-6">
             <breadcrumb v-if="indexUrl" :url="indexUrl" :title="__('CP Nav Preferences')" />
 
             <div class="flex items-center">
                 <h1 class="flex-1">{{ __(title) }}</h1>
 
-                <dropdown-list class="rtl:ml-2 ltr:mr-2">
-                    <dropdown-item :text="__('Reset Nav Customizations')" class="warning" @click="confirmingReset = true"></dropdown-item>
+                <dropdown-list class="ltr:mr-2 rtl:ml-2">
+                    <dropdown-item
+                        :text="__('Reset Nav Customizations')"
+                        class="warning"
+                        @click="confirmingReset = true"
+                    ></dropdown-item>
                 </dropdown-list>
 
-                <a @click="discardChanges" class="text-2xs text-blue rtl:ml-4 ltr:mr-4 underline" v-if="isDirty" v-text="__('Discard changes')" />
+                <a
+                    @click="discardChanges"
+                    class="text-2xs text-blue underline ltr:mr-4 rtl:ml-4"
+                    v-if="isDirty"
+                    v-text="__('Discard changes')"
+                />
 
                 <dropdown-list>
                     <template #trigger>
-                        <button class="btn flex items-center rtl:pl-4 ltr:pr-4">
+                        <button class="btn flex items-center ltr:pr-4 rtl:pl-4">
                             {{ __('Add Item') }}
-                            <svg-icon name="micro/chevron-down-xs" class="w-2 rtl:mr-4 ltr:ml-4" />
+                            <svg-icon name="micro/chevron-down-xs" class="w-2 ltr:ml-4 rtl:mr-4" />
                         </button>
                     </template>
-                    <dropdown-item :text="__('Add Nav Item')" @click="addItem(topLevelTreeData)" />
+                    <dropdown-item :text="__('Add Nav Item')" @click="addItem($refs.tree.rootChildren[0])" />
                     <dropdown-item :text="__('Add Section')" @click="addSection" />
                 </dropdown-list>
 
-                <div class="rtl:mr-4 ltr:ml-4 rtl:text-right ltr:text-left" :class="{ 'btn-group': hasSaveAsOptions }">
+                <div class="ltr:ml-4 ltr:text-left rtl:mr-4 rtl:text-right" :class="{ 'btn-group': hasSaveAsOptions }">
                     <button
-                        class="btn-primary rtl:pr-4 ltr:pl-4"
-                        :class="{ 'disabled': !changed }"
+                        class="btn-primary ltr:pl-4 rtl:pr-4"
+                        :class="{ disabled: !changed }"
                         :disabled="!changed"
                         @click="save"
-                        v-text="__('Save Changes')" />
+                        v-text="__('Save Changes')"
+                    />
 
-                    <dropdown-list v-if="hasSaveAsOptions" class="rtl:mr-0 ltr:ml-0">
+                    <dropdown-list v-if="hasSaveAsOptions" class="ltr:ml-0 rtl:mr-0">
                         <template #trigger>
-                            <button class="btn-primary rtl:rounded-r-none ltr:rounded-l-none flex items-center">
+                            <button class="btn-primary flex items-center ltr:rounded-l-none rtl:rounded-r-none">
                                 <svg-icon name="micro/chevron-down-xs" class="w-2" />
                             </button>
                         </template>
                         <h6 class="p-2">{{ __('Save to') }}...</h6>
-                        <dropdown-item v-for="option in saveAsOptions" :key="option.url" @click="saveAs(option.url)" class="group">
-                            <div class="flex items-start rtl:pl-4 ltr:pr-4">
-                                <svg-icon :name="option.icon" class="text-gray shrink-0 rtl:ml-2 ltr:mr-2 w-4 group-hover:text-white" />
+                        <dropdown-item
+                            v-for="option in saveAsOptions"
+                            :key="option.url"
+                            @click="saveAs(option.url)"
+                            class="group"
+                        >
+                            <div class="flex items-start ltr:pr-4 rtl:pl-4">
+                                <svg-icon
+                                    :name="option.icon"
+                                    class="w-4 shrink-0 text-gray group-hover:text-white ltr:mr-2 rtl:ml-2"
+                                />
                                 <span class="whitespace-normal">{{ __(option.label) }}</span>
                             </div>
                         </dropdown-item>
@@ -52,125 +68,85 @@
         </header>
 
         <div class="mb-2 flex justify-end">
+            <a class="text-2xs text-blue underline ltr:mr-4 rtl:ml-4" v-text="__('Expand All')" @click="expandAll" />
             <a
-                class="text-2xs text-blue rtl:ml-4 ltr:mr-4 underline"
-                v-text="__('Expand All')"
-                @click="expandAll"
-            />
-            <a
-                class="text-2xs text-blue rtl:ml-2 ltr:mr-2 underline"
+                class="text-2xs text-blue underline ltr:mr-2 rtl:ml-2"
                 v-text="__('Collapse All')"
                 @click="collapseAll"
             />
         </div>
 
-        <div v-if="!loading" class="page-tree page-tree-with-sections w-full">
-            <draggable-tree
-                draggable
-                cross-tree
-                class="mb-8"
-                :class="{ 'section-placeholder-inner': showTopLevelSectionPlaceholder }"
-                ref="topLevelTree"
-                :data="topLevelTreeData"
+        <div v-if="!loading" class="page-tree w-full">
+            <Draggable
+                ref="tree"
+                v-model="treeData"
+                :node-key="(stat) => stat.data.id"
                 :space="1"
                 :indent="24"
                 :dir="direction"
+                :stat-handler="statHandler"
+                keep-placeholder
+                trigger-class="page-move"
+                :drag-open="false"
+                :each-draggable="eachDraggable"
+                :each-droppable="eachDroppable"
+                :root-droppable="rootDroppable"
                 @change="changed = true"
-                @drag="treeDrag"
-                @drop="treeDrop"
+                @before-drag-start="beforeDragStart"
+                @after-drop="afterDrop"
             >
-                <tree-branch
-                    slot-scope="{ data: item, store, vm }"
-                    :item="item"
-                    :depth="vm.level"
-                    :vm="vm"
-                    :is-open="item.open"
-                    :is-child="isChildItemNode(item)"
-                    :has-children="item.children.length > 0"
-                    :disable-sections="true"
-                    :top-level="true"
-                    @edit="editItem(item, true)"
-                    @toggle-open="store.toggleOpen(item)"
-                >
-                    <template #branch-options="{ item }">
-                        <dropdown-item
-                            v-if="vm.level < 2"
-                            :text="__('Add Item')"
-                            @click="addItem(item.children, item)" />
-                        <dropdown-item
-                            :text="__('Edit')"
-                            @click="editingItem = item" />
-                        <dropdown-item
-                            :text="__('Duplicate')"
-                            @click="aliasItem(item)" />
-                        <li class="divider" />
-                        <dropdown-item
-                            v-if="itemIsVisible(item)"
-                            :text="isHideable(item) ? __('Hide') : __('Remove')"
-                            class="warning"
-                            @click="isHideable(item) ? hideItem(item) : removeItem(item, vm)" />
-                        <dropdown-item
-                            v-else
-                            :text="__('Show')"
-                            @click="showItem(item)" />
-                    </template>
-                </tree-branch>
-            </draggable-tree>
-
-            <draggable-tree
-                draggable
-                cross-tree
-                class="page-tree-with-sections"
-                ref="mainTree"
-                :data="mainTreeData"
-                :space="1"
-                :indent="24"
-                :dir="direction"
-                @change="changed = true"
-                @drag="treeDrag"
-                @drop="treeDrop"
-            >
-                <tree-branch
-                    slot-scope="{ data: item, store, vm }"
-                    :item="item"
-                    :parent-section="getParentSectionNode(item)"
-                    :depth="vm.level"
-                    :vm="vm"
-                    :is-open="item.open"
-                    :is-child="isChildItemNode(item)"
-                    :has-children="item.children.length > 0"
-                    @edit="editItem(item)"
-                    @toggle-open="store.toggleOpen(item)"
-                >
-                    <template #branch-options="{ item }">
-                        <dropdown-item
-                            v-if="vm.level < 3"
-                            :text="__('Add Item')"
-                            @click="addItem(item.children, item)" />
-                        <dropdown-item
-                            :text="__('Edit')"
-                            @click="editItem(item)" />
-                        <dropdown-item
-                            v-if="! isSectionNode(item)"
-                            :text="__('Pin to Top Level')"
-                            @click="pinItem(item)" />
-                        <dropdown-item
-                            v-if="! isSectionNode(item)"
-                            :text="__('Duplicate')"
-                            @click="aliasItem(item)" />
-                        <li class="divider" />
-                        <dropdown-item
-                            v-if="itemIsVisible(item)"
-                            :text="isHideable(item) ? __('Hide') : __('Remove')"
-                            class="warning"
-                            @click="isHideable(item) ? hideItem(item) : removeItem(item)" />
-                        <dropdown-item
-                            v-else
-                            :text="__('Show')"
-                            @click="showItem(item)" />
-                    </template>
-                </tree-branch>
-            </draggable-tree>
+                <template #placeholder>
+                    <div
+                        class="w-full rounded border border-dashed border-blue-400 bg-blue-500/10 p-2"
+                        :class="{
+                            'mt-8': isSectionNode(draggingStat),
+                            'ml-[-24px]': isDraggingIntoTopLevel,
+                        }"
+                    >
+                        &nbsp;
+                    </div>
+                </template>
+                <template #default="{ node, stat }">
+                    <top-level-tree-branch v-if="stat.level === 1 && stat.data?.text === 'Top Level'" :stat="stat" />
+                    <tree-branch
+                        v-else
+                        :item="node"
+                        :parent-section="getParentSectionNode(stat)"
+                        :depth="stat.level"
+                        :stat="stat"
+                        :is-open="stat.open"
+                        :is-child="isChildItemNode(stat)"
+                        :has-children="stat.children.length > 0"
+                        class="mb-px"
+                        :class="{ 'mt-8': isSectionNode(stat) }"
+                        @edit="editItem(stat)"
+                        @toggle-open="stat.open = !stat.open"
+                    >
+                        <template #branch-options="{ isTopLevel }">
+                            <dropdown-item v-if="stat.level < 3" :text="__('Add Item')" @click="addItem(stat)" />
+                            <dropdown-item :text="__('Edit')" @click="editItem(stat)" />
+                            <dropdown-item
+                                v-if="!isSectionNode(stat) && !isTopLevel"
+                                :text="__('Pin to Top Level')"
+                                @click="pinItem(stat)"
+                            />
+                            <dropdown-item
+                                v-if="!isSectionNode(stat)"
+                                :text="__('Duplicate')"
+                                @click="aliasItem(stat)"
+                            />
+                            <li class="divider" />
+                            <dropdown-item
+                                v-if="itemIsVisible(stat)"
+                                :text="isHideable(stat) ? __('Hide') : __('Remove')"
+                                class="warning"
+                                @click="isHideable(stat) ? hideItem(stat) : removeItem(stat)"
+                            />
+                            <dropdown-item v-else :text="__('Show')" @click="showItem(stat)" />
+                        </template>
+                    </tree-branch>
+                </template>
+            </Draggable>
         </div>
 
         <item-editor
@@ -189,12 +165,7 @@
             @updated="itemUpdated"
         />
 
-        <section-editor
-            v-if="creatingSection"
-            :creating="true"
-            @closed="resetSectionEditor"
-            @updated="sectionAdded"
-        />
+        <section-editor v-if="creatingSection" :creating="true" @closed="resetSectionEditor" @updated="sectionAdded" />
 
         <section-editor
             v-if="editingSection"
@@ -222,25 +193,24 @@
             @confirm="removeItem(confirmingRemoval, true)"
             @cancel="confirmingReset = false"
         />
-
     </div>
-
 </template>
 
 <script>
-import {DraggableTree} from 'vue-draggable-nested-tree/dist/vue-draggable-nested-tree';
+import { dragContext, Draggable, walkTreeData } from '@he-tree/vue';
 import TreeBranch from './Branch.vue';
+import TopLevelTreeBranch from './TopLevelBranch.vue';
 import ItemEditor from './ItemEditor.vue';
 import SectionEditor from './SectionEditor.vue';
-import { data_get } from  '../../bootstrap/globals.js'
+import { data_get } from '../../bootstrap/globals.js';
 
 export default {
-
     components: {
-        DraggableTree,
+        Draggable,
         TreeBranch,
         ItemEditor,
         SectionEditor,
+        TopLevelTreeBranch,
     },
 
     props: {
@@ -273,11 +243,10 @@ export default {
         return {
             initialNav: clone(this.nav),
             loading: false,
-            topLevelTreeData: [],
-            mainTreeData: [],
+            treeData: [],
             originalSectionItems: {},
             changed: false,
-            targetDataArray: null,
+            targetStat: null,
             creatingItem: false,
             creatingItemIsChild: false,
             editingItem: false,
@@ -285,13 +254,13 @@ export default {
             editingSection: false,
             confirmingReset: false,
             confirmingRemoval: false,
-            draggingNode: false,
-            draggingNodeParent: false,
-        }
+            draggingStat: false,
+            isDraggingIntoTopLevel: false,
+        };
     },
 
     created() {
-        this.$keys.bindGlobal(['mod+s'], e => {
+        this.$keys.bindGlobal(['mod+s'], (e) => {
             e.preventDefault();
             this.save();
         });
@@ -302,7 +271,6 @@ export default {
     },
 
     computed: {
-
         isDirty() {
             return this.changed;
         },
@@ -311,44 +279,24 @@ export default {
             return this.saveAsOptions.length;
         },
 
-        showTopLevelSectionPlaceholder() {
-            if (! this.topLevelTreeData.length) {
-                return true;
-            }
-
-            return this.draggingNode
-                && this.topLevelTreeData.length === 1
-                && this.topLevelTreeData[0]._id === this.draggingNode._id;
-        },
-
         direction() {
             return this.$config.get('direction', 'ltr');
         },
-
     },
 
     methods: {
-
         setInitialNav(nav) {
             let navConfig = clone(nav);
 
             this.setOriginalSectionItems(navConfig);
 
-            let topLevelConfig = navConfig.shift();
-
-            this.topLevelTreeData = _.chain(topLevelConfig.items)
-                .map(section => this.normalizeNavConfig(section, false))
-                .values()
-                .value();
-
-            this.mainTreeData = _.chain(navConfig)
-                .mapObject(section => this.normalizeNavConfig(section))
-                .values()
-                .value();
+            this.treeData = Object.values(navConfig.map((section) => this.normalizeNavConfig(section)));
         },
 
         setOriginalSectionItems(nav) {
-            nav.forEach(section => this.originalSectionItems[section.display_original] = section.items_original || []);
+            nav.forEach(
+                (section) => (this.originalSectionItems[section.display_original] = section.items_original || []),
+            );
         },
 
         discardChanges() {
@@ -367,13 +315,15 @@ export default {
                 open: isSectionNode,
             };
 
-            let children = config.items || config.children;
+            let children = config.items || config.children || [];
 
             if (children) {
-                item.children = children.map(childItem => {
+                item.children = children.map((childItem) => {
                     return {
                         text: childItem.display,
-                        children: childItem.children.map(childChildItem => this.normalizeNavConfig(childChildItem, false)),
+                        children: childItem.children.map((childChildItem) =>
+                            this.normalizeNavConfig(childChildItem, false),
+                        ),
                         open: false,
                         config: childItem,
                         original: childItem.original,
@@ -386,106 +336,77 @@ export default {
             return item;
         },
 
-        treeDrag(node) {
-            this.draggingNode = node;
-            this.draggingNodeParent = node.parent;
+        eachDraggable(stat) {
+            // Prevent the top level item being dragged. It should always stay at the top.
+            if (stat.data.text === 'Top Level') return false;
 
-            let nodeDepth = 1;
-
-            this.traverseTree(node, (_, { depth }) => {
-                nodeDepth = Math.max(nodeDepth, depth);
-            });
-
-            // Ensure you can only drop nav item nodes into top level tree root
-            this.$set(this.$refs.topLevelTree.rootData, 'droppable', ! this.isSectionNode(node));
-
-            // Ensure you can only drop section nodes to main tree root
-            this.$set(this.$refs.mainTree.rootData, 'droppable', this.isSectionNode(node));
-
-            // Hardcode max depths
-            const topLevelTreeMaxDepth = 2 - nodeDepth; // 2 for nav items, and one level of nav item children
-            const mainTreeMaxDepth = 3 - nodeDepth; // 3 for sections, nav items, and one level of nav item children
-
-            // Ensure max depth for top level tree
-            this.traverseTree(this.topLevelTreeData, (childNode, { depth }) => {
-                if (childNode !== node) {
-                    this.$set(childNode, 'droppable', depth <= topLevelTreeMaxDepth && ! this.isSectionNode(node));
-                }
-            });
-
-            // Ensure max depth for main tree
-            this.traverseTree(this.mainTreeData, (childNode, { depth }) => {
-                if (childNode !== node) {
-                    this.$set(childNode, 'droppable', depth <= mainTreeMaxDepth && ! this.isSectionNode(node));
-                }
-            });
+            return true;
         },
 
-        treeDrop(node) {
-            this.updateItemAction(node);
+        // This method is called when an item is being dragged into a position that isn't the root level.
+        // For root level behavior, see rootDroppable. (Why the package separated it into two methods is beyond me.)
+        eachDroppable(targetStat) {
+            // If the item being dragged is a section, we don't want it being dragged anywhere except the root level.
+            if (this.isSectionNode(dragContext.dragNode)) return false;
 
-            if (data_get(this.draggingNodeParent, 'isRoot') !== true) {
-                this.updateItemAction(this.draggingNodeParent);
+            // We want to keep track of whether the item is being dragged into the top level.
+            // This was the most appropriate place to hook into.
+            this.isDraggingIntoTopLevel = this.checkIfDraggingIntoTopLevel();
+
+            // We want to prevent creating a tree with too many levels.
+            if (dragContext.dragNode.children.length && targetStat.level >= 2) return false;
+            if (targetStat.level >= 3) return false;
+
+            return true;
+        },
+
+        checkIfDraggingIntoTopLevel() {
+            let stat = dragContext.closestNode;
+            while (stat.level > 1) stat = stat.parent;
+            return stat.data.text === 'Top Level';
+        },
+
+        // This method is called when an item is being dragged into a position at the root level.
+        // For non-root level behavior, see eachDroppable. (Why the package separated it into two methods is beyond me.)
+        rootDroppable() {
+            // If there's no closest node, it means that we're dragging to the very top of the tree.
+            // We don't want to allow dropping before the "top level" node.
+            if (dragContext.closestNode === null) return false;
+
+            // Only allow dropping sections at the root level.
+            return this.isSectionNode(dragContext.dragNode);
+        },
+
+        isSectionNode(stat) {
+            return stat?.data?.isSection;
+        },
+
+        isParentItemNode(stat) {
+            return !this.isSectionNode(stat) && !this.isChildItemNode(stat);
+        },
+
+        isChildItemNode(stat) {
+            if (!stat.parent) return false;
+
+            return !this.isSectionNode(stat.parent);
+        },
+
+        isCustomSectionNode(stat) {
+            return this.isSectionNode(stat) && stat.data?.manipulations?.action === '@create';
+        },
+
+        getParentSectionNode(stat) {
+            if (!this.isSectionNode(stat) && stat !== undefined) {
+                return this.getParentSectionNode(stat.parent);
             }
 
-            this.$nextTick(() => {
-                this.draggingNode = false;
-                this.draggingNodeParent = false;
-            });
+            return stat;
         },
 
-        isSectionNode(node) {
-            return data_get(node, 'isSection', false);
-        },
-
-        isParentItemNode(node) {
-            return ! this.isSectionNode(node) && ! this.isChildItemNode(node);
-        },
-
-        isChildItemNode(node) {
-            if (data_get(node, 'parent.isRoot')) {
-                return false;
-            }
-
-            return ! this.isSectionNode(node.parent);
-        },
-
-        isCustomSectionNode(node) {
-            return this.isSectionNode(node) && data_get(node, 'manipulations.action') === '@create';
-        },
-
-        getParentSectionNode(node) {
-            if (! this.isSectionNode(node) && node !== undefined) {
-                return this.getParentSectionNode(node.parent);
-            }
-
-            return node;
-        },
-
-        traverseTree(nodes, callback, parentPath = []) {
-            const nodesArray = Array.isArray(nodes) ? nodes : [nodes];
-
-            nodesArray.every((node, index) => {
-                const nodePath = [...parentPath, index];
-                const path = nodePath.join('.');
-                const depth = nodePath.length;
-
-                if (false === callback(node, { path, depth, index })) {
-                    return false;
-                }
-
-                if (node.children.length) {
-                    this.traverseTree(node.children, callback, nodePath);
-                }
-
-                return true;
-            });
-        },
-
-        addItem(targetDataArray, parentItem) {
-            this.targetDataArray = targetDataArray;
+        addItem(targetStat) {
+            this.targetStat = targetStat;
             this.creatingItem = true;
-            this.creatingItemIsChild = parentItem && this.isParentItemNode(parentItem);
+            this.creatingItemIsChild = this.isParentItemNode(targetStat);
         },
 
         addSection() {
@@ -502,7 +423,7 @@ export default {
                 icon: createdConfig.icon,
             };
 
-            this.targetDataArray.push(item);
+            this.$refs.tree.add(item, this.targetStat);
             this.resetItemEditor();
             this.changed = true;
         },
@@ -514,22 +435,22 @@ export default {
                 display_original: false,
             });
 
-            this.mainTreeData.push(item);
+            this.$refs.tree.add(item);
             this.resetSectionEditor();
             this.changed = true;
         },
 
-        editItem(item, topLevel) {
-            if (this.isSectionNode(item) && ! topLevel) {
-                this.editingSection = item;
+        editItem(stat) {
+            if (this.isSectionNode(stat)) {
+                this.editingSection = stat;
             } else {
-                this.editingItem = item;
+                this.editingItem = stat;
             }
         },
 
         itemUpdated(updatedConfig, item) {
-            item.text = updatedConfig.display;
-            item.config.icon = updatedConfig.icon;
+            item.data.text = updatedConfig.display;
+            item.data.config.icon = updatedConfig.icon;
 
             this.updateItemManipulation(item, 'display', updatedConfig.display);
             this.updateItemManipulation(item, 'url', updatedConfig.url);
@@ -541,42 +462,42 @@ export default {
         },
 
         sectionUpdated(sectionDisplay, sectionItem) {
-            sectionItem.text = sectionDisplay;
+            sectionItem.data.text = sectionDisplay;
 
             this.resetSectionEditor();
             this.changed = true;
         },
 
-        updateItemManipulation(item, key, value) {
-            let currentAction = data_get(item.manipulations, 'action');
+        updateItemManipulation(stat, key, value) {
+            let currentAction = stat.data.manipulations.action;
 
-            if (currentAction === '@create' || value !== data_get(item.original, key)) {
-                item.manipulations[key] = value;
+            if (currentAction === '@create' || value !== stat.data.original[key]) {
+                stat.data.manipulations[key] = value;
             } else {
-                Vue.delete(item.manipulations, key);
+                delete stat.data.manipulations[key];
             }
         },
 
-        updateItemAction(item) {
-            if (this.isSectionNode(item)) {
+        updateItemAction(stat) {
+            if (this.isSectionNode(stat)) {
                 return;
             }
 
-            let detectedAction = this.detectItemAction(item);
+            let detectedAction = this.detectItemAction(stat);
 
             if (detectedAction) {
-                item.manipulations.action = detectedAction;
+                stat.data.manipulations.action = detectedAction;
             } else {
-                Vue.delete(item.manipulations, 'action');
+                delete stat.data.manipulations.action;
             }
 
-            if (this.isChildItemNode(item)) {
-                this.updateItemAction(item.parent);
+            if (this.isChildItemNode(stat)) {
+                this.updateItemAction(stat.parent);
             }
         },
 
-        detectItemAction(item) {
-            let currentAction = data_get(item.manipulations, 'action');
+        detectItemAction(stat) {
+            let currentAction = stat.data.manipulations.action;
 
             switch (true) {
                 case currentAction === '@create':
@@ -585,101 +506,90 @@ export default {
                     return '@alias';
                 case currentAction === '@hide':
                     return '@hide';
-                case this.itemHasMoved(item):
+                case this.itemHasMoved(stat):
                     return '@move';
-                case this.itemHasBeenModified(item):
+                case this.itemHasBeenModified(stat):
                     return '@modify';
             }
 
             return null;
         },
 
-        itemHasMoved(item) {
-            if (this.itemIsWithinOriginalParentItem(item)) {
+        itemHasMoved(stat) {
+            if (this.itemIsWithinOriginalParentItem(stat)) {
                 return false;
             }
 
-            return this.itemHasMovedWithinSection(item)
-                || this.itemHasMovedToAnotherSection(item);
+            return this.itemHasMovedWithinSection(stat) || this.itemHasMovedToAnotherSection(stat);
         },
 
-        itemIsWithinOriginalParentItem(item) {
-            let parentsOriginalChildIds = data_get(item.parent, 'original', { children: [] })
-                .children
-                .map(child => child.id);
+        itemIsWithinOriginalParentItem(stat) {
+            let parentOriginal = stat.parent.data.original || { children: [] };
+            let parentsOriginalChildIds = parentOriginal.children.map((child) => child.id);
 
-            return this.isChildItemNode(item) && parentsOriginalChildIds.includes(item.config.id);
+            return this.isChildItemNode(stat) && parentsOriginalChildIds.includes(stat.data.config.id);
         },
 
-        itemHasMovedWithinSection(item) {
-            let parentsOriginalChildIds = data_get(item.parent, 'original', { children: [] })
-                .children
-                .map(child => child.id);
+        itemHasMovedWithinSection(stat) {
+            let parentOriginal = stat.parent.data.original || { children: [] };
 
-            if (this.isChildItemNode(item) && ! parentsOriginalChildIds.includes(item.config.id)) {
+            let parentsOriginalChildIds = parentOriginal.children.map((child) => child.id);
+
+            if (this.isChildItemNode(stat) && !parentsOriginalChildIds.includes(stat.data.config.id)) {
                 return true;
             }
 
-            let currentSection = data_get(this.getParentSectionNode(item), 'config.display_original', 'Top Level');
+            let currentSection = this.getParentSectionNode(stat).data?.config?.display_original || 'Top Level';
             let sectionsOriginalIds = this.originalSectionItems[currentSection];
 
             if (sectionsOriginalIds === undefined) {
                 return false;
             }
 
-            if (! this.isChildItemNode(item) && ! sectionsOriginalIds.includes(item.config.id)) {
+            if (!this.isChildItemNode(stat) && !sectionsOriginalIds.includes(stat.data.config.id)) {
                 return true;
             }
 
             return false;
         },
 
-        itemHasMovedToAnotherSection(item) {
-            let currentSection = data_get(this.getParentSectionNode(item), 'config.display_original', 'Top Level');
-            let originalSection = data_get(item.original, 'section') || data_get(item.parent, 'original.section');
+        itemHasMovedToAnotherSection(stat) {
+            let currentSection = this.getParentSectionNode(stat).data.config?.display_original || 'Top Level';
+            let originalSection = stat.data.original.section || stat.parent.data.original.section;
 
             return currentSection !== originalSection;
         },
 
-        itemHasBeenModified(item) {
-            return this.itemHasModifiedProperties(item)
-                || this.itemHasModifiedChildren(item);
+        itemHasBeenModified(stat) {
+            return this.itemHasModifiedProperties(stat) || this.itemHasModifiedChildren(stat);
         },
 
-        itemHasModifiedProperties(item) {
-            return _.chain(item.manipulations).omit(['action', 'reorder', 'children']).keys().value().length > 0;
+        itemHasModifiedProperties(stat) {
+            const { action, reorder, children, ...remaining } = stat.data.manipulations;
+
+            return Object.keys(remaining).length > 0;
         },
 
-        itemHasModifiedChildren(item) {
-            return item.children.filter(childItem => {
-                return _.chain(childItem.manipulations).keys().value().length > 0;
-            }).length > 0;
+        itemHasModifiedChildren(stat) {
+            return (
+                stat.children.filter((childItem) => {
+                    return Object.keys(childItem.data.manipulations).length > 0;
+                }).length > 0
+            );
         },
 
         expandAll() {
-            this.traverseTree(this.topLevelTreeData, (node) => {
-                if (! this.isSectionNode(node)) {
-                    this.$set(node, 'open', true);
-                }
-            });
-
-            this.traverseTree(this.mainTreeData, (node) => {
-                if (! this.isSectionNode(node)) {
-                    this.$set(node, 'open', true);
+            walkTreeData(this.$refs.tree.rootChildren, (stat) => {
+                if (!this.isSectionNode(stat)) {
+                    stat.open = true;
                 }
             });
         },
 
         collapseAll() {
-            this.traverseTree(this.topLevelTreeData, (node) => {
-                if (! this.isSectionNode(node)) {
-                    this.$set(node, 'open', false);
-                }
-            });
-
-            this.traverseTree(this.mainTreeData, (node) => {
-                if (! this.isSectionNode(node)) {
-                    this.$set(node, 'open', false);
+            walkTreeData(this.$refs.tree.rootChildren, (stat) => {
+                if (!this.isSectionNode(stat)) {
+                    stat.open = false;
                 }
             });
         },
@@ -688,7 +598,7 @@ export default {
             this.editingItem = false;
             this.creatingItem = false;
             this.creatingItemIsChild = false;
-            this.targetDataArray = false;
+            this.targetStat = false;
         },
 
         resetSectionEditor() {
@@ -696,16 +606,16 @@ export default {
             this.creatingSection = false;
         },
 
-        pinItem(item) {
-            this.aliasItem(item, this.topLevelTreeData);
+        pinItem(stat) {
+            this.aliasItem(stat, this.$refs.tree.rootChildren[0]);
         },
 
-        aliasItem(item, treeData) {
-            let currentAction = data_get(item.manipulations, 'action');
-            let newItem = this.normalizeNavConfig(clone(item.config), false);
+        aliasItem(stat, parentStat) {
+            let currentAction = stat.data.manipulations.action;
+            let newItem = this.normalizeNavConfig({ ...stat.data.config }, false);
 
             if (currentAction === '@create') {
-                newItem.manipulations = clone(item.manipulations);
+                newItem.manipulations = { ...stat.data.manipulations };
             } else {
                 newItem.manipulations = { action: '@alias' };
             }
@@ -716,48 +626,48 @@ export default {
                 newItem.original.children = [];
             }
 
-            let tree = treeData || item.parent.children;
+            parentStat = parentStat || stat.parent;
 
-            tree.push(newItem);
+            this.$refs.tree.add(newItem, parentStat);
 
             this.changed = true;
         },
 
-        itemIsVisible(item) {
-            return data_get(item.manipulations, 'action') !== '@hide';
+        itemIsVisible(stat) {
+            return stat.data?.manipulations?.action !== '@hide';
         },
 
-        isHideable(item) {
-            let action = data_get(item.manipulations, 'action');
+        isHideable(stat) {
+            let action = stat.data.manipulations.action;
 
-            if (this.isSectionNode(item) && action === '@create') {
+            if (this.isSectionNode(stat) && action === '@create') {
                 return false;
             }
 
-            return ! ['@alias', '@create'].includes(action);
+            return !['@alias', '@create'].includes(action);
         },
 
-        removeItem(item, bypassConfirmation = false) {
-            if (this.isCustomSectionNode(item) && item.children.length && ! bypassConfirmation) {
-                return this.confirmingRemoval = item;
+        removeItem(stat, bypassConfirmation = false) {
+            if (this.isCustomSectionNode(stat) && stat.children.length && !bypassConfirmation) {
+                return (this.confirmingRemoval = stat);
             }
 
-            item._vm.store.deleteNode(item);
+            this.$refs.tree.remove(stat);
 
             this.changed = true;
             this.confirmingRemoval = false;
         },
 
-        hideItem(item) {
-            Vue.set(item.manipulations, 'action', '@hide');
+        hideItem(stat) {
+            stat.data.manipulations.action = '@hide';
 
-            this.updateItemAction(item);
+            this.updateItemAction(stat);
 
             this.changed = true;
         },
 
         showItem(item) {
-            Vue.delete(item.manipulations, 'action');
+            delete item.manipulations['action'];
 
             this.updateItemAction(item);
 
@@ -772,7 +682,7 @@ export default {
         },
 
         save() {
-            if (! this.changed) {
+            if (!this.changed) {
                 return;
             }
 
@@ -780,11 +690,10 @@ export default {
         },
 
         saveAs(url) {
-
             let tree = this.preparePreferencesSubmission();
 
             this.$axios
-                .patch(url, {tree})
+                .patch(url, { tree })
                 .then(() => location.reload())
                 .catch(() => this.$toast.error(__('Something went wrong')));
         },
@@ -792,19 +701,12 @@ export default {
         preparePreferencesSubmission() {
             let tree = [];
 
-            tree.push({
-                'display': 'Top Level',
-                'display_original': 'Top Level',
-                'action': false,
-                'items': this.prepareItemsForSubmission(this.topLevelTreeData),
-            });
-
-            this.mainTreeData.forEach(section => {
+            this.treeData.forEach((section) => {
                 tree.push({
-                    'display': section.text,
-                    'display_original': section.config.display_original || section.text,
-                    'action': section.manipulations.action || false,
-                    'items': this.prepareItemsForSubmission(section.children),
+                    display: section.text,
+                    display_original: section.config.display_original || section.text,
+                    action: section.manipulations.action || false,
+                    items: this.prepareItemsForSubmission(section.children),
                 });
             });
 
@@ -814,11 +716,11 @@ export default {
         prepareItemsForSubmission(treeItems) {
             let items = [];
 
-            treeItems.forEach(item => {
+            treeItems.forEach((item) => {
                 items.push({
-                    'id': this.prepareItemIdForSubmission(item),
-                    'manipulations': item.manipulations,
-                    'children': item.children ? this.prepareItemsForSubmission(item.children) : [],
+                    id: this.prepareItemIdForSubmission(item),
+                    manipulations: item.manipulations,
+                    children: item.children ? this.prepareItemsForSubmission(item.children) : [],
                 });
             });
 
@@ -829,7 +731,20 @@ export default {
             return data_get(item, 'original.id', item.text.toLowerCase().replaceAll(' ', '_'));
         },
 
-    },
+        statHandler(stat) {
+            stat.open = stat.data.open;
+            return stat;
+        },
 
-}
+        beforeDragStart(stat) {
+            this.draggingStat = stat;
+        },
+
+        afterDrop() {
+            this.updateItemAction(this.draggingStat);
+            this.draggingStat = false;
+            return true;
+        },
+    },
+};
 </script>

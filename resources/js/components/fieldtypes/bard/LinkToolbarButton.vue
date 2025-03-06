@@ -28,9 +28,9 @@
 
 <script>
 import LinkToolbar from './LinkToolbar.vue';
+import BardToolbarButton from './ToolbarButton.vue';
 
 export default {
-
     mixins: [BardToolbarButton],
 
     components: {
@@ -41,13 +41,12 @@ export default {
         return {
             linkAttrs: null,
             showingToolbar: false,
-        }
+        };
     },
 
     methods: {
-
         toggleLinkToolbar() {
-            this.showingToolbar = ! this.showingToolbar;
+            this.showingToolbar = !this.showingToolbar;
 
             if (this.showingToolbar) {
                 this.linkAttrs = this.editor.getAttributes('link');
@@ -69,18 +68,18 @@ export default {
             this.editor.chain().focus().setLink(attributes).run();
             this.linkAttrs = null;
             this.close();
-        }
+        },
     },
 
     created() {
-        this.bard.$on('link-toggle', () => {
+        this.bard.events.on('link-toggle', () => {
             this.toggleLinkToolbar();
             this.$refs.popover.toggle();
         });
     },
 
-    beforeDestroy() {
-        this.bard.$off('link-toggle');
-    }
-}
+    beforeUnmount() {
+        this.bard.events.off('link-toggle');
+    },
+};
 </script>

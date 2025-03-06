@@ -1,13 +1,15 @@
 <template>
-
     <div :class="sortableItemClass">
         <slot name="picker" />
         <div class="replicator-set" :class="{ 'has-error': this.hasError }" :data-type="config.handle">
-
-            <div class="replicator-set-header" :class="{ 'p-2': isReadOnly, 'collapsed': collapsed, 'invalid': isInvalid }">
+            <div class="replicator-set-header" :class="{ 'p-2': isReadOnly, collapsed: collapsed, invalid: isInvalid }">
                 <div class="item-move sortable-handle" :class="sortableHandleClass" v-if="!isReadOnly"></div>
-                <div class="flex items-center flex-1 p-2 replicator-set-header-inner cursor-pointer" :class="{'flex items-center': collapsed}" @click="toggleCollapsedState">
-                    <label class="text-xs rtl:ml-2 ltr:mr-2 cursor-pointer">
+                <div
+                    class="replicator-set-header-inner flex flex-1 cursor-pointer items-center p-2"
+                    :class="{ 'flex items-center': collapsed }"
+                    @click="toggleCollapsedState"
+                >
+                    <label class="cursor-pointer text-xs ltr:mr-2 rtl:ml-2">
                         <span v-if="isSetGroupVisible">
                             {{ __(setGroup.display) }}
                             <svg-icon name="micro/chevron-right" class="w-4" />
@@ -15,25 +17,34 @@
                         {{ display || config.handle }}
                     </label>
                     <div class="flex items-center" v-if="config.instructions && !collapsed">
-                        <svg-icon name="micro/circle-help" class="text-gray-700 hover:text-gray-800 h-3 w-3 text-xs" v-tooltip="{ content: $options.filters.markdown(__(config.instructions)), html:true }" />
+                        <svg-icon
+                            name="micro/circle-help"
+                            class="h-3 w-3 text-xs text-gray-700 hover:text-gray-800"
+                            v-tooltip="{ content: $markdown(__(config.instructions)), html: true }"
+                        />
                     </div>
-                    <div v-show="collapsed" class="flex-1 min-w-0 w-1 rtl:pl-8 ltr:pr-8">
+                    <div v-show="collapsed" class="w-1 min-w-0 flex-1 ltr:pr-8 rtl:pl-8">
                         <div
                             v-html="previewText"
-                            class="help-block mb-0 whitespace-nowrap overflow-hidden text-ellipsis" />
+                            class="help-block mb-0 overflow-hidden text-ellipsis whitespace-nowrap"
+                        />
                     </div>
                 </div>
                 <div class="replicator-set-controls" v-if="!isReadOnly">
                     <toggle-fieldtype
                         handle="set-enabled"
-                        class="toggle-sm rtl:ml-2 ltr:mr-2"
-                        @input="toggleEnabledState"
+                        class="toggle-sm ltr:mr-2 rtl:ml-2"
+                        @update:value="toggleEnabledState"
                         :value="values.enabled"
-                        v-tooltip.top="(values.enabled) ? __('Included in output') : __('Hidden from output')" />
+                        v-tooltip.top="values.enabled ? __('Included in output') : __('Hidden from output')"
+                    />
                     <dropdown-list>
                         <dropdown-actions :actions="fieldActions" v-if="fieldActions.length" />
                         <div class="divider" />
-                        <dropdown-item :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))" @click="toggleCollapsedState" />
+                        <dropdown-item
+                            :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))"
+                            @click="toggleCollapsedState"
+                        />
                         <dropdown-item :text="__('Duplicate Set')" @click="duplicate" v-if="canAddSet" />
                         <dropdown-item :text="__('Delete Set')" class="warning" @click="destroy" />
                     </dropdown-list>
@@ -62,17 +73,16 @@
             </div>
         </div>
     </div>
-
 </template>
 
 <style scoped>
-    .draggable-mirror {
-        position: relative;
-        z-index: 1000;
-    }
-    .draggable-source--is-dragging {
-        opacity: 0.5;
-    }
+.draggable-mirror {
+    position: relative;
+    z-index: 1000;
+}
+.draggable-source--is-dragging {
+    opacity: 0.5;
+}
 </style>
 
 <script>
@@ -83,75 +93,70 @@ import HasFieldActions from '../../field-actions/HasFieldActions.js';
 import DropdownActions from '../../field-actions/DropdownActions.vue';
 
 export default {
-
     components: { SetField, DropdownActions },
 
-    mixins: [
-        ValidatesFieldConditions,
-        ManagesPreviewText,
-        HasFieldActions,
-    ],
+    mixins: [ValidatesFieldConditions, ManagesPreviewText, HasFieldActions],
 
-    inject: ['replicatorSets', 'storeName'],
+    inject: ['replicatorSets', 'store', 'storeName'],
 
     props: {
         config: {
             type: Object,
-            required: true
+            required: true,
         },
         meta: {
             type: Object,
-            required: true
+            required: true,
         },
         index: {
             type: Number,
-            required: true
+            required: true,
         },
         collapsed: {
             type: Boolean,
-            default: false
+            default: false,
         },
         values: {
             type: Object,
-            required: true
+            required: true,
         },
         parentName: {
             type: String,
-            required: true
+            required: true,
         },
         fieldPathPrefix: {
             type: String,
-            required: true
+            required: true,
         },
         hasError: {
             type: Boolean,
-            default: false
+            default: false,
         },
         sortableItemClass: {
-            type: String
+            type: String,
         },
         sortableHandleClass: {
-            type: String
+            type: String,
         },
         canAddSet: {
             type: Boolean,
-            default: true
+            default: true,
         },
         isReadOnly: Boolean,
         previews: Object,
         showFieldPreviews: {
-            type: Boolean
-        }
+            type: Boolean,
+        },
     },
 
     data() {
         return {
             fieldPreviews: this.previews,
-        }
+            extraValues: {},
+        };
     },
 
     computed: {
-
         fields() {
             return this.config.fields;
         },
@@ -208,17 +213,15 @@ export default {
                 update: (handle, value) => this.updated(handle, value),
                 updateMeta: (handle, value) => this.metaUpdated(handle, value),
                 isReadOnly: this.isReadOnly,
-                store: this.$store,
+                store: this.store,
                 storeName: this.storeName,
             };
         },
-
     },
 
     methods: {
-
         updated(handle, value) {
-            this.$emit('updated', this.index, {...this.values, [handle]: value });
+            this.$emit('updated', this.index, { ...this.values, [handle]: value });
         },
 
         metaUpdated(handle, value) {
@@ -226,11 +229,11 @@ export default {
         },
 
         previewUpdated(handle, value) {
-            this.$emit('previews-updated', this.fieldPreviews = { ...this.fieldPreviews, [handle]: value });
+            this.$emit('previews-updated', (this.fieldPreviews = { ...this.fieldPreviews, [handle]: value }));
         },
 
         destroy() {
-            if (! confirm(__('Are you sure?'))) return;
+            if (!confirm(__('Are you sure?'))) return;
 
             this.$emit('removed');
         },
@@ -240,7 +243,7 @@ export default {
         },
 
         toggleEnabledState() {
-            this.updated('enabled', ! this.values.enabled);
+            this.updated('enabled', !this.values.enabled);
         },
 
         toggleCollapsedState() {
@@ -266,8 +269,6 @@ export default {
         fieldPath(field) {
             return `${this.fieldPathPrefix}.${this.index}.${field.handle}`;
         },
-
-    }
-
-}
+    },
+};
 </script>

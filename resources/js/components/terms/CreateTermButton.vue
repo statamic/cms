@@ -1,13 +1,13 @@
 <template>
-
     <dropdown-list class="inline-block" :disabled="blueprints.length === 1">
         <template v-slot:trigger>
-            <button
-                class="btn-primary flex items-center"
-                @click="create"
-            >
+            <button class="btn-primary flex items-center" @click="create">
                 <span v-text="text" />
-                <svg-icon name="micro/chevron-down-xs" class="rtl:mr-2 ltr:ml-2 -mr-2 w-2" v-if="blueprints.length > 1" />
+                <svg-icon
+                    name="micro/chevron-down-xs"
+                    class="-mr-2 w-2 ltr:ml-2 rtl:mr-2"
+                    v-if="blueprints.length > 1"
+                />
             </button>
         </template>
 
@@ -17,12 +17,10 @@
             </div>
         </div>
     </dropdown-list>
-
 </template>
 
 <script>
 export default {
-
     props: {
         url: String,
         blueprints: Array,
@@ -30,7 +28,6 @@ export default {
     },
 
     methods: {
-
         create() {
             if (this.blueprints.length === 1) this.select();
         },
@@ -43,9 +40,7 @@ export default {
             }
 
             window.location = url;
-        }
-
-    }
-
-}
+        },
+    },
+};
 </script>

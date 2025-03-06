@@ -3,7 +3,8 @@
         <div class="flex items-center">
             <div class="input-group">
                 <div class="input-group-prepend">{{ __('URL') }}</div>
-                <input type="text"
+                <input
+                    type="text"
                     v-model="data"
                     class="input-text flex-1"
                     :class="{ 'bg-white dark:bg-dark-600': !isReadOnly }"
@@ -11,11 +12,12 @@
                     :readonly="isReadOnly"
                     :placeholder="__(config.placeholder) || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'"
                     @focus="$emit('focus')"
-                    @blur="$emit('blur')" />
+                    @blur="$emit('blur')"
+                />
             </div>
         </div>
 
-        <p v-if="isInvalid" class="text-red-500 mt-4">{{ __('statamic::validation.url') }}</p>
+        <p v-if="isInvalid" class="mt-4 text-red-500">{{ __('statamic::validation.url') }}</p>
 
         <div class="video-preview-wrapper" v-if="!isInvalid && (isEmbeddable || isVideo)">
             <div class="embed-video" v-if="isEmbeddable && canShowIframe">
@@ -29,6 +31,8 @@
 </template>
 
 <script>
+import Fieldtype from './Fieldtype.vue';
+import debounce from '@statamic/util/debounce.js';
 
 export default {
     mixins: [Fieldtype],
@@ -37,19 +41,17 @@ export default {
         return {
             data: this.value || '',
             canShowIframe: false,
-        }
+        };
     },
 
     watch: {
-
-        data: _.debounce(function (value)  {
+        data: debounce(function (value) {
             this.update(value);
         }, 500),
 
         value(value) {
             this.data = value;
-        }
-
+        },
     },
 
     mounted() {
@@ -74,7 +76,7 @@ export default {
             if (embed_url.includes('vimeo')) {
                 embed_url = embed_url.replace('/vimeo.com', '/player.vimeo.com/video');
 
-                if (! this.data.includes('progressive_redirect') && embed_url.split('/').length > 5) {
+                if (!this.data.includes('progressive_redirect') && embed_url.split('/').length > 5) {
                     let hash = embed_url.substr(embed_url.lastIndexOf('/') + 1);
                     embed_url = embed_url.substr(0, embed_url.lastIndexOf('/')) + '?h=' + hash.replace('?', '&');
                 }
@@ -89,29 +91,34 @@ export default {
         },
 
         isEmbeddable() {
-            return this.isUrl && this.data.includes('youtube') || this.data.includes('vimeo') || this.data.includes('youtu.be');
+            return (
+                (this.isUrl && this.data.includes('youtube')) ||
+                this.data.includes('vimeo') ||
+                this.data.includes('youtu.be')
+            );
         },
 
         isInvalid() {
-            let htmlRegex = new RegExp(/<([A-Z][A-Z0-9]*)\b[^>]*>.*?<\/\1>|<([A-Z][A-Z0-9]*)\b[^\/]*\/>/i)
+            let htmlRegex = new RegExp(/<([A-Z][A-Z0-9]*)\b[^>]*>.*?<\/\1>|<([A-Z][A-Z0-9]*)\b[^\/]*\/>/i);
 
             return htmlRegex.test(this.data);
         },
 
         isUrl() {
-            let regex = new RegExp('^(https?|ftp):\/\/[^\s/$.?#].*$', 'i')
+            let regex = new RegExp('^(https?|ftp):\/\/[^\s/$.?#].*$', 'i');
 
             return regex.test(this.data);
         },
 
         isVideo() {
-            return ! this.isEmbeddable && (
-                this.data.includes('.mp4') ||
-                this.data.includes('.ogv') ||
-                this.data.includes('.mov') ||
-                this.data.includes('.webm')
-            )
-        }
+            return (
+                !this.isEmbeddable &&
+                (this.data.includes('.mp4') ||
+                    this.data.includes('.ogv') ||
+                    this.data.includes('.mov') ||
+                    this.data.includes('.webm'))
+            );
+        },
     },
 };
 </script>
