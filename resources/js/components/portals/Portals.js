@@ -19,7 +19,7 @@ export default class Portals {
     }
 
     destroy(id) {
-        const i = _.findIndex(this.portals.value, (portal) => portal.id === id);
+        const i = this.portals.value.findIndex((portal) => portal.id === id);
 
         this.portals.value.splice(i, 1);
     }

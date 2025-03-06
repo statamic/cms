@@ -76,7 +76,7 @@ export default {
             // with inactive buttons dispersed throughout the toolbar, which looks cooler.
             let enabledButtonNames = buttons.filter((button) => button.enabled).map((button) => button.name);
             if (JSON.stringify(enabledButtonNames) !== JSON.stringify(this.data)) {
-                buttons = this.data.map((name) => _.findWhere(buttons, { name }));
+                buttons = this.data.map((name) => buttons.find((b) => b.name === name));
                 let unused = available.filter((button) => !this.data.includes(button.name));
                 buttons = [...buttons, ...unused];
             }
@@ -99,12 +99,12 @@ export default {
         },
 
         toggleButton(name) {
-            const button = _.findWhere(this.buttons, { name });
+            const button = this.buttons.find((b) => b.name === name);
             button.enabled = !button.enabled;
         },
 
         enabled(name) {
-            return _.findWhere(this.buttons, { name }).enabled;
+            return this.buttons.find((b) => b.name === name).enabled;
         },
     },
 };

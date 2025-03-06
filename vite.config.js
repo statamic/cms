@@ -23,14 +23,13 @@ export default defineConfig(({ mode }) => {
             svgLoader(),
             inject({
                 Vue: 'vue',
-                _: 'underscore',
                 include: 'resources/js/**',
             }),
         ],
         resolve: {
             alias: {
                 vue: 'vue/dist/vue.esm-bundler.js',
-                '@': path.resolve(__dirname, 'resources/js'),
+                '@statamic': path.resolve(__dirname, 'resources/js'),
             },
         },
         optimizeDeps: {

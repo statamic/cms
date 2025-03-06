@@ -107,7 +107,7 @@ export default {
         },
 
         submitButtonText() {
-            return _.findWhere(this.options, { value: this.action }).label;
+            return this.options.find((o) => o.value === this.action).label;
         },
     },
 

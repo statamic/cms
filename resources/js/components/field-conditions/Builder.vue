@@ -114,7 +114,7 @@ export default {
             let key = this.type === 'any' ? `${this.when}_any` : this.when;
             let saveableConditions = this.prepareSaveableConditions(this.conditions);
 
-            if (this.isStandard && !_.isEmpty(saveableConditions)) {
+            if (this.isStandard && Object.keys(saveableConditions).length) {
                 conditions[key] = saveableConditions;
             } else if (this.isCustom && this.customMethod) {
                 conditions[key] = this.customMethod;
@@ -162,10 +162,7 @@ export default {
         },
 
         getInitialConditions() {
-            let key = _.chain(KEYS)
-                .filter((key) => this.config[key])
-                .first()
-                .value();
+            let key = KEYS.filter((key) => this.config[key])[0];
 
             let conditions = this.config[key];
 
@@ -199,8 +196,8 @@ export default {
         },
 
         prepareSaveableConditions(conditions) {
-            conditions = _.reject(conditions, (condition) => {
-                return !condition.field || !condition.value;
+            conditions = conditions.filter((condition) => {
+                return !(!condition.field || !condition.value);
             });
 
             return new Converter().toBlueprint(conditions);

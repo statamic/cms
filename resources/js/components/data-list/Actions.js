@@ -1,4 +1,5 @@
 import DataListAction from './Action.vue';
+import { sortBy } from 'lodash-es';
 
 export default {
     components: {
@@ -17,7 +18,7 @@ export default {
 
     computed: {
         sortedActions() {
-            let actions = _.sortBy(this.actions, 'title');
+            let actions = sortBy(this.actions, 'title');
 
             return [...actions.filter((action) => !action.dangerous), ...actions.filter((action) => action.dangerous)];
         },

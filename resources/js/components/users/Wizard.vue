@@ -234,7 +234,6 @@
 
 import isEmail from 'validator/lib/isEmail';
 import HasWizardSteps from '../HasWizardSteps.js';
-import uniq from 'underscore/modules/uniq.js';
 
 export default {
     mixins: [HasWizardSteps],
@@ -399,7 +398,7 @@ export default {
             } else {
                 emailErrors = emailErrors.filter((error) => error !== error);
             }
-            this.errors = { ...this.errors, email: uniq(emailErrors) };
+            this.errors = { ...this.errors, email: [...new Set(emailErrors)] };
         },
 
         errors: function (errors) {

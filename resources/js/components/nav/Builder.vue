@@ -290,10 +290,7 @@ export default {
 
             this.setOriginalSectionItems(navConfig);
 
-            this.treeData = _.chain(navConfig)
-                .mapObject((section) => this.normalizeNavConfig(section))
-                .values()
-                .value();
+            this.treeData = Object.values(navConfig.map((section) => this.normalizeNavConfig(section)));
         },
 
         setOriginalSectionItems(nav) {
@@ -568,13 +565,15 @@ export default {
         },
 
         itemHasModifiedProperties(stat) {
-            return _.chain(stat.data.manipulations).omit(['action', 'reorder', 'children']).keys().value().length > 0;
+            const { action, reorder, children, ...remaining } = stat.data.manipulations;
+
+            return Object.keys(remaining).length > 0;
         },
 
         itemHasModifiedChildren(stat) {
             return (
                 stat.children.filter((childItem) => {
-                    return _.chain(childItem.data.manipulations).keys().value().length > 0;
+                    return Object.keys(childItem.data.manipulations).length > 0;
                 }).length > 0
             );
         },

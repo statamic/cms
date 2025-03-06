@@ -1,5 +1,6 @@
 <script>
 import Fuse from 'fuse.js';
+import { sortBy } from 'lodash-es';
 
 export default {
     emits: ['selections-updated', 'visible-columns-updated'],
@@ -140,7 +141,7 @@ export default {
             // If no column is selected, don't sort.
             if (!this.sharedState.sortColumn) return rows;
 
-            rows = _.sortBy(rows, this.sharedState.sortColumn);
+            rows = sortBy(rows, this.sharedState.sortColumn);
 
             if (this.sharedState.sortDirection === 'desc') {
                 rows = rows.reverse();

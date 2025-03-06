@@ -64,6 +64,7 @@
 import ChangePassword from './ChangePassword.vue';
 import HasHiddenFields from '../publish/HasHiddenFields';
 import HasActions from '../publish/HasActions';
+import clone from '@statamic/util/clone.js';
 
 export default {
     mixins: [HasHiddenFields, HasActions],
@@ -88,9 +89,9 @@ export default {
 
     data() {
         return {
-            fieldset: _.clone(this.initialFieldset),
-            values: _.clone(this.initialValues),
-            meta: _.clone(this.initialMeta),
+            fieldset: clone(this.initialFieldset),
+            values: clone(this.initialValues),
+            meta: clone(this.initialMeta),
             error: null,
             errors: {},
             title: this.initialTitle,

@@ -74,7 +74,7 @@ export default {
 
         activeFilterParameters: {
             get() {
-                if (_.isEmpty(this.activeFilters)) {
+                if (Object.keys(this.activeFilters).length === 0) {
                     return null;
                 }
                 return utf8btoa(JSON.stringify(this.activeFilters));
@@ -86,7 +86,7 @@ export default {
 
         visibleColumnParameters: {
             get() {
-                if (_.isEmpty(this.visibleColumns)) {
+                if (Object.keys(this.visibleColumns).length === 0) {
                     return null;
                 }
                 return this.visibleColumns.map((column) => column.field).join(',');
@@ -210,7 +210,7 @@ export default {
 
         removeRow(row) {
             let id = row.id;
-            let i = _.indexOf(this.rows, _.findWhere(this.rows, { id }));
+            let i = this.rows.indexOf(this.rows.find((r) => r.id === id));
             this.rows.splice(i, 1);
             if (this.rows.length === 0) location.reload();
         },

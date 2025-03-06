@@ -27,7 +27,7 @@ export default {
                 );
             }, []);
 
-            return _.unique(fields);
+            return [...new Set(fields)];
         },
 
         makeConditionsProvider() {

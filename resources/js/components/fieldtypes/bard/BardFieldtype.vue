@@ -130,7 +130,6 @@
 <script>
 import Fieldtype from '../Fieldtype.vue';
 import uniqid from 'uniqid';
-import reduce from 'underscore/modules/reduce';
 import Emitter from 'tiny-emitter';
 import { BubbleMenu, Editor, EditorContent } from '@tiptap/vue-3';
 import { Extension } from '@tiptap/core';
@@ -176,7 +175,7 @@ import { availableButtons, addButtonHtml } from '../bard/buttons';
 import readTimeEstimate from 'read-time-estimate';
 import { common, createLowlight } from 'lowlight';
 import 'highlight.js/styles/github.css';
-import importTiptap from '@/util/tiptap.js';
+import importTiptap from '@statamic/util/tiptap.js';
 
 const lowlight = createLowlight(common);
 let tiptap = null;
@@ -338,13 +337,9 @@ export default {
         },
 
         setConfigs() {
-            return reduce(
-                this.groupConfigs,
-                (sets, group) => {
-                    return sets.concat(group.sets);
-                },
-                [],
-            );
+            return this.groupConfigs.reduce((sets, group) => {
+                return sets.concat(group.sets);
+            }, []);
         },
 
         groupConfigs() {
@@ -595,7 +590,7 @@ export default {
 
             // Get the configured buttons and swap them with corresponding objects
             let buttons = selectedButtons.map((button) => {
-                return _.findWhere(availableButtons(), { name: button.toLowerCase() }) || button;
+                return availableButtons().find((b) => b.name === button.toLowerCase()) || button;
             });
 
             // Let addons add, remove, or control the position of buttons.
@@ -630,7 +625,7 @@ export default {
                 return button.condition ? button.condition.call(null, this.config) : true;
             });
 
-            if (_.findWhere(buttons, { name: 'table' })) {
+            if (buttons.find((b) => b.name === 'table')) {
                 buttons.push(
                     {
                         name: 'deletetable',

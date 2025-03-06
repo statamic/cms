@@ -112,7 +112,7 @@ export default {
 
     computed: {
         activeLocalization() {
-            return _.findWhere(this.localizations, { active: true });
+            return this.localizations.find((l) => l.active);
         },
 
         preferencesKey() {
@@ -178,7 +178,7 @@ export default {
         },
 
         cleanPagesForSubmission(pages) {
-            return _.map(pages, (page) => ({
+            return pages.map((page) => ({
                 id: page.id,
                 children: this.cleanPagesForSubmission(page.children),
             }));

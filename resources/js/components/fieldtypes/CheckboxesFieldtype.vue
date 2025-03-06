@@ -39,7 +39,7 @@ export default {
 
             return this.values
                 .map((value) => {
-                    const option = _.findWhere(this.options, { value });
+                    const option = this.options.find((o) => o.value === value);
                     return option ? option.label : value;
                 })
                 .join(', ');

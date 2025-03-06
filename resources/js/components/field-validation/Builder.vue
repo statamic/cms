@@ -109,6 +109,7 @@
 import RULES from './Rules.js';
 import SemVer from 'semver';
 import { SortableList } from '../sortable/Sortable';
+import { sortBy } from 'lodash-es';
 
 export default {
     components: {
@@ -148,25 +149,22 @@ export default {
         },
 
         laravelRules() {
-            return _.chain(clone(RULES))
+            return clone(RULES)
                 .filter((rule) => (rule.minVersion ? SemVer.gte(this.laravelVersion, rule.minVersion) : true))
                 .filter((rule) => (rule.maxVersion ? SemVer.lte(this.laravelVersion, rule.maxVersion) : true))
                 .map((rule) => {
                     return this.prepareRenderableRule(rule);
-                })
-                .value();
+                });
         },
 
         extensionRules() {
-            return _.chain(clone(Statamic.$config.get('extensionRules')))
-                .map((rule) => {
-                    return this.prepareRenderableRule(rule);
-                })
-                .value();
+            return clone(Statamic.$config.get('extensionRules')).map((rule) => {
+                return this.prepareRenderableRule(rule);
+            });
         },
 
         allRules() {
-            return _.sortBy([...this.laravelRules, ...this.extensionRules], 'display');
+            return sortBy([...this.laravelRules, ...this.extensionRules], 'display');
         },
 
         helpBlock() {
@@ -174,10 +172,7 @@ export default {
                 return false;
             }
 
-            let rule = _.chain(this.allRules)
-                .filter((rule) => rule.value === this.selectedLaravelRule)
-                .first()
-                .value();
+            let rule = this.allRules.filter((rule) => rule.value === this.selectedLaravelRule).first();
 
             return rule.example || false;
         },
