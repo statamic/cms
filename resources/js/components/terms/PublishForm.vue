@@ -292,7 +292,7 @@ import HasPreferences from '../data-list/HasPreferences';
 import HasHiddenFields from '../publish/HasHiddenFields';
 import HasActions from '../publish/HasActions';
 import striptags from 'striptags';
-import clone from '@/util/clone.js';
+import clone from '@statamic/util/clone.js';
 
 export default {
     mixins: [HasPreferences, HasHiddenFields, HasActions],

@@ -32,7 +32,7 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import debounce from '@/util/debounce.js';
+import debounce from '@statamic/util/debounce.js';
 
 export default {
     mixins: [Fieldtype],

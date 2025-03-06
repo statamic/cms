@@ -88,7 +88,7 @@ import Provider from '../portals/Provider.vue';
 import Resizer from './Resizer.vue';
 import UpdatesIframe from './UpdatesIframe';
 import { mapValues } from 'lodash-es';
-import debounce from '@/util/debounce.js';
+import debounce from '@statamic/util/debounce.js';
 
 let source;
 const widthLocalStorageKey = 'statamic.live-preview.editor-width';

@@ -192,7 +192,7 @@ import Fieldtype from '../Fieldtype.vue';
 import { marked } from 'marked';
 import { markRaw } from 'vue';
 import PlainTextRenderer from 'marked-plaintext';
-import throttle from '@/util/throttle.js';
+import throttle from '@statamic/util/throttle.js';
 
 import CodeMirror from 'codemirror/lib/codemirror';
 import 'codemirror/addon/edit/closebrackets';

@@ -236,7 +236,7 @@
 <script>
 import HasFilters from '../../data-list/HasFilters';
 import { defineAsyncComponent } from 'vue';
-import clone from '@/util/clone.js';
+import clone from '@statamic/util/clone.js';
 
 export default {
     mixins: [HasFilters],
