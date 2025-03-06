@@ -60,7 +60,7 @@
 
     .bard-toolbar-button:focus {
         @apply focus-outline;
-
+    }
 
     .bard-toolbar-button:disabled {
         @apply opacity-50;
