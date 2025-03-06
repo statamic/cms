@@ -392,6 +392,15 @@ class EntryTest extends TestCase
             return $entry->get('title').' AND MORE!';
         });
 
+        Facades\Collection::computed('articles', [
+            'tags' => function ($entry) {
+                return ['music', 'pop'];
+            },
+           'featured' => function ($entry) {
+                return true;
+            },
+        ]);
+
         $collection = tap(Collection::make('articles'))->save();
         $entry = (new Entry)->collection($collection)->data(['title' => 'Pop Rocks']);
 
@@ -401,6 +410,8 @@ class EntryTest extends TestCase
 
         $expectedComputedData = [
             'description' => 'Pop Rocks AND MORE!',
+            'tags' => ['music', 'pop'],
+            'featured' => true,
         ];
 
         $expectedValues = array_merge($expectedData, $expectedComputedData);
