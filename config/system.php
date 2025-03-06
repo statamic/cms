@@ -80,7 +80,8 @@ return [
     |--------------------------------------------------------------------------
     |
     | Statamic will use this timezone when displaying dates on the front-end.
-    | You can use any timezone supported by PHP.
+    | You can use any timezone supported by PHP. When set to null it will
+    | fall back to the timezone defined in your `app.php` config file.
     |
     | https://www.php.net/manual/en/timezones.php
     |
@@ -90,12 +91,13 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Localize Dates in Modifiers?
+    | Localize Dates in Modifiers
     |--------------------------------------------------------------------------
     |
-    | Since Statamic stores dates in UTC, any modifiers you chain onto a date
-    | field will be working with the UTC value. If you'd prefer modifiers to
-    | always use your `display_timezone`, set this to `true`.
+    | When using date-related modifiers, Carbon instances will be in UTC.
+    | Enabling this setting will ensure that dates get localized into
+    | the timezone defined in `display_timezone`. Otherwise you'll
+    | need to manually localize dates in all of your templates.
     |
     */
 
