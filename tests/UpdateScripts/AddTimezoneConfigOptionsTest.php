@@ -21,8 +21,6 @@ class AddTimezoneConfigOptionsTest extends TestCase
     #[Test]
     public function it_appends_timezone_option_to_system_config()
     {
-        config()->set('app.timezone', 'America/New_York'); // -05:00
-
         File::ensureDirectoryExists(app()->configPath('statamic'));
 
         File::put(app()->configPath('statamic/system.php'), <<<'EOT'
