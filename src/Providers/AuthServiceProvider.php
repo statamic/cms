@@ -87,13 +87,17 @@ class AuthServiceProvider extends ServiceProvider
         Gate::after(function ($user, $ability) {
             Permission::boot();
 
-            $isStatamicPermission = Permission::all()->first(fn ($permission) => $permission->value() === $ability);
+            if (Permission::all()->map->value()->has($ability)) {
+                $user = User::fromUser($user);
 
-            if ($isStatamicPermission) {
-                return optional(User::fromUser($user))->isSuper() ? true : null;
+                if ($user->isSuper()) {
+                    return true;
+                }
+
+                if ($user->hasPermission($ability)) {
+                    return true;
+                }
             }
-
-            return optional(User::fromUser($user))->hasPermission($ability) === true ? true : null;
         });
 
         foreach ($this->policies as $key => $policy) {
