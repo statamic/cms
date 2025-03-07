@@ -26,6 +26,20 @@ export default class {
         this.converter = new Converter();
     }
 
+    usingRootValues() {
+        if (! this.currentFieldPath) {
+            throw new Error('[currentFieldPath] constructor param required for `usingRootValues()`');
+        }
+
+        this.rootValues = this.values;
+
+        if (this.currentFieldPath.includes('.')) {
+            return this.scopeValuesToParent();
+        }
+
+        return this;
+    }
+
     passesConditions(specificConditions) {
         let conditions = specificConditions || this.getConditions();
 
@@ -281,5 +295,13 @@ export default class {
         }
 
         return dottedPrefix ? dottedPrefix + '.' + lhs : lhs;
+    }
+
+    scopeValuesToParent() {
+        let scope = this.currentFieldPath.replace(new RegExp('\.[^\.]+$'), '');
+
+        this.values = data_get(this.rootValues, scope);
+
+        return this;
     }
 }
