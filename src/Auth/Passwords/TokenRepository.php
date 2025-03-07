@@ -12,9 +12,6 @@ use Statamic\Facades\YAML;
 class TokenRepository extends DatabaseTokenRepository
 {
     protected $files;
-    protected $hasher;
-    protected $hashKey;
-    protected $expires;
     protected $path;
 
     public function __construct(Filesystem $files, HasherContract $hasher, $table, $hashKey, $expires = 60, $throttle = 60)

@@ -51,7 +51,7 @@
     }
 
     .bard-toolbar-button:hover {
-        @apply bg-gray-200 dark:bg-dark-700;
+        @apply bg-gray-200 dark:bg-dark-650;
     }
 
     .bard-toolbar-button.active {

@@ -946,7 +946,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
     protected function getOriginByString($origin)
     {
-        return Facades\Entry::find($origin);
+        return $this->collection()->queryEntries()->where('id', $origin)->first();
     }
 
     protected function getOriginFallbackValues()

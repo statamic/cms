@@ -17,6 +17,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use ReflectionClass;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Entries\QueryBuilder;
 use Statamic\Data\AugmentedCollection;
 use Statamic\Entries\AugmentedEntry;
 use Statamic\Entries\Collection;
@@ -1727,7 +1728,12 @@ class EntryTest extends TestCase
         $originEntry = $this->mock(Entry::class);
         $originEntry->shouldReceive('id')->andReturn('123');
 
-        Facades\Entry::shouldReceive('find')->with('123')->andReturn($originEntry);
+        $builder = $this->mock(QueryBuilder::class);
+        $builder->shouldReceive('where')->with('collection', 'test')->andReturnSelf();
+        $builder->shouldReceive('where')->with('id', 123)->andReturnSelf();
+        $builder->shouldReceive('first')->andReturn($originEntry);
+        Facades\Entry::shouldReceive('query')->andReturn($builder);
+
         $originEntry->shouldReceive('values')->andReturn(collect([]));
         $originEntry->shouldReceive('blueprint')->andReturn(
             $this->mock(Blueprint::class)->shouldReceive('handle')->andReturn('test')->getMock()
@@ -1805,12 +1811,16 @@ class EntryTest extends TestCase
 
         $originEntry = $this->mock(Entry::class);
         $originEntry->shouldReceive('id')->andReturn('123');
-
-        Facades\Entry::shouldReceive('find')->with('123')->andReturn($originEntry);
         $originEntry->shouldReceive('values')->andReturn(collect([]));
         $originEntry->shouldReceive('blueprint')->andReturn(
             $this->mock(Blueprint::class)->shouldReceive('handle')->andReturn('another')->getMock()
         );
+
+        $builder = $this->mock(QueryBuilder::class);
+        $builder->shouldReceive('where')->with('collection', 'test')->andReturnSelf();
+        $builder->shouldReceive('where')->with('id', 123)->andReturnSelf();
+        $builder->shouldReceive('first')->andReturn($originEntry);
+        Facades\Entry::shouldReceive('query')->andReturn($builder);
 
         $entry = (new Entry)
             ->collection('test')
@@ -1831,12 +1841,16 @@ class EntryTest extends TestCase
 
         $originEntry = $this->mock(Entry::class);
         $originEntry->shouldReceive('id')->andReturn('123');
-
-        Facades\Entry::shouldReceive('find')->with('123')->andReturn($originEntry);
         $originEntry->shouldReceive('values')->andReturn(collect([]));
         $originEntry->shouldReceive('blueprint')->andReturn(
             $this->mock(Blueprint::class)->shouldReceive('handle')->andReturn('another')->getMock()
         );
+
+        $builder = $this->mock(QueryBuilder::class);
+        $builder->shouldReceive('where')->with('collection', 'test')->andReturnSelf();
+        $builder->shouldReceive('where')->with('id', 123)->andReturnSelf();
+        $builder->shouldReceive('first')->andReturn($originEntry);
+        Facades\Entry::shouldReceive('query')->andReturn($builder);
 
         $entry = (new Entry)
             ->collection('test')

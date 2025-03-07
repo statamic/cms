@@ -15,23 +15,12 @@ class PasswordBrokerManager extends BaseManager
             $key = base64_decode(substr($key, 7));
         }
 
-        if (version_compare(app()->version(), '12', '<')) {
-            return new TokenRepository(
-                $this->app['files'],
-                $this->app['hash'],
-                $config['table'],
-                $key,
-                $config['expire'],
-                $config['throttle'] ?? 0
-            );
-        }
-
-        return new LaravelTwelveTokenRepository(
+        return new TokenRepository(
             $this->app['files'],
             $this->app['hash'],
             $config['table'],
             $key,
-            ($config['expire'] ?? 60) * 60,
+            $config['expire'],
             $config['throttle'] ?? 0
         );
     }
