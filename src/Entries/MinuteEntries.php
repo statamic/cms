@@ -2,13 +2,13 @@
 
 namespace Statamic\Entries;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 
 class MinuteEntries
 {
-    public function __construct(private readonly Carbon $minute)
+    public function __construct(private readonly CarbonInterface $minute)
     {
     }
 

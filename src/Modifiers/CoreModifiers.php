@@ -546,7 +546,7 @@ class CoreModifiers extends Modifier
      */
     public function daysAgo($value, $params)
     {
-        return $this->carbon($value)->diffInDays(Arr::get($params, 0));
+        return (int) abs($this->carbon($value)->diffInDays(Arr::get($params, 0)));
     }
 
     /**
@@ -1055,7 +1055,7 @@ class CoreModifiers extends Modifier
      */
     public function hoursAgo($value, $params)
     {
-        return $this->carbon($value)->diffInHours(Arr::get($params, 0));
+        return (int) abs($this->carbon($value)->diffInHours(Arr::get($params, 0)));
     }
 
     /**
@@ -1617,7 +1617,7 @@ class CoreModifiers extends Modifier
      */
     public function minutesAgo($value, $params)
     {
-        return $this->carbon($value)->diffInMinutes(Arr::get($params, 0));
+        return (int) abs($this->carbon($value)->diffInMinutes(Arr::get($params, 0)));
     }
 
     /**
@@ -1652,7 +1652,7 @@ class CoreModifiers extends Modifier
      */
     public function monthsAgo($value, $params)
     {
-        return $this->carbon($value)->diffInMonths(Arr::get($params, 0));
+        return (int) abs($this->carbon($value)->diffInMonths(Arr::get($params, 0)));
     }
 
     /**
@@ -2234,7 +2234,7 @@ class CoreModifiers extends Modifier
      */
     public function secondsAgo($value, $params)
     {
-        return $this->carbon($value)->diffInSeconds(Arr::get($params, 0));
+        return (int) abs($this->carbon($value)->diffInSeconds(Arr::get($params, 0)));
     }
 
     /**
@@ -2933,7 +2933,7 @@ class CoreModifiers extends Modifier
      */
     public function weeksAgo($value, $params)
     {
-        return $this->carbon($value)->diffInWeeks(Arr::get($params, 0));
+        return (int) abs($this->carbon($value)->diffInWeeks(Arr::get($params, 0)));
     }
 
     /**
@@ -3045,7 +3045,7 @@ class CoreModifiers extends Modifier
      */
     public function yearsAgo($value, $params)
     {
-        return $this->carbon($value)->diffInYears(Arr::get($params, 0));
+        return (int) abs($this->carbon($value)->diffInYears(Arr::get($params, 0)));
     }
 
     /**
@@ -3106,6 +3106,10 @@ class CoreModifiers extends Modifier
             $url = str_replace('//youtube-nocookie.com', '//www.youtube-nocookie.com', $url);
         }
 
+        if (Str::contains($url, '&') && ! Str::contains($url, '?')) {
+            $url = Str::replaceFirst('&', '?', $url);
+        }
+
         return $url;
     }
 
@@ -3133,6 +3137,10 @@ class CoreModifiers extends Modifier
 
         if (Str::contains($url, 'youtube.com/watch?v=')) {
             $url = str_replace('watch?v=', 'embed/', $url);
+        }
+
+        if (Str::contains($url, '&') && ! Str::contains($url, '?')) {
+            $url = Str::replaceFirst('&', '?', $url);
         }
 
         return $url;
@@ -3202,7 +3210,7 @@ class CoreModifiers extends Modifier
     private function carbon($value)
     {
         if (! $value instanceof Carbon) {
-            $value = (is_numeric($value)) ? Date::createFromTimestamp($value) : Date::parse($value);
+            $value = (is_numeric($value)) ? Date::createFromTimestamp($value, config('app.timezone')) : Date::parse($value);
         }
 
         return $value;

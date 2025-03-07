@@ -12,6 +12,8 @@ use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Utility;
 
+use function Statamic\trans as __;
+
 class CorePermissions
 {
     public function boot()

@@ -589,7 +589,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     public function lastModified()
     {
-        return Carbon::createFromTimestamp($this->meta('last_modified'));
+        return Carbon::createFromTimestamp($this->meta('last_modified'), config('app.timezone'));
     }
 
     /**

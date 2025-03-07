@@ -7,12 +7,10 @@ use Statamic\Contracts\Git\ProvidesCommitMessage;
 
 class EntrySaved extends Event implements ProvidesCommitMessage
 {
-    public $entry;
     public $initiator;
 
-    public function __construct($entry)
+    public function __construct(public $entry)
     {
-        $this->entry = $entry;
         $this->initiator = InitiatorStack::entry($entry)->initiator();
     }
 

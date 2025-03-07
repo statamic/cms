@@ -31,9 +31,6 @@
                         :config="config"
                         :bard="_self"
                         :editor="editor" />
-                    <button class="bard-toolbar-button" @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')" :aria-label="__('Show HTML Source')">
-                        <svg-icon name="show-source" class="w-4 h-4 "/>
-                    </button>
                 </div>
             </div>
         </publish-field-fullscreen-header>
@@ -49,9 +46,6 @@
                     :config="config"
                     :bard="_self"
                     :editor="editor" />
-                <button class="bard-toolbar-button" @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')" :aria-label="__('Show HTML Source')">
-                    <svg-icon name="show-source" class="w-4 h-4 "/>
-                </button>
             </div>
         </div>
 
@@ -369,6 +363,12 @@ export default {
                     run: this.toggleFullscreen,
                     visibleWhenReadOnly: true,
                     visible: this.config.fullscreen,
+                },
+                {
+                    title: __('Show HTML Source'),
+                    run: () => this.showSource = !this.showSource,
+                    visibleWhenReadOnly: true,
+                    visible: this.allowSource,
                 },
             ];
         },
