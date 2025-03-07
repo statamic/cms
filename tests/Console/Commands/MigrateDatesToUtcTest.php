@@ -8,6 +8,7 @@ use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Fieldset;
+use Statamic\Facades\File;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
@@ -33,7 +34,8 @@ class MigrateDatesToUtcTest extends TestCase
 
     public function tearDown(): void
     {
-        User::blueprint()->delete();
+        File::delete(base_path('resources/blueprints'));
+        File::delete(base_path('resources/fieldsets'));
 
         parent::tearDown();
     }
