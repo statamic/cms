@@ -261,6 +261,8 @@ class NavTest extends TestCase
     #[Test]
     public function it_doesnt_build_children_that_the_user_is_not_authorized_to_see()
     {
+        Facades\Permission::register('view sith diaries');
+
         $this->setTestRoles(['sith' => ['view sith diaries']]);
         $this->actingAs(tap(User::make()->assignRole('sith'))->save());
 
