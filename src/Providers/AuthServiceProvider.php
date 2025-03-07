@@ -84,7 +84,7 @@ class AuthServiceProvider extends ServiceProvider
             return new UserProvider;
         });
 
-        Gate::before(function ($user, $ability) {
+        Gate::after(function ($user, $ability) {
             Permission::boot();
 
             $isStatamicPermission = Permission::all()->first(fn ($permission) => $permission->value() === $ability);
@@ -92,9 +92,7 @@ class AuthServiceProvider extends ServiceProvider
             if ($isStatamicPermission) {
                 return optional(User::fromUser($user))->isSuper() ? true : null;
             }
-        });
 
-        Gate::after(function ($user, $ability) {
             return optional(User::fromUser($user))->hasPermission($ability) === true ? true : null;
         });
 
