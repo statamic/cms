@@ -17,18 +17,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Static caching.
-    |--------------------------------------------------------------------------
-    |
-    | Default setting for whether or not to allow protected pages in the static
-    | cache.
-    |
-    */
-
-    'cacheable' => null,
-
-    /*
-    |--------------------------------------------------------------------------
     | Protection Schemes
     |--------------------------------------------------------------------------
     |
@@ -45,9 +33,6 @@ return [
         'ip_address' => [
             'driver' => 'ip_address',
             'allowed' => ['127.0.0.1'],
-            // NOTE: Set `cacheable` to true/false to allow static caching for
-            //       this driver.
-            // 'cacheable' => null,
         ],
 
         'logged_in' => [

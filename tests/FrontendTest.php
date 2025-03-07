@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Auth\Protect\ProtectorManager;
+use Statamic\Auth\Protect\Protectors\Protector;
 use Statamic\Events\ResponseCreated;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Cascade;
@@ -376,7 +378,25 @@ class FrontendTest extends TestCase
     #[Test]
     public function header_is_not_added_to_cacheable_protected_responses()
     {
-        config()->set('statamic.protect.cacheable', true);
+        // config(['statamic.protect.default' => 'test']);
+        config(['statamic.protect.schemes.test' => [
+            'driver' => 'test',
+        ]]);
+
+        app(ProtectorManager::class)->extend('test', function ($app) {
+            return new class() extends Protector
+            {
+                public function protect()
+                {
+                    //
+                }
+
+                public function cacheable()
+                {
+                    return true;
+                }
+            };
+        });
 
         $page = $this->createPage('about');
 
@@ -385,28 +405,7 @@ class FrontendTest extends TestCase
             ->assertOk()
             ->assertHeaderMissing('X-Statamic-Protected');
 
-        $page->set('protect', 'logged_in')->save();
-
-        $this
-            ->actingAs(User::make())
-            ->get('/about')
-            ->assertOk()
-            ->assertHeaderMissing('X-Statamic-Protected');
-    }
-
-    #[Test]
-    public function header_is_not_added_to_cacheable_protected_responses_for_driver()
-    {
-        config()->set('statamic.protect.schemes.logged_in.cacheable', true);
-
-        $page = $this->createPage('about');
-
-        $this
-            ->get('/about')
-            ->assertOk()
-            ->assertHeaderMissing('X-Statamic-Protected');
-
-        $page->set('protect', 'logged_in')->save();
+        $page->set('protect', 'test')->save();
 
         $this
             ->actingAs(User::make())

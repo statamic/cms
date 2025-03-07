@@ -148,40 +148,41 @@ class ProtectionTest extends TestCase
     }
 
     #[Test]
-    public function default_configuration_allows_static_caching()
+    public function protector_driver_allows_static_caching()
     {
-        config(['statamic.protect.default' => 'logged_in']);
-        config(['statamic.protect.cacheable' => true]);
-
-        $this->assertTrue($this->protection->cacheable());
-    }
-
-    #[Test]
-    public function driver_allows_static_caching()
-    {
-        config(['statamic.protect.default' => 'logged_in']);
-        config(['statamic.protect.schemes.logged_in' => [
-            'driver' => 'auth',
-            'form_url' => '/login',
-            'cacheable' => true,
+        config(['statamic.protect.default' => 'test']);
+        config(['statamic.protect.schemes.test' => [
+            'driver' => 'test',
         ]]);
+
+        app(ProtectorManager::class)->extend('test', function ($app) {
+            return new class() extends Protector
+            {
+                public function protect()
+                {
+                    //
+                }
+
+                public function cacheable()
+                {
+                    return true;
+                }
+            };
+        });
 
         $this->assertTrue($this->protection->cacheable());
         $this->assertTrue($this->protection->driver()->cacheable());
     }
 
     #[Test]
-    public function driver_disallows_static_caching()
+    public function protector_driver_disallows_static_caching()
     {
-        config(['statamic.protect.cacheable' => true]);
         config(['statamic.protect.default' => 'logged_in']);
         config(['statamic.protect.schemes.logged_in' => [
             'driver' => 'auth',
             'form_url' => '/login',
-            'cacheable' => false,
         ]]);
 
-        $this->assertTrue(config('statamic.protect.cacheable'));
         $this->assertFalse($this->protection->cacheable());
         $this->assertFalse($this->protection->driver()->cacheable());
     }
