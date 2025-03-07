@@ -6,7 +6,9 @@ use Statamic\Fields\Fieldtype;
 
 class Checkboxes extends Fieldtype
 {
-    use HasSelectOptions;
+    use HasSelectOptions {
+        process as traitProcess;
+    }
 
     protected $categories = ['controls'];
     protected $selectableInForms = true;
@@ -52,8 +54,16 @@ class Checkboxes extends Fieldtype
         return true;
     }
 
+    public function preProcessValidatable($value)
+    {
+        return collect($value)->filter()->values()->all();
+    }
+
     public function process($data)
     {
-        return collect($data)->filter()->values()->all();
+        return collect($this->traitProcess($data))
+            ->reject(fn ($value) => $value === null)
+            ->values()
+            ->all();
     }
 }

@@ -22,5 +22,6 @@ class CheckboxesTest extends TestCase
     public function it_filters_out_nulls()
     {
         $this->assertSame(['foo', 'bar'], $this->field([])->process(['foo', null, 'bar']));
+        $this->assertSame(['foo', 'bar'], $this->field([])->preProcessValidatable(['foo', null, 'bar']));
     }
 }
