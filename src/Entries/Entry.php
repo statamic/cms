@@ -588,14 +588,14 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
     private function parseDateFromString($date)
     {
         if (strlen($date) === 10) {
-            return Carbon::createFromFormat('Y-m-d', $date, config('statamic.system.timezone'))->startOfDay()->utc();
+            return Carbon::createFromFormat('Y-m-d', $date)->startOfDay();
         }
 
         if (strlen($date) === 15) {
-            return Carbon::createFromFormat('Y-m-d-Hi', $date, config('statamic.system.timezone'))->startOfMinute()->utc();
+            return Carbon::createFromFormat('Y-m-d-Hi', $date)->startOfMinute();
         }
 
-        return Carbon::createFromFormat('Y-m-d-His', $date, config('statamic.system.timezone'))->utc();
+        return Carbon::createFromFormat('Y-m-d-His', $date);
     }
 
     private function adjustDateTimeBasedOnSettings($date)

@@ -989,6 +989,48 @@ class EntryTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('dateCollectionEntriesAsStringProvider')]
+    public function it_gets_dates_for_dated_collection_entries_when_passed_as_string(
+        $appTimezone,
+        $date,
+        $expectedDate
+    ) {
+        config(['app.timezone' => $appTimezone]);
+
+        Carbon::setTestNow(Carbon::parse('2025-02-02 13:45:23'));
+
+        $blueprint = Blueprint::makeFromFields([
+            'date' => ['type' => 'date', 'time_enabled' => true, 'time_seconds_enabled' => true],
+        ]);
+        BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect([
+            'test' => $blueprint->setHandle('test'),
+        ]));
+
+        $collection = tap(Facades\Collection::make('test')->dated(true))->save();
+
+        $entry = (new Entry)->collection($collection)->slug('foo')->date($date);
+
+        $this->assertEquals($expectedDate, $entry->date()->toIso8601String());
+    }
+
+    public static function dateCollectionEntriesAsStringProvider()
+    {
+        // The date is treated as UTC regardless of the timezone so no conversion should be done.
+        return [
+            'utc' => [
+                'UTC',
+                '2023-02-20-033513',
+                '2023-02-20T03:35:13+00:00',
+            ],
+            'not utc' => [
+                'America/New_York',
+                '2023-02-20-033513',
+                '2023-02-20T03:35:13+00:00',
+            ],
+        ];
+    }
+
+    #[Test]
     public function date_is_null_if_a_collection_hasnt_been_set()
     {
         $this->assertNull((new Entry)->date());
