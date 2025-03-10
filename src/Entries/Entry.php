@@ -563,17 +563,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
                     return null;
                 }
 
-                $date = $date ?? optional($this->origin())->date() ?? $this->lastModified();
-
-                if (! $this->hasTime()) {
-                    $date->startOfDay();
-                }
-
-                if (! $this->hasSeconds()) {
-                    $date->startOfMinute();
-                }
-
-                return $date;
+                return $date ?? optional($this->origin())->date() ?? $this->adjustDateTimeBasedOnSettings($this->lastModified());
             })
             ->setter(function ($date) {
                 if (! $this->collection()?->dated()) {
@@ -588,17 +578,37 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
                     return $date->utc();
                 }
 
-                if (strlen($date) === 10) {
-                    return Carbon::createFromFormat('Y-m-d', $date, config('statamic.system.timezone'))->startOfDay()->utc();
-                }
+                $date = $this->parseDateFromString($date);
 
-                if (strlen($date) === 15) {
-                    return Carbon::createFromFormat('Y-m-d-Hi', $date, config('statamic.system.timezone'))->startOfMinute()->utc();
-                }
-
-                return Carbon::createFromFormat('Y-m-d-His', $date, config('statamic.system.timezone'))->utc();
+                return $this->adjustDateTimeBasedOnSettings($date);
             })
             ->args(func_get_args());
+    }
+
+    private function parseDateFromString($date)
+    {
+        if (strlen($date) === 10) {
+            return Carbon::createFromFormat('Y-m-d', $date, config('statamic.system.timezone'))->startOfDay()->utc();
+        }
+
+        if (strlen($date) === 15) {
+            return Carbon::createFromFormat('Y-m-d-Hi', $date, config('statamic.system.timezone'))->startOfMinute()->utc();
+        }
+
+        return Carbon::createFromFormat('Y-m-d-His', $date, config('statamic.system.timezone'))->utc();
+    }
+
+    private function adjustDateTimeBasedOnSettings($date)
+    {
+        if (! $this->hasTime()) {
+            $date->startOfDay();
+        }
+
+        if (! $this->hasSeconds()) {
+            $date->startOfMinute();
+        }
+
+        return $date;
     }
 
     public function hasDate()
@@ -612,7 +622,11 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             return false;
         }
 
-        return $this->blueprint()->field('date')->fieldtype()->timeEnabled();
+        if ($this->blueprint()->field('date')->fieldtype()->timeEnabled()) {
+            return true;
+        }
+
+        return $this->date && ! $this->date->isStartOfDay();
     }
 
     public function hasSeconds()
