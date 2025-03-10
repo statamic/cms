@@ -218,6 +218,9 @@ class ActiveNavItemTest extends TestCase
     #[Test]
     public function it_can_check_if_parent_extension_with_array_based_children_item_is_active()
     {
+        Facades\Permission::register('view seo reports');
+        Facades\Permission::register('edit seo section defaults');
+
         Facades\CP\Nav::extend(function ($nav) {
             $nav->tools('SEO Pro')
                 ->url('/cp/seo-pro')
@@ -243,6 +246,9 @@ class ActiveNavItemTest extends TestCase
     #[Test]
     public function it_can_check_when_parent_and_array_based_child_extension_items_are_active()
     {
+        Facades\Permission::register('view seo reports');
+        Facades\Permission::register('edit seo section defaults');
+
         Facades\CP\Nav::extend(function ($nav) {
             $nav->tools('SEO Pro')
                 ->url('/cp/seo-pro')
@@ -268,6 +274,9 @@ class ActiveNavItemTest extends TestCase
     #[Test]
     public function it_can_check_when_parent_and_array_based_descendant_of_child_extension_item_is_active()
     {
+        Facades\Permission::register('view seo reports');
+        Facades\Permission::register('edit seo section defaults');
+
         Facades\CP\Nav::extend(function ($nav) {
             $nav->tools('SEO Pro')
                 ->url('/cp/seo-pro')
@@ -319,6 +328,9 @@ class ActiveNavItemTest extends TestCase
     #[Test]
     public function it_resolves_extension_children_closure_and_can_check_when_parent_item_is_active()
     {
+        Facades\Permission::register('view seo reports');
+        Facades\Permission::register('edit seo section defaults');
+
         Facades\CP\Nav::extend(function ($nav) {
             $nav->tools('SEO Pro')
                 ->url('/cp/seo-pro')
@@ -346,6 +358,9 @@ class ActiveNavItemTest extends TestCase
     #[Test]
     public function it_resolves_extension_children_closure_and_can_check_when_parent_and_child_item_are_active()
     {
+        Facades\Permission::register('view seo reports');
+        Facades\Permission::register('edit seo section defaults');
+
         Facades\CP\Nav::extend(function ($nav) {
             $nav->tools('SEO Pro')
                 ->url('/cp/seo-pro')
@@ -373,6 +388,9 @@ class ActiveNavItemTest extends TestCase
     #[Test]
     public function it_resolves_extension_children_closure_and_can_check_when_parent_and_descendant_of_child_item_is_active()
     {
+        Facades\Permission::register('view seo reports');
+        Facades\Permission::register('edit seo section defaults');
+
         Facades\CP\Nav::extend(function ($nav) {
             $nav->tools('SEO Pro')
                 ->url('/cp/seo-pro')

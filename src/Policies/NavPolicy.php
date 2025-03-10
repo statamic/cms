@@ -13,7 +13,10 @@ class NavPolicy
     {
         $user = User::fromUser($user);
 
-        if ($user->hasPermission('configure navs')) {
+        if (
+            $user->isSuper() ||
+            $user->hasPermission('configure navs')
+        ) {
             return true;
         }
     }
