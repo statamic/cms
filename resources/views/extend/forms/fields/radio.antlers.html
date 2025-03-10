@@ -7,6 +7,7 @@
             value="{{ option }}"
             {{ if js_driver }}{{ js_attributes }}{{ /if }}
             {{ if value == option }}checked{{ /if }}
+            {{ if validate|contains:required }}required{{ /if }}
             {{ if error }}
                 aria-invalid="true" aria-describedby="{{ id }}-error"
             {{ elseif instructions }}
