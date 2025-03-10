@@ -12,8 +12,8 @@
                     <td>
                         <div class="flex items-center text-sm">
                             <toggle-input
-                                :value="site.enabled"
-                                @input="site.enabled = $event"
+                                :model-value="site.enabled"
+                                @update:model-value="site.enabled = $event"
                                 class="ltr:mr-4 rtl:ml-4"
                             />
                             {{ __(site.name) }}
