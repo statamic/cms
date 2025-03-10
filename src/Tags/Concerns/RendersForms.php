@@ -151,7 +151,7 @@ trait RendersForms
             'instructions' => $field->instructions(),
             'error' => $errors->first($field->handle()) ?: null,
             'default' => $field->value() ?? $field->defaultValue(),
-            'old' => old($field->handle()), // TODO: Ensure dotted path for old input works here.
+            'old' => old($field->handle()),
             'value' => $value,
         ], $field->fieldtype()->extraRenderableFieldData());
 
