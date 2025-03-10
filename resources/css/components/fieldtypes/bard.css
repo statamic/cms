@@ -55,7 +55,7 @@
     }
 
     .bard-toolbar-button.active {
-        @apply bg-gray-300 dark:bg-dark-600 text-black dark:text-white;
+        @apply bg-gray-300 text-black dark:bg-dark-600 dark:text-white;
     }
 
     .bard-toolbar-button:focus {
