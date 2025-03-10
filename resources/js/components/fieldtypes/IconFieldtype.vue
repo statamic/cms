@@ -1,6 +1,7 @@
 <template>
     <div class="icon-fieldtype-wrapper flex">
         <v-select
+            v-if="!loading"
             ref="input"
             class="w-full"
             append-to-body
@@ -48,14 +49,24 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 import PositionsSelectOptions from '../../mixins/PositionsSelectOptions';
+import { ref, watch } from 'vue';
+const iconsCache = ref({});
+const loaders = ref({});
 
 export default {
     mixins: [Fieldtype, PositionsSelectOptions],
 
+    data() {
+        return {
+            icons: [],
+            loading: true,
+        };
+    },
+
     computed: {
         options() {
             let options = [];
-            for (let [name, html] of Object.entries(this.meta.icons)) {
+            for (let [name, html] of Object.entries(this.icons)) {
                 options.push({
                     value: name,
                     label: name,
@@ -70,6 +81,18 @@ export default {
         },
     },
 
+    created() {
+        this.request();
+
+        watch(
+            () => loaders.value[this.meta.directory],
+            (loading) => {
+                this.icons = iconsCache.value[this.meta.directory];
+                this.loading = loading;
+            },
+        );
+    },
+
     methods: {
         focus() {
             this.$refs.input.focus();
@@ -81,6 +104,25 @@ export default {
             } else {
                 this.update(null);
             }
+        },
+
+        request() {
+            if (loaders.value[this.meta.directory]) return;
+
+            loaders.value = { ...loaders.value, [this.meta.directory]: true };
+
+            this.$axios
+                .post(this.meta.url, {
+                    config: utf8btoa(JSON.stringify(this.config)),
+                })
+                .then((response) => {
+                    const icons = response.data.icons;
+                    this.icons = icons;
+                    iconsCache.value = { ...iconsCache.value, [this.meta.directory]: icons };
+                })
+                .finally(() => {
+                    loaders.value = { ...loaders.value, [this.meta.directory]: false };
+                });
         },
     },
 };

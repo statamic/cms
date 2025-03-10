@@ -11,7 +11,11 @@
                 <tr v-for="site in sites" :key="site.handle">
                     <td>
                         <div class="flex items-center text-sm">
-                            <toggle-input v-model="site.enabled" class="ltr:mr-4 rtl:ml-4" />
+                            <toggle-input
+                                :model-value="site.enabled"
+                                @update:model-value="site.enabled = $event"
+                                class="ltr:mr-4 rtl:ml-4"
+                            />
                             {{ __(site.name) }}
                         </div>
                     </td>
@@ -21,7 +25,7 @@
                             :value="site.origin"
                             :searchable="false"
                             :reduce="(opt) => opt.value"
-                            @input="site.origin = $event"
+                            @update:model-value="site.origin = $event"
                         />
                     </td>
                 </tr>

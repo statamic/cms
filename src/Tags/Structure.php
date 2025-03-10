@@ -64,7 +64,13 @@ class Structure extends Tags
             'max_depth' => $this->params->get('max_depth'),
         ]);
 
-        return $this->toArray($tree);
+        $value = $this->toArray($tree);
+
+        if ($this->parser && ($as = $this->params->get('as'))) {
+            return [$as => $value];
+        }
+
+        return $value;
     }
 
     protected function ensureStructureExists(string $handle): void
