@@ -133,10 +133,8 @@ class Date extends Fieldtype
 
         if ($value === 'now') {
             return [
-                // We want the current date and time to be rendered, but since we don't
-                // know the users timezone, we'll let the front-end handle it.
-                'date' => now()->startOfDay()->format(self::DEFAULT_DATE_FORMAT),
-                'time' => $this->config('time_enabled') ? 'now' : null, // This will get replaced with the current time in Vue component.
+                'date' => now(tz: 'UTC')->format(self::DEFAULT_DATE_FORMAT),
+                'time' => now(tz: 'UTC')->format($this->config('time_seconds_enabled') ? 'H:i:s' : 'H:i'),
             ];
         }
 
@@ -152,40 +150,34 @@ class Date extends Fieldtype
 
     private function preProcessRange($value)
     {
-        $vueFormat = $this->defaultFormat();
-
+        // If there's no value, return null, so we can handle the empty state on the Vue side.
         if (! $value) {
-            return $this->splitDateTimeForPreProcessRange($this->isRequired() ? [
-                'start' => Carbon::now()->format($vueFormat),
-                'end' => Carbon::now()->format($vueFormat),
-            ] : null);
+            return null;
         }
 
-        // If the value is a string, this field probably used to be a single date.
+        // If the value isn't an array, this field probably used to be a single date.
         // In this case, we'll use the date for both the start and end of the range.
-        if (is_string($value)) {
-            $value = ['start' => $value, 'end' => $value];
+        if (! is_array($value)) {
+            $carbon = $this->parseSavedToCarbon($value);
+
+            return [
+                'start' => $this->splitDateTimeForPreProcessSingle($carbon->copy()->startOfDay()->utc()),
+                'end' => $this->splitDateTimeForPreProcessSingle($carbon->copy()->endOfDay()->utc()),
+            ];
         }
 
-        return $this->splitDateTimeForPreProcessRange([
-            'start' => $this->parseSaved($value['start'])->format($vueFormat),
-            'end' => $this->parseSaved($value['end'])->format($vueFormat),
-        ]);
+        return [
+            'start' => $this->preProcessSingle($value['start']),
+            'end' => $this->preProcessSingle($value['end']),
+        ];
     }
 
     private function splitDateTimeForPreProcessSingle(Carbon $carbon)
     {
         return [
             'date' => $carbon->format(self::DEFAULT_DATE_FORMAT),
-            'time' => $this->config('time_enabled')
-                ? $carbon->format($this->config('time_seconds_enabled') ? 'H:i:s' : 'H:i')
-                : null,
+            'time' => $carbon->format($this->config('time_seconds_enabled') ? 'H:i:s' : 'H:i'),
         ];
-    }
-
-    private function splitDateTimeForPreProcessRange(?array $range = null)
-    {
-        return ['date' => $range, 'time' => null];
     }
 
     public function isRequired()
@@ -195,7 +187,7 @@ class Date extends Fieldtype
 
     public function process($data)
     {
-        if (is_null($data) || is_null($data['date'])) {
+        if (is_null($data)) {
             return null;
         }
 
@@ -204,29 +196,28 @@ class Date extends Fieldtype
 
     private function processSingle($data)
     {
+        if (is_null($data['date'])) {
+            return null;
+        }
+
         return $this->processDateTime($data['date'].' '.($data['time'] ?? '00:00'));
     }
 
     private function processRange($data)
     {
-        $date = $data['date'];
+        if (is_null($data['start'])) {
+            return null;
+        }
 
         return [
-            'start' => $this->processDateTime($date['start']),
-            'end' => $this->processDateTimeEndOfDay($date['end']),
+            'start' => $this->processDateTime($data['start']['date'].' '.($data['start']['time'] ?? '00:00')),
+            'end' => $this->processDateTime($data['end']['date'].' '.($data['end']['time'] ?? '23:59')),
         ];
     }
 
     private function processDateTime($value)
     {
-        $date = Carbon::parse($value);
-
-        return $this->formatAndCast($date, $this->saveFormat());
-    }
-
-    private function processDateTimeEndOfDay($value)
-    {
-        $date = Carbon::parse($value)->endOfDay();
+        $date = Carbon::parse($value, 'UTC');
 
         return $this->formatAndCast($date, $this->saveFormat());
     }
@@ -244,10 +235,15 @@ class Date extends Fieldtype
                 $value = ['start' => $value, 'end' => $value];
             }
 
-            $start = $this->parseSaved($value['start'])->format($this->indexDisplayFormat());
-            $end = $this->parseSaved($value['end'])->format($this->indexDisplayFormat());
+            $start = $this->parseSaved($value['start']);
+            $end = $this->parseSaved($value['end']);
 
-            return $start.' - '.$end;
+            return [
+                'start' => $this->splitDateTimeForPreProcessSingle($start),
+                'end' => $this->splitDateTimeForPreProcessSingle($end),
+                'mode' => $this->config('mode', 'single'),
+                'display_format' => DateFormat::toIso($this->indexDisplayFormat()),
+            ];
         }
 
         // If the value is an array, this field probably used to be a range. In this case, we'll use the start date.
@@ -255,7 +251,13 @@ class Date extends Fieldtype
             $value = $value['start'];
         }
 
-        return $this->parseSaved($value)->format($this->indexDisplayFormat());
+        $date = $this->parseSaved($value);
+
+        return [
+            ...$this->splitDateTimeForPreProcessSingle($date),
+            'mode' => $this->config('mode', 'single'),
+            'display_format' => DateFormat::toIso($this->indexDisplayFormat()),
+        ];
     }
 
     private function saveFormat()
@@ -277,18 +279,18 @@ class Date extends Fieldtype
 
     private function defaultFormat()
     {
-        if ($this->config('time_enabled') && $this->config('mode', 'single') === 'single') {
-            return $this->config('time_seconds_enabled')
-                ? self::DEFAULT_DATETIME_WITH_SECONDS_FORMAT
-                : self::DEFAULT_DATETIME_FORMAT;
+        if ($this->config('mode', 'single') === 'range') {
+            return self::DEFAULT_DATETIME_FORMAT;
         }
 
-        return self::DEFAULT_DATE_FORMAT;
+        return $this->config('time_seconds_enabled')
+            ? self::DEFAULT_DATETIME_WITH_SECONDS_FORMAT
+            : self::DEFAULT_DATETIME_FORMAT;
     }
 
     private function formatAndCast(Carbon $date, $format)
     {
-        $formatted = $date->format($format);
+        $formatted = $date->setTimezone(config('app.timezone'))->format($format);
 
         if (is_numeric($formatted)) {
             $formatted = (int) $formatted;
@@ -323,9 +325,7 @@ class Date extends Fieldtype
 
         $date = $this->parseSaved($value);
 
-        if (! $this->config('time_enabled')) {
-            $date->startOfDay();
-        } elseif (! $this->config('time_seconds_enabled')) {
+        if (! $this->config('time_seconds_enabled')) {
             $date->startOfMinute();
         }
 
@@ -348,10 +348,33 @@ class Date extends Fieldtype
 
     private function parseSaved($value)
     {
+        $hasTime = false;
+
+        if (is_int($value)) {
+            $hasTime = true;
+        } elseif (str_contains($this->saveFormat(), 'H')) {
+            $hasTime = true;
+        }
+
+        $carbon = $this->parseSavedToCarbon($value);
+
+        if (! $hasTime) {
+            $carbon = $carbon->startOfDay();
+        }
+
+        return $carbon->utc();
+    }
+
+    private function parseSavedToCarbon($value): Carbon
+    {
+        if ($value instanceof Carbon) {
+            return $value;
+        }
+
         try {
-            return Carbon::createFromFormat($this->saveFormat(), $value);
+            return Carbon::createFromFormat($this->saveFormat(), $value, config('app.timezone'));
         } catch (InvalidFormatException|InvalidArgumentException $e) {
-            return Carbon::parse($value);
+            return Carbon::parse($value, config('app.timezone'));
         }
     }
 
