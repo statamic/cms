@@ -40,7 +40,7 @@ class RenderableField implements Htmlable
             'slot' => $this->slot,
         ]);
 
-        return $this->minifyFieldHtml(
+        return static::minify(
             view($this->field->fieldtype()->view(), $data)->render(),
         );
     }
@@ -50,9 +50,17 @@ class RenderableField implements Htmlable
         return $this->toHtml();
     }
 
-    protected function minifyFieldHtml(string $html): string
+    /**
+     * We minify renderable fieldtype html from our vendor publishable field partials,
+     * because it makes makes things a bit more consistent and forgiving as far as
+     * whitespace around textarea content, checkbox/radio labels, groups, etc.
+     *
+     * This allows us to format fieldtype partials nicely in a pleasing way that
+     * makes sense to devs who are publishing and overriding fieldtype html.
+     */
+    public static function minify(string $html): string
     {
-        // Leave whitespace around these html elements.
+        // Leave whitespace around textually inline html elements.
         $ignoredHtmlElements = collect(['a', 'span'])->implode('|');
 
         // Trim whitespace between all other html elements.
