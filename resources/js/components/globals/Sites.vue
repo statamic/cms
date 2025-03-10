@@ -11,7 +11,11 @@
                 <tr v-for="site in sites" :key="site.handle">
                     <td>
                         <div class="flex items-center text-sm">
-                            <toggle-input :value="site.enabled" @input="site.enabled = $event" class="ltr:mr-4 rtl:ml-4" />
+                            <toggle-input
+                                :value="site.enabled"
+                                @input="site.enabled = $event"
+                                class="ltr:mr-4 rtl:ml-4"
+                            />
                             {{ __(site.name) }}
                         </div>
                     </td>
