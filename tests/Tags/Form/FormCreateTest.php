@@ -87,14 +87,25 @@ EOT
                             'fields' => [
                                 [
                                     'handle' => 'group_one',
-                                    'display' => 'Group One',
-                                    'instructions' => 'Group One Instructions',
                                     'field' => [
                                         'type' => 'group',
-                                        'instructions' => 'Group Field Instructions',
+                                        'display' => 'Group One',
+                                        'instructions' => 'Group One Instructions',
                                         'fields' => [
-                                            ['handle' => 'alpha', 'field' => ['type' => 'text']],
-                                            ['handle' => 'bravo', 'field' => ['type' => 'text', 'instructions' => 'This field has instructions!']],
+                                            [
+                                                'handle' => 'alpha',
+                                                'field' => [
+                                                    'type' => 'text',
+                                                ],
+                                            ],
+                                            [
+                                                'handle' => 'bravo',
+                                                'field' => [
+                                                    'type' => 'text',
+                                                    'display' => 'Bravo',
+                                                    'instructions' => 'This field has instructions!',
+                                                ],
+                                            ],
                                         ],
                                     ],
                                 ],
@@ -105,19 +116,21 @@ EOT
             ],
         ], 'survey');
 
-        $output = $this->normalizeHtml($this->tag(<<<'EOT'
+        $output = $this->normalizeHtml($wat = $this->tag(<<<'EOT'
 {{ form:survey }}
     {{ sections }}
         <div class="section">{{ display }}{{ if instructions }} ({{ instructions }}){{ /if }}
             {{ form:fields }}
-                <div class="field-in-section">{{ handle }}{{ if instructions }} ({{ instructions }}){{ /if }}</div>
+                <div class="field-in-section">{{ display ?: handle }}{{ if instructions }} ({{ instructions }}){{ /if }}</div>
+                {{ field }}
             {{ /form:fields }}
         </div>
     {{ /sections }}
     <div class="fields">
         {{ form:fields }}
-            <div class="field-by-itself">{{ handle }}{{ if instructions }} ({{ instructions }}){{ /if }}</div>
-        {{ /form:fields }}contact
+            <div class="field-by-itself">{{ display ?: handle }}{{ if instructions }} ({{ instructions }}){{ /if }}</div>
+            {{ field }}
+        {{ /form:fields }}
     </div>
 {{ /form:survey }}
 EOT
@@ -127,10 +140,10 @@ EOT
 
         $this->assertStringContainsString('<div class="field-in-section">Group One (Group One Instructions)', $output);
         $this->assertStringContainsString('<div class="field-by-itself">Group One (Group One Instructions)', $output);
-        $this->assertStringContainsString('<div class="field-in-section">alpha</div>', $output);
-        $this->assertStringContainsString('<div class="field-by-itself">alpha</div>', $output);
-        $this->assertStringContainsString('<div class="field-in-section">bravo (This field has instructions!)</div>', $output);
-        $this->assertStringContainsString('<div class="field-by-itself">bravo (This field has instructions!)</div>', $output);
+        $this->assertStringContainsString('<div class="field-in-section">group_one.alpha</div>', $output);
+        $this->assertStringContainsString('<div class="field-by-itself">group_one.alpha</div>', $output);
+        $this->assertStringContainsString('<div class="field-in-section">Bravo (This field has instructions!)</div>', $output);
+        $this->assertStringContainsString('<div class="field-by-itself">Bravo (This field has instructions!)</div>', $output);
     }
 
     #[Test]
