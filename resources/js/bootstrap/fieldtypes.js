@@ -20,7 +20,7 @@ import Routes from '../components/collections/Routes.vue';
 import TitleFormats from '../components/collections/TitleFormats.vue';
 import ColorFieldtype from '../components/fieldtypes/ColorFieldtype.vue';
 import DateFieldtype from '../components/fieldtypes/DateFieldtype.vue';
-import DateIndexFieldtype from '@/components/fieldtypes/DateIndexFieldtype.vue';
+import DateIndexFieldtype from '../components/fieldtypes/DateIndexFieldtype.vue';
 import DictionaryFieldtype from '../components/fieldtypes/DictionaryFieldtype.vue';
 import DictionaryIndexFieldtype from '../components/fieldtypes/DictionaryIndexFieldtype.vue';
 import DictionaryFields from '../components/fieldtypes/DictionaryFields.vue';
