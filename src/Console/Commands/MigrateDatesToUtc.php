@@ -46,6 +46,7 @@ class MigrateDatesToUtc extends Command
         $this->currentTimezone = $this->argument('timezone');
 
         $this->components->warn('This command makes changes to content. Please make a backup before running.');
+        $this->components->info('This operation converts content dates to UTC for storage purposes only. System functionality is identical whether you proceed or not – do so only if specifically desired.');
 
         if (! confirm('Do you want to continue', default: false)) {
             return;
