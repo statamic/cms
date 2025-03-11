@@ -276,7 +276,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
     public function generateMeta()
     {
-        $meta = ['data' => $this->data->all()];
+        $meta = ['data' => $this->data->toArray()];
 
         if ($this->exists()) {
             $attributes = Attributes::asset($this)->get();
@@ -580,6 +580,40 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
     public function mimeType()
     {
         return $this->meta('mime_type');
+    }
+
+    public function in($site)
+    {
+        return app()->makeWith(LocalizedAsset::class, [
+            'asset' => $this,
+            'locale' => $site,
+        ]);
+    }
+
+    public function inDefaultLocale()
+    {
+        return $this->in($this->defaultLocale());
+    }
+
+    public function defaultLocale()
+    {
+        return $this->container()->sites()->first();
+    }
+
+    public function localizations()
+    {
+        return $this->container()->sites()->mapWithKeys(fn ($site) => [$site => $this->in($site)]);
+    }
+
+    public function dataForLocale($locale, $data = null)
+    {
+        if (func_num_args() === 1) {
+            return collect($this->data[$locale] ?? ($locale === Facades\Site::default()->handle() ? $this->data : null));
+        }
+
+        $this->data[$locale] = collect($data);
+
+        return $this;
     }
 
     /**

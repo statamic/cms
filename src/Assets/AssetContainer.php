@@ -24,6 +24,7 @@ use Statamic\Facades\File;
 use Statamic\Facades\Image;
 use Statamic\Facades\Pattern;
 use Statamic\Facades\Search;
+use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
 use Statamic\Support\Arr;
@@ -144,6 +145,16 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
             ->after(config('app.url'));
 
         return ($url === '') ? '/' : $url;
+    }
+
+    // todo: make this a proper option (& therefore, this should become a setter/getter)
+    public function sites()
+    {
+        if (! Site::multiEnabled()) {
+            return [Site::default()->handle()];
+        }
+
+        return Site::all()->map->handle();
     }
 
     /**

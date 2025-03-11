@@ -205,6 +205,9 @@
                         :extra-values="extraValues"
                         :meta="meta"
                         :errors="errors"
+                        :site="site"
+                        :localized-fields="localizedFields"
+                        :is-root="isRoot"
                         @updated="values = { ...$event, focus: values.focus }"
                         v-slot="{ setFieldValue, setFieldMeta }"
                     >
@@ -215,11 +218,22 @@
 
                             <div v-if="error" class="mb-4 bg-red-500 p-4 text-white shadow" v-text="error" />
 
+                            <site-selector
+                                v-if="localizations.length > 1"
+                                class="mb-4"
+                                :sites="localizations"
+                                :value="site"
+                                @input="localizationSelected"
+                            />
+
                             <publish-sections
                                 :sections="fieldset.tabs[0].sections"
                                 :read-only="readOnly"
+                                :syncable="hasOrigin"
                                 @updated="setFieldValue"
                                 @meta-updated="setFieldMeta"
+                                @synced="syncField"
+                                @desynced="desyncField"
                             />
                         </div>
                     </publish-container>
@@ -292,6 +306,7 @@ import PdfViewer from './PdfViewer.vue';
 import PublishFields from '../../publish/Fields.vue';
 import HasHiddenFields from '../../publish/HasHiddenFields';
 import { pick, flatten } from 'lodash-es';
+import SiteSelector from '@statamic/components/SiteSelector.vue';
 
 export default {
     emits: ['saved', 'closed', 'action-completed'],
@@ -299,6 +314,7 @@ export default {
     mixins: [HasHiddenFields],
 
     components: {
+        SiteSelector,
         EditorActions,
         FocalPointEditor,
         PdfViewer,
@@ -328,11 +344,19 @@ export default {
         return {
             loading: true,
             saving: false,
+            localizing: false,
             asset: null,
             publishContainer: 'asset',
             values: {},
             extraValues: {},
             meta: {},
+            site: null,
+            localizations: [],
+            isRoot: false,
+            hasOrigin: false,
+            localizedFields: [],
+            originValues: {},
+            originMeta: {},
             fields: null,
             fieldset: null,
             showFocalPointEditor: false,
@@ -355,6 +379,18 @@ export default {
 
         hasErrors: function () {
             return this.error || Object.keys(this.errors).length;
+        },
+
+        isDirty() {
+            return this.$dirty.has(this.publishContainer);
+        },
+
+        activeLocalization() {
+            return this.localizations.find((l) => l.active);
+        },
+
+        originLocalization() {
+            return this.localizations.find((l) => l.origin);
         },
 
         canUseGoogleDocsViewer() {
@@ -420,6 +456,14 @@ export default {
                 // it into JSON on the server. We'll ensure it's always an object.
                 this.values = Array.isArray(data.values) ? {} : data.values;
 
+                this.site = data.site;
+                this.localizations = data.localizations;
+                this.isRoot = data.isRoot;
+                this.hasOrigin = data.hasOrigin;
+                this.localizedFields = data.localizedFields;
+                this.originValues = data.originValues;
+                this.originMeta = data.originMeta;
+
                 this.meta = data.meta;
                 this.actionUrl = data.actionUrl;
                 this.actions = data.actions;
@@ -448,6 +492,95 @@ export default {
             });
         },
 
+        localizationSelected(localization) {
+            if (localization.active) return;
+
+            if (this.isDirty) {
+                if (!confirm(__('Are you sure? Unsaved changes will be lost.'))) {
+                    return;
+                }
+            }
+
+            this.localizing = localization.handle;
+
+            if (this.publishContainer === 'base') {
+                window.history.replaceState({}, '', localization.url);
+            }
+
+            const url = cp_url(`assets/${utf8btoa(this.id)}?site=${localization.handle}`);
+
+            this.$axios.get(url).then((response) => {
+                const data = response.data.data;
+                this.asset = data;
+
+                // If there are no fields, it will be an empty array when PHP encodes
+                // it into JSON on the server. We'll ensure it's always an object.
+                this.values = Array.isArray(data.values) ? {} : data.values;
+
+                this.site = localization.handle;
+                this.localizations = data.localizations;
+                this.isRoot = data.isRoot;
+                this.hasOrigin = data.hasOrigin;
+                this.localizedFields = data.localizedFields;
+                this.originValues = data.originValues;
+                this.originMeta = data.originMeta;
+
+                this.meta = data.meta;
+                this.actionUrl = data.actionUrl;
+                this.actions = data.actions;
+
+                this.fieldset = data.blueprint;
+
+                let fields = this.fieldset.tabs;
+                fields = fields.map((tab) => tab.sections);
+                fields = flatten(fields);
+                fields = fields.map((section) => section.fields);
+                fields = flatten(fields);
+                this.fields = fields;
+
+                this.extraValues = pick(this.asset, [
+                    'filename',
+                    'basename',
+                    'extension',
+                    'path',
+                    'mimeType',
+                    'width',
+                    'height',
+                    'duration',
+                ]);
+
+                this.loading = false;
+                this.localizing = false;
+                this.$nextTick(() => this.$refs.container.clearDirtyState());
+            });
+        },
+
+        setFieldValue(handle, value) {
+            if (this.hasOrigin) this.desyncField(handle);
+
+            this.$refs.container.setFieldValue(handle, value);
+        },
+
+        syncField(handle) {
+            if (!confirm(__("Are you sure? This field's value will be replaced by the value in the original localization.")))
+                return;
+
+            console.log(this.originValues[handle])
+
+            this.localizedFields = this.localizedFields.filter((field) => field !== handle);
+            this.$refs.container.setFieldValue(handle, this.originValues[handle]);
+
+            // Update the meta for this field. For instance, a relationship field would have its data preloaded into it.
+            // If you sync the field, the preloaded data would be outdated and an ID would show instead of the titles.
+            this.meta[handle] = this.originMeta[handle];
+        },
+
+        desyncField(handle) {
+            if (!this.localizedFields.includes(handle)) this.localizedFields.push(handle);
+
+            this.$refs.container.dirty();
+        },
+
         openFocalPointEditor() {
             this.showFocalPointEditor = true;
         },
@@ -467,7 +600,11 @@ export default {
             const url = cp_url(`assets/${utf8btoa(this.id)}`);
 
             this.$axios
-                .patch(url, this.visibleValues)
+                .patch(url, {
+                    _locale: this.site,
+                    _localized: this.localizedFields,
+                    ...this.visibleValues,
+                })
                 .then((response) => {
                     this.$emit('saved', response.data.asset);
                     this.$toast.success(__('Saved'));

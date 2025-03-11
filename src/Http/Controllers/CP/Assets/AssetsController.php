@@ -12,6 +12,7 @@ use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Exceptions\AuthorizationException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Resources\CP\Assets\Asset as AssetResource;
@@ -33,9 +34,10 @@ class AssetsController extends CpController
         throw new AuthorizationException;
     }
 
-    public function show($asset)
+    public function show(Request $request, $asset)
     {
         $asset = Asset::find(base64_decode($asset));
+        $asset = $asset->in($request->site ?? Site::selected()->handle());
 
         // TODO: Auth
 
@@ -48,16 +50,20 @@ class AssetsController extends CpController
 
         $this->authorize('edit', $asset);
 
-        $fields = $asset->blueprint()->fields()->addValues($request->all());
+        $fields = $asset->blueprint()->fields()->addValues($request->only($request->_localized));
 
         $fields->validate();
 
-        $values = $fields->process()->values()->merge([
-            'focus' => $request->focus,
-        ]);
+        $values = $fields->process()->values()->filter();
+
+        $localization = $asset->in($request->_locale);
 
         foreach ($values as $key => $value) {
-            $asset->set($key, $value);
+            $localization->set($key, $value);
+        }
+
+        if ($request->focus) {
+            $asset->data()->put('focus', $request->focus);
         }
 
         $asset->save();
@@ -65,7 +71,7 @@ class AssetsController extends CpController
         return [
             'success' => true,
             'message' => 'Asset updated',
-            'asset' => (new AssetResource($asset))->resolve()['data'],
+            'asset' => (new AssetResource($localization))->resolve()['data'],
         ];
     }
 

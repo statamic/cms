@@ -3,7 +3,10 @@
 namespace Statamic\Http\Resources\CP\Assets;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Auth;
+use Statamic\Assets\LocalizedAsset;
 use Statamic\Facades\Action;
+use Statamic\Facades\User;
 use Statamic\Support\Str;
 
 class Asset extends JsonResource
@@ -84,12 +87,54 @@ class Asset extends JsonResource
     protected function publishFormData()
     {
         $fields = $this->blueprint()->fields()
-            ->addValues($this->data()->all())
+            ->addValues($this->values()->all())
             ->preProcess();
 
+        if ($hasOrigin = $this->hasOrigin()) {
+            $originFields = $this->blueprint()->fields()
+                ->addValues($this->origin()->values()->all())
+                ->preProcess();
+
+            $originValues = $this->origin()->merge($originFields->values());
+            $originMeta = $originFields->meta();
+        }
+
         return [
-            'values' => $this->data()->merge($fields->values()),
+            'values' => $this->data()->merge([
+                ...$fields->values(),
+                'focus' => $this->asset()->get('focus'),
+            ]),
             'meta' => $fields->meta(),
+            'localizedFields' => $this->data()->keys()->all(),
+            'site' => $this->locale(),
+            'isRoot' => $this->locale() === 'default', // todo
+            'hasOrigin' => $hasOrigin,
+            'originValues' => $originValues ?? null,
+            'originMeta' => $originMeta ?? null,
+            'localizations' => $this->localizations()
+                ->filter(function (LocalizedAsset $localization) {
+                    // TODO: Extract this into a policy at some point.
+                    $user = User::fromUser(Auth::user());
+
+                    if ($user->isSuper()) {
+                        return true;
+                    }
+
+                    if (! $user->can('view', $localization->site()->handle())) {
+                        return false;
+                    }
+
+                    return $user->hasPermission("edit {$this->container()->handle()} assets");
+                })
+                ->map(function (LocalizedAsset $localization) {
+                    return [
+                        'handle' => $localization->locale(),
+                        'name' => $localization->site()->name(),
+                        'active' => $localization->locale() === $this->locale(),
+                        'origin' => $localization->isRoot(),
+                        'url' => $localization->editUrl(),
+                    ];
+                })->values()->all(),
         ];
     }
 }
