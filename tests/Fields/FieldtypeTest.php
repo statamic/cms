@@ -555,16 +555,17 @@ class FieldtypeTest extends TestCase
     {
         $fieldtype = new class extends Fieldtype
         {
-            public static $handle = 'test';
+            public static $handle = 'test-selectable';
+            protected $selectableInForms = false;
         };
 
         $this->assertFalse($fieldtype->selectableInForms());
-        $this->assertFalse(FieldtypeRepository::hasBeenMadeSelectableInForms('test'));
 
         $fieldtype::makeSelectableInForms();
 
         $this->assertTrue($fieldtype->selectableInForms());
-        $this->assertTrue(FieldtypeRepository::hasBeenMadeSelectableInForms('test'));
+        $this->assertTrue(FieldtypeRepository::hasBeenMadeSelectableInForms('test-selectable'));
+        $this->assertTrue(FieldtypeRepository::selectableInFormIsOverriden('test-selectable'));
     }
 
     #[Test]
@@ -572,18 +573,17 @@ class FieldtypeTest extends TestCase
     {
         $fieldtype = new class extends Fieldtype
         {
-            public static $handle = 'test';
+            public static $handle = 'test-unselectable';
+            protected $selectableInForms = true;
         };
 
-        $fieldtype::makeSelectableInForms();
-
         $this->assertTrue($fieldtype->selectableInForms());
-        $this->assertTrue(FieldtypeRepository::hasBeenMadeSelectableInForms('test'));
 
         $fieldtype::makeUnselectableInForms();
 
         $this->assertFalse($fieldtype->selectableInForms());
-        $this->assertFalse(FieldtypeRepository::hasBeenMadeSelectableInForms('test'));
+        $this->assertFalse(FieldtypeRepository::hasBeenMadeSelectableInForms('test-unselectable'));
+        $this->assertTrue(FieldtypeRepository::selectableInFormIsOverriden('test-unselectable'));
     }
 }
 

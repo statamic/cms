@@ -66,20 +66,22 @@ class FieldtypeRepositoryTest extends TestCase
     #[Test]
     public function it_makes_fields_selectable_in_forms()
     {
-        $this->assertFalse($this->repo->hasBeenMadeSelectableInForms('test'));
+        $this->assertFalse($this->repo->hasBeenMadeSelectableInForms('test-selectable'));
 
-        $this->repo->makeSelectableInForms('test');
-        $this->assertTrue($this->repo->hasBeenMadeSelectableInForms('test'));
+        $this->repo->makeSelectableInForms('test-selectable');
+        $this->assertTrue($this->repo->hasBeenMadeSelectableInForms('test-selectable'));
+        $this->assertTrue($this->repo->selectableInFormIsOverriden('test-selectable'));
     }
 
     #[Test]
     public function it_makes_fields_unselectable_in_forms()
     {
-        $this->repo->makeSelectableInForms('test');
-        $this->assertTrue($this->repo->hasBeenMadeSelectableInForms('test'));
+        $this->repo->makeSelectableInForms('test-unselectable');
+        $this->assertTrue($this->repo->hasBeenMadeSelectableInForms('test-unselectable'));
 
-        $this->repo->makeUnselectableInForms('test');
-        $this->assertFalse($this->repo->hasBeenMadeSelectableInForms('test'));
+        $this->repo->makeUnselectableInForms('test-unselectable');
+        $this->assertFalse($this->repo->hasBeenMadeSelectableInForms('test-unselectable'));
+        $this->assertTrue($this->repo->selectableInFormIsOverriden('test-unselectable'));
     }
 }
 

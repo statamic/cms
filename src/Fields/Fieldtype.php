@@ -103,7 +103,11 @@ abstract class Fieldtype implements Arrayable
 
     public function selectableInForms(): bool
     {
-        return $this->selectableInForms ?: FieldtypeRepository::hasBeenMadeSelectableInForms($this->handle());
+        if (FieldtypeRepository::selectableInFormIsOverriden($this->handle())) {
+            return FieldtypeRepository::hasBeenMadeSelectableInForms($this->handle());
+        }
+
+        return $this->selectableInForms;
     }
 
     public static function makeSelectableInForms()
