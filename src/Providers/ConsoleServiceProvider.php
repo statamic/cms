@@ -29,6 +29,7 @@ class ConsoleServiceProvider extends ServiceProvider
         Commands\MakeFilter::class,
         Commands\MakeTag::class,
         Commands\MakeWidget::class,
+        Commands\MigrateDatesToUtc::class,
         Commands\MakeUser::class,
         Commands\Rtfm::class,
         Commands\StacheClear::class,

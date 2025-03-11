@@ -28,6 +28,9 @@ class DateFieldtypeTest extends FieldtypeTestCase
     #[Test]
     public function it_gets_dates()
     {
+        // Set the timezone. We want to ensure the date is always returned in UTC.
+        config()->set('app.timezone', 'America/New_York'); // -05:00
+
         // Set the to string format so can see it uses that rather than a coincidence.
         // But reset it afterwards.
         $originalFormat = Carbon::getToStringFormat();
@@ -51,8 +54,8 @@ undefined
 GQL;
 
         $this->assertGqlEntryHas($query, [
-            'default' => '2017-12-25 1:29pm',
-            'formatted' => '1514208540',
+            'default' => '2017-12-25 6:29pm',
+            'formatted' => '1514226540',
             'undefined' => null,
         ]);
 

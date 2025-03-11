@@ -32,7 +32,9 @@ class Localize
 
         // Get original Carbon format so it can be restored later.
         $originalToStringFormat = $this->getToStringFormat();
-        Date::setToStringFormat(Statamic::dateFormat());
+        Date::setToStringFormat(function (Carbon $date) {
+            return $date->setTimezone(Statamic::displayTimezone())->format(Statamic::dateFormat());
+        });
 
         $response = $next($request);
 
@@ -51,7 +53,7 @@ class Localize
      *
      * @throws \ReflectionException
      */
-    private function getToStringFormat(): ?string
+    private function getToStringFormat(): string|\Closure|null
     {
         $reflection = new ReflectionClass($date = Date::now());
 
