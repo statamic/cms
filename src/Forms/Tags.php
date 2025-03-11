@@ -103,6 +103,7 @@ class Tags extends BaseTags
         if ($jsDriver) {
             $attrs = array_merge($attrs, $jsDriver->addToFormAttributes($form));
         }
+
         $attrs = $this->runHooks('attrs', ['attrs' => $attrs, 'data' => $data])['attrs'];
 
         $params = [];
@@ -158,20 +159,6 @@ class Tags extends BaseTags
         }
 
         return Antlers::parse('{{ fields }}'.$this->content.'{{ /fields }}', $this->context->all());
-    }
-
-    /**
-     * Maps to {{ form:show_field }}.
-     *
-     * @return string
-     */
-    public function showField()
-    {
-        if (! $handle = $this->params->get('handle')) {
-            throw new \Exception('Field handle required with [form:show_field] tag.');
-        }
-
-        return $this->context->all()['show_field'][$handle];
     }
 
     /**
