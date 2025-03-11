@@ -168,7 +168,7 @@ class Tags extends BaseTags
     public function showField()
     {
         if (! $handle = $this->params->get('handle')) {
-            throw new \Exception("Field with handle [$handle] cannot be found.");
+            throw new \Exception('Field handle required with [form:show_field] tag.');
         }
 
         return $this->context->all()['show_field'][$handle];
