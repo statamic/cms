@@ -2,6 +2,7 @@
 
 namespace Tests\Permissions;
 
+use Facades\Statamic\Auth\CorePermissions;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\Permissions;
@@ -134,6 +135,25 @@ class PermissionsTest extends TestCase
         $names = $permissions->all()->keys()->all();
 
         $this->assertEquals(['three', 'one', 'two'], $names);
+    }
+
+    #[Test]
+    public function booting_is_only_done_once()
+    {
+        CorePermissions::shouldReceive('boot')->once();
+
+        $permissions = new Permissions;
+
+        $callbackCount = 0;
+        $permissions->extend(function ($arg) use ($permissions, &$callbackCount) {
+            $this->assertEquals($permissions, $arg);
+            $callbackCount = true;
+        });
+
+        $permissions->boot();
+        $permissions->boot();
+
+        $this->assertEquals(1, $callbackCount);
     }
 
     #[Test]
