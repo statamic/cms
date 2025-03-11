@@ -2,51 +2,30 @@
 
 namespace Statamic\Fieldtypes\Assets;
 
-use Illuminate\Contracts\Validation\Rule;
+use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Statamic\Facades\Asset;
 use Statamic\Statamic;
+use Statamic\Tags\In;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class ImageRule implements Rule
+class ImageRule implements ValidationRule
 {
-    protected $parameters;
+    public function __construct(protected $parameters) {}
 
-    public function __construct($parameters = null)
+    public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        $this->parameters = $parameters;
-    }
-
-    /**
-     * Determine if the validation rule passes.
-     *
-     * @param  string  $attribute
-     * @param  mixed  $value
-     * @return bool
-     */
-    public function passes($attribute, $value)
-    {
+        $extension = '';
         $extensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'avif'];
 
-        return collect($value)->every(function ($id) use ($extensions) {
-            if ($id instanceof UploadedFile) {
-                return in_array($id->guessExtension(), $extensions);
-            }
+        if ($value instanceof UploadedFile) {
+            $extension = $value->guessExtension();
+        } else if ($asset = Asset::find($value)) {
+            $extension = $asset->extension();
+        }
 
-            if (! $asset = Asset::find($id)) {
-                return false;
-            }
-
-            return $asset->guessedExtensionIsOneOf($extensions);
-        });
-    }
-
-    /**
-     * Get the validation error message.
-     *
-     * @return string
-     */
-    public function message()
-    {
-        return __((Statamic::isCpRoute() ? 'statamic::' : '').'validation.image');
+        if (!in_array($extension, $extensions)) {
+            $fail(__((Statamic::isCpRoute() ? 'statamic::' : '') . 'validation.image', ['extensions' => implode(', ', $extensions)]));
+        }
     }
 }

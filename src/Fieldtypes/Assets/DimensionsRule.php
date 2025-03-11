@@ -2,69 +2,79 @@
 
 namespace Statamic\Fieldtypes\Assets;
 
-use Illuminate\Contracts\Validation\Rule;
+use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Statamic\Facades\Asset;
 use Statamic\Statamic;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class DimensionsRule implements Rule
+class DimensionsRule implements ValidationRule
 {
-    protected $parameters;
+    public function __construct(protected $parameters) {}
 
-    public function __construct($parameters = null)
+    public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        $this->parameters = $parameters;
-    }
+        $size = [0, 0];
 
-    /**
-     * Determine if the validation rule passes.
-     *
-     * @param  string  $attribute
-     * @param  mixed  $value
-     * @return bool
-     */
-    public function passes($attribute, $value)
-    {
-        return collect($value)->every(function ($id) {
-            if ($id instanceof UploadedFile) {
-                if (in_array($id->getMimeType(), ['image/svg+xml', 'image/svg'])) {
-                    return true;
-                }
-
-                $size = getimagesize($id->getPathname());
-            } else {
-                if (! $asset = Asset::find($id)) {
-                    return false;
-                }
-
-                if ($asset->isSvg()) {
-                    return true;
-                }
-
-                $size = $asset->dimensions();
+        if ($value instanceof UploadedFile) {
+            if (in_array($value->getMimeType(), ['image/svg+xml', 'image/svg'])) {
+                return;
             }
 
-            [$width, $height] = $size;
-
-            $parameters = $this->parseNamedParameters($this->parameters);
-
-            if ($this->failsBasicDimensionChecks($parameters, $width, $height) ||
-                $this->failsRatioCheck($parameters, $width, $height)) {
-                return false;
+            $size = getimagesize($value->getPathname());
+        } else if ($asset = Asset::find($value)) {
+            if ($asset->isSvg()) {
+                return;
             }
 
-            return true;
-        });
-    }
+            $size = $asset->dimensions();
+        }
 
-    /**
-     * Get the validation error message.
-     *
-     * @return string
-     */
-    public function message()
-    {
-        return __((Statamic::isCpRoute() ? 'statamic::' : '').'validation.dimensions');
+        [$width, $height] = $size;
+
+        $parameters = $this->parseNamedParameters($this->parameters);
+
+        $invalid_ratio = $this->failsRatioCheck($parameters, $width, $height);
+        $invalid_width = match (true) {
+            isset($parameters['width']) && $parameters['width'] != $width => 'exact',
+            isset($parameters['min_width']) && $parameters['min_width'] > $width => 'min',
+            isset($parameters['max_width']) && $parameters['max_width'] < $width => 'max',
+            default => false,
+        };
+        $invalid_height = match (true) {
+            isset($parameters['height']) && $parameters['height'] != $height => 'exact',
+            isset($parameters['min_height']) && $parameters['min_height'] > $height => 'min',
+            isset($parameters['max_height']) && $parameters['max_height'] < $height => 'max',
+            default => false,
+        };
+
+        $key = match (true) {
+            $invalid_ratio => 'ratio',
+            $invalid_width && $invalid_height && $invalid_width === $invalid_height => 'same',
+            $invalid_width && $invalid_height && $invalid_width !== $invalid_height => 'different',
+            !!$invalid_width => 'width',
+            !!$invalid_height => 'height',
+            default => null,
+        };
+
+        if ($key) {
+            $prefix = Statamic::isCpRoute() ? 'statamic::' : '';
+
+            $comparisons = [
+                'min' => __("{$prefix}validation.dimensions.min"),
+                'max' => __("{$prefix}validation.dimensions.max"),
+                'exact' => __("{$prefix}validation.dimensions.exact"),
+            ];
+
+            $fail(__("{$prefix}validation.dimensions.{$key}", [
+                'width' => $parameters['width'] ?? $parameters['min_width'] ?? $parameters['max_width'] ?? null,
+                'height' => $parameters['height'] ?? $parameters['min_height'] ?? $parameters['max_height'] ?? null,
+                'ratio' => $parameters['ratio'] ?? null,
+                'comparison' => $comparisons[$invalid_width] ?? '',
+                'comparison_width' => $comparisons[$invalid_width] ?? '',
+                'comparison_height' => $comparisons[$invalid_height] ?? '',
+            ]));
+        }
     }
 
     /**
@@ -85,24 +95,6 @@ class DimensionsRule implements Rule
     }
 
     /**
-     * Test if the given width and height fail any conditions.
-     *
-     * @param  array  $parameters
-     * @param  int  $width
-     * @param  int  $height
-     * @return bool
-     */
-    protected function failsBasicDimensionChecks($parameters, $width, $height)
-    {
-        return (isset($parameters['width']) && $parameters['width'] != $width) ||
-               (isset($parameters['min_width']) && $parameters['min_width'] > $width) ||
-               (isset($parameters['max_width']) && $parameters['max_width'] < $width) ||
-               (isset($parameters['height']) && $parameters['height'] != $height) ||
-               (isset($parameters['min_height']) && $parameters['min_height'] > $height) ||
-               (isset($parameters['max_height']) && $parameters['max_height'] < $height);
-    }
-
-    /**
      * Determine if the given parameters fail a dimension ratio check.
      *
      * @param  array  $parameters
@@ -117,7 +109,8 @@ class DimensionsRule implements Rule
         }
 
         [$numerator, $denominator] = array_replace(
-            [1, 1], array_filter(sscanf($parameters['ratio'], '%f/%d'))
+            [1, 1],
+            array_filter(sscanf($parameters['ratio'], '%f/%d'))
         );
 
         $precision = 1 / (max($width, $height) + 1);

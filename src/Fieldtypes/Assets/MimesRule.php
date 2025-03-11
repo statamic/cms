@@ -2,12 +2,13 @@
 
 namespace Statamic\Fieldtypes\Assets;
 
-use Illuminate\Contracts\Validation\Rule;
+use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Statamic\Facades\Asset;
 use Statamic\Statamic;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class MimesRule implements Rule
+class MimesRule implements ValidationRule
 {
     protected $parameters;
 
@@ -20,35 +21,18 @@ class MimesRule implements Rule
         $this->parameters = $parameters;
     }
 
-    /**
-     * Determine if the validation rule passes.
-     *
-     * @param  string  $attribute
-     * @param  mixed  $value
-     * @return bool
-     */
-    public function passes($attribute, $value)
+    public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        return collect($value)->every(function ($id) {
-            if ($id instanceof UploadedFile) {
-                return in_array($id->guessExtension(), $this->parameters);
-            }
+        $mime = '';
 
-            if (! $asset = Asset::find($id)) {
-                return false;
-            }
+        if ($value instanceof UploadedFile) {
+            $mime = $value->guessExtension();
+        } else if ($asset = Asset::find($value)) {
+            $mime = $asset->extension();
+        }
 
-            return $asset->guessedExtensionIsOneOf($this->parameters);
-        });
-    }
-
-    /**
-     * Get the validation error message.
-     *
-     * @return string
-     */
-    public function message()
-    {
-        return str_replace(':values', implode(', ', $this->parameters), __((Statamic::isCpRoute() ? 'statamic::' : '').'validation.mimes'));
+        if (!in_array($mime, $this->parameters)) {
+            $fail(__((Statamic::isCpRoute() ? 'statamic::' : '') . 'validation.mimes', ['values' => implode(', ', $this->parameters)]));
+        }
     }
 }
