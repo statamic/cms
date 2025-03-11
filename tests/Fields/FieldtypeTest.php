@@ -566,6 +566,25 @@ class FieldtypeTest extends TestCase
         $this->assertTrue($fieldtype->selectableInForms());
         $this->assertTrue(FieldtypeRepository::hasBeenMadeSelectableInForms('test'));
     }
+
+    #[Test]
+    public function it_can_make_a_fieldtype_unselectable_in_forms()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            public static $handle = 'test';
+        };
+
+        $fieldtype::makeSelectableInForms();
+        
+        $this->assertTrue($fieldtype->selectableInForms());
+        $this->assertTrue(FieldtypeRepository::hasBeenMadeSelectableInForms('test'));
+
+        $fieldtype::makeUnselectableInForms();
+
+        $this->assertFalse($fieldtype->selectableInForms());
+        $this->assertFalse(FieldtypeRepository::hasBeenMadeSelectableInForms('test'));
+    }
 }
 
 class TestFieldtype extends Fieldtype

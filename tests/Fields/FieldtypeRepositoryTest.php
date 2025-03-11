@@ -62,6 +62,25 @@ class FieldtypeRepositoryTest extends TestCase
         $this->expectExceptionMessage('Fieldtype [test] not found');
         $this->repo->find('test');
     }
+
+    #[Test]
+    public function it_makes_fields_selectable_in_forms()
+    {
+        $this->assertFalse($this->repo->hasBeenMadeSelectableInForms('test'));
+        
+        $this->repo->makeSelectableInForms('test');
+        $this->assertTrue($this->repo->hasBeenMadeSelectableInForms('test'));
+    }
+
+    #[Test]
+    public function it_makes_fields_unselectable_in_forms()
+    {
+        $this->repo->makeSelectableInForms('test');
+        $this->assertTrue($this->repo->hasBeenMadeSelectableInForms('test'));
+
+        $this->repo->makeUnselectableInForms('test');
+        $this->assertFalse($this->repo->hasBeenMadeSelectableInForms('test'));
+    }
 }
 
 class FooFieldtype extends Fieldtype

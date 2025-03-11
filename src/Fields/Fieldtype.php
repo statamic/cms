@@ -111,6 +111,11 @@ abstract class Fieldtype implements Arrayable
         FieldtypeRepository::makeSelectableInForms(self::handle());
     }
 
+    public static function makeUnselectableInForms()
+    {
+        FieldtypeRepository::makeUnselectableInForms(self::handle());
+    }
+
     public function categories(): array
     {
         return $this->categories;

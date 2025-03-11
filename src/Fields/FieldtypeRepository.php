@@ -44,6 +44,13 @@ class FieldtypeRepository
         $this->madeSelectableInForms[] = $handle;
     }
 
+    public function makeUnselectableInForms($handle)
+    {
+        if ($this->hasBeenMadeSelectableInForms($handle)) {
+            $this->madeSelectableInForms = array_diff($this->madeSelectableInForms, [$handle]);
+        }
+    }
+
     public function hasBeenMadeSelectableInForms($handle)
     {
         return in_array($handle, $this->madeSelectableInForms);
