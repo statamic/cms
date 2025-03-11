@@ -282,6 +282,7 @@ EOT
         $expected = [
             'Statamic.$conditions.showField([], $data, \'name\')',
             'Statamic.$conditions.showField('.$this->jsonEncode(['if' => ['email' => 'not empty']]).', $data, \'message\')',
+            // 'Statamic.$conditions.showField('.$this->jsonEncode(['if' => ['name' => 'not empty']]).', $data, \'my_favourites\')', // TODO
             'Statamic.$conditions.showField('.$this->jsonEncode(['if' => ['$root.likes_animals' => 'is true']]).', $data, \'my_favourites.favourite_animals\')',
             'Statamic.$conditions.showField('.$this->jsonEncode(['if' => ['favourite_animals' => 'not empty']]).', $data, \'my_favourites.non_favourite_animals\')',
             'Statamic.$conditions.showField([], $data, \'my_favourites.favourite_colour\')',
