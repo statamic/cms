@@ -576,7 +576,7 @@ class FieldtypeTest extends TestCase
         };
 
         $fieldtype::makeSelectableInForms();
-        
+
         $this->assertTrue($fieldtype->selectableInForms());
         $this->assertTrue(FieldtypeRepository::hasBeenMadeSelectableInForms('test'));
 

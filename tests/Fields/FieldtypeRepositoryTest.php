@@ -67,7 +67,7 @@ class FieldtypeRepositoryTest extends TestCase
     public function it_makes_fields_selectable_in_forms()
     {
         $this->assertFalse($this->repo->hasBeenMadeSelectableInForms('test'));
-        
+
         $this->repo->makeSelectableInForms('test');
         $this->assertTrue($this->repo->hasBeenMadeSelectableInForms('test'));
     }
