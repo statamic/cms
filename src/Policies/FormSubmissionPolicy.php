@@ -10,10 +10,7 @@ class FormSubmissionPolicy
     {
         $user = User::fromUser($user);
 
-        if (
-            $user->isSuper() ||
-            $user->hasPermission('configure forms')
-        ) {
+        if ($user->isSuper() || $user->hasPermission('configure forms')) {
             return true;
         }
     }

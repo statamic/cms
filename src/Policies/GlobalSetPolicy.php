@@ -13,10 +13,7 @@ class GlobalSetPolicy
     {
         $user = User::fromUser($user);
 
-        if (
-            $user->isSuper() ||
-            $user->hasPermission('configure globals')
-        ) {
+        if ($user->isSuper() || $user->hasPermission('configure globals')) {
             return true;
         }
     }

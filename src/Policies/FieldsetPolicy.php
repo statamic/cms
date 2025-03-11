@@ -10,10 +10,7 @@ class FieldsetPolicy
     {
         $user = User::fromUser($user);
 
-        if (
-            $user->isSuper() ||
-            $user->hasPermission('configure fields')
-        ) {
+        if ($user->isSuper() || $user->hasPermission('configure fields')) {
             return true;
         }
     }

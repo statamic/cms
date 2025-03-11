@@ -12,10 +12,7 @@ class TermPolicy
     {
         $user = User::fromUser($user);
 
-        if (
-            $user->isSuper() ||
-            $user->hasPermission('configure taxonomies')
-        ) {
+        if ($user->isSuper() || $user->hasPermission('configure taxonomies')) {
             return true;
         }
     }

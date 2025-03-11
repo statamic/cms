@@ -11,10 +11,7 @@ class AssetContainerPolicy
     {
         $user = User::fromUser($user);
 
-        if (
-            $user->isSuper() ||
-            $user->hasPermission('configure asset containers')
-        ) {
+        if ($user->isSuper() || $user->hasPermission('configure asset containers')) {
             return true;
         }
     }
