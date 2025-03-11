@@ -3,7 +3,6 @@
 namespace Statamic\Forms\JsDrivers;
 
 use Illuminate\Support\Collection;
-use Statamic\Forms\ArrayableShowField;
 use Statamic\Forms\Form;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -91,13 +90,13 @@ abstract class AbstractJsDriver implements JsDriver
     /**
      * Copy renderable `show_field` JS from each individual field for hardcoding field html using top-level form data.
      */
-    public function copyShowFieldToFormData(array $fields): ArrayableShowField
+    public function copyShowFieldToFormData(array $fields): array
     {
         return $this
             ->flattenFields($fields)
             ->each(fn ($field) => $this->validateShowFieldDefined($field))
             ->pluck('show_field', 'handle')
-            ->pipe(fn ($showFieldData) => new ArrayableShowField($showFieldData));
+            ->all();
     }
 
     /**

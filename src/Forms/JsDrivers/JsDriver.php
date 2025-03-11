@@ -2,8 +2,6 @@
 
 namespace Statamic\Forms\JsDrivers;
 
-use Statamic\Forms\ArrayableShowField;
-
 interface JsDriver
 {
     public function addToFormData($data);
@@ -16,5 +14,5 @@ interface JsDriver
 
     public function render($html);
 
-    public function copyShowFieldToFormData(array $fields): ArrayableShowField;
+    public function copyShowFieldToFormData(array $fields): array;
 }
