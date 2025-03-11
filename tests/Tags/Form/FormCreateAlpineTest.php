@@ -37,36 +37,76 @@ class FormCreateAlpineTest extends FormTestCase
             ],
         ],
         [
-            'handle' => 'fav_animals',
+            'handle' => 'likes_animals',
             'field' => [
-                'type' => 'checkboxes',
-                'display' => 'Fav Animals',
-                'options' => [
-                    'cat' => 'Cat',
-                    'armadillo' => 'Armadillo',
-                    'rat' => 'Rat',
-                ],
+                'type' => 'toggle',
+                'display' => 'Likes Animals',
             ],
         ],
         [
-            'handle' => 'fav_colour',
+            'handle' => 'my_favourites',
             'field' => [
-                'type' => 'radio',
-                'display' => 'Fav Colour',
-                'options' => [
-                    'red' => 'Red',
-                    'blue' => 'Blue',
+                'type' => 'group',
+                'display' => 'Group One',
+                'if' => [
+                    'name' => 'not empty',
                 ],
-            ],
-        ],
-        [
-            'handle' => 'fav_subject',
-            'field' => [
-                'type' => 'select',
-                'display' => 'Fav Subject',
-                'options' => [
-                    'math' => 'Math',
-                    'english' => 'English',
+                'fields' => [
+                    [
+                        'handle' => 'favourite_animals',
+                        'field' => [
+                            'type' => 'checkboxes',
+                            'display' => 'Favourite Animals',
+                            'options' => [
+                                'cat' => 'Cat',
+                                'armadillo' => 'Armadillo',
+                                'rat' => 'Rat',
+                            ],
+                            'if' => [
+                                '$root.likes_animals' => 'is true',
+                            ],
+                        ],
+                    ],
+                    [
+                        'handle' => 'non_favourite_animals',
+                        'field' => [
+                            'type' => 'checkboxes',
+                            'display' => 'Non-Favourite Animals',
+                            'options' => [
+                                'cat' => 'Cat',
+                                'armadillo' => 'Armadillo',
+                                'rat' => 'Rat',
+                            ],
+                            'if' => [
+                                'favourite_animals' => 'not empty',
+                            ],
+                        ],
+                    ],
+                    [
+                        'handle' => 'favourite_colour',
+                        'field' => [
+                            'type' => 'radio',
+                            'display' => 'Favourite Colour',
+                            'options' => [
+                                'red' => 'Red',
+                                'blue' => 'Blue',
+                            ],
+                        ],
+                    ],
+                    [
+                        'handle' => 'favourite_subject',
+                        'field' => [
+                            'type' => 'select',
+                            'display' => 'Favourite Subject',
+                            'options' => [
+                                'math' => 'Math',
+                                'english' => 'English',
+                            ],
+                            'if' => [
+                                '$parent.message' => 'not empty',
+                            ],
+                        ],
+                    ],
                 ],
             ],
         ],
