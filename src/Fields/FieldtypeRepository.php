@@ -51,7 +51,6 @@ class FieldtypeRepository
 
     public function hasBeenMadeSelectableInForms($handle)
     {
-        dump([$handle, $this->selectableInForms]);
         return $this->selectableInForms[$handle] ?? false;
     }
 
