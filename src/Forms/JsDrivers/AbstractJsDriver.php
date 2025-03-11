@@ -125,10 +125,8 @@ abstract class AbstractJsDriver implements JsDriver
 
     /**
      * Get initial form data.
-     *
-     * @return array
      */
-    protected function getInitialFormData()
+    protected function getInitialFormData(): array
     {
         $oldValues = collect(old());
 
@@ -138,11 +136,7 @@ abstract class AbstractJsDriver implements JsDriver
             ->preProcess()
             ->values()
             ->when($this->form->honeypot(), fn ($fields, $honeypot) => $fields->merge([$honeypot => null]))
-            ->map(function ($defaultProcessedValue, $handle) use ($oldValues) {
-                return $oldValues->has($handle)
-                    ? $oldValues->get($handle)
-                    : $defaultProcessedValue;
-            })
+            ->map(fn ($default, $handle) => $oldValues->has($handle) ? $oldValues->get($handle) : $default)
             ->all();
     }
 
@@ -159,10 +153,8 @@ abstract class AbstractJsDriver implements JsDriver
 
     /**
      * Get JS driver handle from class name.
-     *
-     * @return string
      */
-    public static function handle()
+    public static function handle(): string
     {
         $className = collect(explode('\\', static::class))->last();
 
@@ -172,7 +164,7 @@ abstract class AbstractJsDriver implements JsDriver
     /**
      * Register driver with Statamic.
      */
-    public static function register()
+    public static function register(): void
     {
         if (! app()->has('statamic.form-js-drivers')) {
             return;
