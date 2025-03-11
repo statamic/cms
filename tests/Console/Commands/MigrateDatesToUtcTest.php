@@ -24,9 +24,6 @@ class MigrateDatesToUtcTest extends TestCase
     {
         parent::setUp();
 
-        config()->set('app.timezone', 'America/New_York'); // -05:00
-        date_default_timezone_set('America/New_York');
-
         Fieldset::make('date_fieldset')->setContents(['fields' => [
             ['handle' => 'fieldset_date', 'field' => ['type' => 'date', 'time_enabled' => true]],
         ]])->save();
@@ -38,6 +35,14 @@ class MigrateDatesToUtcTest extends TestCase
         File::delete(base_path('resources/fieldsets'));
 
         parent::tearDown();
+    }
+
+    protected function defineEnvironment($app)
+    {
+        tap($app['config'], function ($config) {
+            // Set the timezone to something different from UTC and what the commands would be run with.
+            $config->set('app.timezone', 'America/New_York');
+        });
     }
 
     #[Test]
@@ -68,12 +73,12 @@ class MigrateDatesToUtcTest extends TestCase
 
         $entry = Entry::make()->id('foo')->collection('articles')->date('2025-01-01-1200');
         $entry->save();
+        $this->assertEquals('2025-01-01T12:00:00+00:00', $entry->date()->toIso8601String());
 
         $this->migrateDatesToUtc();
 
         $entry = Entry::find($entry->id());
-
-        $this->assertEquals('2025-01-01 17:00', $entry->date()->format('Y-m-d H:i'));
+        $this->assertEquals('2025-01-01T17:00:00+00:00', $entry->date()->toIso8601String());
         $this->assertStringContainsString('2025-01-01-1700.foo.md', $entry->buildPath());
     }
 
