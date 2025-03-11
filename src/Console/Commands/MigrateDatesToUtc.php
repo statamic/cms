@@ -117,17 +117,13 @@ class MigrateDatesToUtc extends Command
                     && empty($dottedPrefix)
                     && $field->handle() === 'date'
                 ) {
-                    $existingDate = $item->date();
-                    $convertedDate = $item->date();
-
-                    // When the app timezone is UTC, we need to parse it as the local timezone before
-                    // converting it to UTC. Otherwise, the returned time will be wrong.
-                    if (config('app.timezone') === 'UTC') {
-                        $localDate = Carbon::parse($existingDate->format('Y-m-d H:i:s'), $this->currentTimezone);
-                        $convertedDate = $localDate->utc();
-                    }
-
-                    $item->date($convertedDate);
+                    // When entries are constructed, the datestamp from the filename would be provided but treated as UTC.
+                    // We need them to be adjusted back to the existing timezone.
+                    $item->date(Carbon::createFromFormat(
+                        $format = 'Y-m-d H:i:s',
+                        $item->date()->format($format),
+                        $this->currentTimezone
+                    ));
 
                     return;
                 }
