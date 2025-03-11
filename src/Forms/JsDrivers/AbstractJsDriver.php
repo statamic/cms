@@ -2,7 +2,9 @@
 
 namespace Statamic\Forms\JsDrivers;
 
+use Illuminate\Support\Collection;
 use Statamic\Forms\Form;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Tags\Parameters;
 
@@ -87,30 +89,26 @@ abstract class AbstractJsDriver implements JsDriver
 
     /**
      * Copy renderable `show_field` JS from each individual field for hardcoding field html using top-level form data.
-     *
-     * @param  array  $fields
-     * @return array
      */
-    public function copyShowFieldToFormData($fields)
+    public function copyShowFieldToFormData(array $fields): array
     {
-        return $this->validateShowFieldDefined(collect($fields))->pluck('show_field', 'handle')->all();
+        return $this
+            ->flattenFields($fields)
+            ->each(fn ($field) => $this->validateShowFieldDefined($field))
+            ->pluck('show_field', 'handle')
+            ->pipe(fn ($showFieldData) => Arr::undot($showFieldData));
     }
 
     /**
      * Validate that `show_field` is defined in `addToRenderableFieldData()` output.
      *
-     * @param  \Illuminate\Support\Collection  $fields
-     * @return \Illuminate\Support\Collection
-     *
      * @throws \Exception
      */
-    protected function validateShowFieldDefined($fields)
+    protected function validateShowFieldDefined(array $field): void
     {
-        return $fields->each(function ($field) {
-            if (! isset($field['show_field'])) {
-                throw new \Exception('JS driver requires [show_field] to be defined in [addToRenderableFieldData()] output!');
-            }
-        });
+        if (! isset($field['show_field'])) {
+            throw new \Exception('JS driver requires [show_field] to be defined in [addToRenderableFieldData()] output!');
+        }
     }
 
     /**
@@ -146,6 +144,17 @@ abstract class AbstractJsDriver implements JsDriver
                     : $defaultProcessedValue;
             })
             ->all();
+    }
+
+    /**
+     * Recursively get flattened fields collection.
+     */
+    protected function flattenFields(array|Collection $fields): Collection
+    {
+        return collect($fields)->flatMap(fn ($field) => [
+            $field,
+            ...$this->flattenFields(Arr::get($field, 'fields') ?? [])->all(),
+        ]);
     }
 
     /**
