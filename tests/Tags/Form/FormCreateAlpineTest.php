@@ -262,6 +262,36 @@ class FormCreateAlpineTest extends FormTestCase
     }
 
     #[Test]
+    public function it_renders_show_field_js_directly_out_of_show_fields_array()
+    {
+        $outputWithJsDisabled = $this->tag('{{ form:contact }}{{ /form:contact }}');
+
+        $output = $this->tag(<<<'EOT'
+{{ form:contact js="alpine" }}
+    <template x-if="{{ show_field:name }}"></template>
+    <template x-if="{{ show_field.message }}"></template>
+    <template x-if="{{ show_field:my_favourites:favourite_animals }}"></template>
+    <template x-if="{{ show_field.my_favourites.non_favourite_animals }}"></template>
+    <template x-if="{{ show_field.my_favourites.favourite_colour }}"></template>
+{{ /form:contact }}
+EOT
+        );
+        ray($output);
+        preg_match_all('/<template x-if="(.+)"><\/template>/U', $output, $js);
+
+        $expected = [
+            'Statamic.$conditions.showField([], $data, \'name\')',
+            'Statamic.$conditions.showField('.$this->jsonEncode(['if' => ['email' => 'not empty']]).', $data, \'message\')',
+            'Statamic.$conditions.showField('.$this->jsonEncode(['if' => ['$root.likes_animals' => 'is true']]).', $data, \'my_favourites.favourite_animals\')',
+            'Statamic.$conditions.showField('.$this->jsonEncode(['if' => ['favourite_animals' => 'not empty']]).', $data, \'my_favourites.non_favourite_animals\')',
+            'Statamic.$conditions.showField([], $data, \'my_favourites.favourite_colour\')',
+        ];
+
+        $this->assertStringNotContainsString('Statamic.$conditions', $outputWithJsDisabled);
+        $this->assertSame($expected, $js[1]);
+    }
+
+    #[Test]
     public function it_renders_show_field_js()
     {
         $outputWithJsDisabled = $this->tag('{{ form:contact }}{{ /form:contact }}');
