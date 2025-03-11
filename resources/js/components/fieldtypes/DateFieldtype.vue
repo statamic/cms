@@ -15,7 +15,7 @@
             <component
                 :is="pickerComponent"
                 v-bind="pickerProps"
-                @update:model-value="setDate"
+                @update:model-value="setLocalDate"
                 @focus="focusedField = $event"
                 @blur="focusedField = null"
             />
@@ -25,12 +25,12 @@
                     v-if="hasTime"
                     ref="time"
                     handle=""
-                    :value="value.time"
+                    :value="localValue.time"
                     :required="config.time_enabled"
                     :show-seconds="config.time_seconds_enabled"
                     :read-only="isReadOnly"
                     :config="{}"
-                    @input="setTime"
+                    @update:value="setLocalTime"
                 />
             </div>
         </div>
@@ -44,6 +44,7 @@ import SingleInline from './date/SingleInline.vue';
 import RangePopover from './date/RangePopover.vue';
 import RangeInline from './date/RangeInline.vue';
 import { useScreens } from 'vue-screen-utils';
+import { toRaw } from 'vue';
 
 export default {
     components: {
@@ -55,7 +56,7 @@ export default {
 
     mixins: [Fieldtype],
 
-    inject: ['storeName'],
+    inject: ['store'],
 
     setup() {
         const { mapCurrent } = useScreens({
@@ -72,6 +73,7 @@ export default {
         return {
             containerWidth: null,
             focusedField: null,
+            localValue: null,
         };
     },
 
@@ -85,6 +87,10 @@ export default {
         },
 
         hasDate() {
+            if (this.isRange) {
+                return this.config.required || this.value?.start || this.value?.end;
+            }
+
             return this.config.required || this.value.date;
         },
 
@@ -93,7 +99,7 @@ export default {
         },
 
         hasSeconds() {
-            return this.config.time_has_seconds;
+            return this.config.time_seconds_enabled;
         },
 
         isSingle() {
@@ -120,14 +126,19 @@ export default {
         },
 
         datePickerValue() {
-            if (this.isRange) return this.value.date;
+            if (this.isRange) {
+                return {
+                    start: this.localValue?.start?.date,
+                    end: this.localValue?.end?.date,
+                };
+            }
 
             // The calendar component will do `new Date(datePickerValue)` under the hood.
             // If you pass a date without a time, it will treat it as UTC. By adding a time,
             // it will behave as local time. The date that comes from the server will be what
             // we expect. The time is handled separately by the nested time fieldtype.
             // https://github.com/statamic/cms/pull/6688
-            return this.value.date + 'T00:00:00';
+            return this.localValue.date + 'T00:00:00';
         },
 
         commonDatePickerBindings() {
@@ -167,20 +178,23 @@ export default {
 
         replicatorPreview() {
             if (!this.showFieldPreviews || !this.config.replicator_preview) return;
-            if (!this.value.date) return;
 
             if (this.isRange) {
+                if (!this.localValue?.start) return;
+
                 return (
-                    this.$moment(this.value.date.start).format(this.displayFormat) +
+                    this.$moment(this.localValue.start.date).format(this.displayFormat) +
                     ' – ' +
-                    this.$moment(this.value.date.end).format(this.displayFormat)
+                    this.$moment(this.localValue.end.date).format(this.displayFormat)
                 );
             }
 
-            let preview = this.$moment(this.value.date).format(this.displayFormat);
+            if (!this.localValue?.date) return;
 
-            if (this.hasTime && this.value.time) {
-                preview += ` ${this.value.time}`;
+            let preview = this.$moment(this.localValue.date).format(this.displayFormat);
+
+            if (this.hasTime && this.localValue.time) {
+                preview += ` ${this.localValue.time}`;
             }
 
             return preview;
@@ -188,43 +202,170 @@ export default {
     },
 
     created() {
-        if (this.value.time === 'now') {
-            // Probably shouldn't be modifying a prop, but luckily it all works nicely, without
-            // needing to create an "update value without triggering dirty state" flow yet.
-            this.value.time = this.$moment().format(this.hasSeconds ? 'HH:mm:ss' : 'HH:mm');
-        }
-
         this.$events.$on(`container.${this.storeName}.saving`, this.triggerChangeOnFocusedField);
+    },
+
+    mounted() {
+        if (this.isRange && this.config.required && !this.value) {
+            this.addDate();
+        }
     },
 
     unmounted() {
         this.$events.$off(`container.${this.storeName}.saving`, this.triggerChangeOnFocusedField);
     },
 
+    watch: {
+        value: {
+            immediate: true,
+            handler(value, oldValue) {
+                if (this.isRange) {
+                    if (!value || !value.start) {
+                        this.localValue = { start: { date: null, time: null }, end: { date: null, time: null } };
+                        return;
+                    }
+
+                    let localValue = {
+                        start: this.createLocalFromUtc(value.start),
+                        end: this.createLocalFromUtc(value.end),
+                    };
+
+                    if (JSON.stringify(toRaw(this.localValue)) === JSON.stringify(localValue)) {
+                        return;
+                    }
+
+                    this.localValue = localValue;
+
+                    return;
+                }
+
+                if (!value || !value.date) {
+                    this.localValue = { date: null, time: null };
+                    return;
+                }
+
+                let localValue = this.createLocalFromUtc(value);
+
+                if (JSON.stringify(toRaw(this.localValue)) === JSON.stringify(localValue)) {
+                    return;
+                }
+
+                this.localValue = localValue;
+            },
+        },
+
+        localValue(value) {
+            if (this.isRange) {
+                this.update({
+                    start: this.createUtcFromLocal(value.start),
+                    end: this.createUtcFromLocal(value.end),
+                });
+
+                return;
+            }
+
+            this.update(this.createUtcFromLocal(value));
+        },
+    },
+
     methods: {
+        createLocalFromUtc(utcValue) {
+            const dateTime = new Date(utcValue.date + 'T' + (utcValue.time || '00:00:00') + 'Z');
+
+            let date =
+                dateTime.getFullYear() +
+                '-' +
+                (dateTime.getMonth() + 1).toString().padStart(2, '0') +
+                '-' +
+                dateTime.getDate().toString().padStart(2, '0');
+            let time =
+                dateTime.getHours().toString().padStart(2, '0') +
+                ':' +
+                dateTime.getMinutes().toString().padStart(2, '0');
+
+            if (this.hasSeconds) {
+                time += ':' + dateTime.getSeconds().toString().padStart(2, '0');
+            }
+
+            return { date, time };
+        },
+
+        createUtcFromLocal(localValue) {
+            const dateTime = new Date(localValue.date + 'T' + (localValue.time || '00:00:00'));
+
+            let date =
+                dateTime.getUTCFullYear() +
+                '-' +
+                (dateTime.getUTCMonth() + 1).toString().padStart(2, '0') +
+                '-' +
+                dateTime.getUTCDate().toString().padStart(2, '0');
+            let time =
+                dateTime.getUTCHours().toString().padStart(2, '0') +
+                ':' +
+                dateTime.getUTCMinutes().toString().padStart(2, '0');
+
+            if (this.hasSeconds) {
+                time += ':' + dateTime.getUTCSeconds().toString().padStart(2, '0');
+            }
+
+            return { date, time };
+        },
+
         triggerChangeOnFocusedField() {
             if (!this.focusedField) return;
 
             this.focusedField.dispatchEvent(new Event('change'));
         },
 
-        setDate(date) {
-            if (!date) {
-                this.update({ date: null, time: null });
+        setLocalDate(date) {
+            if (this.isRange) {
+                this.localValue = {
+                    start: { date: date.start, time: '00:00' },
+                    end: { date: date.end, time: '23:59' },
+                };
+
                 return;
             }
 
-            this.update({ ...this.value, date });
+            if (!date) {
+                this.localValue = { date: null, time: null };
+                return;
+            }
+
+            this.localValue = {
+                date,
+                time: this.config.time_enabled ? this.localValue.time : '00:00',
+            };
         },
 
-        setTime(time) {
-            this.update({ ...this.value, time });
+        setLocalTime(time) {
+            this.localValue = { ...this.localValue, time };
         },
 
         addDate() {
-            const now = this.$moment().format(this.format);
-            const date = this.isRange ? { start: now, end: now } : now;
-            this.update({ date, time: null });
+            let now = new Date();
+
+            if (!this.config.time_enabled) {
+                now.setHours(0, 0, 0, 0);
+            }
+
+            let date =
+                now.getFullYear() +
+                '-' +
+                String(now.getMonth() + 1).padStart(2, '0') +
+                '-' +
+                String(now.getDate()).padStart(2, '0');
+
+            let time = now.toLocaleTimeString(undefined, {
+                hour12: false,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: this.hasSeconds ? '2-digit' : undefined,
+            });
+
+            this.localValue = this.isRange
+                ? { start: { date, time: '00:00' }, end: { date, time: '23:59' } }
+                : { date, time };
         },
     },
 };

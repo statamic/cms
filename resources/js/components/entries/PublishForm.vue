@@ -154,9 +154,9 @@
                                     >
                                         <label v-text="__('Published')" class="publish-field-label font-medium" />
                                         <toggle-input
-                                            :value="published"
+                                            :model-value="published"
                                             :read-only="!canManagePublishState"
-                                            @input="setFieldValue('published', $event)"
+                                            @update:model-value="setFieldValue('published', $event)"
                                         />
                                     </div>
 
