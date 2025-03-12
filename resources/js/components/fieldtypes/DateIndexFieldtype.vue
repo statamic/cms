@@ -30,7 +30,7 @@ export default {
             }
 
             let date = new Date(this.value.date + 'T' + (this.value.time || '00:00:00') + 'Z');
-            
+
             let preview = date.toLocaleDateString(navigator.language, {
                 year: 'numeric',
                 month: 'long',
