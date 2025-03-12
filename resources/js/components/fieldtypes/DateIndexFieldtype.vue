@@ -15,19 +15,34 @@ export default {
             }
 
             if (this.value.mode === 'range') {
-                return (
-                    this.$moment(this.value.start.date + 'T' + (this.value.start.time || '00:00:00') + 'Z').format(
-                        this.value.display_format,
-                    ) +
-                    ' – ' +
-                    this.$moment(this.value.end.date + 'T' + (this.value.end.time || '00:00:00') + 'Z').format(
-                        this.value.display_format,
-                    )
+                let start = new Date(this.value.start.date + 'T' + (this.value.start.time || '00:00:00') + 'Z').toLocaleDateString(
+                    this.$preferences.get('locale') || 'en',
+                    {
+                        year: 'numeric',
+                        month: 'numeric',
+                        day: 'numeric'
+                    }
                 );
+
+                let end = new Date(this.value.end.date + 'T' + (this.value.end.time || '00:00:00') + 'Z').toLocaleDateString(
+                    this.$preferences.get('locale') || 'en',
+                    {
+                        year: 'numeric',
+                        month: 'numeric',
+                        day: 'numeric'
+                    }
+                );
+
+                return `${start} – ${end}`;
             }
 
-            return this.$moment(this.value.date + 'T' + (this.value.time || '00:00:00') + 'Z').format(
-                this.value.display_format,
+            return new Date(this.value.date + 'T' + (this.value.time || '00:00:00') + 'Z').toLocaleDateString(
+                this.$preferences.get('locale') || 'en',
+                {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                }
             );
         },
     },
