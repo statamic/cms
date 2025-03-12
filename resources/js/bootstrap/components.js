@@ -62,6 +62,7 @@ import StackTest from '../components/stacks/StackTest.vue';
 import CodeBlock from '../components/CodeBlock.vue';
 import BlueprintResetter from '../components/blueprints/BlueprintResetter.vue';
 import { defineAsyncComponent } from 'vue';
+import SubmissionPublishForm from '@statamic/components/forms/SubmissionPublishForm.vue';
 
 export default function registerGlobalComponents(app) {
     // Core
@@ -89,6 +90,7 @@ export default function registerGlobalComponents(app) {
 
     app.component('EntryPublishForm', EntryPublishForm);
     app.component('TermPublishForm', TermPublishForm);
+    app.component('SubmissionPublishForm', SubmissionPublishForm);
     app.component('UserPublishForm', UserPublishForm);
 
     // Data List

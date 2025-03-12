@@ -105,18 +105,6 @@ class Submission implements Augmentable, SubmissionContract
     }
 
     /**
-     * Get the date, formatted by what's specified in the form config.
-     *
-     * @return string
-     */
-    public function formattedDate()
-    {
-        return $this->date()->format(
-            $this->form()->dateFormat()
-        );
-    }
-
-    /**
      * Upload files and return asset IDs.
      *
      * @param  array  $uploadedFiles

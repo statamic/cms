@@ -90,7 +90,7 @@
                             @sorted="sorted"
                         >
                             <template #cell-datestamp="{ row: submission, value }">
-                                <a :href="submission.url" class="text-blue">{{ value }}</a>
+                                <a :href="submission.url" class="text-blue">{{ formatDate(value) }}</a>
                             </template>
                             <template #actions="{ row: submission, index }">
                                 <dropdown-list>
@@ -144,5 +144,17 @@ export default {
             return { form: this.form };
         },
     },
+
+    methods: {
+        formatDate(value) {
+            let date = new Date(value);
+
+            return (
+                date.toLocaleDateString(navigator.language, { year: 'numeric', month: 'numeric', day: 'numeric' }) +
+                ' ' +
+                date.toLocaleTimeString(navigator.language, { hour: 'numeric', minute: 'numeric' })
+            );
+        }
+    }
 };
 </script>

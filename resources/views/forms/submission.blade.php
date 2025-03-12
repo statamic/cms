@@ -10,11 +10,11 @@
         ]
     )
 
-    <publish-form
-        title="{{ $title }}"
+    <submission-publish-form
+        date="{{ $submission->date()->toIso8601String() }}"
         :blueprint="{{ Js::from($blueprint) }}"
         :meta="{{ Js::from($meta) }}"
         :values="{{ Js::from($values) }}"
         read-only
-    ></publish-form>
+    ></submission-publish-form>
 @endsection
