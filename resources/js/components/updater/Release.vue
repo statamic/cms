@@ -3,7 +3,7 @@
         <div class="mb-6 flex justify-between">
             <div>
                 <h1>{{ release.version }}</h1>
-                <h5 class="date" v-text="__('Released on :date', { date: release.date })" />
+                <h5 class="date" v-text="__('Released on :date', { date })" />
             </div>
             <div v-if="showActions">
                 <button
@@ -49,6 +49,27 @@ export default {
     },
 
     computed: {
+        locale() {
+            let locale = this.$preferences.get('locale') || 'en';
+
+            if (locale.includes('_')) {
+                locale = locale.split('_')[0];
+            }
+
+            return locale;
+        },
+
+        date() {
+            return new Date(this.release.date + 'T00:00:00Z').toLocaleDateString(
+                this.locale,
+                {
+                    year: 'numeric',
+                    month: 'numeric',
+                    day: 'numeric'
+                }
+            );
+        },
+
         body() {
             return markdown(this.release.body)
                 .replaceAll('[new]', '<span class="label" style="background: #5bc0de;">NEW</span>')
