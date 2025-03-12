@@ -117,7 +117,7 @@ export default function registerGlobalComponents(app) {
 
     // Widgets
     app.component('collection-widget', CollectionWidget);
-    app.component('form-widget',  FormWidget);
+    app.component('form-widget', FormWidget);
 
     // Reusable
     app.component('svg-icon', SvgIcon);

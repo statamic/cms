@@ -1,12 +1,6 @@
 <template>
     <div>
-        <publish-form
-            :title="title"
-            :blueprint="blueprint"
-            :meta="meta"
-            :values="values"
-            read-only
-        ></publish-form>
+        <publish-form :title="title" :blueprint="blueprint" :meta="meta" :values="values" read-only></publish-form>
     </div>
 </template>
 
@@ -29,6 +23,6 @@ export default {
                 date.toLocaleTimeString(navigator.language, { hour: 'numeric', minute: 'numeric' })
             );
         },
-    }
-}
+    },
+};
 </script>

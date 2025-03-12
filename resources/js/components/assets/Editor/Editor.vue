@@ -548,7 +548,7 @@ export default {
                 ' ' +
                 date.toLocaleTimeString(navigator.language, { hour: 'numeric', minute: 'numeric' })
             );
-        }
+        },
     },
 };
 </script>

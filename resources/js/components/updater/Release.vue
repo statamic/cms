@@ -53,7 +53,7 @@ export default {
             return new Date(this.release.date + 'T00:00:00Z').toLocaleDateString(navigator.language, {
                 year: 'numeric',
                 month: 'numeric',
-                day: 'numeric'
+                day: 'numeric',
             });
         },
 
