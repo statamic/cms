@@ -15,35 +15,24 @@ export default {
             }
 
             if (this.value.mode === 'range') {
-                let start = new Date(this.value.start.date + 'T' + (this.value.start.time || '00:00:00') + 'Z').toLocaleDateString(
-                    navigator.language,
-                    {
-                        year: 'numeric',
-                        month: 'numeric',
-                        day: 'numeric'
-                    }
-                );
+                let start = new Date(this.value.start.date + 'T00:00:00Z');
+                let end = new Date(this.value.end.date + 'T00:00:00Z');
 
-                let end = new Date(this.value.end.date + 'T' + (this.value.end.time || '00:00:00') + 'Z').toLocaleDateString(
-                    navigator.language,
-                    {
-                        year: 'numeric',
-                        month: 'numeric',
-                        day: 'numeric'
-                    }
+                return (
+                    start.toLocaleDateString(navigator.language, { year: 'numeric', month: 'numeric', day: 'numeric' }) +
+                    ' – ' +
+                    end.toLocaleDateString(navigator.language, { year: 'numeric', month: 'numeric', day: 'numeric' })
                 );
-
-                return `${start} – ${end}`;
             }
 
-            return new Date(this.value.date + 'T' + (this.value.time || '00:00:00') + 'Z').toLocaleDateString(
-                navigator.language,
-                {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                }
-            );
+            let date = new Date(this.value.date + 'T' + (this.value.time || '00:00:00') + 'Z');
+            let preview = date.toLocaleDateString(navigator.language, { year: 'numeric', month: 'long', day: 'numeric' });
+
+            if (this.value.time_enabled && this.value.time) {
+                preview += ' ' + date.toLocaleTimeString(navigator.language, { hour: 'numeric', minute: 'numeric'});
+            }
+
+            return preview;
         },
     },
 };
