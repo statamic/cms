@@ -174,8 +174,8 @@ export default {
             if (this.isRange) {
                 if (!this.localValue?.start) return;
 
-                let start = new Date(this.localValue.start.date + 'T00:00:00Z');
-                let end = new Date(this.localValue.end.date + 'T00:00:00Z');
+                let start = new Date(this.value.start.date + 'T' + (this.value.start.time || '00:00:00') + 'Z');
+                let end = new Date(this.value.end.date + 'T' + (this.value.end.time || '00:00:00') + 'Z');
 
                 return (
                     start.toLocaleDateString(navigator.language, { year: 'numeric', month: 'numeric', day: 'numeric' }) +
@@ -186,10 +186,10 @@ export default {
 
             if (!this.localValue?.date) return;
 
-            let date = new Date(this.localValue.date + 'T' + (this.localValue.time || '00:00:00') + 'Z');
+            let date = new Date(this.value.date + 'T' + (this.value.time || '00:00:00') + 'Z');
             let preview = date.toLocaleDateString(navigator.language, { year: 'numeric', month: 'numeric', day: 'numeric' });
 
-            if (this.hasTime && this.localValue.time) {
+            if (this.hasTime && this.value.time) {
                 preview += ' ' + date.toLocaleTimeString(navigator.language, { hour: 'numeric', minute: 'numeric'});
             }
 
