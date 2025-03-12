@@ -157,7 +157,7 @@ trait RendersForms
 
         if ($field->fieldtype()->handle() === 'group') {
             $data['fields'] = collect($field->fieldtype()->fields()->all())
-                ->map(fn ($child) => $child->setHandle($field->handle().'.'.$child->handle()))
+                ->map(fn ($child) => $child->setForm($field->form())->setHandle($field->handle().'.'.$child->handle()))
                 ->map(fn ($child) => $this->getRenderableField($child, $errorBag, $manipulateDataCallback))
                 ->values()
                 ->all();
