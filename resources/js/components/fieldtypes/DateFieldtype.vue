@@ -173,7 +173,7 @@ export default {
         },
 
         displayFormat() {
-            return this.meta.displayFormat;
+            return 'L';
         },
 
         replicatorPreview() {
