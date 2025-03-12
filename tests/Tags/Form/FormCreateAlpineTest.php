@@ -592,6 +592,36 @@ EOT
     }
 
     #[Test]
+    public function it_dynamically_renders_group_field_without_x_model_but_x_models_fields_within()
+    {
+        $config = [
+            'handle' => 'address',
+            'field' => [
+                'type' => 'group',
+                'fields' => [
+                    ['handle' => 'street', 'field' => ['type' => 'text']],
+                ],
+            ],
+        ];
+
+        $this->assertFieldRendersHtml(collect([
+            '<div>',
+            '<div class="pb-2">',
+            '<input id="[[form-handle]]-form-address-street-field" type="text" name="address[street]" value="" x-model="address.street">',
+            '</div>',
+            '</div>',
+        ])->implode(''), $config, [], ['js' => 'alpine']);
+
+        $this->assertFieldRendersHtml(collect([
+            '<div>',
+            '<div class="pb-2">',
+            '<input id="[[form-handle]]-form-address-street-field" type="text" name="address[street]" value="" x-model="my_form.address.street">',
+            '</div>',
+            '</div>',
+        ])->implode(''), $config, [], ['js' => 'alpine:my_form']);
+    }
+
+    #[Test]
     public function it_dynamically_renders_field_with_fallback_to_default_partial_x_model()
     {
         $config = [
