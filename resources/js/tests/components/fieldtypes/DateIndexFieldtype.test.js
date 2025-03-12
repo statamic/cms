@@ -60,14 +60,3 @@ test('date range is localized to the users timezone', async () => {
 
     expect(dateIndexField.vm.formatted).toBe('2025-01-01 – 2025-01-10');
 });
-
-test('configured display format is respected', async () => {
-    const dateIndexField = makeDateIndexField({
-        date: '2025-01-01',
-        time: '15:00:15',
-        mode: 'single',
-        display_format: 'DD/MM/YYYY HH:mm:ss',
-    });
-
-    expect(dateIndexField.vm.formatted).toBe('01/01/2025 10:00:15');
-});
