@@ -158,7 +158,7 @@ export default {
                 expanded: this.name === 'date' || this.config.full_width,
                 isRequired: this.config.required,
                 locale: navigator.language,
-                masks: { input: [this.displayFormat], modelValue: this.format },
+                masks: { input: ['L'], modelValue: 'YYYY-MM-DD' },
                 minDate: this.config.earliest_date.date,
                 maxDate: this.config.latest_date.date,
                 updateOnInput: false,
@@ -166,14 +166,6 @@ export default {
                 modelModifiers: { string: true, range: this.isRange },
                 popover: { visibility: 'click' },
             };
-        },
-
-        format() {
-            return 'YYYY-MM-DD';
-        },
-
-        displayFormat() {
-            return 'L';
         },
 
         replicatorPreview() {
