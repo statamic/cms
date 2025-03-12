@@ -310,6 +310,38 @@ EOT
     }
 
     #[Test]
+    public function it_renders_scoped_show_field_js_recursively()
+    {
+        $outputWithJsDisabled = $this->tag('{{ form:contact }}{{ /form:contact }}');
+
+        $output = $this->tag(<<<'EOT'
+{{ form:contact js="alpine:my_form" }}
+    {{ form:fields }}
+        <template x-if="{{ show_field }}">{{ field }}</template>
+    {{ /form:fields }}
+{{ /form:contact }}
+EOT
+        );
+
+        preg_match_all('/<template x-if="(.+)">/U', $output, $js);
+
+        $expected = [
+            'Statamic.$conditions.showField([], $data.my_form, \'name\')',
+            'Statamic.$conditions.showField([], $data.my_form, \'email\')',
+            'Statamic.$conditions.showField('.$this->jsonEncode(['if' => ['email' => 'not empty']]).', $data.my_form, \'message\')',
+            'Statamic.$conditions.showField([], $data.my_form, \'likes_animals\')',
+            'Statamic.$conditions.showField('.$this->jsonEncode(['if' => ['name' => 'not empty']]).', $data.my_form, \'my_favourites\')',
+            'Statamic.$conditions.showField('.$this->jsonEncode(['if' => ['$root.likes_animals' => 'is true']]).', $data.my_form, \'my_favourites.favourite_animals\')',
+            'Statamic.$conditions.showField('.$this->jsonEncode(['if' => ['favourite_animals' => 'not empty']]).', $data.my_form, \'my_favourites.non_favourite_animals\')',
+            'Statamic.$conditions.showField([], $data.my_form, \'my_favourites.favourite_colour\')',
+            'Statamic.$conditions.showField('.$this->jsonEncode(['if' => ['$parent.message' => 'not empty']]).', $data.my_form, \'my_favourites.favourite_subject\')',
+        ];
+
+        $this->assertStringNotContainsString('Statamic.$conditions', $outputWithJsDisabled);
+        $this->assertEquals($expected, $js[1]);
+    }
+
+    #[Test]
     public function it_renders_show_field_js_inside_legacy_fields_array()
     {
         $outputWithJsDisabled = $this->tag('{{ form:contact }}{{ /form:contact }}');
@@ -331,6 +363,34 @@ EOT
             'Statamic.$conditions.showField('.$this->jsonEncode(['if' => ['email' => 'not empty']]).', $data, \'message\')',
             'Statamic.$conditions.showField([], $data, \'likes_animals\')',
             'Statamic.$conditions.showField('.$this->jsonEncode(['if' => ['name' => 'not empty']]).', $data, \'my_favourites\')',
+        ];
+
+        $this->assertStringNotContainsString('Statamic.$conditions', $outputWithJsDisabled);
+        $this->assertEquals($expected, $js[1]);
+    }
+
+    #[Test]
+    public function it_renders_scoped_show_field_js_inside_legacy_fields_array()
+    {
+        $outputWithJsDisabled = $this->tag('{{ form:contact }}{{ /form:contact }}');
+
+        $output = $this->tag(<<<'EOT'
+{{ form:contact js="alpine:my_form" }}
+    {{ fields }}
+        <template x-if="{{ show_field }}">{{ field }}</template>
+    {{ /fields }}
+{{ /form:contact }}
+EOT
+        );
+
+        preg_match_all('/<template x-if="(.+)">/U', $output, $js);
+
+        $expected = [
+            'Statamic.$conditions.showField([], $data.my_form, \'name\')',
+            'Statamic.$conditions.showField([], $data.my_form, \'email\')',
+            'Statamic.$conditions.showField('.$this->jsonEncode(['if' => ['email' => 'not empty']]).', $data.my_form, \'message\')',
+            'Statamic.$conditions.showField([], $data.my_form, \'likes_animals\')',
+            'Statamic.$conditions.showField('.$this->jsonEncode(['if' => ['name' => 'not empty']]).', $data.my_form, \'my_favourites\')',
         ];
 
         $this->assertStringNotContainsString('Statamic.$conditions', $outputWithJsDisabled);
@@ -370,17 +430,18 @@ EOT
     }
 
     #[Test]
-    public function it_renders_scoped_show_field_js()
+    public function it_renders_scoped_top_level_show_field_js()
     {
         $outputWithJsDisabled = $this->tag('{{ form:contact }}{{ /form:contact }}');
 
         $output = $this->tag(<<<'EOT'
 {{ form:contact js="alpine:my_form" }}
     <template x-if="{{ show_field:name }}"></template>
-    <template x-if="{{ show_field:message }}"></template>
-    {{ fields }}
-        <template x-if="{{ show_field }}"></template>
-    {{ /fields }}
+    <template x-if="{{ show_field.message }}"></template>
+    <template x-if="{{ show_field['my_favourites'] }}"></template>
+    <template x-if="{{ show_field['my_favourites.favourite_animals'] }}"></template>
+    <template x-if="{{ show_field['my_favourites.non_favourite_animals'] }}"></template>
+    <template x-if="{{ show_field['my_favourites.favourite_colour'] }}"></template>
 {{ /form:contact }}
 EOT
         );
@@ -388,14 +449,12 @@ EOT
         preg_match_all('/<template x-if="(.+)"><\/template>/U', $output, $js);
 
         $expected = [
-            'Statamic.$conditions.showField([], $data.my_form)',
-            'Statamic.$conditions.showField('.$this->jsonEncode(['if' => ['email' => 'not empty']]).', $data.my_form)',
-            'Statamic.$conditions.showField([], $data.my_form)',
-            'Statamic.$conditions.showField([], $data.my_form)',
-            'Statamic.$conditions.showField('.$this->jsonEncode(['if' => ['email' => 'not empty']]).', $data.my_form)',
-            'Statamic.$conditions.showField([], $data.my_form)',
-            'Statamic.$conditions.showField([], $data.my_form)',
-            'Statamic.$conditions.showField([], $data.my_form)',
+            'Statamic.$conditions.showField([], $data.my_form, \'name\')',
+            'Statamic.$conditions.showField('.$this->jsonEncode(['if' => ['email' => 'not empty']]).', $data.my_form, \'message\')',
+            'Statamic.$conditions.showField('.$this->jsonEncode(['if' => ['name' => 'not empty']]).', $data.my_form, \'my_favourites\')', // TODO
+            'Statamic.$conditions.showField('.$this->jsonEncode(['if' => ['$root.likes_animals' => 'is true']]).', $data.my_form, \'my_favourites.favourite_animals\')',
+            'Statamic.$conditions.showField('.$this->jsonEncode(['if' => ['favourite_animals' => 'not empty']]).', $data.my_form, \'my_favourites.non_favourite_animals\')',
+            'Statamic.$conditions.showField([], $data.my_form, \'my_favourites.favourite_colour\')',
         ];
 
         $this->assertStringNotContainsString('Statamic.$conditions', $outputWithJsDisabled);
