@@ -621,6 +621,53 @@ EOT
     }
 
     #[Test]
+    public function it_dynamically_renders_group_field_without_x_model_but_x_models_deeply_nested_fields_within()
+    {
+        $config = [
+            'handle' => 'group_one',
+            'field' => [
+                'type' => 'group',
+                'fields' => [
+                    [
+                        'handle' => 'nested_field',
+                        'field' => ['type' => 'text'],
+                    ],
+                    [
+                        'handle' => 'group_two',
+                        'field' => [
+                            'type' => 'group',
+                            'fields' => [
+                                [
+                                    'handle' => 'deeply_nested_field',
+                                    'field' => ['type' => 'text'],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->assertFieldRendersHtml(collect([
+            '<div>',
+            '<input id="[[form-handle]]-form-group_one-nested_field-field" type="text" name="group_one[nested_field]" value="" x-model="group_one.nested_field">',
+            '<div>',
+            '<input id="[[form-handle]]-form-group_one-group_two-deeply_nested_field-field" type="text" name="group_one[group_two][deeply_nested_field]" value="" x-model="group_one.group_two.deeply_nested_field">',
+            '</div>',
+            '</div>',
+        ])->implode(''), $config, [], ['js' => 'alpine']);
+
+        $this->assertFieldRendersHtml(collect([
+            '<div>',
+            '<input id="[[form-handle]]-form-group_one-nested_field-field" type="text" name="group_one[nested_field]" value="" x-model="group_one.nested_field">',
+            '<div>',
+            '<input id="[[form-handle]]-form-group_one-group_two-deeply_nested_field-field" type="text" name="group_one[group_two][deeply_nested_field]" value="" x-model="group_one.group_two.deeply_nested_field">',
+            '</div>',
+            '</div>',
+        ])->implode(''), $config, [], ['js' => 'alpine']);
+    }
+
+    #[Test]
     public function it_dynamically_renders_field_with_fallback_to_default_partial_x_model()
     {
         $config = [
