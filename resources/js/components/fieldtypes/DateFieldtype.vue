@@ -182,19 +182,23 @@ export default {
             if (this.isRange) {
                 if (!this.localValue?.start) return;
 
+                let start = new Date(this.localValue.start.date + 'T00:00:00Z');
+                let end = new Date(this.localValue.end.date + 'T00:00:00Z');
+
                 return (
-                    this.$moment(this.localValue.start.date).format(this.displayFormat) +
+                    start.toLocaleDateString(navigator.language, { year: 'numeric', month: 'numeric', day: 'numeric' }) +
                     ' – ' +
-                    this.$moment(this.localValue.end.date).format(this.displayFormat)
+                    end.toLocaleDateString(navigator.language, { year: 'numeric', month: 'numeric', day: 'numeric' })
                 );
             }
 
             if (!this.localValue?.date) return;
 
-            let preview = this.$moment(this.localValue.date).format(this.displayFormat);
+            let date = new Date(this.localValue.date + 'T' + (this.localValue.time || '00:00:00') + 'Z');
+            let preview = date.toLocaleDateString(navigator.language, { year: 'numeric', month: 'numeric', day: 'numeric' });
 
             if (this.hasTime && this.localValue.time) {
-                preview += ` ${this.localValue.time}`;
+                preview += ' ' + date.toLocaleTimeString(navigator.language, { hour: 'numeric', minute: 'numeric'});
             }
 
             return preview;
