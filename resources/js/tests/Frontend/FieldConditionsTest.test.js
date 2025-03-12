@@ -52,11 +52,17 @@ test('it can show deeply field nested in group based on sibling field value', ()
 test('it can show deeply field nested in group based on parent field value', () => {
     expect(showField({ if: { '$parent.village': 'Hobbiton' } }, 'group_field.nested_group_field.birthday')).toBe(true);
     expect(showField({ if: { '$parent.village': 'Mordor' } }, 'group_field.nested_group_field.birthday')).toBe(false);
-    expect(showField({ if: { '$parent.$parent.first_name': 'not empty' } }, 'group_field.nested_group_field.birthday')).toBe(true);
-    expect(showField({ if: { '$parent.$parent.hobby': 'not empty' } }, 'group_field.nested_group_field.birthday')).toBe(false);
+    expect(
+        showField({ if: { '$parent.$parent.first_name': 'not empty' } }, 'group_field.nested_group_field.birthday'),
+    ).toBe(true);
+    expect(showField({ if: { '$parent.$parent.hobby': 'not empty' } }, 'group_field.nested_group_field.birthday')).toBe(
+        false,
+    );
 });
 
 test('it can show deeply field nested in group based on root field value', () => {
-    expect(showField({ if: { '$root.first_name': 'not empty' } }, 'group_field.nested_group_field.birthday')).toBe(true);
+    expect(showField({ if: { '$root.first_name': 'not empty' } }, 'group_field.nested_group_field.birthday')).toBe(
+        true,
+    );
     expect(showField({ if: { '$root.hobby': 'not empty' } }, 'group_field.nested_group_field.birthday')).toBe(false);
 });

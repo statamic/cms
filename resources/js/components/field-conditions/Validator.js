@@ -27,7 +27,7 @@ export default class {
     }
 
     usingRootValues() {
-        if (! this.currentFieldPath) {
+        if (!this.currentFieldPath) {
             throw new Error('[currentFieldPath] constructor param required for `usingRootValues()`');
         }
 
