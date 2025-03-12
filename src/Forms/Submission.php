@@ -58,7 +58,9 @@ class Submission implements Augmentable, SubmissionContract
     {
         return $this->fluentlyGetOrSet('id')
             ->getter(function ($id) {
-                return $this->id = $id ?: str_replace(',', '.', microtime(true));
+                $micro = Carbon::now()->timestamp + Carbon::now()->micro / 1000000;
+
+                return $this->id = $id ?: str_replace(',', '.', $micro);
             })
             ->args(func_get_args());
     }
@@ -101,7 +103,7 @@ class Submission implements Augmentable, SubmissionContract
      */
     public function date()
     {
-        return Carbon::createFromTimestamp($this->id(), config('app.timezone'));
+        return Carbon::createFromTimestamp($this->id());
     }
 
     /**
@@ -111,7 +113,7 @@ class Submission implements Augmentable, SubmissionContract
      */
     public function formattedDate()
     {
-        return $this->date()->format(
+        return $this->date()->tz(config('app.timezone'))->format(
             $this->form()->dateFormat()
         );
     }

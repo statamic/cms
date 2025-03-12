@@ -1,5 +1,20 @@
 # Release Notes
 
+## 5.50.0 (2025-03-10)
+
+### What's new
+- Support `as` on nav tag [#11522](https://github.com/statamic/cms/issues/11522) by @ryanmitchell
+
+### What's fixed
+- Icon fieldtype performance [#11523](https://github.com/statamic/cms/issues/11523) by @jasonvarga
+- Fix password protection on 404 pages [#11544](https://github.com/statamic/cms/issues/11544) by @duncanmcclean
+- Return validation error when AllowedFile is not an UploadedFile [#11535](https://github.com/statamic/cms/issues/11535) by @ryanmitchell
+- Italian translations [#11538](https://github.com/statamic/cms/issues/11538) by @ivanandre
+- French translations [#11519](https://github.com/statamic/cms/issues/11519) by @ebeauchamps
+- Use ubuntu-latest in GitHub Actions workflow [#11526](https://github.com/statamic/cms/issues/11526) by @jasonvarga
+
+
+
 ## 5.49.1 (2025-02-27)
 
 ### What's fixed

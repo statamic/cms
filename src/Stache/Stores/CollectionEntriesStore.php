@@ -2,6 +2,7 @@
 
 namespace Statamic\Stache\Stores;
 
+use Carbon\Carbon;
 use Statamic\Entries\GetDateFromPath;
 use Statamic\Entries\GetSlugFromPath;
 use Statamic\Entries\GetSuffixFromPath;
@@ -96,7 +97,7 @@ class CollectionEntriesStore extends ChildStore
         // }
 
         if ($collection->dated()) {
-            $entry->date((new GetDateFromPath)($path));
+            $entry->date($this->getDateFromPath($path));
         }
 
         // Blink the entry so that it can be used when building the URI. If it's not
@@ -289,5 +290,26 @@ class CollectionEntriesStore extends ChildStore
         $entries = $this->withoutBlinkingEntryUris(fn () => collect($ids)->map(fn ($id) => Entry::find($id))->filter());
 
         $entries->each(fn ($entry) => $this->cacheItem($entry));
+    }
+
+    private function getDateFromPath($path)
+    {
+        if (! $date = (new GetDateFromPath)($path)) {
+            return null;
+        }
+
+        $format = match (strlen($date)) {
+            10 => 'Y-m-d',
+            15 => 'Y-m-d-Hi',
+            17 => 'Y-m-d-His',
+        };
+
+        $carbon = Carbon::createFromFormat($format, $date, config('app.timezone'));
+
+        if (strlen($date) === 10) {
+            $carbon->startOfDay();
+        }
+
+        return $carbon->utc();
     }
 }
