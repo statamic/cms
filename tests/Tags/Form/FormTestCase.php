@@ -112,7 +112,7 @@ abstract class FormTestCase extends TestCase
         $extraParams = $extraParams ? Html::attributes($extraParams) : '';
 
         $output = $this->normalizeHtml(
-            $this->tag("{{ form:{$handle} {$extraParams}}}{{ fields }}{{ field}}{{ /fields }}{{ /form:{$handle} }}", $oldData)
+            $this->tag("{{ form:{$handle} {$extraParams}}}{{ form:fields }}{{ field }}{{ /form:fields }}{{ /form:{$handle} }}", $oldData)
         );
 
         $expected = collect(Arr::wrap($expectedHtmlParts))
