@@ -504,13 +504,13 @@ EOT
             ],
         ];
 
-        $this->assertFieldRendersHtml(['<input id="[[form-handle]]-form-fav_animals-field-cat-option" type="checkbox" name="fav_animals[]" value="cat" x-model="fav_animals">'], $config, [], ['js' => 'alpine']);
-        $this->assertFieldRendersHtml(['<input id="[[form-handle]]-form-fav_animals-field-rat-option" type="checkbox" name="fav_animals[]" value="rat" x-model="fav_animals">'], $config, [], ['js' => 'alpine']);
-        $this->assertFieldRendersHtml(['<input id="[[form-handle]]-form-fav_animals-field-armadillo-option" type="checkbox" name="fav_animals[]" value="armadillo" x-model="fav_animals">'], $config, [], ['js' => 'alpine']);
+        $this->assertFieldRendersHtml(['<input id="[[form-handle]]-form-fav-animals-field-cat-option" type="checkbox" name="fav_animals[]" value="cat" x-model="fav_animals">'], $config, [], ['js' => 'alpine']);
+        $this->assertFieldRendersHtml(['<input id="[[form-handle]]-form-fav-animals-field-rat-option" type="checkbox" name="fav_animals[]" value="rat" x-model="fav_animals">'], $config, [], ['js' => 'alpine']);
+        $this->assertFieldRendersHtml(['<input id="[[form-handle]]-form-fav-animals-field-armadillo-option" type="checkbox" name="fav_animals[]" value="armadillo" x-model="fav_animals">'], $config, [], ['js' => 'alpine']);
 
-        $this->assertFieldRendersHtml(['<input id="[[form-handle]]-form-fav_animals-field-cat-option" type="checkbox" name="fav_animals[]" value="cat" x-model="my_form.fav_animals">'], $config, [], ['js' => 'alpine:my_form']);
-        $this->assertFieldRendersHtml(['<input id="[[form-handle]]-form-fav_animals-field-rat-option" type="checkbox" name="fav_animals[]" value="rat" x-model="my_form.fav_animals">'], $config, [], ['js' => 'alpine:my_form']);
-        $this->assertFieldRendersHtml(['<input id="[[form-handle]]-form-fav_animals-field-armadillo-option" type="checkbox" name="fav_animals[]" value="armadillo" x-model="my_form.fav_animals">'], $config, [], ['js' => 'alpine:my_form']);
+        $this->assertFieldRendersHtml(['<input id="[[form-handle]]-form-fav-animals-field-cat-option" type="checkbox" name="fav_animals[]" value="cat" x-model="my_form.fav_animals">'], $config, [], ['js' => 'alpine:my_form']);
+        $this->assertFieldRendersHtml(['<input id="[[form-handle]]-form-fav-animals-field-rat-option" type="checkbox" name="fav_animals[]" value="rat" x-model="my_form.fav_animals">'], $config, [], ['js' => 'alpine:my_form']);
+        $this->assertFieldRendersHtml(['<input id="[[form-handle]]-form-fav-animals-field-armadillo-option" type="checkbox" name="fav_animals[]" value="armadillo" x-model="my_form.fav_animals">'], $config, [], ['js' => 'alpine:my_form']);
     }
 
     #[Test]
@@ -528,13 +528,13 @@ EOT
             ],
         ];
 
-        $this->assertFieldRendersHtml(['<input id="[[form-handle]]-form-fav_animal-field-cat-option" type="radio" name="fav_animal" value="cat" x-model="fav_animal">'], $config, [], ['js' => 'alpine']);
-        $this->assertFieldRendersHtml(['<input id="[[form-handle]]-form-fav_animal-field-rat-option" type="radio" name="fav_animal" value="rat" x-model="fav_animal">'], $config, [], ['js' => 'alpine']);
-        $this->assertFieldRendersHtml(['<input id="[[form-handle]]-form-fav_animal-field-armadillo-option" type="radio" name="fav_animal" value="armadillo" x-model="fav_animal">'], $config, [], ['js' => 'alpine']);
+        $this->assertFieldRendersHtml(['<input id="[[form-handle]]-form-fav-animal-field-cat-option" type="radio" name="fav_animal" value="cat" x-model="fav_animal">'], $config, [], ['js' => 'alpine']);
+        $this->assertFieldRendersHtml(['<input id="[[form-handle]]-form-fav-animal-field-rat-option" type="radio" name="fav_animal" value="rat" x-model="fav_animal">'], $config, [], ['js' => 'alpine']);
+        $this->assertFieldRendersHtml(['<input id="[[form-handle]]-form-fav-animal-field-armadillo-option" type="radio" name="fav_animal" value="armadillo" x-model="fav_animal">'], $config, [], ['js' => 'alpine']);
 
-        $this->assertFieldRendersHtml(['<input id="[[form-handle]]-form-fav_animal-field-cat-option" type="radio" name="fav_animal" value="cat" x-model="my_form.fav_animal">'], $config, [], ['js' => 'alpine:my_form']);
-        $this->assertFieldRendersHtml(['<input id="[[form-handle]]-form-fav_animal-field-rat-option" type="radio" name="fav_animal" value="rat" x-model="my_form.fav_animal">'], $config, [], ['js' => 'alpine:my_form']);
-        $this->assertFieldRendersHtml(['<input id="[[form-handle]]-form-fav_animal-field-armadillo-option" type="radio" name="fav_animal" value="armadillo" x-model="my_form.fav_animal">'], $config, [], ['js' => 'alpine:my_form']);
+        $this->assertFieldRendersHtml(['<input id="[[form-handle]]-form-fav-animal-field-cat-option" type="radio" name="fav_animal" value="cat" x-model="my_form.fav_animal">'], $config, [], ['js' => 'alpine:my_form']);
+        $this->assertFieldRendersHtml(['<input id="[[form-handle]]-form-fav-animal-field-rat-option" type="radio" name="fav_animal" value="rat" x-model="my_form.fav_animal">'], $config, [], ['js' => 'alpine:my_form']);
+        $this->assertFieldRendersHtml(['<input id="[[form-handle]]-form-fav-animal-field-armadillo-option" type="radio" name="fav_animal" value="armadillo" x-model="my_form.fav_animal">'], $config, [], ['js' => 'alpine:my_form']);
     }
 
     #[Test]
@@ -553,7 +553,7 @@ EOT
         ];
 
         $expected = [
-            '<select id="[[form-handle]]-form-favourite_animal-field" name="favourite_animal" x-model="favourite_animal">',
+            '<select id="[[form-handle]]-form-favourite-animal-field" name="favourite_animal" x-model="favourite_animal">',
             '<option value>Please select...</option>',
             '<option value="cat">Cat</option>',
             '<option value="armadillo">Armadillo</option>',
@@ -564,7 +564,7 @@ EOT
         $this->assertFieldRendersHtml($expected, $config, [], ['js' => 'alpine']);
 
         $expectedScoped = [
-            '<select id="[[form-handle]]-form-favourite_animal-field" name="favourite_animal" x-model="my_form.favourite_animal">',
+            '<select id="[[form-handle]]-form-favourite-animal-field" name="favourite_animal" x-model="my_form.favourite_animal">',
             '<option value>Please select...</option>',
             '<option value="cat">Cat</option>',
             '<option value="armadillo">Armadillo</option>',
@@ -587,8 +587,8 @@ EOT
             ],
         ];
 
-        $this->assertFieldRendersHtml('<input id="[[form-handle]]-form-cat_selfie-field" type="file" name="cat_selfie" x-model="cat_selfie">', $config, [], ['js' => 'alpine']);
-        $this->assertFieldRendersHtml('<input id="[[form-handle]]-form-cat_selfie-field" type="file" name="cat_selfie" x-model="my_form.cat_selfie">', $config, [], ['js' => 'alpine:my_form']);
+        $this->assertFieldRendersHtml('<input id="[[form-handle]]-form-cat-selfie-field" type="file" name="cat_selfie" x-model="cat_selfie">', $config, [], ['js' => 'alpine']);
+        $this->assertFieldRendersHtml('<input id="[[form-handle]]-form-cat-selfie-field" type="file" name="cat_selfie" x-model="my_form.cat_selfie">', $config, [], ['js' => 'alpine:my_form']);
     }
 
     #[Test]
@@ -605,23 +605,27 @@ EOT
             ],
         ];
 
-        $this->assertFieldRendersHtml(collect([
+        $expected = [
             '<div>',
             '<input id="[[form-handle]]-form-address-street-field" type="text" name="address[street]" value="" x-model="address.street">',
             '<input id="[[form-handle]]-form-address-country-field" type="text" name="address[country]" value="" x-model="address.country">',
             '</div>',
-        ])->implode(''), $config, [], ['js' => 'alpine']);
+        ];
 
-        $this->assertFieldRendersHtml(collect([
+        $this->assertFieldRendersHtml($expected, $config, [], ['js' => 'alpine']);
+
+        $expectedScoped = [
             '<div>',
             '<input id="[[form-handle]]-form-address-street-field" type="text" name="address[street]" value="" x-model="my_form.address.street">',
             '<input id="[[form-handle]]-form-address-country-field" type="text" name="address[country]" value="" x-model="my_form.address.country">',
             '</div>',
-        ])->implode(''), $config, [], ['js' => 'alpine:my_form']);
+        ];
+
+        $this->assertFieldRendersHtml($expectedScoped, $config, [], ['js' => 'alpine:my_form']);
     }
 
     #[Test]
-    public function it_dynamically_renders_group_field_without_x_model_but_x_models_deeply_nested_fields_within()
+    public function it_recursively_renders_group_field_without_x_model_but_x_models_deeply_nested_fields_within()
     {
         $config = [
             'handle' => 'group_one',
@@ -648,23 +652,27 @@ EOT
             ],
         ];
 
-        $this->assertFieldRendersHtml(collect([
+        $expected = [
             '<div>',
-            '<input id="[[form-handle]]-form-group_one-nested_field-field" type="text" name="group_one[nested_field]" value="" x-model="group_one.nested_field">',
+            '<input id="[[form-handle]]-form-group-one-nested-field-field" type="text" name="group_one[nested_field]" value="" x-model="group_one.nested_field">',
             '<div>',
-            '<input id="[[form-handle]]-form-group_one-group_two-deeply_nested_field-field" type="text" name="group_one[group_two][deeply_nested_field]" value="" x-model="group_one.group_two.deeply_nested_field">',
+            '<input id="[[form-handle]]-form-group-one-group-two-deeply-nested-field-field" type="text" name="group_one[group_two][deeply_nested_field]" value="" x-model="group_one.group_two.deeply_nested_field">',
             '</div>',
             '</div>',
-        ])->implode(''), $config, [], ['js' => 'alpine']);
+        ];
 
-        $this->assertFieldRendersHtml(collect([
+        $this->assertFieldRendersHtml($expected, $config, [], ['js' => 'alpine']);
+
+        $expectedScoped = [
             '<div>',
-            '<input id="[[form-handle]]-form-group_one-nested_field-field" type="text" name="group_one[nested_field]" value="" x-model="group_one.nested_field">',
+            '<input id="[[form-handle]]-form-group-one-nested-field-field" type="text" name="group_one[nested_field]" value="" x-model="my_form.group_one.nested_field">',
             '<div>',
-            '<input id="[[form-handle]]-form-group_one-group_two-deeply_nested_field-field" type="text" name="group_one[group_two][deeply_nested_field]" value="" x-model="group_one.group_two.deeply_nested_field">',
+            '<input id="[[form-handle]]-form-group-one-group-two-deeply-nested-field-field" type="text" name="group_one[group_two][deeply_nested_field]" value="" x-model="my_form.group_one.group_two.deeply_nested_field">',
             '</div>',
             '</div>',
-        ])->implode(''), $config, [], ['js' => 'alpine']);
+        ];
+
+        $this->assertFieldRendersHtml($expectedScoped, $config, [], ['js' => 'alpine:my_form']);
     }
 
     #[Test]
