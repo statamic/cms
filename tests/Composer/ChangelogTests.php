@@ -44,7 +44,7 @@ trait ChangelogTests
         $this->assertFalse($contents[4]->latest);
 
         collect($contents)->each(function ($release) {
-            $this->assertEquals('2018-11-06', $release->date);
+            $this->assertEquals('2018-11-06T00:00:00+00:00', $release->date);
             $this->assertIsString($release->body);
         });
     }
