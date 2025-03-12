@@ -62,14 +62,14 @@ class SubmissionTest extends TestCase
         $submission = Form::make('test')->makeSubmission();
 
         $this->assertEquals('2025-03-12T02:13:25+00:00', $submission->date()->toIso8601String());
-        $this->assertEquals($expectedFormatted, $submission->formattedDate());
+        $this->assertEquals($expectedFormatted, $submission->date()->setTimezone(config('app.timezone'))->format('Y-m-d H:i'));
     }
 
     public static function utcProvider()
     {
         return [
-            'utc' => ['UTC', 'March 12th, 2025 02:13'],
-            'not utc' => ['America/New_York', 'March 11th, 2025 22:13'],
+            'utc' => ['UTC', '2025-03-12 02:13'],
+            'not utc' => ['America/New_York', '2025-03-11 22:13'],
         ];
     }
 
