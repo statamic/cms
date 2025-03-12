@@ -177,7 +177,7 @@ trait RendersForms
      */
     private function generateFieldId(string $fieldHandle, ?string $formName = null): string
     {
-        return ($formName ?? 'default').'-form-'.$fieldHandle.'-field';
+        return ($formName ?? 'default').'-form-'.str_replace('.', '-', $fieldHandle).'-field';
     }
 
     /**
