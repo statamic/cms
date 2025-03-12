@@ -33,10 +33,9 @@ test('date is localized to the users timezone', async () => {
         date: '2025-01-01',
         time: '05:00',
         mode: 'single',
-        display_format: 'YYYY-MM-DD',
     });
 
-    expect(dateIndexField.vm.formatted).toBe('2025-01-01');
+    expect(dateIndexField.vm.formatted).toBe('January 1, 2025');
 });
 
 test('date and time is localized to the users timezone', async () => {
@@ -44,10 +43,10 @@ test('date and time is localized to the users timezone', async () => {
         date: '2025-01-01',
         time: '15:00',
         mode: 'single',
-        display_format: 'YYYY-MM-DD HH:mm',
+        time_enabled: true,
     });
 
-    expect(dateIndexField.vm.formatted).toBe('2025-01-01 10:00');
+    expect(dateIndexField.vm.formatted).toBe('January 1, 2025 10:00 AM');
 });
 
 test('date range is localized to the users timezone', async () => {
@@ -55,8 +54,7 @@ test('date range is localized to the users timezone', async () => {
         start: { date: '2025-01-01', time: '05:00' },
         end: { date: '2025-01-11', time: '04:59' },
         mode: 'range',
-        display_format: 'YYYY-MM-DD',
     });
 
-    expect(dateIndexField.vm.formatted).toBe('2025-01-01 – 2025-01-10');
+    expect(dateIndexField.vm.formatted).toBe('1/1/2025 – 1/10/2025');
 });
