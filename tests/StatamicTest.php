@@ -21,7 +21,6 @@ class StatamicTest extends TestCase
     {
         parent::resolveApplicationConfiguration($app);
 
-        $app['config']->set('statamic.cp.date_format', 'cp-date-format');
         $app['config']->set('statamic.system.date_format', 'system-date-format');
 
         Route::get('date-format', function () {
