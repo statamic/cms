@@ -157,7 +157,7 @@ export default {
                 rows: this.screens({ default: 1, lg: this.config.rows }).value,
                 expanded: this.name === 'date' || this.config.full_width,
                 isRequired: this.config.required,
-                locale: this.$config.get('locale').replace('_', '-'),
+                locale: navigator.language,
                 masks: { input: [this.displayFormat], modelValue: this.format },
                 minDate: this.config.earliest_date.date,
                 maxDate: this.config.latest_date.date,
