@@ -15,8 +15,8 @@ export default {
             }
 
             if (this.value.mode === 'range') {
-                let start = new Date(this.value.start.date + 'T00:00:00Z');
-                let end = new Date(this.value.end.date + 'T00:00:00Z');
+                let start = new Date(this.value.start.date + 'T' + (this.value.start.time || '00:00:00') + 'Z');
+                let end = new Date(this.value.end.date + 'T' + (this.value.end.time || '00:00:00') + 'Z');
 
                 return (
                     start.toLocaleDateString(navigator.language, { year: 'numeric', month: 'numeric', day: 'numeric' }) +
