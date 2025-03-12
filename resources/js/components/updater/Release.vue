@@ -50,7 +50,7 @@ export default {
 
     computed: {
         date() {
-            return new Date(this.release.date + 'T00:00:00Z').toLocaleDateString(navigator.language, {
+            return new Date(this.release.date).toLocaleDateString(navigator.language, {
                 year: 'numeric',
                 month: 'numeric',
                 day: 'numeric',

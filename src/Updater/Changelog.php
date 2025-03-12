@@ -38,7 +38,7 @@ abstract class Changelog
                 'type' => $type,
                 'latest' => $index === 0,
                 'licensed' => $this->isLicensed($release['version']),
-                'date' => Carbon::parse($release['date'])->format('Y-m-d'),
+                'date' => Carbon::parse($release['date'])->toIso8601String(),
                 'body' => $release['changelog'],
             ];
         });
