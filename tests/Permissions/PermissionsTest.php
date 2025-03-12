@@ -306,6 +306,34 @@ class PermissionsTest extends TestCase
     }
 
     #[Test]
+    public function it_gets_all_permissions_with_placeholders_resolved_in_a_flat_array()
+    {
+        $this->setupComplicatedTest($permissions = new Permissions);
+
+        $resolved = $permissions->flattened();
+
+        $this->assertEquals(collect([
+            'one',
+            'child-one',
+            'child-two',
+
+            'two',
+            'child-three',
+            'nested-child',
+
+            'three',
+
+            'four first',
+            'replaced child first',
+            'replaced nested child first',
+
+            'four second',
+            'replaced child second',
+            'replaced nested child second',
+        ])->all(), $resolved->map->value()->all());
+    }
+
+    #[Test]
     public function existing_permissions_can_be_modified()
     {
         $permissions = new Permissions;

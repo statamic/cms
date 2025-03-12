@@ -131,4 +131,9 @@ class Permissions
 
         $this->pendingGroup = null;
     }
+
+    public function flattened()
+    {
+        return collect($this->permissions)->flatMap->flattened();
+    }
 }

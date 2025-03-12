@@ -89,7 +89,7 @@ class AuthServiceProvider extends ServiceProvider
 
             $user = User::fromUser($user);
 
-            if (Permission::all()->map->value()->has($ability) && $user->isSuper()) {
+            if (Permission::flattened()->map->value()->contains($ability) && $user->isSuper()) {
                 return true;
             }
 
