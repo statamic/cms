@@ -600,23 +600,22 @@ EOT
                 'type' => 'group',
                 'fields' => [
                     ['handle' => 'street', 'field' => ['type' => 'text']],
+                    ['handle' => 'country', 'field' => ['type' => 'text']],
                 ],
             ],
         ];
 
         $this->assertFieldRendersHtml(collect([
             '<div>',
-            '<div class="pb-2">',
             '<input id="[[form-handle]]-form-address-street-field" type="text" name="address[street]" value="" x-model="address.street">',
-            '</div>',
+            '<input id="[[form-handle]]-form-address-country-field" type="text" name="address[country]" value="" x-model="address.country">',
             '</div>',
         ])->implode(''), $config, [], ['js' => 'alpine']);
 
         $this->assertFieldRendersHtml(collect([
             '<div>',
-            '<div class="pb-2">',
             '<input id="[[form-handle]]-form-address-street-field" type="text" name="address[street]" value="" x-model="my_form.address.street">',
-            '</div>',
+            '<input id="[[form-handle]]-form-address-country-field" type="text" name="address[country]" value="" x-model="my_form.address.country">',
             '</div>',
         ])->implode(''), $config, [], ['js' => 'alpine:my_form']);
     }
