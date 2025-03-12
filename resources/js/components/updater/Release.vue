@@ -49,19 +49,9 @@ export default {
     },
 
     computed: {
-        locale() {
-            let locale = this.$preferences.get('locale') || 'en';
-
-            if (locale.includes('_')) {
-                locale = locale.split('_')[0];
-            }
-
-            return locale;
-        },
-
         date() {
             return new Date(this.release.date + 'T00:00:00Z').toLocaleDateString(
-                this.locale,
+                navigator.language,
                 {
                     year: 'numeric',
                     month: 'numeric',
