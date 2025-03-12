@@ -12,7 +12,6 @@ use Statamic\GraphQL\Fields\DateField;
 use Statamic\GraphQL\Types\DateRangeType;
 use Statamic\Query\Scopes\Filters\Fields\Date as DateFilter;
 use Statamic\Rules\DateFieldtype as ValidationRule;
-use Statamic\Statamic;
 
 class Date extends Fieldtype
 {
@@ -261,11 +260,6 @@ class Date extends Fieldtype
     private function saveFormat()
     {
         return $this->config('format', $this->defaultFormat());
-    }
-
-    public function fieldDisplayFormat()
-    {
-        return Statamic::cpDateFormat();
     }
 
     private function defaultFormat()
