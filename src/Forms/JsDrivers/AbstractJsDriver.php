@@ -128,8 +128,6 @@ abstract class AbstractJsDriver implements JsDriver
      */
     protected function getInitialFormData(): array
     {
-        $oldValues = collect(old());
-
         return $this->form
             ->blueprint()
             ->fields()
