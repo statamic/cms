@@ -61,6 +61,7 @@ class SitesTest extends TestCase
         $this->actingAs(tap(User::make()->assignRole('test'))->save());
 
         \Statamic\Facades\Site::shouldReceive('multiEnabled')->andReturnTrue();
+        \Statamic\Facades\Site::shouldReceive('all')->andReturn(collect()); // CorePermissions calls this. It's irrelevant to this test.
 
         tap($this->sites->authorized(), function ($sites) {
             $this->assertInstanceOf(Collection::class, $sites);

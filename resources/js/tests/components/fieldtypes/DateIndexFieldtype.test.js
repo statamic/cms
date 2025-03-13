@@ -9,8 +9,6 @@ window.matchMedia = () => ({
     addEventListener: () => {},
 });
 
-process.env.TZ = 'America/New_York';
-
 const makeDateIndexField = (value = {}) => {
     return mount(DateIndexFieldtype, {
         props: {
@@ -21,33 +19,48 @@ const makeDateIndexField = (value = {}) => {
     });
 };
 
-test('date is localized to the users timezone', async () => {
+test.each([
+    ['UTC', '2025-12-25'],
+    ['America/New_York', '2025-12-24'],
+])('date is localized to the users timezone (%s)', async (tz, expected) => {
+    process.env.TZ = tz;
+
     const dateIndexField = makeDateIndexField({
-        date: '2025-01-01',
-        time: '05:00',
+        date: '2025-12-25',
+        time: '02:13',
         mode: 'single',
     });
 
-    expect(dateIndexField.vm.formatted).toBe('January 1, 2025');
+    expect(dateIndexField.vm.formatted).toBe(expected);
 });
 
-test('date and time is localized to the users timezone', async () => {
+test.each([
+    ['UTC', '2025-12-25 02:13'],
+    ['America/New_York', '2025-12-24 21:13'],
+])('date and time is localized to the users timezone (%s)', async (tz, expected) => {
+    process.env.TZ = tz;
+
     const dateIndexField = makeDateIndexField({
-        date: '2025-01-01',
-        time: '15:00',
+        date: '2025-12-25',
+        time: '02:13',
         mode: 'single',
         time_enabled: true,
     });
 
-    expect(dateIndexField.vm.formatted).toBe('January 1, 2025 10:00 AM');
+    expect(dateIndexField.vm.formatted).toBe(expected);
 });
 
-test('date range is localized to the users timezone', async () => {
+test.each([
+    ['UTC', '2025-12-25 – 2025-12-28'],
+    ['America/New_York', '2025-12-24 – 2025-12-27'],
+])('date range is localized to the users timezone (%s)', async (tz, expected) => {
+    process.env.TZ = tz;
+
     const dateIndexField = makeDateIndexField({
-        start: { date: '2025-01-01', time: '05:00' },
-        end: { date: '2025-01-11', time: '04:59' },
+        start: { date: '2025-12-25', time: '02:13' },
+        end: { date: '2025-12-28', time: '03:59' },
         mode: 'range',
     });
 
-    expect(dateIndexField.vm.formatted).toBe('1/1/2025 – 1/10/2025');
+    expect(dateIndexField.vm.formatted).toBe(expected);
 });
