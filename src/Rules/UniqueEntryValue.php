@@ -39,12 +39,12 @@ class UniqueEntryValue implements ValidationRule
                 ->first();
         } else {
             $existing = $query
-            ->when(
-                is_array($value),
-                fn ($query) => $query->whereIn($attribute, $value),
-                fn ($query) => $query->where($attribute, $value)
-            )
-            ->first();
+                ->when(
+                    is_array($value),
+                    fn ($query) => $query->whereIn($attribute, $value),
+                    fn ($query) => $query->where($attribute, $value)
+                )
+                ->first();
         }
 
         if (! $existing) {
