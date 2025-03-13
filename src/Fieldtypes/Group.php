@@ -153,4 +153,9 @@ class Group extends Fieldtype
             return Str::studly($part);
         })->join('_');
     }
+
+    public function hasJsDriverDataBinding(): bool
+    {
+        return false;
+    }
 }

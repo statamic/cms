@@ -59,13 +59,13 @@ class Alpine extends AbstractJsDriver
      */
     public function addToRenderableFieldAttributes($field)
     {
-        if (in_array($field->type(), ['group'])) {
-            return [];
+        $attributes = [];
+
+        if ($field->fieldtype()->hasJsDriverDataBinding()) {
+            $attributes['x-model'] = $this->getAlpineXDataKey($field->handle(), $this->scope);
         }
 
-        return [
-            'x-model' => $this->getAlpineXDataKey($field->handle(), $this->scope),
-        ];
+        return $attributes;
     }
 
     /**

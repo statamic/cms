@@ -381,4 +381,9 @@ abstract class Fieldtype implements Arrayable
     {
         return [];
     }
+
+    public function hasJsDriverDataBinding(): bool
+    {
+        return true;
+    }
 }
