@@ -2,6 +2,7 @@
 
 namespace Tests\CP\Navigation;
 
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\CP\Navigation\NavItem;
@@ -71,16 +72,16 @@ class NavTest extends TestCase
     #[Test]
     public function it_can_create_a_nav_item_with_a_more_custom_config()
     {
-        $this->actingAs(tap(User::make()->makeSuper())->save());
+        Gate::policy(DroidsClass::class, DroidsPolicy::class);
 
-        Facades\Permission::register('view droids');
+        $this->actingAs(tap(User::make()->makeSuper())->save());
 
         Nav::droids('C-3PO')
             ->id('some::custom::id')
             ->active('threepio*')
             ->url('/human-cyborg-relations')
             ->view('cp.nav.importer')
-            ->can('view droids')
+            ->can('index', DroidsClass::class)
             ->attributes(['target' => '_blank', 'class' => 'red']);
 
         $item = $this->build()->get('Droids')->first();
@@ -91,7 +92,8 @@ class NavTest extends TestCase
         $this->assertEquals('http://localhost/human-cyborg-relations', $item->url());
         $this->assertEquals('cp.nav.importer', $item->view());
         $this->assertEquals('threepio*', $item->active());
-        $this->assertEquals('view droids', $item->authorization()->ability);
+        $this->assertEquals('index', $item->authorization()->ability);
+        $this->assertEquals(DroidsClass::class, $item->authorization()->arguments);
         $this->assertEquals(' target="_blank" class="red"', $item->attributes());
     }
 
@@ -721,5 +723,17 @@ class NavTest extends TestCase
     protected function build()
     {
         return Nav::build()->pluck('items', 'display');
+    }
+}
+
+class DroidsClass
+{
+}
+
+class DroidsPolicy
+{
+    public function index()
+    {
+        return true;
     }
 }
