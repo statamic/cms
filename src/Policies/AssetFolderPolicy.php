@@ -8,6 +8,13 @@ use Statamic\Facades\User;
 
 class AssetFolderPolicy
 {
+    public function before($user)
+    {
+        if (User::fromUser($user)->isSuper()) {
+            return true;
+        }
+    }
+
     public function create($user, $assetContainer)
     {
         $user = User::fromUser($user);
