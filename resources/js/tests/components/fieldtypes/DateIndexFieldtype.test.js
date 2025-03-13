@@ -18,13 +18,6 @@ const makeDateIndexField = (value = {}) => {
             value,
             values: {},
         },
-        global: {
-            mocks: {
-                $moment: (date) => {
-                    return Moment(date);
-                },
-            },
-        },
     });
 };
 
