@@ -325,6 +325,15 @@ class User extends BaseUser
         parent::sendPasswordResetNotification($token);
     }
 
+    public function sendActivateAccountNotification($token)
+    {
+        if (method_exists($this->model(), 'sendActivateAccountNotification')) {
+            return $this->model()->sendActivateAccountNotification($token);
+        }
+
+        parent::sendActivateAccountNotification($token);
+    }
+
     public function lastLogin()
     {
         if (! $date = $this->model()->last_login) {
