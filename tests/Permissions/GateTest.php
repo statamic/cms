@@ -38,7 +38,7 @@ class GateTest extends TestCase
         // that it's not just "core" permissions that will work, but
         // also any permission registered into Statamic.
         Permission::extend(function () {
-            Permission::register('foo');
+            Permission::register('statamic');
         });
 
         Collection::make('blog')->save();
@@ -46,13 +46,13 @@ class GateTest extends TestCase
         // Add a role that has the permission since permissions
         // cannot be applied directly to users.
         Role::make('test')
-            ->addPermission('foo')
+            ->addPermission('statamic')
             ->addPermission('edit blog entries')
             ->save();
 
         // Add a gate, which is how someone would define
         // something completely separate from Statamic.
-        Gate::define('bar', fn ($user) => $user->email === 'bar@domain.com' ? true : null);
+        Gate::define('gate', fn ($user) => $user->email === 'allowed@domain.com' ? true : null);
 
         $this->actingAs($userCallback()->save());
 
@@ -68,17 +68,17 @@ class GateTest extends TestCase
         return [
             'statamic permission, super user' => [
                 fn () => User::make()->makeSuper(),
-                'foo',
+                'statamic',
                 true,
             ],
             'statamic permission, user with permission' => [
                 fn () => User::make()->assignRole('test'),
-                'foo',
+                'statamic',
                 true,
             ],
             'statamic permission, user without permission' => [
                 fn () => User::make(),
-                'foo',
+                'statamic',
                 false,
             ],
             'statamic policy permission, super user' => [
@@ -98,17 +98,17 @@ class GateTest extends TestCase
             ],
             'non-statamic permission, super user' => [
                 fn () => User::make()->makeSuper(),
-                'bar',
+                'gate',
                 false,
             ],
             'non-statamic permission, user with permission' => [
-                fn () => User::make()->email('bar@domain.com'),
-                'bar',
+                fn () => User::make()->email('allowed@domain.com'),
+                'gate',
                 true,
             ],
             'non-statamic permission, user without permission' => [
-                fn () => User::make()->email('baz@domain.com'),
-                'bar',
+                fn () => User::make()->email('denied@domain.com'),
+                'gate',
                 false,
             ],
         ];
