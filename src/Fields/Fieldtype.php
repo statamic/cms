@@ -151,6 +151,11 @@ abstract class Fieldtype implements Arrayable
         return $value;
     }
 
+    public function preProcessTagRenderable($data, $recursiveCallback)
+    {
+        return $data;
+    }
+
     public function defaultValue()
     {
         return $this->defaultValue;

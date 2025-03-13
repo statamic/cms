@@ -155,13 +155,13 @@ trait RendersForms
             'value' => $value,
         ], $field->fieldtype()->extraRenderableFieldData());
 
-        if ($field->fieldtype()->handle() === 'group') {
-            $data['fields'] = collect($field->fieldtype()->fields()->all())
-                ->map(fn ($child) => $child->setForm($field->form())->setHandle($field->handle().'.'.$child->handle()))
-                ->map(fn ($child) => $this->getRenderableField($child, $errorBag, $manipulateDataCallback))
-                ->values()
-                ->all();
-        }
+        $data = $field
+            ->fieldtype()
+            ->preProcessTagRenderable($data, fn ($child) => $this->getRenderableField(
+                $child,
+                $errorBag,
+                $manipulateDataCallback,
+            ));
 
         if ($manipulateDataCallback instanceof Closure) {
             $data = $manipulateDataCallback($data, $field);
