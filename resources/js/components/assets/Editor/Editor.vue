@@ -541,12 +541,8 @@ export default {
         },
 
         formatDate(value) {
-            let date = new Date(value);
-
-            return (
-                date.toLocaleDateString(navigator.language, { year: 'numeric', month: 'numeric', day: 'numeric' }) +
-                ' ' +
-                date.toLocaleTimeString(navigator.language, { hour: 'numeric', minute: 'numeric' })
+            return Intl.DateTimeFormat(navigator.language, { dateStyle: 'short', timeStyle: 'short' }).format(
+                new Date(value),
             );
         },
     },

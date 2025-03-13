@@ -15,12 +15,8 @@ export default {
 
     computed: {
         title() {
-            let date = new Date(this.date);
-
-            return (
-                date.toLocaleDateString(navigator.language, { year: 'numeric', month: 'numeric', day: 'numeric' }) +
-                ' ' +
-                date.toLocaleTimeString(navigator.language, { hour: 'numeric', minute: 'numeric' })
+            return Intl.DateTimeFormat(navigator.language, { dateStyle: 'short', timeStyle: 'short' }).format(
+                new Date(this.date),
             );
         },
     },
