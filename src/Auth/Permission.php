@@ -105,6 +105,50 @@ class Permission
         })->values();
     }
 
+    public function flattened()
+    {
+        if (! $this->callback) {
+            return [
+                $this,
+                ...$this->children()->map(function ($child) {
+                    return (new self)
+                        ->value($child->value())
+                        ->label($child->label())
+                        ->placeholder($this->placeholder)
+                        ->placeholderLabel($this->placeholderLabel)
+                        ->placeholderValue($this->placeholderValue)
+                        ->children($child->children()->all())
+                        ->group($this->group());
+                })->flatMap->flattened()->all(),
+            ];
+        }
+
+        $items = call_user_func($this->callback);
+
+        return collect($items)->flatMap(function ($replacement) {
+            $replaced = (new self)
+                ->value($this->value)
+                ->label($this->label)
+                ->placeholder($this->placeholder)
+                ->placeholderLabel($replacement['label'])
+                ->placeholderValue($replacement['value'])
+                ->group($this->group());
+
+            $children = $this->children()->map(function ($child) use ($replacement) {
+                return (new self)
+                    ->value($child->originalValue())
+                    ->label($child->originalLabel())
+                    ->placeholder($this->placeholder)
+                    ->placeholderLabel($replacement['label'])
+                    ->placeholderValue($replacement['value'])
+                    ->children($child->children()->all())
+                    ->group($this->group());
+            });
+
+            return [$replaced, ...$children->flatMap->flattened()->all()];
+        })->values();
+    }
+
     public function children(?array $children = null)
     {
         return $this
