@@ -218,15 +218,12 @@ class ActiveNavItemTest extends TestCase
     #[Test]
     public function it_can_check_if_parent_extension_with_array_based_children_item_is_active()
     {
-        Facades\Permission::register('view seo reports');
-        Facades\Permission::register('edit seo section defaults');
-
         Facades\CP\Nav::extend(function ($nav) {
             $nav->tools('SEO Pro')
                 ->url('/cp/seo-pro')
                 ->children([
-                    $nav->item('Reports')->url('/cp/seo-pro/reports')->can('view seo reports'),
-                    $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults')->can('edit seo section defaults'),
+                    $nav->item('Reports')->url('/cp/seo-pro/reports'),
+                    $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults'),
                 ]);
         });
 
@@ -246,15 +243,12 @@ class ActiveNavItemTest extends TestCase
     #[Test]
     public function it_can_check_when_parent_and_array_based_child_extension_items_are_active()
     {
-        Facades\Permission::register('view seo reports');
-        Facades\Permission::register('edit seo section defaults');
-
         Facades\CP\Nav::extend(function ($nav) {
             $nav->tools('SEO Pro')
                 ->url('/cp/seo-pro')
                 ->children([
-                    $nav->item('Reports')->url('/cp/seo-pro/reports')->can('view seo reports'),
-                    $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults')->can('edit seo section defaults'),
+                    $nav->item('Reports')->url('/cp/seo-pro/reports'),
+                    $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults'),
                 ]);
         });
 
@@ -274,15 +268,12 @@ class ActiveNavItemTest extends TestCase
     #[Test]
     public function it_can_check_when_parent_and_array_based_descendant_of_child_extension_item_is_active()
     {
-        Facades\Permission::register('view seo reports');
-        Facades\Permission::register('edit seo section defaults');
-
         Facades\CP\Nav::extend(function ($nav) {
             $nav->tools('SEO Pro')
                 ->url('/cp/seo-pro')
                 ->children([
-                    $nav->item('Reports')->url('/cp/seo-pro/reports')->can('view seo reports'),
-                    $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults')->can('edit seo section defaults'),
+                    $nav->item('Reports')->url('/cp/seo-pro/reports'),
+                    $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults'),
                 ]);
         });
 
@@ -307,9 +298,9 @@ class ActiveNavItemTest extends TestCase
                 ->url('/cp/seo-pro')
                 ->children(function () use ($nav) {
                     return [
-                        $nav->item('Reports')->url('/cp/seo-pro/')->can('view seo reports'),
-                        $nav->item('Site Defaults')->url('/cp/seo-pro/site-defaults')->can('edit seo site defaults'),
-                        $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults')->can('edit seo section defaults'),
+                        $nav->item('Reports')->url('/cp/seo-pro/'),
+                        $nav->item('Site Defaults')->url('/cp/seo-pro/site-defaults'),
+                        $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults'),
                     ];
                 });
         });
@@ -328,16 +319,13 @@ class ActiveNavItemTest extends TestCase
     #[Test]
     public function it_resolves_extension_children_closure_and_can_check_when_parent_item_is_active()
     {
-        Facades\Permission::register('view seo reports');
-        Facades\Permission::register('edit seo section defaults');
-
         Facades\CP\Nav::extend(function ($nav) {
             $nav->tools('SEO Pro')
                 ->url('/cp/seo-pro')
                 ->children(function () use ($nav) {
                     return [
-                        $nav->item('Reports')->url('/cp/seo-pro/reports')->can('view seo reports'),
-                        $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults')->can('edit seo section defaults'),
+                        $nav->item('Reports')->url('/cp/seo-pro/reports'),
+                        $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults'),
                     ];
                 });
         });
@@ -358,16 +346,13 @@ class ActiveNavItemTest extends TestCase
     #[Test]
     public function it_resolves_extension_children_closure_and_can_check_when_parent_and_child_item_are_active()
     {
-        Facades\Permission::register('view seo reports');
-        Facades\Permission::register('edit seo section defaults');
-
         Facades\CP\Nav::extend(function ($nav) {
             $nav->tools('SEO Pro')
                 ->url('/cp/seo-pro')
                 ->children(function () use ($nav) {
                     return [
-                        $nav->item('Reports')->url('/cp/seo-pro/reports')->can('view seo reports'),
-                        $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults')->can('edit seo section defaults'),
+                        $nav->item('Reports')->url('/cp/seo-pro/reports'),
+                        $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults'),
                     ];
                 });
         });
@@ -388,16 +373,13 @@ class ActiveNavItemTest extends TestCase
     #[Test]
     public function it_resolves_extension_children_closure_and_can_check_when_parent_and_descendant_of_child_item_is_active()
     {
-        Facades\Permission::register('view seo reports');
-        Facades\Permission::register('edit seo section defaults');
-
         Facades\CP\Nav::extend(function ($nav) {
             $nav->tools('SEO Pro')
                 ->url('/cp/seo-pro')
                 ->children(function () use ($nav) {
                     return [
-                        $nav->item('Reports')->url('/cp/seo-pro/reports')->can('view seo reports'),
-                        $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults')->can('edit seo section defaults'),
+                        $nav->item('Reports')->url('/cp/seo-pro/reports'),
+                        $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults'),
                     ];
                 });
         });
