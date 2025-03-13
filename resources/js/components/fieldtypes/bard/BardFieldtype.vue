@@ -241,9 +241,12 @@ export default {
         readingTime() {
             if (this.html) {
                 var stats = readTimeEstimate(this.html, 265, 12, 500, ['img', 'Image', 'bard-set']);
-                var duration = moment.duration(stats.duration, 'minutes');
+                var durationMs = stats.duration * 60 * 1000;
 
-                return moment.utc(duration.asMilliseconds()).format('mm:ss');
+                var minutes = Math.floor(durationMs / 60000);
+                var seconds = Math.floor((durationMs % 60000) / 1000);
+
+                return String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
             }
         },
 
