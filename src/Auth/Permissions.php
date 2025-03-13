@@ -15,7 +15,7 @@ class Permissions
     public function boot()
     {
         if ($this->booted) {
-            return;
+            return $this;
         }
 
         $early = $this->permissions;
@@ -29,6 +29,8 @@ class Permissions
 
         $this->permissions = array_merge($this->permissions, $early);
         $this->booted = true;
+
+        return $this;
     }
 
     public function extend($callback)

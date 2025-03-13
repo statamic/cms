@@ -150,9 +150,9 @@ class PermissionsTest extends TestCase
             $callbackCount = true;
         });
 
-        $permissions->boot();
-        $permissions->boot();
+        $returned = $permissions->boot()->boot()->boot()->boot();
 
+        $this->assertSame($permissions, $returned);
         $this->assertEquals(1, $callbackCount);
     }
 

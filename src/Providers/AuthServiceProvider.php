@@ -85,9 +85,7 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         Gate::after(function ($user, $ability) {
-            Permission::boot();
-
-            if (! Permission::flattened()->map->value()->contains($ability)) {
+            if (! Permission::boot()->flattened()->map->value()->contains($ability)) {
                 return null;
             }
 
