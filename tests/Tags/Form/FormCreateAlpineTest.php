@@ -207,6 +207,74 @@ class FormCreateAlpineTest extends FormTestCase
     }
 
     #[Test]
+    public function it_renders_x_data_with_old_data_on_form_tag_when_only_one_nested_field_is_submitted()
+    {
+        $this
+            ->post('/!/forms/contact', [
+                'name' => 'Frodo Braggins',
+                'my_favourites' => [
+                    'favourite_colour' => 'red',
+                ],
+            ])
+            ->assertSessionHasErrors(['email', 'message'], null, 'form.contact');
+
+        $output = $this->tag('{{ form:contact js="alpine" }}{{ /form:contact }}');
+
+        $expectedXData = $this->jsonEncode([
+            'name' => 'Frodo Braggins',
+            'email' => null,
+            'message' => null,
+            'likes_animals' => false,
+            'my_favourites' => [
+                'favourite_animals' => [],
+                'non_favourite_animals' => [],
+                'favourite_colour' => 'red',
+                'favourite_subject' => null,
+            ],
+            'winnie' => null,
+        ]);
+
+        $expected = '<form method="POST" action="http://localhost/!/forms/contact" x-data="'.$expectedXData.'">';
+
+        $this->assertStringContainsString($expected, $output);
+    }
+
+    #[Test]
+    public function it_renders_scoped_x_data_with_old_data_on_form_tag_when_only_one_nested_field_is_submitted()
+    {
+        $this
+            ->post('/!/forms/contact', [
+                'name' => 'Frodo Braggins',
+                'my_favourites' => [
+                    'favourite_colour' => 'red',
+                ],
+            ])
+            ->assertSessionHasErrors(['email', 'message'], null, 'form.contact');
+
+        $output = $this->tag('{{ form:contact js="alpine:my_form" }}{{ /form:contact }}');
+
+        $expectedXData = $this->jsonEncode([
+            'my_form' => [
+                'name' => 'Frodo Braggins',
+                'email' => null,
+                'message' => null,
+                'likes_animals' => false,
+                'my_favourites' => [
+                    'favourite_animals' => [],
+                    'non_favourite_animals' => [],
+                    'favourite_colour' => 'red',
+                    'favourite_subject' => null,
+                ],
+                'winnie' => null,
+            ],
+        ]);
+
+        $expected = '<form method="POST" action="http://localhost/!/forms/contact" x-data="'.$expectedXData.'">';
+
+        $this->assertStringContainsString($expected, $output);
+    }
+
+    #[Test]
     public function it_renders_scoped_x_data_with_old_data_on_form_tag()
     {
         $this
