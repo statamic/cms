@@ -4,6 +4,7 @@ namespace Statamic\Rules;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Support\Carbon;
 use Statamic\Facades\Entry;
 
 class UniqueEntryValue implements ValidationRule
@@ -26,6 +27,10 @@ class UniqueEntryValue implements ValidationRule
 
         if ($this->site) {
             $query->where('site', $this->site);
+        }
+
+        if ($value instanceof Carbon) {
+            $value = $value->toDateString();
         }
 
         $existing = $query
