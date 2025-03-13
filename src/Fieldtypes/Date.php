@@ -12,6 +12,7 @@ use Statamic\GraphQL\Fields\DateField;
 use Statamic\GraphQL\Types\DateRangeType;
 use Statamic\Query\Scopes\Filters\Fields\Date as DateFilter;
 use Statamic\Rules\DateFieldtype as ValidationRule;
+use Statamic\Support\DateFormat;
 
 class Date extends Fieldtype
 {
@@ -330,7 +331,7 @@ class Date extends Fieldtype
 
         if (is_int($value)) {
             $hasTime = true;
-        } elseif (str_contains($this->saveFormat(), 'H')) {
+        } elseif (DateFormat::containsTime($this->saveFormat())) {
             $hasTime = true;
         }
 
