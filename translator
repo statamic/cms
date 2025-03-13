@@ -7,7 +7,7 @@ $files = new Illuminate\Filesystem\Filesystem;
 $discovery = new Statamic\Translator\MethodDiscovery($files, [
     __DIR__.'/src',
     __DIR__.'/resources/js',
-    __DIR__.'/resources/views'
+    __DIR__.'/resources/views',
 ]);
 
 // Translation strings starting with these substrings will be ignored.
@@ -22,7 +22,6 @@ $manualFiles = [
     'permissions',
     'markdown',
     'validation',
-    'moment',
     'dictionary-countries',
     'dictionary-currencies',
 ];

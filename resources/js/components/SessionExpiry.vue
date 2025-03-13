@@ -63,7 +63,7 @@ export default {
             errors: {},
             password: null,
             pinging: false,
-            lastCount: moment(),
+            lastCount: new Date(),
             isPageHidden: false,
         };
     },
@@ -102,14 +102,14 @@ export default {
             // Javascript is being executed, but the count will have stopped if the computer
             // has been put to sleep. If it's been a while since the last count, we'll
             // also perform a timeout check. This will let things recalibrate.
-            const secondsSinceLastCount = moment().diff(this.lastCount, 'seconds');
+            const secondsSinceLastCount = Math.floor((Date.now() - this.lastCount) / 1000);
             const itsBeenAWhile = secondsSinceLastCount > 10;
 
             if (withinWarningPeriod || itsBeenAWhile) {
                 this.ping().catch((e) => {});
             }
 
-            this.lastCount = moment();
+            this.lastCount = new Date();
         },
 
         isShowingLogin(showing, wasShowing) {
