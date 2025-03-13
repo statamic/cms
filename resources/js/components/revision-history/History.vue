@@ -73,15 +73,15 @@ export default {
 
     methods: {
         formatRelativeDate(value) {
-            let isToday = new Date(value * 1000) < new Date().setUTCHours(0, 0, 0, 0);
+            const isToday = new Date(value * 1000) < new Date().setUTCHours(0, 0, 0, 0);
 
-            return isToday
-                ? new Date(value * 1000).toLocaleDateString(navigator.language, {
+            return !isToday
+                ? __('Today')
+                : new Date(value * 1000).toLocaleDateString(navigator.language, {
                       month: 'long',
                       day: 'numeric',
                       year: 'numeric',
-                  })
-                : __('Today');
+                  });
         },
 
         close() {
