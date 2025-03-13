@@ -20,8 +20,8 @@ const makeDateIndexField = (value = {}) => {
 };
 
 test.each([
-    ['UTC', '2025-12-25'],
-    ['America/New_York', '2025-12-24'],
+    ['UTC', '12/25/2025'],
+    ['America/New_York', '12/24/2025'],
 ])('date is localized to the users timezone (%s)', async (tz, expected) => {
     process.env.TZ = tz;
 
@@ -35,8 +35,8 @@ test.each([
 });
 
 test.each([
-    ['UTC', '2025-12-25 02:13'],
-    ['America/New_York', '2025-12-24 21:13'],
+    ['UTC', '12/25/2025 2:13 AM'],
+    ['America/New_York', '12/24/2025 9:13 PM'],
 ])('date and time is localized to the users timezone (%s)', async (tz, expected) => {
     process.env.TZ = tz;
 
@@ -51,8 +51,8 @@ test.each([
 });
 
 test.each([
-    ['UTC', '2025-12-25 – 2025-12-28'],
-    ['America/New_York', '2025-12-24 – 2025-12-27'],
+    ['UTC', '12/25/2025 – 12/28/2025'],
+    ['America/New_York', '12/24/2025 – 12/27/2025'],
 ])('date range is localized to the users timezone (%s)', async (tz, expected) => {
     process.env.TZ = tz;
 
