@@ -17,10 +17,7 @@
             </div>
 
             <div v-for="group in revisions" :key="group.day">
-                <h6
-                    class="revision-date"
-                    v-text="formatRelativeDate(group.day)"
-                />
+                <h6 class="revision-date" v-text="formatRelativeDate(group.day)" />
                 <div class="revision-list">
                     <revision
                         v-for="revision in group.revisions"
@@ -80,10 +77,10 @@ export default {
 
             return isToday
                 ? new Date(value * 1000).toLocaleDateString(navigator.language, {
-                    month: 'long',
-                    day: 'numeric',
-                    year: 'numeric',
-                })
+                      month: 'long',
+                      day: 'numeric',
+                      year: 'numeric',
+                  })
                 : __('Today');
         },
 

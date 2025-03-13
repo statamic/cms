@@ -97,7 +97,7 @@ export default {
             return new Date(this.revision.date * 1000).toLocaleTimeString(navigator.language, {
                 hour: 'numeric',
                 minute: '2-digit',
-            })
+            });
         },
     },
 
