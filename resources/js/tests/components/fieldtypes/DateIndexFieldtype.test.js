@@ -46,8 +46,8 @@ test.each([
 });
 
 test.each([
-    ['UTC', '12/25/2025 2:13 AM'],
-    ['America/New_York', '12/24/2025 9:13 PM'],
+    ['UTC', '12/25/2025, 2:13 AM'],
+    ['America/New_York', '12/24/2025, 9:13 PM'],
 ])('date and time is localized to the users timezone (%s)', async (tz, expected) => {
     process.env.TZ = tz;
 
@@ -89,8 +89,8 @@ test.each([
 });
 
 test.each([
-    ['en', '12/25/2025 1:29 PM'],
-    ['de', '25.12.2025 13:29'],
+    ['en', '12/25/2025, 1:29 PM'],
+    ['de', '25.12.2025, 13:29'],
     ['fr', '25/12/2025 13:29'],
 ])('date and time is formatted to the users browser language (%s)', async (lang, expected) => {
     setNavigatorLanguage(lang);
