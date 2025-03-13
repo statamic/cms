@@ -381,9 +381,4 @@ abstract class Fieldtype implements Arrayable
     {
         return [];
     }
-
-    public function requiresJavascriptDataBinding()
-    {
-        //
-    }
 }
