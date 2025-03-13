@@ -33,7 +33,7 @@ export default {
 
             let preview = date.toLocaleDateString(navigator.language, {
                 year: 'numeric',
-                month: 'long',
+                month: 'numeric',
                 day: 'numeric',
             });
 
