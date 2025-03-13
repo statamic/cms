@@ -10,6 +10,8 @@ use Statamic\Facades\User;
 use Statamic\Query\Scopes\Filter;
 use Statamic\Support\Arr;
 
+use function Statamic\trans as __;
+
 class Fields extends Filter
 {
     protected $pinned = true;
