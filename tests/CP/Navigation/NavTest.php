@@ -263,7 +263,12 @@ class NavTest extends TestCase
     #[Test]
     public function it_doesnt_build_children_that_the_user_is_not_authorized_to_see()
     {
+        // Assume we're dealing with Statamic permissions. Technically nav items
+        // could use arbitrary ability strings that correspond to Gate::define().
+        Facades\Permission::register('view jedi diaries');
+        Facades\Permission::register('view jedi logs');
         Facades\Permission::register('view sith diaries');
+        Facades\Permission::register('view sith logs');
 
         $this->setTestRoles(['sith' => ['view sith diaries']]);
         $this->actingAs(tap(User::make()->assignRole('sith'))->save());
