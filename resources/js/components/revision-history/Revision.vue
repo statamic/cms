@@ -18,12 +18,7 @@
                         <template v-if="revision.user"
                             >{{ revision.user.name || revision.user.email }} &ndash;</template
                         >
-                        {{
-                            date.toDate().toLocaleTimeString($config.get('locale').replace('_', '-'), {
-                                hour: 'numeric',
-                                minute: '2-digit',
-                            })
-                        }}
+                        {{ time }}
                     </div>
                 </div>
 
@@ -98,8 +93,11 @@ export default {
     },
 
     computed: {
-        date() {
-            return moment.unix(this.revision.date);
+        time() {
+            return new Date(this.revision.date * 1000).toLocaleTimeString(navigator.language, {
+                hour: 'numeric',
+                minute: '2-digit',
+            })
         },
     },
 

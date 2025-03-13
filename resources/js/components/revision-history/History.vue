@@ -19,18 +19,7 @@
             <div v-for="group in revisions" :key="group.day">
                 <h6
                     class="revision-date"
-                    v-text="
-                        $moment.unix(group.day).isBefore($moment().startOf('day'))
-                            ? $moment
-                                  .unix(group.day)
-                                  .toDate()
-                                  .toLocaleDateString($config.get('locale').replace('_', '-'), {
-                                      month: 'long',
-                                      day: 'numeric',
-                                      year: 'numeric',
-                                  })
-                            : __('Today')
-                    "
+                    v-text="formatRelativeDate(group.day)"
                 />
                 <div class="revision-list">
                     <revision
@@ -86,6 +75,18 @@ export default {
     },
 
     methods: {
+        formatRelativeDate(value) {
+            let isToday = new Date(value * 1000) < new Date().setUTCHours(0, 0, 0, 0);
+
+            return isToday
+                ? new Date(value * 1000).toLocaleDateString(navigator.language, {
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric',
+                })
+                : __('Today');
+        },
+
         close() {
             this.$emit('closed');
         },
