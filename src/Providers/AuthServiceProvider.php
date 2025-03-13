@@ -85,6 +85,7 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         Gate::after(function ($user, $ability) {
+            // If the ability isn't a Statamic permission, we don't want to get involved. 🙈
             if (! Permission::boot()->flattened()->map->value()->contains($ability)) {
                 return null;
             }
