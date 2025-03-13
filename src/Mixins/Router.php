@@ -3,7 +3,6 @@
 namespace Statamic\Mixins;
 
 use Statamic\Http\Controllers\FrontendController;
-use Statamic\Support\Str;
 
 class Router
 {
@@ -11,7 +10,7 @@ class Router
     {
         return function ($uri, $view = null, $data = []) {
             if (! $view) {
-                $view = Str::of($uri)->ltrim('/');
+                $view = ltrim($uri, '/');
             }
 
             return $this->get($uri, [FrontendController::class, 'route'])

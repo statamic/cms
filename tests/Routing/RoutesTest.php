@@ -32,6 +32,8 @@ class RoutesTest extends TestCase
         parent::resolveApplicationConfiguration($app);
 
         $app->booted(function () {
+            Route::statamic('/basic-route');
+
             Route::statamic('/basic-route-with-data', 'test', ['hello' => 'world']);
 
             Route::statamic('/basic-route-with-view-closure', function () {
@@ -159,6 +161,17 @@ class RoutesTest extends TestCase
         $this->viewShouldReturnRaw('test', 'Hello {{ hello }}');
 
         $this->get('/basic-route-with-data')
+            ->assertOk()
+            ->assertSee('Hello world');
+    }
+
+    #[Test]
+    public function it_renders_a_view_implied_from_the_route()
+    {
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('basic-route', 'Hello world');
+
+        $this->get('/basic-route')
             ->assertOk()
             ->assertSee('Hello world');
     }
