@@ -16,6 +16,5 @@ window.Vue = Vue;
 window.Cookies = Cookies;
 window.Alpine = Alpine;
 window.Statamic = Statamic;
-window.moment = Moment;
 
 Alpine.start();
