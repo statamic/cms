@@ -1254,11 +1254,12 @@ class EntryTest extends TestCase
     #[Test]
     public function the_blueprint_is_blinked_when_getting_and_flushed_when_setting()
     {
-        $entry = (new Entry)->collection('blog');
         $collection = Mockery::mock(Collection::make('blog'));
+        Collection::shouldReceive('findByHandle')->with('blog')->andReturn($collection);
+
+        $entry = (new Entry)->collection('blog');
         $collection->shouldReceive('entryBlueprint')->with(null, $entry)->once()->andReturn('the old blueprint');
         $collection->shouldReceive('entryBlueprint')->with('new', $entry)->once()->andReturn('the new blueprint');
-        Collection::shouldReceive('findByHandle')->with('blog')->andReturn($collection);
 
         $this->assertEquals('the old blueprint', $entry->blueprint());
         $this->assertEquals('the old blueprint', $entry->blueprint());
@@ -2586,4 +2587,20 @@ class EntryTest extends TestCase
             ['7', '7'],
         ], $events->map(fn ($event) => [$event->entry->id(), $event->initiator->id()])->all());
     }
+
+    #[Test]
+    public function creates_custom_entry_class()
+    {
+        $collection = tap(Collection::make('custom')->class(CustomEntry::class))->save();
+
+        $one = Facades\Entry::make()->slug('one')->collection($collection);
+        $two = Facades\Entry::make()->collection($collection)->slug('two');
+
+        $this->assertInstanceOf(CustomEntry::class, $one);
+        $this->assertInstanceOf(CustomEntry::class, $two);
+    }
+}
+
+class CustomEntry extends Entry
+{
 }
