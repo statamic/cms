@@ -87,9 +87,13 @@ class AuthServiceProvider extends ServiceProvider
         Gate::after(function ($user, $ability) {
             Permission::boot();
 
+            if (! Permission::flattened()->map->value()->contains($ability)) {
+                return null;
+            }
+
             $user = User::fromUser($user);
 
-            if (Permission::flattened()->map->value()->contains($ability) && $user->isSuper()) {
+            if ($user->isSuper()) {
                 return true;
             }
 

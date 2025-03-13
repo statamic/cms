@@ -47,6 +47,7 @@ class GateTest extends TestCase
         // cannot be applied directly to users.
         Role::make('test')
             ->addPermission('statamic')
+            ->addPermission('gate')
             ->addPermission('edit blog entries')
             ->save();
 
@@ -109,6 +110,13 @@ class GateTest extends TestCase
             'non-statamic permission, user without permission' => [
                 fn () => User::make()->email('denied@domain.com'),
                 'gate',
+                false,
+            ],
+            'non-statamic permission, user has permission in role' => [
+                fn () => User::make()->assignRole('test'),
+                'gate',
+                // Even though the role has the permission, we should not be
+                // checking it if it's not registered as a Statamic permission.
                 false,
             ],
         ];
