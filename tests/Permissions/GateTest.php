@@ -52,7 +52,7 @@ class GateTest extends TestCase
 
         // Add a gate, which is how someone would define
         // something completely separate from Statamic.
-        Gate::define('bar', fn ($user) => $user->email === 'bar@domain.com');
+        Gate::define('bar', fn ($user) => $user->email === 'bar@domain.com' ? true : null);
 
         $this->actingAs($userCallback()->save());
 
