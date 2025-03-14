@@ -50,7 +50,7 @@ class Update extends Command
         $selection = select(
             label: 'Which search index would you like to update?',
             options: collect(['All'])->merge($this->indexes()->keys())->all(),
-            default: 0
+            default: 'All'
         );
 
         return ($selection == 'All') ? $this->indexes() : [$this->indexes()->get($selection)];
