@@ -11,7 +11,7 @@
     )
 
     <publish-form
-        title="{{ $title }}"
+        :title="$date.format('{{ $submission->date() }}')"
         :blueprint="{{ Js::from($blueprint) }}"
         :meta="{{ Js::from($meta) }}"
         :values="{{ Js::from($values) }}"

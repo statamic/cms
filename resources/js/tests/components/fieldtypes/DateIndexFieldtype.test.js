@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils';
-import { test, expect } from 'vitest';
+import { test, expect, beforeEach } from 'vitest';
 import DateIndexFieldtype from '@/components/fieldtypes/DateIndexFieldtype.vue';
 import Moment from 'moment';
 
@@ -9,6 +9,13 @@ window.matchMedia = () => ({
     addEventListener: () => {},
 });
 
+function setNavigatorLanguage(lang) {
+    Object.defineProperty(navigator, 'language', {
+        value: lang,
+        writable: true,
+    });
+}
+
 const makeDateIndexField = (value = {}) => {
     return mount(DateIndexFieldtype, {
         props: {
@@ -16,19 +23,16 @@ const makeDateIndexField = (value = {}) => {
             value,
             values: {},
         },
-        global: {
-            mocks: {
-                $moment: (date) => {
-                    return Moment(date);
-                },
-            },
-        },
     });
 };
 
+beforeEach(() => {
+    process.env.TZ = 'UTC';
+});
+
 test.each([
-    ['UTC', '2025-12-25'],
-    ['America/New_York', '2025-12-24'],
+    ['UTC', '12/25/2025'],
+    ['America/New_York', '12/24/2025'],
 ])('date is localized to the users timezone (%s)', async (tz, expected) => {
     process.env.TZ = tz;
 
@@ -36,15 +40,14 @@ test.each([
         date: '2025-12-25',
         time: '02:13',
         mode: 'single',
-        display_format: 'YYYY-MM-DD',
     });
 
     expect(dateIndexField.vm.formatted).toBe(expected);
 });
 
 test.each([
-    ['UTC', '2025-12-25 02:13'],
-    ['America/New_York', '2025-12-24 21:13'],
+    ['UTC', '12/25/2025, 2:13 AM'],
+    ['America/New_York', '12/24/2025, 9:13 PM'],
 ])('date and time is localized to the users timezone (%s)', async (tz, expected) => {
     process.env.TZ = tz;
 
@@ -52,15 +55,15 @@ test.each([
         date: '2025-12-25',
         time: '02:13',
         mode: 'single',
-        display_format: 'YYYY-MM-DD HH:mm',
+        time_enabled: true,
     });
 
     expect(dateIndexField.vm.formatted).toBe(expected);
 });
 
 test.each([
-    ['UTC', '2025-12-25 – 2025-12-28'],
-    ['America/New_York', '2025-12-24 – 2025-12-27'],
+    ['UTC', '12/25/2025 – 12/28/2025'],
+    ['America/New_York', '12/24/2025 – 12/27/2025'],
 ])('date range is localized to the users timezone (%s)', async (tz, expected) => {
     process.env.TZ = tz;
 
@@ -68,23 +71,46 @@ test.each([
         start: { date: '2025-12-25', time: '02:13' },
         end: { date: '2025-12-28', time: '03:59' },
         mode: 'range',
-        display_format: 'YYYY-MM-DD',
     });
 
     expect(dateIndexField.vm.formatted).toBe(expected);
 });
 
 test.each([
-    ['UTC', '25/12/2025 02:13:15'],
-    ['America/New_York', '24/12/2025 21:13:15'],
-])('configured display format is respected (%s)', async (tz, expected) => {
-    process.env.TZ = tz;
+    ['en', '12/25/2025'],
+    ['de', '25.12.2025'],
+    ['fr', '25/12/2025'],
+])('date is formatted to the users browser language (%s)', async (lang, expected) => {
+    setNavigatorLanguage(lang);
+
+    const dateIndexField = makeDateIndexField({ date: '2025-12-25', time: '13:29' });
+
+    expect(dateIndexField.vm.formatted).toBe(expected);
+});
+
+test.each([
+    ['en', '12/25/2025, 1:29 PM'],
+    ['de', '25.12.2025, 13:29'],
+    ['fr', '25/12/2025 13:29'],
+])('date and time is formatted to the users browser language (%s)', async (lang, expected) => {
+    setNavigatorLanguage(lang);
+
+    const dateIndexField = makeDateIndexField({ date: '2025-12-25', time: '13:29', time_enabled: true });
+
+    expect(dateIndexField.vm.formatted).toBe(expected);
+});
+
+test.each([
+    ['en', '12/25/2025 – 12/28/2025'],
+    ['de', '25.12.2025 – 28.12.2025'],
+    ['fr', '25/12/2025 – 28/12/2025'],
+])('date range is formatted to the users browser language (%s)', async (lang, expected) => {
+    setNavigatorLanguage(lang);
 
     const dateIndexField = makeDateIndexField({
-        date: '2025-12-25',
-        time: '02:13:15',
-        mode: 'single',
-        display_format: 'DD/MM/YYYY HH:mm:ss',
+        start: { date: '2025-12-25', time: '02:13' },
+        end: { date: '2025-12-28', time: '03:59' },
+        mode: 'range',
     });
 
     expect(dateIndexField.vm.formatted).toBe(expected);

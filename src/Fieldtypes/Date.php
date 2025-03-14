@@ -12,7 +12,6 @@ use Statamic\GraphQL\Fields\DateField;
 use Statamic\GraphQL\Types\DateRangeType;
 use Statamic\Query\Scopes\Filters\Fields\Date as DateFilter;
 use Statamic\Rules\DateFieldtype as ValidationRule;
-use Statamic\Statamic;
 use Statamic\Support\DateFormat;
 
 class Date extends Fieldtype
@@ -242,7 +241,6 @@ class Date extends Fieldtype
                 'start' => $this->splitDateTimeForPreProcessSingle($start),
                 'end' => $this->splitDateTimeForPreProcessSingle($end),
                 'mode' => $this->config('mode', 'single'),
-                'display_format' => DateFormat::toIso($this->indexDisplayFormat()),
             ];
         }
 
@@ -256,25 +254,13 @@ class Date extends Fieldtype
         return [
             ...$this->splitDateTimeForPreProcessSingle($date),
             'mode' => $this->config('mode', 'single'),
-            'display_format' => DateFormat::toIso($this->indexDisplayFormat()),
+            'time_enabled' => $this->config('time_enabled'),
         ];
     }
 
     private function saveFormat()
     {
         return $this->config('format', $this->defaultFormat());
-    }
-
-    public function indexDisplayFormat()
-    {
-        return $this->config('time_enabled') && $this->config('mode', 'single') === 'single'
-            ? Statamic::cpDateTimeFormat()
-            : Statamic::cpDateFormat();
-    }
-
-    public function fieldDisplayFormat()
-    {
-        return Statamic::cpDateFormat();
     }
 
     private function defaultFormat()
@@ -297,13 +283,6 @@ class Date extends Fieldtype
         }
 
         return $formatted;
-    }
-
-    public function preload()
-    {
-        return [
-            'displayFormat' => DateFormat::toIso($this->fieldDisplayFormat()),
-        ];
     }
 
     public function augment($value)
@@ -352,7 +331,7 @@ class Date extends Fieldtype
 
         if (is_int($value)) {
             $hasTime = true;
-        } elseif (str_contains($this->saveFormat(), 'H')) {
+        } elseif (DateFormat::containsTime($this->saveFormat())) {
             $hasTime = true;
         }
 

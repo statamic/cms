@@ -90,7 +90,6 @@ class FormSubmissionsController extends CpController
             'blueprint' => $blueprint->toPublishArray(),
             'values' => $fields->values(),
             'meta' => $fields->meta(),
-            'title' => $submission->formattedDate(),
         ]);
     }
 }

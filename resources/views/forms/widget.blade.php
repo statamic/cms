@@ -35,7 +35,7 @@
                         @endforeach
 
                         <td class="ltr:text-right rtl:text-left">
-                            {{ $submission['date']->diffInDays() <= 14 ? $submission['date']->diffForHumans() : $submission['date']->format($format) }}
+                            {{ $submission['date']->diffInDays() <= 14 ? $submission['date']->diffForHumans() : $submission['date']->asVueComponent() }}
                         </td>
                     </tr>
                 @endforeach

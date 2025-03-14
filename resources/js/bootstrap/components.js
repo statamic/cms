@@ -62,6 +62,7 @@ import StackTest from '../components/stacks/StackTest.vue';
 import CodeBlock from '../components/CodeBlock.vue';
 import BlueprintResetter from '../components/blueprints/BlueprintResetter.vue';
 import { defineAsyncComponent } from 'vue';
+import DateTime from '../components/DateTime.vue';
 
 export default function registerGlobalComponents(app) {
     // Core
@@ -131,6 +132,7 @@ export default function registerGlobalComponents(app) {
     app.component('popover', Popover);
     app.component('portal', Portal);
     app.component('code-block', CodeBlock);
+    app.component('date-time', DateTime);
 
     // Recursive
     app.component('role-permission-tree', PermissionTree);

@@ -3,7 +3,7 @@
         <div class="mb-6 flex justify-between">
             <div>
                 <h1>{{ release.version }}</h1>
-                <h5 class="date" v-text="__('Released on :date', { date: release.date })" />
+                <h5 class="date" v-text="__('Released on :date', { date })" />
             </div>
             <div v-if="showActions">
                 <button
@@ -34,6 +34,8 @@
 </template>
 
 <script>
+import DateFormatter from '@statamic/components/DateFormatter.js';
+
 export default {
     props: {
         release: { type: Object, required: true },
@@ -49,6 +51,10 @@ export default {
     },
 
     computed: {
+        date() {
+            return DateFormatter.format(this.release.date, 'date');
+        },
+
         body() {
             return markdown(this.release.body)
                 .replaceAll('[new]', '<span class="label" style="background: #5bc0de;">NEW</span>')

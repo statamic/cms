@@ -383,16 +383,6 @@ class Form implements Arrayable, Augmentable, FormContract
         return cp_route('forms.destroy', $this->handle());
     }
 
-    /**
-     * Get the date format.
-     *
-     * @return string
-     */
-    public function dateFormat()
-    {
-        return Statamic::isCpRoute() ? Statamic::cpDateTimeFormat() : Statamic::dateTimeFormat();
-    }
-
     public function hasFiles()
     {
         return $this->fields()->filter(function ($field) {

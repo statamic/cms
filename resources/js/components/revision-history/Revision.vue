@@ -18,12 +18,7 @@
                         <template v-if="revision.user"
                             >{{ revision.user.name || revision.user.email }} &ndash;</template
                         >
-                        {{
-                            date.toDate().toLocaleTimeString($config.get('locale').replace('_', '-'), {
-                                hour: 'numeric',
-                                minute: '2-digit',
-                            })
-                        }}
+                        {{ time }}
                     </div>
                 </div>
 
@@ -56,6 +51,7 @@
 <script>
 import RestoreRevision from './Restore.vue';
 import RevisionPreview from './Preview.vue';
+import DateFormatter from '@statamic/components/DateFormatter.js';
 
 export default {
     components: {
@@ -98,8 +94,8 @@ export default {
     },
 
     computed: {
-        date() {
-            return moment.unix(this.revision.date);
+        time() {
+            return DateFormatter.format(this.revision.date * 1000, 'time');
         },
     },
 

@@ -17,21 +17,7 @@
             </div>
 
             <div v-for="group in revisions" :key="group.day">
-                <h6
-                    class="revision-date"
-                    v-text="
-                        $moment.unix(group.day).isBefore($moment().startOf('day'))
-                            ? $moment
-                                  .unix(group.day)
-                                  .toDate()
-                                  .toLocaleDateString($config.get('locale').replace('_', '-'), {
-                                      month: 'long',
-                                      day: 'numeric',
-                                      year: 'numeric',
-                                  })
-                            : __('Today')
-                    "
-                />
+                <h6 class="revision-date" v-text="formatRelativeDate(group.day)" />
                 <div class="revision-list">
                     <revision
                         v-for="revision in group.revisions"
@@ -50,6 +36,7 @@
 
 <script>
 import Revision from './Revision.vue';
+import DateFormatter from '@statamic/components/DateFormatter.js';
 
 export default {
     components: {
@@ -86,6 +73,18 @@ export default {
     },
 
     methods: {
+        formatRelativeDate(value) {
+            const isToday = new Date(value * 1000) < new Date().setUTCHours(0, 0, 0, 0);
+
+            return !isToday
+                ? __('Today')
+                : DateFormatter.format(value * 1000, {
+                      month: 'long',
+                      day: 'numeric',
+                      year: 'numeric',
+                  });
+        },
+
         close() {
             this.$emit('closed');
         },
