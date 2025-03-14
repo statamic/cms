@@ -90,7 +90,9 @@
                             @sorted="sorted"
                         >
                             <template #cell-datestamp="{ row: submission, value }">
-                                <a :href="submission.url" class="text-blue">{{ formatDate(value) }}</a>
+                                <a :href="submission.url" class="text-blue">
+                                    <date-time :of="date" />
+                                </a>
                             </template>
                             <template #actions="{ row: submission, index }">
                                 <dropdown-list>
@@ -142,14 +144,6 @@ export default {
     computed: {
         actionContext() {
             return { form: this.form };
-        },
-    },
-
-    methods: {
-        formatDate(value) {
-            return Intl.DateTimeFormat(navigator.language, { dateStyle: 'short', timeStyle: 'short' }).format(
-                new Date(value),
-            );
         },
     },
 };
