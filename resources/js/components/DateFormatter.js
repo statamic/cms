@@ -1,6 +1,7 @@
 export default class DateFormatter {
     #date;
     #options;
+    #locale = navigator.language;
 
     constructor(date, options) {
         this.#date = date;
@@ -26,6 +27,10 @@ export default class DateFormatter {
     }
 
     toString() {
-        return Intl.DateTimeFormat(navigator.language, this.#options).format(this.#date);
+        return Intl.DateTimeFormat(this.locale, this.#options).format(this.#date);
+    }
+
+    get locale() {
+        return this.#locale;
     }
 }

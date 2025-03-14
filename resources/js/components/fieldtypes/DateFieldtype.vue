@@ -158,7 +158,7 @@ export default {
                 rows: this.screens({ default: 1, lg: this.config.rows }).value,
                 expanded: this.name === 'date' || this.config.full_width,
                 isRequired: this.config.required,
-                locale: navigator.language,
+                locale: Statamic.$date.locale,
                 masks: { input: ['L'], modelValue: 'YYYY-MM-DD' },
                 minDate: this.config.earliest_date.date,
                 maxDate: this.config.latest_date.date,
