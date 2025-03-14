@@ -36,6 +36,7 @@
 
 <script>
 import Revision from './Revision.vue';
+import DateFormatter from '@statamic/components/DateFormatter.js';
 
 export default {
     components: {
@@ -77,11 +78,11 @@ export default {
 
             return !isToday
                 ? __('Today')
-                : new Date(value * 1000).toLocaleDateString(navigator.language, {
+                : new DateFormatter(value * 1000, {
                       month: 'long',
                       day: 'numeric',
                       year: 'numeric',
-                  });
+                  }).toString();
         },
 
         close() {

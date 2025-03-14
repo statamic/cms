@@ -45,6 +45,7 @@ import RangePopover from './date/RangePopover.vue';
 import RangeInline from './date/RangeInline.vue';
 import { useScreens } from 'vue-screen-utils';
 import { toRaw } from 'vue';
+import DateFormatter from '@statamic/components/DateFormatter.js';
 
 export default {
     components: {
@@ -174,35 +175,28 @@ export default {
             if (this.isRange) {
                 if (!this.localValue?.start) return;
 
-                let start = new Date(this.value.start.date + 'T' + (this.value.start.time || '00:00:00') + 'Z');
-                let end = new Date(this.value.end.date + 'T' + (this.value.end.time || '00:00:00') + 'Z');
+                const start = new Date(this.value.start.date + 'T' + (this.value.start.time || '00:00:00') + 'Z');
+                const end = new Date(this.value.end.date + 'T' + (this.value.end.time || '00:00:00') + 'Z');
+                const formatter = new DateFormatter().options({
+                    year: 'numeric',
+                    month: 'numeric',
+                    day: 'numeric',
+                });
 
-                return (
-                    start.toLocaleDateString(navigator.language, {
-                        year: 'numeric',
-                        month: 'numeric',
-                        day: 'numeric',
-                    }) +
-                    ' – ' +
-                    end.toLocaleDateString(navigator.language, { year: 'numeric', month: 'numeric', day: 'numeric' })
-                );
+                return formatter.date(start) + ' – ' + formatter.date(end);
             }
 
-            if (!this.localValue?.date) return;
+            if (!this.value?.date) return;
 
-            let date = new Date(this.value.date + 'T' + (this.value.time || '00:00:00') + 'Z');
-
-            let preview = date.toLocaleDateString(navigator.language, {
-                year: 'numeric',
-                month: 'numeric',
-                day: 'numeric',
-            });
-
-            if (this.hasTime && this.value.time) {
-                preview += ' ' + date.toLocaleTimeString(navigator.language, { hour: 'numeric', minute: 'numeric' });
-            }
-
-            return preview;
+            return new DateFormatter()
+                .of(new Date(this.value.date + 'T' + (this.value.time || '00:00:00') + 'Z'))
+                .options({
+                    year: 'numeric',
+                    month: 'numeric',
+                    day: 'numeric',
+                    ...(this.hasTime && this.value.time ? { hour: 'numeric', minute: 'numeric' } : {}),
+                })
+                .toString();
         },
     },
 

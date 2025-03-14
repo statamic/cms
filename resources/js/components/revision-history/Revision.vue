@@ -51,6 +51,7 @@
 <script>
 import RestoreRevision from './Restore.vue';
 import RevisionPreview from './Preview.vue';
+import DateFormatter from '@statamic/components/DateFormatter.js';
 
 export default {
     components: {
@@ -94,10 +95,7 @@ export default {
 
     computed: {
         time() {
-            return new Date(this.revision.date * 1000).toLocaleTimeString(navigator.language, {
-                hour: 'numeric',
-                minute: '2-digit',
-            });
+            return new DateFormatter(this.revision.date * 1000, { hour: 'numeric', minute: '2-digit' }).toString();
         },
     },
 

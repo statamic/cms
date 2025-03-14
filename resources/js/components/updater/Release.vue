@@ -34,6 +34,8 @@
 </template>
 
 <script>
+import DateFormatter from '@statamic/components/DateFormatter.js';
+
 export default {
     props: {
         release: { type: Object, required: true },
@@ -50,11 +52,14 @@ export default {
 
     computed: {
         date() {
-            return new Date(this.release.date).toLocaleDateString(navigator.language, {
-                year: 'numeric',
-                month: 'numeric',
-                day: 'numeric',
-            });
+            return new DateFormatter()
+                .of(this.release.date)
+                .options({
+                    year: 'numeric',
+                    month: 'numeric',
+                    day: 'numeric',
+                })
+                .toString();
         },
 
         body() {
