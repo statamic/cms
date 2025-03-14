@@ -149,8 +149,6 @@ trait HasSelectOptions
             return true;
         } elseif ($value === 'false') {
             return false;
-        } elseif ($value === 'null') {
-            return null;
         }
 
         return $value;
@@ -162,8 +160,6 @@ trait HasSelectOptions
             return 'true';
         } elseif ($value === false) {
             return 'false';
-        } elseif ($value === null) {
-            return 'null';
         }
 
         return $value;
