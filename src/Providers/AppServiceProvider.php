@@ -4,12 +4,12 @@ namespace Statamic\Providers;
 
 use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
+use Statamic\CP\CarbonAsVueComponent;
 use Statamic\Facades;
 use Statamic\Facades\Addon;
 use Statamic\Facades\Site;
@@ -81,27 +81,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Carbon::macro('asVueComponent', static function (?array $options = null) {
-            $attrs = collect([
-                'of' => self::this()->toAtomString(),
-            ])
-                ->when($options, fn ($c) => $c->put('options', $options))
-                ->map(function ($value, $key) {
-                    return is_array($value) ? ':'.$key.'=\''.json_encode($value).'\'' : $key.'="'.$value.'"';
-                })
-                ->implode(' ');
-            $str = '<date-time '.$attrs.'></date-time>';
-
-            return new class($str) implements Htmlable
-            {
-                public function __construct(private string $str)
-                {
-                }
-
-                public function toHtml()
-                {
-                    return $this->str;
-                }
-            };
+            return (new CarbonAsVueComponent)(self::this(), $options);
         });
 
         Request::macro('statamicToken', function () {
