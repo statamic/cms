@@ -14,10 +14,6 @@ export default class DateFormatter {
         };
     }
 
-    of(value) {
-        return this.date(value);
-    }
-
     date(value) {
         return new DateFormatter(value, this.#options);
     }
