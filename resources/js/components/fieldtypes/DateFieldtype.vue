@@ -177,23 +177,17 @@ export default {
 
                 const start = this.value.start.date + 'T' + (this.value.start.time || '00:00:00') + 'Z';
                 const end = this.value.end.date + 'T' + (this.value.end.time || '00:00:00') + 'Z';
-                const formatter = new DateFormatter().options({
-                    year: 'numeric',
-                    month: 'numeric',
-                    day: 'numeric',
-                });
+                const formatter = new DateFormatter().options('date');
 
                 return formatter.date(start) + ' – ' + formatter.date(end);
             }
 
             if (!this.value?.date) return;
 
-            return DateFormatter.format(this.value.date + 'T' + (this.value.time || '00:00:00') + 'Z', {
-                year: 'numeric',
-                month: 'numeric',
-                day: 'numeric',
-                ...(this.hasTime && this.value.time ? { hour: 'numeric', minute: 'numeric' } : {}),
-            });
+            return DateFormatter.format(
+                this.value.date + 'T' + (this.value.time || '00:00:00') + 'Z',
+                this.hasTime && this.value.time ? 'datetime' : 'date',
+            );
         },
     },
 

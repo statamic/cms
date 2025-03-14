@@ -52,11 +52,7 @@ export default {
 
     computed: {
         date() {
-            return DateFormatter.format(this.release.date, {
-                year: 'numeric',
-                month: 'numeric',
-                day: 'numeric',
-            });
+            return DateFormatter.format(this.release.date, 'date');
         },
 
         body() {

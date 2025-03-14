@@ -2,16 +2,27 @@ export default class DateFormatter {
     #date;
     #options;
     #locale = navigator.language;
-
-    constructor(date, options) {
-        this.#date = this.#normalizeDate(date);
-        this.#options = options ?? {
+    #presets = {
+        datetime: {
             year: 'numeric',
             month: 'numeric',
             day: 'numeric',
             hour: 'numeric',
             minute: 'numeric',
-        };
+        },
+        date: {
+            year: 'numeric',
+            month: 'numeric',
+            day: 'numeric',
+        },
+        time: {
+            timeStyle: 'short',
+        },
+    };
+
+    constructor(date, options) {
+        this.#date = this.#normalizeDate(date);
+        this.#options = this.#normalizeOptions(options);
     }
 
     date(value) {
@@ -48,5 +59,17 @@ export default class DateFormatter {
         if (date instanceof Date) return date;
 
         return new Date(date);
+    }
+
+    #normalizeOptions(options) {
+        if (!options) options = 'datetime';
+
+        if (typeof options === 'string') {
+            if (!this.#presets[options]) throw new Error(`Invalid date format: ${options}`);
+
+            return this.#presets[options];
+        }
+
+        return options;
     }
 }

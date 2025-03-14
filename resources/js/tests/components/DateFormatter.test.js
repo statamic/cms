@@ -189,6 +189,22 @@ describe('dates can be provided in various ways', () => {
 
 test('it can get the locale', () => {
     expect(new DateFormatter().locale).toBe('en-us');
-    navigator.language = 'fr';
+    setNavigatorLanguage('fr');
     expect(new DateFormatter().locale).toBe('fr');
+});
+
+test.each([
+    ['en', 'date', '12/25/2021'],
+    ['en', 'time', '12:13 PM'],
+    ['en', 'datetime', '12/25/2021, 12:13 PM'],
+    ['de', 'date', '25.12.2021'],
+    ['de', 'time', '12:13'],
+    ['de', 'datetime', '25.12.2021, 12:13'],
+])('it has format presets (%s %s)', (locale, preset, expected) => {
+    setNavigatorLanguage(locale);
+    expect(new DateFormatter().options(preset).toString()).toBe(expected);
+});
+
+test('an invalid preset throws an error', () => {
+    expect(() => new DateFormatter().options('foo')).toThrow('Invalid date format: foo');
 });
