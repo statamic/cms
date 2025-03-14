@@ -263,6 +263,36 @@ class Grid extends Fieldtype
         })->all();
     }
 
+    public function preProcessTagRenderable($data, $recursiveCallback)
+    {
+        $field = $this->field();
+
+        // TODO: Support both table and stacked modes?
+        $data['stacked'] = true;
+
+        $data['fields'] = collect($this->fields()->all())
+            ->map(fn ($child) => $child->setForm($field->form())->setHandle($field->handle().'.'.$child->handle()))
+            ->map(fn ($child) => $recursiveCallback($child))
+            ->values()
+            ->all();
+
+        // TODO: Loop through rows if value is submitted.
+        // $data['rows'] = collect($field->value() ?? [])->map(function ($row) use ($field, $recursiveCallback) {
+        //     return collect($this->fields()->all())
+        //         ->values()
+        //         ->map(fn ($child, $rowId) => $child->setForm($field->form())->setHandle($field->handle().'.$rowId.'.$child->handle()))
+        //         ->map(fn ($child) => $recursiveCallback($child))
+        //         ->values()
+        //         ->all();
+        // });
+
+        // TODO: Pass minimum one row of pre-processed fields for slot handling?
+        // Obviously JS driver will be required for add row button.
+        $data['rows'] = [$data['fields']];
+
+        return $data;
+    }
+
     public function toQueryableValue($value)
     {
         return empty($value) ? null : $value;
