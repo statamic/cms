@@ -171,9 +171,4 @@ class Group extends Fieldtype
     {
         return false;
     }
-
-    public function name()
-    {
-        //
-    }
 }
