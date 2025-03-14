@@ -4,6 +4,7 @@
 
 <script>
 import IndexFieldtype from './IndexFieldtype.vue';
+import DateFormatter from '@statamic/components/DateFormatter.js';
 
 export default {
     mixins: [IndexFieldtype],
@@ -18,21 +19,24 @@ export default {
                 let start = new Date(this.value.start.date + 'T' + (this.value.start.time || '00:00:00') + 'Z');
                 let end = new Date(this.value.end.date + 'T' + (this.value.end.time || '00:00:00') + 'Z');
 
-                const formatter = Intl.DateTimeFormat(navigator.language, {
+                const formatter = new DateFormatter().options({
                     year: 'numeric',
                     month: 'numeric',
                     day: 'numeric',
                 });
 
-                return formatter.format(start) + ' – ' + formatter.format(end);
+                return formatter.date(start) + ' – ' + formatter.date(end);
             }
 
-            return Intl.DateTimeFormat(navigator.language, {
-                year: 'numeric',
-                month: 'numeric',
-                day: 'numeric',
-                ...(this.value.time_enabled && this.value.time ? { hour: 'numeric', minute: 'numeric' } : {}),
-            }).format(new Date(this.value.date + 'T' + (this.value.time || '00:00:00') + 'Z'));
+            return new DateFormatter()
+                .of(this.value.date + 'T' + (this.value.time || '00:00:00') + 'Z')
+                .options({
+                    year: 'numeric',
+                    month: 'numeric',
+                    day: 'numeric',
+                    ...(this.value.time_enabled && this.value.time ? { hour: 'numeric', minute: 'numeric' } : {}),
+                })
+                .toString();
         },
     },
 };
