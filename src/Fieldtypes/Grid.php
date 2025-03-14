@@ -267,4 +267,9 @@ class Grid extends Fieldtype
     {
         return empty($value) ? null : $value;
     }
+
+    public function hasJsDriverDataBinding(): bool
+    {
+        return false;
+    }
 }
