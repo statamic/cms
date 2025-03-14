@@ -78,11 +78,11 @@ export default {
 
             return !isToday
                 ? __('Today')
-                : new DateFormatter(value * 1000, {
+                : DateFormatter.format(value * 1000, {
                       month: 'long',
                       day: 'numeric',
                       year: 'numeric',
-                  }).toString();
+                  });
         },
 
         close() {

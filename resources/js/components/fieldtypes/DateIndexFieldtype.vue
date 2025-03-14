@@ -28,15 +28,12 @@ export default {
                 return formatter.date(start) + ' – ' + formatter.date(end);
             }
 
-            return new DateFormatter()
-                .of(this.value.date + 'T' + (this.value.time || '00:00:00') + 'Z')
-                .options({
-                    year: 'numeric',
-                    month: 'numeric',
-                    day: 'numeric',
-                    ...(this.value.time_enabled && this.value.time ? { hour: 'numeric', minute: 'numeric' } : {}),
-                })
-                .toString();
+            return DateFormatter.format(this.value.date + 'T' + (this.value.time || '00:00:00') + 'Z', {
+                year: 'numeric',
+                month: 'numeric',
+                day: 'numeric',
+                ...(this.value.time_enabled && this.value.time ? { hour: 'numeric', minute: 'numeric' } : {}),
+            });
         },
     },
 };

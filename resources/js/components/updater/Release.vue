@@ -52,14 +52,11 @@ export default {
 
     computed: {
         date() {
-            return new DateFormatter()
-                .of(this.release.date)
-                .options({
-                    year: 'numeric',
-                    month: 'numeric',
-                    day: 'numeric',
-                })
-                .toString();
+            return DateFormatter.format(this.release.date, {
+                year: 'numeric',
+                month: 'numeric',
+                day: 'numeric',
+            });
         },
 
         body() {

@@ -9,7 +9,7 @@ const props = defineProps({
 
 const date = computed(() => (props.of ? new Date(props.of) : Date.now()));
 
-const text = computed(() => new DateFormatter().of(date.value).options(props.options).toString());
+const text = computed(() => DateFormatter.format(date.value, props.options));
 </script>
 
 <template>{{ text }}</template>

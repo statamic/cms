@@ -95,7 +95,7 @@ export default {
 
     computed: {
         time() {
-            return new DateFormatter(this.revision.date * 1000, { hour: 'numeric', minute: '2-digit' }).toString();
+            return DateFormatter.format(this.revision.date * 1000, { hour: 'numeric', minute: '2-digit' });
         },
     },
 

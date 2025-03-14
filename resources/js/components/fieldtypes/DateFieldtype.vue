@@ -175,8 +175,8 @@ export default {
             if (this.isRange) {
                 if (!this.localValue?.start) return;
 
-                const start = new Date(this.value.start.date + 'T' + (this.value.start.time || '00:00:00') + 'Z');
-                const end = new Date(this.value.end.date + 'T' + (this.value.end.time || '00:00:00') + 'Z');
+                const start = this.value.start.date + 'T' + (this.value.start.time || '00:00:00') + 'Z';
+                const end = this.value.end.date + 'T' + (this.value.end.time || '00:00:00') + 'Z';
                 const formatter = new DateFormatter().options({
                     year: 'numeric',
                     month: 'numeric',
@@ -188,15 +188,12 @@ export default {
 
             if (!this.value?.date) return;
 
-            return new DateFormatter()
-                .of(new Date(this.value.date + 'T' + (this.value.time || '00:00:00') + 'Z'))
-                .options({
-                    year: 'numeric',
-                    month: 'numeric',
-                    day: 'numeric',
-                    ...(this.hasTime && this.value.time ? { hour: 'numeric', minute: 'numeric' } : {}),
-                })
-                .toString();
+            return DateFormatter.format(this.value.date + 'T' + (this.value.time || '00:00:00') + 'Z', {
+                year: 'numeric',
+                month: 'numeric',
+                day: 'numeric',
+                ...(this.hasTime && this.value.time ? { hour: 'numeric', minute: 'numeric' } : {}),
+            });
         },
     },
 

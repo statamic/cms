@@ -4,7 +4,7 @@ export default class DateFormatter {
     #locale = navigator.language;
 
     constructor(date, options) {
-        this.#date = date;
+        this.#date = this.#normalizeDate(date);
         this.#options = options ?? {
             year: 'numeric',
             month: 'numeric',
@@ -19,7 +19,7 @@ export default class DateFormatter {
     }
 
     date(value) {
-        return new DateFormatter(new Date(value), this.#options);
+        return new DateFormatter(value, this.#options);
     }
 
     options(options) {
@@ -27,10 +27,30 @@ export default class DateFormatter {
     }
 
     toString() {
-        return Intl.DateTimeFormat(this.locale, this.#options).format(this.#date);
+        try {
+            return Intl.DateTimeFormat(this.locale, this.#options).format(this.#date);
+        } catch (e) {
+            return 'Invalid Date';
+        }
+    }
+
+    static format(date, options) {
+        return new DateFormatter(date, options).toString();
+    }
+
+    format(date, options) {
+        return this.date(date).options(options).toString();
     }
 
     get locale() {
         return this.#locale;
+    }
+
+    #normalizeDate(date) {
+        if (!date || date === 'now') return Date.now();
+
+        if (date instanceof Date) return date;
+
+        return new Date(date);
     }
 }

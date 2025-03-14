@@ -251,7 +251,7 @@
                             class="flex items-center rounded bg-gray-400 py-1 dark:bg-dark-600 ltr:pl-2 ltr:pr-3 rtl:pl-3 rtl:pr-2"
                         >
                             <svg-icon name="thumbprint" class="h-3 ltr:mr-2 rtl:ml-2" />
-                            <div class="" :title="$date.of(asset.lastModified)">
+                            <div class="" :title="$date.format(asset.lastModified)">
                                 {{ asset.lastModifiedRelative }}
                             </div>
                         </div>
