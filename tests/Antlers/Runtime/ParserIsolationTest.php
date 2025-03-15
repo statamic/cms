@@ -235,11 +235,11 @@ EXPECTED;
         Collection::make('pages')->routes(['en' => '{slug}'])->save();
         EntryFactory::collection('pages')->id('1')->slug('page-one')->data([
             'title' => 'Page One',
-            'template' => 'escaped_braces'
+            'template' => 'escaped_braces',
         ])->create();
         EntryFactory::collection('pages')->id('2')->slug('page-two')->data([
             'title' => 'Page Two',
-            'template' => 'escaped_braces'
+            'template' => 'escaped_braces',
         ])->create();
 
         $this->withFakeViews();
