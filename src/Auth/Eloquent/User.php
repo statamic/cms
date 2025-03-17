@@ -316,6 +316,24 @@ class User extends BaseUser
         return $this->model()->getRememberTokenName();
     }
 
+    public function sendPasswordResetNotification($token)
+    {
+        if (method_exists($this->model(), 'sendPasswordResetNotification')) {
+            return $this->model()->sendPasswordResetNotification($token);
+        }
+
+        parent::sendPasswordResetNotification($token);
+    }
+
+    public function sendActivateAccountNotification($token)
+    {
+        if (method_exists($this->model(), 'sendActivateAccountNotification')) {
+            return $this->model()->sendActivateAccountNotification($token);
+        }
+
+        parent::sendActivateAccountNotification($token);
+    }
+
     public function lastLogin()
     {
         if (! $date = $this->model()->last_login) {
