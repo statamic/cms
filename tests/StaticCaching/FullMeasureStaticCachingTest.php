@@ -141,8 +141,8 @@ class FullMeasureStaticCachingTest extends TestCase
 
         $this->createPage('about');
 
-        $csrfTokenScript = '<script type="text/javascript">'.app(Cacher::class)->getCsrfTokenJs().'</script>';
-        $nocacheScript = '<script type="text/javascript">'.app(Cacher::class)->getNocacheJs().'</script>';
+        $csrfTokenScript = '<script>'.app(Cacher::class)->getCsrfTokenJs().'</script>';
+        $nocacheScript = '<script>'.app(Cacher::class)->getNocacheJs().'</script>';
 
         $this->assertFalse(file_exists($this->dir.'/about_.html'));
 
