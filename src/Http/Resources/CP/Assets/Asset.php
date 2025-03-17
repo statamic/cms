@@ -21,7 +21,7 @@ class Asset extends JsonResource
             'extension' => $this->extension(),
             'downloadUrl' => $this->cpDownloadUrl(),
             'size' => Str::fileSizeForHumans($this->size()),
-            'lastModified' => $this->lastModified()->inPreferredFormat(),
+            'lastModified' => $this->lastModified()->toIso8601String(),
             'lastModifiedRelative' => $this->lastModified()->diffForHumans(),
             'mimeType' => $this->mimeType(),
             'isImage' => $this->isImage(),

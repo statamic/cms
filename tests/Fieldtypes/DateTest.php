@@ -6,7 +6,6 @@ use Illuminate\Support\Carbon;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
-use Statamic\Facades\Preference;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fieldtypes\Date;
@@ -356,11 +355,6 @@ class DateTest extends TestCase
     {
         config()->set('app.timezone', $timezone);
 
-        // Show that the date format from the preference is being used, and
-        // that the fall back would have been the configured date format.
-        config(['statamic.cp.date_format' => 'custom']);
-        Preference::shouldReceive('get')->with('date_format', 'custom')->andReturn('Y/m/d');
-
         $this->assertSame($expected, $this->fieldtype($config)->preProcessIndex($value));
     }
 
@@ -377,37 +371,37 @@ class DateTest extends TestCase
                 'UTC',
                 [],
                 '2012-08-29 00:00',
-                ['date' => '2012-08-29', 'time' => '00:00', 'mode' => 'single', 'display_format' => 'YYYY/MM/DD'],
+                ['date' => '2012-08-29', 'time' => '00:00', 'mode' => 'single', 'time_enabled' => false],
             ],
             'date with custom format' => [
                 'UTC',
                 ['format' => 'Y--m--d H/i'],
                 '2012--08--29 00/00',
-                ['date' => '2012-08-29', 'time' => '00:00', 'mode' => 'single', 'display_format' => 'YYYY/MM/DD'],
+                ['date' => '2012-08-29', 'time' => '00:00', 'mode' => 'single', 'time_enabled' => false],
             ],
             'date in a different timezone' => [
                 'America/New_York', // -0400
                 [],
                 '2012-08-29 00:00',
-                ['date' => '2012-08-29', 'time' => '04:00', 'mode' => 'single', 'display_format' => 'YYYY/MM/DD'],
+                ['date' => '2012-08-29', 'time' => '04:00', 'mode' => 'single', 'time_enabled' => false],
             ],
             'date with time' => [
                 'UTC',
                 ['time_enabled' => true],
                 '2012-08-29 13:43',
-                ['date' => '2012-08-29', 'time' => '13:43', 'mode' => 'single', 'display_format' => 'YYYY/MM/DD HH:mm'],
+                ['date' => '2012-08-29', 'time' => '13:43', 'mode' => 'single', 'time_enabled' => true],
             ],
             'date with time and custom format' => [
                 'UTC',
                 ['time_enabled' => true, 'format' => 'Y--m--d H:i'],
                 '2012--08--29 13:43',
-                ['date' => '2012-08-29', 'time' => '13:43', 'mode' => 'single', 'display_format' => 'YYYY/MM/DD HH:mm'],
+                ['date' => '2012-08-29', 'time' => '13:43', 'mode' => 'single', 'time_enabled' => true],
             ],
             'date with time in a different timezone' => [
                 'America/New_York', // -0400
                 ['time_enabled' => true],
                 '2012-08-29 13:43',
-                ['date' => '2012-08-29', 'time' => '17:43', 'mode' => 'single', 'display_format' => 'YYYY/MM/DD HH:mm'],
+                ['date' => '2012-08-29', 'time' => '17:43', 'mode' => 'single', 'time_enabled' => true],
             ],
             'null range' => [
                 'UTC',
@@ -419,19 +413,19 @@ class DateTest extends TestCase
                 'UTC',
                 ['mode' => 'range'],
                 ['start' => '2012-08-29 00:00', 'end' => '2013-09-27 00:00'],
-                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2013-09-27', 'time' => '00:00'], 'mode' => 'range', 'display_format' => 'YYYY/MM/DD'],
+                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2013-09-27', 'time' => '00:00'], 'mode' => 'range'],
             ],
             'range with custom format' => [
                 'UTC',
                 ['mode' => 'range', 'format' => 'Y--m--d H/i'],
                 ['start' => '2012--08--29 00/00', 'end' => '2013--09--27 00/00'],
-                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2013-09-27', 'time' => '00:00'], 'mode' => 'range', 'display_format' => 'YYYY/MM/DD'],
+                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2013-09-27', 'time' => '00:00'], 'mode' => 'range'],
             ],
             'range in a different timezone' => [
                 'America/New_York', // -4000
                 ['mode' => 'range'],
                 ['start' => '2012-08-29 00:00', 'end' => '2013-09-27 00:00'],
-                ['start' => ['date' => '2012-08-29', 'time' => '04:00'], 'end' => ['date' => '2013-09-27', 'time' => '04:00'], 'mode' => 'range', 'display_format' => 'YYYY/MM/DD'],
+                ['start' => ['date' => '2012-08-29', 'time' => '04:00'], 'end' => ['date' => '2013-09-27', 'time' => '04:00'], 'mode' => 'range'],
             ],
             'range where single date has been provided' => [
                 // e.g. If it was once a non-range field.
@@ -439,89 +433,34 @@ class DateTest extends TestCase
                 'UTC',
                 ['mode' => 'range'],
                 '2012-08-29',
-                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2012-08-29', 'time' => '00:00'], 'mode' => 'range', 'display_format' => 'YYYY/MM/DD'],
+                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2012-08-29', 'time' => '00:00'], 'mode' => 'range'],
             ],
             'range where single date has been provided with custom format' => [
                 'UTC',
                 ['mode' => 'range', 'format' => 'Y--m--d H/i'],
                 '2012--08--29 00/00',
-                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2012-08-29', 'time' => '00:00'], 'mode' => 'range', 'display_format' => 'YYYY/MM/DD'],
+                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2012-08-29', 'time' => '00:00'], 'mode' => 'range'],
             ],
             'date where range has been provided' => [
                 // e.g. If it was once a range field. Use the start date.
                 'UTC',
                 [],
                 ['start' => '2012-08-29 00:00', 'end' => '2013-09-27 00:00'],
-                ['date' => '2012-08-29', 'time' => '00:00', 'mode' => 'single', 'display_format' => 'YYYY/MM/DD'],
+                ['date' => '2012-08-29', 'time' => '00:00', 'mode' => 'single', 'time_enabled' => false],
             ],
             'date where range has been provided with custom format' => [
                 'UTC',
                 ['format' => 'Y--m--d H/i'],
                 ['start' => '2012--08--29 00/00', 'end' => '2013--09--27 00/00'],
-                ['date' => '2012-08-29', 'time' => '00:00', 'mode' => 'single', 'display_format' => 'YYYY/MM/DD'],
+                ['date' => '2012-08-29', 'time' => '00:00', 'mode' => 'single', 'time_enabled' => false],
             ],
             'range where time has been enabled' => [
                 'UTC',
                 ['mode' => 'range', 'time_enabled' => true], // enabling time should have no effect.
                 ['start' => '2012-08-29 00:00', 'end' => '2013-09-27 00:00'],
-                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2013-09-27', 'time' => '00:00'], 'mode' => 'range', 'display_format' => 'YYYY/MM/DD'],
+                ['start' => ['date' => '2012-08-29', 'time' => '00:00'], 'end' => ['date' => '2013-09-27', 'time' => '00:00'], 'mode' => 'range'],
             ],
         ];
-    }
-
-    #[Test]
-    public function it_gets_the_display_format_when_time_is_disabled()
-    {
-        $fieldtype = $this->fieldtype();
-
-        $this->assertEquals('Y-m-d', $fieldtype->indexDisplayFormat());
-        $this->assertEquals('Y-m-d', $fieldtype->fieldDisplayFormat());
-    }
-
-    #[Test]
-    public function it_gets_the_display_format_when_time_is_enabled()
-    {
-        $fieldtype = $this->fieldtype(['time_enabled' => true]);
-        $fieldtype->field()->setValue('2013-04-01');
-
-        $this->assertEquals('Y-m-d H:i', $fieldtype->indexDisplayFormat());
-        $this->assertEquals('Y-m-d', $fieldtype->fieldDisplayFormat());
-    }
-
-    #[Test]
-    public function it_gets_the_display_format_for_ranges()
-    {
-        $fieldtype = $this->fieldtype(['mode' => 'range']);
-
-        $this->assertEquals('Y-m-d', $fieldtype->indexDisplayFormat());
-        $this->assertEquals('Y-m-d', $fieldtype->fieldDisplayFormat());
-    }
-
-    #[Test]
-    public function it_gets_the_display_format_when_time_is_disabled_with_custom_format()
-    {
-        $fieldtype = $this->fieldtype(['format' => 'U']);
-
-        $this->assertEquals('Y-m-d', $fieldtype->indexDisplayFormat());
-        $this->assertEquals('Y-m-d', $fieldtype->fieldDisplayFormat());
-    }
-
-    #[Test]
-    public function it_gets_the_display_format_when_time_is_enabled_with_custom_format()
-    {
-        $fieldtype = $this->fieldtype(['time_enabled' => true, 'format' => 'U']);
-
-        $this->assertEquals('Y-m-d H:i', $fieldtype->indexDisplayFormat());
-        $this->assertEquals('Y-m-d', $fieldtype->fieldDisplayFormat());
-    }
-
-    #[Test]
-    public function it_gets_the_display_format_for_ranges_with_custom_format()
-    {
-        $fieldtype = $this->fieldtype(['mode' => 'range', 'format' => 'U']);
-
-        $this->assertEquals('Y-m-d', $fieldtype->indexDisplayFormat());
-        $this->assertEquals('Y-m-d', $fieldtype->fieldDisplayFormat());
     }
 
     #[Test]
