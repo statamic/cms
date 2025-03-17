@@ -242,7 +242,6 @@ export default {
             if (this.html) {
                 var stats = readTimeEstimate(this.html, 265, 12, 500, ['img', 'Image', 'bard-set']);
                 var durationMs = stats.duration * 60 * 1000;
-
                 var minutes = Math.floor(durationMs / 60000);
                 var seconds = Math.floor((durationMs % 60000) / 1000);
 
