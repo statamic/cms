@@ -77,7 +77,7 @@ class Variables implements Arrayable, ArrayAccess, Augmentable, Contract, Locali
     {
         return vsprintf('%s/%s%s.%s', [
             rtrim(Stache::store('global-variables')->directory(), '/'),
-            Site::multiEnabled() ? $this->locale().'/' : '',
+            $this->locale().'/',
             $this->handle(),
             'yaml',
         ]);

@@ -25,10 +25,6 @@ class GlobalVariablesStore extends BasicStore
 
         $filename = Str::after(Path::tidy($file->getPathName()), $this->directory);
 
-        if (! Site::multiEnabled()) {
-            return substr_count($filename, '/') === 0;
-        }
-
         return substr_count($filename, '/') === 1;
     }
 
@@ -38,10 +34,6 @@ class GlobalVariablesStore extends BasicStore
         $handle = Str::before($relative, '.yaml');
 
         $data = YAML::file($path)->parse($contents);
-
-        if (! Site::multiEnabled()) {
-            $data = $data['data'] ?? [];
-        }
 
         return $this->makeVariablesFromFile($handle, $path, $data);
     }
@@ -53,6 +45,7 @@ class GlobalVariablesStore extends BasicStore
             ->data(Arr::except($data, 'origin'));
 
         $handle = explode('/', $handle);
+
         if (count($handle) > 1) {
             $variables->globalSet($handle[1])
                 ->locale($handle[0]);
@@ -66,24 +59,6 @@ class GlobalVariablesStore extends BasicStore
         }
 
         return $variables;
-    }
-
-    protected function writeItemToDisk($item)
-    {
-        if (Site::multiEnabled()) {
-            $item->writeFile();
-        } else {
-            $item->globalSet()->writeFile();
-        }
-    }
-
-    protected function deleteItemFromDisk($item)
-    {
-        if (Site::multiEnabled()) {
-            $item->deleteFile();
-        } else {
-            $item->globalSet()->removeLocalization($item)->writeFile();
-        }
     }
 
     protected function storeIndexes()

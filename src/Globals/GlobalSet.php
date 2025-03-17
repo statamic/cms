@@ -156,17 +156,9 @@ class GlobalSet implements Contract
 
     public function fileData()
     {
-        $data = [
+        return [
             'title' => $this->title(),
         ];
-
-        if (! Site::multiEnabled() && ($variables = $this->in(Site::default()->handle()))) {
-            $data['data'] = Arr::removeNullValues(
-                $variables->data()->all()
-            );
-        }
-
-        return $data;
     }
 
     public function makeLocalization($site)
