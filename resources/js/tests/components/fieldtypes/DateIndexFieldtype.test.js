@@ -1,7 +1,6 @@
 import { mount } from '@vue/test-utils';
 import { test, expect, beforeEach } from 'vitest';
 import DateIndexFieldtype from '@/components/fieldtypes/DateIndexFieldtype.vue';
-import Moment from 'moment';
 
 window.__ = (key) => key;
 

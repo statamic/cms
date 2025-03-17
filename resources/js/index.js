@@ -3,7 +3,6 @@ import * as Vue from 'vue';
 import Alpine from 'alpinejs';
 import * as Globals from './bootstrap/globals';
 import Cookies from 'cookies-js';
-import Moment from 'moment';
 
 import.meta.glob(['../img/**']);
 
