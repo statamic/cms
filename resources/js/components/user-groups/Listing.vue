@@ -1,14 +1,14 @@
 <template>
-    <data-list :rows="rows" :columns="columns">
-        <div class="card p-0" slot-scope="{ }">
+    <data-list :rows="rows" :columns="columns" v-slot="{}">
+        <div class="card p-0">
             <data-list-table>
-                <template slot="cell-title" slot-scope="{ row: group, index }">
+                <template #cell-title="{ row: group, index }">
                     <a :href="group.show_url">{{ __(group.title) }}</a>
                 </template>
-                <template slot="cell-handle" slot-scope="{ value: handle }">
+                <template #cell-handle="{ value: handle }">
                     <span class="font-mono text-xs">{{ handle }}</span>
                 </template>
-                <template slot="actions" slot-scope="{ row: group, index }">
+                <template #actions="{ row: group, index }">
                     <dropdown-list>
                         <dropdown-item :text="__('Edit')" :redirect="group.edit_url" />
                         <dropdown-item
@@ -19,7 +19,8 @@
                             <resource-deleter
                                 :ref="`deleter_${group.id}`"
                                 :resource="group"
-                                @deleted="removeRow(group)">
+                                @deleted="removeRow(group)"
+                            >
                             </resource-deleter>
                         </dropdown-item>
                     </dropdown-list>
@@ -30,10 +31,9 @@
 </template>
 
 <script>
-import Listing from '../Listing.vue'
+import Listing from '../Listing.vue';
 
 export default {
-
     mixins: [Listing],
 
     props: {
@@ -48,9 +48,8 @@ export default {
                 { label: __('Handle'), field: 'handle' },
                 { label: __('Users'), field: 'users' },
                 { label: __('Roles'), field: 'roles' },
-            ]
-        }
-    }
-
-}
+            ],
+        };
+    },
+};
 </script>

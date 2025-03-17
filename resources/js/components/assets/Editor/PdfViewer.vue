@@ -1,20 +1,19 @@
 <template>
-    <div id="pdfViewer" class="h-full text-white text-center flex flex-col justify-center items-center"></div>
+    <div id="pdfViewer" class="flex h-full flex-col items-center justify-center text-center text-white"></div>
 </template>
 
 <script>
 import PDFObject from 'pdfobject';
 
 export default {
-
     props: {
         src: {
-            required: true
-        }
+            required: true,
+        },
     },
 
     mounted() {
-        PDFObject.embed(this.src, "#pdfViewer");
+        PDFObject.embed(this.src, '#pdfViewer');
     },
-}
+};
 </script>

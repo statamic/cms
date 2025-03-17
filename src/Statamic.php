@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Vite;
 use Laravel\Nova\Nova;
 use Statamic\Facades\File;
-use Statamic\Facades\Preference;
 use Statamic\Facades\URL;
 use Statamic\Modifiers\Modify;
 use Statamic\Support\Arr;
@@ -242,15 +241,18 @@ class Statamic
         return new static;
     }
 
-    public static function svg($name, $attrs = null)
+    public static function svg($name, $attrs = null, $fallback = null)
     {
         if ($attrs) {
             $attrs = " class=\"{$attrs}\"";
         }
 
-        $svg = StaticStringy::collapseWhitespace(
-            File::get(statamic_path("resources/svg/{$name}.svg"))
-        );
+        $path = statamic_path("resources/svg/{$name}.svg");
+        if ($fallback && ! File::exists($path)) {
+            $path = statamic_path("resources/svg/{$fallback}.svg");
+        }
+
+        $svg = StaticStringy::collapseWhitespace(File::get($path));
 
         return str_replace('<svg', sprintf('<svg%s', $attrs), $svg);
     }
@@ -283,7 +285,7 @@ class Statamic
     public static function cpViteScripts()
     {
         return static::cpVite()->withEntryPoints([
-            'resources/js/app.js',
+            'resources/js/index.js',
             'resources/css/tailwind.css',
         ]);
     }
@@ -293,18 +295,6 @@ class Statamic
         return Vite::getFacadeRoot()
             ->useHotFile('vendor/statamic/cp/hot')
             ->useBuildDirectory('vendor/statamic/cp/build');
-    }
-
-    public static function cpDateFormat()
-    {
-        return Preference::get('date_format', config('statamic.cp.date_format'));
-    }
-
-    public static function cpDateTimeFormat()
-    {
-        $format = self::cpDateFormat();
-
-        return DateFormat::containsTime($format) ? $format : $format.' H:i';
     }
 
     public static function dateFormat()
@@ -317,6 +307,11 @@ class Statamic
         $format = self::dateFormat();
 
         return DateFormat::containsTime($format) ? $format : $format.' H:i';
+    }
+
+    public static function displayTimezone(): string
+    {
+        return config('statamic.system.display_timezone') ?? config('app.timezone');
     }
 
     public static function flash()

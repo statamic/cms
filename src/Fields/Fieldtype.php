@@ -12,6 +12,8 @@ use Statamic\Query\Scopes\Filters\Fields\FieldtypeFilter;
 use Statamic\Statamic;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 abstract class Fieldtype implements Arrayable
 {
     use HasHandle, RegistersItself {
@@ -29,6 +31,7 @@ abstract class Fieldtype implements Arrayable
     protected $selectableInForms = false;
     protected $relationship = false;
     protected $categories = [];
+    protected $keywords = [];
     protected $rules = [];
     protected $extraRules = [];
     protected $defaultValue;
@@ -113,6 +116,11 @@ abstract class Fieldtype implements Arrayable
         return $this->categories;
     }
 
+    public function keywords(): array
+    {
+        return $this->keywords;
+    }
+
     public function filter()
     {
         return new FieldtypeFilter($this);
@@ -167,6 +175,7 @@ abstract class Fieldtype implements Arrayable
             'validatable' => $this->validatable(),
             'defaultable' => $this->defaultable(),
             'categories' => $this->categories(),
+            'keywords' => $this->keywords(),
             'icon' => $this->icon(),
             'config' => $this->configFields()->toPublishArray(),
         ];

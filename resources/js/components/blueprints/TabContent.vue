@@ -1,8 +1,5 @@
 <template>
-    <div
-        role="tabpanel"
-        :aria-labelledby="`tab-${tab._id}`"
-        :id="`tab-panel-${tab._id}`">
+    <div role="tabpanel" :aria-labelledby="`tab-${tab._id}`" :id="`tab-panel-${tab._id}`">
         <sections
             ref="sections"
             :tab-id="tab._id"
@@ -12,6 +9,7 @@
             :edit-section-text="editSectionText"
             :show-section-handle-field="showSectionHandleField"
             :show-section-hide-field="showSectionHideField"
+            :can-define-localizable="canDefineLocalizable"
             @updated="sectionsUpdated($event)"
         />
     </div>
@@ -19,8 +17,10 @@
 
 <script>
 import Sections from './Sections.vue';
+import CanDefineLocalizable from '../fields/CanDefineLocalizable';
 
 export default {
+    mixins: [CanDefineLocalizable],
 
     components: {
         Sections,
@@ -50,17 +50,14 @@ export default {
     },
 
     methods: {
-
         addSection() {
             return this.$refs.sections.addSection();
         },
 
         sectionsUpdated(sections) {
-            let tab = {...this.tab, ...{ sections }};
+            let tab = { ...this.tab, ...{ sections } };
             this.$emit('updated', tab);
         },
-
-    }
-
-}
+    },
+};
 </script>

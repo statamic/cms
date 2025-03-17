@@ -1,0 +1,22 @@
+{
+    "printWidth": 120,
+    "semi": true,
+    "singleQuote": true,
+    "tabWidth": 4,
+    "trailingComma": "all",
+    "plugins": ["prettier-plugin-blade", "prettier-plugin-antlers", "prettier-plugin-tailwindcss"],
+    "overrides": [
+        {
+            "files": ["*.blade.php"],
+            "options": {
+                "parser": "blade"
+            }
+        },
+        {
+            "files": ["*.antlers.html"],
+            "options": {
+                "parser": "antlers"
+            }
+        }
+    ]
+}

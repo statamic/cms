@@ -4,11 +4,8 @@ namespace Statamic\Events;
 
 class EntryCreating extends Event
 {
-    public $entry;
-
-    public function __construct($entry)
+    public function __construct(public $entry)
     {
-        $this->entry = $entry;
     }
 
     /**

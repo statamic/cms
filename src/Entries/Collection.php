@@ -265,6 +265,14 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         return cp_route('collections.show', $this->handle());
     }
 
+    public function breadcrumbUrl()
+    {
+        $referer = request()->header('referer');
+        $showUrl = $this->showUrl();
+
+        return $referer && Str::before($referer, '?') === $showUrl ? $referer : $showUrl;
+    }
+
     public function editUrl()
     {
         return cp_route('collections.edit', $this->handle());
@@ -376,16 +384,6 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             $blueprint->ensureField('date', ['type' => 'date', 'required' => true, 'default' => 'now'], 'sidebar');
         }
 
-        if ($this->hasStructure() && ! $this->orderable()) {
-            $blueprint->ensureField('parent', [
-                'type' => 'entries',
-                'collections' => [$this->handle()],
-                'max_items' => 1,
-                'listable' => false,
-                'localizable' => true,
-            ], 'sidebar');
-        }
-
         foreach ($this->taxonomies() as $taxonomy) {
             if ($blueprint->hasField($taxonomy->handle())) {
                 continue;
@@ -442,7 +440,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         return $this
             ->fluentlyGetOrSet('layout')
             ->getter(function ($layout) {
-                return $layout ?? 'layout';
+                return $layout ?? config('statamic.system.layout', 'layout');
             })
             ->args(func_get_args());
     }

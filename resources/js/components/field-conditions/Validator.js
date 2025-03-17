@@ -1,36 +1,29 @@
 import Converter from './Converter.js';
 import ParentResolver from './ParentResolver.js';
 import { KEYS } from './Constants.js';
-import { data_get } from  '../../bootstrap/globals.js'
-import isString from 'underscore/modules/isString.js'
-import isObject from 'underscore/modules/isObject.js'
-import isEmpty from 'underscore/modules/isEmpty.js'
-import intersection from 'underscore/modules/intersection.js'
-import map from 'underscore/modules/map.js'
-import each from 'underscore/modules/each.js'
-import filter from 'underscore/modules/filter.js'
-import reject from 'underscore/modules/reject.js'
-import first from 'underscore/modules/first.js'
-import chain from 'underscore/modules/chain.js'
-import chainable from 'underscore/modules/mixin.js'
+import { data_get } from '../../bootstrap/globals.js';
+import { isObject, intersection } from 'lodash-es';
 
-chainable({ chain, map, each, filter, reject, first, isEmpty });
+const NUMBER_SPECIFIC_COMPARISONS = ['>', '>=', '<', '<='];
 
-const NUMBER_SPECIFIC_COMPARISONS = [
-    '>', '>=', '<', '<='
-];
+const isEmpty = (value) => {
+    if (value === null || value === undefined) return true;
+
+    return Array.isArray(value) ? value.length === 0 : Object.keys(value).length === 0;
+};
+
+const isString = (str) => str != null && typeof str.valueOf() === 'string';
 
 export default class {
-    constructor(field, values, dottedFieldPath, store, storeName) {
+    constructor(field, values, dottedFieldPath, store) {
         this.field = field;
         this.values = values;
         this.dottedFieldPath = dottedFieldPath;
         this.store = store;
-        this.storeName = storeName;
-        this.rootValues = store ? store.state.publish[storeName].values : false;
+        this.rootValues = store ? store.values : false;
         this.passOnAny = false;
         this.showOnPass = true;
-        this.converter = new Converter;
+        this.converter = new Converter();
     }
 
     passesConditions(specificConditions) {
@@ -42,20 +35,15 @@ export default class {
             return this.passesCustomCondition(this.prepareCondition(conditions));
         }
 
-        let passes = this.passOnAny
-            ? this.passesAnyConditions(conditions)
-            : this.passesAllConditions(conditions);
+        let passes = this.passOnAny ? this.passesAnyConditions(conditions) : this.passesAllConditions(conditions);
 
-        return this.showOnPass ? passes : ! passes;
+        return this.showOnPass ? passes : !passes;
     }
 
     getConditions() {
-        let key = chain(KEYS)
-            .filter(key => this.field[key])
-            .first()
-            .value();
+        let key = KEYS.filter((key) => this.field[key])[0];
 
-        if (! key) {
+        if (!key) {
             return undefined;
         }
 
@@ -79,19 +67,19 @@ export default class {
     }
 
     passesAllConditions(conditions) {
-        return chain(conditions)
-            .map(condition => this.prepareCondition(condition))
-            .reject(condition => this.passesCondition(condition))
-            .isEmpty()
-            .value();
+        return isEmpty(
+            conditions
+                .map((condition) => this.prepareCondition(condition))
+                .filter((condition) => !this.passesCondition(condition)),
+        );
     }
 
     passesAnyConditions(conditions) {
-        return ! chain(conditions)
-            .map(condition => this.prepareCondition(condition))
-            .filter(condition => this.passesCondition(condition))
-            .isEmpty()
-            .value();
+        return !isEmpty(
+            conditions
+                .map((condition) => this.prepareCondition(condition))
+                .filter((condition) => this.passesCondition(condition)),
+        );
     }
 
     prepareCondition(condition) {
@@ -103,7 +91,7 @@ export default class {
         let lhs = this.prepareLhs(condition.field, operator);
         let rhs = this.prepareRhs(condition.value, operator);
 
-        return {lhs, operator, rhs};
+        return { lhs, operator, rhs };
     }
 
     prepareOperator(operator) {
@@ -137,7 +125,7 @@ export default class {
         }
 
         // When performing lhs.includes(), if lhs is not an object or array, cast to string.
-        if (operator === 'includes' && ! isObject(lhs)) {
+        if (operator === 'includes' && !isObject(lhs)) {
             return lhs ? lhs.toString() : '';
         }
 
@@ -147,9 +135,7 @@ export default class {
         }
 
         // Prepare for eval() and return.
-        return isString(lhs)
-            ? JSON.stringify(lhs.trim())
-            : lhs;
+        return isString(lhs) ? JSON.stringify(lhs.trim()) : lhs;
     }
 
     prepareRhs(rhs, operator) {
@@ -174,35 +160,27 @@ export default class {
         }
 
         // Prepare for eval() and return.
-        return isString(rhs)
-            ? JSON.stringify(rhs.trim())
-            : rhs;
+        return isString(rhs) ? JSON.stringify(rhs.trim()) : rhs;
     }
 
     prepareCustomCondition(condition) {
         let functionName = this.prepareFunctionName(condition.value || condition);
         let params = this.prepareParams(condition.value || condition);
 
-        let target = condition.field
-            ? this.getFieldValue(condition.field)
-            : null;
+        let target = condition.field ? this.getFieldValue(condition.field) : null;
         let targetHandle = condition.field;
 
-        return {functionName, params, target, targetHandle};
+        return { functionName, params, target, targetHandle };
     }
 
     prepareFunctionName(condition) {
-        return condition
-            .replace(new RegExp('^custom '), '')
-            .split(':')[0];
+        return condition.replace(new RegExp('^custom '), '').split(':')[0];
     }
 
     prepareParams(condition) {
         let params = condition.split(':')[1];
 
-        return params
-            ? params.split(',').map(string => string.trim())
-            : [];
+        return params ? params.split(',').map((string) => string.trim()) : [];
     }
 
     getFieldValue(field) {
@@ -247,7 +225,7 @@ export default class {
     }
 
     passesIncludesAnyCondition(condition) {
-        let values = condition.rhs.split(',').map(string => string.trim());
+        let values = condition.rhs.split(',').map((string) => string.trim());
 
         if (Array.isArray(condition.lhs)) {
             return intersection(condition.lhs, values).length;
@@ -257,7 +235,7 @@ export default class {
     }
 
     passesCustomCondition(condition) {
-        let customFunction = data_get(this.store.state.statamic.conditions, condition.functionName);
+        let customFunction = Statamic.$conditions.get(condition.functionName);
 
         if (typeof customFunction !== 'function') {
             console.error(`Statamic field condition [${condition.functionName}] was not properly defined.`);
@@ -271,11 +249,10 @@ export default class {
             values: this.values,
             root: this.rootValues,
             store: this.store,
-            storeName: this.storeName,
             fieldPath: this.dottedFieldPath,
         });
 
-        return this.showOnPass ? passes : ! passes;
+        return this.showOnPass ? passes : !passes;
     }
 
     passesNonRevealerConditions(dottedPrefix) {
@@ -285,11 +262,11 @@ export default class {
             return this.passesConditions(conditions);
         }
 
-        let revealerFields = data_get(this.store.state.publish[this.storeName], 'revealerFields', []);
+        let revealerFields = this.store.revealerFields || [];
 
-        let nonRevealerConditions = chain(this.getConditions())
-            .reject(condition => revealerFields.includes(this.relativeLhsToAbsoluteFieldPath(condition.field, dottedPrefix)))
-            .value();
+        let nonRevealerConditions = (this.getConditions() ?? []).filter(
+            (condition) => !revealerFields.includes(this.relativeLhsToAbsoluteFieldPath(condition.field, dottedPrefix)),
+        );
 
         return this.passesConditions(nonRevealerConditions);
     }
@@ -303,8 +280,6 @@ export default class {
             return lhs.replace(new RegExp('^\\$?root\\.'), '');
         }
 
-        return dottedPrefix
-            ? dottedPrefix + '.' + lhs
-            : lhs;
+        return dottedPrefix ? dottedPrefix + '.' + lhs : lhs;
     }
 }

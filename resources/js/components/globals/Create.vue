@@ -1,33 +1,32 @@
 <template>
-    <div class="max-w-lg mt-4 mx-auto">
-
-        <div class="rounded p-6 lg:px-20 lg:py-10 shadow bg-white dark:bg-dark-600 dark:shadow-dark">
-            <header class="text-center mb-16">
+    <div class="mx-auto mt-4 max-w-lg">
+        <div class="rounded bg-white p-6 shadow dark:bg-dark-600 dark:shadow-dark lg:px-20 lg:py-10">
+            <header class="mb-16 text-center">
                 <h1 class="mb-6">{{ __('Create Global Set') }}</h1>
                 <p class="text-gray" v-text="__('messages.globals_configure_intro')" />
             </header>
             <div class="mb-10">
-                <label class="font-bold text-base mb-1" for="name">{{ __('Title') }}</label>
-                <input type="text" v-model="title" class="input-text" autofocus tabindex="1">
-                <div class="text-2xs text-gray-600 mt-2 flex items-center">
+                <label class="mb-1 text-base font-bold" for="name">{{ __('Title') }}</label>
+                <input type="text" v-model="title" class="input-text" autofocus tabindex="1" />
+                <div class="mt-2 flex items-center text-2xs text-gray-600">
                     {{ __('messages.globals_configure_title_instructions') }}
                 </div>
             </div>
             <div class="mb-4">
-                <label class="font-bold text-base mb-1" for="name">{{ __('Handle') }}</label>
+                <label class="mb-1 text-base font-bold" for="name">{{ __('Handle') }}</label>
                 <div class="relative">
-                    <loading-graphic inline text="" v-if="slug.busy" class="absolute top-3 right-3"/>
-                    <input type="text" v-model="handle" class="input-text" tabindex="2">
+                    <loading-graphic inline text="" v-if="slug.busy" class="absolute right-3 top-3" />
+                    <input type="text" v-model="handle" class="input-text" tabindex="2" />
                 </div>
-                <div class="text-2xs text-gray-600 mt-2 flex items-center">
+                <div class="mt-2 flex items-center text-2xs text-gray-600">
                     {{ __('messages.globals_configure_handle_instructions') }}
                 </div>
             </div>
         </div>
 
-        <div class="flex justify-center mt-8">
-            <button tabindex="4" class="btn-primary mx-auto btn-lg" :disabled="! canSubmit" @click="submit">
-                {{ __('Create Global Set')}}
+        <div class="mt-8 flex justify-center">
+            <button tabindex="4" class="btn-primary btn-lg mx-auto" :disabled="!canSubmit" @click="submit">
+                {{ __('Create Global Set') }}
             </button>
         </div>
     </div>
@@ -35,11 +34,10 @@
 
 <script>
 export default {
-
     props: {
         route: {
-            type: String
-        }
+            type: String,
+        },
     },
 
     data() {
@@ -47,13 +45,13 @@ export default {
             title: null,
             handle: null,
             slug: this.$slug.async().separatedBy('_'),
-        }
+        };
     },
 
     watch: {
         title(title) {
-            this.slug.create(title).then(slug => this.handle = slug);
-        }
+            this.slug.create(title).then((slug) => (this.handle = slug));
+        },
     },
 
     computed: {
@@ -64,21 +62,23 @@ export default {
 
     methods: {
         submit() {
-            this.$axios.post(this.route, {title: this.title, handle: this.handle}).then(response => {
-                window.location = response.data.redirect;
-            }).catch(error => {
-                this.$toast.error(error.response.data.message);
-            });
-        }
+            this.$axios
+                .post(this.route, { title: this.title, handle: this.handle })
+                .then((response) => {
+                    window.location = response.data.redirect;
+                })
+                .catch((error) => {
+                    this.$toast.error(error.response.data.message);
+                });
+        },
     },
 
     mounted() {
-        this.$keys.bindGlobal(['return'], e => {
+        this.$keys.bindGlobal(['return'], (e) => {
             if (this.canSubmit) {
                 this.submit();
             }
         });
-    }
-
-}
+    },
+};
 </script>

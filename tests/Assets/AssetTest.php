@@ -11,6 +11,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
+use League\Flysystem\PathTraversalDetected;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -483,6 +484,25 @@ class AssetTest extends TestCase
     }
 
     #[Test]
+    public function it_cannot_use_traversal_in_path()
+    {
+        $asset = (new Asset)->path('path/to/asset.jpg');
+
+        try {
+            $asset->path('foo/../test.jpg');
+        } catch (PathTraversalDetected $e) {
+            $this->assertEquals('Path traversal detected: foo/../test.jpg', $e->getMessage());
+
+            // Even if exception was thrown, make sure that the path didn't somehow get updated.
+            $this->assertEquals('path/to/asset.jpg', $asset->path());
+
+            return;
+        }
+
+        $this->fail('Exception was not thrown.');
+    }
+
+    #[Test]
     public function it_gets_the_id_from_the_container_and_path()
     {
         $asset = (new Asset)
@@ -601,7 +621,7 @@ class AssetTest extends TestCase
     #[Test]
     public function it_checks_if_its_an_image_file()
     {
-        $extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        $extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif'];
 
         foreach ($extensions as $ext) {
             $this->assertTrue((new Asset)->path("path/to/asset.$ext")->isImage());
@@ -1997,7 +2017,7 @@ class AssetTest extends TestCase
     public function it_appends_timestamp_to_uploaded_files_filename_if_it_already_exists()
     {
         Event::fake();
-        Carbon::setTestNow(Carbon::createFromTimestamp(1549914700));
+        Carbon::setTestNow(Carbon::createFromTimestamp(1549914700, config('app.timezone')));
         $asset = $this->container->makeAsset('path/to/asset.jpg');
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
         Storage::disk('test')->put('path/to/asset.jpg', '');

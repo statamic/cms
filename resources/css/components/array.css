@@ -3,50 +3,50 @@
    ========================================================================== */
 
 .array-fieldtype {
-
 }
 
 .array-table-wrapper {
-    @apply border dark:border-dark-900 rounded overflow-hidden;
+    @apply overflow-hidden rounded border dark:border-dark-900;
     &:focus-within {
         @apply ring-2 ring-blue-300 dark:ring-dark-blue-100;
     }
 }
 .array-table {
-    @apply rounded text-sm rtl:text-right ltr:text-left w-full;
+    @apply w-full rounded text-sm ltr:text-left rtl:text-right;
     &:focus {
         @apply outline-none;
     }
 
     tr:not(:last-child) {
-        th, td {
+        th,
+        td {
             @apply border-b dark:border-dark-900;
         }
     }
 
     th {
-        @apply rtl:border-l ltr:border-r dark:border-dark-900 p-2 bg-gray-300 dark:bg-dark-500;
+        @apply bg-gray-300 p-2 dark:border-dark-900 dark:bg-dark-500 ltr:border-r rtl:border-l;
     }
 
     td {
-        @apply p-0 m-0;
+        @apply m-0 p-0;
     }
 
     tr:first-child th {
-        @apply rtl:rounded-tr ltr:rounded-tl;
+        @apply ltr:rounded-tl rtl:rounded-tr;
     }
 
     tr:first-child td,
     tr:first-child .input-text-minimal {
-        @apply rtl:rounded-tl ltr:rounded-tr;
+        @apply ltr:rounded-tr rtl:rounded-tl;
     }
 
     tr:last-child th {
-        @apply rtl:rounded-br ltr:rounded-bl;
+        @apply ltr:rounded-bl rtl:rounded-br;
     }
     tr:last-child td:last-child,
     tr:last-child .input-text-minimal {
-        @apply rtl:rounded-bl ltr:rounded-br;
+        @apply ltr:rounded-br rtl:rounded-bl;
     }
 
     &:focus-within {
@@ -59,7 +59,11 @@
 
     /* Read Only */
     .read-only-field & {
-        th { @apply text-gray-500 dark:text-dark-150; }
-        tr td { @apply bg-gray-200 dark:bg-dark-600; }
+        th {
+            @apply text-gray-500 dark:text-dark-150;
+        }
+        tr td {
+            @apply bg-gray-200 dark:bg-dark-600;
+        }
     }
 }

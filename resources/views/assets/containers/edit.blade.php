@@ -1,15 +1,19 @@
-@php use function Statamic\trans as __; @endphp
+@php
+    use function Statamic\trans as __;
+@endphp
 
 @extends('statamic::layout')
 @section('title', __('Configure Asset Container'))
 
 @section('content')
-
     <header class="mb-6">
-        @include('statamic::partials.breadcrumb', [
-            'url' => cp_route('assets.browse.show', $container->handle()),
-            'title' => $container->title()
-        ])
+        @include(
+            'statamic::partials.breadcrumb',
+            [
+                'url' => cp_route('assets.browse.show', $container->handle()),
+                'title' => $container->title(),
+            ]
+        )
         <h1>@yield('title')</h1>
     </header>
 
@@ -22,5 +26,4 @@
         listing-url="{{ cp_route('assets.browse.show', $container->handle()) }}"
         action="patch"
     ></asset-container-edit-form>
-
 @endsection

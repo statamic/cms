@@ -1,44 +1,20 @@
 <template>
-    <portal
-        name="group-fullscreen"
-        :disabled="!fullScreenMode"
-        :provide="provide"
-    >
+    <portal name="group-fullscreen" :disabled="!fullScreenMode" :provide="provide">
         <element-container @resized="containerWidth = $event.width">
-            <div
-                class="group-fieldtype-container"
-                :class="{ 'grid-fullscreen bg-white': fullScreenMode }"
-            >
-                <header
+            <div class="group-fieldtype-container" :class="{ 'grid-fullscreen bg-white': fullScreenMode }">
+                <publish-field-fullscreen-header
                     v-if="fullScreenMode"
-                    class="relative flex items-center justify-between py-3 rtl:pr-3 ltr:pl-3 bg-gray-200 border-b"
+                    :title="config.display"
+                    :field-actions="fieldActions"
+                    @close="toggleFullscreen"
                 >
-                    <h2 v-text="__(config.display)" />
-                    <button
-                        @click="fullScreenMode = false"
-                        class="absolute btn-close top-2 rtl:left-5 ltr:right-5"
-                        :aria-label="__('Exit Fullscreen Mode')"
-                    >&times;</button>
-                </header>
-                <section :class="{ 'p-4': fullScreenMode }">
-                    <div
-                        v-if="!fullScreenMode"
-                        class="group-fieldtype-button-wrapper"
-                    >
-                        <button
-                            v-if="config.fullscreen"
-                            @click="toggleFullScreen"
-                            v-tooltip="__('Toggle Fullscreen Mode')"
-                            class="flex items-center group"
+                </publish-field-fullscreen-header>
+                <section :class="{ 'mt-14 p-4': fullScreenMode }">
+                    <div :class="{ 'replicator-set rounded border shadow-sm dark:border-dark-900': config.border }">
+                        <div
+                            class="publish-fields @container"
+                            :class="{ 'replicator-set-body': config.border, '-mx-4': !config.border }"
                         >
-                            <svg-icon
-                                name="expand-bold"
-                                class="h-3.5 px-0.5 text-gray-750 dark:text-dark-175 group-hover:text-black dark:group-hover:text-dark-100"
-                            />
-                        </button>
-                    </div>
-                    <div :class="{ 'border dark:border-dark-900 rounded shadow-sm replicator-set': config.border }">
-                        <div class="publish-fields @container" :class="{ 'replicator-set-body': config.border, '-mx-4': !config.border }">
                             <set-field
                                 v-for="field in fields"
                                 :key="field.handle"
@@ -51,10 +27,12 @@
                                 :errors="errors(field.handle)"
                                 :field-path="fieldPath(field.handle)"
                                 :read-only="isReadOnly"
+                                :show-field-previews="config.replicator_preview"
                                 @updated="updated(field.handle, $event)"
                                 @meta-updated="updateMeta(field.handle, $event)"
                                 @focus="$emit('focus')"
                                 @blur="$emit('blur')"
+                                @replicator-preview-updated="previewUpdated(field.handle, $event)"
                             />
                         </div>
                     </div>
@@ -65,50 +43,63 @@
 </template>
 
 <style>
-    .group-fieldtype-button-wrapper {
-        @apply flex rtl:left-6 ltr:right-6 absolute top-5 sm:top-7;
-    }
+.group-fieldtype-button-wrapper {
+    @apply absolute top-5 flex sm:top-7 ltr:right-6 rtl:left-6;
+}
 
-    .replicator-set .group-fieldtype-button-wrapper {
-        @apply top-5 rtl:left-4 ltr:right-4;
-    }
+.replicator-set .group-fieldtype-button-wrapper {
+    @apply top-5 ltr:right-4 rtl:left-4;
+}
 </style>
 
 <script>
 import Fieldtype from './Fieldtype.vue';
 import SetField from './replicator/Field.vue';
 import { ValidatesFieldConditions } from '../field-conditions/FieldConditions.js';
+import ManagesPreviewText from './replicator/ManagesPreviewText';
 
 export default {
-    mixins: [
-        Fieldtype,
-        ValidatesFieldConditions,
-    ],
+    mixins: [Fieldtype, ValidatesFieldConditions, ManagesPreviewText],
     components: { SetField },
     data() {
         return {
             containerWidth: null,
             focused: false,
             fullScreenMode: false,
+            previews: {},
             provide: {
                 group: this.makeGroupProvide(),
-                storeName: this.storeName,
             },
         };
     },
-    inject: ['storeName'],
+    inject: ['store'],
     computed: {
         values() {
             return this.value;
+        },
+        extraValues() {
+            return {};
         },
         fields() {
             return this.config.fields;
         },
         replicatorPreview() {
-            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
 
-            return Object.values(this.value).join(', ');
-        }
+            return replicatorPreviewHtml(this.previewText);
+        },
+        internalFieldActions() {
+            return [
+                {
+                    title: __('Toggle Fullscreen Mode'),
+                    icon: ({ vm }) => (vm.fullScreenMode ? 'shrink-all' : 'expand-bold'),
+                    quick: true,
+                    run: this.toggleFullscreen,
+                    visible: this.config.fullscreen,
+                    visibleWhenReadOnly: true,
+                },
+            ];
+        },
     },
     methods: {
         blurred() {
@@ -159,14 +150,22 @@ export default {
             this.$emit('meta-updated', { ...this.meta, [handle]: value });
         },
 
+        previewUpdated(handle, value) {
+            this.previews = { ...this.previews, [handle]: value };
+        },
+
         fieldPath(handle) {
             return (this.fieldPathPrefix || this.handle) + '.' + handle;
         },
 
         errors(handle) {
-            const state = this.$store.state.publish[this.storeName];
+            const state = this.store;
             if (!state) return [];
             return state.errors[this.fieldPath(handle)] || [];
+        },
+
+        toggleFullscreen() {
+            this.fullScreenMode = !this.fullScreenMode;
         },
     },
 };

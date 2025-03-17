@@ -27,7 +27,10 @@
 .head .status {
     display: inline-block;
     label {
-        margin: 0 6px 0 0 ; [dir="rtl"] & { margin: 0 0 0 6px ; }
+        margin: 0 6px 0 0;
+        [dir='rtl'] & {
+            margin: 0 0 0 6px;
+        }
         position: relative;
         top: 3px;
     }
@@ -36,12 +39,14 @@
         position: relative;
         top: 8px;
     }
-
 }
 
 code.parent-url {
-    @apply block text-3xs bg-none text-gray-700;
-    padding: 0 0 3px 0 ; [dir="rtl"] & { padding: 0 0 3px 0 ; }
+    @apply block bg-none text-3xs text-gray-700;
+    padding: 0 0 3px 0;
+    [dir='rtl'] & {
+        padding: 0 0 3px 0;
+    }
 }
 
 .publish-fields {
@@ -50,7 +55,7 @@ code.parent-url {
     .form-group {
         > label,
         .field-inner > label {
-            @apply font-medium mb-2;
+            @apply mb-2 font-medium;
         }
     }
 
@@ -70,6 +75,20 @@ code.parent-url {
         @apply absolute inset-0 cursor-not-allowed bg-white/25;
         z-index: 100;
     }
+
+    .has-field-dropdown {
+        .field-inner {
+            @apply pr-6;
+        }
+        .field-dropdown {
+            @apply absolute bottom-[-3px] right-0 block;
+        }
+        &:not(.has-field-label) {
+            .field-inner {
+                @apply mb-2 min-h-[19.5px];
+            }
+        }
+    }
 }
 
 .publish-field {
@@ -85,17 +104,20 @@ code.parent-url {
 }
 
 .publish-section-header {
-    @apply border-b border-gray-400 dark:border-dark-900 bg-gray-100 dark:bg-dark-700 rounded-t-lg;
+    @apply rounded-t-lg border-b border-gray-400 bg-gray-100 dark:border-dark-900 dark:bg-dark-700;
 }
 
 .publish-section-header-inner {
-    @apply px-4 @lg:px-6 pt-4 pb-3;
-
+    @apply px-4 pb-3 pt-4 @lg:px-6;
 }
 
 .publish-sidebar {
     @apply shrink-0;
-    margin-left: 20px ; [dir="rtl"] & { margin-right: 20px ; margin-left: 0 ; }
+    margin-left: 20px;
+    [dir='rtl'] & {
+        margin-right: 20px;
+        margin-left: 0;
+    }
     width: 300px;
 
     .publish-fields .form-group {

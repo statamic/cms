@@ -1,38 +1,37 @@
 <template>
     <div class="asset-folder-fieldtype-wrapper">
-        <small class="help-block text-gray-600" v-if="!container">{{ __('Select asset container') }}</small>
-
         <relationship-fieldtype
             v-if="container"
             :handle="handle"
             :value="value"
             :meta="relationshipMeta"
-            :config="{ type: 'asset_folder' }"
+            :config="{ type: 'asset_folder', max_items: this.config.max_items }"
             @input="update"
         />
     </div>
 </template>
 
 <script>
-export default {
+import Fieldtype from './Fieldtype.vue';
 
+export default {
     mixins: [Fieldtype],
 
-    inject: ['storeName'],
+    inject: ['store'],
 
     computed: {
-
         container() {
-            return data_get(this.$store.state.publish[this.storeName].values.container, '0', null);
+            return this.store.values?.container[0] ?? this.config.container;
         },
 
         relationshipMeta() {
-            return {...this.meta, ...{
-                getBaseSelectionsUrlParameters: { container: this.container }
-            }};
-        }
-
-    }
-
+            return {
+                ...this.meta,
+                ...{
+                    getBaseSelectionsUrlParameters: { container: this.container },
+                },
+            };
+        },
+    },
 };
 </script>

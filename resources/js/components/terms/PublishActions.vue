@@ -1,77 +1,57 @@
 <template>
-
-    <stack narrow name="publish-options" @closed="$emit('closed')">
-        <div slot-scope="{ close }" class="bg-white dark:bg-dark-800 h-full flex flex-col">
-
-            <div class="bg-gray-200 dark:bg-dark-600 px-6 py-2 border-b border-gray-300 dark:border-dark-900 text-lg font-medium flex items-center justify-between">
+    <stack narrow name="publish-options" @closed="$emit('closed')" v-slot="{ close }">
+        <div class="flex h-full flex-col bg-white dark:bg-dark-800">
+            <div
+                class="flex items-center justify-between border-b border-gray-300 bg-gray-200 px-6 py-2 text-lg font-medium dark:border-dark-900 dark:bg-dark-600"
+            >
                 {{ __('Publish') }}
-                <button
-                    type="button"
-                    class="btn-close"
-                    @click="close"
-                    v-html="'&times'" />
+                <button type="button" class="btn-close" @click="close" v-html="'&times'" />
             </div>
 
             <div class="flex-1 overflow-auto p-6">
-
-                <div class="flex h-full items-center justify-center loading" v-if="saving">
+                <div class="loading flex h-full items-center justify-center" v-if="saving">
                     <loading-graphic text="" />
                 </div>
 
-                <select-input
-                    class="mb-6"
-                    v-model="action"
-                    :options="options"
-                />
+                <select-input class="mb-6" v-model="action" :options="options" />
 
                 <div v-if="action">
-
-                    <date-fieldtype
-                        v-if="action == 'schedule'"
-                        class="mb-6"
-                        name="publishTime"
-                        :value="publishTime" />
+                    <date-fieldtype v-if="action == 'schedule'" class="mb-6" name="publishTime" :value="publishTime" />
 
                     <textarea-input
                         class="mb-6 text-sm"
                         v-model="revisionMessage"
                         :placeholder="__('Notes about this revision')"
                         @keydown.enter="submit"
-                        :focus="true" />
-
-                    <button
-                        class="btn-primary w-full mb-6"
-                        v-text="submitButtonText"
-                        @click="submit"
+                        :focus="true"
                     />
 
-                    <div class="text-gray text-xs flex mb-6">
-                        <div class="pt-px w-4 rtl:ml-2 ltr:mr-2">
+                    <button class="btn-primary mb-6 w-full" v-text="submitButtonText" @click="submit" />
+
+                    <div class="mb-6 flex text-xs text-gray">
+                        <div class="w-4 pt-px ltr:mr-2 rtl:ml-2">
                             <svg-icon name="info-circle" class="pt-px" />
                         </div>
                         <div class="flex-1" v-text="actionInfoText" />
                     </div>
 
-                    <div class="text-gray text-xs flex mb-6 text-red-500" v-if="action === 'schedule'">
-                        <div class="pt-px w-4 rtl:ml-2 ltr:mr-2">
+                    <div class="mb-6 flex text-xs text-gray text-red-500" v-if="action === 'schedule'">
+                        <div class="w-4 pt-px ltr:mr-2 rtl:ml-2">
                             <svg-icon name="info-circle" class="pt-px" />
                         </div>
                         <div class="flex-1">
-                            Since the current revision is published and you've selected a date in the future, once you submit, the revision will act like a draft until the selected date.
+                            Since the current revision is published and you've selected a date in the future, once you
+                            submit, the revision will act like a draft until the selected date.
                         </div>
                     </div>
-
                 </div>
-
             </div>
         </div>
     </stack>
-
 </template>
 
 <script>
 export default {
-
     props: {
         actions: Object,
         published: Boolean,
@@ -83,11 +63,10 @@ export default {
             action: this.canManagePublishState ? 'publish' : 'revision',
             revisionMessage: null,
             saving: false,
-        }
+        };
     },
 
     computed: {
-
         options() {
             const options = [];
 
@@ -118,28 +97,29 @@ export default {
         },
 
         submitButtonText() {
-            return _.findWhere(this.options, { value: this.action }).label;
-        }
-
+            return this.options.find((o) => o.value === this.action).label;
+        },
     },
 
     methods: {
-
         submit() {
             this.saving = true;
             this.$emit('saving');
-            const method = 'submit'+this.action.charAt(0).toUpperCase()+this.action.substring(1);
+            const method = 'submit' + this.action.charAt(0).toUpperCase() + this.action.substring(1);
             this[method]();
         },
 
         submitPublish() {
             const payload = { message: this.revisionMessage };
 
-            this.$axios.post(this.actions.publish, payload).then(response => {
-                this.$toast.success(__('Published'));
-                this.revisionMessage = null;
-                this.$emit('saved', { published: true, isWorkingCopy: false, response });
-            }).catch(e => this.handleAxiosError(e));
+            this.$axios
+                .post(this.actions.publish, payload)
+                .then((response) => {
+                    this.$toast.success(__('Published'));
+                    this.revisionMessage = null;
+                    this.$emit('saved', { published: true, isWorkingCopy: false, response });
+                })
+                .catch((e) => this.handleAxiosError(e));
         },
 
         submitSchedule() {
@@ -149,29 +129,33 @@ export default {
         submitUnpublish() {
             const payload = { message: this.revisionMessage };
 
-            this.$axios.post(this.actions.unpublish, { data: payload }).then(response => {
-                this.$toast.success(__('Unpublished'));
-                this.revisionMessage = null;
-                this.$emit('saved', { published: false, isWorkingCopy: false, response });
-            }).catch(e => this.handleAxiosError(e));
+            this.$axios
+                .post(this.actions.unpublish, { data: payload })
+                .then((response) => {
+                    this.$toast.success(__('Unpublished'));
+                    this.revisionMessage = null;
+                    this.$emit('saved', { published: false, isWorkingCopy: false, response });
+                })
+                .catch((e) => this.handleAxiosError(e));
         },
 
         submitRevision() {
             const payload = { message: this.revisionMessage };
 
-            this.$axios.post(this.actions.createRevision, payload).then(response => {
-                this.$toast.success(__('Revision created'));
-                this.revisionMessage = null;
-                this.$emit('saved', { isWorkingCopy: true, response });
-            }).catch(e => this.handleAxiosError(e));
+            this.$axios
+                .post(this.actions.createRevision, payload)
+                .then((response) => {
+                    this.$toast.success(__('Revision created'));
+                    this.revisionMessage = null;
+                    this.$emit('saved', { isWorkingCopy: true, response });
+                })
+                .catch((e) => this.handleAxiosError(e));
         },
 
         handleAxiosError(e) {
             this.saving = false;
             this.$toast.error(__('Something went wrong'));
-        }
-
-    }
-
-}
+        },
+    },
+};
 </script>

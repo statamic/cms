@@ -1,15 +1,15 @@
 <template>
-    <data-list :visible-columns="columns" :columns="columns" :rows="rows">
-        <div class="card overflow-hidden p-0 relative" slot-scope="{ filteredRows: rows }">
+    <data-list :visible-columns="columns" :columns="columns" :rows="rows" v-slot="{ filteredRows: rows }">
+        <div class="card relative overflow-hidden p-0">
             <div class="overflow-x-auto overflow-y-hidden">
                 <data-list-table>
-                    <template slot="cell-title" slot-scope="{ row: fieldset }">
+                    <template #cell-title="{ row: fieldset }">
                         <a :href="fieldset.edit_url">{{ __(fieldset.title) }}</a>
                     </template>
-                    <template slot="cell-handle" slot-scope="{ value }">
+                    <template #cell-handle="{ value }">
                         <span class="font-mono text-xs">{{ value }}</span>
                     </template>
-                    <template slot="actions" slot-scope="{ row: fieldset, index }">
+                    <template #actions="{ row: fieldset, index }">
                         <dropdown-list>
                             <dropdown-item :text="__('Edit')" :redirect="fieldset.edit_url" />
                             <dropdown-item
@@ -18,11 +18,7 @@
                                 class="warning"
                                 @click="$refs[`resetter_${fieldset.id}`].confirm()"
                             >
-                                <fieldset-resetter
-                                    :ref="`resetter_${fieldset.id}`"
-                                    :resource="fieldset"
-                                    :reload="true"
-                                >
+                                <fieldset-resetter :ref="`resetter_${fieldset.id}`" :resource="fieldset" :reload="true">
                                 </fieldset-resetter>
                             </dropdown-item>
                             <dropdown-item
@@ -34,7 +30,8 @@
                                 <fieldset-deleter
                                     :ref="`deleter_${fieldset.id}`"
                                     :resource="fieldset"
-                                    @deleted="removeRow(fieldset)">
+                                    @deleted="removeRow(fieldset)"
+                                >
                                 </fieldset-deleter>
                             </dropdown-item>
                         </dropdown-list>
@@ -51,12 +48,11 @@ import FieldsetDeleter from './FieldsetDeleter.vue';
 import FieldsetResetter from './FieldsetResetter.vue';
 
 export default {
-
     mixins: [Listing],
 
     components: {
         FieldsetDeleter,
-        FieldsetResetter
+        FieldsetResetter,
     },
 
     props: ['initialRows'],
@@ -68,8 +64,8 @@ export default {
                 { label: __('Title'), field: 'title' },
                 { label: __('Handle'), field: 'handle', width: '25%' },
                 { label: __('Fields'), field: 'fields', width: '15%' },
-            ]
-        }
-    }
-}
+            ],
+        };
+    },
+};
 </script>

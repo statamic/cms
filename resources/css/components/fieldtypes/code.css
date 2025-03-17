@@ -1,27 +1,27 @@
 .code-fieldtype-container {
     direction: ltr;
-    @apply dark:border dark:border-dark-800 rounded;
+    @apply rounded dark:border dark:border-dark-800;
 }
 
 .code-fieldtype-toolbar {
-    @apply bg-white shadow-none py-1 px-2 rounded-t border border-b-0 text-sm flex flex-wrap items-center justify-end gap-2;
-    @apply dark:bg-dark-800 dark:border-l-0 dark:border-r-0 dark:border-t-0 dark:border-b dark:border-dark-900;
+    @apply flex flex-wrap items-center justify-end gap-2 rounded-t border border-b-0 bg-white px-2 py-1 text-sm shadow-none;
+    @apply dark:border-b dark:border-l-0 dark:border-r-0 dark:border-t-0 dark:border-dark-900 dark:bg-dark-800;
 
     [dir='rtl'] & {
         direction: rtl;
     }
 }
 
-.code-fieldtype-toolbar select {
+.code-fieldtype-toolbar select,
+.code-fieldtype-toolbar-fullscreen select {
     @apply h-8 text-sm leading-none;
 }
 
-
 .code-fieldtype-container.code-fullscreen {
-    @apply fixed bg-gray-200 dark:bg-dark-600 inset-0 min-h-screen overflow-scroll rounded-none pt-12;
+    @apply fixed inset-0 min-h-screen overflow-scroll rounded-none bg-gray-200 pt-14 dark:bg-dark-600;
 
     .code-fieldtype-toolbar {
-        @apply fixed z-2 top-0 w-full px-6 py-2 h-12 shadow dark:shadow-dark text-base rounded-none bg-gradient-to-b from-white to-gray-100 dark:from-dark-550 dark:to-dark-600;
+        @apply fixed top-0 z-2 h-12 w-full rounded-none bg-gradient-to-b from-white to-gray-100 px-6 py-2 text-base shadow dark:from-dark-550 dark:to-dark-600 dark:shadow-dark;
     }
 }
 

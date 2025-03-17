@@ -1,45 +1,50 @@
 <template>
-
-    <div class="h-full bg-gray-300 h-full dark:bg-dark-800 overflow-scroll">
-
-        <div v-if="loading" class="absolute inset-0 z-200 flex items-center justify-center text-center ">
+    <div class="h-full overflow-scroll bg-gray-300 dark:bg-dark-800">
+        <div v-if="loading" class="absolute inset-0 z-200 flex items-center justify-center text-center">
             <loading-graphic />
         </div>
 
-        <header v-if="!loading" class="flex items-center sticky top-0 inset-x-0 bg-white dark:bg-dark-550 shadow dark:shadow-dark px-8 py-2 z-1 h-13">
-            <h1 class="flex-1 flex items-center text-xl">
+        <header
+            v-if="!loading"
+            class="sticky inset-x-0 top-0 z-1 flex h-13 items-center bg-white px-8 py-2 shadow dark:bg-dark-550 dark:shadow-dark"
+        >
+            <h1 class="flex flex-1 items-center text-xl">
                 {{ __(values.display) || __(config.display) || config.handle }}
-                <small class="badge-pill bg-gray-100 dark:bg-dark-400 rtl:mr-4 ltr:ml-4 border dark:border-dark-200 text-xs text-gray-700 dark:text-dark-150 font-medium leading-none flex items-center">
-                    <svg-icon class="h-4 w-4 rtl:ml-2 ltr:mr-2 inline-block text-gray-700 dark:text-dark-150" :name="fieldtype.icon.startsWith('<svg') ? fieldtype.icon : `light/${fieldtype.icon}`"></svg-icon>
+                <small
+                    class="badge-pill flex items-center border bg-gray-100 text-xs font-medium leading-none text-gray-700 dark:border-dark-200 dark:bg-dark-400 dark:text-dark-150 ltr:ml-4 rtl:mr-4"
+                >
+                    <svg-icon
+                        class="inline-block h-4 w-4 text-gray-700 dark:text-dark-150 ltr:mr-2 rtl:ml-2"
+                        :name="fieldtype.icon.startsWith('<svg') ? fieldtype.icon : `light/${fieldtype.icon}`"
+                    ></svg-icon>
                     {{ fieldtype.title }}
                 </small>
             </h1>
             <button
-                class="text-gray-700 dark:text-dark-150 hover:text-gray-800 dark:hover:text-dark-100 rtl:ml-6 ltr:mr-6 text-sm"
+                class="text-sm text-gray-700 hover:text-gray-800 dark:text-dark-150 dark:hover:text-dark-100 ltr:mr-6 rtl:ml-6"
                 @click.prevent="close"
                 v-text="__('Cancel')"
             ></button>
-            <button
-                class="btn-primary"
-                @click.prevent="commit"
-                v-text="__('Apply')"
-            ></button>
+            <button class="btn-primary" @click.prevent="commit" v-text="__('Apply')"></button>
         </header>
-        <section class="isolate py-4 px-3 md:px-8">
+        <section class="isolate px-3 py-4 md:px-8">
             <div class="tabs-container">
                 <div class="publish-tabs tabs">
-                    <button class="tab-button"
-                    :class="{ 'active': activeTab === 'settings' }"
+                    <button
+                        class="tab-button"
+                        :class="{ active: activeTab === 'settings' }"
                         @click="activeTab = 'settings'"
                         v-text="__('Settings')"
                     />
-                    <button class="tab-button"
-                    :class="{ 'active': activeTab === 'conditions' }"
+                    <button
+                        class="tab-button"
+                        :class="{ active: activeTab === 'conditions' }"
                         @click="activeTab = 'conditions'"
                         v-text="__('Conditions')"
                     />
-                    <button class="tab-button"
-                    :class="{ 'active': activeTab === 'validation' }"
+                    <button
+                        class="tab-button"
+                        :class="{ active: activeTab === 'validation' }"
                         @click="activeTab = 'validation'"
                         v-text="__('Validation')"
                     />
@@ -47,25 +52,22 @@
             </div>
 
             <div v-if="!loading" class="field-settings">
-
                 <publish-container
-                    :name="publishContainer"
+                    :name="`field-settings-${$.uid}`"
                     :blueprint="blueprint"
                     :values="values"
                     :meta="meta"
-                    :is-config="true"
                     :errors="errors"
                     :is-root="true"
                     @updated="values = $event"
+                    v-slot="{ setFieldValue, setFieldMeta }"
                 >
-                    <div v-show="activeTab === 'settings'" slot-scope="{ setFieldValue, setFieldMeta }">
-
+                    <div v-show="activeTab === 'settings'">
                         <publish-sections
                             :sections="blueprint.tabs[0].sections"
                             @updated="(handle, value) => updateField(handle, value, setFieldValue)"
                             @meta-updated="setFieldMeta"
                         />
-
                     </div>
                 </publish-container>
 
@@ -75,40 +77,32 @@
                             :config="config"
                             :suggestable-fields="suggestableConditionFields"
                             @updated="updateFieldConditions"
-                            @updated-always-save="updateAlwaysSave" />
+                            @updated-always-save="updateAlwaysSave"
+                        />
                     </div>
                 </div>
 
                 <div class="card p-0" v-show="activeTab === 'validation'">
                     <div class="publish-fields @container">
-                        <field-validation-builder
-                            :config="config"
-                            @updated="updateField('validate', $event)" />
+                        <field-validation-builder :config="config" @updated="updateField('validate', $event)" />
                     </div>
                 </div>
-
             </div>
         </section>
     </div>
-
 </template>
 
 <script>
 import PublishField from '../publish/Field.vue';
-import { ValidatesFieldConditions, FieldConditionsBuilder, FIELD_CONDITIONS_KEYS } from '../field-conditions/FieldConditions.js';
+import { FieldConditionsBuilder, FIELD_CONDITIONS_KEYS } from '../field-conditions/FieldConditions.js';
 import FieldValidationBuilder from '../field-validation/Builder.vue';
 
 export default {
-
     components: {
         PublishField,
         FieldConditionsBuilder,
         FieldValidationBuilder,
     },
-
-    mixins: [
-        ValidatesFieldConditions,
-    ],
 
     props: {
         id: String,
@@ -121,16 +115,20 @@ export default {
         isInsideSet: Boolean,
     },
 
-    provide: {
-        isInsideConfigFields: true,
+    provide() {
+        return {
+            isInsideConfigFields: true,
+            updateFieldSettingsValue: this.updateField,
+            getFieldSettingsValue: this.getFieldValue,
+        };
     },
 
     model: {
         prop: 'config',
-        event: 'input'
+        event: 'input',
     },
 
-    data: function() {
+    data: function () {
         return {
             values: null,
             meta: null,
@@ -138,7 +136,6 @@ export default {
             errors: {},
             editedFields: clone(this.overrides),
             activeTab: 'settings',
-            storeName: 'base',
             fieldtype: null,
             loading: true,
             blueprint: null,
@@ -146,13 +143,9 @@ export default {
     },
 
     computed: {
-        publishContainer() {
-            return `field-settings-${this._uid}`;
-        },
-
-        selectedWidth: function() {
+        selectedWidth: function () {
             var width = this.config.width || 100;
-            var found = _.findWhere(this.widths, {value: width});
+            var found = this.widths.find((w) => w.value === width);
             return found.text;
         },
 
@@ -160,15 +153,17 @@ export default {
             return this.fieldtype.config;
         },
 
-        canBeLocalized: function() {
-            return this.root && Object.keys(Statamic.$config.get('locales')).length > 1 && this.fieldtype.canBeLocalized;
+        canBeLocalized: function () {
+            return (
+                this.root && Object.keys(Statamic.$config.get('locales')).length > 1 && this.fieldtype.canBeLocalized
+            );
         },
 
-        canBeValidated: function() {
+        canBeValidated: function () {
             return this.fieldtype.canBeValidated;
         },
 
-        canHaveDefault: function() {
+        canHaveDefault: function () {
             return this.fieldtype.canHaveDefault;
         },
 
@@ -178,15 +173,15 @@ export default {
 
         filteredFieldtypeConfig() {
             if (this.type === 'grid') {
-                return _.filter(this.fieldtypeConfig, config => config.handle !== 'fields');
+                return this.fieldtypeConfig.filter((config) => config.handle !== 'fields');
             }
 
             if (['replicator', 'bard'].includes(this.type)) {
-                return _.filter(this.fieldtypeConfig, config => config.handle !== 'sets');
+                return this.fieldtypeConfig.filter((config) => config.handle !== 'sets');
             }
 
             return this.fieldtypeConfig;
-        }
+        },
     },
 
     created() {
@@ -194,15 +189,15 @@ export default {
     },
 
     methods: {
-
         configFieldClasses(field) {
-            return [
-                `form-group p-4 m-0 ${field.type}-fieldtype`,
-                tailwind_width_class(field.width)
-            ];
+            return [`form-group p-4 m-0 ${field.type}-fieldtype`, tailwind_width_class(field.width)];
         },
 
-        updateField(handle, value, setStoreValue=null) {
+        getFieldValue(handle) {
+            return this.values[handle];
+        },
+
+        updateField(handle, value, setStoreValue = null) {
             this.values[handle] = value;
             this.markFieldEdited(handle);
 
@@ -214,13 +209,13 @@ export default {
         updateFieldConditions(conditions) {
             let values = {};
 
-            _.each(this.values, (value, key) => {
-                if (! FIELD_CONDITIONS_KEYS.includes(key)) {
+            Object.entries(this.values).forEach(([key, value]) => {
+                if (!FIELD_CONDITIONS_KEYS.includes(key)) {
                     values[key] = value;
                 }
             });
 
-            this.values = {...values, ...conditions};
+            this.values = { ...values, ...conditions };
 
             if (Object.keys(conditions).length > 0) {
                 this.markFieldEdited(Object.keys(conditions)[0]);
@@ -242,16 +237,19 @@ export default {
         commit() {
             this.clearErrors();
 
-            this.$axios.post(cp_url('fields/update'), {
-                id: this.id,
-                type: this.type,
-                values: this.values,
-                fields: this.fields,
-                isInsideSet: this.isInsideSet,
-            }).then(response => {
-                this.$emit('committed', response.data, this.editedFields);
-                this.close();
-            }).catch(e => this.handleAxiosError(e));
+            this.$axios
+                .post(cp_url('fields/update'), {
+                    id: this.id,
+                    type: this.type,
+                    values: this.values,
+                    fields: this.fields,
+                    isInsideSet: this.isInsideSet,
+                })
+                .then((response) => {
+                    this.$emit('committed', response.data, this.editedFields);
+                    this.close();
+                })
+                .catch((e) => this.handleAxiosError(e));
         },
 
         handleAxiosError(e) {
@@ -275,19 +273,19 @@ export default {
         },
 
         load() {
-            this.$axios.post(cp_url('fields/edit'), {
-                type: this.type,
-                values: this.config
-            }).then(response => {
-                this.loading = false;
-                this.fieldtype = response.data.fieldtype;
-                this.blueprint = response.data.blueprint;
-                this.values = response.data.values;
-                this.meta = {...response.data.meta};
-            })
-        }
-
-    }
-
+            this.$axios
+                .post(cp_url('fields/edit'), {
+                    type: this.type,
+                    values: this.config,
+                })
+                .then((response) => {
+                    this.loading = false;
+                    this.fieldtype = response.data.fieldtype;
+                    this.blueprint = response.data.blueprint;
+                    this.values = response.data.values;
+                    this.meta = { ...response.data.meta };
+                });
+        },
+    },
 };
 </script>

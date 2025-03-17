@@ -4,8 +4,7 @@
     </head>
     <body>
         <div id="statamic">
-            <live-preview-popout>
-            </live-preview-popout>
+            <live-preview-popout></live-preview-popout>
         </div>
 
         @include('statamic::partials.scripts')

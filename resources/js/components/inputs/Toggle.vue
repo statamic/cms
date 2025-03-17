@@ -2,7 +2,7 @@
     <button
         type="button"
         class="toggle-container"
-        :class="{ 'on': value, 'cursor-not-allowed read-only': readOnly }"
+        :class="{ on: modelValue, 'read-only cursor-not-allowed': readOnly }"
         @click="toggle"
         :aria-pressed="stateLiteral"
         :aria-label="__('Toggle Button')"
@@ -14,35 +14,35 @@
 </template>
 
 <script>
-
 export default {
+    emits: ['update:model-value'],
+
     props: {
-        value: {
-            type: Boolean
+        modelValue: {
+            type: Boolean,
         },
         readOnly: {
             type: Boolean,
-            default: () => false
+            default: () => false,
         },
     },
 
     computed: {
         stateLiteral() {
-            if (this.value) {
+            if (this.modelValue) {
                 return 'true';
             }
 
             return 'false';
-        }
+        },
     },
 
     methods: {
         toggle() {
-            if (! this.readOnly) {
-                this.$emit("input", !this.value)
+            if (!this.readOnly) {
+                this.$emit('update:model-value', !this.modelValue);
             }
-        }
-    }
-
-}
+        },
+    },
+};
 </script>

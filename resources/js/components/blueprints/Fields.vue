@@ -1,9 +1,8 @@
 <template>
-
     <div class="flex flex-col text-sm">
-
-        <div class="blueprint-section-draggable-zone -mx-1"
-            :class="{ 'flex flex-wrap flex-1': fields.length }"
+        <div
+            class="blueprint-section-draggable-zone -mx-1"
+            :class="{ 'flex flex-1 flex-wrap': fields.length }"
             :data-tab="tabId"
             :data-section="sectionId"
         >
@@ -26,33 +25,34 @@
             />
         </div>
 
-        <div class="blueprint-section-field-actions flex mt-2 -mx-1">
+        <div class="blueprint-section-field-actions -mx-1 mt-2 flex">
             <div class="px-1">
-                <link-fields
-                    :exclude-fieldset="excludeFieldset"
-                    @linked="$emit('field-linked', $event)" />
+                <link-fields :exclude-fieldset="excludeFieldset" @linked="$emit('field-linked', $event)" />
             </div>
             <div class="px-1">
-                <button class="btn w-full flex justify-center items-center" @click="isSelectingNewFieldtype = true;">
-                    <svg-icon name="light/wireframe" class="rtl:ml-2 ltr:mr-2 w-4 h-4" />
+                <button class="btn flex w-full items-center justify-center" @click="isSelectingNewFieldtype = true">
+                    <svg-icon name="light/wireframe" class="h-4 w-4 ltr:mr-2 rtl:ml-2" />
                     {{ __('Create Field') }}
                 </button>
             </div>
         </div>
 
-        <stack name="fieldtype-selector"
+        <stack
+            name="fieldtype-selector"
             v-if="isSelectingNewFieldtype"
             @closed="isSelectingNewFieldtype = false"
+            v-slot="{ close }"
         >
-            <fieldtype-selector slot-scope="{ close }" @closed="close" @selected="fieldtypeSelected" />
+            <fieldtype-selector @closed="close" @selected="fieldtypeSelected" />
         </stack>
 
-        <stack name="field-settings"
+        <stack
+            name="field-settings"
             v-if="pendingCreatedField != null"
             @closed="pendingCreatedField = null"
+            v-slot="{ close }"
         >
             <field-settings
-                slot-scope="{ close }"
                 ref="settings"
                 :type="pendingCreatedField.config.type"
                 :root="true"
@@ -64,9 +64,7 @@
                 @closed="close"
             />
         </stack>
-
     </div>
-
 </template>
 
 <script>
@@ -79,7 +77,6 @@ import FieldSettings from '../fields/Settings.vue';
 import CanDefineLocalizable from '../fields/CanDefineLocalizable';
 
 export default {
-
     mixins: [CanDefineLocalizable],
 
     components: {
@@ -107,13 +104,12 @@ export default {
         return {
             isSelectingNewFieldtype: false,
             pendingCreatedField: null,
-        }
+        };
     },
 
     methods: {
-
         fieldComponent(field) {
-            return (field.type === 'import') ? 'ImportField' : 'RegularField';
+            return field.type === 'import' ? 'ImportField' : 'RegularField';
         },
 
         fieldtypeSelected(field) {
@@ -127,10 +123,10 @@ export default {
                 config: {
                     ...field,
                     isNew: true,
-                }
+                },
             };
 
-            this.$nextTick(() => this.pendingCreatedField = pending);
+            this.$nextTick(() => (this.pendingCreatedField = pending));
         },
 
         fieldCreated(created) {
@@ -141,7 +137,7 @@ export default {
             let field = {
                 ...this.pendingCreatedField,
                 ...{ handle },
-                config: created
+                config: created,
             };
 
             this.$emit('field-created', field);
@@ -161,13 +157,11 @@ export default {
                 config: {
                     ...field.config,
                     display,
-                }
+                },
             };
 
-            this.$nextTick(() => this.pendingCreatedField = pending);
+            this.$nextTick(() => (this.pendingCreatedField = pending));
         },
-
-    }
-
-}
+    },
+};
 </script>

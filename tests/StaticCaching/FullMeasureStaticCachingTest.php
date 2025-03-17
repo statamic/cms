@@ -83,7 +83,7 @@ class FullMeasureStaticCachingTest extends TestCase
         $this->assertEquals(vsprintf('<html><body>1 <span class="nocache" data-nocache="%s">%s</span>%s</body></html>', [
             $region->key(),
             '<svg>Loading...</svg>',
-            '<script type="text/javascript">js here</script>',
+            '<script>js here</script>',
         ]), file_get_contents($this->dir.'/about_.html'));
     }
 

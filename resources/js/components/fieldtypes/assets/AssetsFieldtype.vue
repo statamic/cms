@@ -1,9 +1,8 @@
 <template>
     <div class="@container">
-
         <div
             v-if="hasPendingDynamicFolder"
-            class="py-3 px-4 text-sm w-full rounded-md border border-dashed text-gray-700 dark:text-dark-175 dark:border-dark-200"
+            class="w-full rounded-md border border-dashed px-4 py-3 text-sm text-gray-700 dark:border-dark-200 dark:text-dark-175"
             v-html="pendingText"
         />
 
@@ -15,38 +14,43 @@
             @updated="uploadsUpdated"
             @upload-complete="uploadComplete"
             @error="uploadError"
+            v-slot="{ dragging }"
         >
-            <div slot-scope="{ dragging }" class="assets-fieldtype-drag-container">
-
+            <div class="assets-fieldtype-drag-container">
                 <div class="drag-notification" v-if="config.allow_uploads" v-show="dragging && !showSelector">
-                    <svg-icon name="upload" class="h-6 @md:h-8 w-6 @md:w-8 rtl:ml-2 ltr:mr-2 @md:mr-6" />
+                    <svg-icon name="upload" class="h-6 w-6 @md:mr-6 @md:h-8 @md:w-8 ltr:mr-2 rtl:ml-2" />
                     <span>{{ __('Drop to Upload') }}</span>
                 </div>
 
                 <div
                     v-if="!isReadOnly && showPicker"
-                    class="assets-fieldtype-picker space-x-4"
+                    class="assets-fieldtype-picker gap-x-4 gap-y-2"
                     :class="{
                         'is-expanded': expanded,
-                        'bard-drag-handle': isInBardField
+                        'bard-drag-handle': isInBardField,
                     }"
                 >
                     <button
                         v-if="canBrowse"
-                        :class="{'opacity-0': dragging }"
+                        :class="{ 'opacity-0': dragging }"
                         type="button"
                         class="btn btn-with-icon"
                         @click="openSelector"
                         @keyup.space.enter="openSelector"
-                        tabindex="0">
-                        <svg-icon name="folder-image" class="w-4 h-4 text-gray-800 dark:text-dark-150"></svg-icon>
+                        tabindex="0"
+                    >
+                        <svg-icon name="folder-image" class="h-4 w-4 text-gray-800 dark:text-dark-150"></svg-icon>
                         {{ __('Browse') }}
                     </button>
-                    <p class="flex-1 asset-upload-control" v-if="canUpload">
+                    <p class="asset-upload-control flex-1" v-if="canUpload">
                         <button type="button" class="upload-text-button" @click.prevent="uploadFile">
                             {{ __('Upload file') }}
                         </button>
-                        <span v-if="soloAsset" class="drag-drop-text" v-text="__('or drag & drop here to replace.')"></span>
+                        <span
+                            v-if="soloAsset"
+                            class="drag-drop-text"
+                            v-text="__('or drag & drop here to replace.')"
+                        ></span>
                         <span v-else class="drag-drop-text" v-text="__('or drag & drop here.')"></span>
                     </p>
                     <dropdown-list v-if="meta.rename_folder">
@@ -67,7 +71,6 @@
                 />
 
                 <template v-if="expanded">
-
                     <sortable-list
                         v-if="displayMode === 'grid'"
                         v-model="assets"
@@ -81,7 +84,11 @@
                         :animate="false"
                         append-to="body"
                     >
-                        <div class="asset-grid-listing border dark:border-dark-900 rounded overflow-hidden" :class="{ 'rounded-t-none': !isReadOnly && (showPicker || uploads.length) }" ref="assets">
+                        <div
+                            class="asset-grid-listing overflow-hidden rounded border dark:border-dark-900"
+                            :class="{ 'rounded-t-none': !isReadOnly && (showPicker || uploads.length) }"
+                            ref="assets"
+                        >
                             <asset-tile
                                 v-for="asset in assets"
                                 :key="asset.id"
@@ -91,7 +98,8 @@
                                 :show-set-alt="showSetAlt"
                                 @updated="assetUpdated"
                                 @removed="assetRemoved"
-                                @id-changed="idChanged(asset.id, $event)">
+                                @id-changed="idChanged(asset.id, $event)"
+                            >
                             </asset-tile>
                         </div>
                     </sortable-list>
@@ -108,7 +116,8 @@
                                 :mirror="false"
                             >
                                 <tbody ref="assets">
-                                    <tr is="assetRow"
+                                    <component
+                                        is="assetRow"
                                         class="asset-row"
                                         v-for="asset in assets"
                                         :key="asset.id"
@@ -118,8 +127,8 @@
                                         :show-set-alt="showSetAlt"
                                         @updated="assetUpdated"
                                         @removed="assetRemoved"
-                                        @id-changed="idChanged(asset.id, $event)">
-                                    </tr>
+                                        @id-changed="idChanged(asset.id, $event)"
+                                    />
                                 </tbody>
                             </sortable-list>
                         </table>
@@ -138,47 +147,45 @@
                 :max-files="maxFiles"
                 :query-scopes="queryScopes"
                 @selected="assetsSelected"
-                @closed="closeSelector">
+                @closed="closeSelector"
+            >
             </selector>
         </stack>
     </div>
 </template>
 
-
 <style>
+.asset-listing-uploads {
+    border: 1px dashed #ccc;
+    border-top: 0;
+    margin: 0;
+    padding: 10px 20px;
 
-    .asset-listing-uploads {
-        border: 1px dashed #ccc;
-        border-top: 0;
+    table {
         margin: 0;
-        padding: 10px 20px;
-
-        table {
-            margin: 0;
-        }
-
-        thead {
-            display: none;
-        }
-
-        tr:first-child {
-            border-top: 0;
-        }
     }
 
+    thead {
+        display: none;
+    }
+
+    tr:first-child {
+        border-top: 0;
+    }
+}
 </style>
 
-
 <script>
+import Fieldtype from '../Fieldtype.vue';
 import AssetRow from './AssetRow.vue';
 import AssetTile from './AssetTile.vue';
 import Selector from '../../assets/Selector.vue';
 import Uploader from '../../assets/Uploader.vue';
 import Uploads from '../../assets/Uploads.vue';
 import { SortableList } from '../../sortable/Sortable';
+import { isEqual } from 'lodash-es';
 
 export default {
-
     components: {
         AssetTile,
         AssetRow,
@@ -188,9 +195,23 @@ export default {
         SortableList,
     },
 
-
     mixins: [Fieldtype],
 
+    inject: {
+        store: { default: null },
+        isInBardField: {
+            name: 'isInBardField',
+            default: false,
+        },
+        isInGridField: {
+            name: 'isInGridField',
+            default: false,
+        },
+        isInLinkField: {
+            name: 'isInLinkField',
+            default: false,
+        },
+    },
 
     data() {
         return {
@@ -207,9 +228,7 @@ export default {
         };
     },
 
-
     computed: {
-
         /**
          * Whether any assets have been selected.
          */
@@ -248,32 +267,19 @@ export default {
         },
 
         hasPendingDynamicFolder() {
-            return this.isUsingDynamicFolder && ! this.lockedDynamicFolder && ! this.dynamicFolder;
+            return this.isUsingDynamicFolder && !this.lockedDynamicFolder && !this.dynamicFolder;
         },
 
         dynamicFolder() {
             const field = this.config.dynamic;
-            if (! ['id', 'slug', 'author'].includes(field)) {
+            if (!['id', 'slug', 'author'].includes(field)) {
                 throw new Error(`Dynamic folder field [${field}] is invalid. Must be one of: id, slug, author`);
             }
 
-            const value = data_get(this.$store.state.publish[this.store].values, field);
+            const value = this.store.values[field];
 
             // If value is an array (e.g. a users fieldtype), get the first item.
             return Array.isArray(value) ? value[0] : value;
-        },
-
-        store() {
-            let store;
-            let parent = this;
-
-            while (! parent.storeName) {
-                parent = parent.$parent;
-                store = parent.storeName;
-                if (parent === this.$root) return null;
-            }
-
-            return store;
         },
 
         /**
@@ -288,7 +294,7 @@ export default {
          * The maximum number of files allowed.
          */
         maxFiles() {
-            if (! this.config.max_files) return Infinity;
+            if (!this.config.max_files) return Infinity;
 
             return parseInt(this.config.max_files);
         },
@@ -322,7 +328,7 @@ export default {
          * The IDs of the assets.
          */
         assetIds() {
-            return _.pluck(this.assets, 'id');
+            return this.assets.map((asset) => asset.id);
         },
 
         /**
@@ -346,116 +352,86 @@ export default {
             return this.config.query_scopes || [];
         },
 
-        isInBardField() {
-            let vm = this;
-
-            while (true) {
-                let parent = vm.$parent;
-
-                if (! parent) return false;
-
-                if (parent.constructor.name === 'BardFieldtype') {
-                    return true;
-                }
-
-                vm = parent;
-            }
-        },
-
-        isInGridField() {
-            let vm = this;
-
-            while (true) {
-                let parent = vm.$parent;
-
-                if (! parent) return false;
-
-                if (parent.grid) {
-                    return true;
-                }
-
-                vm = parent;
-            }
-        },
-
-        isInLinkField() {
-            let vm = this;
-
-            while (true) {
-                let parent = vm.$parent;
-
-                if (! parent) return false;
-
-                if (parent.$options.name === 'link-fieldtype') {
-                    return true;
-                }
-
-                vm = parent;
-            }
-        },
-
         replicatorPreview() {
-            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
 
-            return replicatorPreviewHtml(_.map(this.assets, (asset) => {
-                return (asset.isImage || asset.isSvg) ?
-                    `<img src="${asset.thumbnail}" width="20" class="max-w-5 max-h-5" height="20" title="${asset.basename}" />`
-                    : asset.basename;
-            }).join(', '));
+            return replicatorPreviewHtml(
+                this.assets
+                    .map((asset) => {
+                        return asset.isImage || asset.isSvg
+                            ? `<img src="${asset.thumbnail}" width="20" class="max-w-5 max-h-5" height="20" title="${asset.basename}" />`
+                            : asset.basename;
+                    })
+                    .join(', '),
+            );
         },
 
         showPicker() {
-            if (! this.canBrowse && ! this.canUpload) return false
+            if (!this.canBrowse && !this.canUpload) return false;
 
-            if (this.maxFilesReached && ! this.isFullWidth) return false
+            if (this.maxFilesReached && !this.isFullWidth) return false;
 
-            if (this.maxFilesReached && (this.isInGridField || this.isInLinkField)) return false
+            if (this.maxFilesReached && (this.isInGridField || this.isInLinkField)) return false;
 
-            return true
+            return true;
         },
 
         isFullWidth() {
-            return ! (this.config.width && this.config.width < 100)
+            return !(this.config.width && this.config.width < 100);
         },
 
         showSetAlt() {
-            return this.config.show_set_alt && ! this.isReadOnly;
+            return this.config.show_set_alt && !this.isReadOnly;
         },
 
         canBrowse() {
-            const hasPermission = this.can('configure asset containers') || this.can('view '+ this.container +' assets');
+            const hasPermission =
+                this.can('configure asset containers') || this.can('view ' + this.container + ' assets');
 
-            if (! hasPermission) return false;
+            if (!hasPermission) return false;
 
-            return ! this.hasPendingDynamicFolder;
+            return !this.hasPendingDynamicFolder;
         },
 
         canUpload() {
-            const hasPermission = this.config.allow_uploads && (this.can('configure asset containers') || this.can('upload '+ this.container +' assets'));
+            const hasPermission =
+                this.config.allow_uploads &&
+                (this.can('configure asset containers') || this.can('upload ' + this.container + ' assets'));
 
-            if (! hasPermission) return false;
+            if (!hasPermission) return false;
 
-            return ! this.hasPendingDynamicFolder;
+            return !this.hasPendingDynamicFolder;
         },
 
         pendingText() {
             return this.config.dynamic === 'id'
                 ? __('statamic::fieldtypes.assets.dynamic_folder_pending_save')
-                : __('statamic::fieldtypes.assets.dynamic_folder_pending_field', {field: `<code>${this.config.dynamic}</code>`});
-        }
+                : __('statamic::fieldtypes.assets.dynamic_folder_pending_field', {
+                      field: `<code>${this.config.dynamic}</code>`,
+                  });
+        },
 
+        internalFieldActions() {
+            return [
+                {
+                    title: __('Remove All'),
+                    dangerous: true,
+                    run: this.removeAll,
+                    visible: this.assets.length > 0,
+                },
+            ];
+        },
     },
 
     events: {
-        'close-selector' () {
+        'close-selector'() {
             this.closeSelector();
-        }
+        },
     },
 
     methods: {
-
         initializeAssets() {
-            if (! this.meta.data) {
+            if (!this.meta.data) {
                 this.loadAssets(this.value);
                 this.initializing = false;
                 return;
@@ -476,7 +452,7 @@ export default {
          * Accepts an array of asset URLs and/or IDs.
          */
         loadAssets(assets) {
-            if (! assets || ! assets.length) {
+            if (!assets || !assets.length) {
                 this.loading = false;
                 this.assets = [];
                 return;
@@ -484,12 +460,14 @@ export default {
 
             this.loading = true;
 
-            this.$axios.post(cp_url('assets-fieldtype'), {
-                assets
-            }).then(response => {
-                this.assets = response.data;
-                this.loading = false;
-            });
+            this.$axios
+                .post(cp_url('assets-fieldtype'), {
+                    assets,
+                })
+                .then((response) => {
+                    this.assets = response.data;
+                    this.loading = false;
+                });
         },
 
         /**
@@ -520,7 +498,7 @@ export default {
          * When an asset is updated in the editor
          */
         assetUpdated(asset) {
-            const index = _(this.assets).findIndex({ id: asset.id });
+            const index = this.assets.findIndex((a) => a.id === asset.id);
             this.assets.splice(index, 1, asset);
         },
 
@@ -528,8 +506,15 @@ export default {
          * When an asset remove button was clicked.
          */
         assetRemoved(asset) {
-            const index = _(this.assets).findIndex({ id: asset.id });
+            const index = this.assets.findIndex((a) => a.id === asset.id);
             this.assets.splice(index, 1);
+        },
+
+        /**
+         * Remove all assets from the field.
+         */
+        removeAll() {
+            this.assets = [];
         },
 
         /**
@@ -573,7 +558,7 @@ export default {
         },
 
         syncDynamicFolderFromValue(value) {
-            if (! this.isUsingDynamicFolder) return;
+            if (!this.isUsingDynamicFolder) return;
 
             this.lockedDynamicFolder = null;
 
@@ -593,20 +578,22 @@ export default {
             this.updateMeta(meta);
         },
 
-        renameFolderActionCompleted(successful=null, response={}) {
+        renameFolderActionCompleted(successful = null, response = {}) {
             if (successful === false) return;
 
             this.$events.$emit('reset-action-modals');
 
             if (response.message !== false) {
-                this.$toast.success(response.message || __("Action completed"));
+                this.$toast.success(response.message || __('Action completed'));
             }
 
             // Update the folder in the current asset values.
             // They will be adjusted in the content but not here automatically since there's no refresh.
             const newFolder = response[0].path;
-            this.update(this.value.map(id => id.replace(`::${this.folder}`, `::${newFolder}`)));
-            this.lockedDynamicFolder = this.configuredFolder ? newFolder.replace(`${this.configuredFolder}/`, '') : newFolder;
+            this.update(this.value.map((id) => id.replace(`::${this.folder}`, `::${newFolder}`)));
+            this.lockedDynamicFolder = this.configuredFolder
+                ? newFolder.replace(`${this.configuredFolder}/`, '')
+                : newFolder;
         },
 
         uploadSelected(upload) {
@@ -622,13 +609,10 @@ export default {
             } else {
                 this.loadAssets([...this.value, id]);
             }
-
-        }
+        },
     },
 
-
     watch: {
-
         assets(assets) {
             if (this.initializing) return;
 
@@ -643,11 +627,11 @@ export default {
         },
 
         loading(loading) {
-            this.$progress.loading(`assets-fieldtype-${this._uid}`, loading);
+            this.$progress.loading(`assets-fieldtype-${this.$.uid}`, loading);
         },
 
         value(value) {
-            if (_.isEqual(value, this.assetIds)) return;
+            if (isEqual(value, this.assetIds)) return;
 
             this.syncDynamicFolderFromValue(value);
 
@@ -656,20 +640,16 @@ export default {
 
         showSelector(selecting) {
             this.$emit(selecting ? 'focus' : 'blur');
-        }
-
+        },
     },
 
     mounted() {
-        this.displayMode = this.isInsideGridField
-            ? 'list'
-            : this.config.mode || 'grid';
+        this.displayMode = this.isInsideGridField ? 'list' : this.config.mode || 'grid';
 
         this.selectorViewMode = Cookies.get('statamic.assets.listing_view_mode') || 'grid';
 
         // We only have URLs in the field data, so we'll need to get the asset data.
         this.initializeAssets();
-    }
-
-}
+    },
+};
 </script>

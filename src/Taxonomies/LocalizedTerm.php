@@ -375,6 +375,10 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
             throw new NotFoundHttpException;
         }
 
+        if ($this->collection() && ! $this->taxonomy()->collections()->contains($this->collection())) {
+            throw new NotFoundHttpException;
+        }
+
         return (new DataResponse($this))->toResponse($request);
     }
 
@@ -481,7 +485,7 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
     public function lastModified()
     {
         return $this->has('updated_at')
-            ? Carbon::createFromTimestamp($this->get('updated_at'))
+            ? Carbon::createFromTimestamp($this->get('updated_at'), config('app.timezone'))
             : $this->term->fileLastModified();
     }
 

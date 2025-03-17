@@ -1,19 +1,16 @@
-const colors = require('tailwindcss/colors')
+const colors = require('tailwindcss/colors');
 
 module.exports = {
     darkMode: 'class',
-    content: [
-        './resources/**/*.{html,js,vue,blade.php}',
-        './tests/**/*.{html,vue,blade.php}'
-    ],
+    content: ['./resources/**/*.{html,js,vue,blade.php}', './tests/**/*.{html,vue,blade.php}'],
     safelist: [
         {
             pattern: /m[l|r]-(?:[0-9]|10|11|12|14|16)$/,
-            variants: ['md', 'lg', 'xl']
+            variants: ['md', 'lg', 'xl'],
         },
         {
             pattern: /p[x|y]-(?:[0-9]|10|11|12|14|16)$/,
-            variants: ['md', 'lg', 'xl']
+            variants: ['md', 'lg', 'xl'],
         },
     ],
     theme: {
@@ -101,13 +98,13 @@ module.exports = {
             amber: colors.amber,
             green: colors.green,
             red: colors.red,
-            'dark-red': '#900000'
+            'dark-red': '#900000',
         },
         screens: {
-            'sm': '576px',
-            'md': '768px',
-            'lg': '992px',
-            'xl': '1200px',
+            sm: '576px',
+            md: '768px',
+            lg: '992px',
+            xl: '1200px',
             '2xl': '1440px',
         },
         extend: {
@@ -115,31 +112,49 @@ module.exports = {
                 DEFAULT: colors.gray[300],
             },
             borderWidth: {
-                '0': '0',
-                '3': '3px',
-                '6': '6px',
+                0: '0',
+                3: '3px',
+                6: '6px',
             },
             boxShadow: {
                 sm: '1px 2px 4px 0 rgba(0,0,0,.03)',
                 md: '0px 2px 6px -1px rgba(0,0,0,.1)',
-                DEFAULT: '0 0 0 1px rgba(49,49,93,.05), 0 2px 5px 0 rgba(49,49,93,.075), 0 1px 3px 0 rgba(49,49,93,.15)',
+                DEFAULT:
+                    '0 0 0 1px rgba(49,49,93,.05), 0 2px 5px 0 rgba(49,49,93,.075), 0 1px 3px 0 rgba(49,49,93,.15)',
                 lg: '0 7px 14px 0 rgba(50,50,93,.1), 0 2px 8px 0 rgba(0,0,0,.075)',
                 xl: '0 12px 24px 0 rgba(50, 50, 93, .1), 0 10px 20px 0 rgba(0, 0, 0, .075)',
-                popover: '0 0 0 1px rgba(40,45,50,0.05), 0 0 0 1px rgba(40,45,50,0.05), 0 2px 7px 1px rgba(40,45,50,0.16)',
+                popover:
+                    '0 0 0 1px rgba(40,45,50,0.05), 0 0 0 1px rgba(40,45,50,0.05), 0 2px 7px 1px rgba(40,45,50,0.16)',
+                quick: '0 0 0 1px rgba(40,45,50,0.075), 0 0 0 1px rgba(40,45,50,0.075)',
                 set: 'rgba(50,50,93,.15) 0 0 0 1px, rgba(50,50,93,.08) 0 2px 5px, rgba(0,0,0,.07) 0 1px 1.5px,rgba(0,0,0,.08) 0 1px 2px 0, transparent 0 0 0 0',
                 button: '0 1px 0 0 rgba(25,30,35,.05)',
                 inner: 'inset 0px 1px 1px 0px rgba(0,0,0,.05)',
                 'inner-dark': 'inset 0px 2px 1px 0px rgba(0,0,0,.15)',
                 dark: '0 20px 35px 0 rgba(22,22,22,.45), 0 10px 23px 0 rgba(23,23,23,.65), 0 0 0 1px rgba(85,87,89,.80)',
-                'dark-lg': '0 40px 78px 0 rgba(22,22,22,.45), 0 15px 28px 0 rgba(23,23,23,.85), 0 0 0 1px rgba(85,87,89,.85)',
+                'dark-lg':
+                    '0 40px 78px 0 rgba(22,22,22,.45), 0 15px 28px 0 rgba(23,23,23,.85), 0 0 0 1px rgba(85,87,89,.85)',
                 'dark-sm': '0 3px 3px 0 rgba(22,22,22,.15), 0 1px 2px 0 rgba(23,23,23,.1)',
-                'dark-popover': '0 10px 17px 10px rgb(31 33 36 / 76%), 0 2px 1px 1px rgb(31 33 36 / 76%), 0 0 0 1px rgb(109 118 118 / 41%), 0 0 0 1px rgb(110 125 140 / 61%)',
-                'dark-set': 'rgba(0,0,0,.25) 0 0 0 1px, rgba(0,0,0,.08) 0 2px 5px, rgba(0,0,0,.17) 0 1px 1.5px,rgba(0,0,0,.18) 0 1px 2px 0, transparent 0 0 0 0',
+                'dark-popover':
+                    '0 10px 17px 10px rgb(31 33 36 / 76%), 0 2px 1px 1px rgb(31 33 36 / 76%), 0 0 0 1px rgb(109 118 118 / 41%), 0 0 0 1px rgb(110 125 140 / 61%)',
+                'dark-set':
+                    'rgba(0,0,0,.25) 0 0 0 1px, rgba(0,0,0,.08) 0 2px 5px, rgba(0,0,0,.17) 0 1px 1.5px,rgba(0,0,0,.18) 0 1px 2px 0, transparent 0 0 0 0',
             },
             fontFamily: {
                 serif: ['Georgia', 'serif'],
                 mono: ['Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', 'monospace'],
-                sans: ['Inter var', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue'],
+                sans: [
+                    'Inter var',
+                    '-apple-system',
+                    'BlinkMacSystemFont',
+                    'Segoe UI',
+                    'Roboto',
+                    'Oxygen',
+                    'Ubuntu',
+                    'Cantarell',
+                    'Fira Sans',
+                    'Droid Sans',
+                    'Helvetica Neue',
+                ],
             },
             fontSize: {
                 '5xs': '9px',
@@ -170,16 +185,16 @@ module.exports = {
             maxWidth: {
                 '3xs': '5rem',
                 '2xs': '10rem',
-                'xs': '20rem',
-                'sm': '30rem',
-                'md': '40rem',
-                'lg': '50rem',
-                'xl': '60rem',
+                xs: '20rem',
+                sm: '30rem',
+                md: '40rem',
+                lg: '50rem',
+                xl: '60rem',
                 '2xl': '70rem',
                 '3xl': '80rem',
                 '4xl': '90rem',
                 '5xl': '100rem',
-                'full': '100%',
+                full: '100%',
             },
             spacing: {
                 13: '3.25rem',
@@ -203,9 +218,6 @@ module.exports = {
             },
         },
     },
-    plugins: [
-        require('@tailwindcss/container-queries'),
-        require('@tailwindcss/typography'),
-    ],
+    plugins: [require('@tailwindcss/container-queries'), require('@tailwindcss/typography')],
     important: true,
-}
+};

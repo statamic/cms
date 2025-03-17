@@ -8,6 +8,7 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Reflector;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Actions\Action;
 use Statamic\Dictionaries\Dictionary;
@@ -16,6 +17,7 @@ use Statamic\Extend\Manifest;
 use Statamic\Facades\Addon;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Fieldset;
+use Statamic\Facades\Path;
 use Statamic\Fields\Fieldtype;
 use Statamic\Forms\JsDrivers\JsDriver;
 use Statamic\Modifiers\Modifier;
@@ -181,6 +183,10 @@ abstract class AddonServiceProvider extends ServiceProvider
      */
     protected $translations = true;
 
+    private $autoloadedClasses;
+
+    private $bootedAddons;
+
     public function boot()
     {
         Statamic::booted(function () {
@@ -215,6 +221,8 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootFieldsets()
                 ->bootPublishAfterInstall()
                 ->bootAddon();
+
+            $this->bootedAddons()->push($this->getAddon()->id());
         });
     }
 
@@ -225,36 +233,11 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     public function bootEvents()
     {
-        collect($this->autoloadFilesFromFolder('Listeners'))
-            ->mapWithKeys(function ($class) {
-                $reflection = new \ReflectionClass($class);
-
-                if (
-                    $reflection->hasMethod('handle')
-                    && isset($reflection->getMethod('handle')->getParameters()[0])
-                    && $reflection->getMethod('handle')->getParameters()[0]->hasType()
-                ) {
-                    $event = $reflection->getMethod('handle')->getParameters()[0]->getType()->getName();
-
-                    return [$event => $class];
-                }
-
-                if (
-                    $reflection->hasMethod('__invoke')
-                    && isset($reflection->getMethod('__invoke')->getParameters()[0])
-                    && $reflection->getMethod('__invoke')->getParameters()[0]->hasType()
-                ) {
-                    $event = $reflection->getMethod('__invoke')->getParameters()[0]->getType()->getName();
-
-                    return [$event => $class];
-                }
-
-                return [];
-            })
-            ->filter()
-            ->merge(collect($this->listen)->flatMap(fn ($listeners, $event) => collect($listeners)->mapWithKeys(fn ($listener) => [$event => $listener])))
-            ->unique()
-            ->each(fn ($listener, $event) => Event::listen($event, $listener));
+        $this->getEventListeners()->each(function ($listeners, $event) {
+            foreach ($listeners as $listener) {
+                Event::listen($event, $listener);
+            }
+        });
 
         $subscribers = collect($this->subscribe)
             ->merge($this->autoloadFilesFromFolder('Subscribers'))
@@ -265,6 +248,47 @@ abstract class AddonServiceProvider extends ServiceProvider
         }
 
         return $this;
+    }
+
+    private function getEventListeners()
+    {
+        $arr = [];
+
+        foreach ($this->discoverListenerEvents() as $listener => $events) {
+            foreach ($events as $event) {
+                $arr[$event][] = $listener;
+            }
+        }
+
+        foreach ($this->listen as $event => $listeners) {
+            foreach ($listeners as $listener) {
+                if (! in_array($listener, $arr[$event] ?? [])) {
+                    $arr[$event][] = $listener;
+                }
+            }
+        }
+
+        return collect($arr);
+    }
+
+    private function discoverListenerEvents()
+    {
+        return collect($this->autoloadFilesFromFolder('Listeners'))->mapWithKeys(function ($class) {
+            $listener = new \ReflectionClass($class);
+            $events = [];
+
+            foreach ($listener->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
+                if ((! Str::is('handle*', $method->name) && ! Str::is('__invoke', $method->name)) || ! isset($method->getParameters()[0])) {
+                    continue;
+                }
+
+                $key = Str::is(['__invoke', 'handle'], $method->name) ? $class : $class.'@'.$method->name;
+
+                $events[$key] = Reflector::getParameterClassNames($method->getParameters()[0]);
+            }
+
+            return $events;
+        });
     }
 
     protected function bootTags()
@@ -437,6 +461,10 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootConfig()
     {
+        if (! $this->shouldBootRootItems()) {
+            return $this;
+        }
+
         $filename = $this->getAddon()->slug();
         $directory = $this->getAddon()->directory();
         $origin = "{$directory}config/{$filename}.php";
@@ -456,6 +484,10 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootTranslations()
     {
+        if (! $this->shouldBootRootItems()) {
+            return $this;
+        }
+
         $slug = $this->getAddon()->slug();
         $directory = $this->getAddon()->directory();
         $origin = "{$directory}lang";
@@ -501,7 +533,7 @@ abstract class AddonServiceProvider extends ServiceProvider
         $web = Arr::get(
             array: $this->routes,
             key: 'web',
-            default: $this->app['files']->exists($path = $directory.'routes/web.php') ? $path : null
+            default: $this->shouldBootRootItems() && $this->app['files']->exists($path = $directory.'routes/web.php') ? $path : null
         );
 
         if ($web) {
@@ -511,7 +543,7 @@ abstract class AddonServiceProvider extends ServiceProvider
         $cp = Arr::get(
             array: $this->routes,
             key: 'cp',
-            default: $this->app['files']->exists($path = $directory.'routes/cp.php') ? $path : null
+            default: $this->shouldBootRootItems() && $this->app['files']->exists($path = $directory.'routes/cp.php') ? $path : null
         );
 
         if ($cp) {
@@ -521,7 +553,7 @@ abstract class AddonServiceProvider extends ServiceProvider
         $actions = Arr::get(
             array: $this->routes,
             key: 'actions',
-            default: $this->app['files']->exists($path = $directory.'routes/actions.php') ? $path : null
+            default: $this->shouldBootRootItems() && $this->app['files']->exists($path = $directory.'routes/actions.php') ? $path : null
         );
 
         if ($actions) {
@@ -603,6 +635,10 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootViews()
     {
+        if (! $this->shouldBootRootItems()) {
+            return $this;
+        }
+
         if (file_exists($this->getAddon()->directory().'resources/views')) {
             $this->loadViewsFrom(
                 $this->getAddon()->directory().'resources/views',
@@ -729,6 +765,10 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootBlueprints()
     {
+        if (! $this->shouldBootRootItems()) {
+            return $this;
+        }
+
         if (! file_exists($path = "{$this->getAddon()->directory()}resources/blueprints")) {
             return $this;
         }
@@ -743,6 +783,10 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootFieldsets()
     {
+        if (! $this->shouldBootRootItems()) {
+            return $this;
+        }
+
         if (! file_exists($path = "{$this->getAddon()->directory()}resources/fieldsets")) {
             return $this;
         }
@@ -766,7 +810,8 @@ abstract class AddonServiceProvider extends ServiceProvider
             return [];
         }
 
-        $path = $addon->directory().$addon->autoload().'/'.$folder;
+        $reflection = new \ReflectionClass(static::class);
+        $path = dirname($reflection->getFileName()).'/'.$folder;
 
         if (! $this->app['files']->exists($path)) {
             return [];
@@ -780,19 +825,71 @@ abstract class AddonServiceProvider extends ServiceProvider
             }
 
             $class = $file->getBasename('.php');
-            $fqcn = $this->namespace().'\\'.str_replace('/', '\\', $folder).'\\'.$class;
+            $fqcn = $reflection->getNamespaceName().'\\'.str_replace('/', '\\', $folder).'\\'.$class;
 
             if ((new \ReflectionClass($fqcn))->isAbstract() || (new \ReflectionClass($fqcn))->isInterface()) {
                 continue;
             }
 
             if ($requiredClass && ! is_subclass_of($fqcn, $requiredClass)) {
-                return;
+                continue;
+            }
+
+            if ($this->autoloadedClasses()->contains($fqcn)) {
+                continue;
             }
 
             $autoloadable[] = $fqcn;
+            $this->autoloadedClasses()->push($fqcn);
         }
 
         return $autoloadable;
+    }
+
+    private function shouldBootRootItems()
+    {
+        $addon = $this->getAddon();
+
+        // We'll keep track of addons that have been booted to ensure that multiple
+        // providers don't try to boot things twice. This could happen if there are
+        // multiple providers in the root autoload directory (src) of an addon.
+        if ($this->bootedAddons()->contains($addon->id())) {
+            return false;
+        }
+
+        // We only want to boot root items if the provider is in the autoloaded directory.
+        // i.e. It's the "root" provider. If it's in a subdirectory maybe the developer
+        // is organizing their providers. Things like tags etc. can be autoloaded but
+        // root level things like routes, views, config, blueprints, etc. will not.
+        $thisDir = Path::tidy(dirname((new \ReflectionClass(static::class))->getFileName()));
+        $autoloadDir = $addon->directory().$addon->autoload();
+
+        return $thisDir === $autoloadDir;
+    }
+
+    private function autoloadedClasses()
+    {
+        if ($this->autoloadedClasses) {
+            return $this->autoloadedClasses;
+        }
+
+        if (! $this->app->bound($autoloaded = 'statamic.autoloaded-addon-classes')) {
+            $this->app->instance($autoloaded, collect());
+        }
+
+        return $this->autoloadedClasses = $this->app->make($autoloaded);
+    }
+
+    private function bootedAddons()
+    {
+        if ($this->bootedAddons) {
+            return $this->bootedAddons;
+        }
+
+        if (! $this->app->bound($booted = 'statamic.booted-addons')) {
+            $this->app->instance($booted, collect());
+        }
+
+        return $this->bootedAddons = $this->app->make($booted);
     }
 }

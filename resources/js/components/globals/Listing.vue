@@ -1,14 +1,14 @@
 <template>
-    <data-list :rows="rows" :columns="columns">
-        <div class="card p-0" slot-scope="{ filteredRows: rows }">
+    <data-list :rows="rows" :columns="columns" v-slot="{ filteredRows: rows }">
+        <div class="card p-0">
             <data-list-table>
-                <template slot="cell-title" slot-scope="{ row: global }">
+                <template #cell-title="{ row: global }">
                     <a :href="global.edit_url">{{ __(global.title) }}</a>
                 </template>
-                <template slot="cell-handle" slot-scope="{ value: handle }">
+                <template #cell-handle="{ value: handle }">
                     <span class="font-mono text-2xs">{{ handle }}</span>
                 </template>
-                <template slot="actions" slot-scope="{ row: global, index }">
+                <template #actions="{ row: global, index }">
                     <dropdown-list>
                         <dropdown-item :text="__('Edit')" :redirect="global.edit_url" />
                         <dropdown-item
@@ -20,7 +20,8 @@
                             <resource-deleter
                                 :ref="`deleter_${global.id}`"
                                 :resource="global"
-                                @deleted="removeRow(global)">
+                                @deleted="removeRow(global)"
+                            >
                             </resource-deleter>
                         </dropdown-item>
                     </dropdown-list>
@@ -31,10 +32,9 @@
 </template>
 
 <script>
-import Listing from '../Listing.vue'
+import Listing from '../Listing.vue';
 
 export default {
-
     mixins: [Listing],
 
     props: ['globals'],
@@ -45,9 +45,8 @@ export default {
             columns: [
                 { label: __('Title'), field: 'title' },
                 { label: __('Handle'), field: 'handle' },
-            ]
-        }
-    }
-
-}
+            ],
+        };
+    },
+};
 </script>

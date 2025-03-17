@@ -5,13 +5,7 @@ import HasPagination from './data-list/HasPagination';
 import HasPreferences from './data-list/HasPreferences';
 
 export default {
-
-    mixins: [
-        HasActions,
-        HasFilters,
-        HasPagination,
-        HasPreferences,
-    ],
+    mixins: [HasActions, HasFilters, HasPagination, HasPreferences],
 
     props: {
         initialSortColumn: String,
@@ -31,18 +25,17 @@ export default {
             loading: true,
             items: [],
             columns: this.initialColumns,
-            visibleColumns: this.initialColumns.filter(column => column.visible),
+            visibleColumns: this.initialColumns.filter((column) => column.visible),
             sortColumn: this.initialSortColumn,
             sortDirection: this.initialSortDirection,
             meta: null,
             pushQuery: false,
             popping: false,
-        }
+        };
     },
 
     computed: {
-
-        parameterMap()  {
+        parameterMap() {
             return {
                 sort: 'sortColumn',
                 order: 'sortDirection',
@@ -54,33 +47,34 @@ export default {
             };
         },
 
-        parameters:  {
+        parameters: {
             get() {
-                const parameters = Object.fromEntries(Object.entries(this.parameterMap)
-                    .map(([key, prop]) => {
-                        return [key, this[prop]];
-                    })
-                    .filter(([key, value]) => {
-                        return value !== null && value !== undefined && value !== '';
-                    }));
+                const parameters = Object.fromEntries(
+                    Object.entries(this.parameterMap)
+                        .map(([key, prop]) => {
+                            return [key, this[prop]];
+                        })
+                        .filter(([key, value]) => {
+                            return value !== null && value !== undefined && value !== '';
+                        }),
+                );
                 return {
                     ...parameters,
                     ...this.additionalParameters,
                 };
             },
             set(value) {
-                Object.entries(this.parameterMap)
-                    .forEach(([key, prop]) => {
-                        if (value.hasOwnProperty(key)) {
-                            this[prop] = value[key];
-                        }
-                    });
+                Object.entries(this.parameterMap).forEach(([key, prop]) => {
+                    if (value.hasOwnProperty(key)) {
+                        this[prop] = value[key];
+                    }
+                });
             },
         },
 
         activeFilterParameters: {
             get() {
-                if (_.isEmpty(this.activeFilters)) {
+                if (Object.keys(this.activeFilters).length === 0) {
                     return null;
                 }
                 return utf8btoa(JSON.stringify(this.activeFilters));
@@ -92,13 +86,15 @@ export default {
 
         visibleColumnParameters: {
             get() {
-                if (_.isEmpty(this.visibleColumns)) {
+                if (Object.keys(this.visibleColumns).length === 0) {
                     return null;
                 }
-                return this.visibleColumns.map(column => column.field).join(',');
+                return this.visibleColumns.map((column) => column.field).join(',');
             },
             set(value) {
-                this.visibleColumns = value.split(',').map(field => this.columns.find(column => column.field === field));
+                this.visibleColumns = value
+                    .split(',')
+                    .map((field) => this.columns.find((column) => column.field === field));
             },
         },
 
@@ -114,7 +110,6 @@ export default {
 
             return false;
         },
-
     },
 
     created() {
@@ -130,14 +125,13 @@ export default {
         }
     },
 
-    beforeDestroy() {
+    beforeUnmount() {
         if (this.pushQuery) {
             window.removeEventListener('popstate', this.popState);
         }
     },
 
     watch: {
-
         parameters: {
             deep: true,
             handler(after, before) {
@@ -148,14 +142,14 @@ export default {
                 if (JSON.stringify(before) === JSON.stringify(after)) return;
                 this.request();
                 this.pushState();
-            }
+            },
         },
 
         loading: {
             immediate: true,
             handler(loading) {
                 this.$progress.loading(this.listingKey, loading);
-            }
+            },
         },
 
         searchQuery(query) {
@@ -164,42 +158,45 @@ export default {
             this.resetPage();
             this.request();
             this.pushState();
-        }
-
+        },
     },
 
     methods: {
-
         request() {
-            if (! this.requestUrl) {
+            if (!this.requestUrl) {
                 this.loading = false;
                 return;
             }
 
             this.loading = true;
 
-            if (this.source) this.source.cancel();
-            this.source = this.$axios.CancelToken.source();
+            if (this.source) this.source.abort();
+            this.source = new AbortController();
 
-            this.$axios.get(this.requestUrl, {
-                params: this.parameters,
-                cancelToken: this.source.token
-            }).then(response => {
-                this.columns = response.data.meta.columns;
-                this.activeFilterBadges = {...response.data.meta.activeFilterBadges};
-                this.items = Object.values(response.data.data);
-                this.meta = response.data.meta;
-                if (this.shouldRequestFirstPage) return this.request();
-                this.loading = false;
-                this.initializing = false;
-                this.afterRequestCompleted(response);
-            }).catch(e => {
-                if (this.$axios.isCancel(e)) return;
-                this.loading = false;
-                this.initializing = false;
-                if (e.request && ! e.response) return;
-                this.$toast.error(e.response ? e.response.data.message : __('Something went wrong'), { duration: null });
-            })
+            this.$axios
+                .get(this.requestUrl, {
+                    params: this.parameters,
+                    signal: this.source.signal,
+                })
+                .then((response) => {
+                    this.columns = response.data.meta.columns;
+                    this.activeFilterBadges = { ...response.data.meta.activeFilterBadges };
+                    this.items = Object.values(response.data.data);
+                    this.meta = response.data.meta;
+                    if (this.shouldRequestFirstPage) return this.request();
+                    this.loading = false;
+                    this.initializing = false;
+                    this.afterRequestCompleted(response);
+                })
+                .catch((e) => {
+                    if (this.$axios.isCancel(e)) return;
+                    this.loading = false;
+                    this.initializing = false;
+                    if (e.request && !e.response) return;
+                    this.$toast.error(e.response ? e.response.data.message : __('Something went wrong'), {
+                        duration: null,
+                    });
+                });
         },
 
         afterRequestCompleted(response) {
@@ -213,7 +210,7 @@ export default {
 
         removeRow(row) {
             let id = row.id;
-            let i = _.indexOf(this.rows, _.findWhere(this.rows, { id }));
+            let i = this.rows.indexOf(this.rows.find((r) => r.id === id));
             this.rows.splice(i, 1);
             if (this.rows.length === 0) location.reload();
         },
@@ -236,9 +233,11 @@ export default {
             const parameters = this.parameters;
             const keys = Object.keys(this.parameterMap);
             // This ensures no additionalParameters are added to the URL
-            const searchParams = new URLSearchParams(Object.fromEntries(keys
-                .filter(key => parameters.hasOwnProperty(key))
-                .map(key => [key, parameters[key]])));
+            const searchParams = new URLSearchParams(
+                Object.fromEntries(
+                    keys.filter((key) => parameters.hasOwnProperty(key)).map((key) => [key, parameters[key]]),
+                ),
+            );
             window.history.pushState({ parameters }, '', '?' + searchParams.toString());
         },
 
@@ -254,8 +253,6 @@ export default {
                 this.popping = false;
             });
         },
-
-    }
-
-}
+    },
+};
 </script>

@@ -1,10 +1,11 @@
-@php use function Statamic\trans as __; @endphp
+@php
+    use function Statamic\trans as __;
+@endphp
 
 @extends('statamic::layout')
 @section('title', __('Edit Global Set'))
 
 @section('content')
-
     <global-publish-form
         publish-container="base"
         :initial-actions="{{ json_encode($actions) }}"
@@ -28,5 +29,4 @@
         :can-edit="{{ json_encode($canEdit) }}"
         :can-edit-blueprint="{{ $actions['editBlueprint'] ? Statamic\Support\Str::bool($user->can('configure fields')) : 'false' }}"
     ></global-publish-form>
-
 @endsection

@@ -1,24 +1,29 @@
-@php use function Statamic\trans as __; @endphp
+@php
+    use function Statamic\trans as __;
+@endphp
 
 @extends('statamic::layout')
 @section('title', $title)
 
 @section('content')
 
-    @if($showBreadcrumb)
-        @include('statamic::partials.breadcrumb', [
+@if ($showBreadcrumb)
+    @include(
+        'statamic::partials.breadcrumb',
+        [
             'url' => cp_route('preferences.index'),
             'title' => __('Preferences'),
-        ])
-    @endif
+        ]
+    )
+@endif
 
-    <preferences-edit-form
-        title="{{ $title }}"
-        :blueprint='@json($blueprint)'
-        :meta='@json($meta)'
-        :values='@json($values)'
-        action="{{ $actionUrl }}"
-        :save-as-options="{{ json_encode($saveAsOptions) }}"
-    ></preferences-edit-form>
+<preferences-edit-form
+    title="{{ $title }}"
+    :blueprint="{{ Js::from($blueprint) }}"
+    :meta="{{ Js::from($meta) }}"
+    :values="{{ Js::from($values) }}"
+    action="{{ $actionUrl }}"
+    :save-as-options="{{ json_encode($saveAsOptions) }}"
+></preferences-edit-form>
 
 @stop

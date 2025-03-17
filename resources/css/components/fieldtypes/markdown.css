@@ -3,10 +3,10 @@
    ========================================================================== */
 
 .markdown-fieldtype-wrapper {
-    @apply border dark:border-dark-900 rounded overflow-hidden relative;
+    @apply relative overflow-hidden rounded border dark:border-dark-900;
 
     .markdown-toolbar {
-        @apply bg-white dark:bg-dark-700 shadow-none rounded-t border-b dark:border-dark-900 text-sm flex flex-wrap items-center justify-between;
+        @apply flex flex-wrap items-center justify-between rounded-t border-b bg-white text-sm shadow-none dark:border-dark-900 dark:bg-dark-700;
         padding: 4px 8px;
     }
 
@@ -15,14 +15,14 @@
     }
 
     .markdown-buttons button {
-        @apply text-gray-800 dark:text-dark-150 rounded px-1 flex items-center justify-center text-base text-center h-8 w-8;
+        @apply flex h-8 w-8 items-center justify-center rounded px-1 text-center text-base text-gray-800 dark:text-dark-150;
 
         &:hover {
             @apply bg-gray-200 dark:bg-dark-750;
         }
 
         &.active {
-            @apply bg-gray-300 dark:bg-dark-800 text-black dark:text-dark-175;
+            @apply bg-gray-300 text-black dark:bg-dark-800 dark:text-dark-175;
         }
     }
 
@@ -37,20 +37,20 @@
         @apply flex items-center;
 
         button {
-            @apply text-gray-700 dark:text-dark-150 inline-block focus:outline-none px-2 py-1 rtl:ml-1 ltr:mr-1;
+            @apply inline-block px-2 py-1 text-gray-700 focus:outline-none dark:text-dark-150 ltr:mr-1 rtl:ml-1;
 
             &:hover {
                 @apply text-blue;
             }
 
             &.active {
-                @apply bg-blue-100 dark:bg-dark-800 text-blue-800 dark:text-dark-150 rounded;
+                @apply rounded bg-blue-100 text-blue-800 dark:bg-dark-800 dark:text-dark-150;
             }
         }
     }
 
     .CodeMirror {
-        @apply bg-gray-100 dark:bg-dark-650 shadow-inner dark:shadow-inner-dark h-auto font-mono leading-normal px-0 py-1 @md/markdown:p-3 text-xs dark:text-dark-150;
+        @apply h-auto bg-gray-100 px-0 py-1 font-mono text-xs leading-normal shadow-inner @md/markdown:p-3 dark:bg-dark-650 dark:text-dark-150 dark:shadow-inner-dark;
         border-radius: 0 0 3px 3px;
 
         &:focus-within {
@@ -58,14 +58,16 @@
         }
 
         .cm-comment {
-            @apply font-mono text-sm
+            @apply font-mono text-sm;
         }
     }
 
-    .CodeMirror-code { min-height: 100px; }
+    .CodeMirror-code {
+        min-height: 100px;
+    }
 
     .helpers {
-        @apply border-t dark:border-dark-900 text-xs text-gray-800 dark:text-dark-150 flex items-center;
+        @apply flex items-center border-t text-xs text-gray-800 dark:border-dark-900 dark:text-dark-150;
 
         button:hover {
             @apply text-blue;
@@ -73,24 +75,23 @@
     }
 
     .markdown-cheatsheet-helper {
-        @apply p-2 inline-block;
+        @apply inline-block p-2;
     }
 
     .markdown-asset-helper {
-        @apply py-2 px-4 inline-block;
+        @apply inline-block px-4 py-2;
     }
 }
-
 
 /* Dark Mode
   ========================================================================== */
 
 .markdown-fieldtype-wrapper.markdown-fullscreen.markdown-dark-mode,
 .dark .markdown-fieldtype-wrapper.markdown-fullscreen {
-    @apply bg-gray-800 border-none;
+    @apply border-none bg-gray-800;
 
     .markdown-toolbar {
-        @apply text-white border-b border-gray-950 shadow-lg;
+        @apply border-b border-gray-950 text-white shadow-lg;
         background: linear-gradient(180deg, theme('colors.gray.900'), hsl(210, 20%, 13%));
     }
 
@@ -102,7 +103,7 @@
     }
 
     .helpers {
-        @apply bg-gray-900 text-white border-t border-gray-950;
+        @apply border-t border-gray-950 bg-gray-900 text-white;
     }
 
     .markdown-buttons button {
@@ -116,7 +117,7 @@
     .markdown-modes button {
         @apply text-gray-700;
         &.active {
-            @apply text-white bg-black;
+            @apply bg-black text-white;
         }
     }
 
@@ -124,7 +125,7 @@
         @apply text-white antialiased;
     }
 
-    [class*="cm-"] {
+    [class*='cm-'] {
         color: white !important;
     }
 
@@ -137,29 +138,28 @@
     }
 }
 
-
 /* Read Only
   ========================================================================== */
 
 .markdown-fieldtype.read-only-field .CodeMirror {
-    @apply bg-gray-300 dark:bg-dark-600 text-gray-700 dark:text-dark-200;
+    @apply bg-gray-300 text-gray-700 dark:bg-dark-600 dark:text-dark-200;
 }
-
 
 /* Inside a Grid fieldtype
   ========================================================================== */
 
 .grid-fieldtype .grid-table .markdown-fieldtype {
     .markdown-fieldtype-wrapper {
-        @apply border rounded;
+        @apply rounded border;
     }
 
     .markdown-preview {
-        @apply border-none p-2 rtl:text-right ltr:text-left;
-        p { line-height: 1.2; }
+        @apply border-none p-2 ltr:text-left rtl:text-right;
+        p {
+            line-height: 1.2;
+        }
     }
 }
-
 
 /* Writing Mode Typography
   ========================================================================== */
@@ -181,15 +181,14 @@
 }
 
 .markdown-fieldtype .cm-quote {
-    @apply text-gray-800 dark:text-dark-150 italic text-sm;
+    @apply text-sm italic text-gray-800 dark:text-dark-150;
 }
-
 
 /* Preview Mode Typography
   ========================================================================== */
 
 .markdown-preview {
-    @apply mx-auto px-3 py-2 @md/markdown:py-4 @md/markdown:px-5;
+    @apply mx-auto px-3 py-2 @md/markdown:px-5 @md/markdown:py-4;
 
     min-height: 167px;
 
@@ -207,18 +206,19 @@
         background-color: #f9f2f4;
         direction: ltr;
 
-        code { @apply p-0 }
+        code {
+            @apply p-0;
+        }
     }
 }
 
 .markdown-fieldtype-wrapper.markdown-fullscreen {
-    @apply fixed bg-gray-200 inset-0 min-h-screen overflow-scroll rounded-none pt-16;
+    @apply fixed inset-0 min-h-screen overflow-scroll rounded-none border-0 bg-gray-200 pt-14;
     /* padding-top: 52px;  offset the nav */
     will-change: transform;
 
     .markdown-toolbar {
-        @apply fixed top-0 w-full px-6 py-2 h-12 shadow text-base flex items-center justify-between;
-        @apply bg-gradient-to-b from-white to-gray-100;
+        @apply border-0;
     }
 
     .mode-wrap {
@@ -231,7 +231,7 @@
     }
 
     .editor {
-        @apply bg-white shadow max-w-xl mx-auto rounded relative my-6 px-2 md:px-8 md:pt-8;
+        @apply relative mx-auto my-6 max-w-xl rounded bg-white px-2 shadow md:px-8 md:pt-8;
 
         .CodeMirror-scroll {
             @apply m-0;
@@ -239,17 +239,18 @@
     }
 
     .CodeMirror {
-        @apply outline-none bg-transparent shadow-none;
-        &:focus, &:focus-within {
+        @apply bg-transparent shadow-none outline-none;
+        &:focus,
+        &:focus-within {
             @apply ring-0 !important;
         }
     }
 
     .markdown-preview {
-        @apply max-w-xl bg-transparent mx-auto relative p-8 text-lg;
+        @apply relative mx-auto max-w-xl bg-transparent p-8 text-lg;
     }
 
     .helpers {
-        @apply absolute bottom-0 inset-x-0 bg-white;
+        @apply absolute inset-x-0 bottom-0 bg-white;
     }
 }

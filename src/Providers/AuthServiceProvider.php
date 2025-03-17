@@ -14,6 +14,7 @@ use Statamic\Auth\UserRepositoryManager;
 use Statamic\Contracts\Auth\RoleRepository;
 use Statamic\Contracts\Auth\UserGroupRepository;
 use Statamic\Contracts\Auth\UserRepository;
+use Statamic\Facades\Permission;
 use Statamic\Facades\User;
 use Statamic\Policies;
 
@@ -83,12 +84,21 @@ class AuthServiceProvider extends ServiceProvider
             return new UserProvider;
         });
 
-        Gate::before(function ($user, $ability) {
-            return optional(User::fromUser($user))->isSuper() ? true : null;
-        });
-
         Gate::after(function ($user, $ability) {
-            return optional(User::fromUser($user))->hasPermission($ability) === true ? true : null;
+            // If the ability isn't a Statamic permission, we don't want to get involved. 🙈
+            if (! Permission::boot()->flattened()->map->value()->contains($ability)) {
+                return null;
+            }
+
+            $user = User::fromUser($user);
+
+            if ($user->isSuper()) {
+                return true;
+            }
+
+            if ($user->hasPermission($ability)) {
+                return true;
+            }
         });
 
         foreach ($this->policies as $key => $policy) {

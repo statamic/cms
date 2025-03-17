@@ -3,13 +3,13 @@
    ========================================================================== */
 
 .text-shadow {
-    text-shadow: 0 1px 2px rgba(0,0,0,.25);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
 }
 
 .focus-outline {
     @apply border border-blue-300 dark:border-dark-blue-200;
     outline: 0;
-    box-shadow: 0 0 0 0.2rem rgba(0,125,255,.25);
+    box-shadow: 0 0 0 0.2rem rgba(0, 125, 255, 0.25);
 }
 
 .focus-none {
@@ -39,14 +39,17 @@
 
         .icon {
             display: inline-block;
-            margin: -2px 5px 0 0 ; [dir="rtl"] & { margin: -2px 0 0 5px ; }
+            margin: -2px 5px 0 0;
+            [dir='rtl'] & {
+                margin: -2px 0 0 5px;
+            }
         }
     }
 }
 
 .shadow-hover-lg {
     @apply shadow-lg;
-    transition: box-shadow .08s ease-in-out;
+    transition: box-shadow 0.08s ease-in-out;
     &:hover {
         @apply shadow-xl;
     }
@@ -63,46 +66,59 @@
 
 .saving-overlay {
     @apply absolute inset-0 z-200 flex items-center rounded;
-    background: rgba(255, 255, 255, .9);
+    background: rgba(255, 255, 255, 0.9);
 
     .dark & {
         @apply bg-dark-600/90;
     }
 
     .inner {
-        @apply p-10 text-center mx-auto;
+        @apply mx-auto p-10 text-center;
     }
 
     i {
         position: relative;
         top: -1px;
-        margin-right: 10px ; [dir="rtl"] & { margin-left: 10px ; margin-right: 0 ; }
+        margin-right: 10px;
+        [dir='rtl'] & {
+            margin-left: 10px;
+            margin-right: 0;
+        }
     }
 }
 
 .bg-checkerboard {
-    background-color: #FFF;
-    background-image: linear-gradient(45deg, #EDF2F6 25%, transparent 25%), linear-gradient(-45deg, #EDF2F6 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #EDF2F6 75%), linear-gradient(-45deg, transparent 75%, #EDF2F6 75%);
+    background-color: #fff;
+    background-image: linear-gradient(45deg, #edf2f6 25%, transparent 25%),
+        linear-gradient(-45deg, #edf2f6 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #edf2f6 75%),
+        linear-gradient(-45deg, transparent 75%, #edf2f6 75%);
     background-size: 16px 16px;
-    background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+    background-position:
+        0 0,
+        0 8px,
+        8px -8px,
+        -8px 0;
 
     .dark & {
         background-color: theme(colors.dark.600);
-        background-image: linear-gradient(45deg, theme(colors.dark.950) 25%, transparent 25%), linear-gradient(-45deg, theme(colors.dark.950) 25%, transparent 25%), linear-gradient(45deg, transparent 75%, theme(colors.dark.950) 75%), linear-gradient(-45deg, transparent 75%, theme(colors.dark.950) 75%);
+        background-image: linear-gradient(45deg, theme(colors.dark.950) 25%, transparent 25%),
+            linear-gradient(-45deg, theme(colors.dark.950) 25%, transparent 25%),
+            linear-gradient(45deg, transparent 75%, theme(colors.dark.950) 75%),
+            linear-gradient(-45deg, transparent 75%, theme(colors.dark.950) 75%);
     }
 }
 
 .clickable {
-    @apply text-gray-800 dark:text-dark-175 select-none cursor-pointer border dark:border-dark-800 bg-gradient-to-b from-white to-gray-100 dark:from-dark-550 dark:to-dark-600;
+    @apply cursor-pointer select-none border bg-gradient-to-b from-white to-gray-100 text-gray-800 dark:border-dark-800 dark:from-dark-550 dark:to-dark-600 dark:text-dark-175;
 
     &:hover {
-        @apply border-gray-500 dark:border-dark-900 from-white to-gray-200 dark:from-dark-550 dark:to-dark-700;
+        @apply border-gray-500 from-white to-gray-200 dark:border-dark-900 dark:from-dark-550 dark:to-dark-700;
     }
 }
 
 [v-cloak],
 [x-cloak] {
-    display: none
+    display: none;
 }
 
 .-max-h-screen-px {

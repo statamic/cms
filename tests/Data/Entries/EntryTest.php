@@ -17,6 +17,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use ReflectionClass;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Entries\QueryBuilder;
 use Statamic\Data\AugmentedCollection;
 use Statamic\Entries\AugmentedEntry;
 use Statamic\Entries\Collection;
@@ -930,14 +931,6 @@ class EntryTest extends TestCase
     ) {
         Carbon::setTestNow(Carbon::parse('2015-09-24 13:45:23'));
 
-        $collection = tap(Facades\Collection::make('test')->dated(true))->save();
-
-        $entry = (new Entry)->collection($collection)->slug('foo');
-
-        if ($setDate) {
-            $entry->date($setDate);
-        }
-
         $fields = [];
 
         if ($enableTimeInBlueprint) {
@@ -948,6 +941,14 @@ class EntryTest extends TestCase
         BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect([
             'test' => $blueprint->setHandle('test'),
         ]));
+
+        $collection = tap(Facades\Collection::make('test')->dated(true))->save();
+
+        $entry = (new Entry)->collection($collection)->slug('foo');
+
+        if ($setDate) {
+            $entry->date($setDate);
+        }
 
         $this->assertTrue($entry->hasDate());
         $this->assertEquals($expectedDate, $entry->date()->format('Y-m-d H:i:s'));
@@ -983,6 +984,50 @@ class EntryTest extends TestCase
 
             'datetime with seconds set, time disabled' => ['2023-04-19-142512', false, null, '2023-04-19 00:00:00', false, false, '2023-04-19.foo'],
             'datetime with seconds set, time disabled, seconds enabled' => ['2023-04-19-142512', false, true, '2023-04-19 00:00:00', false, false, '2023-04-19.foo'], // Time is disabled, so seconds should be disabled too.
+
+            'date explicitly set in another timezone' => [Carbon::parse('2025-03-07 22:00', 'America/New_York'), false, false, '2025-03-08 03:00:00', true, false, '2025-03-08-0300.foo'], // Passing in a carbon instance will adjust from its timezone
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('dateCollectionEntriesAsStringProvider')]
+    public function it_gets_dates_for_dated_collection_entries_when_passed_as_string(
+        $appTimezone,
+        $date,
+        $expectedDate
+    ) {
+        config(['app.timezone' => $appTimezone]);
+
+        Carbon::setTestNow(Carbon::parse('2025-02-02 13:45:23'));
+
+        $blueprint = Blueprint::makeFromFields([
+            'date' => ['type' => 'date', 'time_enabled' => true, 'time_seconds_enabled' => true],
+        ]);
+        BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect([
+            'test' => $blueprint->setHandle('test'),
+        ]));
+
+        $collection = tap(Facades\Collection::make('test')->dated(true))->save();
+
+        $entry = (new Entry)->collection($collection)->slug('foo')->date($date);
+
+        $this->assertEquals($expectedDate, $entry->date()->toIso8601String());
+    }
+
+    public static function dateCollectionEntriesAsStringProvider()
+    {
+        // The date is treated as UTC regardless of the timezone so no conversion should be done.
+        return [
+            'utc' => [
+                'UTC',
+                '2023-02-20-033513',
+                '2023-02-20T03:35:13+00:00',
+            ],
+            'not utc' => [
+                'America/New_York',
+                '2023-02-20-033513',
+                '2023-02-20T03:35:13+00:00',
+            ],
         ];
     }
 
@@ -1727,7 +1772,12 @@ class EntryTest extends TestCase
         $originEntry = $this->mock(Entry::class);
         $originEntry->shouldReceive('id')->andReturn('123');
 
-        Facades\Entry::shouldReceive('find')->with('123')->andReturn($originEntry);
+        $builder = $this->mock(QueryBuilder::class);
+        $builder->shouldReceive('where')->with('collection', 'test')->andReturnSelf();
+        $builder->shouldReceive('where')->with('id', 123)->andReturnSelf();
+        $builder->shouldReceive('first')->andReturn($originEntry);
+        Facades\Entry::shouldReceive('query')->andReturn($builder);
+
         $originEntry->shouldReceive('values')->andReturn(collect([]));
         $originEntry->shouldReceive('blueprint')->andReturn(
             $this->mock(Blueprint::class)->shouldReceive('handle')->andReturn('test')->getMock()
@@ -1805,12 +1855,16 @@ class EntryTest extends TestCase
 
         $originEntry = $this->mock(Entry::class);
         $originEntry->shouldReceive('id')->andReturn('123');
-
-        Facades\Entry::shouldReceive('find')->with('123')->andReturn($originEntry);
         $originEntry->shouldReceive('values')->andReturn(collect([]));
         $originEntry->shouldReceive('blueprint')->andReturn(
             $this->mock(Blueprint::class)->shouldReceive('handle')->andReturn('another')->getMock()
         );
+
+        $builder = $this->mock(QueryBuilder::class);
+        $builder->shouldReceive('where')->with('collection', 'test')->andReturnSelf();
+        $builder->shouldReceive('where')->with('id', 123)->andReturnSelf();
+        $builder->shouldReceive('first')->andReturn($originEntry);
+        Facades\Entry::shouldReceive('query')->andReturn($builder);
 
         $entry = (new Entry)
             ->collection('test')
@@ -1831,12 +1885,16 @@ class EntryTest extends TestCase
 
         $originEntry = $this->mock(Entry::class);
         $originEntry->shouldReceive('id')->andReturn('123');
-
-        Facades\Entry::shouldReceive('find')->with('123')->andReturn($originEntry);
         $originEntry->shouldReceive('values')->andReturn(collect([]));
         $originEntry->shouldReceive('blueprint')->andReturn(
             $this->mock(Blueprint::class)->shouldReceive('handle')->andReturn('another')->getMock()
         );
+
+        $builder = $this->mock(QueryBuilder::class);
+        $builder->shouldReceive('where')->with('collection', 'test')->andReturnSelf();
+        $builder->shouldReceive('where')->with('id', 123)->andReturnSelf();
+        $builder->shouldReceive('first')->andReturn($originEntry);
+        Facades\Entry::shouldReceive('query')->andReturn($builder);
 
         $entry = (new Entry)
             ->collection('test')

@@ -1,27 +1,25 @@
 <template>
-
-    <div class="rounded-full overflow-hidden" v-tooltip="user.name">
+    <div class="overflow-hidden rounded-full" v-tooltip="user.name">
         <img v-if="useAvatar" :src="avatarSrc" class="block" @error="hasAvatarError = true" />
-        <div v-if="useInitials" class="text-center flex items-center justify-center h-full w-full bg-pink text-white"><span>{{ initials }}</span></div>
+        <div v-if="useInitials" class="flex h-full w-full items-center justify-center bg-pink text-center text-white">
+            <span>{{ initials }}</span>
+        </div>
     </div>
-
 </template>
 
 <script>
 export default {
-
     props: {
-        user: Object
+        user: Object,
     },
 
     data() {
         return {
             hasAvatarError: false,
-        }
+        };
     },
 
     computed: {
-
         initials() {
             return this.user.initials || '?';
         },
@@ -31,20 +29,18 @@ export default {
         },
 
         hasAvatar() {
-            return !! this.user.avatar;
+            return !!this.user.avatar;
         },
 
         avatarSrc() {
-            if (! this.hasAvatar) return null;
+            if (!this.hasAvatar) return null;
 
             return this.user.avatar.permalink || this.user.avatar;
         },
 
         useInitials() {
-            return ! this.hasAvatar || this.hasAvatarError;
-        }
-
-    }
-
-}
+            return !this.hasAvatar || this.hasAvatarError;
+        },
+    },
+};
 </script>

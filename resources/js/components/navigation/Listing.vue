@@ -1,11 +1,15 @@
 <template>
-    <data-list :columns="columns" :rows="rows">
-        <div class="card p-0" slot-scope="{ filteredRows: rows }">
-            <data-list-table :rows="rows">
-                <template slot="cell-title" slot-scope="{ row: structure }">
-                    <a :href="structure.available_in_selected_site ? structure.show_url : structure.edit_url" class="flex items-center" v-text="__(structure.title)" />
+    <data-list :columns="columns" :rows="rows" v-slot="{ filteredRows: rows }">
+        <div class="card p-0">
+            <data-list-table>
+                <template #cell-title="{ row: structure }">
+                    <a
+                        :href="structure.available_in_selected_site ? structure.show_url : structure.edit_url"
+                        class="flex items-center"
+                        v-text="__(structure.title)"
+                    />
                 </template>
-                <template slot="actions" slot-scope="{ row: structure, index }">
+                <template #actions="{ row: structure, index }">
                     <dropdown-list>
                         <dropdown-item :text="__('Edit')" :redirect="structure.edit_url" />
                         <dropdown-item
@@ -17,7 +21,8 @@
                             <resource-deleter
                                 :ref="`deleter_${structure.id}`"
                                 :resource="structure"
-                                @deleted="removeRow(structure)">
+                                @deleted="removeRow(structure)"
+                            >
                             </resource-deleter>
                         </dropdown-item>
                     </dropdown-list>
@@ -31,21 +36,15 @@
 import Listing from '../Listing.vue';
 
 export default {
-
     mixins: [Listing],
 
-    props: [
-        'initialRows',
-    ],
+    props: ['initialRows'],
 
     data() {
         return {
             rows: this.initialRows,
-            columns: [
-                { label: __('Title'), field: 'title', visible: true },
-            ]
-        }
-    }
-
-}
+            columns: [{ label: __('Title'), field: 'title', visible: true }],
+        };
+    },
+};
 </script>

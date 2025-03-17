@@ -11,23 +11,33 @@
             :sort="false"
             :sort-column="sortColumn"
             :sort-direction="sortDirection"
-            class="h-full flex flex-col justify-between"
+            class="flex h-full flex-col justify-between"
         >
-            <div slot-scope="{ }">
+            <div>
                 <data-list-table :loading="loading">
-                    <template slot="cell-title" slot-scope="{ row: entry }">
+                    <template #cell-title="{ row: entry }">
                         <div class="flex items-center">
-                            <span class="little-dot rtl:ml-2 ltr:mr-2" v-tooltip="getStatusLabel(entry)" :class="getStatusClass(entry)" v-if="! columnShowing('status')" />
+                            <span
+                                class="little-dot ltr:mr-2 rtl:ml-2"
+                                v-tooltip="getStatusLabel(entry)"
+                                :class="getStatusClass(entry)"
+                                v-if="!columnShowing('status')"
+                            />
                             <a :href="entry.edit_url">{{ entry.title }}</a>
                         </div>
                     </template>
-                    <template slot="cell-status" slot-scope="{ row: entry }">
-                        <div class="status-index-field select-none" v-tooltip="getStatusTooltip(entry)" :class="`status-${entry.status}`" v-text="getStatusLabel(entry)" />
+                    <template #cell-status="{ row: entry }">
+                        <div
+                            class="status-index-field select-none"
+                            v-tooltip="getStatusTooltip(entry)"
+                            :class="`status-${entry.status}`"
+                            v-text="getStatusLabel(entry)"
+                        />
                     </template>
                 </data-list-table>
                 <data-list-pagination
                     v-if="meta.last_page != 1"
-                    class="py-2 border-t bg-gray-200 rounded-b-lg text-sm dark:bg-dark-650 dark:border-gray-900"
+                    class="rounded-b-lg border-t bg-gray-200 py-2 text-sm dark:border-gray-900 dark:bg-dark-650"
                     :resource-meta="meta"
                     @page-selected="selectPage"
                     :scroll-to-top="false"
@@ -39,7 +49,6 @@
         <p v-else-if="!initializing && !items.length" class="p-4 pt-2 text-sm text-gray-600">
             {{ __('There are no entries in this collection') }}
         </p>
-
     </div>
 </template>
 
@@ -47,7 +56,6 @@
 import Listing from '../Listing.vue';
 
 export default {
-
     mixins: [Listing],
 
     props: {
@@ -57,10 +65,10 @@ export default {
 
     data() {
         return {
-            cols: [{ label: "Title", field: "title", visible: true }, ...this.additionalColumns],
+            cols: [{ label: 'Title', field: 'title', visible: true }, ...this.additionalColumns],
             listingKey: 'entries',
             requestUrl: cp_url(`collections/${this.collection}/entries`),
-        }
+        };
     },
 
     methods: {
@@ -89,22 +97,19 @@ export default {
 
         getStatusTooltip(entry) {
             if (entry.status === 'published') {
-                return entry.collection.dated
-                    ? __('messages.status_published_with_date', {date: entry.date})
-                    : null; // The label is sufficient.
+                return entry.collection.dated ? __('messages.status_published_with_date', { date: entry.date }) : null; // The label is sufficient.
             } else if (entry.status === 'scheduled') {
-                return __('messages.status_scheduled_with_date', {date: entry.date})
+                return __('messages.status_scheduled_with_date', { date: entry.date });
             } else if (entry.status === 'expired') {
-                return __('messages.status_expired_with_date', {date: entry.date})
+                return __('messages.status_expired_with_date', { date: entry.date });
             } else if (entry.status === 'draft') {
                 return null; // The label is sufficient.
             }
         },
 
         columnShowing(column) {
-            return this.cols.find(c => c.field === column);
+            return this.cols.find((c) => c.field === column);
         },
-    }
-
-}
+    },
+};
 </script>

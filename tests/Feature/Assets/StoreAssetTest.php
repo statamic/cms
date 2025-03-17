@@ -5,6 +5,7 @@ namespace Tests\Feature\Assets;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\AssetContainer;
 use Statamic\Facades;
@@ -37,22 +38,35 @@ class StoreAssetTest extends TestCase
     }
 
     #[Test]
-    public function it_uploads_an_asset()
+    #[DataProvider('uploadProvider')]
+    public function it_uploads_an_asset($filename, $expected)
     {
-        Storage::disk('test')->assertMissing('path/to/test.jpg');
+        Storage::disk('test')->assertMissing($expected);
 
         $this
             ->actingAs($this->userWithPermission())
-            ->submit()
-            ->assertOk()
+            ->submit([
+                'file' => UploadedFile::fake()->image($filename),
+            ])
             ->assertJson([
                 'data' => [
-                    'id' => 'test_container::path/to/test.jpg',
-                    'path' => 'path/to/test.jpg',
+                    'id' => 'test_container::'.$expected,
+                    'path' => $expected,
                 ],
             ]);
 
-        Storage::disk('test')->assertExists('path/to/test.jpg');
+        Storage::disk('test')->assertExists($expected);
+    }
+
+    public static function uploadProvider()
+    {
+        return [
+            'test.jpg' => ['test.jpg', 'path/to/test.jpg'],
+
+            // path traversal naughtiness
+            '../test.jpg urlencoded' => ['%2e%2e%2ftest.jpg', 'path/to/..-test.jpg'],
+            'foo/../test.jpg urlencoded' => ['foo%2f%2e%2e%2ftest.jpg', 'path/to/foo-..-test.jpg'],
+        ];
     }
 
     #[Test]
@@ -157,7 +171,7 @@ class StoreAssetTest extends TestCase
     #[Test]
     public function it_can_upload_and_append_timestamp()
     {
-        Carbon::setTestNow(Carbon::createFromTimestamp(1697379288));
+        Carbon::setTestNow(Carbon::createFromTimestamp(1697379288, config('app.timezone')));
         Storage::disk('test')->put('path/to/test.jpg', 'contents');
         Storage::disk('test')->assertExists('path/to/test.jpg');
         $this->assertCount(1, Storage::disk('test')->files('path/to'));
@@ -184,6 +198,68 @@ class StoreAssetTest extends TestCase
 
         $this->assertCount(2, $files = Storage::disk('test')->files('path/to'));
         $this->assertEquals(['path/to/newname.jpg', 'path/to/test.jpg'], $files);
+    }
+
+    #[Test]
+    #[DataProvider('relativePathProvider')]
+    public function it_can_upload_to_relative_path($filename, $expected)
+    {
+        Storage::disk('test')->assertMissing('path/to/'.$filename);
+        Storage::disk('test')->assertMissing($expected);
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->submit([
+                'relativePath' => 'sub/folder',
+                'file' => UploadedFile::fake()->image($filename),
+            ])
+            ->assertOk()
+            ->assertJson([
+                'data' => [
+                    'id' => 'test_container::'.$expected,
+                    'path' => $expected,
+                ],
+            ]);
+
+        Storage::disk('test')->assertMissing('path/to/'.$filename);
+        Storage::disk('test')->assertExists($expected);
+    }
+
+    public static function relativePathProvider()
+    {
+        return [
+            'test.jpg' => ['test.jpg', 'path/to/sub/folder/test.jpg'],
+
+            // path traversal naughtiness
+            '../test.jpg urlencoded' => ['%2e%2e%2ftest.jpg', 'path/to/sub/folder/..-test.jpg'],
+            'foo/../test.jpg urlencoded' => ['foo%2f%2e%2e%2ftest.jpg', 'path/to/sub/folder/foo-..-test.jpg'],
+        ];
+    }
+
+    #[Test]
+    public function flattens_relative_path_unless_container_allows_creating_folders()
+    {
+        Storage::disk('test')->assertMissing('path/to/test.jpg');
+        Storage::disk('test')->assertMissing('path/to/sub/folder/test.jpg');
+
+        $createFolders = $this->container->createFolders();
+        $this->container->createFolders(false)->save();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->submit(['relativePath' => 'sub/folder'])
+            ->assertOk()
+            ->assertJson([
+                'data' => [
+                    'id' => 'test_container::path/to/test.jpg',
+                    'path' => 'path/to/test.jpg',
+                ],
+            ]);
+
+        Storage::disk('test')->assertExists('path/to/test.jpg');
+        Storage::disk('test')->assertMissing('path/to/sub/folder/test.jpg');
+
+        $this->container->createFolders($createFolders)->save();
     }
 
     private function submit($overrides = [])

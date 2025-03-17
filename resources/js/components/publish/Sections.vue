@@ -1,11 +1,13 @@
 <template>
     <div class="publish-sections">
         <div class="publish-sections-section" v-for="(section, i) in visibleSections" :key="i">
-            <div class="p-0 card">
+            <div class="card p-0">
                 <header class="publish-section-header @container" v-if="section.display">
                     <div class="publish-section-header-inner">
                         <label v-text="__(section.display)" class="text-base font-semibold" />
-                        <div class="help-block" v-if="section.instructions"><p v-html="$options.filters.markdown(__(section.instructions))" /></div>
+                        <div class="help-block" v-if="section.instructions">
+                            <p v-html="$markdown(__(section.instructions))" />
+                        </div>
                     </div>
                 </header>
                 <publish-fields
@@ -29,12 +31,14 @@
 import { ValidatesFieldConditions } from '../field-conditions/FieldConditions.js';
 
 export default {
+    emits: ['updated', 'meta-updated', 'synced', 'desynced', 'focus', 'blur'],
+
     mixins: [ValidatesFieldConditions],
 
     props: {
         sections: {
             type: Array,
-            required: true
+            required: true,
         },
         readOnly: Boolean,
         syncable: Boolean,
@@ -42,17 +46,19 @@ export default {
         namePrefix: String,
     },
 
+    inject: ['publishContainer'],
+
     computed: {
-        state() {
-            return this.$store.state.publish[this.storeName];
+        values() {
+            return this.publishContainer.store.values;
         },
 
-        values() {
-            return this.state.values;
+        extraValues() {
+            return this.publishContainer.store.extraValues;
         },
 
         visibleSections() {
-            return this.sections.filter(section => this.sectionHasVisibleFields(section));
+            return this.sections.filter((section) => this.sectionHasVisibleFields(section));
         },
     },
 
@@ -60,13 +66,12 @@ export default {
         sectionHasVisibleFields(section) {
             let visibleFields = 0;
 
-            section.fields.forEach(field => {
+            section.fields.forEach((field) => {
                 if (this.showField(field)) visibleFields++;
             });
 
             return visibleFields > 0;
         },
     },
-
-}
+};
 </script>

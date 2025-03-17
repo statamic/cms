@@ -1,10 +1,6 @@
 <script>
 export default {
-
-    model: {
-        prop: 'to',
-        event: 'slugified'
-    },
+    emits: ['slugified', 'slugifying'],
 
     props: {
         from: String,
@@ -12,16 +8,16 @@ export default {
         language: String,
         separator: {
             type: String,
-            default: '-'
+            default: '-',
         },
         enabled: {
             type: Boolean,
-            default: true
+            default: true,
         },
         async: {
             type: Boolean,
-            default: true
-        }
+            default: true,
+        },
     },
 
     data() {
@@ -31,12 +27,11 @@ export default {
         return {
             slugifier,
             slug: null,
-            shouldSlugify: this.enabled && !this.to
-        }
+            shouldSlugify: this.enabled && !this.to,
+        };
     },
 
     watch: {
-
         from: {
             immediate: true,
             handler() {
@@ -47,7 +42,7 @@ export default {
                 } else {
                     this.slugify();
                 }
-            }
+            },
         },
 
         to(to) {
@@ -56,18 +51,16 @@ export default {
 
         slug(slug) {
             this.$emit('slugified', slug);
-        }
-
+        },
     },
 
     render() {
-        return this.$scopedSlots.default({});
+        return this.$slots.default({})[0];
     },
 
     methods: {
-
         reset() {
-            if (! this.enabled) return Promise.resolve();
+            if (!this.enabled) return Promise.resolve();
 
             // If the slug doesn't change, we'll emit the event manually.
             // The watcher will only emit the event if the slug changes.
@@ -77,11 +70,10 @@ export default {
                 this.shouldSlugify = true;
                 if (this.slug === initialSlug) this.$emit('slugified', this.slug);
             });
-
         },
 
         slugify() {
-            if (! this.async) {
+            if (!this.async) {
                 return new Promise((resolve, reject) => {
                     const slug = this.slugifier.create(this.from);
                     this.slug = slug;
@@ -91,14 +83,15 @@ export default {
 
             return new Promise((resolve, reject) => {
                 this.$emit('slugifying');
-                this.slugifier.create(this.from).then(slug => {
-                    this.slug = slug;
-                    resolve(slug);
-                }).catch(error => reject(error));
+                this.slugifier
+                    .create(this.from)
+                    .then((slug) => {
+                        this.slug = slug;
+                        resolve(slug);
+                    })
+                    .catch((error) => reject(error));
             });
-        }
-
-    }
-
-}
+        },
+    },
+};
 </script>

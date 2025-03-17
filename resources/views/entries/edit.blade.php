@@ -4,7 +4,6 @@
 @section('wrapper_class', 'max-w-3xl')
 
 @section('content')
-
     <entry-publish-form
         publish-container="base"
         :initial-actions="{{ json_encode($actions) }}"
@@ -15,6 +14,7 @@
         initial-reference="{{ $reference }}"
         :initial-fieldset="{{ json_encode($blueprint) }}"
         :initial-values="{{ json_encode($values) }}"
+        :initial-extra-values="{{ json_encode($extraValues) }}"
         :initial-localized-fields="{{ json_encode($localizedFields) }}"
         :initial-meta="{{ json_encode($meta) }}"
         initial-permalink="{{ $permalink }}"
@@ -39,5 +39,4 @@
         :initial-item-actions="{{ json_encode($itemActions) }}"
         item-action-url="{{ cp_route('collections.entries.actions.run', $collection) }}"
     ></entry-publish-form>
-
 @endsection

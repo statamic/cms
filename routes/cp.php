@@ -28,6 +28,7 @@ use Statamic\Http\Controllers\CP\Collections\CollectionActionController;
 use Statamic\Http\Controllers\CP\Collections\CollectionBlueprintsController;
 use Statamic\Http\Controllers\CP\Collections\CollectionsController;
 use Statamic\Http\Controllers\CP\Collections\CollectionTreeController;
+use Statamic\Http\Controllers\CP\Collections\EditRedirectController;
 use Statamic\Http\Controllers\CP\Collections\EntriesController;
 use Statamic\Http\Controllers\CP\Collections\EntryActionController;
 use Statamic\Http\Controllers\CP\Collections\EntryPreviewController;
@@ -41,6 +42,7 @@ use Statamic\Http\Controllers\CP\Collections\ScaffoldCollectionController;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Controllers\CP\DashboardController;
 use Statamic\Http\Controllers\CP\DuplicatesController;
+use Statamic\Http\Controllers\CP\FieldActionModalController;
 use Statamic\Http\Controllers\CP\Fields\BlueprintController;
 use Statamic\Http\Controllers\CP\Fields\FieldsController;
 use Statamic\Http\Controllers\CP\Fields\FieldsetController;
@@ -48,6 +50,7 @@ use Statamic\Http\Controllers\CP\Fields\FieldtypesController;
 use Statamic\Http\Controllers\CP\Fields\MetaController;
 use Statamic\Http\Controllers\CP\Fieldtypes\DictionaryFieldtypeController;
 use Statamic\Http\Controllers\CP\Fieldtypes\FilesFieldtypeController;
+use Statamic\Http\Controllers\CP\Fieldtypes\IconFieldtypeController;
 use Statamic\Http\Controllers\CP\Fieldtypes\MarkdownFieldtypeController;
 use Statamic\Http\Controllers\CP\Fieldtypes\RelationshipFieldtypeController;
 use Statamic\Http\Controllers\CP\Forms\ActionController as FormActionController;
@@ -251,7 +254,6 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::get('/', [FieldsController::class, 'index'])->name('fields.index');
         Route::post('edit', [FieldsController::class, 'edit'])->name('fields.edit');
         Route::post('update', [FieldsController::class, 'update'])->name('fields.update');
-        Route::get('field-meta', [MetaController::class, 'show']);
         Route::post('field-meta', [MetaController::class, 'show']);
         Route::delete('fieldsets/{fieldset}/reset', [FieldsetController::class, 'reset'])->name('fieldsets.reset');
         Route::resource('fieldsets', FieldsetController::class)->except(['show']);
@@ -316,6 +318,12 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::post('markdown', [MarkdownFieldtypeController::class, 'preview'])->name('markdown.preview');
         Route::post('files/upload', [FilesFieldtypeController::class, 'upload'])->name('files.upload');
         Route::get('dictionaries/{dictionary}', DictionaryFieldtypeController::class)->name('dictionary-fieldtype');
+        Route::post('icons', IconFieldtypeController::class)->name('icon-fieldtype');
+    });
+
+    Route::group(['prefix' => 'field-action-modal'], function () {
+        Route::post('resolve', [FieldActionModalController::class, 'resolve'])->name('resolve');
+        Route::post('process', [FieldActionModalController::class, 'process'])->name('process');
     });
 
     Route::group(['prefix' => 'api', 'as' => 'api.'], function () {
@@ -360,6 +368,8 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::get('session-timeout', SessionTimeoutController::class)->name('session.timeout');
 
     Route::view('/playground', 'statamic::playground')->name('playground');
+
+    Route::get('edit/{id}', EditRedirectController::class);
 
     Route::get('{segments}', [CpController::class, 'pageNotFound'])->where('segments', '.*')->name('404');
 });

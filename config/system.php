@@ -76,6 +76,35 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Timezone
+    |--------------------------------------------------------------------------
+    |
+    | Statamic will use this timezone when displaying dates on the front-end.
+    | You can use any timezone supported by PHP. When set to null it will
+    | fall back to the timezone defined in your `app.php` config file.
+    |
+    | https://www.php.net/manual/en/timezones.php
+    |
+    */
+
+    'display_timezone' => null,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Localize Dates in Modifiers
+    |--------------------------------------------------------------------------
+    |
+    | When using date-related modifiers, Carbon instances will be in UTC.
+    | Enabling this setting will ensure that dates get localized into
+    | the timezone defined in `display_timezone`. Otherwise you'll
+    | need to manually localize dates in all of your templates.
+    |
+    */
+
+    'localize_dates_in_modifiers' => false,
+
+    /*
+    |--------------------------------------------------------------------------
     | Default Character Set
     |--------------------------------------------------------------------------
     |
@@ -170,6 +199,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Always Augment to Query
+    |--------------------------------------------------------------------------
+    |
+    | By default, Statamic will augment relationship fields with max_items: 1
+    | to the result of a query, for example an Entry instance. Setting this
+    | to true will augment to the query builder instead of the result.
+    |
+    */
+
+    'always_augment_to_query' => false,
+
+    /*
+    |--------------------------------------------------------------------------
     | Row ID handle
     |--------------------------------------------------------------------------
     |
@@ -193,5 +235,16 @@ return [
     */
 
     'fake_sql_queries' => config('app.debug'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Layout
+    |--------------------------------------------------------------------------
+    |
+    | Define the default layout that will be used by views.
+    |
+    */
+
+    'layout' => env('STATAMIC_LAYOUT', 'layout'),
 
 ];

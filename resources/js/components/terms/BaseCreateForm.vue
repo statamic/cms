@@ -1,11 +1,10 @@
 <template>
-
     <term-publish-form
         :is-creating="true"
         publish-container="base"
         :initial-actions="actions"
         method="post"
-        :initial-title="__('Create')"
+        :initial-title="taxonomyCreateLabel"
         :taxonomy-handle="taxonomyHandle"
         :breadcrumbs="breadcrumbs"
         :initial-fieldset="fieldset"
@@ -22,15 +21,14 @@
         :preview-targets="previewTargets"
         @saved="saved"
     ></term-publish-form>
-
 </template>
 
 <script>
 export default {
-
     props: [
         'actions',
         'taxonomyHandle',
+        'taxonomyCreateLabel',
         'breadcrumbs',
         'fieldset',
         'values',
@@ -44,12 +42,9 @@ export default {
     ],
 
     methods: {
-
         saved(response) {
             window.location = response.data.data.edit_url + '?created=true';
-        }
-
-    }
-
-}
+        },
+    },
+};
 </script>

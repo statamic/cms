@@ -1,7 +1,7 @@
 <template>
     <text-input
         ref="input"
-        :value="value"
+        :model-value="value"
         :classes="config.classes"
         :focus="config.focus || name === 'title' || name === 'alt'"
         :autocomplete="config.autocomplete"
@@ -15,7 +15,7 @@
         :name="name"
         :id="fieldId"
         :direction="config.direction"
-        @input="inputUpdated"
+        @update:model-value="inputUpdated"
         @focus="$emit('focus')"
         @blur="$emit('blur')"
     />
@@ -25,18 +25,16 @@
 import Fieldtype from './Fieldtype.vue';
 
 export default {
-
     mixins: [Fieldtype],
 
     methods: {
         inputUpdated(value) {
-            if (! this.config.debounce) {
-                return this.update(value)
+            if (!this.config.debounce) {
+                return this.update(value);
             }
 
-            this.updateDebounced(value)
-        }
-    }
-
-}
+            this.updateDebounced(value);
+        },
+    },
+};
 </script>

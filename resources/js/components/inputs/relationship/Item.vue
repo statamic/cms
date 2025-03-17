@@ -1,19 +1,23 @@
 <template>
-
-    <div
-        class="item select-none"
-        :class="{ 'invalid': item.invalid }"
-    >
+    <div class="item select-none" :class="{ invalid: item.invalid }">
         <div class="item-move" v-if="sortable">&nbsp;</div>
         <div class="item-inner">
-            <div v-if="statusIcon" class="little-dot rtl:ml-2 ltr:mr-2 hidden @sm:block" :class="item.status" />
+            <div v-if="statusIcon" class="little-dot hidden @sm:block ltr:mr-2 rtl:ml-2" :class="item.status" />
 
             <div
                 v-if="item.invalid"
                 v-tooltip.top="__('An item with this ID could not be found')"
-                v-text="__(item.title)" />
+                v-text="__(item.title)"
+            />
 
-            <a v-if="!item.invalid && editable" @click.prevent="edit" v-text="__(item.title)" class="truncate" v-tooltip="item.title" :href="item.edit_url" />
+            <a
+                v-if="!item.invalid && editable"
+                @click.prevent="edit"
+                v-text="__(item.title)"
+                class="truncate"
+                v-tooltip="item.title"
+                :href="item.edit_url"
+            />
 
             <div v-if="!item.invalid && !editable" v-text="__(item.title)" />
 
@@ -22,12 +26,17 @@
                 :item="item"
                 :component="formComponent"
                 :component-props="formComponentProps"
+                :stack-size="formStackSize"
                 @updated="itemUpdated"
                 @closed="isEditing = false"
             />
 
-            <div class="flex items-center flex-1 justify-end">
-                <div v-if="item.hint" v-text="item.hint" class="text-4xs text-gray-600 uppercase whitespace-nowrap rtl:ml-2 ltr:mr-2 hidden @sm:block" />
+            <div class="flex flex-1 items-center justify-end">
+                <div
+                    v-if="item.hint"
+                    v-text="item.hint"
+                    class="hidden whitespace-nowrap text-4xs uppercase text-gray-600 @sm:block ltr:mr-2 rtl:ml-2"
+                />
 
                 <div class="flex items-center" v-if="!readOnly">
                     <dropdown-list>
@@ -36,26 +45,23 @@
                     </dropdown-list>
                 </div>
             </div>
-
         </div>
-
     </div>
-
 </template>
 
 <script>
+import { getActivePinia } from 'pinia';
 import InlineEditForm from './InlineEditForm.vue';
 
 export default {
-
     components: {
-        InlineEditForm
+        InlineEditForm,
     },
 
     inject: {
         storeName: {
-            default: null
-        }
+            default: null,
+        },
     },
 
     props: {
@@ -67,23 +73,28 @@ export default {
         readOnly: Boolean,
         formComponent: String,
         formComponentProps: Object,
+        formStackSize: String,
     },
 
     data() {
         return {
             isEditing: false,
-        }
+        };
     },
 
     methods: {
-
         edit() {
-            if (! this.editable) return;
+            if (!this.editable) return;
             if (this.item.invalid) return;
 
-            if (this.item.reference && Object.entries(this.$store.state.publish).find(([key, value]) => value.reference === this.item.reference)) {
-                this.$toast.error(__("You're already editing this item."));
-                return;
+            if (this.item.reference) {
+                const storeRefs = getActivePinia()
+                    ._s.values()
+                    .map((store) => store.reference);
+                if (Array.from(storeRefs).includes(this.item.reference)) {
+                    this.$toast.error(__("You're already editing this item."));
+                    return;
+                }
             }
 
             this.isEditing = true;
@@ -97,8 +108,6 @@ export default {
 
             this.$events.$emit(`live-preview.${this.storeName}.refresh`);
         },
-
-    }
-
-}
+    },
+};
 </script>

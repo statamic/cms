@@ -1,16 +1,18 @@
+import { __ } from '../../bootstrap/globals.js';
+
 export default {
     methods: {
         normalizeInputOptions(options) {
-            if (! Array.isArray(options)) {
-                return _.map(options, (value, key) => {
+            if (!Array.isArray(options)) {
+                return Object.entries(options).map(([key, value]) => {
                     return {
-                        'value': Array.isArray(options) ? value : key,
-                        'label': __(value) || key
+                        value: Array.isArray(options) ? value : key,
+                        label: __(value) || key,
                     };
                 });
             }
 
-            return _.map(options, (option) => {
+            return options.map((option) => {
                 if (typeof option === 'object') {
                     let valueKey = 'value';
                     let labelKey = 'label';
@@ -22,16 +24,16 @@ export default {
                     }
 
                     return {
-                        'value': option[valueKey],
-                        'label': __(option[labelKey]) || option[valueKey]
+                        value: option[valueKey],
+                        label: __(option[labelKey]) || option[valueKey],
                     };
                 }
 
                 return {
-                    'value': option,
-                    'label': __(option) || option
+                    value: option,
+                    label: __(option) || option,
                 };
             });
-        }
-    }
-}
+        },
+    },
+};

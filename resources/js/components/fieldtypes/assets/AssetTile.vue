@@ -30,11 +30,7 @@
 
                     <template v-else>
                         <img v-if="canShowSvg" :src="asset.url" :title="label" class="p-4" />
-                        <file-icon
-                            v-else
-                            :extension="asset.extension"
-                            class="p-4 h-full w-full"
-                        />
+                        <file-icon v-else :extension="asset.extension" class="h-full w-full p-4" />
                     </template>
                 </template>
 
@@ -42,11 +38,11 @@
                     <div class="flex items-center justify-center space-x-1 rtl:space-x-reverse">
                         <template v-if="!readOnly">
                             <button @click="edit" class="btn btn-icon" :title="__('Edit')">
-                                <svg-icon name="micro/sharp-pencil" class="h-4 my-2" />
+                                <svg-icon name="micro/sharp-pencil" class="my-2 h-4" />
                             </button>
 
                             <button @click="remove" class="btn btn-icon" :title="__('Remove')">
-                                <span class="text-lg antialiased w-4">×</span>
+                                <span class="w-4 text-lg antialiased">×</span>
                             </button>
                         </template>
 
@@ -57,7 +53,7 @@
                                 class="btn btn-icon"
                                 :title="__('Open in a new window')"
                             >
-                                <svg-icon name="light/external-link" class="h-4 my-2" />
+                                <svg-icon name="light/external-link" class="my-2 h-4" />
                             </button>
 
                             <button
@@ -66,36 +62,27 @@
                                 class="btn btn-icon"
                                 :title="__('Download file')"
                             >
-                                <svg-icon name="light/download" class="h-4 my-2" />
+                                <svg-icon name="light/download" class="my-2 h-4" />
                             </button>
                         </template>
                     </div>
                 </div>
-
             </div>
         </div>
 
         <div class="asset-meta flex items-center" v-if="showFilename">
-            <div
-                class="asset-filename flex-1 px-2 py-1"
-                :title="label"
-                :class="{ 'text-center': !needsAlt }"
-            >
+            <div class="asset-filename flex-1 px-2 py-1" :title="label" :class="{ 'text-center': !needsAlt }">
                 {{ label }}
             </div>
-            <button
-                class="asset-meta-btn"
-                @click="edit"
-                v-if="showSetAlt && needsAlt"
-            >
-                {{ asset.values.alt ? "✅" : __("Set Alt") }}
+            <button class="asset-meta-btn" type="button" @click="edit" v-if="showSetAlt && needsAlt">
+                {{ asset.values.alt ? '✅' : __('Set Alt') }}
             </button>
         </div>
     </div>
 </template>
 
 <script>
-import Asset from "./Asset";
+import Asset from './Asset';
 
 export default {
     mixins: [Asset],
@@ -109,7 +96,7 @@ export default {
 
                 if (!parent) return false;
 
-                if (parent.constructor.name === "AssetBrowser") {
+                if (parent.constructor.name === 'AssetBrowser') {
                     return true;
                 }
 
@@ -120,6 +107,6 @@ export default {
         isInBardField() {
             return this.$parent.isInBardField;
         },
-    }
+    },
 };
 </script>
