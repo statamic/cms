@@ -1,5 +1,5 @@
 <script setup>
-import { computed, defineProps } from 'vue';
+import { computed } from 'vue';
 import DateFormatter from '@statamic/components/DateFormatter.js';
 
 const props = defineProps({
