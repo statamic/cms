@@ -141,7 +141,6 @@ export default {
 
         Object.assign(this.$app.config.globalProperties, {
             $axios: axios,
-            $moment: window.moment,
             $events: useGlobalEventBus(),
             $preferences: new Preferences(),
             $progress: useProgressBar(),
