@@ -238,7 +238,7 @@ class Variables implements Arrayable, ArrayAccess, Augmentable, Contract, Locali
             return $this->globalSet()->in($origin);
         }
 
-        throw new \Exception("The origin cannot be set directly on variables, it must be set on the global set.");
+        throw new \Exception('The origin cannot be set directly on variables, it must be set on the global set.');
     }
 
     protected function shouldRemoveNullsFromFileData()

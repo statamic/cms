@@ -13,7 +13,6 @@ use Statamic\Facades\Nav as NavRepository;
 use Statamic\Facades\Structure;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\User;
-use Statamic\Sites\Site;
 use Statamic\Stache\Stache;
 use Tests\TestCase;
 
