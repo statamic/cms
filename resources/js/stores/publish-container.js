@@ -74,7 +74,7 @@ export const usePublishContainerStore = function (name, initial) {
             setErrors(errors) {
                 this.errors = errors;
             },
-            setSite(statesite) {
+            setSite(site) {
                 this.site = site;
             },
             setLocalizedFields(fields) {
