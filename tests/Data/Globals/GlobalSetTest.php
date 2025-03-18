@@ -122,9 +122,7 @@ EOT;
             ->withArgs(fn ($arg) => $arg->locale() === 'fr')
             ->once();
 
-        $set = GlobalSet::make('test');
-        $set->addLocalization($en = $set->makeLocalization('en')->data(['foo' => 'bar']));
-        $set->addLocalization($fr = $set->makeLocalization('fr')->data(['foo' => 'le bar']));
+        $set = GlobalSet::make('test')->sites(['en' => null, 'fr' => null]);
         $set->save();
     }
 
