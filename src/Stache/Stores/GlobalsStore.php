@@ -4,7 +4,6 @@ namespace Statamic\Stache\Stores;
 
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Path;
-use Statamic\Facades\Stache;
 use Statamic\Facades\YAML;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;

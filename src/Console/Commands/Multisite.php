@@ -110,7 +110,7 @@ class Multisite extends Command
         return File::getFiles($directory)
             ->map(fn (string $path) => Str::afterLast($path, '/'))
             ->filter(fn (string $path) => Str::endsWith($path, '.yaml'))
-            ->every(function (string $path) use ($siteHandle, $directory) {
+            ->every(function (string $path) use ($directory) {
                 $contents = YAML::file($directory.$path)->parse();
 
                 return Arr::has($contents, 'sites', []);
