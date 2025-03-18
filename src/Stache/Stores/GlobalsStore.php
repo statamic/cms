@@ -17,15 +17,6 @@ class GlobalsStore extends BasicStore
         return 'globals';
     }
 
-    public function paths()
-    {
-        if ($this->directory !== Stache::store('global-variables')->directory()) {
-            throw new \Exception('The [globals] and [global-variables] Stache stores must share the same directory.');
-        }
-
-        return parent::paths();
-    }
-
     public function getItemFilter(SplFileInfo $file)
     {
         // The global sets themselves should only exist in the root
