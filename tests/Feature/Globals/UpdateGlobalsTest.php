@@ -6,7 +6,6 @@ use Facades\Tests\Factories\GlobalFactory;
 use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\GlobalSetSaved;
-use Statamic\Events\GlobalVariablesDeleted;
 use Statamic\Events\GlobalVariablesSaved;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\GlobalVariables;
