@@ -8,6 +8,7 @@ class GlobalFactory
 {
     protected $id;
     protected $handle;
+    protected $title;
     protected $data = [];
     protected $site = 'en';
 
@@ -21,6 +22,13 @@ class GlobalFactory
     public function handle($handle)
     {
         $this->handle = $handle;
+
+        return $this;
+    }
+
+    public function title($title)
+    {
+        $this->title = $title;
 
         return $this;
     }
@@ -49,6 +57,10 @@ class GlobalFactory
 
         if ($this->id) {
             $set->id($this->id);
+        }
+
+        if ($this->title) {
+            $set->title($this->title);
         }
 
         return $set;

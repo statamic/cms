@@ -119,12 +119,14 @@ class GlobalSet implements Contract
 
     protected function saveOrDeleteLocalizations()
     {
-        $localizations = $this->localizations();
+        $localizations = $this->freshLocalizations();
 
-        $localizations->each->save();
+        $this->sites()
+            ->reject(fn ($origin, $site) => $localizations->has($site))
+            ->each(fn ($origin, $site) => $this->makeLocalization($site)->save());
 
-        $this->freshLocalizations()
-            ->diffKeys($localizations)
+        $localizations
+            ->filter(fn ($localization) => ! $this->sites()->has($localization->locale()))
             ->each->delete();
     }
 
@@ -249,6 +251,11 @@ class GlobalSet implements Contract
     public function editUrl()
     {
         return cp_route('globals.edit', $this->handle());
+    }
+
+    public function updateUrl()
+    {
+        return cp_route('globals.update', $this->handle());
     }
 
     public function deleteUrl()
