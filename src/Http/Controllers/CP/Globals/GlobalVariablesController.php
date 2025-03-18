@@ -100,7 +100,7 @@ class GlobalVariablesController extends CpController
 
         $set->data($values);
 
-        $save = $set->globalSet()->addLocalization($set)->save();
+        $save = $set->save();
 
         return response()->json([
             'saved' => is_bool($save) ? $save : true,

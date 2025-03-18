@@ -85,7 +85,7 @@ class UpdateGlobalVariablesTest extends TestCase
                 && $event->variables->data()->all() === ['foo' => 'baz'];
         });
 
-        Event::assertDispatched(GlobalSetSaved::class, function ($event) {
+        Event::assertNotDispatched(GlobalSetSaved::class, function ($event) {
             return $event->globals->handle() === 'test'
                 && $event->globals->in('en')->data()->all() === ['foo' => 'baz'];
         });
