@@ -54,10 +54,6 @@ class GlobalVariablesStore extends BasicStore
                 ->locale(Site::default()->handle());
         }
 
-        if ($origin = Arr::get($data, 'origin')) {
-            $variables->origin($origin);
-        }
-
         return $variables;
     }
 

@@ -58,8 +58,8 @@ class GlobalsController extends CpController
                 return [
                     'name' => $site->name(),
                     'handle' => $site->handle(),
-                    'enabled' => $enabled = $set->existsIn($site->handle()),
-                    'origin' => $enabled ? optional($set->in($site->handle())->origin())->locale() : null,
+                    'enabled' => $set->sites()->has($site->handle()),
+                    'origin' => $set->sites()->get($site->handle()),
                 ];
             })->values(),
         ];
@@ -112,19 +112,11 @@ class GlobalsController extends CpController
             ->blueprint($values['blueprint']);
 
         if (Site::multiEnabled()) {
-            $sites = collect(Arr::get($values, 'sites'));
+            $sites = collect($values['sites'])
+                ->filter(fn ($site) => $site['enabled'])
+                ->mapWithKeys(fn ($site) => [$site['handle'] => $site['origin']]);
 
-            foreach ($sites->filter->enabled as $site) {
-                $vars = $set->in($site['handle']) ?? $set->makeLocalization($site['handle']);
-                $vars->origin($site['origin']);
-                $set->addLocalization($vars);
-            }
-
-            foreach ($sites->reject->enabled as $site) {
-                if ($set->existsIn($site['handle'])) {
-                    $set->removeLocalization($set->in($site['handle']));
-                }
-            }
+            $set->sites($sites);
         }
 
         $set->save();

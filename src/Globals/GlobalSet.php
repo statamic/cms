@@ -26,6 +26,7 @@ class GlobalSet implements Contract
 
     protected $title;
     protected $handle;
+    protected $sites;
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
 
@@ -156,9 +157,10 @@ class GlobalSet implements Contract
 
     public function fileData()
     {
-        return [
+        return Arr::removeNullValues([
             'title' => $this->title(),
-        ];
+            'sites' => Site::multiEnabled() ? $this->sites()->all() : null,
+        ]);
     }
 
     public function makeLocalization($site)
@@ -186,12 +188,30 @@ class GlobalSet implements Contract
 
     public function sites()
     {
-        return $this->localizations()->map->locale()->values()->toBase();
+        return $this
+            ->fluentlyGetOrSet('sites')
+            ->getter(function ($sites) {
+                if (! Site::multiEnabled() || ! $sites) {
+                    $sites = [Site::default()->handle() => null];
+                }
+
+                return collect($sites);
+            })
+            ->args(func_get_args());
     }
 
     public function in($locale)
     {
-        return $this->localizations()->get($locale);
+        if (! $this->sites()->has($locale)) {
+            return null;
+        }
+
+        if (! $variables = $this->localizations()->get($locale)) {
+            $variables = $this->makeLocalization($locale);
+            $this->addLocalization($variables);
+        }
+
+        return $variables;
     }
 
     public function inSelectedSite()

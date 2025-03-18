@@ -18,9 +18,7 @@ class GlobalVariablesController extends CpController
             return $this->pageNotFound();
         }
 
-        if (! $variables = $set->in($site)) {
-            return abort(404);
-        }
+        $variables = $set->in($site);
 
         $this->authorize('edit', $variables);
 
@@ -86,9 +84,7 @@ class GlobalVariablesController extends CpController
             return $this->pageNotFound();
         }
 
-        if (! $set = $set->in($site)) {
-            abort(404);
-        }
+        $set = $set->in($site);
 
         $this->authorize('edit', $set);
 
@@ -123,9 +119,8 @@ class GlobalVariablesController extends CpController
 
     protected function getAuthorizedLocalizationsForVariables($variables)
     {
-        return $variables
-            ->globalSet()
-            ->localizations()
+        return $variables->globalSet()->sites()
+            ->map(fn ($origin, $site) => $variables->globalSet()->in($site))
             ->filter(fn ($set) => User::current()->can('edit', $set));
     }
 }

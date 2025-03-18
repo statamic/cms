@@ -50,6 +50,7 @@ class GlobalsStore extends BasicStore
         return GlobalSet::make()
             ->handle($handle)
             ->title($data['title'] ?? null)
+            ->sites($data['sites'] ?? [])
             ->initialPath($path);
     }
 }

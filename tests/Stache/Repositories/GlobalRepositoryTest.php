@@ -89,7 +89,7 @@ class GlobalRepositoryTest extends TestCase
     #[Test]
     public function it_saves_a_global_to_the_stache_and_to_a_file()
     {
-        $global = GlobalSetAPI::make('new');
+        $global = GlobalSetAPI::make('new')->sites(['en' => null, 'fr' => null]);
 
         $global->addLocalization(
             $global->makeLocalization('en')->data(['foo' => 'bar', 'baz' => 'qux'])

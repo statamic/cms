@@ -44,7 +44,7 @@ class UpdateGlobalVariablesTest extends TestCase
         $this->setTestRoles(['test' => ['access cp', 'edit test globals']]);
         $user = tap(User::make()->assignRole('test'))->save();
         $global = GlobalFactory::handle('test')->data(['foo' => 'bar'])->make();
-        $global->addLocalization($global->makeLocalization('fr'))->save();
+        $global->sites(['fr' => null])->addLocalization($global->makeLocalization('fr'))->save();
 
         $this
             ->from('/original')

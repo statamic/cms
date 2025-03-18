@@ -41,7 +41,7 @@ class GlobalFactory
 
     public function make()
     {
-        $set = GlobalSet::make($this->handle);
+        $set = GlobalSet::make($this->handle)->sites([$this->site => null]);
 
         $set->addLocalization(
             $set->makeLocalization($this->site)->data($this->data)

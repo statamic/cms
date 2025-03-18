@@ -59,7 +59,11 @@ EOT;
     #[Test]
     public function it_gets_file_contents_for_saving_a_localized_set()
     {
-        $global = GlobalSet::make('test');
+        $global = GlobalSet::make('test')->sites([
+            'a' => null,
+            'b' => 'a',
+            'c' => null,
+        ]);
 
         $a = $global->makeLocalization('a')->data([
             'array' => ['first one', 'second one'],
@@ -68,7 +72,7 @@ EOT;
             'empty' => [],  // and this should get stripped out because there's no origin to fall back to.
         ]);
 
-        $b = $global->makeLocalization('b')->origin($a)->data([
+        $b = $global->makeLocalization('b')->data([
             'array' => ['first one', 'second one'],
             'string' => 'The string',
             'null' => null, // this...
@@ -102,7 +106,6 @@ array:
 string: 'The string'
 'null': null
 empty: {  }
-origin: a
 
 EOT;
         $this->assertEquals($expected, $b->fileContents());
@@ -120,7 +123,13 @@ EOT;
     #[Test]
     public function if_the_value_is_explicitly_set_to_null_then_it_should_not_fall_back()
     {
-        $global = GlobalSet::make('test');
+        $global = GlobalSet::make('test')->sites([
+            'a' => null,
+            'b' => 'a',
+            'c' => 'b',
+            'd' => null,
+            'e' => 'd']
+        );
 
         $a = $global->makeLocalization('a')->data([
             'one' => 'alfa',
@@ -130,13 +139,13 @@ EOT;
         ]);
 
         // originates from a
-        $b = $global->makeLocalization('b')->origin($a)->data([
+        $b = $global->makeLocalization('b')->data([
             'one' => 'echo',
             'two' => null,
         ]);
 
         // originates from b, which originates from a
-        $c = $global->makeLocalization('c')->origin($b)->data([
+        $c = $global->makeLocalization('c')->data([
             'three' => 'foxtrot',
         ]);
 
@@ -148,7 +157,7 @@ EOT;
         ]);
 
         // originates from d. just to test that it doesn't unintentionally fall back to the default/first.
-        $e = $global->makeLocalization('e')->origin($d)->data([
+        $e = $global->makeLocalization('e')->data([
             'one' => 'juliett',
             'two' => null,
         ]);

@@ -1715,7 +1715,7 @@ EOT;
     #[Test]
     public function it_updates_global_sets()
     {
-        $set = Facades\GlobalSet::make('default');
+        $set = Facades\GlobalSet::make('default')->sites(['en' => null, 'fr' => null]);
 
         $set->addLocalization($set->makeLocalization('en')->data(['pic' => 'norris.jpg']));
         $set->addLocalization($set->makeLocalization('fr')->data(['pic' => 'hoff.jpg']));
