@@ -329,6 +329,7 @@ export default {
             loading: true,
             saving: false,
             asset: null,
+            publishContainer: 'asset',
             values: {},
             extraValues: {},
             meta: {},
@@ -344,10 +345,6 @@ export default {
     computed: {
         store() {
             return this.$refs.container.store;
-        },
-
-        publishContainer() {
-            return `asset-${this.$.uid}`;
         },
 
         isImage() {
