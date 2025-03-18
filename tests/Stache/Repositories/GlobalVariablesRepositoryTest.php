@@ -24,12 +24,7 @@ class GlobalVariablesRepositoryTest extends TestCase
     {
         parent::setUp();
 
-        $this->setSites([
-            'en' => ['url' => '/'],
-            'fr' => ['url' => '/fr/'],
-        ]);
-
-        $stache = (new Stache)->sites(['en', 'fr']);
+        $stache = (new Stache)->sites(['en']);
         $this->app->instance(Stache::class, $stache);
         $this->directory = __DIR__.'/../__fixtures__/content/globals';
         $stache->registerStore((new GlobalsStore($stache, app('files')))->directory($this->directory));
@@ -42,6 +37,11 @@ class GlobalVariablesRepositoryTest extends TestCase
     #[Test]
     public function it_gets_all_global_variables()
     {
+        $this->setSites([
+            'en' => ['url' => '/'],
+            'fr' => ['url' => '/fr/'],
+        ]);
+
         $sets = $this->repo->all();
 
         $this->assertInstanceOf(VariablesCollection::class, $sets);
@@ -56,6 +56,33 @@ class GlobalVariablesRepositoryTest extends TestCase
     #[Test]
     public function it_gets_a_global_variable_by_id()
     {
+        tap($this->repo->find('global::en'), function ($variable) {
+            $this->assertInstanceOf(Variables::class, $variable);
+            $this->assertEquals('global::en', $variable->id());
+            $this->assertEquals('global', $variable->handle());
+        });
+
+        $this->assertNull($this->repo->find('global::de'));
+
+        tap($this->repo->find('contact::en'), function ($variable) {
+            $this->assertInstanceOf(Variables::class, $variable);
+            $this->assertEquals('contact::en', $variable->id());
+            $this->assertEquals('contact', $variable->handle());
+        });
+
+        $this->assertNull($this->repo->find('contact::de'));
+
+        $this->assertNull($this->repo->find('unknown'));
+    }
+
+    #[Test]
+    public function it_gets_a_global_variable_by_id_in_a_multisite()
+    {
+        $this->setSites([
+            'en' => ['url' => '/'],
+            'fr' => ['url' => '/fr/'],
+        ]);
+
         tap($this->repo->find('global::en'), function ($variable) {
             $this->assertInstanceOf(Variables::class, $variable);
             $this->assertEquals('global::en', $variable->id());
@@ -90,6 +117,29 @@ class GlobalVariablesRepositoryTest extends TestCase
     #[Test]
     public function it_gets_global_variables_by_set_handle()
     {
+        tap($this->repo->whereSet('global'), function ($variables) {
+            $this->assertInstanceOf(VariablesCollection::class, $variables);
+            $ordered = $variables->sortBy->path()->values();
+            $this->assertEquals(['global::en'], $ordered->map->id()->all());
+        });
+
+        tap($this->repo->whereSet('contact'), function ($variables) {
+            $this->assertInstanceOf(VariablesCollection::class, $variables);
+            $ordered = $variables->sortBy->path()->values();
+            $this->assertEquals(['contact::en'], $ordered->map->id()->all());
+        });
+
+        $this->assertCount(0, $this->repo->whereSet('unknown'));
+    }
+
+    #[Test]
+    public function it_gets_global_variables_by_set_handle_in_a_multisite()
+    {
+        $this->setSites([
+            'en' => ['url' => '/'],
+            'fr' => ['url' => '/fr/'],
+        ]);
+
         tap($this->repo->whereSet('global'), function ($variables) {
             $this->assertInstanceOf(VariablesCollection::class, $variables);
             $ordered = $variables->sortBy->path()->values();

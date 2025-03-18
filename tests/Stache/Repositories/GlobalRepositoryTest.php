@@ -22,7 +22,7 @@ class GlobalRepositoryTest extends TestCase
     {
         parent::setUp();
 
-        $stache = (new Stache)->sites(['en', 'fr']);
+        $stache = (new Stache)->sites(['en']);
         $this->app->instance(Stache::class, $stache);
         $this->directory = __DIR__.'/../__fixtures__/content/globals';
         $stache->registerStore((new GlobalsStore($stache, app('files')))->directory($this->directory));
