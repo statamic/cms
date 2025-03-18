@@ -11,6 +11,8 @@ use Statamic\Events\GlobalSetDeleted;
 use Statamic\Events\GlobalSetDeleting;
 use Statamic\Events\GlobalSetSaved;
 use Statamic\Events\GlobalSetSaving;
+use Statamic\Events\GlobalVariablesDeleted;
+use Statamic\Events\GlobalVariablesSaved;
 use Statamic\Facades\GlobalSet as GlobalSetFacade;
 use Statamic\Facades\GlobalVariables;
 use Statamic\Facades\Site;
@@ -127,7 +129,7 @@ EOT;
     }
 
     #[Test]
-    public function saving_an_existing_global_set_will_save_or_delete_its_localizations()
+    public function saving_an_existing_global_set_will_sync_its_localizations()
     {
         $this->setSites([
             'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
@@ -135,35 +137,55 @@ EOT;
             'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
         ]);
 
-        $set = GlobalSet::make('test');
-        $set->addLocalization($en = $set->makeLocalization('en')->data(['foo' => 'bar']));
-        $set->addLocalization($fr = $set->makeLocalization('fr')->data(['foo' => 'le bar']));
-        $set->addLocalization($de = $set->makeLocalization('de')->data(['foo' => 'der bar']));
-        $set->save();
+        $set = GlobalSet::make('test')->sites(['en' => null, 'it' => null])->save();
+        $set->addLocalization($en = $set->makeLocalization('en')->data(['foo' => 'bar']))->save();
+        $set->addLocalization($de = $set->makeLocalization('de')->data(['foo' => 'bar']))->save();
 
-        // when it queries for fresh localizations
+        // Localizations will be queried fresh.
         GlobalVariables::shouldReceive('whereSet')->with('test')->andReturn(VariablesCollection::make([
             'en' => $en,
-            'fr' => $fr,
             'de' => $de,
         ]));
-        // when it checks if it's new
-        GlobalVariables::shouldReceive('find')->with('test::en');
-        GlobalVariables::shouldReceive('find')->with('test::de');
-        // when it saves
-        GlobalVariables::shouldReceive('save')
-            ->withArgs(fn ($arg) => $arg->locale() === 'en')
-            ->once();
-        GlobalVariables::shouldReceive('save')
-            ->withArgs(fn ($arg) => $arg->locale() === 'de')
-            ->once();
-        // when it deletes
-        GlobalVariables::shouldReceive('delete')
-            ->withArgs(fn ($arg) => $arg->locale() === 'fr')
-            ->once();
 
-        $set->removeLocalization($fr);
-        $set->save();
+        // The English variables shouldn't be saved or deleted.
+        GlobalVariables::shouldReceive('save')->withArgs(fn ($arg) => $arg->locale() === 'en')->never();
+        GlobalVariables::shouldReceive('delete')->withArgs(fn ($arg) => $arg->locale() === 'en')->never();
+
+        // French variables should be created.
+        GlobalVariables::shouldReceive('find')->with('test::fr');
+        GlobalVariables::shouldReceive('save')->withArgs(fn ($arg) => $arg->locale() === 'fr')->once();
+        GlobalVariables::shouldReceive('delete')->withArgs(fn ($arg) => $arg->locale() === 'fr')->never();
+
+        // German variables should be deleted.
+        GlobalVariables::shouldReceive('save')->withArgs(fn ($arg) => $arg->locale() === 'de')->never();
+        GlobalVariables::shouldReceive('delete')->withArgs(fn ($arg) => $arg->locale() === 'de')->once();
+
+        Event::fake();
+
+        $set->sites(['en' => null, 'fr' => null])->save();
+
+        // No events should be dispatched for the English variables.
+        Event::assertNotDispatched(GlobalVariablesSaved::class, function ($event) {
+            return $event->variables->globalSet()->handle() === 'test'
+                && $event->variables->locale() === 'en';
+        });
+
+        // Events should be dispatched for the French variables.
+        Event::assertDispatched(GlobalVariablesSaved::class, function ($event) {
+            return $event->variables->globalSet()->handle() === 'test'
+                && $event->variables->locale() === 'fr';
+        });
+
+        // Only the deleted event should be dispatched for the German variables.
+        Event::assertNotDispatched(GlobalVariablesSaved::class, function ($event) {
+            return $event->variables->globalSet()->handle() === 'test'
+                && $event->variables->locale() === 'de';
+        });
+
+        Event::assertDispatched(GlobalVariablesDeleted::class, function ($event) {
+            return $event->variables->globalSet()->handle() === 'test'
+                && $event->variables->locale() === 'de';
+        });
     }
 
     #[Test]

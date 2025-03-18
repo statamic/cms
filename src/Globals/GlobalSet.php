@@ -100,7 +100,7 @@ class GlobalSet implements Contract
 
         Facades\GlobalSet::save($this);
 
-        $this->saveOrDeleteLocalizations();
+        $this->syncLocalizations();
 
         foreach ($afterSaveCallbacks as $callback) {
             $callback($this);
@@ -117,7 +117,7 @@ class GlobalSet implements Contract
         return $this;
     }
 
-    protected function saveOrDeleteLocalizations()
+    protected function syncLocalizations(): void
     {
         $localizations = $this->freshLocalizations();
 

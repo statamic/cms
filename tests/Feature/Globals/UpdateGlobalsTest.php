@@ -63,10 +63,10 @@ class UpdateGlobalsTest extends TestCase
     public function it_updates_global_set_with_sites()
     {
         $this->setSites([
-            'en' => ['locale' => 'en', 'url' => '/'],
-            'fr' => ['locale' => 'fr', 'url' => '/fr/'],
-            'de' => ['locale' => 'de', 'url' => '/de/'],
-            'it' => ['locale' => 'it', 'url' => '/it/'],
+            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
+            'it' => ['name' => 'Italian', 'locale' => 'it_IT', 'url' => 'http://test.com/it/'],
         ]);
 
         $this->setTestRoles(['test' => ['access cp', 'configure globals']]);
@@ -80,8 +80,6 @@ class UpdateGlobalsTest extends TestCase
         $this->assertNull(GlobalVariables::find('test::fr'));
         $this->assertNull(GlobalVariables::find('test::de'));
         $this->assertNotNull(GlobalVariables::find('test::it'));
-
-        Event::fake();
 
         $this
             ->actingAs($user)
@@ -109,37 +107,5 @@ class UpdateGlobalsTest extends TestCase
         $this->assertNotNull(GlobalVariables::find('test::fr'));
         $this->assertNotNull(GlobalVariables::find('test::de'));
         $this->assertNull(GlobalVariables::find('test::it'));
-
-        Event::assertDispatched(GlobalSetSaved::class, function ($event) {
-            return $event->globals->handle() === 'test';
-        });
-
-        // No events should be dispatched for the English localization.
-        Event::assertNotDispatched(GlobalVariablesSaved::class, function ($event) {
-            return $event->variables->globalSet()->handle() === 'test'
-                && $event->variables->locale() === 'en';
-        });
-
-        // Events should be dispatched for the French and German localizations.
-        Event::assertDispatched(GlobalVariablesSaved::class, function ($event) {
-            return $event->variables->globalSet()->handle() === 'test'
-                && $event->variables->locale() === 'fr';
-        });
-
-        Event::assertDispatched(GlobalVariablesSaved::class, function ($event) {
-            return $event->variables->globalSet()->handle() === 'test'
-                && $event->variables->locale() === 'de';
-        });
-
-        // Only the deleted event should be dispatched for the Italian localization.
-        Event::assertNotDispatched(GlobalVariablesSaved::class, function ($event) {
-            return $event->variables->globalSet()->handle() === 'test'
-                && $event->variables->locale() === 'it';
-        });
-
-        Event::assertDispatched(GlobalVariablesDeleted::class, function ($event) {
-            return $event->variables->globalSet()->handle() === 'test'
-                && $event->variables->locale() === 'it';
-        });
     }
 }
