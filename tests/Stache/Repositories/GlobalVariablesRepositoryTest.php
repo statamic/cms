@@ -44,8 +44,6 @@ class GlobalVariablesRepositoryTest extends TestCase
     {
         $sets = $this->repo->all();
 
-        ray($sets);
-
         $this->assertInstanceOf(VariablesCollection::class, $sets);
         $this->assertCount(4, $sets);
         $this->assertEveryItemIsInstanceOf(Variables::class, $sets);
