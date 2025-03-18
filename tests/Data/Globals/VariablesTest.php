@@ -128,8 +128,8 @@ EOT;
             'b' => 'a',
             'c' => 'b',
             'd' => null,
-            'e' => 'd']
-        );
+            'e' => 'd',
+        ]);
 
         $a = $global->makeLocalization('a')->data([
             'one' => 'alfa',
