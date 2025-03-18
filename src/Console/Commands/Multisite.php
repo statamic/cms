@@ -5,6 +5,7 @@ namespace Statamic\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 use Statamic\Console\EnhancesCommands;
 use Statamic\Console\RunsInPlease;
 use Statamic\Console\ValidatesInput;
@@ -19,6 +20,7 @@ use Statamic\Facades\Stache;
 use Statamic\Facades\YAML;
 use Statamic\Rules\Handle;
 use Statamic\Statamic;
+use Statamic\Support\Arr;
 use Statamic\Support\Traits\Hookable;
 use Wilderborn\Partyline\Facade as Partyline;
 
@@ -103,9 +105,16 @@ class Multisite extends Command
 
     private function globalsHaveBeenMoved(string $siteHandle): bool
     {
-        $directory = Stache::store('globals')->directory().DIRECTORY_SEPARATOR.$siteHandle;
+        $directory = Stache::store('globals')->directory();
 
-        return File::isDirectory($directory);
+        return File::getFiles($directory)
+            ->map(fn (string $path) => Str::afterLast($path, '/'))
+            ->filter(fn (string $path) => Str::endsWith($path, '.yaml'))
+            ->every(function (string $path) use ($siteHandle, $directory) {
+                $contents = YAML::file($directory.$path)->parse();
+
+                return Arr::has($contents, 'sites', []);
+            });
     }
 
     private function navsHaveBeenMoved(string $siteHandle): bool
@@ -270,23 +279,12 @@ class Multisite extends Command
             $this->components->task(
                 description: "Updating global [{$set->handle()}]...",
                 task: function () use ($set) {
-                    $this->moveGlobalSet($set);
+                    $set->save();
                 }
             );
         });
 
         return $this;
-    }
-
-    private function moveGlobalSet($set): void
-    {
-        $yaml = YAML::file($set->path())->parse();
-
-        $data = $yaml['data'] ?? [];
-
-        $set->addLocalization($set->makeLocalization($this->siteHandle)->data($data));
-
-        $set->save();
     }
 
     private function convertNavs(): self
