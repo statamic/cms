@@ -319,7 +319,7 @@ class EloquentUserTest extends TestCase
 
         $user->merge([
             'null_field' => null,
-            'not_null_field' => false
+            'not_null_field' => false,
         ]);
 
         $attributes = $user->model()->getAttributes();
