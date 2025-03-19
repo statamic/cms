@@ -282,6 +282,12 @@ class User extends BaseUser
             $value = Hash::make($value);
         }
 
+        if ($value === null) {
+            unset($this->model()->$key);
+
+            return $this;
+        }
+
         $this->model()->$key = $value;
 
         return $this;
@@ -296,7 +302,7 @@ class User extends BaseUser
 
     public function merge($data)
     {
-        $this->data($this->data()->merge($data));
+        $this->data($this->data()->merge(collect($data)->filter(fn ($v) => $v !== null)->all()));
 
         return $this;
     }
