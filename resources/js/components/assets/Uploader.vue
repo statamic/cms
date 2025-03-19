@@ -268,6 +268,8 @@ export default {
         handleUploadSuccess(id, response) {
             this.$emit('upload-complete', response.data, this.uploads);
             this.uploads.splice(this.findUploadIndex(id), 1);
+
+            this.handleToasts(response._toasts ?? []);
         },
 
         handleUploadError(id, status, response) {
@@ -284,10 +286,17 @@ export default {
                     msg = Object.values(response.errors)[0][0]; // Get first validation message.
                 }
             }
+
+            this.handleToasts(response._toasts ?? []);
+
             upload.errorMessage = msg;
             upload.errorStatus = status;
             this.$emit('error', upload, this.uploads);
             this.processUploadQueue();
+        },
+
+        handleToasts(toasts) {
+            toasts.forEach(toast => Statamic.$toast[toast.type](toast.message, {duration: toast.duration}));
         },
 
         retry(id, args) {
