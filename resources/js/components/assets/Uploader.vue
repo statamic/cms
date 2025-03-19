@@ -4,22 +4,23 @@ import uniqid from 'uniqid';
 import { h } from 'vue';
 
 export default {
+    emits: ['updated', 'upload-complete', 'error'],
+
     render() {
         const fileField = h('input', {
             class: { hidden: true },
-            attrs: { type: 'file', multiple: true },
+            type: 'file',
+            multiple: true,
             ref: 'nativeFileField',
         });
 
         return h(
             'div',
             {
-                on: {
-                    dragenter: this.dragenter,
-                    dragover: this.dragover,
-                    dragleave: this.dragleave,
-                    drop: this.drop,
-                },
+                onDragenter: this.dragenter,
+                onDragover: this.dragover,
+                onDragleave: this.dragleave,
+                onDrop: this.drop,
             },
             [
                 h('div', { class: { 'pointer-events-none': this.dragging } }, [
@@ -60,9 +61,12 @@ export default {
     },
 
     watch: {
-        uploads(uploads) {
-            this.$emit('updated', uploads);
-            this.processUploadQueue();
+        uploads: {
+            deep: true,
+            handler(uploads) {
+                this.$emit('updated', uploads);
+                this.processUploadQueue();
+            },
         },
     },
 
@@ -291,7 +295,7 @@ export default {
         },
 
         handleToasts(toasts) {
-            toasts.forEach(toast => Statamic.$toast[toast.type](toast.message, {duration: toast.duration}));
+            toasts.forEach((toast) => Statamic.$toast[toast.type](toast.message, { duration: toast.duration }));
         },
 
         retry(id, args) {
