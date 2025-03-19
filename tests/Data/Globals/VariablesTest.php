@@ -22,18 +22,6 @@ class VariablesTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->setSites([
-            'a' => ['url' => '/', 'locale' => 'en'],
-            'b' => ['url' => '/b/', 'locale' => 'fr'],
-            'c' => ['url' => '/b/', 'locale' => 'fr'],
-            'd' => ['url' => '/d/', 'locale' => 'fr'],
-        ]);
-    }
-
     #[Test]
     public function it_gets_file_contents_for_saving()
     {
@@ -59,6 +47,13 @@ EOT;
     #[Test]
     public function it_gets_file_contents_for_saving_a_localized_set()
     {
+        $this->setSites([
+            'a' => ['url' => '/', 'locale' => 'en'],
+            'b' => ['url' => '/b/', 'locale' => 'fr'],
+            'c' => ['url' => '/b/', 'locale' => 'fr'],
+            'd' => ['url' => '/d/', 'locale' => 'fr'],
+        ]);
+
         $global = GlobalSet::make('test')->sites([
             'a' => null,
             'b' => 'a',
@@ -123,6 +118,13 @@ EOT;
     #[Test]
     public function if_the_value_is_explicitly_set_to_null_then_it_should_not_fall_back()
     {
+        $this->setSites([
+            'a' => ['url' => '/', 'locale' => 'en'],
+            'b' => ['url' => '/b/', 'locale' => 'fr'],
+            'c' => ['url' => '/b/', 'locale' => 'fr'],
+            'd' => ['url' => '/d/', 'locale' => 'fr'],
+        ]);
+
         $global = GlobalSet::make('test')->sites([
             'a' => null,
             'b' => 'a',
