@@ -295,7 +295,7 @@ export default {
         },
 
         handleToasts(toasts) {
-            toasts.forEach(toast => Statamic.$toast[toast.type](toast.message, {duration: toast.duration}));
+            toasts.forEach((toast) => Statamic.$toast[toast.type](toast.message, { duration: toast.duration }));
         },
 
         retry(id, args) {
