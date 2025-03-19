@@ -1,5 +1,5 @@
 <script>
-import { defineStore } from 'pinia';
+import { defineStore, getActivePinia } from 'pinia';
 import uniqid from 'uniqid';
 import Component from '../Component';
 import { getCurrentInstance, computed } from 'vue';
@@ -78,6 +78,7 @@ export default {
 
     beforeUnmount() {
         this.store.$dispose();
+        delete getActivePinia().state.value[this.store.$id];
     },
 
     unmounted() {
