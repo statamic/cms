@@ -71,9 +71,7 @@ class UpdateGlobalsTest extends TestCase
         $this->setTestRoles(['test' => ['access cp', 'configure globals']]);
         $user = User::make()->assignRole('test')->save();
 
-        $global = GlobalFactory::handle('test')->create();
-
-        $global->sites(['en' => null, 'it' => 'en'])->save();
+        $global = GlobalFactory::handle('test')->sites(['en' => null, 'it' => 'en'])->create();
 
         $this->assertNotNull(GlobalVariables::find('test::en'));
         $this->assertNull(GlobalVariables::find('test::fr'));

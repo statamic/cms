@@ -10,7 +10,7 @@ class GlobalFactory
     protected $handle;
     protected $title;
     protected $data = [];
-    protected $site = 'en';
+    protected $sites = ['en' => null];
 
     public function id($id)
     {
@@ -40,19 +40,19 @@ class GlobalFactory
         return $this;
     }
 
-    public function site($handle)
+    public function sites($sites)
     {
-        $this->site = $handle;
+        $this->sites = $sites;
 
         return $this;
     }
 
     public function make()
     {
-        $set = GlobalSet::make($this->handle)->sites([$this->site => null]);
+        $set = GlobalSet::make($this->handle)->sites($this->sites);
 
         $set->addLocalization(
-            $set->makeLocalization($this->site)->data($this->data)
+            $set->makeLocalization($set->sites()->keys()->first())->data($this->data)
         );
 
         if ($this->id) {

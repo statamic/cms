@@ -57,10 +57,9 @@ class ViewGlobalsListingTest extends TestCase
             'edit test_three globals',
         ]]);
         $user = User::make()->assignRole('test')->save();
-        $one = GlobalFactory::handle('test_one')->create();
-        $one->sites(['en' => null, 'fr' => null])->save();
-        $two = GlobalFactory::handle('test_two')->create();
-        $three = GlobalFactory::handle('test_three')->create();
+        $one = GlobalFactory::handle('test_one')->sites(['en' => null, 'fr' => null])->create();
+        $two = GlobalFactory::handle('test_two')->sites(['en' => null])->create();
+        $three = GlobalFactory::handle('test_three')->sites(['en' => null])->create();
 
         Site::setSelected('fr');
 
@@ -90,8 +89,8 @@ class ViewGlobalsListingTest extends TestCase
             'access fr site',
         ]]);
         $user = User::make()->assignRole('test')->save();
-        $one = GlobalFactory::handle('en')->site('en')->create();
-        $two = GlobalFactory::handle('fr')->site('fr')->create();
+        $one = GlobalFactory::handle('en')->sites(['en' => null])->create();
+        $two = GlobalFactory::handle('fr')->sites(['fr' => null])->create();
 
         Site::setSelected('fr');
 
