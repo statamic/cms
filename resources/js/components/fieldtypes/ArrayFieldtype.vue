@@ -132,9 +132,12 @@ export default {
     },
 
     data() {
+        const keys = Object.keys(this.value || {});
+        const selectedKey = keys.length > 0 ? keys[0] : null;
+
         return {
             data: this.objectToSortable(this.value || []),
-            selectedKey: Object.keys(this.value)[0],
+            selectedKey,
             deleting: false,
         };
     },
