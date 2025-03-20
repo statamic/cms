@@ -121,8 +121,7 @@ GQL;
         ]);
 
         $set = GlobalFactory::handle('social')->sites(['en' => null, 'fr' => null])->data(['twitter' => '@statamic'])->create();
-        $variables = $set->makeLocalization('fr')->data(['twitter' => '@statamic_fr']);
-        $set->addLocalization($variables);
+        $variables = $set->makeLocalization('fr')->data(['twitter' => '@statamic_fr'])->save();
         $social = Blueprint::makeFromFields(['twitter' => ['type' => 'text']])->setHandle('social')->setNamespace('globals');
         BlueprintRepository::shouldReceive('find')->with('globals.social')->andReturn($social);
 

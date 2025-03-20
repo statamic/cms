@@ -40,8 +40,8 @@ class GlobalSetPolicyTest extends PolicyTestCase
         ]);
 
         $global = GlobalFactory::handle('test')->data(['foo' => 'bar'])->create();
-        $global->addLocalization($global->makeLocalization('en'))->save();
-        $global->addLocalization($global->makeLocalization('fr'))->save();
+        $global->makeLocalization('en')->save();
+        $global->makeLocalization('fr')->save();
 
         $this->assertTrue($userWithEnPermission->can('index', GlobalSet::class));
         $this->assertFalse($userWithDePermission->can('index', GlobalSet::class));

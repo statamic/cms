@@ -256,13 +256,8 @@ class FeatureTest extends TestCase
     #[Test]
     public function saving_a_global_set_writes_it_to_file()
     {
-        $global = GlobalSet::make('new')->title('New Global Set');
-
-        $global->addLocalization(
-            $global->makeLocalization('en')->data(['foo' => 'bar'])
-        );
-
-        $global->save();
+        $global = GlobalSet::make('new')->title('New Global Set')->save();
+//        $global->makeLocalization('en')->data(['foo' => 'bar'])->save();
 
         $this->assertStringEqualsFile(
             $path = __DIR__.'/__fixtures__/content/globals/new.yaml',

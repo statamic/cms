@@ -159,9 +159,7 @@ class GlobalVariablesRepositoryTest extends TestCase
     public function it_saves_a_global_to_the_stache_and_to_a_file()
     {
         $global = GlobalSet::make('new');
-
         $localization = $global->makeLocalization('en')->data(['foo' => 'bar', 'baz' => 'qux']);
-        $global->addLocalization($localization);
 
         $this->assertNull($this->repo->find('new::en'));
 
@@ -185,7 +183,6 @@ class GlobalVariablesRepositoryTest extends TestCase
     {
         $global = GlobalSet::make('new');
         $localization = $global->makeLocalization('en')->data(['foo' => 'bar', 'baz' => 'qux']);
-        $global->addLocalization($localization);
         $this->globalRepo->save($global);
         $this->repo->save($localization);
 

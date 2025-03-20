@@ -292,11 +292,12 @@ class GitEventTest extends TestCase
         Git::shouldReceive('dispatchCommit')->with('Global Set deleted')->once();
 
         $set = Facades\GlobalSet::make('main');
-        $set->addLocalization($set->makeLocalization(Facades\Site::default()->handle()));
 
         $set->save();
         $set->delete();
     }
+
+    // todo: additional test for global variables
 
     #[Test]
     public function it_commits_when_form_is_saved_and_deleted()

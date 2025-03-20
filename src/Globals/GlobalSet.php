@@ -172,22 +172,6 @@ class GlobalSet implements Contract
             ->locale($site);
     }
 
-    public function addLocalization($localization)
-    {
-        $localization->globalSet($this);
-
-        $this->localizations()[$localization->locale()] = $localization;
-
-        return $this;
-    }
-
-    public function removeLocalization($localization)
-    {
-        $this->localizations()->forget($localization->locale());
-
-        return $this;
-    }
-
     public function sites()
     {
         return $this
@@ -210,7 +194,6 @@ class GlobalSet implements Contract
 
         if (! $variables = $this->localizations()->get($locale)) {
             $variables = $this->makeLocalization($locale);
-            $this->addLocalization($variables);
         }
 
         return $variables;

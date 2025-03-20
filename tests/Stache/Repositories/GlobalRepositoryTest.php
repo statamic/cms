@@ -91,16 +91,11 @@ class GlobalRepositoryTest extends TestCase
     {
         $global = GlobalSetAPI::make('new')->sites(['en' => null, 'fr' => null]);
 
-        $global->addLocalization(
-            $global->makeLocalization('en')->data(['foo' => 'bar', 'baz' => 'qux'])
-        );
-
         $this->assertNull($this->repo->findByHandle('new'));
 
         $this->repo->save($global);
 
         $this->assertNotNull($item = $this->repo->find('new'));
-        $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $item->in('en')->data()->all());
         $this->assertFileExists($this->directory.'/new.yaml');
         @unlink($this->directory.'/new.yaml');
     }

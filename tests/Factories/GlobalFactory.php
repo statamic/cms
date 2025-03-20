@@ -51,10 +51,6 @@ class GlobalFactory
     {
         $set = GlobalSet::make($this->handle)->sites($this->sites);
 
-        $set->addLocalization(
-            $set->makeLocalization($set->sites()->keys()->first())->data($this->data)
-        );
-
         if ($this->id) {
             $set->id($this->id);
         }
@@ -68,6 +64,10 @@ class GlobalFactory
 
     public function create()
     {
-        return tap($this->make())->save();
+        $set = tap($this->make())->save();
+
+        $set->makeLocalization($set->sites()->keys()->first())->data($this->data)->save();
+
+        return $set;
     }
 }

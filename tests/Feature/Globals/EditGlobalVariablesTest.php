@@ -66,7 +66,7 @@ class EditGlobalVariablesTest extends TestCase
         $global = GlobalFactory::handle('test')->create();
 
         // GlobalFactory would have created the variables/localization, so we'll remove it for this test.
-        $global->removeLocalization($global->in('en'))->save();
+        $global->in('en')->delete();
 
         $this
             ->actingAs($user)
