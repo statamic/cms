@@ -17,16 +17,17 @@
                     </select>
                     <svg-icon name="micro/chevron-down-xs" class="w-2 ltr:ml-2 rtl:mr-2" />
                 </div>
-                <input
-                    type="text"
-                    class="input-text"
-                    v-for="(element, index) in keyedData"
-                    :key="element._id"
-                    v-if="element.key === selectedKey"
-                    :id="fieldId + '__' + element.key"
-                    v-model="data[index].value"
-                    :readonly="isReadOnly"
-                />
+                <template v-for="(element, index) in keyedData">
+                    <input
+                        type="text"
+                        class="input-text"
+                        :key="element._id"
+                        v-if="element.key === selectedKey"
+                        :id="fieldId + '__' + element.key"
+                        v-model="data[index].value"
+                        :readonly="isReadOnly"
+                    />
+                </template>
             </div>
         </div>
 
