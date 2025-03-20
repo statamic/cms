@@ -74,10 +74,10 @@ class UpdateGlobalVariables extends UpdateScript
             $contents = YAML::file($globalSet->path())->parse();
             $data = Arr::get($contents, 'data', []);
 
+            $globalSet->save();
+
             File::ensureDirectoryExists($variablesDirectory);
             File::put($variablesPath, YAML::dump($data));
-
-            $globalSet->save();
         });
     }
 }
