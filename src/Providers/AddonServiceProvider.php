@@ -308,6 +308,8 @@ abstract class AddonServiceProvider extends ServiceProvider
     {
         $scopes = collect($this->scopes)
             ->merge($this->autoloadFilesFromFolder('Scopes', Scope::class))
+            ->merge($this->autoloadFilesFromFolder('Query/Scopes', Scope::class))
+            ->merge($this->autoloadFilesFromFolder('Query/Scopes/Filters', Scope::class))
             ->unique();
 
         foreach ($scopes as $class) {
