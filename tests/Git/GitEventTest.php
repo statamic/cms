@@ -291,6 +291,10 @@ class GitEventTest extends TestCase
         Git::shouldReceive('dispatchCommit')->with('Global Set saved')->once();
         Git::shouldReceive('dispatchCommit')->with('Global Set deleted')->once();
 
+        // These events get dispatched when saving/deleting sets, because of the "variable syncing" that happens.
+        Git::shouldReceive('dispatchCommit')->with('Global Variable saved')->once();
+        Git::shouldReceive('dispatchCommit')->with('Global Variable deleted')->once();
+
         $set = Facades\GlobalSet::make('main');
 
         $set->save();
