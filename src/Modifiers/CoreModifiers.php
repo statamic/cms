@@ -738,6 +738,10 @@ class CoreModifiers extends Modifier
             return Arr::first($value);
         }
 
+        if ($value instanceof Collection) {
+            return $value->first();
+        }
+
         return Stringy::first($value, Arr::get($params, 0));
     }
 
