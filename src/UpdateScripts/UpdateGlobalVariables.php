@@ -76,7 +76,6 @@ class UpdateGlobalVariables extends UpdateScript
 
             $globalSet->save();
 
-            File::ensureDirectoryExists($variablesDirectory);
             File::put($variablesPath, YAML::dump($data));
         });
     }
