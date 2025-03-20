@@ -14,8 +14,6 @@ use Statamic\Events\EntrySaved;
 use Statamic\Events\EntryScheduleReached;
 use Statamic\Events\FormDeleted;
 use Statamic\Events\FormSaved;
-use Statamic\Events\GlobalSetDeleted;
-use Statamic\Events\GlobalSetSaved;
 use Statamic\Events\GlobalVariablesDeleted;
 use Statamic\Events\GlobalVariablesSaved;
 use Statamic\Events\NavDeleted;

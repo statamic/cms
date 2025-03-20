@@ -2,8 +2,6 @@
 
 namespace Statamic\Events\Concerns;
 
-use Statamic\Events\GlobalVariablesDeleted;
-
 trait ListensForContentEvents
 {
     /**

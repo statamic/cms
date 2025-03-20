@@ -152,7 +152,7 @@ class Variables implements Arrayable, ArrayAccess, Augmentable, Contract, Locali
             GlobalVariablesSaved::dispatch($this);
         }
 
-        Blink::forget('global-set-localizations-' . $this->globalSet()->id());
+        Blink::forget('global-set-localizations-'.$this->globalSet()->id());
 
         return $this;
     }
