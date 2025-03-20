@@ -297,7 +297,19 @@ class GitEventTest extends TestCase
         $set->delete();
     }
 
-    // todo: additional test for global variables
+    #[Test]
+    public function it_commits_when_global_variable_is_saved_and_deleted()
+    {
+        Git::shouldReceive('dispatchCommit')->with('Global Set saved')->once();
+        Git::shouldReceive('dispatchCommit')->with('Global Variable saved')->twice(); // Called when the set is saved, then when the variable is saved.
+        Git::shouldReceive('dispatchCommit')->with('Global Variable deleted')->once();
+
+        $set = Facades\GlobalSet::make('main')->save();
+        $variables = $set->makeLocalization('en')->data(['foo' => 'bar']);
+
+        $variables->save();
+        $variables->delete();
+    }
 
     #[Test]
     public function it_commits_when_form_is_saved_and_deleted()
