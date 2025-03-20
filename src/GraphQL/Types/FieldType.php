@@ -46,6 +46,24 @@ class FieldType extends \Rebing\GraphQL\Support\Type
                     return $field->config()['width'] ?? 100;
                 },
             ],
+            'validate' => [
+                'type' => GraphQL::type(ArrayType::NAME),
+                'resolve' => function ($field) {
+                    return $field->rules();
+                },
+            ],
+            'if' => [
+                'type' => GraphQL::type(ArrayType::NAME),
+                'resolve' => function ($field) {
+                    return $field->config()['if'] ?? [];
+                },
+            ],
+            'unless' => [
+                'type' => GraphQL::type(ArrayType::NAME),
+                'resolve' => function ($field) {
+                    return $field->config()['unless'] ?? [];
+                },
+            ],
             'config' => [
                 'type' => GraphQL::type(ArrayType::NAME),
                 'resolve' => function ($field) {
