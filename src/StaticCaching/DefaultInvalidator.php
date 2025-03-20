@@ -6,7 +6,7 @@ use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Forms\Form;
-use Statamic\Contracts\Globals\GlobalSet;
+use Statamic\Contracts\Globals\Variables;
 use Statamic\Contracts\Structures\Nav;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Support\Arr;
@@ -34,7 +34,7 @@ class DefaultInvalidator implements Invalidator
             $this->invalidateTermUrls($item);
         } elseif ($item instanceof Nav) {
             $this->invalidateNavUrls($item);
-        } elseif ($item instanceof GlobalSet) {
+        } elseif ($item instanceof Variables) {
             $this->invalidateGlobalUrls($item);
         } elseif ($item instanceof Collection) {
             $this->invalidateCollectionUrls($item);
@@ -96,10 +96,10 @@ class DefaultInvalidator implements Invalidator
         );
     }
 
-    protected function invalidateGlobalUrls($set)
+    protected function invalidateGlobalUrls($variables)
     {
         $this->cacher->invalidateUrls(
-            Arr::get($this->rules, "globals.{$set->handle()}.urls")
+            Arr::get($this->rules, "globals.{$variables->globalSet()->handle()}.urls")
         );
     }
 
