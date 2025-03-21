@@ -43,8 +43,8 @@ class UpdateGlobalVariablesTest extends TestCase
         ]);
         $this->setTestRoles(['test' => ['access cp', 'edit test globals']]);
         $user = tap(User::make()->assignRole('test'))->save();
-        $global = GlobalFactory::handle('test')->data(['foo' => 'bar'])->make();
-        $global->addLocalization($global->makeLocalization('fr'))->save();
+        $global = GlobalFactory::handle('test')->sites(['fr' => null])->data(['foo' => 'bar'])->create();
+        $global->makeLocalization('fr')->save();
 
         $this
             ->from('/original')
@@ -85,7 +85,7 @@ class UpdateGlobalVariablesTest extends TestCase
                 && $event->variables->data()->all() === ['foo' => 'baz'];
         });
 
-        Event::assertDispatched(GlobalSetSaved::class, function ($event) {
+        Event::assertNotDispatched(GlobalSetSaved::class, function ($event) {
             return $event->globals->handle() === 'test'
                 && $event->globals->in('en')->data()->all() === ['foo' => 'baz'];
         });

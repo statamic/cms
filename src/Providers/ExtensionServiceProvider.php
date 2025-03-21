@@ -247,6 +247,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Updates\MigrateSitesConfigToYaml::class,
         Updates\AddTimezoneConfigOptions::class,
         Updates\RemoveParentField::class,
+        Updates\UpdateGlobalVariables::class,
     ];
 
     public function register()

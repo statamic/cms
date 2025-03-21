@@ -88,7 +88,6 @@ class GlobalsStoreTest extends TestCase
     public function it_saves_to_disk()
     {
         $set = GlobalsAPI::make('test');
-        $set->addLocalization($set->makeLocalization('en'));
 
         $this->store->save($set);
 

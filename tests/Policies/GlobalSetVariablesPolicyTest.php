@@ -31,9 +31,7 @@ class GlobalSetVariablesPolicyTest extends PolicyTestCase
             'access de site',
         ]);
 
-        $global = GlobalFactory::handle('test')->data(['foo' => 'bar'])->make();
-        $global->addLocalization($global->makeLocalization('fr'))->save();
-        $global->addLocalization($global->makeLocalization('de'))->save();
+        $global = GlobalFactory::handle('test')->sites(['en' => null, 'fr' => null, 'de' => null])->data(['foo' => 'bar'])->make();
 
         $this->assertTrue($user->can('edit', $global->in('en')));
         $this->assertTrue($user->can('view', $global->in('en')));

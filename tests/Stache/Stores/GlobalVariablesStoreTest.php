@@ -50,8 +50,8 @@ class GlobalVariablesStoreTest extends TestCase
 
         $dir = Path::tidy($this->tempDir);
         $this->assertEquals([
-            $dir.'/one.yaml' => 1234567890,
-            $dir.'/two.yaml' => 1234567890,
+            $dir.'/subdirectory/nested-one.yaml' => 1234567890,
+            $dir.'/subdirectory/nested-two.yaml' => 1234567890,
         ], $files->all());
 
         // Sanity check. Make sure the file is there but wasn't included.

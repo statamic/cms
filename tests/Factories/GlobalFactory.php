@@ -8,8 +8,9 @@ class GlobalFactory
 {
     protected $id;
     protected $handle;
+    protected $title;
     protected $data = [];
-    protected $site = 'en';
+    protected $sites = ['en' => null];
 
     public function id($id)
     {
@@ -25,6 +26,13 @@ class GlobalFactory
         return $this;
     }
 
+    public function title($title)
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
     public function data($data)
     {
         $this->data = $data;
@@ -32,23 +40,23 @@ class GlobalFactory
         return $this;
     }
 
-    public function site($handle)
+    public function sites($sites)
     {
-        $this->site = $handle;
+        $this->sites = $sites;
 
         return $this;
     }
 
     public function make()
     {
-        $set = GlobalSet::make($this->handle);
-
-        $set->addLocalization(
-            $set->makeLocalization($this->site)->data($this->data)
-        );
+        $set = GlobalSet::make($this->handle)->sites($this->sites);
 
         if ($this->id) {
             $set->id($this->id);
+        }
+
+        if ($this->title) {
+            $set->title($this->title);
         }
 
         return $set;
@@ -56,6 +64,10 @@ class GlobalFactory
 
     public function create()
     {
-        return tap($this->make())->save();
+        $set = tap($this->make())->save();
+
+        $set->makeLocalization($set->sites()->keys()->first())->data($this->data)->save();
+
+        return $set;
     }
 }

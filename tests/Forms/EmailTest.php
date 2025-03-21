@@ -185,12 +185,11 @@ class EmailTest extends TestCase
 
     private function makeEmailWithConfig(array $config)
     {
-        $globalSet = GlobalSet::make()->handle('company_information');
-        $globalSet->addLocalization($globalSet->makeLocalization('en')->data([
+        $globalSet = GlobalSet::make()->handle('company_information')->save();
+        $globalSet->makeLocalization('en')->data([
             'name' => 'Example Company',
             'email' => 'info@example.com',
-        ]));
-        $globalSet->save();
+        ])->save();
 
         $formBlueprint = Blueprint::makeFromFields([
             'name' => ['type' => 'text'],

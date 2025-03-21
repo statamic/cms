@@ -22,18 +22,6 @@ class VariablesTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->setSites([
-            'a' => ['url' => '/', 'locale' => 'en'],
-            'b' => ['url' => '/b/', 'locale' => 'fr'],
-            'c' => ['url' => '/b/', 'locale' => 'fr'],
-            'd' => ['url' => '/d/', 'locale' => 'fr'],
-        ]);
-    }
-
     #[Test]
     public function it_gets_file_contents_for_saving()
     {
@@ -59,32 +47,39 @@ EOT;
     #[Test]
     public function it_gets_file_contents_for_saving_a_localized_set()
     {
-        $global = GlobalSet::make('test');
+        $this->setSites([
+            'a' => ['url' => '/', 'locale' => 'en'],
+            'b' => ['url' => '/b/', 'locale' => 'fr'],
+            'c' => ['url' => '/b/', 'locale' => 'fr'],
+            'd' => ['url' => '/d/', 'locale' => 'fr'],
+        ]);
+
+        $global = GlobalSet::make('test')->sites([
+            'a' => null,
+            'b' => 'a',
+            'c' => null,
+        ])->save();
 
         $a = $global->makeLocalization('a')->data([
             'array' => ['first one', 'second one'],
             'string' => 'The string',
             'null' => null, // this...
             'empty' => [],  // and this should get stripped out because there's no origin to fall back to.
-        ]);
+        ])->save();
 
-        $b = $global->makeLocalization('b')->origin($a)->data([
+        $b = $global->makeLocalization('b')->data([
             'array' => ['first one', 'second one'],
             'string' => 'The string',
             'null' => null, // this...
             'empty' => [],  // and this should not get stripped out, otherwise it would fall back to the origin.
-        ]);
+        ])->save();
 
         $c = $global->makeLocalization('c')->data([
             'array' => ['first one', 'second one'],
             'string' => 'The string',
             'null' => null, // this...
             'empty' => [],  // and this should get stripped out because there's no origin to fall back to.
-        ]);
-
-        $global->addLocalization($a);
-        $global->addLocalization($b);
-        $global->addLocalization($c);
+        ])->save();
 
         $expected = <<<'EOT'
 array:
@@ -102,7 +97,6 @@ array:
 string: 'The string'
 'null': null
 empty: {  }
-origin: a
 
 EOT;
         $this->assertEquals($expected, $b->fileContents());
@@ -120,44 +114,51 @@ EOT;
     #[Test]
     public function if_the_value_is_explicitly_set_to_null_then_it_should_not_fall_back()
     {
-        $global = GlobalSet::make('test');
+        $this->setSites([
+            'a' => ['url' => '/', 'locale' => 'en'],
+            'b' => ['url' => '/b/', 'locale' => 'fr'],
+            'c' => ['url' => '/b/', 'locale' => 'fr'],
+            'd' => ['url' => '/d/', 'locale' => 'fr'],
+        ]);
+
+        $global = GlobalSet::make('test')->sites([
+            'a' => null,
+            'b' => 'a',
+            'c' => 'b',
+            'd' => null,
+            'e' => 'd',
+        ])->save();
 
         $a = $global->makeLocalization('a')->data([
             'one' => 'alfa',
             'two' => 'bravo',
             'three' => 'charlie',
             'four' => 'delta',
-        ]);
+        ])->save();
 
         // originates from a
-        $b = $global->makeLocalization('b')->origin($a)->data([
+        $b = $global->makeLocalization('b')->data([
             'one' => 'echo',
             'two' => null,
-        ]);
+        ])->save();
 
         // originates from b, which originates from a
-        $c = $global->makeLocalization('c')->origin($b)->data([
+        $c = $global->makeLocalization('c')->data([
             'three' => 'foxtrot',
-        ]);
+        ])->save();
 
         // does not originate from anything
         $d = $global->makeLocalization('d')->data([
             'one' => 'golf',
             'two' => 'hotel',
             'three' => 'india',
-        ]);
+        ])->save();
 
         // originates from d. just to test that it doesn't unintentionally fall back to the default/first.
-        $e = $global->makeLocalization('e')->origin($d)->data([
+        $e = $global->makeLocalization('e')->data([
             'one' => 'juliett',
             'two' => null,
-        ]);
-
-        $global->addLocalization($a);
-        $global->addLocalization($b);
-        $global->addLocalization($c);
-        $global->addLocalization($d);
-        $global->addLocalization($e);
+        ])->save();
 
         $this->assertEquals([
             'one' => 'alfa',

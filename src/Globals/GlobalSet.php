@@ -26,6 +26,7 @@ class GlobalSet implements Contract
 
     protected $title;
     protected $handle;
+    protected $sites;
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
 
@@ -99,7 +100,7 @@ class GlobalSet implements Contract
 
         Facades\GlobalSet::save($this);
 
-        $this->saveOrDeleteLocalizations();
+        $this->syncLocalizations();
 
         foreach ($afterSaveCallbacks as $callback) {
             $callback($this);
@@ -116,14 +117,16 @@ class GlobalSet implements Contract
         return $this;
     }
 
-    protected function saveOrDeleteLocalizations()
+    protected function syncLocalizations(): void
     {
-        $localizations = $this->localizations();
+        $localizations = $this->freshLocalizations();
 
-        $localizations->each->save();
+        $this->sites()
+            ->reject(fn ($origin, $site) => $localizations->has($site))
+            ->each(fn ($origin, $site) => $this->makeLocalization($site)->save());
 
-        $this->freshLocalizations()
-            ->diffKeys($localizations)
+        $localizations
+            ->filter(fn ($localization) => ! $this->sites()->has($localization->locale()))
             ->each->delete();
     }
 
@@ -156,17 +159,10 @@ class GlobalSet implements Contract
 
     public function fileData()
     {
-        $data = [
+        return Arr::removeNullValues([
             'title' => $this->title(),
-        ];
-
-        if (! Site::multiEnabled() && ($variables = $this->in(Site::default()->handle()))) {
-            $data['data'] = Arr::removeNullValues(
-                $variables->data()->all()
-            );
-        }
-
-        return $data;
+            'sites' => Site::multiEnabled() ? $this->sites()->all() : null,
+        ]);
     }
 
     public function makeLocalization($site)
@@ -176,30 +172,31 @@ class GlobalSet implements Contract
             ->locale($site);
     }
 
-    public function addLocalization($localization)
-    {
-        $localization->globalSet($this);
-
-        $this->localizations()[$localization->locale()] = $localization;
-
-        return $this;
-    }
-
-    public function removeLocalization($localization)
-    {
-        $this->localizations()->forget($localization->locale());
-
-        return $this;
-    }
-
     public function sites()
     {
-        return $this->localizations()->map->locale()->values()->toBase();
+        return $this
+            ->fluentlyGetOrSet('sites')
+            ->getter(function ($sites) {
+                if (! Site::multiEnabled() || ! $sites) {
+                    $sites = [Site::default()->handle() => null];
+                }
+
+                return collect($sites);
+            })
+            ->args(func_get_args());
     }
 
     public function in($locale)
     {
-        return $this->localizations()->get($locale);
+        if (! $this->sites()->has($locale)) {
+            return null;
+        }
+
+        if (! $variables = $this->localizations()->get($locale)) {
+            $variables = $this->makeLocalization($locale);
+        }
+
+        return $variables;
     }
 
     public function inSelectedSite()
@@ -237,6 +234,11 @@ class GlobalSet implements Contract
     public function editUrl()
     {
         return cp_route('globals.edit', $this->handle());
+    }
+
+    public function updateUrl()
+    {
+        return cp_route('globals.update', $this->handle());
     }
 
     public function deleteUrl()
