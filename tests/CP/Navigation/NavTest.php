@@ -78,7 +78,6 @@ class NavTest extends TestCase
 
         Nav::droids('C-3PO')
             ->id('some::custom::id')
-            ->active('threepio*')
             ->url('/human-cyborg-relations')
             ->view('cp.nav.importer')
             ->can('index', DroidsClass::class)
@@ -91,7 +90,6 @@ class NavTest extends TestCase
         $this->assertEquals('C-3PO', $item->display());
         $this->assertEquals('http://localhost/human-cyborg-relations', $item->url());
         $this->assertEquals('cp.nav.importer', $item->view());
-        $this->assertEquals('threepio*', $item->active());
         $this->assertEquals('index', $item->authorization()->ability);
         $this->assertEquals(DroidsClass::class, $item->authorization()->arguments);
         $this->assertEquals(' target="_blank" class="red"', $item->attributes());
@@ -497,17 +495,14 @@ class NavTest extends TestCase
     {
         tap(Nav::create('external-absolute')->url('http://domain.com'), function ($nav) {
             $this->assertEquals('http://domain.com', $nav->url());
-            $this->assertNull($nav->active());
         });
 
         tap(Nav::create('site-relative')->url('/foo/bar'), function ($nav) {
             $this->assertEquals('http://localhost/foo/bar', $nav->url());
-            $this->assertNull($nav->active());
         });
 
         tap(Nav::create('cp-relative')->url('foo/bar'), function ($nav) {
             $this->assertEquals('http://localhost/cp/foo/bar', $nav->url());
-            $this->assertEquals('foo/bar(/(.*)?|$)', $nav->active());
         });
     }
 
@@ -530,9 +525,8 @@ class NavTest extends TestCase
     #[Test]
     public function it_does_not_automatically_add_a_resolve_children_pattern_when_setting_url_if_one_is_already_defined()
     {
-        $nav = Nav::create('cp-relative')->active('foo.*')->url('foo/bar');
+        $nav = Nav::create('cp-relative')->url('foo/bar');
         $this->assertEquals('http://localhost/cp/foo/bar', $nav->url());
-        $this->assertEquals('foo.*', $nav->active());
     }
 
     #[Test]
