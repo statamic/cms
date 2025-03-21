@@ -370,7 +370,7 @@ export default {
             window.location = url;
         },
 
-        editPage(page, vm, store, $event) {
+        editPage(page, $event) {
             const url = page.edit_url;
             $event.metaKey ? window.open(url) : (window.location = url);
         },
