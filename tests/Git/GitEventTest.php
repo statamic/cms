@@ -292,8 +292,8 @@ class GitEventTest extends TestCase
         Git::shouldReceive('dispatchCommit')->with('Global Set deleted')->once();
 
         // These events get dispatched when saving/deleting sets, because of the "variable syncing" that happens.
-        Git::shouldReceive('dispatchCommit')->with('Global Variable saved')->once();
-        Git::shouldReceive('dispatchCommit')->with('Global Variable deleted')->once();
+        Git::shouldReceive('dispatchCommit')->with('Global variables saved')->once();
+        Git::shouldReceive('dispatchCommit')->with('Global variables deleted')->once();
 
         $set = Facades\GlobalSet::make('main');
 
@@ -305,8 +305,8 @@ class GitEventTest extends TestCase
     public function it_commits_when_global_variable_is_saved_and_deleted()
     {
         Git::shouldReceive('dispatchCommit')->with('Global Set saved')->once();
-        Git::shouldReceive('dispatchCommit')->with('Global Variable saved')->twice(); // Called when the set is saved, then when the variable is saved.
-        Git::shouldReceive('dispatchCommit')->with('Global Variable deleted')->once();
+        Git::shouldReceive('dispatchCommit')->with('Global variables saved')->twice(); // Called when the set is saved, then when the variable is saved.
+        Git::shouldReceive('dispatchCommit')->with('Global variables deleted')->once();
 
         $set = Facades\GlobalSet::make('main')->save();
         $variables = $set->makeLocalization('en')->data(['foo' => 'bar']);

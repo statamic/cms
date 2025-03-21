@@ -12,6 +12,6 @@ class GlobalVariablesDeleted extends Event implements ProvidesCommitMessage
 
     public function commitMessage()
     {
-        return __('Global Variable deleted', [], config('statamic.git.locale'));
+        return __('Global variables deleted', [], config('statamic.git.locale'));
     }
 }

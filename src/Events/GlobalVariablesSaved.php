@@ -12,6 +12,6 @@ class GlobalVariablesSaved extends Event implements ProvidesCommitMessage
 
     public function commitMessage()
     {
-        return __('Global Variable saved', [], config('statamic.git.locale'));
+        return __('Global variables saved', [], config('statamic.git.locale'));
     }
 }
