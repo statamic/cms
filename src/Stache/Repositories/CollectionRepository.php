@@ -8,7 +8,6 @@ use Statamic\Contracts\Entries\CollectionRepository as RepositoryContract;
 use Statamic\Data\StoresScopedComputedFieldCallbacks;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades\Blink;
-use Statamic\Facades\Entry;
 use Statamic\Stache\Stache;
 
 class CollectionRepository implements RepositoryContract
