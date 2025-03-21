@@ -13,6 +13,7 @@ class Group extends Fieldtype
 {
     protected $categories = ['structured'];
     protected $defaultable = false;
+    protected $selectableInForms = true;
 
     protected function configFieldItems(): array
     {
@@ -132,6 +133,19 @@ class Group extends Fieldtype
         );
     }
 
+    public function preProcessTagRenderable($data, $recursiveCallback)
+    {
+        $field = $this->field();
+
+        $data['fields'] = collect($this->fields()->all())
+            ->map(fn ($child) => $child->setForm($field->form())->setHandle($field->handle().'.'.$child->handle()))
+            ->map(fn ($child) => $recursiveCallback($child))
+            ->values()
+            ->all();
+
+        return $data;
+    }
+
     public function toGqlType()
     {
         return GraphQL::type($this->gqlItemTypeName());
@@ -151,5 +165,10 @@ class Group extends Fieldtype
         return 'Group_'.collect($this->field->handlePath())->map(function ($part) {
             return Str::studly($part);
         })->join('_');
+    }
+
+    public function hasJsDriverDataBinding(): bool
+    {
+        return false;
     }
 }
