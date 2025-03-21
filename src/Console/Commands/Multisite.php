@@ -219,7 +219,6 @@ class Multisite extends Command
             task: function () {
                 Stache::disableUpdatingIndexes();
                 Stache::clear();
-                Stache::enableUpdatingIndexes();
             }
         );
 
@@ -276,6 +275,8 @@ class Multisite extends Command
     {
         Config::set('statamic.system.multisite', true);
 
+        Stache::enableUpdatingIndexes();
+
         GlobalSet::all()->each(function ($set) {
             $this->components->task(
                 description: "Updating global [{$set->handle()}]...",
@@ -284,6 +285,8 @@ class Multisite extends Command
                 }
             );
         });
+
+        Stache::disableUpdatingIndexes();
 
         return $this;
     }
