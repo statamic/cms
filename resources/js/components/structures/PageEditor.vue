@@ -83,6 +83,8 @@ import HasHiddenFields from '../publish/HasHiddenFields';
 import { flatten } from 'lodash-es';
 
 export default {
+    emits: ['closed', 'submitted', 'publish-info-updated', 'localized-fields-updated'],
+
     mixins: [HasHiddenFields],
 
     props: {
