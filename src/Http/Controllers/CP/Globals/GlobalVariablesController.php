@@ -119,8 +119,9 @@ class GlobalVariablesController extends CpController
 
     protected function getAuthorizedLocalizationsForVariables($variables)
     {
-        return $variables->globalSet()->sites()
-            ->map(fn ($origin, $site) => $variables->globalSet()->in($site))
+        return $variables
+            ->globalSet()
+            ->localizations()
             ->filter(fn ($set) => User::current()->can('edit', $set));
     }
 }
