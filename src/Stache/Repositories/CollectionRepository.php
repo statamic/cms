@@ -97,26 +97,6 @@ class CollectionRepository implements RepositoryContract
         $this->store->delete($collection);
     }
 
-    /**
-     * @deprecated Use Entry::updateUris($collection, $ids)
-     */
-    public function updateEntryUris(Collection $collection, $ids = null)
-    {
-        Entry::updateUris($collection, $ids);
-    }
-
-    /** @deprecated Use Entry::updateOrders($collection, $ids) */
-    public function updateEntryOrder(Collection $collection, $ids = null)
-    {
-        Entry::updateOrders($collection, $ids);
-    }
-
-    /** @deprecated Use Entry::updateParents($collection, $ids) */
-    public function updateEntryParent(Collection $collection, $ids = null)
-    {
-        Entry::updateParents($collection, $ids);
-    }
-
     public function whereStructured(): IlluminateCollection
     {
         return $this->all()->filter->hasStructure();
