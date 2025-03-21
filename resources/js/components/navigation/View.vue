@@ -376,7 +376,7 @@ export default {
 
             if (this.maxPagesSelection === 1) {
                 this.removePageOnCancel = true;
-                this.editPage(pages[0]);
+                this.$wait(300).then(() => this.editPage(pages[0]));
             }
         },
 
