@@ -14,6 +14,8 @@ use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Rules\Handle;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class FormsController extends CpController
 {
     public function index(Request $request)

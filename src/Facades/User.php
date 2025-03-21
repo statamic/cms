@@ -21,7 +21,7 @@ use Statamic\OAuth\Provider;
  * @method static void delete(\Statamic\Contracts\Auth\User $user);
  * @method static \Statamic\Fields\Blueprint blueprint();
  * @method static \Illuminate\Support\Collection getComputedCallbacks()
- * @method static void computed(string $field, \Closure $callback)
+ * @method static void computed(string|array $field, ?\Closure $callback = null)
  *
  * @see \Statamic\Contracts\Auth\UserRepository
  * @see \Statamic\Auth\User

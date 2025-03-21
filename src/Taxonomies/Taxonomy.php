@@ -31,6 +31,8 @@ use Statamic\Statamic;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
+use function Statamic\trans as __;
+
 class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract, Responsable
 {
     use ContainsCascadingData, ContainsSupplementalData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedData;

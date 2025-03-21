@@ -64,11 +64,12 @@
                                 folder: this.iconSubFolder,
                             }"
                             :initial-value="editingSection.icon"
-                            v-slot="{ meta, value, loading }"
+                            v-slot="{ meta, value, loading, config }"
                         >
                             <icon-fieldtype
                                 v-if="!loading"
                                 handle="icon"
+                                :config="config"
                                 :meta="meta"
                                 :value="value"
                                 @input="editingSection.icon = $event"
