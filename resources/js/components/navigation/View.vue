@@ -179,7 +179,7 @@
         </page-tree>
 
         <page-selector
-            v-if="hasCollections && $refs.tree"
+            v-if="hasCollections"
             ref="selector"
             :site="site"
             :collections="collections"
