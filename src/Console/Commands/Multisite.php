@@ -219,6 +219,7 @@ class Multisite extends Command
             task: function () {
                 Stache::disableUpdatingIndexes();
                 Stache::clear();
+                Stache::enableUpdatingIndexes();
             }
         );
 
