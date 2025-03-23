@@ -1,5 +1,22 @@
 # Release Notes
 
+## 5.51.0 (2025-03-17)
+
+### What's new
+- Allow passing computed fields via an associative array [#11528](https://github.com/statamic/cms/issues/11528) by @godismyjudge95
+- Enable unselecting fieldtypes for forms [#11559](https://github.com/statamic/cms/issues/11559) by @godismyjudge95
+
+### What's fixed
+- Fix implied route views [#11570](https://github.com/statamic/cms/issues/11570) by @duncanmcclean
+- When NavPageInterface has no blueprint fields return something [#11537](https://github.com/statamic/cms/issues/11537) by @ryanmitchell
+- Password reset action should use custom password reset notification  [#11571](https://github.com/statamic/cms/issues/11571) by @duncanmcclean
+- Fix escaped braces in concurrent requests not getting replaced [#11583](https://github.com/statamic/cms/issues/11583) by @o1y
+- Fix control panel crashes when titles share name with existing translation file [#11578](https://github.com/statamic/cms/issues/11578) by @daun
+- Fix carbon deprecation warning [#11561](https://github.com/statamic/cms/issues/11561) by @jasonvarga
+- Fix icon fieldtype [#11560](https://github.com/statamic/cms/issues/11560) by @jasonvarga
+
+
+
 ## 5.50.0 (2025-03-10)
 
 ### What's new

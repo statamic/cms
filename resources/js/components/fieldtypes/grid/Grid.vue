@@ -53,7 +53,6 @@ import uniqid from 'uniqid';
 import GridTable from './Table.vue';
 import GridStacked from './Stacked.vue';
 import ManagesRowMeta from './ManagesRowMeta';
-import { mapValues, keyBy } from 'lodash-es';
 
 export default {
     mixins: [Fieldtype, ManagesRowMeta],
@@ -172,7 +171,9 @@ export default {
         addRow() {
             const id = uniqid();
 
-            const row = mapValues(keyBy(this.field, 'handle'), (field) => this.meta.defaults[field.handle]);
+            const row = Object.fromEntries(
+                this.fields.map((field) => [field.handle, this.meta.defaults[field.handle]]),
+            );
 
             row._id = id;
 

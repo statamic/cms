@@ -27,6 +27,8 @@ use Statamic\Search\Index;
 use Statamic\Search\Result;
 use Statamic\Support\Arr;
 
+use function Statamic\trans as __;
+
 class Entries extends Relationship
 {
     use QueriesFilters;

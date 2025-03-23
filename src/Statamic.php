@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Vite;
 use Laravel\Nova\Nova;
 use Statamic\Facades\File;
-use Statamic\Facades\Preference;
 use Statamic\Facades\URL;
 use Statamic\Modifiers\Modify;
 use Statamic\Support\Arr;
@@ -296,18 +295,6 @@ class Statamic
         return Vite::getFacadeRoot()
             ->useHotFile('vendor/statamic/cp/hot')
             ->useBuildDirectory('vendor/statamic/cp/build');
-    }
-
-    public static function cpDateFormat()
-    {
-        return Preference::get('date_format', config('statamic.cp.date_format'));
-    }
-
-    public static function cpDateTimeFormat()
-    {
-        $format = self::cpDateFormat();
-
-        return DateFormat::containsTime($format) ? $format : $format.' H:i';
     }
 
     public static function dateFormat()

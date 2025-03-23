@@ -28,6 +28,7 @@ export default {
             value: this.value,
             loading: this.loading,
             updateMeta: this.updateMeta,
+            config: this.config,
         })[0];
     },
 

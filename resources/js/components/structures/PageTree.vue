@@ -51,7 +51,7 @@
                         :show-blueprint="blueprints?.length > 1"
                         :editable="editable"
                         :root="isRoot(stat)"
-                        @edit="$emit('edit-page', node, store, $event)"
+                        @edit="$emit('edit-page', node, $event)"
                         @toggle-open="stat.open = !stat.open"
                         @removed="pageRemoved"
                         @branch-clicked="$emit('branch-clicked', node)"

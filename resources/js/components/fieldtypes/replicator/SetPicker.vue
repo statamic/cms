@@ -221,7 +221,7 @@ export default {
             this.$emit('added', handle);
             this.unselectGroup();
             this.search = null;
-            this.$refs.popover.close();
+            this.$refs.popover?.close();
         },
 
         selectGroup(handle) {

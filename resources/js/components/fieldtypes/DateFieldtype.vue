@@ -45,6 +45,7 @@ import RangePopover from './date/RangePopover.vue';
 import RangeInline from './date/RangeInline.vue';
 import { useScreens } from 'vue-screen-utils';
 import { toRaw } from 'vue';
+import DateFormatter from '@statamic/components/DateFormatter.js';
 
 export default {
     components: {
@@ -157,8 +158,8 @@ export default {
                 rows: this.screens({ default: 1, lg: this.config.rows }).value,
                 expanded: this.name === 'date' || this.config.full_width,
                 isRequired: this.config.required,
-                locale: this.$config.get('locale').replace('_', '-'),
-                masks: { input: [this.displayFormat], modelValue: this.format },
+                locale: Statamic.$date.locale,
+                masks: { input: ['L'], modelValue: 'YYYY-MM-DD' },
                 minDate: this.config.earliest_date.date,
                 maxDate: this.config.latest_date.date,
                 updateOnInput: false,
@@ -168,36 +169,25 @@ export default {
             };
         },
 
-        format() {
-            return 'YYYY-MM-DD';
-        },
-
-        displayFormat() {
-            return this.meta.displayFormat;
-        },
-
         replicatorPreview() {
             if (!this.showFieldPreviews || !this.config.replicator_preview) return;
 
             if (this.isRange) {
                 if (!this.localValue?.start) return;
 
-                return (
-                    this.$moment(this.localValue.start.date).format(this.displayFormat) +
-                    ' – ' +
-                    this.$moment(this.localValue.end.date).format(this.displayFormat)
-                );
+                const start = this.value.start.date + 'T' + (this.value.start.time || '00:00:00') + 'Z';
+                const end = this.value.end.date + 'T' + (this.value.end.time || '00:00:00') + 'Z';
+                const formatter = new DateFormatter().options('date');
+
+                return formatter.date(start) + ' – ' + formatter.date(end);
             }
 
-            if (!this.localValue?.date) return;
+            if (!this.value?.date) return;
 
-            let preview = this.$moment(this.localValue.date).format(this.displayFormat);
-
-            if (this.hasTime && this.localValue.time) {
-                preview += ` ${this.localValue.time}`;
-            }
-
-            return preview;
+            return DateFormatter.format(
+                this.value.date + 'T' + (this.value.time || '00:00:00') + 'Z',
+                this.hasTime && this.value.time ? 'datetime' : 'date',
+            );
         },
     },
 

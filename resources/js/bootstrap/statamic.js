@@ -31,6 +31,7 @@ import Reveal from '../components/Reveal';
 import Echo from '../components/Echo';
 import Permission from '../components/Permission';
 import autosize from 'autosize';
+import DateFormatter from '@statamic/components/DateFormatter.js';
 
 const darkMode = ref(null);
 let bootingCallbacks = [];
@@ -94,6 +95,10 @@ export default {
         return components;
     },
 
+    get $date() {
+        return this.$app.config.globalProperties.$date;
+    },
+
     get darkMode() {
         return darkMode;
     },
@@ -136,7 +141,6 @@ export default {
 
         Object.assign(this.$app.config.globalProperties, {
             $axios: axios,
-            $moment: window.moment,
             $events: useGlobalEventBus(),
             $preferences: new Preferences(),
             $progress: useProgressBar(),
@@ -154,6 +158,7 @@ export default {
             $reveal: new Reveal(),
             $echo: new Echo(),
             $permissions: new Permission(),
+            $date: new DateFormatter(),
         });
 
         Object.assign(this.$app.config.globalProperties, {

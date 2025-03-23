@@ -14,6 +14,8 @@ use Statamic\Sites\Site;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class Email extends Mailable
 {
     use Queueable, SerializesModels;
