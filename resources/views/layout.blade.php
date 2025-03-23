@@ -13,6 +13,7 @@
             @include('statamic::partials.session-expiry')
             @include('statamic::partials.licensing-alerts')
             @include('statamic::partials.global-header')
+            @include('statamic::partials.command-palette')
 
             <div
                 id="main"
