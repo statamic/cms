@@ -1694,17 +1694,17 @@ class NavPreferencesTest extends TestCase
         $this->assertTrue($tags->isActive());
     }
 
-    private function buildNavWithPreferences($preferences, $withHidden = false)
+    private function buildNavWithPreferences($preferences, $editingHidden = false)
     {
         $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
 
-        return Facades\CP\Nav::build($preferences, $withHidden)->pluck('items', 'display');
+        return Facades\CP\Nav::build(preferences: $preferences, editing: $editingHidden)->pluck('items', 'display');
     }
 
     private function buildDefaultNav()
     {
         $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
 
-        return Facades\CP\Nav::buildWithoutPreferences()->pluck('items', 'display');
+        return Facades\CP\Nav::build(preferences: false)->pluck('items', 'display');
     }
 }

@@ -34,10 +34,22 @@ class NavBuilder
      * @param  array  $items
      * @param  bool  $withHidden
      */
-    public function __construct($items, $withHidden = false)
+    public function __construct($items)
     {
         $this->items = $items;
+    }
+
+    /**
+     * Build with hidden items.
+     *
+     * @param  bool  $withHidden
+     * @return $this
+     */
+    public function withHidden(bool $withHidden = false): self
+    {
         $this->withHidden = $withHidden;
+
+        return $this;
     }
 
     /**
