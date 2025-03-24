@@ -13,7 +13,7 @@ class GlobalSetVariablesPolicyTest extends PolicyTestCase
     {
         $user = $this->userWithPermissions(['edit test globals']);
 
-        $global = GlobalFactory::handle('test')->data(['foo' => 'bar'])->make();
+        $global = GlobalFactory::handle('test')->data(['foo' => 'bar'])->create();
 
         $this->assertTrue($user->can('edit', $global->inDefaultSite()));
         $this->assertTrue($user->can('view', $global->inDefaultSite()));
@@ -31,7 +31,7 @@ class GlobalSetVariablesPolicyTest extends PolicyTestCase
             'access de site',
         ]);
 
-        $global = GlobalFactory::handle('test')->sites(['en' => null, 'fr' => null, 'de' => null])->data(['foo' => 'bar'])->make();
+        $global = GlobalFactory::handle('test')->sites(['en' => null, 'fr' => null, 'de' => null])->data(['foo' => 'bar'])->create();
 
         $this->assertTrue($user->can('edit', $global->in('en')));
         $this->assertTrue($user->can('view', $global->in('en')));
@@ -56,7 +56,7 @@ class GlobalSetVariablesPolicyTest extends PolicyTestCase
     {
         $forbiddenUser = $this->userWithPermissions([]);
         $authorizedUser = $this->userWithPermissions(['configure globals']);
-        $global = GlobalFactory::handle('test')->data(['foo' => 'bar'])->make();
+        $global = GlobalFactory::handle('test')->data(['foo' => 'bar'])->create();
         $variables = $global->inDefaultSite();
 
         $this->assertTrue($authorizedUser->can('delete', $variables));

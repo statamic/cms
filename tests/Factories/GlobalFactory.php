@@ -47,7 +47,7 @@ class GlobalFactory
         return $this;
     }
 
-    public function make()
+    private function make()
     {
         $set = GlobalSet::make($this->handle)->sites($this->sites);
 
