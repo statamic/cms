@@ -3,6 +3,7 @@
 namespace Tests\CommandPalette;
 
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades;
 use Statamic\Facades\CommandPalette;
 use Statamic\Facades\User;
 use Statamic\Support\Arr;
@@ -21,12 +22,18 @@ class CommandPaletteTest extends TestCase
     {
         parent::setUp();
 
-        $this->actingAs(tap(User::make()->makeSuper())->save());
+        // TODO: Other tests are leaving behind forms without titles that are causing failures here?
+        Facades\Form::shouldReceive('all')->andReturn(collect());
     }
 
     #[Test]
     public function it_builds_an_array_that_can_be_converted_to_json()
     {
+        $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->get(cp_route('dashboard'))
+            ->assertStatus(200);
+
         $commands = CommandPalette::build();
 
         $this->assertTrue(is_array($commands));
@@ -36,6 +43,11 @@ class CommandPaletteTest extends TestCase
     #[Test]
     public function it_can_build_commands_off_nav_items()
     {
+        $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->get(cp_route('dashboard'))
+            ->assertStatus(200);
+
         $navigationCommands = collect(CommandPalette::build())
             ->filter(fn ($item) => $item['category'] === 'Navigation')
             ->map(fn ($item) => Arr::except($item, 'category'))
