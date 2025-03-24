@@ -38,6 +38,8 @@ class Palette
 
     protected function buildHistory(): self
     {
+        // TODO: Set up ajax route for caching command palette history as user runs commands.
+
         return $this;
     }
 
