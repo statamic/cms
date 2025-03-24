@@ -435,7 +435,7 @@ class ConfigTest extends TestCase
         $set = Facades\GlobalSet::make()->handle($handle);
         $set->save();
 
-        $set->makeLocalization('en')->data([])->save();
+        $set->in('en')->data([])->save();
 
         return $set;
     }

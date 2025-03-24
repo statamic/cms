@@ -66,7 +66,7 @@ class GlobalFactory
     {
         $set = tap($this->make())->save();
 
-        $set->makeLocalization($set->sites()->keys()->first())->data($this->data)->save();
+        $set->in($set->sites()->keys()->first())->data($this->data)->save();
 
         return $set;
     }

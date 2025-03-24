@@ -27,7 +27,7 @@ class VariablesTest extends TestCase
     {
         $global = GlobalSet::make('test');
 
-        $entry = $global->makeLocalization('a')->data([
+        $entry = $global->inDefaultSite()->data([
             'array' => ['first one', 'second one'],
             'string' => 'The string',
             'null' => null, // this...
@@ -60,21 +60,21 @@ EOT;
             'c' => null,
         ])->save();
 
-        $a = $global->makeLocalization('a')->data([
+        $a = $global->in('a')->data([
             'array' => ['first one', 'second one'],
             'string' => 'The string',
             'null' => null, // this...
             'empty' => [],  // and this should get stripped out because there's no origin to fall back to.
         ])->save();
 
-        $b = $global->makeLocalization('b')->data([
+        $b = $global->in('b')->data([
             'array' => ['first one', 'second one'],
             'string' => 'The string',
             'null' => null, // this...
             'empty' => [],  // and this should not get stripped out, otherwise it would fall back to the origin.
         ])->save();
 
-        $c = $global->makeLocalization('c')->data([
+        $c = $global->in('c')->data([
             'array' => ['first one', 'second one'],
             'string' => 'The string',
             'null' => null, // this...
@@ -129,7 +129,7 @@ EOT;
             'e' => 'd',
         ])->save();
 
-        $a = $global->makeLocalization('a')->data([
+        $a = $global->in('a')->data([
             'one' => 'alfa',
             'two' => 'bravo',
             'three' => 'charlie',
@@ -137,25 +137,25 @@ EOT;
         ])->save();
 
         // originates from a
-        $b = $global->makeLocalization('b')->data([
+        $b = $global->in('b')->data([
             'one' => 'echo',
             'two' => null,
         ])->save();
 
         // originates from b, which originates from a
-        $c = $global->makeLocalization('c')->data([
+        $c = $global->in('c')->data([
             'three' => 'foxtrot',
         ])->save();
 
         // does not originate from anything
-        $d = $global->makeLocalization('d')->data([
+        $d = $global->in('d')->data([
             'one' => 'golf',
             'two' => 'hotel',
             'three' => 'india',
         ])->save();
 
         // originates from d. just to test that it doesn't unintentionally fall back to the default/first.
-        $e = $global->makeLocalization('e')->data([
+        $e = $global->in('e')->data([
             'one' => 'juliett',
             'two' => null,
         ])->save();
@@ -242,7 +242,7 @@ EOT;
         $blueprint = Facades\Blueprint::makeFromFields(['charlie' => ['type' => 'test']]);
         BlueprintRepository::shouldReceive('find')->with('globals.settings')->andReturn($blueprint);
         $global = GlobalSet::make('settings');
-        $variables = $global->makeLocalization('en');
+        $variables = $global->in('en');
         $variables->set('alfa', 'bravo');
         $variables->set('charlie', 'delta');
 
@@ -272,7 +272,7 @@ EOT;
         $blueprint = Facades\Blueprint::makeFromFields(['foo' => ['type' => 'test']]);
         BlueprintRepository::shouldReceive('find')->with('globals.settings')->andReturn($blueprint);
         $global = GlobalSet::make('settings');
-        $variables = $global->makeLocalization('en');
+        $variables = $global->in('en');
         $variables->set('foo', 'delta');
 
         $this->assertEquals('query builder results', $variables->foo);
@@ -295,7 +295,7 @@ EOT;
         $this->expectException(BadMethodCallException::class);
         $this->expectExceptionMessage('Call to undefined method Statamic\Globals\Variables::thisFieldDoesntExist()');
 
-        GlobalSet::make('settings')->makeLocalization('en')->thisFieldDoesntExist();
+        GlobalSet::make('settings')->in('en')->thisFieldDoesntExist();
     }
 
     #[Test]
@@ -326,7 +326,7 @@ EOT;
         ]);
         BlueprintRepository::shouldReceive('find')->with('globals.settings')->andReturn($blueprint);
         $global = GlobalSet::make('settings');
-        $variables = $global->makeLocalization('en');
+        $variables = $global->in('en');
         $variables->set('foo', 'bar');
         $variables->set('baz', 'qux');
 
@@ -377,7 +377,7 @@ EOT;
         ]);
         BlueprintRepository::shouldReceive('find')->with('globals.settings')->andReturn($blueprint);
         $global = GlobalSet::make('settings');
-        $variables = $global->makeLocalization('en');
+        $variables = $global->in('en');
         $variables->set('alfa', 'one');
         $variables->set('bravo', ['a', 'b']);
         $variables->set('charlie', ['c', 'd']);

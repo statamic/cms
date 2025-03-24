@@ -154,7 +154,7 @@ class GlobalsController extends CpController
         $global = GlobalSet::make($handle)->title($data['title']);
         $global->save();
 
-        $global->makeLocalization(Site::default()->handle())->save();
+        $global->in(Site::default()->handle())->save();
 
         session()->flash('message', __('Global Set created'));
 

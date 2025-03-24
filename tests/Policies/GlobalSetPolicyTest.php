@@ -5,6 +5,7 @@ namespace Tests\Policies;
 use Facades\Tests\Factories\GlobalFactory;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Globals\GlobalSet;
+use Statamic\Facades\GlobalSet as GlobalSets;
 
 class GlobalSetPolicyTest extends PolicyTestCase
 {
@@ -39,9 +40,9 @@ class GlobalSetPolicyTest extends PolicyTestCase
             'access de site',
         ]);
 
-        $global = GlobalFactory::handle('test')->data(['foo' => 'bar'])->create();
-        $global->makeLocalization('en')->save();
-        $global->makeLocalization('fr')->save();
+        $global = GlobalSets::make('test')->sites(['en' => null, 'fr' => null])->save();
+        $global->in('en')->save();
+        $global->in('fr')->save();
 
         $this->assertTrue($userWithEnPermission->can('index', GlobalSet::class));
         $this->assertFalse($userWithDePermission->can('index', GlobalSet::class));

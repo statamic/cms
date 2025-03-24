@@ -137,9 +137,9 @@ EOT;
             'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
         ]);
 
-        $set = GlobalSet::make('test')->sites(['en' => null, 'it' => null])->save();
-        $en = tap($set->makeLocalization('en')->data(['foo' => 'bar']))->save();
-        $de = tap($set->makeLocalization('de')->data(['foo' => 'bar']))->save();
+        $set = GlobalSet::make('test')->sites(['en' => null, 'it' => null, 'de' => null])->save();
+        $en = tap($set->in('en')->data(['foo' => 'bar']))->save();
+        $de = tap($set->in('de')->data(['foo' => 'bar']))->save();
 
         // Localizations will be queried fresh.
         GlobalVariables::shouldReceive('whereSet')->with('test')->andReturn(VariablesCollection::make([
@@ -321,7 +321,7 @@ EOT;
         ]);
 
         $global = tap(GlobalSet::make('test')->sites(['en' => null, 'fr' => 'en', 'de' => 'fr']))->save();
-        $global->makeLocalization('en')->data(['foo' => 'root'])->save();
+        $global->in('en')->data(['foo' => 'root'])->save();
 
         $this->assertEquals('root', $global->in('en')->foo);
         $this->assertEquals('root', $global->in('fr')->foo);

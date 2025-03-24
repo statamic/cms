@@ -1717,8 +1717,8 @@ EOT;
     {
         $set = Facades\GlobalSet::make('default')->sites(['en' => null, 'fr' => null])->save();
 
-        $set->makeLocalization('en')->data(['pic' => 'norris.jpg'])->save();
-        $set->makeLocalization('fr')->data(['pic' => 'hoff.jpg'])->save();
+        $set->in('en')->data(['pic' => 'norris.jpg'])->save();
+        $set->in('fr')->data(['pic' => 'hoff.jpg'])->save();
 
         $this->setSingleBlueprint('globals.default', [
             'fields' => [

@@ -505,7 +505,7 @@ class CascadeTest extends TestCase
     private function createGlobal($handle, $data)
     {
         $global = GlobalSet::make()->handle($handle)->save();
-        $global->makeLocalization('en')->data($data)->save();
+        $global->in('en')->data($data)->save();
 
         return $global->in('en');
     }

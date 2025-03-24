@@ -111,7 +111,7 @@ class MigrateDatesToUtcTest extends TestCase
     public function it_converts_date_fields_in_globals(string $fieldHandle, array $field, $original, $expected)
     {
         $globalSet = tap(GlobalSet::make('settings'))->save();
-        $globalSet->makeLocalization('en')->data([$fieldHandle => $original])->save();
+        $globalSet->in('en')->data([$fieldHandle => $original])->save();
 
         Blueprint::make('settings')->setNamespace('globals')->setContents(['fields' => [$field]])->save();
 

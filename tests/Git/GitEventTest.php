@@ -309,7 +309,7 @@ class GitEventTest extends TestCase
         Git::shouldReceive('dispatchCommit')->with('Global variables deleted')->once();
 
         $set = Facades\GlobalSet::make('main')->save();
-        $variables = $set->makeLocalization('en')->data(['foo' => 'bar']);
+        $variables = $set->in('en')->data(['foo' => 'bar']);
 
         $variables->save();
         $variables->delete();

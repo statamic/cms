@@ -186,7 +186,7 @@ class EmailTest extends TestCase
     private function makeEmailWithConfig(array $config)
     {
         $globalSet = GlobalSet::make()->handle('company_information')->save();
-        $globalSet->makeLocalization('en')->data([
+        $globalSet->in('en')->data([
             'name' => 'Example Company',
             'email' => 'info@example.com',
         ])->save();
