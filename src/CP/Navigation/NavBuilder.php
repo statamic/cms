@@ -4,7 +4,10 @@ namespace Statamic\CP\Navigation;
 
 use Exception;
 use Illuminate\Support\Facades\Cache;
+use Statamic\CommandPalette\Category;
+use Statamic\CommandPalette\Link;
 use Statamic\Facades\Blink;
+use Statamic\Facades\CommandPalette;
 use Statamic\Facades\Preference;
 use Statamic\Facades\User;
 use Statamic\Support\Arr;
@@ -18,6 +21,7 @@ class NavBuilder
     protected $items = [];
     protected $pendingItems = [];
     protected $withHidden = false;
+    protected $withCommandPalette = false;
     protected $itemsWithChildrenClosures = [];
     protected $sections = [];
     protected $sectionsOriginalItemIds = [];
@@ -53,6 +57,19 @@ class NavBuilder
     }
 
     /**
+     * Build with command palette.
+     *
+     * @param  bool  $withHidden
+     * @return $this
+     */
+    public function withCommandPalette(bool $withCommandPalette = false): self
+    {
+        $this->withCommandPalette = $withCommandPalette;
+
+        return $this;
+    }
+
+    /**
      * Build navigation.
      *
      * @param  mixed  $preferences
@@ -78,6 +95,7 @@ class NavBuilder
             ->applyPreferenceOverrides($preferences)
             ->buildSections()
             ->blinkUrls()
+            ->addToCommandPalette()
             ->get();
     }
 
@@ -1058,6 +1076,30 @@ class NavBuilder
         Blink::forget(static::UNRESOLVED_CHILDREN_URLS_CACHE_KEY);
         Cache::forget(static::ALL_URLS_CACHE_KEY);
         Blink::forget(static::ALL_URLS_CACHE_KEY);
+    }
+
+    /**
+     * Add built items to command palette.
+     *
+     * @return $this
+     */
+    protected function addToCommandPalette()
+    {
+        if (! $this->withCommandPalette) {
+            return $this;
+        }
+
+        $this->built
+            ->flatMap(fn ($section) => $section['items'])
+            ->filter(fn ($item) => $item->url())
+            ->each(fn ($item) => CommandPalette::addCommand(
+                (new Link(
+                    text: __($item->section()).' > '.__($item->display()),
+                    category: Category::Navigation,
+                ))->url($item->url())
+            ));
+
+        return $this;
     }
 
     /**

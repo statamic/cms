@@ -2,7 +2,6 @@
 
 namespace Statamic\CommandPalette;
 
-use Statamic\Facades\CP\Nav;
 use Statamic\Support\Arr;
 
 class Palette
@@ -26,29 +25,10 @@ class Palette
     public function build(): array
     {
         return $this
-            ->buildNavigation()
             ->buildActions()
             ->buildHistory()
             ->sort()
             ->toArray();
-    }
-
-    protected function buildNavigation(): self
-    {
-        // TODO:
-        // Use same blink cache as NavComposer?
-        // Do we also want to show/cache resolved item children?
-
-        Nav::build()
-            ->flatMap(fn ($section) => $section['items'])
-            ->each(fn ($item) => $this->addCommand(
-                (new Link(
-                    text: __($item->section()).' > '.__($item->display()),
-                    category: Category::Navigation,
-                ))->url($item->url())
-            ));
-
-        return $this;
     }
 
     protected function buildActions(): self

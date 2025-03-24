@@ -13,7 +13,6 @@
             @include('statamic::partials.session-expiry')
             @include('statamic::partials.licensing-alerts')
             @include('statamic::partials.global-header')
-            @include('statamic::partials.command-palette')
 
             <div
                 id="main"
@@ -57,6 +56,8 @@
             <keyboard-shortcuts-modal></keyboard-shortcuts-modal>
 
             <portal-targets></portal-targets>
+
+            @include('statamic::partials.command-palette')
         </div>
 
         @include('statamic::partials.scripts')
