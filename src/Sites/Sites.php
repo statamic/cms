@@ -290,26 +290,4 @@ class Sites
             collect($currentSites)->diffKeys($newSites)
         );
     }
-
-    /**
-     * Deprecated! This is being replaced by `setSites()` and `setSiteValue()`.
-     *
-     * Though Statamic sites can be updated for this breaking change,
-     * this gives time for addons to follow suit, and allows said
-     * addons to continue working across versions for a while.
-     *
-     * @deprecated
-     */
-    public function setConfig($key, $value = null)
-    {
-        if (is_null($value)) {
-            $this->setSites($key['sites']);
-
-            return;
-        }
-
-        $keyParts = explode('.', $key);
-
-        $this->setSiteValue($keyParts[1], $keyParts[2], $value);
-    }
 }

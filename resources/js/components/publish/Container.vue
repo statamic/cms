@@ -2,7 +2,7 @@
 import { defineStore, getActivePinia } from 'pinia';
 import uniqid from 'uniqid';
 import Component from '../Component';
-import { getCurrentInstance, computed } from 'vue';
+import { getCurrentInstance, computed, watch } from 'vue';
 import { usePublishContainerStore } from '@statamic/stores/publish-container.js';
 import { isEqual } from 'lodash-es';
 import clone from '@statamic/util/clone.js';
@@ -71,9 +71,11 @@ export default {
     created() {
         this.$events.$emit('publish-container-created', this);
 
-        this.store.$subscribe((mutation, state) => {
-            this.emitUpdatedEvent(state.values);
-        });
+        watch(
+            () => this.store.values,
+            (values) => this.emitUpdatedEvent(values),
+            { deep: true },
+        );
     },
 
     beforeUnmount() {

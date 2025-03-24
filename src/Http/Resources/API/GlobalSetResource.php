@@ -7,9 +7,6 @@ use Statamic\Statamic;
 
 class GlobalSetResource extends JsonResource
 {
-    /** @deprecated */
-    private static $relations = false;
-
     /**
      * Transform the resource into an array.
      *
@@ -25,22 +22,14 @@ class GlobalSetResource extends JsonResource
                 'api_url' => Statamic::apiRoute('globals.show', [$this->resource->handle()]),
             ]);
 
-        if (static::$relations) {
-            $with = $this->resource->blueprint()
-                ->fields()->all()
-                ->filter->isRelationship()->keys()->all();
+        $with = $this->resource->blueprint()
+            ->fields()->all()
+            ->filter->isRelationship()->keys()->all();
 
-            $collection->withRelations($with);
-        }
+        $collection->withRelations($with);
 
         return $collection
             ->withShallowNesting()
             ->toArray();
-    }
-
-    /** @deprecated */
-    public static function withRelations()
-    {
-        static::$relations = true;
     }
 }
