@@ -187,13 +187,13 @@ class CoreNavTest extends TestCase
             'de' => ['url' => '/', 'locale' => 'de_DE', 'name' => 'German'],
         ]);
 
-        $set1 = Facades\GlobalSet::make('has_some_french')->sites(['en' => null, 'fr' => null, 'de' => null]);
+        $set1 = Facades\GlobalSet::make('has_some_french')->sites(['en', 'fr', 'de']);
         $set1->save();
 
-        $set2 = Facades\GlobalSet::make('has_no_french')->sites(['en' => null, 'de' => null]);
+        $set2 = Facades\GlobalSet::make('has_no_french')->sites(['en', 'de']);
         $set2->save();
 
-        $set3 = Facades\GlobalSet::make('has_only_french')->sites(['fr' => null]);
+        $set3 = Facades\GlobalSet::make('has_only_french')->sites(['fr']);
         $set3->save();
 
         $this->setTestRoles(['test' => [

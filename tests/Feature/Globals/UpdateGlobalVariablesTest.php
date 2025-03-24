@@ -42,7 +42,7 @@ class UpdateGlobalVariablesTest extends TestCase
         ]);
         $this->setTestRoles(['test' => ['access cp', 'edit test globals']]);
         $user = tap(User::make()->assignRole('test'))->save();
-        $global = GlobalSet::make('test')->sites(['fr' => null])->save();
+        $global = GlobalSet::make('test')->sites(['fr'])->save();
         $global->in('fr')->save();
 
         $this

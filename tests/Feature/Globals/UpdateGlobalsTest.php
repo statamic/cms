@@ -70,7 +70,7 @@ class UpdateGlobalsTest extends TestCase
         $this->setTestRoles(['test' => ['access cp', 'configure globals']]);
         $user = User::make()->assignRole('test')->save();
 
-        $global = GlobalSet::make('test')->sites(['en' => null, 'it' => 'en'])->save();
+        $global = GlobalSet::make('test')->sites(['en', 'it' => 'en'])->save();
 
         $this->assertNotNull(GlobalVariables::find('test::en'));
         $this->assertNull(GlobalVariables::find('test::fr'));
@@ -97,7 +97,7 @@ class UpdateGlobalsTest extends TestCase
             'en' => null,
             'fr' => null,
             'de' => 'fr',
-        ], $global->sites()->all());
+        ], $global->origins()->all());
 
         $this->assertNotNull(GlobalVariables::find('test::en'));
         $this->assertNotNull(GlobalVariables::find('test::fr'));

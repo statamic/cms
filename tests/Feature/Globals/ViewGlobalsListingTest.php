@@ -57,9 +57,9 @@ class ViewGlobalsListingTest extends TestCase
             'edit test_three globals',
         ]]);
         $user = User::make()->assignRole('test')->save();
-        $one = GlobalSet::make('test_one')->sites(['en' => null, 'fr' => null])->save();
-        $two = GlobalSet::make('test_two')->sites(['en' => null])->save();
-        $three = GlobalSet::make('test_three')->sites(['en' => null])->save();
+        $one = GlobalSet::make('test_one')->sites(['en', 'fr'])->save();
+        $two = GlobalSet::make('test_two')->sites(['en'])->save();
+        $three = GlobalSet::make('test_three')->sites(['en'])->save();
 
         Site::setSelected('fr');
 
@@ -89,8 +89,8 @@ class ViewGlobalsListingTest extends TestCase
             'access fr site',
         ]]);
         $user = User::make()->assignRole('test')->save();
-        $one = GlobalSet::make('en')->sites(['en' => null])->save();
-        $two = GlobalSet::make('fr')->sites(['fr' => null])->save();
+        $one = GlobalSet::make('en')->sites(['en'])->save();
+        $two = GlobalSet::make('fr')->sites(['fr'])->save();
 
         Site::setSelected('fr');
 

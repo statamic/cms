@@ -1715,7 +1715,7 @@ EOT;
     #[Test]
     public function it_updates_global_sets()
     {
-        $set = Facades\GlobalSet::make('default')->sites(['en' => null, 'fr' => null])->save();
+        $set = Facades\GlobalSet::make('default')->sites(['en', 'fr'])->save();
 
         $set->in('en')->data(['pic' => 'norris.jpg'])->save();
         $set->in('fr')->data(['pic' => 'hoff.jpg'])->save();

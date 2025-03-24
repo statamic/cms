@@ -55,9 +55,9 @@ EOT;
         ]);
 
         $global = GlobalSet::make('test')->sites([
-            'a' => null,
+            'a',
             'b' => 'a',
-            'c' => null,
+            'c',
         ])->save();
 
         $a = $global->in('a')->data([
@@ -122,10 +122,10 @@ EOT;
         ]);
 
         $global = GlobalSet::make('test')->sites([
-            'a' => null,
+            'a',
             'b' => 'a',
             'c' => 'b',
-            'd' => null,
+            'd',
             'e' => 'd',
         ])->save();
 

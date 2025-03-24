@@ -57,8 +57,8 @@ class GlobalsController extends CpController
                 return [
                     'name' => $site->name(),
                     'handle' => $site->handle(),
-                    'enabled' => $set->sites()->has($site->handle()),
-                    'origin' => $set->sites()->get($site->handle()),
+                    'enabled' => $set->sites()->contains($site->handle()),
+                    'origin' => $set->origins()->get($site->handle()),
                 ];
             })->values(),
         ];

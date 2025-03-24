@@ -31,7 +31,7 @@ class GlobalSetVariablesPolicyTest extends PolicyTestCase
             'access de site',
         ]);
 
-        $global = tap(GlobalSet::make('test')->sites(['en' => null, 'fr' => null, 'de' => null]))->save();
+        $global = tap(GlobalSet::make('test')->sites(['en', 'fr', 'de']))->save();
 
         $this->assertTrue($user->can('edit', $global->in('en')));
         $this->assertTrue($user->can('view', $global->in('en')));

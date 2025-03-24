@@ -5,6 +5,7 @@ namespace Tests\Data\Globals;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Contracts\Globals\Variables;
 use Statamic\Events\GlobalSetCreated;
 use Statamic\Events\GlobalSetCreating;
 use Statamic\Events\GlobalSetDeleted;
@@ -27,6 +28,52 @@ class GlobalSetTest extends TestCase
 {
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
+
+    #[Test]
+    public function it_gets_and_sets_sites_and_origins()
+    {
+        $set = new GlobalSet;
+
+        $this->assertEquals(['en'], $set->sites()->all());
+        $this->assertEquals(['en' => null], $set->origins()->all());
+
+        $return = $set->sites(['en', 'fr', 'de']);
+        $this->assertEquals($set, $return);
+        $this->assertEquals(['en', 'fr', 'de'], $set->sites()->all());
+        $this->assertEquals(['en' => null, 'fr' => null, 'de' => null], $set->origins()->all());
+
+        $return = $set->sites(['en', 'fr' => 'en', 'de' => 'en', 'fr_ca' => 'fr']);
+        $this->assertEquals($set, $return);
+        $this->assertEquals(['en', 'fr', 'de', 'fr_ca'], $set->sites()->all());
+        $this->assertEquals(['en' => null, 'fr' => 'en', 'de' => 'en', 'fr_ca' => 'fr'], $set->origins()->all());
+
+        $return = $set->sites([
+            'en' => ['origin' => null],
+            'fr' => ['origin' => 'en'],
+            'de' => ['origin' => 'en'],
+            'fr_ca' => ['origin' => 'fr'],
+        ]);
+        $this->assertEquals($set, $return);
+        $this->assertEquals(['en', 'fr', 'de', 'fr_ca'], $set->sites()->all());
+        $this->assertEquals(['en' => null, 'fr' => 'en', 'de' => 'en', 'fr_ca' => 'fr'], $set->origins()->all());
+    }
+
+    #[Test]
+    public function requesting_a_localization_will_get_it_even_if_not_created()
+    {
+        $set = new GlobalSet;
+        $set->sites(['en', 'fr']);
+
+        $en = $set->in('en');
+        $this->assertInstanceOf(Variables::class, $en);
+        $this->assertEquals('en', $en->locale());
+
+        $fr = $set->in('fr');
+        $this->assertInstanceOf(Variables::class, $fr);
+        $this->assertEquals('fr', $fr->locale());
+
+        $this->assertNull($set->in('de'));
+    }
 
     #[Test]
     public function it_gets_file_contents_for_saving()
@@ -103,7 +150,7 @@ EOT;
             ->withArgs(fn ($arg) => $arg->locale() === 'fr')
             ->once();
 
-        $set = GlobalSet::make('test')->sites(['en' => null, 'fr' => null]);
+        $set = GlobalSet::make('test')->sites(['en', 'fr']);
         $set->save();
     }
 
@@ -116,7 +163,7 @@ EOT;
             'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
         ]);
 
-        $set = GlobalSet::make('test')->sites(['en' => null, 'it' => null, 'de' => null])->save();
+        $set = GlobalSet::make('test')->sites(['en', 'it', 'de'])->save();
         $en = tap($set->in('en')->data(['foo' => 'bar']))->save();
         $de = tap($set->in('de')->data(['foo' => 'bar']))->save();
 
@@ -141,7 +188,7 @@ EOT;
 
         Event::fake();
 
-        $set->sites(['en' => null, 'fr' => null])->save();
+        $set->sites(['en', 'fr'])->save();
 
         // No events should be dispatched for the English variables.
         Event::assertNotDispatched(GlobalVariablesSaved::class, function ($event) {
@@ -271,7 +318,7 @@ EOT;
             'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => '/de/'],
         ]);
 
-        $global = tap(GlobalSet::make('test')->sites(['en' => null, 'fr' => 'en', 'de' => 'fr']))->save();
+        $global = tap(GlobalSet::make('test')->sites(['en', 'fr' => 'en', 'de' => 'fr']))->save();
         $global->in('en')->data(['foo' => 'root'])->save();
 
         $this->assertEquals('root', $global->in('en')->foo);
@@ -294,22 +341,6 @@ EOT;
     }
 
     #[Test]
-    public function it_gets_available_sites_from_localizations()
-    {
-        $this->setSites([
-            'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-            'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
-            'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
-        ]);
-
-        $set = GlobalSet::make('test')->sites(['en' => null, 'fr' => null]);
-        $set->save();
-
-        $this->assertEquals(\Illuminate\Support\Collection::class, get_class($set->sites()));
-        $this->assertEquals(['en', 'fr'], $set->sites()->keys()->all());
-    }
-
-    #[Test]
     public function it_cannot_view_global_sets_from_sites_that_the_user_is_not_authorized_to_see()
     {
         $this->setSites([
@@ -318,13 +349,13 @@ EOT;
             'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
         ]);
 
-        $set1 = GlobalSet::make('has_some_french')->sites(['en' => null, 'fr' => null, 'de' => null]);
+        $set1 = GlobalSet::make('has_some_french')->sites(['en', 'fr', 'de']);
         $set1->save();
 
-        $set2 = GlobalSet::make('has_no_french')->sites(['en' => null, 'de' => null]);
+        $set2 = GlobalSet::make('has_no_french')->sites(['en', 'de']);
         $set2->save();
 
-        $set3 = GlobalSet::make('has_only_french')->sites(['fr' => null]);
+        $set3 = GlobalSet::make('has_only_french')->sites(['fr']);
         $set3->save();
 
         $this->setTestRoles(['test' => [

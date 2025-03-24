@@ -45,7 +45,7 @@ class GlobalSetPolicy
     {
         $user = User::fromUser($user);
 
-        if (! $this->userCanAccessAnySite($user, $set->sites()->keys())) {
+        if (! $this->userCanAccessAnySite($user, $set->sites())) {
             return false;
         }
 

@@ -121,7 +121,7 @@ GQL;
             'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
         ]);
 
-        $set = tap(GlobalSet::make('social')->sites(['en' => null, 'fr' => null]))->save();
+        $set = tap(GlobalSet::make('social')->sites(['en', 'fr']))->save();
         $set->in('en')->data(['twitter' => '@statamic'])->save();
         $set->in('fr')->data(['twitter' => '@statamic_fr'])->save();
         $social = Blueprint::makeFromFields(['twitter' => ['type' => 'text']])->setHandle('social')->setNamespace('globals');

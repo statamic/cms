@@ -235,7 +235,7 @@ class Variables implements Arrayable, ArrayAccess, Augmentable, Contract, Locali
     public function origin($origin = null)
     {
         if (func_num_args() === 0) {
-            $origin = $this->globalSet()->sites()->get($this->locale());
+            $origin = $this->globalSet()->origins()->get($this->locale());
 
             return $this->globalSet()->in($origin);
         }

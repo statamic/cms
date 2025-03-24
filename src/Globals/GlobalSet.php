@@ -26,9 +26,9 @@ class GlobalSet implements Contract
 
     protected $title;
     protected $handle;
-    protected $sites;
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
+    private $sites = [];
 
     public function id()
     {
@@ -122,11 +122,11 @@ class GlobalSet implements Contract
         $localizations = $this->freshLocalizations();
 
         $this->sites()
-            ->reject(fn ($origin, $site) => $localizations->has($site))
-            ->each(fn ($origin, $site) => $this->makeLocalization($site)->save());
+            ->reject(fn ($site) => $localizations->has($site))
+            ->each(fn ($site) => $this->makeLocalization($site)->save());
 
         $localizations
-            ->filter(fn ($localization) => ! $this->sites()->has($localization->locale()))
+            ->filter(fn ($localization) => ! $this->sites()->contains($localization->locale()))
             ->each->delete();
     }
 
@@ -161,7 +161,7 @@ class GlobalSet implements Contract
     {
         return Arr::removeNullValues([
             'title' => $this->title(),
-            'sites' => Site::multiEnabled() ? $this->sites()->all() : null,
+            'sites' => Site::multiEnabled() ? $this->origins()->all() : null,
         ]);
     }
 
@@ -172,23 +172,45 @@ class GlobalSet implements Contract
             ->locale($site);
     }
 
-    public function sites()
+    public function sites($sites = null)
     {
-        return $this
-            ->fluentlyGetOrSet('sites')
-            ->getter(function ($sites) {
-                if (! Site::multiEnabled() || ! $sites) {
-                    $sites = [Site::default()->handle() => null];
-                }
+        if (func_num_args() === 0) {
+            $sites = collect($this->sites);
 
-                return collect($sites);
-            })
-            ->args(func_get_args());
+            if ($sites->isEmpty()) {
+                return collect([Site::default()->handle()]);
+            }
+
+            return collect($this->sites)->keys();
+        }
+
+        $this->sites = collect($sites)->mapWithKeys(function ($value, $key) {
+            if (is_int($key)) {
+                return [$value => ['origin' => null]];
+            }
+
+            if (is_string($value) || is_null($value)) {
+                return [$key => ['origin' => $value]];
+            }
+
+            return [$key => $value];
+        })->all();
+
+        return $this;
+    }
+
+    public function origins()
+    {
+        $sites = empty($this->sites)
+            ? [Site::default()->handle() => ['origin' => null]]
+            : $this->sites;
+
+        return collect($sites)->map(fn ($value, $key) => $value['origin'] ?? null);
     }
 
     public function in($locale)
     {
-        if (! $this->sites()->has($locale)) {
+        if (! $this->sites()->contains($locale)) {
             return null;
         }
 
