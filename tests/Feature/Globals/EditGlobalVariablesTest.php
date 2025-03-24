@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Globals;
 
-use Facades\Tests\Factories\GlobalFactory;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\GlobalSet;
@@ -66,9 +65,6 @@ class EditGlobalVariablesTest extends TestCase
         $user = User::make()->assignRole('test')->save();
 
         $global = GlobalSet::make('test')->save();
-
-        // GlobalFactory would have created the variables/localization, so we'll remove it for this test.
-        $global->in('en')->delete();
 
         $this
             ->actingAs($user)
