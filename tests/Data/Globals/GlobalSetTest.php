@@ -39,20 +39,6 @@ class GlobalSetTest extends TestCase
 
         $set = (new GlobalSet)->title('The title')->sites(['en' => null, 'fr' => 'en']);
 
-        // We set the data but it's basically irrelevant since it won't get saved to this file.
-        $set->in('en', function ($loc) {
-            $loc->data([
-                'array' => ['first one', 'second one'],
-                'string' => 'The string',
-            ]);
-        });
-        $set->in('fr', function ($loc) {
-            $loc->data([
-                'array' => ['le first one', 'le second one'],
-                'string' => 'Le string',
-            ]);
-        });
-
         $expected = <<<'EOT'
 title: 'The title'
 sites:
@@ -75,13 +61,6 @@ EOT;
         ]);
 
         $set = (new GlobalSet)->title('SEO Settings');
-
-        $set->in('en', function ($loc) {
-            $loc->data([
-                'array' => ['first one', 'second one'],
-                'string' => 'The string',
-            ]);
-        });
 
         $set->save();
 
@@ -201,13 +180,6 @@ EOT;
 
         $set = (new GlobalSet)->title('SEO Settings');
 
-        $set->in('en', function ($loc) {
-            $loc->data([
-                'array' => ['first one', 'second one'],
-                'string' => 'The string',
-            ]);
-        });
-
         GlobalSetFacade::shouldReceive('save')->with($set);
         GlobalSetFacade::shouldReceive('find')->with($set->handle())->times(3)->andReturn(null, $set, $set);
 
@@ -231,13 +203,6 @@ EOT;
         ]);
 
         $set = (new GlobalSet)->title('SEO Settings');
-
-        $set->in('en', function ($loc) {
-            $loc->data([
-                'array' => ['first one', 'second one'],
-                'string' => 'The string',
-            ]);
-        });
 
         $set->saveQuietly();
 
@@ -264,13 +229,6 @@ EOT;
 
         $set = (new GlobalSet)->title('SEO Settings');
 
-        $set->in('en', function ($loc) {
-            $loc->data([
-                'array' => ['first one', 'second one'],
-                'string' => 'The string',
-            ]);
-        });
-
         $return = $set->save();
 
         $this->assertFalse($return);
@@ -293,13 +251,6 @@ EOT;
         ]);
 
         $set = (new GlobalSet)->title('SEO Settings');
-
-        $set->in('en', function ($loc) {
-            $loc->data([
-                'array' => ['first one', 'second one'],
-                'string' => 'The string',
-            ]);
-        });
 
         $set->save();
 
