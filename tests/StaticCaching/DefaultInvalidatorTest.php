@@ -10,6 +10,7 @@ use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Globals\GlobalSet;
+use Statamic\Contracts\Globals\Variables;
 use Statamic\Contracts\Structures\Nav;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\Term;
@@ -220,6 +221,10 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
             $m->shouldReceive('handle')->andReturn('social');
         });
 
+        $variables = tap(Mockery::mock(Variables::class), function ($m) use ($set) {
+            $m->shouldReceive('globalSet')->andReturn($set);
+        });
+
         $invalidator = new Invalidator($cacher, [
             'globals' => [
                 'social' => [
@@ -231,7 +236,7 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
             ],
         ]);
 
-        $this->assertNull($invalidator->invalidate($set));
+        $this->assertNull($invalidator->invalidate($variables));
     }
 
     #[Test]

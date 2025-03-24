@@ -35,6 +35,8 @@ trait ListensForContentEvents
         \Statamic\Events\FormSaved::class,
         \Statamic\Events\GlobalSetDeleted::class,
         \Statamic\Events\GlobalSetSaved::class,
+        \Statamic\Events\GlobalVariablesDeleted::class,
+        \Statamic\Events\GlobalVariablesSaved::class,
         \Statamic\Events\NavDeleted::class,
         \Statamic\Events\NavSaved::class,
         \Statamic\Events\NavTreeSaved::class,

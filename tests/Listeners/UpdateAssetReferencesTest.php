@@ -1715,12 +1715,10 @@ EOT;
     #[Test]
     public function it_updates_global_sets()
     {
-        $set = Facades\GlobalSet::make('default');
+        $set = Facades\GlobalSet::make('default')->sites(['en', 'fr'])->save();
 
-        $set->addLocalization($set->makeLocalization('en')->data(['pic' => 'norris.jpg']));
-        $set->addLocalization($set->makeLocalization('fr')->data(['pic' => 'hoff.jpg']));
-
-        $set->save();
+        $set->in('en')->data(['pic' => 'norris.jpg'])->save();
+        $set->in('fr')->data(['pic' => 'hoff.jpg'])->save();
 
         $this->setSingleBlueprint('globals.default', [
             'fields' => [
