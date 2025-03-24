@@ -235,12 +235,12 @@ class Variables implements Arrayable, ArrayAccess, Augmentable, Contract, Locali
     public function origin($origin = null)
     {
         if (func_num_args() === 0) {
-            $origin = $this->globalSet()->origins()->get($this->locale());
-
-            return $this->globalSet()->in($origin);
+            return $this->getOriginByString(
+                $this->globalSet()->origins()->get($this->locale())
+            );
         }
 
-        throw new \Exception('The origin cannot be set directly on variables, it must be set on the global set.');
+        throw new \Exception('The origin cannot be set directly. It must be defined on the global set.');
     }
 
     protected function shouldRemoveNullsFromFileData()
