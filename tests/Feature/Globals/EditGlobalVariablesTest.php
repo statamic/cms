@@ -76,4 +76,25 @@ class EditGlobalVariablesTest extends TestCase
             ->assertSuccessful()
             ->assertViewHas('values', ['foo' => null, 'unused' => null]);
     }
+
+    #[Test]
+    public function it_404s_if_invalid_site()
+    {
+        $this->setSites([
+            'en' => ['locale' => 'en', 'url' => '/'],
+            'fr' => ['locale' => 'fr', 'url' => '/fr/'],
+        ]);
+        $this->setTestRoles(['test' => ['access cp']]);
+        $user = User::make()->assignRole('test')->save();
+        $global = GlobalSet::make('test')->sites(['en', 'fr'])->save();
+
+        $url = $global->in('fr')->editUrl();
+        $global->sites(['en'])->save();
+
+        $this
+            ->from('/original')
+            ->actingAs($user)
+            ->get($url)
+            ->assertNotFound();
+    }
 }

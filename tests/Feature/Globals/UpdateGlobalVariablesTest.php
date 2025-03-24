@@ -54,6 +54,27 @@ class UpdateGlobalVariablesTest extends TestCase
     }
 
     #[Test]
+    public function it_404s_if_invalid_site()
+    {
+        $this->setSites([
+            'en' => ['locale' => 'en', 'url' => '/'],
+            'fr' => ['locale' => 'fr', 'url' => '/fr/'],
+        ]);
+        $this->setTestRoles(['test' => ['access cp', 'edit test globals']]);
+        $user = tap(User::make()->assignRole('test')->makeSuper())->save();
+        $global = GlobalSet::make('test')->sites(['en', 'fr'])->save();
+
+        $fr = $global->in('fr');
+        $url = $fr->updateUrl();
+        $global->sites(['en'])->save();
+
+        $this
+            ->actingAs($user)
+            ->patchJson($url, ['foo' => 'bar'])
+            ->assertNotFound();
+    }
+
+    #[Test]
     public function global_variables_get_updated()
     {
         $blueprint = Blueprint::make()->setContents(['fields' => [
