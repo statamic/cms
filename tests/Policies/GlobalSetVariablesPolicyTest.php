@@ -2,9 +2,9 @@
 
 namespace Tests\Policies;
 
-use Facades\Tests\Factories\GlobalFactory;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Globals\Variables;
+use Statamic\Facades\GlobalSet;
 
 class GlobalSetVariablesPolicyTest extends PolicyTestCase
 {
@@ -13,7 +13,7 @@ class GlobalSetVariablesPolicyTest extends PolicyTestCase
     {
         $user = $this->userWithPermissions(['edit test globals']);
 
-        $global = GlobalFactory::handle('test')->data(['foo' => 'bar'])->create();
+        $global = tap(GlobalSet::make('test'))->save();
 
         $this->assertTrue($user->can('edit', $global->inDefaultSite()));
         $this->assertTrue($user->can('view', $global->inDefaultSite()));
@@ -31,7 +31,7 @@ class GlobalSetVariablesPolicyTest extends PolicyTestCase
             'access de site',
         ]);
 
-        $global = GlobalFactory::handle('test')->sites(['en' => null, 'fr' => null, 'de' => null])->data(['foo' => 'bar'])->create();
+        $global = tap(GlobalSet::make('test')->sites(['en' => null, 'fr' => null, 'de' => null]))->save();
 
         $this->assertTrue($user->can('edit', $global->in('en')));
         $this->assertTrue($user->can('view', $global->in('en')));
@@ -56,7 +56,7 @@ class GlobalSetVariablesPolicyTest extends PolicyTestCase
     {
         $forbiddenUser = $this->userWithPermissions([]);
         $authorizedUser = $this->userWithPermissions(['configure globals']);
-        $global = GlobalFactory::handle('test')->data(['foo' => 'bar'])->create();
+        $global = tap(GlobalSet::make('test'))->save();
         $variables = $global->inDefaultSite();
 
         $this->assertTrue($authorizedUser->can('delete', $variables));

@@ -5,6 +5,7 @@ namespace Tests\Feature\Globals;
 use Facades\Tests\Factories\GlobalFactory;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\GlobalSet;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -20,7 +21,7 @@ class EditGlobalVariablesTest extends TestCase
     {
         $this->setTestRoles(['test' => ['access cp']]);
         $user = User::make()->assignRole('test')->save();
-        $global = GlobalFactory::handle('test')->create();
+        $global = GlobalSet::make('test')->save();
 
         $this
             ->from('/original')
@@ -42,7 +43,8 @@ class EditGlobalVariablesTest extends TestCase
         $this->setTestRoles(['test' => ['access cp', 'edit test globals']]);
         $user = User::make()->assignRole('test')->save();
 
-        $global = GlobalFactory::handle('test')->data(['foo' => 'bar'])->create();
+        $global = GlobalSet::make('test')->save();
+        $global->in('en')->data(['foo' => 'bar'])->save();
 
         $this
             ->actingAs($user)
@@ -63,7 +65,7 @@ class EditGlobalVariablesTest extends TestCase
         $this->setTestRoles(['test' => ['access cp', 'edit test globals']]);
         $user = User::make()->assignRole('test')->save();
 
-        $global = GlobalFactory::handle('test')->create();
+        $global = GlobalSet::make('test')->save();
 
         // GlobalFactory would have created the variables/localization, so we'll remove it for this test.
         $global->in('en')->delete();

@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Globals;
 
-use Facades\Tests\Factories\GlobalFactory;
 use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\GlobalSetSaved;
@@ -24,7 +23,7 @@ class UpdateGlobalVariablesTest extends TestCase
     {
         $this->setTestRoles(['test' => ['access cp', 'access en site']]);
         $user = User::make()->assignRole('test')->save();
-        $global = GlobalFactory::handle('test')->create();
+        $global = GlobalSet::make('test')->save();
 
         $this
             ->from('/original')
@@ -43,7 +42,7 @@ class UpdateGlobalVariablesTest extends TestCase
         ]);
         $this->setTestRoles(['test' => ['access cp', 'edit test globals']]);
         $user = tap(User::make()->assignRole('test'))->save();
-        $global = GlobalFactory::handle('test')->sites(['fr' => null])->data(['foo' => 'bar'])->create();
+        $global = GlobalSet::make('test')->sites(['fr' => null])->save();
         $global->in('fr')->save();
 
         $this
@@ -64,7 +63,7 @@ class UpdateGlobalVariablesTest extends TestCase
         Blueprint::shouldReceive('find')->with('globals.test')->andReturn($blueprint);
         $this->setTestRoles(['test' => ['access cp', 'edit test globals']]);
         $user = tap(User::make()->assignRole('test')->makeSuper())->save();
-        $global = GlobalFactory::handle('test')->data(['foo' => 'bar'])->create();
+        $global = GlobalSet::make('test')->save();
 
         Event::fake(); // Fake after initial global has been created so its event isn't tracked.
 

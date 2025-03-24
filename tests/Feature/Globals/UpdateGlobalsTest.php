@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Globals;
 
-use Facades\Tests\Factories\GlobalFactory;
 use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\GlobalSetSaved;
@@ -23,7 +22,7 @@ class UpdateGlobalsTest extends TestCase
     {
         $this->setTestRoles(['test' => ['access cp']]);
         $user = User::make()->assignRole('test')->save();
-        $global = GlobalFactory::handle('test')->create();
+        $global = GlobalSet::make('test')->save();
 
         $this
             ->actingAs($user)
@@ -37,7 +36,7 @@ class UpdateGlobalsTest extends TestCase
         $this->setTestRoles(['test' => ['access cp', 'configure globals']]);
         $user = User::make()->assignRole('test')->save();
 
-        $global = GlobalFactory::handle('test')->title('Test')->create();
+        $global = GlobalSet::make('test')->title('Test')->save();
 
         Event::fake();
 
@@ -71,7 +70,7 @@ class UpdateGlobalsTest extends TestCase
         $this->setTestRoles(['test' => ['access cp', 'configure globals']]);
         $user = User::make()->assignRole('test')->save();
 
-        $global = GlobalFactory::handle('test')->sites(['en' => null, 'it' => 'en'])->create();
+        $global = GlobalSet::make('test')->sites(['en' => null, 'it' => 'en'])->save();
 
         $this->assertNotNull(GlobalVariables::find('test::en'));
         $this->assertNull(GlobalVariables::find('test::fr'));

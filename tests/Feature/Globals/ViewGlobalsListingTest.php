@@ -2,8 +2,8 @@
 
 namespace Tests\Feature\Globals;
 
-use Facades\Tests\Factories\GlobalFactory;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Support\Arr;
@@ -26,9 +26,9 @@ class ViewGlobalsListingTest extends TestCase
             'edit test_three globals',
         ]]);
         $user = User::make()->assignRole('test')->save();
-        GlobalFactory::handle('test_one')->create();
-        GlobalFactory::handle('test_two')->create();
-        GlobalFactory::handle('test_three')->create();
+        GlobalSet::make('test_one')->save();
+        GlobalSet::make('test_two')->save();
+        GlobalSet::make('test_three')->save();
 
         $this->actingAs($user)
             ->get(cp_route('globals.index'))
@@ -57,9 +57,9 @@ class ViewGlobalsListingTest extends TestCase
             'edit test_three globals',
         ]]);
         $user = User::make()->assignRole('test')->save();
-        $one = GlobalFactory::handle('test_one')->sites(['en' => null, 'fr' => null])->create();
-        $two = GlobalFactory::handle('test_two')->sites(['en' => null])->create();
-        $three = GlobalFactory::handle('test_three')->sites(['en' => null])->create();
+        $one = GlobalSet::make('test_one')->sites(['en' => null, 'fr' => null])->save();
+        $two = GlobalSet::make('test_two')->sites(['en' => null])->save();
+        $three = GlobalSet::make('test_three')->sites(['en' => null])->save();
 
         Site::setSelected('fr');
 
@@ -89,8 +89,8 @@ class ViewGlobalsListingTest extends TestCase
             'access fr site',
         ]]);
         $user = User::make()->assignRole('test')->save();
-        $one = GlobalFactory::handle('en')->sites(['en' => null])->create();
-        $two = GlobalFactory::handle('fr')->sites(['fr' => null])->create();
+        $one = GlobalSet::make('en')->sites(['en' => null])->save();
+        $two = GlobalSet::make('fr')->sites(['fr' => null])->save();
 
         Site::setSelected('fr');
 
