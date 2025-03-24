@@ -5,22 +5,18 @@ namespace Statamic\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Str;
 use Statamic\Console\EnhancesCommands;
 use Statamic\Console\RunsInPlease;
 use Statamic\Console\ValidatesInput;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Config;
 use Statamic\Facades\File;
-use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Nav;
 use Statamic\Facades\Role;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
-use Statamic\Facades\YAML;
 use Statamic\Rules\Handle;
 use Statamic\Statamic;
-use Statamic\Support\Arr;
 use Statamic\Support\Traits\Hookable;
 use Wilderborn\Partyline\Facade as Partyline;
 
@@ -105,16 +101,9 @@ class Multisite extends Command
 
     private function globalsHaveBeenMoved(string $siteHandle): bool
     {
-        $directory = Stache::store('globals')->directory();
-
-        return File::getFiles($directory)
-            ->map(fn (string $path) => Str::afterLast($path, '/'))
-            ->filter(fn (string $path) => Str::endsWith($path, '.yaml'))
-            ->every(function (string $path) use ($directory) {
-                $contents = YAML::file($directory.$path)->parse();
-
-                return Arr::has($contents, 'sites', []);
-            });
+        return File::exists(
+            Stache::store('globals')->directory().DIRECTORY_SEPARATOR.$siteHandle
+        );
     }
 
     private function navsHaveBeenMoved(string $siteHandle): bool
@@ -273,20 +262,28 @@ class Multisite extends Command
 
     private function convertGlobalSets(): self
     {
-        Config::set('statamic.system.multisite', true);
+        if ($this->siteHandle === 'default') {
+            // If it's default, the variables are already in the right spot.
+            return $this;
+        }
 
-        Stache::enableUpdatingIndexes();
+        $directory = Stache::store('globals')->directory();
+        $originalDirectory = $directory.DIRECTORY_SEPARATOR.'default';
+        $newDirectory = $directory.DIRECTORY_SEPARATOR.$this->siteHandle;
 
-        GlobalSet::all()->each(function ($set) {
-            $this->components->task(
-                description: "Updating global [{$set->handle()}]...",
-                task: function () use ($set) {
-                    $set->save();
-                }
-            );
-        });
+        File::makeDirectory($newDirectory);
 
-        Stache::disableUpdatingIndexes();
+        collect(File::getFiles($originalDirectory))
+            ->each(function ($path) use ($originalDirectory, $newDirectory) {
+                $basename = pathinfo($path, PATHINFO_BASENAME);
+
+                File::move(
+                    $originalDirectory.DIRECTORY_SEPARATOR.$basename,
+                    $newDirectory.DIRECTORY_SEPARATOR.$basename
+                );
+            });
+
+        File::delete($originalDirectory);
 
         return $this;
     }

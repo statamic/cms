@@ -186,13 +186,6 @@ class Stache
         return $this;
     }
 
-    public function enableUpdatingIndexes()
-    {
-        $this->updateIndexes = true;
-
-        return $this;
-    }
-
     public function shouldUpdateIndexes()
     {
         return $this->updateIndexes;
