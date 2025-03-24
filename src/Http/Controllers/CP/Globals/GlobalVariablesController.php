@@ -19,7 +19,7 @@ class GlobalVariablesController extends CpController
         }
 
         if (! $variables = $set->in($site)) {
-            abort(404);
+            return $this->pageNotFound();
         }
 
         $this->authorize('edit', $variables);
@@ -87,7 +87,7 @@ class GlobalVariablesController extends CpController
         }
 
         if (! $set = $set->in($site)) {
-            abort(404);
+            return $this->pageNotFound();
         }
 
         $this->authorize('edit', $set);
