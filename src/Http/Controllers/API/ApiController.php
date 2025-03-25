@@ -87,7 +87,7 @@ class ApiController extends Controller
      */
     protected function filterSortAndPaginate($query)
     {
-        return $this->filterSortScopeAndPaginate($query);
+        return $this->updateAndPaginate($query);
     }
 
     /**
@@ -96,7 +96,7 @@ class ApiController extends Controller
      * @param  \Statamic\Query\Builder  $query
      * @return \Statamic\Extensions\Pagination\LengthAwarePaginator
      */
-    protected function filterSortScopeAndPaginate($query)
+    protected function updateAndPaginate($query)
     {
         return $this
             ->filter($query)

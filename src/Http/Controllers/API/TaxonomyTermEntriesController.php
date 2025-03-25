@@ -47,7 +47,7 @@ class TaxonomyTermEntriesController extends ApiController
         $with = $this->getRelationshipFieldsFromCollections($taxonomy);
 
         return app(EntryResource::class)::collection(
-            $this->filterSortAndPaginate($query->with($with))
+            $this->updateAndPaginate($query->with($with))
         );
     }
 

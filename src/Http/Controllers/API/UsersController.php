@@ -17,7 +17,7 @@ class UsersController extends ApiController
         $this->abortIfDisabled();
 
         return app(UserResource::class)::collection(
-            $this->filterSortAndPaginate(User::query())
+            $this->updateAndPaginate(User::query())
         );
     }
 
