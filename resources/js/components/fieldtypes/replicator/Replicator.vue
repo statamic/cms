@@ -205,7 +205,7 @@ export default {
 
         addSet(handle, index) {
             const set = {
-                ...this.meta.defaults[handle],
+                ...clone(this.meta.defaults[handle]),
                 _id: uniqid(),
                 type: handle,
                 enabled: true,
@@ -228,7 +228,7 @@ export default {
             const index = this.value.findIndex(v => v._id === old_id);
             const old = this.value[index];
             const set = {
-                ...old,
+                ...clone(old),
                 _id: uniqid(),
             };
 
