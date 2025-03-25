@@ -30,7 +30,7 @@ class CollectionEntriesController extends ApiController
             ->filter->isRelationship()->keys()->all();
 
         return app(EntryResource::class)::collection(
-            $this->filterSortAndPaginate($collection->queryEntries()->with($with))
+            $this->updateAndPaginate($collection->queryEntries()->with($with))
         );
     }
 

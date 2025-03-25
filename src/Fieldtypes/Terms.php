@@ -26,6 +26,8 @@ use Statamic\Query\Scopes\Filters\Fields\Terms as TermsFilter;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class Terms extends Relationship
 {
     protected $canEdit = true;
@@ -123,7 +125,9 @@ class Terms extends Relationship
 
         $query = $this->queryBuilder($values);
 
-        return $single ? Blink::once($key, fn () => $query->first()) : $query;
+        return $single && ! config('statamic.system.always_augment_to_query', false)
+            ? Blink::once($key, fn () => $query->first())
+            : $query;
     }
 
     private function queryBuilder($values)
@@ -207,6 +211,7 @@ class Terms extends Relationship
                 return explode('::', $id, 2)[1];
             })
                 ->unique()
+                ->values()
                 ->all();
 
             if ($this->field->get('max_items') === 1) {

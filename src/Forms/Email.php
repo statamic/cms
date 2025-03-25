@@ -14,6 +14,8 @@ use Statamic\Sites\Site;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class Email extends Mailable
 {
     use Queueable, SerializesModels;
@@ -160,6 +162,7 @@ class Email extends Mailable
             });
 
         $data = array_merge($augmented, $this->getGlobalsData(), [
+            'email_config' => $this->config,
             'config' => config()->all(),
             'fields' => $fields,
             'site_url' => Config::getSiteUrl(),

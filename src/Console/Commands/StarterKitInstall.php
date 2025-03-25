@@ -49,10 +49,10 @@ class StarterKitInstall extends Command
         [$package, $branch] = $this->getPackageAndBranch();
 
         if ($this->validationFails($package, new ComposerPackage)) {
-            return;
+            return 1;
         }
 
-        $licenseManager = StarterKitLicenseManager::validate($package, $this->option('license'), $this);
+        $licenseManager = StarterKitLicenseManager::validate($package, $this->option('license'), $this, $this->input->isInteractive());
 
         if (! $licenseManager->isValid()) {
             return;
@@ -75,7 +75,7 @@ class StarterKitInstall extends Command
         try {
             $installer->install();
         } catch (StarterKitException $exception) {
-            $this->error($exception->getMessage());
+            $this->components->error($exception->getMessage());
 
             return 1;
         }
@@ -90,7 +90,11 @@ class StarterKitInstall extends Command
             $this->comment('composer global update statamic/cli'.PHP_EOL);
         }
 
-        $this->components->info("Starter kit [$package] was successfully installed.");
+        if (version_compare(app()->version(), '11', '<')) {
+            return $this->components->info("Starter kit [$package] was successfully installed.");
+        }
+
+        $this->components->success("Starter kit [$package] was successfully installed.");
     }
 
     /**

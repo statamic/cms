@@ -110,16 +110,16 @@ class PasswordEntryTest extends PageProtectionTestCase
     {
         return [
             'string' => [
-                'value' => 'the-local-password',
-                'submitted' => 'the-local-password',
+                'the-local-password',
+                'the-local-password',
             ],
             'array with single value' => [
-                'value' => ['the-local-password'],
-                'submitted' => 'the-local-password',
+                ['the-local-password'],
+                'the-local-password',
             ],
             'array with multiple values' => [
-                'value' => ['first-local-password', 'second-local-password'],
-                'submitted' => 'second-local-password',
+                ['first-local-password', 'second-local-password'],
+                'second-local-password',
             ],
         ];
     }

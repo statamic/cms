@@ -15,6 +15,7 @@ abstract class Dictionary
 
     protected array $fields = [];
     protected array $config = [];
+    protected array $keywords = [];
 
     abstract public function options(?string $search = null): array;
 
@@ -67,5 +68,17 @@ abstract class Dictionary
         }
 
         return GraphQL::string();
+    }
+
+    public function optionItems(?string $search = null): array
+    {
+        return collect($this->options($search))
+            ->map(fn ($label, $value) => new Item($value, $label, $this->get($value)->extra()))
+            ->all();
+    }
+
+    public function keywords(): array
+    {
+        return $this->keywords;
     }
 }

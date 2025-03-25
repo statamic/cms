@@ -9,6 +9,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
+use Statamic\Query\Scopes\Scope;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -667,6 +668,20 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     #[Test]
+    public function entries_are_found_using_scopes()
+    {
+        CustomScope::register();
+        Entry::allowQueryScope(CustomScope::class);
+        Entry::allowQueryScope(CustomScope::class, 'whereCustom');
+
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1'])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2'])->create();
+
+        $this->assertCount(1, Entry::query()->customScope(['title' => 'Post 1'])->get());
+        $this->assertCount(1, Entry::query()->whereCustom(['title' => 'Post 1'])->get());
+    }
+
+    #[Test]
     public function entries_are_found_using_offset()
     {
         $this->createDummyCollectionAndEntries();
@@ -906,5 +921,13 @@ class EntryQueryBuilderTest extends TestCase
             'post-3',
             'thing-2',
         ], Entry::query()->where('type', 'b')->pluck('slug')->all());
+    }
+}
+
+class CustomScope extends Scope
+{
+    public function apply($query, $params)
+    {
+        $query->where('title', $params['title']);
     }
 }

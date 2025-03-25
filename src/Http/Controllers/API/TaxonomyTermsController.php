@@ -25,7 +25,7 @@ class TaxonomyTermsController extends ApiController
             ->filter->isRelationship()->keys()->all();
 
         return app(TermResource::class)::collection(
-            $this->filterSortAndPaginate($taxonomy->queryTerms()->with($with))
+            $this->updateAndPaginate($taxonomy->queryTerms()->with($with))
         );
     }
 

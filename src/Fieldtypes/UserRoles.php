@@ -7,6 +7,8 @@ use Statamic\Facades\Role;
 use Statamic\Facades\Scope;
 use Statamic\GraphQL\Types\RoleType;
 
+use function Statamic\trans as __;
+
 class UserRoles extends Relationship
 {
     protected $canEdit = false;

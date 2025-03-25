@@ -14,6 +14,8 @@ use Statamic\Support\Str;
 
 class Grid extends Fieldtype
 {
+    use AddsEntryValidationReplacements;
+
     protected $categories = ['structured'];
     protected $defaultable = false;
 
@@ -158,7 +160,10 @@ class Grid extends Fieldtype
             ->validator()
             ->withContext([
                 'prefix' => $this->field->validationContext('prefix').$this->rowRuleFieldPrefix($index).'.',
-            ])
+            ]);
+
+        $rules = $this
+            ->addEntryValidationReplacements($this->field, $rules)
             ->rules();
 
         return collect($rules)->mapWithKeys(function ($rules, $handle) use ($index) {

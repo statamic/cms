@@ -23,7 +23,7 @@ class AssetsController extends ApiController
             ->filter->isRelationship()->keys()->all();
 
         return app(AssetResource::class)::collection(
-            $this->filterSortAndPaginate($assetContainer->queryAssets()->with($with))
+            $this->updateAndPaginate($assetContainer->queryAssets()->with($with))
         );
     }
 

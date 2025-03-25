@@ -355,6 +355,25 @@ class FrontendTest extends TestCase
     }
 
     #[Test]
+    public function header_is_added_to_protected_responses()
+    {
+        $page = $this->createPage('about');
+
+        $this
+            ->get('/about')
+            ->assertOk()
+            ->assertHeaderMissing('X-Statamic-Protected');
+
+        $page->set('protect', 'logged_in')->save();
+
+        $this
+            ->actingAs(User::make())
+            ->get('/about')
+            ->assertOk()
+            ->assertHeader('X-Statamic-Protected', true);
+    }
+
+    #[Test]
     public function key_variables_key_added()
     {
         $page = $this->createPage('about');
