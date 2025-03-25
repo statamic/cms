@@ -1,5 +1,31 @@
 # Release Notes
 
+## 5.52.0 (2025-03-25)
+
+### What's new
+- Support query scopes in GraphQL [#11533](https://github.com/statamic/cms/issues/11533) by @ryanmitchell
+- Support query scopes in REST API [#10893](https://github.com/statamic/cms/issues/10893) by @ryanmitchell
+- Added option to exclude asset containers from generating presets [#11613](https://github.com/statamic/cms/issues/11613) by @kevinmeijer97
+- Handle collection instances in `first` modifier [#11608](https://github.com/statamic/cms/issues/11608) by @marcorieser
+- Autoload scopes from `Query/Scopes` and `Query/Scopes/Filters` [#11601](https://github.com/statamic/cms/issues/11601) by @duncanmcclean
+- Allow revisions path to be configurable with an .env [#11594](https://github.com/statamic/cms/issues/11594) by @ryanmitchell
+- Ability to exclude parents from nav tag [#11597](https://github.com/statamic/cms/issues/11597) by @jasonvarga
+- Allow a custom asset meta cache store to be specified [#11512](https://github.com/statamic/cms/issues/11512) by @ryanmitchell
+
+### What's fixed
+- Fix icon fieldtype in nav builder [#11618](https://github.com/statamic/cms/issues/11618) by @jasonvarga
+- Escape start_page Preference to avoid invalid Redirect [#11616](https://github.com/statamic/cms/issues/11616) by @naabster
+- Fix issue with localization files named like fieldset handles [#11603](https://github.com/statamic/cms/issues/11603) by @ChristianPraiss
+- Ensure toasts fired in an AssetUploaded event are delivered to front end [#11592](https://github.com/statamic/cms/issues/11592) by @ryanmitchell
+- Prevent null data from being saved to eloquent users [#11591](https://github.com/statamic/cms/issues/11591) by @ryanmitchell
+- Change default value of update command selection [#11581](https://github.com/statamic/cms/issues/11581) by @Jade-GG
+- Adjust relationship field typeahead no-options message [#11590](https://github.com/statamic/cms/issues/11590) by @jasonvarga
+- Bump axios from 1.7.4 to 1.8.2 [#11604](https://github.com/statamic/cms/issues/11604) by @dependabot
+- Bump tj-actions/changed-files [#11602](https://github.com/statamic/cms/issues/11602) by @dependabot
+- Spanish translations [#11617](https://github.com/statamic/cms/issues/11617) by @nopticon
+
+
+
 ## 5.51.0 (2025-03-17)
 
 ### What's new
