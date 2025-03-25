@@ -19,7 +19,7 @@ class AuthorizeQueryScopes extends Middleware
 
         if ($forbidden->isNotEmpty()) {
             throw ValidationException::withMessages([
-                'filter' => 'Forbidden: '.$forbidden->join(', '),
+                'query_scope' => 'Forbidden: '.$forbidden->join(', '),
             ]);
         }
 

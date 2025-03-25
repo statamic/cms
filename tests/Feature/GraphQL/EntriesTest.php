@@ -952,6 +952,40 @@ GQL;
     }
 
     #[Test]
+    public function it_cannot_use_query_scopes_by_default()
+    {
+        $this->createEntries();
+
+        $query = <<<'GQL'
+{
+    entries(query_scope: { test_scope: { operator: "is", value: 1 }}) {
+        data {
+            id
+            title
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertJson([
+                'errors' => [[
+                    'message' => 'validation',
+                    'extensions' => [
+                        'validation' => [
+                            'query_scope' => ['Forbidden: test_scope'],
+                        ],
+                    ],
+                ]],
+                'data' => [
+                    'entries' => null,
+                ],
+            ]);
+    }
+
+    #[Test]
     public function it_can_use_a_query_scope_when_configuration_allows_for_it()
     {
         $this->createEntries();
