@@ -64,7 +64,7 @@ class AssetsGeneratePresets extends Command
         }
 
         AssetContainer::all()->filter(function ($container) use ($excludedContainers) {
-            return ! in_array($container->handle(), $excludedContainers);
+            return ! in_array($container->handle(), $excludedContainers ?? []);
         })->sortBy('title')->each(function ($container) {
             note('Generating presets for <comment>'.$container->title().'</comment>...');
             $this->generatePresets($container);
