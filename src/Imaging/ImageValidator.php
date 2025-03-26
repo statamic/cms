@@ -45,8 +45,8 @@ class ImageValidator
             $allowed = ['jpeg', 'jpg', 'png', 'gif', 'webp'];
         } elseif ($driver == 'imagick') {
             $allowed = ['jpeg', 'jpg', 'png', 'gif', 'tif', 'bmp', 'psd', 'webp'];
-        } elseif ($driver == 'libvips') {
-            $allowed = ['jpeg', 'jpg', 'png', 'gif', 'tif', 'webp', 'heic'];
+        } elseif ($driver == \Intervention\Image\Drivers\Vips\Driver::class) {
+            $allowed = ['jpeg', 'jpg', 'png', 'gif', 'tif', 'bmp', 'psd', 'webp'];
         } else {
             throw new \Exception("Unsupported image manipulation driver [$driver]");
         }
