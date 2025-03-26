@@ -150,7 +150,13 @@ class Tags extends BaseTags
     {
         $isBlade = $this->isAntlersBladeComponent();
 
-        $slot = new RenderableFieldSlot($this->content, $isBlade);
+        $scope = $this->params->get('scope');
+
+        $slot = new RenderableFieldSlot(
+            html: $this->content,
+            scope: $scope,
+            isBlade: $isBlade,
+        );
 
         collect($this->context['fields'])
             ->each(fn ($field) => $field['field']->slot($slot)->isBlade($isBlade));
