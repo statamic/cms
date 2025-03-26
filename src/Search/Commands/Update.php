@@ -8,6 +8,8 @@ use Statamic\Events\SearchIndexUpdated;
 use Statamic\Facades\Search;
 use Statamic\Support\Str;
 
+use function Laravel\Prompts\select;
+
 class Update extends Command
 {
     use RunsInPlease;
@@ -27,7 +29,7 @@ class Update extends Command
 
             SearchIndexUpdated::dispatch($index);
 
-            $this->info("Index <comment>{$index->name()}</comment> updated.");
+            $this->components->info("Index <comment>{$index->name()}</comment> updated.");
         }
     }
 
@@ -45,13 +47,13 @@ class Update extends Command
             return $this->indexes();
         }
 
-        $selection = $this->choice(
-            'Select an index to update',
-            collect(['all'])->merge($this->indexes()->keys())->all(),
-            0
+        $selection = select(
+            label: 'Which search index would you like to update?',
+            options: collect(['All'])->merge($this->indexes()->keys())->all(),
+            default: 'All'
         );
 
-        return ($selection == 'all') ? $this->indexes() : [$this->indexes()->get($selection)];
+        return ($selection == 'All') ? $this->indexes() : [$this->indexes()->get($selection)];
     }
 
     private function indexes()

@@ -18,6 +18,7 @@ use Statamic\Support\DateFormat;
 class Date extends Fieldtype
 {
     protected $categories = ['special'];
+    protected $keywords = ['datetime', 'time'];
 
     const DEFAULT_DATE_FORMAT = 'Y-m-d';
     const DEFAULT_DATETIME_FORMAT = 'Y-m-d H:i';
@@ -347,6 +348,10 @@ class Date extends Fieldtype
 
     private function parseSaved($value)
     {
+        if ($value instanceof Carbon) {
+            return $value;
+        }
+
         try {
             return Carbon::createFromFormat($this->saveFormat(), $value);
         } catch (InvalidFormatException|InvalidArgumentException $e) {

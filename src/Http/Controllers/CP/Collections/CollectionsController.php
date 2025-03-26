@@ -20,6 +20,8 @@ use Statamic\Structures\CollectionStructure;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class CollectionsController extends CpController
 {
     public function index(Request $request)
@@ -121,7 +123,7 @@ class CollectionsController extends CpController
                 ->all(),
             'canCreate' => User::current()->can('create', [EntryContract::class, $collection]) && $collection->hasVisibleEntryBlueprint(),
             'canChangeLocalizationDeleteBehavior' => count($authorizedSites) > 1 && (count($authorizedSites) == $collection->sites()->count()),
-            'actions' => Action::for($collection),
+            'actions' => Action::for($collection, ['view' => 'form']),
         ];
 
         if ($collection->queryEntries()->count() === 0) {

@@ -35,6 +35,7 @@
             auth()->user()->can('edit', $collection)
             || auth()->user()->can('delete', $collection)
             || auth()->user()->can('configure fields')
+            || $actions->isNotEmpty()
         )
         <template #twirldown="{ actionCompleted }">
             @can('edit', $collection)
@@ -52,17 +53,6 @@
                 :actions="{{ $actions }}"
                 @completed="actionCompleted"
             ></data-list-inline-actions>
-            @can('delete', $collection)
-                <dropdown-item :text="__('Delete Collection')" class="warning" @click="$refs.deleter.confirm()">
-                    <resource-deleter
-                        ref="deleter"
-                        resource-title="{{ $collection->title() }}"
-                        route="{{ cp_route('collections.destroy', $collection->handle()) }}"
-                        redirect="{{ cp_route('collections.index') }}"
-                    ></resource-deleter>
-                </dropdown-item>
-            @endcan
-
         </template>
         @endif
     </collection-view>

@@ -229,6 +229,7 @@ class GlobalRuntimeState
         StackReplacementManager::clearStackState();
         LiteralReplacementManager::resetLiteralState();
         RecursiveNodeManager::resetRecursiveNodeState();
+        RuntimeParser::clearRenderNodeCache();
     }
 
     public static function createIndicatorVariable($indicator)

@@ -10,6 +10,7 @@ use Statamic\Facades;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Token;
 use Statamic\Facades\User;
+use Statamic\Query\Scopes\Scope;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -137,6 +138,25 @@ class APITest extends TestCase
     }
 
     #[Test]
+    public function it_can_use_a_query_scope_on_collection_entries_when_configuration_allows_for_it()
+    {
+        app('statamic.scopes')['test_scope'] = TestScope::class;
+
+        Facades\Config::set('statamic.api.resources.collections.pages', [
+            'allowed_query_scopes' => ['test_scope'],
+        ]);
+
+        Facades\Collection::make('pages')->save();
+
+        Facades\Entry::make()->collection('pages')->id('about')->slug('about')->published(true)->save();
+        Facades\Entry::make()->collection('pages')->id('dance')->slug('dance')->published(true)->save();
+        Facades\Entry::make()->collection('pages')->id('nectar')->slug('nectar')->published(true)->save();
+
+        $this->assertEndpointDataCount('/api/collections/pages/entries?query_scope[test_scope][operator]=is&query_scope[test_scope][value]=about', 1);
+        $this->assertEndpointDataCount('/api/collections/pages/entries?query_scope[test_scope][operator]=isnt&query_scope[test_scope][value]=about', 2);
+    }
+
+    #[Test]
     public function it_can_filter_collection_entries_when_configuration_allows_for_it()
     {
         Facades\Config::set('statamic.api.resources.collections.pages', [
@@ -153,6 +173,7 @@ class APITest extends TestCase
         $this->assertEndpointDataCount('/api/collections/pages/entries?filter[status:is]=draft', 2);
         $this->assertEndpointDataCount('/api/collections/pages/entries?filter[published:is]=true', 1);
         $this->assertEndpointDataCount('/api/collections/pages/entries?filter[published:is]=false', 2);
+        $this->assertEndpointDataCount('/api/collections/pages/entries?filter[status:is]=any', 3);
     }
 
     #[Test]
@@ -383,6 +404,22 @@ class APITest extends TestCase
     }
 
     #[Test]
+    public function can_view_entries_when_cp_route_is_empty()
+    {
+        Facades\Config::set('statamic.cp.route', '');
+        Facades\Config::set('statamic.api.resources.collections', true);
+
+        Facades\Collection::make('pages')->save();
+        Facades\Entry::make()->collection('pages')->id('home')->data(['title' => 'Home'])->save();
+
+        $this->get('/api/collections/pages/entries/home')->assertJson([
+            'data' => [
+                'title' => 'Home',
+            ],
+        ]);
+    }
+
+    #[Test]
     #[DataProvider('userPasswordFilterProvider')]
     public function it_never_allows_filtering_users_by_password($filter)
     {
@@ -527,6 +564,22 @@ class APITest extends TestCase
         ];
     }
 
+    #[Test]
+    public function can_view_terms_when_cp_route_is_empty()
+    {
+        Facades\Config::set('statamic.cp.route', '');
+        Facades\Config::set('statamic.api.resources.taxonomies', true);
+
+        Facades\Taxonomy::make('topics')->save();
+        Facades\Term::make()->taxonomy('topics')->inDefaultLocale()->slug('dance')->data(['title' => 'Dance'])->save();
+
+        $this->get('/api/taxonomies/topics/terms/dance')->assertJson([
+            'data' => [
+                'title' => 'Dance',
+            ],
+        ]);
+    }
+
     private function makeCollection($handle)
     {
         return Facades\Collection::make($handle);
@@ -589,5 +642,13 @@ class FakeTokenHandler
     public function handle(\Statamic\Contracts\Tokens\Token $token, \Illuminate\Http\Request $request, \Closure $next)
     {
         return $next($token);
+    }
+}
+
+class TestScope extends Scope
+{
+    public function apply($query, $values)
+    {
+        $query->where('id', $values['operator'] == 'is' ? '=' : '!=', $values['value']);
     }
 }

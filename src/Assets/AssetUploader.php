@@ -7,7 +7,6 @@ use Statamic\Facades\Image;
 use Statamic\Facades\Path;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
-use Stringy\Stringy;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class AssetUploader extends Uploader
@@ -32,7 +31,7 @@ class AssetUploader extends Uploader
             $ext = strtolower($ext);
         }
 
-        $filename = self::getSafeFilename(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
+        $filename = self::getSafeFilename($this->asset->filename());
 
         $directory = $this->asset->folder();
         $directory = ($directory === '.') ? '/' : $directory;
@@ -92,16 +91,18 @@ class AssetUploader extends Uploader
             '%' => '-',
         ];
 
-        $str = Stringy::create(urldecode($string))->toAscii();
+        return (string) Str::of(urldecode($string))
+            ->replace(array_keys($replacements), array_values($replacements))
+            ->when(config('statamic.assets.lowercase'), fn ($stringable) => $stringable->lower())
+            ->ascii();
+    }
 
-        foreach ($replacements as $from => $to) {
-            $str = $str->replace($from, $to);
-        }
-
-        if (config('statamic.assets.lowercase')) {
-            $str = strtolower($str);
-        }
-
-        return (string) $str;
+    public static function getSafePath($path)
+    {
+        return Str::of($path)
+            ->split('/[\/\\\\]+/')
+            ->map(fn ($folder) => self::getSafeFilename($folder))
+            ->filter()
+            ->implode('/');
     }
 }

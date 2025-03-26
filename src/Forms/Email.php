@@ -14,6 +14,8 @@ use Statamic\Sites\Site;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class Email extends Mailable
 {
     use Queueable, SerializesModels;
@@ -153,13 +155,14 @@ class Email extends Mailable
     protected function addData()
     {
         $augmented = $this->submission->toAugmentedArray();
-        $fields = $this->getRenderableFieldData(Arr::except($augmented, ['id', 'date', 'form']));
-
-        if (Arr::has($this->config, 'attachments')) {
-            $fields = $fields->reject(fn ($field) => in_array($field['fieldtype'], ['assets', 'files']));
-        }
+        $fields = $this->getRenderableFieldData(Arr::except($augmented, ['id', 'date', 'form']))
+            ->reject(fn ($field) => $field['fieldtype'] === 'spacer')
+            ->when(Arr::has($this->config, 'attachments'), function ($fields) {
+                return $fields->reject(fn ($field) => in_array($field['fieldtype'], ['assets', 'files']));
+            });
 
         $data = array_merge($augmented, $this->getGlobalsData(), [
+            'email_config' => $this->config,
             'config' => config()->all(),
             'fields' => $fields,
             'site_url' => Config::getSiteUrl(),

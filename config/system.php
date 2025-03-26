@@ -8,7 +8,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | The license key for the corresponding domain from your Statamic account.
-    | Without a key entered, your app will considered to be in Trial Mode.
+    | Without a key entered, your app will be considered to be in Trial Mode.
     |
     | https://statamic.dev/licensing#trial-mode
     |
@@ -170,6 +170,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Always Augment to Query
+    |--------------------------------------------------------------------------
+    |
+    | By default, Statamic will augment relationship fields with max_items: 1
+    | to the result of a query, for example an Entry instance. Setting this
+    | to true will augment to the query builder instead of the result.
+    |
+    */
+
+    'always_augment_to_query' => false,
+
+    /*
+    |--------------------------------------------------------------------------
     | Row ID handle
     |--------------------------------------------------------------------------
     |
@@ -193,5 +206,16 @@ return [
     */
 
     'fake_sql_queries' => config('app.debug'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Layout
+    |--------------------------------------------------------------------------
+    |
+    | Define the default layout that will be used by views.
+    |
+    */
+
+    'layout' => env('STATAMIC_LAYOUT', 'layout'),
 
 ];

@@ -19,8 +19,8 @@ trait ExtractsFromEntryFields
         if ($entry->hasStructure()) {
             $values['parent'] = array_filter([optional($entry->parent())->id()]);
 
-            if ($entry->revisionsEnabled() && $entry->has('parent')) {
-                $values['parent'] = [$entry->get('parent')];
+            if ($entry->revisionsEnabled() && $parent = $entry->get('parent')) {
+                $values['parent'] = [$parent];
             }
         }
 
@@ -41,6 +41,11 @@ trait ExtractsFromEntryFields
             'published' => $entry->published(),
         ]);
 
-        return [$values->all(), $fields->meta()];
+        $extraValues = [
+            'depth' => $entry->page()?->depth(),
+            'children' => $entry->page()?->flattenedPages()->pluck('id')->all(),
+        ];
+
+        return [$values->all(), $fields->meta(), $extraValues];
     }
 }

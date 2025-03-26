@@ -5,6 +5,7 @@
         :bodyText="modalBody"
         :buttonText="__('Reset')"
         :danger="true"
+        :busy="submitting"
         @confirm="confirmed"
         @cancel="cancel"
     >
@@ -36,6 +37,7 @@ export default {
         return {
             resetting: false,
             redirectFromServer: null,
+            submitting: false,
         }
     },
 
@@ -69,6 +71,8 @@ export default {
         },
 
         confirmed() {
+            this.submitting = true;
+
             this.$axios.delete(this.resetUrl)
                 .then(response => {
                     this.redirectFromServer = data_get(response, 'data.redirect');
@@ -76,6 +80,7 @@ export default {
                 })
                 .catch(() => {
                     this.$toast.error(__('Something went wrong'));
+                    this.submitting = false;
                 });
         },
 
@@ -92,6 +97,7 @@ export default {
 
             this.$toast.success(__('Reset'));
             this.$emit('reset');
+            this.submitting = false;
         },
 
         cancel() {

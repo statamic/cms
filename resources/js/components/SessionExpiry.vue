@@ -121,6 +121,10 @@ export default {
             }
 
             this.lastCount = Vue.moment();
+        },
+
+        isShowingLogin(showing, wasShowing) {
+            if (showing && !wasShowing) this.updateCsrfToken();
         }
 
     },

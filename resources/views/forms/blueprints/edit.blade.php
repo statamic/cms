@@ -15,6 +15,7 @@
         :initial-blueprint="{{ json_encode($blueprintVueObject) }}"
         :use-tabs="false"
         :is-form-blueprint="true"
+        :can-define-localizable="false"
     ></blueprint-builder>
 
     @include('statamic::partials.docs-callout', [
