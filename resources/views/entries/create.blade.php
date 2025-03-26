@@ -1,3 +1,4 @@
+@inject('str', 'Statamic\Support\Str')
 @extends('statamic::layout')
 @section('title', $breadcrumbs->title($collectionCreateLabel))
 @section('wrapper_class', 'max-w-3xl')
@@ -19,6 +20,7 @@
         site="{{ $locale }}"
         create-another-url="{{ cp_route('collections.entries.create', [$collection, $locale, 'blueprint' => $blueprint['handle'], 'parent' => $values['parent'] ?? null]) }}"
         listing-url="{{ cp_route('collections.show', $collection) }}"
+        :can-edit-blueprint="{{ $str::bool($user->can('configure fields')) }}"
         :can-manage-publish-state="{{ Statamic\Support\Str::bool($canManagePublishState) }}"
         :preview-targets="{{ json_encode($previewTargets) }}"
     ></base-entry-create-form>
