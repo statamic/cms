@@ -12,6 +12,8 @@ use Statamic\Http\Middleware\RequireStatamicPro;
 use Statamic\Rules\Handle;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class RolesController extends CpController
 {
     public function __construct()

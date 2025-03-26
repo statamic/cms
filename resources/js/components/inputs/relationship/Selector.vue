@@ -362,10 +362,13 @@ export default {
             this.request();
         },
 
-        selections() {
-            if (this.maxSelections === 1 && this.selections.length === 1) {
-                this.select();
-            }
+        selections: {
+            deep: true,
+            handler: function () {
+                if (this.maxSelections === 1 && this.selections.length === 1) {
+                    this.select();
+                }
+            },
         },
 
         view(view) {

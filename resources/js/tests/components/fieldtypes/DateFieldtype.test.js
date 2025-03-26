@@ -4,12 +4,19 @@ import DateFieldtype from '@/components/fieldtypes/DateFieldtype.vue';
 import TimeFieldtype from '@/components/fieldtypes/TimeFieldtype.vue';
 import SvgIcon from '@/components/SvgIcon.vue';
 import { createPinia } from 'pinia';
+import DateFormatter from '@statamic/components/DateFormatter.js';
 
 window.__ = (key) => key;
 
 window.matchMedia = () => ({
     addEventListener: () => {},
 });
+
+window.Statamic = {
+    get $date() {
+        return new DateFormatter();
+    },
+};
 
 let originalDate;
 function setMockDate(dateString) {

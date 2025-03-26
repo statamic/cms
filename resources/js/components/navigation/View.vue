@@ -179,7 +179,7 @@
         </page-tree>
 
         <page-selector
-            v-if="hasCollections && $refs.tree"
+            v-if="hasCollections"
             ref="selector"
             :site="site"
             :collections="collections"
@@ -376,7 +376,7 @@ export default {
 
             if (this.maxPagesSelection === 1) {
                 this.removePageOnCancel = true;
-                this.editPage(pages[0], this.$refs.tree.$refs.tree, this.$refs.tree.$refs.tree.store);
+                this.$wait(300).then(() => this.editPage(pages[0]));
             }
         },
 
@@ -392,8 +392,8 @@ export default {
             return !this.isEntryBranch(branch) && !this.isLinkBranch(branch);
         },
 
-        editPage(page, vm, store) {
-            this.editingPage = { page, vm, store };
+        editPage(page) {
+            this.editingPage = { page };
         },
 
         updatePage(values) {

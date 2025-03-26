@@ -64,6 +64,10 @@ export default {
     },
 
     computed: {
+        cacheKey() {
+            return `${this.meta.directory}/${this.meta.set}`;
+        },
+
         options() {
             let options = [];
             for (let [name, html] of Object.entries(this.icons)) {
@@ -85,9 +89,9 @@ export default {
         this.request();
 
         watch(
-            () => loaders.value[this.meta.directory],
+            () => loaders.value[this.cacheKey],
             (loading) => {
-                this.icons = iconsCache.value[this.meta.directory];
+                this.icons = iconsCache.value[this.cacheKey];
                 this.loading = loading;
             },
         );
@@ -107,9 +111,9 @@ export default {
         },
 
         request() {
-            if (loaders.value[this.meta.directory]) return;
+            if (loaders.value[this.cacheKey]) return;
 
-            loaders.value = { ...loaders.value, [this.meta.directory]: true };
+            loaders.value = { ...loaders.value, [this.cacheKey]: true };
 
             this.$axios
                 .post(this.meta.url, {
@@ -118,10 +122,10 @@ export default {
                 .then((response) => {
                     const icons = response.data.icons;
                     this.icons = icons;
-                    iconsCache.value = { ...iconsCache.value, [this.meta.directory]: icons };
+                    iconsCache.value = { ...iconsCache.value, [this.cacheKey]: icons };
                 })
                 .finally(() => {
-                    loaders.value = { ...loaders.value, [this.meta.directory]: false };
+                    loaders.value = { ...loaders.value, [this.cacheKey]: false };
                 });
         },
     },

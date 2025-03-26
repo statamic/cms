@@ -666,10 +666,10 @@ export default {
             this.changed = true;
         },
 
-        showItem(item) {
-            delete item.manipulations['action'];
+        showItem(stat) {
+            delete stat.data.manipulations['action'];
 
-            this.updateItemAction(item);
+            this.updateItemAction(stat);
 
             this.changed = true;
         },
