@@ -2,11 +2,20 @@
 
 namespace Statamic\Imaging;
 
+use Intervention\Image\ImageManager;
+use Intervention\Image\Interfaces\DriverInterface;
+use Intervention\Image\Interfaces\ImageManagerInterface;
+use League\Glide\ServerFactory;
+use Statamic\Facades\Glide;
 use Statamic\Support\Str;
 use Symfony\Component\Mime\MimeTypes;
 
 class ImageValidator
 {
+    public function __construct(private DriverInterface $driver)
+    {
+    }
+
     /**
      * Check if image has valid extension and mimetype.
      *
@@ -39,24 +48,7 @@ class ImageValidator
      */
     public function isValidExtension($extension)
     {
-        $driver = config('statamic.assets.image_manipulation.driver');
-
-        if ($driver == 'gd') {
-            $allowed = ['jpeg', 'jpg', 'png', 'gif', 'webp'];
-        } elseif ($driver == 'imagick') {
-            $allowed = ['jpeg', 'jpg', 'png', 'gif', 'tif', 'bmp', 'psd', 'webp'];
-        } elseif ($driver == \Intervention\Image\Drivers\Vips\Driver::class) {
-            $allowed = ['jpeg', 'jpg', 'png', 'gif', 'tif', 'bmp', 'psd', 'webp'];
-        } else {
-            throw new \Exception("Unsupported image manipulation driver [$driver]");
-        }
-
-        $additional = config('statamic.assets.image_manipulation.additional_extensions', []);
-
-        return collect($allowed)
-            ->merge($additional)
-            ->map(fn ($extension) => Str::lower($extension))
-            ->contains(Str::lower($extension));
+        return $this->driver->supports($extension);
     }
 
     /**
