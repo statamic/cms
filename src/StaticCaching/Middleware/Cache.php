@@ -73,6 +73,7 @@ class Cache
         }
 
         if ($response = $this->attemptToServeCachedResponse($request)) {
+            $response->isNotModified($request);
             return $response;
         }
 
@@ -87,6 +88,7 @@ class Cache
 
             if (! app(UrlExcluder::class)->isExcluded($request->normalizedFullUrl())) {
                 $response->makeCacheControlCacheable();
+                $response->isNotModified($request);
             }
         } elseif (! $response->isRedirect()) {
             $this->makeReplacements($response);
