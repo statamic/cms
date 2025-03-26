@@ -419,10 +419,12 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Entr
     {
         if ($this->reference && $this->referenceExists()) {
             $response = (new \Statamic\Http\Responses\DataResponse($this))->toResponse($request);
-            
-            $response
-                ->setEtag(md5($response->getContent() ?? ''))
-                ->isNotModified($request);
+
+            if (($content = $response->getContent())) {
+                $response
+                    ->setEtag(md5($content))
+                    ->isNotModified($request);
+            }
 
             return $response;
         }
