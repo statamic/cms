@@ -27,7 +27,7 @@ class GlideManager
             'source' => base_path(), // this gets overridden on the fly by the image generator
             'cache' => $this->cacheDisk()->getDriver(),
             'response' => new LaravelResponseFactory(app('request')),
-            'driver' => $this->getDriver(),
+            'driver' => Config::get('statamic.assets.image_manipulation.driver'),
             'cache_with_file_extensions' => true,
             'presets' => Image::manipulationPresets(),
             'watermarks' => public_path(),
@@ -78,21 +78,6 @@ class GlideManager
         return $this->shouldServeDirectly()
             ? Config::get('statamic.assets.image_manipulation.cache_path')
             : storage_path('statamic/glide');
-    }
-
-    private function getDriver(): string
-    {
-        $driver = Config::get('statamic.assets.image_manipulation.driver');
-
-        if ($driver == 'libvips') {
-            if (! class_exists(\Intervention\Image\Drivers\Vips\Driver::class)) {
-                throw new \Exception('You must install the [intervention/image-driver-vips] package to use the [libvips] driver.');
-            }
-
-            return \Intervention\Image\Drivers\Vips\Driver::class;
-        }
-
-        return $driver;
     }
 
     public function shouldServeDirectly()
