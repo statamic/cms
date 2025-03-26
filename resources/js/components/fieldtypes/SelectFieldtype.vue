@@ -22,7 +22,7 @@
             @update:model-value="vueSelectUpdated"
             @focus="$emit('focus')"
             @search:focus="$emit('focus')"
-            @-search:blur="$emit('blur-sm')"
+            search:blur="$emit('blur-sm')"
         >
             <template #selected-option-container v-if="config.multiple"><i class="hidden"></i></template>
             <template #search="{ events, attributes }" v-if="config.multiple">

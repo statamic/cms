@@ -13,7 +13,7 @@
             :reduce="(field) => field.value"
             :create-option="(field) => ({ value: field, label: field })"
             @update:model-value="fieldSelected"
-            @-search:blur="fieldSelectBlur"
+            search:blur="fieldSelectBlur"
         >
             <template #no-options><div class="hidden" /></template>
             <template #option="option">
@@ -55,7 +55,7 @@
             :reduce="(field) => field.value"
             :create-option="(field) => ({ value: field, label: field })"
             @update:model-value="valueUpdated"
-            @-search:blur="valueSelectBlur"
+            search:blur="valueSelectBlur"
         >
             <template #no-options><div class="hidden" /></template>
         </v-select>
