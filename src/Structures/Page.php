@@ -419,13 +419,12 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Entr
     {
         if ($this->reference && $this->referenceExists()) {
             $response = (new \Statamic\Http\Responses\DataResponse($this))->toResponse($request);
+            
+            $response
+                ->setEtag(md5($response->getContent() ?? ''))
+                ->isNotModified($request);
 
-            if ($updatedAt = $this->routeData()['updated_at'] ?? null) {
-                $response->setLastModified(Carbon::parse($updatedAt));
-            }
-
-            return $response
-                ->setEtag(md5($response->getContent() ?? ''));
+            return $response;
         }
 
         throw new \LogicException('A page without a reference to an entry cannot be rendered.');
