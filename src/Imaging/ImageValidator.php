@@ -2,12 +2,7 @@
 
 namespace Statamic\Imaging;
 
-use Intervention\Image\ImageManager;
 use Intervention\Image\Interfaces\DriverInterface;
-use Intervention\Image\Interfaces\ImageManagerInterface;
-use League\Glide\ServerFactory;
-use Statamic\Facades\Glide;
-use Statamic\Support\Str;
 use Symfony\Component\Mime\MimeTypes;
 
 class ImageValidator
