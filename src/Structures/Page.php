@@ -5,7 +5,6 @@ namespace Statamic\Structures;
 use ArrayAccess;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Traits\ForwardsCalls;
 use JsonSerializable;
 use Statamic\Contracts\Auth\Protect\Protectable;
