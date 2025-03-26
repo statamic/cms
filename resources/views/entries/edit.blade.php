@@ -1,7 +1,7 @@
 @inject('str', 'Statamic\Support\Str')
 @extends('statamic::layout')
 @section('title', $breadcrumbs->title($title))
-@section('wrapper_class', 'max-w-3xl')
+@section('wrapper_class', 'max-w-7xl')
 
 @section('content')
     <entry-publish-form

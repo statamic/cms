@@ -50,7 +50,7 @@
     }
 
     .CodeMirror {
-        @apply h-auto bg-gray-100 px-0 py-1 font-mono text-xs leading-normal shadow-inner @md/markdown:p-3 dark:bg-dark-650 dark:text-dark-150 dark:shadow-inner-dark;
+        @apply h-auto bg-gray-100 px-0 py-1 font-mono text-xs leading-normal shadow-inner @md/markdown:p-3 dark:bg-dark-650 dark:text-dark-150 ;
         border-radius: 0 0 3px 3px;
 
         &:focus-within {
@@ -231,7 +231,7 @@
     }
 
     .editor {
-        @apply relative mx-auto my-6 max-w-xl rounded-sm bg-white px-2 shadow md:px-8 md:pt-8;
+        @apply relative mx-auto my-6 max-w-5xl rounded-sm bg-white px-2 shadow md:px-8 md:pt-8;
 
         .CodeMirror-scroll {
             @apply m-0;
@@ -247,7 +247,7 @@
     }
 
     .markdown-preview {
-        @apply relative mx-auto max-w-xl bg-transparent p-8 text-lg;
+        @apply relative mx-auto max-w-5xl bg-transparent p-8 text-lg;
     }
 
     .helpers {

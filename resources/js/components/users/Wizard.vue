@@ -1,6 +1,6 @@
 <template>
-    <div class="card mx-auto max-w-xl">
-        <div v-if="steps.length > 1" class="relative mx-auto max-w-lg pt-16">
+    <div class="card mx-auto max-w-5xl">
+        <div v-if="steps.length > 1" class="relative mx-auto max-w-2xl pt-16">
             <div class="wizard-steps">
                 <a
                     class="step"
@@ -122,7 +122,7 @@
             </div>
 
             <div
-                class="mx-auto mb-20 max-w-lg rounded-lg border bg-gray-100 py-10 dark:border-dark-900 dark:bg-dark-650"
+                class="mx-auto mb-20 max-w-2xl rounded-lg border bg-gray-100 py-10 dark:border-dark-900 dark:bg-dark-650"
                 v-if="invitation.send"
             >
                 <!-- Subject Line -->

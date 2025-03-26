@@ -6,7 +6,7 @@
 
         <header
             v-if="!loading"
-            class="sticky inset-x-0 top-0 z-1 flex h-13 items-center bg-white px-8 py-2 shadow dark:bg-dark-550 dark:shadow-dark"
+            class="sticky inset-x-0 top-0 z-1 flex h-13 items-center bg-white px-8 py-2 shadow dark:bg-dark-550 dark:shadow-lg"
         >
             <h1 class="flex flex-1 items-center text-xl">
                 {{ __(values.display) || __(config.display) || config.handle }}

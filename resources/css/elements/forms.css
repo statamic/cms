@@ -23,8 +23,8 @@ select {
   ========================================================================== */
 
 .input-text {
-    @apply block w-full max-w-full appearance-none rounded-sm border bg-gray-100 p-2 text-md text-gray-800 shadow-inner placeholder:text-gray-600 @lg:text-base;
-    @apply dark:border-dark-900 dark:bg-dark-650 dark:text-dark-150 dark:shadow-inner-dark dark:placeholder:text-dark-175;
+    @apply block w-full max-w-full appearance-none rounded-sm border bg-gray-100 p-2 text-sm text-gray-800 shadow-inner placeholder:text-gray-600 @lg:text-base;
+    @apply dark:border-dark-900 dark:bg-dark-650 dark:text-dark-150  dark:placeholder:text-dark-175;
     transition:
         border-color 0.15s ease-in-out,
         box-shadow 0.15s ease-in-out;
@@ -225,7 +225,7 @@ input.input-text-minimal:read-only,
     @apply relative rounded-sm;
 
     select {
-        @apply relative block h-full w-full max-w-full cursor-pointer text-sm text-gray-800 shadow-button dark:text-dark-150 ltr:text-left rtl:text-right;
+        @apply relative block h-full w-full max-w-full cursor-pointer text-sm text-gray-800 shadow-sm dark:text-dark-150 ltr:text-left rtl:text-right;
         @apply select-none appearance-none whitespace-nowrap rounded-sm align-middle leading-normal subpixel-antialiased;
 
         background: linear-gradient(180deg, #fff, #f9fafb);

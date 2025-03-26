@@ -16,7 +16,7 @@
                 class="min-w-0 flex-1"
             />
             <div
-                class="mx-2 rounded-sm border bg-gray-100 px-2 py-1 dark:border-dark-900 dark:bg-dark-600 dark:shadow-inner-dark"
+                class="mx-2 rounded-sm border bg-gray-100 px-2 py-1 dark:border-dark-900 dark:bg-dark-600 "
             >
                 {{ val }}
             </div>

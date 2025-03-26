@@ -1,10 +1,11 @@
 @import 'tailwindcss';
+@import './ui.css';
 @import './cp.css' layer(base);
 @import './core/utilities.css';
 @import './dark.css';
 @import './tailwind-animate.css';
-@import './ui.css';
-@config '../../tailwind.config.js';
+
+/* @config '../../tailwind.config.js'; */
 
 /*
   The default border color has changed to `currentColor` in Tailwind CSS v4,

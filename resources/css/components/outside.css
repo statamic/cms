@@ -95,12 +95,3 @@ html:not(.dark) .outside.rad-theme {
         @apply text-shadow text-white;
     }
 }
-
-.dark .outside.rad-theme {
-    .auth-card {
-        @apply shadow-dark;
-        &:hover {
-            @apply shadow-dark-lg;
-        }
-    }
-}

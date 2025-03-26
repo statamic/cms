@@ -16,7 +16,7 @@
 )
 
 @if ($requestError)
-    <div class="no-results mx-auto max-w-2xl md:pt-30">
+    <div class="no-results mx-auto max-w-6xl md:pt-30">
         <div class="flex flex-wrap items-center">
             <div class="w-full md:w-1/2">
                 <h1 class="mb-8">{{ __('Licensing') }}</h1>

@@ -4,7 +4,7 @@
 
 .card {
     @apply rounded-md bg-white p-2 shadow;
-    @apply dark:bg-dark-600 dark:shadow-dark;
+    @apply dark:bg-dark-600 dark:shadow-lg;
 }
 
 @media (width >= theme(--breakpoint-md)) {

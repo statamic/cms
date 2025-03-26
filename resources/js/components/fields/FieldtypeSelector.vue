@@ -43,7 +43,7 @@
                     <div class="fieldtype-list">
                         <div class="p-2" v-for="fieldtype in group.fieldtypes" :key="fieldtype.handle">
                             <button
-                                class="group flex w-full items-center rounded-sm border border-gray-500 bg-white shadow-sm hover:border-gray-600 hover:shadow-md dark:border-dark-900 dark:bg-dark-700 dark:shadow-dark-sm dark:hover:border-dark-950 ltr:pr-3 rtl:pl-3"
+                                class="group flex w-full items-center rounded-sm border border-gray-500 bg-white shadow-sm hover:border-gray-600 hover:shadow-md dark:border-dark-900 dark:bg-dark-700 dark:shadow-lg dark:hover:border-dark-950 ltr:pr-3 rtl:pl-3"
                                 @click="select(fieldtype)"
                             >
                                 <div
@@ -60,7 +60,7 @@
                                     ></svg-icon>
                                 </div>
                                 <span
-                                    class="text-md text-gray-800 group-hover:text-gray-900 dark:text-dark-150 dark:group-hover:text-dark-100 ltr:pl-3 rtl:pr-3"
+                                    class="text-sm text-gray-800 group-hover:text-gray-900 dark:text-dark-150 dark:group-hover:text-dark-100 ltr:pl-3 rtl:pr-3"
                                     >{{ fieldtype.text }}</span
                                 >
                             </button>

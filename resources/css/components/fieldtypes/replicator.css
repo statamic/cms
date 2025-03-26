@@ -7,7 +7,7 @@
 }
 
 .replicator-set {
-    @apply relative rounded-sm bg-white shadow-set outline-hidden dark:bg-dark-800 dark:shadow-dark-set;
+    @apply relative rounded-sm bg-white shadow-sm outline-hidden dark:bg-dark-800 dark:shadow-lg;
 }
 
 .replicator-set-header {

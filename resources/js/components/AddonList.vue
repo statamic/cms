@@ -49,7 +49,7 @@
 
                 <div class="addon-grid my-8" :class="{ 'opacity-50': loading }">
                     <div
-                        class="addon-card relative h-full cursor-pointer rounded-sm bg-white text-gray-800 shadow dark:bg-dark-600 dark:text-dark-150 dark:shadow-dark"
+                        class="addon-card relative h-full cursor-pointer rounded-sm bg-white text-gray-800 shadow dark:bg-dark-600 dark:text-dark-150 dark:shadow-lg"
                         v-for="addon in addons"
                         :key="addon.id"
                         @click="showAddon(addon)"

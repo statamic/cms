@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .global-header {
-    @apply relative flex h-13 w-full items-center bg-white shadow dark:bg-dark-600 dark:shadow-dark ltr:pr-4 rtl:pl-4;
+    @apply relative flex h-13 w-full items-center bg-white shadow dark:bg-dark-600 dark:shadow-lg ltr:pr-4 rtl:pl-4;
     z-index: 3; /* The search focus overlay sits underneath using z-index 2. */
 
     .dark & {

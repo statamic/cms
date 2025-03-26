@@ -1,6 +1,6 @@
 .item {
     @apply flex w-full items-center justify-between rounded-sm border bg-white text-sm shadow-sm outline-hidden;
-    @apply dark:border-dark-900 dark:bg-dark-550 dark:shadow-dark-sm;
+    @apply dark:border-dark-900 dark:bg-dark-550 dark:shadow-lg;
 
     .item-move {
         @apply w-4 cursor-grab self-stretch bg-gray-200 p-2 ltr:rounded-l ltr:border-r rtl:rounded-r rtl:border-l;

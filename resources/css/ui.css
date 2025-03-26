@@ -47,19 +47,19 @@
     --color-dark-blue-200: '#2a4270';
 
     --color-orange-light: '#fcc062';
-    --color-orange-default: '#f5a82f';
+    --color-orange: '#f5a82f';
     --color-orange-dark: '#e08a1e';
 
     --color-pink-light: '#ff5ba7';
-    --color-pink-default: '#ff269e';
+    --color-pink: '#ff269e';
     --color-pink-dark: '#e00095';
 
     --color-purple-light: '#e0b7ff';
-    --color-purple-default: '#c471ed';
+    --color-purple: '#c471ed';
     --color-purple-dark: '#a855cd';
 
     --color-yellow-light: '#ffffe0';
-    --color-yellow-default: '#fbfab0';
+    --color-yellow: '#fbfab0';
     --color-yellow-dark: '#e8dc1e';
 
     --color-amber: '#ffd700';
@@ -72,7 +72,10 @@
 }
 
 @theme {
+    --text-4xs: 0.4rem;
+    --text-3xs: 0.5rem;
     --text-2xs: 0.625rem;
+
     --shadow-ui-xs: 0px 1px 3px -1px rgba(0,0,0,0.10);
     --shadow-ui-sm: 0px 2px 3px -2px rgba(0,0,0,0.15);
     --shadow-ui-md: 0px 2px 4px -2px rgba(0,0,0,0.37);

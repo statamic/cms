@@ -21,10 +21,10 @@
     @apply fixed inset-0 min-h-screen overflow-scroll rounded-none bg-gray-200 pt-14 dark:bg-dark-600;
 
     .code-fieldtype-toolbar {
-        @apply fixed top-0 z-2 h-12 w-full rounded-none bg-linear-to-b from-white to-gray-100 px-6 py-2 text-base shadow dark:from-dark-550 dark:to-dark-600 dark:shadow-dark;
+        @apply fixed top-0 z-2 h-12 w-full rounded-none bg-linear-to-b from-white to-gray-100 px-6 py-2 text-base shadow dark:from-dark-550 dark:to-dark-600 dark:shadow-lg;
     }
 }
 
 .CodeMirror {
-    @apply dark:text-dark-150 dark:shadow-inner-dark;
+    @apply dark:text-dark-150 ;
 }

@@ -25,7 +25,7 @@
 
     .blueprint-section-field-inner {
         @apply relative z-10 flex rounded-sm border bg-gray-200 shadow-sm outline-hidden;
-        @apply dark:border-none dark:bg-dark-600 dark:shadow-dark;
+        @apply dark:border-none dark:bg-dark-600 dark:shadow-lg;
     }
 
     &.draggable-source--is-dragging {

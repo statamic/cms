@@ -74,7 +74,7 @@
     @apply relative;
 
     .quick-list-content {
-        @apply absolute right-full top-1/2 mr-[8px] flex min-w-max origin-right -translate-y-1/2 rounded-full bg-white p-0.5 shadow-quick transition dark:bg-dark-550;
+        @apply absolute right-full top-1/2 mr-[8px] flex min-w-max origin-right -translate-y-1/2 rounded-full bg-white p-0.5 shadow-sm transition dark:bg-dark-550;
         &::before {
             content: '';
             position: absolute;

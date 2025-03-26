@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .textarea-fieldtype textarea {
-    @apply border-gray-500 text-md leading-normal dark:border-dark-900 dark:shadow-inner-dark;
+    @apply border-gray-500 text-sm leading-normal dark:border-dark-900 ;
     min-height: 80px;
 
     &:not(.focus-within-only):focus,

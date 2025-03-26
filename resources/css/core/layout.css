@@ -3,7 +3,7 @@
    ========================================================================== */
 
 body {
-    @apply relative w-full bg-gray-300 dark:bg-dark-800;
+    @apply relative w-full bg-gray-100 dark:bg-dark-800;
 }
 
 #statamic {
@@ -72,7 +72,7 @@ a {
 
 @media (width >= theme(--breakpoint-md)) {
     .page-wrapper {
-        @apply mx-auto max-w-xl px-8;
+        @apply mx-auto max-w-5xl px-8;
     }
 }
 

@@ -4,7 +4,7 @@
 
 .section-fieldtype {
     @apply border-b border-t bg-gray-200;
-    @apply dark:border-dark-900 dark:bg-dark-700 dark:shadow-inner-dark;
+    @apply dark:border-dark-900 dark:bg-dark-700 ;
     @apply -mt-px; /*  Avoid adjacent borders just in case they're stacked */
 
     &.form-group {
