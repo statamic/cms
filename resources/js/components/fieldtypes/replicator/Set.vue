@@ -67,7 +67,7 @@
                     @updated="updated(field.handle, $event)"
                     @meta-updated="metaUpdated(field.handle, $event)"
                     @focus="$emit('focus')"
-                    @blur="$emit('blur')"
+                    @blur="$emit('blur-sm')"
                     @replicator-preview-updated="previewUpdated(field.handle, $event)"
                 />
             </div>

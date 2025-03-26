@@ -19,13 +19,13 @@
 
 .dark {
     input:-webkit-autofill {
-        -webkit-box-shadow: inset 0 0 0 50px theme('colors.dark.250');
-        -webkit-text-fill-color: theme('colors.dark.150');
+        -webkit-box-shadow: inset 0 0 0 50px var(--color-dark-250);
+        -webkit-text-fill-color: var(--color-dark-150);
 
         &:focus,
         &:active {
-            -webkit-box-shadow: inset 0 0 0 50px theme('colors.dark.200') !important;
-            -webkit-text-fill-color: theme('colors.dark.100');
+            -webkit-box-shadow: inset 0 0 0 50px var(--color-dark-200) !important;
+            -webkit-text-fill-color: var(--color-dark-100);
         }
     }
 

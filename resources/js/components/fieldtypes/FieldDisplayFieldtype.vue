@@ -11,7 +11,7 @@
                 @input="updateDebounced($event.target.value)"
                 @keydown="$emit('keydown', $event)"
                 @focus="$emit('focus')"
-                @blur="$emit('blur')"
+                @blur="$emit('blur-sm')"
             />
             <button
                 class="input-group-append flex items-center"

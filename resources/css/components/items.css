@@ -1,5 +1,5 @@
 .item {
-    @apply flex w-full items-center justify-between rounded border bg-white text-sm shadow-sm outline-none;
+    @apply flex w-full items-center justify-between rounded-sm border bg-white text-sm shadow-sm outline-hidden;
     @apply dark:border-dark-900 dark:bg-dark-550 dark:shadow-dark-sm;
 
     .item-move {

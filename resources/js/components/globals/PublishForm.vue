@@ -82,7 +82,7 @@
                     @synced="syncField"
                     @desynced="desyncField"
                     @focus="container.$emit('focus', $event)"
-                    @blur="container.$emit('blur', $event)"
+                    @blur="container.$emit('blur-sm', $event)"
                 />
             </div>
         </publish-container>

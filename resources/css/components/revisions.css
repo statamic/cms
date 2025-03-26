@@ -34,7 +34,7 @@
 }
 
 .revision-item .badge {
-    @apply rounded-sm text-4xs uppercase text-white ltr:ml-2 rtl:mr-2;
+    @apply rounded-xs text-4xs uppercase text-white ltr:ml-2 rtl:mr-2;
     height: 16px;
 
     &.publish {

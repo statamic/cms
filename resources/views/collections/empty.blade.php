@@ -20,7 +20,7 @@
             <div class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175">
                 @cp_svg('icons/light/hammer-wrench')
             </div>
-            <div class="flex-1 mb-4 md:mb-0 rtl:md:ml-6 ltr:md:mr-6">
+            <div class="flex-1 mb-4 md:mb-0 md:rtl:ml-6 md:ltr:mr-6">
                 <h3 class="mb-2 text-blue dark:text-blue-600">{{ __('Configure Collection') }} @rarr</h3>
                 <p>{{ __('statamic::messages.collection_next_steps_configure_description') }}</p>
             </div>
@@ -36,7 +36,7 @@
             <div class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175">
                 @cp_svg('icons/light/content-writing')
             </div>
-            <div class="flex-1 mb-4 md:mb-0 rtl:md:ml-6 ltr:md:mr-6">
+            <div class="flex-1 mb-4 md:mb-0 md:rtl:ml-6 md:ltr:mr-6">
                 <h3 class="mb-2 text-blue dark:text-blue-600">{{ $collection->createLabel() }} @if (!$multipleBlueprints) @rarr @endif</h3>
                 <p>{{ __('statamic::messages.collection_next_steps_create_entry_description') }}</p>
                 @if ($multipleBlueprints)
@@ -53,7 +53,7 @@
             <div class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175">
                 @cp_svg('icons/light/blueprint')
             </div>
-            <div class="flex-1 mb-4 md:mb-0 rtl:md:ml-6 ltr:md:mr-6">
+            <div class="flex-1 mb-4 md:mb-0 md:rtl:ml-6 md:ltr:mr-6">
                 <h3 class="mb-2 text-blue dark:text-blue-600">{{ __('Configure Blueprints') }} @rarr</h3>
                 <p>{{ __('statamic::messages.collection_next_steps_blueprints_description') }}</p>
             </div>
@@ -64,7 +64,7 @@
             <div class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175">
                 @cp_svg('icons/light/crane')
             </div>
-            <div class="flex-1 mb-4 md:mb-0 rtl:md:ml-6 ltr:md:mr-6">
+            <div class="flex-1 mb-4 md:mb-0 md:rtl:ml-6 md:ltr:mr-6">
                 <h3 class="mb-2 text-blue dark:text-blue-600">{{ __('Scaffold Views') }} @rarr</h3>
                 <p>{{ __('statamic::messages.collection_next_steps_scaffold_description') }}</p>
             </div>

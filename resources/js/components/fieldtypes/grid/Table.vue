@@ -14,7 +14,7 @@
             :handle-class="sortableHandleClass"
             append-to="body"
             @dragstart="$emit('focus')"
-            @dragend="$emit('blur')"
+            @dragend="$emit('blur-sm')"
             @update:model-value="(rows) => $emit('sorted', rows)"
             v-slot="{}"
         >
@@ -35,7 +35,7 @@
                     @duplicate="(row) => $emit('duplicate', row)"
                     @removed="(row) => $emit('removed', row)"
                     @focus="$emit('focus')"
-                    @blur="$emit('blur')"
+                    @blur="$emit('blur-sm')"
                 />
             </tbody>
         </sortable-list>

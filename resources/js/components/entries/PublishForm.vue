@@ -109,7 +109,7 @@
                             @synced="syncField"
                             @desynced="desyncField"
                             @focus="container.$emit('focus', $event)"
-                            @blur="container.$emit('blur', $event)"
+                            @blur="container.$emit('blur-sm', $event)"
                         >
                             <template #actions="{ shouldShowSidebar }">
                                 <div class="card mb-5 p-0">

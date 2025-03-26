@@ -138,7 +138,7 @@ sup {
 }
 
 code {
-    @apply rounded font-mono text-[#c7254e] dark:bg-dark-700 dark:text-blue-400;
+    @apply rounded-sm font-mono text-[#c7254e] dark:bg-dark-700 dark:text-blue-400;
     padding: 2px 4px;
     font-size: 90%;
     background-color: #f9f2f4;

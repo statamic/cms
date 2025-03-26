@@ -16,7 +16,7 @@ const props = defineProps({
 
 const popoverContentClasses = cva({
     base: [
-        'rounded-xl w-64 bg-white dark:bg-gray-800 outline-none overflow-hidden',
+        'rounded-xl w-64 bg-white dark:bg-gray-800 outline-hidden overflow-hidden',
         'border border-gray-200 dark:border-white/15 dark:border-b-0 shadow-lg',
         'duration-100 will-change-[transform,opacity]',
         'data-[state=open]:animate-in data-[state=closed]:animate-out',

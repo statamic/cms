@@ -17,7 +17,7 @@
                 <input
                     ref="search"
                     type="text"
-                    class="input-text h-auto w-full rounded border px-2 py-1 text-xs dark:border-gray-900 dark:bg-dark-650"
+                    class="input-text h-auto w-full rounded-sm border px-2 py-1 text-xs dark:border-gray-900 dark:bg-dark-650"
                     :placeholder="__('Search Sets')"
                     v-show="showSearch"
                     v-model="search"
@@ -25,7 +25,7 @@
                 <div v-if="showGroupBreadcrumb" class="flex items-center font-medium text-gray-700 dark:text-gray-600">
                     <button
                         @click="unselectGroup"
-                        class="rounded hover:text-gray-900 dark:hover:text-gray-500 ltr:ml-2.5 rtl:mr-2.5"
+                        class="rounded-sm hover:text-gray-900 dark:hover:text-gray-500 ltr:ml-2.5 rtl:mr-2.5"
                     >
                         {{ __('Groups') }}
                     </button>
@@ -37,7 +37,7 @@
                 <div
                     v-for="(item, i) in items"
                     :key="item.handle"
-                    class="cursor-pointer rounded"
+                    class="cursor-pointer rounded-sm"
                     :class="{ 'bg-gray-200 dark:bg-dark-600': selectionIndex === i }"
                     @mouseover="selectionIndex = i"
                 >
@@ -49,7 +49,7 @@
                         <svg-icon
                             :name="groupIconName(item.icon)"
                             :directory="iconBaseDirectory"
-                            class="h-9 w-9 rounded border border-gray-600 bg-white p-2 text-gray-800 dark:border-dark-800 dark:bg-dark-650 dark:text-dark-175 ltr:mr-2 rtl:ml-2"
+                            class="h-9 w-9 rounded-sm border border-gray-600 bg-white p-2 text-gray-800 dark:border-dark-800 dark:bg-dark-650 dark:text-dark-175 ltr:mr-2 rtl:ml-2"
                         />
                         <div class="flex-1">
                             <div class="w-52 truncate text-md font-medium text-gray-800 dark:text-dark-175">
@@ -75,7 +75,7 @@
                         <svg-icon
                             :name="setIconName(item.icon)"
                             :directory="iconBaseDirectory"
-                            class="h-9 w-9 rounded border border-gray-600 bg-white p-2 text-gray-800 dark:border-dark-800 dark:bg-dark-650 dark:text-dark-175 ltr:mr-2 rtl:ml-2"
+                            class="h-9 w-9 rounded-sm border border-gray-600 bg-white p-2 text-gray-800 dark:border-dark-800 dark:bg-dark-650 dark:text-dark-175 ltr:mr-2 rtl:ml-2"
                         />
                         <div class="flex-1">
                             <div class="w-52 truncate text-md font-medium text-gray-800 dark:text-dark-175">

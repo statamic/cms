@@ -16,7 +16,7 @@
                         @synced="$emit('synced', $event)"
                         @desynced="$emit('desynced', $event)"
                         @focus="$emit('focus', $event)"
-                        @blur="$emit('blur', $event)"
+                        @blur="$emit('blur-sm', $event)"
                     />
                 </div>
             </div>
@@ -26,7 +26,7 @@
 
 <script>
 export default {
-    emits: ['updated', 'meta-updated', 'synced', 'desynced', 'focus', 'blur'],
+    emits: ['updated', 'meta-updated', 'synced', 'desynced', 'focus', 'blur-sm'],
 
     inject: ['store', 'storeName'],
 

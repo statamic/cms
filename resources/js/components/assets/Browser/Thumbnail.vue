@@ -3,17 +3,17 @@
         <img
             v-if="asset.is_image"
             :src="asset.thumbnail"
-            class="asset-thumbnail mx-auto max-h-8 max-w-full rounded"
+            class="asset-thumbnail mx-auto max-h-8 max-w-full rounded-sm"
             loading="lazy"
             :class="{ 'h-8 w-8 object-cover': square }"
         />
         <img
             v-else-if="asset.is_svg"
             :src="asset.url"
-            class="asset-thumbnail mx-auto h-8 max-w-full rounded"
+            class="asset-thumbnail mx-auto h-8 max-w-full rounded-sm"
             loading="lazy"
         />
-        <file-icon v-else :extension="asset.extension" class="asset-thumbnail h-8 w-8 rounded p-px" />
+        <file-icon v-else :extension="asset.extension" class="asset-thumbnail h-8 w-8 rounded-sm p-px" />
     </div>
 </template>
 

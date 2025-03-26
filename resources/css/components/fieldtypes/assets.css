@@ -7,7 +7,7 @@
 }
 
 .assets-fieldtype .assets-fieldtype-picker {
-    @apply flex flex-wrap items-center rounded border bg-gray-200 px-4 py-2 dark:border-dark-900 dark:bg-dark-650;
+    @apply flex flex-wrap items-center rounded-sm border bg-gray-200 px-4 py-2 dark:border-dark-900 dark:bg-dark-650;
 
     &.is-expanded {
         @apply rounded-b-none border-b-0;

@@ -27,7 +27,7 @@
                 <div class="flex min-h-0 grow rounded-t-md bg-gray-100 dark:bg-dark-600">
                     <!-- Available Columns -->
                     <div
-                        class="flex w-1/2 flex-col outline-none dark:border-dark-900 ltr:border-r ltr:text-left rtl:border-l rtl:text-right"
+                        class="flex w-1/2 flex-col outline-hidden dark:border-dark-900 ltr:border-r ltr:text-left rtl:border-l rtl:text-right"
                     >
                         <header
                             v-text="__('Available Columns')"

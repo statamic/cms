@@ -1,6 +1,6 @@
 <template>
     <div
-        class="replicator-set mb-4 rounded border shadow-sm dark:border-dark-900"
+        class="replicator-set mb-4 rounded-sm border shadow-sm dark:border-dark-900"
         :class="[sortableItemClass, { 'opacity-50': isExcessive }]"
     >
         <div class="replicator-set-header">
@@ -42,7 +42,7 @@
                 @updated="updated(field.handle, $event)"
                 @meta-updated="metaUpdated(field.handle, $event)"
                 @focus="$emit('focus')"
-                @blur="$emit('blur')"
+                @blur="$emit('blur-sm')"
             />
         </div>
     </div>

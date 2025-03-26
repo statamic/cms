@@ -12,7 +12,7 @@
                 v-else
             >
                 <img
-                    class="asset-thumbnail h-7 max-h-full w-7 max-w-full rounded object-cover"
+                    class="asset-thumbnail h-7 max-h-full w-7 max-w-full rounded-sm object-cover"
                     loading="lazy"
                     :src="thumbnail"
                     :alt="asset.basename"

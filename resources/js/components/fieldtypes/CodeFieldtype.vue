@@ -216,7 +216,7 @@ export default {
             });
 
             this.codemirror.on('focus', () => this.$emit('focus'));
-            this.codemirror.on('blur', () => this.$emit('blur'));
+            this.codemirror.on('blur-sm', () => this.$emit('blur-sm'));
 
             // Refresh to ensure CodeMirror visible and the proper size
             // Most applicable when loaded by another field like Bard

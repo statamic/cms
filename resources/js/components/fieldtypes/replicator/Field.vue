@@ -34,7 +34,7 @@
             @update:value="$emit('updated', $event)"
             @meta-updated="$emit('meta-updated', $event)"
             @focus="$emit('focus')"
-            @blur="$emit('blur')"
+            @blur="$emit('blur-sm')"
             @replicator-preview-updated="$emit('replicator-preview-updated', $event)"
         />
 

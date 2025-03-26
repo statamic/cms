@@ -3,7 +3,7 @@
     @apply m-0 p-3 @sm:p-4;
 
     .field-inner {
-        @apply w-full md:w-1/2 ltr:md:pr-8 rtl:md:pl-8;
+        @apply w-full md:w-1/2 md:ltr:pr-8 md:rtl:pl-8;
     }
 
     .field-inner + div {
@@ -15,7 +15,7 @@
     }
 
     .help-block p:last-child {
-        @apply mb-0 !important;
+        @apply mb-0!;
     }
 }
 
@@ -32,6 +32,6 @@
         @apply w-full;
     }
     .help-block p:last-child {
-        @apply mb-4 !important;
+        @apply mb-4!;
     }
 }

@@ -16,7 +16,7 @@ const id = useId();
         <CheckboxRoot
             :id
             :value="value"
-            class="bg-white size-4 mt-0.5 rounded border border-gray-300 dark:border-none data-[state=checked]:border-gray-900 data-[state=checked]:bg-gray-900 dark:data-[state=checked]:bg-white shadow-ui-xs outline-none cursor-default"
+            class="bg-white size-4 mt-0.5 rounded-sm border border-gray-300 dark:border-none data-[state=checked]:border-gray-900 data-[state=checked]:bg-gray-900 dark:data-[state=checked]:bg-white shadow-ui-xs outline-hidden cursor-default"
         >
             <CheckboxIndicator
                 class="flex items-center justify-center w-full h-full relative text-white dark:text-gray-800"

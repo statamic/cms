@@ -21,7 +21,7 @@ defineEmits(['update:modelValue']);
             @update:checked="$emit('update:modelValue', $event)"
             class="
                 relative flex h-[20px] w-[32px] rounded-full border
-                transition-[background] focus-within:outline-none
+                transition-[background] focus-within:outline-hidden
                 data-[state=checked]:border-gray-700
                 data-[state=checked]:bg-gray-800
                 data-[state=unchecked]:border-transparent

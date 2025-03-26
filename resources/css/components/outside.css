@@ -81,7 +81,7 @@ html:not(.dark) .outside.rad-theme {
     }
 
     .btn-primary {
-        @apply text-shadow rounded-md border-0 text-white !important;
+        @apply text-shadow! rounded-md! border-0! text-white!;
         background: linear-gradient(45deg, #f64f59, #c471ed) !important;
         box-shadow: 0 2px 5px rgba(246, 79, 89, 0.3) !important;
         &:hover {

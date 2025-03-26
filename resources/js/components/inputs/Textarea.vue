@@ -11,7 +11,7 @@
             :autofocus="focus"
             @input.stop="$emit('update:model-value', $event.target.value)"
             @focus.stop="$emit('focus')"
-            @blur.stop="$emit('blur')"
+            @blur.stop="$emit('blur-sm')"
         />
         <div
             class="-mb-3 text-xs @sm:-mb-5 @lg:-mb-5 ltr:text-right rtl:text-left"

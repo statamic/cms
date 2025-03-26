@@ -7,7 +7,7 @@
 
     button,
     a {
-        @apply block w-full rounded-sm px-2 py-1 text-xs font-normal text-gray-800 dark:text-dark-100 ltr:text-left rtl:text-right;
+        @apply block w-full rounded-xs px-2 py-1 text-xs font-normal text-gray-800 dark:text-dark-100 ltr:text-left rtl:text-right;
         line-height: 1.4;
         white-space: nowrap;
 

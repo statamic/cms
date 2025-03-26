@@ -2,7 +2,7 @@
     <data-list :visible-columns="columns" :columns="columns" :rows="items" v-slot="{ filteredRows: rows }">
         <div class="card relative overflow-hidden p-0">
             <data-list-bulk-actions
-                class="rounded"
+                class="rounded-sm"
                 :url="actionUrl"
                 @started="actionStarted"
                 @completed="actionCompleted"

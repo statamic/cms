@@ -77,7 +77,7 @@
                         item-class="asset-tile"
                         handle-class="asset-thumb-container"
                         @dragstart="$emit('focus')"
-                        @dragend="$emit('blur')"
+                        @dragend="$emit('blur-sm')"
                         :constrain-dimensions="true"
                         :disabled="isReadOnly"
                         :distance="5"
@@ -85,7 +85,7 @@
                         append-to="body"
                     >
                         <div
-                            class="asset-grid-listing overflow-hidden rounded border dark:border-dark-900"
+                            class="asset-grid-listing overflow-hidden rounded-sm border dark:border-dark-900"
                             :class="{ 'rounded-t-none': !isReadOnly && (showPicker || uploads.length) }"
                             ref="assets"
                         >
@@ -639,7 +639,7 @@ export default {
         },
 
         showSelector(selecting) {
-            this.$emit(selecting ? 'focus' : 'blur');
+            this.$emit(selecting ? 'focus' : 'blur-sm');
         },
     },
 

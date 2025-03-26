@@ -113,7 +113,7 @@
         }
 
         .label {
-            @apply relative inline-block rounded text-center text-3xs uppercase text-white ltr:mr-2 rtl:ml-2;
+            @apply relative inline-block rounded-sm text-center text-3xs uppercase text-white ltr:mr-2 rtl:ml-2;
             padding: 2px;
             width: 54px;
             top: -2px;

@@ -8,7 +8,7 @@
         >
             <div v-if="src" class="p-2 text-center" draggable="true" data-drag-handle>
                 <div ref="content" hidden />
-                <img :src="src" class="mx-auto block rounded-sm" />
+                <img :src="src" class="mx-auto block rounded-xs" />
             </div>
 
             <div

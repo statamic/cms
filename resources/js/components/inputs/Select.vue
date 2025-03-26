@@ -8,7 +8,7 @@
             :value="modelValue"
             :disabled="isReadOnly"
             @focus="$emit('focus')"
-            @blur="$emit('blur')"
+            @blur="$emit('blur-sm')"
         >
             <option v-if="placeholder" v-text="__(placeholder)" value="" disabled :selected="modelValue === null" />
 

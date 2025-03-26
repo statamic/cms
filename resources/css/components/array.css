@@ -6,15 +6,15 @@
 }
 
 .array-table-wrapper {
-    @apply overflow-hidden rounded border dark:border-dark-900;
+    @apply overflow-hidden rounded-sm border dark:border-dark-900;
     &:focus-within {
         @apply ring-2 ring-blue-300 dark:ring-dark-blue-100;
     }
 }
 .array-table {
-    @apply w-full rounded text-sm ltr:text-left rtl:text-right;
+    @apply w-full rounded-sm text-sm ltr:text-left rtl:text-right;
     &:focus {
-        @apply outline-none;
+        @apply outline-hidden;
     }
 
     tr:not(:last-child) {

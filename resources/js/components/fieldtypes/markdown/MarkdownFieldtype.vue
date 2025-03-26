@@ -754,7 +754,7 @@ export default {
             });
 
             self.codemirror.on('focus', () => self.$emit('focus'));
-            self.codemirror.on('blur', () => self.$emit('blur'));
+            self.codemirror.on('blur-sm', () => self.$emit('blur-sm'));
 
             // Expose the array of selections to the Vue instance
             self.codemirror.on('beforeSelectionChange', function (cm, obj) {

@@ -15,7 +15,7 @@ const classes = cva({
         /* When label exists but no description follows */
         '[&>[data-ui-label]:not(:has(+[data-ui-description]))]:mb-2',
         /* When label is followed by description */
-        '[&>[data-ui-description]]:mb-2',
+        '*:data-ui-description:mb-2',
         /* Dim label when a child input control is disabled */
         '[&:not(:has([data-ui-field])):has([data-ui-control][disabled])>[data-ui-label]]:opacity-50'
     ],

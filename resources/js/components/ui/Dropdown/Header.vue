@@ -16,7 +16,7 @@ const hasDefaultSlot = !!slots.default;
         <div v-if="icon" class="size-6 -ms-1 me-2 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800 p-1 text-gray-700 dark:text-gray-400">
             <ui-icon :name="icon" />
         </div>
-        <div class="flex-grow truncate col-start-2">
+        <div class="grow truncate col-start-2">
             <slot v-if="hasDefaultSlot" />
             <template v-else>{{ text }}</template>
         </div>

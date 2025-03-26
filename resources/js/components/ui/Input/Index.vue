@@ -30,7 +30,7 @@ const inputClasses = computed(() => {
     const classes = cva({
         base: [
             'w-full block bg-white dark:bg-gray-900',
-            'border border-gray-300 dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:inset-shadow-xs dark:inset-shadow-black',
+            'border border-gray-300 dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:inset-shadow-2xs dark:inset-shadow-black',
             'text-gray-600 dark:text-gray-300',
             'appearance-none antialiased shadow-ui-sm disabled:shadow-none not-prose',
         ],
@@ -38,7 +38,7 @@ const inputClasses = computed(() => {
             size: {
                 base: 'text-base rounded-lg px-3 py-2 h-10 leading-[1.375rem]',
                 sm: 'text-sm rounded-md px-2.5 py-1.5 h-8 leading-[1.125rem]',
-                xs: 'text-xs rounded-sm px-2 py-1.5 h-6 leading-[1.125rem]'
+                xs: 'text-xs rounded-xs px-2 py-1.5 h-6 leading-[1.125rem]'
             },
         },
         compoundVariants: [

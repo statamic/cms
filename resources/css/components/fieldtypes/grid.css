@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .grid-table {
-    @apply relative mb-4 w-full rounded border text-gray shadow-sm outline-none dark:border-dark-900 dark:text-dark-150 ltr:text-left rtl:text-right;
+    @apply relative mb-4 w-full rounded-sm border text-gray shadow-sm outline-hidden dark:border-dark-900 dark:text-dark-150 ltr:text-left rtl:text-right;
     border-collapse: separate;
     border-spacing: 0;
     table-layout: auto;
@@ -34,10 +34,10 @@
 }
 
 .grid-table > tbody {
-    @apply outline-none;
+    @apply outline-hidden;
 
     > tr {
-        @apply outline-none;
+        @apply outline-hidden;
     }
 
     > tr > td {
@@ -51,14 +51,14 @@
             @apply h-full p-2 ltr:border-r rtl:border-l;
             width: 1%;
             cursor: grab;
-            background: theme('colors.gray.200') url('../../../svg/icons/light/drag-dots.svg') center center no-repeat;
+            background: var(--color-gray-200) url('../../../svg/icons/light/drag-dots.svg') center center no-repeat;
             background-size: 7px 17px;
             &:hover {
                 @apply bg-gray-300;
             }
 
             .dark & {
-                background-color: theme('colors.dark.700');
+                background-color: var(--color-dark-700);
             }
         }
     }
@@ -85,7 +85,7 @@
 }
 
 .grid-item-header {
-    @apply flex cursor-move items-center justify-between border-b bg-gray-200 px-4 py-2 text-sm outline-none;
+    @apply flex cursor-move items-center justify-between border-b bg-gray-200 px-4 py-2 text-sm outline-hidden;
 }
 
 .grid-fullscreen {

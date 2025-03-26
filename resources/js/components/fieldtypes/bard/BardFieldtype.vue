@@ -738,7 +738,7 @@ export default {
                     // of Bard. We use a timeout because activeElement only exists after the blur event.
                     setTimeout(() => {
                         if (!this.$refs.container.contains(document.activeElement)) {
-                            this.$emit('blur');
+                            this.$emit('blur-sm');
                             this.showAddSetButton = false;
                         }
                     }, 1);

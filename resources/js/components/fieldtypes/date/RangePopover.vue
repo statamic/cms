@@ -17,7 +17,7 @@
                                 :value="inputValue.start"
                                 v-on="inputEvents.start"
                                 @focus="$emit('focus', $event.target)"
-                                @blur="$emit('blur')"
+                                @blur="$emit('blur-sm')"
                             />
                             <button
                                 v-if="!isReadOnly"
@@ -52,7 +52,7 @@
                                 :value="inputValue.end"
                                 v-on="inputEvents.end"
                                 @focus="$emit('focus', $event.target)"
-                                @blur="$emit('blur')"
+                                @blur="$emit('blur-sm')"
                             />
                         </div>
                     </div>
@@ -66,7 +66,7 @@
 import Picker from './Picker';
 
 export default {
-    emits: ['update:model-value', 'focus', 'blur'],
+    emits: ['update:model-value', 'focus', 'blur-sm'],
 
     mixins: [Picker],
 

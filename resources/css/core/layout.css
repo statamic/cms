@@ -32,7 +32,7 @@ a {
     text-overflow: ellipsis;
 }
 
-@screen md {
+@media (width >= theme(--breakpoint-md)) {
     #main {
         padding-top: 52px;
     }
@@ -70,7 +70,7 @@ a {
     @apply p-3 pt-6;
 }
 
-@screen md {
+@media (width >= theme(--breakpoint-md)) {
     .page-wrapper {
         @apply mx-auto max-w-xl px-8;
     }

@@ -19,7 +19,7 @@
             @update:model-value="input"
             @search="search"
             @search:focus="$emit('focus')"
-            @search:blur="$emit('blur')"
+            @-search:blur-sm="$emit('blur-sm')"
         >
             <template #option="{ title, hint, status }">
                 <div class="flex items-center justify-between">

@@ -9,7 +9,7 @@
 @section('content')
     @include('statamic::partials.outside-logo')
 
-    <div class="relative mx-auto flex max-w-xs items-center justify-center rounded shadow-lg">
+    <div class="relative mx-auto flex max-w-xs items-center justify-center rounded-sm shadow-lg">
         <div class="outside-shadow absolute inset-0"></div>
         <div class="card auth-card">
             <login

@@ -75,7 +75,7 @@
                             @synced="$emit('synced', $event)"
                             @desynced="$emit('desynced', $event)"
                             @focus="$emit('focus', $event)"
-                            @blur="$emit('blur', $event)"
+                            @blur="$emit('blur-sm', $event)"
                         />
                     </div>
                 </div>
@@ -99,7 +99,7 @@
                             @synced="$emit('synced', $event)"
                             @desynced="$emit('desynced', $event)"
                             @focus="$emit('focus', $event)"
-                            @blur="$emit('blur', $event)"
+                            @blur="$emit('blur-sm', $event)"
                         />
                     </div>
                 </div>

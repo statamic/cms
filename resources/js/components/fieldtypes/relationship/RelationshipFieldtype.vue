@@ -28,7 +28,7 @@
         :initial-sort-column="meta.initialSortColumn"
         :initial-sort-direction="meta.initialSortDirection"
         @focus="$emit('focus')"
-        @blur="$emit('blur')"
+        @blur="$emit('blur-sm')"
         @input="update"
         @item-data-updated="itemDataUpdated"
     />

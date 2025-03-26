@@ -4,7 +4,7 @@
 
 .asset-modal {
     .saving {
-        @apply absolute inset-0 flex items-center rounded-sm bg-white/90;
+        @apply absolute inset-0 flex items-center rounded-xs bg-white/90;
         z-index: 200;
 
         .inner {
@@ -26,15 +26,15 @@
 }
 
 .drag-notification {
-    @apply absolute inset-0 flex items-center justify-center rounded p-1 text-center text-xs leading-tight @sm:text-lg;
-    border: 1px dashed theme('colors.gray.600');
+    @apply absolute inset-0 flex items-center justify-center rounded-sm p-1 text-center text-xs leading-tight @sm:text-lg;
+    border: 1px dashed var(--color-gray-600);
     pointer-events: none;
     z-index: 1049;
     background: rgba(255, 255, 255, 0.9);
 
     .dark & {
         @apply bg-dark-900/90;
-        border-color: theme('colors.dark.600');
+        border-color: var(--color-dark-600);
     }
 }
 
@@ -42,13 +42,13 @@
    ========================================================================== */
 
 .asset-table-listing {
-    @apply relative overflow-hidden rounded border dark:border-dark-900;
+    @apply relative overflow-hidden rounded-sm border dark:border-dark-900;
 
     table {
         @apply m-0 w-full select-none rounded-b border-none;
     }
     tbody tr {
-        @apply outline-none;
+        @apply outline-hidden;
     }
 
     tbody tr:not(:last-child) {
@@ -113,10 +113,10 @@
    ========================================================================== */
 
 .asset-tile {
-    @apply relative flex min-w-0 cursor-pointer flex-col items-center justify-between rounded border bg-white dark:border-dark-300 dark:bg-dark-600;
+    @apply relative flex min-w-0 cursor-pointer flex-col items-center justify-between rounded-sm border bg-white dark:border-dark-300 dark:bg-dark-600;
 
     .asset-thumb {
-        @apply flex h-full w-full items-center justify-center rounded;
+        @apply flex h-full w-full items-center justify-center rounded-sm;
         > img,
         > svg,
         > .svg-img {
@@ -152,7 +152,7 @@
 
 .asset-tile.selected {
     @apply border-blue dark:border-dark-blue-100;
-    box-shadow: 0 0 0 1px theme('colors.blue.DEFAULT');
+    box-shadow: 0 0 0 1px var(--color-blue);
 }
 
 .asset-thumbnail {
@@ -190,7 +190,7 @@
     }
 
     .loading {
-        @apply absolute inset-0 z-10 flex items-center justify-center rounded bg-white/70;
+        @apply absolute inset-0 z-10 flex items-center justify-center rounded-sm bg-white/70;
     }
 }
 

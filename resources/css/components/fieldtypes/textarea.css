@@ -8,7 +8,7 @@
 
     &:not(.focus-within-only):focus,
     &:not(.focus-within-only):focus-within {
-        @apply shadow-none outline-none ring-2 ring-blue-300 dark:ring-blue-600;
+        @apply shadow-none outline-hidden ring-2 ring-blue-300 dark:ring-blue-600;
     }
 }
 

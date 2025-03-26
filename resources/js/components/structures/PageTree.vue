@@ -35,7 +35,7 @@
                 @close:node="nodeClosed"
             >
                 <template #placeholder>
-                    <div class="w-full rounded border border-dashed border-blue-400 bg-blue-500/10 p-2">&nbsp;</div>
+                    <div class="w-full rounded-sm border border-dashed border-blue-400 bg-blue-500/10 p-2">&nbsp;</div>
                 </template>
 
                 <template #default="{ node, stat }">

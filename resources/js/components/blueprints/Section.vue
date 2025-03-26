@@ -101,7 +101,7 @@
                 <template v-slot:empty-state>
                     <div
                         v-text="__('Add or drag fields here')"
-                        class="mb-2 rounded border border-dashed p-2 text-center text-2xs text-gray-600 dark:border-dark-200 dark:text-dark-150"
+                        class="mb-2 rounded-sm border border-dashed p-2 text-center text-2xs text-gray-600 dark:border-dark-200 dark:text-dark-150"
                     />
                 </template>
             </fields>

@@ -41,7 +41,7 @@
                         handle-class="table-drag-handle"
                         :mirror="false"
                         @dragstart="$emit('focus')"
-                        @dragend="$emit('blur')"
+                        @dragend="$emit('blur-sm')"
                     >
                         <tbody>
                             <tr class="sortable-row" v-for="(row, rowIndex) in data" :key="row._id">
@@ -53,7 +53,7 @@
                                         class="input-text"
                                         :readonly="isReadOnly"
                                         @focus="$emit('focus')"
-                                        @blur="$emit('blur')"
+                                        @blur="$emit('blur-sm')"
                                     />
                                 </td>
                                 <td class="row-controls" v-if="canDeleteRows">

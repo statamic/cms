@@ -27,7 +27,7 @@ const buttonClasses = computed(() => {
             variant: {
                 default: [
                     'bg-linear-to-b from-white to-gray-50 hover:to-gray-100 text-gray-800 border border-gray-300 shadow-ui-sm',
-                    'dark:from-gray-800 dark:to-gray-850 dark:hover:to-gray-800 hover:bg-gray-50 dark:hover:bg-gray-850 dark:border-b-0 dark:ring dark:ring-black dark:border-white/15 dark:text-gray-300 dark:shadow-md'
+                    'dark:from-gray-800 dark:to-gray-850 dark:hover:to-gray-800 hover:bg-gray-50 dark:hover:bg-gray-850 dark:border-b-0 dark:ring-3 dark:ring-black dark:border-white/15 dark:text-gray-300 dark:shadow-md'
                 ],
                 primary: [
                     'bg-linear-to-b from-primary/90 to-primary hover:bg-primary-hover text-white border border-primary-border shadow-ui-md inset-shadow-2xs inset-shadow-white/25',
@@ -43,10 +43,10 @@ const buttonClasses = computed(() => {
                 xs: 'px-2 h-6.5 text-xs',
             },
             groupBorder: {
-                default: '[[data-ui-button-group]_&]:border-s-0 [:is([data-ui-button-group]>&:first-child,_[data-ui-button-group]_:first-child>&)]:border-s-[1px]',
-                primary: '[[data-ui-button-group]_&]:border-e-0 [:is([data-ui-button-group]>&:last-child,_[data-ui-button-group]_:last-child>&)]:border-e-[1px] [:is([data-ui-button-group]>&:not(:first-child),_[data-ui-button-group]_:not(:first-child)>&)]:border-s-primary-gap',
-                danger: '[[data-ui-button-group]_&]:border-s-0 [[data-ui-button-group]_&]:border-e [:is([data-ui-button-group]>&:last-child,_[data-ui-button-group]_:last-child>&)]:border-e-0 [[data-ui-button-group]_&]:border-red-600',
-                filled: '[[data-ui-button-group]_&]:border-e [:is([data-ui-button-group]>&:last-child,_[data-ui-button-group]_:last-child>&)]:border-e-0 [[data-ui-button-group]_&]:border-gray-300/70',
+                default: 'in-data-ui-button-group:border-s-0 [:is([data-ui-button-group]>&:first-child,_[data-ui-button-group]_:first-child>&)]:border-s-[1px]',
+                primary: 'in-data-ui-button-group:border-e-0 [:is([data-ui-button-group]>&:last-child,_[data-ui-button-group]_:last-child>&)]:border-e-[1px] [:is([data-ui-button-group]>&:not(:first-child),_[data-ui-button-group]_:not(:first-child)>&)]:border-s-primary-gap',
+                danger: 'in-data-ui-button-group:border-s-0 in-data-ui-button-group:border-e [:is([data-ui-button-group]>&:last-child,_[data-ui-button-group]_:last-child>&)]:border-e-0 in-data-ui-button-group:border-red-600',
+                filled: 'in-data-ui-button-group:border-e [:is([data-ui-button-group]>&:last-child,_[data-ui-button-group]_:last-child>&)]:border-e-0 in-data-ui-button-group:border-gray-300/70',
                 ghost: '',
             },
             iconOnly: { true: 'px-0' },

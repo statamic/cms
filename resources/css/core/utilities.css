@@ -2,29 +2,29 @@
    UTILITES
    ========================================================================== */
 
-.text-shadow {
+@utility text-shadow {
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
 }
 
-.focus-outline {
+@utility focus-outline {
     @apply border border-blue-300 dark:border-dark-blue-200;
     outline: 0;
     box-shadow: 0 0 0 0.2rem rgba(0, 125, 255, 0.25);
 }
 
-.focus-none {
+@utility focus-none {
     /* @apply border-0; */
     outline: 0;
     box-shadow: none;
 }
 
-.selected-outline {
+@utility selected-outline {
     @apply border-blue;
     outline: 0;
-    box-shadow: 0 0 0 2px theme('colors.blue.DEFAULT');
+    box-shadow: 0 0 0 2px var(--color-blue);
 }
 
-.loading {
+@utility loading {
     text-align: center;
     padding: 20px 0;
 
@@ -33,7 +33,7 @@
         margin-bottom: 5px;
     }
 
-    &.loading-basic {
+    /* &.loading-basic {
         @apply ltr:text-left rtl:text-right;
         padding: 0;
 
@@ -44,10 +44,10 @@
                 margin: -2px 0 0 5px;
             }
         }
-    }
+    } */
 }
 
-.shadow-hover-lg {
+@utility shadow-hover-lg {
     @apply shadow-lg;
     transition: box-shadow 0.08s ease-in-out;
     &:hover {
@@ -55,17 +55,17 @@
     }
 }
 
-.w-fit-content {
+@utility w-fit-content {
     width: fit-content;
 }
 
-.break-overflowing-words {
+@utility break-overflowing-words {
     word-break: break-word;
     overflow-wrap: break-word;
 }
 
-.saving-overlay {
-    @apply absolute inset-0 z-200 flex items-center rounded;
+@utility saving-overlay {
+    @apply absolute inset-0 z-200 flex items-center rounded-sm;
     background: rgba(255, 255, 255, 0.9);
 
     .dark & {
@@ -87,7 +87,7 @@
     }
 }
 
-.bg-checkerboard {
+@utility bg-checkerboard {
     background-color: #fff;
     background-image: linear-gradient(45deg, #edf2f6 25%, transparent 25%),
         linear-gradient(-45deg, #edf2f6 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #edf2f6 75%),
@@ -100,16 +100,16 @@
         -8px 0;
 
     .dark & {
-        background-color: theme(colors.dark.600);
-        background-image: linear-gradient(45deg, theme(colors.dark.950) 25%, transparent 25%),
-            linear-gradient(-45deg, theme(colors.dark.950) 25%, transparent 25%),
-            linear-gradient(45deg, transparent 75%, theme(colors.dark.950) 75%),
-            linear-gradient(-45deg, transparent 75%, theme(colors.dark.950) 75%);
+        background-color: var(--color-dark-600);
+        background-image: linear-gradient(45deg, var(--color-dark-950) 25%, transparent 25%),
+            linear-gradient(-45deg, var(--color-dark-950) 25%, transparent 25%),
+            linear-gradient(45deg, transparent 75%, var(--color-dark-950) 75%),
+            linear-gradient(-45deg, transparent 75%, var(--color-dark-950) 75%);
     }
 }
 
-.clickable {
-    @apply cursor-pointer select-none border bg-gradient-to-b from-white to-gray-100 text-gray-800 dark:border-dark-800 dark:from-dark-550 dark:to-dark-600 dark:text-dark-175;
+@utility clickable {
+    @apply cursor-pointer select-none border bg-linear-to-b from-white to-gray-100 text-gray-800 dark:border-dark-800 dark:from-dark-550 dark:to-dark-600 dark:text-dark-175;
 
     &:hover {
         @apply border-gray-500 from-white to-gray-200 dark:border-dark-900 dark:from-dark-550 dark:to-dark-700;
@@ -121,6 +121,6 @@
     display: none;
 }
 
-.-max-h-screen-px {
+@utility max-h-screen-px {
     max-height: calc(100vh - 1px) !important;
 }

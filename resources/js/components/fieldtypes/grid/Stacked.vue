@@ -8,7 +8,7 @@
             append-to="body"
             constrain-dimensions
             @dragstart="$emit('focus')"
-            @dragend="$emit('blur')"
+            @dragend="$emit('blur-sm')"
             @update:model-value="(rows) => $emit('sorted', rows)"
             v-slot="{}"
         >
@@ -36,7 +36,7 @@
                     @meta-updated="$emit('meta-updated', row._id, $event)"
                     @removed="(row) => $emit('removed', row)"
                     @focus="$emit('focus')"
-                    @blur="$emit('blur')"
+                    @blur="$emit('blur-sm')"
                 />
             </div>
         </sortable-list>

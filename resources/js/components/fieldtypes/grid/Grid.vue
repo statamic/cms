@@ -161,7 +161,7 @@ export default {
 
             setTimeout(() => {
                 if (!this.$el.contains(document.activeElement)) {
-                    this.$emit('blur');
+                    this.$emit('blur-sm');
                 }
             }, 1);
         },

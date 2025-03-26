@@ -222,10 +222,11 @@
 
 <style scoped>
 :deep(.publish-fields .form-group .field-inner > label) {
-    @apply mb-1 text-base font-bold;
+    /* TODO: Remove @apply */
+    /* @apply mb-1 text-base font-bold;
     & + .help-block {
         @apply -mt-1 !important;
-    }
+    } */
 }
 </style>
 

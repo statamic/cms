@@ -7,7 +7,7 @@
     @apply dark:bg-dark-600 dark:shadow-dark;
 }
 
-@screen md {
+@media (width >= theme(--breakpoint-md)) {
     .card {
         @apply p-4;
     }

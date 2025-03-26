@@ -9,8 +9,8 @@
             <div class="filename">{{ basename }}</div>
         </div>
 
-        <div v-if="status !== 'error'" class="mx-2 h-4 flex-1 rounded bg-white">
-            <div class="h-full rounded bg-blue" :style="{ width: percent + '%' }" />
+        <div v-if="status !== 'error'" class="mx-2 h-4 flex-1 rounded-sm bg-white">
+            <div class="h-full rounded-sm bg-blue" :style="{ width: percent + '%' }" />
         </div>
 
         <div class="ml-4 flex items-center gap-2 px-2" v-if="status === 'error'">

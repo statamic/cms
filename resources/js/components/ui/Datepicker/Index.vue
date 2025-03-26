@@ -51,10 +51,10 @@ const maxValue = computed(() => props.max ? (typeof props.max === 'string' ? par
             <DatePickerField v-slot="{ segments }" class="w-full">
                 <div class="
                     w-full flex bg-white dark:bg-gray-900
-                    border border-gray-300 dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:inset-shadow-xs dark:inset-shadow-black
+                    border border-gray-300 dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:inset-shadow-2xs dark:inset-shadow-black
                     text-gray-600 dark:text-gray-300 leading-[1.375rem]
                     shadow-ui-sm disabled:shadow-none rounded-lg ps-3 pe-10 py-2 h-10 not-prose
-                    data-[invalid]:border-red-500
+                    data-invalid:border-red-500
                 ">
                     <template v-for="item in segments" :key="item.part">
                         <DatePickerInput v-if="item.part === 'literal'" :part="item.part">
@@ -63,14 +63,14 @@ const maxValue = computed(() => props.max ? (typeof props.max === 'string' ? par
                         <DatePickerInput
                             v-else
                             :part="item.part"
-                            class="py-0.5 px-0.25 rounded focus:outline-none focus:bg-gray-50 dark:focus:bg-gray-800 data-[placeholder]:text-gray-600 dark:data-[placeholder]:text-gray-400"
+                            class="py-0.5 px-0.25 rounded-sm focus:outline-hidden focus:bg-gray-50 dark:focus:bg-gray-800 data-placeholder:text-gray-600 dark:data-placeholder:text-gray-400"
                             :class="{ 'px-0.5!': item.part === 'month' || item.part === 'year' || item.part === 'day' }"
                         >
                             {{ item.value }}
                         </DatePickerInput>
                     </template>
                 </div>
-                <DatePickerTrigger class="absolute text-gray-400 hover:bg-gray-50 focus:bg-gray-50 dark:hover:bg-gray-900 dark:focus:bg-gray-900 rounded-lg flex items-center justify-center end-1 px-2 top-1 bottom-1 outline-none">
+                <DatePickerTrigger class="absolute text-gray-400 hover:bg-gray-50 focus:bg-gray-50 dark:hover:bg-gray-900 dark:focus:bg-gray-900 rounded-lg flex items-center justify-center end-1 px-2 top-1 bottom-1 outline-hidden">
                     <ui-icon name="calendar" class="w-4 h-4" />
                 </DatePickerTrigger>
             </DatePickerField>

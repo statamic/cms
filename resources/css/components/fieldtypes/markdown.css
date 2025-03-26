@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .markdown-fieldtype-wrapper {
-    @apply relative overflow-hidden rounded border dark:border-dark-900;
+    @apply relative overflow-hidden rounded-sm border dark:border-dark-900;
 
     .markdown-toolbar {
         @apply flex flex-wrap items-center justify-between rounded-t border-b bg-white text-sm shadow-none dark:border-dark-900 dark:bg-dark-700;
@@ -15,7 +15,7 @@
     }
 
     .markdown-buttons button {
-        @apply flex h-8 w-8 items-center justify-center rounded px-1 text-center text-base text-gray-800 dark:text-dark-150;
+        @apply flex h-8 w-8 items-center justify-center rounded-sm px-1 text-center text-base text-gray-800 dark:text-dark-150;
 
         &:hover {
             @apply bg-gray-200 dark:bg-dark-750;
@@ -37,14 +37,14 @@
         @apply flex items-center;
 
         button {
-            @apply inline-block px-2 py-1 text-gray-700 focus:outline-none dark:text-dark-150 ltr:mr-1 rtl:ml-1;
+            @apply inline-block px-2 py-1 text-gray-700 focus:outline-hidden dark:text-dark-150 ltr:mr-1 rtl:ml-1;
 
             &:hover {
                 @apply text-blue;
             }
 
             &.active {
-                @apply rounded bg-blue-100 text-blue-800 dark:bg-dark-800 dark:text-dark-150;
+                @apply rounded-sm bg-blue-100 text-blue-800 dark:bg-dark-800 dark:text-dark-150;
             }
         }
     }
@@ -92,7 +92,7 @@
 
     .markdown-toolbar {
         @apply border-b border-gray-950 text-white shadow-lg;
-        background: linear-gradient(180deg, theme('colors.gray.900'), hsl(210, 20%, 13%));
+        background: linear-gradient(180deg, var(--color-gray-900), hsl(210, 20%, 13%));
     }
 
     .editor {
@@ -150,7 +150,7 @@
 
 .grid-fieldtype .grid-table .markdown-fieldtype {
     .markdown-fieldtype-wrapper {
-        @apply rounded border;
+        @apply rounded-sm border;
     }
 
     .markdown-preview {
@@ -201,7 +201,7 @@
     }
 
     pre {
-        @apply rounded px-4 py-2 dark:bg-dark-700 dark:text-red-500;
+        @apply rounded-sm px-4 py-2 dark:bg-dark-700 dark:text-red-500;
         color: #c7254e;
         background-color: #f9f2f4;
         direction: ltr;
@@ -231,7 +231,7 @@
     }
 
     .editor {
-        @apply relative mx-auto my-6 max-w-xl rounded bg-white px-2 shadow md:px-8 md:pt-8;
+        @apply relative mx-auto my-6 max-w-xl rounded-sm bg-white px-2 shadow md:px-8 md:pt-8;
 
         .CodeMirror-scroll {
             @apply m-0;
@@ -239,10 +239,10 @@
     }
 
     .CodeMirror {
-        @apply bg-transparent shadow-none outline-none;
+        @apply bg-transparent shadow-none outline-hidden;
         &:focus,
         &:focus-within {
-            @apply ring-0 !important;
+            @apply ring-0!;
         }
     }
 

@@ -9,13 +9,13 @@
     .dark & {
         .logo {
             path {
-                fill: theme(colors.dark.100) !important;
+                fill: var(--color-dark-100) !important;
             }
         }
     }
 
     .global-header-icon-button {
-        @apply block h-7 w-7 rounded-full border border-transparent p-1 text-gray outline-none hover:border-gray-400 hover:bg-gray-200 hover:text-gray-800;
+        @apply block h-7 w-7 rounded-full border border-transparent p-1 text-gray outline-hidden hover:border-gray-400 hover:bg-gray-200 hover:text-gray-800;
         @apply dark:border-transparent dark:text-dark-100 dark:hover:border-dark-900 dark:hover:bg-dark-800 dark:hover:text-dark-100;
     }
 }
@@ -23,7 +23,7 @@
 /* Responsive Wangjangling
    ========================================================================== */
 
-@screen md {
+@media (width >= theme(--breakpoint-md)) {
     .global-header {
         @apply fixed px-0;
     }
@@ -50,7 +50,7 @@
     }
 
     .global-search-results {
-        @apply absolute w-full rounded border border-gray-500 bg-white p-0 shadow-lg;
+        @apply absolute w-full rounded-sm border border-gray-500 bg-white p-0 shadow-lg;
         @apply dark:border-dark-900 dark:bg-dark-650;
         top: 36px;
         left: -1px;
@@ -83,7 +83,7 @@
     }
 
     .global-search-result-badge {
-        @apply rounded border bg-gray-200 px-1 text-2xs text-gray;
+        @apply rounded-sm border bg-gray-200 px-1 text-2xs text-gray;
         @apply dark:border-dark-700 dark:bg-dark-600 dark:text-dark-100;
     }
 
@@ -129,11 +129,11 @@
     }
 
     kbd {
-        @apply rounded border px-1 pb-px font-sans text-2xs text-gray-500;
+        @apply rounded-sm border px-1 pb-px font-sans text-2xs text-gray-500;
     }
 }
 
-@screen lg {
+@media (width >= theme(--breakpoint-lg)) {
     .global-search {
         @apply flex w-128 max-w-full;
         .global-search-results {
@@ -178,7 +178,7 @@
 }
 
 .session-expiry-stripe {
-    @apply fixed top-0 w-full cursor-pointer bg-red-500 px-4 py-2 text-center text-xs text-white outline-none;
+    @apply fixed top-0 w-full cursor-pointer bg-red-500 px-4 py-2 text-center text-xs text-white outline-hidden;
     z-index: 999;
     height: 48px;
 

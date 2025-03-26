@@ -7,7 +7,7 @@
         @apply absolute right-3 top-2 z-10 text-xs uppercase tracking-wider text-gray-600;
     }
     .CodeMirror-wrap {
-        @apply rounded;
+        @apply rounded-sm;
     }
 }
 

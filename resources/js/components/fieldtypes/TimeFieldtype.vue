@@ -17,7 +17,7 @@
                 :readonly="isReadOnly"
                 @keydown.esc="clear"
                 @focus="focused"
-                @blur="$emit('blur')"
+                @blur="$emit('blur-sm')"
                 @change="updateActualValue"
             />
         </div>

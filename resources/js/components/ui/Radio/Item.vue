@@ -16,7 +16,7 @@ const id = useId();
         <RadioGroupItem
             :id
             :value="value"
-            class="bg-white size-4 mt-0.5 rounded-full border border-gray-300 dark:border-none data-[active=true]:border-gray-900 data-[active=true]:bg-gray-900 dark:data-[active=true]:bg-white shadow-ui-xs outline-none cursor-default"
+            class="bg-white size-4 mt-0.5 rounded-full border border-gray-300 dark:border-none data-[active=true]:border-gray-900 data-[active=true]:bg-gray-900 dark:data-[active=true]:bg-white shadow-ui-xs outline-hidden cursor-default"
         >
             <RadioGroupIndicator
                 class="flex items-center justify-center w-full h-full relative after:content-[''] after:block after:w-1.5 after:h-1.5 after:rounded-[50%] after:bg-white dark:after:bg-gray-800"

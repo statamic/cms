@@ -11,54 +11,54 @@ svg {
 
 .dark svg {
     [fill='#EAEEF9'] {
-        fill: theme(colors.dark.575);
+        fill: var(--color-dark-575);
     }
     [fill='#989FB0'] {
-        fill: theme(colors.dark.700);
+        fill: var(--color-dark-700);
     }
     [stroke='#EAEEF9'] {
-        stroke: theme(colors.dark.200);
+        stroke: var(--color-dark-200);
     }
     [stroke='#C2C8D6'] {
-        stroke: theme(colors.dark.700);
+        stroke: var(--color-dark-700);
     }
     [fill='white'] {
-        fill: theme(colors.dark.200);
+        fill: var(--color-dark-200);
     }
     [stop-color='#B0BACC'] {
-        stop-color: theme(colors.dark.800);
+        stop-color: var(--color-dark-800);
     }
     [stop-color='#969EAE'] {
-        stop-color: theme(colors.dark.950);
+        stop-color: var(--color-dark-950);
     }
     [stop-color='#FDFEFF'] {
-        stop-color: theme(colors.dark.200);
+        stop-color: var(--color-dark-200);
     }
     [stop-color='#ECF0F5'] {
-        stop-color: theme(colors.dark.250);
+        stop-color: var(--color-dark-250);
     }
     [fill='#D6DCE8'] {
-        fill: theme(colors.dark.300);
+        fill: var(--color-dark-300);
     }
     [stroke='#AAB2C5'] {
-        stroke: theme(colors.dark.950);
+        stroke: var(--color-dark-950);
     }
     [fill='#AAB2C5'] {
-        fill: theme(colors.dark.950);
+        fill: var(--color-dark-950);
     }
     [fill='#D5DDEA'] {
-        fill: theme(colors.dark.700);
+        fill: var(--color-dark-700);
     }
     [fill='#C2C8D6'] {
-        fill: theme(colors.black);
+        fill: var(--color-black);
     }
     [stroke='#989FB0'] {
-        stroke: theme(colors.dark.200);
+        stroke: var(--color-dark-200);
     }
 }
 
 .heroicon-component-accent {
-    fill: theme('colors.blue.DEFAULT');
+    fill: var(--color-blue);
 }
 
 .icon-status,
@@ -84,7 +84,7 @@ svg {
 }
 
 .icon-header-avatar {
-    @apply flex-shrink-0 overflow-hidden rounded-full shadow;
+    @apply shrink-0 overflow-hidden rounded-full shadow;
     height: 32px;
     width: 32px;
     line-height: 32px;

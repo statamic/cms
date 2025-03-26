@@ -37,7 +37,7 @@
 }
 
 .data-table {
-    @apply w-full max-w-full text-gray-700 outline-none dark:text-dark-150 ltr:text-left rtl:text-right;
+    @apply w-full max-w-full text-gray-700 outline-hidden dark:text-dark-150 ltr:text-left rtl:text-right;
     overflow-x: auto;
 
     thead {
@@ -161,13 +161,13 @@
         &:after {
             @apply absolute bottom-0 top-0 -z-1 ltr:left-0 ltr:right-0 rtl:left-0 rtl:right-0;
             content: '';
-            background-image: linear-gradient(to right, theme(colors.gray.100) 70%, theme(colors.gray.100 / 0%) 100%);
+            background-image: linear-gradient(to right, var(--color-gray-100) 70%, --theme(--color-gray-100 / 0%) 100%);
 
             .dark & {
                 background-image: linear-gradient(
                     to right,
-                    theme(colors.dark.550) 70%,
-                    theme(colors.dark.550 / 0%) 100%
+                    var(--color-dark-550) 70%,
+                    --theme(--color-dark-550 / 0%) 100%
                 );
             }
         }
@@ -177,8 +177,8 @@
                 .dark & {
                     background-image: linear-gradient(
                         to right,
-                        theme(colors.dark.750) 70%,
-                        theme(colors.dark.750 / 0%) 100%
+                        var(--color-dark-750) 70%,
+                        --theme(--color-dark-750 / 0%) 100%
                     );
                     @apply border-b border-dark-550;
                 }
@@ -193,13 +193,13 @@
         &:after {
             @apply absolute bottom-0 top-0 -z-1 ltr:left-0 ltr:right-0 rtl:left-0 rtl:right-0;
             content: '';
-            background-image: linear-gradient(to left, theme(colors.gray.100) 70%, theme(colors.gray.100 / 0%) 100%);
+            background-image: linear-gradient(to left, var(--color-gray-100) 70%, --theme(--color-gray-100 / 0%) 100%);
 
             .dark & {
                 background-image: linear-gradient(
                     to left,
-                    theme(colors.dark.550) 70%,
-                    theme(colors.dark.550 / 0%) 100%
+                    var(--color-dark-550) 70%,
+                    --theme(--color-dark-550 / 0%) 100%
                 );
             }
         }
@@ -209,8 +209,8 @@
                 .dark & {
                     background-image: linear-gradient(
                         to left,
-                        theme(colors.dark.750) 70%,
-                        theme(colors.dark.750 / 0%) 100%
+                        var(--color-dark-750) 70%,
+                        --theme(--color-dark-750 / 0%) 100%
                     );
                     @apply border-b border-dark-550;
                 }
@@ -228,8 +228,8 @@
             .dark & {
                 background-image: linear-gradient(
                     to right,
-                    theme(colors.dark.600) 70%,
-                    theme(colors.dark.600 / 0%) 100%
+                    var(--color-dark-600) 70%,
+                    --theme(--color-dark-600 / 0%) 100%
                 );
             }
         }
@@ -247,42 +247,42 @@
             .dark & {
                 background-image: linear-gradient(
                     to left,
-                    theme(colors.dark.600) 70%,
-                    theme(colors.dark.600 / 0%) 100%
+                    var(--color-dark-600) 70%,
+                    --theme(--color-dark-600 / 0%) 100%
                 );
             }
         }
     }
 
     tbody tr.row-selected .checkbox-column:after {
-        background-image: linear-gradient(to right, theme(colors.gray.200) 70%, theme(colors.gray.200 / 0%) 100%);
+        background-image: linear-gradient(to right, var(--color-gray-200) 70%, --theme(--color-gray-200 / 0%) 100%);
 
         .dark & {
-            background-image: linear-gradient(to right, theme(colors.dark.600) 70%, theme(colors.dark.600 / 0%) 100%);
+            background-image: linear-gradient(to right, var(--color-dark-600) 70%, --theme(--color-dark-600 / 0%) 100%);
         }
     }
 
     tbody tr.row-selected .actions-column:after {
-        background-image: linear-gradient(to left, theme(colors.gray.200) 70%, theme(colors.gray.200 / 0%) 100%);
+        background-image: linear-gradient(to left, var(--color-gray-200) 70%, --theme(--color-gray-200 / 0%) 100%);
 
         .dark & {
-            background-image: linear-gradient(to left, theme(colors.dark.600) 70%, theme(colors.dark.600 / 0%) 100%);
+            background-image: linear-gradient(to left, var(--color-dark-600) 70%, --theme(--color-dark-600 / 0%) 100%);
         }
     }
 
     tbody tr:hover .checkbox-column:after {
-        background-image: linear-gradient(to right, theme(colors.gray.100) 70%, theme(colors.gray.100 / 0%) 100%);
+        background-image: linear-gradient(to right, var(--color-gray-100) 70%, --theme(--color-gray-100 / 0%) 100%);
 
         .dark & {
-            background-image: linear-gradient(to right, theme(colors.dark.500) 70%, theme(colors.dark.500 / 0%) 100%);
+            background-image: linear-gradient(to right, var(--color-dark-500) 70%, --theme(--color-dark-500 / 0%) 100%);
         }
     }
 
     tbody tr:hover .actions-column:after {
-        background-image: linear-gradient(to left, theme(colors.gray.100) 70%, theme(colors.gray.100 / 0%) 100%);
+        background-image: linear-gradient(to left, var(--color-gray-100) 70%, --theme(--color-gray-100 / 0%) 100%);
 
         .dark & {
-            background-image: linear-gradient(to left, theme(colors.dark.500) 70%, theme(colors.dark.500 / 0%) 100%);
+            background-image: linear-gradient(to left, var(--color-dark-500) 70%, --theme(--color-dark-500 / 0%) 100%);
         }
     }
 }
@@ -315,11 +315,11 @@ td.table-drag-handle {
     @apply h-full w-3 p-2 dark:border-dark-900 ltr:border-r rtl:border-l;
     min-width: 16px;
     cursor: grab;
-    background: theme('colors.gray.200') url('../../svg/icons/light/drag-dots.svg') center center no-repeat;
+    background: var(--color-gray-200) url('../../svg/icons/light/drag-dots.svg') center center no-repeat;
     background-size: 7px 17px;
 
     .dark & {
-        background-color: theme(colors.dark.700);
+        background-color: var(--color-dark-700);
     }
 
     &:hover {
@@ -443,7 +443,7 @@ table.control {
 .relationship-index-field {
     min-width: 10vw;
     .relationship-index-field-item {
-        @apply flex items-center rounded border bg-gray-100 px-1 text-2xs dark:border-dark-400 dark:bg-dark-500 ltr:mr-1 rtl:ml-1;
+        @apply flex items-center rounded-sm border bg-gray-100 px-1 text-2xs dark:border-dark-400 dark:bg-dark-500 ltr:mr-1 rtl:ml-1;
         a {
             @apply line-clamp-1;
         }
@@ -476,6 +476,6 @@ table.control {
 
     .role-index-field-item,
     .groups-index-field-item {
-        @apply mb-1 line-clamp-1 inline-block rounded border bg-gray-100 px-1 text-2xs dark:border-dark-900 dark:bg-dark-700;
+        @apply mb-1 line-clamp-1 inline-block rounded-sm border bg-gray-100 px-1 text-2xs dark:border-dark-900 dark:bg-dark-700;
     }
 }

@@ -27,7 +27,7 @@ defineEmits(['update:modelValue']);
                 <SliderRange class="absolute bg-slate-900 rounded-full h-full" />
             </SliderTrack>
             <SliderThumb
-                class="block w-5 h-5 bg-white rounded-full hover:bg-gray-50 border-2 border-gray-900 shadow-ui-sm focus:outline-none focus:shadow-ui-md"
+                class="block w-5 h-5 bg-white rounded-full hover:bg-gray-50 border-2 border-gray-900 shadow-ui-sm focus:outline-hidden focus:shadow-ui-md"
                 :aria-label="label"
             />
         </SliderRoot>

@@ -35,7 +35,7 @@
     }
 
     label:last-child {
-        @apply mb-0 !important; /* Removes spacing under label when there are no instructions to display */
+        @apply mb-0!; /* Removes spacing under label when there are no instructions to display */
     }
 }
 

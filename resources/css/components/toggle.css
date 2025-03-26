@@ -53,7 +53,7 @@
 }
 
 .toggle-knob {
-    @apply absolute top-px rounded-full bg-white outline-none;
+    @apply absolute top-px rounded-full bg-white outline-hidden;
     right: 0;
     [dir='rtl'] & {
         right: auto;
@@ -67,12 +67,12 @@
         background-color 0.2s ease-in-out;
 
     .dark & {
-        background: theme(colors.dark.500);
+        background: var(--color-dark-500);
     }
 }
 
 .toggle-knob:hover {
-    box-shadow: 0 1px 3px rgba(theme('colors.blue.DEFAULT'), 0.9);
+    box-shadow: 0 1px 3px rgba(var(--color-blue), 0.9);
 }
 
 .toggle-container.on {
@@ -82,7 +82,7 @@
     }
 
     .toggle-knob:focus {
-        box-shadow: 0 0 10px theme(colors.green.500/70);
+        box-shadow: 0 0 10px --theme(--color-green-500 / 70);
         .dark & {
             box-shadow: none;
         }
@@ -93,7 +93,7 @@
     @apply border-gray-600 bg-gray-500;
 
     .toggle-knob:focus {
-        box-shadow: 0 0 10px theme(colors.gray.500/70);
+        box-shadow: 0 0 10px --theme(--color-gray-500 / 70);
     }
 }
 

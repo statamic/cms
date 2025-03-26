@@ -4,7 +4,7 @@
     }
 
     .page-tree-branch {
-        @apply relative rounded bg-white text-xs shadow;
+        @apply relative rounded-sm bg-white text-xs shadow;
         @apply dark:bg-dark-600 dark:shadow-dark;
 
         &:hover {

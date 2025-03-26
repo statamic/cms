@@ -3,7 +3,7 @@
 @endphp
 
 <div class="global-header">
-    <div class="lg:min-w-xl flex h-full items-center ltr:pl-2 ltr:md:pl-6 rtl:pr-2 rtl:md:pr-6">
+    <div class="lg:min-w-xl flex h-full items-center ltr:pl-2 md:ltr:pl-6 rtl:pr-2 md:rtl:pr-6">
         <button
             class="nav-toggle hidden shrink-0 md:flex ltr:ml-1 rtl:mr-1"
             @click="toggleNav"

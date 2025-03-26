@@ -42,7 +42,7 @@
     </div>
 
     @if ($configCached)
-        <div class="rounded border border-yellow-dark bg-yellow p-4 text-xs dark:border-none dark:bg-dark-blue-100">
+        <div class="rounded-sm border border-yellow-dark bg-yellow p-4 text-xs dark:border-none dark:bg-dark-blue-100">
             <div class="mb-2 font-bold">{{ __('Configuration is cached') }}</div>
             <p>{!! __('statamic::messages.licensing_config_cached_warning') !!}</p>
         </div>
@@ -50,7 +50,7 @@
 
     @if ($site->key() && $site->usesIncorrectKeyFormat())
         <div
-            class="{{ $configCached ? 'mt-8' : '' }} rounded border border-yellow-dark bg-yellow p-4 text-xs dark:border-none dark:bg-dark-blue-100"
+            class="{{ $configCached ? 'mt-8' : '' }} rounded-sm border border-yellow-dark bg-yellow p-4 text-xs dark:border-none dark:bg-dark-blue-100"
         >
             <div class="mb-2 font-bold">{{ __('statamic::messages.licensing_incorrect_key_format_heading') }}</div>
             <p>{!! __('statamic::messages.licensing_incorrect_key_format_body') !!}</p>

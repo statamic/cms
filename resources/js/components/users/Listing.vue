@@ -76,7 +76,7 @@
                     <div v-show="items.length === 0" class="p-6 text-center text-gray-500" v-text="__('No results')" />
 
                     <data-list-bulk-actions
-                        class="rounded"
+                        class="rounded-sm"
                         :url="actionUrl"
                         @started="actionStarted"
                         @completed="actionCompleted"

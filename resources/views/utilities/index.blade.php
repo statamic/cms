@@ -20,7 +20,7 @@
                     <div class="h-8 w-8 text-gray-800 dark:text-dark-175 ltr:mr-4 rtl:ml-4">
                         {!! $utility->icon() !!}
                     </div>
-                    <div class="mb-4 flex-1 text-blue md:mb-0 ltr:md:mr-6 rtl:md:ml-6">
+                    <div class="mb-4 flex-1 text-blue md:mb-0 md:ltr:mr-6 md:rtl:ml-6">
                         <h3>{{ $utility->title() }}</h3>
                         <p class="text-xs">{{ $utility->description() }}</p>
                     </div>

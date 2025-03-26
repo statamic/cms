@@ -91,15 +91,15 @@ const maxValue = computed(() => props.max ? (typeof props.max === 'string' ? par
                                 :day="weekDate"
                                 :month="month.value"
                                 class="
-                                    relative flex items-center justify-center rounded-lg whitespace-nowrap text-sm font-normal text-black dark:text-white size-8 outline-none
-                                    data-[outside-view]:text-gray-400 dark:data-[outside-view]:text-gray-600
-                                    data-[selected]:!bg-gray-800 data-[selected]:text-white dark:data-[selected]:!bg-gray-200 dark:data-[selected]:text-black
-                                    hover:bg-gray-100 data-[highlighted]:bg-gray-200 dark:hover:bg-black dark:data-[highlighted]:bg-black
-                                    data-[disabled]:pointer-events-none data-[disabled]:hover:bg-transparent
-                                    data-[disabled]:text-gray-400 dark:data-[disabled]:text-gray-600
-                                    data-[unavailable]:pointer-events-none data-[unavailable]:text-black/30 data-[unavailable]:line-through
+                                    relative flex items-center justify-center rounded-lg whitespace-nowrap text-sm font-normal text-black dark:text-white size-8 outline-hidden
+                                    data-outside-view:text-gray-400 dark:data-outside-view:text-gray-600
+                                    data-selected:bg-gray-800! data-selected:text-white dark:data-selected:bg-gray-200! dark:data-selected:text-black
+                                    hover:bg-gray-100 data-highlighted:bg-gray-200 dark:hover:bg-black dark:data-highlighted:bg-black
+                                    data-disabled:pointer-events-none data-disabled:hover:bg-transparent
+                                    data-disabled:text-gray-400 dark:data-disabled:text-gray-600
+                                    data-unavailable:pointer-events-none data-unavailable:text-black/30 data-unavailable:line-through
                                     before:absolute before:top-[3px] before:hidden before:rounded-lg before:w-1 before:h-1 before:bg-white
-                                    data-[today]:before:block data-[today]:before:bg-green-600
+                                    data-today:before:block data-today:before:bg-green-600
                                 "
                             />
                         </CalendarCell>

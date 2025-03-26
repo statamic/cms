@@ -12,7 +12,7 @@
                     :readonly="isReadOnly"
                     :placeholder="__(config.placeholder) || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'"
                     @focus="$emit('focus')"
-                    @blur="$emit('blur')"
+                    @blur="$emit('blur-sm')"
                 />
             </div>
         </div>
