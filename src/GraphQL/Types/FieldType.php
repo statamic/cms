@@ -55,13 +55,13 @@ class FieldType extends \Rebing\GraphQL\Support\Type
             'if' => [
                 'type' => GraphQL::type(ArrayType::NAME),
                 'resolve' => function ($field) {
-                    return $field->config()['if'] ?? [];
+                    return $field->config()['if'] ?? null;
                 },
             ],
             'unless' => [
                 'type' => GraphQL::type(ArrayType::NAME),
                 'resolve' => function ($field) {
-                    return $field->config()['unless'] ?? [];
+                    return $field->config()['unless'] ?? null;
                 },
             ],
             'config' => [
