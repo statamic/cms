@@ -159,7 +159,7 @@ class Tags extends BaseTags
         );
 
         collect($this->context['fields'])
-            ->each(fn ($field) => $field['field']->slot($slot)->isBlade($isBlade));
+            ->each(fn ($field) => $field['field']->slot($slot));
 
         if ($isBlade) {
             return $this->tagRenderer->render('@foreach($fields as $field)'.$this->content.'@endforeach', $this->context->all());
