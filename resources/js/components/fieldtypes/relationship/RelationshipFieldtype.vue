@@ -147,7 +147,18 @@ export default {
                 const item = _.findWhere(this.meta.data, { id });
                 return item ? item.title : id;
             });
-        }
+        },
+
+        internalFieldActions() {
+            return [
+                {
+                    title: __('Unlink All'),
+                    dangerous: true,
+                    run: this.unlinkAll,
+                    visible: this.value.length > 0,
+                },
+            ];
+        },
 
     },
 
@@ -162,7 +173,15 @@ export default {
 
         linkExistingItem() {
             this.$refs.input.$refs.existing.click();
-        }
+        },
+
+        unlinkAll() {
+            this.update([]);
+            this.updateMeta({
+                ...this.meta,
+                data: [], 
+            });
+        },
 
     }
 

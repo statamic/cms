@@ -117,7 +117,7 @@ class User extends BaseUser
             ? File::disk('users')->lastModified($path)
             : time();
 
-        return Carbon::createFromTimestamp($timestamp);
+        return Carbon::createFromTimestamp($timestamp, config('app.timezone'));
     }
 
     /**
@@ -299,7 +299,7 @@ class User extends BaseUser
     {
         $last_login = $this->getMeta('last_login');
 
-        return $last_login ? Carbon::createFromTimestamp($last_login) : $last_login;
+        return $last_login ? Carbon::createFromTimestamp($last_login, config('app.timezone')) : $last_login;
     }
 
     public function setLastLogin($carbon)

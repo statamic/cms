@@ -248,7 +248,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
             return $meta;
         }
 
-        return $this->meta = Cache::rememberForever($this->metaCacheKey(), function () {
+        return $this->meta = $this->cacheStore()->rememberForever($this->metaCacheKey(), function () {
             if ($contents = $this->disk()->get($path = $this->metaPath())) {
                 return YAML::file($path)->parse($contents);
             }
@@ -267,7 +267,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
             return $value;
         }
 
-        Cache::forget($this->metaCacheKey());
+        $this->cacheStore()->forget($this->metaCacheKey());
 
         $this->writeMeta($meta = $this->generateMeta());
 
@@ -589,7 +589,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     public function lastModified()
     {
-        return Carbon::createFromTimestamp($this->meta('last_modified'));
+        return Carbon::createFromTimestamp($this->meta('last_modified'), config('app.timezone'));
     }
 
     /**
@@ -689,7 +689,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
     protected function clearCaches()
     {
         $this->meta = null;
-        Cache::forget($this->metaCacheKey());
+        $this->cacheStore()->forget($this->metaCacheKey());
     }
 
     /**
@@ -1128,5 +1128,15 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         ] : [];
 
         return array_merge($this->container->warmPresets(), $cpPresets);
+    }
+
+    public function cacheStore()
+    {
+        return Cache::store($this->hasCustomStore() ? 'asset_meta' : null);
+    }
+
+    private function hasCustomStore(): bool
+    {
+        return config()->has('cache.stores.asset_meta');
     }
 }

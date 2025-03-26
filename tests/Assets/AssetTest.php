@@ -2017,7 +2017,7 @@ class AssetTest extends TestCase
     public function it_appends_timestamp_to_uploaded_files_filename_if_it_already_exists()
     {
         Event::fake();
-        Carbon::setTestNow(Carbon::createFromTimestamp(1549914700));
+        Carbon::setTestNow(Carbon::createFromTimestamp(1549914700, config('app.timezone')));
         $asset = $this->container->makeAsset('path/to/asset.jpg');
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
         Storage::disk('test')->put('path/to/asset.jpg', '');
@@ -2638,5 +2638,23 @@ YAML;
         $this->assertFalse($return);
         Facades\Asset::shouldNotHaveReceived('delete');
         Event::assertNotDispatched(AssetDeleted::class);
+    }
+
+    #[Test]
+    public function it_uses_a_custom_cache_store()
+    {
+        config([
+            'cache.stores.asset_meta' => [
+                'driver' => 'file',
+                'path' => storage_path('statamic/asset-meta'),
+            ],
+        ]);
+
+        Storage::fake('local');
+
+        $store = (new Asset)->cacheStore();
+
+        // ideally we would have checked the store name, but laravel 10 doesnt give us a way to do that
+        $this->assertStringContainsString('asset-meta', $store->getStore()->getDirectory());
     }
 }

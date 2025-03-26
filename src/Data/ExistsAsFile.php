@@ -74,7 +74,7 @@ trait ExistsAsFile
             return Carbon::now();
         }
 
-        return Carbon::createFromTimestamp(File::lastModified($this->path()));
+        return Carbon::createFromTimestamp(File::lastModified($this->path()), config('app.timezone'));
     }
 
     public function fileExtension()

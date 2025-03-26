@@ -20,6 +20,8 @@ use Statamic\Stache\Repositories\TermRepository as StacheTermRepository;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class TaxonomiesController extends CpController
 {
     public function index()

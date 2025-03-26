@@ -348,4 +348,28 @@ class EloquentUserTest extends TestCase
 
         $this->assertCount(0, Facades\User::find($user->id())->passkeys());
     }
+
+    #[Test]
+    public function it_does_not_save_null_values_on_the_model()
+    {
+        $user = $this->user();
+
+        $user->set('null_field', null);
+        $user->set('not_null_field', true);
+
+        $attributes = $user->model()->getAttributes();
+
+        $this->assertArrayNotHasKey('null_field', $attributes);
+        $this->assertTrue($attributes['not_null_field']);
+
+        $user->merge([
+            'null_field' => null,
+            'not_null_field' => false,
+        ]);
+
+        $attributes = $user->model()->getAttributes();
+
+        $this->assertArrayNotHasKey('null_field', $attributes);
+        $this->assertFalse($attributes['not_null_field']);
+    }
 }

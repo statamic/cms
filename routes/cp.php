@@ -51,6 +51,7 @@ use Statamic\Http\Controllers\CP\Fields\FieldtypesController;
 use Statamic\Http\Controllers\CP\Fields\MetaController;
 use Statamic\Http\Controllers\CP\Fieldtypes\DictionaryFieldtypeController;
 use Statamic\Http\Controllers\CP\Fieldtypes\FilesFieldtypeController;
+use Statamic\Http\Controllers\CP\Fieldtypes\IconFieldtypeController;
 use Statamic\Http\Controllers\CP\Fieldtypes\MarkdownFieldtypeController;
 use Statamic\Http\Controllers\CP\Fieldtypes\RelationshipFieldtypeController;
 use Statamic\Http\Controllers\CP\Forms\ActionController as FormActionController;
@@ -324,6 +325,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::post('markdown', [MarkdownFieldtypeController::class, 'preview'])->name('markdown.preview');
         Route::post('files/upload', [FilesFieldtypeController::class, 'upload'])->name('files.upload');
         Route::get('dictionaries/{dictionary}', DictionaryFieldtypeController::class)->name('dictionary-fieldtype');
+        Route::post('icons', IconFieldtypeController::class)->name('icon-fieldtype');
     });
 
     Route::group(['prefix' => 'field-action-modal'], function () {

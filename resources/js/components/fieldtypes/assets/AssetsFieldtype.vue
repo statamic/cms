@@ -442,7 +442,18 @@ export default {
             return this.config.dynamic === 'id'
                 ? __('statamic::fieldtypes.assets.dynamic_folder_pending_save')
                 : __('statamic::fieldtypes.assets.dynamic_folder_pending_field', {field: `<code>${this.config.dynamic}</code>`});
-        }
+        },
+
+        internalFieldActions() {
+            return [
+                {
+                    title: __('Remove All'),
+                    dangerous: true,
+                    run: this.removeAll,
+                    visible: this.assets.length > 0,
+                },
+            ];
+        },
 
     },
 
@@ -530,6 +541,13 @@ export default {
         assetRemoved(asset) {
             const index = _(this.assets).findIndex({ id: asset.id });
             this.assets.splice(index, 1);
+        },
+
+        /**
+         * Remove all assets from the field.
+         */
+        removeAll() {
+            this.assets = [];
         },
 
         /**

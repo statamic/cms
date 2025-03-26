@@ -898,4 +898,12 @@ INFO;
     {
         return $this;
     }
+
+    /**
+     * Clears the standard render node cache.
+     */
+    public static function clearRenderNodeCache()
+    {
+        self::$standardRenderNodeCache = [];
+    }
 }
