@@ -7,6 +7,7 @@ const props = defineProps({
     href: {type: String, default: null},
     icon: {type: String, default: null},
     iconAppend: {type: String, default: null},
+    iconOnly: {type: Boolean, default: false},
     loading: {type: Boolean, default: false},
     round: {type: Boolean, default: false},
     size: {type: String, default: 'base'},
@@ -18,7 +19,7 @@ const props = defineProps({
 const slots = useSlots();
 const hasDefaultSlot = !!slots.default;
 const tag = computed(() => props.href ? 'a' : 'button');
-const iconOnly = computed(() => props.icon && !hasDefaultSlot && !props.text);
+const iconOnly = computed(() => (props.icon && !hasDefaultSlot && !props.text) || props.iconOnly);
 
 const buttonClasses = computed(() => {
     const classes = cva({

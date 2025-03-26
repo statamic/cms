@@ -1,5 +1,5 @@
 <template>
-    <text-input
+    <ui-input
         ref="input"
         :model-value="value"
         :classes="config.classes"

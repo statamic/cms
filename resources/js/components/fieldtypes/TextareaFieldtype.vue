@@ -1,12 +1,12 @@
 <template>
-    <textarea-input
+    <ui-textarea
         :focus="config.focus"
         :name="name"
+        :id="fieldId"
         :isReadOnly="isReadOnly"
         :limit="config.character_limit || null"
         :placeholder="__(config.placeholder)"
         :model-value="value"
-        :id="fieldId"
         @blur="$emit('blur')"
         @focus="$emit('focus')"
         @update:model-value="updateDebounced"

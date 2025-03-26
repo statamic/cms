@@ -1,5 +1,5 @@
 <script setup>
-import { computed, useSlots, ref } from 'vue';
+import { computed, useSlots, ref, useId } from 'vue';
 import { cva } from 'cva';
 import { twMerge } from 'tailwind-merge';
 
@@ -13,6 +13,7 @@ const props = defineProps({
     icon: { type: String, default: null },
     iconAppend: { type: String, default: null },
     iconPrepend: { type: String, default: null },
+    id: { type: String, default: () => useId() },
     label: { type: String, default: null },
     required: { type: Boolean, default: false },
     modelValue: { type: String, default: null },
@@ -99,9 +100,6 @@ const copy = () => {
     copied.value = true;
     setTimeout(() => copied.value = false, 1000);
 };
-
-const hasPrepend = !!props.prepend;
-const hasAppend = !!props.append;
 </script>
 
 <template>
@@ -114,6 +112,7 @@ const hasAppend = !!props.append;
             </div>
             <input
                 :class="inputClasses"
+                :id
                 :type="inputType"
                 :value="modelValue"
                 data-ui-control
@@ -123,7 +122,7 @@ const hasAppend = !!props.append;
             />
             <div v-if="hasAppendedIcon" :class="iconClasses">
                 <slot name="append">
-                    <ui-button size="sm" icon="x" variant="ghsost" v-if="clearable" @click="clear" />
+                    <ui-button size="sm" icon="x" variant="ghost" v-if="clearable" @click="clear" />
                     <ui-button size="sm" :icon="inputType === 'password' ? 'eye' : 'eye-closed'" variant="ghost" v-else-if="viewable" @click="togglePassword" />
                     <ui-button size="sm" :icon="copied ? 'clipboard-check' : 'clipboard'" variant="ghost" v-else-if="copyable" @click="copy" class="animate" :class="copied ? 'animate-wiggle' : ''" />
                     <ui-icon v-else :name="iconAppend" />
