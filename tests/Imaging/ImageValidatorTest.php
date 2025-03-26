@@ -95,6 +95,29 @@ class ImageValidatorTest extends TestCase
     }
 
     #[Test]
+    public function it_checks_if_image_extension_is_allowed_for_manipulation_with_libvips_driver()
+    {
+        config(['statamic.assets.image_manipulation.driver' => 'libvips']);
+
+        $this->assertTrue(ImageValidator::isValidExtension('jpeg'));
+        $this->assertTrue(ImageValidator::isValidExtension('jpg'));
+        $this->assertTrue(ImageValidator::isValidExtension('png'));
+        $this->assertTrue(ImageValidator::isValidExtension('gif'));
+        $this->assertTrue(ImageValidator::isValidExtension('webp'));
+        $this->assertTrue(ImageValidator::isValidExtension('tif'));
+
+        // Not supported by libvips...
+        $this->assertFalse(ImageValidator::isValidExtension('bmp'));
+        $this->assertFalse(ImageValidator::isValidExtension('psd'));
+        $this->assertFalse(ImageValidator::isValidExtension('eps'));
+
+        // Supported by libvips, but requires `additional_extensions` configuration...
+        $this->assertFalse(ImageValidator::isValidExtension('svg'));
+        $this->assertFalse(ImageValidator::isValidExtension('pdf'));
+        $this->assertFalse(ImageValidator::isValidExtension('avif'));
+    }
+
+    #[Test]
     public function it_checks_if_custom_image_extension_is_allowed_for_manipulation_with_proper_config()
     {
         config(['statamic.assets.image_manipulation.driver' => 'imagick']);

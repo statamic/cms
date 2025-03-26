@@ -35,7 +35,7 @@ return [
         |--------------------------------------------------------------------------
         |
         | The driver that will be used under the hood for image manipulation.
-        | Supported: "gd" or "imagick" (if installed on your server)
+        | Supported: "gd", "imagick" or "libvips" (if installed on your server)
         |
         */
 
