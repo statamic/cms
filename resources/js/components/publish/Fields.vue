@@ -16,7 +16,7 @@
             @synced="$emit('synced', field.handle)"
             @desynced="$emit('desynced', field.handle)"
             @focus="$emit('focus', field.handle)"
-            @blur="$emit('blur-sm', field.handle)"
+            @blur="$emit('blur', field.handle)"
         />
     </div>
 </template>
@@ -26,7 +26,7 @@ import PublishField from './Field.vue';
 import { ValidatesFieldConditions } from '../field-conditions/FieldConditions.js';
 
 export default {
-    emits: ['updated', 'meta-updated', 'synced', 'desynced', 'focus', 'blur-sm'],
+    emits: ['updated', 'meta-updated', 'synced', 'desynced', 'focus', 'blur'],
 
     components: { PublishField },
 

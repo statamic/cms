@@ -20,7 +20,7 @@
                     @synced="$emit('synced', $event)"
                     @desynced="$emit('desynced', $event)"
                     @focus="$emit('focus', $event)"
-                    @blur="$emit('blur-sm', $event)"
+                    @blur="$emit('blur', $event)"
                 />
             </div>
         </div>
@@ -31,7 +31,7 @@
 import { ValidatesFieldConditions } from '../field-conditions/FieldConditions.js';
 
 export default {
-    emits: ['updated', 'meta-updated', 'synced', 'desynced', 'focus', 'blur-sm'],
+    emits: ['updated', 'meta-updated', 'synced', 'desynced', 'focus', 'blur'],
 
     mixins: [ValidatesFieldConditions],
 

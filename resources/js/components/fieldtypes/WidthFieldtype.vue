@@ -4,7 +4,7 @@
         :model-value="value"
         @update:model-value="updateDebounced"
         @focus="$emit('focus')"
-        @blur="$emit('blur-sm')"
+        @blur="$emit('blur')"
         :initial-widths="config.options"
     />
 </template>

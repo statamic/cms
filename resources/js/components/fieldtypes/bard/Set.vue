@@ -250,7 +250,7 @@ export default {
             // We use a timeout because activeElement only exists after the blur event.
             setTimeout(() => {
                 const bard = this.extension.options.bard;
-                if (!bard.$el.contains(document.activeElement)) bard.$emit('blur-sm');
+                if (!bard.$el.contains(document.activeElement)) bard.$emit('blur');
             }, 1);
         },
 

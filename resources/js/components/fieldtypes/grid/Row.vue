@@ -16,7 +16,7 @@
             @updated="updated(field.handle, $event)"
             @meta-updated="metaUpdated(field.handle, $event)"
             @focus="$emit('focus')"
-            @blur="$emit('blur-sm')"
+            @blur="$emit('blur')"
         />
 
         <td class="grid-row-controls row-controls" v-if="!grid.isReadOnly && (canAddRows || canDelete)">

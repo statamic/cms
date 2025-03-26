@@ -31,7 +31,7 @@
                                 @updated="updated(field.handle, $event)"
                                 @meta-updated="updateMeta(field.handle, $event)"
                                 @focus="$emit('focus')"
-                                @blur="$emit('blur-sm')"
+                                @blur="$emit('blur')"
                                 @replicator-preview-updated="previewUpdated(field.handle, $event)"
                             />
                         </div>
@@ -136,7 +136,7 @@ export default {
 
             setTimeout(() => {
                 if (!this.$el.contains(document.activeElement)) {
-                    this.$emit('blur-sm');
+                    this.$emit('blur');
                 }
             }, 1);
         },

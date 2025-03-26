@@ -279,7 +279,7 @@ export default {
 
         blurred() {
             if (!this.isLocked) {
-                this.$emit('blur-sm');
+                this.$emit('blur');
             }
         },
 

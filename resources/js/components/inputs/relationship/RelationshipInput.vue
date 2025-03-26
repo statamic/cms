@@ -12,7 +12,7 @@
             :site="site"
             @input="selectFieldSelected"
             @focus="$emit('focus')"
-            @blur="$emit('blur-sm')"
+            @blur="$emit('blur')"
         />
 
         <loading-graphic v-if="initializing" :inline="true" />
@@ -232,7 +232,7 @@ export default {
         },
 
         isSelecting(selecting) {
-            this.$emit(selecting ? 'focus' : 'blur-sm');
+            this.$emit(selecting ? 'focus' : 'blur');
         },
 
         itemData(data, olddata) {
@@ -291,7 +291,7 @@ export default {
                     this.value.length === 1 ? e.cancel() : this.$emit('focus');
                 })
                 .on('drag:stop', (e) => {
-                    this.$emit('blur-sm');
+                    this.$emit('blur');
                 })
                 .on('sortable:stop', (e) => {
                     const val = [...this.value];

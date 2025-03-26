@@ -7,7 +7,7 @@
         :placeholder="__(config.placeholder)"
         :model-value="value"
         :id="fieldId"
-        @blur="$emit('blur-sm')"
+        @blur="$emit('blur')"
         @focus="$emit('focus')"
         @update:model-value="updateDebounced"
     />

@@ -17,7 +17,7 @@
         :direction="config.direction"
         @update:model-value="inputUpdated"
         @focus="$emit('focus')"
-        @blur="$emit('blur-sm')"
+        @blur="$emit('blur')"
     />
 </template>
 

@@ -8,7 +8,7 @@
                 handle-class="sortable-handle"
                 :mirror="false"
                 @dragstart="$emit('focus')"
-                @dragend="$emit('blur-sm')"
+                @dragend="$emit('blur')"
             >
                 <tbody>
                     <tr class="sortable-row" v-for="(element, index) in data" :key="element._id">
@@ -100,7 +100,7 @@ export default {
 
             setTimeout(() => {
                 if (!this.$el.contains(document.activeElement)) {
-                    this.$emit('blur-sm');
+                    this.$emit('blur');
                     this.editing = null;
                 }
             }, 1);

@@ -25,7 +25,7 @@
                 @input="$emit('update:model-value', $event.target.value)"
                 @keydown="$emit('keydown', $event)"
                 @focus="$emit('focus')"
-                @blur="$emit('blur-sm')"
+                @blur="$emit('blur')"
             />
             <slot name="append" v-if="append">
                 <div class="input-group-append">
@@ -43,7 +43,7 @@
 import LengthLimiter from '../LengthLimiter.vue';
 
 export default {
-    emits: ['update:model-value', 'keydown', 'focus', 'blur-sm'],
+    emits: ['update:model-value', 'keydown', 'focus', 'blur'],
     mixins: [LengthLimiter],
     props: {
         name: {},

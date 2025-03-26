@@ -13,7 +13,7 @@
         :placeholder="__(config.placeholder)"
         @update:model-value="updateDebounced"
         @focus="$emit('focus')"
-        @blur="$emit('blur-sm')"
+        @blur="$emit('blur')"
     />
 </template>
 

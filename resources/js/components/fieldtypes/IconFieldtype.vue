@@ -18,7 +18,7 @@
             :create-option="(value) => ({ value, label: value })"
             @update:model-value="vueSelectUpdated"
             @search:focus="$emit('focus')"
-            search:blur="$emit('blur-sm')"
+            search:blur="$emit('blur')"
         >
             <template #option="option">
                 <div class="flex items-center">

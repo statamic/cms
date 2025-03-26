@@ -3,7 +3,7 @@ import HasFieldActions from '../field-actions/HasFieldActions';
 import debounce from '@statamic/util/debounce.js';
 
 export default {
-    emits: ['update:value', 'focus', 'blur-sm', 'meta-updated', 'replicator-preview-updated'],
+    emits: ['update:value', 'focus', 'blur', 'meta-updated', 'replicator-preview-updated'],
 
     mixins: [HasFieldActions],
 

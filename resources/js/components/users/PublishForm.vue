@@ -53,7 +53,7 @@
                     @updated="setFieldValue"
                     @meta-updated="setFieldMeta"
                     @focus="container.$emit('focus', $event)"
-                    @blur="container.$emit('blur-sm', $event)"
+                    @blur="container.$emit('blur', $event)"
                 ></publish-tabs>
             </div>
         </publish-container>

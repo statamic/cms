@@ -13,7 +13,7 @@
                 @update:value="$emit('updated', $event)"
                 @meta-updated="$emit('meta-updated', $event)"
                 @focus="$emit('focus')"
-                @blur="$emit('blur-sm')"
+                @blur="$emit('blur')"
             />
         </div>
 

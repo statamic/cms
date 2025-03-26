@@ -19,7 +19,7 @@
             @focus="$emit('focus')"
             @search="search"
             @search:focus="$emit('focus')"
-            search:blur="$emit('blur-sm')"
+            search:blur="$emit('blur')"
         >
             <template #selected-option-container v-if="multiple"><i class="hidden"></i></template>
             <template #search="{ events, attributes }" v-if="multiple">

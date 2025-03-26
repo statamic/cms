@@ -8,7 +8,7 @@ import { isEqual } from 'lodash-es';
 import clone from '@statamic/util/clone.js';
 
 export default {
-    emits: ['updated', 'focus', 'blur-sm'],
+    emits: ['updated', 'focus', 'blur'],
 
     props: {
         reference: {

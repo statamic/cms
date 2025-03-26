@@ -77,7 +77,7 @@
                         item-class="asset-tile"
                         handle-class="asset-thumb-container"
                         @dragstart="$emit('focus')"
-                        @dragend="$emit('blur-sm')"
+                        @dragend="$emit('blur')"
                         :constrain-dimensions="true"
                         :disabled="isReadOnly"
                         :distance="5"
@@ -639,7 +639,7 @@ export default {
         },
 
         showSelector(selecting) {
-            this.$emit(selecting ? 'focus' : 'blur-sm');
+            this.$emit(selecting ? 'focus' : 'blur');
         },
     },
 

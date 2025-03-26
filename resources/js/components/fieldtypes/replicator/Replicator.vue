@@ -26,7 +26,7 @@
                             constrain-dimensions
                             @update:model-value="sorted($event)"
                             @dragstart="$emit('focus')"
-                            @dragend="$emit('blur-sm')"
+                            @dragend="$emit('blur')"
                             v-slot="{}"
                         >
                             <div class="replicator-set-container">
@@ -296,7 +296,7 @@ export default {
 
             setTimeout(() => {
                 if (!this.$el.contains(document.activeElement)) {
-                    this.$emit('blur-sm');
+                    this.$emit('blur');
                 }
             }, 1);
         },

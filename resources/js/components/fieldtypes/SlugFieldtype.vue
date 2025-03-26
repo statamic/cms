@@ -22,7 +22,7 @@
                 :name="slug"
                 :id="fieldId"
                 @focus="$emit('focus')"
-                @blur="$emit('blur-sm')"
+                @blur="$emit('blur')"
                 direction="ltr"
             >
                 <template v-slot:append v-if="config.show_regenerate">
