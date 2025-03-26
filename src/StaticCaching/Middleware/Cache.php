@@ -74,6 +74,7 @@ class Cache
 
         if ($response = $this->attemptToServeCachedResponse($request)) {
             $response->isNotModified($request);
+
             return $response;
         }
 
