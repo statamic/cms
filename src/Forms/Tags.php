@@ -159,7 +159,9 @@ class Tags extends BaseTags
             return $this->tagRenderer->render('@foreach($fields as $field)'.$this->content.'@endforeach', $this->context->all());
         }
 
-        if ($scope = $this->params->get('scope')) {
+        $params = '';
+
+        if ($scope) {
             $params = Html::attributes(['scope' => $scope]);
         }
 
