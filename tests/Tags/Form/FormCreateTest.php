@@ -75,7 +75,7 @@ EOT
     }
 
     #[Test]
-    public function it_dynamically_renders_scoped_fields()
+    public function it_dynamically_renders_fields_with_scope_param()
     {
         $output = $this->normalizeHtml($this->tag(<<<'EOT'
 {{ form:contact }}
@@ -137,7 +137,7 @@ EOT
             ],
         ], 'survey');
 
-        $output = $this->normalizeHtml($wat = $this->tag(<<<'EOT'
+        $output = $this->normalizeHtml($this->tag(<<<'EOT'
 {{ form:survey }}
     {{ sections }}
         <div class="section">{{ display }}{{ if instructions }} ({{ instructions }}){{ /if }}
@@ -151,6 +151,78 @@ EOT
         {{ form:fields }}
             <div class="field-by-itself">{{ display ?: handle }}{{ if instructions }} ({{ instructions }}){{ /if }}</div>
             {{ field }}
+        {{ /form:fields }}
+    </div>
+{{ /form:survey }}
+EOT
+        ));
+
+        $this->assertStringContainsString('<div class="section">Section One (Section One Instructions)', $output);
+
+        $this->assertStringContainsString('<div class="field-in-section">Group One (Group One Instructions)', $output);
+        $this->assertStringContainsString('<div class="field-by-itself">Group One (Group One Instructions)', $output);
+        $this->assertStringContainsString('<div class="field-in-section">group_one.alpha</div>', $output);
+        $this->assertStringContainsString('<div class="field-by-itself">group_one.alpha</div>', $output);
+        $this->assertStringContainsString('<div class="field-in-section">Bravo (This field has instructions!)</div>', $output);
+        $this->assertStringContainsString('<div class="field-by-itself">Bravo (This field has instructions!)</div>', $output);
+    }
+
+    #[Test]
+    public function it_dynamically_renders_group_fields_recursively_with_scope_param()
+    {
+        $this->createForm([
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'display' => 'Section One',
+                            'instructions' => 'Section One Instructions',
+                            'fields' => [
+                                [
+                                    'handle' => 'group_one',
+                                    'field' => [
+                                        'type' => 'group',
+                                        'display' => 'Group One',
+                                        'instructions' => 'Group One Instructions',
+                                        'fields' => [
+                                            [
+                                                'handle' => 'alpha',
+                                                'field' => [
+                                                    'type' => 'text',
+                                                ],
+                                            ],
+                                            [
+                                                'handle' => 'bravo',
+                                                'field' => [
+                                                    'type' => 'text',
+                                                    'display' => 'Bravo',
+                                                    'instructions' => 'This field has instructions!',
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ], 'survey');
+
+        $output = $this->normalizeHtml($this->tag(<<<'EOT'
+{{ form:survey }}
+    {{ sections }}
+        <div class="section">{{ display }}{{ if instructions }} ({{ instructions }}){{ /if }}
+            {{ form:fields scope="field" }}
+                <div class="field-in-section">{{ field:display ?: field:handle }}{{ if field:instructions }} ({{ field:instructions }}){{ /if }}</div>
+                {{ field:field }}
+            {{ /form:fields }}
+        </div>
+    {{ /sections }}
+    <div class="fields">
+        {{ form:fields scope="field" }}
+            <div class="field-by-itself">{{ field:display ?: field:handle }}{{ if field:instructions }} ({{ field:instructions }}){{ /if }}</div>
+            {{ field:field }}
         {{ /form:fields }}
     </div>
 {{ /form:survey }}
