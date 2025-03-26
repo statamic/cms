@@ -1,0 +1,53 @@
+@theme inline {
+
+    --color-primary: var(--color-zinc-800);
+    --color-primary-border: color-mix(in oklch, var(--color-primary) 100%, black 20%);
+    --color-primary-hover: color-mix(in oklch, var(--color-primary) 100%, black 30%);
+    --color-primary-gap: color-mix(in oklch, var(--color-primary) 100%, black 50%);
+    --color-gray-50: var(--color-zinc-50);
+    --color-gray-100: var(--color-zinc-100);
+    --color-gray-200: var(--color-zinc-200);
+    --color-gray-300: var(--color-zinc-300);
+    --color-gray-400: var(--color-zinc-400);
+    --color-gray-500: var(--color-zinc-500);
+    --color-gray-600: var(--color-zinc-600);
+    --color-gray-700: var(--color-zinc-700);
+    --color-gray-800: var(--color-zinc-800);
+    --color-gray-850: oklch(24.48% 0.0056 285.98);
+    --color-gray-900: var(--color-zinc-900);
+    --color-gray-950: var(--color-zinc-950);
+    --color-volt: #D4FF4C;
+}
+
+@theme {
+    --text-2xs: 0.625rem;
+    --shadow-ui-xs: 0px 1px 3px -1px rgba(0,0,0,0.10);
+    --shadow-ui-sm: 0px 2px 3px -2px rgba(0,0,0,0.15);
+    --shadow-ui-md: 0px 2px 4px -2px rgba(0,0,0,0.37);
+    --shadow-ui-lg: 0px 4px 7px -4px rgba(0,0,0,0.15);
+
+    --animate-wiggle: wiggle 200ms ease-in-out infinite;
+
+    @keyframes wiggle {
+        0%,
+        100% {
+        transform: rotate(-3deg);
+        }
+        50% {
+        transform: rotate(3deg);
+        }
+    }
+}
+
+.popoverAnimation {
+    @apply duration-100 will-change-[transform,opacity];
+    @apply data-[state=open]:animate-in data-[state=closed]:animate-out;
+    @apply data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0;
+    @apply data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95;
+    @apply data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2;
+    @apply data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2;
+}
+
+.content-card {
+    @apply min-h-full px-6 md:px-12 pb-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 rounded-xl;
+}

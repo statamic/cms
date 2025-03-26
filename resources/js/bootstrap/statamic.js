@@ -5,6 +5,7 @@ import axios from 'axios';
 import Config from '../components/Config';
 import Preferences from '../components/Preference';
 import registerGlobalComponents from './components.js';
+import registerUiComponents from './ui.js';
 import registerFieldtypes from './fieldtypes.js';
 import registerVueSelect from './vue-select/vue-select';
 import useGlobalEventBus from '../composables/global-event-bus';
@@ -119,7 +120,7 @@ export default {
         this.$components.register(name, component);
     },
 
-    start() {
+    async start() {
         this.$app = createApp(App);
 
         this.$app.config.silent = false;
@@ -193,6 +194,7 @@ export default {
             mounted: (el) => autosize(el),
         });
 
+        await registerUiComponents(this.$app);
         registerGlobalComponents(this.$app);
         registerFieldtypes(this.$app);
         registerVueSelect(this.$app);
