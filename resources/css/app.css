@@ -15,12 +15,12 @@
   color utility to any element that depends on these defaults.
 */
 
-/* @layer base {
+@layer base {
   *,
   ::after,
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: #d1d5db;
+    border-color: var(--color-gray-200, currentColor);
   }
-} */
+}
