@@ -75,6 +75,27 @@ EOT
     }
 
     #[Test]
+    public function it_dynamically_renders_scoped_fields()
+    {
+        $output = $this->normalizeHtml($this->tag(<<<'EOT'
+{{ form:contact }}
+    {{ form:fields scope="field" }}
+        <label>{{ field:display }}</label>{{ field:field }}
+    {{ /form:fields }}
+{{ /form:contact }}
+EOT
+        ));
+
+        $this->assertStringContainsString('<label>Full Name</label><input id="contact-form-name-field" type="text" name="name" value="">', $output);
+        $this->assertStringContainsString('<label>Email Address</label><input id="contact-form-email-field" type="email" name="email" value="" required>', $output);
+        $this->assertStringContainsString('<label>Message</label><textarea id="contact-form-message-field" name="message" rows="5" required></textarea>', $output);
+
+        preg_match_all('/<label>(.+)<\/label>/U', $output, $fieldOrder);
+
+        $this->assertEquals(['Full Name', 'Email Address', 'Message'], $fieldOrder[1]);
+    }
+
+    #[Test]
     public function it_dynamically_renders_group_fields_recursively()
     {
         $this->createForm([

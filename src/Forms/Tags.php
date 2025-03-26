@@ -12,6 +12,7 @@ use Statamic\Facades\Form;
 use Statamic\Facades\URL;
 use Statamic\Forms\JsDrivers\JsDriver;
 use Statamic\Support\Arr;
+use Statamic\Support\Html;
 use Statamic\Support\Str;
 use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags as BaseTags;
@@ -158,7 +159,11 @@ class Tags extends BaseTags
             return $this->tagRenderer->render('@foreach($fields as $field)'.$this->content.'@endforeach', $this->context->all());
         }
 
-        return Antlers::parse('{{ fields }}'.$this->content.'{{ /fields }}', $this->context->all());
+        if ($scope = $this->params->get('scope')) {
+            $params = Html::attributes(['scope' => $scope]);
+        }
+
+        return Antlers::parse('{{ fields '.$params.' }}'.$this->content.'{{ /fields }}', $this->context->all());
     }
 
     /**
