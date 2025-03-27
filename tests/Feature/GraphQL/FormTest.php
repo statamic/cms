@@ -121,8 +121,8 @@ GQL;
                 'invalid' => 'This isnt in the fieldtypes config fields so it shouldnt be output',
                 'width' => 50,
             ],
-            'subject' => ['type' => 'select', 'options' => ['disco' => 'Disco', 'house' => 'House']],
-            'message' => ['type' => 'textarea', 'width' => 33],
+            'subject' => ['type' => 'select', 'options' => ['disco' => 'Disco', 'house' => 'House'], 'if' => ['name' => 'not empty']],
+            'message' => ['type' => 'textarea', 'width' => 33, 'unless' => ['subject' => 'equals spam']],
         ]);
 
         BlueprintRepository::shouldReceive('find')->with('forms.contact')->andReturn($blueprint);
@@ -137,6 +137,8 @@ GQL;
             instructions
             width
             config
+            if
+            unless
         }
     }
 }
@@ -158,6 +160,8 @@ GQL;
                             'config' => [
                                 'placeholder' => 'Type here...',
                             ],
+                            'if' => null,
+                            'unless' => null,
                         ],
                         [
                             'handle' => 'subject',
@@ -168,6 +172,8 @@ GQL;
                             'config' => [
                                 'options' => ['disco' => 'Disco', 'house' => 'House'],
                             ],
+                            'if' => ['name' => 'not empty'],
+                            'unless' => null,
                         ],
                         [
                             'handle' => 'message',
@@ -176,6 +182,8 @@ GQL;
                             'instructions' => null,
                             'width' => 33,
                             'config' => [],
+                            'if' => null,
+                            'unless' => ['subject' => 'equals spam'],
                         ],
                     ],
                 ],
