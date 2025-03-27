@@ -43,6 +43,10 @@ class ImageValidator
      */
     public function isValidExtension($extension)
     {
+        if (! $extension) {
+            return false;
+        }
+
         return $this->driver->supports($extension);
     }
 
