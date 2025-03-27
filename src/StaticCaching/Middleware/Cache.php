@@ -87,7 +87,7 @@ class Cache
 
             $this->nocache->write();
 
-            if (! app(UrlExcluder::class)->isExcluded($request->normalizedFullUrl())) {
+            if ($response instanceof Request && ! app(UrlExcluder::class)->isExcluded($request->normalizedFullUrl())) {
                 $response->makeCacheControlCacheable();
                 $response->isNotModified($request);
             }

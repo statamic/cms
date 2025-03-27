@@ -97,7 +97,7 @@ class ServiceProvider extends LaravelServiceProvider
                 ->setMaxAge(config('statamic.static_caching.max_age', 60))
                 ->setSharedMaxAge(config('statamic.static_caching.shared_max_age', config('statamic.static_caching.max_age', 60)))
                 ->setStaleWhileRevalidate(config('statamic.static_caching.stale_while_revalidate', 60));
-            
+
             if (($content = $this->getContent())) {
                 $this->setEtag(md5($content));
             }
