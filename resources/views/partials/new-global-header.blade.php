@@ -48,42 +48,6 @@
             <kbd class="font-sans">⌘ </kbd><kbd class="font-sans">K</kbd></kbd>
         </button>
         <ui-theme-switcher size="sm" variant="ghost" class="dark" />
-        <ui-dropdown x-cloak>
-            <template #trigger>
-                <ui-button :icon-only="true" variant="ghost">
-                     <img src="{{ $user->avatar() }}" class="size-7 rounded-full" alt="{{ $user->name() }}" />
-                </ui-button>
-            </template>
-            <ui-dropdown-header>
-                <div class="flex items-center gap-2">
-                    <img src="{{ $user->avatar() }}" class="size-8 rounded-full" alt="{{ $user->name() }}" />
-                    <div>
-                        <div class="text-sm">{{ $user->email() }}</div>
-                        @if ($user->isSuper())
-                            <div class="text-xs text-gray-500 font-normal flex items-center gap-1">
-                                {{ __('Super Admin') }}
-                                @if (session()->get('statamic_impersonated_by'))
-                                    <ui-badge size="sm" pill :text="__('Impersonating')" />
-                                @endif
-                            </div>
-                        @elseif (session()->get('statamic_impersonated_by'))
-                            <ui-badge size="sm" pill :text="__('Impersonating')" />
-                        @endif
-                    </div>
-                </div>
-            </ui-dropdown-header>
-            <ui-dropdown-menu>
-                <ui-dropdown-item icon="avatar" :text="__('Profile')" href="{{ route('statamic.cp.account') }}" />
-                <ui-dropdown-item icon="cog" :text="__('Preferences')" href="{{ cp_route('preferences.user.edit') }}" />
-                @if (session()->get('statamic_impersonated_by'))
-                    <ui-dropdown-item icon="mask" :text="__('Stop Impersonating')" href="{{ cp_route('impersonation.stop') }}" />
-                @endif
-            </ui-dropdown-menu>
-            <ui-dropdown-footer
-                :text="__('Log out')"
-                href="{{ route('statamic.cp.logout', ['redirect' => cp_route('index')]) }}"
-                icon="arrow-right"
-            />
-        </ui-dropdown>
+        <x-statamic::user-dropdown />
     </div>
 </header>
