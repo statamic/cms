@@ -22,11 +22,11 @@ jobs:
         os: [ubuntu-latest]
         include:
           - os: windows-latest
-            php: 8.3
+            php: 8.4
             laravel: 11.*
             stability: prefer-stable
           - os: windows-latest
-            php: 8.3
+            php: 8.4
             laravel: 12.*
             stability: prefer-stable
 
