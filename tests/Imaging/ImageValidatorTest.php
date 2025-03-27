@@ -11,7 +11,7 @@ class ImageValidatorTest extends TestCase
     #[Test]
     public function it_checks_if_image_has_valid_extension_and_mimetype()
     {
-        config(['statamic.assets.image_manipulation.driver' => 'imagick']);
+        config(['statamic.assets.image_manipulation.driver' => 'gd']);
 
         // We'll test `isValidExtension()` functionality separately below, and just mock here...
         ImageValidator::shouldReceive('isValidExtension')->andReturnTrue()->times(24);
