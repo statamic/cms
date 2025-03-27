@@ -6,7 +6,7 @@ use Statamic\Contracts\Git\ProvidesCommitMessage;
 
 class AssetReuploaded extends Event implements ProvidesCommitMessage
 {
-    public function __construct(public $asset)
+    public function __construct(public $asset, public $originalFilename)
     {
     }
 
