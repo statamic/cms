@@ -18,7 +18,7 @@
         "laravel/prompts": "^0.3.0",
         "league/commonmark": "^2.2",
         "league/csv": "^9.0",
-        "league/glide": "^2.3",
+        "league/glide": "^3.0",
         "maennchen/zipstream-php": "^3.1",
         "michelf/php-smartypants": "^1.8.1",
         "nesbot/carbon": "^3.0",
