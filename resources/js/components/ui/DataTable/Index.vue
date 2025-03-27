@@ -86,7 +86,7 @@ const tableCellVariants = cva({
             middle: '',
         },
     },
-})
+});
 
 const headerCellClasses = cva({
     base: 'text-sm font-medium text-gray-800 dark:text-gray-300',
@@ -117,43 +117,59 @@ const titleClasses = cva({
         },
     },
 })({ ...props });
-
 </script>
 
 <template>
-<ui-panel class="relative overflow-x-auto overscroll-x-contain">
-    <table data-ui-data-table class="w-full text-gray-500 antialiased table-fixed border-separate border-spacing-y-0 whitespace-nowrap min-w-full">
-        <thead>
-            <tr>
-                <th class="text-left" :class="headerCellClasses">Title</th>
-                <th class="text-left" :class="headerCellClasses">Slug</th>
-                <th class="text-left" :class="headerCellClasses">Date</th>
-                <th class="text-left" :class="headerCellClasses">Author</th>
-                <th class="text-right w-14" :class="headerCellClasses"></th>
-            </tr>
-        </thead>
-        <tbody class="text-sm bg-white dark:bg-gray-900 rounded-xl shadow-sm">
-            <tr v-for="(event, index) in events" :key="event.id">
-                <td :class="[bodyCellClasses, tableCellVariants({ position: index === 0 ? 'first' : index === events.length - 1 ? 'last' : 'left' })]">
-                    <div :class="titleClasses">{{ event.title }}</div>
-                </td>
-                <td :class="[bodyCellClasses, tableCellVariants()]">{{ event.slug }}</td>
-                <td :class="[bodyCellClasses, tableCellVariants()]">{{ event.date }}</td>
-                <td :class="[bodyCellClasses, tableCellVariants()]">
-                    <div class="flex items-center gap-2">
-                        <img class="size-5 rounded-full" src="https://unavatar.io/jackmcdade" />
-                        {{ event.author }}
-                    </div>
-                </td>
-                <td class="text-right" :class="[bodyCellClasses, tableCellVariants({ position: index === 0 ? 'firstRight' : index === events.length - 1 ? 'lastRight' : 'right' })]">
-                    <ui-button icon="dots" variant="ghost" size="xs" />
-                </td>
-            </tr>
-        </tbody>
-    </table>
-</ui-panel>
+    <ui-panel class="relative overflow-x-auto overscroll-x-contain">
+        <table
+            data-ui-data-table
+            class="w-full min-w-full table-fixed border-separate border-spacing-y-0 whitespace-nowrap text-gray-500 antialiased"
+        >
+            <thead>
+                <tr>
+                    <th class="text-left" :class="headerCellClasses">Title</th>
+                    <th class="text-left" :class="headerCellClasses">Slug</th>
+                    <th class="text-left" :class="headerCellClasses">Date</th>
+                    <th class="text-left" :class="headerCellClasses">Author</th>
+                    <th class="w-14 text-right" :class="headerCellClasses"></th>
+                </tr>
+            </thead>
+            <tbody class="rounded-xl bg-white text-sm shadow-sm dark:bg-gray-900">
+                <tr v-for="(event, index) in events" :key="event.id">
+                    <td
+                        :class="[
+                            bodyCellClasses,
+                            tableCellVariants({
+                                position: index === 0 ? 'first' : index === events.length - 1 ? 'last' : 'left',
+                            }),
+                        ]"
+                    >
+                        <div :class="titleClasses">{{ event.title }}</div>
+                    </td>
+                    <td :class="[bodyCellClasses, tableCellVariants()]">{{ event.slug }}</td>
+                    <td :class="[bodyCellClasses, tableCellVariants()]">{{ event.date }}</td>
+                    <td :class="[bodyCellClasses, tableCellVariants()]">
+                        <div class="flex items-center gap-2">
+                            <img class="size-5 rounded-full" src="https://unavatar.io/jackmcdade" />
+                            {{ event.author }}
+                        </div>
+                    </td>
+                    <td
+                        class="text-right"
+                        :class="[
+                            bodyCellClasses,
+                            tableCellVariants({
+                                position:
+                                    index === 0 ? 'firstRight' : index === events.length - 1 ? 'lastRight' : 'right',
+                            }),
+                        ]"
+                    >
+                        <ui-button icon="dots" variant="ghost" size="xs" />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </ui-panel>
 </template>
 
-<style>
-
-</style>
+<style></style>

@@ -1,11 +1,11 @@
 <script setup>
-import { TabsIndicator } from 'reka-ui'
+import { TabsIndicator } from 'reka-ui';
 
 defineOptions({
     name: 'TabsIndicator',
-})
+});
 </script>
 
 <template>
-<TabsIndicator />
+    <TabsIndicator />
 </template>

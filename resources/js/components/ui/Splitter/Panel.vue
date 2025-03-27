@@ -1,5 +1,5 @@
 <script setup>
-import { SplitterPanel } from 'reka-ui'
+import { SplitterPanel } from 'reka-ui';
 
 defineProps({
     collapsible: { type: Boolean, default: false },
@@ -9,7 +9,7 @@ defineProps({
 </script>
 
 <template>
-<SplitterPanel :min-size :collapsible class="">
-    <slot />
-</SplitterPanel>
+    <SplitterPanel :min-size :collapsible class="">
+        <slot />
+    </SplitterPanel>
 </template>

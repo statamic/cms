@@ -21,7 +21,7 @@ const props = defineProps({
     type: { type: String, default: 'text' },
     viewable: { type: Boolean, default: false },
     prepend: { type: String, default: null },
-    append: { type: String, default: null }
+    append: { type: String, default: null },
 });
 
 const hasPrependedIcon = !!props.iconPrepend || !!props.icon || !!slots.prepend;
@@ -39,7 +39,7 @@ const inputClasses = computed(() => {
             size: {
                 base: 'text-base rounded-lg px-3 py-2 h-10 leading-[1.375rem]',
                 sm: 'text-sm rounded-md px-2.5 py-1.5 h-8 leading-[1.125rem]',
-                xs: 'text-xs rounded-xs px-2 py-1.5 h-6 leading-[1.125rem]'
+                xs: 'text-xs rounded-xs px-2 py-1.5 h-6 leading-[1.125rem]',
             },
         },
         compoundVariants: [
@@ -49,7 +49,7 @@ const inputClasses = computed(() => {
             { hasAppendedIcon: true, size: 'base', class: 'pe-10' },
             { hasAppendedIcon: true, size: 'sm', class: 'pe-8' },
             { hasAppendedIcon: true, size: 'xs', class: 'pe-6' },
-        ]
+        ],
     })({
         ...props,
         hasPrependedIcon: hasPrependedIcon,
@@ -59,14 +59,13 @@ const inputClasses = computed(() => {
     return twMerge(classes);
 });
 
-
 const iconClasses = cva({
     base: 'absolute top-0 bottom-0 flex items-center justify-center text-xs text-gray-400/75',
     variants: {
         size: {
             base: '[&_svg]:size-4',
             sm: '[&_svg]:size-3.5',
-            xs: '[&_svg]:size-3'
+            xs: '[&_svg]:size-3',
         },
     },
     compoundVariants: [
@@ -76,7 +75,7 @@ const iconClasses = cva({
         { size: 'base', hasAppendedIcon: true, class: 'pe-3 has-[button]:pe-1 end-0' },
         { size: 'sm', hasAppendedIcon: true, class: 'pe-2 has-[button]:pe-1 end-0' },
         { size: 'xs', hasAppendedIcon: true, class: 'pe-1.5 has-[button]:pe-0 end-0' },
-    ]
+    ],
 })({
     ...props,
     hasPrependedIcon: hasPrependedIcon,
@@ -98,13 +97,13 @@ const copy = () => {
     if (!props.modelValue) return;
     navigator.clipboard.writeText('props.modelValue');
     copied.value = true;
-    setTimeout(() => copied.value = false, 1000);
+    setTimeout(() => (copied.value = false), 1000);
 };
 </script>
 
 <template>
     <ui-with-field :label :description :required :badge>
-        <div class="w-full relative block group/input" data-ui-input>
+        <div class="group/input relative block w-full" data-ui-input>
             <div v-if="hasPrependedIcon" :class="iconClasses">
                 <slot name="prepend">
                     <ui-icon :name="iconPrepend || icon" />
@@ -123,8 +122,22 @@ const copy = () => {
             <div v-if="hasAppendedIcon" :class="iconClasses">
                 <slot name="append">
                     <ui-button size="sm" icon="x" variant="ghost" v-if="clearable" @click="clear" />
-                    <ui-button size="sm" :icon="inputType === 'password' ? 'eye' : 'eye-closed'" variant="ghost" v-else-if="viewable" @click="togglePassword" />
-                    <ui-button size="sm" :icon="copied ? 'clipboard-check' : 'clipboard'" variant="ghost" v-else-if="copyable" @click="copy" class="animate" :class="copied ? 'animate-wiggle' : ''" />
+                    <ui-button
+                        size="sm"
+                        :icon="inputType === 'password' ? 'eye' : 'eye-closed'"
+                        variant="ghost"
+                        v-else-if="viewable"
+                        @click="togglePassword"
+                    />
+                    <ui-button
+                        size="sm"
+                        :icon="copied ? 'clipboard-check' : 'clipboard'"
+                        variant="ghost"
+                        v-else-if="copyable"
+                        @click="copy"
+                        class="animate"
+                        :class="copied ? 'animate-wiggle' : ''"
+                    />
                     <ui-icon v-else :name="iconAppend" />
                 </slot>
             </div>

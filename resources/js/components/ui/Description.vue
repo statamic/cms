@@ -6,13 +6,12 @@ const hasDefaultSlot = !!slots.default;
 
 const props = defineProps({
     required: { type: Boolean, default: false },
-    text: { type: String, default: null }
+    text: { type: String, default: null },
 });
-
 </script>
 
 <template>
-    <div class="text-sm font-normal text-gray-500 dark:text-gray-400 antialiased" data-ui-description>
+    <div class="text-sm font-normal text-gray-500 antialiased dark:text-gray-400" data-ui-description>
         <slot v-if="hasDefaultSlot" />
         <template v-else>{{ text }}</template>
     </div>

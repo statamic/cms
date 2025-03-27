@@ -4,21 +4,21 @@ import { cva } from 'cva';
 import { twMerge } from 'tailwind-merge';
 
 const props = defineProps({
-    href: {type: String, default: null},
-    icon: {type: String, default: null},
-    iconAppend: {type: String, default: null},
-    iconOnly: {type: Boolean, default: false},
-    loading: {type: Boolean, default: false},
-    round: {type: Boolean, default: false},
-    size: {type: String, default: 'base'},
-    text: {type: String, default: null},
-    type: {type: String, default: 'button' },
-    variant: {type: String, default: 'default' },
+    href: { type: String, default: null },
+    icon: { type: String, default: null },
+    iconAppend: { type: String, default: null },
+    iconOnly: { type: Boolean, default: false },
+    loading: { type: Boolean, default: false },
+    round: { type: Boolean, default: false },
+    size: { type: String, default: 'base' },
+    text: { type: String, default: null },
+    type: { type: String, default: 'button' },
+    variant: { type: String, default: 'default' },
 });
 
 const slots = useSlots();
 const hasDefaultSlot = !!slots.default;
-const tag = computed(() => props.href ? 'a' : 'button');
+const tag = computed(() => (props.href ? 'a' : 'button'));
 const iconOnly = computed(() => (props.icon && !hasDefaultSlot && !props.text) || props.iconOnly);
 
 const buttonClasses = computed(() => {
@@ -28,11 +28,11 @@ const buttonClasses = computed(() => {
             variant: {
                 default: [
                     'bg-linear-to-b from-white to-gray-50 hover:to-gray-100 text-gray-800 border border-gray-300 shadow-ui-sm',
-                    'dark:from-gray-800 dark:to-gray-850 dark:hover:to-gray-800 hover:bg-gray-50 dark:hover:bg-gray-850 dark:border-b-0 dark:ring-3 dark:ring-black dark:border-white/15 dark:text-gray-300 dark:shadow-md'
+                    'dark:from-gray-800 dark:to-gray-850 dark:hover:to-gray-800 hover:bg-gray-50 dark:hover:bg-gray-850 dark:border-b-0 dark:ring-3 dark:ring-black dark:border-white/15 dark:text-gray-300 dark:shadow-md',
                 ],
                 primary: [
                     'bg-linear-to-b from-primary/90 to-primary hover:bg-primary-hover text-white border border-primary-border shadow-ui-md inset-shadow-2xs inset-shadow-white/25',
-                    'dark:from-white dark:to-gray-200 dark:hover:from-gray-200 dark:text-gray-800 dark:border-0'
+                    'dark:from-white dark:to-gray-200 dark:hover:from-gray-200 dark:text-gray-800 dark:border-0',
                 ],
                 danger: 'bg-linear-to-b from-red-500/90 to-red-500 hover:bg-red-500/90 text-white border border-red-600 inset-shadow-2xs inset-shadow-red-300 [&_svg]:text-red-200',
                 filled: 'bg-gray-100 hover:bg-gray-200 dark:bg-gray-700/80 dark:hover:bg-gray-700',
@@ -44,14 +44,16 @@ const buttonClasses = computed(() => {
                 xs: 'px-2 h-6.5 text-xs',
             },
             groupBorder: {
-                default: 'in-data-ui-button-group:border-s-0 [:is([data-ui-button-group]>&:first-child,_[data-ui-button-group]_:first-child>&)]:border-s-[1px]',
-                primary: 'in-data-ui-button-group:border-e-0 [:is([data-ui-button-group]>&:last-child,_[data-ui-button-group]_:last-child>&)]:border-e-[1px] [:is([data-ui-button-group]>&:not(:first-child),_[data-ui-button-group]_:not(:first-child)>&)]:border-s-primary-gap',
+                default:
+                    'in-data-ui-button-group:border-s-0 [:is([data-ui-button-group]>&:first-child,_[data-ui-button-group]_:first-child>&)]:border-s-[1px]',
+                primary:
+                    'in-data-ui-button-group:border-e-0 [:is([data-ui-button-group]>&:last-child,_[data-ui-button-group]_:last-child>&)]:border-e-[1px] [:is([data-ui-button-group]>&:not(:first-child),_[data-ui-button-group]_:not(:first-child)>&)]:border-s-primary-gap',
                 danger: 'in-data-ui-button-group:border-s-0 in-data-ui-button-group:border-e [:is([data-ui-button-group]>&:last-child,_[data-ui-button-group]_:last-child>&)]:border-e-0 in-data-ui-button-group:border-red-600',
                 filled: 'in-data-ui-button-group:border-e [:is([data-ui-button-group]>&:last-child,_[data-ui-button-group]_:last-child>&)]:border-e-0 in-data-ui-button-group:border-gray-300/70',
                 ghost: '',
             },
             iconOnly: { true: 'px-0' },
-            round: { true: 'rounded-full'},
+            round: { true: 'rounded-full' },
         },
         compoundVariants: [
             { iconOnly: true, size: 'base', class: 'w-10 [&_svg]:size-4' },
@@ -61,7 +63,7 @@ const buttonClasses = computed(() => {
     })({
         ...props,
         groupBorder: props.variant,
-        iconOnly: iconOnly.value
+        iconOnly: iconOnly.value,
     });
 
     return twMerge(classes);

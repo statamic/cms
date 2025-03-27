@@ -1,14 +1,9 @@
 <script setup>
 import { cva } from 'cva';
-import {
-    DropdownMenuContent,
-    DropdownMenuPortal,
-    DropdownMenuRoot,
-    DropdownMenuTrigger
-} from 'reka-ui';
+import { DropdownMenuContent, DropdownMenuPortal, DropdownMenuRoot, DropdownMenuTrigger } from 'reka-ui';
 
 defineOptions({
-  inheritAttrs: false
+    inheritAttrs: false,
 });
 
 const props = defineProps({
@@ -20,26 +15,26 @@ const props = defineProps({
 const dropdownContentClasses = cva({
     base: [
         'rounded-xl w-64 bg-gray-50 dark:bg-gray-800 outline-hidden overflow-hidden group z-50',
-        'border border-gray-200 dark:border-black shadow-lg popoverAnimation'
+        'border border-gray-200 dark:border-black shadow-lg popoverAnimation',
     ],
 })({});
 </script>
 
 <template>
-<DropdownMenuRoot>
-    <DropdownMenuTrigger data-ui-dropdown-trigger>
-        <slot name="trigger" />
-    </DropdownMenuTrigger>
-    <DropdownMenuPortal>
-        <DropdownMenuContent
-            data-ui-dropdown-content
-            :class="[dropdownContentClasses, $attrs.class]"
-            :align
-            :sideOffset="offset"
-            :side
-        >
-            <slot />
-        </DropdownMenuContent>
-    </DropdownMenuPortal>
-</DropdownMenuRoot>
+    <DropdownMenuRoot>
+        <DropdownMenuTrigger data-ui-dropdown-trigger>
+            <slot name="trigger" />
+        </DropdownMenuTrigger>
+        <DropdownMenuPortal>
+            <DropdownMenuContent
+                data-ui-dropdown-content
+                :class="[dropdownContentClasses, $attrs.class]"
+                :align
+                :sideOffset="offset"
+                :side
+            >
+                <slot />
+            </DropdownMenuContent>
+        </DropdownMenuPortal>
+    </DropdownMenuRoot>
 </template>

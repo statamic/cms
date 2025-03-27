@@ -2,7 +2,7 @@
 import { cva } from 'cva';
 
 defineOptions({
-  inheritAttrs: false
+    inheritAttrs: false,
 });
 
 const props = defineProps({
@@ -17,21 +17,21 @@ const classes = cva({
         /* When label is followed by description */
         '*:data-ui-description:mb-2',
         /* Dim label when a child input control is disabled */
-        '[&:not(:has([data-ui-field])):has([data-ui-control][disabled])>[data-ui-label]]:opacity-50'
+        '[&:not(:has([data-ui-field])):has([data-ui-control][disabled])>[data-ui-label]]:opacity-50',
     ],
     variants: {
         variant: {
-            'block': 'w-full',
-            'inline': [
+            block: 'w-full',
+            inline: [
                 'grid gap-x-3 gap-y-1.5',
                 'has-[[data-ui-label]~[data-ui-control]]:grid-cols-[1fr_auto]',
                 'has-[[data-ui-control]~[data-ui-label]]:grid-cols-[auto_1fr]',
                 '[&>[data-ui-control]~[data-ui-description]]:row-start-2 [&>[data-ui-control]~[data-ui-description]]:col-start-2',
                 '[&>[data-ui-label]~[data-ui-control]]:row-start-1 [&>[data-ui-label]~[data-ui-control]]:col-start-2',
-            ]
-        }
-    }
-})({ ...props  });
+            ],
+        },
+    },
+})({ ...props });
 </script>
 
 <template>

@@ -26,8 +26,8 @@ defineExpose({ focus });
             :modelValue="modelValue"
             @update:modelValue="$emit('update:modelValue', $event)"
             :name="name"
-            class="w-full relative block space-y-2"
-            :class="{ 'flex flex-wrap gap-x-4 gap-y-2 space-y-0': inline }"
+            class="relative block w-full space-y-2"
+            :class="{ 'flex flex-wrap space-y-0 gap-x-4 gap-y-2': inline }"
             data-ui-input
         >
             <slot />

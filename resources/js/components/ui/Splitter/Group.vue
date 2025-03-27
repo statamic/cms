@@ -1,5 +1,5 @@
 <script setup>
-import { SplitterGroup } from 'reka-ui'
+import { SplitterGroup } from 'reka-ui';
 
 defineProps({
     direction: { type: String, default: 'horizontal' },
@@ -7,7 +7,7 @@ defineProps({
 </script>
 
 <template>
-<SplitterGroup :direction>
-    <slot />
-</SplitterGroup>
+    <SplitterGroup :direction>
+        <slot />
+    </SplitterGroup>
 </template>

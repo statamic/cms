@@ -23,21 +23,21 @@ const classes = cva({
     ],
     variants: {
         resize: {
-            'both': 'resize',
-            'horizontal': 'resize-x',
-            'vertical': 'resize-y',
-            'none': 'resize-none',
+            both: 'resize',
+            horizontal: 'resize-x',
+            vertical: 'resize-y',
+            none: 'resize-none',
         },
         elastic: {
-            true: 'field-sizing-content'
-        }
-    }
+            true: 'field-sizing-content',
+        },
+    },
 })({ ...props });
 </script>
 
 <template>
     <ui-with-field :label="label" :description="description" :required="required">
-        <div class="w-full relative block group/input" data-ui-input>
+        <div class="group/input relative block w-full" data-ui-input>
             <textarea
                 :class="classes"
                 :rows="rows"
@@ -46,11 +46,8 @@ const classes = cva({
                 data-ui-control
                 @input="$emit('update:modelValue', $event.target.value)"
             />
-            <div class="absolute bottom-2 right-2" v-if="limit">
-                <ui-character-counter
-                    :text="modelValue"
-                    :limit
-                />
+            <div class="absolute right-2 bottom-2" v-if="limit">
+                <ui-character-counter :text="modelValue" :limit />
             </div>
         </div>
     </ui-with-field>

@@ -2,8 +2,8 @@
 import { cva } from 'cva';
 
 const props = defineProps({
-    inset: {type: Boolean, default: false },
-    variant: {type: String, default: 'default'}
+    inset: { type: Boolean, default: false },
+    variant: { type: String, default: 'default' },
 });
 
 const classes = cva({
@@ -11,12 +11,11 @@ const classes = cva({
     variants: {
         variant: {
             default: 'shadow-ui-s',
-            flat: 'shadow-none'
+            flat: 'shadow-none',
         },
         inset: { false: 'px-4.5 py-5' },
     },
-})({ ...props })
-
+})({ ...props });
 </script>
 
 <template>

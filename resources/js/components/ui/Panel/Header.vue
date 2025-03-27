@@ -1,7 +1,7 @@
 <script setup>
-    const props = defineProps({
-        title: {type: String, default: null }
-    });
+const props = defineProps({
+    title: { type: String, default: null },
+});
 </script>
 
 <template>

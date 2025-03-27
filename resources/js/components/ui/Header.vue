@@ -1,11 +1,11 @@
 <script setup>
-    const props = defineProps({
-        title: {type: String, default: null }
-    });
+const props = defineProps({
+    title: { type: String, default: null },
+});
 </script>
 
 <template>
-    <header class="grid grid-cols-[1fr_auto] gap-4 py-8 items-center justify-between" data-ui-header>
+    <header class="grid grid-cols-[1fr_auto] items-center justify-between gap-4 py-8" data-ui-header>
         <h1 class="text-[25px] font-medium antialiased">
             <slot name="title">{{ title }}</slot>
         </h1>

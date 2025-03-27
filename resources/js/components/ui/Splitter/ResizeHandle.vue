@@ -1,7 +1,7 @@
 <script setup>
-import { SplitterResizeHandle } from 'reka-ui'
+import { SplitterResizeHandle } from 'reka-ui';
 </script>
 
 <template>
-<SplitterResizeHandle />
+    <SplitterResizeHandle />
 </template>

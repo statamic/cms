@@ -1,5 +1,5 @@
 <script setup>
-import { TabsContent } from 'reka-ui'
+import { TabsContent } from 'reka-ui';
 
 defineProps({
     name: { type: String, default: null },
@@ -7,7 +7,7 @@ defineProps({
 </script>
 
 <template>
-<TabsContent :value="name">
-    <slot />
-</TabsContent>
+    <TabsContent :value="name">
+        <slot />
+    </TabsContent>
 </template>

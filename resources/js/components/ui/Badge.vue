@@ -16,7 +16,7 @@ const props = defineProps({
 
 const slots = useSlots();
 const hasDefaultSlot = !!slots.default;
-const tag = computed(() => props.href ? 'a' : 'div');
+const tag = computed(() => (props.href ? 'a' : 'div'));
 
 const badgeClasses = computed(() => {
     const classes = cva({
@@ -53,7 +53,7 @@ const badgeClasses = computed(() => {
                 default: 'border dark:border-none shadow-ui-sm',
                 flat: 'border-0 shadow-none',
             },
-            pill: { true: 'rounded-full', },
+            pill: { true: 'rounded-full' },
         },
     })({ ...props });
 
@@ -66,6 +66,6 @@ const badgeClasses = computed(() => {
         <ui-icon v-if="icon" :name="icon" />
         <slot v-if="hasDefaultSlot" />
         <template v-else>{{ text }}</template>
-        <span v-if="props.subText" class="text-[0.625rem] opacity-70 font-medium leading-tight">{{ subText }}</span>
+        <span v-if="props.subText" class="text-[0.625rem] leading-tight font-medium opacity-70">{{ subText }}</span>
     </component>
 </template>

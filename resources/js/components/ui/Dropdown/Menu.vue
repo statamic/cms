@@ -1,5 +1,7 @@
 <template>
-    <div class="grid grid-cols-[auto_1fr] bg-white dark:bg-gray-900 p-1.5 rounded-b-xl group-has-data-ui-dropdown-footer:border-b border-gray-200 dark:border-black shadow-ui-xs overflow-hidden z-10">
+    <div
+        class="shadow-ui-xs z-10 grid grid-cols-[auto_1fr] overflow-hidden rounded-b-xl border-gray-200 bg-white p-1.5 group-has-data-ui-dropdown-footer:border-b dark:border-black dark:bg-gray-900"
+    >
         <slot />
     </div>
 </template>
