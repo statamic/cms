@@ -19,7 +19,7 @@ const props = defineProps({
 
 const dropdownContentClasses = cva({
     base: [
-        'rounded-xl w-64 bg-gray-50 dark:bg-gray-800 outline-hidden overflow-hidden group',
+        'rounded-xl w-64 bg-gray-50 dark:bg-gray-800 outline-hidden overflow-hidden group z-50',
         'border border-gray-200 dark:border-black shadow-lg popoverAnimation'
     ],
 })({});

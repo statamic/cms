@@ -2,11 +2,7 @@
    GLOBAL CONTROL PANEL LAYOUT ELEMENTS
    ========================================================================== */
 
-body {
-    @apply relative w-full bg-gray-50 dark:bg-dark-800;
-}
-
-#statamic {
+/* #statamic {
     min-height: 100vh;
 }
 
@@ -15,7 +11,7 @@ body {
     padding-bottom: 72px;
     position: relative;
     z-index: 1;
-}
+} */
 
 #main .workspace {
     transition: padding 0.3s;
@@ -33,9 +29,9 @@ a {
 }
 
 @media (width >= theme(--breakpoint-md)) {
-    #main {
+    /* #main {
         padding-top: 52px;
-    }
+    } */
 
     #main .workspace {
         padding-left: 14rem;

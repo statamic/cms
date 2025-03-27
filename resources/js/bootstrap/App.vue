@@ -44,6 +44,7 @@ import Updater from '../components/updater/Updater.vue';
 import PortalTargets from '../components/portals/PortalTargets.vue';
 import SitesEditForm from '../components/sites/EditForm.vue';
 import { defineAsyncComponent } from 'vue';
+import { ConfigProvider } from 'reka-ui';
 
 export default {
     components: {
@@ -92,6 +93,7 @@ export default {
         Updater,
         PortalTargets,
         SitesEditForm,
+        ConfigProvider,
     },
 
     data() {
