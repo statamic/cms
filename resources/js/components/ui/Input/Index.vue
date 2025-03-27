@@ -16,7 +16,7 @@ const props = defineProps({
     id: { type: String, default: () => useId() },
     label: { type: String, default: null },
     required: { type: Boolean, default: false },
-    modelValue: { type: String, default: null },
+    modelValue: { type: [String, Number], default: null },
     size: { type: String, default: 'base' },
     type: { type: String, default: 'text' },
     viewable: { type: Boolean, default: false },
