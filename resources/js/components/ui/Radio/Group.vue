@@ -11,7 +11,13 @@ defineProps({
     required: { type: Boolean, default: false },
 });
 
+const focus = function () {
+    console.log('focusing. todo.');
+};
+
 defineEmits(['update:modelValue']);
+
+defineExpose({ focus });
 </script>
 
 <template>

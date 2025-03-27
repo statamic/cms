@@ -1,52 +1,28 @@
 <template>
-    <div class="radio-fieldtype-wrapper" :class="{ 'inline-mode': config.inline }">
-        <div
-            v-for="(option, $index) in options"
-            :key="$index"
-            class="option"
-            :class="{
-                selected: value === option.value,
-                disabled: isReadOnly,
-            }"
-        >
-            <label>
-                <svg-icon
-                    name="regular/radio-deselected"
-                    class="radio-icon"
-                    :aria-hidden="value == option.value"
-                    @click="update($event.target.value)"
-                    v-show="value != option.value"
-                    v-cloak
-                />
-                <svg-icon
-                    name="regular/radio-selected"
-                    class="radio-icon"
-                    :aria-hidden="value != option.value"
-                    @click="update($event.target.value)"
-                    v-show="value == option.value"
-                    v-cloak
-                />
-                <input
-                    type="radio"
-                    ref="radio"
-                    :name="name"
-                    @input.stop="update($event.target.value)"
-                    :value="option.value"
-                    :disabled="isReadOnly"
-                    :checked="value == option.value"
-                />
-                {{ option.label || option.value }}
-            </label>
-        </div>
-    </div>
+    <RadioGroup :inline="config.inline" :model-value="value" @update:model-value="update" ref="radio">
+        <Radio
+            v-for="(option, index) in options"
+            :key="index"
+            :label="option.label || option.value"
+            :value="option.value"
+            :disabled="isReadOnly"
+        />
+    </RadioGroup>
 </template>
 
 <script>
 import Fieldtype from './Fieldtype.vue';
 import HasInputOptions from './HasInputOptions.js';
+import RadioGroup from '@statamic/components/ui/Radio/Group.vue';
+import Radio from '@statamic/components/ui/Radio/Item.vue';
 
 export default {
     mixins: [Fieldtype, HasInputOptions],
+
+    components: {
+        RadioGroup,
+        Radio,
+    },
 
     computed: {
         options() {
@@ -63,7 +39,7 @@ export default {
 
     methods: {
         focus() {
-            this.$refs.radio[0].focus();
+            this.$refs.radio.focus();
         },
     },
 };
