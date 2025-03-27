@@ -1,5 +1,5 @@
 <template>
-    <text-input
+    <Input
         ref="input"
         type="number"
         :name="name"
@@ -19,9 +19,11 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
+import Input from '@statamic/components/ui/Input/Index.vue';
 
 export default {
     mixins: [Fieldtype],
+    components: { Input },
     props: {
         prepend: { default: null },
         append: { default: null },
