@@ -26,7 +26,11 @@ export default defineConfig(({ mode }) => {
             inject({ Vue: 'vue', include: 'resources/js/**' }),
         ],
         resolve: {
-            alias: { vue: 'vue/dist/vue.esm-bundler.js', '@statamic': path.resolve(__dirname, 'resources/js') },
+            alias: {
+                vue: 'vue/dist/vue.esm-bundler.js',
+                '@statamic/ui': path.resolve(__dirname, 'resources/js/components/ui/index.js'),
+                '@statamic': path.resolve(__dirname, 'resources/js'),
+            },
         },
         optimizeDeps: { include: ['vue'] },
         build: { rollupOptions: { output: { plugins: [visualizer({ filename: 'bundle-stats.html' })] } } },
