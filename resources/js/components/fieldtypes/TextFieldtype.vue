@@ -1,5 +1,5 @@
 <template>
-    <ui-input
+    <Input
         ref="input"
         :model-value="value"
         :classes="config.classes"
@@ -23,9 +23,14 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
+import Input from '@statamic/components/ui/Input/Index.vue';
 
 export default {
     mixins: [Fieldtype],
+
+    components: {
+        Input,
+    },
 
     methods: {
         inputUpdated(value) {

@@ -1,5 +1,5 @@
 <template>
-    <ui-textarea
+    <Textarea
         :focus="config.focus"
         :name="name"
         :id="fieldId"
@@ -15,8 +15,10 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
+import Textarea from '@statamic/components/ui/Textarea.vue';
 
 export default {
     mixins: [Fieldtype],
+    components: { Textarea },
 };
 </script>
