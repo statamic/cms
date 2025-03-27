@@ -16,27 +16,23 @@ trait CastsMultipleBooleansTests
             'options' => [
                 'true' => 'Yup',
                 'false' => 'Nope',
-                'null' => 'Dunno',
                 'foo' => 'Bar',
             ],
         ]);
 
         $this->assertEquals(
-            [true, false, null, 'foo'],
-            $field->process(['true', 'false', 'null', 'foo'])
+            [true, false, 'foo'],
+            $field->process(['true', 'false', 'foo'])
         );
 
         $this->assertEquals(
-            ['true', 'false', 'null', 'foo'],
-            $field->preProcess([true, false, null, 'foo'])
+            ['true', 'false', 'foo'],
+            $field->preProcess([true, false, 'foo'])
         );
 
-        $this->assertEquals([], $field->preProcess(null));
-        $this->assertEquals(['null'], $field->preProcess([null]));
-
         $this->assertEquals(
-            ['Yup', 'Nope', 'Dunno', 'Bar'],
-            $field->preProcessIndex([true, false, null, 'foo'])
+            ['Yup', 'Nope', 'Bar'],
+            $field->preProcessIndex([true, false, 'foo'])
         );
     }
 
@@ -50,24 +46,23 @@ trait CastsMultipleBooleansTests
             'options' => [
                 'true' => 'Yup',
                 'false' => 'Nope',
-                'null' => 'Dunno',
                 'foo' => 'Bar',
             ],
         ]);
 
         $this->assertEquals(
-            ['true', 'false', 'null', 'foo'],
-            $field->process(['true', 'false', 'null', 'foo'])
+            ['true', 'false', 'foo'],
+            $field->process(['true', 'false', 'foo'])
         );
 
         $this->assertEquals(
-            [true, false, null, 'foo'],
-            $field->preProcess([true, false, null, 'foo'])
+            [true, false, 'foo'],
+            $field->preProcess([true, false, 'foo'])
         );
 
         $this->assertEquals(
-            [true, false, null, 'Bar'],
-            $field->preProcessIndex([true, false, null, 'foo'])
+            [true, false, 'Bar'],
+            $field->preProcessIndex([true, false, 'foo'])
         );
     }
 }
