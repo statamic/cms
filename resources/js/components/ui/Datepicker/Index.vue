@@ -19,7 +19,6 @@ import {
     DatePickerNext,
     DatePickerPrev,
 } from 'reka-ui';
-import { parseDate } from '@internationalized/date';
 import { WithField, Card, Button, Calendar } from '@statamic/ui';
 
 const emit = defineEmits(['update:modelValue']);
@@ -34,14 +33,32 @@ const props = defineProps({
     min: { type: [String, Object], default: null },
     max: { type: [String, Object], default: null },
     granularity: { type: String, default: null },
+    inline: { type: Boolean, default: false },
 });
 
-const minValue = computed(() =>
-    props.min ? (typeof props.min === 'string' ? parseDate(props.min) : props.min) : null,
-);
-const maxValue = computed(() =>
-    props.max ? (typeof props.max === 'string' ? parseDate(props.max) : props.max) : null,
-);
+const calendarBindings = computed(() => ({
+    modelValue: props.modelValue,
+    min: props.min,
+    max: props.max,
+    components: {
+        Root: DatePickerCalendar,
+        Header: DatePickerHeader,
+        Heading: DatePickerHeading,
+        Prev: DatePickerPrev,
+        Next: DatePickerNext,
+        Grid: DatePickerGrid,
+        GridHead: DatePickerGridHead,
+        GridBody: DatePickerGridBody,
+        GridRow: DatePickerGridRow,
+        HeadCell: DatePickerHeadCell,
+        Cell: DatePickerCell,
+        CellTrigger: DatePickerCellTrigger,
+    },
+}));
+
+const calendarEvents = computed(() => ({
+    'update:model-value': (event) => emit('update:modelValue', event),
+}));
 </script>
 
 <template>
@@ -81,6 +98,7 @@ const maxValue = computed(() =>
                         </template>
                     </div>
                     <DatePickerTrigger
+                        v-if="!inline"
                         class="absolute end-1 top-1 bottom-1 flex items-center justify-center rounded-lg px-2 text-gray-400 outline-hidden hover:bg-gray-50 focus:bg-gray-50 dark:hover:bg-gray-900 dark:focus:bg-gray-900"
                     >
                         <ui-icon name="calendar" class="h-4 w-4" />
@@ -88,30 +106,18 @@ const maxValue = computed(() =>
                 </DatePickerField>
 
                 <DatePickerContent
+                    v-if="!inline"
                     :side-offset="4"
                     class="data-[state=open]:data-[side=top]:animate-slideDownAndFade data-[state=open]:data-[side=right]:animate-slideLeftAndFade data-[state=open]:data-[side=bottom]:animate-slideUpAndFade data-[state=open]:data-[side=left]:animate-slideRightAndFade will-change-[transform,opacity]"
                 >
-                    <Card>
-                        <Calendar
-                            :model-value="modelValue"
-                            @update:model-value="emit('update:modelValue', $event)"
-                            :components="{
-                                Root: DatePickerCalendar,
-                                Header: DatePickerHeader,
-                                Heading: DatePickerHeading,
-                                Prev: DatePickerPrev,
-                                Next: DatePickerNext,
-                                Grid: DatePickerGrid,
-                                GridHead: DatePickerGridHead,
-                                GridBody: DatePickerGridBody,
-                                GridRow: DatePickerGridRow,
-                                HeadCell: DatePickerHeadCell,
-                                Cell: DatePickerCell,
-                                CellTrigger: DatePickerCellTrigger,
-                            }"
-                        />
+                    <Card class="w-[20rem]">
+                        <Calendar v-bind="calendarBindings" v-on="calendarEvents" />
                     </Card>
                 </DatePickerContent>
+
+                <Card v-if="inline" class="mt-2">
+                    <Calendar v-bind="calendarBindings" v-on="calendarEvents" />
+                </Card>
             </DatePickerRoot>
         </div>
         <Button @click="emit('update:modelValue', null)" type="button" class="" text="Clear" size="xs" />

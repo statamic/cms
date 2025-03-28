@@ -19,7 +19,6 @@ import {
     DateRangePickerRoot,
     DateRangePickerTrigger,
 } from 'reka-ui';
-import { parseDate } from '@internationalized/date';
 import { WithField, Card, Button, Calendar } from '@statamic/ui';
 
 const emit = defineEmits(['update:modelValue']);
@@ -34,14 +33,32 @@ const props = defineProps({
     min: { type: [String, Object], default: null },
     max: { type: [String, Object], default: null },
     granularity: { type: String, default: null },
+    inline: { type: Boolean, default: false },
 });
 
-const minValue = computed(() =>
-    props.min ? (typeof props.min === 'string' ? parseDate(props.min) : props.min) : null,
-);
-const maxValue = computed(() =>
-    props.max ? (typeof props.max === 'string' ? parseDate(props.max) : props.max) : null,
-);
+const calendarBindings = computed(() => ({
+    modelValue: props.modelValue,
+    min: props.min,
+    max: props.max,
+    components: {
+        Root: DateRangePickerCalendar,
+        Header: DateRangePickerHeader,
+        Heading: DateRangePickerHeading,
+        Prev: DateRangePickerPrev,
+        Next: DateRangePickerNext,
+        Grid: DateRangePickerGrid,
+        GridHead: DateRangePickerGridHead,
+        GridBody: DateRangePickerGridBody,
+        GridRow: DateRangePickerGridRow,
+        HeadCell: DateRangePickerHeadCell,
+        Cell: DateRangePickerCell,
+        CellTrigger: DateRangePickerCellTrigger,
+    },
+}));
+
+const calendarEvents = computed(() => ({
+    'update:model-value': (event) => emit('update:modelValue', event),
+}));
 </script>
 
 <template>
@@ -99,6 +116,7 @@ const maxValue = computed(() =>
                         </template>
                     </div>
                     <DateRangePickerTrigger
+                        v-if="!inline"
                         class="absolute end-1 top-1 bottom-1 flex items-center justify-center rounded-lg px-2 text-gray-400 outline-hidden hover:bg-gray-50 focus:bg-gray-50 dark:hover:bg-gray-900 dark:focus:bg-gray-900"
                     >
                         <ui-icon name="calendar" class="h-4 w-4" />
@@ -106,30 +124,18 @@ const maxValue = computed(() =>
                 </DateRangePickerField>
 
                 <DateRangePickerContent
+                    v-if="!inline"
                     :side-offset="4"
                     class="data-[state=open]:data-[side=top]:animate-slideDownAndFade data-[state=open]:data-[side=right]:animate-slideLeftAndFade data-[state=open]:data-[side=bottom]:animate-slideUpAndFade data-[state=open]:data-[side=left]:animate-slideRightAndFade will-change-[transform,opacity]"
                 >
-                    <Card>
-                        <Calendar
-                            :model-value="modelValue"
-                            @update:model-value="emit('update:modelValue', $event)"
-                            :components="{
-                                Root: DateRangePickerCalendar,
-                                Header: DateRangePickerHeader,
-                                Heading: DateRangePickerHeading,
-                                Prev: DateRangePickerPrev,
-                                Next: DateRangePickerNext,
-                                Grid: DateRangePickerGrid,
-                                GridHead: DateRangePickerGridHead,
-                                GridBody: DateRangePickerGridBody,
-                                GridRow: DateRangePickerGridRow,
-                                HeadCell: DateRangePickerHeadCell,
-                                Cell: DateRangePickerCell,
-                                CellTrigger: DateRangePickerCellTrigger,
-                            }"
-                        />
+                    <Card class="w-[20rem]">
+                        <Calendar v-bind="calendarBindings" v-on="calendarEvents" />
                     </Card>
                 </DateRangePickerContent>
+
+                <Card v-if="inline" class="mt-2">
+                    <Calendar v-bind="calendarBindings" v-on="calendarEvents" />
+                </Card>
             </DateRangePickerRoot>
         </div>
         <Button @click="emit('update:modelValue', null)" type="button" class="" text="Clear" size="xs" />
