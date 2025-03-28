@@ -25,7 +25,7 @@
                     }"
                 >
                     @include('statamic::partials.nav-main')
-                    @include('statamic::partials.nav-mobile')
+                    {{-- @include('statamic::partials.nav-mobile') --}}
 
                     <div class="workspace bg-gray-50 rounded-t-xl min-h-[calc(100vh-3.5rem)]">
                         <div class="page-wrapper" :class="wrapperClass">

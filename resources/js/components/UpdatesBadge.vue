@@ -1,7 +1,5 @@
 <template>
-    <span v-if="count" class="badge-sm bg-red-500 dark:bg-blue-900">
-        {{ count }}
-    </span>
+    <ui-badge v-if="count" :text="count" color="red" size="sm" variant="flat" />
 </template>
 
 <script>

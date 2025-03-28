@@ -200,7 +200,7 @@ class NavItem
     {
         $value = $this->icon() ?? 'entries';
 
-        return Str::startsWith($value, '<svg') ? $value : Statamic::svg('icons/light/'.$value);
+        return Str::startsWith($value, '<svg') ? $value : Statamic::svg('icons/'.$value, 'size-4 shrink-0');
     }
 
     /**

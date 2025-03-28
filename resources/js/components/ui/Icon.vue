@@ -20,7 +20,7 @@ const loadIcon = () => {
     }
 
     // Handle file imports
-    return defineAsyncComponent(() => import(`./svg/${props.name}.svg`));
+    return defineAsyncComponent(() => import(`../../../svg/icons/${props.name}.svg`));
 };
 
 watch(

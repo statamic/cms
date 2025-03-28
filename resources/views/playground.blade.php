@@ -213,4 +213,8 @@
             <ui-button text="Hover me" />
         </ui-tooltip>
     </div>
+
+    <div class="mb-4 flex">
+        <ui-icon name="sun" class="size-6" />
+    </div>
 @endsection
