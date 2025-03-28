@@ -20,7 +20,7 @@ import {
     DateRangePickerTrigger,
 } from 'reka-ui';
 import { parseDate } from '@internationalized/date';
-import { WithField, Card, Button } from '@statamic/ui';
+import { WithField, Card, Button, Calendar } from '@statamic/ui';
 
 const emit = defineEmits(['update:modelValue']);
 
@@ -110,82 +110,24 @@ const maxValue = computed(() =>
                     class="data-[state=open]:data-[side=top]:animate-slideDownAndFade data-[state=open]:data-[side=right]:animate-slideLeftAndFade data-[state=open]:data-[side=bottom]:animate-slideUpAndFade data-[state=open]:data-[side=left]:animate-slideRightAndFade will-change-[transform,opacity]"
                 >
                     <Card>
-                        <DateRangePickerCalendar
+                        <Calendar
                             :model-value="modelValue"
-                            v-slot="{ weekDays, grid }"
-                            :minValue="minValue"
-                            :maxValue="maxValue"
-                            :locale="$date.locale"
-                            fixed-weeks
                             @update:model-value="emit('update:modelValue', $event)"
-                        >
-                            <DateRangePickerHeader class="flex items-center justify-between">
-                                <DateRangePickerHeading class="text-sm font-medium text-black dark:text-white" />
-                                <div>
-                                    <DateRangePickerPrev
-                                        class="inline-flex size-8 cursor-pointer items-center justify-center rounded-md hover:bg-gray-50 active:scale-90 dark:hover:bg-gray-950"
-                                    >
-                                        <ui-icon name="chevron-left" class="size-4" />
-                                    </DateRangePickerPrev>
-                                    <DateRangePickerNext
-                                        class="inline-flex size-8 cursor-pointer items-center justify-center rounded-md hover:bg-gray-50 active:scale-90 dark:hover:bg-gray-950"
-                                    >
-                                        <ui-icon name="chevron-right" class="size-4" />
-                                    </DateRangePickerNext>
-                                </div>
-                            </DateRangePickerHeader>
-
-                            <div class="flex flex-col space-y-4 pt-4 sm:flex-row sm:space-y-0 sm:space-x-4">
-                                <DateRangePickerGrid
-                                    v-for="month in grid"
-                                    :key="month.value.toString()"
-                                    class="w-full border-collapse space-y-1 select-none"
-                                >
-                                    <DateRangePickerGridHead>
-                                        <DateRangePickerGridRow class="mb-1 grid w-full grid-cols-7">
-                                            <DateRangePickerHeadCell
-                                                v-for="day in weekDays"
-                                                :key="day"
-                                                class="rounded-md text-xs text-black dark:text-white"
-                                            >
-                                                {{ day }}
-                                            </DateRangePickerHeadCell>
-                                        </DateRangePickerGridRow>
-                                    </DateRangePickerGridHead>
-
-                                    <DateRangePickerGridBody class="grid space-y-1">
-                                        <DateRangePickerGridRow
-                                            v-for="(weekDates, index) in month.rows"
-                                            :key="`weekDate-${index}`"
-                                            class="grid grid-cols-7"
-                                        >
-                                            <DateRangePickerCell
-                                                v-for="weekDate in weekDates"
-                                                :key="weekDate.toString()"
-                                                :date="weekDate"
-                                                class="relative text-center text-sm"
-                                            >
-                                                <DateRangePickerCellTrigger
-                                                    :day="weekDate"
-                                                    :month="month.value"
-                                                    :class="[
-                                                        'relative flex size-8 items-center justify-center rounded-lg text-sm font-normal whitespace-nowrap text-black outline-hidden dark:text-white',
-                                                        'data-outside-view:text-gray-400 dark:data-outside-view:text-gray-600',
-                                                        'data-selected:bg-gray-800! data-selected:text-white dark:data-selected:bg-gray-200! dark:data-selected:text-black',
-                                                        'hover:bg-gray-100 data-highlighted:bg-gray-200 dark:hover:bg-black dark:data-highlighted:bg-black',
-                                                        'data-disabled:pointer-events-none data-disabled:hover:bg-transparent',
-                                                        'data-disabled:text-gray-400 dark:data-disabled:text-gray-600',
-                                                        'data-unavailable:pointer-events-none data-unavailable:text-black/30 data-unavailable:line-through',
-                                                        'before:absolute before:top-[3px] before:hidden before:h-1 before:w-1 before:rounded-lg before:bg-white',
-                                                        'data-today:before:block data-today:before:bg-green-600',
-                                                    ]"
-                                                />
-                                            </DateRangePickerCell>
-                                        </DateRangePickerGridRow>
-                                    </DateRangePickerGridBody>
-                                </DateRangePickerGrid>
-                            </div>
-                        </DateRangePickerCalendar>
+                            :components="{
+                                Root: DateRangePickerCalendar,
+                                Header: DateRangePickerHeader,
+                                Heading: DateRangePickerHeading,
+                                Prev: DateRangePickerPrev,
+                                Next: DateRangePickerNext,
+                                Grid: DateRangePickerGrid,
+                                GridHead: DateRangePickerGridHead,
+                                GridBody: DateRangePickerGridBody,
+                                GridRow: DateRangePickerGridRow,
+                                HeadCell: DateRangePickerHeadCell,
+                                Cell: DateRangePickerCell,
+                                CellTrigger: DateRangePickerCellTrigger,
+                            }"
+                        />
                     </Card>
                 </DateRangePickerContent>
             </DateRangePickerRoot>
