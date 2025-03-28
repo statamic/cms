@@ -61,9 +61,9 @@
 
     <ui-dropdown-footer>
         <ui-button-group>
-            <ui-button size="sm" variant="filled" icon="sun" text="Light" class="flex-1" />
-            <ui-button size="sm" variant="filled" icon="moon" text="Dark" class="flex-1" />
-            <ui-button size="sm" variant="filled" icon="site" text="System" class="flex-1" />
+            <ui-button size="sm" variant="ghost" icon="sun" class="flex-1 [&_svg]:size-4.5" />
+            <ui-button size="sm" variant="ghost" icon="moon" class="flex-1 [&_svg]:size-4.5" />
+            <ui-button size="sm" variant="ghost" icon="monitor" class="flex-1 [&_svg]:size-4.5" />
         </ui-button-group>
     </ui-dropdown-footer>
 </ui-dropdown>
