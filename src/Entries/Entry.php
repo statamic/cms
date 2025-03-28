@@ -528,7 +528,10 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
     protected function inferTemplateFromBlueprint()
     {
-        $template = $this->collection()->handle().'.'.$this->blueprint();
+        $basePath = config('statamic.system.blueprint_template_base_path');
+        $prefix = $basePath ?: $this->collection()->handle();
+
+        $template = $prefix.'.'.$this->blueprint();
 
         $slugifiedTemplate = str_replace('_', '-', $template);
 
