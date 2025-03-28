@@ -14,7 +14,7 @@ import {
     CalendarPrev,
     CalendarNext,
 } from 'reka-ui';
-import { today, parseDate, parseDateTime } from '@internationalized/date';
+import { parseDate } from '@internationalized/date';
 
 defineOptions({ name: 'Calendar' });
 
@@ -26,16 +26,6 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue']);
 
-const value = computed({
-    get: () =>
-        props.modelValue
-            ? typeof props.modelValue === 'string'
-                ? parseDateTime(props.modelValue)
-                : props.modelValue
-            : today(),
-    set: (val) => emit('update:modelValue', val?.toString()),
-});
-
 const minValue = computed(() =>
     props.min ? (typeof props.min === 'string' ? parseDate(props.min) : props.min) : null,
 );
@@ -45,24 +35,17 @@ const maxValue = computed(() =>
 </script>
 
 <template>
-    <CalendarRoot v-model="value" v-slot="{ weekDays, grid }" :minValue="minValue" :maxValue="maxValue" fixed-weeks>
+    <CalendarRoot
+        :model-value="modelValue"
+        v-slot="{ weekDays, grid }"
+        :minValue="minValue"
+        :maxValue="maxValue"
+        :locale="$date.locale"
+        fixed-weeks
+        @update:model-value="emit('update:modelValue', $event)"
+    >
         <CalendarHeader class="flex items-center justify-between">
             <CalendarHeading class="text-sm font-medium text-black dark:text-white" />
-            <!-- <div>
-                <ui-select
-                    :options="months"
-                    size="sm"
-                    flat
-                    class="w-2/3!"
-                />
-
-                <ui-select
-                    :options="years"
-                    size="sm"
-                    flat
-                    class="w-1/3!"
-                />
-            </div> -->
             <div>
                 <CalendarPrev
                     class="inline-flex size-8 cursor-pointer items-center justify-center rounded-md hover:bg-gray-50 active:scale-90 dark:hover:bg-gray-950"

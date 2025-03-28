@@ -1,23 +1,23 @@
 <script setup>
 import { computed } from 'vue';
 import {
-    DatePickerContent,
-    DatePickerField,
-    DatePickerInput,
-    DatePickerRoot,
-    DatePickerTrigger,
-    DatePickerCalendar,
-    DatePickerCell,
-    DatePickerCellTrigger,
-    DatePickerGrid,
-    DatePickerGridBody,
-    DatePickerGridHead,
-    DatePickerGridRow,
-    DatePickerHeadCell,
-    DatePickerHeader,
-    DatePickerHeading,
-    DatePickerNext,
-    DatePickerPrev,
+    DateRangePickerCalendar,
+    DateRangePickerCell,
+    DateRangePickerCellTrigger,
+    DateRangePickerGrid,
+    DateRangePickerGridBody,
+    DateRangePickerGridHead,
+    DateRangePickerGridRow,
+    DateRangePickerHeadCell,
+    DateRangePickerHeader,
+    DateRangePickerHeading,
+    DateRangePickerNext,
+    DateRangePickerPrev,
+    DateRangePickerContent,
+    DateRangePickerField,
+    DateRangePickerInput,
+    DateRangePickerRoot,
+    DateRangePickerTrigger,
 } from 'reka-ui';
 import { parseDate } from '@internationalized/date';
 import { WithField, Card, Button } from '@statamic/ui';
@@ -47,14 +47,14 @@ const maxValue = computed(() =>
 <template>
     <WithField :label :description :required :badge>
         <div class="group/input relative block w-full" data-ui-input>
-            <DatePickerRoot
+            <DateRangePickerRoot
                 :modelValue="modelValue"
                 :granularity="granularity"
                 :locale="$date.locale"
                 @update:model-value="emit('update:modelValue', $event)"
                 v-bind="$attrs"
             >
-                <DatePickerField v-slot="{ segments }" class="w-full">
+                <DateRangePickerField v-slot="{ segments }" class="w-full">
                     <div
                         :class="[
                             'flex w-full bg-white dark:bg-gray-900',
@@ -64,35 +64,53 @@ const maxValue = computed(() =>
                             'data-invalid:border-red-500',
                         ]"
                     >
-                        <template v-for="item in segments" :key="item.part">
-                            <DatePickerInput v-if="item.part === 'literal'" :part="item.part">
+                        <template v-for="item in segments.start" :key="item.part">
+                            <DateRangePickerInput v-if="item.part === 'literal'" :part="item.part" type="start">
                                 {{ item.value }}
-                            </DatePickerInput>
-                            <DatePickerInput
+                            </DateRangePickerInput>
+                            <DateRangePickerInput
                                 v-else
                                 :part="item.part"
                                 class="rounded-sm px-0.25 py-0.5 focus:bg-gray-50 focus:outline-hidden data-placeholder:text-gray-600 dark:focus:bg-gray-800 dark:data-placeholder:text-gray-400"
                                 :class="{
                                     'px-0.5!': item.part === 'month' || item.part === 'year' || item.part === 'day',
                                 }"
+                                type="start"
                             >
                                 {{ item.value }}
-                            </DatePickerInput>
+                            </DateRangePickerInput>
+                        </template>
+                        <span class="mx-2"> - </span>
+                        <template v-for="item in segments.end" :key="item.part">
+                            <DateRangePickerInput v-if="item.part === 'literal'" :part="item.part" type="end">
+                                {{ item.value }}
+                            </DateRangePickerInput>
+                            <DateRangePickerInput
+                                v-else
+                                :part="item.part"
+                                class="rounded-sm px-0.25 py-0.5 focus:bg-gray-50 focus:outline-hidden data-placeholder:text-gray-600 dark:focus:bg-gray-800 dark:data-placeholder:text-gray-400"
+                                :class="{
+                                    'px-0.5!': item.part === 'month' || item.part === 'year' || item.part === 'day',
+                                }"
+                                type="end"
+                            >
+                                {{ item.value }}
+                            </DateRangePickerInput>
                         </template>
                     </div>
-                    <DatePickerTrigger
+                    <DateRangePickerTrigger
                         class="absolute end-1 top-1 bottom-1 flex items-center justify-center rounded-lg px-2 text-gray-400 outline-hidden hover:bg-gray-50 focus:bg-gray-50 dark:hover:bg-gray-900 dark:focus:bg-gray-900"
                     >
                         <ui-icon name="calendar" class="h-4 w-4" />
-                    </DatePickerTrigger>
-                </DatePickerField>
+                    </DateRangePickerTrigger>
+                </DateRangePickerField>
 
-                <DatePickerContent
+                <DateRangePickerContent
                     :side-offset="4"
                     class="data-[state=open]:data-[side=top]:animate-slideDownAndFade data-[state=open]:data-[side=right]:animate-slideLeftAndFade data-[state=open]:data-[side=bottom]:animate-slideUpAndFade data-[state=open]:data-[side=left]:animate-slideRightAndFade will-change-[transform,opacity]"
                 >
                     <Card>
-                        <DatePickerCalendar
+                        <DateRangePickerCalendar
                             :model-value="modelValue"
                             v-slot="{ weekDays, grid }"
                             :minValue="minValue"
@@ -101,53 +119,53 @@ const maxValue = computed(() =>
                             fixed-weeks
                             @update:model-value="emit('update:modelValue', $event)"
                         >
-                            <DatePickerHeader class="flex items-center justify-between">
-                                <DatePickerHeading class="text-sm font-medium text-black dark:text-white" />
+                            <DateRangePickerHeader class="flex items-center justify-between">
+                                <DateRangePickerHeading class="text-sm font-medium text-black dark:text-white" />
                                 <div>
-                                    <DatePickerPrev
+                                    <DateRangePickerPrev
                                         class="inline-flex size-8 cursor-pointer items-center justify-center rounded-md hover:bg-gray-50 active:scale-90 dark:hover:bg-gray-950"
                                     >
                                         <ui-icon name="chevron-left" class="size-4" />
-                                    </DatePickerPrev>
-                                    <DatePickerNext
+                                    </DateRangePickerPrev>
+                                    <DateRangePickerNext
                                         class="inline-flex size-8 cursor-pointer items-center justify-center rounded-md hover:bg-gray-50 active:scale-90 dark:hover:bg-gray-950"
                                     >
                                         <ui-icon name="chevron-right" class="size-4" />
-                                    </DatePickerNext>
+                                    </DateRangePickerNext>
                                 </div>
-                            </DatePickerHeader>
+                            </DateRangePickerHeader>
 
                             <div class="flex flex-col space-y-4 pt-4 sm:flex-row sm:space-y-0 sm:space-x-4">
-                                <DatePickerGrid
+                                <DateRangePickerGrid
                                     v-for="month in grid"
                                     :key="month.value.toString()"
                                     class="w-full border-collapse space-y-1 select-none"
                                 >
-                                    <DatePickerGridHead>
-                                        <DatePickerGridRow class="mb-1 grid w-full grid-cols-7">
-                                            <DatePickerHeadCell
+                                    <DateRangePickerGridHead>
+                                        <DateRangePickerGridRow class="mb-1 grid w-full grid-cols-7">
+                                            <DateRangePickerHeadCell
                                                 v-for="day in weekDays"
                                                 :key="day"
                                                 class="rounded-md text-xs text-black dark:text-white"
                                             >
                                                 {{ day }}
-                                            </DatePickerHeadCell>
-                                        </DatePickerGridRow>
-                                    </DatePickerGridHead>
+                                            </DateRangePickerHeadCell>
+                                        </DateRangePickerGridRow>
+                                    </DateRangePickerGridHead>
 
-                                    <DatePickerGridBody class="grid space-y-1">
-                                        <DatePickerGridRow
+                                    <DateRangePickerGridBody class="grid space-y-1">
+                                        <DateRangePickerGridRow
                                             v-for="(weekDates, index) in month.rows"
                                             :key="`weekDate-${index}`"
                                             class="grid grid-cols-7"
                                         >
-                                            <DatePickerCell
+                                            <DateRangePickerCell
                                                 v-for="weekDate in weekDates"
                                                 :key="weekDate.toString()"
                                                 :date="weekDate"
                                                 class="relative text-center text-sm"
                                             >
-                                                <DatePickerCellTrigger
+                                                <DateRangePickerCellTrigger
                                                     :day="weekDate"
                                                     :month="month.value"
                                                     :class="[
@@ -162,15 +180,15 @@ const maxValue = computed(() =>
                                                         'data-today:before:block data-today:before:bg-green-600',
                                                     ]"
                                                 />
-                                            </DatePickerCell>
-                                        </DatePickerGridRow>
-                                    </DatePickerGridBody>
-                                </DatePickerGrid>
+                                            </DateRangePickerCell>
+                                        </DateRangePickerGridRow>
+                                    </DateRangePickerGridBody>
+                                </DateRangePickerGrid>
                             </div>
-                        </DatePickerCalendar>
+                        </DateRangePickerCalendar>
                     </Card>
-                </DatePickerContent>
-            </DatePickerRoot>
+                </DateRangePickerContent>
+            </DateRangePickerRoot>
         </div>
         <Button @click="emit('update:modelValue', null)" type="button" class="" text="Clear" size="xs" />
     </WithField>
