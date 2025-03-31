@@ -40,9 +40,11 @@ class DefaultInvalidatorTest extends TestCase
     public function assets_can_trigger_url_invalidation()
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
-            $cacher->shouldReceive('invalidateUrl')->with('http://localhost/page/one')->once();
-            $cacher->shouldReceive('invalidateUrl')->with('http://localhost/page/two')->once();
-            $cacher->shouldReceive('invalidateUrl')->with('http://localhost/page/three')->once();
+            $cacher->shouldReceive('invalidateUrls')->with([
+                'http://localhost/page/three',
+                'http://localhost/page/one',
+                'http://localhost/page/two',
+            ])->once();
         });
 
         $container = tap(Mockery::mock(AssetContainer::class), function ($m) {
@@ -77,13 +79,13 @@ class DefaultInvalidatorTest extends TestCase
         ]);
 
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
-            $cacher->shouldReceive('invalidateUrl')->with('http://test.com/page/one')->once();
-            $cacher->shouldReceive('invalidateUrl')->with('http://test.com/page/two')->once();
-
-            $cacher->shouldReceive('invalidateUrl')->with('http://test.fr/page/one')->once();
-            $cacher->shouldReceive('invalidateUrl')->with('http://test.fr/page/two')->once();
-
-            $cacher->shouldReceive('invalidateUrl')->with('http://test.com/page/three')->once();
+            $cacher->shouldReceive('invalidateUrls')->with([
+                'http://test.com/page/three',
+                'http://test.com/page/one',
+                'http://test.com/page/two',
+                'http://test.fr/page/one',
+                'http://test.fr/page/two',
+            ])->once();
         });
 
         $container = tap(Mockery::mock(AssetContainer::class), function ($m) {
@@ -113,9 +115,12 @@ class DefaultInvalidatorTest extends TestCase
     public function collection_urls_can_be_invalidated()
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
-            $cacher->shouldReceive('invalidateUrl')->with('/my/test/collection', 'http://localhost')->once();
-            $cacher->shouldReceive('invalidateUrls')->with(['http://localhost/blog/one', 'http://localhost/blog/two'])->once();
-            $cacher->shouldReceive('invalidateUrl')->with('http://localhost/blog/three')->once();
+            $cacher->shouldReceive('invalidateUrls')->with([
+                'http://localhost/my/test/collection',
+                'http://localhost/blog/three',
+                'http://localhost/blog/one',
+                'http://localhost/blog/two',
+            ])->once();
         });
 
         $collection = tap(Mockery::mock(Collection::class), function ($m) {
@@ -149,16 +154,15 @@ class DefaultInvalidatorTest extends TestCase
         ]);
 
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
-            $cacher->shouldReceive('invalidateUrl')->with('/my/test/collection', 'http://test.com')->once();
-            $cacher->shouldReceive('invalidateUrls')->with(['http://test.com/blog/one', 'http://test.com/blog/two'])->once();
-
-            $cacher->shouldReceive('invalidateUrl')->with('/my/test/collection', 'http://test.fr')->once();
-            $cacher->shouldReceive('invalidateUrls')->with(['http://test.fr/blog/one', 'http://test.fr/blog/two'])->once();
-
-            $cacher->shouldReceive('invalidateUrl')->with('/my/test/collection', 'http://test.de')->never();
-            $cacher->shouldReceive('invalidateUrls')->with(['http://test.de/blog/one', 'http://test.de/blog/two'])->never();
-
-            $cacher->shouldReceive('invalidateUrl')->with('http://test.com/blog/three')->once();
+            $cacher->shouldReceive('invalidateUrls')->with([
+                'http://test.com/my/test/collection',
+                'http://test.fr/my/test/collection',
+                'http://test.com/blog/three',
+                'http://test.com/blog/one',
+                'http://test.com/blog/two',
+                'http://test.fr/blog/one',
+                'http://test.fr/blog/two',
+            ])->once();
         });
 
         $collection = tap(Mockery::mock(Collection::class), function ($m) {
@@ -189,8 +193,11 @@ class DefaultInvalidatorTest extends TestCase
     public function collection_urls_can_be_invalidated_by_a_tree()
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
-            $cacher->shouldReceive('invalidateUrls')->with(['http://localhost/blog/one', 'http://localhost/blog/two'])->once();
-            $cacher->shouldReceive('invalidateUrl')->with('http://localhost/blog/three')->once();
+            $cacher->shouldReceive('invalidateUrls')->with([
+                'http://localhost/blog/three',
+                'http://localhost/blog/one',
+                'http://localhost/blog/two',
+            ])->once();
         });
 
         $collection = tap(Mockery::mock(Collection::class), function ($m) {
@@ -232,9 +239,11 @@ class DefaultInvalidatorTest extends TestCase
         ]);
 
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
-            $cacher->shouldReceive('invalidateUrls')->with(['http://test.fr/blog/one', 'http://test.fr/blog/two'])->once();
-            $cacher->shouldReceive('invalidateUrls')->with(['http://test.com/blog/one', 'http://test.com/blog/two'])->never();
-            $cacher->shouldReceive('invalidateUrl')->with('http://localhost/blog/three')->once();
+            $cacher->shouldReceive('invalidateUrls')->with([
+                'http://localhost/blog/three',
+                'http://test.fr/blog/one',
+                'http://test.fr/blog/two',
+            ])->once();
         });
 
         $collection = tap(Mockery::mock(Collection::class), function ($m) {
@@ -271,9 +280,12 @@ class DefaultInvalidatorTest extends TestCase
     public function collection_urls_can_be_invalidated_by_an_entry()
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
-            $cacher->shouldReceive('invalidateUrl')->with('/my/test/entry', 'http://test.com')->once();
-            $cacher->shouldReceive('invalidateUrls')->with(['http://localhost/blog/one', 'http://localhost/blog/two'])->once();
-            $cacher->shouldReceive('invalidateUrl')->with('http://localhost/blog/three')->once();
+            $cacher->shouldReceive('invalidateUrls')->with([
+                'http://test.com/my/test/entry',
+                'http://localhost/blog/three',
+                'http://localhost/blog/one',
+                'http://localhost/blog/two',
+            ])->once();
         });
 
         $entry = tap(Mockery::mock(Entry::class), function ($m) {
@@ -308,13 +320,12 @@ class DefaultInvalidatorTest extends TestCase
         ]);
 
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
-            $cacher->shouldReceive('invalidateUrl')->with('/my/test/entry', 'http://test.fr')->never();
-            $cacher->shouldReceive('invalidateUrls')->with(['http://test.fr/blog/one', 'http://test.fr/blog/two'])->never();
-
-            $cacher->shouldReceive('invalidateUrl')->with('/my/test/entry', 'http://test.fr')->once();
-            $cacher->shouldReceive('invalidateUrls')->with(['http://test.fr/blog/one', 'http://test.fr/blog/two'])->once();
-
-            $cacher->shouldReceive('invalidateUrl')->with('http://test.com/blog/three')->once();
+            $cacher->shouldReceive('invalidateUrls')->with([
+                'http://test.fr/my/test/entry',
+                'http://test.com/blog/three',
+                'http://test.fr/blog/one',
+                'http://test.fr/blog/two',
+            ])->once();
         });
 
         $entry = tap(Mockery::mock(Entry::class), function ($m) {
@@ -344,8 +355,10 @@ class DefaultInvalidatorTest extends TestCase
     public function entry_urls_are_not_invalidated_by_an_entry_with_a_redirect()
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
-            $cacher->shouldReceive('invalidateUrl')->never();
-            $cacher->shouldReceive('invalidateUrls')->with(['http://localhost/blog/one', 'http://localhost/blog/two'])->once();
+            $cacher->shouldReceive('invalidateUrls')->with([
+                'http://localhost/blog/one',
+                'http://localhost/blog/two',
+            ])->once();
         });
 
         $entry = tap(Mockery::mock(Entry::class), function ($m) {
@@ -374,11 +387,13 @@ class DefaultInvalidatorTest extends TestCase
     public function taxonomy_urls_can_be_invalidated()
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
-            $cacher->shouldReceive('invalidateUrl')->with('/my/test/term', 'http://localhost')->once();
-            $cacher->shouldReceive('invalidateUrl')->with('/my/collection/tags/term', 'http://localhost')->once();
-            $cacher->shouldReceive('invalidateUrls')->with(['http://localhost/tags/one', 'http://localhost/tags/two'])->once();
-
-            $cacher->shouldReceive('invalidateUrl')->with('http://localhost/tags/three')->once();
+            $cacher->shouldReceive('invalidateUrls')->with([
+                'http://localhost/my/test/term',
+                'http://localhost/my/collection/tags/term',
+                'http://localhost/tags/three',
+                'http://localhost/tags/one',
+                'http://localhost/tags/two',
+            ])->once();
         });
 
         $collection = Mockery::mock(Collection::class);
@@ -422,15 +437,13 @@ class DefaultInvalidatorTest extends TestCase
         ]);
 
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
-            $cacher->shouldReceive('invalidateUrl')->with('/my/test/term', 'http://test.com')->never();
-            $cacher->shouldReceive('invalidateUrl')->with('/my/collection/tags/term', 'http://test.com')->never();
-            $cacher->shouldReceive('invalidateUrls')->with(['http://test.com/tags/one', 'http://test.com/tags/two'])->never();
-
-            $cacher->shouldReceive('invalidateUrl')->with('/my/test/term', 'http://test.fr')->once();
-            $cacher->shouldReceive('invalidateUrl')->with('/my/collection/tags/term', 'http://test.fr')->once();
-            $cacher->shouldReceive('invalidateUrls')->with(['http://test.fr/tags/one', 'http://test.fr/tags/two'])->once();
-
-            $cacher->shouldReceive('invalidateUrl')->with('http://test.com/tags/three')->once();
+            $cacher->shouldReceive('invalidateUrls')->with([
+                'http://test.fr/my/test/term',
+                'http://test.fr/my/collection/tags/term',
+                'http://test.com/tags/three',
+                'http://test.fr/tags/one',
+                'http://test.fr/tags/two',
+            ])->once();
         });
 
         $collection = Mockery::mock(Collection::class);
@@ -469,8 +482,11 @@ class DefaultInvalidatorTest extends TestCase
     public function navigation_urls_can_be_invalidated()
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
-            $cacher->shouldReceive('invalidateUrls')->with(['http://localhost/one', 'http://localhost/two'])->once();
-            $cacher->shouldReceive('invalidateUrl')->with('http://localhost/three')->once();
+            $cacher->shouldReceive('invalidateUrls')->with([
+                'http://localhost/three',
+                'http://localhost/one',
+                'http://localhost/two',
+            ])->once();
         });
 
         $nav = tap(Mockery::mock(Nav::class), function ($m) {
@@ -503,11 +519,13 @@ class DefaultInvalidatorTest extends TestCase
         ]);
 
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
-            $cacher->shouldReceive('invalidateUrls')->with(['http://test.com/one', 'http://test.com/two'])->once();
-            $cacher->shouldReceive('invalidateUrls')->with(['http://test.fr/one', 'http://test.fr/two'])->once();
-            $cacher->shouldReceive('invalidateUrls')->with(['http://test.de/one', 'http://test.de/two'])->never();
-
-            $cacher->shouldReceive('invalidateUrl')->with('http://test.com/three')->once();
+            $cacher->shouldReceive('invalidateUrls')->with([
+                'http://test.com/three',
+                'http://test.com/one',
+                'http://test.com/two',
+                'http://test.fr/one',
+                'http://test.fr/two',
+            ])->once();
         });
 
         $nav = tap(Mockery::mock(Nav::class), function ($m) {
@@ -534,8 +552,11 @@ class DefaultInvalidatorTest extends TestCase
     public function navigation_urls_can_be_invalidated_by_a_tree()
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
-            $cacher->shouldReceive('invalidateUrls')->with(['http://localhost/one', 'http://localhost/two'])->once();
-            $cacher->shouldReceive('invalidateUrl')->with('http://localhost/three')->once();
+            $cacher->shouldReceive('invalidateUrls')->with([
+                'http://localhost/three',
+                'http://localhost/one',
+                'http://localhost/two',
+            ])->once();
         });
 
         $nav = tap(Mockery::mock(Nav::class), function ($m) {
@@ -571,9 +592,11 @@ class DefaultInvalidatorTest extends TestCase
         ]);
 
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
-            $cacher->shouldReceive('invalidateUrls')->with(['http://test.fr/one', 'http://test.fr/two'])->once();
-            $cacher->shouldReceive('invalidateUrls')->with(['http://test.com/one', 'http://test.com/two'])->never();
-            $cacher->shouldReceive('invalidateUrl')->with('http://test.com/three')->once();
+            $cacher->shouldReceive('invalidateUrls')->with([
+                'http://test.com/three',
+                'http://test.fr/one',
+                'http://test.fr/two',
+            ])->once();
         });
 
         $nav = tap(Mockery::mock(Nav::class), function ($m) {
@@ -604,8 +627,11 @@ class DefaultInvalidatorTest extends TestCase
     public function globals_urls_can_be_invalidated()
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
-            $cacher->shouldReceive('invalidateUrls')->with(['http://localhost/one', 'http://localhost/two'])->once();
-            $cacher->shouldReceive('invalidateUrl')->with('http://localhost/three')->once();
+            $cacher->shouldReceive('invalidateUrls')->with([
+                'http://localhost/three',
+                'http://localhost/one',
+                'http://localhost/two',
+            ])->once();
         });
 
         $set = tap(Mockery::mock(GlobalSet::class), function ($m) {
@@ -641,10 +667,11 @@ class DefaultInvalidatorTest extends TestCase
         ]);
 
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
-            $cacher->shouldReceive('invalidateUrls')->with(['http://test.com/one', 'http://test.com/two'])->never();
-            $cacher->shouldReceive('invalidateUrls')->with(['http://test.fr/one', 'http://test.fr/two'])->once();
-
-            $cacher->shouldReceive('invalidateUrl')->with('http://test.com/three')->once();
+            $cacher->shouldReceive('invalidateUrls')->with([
+                'http://test.com/three',
+                'http://test.fr/one',
+                'http://test.fr/two',
+            ])->once();
         });
 
         $set = tap(Mockery::mock(GlobalSet::class), function ($m) {
@@ -675,9 +702,11 @@ class DefaultInvalidatorTest extends TestCase
     public function form_urls_can_be_invalidated()
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
-            $cacher->shouldReceive('invalidateUrl')->with('http://localhost/one')->once();
-            $cacher->shouldReceive('invalidateUrl')->with('http://localhost/two')->once();
-            $cacher->shouldReceive('invalidateUrl')->with('http://localhost/three')->once();
+            $cacher->shouldReceive('invalidateUrls')->with([
+                'http://localhost/three',
+                'http://localhost/one',
+                'http://localhost/two',
+            ])->once();
         });
 
         $form = tap(Mockery::mock(Form::class), function ($m) {
@@ -708,13 +737,13 @@ class DefaultInvalidatorTest extends TestCase
         ]);
 
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
-            $cacher->shouldReceive('invalidateUrl')->with('http://test.com/one')->once();
-            $cacher->shouldReceive('invalidateUrl')->with('http://test.com/two')->once();
-
-            $cacher->shouldReceive('invalidateUrl')->with('http://test.fr/one')->once();
-            $cacher->shouldReceive('invalidateUrl')->with('http://test.fr/two')->once();
-
-            $cacher->shouldReceive('invalidateUrl')->with('http://test.com/three')->once();
+            $cacher->shouldReceive('invalidateUrls')->with([
+                'http://test.com/three',
+                'http://test.com/one',
+                'http://test.com/two',
+                'http://test.fr/one',
+                'http://test.fr/two',
+            ])->once();
         });
 
         $form = tap(Mockery::mock(Form::class), function ($m) {
