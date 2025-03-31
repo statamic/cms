@@ -59,11 +59,11 @@
     </ui-dropdown-menu>
 
 
-    <ui-dropdown-footer>
-        <ui-button-group>
-            <ui-button size="sm" variant="ghost" icon="sun" class="flex-1 [&_svg]:size-4.5" />
-            <ui-button size="sm" variant="ghost" icon="moon" class="flex-1 [&_svg]:size-4.5" />
-            <ui-button size="sm" variant="ghost" icon="monitor" class="flex-1 [&_svg]:size-4.5" />
+    <ui-dropdown-footer class="px-1.75!">
+        <ui-button-group class="justify-between">
+            <ui-button size="xs" variant="ghost" icon="sun" class=" [&_svg]:size-4.5" text="{{ __('Light') }}" />
+            <ui-button size="xs" variant="ghost" icon="moon" class=" [&_svg]:size-4.5" text="{{ __('Dark') }}" />
+            <ui-button size="xs" variant="ghost" icon="monitor" class=" [&_svg]:size-4.5" text="{{ __('System') }}" />
         </ui-button-group>
     </ui-dropdown-footer>
 </ui-dropdown>

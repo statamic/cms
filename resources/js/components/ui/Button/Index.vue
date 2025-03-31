@@ -23,7 +23,7 @@ const iconOnly = computed(() => (props.icon && !hasDefaultSlot && !props.text) |
 
 const buttonClasses = computed(() => {
     const classes = cva({
-        base: 'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg font-medium antialiased cursor-pointer no-underline disabled:opacity-75 disabled:cursor-default disabled:pointer-events-none [&_svg]:shrink-0',
+        base: 'inline-flex items-center justify-center whitespace-nowrap font-medium antialiased cursor-pointer no-underline disabled:opacity-75 disabled:cursor-default disabled:pointer-events-none [&_svg]:shrink-0',
         variants: {
             variant: {
                 default: [
@@ -39,9 +39,9 @@ const buttonClasses = computed(() => {
                 ghost: 'bg-transparent hover:bg-gray-400/10 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-gray-700/80 dark:hover:text-gray-200',
             },
             size: {
-                base: 'px-4 h-10 text-sm',
-                sm: 'px-3 h-8 text-[0.8125rem]',
-                xs: 'px-2 h-6.5 text-xs',
+                base: 'px-4 h-10 text-sm gap-2 rounded-lg',
+                sm: 'px-3 h-8 text-[0.8125rem] gap-2 rounded-lg',
+                xs: 'px-2 h-6.5 text-xs gap-1 rounded-md',
             },
             groupBorder: {
                 default:
