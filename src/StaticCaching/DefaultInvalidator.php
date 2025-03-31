@@ -235,14 +235,4 @@ class DefaultInvalidator implements Invalidator
     {
         return isset(parse_url($url)['scheme']);
     }
-
-    private function splitUrlAndDomain(string $url)
-    {
-        $parsed = parse_url($url);
-
-        return [
-            Arr::get($parsed, 'path', '/'),
-            $parsed['scheme'].'://'.$parsed['host'],
-        ];
-    }
 }
