@@ -1,7 +1,7 @@
 <ui-dropdown align="end" x-cloak>
     <template #trigger>
         <ui-button :icon-only="true" variant="ghost">
-                <img src="{{ $user->avatar() }}" class="size-7 rounded-full" alt="{{ $user->name() }}" />
+            <img src="{{ $user->avatar() }}" class="size-7 rounded-full" alt="{{ $user->name() }}" />
         </ui-button>
     </template>
 
@@ -60,10 +60,6 @@
 
 
     <ui-dropdown-footer class="px-1.75!">
-        <ui-button-group class="justify-between">
-            <ui-button size="xs" variant="ghost" icon="sun" class=" [&_svg]:size-4.5" text="{{ __('Light') }}" />
-            <ui-button size="xs" variant="ghost" icon="moon" class=" [&_svg]:size-4.5" text="{{ __('Dark') }}" />
-            <ui-button size="xs" variant="ghost" icon="monitor" class=" [&_svg]:size-4.5" text="{{ __('System') }}" />
-        </ui-button-group>
+        <theme-toggle />
     </ui-dropdown-footer>
 </ui-dropdown>

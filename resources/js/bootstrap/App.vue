@@ -1,7 +1,7 @@
 <script>
 import GlobalSearch from '../components/GlobalSearch.vue';
 import GlobalSiteSelector from '../components/GlobalSiteSelector.vue';
-import DarkModeToggle from '../components/DarkModeToggle.vue';
+import ThemeToggle from '../components/ThemeToggle.vue';
 import Login from '../components/login/Login.vue';
 import BaseEntryCreateForm from '../components/entries/BaseCreateForm.vue';
 import BaseTermCreateForm from '../components/terms/BaseCreateForm.vue';
@@ -50,7 +50,7 @@ export default {
     components: {
         GlobalSearch,
         GlobalSiteSelector,
-        DarkModeToggle,
+        ThemeToggle,
         Login,
         BaseEntryCreateForm,
         BaseTermCreateForm,
