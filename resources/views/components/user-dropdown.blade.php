@@ -60,6 +60,10 @@
 
 
     <ui-dropdown-footer class="px-1.75!">
-        <theme-toggle />
+        <ui-toggle-group variant="ghost" size="xs" class="justify-between" v-model="$theme.preference">
+            <ui-toggle-item icon="sun" class="[&_svg]:size-4.5" value="light" :label="__('Light')" />
+            <ui-toggle-item icon="moon" class="[&_svg]:size-4.5" value="dark" :label="__('Dark')" />
+            <ui-toggle-item icon="monitor" class="[&_svg]:size-4.5" value="auto" :label="__('System')" />
+        </ui-toggle-group>
     </ui-dropdown-footer>
 </ui-dropdown>

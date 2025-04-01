@@ -27,6 +27,7 @@ import Stacks from '../components/stacks/Stacks';
 import Hooks from '../components/Hooks';
 import Bard from '../components/Bard';
 import Components from '../components/Components';
+import Theme from '../components/Theme.js';
 import FieldConditions from '../components/FieldConditions';
 import Reveal from '../components/Reveal';
 import Echo from '../components/Echo';
@@ -34,7 +35,6 @@ import Permission from '../components/Permission';
 import autosize from 'autosize';
 import DateFormatter from '@statamic/components/DateFormatter.js';
 
-const darkMode = ref(null);
 let bootingCallbacks = [];
 let bootedCallbacks = [];
 let components;
@@ -100,12 +100,8 @@ export default {
         return this.$app.config.globalProperties.$date;
     },
 
-    get darkMode() {
-        return darkMode;
-    },
-
-    set darkMode(value) {
-        darkMode.value = value;
+    get $theme() {
+        return this.$app.config.globalProperties.$theme;
     },
 
     get user() {
@@ -160,6 +156,10 @@ export default {
             $echo: new Echo(),
             $permissions: new Permission(),
             $date: new DateFormatter(),
+        });
+
+        Object.assign(this.$app.config.globalProperties, {
+            $theme: new Theme(this.initialConfig.user.theme),
         });
 
         Object.assign(this.$app.config.globalProperties, {

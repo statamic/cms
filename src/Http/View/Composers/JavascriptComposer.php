@@ -102,6 +102,7 @@ class JavascriptComposer
         return $user->toAugmentedCollection()->merge([
             'preferences' => Preference::all(),
             'permissions' => $user->permissions()->all(),
+            'theme' => $user->preferredTheme(),
         ])->toArray();
     }
 
