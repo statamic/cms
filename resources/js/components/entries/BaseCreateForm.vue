@@ -20,6 +20,7 @@
         :breadcrumbs="breadcrumbs"
         :initial-site="site"
         :can-manage-publish-state="canManagePublishState"
+        :can-edit-blueprint="canEditBlueprint"
         :create-another-url="createAnotherUrl"
         :initial-listing-url="listingUrl"
         :preview-targets="previewTargets"
@@ -45,6 +46,7 @@ export default {
         'breadcrumbs',
         'site',
         'canManagePublishState',
+        'canEditBlueprint',
         'createAnotherUrl',
         'listingUrl',
         'previewTargets',

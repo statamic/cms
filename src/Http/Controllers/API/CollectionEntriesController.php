@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\API;
 
 use Facades\Statamic\API\FilterAuthorizer;
+use Facades\Statamic\API\QueryScopeAuthorizer;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Entry;
 use Statamic\Http\Resources\API\EntryResource;
@@ -29,7 +30,7 @@ class CollectionEntriesController extends ApiController
             ->filter->isRelationship()->keys()->all();
 
         return app(EntryResource::class)::collection(
-            $this->filterSortAndPaginate($collection->queryEntries()->with($with))
+            $this->updateAndPaginate($collection->queryEntries()->with($with))
         );
     }
 
@@ -80,5 +81,10 @@ class CollectionEntriesController extends ApiController
     protected function allowedFilters()
     {
         return FilterAuthorizer::allowedForSubResources('api', 'collections', $this->collectionHandle);
+    }
+
+    protected function allowedQueryScopes()
+    {
+        return QueryScopeAuthorizer::allowedForSubResources('api', 'collections', $this->collectionHandle);
     }
 }

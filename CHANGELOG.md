@@ -1,5 +1,63 @@
 # Release Notes
 
+## 5.52.0 (2025-03-25)
+
+### What's new
+- Support query scopes in GraphQL [#11533](https://github.com/statamic/cms/issues/11533) by @ryanmitchell
+- Support query scopes in REST API [#10893](https://github.com/statamic/cms/issues/10893) by @ryanmitchell
+- Added option to exclude asset containers from generating presets [#11613](https://github.com/statamic/cms/issues/11613) by @kevinmeijer97
+- Handle collection instances in `first` modifier [#11608](https://github.com/statamic/cms/issues/11608) by @marcorieser
+- Autoload scopes from `Query/Scopes` and `Query/Scopes/Filters` [#11601](https://github.com/statamic/cms/issues/11601) by @duncanmcclean
+- Allow revisions path to be configurable with an .env [#11594](https://github.com/statamic/cms/issues/11594) by @ryanmitchell
+- Ability to exclude parents from nav tag [#11597](https://github.com/statamic/cms/issues/11597) by @jasonvarga
+- Allow a custom asset meta cache store to be specified [#11512](https://github.com/statamic/cms/issues/11512) by @ryanmitchell
+
+### What's fixed
+- Fix icon fieldtype in nav builder [#11618](https://github.com/statamic/cms/issues/11618) by @jasonvarga
+- Escape start_page Preference to avoid invalid Redirect [#11616](https://github.com/statamic/cms/issues/11616) by @naabster
+- Fix issue with localization files named like fieldset handles [#11603](https://github.com/statamic/cms/issues/11603) by @ChristianPraiss
+- Ensure toasts fired in an AssetUploaded event are delivered to front end [#11592](https://github.com/statamic/cms/issues/11592) by @ryanmitchell
+- Prevent null data from being saved to eloquent users [#11591](https://github.com/statamic/cms/issues/11591) by @ryanmitchell
+- Change default value of update command selection [#11581](https://github.com/statamic/cms/issues/11581) by @Jade-GG
+- Adjust relationship field typeahead no-options message [#11590](https://github.com/statamic/cms/issues/11590) by @jasonvarga
+- Bump axios from 1.7.4 to 1.8.2 [#11604](https://github.com/statamic/cms/issues/11604) by @dependabot
+- Bump tj-actions/changed-files [#11602](https://github.com/statamic/cms/issues/11602) by @dependabot
+- Spanish translations [#11617](https://github.com/statamic/cms/issues/11617) by @nopticon
+
+
+
+## 5.51.0 (2025-03-17)
+
+### What's new
+- Allow passing computed fields via an associative array [#11528](https://github.com/statamic/cms/issues/11528) by @godismyjudge95
+- Enable unselecting fieldtypes for forms [#11559](https://github.com/statamic/cms/issues/11559) by @godismyjudge95
+
+### What's fixed
+- Fix implied route views [#11570](https://github.com/statamic/cms/issues/11570) by @duncanmcclean
+- When NavPageInterface has no blueprint fields return something [#11537](https://github.com/statamic/cms/issues/11537) by @ryanmitchell
+- Password reset action should use custom password reset notification  [#11571](https://github.com/statamic/cms/issues/11571) by @duncanmcclean
+- Fix escaped braces in concurrent requests not getting replaced [#11583](https://github.com/statamic/cms/issues/11583) by @o1y
+- Fix control panel crashes when titles share name with existing translation file [#11578](https://github.com/statamic/cms/issues/11578) by @daun
+- Fix carbon deprecation warning [#11561](https://github.com/statamic/cms/issues/11561) by @jasonvarga
+- Fix icon fieldtype [#11560](https://github.com/statamic/cms/issues/11560) by @jasonvarga
+
+
+
+## 5.50.0 (2025-03-10)
+
+### What's new
+- Support `as` on nav tag [#11522](https://github.com/statamic/cms/issues/11522) by @ryanmitchell
+
+### What's fixed
+- Icon fieldtype performance [#11523](https://github.com/statamic/cms/issues/11523) by @jasonvarga
+- Fix password protection on 404 pages [#11544](https://github.com/statamic/cms/issues/11544) by @duncanmcclean
+- Return validation error when AllowedFile is not an UploadedFile [#11535](https://github.com/statamic/cms/issues/11535) by @ryanmitchell
+- Italian translations [#11538](https://github.com/statamic/cms/issues/11538) by @ivanandre
+- French translations [#11519](https://github.com/statamic/cms/issues/11519) by @ebeauchamps
+- Use ubuntu-latest in GitHub Actions workflow [#11526](https://github.com/statamic/cms/issues/11526) by @jasonvarga
+
+
+
 ## 5.49.1 (2025-02-27)
 
 ### What's fixed

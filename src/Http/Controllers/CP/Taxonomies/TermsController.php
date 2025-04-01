@@ -243,6 +243,7 @@ class TermsController extends CpController
             'title' => $taxonomy->createLabel(),
             'actions' => [
                 'save' => cp_route('taxonomies.terms.store', [$taxonomy->handle(), $site->handle()]),
+                'editBlueprint' => cp_route('taxonomies.blueprints.edit', [$taxonomy, $blueprint]),
             ],
             'values' => $values,
             'meta' => $fields->meta(),

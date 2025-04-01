@@ -2639,4 +2639,22 @@ YAML;
         Facades\Asset::shouldNotHaveReceived('delete');
         Event::assertNotDispatched(AssetDeleted::class);
     }
+
+    #[Test]
+    public function it_uses_a_custom_cache_store()
+    {
+        config([
+            'cache.stores.asset_meta' => [
+                'driver' => 'file',
+                'path' => storage_path('statamic/asset-meta'),
+            ],
+        ]);
+
+        Storage::fake('local');
+
+        $store = (new Asset)->cacheStore();
+
+        // ideally we would have checked the store name, but laravel 10 doesnt give us a way to do that
+        $this->assertStringContainsString('asset-meta', $store->getStore()->getDirectory());
+    }
 }
