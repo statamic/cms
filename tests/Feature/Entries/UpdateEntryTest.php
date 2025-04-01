@@ -112,7 +112,7 @@ class UpdateEntryTest extends TestCase
             ->update($entry, [
                 'title' => 'Updated Entry',
                 'slug' => 'updated-entry',
-                'date' => ['date' => '2021-02-02'],
+                'date' => '2021-02-02T00:00:00Z',
                 '_localized' => [], // empty to show that date doesn't need to be in here.
             ])
             ->assertOk();
@@ -151,7 +151,7 @@ class UpdateEntryTest extends TestCase
             ->update($localized, [
                 'title' => 'Updated Entry',
                 'slug' => 'updated-entry',
-                'date' => ['date' => '2021-02-02'],
+                'date' => '2021-02-02T00:00:00Z',
                 '_localized' => $shouldBeInArray ? ['date'] : [],
             ])
             ->assertOk();

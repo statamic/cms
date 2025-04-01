@@ -20,6 +20,7 @@ import {
     DateRangePickerTrigger,
 } from 'reka-ui';
 import { WithField, Card, Button, Calendar } from '@statamic/ui';
+import { parseAbsoluteToLocal } from '@internationalized/date';
 
 const emit = defineEmits(['update:modelValue']);
 
@@ -34,6 +35,8 @@ const props = defineProps({
     max: { type: [String, Object], default: null },
     granularity: { type: String, default: null },
     inline: { type: Boolean, default: false },
+    clearable: { type: Boolean, default: true },
+    disabled: { type: Boolean, default: false },
 });
 
 const calendarBindings = computed(() => ({
@@ -56,6 +59,12 @@ const calendarBindings = computed(() => ({
     },
 }));
 
+// The placeholder defines the month to show when there's no value. Additionally,
+// by setting it to an absolute value, it ensures that the emitted event value
+// will be the appropriate format (e.g. a full date with time with timezone,
+// rather than just a day).
+const placeholder = parseAbsoluteToLocal(new Date().toISOString());
+
 const calendarEvents = computed(() => ({
     'update:model-value': (event) => emit('update:modelValue', event),
 }));
@@ -70,6 +79,9 @@ const calendarEvents = computed(() => ({
                 :locale="$date.locale"
                 @update:model-value="emit('update:modelValue', $event)"
                 v-bind="$attrs"
+                prevent-deselect
+                hide-time-zone
+                :placeholder="placeholder"
             >
                 <DateRangePickerField v-slot="{ segments }" class="w-full">
                     <div
