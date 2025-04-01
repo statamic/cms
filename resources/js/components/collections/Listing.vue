@@ -1,6 +1,6 @@
 <template>
     <data-list ref="dataList" :columns="columns" :rows="items">
-        <div class="card overflow-hidden p-0">
+        <ui-card-panel class="overflow-hidden">
             <data-list-table>
                 <template #cell-title="{ row: collection }">
                     <a :href="collection.available_in_selected_site ? collection.entries_url : collection.edit_url">{{
@@ -35,7 +35,7 @@
                     </dropdown-list>
                 </template>
             </data-list-table>
-        </div>
+        </ui-card-panel>
     </data-list>
 </template>
 
