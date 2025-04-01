@@ -34,6 +34,8 @@ const props = defineProps({
     max: { type: [String, Object], default: null },
     granularity: { type: String, default: null },
     inline: { type: Boolean, default: false },
+    clearable: { type: Boolean, default: true },
+    disabled: { type: Boolean, default: false },
 });
 
 const calendarBindings = computed(() => ({
@@ -70,6 +72,8 @@ const calendarEvents = computed(() => ({
                 :locale="$date.locale"
                 @update:model-value="emit('update:modelValue', $event)"
                 v-bind="$attrs"
+                prevent-deselect
+                hide-time-zone
             >
                 <DatePickerField v-slot="{ segments }" class="w-full">
                     <div
@@ -120,6 +124,13 @@ const calendarEvents = computed(() => ({
                 </Card>
             </DatePickerRoot>
         </div>
-        <Button @click="emit('update:modelValue', null)" type="button" class="" text="Clear" size="xs" />
+        <Button
+            v-if="clearable"
+            @click="emit('update:modelValue', null)"
+            type="button"
+            class=""
+            text="Clear"
+            size="xs"
+        />
     </WithField>
 </template>
