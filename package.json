@@ -15,7 +15,6 @@
         "knip": "knip"
     },
     "dependencies": {
-        "@angelblanco/v-calendar": "^3.1.2",
         "@floating-ui/dom": "^1.2.5",
         "@he-tree/vue": "^2.8.2",
         "@hoppscotch/vue-toasted": "^0.1.0",

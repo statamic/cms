@@ -14,8 +14,6 @@ import useDirtyState from '../composables/dirty-state';
 import VueClickAway from 'vue3-click-away';
 import FloatingVue from 'floating-vue';
 import 'floating-vue/dist/style.css';
-import VCalendar from '@angelblanco/v-calendar';
-import '@angelblanco/v-calendar/style.css';
 import Toasts from '../components/Toasts';
 import PortalVue from 'portal-vue';
 import Keys from '../components/keys/Keys';
@@ -126,7 +124,6 @@ export default {
         this.$app.use(PortalVue, { portalName: 'v-portal' });
         this.$app.use(VueClickAway);
         this.$app.use(FloatingVue, { disposeTimeout: 30000, distance: 10 });
-        this.$app.use(VCalendar);
 
         const portals = markRaw(new Portals());
 
