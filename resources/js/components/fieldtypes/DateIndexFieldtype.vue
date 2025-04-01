@@ -24,7 +24,7 @@ export default {
                 return formatter.date(start) + ' – ' + formatter.date(end);
             }
 
-            return formatter.date(this.value.date);
+            return formatter.date(this.value.date).toString();
         },
     },
 };
