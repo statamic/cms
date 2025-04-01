@@ -47,7 +47,6 @@
             <kbd class="ml-auto hidden self-center rounded px-[0.3125rem] py-[0.0625rem] text-[0.625rem]/4 font-medium ring-1 ring-inset bg-white/5 text-gray-400 ring-white/7.5 md:block [word-spacing:-0.15em]">
             <kbd class="font-sans">⌘ </kbd><kbd class="font-sans">K</kbd></kbd>
         </button>
-        <ui-theme-switcher size="sm" variant="ghost" class="dark" />
         <x-statamic::user-dropdown />
     </div>
 </header>

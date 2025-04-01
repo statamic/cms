@@ -3,7 +3,7 @@
 @endphp
 
 @section('nav-main')
-<nav class="absolute h-screen w-56 select-none overflow-scroll px-5 text-sm antialiased  [&_svg]:text-gray-400 dark:[&_svg]:text-gray-600 py-6 flex flex-col gap-7">
+<nav class="absolute h-screen w-56 select-none overflow-scroll px-5 text-sm antialiased  [&_svg]:text-gray-400 dark:[&_svg]:text-gray-600 py-6 flex flex-col gap-7 z-2">
     @foreach ($nav as $section)
         <div>
             @if ($section['display'] !== 'Top Level')

@@ -1,11 +1,9 @@
 @import 'tailwindcss';
 @import './ui.css';
-@import './cp.css' layer(base);
+@import './cp.css';
 @import './core/utilities.css';
 @import './dark.css';
 @import './tailwind-animate.css';
-
-/* @config '../../tailwind.config.js'; */
 
 @custom-variant dark (&:where(.dark, .dark *));
 

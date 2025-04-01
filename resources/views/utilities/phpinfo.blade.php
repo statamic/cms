@@ -34,7 +34,7 @@
             @foreach ($items as $name => $value)
                 <tr>
                     <th class="w-1/4 py-2 ltr:pl-4 rtl:pr-4">{{ $name }}</th>
-                    <td class="break-all">{{ is_array($value) ? join(', ', $value) : $value }}</td>
+                    <td class="overflow-hidden text-ellipsis">{{ is_array($value) ? join(', ', $value) : $value }}</td>
                 </tr>
             @endforeach
         </table>

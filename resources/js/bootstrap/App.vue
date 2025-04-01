@@ -115,7 +115,7 @@ export default {
         },
 
         wrapperClass() {
-            return this.$config.get('wrapperClass', 'max-w-5xl');
+            return this.$config.get('wrapperClass', 'max-w-6xl');
         },
     },
 
