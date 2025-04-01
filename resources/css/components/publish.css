@@ -2,15 +2,6 @@
    PUBLISH COMPONENT
    ========================================================================== */
 
-.publishing .page-wrapper {
-    padding: 0;
-
-    .publish-errors {
-        margin: 0 24px 24px;
-        padding: 16px 0;
-    }
-}
-
 .publish-tab-outer {
     @apply flex justify-between;
 }

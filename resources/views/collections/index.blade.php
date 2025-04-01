@@ -7,30 +7,29 @@
 
 @section('content')
     @unless ($collections->isEmpty())
-        <div class="mb-6 flex items-center justify-between">
-            <h1>{{ __('Collections') }}</h1>
-
+        <ui-header title="{{  __('Collections') }}">
             @can('create', 'Statamic\Contracts\Entries\Collection')
-                <a href="{{ cp_route('collections.create') }}" class="btn-primary">{{ __('Create Collection') }}</a>
+                <ui-button
+                    href="{{ cp_route('collections.create') }}"
+                    text="{{ __('Create Collection') }}"
+                    variant="primary"
+                />
             @endcan
-        </div>
+        </ui-header>
 
         <collection-list
             :initial-rows="{{ json_encode($collections) }}"
             :initial-columns="{{ json_encode($columns) }}"
         ></collection-list>
     @else
-        @include(
-            'statamic::partials.empty-state',
-            [
-                'title' => __('Collections'),
-                'description' => __('statamic::messages.collection_configure_intro'),
-                'svg' => 'empty/content',
-                'button_text' => __('Create Collection'),
-                'button_url' => cp_route('collections.create'),
-                'can' => $user->can('create', 'Statamic\Contracts\Entries\Collection'),
-            ]
-        )
+        <x-statamic::empty-screen
+            title="{{ __('Collections') }}"
+            description="{{ __('statamic::messages.collection_configure_intro') }}"
+            svg="empty/content"
+            button_text="{{ __('Create Collection') }}"
+            button_url="{{ cp_route('collections.create') }}"
+            can="{{ $user->can('create', 'Statamic\Contracts\Entries\Collection') }}"
+        />
     @endunless
 
     @include(

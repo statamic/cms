@@ -3,7 +3,7 @@
    ========================================================================== */
 
 body {
-    @apply font-sans text-base tracking-normal text-gray-900 dark:text-dark-100;
+    @apply font-sans text-base tracking-normal text-gray-800 dark:text-white;
     font-variant: common-ligatures tabular-nums;
     font-feature-settings:
         'zero',
@@ -11,6 +11,7 @@ body {
         'calt' off;
 }
 
+/*
 h1,
 h2,
 h3,
@@ -149,4 +150,4 @@ code {
     p {
         @apply mb-2;
     }
-}
+} */

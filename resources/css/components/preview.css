@@ -116,7 +116,7 @@
 
 /*  We only want the animation to happen when its on the regular publish page. */
 /*  When portal-ed into live preview, it won't be inside .workspace */
-.workspace {
+main {
     .live-preview-tabs-drop-enter-active,
     .live-preview-tabs-drop-leave-active {
         transition: all 0.2s;

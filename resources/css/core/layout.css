@@ -2,78 +2,12 @@
    GLOBAL CONTROL PANEL LAYOUT ELEMENTS
    ========================================================================== */
 
-/* #statamic {
-    min-height: 100vh;
+.nav-closed .nav-main {
+    @apply md:-start-56;
 }
 
-#main {
-    @apply flex;
-    padding-bottom: 72px;
-    position: relative;
-    z-index: 1;
-} */
-
-#main .workspace {
-    transition: padding 0.3s;
-    @apply w-full;
-}
-
-a {
-    text-decoration: none;
-    cursor: pointer;
-}
-
-.break-all {
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-@media (width >= theme(--breakpoint-md)) {
-    /* #main {
-        padding-top: 52px;
-    } */
-
-    #main .workspace {
-        padding-left: 14rem;
-        [dir='rtl'] & {
-            padding-right: 14rem;
-            padding-left: 0;
-        }
-    }
-
-    #main.nav-closed {
-        .nav-main {
-            left: -14rem;
-            [dir='rtl'] & {
-                left: auto;
-                right: -14rem;
-            }
-        }
-
-        .workspace {
-            padding-left: 0;
-            [dir='rtl'] & {
-                padding-right: 0;
-                padding-left: 0;
-            }
-        }
-    }
-}
-
-/* Page Wrapper
-  ========================================================================== */
-.page-wrapper {
-    @apply p-3 pt-6;
-}
-
-@media (width >= theme(--breakpoint-md)) {
-    .page-wrapper {
-        @apply mx-auto max-w-5xl px-8;
-    }
-}
-
-.fieldtype-hidden {
-    display: none;
+.nav-closed main {
+    @apply md:ps-0;
 }
 
 /* Draggable Mirrors

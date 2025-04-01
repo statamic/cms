@@ -16,22 +16,27 @@
                 @include('statamic::partials.new-global-header')
 
                 <div
-                    id="main"
-                    class="@yield('content-class') pt-14 "
+                    class="@yield('content-class') pt-14"
                     :class="{
                         'nav-closed': ! navOpen,
                         'nav-mobile-open': mobileNavOpen,
                         'showing-license-banner': showBanner
                     }"
                 >
-                    @include('statamic::partials.nav-main')
                     {{-- @include('statamic::partials.nav-mobile') --}}
 
-                    <div class="workspace bg-gray-50 rounded-t-xl min-h-[calc(100vh-3.5rem)]">
-                        <div class="page-wrapper" :class="wrapperClass">
-                            @yield('content')
+                    <main class="
+                        flex bg-gray-100 dark:bg-gray-900 dark:border-t rounded-t-xl dark:border-white/10
+                        fixed top-14 inset-x-0 bottom-0 min-h-[calc(100vh-3.5rem)]
+                    ">
+                        @include('statamic::partials.nav-main')
+                        {{-- <div class="" :class="wrapperClass"> --}}
+                        <div class="p-2 h-full flex-1 overflow-y-auto">
+                            <div class="content-card min-h-full transition-padding duration-300">
+                                @yield('content')
+                            </div>
                         </div>
-                    </div>
+                    </main>
                 </div>
 
                 <component
