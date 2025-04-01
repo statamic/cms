@@ -1,6 +1,5 @@
 <script setup>
 import { DialogTitle } from 'reka-ui';
-import { defineOptions } from 'vue';
 
 defineOptions({
     name: 'ModalTitle',
