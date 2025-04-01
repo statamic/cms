@@ -32,11 +32,8 @@
         />
     @endunless
 
-    @include(
-        'statamic::partials.docs-callout',
-        [
-            'topic' => __('Collections'),
-            'url' => Statamic::docsUrl('collections'),
-        ]
-    )
+    <x-statamic::docs-callout
+        topic="{{ __('Collections') }}"
+        url="{{ Statamic::docsUrl('collections') }}"
+    />
 @endsection
