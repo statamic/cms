@@ -11,6 +11,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use League\Flysystem\PathTraversalDetected;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -48,8 +49,9 @@ class AssetTest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     private $container;
+    private $validator;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -938,7 +940,7 @@ class AssetTest extends TestCase
     }
 
     #[Test]
-    public function when_saving_quietly_the_cached_assets_withEvents_flag_will_be_set_back_to_true()
+    public function when_saving_quietly_the_cached_assets_with_events_flag_will_be_set_back_to_true()
     {
         Event::fake();
         Storage::fake('test');
@@ -1504,7 +1506,10 @@ class AssetTest extends TestCase
     public function it_passes_the_dimensions_validation()
     {
         $file = UploadedFile::fake()->image('image.jpg', 30, 60);
-        $validDimensions = (new DimensionsRule(['max_width=10']))->passes('Image', [$file]);
+        $validDimensions = Validator::make(
+            ['Image' => $file],
+            ['Image' => [new DimensionsRule(['max_width=10'])]],
+        )->passes();
 
         $this->assertFalse($validDimensions);
     }
