@@ -12,14 +12,14 @@
                     </h1>
                     <p
                         @if($mode === 'recovery_code') x-cloak @endif
-                        x-show="mode === 'code'"
+                    x-show="mode === 'code'"
                         class="text-sm text-gray dark:text-dark-175"
                     >
                         {{ __('statamic::messages.two_factor_challenge_code_introduction') }}
                     </p>
                     <p
                         @if($mode === 'code') x-cloak @endif
-                        x-show="mode === 'recovery_code'"
+                    x-show="mode === 'recovery_code'"
                         class="text-sm text-gray dark:text-dark-175"
                     >
                         {{ __('statamic::messages.two_factor_recovery_code_introduction') }}
@@ -46,7 +46,7 @@
                                 id="input-code"
                             />
                             @error('code')
-                                <div class="mt-2 text-xs text-red-500">{{ $message }}</div>
+                            <div class="mt-2 text-xs text-red-500">{{ $message }}</div>
                             @enderror
                         </div>
 
@@ -63,7 +63,7 @@
                                 id="input-recovery-code"
                             />
                             @error('recovery_code')
-                                <div class="mt-2 text-xs text-red-500">{{ $message }}</div>
+                            <div class="mt-2 text-xs text-red-500">{{ $message }}</div>
                             @enderror
                         </div>
 
@@ -75,7 +75,7 @@
                                 x-on:click.prevent="mode = 'recovery_code'; code = ''"
                                 x-show="mode === 'code'"
                             >
-                                {{ __('Use one-time code') }}
+                                {{ __('Use recovery code') }}
                             </button>
 
                             <button
@@ -85,7 +85,7 @@
                                 x-on:click.prevent="mode = 'code'; recovery_code = ''"
                                 x-show="mode === 'recovery_code'"
                             >
-                                {{ __('Use recovery code') }}
+                                {{ __('Use one-time code') }}
                             </button>
 
                             <button type="submit" class="btn-primary">{{ __('Continue') }}</button>
