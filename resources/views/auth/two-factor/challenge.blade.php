@@ -1,5 +1,5 @@
 @extends('statamic::outside')
-@section('title', __('statamic-two-factor::challenge.title'))
+@section('title', __('Two Factor Authentication'))
 
 @section('content')
 
@@ -11,11 +11,11 @@
                  x-data="{ mode: '{{ $mode }}', code: '', recovery_code: '' }">
 
                 <div class="pb-4 mb-2 text-center">
-                    <h1 class="mb-4 text-lg text-gray-800 dark:text-dark-175">{{ __('statamic-two-factor::challenge.title') }}</h1>
+                    <h1 class="mb-4 text-lg text-gray-800 dark:text-dark-175">{{ __('Two Factor Authentication') }}</h1>
                     <p @if($mode === 'recovery_code') x-cloak @endif x-show="mode === 'code'"
-                       class="text-sm text-gray dark:text-dark-175">{{ __('statamic-two-factor::challenge.code_introduction') }}</p>
+                       class="text-sm text-gray dark:text-dark-175">{{ __('statamic::messages.two_factor_challenge_code_introduction') }}</p>
                     <p @if($mode === 'code') x-cloak @endif x-show="mode === 'recovery_code'"
-                       class="text-sm text-gray dark:text-dark-175">{{ __('statamic-two-factor::challenge.recovery_code_introduction') }}</p>
+                       class="text-sm text-gray dark:text-dark-175">{{ __('statamic::messages.two_factor_recovery_code_introduction') }}</p>
                 </div>
 
                 <div>
@@ -27,7 +27,7 @@
                         <div class="mb-8"
                              @if($mode === 'recovery_code') x-cloak @endif
                              x-show="mode === 'code'">
-                            <label class="mb-2" for="input-code">{{ __('statamic-two-factor::challenge.code') }}</label>
+                            <label class="mb-2" for="input-code">{{ __('Code') }}</label>
                             <input x-model="code" type="text" class="input-text" name="code" pattern="[0-9]*"
                                    maxlength="6" inputmode="numeric" autofocus autocomplete="off" id="input-code">
                             @error('code')
@@ -38,7 +38,7 @@
                              @if($mode === 'code') x-cloak @endif
                              x-show="mode === 'recovery_code'">
                             <label class="mb-2"
-                                   for="input-recovery-code">{{ __('statamic-two-factor::challenge.recovery_code') }}</label>
+                                   for="input-recovery-code">{{ __('Recovery Code') }}</label>
                             <input x-model="recovery_code" type="text" class="input-text" name="recovery_code"
                                    maxlength="21" autofocus autocomplete="off" id="input-recovery-code">
                             @error('recovery_code')
@@ -52,7 +52,7 @@
                                     @if($mode === 'recovery_code') x-cloak @endif
                                     x-on:click.prevent="mode = 'recovery_code'; code = ''"
                                     x-show="mode === 'code'">
-                                {{ __('statamic-two-factor::challenge.recovery_code_use') }}
+                                {{ __('Use one-time code') }}
                             </button>
 
                             <button class="text-xs text-btn"
@@ -60,11 +60,11 @@
                                     @if($mode === 'code') x-cloak @endif
                                     x-on:click.prevent="mode = 'code'; recovery_code = ''"
                                     x-show="mode === 'recovery_code'">
-                                {{ __('statamic-two-factor::challenge.code_use') }}
+                                {{ __('Use recovery code') }}
                             </button>
 
                             <button type="submit"
-                                    class="btn-primary">{{ __('statamic-two-factor::challenge.action') }}</button>
+                                    class="btn-primary">{{ __('Continue') }}</button>
                         </div>
 
                     </form>
@@ -73,7 +73,7 @@
 
             <div class="mt-4 text-sm text-center">
                 <a class="logout opacity-75 hover:opacity-100"
-                   href="{{ cp_route('logout') }}?redirect={{ cp_route('login') }}">{{ __('statamic-two-factor::actions.logout') }}</a>
+                   href="{{ cp_route('logout') }}?redirect={{ cp_route('login') }}">{{ __('Log out') }}</a>
             </div>
 
         </div>

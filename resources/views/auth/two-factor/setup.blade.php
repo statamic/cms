@@ -1,5 +1,5 @@
 @extends('statamic::outside')
-@section('title', __('statamic-two-factor::setup.title'))
+@section('title', __('Set up Two Factor Authentication'))
 
 @section('content')
 
@@ -10,7 +10,7 @@
             <div class="card auth-card mx-auto">
 
                 <div>
-                    <h1 class="mb-4 text-lg text-gray-800 dark:text-dark-175">{{ __('statamic-two-factor::setup.title') }}</h1>
+                    <h1 class="mb-4 text-lg text-gray-800 dark:text-dark-175">{{ __('Set up Two Factor Authentication') }}</h1>
                 </div>
                 <form method="POST" class="">
                     {!! csrf_field() !!}
@@ -24,14 +24,14 @@
                             </div>
 
                             <div class="text-sm text-gray-800  dark:text-dark-175">
-                                <div class="font-bold text-xs">{{ __('statamic-two-factor::setup.code') }}:</div>
+                                <div class="font-bold text-xs">{{ __('Code') }}:</div>
                                 <div>{{ $secret_key }}</div>
                             </div>
                         </div>
 
                         <div class="right">
                             <div class="mb-6">
-                                <p class="text-sm text-gray dark:text-dark-175">{{ __('statamic-two-factor::setup.introduction') }}</p>
+                                <p class="text-sm text-gray dark:text-dark-175">{{ __('statamic::messages.two_factor_setup_instructions') }}</p>
                             </div>
 
                             <div class="md:hidden">
@@ -41,14 +41,14 @@
                                 </div>
 
                                 <div class="text-sm mb-6">
-                                    <div class="font-bold text-xs">{{ __('statamic-two-factor::setup.code') }}:</div>
+                                    <div class="font-bold text-xs">{{ __('Code') }}:</div>
                                     <div>{{ $secret_key }}</div>
                                 </div>
                             </div>
 
                             <div class="mb-6">
                                 <label class="mb-2"
-                                       for="input-code">{{ __('statamic-two-factor::setup.verification_code') }}</label>
+                                       for="input-code">{{ __('Verification Code') }}</label>
                                 <input type="text" class="input-text" name="code" pattern="[0-9]*" maxlength="6"
                                        inputmode="numeric" autofocus autocomplete="off" id="input-code">
                                 @error('code')
@@ -61,10 +61,10 @@
                                 <div class="flex space-x-2">
                                     @if ($cancellable)
                                         <a class="btn"
-                                           href="{{ cp_route('dashboard') }}">{{ __('statamic-two-factor::setup.cancel') }}</a>
+                                           href="{{ cp_route('dashboard') }}">{{ __('Cancel') }}</a>
                                     @endif
                                     <button type="submit"
-                                            class="btn-primary">{{ __('statamic-two-factor::setup.action') }}</button>
+                                            class="btn-primary">{{ __('Enable 2FA') }}</button>
                                 </div>
                             </div>
                         </div>
@@ -75,7 +75,7 @@
 
             <div class="mt-4 text-sm text-center">
                 <a class="logout opacity-75 hover:opacity-100"
-                   href="{{ cp_route('logout') }}?redirect={{ cp_route('login') }}">{{ __('statamic-two-factor::actions.logout') }}</a>
+                   href="{{ cp_route('logout') }}?redirect={{ cp_route('login') }}">{{ __('Log out') }}</a>
             </div>
 
         </div>

@@ -1,28 +1,28 @@
 <template>
     <div>
         <div class="mb-8">
-            <div class="font-semibold mb-2">{{ __('statamic-two-factor::profile.locked.title') }}</div>
+            <div class="font-semibold mb-2">{{ __('Your account has been locked') }}</div>
 
             <div class="text-xs text-gray-700 mb-4">
-                <p class="mb-1">{{ __('statamic-two-factor::profile.locked.intro') }}</p>
+                <p class="mb-1">{{ __('You need to speak to your administrator to unlock your account.') }}</p>
             </div>
 
             <div class="flex space-x-2">
                 <button @click.prevent="confirming = true"
-                        class="btn">{{ __('statamic-two-factor::profile.locked.unlock') }}</button>
+                        class="btn">{{ __('Unlock account') }}</button>
             </div>
         </div>
 
         <confirmation-modal
             v-if="confirming"
-            :title="__('statamic-two-factor::profile.locked.confirm_title')"
+            :title="__('Unlock account?')"
             :danger="true"
             @confirm="action"
             @cancel="confirming = false"
         >
-            <p class="mb-2" v-html="__('statamic-two-factor::profile.locked.confirm_1')"></p>
-            <p class="mb-2">{{ __('statamic-two-factor::profile.locked.confirm_2') }}</p>
-            <p class="font-medium text-red-500">{{ __('statamic-two-factor::profile.locked.confirm_3') }}</p>
+            <p class="mb-2" v-html="__('statamic::messages.two_factor_unlock_confirm_1')"></p>
+            <p class="mb-2">{{ __('statamic::messages.two_factor_unlock_confirm_2') }}</p>
+            <p class="font-medium text-red-500">{{ __('statamic::messages.two_factor_unlock_confirm_3') }}</p>
         </confirmation-modal>
     </div>
 </template>
@@ -64,7 +64,7 @@ export default {
                 .then(res => res.json())
                 .then((data) => {
                     // notify
-                    this.$toast.success(__('statamic-two-factor::profile.locked.success'))
+                    this.$toast.success(__('Account has been unlocked.'))
 
                     // emit the update
                     this.$emit('update', 'locked', false);

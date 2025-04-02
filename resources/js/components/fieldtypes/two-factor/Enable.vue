@@ -1,14 +1,14 @@
 <template>
     <div>
         <div class="mb-8">
-            <div class="font-semibold mb-2">{{ __('statamic-two-factor::profile.enable.title') }}</div>
+            <div class="font-semibold mb-2">{{ __('Enable two factor authentication') }}</div>
 
             <div class="text-xs text-gray-700 mb-4">
-                <p class="mb-1">{{ __('statamic-two-factor::profile.enable.intro') }}</p>
+                <p class="mb-1">{{ __('statamic::messages.two_factor_enable_introduction') }}</p>
             </div>
 
             <div class="flex space-x-2">
-                <a :href="route" class="btn">{{ __('statamic-two-factor::profile.enable.enable') }}</a>
+                <a :href="route" class="btn">{{ __('Set up two factor authentication') }}</a>
             </div>
         </div>
     </div>

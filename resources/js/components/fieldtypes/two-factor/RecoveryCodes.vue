@@ -1,28 +1,28 @@
 <template>
     <div>
         <div class="mb-8">
-            <div class="font-semibold mb-2">{{ __('statamic-two-factor::profile.recovery_codes.title') }}</div>
+            <div class="font-semibold mb-2">{{ __('Recovery codes') }}</div>
 
             <div class="text-xs text-gray-700 mb-4">
-                <p class="mb-1">{{ __('statamic-two-factor::profile.recovery_codes.intro') }}</p>
+                <p class="mb-1">{{ __('statamic::messages.two_factor_recovery_codes_introduction') }}</p>
             </div>
 
             <div class="sm:flex -mt-2">
-                <button :disabled="codes" class="btn mt-2 mr-2" @click.prevent="show">{{ __('statamic-two-factor::profile.recovery_codes.show.action') }}</button>
-                <button class="btn mt-2" @click.prevent="confirming = true">{{ __('statamic-two-factor::profile.recovery_codes.regenerate.action') }}</button>
+                <button :disabled="codes" class="btn mt-2 mr-2" @click.prevent="show">{{ __('Show recovery codes') }}</button>
+                <button class="btn mt-2" @click.prevent="confirming = true">{{ __('Create new recovery codes') }}</button>
             </div>
 
             <div v-if="codes" class="bg-gray-200 dark:bg-dark-650 inline-block rounded-lg px-4 py-4 mt-6">
                 <div class="px-2 text-sm font-medium mb-2">
-                    <span v-if="newCodes">{{ __('statamic-two-factor::profile.recovery_codes.codes.new') }}:</span>
-                    <span v-else>{{ __('statamic-two-factor::profile.recovery_codes.codes.show') }}:</span>
+                    <span v-if="newCodes">{{ __('Your new recovery codes') }}:</span>
+                    <span v-else>{{ __('Your recovery codes') }}:</span>
                 </div>
                 <div class="font-mono flex flex-wrap text-gray-700">
                     <div v-for="(code, index) in codes" :key="code" class="px-2">{{ code }}</div>
                 </div>
                 <div v-if="newCodes"
                      class="text-sm mt-2 px-2 text-red-500">
-                    {{ __('statamic-two-factor::profile.recovery_codes.codes.footnote') }}
+                    {{ __('statamic::messages.two_factor_recovery_codes_footnote') }}
                 </div>
             </div>
         </div>
@@ -30,12 +30,12 @@
         <confirmation-modal
             v-if="confirming"
             :danger="true"
-            :title="__('statamic-two-factor::profile.recovery_codes.regenerate.confirm.title')"
+            :title="__('Are you sure?')"
             @cancel="confirming = false"
             @confirm="regenerate"
         >
-            <p class="mb-2">{{ __('statamic-two-factor::profile.recovery_codes.regenerate.confirm.body_1') }}</p>
-            <p>{{ __('statamic-two-factor::profile.recovery_codes.regenerate.confirm.body_2') }}</p>
+            <p class="mb-2">{{ __('statamic::messages.two_factor_regenerate_recovery_codes_1') }}</p>
+            <p>{{ __('statamic::messages.two_factor_regenerate_recovery_codes_2') }}</p>
         </confirmation-modal>
     </div>
 </template>

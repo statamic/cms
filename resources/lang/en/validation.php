@@ -190,6 +190,12 @@ return [
     'asset_file_exists_same_content' => 'A file already exists with this name and has the same content. You may want to delete this rather than rename it.',
     'asset_file_exists_different_content' => 'A file already exists with this name but has different content. You may want to replace the other file with this one instead.',
 
+    // todo: reorder
+    'two_factor_not_setup' => 'Two factor authentication is not configured correctly on your account.',
+    'two_factor_code_challenge_failed' => 'The provided two factor authentication code was invalid.',
+    'two_factor_recovery_code_challenge_failed' => 'The provided two factor authentication code was invalid.',
+
+
     /*
     |--------------------------------------------------------------------------
     | Custom Validation Language Lines

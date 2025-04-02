@@ -1,5 +1,5 @@
 @extends('statamic::outside')
-@section('title', __('statamic-two-factor::locked.title'))
+@section('title', __('Account is locked'))
 
 @section('content')
 
@@ -10,14 +10,14 @@
             <div class="card auth-card mx-auto">
 
                 <div class="pb-4 mb-2 text-center">
-                    <h1 class="mb-4 text-lg text-gray-800 dark:text-dark-175">{{ __('statamic-two-factor::locked.title') }}</h1>
-                    <p class="text-sm text-gray">{{ __('statamic-two-factor::locked.introduction') }}</p>
+                    <h1 class="mb-4 text-lg text-gray-800 dark:text-dark-175">{{ __('Account is locked') }}</h1>
+                    <p class="text-sm text-gray">{{ __('statamic::messages.two_factor_locked_introduction') }}</p>
                 </div>
 
                 <div>
                     <div class="flex justify-center items-center">
                         <a href="{{ cp_route('login') }}"
-                           class="btn-primary">{{ __('statamic-two-factor::locked.action') }}</a>
+                           class="btn-primary">{{ __('Return to log in') }}</a>
                     </div>
                 </div>
 

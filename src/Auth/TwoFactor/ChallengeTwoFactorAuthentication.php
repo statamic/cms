@@ -20,7 +20,7 @@ class ChallengeTwoFactorAuthentication
         // challenge
         if (empty($user->two_factor_secret)) {
             throw ValidationException::withMessages([
-                $mode => [__('statamic-two-factor::messages.two_factor_not_setup')],
+                $mode => [__('statamic::validation.two_factor_not_setup')],
             ]);
         }
 
@@ -41,7 +41,7 @@ class ChallengeTwoFactorAuthentication
         if (empty($code) ||
             ! $this->provider->verify(decrypt($user->two_factor_secret), $code)) {
             throw ValidationException::withMessages([
-                'code' => [__('statamic-two-factor::messages.code_challenge_failed')],
+                'code' => [__('statamic::validation.two_factor_code_challenge_failed')],
             ])->redirectTo(cp_route('two-factor.challenge'));
         }
     }
@@ -52,11 +52,11 @@ class ChallengeTwoFactorAuthentication
         if (! $recovery_code ||
             empty($recovery_code)) {
             throw ValidationException::withMessages([
-                'recovery_code' => [__('statamic-two-factor::messages.recovery_code_challenge_failed')],
+                'recovery_code' => [__('statamic::validation.two_factor_code_challenge_failed')],
             ]);
         }
 
-        // get the recovery codes
+        // get the recovery codescode_challenge_failed
         $userRecoveryCodes = collect(json_decode(decrypt($user->two_factor_recovery_codes), true));
 
         // find the recovery code
@@ -65,7 +65,7 @@ class ChallengeTwoFactorAuthentication
         // are we valid?
         if (! $foundRecoveryCode) {
             throw ValidationException::withMessages([
-                'recovery_code' => [__('statamic-two-factor::messages.recovery_code_challenge_failed')],
+                'recovery_code' => [__('statamic::validation.two_factor_code_challenge_failed')],
             ]);
         }
 

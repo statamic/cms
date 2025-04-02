@@ -2,7 +2,7 @@
     <div>
         <template v-if="!meta.enabled">
             <div class="text-sm">
-                <p>{{ __('statamic-two-factor::profile.messages.not_enabled') }}</p>
+                <p>{{ __('statamic::messages.two_factor_not_enabled') }}</p>
             </div>
         </template>
 
@@ -12,8 +12,8 @@
 
         <template v-else-if="!meta.is_me && !setup">
             <div class="text-sm">
-                <p class="font-medium mb-2">{{ __('statamic-two-factor::profile.messages.not_setup_1') }}</p>
-                <p>{{ __('statamic-two-factor::profile.messages.not_setup_2') }}</p>
+                <p class="font-medium mb-2">{{ __('statamic::messages.two_factor_not_setup_1') }}</p>
+                <p>{{ __('statamic::messages.two_factor_not_setup_2') }}</p>
             </div>
         </template>
 

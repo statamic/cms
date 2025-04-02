@@ -18,7 +18,7 @@ class ConfirmTwoFactorAuthentication
             empty($code) ||
             ! $this->provider->verify(decrypt($user->two_factor_secret), $code)) {
             throw ValidationException::withMessages([
-                'code' => [__('statamic-two-factor::messages.code_challenge_failed')],
+                'code' => [__('statamic::validation.two_factor_code_challenge_failed')],
             ]);
         }
 

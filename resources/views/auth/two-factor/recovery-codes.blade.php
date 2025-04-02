@@ -1,5 +1,5 @@
 @extends('statamic::outside')
-@section('title', __('statamic-two-factor::recovery-codes.title'))
+@section('title', __('Recovery Codes'))
 
 @section('content')
 
@@ -10,8 +10,8 @@
             <div class="card auth-card mx-auto">
 
                 <div class="pb-4 mb-2 text-center">
-                    <h1 class="mb-4 text-lg text-gray-800 dark:text-dark-175">{{ __('statamic-two-factor::recovery-codes.title') }}</h1>
-                    <p class="text-sm text-gray">{{ __('statamic-two-factor::recovery-codes.introduction') }}</p>
+                    <h1 class="mb-4 text-lg text-gray-800 dark:text-dark-175">{{ __('Recovery Codes') }}</h1>
+                    <p class="text-sm text-gray">{{ __('statamic::messages.two_factor_recovery_codes') }}</p>
                 </div>
 
                 <div>
@@ -29,7 +29,7 @@
                         <div class="flex justify-between items-center">
                             <div></div>
                             <button type="submit"
-                                    class="btn-primary">{{ __('statamic-two-factor::recovery-codes.action') }}</button>
+                                    class="btn-primary">{{ __('Continue') }}</button>
                         </div>
                     </form>
                 </div>

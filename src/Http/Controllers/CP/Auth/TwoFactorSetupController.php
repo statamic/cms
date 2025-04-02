@@ -49,7 +49,7 @@ class TwoFactorSetupController
         // complete the setup
         $complete(User::current());
 
-        Toast::success(__('statamic-two-factor::messages.setup'));
+        Toast::success(__('Two Factor Authentication has been set up.'));
 
         return redirect(cp_route('index'));
     }
