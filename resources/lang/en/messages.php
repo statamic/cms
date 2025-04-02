@@ -38,6 +38,8 @@ return [
     'two_factor_not_setup_1' => 'Two Factor Authentication has not been set up yet.',
     'two_factor_not_setup_2' => 'You can manage two factor authentication details after the user has completed the setup process.',
     'two_factor_setup_instructions' => 'Scan this QR code (or use the text code) with your authentication app on your phone, and enter the next six digit verification code.',
+    'two_factor_recovery_code_used_notification_subject' => 'A recovery code has been used on your account',
+    'two_factor_recovery_code_used_notification_body' => "One of your recovery codes has been used to log into your account. This code has now been removed, and replaced with a new code.\n Please go to your Profile to view your new recovery codes, and store these in a safe place.\n If this was not you, immediately change your password and reset your two factor authentication setup from your Profile.",
 
     'activate_account_notification_body' => 'You are receiving this email because we received a password reset request for your account.',
     'activate_account_notification_subject' => 'Activate Your Account',

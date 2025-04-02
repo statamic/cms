@@ -25,12 +25,13 @@ class RecoveryCodeUsed extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->subject(__('statamic-two-factor::messages.recovery_code_used_subject'))
-            ->greeting(__('statamic-two-factor::messages.recovery_code_used_greeting', ['name' => $notifiable->name()]))
-            ->line(__('statamic-two-factor::messages.recovery_code_used_body'))
-            ->line(__('statamic-two-factor::messages.recovery_code_used_body_2'))
-            ->action(__('statamic-two-factor::messages.recovery_code_used_action'), cp_route('account'))
-            ->line(__('statamic-two-factor::messages.recovery_code_used_body_3'));
+            ->subject(__('statamic::messages.two_factor_recovery_code_used_notification_subject'))
+            ->when(true, function ($mailMessage) {
+                collect(explode("\n", __('statamic::messages.two_factor_recovery_code_used_notification_body')))
+                    ->filter()
+                    ->each(fn ($line) => $mailMessage->line($line));
+            })
+            ->action(__('View Profile'), cp_route('account'));
     }
 
     /**
