@@ -18,12 +18,17 @@ class MinRule implements ValidationRule
 
         if ($value instanceof UploadedFile) {
             $size = $value->getSize() / 1024;
-        } else if ($asset = Asset::find($value)) {
+        } elseif ($asset = Asset::find($value)) {
             $size = $asset->size() / 1024;
         }
 
         if ($size < $this->parameters[0]) {
-            $fail(__((Statamic::isCpRoute() ? 'statamic::' : '') . 'validation.min.file', ['min' => $this->parameters[0]]));
+            $fail($this->message());
         }
+    }
+
+    public function message(): string
+    {
+        return __((Statamic::isCpRoute() ? 'statamic::' : '').'validation.min.file', ['min' => $this->parameters[0]]);
     }
 }

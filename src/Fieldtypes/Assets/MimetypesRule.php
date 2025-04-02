@@ -18,12 +18,17 @@ class MimetypesRule implements ValidationRule
 
         if ($value instanceof UploadedFile) {
             $mime_type = $value->getMimeType();
-        } else if ($asset = Asset::find($value)) {
+        } elseif ($asset = Asset::find($value)) {
             $mime_type = $asset->mimeType();
         }
 
-        if (!in_array($mime_type, $this->parameters) && !in_array(explode('/', $mime_type)[0] . '/*', $this->parameters)) {
-            $fail(__((Statamic::isCpRoute() ? 'statamic::' : '') . 'validation.mimetypes', ['values' => implode(', ', $this->parameters)]));
+        if (! in_array($mime_type, $this->parameters) && ! in_array(explode('/', $mime_type)[0].'/*', $this->parameters)) {
+            $fail($this->message());
         }
+    }
+
+    public function message()
+    {
+        return __((Statamic::isCpRoute() ? 'statamic::' : '').'validation.mimetypes', ['values' => implode(', ', $this->parameters)]);
     }
 }

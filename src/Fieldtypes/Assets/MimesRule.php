@@ -18,7 +18,7 @@ class MimesRule implements ValidationRule
             $parameters = array_unique(array_merge($parameters, ['jpg', 'jpeg']));
         }
 
-        $this->parameters = $parameters;
+        $this->parameters = array_map(strtolower(...), $parameters);
     }
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
@@ -27,12 +27,17 @@ class MimesRule implements ValidationRule
 
         if ($value instanceof UploadedFile) {
             $mime = $value->guessExtension();
-        } else if ($asset = Asset::find($value)) {
+        } elseif ($asset = Asset::find($value)) {
             $mime = $asset->extension();
         }
 
-        if (!in_array($mime, $this->parameters)) {
-            $fail(__((Statamic::isCpRoute() ? 'statamic::' : '') . 'validation.mimes', ['values' => implode(', ', $this->parameters)]));
+        if (! in_array($mime, $this->parameters)) {
+            $fail($this->message());
         }
+    }
+
+    public function message(): string
+    {
+        return __((Statamic::isCpRoute() ? 'statamic::' : '').'validation.mimes', ['values' => implode(', ', $this->parameters)]);
     }
 }
