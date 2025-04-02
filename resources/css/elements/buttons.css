@@ -347,14 +347,10 @@ td .btn-icon {
 }
 
 .super-btn {
-    @apply flex items-start space-x-4 rounded-md border border-transparent p-4 hover:bg-gray-200 rtl:space-x-reverse;
-    @apply dark:hover:border-dark-400 dark:hover:bg-dark-575;
+    @apply flex items-start gap-5 rounded-xl border border-transparent p-3 hover:bg-gray-50 rtl:space-x-reverse;
+    @apply dark:hover:border-black/40 dark:hover:bg-black/20;
 
     svg {
-        @apply h-8 w-8 text-gray-800 dark:text-dark-200;
-    }
-
-    h3 {
-        @apply mb-2 text-blue dark:text-blue-600;
+        @apply h-8 w-8 mt-1 text-gray-600 dark:text-gray-500;
     }
 }

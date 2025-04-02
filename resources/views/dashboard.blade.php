@@ -7,6 +7,8 @@
 
 @section('content')
 
+<ui-header title="{{ __('Dashboard') }}" />
+
 <div class="widgets @container -mx-4 flex flex-wrap py-2">
     @foreach ($widgets as $widget)
         <div
@@ -17,12 +19,9 @@
     @endforeach
 </div>
 
-@include(
-    'statamic::partials.docs-callout',
-    [
-        'topic' => __('Widgets'),
-        'url' => Statamic::docsUrl('widgets'),
-    ]
-)
+    <x-statamic::docs-callout
+        :topic="__('Widgets')"
+        :url="Statamic::docsUrl('widgets')"
+    />
 
 @stop
