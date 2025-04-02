@@ -87,7 +87,7 @@ const calendarEvents = computed(() => ({
                     >
                         <DatePickerTrigger
                             v-if="!inline"
-                            class="absolute start-1 top-1 bottom-1 flex items-center justify-center rounded-lg px-2 text-gray-400 outline-hidden hover:bg-gray-50 focus:bg-gray-50 dark:hover:bg-gray-900 dark:focus:bg-gray-900"
+                            class="absolute start-1 top-1 bottom-1 flex items-center justify-center rounded-lg px-2 text-gray-400 outline-hidden hover:bg-gray-100 focus:bg-gray-100 dark:hover:bg-gray-900 dark:focus:bg-gray-900"
                         >
                             <ui-icon name="calendar" class="size-4" />
                         </DatePickerTrigger>
@@ -98,7 +98,7 @@ const calendarEvents = computed(() => ({
                             <DatePickerInput
                                 v-else
                                 :part="item.part"
-                                class="rounded-sm px-0.25 py-0.5 focus:bg-gray-50 focus:outline-hidden data-placeholder:text-gray-600 dark:focus:bg-gray-800 dark:data-placeholder:text-gray-400"
+                                class="rounded-sm px-0.25 py-0.5 focus:bg-gray-100 focus:outline-hidden data-placeholder:text-gray-600 dark:focus:bg-gray-800 dark:data-placeholder:text-gray-400"
                                 :class="{
                                     'px-0.5!': item.part === 'month' || item.part === 'year' || item.part === 'day',
                                 }"
@@ -111,7 +111,7 @@ const calendarEvents = computed(() => ({
                         v-if="clearable"
                         @click="emit('update:modelValue', null)"
                         type="button"
-                        class="absolute end-1 top-1 bottom-1 flex items-center justify-center rounded-lg px-2 text-gray-300 outline-hidden hover:bg-gray-50 focus:bg-gray-50 active:text-gray-400 dark:hover:bg-gray-900 dark:focus:bg-gray-900"
+                        class="absolute end-1 top-1 bottom-1 flex items-center justify-center rounded-lg px-2 text-gray-300 outline-hidden hover:bg-gray-100 focus:bg-gray-100 active:text-gray-400 dark:hover:bg-gray-900 dark:focus:bg-gray-900"
                     >
                         <ui-icon name="x" class="size-3" />
                     </button>
