@@ -4,7 +4,7 @@
 
 .card {
     @apply rounded-md bg-white p-2 shadow;
-    @apply dark:bg-dark-600 dark:shadow-lg;
+    @apply dark:bg-gray-800 dark:shadow-lg;
 }
 
 @media (width >= theme(--breakpoint-md)) {
@@ -18,5 +18,5 @@
 }
 
 .card-lg header {
-    @apply rounded-t-lg border-b px-8 py-6 dark:border-dark-800 dark:bg-dark-650;
+    @apply rounded-t-lg border-b px-8 py-6 dark:border-gray-800 dark:bg-gray-700;
 }

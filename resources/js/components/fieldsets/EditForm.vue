@@ -1,12 +1,13 @@
 <template>
     <div>
-        <header class="mb-6">
-            <breadcrumb :url="breadcrumbUrl" :title="__('Fieldsets')" />
-            <div class="flex items-center justify-between">
-                <h1>{{ __(initialTitle) }}</h1>
-                <button type="submit" class="btn-primary" @click.prevent="save" v-text="__('Save')" />
-            </div>
-        </header>
+        <ui-header :title="__(initialTitle)">
+            <ui-button
+                type="submit"
+                variant="primary"
+                @click.prevent="save"
+                v-text="__('Save')"
+            />
+        </ui-header>
 
         <div class="publish-form card mb-8 p-0 @container">
             <div class="publish-fields">

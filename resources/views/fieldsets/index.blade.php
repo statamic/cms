@@ -7,10 +7,13 @@
 
 @section('content')
     @unless ($fieldsets->isEmpty())
-        <div class="mb-6 flex">
-            <h1 class="flex-1">{{ __('Fieldsets') }}</h1>
-            <a href="{{ cp_route('fieldsets.create') }}" class="btn-primary">{{ __('Create Fieldset') }}</a>
-        </div>
+        <ui-header title="{{ __('Fieldsets') }}">
+            <ui-button
+                href="{{ cp_route('fieldsets.create') }}"
+                text="{{ __('Create Fieldset') }}"
+                variant="primary"
+            ></ui-button>
+        </ui-header>
 
         @foreach ($fieldsets as $key => $f)
             <div class="mb-4">
