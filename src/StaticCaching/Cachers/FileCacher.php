@@ -224,6 +224,13 @@ class FileCacher extends AbstractCacher
     })
     .then((response) => response.json())
     .then((data) => {
+        var els = document.getElementsByClassName('nocache');
+        var map = {};
+        for (var i = 0; i < els.length; i++) {
+            var section = els[i].getAttribute('data-nocache');
+            map[section] = els[i];
+        }
+
         const regions = data.regions;
         for (var key in regions) {
             if (map[key]) map[key].outerHTML = regions[key];
