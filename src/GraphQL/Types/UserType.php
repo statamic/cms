@@ -17,6 +17,7 @@ class UserType extends \Rebing\GraphQL\Support\Type
     public function fields(): array
     {
         return User::blueprint()->fields()->toGql()
+            ->reject(fn ($field, $handle) => in_array($handle, ['two_factor']))
             ->merge([
                 'id' => [
                     'type' => GraphQL::string(),
