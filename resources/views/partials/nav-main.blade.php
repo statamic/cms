@@ -8,9 +8,9 @@
         @foreach ($nav as $section)
             <div>
                 @if ($section['display'] !== 'Top Level')
-                    <ui-heading size="sm" class="mb-2 text-black dark:text-gray-200">
+                    <div class="text-sm text-black dark:text-gray-200 mb-2">
                         {{ __($section['display']) }}
-                    </ui-heading>
+                    </div>
                 @endif
                 <ul class="flex flex-col gap-2">
                     @foreach ($section['items'] as $item)
