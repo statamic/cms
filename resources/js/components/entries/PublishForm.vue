@@ -1,19 +1,10 @@
 <template>
     <div>
-        <breadcrumb v-if="breadcrumbs" :url="breadcrumbs[1].url" :title="breadcrumbs[1].text" />
-
-        <div class="mb-6 flex items-baseline">
-            <h1 class="flex-1 self-start ltr:mr-4 rtl:ml-4">
-                <div class="flex items-baseline">
-                    <span
-                        v-if="!isCreating"
-                        class="little-dot -top-1 ltr:mr-2 rtl:ml-2"
-                        :class="activeLocalization.status"
-                        v-tooltip="__(activeLocalization.status)"
-                    />
-                    <span class="break-overflowing-words" v-html="formattedTitle" />
-                </div>
-            </h1>
+        <ui-header>
+            <template #title>
+                <span v-if="!isCreating" class="little-dot -top-1" :class="activeLocalization.status" v-tooltip="__(activeLocalization.status)" />
+                {{ formattedTitle }}
+            </template>
 
             <dropdown-list class="ltr:mr-4 rtl:ml-4" v-if="canEditBlueprint || hasItemActions">
                 <dropdown-item :text="__('Edit Blueprint')" v-if="canEditBlueprint" :redirect="actions.editBlueprint" />
@@ -59,7 +50,7 @@
             </div>
 
             <slot name="action-buttons-right" />
-        </div>
+        </ui-header>
 
         <publish-container
             v-if="fieldset"
@@ -112,88 +103,63 @@
                             @blur="container.$emit('blur', $event)"
                         >
                             <template #actions="{ shouldShowSidebar }">
-                                <div class="card mb-5 p-0">
-                                    <div v-if="collectionHasRoutes" :class="{ hi: !shouldShowSidebar }">
-                                        <div
-                                            class="flex items-center space-x-2 p-3 rtl:space-x-reverse"
-                                            v-if="showLivePreviewButton || showVisitUrlButton"
-                                        >
-                                            <button
-                                                class="btn flex w-full items-center justify-center"
-                                                v-if="showLivePreviewButton"
+                                <div class="space-y-6">
+
+                                    <!-- Live Preview / Visit URL Buttons -->
+                                    <div v-if="collectionHasRoutes" :class="{ hidden: !shouldShowSidebar }">
+                                        <div class="grid grid-cols-2 gap-4" v-if="showLivePreviewButton || showVisitUrlButton">
+                                            <ui-button
+                                                :text="__('Live Preview')"
+                                                icon="live-preview"
                                                 @click="openLivePreview"
-                                            >
-                                                <svg-icon
-                                                    name="light/synchronize"
-                                                    class="h-4 w-4 shrink-0 ltr:mr-2 rtl:ml-2"
-                                                />
-                                                <span>{{ __('Live Preview') }}</span>
-                                            </button>
-                                            <a
-                                                class="btn flex w-full items-center justify-center"
-                                                v-if="showVisitUrlButton"
+                                                v-if="showLivePreviewButton"
+                                            />
+                                            <ui-button
                                                 :href="permalink"
+                                                :text="__('Visit URL')"
+                                                icon="external-link"
                                                 target="_blank"
-                                            >
-                                                <svg-icon
-                                                    name="light/external-link"
-                                                    class="h-4 w-4 shrink-0 ltr:mr-2 rtl:ml-2"
-                                                />
-                                                <span>{{ __('Visit URL') }}</span>
-                                            </a>
+                                                v-if="showVisitUrlButton"
+                                            />
                                         </div>
                                     </div>
 
-                                    <div
-                                        v-if="!revisionsEnabled"
-                                        class="flex items-center justify-between px-4 py-2"
-                                        :class="{
-                                            'border-t dark:border-dark-900':
-                                                showLivePreviewButton || showVisitUrlButton,
-                                        }"
-                                    >
-                                        <label v-text="__('Published')" class="publish-field-label font-medium" />
-                                        <toggle-input
+                                    <!-- Published Switch -->
+                                    <ui-panel class="px-5 py-3 flex justify-between">
+                                        <ui-heading :text="__('Published')" />
+                                        <ui-switch
+                                            v-if="!revisionsEnabled"
                                             :model-value="published"
                                             :read-only="!canManagePublishState"
                                             @update:model-value="setFieldValue('published', $event)"
                                         />
-                                    </div>
+                                    </ui-panel>
 
-                                    <div
-                                        v-if="revisionsEnabled && !isCreating"
-                                        class="p-4"
-                                        :class="{
-                                            'border-t dark:border-dark-900':
-                                                showLivePreviewButton || showVisitUrlButton,
-                                        }"
-                                    >
-                                        <label class="publish-field-label mb-2 font-medium" v-text="__('Revisions')" />
-                                        <div class="mb-1 flex items-center" v-if="published">
-                                            <span class="w-6 text-center text-green-600">&check;</span>
-                                            <span class="text-2xs" v-text="__('Entry has a published version')"></span>
-                                        </div>
-                                        <div class="mb-1 flex items-center" v-else>
-                                            <span class="w-6 text-center text-orange">!</span>
-                                            <span class="text-2xs" v-text="__('Entry has not been published')"></span>
-                                        </div>
-                                        <div class="mb-1 flex items-center" v-if="!isWorkingCopy && published">
-                                            <span class="w-6 text-center text-green-600">&check;</span>
-                                            <span class="text-2xs" v-text="__('This is the published version')"></span>
-                                        </div>
-                                        <div class="mb-1 flex items-center" v-if="isDirty">
-                                            <span class="w-6 text-center text-orange">!</span>
-                                            <span class="text-2xs" v-text="__('Unsaved changes')"></span>
-                                        </div>
-                                        <button
-                                            class="btn-flat mt-4 flex w-full items-center justify-center px-2"
-                                            v-if="!isCreating && revisionsEnabled"
-                                            @click="showRevisionHistory = true"
-                                        >
-                                            <svg-icon name="light/history" class="h-4 w-4 ltr:mr-2 rtl:ml-2" />
-                                            <span>{{ __('View History') }}</span>
-                                        </button>
-                                    </div>
+                                    <!-- Revisions -->
+                                    <ui-panel v-if="revisionsEnabled && !isCreating">
+                                        <ui-panel-header class="flex items-center justify-between">
+                                            <ui-heading :text="__('Revisions')" />
+                                            <ui-button @click="showRevisionHistory = true" icon="history" :text="__('View History')" size="sm" />
+                                        </ui-panel-header>
+                                        <ui-card class="space-y-2">
+                                            <ui-subheading v-if="published" class="flex items-center gap-2">
+                                                <ui-icon name="checkmark" class="text-green-600" />
+                                                {{ __('Entry has a published version')}}
+                                            </ui-subheading>
+                                            <ui-subheading v-else class="flex items-center gap-2 text-yellow-600">
+                                                <ui-icon name="warning-diamond"/>
+                                                {{ __('Entry has not been published')}}
+                                            </ui-subheading>
+                                            <ui-subheading v-if="!isWorkingCopy && published" class="flex items-center gap-2">
+                                                <ui-icon name="checkmark" class="text-green-600" />
+                                                {{ __('This is the published version')}}
+                                            </ui-subheading>
+                                            <ui-subheading v-if="isDirty" class="flex items-center gap-2 text-yellow-600">
+                                                <ui-icon name="warning-diamond" />
+                                                {{ __('Unsaved changes')}}
+                                            </ui-subheading>
+                                        </ui-card>
+                                    </ui-panel>
 
                                     <div class="border-t p-4 dark:border-dark-900" v-if="localizations.length > 1">
                                         <label class="publish-field-label mb-2 font-medium" v-text="__('Sites')" />
