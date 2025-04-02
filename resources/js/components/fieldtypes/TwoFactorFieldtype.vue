@@ -6,18 +6,18 @@
             </div>
         </template>
 
-        <template v-else-if="meta.is_me && meta.is_user_edit && !setup">
+        <template v-else-if="meta.is_me && !setup">
             <two-factor-enable :route="meta.routes.setup"/>
         </template>
 
-        <template v-else-if="!meta.is_me && meta.is_user_edit && !setup">
+        <template v-else-if="!meta.is_me && !setup">
             <div class="text-sm">
                 <p class="font-medium mb-2">{{ __('statamic-two-factor::profile.messages.not_setup_1') }}</p>
                 <p>{{ __('statamic-two-factor::profile.messages.not_setup_2') }}</p>
             </div>
         </template>
 
-        <template v-else-if="meta.is_user_edit">
+        <template v-else>
             <two-factor-locked
                 v-if="locked"
                 :route="meta.routes.locked"
@@ -32,12 +32,6 @@
                 :enforced="meta.is_enforced"
                 :language-user="languageUser"
                 @update="updateState"/>
-        </template>
-
-        <template v-else>
-            <div class="text-sm">
-                <p class="text-red-500 font-medium">{{ __('statamic-two-factor::profile.messages.wrong_view') }}</p>
-            </div>
         </template>
     </div>
 </template>
