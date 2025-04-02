@@ -81,10 +81,16 @@ const calendarEvents = computed(() => ({
                             'flex w-full bg-white dark:bg-gray-900',
                             'border border-gray-300 dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:inset-shadow-2xs dark:inset-shadow-black',
                             'leading-[1.375rem] text-gray-600 dark:text-gray-300',
-                            'shadow-ui-sm not-prose h-10 rounded-lg py-2 ps-3 pe-10 disabled:shadow-none',
+                            'shadow-ui-sm not-prose h-10 rounded-lg py-2 px-10 disabled:shadow-none',
                             'data-invalid:border-red-500',
                         ]"
                     >
+                        <DatePickerTrigger
+                            v-if="!inline"
+                            class="absolute start-1 top-1 bottom-1 flex items-center justify-center rounded-lg px-2 text-gray-400 outline-hidden hover:bg-gray-50 focus:bg-gray-50 dark:hover:bg-gray-900 dark:focus:bg-gray-900"
+                        >
+                            <ui-icon name="calendar" class="size-4" />
+                        </DatePickerTrigger>
                         <template v-for="item in segments" :key="item.part">
                             <DatePickerInput v-if="item.part === 'literal'" :part="item.part">
                                 {{ item.value }}
@@ -101,12 +107,14 @@ const calendarEvents = computed(() => ({
                             </DatePickerInput>
                         </template>
                     </div>
-                    <DatePickerTrigger
-                        v-if="!inline"
-                        class="absolute end-1 top-1 bottom-1 flex items-center justify-center rounded-lg px-2 text-gray-400 outline-hidden hover:bg-gray-50 focus:bg-gray-50 dark:hover:bg-gray-900 dark:focus:bg-gray-900"
+                    <button
+                        v-if="clearable"
+                        @click="emit('update:modelValue', null)"
+                        type="button"
+                        class="absolute end-1 top-1 bottom-1 flex items-center justify-center rounded-lg px-2 text-gray-300 outline-hidden hover:bg-gray-50 focus:bg-gray-50 active:text-gray-400 dark:hover:bg-gray-900 dark:focus:bg-gray-900"
                     >
-                        <ui-icon name="calendar" class="h-4 w-4" />
-                    </DatePickerTrigger>
+                        <ui-icon name="x" class="size-3" />
+                    </button>
                 </DatePickerField>
 
                 <DatePickerContent
@@ -124,13 +132,5 @@ const calendarEvents = computed(() => ({
                 </Card>
             </DatePickerRoot>
         </div>
-        <Button
-            v-if="clearable"
-            @click="emit('update:modelValue', null)"
-            type="button"
-            class=""
-            text="Clear"
-            size="xs"
-        />
     </WithField>
 </template>
