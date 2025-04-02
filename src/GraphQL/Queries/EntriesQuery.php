@@ -76,7 +76,7 @@ class EntriesQuery extends Query
 
     private function filterQuery($query, $filters)
     {
-        if (! isset($filters['status']) && ! isset($filters['published'])) {
+        if (!request()->isLivePreview() && (! isset($filters['status']) && ! isset($filters['published']))) {
             $filters['status'] = 'published';
         }
 
