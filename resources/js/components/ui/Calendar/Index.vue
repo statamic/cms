@@ -111,7 +111,7 @@ const maxValue = computed(() =>
                             v-for="weekDate in weekDates"
                             :key="weekDate.toString()"
                             :date="weekDate"
-                            class="relative text-center text-sm"
+                            class="relative flex justify-center text-sm"
                         >
                             <Component
                                 :is="components.CalendarCellTrigger"
