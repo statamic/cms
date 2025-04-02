@@ -82,7 +82,6 @@ abstract class UserRepository implements RepositoryContract
             'type' => 'two_factor',
             'display' => __('Two Factor Authentication'),
             'hide_display' => true,
-            'listable' => false,
         ]);
 
         Blink::put($blink, $blueprint);
