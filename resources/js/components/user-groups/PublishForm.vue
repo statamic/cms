@@ -1,18 +1,18 @@
 <template>
     <div>
-        <header class="mb-3">
-            <breadcrumb :url="cp_url('user-groups')" :title="__('User Groups')" />
-            <div class="flex items-center">
-                <h1 class="flex-1" v-text="__(title)" />
-                <dropdown-list class="ltr:mr-2 rtl:ml-2" v-if="canEditBlueprint">
-                    <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
-                </dropdown-list>
+        <ui-header :title="__(title)">
+            <dropdown-list class="ltr:mr-2 rtl:ml-2" v-if="canEditBlueprint">
+                <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
+            </dropdown-list>
 
-                <button class="btn-primary" @click.prevent="save" v-text="__('Save')" />
+            <ui-button
+                variant="primary"
+                @click.prevent="save"
+                :text="__('Save')"
+            />
 
-                <slot name="action-buttons-right" />
-            </div>
-        </header>
+            <slot name="action-buttons-right" />
+        </ui-header>
 
         <publish-container
             v-if="fieldset"

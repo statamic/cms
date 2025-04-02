@@ -15,7 +15,7 @@
                 <ul class="flex flex-col gap-2">
                     @foreach ($section['items'] as $item)
                         @unless ($item->view())
-                            <li class="{{ $item->isActive() ? '[&_a]:text-black [&_svg]:text-black!' : '' }}" v-pre>
+                            <li class="{{ $item->isActive() ? '[&_a]:text-black [&_svg]:text-black! [&_a]:dark:text-white [&_svg]:dark:text-gray-200!' : '' }}" v-pre>
                                 <a
                                     class="flex items-center gap-3 text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-gray-200 hover:[&_svg]:text-gray-700 dark:hover:[&_svg]:text-gray-200"
                                     href="{{ $item->url() }}"
@@ -25,9 +25,9 @@
                                     <span>{{ __($item->name()) }}</span>
                                 </a>
                                 @if ($item->children() && $item->isActive())
-                                    <ul class="pl-7 py-1 space-y-1">
+                                    <ul class="pl-7 py-1.5 space-y-1 text-[13px] [&_a]:text-gray-600 [&_a]:dark:text-gray-400!">
                                         @foreach ($item->children() as $child)
-                                            <li class="{{ $child->isActive() ? '[&_a]:text-black [&_svg]:text-black' : '' }}">
+                                            <li class="{{ $child->isActive() ? '[&_a]:text-black! [&_svg]:text-black! [&_a]:dark:text-white! [&_svg]:dark:text-gray-200!' : '' }}">
                                                 <a href="{{ $child->url() }}" {{ $item->attributes() }}>
                                                     {{ __($child->name()) }}
                                                 </a>

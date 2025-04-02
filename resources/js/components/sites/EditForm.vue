@@ -12,12 +12,9 @@
         v-slot="{ setFieldValue, setFieldMeta }"
     >
         <div>
-            <header class="mb-6">
-                <div class="flex items-center">
-                    <h1 class="flex-1" v-text="pageTitle" />
-                    <button type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
-                </div>
-            </header>
+            <ui-header :title="pageTitle">
+                <ui-button type="submit" variant="primary" @click="submit">{{ __('Save') }}</ui-button>
+            </ui-header>
             <publish-tabs @updated="setFieldValue" @meta-updated="setFieldMeta" :enable-sidebar="false" />
         </div>
     </publish-container>

@@ -11,39 +11,32 @@
         v-slot="{ setFieldValue, setFieldMeta }"
     >
         <div>
-            <breadcrumbs v-if="breadcrumbs" :crumbs="breadcrumbs" />
+            <ui-header :title="title">
 
-            <div class="mb-6 flex items-center">
-                <h1 class="flex-1">{{ title }}</h1>
-
-                <div class="ltr:ml-4 ltr:text-left rtl:mr-4 rtl:text-right" :class="{ 'btn-group': hasSaveAsOptions }">
-                    <button
-                        class="btn-primary ltr:pl-4 rtl:pr-4"
-                        :class="{ disabled: !isDirty }"
-                        :disabled="!isDirty"
+                <ui-button-group>
+                    <ui-button
+                        type="submit"
+                        variant="primary"
+                        :text="__('Save')"
                         @click="save"
-                        v-text="__('Save')"
                     />
 
-                    <dropdown-list v-if="hasSaveAsOptions" class="ltr:ml-0 rtl:mr-0">
+                    <ui-dropdown align="end" v-if="hasSaveAsOptions">
                         <template #trigger>
-                            <button class="btn-primary flex items-center ltr:rounded-l-none rtl:rounded-r-none">
-                                <svg-icon name="micro/chevron-down-xs" class="w-2" />
-                            </button>
+                            <ui-button icon="chevron-down" variant="primary" />
                         </template>
-                        <h6 class="p-2">{{ __('Save to') }}...</h6>
-                        <dropdown-item v-for="option in saveAsOptions" :key="option.url" @click="saveAs(option.url)">
-                            <div class="flex items-start ltr:pr-4 rtl:pl-4">
-                                <svg-icon
-                                    :name="option.icon"
-                                    class="w-4 shrink-0 text-gray group-hover:text-white ltr:mr-2 rtl:ml-2"
-                                />
-                                <span class="whitespace-normal">{{ option.label }}</span>
-                            </div>
-                        </dropdown-item>
-                    </dropdown-list>
-                </div>
-            </div>
+                        <ui-dropdown-menu>
+                            <ui-dropdown-label>{{ __('Save to') }}...</ui-dropdown-label>
+                            <ui-dropdown-item
+                                v-for="option in saveAsOptions"
+                                :key="option.url"
+                                :text="option.label"
+                                @click="saveAs(option.url)"
+                            />
+                        </ui-dropdown-menu>
+                    </ui-dropdown>
+                </ui-button-group>
+            </ui-header>
 
             <publish-tabs
                 @updated="setFieldValue"

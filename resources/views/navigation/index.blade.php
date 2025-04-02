@@ -7,34 +7,32 @@
 
 @section('content')
     @unless ($navs->isEmpty())
-        <header class="mb-6 flex items-center justify-between">
-            <h1>{{ __('Navigation') }}</h1>
-
+        <ui-header title="{{  __('Navigation') }}">
             @can('create', 'Statamic\Contracts\Structures\Nav')
-                <a href="{{ cp_route('navigation.create') }}" class="btn-primary">{{ __('Create Navigation') }}</a>
+                <ui-button
+                    href="{{ cp_route('navigation.create') }}"
+                    text="{{ __('Create Navigation') }}"
+                    variant="primary"
+                />
             @endcan
-        </header>
+        </ui-header>
 
-        <navigation-listing :initial-rows="{{ json_encode($navs) }}"></navigation-listing>
+        <navigation-listing
+            :initial-rows="{{ json_encode($navs) }}"
+        ></navigation-listing>
     @else
-        @include(
-            'statamic::partials.empty-state',
-            [
-                'title' => __('Navigation'),
-                'description' => __('statamic::messages.navigation_configure_intro'),
-                'svg' => 'empty/navigation',
-                'button_text' => __('Create Navigation'),
-                'button_url' => cp_route('navigation.create'),
-                'can' => $user->can('create', 'Statamic\Contracts\Structures\Nav'),
-            ]
-        )
+        <x-statamic::empty-screen
+            title="{{ __('Navigation') }}"
+            description="{{ __('statamic::messages.navigation_configure_intro') }}"
+            svg="empty/navigation"
+            button_text="{{ __('Create Navigation') }}"
+            button_url="{{ cp_route('navigation.create') }}"
+            can="{{ $user->can('create', 'Statamic\Contracts\Structures\Nav') }}"
+        />
     @endunless
 
-    @include(
-        'statamic::partials.docs-callout',
-        [
-            'topic' => __('Navigation'),
-            'url' => Statamic::docsUrl('navigation'),
-        ]
-    )
+    <x-statamic::docs-callout
+        topic="{{ __('Navigation') }}"
+        url="{{ Statamic::docsUrl('navigation') }}"
+    />
 @endsection

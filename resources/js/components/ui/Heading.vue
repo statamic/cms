@@ -14,7 +14,7 @@ const hasDefaultSlot = !!slots.default;
 const tag = computed(() => (props.level ? `h${props.level}` : 'div'));
 
 const classes = cva({
-    base: 'font-medium [&:has(+[data-ui-subheading])]:mb-2 antialiased not-prose',
+    base: 'font-medium [&:has(+[data-ui-subheading])]:mb-0.5 antialiased not-prose',
     variants: {
         size: {
             base: 'text-sm text-gray-600 dark:text-white',
@@ -27,7 +27,7 @@ const classes = cva({
 
 <template>
     <component :is="tag" :class="classes" data-ui-heading>
-        <ui-heading v-if="!hasDefaultSlot">{{ text }}</ui-heading>
+        <span v-if="!hasDefaultSlot">{{ text }}</span>
         <slot v-else />
     </component>
 </template>

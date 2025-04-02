@@ -7,7 +7,7 @@ const props = defineProps({
 });
 
 const classes = cva({
-    base: 'bg-white dark:bg-gray-850 rounded-xl border border-gray-200 dark:border-x-0 dark:border-b-0 dark:border-white/15 not-prose',
+    base: 'bg-white dark:bg-gray-850 rounded-xl border border-gray-200 dark:border-x-0 dark:border-b-0 dark:border-white/15',
     variants: {
         variant: {
             default: 'shadow-ui-s',

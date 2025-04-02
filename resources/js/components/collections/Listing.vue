@@ -1,6 +1,6 @@
 <template>
     <data-list ref="dataList" :columns="columns" :rows="items">
-        <ui-card-panel class="overflow-hidden">
+        <ui-card-panel>
             <data-list-table>
                 <template #cell-title="{ row: collection }">
                     <a :href="collection.available_in_selected_site ? collection.entries_url : collection.edit_url">{{

@@ -1,12 +1,13 @@
 <template>
     <div>
-        <header class="mb-6">
-            <breadcrumb :url="breadcrumbUrl" :title="__('Roles & Permissions')" />
-            <div class="flex items-center justify-between">
-                <h1 v-text="__(initialTitle) || __('Create Role')" />
-                <button type="submit" class="btn-primary" @click="save">{{ __('Save') }}</button>
-            </div>
-        </header>
+        <ui-header :title="__(initialTitle) || __('Create Role')">
+            <ui-button
+                type="submit"
+                variant="primary"
+                @click="save"
+                :text="__('Save')"
+            />
+        </ui-header>
 
         <div class="card configure-tab publish-fields mb-6 p-0 @container">
             <form-group
