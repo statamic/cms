@@ -1,77 +1,14 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, provide } from 'vue';
 import { cva } from 'cva';
-
-const events = ref([
-    { title: 'Miami, Florida', slug: 'miami-florida', date: '2025-03-16', author: 'Jack McDade' },
-    { title: 'Tampa, Florida', slug: 'tampa-fl', date: '2025-03-17', author: 'Jack McDade' },
-    { title: 'Orlando, Florida', slug: 'orlando-fl', date: '2025-03-18', author: 'Jack McDade' },
-    { title: 'Fort Lauderdale, Florida', slug: 'fort-lauderdale-fl', date: '2025-03-19', author: 'Jack McDade' },
-    { title: 'Miami, Florida', slug: 'miami-florida', date: '2025-03-16', author: 'Jack McDade' },
-    { title: 'Tampa, Florida', slug: 'tampa-fl', date: '2025-03-17', author: 'Jack McDade' },
-    { title: 'Orlando, Florida', slug: 'orlando-fl', date: '2025-03-18', author: 'Jack McDade' },
-    { title: 'Fort Lauderdale, Florida', slug: 'fort-lauderdale-fl', date: '2025-03-19', author: 'Jack McDade' },
-    { title: 'Miami, Florida', slug: 'miami-florida', date: '2025-03-16', author: 'Jack McDade' },
-    { title: 'Tampa, Florida', slug: 'tampa-fl', date: '2025-03-17', author: 'Jack McDade' },
-    { title: 'Orlando, Florida', slug: 'orlando-fl', date: '2025-03-18', author: 'Jack McDade' },
-    { title: 'Fort Lauderdale, Florida', slug: 'fort-lauderdale-fl', date: '2025-03-19', author: 'Jack McDade' },
-    { title: 'Miami, Florida', slug: 'miami-florida', date: '2025-03-16', author: 'Jack McDade' },
-    { title: 'Tampa, Florida', slug: 'tampa-fl', date: '2025-03-17', author: 'Jack McDade' },
-    { title: 'Orlando, Florida', slug: 'orlando-fl', date: '2025-03-18', author: 'Jack McDade' },
-    { title: 'Fort Lauderdale, Florida', slug: 'fort-lauderdale-fl', date: '2025-03-19', author: 'Jack McDade' },
-    { title: 'Miami, Florida', slug: 'miami-florida', date: '2025-03-16', author: 'Jack McDade' },
-    { title: 'Tampa, Florida', slug: 'tampa-fl', date: '2025-03-17', author: 'Jack McDade' },
-    { title: 'Orlando, Florida', slug: 'orlando-fl', date: '2025-03-18', author: 'Jack McDade' },
-    { title: 'Fort Lauderdale, Florida', slug: 'fort-lauderdale-fl', date: '2025-03-19', author: 'Jack McDade' },
-    { title: 'Miami, Florida', slug: 'miami-florida', date: '2025-03-16', author: 'Jack McDade' },
-    { title: 'Tampa, Florida', slug: 'tampa-fl', date: '2025-03-17', author: 'Jack McDade' },
-    { title: 'Orlando, Florida', slug: 'orlando-fl', date: '2025-03-18', author: 'Jack McDade' },
-    { title: 'Fort Lauderdale, Florida', slug: 'fort-lauderdale-fl', date: '2025-03-19', author: 'Jack McDade' },
-    { title: 'Miami, Florida', slug: 'miami-florida', date: '2025-03-16', author: 'Jack McDade' },
-    { title: 'Tampa, Florida', slug: 'tampa-fl', date: '2025-03-17', author: 'Jack McDade' },
-    { title: 'Orlando, Florida', slug: 'orlando-fl', date: '2025-03-18', author: 'Jack McDade' },
-    { title: 'Fort Lauderdale, Florida', slug: 'fort-lauderdale-fl', date: '2025-03-19', author: 'Jack McDade' },
-    { title: 'Miami, Florida', slug: 'miami-florida', date: '2025-03-16', author: 'Jack McDade' },
-    { title: 'Tampa, Florida', slug: 'tampa-fl', date: '2025-03-17', author: 'Jack McDade' },
-    { title: 'Orlando, Florida', slug: 'orlando-fl', date: '2025-03-18', author: 'Jack McDade' },
-    { title: 'Fort Lauderdale, Florida', slug: 'fort-lauderdale-fl', date: '2025-03-19', author: 'Jack McDade' },
-    { title: 'Miami, Florida', slug: 'miami-florida', date: '2025-03-16', author: 'Jack McDade' },
-    { title: 'Tampa, Florida', slug: 'tampa-fl', date: '2025-03-17', author: 'Jack McDade' },
-    { title: 'Orlando, Florida', slug: 'orlando-fl', date: '2025-03-18', author: 'Jack McDade' },
-    { title: 'Fort Lauderdale, Florida', slug: 'fort-lauderdale-fl', date: '2025-03-19', author: 'Jack McDade' },
-    { title: 'Miami, Florida', slug: 'miami-florida', date: '2025-03-16', author: 'Jack McDade' },
-    { title: 'Tampa, Florida', slug: 'tampa-fl', date: '2025-03-17', author: 'Jack McDade' },
-    { title: 'Orlando, Florida', slug: 'orlando-fl', date: '2025-03-18', author: 'Jack McDade' },
-    { title: 'Fort Lauderdale, Florida', slug: 'fort-lauderdale-fl', date: '2025-03-19', author: 'Jack McDade' },
-    { title: 'Miami, Florida', slug: 'miami-florida', date: '2025-03-16', author: 'Jack McDade' },
-    { title: 'Tampa, Florida', slug: 'tampa-fl', date: '2025-03-17', author: 'Jack McDade' },
-    { title: 'Orlando, Florida', slug: 'orlando-fl', date: '2025-03-18', author: 'Jack McDade' },
-    { title: 'Fort Lauderdale, Florida', slug: 'fort-lauderdale-fl', date: '2025-03-19', author: 'Jack McDade' },
-    { title: 'Miami, Florida', slug: 'miami-florida', date: '2025-03-16', author: 'Jack McDade' },
-    { title: 'Tampa, Florida', slug: 'tampa-fl', date: '2025-03-17', author: 'Jack McDade' },
-    { title: 'Orlando, Florida', slug: 'orlando-fl', date: '2025-03-18', author: 'Jack McDade' },
-    { title: 'Fort Lauderdale, Florida', slug: 'fort-lauderdale-fl', date: '2025-03-19', author: 'Jack McDade' },
-    { title: 'Miami, Florida', slug: 'miami-florida', date: '2025-03-16', author: 'Jack McDade' },
-    { title: 'Tampa, Florida', slug: 'tampa-fl', date: '2025-03-17', author: 'Jack McDade' },
-    { title: 'Orlando, Florida', slug: 'orlando-fl', date: '2025-03-18', author: 'Jack McDade' },
-    { title: 'Fort Lauderdale, Florida', slug: 'fort-lauderdale-fl', date: '2025-03-19', author: 'Jack McDade' },
-    { title: 'Miami, Florida', slug: 'miami-florida', date: '2025-03-16', author: 'Jack McDade' },
-    { title: 'Tampa, Florida', slug: 'tampa-fl', date: '2025-03-17', author: 'Jack McDade' },
-    { title: 'Orlando, Florida', slug: 'orlando-fl', date: '2025-03-18', author: 'Jack McDade' },
-    { title: 'Fort Lauderdale, Florida', slug: 'fort-lauderdale-fl', date: '2025-03-19', author: 'Jack McDade' },
-    { title: 'Miami, Florida', slug: 'miami-florida', date: '2025-03-16', author: 'Jack McDade' },
-    { title: 'Tampa, Florida', slug: 'tampa-fl', date: '2025-03-17', author: 'Jack McDade' },
-    { title: 'Orlando, Florida', slug: 'orlando-fl', date: '2025-03-18', author: 'Jack McDade' },
-    { title: 'Fort Lauderdale, Florida', slug: 'fort-lauderdale-fl', date: '2025-03-19', author: 'Jack McDade' },
-    { title: 'Miami, Florida', slug: 'miami-florida', date: '2025-03-16', author: 'Jack McDade' },
-    { title: 'Tampa, Florida', slug: 'tampa-fl', date: '2025-03-17', author: 'Jack McDade' },
-    { title: 'Orlando, Florida', slug: 'orlando-fl', date: '2025-03-18', author: 'Jack McDade' },
-    { title: 'Fort Lauderdale, Florida', slug: 'fort-lauderdale-fl', date: '2025-03-19', author: 'Jack McDade' },
-]);
+import DataTableColumns from './Columns.vue';
+import DataTableRows from './Rows.vue';
 
 const props = defineProps({
     variant: { type: String, default: 'normal' },
-});
+})
+
+provide('dataTableVariant', props.variant);
 
 const tableCellVariants = cva({
     base: 'border-t border-gray-200 dark:border-white/10',
@@ -87,26 +24,6 @@ const tableCellVariants = cva({
         },
     },
 });
-
-const headerCellClasses = cva({
-    base: 'text-sm font-medium text-gray-800 dark:text-gray-300',
-    variants: {
-        variant: {
-            normal: 'px-4 py-2',
-            compact: 'px-2 py-1.5',
-        },
-    },
-})({ ...props });
-
-const bodyCellClasses = cva({
-    base: '',
-    variants: {
-        variant: {
-            normal: 'px-4 py-3',
-            compact: 'px-2 py-1.5',
-        },
-    },
-})({ ...props });
 
 const titleClasses = cva({
     base: 'font-medium text-gray-800 dark:text-white',
@@ -125,49 +42,12 @@ const titleClasses = cva({
             data-ui-data-table
             class="w-full min-w-full table-fixed border-separate border-spacing-y-0 whitespace-nowrap text-gray-500 antialiased"
         >
-            <thead>
-                <tr>
-                    <th class="text-left" :class="headerCellClasses">Title</th>
-                    <th class="text-left" :class="headerCellClasses">Slug</th>
-                    <th class="text-left" :class="headerCellClasses">Date</th>
-                    <th class="text-left" :class="headerCellClasses">Author</th>
-                    <th class="w-14 text-right" :class="headerCellClasses"></th>
-                </tr>
-            </thead>
-            <tbody class="rounded-xl bg-white text-sm shadow-sm dark:bg-gray-900">
-                <tr v-for="(event, index) in events" :key="event.id">
-                    <td
-                        :class="[
-                            bodyCellClasses,
-                            tableCellVariants({
-                                position: index === 0 ? 'first' : index === events.length - 1 ? 'last' : 'left',
-                            }),
-                        ]"
-                    >
-                        <div :class="titleClasses">{{ event.title }}</div>
-                    </td>
-                    <td :class="[bodyCellClasses, tableCellVariants()]">{{ event.slug }}</td>
-                    <td :class="[bodyCellClasses, tableCellVariants()]">{{ event.date }}</td>
-                    <td :class="[bodyCellClasses, tableCellVariants()]">
-                        <div class="flex items-center gap-2">
-                            <img class="size-5 rounded-full" src="https://unavatar.io/jackmcdade" />
-                            {{ event.author }}
-                        </div>
-                    </td>
-                    <td
-                        class="text-right"
-                        :class="[
-                            bodyCellClasses,
-                            tableCellVariants({
-                                position:
-                                    index === 0 ? 'firstRight' : index === events.length - 1 ? 'lastRight' : 'right',
-                            }),
-                        ]"
-                    >
-                        <ui-button icon="dots" variant="ghost" size="xs" />
-                    </td>
-                </tr>
-            </tbody>
+            <DataTableColumns>
+                <slot name="columns" />
+            </DataTableColumns>
+            <DataTableRows>
+                <slot name="rows" />
+            </DataTableRows>
         </table>
     </ui-panel>
 </template>
