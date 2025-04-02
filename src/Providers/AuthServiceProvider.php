@@ -2,6 +2,7 @@
 
 namespace Statamic\Providers;
 
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -9,6 +10,8 @@ use Statamic\Auth\Passwords\PasswordBrokerManager;
 use Statamic\Auth\PermissionCache;
 use Statamic\Auth\Permissions;
 use Statamic\Auth\Protect\ProtectorManager;
+use Statamic\Auth\TwoFactor\Google2FA;
+use Statamic\Auth\TwoFactor\StatamicTwoFactorUser;
 use Statamic\Auth\UserProvider;
 use Statamic\Auth\UserRepositoryManager;
 use Statamic\Contracts\Auth\RoleRepository;
@@ -75,6 +78,16 @@ class AuthServiceProvider extends ServiceProvider
 
         $this->app->singleton(PermissionCache::class, function ($app) {
             return new PermissionCache;
+        });
+
+        $this->app->bind('statamicTwoFactorUser', function ($app) {
+            return new StatamicTwoFactorUser();
+        });
+
+        $this->app->alias(StatamicTwoFactorUser::class, 'statamicTwoFactorUser');
+
+        $this->app->singleton(Google2FA::class, function (Application $app) {
+            return new Google2FA();
         });
     }
 

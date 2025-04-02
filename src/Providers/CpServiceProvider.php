@@ -102,6 +102,7 @@ class CpServiceProvider extends ServiceProvider
             \Statamic\Http\Middleware\CP\BootUtilities::class,
             \Statamic\Http\Middleware\CP\CountUsers::class,
             \Statamic\Http\Middleware\CP\AddVaryHeaderToResponse::class,
+            \Statamic\Http\Middleware\CP\EnforceTwoFactor::class,
             \Statamic\Http\Middleware\DeleteTemporaryFileUploads::class,
         ]);
     }
