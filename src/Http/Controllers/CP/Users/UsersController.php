@@ -139,7 +139,7 @@ class UsersController extends CpController
         $expiry = config("auth.passwords.{$broker}.expire") / 60;
 
         $additional = $fields->all()
-            ->reject(fn ($field) => in_array($field->handle(), ['roles', 'groups', 'super']))
+            ->reject(fn ($field) => in_array($field->handle(), ['roles', 'groups', 'super', 'two_factor']))
             ->keys();
 
         $viewData = [
