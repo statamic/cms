@@ -287,7 +287,7 @@ export default {
                 }
             }
 
-            this.handleToasts(response._toasts ?? []);
+            this.handleToasts(response?._toasts ?? []);
 
             upload.errorMessage = msg;
             upload.errorStatus = status;
