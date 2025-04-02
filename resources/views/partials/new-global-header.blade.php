@@ -3,9 +3,9 @@
 @endphp
 
 <header class="h-14 bg-gray-800 flex justify-between space-x-2 items-center text-white px-4 dark fixed top-0 inset-x-0 z-[100]">
-    <div class="flex items-center gap-3 text-[0.8125rem] text-gray-300">
+    <div class="flex items-center gap-2 text-[0.8125rem] text-gray-300">
         <a href="/" class="flex items-center gap-2">
-            <ui-icon name="statamic-mark-lime" class="size-7" />
+            @cp_svg('icons/statamic-mark-lime', 'size-7')
             <a href="{{ route('statamic.cp.index') }}" class="text-gray-300">
                 {{ config('app.name') }}
             </a>
@@ -14,7 +14,7 @@
             @endif
         </a>
         <span class="text-gray-500">/</span>
-        <ui-dropdown>
+        <ui-dropdown v-cloak>
             <template #trigger>
                 <ui-button text="Collections" size="sm" variant="ghost" icon-append="chevron-vertical" class="[&_svg]:size-2" />
             </template>
@@ -27,7 +27,7 @@
             </ui-dropdown-menu>
         </ui-dropdown>
         <span class="text-gray-500">/</span>
-            <ui-dropdown>
+            <ui-dropdown v-cloak>
             <template #trigger>
                 <ui-button text="Events" size="sm" variant="ghost" icon-append="chevron-vertical" class="[&_svg]:size-2" />
             </template>
