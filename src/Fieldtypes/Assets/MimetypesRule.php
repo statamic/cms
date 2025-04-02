@@ -10,7 +10,9 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class MimetypesRule implements ValidationRule
 {
-    public function __construct(protected $parameters) {}
+    public function __construct(protected $parameters)
+    {
+    }
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {

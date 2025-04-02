@@ -12,7 +12,9 @@ class ImageRule implements ValidationRule
 {
     public $extensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'avif'];
 
-    public function __construct(protected $parameters) {}
+    public function __construct(protected $parameters)
+    {
+    }
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
