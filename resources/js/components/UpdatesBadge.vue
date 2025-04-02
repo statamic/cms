@@ -1,5 +1,5 @@
 <template>
-    <ui-badge v-if="count" :text="count" color="red" size="sm" variant="flat" />
+    <ui-badge v-if="count" :text="String(count)" color="red" size="sm" variant="flat" />
 </template>
 
 <script>
@@ -10,7 +10,7 @@ const requested = ref(false);
 export default {
     computed: {
         count() {
-            return count;
+            return count.value;
         },
     },
 
