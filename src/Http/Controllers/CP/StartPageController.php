@@ -10,7 +10,7 @@ class StartPageController extends CpController
     {
         session()->reflash();
 
-        $url = config('statamic.cp.route').'/'.urlencode(Preference::get('start_page', config('statamic.cp.start_page')));
+        $url = config('statamic.cp.route').'/'.Preference::get('start_page', config('statamic.cp.start_page'));
 
         return redirect($url);
     }
