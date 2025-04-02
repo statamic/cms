@@ -1,8 +1,8 @@
 <template>
     <div>
         <div>
-            <div class="font-semibold mb-2">{{ __('Reset two factor setup') }}</div>
-            <div class="text-xs text-gray-700 mb-4">
+            <div class="mb-2 font-semibold">{{ __('Reset two factor setup') }}</div>
+            <div class="mb-4 text-xs text-gray-700">
                 <p class="mb-1">{{ __('statamic::messages.two_factor_reset_' + languageUserEnforced + '_intro_1') }}</p>
                 <p class="mb-1">{{ __('statamic::messages.two_factor_reset_' + languageUserEnforced + '_intro_2') }}</p>
             </div>
@@ -21,9 +21,17 @@
             @confirm="action"
             @cancel="confirming = false"
         >
-            <p class="mb-2" v-html="__('statamic::messages.two_factor_reset_confirm_'+languageUserEnforced+'_1')"></p>
-            <p class="mb-2" v-html="__('statamic::messages.two_factor_reset_confirm_'+languageUserEnforced+'_2')"></p>
-            <p class="font-medium text-red-500">{{ __('statamic::messages.two_factor_reset_confirm_' + languageUserEnforced + '_3') }}</p>
+            <p
+                class="mb-2"
+                v-html="__('statamic::messages.two_factor_reset_confirm_' + languageUserEnforced + '_1')"
+            ></p>
+            <p
+                class="mb-2"
+                v-html="__('statamic::messages.two_factor_reset_confirm_' + languageUserEnforced + '_2')"
+            ></p>
+            <p class="font-medium text-red-500">
+                {{ __('statamic::messages.two_factor_reset_confirm_' + languageUserEnforced + '_3') }}
+            </p>
         </confirmation-modal>
     </div>
 </template>
@@ -33,20 +41,20 @@ export default {
     props: {
         enforced: {
             type: Boolean,
-            required: true
+            required: true,
         },
         languageUser: {
-            required: true
+            required: true,
         },
         route: {
-            required: true
-        }
+            required: true,
+        },
     },
 
     data() {
         return {
-            confirming: false
-        }
+            confirming: false,
+        };
     },
 
     computed: {
@@ -56,7 +64,7 @@ export default {
 
         timerId() {
             return 'statamic-two-factor-reset-' + this._uid;
-        }
+        },
     },
 
     methods: {
@@ -69,12 +77,12 @@ export default {
                 headers: {
                     'X-CSRF-TOKEN': Statamic.$config.get('csrfToken'),
                     'X-Requested-With': 'XMLHttpRequest',
-                }
+                },
             })
-                .then(res => res.json())
+                .then((res) => res.json())
                 .then((data) => {
                     // notify
-                    this.$toast.success(__('Successfully reset two factor status.'))
+                    this.$toast.success(__('Successfully reset two factor status.'));
 
                     // emit the update
                     this.$emit('update', 'setup', false);
@@ -93,7 +101,7 @@ export default {
                     this.$progress.complete(this.timerId);
                     this.confirming = false;
                 });
-        }
-    }
+        },
+    },
 };
 </script>

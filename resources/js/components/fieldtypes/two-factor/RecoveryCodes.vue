@@ -1,27 +1,30 @@
 <template>
     <div>
         <div class="mb-8">
-            <div class="font-semibold mb-2">{{ __('Recovery codes') }}</div>
+            <div class="mb-2 font-semibold">{{ __('Recovery codes') }}</div>
 
-            <div class="text-xs text-gray-700 mb-4">
+            <div class="mb-4 text-xs text-gray-700">
                 <p class="mb-1">{{ __('statamic::messages.two_factor_recovery_codes_introduction') }}</p>
             </div>
 
-            <div class="sm:flex -mt-2">
-                <button :disabled="codes" class="btn mt-2 mr-2" @click.prevent="show">{{ __('Show recovery codes') }}</button>
-                <button class="btn mt-2" @click.prevent="confirming = true">{{ __('Create new recovery codes') }}</button>
+            <div class="-mt-2 sm:flex">
+                <button :disabled="codes" class="btn mr-2 mt-2" @click.prevent="show">
+                    {{ __('Show recovery codes') }}
+                </button>
+                <button class="btn mt-2" @click.prevent="confirming = true">
+                    {{ __('Create new recovery codes') }}
+                </button>
             </div>
 
-            <div v-if="codes" class="bg-gray-200 dark:bg-dark-650 inline-block rounded-lg px-4 py-4 mt-6">
-                <div class="px-2 text-sm font-medium mb-2">
+            <div v-if="codes" class="mt-6 inline-block rounded-lg bg-gray-200 px-4 py-4 dark:bg-dark-650">
+                <div class="mb-2 px-2 text-sm font-medium">
                     <span v-if="newCodes">{{ __('Your new recovery codes') }}:</span>
                     <span v-else>{{ __('Your recovery codes') }}:</span>
                 </div>
-                <div class="font-mono flex flex-wrap text-gray-700">
+                <div class="flex flex-wrap font-mono text-gray-700">
                     <div v-for="(code, index) in codes" :key="code" class="px-2">{{ code }}</div>
                 </div>
-                <div v-if="newCodes"
-                     class="text-sm mt-2 px-2 text-red-500">
+                <div v-if="newCodes" class="mt-2 px-2 text-sm text-red-500">
                     {{ __('statamic::messages.two_factor_recovery_codes_footnote') }}
                 </div>
             </div>
@@ -45,22 +48,22 @@ export default {
     props: {
         routes: {
             type: Object,
-            required: true
-        }
+            required: true,
+        },
     },
 
     data() {
         return {
             codes: null,
             confirming: false,
-            newCodes: false
-        }
+            newCodes: false,
+        };
     },
 
     computed: {
         timerId() {
             return 'statamic-two-factor-recovery-codes-' + this._uid;
-        }
+        },
     },
 
     methods: {
@@ -84,9 +87,9 @@ export default {
                 headers: {
                     'X-CSRF-TOKEN': Statamic.$config.get('csrfToken'),
                     'X-Requested-With': 'XMLHttpRequest',
-                }
+                },
             })
-                .then(res => res.json())
+                .then((res) => res.json())
                 .then((data) => {
                     // update codes
                     this.codes = data.recovery_codes;
@@ -121,12 +124,12 @@ export default {
                 method: 'GET',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
-                }
+                },
             })
-                .then(res => res.json())
+                .then((res) => res.json())
                 .then((data) => {
                     // update codes
-                    this.codes = data.recovery_codes
+                    this.codes = data.recovery_codes;
                 })
                 .catch((error) => {
                     // a js error took place
@@ -137,7 +140,7 @@ export default {
                     this.$progress.complete(this.timerId);
                     this.confirming = false;
                 });
-        }
-    }
+        },
+    },
 };
 </script>

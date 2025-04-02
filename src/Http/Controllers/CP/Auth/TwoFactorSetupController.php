@@ -7,9 +7,9 @@ use Illuminate\Support\Arr;
 use Statamic\Auth\TwoFactor\CompleteTwoFactorAuthenticationSetup;
 use Statamic\Auth\TwoFactor\ConfirmTwoFactorAuthentication;
 use Statamic\Auth\TwoFactor\EnableTwoFactorAuthentication;
+use Statamic\Auth\TwoFactor\Google2FA;
 use Statamic\Facades\CP\Toast;
 use Statamic\Facades\User;
-use Statamic\Auth\TwoFactor\Google2FA;
 
 class TwoFactorSetupController
 {

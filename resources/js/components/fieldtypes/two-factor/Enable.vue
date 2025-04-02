@@ -1,9 +1,9 @@
 <template>
     <div>
         <div class="mb-8">
-            <div class="font-semibold mb-2">{{ __('Enable two factor authentication') }}</div>
+            <div class="mb-2 font-semibold">{{ __('Enable two factor authentication') }}</div>
 
-            <div class="text-xs text-gray-700 mb-4">
+            <div class="mb-4 text-xs text-gray-700">
                 <p class="mb-1">{{ __('statamic::messages.two_factor_enable_introduction') }}</p>
             </div>
 
@@ -19,8 +19,8 @@ export default {
     props: {
         route: {
             type: String,
-            required: true
-        }
+            required: true,
+        },
     },
 };
 </script>

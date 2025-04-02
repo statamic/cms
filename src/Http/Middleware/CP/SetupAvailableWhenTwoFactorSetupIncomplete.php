@@ -2,11 +2,11 @@
 
 namespace Statamic\Http\Middleware\CP;
 
+use Closure;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
-use Closure;
 
 class SetupAvailableWhenTwoFactorSetupIncomplete
 {

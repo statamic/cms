@@ -7,31 +7,27 @@
         </template>
 
         <template v-else-if="meta.is_me && !setup">
-            <two-factor-enable :route="meta.routes.setup"/>
+            <two-factor-enable :route="meta.routes.setup" />
         </template>
 
         <template v-else-if="!meta.is_me && !setup">
             <div class="text-sm">
-                <p class="font-medium mb-2">{{ __('statamic::messages.two_factor_not_setup_1') }}</p>
+                <p class="mb-2 font-medium">{{ __('statamic::messages.two_factor_not_setup_1') }}</p>
                 <p>{{ __('statamic::messages.two_factor_not_setup_2') }}</p>
             </div>
         </template>
 
         <template v-else>
-            <two-factor-locked
-                v-if="locked"
-                :route="meta.routes.locked"
-                @update="updateState"/>
+            <two-factor-locked v-if="locked" :route="meta.routes.locked" @update="updateState" />
 
-            <two-factor-recovery-codes
-                v-if="meta.is_me"
-                :routes="meta.routes.recovery_codes"/>
+            <two-factor-recovery-codes v-if="meta.is_me" :routes="meta.routes.recovery_codes" />
 
             <two-factor-reset
                 :route="meta.routes.reset"
                 :enforced="meta.is_enforced"
                 :language-user="languageUser"
-                @update="updateState"/>
+                @update="updateState"
+            />
         </template>
     </div>
 </template>
@@ -50,14 +46,14 @@ export default {
         TwoFactorEnable,
         TwoFactorLocked,
         TwoFactorRecoveryCodes,
-        TwoFactorReset
+        TwoFactorReset,
     },
 
     data() {
         return {
             locked: false,
-            setup: false
-        }
+            setup: false,
+        };
     },
 
     mounted() {
@@ -68,14 +64,14 @@ export default {
     computed: {
         languageUser() {
             return (this.meta.is_me ? 'me' : 'user') + (this.meta.is_enforced ? '_enforced' : '');
-        }
+        },
     },
 
     methods: {
         updateState(field, status) {
             // update the status
             this.$data[field] = status;
-        }
+        },
     },
 };
 </script>

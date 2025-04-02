@@ -195,7 +195,6 @@ return [
     'two_factor_code_challenge_failed' => 'The provided two factor authentication code was invalid.',
     'two_factor_recovery_code_challenge_failed' => 'The provided two factor authentication code was invalid.',
 
-
     /*
     |--------------------------------------------------------------------------
     | Custom Validation Language Lines

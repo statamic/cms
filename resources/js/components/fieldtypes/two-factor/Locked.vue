@@ -1,15 +1,14 @@
 <template>
     <div>
         <div class="mb-8">
-            <div class="font-semibold mb-2">{{ __('Your account has been locked') }}</div>
+            <div class="mb-2 font-semibold">{{ __('Your account has been locked') }}</div>
 
-            <div class="text-xs text-gray-700 mb-4">
+            <div class="mb-4 text-xs text-gray-700">
                 <p class="mb-1">{{ __('You need to speak to your administrator to unlock your account.') }}</p>
             </div>
 
             <div class="flex space-x-2">
-                <button @click.prevent="confirming = true"
-                        class="btn">{{ __('Unlock account') }}</button>
+                <button @click.prevent="confirming = true" class="btn">{{ __('Unlock account') }}</button>
             </div>
         </div>
 
@@ -32,20 +31,20 @@ export default {
     props: {
         route: {
             type: String,
-            required: true
-        }
+            required: true,
+        },
     },
 
     data() {
         return {
-            confirming: false
-        }
+            confirming: false,
+        };
     },
 
     computed: {
         timerId() {
             return 'statamic-two-factor-locked-' + this._uid;
-        }
+        },
     },
 
     methods: {
@@ -61,10 +60,10 @@ export default {
                 },
                 //body: new FormData(this.form)
             })
-                .then(res => res.json())
+                .then((res) => res.json())
                 .then((data) => {
                     // notify
-                    this.$toast.success(__('Account has been unlocked.'))
+                    this.$toast.success(__('Account has been unlocked.'));
 
                     // emit the update
                     this.$emit('update', 'locked', false);
@@ -78,7 +77,7 @@ export default {
                     this.$progress.complete(this.timerId);
                     this.confirming = false;
                 });
-        }
-    }
+        },
+    },
 };
 </script>

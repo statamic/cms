@@ -29,7 +29,7 @@ trait GetsReferrerUrl
             'statamic.cp.two-factor.complete',
             'statamic.cp.two-factor.challenge',
             'statamic.cp.two-factor.challenge.attempt',
-//            'statamic.cp.users.two-factor.enable',
+            //            'statamic.cp.users.two-factor.enable',
             'statamic.cp.users.two-factor.recovery-codes.show',
             'statamic.cp.users.two-factor.recovery-codes.generate',
             'statamic.cp.users.two-factor.unlock',
