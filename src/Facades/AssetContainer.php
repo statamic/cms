@@ -12,7 +12,7 @@ use Statamic\Contracts\Assets\AssetContainerRepository;
  * @method static \Statamic\Contracts\Assets\AssetContainer findOrFail($id)
  * @method static \Statamic\Contracts\Assets\AssetContainer make(string $handle = null)
  *
- * @see \Statamic\Assets\AssetRepository
+ * @see \Statamic\Assets\AssetContainerRepository
  */
 class AssetContainer extends Facade
 {
