@@ -10,6 +10,7 @@ use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Statamic\Structures\CollectionStructure;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -498,6 +499,34 @@ class DuplicateEntryTest extends TestCase
             ['slug' => 'alfa-1', 'published' => false, 'data' => ['title' => 'Alfa (Duplicated)', 'duplicated_from' => 'alfa-id'], 'locale' => 'en', 'origin' => null],
             ['slug' => 'alfa-fr-1', 'published' => false, 'data' => ['title' => 'Alfa (French) (Duplicated)', 'duplicated_from' => 'alfa-id-fr'], 'locale' => 'fr', 'origin' => 'en.alfa-1'],
         ], $this->entryData());
+    }
+
+    #[Test]
+    public function it_adds_duplicated_entry_to_tree()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://domain.com/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://domain.com/fr/', 'locale' => 'fr'],
+        ]);
+
+        $structure = new CollectionStructure;
+        Collection::make('test')->sites(['en', 'fr'])->structure($structure)->save();
+
+        $entry = EntryFactory::id('alfa-id')->collection('test')->slug('alfa')->data(['title' => 'Alfa'])->create();
+        $entry->makeLocalization('fr')->id('alfa-id-fr')->slug('alfa-fr')->data(['title' => 'Alfa (French)'])->save();
+
+        // Make super user since this test isn't concerned with permissions.
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        (new DuplicateEntry)->run(collect([
+            Entry::find('alfa-id-fr'),
+            Entry::find('alfa-id'),
+        ]), []);
+
+        Entry::all()->each(function ($entry) use ($structure) {
+            $tree = $structure->in($entry->site());
+            $this->assertEquals($entry, $tree->withEntries()->entry($entry->id()));
+        });
     }
 
     private function entryData()
