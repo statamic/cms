@@ -15,6 +15,7 @@ const props = defineProps({
     iconPrepend: { type: String, default: null },
     id: { type: String, default: () => useId() },
     label: { type: String, default: null },
+    limit: { type: Number, default: null },
     required: { type: Boolean, default: false },
     modelValue: { type: [String, Number], default: null },
     size: { type: String, default: 'base' },
@@ -41,6 +42,9 @@ const inputClasses = computed(() => {
                 sm: 'text-sm rounded-md px-2.5 py-1.5 h-8 leading-[1.125rem]',
                 xs: 'text-xs rounded-xs px-2 py-1.5 h-6 leading-[1.125rem]',
             },
+            hasLimit: {
+                true: 'pe-9',
+            },
         },
         compoundVariants: [
             { hasPrependedIcon: true, size: 'base', class: 'ps-10' },
@@ -54,6 +58,7 @@ const inputClasses = computed(() => {
         ...props,
         hasPrependedIcon: hasPrependedIcon,
         hasAppendedIcon: hasAppendedIcon,
+        hasLimit: !!props.limit,
     });
 
     return twMerge(classes);
@@ -140,6 +145,9 @@ const copy = () => {
                     />
                     <ui-icon v-else :name="iconAppend" />
                 </slot>
+            </div>
+            <div v-if="limit" class="absolute right-2 inset-y-0 flex items-center">
+                <ui-character-counter :text="modelValue" :limit />
             </div>
         </div>
     </ui-with-field>
