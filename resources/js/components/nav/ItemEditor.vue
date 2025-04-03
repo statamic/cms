@@ -43,7 +43,7 @@
                                     :initial-value="config.icon"
                                     v-slot="{ meta, value, loading, config }"
                                 >
-                                    <icon-fieldtype v-if="!loading" handle="icon" :config="config" :meta="meta" :value="value" @input="config.icon = $event" />
+                                    <icon-fieldtype v-if="!loading" handle="icon" :config="config" :meta="meta" :value="value" @input="iconUpdated" />
                                 </publish-field-meta>
                             </div>
                         </div>
@@ -132,6 +132,10 @@ export default {
             }
 
             this.$emit('updated', this.config, this.item);
+        },
+
+        iconUpdated(icon) {
+            this.config.icon = icon;
         },
 
     },
