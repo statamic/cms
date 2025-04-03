@@ -101,11 +101,18 @@ class DuplicateEntry extends Action
                 $this->duplicateEntry($descendant, origin: $entry->id());
             });
 
-        if ($originalParent && $originalParent !== $original->id()) {
-            $entry->structure()
-                ->in($original->locale())
-                ->appendTo($originalParent->id(), $entry)
-                ->save();
+        if ($entry->structure()) {
+            if ($originalParent && $originalParent !== $original->id()) {
+                $entry->structure()
+                    ->in($original->locale())
+                    ->appendTo($originalParent->id(), $entry)
+                    ->save();
+            } else {
+                $entry->structure()
+                    ->in($original->locale())
+                    ->append($entry)
+                    ->save();
+            }
         }
 
         return $entry;
@@ -124,10 +131,6 @@ class DuplicateEntry extends Action
             ->parent();
 
         if (! $parentEntry) {
-            return null;
-        }
-
-        if ($entry->structure()->expectsRoot() && $entry->structure()->in($entry->locale())->root()['entry'] === $parentEntry->id()) {
             return null;
         }
 
