@@ -1,0 +1,38 @@
+<script setup>
+import { useSlots } from 'vue';
+
+defineProps({
+    href: { type: String, default: null },
+    icon: { type: String, default: null },
+    text: { type: String, default: null },
+    badge: { type: String, default: null },
+});
+
+const slots = useSlots();
+const hasDefaultSlot = !!slots.default;
+</script>
+
+<template>
+    <div
+        :class="[
+            'flex items-center gap-2',
+            'rounded-lg px-2 py-1.5 text-sm antialiased',
+            'text-gray-700 dark:text-gray-300',
+            'not-data-disabled:cursor-pointer data-disabled:opacity-50',
+            'hover:not-data-disabled:bg-gray-50 dark:hover:not-data-disabled:bg-gray-900',
+            'outline-hidden focus-visible:bg-gray-100 dark:focus-visible:bg-gray-900',
+        ]"
+        data-ui-command-palette-item
+        :as="href ? 'a' : 'div'"
+        :href="href"
+    >
+        <div v-if="icon" class="flex size-6 items-center justify-center p-1 text-gray-500">
+            <ui-icon :name="icon" class="size-4" />
+        </div>
+        <div class="flex-1">
+            <slot v-if="hasDefaultSlot" />
+            <template v-else>{{ text }}</template>
+        </div>
+        <ui-badge v-if="badge" :text="badge" variant="flat" />
+    </div>
+</template>
