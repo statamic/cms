@@ -15,9 +15,8 @@
                 <ul class="flex flex-col gap-2">
                     @foreach ($section['items'] as $item)
                         @unless ($item->view())
-                            <li class="{{ $item->isActive() ? 'text-black [&_svg]:text-black! [&_a]:dark:text-white [&_svg]:dark:text-gray-200!' : '' }}" v-pre>
-                                <a
-                                    class="
+                            <li v-pre>
+                                <a class="
                                         flex items-center gap-3 hover:text-black dark:hover:text-gray-200 hover:[&_svg]:text-gray-700 dark:hover:[&_svg]:text-gray-200
                                         {{ $item->isActive() ? 'text-black [&_svg]:text-black dark:text-white [&_svg]:dark:text-gray-200' : 'text-gray-600 dark:text-gray-400' }}
                                     "
@@ -30,7 +29,7 @@
                                 @if ($item->children() && $item->isActive())
                                     <ul class="
                                         ml-1.5 pl-5.5 translate-x-px my-1.5 space-y-1 text-[13px]
-                                        min-w-0 flex-col gap-1 border-l border-gray-300
+                                        min-w-0 flex-col gap-1 border-l border-gray-300 dark:border-gray-600
                                     ">
                                         @foreach ($item->children() as $child)
                                             <li>
