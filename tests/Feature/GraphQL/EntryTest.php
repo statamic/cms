@@ -757,7 +757,6 @@ GQL;
             ]]]);
     }
 
-
     #[Test]
     public function it_only_shows_unpublished_entries_with_token()
     {
