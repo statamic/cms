@@ -69,7 +69,7 @@ class EntryQuery extends Query
             $query->where('site', $site);
         }
 
-        $filters = $args['filter'] ?? null;
+        $filters = $args['filter'] ?? [];
 
         $this->filterQuery($query, $filters);
 
