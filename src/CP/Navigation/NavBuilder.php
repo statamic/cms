@@ -1080,10 +1080,8 @@ class NavBuilder
 
     /**
      * Add built items to command palette.
-     *
-     * @return $this
      */
-    protected function addToCommandPalette()
+    protected function addToCommandPalette(): self
     {
         if (! $this->withCommandPalette) {
             return $this;
@@ -1092,14 +1090,28 @@ class NavBuilder
         $this->built
             ->flatMap(fn ($section) => $section['items'])
             ->filter(fn ($item) => $item->url())
-            ->each(fn ($item) => CommandPalette::addCommand(
-                (new Link(
-                    text: __($item->section()).' > '.__($item->display()),
-                    category: Category::Navigation,
-                ))->url($item->url())
-            ));
+            ->each(fn ($item) => CommandPalette::addCommand(static::transformToLink($item)));
 
         return $this;
+    }
+
+    /**
+     * Add built items to command palette.
+     */
+    protected static function transformToLink(NavItem $item): Link
+    {
+        $text = $item->section() !== 'Top Level'
+            ? __($item->section()).' > '.__($item->display())
+            : __($item->display());
+
+        $link = new Link(
+            text: $text,
+            category: Category::Navigation,
+        );
+
+        $link->url($item->url());
+
+        return $link;
     }
 
     /**
