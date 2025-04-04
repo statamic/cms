@@ -9,7 +9,7 @@ const props = defineProps({
 
 const modalClasses = cva({
     base: [
-        'fixed outline-hidden left-1/2 top-[100px] z-50 w-full max-w-2xl -translate-x-1/2 ',
+        'fixed outline-hidden left-1/2 top-[100px] z-50 w-full max-w-3xl -translate-x-1/2 ',
         'backdrop-blur-[2px] rounded-2xl',
         'shadow-[0_8px_5px_-6px_rgba(0,0,0,0.12),_0_3px_8px_0_rgba(0,0,0,0.02),_0_30px_22px_-22px_rgba(39,39,42,0.35)]',
         'dark:shadow-[0_5px_20px_rgba(0,0,0,.5)]',
@@ -45,29 +45,31 @@ const modalClasses = cva({
                     <DialogDescription>{{ __('Search for content, navigate, and run actions.') }}</DialogDescription>
                 </VisuallyHidden>
                 <motion.div
-                    class="relative rounded-xl bg-white divide-y divide-gray-200/80 dark:divide-gray-950 shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:bg-gray-800 dark:shadow-[0_10px_15px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/15"
+                    class="relative rounded-xl bg-white border-b border-gray-200/80 dark:border-gray-950 shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:bg-gray-800 dark:shadow-[0_10px_15px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/15"
                     :initial="{ scale: 1.0 }"
                     :whilePress="{ scale: 0.985 }"
                     :transition="{ duration: 0.1 }"
                 >
-                    <header class="group/cmd-input flex items-center gap-2 h-14 px-5.5">
+                    <header class="group/cmd-input flex items-center gap-2 h-14 px-5.5 border-b border-gray-200/80 dark:border-gray-950">
                         <ui-icon name="magnifying-glass" class="size-5 text-gray-400" />
                         <input type="text" placeholder="Search or jump to..." class="flex w-full bg-transparent py-4 text-lg outline-none placeholder:text-gray-500! antialiased" value="">
                     </header>
-                    <section class="px-3 py-2 space-y-1">
-                        <ui-subheading size="sm" class="py-1 px-3">{{ __('Actions') }}</ui-subheading>
-                        <ui-command-palette-item icon="save" text="Save Entry" badge="⌘ S" />
-                        <ui-command-palette-item icon="duplicate" text="Duplicate Entry" badge="⌘ D" />
-                        <ui-command-palette-item icon="delete" text="Delete Entry" badge="⌘ DEL" />
-                    </section>
-                    <section class="px-3 py-2 space-y-1">
-                        <ui-subheading size="sm" class="py-1 px-3">{{ __('Content results') }}</ui-subheading>
-                        <ui-command-palette-item icon="entry" text="How I Found My Pants" badge="Articles" />
-                        <ui-command-palette-item icon="entry" text="About My Spaghetti" badge="Pages" />
-                        <ui-command-palette-item icon="entry" text="My Secret Sauce Recipe" badge="Recipes" />
-                        <ui-command-palette-item icon="entry" text="Me Myself and I" badge="Articles" />
-                    </section>
-                    <footer class="bg-gray-50 rounded-b-xl px-5 py-3 flex items-center gap-4">
+                    <div class="divide-y divide-gray-200/80 dark:divide-gray-950 max-h-[400px] overflow-y-auto">
+                        <section class="px-3 py-2 space-y-1">
+                            <ui-subheading size="sm" class="py-1 px-3">{{ __('Actions') }}</ui-subheading>
+                            <ui-command-palette-item icon="save" text="Save Entry" badge="⌘ S" />
+                            <ui-command-palette-item icon="duplicate" text="Duplicate Entry" badge="⌘ D" />
+                            <ui-command-palette-item icon="delete" text="Delete Entry" badge="⌘ DEL" />
+                        </section>
+                        <section class="px-3 py-2 space-y-1">
+                            <ui-subheading size="sm" class="py-1 px-3">{{ __('Content results') }}</ui-subheading>
+                            <ui-command-palette-item icon="entry" text="How I Found My Pants" badge="Articles" />
+                            <ui-command-palette-item icon="entry" text="About My Spaghetti" badge="Pages" />
+                            <ui-command-palette-item icon="entry" text="My Secret Sauce Recipe" badge="Recipes" />
+                            <ui-command-palette-item icon="entry" text="Me Myself and I" badge="Articles" />
+                        </section>
+                    </div>
+                    <footer class="bg-gray-50 rounded-b-xl px-5 py-3 flex items-center gap-4 border-t border-gray-200/80 dark:border-gray-950">
                         <div class="flex items-center gap-1.5">
                             <ui-icon name="up-square" class="size-4 text-gray-500" />
                             <ui-icon name="down-square" class="size-4 text-gray-500" />
