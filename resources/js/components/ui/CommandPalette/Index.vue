@@ -69,7 +69,7 @@ const modalClasses = cva({
                             <ui-command-palette-item icon="entry" text="Me Myself and I" badge="Articles" />
                         </section>
                     </div>
-                    <footer class="bg-gray-50 rounded-b-xl px-5 py-3 flex items-center gap-4 border-t border-gray-200/80 dark:border-gray-950">
+                    <footer class="bg-gray-50 dark:bg-gray-900 rounded-b-xl px-6 py-3 flex items-center gap-4 border-t border-gray-200/80 dark:border-gray-950">
                         <div class="flex items-center gap-1.5">
                             <ui-icon name="up-square" class="size-4 text-gray-500" />
                             <ui-icon name="down-square" class="size-4 text-gray-500" />
