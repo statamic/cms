@@ -78,9 +78,9 @@ const calendarEvents = computed(() => ({
                 <DatePickerField v-slot="{ segments }" class="w-full">
                     <div
                         :class="[
-                            'flex w-full bg-white dark:bg-gray-900',
+                            'flex items-center uppercase w-full bg-white dark:bg-gray-900',
                             'border border-gray-300 dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:inset-shadow-2xs dark:inset-shadow-black',
-                            'leading-[1.375rem] text-gray-600 dark:text-gray-300',
+                            'text-gray-600 dark:text-gray-300',
                             'shadow-ui-sm not-prose h-10 rounded-lg py-2 px-10 disabled:shadow-none',
                             'data-invalid:border-red-500',
                         ]"
@@ -92,7 +92,7 @@ const calendarEvents = computed(() => ({
                             <ui-icon name="calendar" class="size-4" />
                         </DatePickerTrigger>
                         <template v-for="item in segments" :key="item.part">
-                            <DatePickerInput v-if="item.part === 'literal'" :part="item.part">
+                            <DatePickerInput v-if="item.part === 'literal'" :part="item.part" :class="{ 'text-gray-500 antialiased text-sm': !item.contenteditable }">
                                 {{ item.value }}
                             </DatePickerInput>
                             <DatePickerInput
