@@ -1,3 +1,39 @@
+<script setup>
+import { ref, computed } from 'vue';
+import fuzzysort from 'fuzzysort';
+import { groupBy, sortBy } from 'lodash-es';
+
+const props = defineProps({
+    initialData: { type: Object },
+});
+
+let open = ref(true);
+let query = ref('');
+
+const results = computed(() => {
+    let data = sortBy(props.initialData, ['category', 'text']);
+
+    let results = fuzzysort
+        .go(query.value, data, {
+            all: true,
+            key: 'text',
+        })
+        .map(result => {
+            return {
+                score: result._score,
+                html: result.highlight('<span class="text-red-500">', '</span>'),
+                ...result.obj,
+            }
+        });
+
+    results = groupBy(results, 'category');
+
+    // TODO: Sort by [category, score]
+
+    return results;
+})
+</script>
+
 <template>
     <modal v-if="open" name="command-palette" :width="580" @closed="open = false" click-to-close>
         <input
@@ -13,46 +49,3 @@
         </div>
     </modal>
 </template>
-
-<script>
-import fuzzysort from 'fuzzysort';
-import { groupBy, sortBy } from 'lodash-es';
-
-export default {
-
-    props: [
-        'initialData',
-    ],
-
-    data() {
-        return {
-            data: this.initialData,
-            open: true,
-            query: '',
-        };
-    },
-
-    computed: {
-        results() {
-            let data = sortBy(this.data, 'category');
-
-            let results = fuzzysort
-                .go(this.query, data, {
-                    all: true,
-                    key: 'text',
-                })
-                .map(result => {
-                    return {
-                        html: result.highlight('<span class="text-red-500">', '</span>'),
-                        ...result.obj,
-                    }
-                });
-
-            results = groupBy(results, 'category');
-
-            return results;
-        },
-    },
-
-};
-</script>
