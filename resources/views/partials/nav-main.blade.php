@@ -15,9 +15,12 @@
                 <ul class="flex flex-col gap-2">
                     @foreach ($section['items'] as $item)
                         @unless ($item->view())
-                            <li class="{{ $item->isActive() ? '[&_a]:text-black [&_svg]:text-black! [&_a]:dark:text-white [&_svg]:dark:text-gray-200!' : '' }}" v-pre>
+                            <li class="{{ $item->isActive() ? 'text-black [&_svg]:text-black! [&_a]:dark:text-white [&_svg]:dark:text-gray-200!' : '' }}" v-pre>
                                 <a
-                                    class="flex items-center gap-3 text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-gray-200 hover:[&_svg]:text-gray-700 dark:hover:[&_svg]:text-gray-200"
+                                    class="
+                                        flex items-center gap-3 hover:text-black dark:hover:text-gray-200 hover:[&_svg]:text-gray-700 dark:hover:[&_svg]:text-gray-200
+                                        {{ $item->isActive() ? 'text-black [&_svg]:text-black dark:text-white [&_svg]:dark:text-gray-200' : 'text-gray-600 dark:text-gray-400' }}
+                                    "
                                     href="{{ $item->url() }}"
                                     {{ $item->attributes() }}
                                 >
@@ -25,10 +28,17 @@
                                     <span>{{ __($item->name()) }}</span>
                                 </a>
                                 @if ($item->children() && $item->isActive())
-                                    <ul class="pl-7 py-1.5 space-y-1 text-[13px] [&_a]:text-gray-600 [&_a]:dark:text-gray-400!">
+                                    <ul class="
+                                        ml-1.5 pl-5.5 translate-x-px my-1.5 space-y-1 text-[13px]
+                                        min-w-0 flex-col gap-1 border-l border-gray-300
+                                    ">
                                         @foreach ($item->children() as $child)
-                                            <li class="{{ $child->isActive() ? '[&_a]:text-black! [&_svg]:text-black! [&_a]:dark:text-white! [&_svg]:dark:text-gray-200!' : '' }}">
-                                                <a href="{{ $child->url() }}" {{ $item->attributes() }}>
+                                            <li>
+                                                <a
+                                                    class="{{ $child->isActive() ? 'text-black [&_svg]:text-black dark:text-white [&_svg]:dark:text-gray-200' : 'text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-gray-200' }}"
+                                                    href="{{ $child->url() }}"
+                                                    {{ $item->attributes() }}
+                                                >
                                                     {{ __($child->name()) }}
                                                 </a>
                                             </li>
