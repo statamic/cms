@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Statamic\Auth\ThrottlesLogins;
 use Statamic\Facades\OAuth;
+use Statamic\Facades\TwoFactorUser;
+use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Middleware\CP\RedirectIfAuthorized;
 use Statamic\Support\Str;
@@ -110,6 +112,13 @@ class LoginController extends CpController
 
     protected function authenticated(Request $request, $user)
     {
+        if (config('statamic.users.two_factor.enabled', false)) {
+            // if the user has been locked, show the locked view
+            if (User::current()->two_factor_locked) {
+                return redirect(cp_route('two-factor.locked'));
+            }
+        }
+
         return $request->expectsJson()
             ? response('Authenticated')
             : redirect()->intended($this->redirectPath());
@@ -127,6 +136,9 @@ class LoginController extends CpController
 
     public function logout(Request $request)
     {
+        // remove the last challenged
+        TwoFactorUser::clearLastChallenged();
+
         $this->guard()->logout();
 
         $request->session()->invalidate();
