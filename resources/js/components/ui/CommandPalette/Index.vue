@@ -1,6 +1,7 @@
 <script setup>
 import { cva } from 'cva';
 import { DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle, DialogTrigger, DialogDescription, VisuallyHidden } from 'reka-ui';
+import { motion } from "motion-v"
 
 const props = defineProps({
 
@@ -43,7 +44,12 @@ const modalClasses = cva({
                 <VisuallyHidden asChild>
                     <DialogDescription>{{ __('Search for content, navigate, and run actions.') }}</DialogDescription>
                 </VisuallyHidden>
-                <div class="relative rounded-xl bg-white divide-y divide-gray-200/80 dark:divide-gray-950 shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:bg-gray-800 dark:shadow-[0_10px_15px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/15">
+                <motion.div
+                    class="relative rounded-xl bg-white divide-y divide-gray-200/80 dark:divide-gray-950 shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:bg-gray-800 dark:shadow-[0_10px_15px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/15"
+                    :initial="{ scale: 1.0 }"
+                    :whilePress="{ scale: 0.985 }"
+                    :transition="{ duration: 0.1 }"
+                >
                     <header class="group/cmd-input flex items-center gap-2 h-14 px-5.5">
                         <ui-icon name="magnifying-glass" class="size-5 text-gray-400" />
                         <input type="text" placeholder="Search or jump to..." class="flex w-full bg-transparent py-4 text-lg outline-none placeholder:text-gray-500! antialiased" value="">
@@ -72,7 +78,7 @@ const modalClasses = cva({
                             <span class="text-sm text-gray-600">Select</span>
                         </div>
                     </footer>
-                </div>
+                </motion.div>
 
             </DialogContent>
         </DialogPortal>

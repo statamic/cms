@@ -69,6 +69,7 @@
         "lowlight": "^3.1.0",
         "marked": "^13.0.0",
         "marked-plaintext": "0.0.2",
+        "motion-v": "^1.0.0-beta.0",
         "mousetrap": "~1.6.5",
         "nprogress": "^0.2.0",
         "pdfobject": "^2.2.7",
