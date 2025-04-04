@@ -4,7 +4,9 @@
 @endphp
 
 @section('command-palette')
-<!-- TODO: Vue component would be neat. -->
+<command-palette
+    :initial-data="{{ $commandPalette->toJson() }}"
+></command-palette>
 @stop
 
 @yield('command-palette')

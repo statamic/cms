@@ -63,6 +63,7 @@ import CodeBlock from '../components/CodeBlock.vue';
 import BlueprintResetter from '../components/blueprints/BlueprintResetter.vue';
 import { defineAsyncComponent } from 'vue';
 import DateTime from '../components/DateTime.vue';
+import CommandPalette from '../components/CommandPalette.vue';
 
 export default function registerGlobalComponents(app) {
     // Core
@@ -152,4 +153,6 @@ export default function registerGlobalComponents(app) {
     app.component('stack-test', StackTest);
 
     app.component('blueprint-resetter', BlueprintResetter);
+
+    app.component('command-palette', CommandPalette);
 }
