@@ -55,9 +55,9 @@
 
             <keyboard-shortcuts-modal></keyboard-shortcuts-modal>
 
-            <portal-targets></portal-targets>
-
             @include('statamic::partials.command-palette')
+
+            <portal-targets></portal-targets>
         </div>
 
         @include('statamic::partials.scripts')

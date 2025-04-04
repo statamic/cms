@@ -2,6 +2,7 @@
 
 namespace Statamic\CommandPalette;
 
+use Illuminate\Support\Collection;
 use Statamic\Support\Arr;
 
 class Palette
@@ -22,17 +23,37 @@ class Palette
         return $this;
     }
 
-    public function build(): array
+    public function build(): Collection
     {
         return $this
             ->buildActions()
             ->buildHistory()
-            ->sort()
-            ->toArray();
+            ->get();
     }
 
     protected function buildActions(): self
     {
+        $this->addCommand(
+            (new Link(
+                text: 'Save',
+                category: Category::Actions,
+            ))->url('/cp')
+        );
+
+        $this->addCommand(
+            (new Link(
+                text: 'Duplicate',
+                category: Category::Actions,
+            ))->url('/cp')
+        );
+
+        $this->addCommand(
+            (new Link(
+                text: 'Delete',
+                category: Category::Actions,
+            ))->url('/cp')
+        );
+
         return $this;
     }
 
@@ -59,8 +80,8 @@ class Palette
         return $command;
     }
 
-    public function toArray(): array
+    public function get(): Collection
     {
-        return $this->items->toArray();
+        return $this->items;
     }
 }
