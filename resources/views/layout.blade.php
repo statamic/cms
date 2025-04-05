@@ -64,8 +64,6 @@
                 <portal-targets></portal-targets>
             </div>
 
-            @include('statamic::partials.command-palette')
-
             @include('statamic::partials.scripts')
             @yield('scripts')
         </config-provider>
