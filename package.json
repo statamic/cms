@@ -78,6 +78,7 @@
     "pusher-js": "^8.4.0-rc2",
     "qs": "^6.9.7",
     "read-time-estimate": "0.0.3",
+    "reka-ui": "^2.2.0",
     "resize-observer-polyfill": "^1.5.1",
     "semver": "^7.7.1",
     "speakingurl": "^14.0.1",

@@ -64,6 +64,7 @@ import BlueprintResetter from '../components/blueprints/BlueprintResetter.vue';
 import { defineAsyncComponent } from 'vue';
 import DateTime from '../components/DateTime.vue';
 import CommandPalette from '../components/CommandPalette.vue';
+import CommandPaletteReka from '../components/CommandPaletteReka.vue';
 
 export default function registerGlobalComponents(app) {
     // Core
@@ -154,5 +155,5 @@ export default function registerGlobalComponents(app) {
 
     app.component('blueprint-resetter', BlueprintResetter);
 
-    app.component('command-palette', CommandPalette);
+    app.component('command-palette', CommandPaletteReka);
 }
