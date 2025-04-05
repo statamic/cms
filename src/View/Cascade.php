@@ -174,7 +174,7 @@ class Cascade
     private function contextualVariables()
     {
         $guard = config('statamic.users.guards.web', 'web');
-        
+
         return [
             // Constants
             'environment' => app()->environment(),
