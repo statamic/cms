@@ -4,7 +4,7 @@
             <header class="mb-6">
                 <p class="text-gray" v-text="__('messages.collection_scaffold_instructions')" />
             </header>
-            <table class="data-table rounded border">
+            <table class="data-table rounded-sm border">
                 <tbody>
                     <tr>
                         <td class="checkbox-column border-r" @click="selected.index = !selected.index">

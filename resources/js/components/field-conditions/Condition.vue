@@ -13,7 +13,7 @@
             :reduce="(field) => field.value"
             :create-option="(field) => ({ value: field, label: field })"
             @update:model-value="fieldSelected"
-            @search:blur="fieldSelectBlur"
+            search:blur="fieldSelectBlur"
         >
             <template #no-options><div class="hidden" /></template>
             <template #option="option">
@@ -32,7 +32,7 @@
             :model-value="condition.operator"
             :options="operatorOptions"
             :placeholder="false"
-            class="ltr:md:ml-4 rtl:md:mr-4"
+            class="md:ltr:ml-4 md:rtl:mr-4"
             @update:model-value="operatorSelected"
         />
 
@@ -55,7 +55,7 @@
             :reduce="(field) => field.value"
             :create-option="(field) => ({ value: field, label: field })"
             @update:model-value="valueUpdated"
-            @search:blur="valueSelectBlur"
+            search:blur="valueSelectBlur"
         >
             <template #no-options><div class="hidden" /></template>
         </v-select>

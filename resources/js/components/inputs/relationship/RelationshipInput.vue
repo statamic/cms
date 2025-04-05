@@ -20,7 +20,7 @@
         <template v-if="shouldShowSelectedItems">
             <div
                 ref="items"
-                class="relationship-input-items space-y-1 outline-none"
+                class="relationship-input-items space-y-1 outline-hidden"
                 :class="{ 'mt-4': usesSelectField && items.length }"
             >
                 <component
@@ -36,7 +36,7 @@
                     :form-component="formComponent"
                     :form-component-props="formComponentProps"
                     :form-stack-size="formStackSize"
-                    class="item outline-none"
+                    class="item outline-hidden"
                     @removed="remove(i)"
                 />
             </div>
@@ -64,7 +64,7 @@
                     </div>
                     <button
                         ref="existing"
-                        class="mb-2 flex items-center text-blue outline-none hover:text-gray-800 dark:text-dark-blue-100 dark:hover:text-dark-100"
+                        class="mb-2 flex items-center text-blue outline-hidden hover:text-gray-800 dark:text-dark-blue-100 dark:hover:text-dark-100"
                         @click.prevent="isSelecting = true"
                     >
                         <svg-icon name="light/hyperlink" class="flex h-4 w-4 items-center ltr:mr-1 rtl:ml-1"></svg-icon>

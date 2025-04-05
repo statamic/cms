@@ -4,10 +4,10 @@
             <popover name="swatches" class="color-picker" placement="bottom-start">
                 <template #trigger>
                     <div class="input-group-prepend px-px" v-tooltip="__('Pick Color')">
-                        <div class="relative flex items-center outline-none">
-                            <div class="m-0 inline-block cursor-pointer rounded p-[2px]">
+                        <div class="relative flex items-center outline-hidden">
+                            <div class="m-0 inline-block cursor-pointer rounded-sm p-[2px]">
                                 <div
-                                    class="h-8 w-8 rounded-sm"
+                                    class="h-8 w-8 rounded-xs"
                                     :class="{ 'border dark:border-dark-900': !value, 'cursor-not-allowed': isReadOnly }"
                                     :style="{ 'background-color': value }"
                                 />
@@ -20,7 +20,7 @@
                         <div v-if="config.swatches.length" class="grid grid-cols-4 gap-3">
                             <div
                                 v-for="swatch in config.swatches"
-                                class="inline-block flex h-10 w-10 cursor-pointer rounded border border-gray-400"
+                                class="inline-block flex h-10 w-10 cursor-pointer rounded-sm border border-gray-400"
                                 :style="{ 'background-color': swatch }"
                                 @click="
                                     () => {
@@ -54,7 +54,7 @@
                             :class="{ 'mt-5': config.swatches.length }"
                         >
                             <input
-                                class="input-text h-10 w-full cursor-pointer rounded p-[2px] ltr:mr-2 rtl:ml-2"
+                                class="input-text h-10 w-full cursor-pointer rounded-sm p-[2px] ltr:mr-2 rtl:ml-2"
                                 type="color"
                                 :value="customColor"
                                 @input="customColorSelected"

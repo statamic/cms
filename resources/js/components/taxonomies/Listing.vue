@@ -1,6 +1,6 @@
 <template>
     <data-list :columns="columns" :rows="rows" v-slot="{ filteredRows: rows }">
-        <div class="card p-0">
+        <ui-card-panel>
             <data-list-table :rows="rows">
                 <template #cell-title="{ row: taxonomy }">
                     <a :href="taxonomy.terms_url">{{ __(taxonomy.title) }}</a>
@@ -25,7 +25,7 @@
                     </dropdown-list>
                 </template>
             </data-list-table>
-        </div>
+        </ui-card-panel>
     </data-list>
 </template>
 

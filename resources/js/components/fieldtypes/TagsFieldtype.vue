@@ -16,7 +16,7 @@
         :dropdown-should-open="({ open }) => open && config.options.length > 0"
         @update:model-value="update"
         @search:focus="$emit('focus')"
-        @search:blur="$emit('blur')"
+        search:blur="$emit('blur')"
     >
         <template #selected-option-container><i class="hidden"></i></template>
         <template #search="{ events, attributes }">

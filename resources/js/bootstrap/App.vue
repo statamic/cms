@@ -1,7 +1,6 @@
 <script>
 import GlobalSearch from '../components/GlobalSearch.vue';
 import GlobalSiteSelector from '../components/GlobalSiteSelector.vue';
-import DarkModeToggle from '../components/DarkModeToggle.vue';
 import Login from '../components/login/Login.vue';
 import BaseEntryCreateForm from '../components/entries/BaseCreateForm.vue';
 import BaseTermCreateForm from '../components/terms/BaseCreateForm.vue';
@@ -44,12 +43,12 @@ import Updater from '../components/updater/Updater.vue';
 import PortalTargets from '../components/portals/PortalTargets.vue';
 import SitesEditForm from '../components/sites/EditForm.vue';
 import { defineAsyncComponent } from 'vue';
+import { ConfigProvider } from 'reka-ui';
 
 export default {
     components: {
         GlobalSearch,
         GlobalSiteSelector,
-        DarkModeToggle,
         Login,
         BaseEntryCreateForm,
         BaseTermCreateForm,
@@ -92,6 +91,7 @@ export default {
         Updater,
         PortalTargets,
         SitesEditForm,
+        ConfigProvider,
     },
 
     data() {
@@ -115,7 +115,7 @@ export default {
         },
 
         wrapperClass() {
-            return this.$config.get('wrapperClass', 'max-w-xl');
+            return this.$config.get('wrapperClass', 'max-w-6xl');
         },
     },
 

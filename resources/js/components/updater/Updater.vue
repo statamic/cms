@@ -18,7 +18,7 @@
         </div>
 
         <div
-            class="mb-6 flex cursor-pointer items-center justify-between rounded border border-dashed border-yellow-dark bg-yellow p-4 text-xs"
+            class="mb-6 flex cursor-pointer items-center justify-between rounded-sm border border-dashed border-yellow-dark bg-yellow p-4 text-xs"
             v-if="!showingUnlicensedReleases && hasUnlicensedReleases"
             @click="showingUnlicensedReleases = true"
         >

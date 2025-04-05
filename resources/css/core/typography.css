@@ -3,7 +3,7 @@
    ========================================================================== */
 
 body {
-    @apply font-sans text-base tracking-normal text-gray-900 dark:text-dark-100;
+    @apply font-sans text-base tracking-normal text-gray-800 dark:text-white;
     font-variant: common-ligatures tabular-nums;
     font-feature-settings:
         'zero',
@@ -11,6 +11,7 @@ body {
         'calt' off;
 }
 
+/*
 h1,
 h2,
 h3,
@@ -138,7 +139,7 @@ sup {
 }
 
 code {
-    @apply rounded font-mono text-[#c7254e] dark:bg-dark-700 dark:text-blue-400;
+    @apply rounded-sm font-mono text-[#c7254e] dark:bg-dark-700 dark:text-blue-400;
     padding: 2px 4px;
     font-size: 90%;
     background-color: #f9f2f4;
@@ -149,4 +150,4 @@ code {
     p {
         @apply mb-2;
     }
-}
+} */

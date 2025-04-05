@@ -13,32 +13,29 @@
             slug = $event;
         "
     >
-        <div>
-            <text-input
-                v-model="slug"
-                classes="font-mono text-xs"
-                :isReadOnly="isReadOnly"
-                :append="config.show_regenerate"
-                :name="slug"
-                :id="fieldId"
-                @focus="$emit('focus')"
-                @blur="$emit('blur')"
-                direction="ltr"
-            >
-                <template v-slot:append v-if="config.show_regenerate">
-                    <button
-                        class="input-group-append flex items-center"
-                        @click="sync"
-                        v-tooltip="__('Regenerate from: :field', { field: config.from })"
-                    >
-                        <svg-icon name="light/synchronize" class="h-5 w-5" v-show="!syncing" />
-                        <div class="h-5 w-5" v-show="syncing">
-                            <loading-graphic inline text="" class="ml-0.5 mt-0.5" />
-                        </div>
-                    </button>
-                </template>
-            </text-input>
-        </div>
+        <ui-input
+            v-model="slug"
+            :id="fieldId"
+            :isReadOnly="isReadOnly"
+            :name="slug"
+            @focus="$emit('focus')"
+            @blur="$emit('blur')"
+        >
+            <template #append v-if="config.show_regenerate">
+                <ui-button
+                    size="sm"
+                    variant="ghost"
+                    :icon-only="true"
+                    @click="sync"
+                    v-tooltip="__('Regenerate from: :field', { field: config.from })"
+                >
+                    <svg-icon name="light/synchronize" class="h-5 w-5" v-show="!syncing" />
+                    <div class="h-5 w-5" v-show="syncing">
+                        <loading-graphic inline text="" class="ml-0.5 mt-0.5" />
+                    </div>
+                </ui-button>
+            </template>
+        </ui-input>
     </slugify>
 </template>
 

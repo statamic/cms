@@ -9,8 +9,8 @@
     z-index: 2;
 
     .dark & {
-        background: linear-gradient(180deg, theme(colors.dark.500), theme(colors.dark.550));
-        border-color: theme(colors.dark.900);
+        background: linear-gradient(180deg, var(--color-dark-500), var(--color-dark-550));
+        border-color: var(--color-dark-900);
     }
 }
 
@@ -44,7 +44,7 @@
 }
 
 .live-preview .publish-tabs {
-    @apply ltr:pl-4 ltr:@4xl/live-preview:pl-6 rtl:pr-4 rtl:@4xl/live-preview:pr-6;
+    @apply ltr:pl-4 @-4xl/live-preview:ltr:pl-6 rtl:pr-4 @-4xl/live-preview:rtl:pr-6;
 }
 
 .live-preview .publish-sections-section {
@@ -69,7 +69,7 @@
         @apply h-full w-full;
     }
     &.device {
-        @apply mt-4 rounded shadow-lg;
+        @apply mt-4 rounded-sm shadow-lg;
     }
 }
 
@@ -77,11 +77,11 @@
     @apply w-4 border-gray-400 shadow-sm dark:border-dark-900 ltr:border-l ltr:border-r rtl:border-l rtl:border-r;
     z-index: 1;
     cursor: ew-resize;
-    background: theme('colors.gray.100') url('../../svg/icons/light/drag-dots.svg') center center no-repeat;
+    background: var(--color-gray-100) url('../../svg/icons/light/drag-dots.svg') center center no-repeat;
     background-size: 7px 17px;
 
     .dark & {
-        background-color: theme('colors.dark.500');
+        background-color: var(--color-dark-500);
     }
 }
 
@@ -116,7 +116,7 @@
 
 /*  We only want the animation to happen when its on the regular publish page. */
 /*  When portal-ed into live preview, it won't be inside .workspace */
-.workspace {
+main {
     .live-preview-tabs-drop-enter-active,
     .live-preview-tabs-drop-leave-active {
         transition: all 0.2s;

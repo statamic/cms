@@ -1,6 +1,6 @@
 <template>
-    <div class="mx-auto mt-4 max-w-lg">
-        <div class="rounded bg-white p-6 shadow dark:bg-dark-600 dark:shadow-dark lg:px-20 lg:py-10">
+    <div class="mx-auto mt-4 max-w-2xl">
+        <div class="rounded-sm bg-white p-6 shadow dark:bg-dark-600 dark:shadow-lg lg:px-20 lg:py-10">
             <header class="mb-16 text-center">
                 <h1 class="mb-6">{{ __('Create Collection') }}</h1>
                 <p class="text-gray" v-text="__('messages.collection_configure_intro')" />

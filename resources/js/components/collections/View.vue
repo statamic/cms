@@ -1,10 +1,6 @@
 <template>
     <div>
-        <header class="mb-6">
-            <breadcrumb :url="breadcrumbUrl" :title="__('Collections')" />
-
-            <div class="flex items-center">
-                <h1 class="flex-1" v-text="__(title)" />
+        <ui-header :title="__(title)">
 
                 <dropdown-list class="ltr:mr-2 rtl:ml-2" v-if="!!this.$slots.twirldown">
                     <slot name="twirldown" :actionCompleted="actionCompleted" />
@@ -93,8 +89,7 @@
                     :blueprints="blueprints"
                     :text="createLabel"
                 />
-            </div>
-        </header>
+        </ui-header>
 
         <entry-list
             v-if="view === 'list'"

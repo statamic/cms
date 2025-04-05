@@ -50,17 +50,6 @@
     @apply flex;
 }
 
-/* VCalendar dark mode background */
-.vc-container,
-.vc-date-picker-content {
-    @apply dark:border-dark-700 dark:bg-dark-500;
-}
-
-/* VCalendar dark mode year/month popover */
-.vc-nav-popover-container {
-    @apply dark:border-dark-900 dark:bg-dark-700;
-}
-
 /* Time Field
   ========================================================================== */
 

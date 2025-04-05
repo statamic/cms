@@ -1,8 +1,8 @@
 .column-picker-item {
-    @apply flex select-none items-center text-sm outline-none;
+    @apply flex select-none items-center text-sm outline-hidden;
 
     &.sortable {
-        @apply rounded border bg-white;
+        @apply rounded-sm border bg-white;
         &:hover {
             @apply bg-gray-200;
         }

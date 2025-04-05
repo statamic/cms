@@ -7,80 +7,70 @@
 
 @section('content')
 
-<header class="mb-6">
-    @include(
-        'statamic::partials.breadcrumb',
-        [
-            'url' => cp_route('utilities.index'),
-            'title' => __('Utilities'),
-        ]
-    )
-    <div class="flex items-center justify-between">
-        <h1>{{ __('Search Indexes') }}</h1>
+<ui-header title="{{ __('Search') }}">
+    <form method="POST" action="{{ cp_route('utilities.search', 'all') }}">
+        @csrf
 
-        <form method="POST" action="{{ cp_route('utilities.search', 'all') }}">
-            @csrf
-            @foreach (\Statamic\Facades\Search::indexes() as $index)
-                <input type="hidden" name="indexes[]" value="{{ $index->name() }}::{{ $index->locale() }}" />
-            @endforeach
+        @foreach (\Statamic\Facades\Search::indexes() as $index)
+            <input type="hidden" name="indexes[]" value="{{ $index->name() }}::{{ $index->locale() }}" />
+        @endforeach
 
-            <button class="btn-primary">{{ __('Update All') }}</button>
-        </form>
-    </div>
-</header>
+        <ui-button variant="primary">{{ __('Update Indexes') }}</ui-button>
+    </form>
+</ui-header>
 
-<div class="card p-0">
+<ui-card-panel heading="{{ __('Search Indexes') }}">
     @if ($errors->has('indexes'))
         <p class="p-4"><small class="help-block text-red-500">{{ $errors->first() }}</small></p>
     @endif
 
-    <table class="data-table">
-        <thead>
-            <tr>
-                <th>{{ __('Index') }}</th>
-                <th>{{ __('Driver') }}</th>
-                <th>{{ __('Searchables') }}</th>
-                <th>{{ __('Fields') }}</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
+    <ui-table>
+        <ui-table-columns>
+            <ui-table-column>{{ __('Index') }}</ui-table-column>
+            <ui-table-column>{{ __('Driver') }}</ui-table-column>
+            <ui-table-column>{{ __('Searchables') }}</ui-table-column>
+            <ui-table-column>{{ __('Fields') }}</ui-table-column>
+            <ui-table-column></ui-table-column>
+        </ui-table-columns>
+        <ui-table-rows>
             @foreach (\Statamic\Facades\Search::indexes() as $index)
-                <tr class="align-top">
-                    <td>
+                <ui-table-row>
+                    <ui-table-cell>
                         <div class="flex items-start">
-                            @cp_svg('search-drivers/' . $index->config()['driver'], '-mt-0.5 flex h-6 w-6 shrink-0 ltr:mr-2 rtl:ml-2', 'search-drivers/local')
+                            @cp_svg('search-drivers/' . $index->config()['driver'], '-mt-0.5 flex h-6 w-6 shrink-0 me-2', 'search-drivers/local')
                             <span class="text-gray-800 dark:text-dark-150">{{ $index->title() }}</span>
                         </div>
-                    </td>
-                    <td>
+                    </ui-table-cell>
+                    <ui-table-cell>
                         {{ ucwords($index->config()['driver']) }}
-                    </td>
-                    <td>
+                    </ui-table-cell>
+                    <ui-table-cell>
                         @if (is_string($index->config()['searchables']))
-                            <div class="flex flex-wrap text-sm text-gray">
-                                <span class="badge-pill-sm">{{ $index->config()['searchables'] }}</span>
+                            <div class="flex flex-wrap">
+                                <ui-badge>
+                                    {{ $index->config()['searchables'] }}
+                                </ui-badge>
                             </div>
                         @else
                             <div class="flex flex-wrap gap-1 text-sm text-gray">
                                 @foreach ($index->config()['searchables'] as $searchable)
-                                    <div class="badge-pill-sm">
+                                    <ui-badge>
                                         {{ $searchable }}
-                                    </div>
+                                    </ui-badge>
                                 @endforeach
                             </div>
                         @endif
-                    </td>
-                    <td>
-                        <div class="flex flex-wrap gap-1 text-sm text-gray">
+                    </ui-table-cell>
+                    <ui-table-cell>
+                        <div class="flex flex-wrap gap-2">
                             @foreach ($index->config()['fields'] as $field)
-                                <div class="badge-pill-sm">
+                                <ui-badge>
                                     {{ $field }}
-                                </div>
+                                </ui-badge>
                             @endforeach
                         </div>
-                    </td>
-                    <td class="ltr:text-right rtl:text-left">
+                    </ui-table-cell>
+                    <ui-table-cell class="text-right rtl:text-left">
                         <form method="POST" action="{{ cp_route('utilities.search') }}">
                             @csrf
                             <input
@@ -88,21 +78,20 @@
                                 name="indexes[]"
                                 value="{{ $index->name() }}::{{ $index->locale() }}"
                             />
-                            <button type="submit" class="btn btn-xs -my-1">{{ __('Update') }}</button>
+                            <ui-button type="submit" size="sm">
+                                {{ __('Update') }}
+                            </ui-button>
                         </form>
-                    </td>
-                </tr>
+                    </ui-table-cell>
+                </ui-table-row>
             @endforeach
-        </tbody>
-    </table>
-</div>
+        </ui-table-rows>
+    </ui-table>
+</ui-card-panel>
 
-@include(
-    'statamic::partials.docs-callout',
-    [
-        'topic' => __('Search Indexes'),
-        'url' => Statamic::docsUrl('search#indexes'),
-    ]
-)
+<x-statamic::docs-callout
+    topic="{{ __('Search Indexes') }}"
+    url="{{ Statamic::docsUrl('search#indexes') }}"
+/>
 
 @stop

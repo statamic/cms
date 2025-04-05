@@ -1,74 +1,35 @@
 <template>
     <div class="datetime min-w-[145px]">
-        <button
-            type="button"
-            class="btn mb-2 flex items-center md:mb-0 ltr:pl-3 rtl:pr-3"
-            v-if="!isReadOnly && config.inline === false && !hasDate"
-            @click="addDate"
-            tabindex="0"
-        >
-            <svg-icon name="light/calendar" class="h-4 w-4 ltr:mr-2 rtl:ml-2"></svg-icon>
-            {{ __('Add Date') }}
-        </button>
+        <Button :text="__('Add Date')" icon="calendar" v-if="!isReadOnly && !isInline && !hasDate" @click="addDate" />
 
-        <div v-if="hasDate || config.inline" class="date-time-container flex flex-col gap-2 @sm:flex-row">
-            <component
-                :is="pickerComponent"
-                v-bind="pickerProps"
-                @update:model-value="setLocalDate"
-                @focus="focusedField = $event"
-                @blur="focusedField = null"
-            />
-
-            <div v-if="config.time_enabled && !isRange" class="time-container time-fieldtype">
-                <time-fieldtype
-                    v-if="hasTime"
-                    ref="time"
-                    handle=""
-                    :value="localValue.time"
-                    :required="config.time_enabled"
-                    :show-seconds="config.time_seconds_enabled"
-                    :read-only="isReadOnly"
-                    :config="{}"
-                    @update:value="setLocalTime"
-                />
-            </div>
-        </div>
+        <Component
+            :is="pickerComponent"
+            v-if="hasDate || isInline"
+            :model-value="datePickerValue"
+            :granularity="datePickerGranularity"
+            :inline="isInline"
+            @update:model-value="datePickerUpdated"
+        />
     </div>
 </template>
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import SinglePopover from './date/SinglePopover.vue';
-import SingleInline from './date/SingleInline.vue';
-import RangePopover from './date/RangePopover.vue';
-import RangeInline from './date/RangeInline.vue';
-import { useScreens } from 'vue-screen-utils';
-import { toRaw } from 'vue';
 import DateFormatter from '@statamic/components/DateFormatter.js';
+import Button from '@statamic/components/ui/Button/Index.vue';
+import { DatePicker, DateRangePicker } from '@statamic/ui';
+import { parseAbsoluteToLocal, toTimeZone, toZoned } from '@internationalized/date';
 
 export default {
     components: {
-        SinglePopover,
-        SingleInline,
-        RangePopover,
-        RangeInline,
+        DatePicker,
+        DateRangePicker,
+        Button,
     },
 
     mixins: [Fieldtype],
 
     inject: ['store'],
-
-    setup() {
-        const { mapCurrent } = useScreens({
-            xs: '0px',
-            sm: '640px',
-            md: '768px',
-            lg: '1024px',
-        });
-
-        return { screens: mapCurrent };
-    },
 
     data() {
         return {
@@ -80,31 +41,19 @@ export default {
 
     computed: {
         pickerComponent() {
-            if (this.isRange) {
-                return this.usesPopover ? 'RangePopover' : 'RangeInline';
-            }
-
-            return this.usesPopover ? 'SinglePopover' : 'SingleInline';
+            return this.isRange ? DateRangePicker : DatePicker;
         },
 
         hasDate() {
-            if (this.isRange) {
-                return this.config.required || this.value?.start || this.value?.end;
-            }
-
-            return this.config.required || this.value.date;
+            return !!(this.config.required || this.value);
         },
 
         hasTime() {
-            return this.config.time_enabled && !this.isRange;
+            return this.config.time_enabled;
         },
 
         hasSeconds() {
             return this.config.time_seconds_enabled;
-        },
-
-        isSingle() {
-            return !this.isRange;
         },
 
         isRange() {
@@ -115,79 +64,36 @@ export default {
             return this.config.inline;
         },
 
-        usesPopover() {
-            return !this.isInline;
-        },
-
-        pickerProps() {
-            return {
-                isReadOnly: this.isReadOnly,
-                bindings: this.commonDatePickerBindings,
-            };
-        },
-
         datePickerValue() {
+            if (!this.value) {
+                return null;
+            }
+
             if (this.isRange) {
                 return {
-                    start: this.localValue?.start?.date,
-                    end: this.localValue?.end?.date,
+                    start: parseAbsoluteToLocal(this.value.start),
+                    end: parseAbsoluteToLocal(this.value.end),
                 };
             }
 
-            // The calendar component will do `new Date(datePickerValue)` under the hood.
-            // If you pass a date without a time, it will treat it as UTC. By adding a time,
-            // it will behave as local time. The date that comes from the server will be what
-            // we expect. The time is handled separately by the nested time fieldtype.
-            // https://github.com/statamic/cms/pull/6688
-            return this.localValue.date + 'T00:00:00';
+            return parseAbsoluteToLocal(this.value);
         },
 
-        commonDatePickerBindings() {
-            return {
-                attributes: [
-                    {
-                        key: 'today',
-                        dot: true,
-                        popover: {
-                            label: __('Today'),
-                        },
-                        dates: new Date(),
-                    },
-                ],
-                columns: this.screens({ default: 1, lg: this.config.columns }).value,
-                rows: this.screens({ default: 1, lg: this.config.rows }).value,
-                expanded: this.name === 'date' || this.config.full_width,
-                isRequired: this.config.required,
-                locale: Statamic.$date.locale,
-                masks: { input: ['L'], modelValue: 'YYYY-MM-DD' },
-                minDate: this.config.earliest_date.date,
-                maxDate: this.config.latest_date.date,
-                updateOnInput: false,
-                modelValue: this.datePickerValue,
-                modelModifiers: { string: true, range: this.isRange },
-                popover: { visibility: 'click' },
-            };
+        datePickerGranularity() {
+            return this.hasTime ? (this.hasSeconds ? 'second' : 'minute') : 'day';
         },
 
         replicatorPreview() {
             if (!this.showFieldPreviews || !this.config.replicator_preview) return;
 
+            if (!this.value) return;
+
             if (this.isRange) {
-                if (!this.localValue?.start) return;
-
-                const start = this.value.start.date + 'T' + (this.value.start.time || '00:00:00') + 'Z';
-                const end = this.value.end.date + 'T' + (this.value.end.time || '00:00:00') + 'Z';
-                const formatter = new DateFormatter().options('date');
-
-                return formatter.date(start) + ' – ' + formatter.date(end);
+                const formatter = new DateFormatter().options(this.hasTime ? 'datetime' : 'date');
+                return formatter.date(this.value.start) + ' – ' + formatter.date(this.value.end);
             }
 
-            if (!this.value?.date) return;
-
-            return DateFormatter.format(
-                this.value.date + 'T' + (this.value.time || '00:00:00') + 'Z',
-                this.hasTime && this.value.time ? 'datetime' : 'date',
-            );
+            return DateFormatter.format(this.value, this.hasTime && this.value ? 'datetime' : 'date');
         },
     },
 
@@ -195,167 +101,54 @@ export default {
         this.$events.$on(`container.${this.storeName}.saving`, this.triggerChangeOnFocusedField);
     },
 
-    mounted() {
-        if (this.isRange && this.config.required && !this.value) {
-            this.addDate();
-        }
-    },
-
     unmounted() {
         this.$events.$off(`container.${this.storeName}.saving`, this.triggerChangeOnFocusedField);
     },
 
-    watch: {
-        value: {
-            immediate: true,
-            handler(value, oldValue) {
-                if (this.isRange) {
-                    if (!value || !value.start) {
-                        this.localValue = { start: { date: null, time: null }, end: { date: null, time: null } };
-                        return;
-                    }
-
-                    let localValue = {
-                        start: this.createLocalFromUtc(value.start),
-                        end: this.createLocalFromUtc(value.end),
-                    };
-
-                    if (JSON.stringify(toRaw(this.localValue)) === JSON.stringify(localValue)) {
-                        return;
-                    }
-
-                    this.localValue = localValue;
-
-                    return;
-                }
-
-                if (!value || !value.date) {
-                    this.localValue = { date: null, time: null };
-                    return;
-                }
-
-                let localValue = this.createLocalFromUtc(value);
-
-                if (JSON.stringify(toRaw(this.localValue)) === JSON.stringify(localValue)) {
-                    return;
-                }
-
-                this.localValue = localValue;
-            },
-        },
-
-        localValue(value) {
-            if (this.isRange) {
-                this.update({
-                    start: this.createUtcFromLocal(value.start),
-                    end: this.createUtcFromLocal(value.end),
-                });
-
-                return;
-            }
-
-            this.update(this.createUtcFromLocal(value));
-        },
-    },
-
     methods: {
-        createLocalFromUtc(utcValue) {
-            const dateTime = new Date(utcValue.date + 'T' + (utcValue.time || '00:00:00') + 'Z');
-
-            let date =
-                dateTime.getFullYear() +
-                '-' +
-                (dateTime.getMonth() + 1).toString().padStart(2, '0') +
-                '-' +
-                dateTime.getDate().toString().padStart(2, '0');
-            let time =
-                dateTime.getHours().toString().padStart(2, '0') +
-                ':' +
-                dateTime.getMinutes().toString().padStart(2, '0');
-
-            if (this.hasSeconds) {
-                time += ':' + dateTime.getSeconds().toString().padStart(2, '0');
-            }
-
-            return { date, time };
-        },
-
-        createUtcFromLocal(localValue) {
-            const dateTime = new Date(localValue.date + 'T' + (localValue.time || '00:00:00'));
-
-            let date =
-                dateTime.getUTCFullYear() +
-                '-' +
-                (dateTime.getUTCMonth() + 1).toString().padStart(2, '0') +
-                '-' +
-                dateTime.getUTCDate().toString().padStart(2, '0');
-            let time =
-                dateTime.getUTCHours().toString().padStart(2, '0') +
-                ':' +
-                dateTime.getUTCMinutes().toString().padStart(2, '0');
-
-            if (this.hasSeconds) {
-                time += ':' + dateTime.getUTCSeconds().toString().padStart(2, '0');
-            }
-
-            return { date, time };
-        },
-
         triggerChangeOnFocusedField() {
             if (!this.focusedField) return;
 
             this.focusedField.dispatchEvent(new Event('change'));
         },
 
-        setLocalDate(date) {
+        datePickerUpdated(value) {
+            if (!value) {
+                return this.update(null);
+            }
+
+            // The date picker will give us CalendarDateTimes in the local time zone.
+            // We want them in UTC.
+
             if (this.isRange) {
-                this.localValue = {
-                    start: { date: date.start, time: '00:00' },
-                    end: { date: date.end, time: '23:59' },
-                };
+                let start = value.start;
+                let end = value.end;
 
-                return;
+                if (!this.hasTime) {
+                    end.set({ hour: 23, minute: 59, second: 59 });
+                }
+
+                return this.update({
+                    start: toZoned(start, 'UTC').toAbsoluteString(),
+                    end: toZoned(end, 'UTC').toAbsoluteString(),
+                });
             }
 
-            if (!date) {
-                this.localValue = { date: null, time: null };
-                return;
-            }
-
-            this.localValue = {
-                date,
-                time: this.config.time_enabled ? this.localValue.time : '00:00',
-            };
-        },
-
-        setLocalTime(time) {
-            this.localValue = { ...this.localValue, time };
+            return this.update(toTimeZone(value, 'UTC').toAbsoluteString());
         },
 
         addDate() {
             let now = new Date();
 
+            now.setMilliseconds(0);
+
             if (!this.config.time_enabled) {
                 now.setHours(0, 0, 0, 0);
             }
 
-            let date =
-                now.getFullYear() +
-                '-' +
-                String(now.getMonth() + 1).padStart(2, '0') +
-                '-' +
-                String(now.getDate()).padStart(2, '0');
+            const str = now.toISOString();
 
-            let time = now.toLocaleTimeString(undefined, {
-                hour12: false,
-                hour: '2-digit',
-                minute: '2-digit',
-                second: this.hasSeconds ? '2-digit' : undefined,
-            });
-
-            this.localValue = this.isRange
-                ? { start: { date, time: '00:00' }, end: { date, time: '23:59' } }
-                : { date, time };
+            this.update(this.isRange ? { start: str, end: str } : str);
         },
     },
 };

@@ -80,7 +80,7 @@
                     :mirror="false"
                     v-model="rules"
                 >
-                    <div class="vs__selected-options-outside flex flex-wrap outline-none">
+                    <div class="vs__selected-options-outside flex flex-wrap outline-hidden">
                         <span v-for="rule in rules" :key="rule" class="vs__selected sortable-item mt-2">
                             {{ rule }}
                             <button

@@ -18,7 +18,7 @@
                     <input type="text" class="input-text w-auto" ref="fave" v-model="name" @keydown.enter="save" />
                     <button @click="save" class="btn-primary ltr:ml-2 rtl:mr-2">{{ __('Save') }}</button>
                 </div>
-                <button @click="makeStartPage" class="mt-2 text-xs text-blue outline-none hover:text-blue-800">
+                <button @click="makeStartPage" class="mt-2 text-xs text-blue outline-hidden hover:text-blue-800">
                     {{ __('Set as start page') }} <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span>
                 </button>
             </div>

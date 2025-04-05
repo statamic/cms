@@ -10,7 +10,7 @@
                 >
                 </publish-field-fullscreen-header>
                 <section :class="{ 'mt-14 p-4': fullScreenMode }">
-                    <div :class="{ 'replicator-set rounded border shadow-sm dark:border-dark-900': config.border }">
+                    <div :class="{ 'replicator-set rounded-sm border shadow-sm dark:border-dark-900': config.border }">
                         <div
                             class="publish-fields @container"
                             :class="{ 'replicator-set-body': config.border, '-mx-4': !config.border }"
@@ -44,11 +44,13 @@
 
 <style>
 .group-fieldtype-button-wrapper {
-    @apply absolute top-5 flex sm:top-7 ltr:right-6 rtl:left-6;
+    /* TODO: Remove @apply */
+    /* @apply absolute top-5 flex sm:top-7 ltr:right-6 rtl:left-6; */
 }
 
 .replicator-set .group-fieldtype-button-wrapper {
-    @apply top-5 ltr:right-4 rtl:left-4;
+    /* TODO: Remove @apply */
+    /* @apply top-5 ltr:right-4 rtl:left-4; */
 }
 </style>
 

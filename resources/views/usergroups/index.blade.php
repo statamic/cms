@@ -7,12 +7,13 @@
 
 @section('content')
     @unless ($groups->isEmpty())
-        <div class="mb-6 flex">
-            <h1 class="flex-1">
-                {{ __('User Groups') }}
-            </h1>
-            <a href="{{ cp_route('user-groups.create') }}" class="btn-primary">{{ __('Create User Group') }}</a>
-        </div>
+        <ui-header title="{{ __('User Groups') }}">
+            <ui-button
+                href="{{ cp_route('user-groups.create') }}"
+                variant="primary"
+                :text="__('Create User Group')"
+            ></ui-button>
+        </ui-header>
 
         <user-group-listing :initial-rows="{{ json_encode($groups) }}"></user-group-listing>
     @else

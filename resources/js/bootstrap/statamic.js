@@ -5,6 +5,7 @@ import axios from 'axios';
 import Config from '../components/Config';
 import Preferences from '../components/Preference';
 import registerGlobalComponents from './components.js';
+import registerUiComponents from './ui.js';
 import registerFieldtypes from './fieldtypes.js';
 import registerVueSelect from './vue-select/vue-select';
 import useGlobalEventBus from '../composables/global-event-bus';
@@ -13,8 +14,6 @@ import useDirtyState from '../composables/dirty-state';
 import VueClickAway from 'vue3-click-away';
 import FloatingVue from 'floating-vue';
 import 'floating-vue/dist/style.css';
-import VCalendar from '@angelblanco/v-calendar';
-import '@angelblanco/v-calendar/style.css';
 import Toasts from '../components/Toasts';
 import PortalVue from 'portal-vue';
 import Keys from '../components/keys/Keys';
@@ -26,6 +25,7 @@ import Stacks from '../components/stacks/Stacks';
 import Hooks from '../components/Hooks';
 import Bard from '../components/Bard';
 import Components from '../components/Components';
+import Theme from '../components/Theme.js';
 import FieldConditions from '../components/FieldConditions';
 import Reveal from '../components/Reveal';
 import Echo from '../components/Echo';
@@ -33,7 +33,6 @@ import Permission from '../components/Permission';
 import autosize from 'autosize';
 import DateFormatter from '@statamic/components/DateFormatter.js';
 
-const darkMode = ref(null);
 let bootingCallbacks = [];
 let bootedCallbacks = [];
 let components;
@@ -99,12 +98,8 @@ export default {
         return this.$app.config.globalProperties.$date;
     },
 
-    get darkMode() {
-        return darkMode;
-    },
-
-    set darkMode(value) {
-        darkMode.value = value;
+    get $theme() {
+        return this.$app.config.globalProperties.$theme;
     },
 
     get user() {
@@ -119,7 +114,7 @@ export default {
         this.$components.register(name, component);
     },
 
-    start() {
+    async start() {
         this.$app = createApp(App);
 
         this.$app.config.silent = false;
@@ -129,7 +124,6 @@ export default {
         this.$app.use(PortalVue, { portalName: 'v-portal' });
         this.$app.use(VueClickAway);
         this.$app.use(FloatingVue, { disposeTimeout: 30000, distance: 10 });
-        this.$app.use(VCalendar);
 
         const portals = markRaw(new Portals());
 
@@ -159,6 +153,10 @@ export default {
             $echo: new Echo(),
             $permissions: new Permission(),
             $date: new DateFormatter(),
+        });
+
+        Object.assign(this.$app.config.globalProperties, {
+            $theme: new Theme(this.initialConfig.user.theme),
         });
 
         Object.assign(this.$app.config.globalProperties, {
@@ -193,6 +191,7 @@ export default {
             mounted: (el) => autosize(el),
         });
 
+        await registerUiComponents(this.$app);
         registerGlobalComponents(this.$app);
         registerFieldtypes(this.$app);
         registerVueSelect(this.$app);

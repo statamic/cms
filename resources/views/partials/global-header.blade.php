@@ -3,16 +3,16 @@
 @endphp
 
 <div class="global-header">
-    <div class="lg:min-w-xl flex h-full items-center ltr:pl-2 ltr:md:pl-6 rtl:pr-2 rtl:md:pr-6">
+    <div class="flex h-full items-center ps-2 md:ps-6">
         <button
-            class="nav-toggle hidden shrink-0 md:flex ltr:ml-1 rtl:mr-1"
+            class="nav-toggle hidden shrink-0 md:flex ms-1"
             @click="toggleNav"
             aria-label="{{ __('Toggle Nav') }}"
         >
             @cp_svg('icons/light/burger', 'h-4 w-4')
         </button>
         <button
-            class="nav-toggle shrink-0 md:hidden ltr:ml-1 rtl:mr-1"
+            class="nav-toggle shrink-0 md:hidden ms-1"
             @click="toggleMobileNav"
             v-if="! mobileNavOpen"
             aria-label="{{ __('Toggle Mobile Nav') }}"
@@ -20,7 +20,7 @@
             @cp_svg('icons/light/burger', 'h-4 w-4')
         </button>
         <button
-            class="nav-toggle shrink-0 md:hidden ltr:ml-1 rtl:mr-1"
+            class="nav-toggle shrink-0 md:hidden ms-1"
             @click="toggleMobileNav"
             v-else
             v-cloak

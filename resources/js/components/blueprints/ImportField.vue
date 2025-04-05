@@ -9,7 +9,7 @@
                         name="paperclip"
                         v-tooltip="__('Linked fieldset')"
                     />
-                    <a class="break-all" @click="$emit('edit')">
+                    <a class="overflow-hidden text-ellipsis" @click="$emit('edit')">
                         <span v-text="__('Fieldset')" />
                         <span class="font-mono text-3xs text-gray-600 dark:text-dark-175 ltr:ml-2 rtl:mr-2">{{
                             field.fieldset

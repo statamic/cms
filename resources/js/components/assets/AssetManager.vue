@@ -1,23 +1,23 @@
 <template>
-    <div class="asset-manager">
-        <div class="mb-6 flex items-center">
-            <h1 class="flex-1">{{ __(container.title) }}</h1>
+    <div>
+        <ui-header :title="__(container.title)">
 
-            <dropdown-list v-if="container.can_edit || container.can_delete" class="ltr:ml-4 rtl:mr-4">
-                <dropdown-item v-if="container.can_edit" v-text="__('Edit Container')" :redirect="container.edit_url">
-                </dropdown-item>
-                <dropdown-item v-text="__('Edit Blueprint')" :redirect="container.blueprint_url"> </dropdown-item>
+            <dropdown-list v-if="container.can_edit || container.can_delete">
+                <dropdown-item v-if="container.can_edit" v-text="__('Edit Container')" :redirect="container.edit_url" />
+                <dropdown-item v-text="__('Edit Blueprint')" :redirect="container.blueprint_url" />
                 <dropdown-item v-if="container.can_delete" class="warning" @click="$refs.deleter.confirm()">
                     {{ __('Delete Container') }}
-                    <resource-deleter ref="deleter" :resource-title="__(container.title)" :route="container.delete_url">
-                    </resource-deleter>
+                    <resource-deleter ref="deleter" :resource-title="__(container.title)" :route="container.delete_url" />
                 </dropdown-item>
             </dropdown-list>
 
-            <a :href="createContainerUrl" class="btn ltr:ml-4 rtl:mr-4" v-if="canCreateContainers">{{
-                __('Create Container')
-            }}</a>
-        </div>
+            <ui-button
+                v-if="canCreateContainers"
+                :href="createContainerUrl"
+                :text="__('Create Container')"
+                variant="primary"
+            />
+        </ui-header>
 
         <asset-browser
             ref="browser"

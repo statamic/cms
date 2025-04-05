@@ -28,7 +28,7 @@
                 <div class="h-8 w-8 text-gray-800 dark:text-dark-175 ltr:mr-4 rtl:ml-4">
                     @cp_svg('icons/light/hammer-wrench')
                 </div>
-                <div class="mb-4 flex-1 md:mb-0 ltr:md:mr-6 rtl:md:ml-6">
+                <div class="mb-4 flex-1 md:mb-0 md:ltr:mr-6 md:rtl:ml-6">
                     <h3 class="mb-2 text-blue dark:text-blue-600">
                         {{ __('Configure Taxonomy') }}
                         @rarr
@@ -46,7 +46,7 @@
                 <div class="h-8 w-8 text-gray-800 dark:text-dark-175 ltr:mr-4 rtl:ml-4">
                     @cp_svg('icons/light/content-writing')
                 </div>
-                <div class="mb-4 flex-1 md:mb-0 ltr:md:mr-6 rtl:md:ml-6">
+                <div class="mb-4 flex-1 md:mb-0 md:ltr:mr-6 md:rtl:ml-6">
                     <h3 class="mb-2 text-blue dark:text-blue-600">
                         {{ __('Create Term') }}
                         @rarr
@@ -64,7 +64,7 @@
                 <div class="h-8 w-8 text-gray-800 dark:text-dark-175 ltr:mr-4 rtl:ml-4">
                     @cp_svg('icons/light/blueprint')
                 </div>
-                <div class="mb-4 flex-1 md:mb-0 ltr:md:mr-6 rtl:md:ml-6">
+                <div class="mb-4 flex-1 md:mb-0 md:ltr:mr-6 md:rtl:ml-6">
                     <h3 class="mb-2 text-blue dark:text-blue-600">
                         {{ __('Configure Blueprints') }}
                         @rarr

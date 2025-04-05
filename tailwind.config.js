@@ -4,14 +4,8 @@ module.exports = {
     darkMode: 'class',
     content: ['./resources/**/*.{html,js,vue,blade.php}', './tests/**/*.{html,vue,blade.php}'],
     safelist: [
-        {
-            pattern: /m[l|r]-(?:[0-9]|10|11|12|14|16)$/,
-            variants: ['md', 'lg', 'xl'],
-        },
-        {
-            pattern: /p[x|y]-(?:[0-9]|10|11|12|14|16)$/,
-            variants: ['md', 'lg', 'xl'],
-        },
+        { pattern: /m[l|r]-(?:[0-9]|10|11|12|14|16)$/, variants: ['md', 'lg', 'xl'] },
+        { pattern: /p[x|y]-(?:[0-9]|10|11|12|14|16)$/, variants: ['md', 'lg', 'xl'] },
     ],
     theme: {
         colors: {
@@ -68,54 +62,20 @@ module.exports = {
                 950: '#161616',
                 975: '#131314',
             },
-            'dark-blue': {
-                100: '#2870F5',
-                125: '#1e68f1',
-                150: '#1f67ec',
-                175: '#1560ec',
-                200: '#2a4270',
-            },
-            orange: {
-                light: '#fcc062',
-                DEFAULT: '#f5a82f',
-                dark: '#e08a1e',
-            },
-            pink: {
-                light: '#ff5ba7',
-                DEFAULT: '#ff269e',
-                dark: '#e00095',
-            },
-            purple: {
-                light: '#e0b7ff',
-                DEFAULT: '#c471ed',
-                dark: '#a855cd',
-            },
-            yellow: {
-                light: '#ffffe0',
-                DEFAULT: '#fbfab0',
-                dark: '#e8dc1e',
-            },
+            'dark-blue': { 100: '#2870F5', 125: '#1e68f1', 150: '#1f67ec', 175: '#1560ec', 200: '#2a4270' },
+            orange: { light: '#fcc062', DEFAULT: '#f5a82f', dark: '#e08a1e' },
+            pink: { light: '#ff5ba7', DEFAULT: '#ff269e', dark: '#e00095' },
+            purple: { light: '#e0b7ff', DEFAULT: '#c471ed', dark: '#a855cd' },
+            yellow: { light: '#ffffe0', DEFAULT: '#fbfab0', dark: '#e8dc1e' },
             amber: colors.amber,
             green: colors.green,
             red: colors.red,
             'dark-red': '#900000',
         },
-        screens: {
-            sm: '576px',
-            md: '768px',
-            lg: '992px',
-            xl: '1200px',
-            '2xl': '1440px',
-        },
+        screens: { sm: '576px', md: '768px', lg: '992px', xl: '1200px', '2xl': '1440px' },
         extend: {
-            borderColor: {
-                DEFAULT: colors.gray[300],
-            },
-            borderWidth: {
-                0: '0',
-                3: '3px',
-                6: '6px',
-            },
+            borderColor: { DEFAULT: colors.gray[300] },
+            borderWidth: { 0: '0', 3: '3px', 6: '6px' },
             boxShadow: {
                 sm: '1px 2px 4px 0 rgba(0,0,0,.03)',
                 md: '0px 2px 6px -1px rgba(0,0,0,.1)',
@@ -172,16 +132,9 @@ module.exports = {
                 '4xl': '48px',
                 '5xl': '60px',
             },
-            letterSpacing: {
-                normal: '-0.004em',
-                widest: '.15em',
-            },
-            minHeight: {
-                40: '10rem',
-            },
-            maxHeight: {
-                'screen-1/2': '50vh',
-            },
+            letterSpacing: { normal: '-0.004em', widest: '.15em' },
+            minHeight: { 40: '10rem' },
+            maxHeight: { 'screen-1/2': '50vh' },
             maxWidth: {
                 '3xs': '5rem',
                 '2xs': '10rem',
@@ -196,28 +149,9 @@ module.exports = {
                 '5xl': '100rem',
                 full: '100%',
             },
-            spacing: {
-                13: '3.25rem',
-                30: '7.5rem',
-                55: '13.75rem',
-            },
-            width: {
-                128: '32rem',
-                160: '40rem',
-                240: '60rem',
-            },
-            zIndex: {
-                1: '1',
-                2: '2',
-                3: '3',
-                5: '5',
-                200: '200',
-                top: '1001',
-                max: '9999',
-                auto: 'auto',
-            },
+            spacing: { 13: '3.25rem', 30: '7.5rem', 55: '13.75rem', 7: '1.75rem' },
+            width: { 128: '32rem', 160: '40rem', 240: '60rem' },
+            zIndex: { 1: '1', 2: '2', 3: '3', 5: '5', 200: '200', top: '1001', max: '9999', auto: 'auto' },
         },
     },
-    plugins: [require('@tailwindcss/container-queries'), require('@tailwindcss/typography')],
-    important: true,
 };

@@ -47,6 +47,8 @@ class CpServiceProvider extends ServiceProvider
         Sets::setIconsDirectory();
 
         $this->registerMiddlewareGroups();
+
+        $this->bootSelfClosingUiTags();
     }
 
     public function register()
@@ -106,5 +108,13 @@ class CpServiceProvider extends ServiceProvider
             \Statamic\Http\Middleware\CP\AddVaryHeaderToResponse::class,
             \Statamic\Http\Middleware\DeleteTemporaryFileUploads::class,
         ]);
+    }
+
+    private function bootSelfClosingUiTags()
+    {
+        // Converts <ui-component /> to <ui-component></ui-component>
+        Blade::prepareStringsForCompilationUsing(fn ($template) => str_contains($template, '<ui-')
+            ? preg_replace_callback('/<(ui-[a-zA-Z0-9_-]+)([^>]*)\/>/', fn ($match) => "<{$match[1]}{$match[2]}></{$match[1]}>", $template)
+            : $template);
     }
 }

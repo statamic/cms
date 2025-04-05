@@ -1,7 +1,7 @@
 <template>
     <node-view-wrapper>
         <div
-            class="bard-set my-6 whitespace-normal rounded border bg-white shadow-md dark:border-dark-900 dark:bg-dark-500"
+            class="bard-set my-6 whitespace-normal rounded-sm border bg-white shadow-md dark:border-dark-900 dark:bg-dark-500"
             :class="{ 'border-blue-400 dark:border-dark-blue-100': selected || withinSelection, 'has-error': hasError }"
             :data-type="config.handle"
             contenteditable="false"

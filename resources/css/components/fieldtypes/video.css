@@ -1,5 +1,5 @@
 .video-fieldtype-container {
-    @apply rounded border bg-gray-200 p-4 dark:border-dark-950 dark:bg-dark-700;
+    @apply rounded-sm border bg-gray-200 p-4 dark:border-dark-950 dark:bg-dark-700;
 }
 
 .video-fieldtype .video-preview-wrapper {
@@ -15,7 +15,7 @@
 }
 
 .video-fieldtype .embed-video iframe {
-    @apply rounded;
+    @apply rounded-sm;
     position: absolute;
     top: 0;
     left: 0;
@@ -28,7 +28,7 @@
 }
 
 .video-fieldtype .native-video video {
-    @apply rounded;
+    @apply rounded-sm;
     width: 100% !important;
     height: auto !important;
 }

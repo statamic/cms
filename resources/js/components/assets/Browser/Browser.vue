@@ -252,7 +252,7 @@
                                     </div>
                                     <!-- Assets -->
                                     <button
-                                        class="asset-tile group relative outline-none"
+                                        class="asset-tile group relative outline-hidden"
                                         v-for="(asset, index) in assets"
                                         :key="asset.id"
                                         :class="{ selected: isSelected(asset.id) }"

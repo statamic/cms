@@ -1,5 +1,5 @@
 .bard-fieldtype-wrapper {
-    @apply relative rounded border outline-none dark:border-dark-900;
+    @apply relative rounded-sm border outline-hidden dark:border-dark-900;
 
     * {
         outline: none;
@@ -7,12 +7,12 @@
 }
 
 .bard-editor {
-    @apply relative rounded bg-gray-100 p-0 text-gray-800 shadow-inner dark:bg-dark-650 dark:text-dark-150;
+    @apply relative rounded-sm bg-gray-100 p-0 text-gray-800 shadow-inner dark:bg-dark-650 dark:text-dark-150;
 }
 
 .bard-editor .ProseMirror {
     @apply min-h-40 p-2 text-sm leading-tight;
-    @apply text-md leading-normal @md/bard:p-2;
+    @apply text-sm leading-normal @md/bard:p-2;
     @apply @lg/bard:p-4;
     &:focus {
         @apply ring-2 ring-inset ring-blue-200 dark:ring-blue-600;
@@ -44,7 +44,7 @@
     @apply top-0 z-5 flex items-start justify-between rounded-t border-b bg-white p-1 text-sm shadow-none dark:border-dark-900 dark:bg-dark-800;
 
     .bard-toolbar-button {
-        @apply m-0 flex h-8 w-8 items-center justify-center rounded px-1 text-center text-base text-gray-800 dark:text-dark-150;
+        @apply m-0 flex h-8 w-8 items-center justify-center rounded-sm px-1 text-center text-base text-gray-800 dark:text-dark-150;
         svg {
             @apply h-4 w-auto;
         }
@@ -84,7 +84,7 @@
     @apply rounded-full bg-black px-4 shadow-lg;
 
     button {
-        @apply mx-0.5 my-0 flex h-8 w-8 items-center justify-center rounded bg-transparent px-1 text-center text-base text-gray-700 outline-none;
+        @apply mx-0.5 my-0 flex h-8 w-8 items-center justify-center rounded-sm bg-transparent px-1 text-center text-base text-gray-700 outline-hidden;
         svg {
             @apply h-4 w-auto;
         }
@@ -107,7 +107,7 @@
 }
 
 /*  Responive Wangjangling */
-@screen md {
+@media (width >= theme(--breakpoint-md)) {
     /*  Fixed toolbar below fixed global header */
     .bard-fixed-toolbar {
         top: 52px;
@@ -232,11 +232,11 @@
     @apply fixed inset-0 min-h-screen overflow-scroll rounded-none bg-gray-200 pt-14 dark:bg-dark-700;
 
     & > .bard-editor {
-        @apply relative mx-auto my-6 max-w-xl rounded bg-white px-8 shadow dark:bg-dark-800 dark:shadow-dark;
+        @apply relative mx-auto my-6 max-w-5xl rounded-sm bg-white px-8 shadow dark:bg-dark-800 dark:shadow-lg;
     }
 
     & > .bard-fixed-toolbar {
-        @apply fixed h-12 w-full bg-gradient-to-b from-white to-gray-100 shadow dark:from-dark-400 dark:to-dark-500 dark:shadow-dark;
+        @apply fixed h-12 w-full bg-linear-to-b from-white to-gray-100 shadow dark:from-dark-400 dark:to-dark-500 dark:shadow-lg;
         padding: 7px 8px;
         top: 0;
         z-index: 999;
@@ -547,7 +547,7 @@
     }
 
     p > code {
-        @apply rounded-sm bg-gray-400 font-mono text-xs dark:bg-dark-750;
+        @apply rounded-xs bg-gray-400 font-mono text-xs dark:bg-dark-750;
         padding: 2px 4px;
         top: -1px;
     }
@@ -557,7 +557,7 @@
     }
 
     pre code {
-        @apply block w-full rounded bg-gray-400 p-4 font-mono text-xs dark:bg-dark-950 dark:text-dark-100;
+        @apply block w-full rounded-sm bg-gray-400 p-4 font-mono text-xs dark:bg-dark-950 dark:text-dark-100;
         line-height: 1.8;
     }
 }
@@ -587,7 +587,7 @@
     }
 
     .bard-toolbar-button {
-        @apply p-0 text-gray-700 outline-none;
+        @apply p-0 text-gray-700 outline-hidden;
         font-size: 16px;
 
         &:hover {
@@ -597,7 +597,7 @@
 }
 
 .bard-inline-image-container {
-    @apply relative mb-6 whitespace-normal rounded border bg-white dark:border-dark-900 dark:bg-dark-600;
+    @apply relative mb-6 whitespace-normal rounded-sm border bg-white dark:border-dark-900 dark:bg-dark-600;
     &:hover {
         cursor: grab;
     }

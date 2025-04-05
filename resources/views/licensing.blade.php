@@ -7,29 +7,21 @@
 
 @section('content')
 
-@include(
-    'statamic::partials.breadcrumb',
-    [
-        'url' => cp_route('utilities.index'),
-        'title' => __('Utilities'),
-    ]
-)
-
 @if ($requestError)
-    <div class="no-results mx-auto max-w-2xl md:pt-30">
+    <div class="no-results mx-auto max-w-6xl md:pt-30">
         <div class="flex flex-wrap items-center">
             <div class="w-full md:w-1/2">
-                <h1 class="mb-8">{{ __('Licensing') }}</h1>
-                <p class="mb-8 text-lg leading-normal text-gray-700 antialiased dark:text-dark-175">
+                <ui-heading level="1" size="xl" text="{{ __('Licensing') }}"></ui-heading>
+                <p class="my-4 text-lg leading-normal text-gray-700 antialiased dark:text-dark-175">
                     @if ($usingLicenseKeyFile)
                         {{ __('statamic::messages.outpost_license_key_error') }}
                     @else
                         {{ __('statamic::messages.outpost_issue_try_later') }}
                     @endif
                 </p>
-                <a href="{{ cp_route('utilities.licensing.refresh') }}" class="btn-primary btn-lg">
+                <ui-button href="{{ cp_route('utilities.licensing.refresh') }}" variant="primary">
                     {{ __('Try again') }}
-                </a>
+                </ui-button>
             </div>
             <div class="hidden w-1/2 md:block ltr:pl-16 rtl:pr-16">
                 @cp_svg('empty/navigation')
@@ -37,144 +29,149 @@
         </div>
     </div>
 @else
-    <div class="mb-6 flex">
-        <h1 class="flex-1">{{ __('Licensing') }}</h1>
-    </div>
-
-    @if ($configCached)
-        <div class="rounded border border-yellow-dark bg-yellow p-4 text-xs dark:border-none dark:bg-dark-blue-100">
-            <div class="mb-2 font-bold">{{ __('Configuration is cached') }}</div>
-            <p>{!! __('statamic::messages.licensing_config_cached_warning') !!}</p>
-        </div>
-    @endif
-
-    @if ($site->key() && $site->usesIncorrectKeyFormat())
-        <div
-            class="{{ $configCached ? 'mt-8' : '' }} rounded border border-yellow-dark bg-yellow p-4 text-xs dark:border-none dark:bg-dark-blue-100"
-        >
-            <div class="mb-2 font-bold">{{ __('statamic::messages.licensing_incorrect_key_format_heading') }}</div>
-            <p>{!! __('statamic::messages.licensing_incorrect_key_format_body') !!}</p>
-        </div>
-    @endif
-
-    <h6 class="mt-8">{{ __('Site') }}</h6>
-    <div class="card mt-2 p-0">
-        <table class="data-table">
-            <tr>
-                <td class="w-64 font-bold">
-                    <span
-                        class="little-dot {{ $site->valid() ? 'bg-green-600' : 'bg-red-500' }} ltr:mr-2 rtl:ml-2"
-                    ></span>
-                    {{ $site->key() ?? __('No license key') }}
-                </td>
-                <td class="relative">
-                    {{ $site->domain()['url'] ?? '' }}
-                    @if ($site->hasMultipleDomains())
-                        <span class="text-2xs">
-                            ({{ trans_choice('and :count more', $site->additionalDomainCount()) }})
-                        </span>
-                    @endif
-                </td>
-                <td class="text-red-500 ltr:text-right rtl:text-left">{{ $site->invalidReason() }}</td>
-            </tr>
-        </table>
-    </div>
-
-    <h6 class="mt-8">{{ __('Core') }}</h6>
-    <div class="card mt-2 p-0">
-        <table class="data-table">
-            <tr>
-                <td class="w-64 font-bold">
-                    <span
-                        class="little-dot {{ $statamic->valid() ? 'bg-green-600' : 'bg-red-500' }} ltr:mr-2 rtl:ml-2"
-                    ></span>
-                    {{ __('Statamic') }}
-
-                    @if ($statamic->pro())
-                        <span class="text-pink">{{ __('Pro') }}</span>
-                    @else
-                        {{ __('Free') }}
-                    @endif
-                </td>
-                <td>{{ $statamic->version() }}</td>
-                <td class="text-red-500 ltr:text-right rtl:text-left">{{ $statamic->invalidReason() }}</td>
-            </tr>
-        </table>
-    </div>
-
-    <h6 class="mt-8">{{ __('Addons') }}</h6>
-
-    @if ($addons->isEmpty())
-        <p class="mt-2 text-sm text-gray dark:text-dark-150">{{ __('No addons installed') }}</p>
-    @else
-        <div class="card mt-2 p-0">
-            <table class="data-table">
-                @foreach ($addons as $addon)
-                    <tr>
-                        <td class="w-64 ltr:mr-2 rtl:ml-2">
-                            <span
-                                class="little-dot {{ $addon->valid() ? 'bg-green-600' : 'bg-red-500' }} ltr:mr-2 rtl:ml-2"
-                            ></span>
-                            <span class="font-bold">
-                                <a
-                                    href="{{ $addon->addon()->marketplaceUrl() }}"
-                                    class="text-gray hover:text-blue dark:text-dark-175 dark:hover:text-dark-blue-100"
-                                >
-                                    {{ $addon->name() }}
-                                </a>
-                            </span>
-                            @if ($addon->edition())
-                                <span class="badge font-bold uppercase text-gray-600 dark:text-dark-200">
-                                    {{ $addon->edition() ?? '' }}
-                                </span>
-                            @endif
-                        </td>
-                        <td>{{ $addon->version() }}</td>
-                        <td class="text-red-500 ltr:text-right rtl:text-left">{{ $addon->invalidReason() }}</td>
-                    </tr>
-                @endforeach
-            </table>
-        </div>
-    @endif
-
-    @if (! $unlistedAddons->isEmpty())
-        <h6 class="mt-8">{{ __('Unlisted Addons') }}</h6>
-        <div class="card mt-2 p-0">
-            <table class="data-table">
-                @foreach ($unlistedAddons as $addon)
-                    <tr>
-                        <td class="w-64 font-bold ltr:mr-2 rtl:ml-2">
-                            <span class="little-dot bg-green-600 ltr:mr-2 rtl:ml-2"></span>
-                            {{ $addon->name() }}
-                        </td>
-                        <td>{{ $addon->version() }}</td>
-                    </tr>
-                @endforeach
-            </table>
-        </div>
-    @endif
-
-    <div class="mt-10 flex items-center border-t py-4 dark:border-dark-950">
-        <a href="{{ $site->url() }}" target="_blank" class="btn btn-primary ltr:mr-4 rtl:ml-4">
-            {{ __('Edit Site') }}
-        </a>
+    <ui-header title="{{ __('Licensing') }}">
+        <ui-button
+            href="{{ $site->url() }}"
+            target="_blank"
+            text="{{ __('Manage on statamic.com') }}"
+        ></ui-button>
         @if ($addToCartUrl)
-            <a href="{{ $addToCartUrl }}" target="_blank" class="btn ltr:mr-4 rtl:ml-4">{{ __('Buy Licenses') }}</a>
+            <ui-button
+                href="{{ $addToCartUrl }}"
+                target="_blank"
+                text="{{ __('Buy Licenses') }}"
+            ></ui-button>
+        @endif
+        <ui-tooltip side="bottom" text="{{ __('statamic::messages.licensing_sync_instructions') }}">
+            <ui-button
+                href="{{ cp_route('utilities.licensing.refresh') }}"
+                variant="primary"
+                text="{{ __('Sync') }}"
+            ></ui-button>
+        </ui-tooltip>
+    </ui-header>
+
+    <section class="space-y-6">
+
+        @if ($configCached)
+            <ui-card-panel heading="{{ __('Configuration is cached') }}">
+                <p class="text-gray-700 text-sm">{!! __('statamic::messages.licensing_config_cached_warning') !!}</p>
+            </ui-card-panel>
         @endif
 
-        <a href="{{ cp_route('utilities.licensing.refresh') }}" class="btn">{{ __('Sync') }}</a>
-        <p class="text-2xs text-gray dark:text-dark-175 ltr:ml-4 rtl:mr-4">
-            {{ __('statamic::messages.licensing_sync_instructions') }}
-        </p>
-    </div>
+        @if ($site->key() && $site->usesIncorrectKeyFormat())
+            <ui-card-panel heading="{{ __('statamic::messages.licensing_incorrect_key_format_heading') }}">
+                <p class="text-gray-700 text-sm">{!! __('statamic::messages.licensing_incorrect_key_format_body') !!}</p>
+            </ui-card-panel>
+        @endif
+
+        <ui-card-panel heading="{{ __('Site') }}">
+            <table class="data-table">
+                <tr>
+                    <td class="w-64 font-bold">
+                        <span
+                            class="little-dot {{ $site->valid() ? 'bg-green-600' : 'bg-red-700' }} me-2"
+                        ></span>
+                        {{ $site->key() ?? __('No license key') }}
+                    </td>
+                    <td class="relative">
+                        {{ $site->domain()['url'] ?? '' }}
+                        @if ($site->hasMultipleDomains())
+                            <span class="text-xs">
+                                ({{ trans_choice('and :count more', $site->additionalDomainCount()) }})
+                            </span>
+                        @endif
+                    </td>
+                    <td class="text-end">
+                        @if ($site->invalidReason())
+                            <ui-badge color="red">
+                                {{ $site->invalidReason() }}
+                            </ui-badge>
+                        @endif
+                    </td>
+                </tr>
+            </table>
+        </ui-card-panel>
+
+        <ui-card-panel heading="{{ __('Core') }}">
+            <table class="data-table">
+                <tr>
+                    <td class="w-64 font-bold">
+                        <span
+                            class="little-dot {{ $statamic->valid() ? 'bg-green-600' : 'bg-red-700' }} ltr:mr-2 rtl:ml-2"
+                        ></span>
+                        {{ __('Statamic') }}
+
+                        @if ($statamic->pro())
+                            <span class="text-pink">{{ __('Pro') }}</span>
+                        @else
+                            {{ __('Free') }}
+                        @endif
+                    </td>
+                    <td>{{ $statamic->version() }}</td>
+                    <td class="text-end">
+                        @if ($statamic->invalidReason())
+                            <ui-badge color="red">
+                                {{ $statamic->invalidReason() }}
+                            </ui-badge>
+                        @endif
+                    </td>
+                </tr>
+            </table>
+        </ui-card-panel>
+
+        @if (! $addons->isEmpty())
+            <ui-card-panel heading="{{ __('Addons') }}" class="mt-6">
+                <table class="data-table">
+                    @foreach ($addons as $addon)
+                        <tr>
+                            <td class="w-64 ltr:mr-2 rtl:ml-2">
+                                <span
+                                    class="little-dot {{ $addon->valid() ? 'bg-green-600' : 'bg-red-700' }} ltr:mr-2 rtl:ml-2"
+                                ></span>
+                                <span class="font-bold">
+                                    <a
+                                        href="{{ $addon->addon()->marketplaceUrl() }}"
+                                        class="text-gray hover:text-blue dark:text-dark-175 dark:hover:text-dark-blue-100"
+                                    >
+                                        {{ $addon->name() }}
+                                    </a>
+                                </span>
+                                @if ($addon->edition())
+                                    <ui-badge>
+                                        {{ $addon->edition() ?? '' }}
+                                    </ui-badge>
+                                @endif
+                            </td>
+                            <td>{{ $addon->version() }}</td>
+                            <td class="text-red-700 ltr:text-right rtl:text-left">{{ $addon->invalidReason() }}</td>
+                        </tr>
+                    @endforeach
+                </table>
+            </ui-card-panel>
+        @endif
+
+        @if (! $unlistedAddons->isEmpty())
+            <ui-card-panel heading="{{ __('Unlisted Addons') }}">
+                <table class="data-table">
+                    @foreach ($unlistedAddons as $addon)
+                        <tr>
+                            <td class="w-64 font-bold ltr:mr-2 rtl:ml-2">
+                                <span class="little-dot bg-green-600 ltr:mr-2 rtl:ml-2"></span>
+                                {{ $addon->name() }}
+                            </td>
+                            <td>{{ $addon->version() }}</td>
+                        </tr>
+                    @endforeach
+                </table>
+            </ui-card-panel>
+        @endif
+    </section>
 @endif
 
-@include(
-    'statamic::partials.docs-callout',
-    [
-        'topic' => __('Licensing'),
-        'url' => Statamic::docsUrl('licensing'),
-    ]
-)
+    <x-statamic::docs-callout
+        topic="{{ __('Licensing') }}"
+        url="{{ Statamic::docsUrl('licensing') }}"
+    />
 
 @stop

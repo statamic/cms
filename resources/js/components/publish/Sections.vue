@@ -1,15 +1,10 @@
 <template>
     <div class="publish-sections">
         <div class="publish-sections-section" v-for="(section, i) in visibleSections" :key="i">
-            <div class="card p-0">
-                <header class="publish-section-header @container" v-if="section.display">
-                    <div class="publish-section-header-inner">
-                        <label v-text="__(section.display)" class="text-base font-semibold" />
-                        <div class="help-block" v-if="section.instructions">
-                            <p v-html="$markdown(__(section.instructions))" />
-                        </div>
-                    </div>
-                </header>
+            <ui-card-panel
+                :heading="__(section.display)"
+                :description="__(section.instructions)"
+            >
                 <publish-fields
                     :fields="section.fields"
                     :read-only="readOnly"
@@ -22,7 +17,7 @@
                     @focus="$emit('focus', $event)"
                     @blur="$emit('blur', $event)"
                 />
-            </div>
+            </ui-card-panel>
         </div>
     </div>
 </template>

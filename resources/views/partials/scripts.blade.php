@@ -27,7 +27,7 @@
         {!!
             json_encode(
                 array_merge(Statamic::jsonVariables(request()), [
-                    'wrapperClass' => $__env->getSection('wrapper_class', 'max-w-xl'),
+                    'wrapperClass' => $__env->getSection('wrapper_class', 'max-w-5xl'),
                 ]),
             )
         !!};

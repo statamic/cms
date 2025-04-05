@@ -64,7 +64,7 @@
                 <tr
                     v-for="(row, index) in rows"
                     :key="row.id"
-                    class="sortable-row outline-none"
+                    class="sortable-row outline-hidden"
                     :class="{ 'row-selected': sharedState.selections.includes(row.id) }"
                 >
                     <td class="table-drag-handle" v-if="reorderable"></td>
@@ -107,7 +107,7 @@
                     <td class="type-column" v-if="type">
                         <span
                             v-if="type === 'entries' || type === 'terms'"
-                            class="rounded bg-gray-200 px-1 py-px text-2xs uppercase text-gray dark:bg-dark-400 dark:text-dark-150"
+                            class="rounded-sm bg-gray-200 px-1 py-px text-2xs uppercase text-gray dark:bg-dark-400 dark:text-dark-150"
                         >
                             <template v-if="type === 'entries'">{{ __(row.collection.title) }}</template>
                             <template v-if="type === 'terms'">{{ __(row.taxonomy.title) }}</template>

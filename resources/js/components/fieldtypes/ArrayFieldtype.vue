@@ -4,7 +4,7 @@
             <div class="input-group">
                 <div class="input-group-prepend flex items-center">
                     <select
-                        class="appearance-none border-0 bg-transparent text-sm shadow-none outline-none"
+                        class="appearance-none border-0 bg-transparent text-sm shadow-none outline-hidden"
                         @input="setKey($event.target.value)"
                     >
                         <option

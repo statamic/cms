@@ -7,7 +7,7 @@
 @section('content')
     <h1 class="mb-6 pt-20 text-center text-gray-800 dark:text-white/80">{{ $title }}</h1>
 
-    <div class="relative mx-auto flex max-w-xs items-center justify-center rounded shadow-lg">
+    <div class="relative mx-auto flex max-w-xs items-center justify-center rounded-sm shadow-lg">
         <div class="outside-shadow absolute inset-0"></div>
         <div class="card auth-card" x-data="{ busy: false }" v-pre>
             <form method="POST" action="{{ $action }}" x-on:submit="busy = true">

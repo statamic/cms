@@ -1,5 +1,5 @@
 <template>
-    <div class="publish-fields @container">
+    <div class="publish-fields @container space-y-4">
         <publish-field
             v-for="field in fields"
             v-show="showField(field)"

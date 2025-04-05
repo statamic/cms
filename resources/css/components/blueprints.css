@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .blueprint-section {
-    @apply min-h-40 w-full p-2 outline-none;
+    @apply min-h-40 w-full p-2 outline-hidden;
 
     &.draggable-source--is-dragging {
         opacity: 0.5;
@@ -21,11 +21,11 @@
 }
 
 .blueprint-section-field {
-    @apply relative z-10 mb-2 px-1 text-sm outline-none;
+    @apply relative z-10 mb-2 px-1 text-sm outline-hidden;
 
     .blueprint-section-field-inner {
-        @apply relative z-10 flex rounded border bg-gray-200 shadow-sm outline-none;
-        @apply dark:border-none dark:bg-dark-600 dark:shadow-dark;
+        @apply relative z-10 flex rounded-sm border bg-gray-200 shadow-sm outline-hidden;
+        @apply dark:border-none dark:bg-dark-600 dark:shadow-lg;
     }
 
     &.draggable-source--is-dragging {
@@ -40,7 +40,7 @@
 .blueprint-section-import {
     &:before {
         content: '';
-        @apply absolute rounded border bg-gray-200 shadow-sm;
+        @apply absolute rounded-sm border bg-gray-200 shadow-sm;
         top: -3px;
         left: 6px;
         right: 0;

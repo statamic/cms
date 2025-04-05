@@ -10,7 +10,7 @@
                         v-tooltip="tooltipText"
                         default="light/generic-field"
                     />
-                    <a class="break-all" v-text="__(labelText)" @click="$emit('edit')" />
+                    <a class="overflow-hidden text-ellipsis" v-text="__(labelText)" @click="$emit('edit')" />
                     <svg-icon
                         name="light/hyperlink"
                         v-if="isReferenceField"

@@ -85,7 +85,7 @@
                         append-to="body"
                     >
                         <div
-                            class="asset-grid-listing overflow-hidden rounded border dark:border-dark-900"
+                            class="asset-grid-listing overflow-hidden rounded-sm border dark:border-dark-900"
                             :class="{ 'rounded-t-none': !isReadOnly && (showPicker || uploads.length) }"
                             ref="assets"
                         >

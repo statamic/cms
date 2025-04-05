@@ -14,7 +14,7 @@
                 </div>
 
                 <component
-                    class="mx-auto max-w-3xl"
+                    class="mx-auto max-w-7xl"
                     :is="component"
                     v-if="!loading"
                     v-bind="componentPropValues"

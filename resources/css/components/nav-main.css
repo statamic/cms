@@ -2,9 +2,9 @@
    THE MAIN NAV
    ========================================================================== */
 
-.nav-main {
-    @apply absolute hidden h-screen w-56 select-none overflow-scroll bg-white shadow ltr:left-0 rtl:right-0;
-    @apply dark:bg-dark-800 dark:shadow-dark;
+.nav-/main {
+    @apply absolute hidden h-screen w-56 select-none overflow-scroll bg-white shadow start-0;
+    @apply dark:bg-dark-800 dark:shadow-lg;
 
     transition: all 0.3s;
 
@@ -81,7 +81,7 @@
     }
 }
 
-@screen md {
+@media (width >= theme(--breakpoint-md)) {
     .nav-main {
         @apply fixed flex overflow-auto bg-transparent shadow-none dark:border-dark-900 ltr:border-r rtl:border-l;
         height: calc(100% - 52px);
@@ -100,7 +100,7 @@
 }
 
 .nav-toggle {
-    @apply flex h-6 w-6 items-center justify-center rounded p-1 ltr:mr-3 rtl:ml-3;
+    @apply flex h-6 w-6 items-center justify-center rounded-sm p-1 ltr:mr-3 rtl:ml-3;
     outline: none !important;
 
     &:hover {

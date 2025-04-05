@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div ref="sections" class="blueprint-sections -mx-2 flex flex-wrap outline-none" :data-tab="tabId">
+        <div ref="sections" class="blueprint-sections -mx-2 flex flex-wrap outline-hidden" :data-tab="tabId">
             <blueprint-section
                 ref="section"
                 v-for="(section, i) in sections"
@@ -16,13 +16,13 @@
             />
 
             <div class="blueprint-add-section-container w-full">
-                <button class="blueprint-add-section-button outline-none" @click="addAndEditSection">
+                <button class="blueprint-add-section-button outline-hidden" @click="addAndEditSection">
                     <div class="flex items-center text-center leading-none">
                         <svg-icon name="micro/plus" class="h-3 w-3 ltr:mr-2 rtl:ml-2" />
                         <div v-text="addSectionText" />
                     </div>
 
-                    <div class="blueprint-section-draggable-zone outline-none" :data-tab="tabId" />
+                    <div class="blueprint-section-draggable-zone outline-hidden" :data-tab="tabId" />
                 </button>
             </div>
         </div>

@@ -7,38 +7,30 @@
 
 @section('content')
 
-<header class="mb-6">
-    @include(
-        'statamic::partials.breadcrumb',
-        [
-            'url' => cp_route('utilities.index'),
-            'title' => __('Utilities'),
-        ]
-    )
-    <h1>{{ __('PHP Info') }}</h1>
-</header>
+<ui-header title="{{ __('PHP Info') }}"></ui-header>
 
-<div class="card p-0" dir="ltr">
-    <table class="data-table ltr:text-left">
-        <tr>
-            <th class="w-1/4 py-2 ltr:pl-4 rtl:pr-4">{{ __('PHP Version') }}</th>
-            <td>{{ PHP_VERSION }}</td>
-        </tr>
-    </table>
-</div>
+<section class="space-y-6">
+    <ui-card-panel heading="{{ __('PHP version') }}">
+        <ui-table>
+            <ui-table-row>
+                <ui-table-cell width="30%">{{ __('PHP Version') }}</ui-table-cell>
+                <ui-table-cell>{{ PHP_VERSION }}</ui-table-cell>
+            </ui-table-row>
+        </ui-table>
+    </ui-card-panel>
 
-@foreach ($phpinfo as $section => $items)
-    <h2 class="mb-2 mt-8 text-lg font-bold" dir="ltr">{{ $section }}</h2>
-    <div class="card p-0" dir="ltr">
-        <table class="data-table ltr:text-left">
-            @foreach ($items as $name => $value)
-                <tr>
-                    <th class="w-1/4 py-2 ltr:pl-4 rtl:pr-4">{{ $name }}</th>
-                    <td class="break-all">{{ is_array($value) ? join(', ', $value) : $value }}</td>
-                </tr>
-            @endforeach
-        </table>
-    </div>
-@endforeach
+    @foreach ($phpinfo as $section => $items)
+        <ui-card-panel heading="{{ $section }}">
+            <ui-table>
+                @foreach ($items as $name => $value)
+                    <ui-table-row>
+                        <ui-table-cell width="30%">{{ $name }}</ui-table-cell>
+                        <ui-table-cell>{{ is_array($value) ? join(', ', $value) : $value }}</ui-table-cell>
+                    </ui-table-row>
+                @endforeach
+            </ui-table>
+        </ui-card-panel>
+    @endforeach
+</section>
 
 @stop

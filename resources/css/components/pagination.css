@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .pagination {
-    @apply flex list-none items-center justify-center overflow-hidden rounded p-0 shadow dark:shadow-dark;
+    @apply flex list-none items-center justify-center overflow-hidden rounded-sm p-0 shadow dark:shadow-lg;
 
     li a {
         @apply block h-full bg-white px-3 py-2 text-gray-800 dark:border-dark-900 dark:bg-dark-600 dark:text-dark-150 ltr:border-r rtl:border-l;

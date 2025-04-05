@@ -15,18 +15,16 @@ export default {
                 return null;
             }
 
+            const formatter = new DateFormatter().options(this.value.time_enabled ? 'datetime' : 'date');
+
             if (this.value.mode === 'range') {
-                let start = new Date(this.value.start.date + 'T' + (this.value.start.time || '00:00:00') + 'Z');
-                let end = new Date(this.value.end.date + 'T' + (this.value.end.time || '00:00:00') + 'Z');
-                const formatter = new DateFormatter().options('date');
+                let start = new Date(this.value.start);
+                let end = new Date(this.value.end);
 
                 return formatter.date(start) + ' – ' + formatter.date(end);
             }
 
-            return DateFormatter.format(
-                this.value.date + 'T' + (this.value.time || '00:00:00') + 'Z',
-                this.value.time_enabled && this.value.time ? 'datetime' : 'date',
-            );
+            return formatter.date(this.value.date).toString();
         },
     },
 };

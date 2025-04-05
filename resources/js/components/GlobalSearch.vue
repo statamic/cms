@@ -23,7 +23,7 @@
 
         <span
             v-if="!(isDirty || searching)"
-            class="rounded border px-1 pb-px text-2xs text-gray-600 dark:border-dark-300 dark:text-dark-200"
+            class="rounded-sm border px-1 pb-px text-2xs text-gray-600 dark:border-dark-300 dark:text-dark-200"
             >/</span
         >
         <loading-graphic v-if="searching" :size="14" :inline="true" text="" class="global-search-loading-indicator" />

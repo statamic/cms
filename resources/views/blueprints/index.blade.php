@@ -5,29 +5,45 @@
 
 @section('content')
 
-    <div class="flex justify-between items-center mb-6">
-        <h1>@yield('title')</h1>
-        <div v-cloak>
-        <dropdown-list class="inline-block">
-            <template v-slot:trigger>
-                <button class="button btn-primary flex items-center rtl:pl-4 ltr:pr-4">
-                    {{ __('Create Blueprint') }}
-                    <svg-icon name="micro/chevron-down-xs" class="w-2 rtl:mr-2 ltr:ml-2" />
-                </button>
+    <ui-header title="{{ __('Blueprints') }}">
+        <ui-dropdown>
+            <template #trigger>
+                <ui-button
+                    text="{{ __('Create Blueprint') }}"
+                    icon-append="chevron-down"
+                    variant="primary"
+                ></ui-button>
             </template>
 
-            @foreach (Statamic\Facades\Collection::all() as $collection)
-                @if ($loop->first)<h6 class="p-2">{{ __('Collections') }}</h6>@endif
-                <dropdown-item redirect="{{ cp_route('collections.blueprints.create', $collection) }}" text="{{ __($collection->title()) }}"></dropdown-item>
-            @endforeach
+            <ui-dropdown-menu>
+                @foreach (Statamic\Facades\Collection::all() as $collection)
+                    @if ($loop->first)
+                        <ui-dropdown-label>
+                            {{ __('Collections') }}
+                        </ui-dropdown-label>
+                    @endif
+                    <ui-dropdown-item
+                        href="{{ cp_route('collections.blueprints.create', $collection) }}"
+                        icon="collections"
+                        text="{{ __($collection->title()) }}"
+                    ></ui-dropdown-item>
+                @endforeach
 
-            @foreach (Statamic\Facades\Taxonomy::all() as $taxonomy)
-                @if ($loop->first)<h6 class="p-2 mt-4">{{ __('Taxonomies') }}</h6>@endif
-                <dropdown-item redirect="{{ cp_route('taxonomies.blueprints.create', $taxonomy) }}" text="{{ __($taxonomy->title()) }}"></dropdown-item>
-            @endforeach
-        </dropdown-list>
-        </div>
-    </div>
+                @foreach (Statamic\Facades\Taxonomy::all() as $taxonomy)
+                    @if ($loop->first)
+                        <ui-dropdown-label>
+                            {{ __('Taxonomies') }}
+                        </ui-dropdown-label>
+                    @endif
+                    <ui-dropdown-item
+                        href="{{ cp_route('taxonomies.blueprints.create', $taxonomy) }}"
+                        icon="taxonomies"
+                        text="{{ __($taxonomy->title()) }}"
+                    ></ui-dropdown-item>
+                @endforeach
+            </ui-dropdown-menu>
+        </ui-dropdown>
+    </ui-header>
 
     @foreach (Statamic\Facades\Collection::all() as $collection)
         @if ($loop->first)
@@ -196,14 +212,14 @@
                 <th class="actions-column">
                     @if ($blueprint['is_resettable'])
                         <dropdown-list class="dropdown-list">
-                            <dropdown-item :text="__('Reset')" class="warning" @click="$refs[`resetter_{{ $blueprint['namespace'] }}_{{ $blueprint['handle'] }}`].confirm()">
+                            <ui-dropdown-item :text="__('Reset')" class="warning" @click="$refs[`resetter_{{ $blueprint['namespace'] }}_{{ $blueprint['handle'] }}`].confirm()">
                                 <blueprint-resetter
                                     ref="resetter_{{ $blueprint['namespace'] }}_{{ $blueprint['handle'] }}"
                                     :resource="{{ Js::from($blueprint) }}"
                                     reload
                                 >
                                 </blueprint-resetter>
-                            </dropdown-item>
+                            </ui-dropdown-item>
                         </dropdown-list>
                     @endif
                 </td>

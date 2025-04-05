@@ -44,7 +44,7 @@
                     <button
                         v-if="!isReadOnly && !isTab"
                         v-show="syncable && isSynced"
-                        class="outline-none"
+                        class="outline-hidden"
                         :class="{ flex: syncable && isSynced }"
                         @click="$emit('desynced')"
                     >
@@ -58,7 +58,7 @@
                     <button
                         v-if="!isReadOnly && !isTab"
                         v-show="syncable && !isSynced"
-                        class="outline-none"
+                        class="outline-hidden"
                         :class="{ flex: syncable && !isSynced }"
                         @click="$emit('synced')"
                     >

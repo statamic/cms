@@ -1,7 +1,7 @@
 <template>
     <stack name="asset-editor" :before-close="shouldClose" :full="true" @closed="close">
         <div
-            class="asset-editor relative flex h-full flex-col rounded bg-gray-100 dark:bg-dark-800"
+            class="asset-editor relative flex h-full flex-col rounded-sm bg-gray-100 dark:bg-dark-800"
             :class="isImage ? 'is-image' : 'is-file'"
         >
             <div v-if="loading" class="loading">
@@ -39,7 +39,7 @@
                 <div class="flex flex-1 grow flex-col overflow-scroll md:flex-row md:justify-between">
                     <!-- Visual Area -->
                     <div
-                        class="editor-preview md:min-h-auto flex min-h-[45vh] w-full flex-1 flex-col justify-between bg-gray-800 shadow-[inset_0px_4px_3px_0px_black] dark:bg-dark-950 md:w-1/2 md:flex-auto md:grow lg:w-2/3 ltr:md:rounded-tr-md rtl:md:rounded-tl-md"
+                        class="editor-preview md:min-h-auto flex min-h-[45vh] w-full flex-1 flex-col justify-between bg-gray-800 shadow-[inset_0px_4px_3px_0px_black] dark:bg-dark-950 md:w-1/2 md:flex-auto md:grow lg:w-2/3 md:ltr:rounded-tr-md md:rtl:rounded-tl-md"
                     >
                         <!-- Toolbar -->
                         <div
@@ -50,7 +50,7 @@
                             <button
                                 v-if="isImage && isFocalPointEditorEnabled"
                                 type="button"
-                                class="flex items-center justify-center rounded bg-gray-750 px-3 py-1.5 hover:bg-gray-900 hover:text-yellow-light dark:bg-dark-400 dark:hover:bg-dark-600 dark:hover:text-yellow-dark"
+                                class="flex items-center justify-center rounded-sm bg-gray-750 px-3 py-1.5 hover:bg-gray-900 hover:text-yellow-light dark:bg-dark-400 dark:hover:bg-dark-600 dark:hover:text-yellow-dark"
                                 @click.prevent="openFocalPointEditor"
                             >
                                 <svg-icon name="focal-point" class="h-4" />
@@ -62,7 +62,7 @@
                             <button
                                 v-if="canRunAction('rename_asset')"
                                 type="button"
-                                class="flex items-center rounded bg-gray-750 px-3 py-1.5 hover:bg-gray-900 hover:text-yellow-light dark:bg-dark-400 dark:hover:bg-dark-600 dark:hover:text-yellow-dark"
+                                class="flex items-center rounded-sm bg-gray-750 px-3 py-1.5 hover:bg-gray-900 hover:text-yellow-light dark:bg-dark-400 dark:hover:bg-dark-600 dark:hover:text-yellow-dark"
                                 @click.prevent="runAction('rename_asset')"
                             >
                                 <svg-icon name="rename-file" class="h-4" />
@@ -74,7 +74,7 @@
                             <button
                                 v-if="canRunAction('move_asset')"
                                 type="button"
-                                class="flex items-center rounded bg-gray-750 px-3 py-1.5 hover:bg-gray-900 hover:text-yellow-light dark:bg-dark-400 dark:hover:bg-dark-600 dark:hover:text-yellow-dark"
+                                class="flex items-center rounded-sm bg-gray-750 px-3 py-1.5 hover:bg-gray-900 hover:text-yellow-light dark:bg-dark-400 dark:hover:bg-dark-600 dark:hover:text-yellow-dark"
                                 @click.prevent="runAction('move_asset')"
                             >
                                 <svg-icon name="move-file" class="h-4" />
@@ -84,7 +84,7 @@
                             <button
                                 v-if="canRunAction('replace_asset')"
                                 type="button"
-                                class="flex items-center rounded bg-gray-750 px-3 py-1.5 hover:bg-gray-900 hover:text-yellow-light dark:bg-dark-400 dark:hover:bg-dark-600 dark:hover:text-yellow-dark"
+                                class="flex items-center rounded-sm bg-gray-750 px-3 py-1.5 hover:bg-gray-900 hover:text-yellow-light dark:bg-dark-400 dark:hover:bg-dark-600 dark:hover:text-yellow-dark"
                                 @click.prevent="runAction('replace_asset')"
                             >
                                 <svg-icon name="swap" class="h-4" />
@@ -96,7 +96,7 @@
                             <button
                                 v-if="canRunAction('reupload_asset')"
                                 type="button"
-                                class="flex items-center rounded bg-gray-750 px-3 py-1.5 hover:bg-gray-900 hover:text-yellow-light dark:bg-dark-400 dark:hover:bg-dark-600 dark:hover:text-yellow-dark"
+                                class="flex items-center rounded-sm bg-gray-750 px-3 py-1.5 hover:bg-gray-900 hover:text-yellow-light dark:bg-dark-400 dark:hover:bg-dark-600 dark:hover:text-yellow-dark"
                                 @click.prevent="runAction('reupload_asset')"
                             >
                                 <svg-icon name="upload-cloud" class="h-4" />
@@ -107,7 +107,7 @@
 
                             <button
                                 v-if="asset.allowDownloading"
-                                class="flex items-center rounded bg-gray-750 px-3 py-1.5 hover:bg-gray-900 hover:text-yellow-light dark:bg-dark-400 dark:hover:bg-dark-600 dark:hover:text-yellow-dark"
+                                class="flex items-center rounded-sm bg-gray-750 px-3 py-1.5 hover:bg-gray-900 hover:text-yellow-light dark:bg-dark-400 dark:hover:bg-dark-600 dark:hover:text-yellow-dark"
                                 @click="download"
                                 :aria-label="__('Download file')"
                             >
@@ -120,7 +120,7 @@
                             <button
                                 v-if="allowDeleting && canRunAction('delete')"
                                 @click="runAction('delete')"
-                                class="flex items-center rounded bg-gray-750 px-3 py-1.5 text-center hover:bg-gray-900 hover:text-red-400 dark:bg-dark-400 dark:hover:bg-dark-600 dark:hover:text-dark-red"
+                                class="flex items-center rounded-sm bg-gray-750 px-3 py-1.5 text-center hover:bg-gray-900 hover:text-red-400 dark:bg-dark-400 dark:hover:bg-dark-600 dark:hover:text-dark-red"
                             >
                                 <svg-icon name="trash" class="h-4" />
                                 <span class="hidden @3xl/toolbar:inline-block ltr:ml-2 rtl:mr-2">{{
@@ -233,7 +233,7 @@
                         class="hidden h-full flex-1 space-x-3 py-1 text-xs text-gray-800 dark:text-dark-150 sm:flex rtl:space-x-reverse"
                     >
                         <div
-                            class="flex items-center rounded bg-gray-400 py-1 dark:bg-dark-600 ltr:pl-2 ltr:pr-3 rtl:pl-3 rtl:pr-2"
+                            class="flex items-center rounded-sm bg-gray-400 py-1 dark:bg-dark-600 ltr:pl-2 ltr:pr-3 rtl:pl-3 rtl:pr-2"
                             v-if="isImage"
                         >
                             <svg-icon name="image-picture" class="h-3 ltr:mr-2 rtl:ml-2" />
@@ -242,13 +242,13 @@
                             </div>
                         </div>
                         <div
-                            class="flex items-center rounded bg-gray-400 py-1 dark:bg-dark-600 ltr:pl-2 ltr:pr-3 rtl:pl-3 rtl:pr-2"
+                            class="flex items-center rounded-sm bg-gray-400 py-1 dark:bg-dark-600 ltr:pl-2 ltr:pr-3 rtl:pl-3 rtl:pr-2"
                         >
                             <svg-icon name="sd-card" class="h-3 ltr:mr-2 rtl:ml-2" />
                             <div class="">{{ asset.size }}</div>
                         </div>
                         <div
-                            class="flex items-center rounded bg-gray-400 py-1 dark:bg-dark-600 ltr:pl-2 ltr:pr-3 rtl:pl-3 rtl:pr-2"
+                            class="flex items-center rounded-sm bg-gray-400 py-1 dark:bg-dark-600 ltr:pl-2 ltr:pr-3 rtl:pl-3 rtl:pr-2"
                         >
                             <svg-icon name="thumbprint" class="h-3 ltr:mr-2 rtl:ml-2" />
                             <div class="" :title="$date.format(asset.lastModified)">

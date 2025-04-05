@@ -2,15 +2,6 @@
    PUBLISH COMPONENT
    ========================================================================== */
 
-.publishing .page-wrapper {
-    padding: 0;
-
-    .publish-errors {
-        margin: 0 24px 24px;
-        padding: 16px 0;
-    }
-}
-
 .publish-tab-outer {
     @apply flex justify-between;
 }
@@ -112,16 +103,10 @@ code.parent-url {
 }
 
 .publish-sidebar {
-    @apply shrink-0;
-    margin-left: 20px;
-    [dir='rtl'] & {
-        margin-right: 20px;
-        margin-left: 0;
-    }
-    width: 300px;
+    @apply shrink-0 ms-4 w-[300px];
 
     .publish-fields .form-group {
-        @apply p-4;
+        @apply p-0;
     }
 }
 
