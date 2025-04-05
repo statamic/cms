@@ -1,11 +1,74 @@
 <script setup>
+import { ref, computed, watch } from 'vue';
 import { cva } from 'cva';
+import Keys from '@statamic/components/keys/Keys';
 import { DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle, DialogTrigger, DialogDescription, VisuallyHidden } from 'reka-ui';
+import { ComboboxContent, ComboboxEmpty, ComboboxGroup, ComboboxLabel, ComboboxInput, ComboboxItem, ComboboxRoot, ComboboxViewport } from 'reka-ui';
+import fuzzysort from 'fuzzysort';
+import { groupBy, sortBy } from 'lodash-es';
 import { motion } from "motion-v"
 
-const props = defineProps({
+let open = ref(false);
+let query = ref('');
+let selected = ref(null);
 
+// TODO: Bring this stuff back using ajax
+let initialData = ref([
+    {"type":"link","category":"Navigation","icon":"entry","text":"Dashboard","url":"http:\/\/commandandconquer.test\/cp\/dashboard"},{"type":"link","category":"Navigation","icon":"entry","text":"Content \u00bb Collections","url":"http:\/\/commandandconquer.test\/cp\/collections"},{"type":"link","category":"Navigation","icon":"entry","text":"Content \u00bb Navigation","url":"http:\/\/commandandconquer.test\/cp\/navigation"},{"type":"link","category":"Navigation","icon":"entry","text":"Content \u00bb Taxonomies","url":"http:\/\/commandandconquer.test\/cp\/taxonomies"},{"type":"link","category":"Navigation","icon":"entry","text":"Content \u00bb Assets","url":"http:\/\/commandandconquer.test\/cp\/assets"},{"type":"link","category":"Navigation","icon":"entry","text":"Content \u00bb Globals","url":"http:\/\/commandandconquer.test\/cp\/globals"},{"type":"link","category":"Navigation","icon":"entry","text":"Fields \u00bb Blueprints","url":"http:\/\/commandandconquer.test\/cp\/fields\/blueprints"},{"type":"link","category":"Navigation","icon":"entry","text":"Fields \u00bb Fieldsets","url":"http:\/\/commandandconquer.test\/cp\/fields\/fieldsets"},{"type":"link","category":"Navigation","icon":"entry","text":"Tools \u00bb Forms","url":"http:\/\/commandandconquer.test\/cp\/forms"},{"type":"link","category":"Navigation","icon":"entry","text":"Tools \u00bb Updates","url":"http:\/\/commandandconquer.test\/cp\/updater"},{"type":"link","category":"Navigation","icon":"entry","text":"Tools \u00bb Addons","url":"http:\/\/commandandconquer.test\/cp\/addons"},{"type":"link","category":"Navigation","icon":"entry","text":"Tools \u00bb Utilities","url":"http:\/\/commandandconquer.test\/cp\/utilities"},{"type":"link","category":"Navigation","icon":"entry","text":"Settings \u00bb Site","url":"http:\/\/commandandconquer.test\/cp\/sites"},{"type":"link","category":"Navigation","icon":"entry","text":"Settings \u00bb Preferences","url":"http:\/\/commandandconquer.test\/cp\/preferences"},{"type":"link","category":"Navigation","icon":"entry","text":"Users \u00bb Users","url":"http:\/\/commandandconquer.test\/cp\/users"},{"type":"link","category":"Navigation","icon":"entry","text":"Users \u00bb Groups","url":"http:\/\/commandandconquer.test\/cp\/user-groups"},{"type":"link","category":"Navigation","icon":"entry","text":"Users \u00bb Permissions","url":"http:\/\/commandandconquer.test\/cp\/roles"},{"type":"link","category":"Actions","icon":"save","text":"Save","url":"\/cp"},{"type":"link","category":"Actions","icon":"duplicate","text":"Duplicate","url":"\/cp"},{"type":"link","category":"Actions","icon":"delete","text":"Delete","url":"\/cp"}
+]);
+
+new Keys().bindGlobal(['mod+k'], (e) => {
+    e.preventDefault();
+
+    // TODO: Make this work again
+    open.value = true;
 });
+
+const results = computed(() => {
+    let data = sortBy(initialData.value, ['category']);
+
+    let filtered = fuzzysort
+        .go(query.value, data, {
+            all: true,
+            key: 'text',
+        })
+        .map(result => {
+            return {
+                score: result._score,
+                html: result.highlight('<span class="text-blue-600 dark:text-blue-400">', '</span>'),
+                ...result.obj,
+            };
+        });
+
+    let groups = groupBy(filtered, 'category');
+
+    // TODO: Get category order from Categories enum in server payload?
+    const categories = [
+        'Actions',
+        'Navigation',
+    ];
+
+    return categories
+        .map((category) => {
+            return {
+                text: __(category),
+                items: groups[category],
+            };
+        })
+        .filter((category) => category.items);
+});
+
+watch(selected, (item) => {
+    if (!item) return;
+    console.log('selected:', item);
+    reset();
+});
+
+function reset() {
+    open.value = false;
+    query.value = '';
+    selected.value = null;
+}
 
 const modalClasses = cva({
     base: [
@@ -50,38 +113,61 @@ const modalClasses = cva({
                     :whilePress="{ scale: 0.985 }"
                     :transition="{ duration: 0.1 }"
                 >
-                    <header class="group/cmd-input flex items-center gap-2 h-14 px-5.5 border-b border-gray-200/80 dark:border-gray-950">
-                        <ui-icon name="magnifying-glass" class="size-5 text-gray-400" />
-                        <input type="text" placeholder="Search or jump to..." class="flex w-full bg-transparent py-4 text-lg outline-none placeholder:text-gray-500! antialiased" value="">
-                    </header>
-                    <div class="divide-y divide-gray-200/80 dark:divide-gray-950 max-h-[400px] overflow-y-auto">
-                        <section class="px-3 py-2 space-y-1">
-                            <ui-subheading size="sm" class="py-1 px-3">{{ __('Actions') }}</ui-subheading>
-                            <ui-command-palette-item icon="save" text="Save Entry" badge="⌘ S" />
-                            <ui-command-palette-item icon="duplicate" text="Duplicate Entry" badge="⌘ D" />
-                            <ui-command-palette-item icon="delete" text="Delete Entry" badge="⌘ DEL" />
-                        </section>
-                        <section class="px-3 py-2 space-y-1">
-                            <ui-subheading size="sm" class="py-1 px-3">{{ __('Content results') }}</ui-subheading>
-                            <ui-command-palette-item icon="entry" text="How I Found My Pants" badge="Articles" />
-                            <ui-command-palette-item icon="entry" text="About My Spaghetti" badge="Pages" />
-                            <ui-command-palette-item icon="entry" text="My Secret Sauce Recipe" badge="Recipes" />
-                            <ui-command-palette-item icon="entry" text="Me Myself and I" badge="Articles" />
-                        </section>
-                    </div>
-                    <footer class="bg-gray-50 dark:bg-gray-900 rounded-b-xl px-6 py-3 flex items-center gap-4 border-t border-gray-200/80 dark:border-gray-950">
-                        <div class="flex items-center gap-1.5">
-                            <ui-icon name="up-square" class="size-4 text-gray-500" />
-                            <ui-icon name="down-square" class="size-4 text-gray-500" />
-                            <span class="text-sm text-gray-600">Navigate</span>
-                        </div>
-                        <div class="flex items-center gap-1.5">
-                            <ui-icon name="return-square" class="size-4 text-gray-500" />
-                            <span class="text-sm text-gray-600">Select</span>
-                        </div>
-                    </footer>
+                    <ComboboxRoot
+                        :open="true"
+                        :default-open="true"
+                        :ignore-filter="true"
+                        v-model="selected"
+                    >
+                        <header class="group/cmd-input flex items-center gap-2 h-14 px-5.5 border-b border-gray-200/80 dark:border-gray-950">
+                            <ui-icon name="magnifying-glass" class="size-5 text-gray-400" />
+                            <ComboboxInput
+                                :auto-focus="true"
+                                :placeholder="__('Search or jump to...')"
+                                v-model="query"
+                                class="flex w-full bg-transparent py-4 text-lg outline-none placeholder:text-gray-500! antialiased"
+                            />
+                        </header>
+                        <ComboboxContent>
+                            <ComboboxViewport class="min-h-[360px] max-h-[360px] divide-y divide-gray-200/80 dark:divide-gray-950 overflow-y-auto">
+                                <ComboboxEmpty v-if="!results.length" class="px-3 py-2 opacity-50">
+                                    <ui-command-palette-item :text="__('No results found!')" icon="entry" disabled />
+                                </ComboboxEmpty>
+                                <ComboboxGroup
+                                    v-else
+                                    v-for="category in results" :key="category"
+                                    class="px-3 py-2 space-y-1"
+                                >
+                                    <ComboboxLabel :as-child="true">
+                                        <ui-subheading size="sm" class="py-1 px-3 border-0" v-text="category.text"></ui-subheading>
+                                    </ComboboxLabel>
+                                    <ComboboxItem
+                                        v-for="item in category.items"
+                                        :key="item.text"
+                                        :value="item.text"
+                                        :text-value="item.text"
+                                        :as-child="true"
+                                    >
+                                        <ui-command-palette-item :icon="item.icon" badge="Articles">
+                                            <div v-html="item.html" />
+                                        </ui-command-palette-item>
+                                    </ComboboxItem>
+                                </ComboboxGroup>
+                            </ComboboxViewport>
+                            <footer class="bg-gray-50 dark:bg-gray-900 rounded-b-xl px-6 py-3 flex items-center gap-4 border-t border-gray-200/80 dark:border-gray-950">
+                                <div class="flex items-center gap-1.5">
+                                    <ui-icon name="up-square" class="size-4 text-gray-500" />
+                                    <ui-icon name="down-square" class="size-4 text-gray-500" />
+                                    <span class="text-sm text-gray-600">Navigate</span>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <ui-icon name="return-square" class="size-4 text-gray-500" />
+                                    <span class="text-sm text-gray-600">Select</span>
+                                </div>
+                            </footer>
+                        </ComboboxContent>
+                    </ComboboxRoot>
                 </motion.div>
-
             </DialogContent>
         </DialogPortal>
     </DialogRoot>

@@ -15,11 +15,11 @@ const hasDefaultSlot = !!slots.default;
 <template>
     <div
         :class="[
-            'flex items-center gap-2',
+            'flex items-center gap-2 border-0',
             'rounded-lg px-2 py-1.5 text-sm antialiased',
             'text-gray-700 dark:text-gray-300',
             'not-data-disabled:cursor-pointer data-disabled:opacity-50',
-            'hover:not-data-disabled:bg-gray-50 dark:hover:not-data-disabled:bg-gray-900',
+            'data-highlighted:bg-gray-200/70 dark:data-highlighted:bg-gray-900/70',
             'outline-hidden focus-visible:bg-gray-100 dark:focus-visible:bg-gray-900',
         ]"
         data-ui-command-palette-item
