@@ -37,21 +37,21 @@ class Palette
             (new Link(
                 text: 'Save',
                 category: Category::Actions,
-            ))->url('/cp')
+            ))->url('/cp')->icon('save')
         );
 
         $this->addCommand(
             (new Link(
                 text: 'Duplicate',
                 category: Category::Actions,
-            ))->url('/cp')
+            ))->url('/cp')->icon('duplicate')
         );
 
         $this->addCommand(
             (new Link(
                 text: 'Delete',
                 category: Category::Actions,
-            ))->url('/cp')
+            ))->url('/cp')->icon('delete')
         );
 
         return $this;

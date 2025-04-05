@@ -4,6 +4,8 @@ namespace Statamic\CommandPalette;
 
 abstract class Command
 {
+    protected $icon = 'entry';
+
     public function __construct(protected string $text, protected Category $category)
     {
         //
@@ -13,6 +15,13 @@ abstract class Command
     // {
     //     // TODO: Implement keyboard shortcut configuration...
     // }
+
+    public function icon(string $icon): self
+    {
+        $this->icon = $icon;
+
+        return $this;
+    }
 
     public function type(): string
     {
@@ -24,6 +33,7 @@ abstract class Command
         return [
             'type' => $this->type(),
             'category' => $this->category->name,
+            'icon' => $this->icon,
             'text' => $this->text,
         ];
     }
