@@ -1101,7 +1101,7 @@ class NavBuilder
     protected static function transformToLink(NavItem $item): Link
     {
         $text = $item->section() !== 'Top Level'
-            ? __($item->section()).' > '.__($item->display())
+            ? __($item->section()).' » '.__($item->display())
             : __($item->display());
 
         $link = new Link(
