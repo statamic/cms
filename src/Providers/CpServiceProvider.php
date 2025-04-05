@@ -12,7 +12,6 @@ use Statamic\Extensions\Translation\Translator;
 use Statamic\Facades\User;
 use Statamic\Fieldtypes\Sets;
 use Statamic\Http\Middleware\CP\StartSession;
-use Statamic\Http\View\Composers\CommandPaletteComposer;
 use Statamic\Http\View\Composers\CustomLogoComposer;
 use Statamic\Http\View\Composers\FieldComposer;
 use Statamic\Http\View\Composers\JavascriptComposer;
@@ -33,7 +32,6 @@ class CpServiceProvider extends ServiceProvider
         View::composer(SessionExpiryComposer::VIEWS, SessionExpiryComposer::class);
         View::composer(JavascriptComposer::VIEWS, JavascriptComposer::class);
         View::composer(NavComposer::VIEWS, NavComposer::class);
-        View::composer(CommandPaletteComposer::VIEWS, CommandPaletteComposer::class);
         View::composer(CustomLogoComposer::VIEWS, CustomLogoComposer::class);
 
         Blade::directive('cp_svg', function ($expression) {
