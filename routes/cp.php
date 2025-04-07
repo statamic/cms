@@ -125,14 +125,14 @@ Route::group(['prefix' => 'auth'], function () {
 
         Route::withoutMiddleware(EnforceTwoFactor::class)->group(function () {
             Route::middleware(SetupAvailableWhenTwoFactorSetupIncomplete::class)->group(function () {
-                Route::get('auth/two-factor/setup', [TwoFactorSetupController::class, 'index'])->name('two-factor.setup');
-                Route::post('auth/two-factor/setup', [TwoFactorSetupController::class, 'store'])->name('two-factor.confirm');
-                Route::post('auth/two-factor/complete', [TwoFactorSetupController::class, 'complete'])->name('two-factor.complete');
+                Route::get('two-factor/setup', [TwoFactorSetupController::class, 'index'])->name('two-factor.setup');
+                Route::post('two-factor/setup', [TwoFactorSetupController::class, 'store'])->name('two-factor.confirm');
+                Route::post('two-factor/complete', [TwoFactorSetupController::class, 'complete'])->name('two-factor.complete');
             });
 
-            Route::get('auth/two-factor/challenge', [TwoFactorChallengeController::class, 'index'])->name('two-factor.challenge');
-            Route::post('auth/two-factor/challenge', [TwoFactorChallengeController::class, 'store'])->name('two-factor.challenge.attempt');
-            Route::get('auth/two-factor/locked', [TwoFactorLockedUserController::class, 'index'])->name('two-factor.locked');
+            Route::get('two-factor/challenge', [TwoFactorChallengeController::class, 'index'])->name('two-factor.challenge');
+            Route::post('two-factor/challenge', [TwoFactorChallengeController::class, 'store'])->name('two-factor.challenge.attempt');
+            Route::get('two-factor/locked', [TwoFactorLockedUserController::class, 'index'])->name('two-factor.locked');
         });
     }
 
