@@ -1,16 +1,19 @@
 <script setup>
 import { ref, computed, watch } from 'vue';
-import { cva } from 'cva';
+import axios from 'axios';
 import Keys from '@statamic/components/keys/Keys';
+import debounce from '@statamic/util/debounce';
 import { DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle, DialogTrigger, DialogDescription, VisuallyHidden } from 'reka-ui';
 import { ComboboxContent, ComboboxEmpty, ComboboxGroup, ComboboxLabel, ComboboxInput, ComboboxItem, ComboboxRoot, ComboboxViewport } from 'reka-ui';
 import fuzzysort from 'fuzzysort';
 import { each, groupBy, sortBy } from 'lodash-es';
 import { motion } from "motion-v"
+import { cva } from 'cva';
 
 let open = ref(false);
 let query = ref('');
 let selected = ref(null);
+let searchResults = ref([]);
 
 // TODO: Bring this stuff back using ajax
 let initialData = ref([
@@ -38,7 +41,11 @@ each({
 });
 
 const results = computed(() => {
-    let data = sortBy(initialData.value, ['category']);
+    let data = searchResults.value.length
+        ? initialData.value.concat(searchResults.value)
+        : initialData.value;
+
+    data = sortBy(data, ['category']);
 
     let filtered = fuzzysort
         .go(query.value, data, {
@@ -59,6 +66,7 @@ const results = computed(() => {
     const categories = [
         'Actions',
         'Navigation',
+        'Content Search',
     ];
 
     return categories
@@ -77,15 +85,35 @@ watch(selected, (item) => {
     reset();
 });
 
+watch(query, debounce(() => {
+    searchContent();
+}, 300));
+
 watch(open, (isOpen) => {
     if (isOpen) return;
     reset();
 })
 
+function searchContent() {
+    axios.get('/cp/search', { params: { q: query.value } }).then((response) => {
+        searchResults.value = response.data.map((result) => {
+            return {
+                type: 'link',
+                category: 'Content Search',
+                icon: 'magnifying-glass',
+                text: result.title,
+                url: result.url,
+                badge: result.badge,
+            };
+        });
+    });
+}
+
 function reset() {
     open.value = false;
     query.value = '';
     selected.value = null;
+    searchResults.value = [];
 }
 
 const modalClasses = cva({
@@ -164,7 +192,7 @@ const modalClasses = cva({
                                         :text-value="item.text"
                                         :as-child="true"
                                     >
-                                        <ui-command-palette-item :icon="item.icon" :badge="item.keys">
+                                        <ui-command-palette-item :icon="item.icon" :badge="item.keys || item.badge">
                                             <div v-html="item.html" />
                                         </ui-command-palette-item>
                                     </ComboboxItem>
