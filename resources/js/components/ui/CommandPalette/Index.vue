@@ -25,6 +25,7 @@ keys.bindGlobal(['mod+k'], (e) => {
 });
 
 each({
+    'esc': () => open.value = false,
     'ctrl+n': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', {'key': 'ArrowDown'})),
     'ctrl+p': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', {'key': 'ArrowUp'})),
 }, (callback, binding) => {
