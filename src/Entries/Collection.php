@@ -314,12 +314,13 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
     private function getEntryBlueprints()
     {
         $blueprints = Blueprint::in('collections/'.$this->handle());
+        $addonBlueprints = Blueprint::addonEntryBlueprints();
 
         if ($blueprints->isEmpty()) {
             $blueprints = collect([$this->fallbackEntryBlueprint()]);
         }
 
-        return $blueprints->values()->map(function ($blueprint) {
+        return $blueprints->merge($addonBlueprints)->values()->map(function ($blueprint) {
             return $this->ensureEntryBlueprintFields($blueprint);
         });
     }
