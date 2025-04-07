@@ -2,7 +2,12 @@
     <portal name="markdown-fullscreen" :disabled="!fullScreenMode" target-class="markdown-fieldtype">
         <element-container @resized="refresh">
             <div
-                class="markdown-fieldtype-wrapper @container/markdown"
+                class="
+                    @container/markdown w-full block bg-white dark:bg-gray-900 rounded-lg
+                    border border-gray-300 dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:inset-shadow-2xs dark:inset-shadow-black
+                    text-gray-600 dark:text-gray-300
+                    appearance-none antialiased shadow-ui-sm disabled:shadow-none not-prose
+                "
                 :class="{ 'markdown-fullscreen': fullScreenMode, 'markdown-dark-mode': darkMode }"
             >
                 <uploader
@@ -21,7 +26,7 @@
                             :field-actions="fieldActions"
                             @close="toggleFullscreen"
                         >
-                            <div class="markdown-toolbar">
+                            <div class="markdown-toolbar flex items-center justify-between ">
                                 <div class="markdown-modes">
                                     <button
                                         @click="mode = 'write'"
@@ -43,7 +48,7 @@
                                         :aria-label="button.text"
                                         @click="button.command(editor)"
                                     >
-                                        <svg-icon :name="button.svg" class="h-4 w-4" />
+                                        <svg-icon :name="button.svg" class="size-4" />
                                     </button>
                                     <button
                                         @click="toggleDarkMode"
@@ -51,49 +56,58 @@
                                         :aria-label="__('Toggle Dark Mode')"
                                         v-if="fullScreenMode"
                                     >
-                                        <svg-icon name="dark-mode" class="h-4 w-4" />
+                                        <svg-icon name="dark-mode" class="size-4" />
                                     </button>
                                 </div>
                             </div>
                         </publish-field-fullscreen-header>
 
-                        <div class="markdown-toolbar" v-if="!fullScreenMode">
-                            <div class="markdown-modes">
-                                <button
-                                    @click="mode = 'write'"
-                                    :class="{ active: mode == 'write' }"
-                                    v-text="__('Write')"
-                                    :aria-pressed="mode === 'write' ? 'true' : 'false'"
-                                />
-                                <button
-                                    @click="mode = 'preview'"
-                                    :class="{ active: mode == 'preview' }"
-                                    v-text="__('Preview')"
-                                    :aria-pressed="mode === 'preview' ? 'true' : 'false'"
-                                />
-                            </div>
-                            <div class="markdown-buttons" v-if="!isReadOnly">
-                                <button
+                        <div class="markdown-toolbar bg-gray-50 dark:bg-gray-950 rounded-t-xl py-1 px-2 border-b border-gray-300 dark:border-white/15 flex items-center justify-between" v-if="!fullScreenMode">
+                            <div class="markdown-buttons flex items-center" v-if="!isReadOnly">
+                                <ui-button
+                                    size="sm"
+                                    variant="ghost"
+                                    class="px-2!"
                                     v-for="button in buttons"
                                     v-tooltip="button.text"
                                     :aria-label="button.text"
                                     @click="button.command(editor)"
                                 >
-                                    <svg-icon :name="button.svg" class="h-4 w-4" />
-                                </button>
-                                <button
+                                    <svg-icon :name="button.svg" class="size-4" />
+                                </ui-button>
+                                <ui-button
                                     @click="toggleDarkMode"
                                     v-tooltip="darkMode ? __('Light Mode') : __('Dark Mode')"
                                     :aria-label="__('Toggle Dark Mode')"
                                     v-if="fullScreenMode"
                                 >
-                                    <svg-icon name="dark-mode" class="h-4 w-4" />
-                                </button>
+                                    <svg-icon name="dark-mode" class="size-4" />
+                                </ui-button>
+                            </div>
+                            <div class="markdown-modes">
+                                <ui-button
+                                    size="sm"
+                                    variant="ghost"
+                                    class="px-2!"
+                                    @click="mode = 'write'"
+                                    :class="{ 'text-black! dark:text-white!': mode == 'write' }"
+                                    v-text="__('Write')"
+                                    :aria-pressed="mode === 'write' ? 'true' : 'false'"
+                                />
+                                <ui-button
+                                    size="sm"
+                                    variant="ghost"
+                                    class="px-2!"
+                                    @click="mode = 'preview'"
+                                    :class="{ 'text-black! dark:text-white!': mode == 'preview' }"
+                                    v-text="__('Preview')"
+                                    :aria-pressed="mode === 'preview' ? 'true' : 'false'"
+                                />
                             </div>
                         </div>
 
                         <div class="drag-notification" v-show="dragging">
-                            <svg-icon name="upload" class="mb-4 h-12 w-12" />
+                            <svg-icon name="upload" class="mb-4 size-12" />
                             {{ __('Drop File to Upload') }}
                         </div>
 
@@ -112,7 +126,7 @@
                                 <div class="editor" ref="codemirror"></div>
 
                                 <div class="helpers">
-                                    <div class="flex w-full">
+                                    <div class="bg-gray-50 dark:bg-gray-950 rounded-b-xl border-t border-gray-200 dark:border-white/15 flex py-2 px-3 text-sm w-full">
                                         <div class="markdown-cheatsheet-helper">
                                             <button
                                                 class="text-link flex items-center"
@@ -138,7 +152,7 @@
                                 </div>
 
                                 <div class="drag-notification" v-if="assetsEnabled && draggingFile">
-                                    <svg-icon name="upload" class="mb-4 h-12 w-12" />
+                                    <svg-icon name="upload" class="mb-4 size-12" />
                                     {{ __('Drop File to Upload') }}
                                 </div>
                             </div>
