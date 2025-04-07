@@ -722,9 +722,11 @@ class CoreModifiers extends Modifier
      */
     public function filterEmpty($value)
     {
+        $isList = array_is_list(collect($value)->all());
+
         return collect($value)
             ->filter()
-            ->when(is_array($value) && array_is_list($value), fn ($collection) => $collection->values())
+            ->when($isList, fn ($collection) => $collection->values())
             ->when(is_array($value), fn ($collection) => $collection->all());
     }
 
