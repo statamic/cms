@@ -186,7 +186,11 @@ abstract class Builder implements Contract
 
     public function prepareValueAndOperator($value, $operator, $useDefault = false)
     {
-        $loweredOperator = strtolower((string) $operator);
+        if ($operator instanceof DateTimeInterface) {
+            $loweredOperator = Carbon::parse($operator)->toDateTimeString();
+        } else {
+            $loweredOperator = strtolower((string) $operator);
+        }
 
         if ($useDefault) {
             return [$operator, '='];
