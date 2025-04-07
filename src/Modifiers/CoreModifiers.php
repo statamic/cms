@@ -724,7 +724,7 @@ class CoreModifiers extends Modifier
     {
         return collect($value)
             ->filter()
-            ->when(array_is_list($value), fn ($collection) => $collection->values())
+            ->when(is_array($value) && array_is_list($value), fn ($collection) => $collection->values())
             ->when(is_array($value), fn ($collection) => $collection->all());
     }
 
