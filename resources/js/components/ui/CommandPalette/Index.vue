@@ -5,7 +5,7 @@ import Keys from '@statamic/components/keys/Keys';
 import { DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle, DialogTrigger, DialogDescription, VisuallyHidden } from 'reka-ui';
 import { ComboboxContent, ComboboxEmpty, ComboboxGroup, ComboboxLabel, ComboboxInput, ComboboxItem, ComboboxRoot, ComboboxViewport } from 'reka-ui';
 import fuzzysort from 'fuzzysort';
-import { groupBy, sortBy } from 'lodash-es';
+import { each, groupBy, sortBy } from 'lodash-es';
 import { motion } from "motion-v"
 
 let open = ref(false);
@@ -17,10 +17,23 @@ let initialData = ref([
     {"type":"link","category":"Navigation","icon":"entry","keys":null,"text":"Dashboard","url":"http:\/\/commandandconquer.test\/cp\/dashboard"},{"type":"link","category":"Navigation","icon":"entry","keys":null,"text":"Content \u00bb Collections","url":"http:\/\/commandandconquer.test\/cp\/collections"},{"type":"link","category":"Navigation","icon":"entry","keys":null,"text":"Content \u00bb Navigation","url":"http:\/\/commandandconquer.test\/cp\/navigation"},{"type":"link","category":"Navigation","icon":"entry","keys":null,"text":"Content \u00bb Taxonomies","url":"http:\/\/commandandconquer.test\/cp\/taxonomies"},{"type":"link","category":"Navigation","icon":"entry","keys":null,"text":"Content \u00bb Assets","url":"http:\/\/commandandconquer.test\/cp\/assets"},{"type":"link","category":"Navigation","icon":"entry","keys":null,"text":"Content \u00bb Globals","url":"http:\/\/commandandconquer.test\/cp\/globals"},{"type":"link","category":"Navigation","icon":"entry","keys":null,"text":"Fields \u00bb Blueprints","url":"http:\/\/commandandconquer.test\/cp\/fields\/blueprints"},{"type":"link","category":"Navigation","icon":"entry","keys":null,"text":"Fields \u00bb Fieldsets","url":"http:\/\/commandandconquer.test\/cp\/fields\/fieldsets"},{"type":"link","category":"Navigation","icon":"entry","keys":null,"text":"Tools \u00bb Forms","url":"http:\/\/commandandconquer.test\/cp\/forms"},{"type":"link","category":"Navigation","icon":"entry","keys":null,"text":"Tools \u00bb Updates","url":"http:\/\/commandandconquer.test\/cp\/updater"},{"type":"link","category":"Navigation","icon":"entry","keys":null,"text":"Tools \u00bb Addons","url":"http:\/\/commandandconquer.test\/cp\/addons"},{"type":"link","category":"Navigation","icon":"entry","keys":null,"text":"Tools \u00bb Utilities","url":"http:\/\/commandandconquer.test\/cp\/utilities"},{"type":"link","category":"Navigation","icon":"entry","keys":null,"text":"Settings \u00bb Site","url":"http:\/\/commandandconquer.test\/cp\/sites"},{"type":"link","category":"Navigation","icon":"entry","keys":null,"text":"Settings \u00bb Preferences","url":"http:\/\/commandandconquer.test\/cp\/preferences"},{"type":"link","category":"Navigation","icon":"entry","keys":null,"text":"Users \u00bb Users","url":"http:\/\/commandandconquer.test\/cp\/users"},{"type":"link","category":"Navigation","icon":"entry","keys":null,"text":"Users \u00bb Groups","url":"http:\/\/commandandconquer.test\/cp\/user-groups"},{"type":"link","category":"Navigation","icon":"entry","keys":null,"text":"Users \u00bb Permissions","url":"http:\/\/commandandconquer.test\/cp\/roles"},{"type":"link","category":"Actions","icon":"save","keys":"\u2318 S","text":"Save","url":"\/cp"},{"type":"link","category":"Actions","icon":"duplicate","keys":"\u2318 D","text":"Duplicate","url":"\/cp"},{"type":"link","category":"Actions","icon":"delete","keys":"\u2318 DEL","text":"Delete","url":"\/cp"}
 ]);
 
-new Keys().bindGlobal(['mod+k'], (e) => {
-    e.preventDefault();
+let keys = new Keys;
 
+keys.bindGlobal(['mod+k'], (e) => {
+    e.preventDefault();
     open.value = true;
+});
+
+each({
+    'ctrl+n': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', {'key': 'ArrowDown'})),
+    'ctrl+p': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', {'key': 'ArrowUp'})),
+}, (callback, binding) => {
+    keys.bindGlobal([binding], (e) => {
+        if (open.value) {
+            e.preventDefault();
+            callback();
+        }
+    });
 });
 
 const results = computed(() => {
