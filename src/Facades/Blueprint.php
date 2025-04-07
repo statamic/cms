@@ -21,7 +21,6 @@ use Statamic\Fields\BlueprintRepository;
  * @method static \Statamic\Fields\Blueprint makeFromFields($fields)
  * @method static \Statamic\Fields\Blueprint makeFromTabs($tabs)
  * @method static \Illuminate\Support\Collection in(string $namespace)
- * @method static \Illuminate\Support\Collection addonEntryBlueprints()
  * @method static void addNamespace(string $namespace, string $directory)
  * @method static \Illuminate\Support\Collection getAdditionalNamespaces()
  *

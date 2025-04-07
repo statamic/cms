@@ -4,9 +4,7 @@ namespace Statamic\Fields;
 
 use Closure;
 use Statamic\Exceptions\BlueprintNotFoundException;
-use Statamic\Facades\Addon;
 use Statamic\Facades\Blink;
-use Statamic\Facades\Blueprint;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
@@ -218,32 +216,6 @@ class BlueprintRepository
                     : $orderA <=> $orderB;
             })
             ->keyBy->handle();
-    }
-
-    public function addonEntryBlueprints()
-    {
-        return Addon::all()
-            ->map(function ($addon) {
-                $path = $addon->directory().'resources/blueprints/collections/'.$this->handle();
-                if (! is_dir($path)) {
-                    return null;
-                }
-
-                return File::withAbsolutePaths()
-                    ->getFilesByType($path, 'yaml')
-                    ->mapWithKeys(fn ($path) => [Str::after($path, $path.'/') => $path])
-                    ->map(function ($path) use ($addon) {
-                        return Blueprint::make()
-                            ->setHandle($addon->handle().'_'.pathinfo($path, PATHINFO_FILENAME))
-                            ->setContents(YAML::file($path)->parse())
-                            ->setNamespace('collections.'.$this->handle());
-                    });
-            })
-            ->filter()
-            ->flatten(1)
-            ->keyBy(function ($blueprint) {
-                return $blueprint->handle();
-            });
     }
 
     public function addNamespace(string $namespace, string $directory): void

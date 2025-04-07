@@ -18,6 +18,7 @@ use Statamic\Events\CollectionSaved;
 use Statamic\Events\CollectionSaving;
 use Statamic\Events\EntryBlueprintFound;
 use Statamic\Facades;
+use Statamic\Facades\Addon;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Entry;
@@ -26,6 +27,7 @@ use Statamic\Facades\Search;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Taxonomy;
+use Statamic\Facades\YAML;
 use Statamic\Statamic;
 use Statamic\Structures\CollectionStructure;
 use Statamic\Support\Arr;
@@ -314,7 +316,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
     private function getEntryBlueprints()
     {
         $blueprints = Blueprint::in('collections/'.$this->handle());
-        $addonBlueprints = Blueprint::addonEntryBlueprints();
+        $addonBlueprints = $this->getAddonEntryBlueprints();
 
         if ($blueprints->isEmpty()) {
             $blueprints = collect([$this->fallbackEntryBlueprint()]);
@@ -323,6 +325,32 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         return $blueprints->merge($addonBlueprints)->values()->map(function ($blueprint) {
             return $this->ensureEntryBlueprintFields($blueprint);
         });
+    }
+
+    public function getAddonEntryBlueprints()
+    {
+        return Addon::all()
+            ->map(function ($addon) {
+                $path = $addon->directory().'resources/blueprints/collections/'.$this->handle();
+                if (! is_dir($path)) {
+                    return null;
+                }
+
+                return File::withAbsolutePaths()
+                    ->getFilesByType($path, 'yaml')
+                    ->mapWithKeys(fn ($path) => [Str::after($path, $path.'/') => $path])
+                    ->map(function ($path) use ($addon) {
+                        return Blueprint::make()
+                            ->setHandle($addon->handle().'_'.pathinfo($path, PATHINFO_FILENAME))
+                            ->setContents(YAML::file($path)->parse())
+                            ->setNamespace('collections.'.$this->handle());
+                    });
+            })
+            ->filter()
+            ->flatten(1)
+            ->keyBy(function ($blueprint) {
+                return $blueprint->handle();
+            });
     }
 
     public function entryBlueprint($blueprint = null, $entry = null)
