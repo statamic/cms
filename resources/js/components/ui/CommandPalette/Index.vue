@@ -77,6 +77,11 @@ watch(selected, (item) => {
     reset();
 });
 
+watch(open, (isOpen) => {
+    if (isOpen) return;
+    reset();
+})
+
 function reset() {
     open.value = false;
     query.value = '';
