@@ -1,5 +1,4 @@
 <script>
-import GlobalSearch from '../components/GlobalSearch.vue';
 import GlobalSiteSelector from '../components/GlobalSiteSelector.vue';
 import Login from '../components/login/Login.vue';
 import BaseEntryCreateForm from '../components/entries/BaseCreateForm.vue';
@@ -47,7 +46,6 @@ import { ConfigProvider } from 'reka-ui';
 
 export default {
     components: {
-        GlobalSearch,
         GlobalSiteSelector,
         Login,
         BaseEntryCreateForm,

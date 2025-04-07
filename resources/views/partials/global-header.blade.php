@@ -52,13 +52,15 @@
             </div>
         </a>
     </div>
-
     <div class="mx-auto w-full max-w-full flex-1 items-center sm:px-8 lg:flex lg:justify-center">
+        {{--
+        I deleted this component, since we have new global header and new command palette...
         <global-search
             ref="globalSearch"
             endpoint="{{ cp_route('search') }}"
             placeholder="{{ __('Search...') }}"
         ></global-search>
+        --}}
     </div>
 
     <div class="head-link flex h-full items-center justify-end space-x-3 px-6 rtl:space-x-reverse">
