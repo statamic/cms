@@ -31,7 +31,7 @@ class CompleteTwoFactorAuthenticationSetupTest extends TestCase
     }
 
     #[Test]
-    public function correctly_updates_the_user_as_having_two_factor_enabled()
+    public function it_correctly_updates_the_user_as_having_two_factor_enabled()
     {
         $this->freezeTime();
 

@@ -17,7 +17,7 @@ class RecoveryCodeTest extends TestCase
     }
 
     #[Test]
-    public function generates_a_different_code_on_each_call()
+    public function it_generates_a_different_code_on_each_call()
     {
         $code1 = RecoveryCode::generate();
 

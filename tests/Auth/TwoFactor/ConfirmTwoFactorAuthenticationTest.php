@@ -49,7 +49,7 @@ class ConfirmTwoFactorAuthenticationTest extends TestCase
     }
 
     #[Test]
-    public function throws_an_exception_when_no_one_time_code_is_present()
+    public function it_throws_an_exception_when_no_one_time_code_is_present()
     {
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('The provided two factor authentication code was invalid.');
@@ -58,7 +58,7 @@ class ConfirmTwoFactorAuthenticationTest extends TestCase
     }
 
     #[Test]
-    public function throws_a_validation_exception_when_an_invalid_one_time_code_is_present()
+    public function it_throws_a_validation_exception_when_an_invalid_one_time_code_is_present()
     {
         // Get a one-time code (so we can make sure we have a wrong one in the test)
         $code = $this->getOneTimeCode();
@@ -78,7 +78,7 @@ class ConfirmTwoFactorAuthenticationTest extends TestCase
     }
 
     #[Test]
-    public function correctly_confirms_two_factor_authentication()
+    public function it_correctly_confirms_two_factor_authentication()
     {
         $this->freezeTime();
 

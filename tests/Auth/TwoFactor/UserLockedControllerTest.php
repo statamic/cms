@@ -6,35 +6,48 @@ use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\TwoFactor\Google2FA;
 use Statamic\Auth\TwoFactor\RecoveryCode;
-use Statamic\Auth\TwoFactor\UnlockUser;
 use Statamic\Facades\User;
+use Statamic\Http\Middleware\CP\EnforceTwoFactor;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-class UnlockUserTest extends TestCase
+class UserLockedControllerTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
-
-    private $action;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->action = app(UnlockUser::class);
+        $this->withoutMiddleware(EnforceTwoFactor::class);
     }
 
     #[Test]
-    public function it_correctly_removes_the_locked_flag_from_the_user()
+    public function it_cannot_be_performed_on_yourself()
     {
-        $user = $this->userWithTwoFactorEnabled();
-        $user->set('two_factor_locked', true)->save();
+        $this
+            ->actingAs($user = $this->userWithTwoFactorEnabled())
+            ->delete(cp_route('users.two-factor.unlock', $user->id))
+            ->assertForbidden();
 
-        $this->assertTrue($user->two_factor_locked);
+        // Try with another user
+        $otherUser = $this->userWithTwoFactorEnabled();
 
-        $this->action->__invoke($user);
+        $this
+            ->actingAs($user)
+            ->delete(cp_route('users.two-factor.unlock', $otherUser->id))
+            ->assertOk();
+    }
 
-        $this->assertFalse($user->two_factor_locked);
+    #[Test]
+    public function it_uses_the_unlock_user_action()
+    {
+        $otherUser = $this->userWithTwoFactorEnabled();
+
+        $this
+            ->actingAs($this->userWithTwoFactorEnabled())
+            ->delete(cp_route('users.two-factor.unlock', $otherUser->id))
+            ->assertOk();
     }
 
     private function user()

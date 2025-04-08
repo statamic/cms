@@ -6,35 +6,43 @@ use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\TwoFactor\Google2FA;
 use Statamic\Auth\TwoFactor\RecoveryCode;
-use Statamic\Auth\TwoFactor\UnlockUser;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-class UnlockUserTest extends TestCase
+class LockedUserControllerTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    private $action;
-
-    protected function setUp(): void
+    #[Test]
+    public function it_redirects_to_the_dashboard_if_the_user_is_not_locked()
     {
-        parent::setUp();
+        $user = $this->userWithTwoFactorEnabled();
 
-        $this->action = app(UnlockUser::class);
+        $this->assertFalse($user->two_factor_locked);
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('two-factor.locked'))
+            ->assertRedirect(cp_route('index'));
     }
 
     #[Test]
-    public function it_correctly_removes_the_locked_flag_from_the_user()
+    public function it_logs_the_user_out_and_returns_the_locked_view_when_the_user_is_locked_out()
     {
         $user = $this->userWithTwoFactorEnabled();
+
         $user->set('two_factor_locked', true)->save();
 
         $this->assertTrue($user->two_factor_locked);
 
-        $this->action->__invoke($user);
+        $this
+            ->actingAs($user)
+            ->get(cp_route('two-factor.locked'))
+            ->assertViewIs('statamic::auth.two-factor.locked');
 
-        $this->assertFalse($user->two_factor_locked);
+        // Ensure the user is now logged out
+        $this->assertNull(User::current());
     }
 
     private function user()

@@ -24,7 +24,7 @@ class SetupAvailableWhenTwoFactorSetupIncompleteTest extends TestCase
     }
 
     #[Test]
-    public function allows_access_to_setup_route_when_two_factor_is_not_setup()
+    public function it_allows_access_to_setup_route_when_two_factor_is_not_setup()
     {
         $request = Request::create(cp_route('two-factor.setup'));
         $request->setUserResolver(fn () => $this->user());
@@ -35,7 +35,7 @@ class SetupAvailableWhenTwoFactorSetupIncompleteTest extends TestCase
     }
 
     #[Test]
-    public function does_not_allow_access_when_two_factor_is_setup()
+    public function it_does_not_allow_access_when_two_factor_is_setup()
     {
         $request = Request::create(cp_route('two-factor.setup'));
         $request->setUserResolver(fn () => $this->userWithTwoFactorEnabled());

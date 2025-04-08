@@ -26,7 +26,7 @@ class EnforceTwoFactorTest extends TestCase
     }
 
     #[Test]
-    public function moves_to_the_next_middleware_when_two_factor_is_disabled()
+    public function it_moves_to_the_next_middleware_when_two_factor_is_disabled()
     {
         // Disable
         config()->set('statamic.users.two_factor.enabled', false);
@@ -54,7 +54,7 @@ class EnforceTwoFactorTest extends TestCase
     }
 
     #[Test]
-    public function redirects_to_the_setup_route_when_two_factor_setup_is_not_completed()
+    public function it_redirects_to_the_setup_route_when_two_factor_setup_is_not_completed()
     {
         $this->actingAs($user = $this->user());
 
@@ -67,7 +67,7 @@ class EnforceTwoFactorTest extends TestCase
     }
 
     #[Test]
-    public function redirects_to_the_setup_route_when_two_factor_setup_is_not_completed_when_the_user_is_super()
+    public function it_redirects_to_the_setup_route_when_two_factor_setup_is_not_completed_when_the_user_is_super()
     {
         config()->set('statamic-two-factor.enforced_roles', []);
 
@@ -82,7 +82,7 @@ class EnforceTwoFactorTest extends TestCase
     }
 
     #[Test]
-    public function redirects_to_the_setup_route_when_two_factor_setup_is_not_completed_when_the_user_has_an_enforced_role()
+    public function it_redirects_to_the_setup_route_when_two_factor_setup_is_not_completed_when_the_user_has_an_enforced_role()
     {
         $enforceableRole = Role::make('enforceable_role')->save();
 
@@ -115,7 +115,7 @@ class EnforceTwoFactorTest extends TestCase
     }
 
     #[Test]
-    public function redirects_to_the_challenge_when_validity_is_enabled_and_there_is_no_recent_challenge_or_it_has_expired()
+    public function it_redirects_to_the_challenge_when_validity_is_enabled_and_there_is_no_recent_challenge_or_it_has_expired()
     {
         config()->set('statamic.users.two_factor.validity', 1); // 1 minute
 
@@ -146,7 +146,7 @@ class EnforceTwoFactorTest extends TestCase
     }
 
     #[Test]
-    public function redirects_to_the_challenge_when_validity_is_disabled_and_there_is_no_recent_challenge()
+    public function it_redirects_to_the_challenge_when_validity_is_disabled_and_there_is_no_recent_challenge()
     {
         config()->set('statamic-two-factor.validity', null);
 
@@ -175,7 +175,7 @@ class EnforceTwoFactorTest extends TestCase
     }
 
     #[Test]
-    public function redirects_to_challenge_when_super_user()
+    public function it_redirects_to_challenge_when_super_user()
     {
         $this->actingAs($user = $this->userWithTwoFactorEnabled());
 
@@ -198,7 +198,7 @@ class EnforceTwoFactorTest extends TestCase
     }
 
     #[Test]
-    public function redirects_to_challenge_when_two_factor_is_enabled_and_when_no_enforced_roles_are_provided()
+    public function it_redirects_to_challenge_when_two_factor_is_enabled_and_when_no_enforced_roles_are_provided()
     {
         $enforceableRole = Role::make('enforceable_role')->save();
 

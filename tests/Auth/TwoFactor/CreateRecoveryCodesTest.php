@@ -23,7 +23,7 @@ class CreateRecoveryCodesTest extends TestCase
     }
 
     #[Test]
-    public function correctly_creates_eight_recovery_codes_for_a_user()
+    public function it_correctly_creates_eight_recovery_codes_for_a_user()
     {
         $user = tap(User::make()->makeSuper())->save();
 

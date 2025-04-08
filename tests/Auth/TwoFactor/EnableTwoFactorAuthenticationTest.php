@@ -25,7 +25,7 @@ class EnableTwoFactorAuthenticationTest extends TestCase
     }
 
     #[Test]
-    public function correctly_updates_the_user_as_partially_setup()
+    public function it_correctly_updates_the_user_as_partially_setup()
     {
         $this->freezeTime();
         $user = tap(User::make()->makeSuper())->save();

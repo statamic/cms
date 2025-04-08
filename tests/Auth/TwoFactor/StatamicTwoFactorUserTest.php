@@ -17,7 +17,7 @@ class StatamicTwoFactorUserTest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     #[Test]
-    public function gets_the_current_user()
+    public function it_gets_the_current_user()
     {
         $this->assertNull(TwoFactorUser::get());
 
@@ -28,7 +28,7 @@ class StatamicTwoFactorUserTest extends TestCase
     }
 
     #[Test]
-    public function sets_gets_and_clears_the_last_challenged_for_the_user()
+    public function it_sets_gets_and_clears_the_last_challenged_for_the_user()
     {
         $this->actingAs($user = $this->userWithTwoFactorEnabled());
         $otherUser = $this->userWithTwoFactorEnabled();
@@ -62,7 +62,7 @@ class StatamicTwoFactorUserTest extends TestCase
     }
 
     #[Test]
-    public function correctly_determines_if_two_factor_is_enforcable()
+    public function it_correctly_determines_if_two_factor_is_enforcable()
     {
         $this->actingAs($user = $this->userWithTwoFactorEnabled());
 

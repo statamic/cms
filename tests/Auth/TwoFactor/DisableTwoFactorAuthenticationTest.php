@@ -25,7 +25,7 @@ class DisableTwoFactorAuthenticationTest extends TestCase
     }
 
     #[Test]
-    public function correctly_removes_two_factor_authentication_from_the_user()
+    public function it_correctly_removes_two_factor_authentication_from_the_user()
     {
         $this->actingAs($user = $this->userWithTwoFactorEnabled());
 

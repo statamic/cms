@@ -30,7 +30,7 @@ class ChallengeTwoFactorAuthenticationTest extends TestCase
     }
 
     #[Test]
-    public function throws_an_exception_when_two_factor_is_not_enabled()
+    public function it_throws_an_exception_when_two_factor_is_not_enabled()
     {
         $this->expectException(ValidationException::class);
 
@@ -42,7 +42,7 @@ class ChallengeTwoFactorAuthenticationTest extends TestCase
     }
 
     #[Test]
-    public function throws_an_invalid_challenge_mode_exception_when_an_invalid_mode_is_presented()
+    public function it_throws_an_invalid_challenge_mode_exception_when_an_invalid_mode_is_presented()
     {
         $this->expectException(InvalidChallengeModeException::class);
 
@@ -50,7 +50,7 @@ class ChallengeTwoFactorAuthenticationTest extends TestCase
     }
 
     #[Test]
-    public function throws_a_validation_exception_when_a_no_one_time_code_is_present()
+    public function it_throws_a_validation_exception_when_a_no_one_time_code_is_present()
     {
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('The provided two factor authentication code was invalid.');
@@ -59,7 +59,7 @@ class ChallengeTwoFactorAuthenticationTest extends TestCase
     }
 
     #[Test]
-    public function throws_a_validation_exception_when_an_invalid_one_time_code_is_present()
+    public function it_throws_a_validation_exception_when_an_invalid_one_time_code_is_present()
     {
         $this->actingAs($user = $this->userWithTwoFactorEnabled());
 
@@ -81,7 +81,7 @@ class ChallengeTwoFactorAuthenticationTest extends TestCase
     }
 
     #[Test]
-    public function correctly_accepts_a_one_time_code_challenge()
+    public function it_correctly_accepts_a_one_time_code_challenge()
     {
         $this->freezeTime();
         $this->actingAs($user = $this->userWithTwoFactorEnabled());
@@ -96,7 +96,7 @@ class ChallengeTwoFactorAuthenticationTest extends TestCase
     }
 
     #[Test]
-    public function throws_a_validation_exception_when_no_recovery_code_is_presented()
+    public function it_throws_a_validation_exception_when_no_recovery_code_is_presented()
     {
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('The provided two factor authentication code was invalid.');
@@ -105,7 +105,7 @@ class ChallengeTwoFactorAuthenticationTest extends TestCase
     }
 
     #[Test]
-    public function throws_a_validation_exception_when_an_invalid_recovery_code_is_presented()
+    public function it_throws_a_validation_exception_when_an_invalid_recovery_code_is_presented()
     {
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('The provided two factor authentication code was invalid.');
@@ -114,7 +114,7 @@ class ChallengeTwoFactorAuthenticationTest extends TestCase
     }
 
     #[Test]
-    public function correctly_accepts_a_recovery_code_challenge()
+    public function it_correctly_accepts_a_recovery_code_challenge()
     {
         $this->freezeTime();
         $this->actingAs($user = $this->userWithTwoFactorEnabled());
@@ -129,7 +129,7 @@ class ChallengeTwoFactorAuthenticationTest extends TestCase
     }
 
     #[Test]
-    public function removes_and_replaces_the_used_recovery_code_on_a_successful_usage()
+    public function it_removes_and_replaces_the_used_recovery_code_on_a_successful_usage()
     {
         $user = $this->userWithTwoFactorEnabled();
 
@@ -152,7 +152,7 @@ class ChallengeTwoFactorAuthenticationTest extends TestCase
     }
 
     #[Test]
-    public function sends_the_recovery_code_used_notification_when_a_recovery_code_is_successfully_used()
+    public function it_sends_the_recovery_code_used_notification_when_a_recovery_code_is_successfully_used()
     {
         Notification::fake();
 

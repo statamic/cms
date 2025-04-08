@@ -25,7 +25,7 @@ class Google2FATest extends TestCase
     }
 
     #[Test]
-    public function can_generate_a_secret_key()
+    public function it_can_generate_a_secret_key()
     {
         // Generate and test the key.
         $key1 = $this->provider->generateSecretKey();
@@ -40,7 +40,7 @@ class Google2FATest extends TestCase
     }
 
     #[Test]
-    public function cannot_return_a_otpauth_url_when_user_is_not_yet_setup()
+    public function it_cannot_return_a_otpauth_url_when_user_is_not_yet_setup()
     {
         $this->actingAs($this->user());
 
@@ -50,7 +50,7 @@ class Google2FATest extends TestCase
     }
 
     #[Test]
-    public function can_return_a_otpauth_url_when_user_is_setup()
+    public function it_can_return_a_otpauth_url_when_user_is_setup()
     {
         $this->actingAs($user = $this->userWithTwoFactorEnabled());
 
@@ -61,7 +61,7 @@ class Google2FATest extends TestCase
     }
 
     #[Test]
-    public function can_return_the_svg_markup_for_the_qr_code()
+    public function it_can_return_the_svg_markup_for_the_qr_code()
     {
         $this->actingAs($this->userWithTwoFactorEnabled());
 
@@ -71,7 +71,7 @@ class Google2FATest extends TestCase
     }
 
     #[Test]
-    public function can_verify_a_one_time_code()
+    public function it_can_verify_a_one_time_code()
     {
         $this->actingAs($this->userWithTwoFactorEnabled());
 
