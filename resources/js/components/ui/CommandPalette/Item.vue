@@ -1,7 +1,7 @@
 <script setup>
-import { useSlots } from 'vue';
+import { useSlots, shallowRef, onMounted } from 'vue';
 
-defineProps({
+const props = defineProps({
     href: { type: String, default: null },
     icon: { type: String, default: null },
     text: { type: String, default: null },
@@ -10,6 +10,13 @@ defineProps({
 
 const slots = useSlots();
 const hasDefaultSlot = !!slots.default;
+const iconComponent = shallowRef(null);
+
+onMounted(() => {
+    if (props.icon) {
+        iconComponent.value = true;
+    }
+});
 </script>
 
 <template>
@@ -27,7 +34,8 @@ const hasDefaultSlot = !!slots.default;
         :href="href"
     >
         <div v-if="icon" class="flex size-6 items-center justify-center p-1 text-gray-500">
-            <ui-icon :name="icon" class="size-4" />
+            <ui-icon v-if="iconComponent" :name="icon" class="size-4" :key="icon" />
+            <div v-else class="size-4 shrink-0" />
         </div>
         <div class="flex-1">
             <slot v-if="hasDefaultSlot" />

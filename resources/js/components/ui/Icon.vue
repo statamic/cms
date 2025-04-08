@@ -1,26 +1,33 @@
 <script setup>
 // Almost definitely a throwaway component
 import { defineAsyncComponent, shallowRef, watch } from 'vue';
+import { preloadIcon } from './iconCache';
 
 const props = defineProps({
     name: {
         type: String,
         required: true,
     },
+    preload: {
+        type: Boolean,
+        default: false
+    }
 });
 
 const icon = shallowRef(null);
 
 const loadIcon = () => {
-    // Handle direct SVG strings
-    if (props.name.startsWith('<svg')) {
-        return defineAsyncComponent(() => {
-            return new Promise((resolve) => resolve({ template: props.name }));
-        });
-    }
+    // Ensure the icon is in the cache
+    preloadIcon(props.name);
 
-    // Handle file imports
-    return defineAsyncComponent(() => import(`../../../svg/icons/${props.name}.svg`));
+    // Create a stable component instance for this icon
+    return defineAsyncComponent({
+        loader: () => preloadIcon(props.name),
+        suspensible: false,
+        loadingComponent: {
+            template: '<div class="size-4 shrink-0" />'
+        }
+    });
 };
 
 watch(
@@ -28,8 +35,13 @@ watch(
     () => {
         icon.value = loadIcon();
     },
-    { immediate: true },
+    { immediate: true }
 );
+
+// If preload is true, trigger the load immediately
+if (props.preload) {
+    preloadIcon(props.name);
+}
 </script>
 
 <template>
