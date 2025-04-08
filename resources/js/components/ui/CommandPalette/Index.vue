@@ -6,7 +6,7 @@ import debounce from '@statamic/util/debounce';
 import { DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle, DialogTrigger, DialogDescription, VisuallyHidden } from 'reka-ui';
 import { ComboboxContent, ComboboxEmpty, ComboboxGroup, ComboboxLabel, ComboboxInput, ComboboxItem, ComboboxRoot, ComboboxViewport } from 'reka-ui';
 import fuzzysort from 'fuzzysort';
-import { each, groupBy, sortBy } from 'lodash-es';
+import { each, groupBy, sortBy, find } from 'lodash-es';
 import { motion } from "motion-v"
 import { cva } from 'cva';
 
@@ -36,15 +36,17 @@ each({
     });
 });
 
-const results = computed(() => {
-    let data = searchResults.value.length
+const aggregatedItems = computed(() => {
+    return searchResults.value.length
         ? items.value.concat(searchResults.value)
         : items.value;
+});
 
-    data = sortBy(data, ['category']);
+const results = computed(() => {
+    let items = sortBy(aggregatedItems.value, ['category']);
 
     let filtered = fuzzysort
-        .go(query.value, data, {
+        .go(query.value, items, {
             all: true,
             key: 'text',
         })
@@ -77,7 +79,7 @@ const results = computed(() => {
 
 watch(selected, (item) => {
     if (!item) return;
-    console.log('selected:', item);
+    select(item);
     reset();
 });
 
@@ -109,6 +111,19 @@ function searchContent() {
             };
         });
     });
+}
+
+function select(selected) {
+    let item = findSelectedItem(selected);
+
+    switch (item.type) {
+        case 'link':
+            window.location = item.url;
+    }
+}
+
+function findSelectedItem(selected) {
+    return find(aggregatedItems.value, (result) => result.text === selected);
 }
 
 function reset() {
