@@ -15,13 +15,6 @@ class TwoFactorSetupControllerTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        config()->set('statamic.users.two_factor.enabled', true);
-    }
-
     #[Test]
     public function it_shows_the_two_factor_setup_view()
     {

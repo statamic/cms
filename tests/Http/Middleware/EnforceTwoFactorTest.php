@@ -18,41 +18,6 @@ class EnforceTwoFactorTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        config()->set('statamic.users.two_factor.enabled', true);
-    }
-
-    #[Test]
-    public function it_moves_to_the_next_middleware_when_two_factor_is_disabled()
-    {
-        // Disable
-        config()->set('statamic.users.two_factor.enabled', false);
-
-        $this->actingAs($user = $this->userWithTwoFactorEnabled());
-
-        $request = Request::create(cp_route('index'));
-        $request->setUserResolver(fn () => $user);
-
-        $response = (new EnforceTwoFactor)->handle($request, fn () => null);
-
-        $this->assertNull($response);
-
-        // Enable
-        config()->set('statamic.users.two_factor.enabled', true);
-
-        $this->actingAs($user = $this->userWithTwoFactorEnabled());
-
-        $request = Request::create(cp_route('index'));
-        $request->setUserResolver(fn () => $user);
-
-        $response = (new EnforceTwoFactor)->handle($request, fn () => null);
-
-        $this->assertTrue($response->isRedirection());
-    }
-
     #[Test]
     public function it_redirects_to_the_setup_route_when_two_factor_setup_is_not_completed()
     {

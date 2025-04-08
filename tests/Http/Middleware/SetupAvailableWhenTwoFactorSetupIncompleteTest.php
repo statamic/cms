@@ -16,13 +16,6 @@ class SetupAvailableWhenTwoFactorSetupIncompleteTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        config()->set('statamic.users.two_factor.enabled', true);
-    }
-
     #[Test]
     public function it_allows_access_to_setup_route_when_two_factor_is_not_setup()
     {

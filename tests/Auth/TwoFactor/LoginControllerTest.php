@@ -15,13 +15,6 @@ class LoginControllerTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        config()->set('statamic.users.two_factor.enabled', true);
-    }
-
     #[Test]
     public function it_shows_the_locked_view_when_the_user_has_logged_in_and_they_are_locked()
     {
@@ -46,23 +39,6 @@ class LoginControllerTest extends TestCase
 
         $user = $this->userWithTwoFactorEnabled();
         $user->set('two_factor_locked', false)->save();
-
-        $this
-            ->actingAs($user)
-            ->post(cp_route('login'), [
-                'email' => $user->email(),
-                'password' => 'secret',
-            ])
-            ->assertRedirect(cp_route('index'));
-    }
-
-    #[Test]
-    public function it_does_not_show_the_locked_view_when_two_factor_as_an_addon_is_disabled()
-    {
-        config()->set('statamic.users.two_factor.enabled', false);
-
-        $user = $this->userWithTwoFactorEnabled();
-        $user->set('two_factor_locked', true)->save();
 
         $this
             ->actingAs($user)

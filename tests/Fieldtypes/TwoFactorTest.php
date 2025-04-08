@@ -26,8 +26,6 @@ class TwoFactorTest extends TestCase
     {
         parent::setUp();
 
-        config()->set('statamic.users.two_factor.enabled', true);
-
         $this->user = $this->userWithTwoFactorEnabled();
         $this->actingAs($this->user);
 
@@ -36,27 +34,6 @@ class TwoFactorTest extends TestCase
         ]);
 
         app()->instance('request', $request);
-    }
-
-    #[Test]
-    public function it_returns_the_minimal_configuration_when_two_factor_is_disabled()
-    {
-        config()->set('statamic.users.two_factor.enabled', false);
-
-        $this->assertEquals([
-            'enabled' => false,
-            'is_enforced' => false,
-            'is_locked' => false,
-            'is_me' => false,
-            'is_setup' => false,
-            'routes' => [],
-        ], $this->fieldtype()->preload());
-    }
-
-    #[Test]
-    public function is_marked_as_enabled_when_two_factor_is_enabled()
-    {
-        $this->assertTrue($this->fieldtype()->preload()['enabled']);
     }
 
     #[Test]

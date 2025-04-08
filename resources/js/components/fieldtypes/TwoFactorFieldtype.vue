@@ -1,12 +1,6 @@
 <template>
     <div>
-        <template v-if="!meta.enabled">
-            <div class="text-sm">
-                <p>{{ __('statamic::messages.two_factor_not_enabled') }}</p>
-            </div>
-        </template>
-
-        <template v-else-if="meta.is_me && !setup">
+        <template v-if="meta.is_me && !setup">
             <two-factor-enable :route="meta.routes.setup" />
         </template>
 

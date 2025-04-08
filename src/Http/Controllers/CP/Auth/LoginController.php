@@ -112,11 +112,9 @@ class LoginController extends CpController
 
     protected function authenticated(Request $request, $user)
     {
-        if (config('statamic.users.two_factor.enabled', false)) {
-            // if the user has been locked, show the locked view
-            if (User::current()->two_factor_locked) {
-                return redirect(cp_route('two-factor.locked'));
-            }
+        // if the user has been locked, show the locked view
+        if (User::current()->two_factor_locked) {
+            return redirect(cp_route('two-factor.locked'));
         }
 
         return $request->expectsJson()
