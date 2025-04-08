@@ -215,18 +215,6 @@ return [
 
         /*
         |--------------------------------------------------------------------------
-        | Blueprint field
-        |--------------------------------------------------------------------------
-        |
-        | The name of the blueprint field handle for the status storage of the
-        | user's two factor authentication status (setup and locked).
-        |
-        */
-
-        'blueprint' => 'two_factor',
-
-        /*
-        |--------------------------------------------------------------------------
         | Number of incorrect two factor code attempts
         |--------------------------------------------------------------------------
         |

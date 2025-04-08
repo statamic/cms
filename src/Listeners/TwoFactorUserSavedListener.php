@@ -28,7 +28,6 @@ class TwoFactorUserSavedListener
         }
 
         // update the user's status fields, and quietly save (shhhhh!)
-        $user->set(config('statamic.users.two_factor.blueprint', 'two_factor'), $status)
-            ->saveQuietly();
+        $user->set('two_factor', $status)->saveQuietly();
     }
 }
