@@ -2,7 +2,7 @@
     use function Statamic\trans as __;
 @endphp
 
-<header class="h-14 bg-gray-800 flex justify-between space-x-2 items-center text-white px-4 dark fixed top-0 inset-x-0 z-[100]">
+<header class="h-14 bg-gray-800 flex justify-between space-x-2 items-center text-white px-4 dark fixed top-0 inset-x-0 z-[3]">
     <div class="flex items-center gap-2 text-[0.8125rem] text-gray-300">
         <a href="/" class="flex items-center gap-2">
             @cp_svg('icons/statamic-mark-lime', 'size-7')

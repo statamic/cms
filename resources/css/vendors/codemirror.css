@@ -4,8 +4,7 @@
 
 .CodeMirror {
     /* Set height, width, borders, and global font properties here */
-    @apply font-mono text-sm leading-loose text-gray-900;
-    min-height: 80px;
+    @apply py-3 text-base text-gray-600 dark:text-gray-300 font-normal leading-normal min-h-20;
 }
 
 /* PADDING */
