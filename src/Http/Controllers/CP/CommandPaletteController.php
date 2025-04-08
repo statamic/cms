@@ -4,6 +4,8 @@ namespace Statamic\Http\Controllers\CP;
 
 use Illuminate\Http\Request;
 use Statamic\Contracts\Search\Result;
+use Statamic\Facades\CommandPalette;
+use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Search;
 use Statamic\Facades\User;
 
@@ -11,7 +13,14 @@ class CommandPaletteController extends CpController
 {
     public function index()
     {
-        //
+        // TODO:
+        // - Resolve and render nav children (ie. Articles, Pages collections, etc.)
+        // - Cache nav and/or built command palette?
+        // - Bust cache when nav preferences saved?
+
+        Nav::build();
+
+        return CommandPalette::build();
     }
 
     public function search(Request $request)
