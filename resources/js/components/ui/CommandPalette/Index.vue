@@ -118,7 +118,7 @@ function select(selected) {
 
     switch (item.type) {
         case 'link':
-            window.location = item.url;
+            window.location = item.url; // TODO: If meta key is held, maybe it can `window.open()` in new window/tab?
     }
 }
 
