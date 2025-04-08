@@ -61,7 +61,7 @@
 @import './components/fieldtypes/environment.css';
 @import './components/fieldtypes/grid.css';
 @import './components/fieldtypes/hidden.css';
-@import './components/fieldtypes/markdown.css';
+/* @import './components/fieldtypes/markdown.css'; */
 @import './components/fieldtypes/partial.css';
 @import './components/fieldtypes/radio.css';
 @import './components/fieldtypes/relationship.css';
