@@ -9,7 +9,6 @@ import fuzzysort from 'fuzzysort';
 import { each, groupBy, sortBy } from 'lodash-es';
 import { motion } from "motion-v"
 import { cva } from 'cva';
-import { preloadIcon } from '../iconCache';
 
 let open = ref(false);
 let query = ref('');
@@ -20,10 +19,6 @@ let searchResults = ref([]);
 let initialData = ref([
     {"type":"link","category":"Navigation","icon":"entry","keys":null,"text":"Dashboard","url":"http:\/\/commandandconquer.test\/cp\/dashboard"},{"type":"link","category":"Navigation","icon":"entry","keys":null,"text":"Content \u00bb Collections","url":"http:\/\/commandandconquer.test\/cp\/collections"},{"type":"link","category":"Navigation","icon":"entry","keys":null,"text":"Content \u00bb Navigation","url":"http:\/\/commandandconquer.test\/cp\/navigation"},{"type":"link","category":"Navigation","icon":"entry","keys":null,"text":"Content \u00bb Taxonomies","url":"http:\/\/commandandconquer.test\/cp\/taxonomies"},{"type":"link","category":"Navigation","icon":"entry","keys":null,"text":"Content \u00bb Assets","url":"http:\/\/commandandconquer.test\/cp\/assets"},{"type":"link","category":"Navigation","icon":"entry","keys":null,"text":"Content \u00bb Globals","url":"http:\/\/commandandconquer.test\/cp\/globals"},{"type":"link","category":"Navigation","icon":"entry","keys":null,"text":"Fields \u00bb Blueprints","url":"http:\/\/commandandconquer.test\/cp\/fields\/blueprints"},{"type":"link","category":"Navigation","icon":"entry","keys":null,"text":"Fields \u00bb Fieldsets","url":"http:\/\/commandandconquer.test\/cp\/fields\/fieldsets"},{"type":"link","category":"Navigation","icon":"entry","keys":null,"text":"Tools \u00bb Forms","url":"http:\/\/commandandconquer.test\/cp\/forms"},{"type":"link","category":"Navigation","icon":"entry","keys":null,"text":"Tools \u00bb Updates","url":"http:\/\/commandandconquer.test\/cp\/updater"},{"type":"link","category":"Navigation","icon":"entry","keys":null,"text":"Tools \u00bb Addons","url":"http:\/\/commandandconquer.test\/cp\/addons"},{"type":"link","category":"Navigation","icon":"entry","keys":null,"text":"Tools \u00bb Utilities","url":"http:\/\/commandandconquer.test\/cp\/utilities"},{"type":"link","category":"Navigation","icon":"entry","keys":null,"text":"Settings \u00bb Site","url":"http:\/\/commandandconquer.test\/cp\/sites"},{"type":"link","category":"Navigation","icon":"entry","keys":null,"text":"Settings \u00bb Preferences","url":"http:\/\/commandandconquer.test\/cp\/preferences"},{"type":"link","category":"Navigation","icon":"entry","keys":null,"text":"Users \u00bb Users","url":"http:\/\/commandandconquer.test\/cp\/users"},{"type":"link","category":"Navigation","icon":"entry","keys":null,"text":"Users \u00bb Groups","url":"http:\/\/commandandconquer.test\/cp\/user-groups"},{"type":"link","category":"Navigation","icon":"entry","keys":null,"text":"Users \u00bb Permissions","url":"http:\/\/commandandconquer.test\/cp\/roles"},{"type":"link","category":"Actions","icon":"save","keys":"\u2318 S","text":"Save","url":"\/cp"},{"type":"link","category":"Actions","icon":"duplicate","keys":"\u2318 D","text":"Duplicate","url":"\/cp"},{"type":"link","category":"Actions","icon":"delete","keys":"\u2318 DEL","text":"Delete","url":"\/cp"}
 ]);
-
-// Preload common icons
-const commonIcons = ['entry', 'magnifying-glass', 'save', 'duplicate', 'delete', 'up-square', 'down-square', 'return-square'];
-commonIcons.forEach(preloadIcon);
 
 let keys = new Keys;
 
