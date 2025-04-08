@@ -87,38 +87,22 @@ class StatamicTwoFactorUser
 
     public function isTwoFactorEnforceable(?\Statamic\Contracts\Auth\User $user = null): bool
     {
-        if (! $user) {
-            $user = $this->get();
-        }
+        $user = $user ?: $this->get();
 
-        // no user - so not enforceable
         if (! $user) {
             return false;
         }
 
-        // super admin are always enforced
+        $enforcedRoles = config('statamic.users.two_factor.enforced_roles', []);
 
-        if ($user->isSuper()) {
+        if (in_array('*', $enforcedRoles)) {
             return true;
         }
 
-        // get configured enforced roles
-        $enforcedRoles = config('statamic.users.two_factor.enforced_roles', null);
-
-        // null means all roles are enforced
-        if ($enforcedRoles === null) {
-            return true;
-        }
-
-        // if an array of roles check if the user contains ANY of them
-        if (is_array($enforcedRoles)) {
-            foreach ($enforcedRoles as $role) {
-                if ($user->hasRole($role)) {
-                    return true;
-                }
-            }
-        }
-
-        return false; // this far, not enforced
+        return $user->roles()
+            ->map->handle()
+            ->when($user->isSuper(), fn ($roles) => $roles->push('super_users'))
+            ->intersect($enforcedRoles)
+            ->isNotEmpty();
     }
 }

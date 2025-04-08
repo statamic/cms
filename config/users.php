@@ -193,25 +193,16 @@ return [
 
         /*
         |--------------------------------------------------------------------------
-        | Role-specific enforcement
+        | Required for...
         |--------------------------------------------------------------------------
         |
-        | Super admins will always require two factor.
-        |
-        | Provide an array of Role handles that should have two factor enforced,
-        | such as:
-        |   'enforced_roles' => [
-        |       'content_publisher',
-        |       'users_admin',
-        |   ],
-        |
-        | An empty array will mean that no roles are enforced.
-        |
-        | Set to null to enforce for all roles.
+        | Determines the roles required to have two factor authentication setup.
+        | You can require two-factor for all users by setting this to ['*'].
+        | You can also require two-factor for super users by adding 'super_users'.
         |
         */
 
-        'enforced_roles' => null,
+        'enforced_roles' => [],
 
         /*
         |--------------------------------------------------------------------------

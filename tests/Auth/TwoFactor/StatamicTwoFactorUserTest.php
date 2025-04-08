@@ -62,56 +62,52 @@ class StatamicTwoFactorUserTest extends TestCase
     }
 
     #[Test]
-    public function it_correctly_determines_if_two_factor_is_enforcable()
+    public function it_determines_if_two_factor_is_required_for_a_non_super_user_with_roles()
     {
-        $this->actingAs($user = $this->userWithTwoFactorEnabled());
+        $role = Role::make('enforceable_role')->save();
 
-        $enforceableRole = Role::make('enforceable_role')->save();
-        $standardRole = Role::make('standard_role')->save();
+        $user = $this->user();
+        $user->assignRole($role)->save();
 
-        // Enforced for all users, never mind their roles.
-        config()->set('statamic.users.two_factor.enforced_roles', null);
-
-        $user->makeSuper()->save();
-        $this->assertTrue(TwoFactorUser::isTwoFactorEnforceable());
-        $user->set('super', false)->save();
-        $this->assertTrue(TwoFactorUser::isTwoFactorEnforceable());
-
-        $user->assignRole($enforceableRole)->save();
-        $this->assertTrue(TwoFactorUser::isTwoFactorEnforceable());
-
-        $user->removeRole($enforceableRole)->assignRole($standardRole)->save();
-        $this->assertTrue(TwoFactorUser::isTwoFactorEnforceable());
-
-        // Enforced for no one.
         config()->set('statamic.users.two_factor.enforced_roles', []);
+        $this->assertFalse(TwoFactorUser::isTwoFactorEnforceable($user));
 
+        config()->set('statamic.users.two_factor.enforced_roles', ['enforceable_role']);
+        $this->assertTrue(TwoFactorUser::isTwoFactorEnforceable($user));
+
+        config()->set('statamic.users.two_factor.enforced_roles', ['*']);
+        $this->assertTrue(TwoFactorUser::isTwoFactorEnforceable($user));
+    }
+
+    #[Test]
+    public function it_determines_if_two_factor_is_required_for_a_non_super_user_without_roles()
+    {
+        $user = $this->user();
+
+        config()->set('statamic.users.two_factor.enforced_roles', []);
+        $this->assertFalse(TwoFactorUser::isTwoFactorEnforceable($user));
+
+        config()->set('statamic.users.two_factor.enforced_roles', ['enforceable_role']);
+        $this->assertFalse(TwoFactorUser::isTwoFactorEnforceable($user));
+
+        config()->set('statamic.users.two_factor.enforced_roles', ['*']);
+        $this->assertTrue(TwoFactorUser::isTwoFactorEnforceable($user));
+    }
+
+    #[Test]
+    public function it_determines_if_two_factor_is_required_for_a_super_user()
+    {
+        $user = $this->user();
         $user->makeSuper()->save();
-        $this->assertTrue(TwoFactorUser::isTwoFactorEnforceable()); // Super users are always enforced.
-        $user->set('super', false)->save();
-        $this->assertFalse(TwoFactorUser::isTwoFactorEnforceable());
 
-        $user->assignRole($enforceableRole)->save();
-        $this->assertFalse(TwoFactorUser::isTwoFactorEnforceable());
+        config()->set('statamic.users.two_factor.enforced_roles', []);
+        $this->assertFalse(TwoFactorUser::isTwoFactorEnforceable($user));
 
-        $user->removeRole($enforceableRole)->assignRole($standardRole)->save();
-        $this->assertFalse(TwoFactorUser::isTwoFactorEnforceable());
+        config()->set('statamic.users.two_factor.enforced_roles', ['super_users']);
+        $this->assertTrue(TwoFactorUser::isTwoFactorEnforceable($user));
 
-        // Enforced for specific roles.
-        config()->set('statamic.users.two_factor.enforced_roles', [
-            'enforceable_role',
-        ]);
-
-        $user->makeSuper()->save();
-        $this->assertTrue(TwoFactorUser::isTwoFactorEnforceable()); // Super users are always enforced.
-        $user->set('super', false)->save();
-        $this->assertFalse(TwoFactorUser::isTwoFactorEnforceable());
-
-        $user->assignRole($enforceableRole)->save();
-        $this->assertTrue(TwoFactorUser::isTwoFactorEnforceable());
-
-        $user->removeRole($enforceableRole)->assignRole($standardRole)->save();
-        $this->assertFalse(TwoFactorUser::isTwoFactorEnforceable());
+        config()->set('statamic.users.two_factor.enforced_roles', ['*']);
+        $this->assertTrue(TwoFactorUser::isTwoFactorEnforceable($user));
     }
 
     private function user()
