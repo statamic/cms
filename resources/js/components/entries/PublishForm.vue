@@ -6,19 +6,24 @@
                 {{ formattedTitle }}
             </template>
 
-            <dropdown-list class="ltr:mr-4 rtl:ml-4" v-if="canEditBlueprint || hasItemActions">
-                <dropdown-item :text="__('Edit Blueprint')" v-if="canEditBlueprint" :redirect="actions.editBlueprint" />
-                <li class="divider" />
-                <data-list-inline-actions
-                    v-if="!isCreating && hasItemActions"
-                    :item="values.id"
-                    :url="itemActionUrl"
-                    :actions="itemActions"
-                    :is-dirty="isDirty"
-                    @started="actionStarted"
-                    @completed="actionCompleted"
-                />
-            </dropdown-list>
+            <ui-dropdown v-if="canEditBlueprint || hasItemActions">
+                <template #trigger>
+                    <ui-button icon="dots" variant="ghost" />
+                </template>
+                <ui-dropdown-menu>
+                    <ui-dropdown-item :text="__('Edit Blueprint')" v-if="canEditBlueprint" :href="actions.editBlueprint" />
+                    <ui-dropdown-separator />
+                    <data-list-inline-actions
+                        v-if="!isCreating && hasItemActions"
+                        :item="values.id"
+                        :url="itemActionUrl"
+                        :actions="itemActions"
+                        :is-dirty="isDirty"
+                        @started="actionStarted"
+                        @completed="actionCompleted"
+                    />
+                </ui-dropdown-menu>
+            </ui-dropdown>
 
             <div class="flex pt-px text-2xs text-gray-600 ltr:mr-4 rtl:ml-4" v-if="readOnly">
                 <svg-icon name="light/lock" class="-mt-1 w-4 ltr:mr-1 rtl:ml-1" /> {{ __('Read Only') }}
