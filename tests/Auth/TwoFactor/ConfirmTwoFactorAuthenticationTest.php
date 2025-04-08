@@ -3,17 +3,13 @@
 namespace Tests\Auth\TwoFactor;
 
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\Test;
-use Statamic\Auth\TwoFactor\ChallengeTwoFactorAuthentication;
 use Statamic\Auth\TwoFactor\ConfirmTwoFactorAuthentication;
 use Statamic\Auth\TwoFactor\Google2FA;
 use Statamic\Auth\TwoFactor\RecoveryCode;
-use Statamic\Exceptions\InvalidChallengeModeException;
 use Statamic\Facades\TwoFactorUser;
 use Statamic\Facades\User;
-use Statamic\Notifications\RecoveryCodeUsed;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 

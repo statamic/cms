@@ -2,11 +2,8 @@
 
 namespace Tests\Auth\TwoFactor;
 
-use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\TwoFactor\EnableTwoFactorAuthentication;
-use Statamic\Auth\TwoFactor\Google2FA;
-use Statamic\Auth\TwoFactor\RecoveryCode;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
