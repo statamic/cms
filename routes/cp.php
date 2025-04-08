@@ -39,6 +39,7 @@ use Statamic\Http\Controllers\CP\Collections\ReorderCollectionBlueprintsControll
 use Statamic\Http\Controllers\CP\Collections\ReorderEntriesController;
 use Statamic\Http\Controllers\CP\Collections\RestoreEntryRevisionController;
 use Statamic\Http\Controllers\CP\Collections\ScaffoldCollectionController;
+use Statamic\Http\Controllers\CP\CommandPaletteController;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Controllers\CP\DashboardController;
 use Statamic\Http\Controllers\CP\DuplicatesController;
@@ -75,7 +76,6 @@ use Statamic\Http\Controllers\CP\Preferences\Nav\UserNavController;
 use Statamic\Http\Controllers\CP\Preferences\PreferenceController;
 use Statamic\Http\Controllers\CP\Preferences\RolePreferenceController;
 use Statamic\Http\Controllers\CP\Preferences\UserPreferenceController;
-use Statamic\Http\Controllers\CP\SearchController;
 use Statamic\Http\Controllers\CP\SelectSiteController;
 use Statamic\Http\Controllers\CP\SessionTimeoutController;
 use Statamic\Http\Controllers\CP\Sites\SitesController;
@@ -301,7 +301,8 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     Route::post('user-exists', UserWizardController::class)->name('user.exists');
 
-    Route::get('search', SearchController::class)->name('search');
+    Route::get('command-palette', [CommandPaletteController::class, 'index'])->name('command-palette.index');
+    Route::get('command-palette/search', [CommandPaletteController::class, 'search'])->name('command-palette.search');
 
     Route::get('utilities', [UtilitiesController::class, 'index'])->name('utilities.index');
     Utility::routes();
