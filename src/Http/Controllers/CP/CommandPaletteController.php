@@ -7,9 +7,14 @@ use Statamic\Contracts\Search\Result;
 use Statamic\Facades\Search;
 use Statamic\Facades\User;
 
-class SearchController extends CpController
+class CommandPaletteController extends CpController
 {
-    public function __invoke(Request $request)
+    public function index()
+    {
+        //
+    }
+
+    public function search(Request $request)
     {
         return Search::index()
             ->ensureExists()
