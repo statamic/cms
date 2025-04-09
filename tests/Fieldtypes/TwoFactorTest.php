@@ -5,11 +5,8 @@ namespace Tests\Fieldtypes;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route as Router;
 use PHPUnit\Framework\Attributes\Test;
-use Statamic\Auth\TwoFactor\Google2FA;
-use Statamic\Auth\TwoFactor\RecoveryCode;
 use Statamic\Facades\User;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\TwoFactor;
@@ -20,131 +17,73 @@ class TwoFactorTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    private $user;
-
-    protected function setUp(): void
+    #[Test]
+    public function it_returns_preload_for_current_user()
     {
-        parent::setUp();
+        $this->actingAs($user = $this->user());
 
-        $this->user = $this->userWithTwoFactorEnabled();
-        $this->actingAs($this->user);
-
-        $request = $this->createRequestWithParameters('statamic.cp.users.edit', [
-            'user' => $this->user->id,
-        ]);
-
+        $request = $this->createRequestWithParameters('statamic.cp.users.edit', ['user' => $user->id]);
         app()->instance('request', $request);
-    }
 
-    #[Test]
-    public function correctly_returns_is_locked()
-    {
-        $this->assertFalse($this->user->two_factor_locked);
-        $this->assertFalse($this->fieldtype()->preload()['is_locked']);
+        $this->assertEquals([
+            'is_current_user' => true,
+            'is_enforced' => false,
+            'is_locked' => false,
+            'is_setup' => false,
+            'routes' => [
+                'setup' => cp_route('two-factor.setup'),
+                'unlock' => cp_route('users.two-factor.unlock', $user->id),
+                'reset' => cp_route('users.two-factor.reset', $user->id),
+                'recovery_codes' => [
+                    'show' => cp_route('users.two-factor.recovery-codes.show', $user->id),
+                    'generate' => cp_route('users.two-factor.recovery-codes.generate', $user->id),
+                ],
+            ],
+        ], $this->fieldtype()->preload());
 
-        $this->user->set('two_factor_locked', true)->save();
-
-        $this->assertTrue($this->user->two_factor_locked);
-        $this->assertTrue($this->fieldtype()->preload()['is_locked']);
-    }
-
-    #[Test]
-    public function correctly_returns_is_me()
-    {
-        $this->assertTrue($this->fieldtype()->preload()['is_me']);
-
-        $this->actingAs($this->userWithTwoFactorEnabled());
-
-        $this->assertFalse($this->fieldtype()->preload()['is_me']);
-    }
-
-    #[Test]
-    public function correctly_returns_is_setup()
-    {
+        $user->set('two_factor_confirmed_at', now())->save();
         $this->assertTrue($this->fieldtype()->preload()['is_setup']);
 
-        // Create a new user, without two factor enabled.
-        $user = $this->user();
+        $user->set('two_factor_locked', true)->save();
+        $this->assertTrue($this->fieldtype()->preload()['is_locked']);
 
-        $request = $this->createRequestWithParameters('statamic.cp.users.edit', [
-            'user' => $user->id,
-        ]);
+        config()->set('statamic.users.two_factor.enforced_roles', ['*']);
+        $this->assertTrue($this->fieldtype()->preload()['is_enforced']);
+    }
 
+    #[Test]
+    public function it_returns_preload_for_another_user()
+    {
+        $anotherUser = $this->user();
+        $this->actingAs($user = $this->user());
+
+        $request = $this->createRequestWithParameters('statamic.cp.users.edit', ['user' => $anotherUser->id]);
         app()->instance('request', $request);
 
-        $this->assertFalse($this->fieldtype()->preload()['is_setup']);
-    }
+        $this->assertEquals([
+            'is_current_user' => false,
+            'is_enforced' => false,
+            'is_locked' => false,
+            'is_setup' => false,
+            'routes' => [
+                'setup' => cp_route('two-factor.setup'),
+                'unlock' => cp_route('users.two-factor.unlock', $anotherUser->id),
+                'reset' => cp_route('users.two-factor.reset', $anotherUser->id),
+                'recovery_codes' => [
+                    'show' => cp_route('users.two-factor.recovery-codes.show', $anotherUser->id),
+                    'generate' => cp_route('users.two-factor.recovery-codes.generate', $anotherUser->id),
+                ],
+            ],
+        ], $this->fieldtype()->preload());
 
-    #[Test]
-    public function correctly_returns_routes_for_me()
-    {
-        // When unlocked...
-        $preload = $this->fieldtype()->preload();
+        $anotherUser->set('two_factor_confirmed_at', now())->save();
+        $this->assertTrue($this->fieldtype()->preload()['is_setup']);
 
-        $this->assertArrayHasKey('locked', $preload['routes']);
-        $this->assertNull($this->fieldtype()->preload()['routes']['locked']);
+        $anotherUser->set('two_factor_locked', true)->save();
+        $this->assertTrue($this->fieldtype()->preload()['is_locked']);
 
-        $this->assertArrayHasKey('recovery_codes', $preload['routes']);
-        $this->assertEquals(cp_route('users.two-factor.recovery-codes.show', $this->user->id), $preload['routes']['recovery_codes']['show']);
-        $this->assertEquals(cp_route('users.two-factor.recovery-codes.generate', $this->user->id), $preload['routes']['recovery_codes']['generate']);
-
-        $this->assertArrayHasKey('reset', $preload['routes']);
-        $this->assertEquals(cp_route('users.two-factor.reset', $this->user->id), $preload['routes']['reset']);
-
-        // When locked...
-        $this->user->set('two_factor_locked', true)->save();
-        $preload = $this->fieldtype()->preload();
-
-        $this->assertArrayHasKey('locked', $preload['routes']);
-        $this->assertEquals(cp_route('users.two-factor.unlock', $this->user->id), $this->fieldtype()->preload()['routes']['locked']);
-
-        $this->assertArrayHasKey('recovery_codes', $preload['routes']);
-        $this->assertEquals(cp_route('users.two-factor.recovery-codes.show', $this->user->id), $preload['routes']['recovery_codes']['show']);
-        $this->assertEquals(cp_route('users.two-factor.recovery-codes.generate', $this->user->id), $preload['routes']['recovery_codes']['generate']);
-
-        $this->assertArrayHasKey('reset', $preload['routes']);
-        $this->assertEquals(cp_route('users.two-factor.reset', $this->user->id), $preload['routes']['reset']);
-    }
-
-    #[Test]
-    public function correctly_returns_routes_for_another_user()
-    {
-        $this->user->delete();
-
-        $user = $this->userWithTwoFactorEnabled();
-
-        $preload = $this->createRequestWithParameters('statamic.cp.users.edit', [
-            'user' => $user->id,
-        ]);
-
-        app()->instance('request', $preload);
-
-        // When unlocked...
-        $preload = $this->fieldtype()->preload();
-
-        $this->assertArrayHasKey('locked', $preload['routes']);
-        $this->assertNull($this->fieldtype()->preload()['routes']['locked']);
-
-        $this->assertArrayHasKey('recovery_codes', $preload['routes']);
-        $this->assertNull($preload['routes']['recovery_codes']['show']);
-        $this->assertNull($preload['routes']['recovery_codes']['generate']);
-
-        $this->assertArrayHasKey('reset', $preload['routes']);
-        $this->assertEquals(cp_route('users.two-factor.reset', $user->id), $preload['routes']['reset']);
-
-        // When locked...
-        $user->set('two_factor_locked', true)->save();
-        $preload = $this->fieldtype()->preload();
-
-        $this->assertArrayHasKey('locked', $preload['routes']);
-        $this->assertEquals(cp_route('users.two-factor.unlock', $user->id), $this->fieldtype()->preload()['routes']['locked']);
-
-        $this->assertArrayHasKey('recovery_codes', $preload['routes']);
-        $this->assertNull($preload['routes']['recovery_codes']['show']);
-        $this->assertNull($preload['routes']['recovery_codes']['generate']);
-
-        $this->assertArrayHasKey('reset', $preload['routes']);
-        $this->assertEquals(cp_route('users.two-factor.reset', $user->id), $preload['routes']['reset']);
+        config()->set('statamic.users.two_factor.enforced_roles', ['*']);
+        $this->assertTrue($this->fieldtype()->preload()['is_enforced']);
     }
 
     private function fieldtype($config = [])
@@ -157,27 +96,9 @@ class TwoFactorTest extends TestCase
         return tap(User::make()->makeSuper())->save();
     }
 
-    private function userWithTwoFactorEnabled()
-    {
-        $user = $this->user();
-
-        $user->merge([
-            'two_factor_locked' => false,
-            'two_factor_confirmed_at' => now(),
-            'two_factor_completed' => now(),
-            'two_factor_secret' => encrypt(app(Google2FA::class)->generateSecretKey()),
-            'two_factor_recovery_codes' => encrypt(json_encode(Collection::times(8, function () {
-                return RecoveryCode::generate();
-            })->all())),
-        ]);
-
-        $user->save();
-
-        return $user;
-    }
-
-    // Based on:
-    // https://gist.github.com/juampi92/fff250719122a596c716c64e5b0afef6
+    /**
+     * Based on https://gist.github.com/juampi92/fff250719122a596c716c64e5b0afef6.
+     */
     private function createRequestWithParameters(string $routeName, array $parameters = [], string $class = Request::class)
     {
         // Find the route properties.

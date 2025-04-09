@@ -1,10 +1,10 @@
 <template>
     <div>
-        <template v-if="meta.is_me && !setup">
             <two-factor-enable :route="meta.routes.setup" />
+        <template v-if="isCurrentUser && !isSetup">
         </template>
 
-        <template v-else-if="!meta.is_me && !setup">
+        <template v-else-if="isCurrentUser && !isSetup">
             <div class="text-sm">
                 <p class="mb-2 font-medium">{{ __('statamic::messages.two_factor_not_setup_1') }}</p>
                 <p>{{ __('statamic::messages.two_factor_not_setup_2') }}</p>
@@ -12,13 +12,13 @@
         </template>
 
         <template v-else>
-            <two-factor-locked v-if="locked" :route="meta.routes.locked" @update="updateState" />
+            <two-factor-locked v-if="isLocked" :route="meta.routes.unlock" @update="updateState" />
 
-            <two-factor-recovery-codes v-if="meta.is_me" :routes="meta.routes.recovery_codes" />
+            <two-factor-recovery-codes v-if="isCurrentUser" :routes="meta.routes.recovery_codes" />
 
             <two-factor-reset
                 :route="meta.routes.reset"
-                :enforced="meta.is_enforced"
+                :enforced="isCurrentUser"
                 :language-user="languageUser"
                 @update="updateState"
             />
@@ -45,19 +45,18 @@ export default {
 
     data() {
         return {
-            locked: false,
-            setup: false,
+            isLocked: this.meta.is_locked,
+            isSetup: this.meta.is_setup,
         };
     },
 
-    mounted() {
-        this.locked = this.meta.is_locked;
-        this.setup = this.meta.is_setup;
-    },
-
     computed: {
+        isCurrentUser() {
+            return this.meta.is_current_user;
+        },
+
         languageUser() {
-            return (this.meta.is_me ? 'me' : 'user') + (this.meta.is_enforced ? '_enforced' : '');
+            return (this.meta.is_current_user ? 'me' : 'user') + (this.meta.is_enforced ? '_enforced' : '');
         },
     },
 
