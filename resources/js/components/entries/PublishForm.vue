@@ -33,7 +33,6 @@
                 <save-button-options
                     v-if="!readOnly"
                     :show-options="!revisionsEnabled && !isInline"
-                    :button-class="saveButtonClass"
                     :preferences-prefix="preferencesPrefix"
                 >
                     <ui-button :disabled="!canSave" @click.prevent="save" v-text="saveText" />
@@ -42,7 +41,6 @@
                 <save-button-options
                     v-if="revisionsEnabled && !isCreating"
                     :show-options="!isInline"
-                    button-class="btn-primary"
                     :preferences-prefix="preferencesPrefix"
                 >
                     <ui-button
@@ -510,13 +508,6 @@ export default {
 
         isDraft() {
             return !this.published;
-        },
-
-        saveButtonClass() {
-            return {
-                btn: this.revisionsEnabled,
-                'btn-primary': this.isCreating || !this.revisionsEnabled,
-            };
         },
 
         afterSaveOption() {
