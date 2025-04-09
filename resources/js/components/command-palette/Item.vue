@@ -29,7 +29,6 @@ onMounted(() => {
             'data-highlighted:bg-gray-200/70 dark:data-highlighted:bg-gray-900/70',
             'outline-hidden focus-visible:bg-gray-100 dark:focus-visible:bg-gray-900',
         ]"
-        data-ui-command-palette-item
         :as="href ? 'a' : 'div'"
         :href="href"
     >
