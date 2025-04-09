@@ -7,7 +7,7 @@
         <div class="flex items-center gap-2 relative">
             <button class="flex items-center group cursor-pointer" type="button" @click="toggleNav" aria-label="{{ __('Toggle Nav') }}">
                 <div class="opacity-0 group-hover:opacity-100 p-1 size-7 transition-opacity duration-150 absolute inset-0 flex items-center justify-center">
-                    @cp_svg('icons/light/burger', 'size-4')
+                    @cp_svg('icons/burger-menu', 'size-5')
                 </div>
                 @cp_svg('icons/statamic-mark-lime', 'size-7 group-hover:opacity-0 transition-opacity duration-150')
             </button>
