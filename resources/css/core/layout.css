@@ -2,13 +2,56 @@
    GLOBAL CONTROL PANEL LAYOUT ELEMENTS
    ========================================================================== */
 
+   /* ==========================================================================
+   THE MAIN NAV (LEFT SIDEBAR)
+   ========================================================================== */
+
+.nav-main {
+    @apply flex flex-col gap-7 py-6 px-5 text-sm antialiased [&_svg]:text-gray-400 dark:[&_svg]:text-gray-600 select-none;
+    @apply h-full overflow-y-auto fixed top-14 left-0 w-46;
+
+    transition: all 0.3s ease-in-out;
+
+    ul {
+        @apply flex flex-col gap-2;
+    }
+
+    ul li a {
+        @apply flex items-center gap-3 text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-gray-200 hover:[&_svg]:text-gray-700 dark:hover:[&_svg]:text-gray-200 ;
+    }
+
+    ul li a.active {
+        @apply text-black [&_svg]:text-black dark:text-white [&_svg]:dark:text-gray-200;
+    }
+
+    ul li ul {
+        @apply ml-1.5 pl-5.5 translate-x-px my-1.5 space-y-1 text-[13px] min-w-0 flex-col gap-1 border-l border-gray-300 dark:border-gray-600;
+    }
+
+    .section-title {
+        @apply text-sm text-black dark:text-gray-200 mb-2;
+    }
+}
+
+main {
+    @apply ps-46;
+    transition: all 0.3s ease-in-out;
+}
+
+
+
 .nav-closed .nav-main {
-    @apply md:-start-56;
+    @apply md:-start-46;
 }
 
 .nav-closed main {
     @apply md:ps-0;
 }
+
+
+
+
+
 
 /* Draggable Mirrors
   ========================================================================== */
