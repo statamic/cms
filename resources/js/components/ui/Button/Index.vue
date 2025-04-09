@@ -41,7 +41,7 @@ const buttonClasses = computed(() => {
             size: {
                 base: 'px-4 h-10 text-sm gap-2 rounded-lg',
                 sm: 'px-3 h-8 text-[0.8125rem] gap-2 rounded-lg',
-                xs: 'px-2 h-6.5 text-xs gap-1 rounded-md',
+                xs: 'px-2 h-6.5 text-xs gap-1.5 rounded-md [&_svg]:size-3',
             },
             groupBorder: {
                 default:

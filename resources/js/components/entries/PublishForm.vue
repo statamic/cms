@@ -142,7 +142,7 @@
                                     <ui-panel v-if="revisionsEnabled && !isCreating">
                                         <ui-panel-header class="flex items-center justify-between">
                                             <ui-heading :text="__('Revisions')" />
-                                            <ui-button @click="showRevisionHistory = true" icon="history" :text="__('View History')" size="sm" />
+                                            <ui-button @click="showRevisionHistory = true" icon="history" :text="__('View History')" size="xs" class="-me-4" />
                                         </ui-panel-header>
                                         <ui-card class="space-y-2">
                                             <ui-subheading v-if="published" class="flex items-center gap-2">

@@ -22,6 +22,6 @@ const classes = cva({
 <template>
     <div :class="classes" data-ui-subheading>
         <slot v-if="!text" />
-        <span v-else>{{ text }}</span>
+        <span v-else :v-html="text" />
     </div>
 </template>
