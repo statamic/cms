@@ -18,7 +18,7 @@ class EnableTwoFactorAuthentication
         $user->set('two_factor_locked', false);
         if ($resetSecret) {
             $user->set('two_factor_secret', encrypt($this->provider->generateSecretKey()));
-            app(CreateRecoveryCodes::class)($user);
+            app(GenerateRecoveryCodes::class)($user);
         }
         $user->save();
     }

@@ -23,18 +23,7 @@ class UserRecoveryCodesControllerTest extends TestCase
     }
 
     #[Test]
-    public function it_returns_a_403_when_trying_to_see_codes_for_another_user()
-    {
-        $this
-            ->actingAs($this->userWithTwoFactorEnabled())
-            ->get(cp_route('users.two-factor.recovery-codes.show', [
-                'user' => $this->userWithTwoFactorEnabled()->id,
-            ]))
-            ->assertForbidden();
-    }
-
-    #[Test]
-    public function it_shows_the_recovery_codes_for_the_logged_in_user()
+    public function it_returns_recovery_codes()
     {
         $this
             ->actingAs($user = $this->userWithTwoFactorEnabled())
@@ -48,11 +37,11 @@ class UserRecoveryCodesControllerTest extends TestCase
     }
 
     #[Test]
-    public function it_returns_a_403_when_trying_to_generate_codes_for_another_user()
+    public function it_does_not_return_recovery_codes_for_another_user()
     {
         $this
             ->actingAs($this->userWithTwoFactorEnabled())
-            ->post(cp_route('users.two-factor.recovery-codes.generate', [
+            ->get(cp_route('users.two-factor.recovery-codes.show', [
                 'user' => $this->userWithTwoFactorEnabled()->id,
             ]))
             ->assertForbidden();
@@ -70,6 +59,42 @@ class UserRecoveryCodesControllerTest extends TestCase
             ]))
             ->assertOk()
             ->assertJsonStructure(['recovery_codes']);
+    }
+
+    #[Test]
+    public function it_cannot_generate_recovery_codes_for_another_user()
+    {
+        $this
+            ->actingAs($this->userWithTwoFactorEnabled())
+            ->post(cp_route('users.two-factor.recovery-codes.generate', [
+                'user' => $this->userWithTwoFactorEnabled()->id,
+            ]))
+            ->assertForbidden();
+    }
+
+    #[Test]
+    public function can_download_recovery_codes()
+    {
+        $user = $this->userWithTwoFactorEnabled();
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('users.two-factor.recovery-codes.download', [
+                'user' => $user->id,
+            ]))
+            ->assertOk()
+            ->assertSeeInOrder(json_decode(decrypt($user->two_factor_recovery_codes), true));
+    }
+
+    #[Test]
+    public function cannot_download_recovery_codes_for_another_user()
+    {
+        $this
+            ->actingAs($this->userWithTwoFactorEnabled())
+            ->get(cp_route('users.two-factor.recovery-codes.download', [
+                'user' => $this->userWithTwoFactorEnabled()->id,
+            ]))
+            ->assertForbidden();
     }
 
     private function user()

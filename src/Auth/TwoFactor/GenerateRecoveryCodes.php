@@ -5,11 +5,10 @@ namespace Statamic\Auth\TwoFactor;
 use Illuminate\Support\Collection;
 use Statamic\Auth\User;
 
-class CreateRecoveryCodes
+class GenerateRecoveryCodes
 {
     public function __invoke(User $user)
     {
-        // create codes, and update the user
         $recoveryCodes = Collection::times(8, function () {
             return RecoveryCode::generate();
         })->all();

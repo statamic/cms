@@ -27,7 +27,9 @@
         <template v-else>
             <two-factor-locked v-if="isLocked" :route="meta.routes.unlock" @update="updateState" />
 
-            <two-factor-recovery-codes v-if="isCurrentUser" :routes="meta.routes.recovery_codes" />
+            <div v-if="isCurrentUser">
+                <button class="btn" @click="recoveryCodesModalOpen = true">Show recovery codes</button>
+            </div>
 
             <two-factor-reset
                 :route="meta.routes.reset"
@@ -36,30 +38,39 @@
                 @update="updateState"
             />
         </template>
+
+        <TwoFactorRecoveryCodesModal
+            v-if="recoveryCodesModalOpen"
+            :recovery-codes-url="meta.routes.recovery_codes.show"
+            :generate-url="meta.routes.recovery_codes.generate"
+            :download-url="meta.routes.recovery_codes.download"
+            @close="recoveryCodesModalOpen = false"
+        />
     </div>
 </template>
 
 <script>
 import Fieldtype from './Fieldtype.vue';
 import TwoFactorLocked from './two-factor/Locked.vue';
-import TwoFactorRecoveryCodes from './two-factor/RecoveryCodes.vue';
 import TwoFactorReset from './two-factor/Reset.vue';
 import TwoFactorSetup from './two-factor/Setup.vue';
+import TwoFactorRecoveryCodesModal from './two-factor/RecoveryCodesModal.vue';
 
 export default {
     mixins: [Fieldtype],
 
     components: {
         TwoFactorLocked,
-        TwoFactorRecoveryCodes,
         TwoFactorReset,
         TwoFactorSetup,
+        TwoFactorRecoveryCodesModal,
     },
 
     data() {
         return {
             isLocked: this.meta.is_locked,
             isSetup: this.meta.is_setup,
+            recoveryCodesModalOpen: false,
             setupModalOpen: false,
         };
     },
@@ -82,6 +93,7 @@ export default {
 
         setupComplete() {
             this.isSetup = true;
+            this.recoveryCodesModalOpen = true;
         },
     },
 };

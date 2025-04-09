@@ -315,6 +315,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::patch('users/{user}/password', [PasswordController::class, 'update'])->name('users.password.update');
     Route::get('users/{user}/two-factor/recovery-codes', [TwoFactorRecoveryCodesController::class, 'show'])->name('users.two-factor.recovery-codes.show');
     Route::post('users/{user}/two-factor/recovery-codes', [TwoFactorRecoveryCodesController::class, 'store'])->name('users.two-factor.recovery-codes.generate');
+    Route::get('users/{user}/two-factor/recovery-codes/download', [TwoFactorRecoveryCodesController::class, 'download'])->name('users.two-factor.recovery-codes.download');
     Route::delete('users/{user}/two-factor/lock', [TwoFactorUserLockedController::class, 'destroy'])->name('users.two-factor.unlock');
     Route::delete('users/{user}/two-factor', [TwoFactorUserResetController::class, 'destroy'])->name('users.two-factor.reset');
     Route::get('account', AccountController::class)->name('account');
