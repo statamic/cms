@@ -11,6 +11,7 @@
     "require": {
         "ext-json": "*",
         "ajthinking/archetype": "^1.0.3 || ^2.0",
+        "bacon/bacon-qr-code": "^3.0",
         "composer/semver": "^3.4",
         "guzzlehttp/guzzle": "^6.3 || ^7.0",
         "james-heinrich/getid3": "^1.9.21",
@@ -23,6 +24,7 @@
         "michelf/php-smartypants": "^1.8.1",
         "nesbot/carbon": "^3.0",
         "pixelfear/composer-dist-plugin": "^0.1.4",
+        "pragmarx/google2fa": "^8.0",
         "rebing/graphql-laravel": "^9.8",
         "rhukster/dom-sanitizer": "^1.0.6",
         "spatie/blink": "^1.3",
