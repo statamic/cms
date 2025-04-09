@@ -35,7 +35,7 @@
                     :show-options="!revisionsEnabled && !isInline"
                     :preferences-prefix="preferencesPrefix"
                 >
-                    <ui-button :disabled="!canSave" @click.prevent="save" v-text="saveText" />
+                    <ui-button :disabled="!canSave" :variant="!revisionsEnabled ? 'primary' : 'default'" @click.prevent="save" v-text="saveText" />
                 </save-button-options>
 
                 <save-button-options
