@@ -63,12 +63,14 @@ import CodeBlock from '../components/CodeBlock.vue';
 import BlueprintResetter from '../components/blueprints/BlueprintResetter.vue';
 import { defineAsyncComponent } from 'vue';
 import DateTime from '../components/DateTime.vue';
+import CommandPalette from '../components/command-palette/CommandPalette.vue';
 
 export default function registerGlobalComponents(app) {
     // Core
     app.component('asset-manager', AssetManager);
     app.component('asset-browser', Browser);
     app.component('updates-badge', UpdatesBadge);
+    app.component('command-palette', CommandPalette);
 
     // Publish
     app.component('publish-container', Container);

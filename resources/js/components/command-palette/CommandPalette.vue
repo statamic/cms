@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, watch } from 'vue';
+import CommandPaletteItem from './Item.vue';
 import axios from 'axios';
 import Keys from '@statamic/components/keys/Keys';
 import debounce from '@statamic/util/debounce';
@@ -192,7 +193,7 @@ const modalClasses = cva({
                         <ComboboxContent>
                             <ComboboxViewport class="min-h-[360px] max-h-[360px] divide-y divide-gray-200/80 dark:divide-gray-950 overflow-y-auto">
                                 <ComboboxEmpty v-if="!results.length" class="px-3 py-2 opacity-50">
-                                    <ui-command-palette-item :text="__('No results found!')" icon="entry" disabled />
+                                    <CommandPaletteItem :text="__('No results found!')" icon="entry" disabled />
                                 </ComboboxEmpty>
                                 <ComboboxGroup
                                     v-else
@@ -209,9 +210,9 @@ const modalClasses = cva({
                                         :text-value="item.text"
                                         :as-child="true"
                                     >
-                                        <ui-command-palette-item :icon="item.icon" :badge="item.keys || item.badge">
+                                        <CommandPaletteItem :icon="item.icon" :badge="item.keys || item.badge">
                                             <div v-html="item.html" />
-                                        </ui-command-palette-item>
+                                        </CommandPaletteItem>
                                     </ComboboxItem>
                                 </ComboboxGroup>
                             </ComboboxViewport>
