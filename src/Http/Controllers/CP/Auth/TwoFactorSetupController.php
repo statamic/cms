@@ -25,23 +25,39 @@ class TwoFactorSetupController
         // enable two factor, and optionally reset the user's code
         $enable(User::current(), $resetSecret);
 
-        // show the setup view
-        return view('statamic::auth.two-factor.setup', [
+        $viewData = [
             'cancellable' => Arr::get(User::current()->two_factor, 'cancellable', false),
             'qr' => $provider->getQrCodeSvg(),
             'secret_key' => $provider->getSecretKey(),
-        ]);
+            'confirm_url' => cp_route('two-factor.confirm'),
+        ];
+
+        if ($request->wantsJson()) {
+            return response()->json($viewData);
+        }
+
+        return view('statamic::auth.two-factor.setup', $viewData);
     }
 
-    public function store(Request $request, ConfirmTwoFactorAuthentication $confirm)
+    public function store(Request $request, ConfirmTwoFactorAuthentication $confirm, CompleteTwoFactorAuthenticationSetup $complete)
     {
         // confirm two factor
         $confirm(User::current(), $request->input('code', null));
 
-        // show recovery codes
-        return view('statamic::auth.two-factor.recovery-codes', [
+        // complete it too - these were separate in the past, but they probably don't need to be any more.
+        $complete(User::current());
+
+        $viewData = [
             'recovery_codes' => json_decode(decrypt(User::current()->two_factor_recovery_codes), true),
-        ]);
+        ];
+
+        // todo: we don't actually need to return anything from this anymore
+        if ($request->wantsJson()) {
+            return response()->json($viewData);
+        }
+
+        // show recovery codes
+        return view('statamic::auth.two-factor.recovery-codes', $viewData);
     }
 
     public function complete(Request $request, CompleteTwoFactorAuthenticationSetup $complete)

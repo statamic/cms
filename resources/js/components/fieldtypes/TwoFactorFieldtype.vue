@@ -1,7 +1,20 @@
 <template>
     <div>
-            <two-factor-enable :route="meta.routes.setup" />
         <template v-if="isCurrentUser && !isSetup">
+            <div>
+                <p class="mb-4 text-sm text-gray">{{ __('statamic::messages.two_factor_enable_introduction') }}</p>
+
+                <div class="flex space-x-2">
+                    <button class="btn" @click="setupModalOpen = true">{{ __('Enable two factor authentication') }}</button>
+                </div>
+
+                <TwoFactorSetup
+                    v-if="setupModalOpen"
+                    :setup-url="meta.routes.setup"
+                    @setup-complete="setupComplete"
+                    @cancel="setupModalOpen = false"
+                />
+            </div>
         </template>
 
         <template v-else-if="isCurrentUser && !isSetup">
@@ -28,25 +41,26 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import TwoFactorEnable from './two-factor/Enable.vue';
 import TwoFactorLocked from './two-factor/Locked.vue';
 import TwoFactorRecoveryCodes from './two-factor/RecoveryCodes.vue';
 import TwoFactorReset from './two-factor/Reset.vue';
+import TwoFactorSetup from './two-factor/Setup.vue';
 
 export default {
     mixins: [Fieldtype],
 
     components: {
-        TwoFactorEnable,
         TwoFactorLocked,
         TwoFactorRecoveryCodes,
         TwoFactorReset,
+        TwoFactorSetup,
     },
 
     data() {
         return {
             isLocked: this.meta.is_locked,
             isSetup: this.meta.is_setup,
+            setupModalOpen: false,
         };
     },
 
@@ -64,6 +78,10 @@ export default {
         updateState(field, status) {
             // update the status
             this.$data[field] = status;
+        },
+
+        setupComplete() {
+            this.isSetup = true;
         },
     },
 };

@@ -81,7 +81,6 @@ abstract class UserRepository implements RepositoryContract
         $blueprint->ensureField('two_factor', [
             'type' => 'two_factor',
             'display' => __('Two Factor Authentication'),
-            'hide_display' => true,
         ]);
 
         Blink::put($blink, $blueprint);

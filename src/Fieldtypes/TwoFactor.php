@@ -33,6 +33,7 @@ class TwoFactor extends Fieldtype
                 'recovery_codes' => [
                     'show' => cp_route('users.two-factor.recovery-codes.show', $user->id),
                     'generate' => cp_route('users.two-factor.recovery-codes.generate', $user->id),
+                    'download' => cp_route('users.two-factor.recovery-codes.download', $user->id),
                 ],
             ],
         ];
