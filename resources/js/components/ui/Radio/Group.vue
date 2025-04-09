@@ -29,6 +29,7 @@ defineExpose({ focus });
             class="relative block w-full space-y-2"
             :class="{ 'flex flex-wrap space-y-0 gap-x-4 gap-y-2': inline }"
             data-ui-input
+            data-ui-radio-group
         >
             <slot />
         </RadioGroupRoot>

@@ -103,7 +103,7 @@ code.parent-url {
 }
 
 .publish-sidebar {
-    @apply shrink-0 ms-4 w-[300px];
+    @apply shrink-0 ms-8 w-[300px];
 
     .publish-fields .form-group {
         @apply p-0;

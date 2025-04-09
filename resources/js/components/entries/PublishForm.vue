@@ -29,14 +29,14 @@
                 <svg-icon name="light/lock" class="-mt-1 w-4 ltr:mr-1 rtl:ml-1" /> {{ __('Read Only') }}
             </div>
 
-            <div class="hidden items-center md:flex">
+            <div class="hidden items-center md:flex gap-3">
                 <save-button-options
                     v-if="!readOnly"
                     :show-options="!revisionsEnabled && !isInline"
                     :button-class="saveButtonClass"
                     :preferences-prefix="preferencesPrefix"
                 >
-                    <button :class="saveButtonClass" :disabled="!canSave" @click.prevent="save" v-text="saveText" />
+                    <ui-button :disabled="!canSave" @click.prevent="save" v-text="saveText" />
                 </save-button-options>
 
                 <save-button-options
@@ -45,11 +45,11 @@
                     button-class="btn-primary"
                     :preferences-prefix="preferencesPrefix"
                 >
-                    <button
-                        class="btn-primary flex items-center ltr:ml-4 rtl:mr-4"
+                    <ui-button
+                        variant="primary"
                         :disabled="!canPublish"
                         @click="confirmingPublish = true"
-                        v-text="publishButtonText"
+                        :text="publishButtonText"
                     />
                 </save-button-options>
             </div>
