@@ -18,6 +18,7 @@ use Statamic\Http\Controllers\CP\Assets\PdfController;
 use Statamic\Http\Controllers\CP\Assets\SvgController;
 use Statamic\Http\Controllers\CP\Assets\ThumbnailController;
 use Statamic\Http\Controllers\CP\Auth\CsrfTokenController;
+use Statamic\Http\Controllers\CP\Auth\ElevatedSessionController;
 use Statamic\Http\Controllers\CP\Auth\ExtendSessionController;
 use Statamic\Http\Controllers\CP\Auth\ForgotPasswordController;
 use Statamic\Http\Controllers\CP\Auth\ImpersonationController;
@@ -102,6 +103,7 @@ use Statamic\Http\Controllers\CP\Users\UserGroupsController;
 use Statamic\Http\Controllers\CP\Users\UsersController;
 use Statamic\Http\Controllers\CP\Users\UserWizardController;
 use Statamic\Http\Controllers\CP\Utilities\UtilitiesController;
+use Statamic\Http\Middleware\CP\RequireElevatedSession;
 use Statamic\Http\Middleware\RequireStatamicPro;
 use Statamic\Statamic;
 
@@ -366,6 +368,9 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     Route::post('slug', SlugController::class);
     Route::get('session-timeout', SessionTimeoutController::class)->name('session.timeout');
+
+    Route::get('elevated-session', [ElevatedSessionController::class, 'index'])->name('elevated-session.status');
+    Route::post('elevated-session', [ElevatedSessionController::class, 'store'])->name('elevated-session.store');
 
     Route::view('/playground', 'statamic::playground')->name('playground');
 
