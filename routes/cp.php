@@ -103,7 +103,6 @@ use Statamic\Http\Controllers\CP\Users\UserGroupsController;
 use Statamic\Http\Controllers\CP\Users\UsersController;
 use Statamic\Http\Controllers\CP\Users\UserWizardController;
 use Statamic\Http\Controllers\CP\Utilities\UtilitiesController;
-use Statamic\Http\Middleware\CP\RequireElevatedSession;
 use Statamic\Http\Middleware\RequireStatamicPro;
 use Statamic\Statamic;
 

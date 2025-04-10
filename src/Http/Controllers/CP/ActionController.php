@@ -6,7 +6,6 @@ use Exception;
 use Illuminate\Http\Request;
 use Statamic\Facades\Action;
 use Statamic\Facades\User;
-use Statamic\Http\Middleware\CP\RequireElevatedSession;
 use Statamic\Support\Arr;
 use Symfony\Component\HttpFoundation\Response;
 
