@@ -394,4 +394,18 @@ abstract class Tree implements Contract, Localization
             'tree' => $this->tree,
         ];
     }
+
+    public function isAlreadyInParent($entryId, $parentId = null): bool
+    {
+        if ($parentId) {
+            $parentPage = $this->find($parentId);
+            if (! $parentPage) {
+                return false;
+            }
+            $childrenIds = Arr::pluck($parentPage->getChildren(), $this->idKey());
+        } else {
+            $childrenIds = collect($this->tree)->pluck($this->idKey())->all();
+        }
+        return in_array($entryId, $childrenIds);
+    }
 }
