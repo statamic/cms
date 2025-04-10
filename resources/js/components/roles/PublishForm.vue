@@ -54,6 +54,8 @@
 </template>
 
 <script>
+import HasElevatedSession from '@statamic/mixins/HasElevatedSession.js';
+
 const checked = function (permissions) {
     return permissions.reduce((carry, permission) => {
         if (!permission.checked) return carry;
@@ -62,6 +64,8 @@ const checked = function (permissions) {
 };
 
 export default {
+    mixins: [HasElevatedSession],
+
     props: {
         initialTitle: String,
         initialHandle: String,
@@ -119,6 +123,10 @@ export default {
         },
 
         save() {
+            this.requireElevatedSession().then(() => this.performSaveAction());
+        },
+
+        performSaveAction() {
             this.clearErrors();
 
             this.$axios[this.method](this.action, this.payload)
