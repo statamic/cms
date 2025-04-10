@@ -121,7 +121,7 @@ abstract class Action implements Arrayable
 
     public function requiresElevatedSession(): bool
     {
-        return true;
+        return false;
     }
 
     public function toArray()
