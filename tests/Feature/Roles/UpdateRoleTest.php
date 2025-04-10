@@ -40,6 +40,15 @@ class UpdateRoleTest extends TestCase
         return tap(User::make()->assignRole('user'))->save();
     }
 
+    private function withActiveElevatedSession()
+    {
+        $this->session([
+            'statamic_elevated_until' => now()->addMinutes(5)->timestamp,
+        ]);
+
+        return $this;
+    }
+
     #[Test]
     public function it_denies_access_without_permission_to_edit_roles()
     {
@@ -47,9 +56,22 @@ class UpdateRoleTest extends TestCase
 
         $this
             ->actingAsUserWithPermissions([])
+            ->withActiveElevatedSession()
             ->from('/original')
             ->update($role)
             ->assertRedirect('/original');
+    }
+
+    #[Test]
+    public function it_denies_access_without_active_elevated_session()
+    {
+        $role = tap(Role::make('test'))->save();
+
+        $this
+            ->actingAsUserWithPermissions([])
+            ->from('/original')
+            ->update($role)
+            ->assertForbidden();
     }
 
     #[Test]
@@ -63,6 +85,7 @@ class UpdateRoleTest extends TestCase
 
         $this
             ->actingAsUserWithPermissions(['edit roles'])
+            ->withActiveElevatedSession()
             ->update($role, [
                 'title' => 'Updated',
                 'handle' => 'changed',
@@ -89,6 +112,7 @@ class UpdateRoleTest extends TestCase
 
         $this
             ->actingAs(tap(User::make()->makeSuper())->save())
+            ->withActiveElevatedSession()
             ->update($role, [
                 'super' => true,
             ])
@@ -111,6 +135,7 @@ class UpdateRoleTest extends TestCase
 
         $this
             ->actingAsUserWithPermissions(['edit roles'])
+            ->withActiveElevatedSession()
             ->update($role, [
                 'super' => true,
             ])
@@ -133,6 +158,7 @@ class UpdateRoleTest extends TestCase
 
         $this
             ->actingAsUserWithPermissions(['edit roles'])
+            ->withActiveElevatedSession()
             ->update($role, [
                 'super' => false,
                 'permissions' => ['super'],
