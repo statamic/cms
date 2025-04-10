@@ -69,7 +69,7 @@ class EntryQuery extends Query
             $query->where('site', $site);
         }
 
-        $filters = $args['filter'] ?? null;
+        $filters = $args['filter'] ?? [];
 
         $this->filterQuery($query, $filters);
 
@@ -107,7 +107,7 @@ class EntryQuery extends Query
 
     private function filterQuery($query, $filters)
     {
-        if (! isset($filters['status']) && ! isset($filters['published'])) {
+        if (! request()->isLivePreview() && (! isset($filters['status']) && ! isset($filters['published']))) {
             $filters['status'] = 'published';
         }
 
