@@ -244,9 +244,11 @@ class EntriesController extends CpController
                         $parent = null;
                     }
 
-                    $tree
-                        ->move($entry->id(), $parent)
-                        ->save();
+                    if(!$tree->isAlreadyInParent($entry->id(), $parent)){
+                        $tree
+                            ->move($entry->id(), $parent)
+                            ->save();
+                    }
                 });
 
                 $entry->remove('parent');
