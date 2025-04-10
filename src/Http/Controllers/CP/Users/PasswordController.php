@@ -10,9 +10,17 @@ use Statamic\Events\UserPasswordChanged;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Middleware\CP\RequireElevatedSession;
 
 class PasswordController extends CpController
 {
+    public function __construct(Request $request)
+    {
+        parent::__construct($request);
+
+        $this->middleware(RequireElevatedSession::class);
+    }
+
     public function update(Request $request, $user)
     {
         throw_unless($user = User::find($user), new NotFoundHttpException);
