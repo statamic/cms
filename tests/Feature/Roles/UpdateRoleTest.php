@@ -42,8 +42,10 @@ class UpdateRoleTest extends TestCase
 
     private function withActiveElevatedSession()
     {
+        $user = $this->app['auth']->guard('web')->user();
+
         $this->session([
-            'statamic_elevated_until' => now()->addMinutes(5)->timestamp,
+            "statamic_elevated_until_{$user->id}" => now()->addMinutes(5)->timestamp,
         ]);
 
         return $this;

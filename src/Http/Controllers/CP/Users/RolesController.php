@@ -3,13 +3,11 @@
 namespace Statamic\Http\Controllers\CP\Users;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Statamic\CP\Column;
 use Statamic\Facades\Permission;
 use Statamic\Facades\Role;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
-use Statamic\Http\Middleware\CP\RequireElevatedSession;
 use Statamic\Http\Middleware\RequireStatamicPro;
 use Statamic\Rules\Handle;
 use Statamic\Support\Str;
@@ -118,7 +116,7 @@ class RolesController extends CpController
 
     public function update(Request $request, $role)
     {
-        $this->requireElevatedSession();
+        $this->requireElevatedSession($request);
 
         $this->authorize('edit roles');
 

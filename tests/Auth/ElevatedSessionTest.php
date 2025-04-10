@@ -31,7 +31,7 @@ class ElevatedSessionTest extends TestCase
 
         $this
             ->session([
-                'statamic_elevated_until' => now()->addMinutes(5)->timestamp,
+                "statamic_elevated_until_{$this->user->id}" => now()->addMinutes(5)->timestamp,
             ])
             ->actingAs($this->user)
             ->get('/cp/elevated-session')
@@ -60,7 +60,7 @@ class ElevatedSessionTest extends TestCase
     {
         $this
             ->session([
-                'statamic_elevated_until' => now()->subMinutes(5)->timestamp,
+                "statamic_elevated_until_{$this->user->id}" => now()->subMinutes(5)->timestamp,
             ])
             ->actingAs($this->user)
             ->get('/cp/elevated-session')
@@ -74,12 +74,14 @@ class ElevatedSessionTest extends TestCase
     #[Test]
     public function it_can_start_elevated_session()
     {
+        $this->freezeTime();
+
         $this
             ->actingAs($this->user)
             ->post('/cp/elevated-session', ['password' => 'secret'])
             ->assertOk()
             ->assertJsonStructure(['elevated', 'time_remaining'])
-            ->assertSessionHas('statamic_elevated_until', now()->addMinutes(15)->timestamp);
+            ->assertSessionHas("statamic_elevated_until_{$this->user->id}", now()->addMinutes(15)->timestamp);
     }
 
     #[Test]
@@ -89,7 +91,7 @@ class ElevatedSessionTest extends TestCase
             ->actingAs($this->user)
             ->post('/cp/elevated-session', ['password' => 'incorrect-password'])
             ->assertSessionHasErrors('password')
-            ->assertSessionMissing('statamic_elevated_until');
+            ->assertSessionMissing("statamic_elevated_until_{$this->user->id}");
     }
 
     #[Test]
@@ -98,10 +100,11 @@ class ElevatedSessionTest extends TestCase
         $this->actingAs($this->user);
 
         $this->session([
-            'statamic_elevated_until' => now()->addMinutes(5)->timestamp,
+            "statamic_elevated_until_{$this->user->id}" => now()->addMinutes(5)->timestamp,
         ]);
 
         $request = new Request();
+        $request->setUserResolver(fn () => $this->user);
 
         $middleware = (new RequireElevatedSession)->handle($request, function () {
             return 'bar';
@@ -116,10 +119,11 @@ class ElevatedSessionTest extends TestCase
         $this->actingAs($this->user);
 
         $this->session([
-            'statamic_elevated_until' => now()->subMinutes(5)->timestamp,
+            "statamic_elevated_until_{$this->user->id}" => now()->subMinutes(5)->timestamp,
         ]);
 
         $request = new Request();
+        $request->setUserResolver(fn () => $this->user);
 
         $middleware = (new RequireElevatedSession)->handle($request, function () {
             return 'bar';

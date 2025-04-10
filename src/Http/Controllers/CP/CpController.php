@@ -108,10 +108,10 @@ class CpController extends Controller
         }
     }
 
-    public function requireElevatedSession(): void
+    public function requireElevatedSession($request): void
     {
         abort_if(
-            boolean: session()->get('statamic_elevated_until') < now()->timestamp,
+            boolean: session()->get("statamic_elevated_until_{$request->user()->id}") < now()->timestamp,
             code: 403,
             message: __('Requires an elevated session.')
         );

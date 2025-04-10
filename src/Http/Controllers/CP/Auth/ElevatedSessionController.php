@@ -11,8 +11,8 @@ class ElevatedSessionController
 {
     public function index(Request $request)
     {
-        $isElevated = session()->get('statamic_elevated_until') > now()->timestamp;
-        $timeRemaining = $isElevated ? Carbon::parse(session()->get('statamic_elevated_until'))->diffInSeconds(absolute: true) : 0;
+        $isElevated = session()->get("statamic_elevated_until_{$request->user()->id}") > now()->timestamp;
+        $timeRemaining = $isElevated ? Carbon::parse(session()->get("statamic_elevated_until_{$request->user()->id}"))->diffInSeconds(absolute: true) : 0;
 
         return ['elevated' => $isElevated, 'time_remaining' => $timeRemaining];
     }
@@ -30,7 +30,7 @@ class ElevatedSessionController
         }
 
         session()->put(
-            'statamic_elevated_until',
+            "statamic_elevated_until_{$request->user()->id}",
             now()->addMinutes(config('statamic.users.elevated_session_duration', 15))->timestamp
         );
 
