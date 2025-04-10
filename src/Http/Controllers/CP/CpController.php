@@ -107,4 +107,13 @@ class CpController extends Controller
             return $this->authorizePro();
         }
     }
+
+    public function requireElevatedSession($request): void
+    {
+        abort_if(
+            boolean: session()->get("statamic_elevated_session_{$request->user()->id}") < now()->timestamp,
+            code: 403,
+            message: __('Requires an elevated session.')
+        );
+    }
 }

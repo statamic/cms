@@ -49,8 +49,11 @@
 
 <script>
 import PublishFields from '../publish/Fields.vue';
+import HasElevatedSession from '@statamic/mixins/HasElevatedSession.js';
 
 export default {
+    mixins: [HasElevatedSession],
+
     components: {
         PublishFields,
     },
@@ -129,11 +132,24 @@ export default {
                 return;
             }
 
-            this.running = true;
-            this.$emit('selected', this.action, this.values, this.onDone);
+            if (this.action.requiresElevatedSession) {
+                this.requireElevatedSession().then(() => this.performAction());
+                return;
+            }
+
+            this.performAction();
         },
 
         confirm() {
+            if (this.action.requiresElevatedSession) {
+                this.requireElevatedSession().then(() => this.performAction());
+                return;
+            }
+
+            this.performAction();
+        },
+
+        performAction() {
             this.running = true;
             this.$emit('selected', this.action, this.values, this.onDone);
         },
