@@ -172,9 +172,9 @@ return [
     | Elevated Sessions
     |--------------------------------------------------------------------------
     |
-    | Sometimes users may be asked to confirm their password before performing
-    | certain actions. This is called an elevated session. Here you can
-    | configure the duration of elevated sessions, in minutes.
+    | Before performing certain actions, users may be asked to confirm their
+    | password. This is called an elevated session. Here you can configure
+    | the duration of elevated sessions, in minutes.
     |
     */
 
