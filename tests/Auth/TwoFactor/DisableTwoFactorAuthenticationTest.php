@@ -41,7 +41,7 @@ class DisableTwoFactorAuthenticationTest extends TestCase
         $this->assertNull($user->two_factor_completed);
         $this->assertNull($user->two_factor_recovery_codes);
         $this->assertNull($user->two_factor_secret);
-        $this->assertFalse($user->two_factor_locked);
+        $this->assertNull($user->two_factor_locked);
     }
 
     private function user()

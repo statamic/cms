@@ -100,7 +100,7 @@ use Statamic\Http\Controllers\CP\Users\PasswordController;
 use Statamic\Http\Controllers\CP\Users\RolesController;
 use Statamic\Http\Controllers\CP\Users\TwoFactorRecoveryCodesController;
 use Statamic\Http\Controllers\CP\Users\TwoFactorUserLockedController;
-use Statamic\Http\Controllers\CP\Users\TwoFactorUserResetController;
+use Statamic\Http\Controllers\CP\Users\DisableTwoFactorController;
 use Statamic\Http\Controllers\CP\Users\UserActionController;
 use Statamic\Http\Controllers\CP\Users\UserBlueprintController;
 use Statamic\Http\Controllers\CP\Users\UserGroupBlueprintController;
@@ -317,7 +317,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::post('users/{user}/two-factor/recovery-codes', [TwoFactorRecoveryCodesController::class, 'store'])->name('users.two-factor.recovery-codes.generate');
     Route::get('users/{user}/two-factor/recovery-codes/download', [TwoFactorRecoveryCodesController::class, 'download'])->name('users.two-factor.recovery-codes.download');
     Route::delete('users/{user}/two-factor/lock', [TwoFactorUserLockedController::class, 'destroy'])->name('users.two-factor.unlock');
-    Route::delete('users/{user}/two-factor', [TwoFactorUserResetController::class, 'destroy'])->name('users.two-factor.reset');
+    Route::delete('users/{user}/two-factor', DisableTwoFactorController::class)->name('users.two-factor.disable');
     Route::get('account', AccountController::class)->name('account');
     Route::get('user-groups/blueprint', [UserGroupBlueprintController::class, 'edit'])->name('user-groups.blueprint.edit');
     Route::patch('user-groups/blueprint', [UserGroupBlueprintController::class, 'update'])->name('user-groups.blueprint.update');

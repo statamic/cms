@@ -29,7 +29,7 @@ class TwoFactor extends Fieldtype
             'routes' => [
                 'setup' => cp_route('two-factor.setup'),
                 'unlock' => cp_route('users.two-factor.unlock', $user->id),
-                'reset' => cp_route('users.two-factor.reset', $user->id),
+                'disable' => cp_route('users.two-factor.disable', $user->id),
                 'recovery_codes' => [
                     'show' => cp_route('users.two-factor.recovery-codes.show', $user->id),
                     'generate' => cp_route('users.two-factor.recovery-codes.generate', $user->id),

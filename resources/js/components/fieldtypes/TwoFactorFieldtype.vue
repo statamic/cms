@@ -25,18 +25,21 @@
         </template>
 
         <template v-else>
-            <two-factor-locked v-if="isLocked" :route="meta.routes.unlock" @update="updateState" />
+<!--            <two-factor-locked v-if="isLocked" :route="meta.routes.unlock" @update="updateState" />-->
 
-            <div v-if="isCurrentUser">
-                <button class="btn" @click="recoveryCodesModalOpen = true">Show recovery codes</button>
+            <div class="flex items-center space-x-4">
+                <button v-if="isCurrentUser" class="btn" @click="recoveryCodesModalOpen = true">Show recovery codes</button>
+
+                <DisableTwoFactor
+                    :url="meta.routes.disable"
+                    :is-current-user="isCurrentUser"
+                    :is-enforced="isEnforced"
+                    @reset-complete="resetComplete"
+                    v-slot="{ confirm }"
+                >
+                    <button class="btn-danger" @click="confirm">Disable two factor authentication</button>
+                </DisableTwoFactor>
             </div>
-
-            <two-factor-reset
-                :route="meta.routes.reset"
-                :enforced="isCurrentUser"
-                :language-user="languageUser"
-                @update="updateState"
-            />
         </template>
 
         <TwoFactorRecoveryCodesModal
@@ -52,7 +55,7 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 import TwoFactorLocked from './two-factor/Locked.vue';
-import TwoFactorReset from './two-factor/Reset.vue';
+import DisableTwoFactor from './two-factor/Disable.vue';
 import TwoFactorSetup from './two-factor/Setup.vue';
 import TwoFactorRecoveryCodesModal from './two-factor/RecoveryCodesModal.vue';
 
@@ -61,7 +64,7 @@ export default {
 
     components: {
         TwoFactorLocked,
-        TwoFactorReset,
+        DisableTwoFactor,
         TwoFactorSetup,
         TwoFactorRecoveryCodesModal,
     },
@@ -80,20 +83,21 @@ export default {
             return this.meta.is_current_user;
         },
 
-        languageUser() {
-            return (this.meta.is_current_user ? 'me' : 'user') + (this.meta.is_enforced ? '_enforced' : '');
+        isEnforced() {
+            return this.meta.is_enforced;
         },
     },
 
     methods: {
-        updateState(field, status) {
-            // update the status
-            this.$data[field] = status;
-        },
-
         setupComplete() {
             this.isSetup = true;
+            this.setupModalOpen = false;
             this.recoveryCodesModalOpen = true;
+        },
+
+        resetComplete() {
+            this.isSetup = false;
+            this.isLocked = false;
         },
     },
 };

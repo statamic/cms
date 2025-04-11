@@ -33,10 +33,11 @@ class TwoFactorTest extends TestCase
             'routes' => [
                 'setup' => cp_route('two-factor.setup'),
                 'unlock' => cp_route('users.two-factor.unlock', $user->id),
-                'reset' => cp_route('users.two-factor.reset', $user->id),
+                'disable' => cp_route('users.two-factor.disable', $user->id),
                 'recovery_codes' => [
                     'show' => cp_route('users.two-factor.recovery-codes.show', $user->id),
                     'generate' => cp_route('users.two-factor.recovery-codes.generate', $user->id),
+                    'download' => cp_route('users.two-factor.recovery-codes.download', $user->id),
                 ],
             ],
         ], $this->fieldtype()->preload());
@@ -67,11 +68,12 @@ class TwoFactorTest extends TestCase
             'is_setup' => false,
             'routes' => [
                 'setup' => cp_route('two-factor.setup'),
-                'unlock' => cp_route('users.two-factor.unlock', $anotherUser->id),
+                'disable' => cp_route('users.two-factor.disable', $anotherUser->id),
                 'reset' => cp_route('users.two-factor.reset', $anotherUser->id),
                 'recovery_codes' => [
                     'show' => cp_route('users.two-factor.recovery-codes.show', $anotherUser->id),
                     'generate' => cp_route('users.two-factor.recovery-codes.generate', $anotherUser->id),
+                    'download' => cp_route('users.two-factor.recovery-codes.download', $user->id),
                 ],
             ],
         ], $this->fieldtype()->preload());
