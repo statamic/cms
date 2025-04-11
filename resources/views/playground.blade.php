@@ -217,7 +217,9 @@
 
     <section class="space-y-4">
         <ui-heading size="lg">Switch</ui-heading>
-        <div class="flex gap-2">
+        <div class="flex items-center gap-2">
+            <ui-switch size="sm" />
+            <ui-switch  />
             <ui-switch size="lg" />
         </div>
     </section>
