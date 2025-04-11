@@ -75,14 +75,13 @@
                                     <div class="bg-gray-50 dark:bg-gray-950 rounded-b-xl border-t border-gray-200 dark:border-white/15 flex p-1 text-sm w-full">
                                         <div class="markdown-cheatsheet-helper">
                                             <ui-button
+                                                icon="markdown"
+                                                size="sm"
                                                 variant="ghost"
-                                                size="xs"
                                                 @click="showCheatsheet = true"
                                                 :aria-label="__('Show Markdown Cheatsheet')"
-                                            >
-                                                <svg-icon name="markdown-icon" class="size-4!" />
-                                                <span>{{ __('Markdown Cheatsheet') }}</span>
-                                            </ui-button>
+                                                :text="__('Markdown Cheatsheet')"
+                                            />
                                         </div>
                                     </div>
                                     <div v-if="fullScreenMode" class="flex items-center pe-2">
