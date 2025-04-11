@@ -2,6 +2,7 @@
 
 namespace Tests\Tags\Form;
 
+use Illuminate\Support\Facades\Blade;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\Parse;
@@ -67,9 +68,14 @@ abstract class FormTestCase extends TestCase
         ], $headers));
     }
 
-    protected function tag($tag, $params = [])
+    protected function tag($string, $context = [])
     {
-        return Parse::template($tag, $params);
+        return Parse::template($string, $context);
+    }
+
+    protected function blade($string, $context = [])
+    {
+        return Blade::render($string, $context);
     }
 
     protected function createForm($blueprintContents = null, $handle = null)
