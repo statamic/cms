@@ -3,11 +3,12 @@ import { TooltipArrow, TooltipContent, TooltipPortal, TooltipProvider, TooltipRo
 
 defineProps({
     text: { type: String, default: null },
+    delay: { type: Number, default: 0 },
 });
 </script>
 
 <template>
-    <TooltipProvider :ariaLabel="text">
+    <TooltipProvider :ariaLabel="text" :delay-duration="delay">
         <TooltipRoot>
             <TooltipTrigger>
                 <slot />
