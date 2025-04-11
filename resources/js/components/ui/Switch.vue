@@ -1,41 +1,63 @@
 <script setup>
 import { useId } from 'vue';
 import { SwitchRoot, SwitchThumb } from 'reka-ui';
+import { cva } from 'cva';
 
-defineProps({
+const props = defineProps({
     description: { type: String, default: null },
     required: { type: Boolean, default: false },
     id: { type: String, default: () => useId() },
     label: { type: String, default: null },
     modelValue: { type: Boolean, default: false },
+    size: { type: String, default: 'base' },
 });
 
 defineEmits(['update:modelValue']);
+
+const switchRootClasses = cva({
+        base: [
+            'relative flex rounded-full shrink-0 border-2',
+            'transition-colors focus-within:outline-hidden cursor-pointer',
+            'data-[state=checked]:border-gray-700',
+            'data-[state=checked]:bg-gray-800',
+            'data-[state=unchecked]:border-transparent',
+            'data-[state=unchecked]:bg-gray-200',
+    ],
+    variants: {
+        size: {
+            sm: 'h-5 w-9',
+            base: 'h-6 w-11',
+            lg: 'h-7 w-14',
+        },
+    },
+})({ size: props.size });
+
+const switchThumbClasses = cva({
+    base: [
+        'my-auto flex items-center justify-center rounded-full bg-white text-xs shadow-ui-xl transition-transform will-change-transform',
+        'data-[state=checked]:translate-x-full',
+    ],
+    variants: {
+        size: {
+            sm: 'size-4',
+            base: 'size-5',
+            lg: 'size-6',
+        },
+    },
+})({ size: props.size });
 </script>
 
 <template>
     <ui-with-field :label :description :required variant="inline" :for="id">
         <SwitchRoot
-            :checked="modelValue"
-            :id
-            @update:checked="$emit('update:modelValue', $event)"
-            :class="[
-                'relative flex h-[20px] w-[32px] rounded-full border',
-                'transition-[background] focus-within:outline-hidden',
-                'data-[state=checked]:border-gray-700',
-                'data-[state=checked]:bg-gray-800',
-                'data-[state=unchecked]:border-transparent',
-                'data-[state=unchecked]:bg-gray-400',
-            ]"
             data-ui-control
             dir="ltr"
+            :id="id"
+            :model-value="modelValue"
+            :class="switchRootClasses"
+            @update:model-value="$emit('update:modelValue', $event)"
         >
-            <SwitchThumb
-                :class="[
-                    'my-auto flex size-3.5 translate-x-0.5 items-center justify-center rounded-full bg-white text-xs shadow-xl transition-transform will-change-transform',
-                    'data-[state=checked]:translate-x-full',
-                ]"
-            />
+                <SwitchThumb :class="switchThumbClasses" />
         </SwitchRoot>
     </ui-with-field>
 </template>

@@ -80,6 +80,7 @@
     --shadow-ui-sm: 0px 2px 3px -2px rgba(0,0,0,0.15);
     --shadow-ui-md: 0px 2px 4px -2px rgba(0,0,0,0.37);
     --shadow-ui-lg: 0px 4px 7px -4px rgba(0,0,0,0.15);
+    --shadow-ui-xl: 0px 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
 
     --animate-wiggle: wiggle 200ms ease-in-out infinite;
 

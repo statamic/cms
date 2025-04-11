@@ -1,15 +1,20 @@
 <template>
-    <div class="toggle-fieldtype-wrapper">
-        <toggle-input :model-value="value" @update:model-value="update" :read-only="isReadOnly" :id="fieldId" />
-        <label v-if="inlineLabel" class="inline-label" v-html="$markdown(__(inlineLabel))"></label>
+    <div class="flex items-center gap-2">
+        <Switch :model-value="value" @update:model-value="update" :id="fieldId" :disabled="isReadOnly" />
+        <ui-heading v-if="inlineLabel" v-html="$markdown(__(inlineLabel))" />
     </div>
 </template>
 
 <script>
 import Fieldtype from './Fieldtype.vue';
+import Switch from '@statamic/components/ui/Switch.vue';
 
 export default {
     mixins: [Fieldtype],
+
+    components: {
+        Switch,
+    },
 
     computed: {
         inlineLabel() {
