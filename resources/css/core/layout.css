@@ -7,7 +7,8 @@
    ========================================================================== */
 
 .nav-main {
-    @apply flex flex-col gap-7 py-6 px-5 text-sm antialiased [&_svg]:text-gray-400 dark:[&_svg]:text-gray-600 select-none;
+    /* =Jay. I know Tailwind has a font-size of text-sm, but I think 0.875rem is a touch too small for the side nav. */
+    @apply flex flex-col gap-7 py-6 px-5 text-[0.9rem] antialiased [&_svg]:text-gray-900 dark:[&_svg]:text-gray-600 select-none;
     @apply h-full overflow-y-auto fixed top-14 left-0 w-46;
 
     transition: all 0.3s ease-in-out;
@@ -17,11 +18,11 @@
     }
 
     ul li a {
-        @apply flex items-center gap-3 text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-gray-200 hover:[&_svg]:text-gray-700 dark:hover:[&_svg]:text-gray-200 ;
+        @apply flex items-center gap-3 text-gray-900 dark:text-gray-400 hover:text-black dark:hover:text-gray-200 hover:[&_svg]:text-gray-700 dark:hover:[&_svg]:text-gray-200;
     }
 
     ul li a.active {
-        @apply text-black [&_svg]:text-black dark:text-white [&_svg]:dark:text-gray-200;
+        @apply text-black [&_svg]:text-black dark:text-white [&_svg]:dark:text-gray-200 font-semibold;
     }
 
     ul li ul {
@@ -29,7 +30,7 @@
     }
 
     .section-title {
-        @apply text-sm text-black dark:text-gray-200 mb-2;
+        @apply text-[0.7rem] font-bold tracking-[0.25px] mb-[0.6rem] uppercase text-black dark:text-gray-200;
     }
 }
 
