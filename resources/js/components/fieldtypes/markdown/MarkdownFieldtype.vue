@@ -72,19 +72,16 @@
                                 <div class="editor" ref="codemirror"></div>
 
                                 <div class="helpers">
-                                    <div class="bg-gray-50 dark:bg-gray-950 rounded-b-xl border-t border-gray-200 dark:border-white/15 flex py-2 px-3 text-sm w-full">
+                                    <div class="bg-gray-50 dark:bg-gray-950 rounded-b-xl border-t border-gray-200 dark:border-white/15 flex p-1 text-sm w-full">
                                         <div class="markdown-cheatsheet-helper">
-                                            <button
-                                                class="text-link flex items-center"
+                                            <ui-button
+                                                icon="markdown"
+                                                size="sm"
+                                                variant="ghost"
                                                 @click="showCheatsheet = true"
                                                 :aria-label="__('Show Markdown Cheatsheet')"
-                                            >
-                                                <svg-icon
-                                                    name="markdown-icon"
-                                                    class="h-4 w-6 items-start me-2"
-                                                />
-                                                <span>{{ __('Markdown Cheatsheet') }}</span>
-                                            </button>
+                                                :text="__('Markdown Cheatsheet')"
+                                            />
                                         </div>
                                     </div>
                                     <div v-if="fullScreenMode" class="flex items-center pe-2">

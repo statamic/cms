@@ -8,7 +8,7 @@
 
             <ui-dropdown v-if="canEditBlueprint || hasItemActions">
                 <template #trigger>
-                    <ui-button icon="dots" variant="ghost" />
+                    <ui-button icon="ui/dots" variant="ghost" />
                 </template>
                 <ui-dropdown-menu>
                     <ui-dropdown-item :text="__('Edit Blueprint')" v-if="canEditBlueprint" :href="actions.editBlueprint" />
@@ -29,27 +29,25 @@
                 <svg-icon name="light/lock" class="-mt-1 w-4 ltr:mr-1 rtl:ml-1" /> {{ __('Read Only') }}
             </div>
 
-            <div class="hidden items-center md:flex">
+            <div class="hidden items-center md:flex gap-3">
                 <save-button-options
                     v-if="!readOnly"
                     :show-options="!revisionsEnabled && !isInline"
-                    :button-class="saveButtonClass"
                     :preferences-prefix="preferencesPrefix"
                 >
-                    <button :class="saveButtonClass" :disabled="!canSave" @click.prevent="save" v-text="saveText" />
+                    <ui-button :disabled="!canSave" :variant="!revisionsEnabled ? 'primary' : 'default'" @click.prevent="save" v-text="saveText" />
                 </save-button-options>
 
                 <save-button-options
                     v-if="revisionsEnabled && !isCreating"
                     :show-options="!isInline"
-                    button-class="btn-primary"
                     :preferences-prefix="preferencesPrefix"
                 >
-                    <button
-                        class="btn-primary flex items-center ltr:ml-4 rtl:mr-4"
+                    <ui-button
+                        variant="primary"
                         :disabled="!canPublish"
                         @click="confirmingPublish = true"
-                        v-text="publishButtonText"
+                        :text="publishButtonText"
                     />
                 </save-button-options>
             </div>
@@ -144,7 +142,7 @@
                                     <ui-panel v-if="revisionsEnabled && !isCreating">
                                         <ui-panel-header class="flex items-center justify-between">
                                             <ui-heading :text="__('Revisions')" />
-                                            <ui-button @click="showRevisionHistory = true" icon="history" :text="__('View History')" size="sm" />
+                                            <ui-button @click="showRevisionHistory = true" icon="history" :text="__('View History')" size="xs" class="-me-4" />
                                         </ui-panel-header>
                                         <ui-card class="space-y-2">
                                             <ui-subheading v-if="published" class="flex items-center gap-2">
@@ -510,13 +508,6 @@ export default {
 
         isDraft() {
             return !this.published;
-        },
-
-        saveButtonClass() {
-            return {
-                btn: this.revisionsEnabled,
-                'btn-primary': this.isCreating || !this.revisionsEnabled,
-            };
         },
 
         afterSaveOption() {

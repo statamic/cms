@@ -68,13 +68,13 @@ const maxValue = computed(() =>
                     :is="components.CalendarPrev"
                     class="inline-flex size-8 cursor-pointer items-center justify-center rounded-md hover:bg-gray-50 active:scale-90 dark:hover:bg-gray-950"
                 >
-                    <ui-icon name="chevron-left" class="size-4" />
+                    <ui-icon name="ui/chevron-left" class="size-4" />
                 </Component>
                 <Component
                     :is="components.CalendarNext"
                     class="inline-flex size-8 cursor-pointer items-center justify-center rounded-md hover:bg-gray-50 active:scale-90 dark:hover:bg-gray-950"
                 >
-                    <ui-icon name="chevron-right" class="size-4" />
+                    <ui-icon name="ui/chevron-right" class="size-4" />
                 </Component>
             </div>
         </Component>

@@ -1,24 +1,24 @@
 <template>
-    <div class="flex h-full flex-col bg-white dark:bg-dark-800">
-        <div
-            class="flex items-center justify-between border-b border-gray-300 bg-gray-200 px-4 py-2 text-lg font-medium dark:border-dark-900 dark:bg-dark-600"
+    <div class="flex h-full flex-col bg-white dark:bg-gray-800 m-2 rounded-xl">
+        <header
+            class="flex items-center justify-between border-b border-gray-300 dark:border-gray-950 bg-gray-50 dark:bg-gray-900 rounded-t-xl px-4 py-2"
         >
-            {{ __('Revision History') }}
-            <button type="button" class="btn-close" @click="close" v-html="'&times'" />
-        </div>
+            <ui-heading size="lg">{{ __('Revision History') }}</ui-heading>
+            <ui-button icon="x" variant="ghost" class="-me-2" @click="close" />
+        </header>
 
         <div class="flex-1 overflow-auto">
             <div class="loading flex h-full items-center justify-center" v-if="loading">
                 <loading-graphic />
             </div>
 
-            <div v-if="!loading && revisions.length === 0" class="p-4 text-sm text-gray dark:text-dark-150">
+            <ui-heading size="sm" class="p-3" v-if="!loading && revisions.length === 0">
                 {{ __('No revisions') }}
-            </div>
+            </ui-heading>
 
             <div v-for="group in revisions" :key="group.day">
-                <h6 class="revision-date" v-text="formatRelativeDate(group.day)" />
-                <div class="revision-list">
+                <ui-heading size="sm" class="p-3" v-text="formatRelativeDate(group.day)" />
+                <div class="divide-y divide-gray-200 dark:divide-gray-900">
                     <revision
                         v-for="revision in group.revisions"
                         :key="revision.date"
