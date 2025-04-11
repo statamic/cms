@@ -23,7 +23,7 @@
 
                     <ui-dropdown align="end" v-if="hasSaveAsOptions">
                         <template #trigger>
-                            <ui-button icon="chevron-down" variant="primary" />
+                            <ui-button icon="ui/chevron-down" variant="primary" />
                         </template>
                         <ui-dropdown-menu>
                             <ui-dropdown-label>{{ __('Save to') }}...</ui-dropdown-label>

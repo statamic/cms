@@ -3,7 +3,7 @@
         <slot />
         <ui-dropdown v-if="showOptions" align="end">
             <template #trigger>
-                <ui-button variant="primary" icon="chevron-down" />
+                <ui-button variant="primary" icon="ui/chevron-down" />
             </template>
             <ui-dropdown-menu>
                 <ui-dropdown-label v-text="__('After Saving')" />

@@ -8,7 +8,7 @@
 
             <ui-dropdown v-if="canEditBlueprint || hasItemActions">
                 <template #trigger>
-                    <ui-button icon="dots" variant="ghost" />
+                    <ui-button icon="ui/dots" variant="ghost" />
                 </template>
                 <ui-dropdown-menu>
                     <ui-dropdown-item :text="__('Edit Blueprint')" v-if="canEditBlueprint" :href="actions.editBlueprint" />

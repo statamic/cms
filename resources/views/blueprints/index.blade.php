@@ -10,7 +10,7 @@
             <template #trigger>
                 <ui-button
                     text="{{ __('Create Blueprint') }}"
-                    icon-append="chevron-down"
+                    icon-append="ui/chevron-down"
                     variant="primary"
                 ></ui-button>
             </template>
