@@ -95,7 +95,7 @@
         <div class="flex">
             <ui-dropdown>
                 <template #trigger>
-                    <ui-button text="Do a Action" variant="filled" icon-append="chevron-vertical" class="[&_svg]:size-2" />
+                    <ui-button text="Do a Action" variant="filled" icon-append="ui/chevron-vertical" class="[&_svg]:size-2" />
                 </template>
             <ui-dropdown-menu>
                 <ui-dropdown-item text="Bake a food" />

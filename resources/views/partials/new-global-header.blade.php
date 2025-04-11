@@ -21,7 +21,7 @@
         <span class="text-gray-500">/</span>
         <ui-dropdown v-cloak>
             <template #trigger>
-                <ui-button text="Collections" size="sm" variant="ghost" icon-append="chevron-vertical" class="[&_svg]:size-2" />
+                <ui-button text="Collections" size="sm" variant="ghost" icon-append="ui/chevron-vertical" class="[&_svg]:size-2" />
             </template>
             <ui-dropdown-header text="Collections" />
             <ui-dropdown-menu>
@@ -34,7 +34,7 @@
         <span class="text-gray-500">/</span>
             <ui-dropdown v-cloak>
             <template #trigger>
-                <ui-button text="Events" size="sm" variant="ghost" icon-append="chevron-vertical" class="[&_svg]:size-2" />
+                <ui-button text="Events" size="sm" variant="ghost" icon-append="ui/chevron-vertical" class="[&_svg]:size-2" />
             </template>
             <ui-dropdown-header text="Events" icon="collections" :link-to-config="true" />
             <ui-dropdown-menu>

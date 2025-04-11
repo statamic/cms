@@ -62,7 +62,7 @@ const itemClasses = cva({
         <SelectRoot v-bind="attrs">
             <SelectTrigger :class="[triggerClasses, $attrs.class]" data-ui-select-trigger>
                 <SelectValue :placeholder="placeholder" class="select-none" />
-                <ui-icon name="chevron-down" class="me-2" />
+                <ui-icon name="ui/chevron-down" class="me-2" />
             </SelectTrigger>
 
             <SelectPortal>
