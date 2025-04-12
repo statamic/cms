@@ -37,7 +37,7 @@
     }
 
     .section-title {
-        @apply text-sm text-black mb-1 dark:text-gray-200;
+        @apply text-sm px-2 text-black font-medium mb-1 dark:text-gray-200;
     }
 }
 
