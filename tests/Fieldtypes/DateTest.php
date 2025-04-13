@@ -584,7 +584,7 @@ class DateTest extends TestCase
         $replicator = (new Field('a', ['type' => 'replicator']));
         $field->setParentField($replicator, 0);
         $fields = (new Fields)->setFields(collect([$field]))->addValues(['test' => ['date' => '2012-01-29']]);
-        $this->assertEquals($fields->validate(), ["test" => new Carbon('2012-01-29 00:00:00')]);
+        $this->assertEquals($fields->validate(), ['test' => new Carbon('2012-01-29 00:00:00')]);
     }
 
     public static function validationProvider()
