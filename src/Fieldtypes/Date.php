@@ -371,7 +371,7 @@ class Date extends Fieldtype
 
     public function preProcessValidatable($value)
     {
-        if(!$this->field->parentField()){
+        if (! $this->field->parentField()) {
             Validator::make(
                 [$this->field->handle() => $value],
                 [$this->field->handle() => [new ValidationRule($this)]],
