@@ -4,12 +4,14 @@ namespace Statamic\Fieldtypes;
 
 use Carbon\Exceptions\InvalidFormatException;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Validator;
 use InvalidArgumentException;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 use Statamic\GraphQL\Fields\DateField;
 use Statamic\GraphQL\Types\DateRangeType;
 use Statamic\Query\Scopes\Filters\Fields\Date as DateFilter;
+use Statamic\Rules\DateFieldtype as ValidationRule;
 use Statamic\Statamic;
 use Statamic\Support\DateFormat;
 
@@ -369,6 +371,13 @@ class Date extends Fieldtype
 
     public function preProcessValidatable($value)
     {
+        if(!$this->field->parentField()){
+            Validator::make(
+                [$this->field->handle() => $value],
+                [$this->field->handle() => [new ValidationRule($this)]],
+            )->validate();
+        }
+
         if ($value === null) {
             return null;
         }
