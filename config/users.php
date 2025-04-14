@@ -180,19 +180,6 @@ return [
 
         /*
         |--------------------------------------------------------------------------
-        | Is two factor enabled?
-        |--------------------------------------------------------------------------
-        |
-        | When enabled, two factor authentication challenges will be presented to
-        | users of the Statamic CP. This will direct them to a setup screen on
-        | their next page visit, or the next time they sign in.
-        |
-        */
-
-        'enabled' => env('STATAMIC_TWO_FACTOR_ENABLED', false),
-
-        /*
-        |--------------------------------------------------------------------------
         | Required for...
         |--------------------------------------------------------------------------
         |
