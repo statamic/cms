@@ -33,6 +33,6 @@ class CompleteTwoFactorAuthenticationSetupTest extends TestCase
         $this->action->__invoke($user);
 
         $this->assertNotNull($user->two_factor_completed);
-        $this->assertEquals(now(), $user->two_factor_completed);
+        $this->assertEquals(now()->timestamp, $user->two_factor_completed);
     }
 }

@@ -28,7 +28,7 @@ class ConfirmTwoFactorAuthenticationTest extends TestCase
 
         $this->user = User::make()->makeSuper()->data([
             'two_factor_confirmed_at' => null,
-            'two_factor_completed' => null,
+            'two_factor_completed' => now()->timestamp,
             'two_factor_secret' => encrypt($this->provider->generateSecretKey()),
             'two_factor_recovery_codes' => encrypt(json_encode(Collection::times(8, function () {
                 return RecoveryCode::generate();
@@ -84,7 +84,7 @@ class ConfirmTwoFactorAuthenticationTest extends TestCase
         $this->action->__invoke($this->user, $code);
 
         $this->assertNotNull($this->user->two_factor_confirmed_at);
-        $this->assertEquals(now(), $this->user->two_factor_confirmed_at);
+        $this->assertEquals(now()->timestamp, $this->user->two_factor_confirmed_at);
 
         $this->assertEquals(now(), $this->user->getLastTwoFactorChallenged());
     }

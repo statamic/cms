@@ -43,7 +43,7 @@ class TwoFactorTest extends TestCase
             ],
         ], $this->fieldtype()->preload());
 
-        $user->set('two_factor_confirmed_at', now())->save();
+        $user->set('two_factor_confirmed_at', now()->timestamp)->save();
         $this->assertTrue($this->fieldtype()->preload()['is_setup']);
 
         config()->set('statamic.users.two_factor.enforced_roles', ['*']);
@@ -74,7 +74,7 @@ class TwoFactorTest extends TestCase
             ],
         ], $this->fieldtype()->preload());
 
-        $anotherUser->set('two_factor_confirmed_at', now())->save();
+        $anotherUser->set('two_factor_confirmed_at', now()->timestamp)->save();
         $this->assertTrue($this->fieldtype()->preload()['is_setup']);
 
         config()->set('statamic.users.two_factor.enforced_roles', ['*']);
@@ -123,8 +123,8 @@ class TwoFactorTest extends TestCase
         $user = $this->user();
 
         $user->merge([
-            'two_factor_confirmed_at' => now(),
-            'two_factor_completed' => now(),
+            'two_factor_confirmed_at' => now()->timestamp,
+            'two_factor_completed' => now()->timestamp,
             'two_factor_secret' => encrypt(app(Google2FA::class)->generateSecretKey()),
             'two_factor_recovery_codes' => encrypt(json_encode(Collection::times(8, function () {
                 return RecoveryCode::generate();
