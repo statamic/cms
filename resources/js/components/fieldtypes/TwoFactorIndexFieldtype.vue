@@ -1,6 +1,6 @@
 <template>
     <div class="flex items-center space-x-2">
-        <template v-else-if="value.setup">
+        <template v-if="value.setup">
             <svg-icon name="light/check" class="w-3 text-green-600" />
             <div>{{ __('Set up') }}</div>
         </template>
