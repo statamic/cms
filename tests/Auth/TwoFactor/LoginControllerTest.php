@@ -37,7 +37,7 @@ class LoginControllerTest extends TestCase
 
         $this->assertNotNull($user->getLastTwoFactorChallenged());
 
-        $this->get(route('statamic.logout'))->assertRedirect();
+        $this->get(cp_route('logout'))->assertRedirect();
 
         $this->assertNull($user->getLastTwoFactorChallenged());
     }
