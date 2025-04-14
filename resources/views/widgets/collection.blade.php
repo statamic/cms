@@ -14,9 +14,10 @@
     @if ($canCreate)
         <template #actions>
             <create-entry-button
-                url="{{ $collection->createEntryUrl(Site::selected()) }}"
-                :blueprints="{{ $blueprints->toJson() }}"
                 text="{{ $button }}"
+                url="{{ $collection->createEntryUrl(Site::selected()) }}"
+                variant="default"
+                :blueprints="{{ $blueprints->toJson() }}"
             ></create-entry-button>
         </template>
     @endif

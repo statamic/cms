@@ -8,14 +8,11 @@ export default {
     mixins: [HasActions, HasFilters, HasPagination, HasPreferences],
 
     props: {
-        initialSortColumn: String,
-        initialSortDirection: String,
-        initialColumns: {
-            type: Array,
-            default: () => [],
-        },
-        filters: Array,
-        actionUrl: String,
+        initialSortColumn: { type: String, default: null },
+        initialSortDirection: { type: String, default: null },
+        initialColumns: { type: Array, default: () => [] },
+        filters: { type: Array, default: () => [] },
+        actionUrl: { type: String, default: null },
     },
 
     data() {
@@ -28,7 +25,7 @@ export default {
             visibleColumns: this.initialColumns.filter((column) => column.visible),
             sortColumn: this.initialSortColumn,
             sortDirection: this.initialSortDirection,
-            meta: null,
+            meta: {},
             pushQuery: false,
             popping: false,
         };

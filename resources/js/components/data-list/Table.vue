@@ -3,10 +3,10 @@
         :data-size="relativeColumnsSize"
         ref="table"
         tabindex="0"
-        class="data-table"
-        :class="{ 'select-none': shifting }"
+        :class="{ 'select-none': shifting, 'data-table': !unstyled }"
         @keydown.shift="shiftDown"
         @keyup="clearShift"
+        data-table
     >
         <thead v-if="allowBulkActions || visibleColumns.length > 1">
             <tr>
@@ -24,7 +24,7 @@
                         'current-column': sharedState.sortColumn === column.field,
                         'sortable-column': column.sortable === true,
                         'cursor-not-allowed': !sortable,
-                        'ltr:pr-8 ltr:text-right rtl:pl-8 rtl:text-left': column.numeric,
+                        'pe-8 text-end': column.numeric,
                     }"
                     class="group rounded-none"
                     @click.prevent="changeSortColumn(column.field)"
@@ -39,7 +39,7 @@
                         height="8"
                         width="8"
                         viewBox="0 0 10 6.5"
-                        class="opacity-0 group-hover:opacity-100 ltr:ml-1 rtl:mr-1"
+                        class="opacity-0 group-hover:opacity-100 ms-1"
                     >
                         <path d="M9.9,1.4L5,6.4L0,1.4L1.4,0L5,3.5L8.5,0L9.9,1.4z" fill="currentColor" />
                     </svg>
@@ -84,7 +84,7 @@
                         :key="column.field"
                         @click="rowClicked(row, index, $event)"
                         :width="column.width"
-                        :class="{ 'ltr:pr-8 ltr:text-right rtl:pl-8 rtl:text-left': column.numeric }"
+                        :class="{ 'pr-8 text-end': column.numeric }"
                     >
                         <slot
                             :name="`cell-${column.field}`"
@@ -140,29 +140,13 @@ export default {
     },
 
     props: {
-        loading: {
-            type: Boolean,
-            default: false,
-        },
-        allowBulkActions: {
-            default: false,
-            type: Boolean,
-        },
-        toggleSelectionOnRowClick: {
-            type: Boolean,
-            default: false,
-        },
-        sortable: {
-            type: Boolean,
-            default: true,
-        },
-        reorderable: {
-            type: Boolean,
-            default: false,
-        },
-        type: {
-            type: String,
-        },
+        loading: { type: Boolean, default: false },
+        allowBulkActions: { type: Boolean, default: false },
+        toggleSelectionOnRowClick: { type: Boolean, default: false },
+        sortable: { type: Boolean, default: true },
+        reorderable: { type: Boolean, default: false },
+        type: { type: String },
+        unstyled: { type: Boolean, default: false },
     },
 
     inject: ['sharedState'],

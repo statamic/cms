@@ -5,34 +5,14 @@ import { sortBy } from 'lodash-es';
 export default {
     emits: ['selections-updated', 'visible-columns-updated'],
     props: {
-        columns: {
-            type: Array,
-            default: () => [],
-        },
-        rows: {
-            type: Array,
-            required: true,
-        },
-        searchQuery: {
-            type: String,
-            default: '',
-        },
-        selections: {
-            type: Array,
-            default: () => [],
-        },
-        maxSelections: {
-            type: Number,
-        },
-        sort: {
-            type: Boolean,
-            default: true,
-        },
-        sortColumn: String,
-        sortDirection: {
-            type: String,
-            default: 'asc',
-        },
+        columns: { type: Array, default: () => [] },
+        rows: { type: Array, required: true },
+        searchQuery: { type: String, default: '' },
+        selections: { type: Array, default: () => [] },
+        maxSelections: { type: Number },
+        sort: { type: Boolean, default: true },
+        sortColumn: { type: String },
+        sortDirection: { type: String, default: 'asc' },
     },
     provide() {
         return {

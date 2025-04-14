@@ -3,7 +3,7 @@
         <ui-button @click="create" v-if="!hasMultipleBlueprints" :text="text" />
         <ui-dropdown v-else>
             <template #trigger>
-                <ui-button @click.prevent="create" icon-append="ui/chevron-down" :text="text" />
+                <ui-button @click.prevent="create" :variant icon-append="ui/chevron-down" :text="text" />
             </template>
             <ui-dropdown-menu>
                 <ui-dropdown-label v-text="__('Choose Blueprint')" />
@@ -23,6 +23,7 @@ export default {
     props: {
         url: String,
         blueprints: Array,
+        variant: { type: String, default: 'primary' },
         text: { type: String, default: () => __('Create Entry') },
         buttonClass: { type: String, default: 'btn' },
     },

@@ -1,36 +1,34 @@
 <template>
-    <div class="flex w-full">
+    <div class="flex">
         <div class="flex flex-1 items-center" v-if="!inline">
             <div class="text-xs text-gray-700" v-if="showTotals && totalItems > 0">
                 {{ __(':start-:end of :total', { start: fromItem, end: toItem, total: totalItems }) }}
             </div>
         </div>
 
-        <ul v-if="hasMultiplePages" class="pagination" :class="{ 'pagination-inline': inline }">
-            <li v-if="hasPrevious">
-                <a @click="selectPreviousPage"
-                    ><span class="text-xs" v-html="direction === 'ltr' ? '&larr;' : '&rarr;'"></span
-                ></a>
-            </li>
+        <div v-if="hasMultiplePages" class="flex items-center gap-1" :class="{ 'pagination-inline': inline }">
+            <ui-button size="sm" variant="filled" icon="ui/chevron-left" :disabled="!hasPrevious" @click="selectPreviousPage" />
 
-            <li v-for="(page, i) in pages" v-if="showPageLinks" :key="i" :class="{ current: page == currentPage }">
-                <span v-if="page === 'separator'" class="unclickable">...</span>
-                <a v-else @click="selectPage(page)">{{ page }}</a>
-            </li>
+            <ui-button
+                v-if="showPageLinks"
+                v-for="(page, i) in pages"
+                size="sm"
+                :variant="page == currentPage ? 'ghost' : 'filled'"
+                :key="i"
+                @click="selectPage(page)"
+                :disabled="page === 'separator' || page === currentPage"
+                :text="page === 'separator' ? '...' : page"
+            />
 
-            <li v-if="hasNext">
-                <a @click="selectNextPage"
-                    ><span class="text-xs" v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span
-                ></a>
-            </li>
-        </ul>
+            <ui-button size="sm" variant="filled" icon="ui/chevron-right" :disabled="!hasNext" @click="selectNextPage" />
+        </div>
 
         <div class="flex flex-1">
             <div class="flex-1"></div>
 
             <select-input
                 v-if="perPage && isPerPageEvenUseful"
-                class="ltr:ml-6 rtl:mr-6"
+                class="ms-6"
                 name="perPage"
                 :placeholder="__('Per Page')"
                 :options="perPageOptions"
@@ -51,29 +49,12 @@ export default {
     mixins: [HasInputOptions],
 
     props: {
-        inline: {
-            type: Boolean,
-            default: false,
-        },
-        showTotals: {
-            type: Boolean,
-            default: false,
-        },
-        perPage: {
-            type: Number,
-        },
-        resourceMeta: {
-            type: Object,
-            required: true,
-        },
-        scrollToTop: {
-            type: Boolean,
-            default: true,
-        },
-        showPageLinks: {
-            type: Boolean,
-            default: true,
-        },
+        inline: { type: Boolean, default: false },
+        showTotals: { type: Boolean, default: false },
+        perPage: { type: Number },
+        resourceMeta: { type: Object, required: true },
+        scrollToTop: { type: Boolean, default: true },
+        showPageLinks: { type: Boolean, default: true },
     },
 
     data() {
