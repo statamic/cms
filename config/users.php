@@ -207,7 +207,7 @@ return [
         |
         */
 
-        'validity' => env('STATAMIC_TWO_FACTOR_VALIDITY', 43200),
+        'validity' => env('TWO_FACTOR_VALIDITY', 43200),
 
     ],
 
