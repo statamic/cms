@@ -2,7 +2,6 @@
 import { ref, computed, watch } from 'vue';
 import CommandPaletteItem from './Item.vue';
 import axios from 'axios';
-import Keys from '@statamic/components/keys/Keys';
 import debounce from '@statamic/util/debounce';
 import { DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle, DialogTrigger, DialogDescription, VisuallyHidden } from 'reka-ui';
 import { ComboboxContent, ComboboxEmpty, ComboboxGroup, ComboboxLabel, ComboboxInput, ComboboxItem, ComboboxRoot, ComboboxViewport } from 'reka-ui';
@@ -17,9 +16,7 @@ let items = ref(getItems());
 let searchResults = ref([]);
 let selected = ref(null);
 
-let keys = new Keys;
-
-keys.bindGlobal(['mod+k'], (e) => {
+Statamic.$keys.bindGlobal(['mod+k'], (e) => {
     e.preventDefault();
     open.value = true;
 });
@@ -29,7 +26,7 @@ each({
     'ctrl+n': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', {'key': 'ArrowDown'})),
     'ctrl+p': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', {'key': 'ArrowUp'})),
 }, (callback, binding) => {
-    keys.bindGlobal([binding], (e) => {
+    Statamic.$keys.bindGlobal([binding], (e) => {
         if (open.value) {
             e.preventDefault();
             callback();
