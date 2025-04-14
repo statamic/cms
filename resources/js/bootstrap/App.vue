@@ -41,11 +41,13 @@ import AssetContainerEditForm from '../components/asset-containers/EditForm.vue'
 import Updater from '../components/updater/Updater.vue';
 import PortalTargets from '../components/portals/PortalTargets.vue';
 import SitesEditForm from '../components/sites/EditForm.vue';
+import CommandPalette from '../components/command-palette/CommandPalette.vue';
 import { defineAsyncComponent } from 'vue';
 import { ConfigProvider } from 'reka-ui';
 
 export default {
     components: {
+        CommandPalette,
         GlobalSiteSelector,
         Login,
         BaseEntryCreateForm,
