@@ -6,7 +6,7 @@ class Link extends Command
 {
     protected $url;
 
-    public function url(string $url): self
+    public function url(string $url): static
     {
         $this->url = $url;
 

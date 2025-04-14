@@ -2,6 +2,8 @@
 
 namespace Statamic\CommandPalette;
 
+use Statamic\Support\Str;
+
 abstract class Command
 {
     protected $icon = 'entry';
@@ -12,19 +14,14 @@ abstract class Command
         //
     }
 
-    // public function keyboardShortcut()
-    // {
-    //     // TODO: Implement keyboard shortcut configuration...
-    // }
-
-    public function icon(string $icon): self
+    public function icon(string $icon): static
     {
         $this->icon = $icon;
 
         return $this;
     }
 
-    public function keys(string $keys): self
+    public function keys(string $keys): static
     {
         $this->keys = $keys;
 
@@ -33,14 +30,14 @@ abstract class Command
 
     public function type(): string
     {
-        return strtolower((new \ReflectionClass(get_called_class()))->getShortName());
+        return Str::snake((new \ReflectionClass(get_called_class()))->getShortName());
     }
 
     public function toArray(): array
     {
         return [
             'type' => $this->type(),
-            'category' => $this->category->name,
+            'category' => $this->category->value,
             'icon' => $this->icon,
             'keys' => $this->keys,
             'text' => $this->text,
