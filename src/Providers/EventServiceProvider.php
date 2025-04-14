@@ -26,9 +26,6 @@ class EventServiceProvider extends ServiceProvider
         \Statamic\Events\ResponseCreated::class => [
             \Statamic\Listeners\ClearState::class,
         ],
-        \Statamic\Events\UserSaved::class => [
-            \Statamic\Listeners\TwoFactorUserSavedListener::class,
-        ],
         \Illuminate\Foundation\Http\Events\RequestHandled::class => [
             \Statamic\Listeners\ClearState::class,
         ],
