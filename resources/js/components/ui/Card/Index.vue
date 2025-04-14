@@ -10,7 +10,7 @@ const classes = cva({
     base: 'bg-white dark:bg-gray-850 rounded-xl border border-gray-200 dark:border-x-0 dark:border-b-0 dark:border-white/15',
     variants: {
         variant: {
-            default: 'shadow-ui-s',
+            default: 'shadow-ui-sm',
             flat: 'shadow-none',
         },
         inset: { false: 'px-4.5 py-5' },

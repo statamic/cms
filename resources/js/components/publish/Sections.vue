@@ -2,8 +2,8 @@
     <div class="publish-sections">
         <div class="publish-sections-section" v-for="(section, i) in visibleSections" :key="i">
             <ui-card-panel
-                :heading="__(section.display)"
-                :description="__(section.instructions)"
+                :heading="__(section.display) || heading"
+                :description="__(section.instructions) || description"
             >
                 <publish-fields
                     :fields="section.fields"
@@ -31,14 +31,13 @@ export default {
     mixins: [ValidatesFieldConditions],
 
     props: {
-        sections: {
-            type: Array,
-            required: true,
-        },
-        readOnly: Boolean,
-        syncable: Boolean,
-        syncableFields: Array,
-        namePrefix: String,
+        sections: { type: Array, required: true },
+        heading: { type: String, default: null },
+        description: { type: String, default: null },
+        readOnly: { type: Boolean, default: false },
+        syncable: { type: Boolean, default: false },
+        syncableFields: { type: Array, default: () => [] },
+        namePrefix: { type: String, default: '' },
     },
 
     inject: ['publishContainer'],
