@@ -33,26 +33,7 @@ class Palette
 
     protected function buildActions(): self
     {
-        $this->addCommand(
-            (new Link(
-                text: 'Save',
-                category: Category::Actions,
-            ))->url('/cp')->icon('save')->keys('⌘ S')
-        );
-
-        $this->addCommand(
-            (new Link(
-                text: 'Duplicate',
-                category: Category::Actions,
-            ))->url('/cp')->icon('duplicate')->keys('⌘ D')
-        );
-
-        $this->addCommand(
-            (new Link(
-                text: 'Delete',
-                category: Category::Actions,
-            ))->url('/cp')->icon('delete')->keys('⌘ DEL')
-        );
+        // TODO: Addressing actions in separate PR.
 
         return $this;
     }
@@ -60,13 +41,6 @@ class Palette
     protected function buildHistory(): self
     {
         // TODO: Set up ajax route for caching command palette history as user runs commands.
-
-        return $this;
-    }
-
-    protected function sort(): self
-    {
-        // TODO: Sort categories? Or sort in JS?
 
         return $this;
     }
