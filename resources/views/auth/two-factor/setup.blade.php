@@ -66,10 +66,6 @@
                                 <div></div>
 
                                 <div class="flex space-x-2">
-                                    @if ($cancellable)
-                                        <a class="btn" href="{{ cp_route('dashboard') }}">{{ __('Cancel') }}</a>
-                                    @endif
-
                                     <button type="submit" class="btn-primary">{{ __('Enable 2FA') }}</button>
                                 </div>
                             </div>
