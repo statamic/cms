@@ -1,22 +1,21 @@
 <template>
-    <dropdown-list class="inline-block" :disabled="!hasMultipleBlueprints">
-        <template v-slot:trigger>
-            <button
-                :class="[buttonClass, { 'flex items-center ltr:pr-4 rtl:pl-4': hasMultipleBlueprints }]"
-                @click="create"
-            >
-                {{ text }}
-                <svg-icon name="micro/chevron-down-xs" class="w-2 ltr:ml-2 rtl:mr-2" v-if="hasMultipleBlueprints" />
-            </button>
-        </template>
-        <h6 v-text="__('Choose Blueprint')" class="p-2" />
-
-        <div class="max-h-[75vh] overflow-y-auto">
-            <div v-for="blueprint in blueprints" :key="blueprint.handle">
-                <dropdown-item :text="blueprint.title" @click="select(blueprint.handle, $event)" />
-            </div>
-        </div>
-    </dropdown-list>
+    <div>
+        <ui-button @click="create" v-if="!hasMultipleBlueprints" :text="text" />
+        <ui-dropdown v-else>
+            <template #trigger>
+                <ui-button @click.prevent="create" icon-append="ui/chevron-down" :text="text" />
+            </template>
+            <ui-dropdown-menu>
+                <ui-dropdown-label v-text="__('Choose Blueprint')" />
+                <ui-dropdown-item
+                    v-for="blueprint in blueprints"
+                    :key="blueprint.handle"
+                    @click="select(blueprint.handle, $event)"
+                    :text="blueprint.title"
+                />
+            </ui-dropdown-menu>
+        </ui-dropdown>
+    </div>
 </template>
 
 <script>
