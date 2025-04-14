@@ -10,7 +10,6 @@ use Statamic\Auth\TwoFactor\ChallengeTwoFactorAuthentication;
 use Statamic\Auth\TwoFactor\Google2FA;
 use Statamic\Auth\TwoFactor\RecoveryCode;
 use Statamic\Exceptions\InvalidChallengeModeException;
-use Statamic\Facades\TwoFactorUser;
 use Statamic\Facades\User;
 use Statamic\Notifications\RecoveryCodeUsed;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -88,11 +87,11 @@ class ChallengeTwoFactorAuthenticationTest extends TestCase
 
         $code = $this->getOneTimeCode();
 
-        $this->assertNull(TwoFactorUser::getLastChallenged($user));
+        $this->assertNull($user->getLastTwoFactorChallenged());
 
         $this->action->__invoke($user, 'code', $code);
 
-        $this->assertEquals(now(), TwoFactorUser::getLastChallenged($user));
+        $this->assertEquals(now(), $user->getLastTwoFactorChallenged());
     }
 
     #[Test]
@@ -119,13 +118,13 @@ class ChallengeTwoFactorAuthenticationTest extends TestCase
         $this->freezeTime();
         $this->actingAs($user = $this->userWithTwoFactorEnabled());
 
-        $this->assertNull(TwoFactorUser::getLastChallenged($user));
+        $this->assertNull($user->getLastTwoFactorChallenged());
 
         $userRecoveryCode = collect(json_decode(decrypt($user->two_factor_recovery_codes), true))->first();
 
         $this->action->__invoke($user, 'recovery_code', $userRecoveryCode);
 
-        $this->assertEquals(now(), TwoFactorUser::getLastChallenged($user));
+        $this->assertEquals(now(), $user->getLastTwoFactorChallenged());
     }
 
     #[Test]

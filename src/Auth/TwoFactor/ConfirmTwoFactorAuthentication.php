@@ -4,7 +4,6 @@ namespace Statamic\Auth\TwoFactor;
 
 use Illuminate\Validation\ValidationException;
 use Statamic\Auth\User;
-use Statamic\Facades\TwoFactorUser;
 
 class ConfirmTwoFactorAuthentication
 {
@@ -27,6 +26,6 @@ class ConfirmTwoFactorAuthentication
         $user->save();
 
         // update (prevents going to the challenge screen after setup)
-        TwoFactorUser::setLastChallenged();
+        $user->setLastTwoFactorChallenged();
     }
 }

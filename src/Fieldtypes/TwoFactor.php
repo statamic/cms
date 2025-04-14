@@ -2,7 +2,6 @@
 
 namespace Statamic\Fieldtypes;
 
-use Statamic\Facades\TwoFactorUser;
 use Statamic\Facades\User;
 use Statamic\Fields\Fieldtype;
 
@@ -23,7 +22,7 @@ class TwoFactor extends Fieldtype
 
         return [
             'is_current_user' => $user->id === User::current()->id,
-            'is_enforced' => TwoFactorUser::isTwoFactorEnforceable($user),
+            'is_enforced' => $user->isTwoFactorAuthRequired(),
             'is_setup' => ! is_null($user->two_factor_confirmed_at),
             'routes' => [
                 'setup' => cp_route('two-factor.setup'),

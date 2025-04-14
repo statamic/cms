@@ -3,7 +3,6 @@
 namespace Statamic\Auth\TwoFactor;
 
 use Statamic\Auth\User;
-use Statamic\Facades\TwoFactorUser;
 
 class DisableTwoFactorAuthentication
 {
@@ -14,8 +13,7 @@ class DisableTwoFactorAuthentication
             ->remove('two_factor_completed')
             ->remove('two_factor_recovery_codes')
             ->remove('two_factor_secret')
+            ->clearLastTwoFactorChallenged()
             ->save();
-
-        TwoFactorUser::clearLastChallenged($user);
     }
 }

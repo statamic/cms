@@ -371,4 +371,29 @@ class User extends BaseUser
             'super' => $this->get('super', false),
         ], $this->data()->toArray());
     }
+
+    public function getLastTwoFactorChallenged(): ?string
+    {
+        $lastChallenged = $this->getMeta('statamic_two_factor');
+
+        if (! $lastChallenged) {
+            return null;
+        }
+
+        return decrypt($lastChallenged);
+    }
+
+    public function setLastTwoFactorChallenged(): self
+    {
+        $this->setMeta('statamic_two_factor', encrypt(Carbon::now()));
+
+        return $this;
+    }
+
+    public function clearLastTwoFactorChallenged(): self
+    {
+        $this->setMeta('statamic_two_factor', null);
+
+        return $this;
+    }
 }

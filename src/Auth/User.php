@@ -353,6 +353,27 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
         return $this->getPreference('theme') ?? 'auto';
     }
 
+    public function isTwoFactorAuthRequired(): bool
+    {
+        $enforcedRoles = config('statamic.users.two_factor.enforced_roles', []);
+
+        if (in_array('*', $enforcedRoles)) {
+            return true;
+        }
+
+        return $this->roles()
+            ->map->handle()
+            ->when($this->isSuper(), fn ($roles) => $roles->push('super_users'))
+            ->intersect($enforcedRoles)
+            ->isNotEmpty();
+    }
+
+    abstract public function getLastTwoFactorChallenged(): ?string;
+
+    abstract public function setLastTwoFactorChallenged(): self;
+
+    abstract public function clearLastTwoFactorChallenged(): self;
+
     public function getCpSearchResultBadge(): string
     {
         return __('User');

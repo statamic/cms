@@ -5,7 +5,6 @@ namespace Statamic\Http\Controllers\CP\Users;
 use Illuminate\Http\Request;
 use Statamic\Auth\TwoFactor\DisableTwoFactorAuthentication;
 use Statamic\Exceptions\NotFoundHttpException;
-use Statamic\Facades\TwoFactorUser;
 use Statamic\Facades\User;
 
 class DisableTwoFactorController
@@ -20,7 +19,7 @@ class DisableTwoFactorController
 
         $disable($user);
 
-        if ($request->user()->id === $user->id && TwoFactorUser::isTwoFactorEnforceable($user)) {
+        if ($request->user()->id === $user->id && $user->isTwoFactorAuthRequired()) {
             return ['redirect' => cp_route('logout')];
         }
 

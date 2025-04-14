@@ -8,7 +8,6 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\TwoFactor\ConfirmTwoFactorAuthentication;
 use Statamic\Auth\TwoFactor\Google2FA;
 use Statamic\Auth\TwoFactor\RecoveryCode;
-use Statamic\Facades\TwoFactorUser;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -87,7 +86,7 @@ class ConfirmTwoFactorAuthenticationTest extends TestCase
         $this->assertNotNull($this->user->two_factor_confirmed_at);
         $this->assertEquals(now(), $this->user->two_factor_confirmed_at);
 
-        $this->assertEquals(now(), TwoFactorUser::getLastChallenged($this->user));
+        $this->assertEquals(now(), $this->user->getLastTwoFactorChallenged());
     }
 
     private function getOneTimeCode()

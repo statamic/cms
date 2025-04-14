@@ -8,7 +8,6 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\TwoFactor\Google2FA;
 use Statamic\Auth\TwoFactor\RecoveryCode;
 use Statamic\Facades\Role;
-use Statamic\Facades\TwoFactorUser;
 use Statamic\Facades\User;
 use Statamic\Http\Middleware\CP\EnforceTwoFactor;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -78,7 +77,7 @@ class EnforceTwoFactorTest extends TestCase
 
         // Set the time and force a challenge (ie. fake it)
         $this->freezeTime();
-        TwoFactorUser::setLastChallenged($user);
+        $user->setLastTwoFactorChallenged();
 
         $this
             ->get(cp_route('collections.index'))
@@ -109,7 +108,7 @@ class EnforceTwoFactorTest extends TestCase
 
         // Set the time and force a challenge (ie. fake it)
         $this->freezeTime();
-        TwoFactorUser::setLastChallenged($user);
+        $user->setLastTwoFactorChallenged();
 
         // Jump forward 5 minutes to ensure we're not redirected.
         $this->travel(5)->minutes();

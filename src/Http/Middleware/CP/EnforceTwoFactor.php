@@ -6,17 +6,17 @@ use Carbon\Carbon;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Statamic\Facades\TwoFactorUser;
+use Statamic\Facades\User;
 
 class EnforceTwoFactor
 {
     public function handle(Request $request, Closure $next)
     {
         // get the user
-        $user = TwoFactorUser::get();
+        $user = User::current();
 
         // two factor setup (opt-in), or is two factor enforceable (mandatory) for this user?
-        if ($user->two_factor_completed || TwoFactorUser::isTwoFactorEnforceable()) {
+        if ($user->two_factor_completed || $user->isTwoFactorAuthRequired()) {
 
             // is two factor NOT set up?
             if (! $user->two_factor_completed) {
@@ -25,7 +25,7 @@ class EnforceTwoFactor
             }
 
             // when were we last challenged?
-            $lastChallenge = TwoFactorUser::getLastChallenged();
+            $lastChallenge = $user->getLastTwoFactorChallenged();
 
             // do we use validity?
             // if so, we need to check if we have a challenge, and if it hasn't expired

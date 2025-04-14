@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Statamic\Auth\ThrottlesLogins;
 use Statamic\Facades\OAuth;
-use Statamic\Facades\TwoFactorUser;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Middleware\CP\RedirectIfAuthorized;
 use Statamic\Support\Str;
@@ -128,8 +127,7 @@ class LoginController extends CpController
 
     public function logout(Request $request)
     {
-        // remove the last challenged
-        TwoFactorUser::clearLastChallenged();
+        $request->user()->clearLastTwoFactorChallenged();
 
         $this->guard()->logout();
 

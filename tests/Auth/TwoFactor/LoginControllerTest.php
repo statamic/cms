@@ -6,7 +6,6 @@ use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\TwoFactor\Google2FA;
 use Statamic\Auth\TwoFactor\RecoveryCode;
-use Statamic\Facades\TwoFactorUser;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -32,15 +31,15 @@ class LoginControllerTest extends TestCase
     #[Test]
     public function it_clears_the_last_challenged_variable_when_logged_out()
     {
-        $this->actingAs($this->userWithTwoFactorEnabled());
+        $this->actingAs($user = $this->userWithTwoFactorEnabled());
 
-        TwoFactorUser::setLastChallenged();
+        $user->setLastTwoFactorChallenged();
 
-        $this->assertNotNull(TwoFactorUser::getLastChallenged());
+        $this->assertNotNull($user->getLastTwoFactorChallenged());
 
         $this->get(route('statamic.logout'))->assertRedirect();
 
-        $this->assertNull(TwoFactorUser::getLastChallenged());
+        $this->assertNull($user->getLastTwoFactorChallenged());
     }
 
     private function user()

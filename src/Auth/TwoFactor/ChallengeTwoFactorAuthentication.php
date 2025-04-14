@@ -6,7 +6,6 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Statamic\Auth\User;
 use Statamic\Exceptions\InvalidChallengeModeException;
-use Statamic\Facades\TwoFactorUser;
 use Statamic\Notifications\RecoveryCodeUsed;
 
 class ChallengeTwoFactorAuthentication
@@ -33,7 +32,7 @@ class ChallengeTwoFactorAuthentication
         $this->{Str::camel('challenge_'.$mode)}($user, $code);
 
         // save session
-        TwoFactorUser::setLastChallenged();
+        $user->setLastTwoFactorChallenged();
     }
 
     protected function challengeCode(User $user, ?string $code): void
