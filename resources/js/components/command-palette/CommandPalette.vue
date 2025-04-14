@@ -98,16 +98,7 @@ function getItems() {
 
 function searchContent() {
     axios.get('/cp/command-palette/search', { params: { q: query.value } }).then((response) => {
-        searchResults.value = response.data.map((result) => {
-            return {
-                type: 'link',
-                category: 'Content Search',
-                icon: 'magnifying-glass',
-                text: result.title,
-                url: result.url,
-                badge: result.badge,
-            };
-        });
+        searchResults.value = response.data;
     });
 }
 
@@ -116,6 +107,7 @@ function select(selected) {
 
     switch (item.type) {
         case 'link':
+        case 'content_search_result':
             window.location = item.url; // TODO: If meta key is held, maybe it can `window.open()` in new window/tab?
     }
 }
