@@ -866,6 +866,13 @@ class PathDataManager
             if ($doCompact) {
                 $this->compact($path->isFinal);
             }
+        } elseif (is_object($this->reducedVar) && property_exists($this->reducedVar, Str::camel($varPath))) {
+            $this->reducedVar = $this->reducedVar->{Str::camel($varPath)};
+            $this->resolvedPath[] = '{method:'.$varPath.'}';
+
+            if ($doCompact) {
+                $this->compact($path->isFinal);
+            }
         } elseif (is_array($this->reducedVar)) {
             if (is_numeric($varPath) && ! Arr::isAssoc($this->reducedVar) && $varPath < count($this->reducedVar) && array_key_exists($varPath, $this->reducedVar)) {
                 $this->resolvedPath[] = $varPath;
