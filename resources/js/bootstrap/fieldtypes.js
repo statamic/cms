@@ -141,7 +141,7 @@ export default function registerFieldtypes(app) {
     app.component('toggle-fieldtype', ToggleFieldtype);
     app.component('toggle-fieldtype-index', ToggleIndexFieldtype);
     app.component('two_factor-fieldtype', TwoFactorFieldtype);
-    app.component('two_factor-index-fieldtype', TwoFactorIndexFieldtype);
+    app.component('two_factor-fieldtype-index', TwoFactorIndexFieldtype);
     app.component('width-fieldtype', WidthFieldtype);
     app.component('video-fieldtype', VideoFieldtype);
     app.component(
