@@ -2,10 +2,11 @@
 
 namespace Statamic\CommandPalette;
 
-enum Category
+enum Category: string
 {
-    case Actions;
-    case History;
-    case Navigation;
-    case Preferences;
+    case Actions = 'Actions';
+    case History = 'History';
+    case Navigation = 'Navigation';
+    case Preferences = 'Preferences';
+    case Search = 'Content Search';
 }
