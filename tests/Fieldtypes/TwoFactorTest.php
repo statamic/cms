@@ -88,6 +88,33 @@ class TwoFactorTest extends TestCase
         $this->assertTrue($this->fieldtype()->preload()['is_enforced']);
     }
 
+    #[Test]
+    public function it_preprocesses_index()
+    {
+        $data = [
+            'locked' => false,
+            'confirmed_at' => now(),
+            'completed' => now(),
+            'secret' => 'foobarbaz',
+            'recovery_codes' => encrypt(json_encode(['foo', 'bar', 'baz'])),
+        ];
+
+        $this->assertEquals(
+            ['locked' => false, 'setup' => true],
+            $this->fieldtype()->preProcessIndex($data)
+        );
+
+        $this->assertEquals(
+            ['locked' => true, 'setup' => true],
+            $this->fieldtype()->preProcessIndex([...$data, 'locked' => true])
+        );
+
+        $this->assertEquals(
+            ['locked' => false, 'setup' => false],
+            $this->fieldtype()->preProcessIndex([...$data, 'confirmed_at' => null])
+        );
+    }
+
     private function fieldtype($config = [])
     {
         return (new TwoFactor())->setField(new Field('test', array_merge(['type' => 'two_factor'], $config)));

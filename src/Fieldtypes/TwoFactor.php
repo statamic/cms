@@ -38,4 +38,13 @@ class TwoFactor extends Fieldtype
             ],
         ];
     }
+    public function preProcessIndex($data)
+    {
+        $user = $this->field->parent();
+
+        return [
+            'locked' => $user->two_factor_locked ? true : false,
+            'setup' => $user->two_factor_confirmed_at ? true : false,
+        ];
+    }
 }
