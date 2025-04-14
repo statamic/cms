@@ -14,11 +14,10 @@ class CommandPaletteController extends CpController
     public function index()
     {
         // TODO:
-        // - Resolve and render nav children (ie. Articles, Pages collections, etc.)
         // - Cache nav and/or built command palette?
         // - Bust cache when nav preferences saved?
 
-        Nav::build();
+        Nav::build(commands: true);
 
         return CommandPalette::build();
     }

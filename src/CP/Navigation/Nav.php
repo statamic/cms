@@ -126,14 +126,13 @@ class Nav
      * Build navigation.
      *
      * @param  mixed  $preferences
-     * @param  bool  $preferences
      * @return \Illuminate\Support\Collection
      */
-    public function build($preferences = true, bool $editing = false)
+    public function build($preferences = true, bool $editing = false, bool $commands = false)
     {
         return (new NavBuilder($this->makeBaseItems()))
             ->withHidden($editing)
-            ->withCommandPalette(! $editing)
+            ->withCommandPalette($commands)
             ->build($preferences);
     }
 
