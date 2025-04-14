@@ -17,11 +17,8 @@
             </div>
         </template>
 
-        <template v-else-if="isCurrentUser && !isSetup">
-            <div class="text-sm">
-                <p class="mb-2 font-medium">{{ __('statamic::messages.two_factor_not_setup_1') }}</p>
-                <p>{{ __('statamic::messages.two_factor_not_setup_2') }}</p>
-            </div>
+        <template v-else-if="!isCurrentUser && !isSetup">
+            <p class="text-sm text-gray">{{ __('statamic::messages.two_factor_not_setup') }}</p>
         </template>
 
         <template v-else>
