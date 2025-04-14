@@ -12,6 +12,7 @@ import { cva } from 'cva';
 
 let open = ref(false);
 let query = ref('');
+let categories = ref([]);
 let items = ref(getItems());
 let searchResults = ref([]);
 let selected = ref(null);
@@ -58,14 +59,7 @@ const results = computed(() => {
 
     let groups = groupBy(filtered, 'category');
 
-    // TODO: Get category order from Categories enum in server payload?
-    const categories = [
-        'Actions',
-        'Navigation',
-        'Content Search',
-    ];
-
-    return categories
+    return categories.value
         .map((category) => {
             return {
                 text: __(category),
@@ -92,7 +86,8 @@ watch(open, (isOpen) => {
 
 function getItems() {
     axios.get('/cp/command-palette').then((response) => {
-        items.value = response.data;
+        categories.value = response.data.categories;
+        items.value = response.data.items;
     });
 }
 

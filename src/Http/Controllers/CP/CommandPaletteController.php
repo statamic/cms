@@ -21,7 +21,10 @@ class CommandPaletteController extends CpController
 
         Nav::build(commands: true);
 
-        return CommandPalette::build();
+        return [
+            'categories' => Category::order(),
+            'items' => CommandPalette::build(),
+        ];
     }
 
     public function search(Request $request)
