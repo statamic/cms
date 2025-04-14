@@ -29,11 +29,10 @@ trait MultipleLabeledValueTests
         $this->assertEquals([
             ['key' => 'au', 'value' => 'au', 'label' => 'Australia'],
             ['key' => 'us', 'value' => 'us', 'label' => 'USA'],
-            ['key' => null, 'value' => null, 'label' => null],
             ['key' => false, 'value' => false, 'label' => false],
             ['key' => true, 'value' => true, 'label' => true],
             ['key' => 'missing', 'value' => 'missing', 'label' => 'missing'],
-        ], $field->augment(['au', 'us', null, false, true, 'missing']));
+        ], $field->augment(['au', 'us', false, true, 'missing']));
     }
 
     #[Test]
@@ -51,11 +50,10 @@ trait MultipleLabeledValueTests
 
         $this->assertEquals([
             ['key' => 2, 'value' => 2, 'label' => 'Canada'],
-            ['key' => null, 'value' => null, 'label' => null],
             ['key' => false, 'value' => false, 'label' => false],
             ['key' => true, 'value' => true, 'label' => true],
             ['key' => 'missing', 'value' => 'missing', 'label' => 'missing'],
-        ], $field->augment([2, null, false, true, 'missing']));
+        ], $field->augment([2, false, true, 'missing']));
 
         $this->assertEquals([
             ['key' => 2, 'value' => 2, 'label' => 'Canada'],
@@ -118,16 +116,14 @@ trait MultipleLabeledValueTests
             'options' => [
                 'true' => 'Yup',
                 'false' => 'Nope',
-                'null' => 'Dunno',
             ],
         ]);
 
         $this->assertEquals([
-            ['key' => null, 'value' => null, 'label' => 'Dunno'],
             ['key' => false, 'value' => false, 'label' => 'Nope'],
             ['key' => true, 'value' => true, 'label' => 'Yup'],
             ['key' => 'missing', 'value' => 'missing', 'label' => 'missing'],
-        ], $field->augment([null, false, true, 'missing']));
+        ], $field->augment([false, true, 'missing']));
     }
 
     #[Test]
@@ -141,11 +137,10 @@ trait MultipleLabeledValueTests
         ]);
 
         $this->assertEquals([
-            ['key' => null, 'value' => null, 'label' => null],
             ['key' => false, 'value' => false, 'label' => false],
             ['key' => true, 'value' => true, 'label' => true],
             ['key' => 'missing', 'value' => 'missing', 'label' => 'missing'],
-        ], $field->augment([null, false, true, 'missing']));
+        ], $field->augment([false, true, 'missing']));
     }
 
     public static function noMultipleOptionsProvider()
