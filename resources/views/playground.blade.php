@@ -217,8 +217,10 @@
 
     <section class="space-y-4">
         <ui-heading size="lg">Switch</ui-heading>
-        <div class="flex">
-            <ui-switch label="Make it So" description="Would you like to make <b>it so</b>?" />
+        <div class="flex items-center gap-2">
+            <ui-switch size="sm" />
+            <ui-switch  />
+            <ui-switch size="lg" />
         </div>
     </section>
 

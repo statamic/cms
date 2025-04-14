@@ -21,7 +21,7 @@
                                     <ul>
                                         @foreach ($item->children() as $child)
                                             <li>
-                                                <a href="{{ $child->url() }}" {{ $item->attributes() }}>
+                                                <a href="{{ $child->url() }}" {{ $item->attributes() }} @class(['active' => $child->isActive()])>
                                                     {{ __($child->name()) }}
                                                 </a>
                                             </li>

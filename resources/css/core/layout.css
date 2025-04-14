@@ -7,29 +7,37 @@
    ========================================================================== */
 
 .nav-main {
-    @apply flex flex-col gap-7 py-6 px-5 text-sm antialiased [&_svg]:text-gray-400 dark:[&_svg]:text-gray-600 select-none;
+    @apply flex flex-col gap-6 py-6 px-3 text-sm antialiased select-none;
     @apply h-full overflow-y-auto fixed top-14 left-0 w-46;
-
+    @apply [&_svg]:text-gray-500 dark:[&_svg]:text-gray-600;
     transition: all 0.3s ease-in-out;
 
     ul {
-        @apply flex flex-col gap-2;
+        @apply flex flex-col gap-0;
     }
 
     ul li a {
-        @apply flex items-center gap-3 text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-gray-200 hover:[&_svg]:text-gray-700 dark:hover:[&_svg]:text-gray-200 ;
+        @apply flex items-center gap-3 text-gray-700 hover:bg-gray-400/10 px-2 py-1 rounded-md dark:text-gray-400 hover:text-black dark:hover:text-gray-200 hover:[&_svg]:text-gray-700 dark:hover:[&_svg]:text-gray-200;
     }
 
     ul li a.active {
-        @apply text-black [&_svg]:text-black dark:text-white [&_svg]:dark:text-gray-200;
+        @apply text-black bg-gray-400/10 [&_svg]:text-black dark:text-white [&_svg]:dark:text-gray-200 font-medium;
     }
 
     ul li ul {
-        @apply ml-1.5 pl-5.5 translate-x-px my-1.5 space-y-1 text-[13px] min-w-0 flex-col gap-1 border-l border-gray-300 dark:border-gray-600;
+        @apply ml-1.5 pl-5.5 translate-x-px my-1.5 text-[0.8125rem] min-w-0 flex-col gap-1 border-l border-gray-300 dark:border-gray-600;
+    }
+
+    ul li ul li a {
+        @apply py-0 hover:bg-transparent;
+    }
+
+    ul li ul li a.active {
+        @apply text-black dark:text-white font-medium bg-transparent;
     }
 
     .section-title {
-        @apply text-sm text-black dark:text-gray-200 mb-2;
+        @apply text-sm px-2 text-black font-medium mb-1 dark:text-gray-200;
     }
 }
 
