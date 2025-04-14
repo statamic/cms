@@ -26,7 +26,6 @@ class TwoFactorSetupController
         $enable(User::current(), $resetSecret);
 
         $viewData = [
-            'cancellable' => Arr::get(User::current()->two_factor, 'cancellable', false),
             'qr' => $provider->getQrCodeSvg(),
             'secret_key' => $provider->getSecretKey(),
             'confirm_url' => cp_route('two-factor.confirm'),
