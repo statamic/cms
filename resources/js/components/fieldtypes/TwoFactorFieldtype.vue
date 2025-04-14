@@ -22,8 +22,6 @@
         </template>
 
         <template v-else>
-<!--            <two-factor-locked v-if="isLocked" :route="meta.routes.unlock" @update="updateState" />-->
-
             <div class="flex items-center space-x-4">
                 <button v-if="isCurrentUser" class="btn" @click="recoveryCodesModalOpen = true">Show recovery codes</button>
 
@@ -51,7 +49,6 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import TwoFactorLocked from './two-factor/Locked.vue';
 import DisableTwoFactor from './two-factor/Disable.vue';
 import TwoFactorSetup from './two-factor/Setup.vue';
 import TwoFactorRecoveryCodesModal from './two-factor/RecoveryCodesModal.vue';
@@ -60,7 +57,6 @@ export default {
     mixins: [Fieldtype],
 
     components: {
-        TwoFactorLocked,
         DisableTwoFactor,
         TwoFactorSetup,
         TwoFactorRecoveryCodesModal,

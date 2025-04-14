@@ -24,7 +24,6 @@ use Statamic\Http\Controllers\CP\Auth\ImpersonationController;
 use Statamic\Http\Controllers\CP\Auth\LoginController;
 use Statamic\Http\Controllers\CP\Auth\ResetPasswordController;
 use Statamic\Http\Controllers\CP\Auth\TwoFactorChallengeController;
-use Statamic\Http\Controllers\CP\Auth\TwoFactorLockedUserController;
 use Statamic\Http\Controllers\CP\Auth\TwoFactorSetupController;
 use Statamic\Http\Controllers\CP\Auth\UnauthorizedController;
 use Statamic\Http\Controllers\CP\Collections\CollectionActionController;
@@ -96,11 +95,10 @@ use Statamic\Http\Controllers\CP\Taxonomies\TermsController;
 use Statamic\Http\Controllers\CP\Updater\UpdateProductController;
 use Statamic\Http\Controllers\CP\Updater\UpdaterController;
 use Statamic\Http\Controllers\CP\Users\AccountController;
+use Statamic\Http\Controllers\CP\Users\DisableTwoFactorController;
 use Statamic\Http\Controllers\CP\Users\PasswordController;
 use Statamic\Http\Controllers\CP\Users\RolesController;
 use Statamic\Http\Controllers\CP\Users\TwoFactorRecoveryCodesController;
-use Statamic\Http\Controllers\CP\Users\TwoFactorUserLockedController;
-use Statamic\Http\Controllers\CP\Users\DisableTwoFactorController;
 use Statamic\Http\Controllers\CP\Users\UserActionController;
 use Statamic\Http\Controllers\CP\Users\UserBlueprintController;
 use Statamic\Http\Controllers\CP\Users\UserGroupBlueprintController;
@@ -132,7 +130,6 @@ Route::group(['prefix' => 'auth'], function () {
 
             Route::get('two-factor/challenge', [TwoFactorChallengeController::class, 'index'])->name('two-factor.challenge');
             Route::post('two-factor/challenge', [TwoFactorChallengeController::class, 'store'])->name('two-factor.challenge.attempt');
-            Route::get('two-factor/locked', [TwoFactorLockedUserController::class, 'index'])->name('two-factor.locked');
         });
     }
 
@@ -316,7 +313,6 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::get('users/{user}/two-factor/recovery-codes', [TwoFactorRecoveryCodesController::class, 'show'])->name('users.two-factor.recovery-codes.show');
     Route::post('users/{user}/two-factor/recovery-codes', [TwoFactorRecoveryCodesController::class, 'store'])->name('users.two-factor.recovery-codes.generate');
     Route::get('users/{user}/two-factor/recovery-codes/download', [TwoFactorRecoveryCodesController::class, 'download'])->name('users.two-factor.recovery-codes.download');
-    Route::delete('users/{user}/two-factor/lock', [TwoFactorUserLockedController::class, 'destroy'])->name('users.two-factor.unlock');
     Route::delete('users/{user}/two-factor', DisableTwoFactorController::class)->name('users.two-factor.disable');
     Route::get('account', AccountController::class)->name('account');
     Route::get('user-groups/blueprint', [UserGroupBlueprintController::class, 'edit'])->name('user-groups.blueprint.edit');

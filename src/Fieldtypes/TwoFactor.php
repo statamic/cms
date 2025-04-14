@@ -24,11 +24,9 @@ class TwoFactor extends Fieldtype
         return [
             'is_current_user' => $user->id === User::current()->id,
             'is_enforced' => TwoFactorUser::isTwoFactorEnforceable($user),
-            'is_locked' => $user->two_factor_locked === true,
             'is_setup' => ! is_null($user->two_factor_confirmed_at),
             'routes' => [
                 'setup' => cp_route('two-factor.setup'),
-                'unlock' => cp_route('users.two-factor.unlock', $user->id),
                 'disable' => cp_route('users.two-factor.disable', $user->id),
                 'recovery_codes' => [
                     'show' => cp_route('users.two-factor.recovery-codes.show', $user->id),
@@ -38,13 +36,13 @@ class TwoFactor extends Fieldtype
             ],
         ];
     }
+
     public function preProcessIndex($data)
     {
         $user = $this->field->parent();
 
         return [
-            'locked' => $user->two_factor_locked ? true : false,
-            'setup' => $user->two_factor_confirmed_at ? true : false,
+            'setup' => ! is_null($user->two_factor_confirmed_at),
         ];
     }
 }

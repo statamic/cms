@@ -30,7 +30,6 @@ class ConfirmTwoFactorAuthenticationTest extends TestCase
         $this->user = User::make()->makeSuper()->data([
             'two_factor_confirmed_at' => null,
             'two_factor_completed' => null,
-            'two_factor_locked' => false,
             'two_factor_secret' => encrypt($this->provider->generateSecretKey()),
             'two_factor_recovery_codes' => encrypt(json_encode(Collection::times(8, function () {
                 return RecoveryCode::generate();

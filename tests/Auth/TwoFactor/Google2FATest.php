@@ -102,7 +102,6 @@ class Google2FATest extends TestCase
         $user = $this->user();
 
         $user->merge([
-            'two_factor_locked' => false,
             'two_factor_confirmed_at' => now(),
             'two_factor_completed' => now(),
             'two_factor_secret' => encrypt(app(Google2FA::class)->generateSecretKey()),

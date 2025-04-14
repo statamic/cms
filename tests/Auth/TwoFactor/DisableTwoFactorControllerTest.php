@@ -6,8 +6,6 @@ use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\TwoFactor\Google2FA;
 use Statamic\Auth\TwoFactor\RecoveryCode;
-use Statamic\Facades\Role;
-use Statamic\Facades\TwoFactorUser;
 use Statamic\Facades\User;
 use Statamic\Http\Middleware\CP\EnforceTwoFactor;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -43,7 +41,6 @@ class DisableTwoFactorControllerTest extends TestCase
         $this->assertNull($user->two_factor_completed);
         $this->assertNull($user->two_factor_recovery_codes);
         $this->assertNull($user->two_factor_secret);
-        $this->assertNull($user->two_factor_locked);
     }
 
     #[Test]
@@ -68,7 +65,6 @@ class DisableTwoFactorControllerTest extends TestCase
         $this->assertNull($user->two_factor_completed);
         $this->assertNull($user->two_factor_recovery_codes);
         $this->assertNull($user->two_factor_secret);
-        $this->assertNull($user->two_factor_locked);
     }
 
     #[Test]
@@ -90,7 +86,6 @@ class DisableTwoFactorControllerTest extends TestCase
         $this->assertNull($otherUser->two_factor_completed);
         $this->assertNull($otherUser->two_factor_recovery_codes);
         $this->assertNull($otherUser->two_factor_secret);
-        $this->assertNull($otherUser->two_factor_locked);
     }
 
     #[Test]
@@ -115,7 +110,6 @@ class DisableTwoFactorControllerTest extends TestCase
         $this->assertNull($otherUser->two_factor_completed);
         $this->assertNull($otherUser->two_factor_recovery_codes);
         $this->assertNull($otherUser->two_factor_secret);
-        $this->assertNull($otherUser->two_factor_locked);
     }
 
     private function user()
@@ -128,7 +122,6 @@ class DisableTwoFactorControllerTest extends TestCase
         $user = $this->user();
 
         $user->merge([
-            'two_factor_locked' => false,
             'two_factor_confirmed_at' => now(),
             'two_factor_completed' => now(),
             'two_factor_secret' => encrypt(app(Google2FA::class)->generateSecretKey()),

@@ -1,10 +1,5 @@
 <template>
     <div class="flex items-center space-x-2">
-        <template v-if="value.locked">
-            <svg-icon name="light/lock" class="w-3 text-orange" />
-            <div>{{ __('Account locked') }}</div>
-        </template>
-
         <template v-else-if="value.setup">
             <svg-icon name="light/check" class="w-3 text-green-600" />
             <div>{{ __('Set up') }}</div>

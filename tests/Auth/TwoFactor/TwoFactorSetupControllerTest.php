@@ -6,7 +6,6 @@ use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\TwoFactor\Google2FA;
 use Statamic\Auth\TwoFactor\RecoveryCode;
-use Statamic\Facades\Role;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -31,36 +30,6 @@ class TwoFactorSetupControllerTest extends TestCase
             ->actingAs($this->userWithTwoFactorEnabled())
             ->get(cp_route('two-factor.setup'))
             ->assertRedirect(cp_route('index'));
-    }
-
-    #[Test]
-    public function it_has_the_correct_cancellable_property()
-    {
-        $user = $this->user();
-
-        $this
-            ->actingAs($user)
-            ->get(cp_route('two-factor.setup'), [
-                'cancellable' => false,
-            ])
-            ->assertViewHas('cancellable', false);
-
-        // No roles enforced
-        config()->set('statamic.users.two_factor.enforced_roles', []);
-
-        $role = Role::make('enforceable_role')
-            ->addPermission('access cp')
-            ->save();
-
-        $user
-            ->set('super', false)
-            ->assignRole($role)
-            ->save();
-
-        $this
-            ->actingAs($user)
-            ->get(cp_route('two-factor.setup'))
-            ->assertViewHas('cancellable', true);
     }
 
     #[Test]
@@ -103,7 +72,6 @@ class TwoFactorSetupControllerTest extends TestCase
         $user = $this->user();
 
         $user->merge([
-            'two_factor_locked' => false,
             'two_factor_confirmed_at' => now(),
             'two_factor_completed' => now(),
             'two_factor_secret' => encrypt(app(Google2FA::class)->generateSecretKey()),

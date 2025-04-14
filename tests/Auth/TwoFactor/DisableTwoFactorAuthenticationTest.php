@@ -33,7 +33,6 @@ class DisableTwoFactorAuthenticationTest extends TestCase
         $this->assertNotNull($user->two_factor_completed);
         $this->assertNotNull($user->two_factor_recovery_codes);
         $this->assertNotNull($user->two_factor_secret);
-        $this->assertNotNull($user->two_factor_locked);
 
         $this->action->__invoke($user);
 
@@ -41,7 +40,6 @@ class DisableTwoFactorAuthenticationTest extends TestCase
         $this->assertNull($user->two_factor_completed);
         $this->assertNull($user->two_factor_recovery_codes);
         $this->assertNull($user->two_factor_secret);
-        $this->assertNull($user->two_factor_locked);
     }
 
     private function user()
@@ -54,7 +52,6 @@ class DisableTwoFactorAuthenticationTest extends TestCase
         $user = $this->user();
 
         $user->merge([
-            'two_factor_locked' => false,
             'two_factor_confirmed_at' => now(),
             'two_factor_completed' => now(),
             'two_factor_secret' => encrypt(app(Google2FA::class)->generateSecretKey()),

@@ -24,57 +24,6 @@ class TwoFactorChallengeControllerTest extends TestCase
     }
 
     #[Test]
-    public function it_increases_the_number_of_failed_attempts_when_an_attempt_fails()
-    {
-        $this->assertEquals(0, session()->get('statamic_two_factor_attempts', 0));
-
-        $this
-            ->followingRedirects()
-            ->actingAs($this->userWithTwoFactorEnabled())
-            ->post(cp_route('two-factor.challenge'), [
-                'code' => '', // Will fail
-            ])
-            ->assertViewIs('statamic::auth.two-factor.challenge');
-
-        $this->assertEquals(1, session()->get('statamic_two_factor_attempts'));
-    }
-
-    #[Test]
-    public function it_locks_the_user_after_a_number_of_failed_attempts()
-    {
-        $user = $this->userWithTwoFactorEnabled();
-
-        // Configured to have 3 failed attempts
-        $this
-            ->followingRedirects()
-            ->actingAs($user)
-            ->post(cp_route('two-factor.challenge'), [
-                'code' => '', // Will fail
-            ])
-            ->assertViewIs('statamic::auth.two-factor.challenge');
-
-        $this->assertEquals(1, session()->get('statamic_two_factor_attempts'));
-
-        $this
-            ->followingRedirects()
-            ->actingAs($user)
-            ->post(cp_route('two-factor.challenge'), [
-                'code' => '', // Will fail
-            ])
-            ->assertViewIs('statamic::auth.two-factor.challenge');
-
-        $this->assertEquals(2, session()->get('statamic_two_factor_attempts'));
-
-        $this
-            ->followingRedirects()
-            ->actingAs($user)
-            ->post(cp_route('two-factor.challenge'), [
-                'code' => '', // Will fail
-            ])
-            ->assertViewIs('statamic::auth.two-factor.challenge');
-    }
-
-    #[Test]
     public function it_sets_a_referrer_url_when_one_is_present_and_not_a_two_factor_route()
     {
         $this->assertNull(session()->get('statamic_two_factor_referrer'));
@@ -87,32 +36,6 @@ class TwoFactorChallengeControllerTest extends TestCase
 
         $this->assertNotNull(session()->get('statamic_two_factor_referrer'));
         $this->assertEquals(cp_route('collections.index'), session()->get('statamic_two_factor_referrer'));
-    }
-
-    #[Test]
-    public function it_forgets_the_number_of_failed_attempts_when_succeeded()
-    {
-        $this->assertNull(session()->get('statamic_two_factor_attempts'));
-
-        // Failed attempt #1
-        $this
-            ->followingRedirects()
-            ->actingAs($this->userWithTwoFactorEnabled())
-            ->post(cp_route('two-factor.challenge'), [
-                'code' => '',
-            ]);
-
-        $this->assertEquals(1, session()->get('statamic_two_factor_attempts'));
-
-        // Attempt #2
-        $this
-            ->followingRedirects()
-            ->actingAs($this->userWithTwoFactorEnabled())
-            ->post(cp_route('two-factor.challenge'), [
-                'code' => $this->getOneTimeCode(),
-            ]);
-
-        $this->assertNull(session()->get('statamic_two_factor_attempts'));
     }
 
     #[Test]
@@ -157,7 +80,6 @@ class TwoFactorChallengeControllerTest extends TestCase
         $user = $this->user();
 
         $user->merge([
-            'two_factor_locked' => false,
             'two_factor_confirmed_at' => now(),
             'two_factor_completed' => now(),
             'two_factor_secret' => encrypt(app(Google2FA::class)->generateSecretKey()),

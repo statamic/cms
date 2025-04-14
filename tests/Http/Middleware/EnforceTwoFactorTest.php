@@ -19,22 +19,9 @@ class EnforceTwoFactorTest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     #[Test]
-    public function it_redirects_to_the_setup_route_when_two_factor_setup_is_not_completed()
-    {
-        $this->actingAs($user = $this->user());
-
-        $request = Request::create(cp_route('index'));
-        $request->setUserResolver(fn () => $user);
-
-        $response = (new EnforceTwoFactor)->handle($request, fn () => null);
-
-        $this->assertTrue($response->isRedirect(cp_route('two-factor.setup')));
-    }
-
-    #[Test]
     public function it_redirects_to_the_setup_route_when_two_factor_setup_is_not_completed_when_the_user_is_super()
     {
-        config()->set('statamic-two-factor.enforced_roles', []);
+        config()->set('statamic.users.two_factor.enforced_roles', ['super_users']);
 
         $this->actingAs($user = $this->user());
 
@@ -209,7 +196,6 @@ class EnforceTwoFactorTest extends TestCase
         $user = $this->user();
 
         $user->merge([
-            'two_factor_locked' => false,
             'two_factor_confirmed_at' => now(),
             'two_factor_completed' => now(),
             'two_factor_secret' => encrypt(app(Google2FA::class)->generateSecretKey()),

@@ -5,8 +5,11 @@ namespace Tests\Fieldtypes;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route as Router;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Auth\TwoFactor\Google2FA;
+use Statamic\Auth\TwoFactor\RecoveryCode;
 use Statamic\Facades\User;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\TwoFactor;
@@ -28,11 +31,9 @@ class TwoFactorTest extends TestCase
         $this->assertEquals([
             'is_current_user' => true,
             'is_enforced' => false,
-            'is_locked' => false,
             'is_setup' => false,
             'routes' => [
                 'setup' => cp_route('two-factor.setup'),
-                'unlock' => cp_route('users.two-factor.unlock', $user->id),
                 'disable' => cp_route('users.two-factor.disable', $user->id),
                 'recovery_codes' => [
                     'show' => cp_route('users.two-factor.recovery-codes.show', $user->id),
@@ -44,9 +45,6 @@ class TwoFactorTest extends TestCase
 
         $user->set('two_factor_confirmed_at', now())->save();
         $this->assertTrue($this->fieldtype()->preload()['is_setup']);
-
-        $user->set('two_factor_locked', true)->save();
-        $this->assertTrue($this->fieldtype()->preload()['is_locked']);
 
         config()->set('statamic.users.two_factor.enforced_roles', ['*']);
         $this->assertTrue($this->fieldtype()->preload()['is_enforced']);
@@ -64,25 +62,20 @@ class TwoFactorTest extends TestCase
         $this->assertEquals([
             'is_current_user' => false,
             'is_enforced' => false,
-            'is_locked' => false,
             'is_setup' => false,
             'routes' => [
                 'setup' => cp_route('two-factor.setup'),
                 'disable' => cp_route('users.two-factor.disable', $anotherUser->id),
-                'reset' => cp_route('users.two-factor.reset', $anotherUser->id),
                 'recovery_codes' => [
                     'show' => cp_route('users.two-factor.recovery-codes.show', $anotherUser->id),
                     'generate' => cp_route('users.two-factor.recovery-codes.generate', $anotherUser->id),
-                    'download' => cp_route('users.two-factor.recovery-codes.download', $user->id),
+                    'download' => cp_route('users.two-factor.recovery-codes.download', $anotherUser->id),
                 ],
             ],
         ], $this->fieldtype()->preload());
 
         $anotherUser->set('two_factor_confirmed_at', now())->save();
         $this->assertTrue($this->fieldtype()->preload()['is_setup']);
-
-        $anotherUser->set('two_factor_locked', true)->save();
-        $this->assertTrue($this->fieldtype()->preload()['is_locked']);
 
         config()->set('statamic.users.two_factor.enforced_roles', ['*']);
         $this->assertTrue($this->fieldtype()->preload()['is_enforced']);
@@ -91,27 +84,27 @@ class TwoFactorTest extends TestCase
     #[Test]
     public function it_preprocesses_index()
     {
-        $data = [
-            'locked' => false,
-            'confirmed_at' => now(),
-            'completed' => now(),
-            'secret' => 'foobarbaz',
-            'recovery_codes' => encrypt(json_encode(['foo', 'bar', 'baz'])),
-        ];
+        $user = $this->userWithTwoFactorEnabled();
+
+        $field = $this->fieldtype()->field()->setParent($user);
 
         $this->assertEquals(
-            ['locked' => false, 'setup' => true],
-            $this->fieldtype()->preProcessIndex($data)
+            ['setup' => true],
+            $this->fieldtype()->setField($field)->preProcessIndex(null)
         );
+    }
+
+    #[Test]
+    public function it_preprocesses_index_when_user_has_two_factor_disabled()
+    {
+        $user = $this->userWithTwoFactorEnabled();
+        $user->remove('two_factor_confirmed_at')->save();
+
+        $field = $this->fieldtype()->field()->setParent($user);
 
         $this->assertEquals(
-            ['locked' => true, 'setup' => true],
-            $this->fieldtype()->preProcessIndex([...$data, 'locked' => true])
-        );
-
-        $this->assertEquals(
-            ['locked' => false, 'setup' => false],
-            $this->fieldtype()->preProcessIndex([...$data, 'confirmed_at' => null])
+            ['setup' => false],
+            $this->fieldtype()->setField($field)->preProcessIndex(null)
         );
     }
 
@@ -123,6 +116,24 @@ class TwoFactorTest extends TestCase
     private function user()
     {
         return tap(User::make()->makeSuper())->save();
+    }
+
+    private function userWithTwoFactorEnabled()
+    {
+        $user = $this->user();
+
+        $user->merge([
+            'two_factor_confirmed_at' => now(),
+            'two_factor_completed' => now(),
+            'two_factor_secret' => encrypt(app(Google2FA::class)->generateSecretKey()),
+            'two_factor_recovery_codes' => encrypt(json_encode(Collection::times(8, function () {
+                return RecoveryCode::generate();
+            })->all())),
+        ]);
+
+        $user->save();
+
+        return $user;
     }
 
     /**
