@@ -1127,9 +1127,9 @@ class NavBuilder
             category: Category::Navigation,
         );
 
-        $link->url($item->url());
-
-        return $link;
+        return $link
+            ->url($item->url())
+            ->icon($item->icon());
     }
 
     /**
