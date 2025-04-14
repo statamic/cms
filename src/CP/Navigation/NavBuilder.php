@@ -1090,7 +1090,12 @@ class NavBuilder
         $this->built
             ->flatMap(fn ($section) => $section['items'])
             ->filter(fn ($item) => $item->url())
-            ->each(fn ($item) => CommandPalette::addCommand(static::transformToLink($item)));
+            ->each(fn ($item) => CommandPalette::addCommand(static::transformToLink($item)))
+            ->filter(fn ($item) => $item->resolvechildren()->children())
+            ->each(fn ($parent) => $parent
+                ->children()
+                ->each(fn ($child) => CommandPalette::addCommand(static::transformToLink($child, $parent)))
+            );
 
         return $this;
     }
@@ -1098,11 +1103,17 @@ class NavBuilder
     /**
      * Add built items to command palette.
      */
-    protected static function transformToLink(NavItem $item): Link
+    protected static function transformToLink(NavItem $item, ?NavItem $parentItem = null): Link
     {
-        $text = $item->section() !== 'Top Level'
-            ? __($item->section()).' » '.__($item->display())
-            : __($item->display());
+        $displayItem = $parentItem ?? $item;
+
+        $text = $displayItem->section() !== 'Top Level'
+            ? __($displayItem->section()).' » '.__($displayItem->display())
+            : __($displayItem->display());
+
+        if ($parentItem) {
+            $text .= ' » '.__($item->display());
+        }
 
         $link = new Link(
             text: $text,
