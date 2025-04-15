@@ -46,7 +46,6 @@ class NavBuilder
     /**
      * Build with hidden items.
      *
-     * @param  bool  $withHidden
      * @return $this
      */
     public function withHidden(bool $withHidden = false): self
