@@ -42,10 +42,8 @@ const aggregatedItems = computed(() => {
 });
 
 const results = computed(() => {
-    let items = sortBy(aggregatedItems.value, ['category']);
-
     let filtered = fuzzysort
-        .go(query.value, items, {
+        .go(query.value, aggregatedItems.value, {
             all: true,
             key: 'text',
         })
