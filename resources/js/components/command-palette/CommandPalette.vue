@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch, nextTick } from 'vue';
+import { ref, computed, watch } from 'vue';
 import CommandPaletteItem from './Item.vue';
 import axios from 'axios';
 import debounce from '@statamic/util/debounce';
@@ -80,13 +80,6 @@ watch(open, (isOpen) => {
     if (isOpen) return;
     reset();
 })
-
-// When aggregatedItems changes, we lose our pre-selected item.
-// This is a bit of a workaround to pre-select the first item, so the user can just hit enter on the first result.
-// TODO: Maybe there's a better way?
-watch(aggregatedItems, () => {
-    nextTick(() => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', {'key': 'ArrowDown'})));
-});
 
 function getItems() {
     axios.get('/cp/command-palette').then((response) => {
@@ -185,7 +178,7 @@ const modalClasses = cva({
                                 </ComboboxEmpty>
                                 <ComboboxGroup
                                     v-else
-                                    v-for="category in results" :key="category"
+                                    v-for="category in results" :key="category.text"
                                     class="px-3 py-2 space-y-1"
                                 >
                                     <ComboboxLabel :as-child="true">
