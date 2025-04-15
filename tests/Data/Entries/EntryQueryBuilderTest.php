@@ -766,10 +766,21 @@ class EntryQueryBuilderTest extends TestCase
     {
         $this->createDummyCollectionAndEntries();
 
-        $count = 0;
-        Entry::query()->chunk(2, function ($entries) use (&$count) {
-            $this->assertCount($count++ == 0 ? 2 : 1, $entries);
+        $chunks = 0;
+
+        Entry::query()->chunk(2, function ($entries, $page) use (&$chunks) {
+            if ($page === 1) {
+                $this->assertCount(2, $entries);
+                $this->assertEquals(['Post 1', 'Post 2'], $entries->map->title->all());
+            } else {
+                $this->assertCount(1, $entries);
+                $this->assertEquals(['Post 3'], $entries->map->title->all());
+            }
+
+            $chunks++;
         });
+
+        $this->assertEquals(2, $chunks);
     }
 
     #[Test]
