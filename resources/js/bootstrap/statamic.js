@@ -86,6 +86,10 @@ export default {
         return { defineStore };
     },
 
+    get $keys() {
+        return this.$app.config.globalProperties.$keys;
+    },
+
     get $permissions() {
         return this.$app.config.globalProperties.$permissions;
     },

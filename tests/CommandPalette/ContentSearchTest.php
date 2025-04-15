@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\GlobalSearch;
+namespace Tests\CommandPalette;
 
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
@@ -13,7 +13,7 @@ use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-class GlobalSearchTest extends TestCase
+class ContentSearchTest extends TestCase
 {
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;

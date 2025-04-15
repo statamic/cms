@@ -46,7 +46,7 @@
         </ui-dropdown>
     </div>
     <div class="flex-1 flex gap-4 items-center justify-end">
-        <ui-command-palette />
+        <command-palette />
         <x-statamic::user-dropdown />
     </div>
 </header>
