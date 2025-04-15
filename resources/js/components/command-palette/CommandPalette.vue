@@ -35,11 +35,10 @@ each({
     });
 });
 
-const aggregatedItems = computed(() => {
-    return searchResults.value.length
-        ? items.value.concat(searchResults.value)
-        : items.value;
-});
+const aggregatedItems = computed(() => [
+    ...items.value || [],
+    ...searchResults.value || [],
+]);
 
 const results = computed(() => {
     let filtered = fuzzysort
