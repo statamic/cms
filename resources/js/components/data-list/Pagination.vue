@@ -7,20 +7,21 @@
         </div>
 
         <div v-if="hasMultiplePages" class="flex items-center gap-1" :class="{ 'pagination-inline': inline }">
-            <ui-button size="sm" variant="filled" icon="ui/chevron-left" :disabled="!hasPrevious" @click="selectPreviousPage" />
+            <ui-button size="sm" :variant="hasPrevious && !showPageLinks ? 'filled' : 'ghost'" round icon="ui/chevron-left" :disabled="!hasPrevious" @click="selectPreviousPage" />
 
             <ui-button
                 v-if="showPageLinks"
                 v-for="(page, i) in pages"
                 size="sm"
-                :variant="page == currentPage ? 'ghost' : 'filled'"
+                round
+                :variant="page == currentPage ? 'filled' : 'ghost'"
                 :key="i"
                 @click="selectPage(page)"
                 :disabled="page === 'separator' || page === currentPage"
                 :text="page === 'separator' ? '...' : page"
             />
 
-            <ui-button size="sm" variant="filled" icon="ui/chevron-right" :disabled="!hasNext" @click="selectNextPage" />
+            <ui-button size="sm" :variant="hasNext && !showPageLinks ? 'filled' : 'ghost'" round icon="ui/chevron-right" :disabled="!hasNext" @click="selectNextPage" />
         </div>
 
         <div class="flex flex-1">
