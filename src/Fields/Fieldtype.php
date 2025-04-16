@@ -212,9 +212,7 @@ abstract class Fieldtype implements Arrayable
         }
 
         if (! empty($extras)) {
-            $extraSections = collect($extras)->filter(function($field) {
-                return Arr::has($field, 'fields');
-            });
+            $extraSections = collect($extras)->filter(fn ($field) => Arr::has($field, 'fields'));
 
             $fields = collect($fields)->merge($extraSections);
 
