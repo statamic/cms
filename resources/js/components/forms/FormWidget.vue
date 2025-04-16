@@ -77,6 +77,7 @@ export default {
                 :scroll-to-top="false"
                 :show-page-links="false"
             />
+            <slot name="actions" />
         </template>
     </Widget>
 </template>
