@@ -23,7 +23,7 @@
 
         <template v-else>
             <div class="flex items-center space-x-4">
-                <button v-if="isCurrentUser" class="btn" @click="recoveryCodesModalOpen = true">Show recovery codes</button>
+                <button v-if="isCurrentUser" class="btn" @click="recoveryCodesModalOpen = true">{{ __('Show recovery codes') }}</button>
 
                 <DisableTwoFactor
                     :url="meta.routes.disable"
@@ -32,7 +32,7 @@
                     @reset-complete="resetComplete"
                     v-slot="{ confirm }"
                 >
-                    <button class="btn-danger" @click="confirm">Disable two factor authentication</button>
+                    <button class="btn-danger" @click="confirm">{{ __('Disable two factor authentication') }}</button>
                 </DisableTwoFactor>
             </div>
         </template>
