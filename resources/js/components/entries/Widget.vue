@@ -32,23 +32,13 @@
                     </div>
                     <data-list-table :loading="loading" unstyled class="[&_td]:text-sm [&_td]:p-0.5 [&_thead]:hidden">
                         <template #cell-title="{ row: entry }">
-                            <div class="flex items-center">
-                                <span
-                                    v-if="!columnShowing('status')"
-                                    class="little-dot me-2"
-                                    :class="getStatusClass(entry)"
-                                    v-tooltip="getStatusLabel(entry)"
-                                />
+                            <div class="flex items-center gap-2">
+                                <StatusIndicator v-if="!columnShowing('status')" :status="entry.status" />
                                 <a :href="entry.edit_url">{{ entry.title }}</a>
                             </div>
                         </template>
                         <template #cell-status="{ row: entry }">
-                            <div
-                                class="status-index-field select-none"
-                                v-tooltip="getStatusTooltip(entry)"
-                                :class="`status-${entry.status}`"
-                                v-text="getStatusLabel(entry)"
-                            />
+                            <StatusIndicator :status="entry.status" :show-dot="false" show-label />
                         </template>
                     </data-list-table>
                 </div>
@@ -63,8 +53,13 @@
 
 <script>
 import Listing from '../Listing.vue';
+import StatusIndicator from '../ui/StatusIndicator.vue';
 
 export default {
+    components: {
+        StatusIndicator
+    },
+
     mixins: [Listing],
 
     props: {
@@ -82,41 +77,6 @@ export default {
     },
 
     methods: {
-        getStatusClass(entry) {
-            // TODO: Replace with `entry.status` (will need to pass down)
-            if (entry.published && entry.private) {
-                return 'bg-transparent border border-gray-600';
-            } else if (entry.published) {
-                return 'bg-green-400';
-            } else {
-                return 'bg-gray-300 dark:bg-dark-200';
-            }
-        },
-
-        getStatusLabel(entry) {
-            if (entry.status === 'published') {
-                return __('Published');
-            } else if (entry.status === 'scheduled') {
-                return __('Scheduled');
-            } else if (entry.status === 'expired') {
-                return __('Expired');
-            } else if (entry.status === 'draft') {
-                return __('Draft');
-            }
-        },
-
-        getStatusTooltip(entry) {
-            if (entry.status === 'published') {
-                return entry.collection.dated ? __('messages.status_published_with_date', { date: entry.date }) : null; // The label is sufficient.
-            } else if (entry.status === 'scheduled') {
-                return __('messages.status_scheduled_with_date', { date: entry.date });
-            } else if (entry.status === 'expired') {
-                return __('messages.status_expired_with_date', { date: entry.date });
-            } else if (entry.status === 'draft') {
-                return null; // The label is sufficient.
-            }
-        },
-
         columnShowing(column) {
             return this.cols.find((c) => c.field === column);
         },
