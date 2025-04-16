@@ -1,5 +1,5 @@
 <script>
-import Listing from '../Listing.vue'
+import Listing from '../Listing.vue';
 import DateFormatter from '@statamic/components/DateFormatter.js';
 
 export default {
@@ -14,43 +14,48 @@ export default {
     data() {
         return {
             cols: [
-                ...this.fields.map(field => ({ label: field, field, visible: true })),
-                { label: 'Date', field: 'date', visible: true }
+                ...this.fields.map((field) => ({ label: field, field, visible: true })),
+                { label: 'Date', field: 'date', visible: true },
             ],
             listingKey: 'submissions',
             requestUrl: cp_url(`forms/${this.form}/submissions`),
-        }
+        };
     },
 
     methods: {
         formatDate(value) {
-             return DateFormatter.format(value, { ...DateFormatter.presets.relative, specificity: 'hour' }).toString();
+            return DateFormatter.format(value, { ...DateFormatter.presets.relative, specificity: 'hour' }).toString();
         },
-    }
-}
+    },
+};
 </script>
 
 <template>
     <ui-widget :title="title" icon="forms">
-        <data-list
-            v-if="!initializing && items.length"
-            :rows="items"
-            :columns="cols"
-            :sort="false"
-            class="w-full"
-        >
+        <data-list v-if="!initializing && items.length" :rows="items" :columns="cols" :sort="false" class="w-full">
             <div v-if="initializing" class="loading">
                 <loading-graphic />
             </div>
 
-            <data-list-table v-else :loading="loading" unstyled class="[&_td]:text-sm [&_td]:px-0.5 [&_td]:py-0.75 [&_thead]:hidden">
+            <data-list-table
+                v-else
+                :loading="loading"
+                unstyled
+                class="[&_td]:px-0.5 [&_td]:py-0.75 [&_td]:text-sm [&_thead]:hidden"
+            >
                 <template v-for="field in fields" #[`cell-${field}`]="{ row: submission }">
-                    <a :href="cp_url(`forms/${form}/submissions/${submission.id}`)" class="overflow-hidden text-ellipsis line-clamp-1">
+                    <a
+                        :href="cp_url(`forms/${form}/submissions/${submission.id}`)"
+                        class="line-clamp-1 overflow-hidden text-ellipsis"
+                    >
                         {{ submission[field] }}
                     </a>
                 </template>
                 <template #cell-date="{ row: submission }">
-                    <div class="text-end font-mono whitespace-nowrap antialiased text-xs text-gray-500" v-html="formatDate(submission.datestamp)" />
+                    <div
+                        class="text-end font-mono text-xs whitespace-nowrap text-gray-500 antialiased"
+                        v-html="formatDate(submission.datestamp)"
+                    />
                 </template>
             </data-list-table>
         </data-list>
