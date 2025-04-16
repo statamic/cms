@@ -868,7 +868,7 @@ class PathDataManager
             }
         } elseif (is_object($this->reducedVar) && property_exists($this->reducedVar, Str::camel($varPath))) {
             $this->reducedVar = $this->reducedVar->{Str::camel($varPath)};
-            $this->resolvedPath[] = '{method:'.$varPath.'}';
+            $this->resolvedPath[] = '{property:'.$varPath.'}';
 
             if ($doCompact) {
                 $this->compact($path->isFinal);
