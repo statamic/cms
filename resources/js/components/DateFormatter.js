@@ -60,7 +60,7 @@ export default class DateFormatter {
         const rtf = new Intl.RelativeTimeFormat(this.locale, { numeric: 'auto' });
 
         // Always show seconds if less than a minute
-        if (seconds < 60) return rtf.format(-Math.sign(diff), 'second');
+        if (seconds < 60) return rtf.format(-Math.sign(diff) * seconds, 'second');
 
         // Show minutes if less than an hour and specificity allows
         if (minutes < 60 && ['minute', 'hour', 'day', 'week', 'month', 'year'].includes(specificity)) {
