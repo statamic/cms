@@ -73,7 +73,7 @@
 </template>
 
 <script>
-import Fuse from 'fuse.js';
+import fuzzysort from 'fuzzysort';
 import { ref } from 'vue';
 import { mapValues } from 'lodash-es';
 const loadedFieldtypes = ref(null);
@@ -198,17 +198,22 @@ export default {
             let options = this.allFieldtypes;
 
             if (this.search) {
-                const fuse = new Fuse(options, {
-                    findAllMatches: true,
-                    threshold: 0.1,
-                    keys: [
-                        { name: 'text', weight: 1 },
-                        { name: 'categories', weight: 0.1 },
-                        { name: 'keywords', weight: 0.4 },
-                    ],
-                });
-
-                options = fuse.search(this.search).map((result) => result.item);
+                return fuzzysort
+                    .go(this.search, this.allFieldtypes, {
+                        all: true,
+                        keys: [
+                            'text',
+                            obj => obj.categories?.join(),
+                            obj => obj.keywords?.join(),
+                        ],
+                        scoreFn: scores => {
+                            const textScore = scores[0]?.score * 1;
+                            const categoriesScore = scores[1]?.score * 0.1;
+                            const keywordsScore = scores[2]?.score * 0.4;
+                            return Math.max(textScore, categoriesScore, keywordsScore);
+                        },
+                    })
+                    .map(result => result.obj);
             }
 
             return options;
