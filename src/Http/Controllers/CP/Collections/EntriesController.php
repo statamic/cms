@@ -70,7 +70,11 @@ class EntriesController extends CpController
 
         if ($search = request('search')) {
             if ($collection->hasSearchIndex()) {
-                return $collection->searchIndex()->ensureExists()->search($search);
+                return $collection
+                    ->searchIndex()
+                    ->ensureExists()
+                    ->search($search)
+                    ->where('collection', $collection->handle());
             }
 
             $query->where('title', 'like', '%'.$search.'%');
@@ -80,7 +84,8 @@ class EntriesController extends CpController
             $query->whereIn('site', Site::authorized()->map->handle()->all());
         }
 
-        return $query;
+        return $query
+            ->where('collection', $collection->handle());
     }
 
     public function edit(Request $request, $collection, $entry)
