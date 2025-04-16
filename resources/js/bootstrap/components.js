@@ -64,6 +64,7 @@ import CodeBlock from '../components/CodeBlock.vue';
 import BlueprintResetter from '../components/blueprints/BlueprintResetter.vue';
 import { defineAsyncComponent } from 'vue';
 import DateTime from '../components/DateTime.vue';
+import UpdaterWidget from '../components/updater/UpdaterWidget.vue';
 
 export default function registerGlobalComponents(app) {
     // Core
@@ -117,6 +118,7 @@ export default function registerGlobalComponents(app) {
     // Widgets
     app.component('collection-widget', CollectionWidget);
     app.component('form-widget', FormWidget);
+    app.component('updater-widget', UpdaterWidget);
 
     // Reusable
     app.component('svg-icon', SvgIcon);

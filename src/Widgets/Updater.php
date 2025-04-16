@@ -21,7 +21,8 @@ class Updater extends Widget
         $count = UpdatesOverview::count();
         $hasStatamicUpdate = UpdatesOverview::hasStatamicUpdate();
         $updatableAddons = UpdatesOverview::updatableAddons();
+        $limit = $this->config('limit', 5);
 
-        return view('statamic::widgets.updater', compact('count', 'hasStatamicUpdate', 'updatableAddons'));
+        return view('statamic::widgets.updater', compact('count', 'hasStatamicUpdate', 'updatableAddons', 'limit'));
     }
 }

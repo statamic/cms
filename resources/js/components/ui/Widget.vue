@@ -12,7 +12,7 @@ defineProps({
     <ui-card inset>
         <div class="flex h-full flex-col justify-between min-h-54">
             <div>
-                <header class="flex items-center justify-between px-4 py-2.5 border-b border-gray-200 dark:border-gray-700">
+                <header class="flex items-center justify-between px-4 py-2 h-15 border-b border-gray-200 dark:border-gray-700">
                     <div class="flex items-center gap-3">
                         <ui-icon :name="icon" class="size-5 text-gray-500" />
                         <span v-text="title" />
