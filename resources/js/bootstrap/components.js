@@ -36,7 +36,8 @@ import TermListing from '../components/terms/Listing.vue';
 import AssetContainerList from '../components/AssetContainerList.vue';
 import AddonList from '../components/AddonList.vue';
 import AddonDetails from '../components/AddonDetails.vue';
-import CollectionWidget from '../components/entries/Widget.vue';
+import CollectionWidget from '../components/entries/CollectionWidget.vue';
+import FormWidget from '../components/forms/FormWidget.vue';
 import SvgIcon from '../components/SvgIcon.vue';
 import FileIcon from '../components/FileIcon.vue';
 import LoadingGraphic from '../components/LoadingGraphic.vue';
@@ -115,6 +116,7 @@ export default function registerGlobalComponents(app) {
 
     // Widgets
     app.component('collection-widget', CollectionWidget);
+    app.component('form-widget', FormWidget);
 
     // Reusable
     app.component('svg-icon', SvgIcon);
