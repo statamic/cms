@@ -174,10 +174,10 @@ class Field implements Arrayable
 
     public function isRequired()
     {
-        if (! isset( $this->rules()[$this->handle] )) {
+        if (! isset($this->rules()[$this->handle])) {
             return false;
         }
-        
+
         return collect($this->rules()[$this->handle])->contains('required');
     }
 
