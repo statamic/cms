@@ -11,10 +11,22 @@
         >
             <p class="mb-2" v-html="__('statamic::messages.disable_two_factor_authentication')"></p>
 
-            <p v-if="isCurrentUser && isEnforced" v-html="__('statamic::messages.disable_two_factor_authentication_current_user_enforced')"></p>
-            <p v-if="isCurrentUser && !isEnforced" v-html="__('statamic::messages.disable_two_factor_authentication_current_user_optional')"></p>
-            <p v-if="!isCurrentUser && isEnforced" v-html="__('statamic::messages.disable_two_factor_authentication_other_user_enforced')"></p>
-            <p v-if="!isCurrentUser && !isEnforced" v-html="__('statamic::messages.disable_two_factor_authentication_other_user_optional')"></p>
+            <p
+                v-if="isCurrentUser && isEnforced"
+                v-html="__('statamic::messages.disable_two_factor_authentication_current_user_enforced')"
+            ></p>
+            <p
+                v-if="isCurrentUser && !isEnforced"
+                v-html="__('statamic::messages.disable_two_factor_authentication_current_user_optional')"
+            ></p>
+            <p
+                v-if="!isCurrentUser && isEnforced"
+                v-html="__('statamic::messages.disable_two_factor_authentication_other_user_enforced')"
+            ></p>
+            <p
+                v-if="!isCurrentUser && !isEnforced"
+                v-html="__('statamic::messages.disable_two_factor_authentication_other_user_optional')"
+            ></p>
         </confirmation-modal>
     </div>
 </template>
@@ -48,7 +60,8 @@ export default {
         disable() {
             this.loading = true;
 
-            this.$axios.delete(this.url)
+            this.$axios
+                .delete(this.url)
                 .then((response) => {
                     this.$toast.success(__('Disabled two factor authentication'));
 

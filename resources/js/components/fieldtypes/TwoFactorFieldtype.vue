@@ -5,15 +5,10 @@
                 <p class="mb-4 text-sm text-gray">{{ __('statamic::messages.two_factor_enable_introduction') }}</p>
 
                 <div class="flex space-x-2">
-                    <button class="btn" @click="setupModalOpen = true">{{ __('Enable two factor authentication') }}</button>
+                    <button class="btn" @click="setupModalOpen = true">
+                        {{ __('Enable two factor authentication') }}
+                    </button>
                 </div>
-
-                <TwoFactorSetup
-                    v-if="setupModalOpen"
-                    :setup-url="meta.routes.setup"
-                    @setup-complete="setupComplete"
-                    @cancel="setupModalOpen = false"
-                />
             </div>
         </template>
 
@@ -22,8 +17,12 @@
         </template>
 
         <template v-else>
+            <p class="mb-4 text-sm text-gray">{{ __('statamic::messages.two_factor_enabled') }}</p>
+
             <div class="flex items-center space-x-4">
-                <button v-if="isCurrentUser" class="btn" @click="recoveryCodesModalOpen = true">{{ __('Show recovery codes') }}</button>
+                <button v-if="isCurrentUser" class="btn" @click="recoveryCodesModalOpen = true">
+                    {{ __('Show recovery codes') }}
+                </button>
 
                 <DisableTwoFactor
                     :url="meta.routes.disable"
@@ -36,6 +35,14 @@
                 </DisableTwoFactor>
             </div>
         </template>
+
+        <TwoFactorSetup
+            v-if="setupModalOpen"
+            :setup-url="meta.routes.setup"
+            :recovery-code-urls="meta.routes.recovery_codes"
+            @close="setupModalOpen = false"
+            @setup-complete="setupComplete"
+        />
 
         <TwoFactorRecoveryCodesModal
             v-if="recoveryCodesModalOpen"
@@ -85,7 +92,6 @@ export default {
         setupComplete() {
             this.isSetup = true;
             this.setupModalOpen = false;
-            this.recoveryCodesModalOpen = true;
         },
 
         resetComplete() {

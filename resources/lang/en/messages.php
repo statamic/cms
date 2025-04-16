@@ -5,6 +5,7 @@ return [
     'two_factor_challenge_code_introduction' => 'Confirm access to your account by entering the authentication code provided by your authenticator application.',
     'two_factor_recovery_code_introduction' => 'Confirm access to your account by entering one of your emergency recovery codes.',
     'two_factor_enable_introduction' => 'When enabled, you will be prompted for a secure, random token from your phone\'s authenticator app every time you log in.',
+    'two_factor_enabled' => 'Two Factor Authentication is enabled for your account. You will be prompted for a secure, random token from your phone\'s authenticator app every time you log in.',
     'two_factor_recovery_codes_introduction' => 'When two factor authentication is enabled, you will be prompted for a token during authentication. You may retrieve this token from your phone\'s authenticator application, such as Google Authenticator or password managers like 1Password.',
     'two_factor_regenerate_recovery_codes_1' => 'Regenerating your recovery codes will invalidate all previously created recovery codes with immediate effect.',
     'two_factor_regenerate_recovery_codes_2' => 'Are you sure you want to do this?',

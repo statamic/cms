@@ -13,7 +13,6 @@ class GenerateRecoveryCodes
             return RecoveryCode::generate();
         })->all();
 
-        $user->set('two_factor_recovery_codes', encrypt(json_encode($recoveryCodes)));
-        $user->save();
+        $user->set('two_factor_recovery_codes', encrypt(json_encode($recoveryCodes)))->save();
     }
 }

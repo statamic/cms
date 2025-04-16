@@ -1,5 +1,5 @@
 <template>
-    <modal name="two-factor-setup" @closed="$emit('cancel')">
+    <modal v-if="setupModalOpen" name="two-factor-setup" @closed="$emit('cancel')">
         <div>
             <div v-if="loading" class="absolute inset-0 z-200 flex items-center justify-center text-center">
                 <loading-graphic />
@@ -15,14 +15,18 @@
                 </div>
                 <div class="p-5">
                     <p class="mb-6">{{ __('statamic::messages.two_factor_setup_instructions') }}</p>
-<!--                    <p>An authenticator app that supports time-based, one-time passwords (TOTP) such as Google Authenticator or 1Password can scan the QR code below to enable 2FA on your account:</p>-->
 
                     <div class="flex justify-center space-x-6">
                         <div class="bg-white" v-html="qrCode"></div>
                         <div>
-                            <p>{{ __('Setup Key') }}: <code>{{ secretKey }}</code></p>
+                            <p>
+                                {{ __('Setup Key') }}: <code>{{ secretKey }}</code>
+                            </p>
 
-                            <label for="code" class="mt-4 mb-2 block text-sm font-medium text-gray-700 dark:text-dark-150">
+                            <label
+                                for="code"
+                                class="mb-2 mt-4 block text-sm font-medium text-gray-700 dark:text-dark-150"
+                            >
                                 {{ __('Verification Code') }}
                             </label>
                             <input
@@ -40,7 +44,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="flex items-center justify-end border-t bg-gray-200 p-4 text-sm dark:border-dark-900 dark:bg-dark-550">
+                <div
+                    class="flex items-center justify-end border-t bg-gray-200 p-4 text-sm dark:border-dark-900 dark:bg-dark-550"
+                >
                     <button
                         class="text-gray hover:text-gray-900 dark:text-dark-150 dark:hover:text-dark-100"
                         @click="$emit('cancel')"
@@ -56,16 +62,26 @@
             </template>
         </div>
     </modal>
+
+    <TwoFactorRecoveryCodesModal
+        v-if="recoveryCodesModalOpen"
+        :recovery-codes-url="recoveryCodeUrls.show"
+        :generate-url="recoveryCodeUrls.generate"
+        :download-url="recoveryCodeUrls.download"
+        @close="complete"
+    />
 </template>
 
 <script>
 import LoadingGraphic from '@statamic/components/LoadingGraphic.vue';
+import TwoFactorRecoveryCodesModal from '@statamic/components/fieldtypes/two-factor/RecoveryCodesModal.vue';
 
 export default {
-    components: { LoadingGraphic },
+    components: { TwoFactorRecoveryCodesModal, LoadingGraphic },
 
     props: {
         setupUrl: String,
+        recoveryCodeUrls: Object,
     },
 
     data() {
@@ -73,9 +89,12 @@ export default {
             loading: true,
             qrCode: null,
             secretKey: null,
-            confirmUrl: null,
             code: null,
             error: null,
+            confirmUrl: null,
+            completeUrl: null,
+            setupModalOpen: true,
+            recoveryCodesModalOpen: false,
         };
     },
 
@@ -87,25 +106,38 @@ export default {
         getSetupCode() {
             this.loading = true;
 
-            this.$axios.get(this.setupUrl)
-                .then((response) => {
-                   this.qrCode = response.data.qr;
-                   this.secretKey = response.data.secret_key;
-                   this.confirmUrl = response.data.confirm_url;
+            this.$axios.get(this.setupUrl).then((response) => {
+                this.qrCode = response.data.qr;
+                this.secretKey = response.data.secret_key;
+                this.confirmUrl = response.data.confirm_url;
 
-                    this.loading = false;
-                });
+                this.loading = false;
+            });
         },
 
         confirm() {
-            this.$axios.post(this.confirmUrl, { code: this.code })
+            this.$axios
+                .post(this.confirmUrl, { code: this.code })
                 .then((response) => {
-                    this.$emit('setup-complete', {
-                        recoveryCodes: response.data.recovery_codes,
-                    });
+                    this.setupModalOpen = false;
+                    this.recoveryCodesModalOpen = true;
+                    this.completeUrl = response.data.complete_url;
                 })
                 .catch((error) => {
                     this.error = error.response.data.errors.code[0];
+                });
+        },
+
+        complete() {
+            this.$axios
+                .post(this.completeUrl)
+                .then((response) => {
+                    this.recoveryCodesModalOpen = false;
+
+                    this.$emit('setup-complete');
+                })
+                .catch((error) => {
+                    this.$toast.error(error.message);
                 });
         },
     },
