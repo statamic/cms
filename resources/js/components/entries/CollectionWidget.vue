@@ -43,7 +43,7 @@ export default {
                 <template #cell-title="{ row: entry }">
                     <div class="flex items-center gap-2">
                         <ui-status-indicator v-if="!columnShowing('status')" :status="entry.status" />
-                        <a :href="entry.edit_url">{{ entry.title }}</a>
+                        <a :href="entry.edit_url" class="overflow-hidden text-ellipsis line-clamp-1">{{ entry.title }}</a>
                     </div>
                 </template>
                 <template #cell-status="{ row: entry }">
