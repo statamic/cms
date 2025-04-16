@@ -46,9 +46,16 @@
         </ui-dropdown>
     </div>
     <div class="flex-1 flex gap-4 items-center justify-end">
-        <div>
-            <command-palette />
-        </div>
+        <div><command-palette /></div>
+        <ui-button
+            icon="visit-website"
+            class="[&_svg]:size-5 -me-3"
+            variant="ghost"
+            href="{{ Statamic\Facades\Site::selected()->url() }}"
+            target="_blank"
+            v-tooltip="'{{ __('View Site') }}'"
+            aria-label="{{ __('View Site') }}"
+        ></ui-button>
         <x-statamic::user-dropdown />
     </div>
 </header>
