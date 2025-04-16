@@ -29,7 +29,7 @@ export default {
 
     methods: {
         formatDate(value) {
-            return DateFormatter.format(value, { ...DateFormatter.presets.relative, specificity: 'hour' }).toString();
+            return DateFormatter.format(value, { relative: 'hour' }).toString();
         },
     },
 };

@@ -2,15 +2,13 @@ export default class DateFormatter {
     #date;
     #options;
     #locale = navigator.language;
-    static presets = {
+    #presets = {
         datetime: {
             year: 'numeric',
             month: 'numeric',
             day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false,
-            formatMatcher: 'basic',
+            hour: 'numeric',
+            minute: 'numeric',
         },
         date: {
             year: 'numeric',
@@ -19,11 +17,6 @@ export default class DateFormatter {
         },
         time: {
             timeStyle: 'short',
-        },
-        relative: {
-            numeric: 'auto',
-            style: 'long',
-            specificity: 'day',
         },
     };
 
@@ -42,9 +35,8 @@ export default class DateFormatter {
 
     toString() {
         try {
-            if (this.#options === 'relative' || (this.#options.specificity && this.#options.numeric === 'auto')) {
-                return this.#formatRelative();
-            }
+            if (this.#options.relative) return this.#formatRelative();
+
             return Intl.DateTimeFormat(this.locale, this.#options).format(this.#date);
         } catch (e) {
             return 'Invalid Date';
@@ -52,6 +44,9 @@ export default class DateFormatter {
     }
 
     #formatRelative() {
+        let specificity = this.#options.relative;
+        specificity = !specificity || specificity === true ? 'year' : specificity;
+
         const now = new Date();
         const diff = now - this.#date;
         const seconds = Math.abs(Math.floor(diff / 1000));
@@ -62,8 +57,7 @@ export default class DateFormatter {
         const months = Math.abs(Math.floor(days / 30));
         const years = Math.abs(Math.floor(days / 365));
 
-        const specificity = this.#options.specificity || DateFormatter.presets.relative.specificity;
-        const rtf = new Intl.RelativeTimeFormat(this.locale, DateFormatter.presets.relative);
+        const rtf = new Intl.RelativeTimeFormat(this.locale, { numeric: 'auto' });
 
         // Always show seconds if less than a minute
         if (seconds < 60) return rtf.format(-Math.sign(diff), 'second');
@@ -98,20 +92,7 @@ export default class DateFormatter {
             return rtf.format(-Math.sign(diff) * years, 'year');
         }
 
-        // Custom format for datetime without comma
-        const date = new Intl.DateTimeFormat(this.locale, {
-            year: 'numeric',
-            month: 'numeric',
-            day: 'numeric',
-        }).format(this.#date);
-
-        const time = new Intl.DateTimeFormat(this.locale, {
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false,
-        }).format(this.#date);
-
-        return `${date} ${time}`;
+        return new DateFormatter(this.#date, this.#options.fallback || 'datetime').toString();
     }
 
     static format(date, options) {
@@ -138,9 +119,9 @@ export default class DateFormatter {
         if (!options) options = 'datetime';
 
         if (typeof options === 'string') {
-            if (!DateFormatter.presets[options]) throw new Error(`Invalid date format: ${options}`);
+            if (!this.#presets[options]) throw new Error(`Invalid date format: ${options}`);
 
-            return DateFormatter.presets[options];
+            return this.#presets[options];
         }
 
         return options;
