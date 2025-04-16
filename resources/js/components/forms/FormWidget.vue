@@ -1,9 +1,14 @@
 <script>
 import Listing from '../Listing.vue';
 import DateFormatter from '@statamic/components/DateFormatter.js';
+import { Widget } from '@statamic/ui';
 
 export default {
     mixins: [Listing],
+
+    components: {
+        Widget,
+    },
 
     props: {
         form: { type: String, required: true },
@@ -31,7 +36,7 @@ export default {
 </script>
 
 <template>
-    <ui-widget :title="title" icon="forms">
+    <Widget :title="title" icon="forms">
         <data-list v-if="!initializing && items.length" :rows="items" :columns="cols" :sort="false" class="w-full">
             <div v-if="initializing" class="loading">
                 <loading-graphic />
@@ -73,5 +78,5 @@ export default {
                 :show-page-links="false"
             />
         </template>
-    </ui-widget>
+    </Widget>
 </template>
