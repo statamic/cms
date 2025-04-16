@@ -61,6 +61,7 @@
     "cookies-js": "^1.2.2",
     "floating-vue": "^5.2.2",
     "fuse.js": "^7.0.0",
+    "fuzzysort": "^3.1.0",
     "highlight.js": "^11.7.0",
     "imask": "^7.6.1",
     "laravel-echo": "^1.16.0",
