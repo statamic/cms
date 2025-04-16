@@ -4,6 +4,7 @@ namespace Statamic\Fields;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Arr;
 use Statamic\Extend\HasHandle;
 use Statamic\Extend\RegistersItself;
 use Statamic\Facades\Blink;
@@ -11,7 +12,6 @@ use Statamic\Facades\GraphQL;
 use Statamic\Query\Scopes\Filters\Fields\FieldtypeFilter;
 use Statamic\Statamic;
 use Statamic\Support\Str;
-use Illuminate\Support\Arr;
 
 use function Statamic\trans as __;
 
