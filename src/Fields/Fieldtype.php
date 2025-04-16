@@ -11,6 +11,7 @@ use Statamic\Facades\GraphQL;
 use Statamic\Query\Scopes\Filters\Fields\FieldtypeFilter;
 use Statamic\Statamic;
 use Statamic\Support\Str;
+use Illuminate\Support\Arr;
 
 use function Statamic\trans as __;
 
@@ -208,6 +209,16 @@ abstract class Fieldtype implements Arrayable
 
         if (empty($fields) && empty($extras)) {
             return [];
+        }
+
+        if (! empty($extras)) {
+            $extraSections = collect($extras)->filter(function($field) {
+                return Arr::has($field, 'fields');
+            });
+
+            $fields = collect($fields)->merge($extraSections);
+
+            $extras = collect($extras)->diffKeys($extraSections);
         }
 
         $extras = collect($extras)
