@@ -194,6 +194,30 @@ export default {
         },
 
         removed(set, index) {
+            let errors = this.storeState.errors || {};
+
+            errors = Object.keys(errors).reduce((acc, key) => {
+                if (key.startsWith(`${this.fieldPathPrefix || this.handle}.${index}.`)) {
+                    return acc;
+                }
+
+                if (key.startsWith(`${this.fieldPathPrefix || this.handle}.`)) {
+                    const parts = key.split('.');
+                    const setIndex = parseInt(parts[1], 10);
+
+                    if (setIndex > index) {
+                        parts[1] = (setIndex - 1).toString();
+                        acc[parts.join('.')] = errors[key];
+                    } else {
+                        acc[key] = errors[key];
+                    }
+                }
+
+                return acc;
+            }, {});
+
+            this.$store.commit(`publish/${this.storeName}/setErrors`, errors);
+
             this.removeSetMeta(set._id);
 
             this.update([...this.value.slice(0, index), ...this.value.slice(index + 1)]);
