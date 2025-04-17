@@ -130,7 +130,7 @@ export default {
                     all: true,
                     keys: this.searchableColumns,
                 })
-                .map(result => result.obj);
+                .map((result) => result.obj);
         },
 
         sortRows(rows) {

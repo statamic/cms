@@ -201,19 +201,15 @@ export default {
                 return fuzzysort
                     .go(this.search, this.allFieldtypes, {
                         all: true,
-                        keys: [
-                            'text',
-                            obj => obj.categories?.join(),
-                            obj => obj.keywords?.join(),
-                        ],
-                        scoreFn: scores => {
+                        keys: ['text', (obj) => obj.categories?.join(), (obj) => obj.keywords?.join()],
+                        scoreFn: (scores) => {
                             const textScore = scores[0]?.score * 1;
                             const categoriesScore = scores[1]?.score * 0.1;
                             const keywordsScore = scores[2]?.score * 0.4;
                             return Math.max(textScore, categoriesScore, keywordsScore);
                         },
                     })
-                    .map(result => result.obj);
+                    .map((result) => result.obj);
             }
 
             return options;

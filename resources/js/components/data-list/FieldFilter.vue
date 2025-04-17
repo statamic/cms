@@ -103,18 +103,18 @@ export default {
         isFilterComplete() {
             if (!this.filter) return false;
 
-            let visibleFields = this.filter.fields
-                .filter(function (field) {
-                    let validator = new Validator(field, this.fieldValues);
-                    return validator.passesConditions();
-                }, this);
+            let visibleFields = this.filter.fields.filter(function (field) {
+                let validator = new Validator(field, this.fieldValues);
+                return validator.passesConditions();
+            }, this);
 
-            visibleFields = mapValues(visibleFields, field => field.handle);
+            visibleFields = mapValues(visibleFields, (field) => field.handle);
             visibleFields = Object.values(visibleFields);
 
-            let allFieldsFilled = Object.entries(this.fieldValues || {})
-                .filter(([handle, value]) => visibleFields.includes(handle) && value)
-                .length === visibleFields.length;
+            let allFieldsFilled =
+                Object.entries(this.fieldValues || {}).filter(
+                    ([handle, value]) => visibleFields.includes(handle) && value,
+                ).length === visibleFields.length;
 
             return this.field !== null && allFieldsFilled;
         },
