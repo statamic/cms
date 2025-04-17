@@ -13,7 +13,6 @@ class DisableTwoFactorAuthentication
             ->remove('two_factor_completed')
             ->remove('two_factor_recovery_codes')
             ->remove('two_factor_secret')
-            ->clearLastTwoFactorChallenged()
             ->save();
     }
 }

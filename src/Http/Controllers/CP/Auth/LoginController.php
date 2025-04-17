@@ -75,10 +75,7 @@ class LoginController extends CpController
             return $this->throwFailedAuthenticationException($request);
         }
 
-        if (
-            $user->hasEnabledTwoFactorAuthentication()
-            && $this->lastTwoFactorChallengedTimestampHasExpired($user)
-        ) {
+        if ($user->hasEnabledTwoFactorAuthentication()) {
             return $this->twoFactorChallengeResponse($request, $user);
         }
 
@@ -141,24 +138,6 @@ class LoginController extends CpController
     }
 
     /**
-     * Determines if the last two factor challenged timestamp has expired.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  mixed  $user
-     * @return bool
-     */
-    protected function lastTwoFactorChallengedTimestampHasExpired($user): bool
-    {
-        $lastTwoFactorChallenged = $user->getLastTwoFactorChallenged();
-
-        if (! $lastTwoFactorChallenged) {
-            return true;
-        }
-
-        return $lastTwoFactorChallenged->addMinutes((int) config('statamic.users.two_factor.validity'))->isPast();
-    }
-
-    /**
      * Get the two factor authentication enabled response.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -217,8 +196,6 @@ class LoginController extends CpController
 
     public function logout(Request $request)
     {
-        $request->user()->clearLastTwoFactorChallenged();
-
         $this->guard()->logout();
 
         $request->session()->invalidate();

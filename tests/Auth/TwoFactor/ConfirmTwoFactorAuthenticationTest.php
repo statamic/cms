@@ -86,8 +86,6 @@ class ConfirmTwoFactorAuthenticationTest extends TestCase
 
         $this->assertNotNull($this->user->two_factor_confirmed_at);
         $this->assertEquals(now()->timestamp, $this->user->two_factor_confirmed_at);
-
-        $this->assertEquals(now(), $this->user->getLastTwoFactorChallenged());
     }
 
     private function getOneTimeCode($user): string

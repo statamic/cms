@@ -88,24 +88,6 @@ class LoginTest extends TestCase
     }
 
     #[Test]
-    public function it_doesnt_redirect_to_the_two_factor_challenge_page_when_last_challenged_timestamp_is_still_valid()
-    {
-        $user = $this->userWithTwoFactorEnabled();
-        $user->setLastTwoFactorChallenged()->save();
-
-        $this
-            ->assertGuest()
-            ->post(cp_route('login'), [
-                'email' => $user->email(),
-                'password' => 'secret',
-                'remember' => true,
-            ])
-            ->assertRedirect(cp_route('index'));
-
-        $this->assertAuthenticatedAs($user);
-    }
-
-    #[Test]
     public function it_redirects_to_referer_url()
     {
         $user = $this->user();
@@ -158,22 +140,6 @@ class LoginTest extends TestCase
             ->assertRedirect();
 
         $this->assertGuest();
-    }
-
-    #[Test]
-    public function it_clears_last_two_factor_challenged_timestamp_when_logging_out()
-    {
-        $user = $this->userWithTwoFactorEnabled();
-
-        $user->setLastTwoFactorChallenged();
-        $this->assertNotNull($user->getLastTwoFactorChallenged());
-
-        $this
-            ->actingAs($user)
-            ->get(cp_route('logout'))
-            ->assertRedirect();
-
-        $this->assertNull($user->getLastTwoFactorChallenged());
     }
 
     private function user()

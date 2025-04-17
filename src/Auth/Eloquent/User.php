@@ -402,29 +402,4 @@ class User extends BaseUser
             'email' => $this->email(),
         ], $this->model()->attributesToArray());
     }
-
-    public function getLastTwoFactorChallenged(): ?\Carbon\Carbon
-    {
-        $lastChallenged = $this->get('two_factor_last_challenged');
-
-        if (! $lastChallenged) {
-            return null;
-        }
-
-        return decrypt($lastChallenged);
-    }
-
-    public function setLastTwoFactorChallenged(): self
-    {
-        $this->set('two_factor_last_challenged', encrypt(Carbon::now()));
-
-        return $this;
-    }
-
-    public function clearLastTwoFactorChallenged(): self
-    {
-        $this->remove('two_factor_last_challenged');
-
-        return $this;
-    }
 }

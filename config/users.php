@@ -167,15 +167,6 @@ return [
         'redirect' => env('STATAMIC_IMPERSONATE_REDIRECT', null),
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Two Factor Authentication
-    |--------------------------------------------------------------------------
-    |
-    | ...
-    |
-    */
-
     'two_factor' => [
 
         /*
@@ -190,24 +181,6 @@ return [
         */
 
         'enforced_roles' => [],
-
-        /*
-        |--------------------------------------------------------------------------
-        | Two factor code validity
-        |--------------------------------------------------------------------------
-        |
-        | The code validity will keep tabs on the last time the user was asked to
-        | complete a two factor challenge. When this period expires, they will
-        | be asked to complete another challenge. Stored as the number of
-        | minutes.
-        |
-        | Default: 43200 minutes (30 days)
-        |
-        | Set to null to disable this feature.
-        |
-        */
-
-        'validity' => env('TWO_FACTOR_VALIDITY', 43200),
 
     ],
 

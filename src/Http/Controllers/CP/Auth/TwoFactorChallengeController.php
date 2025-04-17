@@ -41,8 +41,6 @@ class TwoFactorChallengeController extends CpController
 
         Auth::guard()->login($user, $request->remember());
 
-        $user->setLastTwoFactorChallenged();
-
         $request->session()->regenerate();
 
         return $request->expectsJson()

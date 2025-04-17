@@ -378,12 +378,6 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
             ->isNotEmpty();
     }
 
-    abstract public function getLastTwoFactorChallenged(): ?Carbon;
-
-    abstract public function setLastTwoFactorChallenged(): self;
-
-    abstract public function clearLastTwoFactorChallenged(): self;
-
     /**
      * Determine if two-factor authentication has been enabled.
      *

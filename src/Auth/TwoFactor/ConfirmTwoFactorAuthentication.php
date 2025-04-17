@@ -23,8 +23,5 @@ class ConfirmTwoFactorAuthentication
 
         $user->set('two_factor_confirmed_at', now()->timestamp);
         $user->save();
-
-        // This prevents the user from being challenged after setup.
-        $user->setLastTwoFactorChallenged();
     }
 }

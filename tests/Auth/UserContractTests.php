@@ -634,22 +634,6 @@ trait UserContractTests
     }
 
     #[Test]
-    public function it_gets_sets_and_clears_the_last_challenged_for_the_user()
-    {
-        $user = tap($this->makeUser()->makeSuper())->save();
-
-        $this->assertNull($user->getLastTwoFactorChallenged());
-
-        $user->setLastTwoFactorChallenged();
-
-        $this->assertNotNull($user->getLastTwoFactorChallenged());
-
-        $user->clearLastTwoFactorChallenged();
-
-        $this->assertNull($user->getLastTwoFactorChallenged());
-    }
-
-    #[Test]
     public function it_determines_if_the_user_has_enabled_two_factor_authentication()
     {
         $user = tap($this->makeUser()->makeSuper())->save();
