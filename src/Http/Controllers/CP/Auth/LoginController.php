@@ -82,10 +82,6 @@ class LoginController extends CpController
 
         $this->guard()->login($user, $request->boolean('remember'));
 
-        if ($user->isTwoFactorAuthenticationRequired()) {
-            // todo: send to a route to setup 2fa (now that we're logged in)
-        }
-
         return $this->sendLoginResponse($request);
     }
 
