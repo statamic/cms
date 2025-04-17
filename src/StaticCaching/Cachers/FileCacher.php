@@ -184,14 +184,14 @@ class FileCacher extends AbstractCacher
             $basename = $slug.'_lqs_'.md5($query).'.html';
         }
 
-        if ($this->isHostnameWithPeriod($urlParts['host'])) {
+        if ($this->hasTrailingDot($urlParts['host'])) {
             $sitePath .= '.';
         }
 
         return $sitePath.$pathParts['dirname'].'/'.$basename;
     }
 
-    private function isHostnameWithPeriod($hostname)
+    private function hasTrailingDot($hostname)
     {
         return str_ends_with($hostname, '.');
     }
