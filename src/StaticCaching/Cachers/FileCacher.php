@@ -184,7 +184,7 @@ class FileCacher extends AbstractCacher
             $basename = $slug.'_lqs_'.md5($query).'.html';
         }
 
-        if ($this->hasTrailingDot($urlParts['host'])) {
+        if ($this->hasTrailingDot($urlParts['host'] ?? '')) {
             $sitePath .= '.';
         }
 
