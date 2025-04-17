@@ -119,6 +119,11 @@ abstract class Action implements Arrayable
         return false;
     }
 
+    public function requiresElevatedSession(): bool
+    {
+        return false;
+    }
+
     public function toArray()
     {
         return [
@@ -130,6 +135,7 @@ abstract class Action implements Arrayable
             'warningText' => $this->warningText(),
             'dirtyWarningText' => $this->dirtyWarningText(),
             'bypassesDirtyWarning' => $this->bypassesDirtyWarning(),
+            'requiresElevatedSession' => $this->requiresElevatedSession(),
             'dangerous' => $this->dangerous,
             'fields' => $this->fields()->toPublishArray(),
             'values' => $this->fields()->preProcess()->values(),

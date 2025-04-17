@@ -169,6 +169,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Elevated Sessions
+    |--------------------------------------------------------------------------
+    |
+    | Before performing certain actions, users may be asked to confirm their
+    | password. This is called an elevated session. Here you can configure
+    | the duration of elevated sessions, in minutes.
+    |
+    */
+
+    'elevated_session_duration' => 15,
+
+    /*
+    |--------------------------------------------------------------------------
     | Default Sorting
     |--------------------------------------------------------------------------
     |
