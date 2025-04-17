@@ -84,8 +84,7 @@ class EntriesController extends CpController
             $query->whereIn('site', Site::authorized()->map->handle()->all());
         }
 
-        return $query
-            ->where('collection', $collection->handle());
+        return $query;
     }
 
     public function edit(Request $request, $collection, $entry)
