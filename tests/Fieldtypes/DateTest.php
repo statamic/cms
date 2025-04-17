@@ -577,16 +577,6 @@ class DateTest extends TestCase
         $this->assertEquals($expected, $messages);
     }
 
-    #[Test]
-    public function it_does_not_validate_if_in_a_parent_field()
-    {
-        $field = $this->fieldtype(['time_enabled' => true])->field();
-        $replicator = (new Field('a', ['type' => 'replicator']));
-        $field->setParentField($replicator, 0);
-        $fields = (new Fields)->setFields(collect([$field]))->addValues(['test' => ['date' => '2012-01-29']]);
-        $this->assertEquals($fields->validate(), ['test' => new Carbon('2012-01-29 00:00:00')]);
-    }
-
     public static function validationProvider()
     {
         return [

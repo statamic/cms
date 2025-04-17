@@ -5,6 +5,7 @@ namespace Statamic\Fieldtypes;
 use Carbon\Exceptions\InvalidFormatException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 use InvalidArgumentException;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
@@ -371,11 +372,15 @@ class Date extends Fieldtype
 
     public function preProcessValidatable($value)
     {
-        if (! $this->field->parentField()) {
+        try {
             Validator::make(
-                [$this->field->handle() => $value],
-                [$this->field->handle() => [new ValidationRule($this)]],
+                ['field' => $value],
+                ['field' => [new ValidationRule($this)]],
+                [],
+                ['field' => $this->field->display()],
             )->validate();
+        } catch (ValidationException $e) {
+            throw ValidationException::withMessages([$this->field->fieldPathPrefix() => $e->errors()['field']]);
         }
 
         if ($value === null) {
