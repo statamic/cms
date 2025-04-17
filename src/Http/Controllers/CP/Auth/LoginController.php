@@ -101,6 +101,8 @@ class LoginController extends CpController
 
         return tap($provider->retrieveByCredentials($request->only($this->username(), 'password')), function ($user) use ($provider, $request) {
             if (! $user || ! $provider->validateCredentials($user, ['password' => $request->password])) {
+                $this->fireFailedEvent($request, $user);
+
                 $this->throwFailedAuthenticationException($request);
             }
 
@@ -134,7 +136,7 @@ class LoginController extends CpController
      */
     protected function fireFailedEvent($request, $user = null)
     {
-        event(new Failed($this->guard?->name ?? config('fortify.guard'), $user, [
+        event(new Failed($this->guard()?->name, $user, [
             $this->username() => $request->{$this->username()},
             'password' => $request->password,
         ]));
