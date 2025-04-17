@@ -12,6 +12,8 @@ use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Password;
+use Laravel\Fortify\Events\RecoveryCodeReplaced;
+use Laravel\Fortify\RecoveryCode;
 use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Contracts\Auth\Role as RoleContract;
 use Statamic\Contracts\Auth\User as UserContract;
@@ -35,6 +37,7 @@ use Statamic\Facades;
 use Statamic\GraphQL\ResolvesValues;
 use Statamic\Notifications\ActivateAccount as ActivateAccountNotification;
 use Statamic\Notifications\PasswordReset as PasswordResetNotification;
+use Statamic\Notifications\RecoveryCodeUsed as RecoveryCodeUsedNotification;
 use Statamic\Search\Searchable;
 use Statamic\Statamic;
 use Statamic\Support\Str;
@@ -373,6 +376,37 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
     abstract public function setLastTwoFactorChallenged(): self;
 
     abstract public function clearLastTwoFactorChallenged(): self;
+
+    /**
+     * Get the user's two factor authentication recovery codes.
+     *
+     * @return array
+     */
+    public function recoveryCodes(): array
+    {
+        return json_decode(decrypt($this->two_factor_recovery_codes), true);
+    }
+
+    /**
+     * Replace the given recovery code with a new one in the user's stored codes.
+     *
+     * @param  string  $code
+     * @return void
+     */
+    public function replaceRecoveryCode(string $code): void
+    {
+        $recoveryCodes = collect($this->recoveryCodes());
+
+        $usedRecoveryCode = $recoveryCodes->first(fn (string $recoveryCode) => hash_equals($recoveryCode, $code) ? $recoveryCode : null);
+
+        $recoveryCodes = $recoveryCodes->replace([
+            $recoveryCodes->search($usedRecoveryCode) => TwoFactor\RecoveryCode::generate(),
+        ]);
+
+        $this->set('two_factor_recovery_codes', encrypt(json_encode($recoveryCodes)))->save();
+
+        $this->notify(new RecoveryCodeUsedNotification);
+    }
 
     public function getCpSearchResultBadge(): string
     {

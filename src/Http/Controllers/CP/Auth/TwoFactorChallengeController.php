@@ -2,45 +2,75 @@
 
 namespace Statamic\Http\Controllers\CP\Auth;
 
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Statamic\Auth\TwoFactor\ChallengeTwoFactorAuthentication;
-use Statamic\Facades\User;
+use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Middleware\CP\RedirectIfAuthorized;
+use Statamic\Http\Requests\TwoFactorChallengeRequest;
+use Statamic\Support\Str;
 
-class TwoFactorChallengeController
+class TwoFactorChallengeController extends CpController
 {
-    use Concerns\GetsReferrerUrl;
-
-    public function index(Request $request)
+    public function __construct(Request $request)
     {
-        // if we have a referrer URL, set it
-        if ($referrer = $this->getReferrerUrl($request)) {
-            // if we are not null, let's set it (this way it won't overwrite on failed attempts)
-            if ($referrer) {
-                $request->session()->put('statamic_two_factor_referrer', $referrer);
-            }
+        $this->middleware(RedirectIfAuthorized::class);
+    }
+
+    public function index(TwoFactorChallengeRequest $request)
+    {
+        if (! $request->hasChallengedUser()) {
+            throw new HttpResponseException(redirect()->route('statamic.cp.login'));
         }
 
-        // show the challenge view
         return view('statamic::auth.two-factor.challenge', [
-            'mode' => $request->session()->get('mode', 'code'),
+            'hasError' => $this->hasError(),
+            'mode' => session()->get('errors')?->getBag('default')->has('recovery_code') ? 'recovery_code' : 'code',
         ]);
     }
 
-    public function store(Request $request, ChallengeTwoFactorAuthentication $challenge)
+    public function store(TwoFactorChallengeRequest $request)
     {
-        // set the mode
-        $mode = $request->get('mode', 'code');
-        $request->session()->flash('mode', $mode);
+        $user = $request->challengedUser();
 
-        // do the challenge
-        $challenge(User::current(), $mode, $request->input($mode, null));
-
-        // get the redirect route, or the referrer if we set one
-        $route = cp_route('index');
-        if ($referrer = session()->pull('statamic_two_factor_referrer', null)) {
-            $route = $referrer;
+        if ($code = $request->validRecoveryCode()) {
+            $user->replaceRecoveryCode($code);
+        } elseif (! $request->hasValidCode()) {
+            return $request->sendFailedTwoFactorChallengeResponse();
         }
 
-        return redirect($route);
+        Auth::guard()->login($user, $request->remember());
+
+        $user->setLastTwoFactorChallenged();
+
+        $request->session()->regenerate();
+
+        return $request->expectsJson()
+            ? response('Authenticated')
+            : redirect()->intended($this->redirectPath());
+    }
+
+    private function redirectPath()
+    {
+        $cp = cp_route('index');
+        $referer = request('referer');
+        $referredFromCp = Str::startsWith($referer, $cp) && ! Str::startsWith($referer, $cp.'/auth/');
+
+        return $referredFromCp ? $referer : $cp;
+    }
+
+    private function hasError()
+    {
+        return function ($field) {
+            if (! $error = optional(session('errors'))->first($field)) {
+                return false;
+            }
+
+            return ! in_array($error, [
+                __('auth.failed'),
+                __('statamic::validation.required'),
+            ]);
+        };
     }
 }

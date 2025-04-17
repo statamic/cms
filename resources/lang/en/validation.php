@@ -192,8 +192,6 @@ return [
 
     // todo: reorder
     'two_factor_not_setup' => 'Two factor authentication is not configured correctly on your account.',
-    'two_factor_code_challenge_failed' => 'The provided two factor authentication code was invalid.',
-    'two_factor_recovery_code_challenge_failed' => 'The provided recovery code was invalid.',
 
     /*
     |--------------------------------------------------------------------------

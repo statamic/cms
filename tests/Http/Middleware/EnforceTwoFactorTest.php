@@ -73,7 +73,7 @@ class EnforceTwoFactorTest extends TestCase
         $this
             ->actingAs($user = $this->userWithTwoFactorEnabled())
             ->get(cp_route('collections.index'))
-            ->assertRedirect(cp_route('two-factor.challenge'));
+            ->assertRedirect(cp_route('two-factor-challenge'));
 
         // Set the time and force a challenge (ie. fake it)
         $this->freezeTime();
@@ -88,7 +88,7 @@ class EnforceTwoFactorTest extends TestCase
 
         $this
             ->get(cp_route('collections.index'))
-            ->assertRedirect(cp_route('two-factor.challenge'));
+            ->assertRedirect(cp_route('two-factor-challenge'));
 
         // However, a POST or PATCH will not redirect, to prevent losing things.
         $this
@@ -104,7 +104,7 @@ class EnforceTwoFactorTest extends TestCase
         $this
             ->actingAs($user = $this->userWithTwoFactorEnabled())
             ->get(cp_route('collections.index'))
-            ->assertRedirect(cp_route('two-factor.challenge'));
+            ->assertRedirect(cp_route('two-factor-challenge'));
 
         // Set the time and force a challenge (ie. fake it)
         $this->freezeTime();
@@ -138,14 +138,14 @@ class EnforceTwoFactorTest extends TestCase
 
         $response = (new EnforceTwoFactor)->handle($request, fn () => response('No enforcement'));
 
-        $this->assertTrue($response->isRedirect(cp_route('two-factor.challenge')));
+        $this->assertTrue($response->isRedirect(cp_route('two-factor-challenge')));
 
         // Specific roles - should redirect...
         config()->set('statamic-two-factor.enforced_roles', []);
 
         $response = (new EnforceTwoFactor)->handle($request, fn () => response('No enforcement'));
 
-        $this->assertTrue($response->isRedirect(cp_route('two-factor.challenge')));
+        $this->assertTrue($response->isRedirect(cp_route('two-factor-challenge')));
     }
 
     #[Test]
@@ -166,14 +166,14 @@ class EnforceTwoFactorTest extends TestCase
 
         $response = (new EnforceTwoFactor)->handle($request, fn () => response('No enforcement'));
 
-        $this->assertTrue($response->isRedirect(cp_route('two-factor.challenge')));
+        $this->assertTrue($response->isRedirect(cp_route('two-factor-challenge')));
 
         // Specific roles - none provided meaning not enforced...
         config()->set('statamic.users.two_factor.enforced_roles', []);
 
         $response = (new EnforceTwoFactor)->handle($request, fn () => response('No enforcement'));
 
-        $this->assertTrue($response->isRedirect(cp_route('two-factor.challenge')));
+        $this->assertTrue($response->isRedirect(cp_route('two-factor-challenge')));
 
         // Specific roles - should redirect...
         config()->set('statamic.users.two_factor.enforced_roles', [
@@ -182,7 +182,7 @@ class EnforceTwoFactorTest extends TestCase
 
         $response = (new EnforceTwoFactor)->handle($request, fn () => response('No enforcement'));
 
-        $this->assertTrue($response->isRedirect(cp_route('two-factor.challenge')));
+        $this->assertTrue($response->isRedirect(cp_route('two-factor-challenge')));
     }
 
     private function user()

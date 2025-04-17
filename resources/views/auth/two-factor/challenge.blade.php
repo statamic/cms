@@ -1,107 +1,108 @@
+@php
+    use function Statamic\trans as __;
+@endphp
+
+@inject('str', 'Statamic\Support\Str')
 @extends('statamic::outside')
 @section('title', __('Two Factor Authentication'))
 
 @section('content')
     @include('statamic::partials.outside-logo')
-    <div class="two-factor">
-        <div class="two-factor-challenge">
-            <div class="card auth-card mx-auto" x-data="{ mode: '{{ $mode }}', code: '', recovery_code: '' }">
-                <div class="mb-2 pb-4 text-center">
-                    <h1 class="mb-4 text-lg text-gray-800 dark:text-dark-175">
+
+    <div class="relative mx-auto flex max-w-xs items-center justify-center rounded shadow-lg">
+        <div class="outside-shadow absolute inset-0"></div>
+        <div class="card auth-card">
+            <two-factor-challenge
+                initial-mode="{{ $mode }}"
+                :has-error="{{ $str::bool(count($errors) > 0) }}"
+                v-slot="{ busy, mode, toggleMode, hasError }"
+            >
+                <form
+                    method="POST"
+                    class="email-login select-none"
+                    @submit="busy = true"
+                >
+                    {!! csrf_field() !!}
+
+                    <h1 class="mb-2 text-lg text-gray-800 dark:text-dark-175">
                         {{ __('Two Factor Authentication') }}
                     </h1>
-                    <p
-                        @if($mode === 'recovery_code') x-cloak @endif
-                        x-show="mode === 'code'"
-                        class="text-sm text-gray dark:text-dark-175"
-                    >
-                        {{ __('statamic::messages.two_factor_challenge_code_introduction') }}
+                    <p v-if="mode === 'code'" @if($mode === 'recovery_code') v-cloak
+                       @endif class="mb-4 text-sm text-gray dark:text-dark-175">
+                        {{ __('statamic::messages.two_factor_challenge_code_instructions') }}
                     </p>
-                    <p
-                        @if($mode === 'code') x-cloak @endif
-                        x-show="mode === 'recovery_code'"
-                        class="text-sm text-gray dark:text-dark-175"
-                    >
-                        {{ __('statamic::messages.two_factor_recovery_code_introduction') }}
+                    <p v-if="mode === 'recovery_code'" @if($mode === 'code') v-cloak
+                       @endif class="mb-4 text-sm text-gray dark:text-dark-175">
+                        {{ __('statamic::messages.two_factor_recovery_code_instructions') }}
                     </p>
-                </div>
 
-                <div>
-                    <form method="POST">
-                        {!! csrf_field() !!}
-                        <input type="hidden" name="mode" x-model="mode" />
+                    <div
+                        v-if="mode === 'code'"
+                        @if($mode === 'recovery_code') v-cloak @endif
+                        class="mb-8"
+                    >
+                        <label class="mb-2" for="input-code">{{ __('Code') }}</label>
+                        <input
+                            type="text"
+                            class="input-text"
+                            name="code"
+                            pattern="[0-9]*"
+                            maxlength="6"
+                            inputmode="numeric"
+                            autofocus
+                            autocomplete="off"
+                            id="input-code"
+                        />
+                        @if ($hasError('code'))
+                            <div class="mt-2 text-xs text-red-500">{{ $errors->first('code') }}</div>
+                        @endif
+                    </div>
 
-                        <div class="mb-8" @if($mode === 'recovery_code') x-cloak @endif x-show="mode === 'code'">
-                            <label class="mb-2" for="input-code">{{ __('Code') }}</label>
-                            <input
-                                x-model="code"
-                                type="text"
-                                class="input-text"
-                                name="code"
-                                pattern="[0-9]*"
-                                maxlength="6"
-                                inputmode="numeric"
-                                autofocus
-                                autocomplete="off"
-                                id="input-code"
-                            />
-                            @error('code')
-                                <div class="mt-2 text-xs text-red-500">{{ $message }}</div>
-                            @enderror
-                        </div>
+                    <div
+                        v-if="mode === 'recovery_code'"
+                        @if($mode === 'code') v-cloak @endif
+                        class="mb-8"
+                    >
+                        <label class="mb-2" for="input-recovery-code">{{ __('Recovery Code') }}</label>
+                        <input
+                            type="text"
+                            class="input-text"
+                            name="recovery_code"
+                            maxlength="21"
+                            autofocus
+                            autocomplete="off"
+                            id="input-recovery-code"
+                        />
+                        @if ($hasError('recovery_code'))
+                            <div class="mt-2 text-xs text-red-500">{{ $errors->first('recovery_code') }}</div>
+                        @endif
+                    </div>
 
-                        <div class="mb-8" @if($mode === 'code') x-cloak @endif x-show="mode === 'recovery_code'">
-                            <label class="mb-2" for="input-recovery-code">{{ __('Recovery Code') }}</label>
-                            <input
-                                x-model="recovery_code"
-                                type="text"
-                                class="input-text"
-                                name="recovery_code"
-                                maxlength="21"
-                                autofocus
-                                autocomplete="off"
-                                id="input-recovery-code"
-                            />
-                            @error('recovery_code')
-                                <div class="mt-2 text-xs text-red-500">{{ $message }}</div>
-                            @enderror
-                        </div>
+                    <div class="flex items-center justify-between">
+                        <button
+                            v-if="mode === 'code'"
+                            @if($mode === 'recovery_code') v-cloak @endif
+                            class="text-btn text-xs"
+                            type="button"
+                            @click="toggleMode"
+                        >
+                            {{ __('Use recovery code') }}
+                        </button>
 
-                        <div class="flex items-center justify-between">
-                            <button
-                                class="text-btn text-xs"
-                                type="button"
-                                @if($mode === 'recovery_code') x-cloak @endif
-                                x-on:click.prevent="mode = 'recovery_code'; code = ''"
-                                x-show="mode === 'code'"
-                            >
-                                {{ __('Use recovery code') }}
-                            </button>
+                        <button
+                            v-if="mode === 'recovery_code'"
+                            @if($mode === 'code') v-cloak @endif
+                            class="text-btn text-xs"
+                            type="button"
+                            @click="toggleMode"
+                        >
+                            {{ __('Use one-time code') }}
+                        </button>
 
-                            <button
-                                class="text-btn text-xs"
-                                type="button"
-                                @if($mode === 'code') x-cloak @endif
-                                x-on:click.prevent="mode = 'code'; recovery_code = ''"
-                                x-show="mode === 'recovery_code'"
-                            >
-                                {{ __('Use one-time code') }}
-                            </button>
-
-                            <button type="submit" class="btn-primary">{{ __('Continue') }}</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <div class="mt-4 text-center text-sm">
-                <a
-                    class="logout opacity-75 hover:opacity-100"
-                    href="{{ cp_route('logout') }}?redirect={{ cp_route('login') }}"
-                >
-                    {{ __('Log out') }}
-                </a>
-            </div>
+                        <button type="submit" class="btn-primary">{{ __('Continue') }}</button>
+                    </div>
+                </form>
+            </two-factor-challenge>
         </div>
     </div>
 @endsection

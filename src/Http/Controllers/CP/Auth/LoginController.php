@@ -2,9 +2,12 @@
 
 namespace Statamic\Http\Controllers\CP\Auth;
 
+use Illuminate\Auth\Events\Failed;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use Laravel\Fortify\Events\TwoFactorAuthenticationChallenged;
+use Laravel\Fortify\Fortify;
 use Statamic\Auth\ThrottlesLogins;
 use Statamic\Facades\OAuth;
 use Statamic\Http\Controllers\CP\CpController;
@@ -23,6 +26,7 @@ class LoginController extends CpController
     public function __construct()
     {
         $this->middleware(RedirectIfAuthorized::class)->except('logout');
+        $this->middleware('statamic.cp.authenticated')->only('logout');
     }
 
     /**
@@ -63,21 +67,96 @@ class LoginController extends CpController
             return $this->sendLockoutResponse($request);
         }
 
-        if ($this->attemptLogin($request)) {
-            return $this->sendLoginResponse($request);
+        $user = $this->validateCredentials($request);
+
+        if (! $user) {
+            $this->incrementLoginAttempts($request);
+
+            return $this->throwFailedAuthenticationException($request);
         }
 
-        $this->incrementLoginAttempts($request);
+        // todo: re-implement validity setting
+        if ($user->two_factor_completed) {
+            return $this->twoFactorChallengeResponse($request, $user);
+        }
 
-        return $this->sendFailedLoginResponse($request);
+        $this->guard()->login($user, $request->boolean('remember'));
+
+        if ($user->isTwoFactorAuthRequired()) {
+            // todo: send to a route to setup 2fa (now that we're logged in)
+        }
+
+        return $this->sendLoginResponse($request);
     }
 
-    protected function attemptLogin(Request $request)
+    /**
+     * Attempt to validate the incoming credentials.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return mixed
+     */
+    protected function validateCredentials($request)
     {
-        return $this->guard()->attempt(
-            $this->credentials($request),
-            $request->filled('remember')
-        );
+        $provider = $this->guard()->getProvider();
+
+        return tap($provider->retrieveByCredentials($request->only($this->username(), 'password')), function ($user) use ($provider, $request) {
+            if (! $user || ! $provider->validateCredentials($user, ['password' => $request->password])) {
+                $this->throwFailedAuthenticationException($request);
+            }
+
+            if (config('hashing.rehash_on_login', true) && method_exists($provider, 'rehashPasswordIfRequired')) {
+                $provider->rehashPasswordIfRequired($user, ['password' => $request->password]);
+            }
+        });
+    }
+
+    /**
+     * Throw a failed authentication validation exception.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return void
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    protected function throwFailedAuthenticationException(Request $request)
+    {
+        throw ValidationException::withMessages([
+            $this->username() => [trans('auth.failed')],
+        ]);
+    }
+
+    /**
+     * Fire the failed authentication attempt event with the given arguments.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
+     * @return void
+     */
+    protected function fireFailedEvent($request, $user = null)
+    {
+        event(new Failed($this->guard?->name ?? config('fortify.guard'), $user, [
+            $this->username() => $request->{$this->username()},
+            'password' => $request->password,
+        ]));
+    }
+
+    /**
+     * Get the two factor authentication enabled response.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  mixed  $user
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function twoFactorChallengeResponse($request, $user)
+    {
+        $request->session()->put([
+            'login.id' => $user->getKey(),
+            'login.remember' => $request->boolean('remember'),
+        ]);
+
+        return $request->wantsJson()
+            ? response()->json(['two_factor' => true])
+            : redirect()->route('statamic.cp.two-factor-challenge');
     }
 
     protected function sendLoginResponse(Request $request)
@@ -85,13 +164,6 @@ class LoginController extends CpController
         $request->session()->regenerate();
 
         return $this->authenticated($request, $this->guard()->user());
-    }
-
-    protected function sendFailedLoginResponse(Request $request)
-    {
-        throw ValidationException::withMessages([
-            $this->username() => [trans('auth.failed')],
-        ]);
     }
 
     protected function guard()

@@ -13,9 +13,9 @@ use Statamic\Facades\User;
 
 class Google2FA
 {
-    private \PragmaRX\Google2FA\Google2FA $provider;
+    private $user;
 
-    private ?string $secret_key = null;
+    private \PragmaRX\Google2FA\Google2FA $provider;
 
     public function __construct()
     {
@@ -38,14 +38,15 @@ class Google2FA
     {
         return $this->provider->getQRCodeUrl(
             config('app.name'),
-            User::current()->email(),
+            $this->user()->email(),
             $this->getSecretKey()
         );
     }
 
     public function getSecretKey()
     {
-        $secret = User::current()?->two_factor_secret;
+        $secret = $this->user()?->two_factor_secret;
+
         if (! $secret) {
             throw new TwoFactorNotSetUpException();
         }
@@ -67,5 +68,16 @@ class Google2FA
         }
 
         return false;
+    }
+
+    public function setUser($user)
+    {
+        return $this->user = $user;
+    }
+
+    // todo: this is yucky. fix it.
+    private function user()
+    {
+        return $this->user ?? User::current();
     }
 }

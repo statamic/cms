@@ -12,6 +12,8 @@ class EnforceTwoFactor
 {
     public function handle(Request $request, Closure $next)
     {
+        dd('this is old');
+
         // get the user
         $user = User::current();
 
@@ -45,13 +47,13 @@ class EnforceTwoFactor
                     // if we have no challenge token, it has expired
                     if (! $lastChallenge || Carbon::parse($lastChallenge)->addMinutes((int) config('statamic.users.two_factor.validity'))->isPast()) {
                         // not yet challenged, or expired, so yes, let's challenge
-                        return redirect(cp_route('two-factor.challenge'))->with('two_factor_referer', $request->getRequestUri());
+                        return redirect(cp_route('two-factor-challenge'))->with('two_factor_referer', $request->getRequestUri());
                     }
                 }
             } else {
                 // we don't care about expiry dates - we just need to know if we have been challenged at all
                 if (! $lastChallenge) {
-                    return redirect(cp_route('two-factor.challenge'))->with('two_factor_referer', $request->getRequestUri());
+                    return redirect(cp_route('two-factor-challenge'))->with('two_factor_referer', $request->getRequestUri());
                 }
             }
         }

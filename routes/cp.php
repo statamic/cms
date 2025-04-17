@@ -106,7 +106,6 @@ use Statamic\Http\Controllers\CP\Users\UserGroupsController;
 use Statamic\Http\Controllers\CP\Users\UsersController;
 use Statamic\Http\Controllers\CP\Users\UserWizardController;
 use Statamic\Http\Controllers\CP\Utilities\UtilitiesController;
-use Statamic\Http\Middleware\CP\EnforceTwoFactor;
 use Statamic\Http\Middleware\CP\SetupAvailableWhenTwoFactorSetupIncomplete;
 use Statamic\Http\Middleware\RequireStatamicPro;
 use Statamic\Statamic;
@@ -121,15 +120,13 @@ Route::group(['prefix' => 'auth'], function () {
         Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
         Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.reset.action');
 
-        Route::withoutMiddleware(EnforceTwoFactor::class)->group(function () {
-            Route::middleware(SetupAvailableWhenTwoFactorSetupIncomplete::class)->group(function () {
-                Route::get('two-factor/setup', [TwoFactorSetupController::class, 'index'])->name('two-factor.setup');
-                Route::post('two-factor/setup', [TwoFactorSetupController::class, 'store'])->name('two-factor.confirm');
-                Route::post('two-factor/complete', [TwoFactorSetupController::class, 'complete'])->name('two-factor.complete');
-            });
+        Route::get('two-factor-challenge', [TwoFactorChallengeController::class, 'index'])->name('two-factor-challenge');
+        Route::post('two-factor-challenge', [TwoFactorChallengeController::class, 'store']);
 
-            Route::get('two-factor/challenge', [TwoFactorChallengeController::class, 'index'])->name('two-factor.challenge');
-            Route::post('two-factor/challenge', [TwoFactorChallengeController::class, 'store'])->name('two-factor.challenge.attempt');
+        Route::middleware(SetupAvailableWhenTwoFactorSetupIncomplete::class)->group(function () {
+            Route::get('two-factor/setup', [TwoFactorSetupController::class, 'index'])->name('two-factor.setup');
+            Route::post('two-factor/setup', [TwoFactorSetupController::class, 'store'])->name('two-factor.confirm');
+            Route::post('two-factor/complete', [TwoFactorSetupController::class, 'complete'])->name('two-factor.complete');
         });
     }
 
