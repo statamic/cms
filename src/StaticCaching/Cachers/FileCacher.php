@@ -178,12 +178,22 @@ class FileCacher extends AbstractCacher
         $pathParts = pathinfo($urlParts['path']);
         $slug = $pathParts['basename'];
         $query = $this->config('ignore_query_strings') ? '' : Arr::get($urlParts, 'query', '');
+        $sitePath = $this->getCachePath($site);
 
         if ($this->isBasenameTooLong($basename = $slug.'_'.$query.'.html')) {
             $basename = $slug.'_lqs_'.md5($query).'.html';
         }
 
-        return $this->getCachePath($site).$pathParts['dirname'].'/'.$basename;
+        if ($this->isHostnameWithPeriod($urlParts['host'])) {
+            $sitePath .= '.';
+        }
+
+        return $sitePath.$pathParts['dirname'].'/'.$basename;
+    }
+
+    private function isHostnameWithPeriod($hostname)
+    {
+        return str_ends_with($hostname, '.');
     }
 
     private function isBasenameTooLong($basename)
