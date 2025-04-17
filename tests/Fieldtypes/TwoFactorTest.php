@@ -43,7 +43,11 @@ class TwoFactorTest extends TestCase
             ],
         ], $this->fieldtype()->preload());
 
-        $user->set('two_factor_confirmed_at', now()->timestamp)->save();
+        $user
+            ->set('two_factor_secret', encrypt('secret'))
+            ->set('two_factor_confirmed_at', now()->timestamp)
+            ->set('two_factor_completed', now()->timestamp)
+            ->save();
         $this->assertTrue($this->fieldtype()->preload()['is_setup']);
 
         config()->set('statamic.users.two_factor.enforced_roles', ['*']);
@@ -74,7 +78,11 @@ class TwoFactorTest extends TestCase
             ],
         ], $this->fieldtype()->preload());
 
-        $anotherUser->set('two_factor_confirmed_at', now()->timestamp)->save();
+        $anotherUser
+            ->set('two_factor_secret', encrypt('secret'))
+            ->set('two_factor_confirmed_at', now()->timestamp)
+            ->set('two_factor_completed', now()->timestamp)
+            ->save();
         $this->assertTrue($this->fieldtype()->preload()['is_setup']);
 
         config()->set('statamic.users.two_factor.enforced_roles', ['*']);
