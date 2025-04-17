@@ -54,7 +54,7 @@ class ListedUser extends JsonResource
             $value = $extra[$key] ?? $this->resource->value($key) ?? $field?->defaultValue();
 
             if ($field) {
-                $value = $field->setValue($value)->preProcessIndex()->value();
+                $value = $field->setParent($this->resource)->setValue($value)->preProcessIndex()->value();
             }
 
             return [$key => $value];
