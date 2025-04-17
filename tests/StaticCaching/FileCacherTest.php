@@ -147,6 +147,19 @@ class FileCacherTest extends TestCase
     }
 
     #[Test]
+    public function gets_file_path_with_trailing_dot()
+    {
+        $cacher = $this->fileCacher([
+            'path' => 'test/path',
+        ]);
+
+        $this->assertEquals(
+            'test/path./foo_.html',
+            $cacher->getFilePath('http://domain.com./foo')
+        );
+    }
+
+    #[Test]
     public function flushing_the_cache_deletes_from_all_cache_locations()
     {
         $writer = \Mockery::spy(Writer::class);
