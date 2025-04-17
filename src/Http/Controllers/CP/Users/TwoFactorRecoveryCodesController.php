@@ -18,9 +18,7 @@ class TwoFactorRecoveryCodesController
             abort(403);
         }
 
-        return [
-            'recovery_codes' => json_decode(decrypt(User::current()->two_factor_recovery_codes), true),
-        ];
+        return ['recovery_codes' => $user->recoveryCodes()];
     }
 
     public function store(Request $request, $user, GenerateRecoveryCodes $generateRecoveryCodes)
@@ -33,9 +31,7 @@ class TwoFactorRecoveryCodesController
 
         $generateRecoveryCodes($user);
 
-        return [
-            'recovery_codes' => json_decode(decrypt($user->two_factor_recovery_codes), true),
-        ];
+        return ['recovery_codes' => $user->recoveryCodes()];
     }
 
     public function download(Request $request, $user)
@@ -48,8 +44,7 @@ class TwoFactorRecoveryCodesController
 
         $filename = Str::slug(config('app.name')).'-recovery-codes.txt';
 
-        $content = collect(json_decode(decrypt($user->two_factor_recovery_codes), true))
-            ->implode(PHP_EOL);
+        $content = collect($user->recoveryCodes())->implode(PHP_EOL);
 
         return response($content, 200, [
             'Content-Type' => 'text/plain',

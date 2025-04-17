@@ -5,8 +5,9 @@ namespace Tests\Auth\TwoFactor;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\Test;
+use PragmaRX\Google2FA\Google2FA;
 use Statamic\Auth\TwoFactor\ConfirmTwoFactorAuthentication;
-use Statamic\Auth\TwoFactor\Google2FA;
+use Statamic\Auth\TwoFactor\TwoFactorAuthenticationProvider;
 use Statamic\Auth\TwoFactor\RecoveryCode;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -24,7 +25,7 @@ class ConfirmTwoFactorAuthenticationTest extends TestCase
     {
         parent::setUp();
 
-        $this->provider = app(Google2FA::class);
+        $this->provider = app(TwoFactorAuthenticationProvider::class);
 
         $this->user = User::make()->makeSuper()->data([
             'two_factor_confirmed_at' => null,
@@ -55,7 +56,7 @@ class ConfirmTwoFactorAuthenticationTest extends TestCase
     public function it_throws_a_validation_exception_when_an_invalid_one_time_code_is_present()
     {
         // Get a one-time code (so we can make sure we have a wrong one in the test)
-        $code = $this->getOneTimeCode();
+        $code = $this->getOneTimeCode($this->user);
 
         // If our actual code is 111111, then output 222222
         if ($code === '111111') {
@@ -76,7 +77,7 @@ class ConfirmTwoFactorAuthenticationTest extends TestCase
     {
         $this->freezeTime();
 
-        $code = $this->getOneTimeCode();
+        $code = $this->getOneTimeCode($this->user);
 
         $this->assertNull(session()->get('statamic_two_factor'));
         $this->assertNull($this->user->two_factor_confirmed_at);
@@ -89,13 +90,10 @@ class ConfirmTwoFactorAuthenticationTest extends TestCase
         $this->assertEquals(now(), $this->user->getLastTwoFactorChallenged());
     }
 
-    private function getOneTimeCode()
+    private function getOneTimeCode($user): string
     {
-        $provider = app(Google2FA::class);
+        $internalProvider = app(Google2FA::class);
 
-        // get a one-time code (so we can make sure we have a wrong one in the test)
-        $internalProvider = app(\PragmaRX\Google2FA\Google2FA::class);
-
-        return $internalProvider->getCurrentOtp($provider->getSecretKey());
+        return $internalProvider->getCurrentOtp($user->twoFactorSecretKey());
     }
 }

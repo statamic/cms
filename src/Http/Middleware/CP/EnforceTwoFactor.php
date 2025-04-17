@@ -18,10 +18,10 @@ class EnforceTwoFactor
         $user = User::current();
 
         // two factor setup (opt-in), or is two factor enforceable (mandatory) for this user?
-        if ($user->two_factor_completed || $user->isTwoFactorAuthRequired()) {
+        if ($user->hasEnabledTwoFactorAuthentication() || $user->isTwoFactorAuthenticationRequired()) {
 
             // is two factor NOT set up?
-            if (! $user->two_factor_completed) {
+            if (! $user->hasEnabledTwoFactorAuthentication()) {
                 // go to setup
                 return redirect(cp_route('two-factor.setup'));
             }

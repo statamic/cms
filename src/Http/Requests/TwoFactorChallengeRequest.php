@@ -4,10 +4,9 @@ namespace Statamic\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
-use Statamic\Auth\TwoFactor\Google2FA;
+use Statamic\Auth\TwoFactor\TwoFactorAuthenticationProvider;
 
 class TwoFactorChallengeRequest extends FormRequest
 {
@@ -55,7 +54,7 @@ class TwoFactorChallengeRequest extends FormRequest
      */
     public function hasValidCode()
     {
-        return $this->code && tap(app(Google2FA::class)->verify(
+        return $this->code && tap(app(TwoFactorAuthenticationProvider::class)->verify(
             decrypt($this->challengedUser()->two_factor_secret), $this->code
         ), function ($result) {
             if ($result) {

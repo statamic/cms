@@ -4,7 +4,7 @@ namespace Tests\Auth\TwoFactor;
 
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\Test;
-use Statamic\Auth\TwoFactor\Google2FA;
+use Statamic\Auth\TwoFactor\TwoFactorAuthenticationProvider;
 use Statamic\Auth\TwoFactor\RecoveryCode;
 use Statamic\Facades\User;
 use Statamic\Http\Middleware\CP\EnforceTwoFactor;
@@ -32,7 +32,7 @@ class UserRecoveryCodesControllerTest extends TestCase
             ]))
             ->assertOk()
             ->assertJson([
-                'recovery_codes' => json_decode(decrypt($user->two_factor_recovery_codes), true),
+                'recovery_codes' => $user->recoveryCodes(),
             ]);
     }
 
@@ -83,7 +83,7 @@ class UserRecoveryCodesControllerTest extends TestCase
                 'user' => $user->id,
             ]))
             ->assertOk()
-            ->assertSeeInOrder(json_decode(decrypt($user->two_factor_recovery_codes), true));
+            ->assertSeeInOrder($user->recoveryCodes());
     }
 
     #[Test]
@@ -109,7 +109,7 @@ class UserRecoveryCodesControllerTest extends TestCase
         $user->merge([
             'two_factor_confirmed_at' => now()->timestamp,
             'two_factor_completed' => now()->timestamp,
-            'two_factor_secret' => encrypt(app(Google2FA::class)->generateSecretKey()),
+            'two_factor_secret' => encrypt(app(TwoFactorAuthenticationProvider::class)->generateSecretKey()),
             'two_factor_recovery_codes' => encrypt(json_encode(Collection::times(8, function () {
                 return RecoveryCode::generate();
             })->all())),

@@ -76,13 +76,13 @@ class LoginController extends CpController
         }
 
         // todo: re-implement validity setting
-        if ($user->two_factor_completed) {
+        if ($user->hasEnabledTwoFactorAuthentication()) {
             return $this->twoFactorChallengeResponse($request, $user);
         }
 
         $this->guard()->login($user, $request->boolean('remember'));
 
-        if ($user->isTwoFactorAuthRequired()) {
+        if ($user->isTwoFactorAuthenticationRequired()) {
             // todo: send to a route to setup 2fa (now that we're logged in)
         }
 

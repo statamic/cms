@@ -4,7 +4,8 @@ namespace Tests\Auth\TwoFactor;
 
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\Test;
-use Statamic\Auth\TwoFactor\Google2FA;
+use PragmaRX\Google2FA\Google2FA;
+use Statamic\Auth\TwoFactor\TwoFactorAuthenticationProvider;
 use Statamic\Auth\TwoFactor\RecoveryCode;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -37,7 +38,7 @@ class TwoFactorSetupControllerTest extends TestCase
     {
         $user = $this->user();
 
-        $user->set('two_factor_secret', encrypt(app(Google2FA::class)->generateSecretKey()));
+        $user->set('two_factor_secret', encrypt(app(TwoFactorAuthenticationProvider::class)->generateSecretKey()));
         $user->set('two_factor_recovery_codes', encrypt(json_encode(Collection::times(8, function () {
             return RecoveryCode::generate();
         })->all())));
@@ -45,7 +46,7 @@ class TwoFactorSetupControllerTest extends TestCase
         $this
             ->actingAs($user)
             ->post(cp_route('two-factor.confirm'), [
-                'code' => $this->getOneTimeCode(),
+                'code' => $this->getOneTimeCode($user),
             ])
             ->assertViewIs('statamic::auth.two-factor.recovery-codes')
             ->assertViewHas('recovery_codes');
@@ -55,9 +56,9 @@ class TwoFactorSetupControllerTest extends TestCase
     public function it_completes_setup_and_redirects()
     {
         $this
-            ->actingAs($this->userWithTwoFactorEnabled())
+            ->actingAs($user = $this->userWithTwoFactorEnabled())
             ->post(cp_route('two-factor.complete'), [
-                'code' => $this->getOneTimeCode(),
+                'code' => $this->getOneTimeCode($user),
             ])
             ->assertRedirect(cp_route('index'));
     }
@@ -74,7 +75,7 @@ class TwoFactorSetupControllerTest extends TestCase
         $user->merge([
             'two_factor_confirmed_at' => now()->timestamp,
             'two_factor_completed' => now()->timestamp,
-            'two_factor_secret' => encrypt(app(Google2FA::class)->generateSecretKey()),
+            'two_factor_secret' => encrypt(app(TwoFactorAuthenticationProvider::class)->generateSecretKey()),
             'two_factor_recovery_codes' => encrypt(json_encode(Collection::times(8, function () {
                 return RecoveryCode::generate();
             })->all())),
@@ -85,13 +86,10 @@ class TwoFactorSetupControllerTest extends TestCase
         return $user;
     }
 
-    private function getOneTimeCode()
+    private function getOneTimeCode($user): string
     {
-        $provider = app(Google2FA::class);
+        $internalProvider = app(Google2FA::class);
 
-        // get a one-time code (so we can make sure we have a wrong one in the test)
-        $internalProvider = app(\PragmaRX\Google2FA\Google2FA::class);
-
-        return $internalProvider->getCurrentOtp($provider->getSecretKey());
+        return $internalProvider->getCurrentOtp($user->twoFactorSecretKey());
     }
 }

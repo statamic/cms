@@ -22,8 +22,8 @@ class TwoFactor extends Fieldtype
 
         return [
             'is_current_user' => $user->id === User::current()->id,
-            'is_enforced' => $user->isTwoFactorAuthRequired(),
-            'is_setup' => ! is_null($user->two_factor_confirmed_at),
+            'is_enforced' => $user->isTwoFactorAuthenticationRequired(),
+            'is_setup' => $user->hasEnabledTwoFactorAuthentication(),
             'routes' => [
                 'setup' => cp_route('two-factor.setup'),
                 'disable' => cp_route('users.two-factor.disable', $user->id),
@@ -41,7 +41,7 @@ class TwoFactor extends Fieldtype
         $user = $this->field->parent();
 
         return [
-            'setup' => ! is_null($user->two_factor_confirmed_at),
+            'setup' => $user->hasEnabledTwoFactorAuthentication(),
         ];
     }
 }

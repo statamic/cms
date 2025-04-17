@@ -3,6 +3,12 @@
 namespace Statamic\Auth;
 
 use ArrayAccess;
+use BaconQrCode\Renderer\Color\Rgb;
+use BaconQrCode\Renderer\Image\SvgImageBackEnd;
+use BaconQrCode\Renderer\ImageRenderer;
+use BaconQrCode\Renderer\RendererStyle\Fill;
+use BaconQrCode\Renderer\RendererStyle\RendererStyle;
+use BaconQrCode\Writer;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -12,9 +18,9 @@ use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Password;
-use Laravel\Fortify\Events\RecoveryCodeReplaced;
-use Laravel\Fortify\RecoveryCode;
 use Statamic\Auth\Passwords\PasswordReset;
+use PragmaRX\Google2FA\Google2FA;
+use Statamic\Auth\TwoFactor\TwoFactorAuthenticationProvider;
 use Statamic\Contracts\Auth\Role as RoleContract;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Contracts\Data\Augmentable;
@@ -356,7 +362,7 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
         return $this->getPreference('theme') ?? 'auto';
     }
 
-    public function isTwoFactorAuthRequired(): bool
+     public function isTwoFactorAuthenticationRequired(): bool
     {
         $enforcedRoles = config('statamic.users.two_factor.enforced_roles', []);
 
@@ -376,6 +382,28 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
     abstract public function setLastTwoFactorChallenged(): self;
 
     abstract public function clearLastTwoFactorChallenged(): self;
+
+    /**
+     * Determine if two-factor authentication has been enabled.
+     *
+     * @return bool
+     */
+    public function hasEnabledTwoFactorAuthentication(): bool
+    {
+        return ! is_null($this->two_factor_secret) &&
+            ! is_null($this->two_factor_confirmed_at) &&
+            ! is_null($this->two_factor_completed);
+    }
+
+    /**
+     * Get the user's two factor authentication secret key.
+     *
+     * @return string
+     */
+    public function twoFactorSecretKey(): string
+    {
+        return decrypt($this->two_factor_secret);
+    }
 
     /**
      * Get the user's two factor authentication recovery codes.
@@ -406,6 +434,37 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
         $this->set('two_factor_recovery_codes', encrypt(json_encode($recoveryCodes)))->save();
 
         $this->notify(new RecoveryCodeUsedNotification);
+    }
+
+    /**
+     * Get the QR code SVG of the user's two factor authentication QR code URL.
+     *
+     * @return string
+     */
+    public function twoFactorQrCodeSvg(): string
+    {
+        $svg = (new Writer(
+            new ImageRenderer(
+                new RendererStyle(192, 0, null, null, Fill::uniformColor(new Rgb(255, 255, 255), new Rgb(45, 55, 72))),
+                new SvgImageBackEnd
+            )
+        ))->writeString($this->twoFactorQrCodeUrl());
+
+        return trim(substr($svg, strpos($svg, "\n") + 1));
+    }
+
+    /**
+     * Get the two factor authentication QR code URL.
+     *
+     * @return string
+     */
+    public function twoFactorQrCodeUrl(): string
+    {
+        return app(TwoFactorAuthenticationProvider::class)->qrCodeUrl(
+            config('app.name'),
+            $this->email(),
+            decrypt($this->two_factor_secret)
+        );
     }
 
     public function getCpSearchResultBadge(): string

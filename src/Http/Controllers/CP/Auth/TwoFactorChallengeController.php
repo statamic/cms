@@ -5,7 +5,6 @@ namespace Statamic\Http\Controllers\CP\Auth;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Statamic\Auth\TwoFactor\ChallengeTwoFactorAuthentication;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Middleware\CP\RedirectIfAuthorized;
 use Statamic\Http\Requests\TwoFactorChallengeRequest;

@@ -7,14 +7,16 @@ use Illuminate\Support\Arr;
 use Statamic\Auth\TwoFactor\CompleteTwoFactorAuthenticationSetup;
 use Statamic\Auth\TwoFactor\ConfirmTwoFactorAuthentication;
 use Statamic\Auth\TwoFactor\EnableTwoFactorAuthentication;
-use Statamic\Auth\TwoFactor\Google2FA;
+use Statamic\Auth\TwoFactor\TwoFactorAuthenticationProvider;
 use Statamic\Facades\CP\Toast;
 use Statamic\Facades\User;
 
 class TwoFactorSetupController
 {
-    public function index(Request $request, Google2FA $provider, EnableTwoFactorAuthentication $enable)
+    public function index(Request $request, TwoFactorAuthenticationProvider $provider, EnableTwoFactorAuthentication $enable)
     {
+        $user = $request->user();
+
         // if we have an error for the code, then disable resetting the secret
         $resetSecret = true;
         if (optional(session()->get('errors'))->first('code')) {
@@ -25,8 +27,8 @@ class TwoFactorSetupController
         $enable(User::current(), $resetSecret);
 
         $viewData = [
-            'qr' => $provider->getQrCodeSvg(),
-            'secret_key' => $provider->getSecretKey(),
+            'qr' => $user->twoFactorQrCodeSvg(),
+            'secret_key' => $user->twoFactorSecretKey(),
             'confirm_url' => cp_route('two-factor.confirm'),
         ];
 

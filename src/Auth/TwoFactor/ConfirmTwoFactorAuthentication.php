@@ -7,7 +7,7 @@ use Statamic\Auth\User;
 
 class ConfirmTwoFactorAuthentication
 {
-    public function __construct(private Google2FA $provider)
+    public function __construct(private TwoFactorAuthenticationProvider $provider)
     {
     }
 

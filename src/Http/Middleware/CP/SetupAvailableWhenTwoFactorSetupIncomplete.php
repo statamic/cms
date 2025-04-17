@@ -21,7 +21,7 @@ class SetupAvailableWhenTwoFactorSetupIncomplete
         $user = $request->user();
 
         // is two factor set up?
-        if ($user->two_factor_completed) {
+        if ($user->hasEnabledTwoFactorAuthentication()) {
             // redirect to the home page
             return redirect(cp_route('index'));
         }

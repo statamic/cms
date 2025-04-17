@@ -5,8 +5,9 @@ namespace Tests\Auth;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Notification;
 use PHPUnit\Framework\Attributes\Test;
-use Statamic\Auth\TwoFactor\Google2FA;
+use PragmaRX\Google2FA\Google2FA;
 use Statamic\Auth\TwoFactor\RecoveryCode;
+use Statamic\Auth\TwoFactor\TwoFactorAuthenticationProvider;
 use Statamic\Facades\User;
 use Statamic\Notifications\RecoveryCodeUsed;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -146,7 +147,7 @@ class TwoFactorChallengeTest extends TestCase
         $this
             ->session([
                 'login.id' => $user->id(),
-                'url.intended' => 'http://localhost/cp/cp/collections'
+                'url.intended' => 'http://localhost/cp/cp/collections',
             ])
             ->post(cp_route('two-factor-challenge'), [
                 'code' => $this->getOneTimeCode($user),
@@ -168,7 +169,7 @@ class TwoFactorChallengeTest extends TestCase
         $user->merge([
             'two_factor_confirmed_at' => now()->timestamp,
             'two_factor_completed' => now()->timestamp,
-            'two_factor_secret' => encrypt(app(Google2FA::class)->generateSecretKey()),
+            'two_factor_secret' => encrypt(app(TwoFactorAuthenticationProvider::class)->generateSecretKey()),
             'two_factor_recovery_codes' => encrypt(json_encode(Collection::times(8, function () {
                 return RecoveryCode::generate();
             })->all())),
@@ -179,14 +180,10 @@ class TwoFactorChallengeTest extends TestCase
         return $user;
     }
 
-    private function getOneTimeCode($user)
+    private function getOneTimeCode($user): string
     {
-        $provider = app(Google2FA::class);
-        $provider->setUser($user);
+        $internalProvider = app(Google2FA::class);
 
-        // get a one-time code (so we can make sure we have a wrong one in the test)
-        $internalProvider = app(\PragmaRX\Google2FA\Google2FA::class);
-
-        return $internalProvider->getCurrentOtp($provider->getSecretKey());
+        return $internalProvider->getCurrentOtp($user->twoFactorSecretKey());
     }
 }

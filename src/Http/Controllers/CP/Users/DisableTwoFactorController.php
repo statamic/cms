@@ -19,7 +19,7 @@ class DisableTwoFactorController
 
         $disable($user);
 
-        if ($request->user()->id === $user->id && $user->isTwoFactorAuthRequired()) {
+        if ($request->user()->id === $user->id && $user->isTwoFactorAuthenticationRequired()) {
             return ['redirect' => cp_route('logout')];
         }
 
