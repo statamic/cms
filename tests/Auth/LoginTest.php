@@ -2,7 +2,9 @@
 
 namespace Tests\Auth;
 
+use Illuminate\Auth\Events\Failed;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\TwoFactor\TwoFactorAuthenticationProvider;
 use Statamic\Auth\TwoFactor\RecoveryCode;
@@ -83,6 +85,24 @@ class LoginTest extends TestCase
             ->assertSessionHas('login.remember', true);
 
         $this->assertGuest();
+    }
+
+    #[Test]
+    public function it_doesnt_redirect_to_the_two_factor_challenge_page_when_last_challenged_timestamp_is_still_valid()
+    {
+        $user = $this->userWithTwoFactorEnabled();
+        $user->setLastTwoFactorChallenged()->save();
+
+        $this
+            ->assertGuest()
+            ->post(cp_route('login'), [
+                'email' => $user->email(),
+                'password' => 'secret',
+                'remember' => true,
+            ])
+            ->assertRedirect(cp_route('index'));
+
+        $this->assertAuthenticatedAs($user);
     }
 
     #[Test]

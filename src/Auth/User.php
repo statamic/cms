@@ -9,6 +9,7 @@ use BaconQrCode\Renderer\ImageRenderer;
 use BaconQrCode\Renderer\RendererStyle\Fill;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use BaconQrCode\Writer;
+use Carbon\Carbon;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -377,7 +378,7 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
             ->isNotEmpty();
     }
 
-    abstract public function getLastTwoFactorChallenged(): ?string;
+    abstract public function getLastTwoFactorChallenged(): ?Carbon;
 
     abstract public function setLastTwoFactorChallenged(): self;
 

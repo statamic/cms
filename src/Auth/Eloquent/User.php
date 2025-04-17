@@ -403,7 +403,7 @@ class User extends BaseUser
         ], $this->model()->attributesToArray());
     }
 
-    public function getLastTwoFactorChallenged(): ?string
+    public function getLastTwoFactorChallenged(): ?\Carbon\Carbon
     {
         $lastChallenged = $this->get('two_factor_last_challenged');
 

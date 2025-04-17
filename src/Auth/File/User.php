@@ -372,9 +372,9 @@ class User extends BaseUser
         ], $this->data()->toArray());
     }
 
-    public function getLastTwoFactorChallenged(): ?string
+    public function getLastTwoFactorChallenged(): ?Carbon
     {
-        $lastChallenged = $this->getMeta('statamic_two_factor');
+        $lastChallenged = $this->getMeta('two_factor_last_challenged');
 
         if (! $lastChallenged) {
             return null;
@@ -385,14 +385,14 @@ class User extends BaseUser
 
     public function setLastTwoFactorChallenged(): self
     {
-        $this->setMeta('statamic_two_factor', encrypt(Carbon::now()));
+        $this->setMeta('two_factor_last_challenged', encrypt(Carbon::now()));
 
         return $this;
     }
 
     public function clearLastTwoFactorChallenged(): self
     {
-        $this->setMeta('statamic_two_factor', null);
+        $this->setMeta('two_factor_last_challenged', null);
 
         return $this;
     }
