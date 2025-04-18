@@ -115,7 +115,9 @@ return [
     | Nocache
     |--------------------------------------------------------------------------
     |
-    | Here you may define where the nocache data is stored.
+    | Here you may define where the nocache data is stored. You can also
+    | optionally set a different database connection for the
+    | `nocache_regions` table.
     |
     | https://statamic.dev/tags/nocache#database
     |
@@ -124,6 +126,8 @@ return [
     */
 
     'nocache' => 'cache',
+
+    'nocache_db_connection' => env('STATAMIC_NOCACHE_DB_CONNECTION', null),
 
     'nocache_js_position' => 'body',
 
