@@ -18,7 +18,7 @@
             </v-select>
         </div>
 
-        <div class="flex-1">
+        <div class="flex-1 truncate">
 
             <!-- URL text input -->
             <text-input v-if="option === 'url'" v-model="urlValue" />
