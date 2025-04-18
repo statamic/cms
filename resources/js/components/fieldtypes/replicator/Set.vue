@@ -24,6 +24,18 @@
                     </div>
                 </div>
                 <div class="replicator-set-controls" v-if="!isReadOnly">
+                    <set-settings
+                        v-if="settingsFields.length"
+                        :fields="settingsFields"
+                        :meta="meta"
+                        :values="values"
+                        :parent-name="parentName"
+                        :index="index"
+                        :field-path-prefix="fieldPathPrefix"
+                        :is-read-only="isReadOnly"
+                        @updated="(handle, value) => updated(handle, value)"
+                        @meta-updated="(handle, value) => metaUpdated(handle, value)"
+                    />
                     <toggle-fieldtype
                         handle="set-enabled"
                         class="toggle-sm rtl:ml-2 ltr:mr-2"
@@ -81,10 +93,11 @@ import ManagesPreviewText from './ManagesPreviewText';
 import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
 import HasFieldActions from '../../field-actions/HasFieldActions.js';
 import DropdownActions from '../../field-actions/DropdownActions.vue';
+import SetSettings from './SetSettings.vue';
 
 export default {
 
-    components: { SetField, DropdownActions },
+    components: { SetField, DropdownActions, SetSettings },
 
     mixins: [
         ValidatesFieldConditions,
@@ -153,7 +166,11 @@ export default {
     computed: {
 
         fields() {
-            return this.config.fields;
+            return this.config.fields.filter((field) => ! field.settings_field);
+        },
+
+        settingsFields() {
+            return this.config.fields.filter((field) => field.settings_field);
         },
 
         display() {

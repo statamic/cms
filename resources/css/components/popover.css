@@ -67,3 +67,17 @@
         @apply focus-outline;
     }
 }
+
+.set-settings-button {
+    @apply text-gray-700 dark:text-dark-150 rounded-full flex items-center justify-center p-0 border border-transparent;
+    height: 16px;
+    width: 16px;
+
+    &:hover {
+        @apply text-gray-950 dark:text-dark-100;
+    }
+
+    &:focus {
+        @apply focus-outline;
+    }
+}

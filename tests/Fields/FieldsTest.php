@@ -434,6 +434,7 @@ class FieldsTest extends TestCase
                 'sortable' => true,
                 'replicator_preview' => true,
                 'duplicate' => true,
+                'settings_field' => false,
             ],
             [
                 'handle' => 'two',
@@ -457,6 +458,7 @@ class FieldsTest extends TestCase
                 'sortable' => true,
                 'replicator_preview' => true,
                 'duplicate' => true,
+                'settings_field' => false,
             ],
         ], $fields->toPublishArray());
     }
@@ -522,6 +524,7 @@ class FieldsTest extends TestCase
                 'sortable' => true,
                 'replicator_preview' => true,
                 'duplicate' => true,
+                'settings_field' => false,
             ],
             [
                 'handle' => 'nested_deeper_two',
@@ -548,6 +551,7 @@ class FieldsTest extends TestCase
                 'sortable' => true,
                 'replicator_preview' => true,
                 'duplicate' => true,
+                'settings_field' => false,
             ],
         ], $fields->toPublishArray());
     }

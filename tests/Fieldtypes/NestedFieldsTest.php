@@ -84,6 +84,7 @@ class NestedFieldsTest extends TestCase
                 'visibility' => 'visible',
                 'replicator_preview' => true,
                 'duplicate' => true,
+                'settings_field' => false,
                 'type' => 'assets',
                 'max_files' => 2,
                 'container' => 'main',
