@@ -83,9 +83,10 @@
                     >
                         <div class="asset-grid-listing border dark:border-dark-900 rounded overflow-hidden" :class="{ 'rounded-t-none': !isReadOnly && (showPicker || uploads.length) }" ref="assets">
                             <asset-tile
-                                v-for="asset in assets"
+                                v-for="(asset, index) in assets"
                                 :key="asset.id"
                                 :asset="asset"
+                                :errors="errors[index] ?? []"
                                 :read-only="isReadOnly"
                                 :show-filename="config.show_filename"
                                 :show-set-alt="showSetAlt"
@@ -110,9 +111,10 @@
                                 <tbody ref="assets">
                                     <tr is="assetRow"
                                         class="asset-row"
-                                        v-for="asset in assets"
+                                        v-for="(asset, index) in assets"
                                         :key="asset.id"
                                         :asset="asset"
+                                        :errors="errors[index] ?? []"
                                         :read-only="isReadOnly"
                                         :show-filename="config.show_filename"
                                         :show-set-alt="showSetAlt"
@@ -191,6 +193,7 @@ export default {
 
     mixins: [Fieldtype],
 
+    inject: ['storeName'],
 
     data() {
         return {
@@ -453,6 +456,27 @@ export default {
                     visible: this.assets.length > 0,
                 },
             ];
+        },
+
+        errors() {
+            const state = this.$store.state.publish[this.storeName];
+
+            console.log({ state });
+            if (! state) {
+                return {};
+            }
+
+            let errors = {}
+
+            // Filter errors to only include those for this field, and remove the field path prefix
+            // if there is one, then append it to the errors object.
+            Object.entries(state.errors)
+                .filter(([key, value]) => key.startsWith(this.fieldPathPrefix || this.handle))
+                .forEach(([key, value]) => {
+                    errors[key.split('.').pop()] = value
+                })
+
+            return errors
         },
 
     },
