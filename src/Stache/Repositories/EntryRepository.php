@@ -96,6 +96,19 @@ class EntryRepository implements RepositoryContract
             : $entry;
     }
 
+    public function findByIds($ids): EntryCollection
+    {
+        $entries = $this->query()->whereIn('id', $ids)->get();
+        $entriesById = $entries->keyBy->id();
+
+        $ordered = collect($ids)
+            ->map(fn ($id) => $entriesById->get($id))
+            ->filter()
+            ->values();
+
+        return EntryCollection::make($ordered);
+    }
+
     public function save($entry)
     {
         if (! $entry->id()) {
