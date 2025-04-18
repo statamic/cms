@@ -18,8 +18,6 @@ class DatabaseRegion extends Model
 
     /**
      * Get the database connection for the model.
-     *
-     * @return string|null
      */
     public function getConnectionName(): ?string
     {
