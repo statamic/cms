@@ -94,9 +94,11 @@ trait Revisable
                 $parent = null;
             }
 
-            $tree
-                ->move($this->id(), $parent)
-                ->save();
+            if($tree->isAlreadyInParent($item->id(), $parent)){
+                $tree
+                    ->move($this->id(), $parent)
+                    ->save();
+            }
         }
 
         $item
