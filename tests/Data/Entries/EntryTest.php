@@ -1916,6 +1916,26 @@ class EntryTest extends TestCase
     }
 
     #[Test]
+    public function it_respects_custom_blueprint_template_base_path()
+    {
+        // Set custom base path for test
+        config(['statamic.system.blueprint_template_base_path' => 'custom.path']);
+
+        $collection = tap(Collection::make('articles')->template('@blueprint'))->save();
+        $blueprint = tap(Blueprint::make('standard_article')->setNamespace('collections.articles'))->save();
+        $entry = Entry::make('test')->collection($collection)->blueprint($blueprint->handle());
+
+        // entry uses the custom path instead of collection handle
+        $this->assertEquals('custom.path.standard_article', $entry->template());
+
+        // entry uses slugified custom path when that template exists
+        View::shouldReceive('exists')->with('custom.path.standard-article')->andReturn(true);
+        $this->assertEquals('custom.path.standard-article', $entry->template());
+
+        config(['statamic.system.blueprint_template_base_path' => null]);
+    }
+
+    #[Test]
     public function it_gets_and_sets_the_layout()
     {
         $collection = tap(Collection::make('test'))->save();
