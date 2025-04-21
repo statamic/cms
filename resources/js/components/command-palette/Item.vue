@@ -17,10 +17,18 @@ onMounted(() => {
         iconComponent.value = true;
     }
 });
+
+function click(event) {
+    if (props.href) return;
+
+    event.preventDefault();
+
+    // TODO: Handle ctrl/cmd + enter key to open item in new browser tab, just like ctrl/cms + click does
+}
 </script>
 
 <template>
-    <div
+    <a
         :class="[
             'flex items-center gap-2 border-0',
             'rounded-lg px-2 py-1.5 text-sm antialiased',
@@ -32,6 +40,7 @@ onMounted(() => {
         data-command-palette-item
         :as="href ? 'a' : 'div'"
         :href="href"
+        @click="click"
     >
         <div v-if="icon" class="flex size-6 items-center justify-center p-1 text-gray-500">
             <ui-icon v-if="iconComponent" :name="icon" class="size-4" :key="icon" />
@@ -42,5 +51,5 @@ onMounted(() => {
             <template v-else>{{ text }}</template>
         </div>
         <ui-badge v-if="badge" :text="badge" variant="flat" />
-    </div>
+    </a>
 </template>

@@ -97,10 +97,13 @@ function searchContent() {
 function select(selected) {
     let item = findSelectedItem(selected);
 
+    if (item.href) {
+        return;
+    }
+
     switch (item.type) {
-        case 'link':
-        case 'content_search_result':
-            window.location = item.url; // TODO: If meta key is held, maybe it can `window.open()` in new window/tab?
+        case 'action':
+            // TODO: Handle non <a> items
     }
 }
 
@@ -191,7 +194,7 @@ const modalClasses = cva({
                                         :text-value="item.text"
                                         :as-child="true"
                                     >
-                                        <CommandPaletteItem :icon="item.icon" :badge="item.keys || item.badge">
+                                        <CommandPaletteItem :icon="item.icon" :href="item.url" :badge="item.keys || item.badge">
                                             <div v-html="item.html" />
                                         </CommandPaletteItem>
                                     </ComboboxItem>
