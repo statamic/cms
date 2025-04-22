@@ -19,7 +19,7 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import Input from '@statamic/components/ui/Input/Input.vue';
+import { Input } from '@statamic/ui';
 
 export default {
     mixins: [Fieldtype],

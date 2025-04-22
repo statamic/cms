@@ -15,7 +15,7 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import Textarea from '@statamic/components/ui/Textarea.vue';
+import { Textarea } from '@statamic/ui';
 
 export default {
     mixins: [Fieldtype],

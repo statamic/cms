@@ -15,8 +15,7 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 import HasInputOptions from './HasInputOptions.js';
-import CheckboxGroup from '@statamic/components/ui/Checkbox/Group.vue';
-import Checkbox from '@statamic/components/ui/Checkbox/Item.vue';
+import { CheckboxGroup, Checkbox } from '@statamic/ui';
 
 export default {
     mixins: [Fieldtype, HasInputOptions],
