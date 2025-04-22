@@ -6,7 +6,7 @@
             <Button
                 size="sm"
                 variant="ghost"
-                class="px-2!"
+                class="px-2! [&_svg]:size-3.5"
                 v-for="button in buttons"
                 :key="button.name"
                 v-tooltip="button.text"
@@ -19,7 +19,7 @@
                 v-if="showDarkMode"
                 size="sm"
                 variant="ghost"
-                class="px-2!"
+                class="px-2! [&_svg]:size-3.5"
                 @click="$emit('toggle-dark-mode')"
                 v-tooltip="darkMode ? __('Light Mode') : __('Dark Mode')"
                 :aria-label="__('Toggle Dark Mode')"
@@ -31,7 +31,7 @@
             <Button
                 size="sm"
                 variant="ghost"
-                class="px-2!"
+                class="px-2! [&_svg]:size-3.5"
                 @click="$emit('toggle-mode', 'write')"
                 :class="{ 'text-black! dark:text-white!': mode == 'write' }"
                 v-text="__('Write')"
@@ -40,7 +40,7 @@
             <Button
                 size="sm"
                 variant="ghost"
-                class="px-2!"
+                class="px-2! [&_svg]:size-3.5"
                 @click="$emit('toggle-mode', 'preview')"
                 :class="{ 'text-black! dark:text-white!': mode == 'preview' }"
                 v-text="__('Preview')"
