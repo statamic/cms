@@ -16,7 +16,7 @@ class DatabaseRegion extends Model
         'key' => 'string',
     ];
 
-    public function getConnectionName(): ?string
+    public function getConnectionName()
     {
         return config('statamic.static_caching.nocache_db_connection') ?: parent::getConnectionName();
     }
