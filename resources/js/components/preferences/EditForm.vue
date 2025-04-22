@@ -108,7 +108,6 @@ export default {
                 .patch(url, this.currentValues)
                 .then(() => {
                     this.$refs.container.saved();
-
                     this.$nextTick(() => location.reload());
                 })
                 .catch(e => this.handleAxiosError(e));
