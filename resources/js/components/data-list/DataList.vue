@@ -1,5 +1,5 @@
 <script>
-import Fuse from 'fuse.js';
+import fuzzysort from 'fuzzysort';
 import { sortBy } from 'lodash-es';
 
 export default {
@@ -125,14 +125,12 @@ export default {
         filterBySearch(rows) {
             if (!this.searchQuery) return rows;
 
-            const fuse = new Fuse(rows, {
-                findAllMatches: true,
-                threshold: 0.1,
-                minMatchCharLength: 2,
-                keys: this.searchableColumns,
-            });
-
-            return fuse.search(this.searchQuery).map((result) => result.item);
+            return fuzzysort
+                .go(this.searchQuery, rows, {
+                    all: true,
+                    keys: this.searchableColumns,
+                })
+                .map((result) => result.obj);
         },
 
         sortRows(rows) {
