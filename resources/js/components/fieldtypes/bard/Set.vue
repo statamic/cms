@@ -28,7 +28,7 @@
                 </div>
                 <div class="replicator-set-controls">
                     <set-settings
-                        v-if="settingsFields.length"
+                        v-if="settingsFields.length && index !== undefined"
                         :fields="settingsFields"
                         :meta="meta"
                         :values="values"
@@ -181,6 +181,10 @@ export default {
             return this.extension.options.bard.setIndexes[this.node.attrs.id];
         },
 
+        fieldPathPrefix() {
+            return this.extension.options.bard.fieldPathPrefix || this.extension.options.bard.handle;
+        },
+
         instructions() {
             return this.config.instructions ? markdown(__(this.config.instructions)) : null;
         },
@@ -284,7 +288,7 @@ export default {
         },
 
         fieldPath(field) {
-            let prefix = this.extension.options.bard.fieldPathPrefix || this.extension.options.bard.handle;
+            let prefix = this.fieldPathPrefix;
             return `${prefix}.${this.index}.attrs.values.${field.handle}`;
         },
 
