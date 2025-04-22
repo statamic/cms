@@ -81,8 +81,8 @@ return [
     'access_utility' => ':title',
     'access_utility_desc' => 'Otorga acceso a la utilidad :title',
     'group_misc' => 'Varios',
-    'resolve_duplicate_ids' => 'Resolver identificaciones duplicadas',
-    'resolve_duplicate_ids_desc' => 'Otorga la capacidad de ver y resolver identificaciones duplicadas.',
+    'resolve_duplicate_ids' => 'Resolver identificadores duplicados',
+    'resolve_duplicate_ids_desc' => 'Otorga la capacidad de ver y resolver identificadores duplicados.',
     'view_graphql' => 'Ver GraphQL',
     'view_graphql_desc' => 'Otorga la capacidad de acceder al visor GraphQL',
 ];

@@ -20,6 +20,7 @@
         :initial-site="site"
         :parent="parent"
         :can-manage-publish-state="canManagePublishState"
+        :can-edit-blueprint="canEditBlueprint"
         :create-another-url="createAnotherUrl"
         :initial-listing-url="listingUrl"
         :preview-targets="previewTargets"
@@ -44,6 +45,7 @@ export default {
         'site',
         'parent',
         'canManagePublishState',
+        'canEditBlueprint',
         'createAnotherUrl',
         'listingUrl',
         'previewTargets',

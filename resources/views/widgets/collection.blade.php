@@ -1,5 +1,6 @@
 @php
     use Statamic\Facades\Site;
+    use function Statamic\trans as __;
 @endphp
 
 <div class="card flex h-full flex-col overflow-hidden p-0">
