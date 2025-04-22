@@ -6,9 +6,8 @@ use Illuminate\Auth\Events\Failed;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
-use Laravel\Fortify\Events\TwoFactorAuthenticationChallenged;
-use Laravel\Fortify\Fortify;
 use Statamic\Auth\ThrottlesLogins;
+use Statamic\Events\TwoFactorAuthenticationChallenged;
 use Statamic\Facades\OAuth;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Middleware\CP\RedirectIfAuthorized;
@@ -150,6 +149,8 @@ class LoginController extends CpController
             'login.id' => $user->getKey(),
             'login.remember' => $request->boolean('remember'),
         ]);
+
+        TwoFactorAuthenticationChallenged::dispatch($user);
 
         return $request->wantsJson()
             ? response()->json(['two_factor' => true])

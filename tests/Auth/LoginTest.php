@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\TwoFactor\TwoFactorAuthenticationProvider;
 use Statamic\Auth\TwoFactor\RecoveryCode;
+use Statamic\Events\TwoFactorAuthenticationChallenged;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -71,6 +72,8 @@ class LoginTest extends TestCase
     #[Test]
     public function it_redirects_to_the_two_factor_challenge_page()
     {
+        Event::fake();
+
         $user = $this->userWithTwoFactorEnabled();
 
         $this
@@ -85,6 +88,8 @@ class LoginTest extends TestCase
             ->assertSessionHas('login.remember', true);
 
         $this->assertGuest();
+
+        Event::assertDispatched(TwoFactorAuthenticationChallenged::class, fn ($event) => $event->user->id === $user->id);
     }
 
     #[Test]

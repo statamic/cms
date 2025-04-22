@@ -3,11 +3,14 @@
 namespace Tests\Auth\TwoFactor;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ViewErrorBag;
 use PHPUnit\Framework\Attributes\Test;
 use PragmaRX\Google2FA\Google2FA;
 use Statamic\Auth\TwoFactor\TwoFactorAuthenticationProvider;
 use Statamic\Auth\TwoFactor\RecoveryCode;
+use Statamic\Events\TwoFactorAuthenticationDisabled;
+use Statamic\Events\TwoFactorAuthenticationEnabled;
 use Statamic\Facades\User;
 use Statamic\Http\Middleware\CP\EnforceTwoFactor;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -20,6 +23,8 @@ class TwoFactorAuthenticationControllerTest extends TestCase
     #[Test]
     public function it_enables_two_factor_authentication()
     {
+        Event::fake();
+
         $user = $this->user();
 
         $this->assertNull($user->two_factor_secret);
@@ -33,11 +38,15 @@ class TwoFactorAuthenticationControllerTest extends TestCase
 
         $this->assertNotNull($user->two_factor_secret);
         $this->assertNotNull($user->two_factor_recovery_codes);
+
+        Event::assertDispatched(TwoFactorAuthenticationEnabled::class, fn ($event) => $event->user->id === $user->id);
     }
 
     #[Test]
     public function it_cant_enable_two_factor_authentication_for_another_user()
     {
+        Event::fake();
+
         $user = $this->user();
 
         $this->assertNull($user->two_factor_secret);
@@ -50,11 +59,15 @@ class TwoFactorAuthenticationControllerTest extends TestCase
 
         $this->assertNull($user->two_factor_secret);
         $this->assertNull($user->two_factor_recovery_codes);
+
+        Event::assertNotDispatched(TwoFactorAuthenticationEnabled::class, fn ($event) => $event->user->id === $user->id);
     }
 
     #[Test]
     public function it_doesnt_regenerate_secret_when_validation_error_is_present()
     {
+        Event::fake();
+
         $user = $this->user();
         $user->set('two_factor_secret', $originalSecret = encrypt(app(TwoFactorAuthenticationProvider::class)->generateSecretKey()));
         $user->set('two_factor_recovery_codes', $originalRecoveryCodes = encrypt(['abc', 'def', 'ghi', 'jkl', 'mno', 'pqr', 'stu', 'vwx']));
@@ -71,6 +84,8 @@ class TwoFactorAuthenticationControllerTest extends TestCase
 
         $this->assertEquals($originalSecret, $user->two_factor_secret);
         $this->assertEquals($originalRecoveryCodes, $user->two_factor_recovery_codes);
+
+        Event::assertNotDispatched(TwoFactorAuthenticationEnabled::class, fn ($event) => $event->user->id === $user->id);
     }
 
     #[Test]
@@ -175,6 +190,8 @@ class TwoFactorAuthenticationControllerTest extends TestCase
     #[Test]
     public function it_disables_two_factor_authentication_for_the_current_user()
     {
+        Event::fake();
+
         $user = $this->userWithTwoFactorEnabled();
 
         $this
@@ -191,11 +208,15 @@ class TwoFactorAuthenticationControllerTest extends TestCase
         $this->assertNull($user->two_factor_completed);
         $this->assertNull($user->two_factor_recovery_codes);
         $this->assertNull($user->two_factor_secret);
+
+        Event::assertDispatched(TwoFactorAuthenticationDisabled::class, fn ($event) => $event->user->id === $user->id);
     }
 
     #[Test]
     public function it_disables_two_factor_authentication_for_the_current_user_when_two_factor_is_enforced()
     {
+        Event::fake();
+
         // Enforced for everyone
         config()->set('statamic.users.two_factor.enforced_roles', ['*']);
 
@@ -215,11 +236,15 @@ class TwoFactorAuthenticationControllerTest extends TestCase
         $this->assertNull($user->two_factor_completed);
         $this->assertNull($user->two_factor_recovery_codes);
         $this->assertNull($user->two_factor_secret);
+
+        Event::assertDispatched(TwoFactorAuthenticationDisabled::class, fn ($event) => $event->user->id === $user->id);
     }
 
     #[Test]
     public function it_disables_two_factor_authentication_for_another_user()
     {
+        Event::fake();
+
         $otherUser = $this->userWithTwoFactorEnabled();
 
         $this
@@ -236,11 +261,15 @@ class TwoFactorAuthenticationControllerTest extends TestCase
         $this->assertNull($otherUser->two_factor_completed);
         $this->assertNull($otherUser->two_factor_recovery_codes);
         $this->assertNull($otherUser->two_factor_secret);
+
+        Event::assertDispatched(TwoFactorAuthenticationDisabled::class, fn ($event) => $event->user->id === $otherUser->id);
     }
 
     #[Test]
     public function it_disables_two_factor_authentication_for_another_user_when_two_factor_is_enforced()
     {
+        Event::fake();
+
         // Enforced for everyone
         config()->set('statamic.users.two_factor.enforced_roles', ['*']);
 
@@ -260,6 +289,8 @@ class TwoFactorAuthenticationControllerTest extends TestCase
         $this->assertNull($otherUser->two_factor_completed);
         $this->assertNull($otherUser->two_factor_recovery_codes);
         $this->assertNull($otherUser->two_factor_secret);
+
+        Event::assertDispatched(TwoFactorAuthenticationDisabled::class, fn ($event) => $event->user->id === $otherUser->id);
     }
 
     private function user()
