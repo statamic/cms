@@ -1,7 +1,7 @@
 <template>
     <div class="flex">
         <div class="flex flex-1 items-center" v-if="!inline">
-            <div class="text-xs text-gray-500" v-if="showTotals && totalItems > 0">
+            <div class="text-sm text-gray-500" v-if="showTotals && totalItems > 0">
                 {{ __(':start-:end of :total', { start: fromItem, end: toItem, total: totalItems }) }}
             </div>
         </div>
@@ -38,20 +38,11 @@
             />
         </div>
 
-        <div class="flex flex-1">
-            <div class="flex-1"></div>
-
-            <select-input
-                v-if="perPage && isPerPageEvenUseful"
-                class="ms-6"
-                name="perPage"
-                :placeholder="__('Per Page')"
-                :options="perPageOptions"
-                :value="perPage"
-                @input="$emit('per-page-changed', $event)"
-            />
-
+        <div class="flex items-center flex-1 justify-end">
+            <span class="text-sm text-gray-500 me-3">{{ __('Per Page') }}</span>
             <Select
+                class="w-auto!"
+                size="sm"
                 :options="perPageOptions"
                 :model-value="perPage"
                 @update:model-value="$emit('per-page-changed', $event)"
