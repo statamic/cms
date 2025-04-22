@@ -4,7 +4,7 @@ namespace Statamic\Http\Controllers\CP\Users;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Statamic\Auth\TwoFactor\GenerateRecoveryCodes;
+use Statamic\Auth\TwoFactor\GenerateNewRecoveryCodes;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\User;
 
@@ -21,7 +21,7 @@ class TwoFactorRecoveryCodesController
         return ['recovery_codes' => $user->recoveryCodes()];
     }
 
-    public function store(Request $request, $user, GenerateRecoveryCodes $generateRecoveryCodes)
+    public function store(Request $request, $user, GenerateNewRecoveryCodes $generateRecoveryCodes)
     {
         throw_unless($user = User::find($user), new NotFoundHttpException);
 

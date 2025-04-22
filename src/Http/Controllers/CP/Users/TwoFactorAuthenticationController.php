@@ -23,10 +23,10 @@ class TwoFactorAuthenticationController extends CpController
             abort(403);
         }
 
-        // We don't want to generate a new secret key if the user just got the code wrong.
-        $force = ! session()->get('errors')?->has('code');
-
-        $enable($user, $force);
+        // We don't want to regenerate the QR code when there's an error in the session.
+        if (! session()->get('errors')?->has('code')) {
+            $enable($user);
+        }
 
         return [
             'qr' => $user->twoFactorQrCodeSvg(),

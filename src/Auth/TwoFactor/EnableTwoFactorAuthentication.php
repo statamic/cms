@@ -2,7 +2,9 @@
 
 namespace Statamic\Auth\TwoFactor;
 
+use Illuminate\Support\Collection;
 use Statamic\Auth\User;
+use Statamic\Events\TwoFactorAuthenticationEnabled;
 
 class EnableTwoFactorAuthentication
 {
@@ -10,17 +12,15 @@ class EnableTwoFactorAuthentication
     {
     }
 
-    public function __invoke(User $user, bool $force = false)
+    public function __invoke(User $user)
     {
-        $user
-            ->remove('two_factor_confirmed_at')
-            ->remove('two_factor_completed');
+        $user->merge([
+            'two_factor_secret' => encrypt($this->provider->generateSecretKey()),
+            'two_factor_recovery_codes' => encrypt(json_encode(Collection::times(8, function () {
+                return RecoveryCode::generate();
+            })->all())),
+        ])->save();
 
-        if ($force) {
-            $user->set('two_factor_secret', encrypt($this->provider->generateSecretKey()));
-            app(GenerateRecoveryCodes::class)($user);
-        }
-
-        $user->save();
+        TwoFactorAuthenticationEnabled::dispatch($user);
     }
 }

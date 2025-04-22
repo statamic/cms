@@ -4,12 +4,12 @@ namespace Tests\Auth\TwoFactor;
 
 use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\Test;
-use Statamic\Auth\TwoFactor\GenerateRecoveryCodes;
+use Statamic\Auth\TwoFactor\GenerateNewRecoveryCodes;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-class GenerateRecoveryCodesTest extends TestCase
+class GenerateNewRecoveryCodesTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
@@ -19,7 +19,7 @@ class GenerateRecoveryCodesTest extends TestCase
     {
         parent::setUp();
 
-        $this->action = app(GenerateRecoveryCodes::class);
+        $this->action = app(GenerateNewRecoveryCodes::class);
     }
 
     #[Test]

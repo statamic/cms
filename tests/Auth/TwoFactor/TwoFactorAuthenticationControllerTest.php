@@ -264,7 +264,7 @@ class TwoFactorAuthenticationControllerTest extends TestCase
 
     private function user()
     {
-        return tap(User::make()->makeSuper())->save();
+        return tap(User::make()->makeSuper()->email('david@hasselhoff.com'))->save();
     }
 
     private function userWithTwoFactorEnabled()
