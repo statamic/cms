@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Auth;
+namespace Tests\Auth\TwoFactor;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Notification;
@@ -13,7 +13,7 @@ use Statamic\Notifications\RecoveryCodeUsed;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-class TwoFactorChallengeTest extends TestCase
+class TwoFactorChallengeControllerTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
@@ -132,9 +132,9 @@ class TwoFactorChallengeTest extends TestCase
             ->session(['login.id' => $user->id()])
             ->post(cp_route('two-factor-challenge'), [
                 'code' => $this->getOneTimeCode($user),
-                'referer' => 'http://localhost/cp/cp/collections',
+                'referer' => 'http://localhost/cp/collections',
             ])
-            ->assertRedirect('http://localhost/cp/cp/collections');
+            ->assertRedirect('http://localhost/cp/collections');
 
         $this->assertAuthenticatedAs($user);
     }
@@ -147,12 +147,12 @@ class TwoFactorChallengeTest extends TestCase
         $this
             ->session([
                 'login.id' => $user->id(),
-                'url.intended' => 'http://localhost/cp/cp/collections',
+                'url.intended' => 'http://localhost/cp/collections',
             ])
             ->post(cp_route('two-factor-challenge'), [
                 'code' => $this->getOneTimeCode($user),
             ])
-            ->assertRedirect('http://localhost/cp/cp/collections');
+            ->assertRedirect('http://localhost/cp/collections');
 
         $this->assertAuthenticatedAs($user);
     }
