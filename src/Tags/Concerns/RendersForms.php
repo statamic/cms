@@ -3,9 +3,11 @@
 namespace Statamic\Tags\Concerns;
 
 use Closure;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\MessageBag;
 use Statamic\Fields\Field;
 use Statamic\Forms\RenderableField;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 trait RendersForms
@@ -165,6 +167,10 @@ trait RendersForms
 
         if ($manipulateDataCallback instanceof Closure) {
             $data = $manipulateDataCallback($data, $field);
+        }
+
+        if ($showField = Arr::get($data, 'show_field')) {
+            $data['show_field'] = new HtmlString($showField);
         }
 
         $data['field'] = new RenderableField($field, $data);

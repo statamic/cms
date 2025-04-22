@@ -52,7 +52,7 @@
 <script>
 import Validator from '../field-conditions/Validator.js';
 import PublishField from '../publish/Field.vue';
-import { sortBy } from 'lodash-es';
+import { sortBy, mapValues } from 'lodash-es';
 import debounce from '@statamic/util/debounce.js';
 
 export default {
@@ -103,20 +103,18 @@ export default {
         isFilterComplete() {
             if (!this.filter) return false;
 
-            let visibleFields = _.chain(this.filter.fields)
-                .filter(function (field) {
-                    let validator = new Validator(field, this.fieldValues);
-                    return validator.passesConditions();
-                }, this)
-                .mapObject((field) => field.handle)
-                .values()
-                .value();
+            let visibleFields = this.filter.fields.filter(function (field) {
+                let validator = new Validator(field, this.fieldValues);
+                return validator.passesConditions();
+            }, this);
+
+            visibleFields = mapValues(visibleFields, (field) => field.handle);
+            visibleFields = Object.values(visibleFields);
 
             let allFieldsFilled =
-                _.chain(this.fieldValues)
-                    .filter((value, handle) => visibleFields.includes(handle) && value)
-                    .values()
-                    .value().length === visibleFields.length;
+                Object.entries(this.fieldValues || {}).filter(
+                    ([handle, value]) => visibleFields.includes(handle) && value,
+                ).length === visibleFields.length;
 
             return this.field !== null && allFieldsFilled;
         },
