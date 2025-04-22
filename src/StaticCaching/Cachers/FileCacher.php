@@ -207,12 +207,17 @@ class FileCacher extends AbstractCacher
 
         $default = <<<EOT
 (function() {
-    var els = document.getElementsByClassName('nocache');
-    var map = {};
-    for (var i = 0; i < els.length; i++) {
-        var section = els[i].getAttribute('data-nocache');
-        map[section] = els[i];
+    function createMap() {
+        var map = {};
+        var els = document.getElementsByClassName('nocache');
+        for (var i = 0; i < els.length; i++) {
+            var section = els[i].getAttribute('data-nocache');
+            map[section] = els[i];
+        }
+        return map;
     }
+
+    var map = createMap();
 
     fetch('/!/nocache', {
         method: 'POST',
@@ -224,12 +229,7 @@ class FileCacher extends AbstractCacher
     })
     .then((response) => response.json())
     .then((data) => {
-        var els = document.getElementsByClassName('nocache');
-        var map = {};
-        for (var i = 0; i < els.length; i++) {
-            var section = els[i].getAttribute('data-nocache');
-            map[section] = els[i];
-        }
+        map = createMap(); // Recreate map in case the DOM changed.
 
         const regions = data.regions;
         for (var key in regions) {
