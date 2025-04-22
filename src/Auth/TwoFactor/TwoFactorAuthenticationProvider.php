@@ -48,7 +48,9 @@ class TwoFactorAuthenticationProvider
      * Verify the given code.
      */
     public function verify(
+        #[\SensitiveParameter]
         string $secret,
+        #[\SensitiveParameter]
         string $code
     ): bool {
         $timestamp = $this->engine->verifyKeyNewer(
