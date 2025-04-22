@@ -25,7 +25,7 @@
     }
 
     ul li ul {
-        @apply ml-1.5 pl-5.5 translate-x-px my-1.5 text-[0.8125rem] min-w-0 flex-col gap-1 border-l border-gray-300 dark:border-gray-600;
+        @apply ml-3.5 pl-3.5 translate-x-px my-1.5 text-[0.8125rem] min-w-0 flex-col gap-1 border-s border-gray-300 dark:border-gray-600;
     }
 
     ul li ul li a {
