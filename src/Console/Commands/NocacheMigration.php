@@ -37,14 +37,6 @@ class NocacheMigration extends Command
 
         $this->components->info("Migration [$file] created successfully.");
 
-        // Inform the user about the connection being used
-        $connection = config('statamic.static_caching.nocache_db_connection');
-        if ($connection) {
-            $this->components->info("The migration will use the '{$connection}' database connection.");
-        } else {
-            $this->components->info('The migration will use the default database connection.');
-        }
-
         $this->composer->dumpAutoloads();
     }
 }
