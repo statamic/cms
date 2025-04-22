@@ -1,12 +1,6 @@
 <template>
     <div>
-        <button
-            @click="open = true"
-            v-tooltip="__('Customize Columns')"
-            class="btn flex h-8 w-8 items-center justify-center px-1 py-1"
-        >
-            <svg-icon name="light/settings-horizontal" class="h-4 w-4" />
-        </button>
+        <ui-button icon="utilities" :text="__('Customize')" @click="open = true" />
 
         <modal
             v-if="open"

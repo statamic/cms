@@ -1,110 +1,112 @@
 <template>
-    <div class="bg-gray-300 shadow-inner dark:bg-dark-600">
-        <div class="flex flex-wrap items-center border-b px-3 pt-2 dark:border-dark-900">
-            <!-- Field filter (requires custom selection UI) -->
-            <popover v-if="fieldFilter" placement="bottom-start" @closed="fieldFilterClosed">
-                <template #trigger>
-                    <button
-                        class="filter-badge filter-badge-control mb-2 ltr:mr-2 rtl:ml-2"
-                        @click="resetFilterPopover"
-                    >
-                        {{ fieldFilter.title }}
-                        <svg-icon name="micro/chevron-down-xs" class="mx-2 h-2 w-2" />
-                    </button>
-                </template>
-                <template #default="{ close: closePopover }">
-                    <div class="flex min-w-[18rem] flex-col ltr:text-left rtl:text-right">
-                        <div class="filter-fields text-sm">
-                            <field-filter
-                                ref="fieldFilter"
-                                :config="fieldFilter"
-                                :values="activeFilters.fields || {}"
-                                :badges="fieldFilterBadges"
-                                @changed="$emit('changed', { handle: 'fields', values: $event })"
-                                @cleared="creating = false"
-                                @closed="closePopover"
-                            />
-                        </div>
+    <div class="flex flex-wrap gap-3 items-center">
+        <!-- Field filter (requires custom selection UI) -->
+        <popover v-if="fieldFilter" placement="bottom-start" @closed="fieldFilterClosed">
+            <template #trigger>
+                <ui-button
+                    icon-append="ui/chevron-down"
+                    @click="resetFilterPopover"
+                    :text="fieldFilter.title"
+                />
+            </template>
+            <template #default="{ close: closePopover }">
+                <div class="flex min-w-[18rem] flex-col text-end">
+                    <div class="filter-fields">
+                        <field-filter
+                            ref="fieldFilter"
+                            :config="fieldFilter"
+                            :values="activeFilters.fields || {}"
+                            :badges="fieldFilterBadges"
+                            @changed="$emit('changed', { handle: 'fields', values: $event })"
+                            @cleared="creating = false"
+                            @closed="closePopover"
+                        />
                     </div>
-                </template>
-            </popover>
+                </div>
+            </template>
+        </popover>
 
-            <!-- Standard pinned filters -->
-            <popover
-                v-if="pinnedFilters.length"
-                v-for="filter in pinnedFilters"
-                :key="filter.handle"
-                placement="bottom-start"
-                :stop-propagation="false"
-            >
-                <template #trigger>
-                    <button class="filter-badge filter-badge-control mb-2 ltr:mr-2 rtl:ml-2">
-                        {{ filter.title }}
-                        <svg-icon name="micro/chevron-down-xs" class="mx-2 h-2 w-2" />
-                    </button>
-                </template>
-                <template #default="{ close: closePopover }">
-                    <div class="filter-fields w-64">
+        <!-- Standard pinned filters -->
+        <popover
+            v-if="pinnedFilters.length"
+            v-for="filter in pinnedFilters"
+            :key="filter.handle"
+            placement="bottom-start"
+            :stop-propagation="false"
+        >
+            <template #trigger>
+                <ui-button
+                    icon-append="ui/chevron-down"
+                    @click="resetFilterPopover"
+                    :text="filter.title"
+                />
+            </template>
+            <template #default="{ close: closePopover }">
+                <div class="w-64">
+                    <data-list-filter
+                        :key="filter.handle"
+                        :filter="filter"
+                        :values="activeFilters[filter.handle]"
+                        @changed="$emit('changed', { handle: filter.handle, values: $event })"
+                        @closed="closePopover"
+                    />
+                </div>
+            </template>
+        </popover>
+
+        <!-- Standard unpinned filters -->
+        <popover v-if="unpinnedFilters.length" placement="bottom-start" :stop-propagation="false">
+            <template #trigger>
+                <ui-button
+                    icon-append="ui/chevron-down"
+                    icon-as-button
+                    @click="resetFilterPopover"
+                    :text="__('Filter')"
+                />
+            </template>
+            <template #default="{ close: closePopover }">
+                <div class="w-64">
+                    <h6 v-text="creatingFilterHeader" class="p-3 pb-0" />
+                    <div v-if="showUnpinnedFilterSelection" class="p-3 pt-1">
+                        <button
+                            v-for="filter in unpinnedFilters"
+                            :key="filter.handle"
+                            v-text="filter.title"
+                            class="btn mt-1 w-full"
+                            @click="creating = filter.handle"
+                        />
+                    </div>
+                    <div v-else>
                         <data-list-filter
+                            v-for="filter in unpinnedFilters"
+                            v-if="creating === filter.handle"
                             :key="filter.handle"
                             :filter="filter"
                             :values="activeFilters[filter.handle]"
                             @changed="$emit('changed', { handle: filter.handle, values: $event })"
+                            @cleared="creating = false"
                             @closed="closePopover"
                         />
                     </div>
-                </template>
-            </popover>
+                </div>
+            </template>
+        </popover>
 
-            <!-- Standard unpinned filters -->
-            <popover v-if="unpinnedFilters.length" placement="bottom-start" :stop-propagation="false">
-                <template #trigger>
-                    <button
-                        class="filter-badge filter-badge-control mb-2 ltr:mr-2 rtl:ml-2"
-                        @click="resetFilterPopover"
-                    >
-                        {{ __('Filter') }}
-                        <svg-icon name="micro/chevron-down-xs" class="mx-2 h-2 w-2" />
-                    </button>
-                </template>
-                <template #default="{ close: closePopover }">
-                    <div class="filter-fields w-64">
-                        <h6 v-text="creatingFilterHeader" class="p-3 pb-0" />
-                        <div v-if="showUnpinnedFilterSelection" class="p-3 pt-1">
-                            <button
-                                v-for="filter in unpinnedFilters"
-                                :key="filter.handle"
-                                v-text="filter.title"
-                                class="btn mt-1 w-full"
-                                @click="creating = filter.handle"
-                            />
-                        </div>
-                        <div v-else>
-                            <data-list-filter
-                                v-for="filter in unpinnedFilters"
-                                v-if="creating === filter.handle"
-                                :key="filter.handle"
-                                :filter="filter"
-                                :values="activeFilters[filter.handle]"
-                                @changed="$emit('changed', { handle: filter.handle, values: $event })"
-                                @cleared="creating = false"
-                                @closed="closePopover"
-                            />
-                        </div>
-                    </div>
-                </template>
-            </popover>
-
-            <!-- Active filter badges -->
-            <div class="filter-badge mb-2 ltr:mr-2 rtl:ml-2" v-for="(badge, handle) in fieldFilterBadges">
-                <span>{{ badge }}</span>
-                <button @click="removeFieldFilter(handle)" v-tooltip="__('Remove Filter')">&times;</button>
-            </div>
-            <div class="filter-badge mb-2 ltr:mr-2 rtl:ml-2" v-for="(badge, handle) in standardBadges">
-                <span>{{ badge }}</span>
-                <button @click="removeStandardFilter(handle)" v-tooltip="__('Remove Filter')">&times;</button>
-            </div>
-        </div>
+        <!-- Active filter badges -->
+        <ui-button
+            v-for="(badge, handle) in fieldFilterBadges"
+            variant="filled"
+            icon-append="x"
+            :text="badge"
+            @click="removeFieldFilter(handle)"
+        />
+        <ui-button
+            v-for="(badge, handle) in standardBadges"
+            variant="filled"
+            icon-append="x"
+            :text="badge"
+            @click="removeStandardFilter(handle)"
+        />
     </div>
 </template>
 

@@ -1,7 +1,7 @@
 <template>
     <div class="flex">
         <div class="flex flex-1 items-center" v-if="!inline">
-            <div class="text-xs text-gray-700" v-if="showTotals && totalItems > 0">
+            <div class="text-xs text-gray-500" v-if="showTotals && totalItems > 0">
                 {{ __(':start-:end of :total', { start: fromItem, end: toItem, total: totalItems }) }}
             </div>
         </div>
@@ -18,7 +18,7 @@
                 :key="i"
                 @click="selectPage(page)"
                 :disabled="page === 'separator' || page === currentPage"
-                :text="page === 'separator' ? '...' : page"
+                :text="page === 'separator' ? '...' : String(page)"
             />
 
             <ui-button size="sm" :variant="hasNext && !showPageLinks ? 'filled' : 'ghost'" round icon="ui/chevron-right" :disabled="!hasNext" @click="selectNextPage" />

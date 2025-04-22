@@ -1,14 +1,11 @@
 <template>
-    <div v-if="showAlways || hasSelections" class="data-list-bulk-actions">
-        <div class="input-group input-group-sm relative">
-            <div class="input-group-prepend">
-                <div
-                    class="hidden text-gray-700 dark:text-dark-175 md:inline-block"
-                    v-text="__n(`:count item selected|:count items selected`, selections.length)"
-                />
-                <div class="text-gray-700 dark:text-dark-175 md:hidden" v-text="selections.length" />
-            </div>
-
+    <div v-if="showAlways || hasSelections" class="fixed inset-x-0 bottom-1 w-full flex justify-center z-100">
+        <ui-button-group>
+            <ui-button
+                variant="primary"
+                class="text-gray-400!"
+                :text="__n(`:count item selected|:count items selected`, selections.length)"
+            />
             <data-list-action
                 v-if="hasSelections"
                 v-for="(action, index) in sortedActions"
@@ -19,17 +16,13 @@
                 @selected="run"
                 v-slot="{ action, select }"
             >
-                <button
-                    class="input-group-item"
-                    :class="{
-                        'text-red-500': action.dangerous,
-                        'ltr:rounded-r rtl:rounded-l': index + 1 === sortedActions.length,
-                    }"
+                <ui-button
+                    variant="primary"
                     @click="select"
-                    v-text="__(action.title)"
+                    :text="__(action.title)"
                 />
             </data-list-action>
-        </div>
+        </ui-button-group>
     </div>
 </template>
 

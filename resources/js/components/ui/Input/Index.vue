@@ -21,6 +21,7 @@ const props = defineProps({
     size: { type: String, default: 'base' },
     type: { type: String, default: 'text' },
     viewable: { type: Boolean, default: false },
+    placeholder: { type: String, default: null },
     prepend: { type: String, default: null },
     append: { type: String, default: null },
 });
@@ -33,7 +34,7 @@ const inputClasses = computed(() => {
         base: [
             'w-full block bg-white dark:bg-gray-900',
             'border border-gray-300 dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:inset-shadow-2xs dark:inset-shadow-black',
-            'text-gray-600 dark:text-gray-300',
+            'text-gray-600 dark:text-gray-300 placeholder:text-gray-400 dark:placeholder:text-gray-600',
             'appearance-none antialiased shadow-ui-sm disabled:shadow-none not-prose',
         ],
         variants: {
@@ -47,7 +48,7 @@ const inputClasses = computed(() => {
             },
         },
         compoundVariants: [
-            { hasPrependedIcon: true, size: 'base', class: 'ps-10' },
+            { hasPrependedIcon: true, size: 'base', class: 'ps-9' },
             { hasPrependedIcon: true, size: 'sm', class: 'ps-8' },
             { hasPrependedIcon: true, size: 'xs', class: 'ps-6' },
             { hasAppendedIcon: true, size: 'base', class: 'pe-10' },
@@ -119,6 +120,7 @@ const copy = () => {
                 :id
                 :type="inputType"
                 :value="modelValue"
+                :placeholder="placeholder"
                 data-ui-control
                 data-ui-group-target
                 v-bind="$attrs"

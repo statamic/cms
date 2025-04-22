@@ -165,6 +165,7 @@ return [
     'licensing_utility_description' => 'View and resolve licensing details.',
     'max_depth_instructions' => 'Set a maximum number of levels page may be nested. Leave blank for no limit.',
     'max_items_instructions' => 'Set a maximum number of selectable items.',
+    'plus_count_more' => '+ :count more',
     'navigation_configure_blueprint_instructions' => 'Choose from existing Blueprints or create a new one.',
     'navigation_configure_collections_instructions' => 'Enable linking to entries in these collections.',
     'navigation_configure_handle_instructions' => 'Used to reference this navigation on the frontend. It\'s non-trivial to change later.',

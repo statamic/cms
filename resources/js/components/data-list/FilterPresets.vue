@@ -1,41 +1,37 @@
 <template>
-    <div class="pt-2 ltr:pr-2 rtl:pl-2">
-        <div class="flex flex-wrap items-center">
-            <button
-                class="pill-tab ltr:mr-1 rtl:ml-1"
-                :class="{ active: !activePreset }"
+    <div>
+        <div class="relative flex shrink-0 space-x-2 border-b border-gray-200 text-sm text-gray-400 dark:border-gray-700 dark:text-gray-500">
+            <FilterTrigger
+                :active="!activePreset"
                 @click="viewAll"
-                v-text="__('All')"
+                :text="__('All')"
             />
-
             <template v-for="(preset, handle) in presets">
-                <button class="pill-tab active ltr:mr-1 rtl:ml-1" v-if="handle === activePreset">
+                <FilterTrigger v-if="handle === activePreset" :active="true">
                     {{ preset.display }}
-                    <dropdown-list class="ltr:ml-2 rtl:mr-2" placement="bottom-start">
-                        <template v-slot:trigger>
-                            <button class="opacity-50 hover:opacity-100">
-                                <svg-icon name="micro/chevron-down-xs" class="h-2 w-2" />
-                            </button>
+                    <ui-dropdown class="w-48!">
+                        <template #trigger>
+                            <ui-button class="absolute top-1.5 -right-3" variant="ghost" size="xs" @click="viewPreset(handle)" icon="ui/chevron-down" />
                         </template>
-                        <dropdown-item :text="__('Duplicate')" @click="createPreset" />
-                        <dropdown-item v-if="canRenamePreset(handle)" :text="__('Rename')" @click="renamePreset" />
-                        <div class="divider" />
-                        <dropdown-item
-                            v-if="canDeletePreset(handle)"
-                            :text="__('Delete')"
-                            class="warning"
-                            @click="showDeleteModal = true"
-                        />
-                    </dropdown-list>
-                </button>
-                <button class="pill-tab ltr:mr-1 rtl:ml-1" v-else @click="viewPreset(handle)">
+                        <ui-dropdown-menu>
+                            <ui-dropdown-item :text="__('Duplicate')" icon="duplicate" @click="createPreset" />
+                            <ui-dropdown-item v-if="canRenamePreset(handle)" :text="__('Rename')" icon="rename" @click="renamePreset" />
+                            <ui-dropdown-separator />
+                            <ui-dropdown-item
+                                v-if="canDeletePreset(handle)"
+                                :text="__('Delete')"
+                                icon="delete"
+                                variant="warning"
+                                @click="showDeleteModal = true"
+                            />
+                        </ui-dropdown-menu>
+                    </ui-dropdown>
+                </FilterTrigger>
+                <FilterTrigger v-else @click="viewPreset(handle)">
                     {{ preset.display }}
-                </button>
+                </FilterTrigger>
             </template>
-
-            <button class="pill-tab" @click="createPreset" v-tooltip="__('Create New View')">
-                <svg-icon name="add" class="h-3 w-3" />
-            </button>
+            <ui-button @click="createPreset" variant="ghost" size="sm" :text="__('New View')" icon="add-bookmark" class="[&_svg]:size-4 relative top-0.5" />
         </div>
 
         <confirmation-modal
@@ -91,7 +87,13 @@
 </template>
 
 <script>
+import FilterTrigger from './FilterTrigger.vue';
+
 export default {
+    components: {
+        FilterTrigger,
+    },
+
     props: {
         activeFilters: Object,
         activePreset: String,

@@ -1,10 +1,13 @@
 <script setup>
+import { useAttrs } from 'vue';
 import { cva } from 'cva';
 import { DropdownMenuContent, DropdownMenuPortal, DropdownMenuRoot, DropdownMenuTrigger } from 'reka-ui';
 
 defineOptions({
     inheritAttrs: false,
 });
+
+const attrs = useAttrs();
 
 const props = defineProps({
     align: { type: String, default: 'start' },
@@ -23,7 +26,9 @@ const dropdownContentClasses = cva({
 <template>
     <DropdownMenuRoot>
         <DropdownMenuTrigger data-ui-dropdown-trigger>
-            <slot name="trigger" />
+            <slot name="trigger">
+                <ui-button icon="ui/dots" variant="ghost" size="sm" v-bind="attrs" />
+            </slot>
         </DropdownMenuTrigger>
         <DropdownMenuPortal>
             <DropdownMenuContent

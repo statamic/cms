@@ -6,18 +6,18 @@ label {
     @apply block text-sm font-normal leading-normal text-gray-800 dark:text-dark-150;
 }
 
-input {
+/* input {
     @apply placeholder:text-gray-600 dark:placeholder:text-dark-175;
-}
+} */
 
-input[type='checkbox'],
+/* input[type='checkbox'],
 input[type='radio'] {
     @apply text-lg;
-}
+} */
 
-select {
+/* select {
     @apply cursor-pointer border-2 border-gray-300 bg-gray-300 text-base;
-}
+} */
 
 /* Text Fields
   ========================================================================== */

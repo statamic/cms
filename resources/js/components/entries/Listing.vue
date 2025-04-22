@@ -15,11 +15,8 @@
             @visible-columns-updated="visibleColumns = $event"
         >
             <div>
-                <div class="card relative overflow-hidden p-0">
-                    <div
-                        v-if="!reordering"
-                        class="flex flex-wrap items-center justify-between border-b px-2 pb-2 text-sm dark:border-dark-900"
-                    >
+                <div class="">
+                    <div v-if="!reordering" class="space-y-6">
                         <data-list-filter-presets
                             ref="presets"
                             :active-preset="activePreset"
@@ -32,46 +29,44 @@
                             @reset="filtersReset"
                         />
 
-                        <data-list-search
-                            class="mt-2 h-8 w-full min-w-[240px]"
-                            ref="search"
-                            v-model="searchQuery"
-                            :placeholder="searchPlaceholder"
-                        />
-
-                        <div class="mt-2 flex space-x-2 rtl:space-x-reverse">
-                            <button
-                                class="btn btn-sm ltr:ml-2 rtl:mr-2"
+                        <div class="flex gap-2">
+                            <ui-button
+                                size="sm"
                                 v-text="__('Reset')"
                                 v-show="isDirty"
                                 @click="$refs.presets.refreshPreset()"
                             />
-                            <button
-                                class="btn btn-sm ltr:ml-2 rtl:mr-2"
+                            <ui-button
+                                size="sm"
                                 v-text="__('Save')"
                                 v-show="isDirty"
                                 @click="$refs.presets.savePreset()"
                             />
-                            <data-list-column-picker :preferences-key="preferencesKey('columns')" />
                         </div>
                     </div>
-                    <div v-show="!reordering">
-                        <data-list-filters
-                            ref="filters"
-                            :filters="filters"
-                            :active-preset="activePreset"
-                            :active-preset-payload="activePresetPayload"
-                            :active-filters="activeFilters"
-                            :active-filter-badges="activeFilterBadges"
-                            :active-count="activeFilterCount"
-                            :search-query="searchQuery"
-                            :is-searching="true"
-                            :saves-presets="true"
-                            :preferences-prefix="preferencesPrefix"
-                            @changed="filterChanged"
-                            @saved="$refs.presets.setPreset($event)"
-                            @deleted="$refs.presets.refreshPresets()"
-                        />
+
+                    <!-- Search and Filter -->
+                    <div class="flex items-center gap-3 mb-6">
+                        <data-list-search ref="search" v-model="searchQuery" :placeholder="searchPlaceholder" />
+                            <data-list-filters
+                                v-show="!reordering"
+                                ref="filters"
+                                :filters="filters"
+                                :active-preset="activePreset"
+                                :active-preset-payload="activePresetPayload"
+                                :active-filters="activeFilters"
+                                :active-filter-badges="activeFilterBadges"
+                                :active-count="activeFilterCount"
+                                :search-query="searchQuery"
+                                :is-searching="true"
+                                :saves-presets="true"
+                                :preferences-prefix="preferencesPrefix"
+                                @changed="filterChanged"
+                                @saved="$refs.presets.setPreset($event)"
+                                @deleted="$refs.presets.refreshPresets()"
+                            />
+                            <div class="flex-1" />
+                            <data-list-column-picker :preferences-key="preferencesKey('columns')" />
                     </div>
 
                     <div v-show="items.length === 0" class="p-6 text-center text-gray-500" v-text="__('No results')" />
@@ -82,7 +77,7 @@
                         @started="actionStarted"
                         @completed="actionCompleted"
                     />
-                    <div class="overflow-x-auto overflow-y-hidden">
+                    <ui-panel class="relative overflow-x-auto overscroll-x-contain">
                         <data-list-table
                             v-show="items.length"
                             :allow-bulk-actions="!reordering"
@@ -95,57 +90,42 @@
                         >
                             <template #cell-title="{ row: entry }">
                                 <a
-                                    class="title-index-field inline-flex items-center"
+                                    class="title-index-field"
                                     :href="entry.edit_url"
                                     @click.stop
                                 >
-                                    <span
-                                        class="little-dot ltr:mr-2 rtl:ml-2"
-                                        v-tooltip="getStatusLabel(entry)"
-                                        :class="getStatusClass(entry)"
-                                        v-if="!columnShowing('status')"
-                                    />
+                                    <ui-status-indicator v-if="!columnShowing('status')" :status="entry.status" />
                                     <span v-text="entry.title" />
                                 </a>
                             </template>
                             <template #cell-status="{ row: entry }">
-                                <div
-                                    class="status-index-field select-none"
-                                    v-tooltip="getStatusTooltip(entry)"
-                                    :class="`status-${entry.status}`"
-                                    v-text="getStatusLabel(entry)"
-                                />
+                                <ui-status-indicator :status="entry.status" show-label :show-dot="false" />
                             </template>
                             <template #cell-slug="{ row: entry }">
                                 <div class="slug-index-field" :title="entry.slug">{{ entry.slug }}</div>
                             </template>
                             <template #actions="{ row: entry, index }">
-                                <dropdown-list placement="left-start">
-                                    <dropdown-item
-                                        :text="__('View')"
-                                        :external-link="entry.permalink"
-                                        v-if="entry.viewable && entry.permalink"
-                                    />
-                                    <dropdown-item
-                                        :text="__('Edit')"
-                                        :redirect="entry.edit_url"
-                                        v-if="entry.editable"
-                                    />
-                                    <div class="divider" v-if="entry.actions.length" />
-                                    <data-list-inline-actions
-                                        :item="entry.id"
-                                        :url="actionUrl"
-                                        :actions="entry.actions"
-                                        @started="actionStarted"
-                                        @completed="actionCompleted"
-                                    />
-                                </dropdown-list>
+                                <ui-dropdown placement="left-start" class="me-3">
+                                    <ui-dropdown-menu>
+                                        <ui-dropdown-label :text="__('Actions')" />
+                                        <ui-dropdown-item :text="__('Visit URL')" :href="entry.permalink" icon="eye" v-if="entry.viewable && entry.permalink" />
+                                        <ui-dropdown-item :text="__('Edit')" :href="entry.edit_url" icon="edit" v-if="entry.editable" />
+                                        <ui-dropdown-separator v-if="entry.actions.length" />
+                                        <data-list-list-actions
+                                            :item="entry.id"
+                                            :url="actionUrl"
+                                            :actions="entry.actions"
+                                            @started="actionStarted"
+                                            @completed="actionCompleted"
+                                        />
+                                    </ui-dropdown-menu>
+                                </ui-dropdown>
                             </template>
                         </data-list-table>
-                    </div>
+                    </ui-panel>
                 </div>
                 <data-list-pagination
-                    class="mt-6"
+                    class="mt-3"
                     :resource-meta="meta"
                     :per-page="perPage"
                     :show-totals="true"
@@ -212,41 +192,6 @@ export default {
     },
 
     methods: {
-        getStatusClass(entry) {
-            // TODO: Replace with `entry.status` (will need to pass down)
-            if (entry.published && entry.private) {
-                return 'bg-transparent border border-gray-600';
-            } else if (entry.published) {
-                return 'bg-green-600';
-            } else {
-                return 'bg-gray-400 dark:bg-dark-200';
-            }
-        },
-
-        getStatusLabel(entry) {
-            if (entry.status === 'published') {
-                return __('Published');
-            } else if (entry.status === 'scheduled') {
-                return __('Scheduled');
-            } else if (entry.status === 'expired') {
-                return __('Expired');
-            } else if (entry.status === 'draft') {
-                return __('Draft');
-            }
-        },
-
-        getStatusTooltip(entry) {
-            if (entry.status === 'published') {
-                return entry.collection.dated ? __('messages.status_published_with_date', { date: entry.date }) : null; // The label is sufficient.
-            } else if (entry.status === 'scheduled') {
-                return __('messages.status_scheduled_with_date', { date: entry.date });
-            } else if (entry.status === 'expired') {
-                return __('messages.status_expired_with_date', { date: entry.date });
-            } else if (entry.status === 'draft') {
-                return null; // The label is sufficient.
-            }
-        },
-
         reorder() {
             this.previousFilters = this.activeFilters;
             this.filtersReset();

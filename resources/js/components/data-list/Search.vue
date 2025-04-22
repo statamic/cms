@@ -1,14 +1,15 @@
 <template>
-    <input
-        type="text"
-        ref="input"
-        :placeholder="__(placeholder)"
-        :value="value"
-        @input="emitEvent"
-        @keyup.esc="reset"
-        autofocus
-        class="input-text flex-1 bg-white text-sm outline-0 focus:border-blue-300 dark:bg-dark-600 dark:focus:border-dark-blue-125"
-    />
+    <div class="min-w-64 lg:w-1/3">
+        <ui-input
+            autofocus
+            ref="input"
+            icon="magnifying-glass"
+            :placeholder="__(placeholder)"
+            :value="value"
+            @input="emitEvent"
+            @keyup.esc="reset"
+        />
+    </div>
 </template>
 
 <script>
@@ -20,7 +21,7 @@ export default {
     props: {
         placeholder: {
             type: String,
-            default: 'Search...',
+            default: 'Filter...',
         },
         value: {
             type: String,

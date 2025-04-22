@@ -1,5 +1,5 @@
 <template>
-    <span>
+    <component :is="component">
         <slot :action="action" :select="select" />
 
         <confirmation-modal
@@ -44,7 +44,7 @@
                 <publish-fields :fields="action.fields" @updated="setFieldValue" @meta-updated="setFieldMeta" />
             </publish-container>
         </confirmation-modal>
-    </span>
+    </component>
 </template>
 
 <script>
@@ -56,21 +56,11 @@ export default {
     },
 
     props: {
-        action: {
-            type: Object,
-            required: true,
-        },
-        selections: {
-            type: Number,
-            required: true,
-        },
-        errors: {
-            type: Object,
-        },
-        isDirty: {
-            type: Boolean,
-            default: false,
-        },
+        action: { type: Object, required: true },
+        component: { type: String, required: false, default: 'span' },
+        selections: { type: Number, required: true },
+        errors: { type: Object },
+        isDirty: { type: Boolean, default: false },
     },
 
     data() {

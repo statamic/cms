@@ -49,10 +49,10 @@ export default {
 
         searchPlaceholder() {
             if (this.activePreset) {
-                return `${__('Searching in:')} ${this.activePresetPayload.display}`;
+                return `${__('Filtering:')} ${this.activePresetPayload.display}`;
             }
 
-            return __('Search');
+            return __('Filter');
         },
     },
 
