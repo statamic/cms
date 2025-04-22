@@ -173,6 +173,8 @@ class Cascade
 
     private function contextualVariables()
     {
+        $guard = config('statamic.users.guards.web', 'web');
+
         return [
             // Constants
             'environment' => app()->environment(),
@@ -183,7 +185,7 @@ class Cascade
             'response_code' => 200,
 
             // Auth
-            'logged_in' => $loggedIn = auth()->check(),
+            'logged_in' => $loggedIn = auth()->guard($guard)->check(),
             'logged_out' => ! $loggedIn,
             'current_user' => User::current(),
 
