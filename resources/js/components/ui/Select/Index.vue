@@ -12,12 +12,12 @@ import {
 } from 'reka-ui';
 import { useAttrs } from 'vue';
 
-defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue']);
 
 const props = defineProps({
     description: { type: String, default: null },
     label: { type: String, default: null },
-    modelValue: { type: Object | String, default: null },
+    modelValue: { type: [Object, String], default: null },
     size: { type: String, default: 'base' },
     placeholder: { type: String, default: 'Select...' },
     options: { type: Array, default: null },
@@ -59,7 +59,7 @@ const itemClasses = cva({
 
 <template>
     <ui-with-field :label :description>
-        <SelectRoot v-bind="attrs">
+        <SelectRoot v-bind="attrs" :model-value="modelValue" @update:model-value="emit('update:model-value', $event)">
             <SelectTrigger :class="[triggerClasses, $attrs.class]" data-ui-select-trigger>
                 <SelectValue :placeholder="placeholder" class="select-none" />
                 <ui-icon name="ui/chevron-down" class="me-2" />

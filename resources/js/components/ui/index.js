@@ -6,5 +6,6 @@ import { default as DateRangePicker } from './DateRangePicker/Index.vue';
 import { default as TimePicker } from './TimePicker/Index.vue';
 import { default as Button } from './Button/Index.vue';
 import { default as Widget } from './Widget.vue';
+import { default as Select } from './Select/Index.vue';
 
-export { WithField, Calendar, Card, DatePicker, DateRangePicker, TimePicker, Button, Widget };
+export { WithField, Calendar, Card, DatePicker, DateRangePicker, TimePicker, Button, Widget, Select };

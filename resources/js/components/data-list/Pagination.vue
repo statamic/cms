@@ -7,7 +7,14 @@
         </div>
 
         <div v-if="hasMultiplePages" class="flex items-center gap-1" :class="{ 'pagination-inline': inline }">
-            <ui-button size="sm" :variant="hasPrevious && !showPageLinks ? 'filled' : 'ghost'" round icon="ui/chevron-left" :disabled="!hasPrevious" @click="selectPreviousPage" />
+            <ui-button
+                size="sm"
+                :variant="hasPrevious && !showPageLinks ? 'filled' : 'ghost'"
+                round
+                icon="ui/chevron-left"
+                :disabled="!hasPrevious"
+                @click="selectPreviousPage"
+            />
 
             <ui-button
                 v-if="showPageLinks"
@@ -21,7 +28,14 @@
                 :text="page === 'separator' ? '...' : String(page)"
             />
 
-            <ui-button size="sm" :variant="hasNext && !showPageLinks ? 'filled' : 'ghost'" round icon="ui/chevron-right" :disabled="!hasNext" @click="selectNextPage" />
+            <ui-button
+                size="sm"
+                :variant="hasNext && !showPageLinks ? 'filled' : 'ghost'"
+                round
+                icon="ui/chevron-right"
+                :disabled="!hasNext"
+                @click="selectNextPage"
+            />
         </div>
 
         <div class="flex flex-1">
@@ -36,6 +50,12 @@
                 :value="perPage"
                 @input="$emit('per-page-changed', $event)"
             />
+
+            <Select
+                :options="perPageOptions"
+                :model-value="perPage"
+                @update:model-value="$emit('per-page-changed', $event)"
+            />
         </div>
     </div>
 </template>
@@ -43,11 +63,16 @@
 <script>
 import HasInputOptions from '../fieldtypes/HasInputOptions.js';
 import { flatten, sortBy, range } from 'lodash-es';
+import { Select } from '@statamic/ui';
 
 const onEachSide = 3;
 
 export default {
     mixins: [HasInputOptions],
+
+    components: {
+        Select,
+    },
 
     props: {
         inline: { type: Boolean, default: false },
