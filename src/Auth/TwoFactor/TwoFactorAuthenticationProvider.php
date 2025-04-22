@@ -30,37 +30,27 @@ class TwoFactorAuthenticationProvider
 
     /**
      * Generate a new secret key.
-     *
-     * @param  int  $secretLength
-     * @return string
      */
-    public function generateSecretKey(int $secretLength = 16)
+    public function generateSecretKey(int $secretLength = 16): string
     {
         return $this->engine->generateSecretKey($secretLength);
     }
 
     /**
      * Get the two factor authentication QR code URL.
-     *
-     * @param  string  $companyName
-     * @param  string  $companyEmail
-     * @param  string  $secret
-     * @return string
      */
-    public function qrCodeUrl($companyName, $companyEmail, $secret)
+    public function qrCodeUrl(string $companyName, string $companyEmail, string $secret): string
     {
         return $this->engine->getQRCodeUrl($companyName, $companyEmail, $secret);
     }
 
     /**
      * Verify the given code.
-     *
-     * @param  string  $secret
-     * @param  string  $code
-     * @return bool
      */
-    public function verify($secret, $code)
-    {
+    public function verify(
+        string $secret,
+        string $code
+    ): bool {
         $timestamp = $this->engine->verifyKeyNewer(
             $secret, $code, optional($this->cache)->get($key = 'statamic.2fa_codes.'.md5($code))
         );
