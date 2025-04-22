@@ -80,7 +80,7 @@ export default {
     components: { TwoFactorRecoveryCodesModal, LoadingGraphic },
 
     props: {
-        setupUrl: String,
+        enableUrl: String,
         recoveryCodeUrls: Object,
     },
 
@@ -106,7 +106,7 @@ export default {
         getSetupCode() {
             this.loading = true;
 
-            this.$axios.get(this.setupUrl).then((response) => {
+            this.$axios.get(this.enableUrl).then((response) => {
                 this.qrCode = response.data.qr;
                 this.secretKey = response.data.secret_key;
                 this.confirmUrl = response.data.confirm_url;

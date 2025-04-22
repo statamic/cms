@@ -10,13 +10,13 @@ class EnableTwoFactorAuthentication
     {
     }
 
-    public function __invoke(User $user, bool $resetSecret)
+    public function __invoke(User $user, bool $force = false)
     {
         $user
             ->remove('two_factor_confirmed_at')
             ->remove('two_factor_completed');
 
-        if ($resetSecret) {
+        if ($force) {
             $user->set('two_factor_secret', encrypt($this->provider->generateSecretKey()));
             app(GenerateRecoveryCodes::class)($user);
         }

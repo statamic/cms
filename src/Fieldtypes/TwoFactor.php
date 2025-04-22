@@ -25,7 +25,7 @@ class TwoFactor extends Fieldtype
             'is_enforced' => $user->isTwoFactorAuthenticationRequired(),
             'is_setup' => $user->hasEnabledTwoFactorAuthentication(),
             'routes' => [
-                'setup' => cp_route('two-factor.setup'),
+                'enable' => cp_route('users.two-factor.enable', $user->id),
                 'disable' => cp_route('users.two-factor.disable', $user->id),
                 'recovery_codes' => [
                     'show' => cp_route('users.two-factor.recovery-codes.show', $user->id),

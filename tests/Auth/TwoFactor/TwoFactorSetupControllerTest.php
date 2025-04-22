@@ -20,7 +20,7 @@ class TwoFactorSetupControllerTest extends TestCase
     {
         $this
             ->actingAs($this->user())
-            ->get(cp_route('two-factor.setup'))
+            ->get(cp_route('two-factor-setup'))
             ->assertViewIs('statamic::auth.two-factor.setup');
     }
 
@@ -29,38 +29,19 @@ class TwoFactorSetupControllerTest extends TestCase
     {
         $this
             ->actingAs($this->userWithTwoFactorEnabled())
-            ->get(cp_route('two-factor.setup'))
+            ->get(cp_route('two-factor-setup'))
             ->assertRedirect(cp_route('index'));
     }
 
     #[Test]
-    public function it_shows_the_recovery_codes()
-    {
-        $user = $this->user();
-
-        $user->set('two_factor_secret', encrypt(app(TwoFactorAuthenticationProvider::class)->generateSecretKey()));
-        $user->set('two_factor_recovery_codes', encrypt(json_encode(Collection::times(8, function () {
-            return RecoveryCode::generate();
-        })->all())));
-
-        $this
-            ->actingAs($user)
-            ->post(cp_route('two-factor.confirm'), [
-                'code' => $this->getOneTimeCode($user),
-            ])
-            ->assertViewIs('statamic::auth.two-factor.recovery-codes')
-            ->assertViewHas('recovery_codes');
-    }
-
-    #[Test]
-    public function it_completes_setup_and_redirects()
+    public function redirect_url_is_referer()
     {
         $this
-            ->actingAs($user = $this->userWithTwoFactorEnabled())
-            ->post(cp_route('two-factor.complete'), [
-                'code' => $this->getOneTimeCode($user),
-            ])
-            ->assertRedirect(cp_route('index'));
+            ->actingAs($this->user())
+            ->get(cp_route('two-factor-setup', [
+                'referer' => 'http://localhost/cp/collections',
+            ]))
+            ->assertViewHas('redirect', 'http://localhost/cp/collections');
     }
 
     private function user()
@@ -84,12 +65,5 @@ class TwoFactorSetupControllerTest extends TestCase
         $user->save();
 
         return $user;
-    }
-
-    private function getOneTimeCode($user): string
-    {
-        $internalProvider = app(Google2FA::class);
-
-        return $internalProvider->getCurrentOtp($user->twoFactorSecretKey());
     }
 }

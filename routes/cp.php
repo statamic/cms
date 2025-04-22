@@ -122,9 +122,10 @@ Route::group(['prefix' => 'auth'], function () {
         Route::get('two-factor-challenge', [TwoFactorChallengeController::class, 'index'])->name('two-factor-challenge');
         Route::post('two-factor-challenge', [TwoFactorChallengeController::class, 'store']);
 
-        Route::get('two-factor/setup', [TwoFactorSetupController::class, 'index'])->name('two-factor.setup');
-        Route::post('two-factor/setup', [TwoFactorSetupController::class, 'store'])->name('two-factor.confirm');
-        Route::post('two-factor/complete', [TwoFactorSetupController::class, 'complete'])->name('two-factor.complete');
+        Route::get('two-factor-setup', TwoFactorSetupController::class)
+            ->middleware('statamic.cp.authenticated')
+            ->withoutMiddleware(RedirectIfTwoFactorSetupIncomplete::class)
+            ->name('two-factor-setup');
     }
 
     Route::get('logout', [LoginController::class, 'logout'])->name('logout');

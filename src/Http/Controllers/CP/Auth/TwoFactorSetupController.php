@@ -3,64 +3,38 @@
 namespace Statamic\Http\Controllers\CP\Auth;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
-use Statamic\Auth\TwoFactor\CompleteTwoFactorAuthenticationSetup;
-use Statamic\Auth\TwoFactor\ConfirmTwoFactorAuthentication;
-use Statamic\Auth\TwoFactor\EnableTwoFactorAuthentication;
-use Statamic\Auth\TwoFactor\TwoFactorAuthenticationProvider;
-use Statamic\Facades\CP\Toast;
-use Statamic\Facades\User;
+use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Support\Str;
 
-class TwoFactorSetupController
+class TwoFactorSetupController extends CpController
 {
-    public function index(Request $request, TwoFactorAuthenticationProvider $provider, EnableTwoFactorAuthentication $enable)
+    public function __invoke(Request $request)
     {
         $user = $request->user();
 
-        // if we have an error for the code, then disable resetting the secret
-        $resetSecret = true;
-        if (optional(session()->get('errors'))->first('code')) {
-            // we have tried a code, but failed
-            $resetSecret = false;
+        if ($user->hasEnabledTwoFactorAuthentication()) {
+            return redirect()->route('statamic.cp.index');
         }
 
-        $enable(User::current(), $resetSecret);
-
-        $viewData = [
-            'qr' => $user->twoFactorQrCodeSvg(),
-            'secret_key' => $user->twoFactorSecretKey(),
-            'confirm_url' => cp_route('two-factor.confirm'),
-        ];
-
-        if ($request->wantsJson()) {
-            return response()->json($viewData);
-        }
-
-        return view('statamic::auth.two-factor.setup', $viewData);
+        return view('statamic::auth.two-factor.setup', [
+            'routes' => [
+                'enable' => cp_route('users.two-factor.enable', $user->id),
+                'recovery_codes' => [
+                    'show' => cp_route('users.two-factor.recovery-codes.show', $user->id),
+                    'generate' => cp_route('users.two-factor.recovery-codes.generate', $user->id),
+                    'download' => cp_route('users.two-factor.recovery-codes.download', $user->id),
+                ],
+            ],
+            'redirect' => $this->redirectPath(),
+        ]);
     }
 
-    public function store(Request $request, ConfirmTwoFactorAuthentication $confirm)
+    private function redirectPath()
     {
-        $confirm(User::current(), $request->input('code'));
+        $cp = cp_route('index');
+        $referer = request('referer');
+        $referredFromCp = Str::startsWith($referer, $cp) && ! Str::startsWith($referer, $cp.'/auth/');
 
-        $viewData = [
-            'complete_url' => cp_route('two-factor.complete'),
-        ];
-
-        if ($request->wantsJson()) {
-            return response()->json($viewData);
-        }
-
-        // todo: we won't need this after refactoring the login process
-        return view('statamic::auth.two-factor.recovery-codes', $viewData);
-    }
-
-    public function complete(Request $request, CompleteTwoFactorAuthenticationSetup $complete)
-    {
-        $complete(User::current());
-
-        Toast::success(__('Two Factor Authentication has been set up.'));
-
-        return redirect(cp_route('index'));
+        return $referredFromCp ? $referer : $cp;
     }
 }

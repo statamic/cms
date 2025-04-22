@@ -38,7 +38,7 @@
 
         <TwoFactorSetup
             v-if="setupModalOpen"
-            :setup-url="meta.routes.setup"
+            :enable-url="meta.routes.enable"
             :recovery-code-urls="meta.routes.recovery_codes"
             @close="setupModalOpen = false"
             @setup-complete="setupComplete"
