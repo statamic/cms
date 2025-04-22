@@ -26,13 +26,7 @@ class ParentTags extends Tags
     {
         $var_name = Stringy::removeLeft($this->tag, 'parent:');
 
-        $parent = $this->getParent();
-
-        if (! $parent) {
-            return null;
-        }
-
-        return Arr::get($parent, $var_name)->value();
+        return Arr::get($this->getParent(), $var_name)?->value();
     }
 
     /**
