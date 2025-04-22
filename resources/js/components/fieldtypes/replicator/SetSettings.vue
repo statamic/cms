@@ -3,7 +3,7 @@
         v-if="fields.length"
         :autoclose="false"
         :clickaway="true"
-        :placement="'bottom-start'"
+        :placement="'bottom-end'"
         :offset="[10, 0]"
         :context="{ storeName: storeName }"
     >
@@ -15,7 +15,7 @@
                 <svg-icon name="light/settings" class="h-4 w-4" />
             </button>
         </template>
-        <div class="publish-fields min-w-80 w-[50vw] @container flex flex-wrap">
+        <div class="publish-fields w-[70vw] max-w-[40rem] @container flex flex-wrap">
             <set-field
                 v-for="field in fields"
                 :key="field.handle"
