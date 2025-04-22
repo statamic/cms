@@ -16,7 +16,7 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 import DateFormatter from '@statamic/components/DateFormatter.js';
-import Button from '@statamic/components/ui/Button/Index.vue';
+import Button from '@statamic/components/ui/Button/Button.vue';
 import { DatePicker, DateRangePicker } from '@statamic/ui';
 import { parseAbsoluteToLocal, toTimeZone, toZoned } from '@internationalized/date';
 
