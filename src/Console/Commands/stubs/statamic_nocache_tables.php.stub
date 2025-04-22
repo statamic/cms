@@ -8,12 +8,9 @@ class StatamicNocacheTables extends Migration
 {
     public function up()
     {
-        // Use the configured connection if available
-        $connection = config('statamic.static_caching.nocache_db_connection');
-
-        $schema = $connection ? Schema::connection($connection) : Schema::class;
-
-        $schema->create('NOCACHE_TABLE', function (Blueprint $table) {
+        Schema::connection(
+            config('statamic.static_caching.nocache_db_connection')
+        )->create('NOCACHE_TABLE', function (Blueprint $table) {
             $table->string('key')->index()->primary();
             $table->string('url')->index();
             $table->longText('region');
@@ -23,11 +20,8 @@ class StatamicNocacheTables extends Migration
 
     public function down()
     {
-        // Use the configured connection if available
-        $connection = config('statamic.static_caching.nocache_db_connection');
-
-        $schema = $connection ? Schema::connection($connection) : Schema::class;
-
-        $schema->dropIfExists('NOCACHE_TABLE');
+        Schema::connection(
+            config('statamic.static_caching.nocache_db_connection')
+        )->dropIfExists('NOCACHE_TABLE');
     }
 }
