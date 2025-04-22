@@ -68,10 +68,6 @@ class CollectionStructure extends Structure
 
         $entryIds = $this->getEntryIdsFromTree($tree);
 
-        if ($entryId = $entryIds->duplicates()->first()) {
-            throw new \Exception("Duplicate entry [{$entryId}] in [{$this->collection()->handle()}] collection's structure.");
-        }
-
         $thisCollectionsEntries = $this->collection()->queryEntries()
             ->where('site', $locale)
             ->pluck('id');
