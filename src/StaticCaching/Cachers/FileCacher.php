@@ -67,7 +67,10 @@ class FileCacher extends AbstractCacher
 
         $content = $this->normalizeContent($content);
 
-        $path = $this->getFilePath($url);
+        $parsed = parse_url($url);
+        $domain = $parsed['scheme'].'://'.$parsed['host'];
+        $site = optional(Site::findByUrl($domain))->handle();
+        $path = $this->getFilePath($url, $site);
 
         if (! $this->writer->write($path, $content, $this->config('lock_hold_length'))) {
             return;
@@ -87,8 +90,10 @@ class FileCacher extends AbstractCacher
     public function getCachedPage(Request $request)
     {
         $url = $this->getUrl($request);
-
-        $path = $this->getFilePath($url);
+        $parsed = parse_url($url);
+        $domain = $parsed['scheme'].'://'.$parsed['host'];
+        $site = optional(Site::findByUrl($domain))->handle();
+        $path = $this->getFilePath($url, $site);
 
         if ($this->logRewriteWarning && ! $this->isLongQueryStringPath($path)) {
             Log::debug('Static cache loaded ['.$url.'] If you are seeing this, your server rewrite rules have not been set up correctly.');
@@ -100,8 +105,11 @@ class FileCacher extends AbstractCacher
     public function hasCachedPage(Request $request)
     {
         $url = $this->getUrl($request);
+        $parsed = parse_url($url);
+        $domain = $parsed['scheme'].'://'.$parsed['host'];
+        $site = optional(Site::findByUrl($domain))->handle();
 
-        return File::exists($this->getFilePath($url));
+        return File::exists($this->getFilePath($url, $site));
     }
 
     /**
