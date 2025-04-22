@@ -115,9 +115,7 @@ return [
     | Nocache
     |--------------------------------------------------------------------------
     |
-    | Here you may define where the nocache data is stored. You can also
-    | optionally set a different database connection for the
-    | `nocache_regions` table.
+    | Here you may define where the nocache data is stored.
     |
     | https://statamic.dev/tags/nocache#database
     |
