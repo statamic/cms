@@ -3,13 +3,15 @@
 namespace Statamic\Auth\TwoFactor;
 
 use Illuminate\Cache\Repository;
+use PragmaRX\Google2FA\Google2FA;
+use Statamic\Facades\User;
 
 class TwoFactorAuthenticationProvider
 {
     /**
      * The underlying library providing two factor authentication helper services.
      *
-     * @var \PragmaRX\Google2FA\Google2FA
+     * @var Google2FA
      */
     protected $engine;
 
@@ -20,7 +22,7 @@ class TwoFactorAuthenticationProvider
      */
     protected $cache;
 
-    public function __construct(\PragmaRX\Google2FA\Google2FA $engine, ?Repository $cache = null)
+    public function __construct(Google2FA $engine, ?Repository $cache = null)
     {
         $this->engine = $engine;
         $this->cache = $cache;
