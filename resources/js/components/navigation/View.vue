@@ -135,6 +135,8 @@
 
         <page-editor
             v-if="editingPage"
+            :publishContainer="editingPage.editorId"
+            :persist-state="true"
             :site="site"
             :id="editingPage.page.id"
             :entry="editingPage.page.entry"
@@ -152,6 +154,8 @@
         <page-editor
             v-if="creatingPage"
             creating
+            :publishContainer="creatingPage.editorId"
+            :persist-state="true"
             :site="site"
             :blueprint="blueprint"
             :handle="handle"
@@ -339,7 +343,7 @@ export default {
         },
 
         editPage(page, vm, store) {
-            this.editingPage = { page, vm, store };
+            this.editingPage = { page, vm, store, editorId: `tree-page-${page.id}` };
         },
 
         updatePage(values) {
@@ -362,7 +366,12 @@ export default {
         },
 
         openPageCreator() {
-            this.creatingPage = { info: null };
+            const uniqueId = uniqid();
+            this.creatingPage = {
+                info: null,
+                uniqueId: uniqueId,
+                editorId: `tree-page-${uniqueId}`
+            };
         },
 
         closePageCreator() {
@@ -371,7 +380,7 @@ export default {
 
         pageCreated(values) {
             const page = {
-                id: uniqid(),
+                id: this.creatingPage.uniqueId,
                 title: values.title,
                 url: values.url,
                 children: []

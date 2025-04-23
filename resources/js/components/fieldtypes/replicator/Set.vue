@@ -101,7 +101,8 @@ export default {
         },
         meta: {
             type: Object,
-            required: true
+            required: true,
+            default: () => ({})
         },
         index: {
             type: Number,

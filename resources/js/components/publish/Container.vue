@@ -10,6 +10,7 @@ export default {
     },
 
     props: {
+        persistState: { type: Boolean, default: false },
         reference: {
             type: String
         },
@@ -58,12 +59,16 @@ export default {
     },
 
     created() {
-        this.registerVuexModule();
+        if (! this.$store.state.publish || ! this.$store.state.publish.hasOwnProperty(this.name)) {
+            this.registerVuexModule();
+        }
         this.$events.$emit('publish-container-created', this);
     },
 
     destroyed() {
-        this.removeVuexModule();
+        if (!this.persistState) {
+            this.removeVuexModule();
+        }
         this.clearDirtyState();
         this.$events.$emit('publish-container-destroyed', this);
     },

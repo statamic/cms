@@ -23,6 +23,7 @@
                 <publish-container
                     ref="container"
                     :name="publishContainer"
+                    :persist-state="persistState"
                     :blueprint="adjustedBlueprint"
                     :values="values"
                     :extra-values="extraValues"
@@ -83,6 +84,8 @@ export default {
     ],
 
     props: {
+        publishContainer: { type: String, required: true },
+        persistState: Boolean,
         id: String,
         entry: String,
         site: String,
@@ -109,7 +112,6 @@ export default {
             errors: {},
             validating: false,
             saveKeyBinding: null,
-            publishContainer: 'tree-page'
         }
     },
 
