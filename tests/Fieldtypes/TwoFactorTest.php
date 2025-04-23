@@ -33,7 +33,7 @@ class TwoFactorTest extends TestCase
             'is_enforced' => false,
             'is_setup' => false,
             'routes' => [
-                'setup' => cp_route('two-factor.setup'),
+                'enable' => cp_route('users.two-factor.enable', $user->id),
                 'disable' => cp_route('users.two-factor.disable', $user->id),
                 'recovery_codes' => [
                     'show' => cp_route('users.two-factor.recovery-codes.show', $user->id),
@@ -68,7 +68,7 @@ class TwoFactorTest extends TestCase
             'is_enforced' => false,
             'is_setup' => false,
             'routes' => [
-                'setup' => cp_route('two-factor.setup'),
+                'enable' => cp_route('users.two-factor.enable', $anotherUser->id),
                 'disable' => cp_route('users.two-factor.disable', $anotherUser->id),
                 'recovery_codes' => [
                     'show' => cp_route('users.two-factor.recovery-codes.show', $anotherUser->id),

@@ -707,7 +707,11 @@ trait UserContractTests
     #[Test]
     public function it_returns_the_two_factor_qr_code_svg()
     {
-        $user = tap($this->makeUser()->makeSuper()->set('two_factor_secret', encrypt('secret')))->save();
+        $user = $this
+            ->makeUser()
+            ->makeSuper()
+            ->email('david@hasselhoff.com')
+            ->set('two_factor_secret', encrypt('secret'));
 
         $svg = $user->twoFactorQrCodeSvg();
 
