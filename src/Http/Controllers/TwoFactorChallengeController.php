@@ -8,12 +8,10 @@ use Illuminate\Support\Facades\Auth;
 use Statamic\Events\TwoFactorAuthenticationFailed;
 use Statamic\Events\TwoFactorRecoveryCodeReplaced;
 use Statamic\Events\ValidTwoFactorAuthenticationCodeProvided;
-use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Middleware\RedirectIfAuthenticated;
 use Statamic\Http\Requests\TwoFactorChallengeRequest;
-use Statamic\Support\Str;
 
-class TwoFactorChallengeController extends CpController
+class TwoFactorChallengeController extends Controller
 {
     public function __construct(Request $request)
     {

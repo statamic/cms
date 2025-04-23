@@ -189,6 +189,7 @@ class AppServiceProvider extends ServiceProvider
             \Statamic\Http\Middleware\Localize::class,
             \Statamic\Http\Middleware\AddViewPaths::class,
             \Statamic\Http\Middleware\AuthGuard::class,
+            \Statamic\Http\Middleware\RedirectIfTwoFactorSetupIncomplete::class,
             \Statamic\StaticCaching\Middleware\Cache::class,
         ])->each(fn ($middleware) => $router->pushMiddlewareToGroup('statamic.web', $middleware));
     }

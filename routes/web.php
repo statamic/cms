@@ -13,6 +13,7 @@ use Statamic\Http\Controllers\OAuthController;
 use Statamic\Http\Controllers\PhoneHomeController;
 use Statamic\Http\Controllers\ResetPasswordController;
 use Statamic\Http\Controllers\TwoFactorChallengeController;
+use Statamic\Http\Controllers\TwoFactorSetupController;
 use Statamic\Http\Controllers\User\LoginController;
 use Statamic\Http\Controllers\User\PasswordController;
 use Statamic\Http\Controllers\User\ProfileController;
@@ -44,6 +45,7 @@ Route::name('statamic.')->group(function () {
             Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
             Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.reset.action');
 
+            Route::get('two-factor-setup', TwoFactorSetupController::class)->name('two-factor-setup');
             Route::get('two-factor-challenge', [TwoFactorChallengeController::class, 'index'])->name('two-factor-challenge');
             Route::post('two-factor-challenge', [TwoFactorChallengeController::class, 'store']);
         });

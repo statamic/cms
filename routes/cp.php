@@ -23,7 +23,7 @@ use Statamic\Http\Controllers\CP\Auth\ForgotPasswordController;
 use Statamic\Http\Controllers\CP\Auth\ImpersonationController;
 use Statamic\Http\Controllers\CP\Auth\LoginController;
 use Statamic\Http\Controllers\CP\Auth\ResetPasswordController;
-use Statamic\Http\Controllers\CP\Auth\TwoFactorSetupController;
+use Statamic\Http\Controllers\CP\Auth\TwoFactorChallengeController;
 use Statamic\Http\Controllers\CP\Auth\UnauthorizedController;
 use Statamic\Http\Controllers\CP\Collections\CollectionActionController;
 use Statamic\Http\Controllers\CP\Collections\CollectionBlueprintsController;
@@ -105,7 +105,7 @@ use Statamic\Http\Controllers\CP\Users\UserGroupsController;
 use Statamic\Http\Controllers\CP\Users\UsersController;
 use Statamic\Http\Controllers\CP\Users\UserWizardController;
 use Statamic\Http\Controllers\CP\Utilities\UtilitiesController;
-use Statamic\Http\Controllers\CP\Auth\TwoFactorChallengeController;
+use Statamic\Http\Controllers\CP\Auth\TwoFactorSetupController;
 use Statamic\Http\Middleware\CP\RedirectIfTwoFactorSetupIncomplete;
 use Statamic\Http\Middleware\RequireStatamicPro;
 use Statamic\Statamic;
@@ -124,7 +124,6 @@ Route::group(['prefix' => 'auth'], function () {
         Route::post('two-factor-challenge', [TwoFactorChallengeController::class, 'store']);
 
         Route::get('two-factor-setup', TwoFactorSetupController::class)
-            ->middleware('statamic.cp.authenticated')
             ->withoutMiddleware(RedirectIfTwoFactorSetupIncomplete::class)
             ->name('two-factor-setup');
     }
