@@ -103,10 +103,7 @@ class TwoFactorAuthenticationControllerTest extends TestCase
             ->post(cp_route('users.two-factor.confirm', $user->id), [
                 'code' => $this->getOneTimeCode($user),
             ])
-            ->assertOk()
-            ->assertJson([
-                'complete_url' => cp_route('users.two-factor.complete', $user->id),
-            ]);
+            ->assertOk();
 
         $this->assertNotNull($user->two_factor_confirmed_at);
     }
@@ -152,42 +149,6 @@ class TwoFactorAuthenticationControllerTest extends TestCase
     }
 
     #[Test]
-    public function it_completes_two_factor_authentication()
-    {
-        $user = $this->user();
-        $user->set('two_factor_secret', encrypt(app(TwoFactorAuthenticationProvider::class)->generateSecretKey()));
-        $user->set('two_factor_recovery_codes', encrypt(['abc', 'def', 'ghi', 'jkl', 'mno', 'pqr', 'stu', 'vwx']));
-        $user->save();
-
-        $this->assertNull($user->two_factor_completed);
-
-        $this
-            ->actingAs($user)
-            ->post(cp_route('users.two-factor.complete', $user->id))
-            ->assertOk();
-
-        $this->assertNotNull($user->two_factor_completed);
-    }
-
-    #[Test]
-    public function it_cant_complete_two_factor_authentication_for_another_user()
-    {
-        $user = $this->user();
-        $user->set('two_factor_secret', encrypt(app(TwoFactorAuthenticationProvider::class)->generateSecretKey()));
-        $user->set('two_factor_recovery_codes', encrypt(['abc', 'def', 'ghi', 'jkl', 'mno', 'pqr', 'stu', 'vwx']));
-        $user->save();
-
-        $this->assertNull($user->two_factor_completed);
-
-        $this
-            ->actingAs($this->userWithTwoFactorEnabled())
-            ->post(cp_route('users.two-factor.complete', $user->id))
-            ->assertForbidden();
-
-        $this->assertNull($user->two_factor_completed);
-    }
-
-    #[Test]
     public function it_disables_two_factor_authentication_for_the_current_user()
     {
         Event::fake();
@@ -205,7 +166,6 @@ class TwoFactorAuthenticationControllerTest extends TestCase
         $user->fresh();
 
         $this->assertNull($user->two_factor_confirmed_at);
-        $this->assertNull($user->two_factor_completed);
         $this->assertNull($user->two_factor_recovery_codes);
         $this->assertNull($user->two_factor_secret);
 
@@ -233,7 +193,6 @@ class TwoFactorAuthenticationControllerTest extends TestCase
         $user->fresh();
 
         $this->assertNull($user->two_factor_confirmed_at);
-        $this->assertNull($user->two_factor_completed);
         $this->assertNull($user->two_factor_recovery_codes);
         $this->assertNull($user->two_factor_secret);
 
@@ -258,7 +217,6 @@ class TwoFactorAuthenticationControllerTest extends TestCase
         $otherUser->fresh();
 
         $this->assertNull($otherUser->two_factor_confirmed_at);
-        $this->assertNull($otherUser->two_factor_completed);
         $this->assertNull($otherUser->two_factor_recovery_codes);
         $this->assertNull($otherUser->two_factor_secret);
 
@@ -286,7 +244,6 @@ class TwoFactorAuthenticationControllerTest extends TestCase
         $otherUser->fresh();
 
         $this->assertNull($otherUser->two_factor_confirmed_at);
-        $this->assertNull($otherUser->two_factor_completed);
         $this->assertNull($otherUser->two_factor_recovery_codes);
         $this->assertNull($otherUser->two_factor_secret);
 
@@ -304,7 +261,6 @@ class TwoFactorAuthenticationControllerTest extends TestCase
 
         $user->merge([
             'two_factor_confirmed_at' => now()->timestamp,
-            'two_factor_completed' => now()->timestamp,
             'two_factor_secret' => encrypt(app(TwoFactorAuthenticationProvider::class)->generateSecretKey()),
             'two_factor_recovery_codes' => encrypt(json_encode(Collection::times(8, function () {
                 return RecoveryCode::generate();

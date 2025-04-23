@@ -643,7 +643,6 @@ trait UserContractTests
         $user
             ->set('two_factor_secret', 'secret')
             ->set('two_factor_confirmed_at', now()->timestamp)
-            ->set('two_factor_completed', now()->timestamp)
             ->save();
 
         $this->assertTrue($user->hasEnabledTwoFactorAuthentication());

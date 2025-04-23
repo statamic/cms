@@ -46,7 +46,6 @@ class TwoFactorTest extends TestCase
         $user
             ->set('two_factor_secret', encrypt('secret'))
             ->set('two_factor_confirmed_at', now()->timestamp)
-            ->set('two_factor_completed', now()->timestamp)
             ->save();
         $this->assertTrue($this->fieldtype()->preload()['is_setup']);
 
@@ -81,7 +80,6 @@ class TwoFactorTest extends TestCase
         $anotherUser
             ->set('two_factor_secret', encrypt('secret'))
             ->set('two_factor_confirmed_at', now()->timestamp)
-            ->set('two_factor_completed', now()->timestamp)
             ->save();
         $this->assertTrue($this->fieldtype()->preload()['is_setup']);
 
@@ -132,7 +130,6 @@ class TwoFactorTest extends TestCase
 
         $user->merge([
             'two_factor_confirmed_at' => now()->timestamp,
-            'two_factor_completed' => now()->timestamp,
             'two_factor_secret' => encrypt(app(TwoFactorAuthenticationProvider::class)->generateSecretKey()),
             'two_factor_recovery_codes' => encrypt(json_encode(Collection::times(8, function () {
                 return RecoveryCode::generate();

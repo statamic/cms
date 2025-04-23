@@ -386,8 +386,7 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
     public function hasEnabledTwoFactorAuthentication(): bool
     {
         return ! is_null($this->two_factor_secret) &&
-            ! is_null($this->two_factor_confirmed_at) &&
-            ! is_null($this->two_factor_completed);
+            ! is_null($this->two_factor_confirmed_at);
     }
 
     /**

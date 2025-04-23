@@ -92,7 +92,6 @@ export default {
             code: null,
             error: null,
             confirmUrl: null,
-            completeUrl: null,
             setupModalOpen: true,
             recoveryCodesModalOpen: false,
         };
@@ -121,7 +120,6 @@ export default {
                 .then((response) => {
                     this.setupModalOpen = false;
                     this.recoveryCodesModalOpen = true;
-                    this.completeUrl = response.data.complete_url;
                 })
                 .catch((error) => {
                     this.error = error.response.data.errors.code[0];
@@ -129,16 +127,9 @@ export default {
         },
 
         complete() {
-            this.$axios
-                .post(this.completeUrl)
-                .then((response) => {
-                    this.recoveryCodesModalOpen = false;
+            this.recoveryCodesModalOpen = false;
 
-                    this.$emit('setup-complete');
-                })
-                .catch((error) => {
-                    this.$toast.error(error.message);
-                });
+            this.$emit('setup-complete');
         },
     },
 };

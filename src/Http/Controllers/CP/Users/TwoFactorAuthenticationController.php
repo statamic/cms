@@ -45,23 +45,6 @@ class TwoFactorAuthenticationController extends CpController
 
         $confirm($user, $request->input('code'));
 
-        return [
-            'complete_url' => cp_route('users.two-factor.complete', $user->id),
-        ];
-    }
-
-    public function complete(Request $request, $user, CompleteTwoFactorAuthenticationSetup $complete)
-    {
-        throw_unless($user = User::find($user), new NotFoundHttpException);
-
-        if (User::current()->id !== $user->id) {
-            abort(403);
-        }
-
-        $complete($user);
-
-        Toast::success(__('Two Factor Authentication has been set up.'));
-
         return [];
     }
 
