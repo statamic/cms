@@ -249,6 +249,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Updates\AddTimezoneConfigOptions::class,
         Updates\RemoveParentField::class,
         Updates\UpdateGlobalVariables::class,
+        Updates\AddTwoFactorColumns::class,
     ];
 
     public function register()
