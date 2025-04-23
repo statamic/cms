@@ -201,6 +201,7 @@ return [
     'role_intro' => 'Roles are groups of access and action permissions that can be assigned to users and user groups.',
     'role_title_instructions' => 'Usually a singular noun, like Editor or Admin.',
     'search_utility_description' => 'Manage and view important information about Statamic\'s search indexes.',
+    'search_with_count_filters_applied' => 'Search (1 filter applied)|Search (:count filters applied)',
     'session_expiry_enter_password' => 'Enter your password to continue where you left off',
     'session_expiry_logged_out_for_inactivity' => 'You have been logged out because you\'ve been inactive for a while.',
     'session_expiry_logging_out_in_seconds' => 'You have been inactive for a while and will be logged out in :seconds seconds. Click to extend your session.',

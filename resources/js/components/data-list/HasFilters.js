@@ -49,10 +49,14 @@ export default {
 
         searchPlaceholder() {
             if (this.activePreset) {
-                return `${__('Filtering:')} ${this.activePresetPayload.display}`;
+                return `${__('Search')} ${this.activePresetPayload.display}`;
             }
 
-            return __('Filter');
+            if (this.activeFilterCount > 0) {
+                return __n('messages.search_with_count_filters_applied', this.activeFilterCount);
+            }
+
+            return __('Search');
         },
     },
 
