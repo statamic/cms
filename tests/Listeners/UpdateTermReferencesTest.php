@@ -1120,12 +1120,10 @@ class UpdateTermReferencesTest extends TestCase
     #[Test]
     public function it_updates_global_sets()
     {
-        $set = Facades\GlobalSet::make('default');
+        $set = Facades\GlobalSet::make('default')->sites(['en', 'fr'])->save();
 
-        $set->addLocalization($set->makeLocalization('en')->data(['favourite' => 'norris']));
-        $set->addLocalization($set->makeLocalization('fr')->data(['favourite' => 'hoff']));
-
-        $set->save();
+        $set->in('en')->data(['favourite' => 'norris'])->save();
+        $set->in('fr')->data(['favourite' => 'hoff'])->save();
 
         $this->setSingleBlueprint('globals.default', [
             'fields' => [

@@ -31,7 +31,7 @@ class Site implements Augmentable
 
     public function name()
     {
-        return $this->config['name'];
+        return $this->config['name'] ?? $this->handle();
     }
 
     public function locale()

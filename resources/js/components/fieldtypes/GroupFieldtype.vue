@@ -1,23 +1,20 @@
 <template>
-    <portal
-        name="group-fullscreen"
-        :disabled="!fullScreenMode"
-        :provide="provide"
-    >
+    <portal name="group-fullscreen" :disabled="!fullScreenMode" :provide="provide">
         <element-container @resized="containerWidth = $event.width">
-            <div
-                class="group-fieldtype-container"
-                :class="{ 'grid-fullscreen bg-white': fullScreenMode }"
-            >
+            <div class="group-fieldtype-container" :class="{ 'grid-fullscreen bg-white': fullScreenMode }">
                 <publish-field-fullscreen-header
                     v-if="fullScreenMode"
                     :title="config.display"
                     :field-actions="fieldActions"
-                    @close="toggleFullscreen">
+                    @close="toggleFullscreen"
+                >
                 </publish-field-fullscreen-header>
                 <section :class="{ 'mt-14 p-4': fullScreenMode }">
-                    <div :class="{ 'border dark:border-dark-900 rounded shadow-sm replicator-set': config.border }">
-                        <div class="publish-fields @container" :class="{ 'replicator-set-body': config.border, '-mx-4': !config.border }">
+                    <div :class="{ 'replicator-set rounded border shadow-sm dark:border-dark-900': config.border }">
+                        <div
+                            class="publish-fields @container"
+                            :class="{ 'replicator-set-body': config.border, '-mx-4': !config.border }"
+                        >
                             <set-field
                                 v-for="field in fields"
                                 :key="field.handle"
@@ -46,27 +43,23 @@
 </template>
 
 <style>
-    .group-fieldtype-button-wrapper {
-        @apply flex rtl:left-6 ltr:right-6 absolute top-5 sm:top-7;
-    }
+.group-fieldtype-button-wrapper {
+    @apply absolute top-5 flex sm:top-7 ltr:right-6 rtl:left-6;
+}
 
-    .replicator-set .group-fieldtype-button-wrapper {
-        @apply top-5 rtl:left-4 ltr:right-4;
-    }
+.replicator-set .group-fieldtype-button-wrapper {
+    @apply top-5 ltr:right-4 rtl:left-4;
+}
 </style>
 
 <script>
 import Fieldtype from './Fieldtype.vue';
 import SetField from './replicator/Field.vue';
 import { ValidatesFieldConditions } from '../field-conditions/FieldConditions.js';
-import ManagesPreviewText from "./replicator/ManagesPreviewText";
+import ManagesPreviewText from './replicator/ManagesPreviewText';
 
 export default {
-    mixins: [
-        Fieldtype,
-        ValidatesFieldConditions,
-        ManagesPreviewText,
-    ],
+    mixins: [Fieldtype, ValidatesFieldConditions, ManagesPreviewText],
     components: { SetField },
     data() {
         return {
@@ -76,20 +69,22 @@ export default {
             previews: {},
             provide: {
                 group: this.makeGroupProvide(),
-                storeName: this.storeName,
             },
         };
     },
-    inject: ['storeName'],
+    inject: ['store'],
     computed: {
         values() {
             return this.value;
+        },
+        extraValues() {
+            return {};
         },
         fields() {
             return this.config.fields;
         },
         replicatorPreview() {
-            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
 
             return replicatorPreviewHtml(this.previewText);
         },
@@ -97,7 +92,7 @@ export default {
             return [
                 {
                     title: __('Toggle Fullscreen Mode'),
-                    icon: ({ vm }) => vm.fullScreenMode ? 'shrink-all' : 'expand-bold',
+                    icon: ({ vm }) => (vm.fullScreenMode ? 'shrink-all' : 'expand-bold'),
                     quick: true,
                     run: this.toggleFullscreen,
                     visible: this.config.fullscreen,
@@ -164,7 +159,7 @@ export default {
         },
 
         errors(handle) {
-            const state = this.$store.state.publish[this.storeName];
+            const state = this.store;
             if (!state) return [];
             return state.errors[this.fieldPath(handle)] || [];
         },

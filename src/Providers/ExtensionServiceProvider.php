@@ -195,7 +195,6 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Query::class,
         Tags\Range::class,
         Tags\Redirect::class,
-        Tags\Relate::class,
         Tags\Rotate::class,
         Tags\Route::class,
         Tags\Scope::class,
@@ -246,6 +245,9 @@ class ExtensionServiceProvider extends ServiceProvider
         Updates\AddSitePermissions::class,
         Updates\UseClassBasedStatamicUniqueRules::class,
         Updates\MigrateSitesConfigToYaml::class,
+        Updates\AddTimezoneConfigOptions::class,
+        Updates\RemoveParentField::class,
+        Updates\UpdateGlobalVariables::class,
     ];
 
     public function register()

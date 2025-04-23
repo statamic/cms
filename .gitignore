@@ -11,3 +11,4 @@ resources/dist
 resources/dist-frontend
 composer.lock
 .env
+bundle-stats.html

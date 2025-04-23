@@ -6,11 +6,11 @@
     }
 
     .config-field {
-        @apply md:flex flex-wrap border-b border-gray-400 dark:border-dark-900 w-full;
-        @apply p-3 @sm:p-4 m-0;
+        @apply w-full flex-wrap border-b border-gray-400 dark:border-dark-900 md:flex;
+        @apply m-0 p-3 @sm:p-4;
 
         .field-inner {
-            @apply w-full md:w-1/2 rtl:md:pl-8 ltr:md:pr-8;
+            @apply w-full md:w-1/2 ltr:md:pr-8 rtl:md:pl-8;
         }
 
         .field-inner + div {

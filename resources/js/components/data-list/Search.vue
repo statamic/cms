@@ -3,43 +3,41 @@
         type="text"
         ref="input"
         :placeholder="__(placeholder)"
-        :value="value"
+        :value="modelValue"
         @input="emitEvent"
         @keyup.esc="reset"
         autofocus
-        class="input-text flex-1 bg-white dark:bg-dark-600 text-sm focus:border-blue-300 dark:focus:border-dark-blue-125 outline-0">
+        class="input-text flex-1 bg-white text-sm outline-0 focus:border-blue-300 dark:bg-dark-600 dark:focus:border-dark-blue-125"
+    />
 </template>
 
 <script>
+import debounce from '@statamic/util/debounce.js';
+
 export default {
-
-    props: [
-        'value'
-    ],
-
     props: {
         placeholder: {
             type: String,
-            default: 'Search...'
+            default: 'Search...',
         },
-        value: {
+        modelValue: {
             type: String,
-            default: ''
-        }
+            default: '',
+        },
     },
 
     methods: {
-        emitEvent: _.debounce(function (event) {
-            this.$emit('input', event.target.value);
+        emitEvent: debounce(function (event) {
+            this.$emit('update:model-value', event.target.value);
         }, 300),
 
         reset() {
-            this.$emit('input', '');
+            this.$emit('update:model-value', '');
         },
 
         focus() {
             this.$refs.input.focus();
-        }
+        },
     },
-}
+};
 </script>

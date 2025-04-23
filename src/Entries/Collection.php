@@ -386,16 +386,6 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             $blueprint->ensureField('date', ['type' => 'date', 'required' => true, 'default' => 'now'], 'sidebar');
         }
 
-        if ($this->hasStructure() && ! $this->orderable()) {
-            $blueprint->ensureField('parent', [
-                'type' => 'entries',
-                'collections' => [$this->handle()],
-                'max_items' => 1,
-                'listable' => false,
-                'localizable' => true,
-            ], 'sidebar');
-        }
-
         foreach ($this->taxonomies() as $taxonomy) {
             if ($blueprint->hasField($taxonomy->handle())) {
                 continue;

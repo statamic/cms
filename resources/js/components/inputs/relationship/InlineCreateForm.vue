@@ -2,7 +2,6 @@
 import InlinePublishForm from './InlinePublishForm.vue';
 
 export default {
-
     mixins: [InlinePublishForm],
 
     props: {
@@ -16,20 +15,16 @@ export default {
             method: 'post',
             action: 'store',
             title: __('Create'),
-        }
+        };
     },
 
     inject: ['storeName'],
 
     methods: {
-
         saved(response) {
             this.$emit('created', response.data.data);
             this.$nextTick(() => this.close());
-        }
-
-    }
-
-}
+        },
+    },
+};
 </script>
-

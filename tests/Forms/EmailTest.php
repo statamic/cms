@@ -3,7 +3,6 @@
 namespace Tests\Forms;
 
 use Facades\Statamic\Fields\BlueprintRepository;
-use Facades\Tests\Factories\GlobalFactory;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -130,8 +129,10 @@ class EmailTest extends TestCase
         BlueprintRepository::shouldReceive('find')->with('globals.company')->andReturn($company);
         BlueprintRepository::shouldReceive('find')->with('forms.test')->andReturn($formBlueprint);
 
-        GlobalFactory::handle('social')->data(['twitter' => '@statamic'])->create();
-        GlobalFactory::handle('company')->data(['company_name' => 'Statamic'])->create();
+        $social = tap(GlobalSet::make('social'))->save();
+        $social->inDefaultSite()->data(['twitter' => '@statamic'])->save();
+        $company = tap(GlobalSet::make('company'))->save();
+        $company->inDefaultSite()->data(['company_name' => 'Statamic'])->save();
 
         $form = tap(Form::make('test'))->save();
         $submission = $form->makeSubmission()->data(['foo' => 'bar']);
@@ -185,12 +186,11 @@ class EmailTest extends TestCase
 
     private function makeEmailWithConfig(array $config)
     {
-        $globalSet = GlobalSet::make()->handle('company_information');
-        $globalSet->addLocalization($globalSet->makeLocalization('en')->data([
+        $globalSet = GlobalSet::make()->handle('company_information')->save();
+        $globalSet->in('en')->data([
             'name' => 'Example Company',
             'email' => 'info@example.com',
-        ]));
-        $globalSet->save();
+        ])->save();
 
         $formBlueprint = Blueprint::makeFromFields([
             'name' => ['type' => 'text'],

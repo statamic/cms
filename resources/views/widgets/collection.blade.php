@@ -1,21 +1,25 @@
-@php use Statamic\Facades\Site; @endphp
+@php
+    use Statamic\Facades\Site;
+    use function Statamic\trans as __;
+@endphp
 
-<div class="card p-0 overflow-hidden h-full flex flex-col">
-    <div class="flex justify-between items-center p-4 border-b dark:bg-dark-650 dark:border-b dark:border-dark-900">
+<div class="card flex h-full flex-col overflow-hidden p-0">
+    <div class="flex items-center justify-between border-b p-4 dark:border-b dark:border-dark-900 dark:bg-dark-650">
         <h2>
             <a class="flex items-center" href="{{ $collection->showUrl() }}">
-                <div class="h-6 w-6 rtl:ml-2 ltr:mr-2 text-gray-800 dark:text-dark-200">
+                <div class="h-6 w-6 text-gray-800 dark:text-dark-200 ltr:mr-2 rtl:ml-2">
                     @cp_svg('icons/light/content-writing')
                 </div>
                 <span v-pre>{{ __($title) }}</span>
             </a>
         </h2>
-        @if($canCreate)
-        <create-entry-button
-            button-class="btn-primary"
-            url="{{ $collection->createEntryUrl(Site::selected()) }}"
-            :blueprints="{{ $blueprints->toJson() }}"
-            text="{{ $button }}"></create-entry-button>
+        @if ($canCreate)
+            <create-entry-button
+                button-class="btn-primary"
+                url="{{ $collection->createEntryUrl(Site::selected()) }}"
+                :blueprints="{{ $blueprints->toJson() }}"
+                text="{{ $button }}"
+            ></create-entry-button>
         @endif
     </div>
     <collection-widget

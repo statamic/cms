@@ -3,7 +3,7 @@
         <input
             id="{{ id }}-{{ option | slugify }}-option"
             type="radio"
-            name="{{ handle }}"
+            name="{{ name }}"
             value="{{ option }}"
             {{ if js_driver }}{{ js_attributes }}{{ /if }}
             {{ if value == option }}checked{{ /if }}

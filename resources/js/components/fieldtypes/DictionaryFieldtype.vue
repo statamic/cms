@@ -13,13 +13,14 @@
             :options="normalizeInputOptions(options)"
             :placeholder="__(config.placeholder)"
             :multiple="multiple"
-            :value="selectedOptions"
+            :model-value="selectedOptions"
             :get-option-key="(option) => option.value"
-            @input="vueSelectUpdated"
+            @update:model-value="vueSelectUpdated"
             @focus="$emit('focus')"
             @search="search"
             @search:focus="$emit('focus')"
-            @search:blur="$emit('blur')">
+            @search:blur="$emit('blur')"
+        >
             <template #selected-option-container v-if="multiple"><i class="hidden"></i></template>
             <template #search="{ events, attributes }" v-if="multiple">
                 <input
@@ -28,7 +29,7 @@
                     type="search"
                     v-on="events"
                     v-bind="attributes"
-                >
+                />
             </template>
             <template #option="{ label }">
                 <div v-html="label" />
@@ -37,21 +38,35 @@
                 <div v-html="label" />
             </template>
             <template #no-options>
-                <div class="text-sm text-gray-700 rtl:text-right ltr:text-left py-2 px-4" v-text="__('No options to choose from.')" />
+                <div
+                    class="px-4 py-2 text-sm text-gray-700 ltr:text-left rtl:text-right"
+                    v-text="__('No options to choose from.')"
+                />
             </template>
             <template #footer="{ deselect }" v-if="multiple">
                 <sortable-list
                     item-class="sortable-item"
                     handle-class="sortable-item"
-                    :value="value"
+                    :model-value="value"
                     :distance="5"
                     :mirror="false"
-                    @input="update"
+                    @update:model-value="update"
                 >
                     <div class="vs__selected-options-outside flex flex-wrap">
-                        <span v-for="option in selectedOptions" :key="option.value" class="vs__selected mt-2 sortable-item" :class="{'invalid': option.invalid}">
+                        <span
+                            v-for="option in selectedOptions"
+                            :key="option.value"
+                            class="vs__selected sortable-item mt-2"
+                            :class="{ invalid: option.invalid }"
+                        >
                             <div v-html="option.label" />
-                            <button v-if="!readOnly" @click="deselect(option)" type="button" :aria-label="__('Deselect option')" class="vs__deselect">
+                            <button
+                                v-if="!readOnly"
+                                @click="deselect(option)"
+                                type="button"
+                                :aria-label="__('Deselect option')"
+                                class="vs__deselect"
+                            >
                                 <span>×</span>
                             </button>
                             <button v-else type="button" class="vs__deselect">
@@ -62,7 +77,7 @@
                 </sortable-list>
             </template>
         </v-select>
-        <div class="text-xs rtl:mr-2 ltr:ml-2 mt-3" :class="limitIndicatorColor" v-if="config.max_items > 1">
+        <div class="mt-3 text-xs ltr:ml-2 rtl:mr-2" :class="limitIndicatorColor" v-if="config.max_items > 1">
             <span v-text="currentLength"></span>/<span v-text="config.max_items"></span>
         </div>
     </div>
@@ -70,28 +85,29 @@
 
 <style scoped>
 .draggable-source--is-dragging {
-    @apply opacity-75 bg-transparent border-dashed
+    @apply border-dashed bg-transparent opacity-75;
 }
 </style>
 
 <script>
-import HasInputOptions from './HasInputOptions.js'
+import Fieldtype from './Fieldtype.vue';
+import HasInputOptions from './HasInputOptions.js';
 import { SortableList } from '../sortable/Sortable';
 import PositionsSelectOptions from '../../mixins/PositionsSelectOptions';
+import debounce from '@statamic/util/debounce.js';
 
 export default {
-
     mixins: [Fieldtype, HasInputOptions, PositionsSelectOptions],
 
     components: {
-        SortableList
+        SortableList,
     },
 
     data() {
         return {
             options: {},
             selectedOptionData: this.meta.selectedOptions,
-        }
+        };
     },
 
     computed: {
@@ -106,19 +122,19 @@ export default {
                 selections = [selections];
             }
 
-            return selections.map(value => {
-                let option = this.selectedOptionData.find(option => option.value === value);
+            return selections.map((value) => {
+                let option = this.selectedOptionData.find((option) => option.value === value);
 
-                if (! option) return {value, label: value};
+                if (!option) return { value, label: value };
 
-                return {value: option.value, label: option.label, invalid: option.invalid};
+                return { value: option.value, label: option.label, invalid: option.invalid };
             });
         },
 
         replicatorPreview() {
-            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
 
-            return this.selectedOptions.map(option => option.label).join(', ');
+            return this.selectedOptions.map((option) => option.label).join(', ');
         },
 
         limitReached() {
@@ -135,7 +151,7 @@ export default {
 
         currentLength() {
             if (this.value) {
-                return (typeof this.value == 'string') ? 1 : this.value.length;
+                return typeof this.value == 'string' ? 1 : this.value.length;
             }
 
             return 0;
@@ -167,12 +183,12 @@ export default {
 
         vueSelectUpdated(value) {
             if (this.multiple) {
-                this.update(value.map(v => v.value));
+                this.update(value.map((v) => v.value));
                 value.forEach((option) => this.selectedOptionData.push(option));
             } else {
                 if (value) {
-                    this.update(value.value)
-                    this.selectedOptionData.push(value)
+                    this.update(value.value);
+                    this.selectedOptionData.push(value);
                 } else {
                     this.update(null);
                 }
@@ -183,19 +199,19 @@ export default {
             params = {
                 config: this.configParameter,
                 ...params,
-            }
+            };
 
-            return this.$axios.get(this.meta.url, { params }).then(response => {
+            return this.$axios.get(this.meta.url, { params }).then((response) => {
                 this.options = response.data.data;
                 return Promise.resolve(response);
             });
         },
 
-        search: _.debounce(function (search, loading) {
+        search: debounce(function (search, loading) {
             loading(true);
 
-            this.request({ search }).then(response => loading(false));
+            this.request({ search }).then((response) => loading(false));
         }, 300),
-    }
+    },
 };
 </script>

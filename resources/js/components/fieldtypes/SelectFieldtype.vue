@@ -17,47 +17,61 @@
             :multiple="config.multiple"
             :reset-on-options-change="resetOnOptionsChange"
             :close-on-select="true"
-            :value="selectedOptions"
+            :model-value="selectedOptions"
             :create-option="(value) => ({ value, label: value })"
-            @input="vueSelectUpdated"
+            @update:model-value="vueSelectUpdated"
             @focus="$emit('focus')"
             @search:focus="$emit('focus')"
-            @search:blur="$emit('blur')">
-                <template #selected-option-container v-if="config.multiple"><i class="hidden"></i></template>
-                <template #search="{ events, attributes }" v-if="config.multiple">
-                    <input
-                        :placeholder="__(config.placeholder)"
-                        class="vs__search"
-                        type="search"
-                        v-on="events"
-                        v-bind="attributes"
-                    >
-                </template>
-                <template #option="{ label }">
-                    <div v-if="config.label_html" v-html="label"></div>
-                    <template v-else v-text="label"></template>
-                </template>
-                <template #selected-option="{ label }">
-                    <div v-if="config.label_html" v-html="label"></div>
-                    <template v-else v-text="label"></template>
-                </template>
-                <template #no-options>
-                    <div class="text-sm text-gray-700 rtl:text-right ltr:text-left py-2 px-4" v-text="__('No options to choose from.')" />
-                </template>
-                <template #footer="{ deselect }" v-if="config.multiple">
-                    <sortable-list
-                        item-class="sortable-item"
-                        handle-class="sortable-item"
-                        :value="value"
-                        :distance="5"
-                        :mirror="false"
-                        @input="update"
-                    >
+            @search:blur="$emit('blur')"
+        >
+            <template #selected-option-container v-if="config.multiple"><i class="hidden"></i></template>
+            <template #search="{ events, attributes }" v-if="config.multiple">
+                <input
+                    :placeholder="__(config.placeholder)"
+                    class="vs__search"
+                    type="search"
+                    v-on="events"
+                    v-bind="attributes"
+                />
+            </template>
+            <template #option="{ label }">
+                <div v-if="config.label_html" v-html="label"></div>
+                <template v-else v-text="label"></template>
+            </template>
+            <template #selected-option="{ label }">
+                <div v-if="config.label_html" v-html="label"></div>
+                <template v-else v-text="label"></template>
+            </template>
+            <template #no-options>
+                <div
+                    class="px-4 py-2 text-sm text-gray-700 ltr:text-left rtl:text-right"
+                    v-text="__('No options to choose from.')"
+                />
+            </template>
+            <template #footer="{ deselect }" v-if="config.multiple">
+                <sortable-list
+                    item-class="sortable-item"
+                    handle-class="sortable-item"
+                    :model-value="value"
+                    :distance="5"
+                    :mirror="false"
+                    @update:model-value="update"
+                >
                     <div class="vs__selected-options-outside flex flex-wrap">
-                        <span v-for="option in selectedOptions" :key="option.value" class="vs__selected mt-2 sortable-item">
+                        <span
+                            v-for="option in selectedOptions"
+                            :key="option.value"
+                            class="vs__selected sortable-item mt-2"
+                        >
                             <div v-if="config.label_html" v-html="option.label"></div>
                             <template v-else>{{ __(option.label) }}</template>
-                            <button v-if="!readOnly" @click="deselect(option)" type="button" :aria-label="__('Deselect option')" class="vs__deselect">
+                            <button
+                                v-if="!readOnly"
+                                @click="deselect(option)"
+                                type="button"
+                                :aria-label="__('Deselect option')"
+                                class="vs__deselect"
+                            >
                                 <span>×</span>
                             </button>
                             <button v-else type="button" class="vs__deselect">
@@ -65,33 +79,32 @@
                             </button>
                         </span>
                     </div>
-                    </sortable-list>
-                </template>
+                </sortable-list>
+            </template>
         </v-select>
-        <div class="text-xs rtl:mr-2 ltr:ml-2 mt-3" :class="limitIndicatorColor" v-if="config.max_items">
+        <div class="mt-3 text-xs ltr:ml-2 rtl:mr-2" :class="limitIndicatorColor" v-if="config.max_items">
             <span v-text="currentLength"></span>/<span v-text="config.max_items"></span>
         </div>
     </div>
 </template>
 
 <style scoped>
-    .draggable-source--is-dragging {
-        @apply opacity-75 bg-transparent border-dashed
-    }
+.draggable-source--is-dragging {
+    @apply border-dashed bg-transparent opacity-75;
+}
 </style>
 
 <script>
-import HasInputOptions from './HasInputOptions.js'
+import Fieldtype from './Fieldtype.vue';
+import HasInputOptions from './HasInputOptions.js';
 import { SortableList } from '../sortable/Sortable';
 import PositionsSelectOptions from '../../mixins/PositionsSelectOptions';
 
-
 export default {
-
     mixins: [Fieldtype, HasInputOptions, PositionsSelectOptions],
 
     components: {
-        SortableList
+        SortableList,
     },
 
     computed: {
@@ -100,8 +113,8 @@ export default {
             if (typeof selections === 'string' || typeof selections === 'number') {
                 selections = [selections];
             }
-            return selections.map(value => {
-                return _.findWhere(this.options, {value}) || { value, label: value };
+            return selections.map((value) => {
+                return this.options.find((o) => o.value === value) || { value, label: value };
             });
         },
 
@@ -110,9 +123,9 @@ export default {
         },
 
         replicatorPreview() {
-            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
 
-            return this.selectedOptions.map(option => option.label).join(', ');
+            return this.selectedOptions.map((option) => option.label).join(', ');
         },
 
         resetOnOptionsChange() {
@@ -122,26 +135,26 @@ export default {
 
             // Reset the value if the value doesn't exist in the new set of options.
             return (options, old, val) => {
-                let opts = options.map(o => o.value);
-                return !val.some(v => opts.includes(v.value));
+                let opts = options.map((o) => o.value);
+                return !val.some((v) => opts.includes(v.value));
             };
         },
 
         limitReached() {
-            if (! this.config.max_items) return false;
+            if (!this.config.max_items) return false;
 
             return this.currentLength >= this.config.max_items;
         },
 
         limitExceeded() {
-            if (! this.config.max_items) return false;
+            if (!this.config.max_items) return false;
 
             return this.currentLength > this.config.max_items;
         },
 
         currentLength() {
             if (this.value) {
-                return (typeof this.value == 'string') ? 1 : this.value.length;
+                return typeof this.value == 'string' ? 1 : this.value.length;
             }
 
             return 0;
@@ -155,7 +168,7 @@ export default {
             }
 
             return 'text-gray';
-        }
+        },
     },
 
     methods: {
@@ -165,15 +178,15 @@ export default {
 
         vueSelectUpdated(value) {
             if (this.config.multiple) {
-                this.update(value.map(v => v.value));
+                this.update(value.map((v) => v.value));
             } else {
                 if (value) {
-                    this.update(value.value)
+                    this.update(value.value);
                 } else {
                     this.update(null);
                 }
             }
         },
-    }
+    },
 };
 </script>

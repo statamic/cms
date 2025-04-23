@@ -1,14 +1,18 @@
-@php use function Statamic\trans as __; @endphp
+@php
+    use function Statamic\trans as __;
+@endphp
 
 @extends('statamic::layout')
 @section('title', __('Edit Blueprint'))
 
 @section('content')
-
-    @include('statamic::partials.breadcrumb', [
-        'url' => cp_route('assets.browse.show', $container->handle()),
-        'title' => $container->title(),
-    ])
+    @include(
+        'statamic::partials.breadcrumb',
+        [
+            'url' => cp_route('assets.browse.show', $container->handle()),
+            'title' => $container->title(),
+        ]
+    )
 
     <blueprint-builder
         action="{{ cp_route('asset-containers.blueprint.update', $container->handle()) }}"
@@ -17,9 +21,11 @@
         :can-define-localizable="false"
     ></blueprint-builder>
 
-    @include('statamic::partials.docs-callout', [
-        'topic' => __('Blueprints'),
-        'url' => Statamic::docsUrl('blueprints')
-    ])
-
+    @include(
+        'statamic::partials.docs-callout',
+        [
+            'topic' => __('Blueprints'),
+            'url' => Statamic::docsUrl('blueprints'),
+        ]
+    )
 @endsection

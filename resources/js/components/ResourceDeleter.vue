@@ -13,30 +13,29 @@
 
 <script>
 export default {
-
     props: {
         resource: {
-            type: Object
+            type: Object,
         },
         resourceTitle: {
-            type: String
+            type: String,
         },
         route: {
             type: String,
         },
         redirect: {
-            type: String
+            type: String,
         },
         reload: {
-            type: Boolean
-        }
+            type: Boolean,
+        },
     },
 
     data() {
         return {
             deleting: false,
             redirectFromServer: null,
-        }
+        };
     },
 
     computed: {
@@ -45,7 +44,7 @@ export default {
         },
 
         modalTitle() {
-            return __('Delete :resource', {resource: __(this.title)});
+            return __('Delete :resource', { resource: __(this.title) });
         },
 
         modalBody() {
@@ -54,7 +53,7 @@ export default {
 
         deleteUrl() {
             let url = data_get(this.resource, 'delete_url', this.route);
-            if (! url) console.error('ResourceDeleter cannot find delete url');
+            if (!url) console.error('ResourceDeleter cannot find delete url');
             return url;
         },
 
@@ -69,8 +68,9 @@ export default {
         },
 
         confirmed() {
-            this.$axios.delete(this.deleteUrl)
-                .then(response => {
+            this.$axios
+                .delete(this.deleteUrl)
+                .then((response) => {
                     this.redirectFromServer = data_get(response, 'data.redirect');
                     this.success();
                 })
@@ -96,7 +96,7 @@ export default {
 
         cancel() {
             this.deleting = false;
-        }
-    }
-}
+        },
+    },
+};
 </script>

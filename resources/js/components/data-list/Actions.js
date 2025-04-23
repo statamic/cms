@@ -1,32 +1,27 @@
 import DataListAction from './Action.vue';
+import { sortBy } from 'lodash-es';
 
 export default {
-
     components: {
-        DataListAction
+        DataListAction,
     },
 
     props: {
-        url: String
+        url: String,
     },
 
     data() {
         return {
-            errors: {}
-        }
+            errors: {},
+        };
     },
 
     computed: {
-
         sortedActions() {
-            let actions = _.sortBy(this.actions, 'title');
+            let actions = sortBy(this.actions, 'title');
 
-            return [
-                ...actions.filter(action => !action.dangerous),
-                ...actions.filter(action => action.dangerous)
-            ];
+            return [...actions.filter((action) => !action.dangerous), ...actions.filter((action) => action.dangerous)];
         },
-
     },
 
     methods: {
@@ -39,7 +34,7 @@ export default {
                 action: action.handle,
                 context: action.context,
                 selections: this.selections,
-                values
+                values,
             };
 
             this.$axios
@@ -51,12 +46,12 @@ export default {
                 })
                 .catch((error) => this.handleActionError(error.response))
                 .finally(() => {
-                    if (done) done()
+                    if (done) done();
                 });
         },
 
         handleActionSuccess(response) {
-            response.data.text().then(data => {
+            response.data.text().then((data) => {
                 data = JSON.parse(data);
                 if (data.redirect) {
                     if (data.bypassesDirtyWarning) this.$dirty.disableWarning();
@@ -68,7 +63,7 @@ export default {
         },
 
         handleActionError(response) {
-            response.data.text().then(data => {
+            response.data.text().then((data) => {
                 data = JSON.parse(data);
                 if (response.status == 422) this.errors = data.errors;
                 this.$toast.error(data.message);
@@ -77,8 +72,10 @@ export default {
         },
 
         handleFileDownload(response) {
-            const attachmentMatch = response.headers['content-disposition'].match(/^attachment.+filename\*?=(?:UTF-8'')?"?([^"]+)"?/i) || [];
-            if (! attachmentMatch.length) return;
+            const attachmentMatch =
+                response.headers['content-disposition'].match(/^attachment.+filename\*?=(?:UTF-8'')?"?([^"]+)"?/i) ||
+                [];
+            if (!attachmentMatch.length) return;
             const filename = attachmentMatch.length >= 2 ? attachmentMatch[1] : 'file.txt';
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
@@ -88,7 +85,5 @@ export default {
             link.click();
             this.$emit('completed', true);
         },
-
-    }
-
-}
+    },
+};

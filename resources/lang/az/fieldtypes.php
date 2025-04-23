@@ -22,7 +22,6 @@ return [
     'assets.dynamic_folder_pending_field' => 'Bu sahə bir dəfə əlçatan olacaq :field təyin olundu.',
     'assets.dynamic_folder_pending_save' => 'Bu sahə yadda saxladıqdan sonra əlçatan olacaq.',
     'assets.title' => 'Varlıqlar',
-    'bard.config.allow_source' => 'Yazarkən HTML mənbə kodunu görməyə imkan ver.',
     'bard.config.always_show_set_button' => '“Set Ekle” düyməsini həmişə göstərmək üçün aktivləşdirin.',
     'bard.config.buttons' => 'Alət çubuğunda hansı düymələrin göstəriləcəyini seçin.',
     'bard.config.container' => 'Bu sahə üçün hansı varlıq konteynerinin istifadə olunacağını seçin.',

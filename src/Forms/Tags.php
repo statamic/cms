@@ -5,12 +5,14 @@ namespace Statamic\Forms;
 use DebugBar\DataCollector\ConfigCollector;
 use DebugBar\DebugBarException;
 use Statamic\Contracts\Forms\Form as FormContract;
+use Statamic\Facades\Antlers;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\URL;
 use Statamic\Forms\JsDrivers\JsDriver;
 use Statamic\Support\Arr;
+use Statamic\Support\Html;
 use Statamic\Support\Str;
 use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags as BaseTags;
@@ -102,6 +104,7 @@ class Tags extends BaseTags
         if ($jsDriver) {
             $attrs = array_merge($attrs, $jsDriver->addToFormAttributes($form));
         }
+
         $attrs = $this->runHooks('attrs', ['attrs' => $attrs, 'data' => $data])['attrs'];
 
         $params = [];
@@ -136,6 +139,39 @@ class Tags extends BaseTags
         }
 
         return $html;
+    }
+
+    /**
+     * Maps to {{ form:fields }}.
+     *
+     * @return string
+     */
+    public function fields()
+    {
+        $isBlade = $this->isAntlersBladeComponent();
+
+        $scope = $this->params->get('scope');
+
+        $slot = new RenderableFieldSlot(
+            html: $this->content,
+            scope: $scope,
+            isBlade: $isBlade,
+        );
+
+        collect($this->context['fields'])
+            ->each(fn ($field) => $field['field']->slot($slot));
+
+        if ($isBlade) {
+            return $this->tagRenderer->render('@foreach($fields as $field)'.$this->content.'@endforeach', $this->context->all());
+        }
+
+        $params = '';
+
+        if ($scope) {
+            $params = Html::attributes(['scope' => $scope]);
+        }
+
+        return Antlers::parse('{{ fields '.$params.' }}'.$this->content.'{{ /fields }}', $this->context->all());
     }
 
     /**

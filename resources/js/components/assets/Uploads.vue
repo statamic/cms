@@ -1,6 +1,5 @@
 <template>
-
-    <div class="bg-gray-400 dark:bg-dark-800 text-xs p-2">
+    <div class="bg-gray-400 p-2 text-xs dark:bg-dark-800">
         <upload
             v-for="(upload, i) in uploads"
             :key="upload.id"
@@ -15,28 +14,22 @@
             @existing-selected="existingSelected(i)"
         />
     </div>
-
 </template>
-
 
 <script>
 import Upload from './Upload.vue';
 
 export default {
-
     props: {
         uploads: Array,
         allowSelectingExisting: Boolean,
     },
 
-
     components: {
-        Upload
+        Upload,
     },
 
-
     methods: {
-
         clearUpload(i) {
             this.uploads.splice(i, 1);
         },
@@ -48,9 +41,7 @@ export default {
         existingSelected(i) {
             this.$emit('existing-selected', this.uploads[i]);
             this.clearUpload(i);
-        }
-
-    }
-
-}
+        },
+    },
+};
 </script>

@@ -2,16 +2,16 @@
 
 namespace Statamic\Providers;
 
+use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\ServiceProvider;
+use Statamic\CP\CarbonAsVueComponent;
 use Statamic\Facades;
 use Statamic\Facades\Addon;
-use Statamic\Facades\Preference;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Token;
@@ -42,7 +42,6 @@ class AppServiceProvider extends ServiceProvider
             ->pushMiddleware(\Statamic\Http\Middleware\PoweredByHeader::class)
             ->pushMiddleware(\Statamic\Http\Middleware\CheckComposerJsonScripts::class)
             ->pushMiddleware(\Statamic\Http\Middleware\CheckMultisite::class)
-            ->pushMiddleware(\Statamic\Http\Middleware\DisableFloc::class)
             ->pushMiddleware(\Statamic\Http\Middleware\StopImpersonating::class);
 
         $this->loadViewsFrom("{$this->root}/resources/views", 'statamic');
@@ -80,10 +79,8 @@ class AppServiceProvider extends ServiceProvider
             return $this->to(cp_route($route, $parameters));
         });
 
-        Carbon::macro('inPreferredFormat', function () {
-            return $this->format(
-                Preference::get('date_format', config('statamic.cp.date_format'))
-            );
+        Carbon::macro('asVueComponent', static function (?array $options = null) {
+            return (new CarbonAsVueComponent)(self::this(), $options);
         });
 
         Request::macro('statamicToken', function () {

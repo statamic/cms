@@ -2,6 +2,7 @@
 
 namespace Tests\CP\Navigation;
 
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\CP\Navigation\NavItem;
@@ -71,14 +72,15 @@ class NavTest extends TestCase
     #[Test]
     public function it_can_create_a_nav_item_with_a_more_custom_config()
     {
+        Gate::policy(DroidsClass::class, DroidsPolicy::class);
+
         $this->actingAs(tap(User::make()->makeSuper())->save());
 
         Nav::droids('C-3PO')
             ->id('some::custom::id')
-            ->active('threepio*')
             ->url('/human-cyborg-relations')
             ->view('cp.nav.importer')
-            ->can('index', 'DroidsClass')
+            ->can('index', DroidsClass::class)
             ->attributes(['target' => '_blank', 'class' => 'red']);
 
         $item = $this->build()->get('Droids')->first();
@@ -88,9 +90,8 @@ class NavTest extends TestCase
         $this->assertEquals('C-3PO', $item->display());
         $this->assertEquals('http://localhost/human-cyborg-relations', $item->url());
         $this->assertEquals('cp.nav.importer', $item->view());
-        $this->assertEquals('threepio*', $item->active());
         $this->assertEquals('index', $item->authorization()->ability);
-        $this->assertEquals('DroidsClass', $item->authorization()->arguments);
+        $this->assertEquals(DroidsClass::class, $item->authorization()->arguments);
         $this->assertEquals(' target="_blank" class="red"', $item->attributes());
     }
 
@@ -260,6 +261,13 @@ class NavTest extends TestCase
     #[Test]
     public function it_doesnt_build_children_that_the_user_is_not_authorized_to_see()
     {
+        // Assume we're dealing with Statamic permissions. Technically nav items
+        // could use arbitrary ability strings that correspond to Gate::define().
+        Facades\Permission::register('view jedi diaries');
+        Facades\Permission::register('view jedi logs');
+        Facades\Permission::register('view sith diaries');
+        Facades\Permission::register('view sith logs');
+
         $this->setTestRoles(['sith' => ['view sith diaries']]);
         $this->actingAs(tap(User::make()->assignRole('sith'))->save());
 
@@ -487,17 +495,14 @@ class NavTest extends TestCase
     {
         tap(Nav::create('external-absolute')->url('http://domain.com'), function ($nav) {
             $this->assertEquals('http://domain.com', $nav->url());
-            $this->assertNull($nav->active());
         });
 
         tap(Nav::create('site-relative')->url('/foo/bar'), function ($nav) {
             $this->assertEquals('http://localhost/foo/bar', $nav->url());
-            $this->assertNull($nav->active());
         });
 
         tap(Nav::create('cp-relative')->url('foo/bar'), function ($nav) {
             $this->assertEquals('http://localhost/cp/foo/bar', $nav->url());
-            $this->assertEquals('foo/bar(/(.*)?|$)', $nav->active());
         });
     }
 
@@ -520,9 +525,8 @@ class NavTest extends TestCase
     #[Test]
     public function it_does_not_automatically_add_a_resolve_children_pattern_when_setting_url_if_one_is_already_defined()
     {
-        $nav = Nav::create('cp-relative')->active('foo.*')->url('foo/bar');
+        $nav = Nav::create('cp-relative')->url('foo/bar');
         $this->assertEquals('http://localhost/cp/foo/bar', $nav->url());
-        $this->assertEquals('foo.*', $nav->active());
     }
 
     #[Test]
@@ -718,5 +722,17 @@ class NavTest extends TestCase
     protected function build()
     {
         return Nav::build()->pluck('items', 'display');
+    }
+}
+
+class DroidsClass
+{
+}
+
+class DroidsPolicy
+{
+    public function index()
+    {
+        return true;
     }
 }

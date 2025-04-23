@@ -20,5 +20,4 @@
         listing-url="{{ cp_route('taxonomies.show', $taxonomy) }}"
         :preview-targets="{{ json_encode($previewTargets) }}"
     ></base-term-create-form>
-
 @endsection

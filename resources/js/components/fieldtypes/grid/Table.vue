@@ -1,28 +1,24 @@
 <template>
-
     <table class="grid-table" v-if="rows.length > 0">
         <thead>
             <tr>
                 <th class="grid-drag-handle-header" v-if="grid.isReorderable"></th>
-                <grid-header-cell
-                    v-for="field in fields"
-                    :key="field.handle"
-                    :field="field"
-                />
+                <grid-header-cell v-for="field in fields" :key="field.handle" :field="field" />
                 <th class="grid-row-controls row-controls"></th>
             </tr>
         </thead>
         <sortable-list
-            :value="rows"
+            :model-value="rows"
             :vertical="true"
             :item-class="sortableItemClass"
             :handle-class="sortableHandleClass"
             append-to="body"
             @dragstart="$emit('focus')"
             @dragend="$emit('blur')"
-            @input="(rows) => $emit('sorted', rows)"
+            @update:model-value="(rows) => $emit('sorted', rows)"
+            v-slot="{}"
         >
-            <tbody slot-scope="{}">
+            <tbody>
                 <grid-row
                     v-for="(row, index) in rows"
                     :key="`row-${row._id}`"
@@ -44,25 +40,21 @@
             </tbody>
         </sortable-list>
     </table>
-
 </template>
 
 <script>
 import View from './View.vue';
 import GridRow from './Row.vue';
 import GridHeaderCell from './HeaderCell.vue';
-import { SortableList, SortableItem } from '../../sortable/Sortable';
+import { SortableList } from '../../sortable/Sortable';
 
 export default {
-
     mixins: [View],
 
     components: {
         GridRow,
         GridHeaderCell,
         SortableList,
-        SortableItem
-    }
-
-}
+    },
+};
 </script>

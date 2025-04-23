@@ -22,7 +22,6 @@ return [
     'assets.dynamic_folder_pending_field' => 'Toto pole bude dostupné, jakmile bude nastaveno :field .',
     'assets.dynamic_folder_pending_save' => 'Toto pole bude dostupné po uložení.',
     'assets.title' => 'Soubory',
-    'bard.config.allow_source' => 'Umožňuje zobrazení zdrojového kódu HTML při zápisu.',
     'bard.config.always_show_set_button' => 'Umožňuje trvalé zobrazení tlačítka "Přidat sadu".',
     'bard.config.buttons' => 'Vyberte, která tlačítka se mají zobrazit na panelu nástrojů.',
     'bard.config.container' => 'Pro toto pole vyberte kontejner souboru.',

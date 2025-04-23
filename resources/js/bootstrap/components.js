@@ -1,5 +1,3 @@
-import Vue from 'vue'
-import vSelect from 'vue-select'
 import AssetManager from '../components/assets/AssetManager.vue';
 import Browser from '../components/assets/Browser/Browser.vue';
 import UpdatesBadge from '../components/UpdatesBadge.vue';
@@ -54,7 +52,6 @@ import CreateEntryButton from '../components/entries/CreateEntryButton.vue';
 import Popover from '../components/Popover.vue';
 import Portal from '../components/portals/Portal.vue';
 import PermissionTree from '../components/roles/PermissionTree.vue';
-import Modal from '../components/Modal.vue';
 import ConfirmationModal from '../components/modals/ConfirmationModal.vue';
 import FavoriteCreator from '../components/FavoriteCreator.vue';
 import KeyboardShortcutsModal from '../components/modals/KeyboardShortcutsModal.vue';
@@ -64,90 +61,95 @@ import Stack from '../components/stacks/Stack.vue';
 import StackTest from '../components/stacks/StackTest.vue';
 import CodeBlock from '../components/CodeBlock.vue';
 import BlueprintResetter from '../components/blueprints/BlueprintResetter.vue';
+import { defineAsyncComponent } from 'vue';
+import DateTime from '../components/DateTime.vue';
 
-// Third Party
-Vue.component('v-select', vSelect)
+export default function registerGlobalComponents(app) {
+    // Core
+    app.component('asset-manager', AssetManager);
+    app.component('asset-browser', Browser);
+    app.component('updates-badge', UpdatesBadge);
 
-// Core
-Vue.component('asset-manager', AssetManager);
-Vue.component('asset-browser', Browser);
-Vue.component('updates-badge', UpdatesBadge);
+    // Publish
+    app.component('publish-container', Container);
+    app.component('publish-form', PublishForm);
+    app.component('publish-fields', Fields);
+    app.component('publish-fields-container', FieldsContainer);
+    app.component('publish-field', Field);
+    app.component('publish-field-meta', FieldMeta);
+    app.component('publish-field-actions', FieldActions);
+    app.component('publish-field-fullscreen-header', FullscreenHeader);
+    app.component('configure-tabs', ConfigureTabs);
+    app.component('publish-tabs', PublishTabs);
+    app.component('publish-sections', PublishSections);
+    app.component('publish-validation-errors', PublishValidationErrors);
+    app.component('form-group', FormGroup);
 
-// Publish
-Vue.component('publish-container', Container);
-Vue.component('publish-form', PublishForm);
-Vue.component('publish-fields', Fields);
-Vue.component('publish-fields-container', FieldsContainer);
-Vue.component('publish-field', Field);
-Vue.component('publish-field-meta', FieldMeta);
-Vue.component('publish-field-actions', FieldActions);
-Vue.component('publish-field-fullscreen-header', FullscreenHeader);
-Vue.component('configure-tabs', ConfigureTabs);
-Vue.component('publish-tabs', PublishTabs);
-Vue.component('publish-sections', PublishSections);
-Vue.component('publish-validation-errors', PublishValidationErrors);
-Vue.component('form-group', FormGroup);
+    app.component('live-preview', LivePreview);
+    app.component('live-preview-popout', Popout);
 
-Vue.component('live-preview', LivePreview);
-Vue.component('live-preview-popout', Popout);
+    app.component('EntryPublishForm', EntryPublishForm);
+    app.component('TermPublishForm', TermPublishForm);
+    app.component('UserPublishForm', UserPublishForm);
 
-Vue.component('EntryPublishForm', EntryPublishForm);
-Vue.component('TermPublishForm', TermPublishForm);
-Vue.component('UserPublishForm', UserPublishForm);
+    // Data List
+    app.component('data-list', DataList);
+    app.component('data-list-table', Table);
+    app.component('data-list-search', Search);
+    app.component('data-list-bulk-actions', BulkActions);
+    app.component('data-list-inline-actions', InlineActions);
+    app.component('data-list-column-picker', ColumnPicker);
+    app.component('data-list-toggle-all', ToggleAll);
+    app.component('data-list-pagination', Pagination);
+    app.component('data-list-filters', Filters);
+    app.component('data-list-filter-presets', FilterPresets);
 
-// Data List
-Vue.component('data-list', DataList);
-Vue.component('data-list-table', Table);
-Vue.component('data-list-search', Search);
-Vue.component('data-list-bulk-actions', BulkActions);
-Vue.component('data-list-inline-actions', InlineActions);
-Vue.component('data-list-column-picker', ColumnPicker);
-Vue.component('data-list-toggle-all', ToggleAll);
-Vue.component('data-list-pagination', Pagination);
-Vue.component('data-list-filters', Filters);
-Vue.component('data-list-filter-presets', FilterPresets);
+    // Resource Type Lists
+    app.component('entry-list', EntryListing);
+    app.component('collection-list', CollectionListing);
+    app.component('taxonomy-list', TaxonomyListing);
+    app.component('term-list', TermListing);
+    app.component('asset-container-list', AssetContainerList);
+    app.component('addon-list', AddonList);
+    app.component('addon-details', AddonDetails);
 
-// Resource Type Lists
-Vue.component('entry-list', EntryListing);
-Vue.component('collection-list', CollectionListing);
-Vue.component('taxonomy-list', TaxonomyListing);
-Vue.component('term-list', TermListing);
-Vue.component('asset-container-list', AssetContainerList);
-Vue.component('addon-list', AddonList);
-Vue.component('addon-details', AddonDetails);
+    // Widgets
+    app.component('collection-widget', CollectionWidget);
 
-// Widgets
-Vue.component('collection-widget', CollectionWidget);
+    // Reusable
+    app.component('svg-icon', SvgIcon);
+    app.component('file-icon', FileIcon);
+    app.component('loading-graphic', LoadingGraphic);
+    app.component('dropdown-list', DropdownList);
+    app.component('dropdown-item', DropdownItem);
+    app.component('validation-errors', ValidationErrors);
+    app.component('slugify', Slugify);
+    app.component('element-container', ElementContainer);
+    app.component('avatar', Avatar);
+    app.component('breadcrumb', Breadcrumb);
+    app.component('breadcrumbs', Breadcrumbs);
+    app.component('create-entry-button', CreateEntryButton);
+    app.component('popover', Popover);
+    app.component('portal', Portal);
+    app.component('code-block', CodeBlock);
+    app.component('date-time', DateTime);
 
-// Reusable
-Vue.component('svg-icon', SvgIcon);
-Vue.component('file-icon', FileIcon);
-Vue.component('loading-graphic', LoadingGraphic);
-Vue.component('dropdown-list', DropdownList);
-Vue.component('dropdown-item', DropdownItem);
-Vue.component('validation-errors', ValidationErrors);
-Vue.component('slugify', Slugify);
-Vue.component('element-container', ElementContainer);
-Vue.component('avatar', Avatar);
-Vue.component('breadcrumb', Breadcrumb);
-Vue.component('breadcrumbs', Breadcrumbs);
-Vue.component('create-entry-button', CreateEntryButton);
-Vue.component('popover', Popover);
-Vue.component('portal', Portal);
-Vue.component('code-block', CodeBlock);
+    // Recursive
+    app.component('role-permission-tree', PermissionTree);
 
-// Recursive
-Vue.component('role-permission-tree', PermissionTree);
+    // Modals
+    app.component(
+        'modal',
+        defineAsyncComponent(() => import('../components/Modal.vue')),
+    );
+    app.component('confirmation-modal', ConfirmationModal);
+    app.component('favorite-creator', FavoriteCreator);
+    app.component('keyboard-shortcuts-modal', KeyboardShortcutsModal);
+    app.component('resource-deleter', ResourceDeleter);
+    app.component('field-action-modal', FieldActionModal);
 
-// Modals
-Vue.component('modal', Modal);
-Vue.component('confirmation-modal', ConfirmationModal);
-Vue.component('favorite-creator', FavoriteCreator);
-Vue.component('keyboard-shortcuts-modal', KeyboardShortcutsModal);
-Vue.component('resource-deleter', ResourceDeleter);
-Vue.component('field-action-modal', FieldActionModal);
+    app.component('stack', Stack);
+    app.component('stack-test', StackTest);
 
-Vue.component('stack', Stack);
-Vue.component('stack-test', StackTest);
-
-Vue.component('blueprint-resetter', BlueprintResetter);
+    app.component('blueprint-resetter', BlueprintResetter);
+}

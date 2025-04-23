@@ -1,48 +1,53 @@
 <template>
     <div class="datetime min-w-[145px]">
-
-        <button type="button" class="btn flex mb-2 md:mb-0 items-center rtl:pr-3 ltr:pl-3" v-if="!isReadOnly && config.inline === false && !hasDate" @click="addDate" tabindex="0">
-            <svg-icon name="light/calendar" class="w-4 h-4 rtl:ml-2 ltr:mr-2"></svg-icon>
-    		{{ __('Add Date') }}
-    	</button>
-
-        <div v-if="hasDate || config.inline"
-            class="date-time-container flex flex-col @sm:flex-row gap-2"
+        <button
+            type="button"
+            class="btn mb-2 flex items-center md:mb-0 ltr:pl-3 rtl:pr-3"
+            v-if="!isReadOnly && config.inline === false && !hasDate"
+            @click="addDate"
+            tabindex="0"
         >
+            <svg-icon name="light/calendar" class="h-4 w-4 ltr:mr-2 rtl:ml-2"></svg-icon>
+            {{ __('Add Date') }}
+        </button>
+
+        <div v-if="hasDate || config.inline" class="date-time-container flex flex-col gap-2 @sm:flex-row">
             <component
                 :is="pickerComponent"
                 v-bind="pickerProps"
-                @input="setDate"
+                @update:model-value="setLocalDate"
                 @focus="focusedField = $event"
                 @blur="focusedField = null"
             />
 
             <div v-if="config.time_enabled && !isRange" class="time-container time-fieldtype">
-				<time-fieldtype
+                <time-fieldtype
                     v-if="hasTime"
                     ref="time"
                     handle=""
-                    :value="value.time"
+                    :value="localValue.time"
                     :required="config.time_enabled"
                     :show-seconds="config.time_seconds_enabled"
                     :read-only="isReadOnly"
                     :config="{}"
-                    @input="setTime"
+                    @update:value="setLocalTime"
                 />
-			</div>
+            </div>
         </div>
     </div>
-
 </template>
 
 <script>
+import Fieldtype from './Fieldtype.vue';
 import SinglePopover from './date/SinglePopover.vue';
 import SingleInline from './date/SingleInline.vue';
 import RangePopover from './date/RangePopover.vue';
 import RangeInline from './date/RangeInline.vue';
+import { useScreens } from 'vue-screen-utils';
+import { toRaw } from 'vue';
+import DateFormatter from '@statamic/components/DateFormatter.js';
 
 export default {
-
     components: {
         SinglePopover,
         SingleInline,
@@ -52,17 +57,28 @@ export default {
 
     mixins: [Fieldtype],
 
-    inject: ['storeName'],
+    inject: ['store'],
+
+    setup() {
+        const { mapCurrent } = useScreens({
+            xs: '0px',
+            sm: '640px',
+            md: '768px',
+            lg: '1024px',
+        });
+
+        return { screens: mapCurrent };
+    },
 
     data() {
         return {
             containerWidth: null,
-            focusedField: null
-        }
+            focusedField: null,
+            localValue: null,
+        };
     },
 
     computed: {
-
         pickerComponent() {
             if (this.isRange) {
                 return this.usesPopover ? 'RangePopover' : 'RangeInline';
@@ -72,6 +88,10 @@ export default {
         },
 
         hasDate() {
+            if (this.isRange) {
+                return this.config.required || this.value?.start || this.value?.end;
+            }
+
             return this.config.required || this.value.date;
         },
 
@@ -80,7 +100,7 @@ export default {
         },
 
         hasSeconds() {
-            return this.config.time_has_seconds;
+            return this.config.time_seconds_enabled;
         },
 
         isSingle() {
@@ -103,18 +123,23 @@ export default {
             return {
                 isReadOnly: this.isReadOnly,
                 bindings: this.commonDatePickerBindings,
-            }
+            };
         },
 
         datePickerValue() {
-            if (this.isRange) return this.value.date;
+            if (this.isRange) {
+                return {
+                    start: this.localValue?.start?.date,
+                    end: this.localValue?.end?.date,
+                };
+            }
 
             // The calendar component will do `new Date(datePickerValue)` under the hood.
             // If you pass a date without a time, it will treat it as UTC. By adding a time,
             // it will behave as local time. The date that comes from the server will be what
             // we expect. The time is handled separately by the nested time fieldtype.
             // https://github.com/statamic/cms/pull/6688
-            return this.value.date+'T00:00:00';
+            return this.localValue.date + 'T00:00:00';
         },
 
         commonDatePickerBindings() {
@@ -126,72 +151,155 @@ export default {
                         popover: {
                             label: __('Today'),
                         },
-                        dates: new Date()
-                    }
+                        dates: new Date(),
+                    },
                 ],
-                columns: this.$screens({ default: 1, lg: this.config.columns }),
-                rows: this.$screens({ default: 1, lg: this.config.rows }),
-                isExpanded: this.name === 'date' || this.config.full_width,
+                columns: this.screens({ default: 1, lg: this.config.columns }).value,
+                rows: this.screens({ default: 1, lg: this.config.rows }).value,
+                expanded: this.name === 'date' || this.config.full_width,
                 isRequired: this.config.required,
-                locale: this.$config.get('locale').replace('_', '-'),
-                masks: { input: [this.displayFormat] },
+                locale: Statamic.$date.locale,
+                masks: { input: ['L'], modelValue: 'YYYY-MM-DD' },
                 minDate: this.config.earliest_date.date,
                 maxDate: this.config.latest_date.date,
-                modelConfig: { type: 'string', mask: this.format },
                 updateOnInput: false,
-                value: this.datePickerValue,
+                modelValue: this.datePickerValue,
+                modelModifiers: { string: true, range: this.isRange },
+                popover: { visibility: 'click' },
             };
-        },
-
-        datePickerEvents() {
-            return {
-                input: this.setDate
-            };
-        },
-
-        format() {
-            return 'YYYY-MM-DD';
-        },
-
-        displayFormat() {
-            return this.meta.displayFormat;
         },
 
         replicatorPreview() {
-            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
-            if (! this.value.date) return;
+            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
 
             if (this.isRange) {
-                return Vue.moment(this.value.date.start).format(this.displayFormat) + ' – ' + Vue.moment(this.value.date.end).format(this.displayFormat);
+                if (!this.localValue?.start) return;
+
+                const start = this.value.start.date + 'T' + (this.value.start.time || '00:00:00') + 'Z';
+                const end = this.value.end.date + 'T' + (this.value.end.time || '00:00:00') + 'Z';
+                const formatter = new DateFormatter().options('date');
+
+                return formatter.date(start) + ' – ' + formatter.date(end);
             }
 
-            let preview = Vue.moment(this.value.date).format(this.displayFormat);
+            if (!this.value?.date) return;
 
-            if (this.hasTime && this.value.time) {
-                preview += ` ${this.value.time}`;
-            }
-
-            return preview;
+            return DateFormatter.format(
+                this.value.date + 'T' + (this.value.time || '00:00:00') + 'Z',
+                this.hasTime && this.value.time ? 'datetime' : 'date',
+            );
         },
-
     },
 
     created() {
-        if (this.value.time === 'now') {
-            // Probably shouldn't be modifying a prop, but luckily it all works nicely, without
-            // needing to create an "update value without triggering dirty state" flow yet.
-            this.value.time = Vue.moment().format(this.hasSeconds ? 'HH:mm:ss' : 'HH:mm');
-        }
-
         this.$events.$on(`container.${this.storeName}.saving`, this.triggerChangeOnFocusedField);
     },
 
-    destroyed() {
+    mounted() {
+        if (this.isRange && this.config.required && !this.value) {
+            this.addDate();
+        }
+    },
+
+    unmounted() {
         this.$events.$off(`container.${this.storeName}.saving`, this.triggerChangeOnFocusedField);
     },
 
+    watch: {
+        value: {
+            immediate: true,
+            handler(value, oldValue) {
+                if (this.isRange) {
+                    if (!value || !value.start) {
+                        this.localValue = { start: { date: null, time: null }, end: { date: null, time: null } };
+                        return;
+                    }
+
+                    let localValue = {
+                        start: this.createLocalFromUtc(value.start),
+                        end: this.createLocalFromUtc(value.end),
+                    };
+
+                    if (JSON.stringify(toRaw(this.localValue)) === JSON.stringify(localValue)) {
+                        return;
+                    }
+
+                    this.localValue = localValue;
+
+                    return;
+                }
+
+                if (!value || !value.date) {
+                    this.localValue = { date: null, time: null };
+                    return;
+                }
+
+                let localValue = this.createLocalFromUtc(value);
+
+                if (JSON.stringify(toRaw(this.localValue)) === JSON.stringify(localValue)) {
+                    return;
+                }
+
+                this.localValue = localValue;
+            },
+        },
+
+        localValue(value) {
+            if (this.isRange) {
+                this.update({
+                    start: this.createUtcFromLocal(value.start),
+                    end: this.createUtcFromLocal(value.end),
+                });
+
+                return;
+            }
+
+            this.update(this.createUtcFromLocal(value));
+        },
+    },
 
     methods: {
+        createLocalFromUtc(utcValue) {
+            const dateTime = new Date(utcValue.date + 'T' + (utcValue.time || '00:00:00') + 'Z');
+
+            let date =
+                dateTime.getFullYear() +
+                '-' +
+                (dateTime.getMonth() + 1).toString().padStart(2, '0') +
+                '-' +
+                dateTime.getDate().toString().padStart(2, '0');
+            let time =
+                dateTime.getHours().toString().padStart(2, '0') +
+                ':' +
+                dateTime.getMinutes().toString().padStart(2, '0');
+
+            if (this.hasSeconds) {
+                time += ':' + dateTime.getSeconds().toString().padStart(2, '0');
+            }
+
+            return { date, time };
+        },
+
+        createUtcFromLocal(localValue) {
+            const dateTime = new Date(localValue.date + 'T' + (localValue.time || '00:00:00'));
+
+            let date =
+                dateTime.getUTCFullYear() +
+                '-' +
+                (dateTime.getUTCMonth() + 1).toString().padStart(2, '0') +
+                '-' +
+                dateTime.getUTCDate().toString().padStart(2, '0');
+            let time =
+                dateTime.getUTCHours().toString().padStart(2, '0') +
+                ':' +
+                dateTime.getUTCMinutes().toString().padStart(2, '0');
+
+            if (this.hasSeconds) {
+                time += ':' + dateTime.getUTCSeconds().toString().padStart(2, '0');
+            }
+
+            return { date, time };
+        },
 
         triggerChangeOnFocusedField() {
             if (!this.focusedField) return;
@@ -199,25 +307,56 @@ export default {
             this.focusedField.dispatchEvent(new Event('change'));
         },
 
-        setDate(date) {
-            if (!date) {
-                this.update({ date: null, time: null });
+        setLocalDate(date) {
+            if (this.isRange) {
+                this.localValue = {
+                    start: { date: date.start, time: '00:00' },
+                    end: { date: date.end, time: '23:59' },
+                };
+
                 return;
             }
 
-            this.update({ ...this.value, date });
+            if (!date) {
+                this.localValue = { date: null, time: null };
+                return;
+            }
+
+            this.localValue = {
+                date,
+                time: this.config.time_enabled ? this.localValue.time : '00:00',
+            };
         },
 
-        setTime(time) {
-            this.update({ ...this.value, time });
+        setLocalTime(time) {
+            this.localValue = { ...this.localValue, time };
         },
 
         addDate() {
-            const now = Vue.moment().format(this.format);
-            const date = this.isRange ? { start: now, end: now } : now;
-            this.update({ date, time: null });
-        },
+            let now = new Date();
 
+            if (!this.config.time_enabled) {
+                now.setHours(0, 0, 0, 0);
+            }
+
+            let date =
+                now.getFullYear() +
+                '-' +
+                String(now.getMonth() + 1).padStart(2, '0') +
+                '-' +
+                String(now.getDate()).padStart(2, '0');
+
+            let time = now.toLocaleTimeString(undefined, {
+                hour12: false,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: this.hasSeconds ? '2-digit' : undefined,
+            });
+
+            this.localValue = this.isRange
+                ? { start: { date, time: '00:00' }, end: { date, time: '23:59' } }
+                : { date, time };
+        },
     },
 };
 </script>

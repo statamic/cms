@@ -1,20 +1,19 @@
-import PreviewHtml from "./PreviewHtml";
+import PreviewHtml from './PreviewHtml';
 
 export default {
-
     computed: {
         previewText() {
-            const previews = _(this.previews).filter((value, handle) => {
-                const config = _.findWhere(this.config.fields, { handle }) || {};
+            const previews = Object.entries(this.previews).filter(([handle, value]) => {
+                const config = this.config.fields.find((f) => f.handle === handle) || {};
                 return config.replicator_preview === undefined ? this.showFieldPreviews : config.replicator_preview;
             });
 
             return Object.values(previews)
-                .filter(value => {
+                .filter((value) => {
                     if (['null', '[]', '{}', ''].includes(JSON.stringify(value))) return null;
                     return value;
                 })
-                .map(value => {
+                .map((value) => {
                     if (value instanceof PreviewHtml) return value.html;
 
                     if (typeof value === 'string') return escapeHtml(value);
@@ -26,7 +25,6 @@ export default {
                     return escapeHtml(JSON.stringify(value));
                 })
                 .join(' / ');
-        }
-    }
-
-}
+        },
+    },
+};

@@ -1954,66 +1954,6 @@ class AssetTest extends TestCase
     }
 
     #[Test]
-    public function it_can_process_a_custom_image_format()
-    {
-        Event::fake();
-
-        config(['statamic.assets.image_manipulation.presets.small' => [
-            'w' => '15',
-            'h' => '15',
-        ]]);
-
-        // Normally pdf files (for example) are not supported by gd or imagick. However, imagick does
-        // does actually support over 100 formats with extra configuration (eg. via ghostscript).
-        // Thus, we allow the user to configure additional extensions in their assets config.
-        config(['statamic.assets.image_manipulation.additional_extensions' => [
-            'pdf',
-        ]]);
-
-        $this->container->sourcePreset('small');
-
-        $asset = (new Asset)->container($this->container)->path('path/to/asset.pdf')->syncOriginal();
-
-        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
-        Storage::disk('test')->assertMissing('path/to/asset.pdf');
-
-        $file = UploadedFile::fake()->image('asset.pdf', 20, 30);
-
-        // Ensure a glide server is instantiated and `makeImage()` is called...
-        Facades\Glide::partialMock()
-            ->shouldReceive('server->makeImage')
-            ->andReturn($file->getFilename())
-            ->once();
-
-        // Since we're mocking the glide server, and since the uploader's `write()` method expects
-        // this location, we need to force it into that storage path for this test to pass...
-        File::move($file->getRealPath(), $tempUploadedFilePath = storage_path('statamic/glide/tmp').'/'.$file->getFilename());
-
-        // Perform the upload...
-        $return = $asset->upload($file);
-
-        // Now we'll delete that temporary UploadedFile, because we moved it into the app's storage above, and
-        // it's normally not supposed to be there. This is necessary to prevent state issues across tests...
-        File::delete($tempUploadedFilePath);
-
-        $this->assertEquals($asset, $return);
-        $this->assertDirectoryExists($glideDir = storage_path('statamic/glide/tmp'));
-        $this->assertEmpty(app('files')->allFiles($glideDir)); // no temp files
-        Storage::disk('test')->assertExists('path/to/asset.pdf');
-        $this->assertEquals('path/to/asset.pdf', $asset->path());
-        Event::assertDispatched(AssetUploaded::class, function ($event) use ($asset) {
-            return $event->asset = $asset;
-        });
-        Event::assertDispatched(AssetSaved::class);
-        $meta = $asset->meta();
-
-        // Normally we assert changes to the meta, but we cannot in this test because we can't guarantee
-        // the test suite has imagick with ghostscript installed (required for pdf files, for example).
-        // $this->assertEquals(10, $meta['width']);
-        // $this->assertEquals(15, $meta['height']);
-    }
-
-    #[Test]
     public function it_appends_timestamp_to_uploaded_files_filename_if_it_already_exists()
     {
         Event::fake();

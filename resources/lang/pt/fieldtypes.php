@@ -22,7 +22,6 @@ return [
     'assets.dynamic_folder_pending_field' => 'Este campo estará disponível quando :field for definido.',
     'assets.dynamic_folder_pending_save' => 'Este campo estará disponível após salvar.',
     'assets.title' => 'Assets',
-    'bard.config.allow_source' => 'Habilitar a opção de visualizar o código fonte HTML enquanto escreve',
     'bard.config.always_show_set_button' => 'Permitir mostrar sempre o botão "Adicionar Set".',
     'bard.config.buttons' => 'Escolha quais os botões a mostrar na barra de ferramentas.',
     'bard.config.container' => 'Escolha qual o contentor de activos a utilizar para este campo.',

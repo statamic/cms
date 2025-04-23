@@ -6,7 +6,6 @@
 import { defineAsyncComponent } from 'vue';
 
 export default {
-
     props: {
         extension: String,
     },
@@ -100,7 +99,7 @@ export default {
 
         icon() {
             return defineAsyncComponent(() => import(`./../../svg/filetypes/${this.name}.svg`));
-        }
-    }
-}
+        },
+    },
+};
 </script>

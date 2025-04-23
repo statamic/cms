@@ -1,14 +1,12 @@
 <template>
-
     <div :class="{ 'btn-group': showOptions }">
-
         <!-- Save button -->
         <slot></slot>
 
         <!-- Save and continue options dropdown -->
-        <dropdown-list v-if="showOptions" class="rtl:text-right ltr:text-left">
+        <dropdown-list v-if="showOptions" class="ltr:text-left rtl:text-right">
             <template v-slot:trigger>
-                <button :class="buttonClass" class="rtl:rounded-r-none ltr:rounded-l-none">
+                <button :class="buttonClass" class="ltr:rounded-l-none rtl:rounded-r-none">
                     <svg-icon v-if="buttonIcon" :name="buttonIcon.name" :class="buttonIcon.class" />
                 </button>
             </template>
@@ -18,23 +16,21 @@
                     <radio-fieldtype
                         handle="save_and_continue_options"
                         :config="options"
-                        v-model="currentOption"
+                        :value="currentOption"
+                        @update:value="currentOption = $event"
                     />
                 </div>
             </div>
         </dropdown-list>
-
     </div>
-
 </template>
 
 <script>
 export default {
-
     props: {
         showOptions: {
             type: Boolean,
-            default: true
+            default: true,
         },
         buttonClass: {
             default: 'btn-primary',
@@ -63,13 +59,13 @@ export default {
         },
 
         buttonIcon() {
-            switch(true) {
+            switch (true) {
                 case this.currentOption === 'listing':
-                    return {name: 'micro/arrow-go-back', class: 'w-3'};
+                    return { name: 'micro/arrow-go-back', class: 'w-3' };
                 case this.currentOption === 'continue_editing':
-                    return {name: 'micro/chevron-down-xs', class: 'w-2'};
+                    return { name: 'micro/chevron-down-xs', class: 'w-2' };
                 case this.currentOption === 'create_another':
-                    return {name: 'micro/add-circle', class: 'w-3'};
+                    return { name: 'micro/add-circle', class: 'w-3' };
             }
         },
 
@@ -81,7 +77,7 @@ export default {
     mounted() {
         this.setInitialValue();
 
-        this.$watch('currentOption', value => this.setPreference(value));
+        this.$watch('currentOption', (value) => this.setPreference(value));
     },
 
     methods: {
@@ -97,15 +93,18 @@ export default {
                 : this.$preferences.set(this.preferencesKey, value);
         },
     },
-
-}
+};
 </script>
 
 <style>
-    .save-and-continue-options input {
-        margin-bottom: 9px;
+.save-and-continue-options input {
+    margin-bottom: 9px;
+}
+.save-and-continue-options input {
+    margin-right: 5px;
+    [dir='rtl'] & {
+        margin-left: 5px;
+        margin-right: 0;
     }
-    .save-and-continue-options input {
-        margin-right: 5px ; [dir="rtl"] & { margin-left: 5px ; margin-right: 0 ; }
-    }
+}
 </style>
