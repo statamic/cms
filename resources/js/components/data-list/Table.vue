@@ -7,6 +7,7 @@
         tabindex="0"
         @keydown.shift="shiftDown"
         @keyup="clearShift"
+        :data-has-selections="sharedState.selections.length > 0 || undefined"
     >
         <thead v-if="allowBulkActions || visibleColumns.length > 1">
             <tr>
@@ -49,7 +50,7 @@
                     v-for="(row, index) in rows"
                     :key="row.id"
                     class="sortable-row outline-hidden"
-                    :class="{ 'row-selected': sharedState.selections.includes(row.id) }"
+                    :data-row="sharedState.selections.includes(row.id) ? 'selected' : 'unselected'"
                 >
                     <td class="table-drag-handle" v-if="reorderable"></td>
                     <td class="checkbox-column" v-if="allowBulkActions && !reorderable">

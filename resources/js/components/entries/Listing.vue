@@ -15,38 +15,40 @@
             @visible-columns-updated="visibleColumns = $event"
         >
             <div>
-                <div class="">
-                    <div v-if="!reordering" class="space-y-6">
-                        <data-list-filter-presets
-                            ref="presets"
-                            :active-preset="activePreset"
-                            :active-preset-payload="activePresetPayload"
-                            :active-filters="activeFilters"
-                            :has-active-filters="hasActiveFilters"
-                            :preferences-prefix="preferencesPrefix"
-                            :search-query="searchQuery"
-                            @selected="selectPreset"
-                            @reset="filtersReset"
-                        />
+                <div class="space-y-6">
 
-                        <div class="flex gap-2">
-                            <Button
-                                size="sm"
-                                v-text="__('Reset')"
-                                v-show="isDirty"
-                                @click="$refs.presets.refreshPreset()"
-                            />
-                            <Button
-                                size="sm"
-                                v-text="__('Save')"
-                                v-show="isDirty"
-                                @click="$refs.presets.savePreset()"
-                            />
-                        </div>
-                    </div>
+                    <!-- Preset Views/Tabs -->
+                    <data-list-filter-presets
+                        v-if="!reordering"
+                        ref="presets"
+                        :active-preset="activePreset"
+                        :active-preset-payload="activePresetPayload"
+                        :active-filters="activeFilters"
+                        :has-active-filters="hasActiveFilters"
+                        :preferences-prefix="preferencesPrefix"
+                        :search-query="searchQuery"
+                        @selected="selectPreset"
+                        @reset="filtersReset"
+                    />
+
+                    <!-- <div class="flex gap-2">
+                        <Button
+                            size="sm"
+                            v-text="__('Reset')"
+                            v-show="isDirty"
+                            @click="$refs.presets.refreshPreset()"
+                        />
+                        <Button
+                            size="sm"
+                            v-text="__('Save')"
+                            v-show="isDirty"
+                            @click="$refs.presets.savePreset()"
+                        />
+                    </div> -->
+
 
                     <!-- Search and Filter -->
-                    <div class="mb-6 flex items-center gap-3">
+                    <div class="flex items-center gap-3">
                         <data-list-search ref="search" v-model="searchQuery" :placeholder="searchPlaceholder" />
                         <data-list-filters
                             v-show="!reordering"
