@@ -187,7 +187,6 @@ class DefaultInvalidator implements Invalidator
             ->map(fn (string $rule) => Str::removeRight($variables->site()->url(), '/').Str::ensureLeft($rule, '/'))
             ->all();
 
-            Arr::get($this->rules, "globals.{$variables->globalSet()->handle()}.urls")
         $this->cacher->invalidateUrls([
             ...$absoluteUrls,
             ...$prefixedRelativeUrls,
