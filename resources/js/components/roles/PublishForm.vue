@@ -1,18 +1,13 @@
 <template>
     <div>
-        <ui-header :title="__(initialTitle) || __('Create Role')">
-            <ui-button
-                type="submit"
-                variant="primary"
-                @click="save"
-                :text="__('Save')"
-            />
-        </ui-header>
+        <Header :title="__(initialTitle) || __('Create Role')">
+            <Button type="submit" variant="primary" @click="save" :text="__('Save')" />
+        </Header>
 
-        <div class="card configure-tab publish-fields mb-6 p-0 @container">
+        <div class="card configure-tab publish-fields @container mb-6 p-0">
             <form-group
                 handle="title"
-                class="border-b dark:border-dark-900"
+                class="dark:border-dark-900 border-b"
                 :display="__('Title')"
                 :errors="errors.title"
                 :instructions="__('messages.role_title_instructions')"
@@ -21,7 +16,7 @@
             />
 
             <form-group
-                class="border-b dark:border-dark-900"
+                class="dark:border-dark-900 border-b"
                 fieldtype="slug"
                 handle="handle"
                 :display="__('Handle')"
@@ -47,7 +42,7 @@
 
         <div v-if="!isSuper">
             <div class="content mt-6" v-for="group in permissions" :key="group.handle">
-                <h2 class="mb-2 mt-10 text-base">{{ group.label }}</h2>
+                <h2 class="mt-10 mb-2 text-base">{{ group.label }}</h2>
                 <role-permission-tree class="card p-0" :depth="1" :initial-permissions="group.permissions" />
             </div>
         </div>
@@ -55,6 +50,8 @@
 </template>
 
 <script>
+import { Header, Button } from '@statamic/ui';
+
 const checked = function (permissions) {
     return permissions.reduce((carry, permission) => {
         if (!permission.checked) return carry;
@@ -63,6 +60,11 @@ const checked = function (permissions) {
 };
 
 export default {
+    components: {
+        Header,
+        Button,
+    },
+
     props: {
         initialTitle: String,
         initialHandle: String,

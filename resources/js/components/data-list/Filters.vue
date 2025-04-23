@@ -1,13 +1,9 @@
 <template>
-    <div class="flex flex-wrap gap-3 items-center">
+    <div class="flex flex-wrap items-center gap-3">
         <!-- Field filter (requires custom selection UI) -->
         <popover v-if="fieldFilter" placement="bottom-start" @closed="fieldFilterClosed">
             <template #trigger>
-                <ui-button
-                    icon-append="ui/chevron-down"
-                    @click="resetFilterPopover"
-                    :text="fieldFilter.title"
-                />
+                <Button icon-append="ui/chevron-down" @click="resetFilterPopover" :text="fieldFilter.title" />
             </template>
             <template #default="{ close: closePopover }">
                 <div class="flex min-w-[18rem] flex-col text-end">
@@ -35,11 +31,7 @@
             :stop-propagation="false"
         >
             <template #trigger>
-                <ui-button
-                    icon-append="ui/chevron-down"
-                    @click="resetFilterPopover"
-                    :text="filter.title"
-                />
+                <Button icon-append="ui/chevron-down" @click="resetFilterPopover" :text="filter.title" />
             </template>
             <template #default="{ close: closePopover }">
                 <div class="w-64">
@@ -57,12 +49,7 @@
         <!-- Standard unpinned filters -->
         <popover v-if="unpinnedFilters.length" placement="bottom-start" :stop-propagation="false">
             <template #trigger>
-                <ui-button
-                    icon-append="ui/chevron-down"
-                    icon-as-button
-                    @click="resetFilterPopover"
-                    :text="__('Filter')"
-                />
+                <Button icon-append="ui/chevron-down" icon-as-button @click="resetFilterPopover" :text="__('Filter')" />
             </template>
             <template #default="{ close: closePopover }">
                 <div class="w-64">
@@ -93,14 +80,14 @@
         </popover>
 
         <!-- Active filter badges -->
-        <ui-button
+        <Button
             v-for="(badge, handle) in fieldFilterBadges"
             variant="filled"
             icon-append="x"
             :text="badge"
             @click="removeFieldFilter(handle)"
         />
-        <ui-button
+        <Button
             v-for="(badge, handle) in standardBadges"
             variant="filled"
             icon-append="x"
@@ -114,11 +101,13 @@
 import DataListFilter from './Filter.vue';
 import FieldFilter from './FieldFilter.vue';
 import { isEqual } from 'lodash-es';
+import { Button } from '@statamic/ui';
 
 export default {
     components: {
         DataListFilter,
         FieldFilter,
+        Button,
     },
 
     props: {

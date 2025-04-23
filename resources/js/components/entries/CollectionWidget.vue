@@ -1,9 +1,14 @@
 <script>
-import Listing from '../Listing.vue'
+import Listing from '../Listing.vue';
+import { Widget, StatusIndicator } from '@statamic/ui';
 
 export default {
-
     mixins: [Listing],
+
+    components: {
+        StatusIndicator,
+        Widget,
+    },
 
     props: {
         additionalColumns: Array,
@@ -16,38 +21,35 @@ export default {
             cols: [{ label: 'Title', field: 'title', visible: true }, ...this.additionalColumns],
             listingKey: 'entries',
             requestUrl: cp_url(`collections/${this.collection}/entries`),
-        }
+        };
     },
 
     methods: {
         columnShowing(column) {
-            return this.cols.find((c) => c.field === column)
+            return this.cols.find((c) => c.field === column);
         },
     },
-}
+};
 </script>
 
 <template>
-    <ui-widget :title="title" icon="collections">
-        <data-list
-            v-if="!initializing && items.length"
-            :rows="items"
-            :columns="cols"
-            :sort="false"
-        >
+    <Widget :title="title" icon="collections">
+        <data-list v-if="!initializing && items.length" :rows="items" :columns="cols" :sort="false">
             <div v-if="initializing" class="loading">
                 <loading-graphic />
             </div>
 
-            <data-list-table v-else :loading="loading" unstyled class="[&_td]:text-sm [&_td]:p-0.5 [&_thead]:hidden">
+            <data-list-table v-else :loading="loading" unstyled class="[&_td]:p-0.5 [&_td]:text-sm [&_thead]:hidden">
                 <template #cell-title="{ row: entry }">
                     <div class="flex items-center gap-2">
-                        <ui-status-indicator v-if="!columnShowing('status')" :status="entry.status" />
-                        <a :href="entry.edit_url" class="overflow-hidden text-ellipsis line-clamp-1">{{ entry.title }}</a>
+                        <StatusIndicator v-if="!columnShowing('status')" :status="entry.status" />
+                        <a :href="entry.edit_url" class="line-clamp-1 overflow-hidden text-ellipsis">{{
+                            entry.title
+                        }}</a>
                     </div>
                 </template>
                 <template #cell-status="{ row: entry }">
-                    <ui-status-indicator :status="entry.status" :show-dot="false" show-label />
+                    <StatusIndicator :status="entry.status" :show-dot="false" show-label />
                 </template>
             </data-list-table>
         </data-list>
@@ -66,5 +68,5 @@ export default {
             />
             <slot name="actions" />
         </template>
-    </ui-widget>
+    </Widget>
 </template>

@@ -30,13 +30,13 @@
                         />
 
                         <div class="flex gap-2">
-                            <ui-button
+                            <Button
                                 size="sm"
                                 v-text="__('Reset')"
                                 v-show="isDirty"
                                 @click="$refs.presets.refreshPreset()"
                             />
-                            <ui-button
+                            <Button
                                 size="sm"
                                 v-text="__('Save')"
                                 v-show="isDirty"
@@ -46,27 +46,27 @@
                     </div>
 
                     <!-- Search and Filter -->
-                    <div class="flex items-center gap-3 mb-6">
+                    <div class="mb-6 flex items-center gap-3">
                         <data-list-search ref="search" v-model="searchQuery" :placeholder="searchPlaceholder" />
-                            <data-list-filters
-                                v-show="!reordering"
-                                ref="filters"
-                                :filters="filters"
-                                :active-preset="activePreset"
-                                :active-preset-payload="activePresetPayload"
-                                :active-filters="activeFilters"
-                                :active-filter-badges="activeFilterBadges"
-                                :active-count="activeFilterCount"
-                                :search-query="searchQuery"
-                                :is-searching="true"
-                                :saves-presets="true"
-                                :preferences-prefix="preferencesPrefix"
-                                @changed="filterChanged"
-                                @saved="$refs.presets.setPreset($event)"
-                                @deleted="$refs.presets.refreshPresets()"
-                            />
-                            <div class="flex-1" />
-                            <data-list-column-picker :preferences-key="preferencesKey('columns')" />
+                        <data-list-filters
+                            v-show="!reordering"
+                            ref="filters"
+                            :filters="filters"
+                            :active-preset="activePreset"
+                            :active-preset-payload="activePresetPayload"
+                            :active-filters="activeFilters"
+                            :active-filter-badges="activeFilterBadges"
+                            :active-count="activeFilterCount"
+                            :search-query="searchQuery"
+                            :is-searching="true"
+                            :saves-presets="true"
+                            :preferences-prefix="preferencesPrefix"
+                            @changed="filterChanged"
+                            @saved="$refs.presets.setPreset($event)"
+                            @deleted="$refs.presets.refreshPresets()"
+                        />
+                        <div class="flex-1" />
+                        <data-list-column-picker :preferences-key="preferencesKey('columns')" />
                     </div>
 
                     <div v-show="items.length === 0" class="p-6 text-center text-gray-500" v-text="__('No results')" />
@@ -77,7 +77,7 @@
                         @started="actionStarted"
                         @completed="actionCompleted"
                     />
-                    <ui-panel class="relative overflow-x-auto overscroll-x-contain">
+                    <Panel class="relative overflow-x-auto overscroll-x-contain">
                         <data-list-table
                             v-show="items.length"
                             :allow-bulk-actions="!reordering"
@@ -89,28 +89,34 @@
                             @reordered="reordered"
                         >
                             <template #cell-title="{ row: entry }">
-                                <a
-                                    class="title-index-field"
-                                    :href="entry.edit_url"
-                                    @click.stop
-                                >
-                                    <ui-status-indicator v-if="!columnShowing('status')" :status="entry.status" />
+                                <a class="title-index-field" :href="entry.edit_url" @click.stop>
+                                    <StatusIndicator v-if="!columnShowing('status')" :status="entry.status" />
                                     <span v-text="entry.title" />
                                 </a>
                             </template>
                             <template #cell-status="{ row: entry }">
-                                <ui-status-indicator :status="entry.status" show-label :show-dot="false" />
+                                <StatusIndicator :status="entry.status" show-label :show-dot="false" />
                             </template>
                             <template #cell-slug="{ row: entry }">
                                 <div class="slug-index-field" :title="entry.slug">{{ entry.slug }}</div>
                             </template>
                             <template #actions="{ row: entry, index }">
-                                <ui-dropdown placement="left-start" class="me-3">
-                                    <ui-dropdown-menu>
-                                        <ui-dropdown-label :text="__('Actions')" />
-                                        <ui-dropdown-item :text="__('Visit URL')" :href="entry.permalink" icon="eye" v-if="entry.viewable && entry.permalink" />
-                                        <ui-dropdown-item :text="__('Edit')" :href="entry.edit_url" icon="edit" v-if="entry.editable" />
-                                        <ui-dropdown-separator v-if="entry.actions.length" />
+                                <Dropdown placement="left-start" class="me-3">
+                                    <DropdownMenu>
+                                        <DropdownLabel :text="__('Actions')" />
+                                        <DropdownItem
+                                            :text="__('Visit URL')"
+                                            :href="entry.permalink"
+                                            icon="eye"
+                                            v-if="entry.viewable && entry.permalink"
+                                        />
+                                        <DropdownItem
+                                            :text="__('Edit')"
+                                            :href="entry.edit_url"
+                                            icon="edit"
+                                            v-if="entry.editable"
+                                        />
+                                        <DropdownSeparator v-if="entry.actions.length" />
                                         <data-list-list-actions
                                             :item="entry.id"
                                             :url="actionUrl"
@@ -118,11 +124,11 @@
                                             @started="actionStarted"
                                             @completed="actionCompleted"
                                         />
-                                    </ui-dropdown-menu>
-                                </ui-dropdown>
+                                    </DropdownMenu>
+                                </Dropdown>
                             </template>
                         </data-list-table>
-                    </ui-panel>
+                    </Panel>
                 </div>
                 <data-list-pagination
                     class="mt-3"
@@ -139,9 +145,30 @@
 
 <script>
 import Listing from '../Listing.vue';
+import {
+    Button,
+    Panel,
+    StatusIndicator,
+    Dropdown,
+    DropdownMenu,
+    DropdownItem,
+    DropdownLabel,
+    DropdownSeparator,
+} from '@statamic/ui';
 
 export default {
     mixins: [Listing],
+
+    components: {
+        Button,
+        Panel,
+        StatusIndicator,
+        Dropdown,
+        DropdownMenu,
+        DropdownItem,
+        DropdownLabel,
+        DropdownSeparator,
+    },
 
     props: {
         collection: String,

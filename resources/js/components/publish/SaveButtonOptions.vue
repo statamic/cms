@@ -1,24 +1,35 @@
 <template>
     <component :is="wrapperComponent">
         <slot />
-        <ui-dropdown v-if="showOptions" align="end">
+        <Dropdown v-if="showOptions" align="end">
             <template #trigger>
-                <ui-button variant="primary" icon="ui/chevron-down" />
+                <Button variant="primary" icon="ui/chevron-down" />
             </template>
-            <ui-dropdown-menu>
-                <ui-dropdown-label v-text="__('After Saving')" />
-                <ui-radio-group v-model="currentOption">
-                    <ui-radio-item :label="__('Go To Listing')" value="listing" />
-                    <ui-radio-item :label="__('Continue Editing')" value="continue_editing" />
-                    <ui-radio-item :label="__('Create Another')" value="create_another" />
-                </ui-radio-group>
-            </ui-dropdown-menu>
-        </ui-dropdown>
+            <DropdownMenu>
+                <DropdownLabel v-text="__('After Saving')" />
+                <RadioGroup v-model="currentOption">
+                    <Radio :label="__('Go To Listing')" value="listing" />
+                    <Radio :label="__('Continue Editing')" value="continue_editing" />
+                    <Radio :label="__('Create Another')" value="create_another" />
+                </RadioGroup>
+            </DropdownMenu>
+        </Dropdown>
     </component>
 </template>
 
 <script>
+import { Button, Dropdown, DropdownMenu, DropdownLabel, Radio, RadioGroup } from '@statamic/ui';
+
 export default {
+    components: {
+        Button,
+        Dropdown,
+        DropdownMenu,
+        DropdownLabel,
+        Radio,
+        RadioGroup,
+    },
+
     props: {
         showOptions: { type: Boolean, default: true },
         preferencesPrefix: { type: String, required: true },

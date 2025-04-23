@@ -1,14 +1,15 @@
 <template>
-    <ui-field v-if="label || description" :class="fieldClasses" :variant>
-        <ui-label v-if="label" :text="label" :required :for :badge />
-        <ui-description v-if="description" :text="description" />
+    <Field v-if="label || description" :class="fieldClasses" :variant>
+        <Label v-if="label" :text="label" :required :for :badge />
+        <Description v-if="description" :text="description" />
         <slot v-bind="slotAttrs" />
-    </ui-field>
+    </Field>
     <slot v-else v-bind="$attrs" />
 </template>
 
 <script setup>
 import { useAttrs, computed } from 'vue';
+import { Field, Label, Description } from '@statamic/ui';
 
 defineOptions({ inheritAttrs: false });
 const rawAttrs = useAttrs();

@@ -1,4 +1,6 @@
 <script setup>
+import { WithField } from '@statamic/ui';
+
 const props = defineProps({
     label: { type: String, default: null },
     description: { type: String, default: null },
@@ -8,7 +10,7 @@ const props = defineProps({
 </script>
 
 <template>
-    <ui-with-field :label :description :required :badge>
+    <WithField :label :description :required :badge>
         <div
             :class="[
                 'group/input flex w-full data-ui-input:*:grow',
@@ -27,5 +29,5 @@ const props = defineProps({
         >
             <slot />
         </div>
-    </ui-with-field>
+    </WithField>
 </template>

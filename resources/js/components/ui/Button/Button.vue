@@ -2,6 +2,7 @@
 import { computed, useSlots } from 'vue';
 import { cva } from 'cva';
 import { twMerge } from 'tailwind-merge';
+import { Icon } from '@statamic/ui';
 
 const props = defineProps({
     href: { type: String, default: null },
@@ -83,12 +84,12 @@ const buttonClasses = computed(() => {
         :href
         :type="props.href ? null : type"
     >
-        <ui-icon v-if="icon" :name="icon" class="text-gray-400" />
-        <ui-icon v-if="loading" name="loading" :size />
+        <Icon v-if="icon" :name="icon" class="text-gray-400" />
+        <Icon v-if="loading" name="loading" :size />
 
         <slot v-if="hasDefaultSlot" />
         <template v-else>{{ text }}</template>
 
-        <ui-icon v-if="iconAppend" :name="iconAppend" />
+        <Icon v-if="iconAppend" :name="iconAppend" />
     </component>
 </template>

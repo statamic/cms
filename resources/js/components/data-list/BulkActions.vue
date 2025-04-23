@@ -1,7 +1,7 @@
 <template>
-    <div v-if="showAlways || hasSelections" class="fixed inset-x-0 bottom-1 w-full flex justify-center z-100">
-        <ui-button-group>
-            <ui-button
+    <div v-if="showAlways || hasSelections" class="fixed inset-x-0 bottom-1 z-100 flex w-full justify-center">
+        <ButtonGroup>
+            <Button
                 variant="primary"
                 class="text-gray-400!"
                 :text="__n(`:count item selected|:count items selected`, selections.length)"
@@ -16,21 +16,23 @@
                 @selected="run"
                 v-slot="{ action, select }"
             >
-                <ui-button
-                    variant="primary"
-                    @click="select"
-                    :text="__(action.title)"
-                />
+                <Button variant="primary" @click="select" :text="__(action.title)" />
             </data-list-action>
-        </ui-button-group>
+        </ButtonGroup>
     </div>
 </template>
 
 <script>
 import Actions from './Actions';
+import { Button, ButtonGroup } from '@statamic/ui';
 
 export default {
     mixins: [Actions],
+
+    components: {
+        Button,
+        ButtonGroup,
+    },
 
     inject: ['sharedState'],
 

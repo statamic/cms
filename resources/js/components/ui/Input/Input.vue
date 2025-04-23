@@ -2,6 +2,7 @@
 import { computed, useSlots, ref, useId } from 'vue';
 import { cva } from 'cva';
 import { twMerge } from 'tailwind-merge';
+import { Icon, Button, CharacterCounter, WithField } from '@statamic/ui';
 
 const slots = useSlots();
 
@@ -108,11 +109,11 @@ const copy = () => {
 </script>
 
 <template>
-    <ui-with-field :label :description :required :badge>
+    <WithField :label :description :required :badge>
         <div class="group/input relative block w-full" data-ui-input>
             <div v-if="hasPrependedIcon" :class="iconClasses">
                 <slot name="prepend">
-                    <ui-icon :name="iconPrepend || icon" />
+                    <Icon :name="iconPrepend || icon" />
                 </slot>
             </div>
             <input
@@ -128,15 +129,15 @@ const copy = () => {
             />
             <div v-if="hasAppendedIcon" :class="iconClasses">
                 <slot name="append">
-                    <ui-button size="sm" icon="x" variant="ghost" v-if="clearable" @click="clear" />
-                    <ui-button
+                    <Button size="sm" icon="x" variant="ghost" v-if="clearable" @click="clear" />
+                    <Button
                         size="sm"
                         :icon="inputType === 'password' ? 'eye' : 'eye-closed'"
                         variant="ghost"
                         v-else-if="viewable"
                         @click="togglePassword"
                     />
-                    <ui-button
+                    <Button
                         size="sm"
                         :icon="copied ? 'clipboard-check' : 'clipboard'"
                         variant="ghost"
@@ -145,12 +146,12 @@ const copy = () => {
                         class="animate"
                         :class="copied ? 'animate-wiggle' : ''"
                     />
-                    <ui-icon v-else :name="iconAppend" />
+                    <Icon v-else :name="iconAppend" />
                 </slot>
             </div>
-            <div v-if="limit" class="absolute right-2 inset-y-0 flex items-center">
-                <ui-character-counter :text="modelValue" :limit />
+            <div v-if="limit" class="absolute inset-y-0 right-2 flex items-center">
+                <CharacterCounter :text="modelValue" :limit />
             </div>
         </div>
-    </ui-with-field>
+    </WithField>
 </template>

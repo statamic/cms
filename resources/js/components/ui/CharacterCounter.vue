@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
 import { cva } from 'cva';
+import { Tooltip } from '@statamic/ui';
 
 const emit = defineEmits(['update:text']);
 
@@ -63,7 +64,7 @@ const circleClasses = cva({
 </script>
 
 <template>
-    <ui-tooltip :text="tooltipText" position="top" delay-duration="0">
+    <Tooltip :text="tooltipText" position="top" delay-duration="0">
         <div class="relative flex size-6 items-center justify-center" :class="{ 'animate-pop': isAnimating }">
             <svg :class="circleClasses({ color: 'gray' })" viewBox="0 0 100 100">
                 <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" stroke-width="8" />
@@ -99,7 +100,7 @@ const circleClasses = cva({
                 {{ charsRemaining }}
             </span>
         </div>
-    </ui-tooltip>
+    </Tooltip>
 </template>
 
 <style scoped>

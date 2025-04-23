@@ -12,16 +12,23 @@
         v-slot="{ setFieldValue, setFieldMeta }"
     >
         <div>
-            <ui-header :title="pageTitle">
-                <ui-button type="submit" variant="primary" @click="submit">{{ __('Save') }}</ui-button>
-            </ui-header>
+            <Header :title="pageTitle">
+                <Button type="submit" variant="primary" @click="submit">{{ __('Save') }}</Button>
+            </Header>
             <publish-tabs @updated="setFieldValue" @meta-updated="setFieldMeta" :enable-sidebar="false" />
         </div>
     </publish-container>
 </template>
 
 <script>
+import { Header, Button } from '@statamic/ui';
+
 export default {
+    components: {
+        Header,
+        Button,
+    },
+
     props: {
         blueprint: Object,
         initialValues: Object,

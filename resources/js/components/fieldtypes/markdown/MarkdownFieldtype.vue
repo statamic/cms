@@ -74,7 +74,7 @@
                                 <div class="helpers">
                                     <div class="bg-gray-50 dark:bg-gray-950 rounded-b-xl border-t border-gray-200 dark:border-white/15 flex p-1 text-sm w-full">
                                         <div class="markdown-cheatsheet-helper">
-                                            <ui-button
+                                            <Button
                                                 icon="markdown"
                                                 size="sm"
                                                 variant="ghost"
@@ -150,6 +150,7 @@ import { marked } from 'marked';
 import { markRaw } from 'vue';
 import PlainTextRenderer from 'marked-plaintext';
 import throttle from '@statamic/util/throttle.js';
+import { Button } from '@statamic/ui';
 
 import CodeMirror from 'codemirror/lib/codemirror';
 import 'codemirror/addon/edit/closebrackets';

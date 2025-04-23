@@ -1,6 +1,6 @@
 <template>
     <div
-        class="block cursor-pointer py-2 px-3 space-y-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-900"
+        class="block cursor-pointer space-y-2 px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-900"
         :class="{
             'status-working-copy': revision.working,
             'status-published': revision.attributes.published,
@@ -14,31 +14,39 @@
 
             <div class="revision-item-content flex w-full">
                 <div class="flex-1">
-                    <ui-subheading>
+                    <Subheading>
                         <template v-if="revision.user">
                             {{ revision.user.name || revision.user.email }} &ndash;
                         </template>
                         {{ time }}
-                    </ui-subheading>
+                    </Subheading>
                 </div>
 
                 <div class="flex items-center gap-1">
-                    <ui-badge
+                    <Badge
                         size="sm"
-                        :color="revision.working ? 'gray' : {
-                            publish: 'green',
-                            revision: 'gray',
-                            restore: 'gray',
-                            unpublish: 'red',
-                        }[revision.action]"
-                        :text="revision.working ? __('Working Copy') : {
-                            publish: __('Published'),
-                            revision: __('Revision'),
-                            restore: __('Restored'),
-                            unpublish: __('Unpublished'),
-                        }[revision.action]"
+                        :color="
+                            revision.working
+                                ? 'gray'
+                                : {
+                                      publish: 'green',
+                                      revision: 'gray',
+                                      restore: 'gray',
+                                      unpublish: 'red',
+                                  }[revision.action]
+                        "
+                        :text="
+                            revision.working
+                                ? __('Working Copy')
+                                : {
+                                      publish: __('Published'),
+                                      revision: __('Revision'),
+                                      restore: __('Restored'),
+                                      unpublish: __('Unpublished'),
+                                  }[revision.action]
+                        "
                     />
-                    <ui-badge size="sm" color="orange" v-if="revision.attributes.current" v-text="__('Current')" />
+                    <Badge size="sm" color="orange" v-if="revision.attributes.current" v-text="__('Current')" />
                 </div>
 
                 <revision-preview
@@ -67,11 +75,14 @@
 import RestoreRevision from './Restore.vue';
 import RevisionPreview from './Preview.vue';
 import DateFormatter from '@statamic/components/DateFormatter.js';
+import { Subheading, Badge } from '@statamic/ui';
 
 export default {
     components: {
         RevisionPreview,
         RestoreRevision,
+        Subheading,
+        Badge,
     },
 
     props: {

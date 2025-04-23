@@ -18,13 +18,13 @@
                 </th>
                 <th v-for="column in visibleColumns" :key="column.field" :class="{ 'pe-8 text-end': column.numeric }">
                     <span v-if="!column.sortable" v-text="__(column.label)" />
-                    <ui-button
+                    <Button
                         v-else
                         :text="__(column.label)"
                         :icon-append="isCurrentSortColumn(column) ? 'up-down' : null"
                         size="sm"
                         variant="ghost"
-                        class="text-gray-800! dark:text-gray-400! text-sm! font-medium! -mt-2 -mb-1"
+                        class="-mt-2 -mb-1 text-sm! font-medium! text-gray-800! dark:text-gray-400!"
                         @click.prevent="changeSortColumn(column.field)"
                     />
                 </th>
@@ -88,7 +88,7 @@
                         </slot>
                     </td>
                     <td class="type-column" v-if="type">
-                        <ui-badge
+                        <Badge
                             size="sm"
                             v-if="type === 'entries' || type === 'terms'"
                             :label="type === 'entries' ? __(row.collection.title) : __(row.taxonomy.title)"
@@ -106,11 +106,14 @@
 <script>
 import TableField from './TableField.vue';
 import SortableList from '../sortable/SortableList.vue';
+import { Button, Badge } from '@statamic/ui';
 
 export default {
     components: {
         TableField,
         SortableList,
+        Button,
+        Badge,
     },
 
     data() {
@@ -211,7 +214,6 @@ export default {
         actualIndex(row) {
             return this.sharedState.originalRows.findIndex((r) => r === row);
         },
-
 
         selectRange(from, to) {
             for (var i = from; i <= to; i++) {

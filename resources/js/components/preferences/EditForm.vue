@@ -11,32 +11,26 @@
         v-slot="{ setFieldValue, setFieldMeta }"
     >
         <div>
-            <ui-header :title="title">
+            <Header :title="title">
+                <ButtonGroup>
+                    <Button type="submit" variant="primary" :text="__('Save')" @click="save" />
 
-                <ui-button-group>
-                    <ui-button
-                        type="submit"
-                        variant="primary"
-                        :text="__('Save')"
-                        @click="save"
-                    />
-
-                    <ui-dropdown align="end" v-if="hasSaveAsOptions">
+                    <Dropdown align="end" v-if="hasSaveAsOptions">
                         <template #trigger>
-                            <ui-button icon="ui/chevron-down" variant="primary" />
+                            <Button icon="ui/chevron-down" variant="primary" />
                         </template>
-                        <ui-dropdown-menu>
-                            <ui-dropdown-label>{{ __('Save to') }}...</ui-dropdown-label>
-                            <ui-dropdown-item
+                        <DropdownMenu>
+                            <DropdownLabel>{{ __('Save to') }}...</DropdownLabel>
+                            <DropdownItem
                                 v-for="option in saveAsOptions"
                                 :key="option.url"
                                 :text="option.label"
                                 @click="saveAs(option.url)"
                             />
-                        </ui-dropdown-menu>
-                    </ui-dropdown>
-                </ui-button-group>
-            </ui-header>
+                        </DropdownMenu>
+                    </Dropdown>
+                </ButtonGroup>
+            </Header>
 
             <publish-tabs
                 @updated="setFieldValue"
@@ -49,7 +43,19 @@
 </template>
 
 <script>
+import { Header, Button, ButtonGroup, Dropdown, DropdownMenu, DropdownItem, DropdownLabel } from '@statamic/ui';
+
 export default {
+    components: {
+        Header,
+        Button,
+        ButtonGroup,
+        Dropdown,
+        DropdownMenu,
+        DropdownItem,
+        DropdownLabel,
+    },
+
     props: {
         blueprint: { required: true, type: Object },
         meta: { required: true, type: Object },

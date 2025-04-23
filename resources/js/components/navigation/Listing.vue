@@ -1,6 +1,6 @@
 <template>
     <data-list :columns="columns" :rows="rows" v-slot="{ filteredRows: rows }">
-        <ui-card-panel>
+        <CardPanel>
             <data-list-table>
                 <template #cell-title="{ row: structure }">
                     <a
@@ -28,15 +28,20 @@
                     </dropdown-list>
                 </template>
             </data-list-table>
-        </ui-card-panel>
+        </CardPanel>
     </data-list>
 </template>
 
 <script>
 import Listing from '../Listing.vue';
+import { CardPanel } from '@statamic/ui';
 
 export default {
     mixins: [Listing],
+
+    components: {
+        CardPanel,
+    },
 
     props: ['initialRows'],
 

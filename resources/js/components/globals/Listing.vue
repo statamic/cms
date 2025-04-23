@@ -1,12 +1,12 @@
 <template>
     <data-list :rows="rows" :columns="columns" v-slot="{ filteredRows: rows }">
-        <ui-card-panel>
+        <CardPanel>
             <data-list-table>
                 <template #cell-title="{ row: global }">
                     <a :href="global.edit_url">{{ __(global.title) }}</a>
                 </template>
                 <template #cell-handle="{ value: handle }">
-                    <span class="font-mono text-2xs">{{ handle }}</span>
+                    <span class="text-2xs font-mono">{{ handle }}</span>
                 </template>
                 <template #actions="{ row: global, index }">
                     <dropdown-list>
@@ -27,15 +27,20 @@
                     </dropdown-list>
                 </template>
             </data-list-table>
-        </ui-card-panel>
+        </CardPanel>
     </data-list>
 </template>
 
 <script>
 import Listing from '../Listing.vue';
+import { CardPanel } from '@statamic/ui';
 
 export default {
     mixins: [Listing],
+
+    components: {
+        CardPanel,
+    },
 
     props: ['globals'],
 

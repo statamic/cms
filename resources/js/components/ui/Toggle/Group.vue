@@ -1,7 +1,8 @@
 <script setup>
-import { ToggleGroupRoot } from 'reka-ui'
-import { ref, watch, provide } from 'vue'
-import { cva } from 'cva'
+import { ToggleGroupRoot } from 'reka-ui';
+import { ref, watch, provide } from 'vue';
+import { cva } from 'cva';
+import { WithField } from '@statamic/ui';
 
 const props = defineProps({
     description: { type: String, default: null },
@@ -17,9 +18,12 @@ const emit = defineEmits(['update:modelValue']);
 
 const toggleState = ref(props.modelValue ?? (props.multiple ? [] : null));
 
-watch(() => props.modelValue, (newValue) => {
-    toggleState.value = newValue ?? (props.multiple ? [] : null);
-});
+watch(
+    () => props.modelValue,
+    (newValue) => {
+        toggleState.value = newValue ?? (props.multiple ? [] : null);
+    },
+);
 
 watch(toggleState, (newValue) => {
     emit('update:modelValue', newValue);
@@ -41,17 +45,16 @@ const groupClasses = cva({
                 '[&>*:first-child:not(:last-child)_[data-ui-group-target]]:rounded-e-none',
                 '[&>*:last-child:not(:first-child)_[data-ui-group-target]]:rounded-s-none',
             ],
-            false: 'gap-1.5'
-        }
-    }
+            false: 'gap-1.5',
+        },
+    },
 })({
-    notGhost: props.variant !== 'ghost'
+    notGhost: props.variant !== 'ghost',
 });
-
 </script>
 
 <template>
-    <ui-with-field :label :description :required>
+    <WithField :label :description :required>
         <ToggleGroupRoot
             v-model="toggleState"
             :type="multiple ? 'multiple' : 'single'"
@@ -60,5 +63,5 @@ const groupClasses = cva({
         >
             <slot />
         </ToggleGroupRoot>
-    </ui-with-field>
+    </WithField>
 </template>

@@ -1,6 +1,7 @@
 <script setup>
 import { DialogClose } from 'reka-ui';
 import { computed, useSlots } from 'vue';
+import { Button } from '@statamic/ui';
 
 const slots = useSlots();
 
@@ -13,7 +14,7 @@ const hasSlot = computed(() => !!slots.default);
             <slot />
         </template>
         <template v-else>
-            <ui-button variant="ghost" size="sm" icon="x" class="absolute top-3 right-2" />
+            <Button variant="ghost" size="sm" icon="x" class="absolute top-3 right-2" />
         </template>
     </DialogClose>
 </template>

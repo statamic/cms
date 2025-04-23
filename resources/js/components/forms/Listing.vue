@@ -1,6 +1,6 @@
 <template>
     <data-list :visible-columns="columns" :columns="columns" :rows="items" v-slot="{ filteredRows: rows }">
-        <ui-card-panel>
+        <CardPanel>
             <data-list-bulk-actions
                 class="rounded-sm"
                 :url="actionUrl"
@@ -31,15 +31,20 @@
                     </dropdown-list>
                 </template>
             </data-list-table>
-        </ui-card-panel>
+        </CardPanel>
     </data-list>
 </template>
 
 <script>
 import Listing from '../Listing.vue';
+import { CardPanel } from '@statamic/ui';
 
 export default {
     mixins: [Listing],
+
+    components: {
+        CardPanel,
+    },
 
     props: ['initialColumns'],
 

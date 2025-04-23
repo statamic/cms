@@ -2,6 +2,7 @@
 import { useAttrs } from 'vue';
 import { cva } from 'cva';
 import { DropdownMenuContent, DropdownMenuPortal, DropdownMenuRoot, DropdownMenuTrigger } from 'reka-ui';
+import { Button } from '@statamic/ui';
 
 defineOptions({
     inheritAttrs: false,
@@ -27,7 +28,7 @@ const dropdownContentClasses = cva({
     <DropdownMenuRoot>
         <DropdownMenuTrigger data-ui-dropdown-trigger>
             <slot name="trigger">
-                <ui-button icon="ui/dots" variant="ghost" size="sm" v-bind="attrs" />
+                <Button icon="ui/dots" variant="ghost" size="sm" v-bind="attrs" />
             </slot>
         </DropdownMenuTrigger>
         <DropdownMenuPortal>

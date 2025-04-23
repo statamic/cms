@@ -1,6 +1,7 @@
 <script setup>
 import { useId } from 'vue';
 import { SliderRange, SliderRoot, SliderThumb, SliderTrack } from 'reka-ui';
+import { WithField } from '@statamic/ui';
 
 defineProps({
     description: { type: String, default: null },
@@ -13,7 +14,7 @@ defineEmits(['update:modelValue']);
 </script>
 
 <template>
-    <ui-with-field :label :description :required variant="inline" :for="id">
+    <WithField :label :description :required variant="inline" :for="id">
         <SliderRoot
             data-ui-control
             class="relative flex h-5 w-full touch-none items-center select-none"
@@ -31,5 +32,5 @@ defineEmits(['update:modelValue']);
                 :aria-label="label"
             />
         </SliderRoot>
-    </ui-with-field>
+    </WithField>
 </template>

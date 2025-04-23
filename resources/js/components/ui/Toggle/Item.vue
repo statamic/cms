@@ -3,6 +3,7 @@ import { computed, inject, useSlots } from 'vue';
 import { cva } from 'cva';
 import { twMerge } from 'tailwind-merge';
 import { ToggleGroupItem } from 'reka-ui';
+import { Icon } from '@statamic/ui';
 
 const props = defineProps({
     value: { type: String, required: true },
@@ -10,7 +11,6 @@ const props = defineProps({
     icon: { type: String, default: null },
     iconOnly: { type: Boolean, default: false },
 });
-
 
 const variant = inject('toggleVariant', 'default');
 const size = inject('toggleSize', 'base');
@@ -26,11 +26,11 @@ const toggleItemClasses = computed(() => {
             variant: {
                 default: [
                     'bg-linear-to-b from-white to-gray-50 hover:to-gray-100 text-gray-800 border border-gray-300 shadow-ui-sm data-[state=on]:from-gray-200 data-[state=on]:to-gray-200 data-[state=on]:text-gray-900',
-                    'dark:from-gray-800 dark:to-gray-850 dark:hover:to-gray-800 hover:bg-gray-50 dark:hover:bg-gray-850 dark:border-b-0 dark:ring dark:ring-black dark:border-white/15 dark:text-gray-300 dark:shadow-md dark:data-[state=on]:from-gray-950 dark:data-[state=on]:to-gray-950 dark:data-[state=on]:text-white'
+                    'dark:from-gray-800 dark:to-gray-850 dark:hover:to-gray-800 hover:bg-gray-50 dark:hover:bg-gray-850 dark:border-b-0 dark:ring dark:ring-black dark:border-white/15 dark:text-gray-300 dark:shadow-md dark:data-[state=on]:from-gray-950 dark:data-[state=on]:to-gray-950 dark:data-[state=on]:text-white',
                 ],
                 primary: [
                     'bg-linear-to-b from-primary/90 to-primary hover:bg-primary-hover text-white border border-primary-border shadow-ui-md inset-shadow-2xs inset-shadow-white/25 data-[state=on]:bg-primary-hover',
-                    'dark:from-white dark:to-gray-200 dark:hover:from-gray-200 dark:text-gray-800 dark:border-0 dark:data-[state=on]:from-gray-300 dark:data-[state=on]:to-gray-300'
+                    'dark:from-white dark:to-gray-200 dark:hover:from-gray-200 dark:text-gray-800 dark:border-0 dark:data-[state=on]:from-gray-300 dark:data-[state=on]:to-gray-300',
                 ],
                 filled: 'bg-gray-100 hover:bg-gray-200 dark:bg-gray-700/80 dark:hover:bg-gray-700 data-[state=on]:bg-gray-300 data-[state=on]:border-gray-500 dark:data-[state=on]:bg-gray-950',
                 ghost: 'bg-transparent rounded-lg hover:bg-gray-400/10 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-gray-700/80 dark:hover:text-gray-200 data-[state=on]:bg-gray-400/20 data-[state=on]:text-gray-700 dark:data-[state=on]:bg-gray-700/80 dark:data-[state=on]:text-white',
@@ -41,8 +41,10 @@ const toggleItemClasses = computed(() => {
                 xs: 'px-2 h-6.5 text-xs',
             },
             groupBorder: {
-                default: '[[data-ui-toggle-group]_&]:border-s-0 [:is([data-ui-toggle-group]>&:first-child,_[data-ui-toggle-group]_:first-child>&)]:border-s-[1px]',
-                primary: '[[data-ui-toggle-group]_&]:border-e-0 [:is([data-ui-toggle-group]>&:last-child,_[data-ui-toggle-group]_:last-child>&)]:border-e-[1px] [:is([data-ui-toggle-group]>&:not(:first-child),_[data-ui-toggle-group]_:not(:first-child)>&)]:border-s-primary-gap',
+                default:
+                    '[[data-ui-toggle-group]_&]:border-s-0 [:is([data-ui-toggle-group]>&:first-child,_[data-ui-toggle-group]_:first-child>&)]:border-s-[1px]',
+                primary:
+                    '[[data-ui-toggle-group]_&]:border-e-0 [:is([data-ui-toggle-group]>&:last-child,_[data-ui-toggle-group]_:last-child>&)]:border-e-[1px] [:is([data-ui-toggle-group]>&:not(:first-child),_[data-ui-toggle-group]_:not(:first-child)>&)]:border-s-primary-gap',
                 filled: '[[data-ui-toggle-group]_&]:border-e [:is([data-ui-toggle-group]>&:last-child,_[data-ui-toggle-group]_:last-child>&)]:border-e-0 [[data-ui-toggle-group]_&]:border-gray-300/70',
                 ghost: '',
             },
@@ -64,13 +66,8 @@ const toggleItemClasses = computed(() => {
 </script>
 
 <template>
-    <ToggleGroupItem
-        :value="value"
-        :aria-label="label"
-        :class="toggleItemClasses"
-        data-ui-group-target
-    >
-        <ui-icon v-if="icon" :name="icon" class="text-gray-400" />
+    <ToggleGroupItem :value="value" :aria-label="label" :class="toggleItemClasses" data-ui-group-target>
+        <Icon v-if="icon" :name="icon" class="text-gray-400" />
         <slot>{{ label }}</slot>
     </ToggleGroupItem>
 </template>

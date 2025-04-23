@@ -11,6 +11,7 @@ import {
     SelectViewport,
 } from 'reka-ui';
 import { useAttrs } from 'vue';
+import { WithField, Icon } from '@statamic/ui';
 
 const emit = defineEmits(['update:modelValue']);
 
@@ -58,11 +59,11 @@ const itemClasses = cva({
 </script>
 
 <template>
-    <ui-with-field :label :description>
+    <WithField :label :description>
         <SelectRoot v-bind="attrs" :model-value="modelValue" @update:model-value="emit('update:model-value', $event)">
             <SelectTrigger :class="[triggerClasses, $attrs.class]" data-ui-select-trigger>
                 <SelectValue :placeholder="placeholder" class="select-none" />
-                <ui-icon name="ui/chevron-down" class="me-2" />
+                <Icon name="ui/chevron-down" class="me-2" />
             </SelectTrigger>
 
             <SelectPortal>
@@ -92,5 +93,5 @@ const itemClasses = cva({
                 </SelectContent>
             </SelectPortal>
         </SelectRoot>
-    </ui-with-field>
+    </WithField>
 </template>

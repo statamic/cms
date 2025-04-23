@@ -1,18 +1,23 @@
 <template>
     <div>
-        <ui-header>
+        <Header>
             <template #title>
-                <span v-if="!isCreating" class="little-dot -top-1" :class="activeLocalization.status" v-tooltip="__(activeLocalization.status)" />
+                <span
+                    v-if="!isCreating"
+                    class="little-dot -top-1"
+                    :class="activeLocalization.status"
+                    v-tooltip="__(activeLocalization.status)"
+                />
                 {{ formattedTitle }}
             </template>
 
-            <ui-dropdown v-if="canEditBlueprint || hasItemActions">
+            <Dropdown v-if="canEditBlueprint || hasItemActions">
                 <template #trigger>
-                    <ui-button icon="ui/dots" variant="ghost" />
+                    <Button icon="ui/dots" variant="ghost" />
                 </template>
-                <ui-dropdown-menu>
-                    <ui-dropdown-item :text="__('Edit Blueprint')" v-if="canEditBlueprint" :href="actions.editBlueprint" />
-                    <ui-dropdown-separator />
+                <DropdownMenu>
+                    <DropdownItem :text="__('Edit Blueprint')" v-if="canEditBlueprint" :href="actions.editBlueprint" />
+                    <DropdownSeparator />
                     <data-list-inline-actions
                         v-if="!isCreating && hasItemActions"
                         :item="values.id"
@@ -22,20 +27,25 @@
                         @started="actionStarted"
                         @completed="actionCompleted"
                     />
-                </ui-dropdown-menu>
-            </ui-dropdown>
+                </DropdownMenu>
+            </Dropdown>
 
-            <div class="flex pt-px text-2xs text-gray-600 ltr:mr-4 rtl:ml-4" v-if="readOnly">
+            <div class="text-2xs flex pt-px text-gray-600 ltr:mr-4 rtl:ml-4" v-if="readOnly">
                 <svg-icon name="light/lock" class="-mt-1 w-4 ltr:mr-1 rtl:ml-1" /> {{ __('Read Only') }}
             </div>
 
-            <div class="hidden items-center md:flex gap-3">
+            <div class="hidden items-center gap-3 md:flex">
                 <save-button-options
                     v-if="!readOnly"
                     :show-options="!revisionsEnabled && !isInline"
                     :preferences-prefix="preferencesPrefix"
                 >
-                    <ui-button :disabled="!canSave" :variant="!revisionsEnabled ? 'primary' : 'default'" @click.prevent="save" v-text="saveText" />
+                    <Button
+                        :disabled="!canSave"
+                        :variant="!revisionsEnabled ? 'primary' : 'default'"
+                        @click.prevent="save"
+                        v-text="saveText"
+                    />
                 </save-button-options>
 
                 <save-button-options
@@ -43,7 +53,7 @@
                     :show-options="!isInline"
                     :preferences-prefix="preferencesPrefix"
                 >
-                    <ui-button
+                    <Button
                         variant="primary"
                         :disabled="!canPublish"
                         @click="confirmingPublish = true"
@@ -53,7 +63,7 @@
             </div>
 
             <slot name="action-buttons-right" />
-        </ui-header>
+        </Header>
 
         <publish-container
             v-if="fieldset"
@@ -107,17 +117,19 @@
                         >
                             <template #actions="{ shouldShowSidebar }">
                                 <div class="space-y-6">
-
                                     <!-- Live Preview / Visit URL Buttons -->
                                     <div v-if="collectionHasRoutes" :class="{ hidden: !shouldShowSidebar }">
-                                        <div class="grid grid-cols-2 gap-4" v-if="showLivePreviewButton || showVisitUrlButton">
-                                            <ui-button
+                                        <div
+                                            class="grid grid-cols-2 gap-4"
+                                            v-if="showLivePreviewButton || showVisitUrlButton"
+                                        >
+                                            <Button
                                                 :text="__('Live Preview')"
                                                 icon="live-preview"
                                                 @click="openLivePreview"
                                                 v-if="showLivePreviewButton"
                                             />
-                                            <ui-button
+                                            <Button
                                                 :href="permalink"
                                                 :text="__('Visit URL')"
                                                 icon="external-link"
@@ -128,43 +140,52 @@
                                     </div>
 
                                     <!-- Published Switch -->
-                                    <ui-panel class="px-5 py-3 flex justify-between">
-                                        <ui-heading :text="__('Published')" />
-                                        <ui-switch
+                                    <Panel class="flex justify-between px-5 py-3">
+                                        <Heading :text="__('Published')" />
+                                        <Switch
                                             v-if="!revisionsEnabled"
                                             :model-value="published"
                                             :read-only="!canManagePublishState"
                                             @update:model-value="setFieldValue('published', $event)"
                                         />
-                                    </ui-panel>
+                                    </Panel>
 
                                     <!-- Revisions -->
-                                    <ui-panel v-if="revisionsEnabled && !isCreating">
-                                        <ui-panel-header class="flex items-center justify-between">
-                                            <ui-heading :text="__('Revisions')" />
-                                            <ui-button @click="showRevisionHistory = true" icon="history" :text="__('View History')" size="xs" class="-me-4" />
-                                        </ui-panel-header>
-                                        <ui-card class="space-y-2">
-                                            <ui-subheading v-if="published" class="flex items-center gap-2">
-                                                <ui-icon name="checkmark" class="text-green-600" />
-                                                {{ __('Entry has a published version')}}
-                                            </ui-subheading>
-                                            <ui-subheading v-else class="flex items-center gap-2 text-yellow-600">
-                                                <ui-icon name="warning-diamond"/>
-                                                {{ __('Entry has not been published')}}
-                                            </ui-subheading>
-                                            <ui-subheading v-if="!isWorkingCopy && published" class="flex items-center gap-2">
-                                                <ui-icon name="checkmark" class="text-green-600" />
-                                                {{ __('This is the published version')}}
-                                            </ui-subheading>
-                                            <ui-subheading v-if="isDirty" class="flex items-center gap-2 text-yellow-600">
-                                                <ui-icon name="warning-diamond" />
-                                                {{ __('Unsaved changes')}}
-                                            </ui-subheading>
-                                        </ui-card>
-                                    </ui-panel>
+                                    <Panel v-if="revisionsEnabled && !isCreating">
+                                        <PanelHeader class="flex items-center justify-between">
+                                            <Heading :text="__('Revisions')" />
+                                            <Button
+                                                @click="showRevisionHistory = true"
+                                                icon="history"
+                                                :text="__('View History')"
+                                                size="xs"
+                                                class="-me-4"
+                                            />
+                                        </PanelHeader>
+                                        <Card class="space-y-2">
+                                            <Subheading v-if="published" class="flex items-center gap-2">
+                                                <Icon name="checkmark" class="text-green-600" />
+                                                {{ __('Entry has a published version') }}
+                                            </Subheading>
+                                            <Subheading v-else class="flex items-center gap-2 text-yellow-600">
+                                                <Icon name="warning-diamond" />
+                                                {{ __('Entry has not been published') }}
+                                            </Subheading>
+                                            <Subheading
+                                                v-if="!isWorkingCopy && published"
+                                                class="flex items-center gap-2"
+                                            >
+                                                <Icon name="checkmark" class="text-green-600" />
+                                                {{ __('This is the published version') }}
+                                            </Subheading>
+                                            <Subheading v-if="isDirty" class="flex items-center gap-2 text-yellow-600">
+                                                <Icon name="warning-diamond" />
+                                                {{ __('Unsaved changes') }}
+                                            </Subheading>
+                                        </Card>
+                                    </Panel>
 
-                                    <div class="border-t p-4 dark:border-dark-900" v-if="localizations.length > 1">
+                                    <div class="dark:border-dark-900 border-t p-4" v-if="localizations.length > 1">
                                         <label class="publish-field-label mb-2 font-medium" v-text="__('Sites')" />
                                         <div
                                             v-for="option in localizations"
@@ -172,8 +193,8 @@
                                             class="-mx-4 flex items-center px-4 py-2 text-sm"
                                             :class="[
                                                 option.active
-                                                    ? 'bg-blue-100 dark:bg-dark-300'
-                                                    : 'hover:bg-gray-200 dark:hover:bg-dark-400',
+                                                    ? 'dark:bg-dark-300 bg-blue-100'
+                                                    : 'dark:hover:bg-dark-400 hover:bg-gray-200',
                                                 !canSave && !option.exists ? 'cursor-not-allowed' : 'cursor-pointer',
                                             ]"
                                             @click="localizationSelected(option)"
@@ -327,6 +348,21 @@ import HasHiddenFields from '../publish/HasHiddenFields';
 import HasActions from '../publish/HasActions';
 import striptags from 'striptags';
 import clone from '@statamic/util/clone.js';
+import {
+    Header,
+    Dropdown,
+    DropdownMenu,
+    DropdownItem,
+    DropdownSeparator,
+    Button,
+    Panel,
+    PanelHeader,
+    Switch,
+    Heading,
+    Subheading,
+    Card,
+    Icon,
+} from '@statamic/ui';
 
 export default {
     mixins: [HasPreferences, HasHiddenFields, HasActions],
@@ -335,6 +371,19 @@ export default {
         PublishActions,
         SaveButtonOptions,
         RevisionHistory,
+        Header,
+        Dropdown,
+        DropdownMenu,
+        DropdownItem,
+        DropdownSeparator,
+        Button,
+        Panel,
+        PanelHeader,
+        Switch,
+        Heading,
+        Subheading,
+        Card,
+        Icon,
     },
 
     props: {

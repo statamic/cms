@@ -1,10 +1,7 @@
 <template>
     <div class="publish-sections">
         <div class="publish-sections-section" v-for="(section, i) in visibleSections" :key="i">
-            <ui-card-panel
-                :heading="__(section.display) || heading"
-                :description="__(section.instructions) || description"
-            >
+            <CardPanel :heading="__(section.display) || heading" :description="__(section.instructions) || description">
                 <publish-fields
                     :fields="section.fields"
                     :read-only="readOnly"
@@ -17,18 +14,23 @@
                     @focus="$emit('focus', $event)"
                     @blur="$emit('blur', $event)"
                 />
-            </ui-card-panel>
+            </CardPanel>
         </div>
     </div>
 </template>
 
 <script>
 import { ValidatesFieldConditions } from '../field-conditions/FieldConditions.js';
+import { CardPanel } from '@statamic/ui';
 
 export default {
     emits: ['updated', 'meta-updated', 'synced', 'desynced', 'focus', 'blur'],
 
     mixins: [ValidatesFieldConditions],
+
+    components: {
+        CardPanel,
+    },
 
     props: {
         sections: { type: Array, required: true },

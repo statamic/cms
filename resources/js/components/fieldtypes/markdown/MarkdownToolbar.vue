@@ -1,9 +1,9 @@
 <template>
     <div
-        class="flex items-center justify-between bg-gray-50 dark:bg-gray-950 rounded-t-xl py-1 px-2 border-b border-gray-300 dark:border-white/15"
+        class="flex items-center justify-between rounded-t-xl border-b border-gray-300 bg-gray-50 px-2 py-1 dark:border-white/15 dark:bg-gray-950"
     >
         <div class="flex items-center" v-if="!isReadOnly">
-            <ui-button
+            <Button
                 size="sm"
                 variant="ghost"
                 class="px-2!"
@@ -14,8 +14,8 @@
                 @click="handleButtonClick(button)"
             >
                 <svg-icon :name="button.svg" class="size-4" />
-            </ui-button>
-            <ui-button
+            </Button>
+            <Button
                 v-if="showDarkMode"
                 size="sm"
                 variant="ghost"
@@ -25,10 +25,10 @@
                 :aria-label="__('Toggle Dark Mode')"
             >
                 <svg-icon name="dark-mode" class="size-4" />
-            </ui-button>
+            </Button>
         </div>
         <div class="flex items-center">
-            <ui-button
+            <Button
                 size="sm"
                 variant="ghost"
                 class="px-2!"
@@ -37,7 +37,7 @@
                 v-text="__('Write')"
                 :aria-pressed="mode === 'write' ? 'true' : 'false'"
             />
-            <ui-button
+            <Button
                 size="sm"
                 variant="ghost"
                 class="px-2!"
@@ -51,32 +51,37 @@
 </template>
 
 <script>
+import { Button } from '@statamic/ui';
+
 export default {
+    components: {
+        Button,
+    },
     props: {
         mode: {
             type: String,
-            required: true
+            required: true,
         },
         buttons: {
             type: Array,
-            required: true
+            required: true,
         },
         isReadOnly: {
             type: Boolean,
-            default: false
+            default: false,
         },
         showDarkMode: {
             type: Boolean,
-            default: false
+            default: false,
         },
         darkMode: {
             type: Boolean,
-            default: false
+            default: false,
         },
         isFullscreen: {
             type: Boolean,
-            default: false
-        }
+            default: false,
+        },
     },
 
     emits: ['toggle-mode', 'toggle-dark-mode', 'button-click'],
@@ -84,7 +89,7 @@ export default {
     methods: {
         handleButtonClick(button) {
             this.$emit('button-click', button.command);
-        }
-    }
+        },
+    },
 };
 </script>

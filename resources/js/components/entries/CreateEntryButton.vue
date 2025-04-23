@@ -1,25 +1,35 @@
 <template>
     <div>
-        <ui-button @click="create" v-if="!hasMultipleBlueprints" :text="text" />
-        <ui-dropdown v-else>
+        <Button @click="create" v-if="!hasMultipleBlueprints" :text="text" />
+        <Dropdown v-else>
             <template #trigger>
-                <ui-button @click.prevent="create" :variant icon-append="ui/chevron-down" :text="text" />
+                <Button @click.prevent="create" :variant icon-append="ui/chevron-down" :text="text" />
             </template>
-            <ui-dropdown-menu>
-                <ui-dropdown-label v-text="__('Choose Blueprint')" />
-                <ui-dropdown-item
+            <DropdownMenu>
+                <DropdownLabel v-text="__('Choose Blueprint')" />
+                <DropdownItem
                     v-for="blueprint in blueprints"
                     :key="blueprint.handle"
                     @click="select(blueprint.handle, $event)"
                     :text="blueprint.title"
                 />
-            </ui-dropdown-menu>
-        </ui-dropdown>
+            </DropdownMenu>
+        </Dropdown>
     </div>
 </template>
 
 <script>
+import { Button, Dropdown, DropdownMenu, DropdownItem, DropdownLabel } from '@statamic/ui';
+
 export default {
+    components: {
+        Button,
+        Dropdown,
+        DropdownMenu,
+        DropdownItem,
+        DropdownLabel,
+    },
+
     props: {
         url: String,
         blueprints: Array,

@@ -1,18 +1,14 @@
 <template>
     <div>
-        <ui-header :title="__(title)">
+        <Header :title="__(title)">
             <dropdown-list class="ltr:mr-2 rtl:ml-2" v-if="canEditBlueprint">
                 <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
             </dropdown-list>
 
-            <ui-button
-                variant="primary"
-                @click.prevent="save"
-                :text="__('Save')"
-            />
+            <Button variant="primary" @click.prevent="save" :text="__('Save')" />
 
             <slot name="action-buttons-right" />
-        </ui-header>
+        </Header>
 
         <publish-container
             v-if="fieldset"
@@ -42,9 +38,15 @@
 <script>
 import HasHiddenFields from '../publish/HasHiddenFields';
 import clone from '@statamic/util/clone.js';
+import { Header, Button } from '@statamic/ui';
 
 export default {
     mixins: [HasHiddenFields],
+
+    components: {
+        Header,
+        Button,
+    },
 
     props: {
         publishContainer: String,

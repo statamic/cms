@@ -1,6 +1,7 @@
 <script setup>
 import { DropdownMenuItem } from 'reka-ui';
 import { useSlots } from 'vue';
+import { Icon } from '@statamic/ui';
 
 defineProps({
     href: { type: String, default: null },
@@ -27,7 +28,7 @@ const hasDefaultSlot = !!slots.default;
         :href="href"
     >
         <div v-if="icon" class="flex size-6 items-center justify-center p-1 text-gray-500">
-            <ui-icon :name="icon" class="size-3.5!" />
+            <Icon :name="icon" class="size-3.5!" />
         </div>
         <div class="col-start-2 ps-2">
             <slot v-if="hasDefaultSlot" />

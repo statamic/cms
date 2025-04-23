@@ -1,19 +1,20 @@
 <template>
     <div class="flex items-center gap-2">
         <Switch :model-value="value" @update:model-value="update" :id="fieldId" :disabled="isReadOnly" />
-        <ui-heading v-if="inlineLabel" v-html="$markdown(__(inlineLabel))" />
+        <Heading v-if="inlineLabel" v-html="$markdown(__(inlineLabel))" />
     </div>
 </template>
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import { Switch } from '@statamic/ui';
+import { Switch, Heading } from '@statamic/ui';
 
 export default {
     mixins: [Fieldtype],
 
     components: {
         Switch,
+        Heading,
     },
 
     computed: {

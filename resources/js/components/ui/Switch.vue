@@ -2,6 +2,7 @@
 import { useId } from 'vue';
 import { SwitchRoot, SwitchThumb } from 'reka-ui';
 import { cva } from 'cva';
+import { WithField } from '@statamic/ui';
 
 const props = defineProps({
     description: { type: String, default: null },
@@ -15,13 +16,13 @@ const props = defineProps({
 defineEmits(['update:modelValue']);
 
 const switchRootClasses = cva({
-        base: [
-            'relative flex rounded-full shrink-0 border-2',
-            'transition-colors focus-within:outline-hidden cursor-pointer',
-            'data-[state=checked]:border-gray-700',
-            'data-[state=checked]:bg-gray-800',
-            'data-[state=unchecked]:border-transparent',
-            'data-[state=unchecked]:bg-gray-200',
+    base: [
+        'relative flex rounded-full shrink-0 border-2',
+        'transition-colors focus-within:outline-hidden cursor-pointer',
+        'data-[state=checked]:border-gray-700',
+        'data-[state=checked]:bg-gray-800',
+        'data-[state=unchecked]:border-transparent',
+        'data-[state=unchecked]:bg-gray-200',
     ],
     variants: {
         size: {
@@ -48,7 +49,7 @@ const switchThumbClasses = cva({
 </script>
 
 <template>
-    <ui-with-field :label :description :required variant="inline" :for="id">
+    <WithField :label :description :required variant="inline" :for="id">
         <SwitchRoot
             data-ui-control
             dir="ltr"
@@ -57,7 +58,7 @@ const switchThumbClasses = cva({
             :class="switchRootClasses"
             @update:model-value="$emit('update:modelValue', $event)"
         >
-                <SwitchThumb :class="switchThumbClasses" />
+            <SwitchThumb :class="switchThumbClasses" />
         </SwitchRoot>
-    </ui-with-field>
+    </WithField>
 </template>

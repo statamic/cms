@@ -1,4 +1,6 @@
 <script setup>
+import { Panel, PanelHeader, Heading, Subheading, Card } from '@statamic/ui';
+
 const props = defineProps({
     heading: { type: String, default: null },
     subheading: { type: String, default: null },
@@ -6,13 +8,13 @@ const props = defineProps({
 </script>
 
 <template>
-    <ui-panel>
-        <ui-panel-header v-if="heading">
-            <ui-heading v-html="heading" />
-            <ui-subheading v-if="subheading" v-html="subheading" />
-        </ui-panel-header>
-        <ui-card>
+    <Panel>
+        <PanelHeader v-if="heading">
+            <Heading v-html="heading" />
+            <Subheading v-if="subheading" v-html="subheading" />
+        </PanelHeader>
+        <Card>
             <slot />
-        </ui-card>
-    </ui-panel>
+        </Card>
+    </Panel>
 </template>

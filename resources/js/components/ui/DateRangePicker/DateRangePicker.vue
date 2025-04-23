@@ -19,7 +19,7 @@ import {
     DateRangePickerRoot,
     DateRangePickerTrigger,
 } from 'reka-ui';
-import { WithField, Card, Button, Calendar } from '@statamic/ui';
+import { WithField, Card, Button, Calendar, Icon } from '@statamic/ui';
 import { parseAbsoluteToLocal } from '@internationalized/date';
 
 const emit = defineEmits(['update:modelValue']);
@@ -131,7 +131,7 @@ const calendarEvents = computed(() => ({
                         v-if="!inline"
                         class="absolute end-1 top-1 bottom-1 flex items-center justify-center rounded-lg px-2 text-gray-400 outline-hidden hover:bg-gray-50 focus:bg-gray-50 dark:hover:bg-gray-900 dark:focus:bg-gray-900"
                     >
-                        <ui-icon name="calendar" class="h-4 w-4" />
+                        <Icon name="calendar" class="h-4 w-4" />
                     </DateRangePickerTrigger>
                 </DateRangePickerField>
 

@@ -1,5 +1,6 @@
 <script setup>
 import { cva } from 'cva';
+import { WithField, CharacterCounter } from '@statamic/ui';
 
 defineEmits(['update:modelValue']);
 
@@ -36,7 +37,7 @@ const classes = cva({
 </script>
 
 <template>
-    <ui-with-field :label="label" :description="description" :required="required">
+    <WithField :label="label" :description="description" :required="required">
         <div class="group/input relative block w-full" data-ui-input>
             <textarea
                 :class="classes"
@@ -47,8 +48,8 @@ const classes = cva({
                 @input="$emit('update:modelValue', $event.target.value)"
             />
             <div class="absolute right-2 bottom-2" v-if="limit">
-                <ui-character-counter :text="modelValue" :limit />
+                <CharacterCounter :text="modelValue" :limit />
             </div>
         </div>
-    </ui-with-field>
+    </WithField>
 </template>

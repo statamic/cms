@@ -1,95 +1,94 @@
 <template>
     <div>
-        <ui-header :title="__(title)">
+        <Header :title="__(title)">
+            <dropdown-list class="ltr:mr-2 rtl:ml-2" v-if="!!this.$slots.twirldown">
+                <slot name="twirldown" :actionCompleted="actionCompleted" />
+            </dropdown-list>
 
-                <dropdown-list class="ltr:mr-2 rtl:ml-2" v-if="!!this.$slots.twirldown">
-                    <slot name="twirldown" :actionCompleted="actionCompleted" />
-                </dropdown-list>
+            <div class="btn-group ltr:mr-4 rtl:ml-4" v-if="canUseStructureTree && !treeIsDirty">
+                <button
+                    class="btn flex items-center px-4"
+                    @click="view = 'tree'"
+                    :class="{ active: view === 'tree' }"
+                    v-tooltip="__('Tree')"
+                >
+                    <svg-icon name="light/structures" class="h-4 w-4" />
+                </button>
+                <button
+                    class="btn flex items-center px-4"
+                    @click="view = 'list'"
+                    :class="{ active: view === 'list' }"
+                    v-tooltip="__('List')"
+                >
+                    <svg-icon name="assets-mode-table" class="h-4 w-4" />
+                </button>
+            </div>
 
-                <div class="btn-group ltr:mr-4 rtl:ml-4" v-if="canUseStructureTree && !treeIsDirty">
-                    <button
-                        class="btn flex items-center px-4"
-                        @click="view = 'tree'"
-                        :class="{ active: view === 'tree' }"
-                        v-tooltip="__('Tree')"
-                    >
-                        <svg-icon name="light/structures" class="h-4 w-4" />
-                    </button>
-                    <button
-                        class="btn flex items-center px-4"
-                        @click="view = 'list'"
-                        :class="{ active: view === 'list' }"
-                        v-tooltip="__('List')"
-                    >
-                        <svg-icon name="assets-mode-table" class="h-4 w-4" />
-                    </button>
-                </div>
-
-                <template v-if="view === 'tree'">
-                    <a
-                        class="text-2xs text-blue underline ltr:mr-4 rtl:ml-4"
-                        v-if="treeIsDirty"
-                        v-text="__('Discard changes')"
-                        @click="cancelTreeProgress"
-                    />
-
-                    <site-selector
-                        v-if="sites.length > 1"
-                        class="ltr:mr-4 rtl:ml-4"
-                        :sites="sites"
-                        :value="site"
-                        @input="site = $event.handle"
-                    />
-
-                    <button
-                        class="btn ltr:mr-4 rtl:ml-4"
-                        :class="{ disabled: !treeIsDirty, 'btn-danger': deletedEntries.length }"
-                        :disabled="!treeIsDirty"
-                        @click="saveTree"
-                        v-text="__('Save Changes')"
-                        v-tooltip="
-                            deletedEntries.length
-                                ? __n('An entry will be deleted|:count entries will be deleted', deletedEntries.length)
-                                : null
-                        "
-                    />
-                </template>
-
-                <template v-if="view === 'list' && reorderable">
-                    <site-selector
-                        v-if="sites.length > 1 && reordering && site"
-                        class="ltr:mr-4 rtl:ml-4"
-                        :sites="sites"
-                        :value="site"
-                        @input="site = $event.handle"
-                    />
-
-                    <button
-                        class="btn ltr:mr-4 rtl:ml-4"
-                        v-if="!reordering"
-                        @click="reordering = true"
-                        v-text="__('Reorder')"
-                    />
-
-                    <template v-if="reordering">
-                        <button class="btn ltr:ml-2 rtl:mr-2" @click="reordering = false" v-text="__('Cancel')" />
-
-                        <button
-                            class="btn-primary ltr:ml-2 rtl:mr-2"
-                            @click="$refs.list.saveOrder"
-                            v-text="__('Save Order')"
-                        />
-                    </template>
-                </template>
-
-                <create-entry-button
-                    v-if="!reordering && canCreate"
-                    button-class="btn-primary"
-                    :url="createUrl"
-                    :blueprints="blueprints"
-                    :text="createLabel"
+            <template v-if="view === 'tree'">
+                <a
+                    class="text-2xs text-blue underline ltr:mr-4 rtl:ml-4"
+                    v-if="treeIsDirty"
+                    v-text="__('Discard changes')"
+                    @click="cancelTreeProgress"
                 />
-        </ui-header>
+
+                <site-selector
+                    v-if="sites.length > 1"
+                    class="ltr:mr-4 rtl:ml-4"
+                    :sites="sites"
+                    :value="site"
+                    @input="site = $event.handle"
+                />
+
+                <button
+                    class="btn ltr:mr-4 rtl:ml-4"
+                    :class="{ disabled: !treeIsDirty, 'btn-danger': deletedEntries.length }"
+                    :disabled="!treeIsDirty"
+                    @click="saveTree"
+                    v-text="__('Save Changes')"
+                    v-tooltip="
+                        deletedEntries.length
+                            ? __n('An entry will be deleted|:count entries will be deleted', deletedEntries.length)
+                            : null
+                    "
+                />
+            </template>
+
+            <template v-if="view === 'list' && reorderable">
+                <site-selector
+                    v-if="sites.length > 1 && reordering && site"
+                    class="ltr:mr-4 rtl:ml-4"
+                    :sites="sites"
+                    :value="site"
+                    @input="site = $event.handle"
+                />
+
+                <button
+                    class="btn ltr:mr-4 rtl:ml-4"
+                    v-if="!reordering"
+                    @click="reordering = true"
+                    v-text="__('Reorder')"
+                />
+
+                <template v-if="reordering">
+                    <button class="btn ltr:ml-2 rtl:mr-2" @click="reordering = false" v-text="__('Cancel')" />
+
+                    <button
+                        class="btn-primary ltr:ml-2 rtl:mr-2"
+                        @click="$refs.list.saveOrder"
+                        v-text="__('Save Order')"
+                    />
+                </template>
+            </template>
+
+            <create-entry-button
+                v-if="!reordering && canCreate"
+                button-class="btn-primary"
+                :url="createUrl"
+                :blueprints="blueprints"
+                :text="createLabel"
+            />
+        </Header>
 
         <entry-list
             v-if="view === 'list'"
@@ -182,11 +181,13 @@ import DeleteLocalizationConfirmation from './DeleteLocalizationConfirmation.vue
 import SiteSelector from '../SiteSelector.vue';
 import HasActions from '../publish/HasActions';
 import { defineAsyncComponent } from 'vue';
+import { Header } from '@statamic/ui';
 
 export default {
     mixins: [HasActions],
 
     components: {
+        Header,
         PageTree: defineAsyncComponent(() => import('../structures/PageTree.vue')),
         DeleteEntryConfirmation,
         DeleteLocalizationConfirmation,

@@ -1,6 +1,6 @@
 <template>
     <div class="min-w-64 lg:w-1/3">
-        <ui-input
+        <Input
             autofocus
             ref="input"
             icon="magnifying-glass"
@@ -14,9 +14,11 @@
 
 <script>
 import debounce from '@statamic/util/debounce.js';
-
+import { Input } from '@statamic/ui';
 export default {
-    props: ['value'],
+    components: {
+        Input,
+    },
 
     props: {
         placeholder: {

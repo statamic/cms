@@ -1,37 +1,53 @@
 <template>
     <div>
-        <div class="relative flex shrink-0 space-x-2 border-b border-gray-200 text-sm text-gray-400 dark:border-gray-700 dark:text-gray-500">
-            <FilterTrigger
-                :active="!activePreset"
-                @click="viewAll"
-                :text="__('All')"
-            />
+        <div
+            class="relative flex shrink-0 space-x-2 border-b border-gray-200 text-sm text-gray-400 dark:border-gray-700 dark:text-gray-500"
+        >
+            <FilterTrigger :active="!activePreset" @click="viewAll" :text="__('All')" />
             <template v-for="(preset, handle) in presets">
                 <FilterTrigger v-if="handle === activePreset" :active="true">
                     {{ preset.display }}
-                    <ui-dropdown class="w-48!">
+                    <Dropdown class="w-48!">
                         <template #trigger>
-                            <ui-button class="absolute top-1.5 -right-3" variant="ghost" size="xs" @click="viewPreset(handle)" icon="ui/chevron-down" />
+                            <Button
+                                class="absolute top-1.5 -right-3"
+                                variant="ghost"
+                                size="xs"
+                                @click="viewPreset(handle)"
+                                icon="ui/chevron-down"
+                            />
                         </template>
-                        <ui-dropdown-menu>
-                            <ui-dropdown-item :text="__('Duplicate')" icon="duplicate" @click="createPreset" />
-                            <ui-dropdown-item v-if="canRenamePreset(handle)" :text="__('Rename')" icon="rename" @click="renamePreset" />
-                            <ui-dropdown-separator />
-                            <ui-dropdown-item
+                        <DropdownMenu>
+                            <DropdownItem :text="__('Duplicate')" icon="duplicate" @click="createPreset" />
+                            <DropdownItem
+                                v-if="canRenamePreset(handle)"
+                                :text="__('Rename')"
+                                icon="rename"
+                                @click="renamePreset"
+                            />
+                            <DropdownSeparator />
+                            <DropdownItem
                                 v-if="canDeletePreset(handle)"
                                 :text="__('Delete')"
                                 icon="delete"
                                 variant="warning"
                                 @click="showDeleteModal = true"
                             />
-                        </ui-dropdown-menu>
-                    </ui-dropdown>
+                        </DropdownMenu>
+                    </Dropdown>
                 </FilterTrigger>
                 <FilterTrigger v-else @click="viewPreset(handle)">
                     {{ preset.display }}
                 </FilterTrigger>
             </template>
-            <ui-button @click="createPreset" variant="ghost" size="sm" :text="__('New View')" icon="add-bookmark" class="[&_svg]:size-4 relative top-0.5" />
+            <Button
+                @click="createPreset"
+                variant="ghost"
+                size="sm"
+                :text="__('New View')"
+                icon="add-bookmark"
+                class="relative top-0.5 [&_svg]:size-4"
+            />
         </div>
 
         <confirmation-modal
@@ -45,7 +61,7 @@
 
             <div v-if="presets && Object.keys(presets).includes(savingPresetSlug)">
                 <small
-                    class="help-block mb-0 mt-2 text-red-500"
+                    class="help-block mt-2 mb-0 text-red-500"
                     v-text="__('messages.filters_view_already_exists')"
                 ></small>
             </div>
@@ -68,7 +84,7 @@
                 "
             >
                 <small
-                    class="help-block mb-0 mt-2 text-red-500"
+                    class="help-block mt-2 mb-0 text-red-500"
                     v-text="__('messages.filters_view_already_exists')"
                 ></small>
             </div>
@@ -88,10 +104,16 @@
 
 <script>
 import FilterTrigger from './FilterTrigger.vue';
+import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownSeparator } from '@statamic/ui';
 
 export default {
     components: {
         FilterTrigger,
+        Button,
+        Dropdown,
+        DropdownItem,
+        DropdownMenu,
+        DropdownSeparator,
     },
 
     props: {

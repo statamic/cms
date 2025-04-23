@@ -3,10 +3,11 @@ import { ref, provide } from 'vue';
 import { cva } from 'cva';
 import DataTableColumns from './Columns.vue';
 import DataTableRows from './Rows.vue';
+import { Panel } from '@statamic/ui';
 
 const props = defineProps({
     variant: { type: String, default: 'normal' },
-})
+});
 
 provide('dataTableVariant', props.variant);
 
@@ -37,7 +38,7 @@ const titleClasses = cva({
 </script>
 
 <template>
-    <ui-panel class="relative overflow-x-auto overscroll-x-contain">
+    <Panel class="relative overflow-x-auto overscroll-x-contain">
         <table
             data-ui-data-table
             class="w-full min-w-full table-fixed border-separate border-spacing-y-0 whitespace-nowrap text-gray-500 antialiased"
@@ -49,7 +50,7 @@ const titleClasses = cva({
                 <slot name="rows" />
             </DataTableRows>
         </table>
-    </ui-panel>
+    </Panel>
 </template>
 
 <style></style>

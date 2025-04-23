@@ -2,6 +2,7 @@
 import { computed, useSlots } from 'vue';
 import { cva } from 'cva';
 import { twMerge } from 'tailwind-merge';
+import { Icon } from '@statamic/ui';
 
 const props = defineProps({
     as: { type: String, default: 'div' },
@@ -33,9 +34,12 @@ const badgeClasses = computed(() => {
                 black: 'bg-gray-900 border-black text-white [a]:hover:bg-black/90 [button]:hover:bg-black/90',
                 blue: 'bg-blue-100/80 border-blue-300 text-blue-700 [a]:hover:bg-blue-200/60 [button]:hover:bg-blue-200/60',
                 cyan: 'bg-cyan-100/80 border-cyan-400 text-cyan-700 [a]:hover:bg-cyan-200/60 [button]:hover:bg-cyan-200/60',
-                default: 'bg-gray-100/80 border-gray-300 text-gray-700 [a]:hover:bg-gray-200/50 [button]:hover:bg-gray-200/50',
-                emerald: 'bg-emerald-100/80 border-emerald-400 text-emerald-700 [a]:hover:bg-emerald-200/60 [button]:hover:bg-emerald-200/60',
-                fuchsia: 'bg-fuchsia-100/80 border-fuchsia-300 text-fuchsia-700 [a]:hover:bg-fuchsia-200/60 [button]:hover:bg-fuchsia-200/60',
+                default:
+                    'bg-gray-100/80 border-gray-300 text-gray-700 [a]:hover:bg-gray-200/50 [button]:hover:bg-gray-200/50',
+                emerald:
+                    'bg-emerald-100/80 border-emerald-400 text-emerald-700 [a]:hover:bg-emerald-200/60 [button]:hover:bg-emerald-200/60',
+                fuchsia:
+                    'bg-fuchsia-100/80 border-fuchsia-300 text-fuchsia-700 [a]:hover:bg-fuchsia-200/60 [button]:hover:bg-fuchsia-200/60',
                 green: 'bg-green-100/80 border-green-400 text-green-700 [a]:hover:bg-green-200/60 [button]:hover:bg-green-200/60',
                 indigo: 'bg-indigo-100/80 border-indigo-300 text-indigo-700 [a]:hover:bg-indigo-200/60 [button]:hover:bg-indigo-200/60',
                 lime: 'bg-lime-100 border-lime-400 text-lime-700 [a]:hover:bg-lime-200/80 [button]:hover:bg-lime-200/80',
@@ -64,7 +68,7 @@ const badgeClasses = computed(() => {
 
 <template>
     <component :is="tag" :class="badgeClasses" :href="props.href" data-ui-badge>
-        <ui-icon v-if="icon" :name="icon" />
+        <Icon v-if="icon" :name="icon" />
         <slot v-if="hasDefaultSlot" />
         <template v-else>{{ text }}</template>
         <span v-if="props.subText" class="text-[0.625rem] leading-tight font-medium opacity-70">{{ subText }}</span>

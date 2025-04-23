@@ -7,7 +7,7 @@
         </div>
 
         <div v-if="hasMultiplePages" class="flex items-center gap-1" :class="{ 'pagination-inline': inline }">
-            <ui-button
+            <Button
                 size="sm"
                 :variant="hasPrevious && !showPageLinks ? 'filled' : 'ghost'"
                 round
@@ -16,7 +16,7 @@
                 @click="selectPreviousPage"
             />
 
-            <ui-button
+            <Button
                 v-if="showPageLinks"
                 v-for="(page, i) in pages"
                 size="sm"
@@ -28,7 +28,7 @@
                 :text="page === 'separator' ? '...' : String(page)"
             />
 
-            <ui-button
+            <Button
                 size="sm"
                 :variant="hasNext && !showPageLinks ? 'filled' : 'ghost'"
                 round
@@ -54,7 +54,7 @@
 <script>
 import HasInputOptions from '../fieldtypes/HasInputOptions.js';
 import { flatten, sortBy, range } from 'lodash-es';
-import { Select } from '@statamic/ui';
+import { Select, Button } from '@statamic/ui';
 
 const onEachSide = 3;
 
@@ -63,6 +63,7 @@ export default {
 
     components: {
         Select,
+        Button,
     },
 
     props: {

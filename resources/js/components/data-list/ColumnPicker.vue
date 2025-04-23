@@ -1,6 +1,6 @@
 <template>
     <div>
-        <ui-button icon="utilities" :text="__('Customize')" @click="open = true" />
+        <Button icon="utilities" :text="__('Customize')" @click="open = true" />
 
         <modal
             v-if="open"
@@ -12,23 +12,23 @@
         >
             <div class="-max-h-screen-px flex h-full flex-col">
                 <header
-                    class="modal-drag-handle flex cursor-grab items-center justify-between border-b bg-gray-200 p-4 active:cursor-grabbing dark:border-dark-900 dark:bg-dark-650"
+                    class="modal-drag-handle dark:border-dark-900 dark:bg-dark-650 flex cursor-grab items-center justify-between border-b bg-gray-200 p-4 active:cursor-grabbing"
                 >
                     <h2>{{ __('Customize Columns') }}</h2>
                     <button class="btn-close" @click="close" :aria-label="__('Close Editor')">&times;</button>
                 </header>
 
-                <div class="flex min-h-0 grow rounded-t-md bg-gray-100 dark:bg-dark-600">
+                <div class="dark:bg-dark-600 flex min-h-0 grow rounded-t-md bg-gray-100">
                     <!-- Available Columns -->
                     <div
-                        class="flex w-1/2 flex-col outline-hidden dark:border-dark-900 ltr:border-r ltr:text-left rtl:border-l rtl:text-right"
+                        class="dark:border-dark-900 flex w-1/2 flex-col outline-hidden ltr:border-r ltr:text-left rtl:border-l rtl:text-right"
                     >
                         <header
                             v-text="__('Available Columns')"
-                            class="border-b bg-white px-3 py-2 text-sm font-medium dark:border-dark-900 dark:bg-dark-700"
+                            class="dark:border-dark-900 dark:bg-dark-700 border-b bg-white px-3 py-2 text-sm font-medium"
                         />
                         <div
-                            class="flex flex-1 select-none flex-col space-y-1 overflow-y-scroll px-3 py-2 shadow-inner"
+                            class="flex flex-1 flex-col space-y-1 overflow-y-scroll px-3 py-2 shadow-inner select-none"
                         >
                             <div
                                 class="column-picker-item"
@@ -53,7 +53,7 @@
                     <div class="flex w-1/2 flex-col">
                         <header
                             v-text="__('Displayed Columns')"
-                            class="flex-none border-b bg-white px-3 py-2 text-sm font-medium dark:border-dark-900 dark:bg-dark-700"
+                            class="dark:border-dark-900 dark:bg-dark-700 flex-none border-b bg-white px-3 py-2 text-sm font-medium"
                         />
                         <div class="grow overflow-y-scroll shadow-inner">
                             <sortable-list
@@ -65,7 +65,7 @@
                                 append-to=".modal-body"
                                 constrain-dimensions
                             >
-                                <div class="select-none space-y-1 p-3 px-3">
+                                <div class="space-y-1 p-3 px-3 select-none">
                                     <div
                                         class="item sortable cursor-grab"
                                         v-for="column in selectedColumns"
@@ -91,7 +91,7 @@
                 </div>
 
                 <footer
-                    class="flex items-center justify-end border-t px-3 py-2 dark:border-dark-900 dark:bg-dark-700"
+                    class="dark:border-dark-900 dark:bg-dark-700 flex items-center justify-end border-t px-3 py-2"
                     v-if="preferencesKey"
                 >
                     <button class="btn" v-text="__('Reset')" @click="reset" :disabled="saving" />
@@ -110,10 +110,12 @@
 <script>
 import { SortableList } from '../sortable/Sortable';
 import { sortBy } from 'lodash-es';
+import { Button } from '@statamic/ui';
 
 export default {
     components: {
         SortableList,
+        Button,
     },
 
     props: {

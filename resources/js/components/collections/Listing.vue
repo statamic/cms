@@ -1,6 +1,6 @@
 <template>
     <data-list ref="dataList" :columns="columns" :rows="items">
-        <ui-card-panel>
+        <CardPanel>
             <data-list-table>
                 <template #cell-title="{ row: collection }">
                     <a :href="collection.available_in_selected_site ? collection.entries_url : collection.edit_url">{{
@@ -35,15 +35,20 @@
                     </dropdown-list>
                 </template>
             </data-list-table>
-        </ui-card-panel>
+        </CardPanel>
     </data-list>
 </template>
 
 <script>
 import Listing from '../Listing.vue';
+import { CardPanel } from '@statamic/ui';
 
 export default {
     mixins: [Listing],
+
+    components: {
+        CardPanel,
+    },
 
     props: {
         initialRows: Array,

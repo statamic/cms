@@ -1,6 +1,7 @@
 <script setup>
 import { useId } from 'vue';
 import { RadioGroupRoot } from 'reka-ui';
+import { WithField } from '@statamic/ui';
 
 defineProps({
     description: { type: String, default: null },
@@ -21,7 +22,7 @@ defineExpose({ focus });
 </script>
 
 <template>
-    <ui-with-field :label :description :required>
+    <WithField :label :description :required>
         <RadioGroupRoot
             :modelValue="modelValue"
             @update:modelValue="$emit('update:modelValue', $event)"
@@ -33,5 +34,5 @@ defineExpose({ focus });
         >
             <slot />
         </RadioGroupRoot>
-    </ui-with-field>
+    </WithField>
 </template>

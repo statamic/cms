@@ -1,5 +1,6 @@
 <script setup>
 import { useSlots, shallowRef, onMounted } from 'vue';
+import { Icon, Badge } from '@statamic/ui';
 
 const props = defineProps({
     href: { type: String, default: null },
@@ -43,13 +44,13 @@ function click(event) {
         @click="click"
     >
         <div v-if="icon" class="flex size-6 items-center justify-center p-1 text-gray-500">
-            <ui-icon v-if="iconComponent" :name="icon" class="size-4" :key="icon" />
+            <Icon v-if="iconComponent" :name="icon" class="size-4" :key="icon" />
             <div v-else class="size-4 shrink-0" />
         </div>
         <div class="flex-1">
             <slot v-if="hasDefaultSlot" />
             <template v-else>{{ text }}</template>
         </div>
-        <ui-badge v-if="badge" :text="badge" variant="flat" />
+        <Badge v-if="badge" :text="badge" variant="flat" />
     </a>
 </template>

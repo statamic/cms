@@ -1,23 +1,26 @@
 <template>
     <div>
-        <ui-header :title="__(container.title)">
-
+        <Header :title="__(container.title)">
             <dropdown-list v-if="container.can_edit || container.can_delete">
                 <dropdown-item v-if="container.can_edit" v-text="__('Edit Container')" :redirect="container.edit_url" />
                 <dropdown-item v-text="__('Edit Blueprint')" :redirect="container.blueprint_url" />
                 <dropdown-item v-if="container.can_delete" class="warning" @click="$refs.deleter.confirm()">
                     {{ __('Delete Container') }}
-                    <resource-deleter ref="deleter" :resource-title="__(container.title)" :route="container.delete_url" />
+                    <resource-deleter
+                        ref="deleter"
+                        :resource-title="__(container.title)"
+                        :route="container.delete_url"
+                    />
                 </dropdown-item>
             </dropdown-list>
 
-            <ui-button
+            <Button
                 v-if="canCreateContainers"
                 :href="createContainerUrl"
                 :text="__('Create Container')"
                 variant="primary"
             />
-        </ui-header>
+        </Header>
 
         <asset-browser
             ref="browser"
@@ -35,7 +38,14 @@
 </template>
 
 <script>
+import { Header, Button } from '@statamic/ui';
+
 export default {
+    components: {
+        Header,
+        Button,
+    },
+
     props: {
         initialContainer: Object,
         initialPath: String,

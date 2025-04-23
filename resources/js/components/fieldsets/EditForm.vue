@@ -1,15 +1,10 @@
 <template>
     <div>
-        <ui-header :title="__(initialTitle)">
-            <ui-button
-                type="submit"
-                variant="primary"
-                @click.prevent="save"
-                v-text="__('Save')"
-            />
-        </ui-header>
+        <Header :title="__(initialTitle)">
+            <Button type="submit" variant="primary" @click.prevent="save" v-text="__('Save')" />
+        </Header>
 
-        <div class="publish-form card mb-8 p-0 @container">
+        <div class="publish-form card @container mb-8 p-0">
             <div class="publish-fields">
                 <div class="form-group w-full">
                     <div class="field-inner">
@@ -37,7 +32,7 @@
             </div>
         </div>
 
-        <div class="content mb-4 mt-10">
+        <div class="content mt-10 mb-4">
             <h2 v-text="__('Fields')" />
         </div>
 
@@ -62,12 +57,15 @@
 import Fields from '../blueprints/Fields.vue';
 import { Sortable, Plugins } from '@shopify/draggable';
 import SuggestsConditionalFields from '../blueprints/SuggestsConditionalFields';
+import { Header, Button } from '@statamic/ui';
 
 export default {
     mixins: [SuggestsConditionalFields],
 
     components: {
         Fields,
+        Header,
+        Button,
     },
 
     props: ['action', 'initialFieldset', 'breadcrumbUrl'],

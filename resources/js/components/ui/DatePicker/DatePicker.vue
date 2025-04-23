@@ -19,7 +19,7 @@ import {
     DatePickerNext,
     DatePickerPrev,
 } from 'reka-ui';
-import { WithField, Card, Button, Calendar } from '@statamic/ui';
+import { WithField, Card, Button, Calendar, Icon } from '@statamic/ui';
 
 const emit = defineEmits(['update:modelValue']);
 
@@ -78,10 +78,10 @@ const calendarEvents = computed(() => ({
                 <DatePickerField v-slot="{ segments }" class="w-full">
                     <div
                         :class="[
-                            'flex items-center uppercase w-full bg-white dark:bg-gray-900',
+                            'flex w-full items-center bg-white uppercase dark:bg-gray-900',
                             'border border-gray-300 dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:inset-shadow-2xs dark:inset-shadow-black',
                             'text-gray-600 dark:text-gray-300',
-                            'shadow-ui-sm not-prose h-10 rounded-lg py-2 px-10 disabled:shadow-none',
+                            'shadow-ui-sm not-prose h-10 rounded-lg px-10 py-2 disabled:shadow-none',
                             'data-invalid:border-red-500',
                         ]"
                     >
@@ -89,10 +89,14 @@ const calendarEvents = computed(() => ({
                             v-if="!inline"
                             class="absolute start-1 top-1 bottom-1 flex items-center justify-center rounded-lg px-2 text-gray-400 outline-hidden hover:bg-gray-100 focus:bg-gray-100 dark:hover:bg-gray-900 dark:focus:bg-gray-900"
                         >
-                            <ui-icon name="calendar" class="size-4" />
+                            <Icon name="calendar" class="size-4" />
                         </DatePickerTrigger>
                         <template v-for="item in segments" :key="item.part">
-                            <DatePickerInput v-if="item.part === 'literal'" :part="item.part" :class="{ 'text-gray-500 antialiased text-sm': !item.contenteditable }">
+                            <DatePickerInput
+                                v-if="item.part === 'literal'"
+                                :part="item.part"
+                                :class="{ 'text-sm text-gray-500 antialiased': !item.contenteditable }"
+                            >
                                 {{ item.value }}
                             </DatePickerInput>
                             <DatePickerInput
@@ -113,7 +117,7 @@ const calendarEvents = computed(() => ({
                         type="button"
                         class="absolute end-1 top-1 bottom-1 flex items-center justify-center rounded-lg px-2 text-gray-300 outline-hidden hover:bg-gray-100 focus:bg-gray-100 active:text-gray-400 dark:hover:bg-gray-900 dark:focus:bg-gray-900"
                     >
-                        <ui-icon name="x" class="size-3" />
+                        <Icon name="x" class="size-3" />
                     </button>
                 </DatePickerField>
 
