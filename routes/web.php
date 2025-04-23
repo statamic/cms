@@ -12,6 +12,7 @@ use Statamic\Http\Controllers\FrontendController;
 use Statamic\Http\Controllers\OAuthController;
 use Statamic\Http\Controllers\PhoneHomeController;
 use Statamic\Http\Controllers\ResetPasswordController;
+use Statamic\Http\Controllers\TwoFactorChallengeController;
 use Statamic\Http\Controllers\User\LoginController;
 use Statamic\Http\Controllers\User\PasswordController;
 use Statamic\Http\Controllers\User\ProfileController;
@@ -42,6 +43,9 @@ Route::name('statamic.')->group(function () {
             Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
             Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
             Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.reset.action');
+
+            Route::get('two-factor-challenge', [TwoFactorChallengeController::class, 'index'])->name('two-factor-challenge');
+            Route::post('two-factor-challenge', [TwoFactorChallengeController::class, 'store']);
         });
 
         Route::group(['prefix' => 'auth', 'middleware' => [CPAuthGuard::class]], function () {

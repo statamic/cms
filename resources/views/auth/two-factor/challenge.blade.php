@@ -19,10 +19,15 @@
             >
                 <form
                     method="POST"
+                    action="{{ $action }}"
                     class="email-login select-none"
                     @submit="busy = true"
                 >
-                    {!! csrf_field() !!}
+                    @csrf
+
+                    @if (request('redirect'))
+                        <input type="hidden" name="redirect" value="{{ request('redirect') }}" />
+                    @endif
 
                     <h1 class="mb-2 text-lg text-gray-800 dark:text-dark-175">
                         {{ __('Two Factor Authentication') }}
