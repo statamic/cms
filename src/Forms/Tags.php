@@ -4,6 +4,7 @@ namespace Statamic\Forms;
 
 use DebugBar\DataCollector\ConfigCollector;
 use DebugBar\DebugBarException;
+use Illuminate\Support\Collection;
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Blink;
@@ -171,7 +172,19 @@ class Tags extends BaseTags
             $params = Html::attributes(['scope' => $scope]);
         }
 
-        return Antlers::parse('{{ fields '.$params.' }}'.$this->content.'{{ /fields }}', $this->context->all());
+        $context = $this->context->all();
+
+        $fields = Arr::get($context, 'fields', []);
+
+        if ($handle = $this->params->get('get')) {
+            $context['fields'] = $this->dottedContextFields($fields, recursive: true)->only($handle)->values()->all();
+        } elseif ($only = $this->params->get('only')) {
+            $context['fields'] = $this->dottedContextFields($fields, recursive: false)->only(explode('|', $only))->values()->all();
+        } elseif ($except = $this->params->get('except')) {
+            $context['fields'] = $this->dottedContextFields($fields, recursive: false)->except(explode('|', $except))->values()->all();
+        }
+
+        return Antlers::parse('{{ fields '.$params.' }}'.$this->content.'{{ /fields }}', $context);
     }
 
     /**
@@ -426,5 +439,18 @@ class Tags extends BaseTags
         return URL::prependSiteUrl(
             config('statamic.routes.action').'/form/'.$url
         );
+    }
+
+    private function dottedContextFields(array $fields, $recursive = false, array &$dotted = []): Collection
+    {
+        foreach ($fields as $field) {
+            $dotted[$field['handle']] = $field;
+
+            if ($recursive && $fields = Arr::get($field, 'fields')) {
+                $this->dottedContextFields($fields, $recursive, $dotted);
+            }
+        }
+
+        return collect($dotted);
     }
 }
