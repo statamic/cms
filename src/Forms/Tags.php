@@ -179,9 +179,9 @@ class Tags extends BaseTags
         if ($handle = $this->params->get('get')) {
             $context['fields'] = $this->dottedContextFields($fields, recursive: true)->only($handle)->values()->all();
         } elseif ($only = $this->params->get('only')) {
-            $context['fields'] = $this->dottedContextFields($fields, recursive: false)->only(explode('|', $only))->values()->all();
+            $context['fields'] = $this->dottedContextFields($fields)->only(explode('|', $only))->values()->all();
         } elseif ($except = $this->params->get('except')) {
-            $context['fields'] = $this->dottedContextFields($fields, recursive: false)->except(explode('|', $except))->values()->all();
+            $context['fields'] = $this->dottedContextFields($fields)->except(explode('|', $except))->values()->all();
         }
 
         return Antlers::parse('{{ fields '.$params.' }}'.$this->content.'{{ /fields }}', $context);
