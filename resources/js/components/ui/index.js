@@ -11,7 +11,7 @@ import { default as TimePicker } from './TimePicker/TimePicker.vue';
 import { default as Button } from './Button/Button.vue';
 import { default as ButtonGroup } from './Button/Group.vue';
 import { default as Widget } from './Widget.vue';
-import { default as Select } from './Select/Index.vue';
+import { default as Select } from './Select/Select.vue';
 import { default as Checkbox } from './Checkbox/Item.vue';
 import { default as CheckboxGroup } from './Checkbox/Group.vue';
 import { default as Radio } from './Radio/Item.vue';
