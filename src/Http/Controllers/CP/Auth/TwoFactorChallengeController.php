@@ -14,6 +14,7 @@ class TwoFactorChallengeController extends CpController
 {
     public function __construct(Request $request)
     {
+        $this->middleware('throttle:two-factor');
         $this->middleware(RedirectIfAuthorized::class);
     }
 

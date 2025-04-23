@@ -2,10 +2,13 @@
 
 namespace Statamic\Providers;
 
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Cache\Repository;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use PragmaRX\Google2FA\Google2FA;
 use Statamic\Auth\Passwords\PasswordBrokerManager;
@@ -120,6 +123,10 @@ class AuthServiceProvider extends ServiceProvider
             return ($app['auth']->getProvider() instanceof UserProvider)
                 ? new PasswordBrokerManager($app)
                 : $broker;
+        });
+
+        RateLimiter::for('two-factor', function (Request $request) {
+            return Limit::perMinute(5)->by($request->session()->get('login.id'));
         });
     }
 }
