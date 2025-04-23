@@ -9,6 +9,7 @@ use Illuminate\Validation\ValidationException;
 use Statamic\Auth\ThrottlesLogins;
 use Statamic\Events\TwoFactorAuthenticationChallenged;
 use Statamic\Facades\OAuth;
+use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Middleware\CP\RedirectIfAuthorized;
 use Statamic\Support\Str;
@@ -75,6 +76,8 @@ class LoginController extends CpController
 
             return $this->throwFailedAuthenticationException($request);
         }
+
+        $user = User::fromUser($user);
 
         if ($user->hasEnabledTwoFactorAuthentication()) {
             return $this->twoFactorChallengeResponse($request, $user);

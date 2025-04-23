@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Statamic\Auth\ThrottlesLogins;
 use Statamic\Events\TwoFactorAuthenticationChallenged;
+use Statamic\Facades\User;
 use Statamic\Http\Controllers\Controller;
 use Statamic\Http\Requests\UserLoginRequest;
 
@@ -32,6 +33,8 @@ class LoginController extends Controller
 
             return $errorResponse->withInput()->withErrors(__('Invalid credentials.'));
         }
+
+        $user = User::fromUser($user);
 
         if ($user->hasEnabledTwoFactorAuthentication()) {
             $request->session()->put([
