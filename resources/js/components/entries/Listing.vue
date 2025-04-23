@@ -65,7 +65,6 @@
                             @saved="$refs.presets.setPreset($event)"
                             @deleted="$refs.presets.refreshPresets()"
                         />
-                        <div class="flex-1" />
                         <data-list-column-picker :preferences-key="preferencesKey('columns')" />
                     </div>
 

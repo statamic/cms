@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-wrap items-center gap-3">
+    <div class="flex-1 flex items-center gap-3 overflow-x-auto">
         <!-- Field filter (requires custom selection UI) -->
         <popover v-if="fieldFilter" placement="bottom-start" @closed="fieldFilterClosed">
             <template #trigger>
