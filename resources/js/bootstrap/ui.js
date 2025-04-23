@@ -13,12 +13,10 @@ export default async (app) => {
             }, [])
             .slice(1); // Remove 'components' segment
 
-        // Handle Index files specially
-        // Either named Name/Index.vue or Name/Name.vue
+        // Handle Index files specially (named Name/Name.vue)
         if (
             segments.length > 1 &&
-            (segments[segments.length - 1].toLowerCase() === segments[segments.length - 2].toLowerCase() ||
-                segments[segments.length - 1].toLowerCase() === 'index')
+            segments[segments.length - 1].toLowerCase() === segments[segments.length - 2].toLowerCase()
         ) {
             segments.pop();
         }
