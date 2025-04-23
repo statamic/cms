@@ -4,15 +4,13 @@ namespace Tests\Auth\TwoFactor;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\ViewErrorBag;
 use PHPUnit\Framework\Attributes\Test;
 use PragmaRX\Google2FA\Google2FA;
-use Statamic\Auth\TwoFactor\TwoFactorAuthenticationProvider;
 use Statamic\Auth\TwoFactor\RecoveryCode;
+use Statamic\Auth\TwoFactor\TwoFactorAuthenticationProvider;
 use Statamic\Events\TwoFactorAuthenticationDisabled;
 use Statamic\Events\TwoFactorAuthenticationEnabled;
 use Statamic\Facades\User;
-use Statamic\Http\Middleware\CP\EnforceTwoFactor;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 

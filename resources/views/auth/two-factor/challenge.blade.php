@@ -2,12 +2,12 @@
     use function Statamic\trans as __;
 @endphp
 
-@inject('str', 'Statamic\Support\Str')
-@extends('statamic::outside')
-@section('title', __('Two Factor Authentication'))
+@inject("str", "Statamic\Support\Str")
+@extends("statamic::outside")
+@section("title", __("Two Factor Authentication"))
 
-@section('content')
-    @include('statamic::partials.outside-logo')
+@section("content")
+    @include("statamic::partials.outside-logo")
 
     <div class="relative mx-auto flex max-w-xs items-center justify-center rounded shadow-lg">
         <div class="outside-shadow absolute inset-0"></div>
@@ -17,36 +17,37 @@
                 :has-error="{{ $str::bool(count($errors) > 0) }}"
                 v-slot="{ busy, mode, toggleMode, hasError }"
             >
-                <form
-                    method="POST"
-                    action="{{ $action }}"
-                    class="email-login select-none"
-                    @submit="busy = true"
-                >
+                <form method="POST" action="{{ $action }}" class="email-login select-none" @submit="busy = true">
                     @csrf
 
-                    @if (request('redirect'))
-                        <input type="hidden" name="redirect" value="{{ request('redirect') }}" />
+                    @if (request("redirect"))
+                        <input type="hidden" name="redirect" value="{{ request("redirect") }}" />
                     @endif
 
                     <h1 class="mb-2 text-lg text-gray-800 dark:text-dark-175">
-                        {{ __('Two Factor Authentication') }}
+                        {{ __("Two Factor Authentication") }}
                     </h1>
-                    <p v-if="mode === 'code'" @if($mode === 'recovery_code') v-cloak
-                       @endif class="mb-4 text-sm text-gray dark:text-dark-175">
-                        {{ __('statamic::messages.two_factor_challenge_code_instructions') }}
+                    <p
+                        v-if="mode === 'code'"
+                        @if ($mode === "recovery_code")
+                            v-cloak
+                        @endif
+                        class="mb-4 text-sm text-gray dark:text-dark-175"
+                    >
+                        {{ __("statamic::messages.two_factor_challenge_code_instructions") }}
                     </p>
-                    <p v-if="mode === 'recovery_code'" @if($mode === 'code') v-cloak
-                       @endif class="mb-4 text-sm text-gray dark:text-dark-175">
-                        {{ __('statamic::messages.two_factor_recovery_code_instructions') }}
+                    <p
+                        v-if="mode === 'recovery_code'"
+                        @if ($mode === "code")
+                            v-cloak
+                        @endif
+                        class="mb-4 text-sm text-gray dark:text-dark-175"
+                    >
+                        {{ __("statamic::messages.two_factor_recovery_code_instructions") }}
                     </p>
 
-                    <div
-                        v-if="mode === 'code'"
-                        @if($mode === 'recovery_code') v-cloak @endif
-                        class="mb-8"
-                    >
-                        <label class="mb-2" for="input-code">{{ __('Code') }}</label>
+                    <div v-if="mode === 'code'" @if($mode === 'recovery_code') v-cloak @endif class="mb-8">
+                        <label class="mb-2" for="input-code">{{ __("Code") }}</label>
                         <input
                             type="text"
                             class="input-text"
@@ -58,17 +59,13 @@
                             autocomplete="off"
                             id="input-code"
                         />
-                        @if ($hasError('code'))
-                            <div class="mt-2 text-xs text-red-500">{{ $errors->first('code') }}</div>
+                        @if ($hasError("code"))
+                            <div class="mt-2 text-xs text-red-500">{{ $errors->first("code") }}</div>
                         @endif
                     </div>
 
-                    <div
-                        v-if="mode === 'recovery_code'"
-                        @if($mode === 'code') v-cloak @endif
-                        class="mb-8"
-                    >
-                        <label class="mb-2" for="input-recovery-code">{{ __('Recovery Code') }}</label>
+                    <div v-if="mode === 'recovery_code'" @if($mode === 'code') v-cloak @endif class="mb-8">
+                        <label class="mb-2" for="input-recovery-code">{{ __("Recovery Code") }}</label>
                         <input
                             type="text"
                             class="input-text"
@@ -78,8 +75,8 @@
                             autocomplete="off"
                             id="input-recovery-code"
                         />
-                        @if ($hasError('recovery_code'))
-                            <div class="mt-2 text-xs text-red-500">{{ $errors->first('recovery_code') }}</div>
+                        @if ($hasError("recovery_code"))
+                            <div class="mt-2 text-xs text-red-500">{{ $errors->first("recovery_code") }}</div>
                         @endif
                     </div>
 
@@ -91,7 +88,7 @@
                             type="button"
                             @click="toggleMode"
                         >
-                            {{ __('Use recovery code') }}
+                            {{ __("Use recovery code") }}
                         </button>
 
                         <button
@@ -101,10 +98,10 @@
                             type="button"
                             @click="toggleMode"
                         >
-                            {{ __('Use one-time code') }}
+                            {{ __("Use one-time code") }}
                         </button>
 
-                        <button type="submit" class="btn-primary">{{ __('Continue') }}</button>
+                        <button type="submit" class="btn-primary">{{ __("Continue") }}</button>
                     </div>
                 </form>
             </two-factor-challenge>

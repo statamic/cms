@@ -2,12 +2,11 @@
 
 namespace Tests\Auth;
 
-use Illuminate\Auth\Events\Failed;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\Test;
-use Statamic\Auth\TwoFactor\TwoFactorAuthenticationProvider;
 use Statamic\Auth\TwoFactor\RecoveryCode;
+use Statamic\Auth\TwoFactor\TwoFactorAuthenticationProvider;
 use Statamic\Events\TwoFactorAuthenticationChallenged;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;

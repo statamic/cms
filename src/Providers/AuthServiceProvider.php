@@ -4,7 +4,6 @@ namespace Statamic\Providers;
 
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Cache\Repository;
-use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;

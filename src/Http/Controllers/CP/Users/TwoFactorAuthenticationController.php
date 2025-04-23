@@ -3,13 +3,10 @@
 namespace Statamic\Http\Controllers\CP\Users;
 
 use Illuminate\Http\Request;
-use Statamic\Auth\TwoFactor\CompleteTwoFactorAuthenticationSetup;
 use Statamic\Auth\TwoFactor\ConfirmTwoFactorAuthentication;
 use Statamic\Auth\TwoFactor\DisableTwoFactorAuthentication;
 use Statamic\Auth\TwoFactor\EnableTwoFactorAuthentication;
-use Statamic\Auth\TwoFactor\TwoFactorAuthenticationProvider;
 use Statamic\Exceptions\NotFoundHttpException;
-use Statamic\Facades\CP\Toast;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 

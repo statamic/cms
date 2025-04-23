@@ -167,7 +167,6 @@ return [
         'redirect' => env('STATAMIC_IMPERSONATE_REDIRECT', null),
     ],
 
-
     'two_factor' => [
 
         /*

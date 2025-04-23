@@ -13,7 +13,6 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\File\Role;
 use Statamic\Auth\File\UserGroup;
-use Statamic\Auth\TwoFactor\GenerateNewRecoveryCodes;
 use Statamic\Events\UserSaved;
 use Statamic\Events\UserSaving;
 use Statamic\Facades;

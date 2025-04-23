@@ -4,7 +4,6 @@ namespace Statamic\Auth\TwoFactor;
 
 use Illuminate\Cache\Repository;
 use PragmaRX\Google2FA\Google2FA;
-use Statamic\Facades\User;
 
 class TwoFactorAuthenticationProvider
 {

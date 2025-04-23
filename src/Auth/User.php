@@ -9,7 +9,6 @@ use BaconQrCode\Renderer\ImageRenderer;
 use BaconQrCode\Renderer\RendererStyle\Fill;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use BaconQrCode\Writer;
-use Carbon\Carbon;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -20,7 +19,6 @@ use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Password;
 use Statamic\Auth\Passwords\PasswordReset;
-use PragmaRX\Google2FA\Google2FA;
 use Statamic\Auth\TwoFactor\TwoFactorAuthenticationProvider;
 use Statamic\Contracts\Auth\Role as RoleContract;
 use Statamic\Contracts\Auth\User as UserContract;
@@ -363,7 +361,7 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
         return $this->getPreference('theme') ?? 'auto';
     }
 
-     public function isTwoFactorAuthenticationRequired(): bool
+    public function isTwoFactorAuthenticationRequired(): bool
     {
         $enforcedRoles = config('statamic.users.two_factor.enforced_roles', []);
 
@@ -380,8 +378,6 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
 
     /**
      * Determine if two-factor authentication has been enabled.
-     *
-     * @return bool
      */
     public function hasEnabledTwoFactorAuthentication(): bool
     {
@@ -391,8 +387,6 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
 
     /**
      * Get the user's two factor authentication secret key.
-     *
-     * @return string
      */
     public function twoFactorSecretKey(): string
     {
@@ -401,8 +395,6 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
 
     /**
      * Get the user's two factor authentication recovery codes.
-     *
-     * @return array
      */
     public function recoveryCodes(): array
     {
@@ -411,9 +403,6 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
 
     /**
      * Replace the given recovery code with a new one in the user's stored codes.
-     *
-     * @param  string  $code
-     * @return void
      */
     public function replaceRecoveryCode(string $code): void
     {
@@ -432,8 +421,6 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
 
     /**
      * Get the QR code SVG of the user's two factor authentication QR code URL.
-     *
-     * @return string
      */
     public function twoFactorQrCodeSvg(): string
     {
@@ -449,8 +436,6 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
 
     /**
      * Get the two factor authentication QR code URL.
-     *
-     * @return string
      */
     public function twoFactorQrCodeUrl(): string
     {

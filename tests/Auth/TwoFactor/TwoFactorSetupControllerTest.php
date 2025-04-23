@@ -4,9 +4,8 @@ namespace Tests\Auth\TwoFactor;
 
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\Test;
-use PragmaRX\Google2FA\Google2FA;
-use Statamic\Auth\TwoFactor\TwoFactorAuthenticationProvider;
 use Statamic\Auth\TwoFactor\RecoveryCode;
+use Statamic\Auth\TwoFactor\TwoFactorAuthenticationProvider;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;

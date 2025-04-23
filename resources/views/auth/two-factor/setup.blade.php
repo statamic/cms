@@ -22,7 +22,7 @@
                     </p>
 
                     <enable-two-factor-authentication
-                        :routes='{{ json_encode($routes) }}'
+                        :routes="{{ json_encode($routes) }}"
                         redirect="{{ $redirect }}"
                     />
                 </div>
