@@ -167,16 +167,16 @@ return [
         'redirect' => env('STATAMIC_IMPERSONATE_REDIRECT', null),
     ],
 
+
     'two_factor' => [
 
         /*
         |--------------------------------------------------------------------------
-        | Required for...
+        | Enforce Two-Factor Authentication
         |--------------------------------------------------------------------------
         |
-        | Determines the roles required to have two factor authentication setup.
-        | You can require two-factor for all users by setting this to ['*'].
-        | You can also require two-factor for super users by adding 'super_users'.
+        | Specify which user roles should be required to enable two-factor authentication.
+        | Use "*" to enforce 2FA for all users, or "super_users" to enforce it for super users.
         |
         */
 
