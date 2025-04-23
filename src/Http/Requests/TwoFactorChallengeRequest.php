@@ -138,8 +138,8 @@ class TwoFactorChallengeRequest extends FormRequest
     public function sendFailedTwoFactorChallengeResponse()
     {
         [$key, $message] = $this->filled('recovery_code')
-            ? ['recovery_code', __('The provided two factor recovery code was invalid.')]
-            : ['code', __('The provided two factor authentication code was invalid.')];
+            ? ['recovery_code', __('statamic::validation.invalid_two_factor_recovery_code')]
+            : ['code', __('statamic::validation.invalid_two_factor_code')];
 
         if ($this->wantsJson()) {
             throw ValidationException::withMessages([

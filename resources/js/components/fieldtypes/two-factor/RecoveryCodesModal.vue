@@ -14,7 +14,7 @@
                     </div>
                 </div>
                 <div class="p-5">
-                    <p class="mb-6">{{ __('statamic::messages.two_factor_recovery_codes_introduction') }}</p>
+                    <p class="mb-6">{{ __('statamic::messages.two_factor_recovery_codes') }}</p>
 
                     <div class="mb-3 bg-gray-200 p-4">
                         <ul class="grid gap-2 md:grid-cols-2">
