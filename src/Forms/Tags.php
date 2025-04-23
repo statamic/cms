@@ -162,16 +162,6 @@ class Tags extends BaseTags
         collect($this->context['fields'])
             ->each(fn ($field) => $field['field']->slot($slot));
 
-        if ($isBlade) {
-            return $this->tagRenderer->render('@foreach($fields as $field)'.$this->content.'@endforeach', $this->context->all());
-        }
-
-        $params = '';
-
-        if ($scope) {
-            $params = Html::attributes(['scope' => $scope]);
-        }
-
         $context = $this->context->all();
 
         $fields = Arr::get($context, 'fields', []);
@@ -182,6 +172,16 @@ class Tags extends BaseTags
             $context['fields'] = $this->dottedContextFields($fields)->only(explode('|', $only))->values()->all();
         } elseif ($except = $this->params->get('except')) {
             $context['fields'] = $this->dottedContextFields($fields)->except(explode('|', $except))->values()->all();
+        }
+
+        if ($isBlade) {
+            return $this->tagRenderer->render('@foreach($fields as $field)'.$this->content.'@endforeach', $context);
+        }
+
+        $params = '';
+
+        if ($scope) {
+            $params = Html::attributes(['scope' => $scope]);
         }
 
         return Antlers::parse('{{ fields '.$params.' }}'.$this->content.'{{ /fields }}', $context);
