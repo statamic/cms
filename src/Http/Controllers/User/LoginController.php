@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\User;
 
 use Illuminate\Auth\Events\Failed;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -24,17 +25,9 @@ class LoginController extends Controller
             return $this->sendLockoutResponse($request);
         }
 
-        $user = $this->validateCredentials($request);
+        $this->incrementLoginAttempts($request);
 
-        if (! $user) {
-            $this->incrementLoginAttempts($request);
-
-            $errorResponse = $request->has('_error_redirect') ? redirect($request->input('_error_redirect')) : back();
-
-            return $errorResponse->withInput()->withErrors(__('Invalid credentials.'));
-        }
-
-        $user = User::fromUser($user);
+        $user = User::fromUser($this->validateCredentials($request));
 
         if ($user->hasEnabledTwoFactorAuthentication()) {
             $request->session()->put([
@@ -84,9 +77,9 @@ class LoginController extends Controller
      */
     protected function throwFailedAuthenticationException(Request $request)
     {
-        throw ValidationException::withMessages([
-            $this->username() => [trans('auth.failed')],
-        ]);
+        $errorResponse = $request->has('_error_redirect') ? redirect($request->input('_error_redirect')) : back();
+
+        throw new HttpResponseException($errorResponse->withInput()->withErrors(__('Invalid credentials.')));
     }
 
     /**
