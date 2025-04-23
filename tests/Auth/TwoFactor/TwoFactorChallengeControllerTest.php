@@ -3,11 +3,15 @@
 namespace Tests\Auth\TwoFactor;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
 use PHPUnit\Framework\Attributes\Test;
 use PragmaRX\Google2FA\Google2FA;
 use Statamic\Auth\TwoFactor\RecoveryCode;
 use Statamic\Auth\TwoFactor\TwoFactorAuthenticationProvider;
+use Statamic\Events\TwoFactorAuthenticationFailed;
+use Statamic\Events\TwoFactorRecoveryCodeReplaced;
+use Statamic\Events\ValidTwoFactorAuthenticationCodeProvided;
 use Statamic\Facades\User;
 use Statamic\Notifications\RecoveryCodeUsed;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -50,6 +54,8 @@ class TwoFactorChallengeControllerTest extends TestCase
     #[Test]
     public function it_can_complete_challenge_with_one_time_code()
     {
+        Event::fake();
+
         $user = $this->userWithTwoFactorEnabled();
 
         $this
@@ -60,11 +66,17 @@ class TwoFactorChallengeControllerTest extends TestCase
             ->assertRedirect(cp_route('index'));
 
         $this->assertAuthenticatedAs($user);
+
+        Event::assertDispatched(ValidTwoFactorAuthenticationCodeProvided::class, function (ValidTwoFactorAuthenticationCodeProvided $event) use ($user) {
+            return $event->user->id() === $user->id();
+        });
     }
 
     #[Test]
     public function it_cant_complete_challenge_with_invalid_one_time_code()
     {
+        Event::fake();
+
         $user = $this->userWithTwoFactorEnabled();
 
         $this
@@ -76,11 +88,16 @@ class TwoFactorChallengeControllerTest extends TestCase
             ->assertSessionHasErrors('code');
 
         $this->assertGuest();
+
+        Event::assertDispatched(TwoFactorAuthenticationFailed::class, function (TwoFactorAuthenticationFailed $event) use ($user) {
+            return $event->user->id() === $user->id();
+        });
     }
 
     #[Test]
     public function it_can_complete_challenge_with_recovery_code()
     {
+        Event::fake();
         Notification::fake();
 
         $user = $this->userWithTwoFactorEnabled();
@@ -97,12 +114,17 @@ class TwoFactorChallengeControllerTest extends TestCase
 
         $this->assertNotContains($recoveryCode, $user->fresh()->recoveryCodes());
 
+        Event::assertDispatched(TwoFactorRecoveryCodeReplaced::class, function (TwoFactorRecoveryCodeReplaced $event) use ($user, $recoveryCode) {
+            return $event->user->id() === $user->id() && $event->code === $recoveryCode;
+        });
+
         Notification::assertSentTo($user, RecoveryCodeUsed::class);
     }
 
     #[Test]
     public function it_cant_complete_challenge_with_invalid_recovery_code()
     {
+        Event::fake();
         Notification::fake();
 
         $user = $this->userWithTwoFactorEnabled();
@@ -119,6 +141,10 @@ class TwoFactorChallengeControllerTest extends TestCase
         $this->assertGuest();
 
         $this->assertEquals($originalRecoveryCodes, $user->fresh()->recoveryCodes());
+
+        Event::assertNotDispatched(TwoFactorRecoveryCodeReplaced::class, function (TwoFactorRecoveryCodeReplaced $event) use ($user) {
+            return $event->user->id() === $user->id() && $event->code === 'abcdefg';
+        });
 
         Notification::assertNotSentTo($user, RecoveryCodeUsed::class);
     }

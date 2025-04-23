@@ -5,6 +5,9 @@ namespace Statamic\Http\Controllers\CP\Auth;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Statamic\Events\TwoFactorAuthenticationFailed;
+use Statamic\Events\TwoFactorRecoveryCodeReplaced;
+use Statamic\Events\ValidTwoFactorAuthenticationCodeProvided;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Middleware\CP\RedirectIfAuthorized;
 use Statamic\Http\Requests\TwoFactorChallengeRequest;
@@ -36,9 +39,15 @@ class TwoFactorChallengeController extends CpController
 
         if ($code = $request->validRecoveryCode()) {
             $user->replaceRecoveryCode($code);
+
+            TwoFactorRecoveryCodeReplaced::dispatch($user, $code);
         } elseif (! $request->hasValidCode()) {
+            TwoFactorAuthenticationFailed::dispatch($user);
+
             return $request->sendFailedTwoFactorChallengeResponse();
         }
+
+        ValidTwoFactorAuthenticationCodeProvided::dispatch($user);
 
         Auth::guard()->login($user, $request->remember());
 
