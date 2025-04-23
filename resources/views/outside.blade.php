@@ -5,7 +5,7 @@
 </head>
 <body class="outside {{ config('statamic.cp.theme') }}-theme @yield('body_class')">
 <div id="statamic">
-    <div id="main" class="flex justify-center">
+    <div id="main" class="flex flex-col justify-center">
         <div>
             @yield('content')
         </div>
