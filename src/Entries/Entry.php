@@ -638,6 +638,11 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         return $this->blueprint()->field('date')->fieldtype()->secondsEnabled();
     }
 
+    public function hasExplicitDate(): bool
+    {
+        return $this->hasDate() && $this->date;
+    }
+
     public function sites()
     {
         return $this->collection()->sites();

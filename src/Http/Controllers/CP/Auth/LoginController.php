@@ -13,6 +13,8 @@ use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Middleware\CP\RedirectIfAuthorized;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class LoginController extends CpController
 {
     use ThrottlesLogins;

@@ -32,6 +32,8 @@ use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
+use function Statamic\trans as __;
+
 class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contract
 {
     use ContainsCascadingData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedData;
