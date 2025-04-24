@@ -64,6 +64,14 @@ main {
 /* Draggable Mirrors
   ========================================================================== */
 
+.draggable-mirror {
+    position: relative;
+    z-index: 1000;
+}
+.draggable-source--is-dragging {
+    opacity: 0.5;
+}
+
 /* Mirrors that have been appended to the body should appear on top of everything. (Portals are 4) */
 body > .draggable-mirror {
     z-index: 5;

@@ -48,16 +48,6 @@
     </div>
 </template>
 
-<style scoped>
-.draggable-mirror {
-    position: relative;
-    z-index: 1000;
-}
-.draggable-source--is-dragging {
-    opacity: 0.5;
-}
-</style>
-
 <script>
 import Row from './Row.vue';
 import SetField from '../replicator/Field.vue';

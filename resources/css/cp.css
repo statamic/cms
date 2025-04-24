@@ -61,7 +61,7 @@
 @import './components/fieldtypes/partial.css';
 @import './components/fieldtypes/radio.css';
 @import './components/fieldtypes/relationship.css';
-@import './components/fieldtypes/replicator.css';
+/* @import './components/fieldtypes/replicator.css'; */
 @import './components/fieldtypes/section.css';
 @import './components/fieldtypes/spacer.css';
 @import './components/fieldtypes/table.css';

@@ -25,7 +25,7 @@
                 >
                     {{-- @include('statamic::partials.nav-mobile') --}}
 
-                    <main class="
+                    <main id="main" class="
                         flex bg-gray-100 dark:bg-gray-900 dark:border-t rounded-t-xl dark:border-white/10
                         fixed top-14 inset-x-0 bottom-0 min-h-[calc(100vh-3.5rem)]
                     ">
