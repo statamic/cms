@@ -16,7 +16,7 @@
             <p class="text-sm text-gray">{{ __('statamic::messages.two_factor_not_setup') }}</p>
         </template>
 
-        <template v-else>
+        <template v-else-if="isCurrentUser || meta.can_disable">
             <p class="mb-4 text-sm text-gray">{{ __('statamic::messages.two_factor_enabled') }}</p>
 
             <div class="flex items-center space-x-4">
@@ -25,6 +25,7 @@
                 </button>
 
                 <DisableTwoFactor
+                    v-if="meta.can_disable"
                     :url="meta.routes.disable"
                     :is-current-user="isCurrentUser"
                     :is-enforced="isEnforced"
@@ -34,6 +35,10 @@
                     <button class="btn-danger" @click="confirm">{{ __('Disable two factor authentication') }}</button>
                 </DisableTwoFactor>
             </div>
+        </template>
+
+        <template v-else>
+            <p class="mb-4 text-sm text-gray">{{ __('statamic::messages.two_factor_cant_manage_without_permission') }}</p>
         </template>
 
         <TwoFactorSetup

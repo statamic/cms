@@ -24,6 +24,7 @@ class TwoFactor extends Fieldtype
             'is_current_user' => $user->id === User::current()->id,
             'is_enforced' => $user->isTwoFactorAuthenticationRequired(),
             'is_setup' => $user->hasEnabledTwoFactorAuthentication(),
+            'can_disable' => request()->user()->can('edit', $user),
             'routes' => [
                 'enable' => cp_route('users.two-factor.enable', $user->id),
                 'disable' => cp_route('users.two-factor.disable', $user->id),

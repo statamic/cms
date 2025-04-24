@@ -32,6 +32,7 @@ class TwoFactorTest extends TestCase
             'is_current_user' => true,
             'is_enforced' => false,
             'is_setup' => false,
+            'can_disable' => true,
             'routes' => [
                 'enable' => cp_route('users.two-factor.enable', $user->id),
                 'disable' => cp_route('users.two-factor.disable', $user->id),
@@ -66,6 +67,7 @@ class TwoFactorTest extends TestCase
             'is_current_user' => false,
             'is_enforced' => false,
             'is_setup' => false,
+            'can_disable' => true,
             'routes' => [
                 'enable' => cp_route('users.two-factor.enable', $anotherUser->id),
                 'disable' => cp_route('users.two-factor.disable', $anotherUser->id),

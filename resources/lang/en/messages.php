@@ -233,6 +233,7 @@ return [
     'taxonomy_next_steps_configure_description' => 'Configure names, associate collections, define blueprints, and more.',
     'taxonomy_next_steps_create_term_description' => 'Create the first term or stub out a handful of placeholder terms, it\'s up to you.',
     'try_again_in_seconds' => '{0,1}Try again now.|Try again in :count seconds.',
+    'two_factor_cant_manage_without_permission' => 'You don\'t have permission to manage this user\'s two factor authentication settings.',
     'two_factor_challenge_code_instructions' => 'Please confirm access to your account by entering the authentication code provided by your authenticator application.',
     'two_factor_enable_introduction' => 'When enabled, you will be prompted for a secure, random token from your phone\'s authenticator app every time you log in.',
     'two_factor_enabled' => 'Two Factor Authentication is enabled for your account. You will be prompted for a secure, random token from your phone\'s authenticator app every time you log in.',
