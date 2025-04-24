@@ -29,7 +29,7 @@
                             @dragend="$emit('blur')"
                             v-slot="{}"
                         >
-                            <div class="replicator-set-container">
+                            <div class="relative">
                                 <replicator-set
                                     v-for="(set, index) in value"
                                     :key="set._id"
@@ -59,7 +59,8 @@
                                 >
                                     <template v-slot:picker>
                                         <add-set-button
-                                            class="between"
+                                            variant="between"
+                                            v-if="index !== 0"
                                             :groups="groupConfigs"
                                             :sets="setConfigs"
                                             :index="index"
@@ -73,10 +74,9 @@
 
                         <add-set-button
                             v-if="canAddSet"
-                            class="mt-3"
-                            :last="true"
                             :groups="groupConfigs"
                             :sets="setConfigs"
+                            :show-connector="false"
                             :index="value.length"
                             :label="config.button_label"
                             @added="addSet"
