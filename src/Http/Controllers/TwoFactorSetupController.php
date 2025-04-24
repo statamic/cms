@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Statamic\Facades\User;
 
 class TwoFactorSetupController extends Controller
 {
@@ -13,7 +14,7 @@ class TwoFactorSetupController extends Controller
 
     public function __invoke(Request $request)
     {
-        $user = $request->user();
+        $user = User::fromUser($request->user());
 
         if ($user->hasEnabledTwoFactorAuthentication()) {
             return redirect($this->redirectPath());
