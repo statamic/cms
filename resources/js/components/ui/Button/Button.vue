@@ -24,7 +24,7 @@ const iconOnly = computed(() => (props.icon && !hasDefaultSlot && !props.text) |
 
 const buttonClasses = computed(() => {
     const classes = cva({
-        base: 'inline-flex items-center justify-center whitespace-nowrap font-medium antialiased cursor-pointer no-underline disabled:opacity-75 disabled:cursor-default disabled:pointer-events-none [&_svg]:shrink-0',
+        base: 'inline-flex items-center justify-center whitespace-nowrap shrink-0 font-medium antialiased cursor-pointer no-underline disabled:opacity-75 disabled:cursor-default disabled:pointer-events-none [&_svg]:shrink-0 [&_svg]:text-gray-400',
         variants: {
             variant: {
                 default: [
@@ -84,7 +84,7 @@ const buttonClasses = computed(() => {
         :href
         :type="props.href ? null : type"
     >
-        <Icon v-if="icon" :name="icon" class="text-gray-400" />
+        <Icon v-if="icon" :name="icon" />
         <Icon v-if="loading" name="loading" :size />
 
         <slot v-if="hasDefaultSlot" />

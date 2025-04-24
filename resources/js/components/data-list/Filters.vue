@@ -1,5 +1,9 @@
 <template>
-    <div class="flex-1 flex items-center gap-3 overflow-x-auto">
+    <div class="flex-1 flex items-center gap-3 overflow-x-auto py-3">
+        <Button icon="filter" class="relative">
+            {{ __('Filter') }}
+            <Badge v-if="activeCount" :text="activeCount" pill variant="filled" class="absolute -top-1.5 -right-1.5" />
+        </Button>
         <!-- Field filter (requires custom selection UI) -->
         <popover v-if="fieldFilter" placement="bottom-start" @closed="fieldFilterClosed">
             <template #trigger>
@@ -101,13 +105,14 @@
 import DataListFilter from './Filter.vue';
 import FieldFilter from './FieldFilter.vue';
 import { isEqual } from 'lodash-es';
-import { Button } from '@statamic/ui';
+import { Button, Badge } from '@statamic/ui';
 
 export default {
     components: {
         DataListFilter,
         FieldFilter,
         Button,
+        Badge,
     },
 
     props: {

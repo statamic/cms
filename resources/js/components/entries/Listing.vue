@@ -15,7 +15,7 @@
             @visible-columns-updated="visibleColumns = $event"
         >
             <div>
-                <div class="space-y-6">
+                <div class="space-y-3">
 
                     <!-- Preset Views/Tabs -->
                     <data-list-filter-presets
