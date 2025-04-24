@@ -1,10 +1,8 @@
 <template>
-    <Tooltip :text="label" :delay="300">
-        <span class="flex items-center gap-2">
-            <span v-if="showDot" class="size-2 rounded-full" :class="statusClass" />
-            <span v-if="showLabel" class="status-index-field select-none" :class="`status-${status}`" v-text="label" />
-        </span>
-    </Tooltip>
+    <span class="flex items-center gap-2">
+        <span v-if="showDot" class="size-2 rounded-full" :class="statusClass" v-tooltip="label" />
+        <span v-if="showLabel" class="status-index-field select-none" :class="`status-${status}`" v-text="label" />
+    </span>
 </template>
 
 <script setup>
