@@ -26,6 +26,7 @@ const switchRootClasses = cva({
     ],
     variants: {
         size: {
+            xs: 'h-3.5 w-6',
             sm: 'h-5 w-9',
             base: 'h-6 w-11',
             lg: 'h-7 w-14',
@@ -40,6 +41,7 @@ const switchThumbClasses = cva({
     ],
     variants: {
         size: {
+            xs: 'size-2.5',
             sm: 'size-4',
             base: 'size-5',
             lg: 'size-6',
