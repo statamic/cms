@@ -27,7 +27,7 @@ const badgeClasses = computed(() => {
             size: {
                 sm: 'text-2xs py-0 leading-normal px-1 rounded-[0.1875rem] [&_svg]:size-2',
                 default: 'text-xs py-0.5 px-1.5 rounded-sm [&_svg]:size-2.5',
-                lg: 'text-sm py-1 px-3 rounded-md [&_svg]:size-3 [&_svg]:me-1',
+                lg: 'font-medium text-sm py-0.5 leading-relaxed px-2.5 rounded-lg [&_svg]:size-3 [&_svg]:me-1',
             },
             color: {
                 amber: 'bg-amber-100 border-amber-400 text-amber-700 [a]:hover:bg-amber-200/70 [button]:hover:bg-amber-200/70',
@@ -35,7 +35,7 @@ const badgeClasses = computed(() => {
                 blue: 'bg-blue-100/80 border-blue-300 text-blue-700 [a]:hover:bg-blue-200/60 [button]:hover:bg-blue-200/60',
                 cyan: 'bg-cyan-100/80 border-cyan-400 text-cyan-700 [a]:hover:bg-cyan-200/60 [button]:hover:bg-cyan-200/60',
                 default:
-                    'bg-gray-100/80 border-gray-300 text-gray-700 [a]:hover:bg-gray-200/50 [button]:hover:bg-gray-200/50',
+                    'bg-gray-100/80 border-gray-300 dark:bg-gray-700 dark:text-gray-100 text-gray-700 [a]:hover:bg-gray-200/50 [button]:hover:bg-gray-200/50',
                 emerald:
                     'bg-emerald-100/80 border-emerald-400 text-emerald-700 [a]:hover:bg-emerald-200/60 [button]:hover:bg-emerald-200/60',
                 fuchsia:
