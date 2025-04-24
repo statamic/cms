@@ -152,7 +152,7 @@ trait RendersForms
             'id' => $this->generateFieldId($field->handle(), $formHandle),
             'instructions' => $field->instructions(),
             'error' => $errors->first($field->handle()) ?: null,
-            'default' => $field->value() ?? $field->defaultValue(),
+            'default' => $default,
             'old' => old($field->handle()),
             'value' => $value,
         ], $field->fieldtype()->extraRenderableFieldData());
