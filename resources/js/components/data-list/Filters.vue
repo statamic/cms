@@ -1,11 +1,26 @@
 <template>
     <div class="flex-1 flex items-center gap-3 overflow-x-auto py-3">
-        <Button icon="filter" class="relative">
-            {{ __('Filter') }}
-            <Badge v-if="activeCount" :text="activeCount" pill variant="filled" class="absolute -top-1.5 -right-1.5" />
-        </Button>
+        <ui-modal :title="__('Apply Filters')">
+            <template #trigger>
+                <Button icon="filter" class="relative">
+                    {{ __('Filter') }}
+                    <Badge v-if="activeCount" :text="activeCount" pill variant="filled" class="absolute -top-1.5 -right-1.5" />
+                </Button>
+            </template>
+            <div class="space-y-6 py-3">
+                FILTERS GO HERE
+            </div>
+            <template #footer>
+                <div class="flex items-center justify-end space-x-3 pt-3 pb-1">
+                    <ui-modal-close>
+                        <ui-button text="Cancel" variant="ghost" />
+                    </ui-modal-close>
+                    <ui-button text="Update Filter" variant="primary" />
+                </div>
+            </template>
+        </ui-modal>
         <!-- Field filter (requires custom selection UI) -->
-        <popover v-if="fieldFilter" placement="bottom-start" @closed="fieldFilterClosed">
+        <!-- <popover v-if="fieldFilter" placement="bottom-start" @closed="fieldFilterClosed">
             <template #trigger>
                 <Button icon-append="ui/chevron-down" @click="resetFilterPopover" :text="fieldFilter.title" />
             </template>
@@ -24,10 +39,10 @@
                     </div>
                 </div>
             </template>
-        </popover>
+        </popover> -->
 
         <!-- Standard pinned filters -->
-        <popover
+        <!-- <popover
             v-if="pinnedFilters.length"
             v-for="filter in pinnedFilters"
             :key="filter.handle"
@@ -48,10 +63,10 @@
                     />
                 </div>
             </template>
-        </popover>
+        </popover> -->
 
         <!-- Standard unpinned filters -->
-        <popover v-if="unpinnedFilters.length" placement="bottom-start" :stop-propagation="false">
+        <!-- <popover v-if="unpinnedFilters.length" placement="bottom-start" :stop-propagation="false">
             <template #trigger>
                 <Button icon-append="ui/chevron-down" icon-as-button @click="resetFilterPopover" :text="__('Filter')" />
             </template>
@@ -81,7 +96,7 @@
                     </div>
                 </div>
             </template>
-        </popover>
+        </popover> -->
 
         <!-- Active filter badges -->
         <Button
@@ -112,7 +127,7 @@ export default {
         DataListFilter,
         FieldFilter,
         Button,
-        Badge,
+        Badge
     },
 
     props: {

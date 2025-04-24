@@ -1,6 +1,6 @@
 <template>
     <div>
-        <Button icon="utilities" :text="__('Customize')" @click="open = true" />
+        <Button icon="utilities" v-tooltip="__('Customize Table')" @click="open = true" />
 
         <modal
             v-if="open"
