@@ -80,7 +80,9 @@ export default {
         },
 
         save() {
-            this.requireElevatedSession().then(() => this.performSaveRequest());
+            this.requireElevatedSession()
+                .then(() => this.performSaveRequest())
+                .catch(() => {})
         },
 
         performSaveRequest() {

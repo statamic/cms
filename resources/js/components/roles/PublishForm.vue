@@ -123,7 +123,9 @@ export default {
         },
 
         save() {
-            this.requireElevatedSession().then(() => this.performSaveAction());
+            this.requireElevatedSession()
+                .then(() => this.performSaveAction())
+                .catch(() => {});
         },
 
         performSaveAction() {

@@ -133,7 +133,9 @@ export default {
             }
 
             if (this.action.requiresElevatedSession) {
-                this.requireElevatedSession().then(() => this.performAction());
+                this.requireElevatedSession()
+                    .then(() => this.performAction())
+                    .catch(() => {});
                 return;
             }
 
