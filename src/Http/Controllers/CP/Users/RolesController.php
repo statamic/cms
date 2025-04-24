@@ -116,7 +116,7 @@ class RolesController extends CpController
 
     public function update(Request $request, $role)
     {
-        $this->requireElevatedSession($request);
+        $this->requireElevatedSession();
 
         $this->authorize('edit roles');
 
