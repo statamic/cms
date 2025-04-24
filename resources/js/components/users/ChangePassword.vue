@@ -82,7 +82,7 @@ export default {
         save() {
             this.requireElevatedSession()
                 .then(() => this.performSaveRequest())
-                .catch(() => {})
+                .catch(() => {});
         },
 
         performSaveRequest() {

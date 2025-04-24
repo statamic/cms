@@ -36,17 +36,18 @@ export default {
             password: null,
             errors: [],
             shouldResolve: false,
-        }
+        };
     },
 
     methods: {
         submit(close) {
-            this.$axios.post(cp_url('elevated-session'), { password: this.password })
-                .then(response => {
+            this.$axios
+                .post(cp_url('elevated-session'), { password: this.password })
+                .then((response) => {
                     this.shouldResolve = true;
                     close();
                 })
-                .catch(error => {
+                .catch((error) => {
                     this.errors = error.response.data.errors;
                     if (error.response.status === 422) {
                         this.$refs.password.focus();
@@ -56,7 +57,7 @@ export default {
 
         modalClosed() {
             this.$emit('closed', this.shouldResolve);
-        }
-    }
-}
+        },
+    },
+};
 </script>

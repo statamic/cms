@@ -148,7 +148,7 @@ export default function registerGlobalComponents(app) {
     app.component('keyboard-shortcuts-modal', KeyboardShortcutsModal);
     app.component('resource-deleter', ResourceDeleter);
     app.component('field-action-modal', FieldActionModal);
-    app.component('elevated-session-modal', ElevatedSessionModal)
+    app.component('elevated-session-modal', ElevatedSessionModal);
 
     app.component('stack', Stack);
     app.component('stack-test', StackTest);
