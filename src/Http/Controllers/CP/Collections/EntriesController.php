@@ -70,7 +70,11 @@ class EntriesController extends CpController
 
         if ($search = request('search')) {
             if ($collection->hasSearchIndex()) {
-                return $collection->searchIndex()->ensureExists()->search($search);
+                return $collection
+                    ->searchIndex()
+                    ->ensureExists()
+                    ->search($search)
+                    ->where('collection', $collection->handle());
             }
 
             $query->where('title', 'like', '%'.$search.'%');
@@ -297,6 +301,7 @@ class EntriesController extends CpController
             'title' => $collection->createLabel(),
             'actions' => [
                 'save' => cp_route('collections.entries.store', [$collection->handle(), $site->handle()]),
+                'editBlueprint' => cp_route('collections.blueprints.edit', [$collection, $blueprint]),
             ],
             'values' => $values->all(),
             'extraValues' => [

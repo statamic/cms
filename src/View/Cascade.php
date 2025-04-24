@@ -183,7 +183,7 @@ class Cascade
             'response_code' => 200,
 
             // Auth
-            'logged_in' => $loggedIn = auth()->check(),
+            'logged_in' => $loggedIn = auth(config('statamic.users.guards.web', 'web'))->check(),
             'logged_out' => ! $loggedIn,
             'current_user' => User::current(),
 
