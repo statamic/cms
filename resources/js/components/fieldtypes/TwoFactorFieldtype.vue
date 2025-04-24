@@ -38,7 +38,9 @@
         </template>
 
         <template v-else>
-            <p class="mb-4 text-sm text-gray">{{ __('statamic::messages.two_factor_cant_manage_without_permission') }}</p>
+            <p class="mb-4 text-sm text-gray">
+                {{ __('statamic::messages.two_factor_cant_manage_without_permission') }}
+            </p>
         </template>
 
         <TwoFactorSetup
