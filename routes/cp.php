@@ -368,8 +368,9 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::post('slug', SlugController::class);
     Route::get('session-timeout', SessionTimeoutController::class)->name('session.timeout');
 
-    Route::get('elevated-session', [ElevatedSessionController::class, 'index'])->name('elevated-session.status');
-    Route::post('elevated-session', [ElevatedSessionController::class, 'store'])->name('elevated-session.store');
+    Route::get('auth/confirm-password', [ElevatedSessionController::class, 'showForm'])->name('confirm-password');
+    Route::get('elevated-session', [ElevatedSessionController::class, 'status'])->name('elevated-session.status');
+    Route::post('elevated-session', [ElevatedSessionController::class, 'confirm'])->name('elevated-session.confirm');
 
     Route::view('/playground', 'statamic::playground')->name('playground');
 

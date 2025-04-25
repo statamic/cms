@@ -9,7 +9,7 @@ use Statamic\Facades\User;
 
 class ElevatedSessionController
 {
-    public function index(Request $request)
+    public function status(Request $request)
     {
         return [
             'elevated' => $request->hasElevatedSession(),
@@ -17,7 +17,12 @@ class ElevatedSessionController
         ];
     }
 
-    public function store(Request $request)
+    public function showForm()
+    {
+        return view('statamic::auth.confirm-password');
+    }
+
+    public function confirm(Request $request)
     {
         $user = User::current();
 
@@ -33,6 +38,8 @@ class ElevatedSessionController
 
         session()->elevate();
 
-        return $this->index($request);
+        return $request->wantsJson()
+            ? $this->status($request)
+            : redirect()->intended(cp_route('index'))->with('success', __('Password confirmed'));
     }
 }
