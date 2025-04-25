@@ -1,5 +1,35 @@
 # Release Notes
 
+## 5.53.1 (2025-04-17)
+
+### What's fixed
+- Fix validation of date field nested in a replicator  [#11692](https://github.com/statamic/cms/issues/11692) by @liucf
+- Fix collection index search when using a non-dedicated search index [#11711](https://github.com/statamic/cms/issues/11711) by @simonerd
+- Handle translation issues in collection widget [#11693](https://github.com/statamic/cms/issues/11693) by @daun
+- Remove `templates`/`themes` methods from `CpController` [#11706](https://github.com/statamic/cms/issues/11706) by @duncanmcclean
+- Ensure asset references are updated correctly [#11705](https://github.com/statamic/cms/issues/11705) by @duncanmcclean
+
+
+
+## 5.53.0 (2025-04-10)
+
+### What's new
+- Allow dynamic counter names in `increment` tag [#11671](https://github.com/statamic/cms/issues/11671) by @daun
+- Expose field conditions from GraphQL API [#11607](https://github.com/statamic/cms/issues/11607) by @duncanmcclean
+- Add Edit Blueprint links to create publish forms [#11625](https://github.com/statamic/cms/issues/11625) by @jacksleight
+
+### What's fixed
+- Fix icon selector in nav builder [#11656](https://github.com/statamic/cms/issues/11656) by @duncanmcclean
+- Fix docblock in AssetContainer facade [#11658](https://github.com/statamic/cms/issues/11658) by @duncanmcclean
+- Revert "Escape start_page Preference to avoid invalid Redirect" [#11651](https://github.com/statamic/cms/issues/11651) by @duncanmcclean
+- Restore error message on asset upload server errors [#11642](https://github.com/statamic/cms/issues/11642) by @daun
+- Fix dates in localizations when duplicating entries [#11361](https://github.com/statamic/cms/issues/11361) by @duncanmcclean
+- Use deep copy of objects in replicator set [#11621](https://github.com/statamic/cms/issues/11621) by @faltjo
+- French translations [#11622](https://github.com/statamic/cms/issues/11622) by @ebeauchamps
+- Dutch translations [#11686](https://github.com/statamic/cms/issues/11686) by @rogerthat-be
+
+
+
 ## 5.52.0 (2025-03-25)
 
 ### What's new
