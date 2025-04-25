@@ -8,7 +8,7 @@
             :data-readonly="isReadOnly ?? undefined"
             :data-type="config.handle"
         >
-            <header class="flex items-center px-1.5 antialiased group/header hover:bg-gray-50 rounded-t-lg">
+            <header class="flex items-center px-1.5 antialiased group/header hover:bg-gray-50 border-b border-transparent animate-border-color duration-200 rounded-lg" :class="{ 'border-gray-200! rounded-b-none dark:border-white/15': !collapsed }">
                 <Icon name="handles" class="item-move cursor-grab sortable-handle size-4 text-gray-400" v-if="!isReadOnly" />
                 <button type="button" class="p-2 flex flex-1 items-center gap-4" @click="toggleCollapsedState">
                     <ui-badge variant="flat" size="lg">
@@ -53,7 +53,13 @@
                 </div>
             </header>
 
-            <div class="border-t border-gray-200 pb-3 dark:border-white/15 publish-fields @container" v-show="!collapsed">
+            <Motion
+                layout
+                class="publish-fields overflow-hidden @container"
+                :initial="{ height: collapsed ? '0px' : 'auto' }"
+                :animate="{ height: collapsed ? '0px' : 'auto' }"
+                :transition="{ duration: .25, type: 'tween' }"
+            >
                 <set-field
                     v-for="field in fields"
                     v-show="showField(field, fieldPath(field))"
@@ -72,7 +78,7 @@
                     @blur="$emit('blur')"
                     @replicator-preview-updated="previewUpdated(field.handle, $event)"
                 />
-            </div>
+            </Motion>
         </div>
     </div>
 </template>
@@ -84,8 +90,10 @@ import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions
 import HasFieldActions from '../../field-actions/HasFieldActions.js';
 import DropdownActions from '../../field-actions/DropdownActions.vue';
 import { Icon, Switch } from '@statamic/ui';
+import { Motion } from 'motion-v';
+
 export default {
-    components: { SetField, DropdownActions, Icon, Switch },
+    components: { SetField, DropdownActions, Icon, Switch, Motion },
 
     mixins: [ValidatesFieldConditions, ManagesPreviewText, HasFieldActions],
 
