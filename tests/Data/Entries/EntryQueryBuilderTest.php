@@ -10,7 +10,6 @@ use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Query\Exceptions\MultipleRecordsFoundException;
-use Statamic\Query\Exceptions\RecordNotFoundException;
 use Statamic\Query\Exceptions\RecordsNotFoundException;
 use Statamic\Query\Scopes\Scope;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -943,7 +942,7 @@ class EntryQueryBuilderTest extends TestCase
     #[Test]
     public function exception_is_thrown_when_entry_does_not_exist_using_first_or_fail()
     {
-        $this->expectException(RecordNotFoundException::class);
+        $this->expectException(RecordsNotFoundException::class);
 
         Entry::query()
             ->where('collection', 'posts')

@@ -12,7 +12,6 @@ use Statamic\Contracts\Query\Builder;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Blink;
 use Statamic\Query\Exceptions\MultipleRecordsFoundException;
-use Statamic\Query\Exceptions\RecordNotFoundException;
 use Statamic\Query\Exceptions\RecordsNotFoundException;
 use Statamic\Query\Scopes\AppliesScopes;
 use Statamic\Support\Arr;
@@ -89,7 +88,7 @@ abstract class EloquentQueryBuilder implements Builder
             return $item;
         }
 
-        throw new RecordNotFoundException();
+        throw new RecordsNotFoundException();
     }
 
     public function firstOr($columns = ['*'], ?Closure $callback = null)

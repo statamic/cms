@@ -15,7 +15,6 @@ use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Pattern;
 use Statamic\Query\Concerns\FakesQueries;
 use Statamic\Query\Exceptions\MultipleRecordsFoundException;
-use Statamic\Query\Exceptions\RecordNotFoundException;
 use Statamic\Query\Exceptions\RecordsNotFoundException;
 use Statamic\Query\Scopes\AppliesScopes;
 
@@ -574,7 +573,7 @@ abstract class Builder implements Contract
             return $item;
         }
 
-        throw new RecordNotFoundException();
+        throw new RecordsNotFoundException();
     }
 
     public function firstOr($columns = ['*'], ?Closure $callback = null)
