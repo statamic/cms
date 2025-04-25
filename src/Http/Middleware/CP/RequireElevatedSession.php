@@ -8,9 +8,7 @@ class RequireElevatedSession
 {
     public function handle($request, Closure $next)
     {
-        $elevatedSessionIsActive = session()->get("statamic_elevated_session_{$request->user()->id}") > now()->timestamp;
-
-        if (! $elevatedSessionIsActive) {
+        if (! $request->hasElevatedSession()) {
             return response()->json(['error' => __('Requires an elevated session.')], 403);
         }
 

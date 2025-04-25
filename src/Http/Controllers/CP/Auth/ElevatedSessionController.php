@@ -11,12 +11,10 @@ class ElevatedSessionController
 {
     public function index(Request $request)
     {
-        $user = User::current();
-
-        $expiry = session()->get("statamic_elevated_session_{$user->id}");
-        $isElevated = $expiry > now()->timestamp;
-
-        return ['elevated' => $isElevated, 'expiry' => $expiry];
+        return [
+            'elevated' => $request->hasElevatedSession(),
+            'expiry' => $request->getElevatedSessionExpiry(),
+        ];
     }
 
     public function store(Request $request)
@@ -33,10 +31,7 @@ class ElevatedSessionController
             ]);
         }
 
-        session()->put(
-            "statamic_elevated_session_{$user->id}",
-            now()->addMinutes(config('statamic.users.elevated_session_duration', 15))->timestamp
-        );
+        session()->elevate();
 
         return $this->index($request);
     }
