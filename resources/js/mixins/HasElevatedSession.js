@@ -16,5 +16,9 @@ export default {
                 });
             });
         },
+
+        async requireElevatedSessionIf(condition) {
+            return condition ? this.requireElevatedSession() : Promise.resolve();
+        },
     },
 };

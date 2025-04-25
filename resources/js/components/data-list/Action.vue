@@ -140,7 +140,7 @@ export default {
         },
 
         performAction() {
-            (this.action.requiresElevatedSession ? this.requireElevatedSession() : Promise.resolve()).then(() => {
+            this.requireElevatedSessionIf(this.action.requiresElevatedSession).then(() => {
                 this.running = true;
                 this.$emit('selected', this.action, this.values, this.onDone);
             });

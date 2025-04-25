@@ -80,7 +80,7 @@ export default {
         },
 
         save() {
-            (this.requiresCurrentPassword ? Promise.resolve() : this.requireElevatedSession())
+            this.requireElevatedSessionIf(!this.requiresCurrentPassword)
                 .then(() => this.performSaveRequest())
                 .catch(() => {});
         },
