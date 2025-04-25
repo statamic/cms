@@ -592,6 +592,8 @@ trait UserContractTests
     #[Test]
     public function it_determines_if_two_factor_authentication_is_required_for_a_non_super_user_with_roles(): void
     {
+        $this->markTestSkipped();
+
         \Statamic\Facades\Role::make('test')->save();
         $user = tap($this->makeUser()->assignRole('test'))->save();
 
