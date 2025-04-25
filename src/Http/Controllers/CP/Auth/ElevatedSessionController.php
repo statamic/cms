@@ -3,7 +3,6 @@
 namespace Statamic\Http\Controllers\CP\Auth;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Statamic\Facades\User;
@@ -14,10 +13,10 @@ class ElevatedSessionController
     {
         $user = User::current();
 
-        $isElevated = session()->get("statamic_elevated_session_{$user->id}") > now()->timestamp;
-        $timeRemaining = $isElevated ? Carbon::parse(session()->get("statamic_elevated_session_{$user->id}"))->diffInSeconds(absolute: true) : 0;
+        $expiry = session()->get("statamic_elevated_session_{$user->id}");
+        $isElevated = $expiry > now()->timestamp;
 
-        return ['elevated' => $isElevated, 'time_remaining' => $timeRemaining];
+        return ['elevated' => $isElevated, 'expiry' => $expiry];
     }
 
     public function store(Request $request)
