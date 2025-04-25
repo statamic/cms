@@ -770,6 +770,8 @@ GQL;
             ->published(false)
             ->create();
 
+        LivePreview::tokenize('test-token', $entry);
+
         $query = <<<'GQL'
 {
     entry(id: "6") {
@@ -785,7 +787,6 @@ GQL;
             ->assertGqlOk()
             ->assertExactJson(['data' => ['entry' => null]]);
 
-        $token = LivePreview::tokenize('test-token', $entry);
         $this
             ->withoutExceptionHandling()
             ->post('/graphql?token=test-token', ['query' => $query])
