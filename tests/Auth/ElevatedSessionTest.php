@@ -39,18 +39,20 @@ class ElevatedSessionTest extends TestCase
     #[Test]
     public function it_can_get_status_of_elevated_session()
     {
+        config(['statamic.users.elevated_session_duration' => 15]);
+
         $this->freezeSecond();
 
         $this
             ->session([
-                "statamic_elevated_session_{$this->user->id}" => $exp = now()->addMinutes(5)->timestamp,
+                "statamic_elevated_session_{$this->user->id}" => now()->subMinutes(5)->timestamp,
             ])
             ->actingAs($this->user)
             ->get('/cp/elevated-session')
             ->assertOk()
             ->assertJson([
                 'elevated' => true,
-                'expiry' => $exp,
+                'expiry' => now()->addMinutes(10)->timestamp,
             ]);
     }
 
@@ -70,16 +72,18 @@ class ElevatedSessionTest extends TestCase
     #[Test]
     public function it_can_get_status_of_elevated_session_when_session_has_expired()
     {
+        config(['statamic.users.elevated_session_duration' => 15]);
+
         $this
             ->session([
-                "statamic_elevated_session_{$this->user->id}" => $exp = now()->subMinutes(5)->timestamp,
+                "statamic_elevated_session_{$this->user->id}" => now()->subMinutes(20)->timestamp,
             ])
             ->actingAs($this->user)
             ->get('/cp/elevated-session')
             ->assertOk()
             ->assertJson([
                 'elevated' => false,
-                'expiry' => $exp,
+                'expiry' => now()->subMinutes(5)->timestamp,
             ]);
     }
 
@@ -94,7 +98,7 @@ class ElevatedSessionTest extends TestCase
             ->actingAs($this->user)
             ->post('/cp/elevated-session', ['password' => 'secret'])
             ->assertRedirect('/cp/target-url')
-            ->assertSessionHas("statamic_elevated_session_{$this->user->id}", now()->addMinutes(15)->timestamp);
+            ->assertSessionHas("statamic_elevated_session_{$this->user->id}", now()->timestamp);
     }
 
     #[Test]
@@ -107,7 +111,7 @@ class ElevatedSessionTest extends TestCase
             ->postJson('/cp/elevated-session', ['password' => 'secret'])
             ->assertOk()
             ->assertJsonStructure(['elevated', 'expiry'])
-            ->assertSessionHas("statamic_elevated_session_{$this->user->id}", now()->addMinutes(15)->timestamp);
+            ->assertSessionHas("statamic_elevated_session_{$this->user->id}", now()->timestamp);
     }
 
     #[Test]
@@ -126,7 +130,7 @@ class ElevatedSessionTest extends TestCase
         $this->actingAs($this->user);
 
         $this->session([
-            "statamic_elevated_session_{$this->user->id}" => now()->addMinutes(5)->timestamp,
+            "statamic_elevated_session_{$this->user->id}" => now()->timestamp,
         ]);
 
         $this->get('/requires-elevated-session')
@@ -140,7 +144,7 @@ class ElevatedSessionTest extends TestCase
         $this->actingAs($this->user);
 
         $this->session([
-            "statamic_elevated_session_{$this->user->id}" => now()->subMinutes(5)->timestamp,
+            "statamic_elevated_session_{$this->user->id}" => now()->subMinutes(16)->timestamp,
         ]);
 
         $this->get('/requires-elevated-session')
@@ -153,7 +157,7 @@ class ElevatedSessionTest extends TestCase
         $this->actingAs($this->user);
 
         $this->session([
-            "statamic_elevated_session_{$this->user->id}" => now()->subMinutes(5)->timestamp,
+            "statamic_elevated_session_{$this->user->id}" => now()->subMinutes(16)->timestamp,
         ]);
 
         $this->getJson('/requires-elevated-session')

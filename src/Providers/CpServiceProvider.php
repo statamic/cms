@@ -4,6 +4,7 @@ namespace Statamic\Providers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
@@ -119,13 +120,19 @@ class CpServiceProvider extends ServiceProvider
         Request::macro('getElevatedSessionExpiry', function () {
             $user = User::fromUser($this->user());
 
-            return session()->get("statamic_elevated_session_{$user->id}");
+            if (! $lastElevated = session()->get("statamic_elevated_session_{$user->id}")) {
+                return null;
+            }
+
+            return Carbon::createFromTimestamp($lastElevated)
+                ->addMinutes(config('statamic.users.elevated_session_duration', 15))
+                ->timestamp;
         });
 
         Session::macro('elevate', function () {
             $user = User::fromUser(request()->user());
 
-            $this->put("statamic_elevated_session_{$user->id}", now()->addMinutes(config('statamic.users.elevated_session_duration', 15))->timestamp);
+            $this->put("statamic_elevated_session_{$user->id}", now()->timestamp);
         });
     }
 }
