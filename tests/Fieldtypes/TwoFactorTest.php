@@ -2,7 +2,6 @@
 
 namespace Tests\Fieldtypes;
 
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Collection;
@@ -143,29 +142,14 @@ class TwoFactorTest extends TestCase
         return $user;
     }
 
-    /**
-     * Based on https://gist.github.com/juampi92/fff250719122a596c716c64e5b0afef6.
-     */
-    private function createRequestWithParameters(string $routeName, array $parameters = [], string $class = Request::class)
+    private function createRequestWithParameters(string $routeName, array $parameters = []): Request
     {
-        // Find the route properties.
         $route = Router::getRoutes()->getByName($routeName);
 
-        throw_if(is_null($route),
-            new Exception("[Pest.php createRequestWithParameters] Couldn't find route by the name of {$routeName}."));
-
-        // Recreate the full url
+        $uri = $route->uri;
+        $method = $route->methods()[0];
         $fullUrl = route($routeName, $parameters);
 
-        $method = $route->methods()[0];
-        $uri = $route->uri;
-
-        $request = $class::create($fullUrl);
-        $request->setRouteResolver(function () use ($request, $method, $uri) {
-            // Associate Route to request so we can access route parameters.
-            return (new Route($method, $uri, []))->bind($request);
-        });
-
-        return $request;
+        return ($request = Request::create($fullUrl))->setRouteResolver(fn () => (new Route($method, $uri, []))->bind($request));
     }
 }

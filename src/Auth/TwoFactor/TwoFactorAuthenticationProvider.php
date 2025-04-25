@@ -38,8 +38,12 @@ class TwoFactorAuthenticationProvider
     /**
      * Get the two factor authentication QR code URL.
      */
-    public function qrCodeUrl(string $companyName, string $companyEmail, string $secret): string
-    {
+    public function qrCodeUrl(
+        string $companyName,
+        string $companyEmail,
+        #[\SensitiveParameter]
+        string $secret
+    ): string {
         return $this->engine->getQRCodeUrl($companyName, $companyEmail, $secret);
     }
 

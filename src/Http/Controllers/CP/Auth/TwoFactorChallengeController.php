@@ -10,7 +10,7 @@ class TwoFactorChallengeController extends Controller
 {
     public function __construct()
     {
-        //        $this->middleware('throttle:two-factor');
+        $this->middleware('throttle:two-factor');
         $this->middleware(RedirectIfAuthorized::class);
     }
 

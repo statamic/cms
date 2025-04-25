@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
-class AddTwoFactorColumns extends UpdateScript
+class PublishMigrationForTwoFactorColumns extends UpdateScript
 {
     public function shouldUpdate($newVersion, $oldVersion)
     {

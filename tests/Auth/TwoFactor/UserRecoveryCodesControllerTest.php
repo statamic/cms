@@ -15,13 +15,6 @@ class UserRecoveryCodesControllerTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->withoutMiddleware(EnforceTwoFactor::class);
-    }
-
     #[Test]
     public function it_returns_recovery_codes()
     {

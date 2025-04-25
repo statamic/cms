@@ -67,7 +67,7 @@ class TwoFactorChallengeController extends Controller
         return request('redirect') ?? route('statamic.site');
     }
 
-    private function hasError()
+    protected function hasError()
     {
         return function ($field) {
             if (! $error = optional(session('errors'))->first($field)) {
