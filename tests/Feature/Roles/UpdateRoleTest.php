@@ -44,11 +44,7 @@ class UpdateRoleTest extends TestCase
 
     private function withActiveElevatedSession()
     {
-        $this->session([
-            'statamic_elevated_session' => now()->timestamp,
-        ]);
-
-        return $this;
+        return $this->session(['statamic_elevated_session' => now()->timestamp]);
     }
 
     #[Test]

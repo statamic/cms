@@ -2,6 +2,7 @@
 
 namespace Tests\Auth;
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Route;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
@@ -36,6 +37,11 @@ class ElevatedSessionTest extends TestCase
         });
     }
 
+    private function withElevatedSession(?Carbon $time = null)
+    {
+        return $this->session(['statamic_elevated_session' => ($time ?? now())->timestamp]);
+    }
+
     #[Test]
     public function it_can_get_status_of_elevated_session()
     {
@@ -44,9 +50,7 @@ class ElevatedSessionTest extends TestCase
         $this->freezeSecond();
 
         $this
-            ->session([
-                'statamic_elevated_session' => now()->subMinutes(5)->timestamp,
-            ])
+            ->withElevatedSession(now()->subMinutes(5))
             ->actingAs($this->user)
             ->get('/cp/elevated-session')
             ->assertOk()
@@ -75,9 +79,7 @@ class ElevatedSessionTest extends TestCase
         config(['statamic.users.elevated_session_duration' => 15]);
 
         $this
-            ->session([
-                'statamic_elevated_session' => now()->subMinutes(20)->timestamp,
-            ])
+            ->withElevatedSession(now()->subMinutes(20))
             ->actingAs($this->user)
             ->get('/cp/elevated-session')
             ->assertOk()
@@ -129,11 +131,9 @@ class ElevatedSessionTest extends TestCase
     {
         $this->actingAs($this->user);
 
-        $this->session([
-            'statamic_elevated_session' => now()->timestamp,
-        ]);
-
-        $this->get('/requires-elevated-session')
+        $this
+            ->withElevatedSession()
+            ->get('/requires-elevated-session')
             ->assertOk()
             ->assertSee('ok');
     }
@@ -143,11 +143,9 @@ class ElevatedSessionTest extends TestCase
     {
         $this->actingAs($this->user);
 
-        $this->session([
-            'statamic_elevated_session' => now()->subMinutes(16)->timestamp,
-        ]);
-
-        $this->get('/requires-elevated-session')
+        $this
+            ->withElevatedSession(now()->subMinutes(16))
+            ->get('/requires-elevated-session')
             ->assertRedirect('/cp/auth/confirm-password');
     }
 
@@ -156,14 +154,10 @@ class ElevatedSessionTest extends TestCase
     {
         $this->actingAs($this->user);
 
-        $this->session([
-            'statamic_elevated_session' => now()->subMinutes(16)->timestamp,
-        ]);
-
-        $this->getJson('/requires-elevated-session')
+        $this
+            ->withElevatedSession(now()->subMinutes(16))
+            ->getJson('/requires-elevated-session')
             ->assertStatus(403)
-            ->assertJson([
-                'message' => __('Requires an elevated session.'),
-            ]);
+            ->assertJson(['message' => __('Requires an elevated session.')]);
     }
 }
