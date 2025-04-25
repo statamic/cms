@@ -7,7 +7,6 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\TwoFactor\RecoveryCode;
 use Statamic\Auth\TwoFactor\TwoFactorAuthenticationProvider;
 use Statamic\Facades\User;
-use Statamic\Http\Middleware\CP\EnforceTwoFactor;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
