@@ -118,9 +118,7 @@ class CpServiceProvider extends ServiceProvider
         });
 
         Request::macro('getElevatedSessionExpiry', function () {
-            $user = User::fromUser($this->user());
-
-            if (! $lastElevated = session()->get("statamic_elevated_session_{$user->id}")) {
+            if (! $lastElevated = session()->get('statamic_elevated_session')) {
                 return null;
             }
 
@@ -130,9 +128,7 @@ class CpServiceProvider extends ServiceProvider
         });
 
         Session::macro('elevate', function () {
-            $user = User::fromUser(request()->user());
-
-            $this->put("statamic_elevated_session_{$user->id}", now()->timestamp);
+            $this->put('statamic_elevated_session', now()->timestamp);
         });
     }
 }
