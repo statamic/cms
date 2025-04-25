@@ -2,12 +2,14 @@
 
 namespace Tests\Feature\Roles;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Role;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
+#[Group('elevated-session')]
 class UpdateRoleTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;

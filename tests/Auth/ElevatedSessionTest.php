@@ -3,12 +3,14 @@
 namespace Tests\Auth;
 
 use Illuminate\Support\Facades\Route;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\User;
 use Statamic\Http\Middleware\CP\RequireElevatedSession;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
+#[Group('elevated-session')]
 class ElevatedSessionTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
