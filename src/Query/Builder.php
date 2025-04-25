@@ -562,14 +562,14 @@ abstract class Builder implements Contract
         return $this->where('id', $id)->get($columns)->first();
     }
 
-    public function first($columns = ['*'])
+    public function first()
     {
-        return $this->get($columns)->first();
+        return $this->get()->first();
     }
 
     public function firstOrFail($columns = ['*'])
     {
-        if (! is_null($item = $this->first($columns))) {
+        if (! is_null($item = $this->select($columns)->first())) {
             return $item;
         }
 
@@ -584,7 +584,7 @@ abstract class Builder implements Contract
             $columns = ['*'];
         }
 
-        if (! is_null($model = $this->first($columns))) {
+        if (! is_null($model = $this->select($columns)->first())) {
             return $model;
         }
 

@@ -77,14 +77,14 @@ abstract class EloquentQueryBuilder implements Builder
         return $items;
     }
 
-    public function first($columns = ['*'])
+    public function first()
     {
-        return $this->get($columns)->first();
+        return $this->get()->first();
     }
 
     public function firstOrFail($columns = ['*'])
     {
-        if (! is_null($item = $this->first($columns))) {
+        if (! is_null($item = $this->select($columns)->first($columns))) {
             return $item;
         }
 
@@ -99,7 +99,7 @@ abstract class EloquentQueryBuilder implements Builder
             $columns = ['*'];
         }
 
-        if (! is_null($model = $this->first($columns))) {
+        if (! is_null($model = $this->select($columns)->first())) {
             return $model;
         }
 
