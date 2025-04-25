@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP;
 use Illuminate\Auth\Access\AuthorizationException as LaravelAuthException;
 use Illuminate\Http\Request;
 use Statamic\Exceptions\AuthorizationException;
+use Statamic\Exceptions\ElevatedSessionAuthorizationException;
 use Statamic\Http\Controllers\Controller;
 use Statamic\Statamic;
 
@@ -68,10 +69,8 @@ class CpController extends Controller
 
     public function requireElevatedSession(): void
     {
-        abort_if(
-            boolean: ! request()->hasElevatedSession(),
-            code: 403,
-            message: __('Requires an elevated session.')
-        );
+        if (! request()->hasElevatedSession()) {
+            throw new ElevatedSessionAuthorizationException;
+        }
     }
 }

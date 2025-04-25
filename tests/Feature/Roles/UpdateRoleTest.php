@@ -27,7 +27,7 @@ class UpdateRoleTest extends TestCase
             $data,
         );
 
-        return $this->patch(cp_route('roles.update', $role->handle()), $data);
+        return $this->patchJson(cp_route('roles.update', $role->handle()), $data);
     }
 
     private function actingAsUserWithPermissions($permissions)
@@ -57,7 +57,7 @@ class UpdateRoleTest extends TestCase
             ->withActiveElevatedSession()
             ->from('/original')
             ->update($role)
-            ->assertRedirect('/original');
+            ->assertForbidden();
     }
 
     #[Test]
