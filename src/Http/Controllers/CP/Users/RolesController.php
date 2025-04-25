@@ -116,6 +116,8 @@ class RolesController extends CpController
 
     public function update(Request $request, $role)
     {
+        $this->requireElevatedSession();
+
         $this->authorize('edit roles');
 
         if (! $role = Role::find($role)) {

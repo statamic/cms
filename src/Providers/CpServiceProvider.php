@@ -2,8 +2,11 @@
 
 namespace Statamic\Providers;
 
+use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Statamic\CP\Utilities\UtilityRepository;
@@ -45,6 +48,8 @@ class CpServiceProvider extends ServiceProvider
         Sets::setIconsDirectory();
 
         $this->registerMiddlewareGroups();
+
+        $this->registerElevatedSessionMacros();
     }
 
     public function register()
@@ -104,5 +109,26 @@ class CpServiceProvider extends ServiceProvider
             \Statamic\Http\Middleware\CP\AddVaryHeaderToResponse::class,
             \Statamic\Http\Middleware\DeleteTemporaryFileUploads::class,
         ]);
+    }
+
+    private function registerElevatedSessionMacros()
+    {
+        Request::macro('hasElevatedSession', function () {
+            return $this->getElevatedSessionExpiry() > now()->timestamp;
+        });
+
+        Request::macro('getElevatedSessionExpiry', function () {
+            if (! $lastElevated = session()->get('statamic_elevated_session')) {
+                return null;
+            }
+
+            return Carbon::createFromTimestamp($lastElevated)
+                ->addMinutes(config('statamic.users.elevated_session_duration', 15))
+                ->timestamp;
+        });
+
+        Session::macro('elevate', function () {
+            $this->put('statamic_elevated_session', now()->timestamp);
+        });
     }
 }
