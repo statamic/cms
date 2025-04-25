@@ -242,15 +242,18 @@ class Statamic
         return new static;
     }
 
-    public static function svg($name, $attrs = null)
+    public static function svg($name, $attrs = null, $fallback = null)
     {
         if ($attrs) {
             $attrs = " class=\"{$attrs}\"";
         }
 
-        $svg = StaticStringy::collapseWhitespace(
-            File::get(statamic_path("resources/svg/{$name}.svg"))
-        );
+        $path = statamic_path("resources/svg/{$name}.svg");
+        if ($fallback && ! File::exists($path)) {
+            $path = statamic_path("resources/svg/{$fallback}.svg");
+        }
+
+        $svg = StaticStringy::collapseWhitespace(File::get($path));
 
         return str_replace('<svg', sprintf('<svg%s', $attrs), $svg);
     }

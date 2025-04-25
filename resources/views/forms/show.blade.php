@@ -12,7 +12,7 @@
             'title' => __('Forms')
         ])
         <div class="flex items-center">
-            <h1 class="flex-1">
+            <h1 v-pre class="flex-1">
                 {{ __($form->title()) }}
             </h1>
 

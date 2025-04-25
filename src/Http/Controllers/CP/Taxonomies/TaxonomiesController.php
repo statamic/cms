@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Taxonomies;
 
 use Illuminate\Http\Request;
 use Statamic\Contracts\Taxonomies\Taxonomy as TaxonomyContract;
+use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\Contracts\Taxonomies\TermRepository;
 use Statamic\CP\Column;
 use Statamic\Facades\Blueprint;
@@ -18,6 +19,8 @@ use Statamic\Rules\Handle;
 use Statamic\Stache\Repositories\TermRepository as StacheTermRepository;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+
+use function Statamic\trans as __;
 
 class TaxonomiesController extends CpController
 {
@@ -80,6 +83,7 @@ class TaxonomiesController extends CpController
                 'taxonomy' => $taxonomy->handle(),
                 'blueprints' => $blueprints->pluck('handle')->all(),
             ]),
+            'canCreate' => User::current()->can('create', [TermContract::class, $taxonomy]) && $taxonomy->hasVisibleTermBlueprint(),
         ];
 
         if ($taxonomy->queryTerms()->count() === 0) {

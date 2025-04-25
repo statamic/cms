@@ -98,6 +98,36 @@ class BardTextTest extends TestCase
         $this->assertEquals('', $this->modify(null));
     }
 
+    #[Test]
+    public function it_skips_nodes_with_no_type()
+    {
+        $data = [
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    ['type' => 'text', 'text' => 'This is a paragraph with '],
+                    ['type' => 'text', 'marks' => [['type' => 'bold']], 'text' => 'bold'],
+                    ['type' => 'text', 'text' => ' and '],
+                    ['type' => 'text', 'marks' => [['type' => 'italic']], 'text' => 'italic'],
+                    ['type' => 'text', 'text' => ' text.'],
+                ],
+            ],
+            [
+                // no type
+            ],
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    ['type' => 'text', 'text' => 'Another paragraph.'],
+                ],
+            ],
+        ];
+
+        $expected = 'This is a paragraph with bold and italic text. Another paragraph.';
+
+        $this->assertEquals($expected, $this->modify($data));
+    }
+
     public function modify($arr, ...$args)
     {
         return Modify::value($arr)->bard_text($args)->fetch();

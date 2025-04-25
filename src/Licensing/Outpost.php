@@ -159,7 +159,7 @@ class Outpost
 
     private function payloadHasChanged($previous, $current)
     {
-        $exclude = ['ip'];
+        $exclude = ['ip', 'php_version'];
 
         return Arr::except($previous, $exclude) !== Arr::except($current, $exclude);
     }
@@ -199,7 +199,7 @@ class Outpost
 
     private function cacheAndReturnRateLimitResponse($e)
     {
-        $seconds = $e->getResponse()->getHeader('Retry-After')[0];
+        $seconds = (int) $e->getResponse()->getHeader('Retry-After')[0];
 
         return $this->cacheResponse(now()->addSeconds($seconds), ['error' => 429]);
     }

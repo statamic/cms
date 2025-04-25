@@ -44,6 +44,8 @@ class ViewCollectionListingTest extends TestCase
                     'editable' => true,
                     'blueprint_editable' => true,
                     'available_in_selected_site' => true,
+                    'actions' => Facades\Action::for($collectionA, ['view' => 'list']),
+                    'actions_url' => 'http://localhost/cp/collections/foo/actions',
                 ],
                 [
                     'id' => 'bar',
@@ -59,6 +61,8 @@ class ViewCollectionListingTest extends TestCase
                     'editable' => true,
                     'blueprint_editable' => true,
                     'available_in_selected_site' => true,
+                    'actions' => Facades\Action::for($collectionB, ['view' => 'list']),
+                    'actions_url' => 'http://localhost/cp/collections/bar/actions',
                 ],
             ]))
             ->assertDontSee('no-results');

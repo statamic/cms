@@ -2,11 +2,11 @@
 
 namespace Statamic\View\Antlers\Language\Runtime;
 
-use Facade\Ignition\Exceptions\ViewException;
-use Facade\Ignition\Exceptions\ViewExceptionWithSolution;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use ReflectionProperty;
-use Spatie\Ignition\Contracts\ProvidesSolution;
+use Spatie\ErrorSolutions\Contracts\ProvidesSolution;
+use Spatie\LaravelIgnition\Exceptions\ViewException;
+use Spatie\LaravelIgnition\Exceptions\ViewExceptionWithSolution;
 use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\Fields\Value;
 use Statamic\Modifiers\ModifierNotFoundException;
@@ -897,5 +897,13 @@ INFO;
     public function callback($callback)
     {
         return $this;
+    }
+
+    /**
+     * Clears the standard render node cache.
+     */
+    public static function clearRenderNodeCache()
+    {
+        self::$standardRenderNodeCache = [];
     }
 }

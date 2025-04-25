@@ -22,6 +22,8 @@ use Statamic\Data\Publishable;
 use Statamic\Data\TracksLastModified;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
+use Statamic\Events\LocalizedTermDeleted;
+use Statamic\Events\LocalizedTermSaved;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades;
 use Statamic\Facades\Antlers;
@@ -373,6 +375,10 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
             throw new NotFoundHttpException;
         }
 
+        if ($this->collection() && ! $this->taxonomy()->collections()->contains($this->collection())) {
+            throw new NotFoundHttpException;
+        }
+
         return (new DataResponse($this))->toResponse($request);
     }
 
@@ -430,7 +436,11 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
 
     public function save()
     {
-        return $this->term->save();
+        $save = $this->term->save();
+
+        LocalizedTermSaved::dispatch($this);
+
+        return $save;
     }
 
     public function deleteQuietly()
@@ -440,7 +450,11 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
 
     public function delete()
     {
-        return $this->term->delete();
+        $delete = $this->term->delete();
+
+        LocalizedTermDeleted::dispatch($this);
+
+        return $delete;
     }
 
     public function private()
@@ -471,7 +485,7 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
     public function lastModified()
     {
         return $this->has('updated_at')
-            ? Carbon::createFromTimestamp($this->get('updated_at'))
+            ? Carbon::createFromTimestamp($this->get('updated_at'), config('app.timezone'))
             : $this->term->fileLastModified();
     }
 

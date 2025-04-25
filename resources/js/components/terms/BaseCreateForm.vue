@@ -5,7 +5,7 @@
         publish-container="base"
         :initial-actions="actions"
         method="post"
-        :initial-title="__('Create')"
+        :initial-title="taxonomyCreateLabel"
         :taxonomy-handle="taxonomyHandle"
         :breadcrumbs="breadcrumbs"
         :initial-fieldset="fieldset"
@@ -17,6 +17,7 @@
         :initial-is-root="true"
         :initial-origin-values="{}"
         :initial-site="site"
+        :can-edit-blueprint="canEditBlueprint"
         :create-another-url="createAnotherUrl"
         :listing-url="listingUrl"
         :preview-targets="previewTargets"
@@ -31,6 +32,7 @@ export default {
     props: [
         'actions',
         'taxonomyHandle',
+        'taxonomyCreateLabel',
         'breadcrumbs',
         'fieldset',
         'values',
@@ -38,6 +40,7 @@ export default {
         'published',
         'localizations',
         'site',
+        'canEditBlueprint',
         'createAnotherUrl',
         'listingUrl',
         'previewTargets',

@@ -51,6 +51,7 @@ class InstallCollaboration extends Command
         }
 
         $this->enableBroadcasting();
+        $this->warnAboutLegacyBroadcastDriverKey();
         $this->installBroadcastingDriver();
     }
 
@@ -81,8 +82,18 @@ class InstallCollaboration extends Command
             },
             message: 'Enabling broadcasting...'
         );
-
         $this->components->info('Broadcasting enabled successfully.');
+    }
+
+    protected function warnAboutLegacyBroadcastDriverKey(): void
+    {
+        if (version_compare(app()->version(), '11', '<')) {
+            return;
+        }
+
+        if (Str::contains(File::get(app()->environmentFile()), 'BROADCAST_DRIVER')) {
+            $this->components->warn('The BROADCAST_DRIVER environment variable has been renamed to BROADCAST_CONNECTION in Laravel 11. You should update your .env file.');
+        }
     }
 
     protected function installBroadcastingDriver(): void

@@ -172,6 +172,43 @@ class DictionaryTest extends TestCase
     }
 
     #[Test]
+    public function it_translates_augmented_data()
+    {
+        app()->setLocale('de');
+        $field = (new Field('test', ['type' => 'dictionary', 'dictionary' => 'countries']));
+
+        $fieldtype = FieldtypeRepository::find('dictionary');
+        $fieldtype->setField($field);
+
+        $augment = $fieldtype->augment(['USA', 'GBR']);
+
+        $this->assertEquals([
+            [
+                'name' => 'Vereinigte Staaten',
+                'key' => 'USA',
+                'iso3' => 'USA',
+                'iso2' => 'US',
+                'region' => 'Amerika',
+                'subregion' => 'Nordamerika',
+                'emoji' => '🇺🇸',
+                'value' => 'USA',
+                'label' => '🇺🇸 Vereinigte Staaten',
+            ],
+            [
+                'name' => 'Vereinigtes Königreich',
+                'key' => 'GBR',
+                'iso3' => 'GBR',
+                'iso2' => 'GB',
+                'region' => 'Europa',
+                'subregion' => 'Nordeuropa',
+                'emoji' => '🇬🇧',
+                'value' => 'GBR',
+                'label' => '🇬🇧 Vereinigtes Königreich',
+            ],
+        ], collect($augment)->toArray());
+    }
+
+    #[Test]
     public function it_augments_to_empty_array_when_null_and_configured_for_multiple()
     {
         $field = (new Field('test', ['type' => 'dictionary', 'dictionary' => 'countries']));

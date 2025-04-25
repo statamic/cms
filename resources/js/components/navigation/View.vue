@@ -8,7 +8,7 @@
             <div class="flex items-center">
                 <h1 class="flex-1" v-text="__(title)" />
 
-                <dropdown-list v-if="editable" class="rtl:ml-2 ltr:mr-2">
+                <dropdown-list v-if="canEdit" class="rtl:ml-2 ltr:mr-2">
                     <slot name="twirldown" />
                 </dropdown-list>
 
@@ -421,6 +421,10 @@ export default {
         },
 
         treeSaved(response) {
+            if (! response.data.saved) {
+                return this.$toast.error(`Couldn't save tree`)
+            }
+
             this.replaceGeneratedIds(response.data.generatedIds);
 
             this.changed = false;

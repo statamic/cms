@@ -12,6 +12,7 @@ use Statamic\Exceptions\RecordsNotFoundException;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
+use Statamic\Query\Scopes\Scope;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -670,6 +671,20 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     #[Test]
+    public function entries_are_found_using_scopes()
+    {
+        CustomScope::register();
+        Entry::allowQueryScope(CustomScope::class);
+        Entry::allowQueryScope(CustomScope::class, 'whereCustom');
+
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1'])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2'])->create();
+
+        $this->assertCount(1, Entry::query()->customScope(['title' => 'Post 1'])->get());
+        $this->assertCount(1, Entry::query()->whereCustom(['title' => 'Post 1'])->get());
+    }
+
+    #[Test]
     public function entries_are_found_using_offset()
     {
         $this->createDummyCollectionAndEntries();
@@ -769,6 +784,16 @@ class EntryQueryBuilderTest extends TestCase
 
         $this->assertInstanceOf(\Illuminate\Support\LazyCollection::class, $entries);
         $this->assertCount(3, $entries);
+    }
+
+    #[Test]
+    public function entries_can_be_reordered()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $this->assertSame(['post-3', 'post-2', 'post-1'], Entry::query()->orderBy('title', 'desc')->get()->map->slug()->all());
+
+        $this->assertSame(['post-1', 'post-2', 'post-3'], Entry::query()->orderBy('title', 'desc')->reorder()->orderBy('asc', 'desc')->get()->map->slug()->all());
     }
 
     #[Test]
@@ -1005,5 +1030,13 @@ class EntryQueryBuilderTest extends TestCase
     public function exists_returns_false_when_no_results_are_found()
     {
         $this->assertFalse(Entry::query()->exists());
+    }
+}
+
+class CustomScope extends Scope
+{
+    public function apply($query, $params)
+    {
+        $query->where('title', $params['title']);
     }
 }

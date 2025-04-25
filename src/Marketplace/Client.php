@@ -3,10 +3,16 @@
 namespace Statamic\Marketplace;
 
 use Facades\GuzzleHttp\Client as Guzzle;
+use Illuminate\Cache\NoLock;
+use Illuminate\Contracts\Cache\LockProvider;
+use Illuminate\Contracts\Cache\LockTimeoutException;
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Facades\Cache;
 
 class Client
 {
+    const LOCK_KEY = 'statamic.marketplace.lock';
+
     /**
      * @var string
      */
@@ -23,9 +29,9 @@ class Client
     protected $verifySsl = true;
 
     /**
-     * @var int
+     * @var Repository
      */
-    protected $cache;
+    private $store;
 
     /**
      * Instantiate marketplace API wrapper.
@@ -47,26 +53,40 @@ class Client
      */
     public function get($endpoint, $params = [])
     {
-        $endpoint = collect([$this->domain, self::API_PREFIX, $endpoint])->implode('/');
+        $lock = $this->lock(static::LOCK_KEY, 10);
 
+        $endpoint = collect([$this->domain, self::API_PREFIX, $endpoint])->implode('/');
         $key = 'marketplace-'.md5($endpoint.json_encode($params));
 
-        return Cache::rememberWithExpiration($key, function () use ($endpoint, $params) {
-            $response = Guzzle::request('GET', $endpoint, [
-                'verify' => $this->verifySsl,
-                'query' => $params,
-            ]);
+        try {
+            $lock->block(5);
 
-            $json = json_decode($response->getBody(), true);
+            return $this->cache()->rememberWithExpiration($key, function () use ($endpoint, $params) {
+                $response = Guzzle::request('GET', $endpoint, [
+                    'verify' => $this->verifySsl,
+                    'query' => $params,
+                ]);
 
-            return [$this->cache => $json];
-        });
+                $json = json_decode($response->getBody(), true);
+
+                return [60 => $json];
+            });
+        } catch (LockTimeoutException $e) {
+            return $this->cache()->get($key);
+        } finally {
+            $lock->release();
+        }
     }
 
-    public function cache($cache = 60)
+    private function cache(): Repository
     {
-        $this->cache = $cache;
+        return $this->store ??= Cache::store();
+    }
 
-        return $this;
+    private function lock(string $key, int $seconds)
+    {
+        return $this->cache()->getStore() instanceof LockProvider
+            ? $this->cache()->lock($key, $seconds)
+            : new NoLock($key, $seconds);
     }
 }

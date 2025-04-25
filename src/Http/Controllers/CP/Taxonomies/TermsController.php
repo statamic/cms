@@ -144,6 +144,7 @@ class TermsController extends CpController
             'breadcrumbs' => $this->breadcrumbs($taxonomy),
             'previewTargets' => $taxonomy->previewTargets()->all(),
             'itemActions' => Action::for($term, ['taxonomy' => $taxonomy->handle(), 'view' => 'form']),
+            'hasTemplate' => view()->exists($term->template()),
         ];
 
         if ($request->wantsJson()) {
@@ -239,13 +240,15 @@ class TermsController extends CpController
         ]);
 
         $viewData = [
-            'title' => __('Create Term'),
+            'title' => $taxonomy->createLabel(),
             'actions' => [
                 'save' => cp_route('taxonomies.terms.store', [$taxonomy->handle(), $site->handle()]),
+                'editBlueprint' => cp_route('taxonomies.blueprints.edit', [$taxonomy, $blueprint]),
             ],
             'values' => $values,
             'meta' => $fields->meta(),
             'taxonomy' => $taxonomy->handle(),
+            'taxonomyCreateLabel' => $taxonomy->createLabel(),
             'blueprint' => $blueprint->toPublishArray(),
             'published' => $taxonomy->defaultPublishState(),
             'locale' => $site->handle(),
@@ -352,7 +355,7 @@ class TermsController extends CpController
             ],
             [
                 'text' => $taxonomy->title(),
-                'url' => $taxonomy->showUrl(),
+                'url' => $taxonomy->breadcrumbUrl(),
             ],
         ]);
     }

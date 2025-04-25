@@ -22,15 +22,21 @@ class Icon extends Fieldtype
     {
         [$path, $directory, $folder, $hasConfiguredDirectory] = $this->resolveParts();
 
-        $icons = collect(Folder::getFilesByType($path, 'svg'))->mapWithKeys(fn ($path) => [
-            pathinfo($path)['filename'] => $hasConfiguredDirectory ? File::get($path) : null,
-        ]);
-
         return [
+            'url' => cp_route('icon-fieldtype'),
             'native' => ! $hasConfiguredDirectory,
+            'directory' => $directory,
             'set' => $folder,
-            'icons' => $icons->all(),
         ];
+    }
+
+    public function icons()
+    {
+        [$path, $directory, $folder, $hasConfiguredDirectory] = $this->resolveParts();
+
+        return collect(Folder::getFilesByType($path, 'svg'))->mapWithKeys(fn ($path) => [
+            pathinfo($path)['filename'] => $hasConfiguredDirectory ? File::get($path) : null,
+        ])->all();
     }
 
     protected function configFieldItems(): array

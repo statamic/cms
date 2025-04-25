@@ -6,20 +6,24 @@ use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\MessageBag;
+use Illuminate\Support\Str;
 use Illuminate\Support\ViewErrorBag;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Query\Builder;
+use Statamic\Contracts\Support\Boolable;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Facades\Entry;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
+use Statamic\Fields\LabeledValue;
 use Statamic\Fields\Value;
 use Statamic\Fields\Values;
+use Statamic\Tags\Concerns\OutputsItems;
 use Statamic\Tags\Tags;
 use Statamic\View\Cascade;
 use Tests\Antlers\Fixtures\Addon\Tags\RecursiveChildren;
@@ -310,6 +314,31 @@ EOT;
     }
 
     #[Test]
+    public function unclosed_array_variable_does_not_report_warning_if_followed_by_ray_modifier()
+    {
+        Log::shouldReceive('debug')->never();
+
+        $template = '{{ simple | ray }}';
+
+        $this->assertEquals('', $this->renderString($template, $this->variables));
+    }
+
+    #[Test]
+    public function unclosed_array_variable_does_reports_warning_even_if_a_call_before_it_did_not()
+    {
+        // Test case to ensure the modifier state is cleared correctly.
+
+        Log::shouldReceive('debug')->once()
+            ->with('Cannot render an array variable as a string: {{ simple }}', [
+                'line' => 1, 'file' => '',
+            ]);
+
+        $template = '{{ simple | ray }}{{ simple }}';
+
+        $this->assertEquals('', $this->renderString($template, $this->variables));
+    }
+
+    #[Test]
     public function single_condition()
     {
         $template = '{{ if string == "Hello wilderness" }}yes{{ endif }}';
@@ -462,6 +491,55 @@ EOT;
             $this->variables,
             true
         ));
+    }
+
+    #[Test]
+    #[DataProvider('boolablesInTernaryProvider')]
+    public function ternary_condition_with_boolables_supplied_to_tags_resolve_correctly($value, $expected)
+    {
+        $this->withFakeViews();
+
+        $this->viewShouldReturnRaw('test', "{{ the_field ? 'true' : 'false' }}");
+
+        $template = <<<'EOT'
+view: {{ the_field ? 'true' : 'false' }}, partial: {{ partial:test :the_field="the_field" }}
+EOT;
+
+        $this->assertSame($expected, $this->renderString($template, ['the_field' => $value], true));
+    }
+
+    public static function boolablesInTernaryProvider()
+    {
+        return [
+            'truthy generic boolable' => [
+                new class implements Boolable
+                {
+                    public function toBool(): bool
+                    {
+                        return true;
+                    }
+                },
+                'view: true, partial: true',
+            ],
+            'falsey generic boolable' => [
+                new class implements Boolable
+                {
+                    public function toBool(): bool
+                    {
+                        return false;
+                    }
+                },
+                'view: false, partial: false',
+            ],
+            'truthy LabeledValue' => [
+                new LabeledValue('foo', 'Foo'),
+                'view: true, partial: true',
+            ],
+            'falsey LabeledValue' => [
+                new LabeledValue(null, null),
+                'view: false, partial: false',
+            ],
+        ];
     }
 
     #[Test]
@@ -2522,6 +2600,77 @@ PARTIAL;
     {
         $input = 'Hey, look at that @{{ noun }}!';
         $this->assertSame('Hey, look at that {{ noun }}!', $this->renderString($input, []));
+    }
+
+    #[Test]
+    public function no_results_value_is_added_automatically()
+    {
+        (new class extends Tags
+        {
+            use OutputsItems;
+            public static $handle = 'the_tag';
+
+            public function index()
+            {
+                if ($this->params->get('has_value')) {
+                    return $this->output(collect([
+                        'one',
+                        'two',
+                        'three',
+                    ]));
+                }
+
+                return $this->parseNoResults();
+            }
+        })::register();
+
+        $template = <<<'TEMPLATE'
+{{ the_tag }}
+   {{ if no_results }}
+   No Results 1.
+    {{ the_tag has_value="true" }}
+        {{ if no_results }}
+            No Results 2.
+        {{ else }}
+            {{ value }}
+        {{ /if }}
+    {{ /the_tag }}
+    
+    {{ if no_results }} No Results 1.1 {{ /if }}
+   {{ else }}
+   Has Results 1.
+   {{ /if }}
+{{ /the_tag }}
+TEMPLATE;
+
+        $this->assertSame(
+            'No Results 1. one two three No Results 1.1',
+            Str::squish($this->renderString($template, [], true))
+        );
+
+        $template = <<<'TEMPLATE'
+{{ the_tag }}
+   {{ if no_results }}
+   No Results 1.
+    {{ the_tag has_value="true" as="items" }}
+        {{ if no_results }}
+            No Results 2.
+        {{ else }}
+            {{ items }}{{ value }} {{ /items }}
+        {{ /if }}
+    {{ /the_tag }}
+    
+    {{ if no_results }} No Results 1.1 {{ /if }}
+   {{ else }}
+   Has Results 1.
+   {{ /if }}
+{{ /the_tag }}
+TEMPLATE;
+
+        $this->assertSame(
+            'No Results 1. one two three No Results 1.1',
+            Str::squish($this->renderString($template, [], true))
+        );
     }
 }
 

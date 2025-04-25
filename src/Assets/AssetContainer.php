@@ -27,6 +27,7 @@ use Statamic\Facades\Search;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, Augmentable
@@ -134,7 +135,13 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
      */
     public function url()
     {
-        $url = rtrim($this->disk()->url('/'), '/');
+        if ($this->private()) {
+            return null;
+        }
+
+        $url = (string) Str::of($this->disk()->url('/'))
+            ->rtrim('/')
+            ->after(config('app.url'));
 
         return ($url === '') ? '/' : $url;
     }

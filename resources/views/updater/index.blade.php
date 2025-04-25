@@ -44,24 +44,26 @@
             </table>
         </div>
 
-        <h6 class="mt-8">{{ __('Addons') }}</h6>
-        <div class="card p-0 mt-2">
-            <table class="data-table">
-                @foreach ($addons as $addon)
-                <tr>
-                    <td class="w-64"><a href="{{ route('statamic.cp.updater.product', $addon -> slug()) }}"
-                            class="text-blue font-bold rtl:ml-2 ltr:mr-2">{{ $addon -> name() }}</a>
-                    <td>{{ $addon -> version() }}</td>
-                    @if ($count = $addon->changelog()->availableUpdatesCount())
-                    <td class="rtl:text-left ltr:text-right"><span
-                            class="badge-sm bg-green-600 btn-xs">{{ trans_choice('1 update|:count updates', $count) }}</span></td>
-                    @else
-                    <td class="rtl:text-left ltr:text-right">{{ __('Up to date') }}</td>
-                    @endif
-                </tr>
-                @endforeach
-            </table>
-        </div>
+        @if($addons->count())
+            <h6 class="mt-8">{{ __('Addons') }}</h6>
+            <div class="card p-0 mt-2">
+                <table class="data-table">
+                    @foreach ($addons as $addon)
+                    <tr>
+                        <td class="w-64"><a href="{{ route('statamic.cp.updater.product', $addon -> slug()) }}"
+                                class="text-blue font-bold rtl:ml-2 ltr:mr-2">{{ $addon -> name() }}</a>
+                        <td>{{ $addon -> version() }}</td>
+                        @if ($count = $addon->changelog()->availableUpdatesCount())
+                        <td class="rtl:text-left ltr:text-right"><span
+                                class="badge-sm bg-green-600 btn-xs">{{ trans_choice('1 update|:count updates', $count) }}</span></td>
+                        @else
+                        <td class="rtl:text-left ltr:text-right">{{ __('Up to date') }}</td>
+                        @endif
+                    </tr>
+                    @endforeach
+                </table>
+            </div>
+        @endif
 
         @if($unlistedAddons->count())
             <h6 class="mt-8">{{ __('Unlisted Addons') }}</h6>

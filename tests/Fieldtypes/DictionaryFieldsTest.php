@@ -30,7 +30,17 @@ class DictionaryFieldsTest extends TestCase
                 'fields' => [
                     ['handle' => 'type', 'type' => 'select'],
                 ],
-                'meta' => collect(['type' => null]),
+                'meta' => [
+                    'type' => [
+                        'options' => [
+                            ['value' => 'countries', 'label' => 'Countries'],
+                            ['value' => 'currencies', 'label' => 'Currencies'],
+                            ['value' => 'file', 'label' => 'File'],
+                            ['value' => 'timezones', 'label' => 'Timezones'],
+                            ['value' => 'fake_dictionary', 'label' => 'Fake Dictionary'],
+                        ],
+                    ],
+                ],
             ],
         ], $preload);
 
@@ -39,10 +49,14 @@ class DictionaryFieldsTest extends TestCase
                 'fields' => [
                     ['handle' => 'category',  'type' => 'select'],
                 ],
-                'meta' => collect(['category' => null]),
-                'defaults' => collect(['category' => null]),
+                'meta' => [
+                    'category' => [
+                        'options' => [],
+                    ],
+                ],
+                'defaults' => ['category' => null],
             ],
-        ], $preload['dictionaries']->all());
+        ], $preload['dictionaries']);
     }
 
     #[Test]
@@ -70,6 +84,7 @@ class DictionaryFieldsTest extends TestCase
 
         $this->assertEquals([
             'type' => 'fake_dictionary',
+            'category' => null,
         ], $preProcess);
     }
 

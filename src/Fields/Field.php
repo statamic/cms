@@ -13,6 +13,8 @@ use Statamic\Rules\Handle;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class Field implements Arrayable
 {
     protected $handle;
@@ -537,6 +539,9 @@ class Field implements Arrayable
                 'instructions' => __('statamic::messages.fields_sortable_instructions'),
                 'type' => 'toggle',
                 'default' => true,
+                'unless' => [
+                    'visibility' => 'equals computed',
+                ],
             ],
             'visibility' => [
                 'display' => __('Visibility'),
