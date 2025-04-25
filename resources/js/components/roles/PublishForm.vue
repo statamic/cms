@@ -125,7 +125,7 @@ export default {
         save() {
             this.requireElevatedSession()
                 .then(() => this.performSaveAction())
-                .catch(() => {});
+                .catch(() => this.$toast.error(__('Unable to save role')));
         },
 
         performSaveAction() {
