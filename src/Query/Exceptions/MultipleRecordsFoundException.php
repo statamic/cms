@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Exceptions;
+namespace Statamic\Query\Exceptions;
 
 use Illuminate\Database\MultipleRecordsFoundException as LaravelMultipleRecordsFoundException;
 

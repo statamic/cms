@@ -9,11 +9,11 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\LazyCollection;
 use InvalidArgumentException;
 use Statamic\Contracts\Query\Builder;
-use Statamic\Exceptions\MultipleRecordsFoundException;
-use Statamic\Exceptions\RecordNotFoundException;
-use Statamic\Exceptions\RecordsNotFoundException;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Blink;
+use Statamic\Query\Exceptions\MultipleRecordsFoundException;
+use Statamic\Query\Exceptions\RecordNotFoundException;
+use Statamic\Query\Exceptions\RecordsNotFoundException;
 use Statamic\Query\Scopes\AppliesScopes;
 use Statamic\Support\Arr;
 
