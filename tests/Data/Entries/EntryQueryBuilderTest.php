@@ -6,8 +6,8 @@ use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
-use Statamic\Exceptions\ItemNotFoundException;
 use Statamic\Exceptions\MultipleRecordsFoundException;
+use Statamic\Exceptions\RecordNotFoundException;
 use Statamic\Exceptions\RecordsNotFoundException;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
@@ -943,7 +943,7 @@ class EntryQueryBuilderTest extends TestCase
     #[Test]
     public function exception_is_thrown_when_entry_does_not_exist_using_first_or_fail()
     {
-        $this->expectException(ItemNotFoundException::class);
+        $this->expectException(RecordNotFoundException::class);
 
         Entry::query()
             ->where('collection', 'posts')

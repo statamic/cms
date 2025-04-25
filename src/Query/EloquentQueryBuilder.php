@@ -9,8 +9,8 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\LazyCollection;
 use InvalidArgumentException;
 use Statamic\Contracts\Query\Builder;
-use Statamic\Exceptions\ItemNotFoundException;
 use Statamic\Exceptions\MultipleRecordsFoundException;
+use Statamic\Exceptions\RecordNotFoundException;
 use Statamic\Exceptions\RecordsNotFoundException;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Blink;
@@ -89,7 +89,7 @@ abstract class EloquentQueryBuilder implements Builder
             return $item;
         }
 
-        throw new ItemNotFoundException();
+        throw new RecordNotFoundException();
     }
 
     public function firstOr($columns = ['*'], ?Closure $callback = null)
