@@ -54,7 +54,7 @@
 </template>
 
 <script>
-import HasElevatedSession from '@statamic/mixins/HasElevatedSession.js';
+import { requireElevatedSession } from '@statamic/components/elevated-sessions';
 
 const checked = function (permissions) {
     return permissions.reduce((carry, permission) => {
@@ -64,8 +64,6 @@ const checked = function (permissions) {
 };
 
 export default {
-    mixins: [HasElevatedSession],
-
     props: {
         initialTitle: String,
         initialHandle: String,
@@ -123,7 +121,7 @@ export default {
         },
 
         save() {
-            this.requireElevatedSession()
+            requireElevatedSession()
                 .then(() => this.performSaveAction())
                 .catch(() => this.$toast.error(__('Unable to save role')));
         },

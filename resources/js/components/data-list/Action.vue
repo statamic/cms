@@ -49,11 +49,9 @@
 
 <script>
 import PublishFields from '../publish/Fields.vue';
-import HasElevatedSession from '@statamic/mixins/HasElevatedSession.js';
+import { requireElevatedSessionIf } from '@statamic/components/elevated-sessions';
 
 export default {
-    mixins: [HasElevatedSession],
-
     components: {
         PublishFields,
     },
@@ -140,7 +138,7 @@ export default {
         },
 
         performAction() {
-            this.requireElevatedSessionIf(this.action.requiresElevatedSession).then(() => {
+            requireElevatedSessionIf(this.action.requiresElevatedSession).then(() => {
                 this.running = true;
                 this.$emit('selected', this.action, this.values, this.onDone);
             });

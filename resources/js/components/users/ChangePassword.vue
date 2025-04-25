@@ -41,11 +41,9 @@
 </template>
 
 <script>
-import HasElevatedSession from '@statamic/mixins/HasElevatedSession.js';
+import { requireElevatedSessionIf } from '@statamic/components/elevated-sessions';
 
 export default {
-    mixins: [HasElevatedSession],
-
     props: {
         saveUrl: String,
         requiresCurrentPassword: Boolean,
@@ -80,7 +78,7 @@ export default {
         },
 
         save() {
-            this.requireElevatedSessionIf(!this.requiresCurrentPassword)
+            requireElevatedSessionIf(!this.requiresCurrentPassword)
                 .then(() => this.performSaveRequest())
                 .catch(() => {});
         },
