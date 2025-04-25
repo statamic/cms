@@ -132,28 +132,18 @@ export default {
                 return;
             }
 
-            if (this.action.requiresElevatedSession) {
-                this.requireElevatedSession()
-                    .then(() => this.performAction())
-                    .catch(() => {});
-                return;
-            }
-
             this.performAction();
         },
 
         confirm() {
-            if (this.action.requiresElevatedSession) {
-                this.requireElevatedSession().then(() => this.performAction());
-                return;
-            }
-
             this.performAction();
         },
 
         performAction() {
-            this.running = true;
-            this.$emit('selected', this.action, this.values, this.onDone);
+            (this.action.requiresElevatedSession ? this.requireElevatedSession() : Promise.resolve()).then(() => {
+                this.running = true;
+                this.$emit('selected', this.action, this.values, this.onDone);
+            });
         },
 
         reset() {
