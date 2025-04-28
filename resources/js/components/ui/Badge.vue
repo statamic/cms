@@ -9,6 +9,7 @@ const props = defineProps({
     color: { type: String, default: 'default' },
     href: { type: String, default: null },
     icon: { type: String, default: null },
+    iconAppend: { type: String, default: null },
     pill: { type: Boolean, default: false },
     size: { type: String, default: 'default' },
     subText: { type: String, default: null },
@@ -22,7 +23,7 @@ const tag = computed(() => (props.href ? 'a' : props.as));
 
 const badgeClasses = computed(() => {
     const classes = cva({
-        base: 'flex items-center gap-1 font-normal antialiased whitespace-nowrap no-underline not-prose [button]:cursor-pointer',
+        base: 'flex items-center gap-1 font-normal antialiased whitespace-nowrap no-underline not-prose [button]:cursor-pointer group [&_svg]:opacity-60 [&_svg]:group-hover:opacity-100',
         variants: {
             size: {
                 sm: 'text-2xs py-0 leading-normal px-1 rounded-[0.1875rem] [&_svg]:size-2',
@@ -71,6 +72,7 @@ const badgeClasses = computed(() => {
         <Icon v-if="icon" :name="icon" />
         <slot v-if="hasDefaultSlot" />
         <template v-else>{{ text }}</template>
+        <Icon v-if="iconAppend" :name="iconAppend" />
         <span v-if="props.subText" class="text-[0.625rem] leading-tight font-medium opacity-70">{{ subText }}</span>
     </component>
 </template>
