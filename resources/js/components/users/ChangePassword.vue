@@ -1,6 +1,8 @@
 <template>
     <popover placement="bottom" ref="popper">
-        <button slot="trigger" class="btn" v-text="__('Change Password')" />
+        <template #trigger>
+            <button class="btn" v-text="__('Change Password')" />
+        </template>
         <div class="saving-overlay flex justify-center text-center" v-if="saving">
             <loading-graphic :text="__('Saving')" />
         </div>
