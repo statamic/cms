@@ -11,10 +11,17 @@
         <div class="outside-shadow absolute inset-0"></div>
         <div class="card auth-card">
             <div class="mb-4 pb-4 text-center">
-                <h1 class="mb-4 text-lg text-gray-800 dark:text-white/80">{{ __('Confirm Your Password') }}</h1>
-                <p class="text-sm text-gray dark:text-dark-175">
-                    {{ __('statamic::messages.elevated_session_enter_password') }}
-                </p>
+                @if ($method === 'password_confirmation')
+                    <h1 class="mb-4 text-lg text-gray-800 dark:text-white/80">{{ __('Confirm Your Password') }}</h1>
+                    <p class="text-sm text-gray dark:text-dark-175">
+                        {{ __('statamic::messages.elevated_session_enter_password') }}
+                    </p>
+                @else
+                    <h1 class="mb-4 text-lg text-gray-800 dark:text-white/80">{{ __('Verification Code') }}</h1>
+                    <p class="text-sm text-gray dark:text-dark-175">
+                        {{ __('statamic::messages.elevated_session_enter_verification_code') }}
+                    </p>
+                @endif
             </div>
 
             @if (session('status'))
@@ -26,14 +33,28 @@
             <form method="POST" action="{{ cp_route('elevated-session.confirm') }}">
                 @csrf
 
-                <div class="mb-8">
-                    <label for="password" class="mb-2">{{ __('Password') }}</label>
-                    <input id="password" type="password" class="input-text" name="password" />
+                @if($method === 'password_confirmation')
+                    <div class="mb-8">
+                        <label for="password" class="mb-2">{{ __('Password') }}</label>
+                        <input id="password" type="password" class="input-text" name="password" />
 
-                    @error('password')
+                        @error('password')
                         <div class="mt-2 text-xs text-red-500">{{ $message }}</div>
-                    @enderror
-                </div>
+                        @enderror
+                    </div>
+                @endif
+
+                @if($method === 'verification_code')
+                    <div class="mb-8">
+                        <label for="verification_code" class="mb-2">{{ __('Verification Code') }}</label>
+                        {{-- todo: instructions --}}
+                        <input id="verification_code" type="text" class="input-text" name="verification_code" />
+
+                        @error('verification_code')
+                        <div class="mt-2 text-xs text-red-500">{{ $message }}</div>
+                        @enderror
+                    </div>
+                @endif
 
                 <button type="submit" class="btn-primary">
                     {{ __('Submit') }}
