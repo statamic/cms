@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
 use Statamic\CP\Utilities\UtilityRepository;
 use Statamic\Extensions\Translation\Loader;
 use Statamic\Extensions\Translation\Translator;
@@ -22,6 +23,7 @@ use Statamic\Http\View\Composers\NavComposer;
 use Statamic\Http\View\Composers\SessionExpiryComposer;
 use Statamic\Licensing\LicenseManager;
 use Statamic\Licensing\Outpost;
+use Statamic\Notifications\ElevatedSessionVerificationCode;
 
 class CpServiceProvider extends ServiceProvider
 {
@@ -127,8 +129,21 @@ class CpServiceProvider extends ServiceProvider
                 ->timestamp;
         });
 
+        Request::macro('getElevatedSessionVerificationCode', function () {
+            return session()->get('statamic_elevated_session_verification_code');
+        });
+
         Session::macro('elevate', function () {
             $this->put('statamic_elevated_session', now()->timestamp);
+        });
+
+        Session::macro('sendElevatedSessionVerificationCode', function () {
+            session()->put(
+                key: 'statamic_elevated_session_verification_code',
+                value: $verificationCode = Str::random(20)
+            );
+
+            User::current()->notify(new ElevatedSessionVerificationCode($verificationCode));
         });
     }
 }

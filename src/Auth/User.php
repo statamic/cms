@@ -358,6 +358,11 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
         return __('User');
     }
 
+    public function getElevatedSessionMethod(): string
+    {
+        return $this->password() ? 'password_confirmation' : 'verification_code';
+    }
+
     protected function getComputedCallbacks()
     {
         return Facades\User::getComputedCallbacks();

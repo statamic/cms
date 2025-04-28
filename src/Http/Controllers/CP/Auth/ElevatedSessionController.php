@@ -18,16 +18,11 @@ class ElevatedSessionController
         $response = [
             'elevated' => $request->hasElevatedSession(),
             'expiry' => $request->getElevatedSessionExpiry(),
-            'method' => $user->password() ? 'password_confirmation' : 'verification_code',
+            'method' => $user->getElevatedSessionMethod(),
         ];
 
-        if (! $request->hasElevatedSession() && $response['method'] === 'verification_code') {
-            session()->put(
-                key: 'statamic_elevated_session_verification_code',
-                value: $verificationCode = Str::random(20)
-            );
-
-            $user->notify(new ElevatedSessionVerificationCode($verificationCode));
+        if (! $request->hasElevatedSession() && $user->getElevatedSessionMethod() === 'verification_code') {
+            session()->sendElevatedSessionVerificationCode();
         }
 
         return $response;
@@ -36,19 +31,13 @@ class ElevatedSessionController
     public function showForm()
     {
         $user = User::current();
-        $method = $user->password() ? 'password_confirmation' : 'verification_code';
 
-        if ($method === 'verification_code') {
-            session()->put(
-                key: 'statamic_elevated_session_verification_code',
-                value: $verificationCode = Str::random(20)
-            );
-
-            $user->notify(new ElevatedSessionVerificationCode($verificationCode));
+        if ($user->getElevatedSessionMethod() === 'verification_code') {
+            session()->sendElevatedSessionVerificationCode();
         }
 
         return view('statamic::auth.confirm-password', [
-            'method' => $method,
+            'method' => $user->getElevatedSessionMethod(),
         ]);
     }
 
@@ -61,15 +50,13 @@ class ElevatedSessionController
             'verification_code' => 'required_without:password',
         ]);
 
-        $method = $request->password ? 'password_confirmation' : 'verification_code';
-
         if ($request->password && ! Hash::check($request->password, $user->password())) {
             throw ValidationException::withMessages([
                 'password' => [__('statamic::validation.current_password')],
             ]);
         }
 
-        if ($request->verification_code && $request->verification_code !== $request->session()->get('statamic_elevated_session_verification_code')) {
+        if ($request->verification_code && $request->verification_code !== $request->getElevatedSessionVerificationCode()) {
             throw ValidationException::withMessages([
                 'verification_code' => [__('statamic::validation.elevated_session_verification_code')],
             ]);
@@ -79,6 +66,6 @@ class ElevatedSessionController
 
         return $request->wantsJson()
             ? $this->status($request)
-            : redirect()->intended(cp_route('index'))->with('success', $method === 'password_confirmation' ? __('Password confirmed') : __('Code verified'));
+            : redirect()->intended(cp_route('index'))->with('success', $user->getElevatedSessionMethod() === 'password_confirmation' ? __('Password confirmed') : __('Code verified'));
     }
 }
