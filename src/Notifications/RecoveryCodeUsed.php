@@ -7,10 +7,6 @@ use Illuminate\Notifications\Notification;
 
 class RecoveryCodeUsed extends Notification
 {
-    public function __construct()
-    {
-    }
-
     public function via($notifiable): array
     {
         return ['mail'];
