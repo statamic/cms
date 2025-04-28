@@ -49,7 +49,7 @@
                 >
                     <button
                         class="text-gray hover:text-gray-900 dark:text-dark-150 dark:hover:text-dark-100"
-                        @click="$emit('cancel')"
+                        @click="$emit('close')"
                         v-text="__('Cancel')"
                     />
                     <button
