@@ -9,7 +9,6 @@ use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Middleware\CP\RequireElevatedSession;
-use Statamic\Http\Middleware\RequireStatamicPro;
 
 class TwoFactorRecoveryCodesController extends CpController
 {
