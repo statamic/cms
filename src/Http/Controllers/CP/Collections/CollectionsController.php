@@ -58,10 +58,20 @@ class CollectionsController extends CpController
             return [
                 'id' => $collection->handle(),
                 'title' => $collection->title(),
-                'entries' => $collection->queryEntries()->where('site', Site::selected())->count(),
+                'entries' => $collection->queryEntries()->where('site', Site::selected())->limit(5)->get(),
+                'entries_count' => $collection->queryEntries()->where('site', Site::selected())->count(),
+                'published_entries_count' => $collection->queryEntries()->where('site', Site::selected())->where('status', 'published')->count(),
+                'draft_entries_count' => $collection->queryEntries()->where('site', Site::selected())->where('status', 'draft')->count(),
+                'scheduled_entries_count' => $collection->queryEntries()->where('site', Site::selected())->where('status', 'scheduled')->count(),
+                'blueprints' => $collection->entryBlueprints()->reject->hidden()->values(),
+                'columns' => [
+                    ['label' => 'Title', 'field' => 'title', 'visible' => true],
+                    ['label' => 'Date', 'field' => 'date', 'visible' => true]
+                ],
                 'edit_url' => $collection->editUrl(),
                 'delete_url' => $collection->deleteUrl(),
                 'entries_url' => cp_route('collections.show', $collection->handle()),
+                'create_entry_url' => $collection->createEntryUrl(Site::selected()),
                 'url' => $collection->absoluteUrl(Site::selected()->handle()),
                 'blueprints_url' => cp_route('collections.blueprints.index', $collection->handle()),
                 'scaffold_url' => cp_route('collections.scaffold', $collection->handle()),

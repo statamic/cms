@@ -6,12 +6,17 @@ const props = defineProps({
     size: { type: String, default: 'base' },
     level: { type: [Number, null], default: null },
     text: { type: [String, null], default: null },
+    href: { type: [String, null], default: null },
 });
 
 const slots = useSlots();
 const hasDefaultSlot = !!slots.default;
 
-const tag = computed(() => (props.level ? `h${props.level}` : 'div'));
+const tag = computed(() => {
+    if (props.level) return `h${props.level}`;
+    if (props.href) return 'a';
+    return 'div';
+});
 
 const classes = cva({
     base: 'font-medium [&:has(+[data-ui-subheading])]:mb-0.5 antialiased not-prose',
@@ -26,7 +31,7 @@ const classes = cva({
 </script>
 
 <template>
-    <component :is="tag" :class="classes" data-ui-heading>
+    <component :is="tag" :class="classes" :href="href" data-ui-heading>
         <span v-if="!hasDefaultSlot">{{ text }}</span>
         <slot v-else />
     </component>

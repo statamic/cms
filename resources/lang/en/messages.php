@@ -76,6 +76,7 @@ return [
     'duplicate_action_warning_localizations' => 'One or more selected entries are localizations. In those cases, the origin entry will be duplicated instead.',
     'email_utility_configuration_description' => 'Mail settings are configured in <code>:path</code>',
     'email_utility_description' => 'Check email configuration settings and send test emails.',
+    'entry_count' => ':count entries',
     'entry_origin_instructions' => 'The new localization will inherit values from the entry in the selected site.',
     'expect_root_instructions' => 'Consider the first page in the tree a "root" or "home" page.',
     'field_conditions_always_save_instructions' => 'Always save field value, even if field is hidden.',
