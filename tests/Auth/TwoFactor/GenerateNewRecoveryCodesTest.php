@@ -13,15 +13,6 @@ class GenerateNewRecoveryCodesTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    private $action;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->action = app(GenerateNewRecoveryCodes::class);
-    }
-
     #[Test]
     public function it_correctly_creates_eight_recovery_codes_for_a_user()
     {
@@ -29,7 +20,7 @@ class GenerateNewRecoveryCodesTest extends TestCase
 
         $this->assertNull($user->two_factor_recovery_codes);
 
-        $this->action->__invoke($user);
+        (new GenerateNewRecoveryCodes)($user);
 
         $this->assertIsString($user->two_factor_recovery_codes);
 
