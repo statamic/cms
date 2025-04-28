@@ -20,7 +20,7 @@ class RolesController extends CpController
     public function __construct()
     {
         $this->middleware(RequireStatamicPro::class);
-        $this->middleware(RequireElevatedSession::class)->except('index', 'destroy');
+        $this->middleware(RequireElevatedSession::class)->except('index');
     }
 
     public function index(Request $request)
