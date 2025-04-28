@@ -26,7 +26,7 @@
                     v-if="canEditPassword"
                     :save-url="actions.password"
                     :requires-current-password="requiresCurrentPassword"
-                    class="ltr:mr-4 rtl:ml-4"
+                    trigger-class="ltr:mr-4 rtl:ml-4"
                 />
 
                 <button class="btn-primary" @click.prevent="save" v-text="__('Save')" />
