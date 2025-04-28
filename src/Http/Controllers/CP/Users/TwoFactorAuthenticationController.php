@@ -26,6 +26,10 @@ class TwoFactorAuthenticationController extends CpController
             abort(403);
         }
 
+        if ($user->hasEnabledTwoFactorAuthentication()) {
+            abort(403);
+        }
+
         if (! $user->isTwoFactorAuthenticationRequired()) {
             $this->requireElevatedSession();
         }

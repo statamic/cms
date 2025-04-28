@@ -109,6 +109,22 @@ class TwoFactorAuthenticationControllerTest extends TestCase
     }
 
     #[Test]
+    public function it_cant_enable_two_factor_authentication_when_it_is_already_enabled()
+    {
+        Event::fake();
+
+        $user = $this->userWithTwoFactorEnabled();
+
+        $this
+            ->actingAs($user)
+            ->withActiveElevatedSession()
+            ->get(cp_route('users.two-factor.enable', $user->id))
+            ->assertForbidden();
+
+        Event::assertNotDispatched(TwoFactorAuthenticationEnabled::class, fn ($event) => $event->user->id === $user->id);
+    }
+
+    #[Test]
     public function it_doesnt_regenerate_secret_when_validation_error_is_present()
     {
         Event::fake();
