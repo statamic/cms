@@ -7,7 +7,8 @@
         <ui-badge
             href="{{ $url }}"
             pill
-            text="{{ $text ?? __("Learn more about $topic") }}"
+            icon-append="external-link"
+            text="{{ $text ?? __("Learn about $topic") }}"
         />
     </div>
 @endif
