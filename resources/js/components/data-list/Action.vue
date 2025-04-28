@@ -49,6 +49,7 @@
 
 <script>
 import PublishFields from '../publish/Fields.vue';
+import { requireElevatedSessionIf } from '@statamic/components/elevated-sessions';
 
 export default {
     components: {
@@ -129,13 +130,18 @@ export default {
                 return;
             }
 
-            this.running = true;
-            this.$emit('selected', this.action, this.values, this.onDone);
+            this.performAction();
         },
 
         confirm() {
-            this.running = true;
-            this.$emit('selected', this.action, this.values, this.onDone);
+            this.performAction();
+        },
+
+        performAction() {
+            requireElevatedSessionIf(this.action.requiresElevatedSession).then(() => {
+                this.running = true;
+                this.$emit('selected', this.action, this.values, this.onDone);
+            });
         },
 
         reset() {

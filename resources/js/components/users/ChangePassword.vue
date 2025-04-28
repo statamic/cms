@@ -41,6 +41,8 @@
 </template>
 
 <script>
+import { requireElevatedSessionIf } from '@statamic/components/elevated-sessions';
+
 export default {
     props: {
         saveUrl: String,
@@ -76,6 +78,12 @@ export default {
         },
 
         save() {
+            requireElevatedSessionIf(!this.requiresCurrentPassword)
+                .then(() => this.performSaveRequest())
+                .catch(() => {});
+        },
+
+        performSaveRequest() {
             this.clearErrors();
             this.saving = true;
 

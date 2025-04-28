@@ -186,6 +186,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Elevated Sessions
+    |--------------------------------------------------------------------------
+    |
+    | Users may be required to reauthorize before performing certain
+    | sensitive actions. This is called an elevated session. Here
+    | you may configure the duration of the session in minutes.
+    |
+    */
+
+    'elevated_session_duration' => 15,
+
+    /*
+    |--------------------------------------------------------------------------
     | Default Sorting
     |--------------------------------------------------------------------------
     |
