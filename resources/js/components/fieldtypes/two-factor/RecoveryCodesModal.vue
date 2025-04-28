@@ -27,7 +27,7 @@
                     </div>
 
                     <div class="flex items-center space-x-4">
-                        <button class="btn" @click="copyToClipboard">{{ __('Copy') }}</button>
+                        <button class="btn" v-if="canCopy" @click="copyToClipboard">{{ __('Copy') }}</button>
 
                         <a class="btn" :href="downloadUrl" download>{{ __('Download') }}</a>
 
@@ -81,6 +81,12 @@ export default {
         };
     },
 
+    computed: {
+        canCopy() {
+            return navigator.clipboard;
+        },
+    },
+
     mounted() {
         this.getRecoveryCodes();
     },
@@ -105,6 +111,8 @@ export default {
         },
 
         copyToClipboard() {
+            if (!navigator.clipboard) return Statamic.$toast.error(__('Unable to copy to clipboard'));
+
             navigator.clipboard
                 .writeText(this.recoveryCodes.join('\n'))
                 .then(() => Statamic.$toast.success(__('Copied to clipboard')))
