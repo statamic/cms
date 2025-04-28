@@ -40,14 +40,30 @@ class StoreRoleTest extends TestCase
         return tap(User::make()->assignRole('user'))->save();
     }
 
+    private function withActiveElevatedSession()
+    {
+        return $this->session(['statamic_elevated_session' => now()->timestamp]);
+    }
+
     #[Test]
     public function it_denies_access_without_permission_to_create_roles()
     {
         $this
             ->actingAsUserWithPermissions([])
+            ->withActiveElevatedSession()
             ->from('/original')
             ->store()
             ->assertRedirect('/original');
+    }
+
+    #[Test]
+    public function it_denies_access_without_active_elevated_session()
+    {
+        $this
+            ->actingAsUserWithPermissions(['edit roles'])
+            ->from('/original')
+            ->store()
+            ->assertRedirect('/cp/auth/confirm-password');
     }
 
     #[Test]
@@ -55,6 +71,7 @@ class StoreRoleTest extends TestCase
     {
         $this
             ->actingAsUserWithPermissions(['edit roles'])
+            ->withActiveElevatedSession()
             ->store([
                 'title' => 'Test',
                 'handle' => 'test_role',
@@ -74,6 +91,7 @@ class StoreRoleTest extends TestCase
     {
         $this
             ->actingAs(tap(User::make()->makeSuper())->save())
+            ->withActiveElevatedSession()
             ->store(['super' => true])
             ->assertOk()
             ->assertJson(['redirect' => cp_route('roles.index')]);
@@ -88,6 +106,7 @@ class StoreRoleTest extends TestCase
     {
         $this
             ->actingAsUserWithPermissions(['edit roles'])
+            ->withActiveElevatedSession()
             ->store(['super' => true])
             ->assertOk()
             ->assertJson(['redirect' => cp_route('roles.index')]);
@@ -102,6 +121,7 @@ class StoreRoleTest extends TestCase
     {
         $this
             ->actingAsUserWithPermissions(['edit roles'])
+            ->withActiveElevatedSession()
             ->store([
                 'super' => false,
                 'permissions' => ['super'],
