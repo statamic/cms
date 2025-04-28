@@ -107,12 +107,8 @@ export default {
         copyToClipboard() {
             navigator.clipboard
                 .writeText(this.recoveryCodes.join('\n'))
-                .then(() => {
-                    Statamic.$toast.success(__('Copied to clipboard'));
-                })
-                .catch((error) => {
-                    Statamic.$toast.error(__('Unable to copy to clipboard'));
-                });
+                .then(() => Statamic.$toast.success(__('Copied to clipboard')))
+                .catch((error) => Statamic.$toast.error(__('Unable to copy to clipboard')));
         },
     },
 };
