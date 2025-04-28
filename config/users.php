@@ -167,6 +167,19 @@ return [
         'redirect' => env('STATAMIC_IMPERSONATE_REDIRECT', null),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Elevated Sessions
+    |--------------------------------------------------------------------------
+    |
+    | Users may be required to reauthorize before performing certain
+    | sensitive actions. This is called an elevated session. Here
+    | you may configure the duration of the session in minutes.
+    |
+    */
+
+    'elevated_session_duration' => 15,
+
     'two_factor' => [
 
         /*
@@ -183,19 +196,6 @@ return [
         'enforced_roles' => [],
 
     ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Elevated Sessions
-    |--------------------------------------------------------------------------
-    |
-    | Users may be required to reauthorize before performing certain
-    | sensitive actions. This is called an elevated session. Here
-    | you may configure the duration of the session in minutes.
-    |
-    */
-
-    'elevated_session_duration' => 15,
 
     /*
     |--------------------------------------------------------------------------

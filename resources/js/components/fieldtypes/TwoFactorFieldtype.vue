@@ -5,7 +5,7 @@
                 <p class="mb-4 text-sm text-gray">{{ __('statamic::messages.two_factor_enable_introduction') }}</p>
 
                 <div class="flex space-x-2">
-                    <button class="btn" @click="setupModalOpen = true">
+                    <button class="btn" @click="openSetupModal">
                         {{ __('Enable two factor authentication') }}
                     </button>
                 </div>
@@ -20,7 +20,7 @@
             <p class="mb-4 text-sm text-gray">{{ __('statamic::messages.two_factor_enabled') }}</p>
 
             <div class="flex items-center space-x-4">
-                <button v-if="isCurrentUser" class="btn" @click="recoveryCodesModalOpen = true">
+                <button v-if="isCurrentUser" class="btn" @click="openRecoveryCodesModal">
                     {{ __('Show recovery codes') }}
                 </button>
 
@@ -66,6 +66,7 @@ import Fieldtype from './Fieldtype.vue';
 import DisableTwoFactor from './two-factor/Disable.vue';
 import TwoFactorSetup from './two-factor/Setup.vue';
 import TwoFactorRecoveryCodesModal from './two-factor/RecoveryCodesModal.vue';
+import { requireElevatedSession } from '@statamic/components/elevated-sessions';
 
 export default {
     mixins: [Fieldtype],
@@ -96,6 +97,18 @@ export default {
     },
 
     methods: {
+        openSetupModal() {
+            requireElevatedSession()
+                .then(() => (this.setupModalOpen = true))
+                .catch(() => {});
+        },
+
+        openRecoveryCodesModal() {
+            requireElevatedSession()
+                .then(() => (this.recoveryCodesModalOpen = true))
+                .catch(() => {});
+        },
+
         setupComplete() {
             this.isSetup = true;
             this.setupModalOpen = false;

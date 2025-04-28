@@ -32,6 +32,8 @@
 </template>
 
 <script>
+import { requireElevatedSession } from '@statamic/components/elevated-sessions';
+
 export default {
     props: {
         url: String,
@@ -54,7 +56,9 @@ export default {
 
     methods: {
         confirm() {
-            this.confirming = true;
+            requireElevatedSession()
+                .then(() => (this.confirming = true))
+                .catch(() => {});
         },
 
         disable() {

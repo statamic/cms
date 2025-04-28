@@ -9,15 +9,25 @@ use Statamic\Auth\TwoFactor\EnableTwoFactorAuthentication;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Middleware\CP\RequireElevatedSession;
 
 class TwoFactorAuthenticationController extends CpController
 {
+    public function __construct(Request $request)
+    {
+        $this->middleware(RequireElevatedSession::class)->except('enable');
+    }
+
     public function enable(Request $request, $user, EnableTwoFactorAuthentication $enable)
     {
         throw_unless($user = User::find($user), new NotFoundHttpException);
 
         if (User::current()->id !== $user->id) {
             abort(403);
+        }
+
+        if (! $user->isTwoFactorAuthenticationRequired()) {
+            $this->requireElevatedSession();
         }
 
         // We don't want to regenerate the QR code when there's an error in the session.

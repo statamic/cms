@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\TwoFactor\RecoveryCode;
 use Statamic\Auth\TwoFactor\TwoFactorAuthenticationProvider;
+use Statamic\Exceptions\ElevatedSessionAuthorizationException;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -19,6 +20,7 @@ class UserRecoveryCodesControllerTest extends TestCase
     {
         $this
             ->actingAs($user = $this->userWithTwoFactorEnabled())
+            ->withActiveElevatedSession()
             ->get(cp_route('users.two-factor.recovery-codes.show', [
                 'user' => $user->id,
             ]))
@@ -29,10 +31,22 @@ class UserRecoveryCodesControllerTest extends TestCase
     }
 
     #[Test]
+    public function it_does_not_return_recovery_codes_without_elevated_session()
+    {
+        $this
+            ->actingAs($user = $this->userWithTwoFactorEnabled())
+            ->get(cp_route('users.two-factor.recovery-codes.show', [
+                'user' => $user->id,
+            ]))
+            ->assertRedirect('/cp/auth/confirm-password');
+    }
+
+    #[Test]
     public function it_does_not_return_recovery_codes_for_another_user()
     {
         $this
             ->actingAs($this->userWithTwoFactorEnabled())
+            ->withActiveElevatedSession()
             ->get(cp_route('users.two-factor.recovery-codes.show', [
                 'user' => $this->userWithTwoFactorEnabled()->id,
             ]))
@@ -46,6 +60,7 @@ class UserRecoveryCodesControllerTest extends TestCase
 
         $this
             ->actingAs($user)
+            ->withActiveElevatedSession()
             ->post(cp_route('users.two-factor.recovery-codes.generate', [
                 'user' => $user->id,
             ]))
@@ -54,10 +69,24 @@ class UserRecoveryCodesControllerTest extends TestCase
     }
 
     #[Test]
+    public function it_cannot_generate_recovery_codes_without_elevated_session()
+    {
+        $user = $this->userWithTwoFactorEnabled();
+
+        $this
+            ->actingAs($user)
+            ->post(cp_route('users.two-factor.recovery-codes.generate', [
+                'user' => $user->id,
+            ]))
+            ->assertRedirect('/cp/auth/confirm-password');
+    }
+
+    #[Test]
     public function it_cannot_generate_recovery_codes_for_another_user()
     {
         $this
             ->actingAs($this->userWithTwoFactorEnabled())
+            ->withActiveElevatedSession()
             ->post(cp_route('users.two-factor.recovery-codes.generate', [
                 'user' => $this->userWithTwoFactorEnabled()->id,
             ]))
@@ -65,12 +94,13 @@ class UserRecoveryCodesControllerTest extends TestCase
     }
 
     #[Test]
-    public function can_download_recovery_codes()
+    public function it_can_download_recovery_codes()
     {
         $user = $this->userWithTwoFactorEnabled();
 
         $this
             ->actingAs($user)
+            ->withActiveElevatedSession()
             ->get(cp_route('users.two-factor.recovery-codes.download', [
                 'user' => $user->id,
             ]))
@@ -79,10 +109,24 @@ class UserRecoveryCodesControllerTest extends TestCase
     }
 
     #[Test]
-    public function cannot_download_recovery_codes_for_another_user()
+    public function it_cannot_download_recovery_codes_without_elevated_session()
+    {
+        $user = $this->userWithTwoFactorEnabled();
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('users.two-factor.recovery-codes.download', [
+                'user' => $user->id,
+            ]))
+            ->assertRedirect('/cp/auth/confirm-password');
+    }
+
+    #[Test]
+    public function it_cannot_download_recovery_codes_for_another_user()
     {
         $this
             ->actingAs($this->userWithTwoFactorEnabled())
+            ->withActiveElevatedSession()
             ->get(cp_route('users.two-factor.recovery-codes.download', [
                 'user' => $this->userWithTwoFactorEnabled()->id,
             ]))
@@ -109,5 +153,10 @@ class UserRecoveryCodesControllerTest extends TestCase
         $user->save();
 
         return $user;
+    }
+
+    private function withActiveElevatedSession()
+    {
+        return $this->session(['statamic_elevated_session' => now()->timestamp]);
     }
 }

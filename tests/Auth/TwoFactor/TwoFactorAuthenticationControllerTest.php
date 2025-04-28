@@ -30,6 +30,7 @@ class TwoFactorAuthenticationControllerTest extends TestCase
 
         $this
             ->actingAs($user)
+            ->withActiveElevatedSession()
             ->get(cp_route('users.two-factor.enable', $user->id))
             ->assertOk()
             ->assertJsonStructure(['qr', 'secret_key', 'confirm_url']);
@@ -38,6 +39,51 @@ class TwoFactorAuthenticationControllerTest extends TestCase
         $this->assertNotNull($user->two_factor_recovery_codes);
 
         Event::assertDispatched(TwoFactorAuthenticationEnabled::class, fn ($event) => $event->user->id === $user->id);
+    }
+
+    #[Test]
+    public function it_enables_two_factor_authentication_without_elevated_session_when_two_factor_is_required()
+    {
+        Event::fake();
+
+        config()->set('statamic.users.two_factor.enforced_roles', ['*']);
+
+        $user = $this->user();
+
+        $this->assertNull($user->two_factor_secret);
+        $this->assertNull($user->two_factor_recovery_codes);
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('users.two-factor.enable', $user->id))
+            ->assertOk()
+            ->assertJsonStructure(['qr', 'secret_key', 'confirm_url']);
+
+        $this->assertNotNull($user->two_factor_secret);
+        $this->assertNotNull($user->two_factor_recovery_codes);
+
+        Event::assertDispatched(TwoFactorAuthenticationEnabled::class, fn ($event) => $event->user->id === $user->id);
+    }
+
+    #[Test]
+    public function it_cant_enable_two_factor_authentication_without_elevated_session_when_two_factor_is_optional()
+    {
+        Event::fake();
+
+        $user = $this->user();
+
+        $this->assertNull($user->two_factor_secret);
+        $this->assertNull($user->two_factor_recovery_codes);
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('users.two-factor.enable', $user->id))
+            ->assertRedirect('/cp/auth/confirm-password');
+
+        $this->assertNull($user->two_factor_secret);
+        $this->assertNull($user->two_factor_recovery_codes);
+
+        Event::assertNotDispatched(TwoFactorAuthenticationEnabled::class, fn ($event) => $event->user->id === $user->id);
     }
 
     #[Test]
@@ -52,6 +98,7 @@ class TwoFactorAuthenticationControllerTest extends TestCase
 
         $this
             ->actingAs($this->userWithTwoFactorEnabled())
+            ->withActiveElevatedSession()
             ->get(cp_route('users.two-factor.enable', $user->id))
             ->assertForbidden();
 
@@ -73,6 +120,7 @@ class TwoFactorAuthenticationControllerTest extends TestCase
 
         $this
             ->actingAs($user)
+            ->withActiveElevatedSession()
             ->session([
                 'errors' => collect(['code' => 'The provided two factor authentication code was invalid.']),
             ])
@@ -98,6 +146,7 @@ class TwoFactorAuthenticationControllerTest extends TestCase
 
         $this
             ->actingAs($user)
+            ->withActiveElevatedSession()
             ->post(cp_route('users.two-factor.confirm', $user->id), [
                 'code' => $this->getOneTimeCode($user),
             ])
@@ -118,6 +167,7 @@ class TwoFactorAuthenticationControllerTest extends TestCase
 
         $this
             ->actingAs($user)
+            ->withActiveElevatedSession()
             ->post(cp_route('users.two-factor.confirm', $user->id), [
                 'code' => '123456',
             ])
@@ -138,10 +188,31 @@ class TwoFactorAuthenticationControllerTest extends TestCase
 
         $this
             ->actingAs($this->userWithTwoFactorEnabled())
+            ->withActiveElevatedSession()
             ->post(cp_route('users.two-factor.confirm', $user->id), [
                 'code' => $this->getOneTimeCode($user),
             ])
             ->assertForbidden();
+
+        $this->assertNull($user->two_factor_confirmed_at);
+    }
+
+    #[Test]
+    public function it_cant_confirm_two_factor_authentication_without_elevated_session()
+    {
+        $user = $this->user();
+        $user->set('two_factor_secret', encrypt(app(TwoFactorAuthenticationProvider::class)->generateSecretKey()));
+        $user->set('two_factor_recovery_codes', encrypt(['abc', 'def', 'ghi', 'jkl', 'mno', 'pqr', 'stu', 'vwx']));
+        $user->save();
+
+        $this->assertNull($user->two_factor_confirmed_at);
+
+        $this
+            ->actingAs($user)
+            ->post(cp_route('users.two-factor.confirm', $user->id), [
+                'code' => $this->getOneTimeCode($user),
+            ])
+            ->assertRedirect('/cp/auth/confirm-password');
 
         $this->assertNull($user->two_factor_confirmed_at);
     }
@@ -155,6 +226,7 @@ class TwoFactorAuthenticationControllerTest extends TestCase
 
         $this
             ->actingAs($user)
+            ->withActiveElevatedSession()
             ->delete(cp_route('users.two-factor.disable', [
                 'user' => $user->id,
             ]))
@@ -182,6 +254,7 @@ class TwoFactorAuthenticationControllerTest extends TestCase
 
         $this
             ->actingAs($user)
+            ->withActiveElevatedSession()
             ->delete(cp_route('users.two-factor.disable', [
                 'user' => $user->id,
             ]))
@@ -206,6 +279,7 @@ class TwoFactorAuthenticationControllerTest extends TestCase
 
         $this
             ->actingAs($this->userWithTwoFactorEnabled())
+            ->withActiveElevatedSession()
             ->delete(cp_route('users.two-factor.disable', [
                 'user' => $otherUser->id,
             ]))
@@ -233,6 +307,7 @@ class TwoFactorAuthenticationControllerTest extends TestCase
 
         $this
             ->actingAs($this->userWithTwoFactorEnabled())
+            ->withActiveElevatedSession()
             ->delete(cp_route('users.two-factor.disable', [
                 'user' => $otherUser->id,
             ]))
@@ -246,6 +321,29 @@ class TwoFactorAuthenticationControllerTest extends TestCase
         $this->assertNull($otherUser->two_factor_secret);
 
         Event::assertDispatched(TwoFactorAuthenticationDisabled::class, fn ($event) => $event->user->id === $otherUser->id);
+    }
+
+    #[Test]
+    public function it_cant_disable_two_factor_authentication_without_elevated_session()
+    {
+        Event::fake();
+
+        $user = $this->userWithTwoFactorEnabled();
+
+        $this
+            ->actingAs($user)
+            ->delete(cp_route('users.two-factor.disable', [
+                'user' => $user->id,
+            ]))
+            ->assertRedirect('/cp/auth/confirm-password');
+
+        $user->fresh();
+
+        $this->assertNotNull($user->two_factor_confirmed_at);
+        $this->assertNotNull($user->two_factor_recovery_codes);
+        $this->assertNotNull($user->two_factor_secret);
+
+        Event::assertNotDispatched(TwoFactorAuthenticationDisabled::class, fn ($event) => $event->user->id === $user->id);
     }
 
     private function user()
@@ -275,5 +373,10 @@ class TwoFactorAuthenticationControllerTest extends TestCase
         $internalProvider = app(Google2FA::class);
 
         return $internalProvider->getCurrentOtp($user->twoFactorSecretKey());
+    }
+
+    private function withActiveElevatedSession()
+    {
+        return $this->session(['statamic_elevated_session' => now()->timestamp]);
     }
 }
