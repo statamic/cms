@@ -49,7 +49,7 @@ class TwoFactorTest extends TestCase
             ->save();
         $this->assertTrue($this->fieldtype()->preload()['is_setup']);
 
-        config()->set('statamic.users.two_factor.enforced_roles', ['*']);
+        config()->set('statamic.users.two_factor_enforced_roles', ['*']);
         $this->assertTrue($this->fieldtype()->preload()['is_enforced']);
     }
 
@@ -84,7 +84,7 @@ class TwoFactorTest extends TestCase
             ->save();
         $this->assertTrue($this->fieldtype()->preload()['is_setup']);
 
-        config()->set('statamic.users.two_factor.enforced_roles', ['*']);
+        config()->set('statamic.users.two_factor_enforced_roles', ['*']);
         $this->assertTrue($this->fieldtype()->preload()['is_enforced']);
     }
 

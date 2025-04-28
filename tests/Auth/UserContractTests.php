@@ -597,13 +597,13 @@ trait UserContractTests
 
         $user = tap($this->makeUser()->assignRole('test'))->saveQuietly();
 
-        config()->set('statamic.users.two_factor.enforced_roles', []);
+        config()->set('statamic.users.two_factor_enforced_roles', []);
         $this->assertFalse($user->isTwoFactorAuthenticationRequired());
 
-        config()->set('statamic.users.two_factor.enforced_roles', ['test']);
+        config()->set('statamic.users.two_factor_enforced_roles', ['test']);
         $this->assertTrue($user->isTwoFactorAuthenticationRequired());
 
-        config()->set('statamic.users.two_factor.enforced_roles', ['*']);
+        config()->set('statamic.users.two_factor_enforced_roles', ['*']);
         $this->assertTrue($user->isTwoFactorAuthenticationRequired());
     }
 
@@ -612,13 +612,13 @@ trait UserContractTests
     {
         $user = tap($this->makeUser())->save();
 
-        config()->set('statamic.users.two_factor.enforced_roles', []);
+        config()->set('statamic.users.two_factor_enforced_roles', []);
         $this->assertFalse($user->isTwoFactorAuthenticationRequired());
 
-        config()->set('statamic.users.two_factor.enforced_roles', ['test']);
+        config()->set('statamic.users.two_factor_enforced_roles', ['test']);
         $this->assertFalse($user->isTwoFactorAuthenticationRequired());
 
-        config()->set('statamic.users.two_factor.enforced_roles', ['*']);
+        config()->set('statamic.users.two_factor_enforced_roles', ['*']);
         $this->assertTrue($user->isTwoFactorAuthenticationRequired());
     }
 
@@ -627,13 +627,13 @@ trait UserContractTests
     {
         $user = tap($this->makeUser()->makeSuper())->save();
 
-        config()->set('statamic.users.two_factor.enforced_roles', []);
+        config()->set('statamic.users.two_factor_enforced_roles', []);
         $this->assertFalse($user->isTwoFactorAuthenticationRequired());
 
-        config()->set('statamic.users.two_factor.enforced_roles', ['super_users']);
+        config()->set('statamic.users.two_factor_enforced_roles', ['super_users']);
         $this->assertTrue($user->isTwoFactorAuthenticationRequired());
 
-        config()->set('statamic.users.two_factor.enforced_roles', ['*']);
+        config()->set('statamic.users.two_factor_enforced_roles', ['*']);
         $this->assertTrue($user->isTwoFactorAuthenticationRequired());
     }
 

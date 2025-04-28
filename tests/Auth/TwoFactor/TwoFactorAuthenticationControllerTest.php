@@ -46,7 +46,7 @@ class TwoFactorAuthenticationControllerTest extends TestCase
     {
         Event::fake();
 
-        config()->set('statamic.users.two_factor.enforced_roles', ['*']);
+        config()->set('statamic.users.two_factor_enforced_roles', ['*']);
 
         $user = $this->user();
 
@@ -264,7 +264,7 @@ class TwoFactorAuthenticationControllerTest extends TestCase
         Event::fake();
 
         // Enforced for everyone
-        config()->set('statamic.users.two_factor.enforced_roles', ['*']);
+        config()->set('statamic.users.two_factor_enforced_roles', ['*']);
 
         $user = $this->userWithTwoFactorEnabled();
 
@@ -317,7 +317,7 @@ class TwoFactorAuthenticationControllerTest extends TestCase
         Event::fake();
 
         // Enforced for everyone
-        config()->set('statamic.users.two_factor.enforced_roles', ['*']);
+        config()->set('statamic.users.two_factor_enforced_roles', ['*']);
 
         $otherUser = $this->userWithTwoFactorEnabled();
 

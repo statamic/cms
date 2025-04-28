@@ -363,7 +363,7 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
 
     public function isTwoFactorAuthenticationRequired(): bool
     {
-        $enforcedRoles = config('statamic.users.two_factor.enforced_roles', []);
+        $enforcedRoles = config('statamic.users.two_factor_enforced_roles', []);
 
         if (in_array('*', $enforcedRoles)) {
             return true;
