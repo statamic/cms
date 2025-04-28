@@ -57,7 +57,7 @@
                         <!-- Data input -->
                         <div
                             v-else
-                            class="w-full flex items-center justify-between cursor-pointer"
+                            class="w-full flex items-center justify-between cursor-pointer min-w-[240px]"
                             @click="openSelector"
                         >
 
