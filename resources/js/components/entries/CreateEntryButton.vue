@@ -1,9 +1,9 @@
 <template>
     <div>
-        <Button @click="create" v-if="!hasMultipleBlueprints" :text="text" />
+        <Button @click="create" v-if="!hasMultipleBlueprints" :text="text" :size="size" />
         <Dropdown v-else>
             <template #trigger>
-                <Button @click.prevent="create" :variant icon-append="ui/chevron-down" :text="text" />
+                <Button @click.prevent="create" :variant icon-append="ui/chevron-down" :text="text" :size="size" />
             </template>
             <DropdownMenu>
                 <DropdownLabel v-text="__('Choose Blueprint')" />
@@ -35,6 +35,7 @@ export default {
         blueprints: Array,
         variant: { type: String, default: 'primary' },
         text: { type: String, default: () => __('Create Entry') },
+        size: { type: String, default: 'base' },
         buttonClass: { type: String, default: 'btn' },
     },
 
