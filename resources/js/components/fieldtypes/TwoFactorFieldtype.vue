@@ -100,7 +100,7 @@ export default {
         openSetupModal() {
             requireElevatedSession()
                 .then(() => (this.setupModalOpen = true))
-                .catch(() => {});
+                .catch(() => this.$toast.error(__('statamic::messages.elevated_session_required')));
         },
 
         openRecoveryCodesModal() {

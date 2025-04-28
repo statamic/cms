@@ -80,6 +80,7 @@ return [
     'duplicate_action_warning_localization' => 'This entry is a localization. The origin entry will be duplicated.',
     'duplicate_action_warning_localizations' => 'One or more selected entries are localizations. In those cases, the origin entry will be duplicated instead.',
     'elevated_session_enter_password' => 'For security, please confirm your password to continue.',
+    'elevated_session_required' => 'A password confirmation is required to continue.',
     'email_utility_configuration_description' => 'Mail settings are configured in <code>:path</code>',
     'email_utility_description' => 'Check email configuration settings and send test emails.',
     'entry_origin_instructions' => 'The new localization will inherit values from the entry in the selected site.',
