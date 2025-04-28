@@ -9,7 +9,7 @@
 
 <ui-header title="{{ __('Dashboard') }}" />
 
-<div class="widgets @container/widgets flex flex-wrap py-2 gap-y-6">
+<div class="widgets @container/widgets flex flex-wrap py-2 gap-y-6 -mx-3">
     @foreach ($widgets as $widget)
         <div class="{{ Statamic\Support\Str::tailwindWidthClass($widget['width']) }} {{ $widget['classes'] }} px-3">
             {!! $widget['html'] !!}
