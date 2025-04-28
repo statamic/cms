@@ -4,6 +4,7 @@ namespace Tests\Auth\TwoFactor;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use PragmaRX\Google2FA\Google2FA;
 use Statamic\Auth\TwoFactor\RecoveryCode;
@@ -14,6 +15,7 @@ use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
+#[Group('elevated-session')]
 class TwoFactorAuthenticationControllerTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
