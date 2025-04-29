@@ -6,65 +6,33 @@ use Illuminate\Auth\Events\Failed;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Statamic\Auth\ThrottlesLogins;
-use Statamic\Events\TwoFactorAuthenticationChallenged;
 use Statamic\Facades\User;
+use Statamic\Http\Controllers\Concerns\HandlesLogins;
 use Statamic\Http\Controllers\Controller;
 use Statamic\Http\Requests\UserLoginRequest;
 
 class LoginController extends Controller
 {
-    use ThrottlesLogins;
+    use HandlesLogins;
 
     public function login(UserLoginRequest $request)
     {
-        if ($this->hasTooManyLoginAttempts($request)) {
-            $this->fireLockoutEvent($request);
-
-            return $this->sendLockoutResponse($request);
-        }
-
-        $this->incrementLoginAttempts($request);
+        $this->handleTooManyLoginAttempts($request);
 
         $user = User::fromUser($this->validateCredentials($request));
 
         if ($user->hasEnabledTwoFactorAuthentication()) {
-            $request->session()->put([
-                'login.id' => $user->getKey(),
-                'login.remember' => $request->boolean('remember'),
-            ]);
-
-            TwoFactorAuthenticationChallenged::dispatch($user);
-
-            return redirect()->route('statamic.two-factor-challenge');
+            return $this->twoFactorChallengeResponse($request, $user);
         }
 
-        Auth::login($user, $request->boolean('remember'));
+        $this->authenticate($request, $user);
 
         return redirect($request->input('_redirect', '/'))->withSuccess(__('Login successful.'));
     }
 
-    /**
-     * Attempt to validate the incoming credentials.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return mixed
-     */
-    protected function validateCredentials($request)
+    protected function twoFactorChallengeRedirect(): string
     {
-        $provider = Auth::getProvider();
-
-        return tap($provider->retrieveByCredentials($request->only($this->username(), 'password')), function ($user) use ($provider, $request) {
-            if (! $user || ! $provider->validateCredentials($user, ['password' => $request->password])) {
-                $this->fireFailedEvent($request, $user);
-
-                $this->throwFailedAuthenticationException($request);
-            }
-
-            if (config('hashing.rehash_on_login', true) && method_exists($provider, 'rehashPasswordIfRequired')) {
-                $provider->rehashPasswordIfRequired($user, ['password' => $request->password]);
-            }
-        });
+        return route('statamic.two-factor-challenge');
     }
 
     /**
