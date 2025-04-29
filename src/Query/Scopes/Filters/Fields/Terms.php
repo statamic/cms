@@ -37,7 +37,7 @@ class Terms extends FieldtypeFilter
 
         match ($operator) {
             'like' => $this->fieldtype->config('max_items') === 1
-                ? $query->where($handle, $values['term'])
+                ? $query->where($handle, 'like', "%{$values['term']}%")
                 : $query->whereJsonContains($handle, $values['term']),
             'null' => $query->whereNull($handle),
             'not-null' => $query->whereNotNull($handle),
