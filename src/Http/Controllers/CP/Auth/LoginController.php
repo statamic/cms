@@ -66,6 +66,8 @@ class LoginController extends CpController
         }
 
         if ($this->attemptLogin($request)) {
+            session()->elevate();
+
             return $this->sendLoginResponse($request);
         }
 
