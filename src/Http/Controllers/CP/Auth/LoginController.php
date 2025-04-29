@@ -85,6 +85,8 @@ class LoginController extends CpController
 
         $this->guard()->login($user, $request->boolean('remember'));
 
+        session()->elevate();
+
         return $this->sendLoginResponse($request);
     }
 

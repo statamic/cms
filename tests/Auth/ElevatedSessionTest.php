@@ -22,7 +22,7 @@ class ElevatedSessionTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = User::make()->makeSuper()->password('secret');
+        $this->user = User::make()->email('foo@bar.com')->makeSuper()->password('secret');
         $this->user->save();
     }
 
@@ -159,5 +159,26 @@ class ElevatedSessionTest extends TestCase
             ->getJson('/requires-elevated-session')
             ->assertStatus(403)
             ->assertJson(['message' => __('Requires an elevated session.')]);
+    }
+
+    #[Test]
+    public function the_session_is_elevated_upon_login()
+    {
+        $this
+            ->post(cp_route('login'), [
+                'email' => 'foo@bar.com',
+                'password' => 'secret',
+            ])
+            ->assertRedirectToRoute('statamic.cp.index');
+
+        $this
+            ->get('/requires-elevated-session')
+            ->assertOk();
+    }
+
+    #[Test]
+    public function the_session_is_elevated_upon_login_with_oauth()
+    {
+        $this->markTestIncomplete('Implementation is done but is missing a test.');
     }
 }
