@@ -28,7 +28,7 @@
                     :item="item"
                     :config="config"
                     :status-icon="statusIcons"
-                    :editable="canEdit"
+                    :editable="canEdit && (item.editable || item.editable === undefined)"
                     :sortable="!readOnly && canReorder"
                     :read-only="readOnly"
                     :form-component="formComponent"
