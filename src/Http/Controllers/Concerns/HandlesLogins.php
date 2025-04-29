@@ -66,7 +66,9 @@ trait HandlesLogins
 
         TwoFactorAuthenticationChallenged::dispatch($user);
 
-        return redirect($this->twoFactorChallengeRedirect());
+        return $request->wantsJson()
+            ? response()->json(['two_factor' => true])
+            : redirect($this->twoFactorChallengeRedirect());
     }
 
     abstract protected function twoFactorChallengeRedirect(): string;
