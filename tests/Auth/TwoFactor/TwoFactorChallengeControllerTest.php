@@ -5,6 +5,8 @@ namespace Tests\Auth\TwoFactor;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Route;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use PragmaRX\Google2FA\Google2FA;
 use Statamic\Auth\TwoFactor\RecoveryCode;
@@ -13,13 +15,26 @@ use Statamic\Events\TwoFactorAuthenticationFailed;
 use Statamic\Events\TwoFactorRecoveryCodeReplaced;
 use Statamic\Events\ValidTwoFactorAuthenticationCodeProvided;
 use Statamic\Facades\User;
+use Statamic\Http\Middleware\CP\RequireElevatedSession;
 use Statamic\Notifications\RecoveryCodeUsed;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
+#[Group('elevated-sessions')]
 class TwoFactorChallengeControllerTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+
+    protected function resolveApplicationConfiguration($app)
+    {
+        parent::resolveApplicationConfiguration($app);
+
+        $app->booted(function () {
+            Route::get('/requires-elevated-session', function () {
+                return 'ok';
+            })->middleware(RequireElevatedSession::class);
+        });
+    }
 
     #[Test]
     public function it_shows_the_two_factor_challenge_page()
@@ -181,6 +196,25 @@ class TwoFactorChallengeControllerTest extends TestCase
             ->assertRedirect('http://localhost/cp/collections');
 
         $this->assertAuthenticatedAs($user);
+    }
+
+    #[Test]
+    public function the_session_is_elevated_upon_login()
+    {
+        $user = $this->userWithTwoFactorEnabled();
+
+        $this
+            ->session([
+                'login.id' => $user->id(),
+                'url.intended' => 'http://localhost/requires-elevated-session',
+            ])
+            ->post(cp_route('two-factor-challenge'), [
+                'code' => $this->getOneTimeCode($user),
+            ]);
+
+        $this
+            ->get('/requires-elevated-session')
+            ->assertOk();
     }
 
     private function user()
