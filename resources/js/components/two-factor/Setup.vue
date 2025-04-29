@@ -74,7 +74,7 @@
 
 <script>
 import LoadingGraphic from '@statamic/components/LoadingGraphic.vue';
-import TwoFactorRecoveryCodesModal from '@statamic/components/fieldtypes/two-factor/RecoveryCodesModal.vue';
+import TwoFactorRecoveryCodesModal from '@statamic/components/two-factor/RecoveryCodesModal.vue';
 
 export default {
     components: { TwoFactorRecoveryCodesModal, LoadingGraphic },

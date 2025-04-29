@@ -139,7 +139,7 @@ class UsersController extends CpController
         $expiry = config("auth.passwords.{$broker}.expire") / 60;
 
         $additional = $fields->all()
-            ->reject(fn ($field) => in_array($field->handle(), ['roles', 'groups', 'super', 'two_factor']))
+            ->reject(fn ($field) => in_array($field->handle(), ['roles', 'groups', 'super']))
             ->keys();
 
         $viewData = [
@@ -253,6 +253,21 @@ class UsersController extends CpController
             'canEditPassword' => User::fromUser($request->user())->can('editPassword', $user),
             'requiresCurrentPassword' => $request->user()->id === $user->id(),
             'itemActions' => Action::for($user, ['view' => 'form']),
+            'twoFactor' => [
+                'isCurrentUser' => $user->id === User::current()->id,
+                'isEnforced' => $user->isTwoFactorAuthenticationRequired(),
+                'isSetup' => $user->hasEnabledTwoFactorAuthentication(),
+                'canDisable' => request()->user()->can('edit', $user),
+                'routes' => [
+                    'enable' => cp_route('users.two-factor.enable', $user->id),
+                    'disable' => cp_route('users.two-factor.disable', $user->id),
+                    'recoveryCodes' => [
+                        'show' => cp_route('users.two-factor.recovery-codes.show', $user->id),
+                        'generate' => cp_route('users.two-factor.recovery-codes.generate', $user->id),
+                        'download' => cp_route('users.two-factor.recovery-codes.download', $user->id),
+                    ],
+                ],
+            ],
         ];
 
         if ($request->wantsJson()) {

@@ -48,6 +48,8 @@ export default {
                     close();
                 })
                 .catch((error) => {
+                    console.log('Error in elevated session modal');
+                    console.log(error);
                     this.errors = error.response.data.errors;
                     if (error.response.status === 422) {
                         this.$refs.password.focus();

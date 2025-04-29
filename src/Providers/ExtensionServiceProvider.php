@@ -113,7 +113,6 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Textarea::class,
         Fieldtypes\Time::class,
         Fieldtypes\Toggle::class,
-        Fieldtypes\TwoFactor::class,
         Fieldtypes\UserGroups::class,
         Fieldtypes\UserRoles::class,
         Fieldtypes\Users::class,

@@ -84,7 +84,6 @@ class AugmentedUserTest extends AugmentedTestCase
             'two' => ['type' => 'string', 'value' => 'the "two" value on the user and in the blueprint'],
             'three' => ['type' => 'string', 'value' => 'the "three" value supplemented on the user'],
             'four' => ['type' => 'string', 'value' => 'the "four" value supplemented on the user and in the blueprint'],
-            'two_factor' => ['type' => 'null', 'value' => null],
             'unused_in_bp' => ['type' => 'string', 'value' => null],
         ];
 

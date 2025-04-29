@@ -56,8 +56,6 @@ import TagsIndexFieldtype from '../components/fieldtypes/TagsIndexFieldtype.vue'
 import TemplateFolderFieldtype from '../components/fieldtypes/TemplateFolderFieldtype.vue';
 import ToggleFieldtype from '../components/fieldtypes/ToggleFieldtype.vue';
 import ToggleIndexFieldtype from '../components/fieldtypes/ToggleIndexFieldtype.vue';
-import TwoFactorFieldtype from '../components/fieldtypes/TwoFactorFieldtype.vue';
-import TwoFactorIndexFieldtype from '../components/fieldtypes/TwoFactorIndexFieldtype.vue';
 import WidthFieldtype from '../components/fieldtypes/WidthFieldtype.vue';
 import VideoFieldtype from '../components/fieldtypes/VideoFieldtype.vue';
 import SetPicker from '../components/fieldtypes/replicator/SetPicker.vue';
@@ -140,8 +138,6 @@ export default function registerFieldtypes(app) {
     );
     app.component('toggle-fieldtype', ToggleFieldtype);
     app.component('toggle-fieldtype-index', ToggleIndexFieldtype);
-    app.component('two_factor-fieldtype', TwoFactorFieldtype);
-    app.component('two_factor-fieldtype-index', TwoFactorIndexFieldtype);
     app.component('width-fieldtype', WidthFieldtype);
     app.component('video-fieldtype', VideoFieldtype);
     app.component(

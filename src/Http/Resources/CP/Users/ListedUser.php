@@ -34,6 +34,7 @@ class ListedUser extends JsonResource
                 'email' => $this->email(),
                 'roles' => $this->roles()->map->handle()->all(),
                 'groups' => $this->groups()->map->handle()->all(),
+                'two_factor' => $this->hasEnabledTwoFactorAuthentication(),
             ])),
             'super' => $this->isSuper(),
             'edit_url' => $this->editUrl(),
@@ -54,7 +55,7 @@ class ListedUser extends JsonResource
             $value = $extra[$key] ?? $this->resource->value($key) ?? $field?->defaultValue();
 
             if ($field) {
-                $value = $field->setParent($this->resource)->setValue($value)->preProcessIndex()->value();
+                $value = $field->setValue($value)->preProcessIndex()->value();
             }
 
             return [$key => $value];

@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import TwoFactorSetup from '@statamic/components/fieldtypes/two-factor/Setup.vue';
+import TwoFactorSetup from '@statamic/components/two-factor/Setup.vue';
 
 export default {
     components: { TwoFactorSetup },

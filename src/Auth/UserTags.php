@@ -699,7 +699,7 @@ class UserTags extends Tags
     {
         return User::blueprint()->fields()->all()
             ->reject(function ($field) {
-                return in_array($field->handle(), ['email', 'password', 'password_confirmation', 'roles', 'groups', 'two_factor']);
+                return in_array($field->handle(), ['email', 'password', 'password_confirmation', 'roles', 'groups']);
             })
             ->map(function ($field) {
                 return $this->getRenderableField($field, 'user.register');
@@ -723,7 +723,7 @@ class UserTags extends Tags
 
         return User::blueprint()->fields()->addValues($values)->preProcess()->all()
             ->reject(function ($field) {
-                return in_array($field->handle(), ['password', 'password_confirmation', 'roles', 'groups', 'two_factor'])
+                return in_array($field->handle(), ['password', 'password_confirmation', 'roles', 'groups'])
                     || $field->fieldtype()->handle() === 'assets';
             })
             ->map(function ($field) {

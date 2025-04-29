@@ -58,6 +58,12 @@ class Users extends ResourceCollection
                 ->defaultOrder($columns->max('defaultOrder') + 1)
         );
 
+        $columns->put('two_factor',
+            Column::make('two_factor')
+                ->label(__('Two Factor Authentication'))
+                ->defaultOrder($columns->max('defaultOrder') + 1)
+        );
+
         // Normalize default visibility for when user blueprint file exists in app
         $columns->transform(function ($column) {
             return $this->normalizeDefaultVisibilityOnColumn($column);
