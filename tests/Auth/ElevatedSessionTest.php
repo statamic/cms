@@ -175,4 +175,10 @@ class ElevatedSessionTest extends TestCase
             ->get('/requires-elevated-session')
             ->assertOk();
     }
+
+    #[Test]
+    public function the_session_is_elevated_upon_login_with_oauth()
+    {
+        $this->markTestIncomplete('Implementation is done but is missing a test.');
+    }
 }
