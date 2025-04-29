@@ -58,7 +58,7 @@ class CollectionsController extends CpController
             return [
                 'id' => $collection->handle(),
                 'title' => $collection->title(),
-                'entries' => $collection->queryEntries()->where('site', Site::selected())->limit(5)->get(),
+                'entries' => $collection->queryEntries()->where('site', Site::selected())->orderBy('date', 'desc')->limit(5)->get(),
                 'entries_count' => $collection->queryEntries()->where('site', Site::selected())->count(),
                 'published_entries_count' => $collection->queryEntries()->where('site', Site::selected())->where('status', 'published')->count(),
                 'draft_entries_count' => $collection->queryEntries()->where('site', Site::selected())->where('status', 'draft')->count(),
@@ -68,6 +68,7 @@ class CollectionsController extends CpController
                     ['label' => 'Title', 'field' => 'title', 'visible' => true],
                     ['label' => 'Date', 'field' => 'date', 'visible' => true]
                 ],
+                'dated' => $collection->dated(),
                 'edit_url' => $collection->editUrl(),
                 'delete_url' => $collection->deleteUrl(),
                 'entries_url' => cp_route('collections.show', $collection->handle()),
@@ -82,7 +83,7 @@ class CollectionsController extends CpController
                 'actions' => Action::for($collection),
                 'actions_url' => cp_route('collections.actions.run', ['collection' => $collection->handle()]),
             ];
-        })->values();
+        })->sortBy('title')->values();
     }
 
     public function show(Request $request, $collection)

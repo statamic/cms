@@ -69,6 +69,7 @@
                         :key="column.field"
                         :width="column.width"
                         :class="{ 'pr-8 text-end': column.numeric }"
+                        :data-column="`${column.field}`"
                     >
                         <slot
                             :name="`cell-${column.field}`"

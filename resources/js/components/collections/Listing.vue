@@ -48,11 +48,16 @@
 
                 <ui-card>
                     <data-list :rows="collection.entries" :columns="collection.columns" :sort="false">
-                        <data-list-table unstyled class="[&_td]:p-0.5 [&_td]:text-sm [&_thead]:hidden">
-                            <template #cell-title="{ row: entry }">
+                        <data-list-table unstyled class="[&_td]:p-0.5 [&_td]:text-sm [&_thead]:hidden w-full">
+                            <template #cell-title="{ row: entry }" class="w-full">
                                 <div class="flex items-center gap-2">
                                     <StatusIndicator :status="entry.status" />
                                     <a :href="entry.edit_url" class="line-clamp-1 overflow-hidden text-ellipsis" :text="entry.title" />
+                                </div>
+                            </template>
+                            <template #cell-date="{ row: entry }" v-if="collection.dated">
+                                <div class="text-end font-mono text-gray-400 ps-6">
+                                    <date-time :of="entry.date" date-only />
                                 </div>
                             </template>
                         </data-list-table>
@@ -61,15 +66,15 @@
 
                 <ui-panel-footer class="flex items-center gap-6 text-sm text-gray-500">
                     <div class="flex items-center gap-2" v-if="collection.published_entries_count > 0">
-                        <ui-badge variant="flat" :text="String(collection.published_entries_count)" pill class="bg-gray-200!" />
+                        <ui-badge variant="flat" :text="String(collection.published_entries_count)" pill class="bg-gray-200 dark:bg-gray-700" />
                         <span>{{ __('Published') }}</span>
                     </div>
                     <div class="flex items-center gap-2 text-sm" v-if="collection.scheduled_entries_count > 0">
-                        <ui-badge variant="flat" :text="String(collection.scheduled_entries_count)" pill class="bg-gray-200!" />
+                        <ui-badge variant="flat" :text="String(collection.scheduled_entries_count)" pill class="bg-gray-200 dark:" />
                         <span>{{ __('Scheduled') }}</span>
                     </div>
                     <div class="flex items-center gap-2 text-sm" v-if="collection.draft_entries_count > 0">
-                        <ui-badge variant="flat" :text="String(collection.draft_entries_count)" pill class="bg-gray-200!" />
+                        <ui-badge variant="flat" :text="String(collection.draft_entries_count)" pill class="bg-gray-200 dark:" />
                         <span>{{ __('Draft') }}</span>
                     </div>
                 </ui-panel-footer>
