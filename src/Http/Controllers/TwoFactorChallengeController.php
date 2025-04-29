@@ -50,6 +50,8 @@ class TwoFactorChallengeController extends Controller
 
         Auth::guard()->login($user, $request->remember());
 
+        $request->session()->elevate();
+
         $request->session()->regenerate();
 
         return $request->expectsJson()
