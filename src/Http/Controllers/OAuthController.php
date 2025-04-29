@@ -50,6 +50,8 @@ class OAuthController
             Auth::guard($request->session()->get('statamic.oauth.guard'))
                 ->login($user, config('statamic.oauth.remember_me', true));
 
+            session()->elevate();
+
             return redirect()->to($this->successRedirectUrl());
         }
 
