@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Auth\TwoFactor;
+namespace Feature\Users;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
@@ -21,7 +21,7 @@ use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 #[Group('elevated-sessions')]
-class TwoFactorChallengeControllerTest extends TestCase
+class TwoFactorChallengeTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Auth\TwoFactor;
+namespace Feature\Users;
 
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\Test;
@@ -10,7 +10,7 @@ use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-class TwoFactorSetupControllerTest extends TestCase
+class TwoFactorSetupTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 

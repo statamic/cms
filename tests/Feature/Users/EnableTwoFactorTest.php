@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Auth\TwoFactor;
+namespace Feature\Users;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
@@ -9,14 +9,13 @@ use PHPUnit\Framework\Attributes\Test;
 use PragmaRX\Google2FA\Google2FA;
 use Statamic\Auth\TwoFactor\RecoveryCode;
 use Statamic\Auth\TwoFactor\TwoFactorAuthenticationProvider;
-use Statamic\Events\TwoFactorAuthenticationDisabled;
 use Statamic\Events\TwoFactorAuthenticationEnabled;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 #[Group('elevated-session')]
-class TwoFactorAuthenticationControllerTest extends TestCase
+class EnableTwoFactorTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
@@ -233,135 +232,6 @@ class TwoFactorAuthenticationControllerTest extends TestCase
             ->assertRedirect('/cp/auth/confirm-password');
 
         $this->assertNull($user->two_factor_confirmed_at);
-    }
-
-    #[Test]
-    public function it_disables_two_factor_authentication_for_the_current_user()
-    {
-        Event::fake();
-
-        $user = $this->userWithTwoFactorEnabled();
-
-        $this
-            ->actingAs($user)
-            ->withActiveElevatedSession()
-            ->delete(cp_route('users.two-factor.disable', [
-                'user' => $user->id,
-            ]))
-            ->assertOk()
-            ->assertJson(['redirect' => null]);
-
-        $user->fresh();
-
-        $this->assertNull($user->two_factor_confirmed_at);
-        $this->assertNull($user->two_factor_recovery_codes);
-        $this->assertNull($user->two_factor_secret);
-
-        Event::assertDispatched(TwoFactorAuthenticationDisabled::class, fn ($event) => $event->user->id === $user->id);
-    }
-
-    #[Test]
-    public function it_disables_two_factor_authentication_for_the_current_user_when_two_factor_is_enforced()
-    {
-        Event::fake();
-
-        // Enforced for everyone
-        config()->set('statamic.users.two_factor_enforced_roles', ['*']);
-
-        $user = $this->userWithTwoFactorEnabled();
-
-        $this
-            ->actingAs($user)
-            ->withActiveElevatedSession()
-            ->delete(cp_route('users.two-factor.disable', [
-                'user' => $user->id,
-            ]))
-            ->assertOk()
-            ->assertJson(['redirect' => cp_route('two-factor-setup')]);
-
-        $user->fresh();
-
-        $this->assertNull($user->two_factor_confirmed_at);
-        $this->assertNull($user->two_factor_recovery_codes);
-        $this->assertNull($user->two_factor_secret);
-
-        Event::assertDispatched(TwoFactorAuthenticationDisabled::class, fn ($event) => $event->user->id === $user->id);
-    }
-
-    #[Test]
-    public function it_disables_two_factor_authentication_for_another_user()
-    {
-        Event::fake();
-
-        $otherUser = $this->userWithTwoFactorEnabled();
-
-        $this
-            ->actingAs($this->userWithTwoFactorEnabled())
-            ->withActiveElevatedSession()
-            ->delete(cp_route('users.two-factor.disable', [
-                'user' => $otherUser->id,
-            ]))
-            ->assertOk()
-            ->assertJson(['redirect' => null]);
-
-        $otherUser->fresh();
-
-        $this->assertNull($otherUser->two_factor_confirmed_at);
-        $this->assertNull($otherUser->two_factor_recovery_codes);
-        $this->assertNull($otherUser->two_factor_secret);
-
-        Event::assertDispatched(TwoFactorAuthenticationDisabled::class, fn ($event) => $event->user->id === $otherUser->id);
-    }
-
-    #[Test]
-    public function it_disables_two_factor_authentication_for_another_user_when_two_factor_is_enforced()
-    {
-        Event::fake();
-
-        // Enforced for everyone
-        config()->set('statamic.users.two_factor_enforced_roles', ['*']);
-
-        $otherUser = $this->userWithTwoFactorEnabled();
-
-        $this
-            ->actingAs($this->userWithTwoFactorEnabled())
-            ->withActiveElevatedSession()
-            ->delete(cp_route('users.two-factor.disable', [
-                'user' => $otherUser->id,
-            ]))
-            ->assertOk()
-            ->assertJson(['redirect' => null]);
-
-        $otherUser->fresh();
-
-        $this->assertNull($otherUser->two_factor_confirmed_at);
-        $this->assertNull($otherUser->two_factor_recovery_codes);
-        $this->assertNull($otherUser->two_factor_secret);
-
-        Event::assertDispatched(TwoFactorAuthenticationDisabled::class, fn ($event) => $event->user->id === $otherUser->id);
-    }
-
-    #[Test]
-    public function it_cant_disable_two_factor_authentication_without_elevated_session()
-    {
-        Event::fake();
-
-        $user = $this->userWithTwoFactorEnabled();
-
-        $this
-            ->actingAs($user)
-            ->delete(cp_route('users.two-factor.disable', [
-                'user' => $user->id,
-            ]))
-            ->assertRedirect('/cp/auth/confirm-password');
-
-        $user->fresh();
-
-        $this->assertNotNull($user->two_factor_confirmed_at);
-        $this->assertNotNull($user->two_factor_recovery_codes);
-        $this->assertNotNull($user->two_factor_secret);
-
-        Event::assertNotDispatched(TwoFactorAuthenticationDisabled::class, fn ($event) => $event->user->id === $user->id);
     }
 
     private function user()

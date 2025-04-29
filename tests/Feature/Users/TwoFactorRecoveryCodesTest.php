@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Auth\TwoFactor;
+namespace Feature\Users;
 
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\Group;
@@ -12,7 +12,7 @@ use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 #[Group('elevated-session')]
-class UserRecoveryCodesControllerTest extends TestCase
+class TwoFactorRecoveryCodesTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
