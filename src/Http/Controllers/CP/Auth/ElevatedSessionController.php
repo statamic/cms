@@ -4,10 +4,8 @@ namespace Statamic\Http\Controllers\CP\Auth;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Statamic\Facades\User;
-use Statamic\Notifications\ElevatedSessionVerificationCode;
 
 class ElevatedSessionController
 {

@@ -4,11 +4,12 @@ namespace Statamic\Notifications;
 
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Statamic\Auth\Passwords\PasswordReset as PasswordResetManager;
 
 class ElevatedSessionVerificationCode extends Notification
 {
-    public function __construct(protected string $verificationCode) {}
+    public function __construct(protected string $verificationCode)
+    {
+    }
 
     public function via($notifiable): array
     {
