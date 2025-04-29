@@ -16,7 +16,12 @@
                             class="warning"
                             @click="$refs[`deleter_${role.id}`].confirm()"
                         >
-                            <resource-deleter :ref="`deleter_${role.id}`" :resource="role" :requires-elevated-session="true" @deleted="removeRow(role)">
+                            <resource-deleter
+                                :ref="`deleter_${role.id}`"
+                                :resource="role"
+                                :requires-elevated-session="true"
+                                @deleted="removeRow(role)"
+                            >
                             </resource-deleter>
                         </dropdown-item>
                     </dropdown-list>

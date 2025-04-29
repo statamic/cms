@@ -33,25 +33,25 @@
             <form method="POST" action="{{ cp_route('elevated-session.confirm') }}">
                 @csrf
 
-                @if($method === 'password_confirmation')
+                @if ($method === 'password_confirmation')
                     <div class="mb-8">
                         <label for="password" class="mb-2">{{ __('Password') }}</label>
                         <input id="password" type="password" class="input-text" name="password" />
 
                         @error('password')
-                        <div class="mt-2 text-xs text-red-500">{{ $message }}</div>
+                            <div class="mt-2 text-xs text-red-500">{{ $message }}</div>
                         @enderror
                     </div>
                 @endif
 
-                @if($method === 'verification_code')
+                @if ($method === 'verification_code')
                     <div class="mb-8">
                         <label for="verification_code" class="mb-2">{{ __('Verification Code') }}</label>
                         {{-- todo: instructions --}}
                         <input id="verification_code" type="text" class="input-text" name="verification_code" />
 
                         @error('verification_code')
-                        <div class="mt-2 text-xs text-red-500">{{ $message }}</div>
+                            <div class="mt-2 text-xs text-red-500">{{ $message }}</div>
                         @enderror
                     </div>
                 @endif

@@ -22,13 +22,21 @@
                                 autofocus
                                 @keydown.enter.prevent="submit"
                             />
-                            <button @click="submit(close)" class="btn-primary ltr:ml-2 rtl:mr-2" v-text="__('Confirm')" />
+                            <button
+                                @click="submit(close)"
+                                class="btn-primary ltr:ml-2 rtl:mr-2"
+                                v-text="__('Confirm')"
+                            />
                         </div>
                     </template>
 
                     <template v-if="method === 'verification_code'">
                         <label v-text="__('messages.elevated_session_enter_verification_code')" />
-                        <small class="help-block text-red-500" v-if="errors.verification_code" v-text="errors.verification_code[0]" />
+                        <small
+                            class="help-block text-red-500"
+                            v-if="errors.verification_code"
+                            v-text="errors.verification_code[0]"
+                        />
                         <div class="flex items-center">
                             <input
                                 type="text"
@@ -39,7 +47,11 @@
                                 autofocus
                                 @keydown.enter.prevent="submit"
                             />
-                            <button @click="submit(close)" class="btn-primary ltr:ml-2 rtl:mr-2" v-text="__('Confirm')" />
+                            <button
+                                @click="submit(close)"
+                                class="btn-primary ltr:ml-2 rtl:mr-2"
+                                v-text="__('Confirm')"
+                            />
                         </div>
                     </template>
                 </div>
