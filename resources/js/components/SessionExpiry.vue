@@ -111,7 +111,7 @@
                         v-text="__('Use one-time code')"
                     />
                     <button
-                        class="btn-danger ltr:ml-4 rtl:mr-4"
+                        class="btn-primary ltr:ml-4 rtl:mr-4"
                         @click="submitTwoFactorChallenge"
                         v-text="__('Continue')"
                     />
