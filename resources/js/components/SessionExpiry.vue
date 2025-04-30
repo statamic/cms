@@ -65,7 +65,7 @@
                                 maxlength="6"
                                 inputmode="numeric"
                                 autofocus
-                                autocomplete="off"
+                                autocomplete="one-time-code"
                                 @keydown.enter.prevent="submitTwoFactorChallenge"
                             />
                         </div>

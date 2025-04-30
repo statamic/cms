@@ -56,7 +56,7 @@
                             maxlength="6"
                             inputmode="numeric"
                             autofocus
-                            autocomplete="off"
+                            autocomplete="one-time-code"
                             id="input-code"
                         />
                         @if ($hasError("code"))
