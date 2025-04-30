@@ -23,7 +23,7 @@ const tag = computed(() => (props.href ? 'a' : props.as));
 
 const badgeClasses = computed(() => {
     const classes = cva({
-        base: 'flex items-center gap-1 font-normal antialiased whitespace-nowrap no-underline not-prose [button]:cursor-pointer group [&_svg]:opacity-60 [&_svg]:group-hover:opacity-100',
+        base: 'inline-flex items-center gap-1 font-normal antialiased whitespace-nowrap no-underline not-prose [button]:cursor-pointer group [&_svg]:opacity-60 [&_svg]:group-hover:opacity-100',
         variants: {
             size: {
                 sm: 'text-2xs py-0 leading-normal px-1 rounded-[0.1875rem] [&_svg]:size-2',
