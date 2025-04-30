@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\TwoFactor\RecoveryCode;
-use Statamic\Auth\TwoFactor\TwoFactorAuthenticationProvider;
+use Statamic\Contracts\Auth\TwoFactor\TwoFactorAuthenticationProvider;
 use Statamic\Events\TwoFactorAuthenticationDisabled;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;

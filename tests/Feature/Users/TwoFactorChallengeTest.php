@@ -10,7 +10,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use PragmaRX\Google2FA\Google2FA;
 use Statamic\Auth\TwoFactor\RecoveryCode;
-use Statamic\Auth\TwoFactor\TwoFactorAuthenticationProvider;
+use Statamic\Contracts\Auth\TwoFactor\TwoFactorAuthenticationProvider;
 use Statamic\Events\TwoFactorAuthenticationFailed;
 use Statamic\Events\TwoFactorRecoveryCodeReplaced;
 use Statamic\Events\ValidTwoFactorAuthenticationCodeProvided;

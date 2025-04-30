@@ -6,7 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
-use Statamic\Auth\TwoFactor\TwoFactorAuthenticationProvider;
+use Statamic\Contracts\Auth\TwoFactor\TwoFactorAuthenticationProvider;
 
 class TwoFactorChallengeRequest extends FormRequest
 {
