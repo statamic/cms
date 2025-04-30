@@ -8,24 +8,8 @@ use Statamic\Contracts\Auth\TwoFactor\TwoFactorAuthenticationProvider as Contrac
 
 class TwoFactorAuthenticationProvider implements Contract
 {
-    /**
-     * The underlying library providing two factor authentication helper services.
-     *
-     * @var Google2FA
-     */
-    protected $engine;
-
-    /**
-     * The cache repository implementation.
-     *
-     * @var \Illuminate\Contracts\Cache\Repository|null
-     */
-    protected $cache;
-
-    public function __construct(Google2FA $engine, ?Repository $cache = null)
+    public function __construct(private Google2FA $engine, private ?Repository $cache = null)
     {
-        $this->engine = $engine;
-        $this->cache = $cache;
     }
 
     /**
