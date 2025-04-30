@@ -179,7 +179,11 @@ class Entries extends Relationship
             $collections = $this->getConfiguredCollections();
         }
 
-        return Collection::findByHandle(Arr::first($collections));
+        $collection = Collection::findByHandle($collectionHandle = Arr::first($collections));
+
+        throw_if(! $collection, new CollectionNotFoundException($collectionHandle));
+
+        return $collection;
     }
 
     public function getSortColumn($request)
