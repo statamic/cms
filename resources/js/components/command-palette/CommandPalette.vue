@@ -44,6 +44,7 @@ Statamic.$keys.bindGlobal(['mod+k'], (e) => {
 each(
     {
         esc: () => (open.value = false),
+        'tab': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown' })),
         'ctrl+n': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown' })),
         'ctrl+p': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp' })),
     },
