@@ -2,12 +2,14 @@
 
 namespace Tests\Feature\Users;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
+#[Group('2fa')]
 class EditUserTest extends TestCase
 {
     use FakesRoles;

@@ -2,10 +2,12 @@
 
 namespace Tests\Auth\TwoFactor;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\TwoFactor\RecoveryCode;
 use Tests\TestCase;
 
+#[Group('2fa')]
 class RecoveryCodeTest extends TestCase
 {
     #[Test]

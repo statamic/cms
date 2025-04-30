@@ -14,6 +14,7 @@ use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 #[Group('elevated-session')]
+#[Group('2fa')]
 class DisableTwoFactorTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;

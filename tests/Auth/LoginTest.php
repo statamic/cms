@@ -4,6 +4,7 @@ namespace Tests\Auth;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\TwoFactor\RecoveryCode;
 use Statamic\Contracts\Auth\TwoFactor\TwoFactorAuthenticationProvider;
@@ -12,6 +13,7 @@ use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
+#[Group('2fa')]
 class LoginTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;

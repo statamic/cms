@@ -3,12 +3,14 @@
 namespace Tests\Auth\TwoFactor;
 
 use Illuminate\Support\Str;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\TwoFactor\GenerateNewRecoveryCodes;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
+#[Group('2fa')]
 class GenerateNewRecoveryCodesTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;

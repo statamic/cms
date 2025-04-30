@@ -17,6 +17,7 @@ use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 #[Group('user')]
+#[Group('2fa')]
 class FileUserTest extends TestCase
 {
     use PermissibleContractTests, PreventSavingStacheItemsToDisk, UserContractTests;
