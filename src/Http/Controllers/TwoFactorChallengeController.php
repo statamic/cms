@@ -27,7 +27,7 @@ class TwoFactorChallengeController extends Controller
 
         return view('statamic::auth.two-factor.challenge', [
             'hasError' => $this->hasError(),
-            'action' => $this->resetFormAction(),
+            'action' => $this->formAction(),
             'mode' => session()->get('errors')?->getBag('default')->has('recovery_code') ? 'recovery_code' : 'code',
         ]);
     }
@@ -59,7 +59,7 @@ class TwoFactorChallengeController extends Controller
             : redirect()->intended($this->redirectPath());
     }
 
-    protected function resetFormAction()
+    protected function formAction()
     {
         return route('statamic.two-factor-challenge');
     }

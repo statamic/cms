@@ -14,7 +14,7 @@ class TwoFactorChallengeController extends Controller
         $this->middleware(RedirectIfAuthorized::class);
     }
 
-    protected function resetFormAction()
+    protected function formAction()
     {
         return cp_route('two-factor-challenge');
     }
