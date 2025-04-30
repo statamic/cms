@@ -44,7 +44,6 @@ Statamic.$keys.bindGlobal(['mod+k'], (e) => {
 each(
     {
         esc: () => (open.value = false),
-        'tab': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown' })),
         'ctrl+n': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown' })),
         'ctrl+p': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp' })),
     },
@@ -141,6 +140,10 @@ function reset() {
     searchResults.value = [];
 }
 
+function keydownTab(e) {
+    document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: e.shiftKey ? 'ArrowUp' : 'ArrowDown' }));
+}
+
 const modalClasses = cva({
     base: [
         'fixed outline-hidden left-1/2 top-[100px] z-50 w-full max-w-3xl -translate-x-1/2 ',
@@ -191,7 +194,7 @@ const modalClasses = cva({
                         :default-open="true"
                         :ignore-filter="true"
                         v-model="selected"
-                        @keydown.tab.prevent.stop
+                        @keydown.tab.prevent.stop="keydownTab"
                     >
                         <header
                             class="group/cmd-input flex h-14 items-center gap-2 border-b border-gray-200/80 px-5.5 dark:border-gray-950"
