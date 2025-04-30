@@ -4,7 +4,6 @@ namespace Feature\Users;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Route;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
@@ -16,7 +15,6 @@ use Statamic\Events\TwoFactorRecoveryCodeReplaced;
 use Statamic\Events\ValidTwoFactorAuthenticationCodeProvided;
 use Statamic\Facades\User;
 use Statamic\Http\Middleware\CP\RequireElevatedSession;
-use Statamic\Notifications\RecoveryCodeUsed;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -113,7 +111,6 @@ class TwoFactorChallengeTest extends TestCase
     public function it_can_complete_challenge_with_recovery_code()
     {
         Event::fake();
-        Notification::fake();
 
         $user = $this->userWithTwoFactorEnabled();
         $recoveryCode = collect($user->recoveryCodes())->first();
@@ -132,15 +129,12 @@ class TwoFactorChallengeTest extends TestCase
         Event::assertDispatched(TwoFactorRecoveryCodeReplaced::class, function (TwoFactorRecoveryCodeReplaced $event) use ($user, $recoveryCode) {
             return $event->user->id() === $user->id() && $event->code === $recoveryCode;
         });
-
-        Notification::assertSentTo($user, RecoveryCodeUsed::class);
     }
 
     #[Test]
     public function it_cant_complete_challenge_with_invalid_recovery_code()
     {
         Event::fake();
-        Notification::fake();
 
         $user = $this->userWithTwoFactorEnabled();
         $originalRecoveryCodes = $user->recoveryCodes();
@@ -160,8 +154,6 @@ class TwoFactorChallengeTest extends TestCase
         Event::assertNotDispatched(TwoFactorRecoveryCodeReplaced::class, function (TwoFactorRecoveryCodeReplaced $event) use ($user) {
             return $event->user->id() === $user->id() && $event->code === 'abcdefg';
         });
-
-        Notification::assertNotSentTo($user, RecoveryCodeUsed::class);
     }
 
     #[Test]

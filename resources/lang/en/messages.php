@@ -244,8 +244,6 @@ return [
     'two_factor_enabled' => 'Two Factor Authentication is enabled for your account. You will be prompted for a secure, random token from your phone\'s authenticator app every time you log in.',
     'two_factor_not_setup' => 'This user hasn\'t setup two factor authentication yet.',
     'two_factor_recovery_code_instructions' => 'Please confirm access to your account by entering one of your emergency recovery codes.',
-    'two_factor_recovery_code_used_notification_body' => "One of your recovery codes has been used to log into your account. This code has now been removed, and replaced with a new code.\n Please go to your Profile to view your new recovery codes, and store these in a safe place.\n If this was not you, immediately change your password and reset your two factor authentication setup from your Profile.",
-    'two_factor_recovery_code_used_notification_subject' => 'A recovery code has been used on your account',
     'two_factor_recovery_codes' => 'Store your recovery codes in a safe place. They can be used to recover access to your account if your two-factor authentication app is lost.',
     'two_factor_regenerate_recovery_codes' => 'Regenerating your recovery codes will invalidate all previously created recovery codes with immediate effect.',
     'two_factor_setup_instructions' => 'Scan this QR code (or use the text code) with your authentication app on your phone, and enter the next six digit verification code.',

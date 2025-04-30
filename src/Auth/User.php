@@ -42,7 +42,6 @@ use Statamic\Facades;
 use Statamic\GraphQL\ResolvesValues;
 use Statamic\Notifications\ActivateAccount as ActivateAccountNotification;
 use Statamic\Notifications\PasswordReset as PasswordResetNotification;
-use Statamic\Notifications\RecoveryCodeUsed as RecoveryCodeUsedNotification;
 use Statamic\Search\Searchable;
 use Statamic\Statamic;
 use Statamic\Support\Str;
@@ -415,8 +414,6 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
         ]);
 
         $this->set('two_factor_recovery_codes', encrypt(json_encode($recoveryCodes)))->save();
-
-        $this->notify(new RecoveryCodeUsedNotification);
     }
 
     /**

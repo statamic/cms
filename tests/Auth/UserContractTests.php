@@ -7,21 +7,18 @@ use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\File\Role;
 use Statamic\Auth\File\UserGroup;
-use Statamic\Auth\TwoFactor\RecoveryCode;
 use Statamic\Events\UserSaved;
 use Statamic\Events\UserSaving;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
-use Statamic\Notifications\RecoveryCodeUsed;
 use Statamic\Support\Arr;
 
 trait UserContractTests
@@ -674,8 +671,6 @@ trait UserContractTests
     #[Test]
     public function it_replaces_recovery_codes()
     {
-        Notification::fake();
-
         $user = $this->makeUser()
             ->makeSuper()
             ->set('two_factor_recovery_codes', encrypt(json_encode([
@@ -706,8 +701,6 @@ trait UserContractTests
             'code7',
             'code8',
         ], $user->recoveryCodes());
-
-        Notification::assertSentTo($user, RecoveryCodeUsed::class);
     }
 
     #[Test]
