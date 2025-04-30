@@ -263,9 +263,7 @@ export default {
                         return;
                     }
 
-                    this.$toast.success(__('Logged in'));
-                    this.restartCountdown();
-                    this.updateCsrfToken();
+                    this.loginComplete();
                 })
                 .catch((e) => {
                     if (e.response.status === 422) {
@@ -289,9 +287,7 @@ export default {
                     this.twoFactorRecoveryCode = null;
                     this.twoFactorMode = 'code';
                     this.isShowingTwoFactorChallenge = false;
-                    this.$toast.success(__('Logged in'));
-                    this.restartCountdown();
-                    this.updateCsrfToken();
+                    this.loginComplete();
                 })
                 .catch((e) => {
                     if (e.response.status === 422) {
@@ -307,6 +303,12 @@ export default {
             this.$axios.get(cp_url('auth/extend')).then((response) => {
                 this.remaining = this.lifetime;
             });
+        },
+
+        loginComplete() {
+            this.$toast.success(__('Logged in'));
+            this.restartCountdown();
+            this.updateCsrfToken();
         },
     },
 };
