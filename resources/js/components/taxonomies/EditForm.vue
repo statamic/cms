@@ -1,6 +1,7 @@
 <template>
     <publish-container
         v-if="blueprint"
+        class="max-w-5xl mx-auto"
         ref="container"
         name="taxonomy"
         reference="taxonomy"
@@ -12,20 +13,23 @@
         v-slot="{ setFieldValue, setFieldMeta }"
     >
         <div>
-            <header class="mb-6">
-                <breadcrumb :url="url" :title="values.title" />
-                <div class="flex items-center">
-                    <h1 class="flex-1" v-text="__('Configure Taxonomy')" />
-                    <button type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
-                </div>
-            </header>
+            <Header :title="__(editTitle ?? 'Configure Taxonomy')" icon="cog">
+                <Button variant="primary" @click="submit">{{ __('Save') }}</Button>
+            </Header>
             <configure-tabs @updated="setFieldValue" @meta-updated="setFieldMeta" :enable-sidebar="false" />
         </div>
     </publish-container>
 </template>
 
 <script>
+import { Header, Button } from '@statamic/ui';
+
 export default {
+    components: {
+        Header,
+        Button,
+    },
+
     props: {
         blueprint: Object,
         initialValues: Object,

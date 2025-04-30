@@ -1,29 +1,35 @@
 <template>
     <publish-container
         v-if="blueprint"
+        class="max-w-5xl mx-auto"
         ref="container"
         name="collection"
+        reference="collection"
         :blueprint="blueprint"
         :values="values"
-        reference="collection"
         :meta="meta"
         :errors="errors"
         @updated="values = $event"
         v-slot="{ setFieldValue, setFieldMeta }"
     >
         <div>
+            <Header :title="__(editTitle ?? 'Configure Navigation')" icon="cog">
+                <Button variant="primary" @click="submit">{{ __('Save') }}</Button>
+            </Header>
             <configure-tabs @updated="setFieldValue" @meta-updated="setFieldMeta" :enable-sidebar="false" />
-
-            <div class="flex justify-between border-t py-4 dark:border-dark-950">
-                <a :href="url" class="btn" v-text="__('Cancel')" />
-                <button type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
-            </div>
         </div>
     </publish-container>
 </template>
 
 <script>
+import { Header, Button } from '@statamic/ui';
+
 export default {
+    components: {
+        Header,
+        Button,
+    },
+
     props: {
         blueprint: Object,
         initialValues: Object,

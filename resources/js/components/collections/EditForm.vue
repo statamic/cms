@@ -1,6 +1,7 @@
 <template>
     <publish-container
         v-if="blueprint"
+        class="max-w-5xl mx-auto"
         ref="container"
         name="collection"
         reference="collection"
@@ -13,7 +14,7 @@
         v-slot="{ setFieldValue, setFieldMeta }"
     >
         <div>
-            <Header :title="__(editTitle ?? 'Configure Collection')">
+            <Header :title="__(editTitle ?? 'Configure Collection')" icon="cog">
                 <Button variant="primary" @click="submit">{{ __('Save') }}</Button>
             </Header>
             <configure-tabs @updated="setFieldValue" @meta-updated="setFieldMeta" :enable-sidebar="false" />
