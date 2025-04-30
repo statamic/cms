@@ -256,7 +256,7 @@ class UsersController extends CpController
             'twoFactor' => [
                 'isCurrentUser' => $user->id === User::current()->id,
                 'isEnforced' => $user->isTwoFactorAuthenticationRequired(),
-                'isSetup' => $user->hasEnabledTwoFactorAuthentication(),
+                'wasSetup' => $user->hasEnabledTwoFactorAuthentication(),
                 'canDisable' => request()->user()->can('edit', $user),
                 'routes' => [
                     'enable' => cp_route('users.two-factor.enable', $user->id),

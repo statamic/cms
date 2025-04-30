@@ -40,7 +40,7 @@ class EditUserTest extends TestCase
             ->assertViewHasAll([
                 'twoFactor.isCurrentUser',
                 'twoFactor.isEnforced',
-                'twoFactor.isSetup',
+                'twoFactor.wasSetup',
                 'twoFactor.canDisable',
                 'twoFactor.routes.enable',
                 'twoFactor.routes.disable',

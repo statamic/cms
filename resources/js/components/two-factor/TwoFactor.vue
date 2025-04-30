@@ -81,12 +81,13 @@ export default {
         TwoFactorRecoveryCodesModal,
     },
 
-    props: ['isSetup', 'isCurrentUser', 'isEnforced', 'routes', 'canDisable'],
+    props: ['wasSetup', 'isCurrentUser', 'isEnforced', 'routes', 'canDisable'],
 
     data() {
         return {
             recoveryCodesModalOpen: false,
             setupModalOpen: false,
+            isSetup: this.wasSetup,
         };
     },
 
