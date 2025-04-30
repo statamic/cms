@@ -113,7 +113,7 @@ class TwoFactorChallengeTest extends TestCase
         Event::fake();
 
         $user = $this->userWithTwoFactorEnabled();
-        $recoveryCode = collect($user->recoveryCodes())->first();
+        $recoveryCode = collect($user->twoFactorRecoveryCodes())->first();
 
         $this
             ->session(['login.id' => $user->id()])
@@ -124,7 +124,7 @@ class TwoFactorChallengeTest extends TestCase
 
         $this->assertAuthenticatedAs($user);
 
-        $this->assertNotContains($recoveryCode, $user->fresh()->recoveryCodes());
+        $this->assertNotContains($recoveryCode, $user->fresh()->twoFactorRecoveryCodes());
 
         Event::assertDispatched(TwoFactorRecoveryCodeReplaced::class, function (TwoFactorRecoveryCodeReplaced $event) use ($user, $recoveryCode) {
             return $event->user->id() === $user->id() && $event->code === $recoveryCode;
@@ -137,7 +137,7 @@ class TwoFactorChallengeTest extends TestCase
         Event::fake();
 
         $user = $this->userWithTwoFactorEnabled();
-        $originalRecoveryCodes = $user->recoveryCodes();
+        $originalRecoveryCodes = $user->twoFactorRecoveryCodes();
 
         $this
             ->session(['login.id' => $user->id()])
@@ -149,7 +149,7 @@ class TwoFactorChallengeTest extends TestCase
 
         $this->assertGuest();
 
-        $this->assertEquals($originalRecoveryCodes, $user->fresh()->recoveryCodes());
+        $this->assertEquals($originalRecoveryCodes, $user->fresh()->twoFactorRecoveryCodes());
 
         Event::assertNotDispatched(TwoFactorRecoveryCodeReplaced::class, function (TwoFactorRecoveryCodeReplaced $event) use ($user) {
             return $event->user->id() === $user->id() && $event->code === 'abcdefg';

@@ -74,7 +74,7 @@ class TwoFactorChallengeRequest extends FormRequest
             return;
         }
 
-        return tap(collect($this->challengedUser()->recoveryCodes())->first(function ($code) {
+        return tap(collect($this->challengedUser()->twoFactorRecoveryCodes())->first(function ($code) {
             return hash_equals($code, $this->recovery_code) ? $code : null;
         }), function ($code) {
             if ($code) {

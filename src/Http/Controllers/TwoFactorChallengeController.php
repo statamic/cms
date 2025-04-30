@@ -36,7 +36,7 @@ class TwoFactorChallengeController extends Controller
         $user = $request->challengedUser();
 
         if ($code = $request->validRecoveryCode()) {
-            $user->replaceRecoveryCode($code);
+            $user->replaceTwoFactorRecoveryCode($code);
         } elseif (! $request->hasValidCode()) {
             TwoFactorAuthenticationFailed::dispatch($user);
 

@@ -27,7 +27,7 @@ class TwoFactorRecoveryCodesTest extends TestCase
             ]))
             ->assertOk()
             ->assertJson([
-                'recovery_codes' => $user->recoveryCodes(),
+                'recovery_codes' => $user->twoFactorRecoveryCodes(),
             ]);
     }
 
@@ -106,7 +106,7 @@ class TwoFactorRecoveryCodesTest extends TestCase
                 'user' => $user->id,
             ]))
             ->assertOk()
-            ->assertSeeInOrder($user->recoveryCodes());
+            ->assertSeeInOrder($user->twoFactorRecoveryCodes());
     }
 
     #[Test]

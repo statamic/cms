@@ -25,7 +25,7 @@ class TwoFactorRecoveryCodesController extends CpController
             abort(403);
         }
 
-        return ['recovery_codes' => $user->recoveryCodes()];
+        return ['recovery_codes' => $user->twoFactorRecoveryCodes()];
     }
 
     public function store(Request $request, $user, GenerateNewRecoveryCodes $generateRecoveryCodes)
@@ -38,7 +38,7 @@ class TwoFactorRecoveryCodesController extends CpController
 
         $generateRecoveryCodes($user);
 
-        return ['recovery_codes' => $user->recoveryCodes()];
+        return ['recovery_codes' => $user->twoFactorRecoveryCodes()];
     }
 
     public function download(Request $request, $user)
@@ -51,7 +51,7 @@ class TwoFactorRecoveryCodesController extends CpController
 
         $filename = Str::slug(config('app.name')).'-recovery-codes.txt';
 
-        $content = collect($user->recoveryCodes())->implode(PHP_EOL);
+        $content = collect($user->twoFactorRecoveryCodes())->implode(PHP_EOL);
 
         return response($content, 200, [
             'Content-Type' => 'text/plain',

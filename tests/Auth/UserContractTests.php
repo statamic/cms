@@ -664,8 +664,8 @@ trait UserContractTests
                 'code8',
             ])));
 
-        $this->assertIsArray($user->recoveryCodes());
-        $this->assertEquals($recoveryCodes, $user->recoveryCodes());
+        $this->assertIsArray($user->twoFactorRecoveryCodes());
+        $this->assertEquals($recoveryCodes, $user->twoFactorRecoveryCodes());
     }
 
     #[Test]
@@ -689,7 +689,7 @@ trait UserContractTests
         // RecoveryCode::generate() uses Str::random() to generate the codes.
         Str::createRandomStringsUsingSequence(['abc', 'def']);
 
-        $user->replaceRecoveryCode('code4');
+        $user->replaceTwoFactorRecoveryCode('code4');
 
         $this->assertEquals([
             'code1',
@@ -700,7 +700,7 @@ trait UserContractTests
             'code6',
             'code7',
             'code8',
-        ], $user->recoveryCodes());
+        ], $user->twoFactorRecoveryCodes());
     }
 
     #[Test]

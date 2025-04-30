@@ -396,7 +396,7 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
     /**
      * Get the user's two factor authentication recovery codes.
      */
-    public function recoveryCodes(): array
+    public function twoFactorRecoveryCodes(): array
     {
         return json_decode(decrypt($this->two_factor_recovery_codes), true);
     }
@@ -404,7 +404,7 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
     /**
      * Replace the given recovery code with a new one in the user's stored codes.
      */
-    public function replaceRecoveryCode(string $code): void
+    public function replaceTwoFactorRecoveryCode(string $code): void
     {
         $this->set('two_factor_recovery_codes', encrypt(str_replace(
             $code,
