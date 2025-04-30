@@ -1,23 +1,10 @@
 <template>
     <div>
-        <Button icon="utilities" v-tooltip="__('Customize Table')" @click="open = true" />
-
-        <modal
-            v-if="open"
-            name="column-picker"
-            @closed="open = false"
-            draggable=".modal-drag-handle"
-            click-to-close
-            v-slot="{ close }"
-        >
-            <div class="-max-h-screen-px flex h-full flex-col">
-                <header
-                    class="modal-drag-handle dark:border-dark-900 dark:bg-dark-650 flex cursor-grab items-center justify-between border-b bg-gray-200 p-4 active:cursor-grabbing"
-                >
-                    <h2>{{ __('Customize Columns') }}</h2>
-                    <button class="btn-close" @click="close" :aria-label="__('Close Editor')">&times;</button>
-                </header>
-
+        <ui-modal :title="__('Customize Columns')">
+            <template #trigger>
+                <Button icon="utilities" v-tooltip="__('Customize Table')"/>
+            </template>
+            <div class="flex h-full flex-col">
                 <div class="dark:bg-dark-600 flex min-h-0 grow rounded-t-md bg-gray-100">
                     <!-- Available Columns -->
                     <div
@@ -90,20 +77,21 @@
                     </div>
                 </div>
 
-                <footer
-                    class="dark:border-dark-900 dark:bg-dark-700 flex items-center justify-end border-t px-3 py-2"
-                    v-if="preferencesKey"
-                >
-                    <button class="btn" v-text="__('Reset')" @click="reset" :disabled="saving" />
-                    <button
-                        class="btn-primary ltr:ml-3 rtl:mr-3"
-                        v-text="__('Save')"
-                        @click="save"
-                        :disabled="saving"
-                    />
-                </footer>
             </div>
-        </modal>
+            <template #footer v-if="preferencesKey">
+                <div class="flex items-center justify-end space-x-3 pt-3 pb-1">
+                    <ui-modal-close>
+                        <ui-button :text="__('Cancel')" variant="ghost" />
+                    </ui-modal-close>
+                    <ui-modal-close asChild>
+                        <ui-button :text="__('Reset')" @click="reset" :disabled="saving" />
+                    </ui-modal-close>
+                    <ui-modal-close asChild>
+                        <ui-button :text="__('Save')" variant="primary" @click="save" :disabled="saving" />
+                    </ui-modal-close>
+                </div>
+            </template>
+        </ui-modal>
     </div>
 </template>
 
