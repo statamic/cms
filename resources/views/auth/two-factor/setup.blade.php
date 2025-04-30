@@ -18,7 +18,7 @@
                         {{ __('Set up Two Factor Authentication') }}
                     </h1>
                     <p class="mb-4 text-sm text-gray dark:text-dark-175">
-                        {{ __('Your account requires two factor authentication. Please enable it before proceeding.') }}
+                        {{ __('statamic::messages.two_factor_account_requirement') }}
                     </p>
 
                     <enable-two-factor-authentication

@@ -19,7 +19,7 @@ class ConfirmTwoFactorAuthentication
             || ! $this->provider->verify($user->twoFactorSecretKey(), $code)
         ) {
             throw ValidationException::withMessages([
-                'code' => [__('The provided two factor authentication code was invalid.')],
+                'code' => [__('statamic::validation.invalid_two_factor_code')],
             ]);
         }
 

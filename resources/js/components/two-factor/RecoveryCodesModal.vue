@@ -103,7 +103,6 @@ function copyToClipboard() {
         @cancel="confirming = false"
         @confirm="regenerate"
     >
-        <p class="mb-2">{{ __('statamic::messages.two_factor_regenerate_recovery_codes_1') }}</p>
-        <p>{{ __('statamic::messages.two_factor_regenerate_recovery_codes_2') }}</p>
+        <p>{{ __('statamic::messages.two_factor_regenerate_recovery_codes') }}</p>
     </confirmation-modal>
 </template>
