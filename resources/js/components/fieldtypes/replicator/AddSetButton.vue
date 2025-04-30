@@ -13,11 +13,11 @@
                 :transition="{ duration: 0.2 }"
             >
                 <div v-if="showConnector" class="absolute group-hover:opacity-0 transition-opacity delay-25 duration-125 inset-y-0 h-full left-3.5 border-l-1 border-gray-400 dark:border-gray-600 border-dashed z-0 dark:bg-dark-700" />
-                <div class="w-full absolute inset-0 h-full opacity-0 group-hover:opacity-100 transition-opacity delay-25 duration-75">
+                <button class="w-full absolute inset-0 h-full opacity-0 group-hover:opacity-100 transition-opacity delay-25 duration-75 cursor-pointer" @click="addSetButtonClicked">
                     <div class="h-full flex flex-col justify-center">
                         <div class="rounded-full bg-gray-200 h-2" />
                     </div>
-                </div>
+                </button>
                 <Button v-if="enabled" @click="addSetButtonClicked" round icon="plus" size="sm" class="-my-4 z-3 opacity-0 group-hover:opacity-100 transition-opacity delay-25 duration-75" />
             </Motion>
         </template>
