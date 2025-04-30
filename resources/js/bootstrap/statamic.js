@@ -99,6 +99,10 @@ export default {
         return this.$app.config.globalProperties.$date;
     },
 
+    get $progress() {
+        return this.$app.config.globalProperties.$progress;
+    },
+
     get darkMode() {
         return darkMode;
     },

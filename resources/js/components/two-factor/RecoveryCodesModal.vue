@@ -1,3 +1,50 @@
+<script setup>
+import { ref, onMounted } from 'vue';
+import LoadingGraphic from '@statamic/components/LoadingGraphic.vue';
+import axios from 'axios';
+
+const emit = defineEmits(['cancel', 'close']);
+
+const props = defineProps({
+    recoveryCodesUrl: String,
+    generateUrl: String,
+    downloadUrl: String,
+});
+
+const loading = ref(true);
+const confirming = ref(false);
+const recoveryCodes = ref(null);
+const canCopy = !!navigator.clipboard;
+
+onMounted(() => getRecoveryCodes());
+
+function getRecoveryCodes() {
+    loading.value = true;
+
+    axios.get(props.recoveryCodesUrl).then((response) => {
+        recoveryCodes.value = response.data.recovery_codes;
+        loading.value = false;
+    });
+}
+
+function regenerate() {
+    axios.post(props.generateUrl).then((response) => {
+        recoveryCodes.value = response.data.recovery_codes;
+        confirming.value = false;
+        Statamic.$toast.success(__('Refreshed recovery codes'));
+    });
+}
+
+function copyToClipboard() {
+    if (!canCopy) return Statamic.$toast.error(__('Unable to copy to clipboard'));
+
+    navigator.clipboard
+        .writeText(recoveryCodes.value.join('\n'))
+        .then(() => Statamic.$toast.success(__('Copied to clipboard')))
+        .catch((error) => Statamic.$toast.error(__('Unable to copy to clipboard')));
+}
+</script>
+
 <template>
     <modal name="two-factor-recovery-codes" @closed="$emit('cancel')">
         <div>
@@ -60,64 +107,3 @@
         <p>{{ __('statamic::messages.two_factor_regenerate_recovery_codes_2') }}</p>
     </confirmation-modal>
 </template>
-
-<script>
-import LoadingGraphic from '@statamic/components/LoadingGraphic.vue';
-
-export default {
-    components: { LoadingGraphic },
-
-    props: {
-        recoveryCodesUrl: String,
-        generateUrl: String,
-        downloadUrl: String,
-    },
-
-    data() {
-        return {
-            loading: true,
-            confirming: false,
-            recoveryCodes: null,
-        };
-    },
-
-    computed: {
-        canCopy() {
-            return navigator.clipboard;
-        },
-    },
-
-    mounted() {
-        this.getRecoveryCodes();
-    },
-
-    methods: {
-        getRecoveryCodes() {
-            this.loading = true;
-
-            this.$axios.get(this.recoveryCodesUrl).then((response) => {
-                this.recoveryCodes = response.data.recovery_codes;
-                this.loading = false;
-            });
-        },
-
-        regenerate() {
-            this.$axios.post(this.generateUrl).then((response) => {
-                this.recoveryCodes = response.data.recovery_codes;
-                this.confirming = false;
-
-                Statamic.$toast.success(__('Refreshed recovery codes'));
-            });
-        },
-
-        copyToClipboard() {
-            if (!navigator.clipboard) return Statamic.$toast.error(__('Unable to copy to clipboard'));
-
-            navigator.clipboard
-                .writeText(this.recoveryCodes.join('\n'))
-                .then(() => Statamic.$toast.success(__('Copied to clipboard')))
-                .catch((error) => Statamic.$toast.error(__('Unable to copy to clipboard')));
-        },
-    },
-};
-</script>

@@ -1,36 +1,35 @@
-<template>
-    <slot v-bind="{ busy, mode, toggleMode, hasError }"></slot>
-</template>
+<script setup>
+import { ref, onMounted } from 'vue';
 
-<script>
-export default {
-    props: {
-        initialMode: {
-            type: String,
-            default: 'code',
-        },
-        hasError: {
-            default: false,
-        },
+const props = defineProps({
+    initialMode: {
+        type: String,
+        default: 'code',
     },
+    hasError: {
+        default: false,
+    },
+});
 
-    data() {
-        return {
-            busy: false,
-            mode: this.initialMode,
-        };
-    },
+const wrapper = ref(null);
+const busy = ref(false);
+const mode = ref(props.initialMode);
 
-    mounted() {
-        if (this.hasError) {
-            this.$el.parentElement.parentElement.classList.add('animation-shake');
-        }
-    },
+onMounted(() => {
+    if (props.hasError) {
+        wrapper.value.parentElement.parentElement.classList.add('animation-shake');
+    }
+});
 
-    methods: {
-        toggleMode() {
-            this.mode = this.mode === 'code' ? 'recovery_code' : 'code';
-        },
-    },
-};
+function toggleMode() {
+    mode.value = mode.value === 'code' ? 'recovery_code' : 'code';
+}
+
+function setBusy(state = null) {
+    busy.value = state ?? true;
+}
 </script>
+
+<template>
+    <div ref="wrapper"><slot v-bind="{ busy, setBusy, mode, toggleMode, hasError }"></slot></div>
+</template>

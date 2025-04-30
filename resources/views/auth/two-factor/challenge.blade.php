@@ -15,9 +15,9 @@
             <two-factor-challenge
                 initial-mode="{{ $mode }}"
                 :has-error="{{ $str::bool(count($errors) > 0) }}"
-                v-slot="{ busy, mode, toggleMode, hasError }"
+                v-slot="{ busy, setBusy, mode, toggleMode, hasError }"
             >
-                <form method="POST" action="{{ $action }}" class="email-login select-none" @submit="busy = true">
+                <form method="POST" action="{{ $action }}" class="email-login select-none" @submit="setBusy">
                     @csrf
 
                     @if (request("redirect"))
@@ -101,7 +101,7 @@
                             {{ __("Use one-time code") }}
                         </button>
 
-                        <button type="submit" class="btn-primary">{{ __("Continue") }}</button>
+                        <button type="submit" class="btn-primary" :disabled="busy">{{ __("Continue") }}</button>
                     </div>
                 </form>
             </two-factor-challenge>

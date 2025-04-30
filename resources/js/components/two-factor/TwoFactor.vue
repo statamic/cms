@@ -1,3 +1,38 @@
+<script setup>
+import { ref } from 'vue';
+import DisableTwoFactor from './Disable.vue';
+import TwoFactorSetup from './Setup.vue';
+import TwoFactorRecoveryCodesModal from './RecoveryCodesModal.vue';
+import { requireElevatedSession } from '@statamic/components/elevated-sessions';
+
+const props = defineProps(['wasSetup', 'isCurrentUser', 'isEnforced', 'routes', 'canDisable']);
+
+const recoveryCodesModalOpen = ref(false);
+const setupModalOpen = ref(false);
+const isSetup = ref(props.wasSetup);
+
+function openSetupModal() {
+    requireElevatedSession()
+        .then(() => (setupModalOpen.value = true))
+        .catch(() => Statamic.$toast.error(__('statamic::messages.elevated_session_required')));
+}
+
+function openRecoveryCodesModal() {
+    requireElevatedSession()
+        .then(() => (recoveryCodesModalOpen.value = true))
+        .catch(() => Statamic.$toast.error(__('statamic::messages.elevated_session_required')));
+}
+
+function setupComplete() {
+    isSetup.value = true;
+    setupModalOpen.value = false;
+}
+
+function resetComplete() {
+    isSetup.value = false;
+}
+</script>
+
 <template>
     <popover placement="bottom" ref="popper">
         <template #trigger>
@@ -67,51 +102,3 @@
         </div>
     </popover>
 </template>
-
-<script>
-import DisableTwoFactor from './Disable.vue';
-import TwoFactorSetup from './Setup.vue';
-import TwoFactorRecoveryCodesModal from './RecoveryCodesModal.vue';
-import { requireElevatedSession } from '@statamic/components/elevated-sessions';
-
-export default {
-    components: {
-        DisableTwoFactor,
-        TwoFactorSetup,
-        TwoFactorRecoveryCodesModal,
-    },
-
-    props: ['wasSetup', 'isCurrentUser', 'isEnforced', 'routes', 'canDisable'],
-
-    data() {
-        return {
-            recoveryCodesModalOpen: false,
-            setupModalOpen: false,
-            isSetup: this.wasSetup,
-        };
-    },
-
-    methods: {
-        openSetupModal() {
-            requireElevatedSession()
-                .then(() => (this.setupModalOpen = true))
-                .catch(() => this.$toast.error(__('statamic::messages.elevated_session_required')));
-        },
-
-        openRecoveryCodesModal() {
-            requireElevatedSession()
-                .then(() => (this.recoveryCodesModalOpen = true))
-                .catch(() => this.$toast.error(__('statamic::messages.elevated_session_required')));
-        },
-
-        setupComplete() {
-            this.isSetup = true;
-            this.setupModalOpen = false;
-        },
-
-        resetComplete() {
-            this.isSetup = false;
-        },
-    },
-};
-</script>

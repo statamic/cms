@@ -1,3 +1,56 @@
+<script setup>
+import { ref, onMounted } from 'vue';
+import LoadingGraphic from '@statamic/components/LoadingGraphic.vue';
+import TwoFactorRecoveryCodesModal from '@statamic/components/two-factor/RecoveryCodesModal.vue';
+import axios from 'axios';
+
+const emit = defineEmits(['setup-complete', 'cancel', 'cancel']);
+
+const props = defineProps({
+    enableUrl: String,
+    recoveryCodeUrls: Object,
+});
+
+const loading = ref(true);
+const qrCode = ref(null);
+const secretKey = ref(null);
+const code = ref(null);
+const error = ref(null);
+const confirmUrl = ref(null);
+const setupModalOpen = ref(true);
+const recoveryCodesModalOpen = ref(false);
+
+onMounted(() => getSetupCode());
+
+function getSetupCode() {
+    loading.value = true;
+
+    axios.get(props.enableUrl).then((response) => {
+        qrCode.value = response.data.qr;
+        secretKey.value = response.data.secret_key;
+        confirmUrl.value = response.data.confirm_url;
+        loading.value = false;
+    });
+}
+
+function confirm() {
+    axios
+        .post(confirmUrl.value, { code: code.value })
+        .then((response) => {
+            setupModalOpen.value = false;
+            recoveryCodesModalOpen.value = true;
+        })
+        .catch((error) => {
+            error.value = error.response.data.errors.code[0];
+        });
+}
+
+function complete() {
+    recoveryCodesModalOpen.value = false;
+    emit('setup-complete');
+}
+</script>
+
 <template>
     <modal v-if="setupModalOpen" name="two-factor-setup" @closed="$emit('cancel')">
         <div>
@@ -71,66 +124,3 @@
         @close="complete"
     />
 </template>
-
-<script>
-import LoadingGraphic from '@statamic/components/LoadingGraphic.vue';
-import TwoFactorRecoveryCodesModal from '@statamic/components/two-factor/RecoveryCodesModal.vue';
-
-export default {
-    components: { TwoFactorRecoveryCodesModal, LoadingGraphic },
-
-    props: {
-        enableUrl: String,
-        recoveryCodeUrls: Object,
-    },
-
-    data() {
-        return {
-            loading: true,
-            qrCode: null,
-            secretKey: null,
-            code: null,
-            error: null,
-            confirmUrl: null,
-            setupModalOpen: true,
-            recoveryCodesModalOpen: false,
-        };
-    },
-
-    mounted() {
-        this.getSetupCode();
-    },
-
-    methods: {
-        getSetupCode() {
-            this.loading = true;
-
-            this.$axios.get(this.enableUrl).then((response) => {
-                this.qrCode = response.data.qr;
-                this.secretKey = response.data.secret_key;
-                this.confirmUrl = response.data.confirm_url;
-
-                this.loading = false;
-            });
-        },
-
-        confirm() {
-            this.$axios
-                .post(this.confirmUrl, { code: this.code })
-                .then((response) => {
-                    this.setupModalOpen = false;
-                    this.recoveryCodesModalOpen = true;
-                })
-                .catch((error) => {
-                    this.error = error.response.data.errors.code[0];
-                });
-        },
-
-        complete() {
-            this.recoveryCodesModalOpen = false;
-
-            this.$emit('setup-complete');
-        },
-    },
-};
-</script>

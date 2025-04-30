@@ -1,3 +1,19 @@
+<script setup>
+import TwoFactorSetup from '@statamic/components/two-factor/Setup.vue';
+import { ref } from 'vue';
+
+const props = defineProps({
+    routes: Object,
+    redirect: String,
+});
+
+const setupModalOpen = ref(false);
+
+function setupComplete() {
+    window.location.href = props.redirect;
+}
+</script>
+
 <template>
     <button type="button" class="btn-primary" @click="setupModalOpen = true">{{ __('Set up') }}</button>
 
@@ -9,29 +25,3 @@
         @setup-complete="setupComplete"
     />
 </template>
-
-<script>
-import TwoFactorSetup from '@statamic/components/two-factor/Setup.vue';
-
-export default {
-    components: { TwoFactorSetup },
-
-    props: {
-        routes: Object,
-        redirect: String,
-    },
-
-    data() {
-        return {
-            busy: false,
-            setupModalOpen: false,
-        };
-    },
-
-    methods: {
-        setupComplete() {
-            window.location.href = this.redirect;
-        },
-    },
-};
-</script>

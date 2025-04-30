@@ -1,3 +1,47 @@
+<script setup>
+import { requireElevatedSession } from '@statamic/components/elevated-sessions';
+import { ref, watch } from 'vue';
+import axios from 'axios';
+
+const emit = defineEmits(['reset-complete']);
+
+const props = defineProps({
+    url: String,
+    isCurrentUser: Boolean,
+    isEnforced: Boolean,
+});
+
+const loading = ref(false);
+const confirming = ref(false);
+
+watch(loading, (loading) => {
+    Statamic.$progress.loading(loading);
+});
+
+function confirm() {
+    requireElevatedSession()
+        .then(() => (confirming.value = true))
+        .catch(() => {});
+}
+
+function disable() {
+    loading.value = true;
+
+    axios
+        .delete(props.url)
+        .then((response) => {
+            Statamic.$toast.success(__('Disabled two factor authentication'));
+            emit('reset-complete');
+            if (response.data.redirect) window.location = response.data.redirect;
+        })
+        .catch((error) => Statamic.$toast.error(error.message))
+        .finally(() => {
+            loading.value = false;
+            confirming.value = false;
+        });
+}
+</script>
+
 <template>
     <div>
         <slot :confirm="confirm" />
@@ -30,57 +74,3 @@
         </confirmation-modal>
     </div>
 </template>
-
-<script>
-import { requireElevatedSession } from '@statamic/components/elevated-sessions';
-
-export default {
-    props: {
-        url: String,
-        isCurrentUser: Boolean,
-        isEnforced: Boolean,
-    },
-
-    data() {
-        return {
-            loading: false,
-            confirming: false,
-        };
-    },
-
-    watch: {
-        loading(loading) {
-            this.$progress.loading(loading);
-        },
-    },
-
-    methods: {
-        confirm() {
-            requireElevatedSession()
-                .then(() => (this.confirming = true))
-                .catch(() => {});
-        },
-
-        disable() {
-            this.loading = true;
-
-            this.$axios
-                .delete(this.url)
-                .then((response) => {
-                    this.$toast.success(__('Disabled two factor authentication'));
-
-                    this.$emit('reset-complete');
-
-                    if (response.data.redirect) {
-                        window.location = response.data.redirect;
-                    }
-                })
-                .catch((error) => this.$toast.error(error.message))
-                .finally(() => {
-                    this.loading = false;
-                    this.confirming = false;
-                });
-        },
-    },
-};
-</script>
