@@ -6,7 +6,6 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Statamic\Events\TwoFactorAuthenticationFailed;
-use Statamic\Events\TwoFactorRecoveryCodeReplaced;
 use Statamic\Events\ValidTwoFactorAuthenticationCodeProvided;
 use Statamic\Http\Middleware\RedirectIfAuthenticated;
 use Statamic\Http\Requests\TwoFactorChallengeRequest;
@@ -38,8 +37,6 @@ class TwoFactorChallengeController extends Controller
 
         if ($code = $request->validRecoveryCode()) {
             $user->replaceRecoveryCode($code);
-
-            TwoFactorRecoveryCodeReplaced::dispatch($user, $code);
         } elseif (! $request->hasValidCode()) {
             TwoFactorAuthenticationFailed::dispatch($user);
 

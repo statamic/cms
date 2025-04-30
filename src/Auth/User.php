@@ -32,6 +32,7 @@ use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\HasDirtyState;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
+use Statamic\Events\TwoFactorRecoveryCodeReplaced;
 use Statamic\Events\UserCreated;
 use Statamic\Events\UserCreating;
 use Statamic\Events\UserDeleted;
@@ -414,6 +415,8 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
         ]);
 
         $this->set('two_factor_recovery_codes', encrypt(json_encode($recoveryCodes)))->save();
+
+        TwoFactorRecoveryCodeReplaced::dispatch($this, $code);
     }
 
     /**
