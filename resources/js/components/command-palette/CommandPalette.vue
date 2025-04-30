@@ -185,7 +185,13 @@ const modalClasses = cva({
                     :whilePress="{ scale: 0.985 }"
                     :transition="{ duration: 0.1 }"
                 >
-                    <ComboboxRoot :open="true" :default-open="true" :ignore-filter="true" v-model="selected">
+                    <ComboboxRoot
+                        :open="true"
+                        :default-open="true"
+                        :ignore-filter="true"
+                        v-model="selected"
+                        @keydown.tab.prevent.stop
+                    >
                         <header
                             class="group/cmd-input flex h-14 items-center gap-2 border-b border-gray-200/80 px-5.5 dark:border-gray-950"
                         >
