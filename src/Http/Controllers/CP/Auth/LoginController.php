@@ -25,7 +25,6 @@ class LoginController extends CpController
     public function __construct()
     {
         $this->middleware(RedirectIfAuthorized::class)->except('logout');
-        $this->middleware('statamic.cp.authenticated')->only('logout');
     }
 
     /**
