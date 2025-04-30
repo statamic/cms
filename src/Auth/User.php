@@ -406,15 +406,11 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
      */
     public function replaceRecoveryCode(string $code): void
     {
-        $recoveryCodes = collect($this->recoveryCodes());
-
-        $usedRecoveryCode = $recoveryCodes->first(fn (string $recoveryCode) => hash_equals($recoveryCode, $code) ? $recoveryCode : null);
-
-        $recoveryCodes = $recoveryCodes->replace([
-            $recoveryCodes->search($usedRecoveryCode) => TwoFactor\RecoveryCode::generate(),
-        ]);
-
-        $this->set('two_factor_recovery_codes', encrypt(json_encode($recoveryCodes)))->save();
+        $this->set('two_factor_recovery_codes', encrypt(str_replace(
+            $code,
+            TwoFactor\RecoveryCode::generate(),
+            decrypt($this->two_factor_recovery_codes)
+        )))->save();
 
         TwoFactorRecoveryCodeReplaced::dispatch($this, $code);
     }
