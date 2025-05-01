@@ -47,7 +47,6 @@
                 @if ($method === 'verification_code')
                     <div class="mb-8">
                         <label for="verification_code" class="mb-2">{{ __('Verification Code') }}</label>
-                        {{-- todo: instructions --}}
                         <input id="verification_code" type="text" class="input-text" name="verification_code" />
 
                         @error('verification_code')
