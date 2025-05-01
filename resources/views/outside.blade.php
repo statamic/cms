@@ -5,7 +5,13 @@
     </head>
     <body class="outside {{ config('statamic.cp.theme') }}-theme @yield('body_class')">
         <div id="statamic">
-            @yield('content')
+            <div id="main" class="flex flex-col justify-center">
+                <div>
+                    @yield('content')
+                </div>
+            </div>
+
+            <portal-targets></portal-targets>
         </div>
         @include('statamic::partials.scripts')
         @yield('scripts')

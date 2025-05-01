@@ -2,13 +2,20 @@
 
 namespace Tests\Tags\User;
 
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Auth\TwoFactor\RecoveryCode;
+use Statamic\Contracts\Auth\TwoFactor\TwoFactorAuthenticationProvider;
+use Statamic\Events\TwoFactorAuthenticationChallenged;
 use Statamic\Facades\Parse;
 use Statamic\Facades\User;
 use Statamic\Statamic;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
+#[Group('2fa')]
 class LoginFormTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
@@ -242,5 +249,41 @@ EOT
             ]);
 
         $response->assertStatus(422);
+    }
+
+    #[Test]
+    public function it_redirects_to_the_two_factor_challenge_page()
+    {
+        Event::fake();
+
+        $this->assertFalse(auth()->check());
+
+        User::make()
+            ->id(1)
+            ->email('san@holo.com')
+            ->password('chewy')
+            ->data([
+                'two_factor_confirmed_at' => now()->timestamp,
+                'two_factor_secret' => encrypt(app(TwoFactorAuthenticationProvider::class)->generateSecretKey()),
+                'two_factor_recovery_codes' => encrypt(json_encode(Collection::times(8, function () {
+                    return RecoveryCode::generate();
+                })->all())),
+            ])
+            ->save();
+
+        $this
+            ->assertGuest()
+            ->post('/!/auth/login', [
+                'token' => 'test-token',
+                'email' => 'san@holo.com',
+                'password' => 'chewy',
+            ])
+            ->assertRedirect('/!/auth/two-factor-challenge')
+            ->assertSessionHas('login.id', 1)
+            ->assertSessionHas('login.remember', false);
+
+        $this->assertFalse(auth()->check());
+
+        Event::assertDispatched(TwoFactorAuthenticationChallenged::class, fn ($event) => $event->user->id === 1);
     }
 }

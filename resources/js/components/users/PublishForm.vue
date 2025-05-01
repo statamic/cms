@@ -22,6 +22,8 @@
                     />
                 </dropdown-list>
 
+                <TwoFactor v-if="twoFactor" v-bind="twoFactor" trigger-class="ltr:mr-4 rtl:ml-4" />
+
                 <change-password
                     v-if="canEditPassword"
                     :save-url="actions.password"
@@ -64,6 +66,7 @@
 import ChangePassword from './ChangePassword.vue';
 import HasHiddenFields from '../publish/HasHiddenFields';
 import HasActions from '../publish/HasActions';
+import TwoFactor from '@statamic/components/two-factor/TwoFactor.vue';
 import clone from '@statamic/util/clone.js';
 
 export default {
@@ -71,6 +74,7 @@ export default {
 
     components: {
         ChangePassword,
+        TwoFactor,
     },
 
     props: {
@@ -85,6 +89,7 @@ export default {
         canEditPassword: Boolean,
         canEditBlueprint: Boolean,
         requiresCurrentPassword: Boolean,
+        twoFactor: Object,
     },
 
     data() {

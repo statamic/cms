@@ -15,7 +15,7 @@
             <login
                 :show-email-login="!{{ $str::bool($oauth) }}"
                 :has-error="{{ $str::bool(count($errors) > 0) }}"
-                v-slot="{ showEmailLogin, busy, hasError }"
+                v-slot="{ showEmailLogin, busy, setBusy, hasError }"
             >
                 <div>
                     @if ($oauth)
@@ -48,7 +48,7 @@
                         v-show="showEmailLogin"
                         class="email-login select-none"
                         @if ($oauth) v-cloak @endif
-                        @submit="busy = true"
+                        @submit="setBusy(true)"
                     >
                         {!! csrf_field() !!}
 
