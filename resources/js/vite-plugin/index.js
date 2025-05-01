@@ -6,7 +6,6 @@ function addAliases(config) {
     const jsDir = path.resolve('/@fs' + __dirname + '/../');
 
     const aliases = {
-        '@statamic/ui': `${jsDir}/components/ui/index.js`,
         '@statamic': jsDir,
         statamic: `${jsDir}/exports.js`,
     };
