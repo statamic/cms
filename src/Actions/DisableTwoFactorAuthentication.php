@@ -2,6 +2,8 @@
 
 namespace Statamic\Actions;
 
+use Statamic\Contracts\Auth\User;
+
 class DisableTwoFactorAuthentication extends Action
 {
     protected $dangerous = true;
@@ -25,7 +27,7 @@ class DisableTwoFactorAuthentication extends Action
 
     public function visibleTo($item)
     {
-        return $item->hasEnabledTwoFactorAuthentication();
+        return $item instanceof User && $item->hasEnabledTwoFactorAuthentication();
     }
 
     public function authorize($user, $item)
