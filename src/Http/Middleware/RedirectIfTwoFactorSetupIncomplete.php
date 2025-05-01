@@ -15,11 +15,16 @@ class RedirectIfTwoFactorSetupIncomplete
             && $user->isTwoFactorAuthenticationRequired()
             && ! $user->hasEnabledTwoFactorAuthentication()
         ) {
-            return redirect()->route('statamic.two-factor-setup', [
+            return redirect()->route($this->redirectRoute(), [
                 'referer' => $request->fullUrl(),
             ]);
         }
 
         return $next($request);
+    }
+
+    protected function redirectRoute(): string
+    {
+        return 'statamic.two-factor-setup';
     }
 }

@@ -2,25 +2,12 @@
 
 namespace Statamic\Http\Middleware\CP;
 
-use Closure;
-use Illuminate\Http\Request;
-use Statamic\Facades\User;
+use Statamic\Http\Middleware\RedirectIfTwoFactorSetupIncomplete as Middleware;
 
-class RedirectIfTwoFactorSetupIncomplete
+class RedirectIfTwoFactorSetupIncomplete extends Middleware
 {
-    public function handle(Request $request, Closure $next)
+    protected function redirectRoute(): string
     {
-        $user = User::fromUser($request->user());
-
-        if (
-            $user->isTwoFactorAuthenticationRequired()
-            && ! $user->hasEnabledTwoFactorAuthentication()
-        ) {
-            return redirect()->route('statamic.cp.two-factor-setup', [
-                'referer' => $request->fullUrl(),
-            ]);
-        }
-
-        return $next($request);
+        return 'statamic.cp.two-factor-setup';
     }
 }
