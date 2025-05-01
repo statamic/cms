@@ -32,7 +32,7 @@ class EnableTwoFactorTest extends TestCase
     public static function confirmProvider()
     {
         return [
-            'cp' => fn () => cp_route('users.two-factor.confirm'),
+            'cp' => [fn () => cp_route('users.two-factor.confirm')],
             'frontend' => [fn () => route('statamic.users.two-factor.confirm')],
         ];
     }
@@ -173,9 +173,10 @@ class EnableTwoFactorTest extends TestCase
     }
 
     #[Test]
-    #[DataProvider('confirmProvider')]
-    public function it_cant_confirm_two_factor_authentication_without_elevated_session($url)
+    public function it_cant_confirm_two_factor_authentication_without_elevated_session()
     {
+        // Elevated sessions are only in the cp.
+
         $user = $this->user();
         $user->set('two_factor_secret', encrypt(app(TwoFactorAuthenticationProvider::class)->generateSecretKey()));
         $user->set('two_factor_recovery_codes', encrypt(['abc', 'def', 'ghi', 'jkl', 'mno', 'pqr', 'stu', 'vwx']));
@@ -185,7 +186,7 @@ class EnableTwoFactorTest extends TestCase
 
         $this
             ->actingAs($user)
-            ->post($url(), [
+            ->post(cp_route('users.two-factor.confirm'), [
                 'code' => $this->getOneTimeCode($user),
             ])
             ->assertRedirect('/cp/auth/confirm-password');
