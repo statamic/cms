@@ -86,11 +86,7 @@ function copyToClipboard() {
                 <div
                     class="flex items-center justify-end border-t bg-gray-200 p-4 text-sm dark:border-dark-900 dark:bg-dark-550"
                 >
-                    <button
-                        class="text-gray hover:text-gray-900 dark:text-dark-150 dark:hover:text-dark-100"
-                        @click="$emit('close')"
-                        v-text="__('Close')"
-                    />
+                    <button class="btn" @click="$emit('close')" v-text="__('Close')" />
                 </div>
             </template>
         </div>
