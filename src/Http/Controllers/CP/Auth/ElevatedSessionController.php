@@ -14,12 +14,12 @@ class ElevatedSessionController
         $user = User::current();
 
         $response = [
-            'elevated' => $request->hasElevatedSession(),
+            'elevated' => $hasElevatedSession = $request->hasElevatedSession(),
             'expiry' => $request->getElevatedSessionExpiry(),
-            'method' => $user->getElevatedSessionMethod(),
+            'method' => $method = $user->getElevatedSessionMethod(),
         ];
 
-        if (! $request->hasElevatedSession() && $user->getElevatedSessionMethod() === 'verification_code') {
+        if (! $hasElevatedSession && $method === 'verification_code') {
             session()->sendElevatedSessionVerificationCode();
         }
 
@@ -30,12 +30,12 @@ class ElevatedSessionController
     {
         $user = User::current();
 
-        if ($user->getElevatedSessionMethod() === 'verification_code') {
+        if (($method = $user->getElevatedSessionMethod()) === 'verification_code') {
             session()->sendElevatedSessionVerificationCode();
         }
 
         return view('statamic::auth.confirm-password', [
-            'method' => $user->getElevatedSessionMethod(),
+            'method' => $method,
         ]);
     }
 
