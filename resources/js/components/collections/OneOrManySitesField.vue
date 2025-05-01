@@ -26,9 +26,7 @@
                     <tr v-for="site in sites" :key="site.handle">
                         <td class="align-middle" v-text="__(site.name)" />
                         <td>
-                            <text-input
-                                dir="ltr"
-                                class="slug-field"
+                            <ui-input
                                 :model-value="value[site.handle]"
                                 @update:model-value="updateSiteValue(site.handle, $event)"
                             />
@@ -39,7 +37,7 @@
         </div>
 
         <div v-if="!hasMultipleSites || !inMultipleMode">
-            <text-input :model-value="value" @update:model-value="update" class="slug-field" dir="ltr" />
+            <ui-input :model-value="value" @update:model-value="update" />
         </div>
     </div>
 </template>

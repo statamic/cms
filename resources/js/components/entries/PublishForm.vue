@@ -30,8 +30,8 @@
                 </DropdownMenu>
             </Dropdown>
 
-            <div class="text-2xs flex pt-px text-gray-600 ltr:mr-4 rtl:ml-4" v-if="readOnly">
-                <svg-icon name="light/lock" class="-mt-1 w-4 ltr:mr-1 rtl:ml-1" /> {{ __('Read Only') }}
+            <div class="text-2xs flex pt-px text-gray-600 me-4" v-if="readOnly">
+                <svg-icon name="light/lock" class="-mt-1 w-4 me-1" /> {{ __('Read Only') }}
             </div>
 
             <div class="hidden items-center gap-3 md:flex">
@@ -215,7 +215,7 @@
                                                 <loading-graphic
                                                     :size="14"
                                                     text=""
-                                                    class="ltr:ml-2 rtl:mr-2"
+                                                    class="ms-2"
                                                     v-if="localizing && localizing.handle === option.handle"
                                                 />
                                             </div>
@@ -244,7 +244,7 @@
                 <template v-slot:buttons>
                     <button
                         v-if="!readOnly"
-                        class="ltr:ml-4 rtl:mr-4"
+                        class="ms-4"
                         :class="{
                             btn: revisionsEnabled,
                             'btn-primary': isCreating || !revisionsEnabled,
@@ -256,12 +256,12 @@
 
                     <button
                         v-if="revisionsEnabled && !isCreating"
-                        class="btn-primary flex items-center ltr:ml-4 rtl:mr-4"
+                        class="btn-primary flex items-center ms-4"
                         :disabled="!canPublish"
                         @click="confirmingPublish = true"
                     >
                         <span v-text="publishButtonText" />
-                        <svg-icon name="micro/chevron-down-xs" class="w-2 ltr:ml-2 rtl:mr-2" />
+                        <svg-icon name="micro/chevron-down-xs" class="w-2 ms-2" />
                     </button>
                 </template>
             </live-preview>
@@ -273,7 +273,7 @@
                 class="btn-lg"
                 :class="{
                     'btn-primary w-full': !revisionsEnabled,
-                    'btn w-1/2 ltr:mr-4 rtl:ml-4': revisionsEnabled,
+                    'btn w-1/2 me-4': revisionsEnabled,
                 }"
                 :disabled="!canSave"
                 @click.prevent="save"
@@ -282,12 +282,12 @@
 
             <button
                 v-if="revisionsEnabled"
-                class="btn btn-lg btn-primary flex w-1/2 items-center justify-center ltr:ml-2 rtl:mr-2"
+                class="btn btn-lg btn-primary flex w-1/2 items-center justify-center ms-2"
                 :disabled="!canPublish"
                 @click="confirmingPublish = true"
             >
                 <span v-text="publishButtonText" />
-                <svg-icon name="micro/chevron-down-xs" class="w-2 ltr:ml-2 rtl:mr-2" />
+                <svg-icon name="micro/chevron-down-xs" class="w-2 ms-2" />
             </button>
         </div>
 

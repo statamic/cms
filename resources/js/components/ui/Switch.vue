@@ -59,6 +59,7 @@ const switchThumbClasses = cva({
             :model-value="modelValue"
             :class="switchRootClasses"
             @update:model-value="$emit('update:modelValue', $event)"
+            data-ui-switch
         >
             <SwitchThumb :class="switchThumbClasses" />
         </SwitchRoot>
