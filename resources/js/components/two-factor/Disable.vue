@@ -7,7 +7,6 @@ const emit = defineEmits(['reset-complete']);
 
 const props = defineProps({
     url: String,
-    isCurrentUser: Boolean,
     isEnforced: Boolean,
 });
 
@@ -56,20 +55,11 @@ function disable() {
             <p class="mb-2" v-html="__('statamic::messages.disable_two_factor_authentication')"></p>
 
             <p
-                v-if="isCurrentUser && isEnforced"
-                v-html="__('statamic::messages.disable_two_factor_authentication_current_user_enforced')"
-            ></p>
-            <p
-                v-if="isCurrentUser && !isEnforced"
-                v-html="__('statamic::messages.disable_two_factor_authentication_current_user_optional')"
-            ></p>
-            <p
-                v-if="!isCurrentUser && isEnforced"
-                v-html="__('statamic::messages.disable_two_factor_authentication_other_user_enforced')"
-            ></p>
-            <p
-                v-if="!isCurrentUser && !isEnforced"
-                v-html="__('statamic::messages.disable_two_factor_authentication_other_user_optional')"
+                v-html="
+                    isEnforced
+                        ? __('statamic::messages.disable_two_factor_authentication_current_user_enforced')
+                        : __('statamic::messages.disable_two_factor_authentication_current_user_optional')
+                "
             ></p>
         </confirmation-modal>
     </div>

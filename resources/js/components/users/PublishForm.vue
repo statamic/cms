@@ -22,7 +22,7 @@
                     />
                 </dropdown-list>
 
-                <TwoFactor v-bind="twoFactor" trigger-class="ltr:mr-4 rtl:ml-4" />
+                <TwoFactor v-if="twoFactor" v-bind="twoFactor" trigger-class="ltr:mr-4 rtl:ml-4" />
 
                 <change-password
                     v-if="canEditPassword"

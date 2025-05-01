@@ -251,13 +251,11 @@ class UsersController extends CpController
                 'editBlueprint' => cp_route('users.blueprint.edit'),
             ],
             'canEditPassword' => User::fromUser($request->user())->can('editPassword', $user),
-            'requiresCurrentPassword' => $request->user()->id === $user->id(),
+            'requiresCurrentPassword' => $isCurrentUser = $request->user()->id === $user->id(),
             'itemActions' => Action::for($user, ['view' => 'form']),
-            'twoFactor' => [
-                'isCurrentUser' => $user->id === User::current()->id,
+            'twoFactor' => $isCurrentUser ? [
                 'isEnforced' => $user->isTwoFactorAuthenticationRequired(),
                 'wasSetup' => $user->hasEnabledTwoFactorAuthentication(),
-                'canDisable' => request()->user()->can('edit', $user),
                 'routes' => [
                     'enable' => cp_route('users.two-factor.enable'),
                     'disable' => cp_route('users.two-factor.disable'),
@@ -267,7 +265,7 @@ class UsersController extends CpController
                         'download' => cp_route('users.two-factor.recovery-codes.download'),
                     ],
                 ],
-            ],
+            ] : null,
         ];
 
         if ($request->wantsJson()) {

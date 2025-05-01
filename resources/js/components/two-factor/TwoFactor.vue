@@ -5,7 +5,7 @@ import TwoFactorSetup from './Setup.vue';
 import TwoFactorRecoveryCodesModal from './RecoveryCodesModal.vue';
 import { requireElevatedSession } from '@statamic/components/elevated-sessions';
 
-const props = defineProps(['wasSetup', 'isCurrentUser', 'isEnforced', 'routes', 'canDisable']);
+const props = defineProps(['wasSetup', 'isEnforced', 'routes']);
 
 const recoveryCodesModalOpen = ref(false);
 const setupModalOpen = ref(false);
@@ -39,7 +39,7 @@ function resetComplete() {
             <button class="btn" v-text="__('Two Factor Authentication')" />
         </template>
         <div class="max-w-sm p-4">
-            <template v-if="isCurrentUser && !isSetup">
+            <template v-if="!isSetup">
                 <div>
                     <p class="mb-4 text-sm text-gray">{{ __('statamic::messages.two_factor_enable_introduction') }}</p>
 
@@ -51,22 +51,16 @@ function resetComplete() {
                 </div>
             </template>
 
-            <template v-else-if="!isCurrentUser && !isSetup">
-                <p class="text-sm text-gray">{{ __('statamic::messages.two_factor_not_setup') }}</p>
-            </template>
-
-            <template v-else-if="isCurrentUser || canDisable">
+            <template v-else>
                 <p class="mb-4 text-sm text-gray">{{ __('statamic::messages.two_factor_enabled') }}</p>
 
                 <div class="flex items-center space-x-4">
-                    <button v-if="isCurrentUser" class="btn" @click="openRecoveryCodesModal">
+                    <button class="btn" @click="openRecoveryCodesModal">
                         {{ __('Show recovery codes') }}
                     </button>
 
                     <DisableTwoFactor
-                        v-if="canDisable"
                         :url="routes.disable"
-                        :is-current-user="isCurrentUser"
                         :is-enforced="isEnforced"
                         @reset-complete="resetComplete"
                         v-slot="{ confirm }"
@@ -76,12 +70,6 @@ function resetComplete() {
                         </button>
                     </DisableTwoFactor>
                 </div>
-            </template>
-
-            <template v-else>
-                <p class="mb-4 text-sm text-gray">
-                    {{ __('statamic::messages.two_factor_cant_manage_without_permission') }}
-                </p>
             </template>
 
             <TwoFactorSetup
