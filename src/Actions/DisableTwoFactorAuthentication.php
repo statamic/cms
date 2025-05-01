@@ -6,6 +6,11 @@ class DisableTwoFactorAuthentication extends Action
 {
     protected $dangerous = true;
 
+    public function requiresElevatedSession(): bool
+    {
+        return true;
+    }
+
     public function confirmationText()
     {
         return $this->items->first()->isTwoFactorAuthenticationRequired()
