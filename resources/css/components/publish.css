@@ -41,7 +41,10 @@ code.parent-url {
 }
 
 .publish-fields {
-    @apply flex flex-wrap;
+    @apply grid grid-cols-12 gap-3 lg:gap-6;
+    [data-cards-wrap="fields"] & {
+        @apply gap-1 grid-flow-row;
+    }
 
     .form-group {
         > label,
@@ -90,8 +93,11 @@ code.parent-url {
     @apply flex items-center;
 }
 
-.publish-sections-section {
+.publish-sections .publish-sections-section {
     @apply mb-8;
+    [data-cards-wrap="fields"] & {
+        @apply mb-12;
+    }
 }
 
 .publish-section-header {

@@ -390,6 +390,7 @@ class CollectionsController extends CpController
                         'if' => [
                             'dated' => true,
                         ],
+                        'width' => '50',
                     ],
                     'future_date_behavior' => [
                         'display' => __('Future Date Behavior'),
@@ -403,6 +404,7 @@ class CollectionsController extends CpController
                         'if' => [
                             'dated' => true,
                         ],
+                        'width' => '50',
                     ],
                 ],
             ],
@@ -422,6 +424,7 @@ class CollectionsController extends CpController
                             'asc' => __('Ascending'),
                             'desc' => __('Descending'),
                         ],
+                        'width' => '66',
                     ],
                     'max_depth' => [
                         'display' => __('Max Depth'),
@@ -429,18 +432,21 @@ class CollectionsController extends CpController
                         'type' => 'integer',
                         'validate' => 'min:0',
                         'if' => ['structured' => true],
+                        'width' => '33',
                     ],
                     'expects_root' => [
                         'display' => __('Expect a root page'),
                         'instructions' => __('statamic::messages.expect_root_instructions'),
                         'type' => 'toggle',
                         'if' => ['structured' => true],
+                        'width' => '50',
                     ],
                     'show_slugs' => [
                         'display' => __('Slugs'),
                         'instructions' => __('statamic::messages.show_slugs_instructions'),
                         'type' => 'toggle',
                         'if' => ['structured' => true],
+                        'width' => '50',
                     ],
                 ],
             ],
@@ -457,21 +463,17 @@ class CollectionsController extends CpController
                             '   <a href="'.cp_route('collections.blueprints.index', $collection).'" class="text-blue">'.__('Edit').'</a>'.
                             '</div>',
                     ],
-                    'links' => [
-                        'display' => __('Links'),
-                        'instructions' => __('statamic::messages.collections_links_instructions'),
-                        'type' => 'toggle',
-                    ],
-                    'taxonomies' => [
-                        'display' => __('Taxonomies'),
-                        'instructions' => __('statamic::messages.collections_taxonomies_instructions'),
-                        'type' => 'taxonomies',
-                        'mode' => 'select',
-                    ],
                     'default_publish_state' => [
                         'display' => __('Publish by Default'),
                         'instructions' => __('statamic::messages.collections_default_publish_state_instructions'),
                         'type' => 'toggle',
+                        'width' => '50',
+                    ],
+                    'links' => [
+                        'display' => __('Links'),
+                        'instructions' => __('statamic::messages.collections_links_instructions'),
+                        'type' => 'toggle',
+                        'width' => '50',
                     ],
                     'template' => [
                         'display' => __('Template'),
@@ -479,16 +481,26 @@ class CollectionsController extends CpController
                         'type' => 'template',
                         'placeholder' => __('System default'),
                         'blueprint' => true,
+                        'width' => '50',
                     ],
                     'layout' => [
                         'display' => __('Layout'),
                         'instructions' => __('statamic::messages.collection_configure_layout_instructions'),
                         'type' => 'template',
+                        'width' => '50',
+                    ],
+                    'taxonomies' => [
+                        'display' => __('Taxonomies'),
+                        'instructions' => __('statamic::messages.collections_taxonomies_instructions'),
+                        'type' => 'taxonomies',
+                        'mode' => 'select',
+                        'width' => '50',
                     ],
                     'title_formats' => [
-                        'display' => __('Title Format'),
+                        'display' => __('Automatic Title Format'),
                         'instructions' => __('statamic::messages.collection_configure_title_format_instructions'),
                         'type' => 'collection_title_formats',
+                        'width' => '50',
                     ],
                 ],
             ],
@@ -549,6 +561,7 @@ class CollectionsController extends CpController
                         'display' => __('Require Slugs'),
                         'instructions' => __('statamic::messages.collection_configure_require_slugs_instructions'),
                         'type' => 'toggle',
+                        'width' => '50',
                     ],
                     'mount' => [
                         'display' => __('Mount'),
@@ -559,6 +572,7 @@ class CollectionsController extends CpController
                         'collections' => Collection::all()->map->handle()->reject(function ($collectionHandle) use ($collection) {
                             return $collectionHandle === $collection->handle();
                         })->values()->all(),
+                        'width' => '50',
                     ],
                     'preview_targets' => [
                         'display' => __('Preview Targets'),

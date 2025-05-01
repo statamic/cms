@@ -1,7 +1,7 @@
 <template>
     <publish-container
-        v-if="blueprint"
         class="max-w-5xl mx-auto"
+        v-if="blueprint"
         ref="container"
         name="collection"
         reference="collection"
@@ -12,12 +12,17 @@
         :site="site"
         @updated="values = $event"
         v-slot="{ setFieldValue, setFieldMeta }"
+        data-cards-wrap="fields"
     >
         <div>
             <Header :title="__(editTitle ?? 'Configure Collection')" icon="cog">
                 <Button variant="primary" @click="submit">{{ __('Save') }}</Button>
             </Header>
-            <configure-tabs @updated="setFieldValue" @meta-updated="setFieldMeta" :enable-sidebar="false" />
+            <configure-tabs
+                @updated="setFieldValue"
+                @meta-updated="setFieldMeta"
+                :enable-sidebar="false"
+            />
         </div>
     </publish-container>
 </template>
@@ -44,6 +49,12 @@ export default {
             values: this.initialValues,
             error: null,
             errors: {},
+        };
+    },
+
+    provide() {
+        return {
+            wrapFieldsInCards: true,
         };
     },
 

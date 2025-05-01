@@ -1,5 +1,5 @@
 <template>
-    <div class="publish-fields @container gap-3 lg:gap-6">
+    <div class="publish-fields @container">
         <publish-field
             v-for="field in fields"
             v-show="showField(field)"

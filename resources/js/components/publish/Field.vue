@@ -6,7 +6,7 @@
         @loaded="metaLoaded"
         v-slot="{ meta, value, loading: loadingMeta }"
     >
-        <div :class="classes">
+        <component :is="wrapFieldsInCards ? 'Card' : 'div'" :class="classes">
             <div class="field-inner">
                 <label
                     v-if="showLabel"
@@ -16,12 +16,12 @@
                 >
                     <span
                         v-if="showLabelText"
-                        class="ltr:mr-1 rtl:ml-1"
+                        class="me-1"
                         :class="{ 'text-gray-600': syncable && isSynced }"
                         v-text="__(labelText)"
                         v-tooltip="{ content: config.handle, delay: 500, autoHide: false }"
                     />
-                    <i class="required ltr:mr-1 rtl:ml-1" v-if="showLabelText && config.required">*</i>
+                    <i class="required me-1" v-if="showLabelText && config.required">*</i>
                     <avatar
                         v-if="isLocked"
                         :user="lockingUser"
@@ -30,13 +30,13 @@
                     />
                     <span
                         v-if="isReadOnly && !isTab && !isSection"
-                        class="mt-0.5 text-2xs font-normal text-gray-500 dark:text-dark-200 ltr:mr-1 rtl:ml-1"
+                        class="mt-0.5 text-2xs font-normal text-gray-500 dark:text-dark-200 me-1"
                     >
                         {{ isLocked ? __('Locked') : __('Read Only') }}
                     </span>
                     <svg-icon
                         name="translate"
-                        class="h-4 w-4 text-gray-600 ltr:mr-1 rtl:ml-1"
+                        class="size-4 text-gray-600 me-1"
                         v-if="isLocalizable && !isTab"
                         v-tooltip.top="__('Localizable field')"
                     />
@@ -50,7 +50,7 @@
                     >
                         <svg-icon
                             name="light/hyperlink"
-                            class="mb-1 h-4 w-4 text-gray-600 ltr:mr-1.5 rtl:ml-1.5"
+                            class="mb-1 size-4 text-gray-600 me-1.5"
                             v-tooltip.top="__('messages.field_synced_with_origin')"
                         />
                     </button>
@@ -64,15 +64,14 @@
                     >
                         <svg-icon
                             name="light/hyperlink-broken"
-                            class="mb-1 h-4 w-4 text-gray-600 ltr:mr-1.5 rtl:ml-1.5"
+                            class="mb-1 size-4 text-gray-600 me-1.5"
                             v-tooltip.top="__('messages.field_desynced_from_origin')"
                         />
                     </button>
                 </label>
 
-                <div
-                    class="help-block"
-                    :class="{ '-mt-2': showLabel }"
+                <ui-description
+                    :class="{ '-mt-1 mb-2': showLabel }"
                     v-if="instructions && config.instructions_position !== 'below'"
                     v-html="instructions"
                 />
@@ -105,8 +104,8 @@
                 <!-- TODO: name prop should include prefixing when used recursively like inside a grid. -->
             </slot>
 
-            <div
-                class="help-block mt-2"
+            <ui-description
+                class="mt-2"
                 v-if="instructions && config.instructions_position === 'below'"
                 v-html="instructions"
             />
@@ -114,16 +113,21 @@
             <div v-if="hasError">
                 <small class="help-block mb-0 mt-2 text-red-500" v-for="(error, i) in errors" :key="i" v-text="error" />
             </div>
-        </div>
+        </component>
     </publish-field-meta>
 </template>
 
 <script>
+import { Card } from '@statamic/ui';
 import { marked } from 'marked';
 import titleize from '../../util/titleize';
 import deslugify from '../../util/deslugify';
 
 export default {
+    components: {
+        Card,
+    },
+
     props: {
         config: {
             type: Object,
@@ -145,6 +149,7 @@ export default {
     inject: {
         store: {},
         isInsideConfigFields: { default: false },
+        wrapFieldsInCards: { default: false },
     },
 
     data() {

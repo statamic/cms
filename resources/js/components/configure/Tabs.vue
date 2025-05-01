@@ -24,7 +24,7 @@
 export default {
     emits: ['updated', 'meta-updated', 'synced', 'desynced', 'focus', 'blur'],
 
-    inject: ['store', 'storeName'],
+    inject: ['store', 'storeName', 'wrapFieldsInCards'],
 
     props: {
         readOnly: Boolean,

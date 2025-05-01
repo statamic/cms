@@ -56,15 +56,15 @@ export function clone(value) {
 
 export function tailwind_width_class(width) {
     const widths = {
-        25: 'w-full @lg:w-1/4',
-        33: 'w-full @lg:w-1/3',
-        50: 'w-full @lg:w-1/2',
-        66: 'w-full @lg:w-2/3',
-        75: 'w-full @lg:w-3/4',
-        100: 'w-full',
+        25: 'col-span-12 sm:col-span-3',
+        33: 'col-span-12 sm:col-span-4',
+        50: 'col-span-12 sm:col-span-6',
+        66: 'col-span-12 sm:col-span-8',
+        75: 'col-span-12 sm:col-span-9',
+        100: 'col-span-12',
     };
 
-    return `${widths[width] || 'w-full'}`;
+    return `${widths[width] || 'col-span-12'}`;
 }
 
 export function markdown(value) {
