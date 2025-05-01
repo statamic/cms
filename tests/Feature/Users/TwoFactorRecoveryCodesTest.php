@@ -3,6 +3,7 @@
 namespace Feature\Users;
 
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\TwoFactor\RecoveryCode;
@@ -17,13 +18,38 @@ class TwoFactorRecoveryCodesTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
+    public static function showCodesProvider()
+    {
+        return [
+            'cp' => [fn () => cp_route('users.two-factor.recovery-codes.show')],
+            'frontend' => [fn () => route('statamic.users.two-factor.recovery-codes.show')],
+        ];
+    }
+
+    public static function generateCodesProvider()
+    {
+        return [
+            'cp' => [fn () => cp_route('users.two-factor.recovery-codes.generate')],
+            'frontend' => [fn () => route('statamic.users.two-factor.recovery-codes.generate')],
+        ];
+    }
+
+    public static function downloadCodesProvider()
+    {
+        return [
+            'cp' => [fn () => cp_route('users.two-factor.recovery-codes.download')],
+            'frontend' => [fn () => route('statamic.users.two-factor.recovery-codes.download')],
+        ];
+    }
+
     #[Test]
-    public function it_returns_recovery_codes()
+    #[DataProvider('showCodesProvider')]
+    public function it_returns_recovery_codes($url)
     {
         $this
             ->actingAs($user = $this->userWithTwoFactorEnabled())
             ->withActiveElevatedSession()
-            ->get(cp_route('users.two-factor.recovery-codes.show'))
+            ->get($url())
             ->assertOk()
             ->assertJson([
                 'recovery_codes' => $user->twoFactorRecoveryCodes(),
@@ -33,6 +59,8 @@ class TwoFactorRecoveryCodesTest extends TestCase
     #[Test]
     public function it_does_not_return_recovery_codes_without_elevated_session()
     {
+        // Elevated sessions are only in the cp.
+
         $this
             ->actingAs($user = $this->userWithTwoFactorEnabled())
             ->get(cp_route('users.two-factor.recovery-codes.show'))
@@ -40,14 +68,15 @@ class TwoFactorRecoveryCodesTest extends TestCase
     }
 
     #[Test]
-    public function it_generates_recovery_codes()
+    #[DataProvider('generateCodesProvider')]
+    public function it_generates_recovery_codes($url)
     {
         $user = $this->userWithTwoFactorEnabled();
 
         $this
             ->actingAs($user)
             ->withActiveElevatedSession()
-            ->post(cp_route('users.two-factor.recovery-codes.generate'))
+            ->post($url())
             ->assertOk()
             ->assertJsonStructure(['recovery_codes']);
     }
@@ -55,6 +84,8 @@ class TwoFactorRecoveryCodesTest extends TestCase
     #[Test]
     public function it_cannot_generate_recovery_codes_without_elevated_session()
     {
+        // Elevated sessions are only in the cp.
+
         $user = $this->userWithTwoFactorEnabled();
 
         $this
@@ -64,14 +95,15 @@ class TwoFactorRecoveryCodesTest extends TestCase
     }
 
     #[Test]
-    public function it_can_download_recovery_codes()
+    #[DataProvider('downloadCodesProvider')]
+    public function it_can_download_recovery_codes($url)
     {
         $user = $this->userWithTwoFactorEnabled();
 
         $this
             ->actingAs($user)
             ->withActiveElevatedSession()
-            ->get(cp_route('users.two-factor.recovery-codes.download'))
+            ->get($url())
             ->assertOk()
             ->assertSeeInOrder($user->twoFactorRecoveryCodes());
     }
@@ -79,6 +111,8 @@ class TwoFactorRecoveryCodesTest extends TestCase
     #[Test]
     public function it_cannot_download_recovery_codes_without_elevated_session()
     {
+        // Elevated sessions are only in the cp.
+
         $user = $this->userWithTwoFactorEnabled();
 
         $this

@@ -4,6 +4,7 @@ namespace Feature\Users;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use PragmaRX\Google2FA\Google2FA;
@@ -20,8 +21,25 @@ class EnableTwoFactorTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
+    public static function enableProvider()
+    {
+        return [
+            'cp' => [fn () => cp_route('users.two-factor.enable')],
+            'frontend' => [fn () => route('statamic.users.two-factor.enable')],
+        ];
+    }
+
+    public static function confirmProvider()
+    {
+        return [
+            'cp' => fn () => cp_route('users.two-factor.confirm'),
+            'frontend' => [fn () => route('statamic.users.two-factor.confirm')],
+        ];
+    }
+
     #[Test]
-    public function it_enables_two_factor_authentication()
+    #[DataProvider('enableProvider')]
+    public function it_enables_two_factor_authentication($url)
     {
         Event::fake();
 
@@ -33,7 +51,7 @@ class EnableTwoFactorTest extends TestCase
         $this
             ->actingAs($user)
             ->withActiveElevatedSession()
-            ->get(cp_route('users.two-factor.enable'))
+            ->get($url())
             ->assertOk()
             ->assertJsonStructure(['qr', 'secret_key', 'confirm_url']);
 
@@ -46,6 +64,8 @@ class EnableTwoFactorTest extends TestCase
     #[Test]
     public function it_cant_enable_two_factor_authentication_without_elevated_session()
     {
+        // Elevated sessions are only in the cp.
+
         Event::fake();
 
         $user = $this->user();
@@ -65,7 +85,8 @@ class EnableTwoFactorTest extends TestCase
     }
 
     #[Test]
-    public function it_cant_enable_two_factor_authentication_when_it_is_already_enabled()
+    #[DataProvider('enableProvider')]
+    public function it_cant_enable_two_factor_authentication_when_it_is_already_enabled($url)
     {
         Event::fake();
 
@@ -74,14 +95,15 @@ class EnableTwoFactorTest extends TestCase
         $this
             ->actingAs($user)
             ->withActiveElevatedSession()
-            ->get(cp_route('users.two-factor.enable'))
+            ->get($url())
             ->assertForbidden();
 
         Event::assertNotDispatched(TwoFactorAuthenticationEnabled::class, fn ($event) => $event->user->id === $user->id);
     }
 
     #[Test]
-    public function it_doesnt_regenerate_secret_when_validation_error_is_present()
+    #[DataProvider('enableProvider')]
+    public function it_doesnt_regenerate_secret_when_validation_error_is_present($url)
     {
         Event::fake();
 
@@ -96,7 +118,7 @@ class EnableTwoFactorTest extends TestCase
             ->session([
                 'errors' => collect(['code' => 'The provided two factor authentication code was invalid.']),
             ])
-            ->get(cp_route('users.two-factor.enable'))
+            ->get($url())
             ->assertOk()
             ->assertJsonStructure(['qr', 'secret_key', 'confirm_url']);
 
@@ -107,7 +129,8 @@ class EnableTwoFactorTest extends TestCase
     }
 
     #[Test]
-    public function it_confirms_two_factor_authentication()
+    #[DataProvider('confirmProvider')]
+    public function it_confirms_two_factor_authentication($url)
     {
         $user = $this->user();
         $user->set('two_factor_secret', encrypt(app(TwoFactorAuthenticationProvider::class)->generateSecretKey()));
@@ -119,7 +142,7 @@ class EnableTwoFactorTest extends TestCase
         $this
             ->actingAs($user)
             ->withActiveElevatedSession()
-            ->post(cp_route('users.two-factor.confirm'), [
+            ->post($url(), [
                 'code' => $this->getOneTimeCode($user),
             ])
             ->assertOk();
@@ -128,7 +151,8 @@ class EnableTwoFactorTest extends TestCase
     }
 
     #[Test]
-    public function it_cant_confirm_two_factor_authentication_without_valid_code()
+    #[DataProvider('confirmProvider')]
+    public function it_cant_confirm_two_factor_authentication_without_valid_code($url)
     {
         $user = $this->user();
         $user->set('two_factor_secret', encrypt(app(TwoFactorAuthenticationProvider::class)->generateSecretKey()));
@@ -140,7 +164,7 @@ class EnableTwoFactorTest extends TestCase
         $this
             ->actingAs($user)
             ->withActiveElevatedSession()
-            ->post(cp_route('users.two-factor.confirm'), [
+            ->post($url(), [
                 'code' => '123456',
             ])
             ->assertSessionHasErrors('code');
@@ -149,7 +173,8 @@ class EnableTwoFactorTest extends TestCase
     }
 
     #[Test]
-    public function it_cant_confirm_two_factor_authentication_without_elevated_session()
+    #[DataProvider('confirmProvider')]
+    public function it_cant_confirm_two_factor_authentication_without_elevated_session($url)
     {
         $user = $this->user();
         $user->set('two_factor_secret', encrypt(app(TwoFactorAuthenticationProvider::class)->generateSecretKey()));
@@ -160,7 +185,7 @@ class EnableTwoFactorTest extends TestCase
 
         $this
             ->actingAs($user)
-            ->post(cp_route('users.two-factor.confirm'), [
+            ->post($url(), [
                 'code' => $this->getOneTimeCode($user),
             ])
             ->assertRedirect('/cp/auth/confirm-password');
