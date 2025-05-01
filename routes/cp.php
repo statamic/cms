@@ -99,7 +99,6 @@ use Statamic\Http\Controllers\CP\Users\AccountController;
 use Statamic\Http\Controllers\CP\Users\PasswordController;
 use Statamic\Http\Controllers\CP\Users\RolesController;
 use Statamic\Http\Controllers\CP\Users\TwoFactorAuthenticationController;
-use Statamic\Http\Controllers\CP\Users\TwoFactorRecoveryCodesController;
 use Statamic\Http\Controllers\CP\Users\UserActionController;
 use Statamic\Http\Controllers\CP\Users\UserBlueprintController;
 use Statamic\Http\Controllers\CP\Users\UserGroupBlueprintController;
@@ -107,7 +106,9 @@ use Statamic\Http\Controllers\CP\Users\UserGroupsController;
 use Statamic\Http\Controllers\CP\Users\UsersController;
 use Statamic\Http\Controllers\CP\Users\UserWizardController;
 use Statamic\Http\Controllers\CP\Utilities\UtilitiesController;
+use Statamic\Http\Controllers\User\TwoFactorRecoveryCodesController;
 use Statamic\Http\Middleware\CP\RedirectIfTwoFactorSetupIncomplete;
+use Statamic\Http\Middleware\CP\RequireElevatedSession;
 use Statamic\Http\Middleware\RequireStatamicPro;
 use Statamic\Statamic;
 
@@ -306,7 +307,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::patch('users/blueprint', [UserBlueprintController::class, 'update'])->name('users.blueprint.update');
     Route::resource('users', UsersController::class)->except('destroy');
     Route::patch('users/{user}/password', [PasswordController::class, 'update'])->name('users.password.update');
-    Route::withoutMiddleware(RedirectIfTwoFactorSetupIncomplete::class)->group(function () {
+    Route::withoutMiddleware(RedirectIfTwoFactorSetupIncomplete::class)->middleware(RequireElevatedSession::class)->group(function () {
         Route::get('users/{user}/two-factor/enable', [TwoFactorAuthenticationController::class, 'enable'])->name('users.two-factor.enable');
         Route::post('users/{user}/two-factor/confirm', [TwoFactorAuthenticationController::class, 'confirm'])->name('users.two-factor.confirm');
         Route::get('users/{user}/two-factor/recovery-codes', [TwoFactorRecoveryCodesController::class, 'show'])->name('users.two-factor.recovery-codes.show');

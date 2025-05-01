@@ -44,31 +44,7 @@ class EnableTwoFactorTest extends TestCase
     }
 
     #[Test]
-    public function it_enables_two_factor_authentication_without_elevated_session_when_two_factor_is_required()
-    {
-        Event::fake();
-
-        config()->set('statamic.users.two_factor_enforced_roles', ['*']);
-
-        $user = $this->user();
-
-        $this->assertNull($user->two_factor_secret);
-        $this->assertNull($user->two_factor_recovery_codes);
-
-        $this
-            ->actingAs($user)
-            ->get(cp_route('users.two-factor.enable', $user->id))
-            ->assertOk()
-            ->assertJsonStructure(['qr', 'secret_key', 'confirm_url']);
-
-        $this->assertNotNull($user->two_factor_secret);
-        $this->assertNotNull($user->two_factor_recovery_codes);
-
-        Event::assertDispatched(TwoFactorAuthenticationEnabled::class, fn ($event) => $event->user->id === $user->id);
-    }
-
-    #[Test]
-    public function it_cant_enable_two_factor_authentication_without_elevated_session_when_two_factor_is_optional()
+    public function it_cant_enable_two_factor_authentication_without_elevated_session()
     {
         Event::fake();
 

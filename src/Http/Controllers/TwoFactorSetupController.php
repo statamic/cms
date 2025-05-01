@@ -21,14 +21,7 @@ class TwoFactorSetupController extends Controller
         }
 
         return view('statamic::auth.two-factor.setup', [
-            'routes' => [
-                'enable' => cp_route('users.two-factor.enable', $user->id),
-                'recovery_codes' => [
-                    'show' => cp_route('users.two-factor.recovery-codes.show', $user->id),
-                    'generate' => cp_route('users.two-factor.recovery-codes.generate', $user->id),
-                    'download' => cp_route('users.two-factor.recovery-codes.download', $user->id),
-                ],
-            ],
+            'routes' => $this->routes($user),
             'redirect' => $this->redirectPath(),
         ]);
     }
@@ -36,5 +29,17 @@ class TwoFactorSetupController extends Controller
     protected function redirectPath()
     {
         return request('redirect') ?? route('statamic.site');
+    }
+
+    protected function routes($user): array
+    {
+        return [
+            'enable' => route('statamic.users.two-factor.enable', $user->id),
+            'recovery_codes' => [
+                'show' => route('statamic.users.two-factor.recovery-codes.show', $user->id),
+                'generate' => route('statamic.users.two-factor.recovery-codes.generate', $user->id),
+                'download' => route('statamic.users.two-factor.recovery-codes.download', $user->id),
+            ],
+        ];
     }
 }

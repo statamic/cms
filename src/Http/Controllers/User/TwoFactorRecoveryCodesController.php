@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Http\Controllers\CP\Users;
+namespace Statamic\Http\Controllers\User;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -8,15 +8,9 @@ use Statamic\Auth\TwoFactor\GenerateNewRecoveryCodes;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
-use Statamic\Http\Middleware\CP\RequireElevatedSession;
 
 class TwoFactorRecoveryCodesController extends CpController
 {
-    public function __construct()
-    {
-        $this->middleware(RequireElevatedSession::class);
-    }
-
     public function show(Request $request, $user)
     {
         throw_unless($user = User::find($user), new NotFoundHttpException);

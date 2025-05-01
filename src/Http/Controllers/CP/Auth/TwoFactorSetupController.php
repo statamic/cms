@@ -21,4 +21,16 @@ class TwoFactorSetupController extends Controller
 
         return $referredFromCp ? $referer : $cp;
     }
+
+    protected function routes($user): array
+    {
+        return [
+            'enable' => cp_route('users.two-factor.enable', $user->id),
+            'recovery_codes' => [
+                'show' => cp_route('users.two-factor.recovery-codes.show', $user->id),
+                'generate' => cp_route('users.two-factor.recovery-codes.generate', $user->id),
+                'download' => cp_route('users.two-factor.recovery-codes.download', $user->id),
+            ],
+        ];
+    }
 }

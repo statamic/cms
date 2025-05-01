@@ -18,8 +18,11 @@ use Statamic\Http\Controllers\User\LoginController;
 use Statamic\Http\Controllers\User\PasswordController;
 use Statamic\Http\Controllers\User\ProfileController;
 use Statamic\Http\Controllers\User\RegisterController;
+use Statamic\Http\Controllers\User\TwoFactorAuthenticationController;
+use Statamic\Http\Controllers\User\TwoFactorRecoveryCodesController;
 use Statamic\Http\Middleware\AuthGuard;
 use Statamic\Http\Middleware\CP\AuthGuard as CPAuthGuard;
+use Statamic\Http\Middleware\RedirectIfTwoFactorSetupIncomplete;
 use Statamic\Statamic;
 use Statamic\StaticCaching\NoCache\Controller as NoCacheController;
 use Statamic\StaticCaching\NoCache\NoCacheLocalize;
@@ -48,6 +51,14 @@ Route::name('statamic.')->group(function () {
             Route::get('two-factor-setup', TwoFactorSetupController::class)->name('two-factor-setup');
             Route::get('two-factor-challenge', [TwoFactorChallengeController::class, 'index'])->name('two-factor-challenge');
             Route::post('two-factor-challenge', [TwoFactorChallengeController::class, 'store']);
+
+            Route::withoutMiddleware(RedirectIfTwoFactorSetupIncomplete::class)->group(function () {
+                Route::get('users/{user}/two-factor/enable', [TwoFactorAuthenticationController::class, 'enable'])->name('users.two-factor.enable');
+                Route::post('users/{user}/two-factor/confirm', [TwoFactorAuthenticationController::class, 'confirm'])->name('users.two-factor.confirm');
+                Route::get('users/{user}/two-factor/recovery-codes', [TwoFactorRecoveryCodesController::class, 'show'])->name('users.two-factor.recovery-codes.show');
+                Route::post('users/{user}/two-factor/recovery-codes', [TwoFactorRecoveryCodesController::class, 'store'])->name('users.two-factor.recovery-codes.generate');
+                Route::get('users/{user}/two-factor/recovery-codes/download', [TwoFactorRecoveryCodesController::class, 'download'])->name('users.two-factor.recovery-codes.download');
+            });
         });
 
         Route::group(['prefix' => 'auth', 'middleware' => [CPAuthGuard::class]], function () {
