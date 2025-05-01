@@ -23,9 +23,7 @@ class TwoFactorRecoveryCodesTest extends TestCase
         $this
             ->actingAs($user = $this->userWithTwoFactorEnabled())
             ->withActiveElevatedSession()
-            ->get(cp_route('users.two-factor.recovery-codes.show', [
-                'user' => $user->id,
-            ]))
+            ->get(cp_route('users.two-factor.recovery-codes.show'))
             ->assertOk()
             ->assertJson([
                 'recovery_codes' => $user->twoFactorRecoveryCodes(),
@@ -37,22 +35,8 @@ class TwoFactorRecoveryCodesTest extends TestCase
     {
         $this
             ->actingAs($user = $this->userWithTwoFactorEnabled())
-            ->get(cp_route('users.two-factor.recovery-codes.show', [
-                'user' => $user->id,
-            ]))
+            ->get(cp_route('users.two-factor.recovery-codes.show'))
             ->assertRedirect('/cp/auth/confirm-password');
-    }
-
-    #[Test]
-    public function it_does_not_return_recovery_codes_for_another_user()
-    {
-        $this
-            ->actingAs($this->userWithTwoFactorEnabled())
-            ->withActiveElevatedSession()
-            ->get(cp_route('users.two-factor.recovery-codes.show', [
-                'user' => $this->userWithTwoFactorEnabled()->id,
-            ]))
-            ->assertForbidden();
     }
 
     #[Test]
@@ -63,9 +47,7 @@ class TwoFactorRecoveryCodesTest extends TestCase
         $this
             ->actingAs($user)
             ->withActiveElevatedSession()
-            ->post(cp_route('users.two-factor.recovery-codes.generate', [
-                'user' => $user->id,
-            ]))
+            ->post(cp_route('users.two-factor.recovery-codes.generate'))
             ->assertOk()
             ->assertJsonStructure(['recovery_codes']);
     }
@@ -77,22 +59,8 @@ class TwoFactorRecoveryCodesTest extends TestCase
 
         $this
             ->actingAs($user)
-            ->post(cp_route('users.two-factor.recovery-codes.generate', [
-                'user' => $user->id,
-            ]))
+            ->post(cp_route('users.two-factor.recovery-codes.generate'))
             ->assertRedirect('/cp/auth/confirm-password');
-    }
-
-    #[Test]
-    public function it_cannot_generate_recovery_codes_for_another_user()
-    {
-        $this
-            ->actingAs($this->userWithTwoFactorEnabled())
-            ->withActiveElevatedSession()
-            ->post(cp_route('users.two-factor.recovery-codes.generate', [
-                'user' => $this->userWithTwoFactorEnabled()->id,
-            ]))
-            ->assertForbidden();
     }
 
     #[Test]
@@ -103,9 +71,7 @@ class TwoFactorRecoveryCodesTest extends TestCase
         $this
             ->actingAs($user)
             ->withActiveElevatedSession()
-            ->get(cp_route('users.two-factor.recovery-codes.download', [
-                'user' => $user->id,
-            ]))
+            ->get(cp_route('users.two-factor.recovery-codes.download'))
             ->assertOk()
             ->assertSeeInOrder($user->twoFactorRecoveryCodes());
     }
@@ -117,22 +83,8 @@ class TwoFactorRecoveryCodesTest extends TestCase
 
         $this
             ->actingAs($user)
-            ->get(cp_route('users.two-factor.recovery-codes.download', [
-                'user' => $user->id,
-            ]))
+            ->get(cp_route('users.two-factor.recovery-codes.download'))
             ->assertRedirect('/cp/auth/confirm-password');
-    }
-
-    #[Test]
-    public function it_cannot_download_recovery_codes_for_another_user()
-    {
-        $this
-            ->actingAs($this->userWithTwoFactorEnabled())
-            ->withActiveElevatedSession()
-            ->get(cp_route('users.two-factor.recovery-codes.download', [
-                'user' => $this->userWithTwoFactorEnabled()->id,
-            ]))
-            ->assertForbidden();
     }
 
     private function user()

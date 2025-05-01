@@ -6,19 +6,14 @@ use Illuminate\Http\Request;
 use Statamic\Auth\TwoFactor\ConfirmTwoFactorAuthentication;
 use Statamic\Auth\TwoFactor\DisableTwoFactorAuthentication;
 use Statamic\Auth\TwoFactor\EnableTwoFactorAuthentication;
-use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 
 class TwoFactorAuthenticationController extends CpController
 {
-    public function enable(Request $request, $user, EnableTwoFactorAuthentication $enable)
+    public function enable(Request $request, EnableTwoFactorAuthentication $enable)
     {
-        throw_unless($user = User::find($user), new NotFoundHttpException);
-
-        if (User::current()->id !== $user->id) {
-            abort(403);
-        }
+        $user = User::current();
 
         if ($user->hasEnabledTwoFactorAuthentication()) {
             abort(403);
@@ -36,13 +31,9 @@ class TwoFactorAuthenticationController extends CpController
         ];
     }
 
-    public function confirm(Request $request, $user, ConfirmTwoFactorAuthentication $confirm)
+    public function confirm(Request $request, ConfirmTwoFactorAuthentication $confirm)
     {
-        throw_unless($user = User::find($user), new NotFoundHttpException);
-
-        if (User::current()->id !== $user->id) {
-            abort(403);
-        }
+        $user = User::current();
 
         $confirm($user, $request->input('code'));
 

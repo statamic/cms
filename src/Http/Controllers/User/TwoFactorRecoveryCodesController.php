@@ -5,43 +5,28 @@ namespace Statamic\Http\Controllers\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Statamic\Auth\TwoFactor\GenerateNewRecoveryCodes;
-use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 
 class TwoFactorRecoveryCodesController extends CpController
 {
-    public function show(Request $request, $user)
+    public function show(Request $request)
     {
-        throw_unless($user = User::find($user), new NotFoundHttpException);
-
-        if (User::current()->id !== $user->id) {
-            abort(403);
-        }
-
-        return ['recovery_codes' => $user->twoFactorRecoveryCodes()];
+        return ['recovery_codes' => User::current()->twoFactorRecoveryCodes()];
     }
 
-    public function store(Request $request, $user, GenerateNewRecoveryCodes $generateRecoveryCodes)
+    public function store(Request $request, GenerateNewRecoveryCodes $generateRecoveryCodes)
     {
-        throw_unless($user = User::find($user), new NotFoundHttpException);
-
-        if (User::current()->id !== $user->id) {
-            abort(403);
-        }
+        $user = User::current();
 
         $generateRecoveryCodes($user);
 
         return ['recovery_codes' => $user->twoFactorRecoveryCodes()];
     }
 
-    public function download(Request $request, $user)
+    public function download(Request $request)
     {
-        throw_unless($user = User::find($user), new NotFoundHttpException);
-
-        if (User::current()->id !== $user->id) {
-            abort(403);
-        }
+        $user = User::current();
 
         $filename = Str::slug(config('app.name')).'-recovery-codes.txt';
 
