@@ -49,17 +49,13 @@ class TwoFactorAuthenticationController extends CpController
         return [];
     }
 
-    public function disable(Request $request, $user, DisableTwoFactorAuthentication $disable)
+    public function disable(Request $request, DisableTwoFactorAuthentication $disable)
     {
-        throw_unless($user = User::find($user), new NotFoundHttpException);
-
-        if (! $request->user()->can('edit', $user)) {
-            abort(403);
-        }
+        $user = User::current();
 
         $disable($user);
 
-        if ($request->user()->id === $user->id && $user->isTwoFactorAuthenticationRequired()) {
+        if ($user->isTwoFactorAuthenticationRequired()) {
             return ['redirect' => $this->setupUrlRedirect()];
         }
 
