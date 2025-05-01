@@ -24,6 +24,8 @@ use Statamic\Http\Controllers\CP\Auth\ForgotPasswordController;
 use Statamic\Http\Controllers\CP\Auth\ImpersonationController;
 use Statamic\Http\Controllers\CP\Auth\LoginController;
 use Statamic\Http\Controllers\CP\Auth\ResetPasswordController;
+use Statamic\Http\Controllers\CP\Auth\TwoFactorChallengeController;
+use Statamic\Http\Controllers\CP\Auth\TwoFactorSetupController;
 use Statamic\Http\Controllers\CP\Auth\UnauthorizedController;
 use Statamic\Http\Controllers\CP\Collections\CollectionActionController;
 use Statamic\Http\Controllers\CP\Collections\CollectionBlueprintsController;
@@ -96,6 +98,7 @@ use Statamic\Http\Controllers\CP\Updater\UpdaterController;
 use Statamic\Http\Controllers\CP\Users\AccountController;
 use Statamic\Http\Controllers\CP\Users\PasswordController;
 use Statamic\Http\Controllers\CP\Users\RolesController;
+use Statamic\Http\Controllers\CP\Users\TwoFactorAuthenticationController;
 use Statamic\Http\Controllers\CP\Users\UserActionController;
 use Statamic\Http\Controllers\CP\Users\UserBlueprintController;
 use Statamic\Http\Controllers\CP\Users\UserGroupBlueprintController;
@@ -103,6 +106,9 @@ use Statamic\Http\Controllers\CP\Users\UserGroupsController;
 use Statamic\Http\Controllers\CP\Users\UsersController;
 use Statamic\Http\Controllers\CP\Users\UserWizardController;
 use Statamic\Http\Controllers\CP\Utilities\UtilitiesController;
+use Statamic\Http\Controllers\User\TwoFactorRecoveryCodesController;
+use Statamic\Http\Middleware\CP\RedirectIfTwoFactorSetupIncomplete;
+use Statamic\Http\Middleware\CP\RequireElevatedSession;
 use Statamic\Http\Middleware\RequireStatamicPro;
 use Statamic\Statamic;
 
@@ -115,6 +121,13 @@ Route::group(['prefix' => 'auth'], function () {
         Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
         Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
         Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.reset.action');
+
+        Route::get('two-factor-challenge', [TwoFactorChallengeController::class, 'index'])->name('two-factor-challenge');
+        Route::post('two-factor-challenge', [TwoFactorChallengeController::class, 'store']);
+
+        Route::get('two-factor-setup', TwoFactorSetupController::class)
+            ->withoutMiddleware(RedirectIfTwoFactorSetupIncomplete::class)
+            ->name('two-factor-setup');
     }
 
     Route::get('logout', [LoginController::class, 'logout'])->name('logout');
@@ -294,6 +307,14 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::patch('users/blueprint', [UserBlueprintController::class, 'update'])->name('users.blueprint.update');
     Route::resource('users', UsersController::class)->except('destroy');
     Route::patch('users/{user}/password', [PasswordController::class, 'update'])->name('users.password.update');
+    Route::withoutMiddleware(RedirectIfTwoFactorSetupIncomplete::class)->middleware(RequireElevatedSession::class)->group(function () {
+        Route::get('two-factor/enable', [TwoFactorAuthenticationController::class, 'enable'])->name('users.two-factor.enable');
+        Route::delete('two-factor', [TwoFactorAuthenticationController::class, 'disable'])->name('users.two-factor.disable');
+        Route::post('two-factor/confirm', [TwoFactorAuthenticationController::class, 'confirm'])->name('users.two-factor.confirm');
+        Route::get('two-factor/recovery-codes', [TwoFactorRecoveryCodesController::class, 'show'])->name('users.two-factor.recovery-codes.show');
+        Route::post('two-factor/recovery-codes', [TwoFactorRecoveryCodesController::class, 'store'])->name('users.two-factor.recovery-codes.generate');
+        Route::get('two-factor/recovery-codes/download', [TwoFactorRecoveryCodesController::class, 'download'])->name('users.two-factor.recovery-codes.download');
+    });
     Route::get('account', AccountController::class)->name('account');
     Route::get('user-groups/blueprint', [UserGroupBlueprintController::class, 'edit'])->name('user-groups.blueprint.edit');
     Route::patch('user-groups/blueprint', [UserGroupBlueprintController::class, 'update'])->name('user-groups.blueprint.update');

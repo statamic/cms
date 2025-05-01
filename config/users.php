@@ -182,6 +182,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Enforce Two-Factor Authentication
+    |--------------------------------------------------------------------------
+    |
+    | Specify which user roles should be required to enable two-factor
+    | authentication. Use "*" to enforce 2FA for all users, or "super_users"
+    | to enforce it for super users.
+    |
+    */
+
+    'two_factor_enforced_roles' => [],
+
+    /*
+    |--------------------------------------------------------------------------
     | Default Sorting
     |--------------------------------------------------------------------------
     |

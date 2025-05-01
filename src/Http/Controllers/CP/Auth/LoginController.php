@@ -2,11 +2,11 @@
 
 namespace Statamic\Http\Controllers\CP\Auth;
 
+use Illuminate\Auth\Events\Failed;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
-use Statamic\Auth\ThrottlesLogins;
 use Statamic\Facades\OAuth;
+use Statamic\Facades\User;
+use Statamic\Http\Controllers\Concerns\HandlesLogins;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Middleware\CP\RedirectIfAuthorized;
 use Statamic\Support\Str;
@@ -15,7 +15,7 @@ use function Statamic\trans as __;
 
 class LoginController extends CpController
 {
-    use ThrottlesLogins;
+    use HandlesLogins;
 
     /**
      * Create a new controller instance.
@@ -59,46 +59,37 @@ class LoginController extends CpController
             'password' => 'required|string',
         ]);
 
-        if ($this->hasTooManyLoginAttempts($request)) {
-            $this->fireLockoutEvent($request);
+        $this->handleTooManyLoginAttempts($request);
 
-            return $this->sendLockoutResponse($request);
+        $user = User::fromUser($this->validateCredentials($request));
+
+        if ($user->hasEnabledTwoFactorAuthentication()) {
+            return $this->twoFactorChallengeResponse($request, $user);
         }
 
-        if ($this->attemptLogin($request)) {
-            return $this->sendLoginResponse($request);
-        }
-
-        $this->incrementLoginAttempts($request);
-
-        return $this->sendFailedLoginResponse($request);
-    }
-
-    protected function attemptLogin(Request $request)
-    {
-        return $this->guard()->attempt(
-            $this->credentials($request),
-            $request->filled('remember')
-        );
-    }
-
-    protected function sendLoginResponse(Request $request)
-    {
-        $request->session()->regenerate();
+        $this->authenticate($request, $user);
 
         return $this->authenticated($request, $this->guard()->user());
     }
 
-    protected function sendFailedLoginResponse(Request $request)
+    protected function twoFactorChallengeRedirect(): string
     {
-        throw ValidationException::withMessages([
-            $this->username() => [trans('auth.failed')],
-        ]);
+        return cp_route('two-factor-challenge');
     }
 
-    protected function guard()
+    /**
+     * Fire the failed authentication attempt event with the given arguments.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
+     * @return void
+     */
+    protected function fireFailedEvent($request, $user = null)
     {
-        return Auth::guard();
+        event(new Failed($this->guard()?->name, $user, [
+            $this->username() => $request->{$this->username()},
+            'password' => $request->password,
+        ]));
     }
 
     public function redirectPath()

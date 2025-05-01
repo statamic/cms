@@ -367,7 +367,7 @@ class FrontendTest extends TestCase
         $page->set('protect', 'logged_in')->save();
 
         $this
-            ->actingAs(User::make())
+            ->actingAs(tap(User::make())->save())
             ->get('/about')
             ->assertOk()
             ->assertHeader('X-Statamic-Protected', true);
@@ -1002,7 +1002,7 @@ class FrontendTest extends TestCase
         $this->get('/does-not-exist')->assertRedirect('/login?redirect=http://localhost/does-not-exist');
 
         $this
-            ->actingAs(User::make())
+            ->actingAs(tap(User::make())->save())
             ->get('/does-not-exist')
             ->assertStatus(404);
     }
