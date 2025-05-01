@@ -34,11 +34,11 @@ class TwoFactorSetupController extends Controller
     protected function routes($user): array
     {
         return [
-            'enable' => route('statamic.users.two-factor.enable', $user->id),
+            'enable' => route('statamic.users.two-factor.enable'),
             'recovery_codes' => [
-                'show' => route('statamic.users.two-factor.recovery-codes.show', $user->id),
-                'generate' => route('statamic.users.two-factor.recovery-codes.generate', $user->id),
-                'download' => route('statamic.users.two-factor.recovery-codes.download', $user->id),
+                'show' => route('statamic.users.two-factor.recovery-codes.show'),
+                'generate' => route('statamic.users.two-factor.recovery-codes.generate'),
+                'download' => route('statamic.users.two-factor.recovery-codes.download'),
             ],
         ];
     }

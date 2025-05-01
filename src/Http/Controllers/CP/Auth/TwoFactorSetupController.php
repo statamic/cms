@@ -25,11 +25,11 @@ class TwoFactorSetupController extends Controller
     protected function routes($user): array
     {
         return [
-            'enable' => cp_route('users.two-factor.enable', $user->id),
+            'enable' => cp_route('users.two-factor.enable'),
             'recovery_codes' => [
-                'show' => cp_route('users.two-factor.recovery-codes.show', $user->id),
-                'generate' => cp_route('users.two-factor.recovery-codes.generate', $user->id),
-                'download' => cp_route('users.two-factor.recovery-codes.download', $user->id),
+                'show' => cp_route('users.two-factor.recovery-codes.show'),
+                'generate' => cp_route('users.two-factor.recovery-codes.generate'),
+                'download' => cp_route('users.two-factor.recovery-codes.download'),
             ],
         ];
     }

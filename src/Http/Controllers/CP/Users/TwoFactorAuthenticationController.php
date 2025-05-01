@@ -6,9 +6,9 @@ use Statamic\Http\Controllers\User\TwoFactorAuthenticationController as Controll
 
 class TwoFactorAuthenticationController extends Controller
 {
-    protected function confirmUrl($user)
+    protected function confirmUrl()
     {
-        return cp_route('users.two-factor.confirm', $user->id);
+        return cp_route('users.two-factor.confirm');
     }
 
     protected function setupUrlRedirect()

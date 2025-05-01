@@ -27,7 +27,7 @@ class TwoFactorAuthenticationController extends CpController
         return [
             'qr' => $user->twoFactorQrCodeSvg(),
             'secret_key' => $user->twoFactorSecretKey(),
-            'confirm_url' => $this->confirmUrl($user),
+            'confirm_url' => $this->confirmUrl(),
         ];
     }
 
@@ -53,9 +53,9 @@ class TwoFactorAuthenticationController extends CpController
         return ['redirect' => null];
     }
 
-    protected function confirmUrl($user)
+    protected function confirmUrl()
     {
-        return route('statamic.users.two-factor.confirm', $user->id);
+        return route('statamic.users.two-factor.confirm');
     }
 
     protected function setupUrlRedirect()

@@ -259,12 +259,12 @@ class UsersController extends CpController
                 'wasSetup' => $user->hasEnabledTwoFactorAuthentication(),
                 'canDisable' => request()->user()->can('edit', $user),
                 'routes' => [
-                    'enable' => cp_route('users.two-factor.enable', $user->id),
-                    'disable' => cp_route('users.two-factor.disable', $user->id),
+                    'enable' => cp_route('users.two-factor.enable'),
+                    'disable' => cp_route('users.two-factor.disable'),
                     'recoveryCodes' => [
-                        'show' => cp_route('users.two-factor.recovery-codes.show', $user->id),
-                        'generate' => cp_route('users.two-factor.recovery-codes.generate', $user->id),
-                        'download' => cp_route('users.two-factor.recovery-codes.download', $user->id),
+                        'show' => cp_route('users.two-factor.recovery-codes.show'),
+                        'generate' => cp_route('users.two-factor.recovery-codes.generate'),
+                        'download' => cp_route('users.two-factor.recovery-codes.download'),
                     ],
                 ],
             ],
