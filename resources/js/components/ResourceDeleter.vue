@@ -71,7 +71,7 @@ export default {
         confirm() {
             requireElevatedSessionIf(this.requiresElevatedSession)
                 .then(() => (this.deleting = true))
-                .catch(() => {});
+                .catch(() => Statamic.$toast.error(__('statamic::messages.elevated_session_required')));
         },
 
         confirmed() {
