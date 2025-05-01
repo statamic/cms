@@ -32,7 +32,7 @@ class DisableTwoFactorAuthentication extends Action
 
     public function authorize($user, $item)
     {
-        return $user->can('change passwords', $item);
+        return $user->can('editPassword', $item);
     }
 
     public function authorizeBulk($user, $items)
