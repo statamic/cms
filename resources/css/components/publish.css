@@ -84,31 +84,26 @@ code.parent-url {
         }
     }
 
-
     /* Jay's Flexbox Grid */
     display: flex;
     flex-wrap: wrap;
+    --columns: 12;
     --gap: calc(var(--spacing) * 1);
+    --col-width: calc(100% / var(--columns));
     gap: var(--gap);
+
     .form-group {
-        flex-basis: 100%;
+        --col-span: var(--columns);
+        flex-basis: calc(var(--col-width) * var(--col-span) - var(--gap));
         flex-grow: 1;
     }
-    .sm\:col-span-2 {
-        flex-basis: calc(16.66% - var(--gap));
-      }
-    .sm\:col-span-4 {
-        flex-basis: calc(33.33% - var(--gap));
-    }
-    .sm\:col-span-6 {
-        flex-basis: calc(50% - var(--gap));
-    }
-    .sm\:col-span-8 {
-        flex-basis: calc(66.66% - var(--gap));
-    }
-    .sm\:col-span-10 {
-        flex-basis: calc(83.33% - var(--gap));
-    }
+
+    /* Column spans - each class represents the number of columns it spans */
+    .sm\:col-span-2  { --col-span: 2; }
+    .sm\:col-span-4  { --col-span: 4; }
+    .sm\:col-span-6  { --col-span: 6; }
+    .sm\:col-span-8  { --col-span: 8; }
+    .sm\:col-span-10 { --col-span: 10; }
 }
 
 .publish-field {
