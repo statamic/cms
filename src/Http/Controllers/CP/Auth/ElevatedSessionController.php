@@ -46,6 +46,9 @@ class ElevatedSessionController
         $request->validate([
             'password' => 'required_without:verification_code',
             'verification_code' => 'required_without:password',
+        ], [
+            'password.required_without' => __('statamic::validation.required'),
+            'verification_code.required_without' => __('statamic::validation.required'),
         ]);
 
         if ($request->password && ! Hash::check($request->password, $user->password())) {
