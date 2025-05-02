@@ -50,7 +50,7 @@ class ElevatedSessionTest extends TestCase
     {
         config(['statamic.users.elevated_session_duration' => 15]);
 
-        $this->freezeSecond();
+        $this->freezeTime();
 
         $this
             ->withElevatedSession(now()->subMinutes(5))
