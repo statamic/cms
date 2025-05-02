@@ -7,7 +7,7 @@ use Illuminate\Notifications\Notification;
 
 class ElevatedSessionVerificationCode extends Notification
 {
-    public function __construct(protected string $verificationCode)
+    public function __construct(public string $verificationCode)
     {
     }
 

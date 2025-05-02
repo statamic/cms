@@ -73,7 +73,7 @@ class ElevatedSessionController
     public function resendCode()
     {
         if (User::current()->getElevatedSessionMethod() !== 'verification_code') {
-            throw new \LogicException('Resend code is only available for verification code method');
+            throw ValidationException::withMessages(['method' => 'Resend code is only available for verification code method']);
         }
 
         session()->sendElevatedSessionVerificationCode();
