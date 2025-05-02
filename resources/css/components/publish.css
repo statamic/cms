@@ -83,6 +83,32 @@ code.parent-url {
             }
         }
     }
+
+
+    /* Jay's Flexbox Grid */
+    display: flex;
+    flex-wrap: wrap;
+    --gap: calc(var(--spacing) * 1);
+    gap: var(--gap);
+    .form-group {
+        flex-basis: 100%;
+        flex-grow: 1;
+    }
+    .sm\:col-span-2 {
+        flex-basis: calc(16.66% - var(--gap));
+      }
+    .sm\:col-span-4 {
+        flex-basis: calc(33.33% - var(--gap));
+    }
+    .sm\:col-span-6 {
+        flex-basis: calc(50% - var(--gap));
+    }
+    .sm\:col-span-8 {
+        flex-basis: calc(66.66% - var(--gap));
+    }
+    .sm\:col-span-10 {
+        flex-basis: calc(83.33% - var(--gap));
+    }
 }
 
 .publish-field {
