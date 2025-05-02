@@ -48,6 +48,12 @@
                                 @keydown.enter.prevent="submit"
                             />
                             <button
+                                @click="resendCode"
+                                class="btn ltr:ml-2 rtl:mr-2"
+                                :disabled="resendDisabled"
+                                v-text="__('Resend code')"
+                            />
+                            <button
                                 @click="submit(close)"
                                 class="btn-primary ltr:ml-2 rtl:mr-2"
                                 v-text="__('Confirm')"
@@ -72,6 +78,7 @@ export default {
             verificationCode: null,
             errors: [],
             shouldResolve: false,
+            resendDisabled: false,
         };
     },
 
@@ -95,6 +102,20 @@ export default {
                         this.$refs.verificationCode?.focus();
                     }
                 });
+        },
+
+        resendCode() {
+            this.$axios
+                .get(cp_url('elevated-session/resend-code'))
+                .then(() => this.$toast.success(__('messages.elevated_session_verification_code_sent')))
+                .catch((error) =>
+                    this.$toast.error(
+                        error.response.status === 429 ? error.response.data.error : __('Something went wrong'),
+                    ),
+                );
+
+            this.resendDisabled = true;
+            setTimeout(() => (this.resendDisabled = false), 60 * 1000);
         },
 
         modalClosed() {

@@ -131,17 +131,27 @@ class CpServiceProvider extends ServiceProvider
         });
 
         Request::macro('getElevatedSessionVerificationCode', function () {
-            return session()->get('statamic_elevated_session_verification_code');
+            return session()->get('statamic_elevated_session_verification_code')['code'] ?? null;
         });
 
         Session::macro('elevate', function () {
             $this->put('statamic_elevated_session', now()->timestamp);
         });
 
+        Session::macro('sendElevatedSessionVerificationCodeIfRequired', function () {
+            if ($timestamp = session()->get('statamic_elevated_session_verification_code')['generated_at'] ?? null) {
+                if ($timestamp > now()->subMinutes(5)->timestamp) {
+                    return;
+                }
+            }
+
+            $this->sendElevatedSessionVerificationCode();
+        });
+
         Session::macro('sendElevatedSessionVerificationCode', function () {
             session()->put(
                 key: 'statamic_elevated_session_verification_code',
-                value: $verificationCode = Str::random(20)
+                value: ['code' => $verificationCode = Str::random(20), 'generated_at' => now()->timestamp],
             );
 
             User::current()->notify(new ElevatedSessionVerificationCode($verificationCode));

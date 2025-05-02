@@ -58,6 +58,12 @@
                 <button type="submit" class="btn-primary">
                     {{ __('Submit') }}
                 </button>
+
+                @if ($method === 'verification_code')
+                    <a href="{{ cp_route('elevated-session.resend-code') }}" class="ml-4 text-sm text-gray-700">
+                        {{ __('Resend code') }}
+                    </a>
+                @endif
             </form>
         </div>
     </div>

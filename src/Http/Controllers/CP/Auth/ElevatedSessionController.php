@@ -20,7 +20,7 @@ class ElevatedSessionController
         ];
 
         if (! $hasElevatedSession && $method === 'verification_code') {
-            session()->sendElevatedSessionVerificationCode();
+            session()->sendElevatedSessionVerificationCodeIfRequired();
         }
 
         return $response;
@@ -31,7 +31,7 @@ class ElevatedSessionController
         $user = User::current();
 
         if (($method = $user->getElevatedSessionMethod()) === 'verification_code') {
-            session()->sendElevatedSessionVerificationCode();
+            session()->sendElevatedSessionVerificationCodeIfRequired();
         }
 
         return view('statamic::auth.confirm-password', [
@@ -65,5 +65,16 @@ class ElevatedSessionController
         return $request->wantsJson()
             ? $this->status($request)
             : redirect()->intended(cp_route('index'))->with('success', $user->getElevatedSessionMethod() === 'password_confirmation' ? __('Password confirmed') : __('Code verified'));
+    }
+
+    public function resendCode()
+    {
+        if (User::current()->getElevatedSessionMethod() !== 'verification_code') {
+            throw new \LogicException('Resend code is only available for verification code method');
+        }
+
+        session()->sendElevatedSessionVerificationCode();
+
+        return back()->with('success', __('statamic::messages.elevated_session_verification_code_sent'));
     }
 }
