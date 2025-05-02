@@ -8,6 +8,7 @@ use Statamic\Facades\Permission;
 use Statamic\Facades\Role;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Middleware\CP\RequireElevatedSession;
 use Statamic\Http\Middleware\RequireStatamicPro;
 use Statamic\Rules\Handle;
 use Statamic\Support\Str;
@@ -19,6 +20,7 @@ class RolesController extends CpController
     public function __construct()
     {
         $this->middleware(RequireStatamicPro::class);
+        $this->middleware(RequireElevatedSession::class)->except('index');
     }
 
     public function index(Request $request)

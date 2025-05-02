@@ -7,7 +7,9 @@ export async function requireElevatedSession() {
 
     return new Promise((resolve, reject) => {
         const component = Statamic.$components.append('elevated-session-modal', {
-            props: {},
+            props: {
+                method: response.data.method,
+            },
         });
 
         component.on('closed', (shouldResolve) => {

@@ -121,5 +121,13 @@ class AuthServiceProvider extends ServiceProvider
         RateLimiter::for('two-factor', function (Request $request) {
             return Limit::perMinute(5)->by($request->session()->get('login.id'));
         });
+
+        RateLimiter::for('send-elevated-session-code', function () {
+            return Limit::perMinute(1)->response(function (Request $request) {
+                $message = trans_choice('statamic::messages.try_again_in_minutes', 1);
+
+                return $request->wantsJson() ? response(['error' => $message], 429) : back()->with('error', $message);
+            });
+        });
     }
 }
