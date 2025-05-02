@@ -1,5 +1,33 @@
 # Release Notes
 
+## 5.54.0 (2025-05-02)
+
+### What's new
+- Add `firstOrfail`, `firstOr`, `sole` and `exists` methods to base query builder [#9976](https://github.com/statamic/cms/issues/9976) by @duncanmcclean
+- Allow custom nocache db connection [#11716](https://github.com/statamic/cms/issues/11716) by @macaws
+- Make Live Preview force reload JS modules optional [#11715](https://github.com/statamic/cms/issues/11715) by @eminos
+
+### What's fixed
+- Fix ensured author field when sidebar has empty section [#11747](https://github.com/statamic/cms/issues/11747) by @duncanmcclean
+- Improve error handling in entries fieldtype [#11754](https://github.com/statamic/cms/issues/11754) by @duncanmcclean
+- Hide "Edit" button on relationship fieldtypes when user is missing permissions [#11748](https://github.com/statamic/cms/issues/11748) by @duncanmcclean
+- Fix wrong taxonomies count on multiple sites [#11741](https://github.com/statamic/cms/issues/11741) by @liucf
+- GraphQL should return float fieldtype values as floats [#11742](https://github.com/statamic/cms/issues/11742) by @ryanmitchell
+- Fix pop-up position of for Bard link inconsistent [#11739](https://github.com/statamic/cms/issues/11739) by @liucf
+- Only apply the published filter when not in preview mode [#11652](https://github.com/statamic/cms/issues/11652) by @TheBnl
+- Cleanup roles after running `SitesTest@gets_authorized_sites` [#11738](https://github.com/statamic/cms/issues/11738) by @duncanmcclean
+- Update nocache map on response [#11650](https://github.com/statamic/cms/issues/11650) by @indykoning
+- Fix Add truncate class to flex container in LinkFieldtype [#11689](https://github.com/statamic/cms/issues/11689) by @liucf
+- Fix appended form config fields when user locale differs from app locale [#11704](https://github.com/statamic/cms/issues/11704) by @duncanmcclean
+- Fix dirty state on preferences edit form [#11655](https://github.com/statamic/cms/issues/11655) by @duncanmcclean
+- Fix static caching invalidation for multi-sites [#10669](https://github.com/statamic/cms/issues/10669) by @duncanmcclean
+- Safer check on parent tag [#11717](https://github.com/statamic/cms/issues/11717) by @macaws
+- Dutch translations  [#11730](https://github.com/statamic/cms/issues/11730) by @jeroenpeters1986
+- Bump @babel/runtime from 7.21.0 to 7.27.0 [#11726](https://github.com/statamic/cms/issues/11726) by @dependabot
+- Update caniuse-lite [#11725](https://github.com/statamic/cms/issues/11725) by @jasonvarga
+
+
+
 ## 5.53.1 (2025-04-17)
 
 ### What's fixed
