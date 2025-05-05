@@ -57,7 +57,7 @@ const buttonClasses = computed(() => {
             round: { true: 'rounded-full' },
         },
         compoundVariants: [
-            { iconOnly: true, size: 'base', class: 'w-10 [&_svg]:size-4' },
+            { iconOnly: true, size: 'base', class: 'w-10 [&_svg]:size-4.5' },
             { iconOnly: true, size: 'sm', class: 'w-8 [&_svg]:size-3.5' },
             { iconOnly: true, size: 'xs', class: 'w-6.5 [&_svg]:size-3' },
             { iconOnly: false, iconAppend: true, class: '[&_svg]:-me-1' },
