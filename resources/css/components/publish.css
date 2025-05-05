@@ -46,7 +46,7 @@ code.parent-url {
 
     .form-group {
         --col-span: 12;
-        flex-basis: calc(var(--col-width) * var(--col-span) - var(--spacing) * 3);
+        flex-basis: calc(var(--col-width) * 12 - var(--spacing) * 3);
         flex-grow: 1;
     }
 
@@ -66,10 +66,21 @@ code.parent-url {
     [data-cards-wrap="fields"] & {
         @apply gap-1;
         .form-group {
-            flex-basis: calc(var(--col-width) * var(--col-span) - calc(var(--spacing) * 1));
+            flex-basis: calc(var(--col-width) * 12 - calc(var(--spacing) * 1));
         }
     }
+}
 
+@variant lg {
+    .publish-fields .form-group {
+        flex-basis: calc(var(--col-width) * var(--col-span) - calc(var(--spacing) * 3));
+    }
+    [data-cards-wrap="fields"] .publish-fields .form-group {
+        flex-basis: calc(var(--col-width) * var(--col-span) - calc(var(--spacing) * 1));
+    }
+}
+
+.publish-field {
     .form-group {
         > label,
         .field-inner > label {
