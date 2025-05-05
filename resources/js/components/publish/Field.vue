@@ -200,7 +200,7 @@ export default {
                 `${this.config.component || this.config.type}-fieldtype`,
                 ,
                 this.isReadOnly ? 'read-only-field' : '',
-                this.isInsideConfigFields ? 'config-field' : `${tailwind_width_class(this.config.width)}`,
+                this.isInsideConfigFields ? 'config-field' : `${field_width_class(this.config.width)}`,
                 this.showLabel ? 'has-field-label' : '',
                 this.shouldShowFieldActions ? 'has-field-dropdown' : '',
                 this.config.classes || '',

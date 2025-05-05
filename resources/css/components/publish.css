@@ -41,9 +41,33 @@ code.parent-url {
 }
 
 .publish-fields {
-    @apply grid grid-cols-12 gap-3 lg:gap-6;
+    @apply flex flex-wrap gap-3 lg:gap-6;
+    --col-width: calc(100% / 12);
+
+    .form-group {
+        --col-span: 12;
+        flex-basis: calc(var(--col-width) * var(--col-span) - var(--spacing) * 3);
+        flex-grow: 1;
+    }
+
+    .field-w-10  { --col-span: 1; }
+    .field-w-20  { --col-span: 2; }
+    .field-w-25  { --col-span: 3; }
+    .field-w-33  { --col-span: 4; }
+    .field-w-40  { --col-span: 5; }
+    .field-w-50  { --col-span: 6; }
+    .field-w-60  { --col-span: 7; }
+    .field-w-66  { --col-span: 8; }
+    .field-w-75  { --col-span: 9; }
+    .field-w-80  { --col-span: 10; }
+    .field-w-90  { --col-span: 11; }
+    .field-w-100 { --col-span: 12; }
+
     [data-cards-wrap="fields"] & {
-        @apply gap-1 grid-flow-row;
+        @apply gap-1;
+        .form-group {
+            flex-basis: calc(var(--col-width) * var(--col-span) - calc(var(--spacing) * 1));
+        }
     }
 
     .form-group {
@@ -83,27 +107,6 @@ code.parent-url {
             }
         }
     }
-
-    /* Jay's Flexbox Grid */
-    display: flex;
-    flex-wrap: wrap;
-    --columns: 12;
-    --gap: calc(var(--spacing) * 1);
-    --col-width: calc(100% / var(--columns));
-    gap: var(--gap);
-
-    .form-group {
-        --col-span: var(--columns);
-        flex-basis: calc(var(--col-width) * var(--col-span) - var(--gap));
-        flex-grow: 1;
-    }
-
-    /* Column spans - each class represents the number of columns it spans */
-    .sm\:col-span-2  { --col-span: 2; }
-    .sm\:col-span-4  { --col-span: 4; }
-    .sm\:col-span-6  { --col-span: 6; }
-    .sm\:col-span-8  { --col-span: 8; }
-    .sm\:col-span-10 { --col-span: 10; }
 }
 
 .publish-field {
