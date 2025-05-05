@@ -190,7 +190,7 @@ export default {
 
     methods: {
         configFieldClasses(field) {
-            return [`form-group p-4 m-0 ${field.type}-fieldtype`, tailwind_width_class(field.width)];
+            return [`form-group p-4 m-0 ${field.type}-fieldtype`, field_width_class(field.width)];
         },
 
         getFieldValue(handle) {

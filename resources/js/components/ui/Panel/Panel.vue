@@ -1,3 +1,12 @@
+<script setup>
+import { PanelHeader, Heading, Subheading } from '@statamic/ui';
+
+const props = defineProps({
+    heading: { type: String, default: null },
+    subheading: { type: String, default: null },
+});
+</script>
+
 <template>
     <div
         :class="[
@@ -6,6 +15,10 @@
         ]"
         data-ui-panel
     >
+        <PanelHeader v-if="heading">
+            <Heading v-html="heading" />
+            <Subheading v-if="subheading" v-html="subheading" />
+        </PanelHeader>
         <slot />
     </div>
 </template>
