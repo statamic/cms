@@ -77,11 +77,11 @@ const results = computed(() => {
     // Avoid mutating the original options array.
     let options = JSON.parse(JSON.stringify(props.options));
 
-    if (props.taggable && searchQuery.value) {
+    if (props.taggable && searchQuery.value && options.filter((option => option.value === searchQuery.value)).length === 0) {
         options.push({
             label: searchQuery.value,
             value: searchQuery.value,
-        })
+        });
     }
 
     return fuzzysort.go(searchQuery.value, options, {
@@ -96,7 +96,7 @@ const results = computed(() => {
         <ComboboxRoot v-bind="attrs" :ignore-filter="true" :model-value="modelValue" @update:model-value="emit('update:modelValue', $event)">
             <ComboboxAnchor :class="[anchorClasses, $attrs.class]" data-ui-typeahead-anchor>
                 <ComboboxTrigger as="div" class="w-full">
-                    <ComboboxInput class="w-full" v-model="searchQuery" :placeholder :display-value="!multiple ? ((value) => value[0].label) : null" />
+                    <ComboboxInput class="w-full" v-model="searchQuery" :placeholder :display-value="!multiple && modelValue.length === 1 ? ((value) => value[0].label) : null" />
                 </ComboboxTrigger>
                 <div class="flex items-center space-x-2 pl-2">
                     <ComboboxCancel v-if="clearable">
