@@ -5,7 +5,7 @@ import { computed, useSlots } from 'vue';
 const props = defineProps({
     size: { type: String, default: 'base' },
     level: { type: [Number, null], default: null },
-    text: { type: [String, null], default: null },
+    text: { type: [String, Number, Boolean, null], default: null },
     href: { type: [String, null], default: null },
 });
 

@@ -12,7 +12,7 @@ const props = defineProps({
     loading: { type: Boolean, default: false },
     round: { type: Boolean, default: false },
     size: { type: String, default: 'base' },
-    text: { type: String, default: null },
+    text: { type: [String, Number, Boolean, null], default: null },
     type: { type: String, default: 'button' },
     variant: { type: String, default: 'default' },
 });

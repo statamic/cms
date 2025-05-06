@@ -3,7 +3,7 @@ import { cva } from 'cva';
 
 const props = defineProps({
     size: { type: String, default: 'base' },
-    text: { type: String, default: null },
+    text: { type: [String, Number, Boolean, null], default: null },
 });
 
 const classes = cva({
