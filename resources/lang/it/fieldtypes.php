@@ -158,7 +158,6 @@ return [
     'select.config.multiple' => 'Consenti la selezione multipla delle opzioni.',
     'select.config.options' => 'Imposta le chiavi e le loro etichette opzionali.',
     'select.config.placeholder' => 'Imposta il testo del _placeholder_.',
-    'select.config.push_tags' => 'Consenti l\'aggiunta al volo dei tag all\'elenco delle opzioni.',
     'select.config.searchable' => 'Abilita la ricerca delle opzioni.',
     'select.config.taggable' => 'Consenti l\'inserimento di nuove opzioni oltre a quelle predefinite',
     'select.title' => 'Select',

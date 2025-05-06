@@ -157,7 +157,6 @@ return [
     'select.config.multiple' => 'Tillad flere valg.',
     'select.config.options' => 'Indstil tasterne og deres valgfri etiketter.',
     'select.config.placeholder' => 'Indstil standard, ikke-valgbar pladsholdertekst.',
-    'select.config.push_tags' => 'Føj nyoprettede tags til valglisten.',
     'select.config.searchable' => 'Aktiver søgning gennem mulige muligheder.',
     'select.config.taggable' => 'Tillad at tilføje nye indstillinger ud over foruddefinerede indstillinger',
     'select.title' => 'Udvælg',
