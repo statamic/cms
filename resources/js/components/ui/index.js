@@ -18,6 +18,7 @@ import { default as Radio } from './Radio/Item.vue';
 import { default as RadioGroup } from './Radio/Group.vue';
 import { default as Input } from './Input/Input.vue';
 import { default as Textarea } from './Textarea.vue';
+import { default as Typeahead } from './Typeahead.vue';
 import { default as Switch } from './Switch.vue';
 import { default as Header } from './Header.vue';
 import { default as Heading } from './Heading.vue';
@@ -56,6 +57,7 @@ export {
     RadioGroup,
     Input,
     Textarea,
+    Typeahead,
     Switch,
     Header,
     Heading,

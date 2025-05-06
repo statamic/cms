@@ -1,16 +1,20 @@
 <script setup>
 import { cva } from 'cva';
 import {
-    SelectContent,
-    SelectItem,
-    SelectItemText,
-    SelectPortal,
-    SelectRoot,
-    SelectTrigger,
-    SelectValue,
-    SelectViewport,
+    ComboboxAnchor, ComboboxCancel,
+    ComboboxContent,
+    ComboboxEmpty,
+    ComboboxInput,
+    ComboboxItem,
+    ComboboxItemIndicator,
+    ComboboxLabel,
+    ComboboxRoot,
+    ComboboxSeparator,
+    ComboboxTrigger,
+    ComboboxPortal,
+    ComboboxViewport,
 } from 'reka-ui';
-import { useAttrs } from 'vue';
+import { computed, useAttrs } from 'vue';
 import { WithField, Icon } from '@statamic/ui';
 
 const emit = defineEmits(['update:modelValue']);
@@ -21,6 +25,8 @@ const props = defineProps({
     modelValue: { type: [Object, String], default: null },
     size: { type: String, default: 'base' },
     placeholder: { type: String, default: 'Select...' },
+    multiple: { type: Boolean, default: false },
+    clearable: { type: Boolean, default: false },
     options: { type: Array, default: null },
     flat: { type: Boolean, default: false },
 });
@@ -31,7 +37,7 @@ defineOptions({
 
 const attrs = useAttrs();
 
-const triggerClasses = cva({
+const anchorClasses = cva({
     base: 'w-full flex items-center justify-between border border-gray-300 dark:border-b-0 dark:ring-3 dark:ring-gray-900 dark:border-white/15 text-gray-600 dark:text-gray-300 antialiased appearance-none shadow-ui-sm dark:shadow-md not-prose',
     variants: {
         size: {
@@ -60,23 +66,36 @@ const itemClasses = cva({
 
 <template>
     <WithField :label :description>
-        <SelectRoot v-bind="attrs" :model-value="modelValue" @update:model-value="emit('update:modelValue', $event)">
-            <SelectTrigger :class="[triggerClasses, $attrs.class]" data-ui-select-trigger>
-                <SelectValue :placeholder="placeholder" class="select-none" />
-                <Icon name="ui/chevron-down" class="me-2" />
-            </SelectTrigger>
+        <ComboboxRoot v-bind="attrs" :model-value="modelValue" @update:model-value="emit('update:modelValue', $event)">
+            <ComboboxAnchor :class="[anchorClasses, $attrs.class]" data-ui-typeahead-anchor>
+                <ComboboxTrigger as="div" class="w-full">
+                    <ComboboxInput class="w-full" :placeholder :display-value="!multiple ? ((value) => value[0].label) : null" />
+                </ComboboxTrigger>
+                <div class="flex items-center space-x-2 pl-2">
+                    <ComboboxCancel v-if="clearable">
+                        <div class="inline-flex p-1 bg-zinc-100 rounded-full">
+                            <Icon name="plus" class="rotate-45" />
+                        </div>
+                    </ComboboxCancel>
+                    <ComboboxTrigger class="flex items-center">
+                        <Icon name="ui/chevron-down" class="me-2" />
+                    </ComboboxTrigger>
+                </div>
+            </ComboboxAnchor>
 
-            <SelectPortal>
-                <SelectContent
+            <ComboboxPortal>
+                <ComboboxContent
                     position="popper"
                     :side-offset="5"
                     :class="[
                         'shadow-ui-sm z-100 rounded-lg border border-gray-200 bg-white p-2 dark:border-white/10 dark:bg-gray-800',
-                        'max-h-[var(--reka-select-content-available-height)] w-[var(--reka-select-trigger-width)]',
+                        'max-h-[var(--reka-combobox-content-available-height)] w-[var(--reka-combobox-trigger-width)]',
                     ]"
                 >
-                    <SelectViewport>
-                        <SelectItem
+                    <ComboboxViewport>
+                        <ComboboxEmpty class="text-mauve8 text-xs font-medium text-center py-2" />
+
+                        <ComboboxItem
                             v-if="options"
                             v-for="(option, index) in options"
                             :key="index"
@@ -85,13 +104,19 @@ const itemClasses = cva({
                             :class="itemClasses"
                         >
                             <slot name="option" v-bind="option">
+<!--                                <ComboboxItemIndicator-->
+<!--                                    class="absolute left-0 w-[25px] inline-flex items-center justify-center"-->
+<!--                                >-->
+<!--                                    <p>check</p>-->
+<!--                                </ComboboxItemIndicator>-->
+
                                 <img v-if="option.image" :src="option.image" class="size-5 rounded-full" />
-                                <SelectItemText v-html="option.label" />
+                                <span v-html="option.label" />
                             </slot>
-                        </SelectItem>
-                    </SelectViewport>
-                </SelectContent>
-            </SelectPortal>
-        </SelectRoot>
+                        </ComboboxItem>
+                    </ComboboxViewport>
+                </ComboboxContent>
+            </ComboboxPortal>
+        </ComboboxRoot>
     </WithField>
 </template>
