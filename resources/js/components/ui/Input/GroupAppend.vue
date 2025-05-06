@@ -1,3 +1,9 @@
+<script setup>
+const props = defineProps({
+    text: { type: String, required: false },
+});
+</script>
+
 <template>
     <div
         :class="[
@@ -8,6 +14,7 @@
         ]"
         data-ui-input-group-append
     >
-        <slot />
+        <span v-if="text" class="text-gray-400 dark:text-gray-600">{{ text }}</span>
+        <slot v-else />
     </div>
 </template>
