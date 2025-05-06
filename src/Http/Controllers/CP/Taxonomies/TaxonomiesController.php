@@ -20,6 +20,8 @@ use Statamic\Stache\Repositories\TermRepository as StacheTermRepository;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class TaxonomiesController extends CpController
 {
     public function index()
@@ -32,7 +34,7 @@ class TaxonomiesController extends CpController
             return [
                 'id' => $taxonomy->handle(),
                 'title' => $taxonomy->title(),
-                'terms' => $taxonomy->queryTerms()->count(),
+                'terms' => $taxonomy->queryTerms()->pluck('slug')->unique()->count(),
                 'edit_url' => $taxonomy->editUrl(),
                 'delete_url' => $taxonomy->deleteUrl(),
                 'terms_url' => cp_route('taxonomies.show', $taxonomy->handle()),

@@ -18,7 +18,6 @@ use Statamic\Events\TermBlueprintFound;
 use Statamic\Facades;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
-use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
 use Statamic\Taxonomies\Taxonomy;
@@ -292,6 +291,24 @@ class TaxonomyTest extends TestCase
     }
 
     #[Test]
+    public function it_get_terms_count_from_multi_sites()
+    {
+        $this->setSites([
+            'en' => ['url' => '/', 'locale' => 'en_US', 'name' => 'English'],
+            'fr' => ['url' => '/', 'locale' => 'fr_FR', 'name' => 'French'],
+            'de' => ['url' => '/', 'locale' => 'de_DE', 'name' => 'German'],
+        ]);
+
+        $taxonomy = tap(Facades\Taxonomy::make('tags')->sites(['en', 'fr', 'de']))->save();
+        Facades\Term::make()->taxonomy('tags')->slug('one')->data([])->save();
+        Facades\Term::make()->taxonomy('tags')->slug('two')->data([])->save();
+        Facades\Term::make()->taxonomy('tags')->slug('three')->data([])->save();
+
+        $this->assertCount(9, $taxonomy->queryTerms()->get());
+        $this->assertEquals(3, $taxonomy->queryTerms()->pluck('slug')->unique()->count());
+    }
+
+    #[Test]
     public function it_saves_through_the_api()
     {
         Event::fake();
@@ -427,6 +444,13 @@ class TaxonomyTest extends TestCase
         // taxonomy level overrides the default
         $taxonomy->termTemplate('foo');
         $this->assertEquals('foo', $taxonomy->termTemplate());
+    }
+
+    #[Test]
+    public function it_gets_and_sets_the_create_label()
+    {
+        $taxonomy = (new Taxonomy)->handle('tags');
+        $this->assertEquals('Create Term', $taxonomy->createLabel());
     }
 
     #[Test]

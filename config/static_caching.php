@@ -125,6 +125,10 @@ return [
 
     'nocache' => 'cache',
 
+    'nocache_db_connection' => env('STATAMIC_NOCACHE_DB_CONNECTION'),
+
+    'nocache_js_position' => 'body',
+
     /*
     |--------------------------------------------------------------------------
     | Replacers

@@ -11,6 +11,8 @@ use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Middleware\CP\CanManageBlueprints;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class FieldsController extends CpController
 {
     public function __construct()

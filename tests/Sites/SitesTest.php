@@ -3,6 +3,7 @@
 namespace Tests\Sites;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\File;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Role;
 use Statamic\Facades\User;
@@ -33,6 +34,13 @@ class SitesTest extends TestCase
             'fr' => ['url' => 'http://fr.test.com/'],
             'de' => ['url' => 'http://test.com/de/'],
         ]);
+    }
+
+    public function tearDown(): void
+    {
+        File::delete(resource_path('users/roles.yaml'));
+
+        parent::tearDown();
     }
 
     #[Test]

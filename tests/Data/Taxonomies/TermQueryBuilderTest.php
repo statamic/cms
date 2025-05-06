@@ -10,6 +10,7 @@ use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
+use Statamic\Query\Scopes\Scope;
 use Statamic\Taxonomies\LocalizedTerm;
 use Statamic\Taxonomies\TermCollection;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -590,6 +591,21 @@ class TermQueryBuilderTest extends TestCase
     }
 
     #[Test]
+    public function terms_are_found_using_scopes()
+    {
+        CustomScope::register();
+        Term::allowQueryScope(CustomScope::class);
+        Term::allowQueryScope(CustomScope::class, 'whereCustom');
+
+        Taxonomy::make('tags')->save();
+        Term::make('a')->taxonomy('tags')->data(['title' => 'Post 1'])->save();
+        Term::make('b')->taxonomy('tags')->data(['title' => 'Post 2'])->save();
+
+        $this->assertCount(1, Term::query()->customScope(['title' => 'Post 1'])->get());
+        $this->assertCount(1, Term::query()->whereCustom(['title' => 'Post 1'])->get());
+    }
+
+    #[Test]
     public function terms_are_found_using_offset()
     {
         Taxonomy::make('tags')->save();
@@ -762,5 +778,13 @@ class TermQueryBuilderTest extends TestCase
         $this->assertSame('Alfa', $updateOrCreate->get('title'));
         $this->assertSame('alfa', $updateOrCreate->slug());
         $this->assertSame('tags', $updateOrCreate->taxonomy()->handle());
+    }
+}
+
+class CustomScope extends Scope
+{
+    public function apply($query, $params)
+    {
+        $query->where('title', $params['title']);
     }
 }

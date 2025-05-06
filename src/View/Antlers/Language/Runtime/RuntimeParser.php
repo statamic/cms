@@ -4,7 +4,7 @@ namespace Statamic\View\Antlers\Language\Runtime;
 
 use Illuminate\Http\Exceptions\HttpResponseException;
 use ReflectionProperty;
-use Spatie\Ignition\Contracts\ProvidesSolution;
+use Spatie\ErrorSolutions\Contracts\ProvidesSolution;
 use Spatie\LaravelIgnition\Exceptions\ViewException;
 use Spatie\LaravelIgnition\Exceptions\ViewExceptionWithSolution;
 use Statamic\Contracts\View\Antlers\Parser;
@@ -897,5 +897,13 @@ INFO;
     public function callback($callback)
     {
         return $this;
+    }
+
+    /**
+     * Clears the standard render node cache.
+     */
+    public static function clearRenderNodeCache()
+    {
+        self::$standardRenderNodeCache = [];
     }
 }

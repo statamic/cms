@@ -10,6 +10,7 @@
         :collection-has-routes="collectionHasRoutes"
         :initial-fieldset="fieldset"
         :initial-values="values"
+        :initial-extra-values="extraValues"
         :initial-meta="meta"
         :initial-localizations="localizations"
         :initial-has-origin="false"
@@ -19,6 +20,7 @@
         :breadcrumbs="breadcrumbs"
         :initial-site="site"
         :can-manage-publish-state="canManagePublishState"
+        :can-edit-blueprint="canEditBlueprint"
         :create-another-url="createAnotherUrl"
         :initial-listing-url="listingUrl"
         :preview-targets="previewTargets"
@@ -37,12 +39,14 @@ export default {
         'collectionHasRoutes',
         'fieldset',
         'values',
+        'extraValues',
         'meta',
         'localizations',
         'revisions',
         'breadcrumbs',
         'site',
         'canManagePublishState',
+        'canEditBlueprint',
         'createAnotherUrl',
         'listingUrl',
         'previewTargets',

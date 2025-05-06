@@ -101,7 +101,7 @@ class Submission implements Augmentable, SubmissionContract
      */
     public function date()
     {
-        return Carbon::createFromTimestamp($this->id());
+        return Carbon::createFromTimestamp($this->id(), config('app.timezone'));
     }
 
     /**

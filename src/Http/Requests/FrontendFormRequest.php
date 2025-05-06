@@ -120,8 +120,15 @@ class FrontendFormRequest extends FormRequest
         // If this was submitted from a front-end form, we want to use the appropriate language
         // for the translation messages. If there's no previous url, it was likely submitted
         // directly in a headless format. In that case, we'll just use the default lang.
-        $site = ($previousUrl = session()->previousUrl()) ? Site::findByUrl($previousUrl) : null;
+        $site = ($previousUrl = $this->previousUrl()) ? Site::findByUrl($previousUrl) : null;
 
         return $this->withLocale($site?->lang(), fn () => parent::validateResolved());
+    }
+
+    private function previousUrl()
+    {
+        return ($referrer = request()->header('referer'))
+            ? url()->to($referrer)
+            : session()->previousUrl();
     }
 }

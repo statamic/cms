@@ -37,6 +37,11 @@ class FileCacher extends AbstractCacher
     private $nocachePlaceholder;
 
     /**
+     * @var bool
+     */
+    private $logRewriteWarning = true;
+
+    /**
      * @param  array  $config
      */
     public function __construct(Writer $writer, Repository $cache, $config)
@@ -71,6 +76,11 @@ class FileCacher extends AbstractCacher
         $this->cacheUrl($this->makeHash($url), ...$this->getPathAndDomain($url));
     }
 
+    public function preventLoggingRewriteWarning()
+    {
+        $this->logRewriteWarning = false;
+    }
+
     /**
      * @return Page
      */
@@ -80,7 +90,7 @@ class FileCacher extends AbstractCacher
 
         $path = $this->getFilePath($url);
 
-        if (! $this->isLongQueryStringPath($path)) {
+        if ($this->logRewriteWarning && ! $this->isLongQueryStringPath($path)) {
             Log::debug('Static cache loaded ['.$url.'] If you are seeing this, your server rewrite rules have not been set up correctly.');
         }
 
@@ -197,12 +207,17 @@ class FileCacher extends AbstractCacher
 
         $default = <<<EOT
 (function() {
-    var els = document.getElementsByClassName('nocache');
-    var map = {};
-    for (var i = 0; i < els.length; i++) {
-        var section = els[i].getAttribute('data-nocache');
-        map[section] = els[i];
+    function createMap() {
+        var map = {};
+        var els = document.getElementsByClassName('nocache');
+        for (var i = 0; i < els.length; i++) {
+            var section = els[i].getAttribute('data-nocache');
+            map[section] = els[i];
+        }
+        return map;
     }
+
+    var map = createMap();
 
     fetch('/!/nocache', {
         method: 'POST',
@@ -214,6 +229,8 @@ class FileCacher extends AbstractCacher
     })
     .then((response) => response.json())
     .then((data) => {
+        map = createMap(); // Recreate map in case the DOM changed.
+
         const regions = data.regions;
         for (var key in regions) {
             if (map[key]) map[key].outerHTML = regions[key];
