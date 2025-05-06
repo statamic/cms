@@ -1032,7 +1032,7 @@ class EntryQueryBuilderTest extends TestCase
         $this->assertFalse(Entry::query()->exists());
     }
 
-    /** @test */
+    #[Test]
     public function entry_can_be_found_using_find_or_new()
     {
         Collection::make('posts')->save();
@@ -1045,7 +1045,7 @@ class EntryQueryBuilderTest extends TestCase
         $this->assertSame($entry, $findOrNew);
     }
 
-    /** @test */
+    #[Test]
     public function entry_can_be_created_using_find_or_new()
     {
         Collection::make('posts')->save();
@@ -1058,7 +1058,7 @@ class EntryQueryBuilderTest extends TestCase
         $this->assertInstanceOf(EntryContract::class, $findOrNew);
     }
 
-    /** @test */
+    #[Test]
     public function entry_can_be_found_using_find_or()
     {
         Collection::make('posts')->save();
@@ -1073,7 +1073,7 @@ class EntryQueryBuilderTest extends TestCase
         $this->assertSame($entry, $findOrNew);
     }
 
-    /** @test */
+    #[Test]
     public function callback_is_called_using_find_or()
     {
         Collection::make('posts')->save();
@@ -1087,7 +1087,7 @@ class EntryQueryBuilderTest extends TestCase
         $this->assertSame('This could be anything.', $findOrNew);
     }
 
-    /** @test */
+    #[Test]
     public function entry_can_be_found_using_first_or_new()
     {
         Collection::make('posts')->save();
@@ -1103,7 +1103,7 @@ class EntryQueryBuilderTest extends TestCase
         $this->assertSame($entry, $firstOrNew);
     }
 
-    /** @test */
+    #[Test]
     public function entry_can_be_created_using_first_or_new()
     {
         Collection::make('posts')->save();
@@ -1121,7 +1121,7 @@ class EntryQueryBuilderTest extends TestCase
         $this->assertSame('posts', $firstOrNew->collection()->handle());
     }
 
-    /** @test */
+    #[Test]
     public function entry_can_be_found_using_first_or_create()
     {
         Collection::make('posts')->save();
@@ -1137,7 +1137,7 @@ class EntryQueryBuilderTest extends TestCase
         $this->assertSame($entry, $firstOrCreate);
     }
 
-    /** @test */
+    #[Test]
     public function entry_can_be_created_using_first_or_create()
     {
         Collection::make('posts')->save();
@@ -1155,7 +1155,7 @@ class EntryQueryBuilderTest extends TestCase
         $this->assertSame('posts', $firstOrCreate->collection()->handle());
     }
 
-    /** @test */
+    #[Test]
     public function entry_can_be_found_and_updated_using_update_or_create()
     {
         Collection::make('posts')->save();
@@ -1174,7 +1174,7 @@ class EntryQueryBuilderTest extends TestCase
         $this->assertSame('posts', $updateOrCreate->collection()->handle());
     }
 
-    /** @test */
+    #[Test]
     public function entry_can_be_created_using_update_or_create()
     {
         Collection::make('posts')->save();

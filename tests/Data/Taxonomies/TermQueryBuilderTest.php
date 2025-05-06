@@ -620,7 +620,7 @@ class TermQueryBuilderTest extends TestCase
         $this->assertEquals(['b', 'c'], $terms->map->slug()->all());
     }
 
-    /** @test */
+    #[Test]
     public function term_can_be_found_using_find_or_new()
     {
         Taxonomy::make('tags')->save();
@@ -633,7 +633,7 @@ class TermQueryBuilderTest extends TestCase
         $this->assertEquals($term->slug(), $findOrNew->slug());
     }
 
-    /** @test */
+    #[Test]
     public function term_can_be_created_using_find_or_new()
     {
         Taxonomy::make('tags')->save();
@@ -646,7 +646,7 @@ class TermQueryBuilderTest extends TestCase
         $this->assertInstanceOf(TermContract::class, $findOrNew);
     }
 
-    /** @test */
+    #[Test]
     public function term_can_be_found_using_find_or()
     {
         Taxonomy::make('tags')->save();
@@ -661,7 +661,7 @@ class TermQueryBuilderTest extends TestCase
         $this->assertEquals($term->slug(), $findOrNew->slug());
     }
 
-    /** @test */
+    #[Test]
     public function callback_is_called_using_find_or()
     {
         Taxonomy::make('tags')->save();
@@ -675,7 +675,7 @@ class TermQueryBuilderTest extends TestCase
         $this->assertSame('This could be anything.', $findOrNew);
     }
 
-    /** @test */
+    #[Test]
     public function term_can_be_found_using_first_or_new()
     {
         Taxonomy::make('tags')->save();
@@ -691,7 +691,7 @@ class TermQueryBuilderTest extends TestCase
         $this->assertEquals($term->slug(), $firstOrNew->slug());
     }
 
-    /** @test */
+    #[Test]
     public function term_can_be_created_using_first_or_new()
     {
         Taxonomy::make('tags')->save();
@@ -709,7 +709,7 @@ class TermQueryBuilderTest extends TestCase
         $this->assertSame('tags', $firstOrNew->taxonomy()->handle());
     }
 
-    /** @test */
+    #[Test]
     public function term_can_be_found_using_first_or_create()
     {
         Taxonomy::make('tags')->save();
@@ -725,7 +725,7 @@ class TermQueryBuilderTest extends TestCase
         $this->assertEquals($term->slug(), $firstOrCreate->slug());
     }
 
-    /** @test */
+    #[Test]
     public function term_can_be_created_using_first_or_create()
     {
         Taxonomy::make('tags')->save();
@@ -743,7 +743,7 @@ class TermQueryBuilderTest extends TestCase
         $this->assertSame('tags', $firstOrCreate->taxonomy()->handle());
     }
 
-    /** @test */
+    #[Test]
     public function term_can_be_found_and_updated_using_update_or_create()
     {
         Taxonomy::make('tags')->save();
@@ -762,7 +762,7 @@ class TermQueryBuilderTest extends TestCase
         $this->assertSame('tags', $updateOrCreate->taxonomy()->handle());
     }
 
-    /** @test */
+    #[Test]
     public function term_can_be_created_using_update_or_create()
     {
         Taxonomy::make('tags')->save();
