@@ -14,8 +14,9 @@ import {
     ComboboxPortal,
     ComboboxViewport,
 } from 'reka-ui';
-import { computed, useAttrs } from 'vue';
+import { computed, ref, useAttrs } from 'vue';
 import { WithField, Icon } from '@statamic/ui';
+import fuzzysort from 'fuzzysort';
 
 const emit = defineEmits(['update:modelValue']);
 
@@ -27,6 +28,8 @@ const props = defineProps({
     placeholder: { type: String, default: 'Select...' },
     multiple: { type: Boolean, default: false },
     clearable: { type: Boolean, default: false },
+    searchable: { type: Boolean, default: true },
+    taggable: { type: Boolean, default: false },
     options: { type: Array, default: null },
     flat: { type: Boolean, default: false },
 });
@@ -62,14 +65,38 @@ const itemClasses = cva({
         },
     },
 })({ size: props.size });
+
+// todo: hmm, the search query is set to the current value of the input, probably not what we want...
+const searchQuery = ref('');
+
+const results = computed(() => {
+    if (!props.searchable) {
+        return props.options;
+    }
+
+    // Avoid mutating the original options array.
+    let options = JSON.parse(JSON.stringify(props.options));
+
+    if (props.taggable && searchQuery.value) {
+        options.push({
+            label: searchQuery.value,
+            value: searchQuery.value,
+        })
+    }
+
+    return fuzzysort.go(searchQuery.value, options, {
+        all: true,
+        key: 'label',
+    }).map((result) => result.obj);
+});
 </script>
 
 <template>
     <WithField :label :description>
-        <ComboboxRoot v-bind="attrs" :model-value="modelValue" @update:model-value="emit('update:modelValue', $event)">
+        <ComboboxRoot v-bind="attrs" :ignore-filter="true" :model-value="modelValue" @update:model-value="emit('update:modelValue', $event)">
             <ComboboxAnchor :class="[anchorClasses, $attrs.class]" data-ui-typeahead-anchor>
                 <ComboboxTrigger as="div" class="w-full">
-                    <ComboboxInput class="w-full" :placeholder :display-value="!multiple ? ((value) => value[0].label) : null" />
+                    <ComboboxInput class="w-full" v-model="searchQuery" :placeholder :display-value="!multiple ? ((value) => value[0].label) : null" />
                 </ComboboxTrigger>
                 <div class="flex items-center space-x-2 pl-2">
                     <ComboboxCancel v-if="clearable">
@@ -96,20 +123,14 @@ const itemClasses = cva({
                         <ComboboxEmpty class="text-mauve8 text-xs font-medium text-center py-2" />
 
                         <ComboboxItem
-                            v-if="options"
-                            v-for="(option, index) in options"
+                            v-if="results"
+                            v-for="(option, index) in results"
                             :key="index"
                             :value="option.value"
                             :text-value="option.label"
                             :class="itemClasses"
                         >
                             <slot name="option" v-bind="option">
-<!--                                <ComboboxItemIndicator-->
-<!--                                    class="absolute left-0 w-[25px] inline-flex items-center justify-center"-->
-<!--                                >-->
-<!--                                    <p>check</p>-->
-<!--                                </ComboboxItemIndicator>-->
-
                                 <img v-if="option.image" :src="option.image" class="size-5 rounded-full" />
                                 <span v-html="option.label" />
                             </slot>

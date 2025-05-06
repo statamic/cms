@@ -1,14 +1,17 @@
 <template>
-    <Typeahead
+    <Combobox
         :options="options"
         :clearable="config.clearable"
         :placeholder="__(config.placeholder)"
         :multiple="config.multiple"
+        :searchable="config.searchable || config.taggable"
+        :taggable="config.taggable"
+        :disabled="config.disabled || isReadOnly || (config.multiple && limitReached)"
         :model-value="selectedOptions"
         @update:modelValue="vueSelectUpdated"
     >
         <!-- todo: extend the same way we extended v-select -->
-    </Typeahead>
+    </Combobox>
 
 <!--    <div class="flex">-->
 <!--        <v-select-->
@@ -110,13 +113,13 @@ import Fieldtype from './Fieldtype.vue';
 import HasInputOptions from './HasInputOptions.js';
 import { SortableList } from '../sortable/Sortable';
 import PositionsSelectOptions from '../../mixins/PositionsSelectOptions';
-import { Typeahead } from '@statamic/ui';
+import { Combobox } from '@statamic/ui';
 
 export default {
     mixins: [Fieldtype, HasInputOptions, PositionsSelectOptions],
 
     components: {
-        Typeahead,
+        Combobox,
         SortableList,
     },
 

@@ -5,6 +5,7 @@ import { default as Description } from './Description.vue';
 import { default as Calendar } from './Calendar/Calendar.vue';
 import { default as Card } from './Card/Card.vue';
 import { default as CardPanel } from './Card/Panel.vue';
+import { default as Combobox } from './Combobox.vue';
 import { default as DatePicker } from './Datepicker/DatePicker.vue';
 import { default as DateRangePicker } from './DateRangePicker/DateRangePicker.vue';
 import { default as TimePicker } from './TimePicker/TimePicker.vue';
@@ -18,7 +19,6 @@ import { default as Radio } from './Radio/Item.vue';
 import { default as RadioGroup } from './Radio/Group.vue';
 import { default as Input } from './Input/Input.vue';
 import { default as Textarea } from './Textarea.vue';
-import { default as Typeahead } from './Typeahead.vue';
 import { default as Switch } from './Switch.vue';
 import { default as Header } from './Header.vue';
 import { default as Heading } from './Heading.vue';
@@ -44,6 +44,7 @@ export {
     Calendar,
     Card,
     CardPanel,
+    Combobox,
     DatePicker,
     DateRangePicker,
     TimePicker,
@@ -57,7 +58,6 @@ export {
     RadioGroup,
     Input,
     Textarea,
-    Typeahead,
     Switch,
     Header,
     Heading,
