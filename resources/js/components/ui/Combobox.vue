@@ -11,7 +11,7 @@ import {
     ComboboxPortal,
     ComboboxViewport,
 } from 'reka-ui';
-import { computed, ref, useAttrs, watch } from 'vue';
+import { computed, ref, useAttrs, useTemplateRef, watch } from 'vue';
 import { WithField, Icon } from '@statamic/ui';
 import fuzzysort from 'fuzzysort';
 
@@ -63,6 +63,18 @@ const itemClasses = cva({
     },
 })({ size: props.size });
 
+const selectedOptionPlaceholder = computed(() => {
+    if (props.multiple) {
+        return;
+    }
+
+    if (!props.modelValue) {
+        return props.placeholder;
+    }
+
+    return props.options.find(option => option.value === props.modelValue)?.label ?? props.modelValue;
+});
+
 const searchQuery = ref('');
 
 const results = computed(() => {
@@ -91,17 +103,12 @@ watch(() => props.modelValue, (value) => {
     searchQuery.value = '';
 });
 
-const selectedOptionPlaceholder = computed(() => {
-    if (props.multiple) {
-        return;
-    }
+function clear() {
+    searchQuery.value = '';
+    emit('update:modelValue', null);
 
-    if (!props.modelValue) {
-        return props.placeholder;
-    }
-
-    return props.options.find(option => option.value === props.modelValue)?.label ?? props.modelValue;
-});
+    // todo: focus on input
+};
 
 // todo: focus state
 </script>
@@ -128,11 +135,11 @@ const selectedOptionPlaceholder = computed(() => {
                     <div v-else class="cursor-pointer" v-html="selectedOptionPlaceholder" />
                 </ComboboxTrigger>
                 <div class="flex items-center space-x-2 pl-2">
-                    <ComboboxCancel v-if="clearable">
-                        <div class="inline-flex p-1 bg-zinc-100 rounded-full">
+                    <button v-if="clearable" @click="clear">
+                        <div class="inline-flex p-1 bg-zinc-100 rounded-full aspect-square">
                             <Icon name="plus" class="rotate-45" />
                         </div>
-                    </ComboboxCancel>
+                    </button>
                     <ComboboxTrigger class="flex items-center">
                         <Icon name="ui/chevron-down" class="me-2" />
                     </ComboboxTrigger>

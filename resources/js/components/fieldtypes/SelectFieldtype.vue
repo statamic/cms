@@ -194,9 +194,6 @@ export default {
 
         vueSelectUpdated(value) {
             this.update(value || null);
-
-
-            console.log('value updated', value)
         },
     },
 };
