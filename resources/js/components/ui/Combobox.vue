@@ -6,15 +6,12 @@ import {
     ComboboxEmpty,
     ComboboxInput,
     ComboboxItem,
-    ComboboxItemIndicator,
-    ComboboxLabel,
     ComboboxRoot,
-    ComboboxSeparator,
     ComboboxTrigger,
     ComboboxPortal,
     ComboboxViewport,
 } from 'reka-ui';
-import { computed, ref, useAttrs } from 'vue';
+import { computed, ref, useAttrs, watch } from 'vue';
 import { WithField, Icon } from '@statamic/ui';
 import fuzzysort from 'fuzzysort';
 
@@ -56,7 +53,7 @@ const anchorClasses = cva({
 })({ ...props });
 
 const itemClasses = cva({
-    base: 'antialiased rounded-lg py-1.5 px-2 flex items-center gap-2 text-gray-600 dark:text-gray-300 relative select-none data-disabled:text-gray-300 data-disabled:pointer-events-none data-highlighted:outline-hidden data-highlighted:bg-gray-50 data-highlighted:text-gray-900 dark:data-highlighted:bg-gray-700 dark:data-highlighted:text-gray-300',
+    base: 'w-full cursor-pointer antialiased rounded-lg py-1.5 px-2 flex items-center gap-2 text-gray-600 dark:text-gray-300 relative select-none data-disabled:text-gray-300 data-disabled:pointer-events-none data-highlighted:outline-hidden data-highlighted:bg-gray-50 data-highlighted:text-gray-900 dark:data-highlighted:bg-gray-700 dark:data-highlighted:text-gray-300',
     variants: {
         size: {
             base: '',
@@ -66,7 +63,6 @@ const itemClasses = cva({
     },
 })({ size: props.size });
 
-// todo: hmm, the search query is set to the current value of the input, probably not what we want...
 const searchQuery = ref('');
 
 const results = computed(() => {
@@ -74,29 +70,62 @@ const results = computed(() => {
         return props.options;
     }
 
-    // Avoid mutating the original options array.
     let options = JSON.parse(JSON.stringify(props.options));
 
-    if (props.taggable && searchQuery.value && options.filter((option => option.value === searchQuery.value)).length === 0) {
+    if (props.taggable && searchQuery.value) {
         options.push({
             label: searchQuery.value,
             value: searchQuery.value,
         });
     }
 
-    return fuzzysort.go(searchQuery.value, options, {
-        all: true,
-        key: 'label',
-    }).map((result) => result.obj);
+    return fuzzysort
+        .go(searchQuery.value, options, {
+            all: true,
+            key: 'label',
+        })
+        .map((result) => result.obj);
 });
+
+watch(() => props.modelValue, (value) => {
+    searchQuery.value = '';
+});
+
+const selectedOptionPlaceholder = computed(() => {
+    if (props.multiple) {
+        return;
+    }
+
+    if (!props.modelValue) {
+        return props.placeholder;
+    }
+
+    return props.options.find(option => option.value === props.modelValue)?.label ?? props.modelValue;
+});
+
+// todo: focus state
 </script>
 
 <template>
     <WithField :label :description>
-        <ComboboxRoot v-bind="attrs" :ignore-filter="true" :model-value="modelValue" @update:model-value="emit('update:modelValue', $event)">
-            <ComboboxAnchor :class="[anchorClasses, $attrs.class]" data-ui-typeahead-anchor>
-                <ComboboxTrigger as="div" class="w-full">
-                    <ComboboxInput class="w-full" v-model="searchQuery" :placeholder :display-value="!multiple && modelValue.length === 1 ? ((value) => value[0].label) : null" />
+        <ComboboxRoot
+            v-bind="attrs"
+            :ignore-filter="true"
+            :reset-search-term-on-blur="false"
+            :reset-search-term-on-select="false"
+            :model-value="modelValue"
+            @update:model-value="emit('update:modelValue', $event)"
+        >
+            <ComboboxAnchor :class="[anchorClasses, $attrs.class]" data-ui-combobox-anchor>
+                <ComboboxTrigger as="div" class="w-full min-h-full">
+                    <ComboboxInput
+                        v-if="searchable"
+                        class="w-full"
+                        :class="{ 'placeholder:text-gray-600 dark:placeholder:text-gray-300': modelValue }"
+                        v-model="searchQuery"
+                        :placeholder="selectedOptionPlaceholder"
+                    />
+                    <div v-else class="cursor-pointer" v-html="selectedOptionPlaceholder" />
                 </ComboboxTrigger>
                 <div class="flex items-center space-x-2 pl-2">
                     <ComboboxCancel v-if="clearable">
@@ -129,6 +158,7 @@ const results = computed(() => {
                             :value="option.value"
                             :text-value="option.label"
                             :class="itemClasses"
+                            as="button"
                         >
                             <slot name="option" v-bind="option">
                                 <img v-if="option.image" :src="option.image" class="size-5 rounded-full" />

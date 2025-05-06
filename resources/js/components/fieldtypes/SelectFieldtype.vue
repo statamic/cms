@@ -7,7 +7,7 @@
         :searchable="config.searchable || config.taggable"
         :taggable="config.taggable"
         :disabled="config.disabled || isReadOnly || (config.multiple && limitReached)"
-        :model-value="selectedOptions"
+        :model-value="value"
         @update:modelValue="vueSelectUpdated"
     >
         <!-- todo: extend the same way we extended v-select -->
