@@ -94,7 +94,7 @@ trait Revisable
                 $parent = null;
             }
 
-            if($tree->isAlreadyInParent($item->id(), $parent)){
+            if ($tree->isAlreadyInParent($item->id(), $parent)) {
                 $tree
                     ->move($this->id(), $parent)
                     ->save();

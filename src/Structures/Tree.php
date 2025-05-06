@@ -406,6 +406,7 @@ abstract class Tree implements Contract, Localization
         } else {
             $childrenIds = collect($this->tree)->pluck($this->idKey())->all();
         }
+
         return in_array($entryId, $childrenIds);
     }
 }

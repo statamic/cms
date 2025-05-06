@@ -284,7 +284,7 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Entr
         return $this;
     }
 
-    public function getChildren():array
+    public function getChildren(): array
     {
         return $this->children;
     }
