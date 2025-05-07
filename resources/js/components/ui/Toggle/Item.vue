@@ -21,11 +21,11 @@ const iconOnly = computed(() => (props.icon && !hasDefaultSlot && !props.text) |
 
 const toggleItemClasses = computed(() => {
     const classes = cva({
-        base: 'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg font-medium antialiased cursor-pointer no-underline disabled:opacity-75 disabled:cursor-default disabled:pointer-events-none [&_svg]:shrink-0',
+        base: 'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg font-medium antialiased cursor-pointer no-underline disabled:opacity-75 disabled:cursor-default disabled:pointer-events-none [&_svg]:text-gray-500 [&_svg]:shrink-0',
         variants: {
             variant: {
                 default: [
-                    'bg-linear-to-b from-white to-gray-50 hover:to-gray-100 text-gray-800 border border-gray-300 shadow-ui-sm data-[state=on]:from-gray-200 data-[state=on]:to-gray-200 data-[state=on]:text-gray-900',
+                    'bg-linear-to-b from-white to-gray-50 hover:to-gray-100 text-gray-800 border border-gray-300 shadow-ui-sm data-[state=on]:from-gray-100 data-[state=on]:to-gray-100 data-[state=on]:text-gray-900 data-[state=on]:inset-shadow-sm/10',
                     'dark:from-gray-800 dark:to-gray-850 dark:hover:to-gray-800 hover:bg-gray-50 dark:hover:bg-gray-850 dark:border-b-0 dark:ring dark:ring-black dark:border-white/15 dark:text-gray-300 dark:shadow-md dark:data-[state=on]:from-gray-950 dark:data-[state=on]:to-gray-950 dark:data-[state=on]:text-white',
                 ],
                 primary: [
@@ -36,9 +36,9 @@ const toggleItemClasses = computed(() => {
                 ghost: 'bg-transparent rounded-lg hover:bg-gray-400/10 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-gray-700/80 dark:hover:text-gray-200 data-[state=on]:bg-gray-400/20 data-[state=on]:text-gray-700 dark:data-[state=on]:bg-gray-700/80 dark:data-[state=on]:text-white',
             },
             size: {
-                base: 'px-4 h-10 text-sm',
-                sm: 'px-3 h-8 text-[0.8125rem]',
-                xs: 'px-2 h-6.5 text-xs',
+                base: 'px-3 h-10 text-sm [&_svg]:size-3.5',
+                sm: 'px-2.5 h-8 text-[0.8125rem] [&_svg]:size-3',
+                xs: 'px-2 h-6.5 text-xs [&_svg]:size-2.5',
             },
             groupBorder: {
                 default:

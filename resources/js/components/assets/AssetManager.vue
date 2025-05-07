@@ -14,11 +14,33 @@
                 </dropdown-item>
             </dropdown-list>
 
-            <Button
+            <!-- @TODO: Move Create Container into the action dropdown -->
+            <!-- <Button
                 v-if="canCreateContainers"
                 :href="createContainerUrl"
                 :text="__('Create Container')"
+            /> -->
+
+            <!-- @TODO: Make this work -->
+            <Button
+                :text="__('Upload')"
+                icon="upload"
+                variant="primary"
+                @click="uploadAsset"
             />
+
+            <!-- @TODO: Make this work -->
+            <Button
+                :text="__('Create Folder')"
+                icon="folder-add"
+                @click="createFolder"
+            />
+
+            <ui-toggle-group>
+                <ui-toggle-item icon="layout-grid" value="grid" />
+                <ui-toggle-item icon="layout-grid-compact" value="grid-compact" />
+                <ui-toggle-item icon="layout-list" value="list" />
+            </ui-toggle-group>
         </Header>
 
         <asset-browser
