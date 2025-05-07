@@ -11,7 +11,7 @@ import {
     SelectViewport,
 } from 'reka-ui';
 import { useAttrs } from 'vue';
-import { WithField, Icon } from '@statamic/ui';
+import { Icon } from '@statamic/ui';
 
 const emit = defineEmits(['update:modelValue']);
 
@@ -59,39 +59,37 @@ const itemClasses = cva({
 </script>
 
 <template>
-    <WithField :label :description>
-        <SelectRoot v-bind="attrs" :model-value="modelValue" @update:model-value="emit('update:model-value', $event)">
-            <SelectTrigger :class="[triggerClasses, $attrs.class]" data-ui-select-trigger>
-                <SelectValue :placeholder="placeholder" class="select-none" />
-                <Icon name="ui/chevron-down" class="me-2" />
-            </SelectTrigger>
+    <SelectRoot v-bind="attrs" :model-value="modelValue" @update:model-value="emit('update:model-value', $event)">
+        <SelectTrigger :class="[triggerClasses, $attrs.class]" data-ui-select-trigger>
+            <SelectValue :placeholder="placeholder" class="select-none" />
+            <Icon name="ui/chevron-down" class="me-2" />
+        </SelectTrigger>
 
-            <SelectPortal>
-                <SelectContent
-                    position="popper"
-                    :side-offset="5"
-                    :class="[
-                        'shadow-ui-sm z-100 rounded-lg border border-gray-200 bg-white p-2 dark:border-white/10 dark:bg-gray-800',
-                        'max-h-[var(--reka-select-content-available-height)] w-[var(--reka-select-trigger-width)]',
-                    ]"
-                >
-                    <SelectViewport>
-                        <SelectItem
-                            v-if="options"
-                            v-for="(option, index) in options"
-                            :key="index"
-                            :value="option.value"
-                            :text-value="option.label"
-                            :class="itemClasses"
-                        >
-                            <slot name="option" v-bind="option">
-                                <img v-if="option.image" :src="option.image" class="size-5 rounded-full" />
-                                <SelectItemText v-html="option.label" />
-                            </slot>
-                        </SelectItem>
-                    </SelectViewport>
-                </SelectContent>
-            </SelectPortal>
-        </SelectRoot>
-    </WithField>
+        <SelectPortal>
+            <SelectContent
+                position="popper"
+                :side-offset="5"
+                :class="[
+                    'shadow-ui-sm z-100 rounded-lg border border-gray-200 bg-white p-2 dark:border-white/10 dark:bg-gray-800',
+                    'max-h-[var(--reka-select-content-available-height)] w-[var(--reka-select-trigger-width)]',
+                ]"
+            >
+                <SelectViewport>
+                    <SelectItem
+                        v-if="options"
+                        v-for="(option, index) in options"
+                        :key="index"
+                        :value="option.value"
+                        :text-value="option.label"
+                        :class="itemClasses"
+                    >
+                        <slot name="option" v-bind="option">
+                            <img v-if="option.image" :src="option.image" class="size-5 rounded-full" />
+                            <SelectItemText v-html="option.label" />
+                        </slot>
+                    </SelectItem>
+                </SelectViewport>
+            </SelectContent>
+        </SelectPortal>
+    </SelectRoot>
 </template>

@@ -1,4 +1,3 @@
-import { default as WithField } from './WithField.vue';
 import { default as Field } from './Field.vue';
 import { default as Label } from './Label.vue';
 import { default as Description } from './Description.vue';
@@ -41,7 +40,6 @@ import { default as TabContent } from './Tabs/Content.vue';
 import { default as PublishTabs } from './Publish/Tabs.vue';
 
 export {
-    WithField,
     Field,
     Label,
     Description,

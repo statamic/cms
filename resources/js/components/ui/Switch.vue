@@ -2,7 +2,6 @@
 import { useId } from 'vue';
 import { SwitchRoot, SwitchThumb } from 'reka-ui';
 import { cva } from 'cva';
-import { WithField } from '@statamic/ui';
 
 const props = defineProps({
     description: { type: String, default: null },
@@ -51,17 +50,15 @@ const switchThumbClasses = cva({
 </script>
 
 <template>
-    <WithField :label :description :required variant="inline" :for="id">
-        <SwitchRoot
-            data-ui-control
-            dir="ltr"
-            :id="id"
-            :model-value="modelValue"
-            :class="switchRootClasses"
-            @update:model-value="$emit('update:modelValue', $event)"
-            data-ui-switch
-        >
-            <SwitchThumb :class="switchThumbClasses" />
-        </SwitchRoot>
-    </WithField>
+    <SwitchRoot
+        data-ui-control
+        dir="ltr"
+        :id="id"
+        :model-value="modelValue"
+        :class="switchRootClasses"
+        @update:model-value="$emit('update:modelValue', $event)"
+        data-ui-switch
+    >
+        <SwitchThumb :class="switchThumbClasses" />
+    </SwitchRoot>
 </template>
