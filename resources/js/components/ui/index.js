@@ -34,6 +34,11 @@ import { default as Panel } from './Panel/Panel.vue';
 import { default as PanelHeader } from './Panel/Header.vue';
 import { default as Badge } from './Badge.vue';
 import { default as CharacterCounter } from './CharacterCounter.vue';
+import { default as Tabs } from './Tabs/Tabs.vue';
+import { default as TabList } from './Tabs/List.vue';
+import { default as TabTrigger } from './Tabs/Trigger.vue';
+import { default as TabContent } from './Tabs/Content.vue';
+import { default as PublishTabs } from './Publish/Tabs.vue';
 
 export {
     WithField,
@@ -72,4 +77,9 @@ export {
     PanelHeader,
     Badge,
     CharacterCounter,
+    Tabs,
+    TabList,
+    TabTrigger,
+    TabContent,
+    PublishTabs,
 };
