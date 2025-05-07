@@ -12,8 +12,9 @@ import {
     ComboboxViewport,
 } from 'reka-ui';
 import { computed, ref, useAttrs, useTemplateRef, watch } from 'vue';
-import { WithField, Icon } from '@statamic/ui';
+import { WithField, Icon, Badge } from '@statamic/ui';
 import fuzzysort from 'fuzzysort';
+import { SortableList } from '@statamic/components/sortable/Sortable.js';
 
 const emit = defineEmits(['update:modelValue']);
 
@@ -27,6 +28,8 @@ const props = defineProps({
     clearable: { type: Boolean, default: false },
     searchable: { type: Boolean, default: true },
     taggable: { type: Boolean, default: false },
+    disabled: { type: Boolean, default: false },
+    labelHtml: { type: Boolean, default: false },
     options: { type: Array, default: null },
     flat: { type: Boolean, default: false },
 });
@@ -79,6 +82,18 @@ const selectedOptionPlaceholder = computed(() => {
     return props.options.find(option => option.value === props.modelValue)?.label ?? props.modelValue;
 });
 
+const selectedOptions = computed(() => {
+    let selections = props.modelValue === null ? [] : props.modelValue;
+
+    if (typeof selections === 'string' || typeof selections === 'number') {
+        selections = [selections];
+    }
+
+    return selections.map(value => {
+        return props.options.find(option => option.value === value) ?? { label: value, value };
+    });
+});
+
 const searchQuery = ref('');
 
 const results = computed(() => {
@@ -117,12 +132,23 @@ function clear() {
         inputRef.value.$el.focus();
     }
 };
+
+function deselect(option) {
+    emit('update:modelValue', props.modelValue.filter((item) => item !== option));
+}
 </script>
+
+<style scoped>
+.draggable-source--is-dragging {
+    @apply border-dashed bg-transparent opacity-75;
+}
+</style>
 
 <template>
     <WithField :label :description>
         <ComboboxRoot
             v-bind="attrs"
+            :multiple
             :ignore-filter="true"
             :reset-search-term-on-blur="false"
             :reset-search-term-on-select="false"
@@ -178,12 +204,51 @@ function clear() {
                         >
                             <slot name="option" v-bind="option">
                                 <img v-if="option.image" :src="option.image" class="size-5 rounded-full" />
-                                <span v-html="option.label" />
+                                <span v-if="labelHtml" v-html="option.label" />
+                                <span v-else>{{ option.label }}</span>
                             </slot>
                         </ComboboxItem>
                     </ComboboxViewport>
                 </ComboboxContent>
             </ComboboxPortal>
         </ComboboxRoot>
+
+        <slot name="selected-options" v-bind="{ deselect }">
+            <sortable-list
+                v-if="multiple"
+                item-class="sortable-item"
+                handle-class="sortable-item"
+                :distance="5"
+                :mirror="false"
+                :model-value="modelValue"
+                @update:model-value="emit('update:modelValue', $event)"
+            >
+                <div class="vs__selected-options-outside flex gap-2 flex-wrap">
+                    <div
+                        v-for="option in selectedOptions"
+                        :key="option.value"
+                        class="vs__selected sortable-item mt-2"
+                    >
+                        <Badge :pill="true" size="lg">
+                            <div v-if="labelHtml" v-html="option.label"></div>
+                            <div v-else>{{ __(option.label) }}</div>
+
+                            <button
+                                v-if="!disabled"
+                                @click="deselect(option.value)"
+                                type="button"
+                                :aria-label="__('Deselect option')"
+                                class="vs__deselect"
+                            >
+                                <span>×</span>
+                            </button>
+                            <button v-else type="button" class="vs__deselect">
+                                <span class="text-gray-500">×</span>
+                            </button>
+                        </Badge>
+                    </div>
+                </div>
+            </sortable-list>
+        </slot>
     </WithField>
 </template>
