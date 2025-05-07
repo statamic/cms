@@ -60,8 +60,12 @@ const itemClasses = cva({
             sm: 'text-sm',
             xs: 'text-xs',
         },
+        selected: {
+            true: 'opacity-50',
+            false: '',
+        },
     },
-})({ size: props.size });
+});
 
 const selectedOptionPlaceholder = computed(() => {
     if (props.multiple) {
@@ -159,7 +163,9 @@ function clear() {
                     ]"
                 >
                     <ComboboxViewport>
-                        <ComboboxEmpty class="text-mauve8 text-xs font-medium text-center py-2" />
+                        <ComboboxEmpty class="text-mauve8 text-xs font-medium text-center py-2">
+                            {{ __('No options to choose from.') }}
+                        </ComboboxEmpty>
 
                         <ComboboxItem
                             v-if="results"
@@ -167,7 +173,7 @@ function clear() {
                             :key="index"
                             :value="option.value"
                             :text-value="option.label"
-                            :class="itemClasses"
+                            :class="itemClasses({ size: size, selected: modelValue?.includes(option.value) })"
                             as="button"
                         >
                             <slot name="option" v-bind="option">
