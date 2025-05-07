@@ -3,19 +3,9 @@ import { injectTabContext } from './TabProvider.vue';
 import { CardPanel } from '@statamic/ui';
 import SectionProvider from './SectionProvider.vue';
 import Fields from './Fields.vue';
-import { computed } from 'vue';
 
 const tab = injectTabContext();
-
-const props = defineProps({
-    of: {
-        type: Object,
-    },
-});
-
-const sections = computed(() => {
-    return props.of || tab.sections;
-});
+const sections = tab.sections;
 </script>
 
 <template>
