@@ -145,6 +145,8 @@ function clear() {
 function deselect(option) {
     emit('update:modelValue', props.modelValue.filter((item) => item !== option));
 }
+
+const dropdownOpen = ref(false);
 </script>
 
 <style scoped>
@@ -162,6 +164,7 @@ function deselect(option) {
             :reset-search-term-on-blur="false"
             :reset-search-term-on-select="false"
             :disabled="disabled || limitReached"
+            v-model:open="dropdownOpen"
             :model-value="modelValue"
             @update:model-value="emit('update:modelValue', $event)"
         >
@@ -211,6 +214,7 @@ function deselect(option) {
                             :text-value="option.label"
                             :class="itemClasses({ size: size, selected: modelValue?.includes(option.value) })"
                             as="button"
+                            @select="dropdownOpen = false"
                         >
                             <slot name="option" v-bind="option">
                                 <img v-if="option.image" :src="option.image" class="size-5 rounded-full" />
