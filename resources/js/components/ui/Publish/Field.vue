@@ -1,8 +1,7 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, useTemplateRef } from 'vue';
 import { injectContainerContext } from './Container.vue';
-import { Label, Description, Field } from '@statamic/ui';
-import TheField from '../TheField.vue';
+import { Field } from '@statamic/ui';
 
 const props = defineProps({
     config: {
@@ -32,10 +31,16 @@ const errors = computed(() => {
     // todo: see value todo
     return store.errors[handle];
 });
+const fieldId = 'bob';
 const namePrefix = '';
 const fieldPathPrefix = '';
 const isReadOnly = false;
 const isRequired = computed(() => props.config.required);
+const fieldtype = useTemplateRef('fieldtype');
+
+const fieldActions = computed(() => {
+    return fieldtype.value ? fieldtype.value.fieldActions : [];
+});
 
 function valueUpdated(value) {
     // todo: this is only setting the top level. see value todo.
@@ -53,15 +58,19 @@ function blurred() {}
 </script>
 
 <template>
-    <TheField
+    <Field
         :label="config.display"
-        :id="fieldName"
+        :id="fieldId"
         :instructions="config.instructions"
-        :instructions-position="config.instructions_position"
+        :instructions-below="config.instructions_position === 'below'"
         :required="isRequired"
         :errors="errors"
     >
+        <template #actions>
+            <publish-field-actions v-if="fieldActions.length" :actions="fieldActions" />
+        </template>
         <Component
+            ref="fieldtype"
             :is="fieldtypeComponent"
             :value="value"
             :meta="meta"
@@ -74,24 +83,5 @@ function blurred() {}
             @focus="focused"
             @blur="blurred"
         />
-    </TheField>
-
-    <!--    <Field>-->
-    <!--        <Label :text="config.display" :for="name" :required="isRequired" />-->
-    <!--        <Description :text="config.instructions" />-->
-    <!--            <Component-->
-    <!--                :is="fieldtypeComponent"-->
-    <!--                :value="value"-->
-    <!--                :meta="meta"-->
-    <!--                :handle="handle"-->
-    <!--                :name-prefix="namePrefix"-->
-    <!--                :field-path-prefix="fieldPathPrefix"-->
-    <!--                :read-only="isReadOnly"-->
-    <!--                @update:value="valueUpdated"-->
-    <!--                @meta-updated="metaUpdated"-->
-    <!--                @focus="focused"-->
-    <!--                @blur="blurred"-->
-    <!--            />-->
-    <!--        <Description v-if="errors" v-for="(error, i) in errors" :key="i" :text="error" class="text-red-500" />-->
-    <!--    </Field>-->
+    </Field>
 </template>
