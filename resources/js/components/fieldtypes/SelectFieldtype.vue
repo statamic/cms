@@ -1,35 +1,28 @@
 <template>
-    <div class="flex flex-col w-full">
-        <Combobox
-            :options="options"
-            :clearable="config.clearable"
-            :placeholder="__(config.placeholder)"
-            :multiple="config.multiple"
-            :searchable="config.searchable || config.taggable"
-            :taggable="config.taggable"
-            :disabled="config.disabled || isReadOnly"
-            :max-selections="config.max_items"
-            :label-html="config.label_html"
-            :model-value="value"
-            @update:modelValue="comboboxUpdated"
-        />
-
-        <!-- todo: move this into the combobox if the maxSelections prop is present -->
-        <div class="mt-3 text-xs ltr:ml-2 rtl:mr-2" :class="limitIndicatorColor" v-if="config.max_items">
-            <span v-text="currentLength"></span>/<span v-text="config.max_items"></span>
-        </div>
-    </div>
+    <Combobox
+        class="w-full"
+        :options="options"
+        :clearable="config.clearable"
+        :placeholder="__(config.placeholder)"
+        :multiple="config.multiple"
+        :searchable="config.searchable || config.taggable"
+        :taggable="config.taggable"
+        :disabled="config.disabled || isReadOnly"
+        :max-selections="config.max_items"
+        :label-html="config.label_html"
+        :model-value="value"
+        @update:modelValue="comboboxUpdated"
+    />
 </template>
 
 <script>
 import Fieldtype from './Fieldtype.vue';
 import HasInputOptions from './HasInputOptions.js';
 import { SortableList } from '../sortable/Sortable';
-import PositionsSelectOptions from '../../mixins/PositionsSelectOptions';
 import { Badge, Combobox } from '@statamic/ui';
 
 export default {
-    mixins: [Fieldtype, HasInputOptions, PositionsSelectOptions],
+    mixins: [Fieldtype, HasInputOptions],
 
     components: {
         Badge,
@@ -58,36 +51,6 @@ export default {
             if (!this.showFieldPreviews || !this.config.replicator_preview) return;
 
             return this.selectedOptions.map((option) => option.label).join(', ');
-        },
-
-        limitReached() {
-            if (!this.config.max_items) return false;
-
-            return this.currentLength >= this.config.max_items;
-        },
-
-        limitExceeded() {
-            if (!this.config.max_items) return false;
-
-            return this.currentLength > this.config.max_items;
-        },
-
-        currentLength() {
-            if (this.value) {
-                return typeof this.value == 'string' ? 1 : this.value.length;
-            }
-
-            return 0;
-        },
-
-        limitIndicatorColor() {
-            if (this.limitExceeded) {
-                return 'text-red-500';
-            } else if (this.limitReached) {
-                return 'text-green-600';
-            }
-
-            return 'text-gray';
         },
     },
 
