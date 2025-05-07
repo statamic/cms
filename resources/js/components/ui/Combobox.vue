@@ -222,7 +222,9 @@ const dropdownOpen = ref(false);
                     >
                         <ComboboxViewport>
                             <ComboboxEmpty class="text-mauve8 text-xs font-medium text-center py-2">
-                                {{ __('No options to choose from.') }}
+                                <slot name="no-options">
+                                    {{ __('No options to choose from.') }}
+                                </slot>
                             </ComboboxEmpty>
 
                             <ComboboxItem

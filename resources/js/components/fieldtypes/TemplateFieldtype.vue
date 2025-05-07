@@ -1,37 +1,29 @@
 <template>
-    <div class="template-fieldtype-container">
-        <v-select
-            ref="input"
-            :name="name"
-            @update:model-value="update"
-            append-to-body
-            :calculate-position="positionOptions"
-            :clearable="config.clearable"
-            :placeholder="__(config.placeholder)"
-            :disabled="isReadOnly"
-            :options="options"
-            :reduce="(selection) => selection.value"
-            :searchable="true"
-            :push-tags="false"
-            :multiple="false"
-            :model-value="value"
-        >
-            <template #no-options>
-                <div
-                    class="px-4 py-2 text-sm text-gray-700 ltr:text-left rtl:text-right"
-                    v-text="__('No templates to choose from.')"
-                />
-            </template>
-        </v-select>
-    </div>
+    <Combobox
+        v-if="!loading"
+        class="w-full"
+        :clearable="config.clearable"
+        :placeholder="__(config.placeholder)"
+        :disabled="isReadOnly"
+        :options="options"
+        :searchable="true"
+        :multiple="false"
+        :model-value="value"
+        @update:modelValue="update"
+    >
+        <template #no-options>
+            <div v-text="__('No templates to choose from.')" />
+        </template>
+    </Combobox>
 </template>
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import PositionsSelectOptions from '../../mixins/PositionsSelectOptions';
+import { Combobox } from '@statamic/ui';
 
 export default {
-    mixins: [Fieldtype, PositionsSelectOptions],
+    components: { Combobox },
+    mixins: [Fieldtype],
 
     data: function () {
         return {
