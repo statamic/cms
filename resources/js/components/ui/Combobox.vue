@@ -29,6 +29,7 @@ const props = defineProps({
     searchable: { type: Boolean, default: true },
     taggable: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
+    maxSelections: { type: Number, default: null },
     labelHtml: { type: Boolean, default: false },
     options: { type: Array, default: null },
     flat: { type: Boolean, default: false },
@@ -94,6 +95,14 @@ const selectedOptions = computed(() => {
     });
 });
 
+const limitReached = computed(() => {
+    if (!props.maxSelections) {
+        return false;
+    }
+
+    return selectedOptions.value.length >= props.maxSelections;
+});
+
 const searchQuery = ref('');
 
 const results = computed(() => {
@@ -152,6 +161,7 @@ function deselect(option) {
             :ignore-filter="true"
             :reset-search-term-on-blur="false"
             :reset-search-term-on-select="false"
+            :disabled="disabled || limitReached"
             :model-value="modelValue"
             @update:model-value="emit('update:modelValue', $event)"
         >

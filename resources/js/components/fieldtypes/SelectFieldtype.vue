@@ -7,12 +7,14 @@
             :multiple="config.multiple"
             :searchable="config.searchable || config.taggable"
             :taggable="config.taggable"
-            :disabled="config.disabled || isReadOnly || (config.multiple && limitReached)"
+            :disabled="config.disabled || isReadOnly"
+            :max-selections="config.max_items"
             :label-html="config.label_html"
             :model-value="value"
             @update:modelValue="comboboxUpdated"
         />
 
+        <!-- todo: move this into the combobox if the maxSelections prop is present -->
         <div class="mt-3 text-xs ltr:ml-2 rtl:mr-2" :class="limitIndicatorColor" v-if="config.max_items">
             <span v-text="currentLength"></span>/<span v-text="config.max_items"></span>
         </div>
