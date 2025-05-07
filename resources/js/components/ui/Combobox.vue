@@ -1,7 +1,7 @@
 <script setup>
 import { cva } from 'cva';
 import {
-    ComboboxAnchor, ComboboxCancel,
+    ComboboxAnchor,
     ComboboxContent,
     ComboboxEmpty,
     ComboboxInput,
@@ -38,7 +38,7 @@ defineOptions({
 const attrs = useAttrs();
 
 const anchorClasses = cva({
-    base: 'w-full flex items-center justify-between border border-gray-300 dark:border-b-0 dark:ring-3 dark:ring-gray-900 dark:border-white/15 text-gray-600 dark:text-gray-300 antialiased appearance-none shadow-ui-sm dark:shadow-md not-prose',
+    base: 'focus-within:outline  w-full flex items-center justify-between border border-gray-300 dark:border-b-0 dark:ring-3 dark:ring-gray-900 dark:border-white/15 text-gray-600 dark:text-gray-300 antialiased appearance-none shadow-ui-sm dark:shadow-md not-prose',
     variants: {
         size: {
             base: 'text-base rounded-lg ps-3 py-2 h-10 leading-[1.375rem]',
@@ -103,14 +103,16 @@ watch(() => props.modelValue, (value) => {
     searchQuery.value = '';
 });
 
+const inputRef = useTemplateRef('input');
+
 function clear() {
     searchQuery.value = '';
     emit('update:modelValue', null);
 
-    // todo: focus on input
+    if (props.searchable) {
+        inputRef.value.$el.focus();
+    }
 };
-
-// todo: focus state
 </script>
 
 <template>
@@ -127,7 +129,8 @@ function clear() {
                 <ComboboxTrigger as="div" class="w-full min-h-full">
                     <ComboboxInput
                         v-if="searchable"
-                        class="w-full"
+                        ref="input"
+                        class="w-full focus:outline-none"
                         :class="{ 'placeholder:text-gray-600 dark:placeholder:text-gray-300': modelValue }"
                         v-model="searchQuery"
                         :placeholder="selectedOptionPlaceholder"
