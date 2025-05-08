@@ -8,7 +8,7 @@
 
 @section('content')
     <asset-manager
-        :container="{{ json_encode($container) }}"
+        :initial-container="{{ json_encode($container) }}"
         :can-create-containers="{{ Statamic\Support\Str::bool($user->can('create', \Statamic\Contracts\Assets\AssetContainer::class)) }}"
         create-container-url="{{ cp_route('asset-containers.create') }}"
         initial-path="{{ $folder }}"

@@ -109,14 +109,19 @@
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
 }
 
+.asset-grid-listing.compact {
+    @apply relative grid gap-6;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+}
+
 /* Asset Tile
    ========================================================================== */
 
 .asset-tile {
-    @apply relative flex min-w-0 cursor-pointer flex-col items-center justify-between rounded-lg border bg-white dark:border-dark-300 dark:bg-dark-600;
+    @apply relative flex min-w-0 cursor-pointer flex-col items-center justify-between rounded-lg outline outline-gray-300 dark:outline-gray-700;
 
     .asset-thumb {
-        @apply flex h-full w-full items-center justify-center rounded-sm;
+        @apply flex items-center justify-center size-full;
         > img,
         > svg,
         > .svg-img {
@@ -124,24 +129,12 @@
         }
     }
 
-    .asset-thumb-container {
-        @apply relative flex w-full flex-1 items-center justify-center aspect-square;
-    }
-
     .asset-thumb-container:hover .asset-controls {
         @apply block;
     }
 
-    .asset-meta {
-        @apply w-full border-t text-2xs text-gray-700 dark:border-dark-200 dark:text-dark-100;
-    }
-
     .asset-meta-btn {
         @apply px-2 py-1 text-blue hover:bg-gray-200 dark:border-dark-300 dark:hover:bg-dark-800 ltr:border-l rtl:border-r;
-    }
-
-    .asset-filename {
-        @apply truncate;
     }
 
     .asset-controls {

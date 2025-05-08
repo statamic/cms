@@ -20,7 +20,7 @@
 
             <ui-toggle-group v-model="mode">
                 <ui-toggle-item icon="layout-grid" value="grid" />
-                <!-- <ui-toggle-item icon="layout-grid-compact" value="grid-compact" /> -->
+                <ui-toggle-item icon="layout-grid-compact" value="grid-compact" />
                 <ui-toggle-item icon="layout-list" value="table" />
             </ui-toggle-group>
         </Header>
@@ -89,9 +89,10 @@
 
                             <!-- Grid Mode -->
                             <Grid
-                                v-if="mode === 'grid'"
+                                v-if="mode === 'grid' || mode === 'grid-compact'"
                                 v-bind="sharedAssetProps"
                                 v-on="sharedAssetEvents"
+                                :variant="mode === 'grid-compact' ? 'compact' : 'default'"
                                 :assets="assets"
                                 :selected-assets="selectedAssets"
                                 @toggle-selection="toggleSelection"
@@ -160,32 +161,21 @@ import { Header, Button } from '@statamic/ui';
 export default {
     mixins: [HasActions, HasPagination, HasPreferences],
 
-    components: {
-        AssetThumbnail,
-        AssetEditor,
-        Breadcrumbs,
-        Uploader,
-        Uploads,
-        CreateFolder,
-        Grid,
-        Table,
-        Header,
-        Button,
-    },
+    components: { AssetThumbnail, AssetEditor, Breadcrumbs, Uploader, Uploads, CreateFolder, Grid, Table, Header, Button },
 
     props: {
-        // The container to display, determined by a parent component.
-        // Either the ID, or the whole container object.
-        initialContainer: {},
-        selectedPath: String, // The path to display, determined by a parent component.
-        restrictFolderNavigation: Boolean, // Whether to restrict to a single folder and prevent navigation.
-        selectedAssets: Array,
+        allowSelectingExistingUpload: Boolean,
+        autofocusSearch: Boolean,
+        autoselectUploads: Boolean,
+        canCreateContainers: Boolean,
+        createContainerUrl: String,
+        initialContainer: Object,
+        initialEditingAssetId: String,
         maxFiles: Number,
         queryScopes: Array,
-        initialEditingAssetId: String,
-        autoselectUploads: Boolean,
-        autofocusSearch: Boolean,
-        allowSelectingExistingUpload: Boolean,
+        restrictFolderNavigation: Boolean, // Whether to restrict to a single folder and prevent navigation.
+        selectedAssets: Array,
+        selectedPath: String, // The path to display, determined by a parent component.
     },
 
     data() {

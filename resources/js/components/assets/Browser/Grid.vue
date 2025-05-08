@@ -5,7 +5,7 @@
             <!-- Parent Folder -->
             <div v-if="folder && folder.parent_path && !restrictFolderNavigation">
                 <button @click="selectFolder(folder.parent_path)" class="w-[80px] h-[66px]">
-                    <ui-icon name="asset-folder" class="h-full w-full text-blue-400" />
+                    <ui-icon name="asset-folder" class="size-full text-blue-400" />
                     <div
                         class="font-mono text-xs text-gray-500 text-start overflow-hidden text-ellipsis w-24 whitespace-nowrap"
                     >../</div>
@@ -19,7 +19,7 @@
                 v-if="!restrictFolderNavigation"
             >
                 <button @click="selectFolder(folder.path)" class="w-[80px] h-[66px]">
-                    <ui-icon name="asset-folder" class="h-full w-full text-blue-400" />
+                    <ui-icon name="asset-folder" class="size-full text-blue-400" />
                     <div
                         class="font-mono text-xs text-gray-500 text-start overflow-hidden text-ellipsis w-24 whitespace-nowrap"
                         v-text="folder.basename"
@@ -45,64 +45,60 @@
         </section>
 
         <!-- Assets -->
-        <section class="asset-grid-listing">
-            <button
-                class="asset-tile group relative outline-hidden"
+        <section class="asset-grid-listing" :class="{ compact: variant === 'compact' }">
+            <div
                 v-for="(asset, index) in assets"
                 :key="asset.id"
+                class="group relative"
                 :class="{ selected: isSelected(asset.id) }"
             >
-                <div
-                    class="w-full"
-                    @click.stop="toggleSelection(asset.id, index, $event)"
-                    @dblclick.stop="$emit('edit-asset', asset)"
-                >
-                    <div class="asset-thumb-container">
-                        <div
-                            class="asset-thumb"
-                            :class="{ 'bg-checkerboard': asset.can_be_transparent }"
-                        >
-                            <img
-                                v-if="asset.is_image"
-                                :src="asset.thumbnail"
-                                loading="lazy"
-                                :class="{ 'h-full w-full p-4': asset.extension === 'svg' }"
-                            />
-                            <file-icon
-                                v-else
-                                :extension="asset.extension"
-                                class="h-full w-full p-4"
-                            />
+                <div class="asset-tile group relative" :class="{ 'bg-checkerboard': asset.can_be_transparent }">
+                    <button
+                        class="size-full"
+                        @click.stop="toggleSelection(asset.id, index, $event)"
+                        @dblclick.stop="$emit('edit-asset', asset)"
+                    >
+                        <div class="relative flex items-center justify-center aspect-square size-full">
+                            <div class="asset-thumb">
+                                <img
+                                    v-if="asset.is_image"
+                                    :src="asset.thumbnail"
+                                    loading="lazy"
+                                    :class="{
+                                        'size-full p-4': asset.extension === 'svg',
+                                        'p-1 rounded-lg': asset.orientation === 'square'
+                                    }"
+                                />
+                                <file-icon v-else :extension="asset.extension" class="size-full p-4" />
+                            </div>
                         </div>
-                    </div>
-                    <div class="asset-meta">
-                        <div
-                            class="asset-filename px-2 py-1 text-center"
-                            v-text="asset.basename"
-                            :title="asset.basename"
+                    </button>
+                    <dropdown-list
+                        class="absolute top-1 opacity-0 group-hover:opacity-100 end-2"
+                        :class="{ 'opacity-100': actionOpened === asset.id }"
+                        @opened="actionOpened = asset.id"
+                        @closed="actionOpened = null"
+                    >
+                        <dropdown-item
+                            :text="__(canEdit ? 'Edit' : 'View')"
+                            @click="edit(asset.id)"
                         />
-                    </div>
+                        <div class="divider" v-if="asset.actions.length" />
+                        <data-list-inline-actions
+                            :item="asset.id"
+                            :url="actionUrl"
+                            :actions="asset.actions"
+                            @started="actionStarted"
+                            @completed="actionCompleted"
+                        />
+                    </dropdown-list>
                 </div>
-                <dropdown-list
-                    class="absolute top-1 opacity-0 group-hover:opacity-100 end-2"
-                    :class="{ 'opacity-100': actionOpened === asset.id }"
-                    @opened="actionOpened = asset.id"
-                    @closed="actionOpened = null"
-                >
-                    <dropdown-item
-                        :text="__(canEdit ? 'Edit' : 'View')"
-                        @click="edit(asset.id)"
-                    />
-                    <div class="divider" v-if="asset.actions.length" />
-                    <data-list-inline-actions
-                        :item="asset.id"
-                        :url="actionUrl"
-                        :actions="asset.actions"
-                        @started="actionStarted"
-                        @completed="actionCompleted"
-                    />
-                </dropdown-list>
-            </button>
+                <div
+                    class="font-mono text-xs text-gray-500 mt-2 overflow-hidden text-ellipsis whitespace-nowrap text-center"
+                    v-text="asset.basename"
+                    :title="asset.basename"
+                />
+            </div>
         </section>
     </div>
 </template>
@@ -114,8 +110,9 @@ export default {
     mixins: [AssetBrowserMixin],
 
     props: {
-        assets: Array,
-        selectedAssets: Array,
+        assets: { type: Array },
+        selectedAssets: { type: Array },
+        variant: { type: String, default: 'default' },
     },
 
     data() {
