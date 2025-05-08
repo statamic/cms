@@ -271,6 +271,24 @@ class StaticWarmTest extends TestCase
         ];
     }
 
+    #[Test]
+    public function it_sets_custom_headers_on_requests()
+    {
+        config(['statamic.static_caching.strategy' => 'half']);
+
+        $mock = Mockery::mock(\GuzzleHttp\Client::class);
+        $mock->shouldReceive('send')->andReturnUsing(function ($request) {
+            $this->assertEquals('Bearer testtoken', $request->getHeaderLine('Authorization'));
+
+            return Mockery::mock(\GuzzleHttp\Psr7\Response::class);
+        });
+        $this->app->instance(\GuzzleHttp\Client::class, $mock);
+
+        $this->artisan('statamic:static:warm', [
+            '--headers' => ['Authorization: Bearer testtoken'],
+        ])->assertExitCode(0);
+    }
+
     private function createPage($slug, $attributes = [])
     {
         $this->makeCollection()->save();
