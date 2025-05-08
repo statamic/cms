@@ -16,12 +16,12 @@ use Statamic\Events\FormDeleted;
 use Statamic\Events\FormSaved;
 use Statamic\Events\GlobalVariablesDeleted;
 use Statamic\Events\GlobalVariablesSaved;
+use Statamic\Events\LocalizedTermDeleted;
+use Statamic\Events\LocalizedTermSaved;
 use Statamic\Events\NavDeleted;
 use Statamic\Events\NavSaved;
 use Statamic\Events\NavTreeDeleted;
 use Statamic\Events\NavTreeSaved;
-use Statamic\Events\TermDeleted;
-use Statamic\Events\TermSaved;
 use Statamic\Facades\Form;
 
 class Invalidate implements ShouldQueue
@@ -34,8 +34,8 @@ class Invalidate implements ShouldQueue
         EntrySaved::class => 'invalidateEntry',
         EntryDeleting::class => 'invalidateEntry',
         EntryScheduleReached::class => 'invalidateEntry',
-        TermSaved::class => 'invalidateTerm',
-        TermDeleted::class => 'invalidateTerm',
+        LocalizedTermSaved::class => 'invalidateTerm',
+        LocalizedTermDeleted::class => 'invalidateTerm',
         GlobalVariablesSaved::class => 'invalidateGlobalVariables',
         GlobalVariablesDeleted::class => 'invalidateGlobalVariables',
         NavSaved::class => 'invalidateNav',
@@ -94,12 +94,12 @@ class Invalidate implements ShouldQueue
 
     public function invalidateCollectionByTree($event)
     {
-        $this->invalidator->invalidate($event->tree->collection());
+        $this->invalidator->invalidate($event->tree);
     }
 
     public function invalidateNavByTree($event)
     {
-        $this->invalidator->invalidate($event->tree->structure());
+        $this->invalidator->invalidate($event->tree);
     }
 
     public function invalidateByBlueprint($event)

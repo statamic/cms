@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\API;
 
 use Facades\Statamic\API\FilterAuthorizer;
+use Facades\Statamic\API\QueryScopeAuthorizer;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Http\Resources\API\TreeResource;
 use Statamic\Query\ItemQueryBuilder;
@@ -47,5 +48,10 @@ class CollectionTreeController extends ApiController
     protected function allowedFilters()
     {
         return FilterAuthorizer::allowedForSubResources('api', 'collections', $this->collectionHandle);
+    }
+
+    protected function allowedQueryScopes()
+    {
+        return QueryScopeAuthorizer::allowedForSubResources('api', 'collections', $this->collectionHandle);
     }
 }

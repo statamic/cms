@@ -55,6 +55,10 @@ class AugmentedUser extends AbstractAugmented
             return new Value($this->data->isSuper(), 'is_super', null, $this->data);
         }
 
+        if ($handle === 'two_factor_recovery_codes') {
+            return new Value($this->data->get('two_factor_recovery_codes'), 'two_factor_recovery_codes', null, $this->data);
+        }
+
         if (Str::startsWith($handle, 'is_')) {
             return new Value(in_array(Str::after($handle, 'is_'), $this->roles()), $handle, null, $this->data);
         }

@@ -13,7 +13,7 @@ const props = defineProps({
     pill: { type: Boolean, default: false },
     size: { type: String, default: 'default' },
     subText: { type: String, default: null },
-    text: { type: String, default: null },
+    text: { type: [String, Number, Boolean, null], default: null },
     variant: { type: String, default: 'default' },
 });
 

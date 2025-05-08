@@ -12,6 +12,8 @@
 </template>
 
 <script>
+import { requireElevatedSessionIf } from '@statamic/components/elevated-sessions/index.js';
+
 export default {
     props: {
         resource: {
@@ -27,6 +29,9 @@ export default {
             type: String,
         },
         reload: {
+            type: Boolean,
+        },
+        requiresElevatedSession: {
             type: Boolean,
         },
     },
@@ -64,7 +69,9 @@ export default {
 
     methods: {
         confirm() {
-            this.deleting = true;
+            requireElevatedSessionIf(this.requiresElevatedSession)
+                .then(() => (this.deleting = true))
+                .catch(() => Statamic.$toast.error(__('statamic::messages.elevated_session_required')));
         },
 
         confirmed() {

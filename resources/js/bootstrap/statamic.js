@@ -102,6 +102,10 @@ export default {
         return this.$app.config.globalProperties.$date;
     },
 
+    get $progress() {
+        return this.$app.config.globalProperties.$progress;
+    },
+
     get $theme() {
         return this.$app.config.globalProperties.$theme;
     },

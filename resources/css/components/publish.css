@@ -41,7 +41,7 @@ code.parent-url {
 }
 
 .publish-fields {
-    @apply flex flex-wrap gap-3 lg:gap-6;
+    @apply flex flex-wrap gap-3 lg:gap-8;
     --col-width: calc(100% / 12);
 
     .form-group {
@@ -73,7 +73,7 @@ code.parent-url {
 
 @variant lg {
     .publish-fields .form-group {
-        flex-basis: calc(var(--col-width) * var(--col-span) - calc(var(--spacing) * 3));
+        flex-basis: calc(var(--col-width) * var(--col-span) - calc(var(--spacing) * 8));
     }
     [data-cards-wrap="fields"] .publish-fields .form-group {
         flex-basis: calc(var(--col-width) * var(--col-span) - calc(var(--spacing) * 1));

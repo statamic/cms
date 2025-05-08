@@ -1,67 +1,40 @@
 <template>
-    <div class="video-fieldtype-container">
-        <div class="flex items-center">
-            <div class="input-group">
-                <div class="input-group-prepend">{{ __('URL') }}</div>
-                <input
-                    type="text"
-                    v-model="data"
-                    class="input-text flex-1"
-                    :class="{ 'bg-white dark:bg-dark-600': !isReadOnly }"
-                    :id="fieldId"
-                    :readonly="isReadOnly"
-                    :placeholder="__(config.placeholder) || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'"
-                    @focus="$emit('focus')"
-                    @blur="$emit('blur')"
-                />
-            </div>
-        </div>
-
-        <p v-if="isInvalid" class="mt-4 text-red-500">{{ __('statamic::validation.url') }}</p>
-
-        <div class="video-preview-wrapper" v-if="!isInvalid && (isEmbeddable || isVideo)">
-            <div class="embed-video" v-if="isEmbeddable && canShowIframe">
-                <iframe :src="embedUrl" frameborder="0" allow="fullscreen"></iframe>
-            </div>
-            <div class="native-video" v-else-if="isVideo">
-                <video controls :src="embedUrl"></video>
-            </div>
-        </div>
+    <div class="flex flex-col space-y-3">
+        <ui-input-group>
+            <ui-input-group-prepend :text="__('URL')" />
+            <ui-input
+                :model-value="value"
+                :isReadOnly="isReadOnly"
+                :placeholder="__(config.placeholder) || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'"
+                @update:model-value="update"
+                @focus="$emit('focus')"
+                @blur="$emit('blur')"
+            />
+        </ui-input-group>
+        <ui-description v-if="isInvalid" class="text-red-500">{{ __('statamic::validation.url') }}</ui-description>
+        <iframe
+            v-if="shouldShowPreview"
+            :src="embedUrl"
+            frameborder="0"
+            allow="fullscreen"
+            class="aspect-video rounded-lg"
+        ></iframe>
     </div>
 </template>
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import debounce from '@statamic/util/debounce.js';
 
 export default {
     mixins: [Fieldtype],
 
-    data() {
-        return {
-            data: this.value || '',
-            canShowIframe: false,
-        };
-    },
-
-    watch: {
-        data: debounce(function (value) {
-            this.update(value);
-        }, 500),
-
-        value(value) {
-            this.data = value;
-        },
-    },
-
-    mounted() {
-        // Showing the iframe right away causes Vue to stop in Safari.
-        this.canShowIframe = true;
-    },
-
     computed: {
+        shouldShowPreview() {
+            return !this.isInvalid && (this.isEmbeddable || this.isVideo);
+        },
+
         embedUrl() {
-            let embed_url = this.data;
+            let embed_url = this.value || '';
 
             if (embed_url.includes('youtube')) {
                 embed_url = embed_url.includes('shorts/')
@@ -76,13 +49,12 @@ export default {
             if (embed_url.includes('vimeo')) {
                 embed_url = embed_url.replace('/vimeo.com', '/player.vimeo.com/video');
 
-                if (!this.data.includes('progressive_redirect') && embed_url.split('/').length > 5) {
+                if (!this.value.includes('progressive_redirect') && embed_url.split('/').length > 5) {
                     let hash = embed_url.substr(embed_url.lastIndexOf('/') + 1);
                     embed_url = embed_url.substr(0, embed_url.lastIndexOf('/')) + '?h=' + hash.replace('?', '&');
                 }
             }
 
-            // Make sure additional query parameters are included.
             if (embed_url.includes('&') && !embed_url.includes('?')) {
                 embed_url = embed_url.replace('&', '?');
             }
@@ -91,33 +63,26 @@ export default {
         },
 
         isEmbeddable() {
-            return (
-                (this.isUrl && this.data.includes('youtube')) ||
-                this.data.includes('vimeo') ||
-                this.data.includes('youtu.be')
-            );
+            const url = this.value || '';
+            const isYoutube = url.includes('youtube') || url.includes('youtu.be');
+            const isVimeo = url.includes('vimeo');
+            return isYoutube || isVimeo;
         },
 
         isInvalid() {
             let htmlRegex = new RegExp(/<([A-Z][A-Z0-9]*)\b[^>]*>.*?<\/\1>|<([A-Z][A-Z0-9]*)\b[^\/]*\/>/i);
-
-            return htmlRegex.test(this.data);
+            return htmlRegex.test(this.value || '');
         },
 
         isUrl() {
-            let regex = new RegExp('^(https?|ftp):\/\/[^\s/$.?#].*$', 'i');
-
-            return regex.test(this.data);
+            const url = this.value || '';
+            return url.startsWith('http://') || url.startsWith('https://');
         },
 
         isVideo() {
-            return (
-                !this.isEmbeddable &&
-                (this.data.includes('.mp4') ||
-                    this.data.includes('.ogv') ||
-                    this.data.includes('.mov') ||
-                    this.data.includes('.webm'))
-            );
+            const url = this.value || '';
+            const isVideo = url.includes('.mp4') || url.includes('.ogv') || url.includes('.mov') || url.includes('.webm');
+            return !this.isEmbeddable && isVideo;
         },
     },
 };

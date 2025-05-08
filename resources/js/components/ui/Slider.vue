@@ -7,6 +7,9 @@ defineProps({
     id: { type: String, default: () => useId() },
     label: { type: String, default: null },
     modelValue: { type: Boolean, default: false },
+    min: { type: Number, default: 0 },
+    max: { type: Number, default: 100 },
+    step: { type: Number, default: 1 },
 });
 
 defineEmits(['update:modelValue']);
@@ -17,8 +20,9 @@ defineEmits(['update:modelValue']);
         data-ui-control
         class="relative flex h-5 w-full touch-none items-center select-none"
         :id
-        :max="100"
-        :step="1"
+        :max="max"
+        :min="min"
+        :step="step"
         v-model="sliderValue"
         @update:checked="$emit('update:modelValue', $event)"
     >
