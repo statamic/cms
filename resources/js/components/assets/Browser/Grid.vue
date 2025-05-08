@@ -1,5 +1,5 @@
 <template>
-    <div v-if="!containerIsEmpty">
+    <div v-if="!containerIsEmpty" class="space-y-10">
         <!-- Folders -->
         <section class="flex flex-wrap gap-8">
             <!-- Parent Folder -->
@@ -45,7 +45,7 @@
         </section>
 
         <!-- Assets -->
-        <section class="flex flex-wrap gap-2">
+        <section class="asset-grid-listing">
             <button
                 class="asset-tile group relative outline-hidden"
                 v-for="(asset, index) in assets"
@@ -84,7 +84,7 @@
                     </div>
                 </div>
                 <dropdown-list
-                    class="absolute top-1 opacity-0 group-hover:opacity-100 ltr:right-2 rtl:left-2"
+                    class="absolute top-1 opacity-0 group-hover:opacity-100 end-2"
                     :class="{ 'opacity-100': actionOpened === asset.id }"
                     @opened="actionOpened = asset.id"
                     @closed="actionOpened = null"
