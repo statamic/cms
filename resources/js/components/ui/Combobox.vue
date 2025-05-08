@@ -11,7 +11,7 @@ import {
     ComboboxPortal,
     ComboboxViewport,
 } from 'reka-ui';
-import { computed, ref, useAttrs, useTemplateRef, watch } from 'vue';
+import { computed, nextTick, ref, useAttrs, useTemplateRef, watch } from 'vue';
 import { WithField, Icon, Badge } from '@statamic/ui';
 import fuzzysort from 'fuzzysort';
 import { SortableList } from '@statamic/components/sortable/Sortable.js';
@@ -72,18 +72,6 @@ const itemClasses = cva({
     },
 });
 
-const selectedOptionPlaceholder = computed(() => {
-    if (props.multiple) {
-        return;
-    }
-
-    if (!props.modelValue) {
-        return props.placeholder;
-    }
-
-    return props.options.find(option => option.value === props.modelValue)?.label ?? props.modelValue;
-});
-
 const selectedOptions = computed(() => {
     let selections = props.modelValue === null ? [] : props.modelValue;
 
@@ -94,6 +82,14 @@ const selectedOptions = computed(() => {
     return selections.map(value => {
         return props.options.find(option => option.value === value) ?? { label: value, value };
     });
+});
+
+const selectedOption = computed(() => {
+   if (props.multiple || !props.modelValue || selectedOptions.value.length !== 1) {
+       return null;
+   }
+
+   return selectedOptions.value[0];
 });
 
 const limitReached = computed(() => {
@@ -161,7 +157,9 @@ function clear() {
     emit('update:modelValue', null);
 
     if (props.searchable) {
-        inputRef.value.$el.focus();
+        nextTick(() => {
+            inputRef.value.$el.focus();
+        });
     }
 };
 
@@ -189,14 +187,15 @@ const dropdownOpen = ref(false);
                 <ComboboxAnchor :class="[anchorClasses, $attrs.class]" data-ui-combobox-anchor>
                     <ComboboxTrigger as="div" class="w-full min-h-full">
                         <ComboboxInput
-                            v-if="searchable"
+                            v-if="searchable && (dropdownOpen || !modelValue)"
                             ref="input"
                             class="w-full focus:outline-none"
-                            :class="{ 'placeholder:text-gray-600 dark:placeholder:text-gray-300': modelValue }"
                             v-model="searchQuery"
-                            :placeholder="selectedOptionPlaceholder"
+                            :placeholder
                         />
-                        <div v-else class="cursor-pointer" v-html="selectedOptionPlaceholder" />
+                        <slot name="selected-option" v-bind="{ option: selectedOption }" v-else>
+                            <div class="cursor-pointer" v-text="selectedOption?.label"></div>
+                        </slot>
                     </ComboboxTrigger>
                     <div class="flex items-center space-x-2 pl-2">
                         <button v-if="clearable" @click="clear">
