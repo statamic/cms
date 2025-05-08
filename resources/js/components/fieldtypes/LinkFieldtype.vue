@@ -2,23 +2,12 @@
     <div class="flex items-center">
         <!-- Link type selector -->
         <div class="w-28 ltr:mr-4 rtl:ml-4">
-            <v-select
-                v-model="option"
-                append-to-body
-                :calculate-position="positionOptions"
-                :options="options"
-                :clearable="false"
-                :reduce="(option) => option.value"
-            >
-                <template #option="{ label }">
-                    {{ __(label) }}
-                </template>
-            </v-select>
+            <Select :options v-model="option" />
         </div>
 
         <div class="flex-1">
             <!-- URL text input -->
-            <text-input v-if="option === 'url'" v-model="urlValue" />
+            <Input v-if="option === 'url'" v-model="urlValue" />
 
             <!-- Entry select -->
             <relationship-fieldtype
@@ -49,10 +38,11 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import PositionsSelectOptions from '../../mixins/PositionsSelectOptions';
+import { Input, Select } from '@statamic/ui';
 
 export default {
-    mixins: [Fieldtype, PositionsSelectOptions],
+    components: { Input, Text, Select },
+    mixins: [Fieldtype],
 
     provide: {
         isInLinkField: true,
