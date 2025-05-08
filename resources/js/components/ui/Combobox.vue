@@ -16,7 +16,7 @@ import { WithField, Icon, Badge } from '@statamic/ui';
 import fuzzysort from 'fuzzysort';
 import { SortableList } from '@statamic/components/sortable/Sortable.js';
 
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue', 'search']);
 
 const props = defineProps({
     description: { type: String, default: null },
@@ -31,6 +31,7 @@ const props = defineProps({
     disabled: { type: Boolean, default: false },
     maxSelections: { type: Number, default: null },
     labelHtml: { type: Boolean, default: false },
+    ignoreFilter: { type: Boolean, default: false },
     options: { type: Array, default: null },
     flat: { type: Boolean, default: false },
 });
@@ -124,7 +125,7 @@ const limitIndicatorColor = computed(() => {
 const searchQuery = ref('');
 
 const results = computed(() => {
-    if (!props.searchable) {
+    if (!props.searchable || props.ignoreFilter) {
         return props.options;
     }
 
@@ -149,6 +150,10 @@ watch(() => props.modelValue, (value) => {
     searchQuery.value = '';
 });
 
+watch(searchQuery, (value) => {
+    emit('search', value, () => {});
+})
+
 const inputRef = useTemplateRef('input');
 
 function clear() {
@@ -167,22 +172,16 @@ function deselect(option) {
 const dropdownOpen = ref(false);
 </script>
 
-<style scoped>
-.draggable-source--is-dragging {
-    @apply border-dashed bg-transparent opacity-75;
-}
-</style>
-
 <template>
     <WithField :label :description>
         <div class="flex">
             <ComboboxRoot
                 v-bind="attrs"
+                ignore-filter
                 :multiple
-                :ignore-filter="true"
                 :reset-search-term-on-blur="false"
                 :reset-search-term-on-select="false"
-                :disabled="disabled || limitReached"
+                :disabled="disabled || (multiple && limitReached)"
                 v-model:open="dropdownOpen"
                 :model-value="modelValue"
                 @update:model-value="emit('update:modelValue', $event)"
@@ -253,37 +252,38 @@ const dropdownOpen = ref(false);
             </div>
         </div>
 
-        <slot name="selected-options" v-bind="{ deselect }">
+        <slot name="selected-options" v-bind="{ disabled, labelHtml, deselect }">
             <sortable-list
                 v-if="multiple"
                 item-class="sortable-item"
                 handle-class="sortable-item"
                 :distance="5"
                 :mirror="false"
+                :disabled
                 :model-value="modelValue"
                 @update:model-value="emit('update:modelValue', $event)"
             >
                 <div class="vs__selected-options-outside flex gap-2 flex-wrap">
-                    <div
+                     <div
                         v-for="option in selectedOptions"
                         :key="option.value"
                         class="vs__selected sortable-item mt-2"
                     >
-                        <Badge :pill="true" size="lg">
+                        <Badge pill size="lg">
                             <div v-if="labelHtml" v-html="option.label"></div>
                             <div v-else>{{ __(option.label) }}</div>
 
                             <button
                                 v-if="!disabled"
-                                @click="deselect(option.value)"
                                 type="button"
-                                :aria-label="__('Deselect option')"
                                 class="vs__deselect"
+                                :aria-label="__('Deselect option')"
+                                @click="deselect(option.value)"
                             >
                                 <span>×</span>
                             </button>
                             <button v-else type="button" class="vs__deselect">
-                                <span class="text-gray-500">×</span>
+                                <span class="text-gray-300">×</span>
                             </button>
                         </Badge>
                     </div>
