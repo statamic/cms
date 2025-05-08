@@ -60,14 +60,9 @@
                 >
                     <div :class="modeClass">
                         <div class="space-y-4">
-                            <div class="flex items-center gap-3">
-                                <data-list-search ref="search" v-model="searchQuery" />
-                                <!-- Placeholder 👇 -->
-                                <Button icon="filter" text="Filter" />
-                                <!-- <data-list-filters /> -->
-                            </div>
+                            <data-list-search ref="search" v-model="searchQuery" />
 
-                            <!-- <breadcrumbs v-if="!restrictFolderNavigation" :path="path" @navigated="selectFolder" /> -->
+                            <breadcrumbs v-if="!restrictFolderNavigation" :path="path" @navigated="selectFolder" />
 
                             <uploads
                                 v-if="uploads.length"
@@ -146,7 +141,6 @@
 <script>
 import AssetThumbnail from './Thumbnail.vue';
 import AssetEditor from '../Editor/Editor.vue';
-import Breadcrumbs from './Breadcrumbs.vue';
 import CreateFolder from './CreateFolder.vue';
 import Grid from './Grid.vue';
 import Table from './Table.vue';
@@ -161,7 +155,7 @@ import { Header, Button } from '@statamic/ui';
 export default {
     mixins: [HasActions, HasPagination, HasPreferences],
 
-    components: { AssetThumbnail, AssetEditor, Breadcrumbs, Uploader, Uploads, CreateFolder, Grid, Table, Header, Button },
+    components: { AssetThumbnail, AssetEditor, Uploader, Uploads, CreateFolder, Grid, Table, Header, Button },
 
     props: {
         allowSelectingExistingUpload: Boolean,
@@ -297,6 +291,7 @@ export default {
                 folderActionUrl: this.folderActionUrl,
                 folders: this.folders,
                 restrictFolderNavigation: this.restrictFolderNavigation,
+                path: this.path,
             };
         },
 
@@ -369,10 +364,10 @@ export default {
             this.page = 1;
         },
 
-        selectedPath(selectedPath) {
-            // The selected path might change from outside due to a popstate navigation
-            if (!selectedPath.endsWith('/edit')) {
-                this.path = selectedPath;
+        selectedPath: {
+            immediate: true,
+            handler(newPath) {
+                this.path = newPath;
             }
         },
     },

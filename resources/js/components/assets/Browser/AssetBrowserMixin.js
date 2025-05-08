@@ -1,33 +1,34 @@
 export default {
     props: {
-        containerIsEmpty: Boolean,
-        folder: Object,
-        folders: Array,
-        restrictFolderNavigation: Boolean,
-        folderActionUrl: String,
         actionUrl: String,
         canEdit: Boolean,
+        containerIsEmpty: Boolean,
+        folder: Object,
+        folderActionUrl: String,
+        folders: Array,
+        path: String,
+        restrictFolderNavigation: Boolean,
     },
 
     methods: {
-        selectFolder(path) {
-            this.$emit('select-folder', path);
-        },
-
-        folderActions(folder) {
-            return folder.actions || this.folder.actions || [];
-        },
-
-        edit(id) {
-            this.$emit('edit', id);
+        actionCompleted() {
+            this.$emit('action-completed');
         },
 
         actionStarted() {
             this.$emit('action-started');
         },
 
-        actionCompleted() {
-            this.$emit('action-completed');
+        edit(id) {
+            this.$emit('edit', id);
+        },
+
+        folderActions(folder) {
+            return folder.actions || this.folder.actions || [];
+        },
+
+        selectFolder(path) {
+            this.$emit('select-folder', path);
         },
     },
 };

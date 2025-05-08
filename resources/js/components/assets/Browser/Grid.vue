@@ -1,114 +1,110 @@
 <template>
-    <div v-if="!containerIsEmpty" class="space-y-10">
+    <ui-panel v-if="!containerIsEmpty">
+        <ui-panel-header class="p-1!">
+            <breadcrumbs v-if="!restrictFolderNavigation" :path="path" @navigated="selectFolder" />
+        </ui-panel-header>
         <!-- Folders -->
-        <section class="flex flex-wrap gap-8">
-            <!-- Parent Folder -->
-            <div v-if="folder && folder.parent_path && !restrictFolderNavigation">
-                <button @click="selectFolder(folder.parent_path)" class="w-[80px] h-[66px]">
-                    <ui-icon name="asset-folder" class="size-full text-blue-400" />
-                    <div
-                        class="font-mono text-xs text-gray-500 text-start overflow-hidden text-ellipsis w-24 whitespace-nowrap"
-                    >../</div>
-                </button>
-            </div>
-            <!-- Sub-Folders -->
-            <div
-                class="group/folder relative"
-                v-for="(folder, i) in folders"
-                :key="folder.path"
-                v-if="!restrictFolderNavigation"
-            >
-                <button @click="selectFolder(folder.path)" class="w-[80px] h-[66px]">
-                    <ui-icon name="asset-folder" class="size-full text-blue-400" />
-                    <div
-                        class="font-mono text-xs text-gray-500 text-start overflow-hidden text-ellipsis w-24 whitespace-nowrap"
-                        v-text="folder.basename"
-                        :title="folder.basename"
-                    />
-                </button>
-                <dropdown-list
-                    v-if="folderActions(folder).length"
-                    class="absolute top-1 opacity-0 group-hover:opacity-100 end-2"
-                    :class="{ 'opacity-100': actionOpened === folder.path }"
-                    @opened="actionOpened = folder.path"
-                    @closed="actionOpened = null"
+        <ui-card class="space-y-8">
+            <section class="flex flex-wrap gap-8" v-if="folders.length">
+                <div
+                    class="group/folder relative"
+                    v-for="folder in folders"
+                    :key="folder.path"
+                    v-if="!restrictFolderNavigation"
                 >
-                    <data-list-inline-actions
-                        :item="folder.path"
-                        :url="folderActionUrl"
-                        :actions="folderActions(folder)"
-                        @started="actionStarted"
-                        @completed="actionCompleted"
-                    />
-                </dropdown-list>
-            </div>
-        </section>
-
-        <!-- Assets -->
-        <section class="asset-grid-listing" :class="{ compact: variant === 'compact' }">
-            <div
-                v-for="(asset, index) in assets"
-                :key="asset.id"
-                class="group relative"
-                :class="{ selected: isSelected(asset.id) }"
-            >
-                <div class="asset-tile group relative" :class="{ 'bg-checkerboard': asset.can_be_transparent }">
-                    <button
-                        class="size-full"
-                        @click.stop="toggleSelection(asset.id, index, $event)"
-                        @dblclick.stop="$emit('edit-asset', asset)"
-                    >
-                        <div class="relative flex items-center justify-center aspect-square size-full">
-                            <div class="asset-thumb">
-                                <img
-                                    v-if="asset.is_image"
-                                    :src="asset.thumbnail"
-                                    loading="lazy"
-                                    :class="{
-                                        'size-full p-4': asset.extension === 'svg',
-                                        'p-1 rounded-lg': asset.orientation === 'square'
-                                    }"
-                                />
-                                <file-icon v-else :extension="asset.extension" class="size-full p-4" />
-                            </div>
-                        </div>
+                    <button @click="selectFolder(folder.path)" class="w-[80px] h-[66px]">
+                        <ui-icon name="asset-folder" class="size-full text-blue-400" />
+                        <div
+                            class="font-mono text-xs text-gray-500 text-center overflow-hidden text-ellipsis whitespace-nowrap"
+                            v-text="folder.basename"
+                            :title="folder.basename"
+                        />
                     </button>
                     <dropdown-list
+                        v-if="folderActions(folder).length"
                         class="absolute top-1 opacity-0 group-hover:opacity-100 end-2"
-                        :class="{ 'opacity-100': actionOpened === asset.id }"
-                        @opened="actionOpened = asset.id"
+                        :class="{ 'opacity-100': actionOpened === folder.path }"
+                        @opened="actionOpened = folder.path"
                         @closed="actionOpened = null"
                     >
-                        <dropdown-item
-                            :text="__(canEdit ? 'Edit' : 'View')"
-                            @click="edit(asset.id)"
-                        />
-                        <div class="divider" v-if="asset.actions.length" />
                         <data-list-inline-actions
-                            :item="asset.id"
-                            :url="actionUrl"
-                            :actions="asset.actions"
+                            :item="folder.path"
+                            :url="folderActionUrl"
+                            :actions="folderActions(folder)"
                             @started="actionStarted"
                             @completed="actionCompleted"
                         />
                     </dropdown-list>
                 </div>
+            </section>
+
+            <!-- Assets -->
+            <section class="asset-grid-listing" :class="{ compact: variant === 'compact' }" v-if="assets.length">
                 <div
-                    class="font-mono text-xs text-gray-500 mt-2 overflow-hidden text-ellipsis whitespace-nowrap text-center"
-                    v-text="asset.basename"
-                    :title="asset.basename"
-                />
-            </div>
-        </section>
-    </div>
+                    v-for="(asset, index) in assets"
+                    :key="asset.id"
+                    class="group relative"
+                    :class="{ selected: isSelected(asset.id) }"
+                >
+                    <div class="asset-tile group relative" :class="{ 'bg-checkerboard': asset.can_be_transparent }">
+                        <button
+                            class="size-full"
+                            @click.stop="toggleSelection(asset.id, index, $event)"
+                            @dblclick.stop="$emit('edit-asset', asset)"
+                        >
+                            <div class="relative flex items-center justify-center aspect-square size-full">
+                                <div class="asset-thumb">
+                                    <img
+                                        v-if="asset.is_image"
+                                        :src="asset.thumbnail"
+                                        loading="lazy"
+                                        :class="{
+                                            'size-full p-4': asset.extension === 'svg',
+                                            'p-1 rounded-lg': asset.orientation === 'square'
+                                        }"
+                                    />
+                                    <file-icon v-else :extension="asset.extension" class="size-full p-4" />
+                                </div>
+                            </div>
+                        </button>
+                        <dropdown-list
+                            class="absolute top-1 opacity-0 group-hover:opacity-100 end-2"
+                            :class="{ 'opacity-100': actionOpened === asset.id }"
+                            @opened="actionOpened = asset.id"
+                            @closed="actionOpened = null"
+                        >
+                            <dropdown-item
+                                :text="__(canEdit ? 'Edit' : 'View')"
+                                @click="edit(asset.id)"
+                            />
+                            <div class="divider" v-if="asset.actions.length" />
+                            <data-list-inline-actions
+                                :item="asset.id"
+                                :url="actionUrl"
+                                :actions="asset.actions"
+                                @started="actionStarted"
+                                @completed="actionCompleted"
+                            />
+                        </dropdown-list>
+                    </div>
+                    <div
+                        class="font-mono text-xs text-gray-500 mt-2 overflow-hidden text-ellipsis whitespace-nowrap text-center"
+                        v-text="asset.basename"
+                        :title="asset.basename"
+                    />
+                </div>
+            </section>
+        </ui-card>
+    </ui-panel>
 </template>
 
 <script>
 import AssetBrowserMixin from './AssetBrowserMixin';
+import Breadcrumbs from './Breadcrumbs.vue';
 
 export default {
     mixins: [AssetBrowserMixin],
-
+    components: { Breadcrumbs },
     props: {
         assets: { type: Array },
         selectedAssets: { type: Array },
