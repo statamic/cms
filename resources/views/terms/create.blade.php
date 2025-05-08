@@ -1,3 +1,4 @@
+@inject('str', 'Statamic\Support\Str')
 @extends('statamic::layout')
 @section('title', $breadcrumbs->title($taxonomyCreateLabel))
 @section('wrapper_class', 'max-w-7xl')
@@ -14,6 +15,7 @@
         :published="{{ json_encode($published) }}"
         :localizations="{{ json_encode($localizations) }}"
         site="{{ $locale }}"
+        :can-edit-blueprint="{{ $str::bool($user->can('configure fields')) }}"
         create-another-url="{{ cp_route('taxonomies.terms.create', [$taxonomy, $locale]) }}"
         listing-url="{{ cp_route('taxonomies.show', $taxonomy) }}"
         :preview-targets="{{ json_encode($previewTargets) }}"

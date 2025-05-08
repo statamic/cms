@@ -1,5 +1,61 @@
 # Release Notes
 
+## 5.53.1 (2025-04-17)
+
+### What's fixed
+- Fix validation of date field nested in a replicator  [#11692](https://github.com/statamic/cms/issues/11692) by @liucf
+- Fix collection index search when using a non-dedicated search index [#11711](https://github.com/statamic/cms/issues/11711) by @simonerd
+- Handle translation issues in collection widget [#11693](https://github.com/statamic/cms/issues/11693) by @daun
+- Remove `templates`/`themes` methods from `CpController` [#11706](https://github.com/statamic/cms/issues/11706) by @duncanmcclean
+- Ensure asset references are updated correctly [#11705](https://github.com/statamic/cms/issues/11705) by @duncanmcclean
+
+
+
+## 5.53.0 (2025-04-10)
+
+### What's new
+- Allow dynamic counter names in `increment` tag [#11671](https://github.com/statamic/cms/issues/11671) by @daun
+- Expose field conditions from GraphQL API [#11607](https://github.com/statamic/cms/issues/11607) by @duncanmcclean
+- Add Edit Blueprint links to create publish forms [#11625](https://github.com/statamic/cms/issues/11625) by @jacksleight
+
+### What's fixed
+- Fix icon selector in nav builder [#11656](https://github.com/statamic/cms/issues/11656) by @duncanmcclean
+- Fix docblock in AssetContainer facade [#11658](https://github.com/statamic/cms/issues/11658) by @duncanmcclean
+- Revert "Escape start_page Preference to avoid invalid Redirect" [#11651](https://github.com/statamic/cms/issues/11651) by @duncanmcclean
+- Restore error message on asset upload server errors [#11642](https://github.com/statamic/cms/issues/11642) by @daun
+- Fix dates in localizations when duplicating entries [#11361](https://github.com/statamic/cms/issues/11361) by @duncanmcclean
+- Use deep copy of objects in replicator set [#11621](https://github.com/statamic/cms/issues/11621) by @faltjo
+- French translations [#11622](https://github.com/statamic/cms/issues/11622) by @ebeauchamps
+- Dutch translations [#11686](https://github.com/statamic/cms/issues/11686) by @rogerthat-be
+
+
+
+## 5.52.0 (2025-03-25)
+
+### What's new
+- Support query scopes in GraphQL [#11533](https://github.com/statamic/cms/issues/11533) by @ryanmitchell
+- Support query scopes in REST API [#10893](https://github.com/statamic/cms/issues/10893) by @ryanmitchell
+- Added option to exclude asset containers from generating presets [#11613](https://github.com/statamic/cms/issues/11613) by @kevinmeijer97
+- Handle collection instances in `first` modifier [#11608](https://github.com/statamic/cms/issues/11608) by @marcorieser
+- Autoload scopes from `Query/Scopes` and `Query/Scopes/Filters` [#11601](https://github.com/statamic/cms/issues/11601) by @duncanmcclean
+- Allow revisions path to be configurable with an .env [#11594](https://github.com/statamic/cms/issues/11594) by @ryanmitchell
+- Ability to exclude parents from nav tag [#11597](https://github.com/statamic/cms/issues/11597) by @jasonvarga
+- Allow a custom asset meta cache store to be specified [#11512](https://github.com/statamic/cms/issues/11512) by @ryanmitchell
+
+### What's fixed
+- Fix icon fieldtype in nav builder [#11618](https://github.com/statamic/cms/issues/11618) by @jasonvarga
+- Escape start_page Preference to avoid invalid Redirect [#11616](https://github.com/statamic/cms/issues/11616) by @naabster
+- Fix issue with localization files named like fieldset handles [#11603](https://github.com/statamic/cms/issues/11603) by @ChristianPraiss
+- Ensure toasts fired in an AssetUploaded event are delivered to front end [#11592](https://github.com/statamic/cms/issues/11592) by @ryanmitchell
+- Prevent null data from being saved to eloquent users [#11591](https://github.com/statamic/cms/issues/11591) by @ryanmitchell
+- Change default value of update command selection [#11581](https://github.com/statamic/cms/issues/11581) by @Jade-GG
+- Adjust relationship field typeahead no-options message [#11590](https://github.com/statamic/cms/issues/11590) by @jasonvarga
+- Bump axios from 1.7.4 to 1.8.2 [#11604](https://github.com/statamic/cms/issues/11604) by @dependabot
+- Bump tj-actions/changed-files [#11602](https://github.com/statamic/cms/issues/11602) by @dependabot
+- Spanish translations [#11617](https://github.com/statamic/cms/issues/11617) by @nopticon
+
+
+
 ## 5.51.0 (2025-03-17)
 
 ### What's new

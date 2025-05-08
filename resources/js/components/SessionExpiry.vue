@@ -40,6 +40,84 @@
                 </div>
             </div>
         </modal>
+
+        <modal name="session-timeout-login" v-if="isShowingTwoFactorChallenge" height="auto" :width="500">
+            <div class="-max-h-screen-px">
+                <div
+                    class="flex items-center justify-between rounded-t-lg border-b bg-gray-200 px-5 py-3 text-lg font-semibold dark:border-dark-900 dark:bg-dark-550"
+                >
+                    {{ __('Resume Your Session') }}
+                </div>
+
+                <div class="publish-fields p-2">
+                    <div v-if="twoFactorMode === 'code'" class="form-group w-full">
+                        <label v-text="__('messages.session_expiry_enter_two_factor_code')" />
+                        <small class="help-block text-red-500" v-if="errors.code" v-text="errors.code[0]" />
+                        <div class="flex items-center">
+                            <input
+                                type="text"
+                                name="code"
+                                v-model="twoFactorCode"
+                                ref="twoFactorCode"
+                                class="input-text"
+                                tabindex="1"
+                                pattern="[0-9]*"
+                                maxlength="6"
+                                inputmode="numeric"
+                                autofocus
+                                autocomplete="one-time-code"
+                                @keydown.enter.prevent="submitTwoFactorChallenge"
+                            />
+                        </div>
+                    </div>
+
+                    <div v-if="twoFactorMode === 'recovery_code'" class="form-group w-full">
+                        <label v-text="__('messages.session_expiry_enter_two_factor_recovery_code')" />
+                        <small
+                            class="help-block text-red-500"
+                            v-if="errors.recovery_code"
+                            v-text="errors.recovery_code[0]"
+                        />
+                        <div class="flex items-center">
+                            <input
+                                type="text"
+                                name="recovery_code"
+                                v-model="twoFactorRecoveryCode"
+                                ref="twoFactorRecoveryCode"
+                                class="input-text"
+                                tabindex="1"
+                                maxlength="21"
+                                autofocus
+                                autocomplete="off"
+                                @keydown.enter.prevent="submitTwoFactorChallenge"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    class="flex items-center justify-end border-t bg-gray-200 p-4 text-sm dark:border-dark-900 dark:bg-dark-550"
+                >
+                    <button
+                        v-if="twoFactorMode === 'code'"
+                        class="text-gray hover:text-gray-900 dark:text-dark-150 dark:hover:text-dark-100"
+                        @click="twoFactorMode = 'recovery_code'"
+                        v-text="__('Use recovery code')"
+                    />
+                    <button
+                        v-if="twoFactorMode === 'recovery_code'"
+                        class="text-gray hover:text-gray-900 dark:text-dark-150 dark:hover:text-dark-100"
+                        @click="twoFactorMode = 'code'"
+                        v-text="__('Use one-time code')"
+                    />
+                    <button
+                        class="btn-primary ltr:ml-4 rtl:mr-4"
+                        @click="submitTwoFactorChallenge"
+                        v-text="__('Continue')"
+                    />
+                </div>
+            </div>
+        </modal>
     </div>
 </template>
 
@@ -58,10 +136,14 @@ export default {
     data() {
         return {
             isShowingLogin: false,
+            isShowingTwoFactorChallenge: false,
             count: this.lifetime, // The timer used in vue
             remaining: this.lifetime, // The actual time remaining as per server responses
             errors: {},
             password: null,
+            twoFactorCode: null,
+            twoFactorRecoveryCode: null,
+            twoFactorMode: 'code',
             pinging: false,
             lastCount: new Date(),
             isPageHidden: false,
@@ -92,7 +174,7 @@ export default {
 
     watch: {
         count(count) {
-            this.isShowingLogin = this.auth.enabled && this.remaining <= 0;
+            this.isShowingLogin = this.auth.enabled && !this.isShowingTwoFactorChallenge && this.remaining <= 0;
 
             // While we're in the warning period, we'll check every second so that any
             // activity in another tab is picked up and the count will get restarted.
@@ -175,9 +257,37 @@ export default {
                     this.errors = {};
                     this.password = null;
                     this.isShowingLogin = false;
-                    this.$toast.success(__('Logged in'));
-                    this.restartCountdown();
-                    this.updateCsrfToken();
+
+                    if (response.data.two_factor) {
+                        this.isShowingTwoFactorChallenge = true;
+                        return;
+                    }
+
+                    this.loginComplete();
+                })
+                .catch((e) => {
+                    if (e.response.status === 422) {
+                        this.errors = e.response.data.errors;
+                        this.$toast.error(e.response.data.message);
+                    } else {
+                        this.$toast.error(__('Something went wrong'));
+                    }
+                });
+        },
+
+        submitTwoFactorChallenge() {
+            this.$axios
+                .post(cp_url('auth/two-factor-challenge'), {
+                    code: this.twoFactorCode,
+                    recovery_code: this.twoFactorRecoveryCode,
+                })
+                .then((response) => {
+                    this.errors = {};
+                    this.twoFactorCode = null;
+                    this.twoFactorRecoveryCode = null;
+                    this.twoFactorMode = 'code';
+                    this.isShowingTwoFactorChallenge = false;
+                    this.loginComplete();
                 })
                 .catch((e) => {
                     if (e.response.status === 422) {
@@ -193,6 +303,12 @@ export default {
             this.$axios.get(cp_url('auth/extend')).then((response) => {
                 this.remaining = this.lifetime;
             });
+        },
+
+        loginComplete() {
+            this.$toast.success(__('Logged in'));
+            this.restartCountdown();
+            this.updateCsrfToken();
         },
     },
 };

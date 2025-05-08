@@ -86,4 +86,9 @@ class Impersonate extends Action
     {
         return true;
     }
+
+    public function requiresElevatedSession(): bool
+    {
+        return true;
+    }
 }

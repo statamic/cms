@@ -16,6 +16,7 @@
         :initial-is-root="true"
         :initial-origin-values="{}"
         :initial-site="site"
+        :can-edit-blueprint="canEditBlueprint"
         :create-another-url="createAnotherUrl"
         :listing-url="listingUrl"
         :preview-targets="previewTargets"
@@ -36,6 +37,7 @@ export default {
         'published',
         'localizations',
         'site',
+        'canEditBlueprint',
         'createAnotherUrl',
         'listingUrl',
         'previewTargets',
