@@ -342,6 +342,7 @@ class FieldTest extends TestCase
             'visibility' => 'visible',
             'replicator_preview' => true,
             'duplicate' => true,
+            'settings_field' => false,
             'type' => 'example',
             'validate' => 'required',
             'foo' => 'bar',

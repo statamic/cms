@@ -8,7 +8,7 @@
         <portal
             name="popover"
             :target-class="`popover-container ${targetClass || ''}`"
-            :provide="provide"
+            :provide="{ ...provide, ...context }"
         >
             <div :class="`${isOpen ? 'popover-open' : ''}`">
                 <div ref="popover" class="popover" v-if="!disabled" v-on-clickaway="clickawayClose">
@@ -50,6 +50,10 @@ export default {
         placement: {
             type: String,
             default: 'bottom-end',
+        },
+        context: {
+            type: Object,
+            default: () => ({}),
         },
     },
 
