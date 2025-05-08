@@ -108,16 +108,13 @@
 </template>
 
 <script>
+import AssetBrowserMixin from './AssetBrowserMixin';
+
 export default {
+    mixins: [AssetBrowserMixin],
+
     props: {
-        containerIsEmpty: Boolean,
-        folder: Object,
-        folders: Array,
         assets: Array,
-        restrictFolderNavigation: Boolean,
-        folderActionUrl: String,
-        actionUrl: String,
-        canEdit: Boolean,
         selectedAssets: Array,
     },
 
@@ -128,13 +125,6 @@ export default {
     },
 
     methods: {
-        selectFolder(path) {
-            this.$emit('select-folder', path);
-        },
-
-        folderActions(folder) {
-            return folder.actions || this.folder.actions || [];
-        },
 
         isSelected(id) {
             return this.selectedAssets.includes(id);
@@ -142,18 +132,6 @@ export default {
 
         toggleSelection(id, index, $event) {
             this.$emit('toggle-selection', { id, index, event: $event });
-        },
-
-        edit(id) {
-            this.$emit('edit', id);
-        },
-
-        actionStarted() {
-            this.$emit('action-started');
-        },
-
-        actionCompleted() {
-            this.$emit('action-completed');
         },
     },
 };

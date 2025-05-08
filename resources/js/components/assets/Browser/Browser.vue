@@ -1,5 +1,30 @@
 <template>
     <div class="min-h-screen" ref="browser" @keydown.shift="shiftDown" @keyup="clearShift">
+        <Header :title="__(container.title)">
+            <dropdown-list v-if="container.can_edit || container.can_delete || container.can_create">
+                <dropdown-item v-if="canCreateContainers" v-text="__('Create Container')" :redirect="createContainerUrl" />
+                <dropdown-item v-if="container.can_edit" v-text="__('Edit Container')" :redirect="container.edit_url" />
+                <dropdown-item v-text="__('Edit Blueprint')" :redirect="container.blueprint_url" />
+                <dropdown-item v-if="container.can_delete" class="warning" @click="$refs.deleter.confirm()">
+                    {{ __('Delete Container') }}
+                    <resource-deleter
+                        ref="deleter"
+                        :resource-title="__(container.title)"
+                        :route="container.delete_url"
+                    />
+                </dropdown-item>
+            </dropdown-list>
+
+            <Button v-if="canUpload" :text="__('Upload')" icon="upload" @click="openFileBrowser" />
+            <Button v-if="canCreateFolders" :text="__('Create Folder')" icon="folder-add" @click="createFolder" />
+
+            <ui-toggle-group v-model="mode">
+                <ui-toggle-item icon="layout-grid" value="grid" />
+                <ui-toggle-item icon="layout-grid-compact" value="grid-compact" />
+                <ui-toggle-item icon="layout-list" value="table" />
+            </ui-toggle-group>
+        </Header>
+
         <div v-if="initializing" class="loading">
             <loading-graphic />
         </div>
@@ -37,44 +62,11 @@
                         <div class="space-y-4">
                             <div class="flex items-center gap-3">
                                 <data-list-search ref="search" v-model="searchQuery" />
+                                <!-- Placeholder 👇 -->
+                                <Button icon="filter" text="Filter" />
                                 <!-- <data-list-filters /> -->
                             </div>
 
-
-                                <!-- <button
-                                    v-if="canCreateFolders"
-                                    class="btn btn-sm ltr:ml-3 rtl:mr-3"
-                                    @click="creatingFolder = true"
-                                >
-                                    <svg-icon name="folder-add" class="h-4 w-4 ltr:mr-2 rtl:ml-2" />
-                                    <span>{{ __('Create Folder') }}</span>
-                                </button> -->
-
-                                <!-- <button
-                                    v-if="canUpload"
-                                    class="btn btn-sm ltr:ml-3 rtl:mr-3"
-                                    @click="openFileBrowser"
-                                >
-                                    <svg-icon name="upload" class="h-4 w-4 text-current ltr:mr-2 rtl:ml-2" />
-                                    <span>{{ __('Upload') }}</span>
-                                </button> -->
-
-                                <!-- <div class="btn-group ltr:ml-3 rtl:mr-3">
-                                    <button
-                                        class="btn btn-sm"
-                                        @click="setMode('grid')"
-                                        :class="{ active: mode === 'grid' }"
-                                    >
-                                        <svg-icon name="assets-mode-grid" class="h-4 w-4" />
-                                    </button>
-                                    <button
-                                        class="btn btn-sm"
-                                        @click="setMode('table')"
-                                        :class="{ active: mode === 'table' }"
-                                    >
-                                        <svg-icon name="assets-mode-table" class="h-4 w-4" />
-                                    </button>
-                                </div> -->
                             <!-- <breadcrumbs v-if="!restrictFolderNavigation" :path="path" @navigated="selectFolder" /> -->
 
                             <uploads
@@ -87,42 +79,22 @@
 
                             <Table
                                 v-if="mode === 'table'"
-                                :mode="mode"
-                                :container-is-empty="containerIsEmpty"
-                                :loading="loading"
-                                :folder="folder"
-                                :folders="folders"
+                                v-bind="sharedAssetProps"
+                                v-on="sharedAssetEvents"
                                 :columns="columns"
-                                :restrict-folder-navigation="restrictFolderNavigation"
-                                :folder-action-url="folderActionUrl"
-                                :action-url="actionUrl"
-                                :can-edit="canEdit"
-                                @select-folder="selectFolder"
-                                @edit="edit"
+                                :loading="loading"
+                                :mode="mode"
                                 @sorted="sorted"
-                                @action-started="actionStarted"
-                                @action-completed="actionCompleted"
-                                @edit-asset="$emit('edit-asset', $event)"
                             />
 
                             <!-- Grid Mode -->
                             <Grid
                                 v-if="mode === 'grid'"
-                                :container-is-empty="containerIsEmpty"
-                                :folder="folder"
-                                :folders="folders"
+                                v-bind="sharedAssetProps"
+                                v-on="sharedAssetEvents"
                                 :assets="assets"
-                                :restrict-folder-navigation="restrictFolderNavigation"
-                                :folder-action-url="folderActionUrl"
-                                :action-url="actionUrl"
-                                :can-edit="canEdit"
                                 :selected-assets="selectedAssets"
-                                @select-folder="selectFolder"
                                 @toggle-selection="toggleSelection"
-                                @edit="edit"
-                                @action-started="actionStarted"
-                                @action-completed="actionCompleted"
-                                @edit-asset="$emit('edit-asset', $event)"
                             />
 
                             <div
@@ -183,6 +155,7 @@ import Uploader from '../Uploader.vue';
 import Uploads from '../Uploads.vue';
 import HasActions from '../../data-list/HasActions';
 import { keyBy, sortBy } from 'lodash-es';
+import { Header, Button } from '@statamic/ui';
 
 export default {
     mixins: [HasActions, HasPagination, HasPreferences],
@@ -196,6 +169,8 @@ export default {
         CreateFolder,
         Grid,
         Table,
+        Header,
+        Button,
     },
 
     props: {
@@ -253,16 +228,17 @@ export default {
     },
 
     computed: {
-        selectedContainer() {
-            return typeof this.initialContainer === 'object' ? this.initialContainer.id : this.initialContainer;
-        },
-
         actionContext() {
             return { container: this.selectedContainer };
         },
 
-        showAssetEditor() {
-            return Boolean(this.editedAssetId);
+        canCreateFolders() {
+            return (
+                this.folder &&
+                this.container.create_folders &&
+                !this.restrictFolderNavigation &&
+                (this.can('upload ' + this.container.id + ' assets') || this.can('configure asset containers'))
+            );
         },
 
         canEdit() {
@@ -277,13 +253,26 @@ export default {
             );
         },
 
-        canCreateFolders() {
-            return (
-                this.folder &&
-                this.container.create_folders &&
-                !this.restrictFolderNavigation &&
-                (this.can('upload ' + this.container.id + ' assets') || this.can('configure asset containers'))
-            );
+        containerIsEmpty() {
+            return this.assets.length === 0 && this.folders.length === 0 && (!this.folder || !this.folder.parent_path);
+        },
+
+        editedAssetBasename() {
+            let asset = this.assets.find((asset) => asset.id == this.editedAssetId);
+
+            return asset ? asset.basename : null;
+        },
+
+        hasMaxFiles() {
+            return this.maxFiles !== undefined && this.maxFiles !== Infinity;
+        },
+
+        hasSelections() {
+            return this.selectedAssets.length > 0;
+        },
+
+        modeClass() {
+            return 'mode-' + this.mode;
         },
 
         parameters() {
@@ -297,30 +286,38 @@ export default {
             };
         },
 
-        hasMaxFiles() {
-            return this.maxFiles !== undefined && this.maxFiles !== Infinity;
-        },
-
         reachedSelectionLimit() {
             return this.selectedAssets.length >= this.maxFiles;
         },
 
-        hasSelections() {
-            return this.selectedAssets.length > 0;
+        selectedContainer() {
+            return typeof this.initialContainer === 'object' ? this.initialContainer.id : this.initialContainer;
         },
 
-        containerIsEmpty() {
-            return this.assets.length === 0 && this.folders.length === 0 && (!this.folder || !this.folder.parent_path);
+        showAssetEditor() {
+            return Boolean(this.editedAssetId);
         },
 
-        editedAssetBasename() {
-            let asset = this.assets.find((asset) => asset.id == this.editedAssetId);
-
-            return asset ? asset.basename : null;
+        sharedAssetProps() {
+            return {
+                actionUrl: this.actionUrl,
+                canEdit: this.canEdit,
+                containerIsEmpty: this.containerIsEmpty,
+                folder: this.folder,
+                folderActionUrl: this.folderActionUrl,
+                folders: this.folders,
+                restrictFolderNavigation: this.restrictFolderNavigation,
+            };
         },
 
-        modeClass() {
-            return 'mode-' + this.mode;
+        sharedAssetEvents() {
+            return {
+                'action-completed': this.actionCompleted,
+                'action-started': this.actionStarted,
+                'edit': this.edit,
+                'edit-asset': (event) => this.$emit('edit-asset', event),
+                'select-folder': this.selectFolder,
+            };
         },
     },
 
@@ -339,10 +336,6 @@ export default {
     },
 
     watch: {
-        initialContainer() {
-            this.container = this.initialContainer;
-        },
-
         container(container) {
             this.initializing = true;
             this.preferencesPrefix = `assets.${container.id}`;
@@ -351,20 +344,16 @@ export default {
             this.loadAssets();
         },
 
-        path() {
-            this.loadAssets();
+        editedAssetId(editedAssetId) {
+            let path = editedAssetId
+                ? [this.path, this.editedAssetBasename].filter((value) => value != '/').join('/') + '/edit'
+                : this.path;
+
+            this.$emit('navigated', this.container, path);
         },
 
-        selectedPath(selectedPath) {
-            // The selected path might change from outside due to a popstate navigation
-            if (!selectedPath.endsWith('/edit')) {
-                this.path = selectedPath;
-            }
-        },
-
-        parameters(after, before) {
-            if (this.initializing || JSON.stringify(before) === JSON.stringify(after)) return;
-            this.loadAssets();
+        initialContainer() {
+            this.container = this.initialContainer;
         },
 
         initializing(isInitializing, wasInitializing) {
@@ -377,16 +366,24 @@ export default {
             this.$progress.loading('asset-browser', loading);
         },
 
-        editedAssetId(editedAssetId) {
-            let path = editedAssetId
-                ? [this.path, this.editedAssetBasename].filter((value) => value != '/').join('/') + '/edit'
-                : this.path;
+        parameters(after, before) {
+            if (this.initializing || JSON.stringify(before) === JSON.stringify(after)) return;
+            this.loadAssets();
+        },
 
-            this.$emit('navigated', this.container, path);
+        path() {
+            this.loadAssets();
         },
 
         searchQuery() {
             this.page = 1;
+        },
+
+        selectedPath(selectedPath) {
+            // The selected path might change from outside due to a popstate navigation
+            if (!selectedPath.endsWith('/edit')) {
+                this.path = selectedPath;
+            }
         },
     },
 
@@ -395,11 +392,52 @@ export default {
             this.loadAssets();
         },
 
-        loadContainers() {
-            this.$axios.get(cp_url('asset-containers')).then((response) => {
-                this.containers = keyBy(response.data, 'id');
-                this.container = this.containers[this.selectedContainer];
-            });
+        assetDeleted() {
+            this.closeAssetEditor();
+            this.loadAssets();
+        },
+
+        assetSaved() {
+            this.closeAssetEditor();
+            this.loadAssets();
+        },
+
+        clearShift() {
+            this.shifting = false;
+        },
+
+        closeAssetEditor() {
+            this.editedAssetId = null;
+        },
+
+        createFolder() {
+            this.creatingFolder = true;
+        },
+
+        edit(id) {
+            this.editedAssetId = id;
+        },
+
+        existingUploadSelected(upload) {
+            const path = `${this.folder.path}/${upload.basename}`.replace(/^\/+/, '');
+            const id = `${this.container.id}::${path}`;
+
+            this.selectedAssets.push(id);
+            this.$emit('selections-updated', this.selectedAssets);
+        },
+
+        folderActions(folder) {
+            return folder.actions || this.folder.actions || [];
+        },
+
+        folderCreated(folder) {
+            this.folders.push(folder);
+            this.folders = sortBy(this.folders, 'title');
+            this.creatingFolder = false;
+        },
+
+        isSelected(id) {
+            return this.selectedAssets.includes(id);
         },
 
         loadAssets() {
@@ -440,6 +478,17 @@ export default {
                 });
         },
 
+        loadContainers() {
+            this.$axios.get(cp_url('asset-containers')).then((response) => {
+                this.containers = keyBy(response.data, 'id');
+                this.container = this.containers[this.selectedContainer];
+            });
+        },
+
+        openFileBrowser() {
+            this.$refs.uploader.browse();
+        },
+
         selectFolder(path) {
             // Trigger re-loading of assets in the selected folder.
             this.path = path;
@@ -448,76 +497,28 @@ export default {
             this.$emit('navigated', this.container, this.path);
         },
 
+        selectRange(from, to) {
+            for (var i = from; i <= to; i++) {
+                let asset = this.assets[i].id;
+                if (!this.selectedAssets.includes(asset) && !this.reachedSelectionLimit) {
+                    this.selectedAssets.push(asset);
+                }
+                this.$emit('selections-updated', this.selectedAssets);
+            }
+        },
+
         setMode(mode) {
             this.mode = mode;
             this.setPreference('mode', mode == 'table' ? null : mode);
         },
 
-        edit(id) {
-            this.editedAssetId = id;
-        },
-
-        closeAssetEditor() {
-            this.editedAssetId = null;
-        },
-
-        assetSaved() {
-            this.closeAssetEditor();
-            this.loadAssets();
-        },
-
-        assetDeleted() {
-            this.closeAssetEditor();
-            this.loadAssets();
-        },
-
-        uploadsUpdated(uploads) {
-            this.uploads = uploads;
-        },
-
-        uploadCompleted(asset) {
-            if (this.autoselectUploads) {
-                this.sortColumn = 'last_modified';
-                this.sortDirection = 'desc';
-
-                this.selectedAssets.push(asset.id);
-                this.$emit('selections-updated', this.selectedAssets);
-            }
-
-            this.loadAssets();
-            this.$toast.success(__(':file uploaded', { file: asset.basename }));
-        },
-
-        uploadError(upload, uploads) {
-            this.uploads = uploads;
-            this.$toast.error(upload.errorMessage);
-        },
-
-        existingUploadSelected(upload) {
-            const path = `${this.folder.path}/${upload.basename}`.replace(/^\/+/, '');
-            const id = `${this.container.id}::${path}`;
-
-            this.selectedAssets.push(id);
-            this.$emit('selections-updated', this.selectedAssets);
-        },
-
-        openFileBrowser() {
-            this.$refs.uploader.browse();
-        },
-
-        folderCreated(folder) {
-            this.folders.push(folder);
-            this.folders = sortBy(this.folders, 'title');
-            this.creatingFolder = false;
+        shiftDown() {
+            this.shifting = true;
         },
 
         sorted(column, direction) {
             this.sortColumn = column;
             this.sortDirection = direction;
-        },
-
-        isSelected(id) {
-            return this.selectedAssets.includes(id);
         },
 
         toggleSelection(id, index, $event) {
@@ -539,26 +540,26 @@ export default {
             this.lastItemClicked = index;
         },
 
-        folderActions(folder) {
-            return folder.actions || this.folder.actions || [];
-        },
+        uploadCompleted(asset) {
+            if (this.autoselectUploads) {
+                this.sortColumn = 'last_modified';
+                this.sortDirection = 'desc';
 
-        selectRange(from, to) {
-            for (var i = from; i <= to; i++) {
-                let asset = this.assets[i].id;
-                if (!this.selectedAssets.includes(asset) && !this.reachedSelectionLimit) {
-                    this.selectedAssets.push(asset);
-                }
+                this.selectedAssets.push(asset.id);
                 this.$emit('selections-updated', this.selectedAssets);
             }
+
+            this.loadAssets();
+            this.$toast.success(__(':file uploaded', { file: asset.basename }));
         },
 
-        shiftDown() {
-            this.shifting = true;
+        uploadError(upload, uploads) {
+            this.uploads = uploads;
+            this.$toast.error(upload.errorMessage);
         },
 
-        clearShift() {
-            this.shifting = false;
+        uploadsUpdated(uploads) {
+            this.uploads = uploads;
         },
     },
 };

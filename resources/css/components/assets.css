@@ -112,7 +112,7 @@
 /* Asset Tile
    ========================================================================== */
 
-.asset-tile {
+/* .asset-tile {
     @apply relative flex min-w-0 cursor-pointer flex-col items-center justify-between rounded-sm border bg-white dark:border-dark-300 dark:bg-dark-600;
 
     .asset-thumb {
@@ -148,16 +148,16 @@
     .asset-controls {
         @apply absolute hidden;
     }
-}
+} */
 
-.asset-tile.selected {
+/* .asset-tile.selected {
     @apply border-blue dark:border-dark-blue-100;
     box-shadow: 0 0 0 1px var(--color-blue);
 }
 
 .asset-thumbnail {
     @apply border border-white dark:border-dark-950;
-}
+} */
 
 /* The Asset Editor
   ========================================================================== */

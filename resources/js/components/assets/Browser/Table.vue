@@ -1,7 +1,6 @@
 <template>
     <div class="overflow-x-auto overflow-y-hidden">
         <data-list-table
-            v-if="mode === 'table' && !containerIsEmpty"
             :allow-bulk-actions="true"
             :loading="loading"
             :toggle-selection-on-row-click="true"
@@ -96,48 +95,23 @@
 
 <script>
 import AssetThumbnail from './Thumbnail.vue';
+import AssetBrowserMixin from './AssetBrowserMixin';
 
 export default {
     components: {
         AssetThumbnail,
     },
 
+    mixins: [AssetBrowserMixin],
+
     props: {
-        mode: String,
-        containerIsEmpty: Boolean,
         loading: Boolean,
-        folder: Object,
-        folders: Array,
         columns: Array,
-        restrictFolderNavigation: Boolean,
-        folderActionUrl: String,
-        actionUrl: String,
-        canEdit: Boolean,
     },
 
     methods: {
-        selectFolder(path) {
-            this.$emit('select-folder', path);
-        },
-
-        folderActions(folder) {
-            return folder.actions || this.folder.actions || [];
-        },
-
-        edit(id) {
-            this.$emit('edit', id);
-        },
-
         sorted(column, direction) {
             this.$emit('sorted', column, direction);
-        },
-
-        actionStarted() {
-            this.$emit('action-started');
-        },
-
-        actionCompleted() {
-            this.$emit('action-completed');
         },
     },
 };
