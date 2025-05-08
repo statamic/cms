@@ -4,6 +4,7 @@ namespace Statamic\Fields;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Arr;
 use Statamic\Extend\HasHandle;
 use Statamic\Extend\RegistersItself;
 use Statamic\Facades\Blink;
@@ -208,6 +209,14 @@ abstract class Fieldtype implements Arrayable
 
         if (empty($fields) && empty($extras)) {
             return [];
+        }
+
+        if (! empty($extras)) {
+            $extraSections = collect($extras)->filter(fn ($field) => Arr::has($field, 'fields'));
+
+            $fields = collect($fields)->merge($extraSections);
+
+            $extras = collect($extras)->diffKeys($extraSections);
         }
 
         $extras = collect($extras)
