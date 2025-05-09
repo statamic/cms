@@ -51,7 +51,6 @@
                     :columns="columns"
                     :selections="selectedAssets"
                     :max-selections="maxFiles"
-                    :sort="false"
                     :sort-column="sortColumn"
                     :sort-direction="sortDirection"
                     @selections-updated="(ids) => $emit('selections-updated', ids)"

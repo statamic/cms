@@ -108,6 +108,7 @@
 <script>
 import AssetBrowserMixin from './AssetBrowserMixin';
 import Breadcrumbs from './Breadcrumbs.vue';
+import { debounce } from 'lodash-es';
 
 export default {
     mixins: [AssetBrowserMixin],
@@ -122,6 +123,19 @@ export default {
             actionOpened: null,
             thumbnailSize: 200,
         };
+    },
+
+    watch: {
+        thumbnailSize: {
+            handler: debounce(function(size) {
+                this.$preferences.set('asset-browser-thumbnail-size', size);
+            }, 300)
+        }
+    },
+
+    mounted() {
+        const savedSize = this.$preferences.get('asset-browser-thumbnail-size');
+        if (savedSize) this.thumbnailSize = savedSize;
     },
 
     computed: {
