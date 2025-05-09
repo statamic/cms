@@ -140,7 +140,7 @@ const limitIndicatorColor = computed(() => {
 
 const searchQuery = ref('');
 
-const results = computed(() => {
+const filteredOptions = computed(() => {
     if (!props.searchable || props.ignoreFilter) {
         return props.options;
     }
@@ -246,8 +246,8 @@ const dropdownOpen = ref(false);
                             </ComboboxEmpty>
 
                             <ComboboxItem
-                                v-if="results"
-                                v-for="(option, index) in results"
+                                v-if="filteredOptions"
+                                v-for="(option, index) in filteredOptions"
                                 :key="index"
                                 :value="option"
                                 :text-value="getOptionLabel(option)"
