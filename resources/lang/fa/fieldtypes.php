@@ -157,7 +157,6 @@ return [
     'select.config.multiple' => 'امکان انتخاب چندین گزینه را میسر سازید.',
     'select.config.options' => 'کلید‌ها و عناوین آنها را بیفزائید.',
     'select.config.placeholder' => 'متن مکان نگهدار را مشخص کنید.',
-    'select.config.push_tags' => 'آیتم‌های تازه ساخته شده به لیست گزینه‌ها افزوده شوند.',
     'select.config.searchable' => 'امکان جستجو بین گزینه‌ها فراهم باشد.',
     'select.config.taggable' => 'امکان افزودن گزینه‌های جدید در کنار گزینه‌های موجود فراهم باشد',
     'select.title' => 'انتخاب',

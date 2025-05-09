@@ -34,12 +34,6 @@ class Select extends Fieldtype
                         'type' => 'toggle',
                         'default' => false,
                     ],
-                    'push_tags' => [
-                        'display' => __('Push Tags'),
-                        'instructions' => __('statamic::fieldtypes.select.config.push_tags'),
-                        'type' => 'toggle',
-                        'default' => false,
-                    ],
                 ],
             ],
             [

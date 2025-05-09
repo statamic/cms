@@ -157,7 +157,6 @@ return [
     'select.config.multiple' => '複数の選択を許可します。',
     'select.config.options' => 'キーとそのオプションのラベルを設定します。',
     'select.config.placeholder' => 'プレースホルダーテキストを設定します。',
-    'select.config.push_tags' => '新しく作成したタグをオプション リストに追加します。',
     'select.config.searchable' => '可能なオプションによる検索を有効にします。',
     'select.config.taggable' => '事前定義されたオプションに加えて新しいオプションを追加できるようにする',
     'select.title' => '選択する',

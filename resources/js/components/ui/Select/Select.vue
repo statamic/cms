@@ -60,7 +60,7 @@ const itemClasses = cva({
 
 <template>
     <WithField :label :description>
-        <SelectRoot v-bind="attrs" :model-value="modelValue" @update:model-value="emit('update:model-value', $event)">
+        <SelectRoot v-bind="attrs" :model-value="modelValue" @update:model-value="emit('update:modelValue', $event)">
             <SelectTrigger :class="[triggerClasses, $attrs.class]" data-ui-select-trigger>
                 <SelectValue :placeholder="placeholder" class="select-none" />
                 <Icon name="ui/chevron-down" class="me-2" />

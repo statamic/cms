@@ -157,7 +157,6 @@ return [
     'select.config.multiple' => 'Povolit vícenásobný výběr.',
     'select.config.options' => 'Nastavení klíčů pole a jejich volitelných popisků.',
     'select.config.placeholder' => 'Nastavení zástupného textu.',
-    'select.config.push_tags' => 'Přidání nově vytvořených značek do seznamu možností.',
     'select.config.searchable' => 'Aktivujte vyhledávání podle dostupných možností.',
     'select.config.taggable' => 'Aktivujte možnost označování.',
     'select.title' => 'Výběr',

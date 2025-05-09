@@ -157,7 +157,6 @@ return [
     'select.config.multiple' => 'Dayakan berbilang pilihan.',
     'select.config.options' => 'Tetapkan kunci dan label pilihannya.',
     'select.config.placeholder' => 'Tetapkan teks pemegang tempat.',
-    'select.config.push_tags' => 'Tambahkan teg yang baru dibuat pada senarai pilihan.',
     'select.config.searchable' => 'Dayakan carian melalui pilihan yang mungkin.',
     'select.config.taggable' => 'Dayakan menambah pilihan baharu sebagai tambahan kepada pilihan pilihan yang telah ditetapkan.',
     'select.title' => 'Pilih',

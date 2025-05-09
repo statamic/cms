@@ -157,7 +157,6 @@ return [
     'select.config.multiple' => 'Birdən çox seçim etməyə icazə ver.',
     'select.config.options' => 'Açarları və isteğe bağlı etiketlərini təyin edin.',
     'select.config.placeholder' => 'Yer tutucu mətnini təyin edin.',
-    'select.config.push_tags' => 'Yeni yaradılmış etiketləri seçimlər siyahısına əlavə edin.',
     'select.config.searchable' => 'Mümkün seçimlər arasında axtarış etməyə icazə ver.',
     'select.config.taggable' => 'Öncədən təyin edilmiş seçimlərə əlavə olaraq yeni seçimlər əlavə etməyə icazə ver.',
     'select.title' => 'Seç',

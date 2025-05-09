@@ -5,6 +5,7 @@ import { default as Description } from './Description.vue';
 import { default as Calendar } from './Calendar/Calendar.vue';
 import { default as Card } from './Card/Card.vue';
 import { default as CardPanel } from './Card/Panel.vue';
+import { default as Combobox } from './Combobox.vue';
 import { default as DatePicker } from './Datepicker/DatePicker.vue';
 import { default as DateRangePicker } from './DateRangePicker/DateRangePicker.vue';
 import { default as TimePicker } from './TimePicker/TimePicker.vue';
@@ -43,6 +44,7 @@ export {
     Calendar,
     Card,
     CardPanel,
+    Combobox,
     DatePicker,
     DateRangePicker,
     TimePicker,

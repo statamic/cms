@@ -157,7 +157,6 @@ return [
     'select.config.multiple' => 'Zezwalaj na wiele wyborów.',
     'select.config.options' => 'Ustaw klucze i ich opcjonalne etykiety.',
     'select.config.placeholder' => 'Ustaw tekst zastępczy.',
-    'select.config.push_tags' => 'Dodaj nowo utworzone tagi do listy opcji.',
     'select.config.searchable' => 'Włącz przeszukiwanie dostępnych opcji.',
     'select.config.taggable' => 'Zezwól na dodawanie nowych opcji oprócz predefiniowanych.',
     'select.title' => 'Wybierz',

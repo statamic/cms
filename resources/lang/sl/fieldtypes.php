@@ -157,7 +157,6 @@ return [
     'select.config.multiple' => 'Dovoli več izbir.',
     'select.config.options' => 'Nastavite tipke in njihove izbirne nalepke.',
     'select.config.placeholder' => 'Nastavite nadomestno besedilo.',
-    'select.config.push_tags' => 'Na seznam možnosti dodajte novo ustvarjene oznake.',
     'select.config.searchable' => 'Omogočite iskanje po možnih možnostih.',
     'select.config.taggable' => 'Dovoli dodajanje novih možnosti poleg vnaprej določenih možnosti',
     'select.title' => 'Select',

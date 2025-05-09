@@ -159,7 +159,6 @@ return [
     'select.config.multiple' => 'Дозволити кілька виборів.',
     'select.config.options' => 'Встановіть ключі та їх необов’язкові мітки.',
     'select.config.placeholder' => 'Встановіть текст заповнювача.',
-    'select.config.push_tags' => 'Додати новостворені теги до списку опцій.',
     'select.config.searchable' => 'Дозволити пошук серед можливих опцій.',
     'select.config.taggable' => 'Дозволити додавання нових опцій, крім попередньо визначених',
     'select.title' => 'Вибір',

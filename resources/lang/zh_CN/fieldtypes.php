@@ -157,7 +157,6 @@ return [
     'select.config.multiple' => '允许多项选择。',
     'select.config.options' => '设置键及其可选标签。',
     'select.config.placeholder' => '设置默认的，不可选择的占位符文本。',
-    'select.config.push_tags' => '将新创建的标签添加到选项列表中。',
     'select.config.searchable' => '启用可能的选项搜索。',
     'select.config.taggable' => '除了预定义的选项外，还允许添加新的选项',
     'select.title' => '选择',

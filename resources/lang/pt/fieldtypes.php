@@ -157,7 +157,6 @@ return [
     'select.config.multiple' => 'Permitir selecções múltiplas.',
     'select.config.options' => 'Defina as chaves e as suas etiquetas opcionais.',
     'select.config.placeholder' => 'Defina o texto padrão, não seleccionável, dos espaços reservados.',
-    'select.config.push_tags' => 'Adicione etiquetas recentemente criadas à lista de opções.',
     'select.config.searchable' => 'Habilitar a pesquisa através de opções possíveis.',
     'select.config.taggable' => 'Permitir a adição de novas opções para além das opções pré-definidas',
     'select.title' => 'Select',

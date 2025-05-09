@@ -157,7 +157,6 @@ return [
     'select.config.multiple' => 'Sta meerdere selecties toe',
     'select.config.options' => 'Stel de keys hun optionele labels in.',
     'select.config.placeholder' => 'Stel de standaard, niet selecteerbare, placeholdertekst in.',
-    'select.config.push_tags' => 'Voeg nieuw aangemaakte tags toe aan de optie-lijst.',
     'select.config.searchable' => 'Sta zoeken door mogelijke opties toe.',
     'select.config.taggable' => 'Sta het toevoegen van nieuwe opties toe.',
     'select.title' => 'Select',

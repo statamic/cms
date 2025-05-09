@@ -157,7 +157,6 @@ return [
     'select.config.multiple' => '允許多選。',
     'select.config.options' => '設定鍵值與其標籤。',
     'select.config.placeholder' => '設定預留位置文字。',
-    'select.config.push_tags' => '新增新建立的標籤至選項列表。',
     'select.config.searchable' => '啟用在各個可能選項間的搜尋。',
     'select.config.taggable' => '允許新增除了預定義選項外的新選項',
     'select.title' => '選擇',

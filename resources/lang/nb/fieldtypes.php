@@ -157,7 +157,6 @@ return [
     'select.config.multiple' => 'Tillat flere valg.',
     'select.config.options' => 'Angi nøkler og tilknyttede valgfrie etiketter.',
     'select.config.placeholder' => 'Angi plassholdertekst.',
-    'select.config.push_tags' => 'Legg til nyopprettede koder til valglisten.',
     'select.config.searchable' => 'Aktiver søk gjennom mulige alternativer.',
     'select.config.taggable' => 'Tillat å tilføye nye alternativer i tillegg til forhåndsdefinerte alternativer',
     'select.title' => 'Velg',

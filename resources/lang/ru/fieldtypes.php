@@ -157,7 +157,6 @@ return [
     'select.config.multiple' => 'Разрешить множественный выбор.',
     'select.config.options' => 'Установите клавиши и их дополнительные метки.',
     'select.config.placeholder' => 'Задайте текст заполнителя.',
-    'select.config.push_tags' => 'Добавить вновь созданные теги в список опций.',
     'select.config.searchable' => 'Включить поиск по возможным вариантам.',
     'select.config.taggable' => 'Разрешить добавление новых опций в дополнение к предварительно заданным',
     'select.title' => 'Выбор',

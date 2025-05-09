@@ -158,7 +158,6 @@ return [
     'select.config.multiple' => 'Autorisez des sélections multiples.',
     'select.config.options' => 'Définissez les clés et leurs étiquettes facultatives.',
     'select.config.placeholder' => 'Définissez un texte d’espace réservé.',
-    'select.config.push_tags' => 'Ajoutez les étiquettes nouvellement créées à la liste d’options.',
     'select.config.searchable' => 'Activez la recherche parmi les options possibles.',
     'select.config.taggable' => 'Autorisez l’ajout de nouvelles options en plus des options prédéfinies.',
     'select.title' => 'Select',
