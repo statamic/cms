@@ -146,7 +146,7 @@ export default {
 
     methods: {
         truncateFilename(filename) {
-            const maxLength = Math.floor(this.thumbnailSize / 7); // 20 chars at 200px, 30 chars at 300px
+            const maxLength = Math.floor(this.thumbnailSize / 7);
             if (filename.length <= maxLength) return filename;
 
             const extension = filename.split('.').pop();
