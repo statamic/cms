@@ -116,6 +116,12 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         $this->supplements = collect();
     }
 
+    public function __clone()
+    {
+        $this->data = clone $this->data;
+        $this->supplements = clone $this->supplements;
+    }
+
     public function id($id = null)
     {
         if ($id) {

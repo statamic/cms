@@ -48,6 +48,12 @@ class Submission implements Augmentable, SubmissionContract
         $this->supplements = collect();
     }
 
+    public function __clone()
+    {
+        $this->data = clone $this->data;
+        $this->supplements = clone $this->supplements;
+    }
+
     /**
      * Get or set the ID.
      *

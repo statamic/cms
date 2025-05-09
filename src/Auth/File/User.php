@@ -39,6 +39,12 @@ class User extends BaseUser
         $this->supplements = collect();
     }
 
+    public function __clone()
+    {
+        $this->data = clone $this->data;
+        $this->supplements = clone $this->supplements;
+    }
+
     public function data($data = null)
     {
         if (func_num_args() === 0) {
