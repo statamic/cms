@@ -7,7 +7,7 @@ const props = defineProps({
     description: { type: String, default: null },
     id: { type: String, default: () => useId() },
     label: { type: String, default: null },
-    modelValue: { type: Number, default: false },
+    modelValue: { type: Number, default: 0 },
     min: { type: Number, default: 0 },
     max: { type: Number, default: 100 },
     step: { type: Number, default: 1 },
@@ -69,7 +69,7 @@ const thumbClasses = cva({
         :max="max"
         :min="min"
         :step="step"
-        :value="[modelValue]"
+        :model-value="[modelValue]"
         @update:model-value="$emit('update:modelValue', $event[0])"
     >
         <SliderTrack :class="trackClasses">
