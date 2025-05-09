@@ -41,8 +41,46 @@ code.parent-url {
 }
 
 .publish-fields {
-    @apply flex flex-wrap;
+    @apply flex flex-wrap gap-3 lg:gap-8;
+    --col-width: calc(100% / 12);
 
+    .form-group {
+        --col-span: 12;
+        flex-basis: calc(var(--col-width) * 12 - var(--spacing) * 3);
+        flex-grow: 1;
+    }
+
+    .field-w-10  { --col-span: 1; }
+    .field-w-20  { --col-span: 2; }
+    .field-w-25  { --col-span: 3; }
+    .field-w-33  { --col-span: 4; }
+    .field-w-40  { --col-span: 5; }
+    .field-w-50  { --col-span: 6; }
+    .field-w-60  { --col-span: 7; }
+    .field-w-66  { --col-span: 8; }
+    .field-w-75  { --col-span: 9; }
+    .field-w-80  { --col-span: 10; }
+    .field-w-90  { --col-span: 11; }
+    .field-w-100 { --col-span: 12; }
+
+    [data-cards-wrap="fields"] & {
+        @apply gap-1;
+        .form-group {
+            flex-basis: calc(var(--col-width) * 12 - calc(var(--spacing) * 1));
+        }
+    }
+}
+
+@variant lg {
+    .publish-fields .form-group {
+        flex-basis: calc(var(--col-width) * var(--col-span) - calc(var(--spacing) * 8));
+    }
+    [data-cards-wrap="fields"] .publish-fields .form-group {
+        flex-basis: calc(var(--col-width) * var(--col-span) - calc(var(--spacing) * 1));
+    }
+}
+
+.publish-field {
     .form-group {
         > label,
         .field-inner > label {
@@ -90,8 +128,11 @@ code.parent-url {
     @apply flex items-center;
 }
 
-.publish-sections-section {
+.publish-sections .publish-sections-section {
     @apply mb-8;
+    [data-cards-wrap="fields"] & {
+        @apply mb-12;
+    }
 }
 
 .publish-section-header {

@@ -159,7 +159,6 @@
 .bard-index-field,
 .code-index-field,
 .markdown-index-field,
-.text-index-field,
 .textarea-index-field {
     @apply line-clamp-2 text-xs;
 }

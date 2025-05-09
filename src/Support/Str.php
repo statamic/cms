@@ -261,7 +261,7 @@ class Str
             100 => 'full'
         ];
 
-        $size = is_numeric($width) ? ($legacyMap[$width] ?? 'md') : $width;
+        $size = is_numeric($width) ? ($legacyMap[$width] ?? 'full') : $width;
 
         return $sizes[$size] ?? $sizes['md'];
     }

@@ -6,7 +6,7 @@ const hasDefaultSlot = !!slots.default;
 
 const props = defineProps({
     required: { type: Boolean, default: false },
-    text: { type: String, default: null },
+    text: { type: [String, Number, Boolean, null], default: null },
 });
 
 </script>

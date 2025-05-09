@@ -55,11 +55,11 @@ export default {
     data() {
         return {
             store: usePublishContainerStore(this.name, {
-                blueprint: clone(this.blueprint),
-                values: clone(this.values),
-                extraValues: clone(this.extraValues),
-                meta: clone(this.meta),
-                localizedFields: clone(this.localizedFields),
+                blueprint: this.blueprint,
+                values: this.values,
+                extraValues: this.extraValues,
+                meta: this.meta,
+                localizedFields: this.localizedFields,
                 site: this.site,
                 isRoot: this.isRoot,
                 reference: this.reference,

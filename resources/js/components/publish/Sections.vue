@@ -1,7 +1,8 @@
 <template>
     <div class="publish-sections">
         <div class="publish-sections-section" v-for="(section, i) in visibleSections" :key="i">
-            <CardPanel :heading="__(section.display) || heading" :description="__(section.instructions) || description">
+            <Panel :heading="__(section.display) || heading" :description="__(section.instructions) || description">
+                <component :is="wrapperComponent">
                 <publish-fields
                     :fields="section.fields"
                     :read-only="readOnly"
@@ -13,15 +14,16 @@
                     @desynced="$emit('desynced', $event)"
                     @focus="$emit('focus', $event)"
                     @blur="$emit('blur', $event)"
-                />
-            </CardPanel>
+                    />
+                </component>
+            </Panel>
         </div>
     </div>
 </template>
 
 <script>
 import { ValidatesFieldConditions } from '../field-conditions/FieldConditions.js';
-import { CardPanel } from '@statamic/ui';
+import { Panel, Card } from '@statamic/ui';
 
 export default {
     emits: ['updated', 'meta-updated', 'synced', 'desynced', 'focus', 'blur'],
@@ -29,7 +31,8 @@ export default {
     mixins: [ValidatesFieldConditions],
 
     components: {
-        CardPanel,
+        Panel,
+        Card,
     },
 
     props: {
@@ -42,7 +45,10 @@ export default {
         namePrefix: { type: String, default: '' },
     },
 
-    inject: ['publishContainer'],
+    inject: {
+        publishContainer: {},
+        wrapFieldsInCards: { default: false }
+    },
 
     computed: {
         values() {
@@ -55,6 +61,10 @@ export default {
 
         visibleSections() {
             return this.sections.filter((section) => this.sectionHasVisibleFields(section));
+        },
+
+        wrapperComponent() {
+            return this.wrapFieldsInCards ? 'div' : 'Card';
         },
     },
 

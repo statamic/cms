@@ -305,7 +305,7 @@ input[type='file'] {
 /* Form groups
   ========================================================================== */
 .form-group {
-    @apply m-0 pb-3 last:pb-0;
+    /* @apply m-0 pb-3 last:pb-0; */
 
     label {
         font-weight: 500;

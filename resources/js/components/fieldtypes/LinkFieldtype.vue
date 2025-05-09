@@ -5,7 +5,7 @@
             <Select :options v-model="option" />
         </div>
 
-        <div class="flex-1">
+        <div class="flex-1 truncate">
             <!-- URL text input -->
             <Input v-if="option === 'url'" v-model="urlValue" />
 

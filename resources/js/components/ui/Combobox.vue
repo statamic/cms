@@ -271,7 +271,6 @@ const dropdownOpen = ref(false);
             </div>
         </div>
 
-        <slot name="selected-options" v-bind="{ disabled, labelHtml, deselect }">
         <slot name="selected-options" v-bind="{ disabled, getOptionLabel, getOptionValue, labelHtml, deselect }">
             <sortable-list
                 v-if="multiple"

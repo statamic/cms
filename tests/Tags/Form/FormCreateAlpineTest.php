@@ -809,6 +809,35 @@ EOT
         $this->assertStringContainsString($expected, $output);
     }
 
+    #[Test]
+    public function it_properly_escapes_show_field_js_in_blade()
+    {
+        $output = $this->blade(<<<'EOT'
+<s:form:contact js="alpine">
+    <template x-if="{{ $show_field['message'] }}"></template>
+    <template x-if="{{ $show_field['my_favourites'] }}"></template>
+    <template x-if="{{ $show_field['my_favourites.favourite_animals'] }}"></template>
+    <s:form:fields>
+        @if ($field['handle'] === 'message')
+            <template x-if="{{ $field['show_field'] }}"></template>
+        @endif
+    </s:form:fields>
+</s:form:contact>
+EOT
+        );
+
+        preg_match_all('/<template x-if="(.+)"><\/template>/U', $output, $js);
+
+        $expected = [
+            'Statamic.$conditions.showField('.$this->jsonEncode(['if' => ['email' => 'not empty']]).', $data, \'message\')',
+            'Statamic.$conditions.showField('.$this->jsonEncode(['if' => ['name' => 'not empty']]).', $data, \'my_favourites\')',
+            'Statamic.$conditions.showField('.$this->jsonEncode(['if' => ['$root.likes_animals' => 'is true']]).', $data, \'my_favourites.favourite_animals\')',
+            'Statamic.$conditions.showField('.$this->jsonEncode(['if' => ['email' => 'not empty']]).', $data, \'message\')',
+        ];
+
+        $this->assertSame($expected, $js[1]);
+    }
+
     private function jsonEncode($data)
     {
         return Statamic::modify($data)->toJson()->entities();

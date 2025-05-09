@@ -44,11 +44,12 @@
                                 <publish-field-meta
                                     :config="{ handle: 'icon', type: 'icon', folder: 'light' }"
                                     :initial-value="config.icon"
-                                    v-slot="{ meta, value, loading }"
+                                    v-slot="{ meta, value, loading, config: fieldtypeConfig }"
                                 >
                                     <icon-fieldtype
                                         v-if="!loading"
                                         handle="icon"
+                                        :config="fieldtypeConfig"
                                         :meta="meta"
                                         :value="value"
                                         @update:value="config.icon = $event"

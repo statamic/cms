@@ -18,7 +18,6 @@
                 v-if="canCreateContainers"
                 :href="createContainerUrl"
                 :text="__('Create Container')"
-                variant="primary"
             />
         </Header>
 

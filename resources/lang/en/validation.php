@@ -169,6 +169,7 @@ return [
     'date_fieldtype_time_required' => 'Time is required.',
     'duplicate_field_handle' => 'A field with a handle of :handle already exists.',
     'duplicate_uri' => 'Duplicate URI :value',
+    'elevated_session_verification_code' => 'The verification code is incorrect.',
     'email_available' => 'A user with this email already exists.',
     'fieldset_imported_recursively' => 'Fieldset :handle is being imported recursively.',
     'one_site_without_origin' => 'At least one site must not have an origin.',
@@ -189,6 +190,8 @@ return [
     'asset_file_exists' => 'A file already exists with this name.',
     'asset_file_exists_same_content' => 'A file already exists with this name and has the same content. You may want to delete this rather than rename it.',
     'asset_file_exists_different_content' => 'A file already exists with this name but has different content. You may want to replace the other file with this one instead.',
+    'invalid_two_factor_code' => 'The provided two factor authentication code was invalid.',
+    'invalid_two_factor_recovery_code' => 'The provided two factor recovery code was invalid.',
 
     /*
     |--------------------------------------------------------------------------
