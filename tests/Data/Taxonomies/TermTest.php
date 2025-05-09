@@ -487,7 +487,7 @@ class TermTest extends TestCase
     {
         $taxonomy = (new TaxonomiesTaxonomy)->handle('tags')->save();
         $term = (new Term)->taxonomy('tags')->slug('foo')->data(['foo' => 'bar'])->inDefaultLocale();
-        
+
         $term->set('foo', 'A');
         $term->setSupplement('bar', 'A');
 
