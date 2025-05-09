@@ -67,7 +67,7 @@
                                             'p-1 rounded-lg': asset.orientation === 'square'
                                         }"
                                     />
-                                    <file-icon v-else :extension="asset.extension" class="size-full p-4" />
+                                    <file-icon v-else :extension="asset.extension" class="size-1/2" />
                                 </div>
                             </div>
                         </button>
