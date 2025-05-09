@@ -77,11 +77,13 @@ const itemClasses = cva({
 const selectedOptions = computed(() => {
     let selections = props.modelValue === null ? [] : props.modelValue;
 
-    if (! props.multiple) {
+    if (typeof selections === 'string' || typeof selections === 'number') {
         selections = [selections];
     }
 
-    return selections;
+    return selections.map(value => {
+        return props.options.find(option => option.value === value) ?? { label: value, value };
+    });
 });
 
 const selectedOption = computed(() => {
@@ -249,8 +251,8 @@ const dropdownOpen = ref(false);
                                 v-if="filteredOptions"
                                 v-for="(option, index) in filteredOptions"
                                 :key="index"
-                                :value="option"
-                                :text-value="getOptionLabel(option)"
+                                :value="option.value"
+                                :text-value="option.label"
                                 :class="itemClasses({ size: size, selected: isSelected(option) })"
                                 as="button"
                                 @select="dropdownOpen = false"
@@ -297,7 +299,7 @@ const dropdownOpen = ref(false);
                                 type="button"
                                 class="vs__deselect"
                                 :aria-label="__('Deselect option')"
-                                @click="deselect(option)"
+                                @click="deselect(option.value)"
                             >
                                 <span>×</span>
                             </button>

@@ -10,7 +10,7 @@
         :disabled="config.disabled || isReadOnly"
         :max-selections="config.max_items"
         :label-html="config.label_html"
-        :model-value="comboboxValue"
+        :model-value="value"
         @update:modelValue="comboboxUpdated"
     />
 </template>
@@ -31,14 +31,6 @@ export default {
     },
 
     computed: {
-        comboboxValue() {
-            if (! this.config.multiple) {
-                return this.selectedOptions.length ? this.selectedOptions[0] : null;
-            }
-
-            return this.selectedOptions;
-        },
-
         selectedOptions() {
             let selections = this.value === null ? [] : this.value;
 
@@ -47,7 +39,7 @@ export default {
             }
 
             return selections.map(value => {
-                return this.options.find(option => option.value === value) ?? { label: value, value };
+                return props.options.find(option => option.value === value) ?? { label: value, value };
             });
         },
 
@@ -64,15 +56,7 @@ export default {
 
     methods: {
         comboboxUpdated(value) {
-            if (this.config.multiple) {
-                this.update(value.map(v => v.value));
-            } else {
-                if (value) {
-                    this.update(value.value)
-                } else {
-                    this.update(null);
-                }
-            }
+            this.update(value || null);
         },
     },
 };
