@@ -2,7 +2,7 @@
     <ui-panel v-if="!containerIsEmpty">
         <ui-panel-header class="p-1! flex items-center justify-between">
             <breadcrumbs v-if="!restrictFolderNavigation" :path="path" @navigated="selectFolder" />
-            <ui-slider size="sm" class="mr-2 w-24!" variant="subtle" v-model="thumbnailSize" :min="60" :max="300" :step="5" />
+            <ui-slider size="sm" class="mr-2 w-24!" variant="subtle" v-model="thumbnailSize" :min="60" :max="300" :step="25" />
         </ui-panel-header>
         <!-- Folders -->
         <ui-card class="space-y-8">
@@ -93,7 +93,7 @@
                     </div>
                     <div
                         class="asset-filename"
-                        v-text="asset.basename"
+                        v-text="truncateFilename(asset.basename)"
                         :title="asset.basename"
                     />
                 </div>
@@ -145,6 +145,16 @@ export default {
     },
 
     methods: {
+        truncateFilename(filename) {
+            const maxLength = Math.floor(this.thumbnailSize / 7); // 20 chars at 200px, 30 chars at 300px
+            if (filename.length <= maxLength) return filename;
+
+            const extension = filename.split('.').pop();
+            const name = filename.slice(0, -(extension.length + 1));
+            const charsToKeep = Math.floor((maxLength - 3 - extension.length) / 2);
+
+            return `${name.slice(0, charsToKeep)}…${name.slice(-charsToKeep)}.${extension}`;
+        },
 
         isSelected(id) {
             return this.selectedAssets.includes(id);
