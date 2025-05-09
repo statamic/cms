@@ -30,6 +30,8 @@ const props = defineProps({
     taggable: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
     maxSelections: { type: Number, default: null },
+    optionLabel: { type: String, default: 'label' },
+    optionValue: { type: String, default: 'value' },
     labelHtml: { type: Boolean, default: false },
     ignoreFilter: { type: Boolean, default: false },
     options: { type: Array, default: null },
@@ -90,8 +92,24 @@ const selectedOption = computed(() => {
    return selectedOptions.value[0];
 });
 
+function getOptionLabel(option) {
+    if (!option) {
+        return;
+    }
+
+    return option[props.optionLabel];
+}
+
+function getOptionValue(option) {
+    if (! option) {
+        return;
+    }
+
+    return option[props.optionValue];
+}
+
 function isSelected(option) {
-    return selectedOptions.value.filter((item) => item.value === option.value).length > 0;
+    return selectedOptions.value.filter((item) => getOptionValue(item) === getOptionValue(option)).length > 0;
 }
 
 const limitReached = computed(() => {
@@ -131,15 +149,15 @@ const results = computed(() => {
 
     if (props.taggable && searchQuery.value) {
         options.push({
-            label: searchQuery.value,
-            value: searchQuery.value,
+            [props.optionLabel]: searchQuery.value,
+            [props.optionValue]: searchQuery.value,
         });
     }
 
     return fuzzysort
         .go(searchQuery.value, options, {
             all: true,
-            key: 'label',
+            key: props.optionLabel,
         })
         .map((result) => result.obj);
 });
@@ -196,7 +214,7 @@ const dropdownOpen = ref(false);
                             :placeholder
                         />
                         <slot name="selected-option" v-bind="{ option: selectedOption }" v-else>
-                            <div class="cursor-pointer" v-text="selectedOption?.label"></div>
+                            <div class="cursor-pointer" v-text="getOptionLabel(selectedOption)"></div>
                         </slot>
                     </ComboboxTrigger>
                     <div class="flex items-center space-x-2 pl-2">
@@ -232,15 +250,15 @@ const dropdownOpen = ref(false);
                                 v-for="(option, index) in results"
                                 :key="index"
                                 :value="option"
-                                :text-value="option.label"
+                                :text-value="getOptionLabel(option)"
                                 :class="itemClasses({ size: size, selected: isSelected(option) })"
                                 as="button"
                                 @select="dropdownOpen = false"
                             >
                                 <slot name="option" v-bind="option">
                                     <img v-if="option.image" :src="option.image" class="size-5 rounded-full" />
-                                    <span v-if="labelHtml" v-html="option.label" />
-                                    <span v-else>{{ option.label }}</span>
+                                    <span v-if="labelHtml" v-html="getOptionLabel(option)" />
+                                    <span v-else>{{ __(getOptionLabel(option)) }}</span>
                                 </slot>
                             </ComboboxItem>
                         </ComboboxViewport>
@@ -254,6 +272,7 @@ const dropdownOpen = ref(false);
         </div>
 
         <slot name="selected-options" v-bind="{ disabled, labelHtml, deselect }">
+        <slot name="selected-options" v-bind="{ disabled, getOptionLabel, getOptionValue, labelHtml, deselect }">
             <sortable-list
                 v-if="multiple"
                 item-class="sortable-item"
@@ -267,12 +286,12 @@ const dropdownOpen = ref(false);
                 <div class="vs__selected-options-outside flex gap-2 flex-wrap">
                      <div
                         v-for="option in selectedOptions"
-                        :key="option.value"
+                        :key="getOptionValue(option)"
                         class="vs__selected sortable-item mt-2"
                     >
                         <Badge pill size="lg">
-                            <div v-if="labelHtml" v-html="option.label"></div>
-                            <div v-else>{{ __(option.label) }}</div>
+                            <div v-if="labelHtml" v-html="getOptionLabel(option)"></div>
+                            <div v-else>{{ __(getOptionLabel(option)) }}</div>
 
                             <button
                                 v-if="!disabled"
