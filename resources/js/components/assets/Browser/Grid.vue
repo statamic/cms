@@ -48,9 +48,9 @@
                     v-for="(asset, index) in assets"
                     :key="asset.id"
                     class="group relative"
-                    :class="{ selected: isSelected(asset.id) }"
+                    :class="{ 'selected': isSelected(asset.id) }"
                 >
-                    <div class="asset-tile group relative" :class="{ 'bg-checkerboard': asset.can_be_transparent }">
+                    <div class="asset-tile group relative" :class="{ 'bg-checkerboard': asset.can_be_transparent, }">
                         <button
                             class="size-full"
                             @click.stop="toggleSelection(asset.id, index, $event)"
@@ -92,7 +92,7 @@
                         </dropdown-list>
                     </div>
                     <div
-                        class="font-mono text-xs text-gray-500 mt-2 overflow-hidden text-ellipsis whitespace-nowrap text-center"
+                        class="asset-filename"
                         v-text="asset.basename"
                         :title="asset.basename"
                     />
@@ -151,7 +151,7 @@ export default {
         },
 
         toggleSelection(id, index, $event) {
-            this.$emit('toggle-selection', { id, index, event: $event });
+            this.$emit('toggle-selection', id, index, $event);
         },
     },
 };

@@ -114,6 +114,10 @@
 .asset-tile {
     @apply relative flex min-w-0 cursor-pointer flex-col items-center justify-between rounded-lg outline outline-gray-300 dark:outline-gray-700;
 
+    .selected & {
+        @apply outline-3 outline-blue-500;
+    }
+
     .asset-thumb {
         @apply flex items-center justify-center size-full;
         > img,
@@ -136,14 +140,12 @@
     }
 }
 
-/* .asset-tile.selected {
-    @apply border-blue dark:border-dark-blue-100;
-    box-shadow: 0 0 0 1px var(--color-blue);
+.asset-filename {
+    @apply font-mono text-xs text-gray-500 mt-2 overflow-hidden text-ellipsis whitespace-nowrap text-center;
+    .selected & {
+        @apply text-blue-500;
+    }
 }
-
-.asset-thumbnail {
-    @apply border border-white dark:border-dark-950;
-} */
 
 /* The Asset Editor
   ========================================================================== */
