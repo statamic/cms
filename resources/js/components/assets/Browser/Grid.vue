@@ -12,8 +12,8 @@
                     :key="folder.path"
                     v-if="!restrictFolderNavigation"
                 >
-                    <button @click="selectFolder(folder.path)" class="w-[80px] h-[66px]">
-                        <ui-icon name="asset-folder" class="size-full text-blue-400" />
+                    <button @click="selectFolder(folder.path)" class="w-[80px] h-[66px] group">
+                        <ui-icon name="asset-folder" class="size-full text-blue-400/90 hover:text-blue-400" />
                         <div
                             class="font-mono text-xs text-gray-500 text-center overflow-hidden text-ellipsis whitespace-nowrap"
                             v-text="folder.basename"
@@ -95,6 +95,10 @@
                 </div>
             </section>
         </ui-card>
+        <ui-panel-footer>
+            <!-- <slot name="pagination" /> -->
+            Slider goes here
+        </ui-panel-footer>
     </ui-panel>
 </template>
 

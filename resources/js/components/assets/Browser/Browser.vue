@@ -91,7 +91,16 @@
                                 :assets="assets"
                                 :selected-assets="selectedAssets"
                                 @toggle-selection="toggleSelection"
-                            />
+                            >
+                                <template #pagination>
+                                    <data-list-pagination
+                                        :resource-meta="meta"
+                                        :per-page="perPage"
+                                        @page-selected="page = $event"
+                                        @per-page-changed="changePerPage"
+                                    />
+                                </template>
+                            </Grid>
 
                             <div
                                 class="p-4 text-gray-700"
@@ -100,13 +109,13 @@
                             />
                         </div>
 
-                        <data-list-pagination
+                        <!-- <data-list-pagination
                             class="mt-6"
                             :resource-meta="meta"
                             :per-page="perPage"
                             @page-selected="page = $event"
                             @per-page-changed="changePerPage"
-                        />
+                        /> -->
                     </div>
 
                     <data-list-bulk-actions
