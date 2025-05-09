@@ -82,7 +82,7 @@ const selectedOptions = computed(() => {
     }
 
     return selections.map(value => {
-        return props.options.find(option => option.value === value) ?? { label: value, value };
+        return props.options.find(option => getOptionValue(option) === value) ?? { label: value, value };
     });
 });
 
@@ -251,8 +251,8 @@ const dropdownOpen = ref(false);
                                 v-if="filteredOptions"
                                 v-for="(option, index) in filteredOptions"
                                 :key="index"
-                                :value="option.value"
-                                :text-value="option.label"
+                                :value="getOptionValue(option)"
+                                :text-value="getOptionLabel(option)"
                                 :class="itemClasses({ size: size, selected: isSelected(option) })"
                                 as="button"
                                 @select="dropdownOpen = false"
