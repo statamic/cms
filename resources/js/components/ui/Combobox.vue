@@ -16,7 +16,7 @@ import { WithField, Icon, Badge } from '@statamic/ui';
 import fuzzysort from 'fuzzysort';
 import { SortableList } from '@statamic/components/sortable/Sortable.js';
 
-const emit = defineEmits(['update:modelValue', 'search']);
+const emit = defineEmits(['update:modelValue', 'update:selectedOptions', 'search']);
 
 const props = defineProps({
     description: { type: String, default: null },
@@ -74,8 +74,8 @@ const itemClasses = cva({
     },
 });
 
-const selectedOptions = computed(() => {
-    let selections = props.modelValue === null ? [] : props.modelValue;
+function getSelectedOptions(value) {
+    let selections = value === null ? [] : value;
 
     if (typeof selections === 'string' || typeof selections === 'number') {
         selections = [selections];
@@ -84,7 +84,9 @@ const selectedOptions = computed(() => {
     return selections.map(value => {
         return props.options.find(option => getOptionValue(option) === value) ?? { label: value, value };
     });
-});
+}
+
+const selectedOptions = computed(() => getSelectedOptions(props.modelValue));
 
 const selectedOption = computed(() => {
    if (props.multiple || !props.modelValue || selectedOptions.value.length !== 1) {
@@ -164,10 +166,6 @@ const filteredOptions = computed(() => {
         .map((result) => result.obj);
 });
 
-watch(() => props.modelValue, (value) => {
-    searchQuery.value = '';
-});
-
 watch(searchQuery, (value) => {
     emit('search', value, () => {});
 })
@@ -189,6 +187,13 @@ function deselect(option) {
     emit('update:modelValue', props.modelValue.filter((item) => item !== option));
 }
 
+function updateModelValue(value) {
+    searchQuery.value = '';
+
+    emit('update:modelValue', value);
+    emit('update:selectedOptions', getSelectedOptions(value));
+}
+
 const dropdownOpen = ref(false);
 </script>
 
@@ -204,7 +209,7 @@ const dropdownOpen = ref(false);
                 :disabled="disabled || (multiple && limitReached)"
                 v-model:open="dropdownOpen"
                 :model-value="modelValue"
-                @update:model-value="emit('update:modelValue', $event)"
+                @update:model-value="updateModelValue"
             >
                 <ComboboxAnchor :class="[anchorClasses, $attrs.class]" data-ui-combobox-anchor>
                     <ComboboxTrigger as="div" class="w-full min-h-full">
