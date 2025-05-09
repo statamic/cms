@@ -36,4 +36,9 @@ abstract class Protector
 
         return $this;
     }
+
+    public function cacheable()
+    {
+        return false;
+    }
 }
