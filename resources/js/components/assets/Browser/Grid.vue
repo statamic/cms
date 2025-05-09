@@ -1,7 +1,8 @@
 <template>
     <ui-panel v-if="!containerIsEmpty">
-        <ui-panel-header class="p-1!">
+        <ui-panel-header class="p-1! flex items-center justify-between">
             <breadcrumbs v-if="!restrictFolderNavigation" :path="path" @navigated="selectFolder" />
+            <ui-slider size="sm" class="mr-2 w-24!" variant="subtle" v-model="thumbnailSize" :min="60" :max="300" :step="5" />
         </ui-panel-header>
         <!-- Folders -->
         <ui-card class="space-y-8">
@@ -39,7 +40,10 @@
             </section>
 
             <!-- Assets -->
-            <section class="asset-grid-listing" :class="{ compact: variant === 'compact' }" v-if="assets.length">
+            <section class="asset-grid-listing"
+                v-if="assets.length"
+                :style="{ gridTemplateColumns: gridSize }"
+            >
                 <div
                     v-for="(asset, index) in assets"
                     :key="asset.id"
@@ -96,8 +100,7 @@
             </section>
         </ui-card>
         <ui-panel-footer>
-            <!-- <slot name="pagination" /> -->
-            Slider goes here
+            <slot name="footer" />
         </ui-panel-footer>
     </ui-panel>
 </template>
@@ -112,13 +115,19 @@ export default {
     props: {
         assets: { type: Array },
         selectedAssets: { type: Array },
-        variant: { type: String, default: 'default' },
     },
 
     data() {
         return {
             actionOpened: null,
+            thumbnailSize: 200,
         };
+    },
+
+    computed: {
+        gridSize() {
+            return `repeat(auto-fill, minmax(${this.thumbnailSize}px, 1fr))`;
+        },
     },
 
     methods: {

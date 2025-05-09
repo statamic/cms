@@ -105,13 +105,7 @@
   ========================================================================== */
 
 .asset-grid-listing {
-    @apply relative grid gap-10;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-}
-
-.asset-grid-listing.compact {
-    @apply relative grid gap-6;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    @apply relative grid gap-6 xl:gap-10;
 }
 
 /* Asset Tile

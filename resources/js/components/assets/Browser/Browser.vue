@@ -20,7 +20,6 @@
 
             <ui-toggle-group v-model="mode">
                 <ui-toggle-item icon="layout-grid" value="grid" />
-                <ui-toggle-item icon="layout-grid-compact" value="grid-compact" />
                 <ui-toggle-item icon="layout-list" value="table" />
             </ui-toggle-group>
         </Header>
@@ -84,15 +83,14 @@
 
                             <!-- Grid Mode -->
                             <Grid
-                                v-if="mode === 'grid' || mode === 'grid-compact'"
+                                v-if="mode === 'grid'"
                                 v-bind="sharedAssetProps"
                                 v-on="sharedAssetEvents"
-                                :variant="mode === 'grid-compact' ? 'compact' : 'default'"
                                 :assets="assets"
                                 :selected-assets="selectedAssets"
                                 @toggle-selection="toggleSelection"
                             >
-                                <template #pagination>
+                                <template #footer>
                                     <data-list-pagination
                                         :resource-meta="meta"
                                         :per-page="perPage"
