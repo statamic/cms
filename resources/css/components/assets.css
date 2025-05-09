@@ -108,6 +108,11 @@
     @apply relative grid gap-6 xl:gap-10;
 }
 
+.folder-grid-listing {
+    @apply relative grid gap-8;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+}
+
 /* Asset Tile
    ========================================================================== */
 

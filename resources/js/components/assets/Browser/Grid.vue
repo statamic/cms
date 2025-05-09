@@ -6,7 +6,7 @@
         </ui-panel-header>
         <!-- Folders -->
         <ui-card class="space-y-8">
-            <section class="flex flex-wrap gap-8" v-if="folders.length">
+            <section class="folder-grid-listing" v-if="folders.length">
                 <div
                     class="group/folder relative"
                     v-for="folder in folders"
