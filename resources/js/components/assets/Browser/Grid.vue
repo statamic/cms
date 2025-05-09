@@ -50,7 +50,7 @@
                     class="group relative"
                     :class="{ 'selected': isSelected(asset.id) }"
                 >
-                    <div class="asset-tile group relative" :class="{ 'bg-checkerboard': asset.can_be_transparent, }">
+                    <div class="asset-tile group relative" :class="{ 'bg-checkerboard': asset.can_be_transparent }">
                         <button
                             class="size-full"
                             @click.stop="toggleSelection(asset.id, index, $event)"

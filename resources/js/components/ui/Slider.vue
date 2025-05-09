@@ -28,7 +28,7 @@ const rootClasses = cva({
 })({ ...props });
 
 const trackClasses = cva({
-    base: 'relative grow rounded-full bg-gray-300/80',
+    base: 'relative grow rounded-full bg-gray-300/80 dark:bg-gray-800',
     variants: {
         size: {
             sm: 'h-1',
@@ -41,13 +41,13 @@ const rangeClasses = cva({
     base: 'absolute h-full rounded-full',
     variants: {
         variant: {
-            default: 'bg-slate-900',
+            default: 'bg-gray-900',
         },
     },
 })({ ...props });
 
 const thumbClasses = cva({
-    base: 'shadow-ui-sm focus:shadow-ui-md block rounded-full bg-white focus:outline-hidden',
+    base: 'shadow-ui-md block rounded-full bg-white dark:bg-gray-400 focus:outline-hidden',
     variants: {
         size: {
             sm: 'size-4',
@@ -55,7 +55,6 @@ const thumbClasses = cva({
         },
         variant: {
             default: 'border-2 border-gray-900 hover:bg-gray-50',
-            subtle: 'bg-slate-400',
         },
     },
 })({ ...props });
