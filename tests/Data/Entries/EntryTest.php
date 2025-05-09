@@ -2597,4 +2597,22 @@ class EntryTest extends TestCase
             ['7', '7'],
         ], $events->map(fn ($event) => [$event->entry->id(), $event->initiator->id()])->all());
     }
+
+    #[Test]
+    public function it_clones_internal_collections()
+    {
+        $entry = EntryFactory::collection('test')->create();
+        $entry->set('foo', 'A');
+        $entry->setSupplement('bar', 'A');
+
+        $clone = clone $entry;
+        $clone->set('foo', 'B');
+        $clone->setSupplement('bar', 'B');
+
+        $this->assertEquals('A', $entry->get('foo'));
+        $this->assertEquals('B', $clone->get('foo'));
+
+        $this->assertEquals('A', $entry->getSupplement('bar'));
+        $this->assertEquals('B', $clone->getSupplement('bar'));
+    }
 }

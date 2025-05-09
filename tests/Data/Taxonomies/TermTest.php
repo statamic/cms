@@ -481,4 +481,24 @@ class TermTest extends TestCase
 
         $this->assertTrue($return);
     }
+
+    #[Test]
+    public function it_clones_internal_collections()
+    {
+        $taxonomy = (new TaxonomiesTaxonomy)->handle('tags')->save();
+        $term = (new Term)->taxonomy('tags')->slug('foo')->data(['foo' => 'bar'])->inDefaultLocale();
+        
+        $term->set('foo', 'A');
+        $term->setSupplement('bar', 'A');
+
+        $clone = clone $term;
+        $clone->set('foo', 'B');
+        $clone->setSupplement('bar', 'B');
+
+        $this->assertEquals('A', $term->get('foo'));
+        $this->assertEquals('B', $clone->get('foo'));
+
+        $this->assertEquals('A', $term->getSupplement('bar'));
+        $this->assertEquals('B', $clone->getSupplement('bar'));
+    }
 }
