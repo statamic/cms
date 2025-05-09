@@ -75,13 +75,11 @@ const itemClasses = cva({
 const selectedOptions = computed(() => {
     let selections = props.modelValue === null ? [] : props.modelValue;
 
-    if (typeof selections === 'string' || typeof selections === 'number') {
+    if (! props.multiple) {
         selections = [selections];
     }
 
-    return selections.map(value => {
-        return props.options.find(option => option.value === value) ?? { label: value, value };
-    });
+    return selections;
 });
 
 const selectedOption = computed(() => {
@@ -91,6 +89,10 @@ const selectedOption = computed(() => {
 
    return selectedOptions.value[0];
 });
+
+function isSelected(option) {
+    return selectedOptions.value.filter((item) => item.value === option.value).length > 0;
+}
 
 const limitReached = computed(() => {
     if (!props.maxSelections) {
@@ -229,9 +231,9 @@ const dropdownOpen = ref(false);
                                 v-if="results"
                                 v-for="(option, index) in results"
                                 :key="index"
-                                :value="option.value"
+                                :value="option"
                                 :text-value="option.label"
-                                :class="itemClasses({ size: size, selected: modelValue?.includes(option.value) })"
+                                :class="itemClasses({ size: size, selected: isSelected(option) })"
                                 as="button"
                                 @select="dropdownOpen = false"
                             >
@@ -277,7 +279,7 @@ const dropdownOpen = ref(false);
                                 type="button"
                                 class="vs__deselect"
                                 :aria-label="__('Deselect option')"
-                                @click="deselect(option.value)"
+                                @click="deselect(option)"
                             >
                                 <span>×</span>
                             </button>
