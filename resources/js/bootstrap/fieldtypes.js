@@ -14,6 +14,7 @@ import AssetsFieldtype from '../components/fieldtypes/assets/AssetsFieldtype.vue
 import AssetsIndexFieldtype from '../components/fieldtypes/assets/AssetsIndexFieldtype.vue';
 import AssetFolderFieldtype from '../components/fieldtypes/AssetFolderFieldtype.vue';
 import BardButtonsSettingFieldtype from '../components/fieldtypes/bard/BardButtonsSettingFieldtype.vue';
+import BlueprintsFieldtype from '../components/fieldtypes/BlueprintsFieldtype.vue';
 import ButtonGroupFieldtype from '../components/fieldtypes/ButtonGroupFieldtype.vue';
 import CheckboxesFieldtype from '../components/fieldtypes/CheckboxesFieldtype.vue';
 import Routes from '../components/collections/Routes.vue';
@@ -85,6 +86,7 @@ export default function registerFieldtypes(app) {
     );
     app.component('bard_buttons_setting-fieldtype', BardButtonsSettingFieldtype);
     app.component('button_group-fieldtype', ButtonGroupFieldtype);
+    app.component('blueprints-fieldtype', BlueprintsFieldtype);
     app.component('checkboxes-fieldtype', CheckboxesFieldtype);
     app.component(
         'code-fieldtype',
