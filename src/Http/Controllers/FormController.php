@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Support\MessageBag;
 use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Forms\Submission;
+use Statamic\Events\FormSendingEmails;
 use Statamic\Events\FormSubmitted;
 use Statamic\Events\SubmissionCreated;
 use Statamic\Exceptions\SilentFormFailureException;
@@ -83,7 +84,7 @@ class FormController extends Controller
             SubmissionCreated::dispatch($submission);
         }
 
-        SendEmails::dispatch($submission, $site);
+        SendEmails::dispatchUnless(FormSendingEmails::dispatch($submission) === false, $submission, $site);
 
         return $this->formSuccess($params, $submission);
     }
