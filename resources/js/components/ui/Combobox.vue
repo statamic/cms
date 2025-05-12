@@ -269,7 +269,7 @@ function updateModelValue(value) {
                 </ComboboxPortal>
             </ComboboxRoot>
 
-            <div v-if="maxSelections" class="mt-3 text-xs ltr:ml-2 rtl:mr-2" :class="limitIndicatorColor">
+            <div v-if="maxSelections && maxSelections !== Infinity" class="mt-3 text-xs ltr:ml-2 rtl:mr-2" :class="limitIndicatorColor">
                 <span v-text="selectedOptions.length"></span>/<span v-text="maxSelections"></span>
             </div>
         </div>
