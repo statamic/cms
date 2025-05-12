@@ -2,7 +2,7 @@
     <Motion
         v-if="hasSelections"
         layout
-        class="absolute inset-x-0 bottom-2 z-100 flex w-full justify-center"
+        class="absolute inset-x-0 bottom-6 z-100 flex w-full justify-center"
         :initial="{ y: 100, opacity: 0 }"
         :animate="{ y: 0, opacity: 1 }"
         :transition="{ duration: 0.2, ease: 'easeInOut' }"
@@ -10,7 +10,8 @@
         <ButtonGroup>
             <Button
                 class="text-blue-500!"
-                :text="__n(`:count item selected|:count items selected`, selections.length)"
+                :text="__n(`Deselect :count item|Deselect all :count items`, selections.length)"
+                @click="deselectAll"
             />
             <data-list-action
                 v-for="(action, index) in sortedActions"
@@ -91,6 +92,10 @@ export default {
             this.$axios.post(this.url + '/list', data).then((response) => {
                 this.actions = response.data;
             });
+        },
+
+        deselectAll() {
+            this.sharedState.selections = [];
         },
     },
 };
