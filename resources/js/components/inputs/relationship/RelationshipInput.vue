@@ -152,6 +152,8 @@ export default {
         },
     },
 
+    emits: ['input', 'focus', 'blur', 'item-data-updated', 'loading'],
+
     components: {
         ItemSelector,
         RelatedItem,

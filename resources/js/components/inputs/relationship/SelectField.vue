@@ -63,6 +63,8 @@ export default {
         };
     },
 
+    emits: ['input'],
+
     computed: {
         isTaggable() {
             if (data_get(this.config, 'create') === false) return false;
