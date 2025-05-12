@@ -1,9 +1,8 @@
 <script setup>
-import { injectSectionContext } from './SectionProvider.vue';
+import { injectFieldsContext } from './FieldsProvider.vue';
 import Field from './Field.vue';
 
-const section = injectSectionContext();
-const fields = section.fields;
+const { fields } = injectFieldsContext();
 </script>
 
 <template>

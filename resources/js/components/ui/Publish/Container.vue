@@ -7,7 +7,7 @@ export const [injectContainerContext, provideContainerContext] = createContext('
 <script setup>
 import uniqid from 'uniqid';
 import { usePublishContainerStore } from '@statamic/stores/publish-container.js';
-import { watch } from 'vue';
+import { watch, provide, getCurrentInstance } from 'vue';
 
 const emit = defineEmits(['updated']);
 
@@ -61,6 +61,11 @@ provideContainerContext({
         alert('Function from container context');
     },
 });
+
+// Backwards compatibility.
+provide('store', store);
+provide('storeName', props.name);
+provide('publishContainer', getCurrentInstance());
 </script>
 
 <template>

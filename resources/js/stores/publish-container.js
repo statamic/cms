@@ -10,6 +10,7 @@ export const usePublishContainerStore = function (name, initial) {
             jsonSubmittingFields: [],
             revealerFields: [],
             meta: initial.meta,
+            previews: {},
             localizedFields: initial.localizedFields,
             site: initial.site,
             fieldLocks: {},
@@ -23,6 +24,10 @@ export const usePublishContainerStore = function (name, initial) {
             setFieldValue(payload) {
                 const { handle, value } = payload;
                 this.values[handle] = value;
+            },
+            setDottedFieldValue(payload) {
+                const { path, value } = payload;
+                data_set(this.values, path, value);
             },
             setValues(values) {
                 this.values = values;
@@ -64,6 +69,14 @@ export const usePublishContainerStore = function (name, initial) {
             setFieldMeta(payload) {
                 const { handle, value } = payload;
                 this.meta[handle] = value;
+            },
+            setDottedFieldMeta(payload) {
+                const { path, value } = payload;
+                data_set(this.meta, path, value);
+            },
+            setDottedFieldReplicatorPreview(payload) {
+                const { path, value } = payload;
+                data_set(this.previews, path + '_', value);
             },
             setIsRoot(isRoot) {
                 this.isRoot = isRoot;

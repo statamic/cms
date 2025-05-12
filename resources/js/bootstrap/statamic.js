@@ -110,6 +110,10 @@ export default {
         return this.$app.config.globalProperties.$theme;
     },
 
+    get $fieldActions() {
+        return this.$app.config.globalProperties.$fieldActions;
+    },
+
     get user() {
         return this.$config.get('user');
     },
