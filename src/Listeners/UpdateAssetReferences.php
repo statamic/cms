@@ -85,16 +85,21 @@ class UpdateAssetReferences extends Subscriber implements ShouldQueue
 
         $container = $asset->container()->handle();
 
-        $updatedItems = $this
+        $hasUpdatedItems = false;
+
+        $this
             ->getItemsContainingData()
-            ->map(function ($item) use ($container, $originalPath, $newPath) {
-                return AssetReferenceUpdater::item($item)
+            ->each(function ($item) use ($container, $originalPath, $newPath, &$hasUpdatedItems) {
+                $updated = AssetReferenceUpdater::item($item)
                     ->filterByContainer($container)
                     ->updateReferences($originalPath, $newPath);
-            })
-            ->filter();
 
-        if ($updatedItems->isNotEmpty()) {
+                if ($updated) {
+                    $hasUpdatedItems = true;
+                }
+            });
+
+        if ($hasUpdatedItems) {
             AssetReferencesUpdated::dispatch($asset);
         }
     }

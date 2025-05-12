@@ -24,7 +24,6 @@ import Table from '../components/data-list/Table.vue';
 import Search from '../components/data-list/Search.vue';
 import BulkActions from '../components/data-list/BulkActions.vue';
 import InlineActions from '../components/data-list/InlineActions.vue';
-import ListActions from '../components/data-list/ListActions.vue';
 import ColumnPicker from '../components/data-list/ColumnPicker.vue';
 import ToggleAll from '../components/data-list/ToggleAll.vue';
 import Pagination from '../components/data-list/Pagination.vue';
@@ -58,6 +57,7 @@ import ConfirmationModal from '../components/modals/ConfirmationModal.vue';
 import FavoriteCreator from '../components/FavoriteCreator.vue';
 import KeyboardShortcutsModal from '../components/modals/KeyboardShortcutsModal.vue';
 import FieldActionModal from '../components/field-actions/FieldActionModal.vue';
+import ElevatedSessionModal from '../components/modals/ElevatedSessionModal.vue';
 import ResourceDeleter from '../components/ResourceDeleter.vue';
 import Stack from '../components/stacks/Stack.vue';
 import StackTest from '../components/stacks/StackTest.vue';
@@ -101,7 +101,6 @@ export default function registerGlobalComponents(app) {
     app.component('data-list-search', Search);
     app.component('data-list-bulk-actions', BulkActions);
     app.component('data-list-inline-actions', InlineActions);
-    app.component('data-list-list-actions', ListActions);
     app.component('data-list-column-picker', ColumnPicker);
     app.component('data-list-toggle-all', ToggleAll);
     app.component('data-list-pagination', Pagination);
@@ -153,6 +152,7 @@ export default function registerGlobalComponents(app) {
     app.component('keyboard-shortcuts-modal', KeyboardShortcutsModal);
     app.component('resource-deleter', ResourceDeleter);
     app.component('field-action-modal', FieldActionModal);
+    app.component('elevated-session-modal', ElevatedSessionModal);
 
     app.component('stack', Stack);
     app.component('stack-test', StackTest);

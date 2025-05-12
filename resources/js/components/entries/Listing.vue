@@ -118,7 +118,7 @@
                                             v-if="entry.editable"
                                         />
                                         <DropdownSeparator v-if="entry.actions.length" />
-                                        <data-list-list-actions
+                                        <data-list-inline-actions
                                             :item="entry.id"
                                             :url="actionUrl"
                                             :actions="entry.actions"

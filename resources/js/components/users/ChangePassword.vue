@@ -1,6 +1,8 @@
 <template>
     <popover placement="bottom" ref="popper">
-        <button slot="trigger" class="btn" v-text="__('Change Password')" />
+        <template #trigger>
+            <button class="btn" v-text="__('Change Password')" />
+        </template>
         <div class="saving-overlay flex justify-center text-center" v-if="saving">
             <loading-graphic :text="__('Saving')" />
         </div>
@@ -41,6 +43,8 @@
 </template>
 
 <script>
+import { requireElevatedSessionIf } from '@statamic/components/elevated-sessions';
+
 export default {
     props: {
         saveUrl: String,
@@ -76,6 +80,12 @@ export default {
         },
 
         save() {
+            requireElevatedSessionIf(!this.requiresCurrentPassword)
+                .then(() => this.performSaveRequest())
+                .catch(() => {});
+        },
+
+        performSaveRequest() {
             this.clearErrors();
             this.saving = true;
 

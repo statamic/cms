@@ -66,10 +66,10 @@ export default {
 
     watch: {
         selections: {
+            deep: true,
             handler() {
                 this.getActions();
-            },
-            deep: true,
+            }
         },
     },
 

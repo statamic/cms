@@ -6,6 +6,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\Eloquent\User as EloquentUser;
 use Statamic\Auth\File\Role;
@@ -19,6 +20,7 @@ use Tests\Auth\UserContractTests;
 use Tests\Preferences\HasPreferencesTests;
 use Tests\TestCase;
 
+#[Group('2fa')]
 class EloquentUserTest extends TestCase
 {
     use HasPreferencesTests, PermissibleContractTests, UserContractTests, WithFaker;

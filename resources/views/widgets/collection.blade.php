@@ -1,5 +1,6 @@
 @php
     use Statamic\Facades\Site;
+    use function Statamic\trans as __;
 @endphp
 
 <collection-widget

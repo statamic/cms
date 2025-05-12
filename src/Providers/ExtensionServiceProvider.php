@@ -31,6 +31,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Actions\CopyPasswordResetLink::class,
         Actions\Delete::class,
         Actions\DeleteMultisiteEntry::class,
+        Actions\DisableTwoFactorAuthentication::class,
         Actions\DownloadAsset::class,
         Actions\DownloadAssetFolder::class,
         Actions\DuplicateAsset::class,
@@ -248,6 +249,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Updates\AddTimezoneConfigOptions::class,
         Updates\RemoveParentField::class,
         Updates\UpdateGlobalVariables::class,
+        Updates\PublishMigrationForTwoFactorColumns::class,
     ];
 
     public function register()
