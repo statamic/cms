@@ -12,7 +12,7 @@ class RedirectAbsoluteDomains
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  string|null  $guard
+     * @param  Closure  $next
      * @return mixed
      */
     public function handle($request, Closure $next)
