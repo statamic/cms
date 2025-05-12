@@ -1,13 +1,18 @@
 <template>
-    <div v-if="showAlways || hasSelections" class="fixed inset-x-0 bottom-1 z-100 flex w-full justify-center">
+    <Motion
+        v-if="hasSelections"
+        layout
+        class="absolute inset-x-0 bottom-2 z-100 flex w-full justify-center"
+        :initial="{ y: 100, opacity: 0 }"
+        :animate="{ y: 0, opacity: 1 }"
+        :transition="{ duration: 0.2, ease: 'easeInOut' }"
+    >
         <ButtonGroup>
             <Button
-                variant="primary"
-                class="text-gray-400!"
+                class="text-blue-500!"
                 :text="__n(`:count item selected|:count items selected`, selections.length)"
             />
             <data-list-action
-                v-if="hasSelections"
                 v-for="(action, index) in sortedActions"
                 :key="action.handle"
                 :action="action"
@@ -16,15 +21,16 @@
                 @selected="run"
                 v-slot="{ action, select }"
             >
-                <Button variant="primary" @click="select" :text="__(action.title)" />
+                <Button @click="select" :text="__(action.title)" />
             </data-list-action>
         </ButtonGroup>
-    </div>
+    </Motion>
 </template>
 
 <script>
 import Actions from './Actions';
 import { Button, ButtonGroup } from '@statamic/ui';
+import { Motion } from 'motion-v';
 
 export default {
     mixins: [Actions],
@@ -32,19 +38,13 @@ export default {
     components: {
         Button,
         ButtonGroup,
+        Motion,
     },
 
     inject: ['sharedState'],
 
     props: {
-        context: {
-            type: Object,
-            default: () => {},
-        },
-        showAlways: {
-            type: Boolean,
-            default: false,
-        },
+        context: { type: Object, default: () => {} }
     },
 
     data() {

@@ -113,15 +113,14 @@
                             @page-selected="page = $event"
                             @per-page-changed="changePerPage"
                         /> -->
-                    </div>
 
-                    <data-list-bulk-actions
-                        :url="actionUrl"
-                        :context="actionContext"
-                        :show-always="mode === 'grid'"
-                        @started="actionStarted"
-                        @completed="actionCompleted"
-                    />
+                         <data-list-bulk-actions
+                            :url="actionUrl"
+                            :context="actionContext"
+                            @started="actionStarted"
+                            @completed="actionCompleted"
+                        />
+                    </div>
                 </data-list>
             </div>
         </uploader>
