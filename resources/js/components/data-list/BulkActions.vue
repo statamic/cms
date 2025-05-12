@@ -64,7 +64,12 @@ export default {
     },
 
     watch: {
-        selections: 'getActions',
+        selections: {
+            handler() {
+                this.getActions();
+            },
+            deep: true,
+        },
     },
 
     methods: {
