@@ -92,11 +92,15 @@
                 </Dropdown>
             </template>
         </data-list-table>
+        <ui-panel-footer class="p-1! pb-0!">
+            <Breadcrumbs :path="path" @navigated="selectFolder" />
+        </ui-panel-footer>
     </Panel>
 </template>
 
 <script>
 import AssetThumbnail from './Thumbnail.vue';
+import Breadcrumbs from './Breadcrumbs.vue';
 import AssetBrowserMixin from './AssetBrowserMixin';
 import {
     Panel,
@@ -110,6 +114,7 @@ import {
 export default {
     components: {
         AssetThumbnail,
+        Breadcrumbs,
         Panel,
         Dropdown,
         DropdownMenu,
