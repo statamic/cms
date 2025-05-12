@@ -42,7 +42,7 @@ class FormType extends \Rebing\GraphQL\Support\Type
                                     return $rule;
                                 }
 
-                                if (method_exists($rule, '__toString')) {
+                                if ($rule instanceof \Stringable) {
                                     return (string) $rule;
                                 }
 
