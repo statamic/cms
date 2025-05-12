@@ -66,7 +66,7 @@ class CollectionsController extends CpController
                 'blueprints' => $collection->entryBlueprints()->reject->hidden()->values(),
                 'columns' => [
                     ['label' => 'Title', 'field' => 'title', 'visible' => true],
-                    ['label' => 'Date', 'field' => 'date', 'visible' => true]
+                    ['label' => 'Date', 'field' => 'date', 'visible' => true],
                 ],
                 'dated' => $collection->dated(),
                 'edit_url' => $collection->editUrl(),
