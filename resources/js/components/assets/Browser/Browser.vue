@@ -334,6 +334,10 @@ export default {
             this.loadAssets();
         },
 
+        mode(mode) {
+            this.setPreference('mode', mode == 'table' ? null : mode);
+        },
+
         editedAssetId(editedAssetId) {
             let path = editedAssetId
                 ? [this.path, this.editedAssetBasename].filter((value) => value != '/').join('/') + '/edit'
