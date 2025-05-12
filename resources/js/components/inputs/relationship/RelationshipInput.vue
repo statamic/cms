@@ -7,6 +7,7 @@
             :multiple="maxItems > 1"
             :typeahead="mode === 'typeahead'"
             :taggable="taggable"
+            :max-selections="maxItems"
             :read-only="readOnly"
             :url="selectionsUrl"
             :site="site"

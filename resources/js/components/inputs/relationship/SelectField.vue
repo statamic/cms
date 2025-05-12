@@ -1,6 +1,5 @@
 <template>
     <div>
-        <!-- todo: max selections, create option -->
         <Combobox
             class="w-full"
             searchable
@@ -9,6 +8,7 @@
             option-value="id"
             option-label="title"
             :taggable="isTaggable"
+            :max-selections="maxSelections"
             :disabled="readOnly"
             :ignore-filter="typeahead"
             :placeholder="__(config.placeholder) || __('Choose...')"
@@ -29,7 +29,7 @@
                 <div v-text="noOptionsText" />
             </template>
             <template #selected-options>
-                <!-- We don't need to display the selected options here. The RelationshipInput component does that for us. -->
+                <!-- We don't want to display the selected options here. The RelationshipInput component does that for us. -->
                 <div></div>
             </template>
         </Combobox>
@@ -51,6 +51,7 @@ export default {
         typeahead: Boolean,
         multiple: Boolean,
         taggable: Boolean,
+        maxSelections: Number,
         config: Object,
         readOnly: Boolean,
         site: String,

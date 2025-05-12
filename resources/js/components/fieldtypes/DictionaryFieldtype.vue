@@ -16,7 +16,7 @@
             This slot is *basically* exactly the same as the default selected-options slot in Combobox. We're just looping
             through the Dictionary Fieldtype's selectedOptions state, rather than the one maintained by the Combobox component.
         -->
-        <template #selected-options="{ disabled, labelHtml, deselect }">
+        <template #selected-options="{ disabled, getOptionLabel, getOptionValue, labelHtml, deselect }">
             <sortable-list
                 v-if="multiple"
                 item-class="sortable-item"
@@ -27,11 +27,15 @@
                 :model-value="value"
                 @update:modelValue="comboboxUpdated"
             >
-                <div class="vs__selected-options-outside flex flex-wrap gap-2">
-                    <div v-for="option in selectedOptions" :key="option.value" class="vs__selected sortable-item mt-2">
+                <div class="vs__selected-options-outside flex gap-2 flex-wrap">
+                    <div
+                        v-for="option in selectedOptions"
+                        :key="getOptionValue(option)"
+                        class="vs__selected sortable-item mt-2"
+                    >
                         <Badge pill size="lg">
-                            <div v-if="labelHtml" v-html="option.label"></div>
-                            <div v-else>{{ __(option.label) }}</div>
+                            <div v-if="labelHtml" v-html="getOptionLabel(option)"></div>
+                            <div v-else>{{ __(getOptionLabel(option)) }}</div>
 
                             <button
                                 v-if="!disabled"
