@@ -25,7 +25,7 @@ export default {
             type: String,
             default: 'Search...',
         },
-        value: {
+        modelValue: {
             type: String,
             default: '',
         },
@@ -33,11 +33,11 @@ export default {
 
     methods: {
         emitEvent: debounce(function (event) {
-            this.$emit('input', event.target.value);
+            this.$emit('update:model-value', event.target.value);
         }, 300),
 
         reset() {
-            this.$emit('input', '');
+            this.$emit('update:model-value', '');
         },
 
         focus() {

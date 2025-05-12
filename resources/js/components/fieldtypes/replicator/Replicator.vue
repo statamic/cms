@@ -44,7 +44,7 @@
                                     :collapsed="collapsed.includes(set._id)"
                                     :field-path-prefix="fieldPathPrefix || handle"
                                     :has-error="setHasError(index)"
-                                    :previews="previews[set._id]"
+                                    :previews="meta.previews[set._id]"
                                     :show-field-previews="config.previews"
                                     :can-add-set="canAddSet"
                                     @collapsed="collapseSet(set._id)"
@@ -111,7 +111,6 @@ export default {
         return {
             focused: false,
             collapsed: clone(this.meta.collapsed),
-            previews: this.meta.previews,
             fullScreenMode: false,
             provide: {
                 storeName: this.storeName,
@@ -203,15 +202,13 @@ export default {
 
         addSet(handle, index) {
             const set = {
-                ...this.meta.defaults[handle],
+                ...JSON.parse(JSON.stringify(this.meta.defaults[handle])),
                 _id: uniqid(),
                 type: handle,
                 enabled: true,
             };
 
-            this.updateSetPreviews(set._id, {});
-
-            this.updateSetMeta(set._id, this.meta.new[handle]);
+            this.updateSetMeta(set._id, this.meta.new[handle], {});
 
             this.update([...this.value.slice(0, index), set, ...this.value.slice(index)]);
 
@@ -222,13 +219,11 @@ export default {
             const index = this.value.findIndex((v) => v._id === old_id);
             const old = this.value[index];
             const set = {
-                ...old,
+                ...JSON.parse(JSON.stringify(old)),
                 _id: uniqid(),
             };
 
-            this.updateSetPreviews(set._id, {});
-
-            this.updateSetMeta(set._id, this.meta.existing[old_id]);
+            this.updateSetMeta(set._id, this.meta.existing[old_id], {});
 
             this.update([...this.value.slice(0, index + 1), set, ...this.value.slice(index + 1)]);
 
@@ -236,7 +231,13 @@ export default {
         },
 
         updateSetPreviews(id, previews) {
-            this.previews[id] = previews;
+            this.updateMeta({
+                ...this.meta,
+                previews: {
+                    ...this.meta.previews,
+                    [id]: previews,
+                },
+            });
         },
 
         collapseSet(id) {
@@ -303,18 +304,6 @@ export default {
 
         collapsed(collapsed) {
             this.updateMeta({ ...this.meta, collapsed: clone(collapsed) });
-        },
-
-        previews: {
-            deep: true,
-            handler(value) {
-                if (JSON.stringify(this.meta.previews) === JSON.stringify(value)) {
-                    return;
-                }
-                const meta = this.meta;
-                meta.previews = value;
-                this.updateMeta(meta);
-            },
         },
     },
 };

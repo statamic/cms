@@ -8,7 +8,8 @@ export default {
                 return config.replicator_preview === undefined ? this.showFieldPreviews : config.replicator_preview;
             });
 
-            return Object.values(previews)
+            return previews
+                .map(([handle, value]) => value)
                 .filter((value) => {
                     if (['null', '[]', '{}', ''].includes(JSON.stringify(value))) return null;
                     return value;

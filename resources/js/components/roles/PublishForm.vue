@@ -51,6 +51,7 @@
 
 <script>
 import { Header, Button } from '@statamic/ui';
+import { requireElevatedSession } from '@statamic/components/elevated-sessions';
 
 const checked = function (permissions) {
     return permissions.reduce((carry, permission) => {
@@ -122,6 +123,12 @@ export default {
         },
 
         save() {
+            requireElevatedSession()
+                .then(() => this.performSaveAction())
+                .catch(() => this.$toast.error(__('Unable to save role')));
+        },
+
+        performSaveAction() {
             this.clearErrors();
 
             this.$axios[this.method](this.action, this.payload)

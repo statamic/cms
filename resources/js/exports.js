@@ -5,3 +5,4 @@ export { default as Listing } from './components/Listing.vue';
 export * as FieldConditions from './components/field-conditions/FieldConditions';
 export { default as ValidatesFieldConditions } from './components/field-conditions/ValidatorMixin';
 export * from './components/ui/index.js';
+export * from './components/elevated-sessions';

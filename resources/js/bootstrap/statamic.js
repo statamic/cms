@@ -102,8 +102,16 @@ export default {
         return this.$app.config.globalProperties.$date;
     },
 
-    get $theme() {
-        return this.$app.config.globalProperties.$theme;
+    get $progress() {
+        return this.$app.config.globalProperties.$progress;
+    },
+
+    get darkMode() {
+        return darkMode;
+    },
+
+    set darkMode(value) {
+        darkMode.value = value;
     },
 
     get user() {

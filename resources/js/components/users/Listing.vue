@@ -99,6 +99,16 @@
                                     </div>
                                 </div>
                             </template>
+                            <template #cell-two_factor="{ row: user, value }">
+                                <div class="flex items-center space-x-2">
+                                    <template v-if="value">
+                                        <svg-icon name="light/check" class="w-3 text-green-600" />
+                                    </template>
+                                    <template v-else>
+                                        <svg-icon name="light/close" class="w-3 text-gray-500" />
+                                    </template>
+                                </div>
+                            </template>
                             <template #actions="{ row: user, index }">
                                 <Dropdown placement="left-start" class="me-3">
                                     <DropdownMenu>
