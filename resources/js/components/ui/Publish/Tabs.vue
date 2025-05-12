@@ -7,21 +7,56 @@ import { ref, computed, useSlots } from 'vue';
 import ElementContainer from '@statamic/components/ElementContainer.vue';
 
 const slots = useSlots();
-const context = injectContainerContext();
-const tabs = context.blueprint.tabs;
+const { blueprint, store } = injectContainerContext();
+const tabs = ref(blueprint.tabs);
 const width = ref(null);
-const sidebarTab = computed(() => tabs.find((tab) => tab.handle === 'sidebar'));
+const sidebarTab = computed(() => tabs.value.find((tab) => tab.handle === 'sidebar'));
 const mainTabs = computed(() =>
-    shouldShowSidebar.value && sidebarTab ? tabs.filter((tab) => tab.handle !== 'sidebar') : tabs,
+    shouldShowSidebar.value && sidebarTab.value ? tabs.value.filter((tab) => tab.handle !== 'sidebar') : tabs.value,
 );
 const shouldShowSidebar = computed(() => (slots.sidebar || sidebarTab.value) && width.value > 920);
+
+const fieldTabMap = computed(() => {
+    let map = {};
+
+    Object.values(tabs.value).forEach((tab) => {
+        tab.sections.forEach((section) => {
+            section.fields.forEach((field) => {
+                map[field.handle] = tab.handle;
+            });
+        });
+    });
+
+    return map;
+});
+
+const tabsWithErrors = computed(() => {
+    return [
+        ...new Set(
+            Object.keys(store.errors)
+                .map((handle) => handle.split('.')[0])
+                .filter((handle) => fieldTabMap.value[handle])
+                .map((handle) => fieldTabMap.value[handle]),
+        ),
+    ];
+});
+
+function tabHasError(tab) {
+    return tabsWithErrors.value.includes(tab.handle);
+}
 </script>
 
 <template>
     <ElementContainer @resized="width = $event.width">
         <Tabs :default-tab="mainTabs[0].handle">
             <TabList class="mb-6">
-                <TabTrigger v-for="tab in mainTabs" :key="tab.handle" :name="tab.handle" :text="tab.display" />
+                <TabTrigger
+                    v-for="tab in mainTabs"
+                    :key="tab.handle"
+                    :name="tab.handle"
+                    :text="tab.display"
+                    :class="{ '!text-red-500': tabHasError(tab) }"
+                />
             </TabList>
 
             <div :class="{ 'grid grid-cols-[1fr_320px] gap-8': shouldShowSidebar }">
