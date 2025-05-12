@@ -13,7 +13,7 @@
             :ignore-filter="typeahead"
             :placeholder="__(config.placeholder) || __('Choose...')"
             :model-value="items.map((item) => item.id)"
-            @update:selectedOptions="input"
+            @update:modelValue="itemsSelected"
             @search="search"
         >
             <template #option="{ title, hint, status }">
@@ -116,12 +116,21 @@ export default {
             this.request({ search }).then((response) => loading(false));
         },
 
-        input(items) {
+        itemsSelected(items) {
             if (!this.multiple) {
                 items = items === null ? [] : [items];
             }
 
+            items = items.map((id) => {
+                let option = this.options.find((option) => option.id === id);
+                let existing = this.items.find((item) => item.id === id);
+
+                return existing || option || { id: value, title: value };
+            });
+
             this.$emit('input', items);
+
+            console.log(items)
         },
 
         createOption(value) {

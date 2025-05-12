@@ -16,7 +16,7 @@ import { WithField, Icon, Badge } from '@statamic/ui';
 import fuzzysort from 'fuzzysort';
 import { SortableList } from '@statamic/components/sortable/Sortable.js';
 
-const emit = defineEmits(['update:modelValue', 'update:selectedOptions', 'search']);
+const emit = defineEmits(['update:modelValue', 'search']);
 
 const props = defineProps({
     description: { type: String, default: null },
@@ -74,8 +74,8 @@ const itemClasses = cva({
     },
 });
 
-function getSelectedOptions(value) {
-    let selections = value === null ? [] : value;
+const selectedOptions = computed(() => {
+    let selections = props.modelValue === null ? [] : props.modelValue;
 
     if (typeof selections === 'string' || typeof selections === 'number') {
         selections = [selections];
@@ -84,9 +84,7 @@ function getSelectedOptions(value) {
     return selections.map(value => {
         return props.options.find(option => getOptionValue(option) === value) ?? { label: value, value };
     });
-}
-
-const selectedOptions = computed(() => getSelectedOptions(props.modelValue));
+});
 
 const selectedOption = computed(() => {
    if (props.multiple || !props.modelValue || selectedOptions.value.length !== 1) {
@@ -187,14 +185,12 @@ function deselect(option) {
     emit('update:modelValue', props.modelValue.filter((item) => item !== option));
 }
 
+const dropdownOpen = ref(false);
+
 function updateModelValue(value) {
     searchQuery.value = '';
-
     emit('update:modelValue', value);
-    emit('update:selectedOptions', getSelectedOptions(value));
 }
-
-const dropdownOpen = ref(false);
 </script>
 
 <template>
