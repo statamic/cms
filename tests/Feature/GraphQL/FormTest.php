@@ -333,7 +333,7 @@ GQL;
                     'dimensions:1024',
                     'size:1000',
                     'image:jpeg',
-                ]
+                ],
             ],
         ]);
 
