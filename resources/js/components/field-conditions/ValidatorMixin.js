@@ -2,7 +2,7 @@ import Validator from './Validator.js';
 import { data_get } from '../../bootstrap/globals.js';
 
 export default {
-    inject: ['publishContainer'],
+    inject: ['store'],
 
     methods: {
         showField(field, dottedKey) {
@@ -21,12 +21,7 @@ export default {
             }
 
             // Use validation to determine whether field should be shown.
-            let validator = new Validator(
-                field,
-                { ...this.values, ...this.extraValues },
-                dottedFieldPath,
-                this.publishContainer.store,
-            );
+            let validator = new Validator(field, { ...this.values, ...this.extraValues }, dottedFieldPath, this.store);
             let passes = validator.passesConditions();
 
             // If the field is configured to always save, never omit value.
@@ -53,14 +48,14 @@ export default {
         },
 
         setHiddenFieldState({ dottedKey, hidden, omitValue }) {
-            const currentValue = this.publishContainer.store.hiddenFields[dottedKey];
+            const currentValue = this.store.hiddenFields[dottedKey];
 
             // Prevent infinite loops
             if (currentValue && currentValue.hidden === hidden && currentValue.omitValue === omitValue) {
                 return;
             }
 
-            this.publishContainer.store.setHiddenField({
+            this.store.setHiddenField({
                 dottedKey,
                 hidden,
                 omitValue,
@@ -68,7 +63,7 @@ export default {
         },
 
         shouldForceHiddenField(dottedFieldPath) {
-            return data_get(this.publishContainer.store.hiddenFields[dottedFieldPath], 'hidden') === 'force';
+            return data_get(this.store.hiddenFields[dottedFieldPath], 'hidden') === 'force';
         },
     },
 };
