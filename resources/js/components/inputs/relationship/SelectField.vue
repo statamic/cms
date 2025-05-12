@@ -129,8 +129,6 @@ export default {
             });
 
             this.$emit('input', items);
-
-            console.log(items)
         },
 
         createOption(value) {
