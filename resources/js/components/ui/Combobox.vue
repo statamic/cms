@@ -216,9 +216,11 @@ function updateModelValue(value) {
                             v-model="searchQuery"
                             :placeholder
                         />
-                        <slot name="selected-option" v-bind="{ option: selectedOption }" v-else>
-                            <div class="cursor-pointer" v-text="getOptionLabel(selectedOption)"></div>
-                        </slot>
+                        <div v-else class="cursor-pointer">
+                            <slot name="selected-option" v-bind="{ option: selectedOption }">
+                                <span v-text="getOptionLabel(selectedOption)" />
+                            </slot>
+                        </div>
                     </ComboboxTrigger>
                     <div class="flex items-center space-x-2 pl-2">
                         <button v-if="clearable" @click="clear">
