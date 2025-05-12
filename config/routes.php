@@ -31,6 +31,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Enable Absolute Domain Redirects
+    |--------------------------------------------------------------------------
+    |
+    | Whether to redirect absolute domains ending in a dot to the
+    | corresponding domain without a dot. This is useful for
+    | preventing issues with browsers and DNS resolvers.
+    |
+    | see: https://www.rfc-editor.org/rfc/rfc1035#:~:text=Domain%20names%20that%20end%20in%20a%20dot%20are%20called%0Aabsolute%2C%20and%20are%20taken%20as%20complete
+    |
+    */
+
+    'absolute_domain_redirect' => true,
+
+    /*
+    |--------------------------------------------------------------------------
     | Action Route Prefix
     |--------------------------------------------------------------------------
     |

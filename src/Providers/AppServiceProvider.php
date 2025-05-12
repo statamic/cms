@@ -194,6 +194,10 @@ class AppServiceProvider extends ServiceProvider
             \Statamic\Http\Middleware\AuthGuard::class,
             \Statamic\StaticCaching\Middleware\Cache::class,
         ])->each(fn ($middleware) => $router->pushMiddlewareToGroup('statamic.web', $middleware));
+
+        collect([
+            \Statamic\Http\Middleware\RedirectAbsoluteDomains::class,
+        ])->each(fn ($middleware) => $router->pushMiddlewareToGroup('web', $middleware));
     }
 
     protected function addAboutCommandInfo()
