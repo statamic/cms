@@ -1,5 +1,5 @@
 <template>
-    <div class="overflow-x-auto overflow-y-hidden">
+    <Panel class="relative overflow-x-auto overscroll-x-contain">
         <data-list-table
             :allow-bulk-actions="true"
             :loading="loading"
@@ -35,23 +35,21 @@
                             {{ folder.basename }}
                         </a>
                     </td>
-                    <td />
-                    <td />
-
-                    <th class="actions-column" :colspan="columns.length">
-                        <dropdown-list
-                            placement="left-start"
-                            v-if="folderActions(folder).length"
-                        >
-                            <data-list-inline-actions
-                                :item="folder.path"
-                                :url="folderActionUrl"
-                                :actions="folderActions(folder)"
-                                @started="actionStarted"
-                                @completed="actionCompleted"
-                            />
-                        </dropdown-list>
-                    </th>
+                    <td :colspan="columns.length - 1" />
+                    <td class="actions-column pr-3!">
+                        <Dropdown placement="left-start" v-if="folderActions(folder).length">
+                            <DropdownMenu>
+                                <DropdownLabel :text="__('Actions')" />
+                                <data-list-inline-actions
+                                    :item="folder.path"
+                                    :url="folderActionUrl"
+                                    :actions="folderActions(folder)"
+                                    @started="actionStarted"
+                                    @completed="actionCompleted"
+                                />
+                            </DropdownMenu>
+                        </Dropdown>
+                    </td>
                 </tr>
             </template>
 
@@ -74,32 +72,50 @@
             </template>
 
             <template #actions="{ row: asset }">
-                <dropdown-list placement="left-start">
-                    <dropdown-item
-                        :text="__(canEdit ? 'Edit' : 'View')"
-                        @click="edit(asset.id)"
-                    />
-                    <div class="divider" v-if="asset.actions.length" />
-                    <data-list-inline-actions
-                        :item="asset.id"
-                        :url="actionUrl"
-                        :actions="asset.actions"
-                        @started="actionStarted"
-                        @completed="actionCompleted"
-                    />
-                </dropdown-list>
+                <Dropdown placement="left-start" class="me-3">
+                    <DropdownMenu>
+                        <DropdownLabel :text="__('Actions')" />
+                        <DropdownItem
+                            :text="__(canEdit ? 'Edit' : 'View')"
+                            @click="edit(asset.id)"
+                            icon="edit"
+                        />
+                        <DropdownSeparator v-if="asset.actions.length" />
+                        <data-list-inline-actions
+                            :item="asset.id"
+                            :url="actionUrl"
+                            :actions="asset.actions"
+                            @started="actionStarted"
+                            @completed="actionCompleted"
+                        />
+                    </DropdownMenu>
+                </Dropdown>
             </template>
         </data-list-table>
-    </div>
+    </Panel>
 </template>
 
 <script>
 import AssetThumbnail from './Thumbnail.vue';
 import AssetBrowserMixin from './AssetBrowserMixin';
+import {
+    Panel,
+    Dropdown,
+    DropdownMenu,
+    DropdownItem,
+    DropdownLabel,
+    DropdownSeparator,
+} from '@statamic/ui';
 
 export default {
     components: {
         AssetThumbnail,
+        Panel,
+        Dropdown,
+        DropdownMenu,
+        DropdownItem,
+        DropdownLabel,
+        DropdownSeparator,
     },
 
     mixins: [AssetBrowserMixin],
