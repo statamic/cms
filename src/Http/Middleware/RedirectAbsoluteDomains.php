@@ -12,7 +12,6 @@ class RedirectAbsoluteDomains
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  Closure  $next
      * @return mixed
      */
     public function handle($request, Closure $next)
@@ -20,7 +19,7 @@ class RedirectAbsoluteDomains
         /** @var Request $request */
         $host = $request->getHost();
 
-        if (!config('statamic.routes.absolute_domain_redirect', true) || !Str::endsWith($host, '.')) {
+        if (! config('statamic.routes.absolute_domain_redirect', true) || !Str::endsWith($host, '.')) {
             return $next($request);
         }
 
