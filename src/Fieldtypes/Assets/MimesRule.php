@@ -51,4 +51,9 @@ class MimesRule implements Rule
     {
         return str_replace(':values', implode(', ', $this->parameters), __((Statamic::isCpRoute() ? 'statamic::' : '').'validation.mimes'));
     }
+
+    public function __toString()
+    {
+        return 'mimes:'.implode(',', $this->parameters);
+    }
 }

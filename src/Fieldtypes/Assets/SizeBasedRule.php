@@ -66,4 +66,9 @@ abstract class SizeBasedRule implements Rule
 
         return false;
     }
+
+    public function __toString()
+    {
+        return 'size:'.implode(',', $this->parameters);
+    }
 }
