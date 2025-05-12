@@ -287,7 +287,7 @@ const dropdownOpen = ref(false);
                 :mirror="false"
                 :disabled
                 :model-value="modelValue"
-                @update:model-value="emit('update:modelValue', $event)"
+                @update:modelValue="updateModelValue"
             >
                 <div class="vs__selected-options-outside flex gap-2 flex-wrap">
                      <div
