@@ -376,8 +376,10 @@ export default {
         selectedPath: {
             immediate: true,
             handler(newPath) {
-                this.path = newPath;
-            }
+                if (!newPath.endsWith('/edit')) {
+                    this.path = newPath;
+                }
+            },
         },
     },
 
