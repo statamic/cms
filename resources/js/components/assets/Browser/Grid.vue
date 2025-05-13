@@ -37,6 +37,25 @@
                         />
                     </dropdown-list>
                 </div>
+                <div v-if="creatingFolder" class="group/folder relative">
+                    <div class="group h-[66px] w-[80px]">
+                        <ui-icon name="asset-folder" class="size-full text-blue-400/90 hover:text-blue-400" />
+
+                        <Editable
+                            ref="newFolderInput"
+                            v-model:modelValue="newFolderName"
+                            :start-with-edit-mode="true"
+                            submit-mode="enter"
+                            :placeholder="__('New Folder')"
+                            class="font-mono text-xs text-gray-500 text-center overflow-hidden text-ellipsis whitespace-nowrap"
+                            @submit="$emit('create-folder', newFolderName)"
+                            @cancel="() => {
+                                newFolderName = null;
+                                $emit('cancel-creating-folder');
+                            }"
+                        />
+                    </div>
+                </div>
             </section>
 
             <!-- Assets -->
@@ -109,19 +128,23 @@
 import AssetBrowserMixin from './AssetBrowserMixin';
 import Breadcrumbs from './Breadcrumbs.vue';
 import { debounce } from 'lodash-es';
+import { EditableArea, EditableInput, EditablePreview, EditableRoot } from 'reka-ui';
+import { Editable } from '@statamic/ui';
 
 export default {
     mixins: [AssetBrowserMixin],
-    components: { Breadcrumbs },
+    components: { Editable, EditableInput, EditablePreview, EditableArea, EditableRoot, Breadcrumbs },
     props: {
         assets: { type: Array },
         selectedAssets: { type: Array },
+        creatingFolder: { type: Boolean },
     },
 
     data() {
         return {
             actionOpened: null,
             thumbnailSize: 200,
+            newFolderName: null,
         };
     },
 
@@ -162,6 +185,14 @@ export default {
 
         toggleSelection(id, index, $event) {
             this.$emit('toggle-selection', id, index, $event);
+        },
+
+        focusNewFolderInput() {
+            this.$refs.newFolderInput?.edit();
+        },
+
+        clearNewFolderName() {
+            this.newFolderName = null;
         },
     },
 };

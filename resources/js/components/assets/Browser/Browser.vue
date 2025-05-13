@@ -16,7 +16,7 @@
             </dropdown-list>
 
             <Button v-if="canUpload" :text="__('Upload')" icon="upload" @click="openFileBrowser" />
-            <Button v-if="canCreateFolders" :text="__('Create Folder')" icon="folder-add" @click="createFolder" />
+            <Button v-if="canCreateFolders" :text="__('Create Folder')" icon="folder-add" @click="creatingFolder = true" />
 
             <ui-toggle-group v-model="mode">
                 <ui-toggle-item icon="layout-grid" value="grid" />
@@ -71,6 +71,7 @@
                             />
 
                             <Table
+                                ref="table"
                                 v-if="mode === 'table'"
                                 v-bind="sharedAssetProps"
                                 v-on="sharedAssetEvents"
@@ -78,15 +79,20 @@
                                 :loading="loading"
                                 :mode="mode"
                                 @sorted="sorted"
+                                @create-folder="createFolder"
+                                @cancel-creating-folder="creatingFolder = false"
                             />
 
                             <!-- Grid Mode -->
                             <Grid
+                                ref="grid"
                                 v-if="mode === 'grid'"
                                 v-bind="sharedAssetProps"
                                 v-on="sharedAssetEvents"
                                 :assets="assets"
                                 :selected-assets="selectedAssets"
+                                @create-folder="createFolder"
+                                @cancel-creating-folder="creatingFolder = false"
                                 @toggle-selection="toggleSelection"
                             >
                                 <template #footer>
@@ -132,21 +138,12 @@
             @closed="closeAssetEditor"
             @saved="assetSaved"
         />
-
-        <create-folder
-            v-if="creatingFolder"
-            :container="container"
-            :path="path"
-            @closed="creatingFolder = false"
-            @created="folderCreated"
-        />
     </div>
 </template>
 
 <script>
 import AssetThumbnail from './Thumbnail.vue';
 import AssetEditor from '../Editor/Editor.vue';
-import CreateFolder from './CreateFolder.vue';
 import Grid from './Grid.vue';
 import Table from './Table.vue';
 import HasPagination from '../../data-list/HasPagination';
@@ -160,7 +157,7 @@ import { Header, Button } from '@statamic/ui';
 export default {
     mixins: [HasActions, HasPagination, HasPreferences],
 
-    components: { AssetThumbnail, AssetEditor, Uploader, Uploads, CreateFolder, Grid, Table, Header, Button },
+    components: { AssetThumbnail, AssetEditor, Uploader, Uploads, Grid, Table, Header, Button },
 
     props: {
         allowSelectingExistingUpload: Boolean,
@@ -297,6 +294,7 @@ export default {
                 folders: this.folders,
                 restrictFolderNavigation: this.restrictFolderNavigation,
                 path: this.path,
+                creatingFolder: this.creatingFolder,
             };
         },
 
@@ -406,8 +404,33 @@ export default {
             this.editedAssetId = null;
         },
 
-        createFolder() {
-            this.creatingFolder = true;
+        createFolder(name) {
+            this.$axios
+                .post(cp_url(`asset-containers/${this.container.id}/folders`), { path: this.path, directory: name })
+                .then((response) => {
+                    this.$toast.success(__('Folder created'));
+
+                    this.folders.push(response.data);
+                    this.folders = sortBy(this.folders, 'title');
+                    this.creatingFolder = false;
+
+                    this.$refs.grid?.clearNewFolderName();
+                    this.$refs.table?.clearNewFolderName();
+                })
+                .catch((e) => {
+                    if (e.response && e.response.status === 422) {
+                        const { message, errors } = e.response.data;
+
+                        errors.directory
+                            ? this.$toast.error(errors.directory[0])
+                            : this.$toast.error(message);
+
+                        this.$refs.grid?.focusNewFolderInput();
+                        this.$refs.table?.focusNewFolderInput();
+                    } else {
+                        this.$toast.error(__('Something went wrong'));
+                    }
+                });
         },
 
         edit(id) {
@@ -424,12 +447,6 @@ export default {
 
         folderActions(folder) {
             return folder.actions || this.folder.actions || [];
-        },
-
-        folderCreated(folder) {
-            this.folders.push(folder);
-            this.folders = sortBy(this.folders, 'title');
-            this.creatingFolder = false;
         },
 
         isSelected(id) {

@@ -51,6 +51,33 @@
                         </Dropdown>
                     </td>
                 </tr>
+                <tr v-if="creatingFolder">
+                    <td />
+                    <td>
+                        <a class="group flex cursor-pointer items-center">
+                            <file-icon
+                                extension="folder"
+                                class="group-hover:text-blue inline-block h-8 w-8 text-blue-400 ltr:mr-2 rtl:ml-2"
+                            />
+                            <Editable
+                                ref="newFolderInput"
+                                v-model:modelValue="newFolderName"
+                                :start-with-edit-mode="true"
+                                submit-mode="enter"
+                                :placeholder="__('New Folder')"
+                                @submit="$emit('create-folder', newFolderName)"
+                                @cancel="
+                                    () => {
+                                        newFolderName = null;
+                                        $emit('cancel-creating-folder');
+                                    }
+                                "
+                            />
+                        </a>
+                    </td>
+                    <td :colspan="columns.length - 1" />
+                    <td class="actions-column pr-3!" />
+                </tr>
             </template>
 
             <template #cell-basename="{ row: asset, checkboxId }">
@@ -102,17 +129,11 @@
 import AssetThumbnail from './Thumbnail.vue';
 import Breadcrumbs from './Breadcrumbs.vue';
 import AssetBrowserMixin from './AssetBrowserMixin';
-import {
-    Panel,
-    Dropdown,
-    DropdownMenu,
-    DropdownItem,
-    DropdownLabel,
-    DropdownSeparator,
-} from '@statamic/ui';
+import { Panel, Dropdown, DropdownMenu, DropdownItem, DropdownLabel, DropdownSeparator, Editable } from '@statamic/ui';
 
 export default {
     components: {
+        Editable,
         AssetThumbnail,
         Breadcrumbs,
         Panel,
@@ -128,12 +149,37 @@ export default {
     props: {
         loading: Boolean,
         columns: Array,
+        creatingFolder: { type: Boolean },
+    },
+
+    data() {
+        return {
+            newFolderName: null,
+        };
     },
 
     methods: {
         sorted(column, direction) {
             this.$emit('sorted', column, direction);
         },
+
+        focusNewFolderInput() {
+            this.$refs.newFolderInput?.edit();
+        },
+
+        clearNewFolderName() {
+            this.newFolderName = null;
+        },
     },
+
+    watch: {
+        creatingFolder(creating) {
+            if (creating) {
+                this.$nextTick(() => {
+                    this.$refs.newFolderInput.$el.scrollIntoView();
+                });
+            }
+        },
+    }
 };
 </script>
