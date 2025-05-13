@@ -114,6 +114,10 @@ export default {
         return this.$app.config.globalProperties.$fieldActions;
     },
 
+    get $dirty() {
+        return this.$app.config.globalProperties.$dirty;
+    },
+
     get user() {
         return this.$config.get('user');
     },
