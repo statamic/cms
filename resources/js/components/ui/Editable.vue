@@ -1,6 +1,6 @@
 <script setup>
 import { EditableArea, EditableInput, EditablePreview, EditableRoot } from 'reka-ui';
-import { useTemplateRef } from 'vue';
+import { useAttrs, useTemplateRef } from 'vue';
 
 const emit = defineEmits(['update:modelValue', 'cancel', 'submit', 'edit']);
 
@@ -11,15 +11,19 @@ const props = defineProps({
     placeholder: { type: String, default: 'Enter text...' },
 });
 
+const attrs = useAttrs();
+
 const editableRoot = useTemplateRef('root');
+
+defineOptions({
+    inheritAttrs: false,
+});
 
 defineExpose({
     edit,
 });
 
 function stateUpdated(state) {
-    console.log('state updated', state)
-
     if (state === 'cancel') {
         emit('update:modelValue', null);
         emit('cancel');
@@ -51,7 +55,7 @@ function edit() {
     >
         <EditableArea>
             <EditablePreview />
-            <EditableInput />
+            <EditableInput v-bind="attrs" />
         </EditableArea>
     </EditableRoot>
 </template>

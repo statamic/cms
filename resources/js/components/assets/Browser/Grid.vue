@@ -13,7 +13,7 @@
                     :key="folder.path"
                     v-if="!restrictFolderNavigation"
                 >
-                    <button @click="selectFolder(folder.path)" class="w-[80px] h-[66px] group">
+                    <button @dblclick="selectFolder(folder.path)" class="w-[80px] h-[66px] group">
                         <ui-icon name="asset-folder" class="size-full text-blue-400/90 hover:text-blue-400" />
                         <div
                             class="font-mono text-xs text-gray-500 text-center overflow-hidden text-ellipsis whitespace-nowrap"
@@ -47,7 +47,7 @@
                             :start-with-edit-mode="true"
                             submit-mode="enter"
                             :placeholder="__('New Folder')"
-                            class="font-mono text-xs text-gray-500 text-center overflow-hidden text-ellipsis whitespace-nowrap"
+                            class="font-mono text-xs text-gray-500 flex items-center justify-center w-[80px] text-center overflow-hidden text-ellipsis whitespace-nowrap"
                             @submit="$emit('create-folder', newFolderName)"
                             @cancel="() => {
                                 newFolderName = null;
