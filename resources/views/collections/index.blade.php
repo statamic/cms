@@ -7,7 +7,7 @@
 
 @section('content')
     @unless ($collections->isEmpty())
-        <ui-header title="{{ __('Collections') }}">
+        <ui-header title="{{ __('Collections') }}" icon="collections">
             @can('create', 'Statamic\Contracts\Entries\Collection')
                 <ui-button
                     href="{{ cp_route('collections.create') }}"

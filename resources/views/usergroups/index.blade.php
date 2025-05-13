@@ -7,7 +7,7 @@
 
 @section('content')
     @unless ($groups->isEmpty())
-        <ui-header title="{{ __('User Groups') }}">
+        <ui-header title="{{ __('User Groups') }}" icon="groups">
             <ui-button
                 href="{{ cp_route('user-groups.create') }}"
                 variant="primary"

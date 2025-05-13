@@ -7,7 +7,7 @@
 
 @section('content')
     @unless ($forms->isEmpty())
-        <ui-header title="{{ __('Forms') }}">
+        <ui-header title="{{ __('Forms') }}" icon="forms">
             @if (Statamic::pro() && $user->can('create', 'Statamic\Contracts\Forms\Form'))
                 <ui-button
                     href="{{ cp_route('forms.create') }}"

@@ -6,7 +6,7 @@
 @section('title', __('Utilities'))
 
 @section('content')
-    <ui-header title="{{ __('Utilities') }}" />
+    <ui-header title="{{ __('Utilities') }}" icon="utilities" />
 
     <ui-card-panel>
         <div class="flex flex-wrap">

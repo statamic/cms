@@ -7,7 +7,7 @@
 
 @section('content')
     @unless ($taxonomies->isEmpty())
-        <ui-header title="{{ __('Taxonomies') }}">
+        <ui-header title="{{ __('Taxonomies') }}" icon="taxonomies">
 
             @can('create', 'Statamic\Contracts\Taxonomies\Taxonomy')
                 <ui-button

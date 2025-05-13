@@ -11,7 +11,7 @@
         v-slot="{ setFieldValue, setFieldMeta }"
     >
         <div>
-            <Header :title="title">
+            <Header :title="title" icon="preferences">
                 <ButtonGroup>
                     <Button type="submit" variant="primary" :text="__('Save')" @click="save" />
 
