@@ -19,7 +19,7 @@ class RedirectAbsoluteDomains
         /** @var Request $request */
         $host = $request->getHost();
 
-        if (! config('statamic.routes.absolute_domain_redirect', true) || ! Str::endsWith($host, '.')) {
+        if (! Str::endsWith($host, '.')) {
             return $next($request);
         }
 
