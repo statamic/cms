@@ -9,36 +9,15 @@
                 class="group-fieldtype-container"
                 :class="{ 'grid-fullscreen bg-white': fullScreenMode }"
             >
-                <header
+                <publish-field-fullscreen-header
                     v-if="fullScreenMode"
-                    class="relative flex items-center justify-between py-3 rtl:pr-3 ltr:pl-3 bg-gray-200 border-b"
-                >
-                    <h2 v-text="__(config.display)" />
-                    <button
-                        @click="fullScreenMode = false"
-                        class="absolute btn-close top-2 rtl:left-5 ltr:right-5"
-                        :aria-label="__('Exit Fullscreen Mode')"
-                    >&times;</button>
-                </header>
-                <section :class="{ 'p-4': fullScreenMode }">
-                    <div
-                        v-if="!fullScreenMode"
-                        class="group-fieldtype-button-wrapper"
-                    >
-                        <button
-                            v-if="config.fullscreen"
-                            @click="toggleFullScreen"
-                            v-tooltip="__('Toggle Fullscreen Mode')"
-                            class="flex items-center group"
-                        >
-                            <svg-icon
-                                name="expand-bold"
-                                class="h-3.5 px-0.5 text-gray-750 dark:text-dark-175 group-hover:text-black dark:group-hover:text-dark-100"
-                            />
-                        </button>
-                    </div>
-                    <div class="mb-4 border dark:border-dark-900 rounded shadow-sm replicator-set">
-                        <div class="replicator-set-body publish-fields @container">
+                    :title="config.display"
+                    :field-actions="fieldActions"
+                    @close="toggleFullscreen">
+                </publish-field-fullscreen-header>
+                <section :class="{ 'mt-14 p-4': fullScreenMode }">
+                    <div :class="{ 'border dark:border-dark-900 rounded shadow-sm replicator-set': config.border }">
+                        <div class="publish-fields @container" :class="{ 'replicator-set-body': config.border, '-mx-4': !config.border }">
                             <set-field
                                 v-for="field in fields"
                                 :key="field.handle"
@@ -51,11 +30,12 @@
                                 :errors="errors(field.handle)"
                                 :field-path="fieldPath(field.handle)"
                                 :read-only="isReadOnly"
+                                :show-field-previews="config.replicator_preview"
                                 @updated="updated(field.handle, $event)"
                                 @meta-updated="updateMeta(field.handle, $event)"
                                 @focus="$emit('focus')"
                                 @blur="$emit('blur')"
-                                class="p-4"
+                                @replicator-preview-updated="previewUpdated(field.handle, $event)"
                             />
                         </div>
                     </div>
@@ -79,11 +59,13 @@
 import Fieldtype from './Fieldtype.vue';
 import SetField from './replicator/Field.vue';
 import { ValidatesFieldConditions } from '../field-conditions/FieldConditions.js';
+import ManagesPreviewText from "./replicator/ManagesPreviewText";
 
 export default {
     mixins: [
         Fieldtype,
         ValidatesFieldConditions,
+        ManagesPreviewText,
     ],
     components: { SetField },
     data() {
@@ -91,6 +73,7 @@ export default {
             containerWidth: null,
             focused: false,
             fullScreenMode: false,
+            previews: {},
             provide: {
                 group: this.makeGroupProvide(),
                 storeName: this.storeName,
@@ -108,8 +91,20 @@ export default {
         replicatorPreview() {
             if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
 
-            return Object.values(this.value).join(', ');
-        }
+            return replicatorPreviewHtml(this.previewText);
+        },
+        internalFieldActions() {
+            return [
+                {
+                    title: __('Toggle Fullscreen Mode'),
+                    icon: ({ vm }) => vm.fullScreenMode ? 'shrink-all' : 'expand-bold',
+                    quick: true,
+                    run: this.toggleFullscreen,
+                    visible: this.config.fullscreen,
+                    visibleWhenReadOnly: true,
+                },
+            ];
+        },
     },
     methods: {
         blurred() {
@@ -160,6 +155,10 @@ export default {
             this.$emit('meta-updated', { ...this.meta, [handle]: value });
         },
 
+        previewUpdated(handle, value) {
+            this.previews = { ...this.previews, [handle]: value };
+        },
+
         fieldPath(handle) {
             return (this.fieldPathPrefix || this.handle) + '.' + handle;
         },
@@ -168,6 +167,10 @@ export default {
             const state = this.$store.state.publish[this.storeName];
             if (!state) return [];
             return state.errors[this.fieldPath(handle)] || [];
+        },
+
+        toggleFullscreen() {
+            this.fullScreenMode = !this.fullScreenMode;
         },
     },
 };

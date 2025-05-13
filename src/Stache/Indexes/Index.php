@@ -65,15 +65,18 @@ abstract class Index
             return $this;
         }
 
-        static::$currentlyLoading = $this->store->key().'/'.$this->name;
+        $loadingKey = $this->store->key().'/'.$this->name;
+        $currentlyLoadingThis = static::$currentlyLoading === $loadingKey;
+
+        static::$currentlyLoading = $loadingKey;
 
         $this->loaded = true;
 
-        if (Statamic::isWorker()) {
+        if (Statamic::isWorker() && ! $currentlyLoadingThis) {
             $this->loaded = false;
         }
 
-        debugbar()->addMessage("Loading index: {$this->store->key()}/{$this->name}", 'stache');
+        debugbar()->addMessage("Loading index: {$loadingKey}", 'stache');
 
         $this->items = Stache::cacheStore()->get($this->cacheKey());
 
@@ -135,15 +138,18 @@ abstract class Index
 
     public function cacheKey()
     {
+        $searches = ['.', '/'];
         $replacements = ['::', '->'];
 
         if (windows_os()) {
             $replacements[1] = '-]';
+            $searches[] = '->';
+            $replacements[] = '-]';
         }
 
         return vsprintf('stache::indexes::%s::%s', [
             $this->store->key(),
-            str_replace(['.', '/'], $replacements, $this->name),
+            str_replace($searches, $replacements, $this->name),
         ]);
     }
 

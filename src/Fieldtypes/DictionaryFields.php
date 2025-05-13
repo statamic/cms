@@ -30,17 +30,17 @@ class DictionaryFields extends Fieldtype
         return [
             'type' => [
                 'fields' => $typeField->toPublishArray(),
-                'meta' => $typeField->meta(),
+                'meta' => $typeField->meta()->all(),
             ],
             'dictionaries' => Dictionary::all()->mapWithKeys(function (\Statamic\Dictionaries\Dictionary $dictionary) {
                 return [$dictionary->handle() => [
                     'fields' => $dictionary->fields()->toPublishArray(),
-                    'meta' => $dictionary->fields()->meta(),
+                    'meta' => $dictionary->fields()->meta()->all(),
                     'defaults' => $dictionary->fields()->all()->map(function ($field) {
                         return $field->fieldtype()->preProcess($field->defaultValue());
-                    }),
+                    })->all(),
                 ]];
-            }),
+            })->all(),
         ];
     }
 
@@ -51,7 +51,7 @@ class DictionaryFields extends Fieldtype
         }
 
         if (is_string($data)) {
-            return ['type' => $data];
+            $data = ['type' => $data];
         }
 
         $dictionary = Dictionary::find($data['type']);
@@ -71,7 +71,7 @@ class DictionaryFields extends Fieldtype
             return $dictionary->handle();
         }
 
-        return array_merge(['type' => $dictionary->handle()], $values->all());
+        return array_merge(['type' => $dictionary->handle()], $values->filter()->all());
     }
 
     public function extraRules(): array

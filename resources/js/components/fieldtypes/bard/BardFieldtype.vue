@@ -15,8 +15,28 @@
         @dragend="ignorePageHeader(false)"
     >
 
-        <div class="bard-fixed-toolbar" v-if="!readOnly && showFixedToolbar">
-            <div class="flex flex-wrap flex-1 items-center no-select" v-if="toolbarIsFixed" :class="{'justify-center': fullScreenMode}">
+        <publish-field-fullscreen-header
+            v-if="fullScreenMode"
+            :title="config.display"
+            :field-actions="fieldActions"
+            @close="toggleFullscreen">
+            <div class="bard-fixed-toolbar border-0" v-if="!readOnly && showFixedToolbar">
+                <div class="flex flex-wrap flex-1 items-center no-select" v-if="toolbarIsFixed">
+                    <component
+                        v-for="button in visibleButtons(buttons)"
+                        :key="button.name"
+                        :is="button.component || 'BardToolbarButton'"
+                        :button="button"
+                        :active="buttonIsActive(button)"
+                        :config="config"
+                        :bard="_self"
+                        :editor="editor" />
+                </div>
+            </div>
+        </publish-field-fullscreen-header>
+
+        <div class="bard-fixed-toolbar" v-if="!readOnly && showFixedToolbar && !fullScreenMode">
+            <div class="flex flex-wrap flex-1 items-center no-select" v-if="toolbarIsFixed">
                 <component
                     v-for="button in visibleButtons(buttons)"
                     :key="button.name"
@@ -26,16 +46,6 @@
                     :config="config"
                     :bard="_self"
                     :editor="editor" />
-                    <button class="bard-toolbar-button" @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')" :aria-label="__('Show HTML Source')">
-                        <svg-icon name="show-source" class="w-4 h-4 "/>
-                    </button>
-                    <button class="bard-toolbar-button" @click="toggleCollapseSets" v-tooltip="__('Expand/Collapse Sets')" :aria-label="__('Expand/Collapse Sets')" v-if="config.collapse !== 'accordion' && setConfigs.length > 0">
-                        <svg-icon name="expand-collapse-vertical-2" class="w-4 h-4" />
-                    </button>
-                    <button class="bard-toolbar-button" @click="toggleFullscreen" v-tooltip="__('Toggle Fullscreen Mode')" :aria-label="__('Toggle Fullscreen Mode')" v-if="config.fullscreen">
-                        <svg-icon name="arrows-shrink" class="w-4 h-4" v-show="fullScreenMode" />
-                        <svg-icon name="expand-bold" class="w-4 h-4" v-show="!fullScreenMode" />
-                    </button>
             </div>
         </div>
 
@@ -328,6 +338,41 @@ export default {
             return this.config.sets;
         },
 
+        internalFieldActions() {
+            return [
+                {
+                    title: __('Expand All Sets'),
+                    icon: 'arrows-horizontal-expand',
+                    quick: true,
+                    visibleWhenReadOnly: true,
+                    run: this.expandAll,
+                    visible: this.setConfigs.length > 0,
+                },
+                {
+                    title: __('Collapse All Sets'),
+                    icon: 'arrows-horizontal-collapse',
+                    quick: true,
+                    visibleWhenReadOnly: true,
+                    run: this.collapseAll,
+                    visible: this.setConfigs.length > 0,
+                },
+                {
+                    title: __('Toggle Fullscreen Mode'),
+                    icon: ({ vm }) => vm.fullScreenMode ? 'shrink-all' : 'expand-bold',
+                    quick: true,
+                    run: this.toggleFullscreen,
+                    visibleWhenReadOnly: true,
+                    visible: this.config.fullscreen,
+                },
+                {
+                    title: __('Show HTML Source'),
+                    run: () => this.showSource = !this.showSource,
+                    visibleWhenReadOnly: true,
+                    visible: this.allowSource,
+                },
+            ];
+        },
+
     },
 
     mounted() {
@@ -412,8 +457,8 @@ export default {
     methods: {
         addSet(handle) {
             const id = uniqid();
-            const values = Object.assign({}, { type: handle }, this.meta.defaults[handle]);
-
+            const deepCopy = JSON.parse(JSON.stringify(this.meta.defaults[handle]));
+            const values = Object.assign({}, { type: handle }, deepCopy);
             let previews = {};
             Object.keys(this.meta.defaults[handle]).forEach(key => previews[key] = null);
             this.previews = Object.assign({}, this.previews, { [id]: previews });
@@ -436,7 +481,8 @@ export default {
         duplicateSet(old_id, attrs, pos) {
             const id = uniqid();
             const enabled = attrs.enabled;
-            const values = Object.assign({}, attrs.values);
+            const deepCopy = JSON.parse(JSON.stringify(attrs.values));
+            const values = Object.assign({}, deepCopy);
 
             let previews = Object.assign({}, this.previews[old_id]);
             this.previews = Object.assign({}, this.previews, { [id]: previews });

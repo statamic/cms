@@ -44,10 +44,14 @@
                         <publish-field-meta
                             :config="{ handle: 'icon', type: 'icon', directory: this.iconBaseDirectory, folder: this.iconSubFolder }"
                             :initial-value="editingSection.icon"
-                            v-slot="{ meta, value, loading }"
+                            v-slot="{ meta, value, loading, config }"
                         >
-                            <icon-fieldtype v-if="!loading" handle="icon" :meta="meta" :value="value" @input="editingSection.icon = $event" />
+                            <icon-fieldtype v-if="!loading" handle="icon" :config="config" :meta="meta" :value="value" @input="editingSection.icon = $event" />
                         </publish-field-meta>
+                    </div>
+                    <div class="form-group w-full" v-if="showHideField">
+                        <label v-text="__('Hidden')" />
+                        <toggle-input v-model="editingSection.hide" />
                     </div>
                 </div>
             </confirmation-modal>
@@ -105,6 +109,10 @@ export default {
             required: true
         },
         showHandleField: {
+            type: Boolean,
+            default: false
+        },
+        showHideField: {
             type: Boolean,
             default: false
         },
@@ -191,6 +199,7 @@ export default {
                 handle: this.section.handle,
                 instructions: this.section.instructions,
                 icon: this.section.icon,
+                hide: this.section.hide,
             };
         },
 

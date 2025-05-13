@@ -22,6 +22,7 @@
                 :item="item"
                 :component="formComponent"
                 :component-props="formComponentProps"
+                :stack-size="formStackSize"
                 @updated="itemUpdated"
                 @closed="isEditing = false"
             />
@@ -52,7 +53,11 @@ export default {
         InlineEditForm
     },
 
-    inject: ['storeName'],
+    inject: {
+        storeName: {
+            default: null
+        }
+    },
 
     props: {
         item: Object,
@@ -63,6 +68,7 @@ export default {
         readOnly: Boolean,
         formComponent: String,
         formComponentProps: Object,
+        formStackSize: String,
     },
 
     data() {

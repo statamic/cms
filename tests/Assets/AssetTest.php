@@ -11,6 +11,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
+use League\Flysystem\PathTraversalDetected;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -483,6 +484,25 @@ class AssetTest extends TestCase
     }
 
     #[Test]
+    public function it_cannot_use_traversal_in_path()
+    {
+        $asset = (new Asset)->path('path/to/asset.jpg');
+
+        try {
+            $asset->path('foo/../test.jpg');
+        } catch (PathTraversalDetected $e) {
+            $this->assertEquals('Path traversal detected: foo/../test.jpg', $e->getMessage());
+
+            // Even if exception was thrown, make sure that the path didn't somehow get updated.
+            $this->assertEquals('path/to/asset.jpg', $asset->path());
+
+            return;
+        }
+
+        $this->fail('Exception was not thrown.');
+    }
+
+    #[Test]
     public function it_gets_the_id_from_the_container_and_path()
     {
         $asset = (new Asset)
@@ -601,7 +621,7 @@ class AssetTest extends TestCase
     #[Test]
     public function it_checks_if_its_an_image_file()
     {
-        $extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        $extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif'];
 
         foreach ($extensions as $ext) {
             $this->assertTrue((new Asset)->path("path/to/asset.$ext")->isImage());
@@ -1997,7 +2017,7 @@ class AssetTest extends TestCase
     public function it_appends_timestamp_to_uploaded_files_filename_if_it_already_exists()
     {
         Event::fake();
-        Carbon::setTestNow(Carbon::createFromTimestamp(1549914700));
+        Carbon::setTestNow(Carbon::createFromTimestamp(1549914700, config('app.timezone')));
         $asset = $this->container->makeAsset('path/to/asset.jpg');
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
         Storage::disk('test')->put('path/to/asset.jpg', '');
@@ -2042,6 +2062,8 @@ class AssetTest extends TestCase
         Storage::disk('test')->assertExists('path/to/asset.jpg');
         $originalFileContents = Storage::disk('test')->get('path/to/asset.jpg');
         $this->assertEquals('path/to/asset.jpg', $asset->path());
+        $asset->set('alt', 'Original alt text');
+        $asset->save();
         $meta = $asset->meta();
         $this->assertEquals(13, $meta['width']);
         $this->assertEquals(15, $meta['height']);
@@ -2061,6 +2083,7 @@ class AssetTest extends TestCase
         $meta = $asset->meta();
         $this->assertEquals(40, $meta['width']);
         $this->assertEquals(25, $meta['height']);
+        $this->assertEquals('Original alt text', $asset->get('alt'));
         Storage::disk('test')->assertExists('path/to/asset.jpg');
         Storage::disk('test')->assertMissing('path/to/different-filename.jpg');
         $this->assertNotEquals($originalFileContents, Storage::disk('test')->get('path/to/asset.jpg'));
@@ -2069,7 +2092,7 @@ class AssetTest extends TestCase
         Event::assertDispatched(AssetReuploaded::class, function ($event) use ($asset) {
             return $event->asset->id() === $asset->id();
         });
-        Event::assertDispatched(AssetSaved::class, 1); // Once during the initial upload, but not again for the reupload.
+        Event::assertDispatched(AssetSaved::class, 2); // Once during the initial upload, again when we save the alt text, but not for the reupload.
 
         // Assertions that the Glide cache is cleared and the presets
         // are regenerated for this asset are in ReuploadAssetTest.
@@ -2615,5 +2638,23 @@ YAML;
         $this->assertFalse($return);
         Facades\Asset::shouldNotHaveReceived('delete');
         Event::assertNotDispatched(AssetDeleted::class);
+    }
+
+    #[Test]
+    public function it_uses_a_custom_cache_store()
+    {
+        config([
+            'cache.stores.asset_meta' => [
+                'driver' => 'file',
+                'path' => storage_path('statamic/asset-meta'),
+            ],
+        ]);
+
+        Storage::fake('local');
+
+        $store = (new Asset)->cacheStore();
+
+        // ideally we would have checked the store name, but laravel 10 doesnt give us a way to do that
+        $this->assertStringContainsString('asset-meta', $store->getStore()->getDirectory());
     }
 }

@@ -22,6 +22,9 @@ $manualFiles = [
     'permissions',
     'markdown',
     'validation',
+    'moment',
+    'dictionary-countries',
+    'dictionary-currencies',
 ];
 
 // Don't translate the following files.
@@ -43,7 +46,6 @@ $additionalStrings = [
     'Whoops!',
     'Regards',
     "If you're having trouble clicking the \":actionText\" button, copy and paste the URL below\ninto your web browser:",
-    "If you’re having trouble clicking the \":actionText\" button, copy and paste the URL below\ninto your web browser:", // laravel <8.48.0
     'All rights reserved.',
     'The given data was invalid.',
     'Protected Page',

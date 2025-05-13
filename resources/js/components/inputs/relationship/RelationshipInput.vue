@@ -28,11 +28,12 @@
                     :item="item"
                     :config="config"
                     :status-icon="statusIcons"
-                    :editable="canEdit"
+                    :editable="canEdit && (item.editable || item.editable === undefined)"
                     :sortable="!readOnly && canReorder"
                     :read-only="readOnly"
                     :form-component="formComponent"
                     :form-component-props="formComponentProps"
+                    :form-stack-size="formStackSize"
                     class="item outline-none"
                     @removed="remove(i)"
                 />
@@ -51,6 +52,7 @@
                             :site="site"
                             :component="formComponent"
                             :component-props="formComponentProps"
+                            :stack-size="formStackSize"
                             @created="itemCreated"
                         />
                     </div>
@@ -77,7 +79,7 @@
                     :search="search"
                     :exclusions="exclusions"
                     :type="config.type"
-                    :tree="tree"
+                    :tree="config.query_scopes?.length > 0 ? null : tree"
                     @selected="selectionsUpdated"
                     @closed="close"
                 />
@@ -122,6 +124,7 @@ export default {
         creatables: Array,
         formComponent: String,
         formComponentProps: Object,
+        formStackSize: String,
         mode: {
             type: String,
             default: 'default',
@@ -164,7 +167,9 @@ export default {
     computed: {
 
         items() {
-            return this.value.map(selection => {
+            if (this.value === null) return [];
+
+            return this.value?.map(selection => {
                 const data = _.find(this.data, (item) => item.id == selection);
 
                 if (! data) return { id: selection, title: selection };
@@ -174,7 +179,7 @@ export default {
         },
 
         maxItemsReached() {
-            return this.value.length >= this.maxItems;
+            return this.value?.length >= this.maxItems;
         },
 
         canSelectOrCreate() {

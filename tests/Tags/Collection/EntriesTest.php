@@ -143,6 +143,19 @@ class EntriesTest extends TestCase
     }
 
     #[Test]
+    public function it_should_not_throw_exception_if_trying_to_paginate_or_limit_and_the_other_is_null()
+    {
+        $this->makeEntry('a')->save();
+        $this->makeEntry('b')->save();
+        $this->makeEntry('c')->save();
+        $this->makeEntry('d')->save();
+        $this->makeEntry('e')->save();
+
+        $this->assertCount(3, $this->getEntries(['paginate' => 3, 'limit' => null]));
+        $this->assertCount(3, $this->getEntries(['paginate' => null, 'limit' => 3]));
+    }
+
+    #[Test]
     public function it_should_throw_exception_if_trying_to_paginate_and_chunk_at_same_time()
     {
         $this->makeEntry('a')->save();
@@ -342,6 +355,7 @@ class EntriesTest extends TestCase
         $this->assertCount(1, $this->getEntries(['status:is' => 'published']));
         $this->assertCount(3, $this->getEntries(['status:not' => 'published']));
         $this->assertCount(3, $this->getEntries(['status:in' => 'published|draft']));
+        $this->assertCount(4, $this->getEntries(['status:is' => 'any']));
     }
 
     #[Test]

@@ -11,10 +11,15 @@ use InvalidArgumentException;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Blink;
+use Statamic\Query\Exceptions\MultipleRecordsFoundException;
+use Statamic\Query\Exceptions\RecordsNotFoundException;
+use Statamic\Query\Scopes\AppliesScopes;
 use Statamic\Support\Arr;
 
 abstract class EloquentQueryBuilder implements Builder
 {
+    use AppliesScopes;
+
     protected $builder;
     protected $columns;
 
@@ -39,6 +44,12 @@ abstract class EloquentQueryBuilder implements Builder
 
     public function __call($method, $args)
     {
+        if ($this->canApplyScope($method)) {
+            $this->applyScope($method, $args[0] ?? []);
+
+            return $this;
+        }
+
         $response = $this->builder->$method(...$args);
 
         return $response instanceof EloquentBuilder ? $this : $response;
@@ -69,6 +80,52 @@ abstract class EloquentQueryBuilder implements Builder
     public function first()
     {
         return $this->get()->first();
+    }
+
+    public function firstOrFail($columns = ['*'])
+    {
+        if (! is_null($item = $this->select($columns)->first($columns))) {
+            return $item;
+        }
+
+        throw new RecordsNotFoundException();
+    }
+
+    public function firstOr($columns = ['*'], ?Closure $callback = null)
+    {
+        if ($columns instanceof Closure) {
+            $callback = $columns;
+
+            $columns = ['*'];
+        }
+
+        if (! is_null($model = $this->select($columns)->first())) {
+            return $model;
+        }
+
+        return $callback();
+    }
+
+    public function sole($columns = ['*'])
+    {
+        $result = $this->get($columns);
+
+        $count = $result->count();
+
+        if ($count === 0) {
+            throw new RecordsNotFoundException();
+        }
+
+        if ($count > 1) {
+            throw new MultipleRecordsFoundException($count);
+        }
+
+        return $result->first();
+    }
+
+    public function exists()
+    {
+        return $this->builder->count() >= 1;
     }
 
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
@@ -382,6 +439,19 @@ abstract class EloquentQueryBuilder implements Builder
     public function orderBy($column, $direction = 'asc')
     {
         $this->builder->orderBy($this->column($column), $direction);
+
+        return $this;
+    }
+
+    public function reorder($column = null, $direction = 'asc')
+    {
+        if ($column) {
+            $this->builder->reorder($this->column($column), $direction);
+
+            return $this;
+        }
+
+        $this->builder->reorder();
 
         return $this;
     }

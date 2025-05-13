@@ -25,7 +25,7 @@ class ImageRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        $extensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp'];
+        $extensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'avif'];
 
         return collect($value)->every(function ($id) use ($extensions) {
             if ($id instanceof UploadedFile) {

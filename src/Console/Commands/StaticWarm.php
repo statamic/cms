@@ -9,6 +9,7 @@ use GuzzleHttp\Psr7\Message;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Console\Command;
+use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Collection;
 use Statamic\Console\EnhancesCommands;
@@ -36,6 +37,11 @@ class StaticWarm extends Command
         {--u|user= : HTTP authentication user}
         {--p|password= : HTTP authentication password}
         {--insecure : Skip SSL verification}
+        {--uncached : Only warm uncached URLs}
+        {--max-depth= : Maximum depth of URLs to warm}
+        {--include= : Only warm specific URLs}
+        {--exclude= : Exclude specific URLs}
+        {--max-requests= : Maximum number of requests to warm}
     ';
 
     protected $description = 'Warms the static cache by visiting all URLs';
@@ -89,8 +95,12 @@ class StaticWarm extends Command
             $queue = config('statamic.static_caching.warm_queue');
             $this->line(sprintf('Adding %s requests onto %squeue...', count($requests), $queue ? $queue.' ' : ''));
 
+            $jobClass = $this->option('uncached')
+                ? StaticWarmUncachedJob::class
+                : StaticWarmJob::class;
+
             foreach ($requests as $request) {
-                StaticWarmJob::dispatch($request, $this->clientConfig())
+                $jobClass::dispatch($request, $this->clientConfig())
                     ->onConnection($this->queueConnection)
                     ->onQueue($queue);
             }
@@ -177,13 +187,69 @@ class StaticWarm extends Command
             ->merge($this->customRouteUris())
             ->merge($this->additionalUris())
             ->unique()
+            ->filter(fn ($uri) => $this->shouldInclude($uri))
+            ->reject(fn ($uri) => $this->shouldExclude($uri))
+            ->reject(fn ($uri) => $this->exceedsMaxDepth($uri))
             ->reject(function ($uri) use ($cacher) {
+                if ($this->option('uncached') && $cacher->hasCachedPage(HttpRequest::create($uri))) {
+                    return true;
+                }
+
                 Site::resolveCurrentUrlUsing(fn () => $uri);
 
                 return $cacher->isExcluded($uri);
             })
             ->sort()
-            ->values();
+            ->values()
+            ->when($this->option('max-requests'), fn ($uris, $max) => $uris->take($max));
+    }
+
+    private function shouldInclude($uri): bool
+    {
+        if (! $inclusions = $this->option('include')) {
+            return true;
+        }
+
+        $inclusions = explode(',', $inclusions);
+
+        return collect($inclusions)->contains(fn ($included) => $this->uriMatches($uri, $included));
+    }
+
+    private function shouldExclude($uri): bool
+    {
+        if (! $exclusions = $this->option('exclude')) {
+            return false;
+        }
+
+        $exclusions = explode(',', $exclusions);
+
+        return collect($exclusions)->contains(fn ($excluded) => $this->uriMatches($uri, $excluded));
+    }
+
+    private function uriMatches($uri, $pattern): bool
+    {
+        $uri = URL::makeRelative($uri);
+
+        if (Str::endsWith($pattern, '*')) {
+            $prefix = Str::removeRight($pattern, '*');
+
+            if (Str::startsWith($uri, $prefix) && ! (Str::endsWith($prefix, '/') && $uri === $prefix)) {
+                return true;
+            }
+        } elseif (Str::removeRight($uri, '/') === Str::removeRight($pattern, '/')) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private function exceedsMaxDepth($uri): bool
+    {
+        if (! $max = $this->option('max-depth')) {
+            return false;
+        }
+
+        return count(explode('/', trim(URL::makeRelative($uri), '/'))) > $max;
     }
 
     private function shouldVerifySsl(): bool

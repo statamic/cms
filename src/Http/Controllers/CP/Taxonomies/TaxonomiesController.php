@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Taxonomies;
 
 use Illuminate\Http\Request;
 use Statamic\Contracts\Taxonomies\Taxonomy as TaxonomyContract;
+use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\Contracts\Taxonomies\TermRepository;
 use Statamic\CP\Column;
 use Statamic\Facades\Blueprint;
@@ -19,6 +20,8 @@ use Statamic\Stache\Repositories\TermRepository as StacheTermRepository;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class TaxonomiesController extends CpController
 {
     public function index()
@@ -31,7 +34,7 @@ class TaxonomiesController extends CpController
             return [
                 'id' => $taxonomy->handle(),
                 'title' => $taxonomy->title(),
-                'terms' => $taxonomy->queryTerms()->count(),
+                'terms' => $taxonomy->queryTerms()->pluck('slug')->unique()->count(),
                 'edit_url' => $taxonomy->editUrl(),
                 'delete_url' => $taxonomy->deleteUrl(),
                 'terms_url' => cp_route('taxonomies.show', $taxonomy->handle()),
@@ -80,6 +83,7 @@ class TaxonomiesController extends CpController
                 'taxonomy' => $taxonomy->handle(),
                 'blueprints' => $blueprints->pluck('handle')->all(),
             ]),
+            'canCreate' => User::current()->can('create', [TermContract::class, $taxonomy]) && $taxonomy->hasVisibleTermBlueprint(),
         ];
 
         if ($taxonomy->queryTerms()->count() === 0) {

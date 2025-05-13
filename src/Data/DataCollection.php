@@ -7,6 +7,8 @@ use Closure;
 use Illuminate\Support\Collection as IlluminateCollection;
 use Statamic\Exceptions\MethodNotFoundException;
 use Statamic\Facades\Compare;
+use Statamic\Search\PlainResult;
+use Statamic\Search\Result;
 use Statamic\Support\Str;
 
 /**
@@ -94,13 +96,19 @@ class DataCollection extends IlluminateCollection
             return $this->normalizeSortableValue($item[$sort] ?? null);
         }
 
-        $method = Str::camel($sort);
+        if ($item instanceof Result && ! $item instanceof PlainResult) {
+            $item = $item->getSearchable() ?? $item;
+        }
 
-        $value = (method_exists($item, $method))
-            ? call_user_func([$item, $method])
-            : $item->get($sort);
+        if (method_exists($item, $method = Str::camel($sort))) {
+            return $this->normalizeSortableValue(call_user_func([$item, $method]));
+        }
 
-        return $this->normalizeSortableValue($value);
+        if (method_exists($item, 'value')) {
+            return $this->normalizeSortableValue($item->value($sort));
+        }
+
+        return $this->normalizeSortableValue($item->get($sort));
     }
 
     /**

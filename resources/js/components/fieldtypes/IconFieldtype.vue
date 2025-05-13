@@ -1,6 +1,7 @@
 <template>
     <div class="flex icon-fieldtype-wrapper">
         <v-select
+            v-if="!loading"
             ref="input"
             class="w-full"
             append-to-body
@@ -38,15 +39,30 @@
 
 <script>
 import PositionsSelectOptions from '../../mixins/PositionsSelectOptions';
+import { ref, watch } from 'vue';
+const iconsCache = ref({});
+const loaders = ref({});
 
 export default {
 
     mixins: [Fieldtype, PositionsSelectOptions],
 
+    data() {
+        return {
+            icons: [],
+            loading: true,
+        }
+    },
+
     computed: {
+
+        cacheKey() {
+            return `${this.meta.directory}/${this.meta.set}`;
+        },
+
         options() {
             let options = [];
-            for (let [name, html] of Object.entries(this.meta.icons)) {
+            for (let [name, html] of Object.entries(this.icons)) {
                 options.push({
                     value: name,
                     label: name,
@@ -61,6 +77,18 @@ export default {
         }
     },
 
+    created() {
+        this.request();
+
+        watch(
+            () => loaders.value[this.cacheKey],
+            (loading) => {
+                this.icons = iconsCache.value[this.cacheKey];
+                this.loading = loading;
+            }
+        );
+    },
+
     methods: {
         focus() {
             this.$refs.input.focus();
@@ -73,6 +101,23 @@ export default {
                 this.update(null);
             }
         },
+
+        request() {
+            if (loaders.value[this.cacheKey]) return;
+
+            loaders.value = {...loaders.value, [this.cacheKey]: true};
+
+            this.$axios.post(this.meta.url, {
+                config: utf8btoa(JSON.stringify(this.config)),
+            }).then(response => {
+                const icons = response.data.icons;
+                this.icons = icons;
+                iconsCache.value = {...iconsCache.value, [this.cacheKey]: icons};
+            })
+            .finally(() => {
+                loaders.value = {...loaders.value , [this.cacheKey]: false};
+            });
+        }
     }
 };
 </script>

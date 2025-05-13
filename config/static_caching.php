@@ -102,6 +102,33 @@ return [
 
     'ignore_query_strings' => false,
 
+    'allowed_query_strings' => [
+        //
+    ],
+
+    'disallowed_query_strings' => [
+        //
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Nocache
+    |--------------------------------------------------------------------------
+    |
+    | Here you may define where the nocache data is stored.
+    |
+    | https://statamic.dev/tags/nocache#database
+    |
+    | Supported drivers: "cache", "database"
+    |
+    */
+
+    'nocache' => 'cache',
+
+    'nocache_db_connection' => env('STATAMIC_NOCACHE_DB_CONNECTION'),
+
+    'nocache_js_position' => 'body',
+
     /*
     |--------------------------------------------------------------------------
     | Replacers

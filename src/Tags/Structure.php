@@ -64,7 +64,13 @@ class Structure extends Tags
             'max_depth' => $this->params->get('max_depth'),
         ]);
 
-        return $this->toArray($tree);
+        $value = $this->toArray($tree);
+
+        if ($this->parser && ($as = $this->params->get('as'))) {
+            return [$as => $value];
+        }
+
+        return $value;
     }
 
     protected function ensureStructureExists(string $handle): void
@@ -121,7 +127,7 @@ class Structure extends Tags
 
     public function toArray($tree, $parent = null, $depth = 1)
     {
-        $pages = BulkAugmentor::tree($tree)->map(function ($item, $data, $index) use ($depth, $tree, $parent) {
+        $pages = BulkAugmentor::tree($tree, $this->params->explode('select'))->map(function ($item, $data, $index) use ($depth, $tree, $parent) {
             $page = $item['page'];
             $children = empty($item['children']) ? [] : $this->toArray($item['children'], $page, $depth + 1);
 
@@ -130,7 +136,6 @@ class Structure extends Tags
 
             return array_merge($data, [
                 'children' => $children,
-                'parent' => $parent,
                 'depth' => $depth,
                 'index' => $index,
                 'count' => $index + 1,
@@ -139,7 +144,7 @@ class Structure extends Tags
                 'is_current' => ! is_null($url) && rtrim($url, '/') === rtrim($this->currentUrl, '/'),
                 'is_parent' => ! is_null($url) && $this->siteAbsoluteUrl !== $absoluteUrl && URL::isAncestorOf($this->currentUrl, $url),
                 'is_external' => URL::isExternal((string) $absoluteUrl),
-            ]);
+            ], $this->params->bool('include_parents', true) ? ['parent' => $parent] : []);
         })->filter()->values();
 
         $this->updateIsParent($pages);

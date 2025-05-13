@@ -177,4 +177,57 @@ class ApplicationCacherTest extends TestCase
         $this->assertEquals([], $cacher->getUrls('http://example.com')->all());
         $this->assertEquals([], $cacher->getUrls('http://another.com')->all());
     }
+
+    #[Test]
+    #[DataProvider('currentUrlProvider')]
+    public function it_gets_the_current_url(
+        array $query,
+        array $config,
+        string $expectedUrl
+    ) {
+        $request = Request::create('http://example.com/test', 'GET', $query);
+
+        $cacher = new ApplicationCacher(app(Repository::class), $config);
+
+        $this->assertEquals($expectedUrl, $cacher->getUrl($request));
+    }
+
+    public static function currentUrlProvider()
+    {
+        return [
+            'no query' => [
+                [],
+                [],
+                'http://example.com/test',
+            ],
+            'with query' => [
+                ['bravo' => 'b', 'charlie' => 'c', 'alfa' => 'a'],
+                [],
+                'http://example.com/test?alfa=a&bravo=b&charlie=c',
+            ],
+            'with query, ignoring query' => [
+                ['bravo' => 'b', 'charlie' => 'c', 'alfa' => 'a'],
+                ['ignore_query_strings' => true],
+                'http://example.com/test',
+            ],
+            'with query, allowed query' => [
+                ['bravo' => 'b', 'charlie' => 'c', 'alfa' => 'a'],
+                ['allowed_query_strings' => ['alfa', 'bravo']],
+                'http://example.com/test?alfa=a&bravo=b',
+            ],
+            'with query, disallowed query' => [
+                ['bravo' => 'b', 'charlie' => 'c', 'alfa' => 'a'],
+                ['disallowed_query_strings' => ['charlie']],
+                'http://example.com/test?alfa=a&bravo=b',
+            ],
+            'with query, allowed and disallowed' => [
+                ['bravo' => 'b', 'charlie' => 'c', 'alfa' => 'a'],
+                [
+                    'allowed_query_strings' => ['alfa', 'bravo'],
+                    'disallowed_query_strings' => ['bravo'],
+                ],
+                'http://example.com/test?alfa=a',
+            ],
+        ];
+    }
 }

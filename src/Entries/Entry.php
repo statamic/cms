@@ -277,6 +277,8 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
                     ->save();
             });
 
+        Blink::forget('entry-descendants-'.$this->id());
+
         return true;
     }
 
@@ -515,7 +517,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         return $this
             ->fluentlyGetOrSet('template')
             ->getter(function ($template) {
-                $template = $template ?? $this->get('template') ?? optional($this->origin())->template() ?? $this->collection()->template();
+                $template = $template ?? $this->getSupplement('template') ?? $this->get('template') ?? optional($this->origin())->template() ?? $this->collection()->template();
 
                 return $template === '@blueprint'
                     ? $this->inferTemplateFromBlueprint()
@@ -540,7 +542,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         return $this
             ->fluentlyGetOrSet('layout')
             ->getter(function ($layout) {
-                return $layout ?? $this->get('layout') ?? optional($this->origin())->layout() ?? $this->collection()->layout();
+                return $layout ?? $this->getSupplement('layout') ?? $this->get('layout') ?? optional($this->origin())->layout() ?? $this->collection()->layout();
             })
             ->args(func_get_args());
     }
@@ -620,6 +622,11 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         return $this->blueprint()->field('date')->fieldtype()->secondsEnabled();
     }
 
+    public function hasExplicitDate(): bool
+    {
+        return $this->hasDate() && $this->date;
+    }
+
     public function sites()
     {
         return $this->collection()->sites();
@@ -691,7 +698,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             ->slug($attrs['slug']);
 
         if ($this->collection()->dated() && ($date = Arr::get($attrs, 'date'))) {
-            $entry->date(Carbon::createFromTimestamp($date));
+            $entry->date(Carbon::createFromTimestamp($date, config('app.timezone')));
         }
 
         return $entry;
@@ -944,7 +951,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
     protected function getOriginByString($origin)
     {
-        return Facades\Entry::find($origin);
+        return $this->collection()->queryEntries()->where('id', $origin)->first();
     }
 
     protected function getOriginFallbackValues()
@@ -1006,7 +1013,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
         // Since the slug is generated from the title, we'll avoid augmenting
         // the slug which could result in an infinite loop in some cases.
-        $title = $this->withLocale($this->site()->locale(), fn () => (string) Antlers::parse($format, $this->augmented()->except('slug')->all()));
+        $title = $this->withLocale($this->site()->lang(), fn () => (string) Antlers::parse($format, $this->augmented()->except('slug')->all()));
 
         return trim($title);
     }

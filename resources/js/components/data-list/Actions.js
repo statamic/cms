@@ -30,8 +30,7 @@ export default {
     },
 
     methods: {
-
-        run(action, values) {
+        run(action, values, done) {
             this.$emit('started');
 
             this.errors = {};
@@ -43,11 +42,17 @@ export default {
                 values
             };
 
-            this.$axios.post(this.url, payload, { responseType: 'blob' }).then(response => {
-                response.headers['content-disposition']
-                    ? this.handleFileDownload(response) // Pass blob response for downloads
-                    : this.handleActionSuccess(response); // Otherwise handle as normal, converting from JSON
-            }).catch(error => this.handleActionError(error.response));
+            this.$axios
+                .post(this.url, payload, { responseType: 'blob' })
+                .then((response) => {
+                    response.headers['content-disposition']
+                        ? this.handleFileDownload(response) // Pass blob response for downloads
+                        : this.handleActionSuccess(response); // Otherwise handle as normal, converting from JSON
+                })
+                .catch((error) => this.handleActionError(error.response))
+                .finally(() => {
+                    if (done) done()
+                });
         },
 
         handleActionSuccess(response) {

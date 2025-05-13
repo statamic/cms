@@ -38,6 +38,7 @@ class Bard extends Replicator
     ];
 
     protected $categories = ['text', 'structured'];
+    protected $keywords = ['rich', 'richtext', 'rich text', 'editor', 'wysiwg', 'builder', 'page builder', 'gutenberg', 'content'];
     protected $rules = [];
 
     protected function configFieldItems(): array
@@ -180,6 +181,11 @@ class Bard extends Replicator
                         'instructions' => __('statamic::fieldtypes.bard.config.link_collections'),
                         'type' => 'collections',
                         'mode' => 'select',
+                    ],
+                    'select_across_sites' => [
+                        'display' => __('Select Across Sites'),
+                        'instructions' => __('statamic::fieldtypes.bard.config.select_across_sites'),
+                        'type' => 'toggle',
                     ],
                     'container' => [
                         'display' => __('Container'),
@@ -369,7 +375,7 @@ class Bard extends Replicator
         }
 
         if (is_string($value)) {
-            $value = str_replace('statamic://', '', $value);
+            $value = str_replace('src="statamic://', 'src="', $value);
             $doc = (new Augmentor($this))->renderHtmlToProsemirror($value);
             $value = $doc['content'];
         } elseif ($this->isLegacyData($value)) {
@@ -379,16 +385,16 @@ class Bard extends Replicator
         $value = $this->convertLegacyTiptap($value);
 
         if ($this->config('inline')) {
-            // Root should be text, if it's not this must be a block field converted
+            // Root should be text or br, if it's not this must be a block field converted
             // to inline. In that instance unwrap the content of the first node.
-            if ($value[0]['type'] !== 'text') {
+            if (! in_array($value[0]['type'], ['text', 'hardBreak'])) {
                 $value = $this->unwrapInlineValue($value);
             }
             $value = $this->wrapInlineValue($value);
         } else {
-            // Root should not be text, if it is this must be an inline field converted
+            // Root should not be text or br, if it is this must be an inline field converted
             // to block. In that instance wrap the content in a paragraph node.
-            if ($value[0]['type'] === 'text') {
+            if (in_array($value[0]['type'], ['text', 'hardBreak'])) {
                 $value = $this->wrapInlineValue($value);
             }
         }

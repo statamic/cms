@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\User;
 
+use Illuminate\Support\Facades\Password;
 use Statamic\Facades\User;
 use Statamic\Http\Requests\UserPasswordRequest;
 
@@ -11,9 +12,9 @@ class PasswordController
     {
         $user = User::current();
 
-        $user->password($request->password);
+        $user->password($request->password)->save();
 
-        $user->save();
+        Password::deleteToken($user);
 
         return $this->successfulResponse();
     }
