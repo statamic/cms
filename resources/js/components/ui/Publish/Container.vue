@@ -31,6 +31,10 @@ const props = defineProps({
         type: Object,
         default: () => ({}),
     },
+    trackDirtyState: {
+        type: Boolean,
+        default: true,
+    },
 });
 
 const store = usePublishContainerStore(props.name, {
@@ -42,7 +46,7 @@ const store = usePublishContainerStore(props.name, {
 watch(
     () => store.values,
     (values) => {
-        // markAsDirty();
+        if (props.trackDirtyState) dirty();
         emit('updated', values);
     },
     { deep: true },
@@ -62,6 +66,13 @@ provideContainerContext({
     },
 });
 
+function dirty() {
+    Statamic.$dirty.add(props.name);
+}
+
+function clearDirtyState() {
+    Statamic.$dirty.remove(props.name);
+}
 // Backwards compatibility.
 provide('store', store);
 provide('storeName', props.name);
