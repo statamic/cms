@@ -5,6 +5,8 @@ import { default as Description } from './Description.vue';
 import { default as Calendar } from './Calendar/Calendar.vue';
 import { default as Card } from './Card/Card.vue';
 import { default as CardPanel } from './Card/Panel.vue';
+import { default as CardList } from './Card/List.vue';
+import { default as CardListItem } from './Card/ListItem.vue';
 import { default as DatePicker } from './DatePicker/DatePicker.vue';
 import { default as DateRangePicker } from './DateRangePicker/DateRangePicker.vue';
 import { default as TimePicker } from './TimePicker/TimePicker.vue';
@@ -72,4 +74,6 @@ export {
     PanelHeader,
     Badge,
     CharacterCounter,
+    CardList,
+    CardListItem,
 };
