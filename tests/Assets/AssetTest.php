@@ -2657,4 +2657,22 @@ YAML;
         // ideally we would have checked the store name, but laravel 10 doesnt give us a way to do that
         $this->assertStringContainsString('asset-meta', $store->getStore()->getDirectory());
     }
+
+    #[Test]
+    public function it_clones_internal_collections()
+    {
+        $asset = (new Asset)->container($this->container)->path('foo/test.txt');
+        $asset->set('foo', 'A');
+        $asset->setSupplement('bar', 'A');
+
+        $clone = clone $asset;
+        $clone->set('foo', 'B');
+        $clone->setSupplement('bar', 'B');
+
+        $this->assertEquals('A', $asset->get('foo'));
+        $this->assertEquals('B', $clone->get('foo'));
+
+        $this->assertEquals('A', $asset->getSupplement('bar'));
+        $this->assertEquals('B', $clone->getSupplement('bar'));
+    }
 }
