@@ -49,9 +49,11 @@ class Link extends Fieldtype
 
     public function augment($value)
     {
+        $localize = ! $this->canSelectAcrossSites();
+
         return new ArrayableLink(
             $value
-                ? ResolveRedirect::item($value, $this->field->parent(), true)
+                ? ResolveRedirect::item($value, $this->field->parent(), $localize)
                 : null,
             ['select_across_sites' => $this->canSelectAcrossSites()]
         );
