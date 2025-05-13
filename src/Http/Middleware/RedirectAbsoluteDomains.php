@@ -16,7 +16,6 @@ class RedirectAbsoluteDomains
      */
     public function handle($request, Closure $next)
     {
-        /** @var Request $request */
         $host = $request->getHost();
 
         if (! Str::endsWith($host, '.')) {
