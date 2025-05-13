@@ -28,29 +28,19 @@
                 />
             </dropdown-list>
 
-            <div class="flex pt-px text-2xs text-gray-600 ltr:mr-4 rtl:ml-4" v-if="readOnly">
+            <div class="text-2xs flex pt-px text-gray-600 ltr:mr-4 rtl:ml-4" v-if="readOnly">
                 <svg-icon name="light/lock" class="-mt-1 w-4 ltr:mr-1 rtl:ml-1" /> {{ __('Read Only') }}
             </div>
 
             <div class="hidden items-center md:flex">
                 <save-button-options
                     v-if="!readOnly"
-                    :show-options="!revisionsEnabled && !isInline"
+                    :show-options="!isInline"
                     :button-class="saveButtonClass"
                     :preferences-prefix="preferencesPrefix"
                 >
                     <button :class="saveButtonClass" :disabled="!canSave" @click.prevent="save" v-text="saveText" />
                 </save-button-options>
-
-                <button
-                    v-if="revisionsEnabled"
-                    class="btn-primary flex items-center ltr:ml-4 rtl:mr-4"
-                    :disabled="!canPublish"
-                    @click="confirmingPublish = true"
-                >
-                    <span v-text="__('Publish')" />
-                    <svg-icon name="micro/chevron-down-xs" class="w-2 ltr:ml-2 rtl:mr-2" />
-                </button>
             </div>
 
             <slot name="action-buttons-right" />
@@ -141,46 +131,7 @@
                                         </div>
                                     </div>
 
-                                    <!--
-                                TODO
-                                <div class="flex items-center border-t justify-between px-4 py-2" v-if="!revisionsEnabled">
-                                    <label v-text="__('Published')" class="publish-field-label font-medium" />
-                                    <toggle-input v-model="published" />
-                                </div>
-
-                                <div class="border-t p-4" v-if="revisionsEnabled">
-                                    <label class="publish-field-label font-medium mb-2" v-text="__('Revisions')"/>
-                                    <div class="mb-1 flex items-center" v-if="published">
-                                        <span class="text-green-600 w-6 text-center">&check;</span>
-                                        <span class="text-2xs" v-text="__('Entry has a published version')"></span>
-                                    </div>
-                                    <div class="mb-1 flex items-center" v-else="published">
-                                        <span class="text-orange w-6 text-center">!</span>
-                                        <span class="text-2xs" v-text="__('Entry has not been published')"></span>
-                                    </div>
-                                    <div class="mb-1 flex items-center" v-if="isWorkingCopy && isDirty">
-                                        <span class="text-orange w-6 text-center">!</span>
-                                        <span class="text-2xs" v-text="__('Working copy has unsaved changes')"></span>
-                                    </div>
-                                    <div class="mb-1 flex items-center" v-else-if="isWorkingCopy">
-                                        <span class="text-orange w-6 text-center">!</span>
-                                        <span class="text-2xs" v-text="__('Entry has unpublished changes')"></span>
-                                    </div>
-                                    <div class="mb-1 flex items-center" v-if="!isWorkingCopy && published">
-                                        <span class="text-green-600 w-6 text-center">&check;</span>
-                                        <span class="text-2xs" v-text="__('This is the published version')"></span>
-                                    </div>
-                                    <button
-                                            class="flex items-center justify-center mt-4 btn-flat px-2 w-full"
-                                            v-if="!isCreating && revisionsEnabled"
-                                            @click="showRevisionHistory = true">
-                                            <svg-icon name="history" class="h-4 w-4 rtl:ml-2 ltr:mr-2" />
-                                            <span>{{ __('View History') }}</span>
-                                        </button>
-                                </div>
-                                -->
-
-                                    <div class="border-t p-4 dark:border-dark-900" v-if="localizations.length > 1">
+                                    <div class="dark:border-dark-900 border-t p-4" v-if="localizations.length > 1">
                                         <label class="publish-field-label mb-2 font-medium" v-text="__('Sites')" />
                                         <div
                                             v-for="option in localizations"
@@ -188,8 +139,8 @@
                                             class="-mx-4 flex cursor-pointer items-center px-4 py-2 text-sm"
                                             :class="
                                                 option.active
-                                                    ? 'bg-blue-100 dark:bg-dark-300'
-                                                    : 'hover:bg-gray-200 dark:hover:bg-dark-400'
+                                                    ? 'dark:bg-dark-300 bg-blue-100'
+                                                    : 'dark:hover:bg-dark-400 hover:bg-gray-200'
                                             "
                                             @click="localizationSelected(option)"
                                         >
@@ -241,53 +192,17 @@
         <div class="mt-6 flex items-center md:hidden">
             <button
                 v-if="!readOnly"
-                class="btn-lg"
-                :class="{
-                    'btn-primary w-full': !revisionsEnabled,
-                    'btn w-1/2 ltr:mr-4 rtl:ml-4': revisionsEnabled,
-                }"
+                class="btn-lg btn-primary w-full"
                 :disabled="!canSave"
                 @click.prevent="save"
-                v-text="__(revisionsEnabled ? 'Save Changes' : 'Save')"
+                v-text="__('Save')"
             />
-
-            <button
-                v-if="revisionsEnabled"
-                class="btn-primary btn-lg flex w-1/2 items-center justify-center ltr:ml-2 rtl:mr-2"
-                :disabled="!canPublish"
-                @click="confirmingPublish = true"
-            >
-                <span v-text="__('Publish')" />
-                <svg-icon name="micro/chevron-down-xs" class="w-2 ltr:ml-2 rtl:mr-2" />
-            </button>
         </div>
-
-        <stack
-            name="revision-history"
-            v-if="showRevisionHistory"
-            @closed="showRevisionHistory = false"
-            :narrow="true"
-            v-slot="{ close }"
-        >
-            <revision-history :index-url="actions.revisions" :restore-url="actions.restore" @closed="close" />
-        </stack>
-
-        <publish-actions
-            v-if="confirmingPublish"
-            :actions="actions"
-            :published="published"
-            :can-manage-publish-state="canManagePublishState"
-            @closed="confirmingPublish = false"
-            @saving="saving = true"
-            @saved="publishActionCompleted"
-        />
     </div>
 </template>
 
 <script>
-import PublishActions from './PublishActions.vue';
 import SaveButtonOptions from '../publish/SaveButtonOptions.vue';
-import RevisionHistory from '../revision-history/History.vue';
 import HasPreferences from '../data-list/HasPreferences';
 import HasHiddenFields from '../publish/HasHiddenFields';
 import HasActions from '../publish/HasActions';
@@ -298,9 +213,7 @@ export default {
     mixins: [HasPreferences, HasHiddenFields, HasActions],
 
     components: {
-        PublishActions,
         SaveButtonOptions,
-        RevisionHistory,
     },
 
     props: {
@@ -316,7 +229,6 @@ export default {
         initialOriginValues: Object,
         initialOriginMeta: Object,
         initialSite: String,
-        initialIsWorkingCopy: Boolean,
         taxonomyHandle: String,
         breadcrumbs: Array,
         initialActions: Object,
@@ -327,7 +239,6 @@ export default {
         initialReadOnly: Boolean,
         initialIsRoot: Boolean,
         initialPermalink: String,
-        revisionsEnabled: Boolean,
         preloadedAssets: Array,
         canEditBlueprint: Boolean,
         createAnotherUrl: String,
@@ -351,16 +262,12 @@ export default {
             originValues: this.initialOriginValues || {},
             originMeta: this.initialOriginMeta || {},
             site: this.initialSite,
-            isWorkingCopy: this.initialIsWorkingCopy,
             error: null,
             errors: {},
             isPreviewing: false,
             tabsVisible: true,
             state: 'new',
-            revisionMessage: null,
-            showRevisionHistory: false,
             published: this.initialPublished,
-            confirmingPublish: false,
             readOnly: this.initialReadOnly,
             isRoot: this.initialIsRoot,
             permalink: this.initialPermalink,
@@ -392,14 +299,6 @@ export default {
             return !this.readOnly && this.isDirty && !this.somethingIsLoading;
         },
 
-        canPublish() {
-            if (!this.revisionsEnabled) return false;
-
-            return (
-                !this.readOnly && !this.isCreating && !this.canSave && !this.somethingIsLoading && this.isWorkingCopy
-            );
-        },
-
         livePreviewUrl() {
             return this.localizations.find((l) => l.active).livePreviewUrl;
         },
@@ -425,8 +324,6 @@ export default {
         },
 
         saveText() {
-            if (this.revisionsEnabled) return __('Save Changes');
-
             if (this.published) return __('Save & Publish');
 
             if (!this.published && this.initialPublished) return __('Save & Unpublish');
@@ -435,10 +332,7 @@ export default {
         },
 
         saveButtonClass() {
-            return {
-                btn: this.revisionsEnabled,
-                'btn-primary': !this.revisionsEnabled,
-            };
+            return 'btn-primary';
         },
 
         afterSaveOption() {
@@ -507,18 +401,11 @@ export default {
                     }
                     this.title = response.data.data.title;
                     this.permalink = response.data.data.permalink;
-                    this.isWorkingCopy = true;
                     if (!this.isCreating) this.$toast.success(__('Saved'));
                     this.$refs.container.saved();
                     this.runAfterSaveHook(response);
                 })
                 .catch((e) => this.handleAxiosError(e));
-        },
-
-        confirmPublish() {
-            if (this.canPublish) {
-                this.confirmingPublish = true;
-            }
         },
 
         runAfterSaveHook(response) {
@@ -529,13 +416,6 @@ export default {
                     response,
                 })
                 .then(() => {
-                    // If revisions are enabled, just emit event.
-                    if (this.revisionsEnabled) {
-                        this.values = this.resetValuesFromResponse(response.data.data.values);
-                        this.$nextTick(() => this.$emit('saved', response));
-                        return;
-                    }
-
                     let nextAction = this.quickSave ? 'continue_editing' : this.afterSaveOption;
 
                     // If the user has opted to create another entry, redirect them to create page.
@@ -606,7 +486,6 @@ export default {
                 this.localizations = data.localizations;
                 this.localizedFields = data.localizedFields;
                 this.hasOrigin = data.hasOrigin;
-                this.publishUrl = data.actions[this.action];
                 this.taxonomy = data.taxonomy;
                 this.title = data.editing ? data.values.title : this.title;
                 this.actions = data.actions;
@@ -648,16 +527,6 @@ export default {
             this.tabsVisible = true;
         },
 
-        publishActionCompleted({ published, isWorkingCopy, response }) {
-            this.saving = false;
-            this.$refs.container.saved();
-            if (published !== undefined) this.published = published;
-            this.isWorkingCopy = isWorkingCopy;
-            this.confirmingPublish = false;
-            this.permalink = response.data.data.permalink;
-            this.$nextTick(() => this.$emit('saved', response));
-        },
-
         setFieldValue(handle, value) {
             if (this.hasOrigin) this.desyncField(handle);
 
@@ -694,15 +563,13 @@ export default {
     mounted() {
         this.saveKeyBinding = this.$keys.bindGlobal(['mod+return'], (e) => {
             e.preventDefault();
-            if (this.confirmingPublish) return;
-            this.canPublish ? this.confirmPublish() : this.save();
+            this.save();
         });
 
         this.quickSaveKeyBinding = this.$keys.bindGlobal(['mod+s'], (e) => {
             e.preventDefault();
-            if (this.confirmingPublish) return;
             this.quickSave = true;
-            this.canPublish ? this.confirmPublish() : this.save();
+            this.save();
         });
 
         this.$refs.container.store.setPreloadedAssets(this.preloadedAssets);
