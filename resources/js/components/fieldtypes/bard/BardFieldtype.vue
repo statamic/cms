@@ -460,8 +460,8 @@ export default {
     methods: {
         addSet(handle) {
             const id = uniqid();
-            const values = Object.assign({}, { type: handle }, this.meta.defaults[handle]);
-
+            const deepCopy = JSON.parse(JSON.stringify(this.meta.defaults[handle]));
+            const values = Object.assign({}, { type: handle }, deepCopy);
             let previews = {};
             Object.keys(this.meta.defaults[handle]).forEach((key) => (previews[key] = null));
             this.previews = Object.assign({}, this.previews, { [id]: previews });
@@ -484,7 +484,8 @@ export default {
         duplicateSet(old_id, attrs, pos) {
             const id = uniqid();
             const enabled = attrs.enabled;
-            const values = Object.assign({}, attrs.values);
+            const deepCopy = JSON.parse(JSON.stringify(attrs.values));
+            const values = Object.assign({}, deepCopy);
 
             let previews = Object.assign({}, this.previews[old_id]);
             this.previews = Object.assign({}, this.previews, { [id]: previews });

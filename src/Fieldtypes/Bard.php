@@ -176,6 +176,11 @@ class Bard extends Replicator
                         'type' => 'collections',
                         'mode' => 'select',
                     ],
+                    'select_across_sites' => [
+                        'display' => __('Select Across Sites'),
+                        'instructions' => __('statamic::fieldtypes.bard.config.select_across_sites'),
+                        'type' => 'toggle',
+                    ],
                     'container' => [
                         'display' => __('Container'),
                         'instructions' => __('statamic::fieldtypes.bard.config.container'),

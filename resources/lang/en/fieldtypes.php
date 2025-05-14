@@ -44,6 +44,7 @@ return [
     'bard.config.section.editor.instructions' => 'Configure the editor\'s appearance and general behavior.',
     'bard.config.section.links.instructions' => 'Configure how links are handled in this instance of Bard.',
     'bard.config.section.sets.instructions' => 'Configure blocks of fields that can be inserted anywhere in your Bard content.',
+    'bard.config.select_across_sites' => 'Allow selecting entries from other sites. This also disables localizing options on the front-end. Learn more in the [documentation](https://statamic.dev/fieldtypes/entries#select-across-sites).',
     'bard.config.smart_typography' => 'Convert common text patterns with the proper typographic characters.',
     'bard.config.target_blank' => 'Set `target="_blank"` on all links.',
     'bard.config.toolbar_mode' => '**Fixed** mode will keep the toolbar visible at all times, while **floating** only appears while selecting text.',

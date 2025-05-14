@@ -9,6 +9,8 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
+use Statamic\Query\Exceptions\MultipleRecordsFoundException;
+use Statamic\Query\Exceptions\RecordsNotFoundException;
 use Statamic\Query\Scopes\Scope;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -1042,6 +1044,112 @@ class EntryQueryBuilderTest extends TestCase
             'post-3',
             'thing-2',
         ], Entry::query()->where('type', 'b')->pluck('slug')->all());
+    }
+
+    #[Test]
+    public function entry_can_be_found_using_first_or_fail()
+    {
+        Collection::make('posts')->save();
+        $entry = EntryFactory::collection('posts')->id('hoff')->slug('david-hasselhoff')->data(['title' => 'David Hasselhoff'])->create();
+
+        $firstOrFail = Entry::query()
+            ->where('collection', 'posts')
+            ->where('id', 'hoff')
+            ->firstOrFail();
+
+        $this->assertSame($entry, $firstOrFail);
+    }
+
+    #[Test]
+    public function exception_is_thrown_when_entry_does_not_exist_using_first_or_fail()
+    {
+        $this->expectException(RecordsNotFoundException::class);
+
+        Entry::query()
+            ->where('collection', 'posts')
+            ->where('id', 'ze-hoff')
+            ->firstOrFail();
+    }
+
+    #[Test]
+    public function entry_can_be_found_using_first_or()
+    {
+        Collection::make('posts')->save();
+        $entry = EntryFactory::collection('posts')->id('hoff')->slug('david-hasselhoff')->data(['title' => 'David Hasselhoff'])->create();
+
+        $firstOrFail = Entry::query()
+            ->where('collection', 'posts')
+            ->where('id', 'hoff')
+            ->firstOr(function () {
+                return 'fallback';
+            });
+
+        $this->assertSame($entry, $firstOrFail);
+    }
+
+    #[Test]
+    public function callback_is_called_when_entry_does_not_exist_using_first_or()
+    {
+        $firstOrFail = Entry::query()
+            ->where('collection', 'posts')
+            ->where('id', 'hoff')
+            ->firstOr(function () {
+                return 'fallback';
+            });
+
+        $this->assertSame('fallback', $firstOrFail);
+    }
+
+    #[Test]
+    public function sole_entry_is_returned()
+    {
+        Collection::make('posts')->save();
+        $entry = EntryFactory::collection('posts')->id('hoff')->slug('david-hasselhoff')->data(['title' => 'David Hasselhoff'])->create();
+
+        $sole = Entry::query()
+            ->where('collection', 'posts')
+            ->where('id', 'hoff')
+            ->sole();
+
+        $this->assertSame($entry, $sole);
+    }
+
+    #[Test]
+    public function exception_is_thrown_by_sole_when_multiple_entries_are_returned_from_query()
+    {
+        Collection::make('posts')->save();
+        EntryFactory::collection('posts')->id('hoff')->slug('david-hasselhoff')->data(['title' => 'David Hasselhoff'])->create();
+        EntryFactory::collection('posts')->id('smoff')->slug('joe-hasselsmoff')->data(['title' => 'Joe Hasselsmoff'])->create();
+
+        $this->expectException(MultipleRecordsFoundException::class);
+
+        Entry::query()
+            ->where('collection', 'posts')
+            ->sole();
+    }
+
+    #[Test]
+    public function exception_is_thrown_by_sole_when_no_entries_are_returned_from_query()
+    {
+        $this->expectException(RecordsNotFoundException::class);
+
+        Entry::query()
+            ->where('collection', 'posts')
+            ->sole();
+    }
+
+    #[Test]
+    public function exists_returns_true_when_results_are_found()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $this->assertTrue(Entry::query()->exists());
+    }
+
+    #[Test]
+    public function exists_returns_false_when_no_results_are_found()
+    {
+        $this->assertFalse(Entry::query()->exists());
     }
 }
 

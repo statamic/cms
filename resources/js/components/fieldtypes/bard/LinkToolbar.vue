@@ -52,7 +52,7 @@
                         <!-- Data input -->
                         <div
                             v-else
-                            class="flex w-full cursor-pointer items-center justify-between"
+                            class="flex w-full min-w-[240px] cursor-pointer items-center justify-between"
                             @click="openSelector"
                         >
                             <loading-graphic v-if="isLoading" :inline="true" />
@@ -256,6 +256,7 @@ export default {
                 type: 'entries',
                 collections: this.collections,
                 max_items: 1,
+                select_across_sites: this.config.select_across_sites,
             };
         },
 
