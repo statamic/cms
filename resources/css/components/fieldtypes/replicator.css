@@ -69,8 +69,11 @@
     @apply h-5;
 }
 
-.replicator-set.has-error > .replicator-set-header label {
-    @apply text-red-500;
+.replicator-set.has-error {
+    & > .replicator-set-header label,
+    .set-settings-button {
+        @apply text-red-500;
+    }
 }
 
 .replicator-set-body > .has-error > label {
