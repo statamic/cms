@@ -42,7 +42,7 @@ class StaticWarm extends Command
         {--include= : Only warm specific URLs}
         {--exclude= : Exclude specific URLs}
         {--max-requests= : Maximum number of requests to warm}
-        {--headers= : Set custom headers (e.g. --headers="Authorization: Bearer your_token", can be used multiple times)}
+        {--header=* : Set custom header (e.g. "Authorization: Bearer your_token")}
     ';
 
     protected $description = 'Warms the static cache by visiting all URLs';
@@ -168,7 +168,7 @@ class StaticWarm extends Command
 
     private function requests()
     {
-        $headers = $this->parseHeaders($this->option('headers'));
+        $headers = $this->parseHeaders($this->option('header'));
 
         return $this->uris()->map(function ($uri) use ($headers) {
             return new Request('GET', $uri, $headers);

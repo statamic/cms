@@ -279,13 +279,14 @@ class StaticWarmTest extends TestCase
         $mock = Mockery::mock(\GuzzleHttp\Client::class);
         $mock->shouldReceive('send')->andReturnUsing(function ($request) {
             $this->assertEquals('Bearer testtoken', $request->getHeaderLine('Authorization'));
+            $this->assertEquals('Bar', $request->getHeaderLine('X-Foo'));
 
             return Mockery::mock(\GuzzleHttp\Psr7\Response::class);
         });
         $this->app->instance(\GuzzleHttp\Client::class, $mock);
 
         $this->artisan('statamic:static:warm', [
-            '--headers' => ['Authorization: Bearer testtoken'],
+            '--header' => ['Authorization: Bearer testtoken', 'X-Foo: Bar'],
         ])->assertExitCode(0);
     }
 
