@@ -7,7 +7,7 @@
 
 @section('content')
     @unless ($fieldsets->isEmpty())
-        <ui-header title="{{ __('Fieldsets') }}">
+        <ui-header title="{{ __('Fieldsets') }}" icon="fieldsets">
             <ui-button
                 href="{{ cp_route('fieldsets.create') }}"
                 text="{{ __('Create Fieldset') }}"

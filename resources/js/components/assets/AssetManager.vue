@@ -1,6 +1,6 @@
 <template>
     <div>
-        <Header :title="__(container.title)">
+        <Header :title="__(container.title)" icon="assets">
             <dropdown-list v-if="container.can_edit || container.can_delete">
                 <dropdown-item v-if="container.can_edit" v-text="__('Edit Container')" :redirect="container.edit_url" />
                 <dropdown-item v-text="__('Edit Blueprint')" :redirect="container.blueprint_url" />

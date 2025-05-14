@@ -12,7 +12,7 @@
         v-slot="{ setFieldValue, setFieldMeta }"
     >
         <div>
-            <Header :title="pageTitle">
+            <Header :title="pageTitle" icon="site">
                 <Button type="submit" variant="primary" @click="submit">{{ __('Save') }}</Button>
             </Header>
             <publish-tabs @updated="setFieldValue" @meta-updated="setFieldMeta" :enable-sidebar="false" />

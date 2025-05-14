@@ -6,7 +6,7 @@
 @section('title', __('Preferences'))
 
 @section('content')
-    <ui-header :title="__('Preferences')" :subtitle="__('Manage your preferences across the CMS')" />
+    <ui-header :title="__('Preferences')" icon="preferences" />
 
     <section class="space-y-6">
         <ui-card-panel heading="{{ __('Global Preferences') }}">

@@ -7,7 +7,7 @@
 
 @section('content')
     @unless ($globals->isEmpty())
-        <ui-header title="{{ __('Globals') }}">
+        <ui-header title="{{ __('Globals') }}" icon="globals">
             @can('create', 'Statamic\Contracts\Globals\GlobalSet')
                 <ui-button
                     href="{{ cp_route('globals.create') }}"
