@@ -6,6 +6,7 @@ use Facades\Statamic\API\ResourceAuthorizer;
 use Facades\Statamic\Fields\BlueprintRepository;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Contracts\GraphQL\CastableToValidationString;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -333,6 +334,8 @@ GQL;
                     'dimensions:1024',
                     'size:1000',
                     'image:jpeg',
+                    'new Tests\Feature\GraphQL\TestValidationRuleWithToString',
+                    'new Tests\Feature\GraphQL\TestValidationRuleWithoutToString',
                 ],
             ],
         ]);
@@ -359,6 +362,8 @@ GQL;
                             'dimensions:1024',
                             'size:1000',
                             'image:jpeg',
+                            'thevalidationrule:foo,bar',
+                            'Tests\\Feature\\GraphQL\\TestValidationRuleWithoutToString::class',
                             'array',
                             'nullable',
                         ],
@@ -366,4 +371,16 @@ GQL;
                 ],
             ]]);
     }
+}
+
+class TestValidationRuleWithToString implements CastableToValidationString
+{
+    public function toGqlValidationString(): string
+    {
+        return 'thevalidationrule:foo,bar';
+    }
+}
+
+class TestValidationRuleWithoutToString
+{
 }
