@@ -258,7 +258,7 @@ class Str
             50 => 'md',
             66 => 'md',
             75 => 'lg',
-            100 => 'full'
+            100 => 'full',
         ];
 
         $size = is_numeric($width) ? ($legacyMap[$width] ?? 'full') : $width;

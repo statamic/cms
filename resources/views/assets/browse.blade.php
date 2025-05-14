@@ -9,10 +9,10 @@
 @section('content')
     <asset-manager
         :initial-container="{{ json_encode($container) }}"
-        initial-path="{{ $folder }}"
-        initial-editing-asset-id="{{ $editing ?? null }}"
         :can-create-containers="{{ Statamic\Support\Str::bool($user->can('create', \Statamic\Contracts\Assets\AssetContainer::class)) }}"
         create-container-url="{{ cp_route('asset-containers.create') }}"
+        initial-path="{{ $folder }}"
+        initial-editing-asset-id="{{ $editing ?? null }}"
     ></asset-manager>
 
     <x-statamic::docs-callout

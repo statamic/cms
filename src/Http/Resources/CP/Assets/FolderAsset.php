@@ -24,6 +24,7 @@ class FolderAsset extends JsonResource
                     'thumbnail' => $this->thumbnailUrl('small'),
                     'can_be_transparent' => $this->isSvg() || $this->extensionIsOneOf(['svg', 'png', 'webp', 'avif']),
                     'alt' => $this->alt,
+                    'orientation' => $this->orientation(),
                 ];
             }),
 

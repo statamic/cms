@@ -1,50 +1,22 @@
 <template>
-    <div>
-        <Header :title="__(container.title)" icon="assets">
-            <dropdown-list v-if="container.can_edit || container.can_delete">
-                <dropdown-item v-if="container.can_edit" v-text="__('Edit Container')" :redirect="container.edit_url" />
-                <dropdown-item v-text="__('Edit Blueprint')" :redirect="container.blueprint_url" />
-                <dropdown-item v-if="container.can_delete" class="warning" @click="$refs.deleter.confirm()">
-                    {{ __('Delete Container') }}
-                    <resource-deleter
-                        ref="deleter"
-                        :resource-title="__(container.title)"
-                        :route="container.delete_url"
-                    />
-                </dropdown-item>
-            </dropdown-list>
-
-            <Button
-                v-if="canCreateContainers"
-                :href="createContainerUrl"
-                :text="__('Create Container')"
-            />
-        </Header>
-
-        <asset-browser
-            ref="browser"
-            :initial-container="container"
-            :initial-per-page="$config.get('paginationSize')"
-            :initial-editing-asset-id="initialEditingAssetId"
-            :selected-path="path"
-            :selected-assets="selectedAssets"
-            @navigated="navigate"
-            @selections-updated="updateSelections"
-            @asset-doubleclicked="editAsset"
-            @edit-asset="editAsset"
-        />
-    </div>
+    <asset-browser
+        ref="browser"
+        :can-create-containers="canCreateContainers"
+        :create-container-url="createContainerUrl"
+        :initial-container="container"
+        :initial-per-page="$config.get('paginationSize')"
+        :initial-editing-asset-id="initialEditingAssetId"
+        :selected-path="path"
+        :selected-assets="selectedAssets"
+        @navigated="navigate"
+        @selections-updated="updateSelections"
+        @asset-doubleclicked="editAsset"
+        @edit-asset="editAsset"
+    />
 </template>
 
 <script>
-import { Header, Button } from '@statamic/ui';
-
 export default {
-    components: {
-        Header,
-        Button,
-    },
-
     props: {
         initialContainer: Object,
         initialPath: String,
@@ -82,6 +54,25 @@ export default {
             };
         },
 
+        editAsset(asset) {
+            event.preventDefault();
+            this.$refs.browser.edit(asset.id);
+        },
+
+        /**
+         * When a user has navigated to another folder or container
+         */
+        navigate(container, path) {
+            this.container = container;
+            this.path = path;
+            this.pushState();
+
+            // Clear out any selections. It would be confusing to navigate to a different
+            // folder and/or container, perform an action, and discover you performed
+            // it on an asset that was still selected, but no longer visible.
+            this.selectedAssets = [];
+        },
+
         /**
          * Push a new state onto the browser's history
          */
@@ -103,29 +94,10 @@ export default {
         },
 
         /**
-         * When a user has navigated to another folder or container
-         */
-        navigate(container, path) {
-            this.container = container;
-            this.path = path;
-            this.pushState();
-
-            // Clear out any selections. It would be confusing to navigate to a different
-            // folder and/or container, perform an action, and discover you performed
-            // it on an asset that was still selected, but no longer visible.
-            this.selectedAssets = [];
-        },
-
-        /**
          * When selections are changed, we need them reflected here.
          */
         updateSelections(selections) {
             this.selectedAssets = selections;
-        },
-
-        editAsset(asset) {
-            event.preventDefault();
-            this.$refs.browser.edit(asset.id);
         },
     },
 };

@@ -23,7 +23,7 @@ export default {
     props: {
         placeholder: {
             type: String,
-            default: 'Filter...',
+            default: 'Search...',
         },
         modelValue: {
             type: String,

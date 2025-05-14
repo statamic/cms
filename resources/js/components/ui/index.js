@@ -36,6 +36,7 @@ import { default as Panel } from './Panel/Panel.vue';
 import { default as PanelHeader } from './Panel/Header.vue';
 import { default as Badge } from './Badge.vue';
 import { default as CharacterCounter } from './CharacterCounter.vue';
+import { default as Editable } from './Editable.vue';
 
 export {
     WithField,
@@ -74,6 +75,7 @@ export {
     PanelHeader,
     Badge,
     CharacterCounter,
+    Editable,
     CardList,
     CardListItem,
 };

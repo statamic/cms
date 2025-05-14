@@ -89,22 +89,18 @@
 
 @utility bg-checkerboard {
     background-color: #fff;
-    background-image: linear-gradient(45deg, #edf2f6 25%, transparent 25%),
-        linear-gradient(-45deg, #edf2f6 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #edf2f6 75%),
-        linear-gradient(-45deg, transparent 75%, #edf2f6 75%);
-    background-size: 16px 16px;
-    background-position:
-        0 0,
-        0 8px,
-        8px -8px,
-        -8px 0;
+    background-image: linear-gradient(45deg, var(--color-gray-100) 25%, transparent 25%),
+        linear-gradient(-45deg, var(--color-gray-100) 25%, transparent 25%), linear-gradient(45deg, transparent 75%, var(--color-gray-100) 75%),
+        linear-gradient(-45deg, transparent 75%, var(--color-gray-100) 75%);
+    background-size: 24px 24px;
+    background-position: 0 0, 0 12px, 12px -12px, -12px 0;
 
     .dark & {
-        background-color: var(--color-dark-600);
-        background-image: linear-gradient(45deg, var(--color-dark-950) 25%, transparent 25%),
-            linear-gradient(-45deg, var(--color-dark-950) 25%, transparent 25%),
-            linear-gradient(45deg, transparent 75%, var(--color-dark-950) 75%),
-            linear-gradient(-45deg, transparent 75%, var(--color-dark-950) 75%);
+        background-color: var(--color-gray-850);
+        background-image: linear-gradient(45deg, var(--color-gray-800) 25%, transparent 25%),
+            linear-gradient(-45deg, var(--color-gray-800) 25%, transparent 25%),
+            linear-gradient(45deg, transparent 75%, var(--color-gray-800) 75%),
+            linear-gradient(-45deg, transparent 75%, var(--color-gray-800) 75%);
     }
 }
 
