@@ -7,7 +7,7 @@
 
 @section('content')
     @unless ($navs->isEmpty())
-        <ui-header title="{{  __('Navigation') }}">
+        <ui-header title="{{  __('Navigation') }}" icon="navigation">
             @can('create', 'Statamic\Contracts\Structures\Nav')
                 <ui-button
                     href="{{ cp_route('navigation.create') }}"
@@ -18,7 +18,7 @@
         </ui-header>
 
         <navigation-listing
-            :initial-rows="{{ json_encode($navs) }}"
+            :navigations="{{ json_encode($navs) }}"
         ></navigation-listing>
     @else
         <x-statamic::empty-screen

@@ -1,6 +1,6 @@
 <template>
     <div class="min-h-screen" ref="browser" @keydown.shift="shiftDown" @keyup="clearShift">
-        <Header :title="__(container.title)">
+        <Header :title="__(container.title)" icon="assets">
             <dropdown-list v-if="container.can_edit || container.can_delete || container.can_create">
                 <dropdown-item v-if="canCreateContainers" v-text="__('Create Container')" :redirect="createContainerUrl" />
                 <dropdown-item v-if="container.can_edit" v-text="__('Edit Container')" :redirect="container.edit_url" />

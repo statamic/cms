@@ -7,7 +7,7 @@
 
 @section('content')
 
-<ui-header title="{{ __('Dashboard') }}" />
+<ui-header title="{{ __('Dashboard') }}" icon="dashboard" />
 
 <div class="widgets @container/widgets flex flex-wrap py-2 gap-y-6 -mx-3">
     @foreach ($widgets as $widget)
