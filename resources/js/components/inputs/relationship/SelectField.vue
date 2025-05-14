@@ -19,10 +19,10 @@
             <template #option="{ title, hint, status }">
                 <div class="flex w-full items-center justify-between">
                     <div class="flex items-center">
-                        <StatusIndicator v-if="status" class="ltr:mr-2 rtl:ml-2" :status="status" />
-                        <div v-text="title" />
+                        <StatusIndicator v-if="status" class="me-2" :status="status" />
+                        <div v-text="title" class="truncate" />
                     </div>
-                    <div v-if="hint" class="text-3xs whitespace-nowrap text-gray-600 uppercase" v-text="hint" />
+                    <ui-badge v-if="hint" size="sm" variant="flat" v-text="hint" />
                 </div>
             </template>
             <template #no-options>

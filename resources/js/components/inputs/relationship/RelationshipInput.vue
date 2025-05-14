@@ -1,5 +1,5 @@
 <template>
-    <div class="relationship-input" :class="{ 'relationship-input-empty': items.length == 0 }">
+    <div class="relationship-input @container" :class="{ 'relationship-input-empty': items.length == 0 }">
         <relationship-select-field
             v-if="!initializing && usesSelectField"
             :config="config"
@@ -21,8 +21,8 @@
         <template v-if="shouldShowSelectedItems">
             <div
                 ref="items"
-                class="relationship-input-items space-y-1 outline-hidden"
-                :class="{ 'mt-4': usesSelectField && items.length }"
+                class="outline-hidden grid grid-cols-1 @xl:grid-cols-2 gap-2"
+                :class="{ 'mt-2': usesSelectField && items.length }"
             >
                 <component
                     :is="itemComponent"
@@ -37,7 +37,7 @@
                     :form-component="formComponent"
                     :form-component-props="formComponentProps"
                     :form-stack-size="formStackSize"
-                    class="item outline-hidden"
+                    class="related-item"
                     @removed="remove(i)"
                 />
             </div>
@@ -284,7 +284,7 @@ export default {
 
         makeSortable() {
             this.sortable = new Sortable(this.$refs.items, {
-                draggable: '.item',
+                draggable: '.related-item',
                 handle: '.item-move',
                 mirror: { constrainDimensions: true, xAxis: false, appendTo: 'body' },
                 swapAnimation: { vertical: true },

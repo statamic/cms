@@ -27,11 +27,11 @@
                 :model-value="value"
                 @update:modelValue="comboboxUpdated"
             >
-                <div class="vs__selected-options-outside flex gap-2 flex-wrap">
+                <div class="vs__selected-options-outside flex gap-2 pt-3 flex-wrap">
                     <div
                         v-for="option in selectedOptions"
                         :key="getOptionValue(option)"
-                        class="vs__selected sortable-item mt-2"
+                        class="vs__selected sortable-item cursor-grab"
                     >
                         <Badge pill size="lg">
                             <div v-if="labelHtml" v-html="getOptionLabel(option)"></div>
@@ -40,14 +40,14 @@
                             <button
                                 v-if="!disabled"
                                 type="button"
-                                class="vs__deselect"
+                                class="text-gray-400 hover:text-gray-700 px-3 -mx-3 cursor-pointer"
                                 :aria-label="__('Deselect option')"
                                 @click="deselect(option.value)"
                             >
-                                <span>×</span>
+                                <span>&times;</span>
                             </button>
-                            <button v-else type="button" class="vs__deselect">
-                                <span class="text-gray-300">×</span>
+                            <button v-else type="button" class="text-gray-400 hover:text-gray-700 px-3 -mx-3 cursor-pointer"">
+                                <span>&times;</span>
                             </button>
                         </Badge>
                     </div>

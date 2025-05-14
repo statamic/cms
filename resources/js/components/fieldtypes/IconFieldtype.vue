@@ -13,11 +13,11 @@
     >
         <template #option="option">
             <div class="flex items-center">
-                <svg-icon v-if="!option.html" :name="`${meta.set}/${option.label}`" class="h-5 w-5" />
-                <div v-if="option.html" v-html="option.html" class="h-5 w-5" />
-                <span class="truncate ltr:ml-4 rtl:mr-4">{{
-                    __(option.label)
-                }}</span>
+                <svg-icon v-if="!option.html" :name="`${meta.set}/${option.label}`" class="size-4" />
+                <div v-if="option.html" v-html="option.html" class="size-4" />
+                <span class="truncate ms-3">
+                    {{ __(option.label) }}
+                </span>
             </div>
         </template>
         <template #selected-option="{ option }">
@@ -25,12 +25,12 @@
                 <svg-icon
                     v-if="!option.html"
                     :name="`${meta.set}/${option.label}`"
-                    class="flex h-5 w-5 items-center"
+                    class="flex items-center size-4"
                 />
-                <div v-if="option.html" v-html="option.html" class="h-5 w-5" />
-                <span class="truncate text-xs text-gray-800 dark:text-dark-150 ltr:ml-4 rtl:mr-4">{{
-                    __(option.label)
-                }}</span>
+                <div v-if="option.html" v-html="option.html" class="size-4" />
+                <span class="truncate text-sm text-gray-800 dark:text-gray-200 ms-3">
+                    {{ __(option.label) }}
+                </span>
             </div>
         </template>
     </Combobox>

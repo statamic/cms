@@ -1,7 +1,7 @@
 <template>
-    <div class="flex items-center">
+    <div class="flex items-center gap-3">
         <!-- Link type selector -->
-        <div class="w-28 ltr:mr-4 rtl:ml-4">
+        <div class="w-28">
             <Select :options v-model="option" />
         </div>
 

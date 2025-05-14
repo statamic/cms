@@ -1,18 +1,8 @@
 <script setup>
 import { cva } from 'cva';
-import {
-    ComboboxAnchor,
-    ComboboxContent,
-    ComboboxEmpty,
-    ComboboxInput,
-    ComboboxItem,
-    ComboboxRoot,
-    ComboboxTrigger,
-    ComboboxPortal,
-    ComboboxViewport,
-} from 'reka-ui';
+import { ComboboxAnchor, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxRoot, ComboboxTrigger, ComboboxPortal, ComboboxViewport } from 'reka-ui';
 import { computed, nextTick, ref, useAttrs, useTemplateRef, watch } from 'vue';
-import { WithField, Icon, Badge } from '@statamic/ui';
+import { Button, WithField, Icon, Badge } from '@statamic/ui';
 import fuzzysort from 'fuzzysort';
 import { SortableList } from '@statamic/components/sortable/Sortable.js';
 
@@ -45,7 +35,7 @@ defineOptions({
 const attrs = useAttrs();
 
 const anchorClasses = cva({
-    base: 'focus-within:outline  w-full flex items-center justify-between border border-gray-300 dark:border-b-0 dark:ring-3 dark:ring-gray-900 dark:border-white/15 text-gray-600 dark:text-gray-300 antialiased appearance-none shadow-ui-sm dark:shadow-md not-prose',
+    base: 'focus-within:outline w-full flex items-center justify-between border border-gray-300 dark:border-b-0 dark:ring-3 dark:ring-gray-900 dark:border-white/15 text-gray-600 dark:text-gray-300 antialiased appearance-none shadow-ui-sm dark:shadow-md',
     variants: {
         size: {
             base: 'text-base rounded-lg ps-3 py-2 h-10 leading-[1.375rem]',
@@ -60,7 +50,11 @@ const anchorClasses = cva({
 })({ ...props });
 
 const itemClasses = cva({
-    base: 'w-full cursor-pointer antialiased rounded-lg py-1.5 px-2 flex items-center gap-2 text-gray-600 dark:text-gray-300 relative select-none data-disabled:text-gray-300 data-disabled:pointer-events-none data-highlighted:outline-hidden data-highlighted:bg-gray-50 data-highlighted:text-gray-900 dark:data-highlighted:bg-gray-700 dark:data-highlighted:text-gray-300',
+    base: [
+        'w-full flex items-center gap-2 relative select-none cursor-pointer',
+        'py-1.5 px-2 antialiased rounded-lg',
+        'data-disabled:text-gray-300 data-disabled:pointer-events-none data-highlighted:outline-hidden'
+    ],
     variants: {
         size: {
             base: '',
@@ -68,8 +62,8 @@ const itemClasses = cva({
             xs: 'text-xs',
         },
         selected: {
-            true: 'opacity-50',
-            false: '',
+            false: 'text-gray-600 dark:text-gray-300 data-highlighted:bg-gray-50 data-highlighted:text-gray-900 dark:data-highlighted:bg-gray-700 dark:data-highlighted:text-gray-300',
+            true: 'bg-blue-50 text-blue-500!',
         },
     },
 });
@@ -222,14 +216,10 @@ function updateModelValue(value) {
                             </slot>
                         </div>
                     </ComboboxTrigger>
-                    <div class="flex items-center space-x-2 pl-2">
-                        <button v-if="clearable" @click="clear">
-                            <div class="inline-flex p-1 bg-zinc-100 rounded-full aspect-square">
-                                <Icon name="plus" class="rotate-45" />
-                            </div>
-                        </button>
+                    <div class="flex items-center space-x-2 px-2">
+                        <Button icon="x" variant="filled" size="xs" round v-if="clearable && modelValue" @click="clear" />
                         <ComboboxTrigger class="flex items-center">
-                            <Icon name="ui/chevron-down" class="me-2" />
+                            <Icon name="ui/chevron-down" />
                         </ComboboxTrigger>
                     </div>
                 </ComboboxAnchor>
@@ -271,7 +261,7 @@ function updateModelValue(value) {
                 </ComboboxPortal>
             </ComboboxRoot>
 
-            <div v-if="maxSelections && maxSelections !== Infinity" class="mt-3 text-xs ltr:ml-2 rtl:mr-2" :class="limitIndicatorColor">
+            <div v-if="maxSelections && maxSelections !== Infinity" class="mt-3 text-xs ms-2" :class="limitIndicatorColor">
                 <span v-text="selectedOptions.length"></span>/<span v-text="maxSelections"></span>
             </div>
         </div>
