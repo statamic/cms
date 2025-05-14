@@ -3,11 +3,12 @@
 namespace Statamic\Fieldtypes\Assets;
 
 use Illuminate\Contracts\Validation\Rule;
+use Statamic\Contracts\GraphQL\CastableToValidationString;
 use Statamic\Facades\Asset;
 use Statamic\Statamic;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class DimensionsRule implements Rule
+class DimensionsRule implements CastableToValidationString, Rule
 {
     protected $parameters;
 
@@ -125,7 +126,7 @@ class DimensionsRule implements Rule
         return abs($numerator / $denominator - $width / $height) > $precision;
     }
 
-    public function __toString()
+    public function toGqlValidationString(): string
     {
         return 'dimensions:'.implode(',', $this->parameters);
     }

@@ -3,6 +3,7 @@
 namespace Statamic\GraphQL\Types;
 
 use Statamic\Contracts\Forms\Form;
+use Statamic\Contracts\GraphQL\CastableToValidationString;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Value;
 
@@ -42,11 +43,11 @@ class FormType extends \Rebing\GraphQL\Support\Type
                                     return $rule;
                                 }
 
-                                if ($rule instanceof \Stringable) {
-                                    return (string) $rule;
+                                if ($rule instanceof CastableToValidationString) {
+                                    return $rule->toGqlValidationString();
                                 }
 
-                                return $rule;
+                                return get_class($rule).'::class';
                             });
                         })
                         ->all();

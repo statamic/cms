@@ -3,11 +3,12 @@
 namespace Statamic\Fieldtypes\Assets;
 
 use Illuminate\Contracts\Validation\Rule;
+use Statamic\Contracts\GraphQL\CastableToValidationString;
 use Statamic\Facades\Asset;
 use Statamic\Statamic;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class ImageRule implements Rule
+class ImageRule implements CastableToValidationString, Rule
 {
     protected $parameters;
 
@@ -50,7 +51,7 @@ class ImageRule implements Rule
         return __((Statamic::isCpRoute() ? 'statamic::' : '').'validation.image');
     }
 
-    public function __toString()
+    public function toGqlValidationString(): string
     {
         return 'image:'.implode(',', $this->parameters);
     }
