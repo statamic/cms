@@ -15,20 +15,16 @@
             <div class="flex items-center">
                 <svg-icon v-if="!option.html" :name="`${meta.set}/${option.label}`" class="size-4" />
                 <div v-if="option.html" v-html="option.html" class="size-4" />
-                <span class="truncate ms-3">
+                <span class="ms-3 truncate">
                     {{ __(option.label) }}
                 </span>
             </div>
         </template>
         <template #selected-option="{ option }">
             <div class="flex items-center">
-                <svg-icon
-                    v-if="!option.html"
-                    :name="`${meta.set}/${option.label}`"
-                    class="flex items-center size-4"
-                />
+                <svg-icon v-if="!option.html" :name="`${meta.set}/${option.label}`" class="flex size-4 items-center" />
                 <div v-if="option.html" v-html="option.html" class="size-4" />
-                <span class="truncate text-sm text-gray-800 dark:text-gray-200 ms-3">
+                <span class="ms-3 truncate text-sm text-gray-800 dark:text-gray-200">
                     {{ __(option.label) }}
                 </span>
             </div>

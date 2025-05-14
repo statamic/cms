@@ -27,7 +27,7 @@
                 :model-value="value"
                 @update:modelValue="comboboxUpdated"
             >
-                <div class="vs__selected-options-outside flex gap-2 pt-3 flex-wrap">
+                <div class="vs__selected-options-outside flex flex-wrap gap-2 pt-3">
                     <div
                         v-for="option in selectedOptions"
                         :key="getOptionValue(option)"
@@ -40,13 +40,17 @@
                             <button
                                 v-if="!disabled"
                                 type="button"
-                                class="text-gray-400 hover:text-gray-700 px-3 -mx-3 cursor-pointer"
+                                class="-mx-3 cursor-pointer px-3 text-gray-400 hover:text-gray-700"
                                 :aria-label="__('Deselect option')"
                                 @click="deselect(option.value)"
                             >
                                 <span>&times;</span>
                             </button>
-                            <button v-else type="button" class="text-gray-400 hover:text-gray-700 px-3 -mx-3 cursor-pointer"">
+                            <button
+                                v-else
+                                type="button"
+                                class="-mx-3 cursor-pointer px-3 text-gray-400 hover:text-gray-700"
+                            >
                                 <span>&times;</span>
                             </button>
                         </Badge>
@@ -135,13 +139,13 @@ export default {
             }
 
             selections.forEach((value) => {
-               if (this.selectedOptionData.find((option) => option.value === value)) {
-                   return;
-               }
+                if (this.selectedOptionData.find((option) => option.value === value)) {
+                    return;
+                }
 
-               let option = this.normalizedOptions.find((option) => option.value === value);
+                let option = this.normalizedOptions.find((option) => option.value === value);
 
-               this.selectedOptionData.push(option);
+                this.selectedOptionData.push(option);
             });
         },
 

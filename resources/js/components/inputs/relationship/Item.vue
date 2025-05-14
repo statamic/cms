@@ -1,7 +1,10 @@
 <template>
-    <div class="w-full bg-white px-1.5 py-2 gap-2 relative text-base rounded-lg flex items-center z-2 dark:bg-gray-900 border border-gray-200 dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:inset-shadow-2xs dark:inset-shadow-black shadow-ui-sm" :class="{ invalid: item.invalid }">
-        <ui-icon name="handles" class="item-move cursor-grab sortable-handle size-4 text-gray-400" v-if="sortable" />
-        <div class="flex items-center flex-1">
+    <div
+        class="shadow-ui-sm relative z-2 flex w-full items-center gap-2 rounded-lg border border-gray-200 bg-white px-1.5 py-2 text-base dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
+        :class="{ invalid: item.invalid }"
+    >
+        <ui-icon name="handles" class="item-move sortable-handle size-4 cursor-grab text-gray-400" v-if="sortable" />
+        <div class="flex flex-1 items-center">
             <ui-status-indicator v-if="item.status" :status="item.status" class="me-2" />
 
             <div
@@ -36,7 +39,7 @@
                 <div
                     v-if="item.hint"
                     v-text="item.hint"
-                    class="hidden whitespace-nowrap text-4xs uppercase text-gray-600 @sm:block me-2"
+                    class="text-4xs me-2 hidden whitespace-nowrap text-gray-600 uppercase @sm:block"
                 />
 
                 <div class="flex items-center" v-if="!readOnly">

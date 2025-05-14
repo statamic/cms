@@ -1,6 +1,16 @@
 <script setup>
 import { cva } from 'cva';
-import { ComboboxAnchor, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxRoot, ComboboxTrigger, ComboboxPortal, ComboboxViewport } from 'reka-ui';
+import {
+    ComboboxAnchor,
+    ComboboxContent,
+    ComboboxEmpty,
+    ComboboxInput,
+    ComboboxItem,
+    ComboboxRoot,
+    ComboboxTrigger,
+    ComboboxPortal,
+    ComboboxViewport,
+} from 'reka-ui';
 import { computed, nextTick, ref, useAttrs, useTemplateRef, watch } from 'vue';
 import { Button, WithField, Icon, Badge } from '@statamic/ui';
 import fuzzysort from 'fuzzysort';
@@ -53,7 +63,7 @@ const itemClasses = cva({
     base: [
         'w-full flex items-center gap-2 relative select-none cursor-pointer',
         'py-1.5 px-2 antialiased rounded-lg',
-        'data-disabled:text-gray-300 data-disabled:pointer-events-none data-highlighted:outline-hidden'
+        'data-disabled:text-gray-300 data-disabled:pointer-events-none data-highlighted:outline-hidden',
     ],
     variants: {
         size: {
@@ -75,17 +85,17 @@ const selectedOptions = computed(() => {
         selections = [selections];
     }
 
-    return selections.map(value => {
-        return props.options.find(option => getOptionValue(option) === value) ?? { label: value, value };
+    return selections.map((value) => {
+        return props.options.find((option) => getOptionValue(option) === value) ?? { label: value, value };
     });
 });
 
 const selectedOption = computed(() => {
-   if (props.multiple || !props.modelValue || selectedOptions.value.length !== 1) {
-       return null;
-   }
+    if (props.multiple || !props.modelValue || selectedOptions.value.length !== 1) {
+        return null;
+    }
 
-   return selectedOptions.value[0];
+    return selectedOptions.value[0];
 });
 
 function getOptionLabel(option) {
@@ -97,7 +107,7 @@ function getOptionLabel(option) {
 }
 
 function getOptionValue(option) {
-    if (! option) {
+    if (!option) {
         return;
     }
 
@@ -160,7 +170,7 @@ const filteredOptions = computed(() => {
 
 watch(searchQuery, (value) => {
     emit('search', value, () => {});
-})
+});
 
 const inputRef = useTemplateRef('input');
 
@@ -173,10 +183,13 @@ function clear() {
             inputRef.value.$el.focus();
         });
     }
-};
+}
 
 function deselect(option) {
-    emit('update:modelValue', props.modelValue.filter((item) => item !== option));
+    emit(
+        'update:modelValue',
+        props.modelValue.filter((item) => item !== option),
+    );
 }
 
 const dropdownOpen = ref(false);
@@ -202,7 +215,7 @@ function updateModelValue(value) {
                 @update:model-value="updateModelValue"
             >
                 <ComboboxAnchor :class="[anchorClasses, $attrs.class]" data-ui-combobox-anchor>
-                    <ComboboxTrigger as="div" class="w-full min-h-full">
+                    <ComboboxTrigger as="div" class="min-h-full w-full">
                         <ComboboxInput
                             v-if="searchable && (dropdownOpen || !modelValue)"
                             ref="input"
@@ -217,7 +230,14 @@ function updateModelValue(value) {
                         </div>
                     </ComboboxTrigger>
                     <div class="flex items-center space-x-2 px-2">
-                        <Button icon="x" variant="filled" size="xs" round v-if="clearable && modelValue" @click="clear" />
+                        <Button
+                            icon="x"
+                            variant="filled"
+                            size="xs"
+                            round
+                            v-if="clearable && modelValue"
+                            @click="clear"
+                        />
                         <ComboboxTrigger class="flex items-center">
                             <Icon name="ui/chevron-down" />
                         </ComboboxTrigger>
@@ -234,7 +254,7 @@ function updateModelValue(value) {
                         ]"
                     >
                         <ComboboxViewport>
-                            <ComboboxEmpty class="text-mauve8 text-xs font-medium text-center py-2">
+                            <ComboboxEmpty class="text-mauve8 py-2 text-center text-xs font-medium">
                                 <slot name="no-options">
                                     {{ __('No options to choose from.') }}
                                 </slot>
@@ -261,7 +281,11 @@ function updateModelValue(value) {
                 </ComboboxPortal>
             </ComboboxRoot>
 
-            <div v-if="maxSelections && maxSelections !== Infinity" class="mt-3 text-xs ms-2" :class="limitIndicatorColor">
+            <div
+                v-if="maxSelections && maxSelections !== Infinity"
+                class="ms-2 mt-3 text-xs"
+                :class="limitIndicatorColor"
+            >
                 <span v-text="selectedOptions.length"></span>/<span v-text="maxSelections"></span>
             </div>
         </div>
@@ -277,8 +301,8 @@ function updateModelValue(value) {
                 :model-value="modelValue"
                 @update:modelValue="updateModelValue"
             >
-                <div class="vs__selected-options-outside flex gap-2 flex-wrap">
-                     <div
+                <div class="vs__selected-options-outside flex flex-wrap gap-2">
+                    <div
                         v-for="option in selectedOptions"
                         :key="getOptionValue(option)"
                         class="vs__selected sortable-item mt-2"
