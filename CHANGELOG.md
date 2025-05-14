@@ -1,5 +1,28 @@
 # Release Notes
 
+## 5.55.0 (2025-05-14)
+
+### What's new
+- Middleware to redirect absolute domains ending in dot [#11782](https://github.com/statamic/cms/issues/11782) by @indykoning
+- Add `increment`/`decrement` methods to `ContainsData` [#11786](https://github.com/statamic/cms/issues/11786) by @duncanmcclean
+- Update GraphiQL [#11780](https://github.com/statamic/cms/issues/11780) by @duncanmcclean
+- Allow selecting entries from different sites within the link fieldtype [#10546](https://github.com/statamic/cms/issues/10546) by @justkidding96
+- Ability to select entries from all sites from Bard link [#11768](https://github.com/statamic/cms/issues/11768) by @edalzell
+
+### What's fixed
+- Ensure asset validation rules are returned as strings to GraphQL [#11781](https://github.com/statamic/cms/issues/11781) by @ryanmitchell
+- Asset validation rules as string in GraphQL, part 2 [#11790](https://github.com/statamic/cms/issues/11790) by @jasonvarga
+- Fix Term filter on entry listing not working when limiting to 1 term [#11735](https://github.com/statamic/cms/issues/11735) by @liucf
+- Fix filtering group fieldtype null values [#11788](https://github.com/statamic/cms/issues/11788) by @jacksleight
+- Clone internal data collections [#11777](https://github.com/statamic/cms/issues/11777) by @jacksleight
+- Fix creating terms in non-default sites [#11746](https://github.com/statamic/cms/issues/11746) by @duncanmcclean
+- Ensure `null` values are filtered out in dictionary field config [#11773](https://github.com/statamic/cms/issues/11773) by @duncanmcclean
+- Use deep copy of set's data in bard field [#11766](https://github.com/statamic/cms/issues/11766) by @faltjo
+- Dutch translations [#11783](https://github.com/statamic/cms/issues/11783) by @rinusvandam
+- PHPUnit: Use `#[Test]` attribute instead of `/** @test */` [#11767](https://github.com/statamic/cms/issues/11767) by @duncanmcclean
+
+
+
 ## 5.54.0 (2025-05-02)
 
 ### What's new
