@@ -124,4 +124,9 @@ class DimensionsRule implements Rule
 
         return abs($numerator / $denominator - $width / $height) > $precision;
     }
+
+    public function __toString()
+    {
+        return 'dimensions:'.implode(',', $this->parameters);
+    }
 }

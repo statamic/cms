@@ -46,4 +46,9 @@ class MimetypesRule implements Rule
     {
         return str_replace(':values', implode(', ', $this->parameters), __((Statamic::isCpRoute() ? 'statamic::' : '').'validation.mimetypes'));
     }
+
+    public function __toString()
+    {
+        return 'mimetypes:'.implode(',', $this->parameters);
+    }
 }

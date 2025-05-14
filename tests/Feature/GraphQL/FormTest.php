@@ -317,4 +317,53 @@ GQL;
                 ],
             ]]);
     }
+
+    #[Test]
+    public function it_returns_string_based_validation_rules_for_mimes_mimetypes_dimension_size_and_image()
+    {
+        Form::make('contact')->title('Contact Us')->save();
+
+        $blueprint = Blueprint::makeFromFields([
+            'name' => [
+                'type' => 'assets',
+                'display' => 'Asset',
+                'validate' => [
+                    'mimes:image/jpeg,image/png',
+                    'mimetypes:image/jpeg,image/png',
+                    'dimensions:1024',
+                    'size:1000',
+                    'image:jpeg',
+                ],
+            ],
+        ]);
+
+        BlueprintRepository::shouldReceive('find')->with('forms.contact')->andReturn($blueprint);
+
+        $query = <<<'GQL'
+{
+    form(handle: "contact") {
+        rules
+    }
+}
+GQL;
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'form' => [
+                    'rules' => [
+                        'name' => [
+                            'mimes:image/jpeg,image/png',
+                            'mimetypes:image/jpeg,image/png',
+                            'dimensions:1024',
+                            'size:1000',
+                            'image:jpeg',
+                            'array',
+                            'nullable',
+                        ],
+                    ],
+                ],
+            ]]);
+    }
 }

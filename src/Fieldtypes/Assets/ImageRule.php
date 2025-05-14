@@ -49,4 +49,9 @@ class ImageRule implements Rule
     {
         return __((Statamic::isCpRoute() ? 'statamic::' : '').'validation.image');
     }
+
+    public function __toString()
+    {
+        return 'image:'.implode(',', $this->parameters);
+    }
 }
