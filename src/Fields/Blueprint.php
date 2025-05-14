@@ -138,9 +138,8 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
             $namespace = 'vendor/'.$namespace;
         }
 
-        return Path::tidy(vsprintf('%s/%s/%s.yaml', [
-            Facades\Blueprint::directory(),
-            $namespace,
+        return Path::tidy(vsprintf('%s/%s.yaml', [
+            Facades\Blueprint::namespaceDirectory($namespace),
             $this->handle(),
         ]));
     }
