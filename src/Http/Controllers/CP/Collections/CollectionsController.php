@@ -451,14 +451,12 @@ class CollectionsController extends CpController
                         'display' => __('Blueprints'),
                         'instructions' => __('statamic::messages.collections_blueprint_instructions'),
                         'type' => 'blueprints',
-                        'options' => [
-                            'blueprints' => $collection->entryBlueprints()->map(fn ($bp) => [
-                                'handle' => $bp->handle(),
-                                'title' => __($bp->title()),
-                                'edit_url' => cp_route('collections.blueprints.edit', [$collection->handle(), $bp->handle()]),
-                            ])->values()->all(),
-                            'all_blueprints_url' => cp_route('collections.blueprints.index', $collection->handle()),
-                        ]
+                        'options' => $collection->entryBlueprints()->map(fn ($bp) => [
+                            'handle' => $bp->handle(),
+                            'title' => __($bp->title()),
+                            'edit_url' => cp_route('collections.blueprints.edit', [$collection->handle(), $bp->handle()]),
+                        ])->values()->all(),
+                        'all_blueprints_url' => cp_route('collections.blueprints.index', $collection->handle()),
                     ],
                     'links' => [
                         'display' => __('Links'),
