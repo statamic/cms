@@ -88,6 +88,25 @@
                                         </div>
                                     </div>
                                 </button>
+                                <dropdown-list
+                                    class="absolute top-1 opacity-0 group-hover:opacity-100 end-2"
+                                    :class="{ 'opacity-100': actionOpened === asset.id }"
+                                    @opened="actionOpened = asset.id"
+                                    @closed="actionOpened = null"
+                                >
+                                    <dropdown-item
+                                        :text="__(canEdit ? 'Edit' : 'View')"
+                                        @click="edit(asset.id)"
+                                    />
+                                    <div class="divider" v-if="asset.actions.length" />
+                                    <data-list-inline-actions
+                                        :item="asset.id"
+                                        :url="actionUrl"
+                                        :actions="asset.actions"
+                                        @started="actionStarted"
+                                        @completed="actionCompleted"
+                                    />
+                                </dropdown-list>
                             </div>
                         </template>
                         <ContextMenu>
