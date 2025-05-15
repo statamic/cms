@@ -33,6 +33,12 @@ import { default as DropdownItem } from './Dropdown/Item.vue';
 import { default as DropdownLabel } from './Dropdown/Label.vue';
 import { default as DropdownMenu } from './Dropdown/Menu.vue';
 import { default as DropdownSeparator } from './Dropdown/Separator.vue';
+import { default as Context } from './Context/Context.vue';
+import { default as ContextItem } from './Context/Item.vue';
+import { default as ContextLabel } from './Context/Label.vue';
+import { default as ContextMenu } from './Context/Menu.vue';
+import { default as ContextFooter } from './Context/Footer.vue';
+import { default as ContextSeparator } from './Context/Separator.vue';
 import { default as Panel } from './Panel/Panel.vue';
 import { default as PanelHeader } from './Panel/Header.vue';
 import { default as Badge } from './Badge.vue';
@@ -73,6 +79,12 @@ export {
     DropdownLabel,
     DropdownMenu,
     DropdownSeparator,
+    Context,
+    ContextItem,
+    ContextLabel,
+    ContextMenu,
+    ContextSeparator,
+    ContextFooter,
     Panel,
     PanelHeader,
     Badge,

@@ -4,8 +4,9 @@
             <breadcrumbs v-if="!restrictFolderNavigation" :path="path" @navigated="selectFolder" />
             <ui-slider size="sm" class="mr-2 w-24!" variant="subtle" v-model="thumbnailSize" :min="60" :max="300" :step="25" />
         </ui-panel-header>
-        <!-- Folders -->
+
         <ui-card class="space-y-8">
+            <!-- Folders -->
             <section class="folder-grid-listing" v-if="folders.length">
                 <div
                     class="group/folder relative"
@@ -13,29 +14,27 @@
                     :key="folder.path"
                     v-if="!restrictFolderNavigation"
                 >
-                    <button @dblclick="selectFolder(folder.path)" class="w-[80px] h-[66px] group">
-                        <ui-icon name="asset-folder" class="size-full text-blue-400/90 hover:text-blue-400" />
-                        <div
-                            class="font-mono text-xs text-gray-500 text-center overflow-hidden text-ellipsis whitespace-nowrap"
-                            v-text="folder.basename"
-                            :title="folder.basename"
-                        />
-                    </button>
-                    <dropdown-list
-                        v-if="folderActions(folder).length"
-                        class="absolute top-1 opacity-0 group-hover:opacity-100 end-2"
-                        :class="{ 'opacity-100': actionOpened === folder.path }"
-                        @opened="actionOpened = folder.path"
-                        @closed="actionOpened = null"
-                    >
-                        <data-list-inline-actions
-                            :item="folder.path"
-                            :url="folderActionUrl"
-                            :actions="folderActions(folder)"
-                            @started="actionStarted"
-                            @completed="actionCompleted"
-                        />
-                    </dropdown-list>
+                    <Context>
+                        <template #trigger>
+                            <button @dblclick="selectFolder(folder.path)" class="group h-[66px] w-[80px]">
+                                <ui-icon name="asset-folder" class="size-full text-blue-400/90 hover:text-blue-400" />
+                                <div
+                                    class="overflow-hidden text-center font-mono text-xs text-ellipsis whitespace-nowrap text-gray-500"
+                                    v-text="folder.basename"
+                                    :title="folder.basename"
+                                />
+                            </button>
+                        </template>
+                        <ContextMenu v-if="folderActions(folder).length">
+                            <data-list-inline-actions
+                                :item="folder.path"
+                                :url="folderActionUrl"
+                                :actions="folderActions(folder)"
+                                @started="actionStarted"
+                                @completed="actionCompleted"
+                            />
+                        </ContextMenu>
+                    </Context>
                 </div>
                 <div v-if="creatingFolder" class="group/folder relative">
                     <div class="group h-[66px] w-[80px]">
@@ -59,48 +58,60 @@
             </section>
 
             <!-- Assets -->
-            <section class="asset-grid-listing"
-                v-if="assets.length"
-                :style="{ gridTemplateColumns: gridSize }"
-            >
+            <section class="asset-grid-listing" v-if="assets.length" :style="{ gridTemplateColumns: gridSize }">
                 <div
                     v-for="(asset, index) in assets"
                     :key="asset.id"
                     class="group relative"
-                    :class="{ 'selected': isSelected(asset.id) }"
+                    :class="{ selected: isSelected(asset.id) }"
                 >
-                    <div class="asset-tile group relative" :class="{ 'bg-checkerboard': asset.can_be_transparent }">
-                        <button
-                            class="size-full"
-                            @click.stop="toggleSelection(asset.id, index, $event)"
-                            @dblclick.stop="$emit('edit-asset', asset)"
-                        >
-                            <div class="relative flex items-center justify-center aspect-square size-full">
-                                <div class="asset-thumb">
-                                    <img
-                                        v-if="asset.is_image"
-                                        :src="asset.thumbnail"
-                                        loading="lazy"
-                                        :class="{
-                                            'size-full p-4': asset.extension === 'svg',
-                                            'p-1 rounded-lg': asset.orientation === 'square'
-                                        }"
+                    <Context>
+                        <template #trigger>
+                            <div class="asset-tile group relative" :class="{ 'bg-checkerboard': asset.can_be_transparent }">
+                                <button
+                                    class="size-full"
+                                    @click.stop="toggleSelection(asset.id, index, $event)"
+                                    @dblclick.stop="$emit('edit-asset', asset)"
+                                >
+                                    <div class="relative flex aspect-square size-full items-center justify-center">
+                                        <div class="asset-thumb">
+                                            <img
+                                                v-if="asset.is_image"
+                                                :src="asset.thumbnail"
+                                                loading="lazy"
+                                                :class="{
+                                                    'size-full p-4': asset.extension === 'svg',
+                                                    'rounded-lg p-1': asset.orientation === 'square',
+                                                }"
+                                            />
+                                            <file-icon v-else :extension="asset.extension" class="size-1/2" />
+                                        </div>
+                                    </div>
+                                </button>
+                                <dropdown-list
+                                    class="absolute top-1 opacity-0 group-hover:opacity-100 end-2"
+                                    :class="{ 'opacity-100': actionOpened === asset.id }"
+                                    @opened="actionOpened = asset.id"
+                                    @closed="actionOpened = null"
+                                >
+                                    <dropdown-item
+                                        :text="__(canEdit ? 'Edit' : 'View')"
+                                        @click="edit(asset.id)"
                                     />
-                                    <file-icon v-else :extension="asset.extension" class="size-1/2" />
-                                </div>
+                                    <div class="divider" v-if="asset.actions.length" />
+                                    <data-list-inline-actions
+                                        :item="asset.id"
+                                        :url="actionUrl"
+                                        :actions="asset.actions"
+                                        @started="actionStarted"
+                                        @completed="actionCompleted"
+                                    />
+                                </dropdown-list>
                             </div>
-                        </button>
-                        <dropdown-list
-                            class="absolute top-1 opacity-0 group-hover:opacity-100 end-2"
-                            :class="{ 'opacity-100': actionOpened === asset.id }"
-                            @opened="actionOpened = asset.id"
-                            @closed="actionOpened = null"
-                        >
-                            <dropdown-item
-                                :text="__(canEdit ? 'Edit' : 'View')"
-                                @click="edit(asset.id)"
-                            />
-                            <div class="divider" v-if="asset.actions.length" />
+                        </template>
+                        <ContextMenu>
+                            <ContextItem icon="edit" :text="__(canEdit ? 'Edit' : 'View')" @click="edit(asset.id)" />
+                            <ContextSeparator />
                             <data-list-inline-actions
                                 :item="asset.id"
                                 :url="actionUrl"
@@ -108,13 +119,9 @@
                                 @started="actionStarted"
                                 @completed="actionCompleted"
                             />
-                        </dropdown-list>
-                    </div>
-                    <div
-                        class="asset-filename"
-                        v-text="truncateFilename(asset.basename)"
-                        :title="asset.basename"
-                    />
+                        </ContextMenu>
+                    </Context>
+                    <div class="asset-filename" v-text="truncateFilename(asset.basename)" :title="asset.basename" />
                 </div>
             </section>
         </ui-card>
@@ -129,11 +136,23 @@ import AssetBrowserMixin from './AssetBrowserMixin';
 import Breadcrumbs from './Breadcrumbs.vue';
 import { debounce } from 'lodash-es';
 import { EditableArea, EditableInput, EditablePreview, EditableRoot } from 'reka-ui';
-import { Editable } from '@statamic/ui';
+import { Context, ContextMenu, ContextItem, ContextLabel, ContextSeparator, Editable } from '@statamic/ui';
 
 export default {
     mixins: [AssetBrowserMixin],
-    components: { Editable, EditableInput, EditablePreview, EditableArea, EditableRoot, Breadcrumbs },
+    components: {
+        ContextItem,
+        ContextLabel,
+        ContextMenu,
+        ContextSeparator,
+        Context,
+        Editable,
+        EditableInput,
+        EditablePreview,
+        EditableArea,
+        EditableRoot,
+        Breadcrumbs,
+    },
     props: {
         assets: { type: Array },
         selectedAssets: { type: Array },
@@ -142,7 +161,6 @@ export default {
 
     data() {
         return {
-            actionOpened: null,
             thumbnailSize: 200,
             newFolderName: null,
         };
