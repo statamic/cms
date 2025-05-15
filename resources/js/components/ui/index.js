@@ -36,6 +36,7 @@ import { default as Context } from './Context/Context.vue';
 import { default as ContextItem } from './Context/Item.vue';
 import { default as ContextLabel } from './Context/Label.vue';
 import { default as ContextMenu } from './Context/Menu.vue';
+import { default as ContextFooter } from './Context/Footer.vue';
 import { default as ContextSeparator } from './Context/Separator.vue';
 import { default as Panel } from './Panel/Panel.vue';
 import { default as PanelHeader } from './Panel/Header.vue';
@@ -81,6 +82,7 @@ export {
     ContextLabel,
     ContextMenu,
     ContextSeparator,
+    ContextFooter,
     Panel,
     PanelHeader,
     Badge,
