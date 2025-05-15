@@ -214,7 +214,7 @@ class CoreNav
         if (config('statamic.graphql.enabled') && Statamic::pro()) {
             Nav::tools('GraphQL')
                 ->route('graphql.index')
-                ->icon('array')
+                ->icon('graphql')
                 ->attributes(['target' => '_blank'])
                 ->can('view graphql');
         }
