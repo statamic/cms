@@ -157,7 +157,6 @@ return [
     'select.config.multiple' => 'Tillåt flera val.',
     'select.config.options' => 'Ställ in nycklarna och deras valfria etiketter.',
     'select.config.placeholder' => 'Ställ in platshållartext.',
-    'select.config.push_tags' => 'Lägg till nyskapade taggar i alternativlistan.',
     'select.config.searchable' => 'Aktivera sökning genom möjliga alternativ.',
     'select.config.taggable' => 'Tillåt tillägg av nya alternativ utöver fördefinierade alternativ',
     'select.title' => 'Rullgardinsmeny',

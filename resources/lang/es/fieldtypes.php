@@ -158,7 +158,6 @@ return [
     'select.config.multiple' => 'Permitir selección múltiple.',
     'select.config.options' => 'Establecer las teclas y sus etiquetas opcionales.',
     'select.config.placeholder' => 'Establecer texto predeterminado en el campo.',
-    'select.config.push_tags' => 'Agregar etiquetas recién creadas a la lista de opciones.',
     'select.config.searchable' => 'Habilita la búsqueda a través de las opciones posibles.',
     'select.config.taggable' => 'Permitir agregar nuevas opciones además de las opciones predefinidas',
     'select.title' => 'Selección',

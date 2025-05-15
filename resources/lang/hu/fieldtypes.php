@@ -157,7 +157,6 @@ return [
     'select.config.multiple' => 'Több opció kiválasztásának engedélyezése.',
     'select.config.options' => 'Állítsa be a kulcsokat és az opcionális címkéket.',
     'select.config.placeholder' => 'Placeholder szöveg beállítása.',
-    'select.config.push_tags' => 'Újonnan létrehozott címkék hozzáadása az opciók listájához.',
     'select.config.searchable' => 'Engedélyezze a lehetséges opciók közötti keresést.',
     'select.config.taggable' => 'Új opciók hozzáadásának engedélyezése, az előre meghatározott opciókon felül',
     'select.title' => 'Választó',

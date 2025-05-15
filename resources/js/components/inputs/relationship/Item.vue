@@ -1,20 +1,24 @@
 <template>
-    <div class="item select-none" :class="{ invalid: item.invalid }">
-        <div class="item-move" v-if="sortable">&nbsp;</div>
-        <div class="item-inner">
-            <div v-if="statusIcon" class="little-dot hidden @sm:block ltr:mr-2 rtl:ml-2" :class="item.status" />
+    <div
+        class="shadow-ui-sm relative z-2 flex w-full items-center gap-2 rounded-lg border border-gray-200 bg-white px-1.5 py-2 text-base dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
+        :class="{ invalid: item.invalid }"
+    >
+        <ui-icon name="handles" class="item-move sortable-handle size-4 cursor-grab text-gray-400" v-if="sortable" />
+        <div class="flex flex-1 items-center">
+            <ui-status-indicator v-if="item.status" :status="item.status" class="me-2" />
 
             <div
                 v-if="item.invalid"
-                v-tooltip.top="__('An item with this ID could not be found')"
+                v-tooltip.top="__('ID not found')"
                 v-text="__(item.title)"
+                class="line-clamp-1 text-sm text-gray-600 dark:text-gray-300"
             />
 
             <a
                 v-if="!item.invalid && editable"
                 @click.prevent="edit"
                 v-text="__(item.title)"
-                class="truncate"
+                class="line-clamp-1 text-sm text-gray-600 dark:text-gray-300"
                 v-tooltip="item.title"
                 :href="item.edit_url"
             />
@@ -35,7 +39,7 @@
                 <div
                     v-if="item.hint"
                     v-text="item.hint"
-                    class="hidden whitespace-nowrap text-4xs uppercase text-gray-600 @sm:block ltr:mr-2 rtl:ml-2"
+                    class="text-4xs me-2 hidden whitespace-nowrap text-gray-600 uppercase @sm:block"
                 />
 
                 <div class="flex items-center" v-if="!readOnly">

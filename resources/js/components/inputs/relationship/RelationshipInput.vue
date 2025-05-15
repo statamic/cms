@@ -1,5 +1,5 @@
 <template>
-    <div class="relationship-input" :class="{ 'relationship-input-empty': items.length == 0 }">
+    <div class="relationship-input @container" :class="{ 'relationship-input-empty': items.length == 0 }">
         <relationship-select-field
             v-if="!initializing && usesSelectField"
             :config="config"
@@ -7,6 +7,7 @@
             :multiple="maxItems > 1"
             :typeahead="mode === 'typeahead'"
             :taggable="taggable"
+            :max-selections="maxItems"
             :read-only="readOnly"
             :url="selectionsUrl"
             :site="site"
@@ -20,8 +21,8 @@
         <template v-if="shouldShowSelectedItems">
             <div
                 ref="items"
-                class="relationship-input-items space-y-1 outline-hidden"
-                :class="{ 'mt-4': usesSelectField && items.length }"
+                class="grid grid-cols-1 gap-2 outline-hidden @xl:grid-cols-2"
+                :class="{ 'mt-2': usesSelectField && items.length }"
             >
                 <component
                     :is="itemComponent"
@@ -36,18 +37,18 @@
                     :form-component="formComponent"
                     :form-component-props="formComponentProps"
                     :form-stack-size="formStackSize"
-                    class="item outline-hidden"
+                    class="related-item"
                     @removed="remove(i)"
                 />
             </div>
 
-            <div class="py-2 text-xs text-gray" v-if="maxItemsReached && maxItems != 1">
+            <div class="text-gray py-2 text-xs" v-if="maxItemsReached && maxItems != 1">
                 <span>{{ __('Maximum items selected:') }}</span>
                 <span>{{ maxItems }}/{{ maxItems }}</span>
             </div>
             <div
                 v-if="canSelectOrCreate"
-                class="relationship-input-buttons relative @container"
+                class="relationship-input-buttons @container relative"
                 :class="{ 'mt-4': items.length > 0 }"
             >
                 <div class="-mb-2 flex flex-wrap items-center text-sm">
@@ -64,7 +65,7 @@
                     </div>
                     <button
                         ref="existing"
-                        class="mb-2 flex items-center text-blue outline-hidden hover:text-gray-800 dark:text-dark-blue-100 dark:hover:text-dark-100"
+                        class="text-blue dark:text-dark-blue-100 dark:hover:text-dark-100 mb-2 flex items-center outline-hidden hover:text-gray-800"
                         @click.prevent="isSelecting = true"
                     >
                         <svg-icon name="light/hyperlink" class="flex h-4 w-4 items-center ltr:mr-1 rtl:ml-1"></svg-icon>
@@ -151,6 +152,8 @@ export default {
             default: 'asc',
         },
     },
+
+    emits: ['input', 'focus', 'blur', 'item-data-updated', 'loading'],
 
     components: {
         ItemSelector,
@@ -281,7 +284,7 @@ export default {
 
         makeSortable() {
             this.sortable = new Sortable(this.$refs.items, {
-                draggable: '.item',
+                draggable: '.related-item',
                 handle: '.item-move',
                 mirror: { constrainDimensions: true, xAxis: false, appendTo: 'body' },
                 swapAnimation: { vertical: true },
