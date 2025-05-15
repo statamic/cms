@@ -223,6 +223,9 @@ function updateModelValue(value) {
                             v-model="searchQuery"
                             :placeholder
                         />
+                        <div v-else-if="!searchable && (dropdownOpen || !modelValue)">
+                            <span class="text-gray-400 dark:text-gray-600" v-text="placeholder" />
+                        </div>
                         <div v-else class="cursor-pointer">
                             <slot name="selected-option" v-bind="{ option: selectedOption }">
                                 <span v-text="getOptionLabel(selectedOption)" />
