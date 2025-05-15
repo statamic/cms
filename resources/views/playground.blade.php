@@ -183,6 +183,7 @@
         <ui-heading size="lg">Select</ui-heading>
         <div class="flex">
             <ui-select
+                class="w-full"
                 label="Favorite band"
                 :options="[
                     { label: 'The Midnight', value: 'the_midnight' },
