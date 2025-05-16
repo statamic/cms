@@ -40,6 +40,7 @@ return [
     'collection_configure_date_behavior_unlisted' => 'Unlisted - Hidden from listings, URLs visible',
     'collection_configure_dated_instructions' => 'Publish dates can be used to schedule and expire content.',
     'collection_configure_handle_instructions' => 'Used to reference this collection on the frontend. It\'s non-trivial to change later.',
+    'collection_configure_icon_instructions' => 'Icon used to represent this collection in the Control Panel.',
     'collection_configure_intro' => 'Collections are containers that hold entries that can represent articles, blog posts, products, events, or any other content type.',
     'collection_configure_layout_instructions' => 'Set this collection\'s default layout. Entries can override this setting with a `template` field named `layout`. It is unusual to change this setting.',
     'collection_configure_origin_behavior_instructions' => 'When localizing an entry, which site should be used as the origin?',
