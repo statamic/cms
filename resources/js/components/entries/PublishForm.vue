@@ -30,8 +30,8 @@
                 </DropdownMenu>
             </Dropdown>
 
-            <div class="text-2xs flex pt-px text-gray-600 me-4" v-if="readOnly">
-                <svg-icon name="light/lock" class="-mt-1 w-4 me-1" /> {{ __('Read Only') }}
+            <div class="text-2xs me-4 flex pt-px text-gray-600" v-if="readOnly">
+                <svg-icon name="light/lock" class="me-1 -mt-1 w-4" /> {{ __('Read Only') }}
             </div>
 
             <div class="hidden items-center gap-3 md:flex">
@@ -65,231 +65,128 @@
             <slot name="action-buttons-right" />
         </Header>
 
-        <publish-container
+        <PublishContainer
             v-if="fieldset"
             ref="container"
             :name="publishContainer"
+            :reference="initialReference"
             :blueprint="fieldset"
             :values="values"
             :extra-values="extraValues"
-            :reference="initialReference"
             :meta="meta"
+            :origin-values="originValues"
+            :origin-meta="originMeta"
             :errors="errors"
+            :is-root="isRoot"
             :site="site"
             :localized-fields="localizedFields"
-            :is-root="isRoot"
             :track-dirty-state="trackDirtyState"
+            :sync-field-confirmation-text="syncFieldConfirmationText"
             @updated="values = $event"
-            v-slot="{ container, components, setFieldMeta }"
         >
-            <live-preview
-                :name="publishContainer"
+            <LivePreview
+                :enabled="isPreviewing"
                 :url="livePreviewUrl"
-                :previewing="isPreviewing"
                 :targets="previewTargets"
-                :values="values"
-                :blueprint="fieldset.handle"
-                :reference="initialReference"
-                @opened-via-keyboard="openLivePreview"
+                @opened="openLivePreview"
                 @closed="closeLivePreview"
             >
-                <div>
-                    <component
-                        v-for="component in components"
-                        :key="component.id"
-                        :is="component.name"
-                        :container="container"
-                        v-bind="component.props"
-                        v-on="component.events"
-                    />
+                <PublishComponents />
 
-                    <transition name="live-preview-tabs-drop">
-                        <publish-tabs
-                            v-show="tabsVisible"
-                            :read-only="readOnly"
-                            :syncable="hasOrigin"
-                            @updated="setFieldValue"
-                            @meta-updated="setFieldMeta"
-                            @synced="syncField"
-                            @desynced="desyncField"
-                            @focus="container.$emit('focus', $event)"
-                            @blur="container.$emit('blur', $event)"
-                        >
-                            <template #actions="{ shouldShowSidebar }">
-                                <div class="space-y-6">
-                                    <!-- Live Preview / Visit URL Buttons -->
-                                    <div v-if="collectionHasRoutes" :class="{ hidden: !shouldShowSidebar }">
-                                        <div
-                                            class="grid grid-cols-2 gap-4"
-                                            v-if="showLivePreviewButton || showVisitUrlButton"
-                                        >
-                                            <Button
-                                                :text="__('Live Preview')"
-                                                icon="live-preview"
-                                                @click="openLivePreview"
-                                                v-if="showLivePreviewButton"
-                                            />
-                                            <Button
-                                                :href="permalink"
-                                                :text="__('Visit URL')"
-                                                icon="external-link"
-                                                target="_blank"
-                                                v-if="showVisitUrlButton"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <!-- Published Switch -->
-                                    <Panel class="flex justify-between px-5 py-3">
-                                        <Heading :text="__('Published')" />
-                                        <Switch
-                                            v-if="!revisionsEnabled"
-                                            :model-value="published"
-                                            :read-only="!canManagePublishState"
-                                            @update:model-value="setFieldValue('published', $event)"
-                                        />
-                                    </Panel>
-
-                                    <!-- Revisions -->
-                                    <Panel v-if="revisionsEnabled && !isCreating">
-                                        <PanelHeader class="flex items-center justify-between">
-                                            <Heading :text="__('Revisions')" />
-                                            <Button
-                                                @click="showRevisionHistory = true"
-                                                icon="history"
-                                                :text="__('View History')"
-                                                size="xs"
-                                                class="-me-4"
-                                            />
-                                        </PanelHeader>
-                                        <Card class="space-y-2">
-                                            <Subheading v-if="published" class="flex items-center gap-2">
-                                                <Icon name="checkmark" class="text-green-600" />
-                                                {{ __('Entry has a published version') }}
-                                            </Subheading>
-                                            <Subheading v-else class="flex items-center gap-2 text-yellow-600">
-                                                <Icon name="warning-diamond" />
-                                                {{ __('Entry has not been published') }}
-                                            </Subheading>
-                                            <Subheading
-                                                v-if="!isWorkingCopy && published"
-                                                class="flex items-center gap-2"
-                                            >
-                                                <Icon name="checkmark" class="text-green-600" />
-                                                {{ __('This is the published version') }}
-                                            </Subheading>
-                                            <Subheading v-if="isDirty" class="flex items-center gap-2 text-yellow-600">
-                                                <Icon name="warning-diamond" />
-                                                {{ __('Unsaved changes') }}
-                                            </Subheading>
-                                        </Card>
-                                    </Panel>
-
-                                    <div class="dark:border-dark-900 border-t p-4" v-if="localizations.length > 1">
-                                        <label class="publish-field-label mb-2 font-medium" v-text="__('Sites')" />
-                                        <div
-                                            v-for="option in localizations"
-                                            :key="option.handle"
-                                            class="-mx-4 flex items-center px-4 py-2 text-sm"
-                                            :class="[
-                                                option.active
-                                                    ? 'dark:bg-dark-300 bg-blue-100'
-                                                    : 'dark:hover:bg-dark-400 hover:bg-gray-200',
-                                                !canSave && !option.exists ? 'cursor-not-allowed' : 'cursor-pointer',
-                                            ]"
-                                            @click="localizationSelected(option)"
-                                        >
-                                            <div
-                                                class="flex flex-1 items-center"
-                                                :class="{ 'line-through': !option.exists }"
-                                            >
-                                                <span
-                                                    class="little-dot ltr:mr-2 rtl:ml-2"
-                                                    :class="{
-                                                        'bg-green-600': option.published,
-                                                        'bg-gray-500': !option.published,
-                                                        'bg-red-500': !option.exists,
-                                                    }"
-                                                />
-                                                {{ __(option.name) }}
-                                                <loading-graphic
-                                                    :size="14"
-                                                    text=""
-                                                    class="ms-2"
-                                                    v-if="localizing && localizing.handle === option.handle"
-                                                />
-                                            </div>
-                                            <div
-                                                class="badge-sm bg-orange dark:bg-orange-dark"
-                                                v-if="option.origin"
-                                                v-text="__('Origin')"
-                                            />
-                                            <div
-                                                class="badge-sm bg-blue dark:bg-dark-blue-175"
-                                                v-if="option.active"
-                                                v-text="__('Active')"
-                                            />
-                                            <div
-                                                class="badge-sm bg-purple dark:bg-purple-dark"
-                                                v-if="option.root && !option.origin && !option.active"
-                                                v-text="__('Root')"
-                                            />
-                                        </div>
-                                    </div>
+                <PublishTabs>
+                    <template #actions>
+                        <div class="space-y-6">
+                            <!-- Live Preview / Visit URL Buttons -->
+                            <div v-if="collectionHasRoutes">
+                                <div class="grid grid-cols-2 gap-4" v-if="showLivePreviewButton || showVisitUrlButton">
+                                    <Button
+                                        :text="__('Live Preview')"
+                                        icon="live-preview"
+                                        @click="openLivePreview"
+                                        v-if="showLivePreviewButton"
+                                    />
+                                    <Button
+                                        :href="permalink"
+                                        :text="__('Visit URL')"
+                                        icon="external-link"
+                                        target="_blank"
+                                        v-if="showVisitUrlButton"
+                                    />
                                 </div>
-                            </template>
-                        </publish-tabs>
-                    </transition>
-                </div>
-                <template v-slot:buttons>
-                    <button
+                            </div>
+
+                            <!-- Published Switch -->
+                            <Panel class="flex justify-between px-5 py-3" v-if="!revisionsEnabled">
+                                <Heading :text="__('Published')" />
+                                <Switch
+                                    :model-value="published"
+                                    :read-only="!canManagePublishState"
+                                    @update:model-value="setFieldValue('published', $event)"
+                                />
+                            </Panel>
+
+                            <!-- Revisions -->
+                            <Panel v-if="revisionsEnabled && !isCreating">
+                                <PanelHeader class="flex items-center justify-between">
+                                    <Heading :text="__('Revisions')" />
+                                    <Button
+                                        @click="showRevisionHistory = true"
+                                        icon="history"
+                                        :text="__('View History')"
+                                        size="xs"
+                                        class="-me-4"
+                                    />
+                                </PanelHeader>
+                                <Card class="space-y-2">
+                                    <Subheading v-if="published" class="flex items-center gap-2">
+                                        <Icon name="checkmark" class="text-green-600" />
+                                        {{ __('Entry has a published version') }}
+                                    </Subheading>
+                                    <Subheading v-else class="flex items-center gap-2 text-yellow-600">
+                                        <Icon name="warning-diamond" />
+                                        {{ __('Entry has not been published') }}
+                                    </Subheading>
+                                    <Subheading v-if="!isWorkingCopy && published" class="flex items-center gap-2">
+                                        <Icon name="checkmark" class="text-green-600" />
+                                        {{ __('This is the published version') }}
+                                    </Subheading>
+                                    <Subheading v-if="isDirty" class="flex items-center gap-2 text-yellow-600">
+                                        <Icon name="warning-diamond" />
+                                        {{ __('Unsaved changes') }}
+                                    </Subheading>
+                                </Card>
+                            </Panel>
+
+                            <LocalizationsCard
+                                v-if="showLocalizationSelector"
+                                :localizations
+                                :localizing
+                                @selected="localizationSelected"
+                            />
+                        </div>
+                    </template>
+                </PublishTabs>
+                <template #buttons>
+                    <Button
                         v-if="!readOnly"
-                        class="ms-4"
-                        :class="{
-                            btn: revisionsEnabled,
-                            'btn-primary': isCreating || !revisionsEnabled,
-                        }"
+                        size="sm"
+                        :variant="revisionsEnabled ? 'default' : 'primary'"
                         :disabled="!canSave"
                         @click.prevent="save"
-                        v-text="saveText"
-                    ></button>
+                        :text="saveText"
+                    ></Button>
 
-                    <button
-                        v-if="revisionsEnabled && !isCreating"
-                        class="btn-primary flex items-center ms-4"
+                    <Button
+                        v-if="revisionsEnabled"
+                        size="sm"
+                        variant="primary"
                         :disabled="!canPublish"
                         @click="confirmingPublish = true"
-                    >
-                        <span v-text="publishButtonText" />
-                        <svg-icon name="micro/chevron-down-xs" class="w-2 ms-2" />
-                    </button>
+                        :text="publishButtonText"
+                    />
                 </template>
-            </live-preview>
-        </publish-container>
-
-        <div class="mt-6 flex items-center md:hidden">
-            <button
-                v-if="!readOnly"
-                class="btn-lg"
-                :class="{
-                    'btn-primary w-full': !revisionsEnabled,
-                    'btn w-1/2 me-4': revisionsEnabled,
-                }"
-                :disabled="!canSave"
-                @click.prevent="save"
-                v-text="__(revisionsEnabled ? 'Save Changes' : 'Save')"
-            />
-
-            <button
-                v-if="revisionsEnabled"
-                class="btn btn-lg btn-primary flex w-1/2 items-center justify-center ms-2"
-                :disabled="!canPublish"
-                @click="confirmingPublish = true"
-            >
-                <span v-text="publishButtonText" />
-                <svg-icon name="micro/chevron-down-xs" class="w-2 ms-2" />
-            </button>
-        </div>
+            </LivePreview>
+        </PublishContainer>
 
         <stack
             name="revision-history"
@@ -362,7 +259,13 @@ import {
     Subheading,
     Card,
     Icon,
+    CardPanel,
 } from '@statamic/ui';
+import PublishContainer from '@statamic/components/ui/Publish/Container.vue';
+import PublishTabs from '@statamic/components/ui/Publish/Tabs.vue';
+import PublishComponents from '@statamic/components/ui/Publish/Components.vue';
+import LocalizationsCard from '@statamic/components/ui/Publish/Localizations.vue';
+import LivePreview from '@statamic/components/ui/LivePreview/LivePreview.vue';
 
 export default {
     mixins: [HasPreferences, HasHiddenFields, HasActions],
@@ -384,6 +287,12 @@ export default {
         Subheading,
         Card,
         Icon,
+        PublishContainer,
+        PublishTabs,
+        PublishComponents,
+        CardPanel,
+        LocalizationsCard,
+        LivePreview,
     },
 
     props: {
@@ -466,6 +375,7 @@ export default {
             quickSaveKeyBinding: null,
             quickSave: false,
             isAutosave: false,
+            syncFieldConfirmationText: __('messages.sync_entry_field_confirmation_text'),
         };
     },
 
@@ -516,6 +426,10 @@ export default {
 
         showVisitUrlButton() {
             return !!this.permalink;
+        },
+
+        showLocalizationSelector() {
+            return this.localizations.length > 1;
         },
 
         isBase() {
@@ -744,7 +658,7 @@ export default {
 
             this.$dirty.remove(this.publishContainer);
 
-            this.localizing = localization;
+            this.localizing = localization.handle;
 
             if (localization.exists) {
                 this.editLocalization(localization);

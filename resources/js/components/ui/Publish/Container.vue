@@ -29,6 +29,10 @@ const props = defineProps({
         type: Object,
         default: () => ({}),
     },
+    extraValues: {
+        type: Object,
+        default: () => ({}),
+    },
     meta: {
         type: Object,
         default: () => ({}),
@@ -67,6 +71,7 @@ const props = defineProps({
 
 const store = usePublishContainerStore(props.name, {
     values: props.values,
+    extraValues: props.extraValues,
     meta: props.meta,
     originValues: props.originValues,
     originMeta: props.originMeta,

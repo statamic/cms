@@ -38,7 +38,7 @@ const fieldActions = computed(() => {
 
 function valueUpdated(value) {
     store.setDottedFieldValue({ path: fullPath.value, value });
-    desync();
+    if (isSyncable.value) desync();
 }
 
 function metaUpdated(value) {
@@ -69,9 +69,7 @@ const shouldShowField = computed(() => {
     return new ShowField(store, values.value, extraValues.value).showField(props.config, fullPath.value);
 });
 
-const isLocalizable = computed(() => {
-    return props.config.localizable !== false;
-});
+const isLocalizable = computed(() => props.config.localizable);
 
 const isReadOnly = computed(() => {
     if (store.isRoot === false && !isLocalizable.value) return true;
@@ -82,7 +80,7 @@ const isReadOnly = computed(() => {
 const isLocked = computed(() => false); // todo
 
 const isSyncable = computed(() => store.isRoot === false);
-const isSynced = computed(() => !store.localizedFields.includes(fullPath.value));
+const isSynced = computed(() => isSyncable.value && !store.localizedFields.includes(fullPath.value));
 
 function sync() {
     syncField(fullPath.value);
