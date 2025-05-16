@@ -18,6 +18,7 @@
             :id="fieldId"
             :isReadOnly="isReadOnly"
             :name="slug"
+            :disabled="isReadOnly"
             @focus="$emit('focus')"
             @blur="$emit('blur')"
         >

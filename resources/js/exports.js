@@ -6,3 +6,4 @@ export * as FieldConditions from './components/field-conditions/FieldConditions'
 export { default as ValidatesFieldConditions } from './components/field-conditions/ValidatorMixin';
 export * from './components/ui/index.js';
 export * from './components/elevated-sessions';
+export * as SavePipeline from './components/ui/Publish/SavePipeline.js';

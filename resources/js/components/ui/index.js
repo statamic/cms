@@ -1,4 +1,3 @@
-import { default as WithField } from './WithField.vue';
 import { default as Field } from './Field.vue';
 import { default as Label } from './Label.vue';
 import { default as Description } from './Description.vue';
@@ -44,9 +43,13 @@ import { default as PanelHeader } from './Panel/Header.vue';
 import { default as Badge } from './Badge.vue';
 import { default as CharacterCounter } from './CharacterCounter.vue';
 import { default as Editable } from './Editable.vue';
+import { default as Tabs } from './Tabs/Tabs.vue';
+import { default as TabList } from './Tabs/List.vue';
+import { default as TabTrigger } from './Tabs/Trigger.vue';
+import { default as TabContent } from './Tabs/Content.vue';
+import { default as PublishTabs } from './Publish/Tabs.vue';
 
 export {
-    WithField,
     Field,
     Label,
     Description,
@@ -92,4 +95,9 @@ export {
     Editable,
     CardList,
     CardListItem,
+    Tabs,
+    TabList,
+    TabTrigger,
+    TabContent,
+    PublishTabs,
 };

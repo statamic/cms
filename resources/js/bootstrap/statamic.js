@@ -32,6 +32,7 @@ import Echo from '../components/Echo';
 import Permission from '../components/Permission';
 import autosize from 'autosize';
 import DateFormatter from '@statamic/components/DateFormatter.js';
+import wait from '@statamic/util/wait.js';
 
 let bootingCallbacks = [];
 let bootedCallbacks = [];
@@ -108,6 +109,18 @@ export default {
 
     get $theme() {
         return this.$app.config.globalProperties.$theme;
+    },
+
+    get $fieldActions() {
+        return this.$app.config.globalProperties.$fieldActions;
+    },
+
+    get $dirty() {
+        return this.$app.config.globalProperties.$dirty;
+    },
+
+    get $events() {
+        return this.$app.config.globalProperties.$events;
     },
 
     get user() {
@@ -189,9 +202,7 @@ export default {
                 return permissions.includes('super') || permissions.includes(permission);
             },
             $wait(ms) {
-                return new Promise((resolve) => {
-                    setTimeout(resolve, ms);
-                });
+                return wait(ms);
             },
         });
 

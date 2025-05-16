@@ -1,6 +1,6 @@
 <template>
     <div
-        class="replicator-set mb-4 rounded-sm border shadow-sm dark:border-dark-900"
+        class="replicator-set dark:border-dark-900 mb-4 rounded-sm border shadow-sm"
         :class="[sortableItemClass, { 'opacity-50': isExcessive }]"
     >
         <div class="replicator-set-header">
@@ -25,26 +25,13 @@
             </div>
         </div>
 
-        <div class="replicator-set-body publish-fields @container">
-            <set-field
-                v-for="field in fields"
-                v-show="showField(field, fieldPath(field.handle))"
-                :key="field.handle"
-                :field="field"
-                :meta="meta[field.handle]"
-                :value="values[field.handle]"
-                :parent-name="name"
-                :set-index="index"
-                :errors="errors(field.handle)"
-                :field-path="fieldPath(field.handle)"
-                class="p-4"
-                :read-only="grid.isReadOnly"
-                @updated="updated(field.handle, $event)"
-                @meta-updated="metaUpdated(field.handle, $event)"
-                @focus="$emit('focus')"
-                @blur="$emit('blur')"
-            />
-        </div>
+        <FieldsProvider
+            :fields="fields"
+            :path-prefix="`${fieldPathPrefix}.${index}`"
+            :meta-path-prefix="`${fieldPathPrefix}.existing.${values._id}`"
+        >
+            <PublishFields />
+        </FieldsProvider>
     </div>
 </template>
 
@@ -52,10 +39,12 @@
 import Row from './Row.vue';
 import SetField from '../replicator/Field.vue';
 import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
+import { default as PublishFields } from '@statamic/components/ui/Publish/Fields.vue';
+import FieldsProvider from '@statamic/components/ui/Publish/FieldsProvider.vue';
 
 export default {
     mixins: [Row, ValidatesFieldConditions],
 
-    components: { SetField },
+    components: { SetField, PublishFields, FieldsProvider },
 };
 </script>

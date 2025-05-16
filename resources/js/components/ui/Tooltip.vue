@@ -1,10 +1,14 @@
 <script setup>
 import { TooltipArrow, TooltipContent, TooltipPortal, TooltipProvider, TooltipRoot, TooltipTrigger } from 'reka-ui';
+import { computed } from 'vue';
 
-defineProps({
+const props = defineProps({
     text: { type: String, default: null },
+    markdown: { type: String, default: null },
     delay: { type: Number, default: 0 },
 });
+
+const tooltipText = computed(() => (props.markdown ? markdown(props.markdown) : props.text));
 </script>
 
 <template>
@@ -27,7 +31,7 @@ defineProps({
                     ]"
                     :side-offset="5"
                 >
-                    {{ text }}
+                    <span v-html="tooltipText" />
                     <TooltipArrow class="fill-white stroke-gray-300" :width="12" :height="6" />
                 </TooltipContent>
             </TooltipPortal>

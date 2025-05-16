@@ -1,0 +1,80 @@
+<script setup>
+import { Tabs, TabList, TabTrigger, TabContent } from '@statamic/ui';
+import TabProvider from './TabProvider.vue';
+import { injectContainerContext } from './Container.vue';
+import Sections from '@statamic/components/ui/Publish/Sections.vue';
+import { ref, computed, useSlots } from 'vue';
+import ElementContainer from '@statamic/components/ElementContainer.vue';
+
+const slots = useSlots();
+const { blueprint, store } = injectContainerContext();
+const tabs = ref(blueprint.tabs);
+const width = ref(null);
+const sidebarTab = computed(() => tabs.value.find((tab) => tab.handle === 'sidebar'));
+const mainTabs = computed(() =>
+    shouldShowSidebar.value && sidebarTab.value ? tabs.value.filter((tab) => tab.handle !== 'sidebar') : tabs.value,
+);
+const shouldShowSidebar = computed(() => (slots.sidebar || sidebarTab.value) && width.value > 920);
+
+const fieldTabMap = computed(() => {
+    let map = {};
+
+    Object.values(tabs.value).forEach((tab) => {
+        tab.sections.forEach((section) => {
+            section.fields.forEach((field) => {
+                map[field.handle] = tab.handle;
+            });
+        });
+    });
+
+    return map;
+});
+
+const tabsWithErrors = computed(() => {
+    return [
+        ...new Set(
+            Object.keys(store.errors)
+                .map((handle) => handle.split('.')[0])
+                .filter((handle) => fieldTabMap.value[handle])
+                .map((handle) => fieldTabMap.value[handle]),
+        ),
+    ];
+});
+
+function tabHasError(tab) {
+    return tabsWithErrors.value.includes(tab.handle);
+}
+</script>
+
+<template>
+    <ElementContainer @resized="width = $event.width">
+        <Tabs :default-tab="mainTabs[0].handle">
+            <TabList class="mb-6">
+                <TabTrigger
+                    v-for="tab in mainTabs"
+                    :key="tab.handle"
+                    :name="tab.handle"
+                    :text="tab.display"
+                    :class="{ '!text-red-500': tabHasError(tab) }"
+                />
+            </TabList>
+
+            <div :class="{ 'grid grid-cols-[1fr_320px] gap-8': shouldShowSidebar }">
+                <TabContent v-for="tab in mainTabs" :key="tab.handle" :name="tab.handle">
+                    <TabProvider :tab="tab">
+                        <slot :tab="tab">
+                            <Sections />
+                        </slot>
+                    </TabProvider>
+                </TabContent>
+
+                <aside class="space-y-6" v-if="shouldShowSidebar">
+                    <slot name="actions" />
+                    <TabProvider v-if="sidebarTab" :tab="sidebarTab">
+                        <Sections />
+                    </TabProvider>
+                </aside>
+            </div>
+        </Tabs>
+    </ElementContainer>
+</template>
