@@ -69,7 +69,7 @@ function tabHasError(tab) {
                 </TabContent>
 
                 <aside class="space-y-6" v-if="shouldShowSidebar">
-                    <slot name="sidebar" />
+                    <slot name="actions" />
                     <TabProvider v-if="sidebarTab" :tab="sidebarTab">
                         <Sections />
                     </TabProvider>

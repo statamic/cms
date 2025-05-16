@@ -25,6 +25,7 @@ const props = defineProps({
     placeholder: { type: String, default: null },
     prepend: { type: String, default: null },
     append: { type: String, default: null },
+    disabled: { type: Boolean, default: false },
 });
 
 const hasPrependedIcon = !!props.iconPrepend || !!props.icon || !!slots.prepend;
@@ -121,6 +122,7 @@ const copy = () => {
             :type="inputType"
             :value="modelValue"
             :placeholder="placeholder"
+            :disabled="disabled"
             data-ui-control
             data-ui-group-target
             v-bind="$attrs"

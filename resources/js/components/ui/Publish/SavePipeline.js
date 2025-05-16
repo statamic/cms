@@ -102,7 +102,9 @@ export class BeforeSaveHooks extends Step {
         this.#hookPayload = hookPayload;
     }
     handle(payload) {
-        return Statamic.$hooks.run(`${this.#prefix}.saving`, this.#hookPayload);
+        return new Promise((resolve, reject) => {
+            return Statamic.$hooks.run(`${this.#prefix}.saving`, this.#hookPayload).then(() => resolve(payload));
+        });
     }
 }
 
@@ -115,9 +117,13 @@ export class AfterSaveHooks extends Step {
         this.#hookPayload = hookPayload;
     }
     handle(response) {
-        return Statamic.$hooks.run(`${this.#prefix}.saved`, {
-            ...this.#hookPayload,
-            response,
+        return new Promise((resolve, reject) => {
+            return Statamic.$hooks
+                .run(`${this.#prefix}.saved`, {
+                    ...this.#hookPayload,
+                    response,
+                })
+                .then(() => resolve(response));
         });
     }
 }
