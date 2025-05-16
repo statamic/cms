@@ -13,6 +13,7 @@
         create-container-url="{{ cp_route('asset-containers.create') }}"
         initial-path="{{ $folder }}"
         initial-editing-asset-id="{{ $editing ?? null }}"
+        :columns="{{ $columns->toJson() }}"
     ></asset-manager>
 
     <x-statamic::docs-callout
