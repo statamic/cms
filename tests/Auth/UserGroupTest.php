@@ -374,4 +374,22 @@ class UserGroupTest extends TestCase
         $this->assertEquals($group->get('one'), $data['one']);
         $this->assertEquals($group->get('two'), $data['two']);
     }
+
+    #[Test]
+    public function it_clones_internal_collections()
+    {
+        $group = UserGroup::make();
+        $group->set('foo', 'A');
+        $group->setSupplement('bar', 'A');
+
+        $clone = clone $group;
+        $clone->set('foo', 'B');
+        $clone->setSupplement('bar', 'B');
+
+        $this->assertEquals('A', $group->get('foo'));
+        $this->assertEquals('B', $clone->get('foo'));
+
+        $this->assertEquals('A', $group->getSupplement('bar'));
+        $this->assertEquals('B', $clone->getSupplement('bar'));
+    }
 }

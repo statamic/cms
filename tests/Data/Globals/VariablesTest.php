@@ -388,4 +388,23 @@ EOT;
             'charlie' => ['augmented c', 'augmented d'],
         ], Arr::only($variables->selectedQueryRelations(['charlie'])->toArray(), ['alfa', 'bravo', 'charlie']));
     }
+
+    #[Test]
+    public function it_clones_internal_collections()
+    {
+        $global = GlobalSet::make('test');
+        $variables = $global->makeLocalization('en');
+        $variables->set('foo', 'A');
+        $variables->setSupplement('bar', 'A');
+
+        $clone = clone $variables;
+        $clone->set('foo', 'B');
+        $clone->setSupplement('bar', 'B');
+
+        $this->assertEquals('A', $variables->get('foo'));
+        $this->assertEquals('B', $clone->get('foo'));
+
+        $this->assertEquals('A', $variables->getSupplement('bar'));
+        $this->assertEquals('B', $clone->getSupplement('bar'));
+    }
 }

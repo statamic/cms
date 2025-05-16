@@ -5,7 +5,7 @@
 
 @section('content')
 
-    <ui-header title="{{ __('Blueprints') }}">
+    <ui-header title="{{ __('Blueprints') }}" icon="blueprints">
         <ui-dropdown>
             <template #trigger>
                 <ui-button

@@ -157,7 +157,6 @@ return [
     'select.config.multiple' => 'Izinkan banyak pilihan.',
     'select.config.options' => 'Atur kunci dan label opsionalnya.',
     'select.config.placeholder' => 'Tetapkan teks placeholder default yang tidak dapat dipilih.',
-    'select.config.push_tags' => 'Tambahkan tag yang baru dibuat ke daftar opsi.',
     'select.config.searchable' => 'Aktifkan pencarian melalui opsi yang memungkinkan.',
     'select.config.taggable' => 'Izinkan menambahkan opsi baru selain opsi yang telah ditentukan sebelumnya',
     'select.title' => 'Select',

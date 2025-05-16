@@ -158,7 +158,6 @@ return [
     'select.config.multiple' => 'Mehrfachauswahl zulassen.',
     'select.config.options' => 'Arrayschlüssel und deren optionale Beschriftungen festlegen.',
     'select.config.placeholder' => 'Platzhaltertext festlegen.',
-    'select.config.push_tags' => 'Neu erstellte Tags zur Optionsliste hinzufügen.',
     'select.config.searchable' => 'Die Suche durch verfügbare Optionen aktivieren.',
     'select.config.taggable' => 'Das Hinzufügen neuer Optionen zusätzlich zu den vordefinierten zulassen.',
     'select.title' => 'Auswahl',

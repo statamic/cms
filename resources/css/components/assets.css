@@ -105,18 +105,26 @@
   ========================================================================== */
 
 .asset-grid-listing {
-    @apply relative grid gap-4 bg-white p-4 dark:bg-dark-800;
-    grid-template-columns: repeat(auto-fill, minmax(125px, 1fr));
+    @apply relative grid gap-6 xl:gap-10;
+}
+
+.folder-grid-listing {
+    @apply relative grid gap-8;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
 }
 
 /* Asset Tile
    ========================================================================== */
 
 .asset-tile {
-    @apply relative flex min-w-0 cursor-pointer flex-col items-center justify-between rounded-sm border bg-white dark:border-dark-300 dark:bg-dark-600;
+    @apply relative flex min-w-0 cursor-pointer flex-col items-center justify-between rounded-lg outline outline-gray-300 dark:outline-gray-700;
+
+    .selected & {
+        @apply outline-3 outline-blue-500;
+    }
 
     .asset-thumb {
-        @apply flex h-full w-full items-center justify-center rounded-sm;
+        @apply flex items-center justify-center size-full;
         > img,
         > svg,
         > .svg-img {
@@ -124,25 +132,12 @@
         }
     }
 
-    .asset-thumb-container {
-        @apply relative flex w-full flex-1 items-center justify-center;
-        aspect-ratio: 1 / 1;
-    }
-
     .asset-thumb-container:hover .asset-controls {
         @apply block;
     }
 
-    .asset-meta {
-        @apply w-full border-t text-2xs text-gray-700 dark:border-dark-200 dark:text-dark-100;
-    }
-
     .asset-meta-btn {
         @apply px-2 py-1 text-blue hover:bg-gray-200 dark:border-dark-300 dark:hover:bg-dark-800 ltr:border-l rtl:border-r;
-    }
-
-    .asset-filename {
-        @apply truncate;
     }
 
     .asset-controls {
@@ -150,13 +145,11 @@
     }
 }
 
-.asset-tile.selected {
-    @apply border-blue dark:border-dark-blue-100;
-    box-shadow: 0 0 0 1px var(--color-blue);
-}
-
-.asset-thumbnail {
-    @apply border border-white dark:border-dark-950;
+.asset-filename {
+    @apply font-mono text-xs text-gray-500 mt-2 whitespace-nowrap text-center;
+    .selected & {
+        @apply text-blue-500;
+    }
 }
 
 /* The Asset Editor

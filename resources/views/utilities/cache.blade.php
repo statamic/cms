@@ -17,7 +17,6 @@
             />
         </form>
     </ui-header>
-</header>
 
 <ui-card-panel>
     <div class="p-4">

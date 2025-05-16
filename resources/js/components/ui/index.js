@@ -4,7 +4,10 @@ import { default as Description } from './Description.vue';
 import { default as Calendar } from './Calendar/Calendar.vue';
 import { default as Card } from './Card/Card.vue';
 import { default as CardPanel } from './Card/Panel.vue';
-import { default as DatePicker } from './Datepicker/DatePicker.vue';
+import { default as Combobox } from './Combobox.vue';
+import { default as CardList } from './Card/List.vue';
+import { default as CardListItem } from './Card/ListItem.vue';
+import { default as DatePicker } from './DatePicker/DatePicker.vue';
 import { default as DateRangePicker } from './DateRangePicker/DateRangePicker.vue';
 import { default as TimePicker } from './TimePicker/TimePicker.vue';
 import { default as Button } from './Button/Button.vue';
@@ -29,10 +32,17 @@ import { default as DropdownItem } from './Dropdown/Item.vue';
 import { default as DropdownLabel } from './Dropdown/Label.vue';
 import { default as DropdownMenu } from './Dropdown/Menu.vue';
 import { default as DropdownSeparator } from './Dropdown/Separator.vue';
+import { default as Context } from './Context/Context.vue';
+import { default as ContextItem } from './Context/Item.vue';
+import { default as ContextLabel } from './Context/Label.vue';
+import { default as ContextMenu } from './Context/Menu.vue';
+import { default as ContextFooter } from './Context/Footer.vue';
+import { default as ContextSeparator } from './Context/Separator.vue';
 import { default as Panel } from './Panel/Panel.vue';
 import { default as PanelHeader } from './Panel/Header.vue';
 import { default as Badge } from './Badge.vue';
 import { default as CharacterCounter } from './CharacterCounter.vue';
+import { default as Editable } from './Editable.vue';
 import { default as Tabs } from './Tabs/Tabs.vue';
 import { default as TabList } from './Tabs/List.vue';
 import { default as TabTrigger } from './Tabs/Trigger.vue';
@@ -46,6 +56,7 @@ export {
     Calendar,
     Card,
     CardPanel,
+    Combobox,
     DatePicker,
     DateRangePicker,
     TimePicker,
@@ -71,10 +82,19 @@ export {
     DropdownLabel,
     DropdownMenu,
     DropdownSeparator,
+    Context,
+    ContextItem,
+    ContextLabel,
+    ContextMenu,
+    ContextSeparator,
+    ContextFooter,
     Panel,
     PanelHeader,
     Badge,
     CharacterCounter,
+    Editable,
+    CardList,
+    CardListItem,
     Tabs,
     TabList,
     TabTrigger,

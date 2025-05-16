@@ -24,7 +24,6 @@ import Table from '../components/data-list/Table.vue';
 import Search from '../components/data-list/Search.vue';
 import BulkActions from '../components/data-list/BulkActions.vue';
 import InlineActions from '../components/data-list/InlineActions.vue';
-import ListActions from '../components/data-list/ListActions.vue';
 import ColumnPicker from '../components/data-list/ColumnPicker.vue';
 import ToggleAll from '../components/data-list/ToggleAll.vue';
 import Pagination from '../components/data-list/Pagination.vue';
@@ -102,7 +101,6 @@ export default function registerGlobalComponents(app) {
     app.component('data-list-search', Search);
     app.component('data-list-bulk-actions', BulkActions);
     app.component('data-list-inline-actions', InlineActions);
-    app.component('data-list-list-actions', ListActions);
     app.component('data-list-column-picker', ColumnPicker);
     app.component('data-list-toggle-all', ToggleAll);
     app.component('data-list-pagination', Pagination);

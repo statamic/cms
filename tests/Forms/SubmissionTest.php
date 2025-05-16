@@ -232,4 +232,24 @@ class SubmissionTest extends TestCase
 
         $this->assertTrue($return);
     }
+
+    #[Test]
+    public function it_clones_internal_collections()
+    {
+        $form = Form::make('contact_us');
+        $form->save();
+        $submission = $form->makeSubmission();
+        $submission->set('foo', 'A');
+        $submission->setSupplement('bar', 'A');
+
+        $clone = clone $submission;
+        $clone->set('foo', 'B');
+        $clone->setSupplement('bar', 'B');
+
+        $this->assertEquals('A', $submission->get('foo'));
+        $this->assertEquals('B', $clone->get('foo'));
+
+        $this->assertEquals('A', $submission->getSupplement('bar'));
+        $this->assertEquals('B', $clone->getSupplement('bar'));
+    }
 }

@@ -5,6 +5,7 @@ namespace Tests\Modifiers;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Entries\EntryCollection;
 use Statamic\Modifiers\Modify;
@@ -12,7 +13,7 @@ use Tests\TestCase;
 
 class SelectTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_selects_certain_values_from_array_of_items()
     {
         $items = $this->items();
@@ -38,7 +39,7 @@ class SelectTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_selects_certain_values_from_collections_of_items()
     {
         $items = Collection::make($this->items());
@@ -64,7 +65,7 @@ class SelectTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_selects_certain_values_from_query_builder()
     {
         $builder = Mockery::mock(Builder::class);
@@ -91,7 +92,7 @@ class SelectTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_selects_certain_values_from_array_of_items_with_origins()
     {
         $items = $this->itemsWithOrigins();
@@ -121,7 +122,7 @@ class SelectTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_selects_certain_values_from_collections_of_items_with_origins()
     {
         $items = EntryCollection::make($this->itemsWithOrigins());
@@ -151,7 +152,7 @@ class SelectTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_selects_certain_values_from_array_of_items_of_type_array()
     {
         $items = $this->itemsOfTypeArray();
@@ -177,7 +178,7 @@ class SelectTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_selects_certain_values_from_collections_of_items_of_type_array()
     {
         $items = EntryCollection::make($this->itemsOfTypeArray());
@@ -203,7 +204,7 @@ class SelectTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_selects_certain_values_from_array_of_items_of_type_arrayaccess()
     {
         $items = $this->itemsOfTypeArrayAccess();

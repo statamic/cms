@@ -1,21 +1,15 @@
 <template>
-    <div
-        class="flex flex-wrap border-b border-t bg-gray-200 px-4 py-2 text-sm shadow-inner dark:border-dark-900 dark:bg-dark-700"
-    >
-        <a v-for="(part, index) in pathParts" :key="index" @click="selectFolder(index)" class="group flex items-center">
-            <svg-icon
-                name="micro/chevron-right"
-                class="h-4 w-4 text-gray-700 ltr:mr-1 rtl:ml-1 rtl:rotate-180"
-                v-if="index !== 0"
+    <div class="flex flex-wrap">
+        <div v-for="(part, index) in pathParts" :key="index" class="flex items-center">
+            <ui-icon name="ui/chevron-right" class="size-4 text-gray-500" v-if="index !== 0" />
+            <ui-button
+                variant="ghost"
+                :icon="isHomeFolder(part) ? 'home' : !isLastFolder(index) ? 'folder' : 'folder-open'"
+                :text="isHomeFolder(part) ? __('All') : part"
+                @click="selectFolder(index)"
+                class="gap-2 h-8!"
             />
-            <svg-icon
-                name="folder-home"
-                class="h-5 w-5 text-blue-400 group-hover:text-blue-600 ltr:mr-2 rtl:ml-2"
-                v-if="part === '/'"
-            />
-            <svg-icon name="folder" class="h-5 w-5 text-blue-400 group-hover:text-blue-600 ltr:mr-2 rtl:ml-2" v-else />
-            <span class="text-2xs text-gray-700 group-hover:text-gray-800" v-if="part !== '/'" v-text="part" />
-        </a>
+        </div>
     </div>
 </template>
 
@@ -43,6 +37,14 @@ export default {
 
             this.$emit('navigated', path);
         },
+
+        isHomeFolder(part) {
+            return part === '/';
+        },
+
+        isLastFolder(index) {
+            return index === this.pathParts.length - 1;
+        }
     },
 };
 </script>

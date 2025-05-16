@@ -66,7 +66,7 @@ class CollectionsController extends CpController
                 'blueprints' => $collection->entryBlueprints()->reject->hidden()->values(),
                 'columns' => [
                     ['label' => 'Title', 'field' => 'title', 'visible' => true],
-                    ['label' => 'Date', 'field' => 'date', 'visible' => true]
+                    ['label' => 'Date', 'field' => 'date', 'visible' => true],
                 ],
                 'dated' => $collection->dated(),
                 'edit_url' => $collection->editUrl(),
@@ -456,12 +456,13 @@ class CollectionsController extends CpController
                     'blueprints' => [
                         'display' => __('Blueprints'),
                         'instructions' => __('statamic::messages.collections_blueprint_instructions'),
-                        'type' => 'html',
-                        'html' => ''.
-                            '<div class="text-xs">'.
-                            '   <span class="rtl:ml-4 ltr:mr-4">'.$collection->entryBlueprints()->map(fn ($bp) => __($bp->title()))->join(', ').'</span>'.
-                            '   <a href="'.cp_route('collections.blueprints.index', $collection).'" class="text-blue">'.__('Edit').'</a>'.
-                            '</div>',
+                        'type' => 'blueprints',
+                        'options' => $collection->entryBlueprints()->map(fn ($bp) => [
+                            'handle' => $bp->handle(),
+                            'title' => __($bp->title()),
+                            'edit_url' => cp_route('collections.blueprints.edit', [$collection->handle(), $bp->handle()]),
+                        ])->values()->all(),
+                        'all_blueprints_url' => cp_route('collections.blueprints.index', $collection->handle()),
                     ],
                     'default_publish_state' => [
                         'display' => __('Publish by Default'),

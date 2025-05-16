@@ -51,7 +51,7 @@ class Group extends Fieldtype
 
     public function process($data)
     {
-        return $this->fields()->addValues($data ?? [])->process()->values()->all();
+        return $this->fields()->addValues($data ?? [])->process()->values()->filter()->all();
     }
 
     public function preProcess($data)

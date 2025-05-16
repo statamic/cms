@@ -7,7 +7,7 @@
 
 @section('content')
     @unless ($roles->isEmpty())
-        <ui-header title="{{ __('Roles & Permissions') }}">
+        <ui-header title="{{ __('Roles & Permissions') }}" icon="permissions">
             <ui-button
                 href="{{ cp_route('roles.create') }}"
                 variant="primary"

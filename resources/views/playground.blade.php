@@ -12,7 +12,7 @@
 @section('wrapper_class', 'max-w-7xl')
 
 @section('content')
-<ui-header title="Playground" >
+<ui-header title="Playground" icon="playground">
     <ui-subheading>A collection of components to test and play with.</ui-subheading>
 </ui-header>
 
@@ -183,6 +183,7 @@
         <ui-heading size="lg">Select</ui-heading>
         <div class="flex">
             <ui-select
+                class="w-full"
                 label="Favorite band"
                 :options="[
                     { label: 'The Midnight', value: 'the_midnight' },
