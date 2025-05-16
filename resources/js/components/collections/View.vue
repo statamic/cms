@@ -1,6 +1,6 @@
 <template>
     <div>
-        <Header :title="__(title)">
+        <Header :title="__(title)" :icon="icon">
             <dropdown-list class="ltr:mr-2 rtl:ml-2" v-if="!!this.$slots.twirldown">
                 <slot name="twirldown" :actionCompleted="actionCompleted" />
             </dropdown-list>
@@ -197,6 +197,7 @@ export default {
     props: {
         title: { type: String, required: true },
         handle: { type: String, required: true },
+        icon: { type: String, required: true },
         canCreate: { type: Boolean, required: true },
         createUrls: { type: Object, required: true },
         createLabel: { type: String, required: true },
