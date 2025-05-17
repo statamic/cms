@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, inject, nextTick, useTemplateRef } from 'vue';
+import { ref, computed, useTemplateRef } from 'vue';
 import useActions from './Actions.js';
 import ConfirmableAction from './ConfirmableAction.vue';
 import { keyBy, sortBy } from 'lodash-es';
