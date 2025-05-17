@@ -44,6 +44,8 @@ import Updater from '../components/updater/Updater.vue';
 import PortalTargets from '../components/portals/PortalTargets.vue';
 import SitesEditForm from '../components/sites/EditForm.vue';
 import CommandPalette from '../components/command-palette/CommandPalette.vue';
+import ItemActions from '../components/actions/ItemActions.vue';
+
 import { defineAsyncComponent } from 'vue';
 import { ConfigProvider } from 'reka-ui';
 
@@ -96,6 +98,8 @@ export default {
         PortalTargets,
         SitesEditForm,
         ConfigProvider,
+        ItemActions,
+        // BulkActions,
     },
 
     data() {
