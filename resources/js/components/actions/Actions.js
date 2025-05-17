@@ -20,12 +20,14 @@ export default function useActions() {
                 values,
             };
 
+            // Note: A blob response type is required for file downloads,
+            // but we can use handlers to JSON.parse all non-file responses...
             axios
                 .post(url, payload, { responseType: 'blob' })
                 .then(response => {
                     response.headers['content-disposition']
-                        ? handleFileDownload(response, resolve) // Pass blob response for downloads
-                        : handleActionSuccess(response, resolve); // Otherwise handle as normal, converting from JSON
+                        ? handleFileDownload(response, resolve)
+                        : handleActionSuccess(response, resolve);
                 })
                 .catch(error => handleActionError(error.response, reject))
                 .finally(() => {
