@@ -1,3 +1,89 @@
+<script setup>
+import { ref, computed } from 'vue';
+import PublishFields from '../publish/Fields.vue';
+import { requireElevatedSessionIf } from '@statamic/components/elevated-sessions';
+
+const props = defineProps({
+    action: { type: Object, required: true },
+    selections: { type: Number, required: true },
+    errors: { type: Object },
+    isDirty: { type: Boolean, default: false },
+});
+
+const emit = defineEmits(['confirmed']);
+
+let confirming = ref(false);
+let running = ref(false);
+let fieldset = ref({ tabs: [{ fields: props.action.fields }] });
+let values = ref(props.action.values);
+
+let confirmationText = computed(() => {
+    if (!props.action.confirmationText) return;
+    return __n(props.action.confirmationText, props.selections);
+});
+
+let warningText = computed(() => {
+    if (!props.action.warningText) return;
+    return __n(props.action.warningText, props.selections);
+});
+
+let dirtyText = computed(() => {
+    if (!props.isDirty) return;
+    return __(props.action.dirtyWarningText);
+});
+
+let showDirtyWarning = computed(() => {
+    return props.isDirty && props.action.dirtyWarningText && !props.action.bypassesDirtyWarning;
+});
+
+let runButtonText = computed(() => {
+    return __n(props.action.buttonText, props.selections);
+});
+
+// TODO: How do we convert these to composition API?
+//
+// created() {
+//     this.$events.$on('reset-action-modals', this.reset);
+// },
+//
+// unmounted() {
+//     this.$events.$off('reset-action-modals', this.reset);
+// },
+
+function onDone() {
+    running.value = false;
+}
+
+function select() {
+    if (props.action.confirm) {
+        confirming.value = true;
+        return;
+    }
+
+    runAction();
+}
+
+function confirm() {
+    runAction();
+}
+
+function runAction() {
+    requireElevatedSessionIf(props.action.requiresElevatedSession).then(() => {
+        running.value = true;
+        emit('confirmed', props.action, values.value, onDone);
+    });
+}
+
+function reset() {
+    confirming.value = false;
+    values.value = clone(props.action.values);
+}
+
+defineExpose({
+    select,
+});
+</script>
+
 <template>
     <confirmation-modal
         v-if="confirming"
@@ -42,100 +128,3 @@
         </publish-container>
     </confirmation-modal>
 </template>
-
-<script>
-import PublishFields from '../publish/Fields.vue';
-import { requireElevatedSessionIf } from '@statamic/components/elevated-sessions';
-
-export default {
-    emits: ['confirmed'],
-
-    components: {
-        PublishFields,
-    },
-
-    props: {
-        action: { type: Object, required: true },
-        selections: { type: Number, required: true },
-        errors: { type: Object },
-        isDirty: { type: Boolean, default: false },
-    },
-
-    data() {
-        return {
-            confirming: false,
-            fieldset: { tabs: [{ fields: this.action.fields }] },
-            values: this.action.values,
-            running: false,
-        };
-    },
-
-    computed: {
-        confirmationText() {
-            if (!this.action.confirmationText) return;
-
-            return __n(this.action.confirmationText, this.selections);
-        },
-
-        warningText() {
-            if (!this.action.warningText) return;
-
-            return __n(this.action.warningText, this.selections);
-        },
-
-        dirtyText() {
-            if (!this.isDirty) return;
-
-            return __(this.action.dirtyWarningText);
-        },
-
-        showDirtyWarning() {
-            return this.isDirty && this.action.dirtyWarningText && !this.action.bypassesDirtyWarning;
-        },
-
-        runButtonText() {
-            return __n(this.action.buttonText, this.selections);
-        },
-    },
-
-    created() {
-        this.$events.$on('reset-action-modals', this.reset);
-    },
-
-    unmounted() {
-        this.$events.$off('reset-action-modals', this.reset);
-    },
-
-    methods: {
-        onDone() {
-            this.running = false;
-        },
-
-        select() {
-            if (this.action.confirm) {
-                this.confirming = true;
-                return;
-            }
-
-            this.runAction();
-        },
-
-        confirm() {
-            this.runAction();
-        },
-
-        runAction() {
-            requireElevatedSessionIf(this.action.requiresElevatedSession).then(() => {
-                this.running = true;
-                this.$emit('confirmed', this.action, this.values, this.onDone);
-            });
-        },
-
-        reset() {
-            this.confirming = false;
-
-            this.values = clone(this.action.values);
-        },
-    },
-};
-</script>
