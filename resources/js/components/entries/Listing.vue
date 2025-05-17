@@ -102,31 +102,41 @@
                                 <div class="slug-index-field" :title="entry.slug">{{ entry.slug }}</div>
                             </template>
                             <template #actions="{ row: entry, index }">
-                                <Dropdown placement="left-start" class="me-3">
-                                    <DropdownMenu>
-                                        <DropdownLabel :text="__('Actions')" />
-                                        <DropdownItem
-                                            :text="__('Visit URL')"
-                                            :href="entry.permalink"
-                                            icon="eye"
-                                            v-if="entry.viewable && entry.permalink"
-                                        />
-                                        <DropdownItem
-                                            :text="__('Edit')"
-                                            :href="entry.edit_url"
-                                            icon="edit"
-                                            v-if="entry.editable"
-                                        />
-                                        <DropdownSeparator v-if="entry.actions.length" />
-                                        <data-list-inline-actions
-                                            :item="entry.id"
-                                            :url="actionUrl"
-                                            :actions="entry.actions"
-                                            @started="actionStarted"
-                                            @completed="actionCompleted"
-                                        />
-                                    </DropdownMenu>
-                                </Dropdown>
+                                <ItemActions
+                                    :url="actionUrl"
+                                    :actions="entry.actions"
+                                    :item="entry.id"
+                                    @started="actionStarted"
+                                    @completed="actionCompleted"
+                                    v-slot="{ actions, select }"
+                                >
+                                    <Dropdown placement="left-start" class="me-3">
+                                        <DropdownMenu>
+                                            <DropdownLabel :text="__('Actions')" />
+                                            <DropdownItem
+                                                :text="__('Visit URL')"
+                                                :href="entry.permalink"
+                                                icon="eye"
+                                                v-if="entry.viewable && entry.permalink"
+                                            />
+                                            <DropdownItem
+                                                :text="__('Edit')"
+                                                :href="entry.edit_url"
+                                                icon="edit"
+                                                v-if="entry.editable"
+                                            />
+                                            <DropdownSeparator v-if="entry.actions.length" />
+                                            <DropdownItem
+                                                v-for="action in actions"
+                                                :key="action.handle"
+                                                :text="__(action.title)"
+                                                icon="edit"
+                                                :class="{ 'text-red-500': action.dangerous }"
+                                                @click="select(action)"
+                                            />
+                                        </DropdownMenu>
+                                    </Dropdown>
+                                </ItemActions>
                             </template>
                         </data-list-table>
                     </Panel>
@@ -156,6 +166,7 @@ import {
     DropdownLabel,
     DropdownSeparator,
 } from '@statamic/ui';
+import ItemActions from '../../components/actions/ItemActions.vue';
 
 export default {
     mixins: [Listing],
@@ -169,6 +180,7 @@ export default {
         DropdownItem,
         DropdownLabel,
         DropdownSeparator,
+        ItemActions,
     },
 
     props: {
@@ -220,6 +232,14 @@ export default {
     },
 
     methods: {
+        fakeStarted() {
+            console.log('fake started!');
+        },
+
+        fakeCompleted() {
+            console.log('fake completed!');
+        },
+
         reorder() {
             this.previousFilters = this.activeFilters;
             this.filtersReset();
