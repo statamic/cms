@@ -24,7 +24,7 @@ use Statamic\OAuth\Provider;
  * @method static void computed(string|array $field, ?\Closure $callback = null)
  *
  * @see \Statamic\Contracts\Auth\UserRepository
- * @see \Statamic\Auth\User
+ * @link \Statamic\Auth\User
  */
 class User extends Facade
 {

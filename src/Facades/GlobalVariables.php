@@ -14,7 +14,7 @@ use Statamic\Contracts\Globals\GlobalVariablesRepository;
  * @method static void delete(\Statamic\Globals\Variables $variable)
  *
  * @see \Statamic\Stache\Repositories\GlobalVariablesRepository
- * @see \Statamic\Globals\Variables
+ * @link \Statamic\Globals\Variables
  */
 class GlobalVariables extends Facade
 {

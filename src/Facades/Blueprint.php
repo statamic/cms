@@ -25,7 +25,7 @@ use Statamic\Fields\BlueprintRepository;
  * @method static \Illuminate\Support\Collection getAdditionalNamespaces()
  *
  * @see \Statamic\Fields\BlueprintRepository
- * @see \Statamic\Fields\Blueprint
+ * @link \Statamic\Fields\Blueprint
  */
 class Blueprint extends Facade
 {

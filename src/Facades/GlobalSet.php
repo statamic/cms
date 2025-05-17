@@ -14,7 +14,7 @@ use Statamic\Contracts\Globals\GlobalRepository;
  * @method static void delete(\Statamic\Contracts\Globals\GlobalSet $global)
  *
  * @see \Statamic\Stache\Repositories\GlobalRepository
- * @see \Statamic\Globals\GlobalSet
+ * @link \Statamic\Globals\GlobalSet
  */
 class GlobalSet extends Facade
 {
