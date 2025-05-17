@@ -3,7 +3,6 @@ import { ref, computed, useTemplateRef } from 'vue';
 import useActions from './Actions.js';
 import ConfirmableAction from './ConfirmableAction.vue';
 import { keyBy, sortBy } from 'lodash-es';
-import axios from 'axios';
 
 const props = defineProps({
     url: { type: String, required: true },
@@ -46,7 +45,6 @@ function runAction(action, values, done) {
         :errors="errors"
         :is-dirty="isDirty"
         @confirmed="runAction"
-        v-slot="{ action, select }"
     />
     <slot :actions="sortedActions" :select="confirmAction" />
 </template>
