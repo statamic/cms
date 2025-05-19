@@ -85,8 +85,15 @@ const store = usePublishContainerStore(props.name, {
 const components = ref([]);
 
 watch(
+    () => props.values,
+    (values) => store.setValues(values),
+    { deep: true },
+);
+
+watch(
     () => store.values,
     (values) => {
+        if (values === props.values) return;
         if (props.trackDirtyState) dirty();
         emit('updated', values);
     },
