@@ -62,7 +62,7 @@ export class Request extends Step {
     constructor(url, method, data) {
         super();
         this.#url = url;
-        this.#method = method;
+        this.#method = method.toLowerCase();
         this.#data = data;
     }
 
@@ -70,7 +70,7 @@ export class Request extends Step {
         return new Promise((resolve, reject) => {
             return axios[this.#method](this.#url, this.#data)
                 .then((response) => {
-                    if (container) {
+                    if (container && response.data.data?.hasOwnProperty('values')) {
                         container.value.store.setValues(
                             resetValuesFromResponse(response.data.data.values, container.value.store),
                         );

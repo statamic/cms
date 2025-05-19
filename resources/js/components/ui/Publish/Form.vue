@@ -26,9 +26,13 @@ const props = defineProps({
         required: true,
         default: () => ({}),
     },
-    saveUrl: {
+    submitUrl: {
         type: String,
         required: true,
+    },
+    submitMethod: {
+        type: String,
+        default: 'patch',
     },
 });
 
@@ -44,7 +48,7 @@ function save() {
         .provide({ container, errors, saving })
         .through([
             new BeforeSaveHooks('entry'),
-            new Request(props.saveUrl, 'patch', { values: values.value }),
+            new Request(props.submitUrl, props.submitMethod, { values: values.value }),
             new AfterSaveHooks('entry'),
         ])
         .then((response) => {
