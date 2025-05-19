@@ -104,7 +104,7 @@ function desync() {
         :disabled="isReadOnly"
     >
         <template #label>
-            <Label :for="fieldId">
+            <Label :for="fieldId" :required="isRequired">
                 {{ __(config.display) }}
                 <Tooltip :text="__('Localizable field')" v-if="isLocalizable">
                     <Icon name="globals" class="text-gray-400" />
