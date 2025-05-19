@@ -132,7 +132,7 @@ import PublishComponents from '@statamic/components/ui/Publish/Components.vue';
 import LivePreview from '@statamic/components/ui/LivePreview/LivePreview.vue';
 import { SavePipeline } from '@statamic/exports.js';
 import { ref, computed } from 'vue';
-const { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks } = SavePipeline;
+const { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } = SavePipeline;
 import LocalizationsCard from '@statamic/components/ui/Publish/Localizations.vue';
 
 let saving = ref(false);
@@ -344,11 +344,16 @@ export default {
                     // the hooks are resolved because if this form is being shown in a stack, we only
                     // want to close it once everything's done.
                     else {
-                        // this.values = this.resetValuesFromResponse(response.data.data.values);
                         this.$nextTick(() => this.$emit('saved', response));
                     }
 
                     this.quickSave = false;
+                })
+                .catch((e) => {
+                    if (!(e instanceof PipelineStopped)) {
+                        this.$toast.error(__('Something went wrong'));
+                        console.error(e);
+                    }
                 });
         },
 
