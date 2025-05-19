@@ -1,5 +1,5 @@
 <template>
-    <div class="field-width field-width-selector" @mouseenter="isHovering = true" @mouseleave="isHovering = false">
+    <div class="relative bg-white border border-gray-300 overflow-hidden rounded-md flex h-8 w-20 cursor-pointer" @mouseenter="isHovering = true" @mouseleave="isHovering = false">
         <div class="flex w-full">
             <div
                 v-for="width in widths"
@@ -7,13 +7,12 @@
                 @mouseenter.stop="hoveringOver = width"
                 @click="$emit('update:model-value', width)"
                 :class="[
-                    'field-width-notch',
-                    'notch-' + width,
-                    { filled: selected >= width, selected: selected == width },
+                    'relative flex-1 border-l border-gray-300',
+                    { 'bg-gray-100 border-l-0 border-gray-400': selected >= width, selected: selected == width },
                 ]"
             />
         </div>
-        <div class="field-width-label">{{ selected }}%</div>
+        <div class="pointer-events-none absolute inset-0 z-10 flex w-full items-center justify-center text-center text-sm text-gray-600">{{ selected }}%</div>
     </div>
 </template>
 
@@ -21,7 +20,11 @@
 export default {
     emits: ['update:model-value'],
 
-    props: ['modelValue', 'initialWidths'],
+    props: [
+        'modelValue',
+        'initialWidths',
+        'size',
+    ],
 
     data() {
         return {
