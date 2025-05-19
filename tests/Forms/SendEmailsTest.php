@@ -119,8 +119,6 @@ class SendEmailsTest extends TestCase
     #[Test]
     public function delete_attachments_job_only_saves_submission_when_enabled()
     {
-        Bus::fake();
-
         $form = tap(FacadesForm::make('attachments_test')->email([
             'from' => 'first@sender.com',
             'to' => 'first@recipient.com',
