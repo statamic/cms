@@ -1,47 +1,71 @@
+<script setup>
+import { ref, computed } from 'vue'
+import { cva } from 'cva'
+
+const props = defineProps({
+    modelValue: Number,
+    initialWidths: Array,
+    size: { type: String, default: 'base' },
+    variant: { type: String, default: 'default' },
+})
+
+const emit = defineEmits(['update:model-value'])
+
+const isHovering = ref(false)
+const hoveringOver = ref(null)
+const widths = ref(props.initialWidths ?? [25, 33, 50, 66, 75, 100])
+
+const selected = computed(() => {
+    if (isHovering.value) {
+        return hoveringOver.value
+    }
+    return props.modelValue
+})
+
+const wrapperClasses = cva({
+    base: 'relative text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 overflow-hidden flex cursor-pointer',
+    variants: {
+        size: {
+            base: 'h-7 w-16 text-xs rounded-md',
+            lg: 'h-10 w-24 text-sm rounded-lg',
+        },
+    },
+})({
+    size: props.size,
+})
+
+const sizerClasses = cva({
+    base: 'border-l-0 border-gray-300 dark:border-gray-700 flex-1',
+    variants: {
+        variant: {
+            default: [
+                'data-[state="selected"]:bg-gray-100 data-[state="selected"]:border-gray-300 data-[last="true"]:border-r data-[last="true"]:border-gray-300',
+                'dark:data-[state="selected"]:bg-gray-900 dark:data-[state="selected"]:border-gray-700',
+            ],
+            filled: [
+                'data-[state="selected"]:bg-gray-100 data-[last="true"]:border-r data-[last="true"]:border-gray-300',
+                'dark:data-[state="selected"]:bg-gray-900 dark:data-[state="selected"]:border-gray-700',
+            ],
+        },
+    },
+})({
+    variant: props.variant,
+})
+</script>
+
 <template>
-    <div class="relative bg-white border border-gray-300 overflow-hidden rounded-md flex h-8 w-20 cursor-pointer" @mouseenter="isHovering = true" @mouseleave="isHovering = false">
+    <div :class="wrapperClasses" @mouseenter="isHovering = true" @mouseleave="isHovering = false">
         <div class="flex w-full">
             <div
                 v-for="width in widths"
                 :key="width"
                 @mouseenter.stop="hoveringOver = width"
                 @click="$emit('update:model-value', width)"
-                :class="[
-                    'relative flex-1 border-l border-gray-300',
-                    { 'bg-gray-100 border-l-0 border-gray-400': selected >= width, selected: selected == width },
-                ]"
+                :class="sizerClasses"
+                :data-state="selected >= width ? 'selected' : 'unselected'"
+                :data-last="selected === width && width !== 100"
             />
         </div>
-        <div class="pointer-events-none absolute inset-0 z-10 flex w-full items-center justify-center text-center text-sm text-gray-600">{{ selected }}%</div>
+        <div class="pointer-events-none absolute inset-0 z-10 flex w-full items-center justify-center text-center">{{ selected }}%</div>
     </div>
 </template>
-
-<script>
-export default {
-    emits: ['update:model-value'],
-
-    props: [
-        'modelValue',
-        'initialWidths',
-        'size',
-    ],
-
-    data() {
-        return {
-            isHovering: false,
-            hoveringOver: null,
-            widths: this.initialWidths ?? [25, 33, 50, 66, 75, 100],
-        };
-    },
-
-    computed: {
-        selected() {
-            if (this.isHovering) {
-                return this.hoveringOver;
-            }
-
-            return this.modelValue;
-        },
-    },
-};
-</script>
