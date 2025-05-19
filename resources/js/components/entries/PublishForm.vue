@@ -266,6 +266,13 @@ import PublishTabs from '@statamic/components/ui/Publish/Tabs.vue';
 import PublishComponents from '@statamic/components/ui/Publish/Components.vue';
 import LocalizationsCard from '@statamic/components/ui/Publish/Localizations.vue';
 import LivePreview from '@statamic/components/ui/LivePreview/LivePreview.vue';
+import { SavePipeline } from '@statamic/exports.js';
+import { computed, ref } from 'vue';
+const { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } = SavePipeline;
+
+let saving = ref(false);
+let errors = ref({});
+let container = null;
 
 export default {
     mixins: [HasPreferences, HasHiddenFields, HasActions],
@@ -335,7 +342,6 @@ export default {
     data() {
         return {
             actions: this.initialActions,
-            saving: false,
             localizing: false,
             trackDirtyState: true,
             fieldset: this.initialFieldset,
@@ -352,8 +358,6 @@ export default {
             selectingOrigin: false,
             selectedOrigin: null,
             isWorkingCopy: this.initialIsWorkingCopy,
-            error: null,
-            errors: {},
             isPreviewing: false,
             tabsVisible: true,
             state: 'new',
@@ -380,16 +384,20 @@ export default {
     },
 
     computed: {
+        saving() {
+            return saving.value;
+        },
+
+        errors() {
+            return errors.value;
+        },
+
         store() {
             return this.$refs.container.store;
         },
 
         formattedTitle() {
             return striptags(__(this.title));
-        },
-
-        hasErrors() {
-            return this.error || Object.keys(this.errors).length;
         },
 
         somethingIsLoading() {
@@ -505,78 +513,35 @@ export default {
     },
 
     methods: {
-        clearErrors() {
-            this.error = null;
-            this.errors = {};
-        },
-
         save() {
             if (!this.canSave) {
                 this.quickSave = false;
                 return;
             }
 
-            this.saving = true;
-            this.clearErrors();
-
-            setTimeout(() => this.runBeforeSaveHook(), 151); // 150ms is the debounce time for fieldtype updates
-        },
-
-        runBeforeSaveHook() {
-            this.$refs.container.saving();
-
-            Statamic.$hooks
-                .run('entry.saving', {
-                    collection: this.collectionHandle,
-                    values: this.values,
-                    container: this.$refs.container,
-                    storeName: this.publishContainer,
-                })
-                .then(this.performSaveRequest)
-                .catch((error) => {
-                    this.saving = false;
-                    this.$toast.error(error || 'Something went wrong');
-                });
-        },
-
-        performSaveRequest() {
-            // Once the hook has completed, we need to make the actual request.
-            // We build the payload here because the before hook may have modified values.
-            const payload = {
-                ...this.visibleValues,
-                ...{
-                    _blueprint: this.fieldset.handle,
-                    _localized: this.localizedFields,
-                    _parent: this.parent,
-                },
-            };
-
-            this.$axios[this.method](this.actions.save, payload)
+            new Pipeline()
+                .provide({ container, errors, saving })
+                .through([
+                    new BeforeSaveHooks('entry', {
+                        collection: this.collectionHandle,
+                        values: this.values,
+                        container: this.$refs.container,
+                        storeName: this.publishContainer,
+                    }),
+                    new Request(this.actions.save, this.method, {
+                        ...this.visibleValues,
+                        ...{
+                            _blueprint: this.fieldset.handle,
+                            _localized: this.localizedFields,
+                            _parent: this.parent,
+                        },
+                    }),
+                    new AfterSaveHooks('entry', {
+                        collection: this.collectionHandle,
+                        reference: this.initialReference,
+                    }),
+                ])
                 .then((response) => {
-                    this.saving = false;
-                    if (!response.data.saved) {
-                        return this.$toast.error(__(`Couldn't save entry`));
-                    }
-                    this.title = response.data.data.title;
-                    this.isWorkingCopy = true;
-                    if (!this.revisionsEnabled) this.permalink = response.data.data.permalink;
-                    if (!this.isCreating && !this.isAutosave) this.$toast.success(__('Saved'));
-                    this.$refs.container.saved();
-                    this.runAfterSaveHook(response);
-                })
-                .catch((error) => this.handleAxiosError(error));
-        },
-
-        runAfterSaveHook(response) {
-            // Once the save request has completed, we want to run the "after" hook.
-            // Devs can do what they need and we'll wait for them, but they can't cancel anything.
-            Statamic.$hooks
-                .run('entry.saved', {
-                    collection: this.collectionHandle,
-                    reference: this.initialReference,
-                    response,
-                })
-                .then(() => {
                     // If revisions are enabled, just emit event.
                     if (this.revisionsEnabled) {
                         clearTimeout(this.trackDirtyStateTimeout);
@@ -587,6 +552,11 @@ export default {
                         this.$nextTick(() => this.$emit('saved', response));
                         return;
                     }
+
+                    this.title = response.data.data.title;
+                    this.isWorkingCopy = true;
+                    if (!this.revisionsEnabled) this.permalink = response.data.data.permalink;
+                    if (!this.isCreating && !this.isAutosave) this.$toast.success(__('Saved'));
 
                     let nextAction = this.quickSave || this.isAutosave ? 'continue_editing' : this.afterSaveOption;
 
@@ -606,8 +576,6 @@ export default {
                     else {
                         clearTimeout(this.trackDirtyStateTimeout);
                         this.trackDirtyState = false;
-                        this.values = this.resetValuesFromResponse(response.data.data.values);
-                        this.extraValues = response.data.data.extraValues;
                         this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500);
                         this.initialPublished = response.data.data.published;
                         this.activeLocalization.published = response.data.data.published;
@@ -618,27 +586,17 @@ export default {
                     this.quickSave = false;
                     this.isAutosave = false;
                 })
-                .catch((e) => console.error(e));
+                .catch((e) => {
+                    if (!(e instanceof PipelineStopped)) {
+                        this.$toast.error(__('Something went wrong'));
+                        console.error(e);
+                    }
+                });
         },
 
         confirmPublish() {
             if (this.canPublish) {
                 this.confirmingPublish = true;
-            }
-        },
-
-        handleAxiosError(e) {
-            this.saving = false;
-            if (e.response && e.response.status === 422) {
-                const { message, errors } = e.response.data;
-                this.error = message;
-                this.errors = errors;
-                this.$toast.error(message);
-                this.$reveal.invalid();
-            } else if (e.response) {
-                this.$toast.error(e.response.data.message);
-            } else {
-                this.$toast.error(e || 'Something went wrong');
             }
         },
 
@@ -874,6 +832,8 @@ export default {
             this.originBehavior === 'active'
                 ? this.localizations.find((l) => l.active)?.handle
                 : this.localizations.find((l) => l.root)?.handle;
+
+        container = computed(() => this.$refs.container);
     },
 
     unmounted() {
