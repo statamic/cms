@@ -74,6 +74,7 @@ export class Request extends Step {
                         container.value.store.setValues(
                             resetValuesFromResponse(response.data.data.values, container.value.store),
                         );
+                        container.value.store.setExtraValues(response.data.data.extraValues);
                     }
                     resolve(response);
                 })
