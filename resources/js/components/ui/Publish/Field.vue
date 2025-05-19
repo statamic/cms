@@ -37,6 +37,8 @@ const fieldActions = computed(() => {
 });
 
 function valueUpdated(value) {
+    const existingValue = data_get(store.values, fullPath.value);
+    if (value === existingValue) return;
     store.setDottedFieldValue({ path: fullPath.value, value });
     if (isSyncable.value) desync();
 }
