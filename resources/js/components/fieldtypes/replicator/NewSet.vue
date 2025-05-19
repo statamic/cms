@@ -55,7 +55,7 @@ const fieldActionPayload = computed(() => ({
     config: props.config,
     // meta: this.meta,
     update: (handle, value) => store.setDottedFieldValue({ path: `${pathPrefix.value}.${handle}`, value }),
-    // updateMeta: (handle, value) => this.metaUpdated(handle, value),
+    updateMeta: (handle, value) => store.setDottedFieldMeta({ path: `${pathPrefix.value}.${handle}`, value }),
     isReadOnly: props.readOnly,
     // store: this.store,
     // storeName: this.storeName,
