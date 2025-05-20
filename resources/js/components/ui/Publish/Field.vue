@@ -111,12 +111,12 @@ function desync() {
                 </Tooltip>
                 <button v-if="!isReadOnly && isSyncable" v-show="isSynced" @click="desync">
                     <Tooltip :text="__('messages.field_synced_with_origin')">
-                        <Icon name="link" class="text-gray-400" />
+                        <Icon name="synced" class="text-gray-400" />
                     </Tooltip>
                 </button>
                 <button v-if="!isReadOnly && isSyncable" v-show="!isSynced" @click="sync">
                     <Tooltip :text="__('messages.field_desynced_from_origin')">
-                        <Icon name="link-broken" class="text-gray-400" />
+                        <Icon name="unsynced" class="text-gray-400" />
                     </Tooltip>
                 </button>
             </Label>
