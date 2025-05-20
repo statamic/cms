@@ -79,6 +79,7 @@
                                                 v-if="asset.is_image"
                                                 :src="asset.thumbnail"
                                                 loading="lazy"
+                                                :draggable="false"
                                                 :class="{
                                                     'size-full p-4': asset.extension === 'svg',
                                                     'rounded-lg p-1': asset.orientation === 'square',
