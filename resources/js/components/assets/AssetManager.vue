@@ -59,10 +59,9 @@ export default {
         },
 
         /**
-         * When a user has navigated to another folder or container
+         * When a user has navigated to another folder.
          */
-        navigate(container, path) {
-            this.container = container;
+        navigate(path) {
             this.path = path;
             this.pushState();
 

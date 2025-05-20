@@ -344,7 +344,7 @@ export default {
                 ? [this.path, this.editedAssetBasename].filter((value) => value != '/').join('/') + '/edit'
                 : this.path;
 
-            this.$emit('navigated', this.container, path);
+            this.$emit('navigated', path);
         },
 
         initializing(isInitializing, wasInitializing) {
@@ -499,7 +499,7 @@ export default {
             this.path = path;
             this.page = 1;
 
-            this.$emit('navigated', this.container, this.path);
+            this.$emit('navigated', this.path);
         },
 
         selectRange(from, to) {
