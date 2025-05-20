@@ -106,9 +106,6 @@ function desync() {
         <template #label>
             <Label :for="fieldId" :required="isRequired">
                 {{ __(config.display) }}
-                <Tooltip :text="__('Localizable field')" v-if="isLocalizable">
-                    <Icon name="globals" class="text-gray-400" />
-                </Tooltip>
                 <button v-if="!isReadOnly && isSyncable" v-show="isSynced" @click="desync">
                     <Tooltip :text="__('messages.field_synced_with_origin')">
                         <Icon name="synced" class="text-gray-400" />
