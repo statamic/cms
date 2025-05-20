@@ -48,6 +48,7 @@ export default {
         },
         namePrefix: String,
         fieldPathPrefix: String,
+        metaPathPrefix: String,
         id: String,
     },
 

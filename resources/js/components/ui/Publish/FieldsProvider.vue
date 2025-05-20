@@ -10,7 +10,7 @@ const props = defineProps({
         type: Array,
         required: true,
     },
-    pathPrefix: {
+    fieldPathPrefix: {
         type: String,
     },
     metaPathPrefix: {
@@ -21,7 +21,7 @@ const props = defineProps({
 
 provideFieldsContext({
     fields: props.fields,
-    pathPrefix: props.pathPrefix,
+    fieldPathPrefix: props.fieldPathPrefix,
     metaPathPrefix: props.metaPathPrefix,
 });
 </script>

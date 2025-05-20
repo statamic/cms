@@ -27,8 +27,8 @@
 
         <FieldsProvider
             :fields="fields"
-            :path-prefix="`${fieldPathPrefix}.${index}`"
-            :meta-path-prefix="`${fieldPathPrefix}.existing.${values._id}`"
+            :field-path-prefix="`${fieldPathPrefix}.${index}`"
+            :meta-path-prefix="`${metaPathPrefix}.existing.${values._id}`"
         >
             <PublishFields />
         </FieldsProvider>

@@ -13,20 +13,21 @@ const props = defineProps({
 });
 
 const { store, syncField, desyncField } = injectContainerContext();
-const { pathPrefix, metaPathPrefix } = injectFieldsContext();
+const { fieldPathPrefix, metaPathPrefix } = injectFieldsContext();
 const handle = props.config.handle;
 
 const fieldtypeComponent = computed(() => {
     return `${props.config.component || props.config.type}-fieldtype`;
 });
 
-const fullPath = computed(() => [pathPrefix, handle].filter(Boolean).join('.'));
+const fullPath = computed(() => [fieldPathPrefix, handle].filter(Boolean).join('.'));
+const metaFullPath = computed(() => [metaPathPrefix, handle].filter(Boolean).join('.'));
 const value = computed(() => data_get(store.values, fullPath.value));
 const meta = computed(() => {
     const key = [metaPathPrefix, handle].filter(Boolean).join('.');
     return data_get(store.meta, key);
 });
-const errors = computed(() => data_get(store.errors, fullPath.value));
+const errors = computed(() => store.errors[fullPath.value]);
 const fieldId = computed(() => `field_${fullPath.value.replaceAll('.', '_')}`);
 const namePrefix = '';
 const isRequired = computed(() => props.config.required);
@@ -44,7 +45,7 @@ function valueUpdated(value) {
 }
 
 function metaUpdated(value) {
-    store.setDottedFieldMeta({ path: fullPath.value, value });
+    store.setDottedFieldMeta({ path: metaFullPath.value, value });
 }
 
 function replicatorPreviewUpdated(value) {
@@ -60,11 +61,11 @@ function blurred() {
 }
 
 const values = computed(() => {
-    return pathPrefix ? data_get(store.values, pathPrefix) : store.values;
+    return fieldPathPrefix ? data_get(store.values, fieldPathPrefix) : store.values;
 });
 
 const extraValues = computed(() => {
-    return pathPrefix ? data_get(store.extraValues, pathPrefix) : store.extraValues;
+    return fieldPathPrefix ? data_get(store.extraValues, fieldPathPrefix) : store.extraValues;
 });
 
 const shouldShowField = computed(() => {
@@ -80,7 +81,6 @@ const isReadOnly = computed(() => {
 });
 
 const isLocked = computed(() => false); // todo
-
 const isSyncable = computed(() => store.isRoot === false);
 const isSynced = computed(() => isSyncable.value && !store.localizedFields.includes(fullPath.value));
 
@@ -133,7 +133,8 @@ function desync() {
             :meta="meta"
             :handle="handle"
             :name-prefix="namePrefix"
-            :field-path-prefix="pathPrefix"
+            :field-path-prefix="fieldPathPrefix"
+            :meta-path-prefix="metaPathPrefix"
             :read-only="isReadOnly"
             show-field-previews
             @update:value="valueUpdated"

@@ -30,12 +30,13 @@
                             v-slot="{}"
                         >
                             <div class="relative">
-                                <NewReplicatorSet
+                                <ReplicatorSet
                                     v-for="(set, index) in value"
                                     :key="set._id"
                                     :id="set._id"
                                     :index
-                                    :path="setPathPrefix"
+                                    :field-path="setFieldPathPrefix"
+                                    :meta-path="setMetaPathPrefix"
                                     :values="set"
                                     :config="setConfig(set.type)"
                                     :sortable-item-class="sortableItemClass"
@@ -62,7 +63,7 @@
                                             @added="addSet"
                                         />
                                     </template>
-                                </NewReplicatorSet>
+                                </ReplicatorSet>
                             </div>
                         </sortable-list>
 
@@ -85,8 +86,7 @@
 <script>
 import Fieldtype from '../Fieldtype.vue';
 import uniqid from 'uniqid';
-import ReplicatorSet from './Set.vue';
-import NewReplicatorSet from './NewSet.vue';
+import ReplicatorSet from './NewSet.vue';
 import AddSetButton from './AddSetButton.vue';
 import ManagesSetMeta from './ManagesSetMeta';
 import { SortableList } from '../../sortable/Sortable';
@@ -96,7 +96,6 @@ export default {
 
     components: {
         ReplicatorSet,
-        NewReplicatorSet,
         SortableList,
         AddSetButton,
     },
@@ -116,8 +115,12 @@ export default {
     },
 
     computed: {
-        setPathPrefix() {
+        setFieldPathPrefix() {
             return this.fieldPathPrefix ? `${this.fieldPathPrefix}.${this.handle}` : this.handle;
+        },
+
+        setMetaPathPrefix() {
+            return this.metaPathPrefix ? `${this.metaPathPrefix}.${this.handle}` : this.handle;
         },
 
         canAddSet() {
@@ -208,7 +211,7 @@ export default {
                 enabled: true,
             };
 
-            this.updateSetMeta(set._id, this.meta.new[handle], {});
+            this.updateSetMeta(set._id, this.meta.new[handle]);
 
             this.update([...this.value.slice(0, index), set, ...this.value.slice(index)]);
 
@@ -223,21 +226,11 @@ export default {
                 _id: uniqid(),
             };
 
-            this.updateSetMeta(set._id, this.meta.existing[old_id], {});
+            this.updateSetMeta(set._id, this.meta.existing[old_id]);
 
             this.update([...this.value.slice(0, index + 1), set, ...this.value.slice(index + 1)]);
 
             this.expandSet(set._id);
-        },
-
-        updateSetPreviews(id, previews) {
-            this.updateMeta({
-                ...this.meta,
-                previews: {
-                    ...this.meta.previews,
-                    [id]: previews,
-                },
-            });
         },
 
         collapseSet(id) {

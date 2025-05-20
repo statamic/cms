@@ -11,7 +11,11 @@
                 </publish-field-fullscreen-header>
                 <section :class="{ 'mt-14 p-4': fullScreenMode }">
                     <div :class="{ 'replicator-set dark:border-dark-900 rounded-sm border shadow-sm': config.border }">
-                        <FieldsProvider :fields="fields" :path-prefix="pathPrefix" :meta-path-prefix="pathPrefix">
+                        <FieldsProvider
+                            :fields="fields"
+                            :field-path-prefix="fieldPathPrefix || handle"
+                            :meta-path-prefix="metaPathPrefix || handle"
+                        >
                             <Fields class="p-4" />
                         </FieldsProvider>
                     </div>
@@ -48,7 +52,6 @@ export default {
             containerWidth: null,
             focused: false,
             fullScreenMode: false,
-            previews: {},
             provide: {
                 group: this.makeGroupProvide(),
             },
@@ -56,9 +59,6 @@ export default {
     },
     inject: ['store'],
     computed: {
-        pathPrefix() {
-            return this.fieldPathPrefix || this.handle;
-        },
         values() {
             return this.value;
         },
@@ -67,6 +67,9 @@ export default {
         },
         fields() {
             return this.config.fields;
+        },
+        previews() {
+            return data_get(this.store.previews, this.fieldPathPrefix || this.handle) || {};
         },
         replicatorPreview() {
             if (!this.showFieldPreviews || !this.config.replicator_preview) return;
@@ -133,10 +136,6 @@ export default {
 
         updateMeta(handle, value) {
             this.$emit('meta-updated', { ...this.meta, [handle]: value });
-        },
-
-        previewUpdated(handle, value) {
-            this.previews = { ...this.previews, [handle]: value };
         },
 
         fieldPath(handle) {

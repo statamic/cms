@@ -103,7 +103,7 @@
                                     >
                                         <svg-icon
                                             name="micro/plus"
-                                            class="dark:group-hover:dark-text-100 h-3 w-3 text-gray-800 group-hover:text-black dark:text-dark-175"
+                                            class="dark:group-hover:dark-text-100 dark:text-dark-175 h-3 w-3 text-gray-800 group-hover:text-black"
                                         />
                                     </button>
                                 </template>
@@ -207,7 +207,6 @@ export default {
             fullScreenMode: false,
             buttons: [],
             collapsed: this.meta.collapsed,
-            previews: this.meta.previews,
             mounted: false,
             initError: null,
             pageHeader: null,
@@ -265,14 +264,6 @@ export default {
             // Otherwise show one or the other.
             if (showCharLimit) return `${charCount}/${charLimit}`;
             if (showWordCount) return wordCountText;
-        },
-
-        isFirstCreation() {
-            return !this.$config.get('bard.meta').hasOwnProperty(this.id);
-        },
-
-        id() {
-            return `${this.storeName}.${this.name}`;
         },
 
         setIndexes() {
@@ -440,18 +431,6 @@ export default {
             this.updateMeta(meta);
         },
 
-        previews: {
-            deep: true,
-            handler(value) {
-                if (JSON.stringify(this.meta.previews) === JSON.stringify(value)) {
-                    return;
-                }
-                const meta = this.meta;
-                meta.previews = value;
-                this.updateMeta(meta);
-            },
-        },
-
         fullScreenMode() {
             this.initEditor();
         },
@@ -462,9 +441,6 @@ export default {
             const id = uniqid();
             const deepCopy = JSON.parse(JSON.stringify(this.meta.defaults[handle]));
             const values = Object.assign({}, { type: handle }, deepCopy);
-            let previews = {};
-            Object.keys(this.meta.defaults[handle]).forEach((key) => (previews[key] = null));
-            this.previews = Object.assign({}, this.previews, { [id]: previews });
 
             this.updateSetMeta(id, this.meta.new[handle]);
 
@@ -487,9 +463,6 @@ export default {
             const deepCopy = JSON.parse(JSON.stringify(attrs.values));
             const values = Object.assign({}, deepCopy);
 
-            let previews = Object.assign({}, this.previews[old_id]);
-            this.previews = Object.assign({}, this.previews, { [id]: previews });
-
             this.updateSetMeta(id, this.meta.existing[old_id]);
 
             // Perform this in nextTick because the meta data won't be ready until then.
@@ -503,9 +476,6 @@ export default {
             const id = uniqid();
             const enabled = attrs.enabled;
             const values = Object.assign({}, attrs.values);
-
-            let previews = Object.assign({}, this.previews[old_id] || {});
-            this.previews = Object.assign({}, this.previews, { [id]: previews });
 
             this.updateSetMeta(id, this.meta.existing[old_id] || this.meta.defaults[values.type] || {});
 
@@ -833,7 +803,7 @@ export default {
                 Gapcursor,
                 History,
                 Paragraph,
-                Set.configure({ bard: this }),
+                Set.configure({ bard: this, foo: 'bar' }),
                 Text,
             ];
 
@@ -897,10 +867,6 @@ export default {
             });
 
             return exts;
-        },
-
-        updateSetPreviews(set, previews) {
-            this.previews[set] = previews;
         },
 
         ignorePageHeader(ignore) {

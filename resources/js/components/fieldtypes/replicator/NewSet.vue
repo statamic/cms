@@ -16,7 +16,8 @@ const replicatorSets = inject('replicatorSets');
 const props = defineProps({
     config: Object,
     id: String,
-    path: String,
+    fieldPath: String,
+    metaPath: String,
     index: Number,
     collapsed: Boolean,
     values: Object,
@@ -30,8 +31,8 @@ const props = defineProps({
 });
 
 const { store } = injectContainerContext();
-const pathPrefix = computed(() => `${props.path}.${props.index}`);
-const metaPathPrefix = computed(() => `${props.path}.existing.${props.id}`);
+const fieldPathPrefix = computed(() => `${props.fieldPath}.${props.index}`);
+const metaPathPrefix = computed(() => `${props.metaPath}.existing.${props.id}`);
 const isInvalid = computed(() => Object.keys(props.config).length === 0);
 
 const setGroup = computed(() => {
@@ -54,8 +55,8 @@ const fieldActionPayload = computed(() => ({
     values: props.values,
     config: props.config,
     // meta: this.meta,
-    update: (handle, value) => store.setDottedFieldValue({ path: `${pathPrefix.value}.${handle}`, value }),
-    updateMeta: (handle, value) => store.setDottedFieldMeta({ path: `${pathPrefix.value}.${handle}`, value }),
+    update: (handle, value) => store.setDottedFieldValue({ path: `${fieldPathPrefix.value}.${handle}`, value }),
+    updateMeta: (handle, value) => store.setDottedFieldMeta({ path: `${metaPathPrefix.value}.${handle}`, value }),
     isReadOnly: props.readOnly,
     // store: this.store,
     // storeName: this.storeName,
@@ -68,8 +69,9 @@ const fieldActions = computed(() => {
 });
 
 const previewText = computed(() => {
-    return Object.entries(data_get(store.previews, pathPrefix.value) || {})
+    return Object.entries(data_get(store.previews, fieldPathPrefix.value) || {})
         .filter(([handle, value]) => {
+            if (!handle.endsWith('_')) return false;
             handle = handle.substr(0, handle.length - 1); // Remove the trailing underscore.
             const config = props.config.fields.find((f) => f.handle === handle) || {};
             return config.replicator_preview === undefined ? props.showFieldPreviews : config.replicator_preview;
@@ -91,7 +93,7 @@ const previewText = computed(() => {
 });
 
 function toggleEnabledState() {
-    store.setDottedFieldValue({ path: `${pathPrefix.value}.enabled`, value: !props.enabled });
+    store.setDottedFieldValue({ path: `${fieldPathPrefix.value}.enabled`, value: !props.enabled });
 }
 
 function toggleCollapsedState() {
@@ -131,7 +133,7 @@ function destroy() {
                             {{ __(setGroup.display) }}
                             <Icon name="ui/chevron-right" class="relative top-px size-3" />
                         </span>
-                        {{ __(props.config.display) || config.handle }}
+                        {{ __(config.display) || config.handle }}
                     </Badge>
                     <Tooltip :markdown="__(config.instructions)">
                         <Icon
@@ -172,7 +174,11 @@ function destroy() {
                 :animate="{ height: collapsed ? '0px' : 'auto' }"
                 :transition="{ duration: 0.25, type: 'tween' }"
             >
-                <FieldsProvider :fields="config.fields" :path-prefix="pathPrefix" :meta-path-prefix="metaPathPrefix">
+                <FieldsProvider
+                    :fields="config.fields"
+                    :field-path-prefix="fieldPathPrefix"
+                    :meta-path-prefix="metaPathPrefix"
+                >
                     <Fields class="p-4" />
                 </FieldsProvider>
             </Motion>
