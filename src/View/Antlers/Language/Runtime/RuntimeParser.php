@@ -333,6 +333,8 @@ class RuntimeParser implements Parser
      */
     protected function renderText($text, $data = [])
     {
+        $text = $this->componentCompiler->compile($text);
+
         $this->parseStack += 1;
         $text = $this->runPreParserCallbacks($text);
 
@@ -716,8 +718,6 @@ INFO;
 
     public function parse($text, $data = [])
     {
-        $text = $this->componentCompiler->compile($text);
-
         if ($this->shouldIsolate()) {
             return $this->cloneRuntimeParser()->renderText($text, $data);
         }

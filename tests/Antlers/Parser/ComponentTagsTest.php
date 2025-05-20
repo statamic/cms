@@ -7,10 +7,12 @@ use Statamic\Facades\Collection;
 use Statamic\Tags\Tags;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 use Tests\Antlers\ParserTestCase;
+use Tests\FakesViews;
 
 class ComponentTagsTest extends ParserTestCase
 {
-    use PreventsSavingStacheItemsToDisk;
+    use FakesViews,
+        PreventsSavingStacheItemsToDisk;
 
     protected function setUp(): void
     {
@@ -26,6 +28,7 @@ class ComponentTagsTest extends ParserTestCase
                 ->data([
                     'title' => "Page: $i",
                 ])
+                ->slug('page-'.$i)
                 ->create();
         }
     }
@@ -112,5 +115,22 @@ RESULT;
             $expected,
             (string) str($this->renderString($template))->squish(),
         );
+    }
+
+    public function test_component_syntax_works_with_render_text_calls()
+    {
+        $this->withFakeViews();
+        $template = <<<'ANTLERS'
+Page Title: {{ title }}
+<s:collection:pages>{{ title }}.</s:collection:pages>
+ANTLERS;
+
+        $this->viewShouldReturnRaw('default', $template);
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+
+        $this->get('/page-1')
+            ->assertOk()
+            ->assertSee('Page Title: Page: 1')
+            ->assertSee('Page: 1.Page: 2.Page: 3.Page: 4.Page: 5.');
     }
 }
