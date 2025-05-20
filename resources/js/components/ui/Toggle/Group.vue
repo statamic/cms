@@ -51,15 +51,22 @@ const groupClasses = cva({
 })({
     notGhost: props.variant !== 'ghost',
 });
+
+function updateModelValue(value) {
+    if (value) {
+        emit('update:modelValue', value);
+    }
+}
 </script>
 
 <template>
     <WithField :label :description :required>
         <ToggleGroupRoot
-            v-model="toggleState"
             :type="multiple ? 'multiple' : 'single'"
             :class="groupClasses"
             data-ui-toggle-group
+            :model-value="toggleState"
+            @update:model-value="updateModelValue"
         >
             <slot />
         </ToggleGroupRoot>
