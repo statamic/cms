@@ -9,10 +9,16 @@
             <!-- Folders -->
             <section class="folder-grid-listing" v-if="folders.length || creatingFolder">
                 <div
-                    class="group/folder relative"
+                    data-folder
+                    v-if="!restrictFolderNavigation"
                     v-for="folder in folders"
                     :key="folder.path"
-                    v-if="!restrictFolderNavigation"
+                    class="group/folder relative"
+                    :draggable="true"
+                    @dragover.prevent
+                    @drop="handleDropOnFolder(folder)"
+                    @dragstart="draggingFolder = folder.path"
+                    @dragend="draggingFolder = null"
                 >
                     <Context>
                         <template #trigger>
@@ -69,7 +75,12 @@
                         <template #trigger>
                             <div class="asset-tile group relative" :class="{ 'bg-checkerboard': asset.can_be_transparent }">
                                 <button
+                                    data-asset
                                     class="size-full"
+                                    :draggable="true"
+                                    @dragover.prevent
+                                    @dragstart="draggingAsset = asset.id"
+                                    @dragend="draggingAsset = null"
                                     @click.stop="toggleSelection(asset.id, index, $event)"
                                     @dblclick.stop="$emit('edit-asset', asset)"
                                 >
@@ -141,6 +152,7 @@ import { Context, ContextMenu, ContextItem, ContextLabel, ContextSeparator, Edit
 
 export default {
     mixins: [AssetBrowserMixin],
+
     components: {
         ContextItem,
         ContextLabel,
@@ -154,6 +166,7 @@ export default {
         EditableRoot,
         Breadcrumbs,
     },
+
     props: {
         assets: { type: Array },
         selectedAssets: { type: Array },
@@ -165,6 +178,8 @@ export default {
             actionOpened: null,
             thumbnailSize: 200,
             newFolderName: null,
+            draggingAsset: null,
+            draggingFolder: null,
         };
     },
 
@@ -213,6 +228,50 @@ export default {
 
         clearNewFolderName() {
             this.newFolderName = null;
+        },
+
+        handleDropOnFolder(destinationFolder) {
+            if (this.draggingAsset) {
+                let asset = this.assets.find((asset) => asset.id === this.draggingAsset);
+                let action = asset.actions.find((action) => action.handle === 'move_asset');
+
+                if (!action) {
+                    return;
+                }
+
+                const payload = {
+                    action: action.handle,
+                    context: action.context,
+                    selections: [this.draggingAsset],
+                    values: { folder: destinationFolder.path },
+                };
+
+                this.$axios
+                    .post(this.actionUrl, payload)
+                    .then(response => this.$emit('action-completed', true, response))
+                    .finally(() => this.draggingAsset = null);
+            }
+
+            if (this.draggingFolder) {
+                let folder = this.folders.find((folder) => folder.path === this.draggingFolder);
+                let action = folder.actions.find((action) => action.handle === 'move_asset_folder');
+
+                if (!action) {
+                    return;
+                }
+
+                const payload = {
+                    action: action.handle,
+                    context: action.context,
+                    selections: [this.draggingFolder],
+                    values: { folder: destinationFolder.path },
+                };
+
+                this.$axios
+                    .post(this.folderActionUrl, payload)
+                    .then(response => this.$emit('action-completed', true, response))
+                    .finally(() => this.draggingFolder = null);
+            }
         },
     },
 };
