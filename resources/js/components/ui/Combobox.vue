@@ -21,7 +21,7 @@ const emit = defineEmits(['update:modelValue', 'search']);
 const props = defineProps({
     description: { type: String, default: null },
     label: { type: String, default: null },
-    modelValue: { type: [Object, String], default: null },
+    modelValue: { type: [Object, String, Number], default: null },
     size: { type: String, default: 'base' },
     placeholder: { type: String, default: 'Select...' },
     multiple: { type: Boolean, default: false },

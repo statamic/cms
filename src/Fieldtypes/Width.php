@@ -23,6 +23,13 @@ class Width extends Fieldtype
                         'type' => 'list',
                         'default' => [25, 33, 50, 66, 75, 100],
                     ],
+                    'size' => [
+                        'display' => __('Size'),
+                        'instructions' => __('statamic::fieldtypes.width.config.size'),
+                        'type' => 'select',
+                        'options' => ['base' => 'Base', 'lg' => 'Large'],
+                        'default' => 'lg',
+                    ],
                     'default' => [
                         'display' => __('Default Value'),
                         'instructions' => __('statamic::messages.fields_default_instructions'),
