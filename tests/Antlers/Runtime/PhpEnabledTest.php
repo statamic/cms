@@ -2,9 +2,13 @@
 
 namespace Tests\Antlers\Runtime;
 
+use Illuminate\Support\Facades\Log;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
+use Statamic\Fieldtypes\Text;
+use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 use Statamic\View\Antlers\Language\Runtime\RuntimeConfiguration;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Tests\Antlers\ParserTestCase;
@@ -632,5 +636,77 @@ EOT;
             $expected,
             $this->renderString($template, ['title' => 'The Original Title']),
         );
+    }
+
+    public function test_disabled_php_echo_node_inside_user_values()
+    {
+        $textFieldtype = new Text();
+        $field = new Field('text_field', [
+            'type' => 'text',
+            'antlers' => true,
+        ]);
+
+        $textContent = <<<'TEXT'
+Text: {{$ Str::upper('hello, world.') $}}
+TEXT;
+
+        $textFieldtype->setField($field);
+        $value = new Value($textContent, 'text_field', $textFieldtype);
+
+        Log::shouldReceive('warning')
+            ->once()
+            ->with("PHP Node evaluated in user content: {{\$ Str::upper('hello, world.') \$}}", [
+                'file' => null,
+                'trace' => [],
+                'content' => " Str::upper('hello, world.') ",
+            ]);
+
+        $result = $this->renderString('{{ text_field }}', ['text_field' => $value]);
+
+        $this->assertSame('Text: ', $result);
+
+        GlobalRuntimeState::$allowPhpInContent = true;
+
+        $result = $this->renderString('{{ text_field }}', ['text_field' => $value]);
+
+        $this->assertSame('Text: HELLO, WORLD.', $result);
+
+        GlobalRuntimeState::$allowPhpInContent = false;
+    }
+
+    public function test_disabled_php_node_inside_user_values()
+    {
+        $textFieldtype = new Text();
+        $field = new Field('text_field', [
+            'type' => 'text',
+            'antlers' => true,
+        ]);
+
+        $textContent = <<<'TEXT'
+Text: {{? echo Str::upper('hello, world.') ?}}
+TEXT;
+
+        $textFieldtype->setField($field);
+        $value = new Value($textContent, 'text_field', $textFieldtype);
+
+        Log::shouldReceive('warning')
+            ->once()
+            ->with("PHP Node evaluated in user content: {{? echo Str::upper('hello, world.') ?}}", [
+                'file' => null,
+                'trace' => [],
+                'content' => " echo Str::upper('hello, world.') ",
+            ]);
+
+        $result = $this->renderString('{{ text_field }}', ['text_field' => $value]);
+
+        $this->assertSame('Text: ', $result);
+
+        GlobalRuntimeState::$allowPhpInContent = true;
+
+        $result = $this->renderString('{{ text_field }}', ['text_field' => $value]);
+
+        $this->assertSame('Text: HELLO, WORLD.', $result);
+
+        GlobalRuntimeState::$allowPhpInContent = false;
     }
 }

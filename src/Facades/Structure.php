@@ -13,7 +13,7 @@ use Statamic\Contracts\Structures\StructureRepository;
  * @method static void delete(Structure $structure)
  *
  * @see \Statamic\Contracts\Structures\StructureRepository
- * @see \Statamic\Structures\Structure
+ * @link \Statamic\Structures\Structure
  */
 class Structure extends Facade
 {

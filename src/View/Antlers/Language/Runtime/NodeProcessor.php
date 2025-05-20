@@ -1218,7 +1218,9 @@ class NodeProcessor
                                 'User content Antlers PHP tag.'
                             );
                         } else {
-                            Log::warning('PHP Node evaluated in user content: '.$node->name->name, [
+                            $logContent = $node->rawStart.$node->innerContent().$node->rawEnd;
+
+                            Log::warning('PHP Node evaluated in user content: '.$logContent, [
                                 'file' => GlobalRuntimeState::$currentExecutionFile,
                                 'trace' => GlobalRuntimeState::$templateFileStack,
                                 'content' => $node->innerContent(),
@@ -2456,7 +2458,7 @@ class NodeProcessor
 
     protected function evaluateAntlersPhpNode(PhpExecutionNode $___node)
     {
-        if (! GlobalRuntimeState::$allowPhpInContent == false && GlobalRuntimeState::$isEvaluatingUserData) {
+        if (! GlobalRuntimeState::$allowPhpInContent && GlobalRuntimeState::$isEvaluatingUserData) {
             return StringUtilities::sanitizePhp($___node->content);
         }
 
