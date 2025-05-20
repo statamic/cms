@@ -1,19 +1,35 @@
 <template>
     <div class="min-h-screen" ref="browser" @keydown.shift="shiftDown" @keyup="clearShift">
         <Header :title="__(container.title)" icon="assets">
-            <dropdown-list v-if="container.can_edit || container.can_delete || container.can_create">
-                <dropdown-item v-if="canCreateContainers" v-text="__('Create Container')" :redirect="createContainerUrl" />
-                <dropdown-item v-if="container.can_edit" v-text="__('Edit Container')" :redirect="container.edit_url" />
-                <dropdown-item v-text="__('Edit Blueprint')" :redirect="container.blueprint_url" />
-                <dropdown-item v-if="container.can_delete" class="warning" @click="$refs.deleter.confirm()">
-                    {{ __('Delete Container') }}
-                    <resource-deleter
-                        ref="deleter"
-                        :resource-title="__(container.title)"
-                        :route="container.delete_url"
+            <Dropdown v-if="container.can_edit || container.can_delete || container.can_create">
+                <DropdownMenu>
+                    <DropdownItem
+                        v-if="canCreateContainers"
+                        :text="__('Create Container')"
+                        :href="createContainerUrl"
                     />
-                </dropdown-item>
-            </dropdown-list>
+                    <DropdownItem
+                        v-if="container.can_edit"
+                        :text="__('Edit Container')"
+                        :href="container.edit_url"
+                    />
+                    <DropdownItem
+                        :text="__('Edit Blueprint')"
+                        :href="container.blueprint_url"
+                    />
+                    <DropdownItem
+                        v-if="container.can_delete"
+                        :text="__('Delete Container')"
+                        @click="$event.preventDefault(); $refs.deleter.confirm()"
+                    />
+                </DropdownMenu>
+            </Dropdown>
+
+            <resource-deleter
+                ref="deleter"
+                :resource-title="__(container.title)"
+                :route="container.delete_url"
+            />
 
             <Button v-if="canUpload" :text="__('Upload')" icon="upload" @click="openFileBrowser" />
             <Button v-if="canCreateFolders" :text="__('Create Folder')" icon="folder-add" @click="creatingFolder = true" />
@@ -152,12 +168,12 @@ import Uploader from '../Uploader.vue';
 import Uploads from '../Uploads.vue';
 import HasActions from '../../data-list/HasActions';
 import { keyBy, sortBy } from 'lodash-es';
-import { Header, Button } from '@statamic/ui';
+import { Header, Button, Dropdown, DropdownItem, DropdownMenu } from '@statamic/ui';
 
 export default {
     mixins: [HasActions, HasPagination, HasPreferences],
 
-    components: { AssetThumbnail, AssetEditor, Uploader, Uploads, Grid, Table, Header, Button },
+    components: { DropdownMenu, DropdownItem, Dropdown, AssetThumbnail, AssetEditor, Uploader, Uploads, Grid, Table, Header, Button },
 
     props: {
         allowSelectingExistingUpload: Boolean,
