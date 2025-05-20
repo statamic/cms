@@ -48,7 +48,6 @@ export default {
             window.history.replaceState({ container: { ...this.container }, path: this.path }, '');
 
             window.onpopstate = (e) => {
-                this.container = e.state.container;
                 this.path = e.state.path;
             };
         },
