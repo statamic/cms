@@ -7,7 +7,7 @@
 
         <ui-card class="space-y-8">
             <!-- Folders -->
-            <section class="folder-grid-listing" v-if="folders.length">
+            <section class="folder-grid-listing" v-if="folders.length || creatingFolder">
                 <div
                     class="group/folder relative"
                     v-for="folder in folders"
