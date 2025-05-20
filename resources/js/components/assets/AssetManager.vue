@@ -18,7 +18,7 @@
 <script>
 export default {
     props: {
-        initialContainer: Object,
+        container: Object,
         initialPath: String,
         initialEditingAssetId: String,
         actions: Array,
@@ -28,7 +28,6 @@ export default {
 
     data() {
         return {
-            container: this.initialContainer,
             path: this.initialPath,
             selectedAssets: [],
         };
