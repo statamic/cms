@@ -86,7 +86,7 @@
 <script>
 import Fieldtype from '../Fieldtype.vue';
 import uniqid from 'uniqid';
-import ReplicatorSet from './NewSet.vue';
+import ReplicatorSet from './Set.vue';
 import AddSetButton from './AddSetButton.vue';
 import ManagesSetMeta from './ManagesSetMeta';
 import { SortableList } from '../../sortable/Sortable';
