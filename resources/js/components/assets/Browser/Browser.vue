@@ -146,6 +146,8 @@
             v-if="showAssetEditor"
             :id="editedAssetId"
             :read-only="!canEdit"
+            @previous="editPreviousAsset"
+            @next="editNextAsset"
             @closed="closeAssetEditor"
             @saved="assetSaved"
         />
@@ -385,18 +387,72 @@ export default {
             this.loadAssets();
         },
 
-        assetDeleted() {
-            this.closeAssetEditor();
-            this.loadAssets();
-        },
-
         assetSaved() {
-            this.closeAssetEditor();
             this.loadAssets();
         },
 
         clearShift() {
             this.shifting = false;
+        },
+
+        async editPreviousAsset() {
+            let currentAssetIndex = this.assets.findIndex((asset) => asset.id === this.editedAssetId);
+
+            // When we're editing the first asset on the page, navigating to the previous asset
+            // requires us to load the previous page of assets, if there is one.
+            if (currentAssetIndex === 0) {
+                if (this.page > 1) {
+                    this.page = this.page - 1;
+                    await this.loadAssets();
+
+                    if (this.assets.length > 0) {
+                        this.editedAssetId = null;
+
+                        this.$nextTick(() => {
+                            this.editedAssetId = this.assets.slice(-1)[0].id;
+                        });
+                    }
+                }
+
+                this.editedAssetId = null;
+                return;
+            }
+
+            this.editedAssetId = null;
+
+            this.$nextTick(() => {
+                this.editedAssetId = this.assets.slice(currentAssetIndex - 1, currentAssetIndex)[0].id;
+            });
+        },
+
+        async editNextAsset() {
+            let currentAssetIndex = this.assets.findIndex((asset) => asset.id === this.editedAssetId);
+
+            // When we're editing the last asset on the page, navigating to the next asset
+            // requires us to load the next page of assets, if there is one.
+            if (currentAssetIndex === this.assets.length - 1) {
+                if (this.meta.last_page > this.page) {
+                    this.page = this.page + 1;
+                    await this.loadAssets();
+
+                    if (this.assets.length > 0) {
+                        this.editedAssetId = null;
+
+                        this.$nextTick(() => {
+                            this.editedAssetId = this.assets[0].id;
+                        });
+                    }
+                }
+
+                this.editedAssetId = null;
+                return;
+            }
+
+            this.editedAssetId = null;
+
+            this.$nextTick(() => {
+                this.editedAssetId = this.assets.slice(currentAssetIndex + 1, currentAssetIndex + 2)[0].id;
+            });
         },
 
         closeAssetEditor() {
@@ -461,7 +517,7 @@ export default {
                   ).replace(/\/$/, '')
                 : cp_url(`assets/browse/folders/${this.container.id}/${this.path || ''}`).replace(/\/$/, '');
 
-            this.$axios
+            return this.$axios
                 .get(url, { params: this.parameters })
                 .then((response) => {
                     const data = response.data;

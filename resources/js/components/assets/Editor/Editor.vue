@@ -260,7 +260,7 @@
                         <button type="button" class="btn" @click="close">
                             {{ __('Cancel') }}
                         </button>
-                        <button type="button" class="btn-primary" @click="save" v-if="!readOnly">
+                        <button type="button" class="btn-primary" @click="saveAndClose" v-if="!readOnly">
                             {{ __('Save') }}
                         </button>
                     </div>
@@ -296,7 +296,7 @@ import HasHiddenFields from '../../publish/HasHiddenFields';
 import { pick, flatten } from 'lodash-es';
 
 export default {
-    emits: ['saved', 'closed', 'action-completed'],
+    emits: ['previous', 'next', 'saved', 'closed', 'action-completed'],
 
     mixins: [HasHiddenFields],
 
@@ -392,6 +392,12 @@ export default {
 
     mounted() {
         this.load();
+
+        window.addEventListener('keydown', this.keydown);
+    },
+
+    beforeUnmount() {
+        window.removeEventListener('keydown', this.keydown);
     },
 
     events: {
@@ -450,6 +456,18 @@ export default {
             });
         },
 
+        keydown(event) {
+            if ((event.metaKey || event.ctrlKey) && event.key === 'ArrowLeft') {
+                this.save();
+                this.$emit('previous');
+            }
+
+            if ((event.metaKey || event.ctrlKey) && event.key === 'ArrowRight') {
+                this.save();
+                this.$emit('next');
+            }
+        },
+
         openFocalPointEditor() {
             this.showFocalPointEditor = true;
         },
@@ -462,6 +480,13 @@ export default {
             point = point === '50-50-1' ? null : point;
             this.values['focus'] = point;
             this.$dirty.add(this.publishContainer);
+        },
+
+        // We only want to close when clicking the save button, not when saving when navigating between prev/next assets.
+        // TODO: Can likely be refactored when we implement the new publish form components.
+        saveAndClose() {
+            this.save();
+            this.close();
         },
 
         save() {
