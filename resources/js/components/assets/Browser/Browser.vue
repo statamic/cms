@@ -93,10 +93,7 @@
                                 v-on="sharedAssetEvents"
                                 :columns="columns"
                                 :loading="loading"
-                                :mode="mode"
                                 @sorted="sorted"
-                                @create-folder="createFolder"
-                                @cancel-creating-folder="creatingFolder = false"
                             />
 
                             <!-- Grid Mode -->
@@ -107,8 +104,6 @@
                                 v-on="sharedAssetEvents"
                                 :assets="assets"
                                 :selected-assets="selectedAssets"
-                                @create-folder="createFolder"
-                                @cancel-creating-folder="creatingFolder = false"
                                 @toggle-selection="toggleSelection"
                             >
                                 <template #footer>
@@ -315,6 +310,8 @@ export default {
                 'edit': this.edit,
                 'edit-asset': (event) => this.$emit('edit-asset', event),
                 'select-folder': this.selectFolder,
+                'create-folder': this.createFolder,
+                'cancel-creating-folder': () => (this.creatingFolder = false),
             };
         },
     },
