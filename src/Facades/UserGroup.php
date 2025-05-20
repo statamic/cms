@@ -14,7 +14,7 @@ use Statamic\Contracts\Auth\UserGroupRepository;
  * @method static \Statamic\Fields\Blueprint blueprint()
  *
  * @see \Statamic\Contracts\Auth\UserGroupRepository
- * @see \Statamic\Auth\UserGroup
+ * @link \Statamic\Auth\UserGroup
  */
 class UserGroup extends Facade
 {

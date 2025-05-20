@@ -42,6 +42,7 @@ class StaticWarm extends Command
         {--include= : Only warm specific URLs}
         {--exclude= : Exclude specific URLs}
         {--max-requests= : Maximum number of requests to warm}
+        {--header=* : Set custom header (e.g. "Authorization: Bearer your_token")}
     ';
 
     protected $description = 'Warms the static cache by visiting all URLs';
@@ -167,8 +168,10 @@ class StaticWarm extends Command
 
     private function requests()
     {
-        return $this->uris()->map(function ($uri) {
-            return new Request('GET', $uri);
+        $headers = $this->parseHeaders($this->option('header'));
+
+        return $this->uris()->map(function ($uri) use ($headers) {
+            return new Request('GET', $uri, $headers);
         })->all();
     }
 
@@ -373,5 +376,26 @@ class StaticWarm extends Command
         $this->line("\x1B[1A\x1B[2K<info>[✔]</info> Additional");
 
         return $uris->map(fn ($uri) => URL::makeAbsolute($uri));
+    }
+
+    private function parseHeaders($headerOptions): array
+    {
+        $headers = [];
+        if (empty($headerOptions)) {
+            return $headers;
+        }
+        if (! is_array($headerOptions)) {
+            $headerOptions = [$headerOptions];
+        }
+        foreach ($headerOptions as $header) {
+            if (strpos($header, ':') !== false) {
+                [$key, $value] = explode(':', $header, 2);
+                $headers[trim($key)] = trim($value);
+            } else {
+                $this->line("<fg=yellow;options=bold>Warning:</> Invalid header format: '$header'. Headers should be in 'Key: Value' format.");
+            }
+        }
+
+        return $headers;
     }
 }

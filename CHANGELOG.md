@@ -1,5 +1,22 @@
 # Release Notes
 
+## 5.56.0 (2025-05-20)
+
+### What's new
+- Add `moveQuietly` method to `Asset` class [#11804](https://github.com/statamic/cms/issues/11804) by @duncanmcclean
+- Add --header option to static warm command [#11763](https://github.com/statamic/cms/issues/11763) by @ChristianPraiss
+
+### What's fixed
+- Fix values being wrapped in arrays causing multiple selected options  [#11630](https://github.com/statamic/cms/issues/11630) by @simonworkhouse
+- Hide read only and computed fields in user creation wizard [#11635](https://github.com/statamic/cms/issues/11635) by @duncanmcclean
+- Fix storing submissions of forms with 'files' fieldtypes even when disabled [#11794](https://github.com/statamic/cms/issues/11794) by @andjsch
+- Corrects Antlers error logging with PHP nodes [#11800](https://github.com/statamic/cms/issues/11800) by @JohnathonKoster
+- Fix facade PhpDocs for better understanding by Laravel Idea [#11798](https://github.com/statamic/cms/issues/11798) by @adelf
+- Correct issue with nested noparse and partials [#11801](https://github.com/statamic/cms/issues/11801) by @JohnathonKoster
+- Prepare value & operator before passing to Eloquent Query Builder [#11805](https://github.com/statamic/cms/issues/11805) by @duncanmcclean
+
+
+
 ## 5.55.0 (2025-05-14)
 
 ### What's new
