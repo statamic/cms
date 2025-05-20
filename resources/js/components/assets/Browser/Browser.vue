@@ -165,7 +165,7 @@ export default {
         autoselectUploads: Boolean,
         canCreateContainers: Boolean,
         createContainerUrl: String,
-        initialContainer: Object,
+        container: Object,
         initialEditingAssetId: String,
         maxFiles: Number,
         queryScopes: Array,
@@ -188,7 +188,6 @@ export default {
                 },
             ],
             containers: [],
-            container: {},
             initializing: true,
             loading: true,
             assets: [],
@@ -202,8 +201,8 @@ export default {
             page: 1,
             preferencesPrefix: null,
             meta: {},
-            sortColumn: this.initialContainer.sort_field,
-            sortDirection: this.initialContainer.sort_direction,
+            sortColumn: this.container.sort_field,
+            sortDirection: this.container.sort_direction,
             mode: 'table',
             actionUrl: null,
             folderActionUrl: null,
@@ -215,7 +214,7 @@ export default {
 
     computed: {
         actionContext() {
-            return { container: this.selectedContainer };
+            return { container: this.container.id };
         },
 
         canCreateFolders() {
@@ -276,10 +275,6 @@ export default {
             return this.selectedAssets.length >= this.maxFiles;
         },
 
-        selectedContainer() {
-            return typeof this.initialContainer === 'object' ? this.initialContainer.id : this.initialContainer;
-        },
-
         showAssetEditor() {
             return Boolean(this.editedAssetId);
         },
@@ -309,13 +304,17 @@ export default {
         },
     },
 
-    mounted() {
-        this.loadContainers();
-    },
-
     created() {
         this.$events.$on('editor-action-started', this.actionStarted);
         this.$events.$on('editor-action-completed', this.actionCompleted);
+    },
+
+    mounted() {
+        this.initializing = true;
+        this.preferencesPrefix = `assets.${this.container.id}`;
+        this.mode = this.getPreference('mode') || 'table';
+        this.setInitialPerPage();
+        this.loadAssets();
     },
 
     unmounted() {
@@ -324,14 +323,6 @@ export default {
     },
 
     watch: {
-        container(container) {
-            this.initializing = true;
-            this.preferencesPrefix = `assets.${container.id}`;
-            this.mode = this.getPreference('mode') || 'table';
-            this.setInitialPerPage();
-            this.loadAssets();
-        },
-
         mode(mode) {
             this.setPreference('mode', mode == 'table' ? null : mode);
         },
@@ -342,10 +333,6 @@ export default {
                 : this.path;
 
             this.$emit('navigated', this.container, path);
-        },
-
-        initialContainer() {
-            this.container = this.initialContainer;
         },
 
         initializing(isInitializing, wasInitializing) {
@@ -489,13 +476,6 @@ export default {
                     this.loading = false;
                     this.initializing = false;
                 });
-        },
-
-        loadContainers() {
-            this.$axios.get(cp_url('asset-containers')).then((response) => {
-                this.containers = keyBy(response.data, 'id');
-                this.container = this.containers[this.selectedContainer];
-            });
         },
 
         openFileBrowser() {

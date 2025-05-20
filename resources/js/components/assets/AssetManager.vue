@@ -3,7 +3,7 @@
         ref="browser"
         :can-create-containers="canCreateContainers"
         :create-container-url="createContainerUrl"
-        :initial-container="container"
+        :container="container"
         :initial-per-page="$config.get('paginationSize')"
         :initial-editing-asset-id="initialEditingAssetId"
         :selected-path="path"
