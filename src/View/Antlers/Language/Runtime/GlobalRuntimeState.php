@@ -216,6 +216,7 @@ class GlobalRuntimeState
 
     public static function resetGlobalState()
     {
+        self::$templateFileStack = [];
         self::$shareVariablesTemplateTrigger = '';
         self::$layoutVariables = [];
         self::$containsLayout = false;
