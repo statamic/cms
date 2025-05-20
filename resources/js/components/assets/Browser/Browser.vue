@@ -224,7 +224,6 @@ export default {
             folderActionUrl: null,
             shifting: false,
             lastItemClicked: null,
-            actionOpened: null,
         };
     },
 

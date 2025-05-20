@@ -161,6 +161,7 @@ export default {
 
     data() {
         return {
+            actionOpened: null,
             thumbnailSize: 200,
             newFolderName: null,
         };
