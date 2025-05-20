@@ -22,7 +22,7 @@ use Statamic\Contracts\Entries\CollectionRepository;
  * @method static \Illuminate\Support\Collection getComputedCallbacks($collection)
  *
  * @see CollectionRepository
- * @see \Statamic\Entries\Collection
+ * @link \Statamic\Entries\Collection
  */
 class Collection extends Facade
 {
