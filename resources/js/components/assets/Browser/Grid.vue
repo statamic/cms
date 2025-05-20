@@ -170,13 +170,13 @@ export default {
     watch: {
         thumbnailSize: {
             handler: debounce(function(size) {
-                this.$preferences.set('asset-browser-thumbnail-size', size);
+                this.$preferences.set('assets.browser_thumbnail_size', size);
             }, 300)
         }
     },
 
     mounted() {
-        const savedSize = this.$preferences.get('asset-browser-thumbnail-size');
+        const savedSize = this.$preferences.get('assets.browser_thumbnail_size');
         if (savedSize) this.thumbnailSize = savedSize;
     },
 
