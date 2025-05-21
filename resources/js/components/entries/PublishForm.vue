@@ -610,7 +610,7 @@ export default {
                         this.trackDirtyState = false
                         this.values = this.resetValuesFromResponse(response.data.data.values);
                         this.extraValues = response.data.data.extraValues;
-                        this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500)
+                        this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 1000)
                         this.$nextTick(() => this.$emit('saved', response));
                         return;
                     }
