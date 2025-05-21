@@ -28,7 +28,7 @@ function confirmAction(action) {
 function runAction(action, values, done) {
     emit('started');
 
-    runServerAction({ url: props.url, selections: [props.item], action, values, done })
+    runServerAction({ action, values, done, url: props.url, selections: [props.item] })
         .then(data => emit('completed', true, data))
         .catch(data => emit('completed', false, data));
 }
