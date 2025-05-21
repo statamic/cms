@@ -14,7 +14,11 @@ export default {
         },
 
         fieldPathPrefix() {
-            return this.grid.fieldPathPrefix || this.grid.handle;
+            return this.grid.fieldPathPrefix ? `${this.grid.fieldPathPrefix}.${this.grid.handle}` : this.grid.handle;
+        },
+
+        metaPathPrefix() {
+            return this.grid.metaPathPrefix ? `${this.grid.metaPathPrefix}.${this.grid.handle}` : this.grid.handle;
         },
     },
 

@@ -140,6 +140,7 @@ class UsersController extends CpController
 
         $additional = $fields->all()
             ->reject(fn ($field) => in_array($field->handle(), ['roles', 'groups', 'super']))
+            ->reject(fn ($field) => in_array($field->visibility(), ['read_only', 'computed']))
             ->keys();
 
         $viewData = [

@@ -1,6 +1,6 @@
 <script setup>
 import { useAttrs } from 'vue';
-import { WithField, Combobox } from '@statamic/ui';
+import { Combobox } from '@statamic/ui';
 
 const emit = defineEmits(['update:modelValue']);
 
@@ -26,18 +26,16 @@ const attrs = useAttrs();
 </script>
 
 <template>
-    <WithField :label :description>
-        <Combobox
-            v-bind="attrs"
-            :size
-            :clearable
-            :disabled
-            :option-label
-            :option-value
-            :options
-            :searchable="false"
-            :model-value="modelValue"
-            @update:modelValue="emit('update:modelValue', $event)"
-        />
-    </WithField>
+    <Combobox
+        v-bind="attrs"
+        :size
+        :clearable
+        :disabled
+        :option-label
+        :option-value
+        :options
+        :searchable="false"
+        :model-value="modelValue"
+        @update:modelValue="emit('update:modelValue', $event)"
+    />
 </template>

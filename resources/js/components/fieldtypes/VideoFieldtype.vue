@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col space-y-3">
+    <div class="flex flex-col space-y-3 p-1.5 bg-gray-100 border border-gray-300 dark:bg-gray-900 dark:border-gray-700 rounded-xl">
         <ui-input-group>
             <ui-input-group-prepend :text="__('URL')" />
             <ui-input

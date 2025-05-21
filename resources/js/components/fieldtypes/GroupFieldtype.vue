@@ -10,31 +10,14 @@
                 >
                 </publish-field-fullscreen-header>
                 <section :class="{ 'mt-14 p-4': fullScreenMode }">
-                    <div :class="{ 'replicator-set rounded-sm border shadow-sm dark:border-dark-900': config.border }">
-                        <div
-                            class="publish-fields @container"
-                            :class="{ 'replicator-set-body': config.border, '-mx-4': !config.border }"
+                    <div :class="{ 'replicator-set dark:border-dark-900 rounded-sm border shadow-sm': config.border }">
+                        <FieldsProvider
+                            :fields="fields"
+                            :field-path-prefix="fieldPathPrefix || handle"
+                            :meta-path-prefix="metaPathPrefix || handle"
                         >
-                            <set-field
-                                v-for="field in fields"
-                                :key="field.handle"
-                                v-show="showField(field, fieldPath(field.handle))"
-                                :field="field"
-                                :meta="meta[field.handle]"
-                                :value="value[field.handle]"
-                                :parent-name="name"
-                                :set-index="0"
-                                :errors="errors(field.handle)"
-                                :field-path="fieldPath(field.handle)"
-                                :read-only="isReadOnly"
-                                :show-field-previews="config.replicator_preview"
-                                @updated="updated(field.handle, $event)"
-                                @meta-updated="updateMeta(field.handle, $event)"
-                                @focus="$emit('focus')"
-                                @blur="$emit('blur')"
-                                @replicator-preview-updated="previewUpdated(field.handle, $event)"
-                            />
-                        </div>
+                            <Fields class="p-4" />
+                        </FieldsProvider>
                     </div>
                 </section>
             </div>
@@ -56,19 +39,19 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import SetField from './replicator/Field.vue';
 import { ValidatesFieldConditions } from '../field-conditions/FieldConditions.js';
 import ManagesPreviewText from './replicator/ManagesPreviewText';
+import Fields from '@statamic/components/ui/Publish/Fields.vue';
+import FieldsProvider from '@statamic/components/ui/Publish/FieldsProvider.vue';
 
 export default {
     mixins: [Fieldtype, ValidatesFieldConditions, ManagesPreviewText],
-    components: { SetField },
+    components: { Fields, FieldsProvider },
     data() {
         return {
             containerWidth: null,
             focused: false,
             fullScreenMode: false,
-            previews: {},
             provide: {
                 group: this.makeGroupProvide(),
             },
@@ -84,6 +67,9 @@ export default {
         },
         fields() {
             return this.config.fields;
+        },
+        previews() {
+            return data_get(this.store.previews, this.fieldPathPrefix || this.handle) || {};
         },
         replicatorPreview() {
             if (!this.showFieldPreviews || !this.config.replicator_preview) return;
@@ -150,10 +136,6 @@ export default {
 
         updateMeta(handle, value) {
             this.$emit('meta-updated', { ...this.meta, [handle]: value });
-        },
-
-        previewUpdated(handle, value) {
-            this.previews = { ...this.previews, [handle]: value };
         },
 
         fieldPath(handle) {

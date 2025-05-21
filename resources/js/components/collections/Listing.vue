@@ -1,5 +1,17 @@
 <template>
-    <div class="@container/collections flex flex-wrap py-2 gap-y-6 -mx-3">
+    <ui-header :title="__('Collections')" icon="collections">
+        <ui-toggle-group v-model="mode">
+            <ui-toggle-item icon="layout-grid" value="grid" />
+            <ui-toggle-item icon="layout-list" value="table" />
+        </ui-toggle-group>
+        <ui-button
+            :href="createUrl"
+            :text="__('Create Collection')"
+            variant="primary"
+            v-if="canCreateCollections"
+        />
+    </ui-header>
+    <div class="@container/collections flex flex-wrap py-2 gap-y-6 -mx-3" v-if="mode === 'grid'">
         <div v-for="collection in items" class="w-full @4xl:w-1/2 px-3">
             <ui-panel>
                 <ui-panel-header class="flex items-center justify-between">
@@ -82,42 +94,43 @@
         </div>
     </div>
 
-        <!-- <data-list ref="dataList" :columns="columns" :rows="items">
-            <data-list-table>
-                <template #cell-title="{ row: collection }">
-                    <a :href="collection.available_in_selected_site ? collection.entries_url : collection.edit_url">{{
-                        __(collection.title)
-                    }}</a>
-                </template>
-                <template #actions="{ row: collection, index }">
-                    <dropdown-list placement="left-start">
-                        <dropdown-item :text="__('View')" :redirect="collection.entries_url" />
-                        <dropdown-item v-if="collection.url" :text="__('Visit URL')" :external-link="collection.url" />
-                        <dropdown-item
-                            v-if="collection.editable"
-                            :text="__('Edit Collection')"
-                            :redirect="collection.edit_url"
-                        />
-                        <dropdown-item
-                            v-if="collection.blueprint_editable"
-                            :text="__('Edit Blueprints')"
-                            :redirect="collection.blueprints_url"
-                        />
-                        <dropdown-item
-                            v-if="collection.editable"
-                            :text="__('Scaffold Views')"
-                            :redirect="collection.scaffold_url"
-                        />
-                        <data-list-inline-actions
-                            :item="collection.id"
-                            :url="collection.actions_url"
-                            :actions="collection.actions"
-                            @completed="actionCompleted"
-                        ></data-list-inline-actions>
-                    </dropdown-list>
-                </template>
-            </data-list-table>
-    </data-list> -->
+    <data-list ref="dataList" :columns="columns" :rows="items" v-if="mode === 'table'">
+        <data-list-table>
+            <template #cell-title="{ row: collection }">
+                <a :href="collection.available_in_selected_site ? collection.entries_url : collection.edit_url" class="flex items-center gap-2">
+                    <ui-icon :name="collection.icon || 'collections'" />
+                    {{ __(collection.title) }}
+                </a>
+            </template>
+            <template #actions="{ row: collection, index }">
+                <dropdown-list placement="left-start">
+                    <dropdown-item :text="__('View')" :redirect="collection.entries_url" />
+                    <dropdown-item v-if="collection.url" :text="__('Visit URL')" :external-link="collection.url" />
+                    <dropdown-item
+                        v-if="collection.editable"
+                        :text="__('Edit Collection')"
+                        :redirect="collection.edit_url"
+                    />
+                    <dropdown-item
+                        v-if="collection.blueprint_editable"
+                        :text="__('Edit Blueprints')"
+                        :redirect="collection.blueprints_url"
+                    />
+                    <dropdown-item
+                        v-if="collection.editable"
+                        :text="__('Scaffold Views')"
+                        :redirect="collection.scaffold_url"
+                    />
+                    <data-list-inline-actions
+                        :item="collection.id"
+                        :url="collection.actions_url"
+                        :actions="collection.actions"
+                        @completed="actionCompleted"
+                    ></data-list-inline-actions>
+                </dropdown-list>
+            </template>
+        </data-list-table>
+    </data-list>
 </template>
 
 <script>
@@ -130,6 +143,8 @@ export default {
     components: { CardPanel, StatusIndicator, Badge },
 
     props: {
+        canCreateCollections: Boolean,
+        createUrl: String,
         initialRows: Array,
         initialColumns: Array,
     },
@@ -138,8 +153,9 @@ export default {
         return {
             initializedRequest: false,
             items: this.initialRows,
+            columns: this.initialColumns,
             requestUrl: cp_url(`collections`),
-            mode: 'grid',
+            mode: 'table',
         };
     },
 

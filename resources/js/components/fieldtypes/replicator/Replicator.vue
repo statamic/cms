@@ -7,7 +7,7 @@
             <div :class="{ wrapperClasses: fullScreenMode }">
                 <div
                     class="replicator-fieldtype-container"
-                    :class="{ 'replicator-fullscreen bg-gray-200 dark:bg-dark-700': fullScreenMode }"
+                    :class="{ 'replicator-fullscreen dark:bg-dark-700 bg-gray-200': fullScreenMode }"
                 >
                     <publish-field-fullscreen-header
                         v-if="fullScreenMode"
@@ -16,7 +16,7 @@
                         @close="toggleFullscreen"
                     />
 
-                    <section :class="{ 'mt-14 bg-gray-200 p-4 dark:bg-dark-700': fullScreenMode }">
+                    <section :class="{ 'dark:bg-dark-700 mt-14 bg-gray-200 p-4': fullScreenMode }">
                         <sortable-list
                             :model-value="value"
                             :vertical="true"
@@ -30,32 +30,27 @@
                             v-slot="{}"
                         >
                             <div class="relative">
-                                <replicator-set
+                                <ReplicatorSet
                                     v-for="(set, index) in value"
                                     :key="set._id"
-                                    :index="index"
+                                    :id="set._id"
+                                    :index
+                                    :field-path="setFieldPathPrefix"
+                                    :meta-path="setMetaPathPrefix"
                                     :values="set"
-                                    :meta="meta.existing[set._id]"
                                     :config="setConfig(set.type)"
-                                    :parent-name="name"
                                     :sortable-item-class="sortableItemClass"
                                     :sortable-handle-class="sortableHandleClass"
-                                    :is-read-only="isReadOnly"
                                     :collapsed="collapsed.includes(set._id)"
-                                    :field-path-prefix="fieldPathPrefix || handle"
-                                    :has-error="setHasError(index)"
-                                    :previews="meta.previews[set._id]"
-                                    :show-field-previews="config.previews"
+                                    :enabled="set.enabled"
+                                    :read-only
                                     :can-add-set="canAddSet"
+                                    :has-error="setHasError(index)"
+                                    :show-field-previews="config.previews"
                                     @collapsed="collapseSet(set._id)"
                                     @expanded="expandSet(set._id)"
                                     @duplicated="duplicateSet(set._id)"
-                                    @updated="updated"
-                                    @meta-updated="updateSetMeta(set._id, $event)"
                                     @removed="removed(set, index)"
-                                    @focus="focused = true"
-                                    @blur="blurred"
-                                    @previews-updated="updateSetPreviews(set._id, $event)"
                                 >
                                     <template v-slot:picker>
                                         <add-set-button
@@ -68,7 +63,7 @@
                                             @added="addSet"
                                         />
                                     </template>
-                                </replicator-set>
+                                </ReplicatorSet>
                             </div>
                         </sortable-list>
 
@@ -120,6 +115,14 @@ export default {
     },
 
     computed: {
+        setFieldPathPrefix() {
+            return this.fieldPathPrefix ? `${this.fieldPathPrefix}.${this.handle}` : this.handle;
+        },
+
+        setMetaPathPrefix() {
+            return this.metaPathPrefix ? `${this.metaPathPrefix}.${this.handle}` : this.handle;
+        },
+
         canAddSet() {
             if (this.isReadOnly) return false;
 
@@ -208,7 +211,7 @@ export default {
                 enabled: true,
             };
 
-            this.updateSetMeta(set._id, this.meta.new[handle], {});
+            this.updateSetMeta(set._id, this.meta.new[handle]);
 
             this.update([...this.value.slice(0, index), set, ...this.value.slice(index)]);
 
@@ -223,21 +226,11 @@ export default {
                 _id: uniqid(),
             };
 
-            this.updateSetMeta(set._id, this.meta.existing[old_id], {});
+            this.updateSetMeta(set._id, this.meta.existing[old_id]);
 
             this.update([...this.value.slice(0, index + 1), set, ...this.value.slice(index + 1)]);
 
             this.expandSet(set._id);
-        },
-
-        updateSetPreviews(id, previews) {
-            this.updateMeta({
-                ...this.meta,
-                previews: {
-                    ...this.meta.previews,
-                    [id]: previews,
-                },
-            });
         },
 
         collapseSet(id) {

@@ -2,14 +2,17 @@
     <div class="field-dropdown">
         <div class="quick-list">
             <div class="quick-list-content">
-                <a
+                <ui-button
                     v-for="(action, index) in actions.filter((a) => a.quick)"
                     :key="index"
                     @click="action.run()"
                     v-tooltip="action.title"
+                    :icon-only="true"
+                    size="sm"
+                    variant="ghost"
                 >
-                    <svg-icon :name="action.icon" class="h-3 w-3" />
-                </a>
+                    <svg-icon :name="action.icon" class="size-3" />
+                </ui-button>
             </div>
             <dropdown-list placement="left-start" :offset="[7, -3]">
                 <dropdown-actions :actions="actions" />
