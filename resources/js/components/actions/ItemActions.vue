@@ -2,7 +2,6 @@
 import { ref, computed, useTemplateRef } from 'vue';
 import useActions from './Actions.js';
 import ConfirmableAction from './ConfirmableAction.vue';
-import { keyBy, sortBy } from 'lodash-es';
 
 const props = defineProps({
     url: { type: String, required: true },
