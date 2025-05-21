@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onUnmounted } from 'vue';
 import PublishFields from '../publish/Fields.vue';
 import { requireElevatedSessionIf } from '@statamic/components/elevated-sessions';
 
@@ -40,16 +40,6 @@ let runButtonText = computed(() => {
     return __n(props.action.buttonText, props.selections);
 });
 
-// TODO: How do we convert these to composition API?
-//
-// created() {
-//     this.$events.$on('reset-action-modals', this.reset);
-// },
-//
-// unmounted() {
-//     this.$events.$off('reset-action-modals', this.reset);
-// },
-
 function onDone() {
     running.value = false;
 }
@@ -77,7 +67,17 @@ function runAction() {
 function reset() {
     confirming.value = false;
     values.value = clone(props.action.values);
+
+    // TODO: `reset-action-modals` listeners are over-registering still
+    // You can see it with this:
+    // console.log('resetting!');
 }
+
+Statamic.$events.$on('reset-action-modals', reset);
+
+onUnmounted(() => {
+    Statamic.$events.$off('reset-action-modals', reset);
+});
 
 defineExpose({
     select,
