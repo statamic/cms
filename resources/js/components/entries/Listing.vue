@@ -232,14 +232,6 @@ export default {
     },
 
     methods: {
-        fakeStarted() {
-            console.log('fake started!');
-        },
-
-        fakeCompleted() {
-            console.log('fake completed!');
-        },
-
         reorder() {
             this.previousFilters = this.activeFilters;
             this.filtersReset();
