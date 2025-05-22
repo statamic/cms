@@ -22,7 +22,7 @@ const confirmableActions = useTemplateRef('confirmableActions');
 
 function confirmAction(action) {
     let i = sortedActions.value.findIndex(a => a.handle === action.handle);
-    confirmableActions.value[i].select();
+    confirmableActions.value[i].confirm();
 }
 
 function runAction(action, values, done) {

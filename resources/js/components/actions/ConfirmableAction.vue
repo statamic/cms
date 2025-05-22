@@ -44,16 +44,16 @@ function onDone() {
     running.value = false;
 }
 
-function select() {
+function confirm() {
     if (props.action.confirm) {
         confirming.value = true;
         return;
     }
 
-    runAction();
+    confirmed();
 }
 
-function confirm() {
+function confirmed() {
     runAction();
 }
 
@@ -80,7 +80,7 @@ onUnmounted(() => {
 });
 
 defineExpose({
-    select,
+    confirm,
 });
 </script>
 
@@ -91,7 +91,7 @@ defineExpose({
         :danger="action.dangerous"
         :buttonText="runButtonText"
         :busy="running"
-        @confirm="confirm"
+        @confirm="confirmed"
         @cancel="reset"
     >
         <div
