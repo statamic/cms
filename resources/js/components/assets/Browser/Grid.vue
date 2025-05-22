@@ -9,7 +9,6 @@
             <!-- Folders -->
             <section class="folder-grid-listing" v-if="folders.length || creatingFolder">
                 <div
-                    data-folder
                     v-if="!restrictFolderNavigation"
                     v-for="folder in folders"
                     :key="folder.path"
@@ -75,7 +74,6 @@
                         <template #trigger>
                             <div class="asset-tile group relative" :class="{ 'bg-checkerboard': asset.can_be_transparent }">
                                 <button
-                                    data-asset
                                     class="size-full"
                                     :draggable="true"
                                     @dragover.prevent
