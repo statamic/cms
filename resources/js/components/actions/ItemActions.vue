@@ -12,7 +12,7 @@ const props = defineProps({
 
 const emit = defineEmits(['started', 'completed']);
 
-const { prepareActions, runServerAction, errors } = useActions();
+const { prepareActions, runServerAction } = useActions();
 
 const confirmableActions = useTemplateRef('confirmableActions');
 
@@ -26,6 +26,8 @@ function runAction(action, values, done) {
     runServerAction({ action, values, done, url: props.url, selections: [props.item] })
         .then(data => emit('completed', true, data))
         .catch(data => emit('completed', false, data));
+
+    // TODO: Handle validation `errors` from server, which is passed into ConfirmableAction's errors prop below
 }
 </script>
 
