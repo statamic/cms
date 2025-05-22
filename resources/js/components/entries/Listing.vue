@@ -13,6 +13,7 @@
             :sort-column="sortColumn"
             :sort-direction="sortDirection"
             @visible-columns-updated="visibleColumns = $event"
+            @selections-updated="selections = $event"
         >
             <div>
                 <div class="space-y-3">
@@ -199,6 +200,7 @@ export default {
             initialSite: this.site,
             pushQuery: true,
             previousFilters: null,
+            selections: [],
         };
     },
 
