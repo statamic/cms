@@ -249,7 +249,7 @@ function updateModelValue(value) {
                     ]"
                 >
                     <ComboboxViewport>
-                        <ComboboxEmpty class="text-mauve8 py-2 text-center text-xs font-medium">
+                        <ComboboxEmpty class="py-2 text-sm">
                             <slot name="no-options">
                                 {{ __('No options to choose from.') }}
                             </slot>

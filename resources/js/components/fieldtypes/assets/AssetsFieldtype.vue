@@ -1,5 +1,5 @@
 <template>
-    <div class="@container">
+    <div class="@container relative">
         <div
             v-if="hasPendingDynamicFolder"
             class="w-full rounded-md border border-dashed px-4 py-3 text-sm text-gray-700 dark:border-dark-200 dark:text-dark-175"
@@ -16,51 +16,53 @@
             @error="uploadError"
             v-slot="{ dragging }"
         >
-            <div class="assets-fieldtype-drag-container">
-                <div class="drag-notification" v-if="config.allow_uploads" v-show="dragging && !showSelector">
-                    <svg-icon name="upload" class="h-6 w-6 @md:mr-6 @md:h-8 @md:w-8 ltr:mr-2 rtl:ml-2" />
-                    <span>{{ __('Drop to Upload') }}</span>
+            <div class="">
+                <div
+                    v-if="config.allow_uploads"
+                    v-show="dragging && !showSelector"
+                    class="absolute inset-0 flex flex-col gap-2 items-center justify-center bg-white/80 backdrop-blur-sm border border-gray-400 border-dashed rounded-lg"
+                >
+                    <ui-icon name="upload-cloud" class="size-5 text-gray-500" />
+                    <ui-heading size="lg">{{ __('Drop to Upload') }}</ui-heading>
                 </div>
 
                 <div
                     v-if="!isReadOnly && showPicker"
-                    class="assets-fieldtype-picker gap-x-4 gap-y-2"
+                    class="border border-gray-400 dark:border-gray-700 border-dashed rounded-xl p-2 grid grid-cols-5 gap-4"
                     :class="{
-                        'is-expanded': expanded,
+                        'rounded-b-none': expanded,
                         'bard-drag-handle': isInBardField,
                     }"
                 >
-                    <button
-                        v-if="canBrowse"
-                        :class="{ 'opacity-0': dragging }"
-                        type="button"
-                        class="btn btn-with-icon"
-                        @click="openSelector"
-                        @keyup.space.enter="openSelector"
-                        tabindex="0"
-                    >
-                        <svg-icon name="folder-image" class="h-4 w-4 text-gray-800 dark:text-dark-150"></svg-icon>
-                        {{ __('Browse') }}
-                    </button>
-                    <p class="asset-upload-control flex-1" v-if="canUpload">
-                        <button type="button" class="upload-text-button" @click.prevent="uploadFile">
-                            {{ __('Upload file') }}
-                        </button>
-                        <span
-                            v-if="soloAsset"
-                            class="drag-drop-text"
-                            v-text="__('or drag & drop here to replace.')"
-                        ></span>
-                        <span v-else class="drag-drop-text" v-text="__('or drag & drop here.')"></span>
-                    </p>
-                    <dropdown-list v-if="meta.rename_folder">
-                        <data-list-inline-actions
-                            :item="folder"
-                            :url="meta.rename_folder.url"
-                            :actions="[meta.rename_folder.action]"
-                            @completed="renameFolderActionCompleted"
+                    <div>
+                        <Button
+                            v-if="canBrowse"
+                            icon="folder-open"
+                            tabindex="0"
+                            :text="__('Browse Assets')"
+                            @click="openSelector"
+                            @keyup.space.enter="openSelector"
                         />
-                    </dropdown-list>
+                    </div>
+
+                    <div class="text-sm text-gray-600 dark:text-gray-400 flex items-center flex-1 col-span-3 justify-center" v-if="canUpload">
+                        <ui-icon name="upload-cloud" class="size-5 text-gray-500 me-3" />
+                        <span v-text="__('Drag & drop here or&nbsp;')" />
+                        <button type="button" class="underline underline-offset-2 cursor-pointer hover:text-black dark:hover:text-gray-200" @click.prevent="uploadFile">
+                            {{ __('choose a file') }}
+                        </button>
+                        <span>.</span>
+                    </div>
+                    <div class="flex items-center justify-end">
+                        <dropdown-list v-if="meta.rename_folder">
+                            <data-list-inline-actions
+                                :item="folder"
+                                :url="meta.rename_folder.url"
+                                :actions="[meta.rename_folder.action]"
+                                @completed="renameFolderActionCompleted"
+                            />
+                        </dropdown-list>
+                    </div>
                 </div>
 
                 <uploads
@@ -72,7 +74,7 @@
 
                 <template v-if="expanded">
                     <sortable-list
-                        v-if="displayMode === 'grid'"
+                        v-if="expanded && displayMode === 'grid'"
                         v-model="assets"
                         item-class="asset-tile"
                         handle-class="asset-thumb-container"
@@ -85,7 +87,7 @@
                         append-to="body"
                     >
                         <div
-                            class="asset-grid-listing overflow-hidden rounded-sm border dark:border-dark-900"
+                            class="relative grid gap-6 xl:gap-10 overflow-hidden rounded-xl border border-t-0 rounded-t-none dark:border-dark-700"
                             :class="{ 'rounded-t-none': !isReadOnly && (showPicker || uploads.length) }"
                             ref="assets"
                         >
@@ -104,8 +106,8 @@
                         </div>
                     </sortable-list>
 
-                    <div class="asset-table-listing" v-if="displayMode === 'list'">
-                        <table class="table-fixed">
+                    <div class="relative overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700 border-t-0! rounded-t-none" v-if="displayMode === 'list'">
+                        <table class="w-full">
                             <sortable-list
                                 v-model="assets"
                                 item-class="asset-row"
@@ -154,27 +156,6 @@
     </div>
 </template>
 
-<style>
-.asset-listing-uploads {
-    border: 1px dashed #ccc;
-    border-top: 0;
-    margin: 0;
-    padding: 10px 20px;
-
-    table {
-        margin: 0;
-    }
-
-    thead {
-        display: none;
-    }
-
-    tr:first-child {
-        border-top: 0;
-    }
-}
-</style>
-
 <script>
 import Fieldtype from '../Fieldtype.vue';
 import AssetRow from './AssetRow.vue';
@@ -184,11 +165,13 @@ import Uploader from '../../assets/Uploader.vue';
 import Uploads from '../../assets/Uploads.vue';
 import { SortableList } from '../../sortable/Sortable';
 import { isEqual } from 'lodash-es';
+import { Button } from '@statamic/ui';
 
 export default {
     components: {
         AssetTile,
         AssetRow,
+        Button,
         Selector,
         Uploader,
         Uploads,
