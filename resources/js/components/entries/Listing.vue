@@ -79,7 +79,7 @@
                         :context="actionContext"
                         @started="actionStarted"
                         @completed="actionCompleted"
-                        v-slot="{ actions, select }"
+                        v-slot="{ actions }"
                     >
                         <div class="fixed inset-x-0 bottom-1 z-100 flex w-full justify-center">
                             <ButtonGroup>
@@ -93,7 +93,7 @@
                                     :key="action.handle"
                                     variant="primary"
                                     :text="__(action.title)"
-                                    @click="select(action)"
+                                    @click="action.run"
                                 />
                             </ButtonGroup>
                         </div>
@@ -129,7 +129,7 @@
                                     :item="entry.id"
                                     @started="actionStarted"
                                     @completed="actionCompleted"
-                                    v-slot="{ actions, select }"
+                                    v-slot="{ actions }"
                                 >
                                     <Dropdown placement="left-start" class="me-3">
                                         <DropdownMenu>
@@ -153,7 +153,7 @@
                                                 :text="__(action.title)"
                                                 icon="edit"
                                                 :class="{ 'text-red-500': action.dangerous }"
-                                                @click="select(action)"
+                                                @click="action.run"
                                             />
                                         </DropdownMenu>
                                     </Dropdown>
