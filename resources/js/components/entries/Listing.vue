@@ -73,12 +73,32 @@
 
                     <div v-show="items.length === 0" class="p-6 text-center text-gray-500" v-text="__('No results')" />
 
-                    <data-list-bulk-actions
+                    <BulkActions
                         :url="actionUrl"
+                        :selections="selections"
                         :context="actionContext"
                         @started="actionStarted"
                         @completed="actionCompleted"
-                    />
+                        v-slot="{ actions, select }"
+                    >
+                        <div class="fixed inset-x-0 bottom-1 z-100 flex w-full justify-center">
+                            <ButtonGroup>
+                                <Button
+                                    variant="primary"
+                                    class="text-gray-400!"
+                                    :text="__n(`:count item selected|:count items selected`, selections.length)"
+                                />
+                                <Button
+                                    v-for="action in actions"
+                                    :key="action.handle"
+                                    variant="primary"
+                                    :text="__(action.title)"
+                                    @click="select(action)"
+                                />
+                            </ButtonGroup>
+                        </div>
+                    </BulkActions>
+
                     <Panel class="relative overflow-x-auto overscroll-x-contain">
                         <data-list-table
                             v-show="items.length"
@@ -159,6 +179,7 @@
 import Listing from '../Listing.vue';
 import {
     Button,
+    ButtonGroup,
     Panel,
     StatusIndicator,
     Dropdown,
@@ -167,6 +188,7 @@ import {
     DropdownLabel,
     DropdownSeparator,
 } from '@statamic/ui';
+import BulkActions from '../../components/actions/BulkActions.vue';
 import ItemActions from '../../components/actions/ItemActions.vue';
 
 export default {
@@ -174,6 +196,7 @@ export default {
 
     components: {
         Button,
+        ButtonGroup,
         Panel,
         StatusIndicator,
         Dropdown,
@@ -182,6 +205,7 @@ export default {
         DropdownLabel,
         DropdownSeparator,
         ItemActions,
+        BulkActions,
     },
 
     props: {
