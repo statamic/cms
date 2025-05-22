@@ -1,18 +1,17 @@
 <script setup>
-import { ref, computed, watch, inject, useTemplateRef } from 'vue';
+import { ref, computed, watch, useTemplateRef } from 'vue';
 import useActions from './Actions.js';
 import ConfirmableAction from './ConfirmableAction.vue';
 import axios from 'axios';
 
 const props = defineProps({
     url: { type: String, required: true },
+    selections: { type: Array, required: true },
     context: { type: Object, default: () => {} },
     showAlways: { type: Boolean, default: false },
 });
 
 const emit = defineEmits(['started', 'completed']);
-
-const sharedState = inject('sharedState');
 
 const { sortActions, runServerAction, errors } = useActions();
 
@@ -22,28 +21,24 @@ let sortedActions = computed(() => {
     return sortActions(actions.value);
 });
 
-let selections = computed(() => {
-    return sharedState.selections;
-});
-
 let hasSelections = computed(() => {
-    return selections.value.length > 0;
+    return props.selections.length > 0;
 });
 
 watch(
-    selections,
+    props.selections,
     () => getActions(),
     { deep: true },
 );
 
 function getActions() {
-    if (selections.value.length === 0) {
+    if (!hasSelections) {
         actions.value = [];
         return;
     }
 
     let params = {
-        selections: selections.value,
+        selections: props.selections,
     };
 
     if (props.context) {
@@ -65,7 +60,7 @@ function confirmAction(action) {
 function runAction(action, values, done) {
     emit('started');
 
-    runServerAction({ action, values, done, url: props.url, selections })
+    runServerAction({ action, values, done, url: props.url, selections: props.selections })
         .then(data => emit('completed', true, data))
         .catch(data => emit('completed', false, data));
 }
