@@ -13,12 +13,14 @@ const props = defineProps({
 
 const emit = defineEmits(['started', 'completed']);
 
-const { sortActions, runServerAction, errors } = useActions();
+const { prepareActions, runServerAction, errors } = useActions();
 
 let actions = ref([]);
 
-let sortedActions = computed(() => {
-    return sortActions(actions.value);
+const confirmableActions = useTemplateRef('confirmableActions');
+
+let preparedActions = computed(() => {
+    return prepareActions(actions.value, confirmableActions.value);
 });
 
 let hasSelections = computed(() => {
@@ -46,13 +48,6 @@ function getActions() {
         .then(response => actions.value = response.data);
 }
 
-const confirmableActions = useTemplateRef('confirmableActions');
-
-function confirmAction(action) {
-    let i = sortedActions.value.findIndex(a => a.handle === action.handle);
-    confirmableActions.value[i].confirm();
-}
-
 function runAction(action, values, done) {
     emit('started');
 
@@ -66,7 +61,7 @@ function runAction(action, values, done) {
     <ConfirmableAction
         ref="confirmableActions"
         v-if="hasSelections"
-        v-for="action in sortedActions"
+        v-for="action in actions"
         :key="action.handle"
         :action="action"
         :selections="selections.length"
@@ -75,7 +70,6 @@ function runAction(action, values, done) {
     />
     <slot
         v-if="showAlways || hasSelections"
-        :actions="sortedActions"
-        :select="confirmAction"
+        :actions="preparedActions"
     />
 </template>

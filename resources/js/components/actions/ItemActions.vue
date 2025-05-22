@@ -12,18 +12,13 @@ const props = defineProps({
 
 const emit = defineEmits(['started', 'completed']);
 
-const { sortActions, runServerAction, errors } = useActions();
-
-let sortedActions = computed(() => {
-    return sortActions(props.actions);
-});
+const { prepareActions, runServerAction, errors } = useActions();
 
 const confirmableActions = useTemplateRef('confirmableActions');
 
-function confirmAction(action) {
-    let i = sortedActions.value.findIndex(a => a.handle === action.handle);
-    confirmableActions.value[i].confirm();
-}
+let preparedActions = computed(() => {
+    return prepareActions(props.actions, confirmableActions.value);
+});
 
 function runAction(action, values, done) {
     emit('started');
@@ -37,7 +32,7 @@ function runAction(action, values, done) {
 <template>
     <ConfirmableAction
         ref="confirmableActions"
-        v-for="action in sortedActions"
+        v-for="action in actions"
         :key="action.handle"
         :action="action"
         :selections="1"
@@ -45,5 +40,5 @@ function runAction(action, values, done) {
         :is-dirty="isDirty"
         @confirmed="runAction"
     />
-    <slot :actions="sortedActions" :select="confirmAction" />
+    <slot :actions="preparedActions" />
 </template>
