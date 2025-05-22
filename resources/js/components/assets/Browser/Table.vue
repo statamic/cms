@@ -149,26 +149,11 @@ export default {
     props: {
         loading: Boolean,
         columns: Array,
-        creatingFolder: { type: Boolean },
-    },
-
-    data() {
-        return {
-            newFolderName: null,
-        };
     },
 
     methods: {
         sorted(column, direction) {
             this.$emit('sorted', column, direction);
-        },
-
-        focusNewFolderInput() {
-            this.$refs.newFolderInput?.edit();
-        },
-
-        clearNewFolderName() {
-            this.newFolderName = null;
         },
     },
 

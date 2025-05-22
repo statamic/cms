@@ -8,6 +8,13 @@ export default {
         folders: Array,
         path: String,
         restrictFolderNavigation: Boolean,
+        creatingFolder: Boolean,
+    },
+
+    data() {
+        return {
+            newFolderName: null,
+        }
     },
 
     methods: {
@@ -29,6 +36,14 @@ export default {
 
         selectFolder(path) {
             this.$emit('select-folder', path);
+        },
+
+        focusNewFolderInput() {
+            this.$refs.newFolderInput?.edit();
+        },
+
+        clearNewFolderName() {
+            this.newFolderName = null;
         },
     },
 };

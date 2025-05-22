@@ -168,14 +168,12 @@ export default {
     props: {
         assets: { type: Array },
         selectedAssets: { type: Array },
-        creatingFolder: { type: Boolean },
     },
 
     data() {
         return {
             actionOpened: null,
             thumbnailSize: 200,
-            newFolderName: null,
             draggingAsset: null,
             draggingFolder: null,
         };
@@ -226,14 +224,6 @@ export default {
 
         toggleSelection(id, index, $event) {
             this.$emit('toggle-selection', id, index, $event);
-        },
-
-        focusNewFolderInput() {
-            this.$refs.newFolderInput?.edit();
-        },
-
-        clearNewFolderName() {
-            this.newFolderName = null;
         },
 
         handleDropOnFolder(destinationFolder) {
