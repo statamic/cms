@@ -26,13 +26,11 @@ export default {
         checkMaximumAmountOfItems() {
             let selections = this.sharedState.rows.map((row) => row.id);
             if (this.sharedState.maxSelections) selections = selections.slice(0, this.sharedState.maxSelections);
-            this.sharedState.selections = selections;
-            console.log('selected all', selections);
+            this.sharedState.selections.splice(0, this.sharedState.selections.length, ...selections);
         },
 
         uncheckAllItems() {
-            this.sharedState.selections = [];
-            console.log('selected none');
+            this.sharedState.selections.splice(0, this.sharedState.selections.length);
         },
     },
 };
