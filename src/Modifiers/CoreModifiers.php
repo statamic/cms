@@ -1932,8 +1932,12 @@ class CoreModifiers extends Modifier
      *
      * @return string
      */
-    public function rawurlencode($value)
+    public function rawurlencode($value, $params)
     {
+        if (! Arr::get($params, 0, true)) {
+            return rawurlencode($value);
+        }
+
         return implode('/', array_map('rawurlencode', explode('/', $value)));
     }
 

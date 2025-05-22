@@ -80,6 +80,7 @@ class CoreModifiersTest extends ParserTestCase
             ],
             'remove_left_var' => 'https://',
             'test_currency_symbol' => '£32.00',
+            'test_url_encode' => 'please and thank you/Mommy',
         ];
     }
 
@@ -564,6 +565,12 @@ EOT;
         $this->assertSame('No', $this->renderString($template, ['variable' => []], true));
         $this->assertSame('No', $this->renderString($template, ['variable' => collect()], true));
         $this->assertSame('Yes', $this->renderString($template, ['variable' => ['One']], true));
+    }
+
+    public function test_rawurlencode()
+    {
+        $this->assertSame('please%20and%20thank%20you/Mommy', $this->resultOf('{{ test_url_encode | rawurlencode }}'));
+        $this->assertSame('please%20and%20thank%20you%2FMommy', $this->resultOf('{{ test_url_encode | rawurlencode(false) }}'));
     }
 }
 
