@@ -132,6 +132,8 @@ import AssetBrowserMixin from './AssetBrowserMixin';
 import { Panel, Dropdown, DropdownMenu, DropdownItem, DropdownLabel, DropdownSeparator, Editable } from '@statamic/ui';
 
 export default {
+    mixins: [AssetBrowserMixin],
+
     components: {
         Editable,
         AssetThumbnail,
@@ -143,8 +145,6 @@ export default {
         DropdownLabel,
         DropdownSeparator,
     },
-
-    mixins: [AssetBrowserMixin],
 
     props: {
         loading: Boolean,
