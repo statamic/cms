@@ -67,7 +67,7 @@ function runAction(action, values, done) {
         :key="action.handle"
         :action="action"
         :selections="selections.length"
-        :errors="errors"
+        :errors="{}"
         @confirmed="runAction"
     />
     <slot

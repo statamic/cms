@@ -38,7 +38,7 @@ function runAction(action, values, done) {
         :key="action.handle"
         :action="action"
         :selections="1"
-        :errors="errors"
+        :errors="{}"
         :is-dirty="isDirty"
         @confirmed="runAction"
     />
