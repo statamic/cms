@@ -80,6 +80,7 @@ onUnmounted(() => {
 });
 
 defineExpose({
+    handle: props.action.handle,
     confirm,
 });
 </script>
