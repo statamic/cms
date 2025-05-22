@@ -188,7 +188,15 @@ export default {
             handler: debounce(function(size) {
                 this.$preferences.set('assets.browser_thumbnail_size', size);
             }, 300)
-        }
+        },
+
+        draggingAsset() {
+            this.$emit('prevent-dragging', this.draggingAsset !== null);
+        },
+
+        draggingFolder() {
+            this.$emit('prevent-dragging', this.draggingFolder !== null);
+        },
     },
 
     mounted() {

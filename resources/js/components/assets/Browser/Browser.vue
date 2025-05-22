@@ -49,7 +49,7 @@
             ref="uploader"
             :container="container.id"
             :path="path"
-            :enabled="canUpload"
+            :enabled="!preventDragging && canUpload"
             @updated="uploadsUpdated"
             @upload-complete="uploadCompleted"
             @error="uploadError"
@@ -221,6 +221,7 @@ export default {
             folderActionUrl: null,
             shifting: false,
             lastItemClicked: null,
+            preventDragging: false,
         };
     },
 
@@ -314,6 +315,7 @@ export default {
                 'select-folder': this.selectFolder,
                 'create-folder': this.createFolder,
                 'cancel-creating-folder': () => (this.creatingFolder = false),
+                'prevent-dragging': (preventDragging) => (this.preventDragging = preventDragging),
             };
         },
     },
