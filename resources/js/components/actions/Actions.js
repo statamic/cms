@@ -1,7 +1,13 @@
-import { sortBy } from 'lodash-es';
+import { sortBy, keyBy } from 'lodash-es';
 import axios from 'axios';
 
 export default function useActions() {
+    function prepareActions(actions, confirmableActions) {
+        let sortedActions = sortActions(actions);
+
+        return mapRunMethods(sortedActions, confirmableActions);
+    }
+
     function sortActions(actions) {
         let sorted = sortBy(actions, 'title');
 
@@ -9,6 +15,19 @@ export default function useActions() {
             ...sorted.filter((action) => !action.dangerous),
             ...sorted.filter((action) => action.dangerous),
         ];
+    }
+
+    function mapRunMethods(actions, confirmableActions) {
+        return actions?.map(action => {
+            return {
+                ...action,
+                run: findMatchingConfirmableAction(confirmableActions, action.handle)?.confirm,
+            };
+        });
+    }
+
+    function findMatchingConfirmableAction(confirmableActions, handle) {
+        return keyBy(confirmableActions, 'handle')[handle];
     }
 
     function runServerAction({ url, selections, action, values, done }) {
@@ -82,7 +101,7 @@ export default function useActions() {
     }
 
     return {
-        sortActions,
+        prepareActions,
         runServerAction,
     };
 }
