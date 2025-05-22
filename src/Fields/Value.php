@@ -153,7 +153,7 @@ class Value implements ArrayAccess, IteratorAggregate, JsonSerializable
         }
 
         if ($shouldParseAntlers) {
-            if ($parseFromRawString = $this->fieldtype->shouldParseAntlersFromRawString()) {
+            if ($parseFromRawString = $this->fieldtype?->shouldParseAntlersFromRawString()) {
                 $value = $this->raw();
             }
 
