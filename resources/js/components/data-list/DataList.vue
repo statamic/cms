@@ -68,7 +68,6 @@ export default {
             immediate: true,
             deep: true,
             handler: function (selections) {
-                console.log('selections updated!', selections);
                 this.$emit('selections-updated', selections);
             },
         },

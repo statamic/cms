@@ -25,10 +25,9 @@ let hasSelections = computed(() => {
     return props.selections.length > 0;
 });
 
-watch(props.selections, () => alert('hi'), { deep: true });
+watch(props.selections, getActions, { deep: true });
 
 function getActions() {
-    console.log('getting actions...', hasSelections.value);
     if (!hasSelections.value) {
         actions.value = [];
         return;
@@ -42,7 +41,6 @@ function getActions() {
         params.context = props.context;
     }
 
-    console.log('requesting actions...');
     axios
         .post(props.url + '/list', params)
         .then(response => actions.value = response.data);
@@ -65,7 +63,6 @@ function runAction(action, values, done) {
 </script>
 
 <template>
-    {{ selections }}
     <ConfirmableAction
         ref="confirmableActions"
         v-if="hasSelections"
