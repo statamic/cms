@@ -27,10 +27,12 @@ export default {
             let selections = this.sharedState.rows.map((row) => row.id);
             if (this.sharedState.maxSelections) selections = selections.slice(0, this.sharedState.maxSelections);
             this.sharedState.selections = selections;
+            console.log('selected all', selections);
         },
 
         uncheckAllItems() {
             this.sharedState.selections = [];
+            console.log('selected none');
         },
     },
 };

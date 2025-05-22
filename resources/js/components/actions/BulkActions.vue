@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch, useTemplateRef } from 'vue';
+import { ref, computed, watch, useTemplateRef, toRaw } from 'vue';
 import useActions from './Actions.js';
 import ConfirmableAction from './ConfirmableAction.vue';
 import axios from 'axios';
@@ -25,26 +25,24 @@ let hasSelections = computed(() => {
     return props.selections.length > 0;
 });
 
-watch(
-    props.selections,
-    () => getActions(),
-    { deep: true },
-);
+watch(props.selections, () => alert('hi'), { deep: true });
 
 function getActions() {
-    if (!hasSelections) {
+    console.log('getting actions...', hasSelections.value);
+    if (!hasSelections.value) {
         actions.value = [];
         return;
     }
 
     let params = {
-        selections: props.selections,
+        selections: toRaw(props.selections),
     };
 
     if (props.context) {
         params.context = props.context;
     }
 
+    console.log('requesting actions...');
     axios
         .post(props.url + '/list', params)
         .then(response => actions.value = response.data);
@@ -67,6 +65,7 @@ function runAction(action, values, done) {
 </script>
 
 <template>
+    {{ selections }}
     <ConfirmableAction
         ref="confirmableActions"
         v-if="hasSelections"
