@@ -316,6 +316,48 @@ abstract class Builder implements Contract
         return $this->whereJsonLength($column, $operator, $value, 'or');
     }
 
+    public function whereJsonOverlaps($column, $values, $boolean = 'and')
+    {
+        if (! is_array($values)) {
+            $values = [$values];
+        }
+
+        $this->wheres[] = [
+            'type' => 'JsonOverlaps',
+            'column' => $column,
+            'values' => $values,
+            'boolean' => $boolean,
+        ];
+
+        return $this;
+    }
+
+    public function orWhereJsonOverlaps($column, $values)
+    {
+        return $this->whereJsonOverlaps($column, $values, 'or');
+    }
+
+    public function whereJsonDoesntOverlap($column, $values, $boolean = 'and')
+    {
+        if (! is_array($values)) {
+            $values = [$values];
+        }
+
+        $this->wheres[] = [
+            'type' => 'JsonDoesntOverlap',
+            'column' => $column,
+            'values' => $values,
+            'boolean' => $boolean,
+        ];
+
+        return $this;
+    }
+
+    public function orWhereJsonDoesntOverlap($column, $values)
+    {
+        return $this->whereJsonDoesntOverlap($column, $values, 'or');
+    }
+
     public function whereNull($column, $boolean = 'and', $not = false)
     {
         $this->wheres[] = [
