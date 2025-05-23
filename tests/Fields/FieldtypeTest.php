@@ -312,7 +312,7 @@ class FieldtypeTest extends TestCase
     #[Test]
     public function it_can_append_new_section_config_fields()
     {
-        TestAppendConfigFields::appendConfigFields([
+        TestAppendConfigSectionFields::appendConfigFields([
             [
                 'display' => __('Extra section'),
                 'fields' => [
@@ -330,7 +330,7 @@ class FieldtypeTest extends TestCase
             ],
         ]);
 
-        $fields = (new TestAppendConfigFields())->configFields();
+        $fields = (new TestAppendConfigSectionFields())->configFields();
 
         $this->assertCount(4, $fields->all());
         $this->assertEquals('array', $fields->get('more_options')->type());
@@ -340,7 +340,7 @@ class FieldtypeTest extends TestCase
     #[Test]
     public function it_can_append_new_sections_config_fields()
     {
-        TestAppendConfigFields::appendConfigFields([
+        TestAppendConfigSectionFields::appendConfigFields([
             [
                 'display' => __('Extra section'),
                 'fields' => [
@@ -363,7 +363,7 @@ class FieldtypeTest extends TestCase
             ],
         ]);
 
-        $fields = (new TestAppendConfigFields())->configFields();
+        $fields = (new TestAppendConfigSectionFields())->configFields();
 
         $this->assertCount(4, $fields->all());
         $this->assertEquals('array', $fields->get('more_options')->type());
@@ -699,6 +699,14 @@ class TestMultiWordWithNoFieldtypeSuffix extends Fieldtype
 }
 
 class TestAppendConfigFields extends Fieldtype
+{
+    protected $configFields = [
+        'foo' => ['type' => 'textarea'],
+        'max_items' => ['type' => 'integer'],
+    ];
+}
+
+class TestAppendConfigSectionFields extends Fieldtype
 {
     protected $configFields = [
         'foo' => ['type' => 'textarea'],
