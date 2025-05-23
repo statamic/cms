@@ -7,29 +7,30 @@ import { Icon, Button, CharacterCounter } from '@statamic/ui';
 const slots = useSlots();
 
 const props = defineProps({
+    append: { type: String, default: null },
     badge: { type: String, default: null },
     clearable: { type: Boolean, default: false },
     copyable: { type: Boolean, default: false },
     description: { type: String, default: null },
+    disabled: { type: Boolean, default: false },
     icon: { type: String, default: null },
     iconAppend: { type: String, default: null },
     iconPrepend: { type: String, default: null },
     id: { type: String, default: () => useId() },
     label: { type: String, default: null },
     limit: { type: Number, default: null },
-    required: { type: Boolean, default: false },
+    loading: { type: Boolean, default: false },
     modelValue: { type: [String, Number], default: null },
+    placeholder: { type: String, default: null },
+    prepend: { type: String, default: null },
+    required: { type: Boolean, default: false },
     size: { type: String, default: 'base' },
     type: { type: String, default: 'text' },
     viewable: { type: Boolean, default: false },
-    placeholder: { type: String, default: null },
-    prepend: { type: String, default: null },
-    append: { type: String, default: null },
-    disabled: { type: Boolean, default: false },
 });
 
 const hasPrependedIcon = !!props.iconPrepend || !!props.icon || !!slots.prepend;
-const hasAppendedIcon = !!props.iconAppend || !!slots.append || props.clearable || props.viewable || props.copyable;
+const hasAppendedIcon = !!props.iconAppend || !!slots.append || props.clearable || props.viewable || props.copyable || props.loading;
 
 const inputClasses = computed(() => {
     const classes = cva({
@@ -147,7 +148,8 @@ const copy = () => {
                     class="animate"
                     :class="copied ? 'animate-wiggle' : ''"
                 />
-                <Icon v-else :name="iconAppend" />
+                <Icon v-else-if="iconAppend" :name="iconAppend" />
+                <loading-graphic v-if="loading" inline text=""/>
             </slot>
         </div>
         <div v-if="limit" class="absolute inset-y-0 right-2 flex items-center">

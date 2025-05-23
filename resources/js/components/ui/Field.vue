@@ -95,7 +95,7 @@ const classes = computed(() =>
         </slot>
         <Description :text="instructions" v-if="instructions && !instructionsBelow" />
         <slot />
-        <Description :text="instructions" v-if="instructions && instructionsBelow" />
-        <Description v-if="errors" v-for="(error, i) in errors" :key="i" :text="error" class="text-red-500" />
+        <Description :text="instructions" v-if="instructions && instructionsBelow" class="mt-2" />
+        <Description v-if="errors" v-for="(error, i) in errors" :key="i" :text="error" class="mt-2 text-red-500" />
     </div>
 </template>

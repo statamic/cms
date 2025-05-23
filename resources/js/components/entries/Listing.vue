@@ -129,16 +129,17 @@
                                 </Dropdown>
                             </template>
                         </data-list-table>
+                        <PanelFooter>
+                            <data-list-pagination
+                                :resource-meta="meta"
+                                :per-page="perPage"
+                                :show-totals="true"
+                                @page-selected="selectPage"
+                                @per-page-changed="changePerPage"
+                            />
+                        </PanelFooter>
                     </Panel>
                 </div>
-                <data-list-pagination
-                    class="mt-3"
-                    :resource-meta="meta"
-                    :per-page="perPage"
-                    :show-totals="true"
-                    @page-selected="selectPage"
-                    @per-page-changed="changePerPage"
-                />
             </div>
         </data-list>
     </div>
@@ -149,6 +150,7 @@ import Listing from '../Listing.vue';
 import {
     Button,
     Panel,
+    PanelFooter,
     StatusIndicator,
     Dropdown,
     DropdownMenu,
@@ -163,6 +165,7 @@ export default {
     components: {
         Button,
         Panel,
+        PanelFooter,
         StatusIndicator,
         Dropdown,
         DropdownMenu,
