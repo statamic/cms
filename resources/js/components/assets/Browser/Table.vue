@@ -1,6 +1,7 @@
 <template>
     <Panel class="relative overflow-x-auto overscroll-x-contain">
         <data-list-table
+            ref="dataListTable"
             :allow-bulk-actions="true"
             :loading="loading"
             :toggle-selection-on-row-click="true"
@@ -21,9 +22,15 @@
                     <td :colspan="columns.length" />
                 </tr>
                 <tr
+                    v-if="!restrictFolderNavigation"
                     v-for="(folder, i) in folders"
                     :key="folder.path"
-                    v-if="!restrictFolderNavigation"
+                    class="pointer-events-auto"
+                    :draggable="true"
+                    @dragover.prevent
+                    @drop="handleFolderDrop(folder)"
+                    @dragstart="draggingFolder = folder.path"
+                    @dragend="draggingFolder = null"
                 >
                     <td />
                     <td @click="selectFolder(folder.path)">
@@ -81,7 +88,13 @@
             </template>
 
             <template #cell-basename="{ row: asset, checkboxId }">
-                <div class="w-fit-content group flex items-center">
+                <div
+                    class="w-fit-content group flex items-center"
+                    :draggable="true"
+                    @dragover.prevent
+                    @dragstart="draggingAsset = asset.id"
+                    @dragend="draggingAsset = null"
+                >
                     <asset-thumbnail
                         :asset="asset"
                         :square="true"
@@ -149,6 +162,12 @@ export default {
     props: {
         loading: Boolean,
         columns: Array,
+    },
+
+    computed: {
+        assets() {
+            return this.$refs.dataListTable.rows;
+        },
     },
 
     methods: {

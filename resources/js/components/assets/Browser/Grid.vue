@@ -15,7 +15,7 @@
                     class="group/folder relative"
                     :draggable="true"
                     @dragover.prevent
-                    @drop="handleDropOnFolder(folder)"
+                    @drop="handleFolderDrop(folder)"
                     @dragstart="draggingFolder = folder.path"
                     @dragend="draggingFolder = null"
                 >
@@ -174,8 +174,6 @@ export default {
         return {
             actionOpened: null,
             thumbnailSize: 200,
-            draggingAsset: null,
-            draggingFolder: null,
         };
     },
 
@@ -184,14 +182,6 @@ export default {
             handler: debounce(function(size) {
                 this.$preferences.set('assets.browser_thumbnail_size', size);
             }, 300)
-        },
-
-        draggingAsset() {
-            this.$emit('prevent-dragging', this.draggingAsset !== null);
-        },
-
-        draggingFolder() {
-            this.$emit('prevent-dragging', this.draggingFolder !== null);
         },
     },
 
@@ -224,50 +214,6 @@ export default {
 
         toggleSelection(id, index, $event) {
             this.$emit('toggle-selection', id, index, $event);
-        },
-
-        handleDropOnFolder(destinationFolder) {
-            if (this.draggingAsset) {
-                let asset = this.assets.find((asset) => asset.id === this.draggingAsset);
-                let action = asset.actions.find((action) => action.handle === 'move_asset');
-
-                if (!action) {
-                    return;
-                }
-
-                const payload = {
-                    action: action.handle,
-                    context: action.context,
-                    selections: [this.draggingAsset],
-                    values: { folder: destinationFolder.path },
-                };
-
-                this.$axios
-                    .post(this.actionUrl, payload)
-                    .then(response => this.$emit('action-completed', true, response))
-                    .finally(() => this.draggingAsset = null);
-            }
-
-            if (this.draggingFolder) {
-                let folder = this.folders.find((folder) => folder.path === this.draggingFolder);
-                let action = folder.actions.find((action) => action.handle === 'move_asset_folder');
-
-                if (!action) {
-                    return;
-                }
-
-                const payload = {
-                    action: action.handle,
-                    context: action.context,
-                    selections: [this.draggingFolder],
-                    values: { folder: destinationFolder.path },
-                };
-
-                this.$axios
-                    .post(this.folderActionUrl, payload)
-                    .then(response => this.$emit('action-completed', true, response))
-                    .finally(() => this.draggingFolder = null);
-            }
         },
     },
 };
