@@ -16,7 +16,7 @@
 
 /* Components */
 @import './components/array.css';
-/* @import './components/assets.css'; */
+@import './components/assets.css';
 @import './components/blueprints.css';
 @import './components/cards.css';
 @import './components/column-picker.css';

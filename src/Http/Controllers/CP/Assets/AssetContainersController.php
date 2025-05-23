@@ -38,15 +38,7 @@ class AssetContainersController extends CpController
             ];
         })->values();
 
-        if ($request->wantsJson()) {
-            return $containers;
-        }
-
-        return view('statamic::assets.containers.index', [
-            'containers' => $containers->all(),
-            'columns' => ['title'],
-            'visibleColumns' => ['title'],
-        ]);
+        return $containers;
     }
 
     public function edit($container)
