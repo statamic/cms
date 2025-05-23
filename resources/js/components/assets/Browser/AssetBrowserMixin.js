@@ -58,6 +58,14 @@ export default {
             this.newFolderName = null;
         },
 
+        canMoveAsset(asset) {
+            return asset.actions.some((action) => action.handle === 'move_asset');
+        },
+
+        canMoveFolder(folder) {
+            return folder.actions.some((action) => action.handle === 'move_asset_folder');
+        },
+
         handleFolderDrop(destinationFolder) {
             if (this.draggingAsset) {
                 let asset = this.assets.find((asset) => asset.id === this.draggingAsset);

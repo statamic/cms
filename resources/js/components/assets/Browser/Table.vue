@@ -26,7 +26,7 @@
                     v-for="(folder, i) in folders"
                     :key="folder.path"
                     class="pointer-events-auto"
-                    :draggable="true"
+                    :draggable="canMoveFolder(folder)"
                     @dragover.prevent
                     @drop="handleFolderDrop(folder)"
                     @dragstart="draggingFolder = folder.path"
@@ -90,7 +90,7 @@
             <template #cell-basename="{ row: asset, checkboxId }">
                 <div
                     class="w-fit-content group flex items-center"
-                    :draggable="true"
+                    :draggable="canMoveAsset(asset)"
                     @dragover.prevent
                     @dragstart="draggingAsset = asset.id"
                     @dragend="draggingAsset = null"

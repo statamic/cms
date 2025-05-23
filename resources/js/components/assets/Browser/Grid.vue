@@ -13,7 +13,7 @@
                     v-for="folder in folders"
                     :key="folder.path"
                     class="group/folder relative"
-                    :draggable="true"
+                    :draggable="canMoveFolder(folder)"
                     @dragover.prevent
                     @drop="handleFolderDrop(folder)"
                     @dragstart="draggingFolder = folder.path"
@@ -75,7 +75,7 @@
                             <div class="asset-tile group relative" :class="{ 'bg-checkerboard': asset.can_be_transparent }">
                                 <button
                                     class="size-full"
-                                    :draggable="true"
+                                    :draggable="canMoveAsset(asset)"
                                     @dragover.prevent
                                     @dragstart="draggingAsset = asset.id"
                                     @dragend="draggingAsset = null"
