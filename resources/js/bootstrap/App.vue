@@ -17,7 +17,7 @@ import FormSubmissionListing from '../components/forms/SubmissionListing.vue';
 import GlobalListing from '../components/globals/Listing.vue';
 import GlobalEditForm from '../components/globals/EditForm.vue';
 import GlobalPublishForm from '../components/globals/PublishForm.vue';
-import GlobalCreateForm from '../components/globals/Create.vue';
+import GlobalCreateForm from '../components/globals/CreateForm.vue';
 import UserListing from '../components/users/Listing.vue';
 import UserWizard from '../components/users/Wizard.vue';
 import RoleListing from '../components/roles/Listing.vue';

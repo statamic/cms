@@ -1,16 +1,16 @@
 <template>
     <CreateForm
-        :title="__('Create Form')"
-        :subtitle="__('messages.form_configure_intro')"
-        icon="forms"
+        :title="__('Create Global Set')"
+        :subtitle="__('messages.globals_configure_intro')"
+        icon="globals"
         @submit="submit"
     >
-        <ui-card-panel :heading="__('Form Details')">
+        <ui-card-panel :heading="__('Global Set Details')">
             <div class="space-y-8">
-                <ui-field :label="__('Title')" :instructions="__('messages.form_configure_title_instructions')" :instructions-below="true">
+                <ui-field :label="__('Title')" :instructions="__('messages.globals_configure_title_instructions')" :instructions-below="true">
                     <ui-input v-model="title" autofocus tabindex="1" />
                 </ui-field>
-                <ui-field :label="__('Handle')" :instructions="__('messages.form_configure_handle_instructions')" :instructions-below="true">
+                <ui-field :label="__('Handle')" :instructions="__('messages.globals_configure_handle_instructions')" :instructions-below="true">
                     <ui-input v-model="handle" tabindex="2" :loading="slug.busy" />
                 </ui-field>
             </div>
@@ -18,16 +18,17 @@
     </CreateForm>
 </template>
 
-<script setup>
-import { CreateForm } from '@statamic/ui';
-</script>
-
 <script>
+import { CreateForm } from '@statamic/ui';
+
 export default {
     props: {
         route: { type: String },
     },
 
+    components: {
+        CreateForm,
+    },
     data() {
         return {
             title: null,
