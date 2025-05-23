@@ -30,7 +30,7 @@ class CollectionsController extends CpController
 
         $columns = [
             Column::make('title')->label(__('Title')),
-            Column::make('entries')->label(__('Entries'))->numeric(true),
+            Column::make('entries_count')->label(__('Entries'))->numeric(true),
         ];
 
         if ($request->wantsJson()) {
@@ -82,6 +82,7 @@ class CollectionsController extends CpController
                 'available_in_selected_site' => $collection->sites()->contains(Site::selected()->handle()),
                 'actions' => Action::for($collection),
                 'actions_url' => cp_route('collections.actions.run', ['collection' => $collection->handle()]),
+                'icon' => $collection->icon(),
             ];
         })->sortBy('title')->values();
     }

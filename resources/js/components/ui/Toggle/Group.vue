@@ -2,7 +2,6 @@
 import { ToggleGroupRoot } from 'reka-ui';
 import { ref, watch, provide } from 'vue';
 import { cva } from 'cva';
-import { WithField } from '@statamic/ui';
 
 const props = defineProps({
     description: { type: String, default: null },
@@ -60,15 +59,13 @@ function updateModelValue(value) {
 </script>
 
 <template>
-    <WithField :label :description :required>
-        <ToggleGroupRoot
-            :type="multiple ? 'multiple' : 'single'"
-            :class="groupClasses"
-            data-ui-toggle-group
-            :model-value="toggleState"
-            @update:model-value="updateModelValue"
-        >
-            <slot />
-        </ToggleGroupRoot>
-    </WithField>
+    <ToggleGroupRoot
+        :type="multiple ? 'multiple' : 'single'"
+        :class="groupClasses"
+        data-ui-toggle-group
+        :model-value="toggleState"
+        @update:model-value="updateModelValue"
+    >
+        <slot />
+    </ToggleGroupRoot>
 </template>

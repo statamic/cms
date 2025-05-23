@@ -39,7 +39,7 @@ export default {
             }
 
             return selections.map((value) => {
-                return props.options.find((option) => option.value === value) ?? { label: value, value };
+                return this.options.find((option) => option.value === value) ?? { label: value, value };
             });
         },
 

@@ -775,6 +775,13 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         return $this;
     }
 
+    public function moveQuietly($folder, $filename = null)
+    {
+        $this->withEvents = false;
+
+        return $this->move(...func_get_args());
+    }
+
     /**
      * Replace an asset and/or its references where necessary.
      *

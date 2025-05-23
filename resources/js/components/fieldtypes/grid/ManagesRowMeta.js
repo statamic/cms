@@ -1,13 +1,12 @@
 export default {
     methods: {
-        updateRowMeta(row, value, previews) {
+        updateRowMeta(row, value) {
             this.updateMeta({
                 ...this.meta,
                 existing: {
                     ...this.meta.existing,
                     [row]: clone(value),
                 },
-                previews: previews ? { ...this.meta.previews, [row]: previews } : this.meta.previews,
             });
         },
 
