@@ -310,6 +310,67 @@ class FieldtypeTest extends TestCase
     }
 
     #[Test]
+    public function it_can_append_new_section_config_fields()
+    {
+        TestAppendConfigFields::appendConfigFields([
+            [
+                'display' => __('Extra section'),
+                'fields' => [
+                    'more_options' => [
+                        'display' => __('Options'),
+                        'instructions' => __('Instructions for this field'),
+                        'type' => 'array',
+                    ],
+                    'extra_html_class' => [
+                        'display' => __('Append HTML Classes options'),
+                        'instructions' => __('Instructions for this field'),
+                        'type' => 'textarea',
+                    ],
+                ],
+            ],
+        ]);
+
+        $fields = (new TestAppendConfigFields())->configFields();
+
+        $this->assertCount(4, $fields->all());
+        $this->assertEquals('array', $fields->get('more_options')->type());
+        $this->assertEquals('textarea', $fields->get('extra_html_class')->type());
+    }
+
+    #[Test]
+    public function it_can_append_new_sections_config_fields()
+    {
+        TestAppendConfigFields::appendConfigFields([
+            [
+                'display' => __('Extra section'),
+                'fields' => [
+                    'more_options' => [
+                        'display' => __('Options'),
+                        'instructions' => __('Instructions for this field'),
+                        'type' => 'array',
+                    ],
+                ],
+            ],
+            [
+                'display' => __('New Extra section'),
+                'fields' => [
+                    'extra_html_class' => [
+                        'display' => __('Append HTML Classes options'),
+                        'instructions' => __('Instructions for this field'),
+                        'type' => 'textarea',
+                    ],
+                ],
+            ],
+        ]);
+
+        $fields = (new TestAppendConfigFields())->configFields();
+
+        $this->assertCount(4, $fields->all());
+        $this->assertEquals('array', $fields->get('more_options')->type());
+        $this->assertEquals('textarea', $fields->get('extra_html_class')->type());
+    }
+
+    #[Test]
     public function it_wont_override_previously_appended_config_fields()
     {
         TestAppendConfigFields::appendConfigFields([
