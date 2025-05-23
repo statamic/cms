@@ -211,7 +211,7 @@ abstract class Fieldtype implements Arrayable
             return [];
         }
 
-        if (! empty($extras)) {
+        if ($this->extraConfigFieldsUseSections()) {
             $extraSections = collect($extras)->filter(fn ($field) => Arr::has($field, 'fields'));
 
             $fields = collect($fields)->merge($extraSections);
@@ -264,6 +264,15 @@ abstract class Fieldtype implements Arrayable
         return array_keys($fields)[0] === 0;
     }
 
+    private function extraConfigFieldsUseSections()
+    {
+        if (empty($fields = $this->extraConfigFieldItems())) {
+            return false;
+        }
+
+        return array_keys($fields)[0] === 0;
+    }
+
     public function configFields(): Fields
     {
         if ($cached = Blink::get($blink = 'config-fields-'.$this->handle())) {
@@ -271,13 +280,18 @@ abstract class Fieldtype implements Arrayable
         }
 
         $fields = collect($this->configFieldItems());
+        $extraFields = collect($this->extraConfigFieldItems());
 
         if ($this->configFieldsUseSections()) {
             $fields = $fields->flatMap(fn ($section) => $section['fields']);
         }
 
+        if ($this->extraConfigFieldsUseSections()) {
+            $extraFields = $extraFields->flatMap(fn ($section) => $section['fields']);
+        }
+
         $fields = $fields
-            ->merge($this->extraConfigFieldItems())
+            ->merge($extraFields)
             ->map(function ($field, $handle) {
                 return compact('handle', 'field');
             });
