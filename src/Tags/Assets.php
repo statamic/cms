@@ -191,8 +191,24 @@ class Assets extends Tags
         return $this->output();
     }
 
+    /**
+     * Filter out assets from a requested folder.
+     */
+    private function filterNotIn()
+    {
+        if ($not_in = $this->params->get('not_in')) {
+            $regex = '#^('.$not_in.')#';
+
+            $this->assets = $this->assets->reject(function ($path) use ($regex) {
+                return preg_match($regex, $path);
+            });
+        }
+    }
+
     private function output()
     {
+        $this->filterNotIn();
+
         $this->sort();
         $this->limit();
 
