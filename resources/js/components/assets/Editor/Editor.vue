@@ -257,6 +257,12 @@
                         </div>
                     </div>
                     <div class="flex items-center space-x-3 rtl:space-x-reverse">
+                        <button type="button" class="btn" @click="navigateToPreviousAsset">
+                            {{ __('<') }}
+                        </button>
+                        <button type="button" class="btn" @click="navigateToNextAsset">
+                            {{ __('>') }}
+                        </button>
                         <button type="button" class="btn" @click="close">
                             {{ __('Cancel') }}
                         </button>
@@ -458,14 +464,22 @@ export default {
 
         keydown(event) {
             if ((event.metaKey || event.ctrlKey) && event.key === 'ArrowLeft') {
-                this.save();
-                this.$emit('previous');
+                this.navigateToPreviousAsset();
             }
 
             if ((event.metaKey || event.ctrlKey) && event.key === 'ArrowRight') {
-                this.save();
-                this.$emit('next');
+                this.navigateToNextAsset();
             }
+        },
+
+        navigateToPreviousAsset() {
+            this.save();
+            this.$emit('previous');
+        },
+
+        navigateToNextAsset() {
+            this.save();
+            this.$emit('next');
         },
 
         openFocalPointEditor() {
