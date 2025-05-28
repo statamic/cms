@@ -161,7 +161,7 @@ class Assets extends Tags
 
     /**
      * Filter out assets from a requested folder.
-     * 
+     *
      * @return void
      */
     private function filterNotIn()
