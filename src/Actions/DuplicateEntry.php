@@ -175,18 +175,4 @@ class DuplicateEntry extends Action
 
         return $this->newItems->first()->editUrl();
     }
-
-    protected function fieldItems()
-    {
-        $asset = $this->items->first();
-
-        return [
-            'test_field' => [
-                'type' => 'text',
-                'display' => __('Test Field'),
-                'validate' => ['required'],
-                'focus' => true,
-            ],
-        ];
-    }
 }
