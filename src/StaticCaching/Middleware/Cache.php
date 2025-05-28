@@ -184,7 +184,7 @@ class Cache
             $response->headers->has('X-Statamic-Draft')
             || $response->headers->has('X-Statamic-Private')
             || $response->headers->has('X-Statamic-Protected')
-            || $response->headers->has('X-Statamic-No-Static-Cache')
+            || $response->headers->has('X-Statamic-Uncacheable')
         ) {
             return false;
         }
