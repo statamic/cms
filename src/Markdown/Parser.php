@@ -15,6 +15,7 @@ class Parser
 
     protected $converter;
     protected $extensions = [];
+    protected $renderers = [];
     protected $config = [];
 
     public function __construct(array $config = [])
@@ -41,6 +42,10 @@ class Parser
             $env->addExtension($ext);
         }
 
+        foreach ($this->renderers() as $ren) {
+            $env->addRenderer(...$ren);
+        }
+
         return $this->converter = $converter;
     }
 
@@ -54,6 +59,15 @@ class Parser
         $this->converter = null;
 
         $this->extensions[] = $closure;
+
+        return $this;
+    }
+
+    public function addRenderers(Closure $closure): self
+    {
+        $this->converter = null;
+
+        $this->renderers[] = $closure;
 
         return $this;
     }
@@ -74,6 +88,19 @@ class Parser
         }
 
         return $exts;
+    }
+
+    public function renderers(): array
+    {
+        $renderers = [];
+
+        foreach ($this->renderers as $closure) {
+            foreach ($closure() as $renderer) {
+                $renderers[] = $renderer;
+            }
+        }
+
+        return $renderers;
     }
 
     public function withStatamicDefaults()
@@ -149,6 +176,10 @@ class Parser
 
         foreach ($this->extensions as $ext) {
             $parser->addExtensions($ext);
+        }
+
+        foreach ($this->renderers as $ren) {
+            $parser->addRenderers($ren);
         }
 
         return $parser;
