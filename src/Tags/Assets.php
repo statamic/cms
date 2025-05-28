@@ -209,10 +209,9 @@ class Assets extends Tags
 
     private function output()
     {
-        $this->filterNotIn();
-
         $this->sort();
         $this->limit();
+        $this->filterNotIn();
 
         return $this->assets;
     }
