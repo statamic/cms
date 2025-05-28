@@ -160,6 +160,22 @@ class Assets extends Tags
     }
 
     /**
+     * Filter out assets from a requested folder.
+     *
+     * @return void
+     */
+    private function filterNotIn()
+    {
+        if ($not_in = $this->params->get('not_in')) {
+            $regex = '#^('.$not_in.')#';
+
+            $this->assets = $this->assets->reject(function ($path) use ($regex) {
+                return preg_match($regex, $path);
+            });
+        }
+    }
+
+    /**
      * Perform the asset lookups.
      *
      * @param  string|array  $urls  One URL, or array of URLs.
@@ -189,20 +205,6 @@ class Assets extends Tags
         });
 
         return $this->output();
-    }
-
-    /**
-     * Filter out assets from a requested folder.
-     */
-    private function filterNotIn()
-    {
-        if ($not_in = $this->params->get('not_in')) {
-            $regex = '#^('.$not_in.')#';
-
-            $this->assets = $this->assets->reject(function ($path) use ($regex) {
-                return preg_match($regex, $path);
-            });
-        }
     }
 
     private function output()
