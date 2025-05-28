@@ -1,19 +1,35 @@
 <template>
     <div class="min-h-screen" ref="browser" @keydown.shift="shiftDown" @keyup="clearShift">
         <Header :title="__(container.title)" icon="assets">
-            <dropdown-list v-if="container.can_edit || container.can_delete || container.can_create">
-                <dropdown-item v-if="canCreateContainers" v-text="__('Create Container')" :redirect="createContainerUrl" />
-                <dropdown-item v-if="container.can_edit" v-text="__('Edit Container')" :redirect="container.edit_url" />
-                <dropdown-item v-text="__('Edit Blueprint')" :redirect="container.blueprint_url" />
-                <dropdown-item v-if="container.can_delete" class="warning" @click="$refs.deleter.confirm()">
-                    {{ __('Delete Container') }}
-                    <resource-deleter
-                        ref="deleter"
-                        :resource-title="__(container.title)"
-                        :route="container.delete_url"
+            <Dropdown v-if="container.can_edit || container.can_delete || container.can_create">
+                <DropdownMenu>
+                    <DropdownItem
+                        v-if="canCreateContainers"
+                        :text="__('Create Container')"
+                        :href="createContainerUrl"
                     />
-                </dropdown-item>
-            </dropdown-list>
+                    <DropdownItem
+                        v-if="container.can_edit"
+                        :text="__('Edit Container')"
+                        :href="container.edit_url"
+                    />
+                    <DropdownItem
+                        :text="__('Edit Blueprint')"
+                        :href="container.blueprint_url"
+                    />
+                    <DropdownItem
+                        v-if="container.can_delete"
+                        :text="__('Delete Container')"
+                        @click="$event.preventDefault(); $refs.deleter.confirm()"
+                    />
+                </DropdownMenu>
+            </Dropdown>
+
+            <resource-deleter
+                ref="deleter"
+                :resource-title="__(container.title)"
+                :route="container.delete_url"
+            />
 
             <Button v-if="canUpload" :text="__('Upload')" icon="upload" @click="openFileBrowser" />
             <Button v-if="canCreateFolders" :text="__('Create Folder')" icon="folder-add" @click="creatingFolder = true" />
@@ -33,7 +49,7 @@
             ref="uploader"
             :container="container.id"
             :path="path"
-            :enabled="canUpload"
+            :enabled="!preventDragging && canUpload"
             @updated="uploadsUpdated"
             @upload-complete="uploadCompleted"
             @error="uploadError"
@@ -77,10 +93,7 @@
                                 v-on="sharedAssetEvents"
                                 :columns="columns"
                                 :loading="loading"
-                                :mode="mode"
                                 @sorted="sorted"
-                                @create-folder="createFolder"
-                                @cancel-creating-folder="creatingFolder = false"
                             />
 
                             <!-- Grid Mode -->
@@ -91,8 +104,6 @@
                                 v-on="sharedAssetEvents"
                                 :assets="assets"
                                 :selected-assets="selectedAssets"
-                                @create-folder="createFolder"
-                                @cancel-creating-folder="creatingFolder = false"
                                 @toggle-selection="toggleSelection"
                             >
                                 <template #footer>
@@ -135,6 +146,8 @@
             v-if="showAssetEditor"
             :id="editedAssetId"
             :read-only="!canEdit"
+            @previous="editPreviousAsset"
+            @next="editNextAsset"
             @closed="closeAssetEditor"
             @saved="assetSaved"
         />
@@ -152,12 +165,12 @@ import Uploader from '../Uploader.vue';
 import Uploads from '../Uploads.vue';
 import HasActions from '../../data-list/HasActions';
 import { keyBy, sortBy } from 'lodash-es';
-import { Header, Button } from '@statamic/ui';
+import { Header, Button, Dropdown, DropdownItem, DropdownMenu } from '@statamic/ui';
 
 export default {
     mixins: [HasActions, HasPagination, HasPreferences],
 
-    components: { AssetThumbnail, AssetEditor, Uploader, Uploads, Grid, Table, Header, Button },
+    components: { DropdownMenu, DropdownItem, Dropdown, AssetThumbnail, AssetEditor, Uploader, Uploads, Grid, Table, Header, Button },
 
     props: {
         allowSelectingExistingUpload: Boolean,
@@ -165,7 +178,7 @@ export default {
         autoselectUploads: Boolean,
         canCreateContainers: Boolean,
         createContainerUrl: String,
-        initialContainer: Object,
+        container: Object,
         initialEditingAssetId: String,
         maxFiles: Number,
         queryScopes: Array,
@@ -188,7 +201,6 @@ export default {
                 },
             ],
             containers: [],
-            container: {},
             initializing: true,
             loading: true,
             assets: [],
@@ -202,20 +214,20 @@ export default {
             page: 1,
             preferencesPrefix: null,
             meta: {},
-            sortColumn: this.initialContainer.sort_field,
-            sortDirection: this.initialContainer.sort_direction,
+            sortColumn: this.container.sort_field,
+            sortDirection: this.container.sort_direction,
             mode: 'table',
             actionUrl: null,
             folderActionUrl: null,
             shifting: false,
             lastItemClicked: null,
-            actionOpened: null,
+            preventDragging: false,
         };
     },
 
     computed: {
         actionContext() {
-            return { container: this.selectedContainer };
+            return { container: this.container.id };
         },
 
         canCreateFolders() {
@@ -276,10 +288,6 @@ export default {
             return this.selectedAssets.length >= this.maxFiles;
         },
 
-        selectedContainer() {
-            return typeof this.initialContainer === 'object' ? this.initialContainer.id : this.initialContainer;
-        },
-
         showAssetEditor() {
             return Boolean(this.editedAssetId);
         },
@@ -305,17 +313,24 @@ export default {
                 'edit': this.edit,
                 'edit-asset': (event) => this.$emit('edit-asset', event),
                 'select-folder': this.selectFolder,
+                'create-folder': this.createFolder,
+                'cancel-creating-folder': () => (this.creatingFolder = false),
+                'prevent-dragging': (preventDragging) => (this.preventDragging = preventDragging),
             };
         },
-    },
-
-    mounted() {
-        this.loadContainers();
     },
 
     created() {
         this.$events.$on('editor-action-started', this.actionStarted);
         this.$events.$on('editor-action-completed', this.actionCompleted);
+    },
+
+    mounted() {
+        this.initializing = true;
+        this.preferencesPrefix = `assets.${this.container.id}`;
+        this.mode = this.getPreference('mode') || 'table';
+        this.setInitialPerPage();
+        this.loadAssets();
     },
 
     unmounted() {
@@ -324,14 +339,6 @@ export default {
     },
 
     watch: {
-        container(container) {
-            this.initializing = true;
-            this.preferencesPrefix = `assets.${container.id}`;
-            this.mode = this.getPreference('mode') || 'table';
-            this.setInitialPerPage();
-            this.loadAssets();
-        },
-
         mode(mode) {
             this.setPreference('mode', mode == 'table' ? null : mode);
         },
@@ -341,11 +348,7 @@ export default {
                 ? [this.path, this.editedAssetBasename].filter((value) => value != '/').join('/') + '/edit'
                 : this.path;
 
-            this.$emit('navigated', this.container, path);
-        },
-
-        initialContainer() {
-            this.container = this.initialContainer;
+            this.$emit('navigated', path);
         },
 
         initializing(isInitializing, wasInitializing) {
@@ -386,18 +389,72 @@ export default {
             this.loadAssets();
         },
 
-        assetDeleted() {
-            this.closeAssetEditor();
-            this.loadAssets();
-        },
-
         assetSaved() {
-            this.closeAssetEditor();
             this.loadAssets();
         },
 
         clearShift() {
             this.shifting = false;
+        },
+
+        async editPreviousAsset() {
+            let currentAssetIndex = this.assets.findIndex((asset) => asset.id === this.editedAssetId);
+
+            // When we're editing the first asset on the page, navigating to the previous asset
+            // requires us to load the previous page of assets, if there is one.
+            if (currentAssetIndex === 0) {
+                if (this.page > 1) {
+                    this.page = this.page - 1;
+                    await this.loadAssets();
+
+                    if (this.assets.length > 0) {
+                        this.editedAssetId = null;
+
+                        this.$nextTick(() => {
+                            this.editedAssetId = this.assets.slice(-1)[0].id;
+                        });
+                    }
+                }
+
+                this.editedAssetId = null;
+                return;
+            }
+
+            this.editedAssetId = null;
+
+            this.$nextTick(() => {
+                this.editedAssetId = this.assets.slice(currentAssetIndex - 1, currentAssetIndex)[0].id;
+            });
+        },
+
+        async editNextAsset() {
+            let currentAssetIndex = this.assets.findIndex((asset) => asset.id === this.editedAssetId);
+
+            // When we're editing the last asset on the page, navigating to the next asset
+            // requires us to load the next page of assets, if there is one.
+            if (currentAssetIndex === this.assets.length - 1) {
+                if (this.meta.last_page > this.page) {
+                    this.page = this.page + 1;
+                    await this.loadAssets();
+
+                    if (this.assets.length > 0) {
+                        this.editedAssetId = null;
+
+                        this.$nextTick(() => {
+                            this.editedAssetId = this.assets[0].id;
+                        });
+                    }
+                }
+
+                this.editedAssetId = null;
+                return;
+            }
+
+            this.editedAssetId = null;
+
+            this.$nextTick(() => {
+                this.editedAssetId = this.assets.slice(currentAssetIndex + 1, currentAssetIndex + 2)[0].id;
+            });
         },
 
         closeAssetEditor() {
@@ -462,7 +519,7 @@ export default {
                   ).replace(/\/$/, '')
                 : cp_url(`assets/browse/folders/${this.container.id}/${this.path || ''}`).replace(/\/$/, '');
 
-            this.$axios
+            return this.$axios
                 .get(url, { params: this.parameters })
                 .then((response) => {
                     const data = response.data;
@@ -491,13 +548,6 @@ export default {
                 });
         },
 
-        loadContainers() {
-            this.$axios.get(cp_url('asset-containers')).then((response) => {
-                this.containers = keyBy(response.data, 'id');
-                this.container = this.containers[this.selectedContainer];
-            });
-        },
-
         openFileBrowser() {
             this.$refs.uploader.browse();
         },
@@ -507,7 +557,7 @@ export default {
             this.path = path;
             this.page = 1;
 
-            this.$emit('navigated', this.container, this.path);
+            this.$emit('navigated', this.path);
         },
 
         selectRange(from, to) {

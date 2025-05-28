@@ -7,12 +7,17 @@
 
         <ui-card class="space-y-8">
             <!-- Folders -->
-            <section class="folder-grid-listing" v-if="folders.length">
+            <section class="folder-grid-listing" v-if="folders.length || creatingFolder">
                 <div
-                    class="group/folder relative"
+                    v-if="!restrictFolderNavigation"
                     v-for="folder in folders"
                     :key="folder.path"
-                    v-if="!restrictFolderNavigation"
+                    class="group/folder relative"
+                    :draggable="canMoveFolder(folder)"
+                    @dragover.prevent
+                    @drop="handleFolderDrop(folder)"
+                    @dragstart="draggingFolder = folder.path"
+                    @dragend="draggingFolder = null"
                 >
                     <Context>
                         <template #trigger>
@@ -70,6 +75,10 @@
                             <div class="asset-tile group relative" :class="{ 'bg-checkerboard': asset.can_be_transparent }">
                                 <button
                                     class="size-full"
+                                    :draggable="canMoveAsset(asset)"
+                                    @dragover.prevent
+                                    @dragstart="draggingAsset = asset.id"
+                                    @dragend="draggingAsset = null"
                                     @click.stop="toggleSelection(asset.id, index, $event)"
                                     @dblclick.stop="$emit('edit-asset', asset)"
                                 >
@@ -79,6 +88,7 @@
                                                 v-if="asset.is_image"
                                                 :src="asset.thumbnail"
                                                 loading="lazy"
+                                                :draggable="false"
                                                 :class="{
                                                     'size-full p-4': asset.extension === 'svg',
                                                     'rounded-lg p-1': asset.orientation === 'square',
@@ -140,6 +150,7 @@ import { Context, ContextMenu, ContextItem, ContextLabel, ContextSeparator, Edit
 
 export default {
     mixins: [AssetBrowserMixin],
+
     components: {
         ContextItem,
         ContextLabel,
@@ -153,29 +164,29 @@ export default {
         EditableRoot,
         Breadcrumbs,
     },
+
     props: {
         assets: { type: Array },
         selectedAssets: { type: Array },
-        creatingFolder: { type: Boolean },
     },
 
     data() {
         return {
+            actionOpened: null,
             thumbnailSize: 200,
-            newFolderName: null,
         };
     },
 
     watch: {
         thumbnailSize: {
             handler: debounce(function(size) {
-                this.$preferences.set('asset-browser-thumbnail-size', size);
+                this.$preferences.set('assets.browser_thumbnail_size', size);
             }, 300)
-        }
+        },
     },
 
     mounted() {
-        const savedSize = this.$preferences.get('asset-browser-thumbnail-size');
+        const savedSize = this.$preferences.get('assets.browser_thumbnail_size');
         if (savedSize) this.thumbnailSize = savedSize;
     },
 
@@ -203,14 +214,6 @@ export default {
 
         toggleSelection(id, index, $event) {
             this.$emit('toggle-selection', id, index, $event);
-        },
-
-        focusNewFolderInput() {
-            this.$refs.newFolderInput?.edit();
-        },
-
-        clearNewFolderName() {
-            this.newFolderName = null;
         },
     },
 };

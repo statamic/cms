@@ -1,6 +1,7 @@
 <template>
     <Panel class="relative overflow-x-auto overscroll-x-contain">
         <data-list-table
+            ref="dataListTable"
             :allow-bulk-actions="true"
             :loading="loading"
             :toggle-selection-on-row-click="true"
@@ -21,9 +22,15 @@
                     <td :colspan="columns.length" />
                 </tr>
                 <tr
+                    v-if="!restrictFolderNavigation"
                     v-for="(folder, i) in folders"
                     :key="folder.path"
-                    v-if="!restrictFolderNavigation"
+                    class="pointer-events-auto"
+                    :draggable="canMoveFolder(folder)"
+                    @dragover.prevent
+                    @drop="handleFolderDrop(folder)"
+                    @dragstart="draggingFolder = folder.path"
+                    @dragend="draggingFolder = null"
                 >
                     <td />
                     <td @click="selectFolder(folder.path)">
@@ -81,7 +88,13 @@
             </template>
 
             <template #cell-basename="{ row: asset, checkboxId }">
-                <div class="w-fit-content group flex items-center">
+                <div
+                    class="w-fit-content group flex items-center"
+                    :draggable="canMoveAsset(asset)"
+                    @dragover.prevent
+                    @dragstart="draggingAsset = asset.id"
+                    @dragend="draggingAsset = null"
+                >
                     <asset-thumbnail
                         :asset="asset"
                         :square="true"
@@ -132,6 +145,8 @@ import AssetBrowserMixin from './AssetBrowserMixin';
 import { Panel, Dropdown, DropdownMenu, DropdownItem, DropdownLabel, DropdownSeparator, Editable } from '@statamic/ui';
 
 export default {
+    mixins: [AssetBrowserMixin],
+
     components: {
         Editable,
         AssetThumbnail,
@@ -144,31 +159,20 @@ export default {
         DropdownSeparator,
     },
 
-    mixins: [AssetBrowserMixin],
-
     props: {
         loading: Boolean,
         columns: Array,
-        creatingFolder: { type: Boolean },
     },
 
-    data() {
-        return {
-            newFolderName: null,
-        };
+    computed: {
+        assets() {
+            return this.$refs.dataListTable.rows;
+        },
     },
 
     methods: {
         sorted(column, direction) {
             this.$emit('sorted', column, direction);
-        },
-
-        focusNewFolderInput() {
-            this.$refs.newFolderInput?.edit();
-        },
-
-        clearNewFolderName() {
-            this.newFolderName = null;
         },
     },
 

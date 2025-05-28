@@ -8,6 +8,25 @@ export default {
         folders: Array,
         path: String,
         restrictFolderNavigation: Boolean,
+        creatingFolder: Boolean,
+    },
+
+    data() {
+        return {
+            newFolderName: null,
+            draggingAsset: null,
+            draggingFolder: null,
+        }
+    },
+
+    watch: {
+        draggingAsset() {
+            this.$emit('prevent-dragging', this.draggingAsset !== null);
+        },
+
+        draggingFolder() {
+            this.$emit('prevent-dragging', this.draggingFolder !== null);
+        },
     },
 
     methods: {
@@ -29,6 +48,66 @@ export default {
 
         selectFolder(path) {
             this.$emit('select-folder', path);
+        },
+
+        focusNewFolderInput() {
+            this.$refs.newFolderInput?.edit();
+        },
+
+        clearNewFolderName() {
+            this.newFolderName = null;
+        },
+
+        canMoveAsset(asset) {
+            return asset.actions.some((action) => action.handle === 'move_asset');
+        },
+
+        canMoveFolder(folder) {
+            return folder.actions.some((action) => action.handle === 'move_asset_folder');
+        },
+
+        handleFolderDrop(destinationFolder) {
+            if (this.draggingAsset) {
+                let asset = this.assets.find((asset) => asset.id === this.draggingAsset);
+                let action = asset.actions.find((action) => action.handle === 'move_asset');
+
+                if (!action) {
+                    return;
+                }
+
+                const payload = {
+                    action: action.handle,
+                    context: action.context,
+                    selections: [this.draggingAsset],
+                    values: { folder: destinationFolder.path },
+                };
+
+                this.$axios
+                    .post(this.actionUrl, payload)
+                    .then(response => this.$emit('action-completed', true, response))
+                    .finally(() => this.draggingAsset = null);
+            }
+
+            if (this.draggingFolder) {
+                let folder = this.folders.find((folder) => folder.path === this.draggingFolder);
+                let action = folder.actions.find((action) => action.handle === 'move_asset_folder');
+
+                if (!action) {
+                    return;
+                }
+
+                const payload = {
+                    action: action.handle,
+                    context: action.context,
+                    selections: [this.draggingFolder],
+                    values: { folder: destinationFolder.path },
+                };
+
+                this.$axios
+                    .post(this.folderActionUrl, payload)
+                    .then(response => this.$emit('action-completed', true, response))
+                    .finally(() => this.draggingFolder = null);
+            }
         },
     },
 };
