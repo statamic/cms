@@ -473,12 +473,18 @@ export default {
         },
 
         navigateToPreviousAsset() {
-            this.save();
+            if (this.$dirty.has(this.publishContainer)) {
+                this.save();
+            }
+
             this.$emit('previous');
         },
 
         navigateToNextAsset() {
-            this.save();
+            if (this.$dirty.has(this.publishContainer)) {
+                this.save();
+            }
+            
             this.$emit('next');
         },
 
