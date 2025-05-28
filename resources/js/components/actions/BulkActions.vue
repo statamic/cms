@@ -48,14 +48,18 @@ function getActions() {
         .then(response => actions.value = response.data);
 }
 
+let errors = ref({});
+
 function runAction(action, values, done) {
+    errors.value = {};
     emit('started');
 
     runServerAction({ action, values, done, url: props.url, selections: props.selections })
         .then(data => emit('completed', true, data))
-        .catch(data => emit('completed', false, data));
-
-    // TODO: Handle validation `errors` from server, which is passed into ConfirmableAction's errors prop below
+        .catch(data => {
+            errors.value = data.errors;
+            emit('completed', false, data);
+        });
 }
 </script>
 
@@ -67,7 +71,7 @@ function runAction(action, values, done) {
         :key="action.handle"
         :action="action"
         :selections="selections.length"
-        :errors="{}"
+        :errors="errors"
         @confirmed="runAction"
     />
     <slot
