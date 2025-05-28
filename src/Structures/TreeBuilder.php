@@ -95,7 +95,7 @@ class TreeBuilder
             return [
                 'id' => $page->id(),
                 'entry' => $page->reference(),
-                'title' => $page->hasCustomTitle() ? $page->title() : null,
+                'title' => $page->hasCustomTitle() ? $page->title() : ($page->hasCustomUrl() ? $page->url() : null),
                 'entry_title' => $referenceExists ? $page->entry()->value('title') : null,
                 'entry_blueprint' => $referenceExists ? [
                     'handle' => $page->entry()->blueprint()->handle(),
