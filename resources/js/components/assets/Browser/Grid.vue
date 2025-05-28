@@ -12,12 +12,14 @@
                     v-if="!restrictFolderNavigation"
                     v-for="folder in folders"
                     :key="folder.path"
-                    class="group/folder relative"
+                    class="group/folder relative p-1"
+                    :class="{ 'ring-2 rounded-xl ring-blue-400': dragOverFolder === folder.path }"
                     :draggable="canMoveFolder(folder)"
-                    @dragover.prevent
-                    @drop="handleFolderDrop(folder)"
+                    @dragover.prevent="dragOverFolder = folder.path"
+                    @dragleave.prevent="dragOverFolder = null"
+                    @drop="handleFolderDrop(folder); dragOverFolder = null"
                     @dragstart="draggingFolder = folder.path"
-                    @dragend="draggingFolder = null"
+                    @dragend="draggingFolder = null; dragOverFolder = null"
                 >
                     <Context>
                         <template #trigger>
@@ -72,7 +74,13 @@
                 >
                     <Context>
                         <template #trigger>
-                            <div class="asset-tile group relative" :class="{ 'bg-checkerboard': asset.can_be_transparent }">
+                            <div
+                                class="asset-tile group relative bg-white"
+                                :class="{
+                                    'bg-checkerboard!': asset.can_be_transparent,
+                                    'opacity-50!': draggingAsset === asset.id,
+                                }"
+                            >
                                 <button
                                     class="size-full"
                                     :draggable="canMoveAsset(asset)"
@@ -174,6 +182,7 @@ export default {
         return {
             actionOpened: null,
             thumbnailSize: 200,
+            dragOverFolder: null,
         };
     },
 

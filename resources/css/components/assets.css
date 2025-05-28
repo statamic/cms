@@ -109,7 +109,7 @@
 }
 
 .folder-grid-listing {
-    @apply relative grid gap-8;
+    @apply relative grid gap-7;
     grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
 }
 
