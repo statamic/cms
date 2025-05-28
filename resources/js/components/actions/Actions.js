@@ -92,11 +92,7 @@ export default function useActions() {
 
     function handleActionError(response, reject) {
         response.data.text().then((data) => {
-            data = JSON.parse(data);
-            // TODO: Pass errors through reject() and toast in actual component
-            // if (response.status == 422) errors.value = data.errors;
-            // this.$toast.error(data.message);
-            reject(data);
+            reject(JSON.parse(data));
         });
     }
 
