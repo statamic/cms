@@ -131,12 +131,31 @@
                             @per-page-changed="changePerPage"
                         /> -->
 
-                         <data-list-bulk-actions
+                        <BulkActions
                             :url="actionUrl"
+                            :selections="selections"
                             :context="actionContext"
                             @started="actionStarted"
                             @completed="actionCompleted"
-                        />
+                            v-slot="{ actions }"
+                        >
+                            <div class="fixed inset-x-0 bottom-1 z-100 flex w-full justify-center">
+                                <ButtonGroup>
+                                    <Button
+                                        variant="primary"
+                                        class="text-gray-400!"
+                                        :text="__n(`:count item selected|:count items selected`, selections.length)"
+                                    />
+                                    <Button
+                                        v-for="action in actions"
+                                        :key="action.handle"
+                                        variant="primary"
+                                        :text="__(action.title)"
+                                        @click="action.run"
+                                    />
+                                </ButtonGroup>
+                            </div>
+                        </BulkActions>
                     </div>
                 </data-list>
             </div>
@@ -165,12 +184,27 @@ import Uploader from '../Uploader.vue';
 import Uploads from '../Uploads.vue';
 import HasActions from '../../data-list/HasActions';
 import { keyBy, sortBy } from 'lodash-es';
-import { Header, Button, Dropdown, DropdownItem, DropdownMenu } from '@statamic/ui';
+import { Header, Button, ButtonGroup, Dropdown, DropdownItem, DropdownMenu } from '@statamic/ui';
+import BulkActions from '@statamic/components/data-list/BulkActions.vue';
 
 export default {
     mixins: [HasActions, HasPagination, HasPreferences],
 
-    components: { DropdownMenu, DropdownItem, Dropdown, AssetThumbnail, AssetEditor, Uploader, Uploads, Grid, Table, Header, Button },
+    components: {
+        DropdownMenu,
+        DropdownItem,
+        Dropdown,
+        AssetThumbnail,
+        AssetEditor,
+        Uploader,
+        Uploads,
+        Grid,
+        Table,
+        Header,
+        Button,
+        ButtonGroup,
+        BulkActions,
+    },
 
     props: {
         allowSelectingExistingUpload: Boolean,

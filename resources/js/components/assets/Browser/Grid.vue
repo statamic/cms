@@ -72,73 +72,86 @@
                     class="group relative"
                     :class="{ selected: isSelected(asset.id) }"
                 >
-                    <Context>
-                        <template #trigger>
-                            <div
-                                class="asset-tile group relative bg-white"
-                                :class="{
-                                    'bg-checkerboard!': asset.can_be_transparent,
-                                    'opacity-50!': draggingAsset === asset.id,
-                                }"
-                            >
-                                <button
-                                    class="size-full"
-                                    :draggable="canMoveAsset(asset)"
-                                    @dragover.prevent
-                                    @dragstart="draggingAsset = asset.id"
-                                    @dragend="draggingAsset = null"
-                                    @click.stop="toggleSelection(asset.id, index, $event)"
-                                    @dblclick.stop="$emit('edit-asset', asset)"
+                    <ItemActions
+                        :url="actionUrl"
+                        :actions="asset.actions"
+                        :item="asset.id"
+                        @started="actionStarted"
+                        @completed="actionCompleted"
+                        v-slot="{ actions }"
+                    >
+                        <Context>
+                            <template #trigger>
+                                <div
+                                    class="asset-tile group relative bg-white"
+                                    :class="{
+                                        'bg-checkerboard!': asset.can_be_transparent,
+                                        'opacity-50!': draggingAsset === asset.id,
+                                    }"
                                 >
-                                    <div class="relative flex aspect-square size-full items-center justify-center">
-                                        <div class="asset-thumb">
-                                            <img
-                                                v-if="asset.is_image"
-                                                :src="asset.thumbnail"
-                                                loading="lazy"
-                                                :draggable="false"
-                                                :class="{
-                                                    'size-full p-4': asset.extension === 'svg',
-                                                    'rounded-lg p-1': asset.orientation === 'square',
-                                                }"
-                                            />
-                                            <file-icon v-else :extension="asset.extension" class="size-1/2" />
+                                    <button
+                                        class="size-full"
+                                        :draggable="canMoveAsset(asset)"
+                                        @dragover.prevent
+                                        @dragstart="draggingAsset = asset.id"
+                                        @dragend="draggingAsset = null"
+                                        @click.stop="toggleSelection(asset.id, index, $event)"
+                                        @dblclick.stop="$emit('edit-asset', asset)"
+                                    >
+                                        <div class="relative flex aspect-square size-full items-center justify-center">
+                                            <div class="asset-thumb">
+                                                <img
+                                                    v-if="asset.is_image"
+                                                    :src="asset.thumbnail"
+                                                    loading="lazy"
+                                                    :draggable="false"
+                                                    :class="{
+                                                        'size-full p-4': asset.extension === 'svg',
+                                                        'rounded-lg p-1': asset.orientation === 'square',
+                                                    }"
+                                                />
+                                                <file-icon v-else :extension="asset.extension" class="size-1/2" />
+                                            </div>
                                         </div>
+                                    </button>
+                                    <div class="absolute top-1 end-2">
+                                        <Dropdown placement="left-start">
+                                            <DropdownMenu>
+                                                <DropdownLabel :text="__('Actions')" />
+                                                <DropdownItem
+                                                    :text="__(canEdit ? 'Edit' : 'View')"
+                                                    @click="edit(asset.id)"
+                                                    icon="edit"
+                                                />
+                                                <DropdownSeparator v-if="asset.actions.length" />
+                                                <DropdownItem
+                                                    v-for="action in actions"
+                                                    :key="action.handle"
+                                                    :text="__(action.title)"
+                                                    icon="edit"
+                                                    :class="{ 'text-red-500': action.dangerous }"
+                                                    @click="action.run"
+                                                />
+                                            </DropdownMenu>
+                                        </Dropdown>
                                     </div>
-                                </button>
-                                <dropdown-list
-                                    class="absolute top-1 opacity-0 group-hover:opacity-100 end-2"
-                                    :class="{ 'opacity-100': actionOpened === asset.id }"
-                                    @opened="actionOpened = asset.id"
-                                    @closed="actionOpened = null"
-                                >
-                                    <dropdown-item
-                                        :text="__(canEdit ? 'Edit' : 'View')"
-                                        @click="edit(asset.id)"
-                                    />
-                                    <div class="divider" v-if="asset.actions.length" />
-                                    <data-list-inline-actions
-                                        :item="asset.id"
-                                        :url="actionUrl"
-                                        :actions="asset.actions"
-                                        @started="actionStarted"
-                                        @completed="actionCompleted"
-                                    />
-                                </dropdown-list>
-                            </div>
-                        </template>
-                        <ContextMenu>
-                            <ContextItem icon="edit" :text="__(canEdit ? 'Edit' : 'View')" @click="edit(asset.id)" />
-                            <ContextSeparator />
-                            <data-list-inline-actions
-                                :item="asset.id"
-                                :url="actionUrl"
-                                :actions="asset.actions"
-                                @started="actionStarted"
-                                @completed="actionCompleted"
-                            />
-                        </ContextMenu>
-                    </Context>
+                                </div>
+                            </template>
+                            <ContextMenu>
+                                <ContextLabel :text="__('Actions')" />
+                                <ContextItem icon="edit" :text="__(canEdit ? 'Edit' : 'View')" @click="edit(asset.id)" />
+                                <ContextSeparator />
+                                <ContextItem
+                                    v-for="action in actions"
+                                    :key="action.handle"
+                                    :text="__(action.title)"
+                                    icon="edit"
+                                    :class="{ 'text-red-500': action.dangerous }"
+                                    @click="action.run"
+                                />
+                            </ContextMenu>
+                        </Context>
+                    </ItemActions>
                     <div class="asset-filename" v-text="truncateFilename(asset.basename)" :title="asset.basename" />
                 </div>
             </section>
@@ -154,7 +167,8 @@ import AssetBrowserMixin from './AssetBrowserMixin';
 import Breadcrumbs from './Breadcrumbs.vue';
 import { debounce } from 'lodash-es';
 import { EditableArea, EditableInput, EditablePreview, EditableRoot } from 'reka-ui';
-import { Context, ContextMenu, ContextItem, ContextLabel, ContextSeparator, Editable } from '@statamic/ui';
+import { Context, ContextMenu, ContextItem, ContextLabel, ContextSeparator, Editable, Dropdown, DropdownMenu, DropdownLabel, DropdownItem, DropdownSeparator } from '@statamic/ui';
+import ItemActions from '@statamic/components/actions/ItemActions.vue';
 
 export default {
     mixins: [AssetBrowserMixin],
@@ -171,6 +185,12 @@ export default {
         EditableArea,
         EditableRoot,
         Breadcrumbs,
+        Dropdown,
+        DropdownMenu,
+        DropdownLabel,
+        DropdownItem,
+        DropdownSeparator,
+        ItemActions
     },
 
     props: {
@@ -180,7 +200,6 @@ export default {
 
     data() {
         return {
-            actionOpened: null,
             thumbnailSize: 200,
             dragOverFolder: null,
         };

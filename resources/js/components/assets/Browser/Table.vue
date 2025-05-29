@@ -112,24 +112,34 @@
             </template>
 
             <template #actions="{ row: asset }">
-                <Dropdown placement="left-start" class="me-3">
-                    <DropdownMenu>
-                        <DropdownLabel :text="__('Actions')" />
-                        <DropdownItem
-                            :text="__(canEdit ? 'Edit' : 'View')"
-                            @click="edit(asset.id)"
-                            icon="edit"
-                        />
-                        <DropdownSeparator v-if="asset.actions.length" />
-                        <data-list-inline-actions
-                            :item="asset.id"
-                            :url="actionUrl"
-                            :actions="asset.actions"
-                            @started="actionStarted"
-                            @completed="actionCompleted"
-                        />
-                    </DropdownMenu>
-                </Dropdown>
+                <ItemActions
+                    :url="actionUrl"
+                    :actions="asset.actions"
+                    :item="asset.id"
+                    @started="actionStarted"
+                    @completed="actionCompleted"
+                    v-slot="{ actions }"
+                >
+                    <Dropdown placement="left-start" class="me-3">
+                        <DropdownMenu>
+                            <DropdownLabel :text="__('Actions')" />
+                            <DropdownItem
+                                :text="__(canEdit ? 'Edit' : 'View')"
+                                @click="edit(asset.id)"
+                                icon="edit"
+                            />
+                            <DropdownSeparator v-if="asset.actions.length" />
+                            <DropdownItem
+                                v-for="action in actions"
+                                :key="action.handle"
+                                :text="__(action.title)"
+                                icon="edit"
+                                :class="{ 'text-red-500': action.dangerous }"
+                                @click="action.run"
+                            />
+                        </DropdownMenu>
+                    </Dropdown>
+                </ItemActions>
             </template>
         </data-list-table>
         <ui-panel-footer class="p-1! pb-0!">
@@ -143,11 +153,13 @@ import AssetThumbnail from './Thumbnail.vue';
 import Breadcrumbs from './Breadcrumbs.vue';
 import AssetBrowserMixin from './AssetBrowserMixin';
 import { Panel, Dropdown, DropdownMenu, DropdownItem, DropdownLabel, DropdownSeparator, Editable } from '@statamic/ui';
+import ItemActions from '@statamic/components/actions/ItemActions.vue';
 
 export default {
     mixins: [AssetBrowserMixin],
 
     components: {
+        ItemActions,
         Editable,
         AssetThumbnail,
         Breadcrumbs,
