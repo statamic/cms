@@ -95,13 +95,13 @@ class TreeBuilder
             return [
                 'id' => $page->id(),
                 'entry' => $page->reference(),
-                'title' => $page->hasCustomTitle() ? $page->title() : ($page->hasCustomUrl() ? $page->url() : null),
+                'title' => $page->hasCustomTitle() ? $page->title() : null,
                 'entry_title' => $referenceExists ? $page->entry()->value('title') : null,
                 'entry_blueprint' => $referenceExists ? [
                     'handle' => $page->entry()->blueprint()->handle(),
                     'title' => $page->entry()->blueprint()->title(),
                 ] : null,
-                'url' => $referenceExists ? $page->url() : null,
+                'url' => $page->url(),
                 'edit_url' => $page->editUrl(),
                 'can_delete' => $referenceExists ? User::current()->can('delete', $page->entry()) : true,
                 'slug' => $page->slug(),
