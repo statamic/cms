@@ -62,6 +62,24 @@ class StacheTest extends TestCase
     }
 
     #[Test]
+    public function stores_can_be_removed()
+    {
+        $this->stache->sites(['en']); // store expects the stache to have site(s)
+        $this->assertTrue($this->stache->stores()->isEmpty());
+
+        $this->stache->registerStore(
+            new CollectionsStore($this->stache, \Mockery::mock(Filesystem::class))
+        );
+
+        $return = $this->stache->removeStore('collections');
+
+        $this->assertEquals($this->stache, $return);
+        tap($this->stache->stores(), function ($stores) {
+            $this->assertEquals(0, $stores->count());
+        });
+    }
+
+    #[Test]
     public function multiple_stores_can_be_registered_at_once()
     {
         $this->stache->sites(['en']); // store expects the stache to have site(s)
