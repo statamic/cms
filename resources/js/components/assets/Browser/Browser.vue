@@ -78,7 +78,6 @@
                             <!-- Search and Filter -->
                             <div class="flex items-center justify-between gap-3">
                                 <data-list-search ref="search" v-model="searchQuery" />
-
                                 <data-list-column-picker v-if="mode === 'table'" :preferences-key="preferencesKey('columns')" />
                             </div>
 
@@ -101,7 +100,16 @@
                                 :loading="loading"
                                 :visible-columns="visibleColumns"
                                 @sorted="sorted"
-                            />
+                            >
+                                <template #footer>
+                                    <data-list-pagination
+                                        :resource-meta="meta"
+                                        :per-page="perPage"
+                                        @page-selected="page = $event"
+                                        @per-page-changed="changePerPage"
+                                    />
+                                </template>
+                            </Table>
 
                             <!-- Grid Mode -->
                             <Grid

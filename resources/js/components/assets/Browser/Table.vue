@@ -147,7 +147,9 @@
                 </template>
             </data-list-table>
         </Card>
-        <slot name="footer" />
+        <PanelFooter>
+            <slot name="footer" />
+        </PanelFooter>
     </Panel>
 </template>
 
@@ -156,7 +158,7 @@ import AssetBrowserMixin from './AssetBrowserMixin';
 import AssetThumbnail from './Thumbnail.vue';
 import Breadcrumbs from './Breadcrumbs.vue';
 import ItemActions from '@statamic/components/actions/ItemActions.vue';
-import { Card, Dropdown, DropdownItem, DropdownLabel, DropdownMenu, DropdownSeparator, Editable, Panel, PanelHeader } from '@statamic/ui';
+import { Card, Dropdown, DropdownItem, DropdownLabel, DropdownMenu, DropdownSeparator, Editable, Panel, PanelFooter, PanelHeader } from '@statamic/ui';
 
 export default {
     mixins: [AssetBrowserMixin],
@@ -173,6 +175,7 @@ export default {
         Editable,
         ItemActions,
         Panel,
+        PanelFooter,
         PanelHeader,
     },
 
