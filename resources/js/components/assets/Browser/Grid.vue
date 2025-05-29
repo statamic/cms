@@ -21,27 +21,37 @@
                     @dragstart="draggingFolder = folder.path"
                     @dragend="draggingFolder = null; dragOverFolder = null"
                 >
-                    <Context>
-                        <template #trigger>
-                            <button @dblclick="selectFolder(folder.path)" class="group h-[66px] w-[80px]">
-                                <ui-icon name="asset-folder" class="size-full text-blue-400/90 hover:text-blue-400" />
-                                <div
-                                    class="overflow-hidden text-center font-mono text-xs text-ellipsis whitespace-nowrap text-gray-500"
-                                    v-text="folder.basename"
-                                    :title="folder.basename"
+                    <ItemActions
+                        :url="actionUrl"
+                        :actions="folderActions(folder)"
+                        :item="folder.path"
+                        @started="actionStarted"
+                        @completed="actionCompleted"
+                        v-slot="{ actions }"
+                    >
+                        <Context>
+                            <template #trigger>
+                                <button @dblclick="selectFolder(folder.path)" class="group h-[66px] w-[80px]">
+                                    <ui-icon name="asset-folder" class="size-full text-blue-400/90 hover:text-blue-400" />
+                                    <div
+                                        class="overflow-hidden text-center font-mono text-xs text-ellipsis whitespace-nowrap text-gray-500"
+                                        v-text="folder.basename"
+                                        :title="folder.basename"
+                                    />
+                                </button>
+                            </template>
+                            <ContextMenu>
+                                <ContextItem
+                                    v-for="action in actions"
+                                    :key="action.handle"
+                                    :text="__(action.title)"
+                                    icon="edit"
+                                    :class="{ 'text-red-500': action.dangerous }"
+                                    @click="action.run"
                                 />
-                            </button>
-                        </template>
-                        <ContextMenu v-if="folderActions(folder).length">
-                            <data-list-inline-actions
-                                :item="folder.path"
-                                :url="folderActionUrl"
-                                :actions="folderActions(folder)"
-                                @started="actionStarted"
-                                @completed="actionCompleted"
-                            />
-                        </ContextMenu>
-                    </Context>
+                            </ContextMenu>
+                        </Context>
+                    </ItemActions>
                 </div>
                 <div v-if="creatingFolder" class="group/folder relative">
                     <div class="group h-[66px] w-[80px]">
