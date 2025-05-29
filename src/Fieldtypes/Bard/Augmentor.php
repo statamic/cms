@@ -3,10 +3,10 @@
 namespace Statamic\Fieldtypes\Bard;
 
 use Closure;
-use Facades\Statamic\Fieldtypes\RowId;
 use Statamic\Fields\Field;
 use Statamic\Fields\Value;
 use Statamic\Fields\Values;
+use Statamic\Fieldtypes\RowId;
 use Statamic\Fieldtypes\Text;
 use Statamic\Support\Arr;
 use Tiptap\Editor;

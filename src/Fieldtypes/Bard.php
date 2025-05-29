@@ -2,7 +2,6 @@
 
 namespace Statamic\Fieldtypes;
 
-use Facades\Statamic\Fieldtypes\RowId;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
