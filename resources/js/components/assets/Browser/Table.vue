@@ -8,29 +8,18 @@
             @sorted="sorted"
         >
             <template #tbody-start>
-                <tr v-if="folder && folder.parent_path && !restrictFolderNavigation">
-                    <td />
-                    <td @click="selectFolder(folder.parent_path)">
-                        <a class="group flex cursor-pointer items-center">
-                            <file-icon
-                                extension="folder"
-                                class="inline-block h-8 w-8 text-blue-400 group-hover:text-blue ltr:mr-2 rtl:ml-2"
-                            />
-                            ..
-                        </a>
-                    </td>
-                    <td :colspan="columns.length" />
-                </tr>
                 <tr
                     v-if="!restrictFolderNavigation"
                     v-for="(folder, i) in folders"
                     :key="folder.path"
                     class="pointer-events-auto"
+                    :class="{ 'bg-blue-50': dragOverFolder === folder.path }"
                     :draggable="canMoveFolder(folder)"
-                    @dragover.prevent
-                    @drop="handleFolderDrop(folder)"
+                    @dragover.prevent="dragOverFolder = folder.path"
+                    @dragleave.prevent="dragOverFolder = null"
+                    @drop="handleFolderDrop(folder); dragOverFolder = null"
                     @dragstart="draggingFolder = folder.path"
-                    @dragend="draggingFolder = null"
+                    @dragend="draggingFolder = null; dragOverFolder = null"
                 >
                     <td />
                     <td v-for="column in visibleColumns">
@@ -186,6 +175,12 @@ export default {
         loading: Boolean,
         columns: Array,
         visibleColumns: Array,
+    },
+
+    data() {
+        return {
+            dragOverFolder: null,
+        };
     },
 
     computed: {
