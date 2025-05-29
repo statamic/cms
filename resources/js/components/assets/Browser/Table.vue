@@ -45,18 +45,28 @@
                         </template>
                     </td>
                     <td class="actions-column pr-3!">
-                        <Dropdown placement="left-start" v-if="folderActions(folder).length">
-                            <DropdownMenu>
-                                <DropdownLabel :text="__('Actions')" />
-                                <data-list-inline-actions
-                                    :item="folder.path"
-                                    :url="folderActionUrl"
-                                    :actions="folderActions(folder)"
-                                    @started="actionStarted"
-                                    @completed="actionCompleted"
-                                />
-                            </DropdownMenu>
-                        </Dropdown>
+                        <ItemActions
+                            :url="actionUrl"
+                            :actions="folder.actions"
+                            :item="folder.path"
+                            @started="actionStarted"
+                            @completed="actionCompleted"
+                            v-slot="{ actions }"
+                        >
+                            <Dropdown placement="left-start" v-if="folderActions(folder).length">
+                                <DropdownMenu>
+                                    <DropdownLabel :text="__('Actions')" />
+                                    <DropdownItem
+                                        v-for="action in actions"
+                                        :key="action.handle"
+                                        :text="__(action.title)"
+                                        icon="edit"
+                                        :class="{ 'text-red-500': action.dangerous }"
+                                        @click="action.run"
+                                    />
+                                </DropdownMenu>
+                            </Dropdown>
+                        </ItemActions>
                     </td>
                 </tr>
                 <tr v-if="creatingFolder">

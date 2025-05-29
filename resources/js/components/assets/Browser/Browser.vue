@@ -140,7 +140,7 @@
 
                         <BulkActions
                             :url="actionUrl"
-                            :selections="selections"
+                            :selections="selectedAssets"
                             :context="actionContext"
                             @started="actionStarted"
                             @completed="actionCompleted"
@@ -151,7 +151,7 @@
                                     <Button
                                         variant="primary"
                                         class="text-gray-400!"
-                                        :text="__n(`:count item selected|:count items selected`, selections.length)"
+                                        :text="__n(`:count item selected|:count items selected`, selectedAssets.length)"
                                     />
                                     <Button
                                         v-for="action in actions"
