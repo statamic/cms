@@ -17,7 +17,7 @@ import FormSubmissionListing from '../components/forms/SubmissionListing.vue';
 import GlobalListing from '../components/globals/Listing.vue';
 import GlobalEditForm from '../components/globals/EditForm.vue';
 import GlobalPublishForm from '../components/globals/PublishForm.vue';
-import GlobalCreateForm from '../components/globals/Create.vue';
+import GlobalCreateForm from '../components/globals/CreateForm.vue';
 import UserListing from '../components/users/Listing.vue';
 import UserWizard from '../components/users/Wizard.vue';
 import RoleListing from '../components/roles/Listing.vue';
@@ -44,6 +44,9 @@ import Updater from '../components/updater/Updater.vue';
 import PortalTargets from '../components/portals/PortalTargets.vue';
 import SitesEditForm from '../components/sites/EditForm.vue';
 import CommandPalette from '../components/command-palette/CommandPalette.vue';
+import ItemActions from '../components/actions/ItemActions.vue';
+import BulkActions from '../components/actions/BulkActions.vue';
+
 import { defineAsyncComponent } from 'vue';
 import { ConfigProvider } from 'reka-ui';
 
@@ -96,6 +99,8 @@ export default {
         PortalTargets,
         SitesEditForm,
         ConfigProvider,
+        ItemActions,
+        BulkActions,
     },
 
     data() {

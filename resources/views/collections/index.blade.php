@@ -7,19 +7,11 @@
 
 @section('content')
     @unless ($collections->isEmpty())
-        <ui-header title="{{ __('Collections') }}" icon="collections">
-            @can('create', 'Statamic\Contracts\Entries\Collection')
-                <ui-button
-                    href="{{ cp_route('collections.create') }}"
-                    text="{{ __('Create Collection') }}"
-                    variant="primary"
-                />
-            @endcan
-        </ui-header>
-
         <collection-list
             :initial-rows="{{ json_encode($collections) }}"
             :initial-columns="{{ json_encode($columns) }}"
+            :can-create-collections="{{ $user->can('create', 'Statamic\Contracts\Entries\Collection') ? 'true' : 'false' }}"
+            create-url="{{ cp_route('collections.create') }}"
         ></collection-list>
     @else
         <x-statamic::empty-screen

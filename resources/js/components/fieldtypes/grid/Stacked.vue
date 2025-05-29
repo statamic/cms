@@ -29,6 +29,7 @@
                     :meta="meta[row._id]"
                     :name="name"
                     :field-path-prefix="fieldPathPrefix"
+                    :meta-path-prefix="metaPathPrefix"
                     :can-delete="canDeleteRows"
                     :can-add-rows="canAddRows"
                     @updated="(row, value) => $emit('updated', row, value)"

@@ -1,5 +1,17 @@
 <template>
-    <div class="@container/collections flex flex-wrap py-2 gap-y-6 -mx-3">
+    <ui-header :title="__('Collections')" icon="collections">
+        <ui-toggle-group v-model="mode">
+            <ui-toggle-item icon="layout-grid" value="grid" />
+            <ui-toggle-item icon="layout-list" value="table" />
+        </ui-toggle-group>
+        <ui-button
+            :href="createUrl"
+            :text="__('Create Collection')"
+            variant="primary"
+            v-if="canCreateCollections"
+        />
+    </ui-header>
+    <div class="@container/collections flex flex-wrap py-2 gap-y-6 -mx-3" v-if="mode === 'grid'">
         <div v-for="collection in items" class="w-full @4xl:w-1/2 px-3">
             <ui-panel>
                 <ui-panel-header class="flex items-center justify-between">
@@ -46,7 +58,7 @@
                     </aside>
                 </ui-panel-header>
 
-                <ui-card>
+                <ui-card class="h-40">
                     <data-list :rows="collection.entries" :columns="collection.columns" :sort="false">
                         <data-list-table unstyled class="[&_td]:p-0.5 [&_td]:text-sm [&_thead]:hidden w-full">
                             <template #cell-title="{ row: entry }" class="w-full">
@@ -62,10 +74,11 @@
                             </template>
                         </data-list-table>
                     </data-list>
+                    <ui-subheading v-if="collection.entries.length === 0" class="text-center h-full flex items-center justify-center">{{ __('Nothing to see here, yet.') }}</ui-subheading>
                 </ui-card>
 
                 <ui-panel-footer class="flex items-center gap-6 text-sm text-gray-500">
-                    <div class="flex items-center gap-2" v-if="collection.published_entries_count > 0">
+                    <div class="flex items-center gap-2">
                         <ui-badge variant="flat" :text="String(collection.published_entries_count)" pill class="bg-gray-200 dark:bg-gray-700" />
                         <span>{{ __('Published') }}</span>
                     </div>
@@ -82,12 +95,35 @@
         </div>
     </div>
 
-        <!-- <data-list ref="dataList" :columns="columns" :rows="items">
+    <data-list ref="dataList" :columns="columns" :rows="items" v-if="mode === 'table'">
+        <ui-panel>
             <data-list-table>
                 <template #cell-title="{ row: collection }">
-                    <a :href="collection.available_in_selected_site ? collection.entries_url : collection.edit_url">{{
-                        __(collection.title)
-                    }}</a>
+                    <a :href="collection.available_in_selected_site ? collection.entries_url : collection.edit_url" class="flex items-center gap-2">
+                        <ui-icon :name="collection.icon || 'collections'" />
+                        {{ __(collection.title) }}
+                    </a>
+                </template>
+                <template #cell-entries_count="{ row: collection }">
+                    <div class="flex items-center gap-3">
+                        <ui-badge
+                            v-if="collection.published_entries_count > 0"
+                            color="green"
+                            :text="String(collection.published_entries_count) + ' ' + __('Published')"
+                            pill
+                        />
+                        <ui-badge
+                            v-if="collection.scheduled_entries_count > 0"
+                            color="yellow"
+                            :text="String(collection.scheduled_entries_count) + ' ' + __('Scheduled')"
+                            pill
+                        />
+                        <ui-badge
+                            v-if="collection.draft_entries_count > 0"
+                            :text="String(collection.draft_entries_count) + ' ' + __('Draft')"
+                            pill
+                        />
+                    </div>
                 </template>
                 <template #actions="{ row: collection, index }">
                     <dropdown-list placement="left-start">
@@ -117,7 +153,8 @@
                     </dropdown-list>
                 </template>
             </data-list-table>
-    </data-list> -->
+        </ui-panel>
+    </data-list>
 </template>
 
 <script>
@@ -130,6 +167,8 @@ export default {
     components: { CardPanel, StatusIndicator, Badge },
 
     props: {
+        canCreateCollections: Boolean,
+        createUrl: String,
         initialRows: Array,
         initialColumns: Array,
     },
@@ -138,8 +177,9 @@ export default {
         return {
             initializedRequest: false,
             items: this.initialRows,
+            columns: this.initialColumns,
             requestUrl: cp_url(`collections`),
-            mode: 'grid',
+            mode: 'table',
         };
     },
 

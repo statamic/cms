@@ -5,6 +5,7 @@
             :src="asset.thumbnail"
             class="asset-thumbnail mx-auto max-h-8 max-w-full rounded-sm"
             loading="lazy"
+            :draggable="false"
             :class="{ 'h-8 w-8 object-cover': square }"
         />
         <img
@@ -12,6 +13,7 @@
             :src="asset.url"
             class="asset-thumbnail mx-auto h-8 max-w-full rounded-sm"
             loading="lazy"
+            :draggable="false"
         />
         <file-icon v-else :extension="asset.extension" class="asset-thumbnail h-8 w-8 rounded-sm p-px" />
     </div>

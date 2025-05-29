@@ -63,15 +63,14 @@
                             @created="itemCreated"
                         />
                     </div>
-                    <button
+                    <Button
                         ref="existing"
-                        class="text-blue dark:text-dark-blue-100 dark:hover:text-dark-100 mb-2 flex items-center outline-hidden hover:text-gray-800"
+                        icon="link"
+                        size="sm"
+                        variant="filled"
+                        :text="__('Link Item')"
                         @click.prevent="isSelecting = true"
-                    >
-                        <svg-icon name="light/hyperlink" class="flex h-4 w-4 items-center ltr:mr-1 rtl:ml-1"></svg-icon>
-                        <span class="hidden @sm:block" v-text="__('Link Existing Item')" />
-                        <span class="@sm:hidden" v-text="__('Link')" />
-                    </button>
+                    />
                 </div>
             </div>
 
@@ -106,6 +105,7 @@ import ItemSelector from './Selector.vue';
 import CreateButton from './CreateButton.vue';
 import { Sortable, Plugins } from '@shopify/draggable';
 import RelationshipSelectField from './SelectField.vue';
+import { Button } from '@statamic/ui';
 
 export default {
     props: {
@@ -160,6 +160,7 @@ export default {
         RelatedItem,
         CreateButton,
         RelationshipSelectField,
+        Button,
     },
 
     data() {

@@ -52,9 +52,8 @@ trait HasSelectOptions
     {
         $values = $this->preProcess($value);
 
-        $values = collect(is_array($values) ? $values : [$values]);
-
-        return $values->map(function ($value) {
+        // NOTE: Null-coalescing into `[null]` as that matches old behaviour.
+        return collect($values ?? [null])->map(function ($value) {
             return $this->getLabel($value);
         })->all();
     }
@@ -67,9 +66,8 @@ trait HasSelectOptions
             return [];
         }
 
-        $value = is_array($value) ? $value : [$value];
-
-        $values = collect($value)->map(function ($value) {
+        // NOTE: Null-coalescing into `[null]` as that matches old behaviour.
+        $values = collect($value ?? [null])->map(function ($value) {
             return $this->config('cast_booleans') ? $this->castFromBoolean($value) : $value;
         });
 

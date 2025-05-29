@@ -3,7 +3,7 @@
         <element-container @resized="containerWidth = $event.width">
             <div
                 class="grid-fieldtype-container"
-                :class="{ 'grid-fullscreen bg-white dark:bg-dark-600': fullScreenMode }"
+                :class="{ 'grid-fullscreen dark:bg-dark-600 bg-white': fullScreenMode }"
             >
                 <publish-field-fullscreen-header
                     v-if="fullScreenMode"
@@ -229,6 +229,7 @@ export default {
                 isReadOnly: { get: () => this.isReadOnly },
                 handle: { get: () => this.handle },
                 fieldPathPrefix: { get: () => this.fieldPathPrefix },
+                metaPathPrefix: { get: () => this.metaPathPrefix },
                 fullScreenMode: { get: () => this.fullScreenMode },
                 toggleFullScreen: { get: () => this.toggleFullScreen },
             });

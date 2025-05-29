@@ -7,12 +7,19 @@
 
         <ui-card class="space-y-8">
             <!-- Folders -->
-            <section class="folder-grid-listing" v-if="folders.length">
+            <section class="folder-grid-listing" v-if="folders.length || creatingFolder">
                 <div
-                    class="group/folder relative"
+                    v-if="!restrictFolderNavigation"
                     v-for="folder in folders"
                     :key="folder.path"
-                    v-if="!restrictFolderNavigation"
+                    class="group/folder relative p-1"
+                    :class="{ 'ring-2 rounded-xl ring-blue-400': dragOverFolder === folder.path }"
+                    :draggable="canMoveFolder(folder)"
+                    @dragover.prevent="dragOverFolder = folder.path"
+                    @dragleave.prevent="dragOverFolder = null"
+                    @drop="handleFolderDrop(folder); dragOverFolder = null"
+                    @dragstart="draggingFolder = folder.path"
+                    @dragend="draggingFolder = null; dragOverFolder = null"
                 >
                     <Context>
                         <template #trigger>
@@ -65,62 +72,86 @@
                     class="group relative"
                     :class="{ selected: isSelected(asset.id) }"
                 >
-                    <Context>
-                        <template #trigger>
-                            <div class="asset-tile group relative" :class="{ 'bg-checkerboard': asset.can_be_transparent }">
-                                <button
-                                    class="size-full"
-                                    @click.stop="toggleSelection(asset.id, index, $event)"
-                                    @dblclick.stop="$emit('edit-asset', asset)"
+                    <ItemActions
+                        :url="actionUrl"
+                        :actions="asset.actions"
+                        :item="asset.id"
+                        @started="actionStarted"
+                        @completed="actionCompleted"
+                        v-slot="{ actions }"
+                    >
+                        <Context>
+                            <template #trigger>
+                                <div
+                                    class="asset-tile group relative bg-white"
+                                    :class="{
+                                        'bg-checkerboard!': asset.can_be_transparent,
+                                        'opacity-50!': draggingAsset === asset.id,
+                                    }"
                                 >
-                                    <div class="relative flex aspect-square size-full items-center justify-center">
-                                        <div class="asset-thumb">
-                                            <img
-                                                v-if="asset.is_image"
-                                                :src="asset.thumbnail"
-                                                loading="lazy"
-                                                :class="{
-                                                    'size-full p-4': asset.extension === 'svg',
-                                                    'rounded-lg p-1': asset.orientation === 'square',
-                                                }"
-                                            />
-                                            <file-icon v-else :extension="asset.extension" class="size-1/2" />
+                                    <button
+                                        class="size-full"
+                                        :draggable="canMoveAsset(asset)"
+                                        @dragover.prevent
+                                        @dragstart="draggingAsset = asset.id"
+                                        @dragend="draggingAsset = null"
+                                        @click.stop="toggleSelection(asset.id, index, $event)"
+                                        @dblclick.stop="$emit('edit-asset', asset)"
+                                    >
+                                        <div class="relative flex aspect-square size-full items-center justify-center">
+                                            <div class="asset-thumb">
+                                                <img
+                                                    v-if="asset.is_image"
+                                                    :src="asset.thumbnail"
+                                                    loading="lazy"
+                                                    :draggable="false"
+                                                    :class="{
+                                                        'size-full p-4': asset.extension === 'svg',
+                                                        'rounded-lg p-1': asset.orientation === 'square',
+                                                    }"
+                                                />
+                                                <file-icon v-else :extension="asset.extension" class="size-1/2" />
+                                            </div>
                                         </div>
+                                    </button>
+                                    <div class="absolute top-1 end-2">
+                                        <Dropdown placement="left-start">
+                                            <DropdownMenu>
+                                                <DropdownLabel :text="__('Actions')" />
+                                                <DropdownItem
+                                                    :text="__(canEdit ? 'Edit' : 'View')"
+                                                    @click="edit(asset.id)"
+                                                    icon="edit"
+                                                />
+                                                <DropdownSeparator v-if="asset.actions.length" />
+                                                <DropdownItem
+                                                    v-for="action in actions"
+                                                    :key="action.handle"
+                                                    :text="__(action.title)"
+                                                    icon="edit"
+                                                    :class="{ 'text-red-500': action.dangerous }"
+                                                    @click="action.run"
+                                                />
+                                            </DropdownMenu>
+                                        </Dropdown>
                                     </div>
-                                </button>
-                                <dropdown-list
-                                    class="absolute top-1 opacity-0 group-hover:opacity-100 end-2"
-                                    :class="{ 'opacity-100': actionOpened === asset.id }"
-                                    @opened="actionOpened = asset.id"
-                                    @closed="actionOpened = null"
-                                >
-                                    <dropdown-item
-                                        :text="__(canEdit ? 'Edit' : 'View')"
-                                        @click="edit(asset.id)"
-                                    />
-                                    <div class="divider" v-if="asset.actions.length" />
-                                    <data-list-inline-actions
-                                        :item="asset.id"
-                                        :url="actionUrl"
-                                        :actions="asset.actions"
-                                        @started="actionStarted"
-                                        @completed="actionCompleted"
-                                    />
-                                </dropdown-list>
-                            </div>
-                        </template>
-                        <ContextMenu>
-                            <ContextItem icon="edit" :text="__(canEdit ? 'Edit' : 'View')" @click="edit(asset.id)" />
-                            <ContextSeparator />
-                            <data-list-inline-actions
-                                :item="asset.id"
-                                :url="actionUrl"
-                                :actions="asset.actions"
-                                @started="actionStarted"
-                                @completed="actionCompleted"
-                            />
-                        </ContextMenu>
-                    </Context>
+                                </div>
+                            </template>
+                            <ContextMenu>
+                                <ContextLabel :text="__('Actions')" />
+                                <ContextItem icon="edit" :text="__(canEdit ? 'Edit' : 'View')" @click="edit(asset.id)" />
+                                <ContextSeparator />
+                                <ContextItem
+                                    v-for="action in actions"
+                                    :key="action.handle"
+                                    :text="__(action.title)"
+                                    icon="edit"
+                                    :class="{ 'text-red-500': action.dangerous }"
+                                    @click="action.run"
+                                />
+                            </ContextMenu>
+                        </Context>
+                    </ItemActions>
                     <div class="asset-filename" v-text="truncateFilename(asset.basename)" :title="asset.basename" />
                 </div>
             </section>
@@ -136,10 +167,12 @@ import AssetBrowserMixin from './AssetBrowserMixin';
 import Breadcrumbs from './Breadcrumbs.vue';
 import { debounce } from 'lodash-es';
 import { EditableArea, EditableInput, EditablePreview, EditableRoot } from 'reka-ui';
-import { Context, ContextMenu, ContextItem, ContextLabel, ContextSeparator, Editable } from '@statamic/ui';
+import { Context, ContextMenu, ContextItem, ContextLabel, ContextSeparator, Editable, Dropdown, DropdownMenu, DropdownLabel, DropdownItem, DropdownSeparator } from '@statamic/ui';
+import ItemActions from '@statamic/components/actions/ItemActions.vue';
 
 export default {
     mixins: [AssetBrowserMixin],
+
     components: {
         ContextItem,
         ContextLabel,
@@ -152,30 +185,36 @@ export default {
         EditableArea,
         EditableRoot,
         Breadcrumbs,
+        Dropdown,
+        DropdownMenu,
+        DropdownLabel,
+        DropdownItem,
+        DropdownSeparator,
+        ItemActions
     },
+
     props: {
         assets: { type: Array },
         selectedAssets: { type: Array },
-        creatingFolder: { type: Boolean },
     },
 
     data() {
         return {
             thumbnailSize: 200,
-            newFolderName: null,
+            dragOverFolder: null,
         };
     },
 
     watch: {
         thumbnailSize: {
             handler: debounce(function(size) {
-                this.$preferences.set('asset-browser-thumbnail-size', size);
+                this.$preferences.set('assets.browser_thumbnail_size', size);
             }, 300)
-        }
+        },
     },
 
     mounted() {
-        const savedSize = this.$preferences.get('asset-browser-thumbnail-size');
+        const savedSize = this.$preferences.get('assets.browser_thumbnail_size');
         if (savedSize) this.thumbnailSize = savedSize;
     },
 
@@ -203,14 +242,6 @@ export default {
 
         toggleSelection(id, index, $event) {
             this.$emit('toggle-selection', id, index, $event);
-        },
-
-        focusNewFolderInput() {
-            this.$refs.newFolderInput?.edit();
-        },
-
-        clearNewFolderName() {
-            this.newFolderName = null;
         },
     },
 };

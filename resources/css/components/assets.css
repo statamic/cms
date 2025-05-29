@@ -109,7 +109,7 @@
 }
 
 .folder-grid-listing {
-    @apply relative grid gap-8;
+    @apply relative grid gap-7;
     grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
 }
 
@@ -117,7 +117,7 @@
    ========================================================================== */
 
 .asset-tile {
-    @apply relative flex min-w-0 cursor-pointer flex-col items-center justify-between rounded-lg outline outline-gray-300 dark:outline-gray-700;
+    @apply relative flex min-w-0 cursor-pointer flex-col items-center justify-between rounded-lg outline outline-gray-300 dark:outline-gray-700 overflow-hidden;
 
     .selected & {
         @apply outline-3 outline-blue-500;

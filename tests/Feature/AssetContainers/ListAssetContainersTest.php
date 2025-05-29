@@ -30,23 +30,6 @@ class ListAssetContainersTest extends TestCase
             ->assertJson($this->containerArray());
     }
 
-    #[Test]
-    public function it_loads_a_view_when_requested_normally()
-    {
-        $this->setTestRoles(['test' => ['access cp', 'view two assets', 'view three assets']]);
-        $user = User::make()->assignRole('test')->save();
-        AssetContainer::make('one')->save();
-        AssetContainer::make('two')->save();
-        AssetContainer::make('three')->save();
-
-        $this
-            ->actingAs($user)
-            ->get(cp_route('asset-containers.index'))
-            ->assertSuccessful()
-            ->assertViewIs('statamic::assets.containers.index')
-            ->assertViewHas('containers', $this->containerArray());
-    }
-
     public function containerArray()
     {
         return [

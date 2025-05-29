@@ -3,10 +3,11 @@ import { cva } from 'cva';
 import { computed, useSlots } from 'vue';
 
 const props = defineProps({
-    size: { type: String, default: 'base' },
-    level: { type: [Number, null], default: null },
-    text: { type: [String, Number, Boolean, null], default: null },
     href: { type: [String, null], default: null },
+    icon: { type: String, default: null },
+    level: { type: [Number, null], default: null },
+    size: { type: String, default: 'base' },
+    text: { type: [String, Number, Boolean, null], default: null },
 });
 
 const slots = useSlots();
@@ -19,7 +20,7 @@ const tag = computed(() => {
 });
 
 const classes = cva({
-    base: 'font-medium [&:has(+[data-ui-subheading])]:mb-0.5 antialiased not-prose',
+    base: 'font-medium [&:has(+[data-ui-subheading])]:mb-0.5 antialiased flex items-center gap-2',
     variants: {
         size: {
             base: 'text-sm text-gray-600 dark:text-white',
@@ -32,6 +33,7 @@ const classes = cva({
 
 <template>
     <component :is="tag" :class="classes" :href="href" data-ui-heading>
+        <ui-icon v-if="icon" :name="icon" class="size-5.5 text-gray-400 dark:text-gray-600" />
         <span v-if="!hasDefaultSlot">{{ text }}</span>
         <slot v-else />
     </component>

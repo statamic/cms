@@ -1,6 +1,7 @@
 <template>
     <Panel class="relative overflow-x-auto overscroll-x-contain">
         <data-list-table
+            ref="dataListTable"
             :allow-bulk-actions="true"
             :loading="loading"
             :toggle-selection-on-row-click="true"
@@ -21,9 +22,15 @@
                     <td :colspan="columns.length" />
                 </tr>
                 <tr
+                    v-if="!restrictFolderNavigation"
                     v-for="(folder, i) in folders"
                     :key="folder.path"
-                    v-if="!restrictFolderNavigation"
+                    class="pointer-events-auto"
+                    :draggable="canMoveFolder(folder)"
+                    @dragover.prevent
+                    @drop="handleFolderDrop(folder)"
+                    @dragstart="draggingFolder = folder.path"
+                    @dragend="draggingFolder = null"
                 >
                     <td />
                     <td v-for="column in visibleColumns">
@@ -82,7 +89,13 @@
             </template>
 
             <template #cell-basename="{ row: asset, checkboxId }">
-                <div class="w-fit-content group flex items-center">
+                <div
+                    class="w-fit-content group flex items-center"
+                    :draggable="canMoveAsset(asset)"
+                    @dragover.prevent
+                    @dragstart="draggingAsset = asset.id"
+                    @dragend="draggingAsset = null"
+                >
                     <asset-thumbnail
                         :asset="asset"
                         :square="true"
@@ -100,24 +113,34 @@
             </template>
 
             <template #actions="{ row: asset }">
-                <Dropdown placement="left-start" class="me-3">
-                    <DropdownMenu>
-                        <DropdownLabel :text="__('Actions')" />
-                        <DropdownItem
-                            :text="__(canEdit ? 'Edit' : 'View')"
-                            @click="edit(asset.id)"
-                            icon="edit"
-                        />
-                        <DropdownSeparator v-if="asset.actions.length" />
-                        <data-list-inline-actions
-                            :item="asset.id"
-                            :url="actionUrl"
-                            :actions="asset.actions"
-                            @started="actionStarted"
-                            @completed="actionCompleted"
-                        />
-                    </DropdownMenu>
-                </Dropdown>
+                <ItemActions
+                    :url="actionUrl"
+                    :actions="asset.actions"
+                    :item="asset.id"
+                    @started="actionStarted"
+                    @completed="actionCompleted"
+                    v-slot="{ actions }"
+                >
+                    <Dropdown placement="left-start" class="me-3">
+                        <DropdownMenu>
+                            <DropdownLabel :text="__('Actions')" />
+                            <DropdownItem
+                                :text="__(canEdit ? 'Edit' : 'View')"
+                                @click="edit(asset.id)"
+                                icon="edit"
+                            />
+                            <DropdownSeparator v-if="asset.actions.length" />
+                            <DropdownItem
+                                v-for="action in actions"
+                                :key="action.handle"
+                                :text="__(action.title)"
+                                icon="edit"
+                                :class="{ 'text-red-500': action.dangerous }"
+                                @click="action.run"
+                            />
+                        </DropdownMenu>
+                    </Dropdown>
+                </ItemActions>
             </template>
         </data-list-table>
         <ui-panel-footer class="p-1! pb-0!">
@@ -131,9 +154,13 @@ import AssetThumbnail from './Thumbnail.vue';
 import Breadcrumbs from './Breadcrumbs.vue';
 import AssetBrowserMixin from './AssetBrowserMixin';
 import { Panel, Dropdown, DropdownMenu, DropdownItem, DropdownLabel, DropdownSeparator, Editable } from '@statamic/ui';
+import ItemActions from '@statamic/components/actions/ItemActions.vue';
 
 export default {
+    mixins: [AssetBrowserMixin],
+
     components: {
+        ItemActions,
         Editable,
         AssetThumbnail,
         Breadcrumbs,
@@ -145,32 +172,21 @@ export default {
         DropdownSeparator,
     },
 
-    mixins: [AssetBrowserMixin],
-
     props: {
         loading: Boolean,
         columns: Array,
-        creatingFolder: { type: Boolean },
         visibleColumns: Array,
     },
 
-    data() {
-        return {
-            newFolderName: null,
-        };
+    computed: {
+        assets() {
+            return this.$refs.dataListTable.rows;
+        },
     },
 
     methods: {
         sorted(column, direction) {
             this.$emit('sorted', column, direction);
-        },
-
-        focusNewFolderInput() {
-            this.$refs.newFolderInput?.edit();
-        },
-
-        clearNewFolderName() {
-            this.newFolderName = null;
         },
     },
 

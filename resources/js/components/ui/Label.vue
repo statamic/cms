@@ -6,6 +6,7 @@ const slots = useSlots();
 const hasDefaultSlot = !!slots.default;
 
 const props = defineProps({
+    for: { type: String, default: null },
     badge: { type: String, default: '' },
     required: { type: Boolean, default: false },
     text: { type: [String, Number, Boolean, null], default: null },
@@ -14,8 +15,9 @@ const props = defineProps({
 
 <template>
     <label
-        class="flex justify-between text-sm font-medium text-gray-800 antialiased select-none dark:text-gray-300"
+        class="flex justify-between text-sm font-medium text-gray-800 select-none dark:text-gray-300"
         data-ui-label
+        :for="for"
     >
         <div>
             <slot v-if="hasDefaultSlot" />

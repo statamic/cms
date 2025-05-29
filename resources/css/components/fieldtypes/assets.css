@@ -12,25 +12,6 @@
     &.is-expanded {
         @apply rounded-b-none border-b-0;
     }
-
-    .asset-upload-control {
-        @apply text-xs leading-tight text-gray-600;
-    }
-
-    .upload-text-button {
-        @apply whitespace-nowrap text-blue underline;
-        &:hover {
-            @apply text-blue-800;
-        }
-    }
-}
-
-.assets-fieldtype .drag-drop-text {
-    @apply text-gray-700 dark:text-dark-175 ltr:ml-1 rtl:mr-1;
-}
-
-.assets-fieldtype .asset-upload-control {
-    @apply inline-block;
 }
 
 /* Inside a Grid

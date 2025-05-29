@@ -43,6 +43,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
     private $cachedRoutes = null;
     protected $mount;
     protected $title;
+    protected $icon;
     protected $template;
     protected $layout;
     protected $sites;
@@ -225,6 +226,16 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             ->fluentlyGetOrSet('title')
             ->getter(function ($title) {
                 return $title ?? ucfirst($this->handle);
+            })
+            ->args(func_get_args());
+    }
+
+    public function icon($icon = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('icon')
+            ->getter(function ($icon) {
+                return $icon ?? 'collections';
             })
             ->args(func_get_args());
     }
@@ -550,6 +561,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         $formerlyToArray = [
             'title' => $this->title,
             'handle' => $this->handle,
+            'icon' => $this->icon,
             'routes' => $this->routes,
             'dated' => $this->dated,
             'past_date_behavior' => $this->pastDateBehavior(),

@@ -30,7 +30,7 @@ class CollectionsController extends CpController
 
         $columns = [
             Column::make('title')->label(__('Title')),
-            Column::make('entries')->label(__('Entries'))->numeric(true),
+            Column::make('entries_count')->label(__('Entries'))->numeric(true),
         ];
 
         if ($request->wantsJson()) {
@@ -82,6 +82,7 @@ class CollectionsController extends CpController
                 'available_in_selected_site' => $collection->sites()->contains(Site::selected()->handle()),
                 'actions' => Action::for($collection),
                 'actions_url' => cp_route('collections.actions.run', ['collection' => $collection->handle()]),
+                'icon' => $collection->icon(),
             ];
         })->sortBy('title')->values();
     }
@@ -174,6 +175,7 @@ class CollectionsController extends CpController
         $values = [
             'title' => $collection->title(),
             'handle' => $collection->handle(),
+            'icon' => $collection->icon(),
             'dated' => $collection->dated(),
             'past_date_behavior' => $collection->pastDateBehavior(),
             'future_date_behavior' => $collection->futureDateBehavior(),
@@ -261,6 +263,7 @@ class CollectionsController extends CpController
 
         $collection
             ->title($values['title'])
+            ->icon($values['icon'])
             ->routes($values['routes'])
             ->dated($values['dated'])
             ->template($values['template'])
@@ -367,6 +370,14 @@ class CollectionsController extends CpController
                         'instructions' => __('statamic::messages.collection_configure_title_instructions'),
                         'type' => 'text',
                         'validate' => 'required',
+                        'width' => '66',
+                    ],
+                    'icon' => [
+                        'display' => __('Icon'),
+                        'instructions' => __('statamic::messages.collection_configure_icon_instructions'),
+                        'type' => 'icon',
+                        'folder' => 'light',
+                        'width' => '33',
                     ],
                 ],
             ],

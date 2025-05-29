@@ -48,6 +48,8 @@ export default {
         },
         namePrefix: String,
         fieldPathPrefix: String,
+        metaPathPrefix: String,
+        id: String,
     },
 
     methods: {
@@ -95,9 +97,7 @@ export default {
         },
 
         fieldId() {
-            let prefix = this.fieldPathPrefix ? this.fieldPathPrefix + '.' : '';
-
-            return prefix + 'field_' + this.config.handle;
+            return this.id;
         },
 
         fieldActionPayload() {

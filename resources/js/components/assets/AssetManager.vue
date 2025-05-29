@@ -3,7 +3,7 @@
         ref="browser"
         :can-create-containers="canCreateContainers"
         :create-container-url="createContainerUrl"
-        :initial-container="container"
+        :container="container"
         :initial-per-page="$config.get('paginationSize')"
         :initial-editing-asset-id="initialEditingAssetId"
         :selected-path="path"
@@ -19,7 +19,7 @@
 <script>
 export default {
     props: {
-        initialContainer: Object,
+        container: Object,
         initialPath: String,
         initialEditingAssetId: String,
         actions: Array,
@@ -30,7 +30,6 @@ export default {
 
     data() {
         return {
-            container: this.initialContainer,
             path: this.initialPath,
             selectedAssets: [],
         };
@@ -51,7 +50,6 @@ export default {
             window.history.replaceState({ container: { ...this.container }, path: this.path }, '');
 
             window.onpopstate = (e) => {
-                this.container = e.state.container;
                 this.path = e.state.path;
             };
         },
@@ -62,10 +60,9 @@ export default {
         },
 
         /**
-         * When a user has navigated to another folder or container
+         * When a user has navigated to another folder.
          */
-        navigate(container, path) {
-            this.container = container;
+        navigate(path) {
             this.path = path;
             this.pushState();
 
