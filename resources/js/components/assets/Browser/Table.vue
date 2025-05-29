@@ -32,13 +32,13 @@
                                 <a class="group flex cursor-pointer items-center" @click="selectFolder(folder.path)">
                                     <file-icon
                                         extension="folder"
-                                        class="inline-block h-8 w-8 text-blue-400 group-hover:text-blue ltr:mr-2 rtl:ml-2"
+                                        class="inline-block size-8 text-blue-400 group-hover:text-blue-400 me-2"
                                     />
                                     {{ folder.basename }}
                                 </a>
                             </template>
                         </td>
-                        <td class="actions-column pr-3!">
+                        <td class="actions-column pe-3!">
                             <ItemActions
                                 :url="actionUrl"
                                 :actions="folder.actions"
@@ -69,7 +69,7 @@
                             <a class="group flex cursor-pointer items-center">
                                 <file-icon
                                     extension="folder"
-                                    class="group-hover:text-blue inline-block h-8 w-8 text-blue-400 ltr:mr-2 rtl:ml-2"
+                                    class="group-hover:text-blue-500 inline-block size-8 text-blue-400 me-2"
                                 />
                                 <Editable
                                     ref="newFolderInput"
@@ -88,7 +88,7 @@
                             </a>
                         </td>
                         <td :colspan="columns.length - 1" />
-                        <td class="actions-column pr-3!" />
+                        <td class="actions-column pe-3!" />
                     </tr>
                 </template>
 
@@ -103,16 +103,15 @@
                         <asset-thumbnail
                             :asset="asset"
                             :square="true"
-                            class="h-8 w-8 cursor-pointer ltr:mr-2 rtl:ml-2"
+                            class="size-8 cursor-pointer me-2"
                             @click.native.stop="$emit('edit-asset', asset)"
                         />
-                        <label
-                            :for="checkboxId"
-                            class="cursor-pointer select-none normal-nums group-hover:text-blue"
-                            @click.stop="$emit('edit-asset', asset)"
+                        <button
+                            class="cursor-pointer select-none normal-nums group-hover:text-blue-500"
+                            @click="$emit('edit-asset', asset)"
                         >
                             {{ asset.basename }}
-                        </label>
+                        </button>
                     </div>
                 </template>
 
