@@ -58,7 +58,7 @@
                     </aside>
                 </ui-panel-header>
 
-                <ui-card>
+                <ui-card class="h-40">
                     <data-list :rows="collection.entries" :columns="collection.columns" :sort="false">
                         <data-list-table unstyled class="[&_td]:p-0.5 [&_td]:text-sm [&_thead]:hidden w-full">
                             <template #cell-title="{ row: entry }" class="w-full">
@@ -74,10 +74,11 @@
                             </template>
                         </data-list-table>
                     </data-list>
+                    <ui-subheading v-if="collection.entries.length === 0" class="text-center h-full flex items-center justify-center">{{ __('Nothing to see here, yet.') }}</ui-subheading>
                 </ui-card>
 
                 <ui-panel-footer class="flex items-center gap-6 text-sm text-gray-500">
-                    <div class="flex items-center gap-2" v-if="collection.published_entries_count > 0">
+                    <div class="flex items-center gap-2">
                         <ui-badge variant="flat" :text="String(collection.published_entries_count)" pill class="bg-gray-200 dark:bg-gray-700" />
                         <span>{{ __('Published') }}</span>
                     </div>
@@ -95,41 +96,64 @@
     </div>
 
     <data-list ref="dataList" :columns="columns" :rows="items" v-if="mode === 'table'">
-        <data-list-table>
-            <template #cell-title="{ row: collection }">
-                <a :href="collection.available_in_selected_site ? collection.entries_url : collection.edit_url" class="flex items-center gap-2">
-                    <ui-icon :name="collection.icon || 'collections'" />
-                    {{ __(collection.title) }}
-                </a>
-            </template>
-            <template #actions="{ row: collection, index }">
-                <dropdown-list placement="left-start">
-                    <dropdown-item :text="__('View')" :redirect="collection.entries_url" />
-                    <dropdown-item v-if="collection.url" :text="__('Visit URL')" :external-link="collection.url" />
-                    <dropdown-item
-                        v-if="collection.editable"
-                        :text="__('Edit Collection')"
-                        :redirect="collection.edit_url"
-                    />
-                    <dropdown-item
-                        v-if="collection.blueprint_editable"
-                        :text="__('Edit Blueprints')"
-                        :redirect="collection.blueprints_url"
-                    />
-                    <dropdown-item
-                        v-if="collection.editable"
-                        :text="__('Scaffold Views')"
-                        :redirect="collection.scaffold_url"
-                    />
-                    <data-list-inline-actions
-                        :item="collection.id"
-                        :url="collection.actions_url"
-                        :actions="collection.actions"
-                        @completed="actionCompleted"
-                    ></data-list-inline-actions>
-                </dropdown-list>
-            </template>
-        </data-list-table>
+        <ui-panel>
+            <data-list-table>
+                <template #cell-title="{ row: collection }">
+                    <a :href="collection.available_in_selected_site ? collection.entries_url : collection.edit_url" class="flex items-center gap-2">
+                        <ui-icon :name="collection.icon || 'collections'" />
+                        {{ __(collection.title) }}
+                    </a>
+                </template>
+                <template #cell-entries_count="{ row: collection }">
+                    <div class="flex items-center gap-3">
+                        <ui-badge
+                            v-if="collection.published_entries_count > 0"
+                            color="green"
+                            :text="String(collection.published_entries_count) + ' ' + __('Published')"
+                            pill
+                        />
+                        <ui-badge
+                            v-if="collection.scheduled_entries_count > 0"
+                            color="yellow"
+                            :text="String(collection.scheduled_entries_count) + ' ' + __('Scheduled')"
+                            pill
+                        />
+                        <ui-badge
+                            v-if="collection.draft_entries_count > 0"
+                            :text="String(collection.draft_entries_count) + ' ' + __('Draft')"
+                            pill
+                        />
+                    </div>
+                </template>
+                <template #actions="{ row: collection, index }">
+                    <dropdown-list placement="left-start">
+                        <dropdown-item :text="__('View')" :redirect="collection.entries_url" />
+                        <dropdown-item v-if="collection.url" :text="__('Visit URL')" :external-link="collection.url" />
+                        <dropdown-item
+                            v-if="collection.editable"
+                            :text="__('Edit Collection')"
+                            :redirect="collection.edit_url"
+                        />
+                        <dropdown-item
+                            v-if="collection.blueprint_editable"
+                            :text="__('Edit Blueprints')"
+                            :redirect="collection.blueprints_url"
+                        />
+                        <dropdown-item
+                            v-if="collection.editable"
+                            :text="__('Scaffold Views')"
+                            :redirect="collection.scaffold_url"
+                        />
+                        <data-list-inline-actions
+                            :item="collection.id"
+                            :url="collection.actions_url"
+                            :actions="collection.actions"
+                            @completed="actionCompleted"
+                        ></data-list-inline-actions>
+                    </dropdown-list>
+                </template>
+            </data-list-table>
+        </ui-panel>
     </data-list>
 </template>
 

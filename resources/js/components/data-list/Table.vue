@@ -17,7 +17,7 @@
                 >
                     <data-list-toggle-all ref="toggleAll" v-if="allowBulkActions && !singleSelect" />
                 </th>
-                <th v-for="column in visibleColumns" :key="column.field" :class="{ 'pe-8 text-end': column.numeric }">
+                <th v-for="column in visibleColumns" :key="column.field">
                     <span v-if="!column.sortable" v-text="__(column.label)" />
                     <Button
                         v-else
@@ -68,7 +68,6 @@
                         v-for="column in visibleColumns"
                         :key="column.field"
                         :width="column.width"
-                        :class="{ 'pr-8 text-end': column.numeric }"
                         :data-column="`${column.field}`"
                     >
                         <slot
