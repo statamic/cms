@@ -42,8 +42,8 @@ class Parser
             $env->addExtension($ext);
         }
 
-        foreach ($this->renderers() as $ren) {
-            $env->addRenderer(...$ren);
+        foreach ($this->renderers() as $renderer) {
+            $env->addRenderer(...$renderer);
         }
 
         return $this->converter = $converter;
@@ -178,8 +178,8 @@ class Parser
             $parser->addExtensions($ext);
         }
 
-        foreach ($this->renderers as $ren) {
-            $parser->addRenderers($ren);
+        foreach ($this->renderers as $renderer) {
+            $parser->addRenderers($renderer);
         }
 
         return $parser;
