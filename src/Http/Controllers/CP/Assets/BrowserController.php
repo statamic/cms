@@ -200,7 +200,6 @@ class BrowserController extends CpController
             ->each(fn ($scope) => $scope->apply($query, $params));
     }
 
-    // Duplicated in the SearchedAssetsCollection resource.
     public function setColumns($container)
     {
         $blueprint = $container->blueprint();

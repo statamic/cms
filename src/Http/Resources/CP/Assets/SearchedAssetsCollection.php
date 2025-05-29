@@ -29,7 +29,6 @@ class SearchedAssetsCollection extends ResourceCollection
         return $this;
     }
 
-    // Duplicate of the code in BrowserController
     public function setColumns()
     {
         $columns = $this->blueprint->columns();
