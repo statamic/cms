@@ -38,7 +38,8 @@ class SearchedAssetsCollection extends ResourceCollection
             ->label(__('File'))
             ->visible(true)
             ->defaultVisibility(true)
-            ->sortable(true);
+            ->sortable(true)
+            ->required(true);
 
         $size = Column::make('size')
             ->label(__('Size'))
