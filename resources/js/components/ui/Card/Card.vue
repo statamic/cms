@@ -19,7 +19,7 @@ const classes = cva({
 </script>
 
 <template>
-    <div :class="classes">
+    <div :class="classes" ui-card :data-inset="inset">
         <slot />
     </div>
 </template>
