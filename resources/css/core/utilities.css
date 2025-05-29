@@ -88,19 +88,32 @@
 }
 
 @utility bg-checkerboard {
+    --checkerboard-light: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h12v12H0zm12 12h12v12H12z' fill='%23f3f4f6'/%3E%3C/svg%3E");
+    --checkerboard-dark: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h12v12H0zm12 12h12v12H12z' fill='%231f2937'/%3E%3C/svg%3E");
+
+    position: relative;
     background-color: #fff;
-    background-image: linear-gradient(45deg, var(--color-gray-100) 25%, transparent 25%),
-        linear-gradient(-45deg, var(--color-gray-100) 25%, transparent 25%), linear-gradient(45deg, transparent 75%, var(--color-gray-100) 75%),
-        linear-gradient(-45deg, transparent 75%, var(--color-gray-100) 75%);
-    background-size: 24px 24px;
-    background-position: 0 0, 0 12px, 12px -12px, -12px 0;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: var(--checkerboard-light);
+        opacity: 0;
+        transition: opacity 0.2s ease-in-out;
+        pointer-events: none;
+    }
+
+    &:hover::before {
+        opacity: 1;
+    }
 
     .dark & {
         background-color: var(--color-gray-850);
-        background-image: linear-gradient(45deg, var(--color-gray-800) 25%, transparent 25%),
-            linear-gradient(-45deg, var(--color-gray-800) 25%, transparent 25%),
-            linear-gradient(45deg, transparent 75%, var(--color-gray-800) 75%),
-            linear-gradient(-45deg, transparent 75%, var(--color-gray-800) 75%);
+
+        &::before {
+            background-image: var(--checkerboard-dark);
+        }
     }
 }
 
