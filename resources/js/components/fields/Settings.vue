@@ -25,7 +25,8 @@
                 @click.prevent="close"
                 v-text="__('Cancel')"
             ></button>
-            <button class="btn-primary" @click.prevent="commit" v-text="__('Apply')"></button>
+            <button class="btn-primary ltr:mr-6 rtl:ml-6" @click.prevent="commit()" v-text="__('Apply')"></button>
+            <button class="btn-primary" @click.prevent="commit(true)" v-text="__('Apply & Close All')"></button>
         </header>
         <section class="isolate px-3 py-4 md:px-8">
             <div class="tabs-container">
@@ -120,7 +121,14 @@ export default {
             isInsideConfigFields: true,
             updateFieldSettingsValue: this.updateField,
             getFieldSettingsValue: this.getFieldValue,
+            commitParentField: this.commit,
         };
+    },
+
+    inject: {
+        commitParentField: {
+            default: () => {}
+        }
     },
 
     model: {
@@ -234,7 +242,7 @@ export default {
             }
         },
 
-        commit() {
+        commit(shouldCommitParent = false) {
             this.clearErrors();
 
             this.$axios
@@ -248,6 +256,10 @@ export default {
                 .then((response) => {
                     this.$emit('committed', response.data, this.editedFields);
                     this.close();
+
+                    if (shouldCommitParent && this.commitParentField) {
+                        this.commitParentField(true);
+                    }
                 })
                 .catch((e) => this.handleAxiosError(e));
         },
