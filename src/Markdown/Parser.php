@@ -38,8 +38,8 @@ class Parser
 
         $env = $converter->getEnvironment();
 
-        foreach ($this->extensions() as $ext) {
-            $env->addExtension($ext);
+        foreach ($this->extensions() as $extension) {
+            $env->addExtension($extension);
         }
 
         foreach ($this->renderers() as $renderer) {
@@ -79,15 +79,15 @@ class Parser
 
     public function extensions(): array
     {
-        $exts = [];
+        $extensions = [];
 
         foreach ($this->extensions as $closure) {
-            foreach (Arr::wrap($closure()) as $ext) {
-                $exts[] = $ext;
+            foreach (Arr::wrap($closure()) as $extension) {
+                $extensions[] = $extension;
             }
         }
 
-        return $exts;
+        return $extensions;
     }
 
     public function renderers(): array
