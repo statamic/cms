@@ -19,7 +19,7 @@
             </ui-card>
         </ui-panel>
 
-        <tabs
+        <Tabs
             class="mt-8"
             :single-tab="!useTabs"
             :initial-tabs="tabs"
