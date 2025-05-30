@@ -32,7 +32,7 @@
                         @include('statamic::partials.nav-main')
                         {{-- <div class="" :class="wrapperClass"> --}}
                         <div class="p-2 h-full flex-1 overflow-y-auto">
-                            <div class="content-card min-h-full transition-padding duration-300">
+                            <div class="relative content-card @yield('content-card-modifiers') min-h-full transition-padding duration-300">
                                 @yield('content')
                             </div>
                         </div>

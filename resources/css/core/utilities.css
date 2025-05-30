@@ -87,6 +87,18 @@
     }
 }
 
+@utility bg-architectural-lines {
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: url('../../svg/ui/architectural-lines.svg');
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-size: 100% 100%;
+    }
+}
+
 @utility bg-checkerboard {
     --checkerboard-light: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h12v12H0zm12 12h12v12H12z' fill='%23f3f4f6'/%3E%3C/svg%3E");
     --checkerboard-dark: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h12v12H0zm12 12h12v12H12z' fill='%231f2937'/%3E%3C/svg%3E");

@@ -11,7 +11,7 @@ const emit = defineEmits(['submit']);
 </script>
 
 <template>
-    <div class="mx-auto mt-4 space-y-3 lg:space-y-6 max-w-2xl">
+    <div class="mx-auto mt-4 space-y-3 lg:space-y-6 max-w-3xl">
         <header v-if="title || subtitle" class="text-center max-w-xl mx-auto py-6 lg:pt-12 xl:pt-16">
             <ui-heading v-if="title" size="xl" :level="1" :icon="icon" :text="title" class="justify-center" />
             <ui-subheading v-if="subtitle" class="mt-6" size="lg" :text="subtitle" />
@@ -23,6 +23,7 @@ const emit = defineEmits(['submit']);
             <footer class="flex justify-center">
                 <ui-button
                     variant="primary"
+                    size="lg"
                     @click="$emit('submit')"
                     :loading="loading"
                 >
