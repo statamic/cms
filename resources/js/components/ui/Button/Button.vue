@@ -89,8 +89,10 @@ const buttonClasses = computed(() => {
         <Icon v-if="icon" :name="icon" />
         <Icon v-if="loading" name="loading" :size />
 
-        <slot v-if="hasDefaultSlot" />
-        <template v-else>{{ text }}</template>
+        <div class="trim-text-start">
+            <slot v-if="hasDefaultSlot" />
+            <template v-else>{{ text }}</template>
+        </div>
 
         <Icon v-if="iconAppend" :name="iconAppend" />
     </component>

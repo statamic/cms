@@ -125,6 +125,10 @@
     }
 }
 
+@utility trim-text-start {
+    text-box: trim-start;
+}
+
 [v-cloak],
 [x-cloak] {
     display: none;
