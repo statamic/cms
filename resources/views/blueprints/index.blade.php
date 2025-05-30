@@ -4,7 +4,6 @@
 @section('title', __('Blueprints'))
 
 @section('content')
-
     <ui-header title="{{ __('Blueprints') }}" icon="blueprints">
         <ui-dropdown>
             <template #trigger>
@@ -45,29 +44,36 @@
         </ui-dropdown>
     </ui-header>
 
-    @foreach (Statamic\Facades\Collection::all() as $collection)
-        @if ($loop->first)
-        <h3 class="little-heading rtl:pr-0 ltr:pl-0 mb-2">{{ __('Collections') }}</h3>
-        <div class="card p-0 mb-4">
-            <table class="data-table">
-        @endif
-                @foreach ($collection->entryBlueprints() as $blueprint)
-                    <tr>
-                        <td>
-                            <div class="flex items-center">
-                                <div class="w-4 h-4 rtl:ml-4 ltr:mr-4">@cp_svg('icons/light/content-writing')</div>
-                                <span class="little-dot {{ $blueprint->hidden() ? 'hollow' : 'bg-green-600' }} rtl:ml-2 ltr:mr-2" v-tooltip="'{{ __($blueprint->hidden() ? 'Hidden': 'Visible') }}'"></span>
-                                <a href="{{ cp_route('collections.blueprints.edit', [$collection, $blueprint]) }}" v-pre>{{ __($blueprint->title()) }}</a>
-                            </div>
-                        </td>
-                        <td class="rtl:text-left ltr:text-right text-2xs" v-pre>{{ __($collection->title()) }}</td>
-                    </tr>
-                @endforeach
-        @if ($loop->last)
+    @if (Statamic\Facades\Collection::all()->count() > 0)
+        <ui-subheading size="xl" class="mb-2">{{ __('Collections') }}</ui-subheading>
+            <ui-panel>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>{{ __('Blueprint') }}</th>
+                            <th>{{ __('Collection') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (Statamic\Facades\Collection::all() as $collection)
+                        @foreach ($collection->entryBlueprints() as $blueprint)
+                            <tr>
+                                <td class="flex items-center gap-2">
+                                    <ui-status-indicator status="{{ $blueprint->hidden() ? 'hidden' : 'published' }}" v-tooltip="'{{ __($blueprint->hidden() ? 'Hidden': 'Visible') }}'"></ui-status-indicator>
+                                    <a href="{{ cp_route('collections.blueprints.edit', [$collection, $blueprint]) }}" v-pre>{{ __($blueprint->title()) }}</a>
+                                </td>
+                                <td class="text-end" v-pre>
+                                    <span class="pe-2 font-mono text-xs text-gray-500 dark:text-gray-400">
+                                        {{ __($collection->title()) }}
+                                    </span>
+                                </td>
+                            </tr>
+                        @endforeach
+                    @endforeach
+                </tbody>
             </table>
-        </div>
-        @endif
-    @endforeach
+        </ui-panel>
+    @endif
 
     @foreach (Statamic\Facades\Taxonomy::all() as $taxonomy)
         @if ($loop->first)

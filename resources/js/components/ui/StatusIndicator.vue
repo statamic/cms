@@ -12,8 +12,9 @@ import { Tooltip } from '@statamic/ui';
 const props = defineProps({
     status: {
         type: String,
-        required: true,
-        validator: (value) => ['published', 'scheduled', 'expired', 'draft'].includes(value),
+        required: false,
+        default: 'published',
+        validator: (value) => ['published', 'scheduled', 'expired', 'draft', 'hidden'].includes(value),
     },
     date: { type: String, default: null },
     showDot: { type: Boolean, default: true },
@@ -22,12 +23,12 @@ const props = defineProps({
 });
 
 const statusClass = computed(() => {
-    if (props.status === 'published' && props.private) {
+    if (props.status === 'published' && props.private || props.status === 'hidden') {
         return 'bg-transparent border border-gray-600';
     } else if (props.status === 'published') {
         return 'bg-green-400';
     }
-    return 'bg-gray-300 dark:bg-dark-200';
+    return 'bg-gray-300 dark:bg-gray-200';
 });
 
 const label = computed(() => {
