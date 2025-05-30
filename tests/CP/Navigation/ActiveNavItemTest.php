@@ -197,6 +197,25 @@ class ActiveNavItemTest extends TestCase
     }
 
     #[Test]
+    public function it_resolves_core_children_closure_and_can_check_when_parent_and_descendant_of_parent_item_is_active()
+    {
+        Facades\Collection::make('pages')->title('Pages')->save();
+        Facades\Collection::make('articles')->title('Articles')->save();
+
+        $this
+            ->prepareNavCaches()
+            ->get('http://localhost/cp/collections/create')
+            ->assertStatus(200);
+
+        $collections = $this->buildAndGetItem('Content', 'Collections');
+
+        $this->assertTrue($collections->isActive());
+        $this->assertInstanceOf(Collection::class, $collections->children());
+        $this->assertFalse($collections->children()->keyBy->display()->get('Pages')->isActive());
+        $this->assertFalse($collections->children()->keyBy->display()->get('Articles')->isActive());
+    }
+
+    #[Test]
     public function it_resolves_core_children_closure_and_can_check_when_parent_and_descendant_of_child_item_is_active()
     {
         Facades\Collection::make('pages')->title('Pages')->save();
