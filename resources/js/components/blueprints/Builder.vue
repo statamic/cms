@@ -1,59 +1,26 @@
 <template>
-    <div class="blueprint-builder">
-        <header class="mb-6">
-            <div class="flex items-center justify-between">
-                <h1 v-text="__('Edit Blueprint')" />
-                <button type="submit" class="btn-primary" @click.prevent="save" v-text="__('Save')" />
-            </div>
-        </header>
+    <div>
+        <ui-header :title="__('Edit Blueprint')" icon="blueprints">
+            <template #actions>
+                <ui-button type="submit" variant="primary" @click.prevent="save" v-text="__('Save')" />
+            </template>
+        </ui-header>
 
-        <div class="publish-form card mb-8 p-0 @container" v-if="showTitle">
-            <div class="publish-fields">
-                <div class="form-group config-field">
-                    <div class="field-inner">
-                        <label class="block">{{ __('Title') }}</label>
-                        <p class="help-block">{{ __('messages.blueprints_title_instructions') }}</p>
-                        <div v-if="errors.title">
-                            <p
-                                class="help-block text-red-500"
-                                v-for="(error, i) in errors.title"
-                                :key="i"
-                                v-text="error"
-                            />
-                        </div>
-                    </div>
-                    <div>
-                        <input
-                            type="text"
-                            name="title"
-                            class="input-text"
-                            v-model="blueprint.title"
-                            autofocus="autofocus"
-                        />
-                    </div>
-                </div>
-
-                <div class="form-group config-field">
-                    <div class="field-inner">
-                        <label class="block">{{ __('Hidden') }}</label>
-                        <p class="help-block">{{ __('messages.blueprints_hidden_instructions') }}</p>
-                        <div v-if="errors.hidden">
-                            <p
-                                class="help-block text-red-500"
-                                v-for="(error, i) in errors.hidden"
-                                :key="i"
-                                v-text="error"
-                            />
-                        </div>
-                    </div>
-                    <div>
-                        <toggle-input name="hidden" v-model="blueprint.hidden" />
-                    </div>
-                </div>
-            </div>
-        </div>
+        <ui-panel :heading="__('Settings')">
+            <ui-card>
+                <ui-field :label="__('Title')" :instructions="__('messages.blueprints_title_instructions')" :errors="errors.title">
+                    <ui-input v-model="blueprint.title" />
+                </ui-field>
+            </ui-card>
+            <ui-card class="mt-2">
+                <ui-field :label="__('Hidden')" :instructions="__('messages.blueprints_hidden_instructions')" :error="errors.hidden">
+                    <ui-switch v-model="blueprint.hidden" />
+                </ui-field>
+            </ui-card>
+        </ui-panel>
 
         <tabs
+            class="mt-8"
             :single-tab="!useTabs"
             :initial-tabs="tabs"
             :errors="errors.tabs"
