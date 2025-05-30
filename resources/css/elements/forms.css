@@ -3,7 +3,7 @@
    ========================================================================== */
 
 label {
-    @apply block text-sm font-normal leading-normal text-gray-800 dark:text-dark-150;
+    @apply block text-sm font-medium leading-normal text-gray-800 dark:text-dark-150;
 }
 
 /* input {
