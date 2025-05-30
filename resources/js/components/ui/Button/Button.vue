@@ -55,7 +55,7 @@ const buttonClasses = computed(() => {
                 filled: 'in-data-ui-button-group:border-e [:is([data-ui-button-group]>&:last-child,_[data-ui-button-group]_:last-child>&)]:border-e-0 in-data-ui-button-group:border-gray-300/70',
                 ghost: '',
             },
-            iconOnly: { true: 'px-0' },
+            iconOnly: { true: 'px-0 gap-0' },
             round: { true: 'rounded-full' },
         },
         compoundVariants: [
