@@ -100,24 +100,37 @@
             background-position-y: 130%;
         }
     }
-    footer button {
+    footer {
         position: relative;
-        &::before, &::after {
+        &::before {
             content: '';
             pointer-events: none;
             position: absolute;
-            inset: 0;
-            border: 1px solid black;
+            border-block-end: 1px solid black;
             opacity: 0.06;
-            width: 60%;
-            aspect-ratio: 1;
-            left: 50%;
+            width: 100vw;
             top: 50%;
-            transform: translate(-50%, -50%);
-            border-radius: 50%;
+            transform: translateY(50%);
         }
-        &::before {
-            width: 45%;
+        button {
+            position: relative;
+            &::before, &::after {
+                content: '';
+                pointer-events: none;
+                position: absolute;
+                inset: 0;
+                border: 1px solid black;
+                opacity: 0.06;
+                width: 60%;
+                aspect-ratio: 1;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                border-radius: 50%;
+            }
+            &::before {
+                width: 45%;
+            }
         }
     }
 }
