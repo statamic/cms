@@ -10,6 +10,7 @@ export default {
     },
 
     props: {
+        persistState: { type: Boolean, default: false },
         reference: {
             type: String
         },
@@ -58,12 +59,16 @@ export default {
     },
 
     created() {
-        this.registerVuexModule();
+        if (!this.$store.hasModule(['publish', this.name])) {
+            this.registerVuexModule();
+        }
         this.$events.$emit('publish-container-created', this);
     },
 
     destroyed() {
-        this.removeVuexModule();
+        if (!this.persistState) {
+            this.removeVuexModule();
+        }
         this.clearDirtyState();
         this.$events.$emit('publish-container-destroyed', this);
     },
@@ -77,8 +82,6 @@ export default {
     methods: {
 
         registerVuexModule() {
-            const vm = this;
-
             const initial = {
                 blueprint: _.clone(this.blueprint),
                 values: _.clone(this.values),
@@ -205,14 +208,12 @@ export default {
                 actions: {
                     setFieldValue(context, payload) {
                         context.commit('setFieldValue', payload);
-                        vm.emitUpdatedEvent(context.state.values);
                     },
                     setFieldMeta(context, payload) {
                         context.commit('setFieldMeta', payload);
                     },
                     setValues(context, payload) {
                         context.commit('setValues', payload);
-                        vm.emitUpdatedEvent(context.state.values);
                     },
                     setExtraValues(context, payload) {
                         context.commit('setExtraValues', payload);
@@ -257,6 +258,7 @@ export default {
                 handle, value,
                 user: Statamic.user.id
             });
+            this.emitUpdatedEvent(this.$store.state.publish[this.name].values);
         },
 
         setFieldMeta(handle, value) {
@@ -264,6 +266,7 @@ export default {
                 handle, value,
                 user: Statamic.user.id
             });
+            this.$emit('meta-updated', this.$store.state.publish[this.name].meta);
         },
 
         dirty() {
