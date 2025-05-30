@@ -75,9 +75,7 @@ class CollectionBlueprintsController extends CpController
 
         $blueprint = $this->storeBlueprint($request, 'collections.'.$collection->handle());
 
-        return redirect()
-            ->cpRoute('collections.blueprints.edit', [$collection, $blueprint])
-            ->with('success', __('Blueprint created'));
+        return ['redirect' => cp_route('collections.blueprints.edit', [$collection, $blueprint])];
     }
 
     public function destroy($collection, $blueprint)
