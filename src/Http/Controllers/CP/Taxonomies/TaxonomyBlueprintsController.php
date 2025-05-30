@@ -75,9 +75,7 @@ class TaxonomyBlueprintsController extends CpController
 
         $blueprint = $this->storeBlueprint($request, 'taxonomies.'.$taxonomy->handle());
 
-        return redirect()
-            ->cpRoute('taxonomies.blueprints.edit', [$taxonomy, $blueprint])
-            ->with('success', __('Blueprint created'));
+        return ['redirect' => cp_route('taxonomies.blueprints.edit', [$taxonomy, $blueprint])];
     }
 
     public function destroy($taxonomy, $blueprint)
