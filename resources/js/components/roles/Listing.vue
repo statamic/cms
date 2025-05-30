@@ -1,6 +1,6 @@
 <template>
     <data-list :rows="rows" :columns="columns" v-slot="{}">
-        <div class="card p-0">
+        <ui-panel>
             <data-list-table>
                 <template #cell-title="{ row: role, index }">
                     <a :href="role.edit_url">{{ __(role.title) }}</a>
@@ -27,7 +27,7 @@
                     </dropdown-list>
                 </template>
             </data-list-table>
-        </div>
+        </ui-panel>
     </data-list>
 </template>
 
