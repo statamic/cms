@@ -58,9 +58,11 @@
                     @foreach (Statamic\Facades\Collection::all() as $collection)
                         @foreach ($collection->entryBlueprints() as $blueprint)
                             <tr>
-                                <td class="flex items-center gap-2">
-                                    <ui-status-indicator status="{{ $blueprint->hidden() ? 'hidden' : 'published' }}" v-tooltip="'{{ __($blueprint->hidden() ? 'Hidden': 'Visible') }}'"></ui-status-indicator>
-                                    <a href="{{ cp_route('collections.blueprints.edit', [$collection, $blueprint]) }}" v-pre>{{ __($blueprint->title()) }}</a>
+                                <td>
+                                    <div class="flex items-center gap-2">
+                                        <ui-status-indicator status="{{ $blueprint->hidden() ? 'hidden' : 'published' }}" v-tooltip="'{{ __($blueprint->hidden() ? 'Hidden': 'Visible') }}'"></ui-status-indicator>
+                                        <a href="{{ cp_route('collections.blueprints.edit', [$collection, $blueprint]) }}" v-pre>{{ __($blueprint->title()) }}</a>
+                                    </div>
                                 </td>
                                 <td class="text-end" v-pre>
                                     <span class="pe-2 font-mono text-xs text-gray-500 dark:text-gray-400">

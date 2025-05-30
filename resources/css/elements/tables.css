@@ -41,9 +41,9 @@
     }
 
     tbody {
-        @apply text-sm bg-white dark:bg-gray-900 shadow-sm outline-none;
+        @apply text-sm bg-white dark:bg-gray-900 shadow-sm rounded-xl outline-none;
         .contained & {
-            @apply shadow-none;
+            @apply shadow-none rounded-none;
         }
 
         tr {
