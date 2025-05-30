@@ -90,6 +90,7 @@
 @utility bg-architectural-lines {
     &::before {
         content: '';
+        pointer-events: none;
         position: absolute;
         inset: 0;
         background-image: url('../../svg/ui/architectural-lines.svg');
