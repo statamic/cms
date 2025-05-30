@@ -95,6 +95,30 @@
         inset: 0;
         background-image: url('../../svg/ui/architectural-lines.svg');
         background-size: 100%;
+        /* Reduce the chances of the background circles overlapping the button */
+        @media (width < 1300px) {
+            background-position-y: 130%;
+        }
+    }
+    footer button {
+        position: relative;
+        &::before, &::after {
+            content: '';
+            pointer-events: none;
+            position: absolute;
+            inset: 0;
+            border: 1px solid black;
+            opacity: 0.06;
+            width: 60%;
+            aspect-ratio: 1;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+        }
+        &::before {
+            width: 45%;
+        }
     }
 }
 
