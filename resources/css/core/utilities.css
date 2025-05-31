@@ -87,6 +87,29 @@
     }
 }
 
+/* ARCHIECTURAL LINES 
+=================================================== */
+/* Notes...
+
+    URL example
+    -----------
+    /cp/collections/create
+
+    What does it do?
+    ----------------
+    - Add a background image of architectural lines to the element.
+    - Target single buttons in any descended footers to add a circular line effect around them.
+
+*/
+/* HTML Example...
+
+<div class="content-card bg-architectural-lines"> <-- background lines added to this element
+    <footer>
+        <button>Create Collection</button> <--- circular line effect added to this descendended button in the footer
+    </footer>
+</div>
+
+*/
 @utility bg-architectural-lines {
     &::before {
         content: '';
@@ -112,7 +135,7 @@
             top: 50%;
             transform: translateY(50%);
         }
-        button {
+        button:only-child {
             position: relative;
             &::before, &::after {
                 content: '';
