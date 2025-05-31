@@ -60,6 +60,13 @@ class Stache
         return $this;
     }
 
+    public function removeStore(string $store)
+    {
+        $this->stores->forget($store);
+
+        return $this;
+    }
+
     public function stores()
     {
         return $this->stores;
