@@ -119,7 +119,7 @@ function desync() {
             </Label>
         </template>
         <template #actions>
-            <publish-field-actions v-if="fieldActions.length" :actions="fieldActions" />
+            <publish-field-actions v-if="fieldActions?.length" :actions="fieldActions" />
         </template>
         <Component
             ref="fieldtype"
