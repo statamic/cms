@@ -7,7 +7,7 @@
 }
 
 @utility focus-outline {
-    @apply border border-blue-300 dark:border-dark-blue-200;
+    @apply border border-blue-400 dark:border-dark-blue-200;
     outline: 0;
     box-shadow: 0 0 0 0.2rem rgba(0, 125, 255, 0.25);
 }
