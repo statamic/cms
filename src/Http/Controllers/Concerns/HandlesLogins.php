@@ -43,7 +43,7 @@ trait HandlesLogins
         return Auth::guard();
     }
 
-    protected function failAuthentication(Request $request, Authenticatable $user)
+    protected function failAuthentication(Request $request, ?Authenticatable $user = null)
     {
         $this->fireFailedEvent($request, $user);
         $this->incrementLoginAttempts($request);
