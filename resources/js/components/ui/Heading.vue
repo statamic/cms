@@ -1,10 +1,11 @@
 <script setup>
 import { cva } from 'cva';
 import { computed, useSlots } from 'vue';
+import { Icon } from '@statamic/ui';
 
 const props = defineProps({
     href: { type: [String, null], default: null },
-    icon: { type: String, default: null },
+    icon: { type: [String, null], default: null },
     level: { type: [Number, null], default: null },
     size: { type: String, default: 'base' },
     text: { type: [String, Number, Boolean, null], default: null },
@@ -25,7 +26,20 @@ const classes = cva({
         size: {
             base: 'text-sm text-gray-600 dark:text-white',
             lg: 'text-base text-gray-700 dark:text-white',
-            xl: 'text-2xl text-gray-800 dark:text-white',
+            xl: 'text-lg text-gray-800 dark:text-white',
+            '2xl': 'text-2xl text-gray-800 dark:text-white',
+        },
+    },
+})({ ...props });
+
+const iconClasses = cva({
+    base: 'text-gray-500 dark:text-gray-600',
+    variants: {
+        size: {
+            base: 'size-4',
+            lg: 'size-5',
+            xl: 'size-5.5',
+            '2xl': 'size-6',
         },
     },
 })({ ...props });
@@ -33,7 +47,7 @@ const classes = cva({
 
 <template>
     <component :is="tag" :class="classes" :href="href" data-ui-heading>
-        <ui-icon v-if="icon" :name="icon" class="size-5.5 text-gray-400 dark:text-gray-600" />
+        <Icon v-if="icon" :name="icon" :class="iconClasses" />
         <span v-if="!hasDefaultSlot">{{ text }}</span>
         <slot v-else />
     </component>

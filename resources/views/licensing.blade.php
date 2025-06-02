@@ -11,7 +11,7 @@
     <div class="no-results mx-auto max-w-6xl md:pt-30">
         <div class="flex flex-wrap items-center">
             <div class="w-full md:w-1/2">
-                <ui-heading level="1" size="xl" text="{{ __('Licensing') }}"></ui-heading>
+                <ui-heading level="1" size="2xl" text="{{ __('Licensing') }}"></ui-heading>
                 <p class="my-4 text-lg leading-normal text-gray-700 antialiased dark:text-dark-175">
                     @if ($usingLicenseKeyFile)
                         {{ __('statamic::messages.outpost_license_key_error') }}
