@@ -38,7 +38,7 @@ const buttonClasses = computed(() => {
                 danger: 'bg-linear-to-b from-red-500/90 to-red-500 hover:bg-red-500/90 text-white border border-red-600 inset-shadow-2xs inset-shadow-red-300 [&_svg]:text-red-200',
                 filled: 'bg-gray-800/5 hover:bg-gray-200 hover:text-gray-900 dark:bg-gray-700/80 dark:hover:bg-gray-700 [&_svg]:text-gray-700 dark:[&_svg]:text-gray-300',
                 ghost: 'bg-transparent hover:bg-gray-400/10 text-gray-800 dark:text-gray-300 dark:hover:bg-gray-700/80 dark:hover:text-gray-200',
-                subtle: 'bg-transparent hover:bg-gray-400/10 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-gray-700/80 dark:hover:text-gray-200',
+                subtle: 'bg-transparent hover:bg-gray-400/10 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-gray-700/80 dark:hover:text-gray-200 [&_svg]:text-gray-400 dark:[&_svg]:text-gray-300',
             },
             size: {
                 lg: 'px-6 h-12 text-base gap-2 rounded-lg text-base',
@@ -55,7 +55,7 @@ const buttonClasses = computed(() => {
                 filled: 'in-data-ui-button-group:border-e [:is([data-ui-button-group]>&:last-child,_[data-ui-button-group]_:last-child>&)]:border-e-0 in-data-ui-button-group:border-gray-300/70',
                 ghost: '',
             },
-            iconOnly: { true: 'px-0' },
+            iconOnly: { true: 'px-0 gap-0' },
             round: { true: 'rounded-full' },
         },
         compoundVariants: [

@@ -40,7 +40,7 @@ code.parent-url {
     }
 }
 
-.publish-fields {
+.publish-fields, .field-grid {
     @apply flex flex-wrap gap-3 lg:gap-8;
     --col-width: calc(100% / 12);
 
@@ -48,6 +48,11 @@ code.parent-url {
         --col-span: 12;
         flex-basis: calc(var(--col-width) * 12 - var(--spacing) * 3);
         flex-grow: 1;
+    }
+
+    .field-grid-item {
+        --col-span: 12;
+        flex-basis: calc(var(--col-width) * 12 - calc(var(--spacing) * 1));
     }
 
     .field-w-10  { --col-span: 1; }
@@ -65,7 +70,7 @@ code.parent-url {
 
     [data-cards-wrap="fields"] & {
         @apply gap-1;
-        .form-group {
+        .form-group, .field-grid-item {
             flex-basis: calc(var(--col-width) * 12 - calc(var(--spacing) * 1));
         }
     }
@@ -75,6 +80,8 @@ code.parent-url {
     .publish-fields .form-group {
         flex-basis: calc(var(--col-width) * var(--col-span) - calc(var(--spacing) * 8));
     }
+
+    .field-grid .field-grid-item,
     [data-cards-wrap="fields"] .publish-fields .form-group {
         flex-basis: calc(var(--col-width) * var(--col-span) - calc(var(--spacing) * 1));
     }

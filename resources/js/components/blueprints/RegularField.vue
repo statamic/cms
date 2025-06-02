@@ -1,59 +1,38 @@
 <template>
-    <div class="blueprint-section-field" :class="widthClass">
-        <div class="blueprint-section-field-inner">
-            <div class="blueprint-drag-handle"></div>
+    <ui-card class="py-0.75! px-2! field-grid-item blueprint-section-field" :class="widthClass">
+        <div class="flex items-center gap-2">
+            <ui-icon name="handles" class="blueprint-drag-handle size-4 cursor-grab text-gray-300" />
             <div class="flex flex-1 items-center justify-between">
-                <div class="flex flex-1 items-center py-2 ltr:pl-2 ltr:pr-4 rtl:pl-4 rtl:pr-2">
-                    <svg-icon
-                        class="h-4 w-4 flex-none text-gray-800 dark:text-dark-150 ltr:mr-2 rtl:ml-2"
-                        :name="field.icon.startsWith('<svg') ? field.icon : `light/${field.icon}`"
+                <div class="flex flex-1 items-center py-2">
+                    <ui-icon
+                        class="size-4 me-2 text-gray-500"
+                        :name="field.icon.startsWith('<svg') ? field.icon : `fieldtype-${field.icon}`"
                         v-tooltip="tooltipText"
-                        default="light/generic-field"
                     />
-                    <a class="overflow-hidden text-ellipsis" v-text="__(labelText)" @click="$emit('edit')" />
+                    <button class="overflow-hidden text-ellipsis text-sm" v-text="__(labelText)" @click="$emit('edit')" />
                     <svg-icon
                         name="light/hyperlink"
                         v-if="isReferenceField"
-                        class="h-4 w-4 text-3xs text-gray-600 dark:text-dark-175 ltr:ml-2 rtl:mr-2"
+                        class="size-4 text-3xs text-gray-600 dark:text-dark-175 ltr:ml-2 rtl:mr-2"
                         v-tooltip="__('Imported from fieldset') + ': ' + field.field_reference"
                     />
                 </div>
-                <div class="flex flex-none ltr:pr-2 rtl:pl-2">
-                    <width-selector v-if="!isHidden" v-model="width" class="ltr:mr-2 rtl:ml-2" />
+                <div class="flex items-center gap-2">
+                    <width-selector v-if="!isHidden" v-model="width" class="" />
 
                     <div
                         v-else
-                        class="relative flex w-12 items-center justify-center border border-gray-400 opacity-50 dark:border-dark-200 ltr:mr-2 rtl:ml-2"
+                        class="relative flex w-12 items-center justify-center border border-gray-400 opacity-50 dark:border-dark-200 "
                     >
-                        <svg-icon name="regular/hidden" class="h-4 w-4 opacity-50"></svg-icon>
+                        <svg-icon name="regular/hidden" class="size-4 opacity-50"></svg-icon>
                     </div>
 
-                    <button
-                        v-if="canDefineLocalizable"
-                        class="flex items-center hover:text-gray-950 dark:hover:text-dark-100 ltr:mr-2 rtl:ml-2"
-                        :class="{
-                            'text-gray-950 dark:text-dark-150': localizable,
-                            'text-gray-600 dark:text-dark-200': !localizable,
-                        }"
-                        v-tooltip="__('Localizable')"
-                        @click="localizable = !localizable"
-                    >
-                        <svg-icon name="light/earth" class="h-4 w-4" />
-                    </button>
-                    <button
-                        @click.prevent="$emit('duplicate')"
-                        class="flex items-center text-gray-600 hover:text-gray-950 dark:text-dark-150 dark:hover:text-dark-100 ltr:mr-2 rtl:ml-2"
-                        v-tooltip="__('Duplicate')"
-                    >
-                        <svg-icon name="light/duplicate" class="h-4 w-4" />
-                    </button>
-                    <button
-                        @click.prevent="$emit('deleted')"
-                        class="flex items-center text-gray-600 hover:text-gray-950 dark:text-dark-150 dark:hover:text-dark-100"
-                        v-tooltip="__('Remove')"
-                    >
-                        <svg-icon name="micro/trash" class="h-4 w-4" />
-                    </button>
+                    <div class="flex items-center">
+                        <ui-button v-if="canDefineLocalizable" size="sm" icon="earth" variant="subtle" v-tooltip="__('Localizable')" @click="localizable = !localizable" />
+                        <ui-button size="sm" icon="duplicate" variant="subtle" @click.prevent="$emit('duplicate')" v-tooltip="__('Duplicate')" />
+                        <ui-button size="sm" icon="trash" variant="subtle" @click.prevent="$emit('deleted')" v-tooltip="__('Remove')" />
+                    </div>
+
                     <stack name="field-settings" v-if="isEditing" @closed="editorClosed">
                         <field-settings
                             ref="settings"
@@ -72,7 +51,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </ui-card>
 </template>
 
 <script>
@@ -143,7 +122,7 @@ export default {
         },
 
         widthClass() {
-            return `blueprint-section-field-${tailwind_width_class(this.width)}`;
+            return `${field_width_class(this.width)}`;
         },
 
         localizable: {

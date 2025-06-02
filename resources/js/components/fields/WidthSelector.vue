@@ -23,10 +23,10 @@ const selected = computed(() => {
 })
 
 const wrapperClasses = cva({
-    base: 'relative text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 overflow-hidden flex cursor-pointer',
+    base: 'relative text-gray-600 dark:text-gray-400 font-mono antialiased bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 overflow-hidden flex cursor-pointer',
     variants: {
         size: {
-            base: 'h-7 w-16 text-xs rounded-md',
+            base: 'h-6 w-14 text-xs rounded-md',
             lg: 'h-10 w-24 text-sm rounded-lg',
         },
     },
