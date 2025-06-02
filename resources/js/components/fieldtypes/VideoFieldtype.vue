@@ -92,9 +92,9 @@ export default {
 
         isEmbeddable() {
             return (
-                (this.isUrl && this.data.includes('youtube')) ||
-                this.data.includes('vimeo') ||
-                this.data.includes('youtu.be')
+                (this.isUrl && this.data?.includes('youtube')) ||
+                this.data?.includes('vimeo') ||
+                this.data?.includes('youtu.be')
             );
         },
 
@@ -113,10 +113,10 @@ export default {
         isVideo() {
             return (
                 !this.isEmbeddable &&
-                (this.data.includes('.mp4') ||
-                    this.data.includes('.ogv') ||
-                    this.data.includes('.mov') ||
-                    this.data.includes('.webm'))
+                (this.data?.includes('.mp4') ||
+                    this.data?.includes('.ogv') ||
+                    this.data?.includes('.mov') ||
+                    this.data?.includes('.webm'))
             );
         },
     },
