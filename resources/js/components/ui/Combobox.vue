@@ -218,7 +218,7 @@ function updateModelValue(value) {
                     <ComboboxInput
                         v-if="searchable && (dropdownOpen || !modelValue)"
                         ref="input"
-                        class="w-full focus:outline-none"
+                        class="w-full text-gray-700 opacity-100 focus:outline-none"
                         v-model="searchQuery"
                         :placeholder
                     />
