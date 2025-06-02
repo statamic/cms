@@ -11,7 +11,7 @@ const props = defineProps({
     <div
         :class="[
             'relative bg-gray-100 dark:border-b dark:border-white/13 dark:bg-black/25 dark:inset-shadow-2xs dark:inset-shadow-black',
-            'not-prose w-full rounded-[.825rem] mb-13 px-1 py-1.25',
+            'not-prose w-full rounded-[.875rem] mb-13 px-1 py-1.25',
         ]"
         data-ui-panel
     >
