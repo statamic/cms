@@ -69,7 +69,7 @@
                                 @drop="draggingFile = false"
                                 @keydown="shortcut"
                             >
-                                <div class="editor" ref="codemirror"></div>
+                                <div class="editor relative focus-within:focus-outline" ref="codemirror"></div>
 
                                 <div class="helpers">
                                     <div class="bg-gray-50 dark:bg-gray-950 rounded-b-xl border-t border-gray-200 dark:border-white/15 flex p-1 text-sm w-full">

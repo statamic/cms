@@ -22,6 +22,7 @@ const switchRootClasses = cva({
         'data-[state=checked]:bg-gray-800',
         'data-[state=unchecked]:border-transparent',
         'data-[state=unchecked]:bg-gray-200',
+        'focus:focus-outline'
     ],
     variants: {
         size: {

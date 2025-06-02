@@ -45,7 +45,7 @@ defineOptions({
 const attrs = useAttrs();
 
 const anchorClasses = cva({
-    base: 'focus-within:outline w-full flex items-center justify-between border border-gray-300 dark:border-b-0 dark:ring-3 dark:ring-gray-900 dark:border-white/15 text-gray-600 dark:text-gray-300 antialiased appearance-none shadow-ui-sm dark:shadow-md',
+    base: 'focus-within:focus-outline w-full flex items-center justify-between border border-gray-300 dark:border-b-0 dark:ring-3 dark:ring-gray-900 dark:border-white/15 text-gray-600 dark:text-gray-300 antialiased appearance-none shadow-ui-sm dark:shadow-md',
     variants: {
         size: {
             base: 'text-base rounded-lg ps-3 py-2 h-10 leading-[1.375rem]',
