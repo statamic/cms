@@ -25,6 +25,9 @@ export default defineConfig(({ mode }) => {
             svgLoader(),
             inject({ Vue: 'vue', include: 'resources/js/**' }),
         ],
+        server: {
+            hmr: false,
+        },
         resolve: {
             alias: {
                 vue: 'vue/dist/vue.esm-bundler.js',

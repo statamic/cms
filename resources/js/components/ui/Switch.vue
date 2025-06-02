@@ -17,7 +17,7 @@ defineEmits(['update:modelValue']);
 const switchRootClasses = cva({
     base: [
         'relative flex rounded-full shrink-0 border-2',
-        'transition-colors focus-within:outline-hidden cursor-pointer',
+        'transition-colors cursor-pointer',
         'data-[state=checked]:border-gray-700',
         'data-[state=checked]:bg-gray-800',
         'data-[state=unchecked]:border-transparent',
