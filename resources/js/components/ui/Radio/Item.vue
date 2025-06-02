@@ -19,7 +19,7 @@ const id = useId();
             class="shadow-ui-xs mt-0.5 size-4 cursor-default rounded-full border border-gray-300 bg-white outline-hidden data-[active=true]:border-gray-900 data-[active=true]:bg-gray-900 dark:border-none dark:data-[active=true]:bg-white"
         >
             <RadioGroupIndicator
-                class="relative flex h-full w-full items-center justify-center after:block after:h-1.5 after:w-1.5 after:rounded-[50%] after:bg-white after:content-[''] dark:after:bg-gray-800"
+                class="relative flex h-full w-full items-center justify-center border border-black rounded-[50%] after:block after:h-[0.5rem] after:w-[0.5rem] after:rounded-[50%] after:bg-black after:content-[''] dark:after:bg-gray-800"
             />
         </RadioGroupItem>
         <label class="flex flex-col" :for="id">
