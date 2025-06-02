@@ -49,7 +49,7 @@ function tabHasError(tab) {
 <template>
     <ElementContainer @resized="width = $event.width">
         <Tabs :default-tab="mainTabs[0].handle">
-            <TabList class="mb-6">
+            <TabList v-if="mainTabs.length > 1" class="mb-6">
                 <TabTrigger
                     v-for="tab in mainTabs"
                     :key="tab.handle"
