@@ -1,6 +1,7 @@
 <script setup>
 import { useSlots } from 'vue';
 import { cva } from 'cva';
+import { Icon } from '@statamic/ui';
 
 defineProps({
     icon: { type: String, default: null },
