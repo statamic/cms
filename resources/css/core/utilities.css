@@ -197,6 +197,10 @@
 
 @utility trim-text-start {
     text-box: trim-start;
+    /* =JFG. When we _just_ have an SVG we probably don't want to text trim, for example in a Markdown field with button controls like Bold, Italic, etc. */
+    &:has(svg:only-child) {
+        display: flex;
+    }
 }
 
 [v-cloak],
