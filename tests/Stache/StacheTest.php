@@ -6,10 +6,12 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Stache\NullLockStore;
 use Statamic\Stache\Stache;
 use Statamic\Stache\Stores\ChildStore;
 use Statamic\Stache\Stores\CollectionsStore;
 use Statamic\Stache\Stores\EntriesStore;
+use Symfony\Component\Lock\LockFactory;
 use Tests\TestCase;
 
 class StacheTest extends TestCase
@@ -62,21 +64,26 @@ class StacheTest extends TestCase
     }
 
     #[Test]
-    public function stores_can_be_removed()
+    public function stores_can_be_excluded_from_warming_and_clearing()
     {
         $this->stache->sites(['en']); // store expects the stache to have site(s)
         $this->assertTrue($this->stache->stores()->isEmpty());
 
-        $this->stache->registerStore(
-            new CollectionsStore($this->stache, \Mockery::mock(Filesystem::class))
-        );
+        $mockStore = $this->mock(CollectionsStore::class, function ($mock) {
+            $mock->shouldReceive('warm')->never();
+            $mock->shouldReceive('clear')->never();
+            $mock->shouldReceive('key')->andReturn('collections');
+        });
 
-        $return = $this->stache->removeStore('collections');
+        $this->stache->registerStore($mockStore);
+
+        $return = $this->stache->exclude('collections');
 
         $this->assertEquals($this->stache, $return);
-        tap($this->stache->stores(), function ($stores) {
-            $this->assertEquals(0, $stores->count());
-        });
+
+        $this->stache->setLockFactory(new LockFactory(new NullLockStore()));
+        $this->stache->warm();
+        $this->stache->clear();
     }
 
     #[Test]

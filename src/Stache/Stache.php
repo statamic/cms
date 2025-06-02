@@ -22,6 +22,7 @@ class Stache
     protected $lockFactory;
     protected $locks = [];
     protected $duplicates;
+    protected $exclude = [];
 
     public function __construct()
     {
@@ -60,9 +61,9 @@ class Stache
         return $this;
     }
 
-    public function removeStore(string $store)
+    public function exclude(string $store)
     {
-        $this->stores->forget($store);
+        $this->exclude[] = $store;
 
         return $this;
     }
@@ -95,7 +96,7 @@ class Stache
 
     public function clear()
     {
-        $this->stores()->reverse()->each->clear();
+        $this->stores()->except($this->exclude)->reverse()->each->clear();
 
         $this->duplicates()->clear();
 
@@ -117,7 +118,7 @@ class Stache
 
         $this->startTimer();
 
-        $this->stores()->each->warm();
+        $this->stores()->except($this->exclude)->each->warm();
 
         $this->stopTimer();
 
