@@ -9,13 +9,11 @@
                         :name="field.icon.startsWith('<svg') ? field.icon : `fieldtype-${field.icon}`"
                         v-tooltip="tooltipText"
                     />
-                    <button class="overflow-hidden text-ellipsis text-sm" v-text="__(labelText)" @click="$emit('edit')" />
-                    <svg-icon
-                        name="light/hyperlink"
-                        v-if="isReferenceField"
-                        class="size-4 text-3xs text-gray-600 dark:text-dark-175 ltr:ml-2 rtl:mr-2"
-                        v-tooltip="__('Imported from fieldset') + ': ' + field.field_reference"
-                    />
+                    <div class="flex items-center gap-2">
+                        <button class="cursor-pointer overflow-hidden text-ellipsis text-sm hover:text-blue-500" type="button" v-text="__(labelText)" @click="$emit('edit')" />
+                        <ui-icon v-if="isReferenceField" name="link" class="text-gray-400" />
+                        <span v-if="isReferenceField" class="text-gray-500 font-mono text-2xs cursor-help" v-text="__('field')" v-tooltip="__('Imported from: ') + field.field_reference" />
+                    </div>
                 </div>
                 <div class="flex items-center gap-2">
                     <width-selector v-if="!isHidden" v-model="width" class="" />
@@ -25,6 +23,7 @@
                         class="relative flex w-12 items-center justify-center border border-gray-400 opacity-50 dark:border-dark-200 "
                     >
                         <svg-icon name="regular/hidden" class="size-4 opacity-50"></svg-icon>
+                        hai
                     </div>
 
                     <div class="flex items-center">
