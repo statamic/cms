@@ -261,7 +261,7 @@ class NavItem
             ->map(function ($navItem) use ($generateNewIds) {
                 return $navItem
                     ->id($generateNewIds ? $this->id().'::' : $navItem->id())
-                    ->icon($this->icon())
+                    ->icon($navItem->icon() ?? $this->icon())
                     ->section($this->section())
                     ->isChild(true);
             })
