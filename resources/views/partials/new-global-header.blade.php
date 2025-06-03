@@ -18,32 +18,36 @@
                 <ui-badge size="sm" variant="flat" text="Pro" />
             @endif
         </div>
-        <span class="text-gray-500">/</span>
-        <ui-dropdown v-cloak>
-            <template #trigger>
-                <ui-button text="Collections" size="sm" variant="ghost" icon-append="ui/chevron-vertical" class="[&_svg]:size-2" />
-            </template>
-            <ui-dropdown-header text="Collections" />
-            <ui-dropdown-menu>
-                <ui-dropdown-item text="Assets" icon="assets" />
-                <ui-dropdown-item text="Globals" icon="globals" />
-                <ui-dropdown-item text="Navigation" icon="navigation" />
-                <ui-dropdown-item text="Taxonomies" icon="taxonomies" />
-            </ui-dropdown-menu>
-        </ui-dropdown>
-        <span class="text-gray-500">/</span>
+        @foreach($breadcrumbs as $breadcrumb)
+            <span class="text-gray-500">/</span>
             <ui-dropdown v-cloak>
-            <template #trigger>
-                <ui-button text="Events" size="sm" variant="ghost" icon-append="ui/chevron-vertical" class="[&_svg]:size-2" />
-            </template>
-            <ui-dropdown-header text="Events" icon="collections" :link-to-config="true" />
-            <ui-dropdown-menu>
-                <ui-dropdown-item text="Blog" icon="collections" />
-                <ui-dropdown-item text="News" icon="collections" />
-                <ui-dropdown-item text="Pages" icon="collections" />
-            </ui-dropdown-menu>
-            <ui-dropdown-footer icon="plus" text="Create Collection" />
-        </ui-dropdown>
+                <template #trigger>
+                    <ui-button text="{{ __($breadcrumb->text()) }}" size="sm" variant="ghost" icon-append="ui/chevron-vertical" class="[&_svg]:size-2" />
+                </template>
+                <ui-dropdown-header
+                    text="{{ __($breadcrumb->text()) }}"
+                    icon="{{ $breadcrumb->icon() }}"
+                    @if($breadcrumb->hasConfigureUrl())
+                        append-icon="cog-solid"
+                        append-href="{{ $breadcrumb->configureUrl() }}"
+                    @endif
+                ></ui-dropdown-header>
+                @if($breadcrumb->hasLinks())
+                    <ui-dropdown-menu>
+                        @foreach($breadcrumb->links() as $link)
+                            <ui-dropdown-item
+                                text="{{ __($link->text) }}"
+                                icon="{{ $link->icon }}"
+                                href="{{ $link->url }}"
+                            ></ui-dropdown-item>
+                        @endforeach
+                    </ui-dropdown-menu>
+                @endif
+                @if($breadcrumb->createUrl())
+                    <ui-dropdown-footer icon="plus" text="{{ __($breadcrumb->createLabel()) }}" href="{{ $breadcrumb->createUrl() }}" />
+                @endif
+            </ui-dropdown>
+        @endforeach
     </div>
     <div class="flex-1 flex gap-4 items-center justify-end">
         <div><command-palette /></div>
