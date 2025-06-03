@@ -345,9 +345,9 @@ class URL
     }
 
     /**
-     * Normalize trailing slashes before query and fragment (trims by default, but can be enforced).
+     * Normalize trailing slash before query and fragment (trims by default, but can be enforced).
      */
-    public function normalizeTrailingSlashes(string $url): string
+    public function normalizeTrailingSlash(string $url): string
     {
         $parts = str($url)
             ->split(pattern: '/([?#])/', flags: PREG_SPLIT_DELIM_CAPTURE)

@@ -254,7 +254,7 @@ class UrlTest extends TestCase
     {
         URL::enforceTrailingSlashes();
 
-        $this->assertSame($expected, URL::normalizeTrailingSlashes($url));
+        $this->assertSame($expected, URL::normalizeTrailingSlash($url));
     }
 
     public static function enforceTrailingSlashesProvider()
@@ -299,7 +299,7 @@ class UrlTest extends TestCase
     #[DataProvider('removeTrailingSlashesProvider')]
     public function removes_trailing_slashes($url, $expected)
     {
-        $this->assertSame($expected, URL::normalizeTrailingSlashes($url));
+        $this->assertSame($expected, URL::normalizeTrailingSlash($url));
     }
 
     public static function removeTrailingSlashesProvider()
@@ -343,14 +343,14 @@ class UrlTest extends TestCase
     #[Test]
     public function it_can_configure_and_unconfigure_enforcing_of_trailing_slashes()
     {
-        $this->assertSame('https://example.com?query', URL::normalizeTrailingSlashes('https://example.com?query'));
+        $this->assertSame('https://example.com?query', URL::normalizeTrailingSlash('https://example.com?query'));
 
         URL::enforceTrailingSlashes();
 
-        $this->assertSame('https://example.com/?query', URL::normalizeTrailingSlashes('https://example.com?query'));
+        $this->assertSame('https://example.com/?query', URL::normalizeTrailingSlash('https://example.com?query'));
 
         URL::enforceTrailingSlashes(false);
 
-        $this->assertSame('https://example.com?query', URL::normalizeTrailingSlashes('https://example.com?query'));
+        $this->assertSame('https://example.com?query', URL::normalizeTrailingSlash('https://example.com?query'));
     }
 }
