@@ -19,6 +19,8 @@
 
 <div class="space-y-12">
 
+    <ui-switch />
+
     <section class="space-y-4">
         <ui-heading size="lg">Badges</ui-heading>
         <div class="mb-4 flex gap-3 items-end">

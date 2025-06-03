@@ -41,7 +41,7 @@
                         <td>
                             <input
                                 type="text"
-                                class="input-text-minimal"
+                                class="w-full"
                                 :id="fieldId + '__' + element.key"
                                 v-model="data[index].value"
                                 :readonly="isReadOnly"

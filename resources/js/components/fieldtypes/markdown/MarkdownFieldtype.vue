@@ -220,6 +220,7 @@ export default {
     mixins: [Fieldtype],
 
     components: {
+        Button,
         Selector,
         Uploader,
         Uploads,
