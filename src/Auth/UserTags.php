@@ -196,7 +196,12 @@ class UserTags extends Tags
 
         $data = $this->getFormSession('user.profile');
 
-        $data['fields'] = $this->getProfileFields();
+        $array_tabs = $this->getProfileTabs();
+        $array_sections = array_reduce(array_column($array_tabs, 'sections'), 'array_merge', []);
+        $array_fields = array_reduce(array_column($array_sections, 'fields'), 'array_merge', []);
+        $data['tabs'] = $array_tabs;
+        $data['sections'] = $array_sections;
+        $data['fields'] = $array_fields;
 
         $knownParams = ['redirect', 'error_redirect', 'allow_request_redirect'];
 
@@ -705,6 +710,68 @@ class UserTags extends Tags
                 return $this->getRenderableField($field, 'user.register');
             })
             ->values()
+            ->all();
+    }
+
+    /**
+     * Get tabs with fields filled with extra data for looping over and rendering, using tabs defined in blueprint.
+     * The result is unpacked into a sections array and a fields array for choosing what to loop over and render.
+     *
+     * @return array
+     */
+    protected function getProfileTabs()
+    {
+        $user = User::current();
+
+        $values = $user
+            ? $user->data()->merge(['email' => $user->email()])->all()
+            : [];
+
+        return User::blueprint()->tabs()
+            ->map(function ($tab) use ($values) {
+                return [
+                    'display' => $tab->display(),
+                    'sections'  => $tab->sections()
+                    ->map(function ($section) use ($values) {
+                        return [
+                            'display' => $section->display(),
+                            'instructions' => $section->instructions(),
+                            'fields' => $section->fields()->addValues($values)->preProcess()->all()
+                            ->reject(function ($field) {
+                                return in_array($field->handle(), ['password', 'password_confirmation', 'roles', 'groups'])
+                                    || $field->fieldtype()->handle() === 'assets';
+                            })
+                            ->map(function ($field) {
+                                return $this->getRenderableField($field, 'user.profile');
+                            })
+                            ->values()
+                            ->all(),
+                        ];
+                    })
+                    ->all()
+                ];
+            })
+            ->values()
+            ->all();
+            
+        return User::blueprint()->tabs()->first()->sections()
+            ->map(function ($section) use ($values) {
+                return [
+                    'display' => $section->display(),
+                    'instructions' => $section->instructions(),
+                    'fields' => $section->fields()->addValues($values)->preProcess()->all()
+                    ->reject(function ($field) {
+                        return in_array($field->handle(), ['password', 'password_confirmation', 'roles', 'groups'])
+                            || $field->fieldtype()->handle() === 'assets';
+                    })
+                    ->map(function ($field) {
+                        return $this->getRenderableField($field, 'user.profile');
+                    })
+                    ->values()
+                    ->all(),
+                    
+                ];
+            })
             ->all();
     }
 
