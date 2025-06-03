@@ -349,10 +349,11 @@ class URL
      */
     public function normalizeTrailingSlashes(string $url): string
     {
-        $parts = str($url)->split(pattern: '/([?#])/', flags: PREG_SPLIT_DELIM_CAPTURE)->all();
+        $parts = str($url)
+            ->split(pattern: '/([?#])/', flags: PREG_SPLIT_DELIM_CAPTURE)
+            ->all();
 
         $url = array_shift($parts);
-
         $queryAndFragments = implode($parts);
 
         if (in_array($url, ['', '/']) && ! $queryAndFragments) {
