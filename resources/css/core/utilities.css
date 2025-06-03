@@ -57,6 +57,12 @@
     }
 }
 
+@utility border-r-0-last-child {
+    &:last-child {
+        @apply border-r-0;
+    }
+}
+
 @utility w-fit-content {
     width: fit-content;
 }
