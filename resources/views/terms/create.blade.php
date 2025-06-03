@@ -1,6 +1,6 @@
 @inject('str', 'Statamic\Support\Str')
 @extends('statamic::layout')
-@section('title', $breadcrumbs->title($taxonomyCreateLabel))
+{{--@section('title', $breadcrumbs->title($taxonomyCreateLabel))--}}
 @section('wrapper_class', 'max-w-7xl')
 
 @section('content')
@@ -8,7 +8,6 @@
         :actions="{{ json_encode($actions) }}"
         taxonomy-handle="{{ $taxonomy }}"
         taxonomy-create-label="{{ $taxonomyCreateLabel }}"
-        :breadcrumbs="{{ $breadcrumbs->toJson() }}"
         :fieldset="{{ json_encode($blueprint) }}"
         :values="{{ json_encode($values) }}"
         :meta="{{ json_encode($meta) }}"

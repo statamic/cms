@@ -5,7 +5,7 @@ namespace Statamic\CP\Breadcrumbs;
 use Statamic\CP\Navigation\NavItem;
 use Statamic\Facades\CP\Nav;
 
-class SmarterBreadcrumbs
+class Breadcrumbs
 {
     public static function build(): array
     {

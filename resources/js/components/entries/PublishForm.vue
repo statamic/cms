@@ -319,7 +319,6 @@ export default {
         initialSite: String,
         initialIsWorkingCopy: Boolean,
         collectionHandle: String,
-        breadcrumbs: Array,
         initialActions: Object,
         method: String,
         isCreating: Boolean,
@@ -507,7 +506,7 @@ export default {
         title(title) {
             if (this.isBase) {
                 const arrow = this.direction === 'ltr' ? '‹' : '›';
-                document.title = `${title} ${arrow} ${this.breadcrumbs[1].text} ${arrow} ${this.breadcrumbs[0].text} ${arrow} ${__('Statamic')}`;
+                // document.title = `${title} ${arrow} ${this.breadcrumbs[1].text} ${arrow} ${this.breadcrumbs[0].text} ${arrow} ${__('Statamic')}`;
             }
         },
     },

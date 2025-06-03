@@ -173,7 +173,6 @@ export default {
         initialOriginMeta: Object,
         initialSite: String,
         taxonomyHandle: String,
-        breadcrumbs: Array,
         initialActions: Object,
         method: String,
         initialPublished: Boolean,

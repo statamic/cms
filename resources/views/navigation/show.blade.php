@@ -6,7 +6,6 @@
     <navigation-view
         title="{{ $nav->title() }}"
         handle="{{ $nav->handle() }}"
-        breadcrumb-url="{{ cp_route('navigation.index') }}"
         pages-url="{{ cp_route('navigation.tree.index', $nav->handle()) }}"
         submit-url="{{ cp_route('navigation.tree.update', $nav->handle()) }}"
         edit-url="{{ $nav->editUrl() }}"

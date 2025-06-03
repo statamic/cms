@@ -7,13 +7,6 @@
 
 @section('content')
     <header class="mb-6">
-        @include(
-            'statamic::partials.breadcrumb',
-            [
-                'url' => cp_route('assets.browse.show', $container->handle()),
-                'title' => $container->title(),
-            ]
-        )
         <h1>@yield('title')</h1>
     </header>
 

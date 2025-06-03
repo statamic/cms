@@ -61,7 +61,6 @@ class Entries extends Relationship
         'initialIsRoot' => 'isRoot',
         'initialReadOnly' => 'readOnly',
         'revisionsEnabled' => 'revisionsEnabled',
-        'breadcrumbs' => 'breadcrumbs',
         'collectionHandle' => 'collection',
         'canManagePublishState' => 'canManagePublishState',
         'collectionHasRoutes' => 'collectionHasRoutes',

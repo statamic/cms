@@ -4,7 +4,7 @@ namespace CP\Breadcrumbs;
 
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\CP\Breadcrumbs\Breadcrumb;
-use Statamic\CP\Breadcrumbs\SmarterBreadcrumbs;
+use Statamic\CP\Breadcrumbs\Breadcrumbs;
 use Statamic\Facades\Collection;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -21,7 +21,7 @@ class BreadcrumbsTest extends TestCase
     {
         $this->actingAs(User::make()->makeSuper())->get(cp_route('dashboard'));
 
-        $breadcrumbs = SmarterBreadcrumbs::build();
+        $breadcrumbs = Breadcrumbs::build();
 
         $this->assertEquals([
             new Breadcrumb(
@@ -38,7 +38,7 @@ class BreadcrumbsTest extends TestCase
     {
         $this->actingAs(User::make()->makeSuper())->get(cp_route('collections.index'));
 
-        $breadcrumbs = SmarterBreadcrumbs::build();
+        $breadcrumbs = Breadcrumbs::build();
 
         $this->assertEquals([
             new Breadcrumb(
@@ -64,7 +64,7 @@ class BreadcrumbsTest extends TestCase
 
         $this->actingAs(User::make()->makeSuper())->get(cp_route('collections.show', 'pages'));
 
-        $breadcrumbs = SmarterBreadcrumbs::build();
+        $breadcrumbs = Breadcrumbs::build();
 
         $this->assertEquals([
             new Breadcrumb(
@@ -115,7 +115,7 @@ class BreadcrumbsTest extends TestCase
             ],
         ]);
 
-        $breadcrumbs = SmarterBreadcrumbs::build();
+        $breadcrumbs = Breadcrumbs::build();
 
         // None of the preferences should be applied to the breadcrumbs.
         $this->assertEquals([
@@ -133,7 +133,7 @@ class BreadcrumbsTest extends TestCase
     {
         $this->actingAs(User::make()->makeSuper())->get(cp_route('playground'));
 
-        $breadcrumbs = SmarterBreadcrumbs::build();
+        $breadcrumbs = Breadcrumbs::build();
 
         $this->assertEquals([], $breadcrumbs);
     }
