@@ -92,6 +92,6 @@ html:not(.dark) .outside.rad-theme {
     }
 
     .forgot-password-link {
-        @apply text-shadow text-white;
+        @apply text-white;
     }
 }
