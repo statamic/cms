@@ -5,7 +5,7 @@
         :name="name"
         :focus="config.focus"
         :model-value="value"
-        :is-read-only="isReadOnly"
+        :disabled="isReadOnly"
         :id="fieldId"
         :min="config.min"
         :prepend="__(config.prepend)"
