@@ -35,7 +35,7 @@ const wrapperClasses = cva({
 })
 
 const sizerClasses = cva({
-    base: 'border border-l-0 border-r-0-last-child border-y-0 data-[state="selected"]:data-[last="false"]:border-gray-100 dark:border-gray-700 dark:data-[state="selected"]:data-[last="false"]:border-gray-900 flex-1',
+    base: 'border border-l-0 last:border-r-0 border-y-0 data-[state="selected"]:data-[last="false"]:border-gray-100 dark:border-gray-700 dark:data-[state="selected"]:data-[last="false"]:border-gray-900 flex-1',
     variants: {
         variant: {
             default: [
