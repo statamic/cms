@@ -5,9 +5,7 @@ import { CharacterCounter } from '@statamic/ui';
 defineEmits(['update:modelValue']);
 
 const props = defineProps({
-    description: { type: String, default: null },
     elastic: { type: Boolean, default: false },
-    label: { type: String, default: null },
     required: { type: Boolean, default: false },
     resize: { type: String, default: 'vertical' },
     rows: { type: [Number, String], default: 4 },
@@ -19,8 +17,8 @@ const classes = cva({
     base: [
         'w-full block bg-white dark:bg-gray-900 px-3 pt-2.5 pb-3 rounded-lg',
         'border border-gray-300 dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:inset-shadow-2xs dark:inset-shadow-black',
-        'text-gray-600 dark:text-gray-300',
-        'appearance-none antialiased shadow-ui-sm disabled:shadow-none not-prose',
+        'text-gray-800 dark:text-gray-300',
+        'appearance-none antialiased shadow-ui-sm disabled:shadow-none not-prose'
     ],
     variants: {
         resize: {

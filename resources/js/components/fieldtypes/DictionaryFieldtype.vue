@@ -33,7 +33,7 @@
                         :key="getOptionValue(option)"
                         class="vs__selected sortable-item cursor-grab"
                     >
-                        <Badge pill size="lg">
+                        <Badge size="lg" color="white">
                             <div v-if="labelHtml" v-html="getOptionLabel(option)"></div>
                             <div v-else>{{ __(getOptionLabel(option)) }}</div>
 

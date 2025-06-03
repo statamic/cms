@@ -1,7 +1,5 @@
 <script setup>
 const props = defineProps({
-    label: { type: String, default: null },
-    description: { type: String, default: null },
     required: { type: Boolean, default: false },
     badge: { type: String, default: null },
 });

@@ -35,7 +35,7 @@ const wrapperClasses = cva({
 })
 
 const sizerClasses = cva({
-    base: 'border-l-0 border-gray-300 dark:border-gray-700 flex-1',
+    base: 'border border-l-0 last:border-r-0 border-y-0 data-[state="selected"]:data-[last="false"]:border-gray-100 dark:border-gray-700 dark:data-[state="selected"]:data-[last="false"]:border-gray-900 flex-1',
     variants: {
         variant: {
             default: [
@@ -44,7 +44,7 @@ const sizerClasses = cva({
             ],
             filled: [
                 'data-[state="selected"]:bg-gray-100 data-[last="true"]:border-r data-[last="true"]:border-gray-300',
-                'dark:data-[state="selected"]:bg-gray-900 dark:data-[state="selected"]:border-gray-700',
+                'dark:data-[state="selected"]:bg-gray-900 dark:data-[state="selected"]:border-gray-800',
             ],
         },
     },
@@ -66,6 +66,6 @@ const sizerClasses = cva({
                 :data-last="selected === width && width !== 100"
             />
         </div>
-        <div class="pointer-events-none absolute inset-0 z-10 flex w-full items-center justify-center text-center">{{ selected }}%</div>
+        <div class="pointer-events-none absolute inset-0 z-10 flex w-full items-center justify-center text-center font-semibold">{{ selected }}%</div>
     </div>
 </template>

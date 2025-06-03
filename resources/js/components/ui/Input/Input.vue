@@ -11,13 +11,11 @@ const props = defineProps({
     badge: { type: String, default: null },
     clearable: { type: Boolean, default: false },
     copyable: { type: Boolean, default: false },
-    description: { type: String, default: null },
     disabled: { type: Boolean, default: false },
     icon: { type: String, default: null },
     iconAppend: { type: String, default: null },
     iconPrepend: { type: String, default: null },
     id: { type: String, default: () => useId() },
-    label: { type: String, default: null },
     limit: { type: Number, default: null },
     loading: { type: Boolean, default: false },
     modelValue: { type: [String, Number], default: null },
@@ -37,7 +35,7 @@ const inputClasses = computed(() => {
         base: [
             'w-full block bg-white dark:bg-gray-900',
             'border border-gray-300 dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:inset-shadow-2xs dark:inset-shadow-black',
-            'text-gray-600 dark:text-gray-300 placeholder:text-gray-400 dark:placeholder:text-gray-600',
+            'text-gray-800 dark:text-gray-300 placeholder:text-gray-400 dark:placeholder:text-gray-600',
             'appearance-none antialiased shadow-ui-sm disabled:shadow-none not-prose',
         ],
         variants: {
@@ -111,49 +109,53 @@ const copy = () => {
 </script>
 
 <template>
-    <div class="group/input relative block w-full" data-ui-input>
-        <div v-if="hasPrependedIcon" :class="iconClasses">
-            <slot name="prepend">
-                <Icon :name="iconPrepend || icon" />
-            </slot>
+    <ui-input-group>
+        <ui-input-group-prepend v-if="prepend" v-text="prepend" />
+        <div class="group/input relative block w-full" data-ui-input>
+            <div v-if="hasPrependedIcon" :class="iconClasses">
+                <slot name="prepend">
+                    <Icon :name="iconPrepend || icon" />
+                </slot>
+            </div>
+            <input
+                :class="inputClasses"
+                :id
+                :type="inputType"
+                :value="modelValue"
+                :placeholder="placeholder"
+                :disabled="disabled"
+                data-ui-control
+                data-ui-group-target
+                v-bind="$attrs"
+                @input="$emit('update:modelValue', $event.target.value)"
+            />
+            <div v-if="hasAppendedIcon" :class="iconClasses">
+                <slot name="append">
+                    <Button size="sm" icon="x" variant="ghost" v-if="clearable" @click="clear" />
+                    <Button
+                        size="sm"
+                        :icon="inputType === 'password' ? 'eye' : 'eye-closed'"
+                        variant="ghost"
+                        v-else-if="viewable"
+                        @click="togglePassword"
+                    />
+                    <Button
+                        size="sm"
+                        :icon="copied ? 'clipboard-check' : 'clipboard'"
+                        variant="ghost"
+                        v-else-if="copyable"
+                        @click="copy"
+                        class="animate"
+                        :class="copied ? 'animate-wiggle' : ''"
+                    />
+                    <Icon v-else-if="iconAppend" :name="iconAppend" />
+                    <loading-graphic v-if="loading" inline text=""/>
+                </slot>
+            </div>
+            <div v-if="limit" class="absolute inset-y-0 right-2 flex items-center">
+                <CharacterCounter :text="modelValue" :limit />
+            </div>
         </div>
-        <input
-            :class="inputClasses"
-            :id
-            :type="inputType"
-            :value="modelValue"
-            :placeholder="placeholder"
-            :disabled="disabled"
-            data-ui-control
-            data-ui-group-target
-            v-bind="$attrs"
-            @input="$emit('update:modelValue', $event.target.value)"
-        />
-        <div v-if="hasAppendedIcon" :class="iconClasses">
-            <slot name="append">
-                <Button size="sm" icon="x" variant="ghost" v-if="clearable" @click="clear" />
-                <Button
-                    size="sm"
-                    :icon="inputType === 'password' ? 'eye' : 'eye-closed'"
-                    variant="ghost"
-                    v-else-if="viewable"
-                    @click="togglePassword"
-                />
-                <Button
-                    size="sm"
-                    :icon="copied ? 'clipboard-check' : 'clipboard'"
-                    variant="ghost"
-                    v-else-if="copyable"
-                    @click="copy"
-                    class="animate"
-                    :class="copied ? 'animate-wiggle' : ''"
-                />
-                <Icon v-else-if="iconAppend" :name="iconAppend" />
-                <loading-graphic v-if="loading" inline text=""/>
-            </slot>
-        </div>
-        <div v-if="limit" class="absolute inset-y-0 right-2 flex items-center">
-            <CharacterCounter :text="modelValue" :limit />
-        </div>
-    </div>
+        <ui-input-group-append v-if="append" v-text="append" />
+    </ui-input-group>
 </template>

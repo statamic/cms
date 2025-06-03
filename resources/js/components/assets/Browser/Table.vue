@@ -94,7 +94,7 @@
 
                 <template #cell-basename="{ row: asset, checkboxId }">
                     <div
-                        class="w-fit-content group flex items-center"
+                        class="w-fit group flex items-center"
                         :draggable="canMoveAsset(asset)"
                         @dragover.prevent
                         @dragstart="draggingAsset = asset.id"
