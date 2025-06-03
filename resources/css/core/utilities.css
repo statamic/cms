@@ -206,9 +206,14 @@
 
 @utility trim-text-start {
     text-box: trim-start;
-    /* =JFG. When we _just_ have an SVG we probably don't want to text trim, for example in a Markdown field with button controls like Bold, Italic, etc. */
-    &:has(svg:only-child) {
+    /* =JFG. When we have an SVG we probably don't want to text trim, for example in a Markdown field with button controls like Bold, Italic, etc. */
+    &:has(svg) {
         display: flex;
+    }
+    /* =JFG. Exceptions */
+    /* e.g. for a fieldset, we don't want to trim the text when we have a label like on a collections field, Link Item button */
+    .form-group :has(> &) & {
+        text-box: unset;
     }
 }
 

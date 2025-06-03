@@ -3,7 +3,7 @@
    ========================================================================== */
 
 label {
-    @apply block text-sm font-medium leading-normal text-gray-800 dark:text-dark-150;
+    @apply block text-sm font-semibold leading-normal text-gray-800 dark:text-dark-150;
 }
 
 /* input {
@@ -306,10 +306,6 @@ input[type='file'] {
   ========================================================================== */
 .form-group {
     /* @apply m-0 pb-3 last:pb-0; */
-
-    label {
-        font-weight: 500;
-    }
 
     .input-with-loader + .help-block {
         margin-top: 0;
