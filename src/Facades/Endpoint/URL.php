@@ -345,16 +345,20 @@ class URL
     }
 
     /**
-     * Normalize trailing slashes (trims by default, but can be enforced onto end).
+     * Normalize trailing slashes before query and fragment (trims by default, but can be enforced).
      */
     public function normalizeTrailingSlashes(string $url): string
     {
-        if ($url === '/') {
-            return $url;
+        $parts = str($url)->split(pattern: '/([?#])/', flags: PREG_SPLIT_DELIM_CAPTURE)->all();
+
+        $url = array_shift($parts);
+
+        $queryAndFragments = implode($parts);
+
+        if (static::$enforceTrailingSlashes) {
+            $url = Str::ensureRight($url, '/');
         }
 
-        return static::$enforceTrailingSlashes
-            ? Str::ensureRight($url, '/')
-            : rtrim($url, '/');
+        return $url.$queryAndFragments;
     }
 }
