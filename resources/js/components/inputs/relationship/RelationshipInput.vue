@@ -66,7 +66,6 @@
                     <Button
                         ref="existing"
                         icon="link"
-                        size="sm"
                         variant="filled"
                         :text="__('Link Item')"
                         @click.prevent="isSelecting = true"
