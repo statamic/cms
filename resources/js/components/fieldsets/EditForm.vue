@@ -1,42 +1,18 @@
 <template>
     <div>
-        <Header :title="__(initialTitle)">
+        <Header :title="__('Edit Fieldset')" icon="fieldsets">
             <Button type="submit" variant="primary" @click.prevent="save" v-text="__('Save')" />
         </Header>
 
-        <div class="publish-form card @container mb-8 p-0">
-            <div class="publish-fields">
-                <div class="form-group w-full">
-                    <div class="field-inner">
-                        <label class="block">{{ __('Title') }}</label>
-                        <small class="help-block -mt-2">{{ __('messages.fieldsets_title_instructions') }}</small>
-                        <div v-if="errors.title">
-                            <small
-                                class="help-block text-red-500"
-                                v-for="(error, i) in errors.title"
-                                :key="i"
-                                v-text="error"
-                            />
-                        </div>
-                    </div>
-                    <div>
-                        <input
-                            type="text"
-                            name="title"
-                            class="input-text"
-                            v-model="fieldset.title"
-                            autofocus="autofocus"
-                        />
-                    </div>
-                </div>
-            </div>
-        </div>
+        <ui-panel :heading="__('Settings')">
+            <ui-card>
+                <ui-field :label="__('Title')" :instructions="__('messages.fieldsets_title_instructions')" :errors="errors.title">
+                    <ui-input v-model="fieldset.title" />
+                </ui-field>
+            </ui-card>
+        </ui-panel>
 
-        <div class="content mt-10 mb-4">
-            <h2 v-text="__('Fields')" />
-        </div>
-
-        <div class="card @container" :class="{ 'pt-2': !fields.length }">
+        <ui-panel :heading="__('Fields')">
             <fields
                 :fields="fields"
                 :editing-field="editingField"
@@ -49,7 +25,7 @@
                 @field-editing="editingField = $event"
                 @editor-closed="editingField = null"
             />
-        </div>
+        </ui-panel>
     </div>
 </template>
 
