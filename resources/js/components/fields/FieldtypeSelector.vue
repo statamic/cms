@@ -213,7 +213,9 @@ export default {
             immediate: true,
             handler() {
                 this.$nextTick(() => {
-                    if (this.$refs.search) this.$refs.search.focus();
+                    if (this.$refs.search?.$el?.querySelector('input')) {
+                        this.$refs.search.$el.querySelector('input').focus();
+                    }
                 });
             },
         },

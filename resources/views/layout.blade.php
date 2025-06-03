@@ -9,7 +9,7 @@
 
     <body class="bg-gray-800 dark:bg-gray-950 font-sans leading-normal text-gray-800 dark:text-white">
         <config-provider>
-            <div id="statamic">
+            <div id="statamic" v-cloak>
                 @include('statamic::partials.session-expiry')
                 @include('statamic::partials.licensing-alerts')
                 {{-- @include('statamic::partials.global-header') --}}
