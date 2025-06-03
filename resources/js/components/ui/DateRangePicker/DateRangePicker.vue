@@ -27,8 +27,6 @@ const emit = defineEmits(['update:modelValue']);
 const props = defineProps({
     date: { type: String, default: null },
     badge: { type: String, default: null },
-    description: { type: String, default: null },
-    label: { type: String, default: null },
     required: { type: Boolean, default: false },
     modelValue: { type: [Object, String], default: null },
     min: { type: [String, Object], default: null },

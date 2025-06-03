@@ -4,10 +4,8 @@ import { SwitchRoot, SwitchThumb } from 'reka-ui';
 import { cva } from 'cva';
 
 const props = defineProps({
-    description: { type: String, default: null },
     required: { type: Boolean, default: false },
     id: { type: String, default: () => useId() },
-    label: { type: String, default: null },
     modelValue: { type: Boolean, default: false },
     size: { type: String, default: 'base' },
 });
