@@ -41,7 +41,7 @@ export default {
         },
 
         focus() {
-            this.$refs.input.focus();
+            this.$refs.input.$el.querySelector('input').focus();
         },
     },
 };
