@@ -339,4 +339,18 @@ class UrlTest extends TestCase
             ['https://example.com/about/?foo=bar&baz=qux#anchor', 'https://example.com/about?foo=bar&baz=qux#anchor'],
         ];
     }
+
+    #[Test]
+    public function it_can_configure_and_unconfigure_enforcing_of_trailing_slashes()
+    {
+        $this->assertSame('https://example.com?query', URL::normalizeTrailingSlashes('https://example.com?query'));
+
+        URL::enforceTrailingSlashes();
+
+        $this->assertSame('https://example.com/?query', URL::normalizeTrailingSlashes('https://example.com?query'));
+
+        URL::enforceTrailingSlashes(false);
+
+        $this->assertSame('https://example.com?query', URL::normalizeTrailingSlashes('https://example.com?query'));
+    }
 }
