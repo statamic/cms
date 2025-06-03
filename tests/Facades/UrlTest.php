@@ -294,4 +294,49 @@ class UrlTest extends TestCase
             ['https://example.com/about/?foo=bar&baz=qux#anchor', 'https://example.com/about/?foo=bar&baz=qux#anchor'],
         ];
     }
+
+    #[Test]
+    #[DataProvider('removeTrailingSlashesProvider')]
+    public function removes_trailing_slashes($url, $expected)
+    {
+        $this->assertSame($expected, URL::normalizeTrailingSlashes($url));
+    }
+
+    public static function removeTrailingSlashesProvider()
+    {
+        return [
+            ['', '/'],
+            ['/', '/'],
+
+            ['?query', '?query'],
+            ['#anchor', '#anchor'],
+            ['?foo=bar&baz=qux', '?foo=bar&baz=qux'],
+            ['?foo=bar&baz=qux#anchor', '?foo=bar&baz=qux#anchor'],
+
+            ['/?query', '?query'],
+            ['/#anchor', '#anchor'],
+            ['/?foo=bar&baz=qux', '?foo=bar&baz=qux'],
+            ['/?foo=bar&baz=qux#anchor', '?foo=bar&baz=qux#anchor'],
+
+            ['https://example.com?query', 'https://example.com?query'],
+            ['https://example.com#anchor', 'https://example.com#anchor'],
+            ['https://example.com?foo=bar&baz=qux', 'https://example.com?foo=bar&baz=qux'],
+            ['https://example.com?foo=bar&baz=qux#anchor', 'https://example.com?foo=bar&baz=qux#anchor'],
+
+            ['https://example.com/?query', 'https://example.com?query'],
+            ['https://example.com/#anchor', 'https://example.com#anchor'],
+            ['https://example.com/?foo=bar&baz=qux', 'https://example.com?foo=bar&baz=qux'],
+            ['https://example.com/?foo=bar&baz=qux#anchor', 'https://example.com?foo=bar&baz=qux#anchor'],
+
+            ['https://example.com/about?query', 'https://example.com/about?query'],
+            ['https://example.com/about#anchor', 'https://example.com/about#anchor'],
+            ['https://example.com/about?foo=bar&baz=qux', 'https://example.com/about?foo=bar&baz=qux'],
+            ['https://example.com/about?foo=bar&baz=qux#anchor', 'https://example.com/about?foo=bar&baz=qux#anchor'],
+
+            ['https://example.com/about/?query', 'https://example.com/about?query'],
+            ['https://example.com/about/#anchor', 'https://example.com/about#anchor'],
+            ['https://example.com/about/?foo=bar&baz=qux', 'https://example.com/about?foo=bar&baz=qux'],
+            ['https://example.com/about/?foo=bar&baz=qux#anchor', 'https://example.com/about?foo=bar&baz=qux#anchor'],
+        ];
+    }
 }
