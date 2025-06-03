@@ -30,6 +30,7 @@ class NavItem
     protected $manipulations;
     protected $original;
     protected $attributes;
+    protected $extra;
 
     /**
      * Get or set display.
@@ -217,6 +218,19 @@ class NavItem
                 return is_array($value) ? Html::attributes($value) : $value;
             })
             ->value($attrs);
+    }
+
+    /**
+     * Get or set extra data.
+     *
+     * @param  array|null  $extra
+     * @return mixed
+     */
+    public function extra($extra = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('extra')
+            ->value($extra);
     }
 
     /**
