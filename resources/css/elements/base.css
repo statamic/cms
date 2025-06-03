@@ -1,0 +1,23 @@
+:root {
+    --focus-outline-width: 1px;
+    --focus-outline-offset: 0;
+    --focus-outline-color: var(--color-blue-400);
+    --focus-outline-style: solid;
+    --focus-outline-box-shadow: 0 0 0 0.25rem hsl(from var(--color-blue-400) h s l / 0.25), inset 0 0 0 0.05rem hsl(from var(--color-blue-400) h s l / 0.25);
+}
+
+/* FOCUS STATES 
+=================================================== */
+@layer base {
+    /* (Except the focus-within class will handle the focus outline target instead) */
+    :not([class*='focus-within'] *) {
+        :focus-visible& {
+            outline-width: var(--focus-outline-width);
+            outline-offset: var(--focus-outline-offset);
+            outline-color: var(--focus-outline-color, currentColor);
+            outline-style: var(--focus-outline-style, solid);
+            /* This needs to be !important to override box-shadows set in the utilities layer */
+            box-shadow: var(--focus-outline-box-shadow)!important;
+        }
+    }
+}

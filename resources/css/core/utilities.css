@@ -7,8 +7,11 @@
 }
 
 @utility focus-outline {
-    @apply outline outline-blue-400 dark:outline-dark-blue-200;
-    box-shadow: 0 0 0 0.2rem hsl(from var(--color-blue-400) h s l / 0.25);
+    outline-width: var(--focus-outline-width);
+    outline-offset: var(--focus-outline-offset);
+    outline-color: var(--focus-outline-color, currentColor);
+    outline-style: var(--focus-outline-style, solid);
+    box-shadow: var(--focus-outline-box-shadow);
 }
 
 @utility focus-none {
