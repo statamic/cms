@@ -196,9 +196,12 @@ class UserTags extends Tags
 
         $data = $this->getFormSession('user.profile');
 
-        $data['tabs'] = $this->getProfileTabs();        
-        $data['sections'] = collect($data['tabs'])->flatMap->sections->all();
-        $data['fields'] = collect($data['sections'])->flatMap->fields->all();
+        $array_tabs = $this->getProfileTabs();
+        $array_sections = array_reduce(array_column($array_tabs, 'sections'), 'array_merge', []);
+        $array_fields = array_reduce(array_column($array_sections, 'fields'), 'array_merge', []);
+        $data['tabs'] = $array_tabs;
+        $data['sections'] = $array_sections;
+        $data['fields'] = $array_fields;
 
         $knownParams = ['redirect', 'error_redirect', 'allow_request_redirect'];
 
@@ -749,26 +752,6 @@ class UserTags extends Tags
                 ];
             })
             ->values()
-            ->all();
-            
-        return User::blueprint()->tabs()->first()->sections()
-            ->map(function ($section) use ($values) {
-                return [
-                    'display' => $section->display(),
-                    'instructions' => $section->instructions(),
-                    'fields' => $section->fields()->addValues($values)->preProcess()->all()
-                    ->reject(function ($field) {
-                        return in_array($field->handle(), ['password', 'password_confirmation', 'roles', 'groups'])
-                            || $field->fieldtype()->handle() === 'assets';
-                    })
-                    ->map(function ($field) {
-                        return $this->getRenderableField($field, 'user.profile');
-                    })
-                    ->values()
-                    ->all(),
-                    
-                ];
-            })
             ->all();
     }
 
