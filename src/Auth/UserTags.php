@@ -731,7 +731,7 @@ class UserTags extends Tags
             ->map(function ($tab) use ($values) {
                 return [
                     'display' => $tab->display(),
-                    'sections'  => $tab->sections()
+                    'sections' => $tab->sections()
                         ->map(function ($section) use ($values) {
                             return [
                                 'display' => $section->display(),
