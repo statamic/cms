@@ -203,6 +203,8 @@ class Glide extends Tags
      */
     private function generateGlideUrl($item)
     {
+        $item = $this->stripAppUrl($item);
+
         try {
             $url = $this->isValidExtension($item) ? $this->getManipulator($item)->build() : $this->normalizeItem($item);
         } catch (\Exception $e) {
@@ -359,5 +361,14 @@ class Glide extends Tags
         }
 
         return Str::startsWith(GlideManager::url(), ['http://', 'https://']);
+    }
+
+    private function stripAppUrl(string $item): string
+    {
+        if (! Str::startsWith($item, config('app.url'))) {
+            return $item;
+        }
+
+        return (string) Str::of($item)->after(config('app.url'));
     }
 }
