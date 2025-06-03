@@ -1,6 +1,6 @@
 <template>
     <div class="relationship-input @container" :class="{ 'relationship-input-empty': items.length == 0 }">
-        <relationship-select-field
+        <RelationshipSelectField
             v-if="!initializing && usesSelectField"
             :config="config"
             :items="items"
@@ -51,30 +51,30 @@
                 class="relationship-input-buttons @container relative"
                 :class="{ 'mt-4': items.length > 0 }"
             >
-                <div class="-mb-2 flex flex-wrap items-center text-sm">
-                    <div class="relative mb-2">
-                        <create-button
-                            v-if="canCreate && creatables.length"
-                            :creatables="creatables"
-                            :site="site"
-                            :component="formComponent"
-                            :component-props="formComponentProps"
-                            :stack-size="formStackSize"
-                            @created="itemCreated"
-                        />
-                    </div>
+                <div class="flex flex-wrap items-center gap-3">
+                    <CreateButton
+                        v-if="canCreate && creatables.length"
+                        :creatables="creatables"
+                        :component="formComponent"
+                        :component-props="formComponentProps"
+                        :icon="icon"
+                        :text="createLabel"
+                        :site="site"
+                        :stack-size="formStackSize"
+                        @created="itemCreated"
+                    />
                     <Button
                         ref="existing"
                         icon="link"
                         variant="filled"
-                        :text="__('Link Item')"
+                        :text="linkLabel"
                         @click.prevent="isSelecting = true"
                     />
                 </div>
             </div>
 
             <stack name="item-selector" v-if="isSelecting" @closed="isSelecting = false" v-slot="{ close }">
-                <item-selector
+                <ItemSelector
                     :name="name"
                     :filters-url="filtersUrl"
                     :selections-url="selectionsUrl"
@@ -175,6 +175,50 @@ export default {
     },
 
     computed: {
+        icon() {
+            if (this.config.type === 'taxonomies') {
+                return 'add-tag';
+            }
+
+            if (this.config.type === 'users') {
+                return 'add-user';
+            }
+
+            return 'add-entry';
+        },
+
+        createLabel() {
+            if (this.config.type === 'entries') {
+                return __('Create Entry');
+            }
+
+            if (this.config.type === 'taxonomies') {
+                return __('Create Taxonomy');
+            }
+
+            if (this.config.type === 'users') {
+                return __('Create User');
+            }
+
+            return __('Create Item');
+        },
+
+        linkLabel() {
+            if (this.config.type === 'entries') {
+                return __('Link Entry');
+            }
+
+            if (this.config.type === 'taxonomies') {
+                return __('Link Taxonomy');
+            }
+
+            if (this.config.type === 'users') {
+                return __('Link User');
+            }
+
+            return __('Link Item');
+        },
+
         items() {
             if (this.value === null) return [];
 
