@@ -10,7 +10,7 @@ trait TracksLastModified
     public function lastModified()
     {
         return $this->has('updated_at')
-            ? Carbon::createFromTimestamp($this->get('updated_at'))
+            ? Carbon::createFromTimestamp($this->get('updated_at'), config('app.timezone'))
             : $this->fileLastModified();
     }
 

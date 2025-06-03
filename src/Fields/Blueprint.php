@@ -28,6 +28,8 @@ use Statamic\Facades\Path;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
 {
     use ExistsAsFile, HasAugmentedData;
@@ -626,7 +628,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
     private function getTabFields($tab)
     {
         return collect($this->contents['tabs'][$tab]['sections'])->flatMap(function ($section, $sectionIndex) {
-            return collect($section['fields'])->map(function ($field, $fieldIndex) use ($sectionIndex) {
+            return collect($section['fields'] ?? [])->map(function ($field, $fieldIndex) use ($sectionIndex) {
                 return $field + ['fieldIndex' => $fieldIndex, 'sectionIndex' => $sectionIndex];
             });
         })->keyBy('handle');

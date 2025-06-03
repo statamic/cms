@@ -173,7 +173,11 @@ class ExportTest extends TestCase
             base_path('two'),
         ]);
 
-        // Imagine this exists from previous export
+        // Imagine we already have a target a git repo
+        $this->files->makeDirectory($this->targetPath('.git'), 0777, true, true);
+        $this->files->put($this->targetPath('.git/config'), 'Config.');
+
+        // And imagine this exists from previous export
         $this->files->makeDirectory($this->exportPath('one'), 0777, true, true);
         $this->files->put($this->exportPath('one/file.md'), 'One.');
 
@@ -195,9 +199,12 @@ class ExportTest extends TestCase
 
         $this->exportCoolRunnings(['--clear' => true]);
 
-        // But 'one' folder should exist after exporting with `--clear` option
+        // Our 'one' folder shouldn't exist after exporting with `--clear` option
         $this->assertFileDoesNotExist($this->exportPath('one'));
         $this->assertFileExists($this->exportPath('two'));
+
+        // But it should not clear `.git` directory
+        $this->assertFileExists($this->targetPath('.git/config'));
 
         $this->exportCoolRunnings();
 

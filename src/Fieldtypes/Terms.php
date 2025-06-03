@@ -26,6 +26,8 @@ use Statamic\Query\Scopes\Filters\Fields\Terms as TermsFilter;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class Terms extends Relationship
 {
     protected $canEdit = true;
@@ -371,6 +373,7 @@ class Terms extends Relationship
             'published' => $term->published(),
             'private' => $term->private(),
             'edit_url' => $term->editUrl(),
+            'editable' => User::current()->can('edit', $term),
             'hint' => $this->getItemHint($term),
         ];
     }

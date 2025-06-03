@@ -48,6 +48,12 @@ class Submission implements Augmentable, SubmissionContract
         $this->supplements = collect();
     }
 
+    public function __clone()
+    {
+        $this->data = clone $this->data;
+        $this->supplements = clone $this->supplements;
+    }
+
     /**
      * Get or set the ID.
      *
@@ -101,7 +107,7 @@ class Submission implements Augmentable, SubmissionContract
      */
     public function date()
     {
-        return Carbon::createFromTimestamp($this->id());
+        return Carbon::createFromTimestamp($this->id(), config('app.timezone'));
     }
 
     /**

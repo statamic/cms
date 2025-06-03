@@ -13,6 +13,8 @@ use Statamic\Rules\Handle;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class Field implements Arrayable
 {
     protected $handle;

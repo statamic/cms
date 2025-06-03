@@ -14,6 +14,8 @@ use Statamic\Contracts\Query\Builder as Contract;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Pattern;
 use Statamic\Query\Concerns\FakesQueries;
+use Statamic\Query\Exceptions\MultipleRecordsFoundException;
+use Statamic\Query\Exceptions\RecordsNotFoundException;
 use Statamic\Query\Scopes\AppliesScopes;
 
 abstract class Builder implements Contract
@@ -563,6 +565,52 @@ abstract class Builder implements Contract
     public function first()
     {
         return $this->get()->first();
+    }
+
+    public function firstOrFail($columns = ['*'])
+    {
+        if (! is_null($item = $this->select($columns)->first())) {
+            return $item;
+        }
+
+        throw new RecordsNotFoundException();
+    }
+
+    public function firstOr($columns = ['*'], ?Closure $callback = null)
+    {
+        if ($columns instanceof Closure) {
+            $callback = $columns;
+
+            $columns = ['*'];
+        }
+
+        if (! is_null($model = $this->select($columns)->first())) {
+            return $model;
+        }
+
+        return $callback();
+    }
+
+    public function sole($columns = ['*'])
+    {
+        $result = $this->get($columns);
+
+        $count = $result->count();
+
+        if ($count === 0) {
+            throw new RecordsNotFoundException();
+        }
+
+        if ($count > 1) {
+            throw new MultipleRecordsFoundException($count);
+        }
+
+        return $result->first();
+    }
+
+    public function exists()
+    {
+        return $this->count() >= 1;
     }
 
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
