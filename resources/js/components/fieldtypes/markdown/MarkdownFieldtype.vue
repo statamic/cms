@@ -5,7 +5,7 @@
                 class="
                     @container/markdown w-full block bg-white dark:bg-gray-900 rounded-lg
                     border border-gray-300 dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:inset-shadow-2xs dark:inset-shadow-black
-                    text-gray-600 dark:text-gray-300
+                    text-gray-800 dark:text-gray-300
                     appearance-none antialiased shadow-ui-sm disabled:shadow-none not-prose
                 "
                 :class="{ 'markdown-fullscreen': fullScreenMode, 'markdown-dark-mode': darkMode }"
