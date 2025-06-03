@@ -8,13 +8,6 @@
 
 @section('content')
     <header class="mb-6">
-        @include(
-            'statamic::partials.breadcrumb',
-            [
-                'url' => cp_route('taxonomies.index'),
-                'title' => __('Taxonomies'),
-            ]
-        )
         <div class="flex items-center">
             <h1 v-pre class="flex-1">{{ __($taxonomy->title()) }}</h1>
 

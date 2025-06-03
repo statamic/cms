@@ -6,14 +6,6 @@
 @section('title', __('Blueprints'))
 
 @section('content')
-    @include(
-        'statamic::partials.breadcrumb',
-        [
-            'url' => cp_route('collections.show', $collection->handle()),
-            'title' => $collection->title(),
-        ]
-    )
-
     <collection-blueprint-listing
         inline-template
         :initial-rows="{{ json_encode($blueprints) }}"
