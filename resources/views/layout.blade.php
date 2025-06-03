@@ -9,7 +9,7 @@
 
     <body class="bg-gray-800 dark:bg-gray-950 font-sans leading-normal text-gray-800 dark:text-white">
         <config-provider>
-            <div id="statamic">
+            <div id="statamic" v-cloak>
                 @include('statamic::partials.session-expiry')
                 @include('statamic::partials.licensing-alerts')
                 {{-- @include('statamic::partials.global-header') --}}
@@ -33,9 +33,7 @@
                         {{-- <div class="" :class="wrapperClass"> --}}
                         <div class="p-2 h-full flex-1 overflow-y-auto">
                             <div class="relative content-card @yield('content-card-modifiers') min-h-full transition-padding duration-300">
-                                <div v-cloak>
-                                    @yield('content')
-                                </div>
+                                @yield('content')
                             </div>
                         </div>
                     </main>
