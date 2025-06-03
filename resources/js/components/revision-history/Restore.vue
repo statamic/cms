@@ -1,5 +1,4 @@
 <template>
-
     <div>
         <button class="btn" @click="confirming = true" v-text="__('Restore')" />
 
@@ -14,12 +13,10 @@
             <p class="mb-6" v-text="__('Your working copy will be replaced by the contents of this revision.')" />
         </confirmation-modal>
     </div>
-
 </template>
 
 <script>
 export default {
-
     props: {
         revision: Object,
         url: String,
@@ -29,27 +26,22 @@ export default {
     data() {
         return {
             confirming: false,
-        }
+        };
     },
 
     methods: {
-
         restore() {
             const payload = {
                 revision: this.revision.date,
             };
 
-            this.$axios.post(this.url, payload).then(response => {
-                Statamic.$hooks
-                    .run('revision.restored', { reference: this.reference })
-                    .then(() => {
-                        this.$dirty.disableWarning();
-                        window.location.reload();
-                    });
-            })
-        }
-
-    }
-
-}
+            this.$axios.post(this.url, payload).then((response) => {
+                Statamic.$hooks.run('revision.restored', { reference: this.reference }).then(() => {
+                    this.$dirty.disableWarning();
+                    window.location.reload();
+                });
+            });
+        },
+    },
+};
 </script>

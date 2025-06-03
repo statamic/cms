@@ -3,31 +3,35 @@
    ========================================================================== */
 
 .badge {
-    @apply text-3xs not-italic bg-gray-300 dark:bg-dark-700 text-gray-800 dark:text-dark-150 rounded-md leading-normal;
+    @apply rounded-md bg-gray-300 text-3xs not-italic leading-normal text-gray-800 dark:bg-dark-700 dark:text-dark-150;
     padding: 1px 5px 0;
 }
 
 .badge-pill {
-    @apply bg-gray-300 dark:bg-dark-700 px-2 py-1 rounded;
+    @apply rounded-sm bg-gray-300 px-2 py-1 dark:bg-dark-700;
 }
 
 .badge-pill-sm {
-    @apply bg-gray-300 dark:bg-dark-700 px-1 py-px rounded;
+    @apply rounded-sm bg-gray-300 px-1 py-px dark:bg-dark-700;
 }
 
 .badge-sm {
-    @apply bg-gray-300 dark:bg-dark-700 uppercase text-4xs text-white dark:text-dark-100 rounded-sm leading-normal;
+    @apply rounded-xs bg-gray-300 text-4xs uppercase leading-normal text-white dark:bg-dark-700 dark:text-dark-100;
     height: 16px;
     padding: 1px 5px 2px;
 }
 
 .filter-badge {
-    @apply text-2xs text-gray-800 dark:text-dark-150 bg-white dark:bg-dark-550 border border-dashed border-gray-600 dark:border-dark-900 flex items-center rounded-full;
+    @apply flex items-center rounded-full border border-dashed border-gray-600 bg-white text-2xs text-gray-800 dark:border-dark-900 dark:bg-dark-550 dark:text-dark-150;
     height: 1.625rem;
-    padding-left: 10px ; [dir="rtl"] & { padding-right: 10px ; padding-left: 0 ; }
+    padding-left: 10px;
+    [dir='rtl'] & {
+        padding-right: 10px;
+        padding-left: 0;
+    }
 
     button {
-        @apply px-2 text-base text-gray-600 dark:text-dark-175 flex items-center rounded;
+        @apply flex items-center rounded-sm px-2 text-base text-gray-600 dark:text-dark-175;
 
         &:hover {
             @apply text-gray-800 dark:text-dark-100;
@@ -39,6 +43,6 @@
     }
 
     &.filter-badge-control {
-        @apply bg-gray-100 dark:bg-dark-600 border border-solid rounded-full border-gray-500 dark:border-dark-900 hover:border-gray-600 dark:hover:border-dark-800 hover:bg-gray-200 dark:hover:bg-dark-800;
+        @apply rounded-full border border-solid border-gray-500 bg-gray-100 hover:border-gray-600 hover:bg-gray-200 dark:border-dark-900 dark:bg-dark-600 dark:hover:border-dark-800 dark:hover:bg-dark-800;
     }
 }

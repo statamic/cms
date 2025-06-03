@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .grid-table {
-    @apply w-full rtl:text-right ltr:text-left border dark:border-dark-900 text-gray dark:text-dark-150 relative mb-4 outline-none shadow-sm rounded;
+    @apply relative mb-4 w-full rounded-sm border text-gray shadow-sm outline-hidden dark:border-dark-900 dark:text-dark-150 ltr:text-left rtl:text-right;
     border-collapse: separate;
     border-spacing: 0;
     table-layout: auto;
@@ -11,14 +11,18 @@
 
 .grid-table thead {
     th {
-        @apply font-medium px-2 py-2 border-b dark:border-dark-900 z-10 bg-gray-200 dark:bg-dark-650 text-gray-900 dark:text-dark-150 text-sm;
+        @apply z-10 border-b bg-gray-200 px-2 py-2 text-sm font-medium text-gray-900 dark:border-dark-900 dark:bg-dark-650 dark:text-dark-150;
         display: table-cell;
         position: sticky;
         top: -1px;
         z-index: auto;
 
-        &:first-child { @apply rtl:rounded-tr ltr:rounded-tl rtl:pr-3 ltr:pl-3; }
-        &:last-child { @apply rtl:rounded-tl ltr:rounded-tr; }
+        &:first-child {
+            @apply ltr:rounded-tl ltr:pl-3 rtl:rounded-tr rtl:pr-3;
+        }
+        &:last-child {
+            @apply ltr:rounded-tr rtl:rounded-tl;
+        }
         &.grid-drag-handle-header {
             @apply w-3;
         }
@@ -30,37 +34,43 @@
 }
 
 .grid-table > tbody {
-    @apply outline-none;
+    @apply outline-hidden;
 
     > tr {
-        @apply outline-none;
+        @apply outline-hidden;
     }
 
     > tr > td {
-        @apply border-b dark:border-dark-900 px-2 py-3 align-top;
+        @apply border-b px-2 py-3 align-top dark:border-dark-900;
 
         &:first-child.grid-cell {
-            @apply rtl:pr-3 ltr:pl-3;
+            @apply ltr:pl-3 rtl:pr-3;
         }
 
         &.drag-handle {
-            @apply rtl:border-l ltr:border-r h-full p-2;
+            @apply h-full p-2 ltr:border-r rtl:border-l;
             width: 1%;
             cursor: grab;
-            background: theme('colors.gray.200') url('../../../svg/icons/light/drag-dots.svg') center center no-repeat;
+            background: var(--color-gray-200) url('../../../svg/icons/light/drag-dots.svg') center center no-repeat;
             background-size: 7px 17px;
-            &:hover { @apply bg-gray-300; }
+            &:hover {
+                @apply bg-gray-300;
+            }
 
             .dark & {
-                background-color: theme('colors.dark.700');
+                background-color: var(--color-dark-700);
             }
         }
     }
 
     tr:last-child td {
         @apply border-b-0;
-        &:first-child { @apply rtl:rounded-br ltr:rounded-bl; }
-        &:last-child { @apply rtl:rounded-bl ltr:rounded-br; }
+        &:first-child {
+            @apply ltr:rounded-bl rtl:rounded-br;
+        }
+        &:last-child {
+            @apply ltr:rounded-br rtl:rounded-bl;
+        }
     }
 
     tr.draggable-source--is-dragging td {
@@ -69,17 +79,17 @@
 }
 
 .grid-table tbody .grid-row-controls {
-    @apply rtl:pr-0 ltr:pl-0 text-center;
+    @apply text-center ltr:pl-0 rtl:pr-0;
     width: 1%;
     padding-top: 21px; /*  pseudo-center for text/select fields */
 }
 
 .grid-item-header {
-    @apply bg-gray-200 border-b px-4 py-2 text-sm flex items-center justify-between outline-none cursor-move;
+    @apply flex cursor-move items-center justify-between border-b bg-gray-200 px-4 py-2 text-sm outline-hidden;
 }
 
 .grid-fullscreen {
-    @apply fixed bg-gray-200 inset-0 min-h-screen overflow-scroll rounded-none;
+    @apply fixed inset-0 min-h-screen overflow-scroll rounded-none bg-gray-200;
     z-index: 998; /*  to appear over the top of the rest of the stuff on the page. */
-                /*  too high and it'll be over the top of stacks, etc. */
+    /*  too high and it'll be over the top of stacks, etc. */
 }

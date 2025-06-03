@@ -1,7 +1,8 @@
 <template>
-    <div class="button-group-fieldtype-wrapper" :class="{'inline-mode': config.inline}">
+    <div class="button-group-fieldtype-wrapper" :class="{ 'inline-mode': config.inline }">
         <div class="btn-group" ref="buttonGroup">
-            <button class="btn px-4"
+            <button
+                class="btn px-4"
                 v-for="(option, $index) in options"
                 :key="$index"
                 ref="button"
@@ -10,7 +11,7 @@
                 @click="updateSelectedOption(option.value)"
                 :value="option.value"
                 :disabled="isReadOnly"
-                :class="{'active': value == option.value}"
+                :class="{ active: value == option.value }"
                 v-text="option.label || option.value"
             />
         </div>
@@ -18,7 +19,8 @@
 </template>
 
 <script>
-import HasInputOptions from './HasInputOptions.js'
+import Fieldtype from './Fieldtype.vue';
+import HasInputOptions from './HasInputOptions.js';
 import ResizeObserver from 'resize-observer-polyfill';
 
 export default {
@@ -27,14 +29,14 @@ export default {
     data() {
         return {
             resizeObserver: null,
-        }
+        };
     },
 
     mounted() {
         this.setupResizeObserver();
     },
 
-    beforeDestroy() {
+    beforeUnmount() {
         this.resizeObserver.disconnect();
     },
 
@@ -44,15 +46,14 @@ export default {
         },
 
         replicatorPreview() {
-            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
 
-            var option = _.findWhere(this.options, {value: this.value});
-            return (option) ? option.label : this.value;
+            var option = this.options.find((o) => o.value === this.value);
+            return option ? option.label : this.value;
         },
     },
 
     methods: {
-
         updateSelectedOption(newValue) {
             this.update(this.value == newValue && this.config.clearable ? null : newValue);
         },
@@ -71,15 +72,14 @@ export default {
 
             node.classList.remove('btn-vertical');
 
-            if(lastEl.offsetTop > node.clientTop) {
+            if (lastEl.offsetTop > node.clientTop) {
                 node.classList.add('btn-vertical');
             }
         },
 
         focus() {
             this.$refs.button[0].focus();
-        }
-
-    }
+        },
+    },
 };
 </script>

@@ -1,15 +1,19 @@
 <template>
-
     <div>
         <div v-if="hasMultipleSites">
             <div class="radio-fieldtype mb-2">
-                <radio-fieldtype :handle="`${handle}_mode`" :value="mode" @input="setMode" :config="{
-                    inline: true,
-                    options: {
-                        single: __('Single'),
-                        multiple: __('Per-site'),
-                    }
-                }" />
+                <radio-fieldtype
+                    :handle="`${handle}_mode`"
+                    :value="mode"
+                    @update:value="setMode"
+                    :config="{
+                        inline: true,
+                        options: {
+                            single: __('Single'),
+                            multiple: __('Per-site'),
+                        },
+                    }"
+                />
             </div>
             <table class="grid-table" v-if="inMultipleMode">
                 <thead>
@@ -22,11 +26,10 @@
                     <tr v-for="site in sites" :key="site.handle">
                         <td class="align-middle" v-text="__(site.name)" />
                         <td>
-                            <text-input
-                                dir="ltr"
-                                class="slug-field"
-                                :value="value[site.handle]"
-                                @input="updateSiteValue(site.handle, $event)" />
+                            <ui-input
+                                :model-value="value[site.handle]"
+                                @update:model-value="updateSiteValue(site.handle, $event)"
+                            />
                         </td>
                     </tr>
                 </tbody>
@@ -34,33 +37,28 @@
         </div>
 
         <div v-if="!hasMultipleSites || !inMultipleMode">
-            <text-input :value="value" @input="update" class="slug-field" dir="ltr" />
+            <ui-input :model-value="value" @update:model-value="update" />
         </div>
     </div>
-
 </template>
 
 <script>
 export default {
-
-    props: ['handle', 'value', 'state', 'columnHeader'],
+    props: ['handle', 'value', 'store', 'columnHeader'],
 
     computed: {
-
         mode() {
-            return (this.value === null || typeof this.value === 'string') ? 'single' : 'multiple';
+            return this.value === null || typeof this.value === 'string' ? 'single' : 'multiple';
         },
 
         sites() {
-            let state = this.state;
+            if (!this.store.values.sites) return [];
 
-            if (!state.values.sites) return [];
-
-            return state.values.sites.map((handle, i) => {
+            return this.store.values.sites.map((handle, i) => {
                 return {
                     handle,
-                    name: state.meta.sites.data[i].title
-                }
+                    name: this.store.meta.sites.data[i].title,
+                };
             });
         },
 
@@ -71,11 +69,9 @@ export default {
         inMultipleMode() {
             return this.mode === 'multiple';
         },
-
     },
 
     methods: {
-
         setMode(mode) {
             if (mode === this.mode) return;
 
@@ -94,7 +90,7 @@ export default {
                     value = this.multipleValue;
                 } else {
                     value = {};
-                    this.sites.forEach(site => value[site.handle] = '');
+                    this.sites.forEach((site) => (value[site.handle] = ''));
                 }
             }
 
@@ -108,9 +104,8 @@ export default {
         },
 
         update(value) {
-            this.$emit('input', value);
+            this.$emit('update:value', value);
         },
-
-    }
-}
+    },
+};
 </script>

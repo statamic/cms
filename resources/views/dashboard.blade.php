@@ -1,21 +1,25 @@
-@php use function Statamic\trans as __; @endphp
+@php
+    use function Statamic\trans as __;
+@endphp
 
 @extends('statamic::layout')
 @section('title', __('Dashboard'))
 
 @section('content')
 
-    <div class="widgets @container flex flex-wrap -mx-4 py-2">
-        @foreach($widgets as $widget)
-            <div class="widget w-full md:{{ Statamic\Support\Str::tailwindWidthClass($widget['width']) }} {{ $widget['classes'] }} mb-8 px-4">
-                {!! $widget['html'] !!}
-            </div>
-        @endforeach
-    </div>
+<ui-header title="{{ __('Dashboard') }}" icon="dashboard" />
 
-    @include('statamic::partials.docs-callout', [
-        'topic' => __('Widgets'),
-        'url' => Statamic::docsUrl('widgets')
-    ])
+<div class="widgets @container/widgets flex flex-wrap py-2 gap-y-6 -mx-3">
+    @foreach ($widgets as $widget)
+        <div class="{{ Statamic\Support\Str::tailwindWidthClass($widget['width']) }} {{ $widget['classes'] }} px-3">
+            {!! $widget['html'] !!}
+        </div>
+    @endforeach
+</div>
+
+    <x-statamic::docs-callout
+        :topic="__('Widgets')"
+        :url="Statamic::docsUrl('widgets')"
+    />
 
 @stop

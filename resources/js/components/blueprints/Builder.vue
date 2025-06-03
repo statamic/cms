@@ -1,63 +1,41 @@
 <template>
+    <div>
+        <ui-header :title="__('Edit Blueprint')" icon="blueprints">
+            <template #actions>
+                <ui-button type="submit" variant="primary" @click.prevent="save" v-text="__('Save')" />
+            </template>
+        </ui-header>
 
-    <div class="blueprint-builder">
+        <ui-panel :heading="__('Settings')">
+            <ui-card>
+                <ui-field :label="__('Title')" :instructions="__('messages.blueprints_title_instructions')" :errors="errors.title">
+                    <ui-input v-model="blueprint.title" />
+                </ui-field>
+            </ui-card>
+            <ui-card class="mt-2">
+                <ui-field :label="__('Hidden')" :instructions="__('messages.blueprints_hidden_instructions')" :error="errors.hidden">
+                    <ui-switch v-model="blueprint.hidden" />
+                </ui-field>
+            </ui-card>
+        </ui-panel>
 
-        <header class="mb-6">
-            <div class="flex items-center justify-between">
-                <h1 v-text="__('Edit Blueprint')" />
-                <button type="submit" class="btn-primary" @click.prevent="save" v-text="__('Save')" />
-            </div>
-        </header>
-
-        <div class="publish-form card p-0 @container mb-8" v-if="showTitle">
-            <div class="publish-fields">
-                <div class="form-group config-field">
-                    <div class="field-inner">
-                        <label class="block">{{ __('Title') }}</label>
-                        <p class="help-block">{{ __('messages.blueprints_title_instructions') }}</p>
-                        <div v-if="errors.title">
-                            <p class="help-block text-red-500" v-for="(error, i) in errors.title" :key="i" v-text="error" />
-                        </div>
-                    </div>
-                    <div>
-                        <input type="text" name="title" class="input-text" v-model="blueprint.title" autofocus="autofocus">
-                    </div>
-                </div>
-
-                <div class="form-group config-field">
-                    <div class="field-inner">
-                        <label class="block">{{ __('Hidden') }}</label>
-                        <p class="help-block">{{ __('messages.blueprints_hidden_instructions') }}</p>
-                        <div v-if="errors.hidden">
-                            <p class="help-block text-red-500" v-for="(error, i) in errors.hidden" :key="i" v-text="error" />
-                        </div>
-                    </div>
-                    <div>
-                        <toggle-input name="hidden" v-model="blueprint.hidden" />
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <tabs
+        <Tabs
+            class="mt-8"
             :single-tab="!useTabs"
             :initial-tabs="tabs"
             :errors="errors.tabs"
             :can-define-localizable="canDefineLocalizable"
             @updated="tabsUpdated"
         />
-
     </div>
-
 </template>
 
 <script>
 import SuggestsConditionalFields from './SuggestsConditionalFields';
 import Tabs from './Tabs.vue';
-import CanDefineLocalizable from "../fields/CanDefineLocalizable";
+import CanDefineLocalizable from '../fields/CanDefineLocalizable';
 
 export default {
-
     mixins: [SuggestsConditionalFields, CanDefineLocalizable],
 
     components: {
@@ -75,20 +53,18 @@ export default {
     data() {
         return {
             blueprint: this.initializeBlueprint(),
-            errors: {}
-        }
+            errors: {},
+        };
     },
 
     computed: {
-
         tabs() {
             return this.blueprint.tabs;
-        }
-
+        },
     },
 
     created() {
-        this.$keys.bindGlobal(['mod+s'], e => {
+        this.$keys.bindGlobal(['mod+s'], (e) => {
             e.preventDefault();
             this.save();
         });
@@ -99,22 +75,19 @@ export default {
     },
 
     watch: {
-
         blueprint: {
             deep: true,
             handler() {
                 this.$dirty.add('blueprints');
-            }
-        }
-
+            },
+        },
     },
 
     methods: {
-
         initializeBlueprint() {
             let blueprint = clone(this.initialBlueprint);
 
-            if (! this.showTitle) delete blueprint.title;
+            if (!this.showTitle) delete blueprint.title;
 
             return blueprint;
         },
@@ -126,20 +99,18 @@ export default {
         save() {
             // this.$axios[this.method](this.action, this.fieldset)
             this.$axios['patch'](this.action, this.blueprint)
-                .then(response => this.saved(response))
-                .catch(e => {
+                .then((response) => this.saved(response))
+                .catch((e) => {
                     this.$toast.error(e.response.data.message);
                     this.errors = e.response.data.errors;
-                })
+                });
         },
 
         saved(response) {
             this.$toast.success(__('Saved'));
             this.errors = {};
             this.$dirty.remove('blueprints');
-        }
-
-    }
-
-}
+        },
+    },
+};
 </script>

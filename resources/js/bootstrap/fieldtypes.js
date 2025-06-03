@@ -1,7 +1,6 @@
-import Vue from "vue";
-import RevealerFieldtype from '../components/fieldtypes/RevealerFieldtype.vue'
-import StatusFieldtype from '../components/fieldtypes/StatusFieldtype.vue'
-import TemplateFieldtype from '../components/fieldtypes/TemplateFieldtype.vue'
+import { defineAsyncComponent } from 'vue';
+import RevealerFieldtype from '../components/fieldtypes/RevealerFieldtype.vue';
+import TemplateFieldtype from '../components/fieldtypes/TemplateFieldtype.vue';
 import Select from '../components/inputs/Select.vue';
 import Text from '../components/inputs/Text.vue';
 import Textarea from '../components/inputs/Textarea.vue';
@@ -14,19 +13,18 @@ import ArrayFieldtype from '../components/fieldtypes/ArrayFieldtype.vue';
 import AssetsFieldtype from '../components/fieldtypes/assets/AssetsFieldtype.vue';
 import AssetsIndexFieldtype from '../components/fieldtypes/assets/AssetsIndexFieldtype.vue';
 import AssetFolderFieldtype from '../components/fieldtypes/AssetFolderFieldtype.vue';
-import BardFieldtype from '../components/fieldtypes/bard/BardFieldtype.vue';
-import BardSet from '../components/fieldtypes/bard/Set.vue';
 import BardButtonsSettingFieldtype from '../components/fieldtypes/bard/BardButtonsSettingFieldtype.vue';
+import BlueprintsFieldtype from '../components/fieldtypes/BlueprintsFieldtype.vue';
 import ButtonGroupFieldtype from '../components/fieldtypes/ButtonGroupFieldtype.vue';
 import CheckboxesFieldtype from '../components/fieldtypes/CheckboxesFieldtype.vue';
-import CodeFieldtype from '../components/fieldtypes/CodeFieldtype.vue';
 import Routes from '../components/collections/Routes.vue';
 import TitleFormats from '../components/collections/TitleFormats.vue';
 import ColorFieldtype from '../components/fieldtypes/ColorFieldtype.vue';
 import DateFieldtype from '../components/fieldtypes/DateFieldtype.vue';
-import DictionaryFieldtype from "../components/fieldtypes/DictionaryFieldtype.vue";
-import DictionaryIndexFieldtype from "../components/fieldtypes/DictionaryIndexFieldtype.vue";
-import DictionaryFields from "../components/fieldtypes/DictionaryFields.vue";
+import DateIndexFieldtype from '../components/fieldtypes/DateIndexFieldtype.vue';
+import DictionaryFieldtype from '../components/fieldtypes/DictionaryFieldtype.vue';
+import DictionaryIndexFieldtype from '../components/fieldtypes/DictionaryIndexFieldtype.vue';
+import DictionaryFields from '../components/fieldtypes/DictionaryFields.vue';
 import FieldDisplayFieldtype from '../components/fieldtypes/FieldDisplayFieldtype.vue';
 import FieldsFieldtype from '../components/fieldtypes/grid/FieldsFieldtype.vue';
 import FilesFieldtype from '../components/fieldtypes/FilesFieldtype.vue';
@@ -42,7 +40,6 @@ import IntegerFieldtype from '../components/fieldtypes/IntegerFieldtype.vue';
 import LinkFieldtype from '../components/fieldtypes/LinkFieldtype.vue';
 import ListFieldtype from '../components/fieldtypes/ListFieldtype.vue';
 import ListIndexFieldtype from '../components/fieldtypes/ListIndexFieldtype.vue';
-import MarkdownFieldtype from '../components/fieldtypes/markdown/MarkdownFieldtype.vue';
 import MarkdownButtonsSettingFieldtype from '../components/fieldtypes/markdown/MarkdownButtonsSettingFieldtype.vue';
 import RadioFieldtype from '../components/fieldtypes/RadioFieldtype.vue';
 import RangeFieldtype from '../components/fieldtypes/RangeFieldtype.vue';
@@ -58,82 +55,97 @@ import TableFieldtype from '../components/fieldtypes/TableFieldtype.vue';
 import TagsFieldtype from '../components/fieldtypes/TagsFieldtype.vue';
 import TagsIndexFieldtype from '../components/fieldtypes/TagsIndexFieldtype.vue';
 import TemplateFolderFieldtype from '../components/fieldtypes/TemplateFolderFieldtype.vue';
-import TimeFieldtype from '../components/fieldtypes/TimeFieldtype.vue';
 import ToggleFieldtype from '../components/fieldtypes/ToggleFieldtype.vue';
 import ToggleIndexFieldtype from '../components/fieldtypes/ToggleIndexFieldtype.vue';
 import WidthFieldtype from '../components/fieldtypes/WidthFieldtype.vue';
 import VideoFieldtype from '../components/fieldtypes/VideoFieldtype.vue';
-import YamlFieldtype from '../components/fieldtypes/YamlFieldtype.vue';
 import SetPicker from '../components/fieldtypes/replicator/SetPicker.vue';
 import SetField from '../components/fieldtypes/replicator/Field.vue';
+import TimeFieldtype from '../components/fieldtypes/TimeFieldtype.vue';
 
-Vue.component('select-input', Select);
-Vue.component('text-input', Text);
-Vue.component('textarea-input', Textarea);
-Vue.component('toggle-input', Toggle);
-Vue.component('relationship-input', RelationshipInput);
-Vue.component('text-fieldtype', TextFieldtype);
-Vue.component('textarea-fieldtype', TextareaFieldtype);
-Vue.component('slug-fieldtype', SlugFieldtype);
-Vue.component('array-fieldtype', ArrayFieldtype);
-Vue.component('assets-fieldtype', AssetsFieldtype);
-Vue.component('assets-fieldtype-index', AssetsIndexFieldtype);
-Vue.component('asset_folder-fieldtype', AssetFolderFieldtype);
-Vue.component('bard-fieldtype', BardFieldtype);
-Vue.component('bard-fieldtype-set', BardSet);
-Vue.component('bard_buttons_setting-fieldtype', BardButtonsSettingFieldtype);
-Vue.component('button_group-fieldtype', ButtonGroupFieldtype);
-Vue.component('checkboxes-fieldtype', CheckboxesFieldtype);
-Vue.component('code-fieldtype', CodeFieldtype);
-Vue.component('collection_routes-fieldtype', Routes);
-Vue.component('collection_title_formats-fieldtype', TitleFormats);
-Vue.component('color-fieldtype', ColorFieldtype);
-Vue.component('date-fieldtype', DateFieldtype);
-Vue.component('dictionary-fieldtype', DictionaryFieldtype);
-Vue.component('dictionary-fieldtype-index', DictionaryIndexFieldtype);
-Vue.component('dictionary_fields-fieldtype', DictionaryFields);
-Vue.component('field_display-fieldtype', FieldDisplayFieldtype);
-Vue.component('fields-fieldtype', FieldsFieldtype);
-Vue.component('files-fieldtype', FilesFieldtype);
-Vue.component('float-fieldtype', FloatFieldtype);
-Vue.component('global_set_sites-fieldtype', Sites);
-Vue.component('grid-fieldtype', Grid);
-Vue.component('grid-fieldtype-index', GridIndex);
-Vue.component('group-fieldtype', GroupFieldtype);
-Vue.component('hidden-fieldtype', HiddenFieldtype);
-Vue.component('html-fieldtype', HtmlFieldtype);
-Vue.component('icon-fieldtype', IconFieldtype);
-Vue.component('integer-fieldtype', IntegerFieldtype);
-Vue.component('link-fieldtype', LinkFieldtype);
-Vue.component('list-fieldtype', ListFieldtype);
-Vue.component('list-fieldtype-index', ListIndexFieldtype);
-Vue.component('markdown-fieldtype', MarkdownFieldtype);
-Vue.component('markdown_buttons_setting-fieldtype', MarkdownButtonsSettingFieldtype);
-Vue.component('radio-fieldtype', RadioFieldtype);
-Vue.component('range-fieldtype', RangeFieldtype);
-Vue.component('relationship-fieldtype', RelationshipFieldtype);
-Vue.component('relationship-fieldtype-index', RelationshipIndexFieldtype);
-Vue.component('replicator-fieldtype', Replicator);
-Vue.component('replicator-fieldtype-set', ReplicatorSet);
-Vue.component('replicator-fieldtype-index', ReplicatorIndex);
-Vue.component('section-fieldtype', SectionFieldtype);
-Vue.component('select-fieldtype', SelectFieldtype);
-Vue.component('sets-fieldtype', SetsFieldtype);
-Vue.component('table-fieldtype', TableFieldtype);
-Vue.component('tags-fieldtype', TagsFieldtype);
-Vue.component('tags-fieldtype-index', TagsIndexFieldtype);
-Vue.component('taggable-fieldtype-index', TagsIndexFieldtype);
-Vue.component('template_folder-fieldtype', TemplateFolderFieldtype);
-Vue.component('time-fieldtype', TimeFieldtype);
-Vue.component('toggle-fieldtype', ToggleFieldtype);
-Vue.component('toggle-fieldtype-index', ToggleIndexFieldtype);
-Vue.component('width-fieldtype', WidthFieldtype);
-Vue.component('video-fieldtype', VideoFieldtype);
-Vue.component('yaml-fieldtype', YamlFieldtype);
-Vue.component('set-picker', SetPicker);
-Vue.component('set-field', SetField);
-
-
-Vue.component('revealer-fieldtype', RevealerFieldtype);
-Vue.component('status-fieldtype', StatusFieldtype);
-Vue.component('template-fieldtype', TemplateFieldtype);
+export default function registerFieldtypes(app) {
+    app.component('select-input', Select);
+    app.component('text-input', Text);
+    app.component('textarea-input', Textarea);
+    app.component('toggle-input', Toggle);
+    app.component('relationship-input', RelationshipInput);
+    app.component('text-fieldtype', TextFieldtype);
+    app.component('textarea-fieldtype', TextareaFieldtype);
+    app.component('slug-fieldtype', SlugFieldtype);
+    app.component('array-fieldtype', ArrayFieldtype);
+    app.component('assets-fieldtype', AssetsFieldtype);
+    app.component('assets-fieldtype-index', AssetsIndexFieldtype);
+    app.component('asset_folder-fieldtype', AssetFolderFieldtype);
+    app.component(
+        'bard-fieldtype',
+        defineAsyncComponent(() => import('../components/fieldtypes/bard/BardFieldtype.vue')),
+    );
+    app.component(
+        'bard-fieldtype-set',
+        defineAsyncComponent(() => import('../components/fieldtypes/bard/Set.vue')),
+    );
+    app.component('bard_buttons_setting-fieldtype', BardButtonsSettingFieldtype);
+    app.component('button_group-fieldtype', ButtonGroupFieldtype);
+    app.component('blueprints-fieldtype', BlueprintsFieldtype);
+    app.component('checkboxes-fieldtype', CheckboxesFieldtype);
+    app.component(
+        'code-fieldtype',
+        defineAsyncComponent(() => import('../components/fieldtypes/CodeFieldtype.vue')),
+    );
+    app.component('collection_routes-fieldtype', Routes);
+    app.component('collection_title_formats-fieldtype', TitleFormats);
+    app.component('color-fieldtype', ColorFieldtype);
+    app.component('date-fieldtype', DateFieldtype);
+    app.component('date-fieldtype-index', DateIndexFieldtype);
+    app.component('dictionary-fieldtype', DictionaryFieldtype);
+    app.component('dictionary-fieldtype-index', DictionaryIndexFieldtype);
+    app.component('dictionary_fields-fieldtype', DictionaryFields);
+    app.component('field_display-fieldtype', FieldDisplayFieldtype);
+    app.component('fields-fieldtype', FieldsFieldtype);
+    app.component('files-fieldtype', FilesFieldtype);
+    app.component('float-fieldtype', FloatFieldtype);
+    app.component('global_set_sites-fieldtype', Sites);
+    app.component('grid-fieldtype', Grid);
+    app.component('grid-fieldtype-index', GridIndex);
+    app.component('group-fieldtype', GroupFieldtype);
+    app.component('hidden-fieldtype', HiddenFieldtype);
+    app.component('html-fieldtype', HtmlFieldtype);
+    app.component('icon-fieldtype', IconFieldtype);
+    app.component('integer-fieldtype', IntegerFieldtype);
+    app.component('link-fieldtype', LinkFieldtype);
+    app.component('list-fieldtype', ListFieldtype);
+    app.component('list-fieldtype-index', ListIndexFieldtype);
+    app.component(
+        'markdown-fieldtype',
+        defineAsyncComponent(() => import('../components/fieldtypes/markdown/MarkdownFieldtype.vue')),
+    );
+    app.component('markdown_buttons_setting-fieldtype', MarkdownButtonsSettingFieldtype);
+    app.component('radio-fieldtype', RadioFieldtype);
+    app.component('range-fieldtype', RangeFieldtype);
+    app.component('relationship-fieldtype', RelationshipFieldtype);
+    app.component('relationship-fieldtype-index', RelationshipIndexFieldtype);
+    app.component('replicator-fieldtype', Replicator);
+    app.component('replicator-fieldtype-set', ReplicatorSet);
+    app.component('replicator-fieldtype-index', ReplicatorIndex);
+    app.component('section-fieldtype', SectionFieldtype);
+    app.component('select-fieldtype', SelectFieldtype);
+    app.component('sets-fieldtype', SetsFieldtype);
+    app.component('table-fieldtype', TableFieldtype);
+    app.component('tags-fieldtype', TagsFieldtype);
+    app.component('tags-fieldtype-index', TagsIndexFieldtype);
+    app.component('taggable-fieldtype-index', TagsIndexFieldtype);
+    app.component('template_folder-fieldtype', TemplateFolderFieldtype);
+    app.component('time-fieldtype', TimeFieldtype);
+    app.component('toggle-fieldtype', ToggleFieldtype);
+    app.component('toggle-fieldtype-index', ToggleIndexFieldtype);
+    app.component('width-fieldtype', WidthFieldtype);
+    app.component('video-fieldtype', VideoFieldtype);
+    app.component(
+        'yaml-fieldtype',
+        defineAsyncComponent(() => import('../components/fieldtypes/YamlFieldtype.vue')),
+    );
+    app.component('set-picker', SetPicker);
+    app.component('set-field', SetField);
+    app.component('revealer-fieldtype', RevealerFieldtype);
+    app.component('template-fieldtype', TemplateFieldtype);
+}

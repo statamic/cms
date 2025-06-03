@@ -31,6 +31,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Actions\CopyPasswordResetLink::class,
         Actions\Delete::class,
         Actions\DeleteMultisiteEntry::class,
+        Actions\DisableTwoFactorAuthentication::class,
         Actions\DownloadAsset::class,
         Actions\DownloadAssetFolder::class,
         Actions\DuplicateAsset::class,
@@ -65,6 +66,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Assets\Assets::class,
         Fieldtypes\Bard::class,
         Fieldtypes\Bard\Buttons::class,
+        Fieldtypes\Blueprints::class,
         Fieldtypes\ButtonGroup::class,
         Fieldtypes\Checkboxes::class,
         Fieldtypes\Code::class,
@@ -195,7 +197,6 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Query::class,
         Tags\Range::class,
         Tags\Redirect::class,
-        Tags\Relate::class,
         Tags\Rotate::class,
         Tags\Route::class,
         Tags\Scope::class,
@@ -246,6 +247,10 @@ class ExtensionServiceProvider extends ServiceProvider
         Updates\AddSitePermissions::class,
         Updates\UseClassBasedStatamicUniqueRules::class,
         Updates\MigrateSitesConfigToYaml::class,
+        Updates\AddTimezoneConfigOptions::class,
+        Updates\RemoveParentField::class,
+        Updates\UpdateGlobalVariables::class,
+        Updates\PublishMigrationForTwoFactorColumns::class,
     ];
 
     public function register()

@@ -1,21 +1,21 @@
 <template>
-    <text-input
+    <Input
         ref="input"
-        :value="value"
+        :model-value="value"
         :classes="config.classes"
         :focus="config.focus || name === 'title' || name === 'alt'"
         :autocomplete="config.autocomplete"
         :autoselect="config.autoselect"
         :type="config.input_type"
-        :isReadOnly="isReadOnly"
+        :disabled="isReadOnly"
         :prepend="__(config.prepend)"
         :append="__(config.append)"
         :limit="config.character_limit"
         :placeholder="__(config.placeholder)"
         :name="name"
-        :id="fieldId"
+        :id="id"
         :direction="config.direction"
-        @input="inputUpdated"
+        @update:model-value="inputUpdated"
         @focus="$emit('focus')"
         @blur="$emit('blur')"
     />
@@ -23,20 +23,23 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
+import { Input } from '@statamic/ui';
 
 export default {
-
     mixins: [Fieldtype],
+
+    components: {
+        Input,
+    },
 
     methods: {
         inputUpdated(value) {
-            if (! this.config.debounce) {
-                return this.update(value)
+            if (!this.config.debounce) {
+                return this.update(value);
             }
 
-            this.updateDebounced(value)
-        }
-    }
-
-}
+            this.updateDebounced(value);
+        },
+    },
+};
 </script>

@@ -1,30 +1,27 @@
 /* ==========================================================================
    UTILITES
    ========================================================================== */
-
-.text-shadow {
-    text-shadow: 0 1px 2px rgba(0,0,0,.25);
+/* Here we typically need a negative outline-offset because of the inner shadow on inputs */
+@utility focus-outline {
+    outline-width: var(--focus-outline-width);
+    outline-offset: var(--focus-outline-offset);
+    outline-color: var(--focus-outline-color, currentColor);
+    outline-style: var(--focus-outline-style, solid);
+}
+/* Same as focus-outline, but without the outline-offset, e.g. a Markdown editor */
+@utility focus-outline-within {
+    outline-offset: 0;
+    outline-width: var(--focus-outline-width);
+    outline-color: var(--focus-outline-color, currentColor);
+    outline-style: var(--focus-outline-style, solid);
 }
 
-.focus-outline {
-    @apply border border-blue-300 dark:border-dark-blue-200;
-    outline: 0;
-    box-shadow: 0 0 0 0.2rem rgba(0,125,255,.25);
-}
-
-.focus-none {
-    /* @apply border-0; */
+@utility focus-none {
     outline: 0;
     box-shadow: none;
 }
 
-.selected-outline {
-    @apply border-blue;
-    outline: 0;
-    box-shadow: 0 0 0 2px theme('colors.blue.DEFAULT');
-}
-
-.loading {
+@utility loading {
     text-align: center;
     padding: 20px 0;
 
@@ -33,78 +30,164 @@
         margin-bottom: 5px;
     }
 
-    &.loading-basic {
+    /* &.loading-basic {
         @apply ltr:text-left rtl:text-right;
         padding: 0;
 
         .icon {
             display: inline-block;
-            margin: -2px 5px 0 0 ; [dir="rtl"] & { margin: -2px 0 0 5px ; }
+            margin: -2px 5px 0 0;
+            [dir='rtl'] & {
+                margin: -2px 0 0 5px;
+            }
         }
-    }
+    } */
 }
 
-.shadow-hover-lg {
-    @apply shadow-lg;
-    transition: box-shadow .08s ease-in-out;
-    &:hover {
-        @apply shadow-xl;
-    }
-}
 
-.w-fit-content {
-    width: fit-content;
-}
-
-.break-overflowing-words {
-    word-break: break-word;
-    overflow-wrap: break-word;
-}
-
-.saving-overlay {
-    @apply absolute inset-0 z-200 flex items-center rounded;
-    background: rgba(255, 255, 255, .9);
+@utility saving-overlay {
+    @apply absolute inset-0 z-200 flex items-center rounded-sm;
+    background: rgba(255, 255, 255, 0.9);
 
     .dark & {
         @apply bg-dark-600/90;
     }
 
     .inner {
-        @apply p-10 text-center mx-auto;
+        @apply mx-auto p-10 text-center;
     }
 
     i {
         position: relative;
         top: -1px;
-        margin-right: 10px ; [dir="rtl"] & { margin-left: 10px ; margin-right: 0 ; }
+        margin-right: 10px;
+        [dir='rtl'] & {
+            margin-left: 10px;
+            margin-right: 0;
+        }
     }
 }
 
-.bg-checkerboard {
-    background-color: #FFF;
-    background-image: linear-gradient(45deg, #EDF2F6 25%, transparent 25%), linear-gradient(-45deg, #EDF2F6 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #EDF2F6 75%), linear-gradient(-45deg, transparent 75%, #EDF2F6 75%);
-    background-size: 16px 16px;
-    background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+/* ARCHIECTURAL LINES
+=================================================== */
+/* Notes...
+
+    URL example
+    -----------
+    /cp/collections/create
+
+    What does it do?
+    ----------------
+    - Add a background image of architectural lines to the element.
+    - Target single buttons in any descended footers to add a circular line effect around them.
+
+*/
+/* HTML Example...
+
+<div class="content-card bg-architectural-lines"> <-- background lines added to this element
+    <footer>
+        <button>Create Collection</button> <--- circular line effect added to this descendended button in the footer
+    </footer>
+</div>
+
+*/
+@utility bg-architectural-lines {
+    &::before {
+        content: '';
+        pointer-events: none;
+        position: absolute;
+        inset: 0;
+        background-image: url('../../svg/ui/architectural-lines.svg');
+        background-size: 100%;
+        /* Reduce the chances of the background circles overlapping the button */
+        @media (width < 1300px) {
+            background-position-y: 130%;
+        }
+    }
+    footer {
+        position: relative;
+        &::before {
+            content: '';
+            pointer-events: none;
+            position: absolute;
+            border-block-end: 1px solid black;
+            opacity: 0.06;
+            width: 100vw;
+            top: 50%;
+            transform: translateY(50%);
+        }
+        button:only-child {
+            position: relative;
+            &::before, &::after {
+                content: '';
+                pointer-events: none;
+                position: absolute;
+                inset: 0;
+                border: 1px solid black;
+                opacity: 0.06;
+                width: 60%;
+                aspect-ratio: 1;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                border-radius: 50%;
+            }
+            &::before {
+                width: 45%;
+            }
+        }
+    }
+}
+
+@utility bg-checkerboard {
+    --checkerboard-light: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h12v12H0zm12 12h12v12H12z' fill='%23f3f4f6'/%3E%3C/svg%3E");
+    --checkerboard-dark: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h12v12H0zm12 12h12v12H12z' fill='%231f2937'/%3E%3C/svg%3E");
+
+    position: relative;
+    background-color: #fff;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: var(--checkerboard-light);
+        opacity: 0;
+        transition: opacity 0.2s ease-in-out;
+        pointer-events: none;
+    }
+
+    &:hover::before {
+        opacity: 1;
+    }
 
     .dark & {
-        background-color: theme(colors.dark.600);
-        background-image: linear-gradient(45deg, theme(colors.dark.950) 25%, transparent 25%), linear-gradient(-45deg, theme(colors.dark.950) 25%, transparent 25%), linear-gradient(45deg, transparent 75%, theme(colors.dark.950) 75%), linear-gradient(-45deg, transparent 75%, theme(colors.dark.950) 75%);
+        background-color: var(--color-gray-850);
+
+        &::before {
+            background-image: var(--checkerboard-dark);
+        }
     }
 }
 
-.clickable {
-    @apply text-gray-800 dark:text-dark-175 select-none cursor-pointer border dark:border-dark-800 bg-gradient-to-b from-white to-gray-100 dark:from-dark-550 dark:to-dark-600;
 
-    &:hover {
-        @apply border-gray-500 dark:border-dark-900 from-white to-gray-200 dark:from-dark-550 dark:to-dark-700;
+@utility trim-text-start {
+    text-box: trim-start;
+    /* =JFG. When we have an SVG we probably don't want to text trim, for example in a Markdown field with button controls like Bold, Italic, etc. */
+    &:has(svg) {
+        display: flex;
+    }
+    /* =JFG. Exceptions */
+    /* e.g. for a fieldset, we don't want to trim the text when we have a label like on a collections field, Link Item button */
+    .form-group :has(> &) & {
+        text-box: unset;
     }
 }
 
 [v-cloak],
 [x-cloak] {
-    display: none
+    display: none;
 }
 
-.-max-h-screen-px {
+@utility max-h-screen-px {
     max-height: calc(100vh - 1px) !important;
 }

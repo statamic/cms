@@ -1,6 +1,5 @@
 <template>
-
-    <span>
+    <component :is="component">
         <slot :action="action" :select="select" />
 
         <confirmation-modal
@@ -12,11 +11,25 @@
             @confirm="confirm"
             @cancel="reset"
         >
-            <div v-if="confirmationText" v-text="confirmationText" :class="{ 'mb-4': warningText || showDirtyWarning || action.fields.length }" />
+            <div
+                v-if="confirmationText"
+                v-text="confirmationText"
+                :class="{ 'mb-4': warningText || showDirtyWarning || action.fields.length }"
+            />
 
-            <div v-if="warningText" v-text="warningText" class="text-red-500" :class="{ 'mb-4': showDirtyWarning || action.fields.length }" />
+            <div
+                v-if="warningText"
+                v-text="warningText"
+                class="text-red-500"
+                :class="{ 'mb-4': showDirtyWarning || action.fields.length }"
+            />
 
-            <div v-if="showDirtyWarning" v-text="dirtyText" class="text-red-500" :class="{ 'mb-4': action.fields.length }" />
+            <div
+                v-if="showDirtyWarning"
+                v-text="dirtyText"
+                class="text-red-500"
+                :class="{ 'mb-4': action.fields.length }"
+            />
 
             <publish-container
                 v-if="action.fields.length"
@@ -26,91 +39,73 @@
                 :meta="action.meta"
                 :errors="errors"
                 @updated="values = $event"
+                v-slot="{ setFieldValue, setFieldMeta }"
             >
-                <publish-fields
-                    slot-scope="{ setFieldValue, setFieldMeta }"
-                    :fields="action.fields"
-                    @updated="setFieldValue"
-                    @meta-updated="setFieldMeta"
-                />
+                <publish-fields :fields="action.fields" @updated="setFieldValue" @meta-updated="setFieldMeta" />
             </publish-container>
         </confirmation-modal>
-    </span>
-
+    </component>
 </template>
-
 
 <script>
 import PublishFields from '../publish/Fields.vue';
+import { requireElevatedSessionIf } from '@statamic/components/elevated-sessions';
 
 export default {
-
     components: {
         PublishFields,
     },
 
     props: {
-        action: {
-            type: Object,
-            required: true,
-        },
-        selections: {
-            type: Number,
-            required: true,
-        },
-        errors: {
-            type: Object
-        },
-        isDirty: {
-            type: Boolean,
-            default: false,
-        }
+        action: { type: Object, required: true },
+        component: { type: String, required: false, default: 'span' },
+        selections: { type: Number, required: true },
+        errors: { type: Object },
+        isDirty: { type: Boolean, default: false },
     },
 
     data() {
         return {
             confirming: false,
-            fieldset: {tabs:[{fields:this.action.fields}]},
+            fieldset: { tabs: [{ fields: this.action.fields }] },
             values: this.action.values,
             running: false,
-        }
+        };
     },
 
     computed: {
-
         confirmationText() {
-            if (! this.action.confirmationText) return;
+            if (!this.action.confirmationText) return;
 
             return __n(this.action.confirmationText, this.selections);
         },
 
         warningText() {
-            if (! this.action.warningText) return;
+            if (!this.action.warningText) return;
 
             return __n(this.action.warningText, this.selections);
         },
 
         dirtyText() {
-            if (! this.isDirty) return;
+            if (!this.isDirty) return;
 
             return __(this.action.dirtyWarningText);
         },
 
         showDirtyWarning() {
-            return this.isDirty && this.action.dirtyWarningText && ! this.action.bypassesDirtyWarning;
+            return this.isDirty && this.action.dirtyWarningText && !this.action.bypassesDirtyWarning;
         },
 
         runButtonText() {
             return __n(this.action.buttonText, this.selections);
-        }
-
+        },
     },
 
     created() {
         this.$events.$on('reset-action-modals', this.reset);
     },
 
-    destroyed() {
+    unmounted() {
         this.$events.$off('reset-action-modals', this.reset);
     },
 
@@ -125,13 +120,18 @@ export default {
                 return;
             }
 
-            this.running = true;
-            this.$emit('selected', this.action, this.values, this.onDone);
+            this.performAction();
         },
 
         confirm() {
-            this.running = true;
-            this.$emit('selected', this.action, this.values, this.onDone);
+            this.performAction();
+        },
+
+        performAction() {
+            requireElevatedSessionIf(this.action.requiresElevatedSession).then(() => {
+                this.running = true;
+                this.$emit('selected', this.action, this.values, this.onDone);
+            });
         },
 
         reset() {
@@ -139,8 +139,6 @@ export default {
 
             this.values = clone(this.action.values);
         },
-
-    }
-
-}
+    },
+};
 </script>

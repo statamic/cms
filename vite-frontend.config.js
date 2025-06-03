@@ -8,6 +8,6 @@ export default defineConfig({
             name: 'statamic',
             fileName: () => 'helpers.js',
             formats: ['umd'],
-        }
-    }
+        },
+    },
 });

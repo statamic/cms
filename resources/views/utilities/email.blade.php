@@ -1,113 +1,123 @@
-@php use function Statamic\trans as __; @endphp
+@php
+    use function Statamic\trans as __;
+@endphp
 
 @extends('statamic::layout')
 @section('title', Statamic::crumb(__('Email'), __('Utilities')))
 
 @section('content')
 
-    <header class="mb-6">
-        @include('statamic::partials.breadcrumb', [
-            'url' => cp_route('utilities.index'),
-            'title' => __('Utilities')
-        ])
-        <h1>{{ __('Email') }}</h1>
-    </header>
+<ui-header title="{{ __('Email') }}" />
 
-    <div class="card">
-        <form method="POST" action="{{ cp_route('utilities.email') }}">
-            @csrf
+<ui-card-panel heading="{{ __('Send Test Email') }}">
+    <form method="POST" action="{{ cp_route('utilities.email') }}">
+        @csrf
 
-            <div class="flex items-center">
-                <input class="input-text rtl:ml-4 ltr:mr-4" type="text" name="email" value="{{ old('email', $user->email()) }}" />
-                <button type="submit" class="btn-primary">{{ __('Send Test Email') }}</button>
-            </div>
-            @if ($errors->has('email'))
-                <p class="mt-2"><small class="help-block text-red-500">{{ $errors->first('email') }}</small></p>
-            @endif
-        </form>
-    </div>
+        <div class="flex items-center gap-2">
+            <ui-input
+                name="email"
+                value="{{ old('email', $user->email()) }}"
+            ></ui-input>
+            <ui-button
+                text="{{ __('Send') }}"
+                type="submit"
+                variant="primary"
+            ></ui-button>
+        </div>
+        @if ($errors->has('email'))
+            <p class="mt-4 text-red-700 text-sm">{{ $errors->first('email') }}</p>
+        @endif
+    </form>
+</ui-card-panel>
 
-    <h2 class="mt-10 mb-2 font-bold text-lg">{{ __('Configuration') }}</h2>
-    <p class="text-sm text-gray mb-4">{!! __('statamic::messages.email_utility_configuration_description', ['path' => config_path('mail.php')]) !!}</p>
-    <div class="card p-0">
-        <table class="data-table">
-            <tr>
-                <th class="rtl:pr-4 ltr:pl-4 py-2 w-1/4">{{ __('Default Mailer') }}</th>
-                <td><code>{{ config('mail.default') }}</code></td>
-            </tr>
+<ui-card-panel
+    class="mt-6"
+    heading="{{ __('Configuration') }}"
+    subheading="{{ __('statamic::messages.email_utility_configuration_description', ['path' => config_path('mail.php')]) }}"
+>
+    <ui-table>
+        <ui-table-rows>
+            <ui-table-row class="[&_td:first-child]:font-medium">
+                <ui-table-cell>{{ __('Default Mailer') }}</ui-table-cell>
+                <ui-table-cell>{{ config('mail.default') }}</ui-table-cell>
+            </ui-table-row>
             @if (config('mail.default') == 'smtp')
-            <tr>
-                <th class="rtl:pr-4 ltr:pl-4 py-2 w-1/4">{{ __('Host') }}</th>
-                <td><code>{{ config('mail.mailers.smtp.host') }}</code></td>
-            </tr>
-            <tr>
-                <th class="rtl:pr-4 ltr:pl-4 py-2 w-1/4">{{ __('Port') }}</th>
-                <td><code>{{ config('mail.mailers.smtp.port') }}</code></td>
-            </tr>
-            <tr>
-                <th class="rtl:pr-4 ltr:pl-4 py-2 w-1/4">{{ __('Encryption') }}</th>
-                <td>
-                    @if (config('mail.mailers.smtp.encryption'))
-                        <code>{{ config('mail.mailers.smtp.encryption') }}</code>
-                    @endif
-                </td>
-            </tr>
-            <tr>
-                <th class="rtl:pr-4 ltr:pl-4 py-2 w-1/4">{{ __('Username') }}</th>
-                <td>
-                    @if (config('mail.mailers.smtp.username'))
-                        <code>{{ config('mail.mailers.smtp.username') }}</code>
-                    @endif
-                </td>
-            </tr>
-            <tr>
-                <th class="rtl:pr-4 ltr:pl-4 py-2 w-1/4">{{ __('Password') }}</th>
-                <td>
-                    @if (config('mail.mailers.smtp.password'))
-                        <code>{{ config('mail.mailers.smtp.password') }}</code>
-                    @endif
-                </td>
-            </tr>
+                <ui-table-row class="[&_td:fir]">
+                    <ui-table-cell>{{ __('Host') }}</ui-table-cell>
+                    <ui-table-cell>{{ config('mail.mailers.smtp.host') }}</ui-table-cell>
+                </ui-table-row>
+                <ui-table-row class="[&_td:fir]">
+                    <ui-table-cell>{{ __('Port') }}</ui-table-cell>
+                    <ui-table-cell>{{ config('mail.mailers.smtp.port') }}</ui-table-cell>
+                </ui-table-row>
+                <ui-table-row class="[&_td:fir]">
+                    <ui-table-cell>{{ __('Encryption') }}</ui-table-cell>
+                    <ui-table-cell>
+                        @if (config('mail.mailers.smtp.encryption'))
+                            {{ config('mail.mailers.smtp.encryption') }}
+                        @endif
+                    </ui-table-cell>
+                </ui-table-row>
+                <ui-table-row class="[&_td:fir]">
+                    <ui-table-cell>{{ __('Username') }}</ui-table-cell>
+                    <ui-table-cell>
+                        @if (config('mail.mailers.smtp.username'))
+                            {{ config('mail.mailers.smtp.username') }}
+                        @endif
+                    </ui-table-cell>
+                </ui-table-row>
+                <ui-table-row class="[&_td:fir]">
+                    <ui-table-cell>{{ __('Password') }}</ui-table-cell>
+                    <ui-table-cell>
+                        @if (config('mail.mailers.smtp.password'))
+                            {{ config('mail.mailers.smtp.password') }}
+                        @endif
+                    </ui-table-cell>
+                </ui-table-row>
             @endif
+
             @if (config('mail.default') == 'sendmail')
-            <tr>
-                <th class="rtl:pr-4 ltr:pl-4 py-2 w-1/4">{{ __('Sendmail') }}</th>
-                <td><code>{{ config('mail.mailers.sendmail.path') }}</code></td>
-            </tr>
+                <ui-table-row class="[&_td:fir]">
+                    <ui-table-cell>{{ __('Sendmail') }}</ui-table-cell>
+                    <ui-table-cell>{{ config('mail.mailers.sendmail.path') }}</ui-table-cell>
+                </ui-table-row>
             @endif
-            <tr>
-                <th class="rtl:pr-4 ltr:pl-4 py-2 w-1/4">{{ __('Default From Address') }}</th>
-                <td>
+
+            <ui-table-row class="[&_td:fir]">
+                <ui-table-cell>{{ __('Default From Address') }}</ui-table-cell>
+                <ui-table-cell>
                     @if (config('mail.from.address'))
-                        <code>{{ config('mail.from.address') }}</code>
+                        {{ config('mail.from.address') }}
                     @endif
-                </td>
-            </tr>
-            <tr>
-                <th class="rtl:pr-4 ltr:pl-4 py-2 w-1/4">{{ __('Default From Name') }}</th>
-                <td>
+                </ui-table-cell>
+            </ui-table-row>
+            <ui-table-row class="[&_td:fir]">
+                <ui-table-cell>{{ __('Default From Name') }}</ui-table-cell>
+                <ui-table-cell>
                     @if (config('mail.from.name'))
-                        <code>{{ config('mail.from.name') }}</code>
+                        {{ config('mail.from.name') }}
                     @endif
-                </td>
-            </tr>
-            <tr>
-                <th class="rtl:pr-4 ltr:pl-4 py-2 w-1/4">{{ __('Markdown theme') }}</th>
-                <td>
+                </ui-table-cell>
+            </ui-table-row>
+            <ui-table-row class="[&_td:fir]">
+                <ui-table-cell>{{ __('Markdown theme') }}</ui-table-cell>
+                <ui-table-cell>
                     @if (config('mail.markdown.theme'))
-                        <code>{{ config('mail.markdown.theme') }}</code>
+                        {{ config('mail.markdown.theme') }}
                     @endif
-                </td>
-            </tr>
-            <tr>
-                <th class="rtl:pr-4 ltr:pl-4 py-2 w-1/4">{{ __('Markdown paths') }}</th>
-                <td>
+                </ui-table-cell>
+            </ui-table-row>
+            <ui-table-row class="[&_td:fir]">
+                <ui-table-cell>{{ __('Markdown paths') }}</ui-table-cell>
+                <ui-table-cell>
                     @foreach (config('mail.markdown.paths') as $path)
-                        <code>{{ $path }}</code><br>
+                        {{ $path }}
+                        @if (! $loop->last)<br />@endif
                     @endforeach
-                </td>
-            </tr>
-        </table>
-    </div>
+                </ui-table-cell>
+            </ui-table-row>
+        </ui-table-rows>
+    </ui-table>
+</ui-card-panel>
 
 @stop

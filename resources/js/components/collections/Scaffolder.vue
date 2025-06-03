@@ -1,53 +1,61 @@
 <template>
     <div class="">
-        <div class="card p-6 ">
+        <div class="card p-6">
             <header class="mb-6">
                 <p class="text-gray" v-text="__('messages.collection_scaffold_instructions')" />
             </header>
-             <table class="data-table border rounded">
+            <table class="data-table rounded-sm border">
                 <tbody>
                     <tr>
-                        <td class="checkbox-column border-r" @click="selected.index = ! selected.index">
-                            <div class="flex items-center h-full">
-                                <input type="checkbox" v-model="selected.index" class="rtl:ml-4 ltr:mr-4" id="field_index" />
+                        <td class="checkbox-column border-r" @click="selected.index = !selected.index">
+                            <div class="flex h-full items-center">
+                                <input
+                                    type="checkbox"
+                                    v-model="selected.index"
+                                    class="ltr:mr-4 rtl:ml-4"
+                                    id="field_index"
+                                />
                             </div>
                         </td>
                         <td class="border-r">
                             <label for="field_index" v-text="__('Index Template')" />
                         </td>
-                        <td :class="{'opacity-25': ! selected.index }">
-                            <input type="text" v-model="index" class="input-text font-mono" dir="ltr">
+                        <td :class="{ 'opacity-25': !selected.index }">
+                            <input type="text" v-model="index" class="input-text font-mono" dir="ltr" />
                         </td>
                     </tr>
                     <tr>
-                        <td class="checkbox-column border-r" @click="selected.show = ! selected.show">
-                            <div class="flex items-center h-full">
-                                <input type="checkbox" v-model="selected.show" class="rtl:ml-4 ltr:mr-4" id="field_template" />
+                        <td class="checkbox-column border-r" @click="selected.show = !selected.show">
+                            <div class="flex h-full items-center">
+                                <input
+                                    type="checkbox"
+                                    v-model="selected.show"
+                                    class="ltr:mr-4 rtl:ml-4"
+                                    id="field_template"
+                                />
                             </div>
                         </td>
                         <td class="border-r">
                             <label for="field_template" v-text="__('Show Template')" />
                         </td>
-                        <td :class="{'opacity-25': ! selected.show }">
-                            <input type="text" v-model="show" class="input-text font-mono" dir="ltr">
+                        <td :class="{ 'opacity-25': !selected.show }">
+                            <input type="text" v-model="show" class="input-text font-mono" dir="ltr" />
                         </td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
-        <div class="flex justify-center mt-8">
-            <button tabindex="4" class="btn-primary mx-auto btn-lg" :disabled="! canSubmit" @click="submit">
-                {{ __('Create Views')}}
+        <div class="mt-8 flex justify-center">
+            <button tabindex="4" class="btn-primary btn-lg mx-auto" :disabled="!canSubmit" @click="submit">
+                {{ __('Create Views') }}
             </button>
         </div>
     </div>
 </template>
 
 <script>
-
 export default {
-
     props: {
         route: { type: String },
         title: { type: String },
@@ -61,14 +69,14 @@ export default {
             selected: {
                 blueprint: true,
                 index: true,
-                show: true
-            }
-        }
+                show: true,
+            },
+        };
     },
 
     computed: {
         canSubmit() {
-            return ! _.isEmpty(this.files);
+            return Object.keys(this.files).length > 0;
         },
 
         files() {
@@ -83,25 +91,28 @@ export default {
             }
 
             return files;
-        }
+        },
     },
 
     methods: {
         submit() {
-            this.$axios.post(this.route, this.files).then(response => {
-                window.location = response.data.redirect;
-            }).catch(error => {
-                this.$toast.error(error.response.data.message);
-            });
-        }
+            this.$axios
+                .post(this.route, this.files)
+                .then((response) => {
+                    window.location = response.data.redirect;
+                })
+                .catch((error) => {
+                    this.$toast.error(error.response.data.message);
+                });
+        },
     },
 
     mounted() {
-        this.$keys.bindGlobal(['return'], e => {
+        this.$keys.bindGlobal(['return'], (e) => {
             if (this.canSubmit) {
                 this.submit();
             }
         });
-    }
-}
+    },
+};
 </script>

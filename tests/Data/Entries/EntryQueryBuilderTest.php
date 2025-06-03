@@ -768,10 +768,131 @@ class EntryQueryBuilderTest extends TestCase
     {
         $this->createDummyCollectionAndEntries();
 
-        $count = 0;
-        Entry::query()->chunk(2, function ($entries) use (&$count) {
-            $this->assertCount($count++ == 0 ? 2 : 1, $entries);
+        $chunks = 0;
+
+        Entry::query()->chunk(2, function ($entries, $page) use (&$chunks) {
+            if ($page === 1) {
+                $this->assertCount(2, $entries);
+                $this->assertEquals(['Post 1', 'Post 2'], $entries->map->title->all());
+            } else {
+                $this->assertCount(1, $entries);
+                $this->assertEquals(['Post 3'], $entries->map->title->all());
+            }
+
+            $chunks++;
         });
+
+        $this->assertEquals(2, $chunks);
+    }
+
+    #[Test]
+    public function entries_are_found_using_chunk_with_limits_where_limit_is_less_than_total()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $chunks = 0;
+
+        Entry::query()->limit(2)->chunk(1, function ($entries, $page) use (&$chunks) {
+            if ($page === 1) {
+                $this->assertCount(1, $entries);
+                $this->assertEquals(['Post 1'], $entries->map->title->all());
+            } else {
+                $this->assertCount(1, $entries);
+                $this->assertEquals(['Post 2'], $entries->map->title->all());
+            }
+
+            $chunks++;
+        });
+
+        $this->assertEquals(2, $chunks);
+    }
+
+    #[Test]
+    public function entries_are_found_using_chunk_with_limits_where_limit_is_more_than_total()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $chunks = 0;
+
+        Entry::query()->limit(10)->chunk(2, function ($entries, $page) use (&$chunks) {
+            if ($page === 1) {
+                $this->assertCount(2, $entries);
+                $this->assertEquals(['Post 1', 'Post 2'], $entries->map->title->all());
+            } elseif ($page === 2) {
+                $this->assertCount(1, $entries);
+                $this->assertEquals(['Post 3'], $entries->map->title->all());
+            } else {
+                $this->fail('Should have had two pages.');
+            }
+
+            $chunks++;
+        });
+
+        $this->assertEquals(2, $chunks);
+    }
+
+    #[Test]
+    public function entries_are_found_using_chunk_with_offset()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $chunks = 0;
+
+        Entry::query()->offset(1)->chunk(2, function ($entries, $page) use (&$chunks) {
+            if ($page === 1) {
+                $this->assertCount(2, $entries);
+                $this->assertEquals(['Post 2', 'Post 3'], $entries->map->title->all());
+            } else {
+                $this->fail('Should only have had one page.');
+            }
+
+            $chunks++;
+        });
+
+        $this->assertEquals(1, $chunks);
+    }
+
+    #[Test]
+    public function entries_are_found_using_chunk_with_offset_where_more_than_total()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $chunks = 0;
+
+        Entry::query()->offset(3)->chunk(2, function ($entries, $page) use (&$chunks) {
+            $chunks++;
+        });
+
+        $this->assertEquals(0, $chunks);
+    }
+
+    #[Test]
+    public function entries_are_found_using_chunk_with_limits_and_offsets()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        EntryFactory::id('id-4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4'])->create();
+        EntryFactory::id('id-5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5'])->create();
+        EntryFactory::id('id-6')->slug('post-6')->collection('posts')->data(['title' => 'Post 6'])->create();
+        EntryFactory::id('id-7')->slug('post-7')->collection('posts')->data(['title' => 'Post 7'])->create();
+
+        $chunks = 0;
+
+        Entry::query()->orderBy('id', 'asc')->offset(2)->limit(3)->chunk(2, function ($entries, $page) use (&$chunks) {
+            if ($page === 1) {
+                $this->assertCount(2, $entries);
+                $this->assertEquals(['Post 3', 'Post 4'], $entries->map->title->all());
+            } elseif ($page === 2) {
+                $this->assertCount(1, $entries);
+                $this->assertEquals(['Post 5'], $entries->map->title->all());
+            } else {
+                $this->fail('Should only have had two pages.');
+            }
+
+            $chunks++;
+        });
+
+        $this->assertEquals(2, $chunks);
     }
 
     #[Test]

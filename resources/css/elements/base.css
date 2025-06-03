@@ -1,0 +1,26 @@
+:root {
+    --focus-outline-width: 2px;
+    /* Here we typically need a negative outline-offset because of the inner shadow on inputs */
+    --focus-outline-offset: -1px;
+    --focus-within-outline-offset: 0;
+    --focus-outline-color: var(--color-blue-400);
+    --focus-outline-style: solid;
+    :is(.dark)& {
+        --focus-outline-color: var(--color-blue-500);
+        --focus-shadow-color: var(--color-blue-500);
+    }
+}
+
+/* FOCUS STATES 
+=================================================== */
+@layer base {
+    /* (Except the focus-within class will handle the focus outline target instead) */
+    :not([class*='focus-within'] *) {
+        :focus-visible& {
+            outline-width: var(--focus-outline-width);
+            outline-offset: var(--focus-outline-offset);
+            outline-color: var(--focus-outline-color, currentColor);
+            outline-style: var(--focus-outline-style, solid);
+        }
+    }
+}

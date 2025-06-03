@@ -1,23 +1,21 @@
 <script>
-import { Sortable, Plugins } from '@shopify/draggable'
+import { Sortable, Plugins } from '@shopify/draggable';
 
 function move(items, oldIndex, newIndex) {
-    const itemRemovedArray = [
-        ...items.slice(0, oldIndex),
-        ...items.slice(oldIndex + 1, items.length)
-    ]
+    const itemRemovedArray = [...items.slice(0, oldIndex), ...items.slice(oldIndex + 1, items.length)];
 
     return [
         ...itemRemovedArray.slice(0, newIndex),
         items[oldIndex],
-        ...itemRemovedArray.slice(newIndex, itemRemovedArray.length)
-    ]
+        ...itemRemovedArray.slice(newIndex, itemRemovedArray.length),
+    ];
 }
 
 export default {
+    emits: ['dragstart', 'dragend', 'update:model-value'],
 
     props: {
-        value: {
+        modelValue: {
             required: true,
         },
         itemClass: {
@@ -28,86 +26,88 @@ export default {
         },
         mirror: {
             type: Boolean,
-            default: true
+            default: true,
         },
         appendTo: {
             default: null,
         },
         options: {
-            default: () => {}
+            default: () => {},
         },
         vertical: {
-            type: Boolean
+            type: Boolean,
         },
         constrainDimensions: {
-            type: Boolean
+            type: Boolean,
         },
         delay: {
             type: Number,
-            default: 0
+            default: 0,
         },
         distance: {
             type: Number,
-            default: 0
+            default: 0,
         },
         disabled: {
             type: Boolean,
-            default: false
+            default: false,
         },
         animate: {
             type: Boolean,
-            default: true
-        }
+            default: true,
+        },
     },
 
     data() {
         return {
             sortable: null,
-        }
+        };
     },
 
     computed: {
-
         computedOptions() {
             let plugins = [];
             if (this.animate) plugins.push(Plugins.SwapAnimation);
 
-            let options = Object.assign({}, {
-                draggable: `.${CSS.escape(this.itemClass)}`,
-                handle: `.${CSS.escape(this.handleClass)}`,
-                delay: this.delay,
-                distance: this.distance,
-                swapAnimation: { vertical: this.vertical, horizontal: !this.vertical },
-                plugins,
-                mirror: {
-                    constrainDimensions: this.constrainDimensions
+            let options = Object.assign(
+                {},
+                {
+                    draggable: `.${CSS.escape(this.itemClass)}`,
+                    handle: `.${CSS.escape(this.handleClass)}`,
+                    delay: this.delay,
+                    distance: this.distance,
+                    swapAnimation: { vertical: this.vertical, horizontal: !this.vertical },
+                    plugins,
+                    mirror: {
+                        constrainDimensions: this.constrainDimensions,
+                    },
                 },
-            }, this.options);
+                this.options,
+            );
 
             if (this.vertical) {
                 options.mirror.xAxis = false;
             }
 
             if (this.appendTo) {
-                options.mirror.appendTo = this.appendTo
+                options.mirror.appendTo = this.appendTo;
             }
 
             return options;
-        }
-
+        },
     },
 
     provide() {
         return {
             itemClass: this.itemClass,
             handleClass: this.handleClass,
-        }
+        };
     },
 
     render() {
-        return this.$scopedSlots.default({
-            items: this.value,
-        })
+        return this.$slots.default({
+            items: this.modelValue,
+        })[0];
     },
 
     mounted() {
@@ -118,6 +118,10 @@ export default {
         this.setupSortableList();
     },
 
+    unmounted() {
+        this.destroySortableList();
+    },
+
     methods: {
         setupSortableList() {
             this.sortable = new Sortable(this.$el, this.computedOptions);
@@ -126,12 +130,8 @@ export default {
             this.sortable.on('drag:stop', () => this.$emit('dragend'));
 
             this.sortable.on('sortable:stop', ({ oldIndex, newIndex }) => {
-                this.$emit('input', move(this.value, oldIndex, newIndex))
-            })
-
-            this.$on('hook:destroyed', () => {
-                this.sortable.destroy()
-            })
+                this.$emit('update:model-value', move(this.modelValue, oldIndex, newIndex));
+            });
 
             if (this.mirror === false) {
                 this.sortable.on('mirror:create', (e) => e.cancel());
@@ -139,7 +139,7 @@ export default {
         },
 
         destroySortableList() {
-            this.sortable.destroy()
+            this.sortable.destroy();
         },
     },
 
@@ -148,6 +148,5 @@ export default {
             disabled ? this.destroySortableList() : this.setupSortableList();
         },
     },
-
-}
+};
 </script>

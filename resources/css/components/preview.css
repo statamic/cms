@@ -3,17 +3,16 @@
 }
 
 .live-preview-header {
-    @apply relative rtl:pl-4 ltr:pr-4 rtl:pr-6 ltr:pl-6 py-2 h-13 shadow-md flex items-center justify-between;
+    @apply relative flex h-13 items-center justify-between py-2 shadow-md ltr:pl-6 ltr:pr-4 rtl:pl-4 rtl:pr-6;
     background: linear-gradient(180deg, #fff, #f9fafb);
     border-bottom: 1px solid #c4cdd6;
     z-index: 2;
 
     .dark & {
-        background: linear-gradient(180deg, theme(colors.dark.500), theme(colors.dark.550));
-        border-color: theme(colors.dark.900);
+        background: linear-gradient(180deg, var(--color-dark-500), var(--color-dark-550));
+        border-color: var(--color-dark-900);
     }
 }
-
 
 .live-preview-main {
     @apply flex flex-1 overflow-scroll;
@@ -21,7 +20,7 @@
 }
 
 .live-preview-editor {
-    @apply flex relative bg-gray-200 dark:bg-dark-800 h-full;
+    @apply relative flex h-full bg-gray-200 dark:bg-dark-800;
     z-index: 3;
 }
 
@@ -35,17 +34,17 @@
 }
 
 .live-preview-contents {
-    @apply relative bg-gray-500 flex-1 flex flex-col;
+    @apply relative flex flex-1 flex-col bg-gray-500;
     z-index: 1;
 }
 
 .live-preview .tabs-container {
-    @apply bg-gray-300 dark:bg-dark-550 mb-0;
+    @apply mb-0 bg-gray-300 dark:bg-dark-550;
     @apply @4xl/live-preview:mb-6;
 }
 
 .live-preview .publish-tabs {
-    @apply rtl:pr-4 ltr:pl-4 rtl:@4xl/live-preview:pr-6 ltr:@4xl/live-preview:pl-6;
+    @apply ltr:pl-4 @-4xl/live-preview:ltr:pl-6 rtl:pr-4 @-4xl/live-preview:rtl:pr-6;
 }
 
 .live-preview .publish-sections-section {
@@ -66,22 +65,25 @@
 
 .live-preview-contents iframe {
     @apply bg-white;
-    &.responsive { @apply h-full w-full; }
-    &.device { @apply mt-4 shadow-lg rounded; }
-}
-
-.live-preview-resizer {
-    @apply w-4 rtl:border-r ltr:border-l rtl:border-l ltr:border-r border-gray-400 dark:border-dark-900 shadow-sm;
-    z-index: 1;
-    cursor: ew-resize;
-    background: theme('colors.gray.100') url('../../svg/icons/light/drag-dots.svg') center center no-repeat;
-    background-size: 7px 17px;
-
-    .dark & {
-        background-color: theme('colors.dark.500');
+    &.responsive {
+        @apply h-full w-full;
+    }
+    &.device {
+        @apply mt-4 rounded-sm shadow-lg;
     }
 }
 
+.live-preview-resizer {
+    @apply w-4 border-gray-400 shadow-sm dark:border-dark-900 ltr:border-l ltr:border-r rtl:border-l rtl:border-r;
+    z-index: 1;
+    cursor: ew-resize;
+    background: var(--color-gray-100) url('../../svg/icons/light/drag-dots.svg') center center no-repeat;
+    background-size: 7px 17px;
+
+    .dark & {
+        background-color: var(--color-dark-500);
+    }
+}
 
 .live-preview-header-slide-enter-active,
 .live-preview-header-slide-leave-active {
@@ -112,16 +114,15 @@
     opacity: 0;
 }
 
-
 /*  We only want the animation to happen when its on the regular publish page. */
 /*  When portal-ed into live preview, it won't be inside .workspace */
-.workspace {
+main {
     .live-preview-tabs-drop-enter-active,
     .live-preview-tabs-drop-leave-active {
         transition: all 0.2s;
     }
     .live-preview-tabs-drop-enter-active {
-        transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275)
+        transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     .live-preview-tabs-drop-leave-active {
         transition-timing-function: cubic-bezier(0.6, -0.28, 0.735, 0.045);

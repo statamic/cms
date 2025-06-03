@@ -1,86 +1,109 @@
 <template>
-    <table :data-size="relativeColumnsSize" ref="table" tabindex="0" class="data-table" :class="{ 'select-none' : shifting }" @keydown.shift="shiftDown" @keyup="clearShift">
+    <table
+        :data-size="relativeColumnsSize"
+        :class="{
+            'select-none': shifting,
+            'data-table': !unstyled,
+            'contained': contained,
+        }"
+        data-table
+        ref="table"
+        tabindex="0"
+        @keydown.shift="shiftDown"
+        @keyup="clearShift"
+        :data-has-selections="sharedState.selections.length > 0 || undefined"
+    >
         <thead v-if="allowBulkActions || visibleColumns.length > 1">
             <tr>
-                <th class="rounded-none" :class="{'checkbox-column': ! reorderable, 'handle-column': reorderable}" v-if="allowBulkActions || reorderable">
+                <th
+                    v-if="allowBulkActions || reorderable"
+                    :class="{ 'checkbox-column': !reorderable, 'handle-column': reorderable }"
+                >
                     <data-list-toggle-all ref="toggleAll" v-if="allowBulkActions && !singleSelect" />
                 </th>
-                <th
-                    v-for="column in visibleColumns"
-                    :key="column.field"
-                    :class="{
-                        'current-column': sharedState.sortColumn === column.field,
-                        'sortable-column': column.sortable === true,
-                        'cursor-not-allowed': !sortable,
-                        'rtl:text-left ltr:text-right rtl:pl-8 ltr:pr-8': column.numeric,
-                    }"
-                    class="group rounded-none"
-                    @click.prevent="changeSortColumn(column.field)"
-                >
-                    <span v-text="__(column.label)" />
-                    <svg v-if="column.sortable" :class="[sharedState.sortDirection, {'opacity-100 pointer-events-none': sharedState.sortColumn === column.field}]" height="8" width="8" viewBox="0 0 10 6.5" class="rtl:mr-1 ltr:ml-1 opacity-0 group-hover:opacity-100">
-                        <path d="M9.9,1.4L5,6.4L0,1.4L1.4,0L5,3.5L8.5,0L9.9,1.4z" fill="currentColor"/>
-                    </svg>
+                <th v-for="column in visibleColumns" :key="column.field">
+                    <span v-if="!column.sortable" v-text="__(column.label)" />
+                    <Button
+                        v-else
+                        :text="__(column.label)"
+                        :icon-append="isCurrentSortColumn(column) ? 'up-down' : null"
+                        size="sm"
+                        variant="ghost"
+                        class="-mt-2 -mb-1 -ml-3 text-sm! font-medium! text-gray-800! dark:text-gray-400!"
+                        @click.prevent="changeSortColumn(column.field)"
+                    />
                 </th>
                 <th class="type-column" v-if="type">
                     <template v-if="type === 'entries'">{{ __('Collection') }}</template>
                     <template v-if="type === 'terms'">{{ __('Taxonomy') }}</template>
                 </th>
-                <th class="actions-column rounded-none" />
+                <th class="actions-column" />
             </tr>
         </thead>
         <sortable-list
-            :value="rows"
+            :model-value="rows"
             :vertical="true"
             :mirror="false"
             item-class="sortable-row"
             handle-class="table-drag-handle"
-            @input="$emit('reordered', $event)"
+            @update:model-value="$emit('reordered', $event)"
         >
-        <tbody>
-            <slot name="tbody-start" />
-            <tr v-for="(row, index) in rows" :key="row.id" class="sortable-row outline-none" :class="{'row-selected': sharedState.selections.includes(row.id)}">
-                <td class="table-drag-handle" v-if="reorderable"></td>
-                <th class="checkbox-column" v-if="allowBulkActions && !reorderable">
-                    <input
-                        v-if="!reorderable"
-                        type="checkbox"
-                        :value="row.id"
-                        :checked="isSelected(row.id)"
-                        :disabled="reachedSelectionLimit && !singleSelect && !isSelected(row.id)"
-                        :id="`checkbox-${row.id}`"
-                        @click="checkboxClicked(row, index, $event)"
-                    />
-                </th>
-                <td v-for="column in visibleColumns" :key="column.field" @click="rowClicked(row, index, $event)" :width="column.width" :class="{'rtl:text-left ltr:text-right rtl:pl-8 ltr:pr-8': column.numeric}">
-                    <slot
-                        :name="`cell-${column.field}`"
-                        :value="row[column.value || column.field]"
-                        :values="row"
-                        :row="row"
-                        :index="actualIndex(row)"
-                        :display-index="index"
-                        :checkbox-id="`checkbox-${row.id}`"
+            <tbody>
+                <slot name="tbody-start" />
+                <tr
+                    v-for="(row, index) in rows"
+                    :key="row.id"
+                    class="sortable-row outline-hidden"
+                    :data-row="sharedState.selections.includes(row.id) ? 'selected' : 'unselected'"
+                >
+                    <td class="table-drag-handle" v-if="reorderable"></td>
+                    <td class="checkbox-column" v-if="allowBulkActions && !reorderable">
+                        <input
+                            v-if="!reorderable"
+                            type="checkbox"
+                            :value="row.id"
+                            :checked="isSelected(row.id)"
+                            :disabled="reachedSelectionLimit && !singleSelect && !isSelected(row.id)"
+                            :id="`checkbox-${row.id}`"
+                            @click="checkboxClicked(row, index, $event)"
+                        />
+                    </td>
+                    <td
+                        v-for="column in visibleColumns"
+                        :key="column.field"
+                        :width="column.width"
+                        :data-column="`${column.field}`"
                     >
-                        <table-field :handle="column.field" :value="row[column.value || column.field]" :values="row" :fieldtype="column.fieldtype" :key="column.field" />
-                    </slot>
-                </td>
-                <td class="type-column" v-if="type">
-                    <span v-if="type === 'entries' || type === 'terms'" class="rounded px-1 py-px text-2xs uppercase bg-gray-200 dark:bg-dark-400 text-gray dark:text-dark-150">
-                        <template v-if="type === 'entries'">{{ __(row.collection.title) }}</template>
-                        <template v-if="type === 'terms'">{{ __(row.taxonomy.title) }}</template>
-                    </span>
-                </td>
-                <th class="actions-column">
-                    <slot
-                        name="actions"
-                        :row="row"
-                        :index="actualIndex(row)"
-                        :display-index="index"
-                    ></slot>
-                </th>
-            </tr>
-        </tbody>
+                        <slot
+                            :name="`cell-${column.field}`"
+                            :value="row[column.value || column.field]"
+                            :values="row"
+                            :row="row"
+                            :index="actualIndex(row)"
+                            :display-index="index"
+                            :checkbox-id="`checkbox-${row.id}`"
+                        >
+                            <table-field
+                                :handle="column.field"
+                                :value="row[column.value || column.field]"
+                                :values="row"
+                                :fieldtype="column.fieldtype"
+                                :key="column.field"
+                            />
+                        </slot>
+                    </td>
+                    <td class="type-column" v-if="type">
+                        <Badge
+                            size="sm"
+                            v-if="type === 'entries' || type === 'terms'"
+                            :label="type === 'entries' ? __(row.collection.title) : __(row.taxonomy.title)"
+                        />
+                    </td>
+                    <td class="actions-column">
+                        <slot name="actions" :row="row" :index="actualIndex(row)" :display-index="index"></slot>
+                    </td>
+                </tr>
+            </tbody>
         </sortable-list>
     </table>
 </template>
@@ -88,58 +111,44 @@
 <script>
 import TableField from './TableField.vue';
 import SortableList from '../sortable/SortableList.vue';
+import { Button, Badge } from '@statamic/ui';
 
 export default {
-
     components: {
         TableField,
         SortableList,
+        Button,
+        Badge,
     },
 
     data() {
         return {
             shifting: false,
-            lastItemClicked: null
-        }
+            lastItemClicked: null,
+        };
     },
 
     props: {
-        loading: {
-            type: Boolean,
-            default: false
-        },
-        allowBulkActions: {
-            default: false,
-            type: Boolean
-        },
-        toggleSelectionOnRowClick: {
-            type: Boolean,
-            default: false
-        },
-        sortable: {
-            type: Boolean,
-            default: true
-        },
-        reorderable: {
-            type: Boolean,
-            default: false
-        },
-        type: {
-            type: String
-        },
+        loading: { type: Boolean, default: false },
+        allowBulkActions: { type: Boolean, default: false },
+        toggleSelectionOnRowClick: { type: Boolean, default: false },
+        sortable: { type: Boolean, default: true },
+        reorderable: { type: Boolean, default: false },
+        type: { type: String },
+        unstyled: { type: Boolean, default: false },
+        contained: { type: Boolean, default: false },
     },
 
     inject: ['sharedState'],
 
     computed: {
-
         rows: {
             get() {
                 return this.sharedState.rows;
             },
             set(rows) {
                 this.sharedState.rows = rows;
-            }
+            },
         },
 
         reachedSelectionLimit() {
@@ -159,24 +168,25 @@ export default {
         },
 
         visibleColumns() {
-            const columns = this.sharedState.columns.filter(column => column.visible);
+            const columns = this.sharedState.columns.filter((column) => column.visible);
 
             return columns.length ? columns : this.sharedState.columns;
         },
 
         sortableColumns() {
-            return this.sharedState.columns
-                .filter(column => column.sortable)
-                .map(column => column.field);
-        }
+            return this.sharedState.columns.filter((column) => column.sortable).map((column) => column.field);
+        },
 
+        isCurrentSortColumn() {
+            return (column) => this.sharedState.sortColumn === column.field;
+        },
     },
 
     methods: {
         changeSortColumn(column) {
             if (!this.sortable) return;
 
-            if (! this.sortableColumns.includes(column)) {
+            if (!this.sortableColumns.includes(column)) {
                 return;
             }
 
@@ -184,9 +194,9 @@ export default {
             if (this.sharedState.sortColumn === column) {
                 this.swapSortDirection();
 
-            // Always start sorting by asc unless column is a date field
+                // Always start sorting by asc unless column is a date field
             } else if (this.getFieldtype(column) !== 'date') {
-                this.sharedState.sortDirection = 'asc'
+                this.sharedState.sortDirection = 'asc';
             }
 
             this.sharedState.currentPage = 1;
@@ -200,36 +210,24 @@ export default {
         },
 
         getFieldtype(columnName) {
-            let field = _.find(this.sharedState.columns, function(field) {
-                return columnName === field.field
-            })
+            let field = this.sharedState.columns.find(function (field) {
+                return columnName === field.field;
+            });
 
-            return field.fieldtype
+            return field.fieldtype;
         },
 
         actualIndex(row) {
-            return _.findIndex(this.sharedState.originalRows, row);
-        },
-
-        rowClicked(row, index, $event) {
-            if ($event.shiftKey && this.lastItemClicked !== null) {
-                this.selectRange(
-                    Math.min(this.lastItemClicked, index),
-                    Math.max(this.lastItemClicked, index)
-                );
-            } else if (this.toggleSelectionOnRowClick) {
-                this.toggleSelection(row.id, index);
-            }
-            this.lastItemClicked = index;
+            return this.sharedState.originalRows.findIndex((r) => r === row);
         },
 
         selectRange(from, to) {
-            for (var i = from; i <= to; i++ ) {
+            for (var i = from; i <= to; i++) {
                 let row = this.sharedState.rows[i].id;
-                if (! this.sharedState.selections.includes(row) && ! this.reachedSelectionLimit) {
+                if (!this.sharedState.selections.includes(row) && !this.reachedSelectionLimit) {
                     this.sharedState.selections.push(row);
                 }
-            };
+            }
         },
 
         isSelected(id) {
@@ -249,34 +247,31 @@ export default {
                 this.sharedState.selections.pop();
             }
 
-            if (! this.reachedSelectionLimit) {
+            if (!this.reachedSelectionLimit) {
                 this.sharedState.selections.push(id);
             }
         },
 
         shiftDown() {
-            this.shifting = true
+            this.shifting = true;
         },
 
         clearShift() {
-            this.shifting = false
+            this.shifting = false;
         },
 
         checkboxClicked(row, index, $event) {
             if ($event.shiftKey && this.lastItemClicked !== null) {
                 this.$refs.table.focus();
-                this.selectRange(
-                    Math.min(this.lastItemClicked, index),
-                    Math.max(this.lastItemClicked, index)
-                );
+                this.selectRange(Math.min(this.lastItemClicked, index), Math.max(this.lastItemClicked, index));
             } else {
-                this.toggleSelection(row.id, index)
+                this.toggleSelection(row.id, index);
             }
 
             if ($event.target.checked) {
-                this.lastItemClicked = index
+                this.lastItemClicked = index;
             }
-        }
+        },
     },
-}
+};
 </script>

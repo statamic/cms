@@ -1,5 +1,6 @@
-export default {
+import { isEqual } from 'lodash-es';
 
+export default {
     data() {
         return {
             activeFilterBadges: {},
@@ -7,16 +8,15 @@ export default {
             activePreset: null,
             activePresetPayload: {},
             searchQuery: '',
-        }
+        };
     },
 
     computed: {
-
         activeFilterCount() {
             let count = Object.keys(this.activeFilters).length;
 
             if (this.activeFilters.hasOwnProperty('fields')) {
-                count = count + Object.keys(this.activeFilters.fields).filter(field => field != 'badge').length - 1;
+                count = count + Object.keys(this.activeFilters.fields).filter((field) => field != 'badge').length - 1;
             }
 
             return count;
@@ -27,18 +27,20 @@ export default {
         },
 
         isDirty() {
-            if (! this.isFiltering) return false;
+            if (!this.isFiltering) return false;
 
             if (this.activePreset) {
-                return this.activePresetPayload.query != this.searchQuery
-                    || ! _.isEqual(this.activePresetPayload.filters || {}, this.activeFilters);
+                return (
+                    this.activePresetPayload.query != this.searchQuery ||
+                    !isEqual(this.activePresetPayload.filters || {}, this.activeFilters)
+                );
             }
 
             return true;
         },
 
         isFiltering() {
-            return ! _.isEmpty(this.activeFilters) || this.searchQuery || this.activePreset;
+            return Object.keys(this.activeFilters).length || this.searchQuery || this.activePreset;
         },
 
         hasActiveFilters() {
@@ -47,16 +49,18 @@ export default {
 
         searchPlaceholder() {
             if (this.activePreset) {
-                return `${__('Searching in:')} ${this.activePresetPayload.display}`;
+                return `${__('Search')} ${this.activePresetPayload.display}`;
+            }
+
+            if (this.activeFilterCount > 0) {
+                return __n('messages.search_with_count_filters_applied', this.activeFilterCount);
             }
 
             return __('Search');
         },
-
     },
 
     methods: {
-
         searchChanged(query) {
             this.searchQuery = query;
         },
@@ -70,9 +74,9 @@ export default {
 
         filterChanged({ handle, values }, unselectAll = true) {
             if (values && this.hasFields(values)) {
-                Vue.set(this.activeFilters, handle, values);
+                this.activeFilters[handle] = values;
             } else {
-                Vue.delete(this.activeFilters, handle);
+                delete this.activeFilters[handle];
             }
             if (unselectAll) this.unselectAllItems();
         },
@@ -102,7 +106,7 @@ export default {
             }
         },
 
-        selectPreset(handle, preset)  {
+        selectPreset(handle, preset) {
             this.activePreset = handle;
             this.activePresetPayload = preset;
             this.searchQuery = preset.query;
@@ -111,17 +115,19 @@ export default {
         },
 
         autoApplyFilters(filters) {
-            if (! filters) return;
+            if (!filters) return;
 
             let values = {};
 
-            filters.filter(filter => ! _.isEmpty(filter.auto_apply)).forEach(filter => {
-                values[filter.handle] = filter.auto_apply;
-            });
+            const isEmpty = (value) => (Array.isArray(value) ? value.length === 0 : Object.keys(value).length === 0);
+
+            filters
+                .filter((filter) => !isEmpty(filter.auto_apply))
+                .forEach((filter) => {
+                    values[filter.handle] = filter.auto_apply;
+                });
 
             this.activeFilters = values;
         },
-
-    }
-
-}
+    },
+};

@@ -1,14 +1,14 @@
 <template>
-    <data-list :rows="rows" :columns="columns">
-        <div class="card p-0" slot-scope="{ }">
+    <data-list :rows="rows" :columns="columns" v-slot="{}">
+        <ui-panel>
             <data-list-table>
-                <template slot="cell-title" slot-scope="{ row: role, index }">
+                <template #cell-title="{ row: role, index }">
                     <a :href="role.edit_url">{{ __(role.title) }}</a>
                 </template>
-                <template slot="cell-handle" slot-scope="{ value: handle }">
+                <template #cell-handle="{ value: handle }">
                     <span class="font-mono text-xs">{{ handle }}</span>
                 </template>
-                <template slot="actions" slot-scope="{ row: role, index }">
+                <template #actions="{ row: role, index }">
                     <dropdown-list>
                         <dropdown-item :text="__('Edit')" :redirect="role.edit_url" />
                         <dropdown-item
@@ -19,34 +19,31 @@
                             <resource-deleter
                                 :ref="`deleter_${role.id}`"
                                 :resource="role"
-                                @deleted="removeRow(role)">
+                                :requires-elevated-session="true"
+                                @deleted="removeRow(role)"
+                            >
                             </resource-deleter>
                         </dropdown-item>
                     </dropdown-list>
                 </template>
             </data-list-table>
-        </div>
+        </ui-panel>
     </data-list>
 </template>
 
 <script>
-import Listing from '../Listing.vue'
+import Listing from '../Listing.vue';
 
 export default {
-
     mixins: [Listing],
 
-    props: [
-        'initialRows',
-        'initialColumns',
-    ],
+    props: ['initialRows', 'initialColumns'],
 
     data() {
         return {
             rows: this.initialRows,
-            columns: this.initialColumns
-        }
-    }
-
-}
+            columns: this.initialColumns,
+        };
+    },
+};
 </script>

@@ -1,5 +1,4 @@
 <template>
-
     <div>
         <header class="mb-6">
             <breadcrumb :url="globalsUrl" :title="__('Globals')" />
@@ -7,18 +6,22 @@
             <div class="flex items-center">
                 <h1 class="flex-1" v-text="__(title)" />
 
-                <div class="pt-px text-2xs text-gray-600 dark:text-dark-200 rtl:mr-4 ltr:ml-4 flex" v-if="! canEdit">
-                    <svg-icon name="light/lock" class="w-4 rtl:ml-1 ltr:mr-1 -mt-1" /> {{ __('Read Only') }}
+                <div class="flex pt-px text-2xs text-gray-600 dark:text-dark-200 ltr:ml-4 rtl:mr-4" v-if="!canEdit">
+                    <svg-icon name="light/lock" class="-mt-1 w-4 ltr:mr-1 rtl:ml-1" /> {{ __('Read Only') }}
                 </div>
 
-                <dropdown-list v-if="canConfigure || canEditBlueprint" class="rtl:ml-2 ltr:mr-2">
+                <dropdown-list v-if="canConfigure || canEditBlueprint" class="ltr:mr-2 rtl:ml-2">
                     <dropdown-item v-if="canConfigure" v-text="__('Configure')" :redirect="configureUrl" />
-                    <dropdown-item v-if="canEditBlueprint" :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
+                    <dropdown-item
+                        v-if="canEditBlueprint"
+                        :text="__('Edit Blueprint')"
+                        :redirect="actions.editBlueprint"
+                    />
                 </dropdown-list>
 
                 <site-selector
                     v-if="localizations.length > 1"
-                    class="rtl:ml-4 ltr:mr-4"
+                    class="ltr:mr-4 rtl:ml-4"
                     :sites="localizations"
                     :value="site"
                     @input="localizationSelected"
@@ -30,14 +33,18 @@
                     :class="{ 'opacity-25': !canSave }"
                     :disabled="!canSave"
                     @click.prevent="save"
-                    v-text="__('Save')" />
+                    v-text="__('Save')"
+                />
 
                 <slot name="action-buttons-right" />
             </div>
         </header>
 
-        <div v-if="fieldset.empty" class="text-center mt-10 border-2 dark:border-dark-300 border-dashed rounded-lg px-8 py-32">
-            <div class="max-w-md mx-auto opacity-50">
+        <div
+            v-if="fieldset.empty"
+            class="mt-10 rounded-lg border-2 border-dashed px-8 py-32 text-center dark:border-dark-300"
+        >
+            <div class="mx-auto max-w-md opacity-50">
                 <h1 class="my-6" v-text="__('This Global Set has no fields.')" />
                 <p v-text="__('messages.global_set_no_fields_description')" />
             </div>
@@ -56,8 +63,9 @@
             :localized-fields="localizedFields"
             :is-root="isRoot"
             @updated="values = $event"
+            v-slot="{ container, components, setFieldMeta }"
         >
-            <div slot-scope="{ container, components, setFieldMeta }">
+            <div>
                 <component
                     v-for="component in components"
                     :key="component.name"
@@ -66,7 +74,7 @@
                     v-bind="component.props"
                 />
                 <publish-tabs
-                    :read-only="! canEdit"
+                    :read-only="!canEdit"
                     :syncable="hasOrigin"
                     :enable-sidebar="false"
                     @updated="setFieldValue"
@@ -79,21 +87,18 @@
             </div>
         </publish-container>
     </div>
-
 </template>
 
 <script>
 import SiteSelector from '../SiteSelector.vue';
 import HasHiddenFields from '../publish/HasHiddenFields';
+import clone from '@statamic/util/clone.js';
 
 export default {
-
-    mixins: [
-        HasHiddenFields,
-    ],
+    mixins: [HasHiddenFields],
 
     components: {
-        SiteSelector
+        SiteSelector,
     },
 
     props: {
@@ -130,9 +135,9 @@ export default {
             localizing: false,
             fieldset: this.initialFieldset,
             title: this.initialTitle,
-            values: _.clone(this.initialValues),
-            meta: _.clone(this.initialMeta),
-            localizations: _.clone(this.initialLocalizations),
+            values: clone(this.initialValues),
+            meta: clone(this.initialMeta),
+            localizations: clone(this.initialLocalizations),
             localizedFields: this.initialLocalizedFields,
             hasOrigin: this.initialHasOrigin,
             originValues: this.initialOriginValues || {},
@@ -141,17 +146,20 @@ export default {
             error: null,
             errors: {},
             isRoot: this.initialIsRoot,
-        }
+        };
     },
 
     computed: {
+        store() {
+            return this.$refs.container.store;
+        },
 
         hasErrors() {
             return this.error || Object.keys(this.errors).length;
         },
 
         somethingIsLoading() {
-            return ! this.$progress.isComplete();
+            return !this.$progress.isComplete();
         },
 
         canSave() {
@@ -167,25 +175,21 @@ export default {
         },
 
         activeLocalization() {
-            return _.findWhere(this.localizations, { active: true });
+            return this.localizations.find((l) => l.active);
         },
 
         originLocalization() {
-            return _.findWhere(this.localizations, { origin: true });
-        }
-
+            return this.localizations.find((l) => l.origin);
+        },
     },
 
     watch: {
-
         saving(saving) {
             this.$progress.loading(`${this.publishContainer}-global-publish-form`, saving);
-        }
-
+        },
     },
 
     methods: {
-
         clearErrors() {
             this.error = null;
             this.errors = {};
@@ -201,34 +205,40 @@ export default {
         },
 
         runBeforeSaveHook() {
-            Statamic.$hooks.run('global-set.saving', {
-                globalSet: this.initialHandle,
-                values: this.values,
-                container: this.$refs.container,
-                storeName: this.publishContainer,
-            })
-            .then(this.performSaveRequest)
-            .catch(error => {
-                this.saving = false
-                this.$toast.error(error || 'Something went wrong');
-            })
+            Statamic.$hooks
+                .run('global-set.saving', {
+                    globalSet: this.initialHandle,
+                    values: this.values,
+                    container: this.$refs.container,
+                    storeName: this.publishContainer,
+                })
+                .then(this.performSaveRequest)
+                .catch((error) => {
+                    this.saving = false;
+                    this.$toast.error(error || 'Something went wrong');
+                });
         },
 
         performSaveRequest() {
-            const payload = { ...this.visibleValues, ...{
-                blueprint: this.fieldset.handle,
-                _localized: this.localizedFields,
-            }};
+            const payload = {
+                ...this.visibleValues,
+                ...{
+                    blueprint: this.fieldset.handle,
+                    _localized: this.localizedFields,
+                },
+            };
 
-            this.$axios[this.method](this.actions.save, payload).then(response => {
-                this.saving = false;
-                if (!response.data.saved) {
-                    return this.$toast.error(`Couldn't save global set`)
-                }
-                if (!this.isCreating) this.$toast.success(__('Saved'));
-                this.$refs.container.saved();
-                this.runAfterSaveHook(response);
-            }).catch(e => this.handleAxiosError(e));
+            this.$axios[this.method](this.actions.save, payload)
+                .then((response) => {
+                    this.saving = false;
+                    if (!response.data.saved) {
+                        return this.$toast.error(`Couldn't save global set`);
+                    }
+                    if (!this.isCreating) this.$toast.success(__('Saved'));
+                    this.$refs.container.saved();
+                    this.runAfterSaveHook(response);
+                })
+                .catch((e) => this.handleAxiosError(e));
         },
 
         runAfterSaveHook(response) {
@@ -240,7 +250,8 @@ export default {
                 })
                 .then(() => {
                     this.$nextTick(() => this.$emit('saved', response));
-                }).catch(e => {})
+                })
+                .catch((e) => {});
         },
 
         handleAxiosError(e) {
@@ -259,7 +270,7 @@ export default {
             if (localization.active) return;
 
             if (this.isDirty) {
-                if (! confirm(__('Are you sure? Unsaved changes will be lost.'))) {
+                if (!confirm(__('Are you sure? Unsaved changes will be lost.'))) {
                     return;
                 }
             }
@@ -270,7 +281,7 @@ export default {
                 window.history.replaceState({}, '', localization.url);
             }
 
-            this.$axios.get(localization.url).then(response => {
+            this.$axios.get(localization.url).then((response) => {
                 const data = response.data;
                 this.values = data.values;
                 this.originValues = data.originValues;
@@ -284,7 +295,7 @@ export default {
                 this.site = localization.handle;
                 this.localizing = false;
                 this.$nextTick(() => this.$refs.container.clearDirtyState());
-            })
+            });
         },
 
         localizationStatusText(localization) {
@@ -300,10 +311,10 @@ export default {
         },
 
         syncField(handle) {
-            if (! confirm(__('Are you sure? This field\'s value will be replaced by the value in the original entry.')))
+            if (!confirm(__("Are you sure? This field's value will be replaced by the value in the original entry.")))
                 return;
 
-            this.localizedFields = this.localizedFields.filter(field => field !== handle);
+            this.localizedFields = this.localizedFields.filter((field) => field !== handle);
             this.$refs.container.setFieldValue(handle, this.originValues[handle]);
 
             // Update the meta for this field. For instance, a relationship field would have its data preloaded into it.
@@ -312,16 +323,14 @@ export default {
         },
 
         desyncField(handle) {
-            if (!this.localizedFields.includes(handle))
-                this.localizedFields.push(handle);
+            if (!this.localizedFields.includes(handle)) this.localizedFields.push(handle);
 
             this.$refs.container.dirty();
         },
-
     },
 
     mounted() {
-        this.$keys.bindGlobal(['mod+s'], e => {
+        this.$keys.bindGlobal(['mod+s'], (e) => {
             e.preventDefault();
             this.save();
         });
@@ -329,7 +338,6 @@ export default {
 
     created() {
         window.history.replaceState({}, document.title, document.location.href.replace('created=true', ''));
-    }
-
-}
+    },
+};
 </script>

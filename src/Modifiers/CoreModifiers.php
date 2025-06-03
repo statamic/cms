@@ -27,6 +27,7 @@ use Statamic\Fields\Values;
 use Statamic\Fieldtypes\Bard;
 use Statamic\Fieldtypes\Bard\Augmentor;
 use Statamic\Fieldtypes\Link\ArrayableLink;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Dumper;
 use Statamic\Support\Html;
@@ -546,7 +547,7 @@ class CoreModifiers extends Modifier
      */
     public function daysAgo($value, $params)
     {
-        return (int) abs($this->carbon($value)->diffInDays(Arr::get($params, 0)));
+        return $this->carbon($value)->diffInDays(Arr::get($params, 0));
     }
 
     /**
@@ -1059,7 +1060,7 @@ class CoreModifiers extends Modifier
      */
     public function hoursAgo($value, $params)
     {
-        return (int) abs($this->carbon($value)->diffInHours(Arr::get($params, 0)));
+        return $this->carbon($value)->diffInHours(Arr::get($params, 0));
     }
 
     /**
@@ -1621,7 +1622,7 @@ class CoreModifiers extends Modifier
      */
     public function minutesAgo($value, $params)
     {
-        return (int) abs($this->carbon($value)->diffInMinutes(Arr::get($params, 0)));
+        return $this->carbon($value)->diffInMinutes(Arr::get($params, 0));
     }
 
     /**
@@ -1656,7 +1657,7 @@ class CoreModifiers extends Modifier
      */
     public function monthsAgo($value, $params)
     {
-        return (int) abs($this->carbon($value)->diffInMonths(Arr::get($params, 0)));
+        return $this->carbon($value)->diffInMonths(Arr::get($params, 0));
     }
 
     /**
@@ -2238,7 +2239,7 @@ class CoreModifiers extends Modifier
      */
     public function secondsAgo($value, $params)
     {
-        return (int) abs($this->carbon($value)->diffInSeconds(Arr::get($params, 0)));
+        return $this->carbon($value)->diffInSeconds(Arr::get($params, 0));
     }
 
     /**
@@ -2795,7 +2796,7 @@ class CoreModifiers extends Modifier
      */
     public function timezone($value, $params)
     {
-        $timezone = Arr::get($params, 0, Config::get('app.timezone'));
+        $timezone = Arr::get($params, 0, Statamic::displayTimezone());
 
         return $this->carbon($value)->tz($timezone);
     }
@@ -2937,7 +2938,7 @@ class CoreModifiers extends Modifier
      */
     public function weeksAgo($value, $params)
     {
-        return (int) abs($this->carbon($value)->diffInWeeks(Arr::get($params, 0)));
+        return $this->carbon($value)->diffInWeeks(Arr::get($params, 0));
     }
 
     /**
@@ -3215,6 +3216,10 @@ class CoreModifiers extends Modifier
     {
         if (! $value instanceof Carbon) {
             $value = (is_numeric($value)) ? Date::createFromTimestamp($value, config('app.timezone')) : Date::parse($value);
+        }
+
+        if (config('statamic.system.localize_dates_in_modifiers')) {
+            $value->setTimezone(Statamic::displayTimezone());
         }
 
         return $value;

@@ -9,7 +9,6 @@ class Taggable extends Fieldtype
 {
     protected $categories = ['structured'];
     protected $component = 'tags';
-    protected $icon = 'tags';
 
     protected function configFieldItems(): array
     {

@@ -1,273 +1,187 @@
-<template>
+<script setup>
+import Fields from '@statamic/components/ui/Publish/Fields.vue';
+import FieldsProvider from '@statamic/components/ui/Publish/FieldsProvider.vue';
+import { computed, inject } from 'vue';
+import { Icon, Switch, Subheading, Badge, Tooltip } from '@statamic/ui';
+import DropdownActions from '@statamic/components/field-actions/DropdownActions.vue';
+import { Motion } from 'motion-v';
+import { injectContainerContext } from '@statamic/components/ui/Publish/Container.vue';
+import PreviewHtml from '@statamic/components/fieldtypes/replicator/PreviewHtml.js';
+import FieldAction from '@statamic/components/field-actions/FieldAction.js';
 
+const emit = defineEmits(['collapsed', 'expanded', 'duplicated', 'removed']);
+
+const replicatorSets = inject('replicatorSets');
+
+const props = defineProps({
+    config: Object,
+    id: String,
+    fieldPath: String,
+    metaPath: String,
+    index: Number,
+    collapsed: Boolean,
+    values: Object,
+    sortableItemClass: String,
+    sortableHandleClass: String,
+    readOnly: Boolean,
+    enabled: Boolean,
+    hasError: Boolean,
+    canAddSet: Boolean,
+    showFieldPreviews: Boolean,
+});
+
+const { store } = injectContainerContext();
+const fieldPathPrefix = computed(() => `${props.fieldPath}.${props.index}`);
+const metaPathPrefix = computed(() => `${props.metaPath}.existing.${props.id}`);
+const isInvalid = computed(() => Object.keys(props.config).length === 0);
+
+const setGroup = computed(() => {
+    if (replicatorSets.length < 1) return null;
+
+    return (
+        replicatorSets.find((group) => {
+            return group.sets.filter((set) => set.handle === props.config.handle).length > 0;
+        }) ?? {}
+    );
+});
+
+const isSetGroupVisible = computed(() => replicatorSets.length > 1 && setGroup.value.display);
+
+const fieldActionPayload = computed(() => ({
+    // vm: this,
+    // fieldVm: this.fieldVm,
+    // fieldPathPrefix: this.fieldPathPrefix,
+    index: props.index,
+    values: props.values,
+    config: props.config,
+    // meta: this.meta,
+    update: (handle, value) => store.setDottedFieldValue({ path: `${fieldPathPrefix.value}.${handle}`, value }),
+    updateMeta: (handle, value) => store.setDottedFieldMeta({ path: `${metaPathPrefix.value}.${handle}`, value }),
+    isReadOnly: props.readOnly,
+    // store: this.store,
+    // storeName: this.storeName,
+}));
+
+const fieldActions = computed(() => {
+    return [...Statamic.$fieldActions.get('replicator-fieldtype-set')]
+        .map((action) => new FieldAction(action, fieldActionPayload.value))
+        .filter((action) => action.visible);
+});
+
+const previewText = computed(() => {
+    return Object.entries(data_get(store.previews, fieldPathPrefix.value) || {})
+        .filter(([handle, value]) => {
+            if (!handle.endsWith('_')) return false;
+            handle = handle.substr(0, handle.length - 1); // Remove the trailing underscore.
+            const config = props.config.fields.find((f) => f.handle === handle) || {};
+            return config.replicator_preview === undefined ? props.showFieldPreviews : config.replicator_preview;
+        })
+        .map(([handle, value]) => value)
+        .filter((value) => (['null', '[]', '{}', ''].includes(JSON.stringify(value)) ? null : value))
+        .map((value) => {
+            if (value instanceof PreviewHtml) return value.html;
+
+            if (typeof value === 'string') return escapeHtml(value);
+
+            if (Array.isArray(value) && typeof value[0] === 'string') {
+                return escapeHtml(value.join(', '));
+            }
+
+            return escapeHtml(JSON.stringify(value));
+        })
+        .join(' / ');
+});
+
+function toggleEnabledState() {
+    store.setDottedFieldValue({ path: `${fieldPathPrefix.value}.enabled`, value: !props.enabled });
+}
+
+function toggleCollapsedState() {
+    props.collapsed ? emit('expanded') : emit('collapsed');
+}
+
+function destroy() {
+    if (confirm(__('Are you sure?'))) emit('removed');
+}
+</script>
+
+<template>
     <div :class="sortableItemClass">
         <slot name="picker" />
-        <div class="replicator-set" :class="{ 'has-error': this.hasError }" :data-type="config.handle">
-
-            <div class="replicator-set-header" :class="{ 'p-2': isReadOnly, 'collapsed': collapsed, 'invalid': isInvalid }">
-                <div class="item-move sortable-handle" :class="sortableHandleClass" v-if="!isReadOnly"></div>
-                <div class="flex items-center flex-1 p-2 replicator-set-header-inner cursor-pointer" :class="{'flex items-center': collapsed}" @click="toggleCollapsedState">
-                    <label class="text-xs rtl:ml-2 ltr:mr-2 cursor-pointer">
+        <div
+            layout
+            class="shadow-ui-sm relative z-2 w-full rounded-lg border border-gray-200 bg-white text-base dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
+            :data-collapsed="collapsed ?? undefined"
+            :data-error="hasError ?? undefined"
+            :data-invalid="isInvalid ?? undefined"
+            :data-readonly="readOnly ?? undefined"
+            :data-type="config.handle"
+        >
+            <header
+                class="group/header animate-border-color flex items-center rounded-lg border-b border-transparent px-1.5 antialiased duration-200 hover:bg-gray-50"
+                :class="{ 'rounded-b-none border-gray-200! dark:border-white/15': !collapsed }"
+            >
+                <Icon
+                    name="handles"
+                    :class="sortableHandleClass"
+                    class="size-4 cursor-grab text-gray-400"
+                    v-if="!readOnly"
+                />
+                <button type="button" class="flex flex-1 items-center gap-4 p-2" @click="toggleCollapsedState">
+                    <Badge variant="flat" size="lg">
                         <span v-if="isSetGroupVisible">
                             {{ __(setGroup.display) }}
-                            <svg-icon name="micro/chevron-right" class="w-4" />
+                            <Icon name="ui/chevron-right" class="relative top-px size-3" />
                         </span>
-                        {{ display || config.handle }}
-                    </label>
-                    <div class="flex items-center" v-if="config.instructions && !collapsed">
-                        <svg-icon name="micro/circle-help" class="text-gray-700 hover:text-gray-800 h-3 w-3 text-xs" v-tooltip="{ content: $options.filters.markdown(__(config.instructions)), html:true }" />
-                    </div>
-                    <div v-show="collapsed" class="flex-1 min-w-0 w-1 rtl:pl-8 ltr:pr-8">
-                        <div
-                            v-html="previewText"
-                            class="help-block mb-0 whitespace-nowrap overflow-hidden text-ellipsis" />
-                    </div>
-                </div>
-                <div class="replicator-set-controls" v-if="!isReadOnly">
-                    <toggle-fieldtype
-                        handle="set-enabled"
-                        class="toggle-sm rtl:ml-2 ltr:mr-2"
-                        @input="toggleEnabledState"
-                        :value="values.enabled"
-                        v-tooltip.top="(values.enabled) ? __('Included in output') : __('Hidden from output')" />
+                        {{ __(config.display) || config.handle }}
+                    </Badge>
+                    <Tooltip :markdown="__(config.instructions)">
+                        <Icon
+                            v-if="config.instructions && !collapsed"
+                            name="info-square"
+                            class="size-3.5! text-gray-500"
+                        />
+                    </Tooltip>
+                    <Subheading
+                        v-show="collapsed"
+                        v-html="previewText"
+                        class="overflow-hidden text-ellipsis whitespace-nowrap"
+                    />
+                </button>
+                <div class="flex items-center gap-2" v-if="!readOnly">
+                    <Tooltip :text="enabled ? __('Included in output') : __('Hidden from output')">
+                        <Switch size="xs" :model-value="enabled" @update:model-value="toggleEnabledState" />
+                    </Tooltip>
+
+                    <!-- @TODO: Replace with UI/Dropdown when Actions are more isolatable -->
                     <dropdown-list>
                         <dropdown-actions :actions="fieldActions" v-if="fieldActions.length" />
                         <div class="divider" />
-                        <dropdown-item :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))" @click="toggleCollapsedState" />
-                        <dropdown-item :text="__('Duplicate Set')" @click="duplicate" v-if="canAddSet" />
+                        <dropdown-item
+                            :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))"
+                            @click="toggleCollapsedState"
+                        />
+                        <dropdown-item :text="__('Duplicate Set')" @click="emit('duplicated')" v-if="canAddSet" />
                         <dropdown-item :text="__('Delete Set')" class="warning" @click="destroy" />
                     </dropdown-list>
                 </div>
-            </div>
+            </header>
 
-            <div class="replicator-set-body publish-fields @container" v-show="!collapsed">
-                <set-field
-                    v-for="field in fields"
-                    v-show="showField(field, fieldPath(field))"
-                    :key="field.handle"
-                    :field="field"
-                    :meta="meta[field.handle]"
-                    :value="values[field.handle]"
-                    :parent-name="parentName"
-                    :set-index="index"
-                    :field-path="fieldPath(field)"
-                    :read-only="isReadOnly"
-                    :show-field-previews="showFieldPreviews"
-                    @updated="updated(field.handle, $event)"
-                    @meta-updated="metaUpdated(field.handle, $event)"
-                    @focus="$emit('focus')"
-                    @blur="$emit('blur')"
-                    @replicator-preview-updated="previewUpdated(field.handle, $event)"
-                />
-            </div>
+            <Motion
+                layout
+                class="overflow-hidden"
+                :initial="{ height: collapsed ? '0px' : 'auto' }"
+                :animate="{ height: collapsed ? '0px' : 'auto' }"
+                :transition="{ duration: 0.25, type: 'tween' }"
+            >
+                <FieldsProvider
+                    :fields="config.fields"
+                    :field-path-prefix="fieldPathPrefix"
+                    :meta-path-prefix="metaPathPrefix"
+                >
+                    <Fields class="p-4" />
+                </FieldsProvider>
+            </Motion>
         </div>
     </div>
-
 </template>
-
-<style scoped>
-    .draggable-mirror {
-        position: relative;
-        z-index: 1000;
-    }
-    .draggable-source--is-dragging {
-        opacity: 0.5;
-    }
-</style>
-
-<script>
-import SetField from './Field.vue';
-import ManagesPreviewText from './ManagesPreviewText';
-import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
-import HasFieldActions from '../../field-actions/HasFieldActions.js';
-import DropdownActions from '../../field-actions/DropdownActions.vue';
-
-export default {
-
-    components: { SetField, DropdownActions },
-
-    mixins: [
-        ValidatesFieldConditions,
-        ManagesPreviewText,
-        HasFieldActions,
-    ],
-
-    inject: ['replicatorSets', 'storeName'],
-
-    props: {
-        config: {
-            type: Object,
-            required: true
-        },
-        meta: {
-            type: Object,
-            required: true
-        },
-        index: {
-            type: Number,
-            required: true
-        },
-        collapsed: {
-            type: Boolean,
-            default: false
-        },
-        values: {
-            type: Object,
-            required: true
-        },
-        parentName: {
-            type: String,
-            required: true
-        },
-        fieldPathPrefix: {
-            type: String,
-            required: true
-        },
-        hasError: {
-            type: Boolean,
-            default: false
-        },
-        sortableItemClass: {
-            type: String
-        },
-        sortableHandleClass: {
-            type: String
-        },
-        canAddSet: {
-            type: Boolean,
-            default: true
-        },
-        isReadOnly: Boolean,
-        previews: Object,
-        showFieldPreviews: {
-            type: Boolean
-        }
-    },
-
-    data() {
-        return {
-            fieldPreviews: this.previews,
-        }
-    },
-
-    computed: {
-
-        fields() {
-            return this.config.fields;
-        },
-
-        display() {
-            return __(this.config.display) || this.values.type;
-        },
-
-        instructions() {
-            return this.config.instructions ? markdown(__(this.config.instructions)) : null;
-        },
-
-        setGroup() {
-            if (this.replicatorSets.length < 1) return null;
-
-            return this.replicatorSets.find((group) => {
-                return group.sets.filter((set) => set.handle === this.config.handle).length > 0;
-            });
-        },
-
-        hasMultipleFields() {
-            return this.fields.length > 1;
-        },
-
-        isSetGroupVisible() {
-            return this.replicatorSets.length > 1 && this.setGroup?.display;
-        },
-
-        isHidden() {
-            return this.values['#hidden'] === true;
-        },
-
-        isInvalid() {
-            return Object.keys(this.config).length === 0;
-        },
-
-        fieldVm() {
-            let vm = this;
-            while (vm !== vm.$root) {
-                if (vm.$options.name === 'replicator-fieldtype') return vm;
-                vm = vm.$parent;
-            }
-        },
-
-        fieldActionPayload() {
-            return {
-                vm: this,
-                fieldVm: this.fieldVm,
-                fieldPathPrefix: this.fieldPathPrefix,
-                index: this.index,
-                values: this.values,
-                config: this.config,
-                meta: this.meta,
-                update: (handle, value) => this.updated(handle, value),
-                updateMeta: (handle, value) => this.metaUpdated(handle, value),
-                isReadOnly: this.isReadOnly,
-                store: this.$store,
-                storeName: this.storeName,
-            };
-        },
-
-    },
-
-    methods: {
-
-        updated(handle, value) {
-            this.$emit('updated', this.index, {...this.values, [handle]: value });
-        },
-
-        metaUpdated(handle, value) {
-            this.$emit('meta-updated', { ...this.meta, [handle]: value });
-        },
-
-        previewUpdated(handle, value) {
-            this.$emit('previews-updated', this.fieldPreviews = { ...this.fieldPreviews, [handle]: value });
-        },
-
-        destroy() {
-            if (! confirm(__('Are you sure?'))) return;
-
-            this.$emit('removed');
-        },
-
-        toggle() {
-            this.isHidden ? this.expand() : this.collapse();
-        },
-
-        toggleEnabledState() {
-            this.updated('enabled', ! this.values.enabled);
-        },
-
-        toggleCollapsedState() {
-            if (this.collapsed) {
-                this.expand();
-            } else {
-                this.collapse();
-            }
-        },
-
-        collapse() {
-            this.$emit('collapsed');
-        },
-
-        expand() {
-            this.$emit('expanded');
-        },
-
-        duplicate() {
-            this.$emit('duplicated');
-        },
-
-        fieldPath(field) {
-            return `${this.fieldPathPrefix}.${this.index}.${field.handle}`;
-        },
-
-    }
-
-}
-</script>

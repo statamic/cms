@@ -4,14 +4,12 @@
 
 .yaml-fieldtype {
     .code-mode {
-        @apply absolute top-2 z-10 right-3 text-gray-600 text-xs uppercase tracking-wider;
+        @apply absolute right-3 top-2 z-10 text-xs uppercase tracking-wider text-gray-600;
     }
     .CodeMirror-wrap {
-        @apply rounded;
+        @apply rounded-sm;
     }
 }
-
-
 
 /* Inside a Grid field
   ========================================================================== */
@@ -19,12 +17,18 @@
 .grid-fieldtype .yaml-fieldtype-wrapper {
     > span {
         border-top: 0;
-        border-right: 0 ; [dir="rtl"] & { border-right: 0 ; border-left: 0 ; }
+        border-right: 0;
+        [dir='rtl'] & {
+            border-right: 0;
+            border-left: 0;
+        }
     }
 
     .editor {
         border: none;
         border-radius: 0;
-        .CodeMirror { box-shadow: none; }
+        .CodeMirror {
+            box-shadow: none;
+        }
     }
 }

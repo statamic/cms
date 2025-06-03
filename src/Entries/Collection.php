@@ -43,6 +43,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
     private $cachedRoutes = null;
     protected $mount;
     protected $title;
+    protected $icon;
     protected $template;
     protected $layout;
     protected $sites;
@@ -229,6 +230,16 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             ->args(func_get_args());
     }
 
+    public function icon($icon = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('icon')
+            ->getter(function ($icon) {
+                return $icon ?? 'collections';
+            })
+            ->args(func_get_args());
+    }
+
     public function absoluteUrl($site = null)
     {
         if (! $mount = $this->mount()) {
@@ -384,16 +395,6 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
         if ($this->dated()) {
             $blueprint->ensureField('date', ['type' => 'date', 'required' => true, 'default' => 'now'], 'sidebar');
-        }
-
-        if ($this->hasStructure() && ! $this->orderable()) {
-            $blueprint->ensureField('parent', [
-                'type' => 'entries',
-                'collections' => [$this->handle()],
-                'max_items' => 1,
-                'listable' => false,
-                'localizable' => true,
-            ], 'sidebar');
         }
 
         foreach ($this->taxonomies() as $taxonomy) {
@@ -560,6 +561,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         $formerlyToArray = [
             'title' => $this->title,
             'handle' => $this->handle,
+            'icon' => $this->icon,
             'routes' => $this->routes,
             'dated' => $this->dated,
             'past_date_behavior' => $this->pastDateBehavior(),

@@ -1,41 +1,23 @@
 <script>
-import Fuse from 'fuse.js';
+import fuzzysort from 'fuzzysort';
+import { sortBy } from 'lodash-es';
 
 export default {
+    emits: ['selections-updated', 'visible-columns-updated'],
     props: {
-        columns: {
-            type: Array,
-            default: () => []
-        },
-        rows: {
-            type: Array,
-            required: true,
-        },
-        searchQuery: {
-            type: String,
-            default: ''
-        },
-        selections: {
-            type: Array,
-            default: () => []
-        },
-        maxSelections: {
-            type: Number
-        },
-        sort: {
-            type: Boolean,
-            default: true
-        },
-        sortColumn: String,
-        sortDirection: {
-            type: String,
-            default: 'asc'
-        }
+        columns: { type: Array, default: () => [] },
+        rows: { type: Array, required: true },
+        searchQuery: { type: String, default: '' },
+        selections: { type: Array, default: () => [] },
+        maxSelections: { type: Number },
+        sort: { type: Boolean, default: true },
+        sortColumn: { type: String },
+        sortDirection: { type: String, default: 'asc' },
     },
     provide() {
         return {
-            sharedState: this.sharedState
-        }
+            sharedState: this.sharedState,
+        };
     },
     data() {
         return {
@@ -48,12 +30,11 @@ export default {
                 originalRows: this.rows,
                 selections: this.selections,
                 maxSelections: this.maxSelections,
-            }
-        }
+            },
+        };
     },
 
     computed: {
-
         filteredRows() {
             let rows = this.rows;
             rows = this.filterBySearch(rows);
@@ -61,32 +42,34 @@ export default {
         },
 
         visibleColumns() {
-            return this.sharedState.columns.filter(column => column.visible);
+            return this.sharedState.columns.filter((column) => column.visible);
         },
 
         searchableColumns() {
             return this.visibleColumns.length
-                ? this.visibleColumns.map(column => column.field)
+                ? this.visibleColumns.map((column) => column.field)
                 : Object.keys(rows[0]);
         },
-
     },
 
     watch: {
-
         filteredRows: {
             immediate: true,
             handler: function (rows) {
                 this.sharedState.rows = rows;
-            }
+            },
         },
 
         selections(selections) {
             this.sharedState.selections = selections;
         },
 
-        'sharedState.selections': function (selections) {
-            this.$emit('selections-updated', selections);
+        'sharedState.selections': {
+            immediate: true,
+            deep: true,
+            handler: function (selections) {
+                this.$emit('selections-updated', selections);
+            },
         },
 
         columns(columns) {
@@ -100,7 +83,6 @@ export default {
         visibleColumns(columns) {
             this.$emit('visible-columns-updated', columns);
         },
-
     },
 
     created() {
@@ -109,12 +91,11 @@ export default {
         this.$events.$on('clear-selections', this.clearSelections);
     },
 
-    destroyed() {
+    unmounted() {
         this.$events.$off('clear-selections', this.clearSelections);
     },
 
     methods: {
-
         setInitialSortColumn() {
             const columns = this.sharedState.columns;
 
@@ -126,25 +107,23 @@ export default {
         },
 
         filterBySearch(rows) {
-            if (! this.searchQuery) return rows;
+            if (!this.searchQuery) return rows;
 
-            const fuse = new Fuse(rows, {
-                findAllMatches: true,
-                threshold: 0.1,
-                minMatchCharLength: 2,
-                keys: this.searchableColumns,
-            });
-
-            return fuse.search(this.searchQuery).map(result => result.item);
+            return fuzzysort
+                .go(this.searchQuery, rows, {
+                    all: true,
+                    keys: this.searchableColumns,
+                })
+                .map((result) => result.obj);
         },
 
         sortRows(rows) {
-            if (! this.sort) return rows;
+            if (!this.sort) return rows;
 
             // If no column is selected, don't sort.
-            if (! this.sharedState.sortColumn) return rows;
+            if (!this.sharedState.sortColumn) return rows;
 
-            rows = _.sortBy(rows, this.sharedState.sortColumn);
+            rows = sortBy(rows, this.sharedState.sortColumn);
 
             if (this.sharedState.sortDirection === 'desc') {
                 rows = rows.reverse();
@@ -156,15 +135,13 @@ export default {
         clearSelections() {
             this.sharedState.selections = [];
         },
-
     },
 
     render() {
-        return this.$scopedSlots.default({
+        return this.$slots.default({
             rows: this.filteredRows,
             hasSelections: this.sharedState.selections.length > 0,
-        });
-    }
-
-}
+        })[0];
+    },
+};
 </script>

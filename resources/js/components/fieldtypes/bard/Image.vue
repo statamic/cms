@@ -1,49 +1,63 @@
 <template>
-
     <node-view-wrapper>
         <div
             class="bard-inline-image-container shadow-sm"
             :class="{
-                'border-blue-400' : selected,
+                'border-blue-400': selected,
             }"
         >
             <div v-if="src" class="p-2 text-center" draggable="true" data-drag-handle>
                 <div ref="content" hidden />
-                <img :src="src" class="block mx-auto rounded-sm" />
+                <img :src="src" class="mx-auto block rounded-xs" />
             </div>
 
-            <div class="@container/toolbar flex items-center border-t dark:border-dark-900 justify-center py-2 px-2 text-2xs text-white dark:text-dark-150 text-center space-x-1 sm:space-x-3 rtl:space-x-reverse">
-                <button v-if="!src" @click="openSelector" type="button" class="flex btn btn-sm px-3 py-1.5">
-                    <svg-icon name="folder-image" class="h-4" />
-                    <span class="rtl:mr-2 ltr:ml-2 hidden @md/toolbar:inline-block">{{ __('Choose Image') }}</span>
-                </button>
-                <button v-if="src" @click="edit" type="button" class="flex btn btn-sm px-3 py-1.5">
-                    <svg-icon name="pencil" class="h-4" />
-                    <span class="rtl:mr-2 ltr:ml-2 hidden @md/toolbar:inline-block">{{ __('Edit Image') }}</span>
-                </button>
-                <button v-if="src" @click="toggleAltEditor" type="button" class="flex btn btn-sm px-3 py-1.5" :class="{ active: showingAltEdit }">
-                    <svg-icon name="rename-file" class="h-4" />
-                    <span class="rtl:mr-2 ltr:ml-2 hidden @md/toolbar:inline-block">{{ __('Override Alt') }}</span>
-                </button>
-                <button v-if="src" @click="openSelector" type="button" class="flex btn btn-sm px-3 py-1.5">
-                    <svg-icon name="swap" class="h-4" />
-                    <span class="rtl:mr-2 ltr:ml-2 hidden @md/toolbar:inline-block">{{ __('Replace') }}</span>
-                </button>
-                <button @click="deleteNode" class="flex btn btn-sm text-red-500 px-3 py-1.5">
-                    <svg-icon name="trash" class="h-4" />
-                    <span class="rtl:mr-2 ltr:ml-2 hidden @md/toolbar:inline-block">{{ __('Remove') }}</span>
-                </button>
-            </div>
-
-            <div v-if="showingAltEdit" class="flex items-center p-2 border-t dark:border-dark-900 rounded-b" @paste.stop>
-                <text-input name="alt" :focus="showingAltEdit" v-model="alt" :placeholder="assetAlt" :prepend="__('Alt Text')" class="flex-1" />
-            </div>
-
-            <stack
-                v-if="showingSelector"
-                name="asset-selector"
-                @closed="closeSelector"
+            <div
+                class="flex items-center justify-center space-x-1 border-t px-2 py-2 text-center text-2xs text-white @container/toolbar dark:border-dark-900 dark:text-dark-150 sm:space-x-3 rtl:space-x-reverse"
             >
+                <button v-if="!src" @click="openSelector" type="button" class="btn btn-sm flex px-3 py-1.5">
+                    <svg-icon name="folder-image" class="h-4" />
+                    <span class="hidden @md/toolbar:inline-block ltr:ml-2 rtl:mr-2">{{ __('Choose Image') }}</span>
+                </button>
+                <button v-if="src" @click="edit" type="button" class="btn btn-sm flex px-3 py-1.5">
+                    <svg-icon name="pencil" class="h-4" />
+                    <span class="hidden @md/toolbar:inline-block ltr:ml-2 rtl:mr-2">{{ __('Edit Image') }}</span>
+                </button>
+                <button
+                    v-if="src"
+                    @click="toggleAltEditor"
+                    type="button"
+                    class="btn btn-sm flex px-3 py-1.5"
+                    :class="{ active: showingAltEdit }"
+                >
+                    <svg-icon name="rename-file" class="h-4" />
+                    <span class="hidden @md/toolbar:inline-block ltr:ml-2 rtl:mr-2">{{ __('Override Alt') }}</span>
+                </button>
+                <button v-if="src" @click="openSelector" type="button" class="btn btn-sm flex px-3 py-1.5">
+                    <svg-icon name="swap" class="h-4" />
+                    <span class="hidden @md/toolbar:inline-block ltr:ml-2 rtl:mr-2">{{ __('Replace') }}</span>
+                </button>
+                <button @click="deleteNode" class="btn btn-sm flex px-3 py-1.5 text-red-500">
+                    <svg-icon name="trash" class="h-4" />
+                    <span class="hidden @md/toolbar:inline-block ltr:ml-2 rtl:mr-2">{{ __('Remove') }}</span>
+                </button>
+            </div>
+
+            <div
+                v-if="showingAltEdit"
+                class="flex items-center rounded-b border-t p-2 dark:border-dark-900"
+                @paste.stop
+            >
+                <text-input
+                    name="alt"
+                    :focus="showingAltEdit"
+                    v-model="alt"
+                    :placeholder="assetAlt"
+                    :prepend="__('Alt Text')"
+                    class="flex-1"
+                />
+            </div>
+
+            <stack v-if="showingSelector" name="asset-selector" @closed="closeSelector">
                 <selector
                     :container="extension.options.bard.config.container"
                     :folder="extension.options.bard.config.folder || '/'"
@@ -52,7 +66,8 @@
                     :view-mode="'grid'"
                     :max-files="1"
                     @selected="assetsSelected"
-                    @closed="closeSelector">
+                    @closed="closeSelector"
+                >
                 </selector>
             </stack>
 
@@ -68,12 +83,11 @@
             </asset-editor>
         </div>
     </node-view-wrapper>
-
 </template>
 
 <script>
 import Asset from '../assets/Asset';
-import { NodeViewWrapper } from '@tiptap/vue-2';
+import { NodeViewWrapper } from '@tiptap/vue-3';
 import Selector from '../../assets/Selector.vue';
 
 export default {
@@ -84,7 +98,7 @@ export default {
         Selector,
     },
 
-    inject: ['storeName'],
+    inject: ['store'],
 
     props: [
         'editor', // the editor instance
@@ -106,11 +120,10 @@ export default {
             loading: false,
             alt: this.node.attrs.alt,
             showingAltEdit: !!this.node.attrs.alt,
-        }
+        };
     },
 
     computed: {
-
         src() {
             if (this.editorAsset) {
                 return this.editorAsset.url;
@@ -127,8 +140,7 @@ export default {
 
         selections() {
             return this.assetId ? [this.assetId] : [];
-        }
-
+        },
     },
 
     created() {
@@ -147,21 +159,18 @@ export default {
     },
 
     watch: {
-
         actualSrc(src) {
-            if ( !this.node.attrs.src) {
+            if (!this.node.attrs.src) {
                 this.updateAttributes({ src, asset: !!this.assetId });
             }
         },
 
         alt(alt) {
             this.updateAttributes({ alt });
-        }
-
+        },
     },
 
     methods: {
-
         openSelector() {
             this.showingSelector = true;
         },
@@ -177,7 +186,7 @@ export default {
         },
 
         loadAsset(id) {
-            let preloaded = _.find(this.$store.state.publish[this.storeName].preloadedAssets, asset => asset.id === id);
+            let preloaded = this.store.preloadedAssets.find((asset) => asset.id === id);
 
             if (preloaded) {
                 // TODO
@@ -187,11 +196,13 @@ export default {
                 // return;
             }
 
-            this.$axios.post(cp_url('assets-fieldtype'), {
-                assets: [id],
-            }).then(response => {
-                this.setAsset(response.data[0]);
-            });
+            this.$axios
+                .post(cp_url('assets-fieldtype'), {
+                    assets: [id],
+                })
+                .then((response) => {
+                    this.setAsset(response.data[0]);
+                });
         },
 
         setAsset(asset) {
@@ -219,6 +230,6 @@ export default {
         // This is a workaround to avoid Firefox's inability to select inputs/textareas when the
         // parent element is set to draggable: https://bugzilla.mozilla.org/show_bug.cgi?id=739071
         this.$el.setAttribute('draggable', false);
-    }
-}
+    },
+};
 </script>

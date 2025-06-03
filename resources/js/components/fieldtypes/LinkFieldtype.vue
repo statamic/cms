@@ -1,27 +1,13 @@
 <template>
-    <div class="flex items-center">
-
+    <div class="flex items-center gap-3">
         <!-- Link type selector -->
-        <div class="w-28 rtl:ml-4 ltr:mr-4">
-            <v-select
-                v-model="option"
-                append-to-body
-                :calculate-position="positionOptions"
-                :options="options"
-                :clearable="false"
-                :reduce="(option) => option.value"
-
-            >
-                <template #option="{ label }">
-                  {{ __(label) }}
-                </template>
-            </v-select>
+        <div class="w-28">
+            <Select :options v-model="option" />
         </div>
 
         <div class="flex-1 truncate">
-
             <!-- URL text input -->
-            <text-input v-if="option === 'url'" v-model="urlValue" />
+            <Input v-if="option === 'url'" v-model="urlValue" />
 
             <!-- Entry select -->
             <relationship-fieldtype
@@ -46,20 +32,23 @@
                 @input="assetsSelected"
                 @meta-updated="meta.asset.meta = $event"
             />
-
         </div>
     </div>
 </template>
 
 <script>
-import PositionsSelectOptions from '../../mixins/PositionsSelectOptions';
+import Fieldtype from './Fieldtype.vue';
+import { Input, Select } from '@statamic/ui';
 
 export default {
+    components: { Input, Text, Select },
+    mixins: [Fieldtype],
 
-    mixins: [Fieldtype, PositionsSelectOptions],
+    provide: {
+        isInLinkField: true,
+    },
 
     data() {
-
         return {
             option: this.meta.initialOption,
             options: this.initialOptions(),
@@ -67,26 +56,20 @@ export default {
             selectedEntries: this.meta.initialSelectedEntries,
             selectedAssets: this.meta.initialSelectedAssets,
             metaChanging: false,
-        }
-
+        };
     },
 
     computed: {
-
         entryValue() {
-            return this.selectedEntries.length
-                ? `entry::${this.selectedEntries[0]}`
-                : null
+            return this.selectedEntries.length ? `entry::${this.selectedEntries[0]}` : null;
         },
 
         assetValue() {
-            return this.selectedAssets.length
-                ? `asset::${this.selectedAssets[0]}`
-                : null
+            return this.selectedAssets.length ? `asset::${this.selectedAssets[0]}` : null;
         },
 
         replicatorPreview() {
-            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
 
             switch (this.option) {
                 case 'url':
@@ -100,12 +83,10 @@ export default {
             }
 
             return this.value;
-        }
-
+        },
     },
 
     watch: {
-
         option(option, oldOption) {
             if (this.metaChanging) return;
 
@@ -129,14 +110,14 @@ export default {
                 }
             }
 
-            this.updateMeta({...this.meta, initialOption: option});
+            this.updateMeta({ ...this.meta, initialOption: option });
         },
 
         urlValue(url) {
             if (this.metaChanging) return;
 
             this.update(url);
-            this.updateMeta({...this.meta, initialUrl: url});
+            this.updateMeta({ ...this.meta, initialUrl: url });
         },
 
         meta(meta, oldMeta) {
@@ -147,48 +128,36 @@ export default {
             this.option = meta.initialOption;
             this.selectedEntries = meta.initialSelectedEntries;
             this.selectedAssets = meta.initialSelectedAssets;
-            this.$nextTick(() => this.metaChanging = false);
-        }
-
+            this.$nextTick(() => (this.metaChanging = false));
+        },
     },
 
     methods: {
-
         initialOptions() {
             return [
-
-                this.config.required
-                    ? null
-                    : { label: __('None'), value: null },
+                this.config.required ? null : { label: __('None'), value: null },
 
                 { label: __('URL'), value: 'url' },
 
-                this.meta.showFirstChildOption
-                    ? { label: __('First Child'), value: 'first-child' }
-                    : null,
+                this.meta.showFirstChildOption ? { label: __('First Child'), value: 'first-child' } : null,
 
                 { label: __('Entry'), value: 'entry' },
 
-                this.meta.showAssetOption
-                    ? { label: __('Asset'), value: 'asset' }
-                    : null,
-
-            ].filter(option => option);
+                this.meta.showAssetOption ? { label: __('Asset'), value: 'asset' } : null,
+            ].filter((option) => option);
         },
 
         entriesSelected(entries) {
             this.selectedEntries = entries;
             this.update(this.entryValue);
-            this.updateMeta({...this.meta, initialSelectedEntries: entries});
+            this.updateMeta({ ...this.meta, initialSelectedEntries: entries });
         },
 
         assetsSelected(assets) {
             this.selectedAssets = assets;
             this.update(this.assetValue);
-            this.updateMeta({...this.meta, initialSelectedAssets: assets});
-        }
-
-    }
-
-}
+            this.updateMeta({ ...this.meta, initialSelectedAssets: assets });
+        },
+    },
+};
 </script>

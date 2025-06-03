@@ -1,22 +1,23 @@
 /* ==========================================================================
    MODALS
    ========================================================================== */
-.vm--container {
+.vfm {
     direction: ltr;
 }
 
-.vm--modal {
-    @apply rounded-lg dark:bg-dark-600 dark:shadow-dark !important;
+.vfm__content {
+    @apply rounded-lg! dark:bg-dark-600! dark:shadow-lg!;
+    @apply overflow-clip bg-white shadow-2xl;
 
     [dir='rtl'] & {
         direction: rtl;
     }
 }
 
-.vm--overlay {
-    background: hsla(210, 20%, 10%, .15) !important;
+.vfm__overlay {
+    background: hsla(210, 20%, 10%, 0.15) !important;
 }
 
 .confirmation-modal .publish-fields .form-group {
-    @apply p-0 mb-6;
+    @apply mb-6 p-0;
 }

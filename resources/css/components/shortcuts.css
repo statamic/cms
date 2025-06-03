@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .shortcut-pair {
-    @apply pb-2 mb-2 antialiased flex items-center justify-between;
+    @apply mb-2 flex items-center justify-between pb-2 antialiased;
     &:not(:last-child) {
         @apply border-b dark:border-dark-800;
     }
@@ -12,25 +12,34 @@
 .shortcut {
     @apply flex items-center justify-center text-3xs;
     border-radius: 3px;
-    background: linear-gradient(-225deg,#d5dbe4,#f8f8f8);
-    box-shadow: inset 0 -2px 0 0 #cdcde6, inset 0 0 1px 1px #fff, 0 1px 2px 1px rgba(30,35,90,.4);
+    background: linear-gradient(-225deg, #d5dbe4, #f8f8f8);
+    box-shadow:
+        inset 0 -2px 0 0 #cdcde6,
+        inset 0 0 1px 1px #fff,
+        0 1px 2px 1px rgba(30, 35, 90, 0.4);
     color: #8d949e;
     min-width: 18px;
     height: 18px;
-    margin: 0 .25em;
-    padding: 0 2px 2px 2px ; [dir="rtl"] & { padding: 0 2px 2px 2px ; }
+    margin: 0 0.25em;
+    padding: 0 2px 2px 2px;
+    [dir='rtl'] & {
+        padding: 0 2px 2px 2px;
+    }
     .dark & {
-        @apply bg-gradient-to-br from-dark-500 to-dark-600 text-dark-150;
-        box-shadow: inset 0 1px 0 0 #6b6868, inset 0 0 1px 1px rgba(0,0,0,.7), 0 1px 3px 1px rgba(30,35,90,.2);
+        @apply bg-linear-to-br from-dark-500 to-dark-600 text-dark-150;
+        box-shadow:
+            inset 0 1px 0 0 #6b6868,
+            inset 0 0 1px 1px rgba(0, 0, 0, 0.7),
+            0 1px 3px 1px rgba(30, 35, 90, 0.2);
     }
 }
 
 .shortcut-combo {
-    @apply flex order-2;
+    @apply order-2 flex;
 }
 
 .shortcut-joiner {
-    @apply text-gray text-xs mx-1;
+    @apply mx-1 text-xs text-gray;
 }
 
 .shortcut-value {

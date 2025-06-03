@@ -36,8 +36,8 @@ class Invalidate implements ShouldQueue
         EntryScheduleReached::class => 'invalidateEntry',
         LocalizedTermSaved::class => 'invalidateTerm',
         LocalizedTermDeleted::class => 'invalidateTerm',
-        GlobalVariablesSaved::class => 'invalidateGlobalSet',
-        GlobalVariablesDeleted::class => 'invalidateGlobalSet',
+        GlobalVariablesSaved::class => 'invalidateGlobalVariables',
+        GlobalVariablesDeleted::class => 'invalidateGlobalVariables',
         NavSaved::class => 'invalidateNav',
         NavDeleted::class => 'invalidateNav',
         FormSaved::class => 'invalidateForm',
@@ -77,7 +77,7 @@ class Invalidate implements ShouldQueue
         $this->invalidator->invalidate($event->term);
     }
 
-    public function invalidateGlobalSet($event)
+    public function invalidateGlobalVariables($event)
     {
         $this->invalidator->invalidate($event->variables);
     }

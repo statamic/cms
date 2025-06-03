@@ -1,27 +1,33 @@
 <template>
     <div class="array-fieldtype-container">
-
         <div v-if="isSingle" class="flex items-center">
             <div class="input-group">
                 <div class="input-group-prepend flex items-center">
-                     <select class="bg-transparent appearance-none shadow-none outline-none border-0 text-sm" @input="setKey($event.target.value)">
+                    <select
+                        class="appearance-none border-0 bg-transparent text-sm shadow-none outline-hidden"
+                        @input="setKey($event.target.value)"
+                    >
                         <option
                             v-for="(element, index) in keyedData"
                             v-text="keys[element.key] || element.key"
                             :key="element._id"
                             :value="element.key"
-                            :selected="element.key === selectedKey" />
+                            :selected="element.key === selectedKey"
+                        />
                     </select>
-                    <svg-icon name="micro/chevron-down-xs" class="w-2 rtl:mr-2 ltr:ml-2" />
+                    <svg-icon name="micro/chevron-down-xs" class="w-2 ltr:ml-2 rtl:mr-2" />
                 </div>
+                <template v-for="(element, index) in keyedData">
                     <input
                         type="text"
                         class="input-text"
-                        v-for="(element, index) in keyedData"
                         :key="element._id"
                         v-if="element.key === selectedKey"
-                        :id="fieldId+'__'+element.key" v-model="data[index].value" :readonly="isReadOnly"
+                        :id="fieldId + '__' + element.key"
+                        v-model="data[index].value"
+                        :readonly="isReadOnly"
                     />
+                </template>
             </div>
         </div>
 
@@ -29,9 +35,17 @@
             <table class="array-table">
                 <tbody>
                     <tr v-if="data" v-for="(element, index) in keyedData" :key="element._id">
-                        <th class="w-1/4"><label :for="fieldId+'__'+element.key">{{ keys[element.key] || element.key }}</label></th>
+                        <th class="w-1/4">
+                            <label :for="fieldId + '__' + element.key">{{ keys[element.key] || element.key }}</label>
+                        </th>
                         <td>
-                            <input type="text" class="input-text-minimal" :id="fieldId+'__'+element.key" v-model="data[index].value" :readonly="isReadOnly" />
+                            <input
+                                type="text"
+                                class="w-full"
+                                :id="fieldId + '__' + element.key"
+                                v-model="data[index].value"
+                                :readonly="isReadOnly"
+                            />
                         </td>
                     </tr>
                 </tbody>
@@ -61,13 +75,27 @@
                             <tr class="sortable-row" v-for="(element, index) in data" :key="element._id">
                                 <td class="sortable-handle table-drag-handle" v-if="!isReadOnly"></td>
                                 <td>
-                                    <input type="text" class="input-text font-bold" v-model="element.key" :readonly="isReadOnly" />
+                                    <input
+                                        type="text"
+                                        class="input-text font-bold"
+                                        v-model="element.key"
+                                        :readonly="isReadOnly"
+                                    />
                                 </td>
                                 <td>
-                                    <input type="text" class="input-text" v-model="element.value" :readonly="isReadOnly" />
+                                    <input
+                                        type="text"
+                                        class="input-text"
+                                        v-model="element.value"
+                                        :readonly="isReadOnly"
+                                    />
                                 </td>
                                 <td class="row-controls" v-if="!isReadOnly">
-                                    <a @click="deleteOrConfirm(index)" class="inline opacity-25 text-lg antialiased hover:opacity-75">&times;</a>
+                                    <a
+                                        @click="deleteOrConfirm(index)"
+                                        class="inline text-lg antialiased opacity-25 hover:opacity-75"
+                                        >&times;</a
+                                    >
                                 </td>
                             </tr>
                         </tbody>
@@ -90,42 +118,43 @@
                 </confirmation-modal>
             </div>
         </template>
-
     </div>
 </template>
 
 <script>
-import { SortableList, SortableItem, SortableHelpers } from '../sortable/Sortable';
+import Fieldtype from './Fieldtype.vue';
+import { SortableList, SortableHelpers } from '../sortable/Sortable';
 
 export default {
-
     mixins: [Fieldtype, SortableHelpers],
 
     components: {
         SortableList,
-        SortableItem
     },
 
     data() {
+        const keys = Object.keys(this.value || {});
+        const selectedKey = keys.length > 0 ? keys[0] : null;
+
         return {
             data: this.objectToSortable(this.value || []),
-            selectedKey:  Object.keys(this.value)[0],
-            deleting: false
-        }
+            selectedKey,
+            deleting: false,
+        };
     },
 
     watch: {
         data: {
             deep: true,
-            handler (data) {
+            handler(data) {
                 this.updateDebounced(this.sortableToObject(data));
-            }
+            },
         },
 
         value(value) {
             if (JSON.stringify(value) == JSON.stringify(this.sortableToObject(this.data))) return;
             this.data = this.objectToSortable(value);
-        }
+        },
     },
 
     computed: {
@@ -138,7 +167,7 @@ export default {
         },
 
         isDynamic() {
-            return ! this.isKeyed;
+            return !this.isKeyed;
         },
 
         isSingle() {
@@ -146,7 +175,7 @@ export default {
         },
 
         keyedData() {
-            return this.data.filter(element => this.keys.hasOwnProperty(element.key));
+            return this.data.filter((element) => this.keys.hasOwnProperty(element.key));
         },
 
         maxItems() {
@@ -174,14 +203,14 @@ export default {
         },
 
         replicatorPreview() {
-            if (! this.showFieldPreviews || ! this.config.replicator_preview) return;
+            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
 
-            return _.reduce(this.value, (carry, value, key) => {
+            return this.value.reduce((carry, value, key) => {
                 let str = `${key}: ${value}`;
                 if (carry) str = carry + ', ' + str;
                 return str;
             }, '');
-        }
+        },
     },
 
     methods: {
@@ -215,9 +244,8 @@ export default {
         },
 
         setKey(key) {
-            this.selectedKey = key
-        }
-    }
-
-}
+            this.selectedKey = key;
+        },
+    },
+};
 </script>

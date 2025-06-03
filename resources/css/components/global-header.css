@@ -3,142 +3,69 @@
    ========================================================================== */
 
 .global-header {
-    @apply bg-white dark:bg-dark-600 shadow dark:shadow-dark rtl:pl-4 ltr:pr-4 h-13 items-center flex relative w-full;
+    @apply relative flex h-13 w-full items-center bg-white shadow dark:bg-dark-600 dark:shadow-lg ltr:pr-4 rtl:pl-4;
     z-index: 3; /* The search focus overlay sits underneath using z-index 2. */
 
     .dark & {
         .logo {
             path {
-                fill: theme(colors.dark.100) !important;
+                fill: var(--color-dark-100) !important;
             }
         }
     }
 
     .global-header-icon-button {
-        @apply h-7 w-7 block outline-none p-1 text-gray hover:text-gray-800 rounded-full hover:bg-gray-200 border border-transparent hover:border-gray-400;
-        @apply dark:text-dark-100 dark:hover:text-dark-100 dark:hover:bg-dark-800 dark:border-transparent  dark:hover:border-dark-900;
+        @apply block h-7 w-7 rounded-full border border-transparent p-1 text-gray outline-hidden hover:border-gray-400 hover:bg-gray-200 hover:text-gray-800;
+        @apply dark:border-transparent dark:text-dark-100 dark:hover:border-dark-900 dark:hover:bg-dark-800 dark:hover:text-dark-100;
     }
 }
-
 
 /* Responsive Wangjangling
    ========================================================================== */
 
-@screen md {
-    .global-header { @apply px-0 fixed }
-}
-
-/* Search
-   ========================================================================== */
-.global-search {
-    @apply rounded-md px-2 hidden py-0 flex items-center relative border dark:border-dark-300;
-    transition: .12s ease-out;
-
-    .search-input {
-        @apply text-sm w-full max-w-full dark:bg-dark-600 dark:text-dark-150;
-        padding-left: 5px ;
-        padding-right: 20px ; [dir="rtl"] & { padding-left: 20px ; padding-right: 5px ; }
-        height: 32px;
-		&:focus {
-			outline: 0;
-		}
-    }
-
-    .global-search-results {
-        @apply shadow-lg absolute p-0 w-full bg-white rounded border border-gray-500;
-        @apply dark:bg-dark-650 dark:border-dark-900;
-        top: 36px;
-        left: -1px ; [dir="rtl"] & { left: auto ; right: -1px ; } /*  border offset */
-        z-index: 999;
-    }
-
-    .global-search-loading-indicator {
-        position: absolute;
-        right: 8px ; [dir="rtl"] & { right: auto ; left: 8px ; }
-    }
-
-    .global-search-result-item {
-        @apply border-t cursor-pointer dark:bg-dark-600 dark:border-dark-800 dark:text-dark-150;
-
-        &:first-child {
-            @apply rounded-t border-none;
-        }
-
-        &:last-child {
-            @apply rounded-b;
-        }
-    }
-
-    .global-search-result-badge {
-        @apply rounded px-1 text-2xs border bg-gray-200 text-gray;
-        @apply dark:bg-dark-600 dark:text-dark-100 dark:border-dark-700;
-    }
-
-    .active {
-        @apply bg-gray-300 dark:bg-dark-650;
-    }
-
-    .title {
-        @apply font-medium text-sm;
-    }
-
-    .url {
-        @apply text-2xs text-gray-400;
-    }
-
-    .status {
-        float: right ; [dir="rtl"] & { float: left ; }
-        background: #ddd;
-        border-radius: 2px;
-        padding: 2px 4px;
-    }
-
-    .icon {
-        @apply text-gray dark:text-dark-175 relative cursor-pointer overflow-hidden;
-        font-size: 18px;
-        top: 1px;
-        width: 20px;
-        height: 20px;
-        line-height: 20px;
-    }
-
-    .reset {
-        font-size: 21px;
-        left: -3px ; [dir="rtl"] & { left: auto ; right: -3px ; }
-        position: relative;
-    }
-
-    kbd {
-        @apply font-sans rounded px-1 pb-px text-2xs border text-gray-500;
-    }
-}
-
-@screen lg {
-    .global-search {
-        @apply flex w-128 max-w-full;
-        .global-search-results { @apply w-128 }
+@media (width >= theme(--breakpoint-md)) {
+    .global-header {
+        @apply fixed px-0;
     }
 }
 
 .site-selector {
-
-    .v-select { @apply h-full }
-    .vs__dropdown-toggle { @apply border-none bg-none }
-    .vs__actions { @apply hidden }
-    .vs__search { @apply p-0; [dir="rtl"] & { @apply p-0; } [dir="ltr"] & { @apply p-0; } }
-    .vs__selected-options { @apply border-none shadow-none p-0 bg-none }
-    .vs__selected { @apply flex }
+    .v-select {
+        @apply h-full;
+    }
+    .vs__dropdown-toggle {
+        @apply border-none bg-none;
+    }
+    .vs__actions {
+        @apply hidden;
+    }
+    .vs__search {
+        @apply p-0;
+        [dir='rtl'] & {
+            @apply p-0;
+        }
+        [dir='ltr'] & {
+            @apply p-0;
+        }
+    }
+    .vs__selected-options {
+        @apply border-none bg-none p-0 shadow-none;
+    }
+    .vs__selected {
+        @apply flex;
+    }
     .vs__dropdown-toggle {
         @apply h-full rounded-none bg-transparent;
         box-shadow: none;
     }
 
-    .vs--single.vs--unsearchable .vs__selected-options { @apply bg-none }
+    .vs--single.vs--unsearchable .vs__selected-options {
+        @apply bg-none;
+    }
 }
 
-
 .session-expiry-stripe {
-    @apply px-4 py-2 text-xs top-0 text-center bg-red-500 text-white cursor-pointer w-full outline-none fixed;
+    @apply fixed top-0 w-full cursor-pointer bg-red-500 px-4 py-2 text-center text-xs text-white outline-hidden;
     z-index: 999;
     height: 48px;
 
@@ -146,7 +73,8 @@
         @apply bg-red-700;
     }
 
-    &:active, &:focus {
+    &:active,
+    &:focus {
         outline: none;
     }
 
@@ -161,25 +89,31 @@
 }
 
 @keyframes rotate {
-	100% {
-		transform: rotate(1turn);
-	}
+    100% {
+        transform: rotate(1turn);
+    }
 }
 
 .animate-radar {
     @apply relative z-0;
 
-	&::after {
+    &::after {
         @apply absolute bg-transparent bg-no-repeat;
-		content: '';
-		z-index: 2;
-		left: -50%;
-		top: -50%;
-		width: 200%;
-		height: 200%;
-		background-size: 50% 50%, 50% 50%;
-		background-position: 0 0, 100% 0, 100% 100%, 0 100%;
-		background-image: linear-gradient(transparent, rgba(255,255,255,.7), transparent);
-		animation: rotate 4s linear infinite;
-	}
+        content: '';
+        z-index: 2;
+        left: -50%;
+        top: -50%;
+        width: 200%;
+        height: 200%;
+        background-size:
+            50% 50%,
+            50% 50%;
+        background-position:
+            0 0,
+            100% 0,
+            100% 100%,
+            0 100%;
+        background-image: linear-gradient(transparent, rgba(255, 255, 255, 0.7), transparent);
+        animation: rotate 4s linear infinite;
+    }
 }

@@ -1,10 +1,9 @@
 @inject('str', 'Statamic\Support\Str')
 @extends('statamic::layout')
 @section('title', $breadcrumbs->title($title))
-@section('wrapper_class', 'max-w-3xl')
+@section('wrapper_class', 'max-w-7xl')
 
 @section('content')
-
     <entry-publish-form
         publish-container="base"
         :initial-actions="{{ json_encode($actions) }}"
@@ -40,5 +39,4 @@
         :initial-item-actions="{{ json_encode($itemActions) }}"
         item-action-url="{{ cp_route('collections.entries.actions.run', $collection) }}"
     ></entry-publish-form>
-
 @endsection

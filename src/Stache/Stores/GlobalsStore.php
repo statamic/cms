@@ -4,7 +4,6 @@ namespace Statamic\Stache\Stores;
 
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Path;
-use Statamic\Facades\Stache;
 use Statamic\Facades\YAML;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -15,15 +14,6 @@ class GlobalsStore extends BasicStore
     public function key()
     {
         return 'globals';
-    }
-
-    public function paths()
-    {
-        if ($this->directory !== Stache::store('global-variables')->directory()) {
-            throw new \Exception('The [globals] and [global-variables] Stache stores must share the same directory.');
-        }
-
-        return parent::paths();
     }
 
     public function getItemFilter(SplFileInfo $file)
@@ -50,6 +40,7 @@ class GlobalsStore extends BasicStore
         return GlobalSet::make()
             ->handle($handle)
             ->title($data['title'] ?? null)
+            ->sites($data['sites'] ?? [])
             ->initialPath($path);
     }
 }

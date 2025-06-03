@@ -1,39 +1,40 @@
 <template>
-
     <publish-container
         v-if="blueprint"
+        class="max-w-5xl mx-auto"
         ref="container"
         name="collection"
+        reference="collection"
         :blueprint="blueprint"
         :values="values"
-        reference="collection"
         :meta="meta"
         :errors="errors"
         @updated="values = $event"
+        v-slot="{ setFieldValue, setFieldMeta }"
     >
-        <div slot-scope="{ setFieldValue, setFieldMeta }">
-            <configure-tabs
-                @updated="setFieldValue"
-                @meta-updated="setFieldMeta"
-                :enable-sidebar="false" />
-
-            <div class="py-4 border-t dark:border-dark-950 flex justify-between">
-                <a :href="url" class="btn" v-text="__('Cancel') "/>
-                <button type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
-            </div>
+        <div>
+            <Header :title="__(editTitle ?? 'Configure Navigation')" icon="cog">
+                <Button variant="primary" @click="submit">{{ __('Save') }}</Button>
+            </Header>
+            <configure-tabs @updated="setFieldValue" @meta-updated="setFieldMeta" :enable-sidebar="false" />
         </div>
     </publish-container>
-
 </template>
 
 <script>
+import { Header, Button } from '@statamic/ui';
+
 export default {
+    components: {
+        Header,
+        Button,
+    },
 
     props: {
         blueprint: Object,
         initialValues: Object,
         meta: Object,
-        url: String
+        url: String,
     },
 
     data() {
@@ -41,11 +42,10 @@ export default {
             values: this.initialValues,
             error: null,
             errors: {},
-        }
+        };
     },
 
     methods: {
-
         clearErrors() {
             this.error = null;
             this.errors = {};
@@ -55,11 +55,14 @@ export default {
             this.saving = true;
             this.clearErrors();
 
-            this.$axios.patch(this.url, this.values).then(response => {
-                this.saving = false;
-                this.$toast.success(__('Saved'));
-                this.$refs.container.saved();
-            }).catch(e => this.handleAxiosError(e));
+            this.$axios
+                .patch(this.url, this.values)
+                .then((response) => {
+                    this.saving = false;
+                    this.$toast.success(__('Saved'));
+                    this.$refs.container.saved();
+                })
+                .catch((e) => this.handleAxiosError(e));
         },
 
         handleAxiosError(e) {
@@ -73,15 +76,13 @@ export default {
                 this.$toast.error(__('Something went wrong'));
             }
         },
-
     },
 
     created() {
-        this.$keys.bindGlobal(['mod+s'], e => {
+        this.$keys.bindGlobal(['mod+s'], (e) => {
             e.preventDefault();
             this.submit();
         });
     },
-
-}
+};
 </script>

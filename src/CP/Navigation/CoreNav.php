@@ -50,7 +50,7 @@ class CoreNav
         if (count(config('statamic.cp.widgets')) > 0 || config('statamic.cp.start_page') === 'dashboard') {
             Nav::topLevel('Dashboard')
                 ->route('dashboard')
-                ->icon('charts');
+                ->icon('dashboard');
         }
 
         return $this;
@@ -65,7 +65,7 @@ class CoreNav
     {
         Nav::content('Collections')
             ->route('collections.index')
-            ->icon('content-writing')
+            ->icon('collections')
             ->can('index', Collection::class)
             ->children(function () {
                 return CollectionAPI::all()->sortBy->title()
@@ -86,7 +86,7 @@ class CoreNav
 
         Nav::content('Navigation')
             ->route('navigation.index')
-            ->icon('hierarchy-files')
+            ->icon('navigation')
             ->can('index', NavContract::class)
             ->children(function () {
                 return NavAPI::all()->sortBy->title()
@@ -107,7 +107,7 @@ class CoreNav
 
         Nav::content('Taxonomies')
             ->route('taxonomies.index')
-            ->icon('tags')
+            ->icon('taxonomies')
             ->can('index', Taxonomy::class)
             ->children(function () {
                 return TaxonomyAPI::all()->sortBy->title()->map(function ($taxonomy) {
@@ -131,7 +131,7 @@ class CoreNav
 
         Nav::content('Globals')
             ->route('globals.index')
-            ->icon('earth')
+            ->icon('globals')
             ->can('index', GlobalSet::class)
             ->children(function () {
                 return GlobalSetAPI::all()->sortBy->title()
@@ -160,7 +160,7 @@ class CoreNav
     {
         Nav::fields('Blueprints')
             ->route('blueprints.index')
-            ->icon('blueprint')
+            ->icon('blueprints')
             ->can('configure fields');
 
         Nav::fields('Fieldsets')
@@ -180,7 +180,7 @@ class CoreNav
     {
         Nav::tools('Forms')
             ->route('forms.index')
-            ->icon('drawer-file')
+            ->icon('forms')
             ->can('index', Form::class)
             ->children(function () {
                 return FormAPI::all()->sortBy->title()->map(function ($form) {
@@ -192,7 +192,7 @@ class CoreNav
 
         Nav::tools('Updates')
             ->route('updater')
-            ->icon('loading-bar')
+            ->icon('updates')
             ->view('statamic::nav.updates')
             ->can('view updates');
 
@@ -214,7 +214,7 @@ class CoreNav
         if (config('statamic.graphql.enabled') && Statamic::pro()) {
             Nav::tools('GraphQL')
                 ->route('graphql.index')
-                ->icon('array')
+                ->icon('graphql')
                 ->attributes(['target' => '_blank'])
                 ->can('view graphql');
         }
@@ -236,7 +236,7 @@ class CoreNav
         if (count($utilities)) {
             Nav::tools('Utilities')
                 ->route('utilities.index')
-                ->icon('settings-slider')
+                ->icon('utilities')
                 ->children($utilities);
         }
 
@@ -252,12 +252,12 @@ class CoreNav
     {
         Nav::settings(Site::multiEnabled() ? 'Sites' : 'Site')
             ->route('sites.edit')
-            ->icon('sites')
+            ->icon('site')
             ->can('configure sites');
 
         Nav::settings('Preferences')
             ->route('preferences.index')
-            ->icon('settings')
+            ->icon('preferences')
             ->children([
                 Nav::item('General')->route('preferences.index'),
                 Nav::item('CP Nav')->route('preferences.nav.index'),
@@ -279,12 +279,12 @@ class CoreNav
 
         Nav::users('Users')
             ->route('users.index')
-            ->icon('users-box')
+            ->icon('users')
             ->can('index', UserContract::class);
 
         Nav::users('Groups')
             ->route('user-groups.index')
-            ->icon('users-multiple')
+            ->icon('groups')
             ->can('edit user groups')
             ->children(function () {
                 return UserGroupAPI::all()->sortBy->title()->map(function ($userGroup) {
@@ -295,7 +295,7 @@ class CoreNav
 
         Nav::users('Permissions')
             ->route('roles.index')
-            ->icon('shield-key')
+            ->icon('permissions')
             ->can('edit roles')
             ->children(function () {
                 return RoleAPI::all()->sortBy->title()->map(function ($role) {

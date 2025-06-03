@@ -3,33 +3,33 @@
    ========================================================================== */
 
 .pagination {
-    @apply flex justify-center shadow dark:shadow-dark items-center list-none p-0 rounded overflow-hidden;
+    @apply flex list-none items-center justify-center overflow-hidden rounded-sm p-0 shadow dark:shadow-lg;
 
-	li a {
-        @apply h-full px-3 py-2 rtl:border-l ltr:border-r dark:border-dark-900 bg-white dark:bg-dark-600 block text-gray-800 dark:text-dark-150;
+    li a {
+        @apply block h-full bg-white px-3 py-2 text-gray-800 dark:border-dark-900 dark:bg-dark-600 dark:text-dark-150 ltr:border-r rtl:border-l;
 
-		&:hover {
-            @apply bg-gray-100 dark:bg-dark-700 text-gray-800 dark:text-dark-100;
-		}
-	}
+        &:hover {
+            @apply bg-gray-100 text-gray-800 dark:bg-dark-700 dark:text-dark-100;
+        }
+    }
 
-	li > .unclickable {
-        @apply h-full px-3 py-2 rtl:border-l ltr:border-r dark:border-dark-900 bg-white dark:bg-dark-600 block text-gray-500 dark:text-dark-200;
+    li > .unclickable {
+        @apply block h-full bg-white px-3 py-2 text-gray-500 dark:border-dark-900 dark:bg-dark-600 dark:text-dark-200 ltr:border-r rtl:border-l;
 
-		&:hover {
+        &:hover {
             cursor: text;
-		}
-	}
+        }
+    }
 
-	li:last-child a {
-		@apply rtl:border-l-0 ltr:border-r-0;
-	}
+    li:last-child a {
+        @apply ltr:border-r-0 rtl:border-l-0;
+    }
 
-	li.current a {
-        @apply bg-gray-100 dark:bg-dark-700 text-blue dark:text-dark-blue-100 shadow-inner;
-	}
+    li.current a {
+        @apply bg-gray-100 text-blue shadow-inner dark:bg-dark-700 dark:text-dark-blue-100;
+    }
 }
 
 .pagination.pagination-inline {
-	@apply shadow-none rounded-none;
+    @apply rounded-none shadow-none;
 }

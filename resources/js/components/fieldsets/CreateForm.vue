@@ -1,46 +1,33 @@
 <template>
-    <div class="max-w-lg mt-4 mx-auto">
-
-        <div class="rounded p-6 lg:px-20 lg:py-10 shadow bg-white dark:bg-dark-600 dark:shadow-dark">
-            <header class="text-center mb-16">
-                <h1 class="mb-6">{{ __('Create Fieldset') }}</h1>
-                <p class="text-gray" v-text="__('messages.fields_fieldsets_description')" />
-            </header>
-            <div class="mb-10">
-                <label class="font-bold text-base mb-1" for="name">{{ __('Title') }}</label>
-                <input type="text" v-model="title" class="input-text" autofocus tabindex="1">
-                <div class="text-2xs text-gray-600 mt-2 flex items-center">
-                    {{ __('messages.fieldsets_title_instructions') }}
-                </div>
+    <CreateForm
+        :title="__('Create Fieldset')"
+        :subtitle="__('messages.fields_fieldsets_description')"
+        icon="fieldsets"
+        @submit="submit"
+    >
+        <ui-card-panel :heading="__('Fieldset Details')">
+            <div class="space-y-8">
+                <ui-field :label="__('Title')" :instructions="__('messages.fieldsets_title_instructions')" :instructions-below="true">
+                    <ui-input v-model="title" autofocus tabindex="1" />
+                </ui-field>
+                <ui-field :label="__('Handle')" :instructions="__('messages.fieldsets_handle_instructions')" :instructions-below="true">
+                    <ui-input v-model="handle" tabindex="2" :loading="slug.busy" />
+                </ui-field>
             </div>
-            <div class="mb-4">
-                <label class="font-bold text-base mb-1" for="name">{{ __('Handle') }}</label>
-                <div class="relative">
-                    <loading-graphic inline text="" v-if="slug.busy" class="absolute top-3 right-3"/>
-                    <input type="text" v-model="handle" class="input-text" tabindex="2">
-                </div>
-                <div class="text-2xs text-gray-600 mt-2 flex items-center">
-                    {{ __('messages.fieldsets_handle_instructions') }}
-                </div>
-            </div>
-        </div>
-
-        <div class="flex justify-center mt-8">
-            <button tabindex="4" class="btn-primary mx-auto btn-lg" :disabled="! canSubmit" @click="submit">
-                {{ __('Create Fieldset')}}
-            </button>
-        </div>
-    </div>
+        </ui-card-panel>
+    </CreateForm>
 </template>
 
+<script setup>
+import { CreateForm } from '@statamic/ui';
+</script>
+
 <script>
-
 export default {
-
     props: {
         route: {
-            type: String
-        }
+            type: String,
+        },
     },
 
     data() {
@@ -48,37 +35,34 @@ export default {
             title: null,
             handle: null,
             slug: this.$slug.async().separatedBy('_'),
-        }
+        };
     },
 
     watch: {
         title(title) {
-            this.slug.create(title).then(slug => this.handle = slug);
-        }
-    },
-
-    computed: {
-        canSubmit() {
-            return Boolean(this.title && this.handle && !this.slug.busy);
+            this.slug.create(title).then((slug) => (this.handle = slug));
         },
     },
 
     methods: {
         submit() {
-            this.$axios.post(this.route, {title: this.title, handle: this.handle}).then(response => {
-                window.location = response.data.redirect;
-            }).catch(error => {
-                this.$toast.error(error.response.data.message);
-            });
-        }
+            this.$axios
+                .post(this.route, { title: this.title, handle: this.handle })
+                .then((response) => {
+                    window.location = response.data.redirect;
+                })
+                .catch((error) => {
+                    this.$toast.error(error.response.data.message);
+                });
+        },
     },
 
     mounted() {
-        this.$keys.bindGlobal(['return'], e => {
+        this.$keys.bindGlobal(['return'], (e) => {
             if (this.canSubmit) {
                 this.submit();
             }
         });
-    }
-}
+    },
+};
 </script>

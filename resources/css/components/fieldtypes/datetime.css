@@ -3,29 +3,43 @@
    ========================================================================== */
 
 .daterange {
-	outline: none;
-	width: 100%;
-	.icon-remove { right: 32px ; [dir="rtl"] & { right: auto ; left: 32px ; } }
+    outline: none;
+    width: 100%;
+    .icon-remove {
+        right: 32px;
+        [dir='rtl'] & {
+            right: auto;
+            left: 32px;
+        }
+    }
 
-    .dr-calendar { max-width: 250px; }
+    .dr-calendar {
+        max-width: 250px;
+    }
 
-    .dr-active, .dr-input {
+    .dr-active,
+    .dr-input {
         z-index: 1;
     }
 }
 
-.datetime .icon-remove, .time-fieldtype .icon-remove {
-	cursor: pointer;
-	background: rgba(0, 0, 0, 0.1);
-	font-size: 15px;
-	line-height: 1;
-	padding: 0 4px 2px;
-	border-radius: 50%;
-	color: #777;
+.datetime .icon-remove,
+.time-fieldtype .icon-remove {
+    cursor: pointer;
+    background: rgba(0, 0, 0, 0.1);
+    font-size: 15px;
+    line-height: 1;
+    padding: 0 4px 2px;
+    border-radius: 50%;
+    color: #777;
     height: 18px;
     width: 18px;
-    margin-right: 8px ; [dir="rtl"] & { margin-left: 8px ; margin-right: 0 ; }
-	text-shadow: 0 1px 1px #FFF;
+    margin-right: 8px;
+    [dir='rtl'] & {
+        margin-left: 8px;
+        margin-right: 0;
+    }
+    text-shadow: 0 1px 1px #fff;
 }
 
 .daterange--single .dr-input .dr-dates {
@@ -33,49 +47,40 @@
 }
 
 .date-time-container {
-	@apply flex;
-}
-
-/* Remove style from datepicker in popover since the popover has them. */
-.popover-content .vc-container {
-    @apply border-none bg-none;
-}
-
-.vc-container.vc-is-dark {
-    @apply dark:bg-transparent;
+    @apply flex;
 }
 
 /* Time Field
   ========================================================================== */
 
 .time-fieldtype {
-	.time-fieldtype-container {
-		@apply flex items-center;
-		min-width: max-content;
-	}
+    .time-fieldtype-container {
+        @apply flex items-center;
+        min-width: max-content;
+    }
 
-	.input-time {
-		@apply inline-block text-center bg-transparent;
-		-moz-appearance: textfield;
-		width: 26px;
+    .input-time {
+        @apply inline-block bg-transparent text-center;
+        -moz-appearance: textfield;
+        width: 26px;
 
-		&:active, &:focus {
-			outline: none;
-		}
-	}
+        &:active,
+        &:focus {
+            outline: none;
+        }
+    }
 
-	.colon {
-		@apply select-none;
-		margin: 0 -2px;
-	}
+    .colon {
+        @apply select-none;
+        margin: 0 -2px;
+    }
 
-	input::-webkit-inner-spin-button,
-	input::-webkit-outer-spin-button {
-		-webkit-appearance: none;
-		margin: 0;
-	}
+    input::-webkit-inner-spin-button,
+    input::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
 }
-
 
 /* Inside a Grid field
   ========================================================================== */
@@ -85,9 +90,13 @@
         top: 8px;
     }
 
-    .btn.add-time { top: 8px; }
+    .btn.add-time {
+        top: 8px;
+    }
 
-    .dr-input { border: 0 !important; }
+    .dr-input {
+        border: 0 !important;
+    }
 
     .colon {
         background: #fff;

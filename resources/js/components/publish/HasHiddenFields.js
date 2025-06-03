@@ -1,34 +1,28 @@
 import Values from './Values.js';
+import { pick } from 'lodash-es';
 
 export default {
-
     computed: {
-
         hiddenFields() {
-            return this.$store.state.publish[this.publishContainer].hiddenFields;
+            return this.store.hiddenFields;
         },
 
         jsonSubmittingFields() {
-            return this.$store.state.publish[this.publishContainer].jsonSubmittingFields;
+            return this.store.jsonSubmittingFields;
         },
 
         revealerFields() {
-            return this.$store.state.publish[this.publishContainer].revealerFields;
+            return this.store.revealerFields;
         },
 
         visibleValues() {
-            let omittableFields = _.chain(this.hiddenFields)
-                .pick(field => field.omitValue)
-                .keys()
-                .value();
+            let omittableFields = Object.keys(pick(this.hiddenFields, (field) => field.omitValue));
 
             return new Values(this.values, this.jsonSubmittingFields).except(omittableFields);
         },
-
     },
 
     methods: {
-
         resetValuesFromResponse(responseValues) {
             if (!responseValues) return this.values;
 
@@ -40,7 +34,5 @@ export default {
 
             return newValues.all();
         },
-
     },
-
-}
+};

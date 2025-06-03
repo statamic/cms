@@ -1,60 +1,130 @@
 <template>
-
     <div class="session-expiry">
-
         <button v-if="isWarning" class="session-expiry-stripe" @click="extend" v-text="warningText" />
 
-        <modal name="session-timeout-login" v-if="isShowingLogin" height="auto" width="500px" :adaptive="true">
+        <modal name="session-timeout-login" v-if="isShowingLogin" height="auto" :width="500">
             <div class="-max-h-screen-px">
-            <div class="text-lg font-semibold px-5 py-3 bg-gray-200 dark:bg-dark-550 rounded-t-lg flex items-center justify-between border-b dark:border-dark-900">
-                {{ __('Resume Your Session') }}
-            </div>
-
-            <div v-if="isUsingOauth" class="p-5">
-                <a :href="oauthProvider.loginUrl" target="_blank" class="btn-primary">
-                    {{ __('Log in with :provider', {provider: oauthProvider.label}) }}
-                </a>
-                <div class="text-2xs text-gray mt-4">
-                    {{ __('messages.session_expiry_new_window') }}
+                <div
+                    class="flex items-center justify-between rounded-t-lg border-b bg-gray-200 px-5 py-3 text-lg font-semibold dark:border-dark-900 dark:bg-dark-550"
+                >
+                    {{ __('Resume Your Session') }}
                 </div>
-            </div>
 
-            <div v-if="!isUsingOauth" class="publish-fields p-2">
-                <div class="form-group w-full">
-                    <label v-text="__('messages.session_expiry_enter_password')" />
-                    <small
-                        class="help-block text-red-500"
-                        v-if="errors.email"
-                        v-text="errors.email[0]" />
-                    <small
-                        class="help-block text-red-500"
-                        v-if="errors.password"
-                        v-text="errors.password[0]" />
-                    <div class="flex items-center">
-                        <input
-                            type="password"
-                            v-model="password"
-                            ref="password"
-                            class="input-text"
-                            tabindex="1"
-                            autofocus
-                            @keydown.enter.prevent="submit" />
-                        <button @click="submit" class="btn-primary rtl:mr-2 ltr:ml-2" v-text="__('Log in')" />
+                <div v-if="isUsingOauth" class="p-5">
+                    <a :href="oauthProvider.loginUrl" target="_blank" class="btn-primary">
+                        {{ __('Log in with :provider', { provider: oauthProvider.label }) }}
+                    </a>
+                    <div class="mt-4 text-2xs text-gray">
+                        {{ __('messages.session_expiry_new_window') }}
+                    </div>
+                </div>
+
+                <div v-if="!isUsingOauth" class="publish-fields p-2">
+                    <div class="form-group w-full">
+                        <label v-text="__('messages.session_expiry_enter_password')" />
+                        <small class="help-block text-red-500" v-if="errors.email" v-text="errors.email[0]" />
+                        <small class="help-block text-red-500" v-if="errors.password" v-text="errors.password[0]" />
+                        <div class="flex items-center">
+                            <input
+                                type="password"
+                                v-model="password"
+                                ref="password"
+                                class="input-text"
+                                tabindex="1"
+                                autofocus
+                                @keydown.enter.prevent="submit"
+                            />
+                            <button @click="submit" class="btn-primary ltr:ml-2 rtl:mr-2" v-text="__('Log in')" />
+                        </div>
                     </div>
                 </div>
             </div>
-            </div>
         </modal>
 
-    </div>
+        <modal name="session-timeout-login" v-if="isShowingTwoFactorChallenge" height="auto" :width="500">
+            <div class="-max-h-screen-px">
+                <div
+                    class="flex items-center justify-between rounded-t-lg border-b bg-gray-200 px-5 py-3 text-lg font-semibold dark:border-dark-900 dark:bg-dark-550"
+                >
+                    {{ __('Resume Your Session') }}
+                </div>
 
+                <div class="publish-fields p-2">
+                    <div v-if="twoFactorMode === 'code'" class="form-group w-full">
+                        <label v-text="__('messages.session_expiry_enter_two_factor_code')" />
+                        <small class="help-block text-red-500" v-if="errors.code" v-text="errors.code[0]" />
+                        <div class="flex items-center">
+                            <input
+                                type="text"
+                                name="code"
+                                v-model="twoFactorCode"
+                                ref="twoFactorCode"
+                                class="input-text"
+                                tabindex="1"
+                                pattern="[0-9]*"
+                                maxlength="6"
+                                inputmode="numeric"
+                                autofocus
+                                autocomplete="one-time-code"
+                                @keydown.enter.prevent="submitTwoFactorChallenge"
+                            />
+                        </div>
+                    </div>
+
+                    <div v-if="twoFactorMode === 'recovery_code'" class="form-group w-full">
+                        <label v-text="__('messages.session_expiry_enter_two_factor_recovery_code')" />
+                        <small
+                            class="help-block text-red-500"
+                            v-if="errors.recovery_code"
+                            v-text="errors.recovery_code[0]"
+                        />
+                        <div class="flex items-center">
+                            <input
+                                type="text"
+                                name="recovery_code"
+                                v-model="twoFactorRecoveryCode"
+                                ref="twoFactorRecoveryCode"
+                                class="input-text"
+                                tabindex="1"
+                                maxlength="21"
+                                autofocus
+                                autocomplete="off"
+                                @keydown.enter.prevent="submitTwoFactorChallenge"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    class="flex items-center justify-end border-t bg-gray-200 p-4 text-sm dark:border-dark-900 dark:bg-dark-550"
+                >
+                    <button
+                        v-if="twoFactorMode === 'code'"
+                        class="text-gray hover:text-gray-900 dark:text-dark-150 dark:hover:text-dark-100"
+                        @click="twoFactorMode = 'recovery_code'"
+                        v-text="__('Use recovery code')"
+                    />
+                    <button
+                        v-if="twoFactorMode === 'recovery_code'"
+                        class="text-gray hover:text-gray-900 dark:text-dark-150 dark:hover:text-dark-100"
+                        @click="twoFactorMode = 'code'"
+                        v-text="__('Use one-time code')"
+                    />
+                    <button
+                        class="btn-primary ltr:ml-4 rtl:mr-4"
+                        @click="submitTwoFactorChallenge"
+                        v-text="__('Continue')"
+                    />
+                </div>
+            </div>
+        </modal>
+    </div>
 </template>
 
 <script>
 var counter;
 
 export default {
-
     props: {
         warnAt: Number,
         lifetime: Number,
@@ -66,44 +136,45 @@ export default {
     data() {
         return {
             isShowingLogin: false,
+            isShowingTwoFactorChallenge: false,
             count: this.lifetime, // The timer used in vue
             remaining: this.lifetime, // The actual time remaining as per server responses
             errors: {},
             password: null,
+            twoFactorCode: null,
+            twoFactorRecoveryCode: null,
+            twoFactorMode: 'code',
             pinging: false,
-            lastCount: Vue.moment(),
+            lastCount: new Date(),
             isPageHidden: false,
-        }
+        };
     },
 
     computed: {
-
         isWarning() {
             return this.count <= this.warnAt;
         },
 
         warningText() {
-            return (this.remaining === 0)
+            return this.remaining === 0
                 ? __('messages.session_expiry_logged_out_for_inactivity')
                 : __('messages.session_expiry_logging_out_in_seconds', { seconds: this.remaining });
         },
 
         isUsingOauth() {
             return this.oauthProvider != null;
-        }
-
+        },
     },
 
     created() {
         this.startCountdown();
 
-        document.addEventListener('visibilitychange', () => this.isPageHidden = document.hidden, false);
+        document.addEventListener('visibilitychange', () => (this.isPageHidden = document.hidden), false);
     },
 
     watch: {
-
         count(count) {
-            this.isShowingLogin = this.auth.enabled && this.remaining <= 0;
+            this.isShowingLogin = this.auth.enabled && !this.isShowingTwoFactorChallenge && this.remaining <= 0;
 
             // While we're in the warning period, we'll check every second so that any
             // activity in another tab is picked up and the count will get restarted.
@@ -113,24 +184,22 @@ export default {
             // Javascript is being executed, but the count will have stopped if the computer
             // has been put to sleep. If it's been a while since the last count, we'll
             // also perform a timeout check. This will let things recalibrate.
-            const secondsSinceLastCount = Vue.moment().diff(this.lastCount, 'seconds');
+            const secondsSinceLastCount = Math.floor((Date.now() - this.lastCount) / 1000);
             const itsBeenAWhile = secondsSinceLastCount > 10;
 
             if (withinWarningPeriod || itsBeenAWhile) {
-                this.ping().catch(e => {});
+                this.ping().catch((e) => {});
             }
 
-            this.lastCount = Vue.moment();
+            this.lastCount = new Date();
         },
 
         isShowingLogin(showing, wasShowing) {
             if (showing && !wasShowing) this.updateCsrfToken();
-        }
-
+        },
     },
 
     methods: {
-
         startCountdown() {
             counter = setInterval(() => {
                 this.count--;
@@ -147,21 +216,25 @@ export default {
 
             this.pinging = true;
 
-            return this.$axios.get(cp_url('session-timeout')).then(response => {
-                this.count = this.remaining = response.data;
-            }).catch(e => {
-                if (e.response.status === 401) {
-                    this.remaining = 0;
-                    if (!this.auth.enabled) window.location = this.auth.redirect_to || '/';
-                }
-                throw e;
-            }).finally(response => {
-                this.pinging = false;
-            });
+            return this.$axios
+                .get(cp_url('session-timeout'))
+                .then((response) => {
+                    this.count = this.remaining = response.data;
+                })
+                .catch((e) => {
+                    if (e.response.status === 401) {
+                        this.remaining = 0;
+                        if (!this.auth.enabled) window.location = this.auth.redirect_to || '/';
+                    }
+                    throw e;
+                })
+                .finally((response) => {
+                    this.pinging = false;
+                });
         },
 
         updateCsrfToken() {
-            return this.$axios.get(cp_url('auth/token')).then(response => {
+            return this.$axios.get(cp_url('auth/token')).then((response) => {
                 const csrf = response.data;
                 this.$axios.defaults.headers.common['X-CSRF-TOKEN'] = csrf;
                 this.$config.set('csrfToken', csrf);
@@ -175,33 +248,68 @@ export default {
         },
 
         login() {
-            this.$axios.post(cp_url('auth/login'), {
-                email: this.email,
-                password: this.password
-            }).then(response => {
-                this.errors = {};
-                this.password = null;
-                this.isShowingLogin = false;
-                this.$toast.success(__('Logged in'));
-                this.restartCountdown();
-                this.updateCsrfToken();
-            }).catch(e => {
-                if (e.response.status === 422) {
-                    this.errors = e.response.data.errors;
-                    this.$toast.error(e.response.data.message);
-                } else {
-                    this.$toast.error(__('Something went wrong'))
-                }
-            });
+            this.$axios
+                .post(cp_url('auth/login'), {
+                    email: this.email,
+                    password: this.password,
+                })
+                .then((response) => {
+                    this.errors = {};
+                    this.password = null;
+                    this.isShowingLogin = false;
+
+                    if (response.data.two_factor) {
+                        this.isShowingTwoFactorChallenge = true;
+                        return;
+                    }
+
+                    this.loginComplete();
+                })
+                .catch((e) => {
+                    if (e.response.status === 422) {
+                        this.errors = e.response.data.errors;
+                        this.$toast.error(e.response.data.message);
+                    } else {
+                        this.$toast.error(__('Something went wrong'));
+                    }
+                });
+        },
+
+        submitTwoFactorChallenge() {
+            this.$axios
+                .post(cp_url('auth/two-factor-challenge'), {
+                    code: this.twoFactorCode,
+                    recovery_code: this.twoFactorRecoveryCode,
+                })
+                .then((response) => {
+                    this.errors = {};
+                    this.twoFactorCode = null;
+                    this.twoFactorRecoveryCode = null;
+                    this.twoFactorMode = 'code';
+                    this.isShowingTwoFactorChallenge = false;
+                    this.loginComplete();
+                })
+                .catch((e) => {
+                    if (e.response.status === 422) {
+                        this.errors = e.response.data.errors;
+                        this.$toast.error(e.response.data.message);
+                    } else {
+                        this.$toast.error(__('Something went wrong'));
+                    }
+                });
         },
 
         extend() {
-            this.$axios.get(cp_url('auth/extend')).then(response => {
+            this.$axios.get(cp_url('auth/extend')).then((response) => {
                 this.remaining = this.lifetime;
             });
-        }
+        },
 
-    }
-
-}
+        loginComplete() {
+            this.$toast.success(__('Logged in'));
+            this.restartCountdown();
+            this.updateCsrfToken();
+        },
+    },
+};
 </script>

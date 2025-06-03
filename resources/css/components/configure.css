@@ -2,15 +2,20 @@
    CONFIGURE COMPONENT: A variation of the publish component
    ========================================================================== */
 
-   .configure-tab {
-       .publish-fields .form-group:not(:last-child) {
-           @apply border-b;
-       }
+.configure-tab {
+    .publish-fields .form-group:not(:last-child) {
+        @apply border-b;
+    }
 
-       /*  Push toggle off to the right */
-       > .publish-fields > .toggle-fieldtype {
-           @apply flex justify-between items-center flex-wrap;
-           .help-block, .help-block p { @apply mb-0; }
-           .field-inner { @apply rtl:pl-8 ltr:pr-8; }
-       }
-   }
+    /*  Push toggle off to the right */
+    > .publish-fields > .toggle-fieldtype {
+        @apply flex flex-wrap items-center justify-between;
+        .help-block,
+        .help-block p {
+            @apply mb-0;
+        }
+        .field-inner {
+            @apply pe-8;
+        }
+    }
+}

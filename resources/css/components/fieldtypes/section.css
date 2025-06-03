@@ -3,8 +3,8 @@
    ========================================================================== */
 
 .section-fieldtype {
-    @apply border-t border-b bg-gray-200;
-    @apply dark:border-dark-900 dark:bg-dark-700 dark:shadow-inner-dark;
+    @apply border-b border-t bg-gray-200;
+    @apply dark:border-dark-900 dark:bg-dark-700 ;
     @apply -mt-px; /*  Avoid adjacent borders just in case they're stacked */
 
     &.form-group {
@@ -18,14 +18,16 @@
         }
 
         .field-inner > label {
-            @apply uppercase text-sm font-bold;
+            @apply text-sm font-bold uppercase;
         }
     }
 
     .help-block {
         @apply mb-0;
 
-        p { margin: 0; }
+        p {
+            margin: 0;
+        }
     }
 
     .read-only-overlay {
@@ -33,7 +35,7 @@
     }
 
     label:last-child {
-        @apply mb-0 !important; /* Removes spacing under label when there are no instructions to display */
+        @apply mb-0!; /* Removes spacing under label when there are no instructions to display */
     }
 }
 

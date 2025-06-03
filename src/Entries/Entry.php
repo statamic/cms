@@ -486,11 +486,13 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
         if ($this->hasDate() && $this->date) {
             $format = 'Y-m-d';
+
             if ($this->hasTime()) {
                 $format .= '-Hi';
-                if ($this->hasSeconds()) {
-                    $format .= 's';
-                }
+            }
+
+            if ($this->hasSeconds()) {
+                $format .= 's';
             }
 
             $prefix = $this->date->format($format).'.';
@@ -567,17 +569,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
                     return null;
                 }
 
-                $date = $date ?? optional($this->origin())->date() ?? $this->lastModified();
-
-                if (! $this->hasTime()) {
-                    $date->startOfDay();
-                }
-
-                if (! $this->hasSeconds()) {
-                    $date->startOfMinute();
-                }
-
-                return $date;
+                return $date ?? optional($this->origin())->date() ?? $this->adjustDateTimeBasedOnSettings($this->lastModified());
             })
             ->setter(function ($date) {
                 if (! $this->collection()?->dated()) {
@@ -589,20 +581,40 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
                 }
 
                 if ($date instanceof \Carbon\CarbonInterface) {
-                    return $date;
+                    return $date->utc();
                 }
 
-                if (strlen($date) === 10) {
-                    return Carbon::createFromFormat('Y-m-d', $date)->startOfDay();
-                }
+                $date = $this->parseDateFromString($date);
 
-                if (strlen($date) === 15) {
-                    return Carbon::createFromFormat('Y-m-d-Hi', $date)->startOfMinute();
-                }
-
-                return Carbon::createFromFormat('Y-m-d-His', $date);
+                return $this->adjustDateTimeBasedOnSettings($date);
             })
             ->args(func_get_args());
+    }
+
+    private function parseDateFromString($date)
+    {
+        if (strlen($date) === 10) {
+            return Carbon::createFromFormat('Y-m-d', $date)->startOfDay();
+        }
+
+        if (strlen($date) === 15) {
+            return Carbon::createFromFormat('Y-m-d-Hi', $date)->startOfMinute();
+        }
+
+        return Carbon::createFromFormat('Y-m-d-His', $date);
+    }
+
+    private function adjustDateTimeBasedOnSettings($date)
+    {
+        if (! $this->hasTime()) {
+            $date->startOfDay();
+        }
+
+        if (! $this->hasSeconds()) {
+            $date->startOfMinute();
+        }
+
+        return $date;
     }
 
     public function hasDate()
@@ -616,7 +628,11 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             return false;
         }
 
-        return $this->blueprint()->field('date')->fieldtype()->timeEnabled();
+        if ($this->blueprint()->field('date')->fieldtype()->timeEnabled()) {
+            return true;
+        }
+
+        return $this->date && ! $this->date->isStartOfDay();
     }
 
     public function hasSeconds()
@@ -908,11 +924,13 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         ]);
 
         if ($this->hasDate()) {
+            $date = $this->date()->setTimezone(Statamic::displayTimezone());
+
             $data = $data->merge([
-                'date' => $this->date(),
-                'year' => $this->date()->format('Y'),
-                'month' => $this->date()->format('m'),
-                'day' => $this->date()->format('d'),
+                'date' => $date,
+                'year' => $date->format('Y'),
+                'month' => $date->format('m'),
+                'day' => $date->format('d'),
             ]);
         }
 

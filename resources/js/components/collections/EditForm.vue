@@ -1,6 +1,6 @@
 <template>
-
     <publish-container
+        class="max-w-5xl mx-auto"
         v-if="blueprint"
         ref="container"
         name="collection"
@@ -11,33 +11,37 @@
         :errors="errors"
         :site="site"
         @updated="values = $event"
+        v-slot="{ setFieldValue, setFieldMeta }"
+        data-cards-wrap="fields"
     >
-        <div slot-scope="{ setFieldValue, setFieldMeta }">
-            <header class="mb-6">
-                <breadcrumb :url="url" :title="values.title" />
-                <div class="flex items-center">
-                    <h1 class="flex-1" v-text="__(editTitle ?? 'Configure Collection')" />
-                    <button type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
-                </div>
-            </header>
+        <div>
+            <Header :title="__(editTitle ?? 'Configure Collection')" icon="cog">
+                <Button variant="primary" @click="submit">{{ __('Save') }}</Button>
+            </Header>
             <configure-tabs
                 @updated="setFieldValue"
                 @meta-updated="setFieldMeta"
-                :enable-sidebar="false"/>
+                :enable-sidebar="false"
+            />
         </div>
     </publish-container>
-
 </template>
 
 <script>
+import { Header, Button } from '@statamic/ui';
+
 export default {
+    components: {
+        Header,
+        Button,
+    },
 
     props: {
         blueprint: Object,
         editTitle: String,
         initialValues: Object,
         meta: Object,
-        url: String
+        url: String,
     },
 
     data() {
@@ -45,11 +49,16 @@ export default {
             values: this.initialValues,
             error: null,
             errors: {},
-        }
+        };
+    },
+
+    provide() {
+        return {
+            wrapFieldsInCards: true,
+        };
     },
 
     methods: {
-
         clearErrors() {
             this.error = null;
             this.errors = {};
@@ -59,11 +68,14 @@ export default {
             this.saving = true;
             this.clearErrors();
 
-            this.$axios.patch(this.url, this.values).then(response => {
-                this.saving = false;
-                this.$toast.success(__('Saved'));
-                this.$refs.container.saved();
-            }).catch(e => this.handleAxiosError(e));
+            this.$axios
+                .patch(this.url, this.values)
+                .then((response) => {
+                    this.saving = false;
+                    this.$toast.success(__('Saved'));
+                    this.$refs.container.saved();
+                })
+                .catch((e) => this.handleAxiosError(e));
         },
 
         handleAxiosError(e) {
@@ -77,11 +89,10 @@ export default {
                 this.$toast.error(__('Something went wrong'));
             }
         },
-
     },
 
     created() {
-        this.$keys.bindGlobal(['mod+s'], e => {
+        this.$keys.bindGlobal(['mod+s'], (e) => {
             e.preventDefault();
             this.submit();
         });
@@ -90,8 +101,7 @@ export default {
     computed: {
         site() {
             return this.$config.get('selectedSite');
-        }
-    }
-
-}
+        },
+    },
+};
 </script>

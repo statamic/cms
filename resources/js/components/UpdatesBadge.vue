@@ -1,50 +1,39 @@
 <template>
-    <span v-if="count" class="badge-sm bg-red-500 dark:bg-blue-900">
-        {{ count }}
-    </span>
+    <Badge v-if="count" :text="String(count)" color="red" size="sm" variant="flat" pill />
 </template>
 
 <script>
-    export default {
+import { ref } from 'vue';
+import { Badge } from '@statamic/ui';
 
-        computed: {
-            count() {
-                return this.$store.state.updates.count;
-            }
+const count = ref(null);
+const requested = ref(false);
+
+export default {
+    components: {
+        Badge,
+    },
+
+    computed: {
+        count() {
+            return count.value;
         },
+    },
 
-        created() {
-            this.registerVuexModule();
+    created() {
+        this.getCount();
+    },
 
-            this.getCount();
+    methods: {
+        getCount() {
+            if (requested.value) return;
+
+            this.$axios
+                .get(cp_url('updater/count'))
+                .then((response) => (count.value = !isNaN(response.data) ? response.data : 0));
+
+            requested.value = true;
         },
-
-        methods: {
-            registerVuexModule() {
-                if (this.$store.state.updates) return;
-
-                this.$store.registerModule('updates', {
-                    namespaced: true,
-                    state: {
-                        count: 0,
-                        requested: false,
-                    },
-                    mutations: {
-                        count: (state, count) => state.count = count,
-                        requested: (state) => state.requested = true,
-                    }
-                })
-            },
-
-            getCount() {
-                if (this.$store.state.updates.requested) return;
-
-                this.$axios
-                    .get(cp_url('updater/count'))
-                    .then(response => this.$store.commit('updates/count', !isNaN(response.data) ? response.data : 0));
-
-                this.$store.commit('updates/requested');
-            },
-        }
-    }
+    },
+};
 </script>

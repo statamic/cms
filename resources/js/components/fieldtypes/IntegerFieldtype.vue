@@ -1,30 +1,32 @@
 <template>
-    <text-input
+    <Input
         ref="input"
         type="number"
         :name="name"
         :focus="config.focus"
-        :value="value"
-        :is-read-only="isReadOnly"
+        :model-value="value"
+        :disabled="isReadOnly"
         :id="fieldId"
         :min="config.min"
         :prepend="__(config.prepend)"
         :append="__(config.append)"
         :placeholder="__(config.placeholder)"
-        @input="updateDebounced"
+        @update:model-value="updateDebounced"
         @focus="$emit('focus')"
         @blur="$emit('blur')"
     />
 </template>
 
 <script>
+import Fieldtype from './Fieldtype.vue';
+import { Input } from '@statamic/ui';
 
 export default {
-
     mixins: [Fieldtype],
+    components: { Input },
     props: {
         prepend: { default: null },
         append: { default: null },
-    }
+    },
 };
 </script>

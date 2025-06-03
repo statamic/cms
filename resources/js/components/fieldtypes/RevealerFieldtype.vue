@@ -1,32 +1,41 @@
 <template>
-
     <div>
-        <template v-if="isToggleMode">
-            <div class="toggle-fieldtype-wrapper">
-                <toggle-input :value="isRevealed" @input="update" :read-only="isReadOnly" />
-                <label v-if="config.input_label" class="rtl:mr-2 ltr:ml-2 font-normal">{{ __(config.input_label) }}</label>
-            </div>
-        </template>
-
-        <template v-else>
-            <button
-                @click="buttonReveal"
-                class="btn"
-                :disabled="isReadOnly"
-                :v-tooltip="__(config.instructions)"
-                v-text="config.input_label || __('Show Fields')" />
-        </template>
+        <div class="flex items-center" v-if="isToggleMode">
+            <toggle-input :model-value="isRevealed" @update:model-value="update" :read-only="isReadOnly" :id="id" />
+            <label v-if="config.input_label" class="font-normal! ms-2" :for="id">
+                {{ __(config.input_label) }}
+            </label>
+        </div>
+        <Button
+            v-else
+            icon="eye-closed"
+            @click="buttonReveal"
+            :disabled="isReadOnly"
+            :v-tooltip="__(config.instructions)"
+            :text="config.input_label || __('Show Fields')"
+        />
     </div>
-
 </template>
 
 <script>
+import Fieldtype from './Fieldtype.vue';
+import { Button } from '@/components/ui';
+import { useId } from 'vue'
+
 export default {
+    components: {
+        Button,
+    },
 
     mixins: [Fieldtype],
 
-    computed: {
+    setup() {
+        const id = useId();
 
+        return { id };
+    },
+
+    computed: {
         isRevealed() {
             return this.value;
         },
@@ -38,45 +47,41 @@ export default {
         fieldPath() {
             return this.fieldPathPrefix || this.handle;
         },
-
     },
 
-    inject: ['storeName'],
+    inject: ['store'],
 
     mounted() {
-        this.$store.commit(`publish/${this.storeName}/setRevealerField`, this.fieldPath);
+        this.store.setRevealerField(this.fieldPath);
     },
 
-    beforeDestroy() {
-        this.$store.commit(`publish/${this.storeName}/unsetRevealerField`, this.fieldPath);
+    beforeUnmount() {
+        this.store.unsetRevealerField(this.fieldPath);
     },
 
     watch: {
         fieldPath(fieldPath, oldFieldPath) {
-            this.$store.commit(`publish/${this.storeName}/unsetRevealerField`, oldFieldPath);
+            this.store.unsetRevealerField(oldFieldPath);
             this.$nextTick(() => {
-                this.$store.commit(`publish/${this.storeName}/setRevealerField`, fieldPath);
+                this.store.setRevealerField(fieldPath);
             });
-        }
+        },
     },
 
     methods: {
-
         buttonReveal() {
             if (this.isReadOnly) {
                 return;
             }
 
-            this.$store.commit(`publish/${this.storeName}/setHiddenField`, {
+            this.store.setHiddenField({
                 dottedKey: this.fieldPath,
                 hidden: 'force',
                 omitValue: true,
             });
 
-            this.update(true)
-        }
-
-    }
-
-}
+            this.update(true);
+        },
+    },
+};
 </script>

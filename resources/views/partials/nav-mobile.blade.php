@@ -1,4 +1,6 @@
-@php use function Statamic\trans as __; @endphp
+@php
+    use function Statamic\trans as __;
+@endphp
 
 <nav class="nav-main nav-mobile" v-cloak>
     <div class="nav-main-inner">
@@ -6,12 +8,14 @@
             @if ($section['display'] !== 'Top Level')
                 <h6 v-pre>{{ __($section['display']) }}</h6>
             @endif
+
             <ul>
                 @foreach ($section['items'] as $item)
                     @unless ($item->view())
                         <li class="{{ $item->isActive() ? 'current' : '' }}" v-pre>
                             <a href="{{ $item->url() }}">
-                                <i>{!! $item->svg() !!}</i><span>{{ __($item->name()) }}</span>
+                                <i>{!! $item->svg() !!}</i>
+                                <span>{{ __($item->name()) }}</span>
                             </a>
                             @if ($item->children() && $item->isActive())
                                 <ul>

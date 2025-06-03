@@ -1,10 +1,10 @@
 <template>
-
     <publish-container
         ref="container"
         :name="name"
         :blueprint="blueprint"
-        v-model="currentValues"
+        :values="currentValues"
+        @updated="currentValues = $event"
         reference="collection"
         :meta="meta"
         :errors="errors"
@@ -13,7 +13,7 @@
         <div>
             <breadcrumbs v-if="breadcrumbs" :crumbs="breadcrumbs" />
 
-            <div class="flex items-center mb-6">
+            <div class="mb-6 flex items-center">
                 <h1 class="flex-1">{{ title }}</h1>
                 <button v-if="action" type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
             </div>
@@ -22,15 +22,14 @@
                 @updated="setFieldValue"
                 @meta-updated="setFieldMeta"
                 :enable-sidebar="hasSidebar"
-                :read-only="readOnly" />
+                :read-only="readOnly"
+            />
         </div>
     </publish-container>
-
 </template>
 
 <script>
 export default {
-
     props: {
         blueprint: { required: true, type: Object },
         meta: { required: true, type: Object },
@@ -40,7 +39,7 @@ export default {
         breadcrumbs: Array,
         action: String,
         method: { type: String, default: 'post' },
-        readOnly: { type: Boolean, default: false }
+        readOnly: { type: Boolean, default: false },
     },
 
     data() {
@@ -48,12 +47,11 @@ export default {
             currentValues: this.values,
             error: null,
             errors: {},
-            hasSidebar: this.blueprint.tabs.map(tab => tab.handle).includes('sidebar'),
-        }
+            hasSidebar: this.blueprint.tabs.map((tab) => tab.handle).includes('sidebar'),
+        };
     },
 
     methods: {
-
         clearErrors() {
             this.error = null;
             this.errors = {};
@@ -65,12 +63,14 @@ export default {
             this.saving = true;
             this.clearErrors();
 
-            this.$axios[this.method](this.action, this.currentValues).then(response => {
-                this.saving = false;
-                this.$toast.success(__('Saved'));
-                this.$refs.container.saved();
-                this.$emit('saved', response);
-            }).catch(e => this.handleAxiosError(e));
+            this.$axios[this.method](this.action, this.currentValues)
+                .then((response) => {
+                    this.saving = false;
+                    this.$toast.success(__('Saved'));
+                    this.$refs.container.saved();
+                    this.$emit('saved', response);
+                })
+                .catch((e) => this.handleAxiosError(e));
         },
 
         handleAxiosError(e) {
@@ -86,15 +86,13 @@ export default {
                 console.log(e);
             }
         },
-
     },
 
     created() {
-        this.$keys.bindGlobal(['mod+s'], e => {
+        this.$keys.bindGlobal(['mod+s'], (e) => {
             e.preventDefault();
             this.submit();
         });
     },
-
-}
+};
 </script>

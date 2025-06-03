@@ -46,9 +46,11 @@ export const translateChoice = function (key, count, replacements) {
 const getLine = function (key) {
     const translations = Statamic.$config.get('translations');
 
-    return translations[`*.${key}`]
-        || translations[key]
-        || translations[`statamic::${key}`]
-        || translations[`statamic::messages.${key}`]
-        || key;
-}
+    return (
+        translations[`*.${key}`] ||
+        translations[key] ||
+        translations[`statamic::${key}`] ||
+        translations[`statamic::messages.${key}`] ||
+        key
+    );
+};

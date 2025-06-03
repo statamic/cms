@@ -1,6 +1,5 @@
 <template>
     <div>
-
         <div v-if="initializing" class="card loading">
             <loading-graphic />
         </div>
@@ -13,10 +12,13 @@
             :sort-column="sortColumn"
             :sort-direction="sortDirection"
             @visible-columns-updated="visibleColumns = $event"
+            v-slot="{ hasSelections }"
         >
-            <div slot-scope="{ hasSelections }">
-                <div class="card p-0 relative">
-                    <div class="flex flex-wrap items-center justify-between px-2 pb-2 text-sm border-b dark:border-dark-900">
+            <div>
+                <div class="card relative p-0">
+                    <div
+                        class="flex flex-wrap items-center justify-between border-b px-2 pb-2 text-sm dark:border-dark-900"
+                    >
                         <data-list-filter-presets
                             ref="presets"
                             :active-preset="activePreset"
@@ -29,11 +31,26 @@
                             @reset="filtersReset"
                         />
 
-                        <data-list-search class="h-8 mt-2 min-w-[240px] w-full" ref="search" v-model="searchQuery" :placeholder="searchPlaceholder" />
+                        <data-list-search
+                            class="mt-2 h-8 w-full min-w-[240px]"
+                            ref="search"
+                            v-model="searchQuery"
+                            :placeholder="searchPlaceholder"
+                        />
 
-                        <div class="flex space-x-2 rtl:space-x-reverse mt-2">
-                            <button class="btn btn-sm rtl:mr-2 ltr:ml-2" v-text="__('Reset')" v-show="isDirty" @click="$refs.presets.refreshPreset()" />
-                            <button class="btn btn-sm rtl:mr-2 ltr:ml-2" v-text="__('Save')" v-show="isDirty" @click="$refs.presets.savePreset()" />
+                        <div class="mt-2 flex space-x-2 rtl:space-x-reverse">
+                            <button
+                                class="btn btn-sm ltr:ml-2 rtl:mr-2"
+                                v-text="__('Reset')"
+                                v-show="isDirty"
+                                @click="$refs.presets.refreshPreset()"
+                            />
+                            <button
+                                class="btn btn-sm ltr:ml-2 rtl:mr-2"
+                                v-text="__('Save')"
+                                v-show="isDirty"
+                                @click="$refs.presets.savePreset()"
+                            />
                             <data-list-column-picker :preferences-key="preferencesKey('columns')" />
                         </div>
                     </div>
@@ -72,10 +89,12 @@
                             :column-preferences-key="preferencesKey('columns')"
                             @sorted="sorted"
                         >
-                            <template slot="cell-datestamp" slot-scope="{ row: submission, value }">
-                                <a :href="submission.url" class="text-blue">{{ value }}</a>
+                            <template #cell-datestamp="{ row: submission, value }">
+                                <a :href="submission.url" class="text-blue">
+                                    <date-time :of="date" />
+                                </a>
                             </template>
-                            <template slot="actions" slot-scope="{ row: submission, index }">
+                            <template #actions="{ row: submission, index }">
                                 <dropdown-list>
                                     <dropdown-item :text="__('View')" :redirect="submission.url" />
                                     <data-list-inline-actions
@@ -101,7 +120,6 @@
                 />
             </div>
         </data-list>
-
     </div>
 </template>
 
@@ -109,11 +127,10 @@
 import Listing from '../Listing.vue';
 
 export default {
-
     mixins: [Listing],
 
     props: {
-        form: String
+        form: String,
     },
 
     data() {
@@ -121,14 +138,13 @@ export default {
             listingKey: 'submissions',
             preferencesPrefix: `forms.${this.form}`,
             requestUrl: cp_url(`forms/${this.form}/submissions`),
-        }
+        };
     },
 
     computed: {
         actionContext() {
-            return {form: this.form};
+            return { form: this.form };
         },
     },
-
-}
+};
 </script>

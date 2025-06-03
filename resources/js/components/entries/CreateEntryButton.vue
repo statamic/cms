@@ -1,46 +1,51 @@
 <template>
-
-    <dropdown-list class="inline-block" :disabled="!hasMultipleBlueprints">
-        <template v-slot:trigger>
-            <button
-                :class="[buttonClass, {'flex items-center rtl:pl-4 ltr:pr-4': hasMultipleBlueprints }]"
-                @click="create"
-            >
-                {{ text }}
-                <svg-icon name="micro/chevron-down-xs" class="w-2 rtl:mr-2 ltr:ml-2" v-if="hasMultipleBlueprints" />
-            </button>
-        </template>
-        <h6 v-text="__('Choose Blueprint')" class="p-2" />
-
-        <div class="max-h-[75vh] overflow-y-auto">
-            <div v-for="blueprint in blueprints" :key="blueprint.handle"">
-                <dropdown-item :text="blueprint.title" @click="select(blueprint.handle, $event)" />
-            </div>
-        </div>
-    </dropdown-list>
-
+    <div>
+        <Button @click="create" v-if="!hasMultipleBlueprints" :text="text" :size="size" />
+        <Dropdown v-else>
+            <template #trigger>
+                <Button @click.prevent="create" :variant icon-append="ui/chevron-down" :text="text" :size="size" />
+            </template>
+            <DropdownMenu>
+                <DropdownLabel v-text="__('Choose Blueprint')" />
+                <DropdownItem
+                    v-for="blueprint in blueprints"
+                    :key="blueprint.handle"
+                    @click="select(blueprint.handle, $event)"
+                    :text="blueprint.title"
+                />
+            </DropdownMenu>
+        </Dropdown>
+    </div>
 </template>
 
 <script>
+import { Button, Dropdown, DropdownMenu, DropdownItem, DropdownLabel } from '@statamic/ui';
+
 export default {
+    components: {
+        Button,
+        Dropdown,
+        DropdownMenu,
+        DropdownItem,
+        DropdownLabel,
+    },
 
     props: {
         url: String,
         blueprints: Array,
+        variant: { type: String, default: 'primary' },
         text: { type: String, default: () => __('Create Entry') },
-        buttonClass: { type: String, default: 'btn' }
+        size: { type: String, default: 'base' },
+        buttonClass: { type: String, default: 'btn' },
     },
 
     computed: {
-
         hasMultipleBlueprints() {
             return this.blueprints.length > 1;
-        }
-
+        },
     },
 
     methods: {
-
         create($event) {
             if (this.blueprints.length === 1) this.select(null, $event);
         },
@@ -52,10 +57,8 @@ export default {
                 url = url += `?blueprint=${blueprint}`;
             }
 
-            $event.metaKey ? window.open(url) : window.location = url;
-        }
-
-    }
-
-}
+            $event.metaKey ? window.open(url) : (window.location = url);
+        },
+    },
+};
 </script>

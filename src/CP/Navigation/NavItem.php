@@ -200,7 +200,7 @@ class NavItem
     {
         $value = $this->icon() ?? 'entries';
 
-        return Str::startsWith($value, '<svg') ? $value : Statamic::svg('icons/light/'.$value);
+        return Str::startsWith($value, '<svg') ? $value : Statamic::svg('icons/'.$value, 'size-4 shrink-0');
     }
 
     /**
@@ -298,22 +298,6 @@ class NavItem
     protected function wasOriginallyChild(): bool
     {
         return (bool) $this->wasOriginallyChild;
-    }
-
-    /**
-     * Active URL pattern to determine when to resolve children for `hasActiveChild()` checks.
-     *
-     * Though we still check active patterns for nested URLs internally, having to manually
-     * use this method should not be needed anymore, not to mention it is confusing for
-     * addon devs to know when they even need to use it, thus we are deprecating it.
-     *
-     * @deprecated
-     *
-     * @return $this
-     */
-    public function active($pattern = null)
-    {
-        return $this->fluentlyGetOrSet('active')->value($pattern);
     }
 
     /**

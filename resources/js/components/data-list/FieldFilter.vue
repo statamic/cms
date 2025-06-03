@@ -2,14 +2,13 @@
     <div>
         <div v-if="hasAvailableFieldFilters">
             <div class="flex flex-col p-3">
-
                 <v-select
                     ref="fieldSelect"
                     :placeholder="__('Field')"
                     :options="fieldOptions"
-                    :reduce="option => option.value"
-                    :value="field"
-                    @input="createFilter"
+                    :reduce="(option) => option.value"
+                    :model-value="field"
+                    @update:model-value="createFilter"
                 />
 
                 <publish-container
@@ -20,33 +19,31 @@
                     :track-dirty-state="false"
                     class="filter-fields mt-2"
                     @updated="updateValues"
+                    v-slot="{ setFieldValue, setFieldMeta }"
                 >
-                    <!-- TODO: handle showing/hiding of labels more elegantly -->
                     <publish-fields
-                        slot-scope="{ setFieldValue, setFieldMeta }"
                         :fields="filter.fields"
                         name-prefix="filter-field"
-                        class="w-full no-label"
+                        class="no-label w-full"
                         @updated="setFieldValue"
                         @meta-updated="setFieldMeta"
                     />
+                    <!-- TODO: handle showing/hiding of labels more elegantly -->
                 </publish-container>
-
             </div>
 
-            <div class="flex border-t dark:border-dark-900 text-gray-800 dark:text-dark-150">
+            <div class="flex border-t text-gray-800 dark:border-dark-900 dark:text-dark-150">
                 <button
-                    class="p-2 hover:bg-gray-100 dark:hover:bg-dark-600 rtl:rounded-br ltr:rounded-bl text-xs flex-1"
+                    class="flex-1 p-2 text-xs hover:bg-gray-100 dark:hover:bg-dark-600 ltr:rounded-bl rtl:rounded-br"
                     v-text="__('Clear')"
                     @click="resetAll"
                 />
                 <button
-                    class="p-2 hover:bg-gray-100 dark:hover:bg-dark-600 flex-1 rtl:rounded-bl ltr:rounded-br rtl:border-r ltr:border-l dark:border-dark-900 text-xs"
+                    class="flex-1 p-2 text-xs hover:bg-gray-100 dark:border-dark-900 dark:hover:bg-dark-600 ltr:rounded-br ltr:border-l rtl:rounded-bl rtl:border-r"
                     v-text="__('Close')"
                     @click="$emit('closed')"
                 />
             </div>
-
         </div>
         <v-select v-else :disabled="true" :placeholder="__('No available filters')" />
     </div>
@@ -55,9 +52,10 @@
 <script>
 import Validator from '../field-conditions/Validator.js';
 import PublishField from '../publish/Field.vue';
+import { sortBy, mapValues } from 'lodash-es';
+import debounce from '@statamic/util/debounce.js';
 
 export default {
-
     components: { PublishField },
 
     props: {
@@ -77,26 +75,25 @@ export default {
     },
 
     computed: {
-
         availableFieldFilters() {
-            if (! this.config) return [];
+            if (!this.config) return [];
 
-            return this.config.extra.filter(field => ! this.initialValues[field.handle]);
+            return this.config.extra.filter((field) => !this.initialValues[field.handle]);
         },
 
         hasAvailableFieldFilters() {
-            return !! this.availableFieldFilters.length;
+            return !!this.availableFieldFilters.length;
         },
 
         fieldOptions() {
-            let options = this.availableFieldFilters.map(filter => {
+            let options = this.availableFieldFilters.map((filter) => {
                 return {
                     value: filter.handle,
                     label: filter.display,
                 };
             });
 
-            return _.sortBy(options, option => option.label);
+            return sortBy(options, (option) => option.label);
         },
 
         showFieldFilter() {
@@ -104,14 +101,20 @@ export default {
         },
 
         isFilterComplete() {
-            if (! this.filter) return false;
+            if (!this.filter) return false;
 
-            let visibleFields = _.chain(this.filter.fields).filter(function (field) {
+            let visibleFields = this.filter.fields.filter(function (field) {
                 let validator = new Validator(field, this.fieldValues);
                 return validator.passesConditions();
-            }, this).mapObject(field => field.handle).values().value();
+            }, this);
 
-            let allFieldsFilled = _.chain(this.fieldValues).filter((value, handle) => visibleFields.includes(handle) && value).values().value().length === visibleFields.length;
+            visibleFields = mapValues(visibleFields, (field) => field.handle);
+            visibleFields = Object.values(visibleFields);
+
+            let allFieldsFilled =
+                Object.entries(this.fieldValues || {}).filter(
+                    ([handle, value]) => visibleFields.includes(handle) && value,
+                ).length === visibleFields.length;
 
             return this.field !== null && allFieldsFilled;
         },
@@ -121,13 +124,10 @@ export default {
 
             delete values[this.field];
 
-            values[this.field] = this.isFilterComplete
-                ? this.fieldValues
-                : null;
+            values[this.field] = this.isFilterComplete ? this.fieldValues : null;
 
             return values;
         },
-
     },
 
     watch: {
@@ -136,12 +136,12 @@ export default {
             deep: true,
             handler() {
                 this.update();
-            }
+            },
         },
     },
 
     mounted() {
-        if (! this.hasAvailableFieldFilters) return;
+        if (!this.hasAvailableFieldFilters) return;
 
         this.reset();
 
@@ -149,9 +149,8 @@ export default {
     },
 
     methods: {
-
         popoverClosed() {
-            if (! this.badges[this.field]) {
+            if (!this.badges[this.field]) {
                 this.resetAll();
             }
         },
@@ -163,7 +162,6 @@ export default {
             this.filter = null;
             this.field = null;
             this.fieldValues = null;
-
         },
 
         resetAll() {
@@ -194,17 +192,17 @@ export default {
         },
 
         setFilter(field) {
-            this.filter = _.find(this.availableFieldFilters, filter => filter.handle === field);
+            this.filter = this.availableFieldFilters.find((filter) => filter.handle === field);
         },
 
         setDefaultValues() {
-            if (! this.filter) return;
+            if (!this.filter) return;
 
             let values = {};
 
             this.filter.fields
-                .filter(field => field.default)
-                .forEach(field => values[field.handle] = field.default);
+                .filter((field) => field.default)
+                .forEach((field) => (values[field.handle] = field.default));
 
             this.updateValues(values);
         },
@@ -218,15 +216,13 @@ export default {
             this.containerValues = clone(values);
         },
 
-        updateFieldValues: _.debounce(function (values) {
+        updateFieldValues: debounce(function (values) {
             this.fieldValues = clone(values);
         }, 300),
 
         update() {
             this.$emit('changed', this.newValues);
         },
-
-    }
-
-}
+    },
+};
 </script>

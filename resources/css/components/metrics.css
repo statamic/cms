@@ -10,11 +10,10 @@
 }
 
 .metric {
-
 }
 
 .mini-chart {
-    @apply shadow bg-gray-800 relative rounded;
+    @apply relative rounded-sm bg-gray-800 shadow;
     .count {
         overflow: hidden;
         color: #fff;
@@ -24,10 +23,17 @@
             margin: 10px 0 0;
         }
     }
-    &.dark { }
-    &.blue { @apply bg-blue; }
-    &.green { @apply bg-green-600; }
-    &.red { @apply bg-red-500; }
+    &.dark {
+    }
+    &.blue {
+        @apply bg-blue;
+    }
+    &.green {
+        @apply bg-green-600;
+    }
+    &.red {
+        @apply bg-red-500;
+    }
 }
 
 .metric.simple {
