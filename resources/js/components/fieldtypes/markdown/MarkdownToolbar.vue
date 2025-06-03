@@ -6,7 +6,7 @@
             <Button
                 size="sm"
                 variant="ghost"
-                class="px-2! [&_svg]:size-3.5 focus:focus-outline"
+                class="px-2! [&_svg]:size-3.5"
                 v-for="button in buttons"
                 :key="button.name"
                 v-tooltip="button.text"
