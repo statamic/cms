@@ -52,7 +52,7 @@
                 :class="{ 'mt-4': items.length > 0 }"
             >
                 <div class="-mb-2 flex flex-wrap items-center text-sm">
-                    <div class="relative mb-2">
+                    <!-- <div class="relative mb-2">
                         <create-button
                             v-if="canCreate && creatables.length"
                             :creatables="creatables"
@@ -62,7 +62,21 @@
                             :stack-size="formStackSize"
                             @created="itemCreated"
                         />
-                    </div>
+                    </div> -->
+                    <CreateButton
+                        ref="existing"
+                        icon="link"
+                        variant="filled"
+                        :text="__('Create & Link Item')"
+
+                        v-if="canCreate && creatables.length"
+                        :creatables="creatables"
+                        :site="site"
+                        :component="formComponent"
+                        :component-props="formComponentProps"
+                        :stack-size="formStackSize"
+                        @created="itemCreated"
+                    />
                     <Button
                         ref="existing"
                         icon="link"
