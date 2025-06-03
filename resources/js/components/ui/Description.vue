@@ -8,7 +8,6 @@ const props = defineProps({
     required: { type: Boolean, default: false },
     text: { type: [String, Number, Boolean, null], default: null },
 });
-
 </script>
 
 <template>
