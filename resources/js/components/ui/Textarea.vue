@@ -5,9 +5,7 @@ import { CharacterCounter } from '@statamic/ui';
 defineEmits(['update:modelValue']);
 
 const props = defineProps({
-    description: { type: String, default: null },
     elastic: { type: Boolean, default: false },
-    label: { type: String, default: null },
     required: { type: Boolean, default: false },
     resize: { type: String, default: 'vertical' },
     rows: { type: [Number, String], default: 4 },

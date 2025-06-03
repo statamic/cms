@@ -4,9 +4,7 @@ import { ref, watch, provide } from 'vue';
 import { cva } from 'cva';
 
 const props = defineProps({
-    description: { type: String, default: null },
     required: { type: Boolean, default: false },
-    label: { type: String, default: null },
     modelValue: { type: [String, Array], default: null },
     size: { type: String, default: 'base' },
     variant: { type: String, default: 'default' },

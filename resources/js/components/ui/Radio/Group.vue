@@ -3,9 +3,7 @@ import { useId } from 'vue';
 import { RadioGroupRoot } from 'reka-ui';
 
 defineProps({
-    description: { type: String, default: null },
     inline: { type: Boolean, default: false },
-    label: { type: String, default: null },
     modelValue: { type: [String, Number, Boolean], default: null },
     name: { type: String, default: () => useId() },
     required: { type: Boolean, default: false },

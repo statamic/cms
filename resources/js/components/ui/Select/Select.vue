@@ -5,8 +5,6 @@ import { Combobox } from '@statamic/ui';
 const emit = defineEmits(['update:modelValue']);
 
 const props = defineProps({
-    description: { type: String, default: null },
-    label: { type: String, default: null },
     modelValue: { type: [Object, String, Number], default: null },
     size: { type: String, default: 'base' },
     placeholder: { type: String, default: 'Select...' },
