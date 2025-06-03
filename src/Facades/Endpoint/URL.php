@@ -14,10 +14,19 @@ use Statamic\Support\Str;
  */
 class URL
 {
+    private static $enforceTrailingSlashes = false;
     private static $externalUriCache = [];
 
     /**
-     * Removes occurrences of "//" in a $path (except when part of a protocol)
+     * Enforce trailing slashes service provider helper.
+     */
+    public function enforceTrailingSlashes(bool $bool = true): void
+    {
+        static::$enforceTrailingSlashes = $bool;
+    }
+
+    /**
+     * Removes occurrences of "//" in a $path (except when part of a protocol).
      * Alias of Path::tidy().
      *
      * @param  string  $url  URL to remove "//" from
@@ -333,5 +342,19 @@ class URL
         $url = Str::before($url, '#'); // Remove anchor fragment
 
         return $url;
+    }
+
+    /**
+     * Normalize trailing slashes (trims by default, but can be enforced onto end).
+     */
+    public function normalizeTrailingSlashes(string $url): string
+    {
+        if ($url === '/') {
+            return $url;
+        }
+
+        return static::$enforceTrailingSlashes
+            ? Str::ensureRight($url, '/')
+            : rtrim($url, '/');
     }
 }
