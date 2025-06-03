@@ -9,6 +9,13 @@ use Tests\TestCase;
 
 class UrlTest extends TestCase
 {
+    public function tearDown(): void
+    {
+        URL::enforceTrailingSlashes(false);
+
+        parent::tearDown();
+    }
+
     protected function resolveApplicationConfiguration($app)
     {
         parent::resolveApplicationConfiguration($app);
