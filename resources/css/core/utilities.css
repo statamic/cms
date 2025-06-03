@@ -1,13 +1,19 @@
 /* ==========================================================================
    UTILITES
    ========================================================================== */
-
+/* Here we typically need a negative outline-offset because of the inner shadow on inputs */
 @utility focus-outline {
     outline-width: var(--focus-outline-width);
     outline-offset: var(--focus-outline-offset);
     outline-color: var(--focus-outline-color, currentColor);
     outline-style: var(--focus-outline-style, solid);
-    box-shadow: var(--focus-outline-box-shadow);
+}
+/* Same as focus-outline, but without the outline-offset, e.g. a Markdown editor */
+@utility focus-outline-within {
+    outline-offset: 0;
+    outline-width: var(--focus-outline-width);
+    outline-color: var(--focus-outline-color, currentColor);
+    outline-style: var(--focus-outline-style, solid);
 }
 
 @utility focus-none {

@@ -1,10 +1,10 @@
 :root {
-    --focus-outline-width: 1px;
-    --focus-outline-offset: 0;
-    --focus-outline-color: var(--color-blue-400);
+    --focus-outline-width: 2px;
+    /* Here we typically need a negative outline-offset because of the inner shadow on inputs */
+    --focus-outline-offset: -1px;
+    --focus-within-outline-offset: 0;
+    --focus-outline-color: var(--color-blue-500);
     --focus-outline-style: solid;
-    --focus-shadow-color: var(--color-blue-400);
-    --focus-outline-box-shadow: 0 0 0 0.25rem hsl(from var(--focus-shadow-color) h s l / 0.25), inset 0 0 0 0.05rem hsl(from var(--focus-shadow-color) h s l / 0.25);
     :is(.dark)& {
         --focus-outline-color: var(--color-blue-500);
         --focus-shadow-color: var(--color-blue-500);
@@ -21,8 +21,6 @@
             outline-offset: var(--focus-outline-offset);
             outline-color: var(--focus-outline-color, currentColor);
             outline-style: var(--focus-outline-style, solid);
-            /* This needs to be !important to override box-shadows set in the utilities layer */
-            box-shadow: var(--focus-outline-box-shadow)!important;
         }
     }
 }
