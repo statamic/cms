@@ -33,7 +33,9 @@
                         {{-- <div class="" :class="wrapperClass"> --}}
                         <div class="p-2 h-full flex-1 overflow-y-auto">
                             <div class="relative content-card @yield('content-card-modifiers') min-h-full transition-padding duration-300">
-                                @yield('content')
+                                <div v-cloak>
+                                    @yield('content')
+                                </div>
                             </div>
                         </div>
                     </main>
