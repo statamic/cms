@@ -12,7 +12,7 @@ const props = defineProps({
 </script>
 
 <template>
-    <div class="text-[0.8125rem] font-normal text-gray-500 dark:text-gray-400" data-ui-description>
+    <div class="text-[0.8125rem] font-normal text-gray-500 dark:text-gray-400 trim-text-start" data-ui-description>
         <slot v-if="hasDefaultSlot" />
         <span v-else v-html="text" />
     </div>

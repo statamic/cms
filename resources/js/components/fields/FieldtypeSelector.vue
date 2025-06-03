@@ -25,13 +25,13 @@
                 :key="group.handle"
                 v-show="group.fieldtypes.length > 0"
             >
-                <h2 v-if="group.title" v-text="group.title" class="mb-1 px-2" />
+                <h2 v-if="group.title" v-text="group.title" class="mb-2 px-2" />
                 <div class="fieldtype-selector">
                     <ui-panel>
                         <ui-panel-header class="px-2! py-1.5!">
                             <ui-description :text="group.description" />
                         </ui-panel-header>
-                        <div class="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-3">
+                        <div class="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-1.5">
                         <div v-for="fieldtype in group.fieldtypes" :key="fieldtype.handle">
                             <button
                                 class="flex items-center gap-2 w-full px-3 py-2.5 group bg-white dark:bg-gray-850 shadow-ui-sm rounded-xl border border-gray-200 dark:border-x-0 dark:border-b-0 dark:border-gray-700 cursor-pointer"
