@@ -240,4 +240,51 @@ class UrlTest extends TestCase
         $this->assertEquals('https://example.com/about', URL::removeQueryAndFragment('https://example.com/about?foo=bar&baz=qux'));
         $this->assertEquals('https://example.com/about', URL::removeQueryAndFragment('https://example.com/about?foo=bar&baz=qux#anchor'));
     }
+
+    #[Test]
+    #[DataProvider('enforceTrailingSlashesProvider')]
+    public function enforces_trailing_slashes($url, $expected)
+    {
+        URL::enforceTrailingSlashes();
+
+        $this->assertSame($expected, URL::normalizeTrailingSlashes($url));
+    }
+
+    public static function enforceTrailingSlashesProvider()
+    {
+        return [
+            ['', '/'],
+            ['/', '/'],
+
+            ['?query', '/?query'],
+            ['#anchor', '/#anchor'],
+            ['?foo=bar&baz=qux', '/?foo=bar&baz=qux'],
+            ['?foo=bar&baz=qux#anchor', '/?foo=bar&baz=qux#anchor'],
+
+            ['/?query', '/?query'],
+            ['/#anchor', '/#anchor'],
+            ['/?foo=bar&baz=qux', '/?foo=bar&baz=qux'],
+            ['/?foo=bar&baz=qux#anchor', '/?foo=bar&baz=qux#anchor'],
+
+            ['https://example.com?query', 'https://example.com/?query'],
+            ['https://example.com#anchor', 'https://example.com/#anchor'],
+            ['https://example.com?foo=bar&baz=qux', 'https://example.com/?foo=bar&baz=qux'],
+            ['https://example.com?foo=bar&baz=qux#anchor', 'https://example.com/?foo=bar&baz=qux#anchor'],
+
+            ['https://example.com/?query', 'https://example.com/?query'],
+            ['https://example.com/#anchor', 'https://example.com/#anchor'],
+            ['https://example.com/?foo=bar&baz=qux', 'https://example.com/?foo=bar&baz=qux'],
+            ['https://example.com/?foo=bar&baz=qux#anchor', 'https://example.com/?foo=bar&baz=qux#anchor'],
+
+            ['https://example.com/about?query', 'https://example.com/about/?query'],
+            ['https://example.com/about#anchor', 'https://example.com/about/#anchor'],
+            ['https://example.com/about?foo=bar&baz=qux', 'https://example.com/about/?foo=bar&baz=qux'],
+            ['https://example.com/about?foo=bar&baz=qux#anchor', 'https://example.com/about/?foo=bar&baz=qux#anchor'],
+
+            ['https://example.com/about/?query', 'https://example.com/about/?query'],
+            ['https://example.com/about/#anchor', 'https://example.com/about/#anchor'],
+            ['https://example.com/about/?foo=bar&baz=qux', 'https://example.com/about/?foo=bar&baz=qux'],
+            ['https://example.com/about/?foo=bar&baz=qux#anchor', 'https://example.com/about/?foo=bar&baz=qux#anchor'],
+        ];
+    }
 }
