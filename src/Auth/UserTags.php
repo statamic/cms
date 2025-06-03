@@ -745,7 +745,7 @@ class UserTags extends Tags
                                 return $this->getRenderableField($field, 'user.profile');
                             })
                             ->values()
-                            ->all(),
+                            ->all()
                         ];
                     })
                     ->all()
