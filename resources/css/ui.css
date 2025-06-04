@@ -74,7 +74,7 @@
 @theme {
     --text-4xs: 0.4rem;
     --text-3xs: 0.5rem;
-    --text-2xs: 0.625rem;
+    --text-2xs: 0.7rem;
 
     --shadow-ui-xs: 0px 1px 3px -1px rgba(0,0,0,0.10);
     --shadow-ui-sm: 0px 2px 3px -2px rgba(0,0,0,0.15);
