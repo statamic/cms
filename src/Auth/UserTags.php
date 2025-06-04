@@ -741,9 +741,11 @@ class UserTags extends Tags
                                     ->map(function ($field) {
                                         return $this->getRenderableField($field, 'user.profile');
                                     })
-                                    ->values(),
+                                    ->values()
+                                    ->all(),
                             ];
-                        }),
+                        })
+                        ->all(),
                 ];
             })
             ->values()
