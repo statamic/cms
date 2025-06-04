@@ -725,29 +725,29 @@ class UserTags extends Tags
             : [];
 
         return User::blueprint()->tabs()
-            ->map(function ($tab) use ($values) {
-                return [
+            ->map(fn ($tab) =>
+                [
                     'display' => $tab->display(),
                     'sections' => $tab->sections()
-                        ->map(function ($section) use ($values) {
-                            return [
+                        ->map(fn ($section) =>
+                            [
                                 'display' => $section->display(),
                                 'instructions' => $section->instructions(),
                                 'fields' => $section->fields()->addValues($values)->preProcess()->all()
-                                    ->reject(function ($field) {
-                                        return in_array($field->handle(), ['password', 'password_confirmation', 'roles', 'groups'])
-                                            || $field->fieldtype()->handle() === 'assets';
-                                    })
-                                    ->map(function ($field) {
-                                        return $this->getRenderableField($field, 'user.profile');
-                                    })
+                                    ->reject(fn ($field) =>
+                                        in_array($field->handle(), ['password', 'password_confirmation', 'roles', 'groups'])
+                                            || $field->fieldtype()->handle() === 'assets'
+                                    )
+                                    ->map(fn ($field) =>
+                                        $this->getRenderableField($field, 'user.profile')
+                                    )
                                     ->values()
                                     ->all(),
-                            ];
-                        })
+                            ]
+                        )
                         ->all(),
-                ];
-            })
+                ]
+            )
             ->values()
             ->all();
     }
