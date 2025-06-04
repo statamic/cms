@@ -142,7 +142,7 @@ const copy = () => {
                     <Button
                         size="sm"
                         :icon="copied ? 'clipboard-check' : 'clipboard'"
-                        variant="ghost"
+                        variant="subtle"
                         v-else-if="copyable"
                         @click="copy"
                         class="animate"
