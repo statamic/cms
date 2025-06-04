@@ -43,10 +43,20 @@
                 />
 
                 <div class="flex items-center" v-if="!readOnly">
-                    <dropdown-list>
-                        <dropdown-item :text="__('Edit')" @click="edit" v-if="editable" />
-                        <dropdown-item :text="__('Unlink')" class="warning" @click="$emit('removed')" />
-                    </dropdown-list>
+                    <Dropdown>
+                        <DropdownMenu>
+                            <DropdownItem
+                                v-if="editable"
+                                :text="__('Edit')"
+                                @click="edit"
+                            />
+                            <DropdownItem
+                                :text="__('Unlink')"
+                                variant="destructive"
+                                @click="$emit('removed')"
+                            />
+                        </DropdownMenu>
+                    </Dropdown>
                 </div>
             </div>
         </div>
@@ -56,9 +66,13 @@
 <script>
 import { getActivePinia } from 'pinia';
 import InlineEditForm from './InlineEditForm.vue';
+import { Dropdown, DropdownMenu, DropdownItem } from '@statamic/ui';
 
 export default {
     components: {
+        DropdownItem,
+        DropdownMenu,
+        Dropdown,
         InlineEditForm,
     },
 
