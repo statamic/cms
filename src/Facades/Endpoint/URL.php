@@ -185,7 +185,7 @@ class URL
             $url .= '#'.$parsed['fragment'];
         }
 
-        return $url;
+        return self::tidy($url);
     }
 
     /**
