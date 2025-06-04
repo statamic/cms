@@ -20,6 +20,7 @@
 
         <template v-if="shouldShowSelectedItems">
             <div
+                v-if="items.length"
                 ref="items"
                 :class="{ 'mt-2': usesSelectField && items.length }"
             >
