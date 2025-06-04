@@ -230,13 +230,13 @@ class NavTest extends TestCase
         $item = $this->build()->get('Droids')->first();
 
         $this->assertEquals('droid', $item->icon());
-        $this->assertEquals('<svg>droid</svg>', $item->svg());
+        $this->assertEquals('<svg class="size-4 shrink-0">droid</svg>', $item->svg());
         $this->assertEquals('droid', $item->children()->get(0)->icon());
-        $this->assertEquals('<svg>droid</svg>', $item->children()->get(0)->svg());
+        $this->assertEquals('<svg class="size-4 shrink-0">droid</svg>', $item->children()->get(0)->svg());
         $this->assertEquals('droid', $item->children()->get(1)->icon());
-        $this->assertEquals('<svg>droid</svg>', $item->children()->get(1)->svg());
+        $this->assertEquals('<svg class="size-4 shrink-0">droid</svg>', $item->children()->get(1)->svg());
         $this->assertEquals('droid', $item->children()->get(2)->icon());
-        $this->assertEquals('<svg>droid</svg>', $item->children()->get(2)->svg());
+        $this->assertEquals('<svg class="size-4 shrink-0">droid</svg>', $item->children()->get(2)->svg());
 
         File::delete($svg);
     }
