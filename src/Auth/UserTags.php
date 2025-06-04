@@ -196,7 +196,7 @@ class UserTags extends Tags
 
         $data = $this->getFormSession('user.profile');
 
-        $data['tabs'] = $this->getProfileTabs();        
+        $data['tabs'] = $this->getProfileTabs();
         $data['sections'] = collect($data['tabs'])->flatMap->sections->all();
         $data['fields'] = collect($data['sections'])->flatMap->fields->all();
 
