@@ -61,7 +61,7 @@ const classes = computed(() =>
             /* When label exists but no description follows */
             '[&>[data-ui-label]:not(:has(+[data-ui-description]))]:mb-2',
             /* When label is followed by description */
-            '*:data-ui-description:mb-2',
+            '*:data-ui-description:mb-2 *:data-ui-description:mt-1',
         ],
         variants: {
             variant: {
