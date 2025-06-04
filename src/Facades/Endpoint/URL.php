@@ -31,9 +31,8 @@ class URL
      * Also normalizes trailing slash (configurable via `enforceTrailingSlashes()` function).
      *
      * @param  string  $url  URL to remove "//" from
-     * @return string
      */
-    public function tidy($url)
+    public function tidy($url): string
     {
         return self::normalizeTrailingSlash(Path::tidy($url));
     }
@@ -169,9 +168,8 @@ class URL
      * Make an absolute URL relative.
      *
      * @param  string  $url
-     * @return string
      */
-    public function makeRelative($url)
+    public function makeRelative($url): string
     {
         $parsed = parse_url($url);
 
@@ -192,9 +190,8 @@ class URL
      * Make a relative URL absolute.
      *
      * @param  string  $url
-     * @return string
      */
-    public function makeAbsolute($url)
+    public function makeAbsolute($url): string
     {
         // If it doesn't start with a slash, we'll just leave it as-is.
         if (! Str::startsWith($url, '/')) {
