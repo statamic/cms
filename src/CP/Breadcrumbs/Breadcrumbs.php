@@ -4,6 +4,7 @@ namespace Statamic\CP\Breadcrumbs;
 
 use Statamic\CP\Navigation\NavItem;
 use Statamic\Facades\CP\Nav;
+use Statamic\Statamic;
 
 class Breadcrumbs
 {
@@ -67,5 +68,18 @@ class Breadcrumbs
         }
 
         return $breadcrumbs;
+    }
+
+    public static function title(?string $title = null): string
+    {
+        $crumbs = collect(static::build())->map->text();
+
+        if ($title) {
+            $crumbs->push(__($title));
+        }
+
+        $arrow = Statamic::cpDirection() === 'ltr' ? ' ‹ ' : ' › ';
+
+        return $crumbs->reverse()->join($arrow);
     }
 }

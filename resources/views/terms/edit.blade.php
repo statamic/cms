@@ -1,10 +1,11 @@
 @php
     use function Statamic\trans as __;
+    use Statamic\CP\Breadcrumbs\Breadcrumbs;
 @endphp
 
 @inject('str', 'Statamic\Support\Str')
 @extends('statamic::layout')
-@section('title', __('Edit Term'))
+@section('title', Breadcrumbs::title($title))
 @section('wrapper_class', 'max-w-7xl')
 
 @section('content')

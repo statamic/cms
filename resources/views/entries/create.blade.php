@@ -1,6 +1,7 @@
+@use(Statamic\CP\Breadcrumbs\Breadcrumbs)
 @inject('str', 'Statamic\Support\Str')
 @extends('statamic::layout')
-{{--@section('title', $breadcrumbs->title($collectionCreateLabel))--}}
+@section('title', Breadcrumbs::title($collectionCreateLabel))
 @section('wrapper_class', 'max-w-7xl')
 
 @section('content')
