@@ -196,12 +196,9 @@ class UserTags extends Tags
 
         $data = $this->getFormSession('user.profile');
 
-        $array_tabs = $this->getProfileTabs();
-        $array_sections = array_reduce(array_column($array_tabs, 'sections'), 'array_merge', []);
-        $array_fields = array_reduce(array_column($array_sections, 'fields'), 'array_merge', []);
-        $data['tabs'] = $array_tabs;
-        $data['sections'] = $array_sections;
-        $data['fields'] = $array_fields;
+        $data['tabs'] = $this->getProfileTabs();        
+        $data['sections'] = collect($data['tabs'])->flatMap->sections->all();
+        $data['fields'] = collect($data['sections'])->flatMap->fields->all();
 
         $knownParams = ['redirect', 'error_redirect', 'allow_request_redirect'];
 
@@ -744,11 +741,9 @@ class UserTags extends Tags
                                     ->map(function ($field) {
                                         return $this->getRenderableField($field, 'user.profile');
                                     })
-                                    ->values()
-                                    ->all(),
+                                    ->values(),
                             ];
-                        })
-                        ->all(),
+                        }),
                 ];
             })
             ->values()
