@@ -229,6 +229,7 @@ class Glide extends Tags
         $cache = GlideManager::cacheDisk();
 
         try {
+            $item = $this->stripAppUrl($item);
             $path = $this->generateImage($item);
             $source = $cache->read($path);
             $url = 'data:'.$cache->mimeType($path).';base64,'.base64_encode($source);
