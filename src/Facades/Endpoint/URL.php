@@ -27,14 +27,15 @@ class URL
 
     /**
      * Removes occurrences of "//" in a $path (except when part of a protocol).
-     * Alias of Path::tidy().
+     *
+     * Also normalizes trailing slash (configurable via `enforceTrailingSlashes()` function).
      *
      * @param  string  $url  URL to remove "//" from
      * @return string
      */
     public function tidy($url)
     {
-        return Path::tidy($url);
+        return self::normalizeTrailingSlash(Path::tidy($url));
     }
 
     /**
