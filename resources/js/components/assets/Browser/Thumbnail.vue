@@ -1,7 +1,7 @@
 <template>
     <div class="">
         <img
-            v-if="asset.is_image"
+            v-if="asset.thumbnail"
             :src="asset.thumbnail"
             class="asset-thumbnail mx-auto max-h-8 max-w-full rounded-sm"
             loading="lazy"

@@ -208,4 +208,32 @@ return [
 
     'svg_sanitization_on_upload' => true,
 
+    /*
+    |--------------------------------------------------------------------------
+    | Generate Video Thumbnails
+    |--------------------------------------------------------------------------
+    |
+    | When enabled, Statamic will generate thumbnails for videos.
+    | Generated thumbnails are displayed in the Control Panel.
+    |
+    */
+
+    'video_thumbnails' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | FFmpeg
+    |--------------------------------------------------------------------------
+    |
+    | FFMpeg is used to extract thumbnails for video assets
+    | to be displayed within the Control Panel. You may
+    | adjust the binary location and cache path here.
+    |
+    */
+
+    'ffmpeg' => [
+        'binary' => 'ffmpeg',
+        'cache_path' => storage_path('statamic/glide/ffmpeg'),
+    ],
+
 ];

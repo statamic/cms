@@ -93,7 +93,7 @@
                                     <div class="relative flex aspect-square size-full items-center justify-center">
                                         <div class="asset-thumb">
                                             <img
-                                                v-if="asset.is_image"
+                                                v-if="asset.thumbnail"
                                                 :src="asset.thumbnail"
                                                 loading="lazy"
                                                 :draggable="false"
