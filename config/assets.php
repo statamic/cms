@@ -232,7 +232,7 @@ return [
     */
 
     'ffmpeg' => [
-        'binary' => 'ffmpeg',
+        'binary' => null,
         'cache_path' => storage_path('statamic/glide/ffmpeg'),
     ],
 
