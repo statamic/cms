@@ -53,7 +53,7 @@ class Ffmpeg extends Process
             return $binary;
         }
 
-        $output = $this->run($this->isWindows() ? 'where ffmpeg2' : 'which ffmpeg');
+        $output = $this->run($this->isWindows() ? 'where ffmpeg' : 'which ffmpeg');
 
         if (str($output)->lower()->contains([
             'could not find files for the given',
