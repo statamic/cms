@@ -1,11 +1,11 @@
 <template>
-    <div class="flex items-center gap-3">
+    <div class="flex gap-3">
         <!-- Link type selector -->
-        <div class="w-28">
+        <div class="w-fit">
             <Select :options v-model="option" />
         </div>
 
-        <div class="flex-1 truncate">
+        <div class="flex-1 flex">
             <!-- URL text input -->
             <Input v-if="option === 'url'" v-model="urlValue" />
 
@@ -35,6 +35,18 @@
         </div>
     </div>
 </template>
+
+<!-- This is a hack to...  -->
+<style scoped>
+    /* [1] Make the relationship input full height when it's in a link field. */
+    ::v-deep(.relationship-input) > div:first-child {
+        @apply h-full;
+    }
+    /* [/2] Make the combobox text smaller when it's in a link field so there's not jarring when looking between the two. */
+    ::v-deep [data-ui-combobox-anchor] {
+        font-size: var(--text-sm)!important;
+    }
+</style>
 
 <script>
 import Fieldtype from './Fieldtype.vue';
