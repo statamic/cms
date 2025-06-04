@@ -96,7 +96,7 @@ class NavTest extends TestCase
     }
 
     #[Test]
-    public function it_can_create_a_nav_item_which_uses_default_entries_icon()
+    public function it_can_create_a_nav_item_which_uses_default_collections_icon()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
 
@@ -105,7 +105,6 @@ class NavTest extends TestCase
         $item = $this->build()->get('Utilities')->last();
 
         $this->assertNull($item->icon());
-        $this->assertEquals(\Statamic\Statamic::svg('icons/light/entries'), $item->svg());
     }
 
     #[Test]
@@ -123,6 +122,7 @@ class NavTest extends TestCase
         $this->assertEquals('<svg>the totally real svg</svg>', $item->svg());
 
         File::delete($svg);
+        $this->assertEquals(\Statamic\Statamic::svg('icons/collections', 'size-4 shrink-0'), $item->svg());
     }
 
     #[Test]
