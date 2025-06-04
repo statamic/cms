@@ -273,6 +273,16 @@ class UrlTest extends TestCase
             ['/?foo=bar&baz=qux', '/?foo=bar&baz=qux'],
             ['/?foo=bar&baz=qux#anchor', '/?foo=bar&baz=qux#anchor'],
 
+            ['/about?query', '/about/?query'],
+            ['/about#anchor', '/about/#anchor'],
+            ['/about?foo=bar&baz=qux', '/about/?foo=bar&baz=qux'],
+            ['/about?foo=bar&baz=qux#anchor', '/about/?foo=bar&baz=qux#anchor'],
+
+            ['/about/?query', '/about/?query'],
+            ['/about/#anchor', '/about/#anchor'],
+            ['/about/?foo=bar&baz=qux', '/about/?foo=bar&baz=qux'],
+            ['/about/?foo=bar&baz=qux#anchor', '/about/?foo=bar&baz=qux#anchor'],
+
             ['https://example.com?query', 'https://example.com/?query'],
             ['https://example.com#anchor', 'https://example.com/#anchor'],
             ['https://example.com?foo=bar&baz=qux', 'https://example.com/?foo=bar&baz=qux'],
@@ -308,15 +318,25 @@ class UrlTest extends TestCase
             ['', '/'],
             ['/', '/'],
 
-            ['?query', '?query'],
-            ['#anchor', '#anchor'],
-            ['?foo=bar&baz=qux', '?foo=bar&baz=qux'],
-            ['?foo=bar&baz=qux#anchor', '?foo=bar&baz=qux#anchor'],
+            ['?query', '/?query'],
+            ['#anchor', '/#anchor'],
+            ['?foo=bar&baz=qux', '/?foo=bar&baz=qux'],
+            ['?foo=bar&baz=qux#anchor', '/?foo=bar&baz=qux#anchor'],
 
-            ['/?query', '?query'],
-            ['/#anchor', '#anchor'],
-            ['/?foo=bar&baz=qux', '?foo=bar&baz=qux'],
-            ['/?foo=bar&baz=qux#anchor', '?foo=bar&baz=qux#anchor'],
+            ['/?query', '/?query'],
+            ['/#anchor', '/#anchor'],
+            ['/?foo=bar&baz=qux', '/?foo=bar&baz=qux'],
+            ['/?foo=bar&baz=qux#anchor', '/?foo=bar&baz=qux#anchor'],
+
+            ['/about?query', '/about?query'],
+            ['/about#anchor', '/about#anchor'],
+            ['/about?foo=bar&baz=qux', '/about?foo=bar&baz=qux'],
+            ['/about?foo=bar&baz=qux#anchor', '/about?foo=bar&baz=qux#anchor'],
+
+            ['/about/?query', '/about?query'],
+            ['/about/#anchor', '/about#anchor'],
+            ['/about/?foo=bar&baz=qux', '/about?foo=bar&baz=qux'],
+            ['/about/?foo=bar&baz=qux#anchor', '/about?foo=bar&baz=qux#anchor'],
 
             ['https://example.com?query', 'https://example.com?query'],
             ['https://example.com#anchor', 'https://example.com#anchor'],
