@@ -7,7 +7,7 @@ use Statamic\Facades\User;
 
 class Unpublish extends Action
 {
-    protected $icon = 'eye-closed';
+    protected $icon = 'eye-slash';
 
     public function visibleTo($item)
     {
