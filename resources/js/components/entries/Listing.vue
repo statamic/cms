@@ -151,7 +151,7 @@
                                                 v-for="action in actions"
                                                 :key="action.handle"
                                                 :text="__(action.title)"
-                                                icon="edit"
+                                                :icon="action.icon"
                                                 :class="{ 'text-red-500': action.dangerous }"
                                                 @click="action.run"
                                             />

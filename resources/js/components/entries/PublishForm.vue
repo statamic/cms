@@ -2,33 +2,37 @@
     <div>
         <Header>
             <template #title>
-                <span
-                    v-if="!isCreating"
-                    class="little-dot -top-1"
-                    :class="activeLocalization.status"
-                    v-tooltip="__(activeLocalization.status)"
-                />
+                <StatusIndicator v-if="!isCreating" :status="activeLocalization.status" />
                 {{ formattedTitle }}
             </template>
 
-            <Dropdown v-if="canEditBlueprint || hasItemActions">
-                <template #trigger>
-                    <Button icon="ui/dots" variant="ghost" />
-                </template>
-                <DropdownMenu>
-                    <DropdownItem :text="__('Edit Blueprint')" v-if="canEditBlueprint" :href="actions.editBlueprint" />
-                    <DropdownSeparator />
-                    <data-list-inline-actions
-                        v-if="!isCreating && hasItemActions"
-                        :item="values.id"
-                        :url="itemActionUrl"
-                        :actions="itemActions"
-                        :is-dirty="isDirty"
-                        @started="actionStarted"
-                        @completed="actionCompleted"
-                    />
-                </DropdownMenu>
-            </Dropdown>
+            <ItemActions
+                v-if="!isCreating && hasItemActions"
+                :item="values.id"
+                :url="itemActionUrl"
+                :actions="itemActions"
+                :is-dirty="isDirty"
+                @started="actionStarted"
+                @completed="actionCompleted"
+            >
+                <Dropdown v-if="canEditBlueprint || hasItemActions">
+                    <template #trigger>
+                        <Button icon="ui/dots" variant="ghost" />
+                    </template>
+                    <DropdownMenu>
+                        <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" v-if="canEditBlueprint" :href="actions.editBlueprint" />
+                        <DropdownSeparator />
+                        <DropdownItem
+                            v-for="action in itemActions"
+                            :key="action.handle"
+                            :text="__(action.title)"
+                            :icon="action.icon"
+                            :variant="action.dangerous ? 'destructive' : 'default'"
+                            @click="action.run"
+                        />
+                    </DropdownMenu>
+                </Dropdown>
+            </ItemActions>
 
             <div class="text-2xs me-4 flex pt-px text-gray-600" v-if="readOnly">
                 <svg-icon name="light/lock" class="me-1 -mt-1 w-4" /> {{ __('Read Only') }}
@@ -237,6 +241,7 @@
 </template>
 
 <script>
+import ItemActions from '../../components/actions/ItemActions.vue';
 import PublishActions from './PublishActions.vue';
 import SaveButtonOptions from '../publish/SaveButtonOptions.vue';
 import RevisionHistory from '../revision-history/History.vue';
@@ -246,20 +251,21 @@ import HasActions from '../publish/HasActions';
 import striptags from 'striptags';
 import clone from '@statamic/util/clone.js';
 import {
-    Header,
-    Dropdown,
-    DropdownMenu,
-    DropdownItem,
-    DropdownSeparator,
     Button,
+    Card,
+    CardPanel,
+    Dropdown,
+    DropdownItem,
+    DropdownMenu,
+    DropdownSeparator,
+    Header,
+    Heading,
+    Icon,
     Panel,
     PanelHeader,
-    Switch,
-    Heading,
+    StatusIndicator,
     Subheading,
-    Card,
-    Icon,
-    CardPanel,
+    Switch,
 } from '@statamic/ui';
 import PublishContainer from '@statamic/components/ui/Publish/Container.vue';
 import PublishTabs from '@statamic/components/ui/Publish/Tabs.vue';
@@ -278,28 +284,30 @@ export default {
     mixins: [HasPreferences, HasHiddenFields, HasActions],
 
     components: {
-        PublishActions,
-        SaveButtonOptions,
-        RevisionHistory,
-        Header,
-        Dropdown,
-        DropdownMenu,
-        DropdownItem,
-        DropdownSeparator,
         Button,
+        Card,
+        CardPanel,
+        Dropdown,
+        DropdownItem,
+        DropdownMenu,
+        DropdownSeparator,
+        Header,
+        Heading,
+        Icon,
+        ItemActions,
+        LivePreview,
+        LocalizationsCard,
         Panel,
         PanelHeader,
-        Switch,
-        Heading,
-        Subheading,
-        Card,
-        Icon,
+        PublishActions,
+        PublishComponents,
         PublishContainer,
         PublishTabs,
-        PublishComponents,
-        CardPanel,
-        LocalizationsCard,
-        LivePreview,
+        RevisionHistory,
+        SaveButtonOptions,
+        StatusIndicator,
+        Subheading,
+        Switch,
     },
 
     props: {

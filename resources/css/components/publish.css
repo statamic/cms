@@ -88,25 +88,6 @@ code.parent-url {
 }
 
 .publish-field {
-    .form-group {
-        > label,
-        .field-inner > label {
-            @apply mb-2 font-medium;
-        }
-    }
-
-    > .form-group:last-child {
-        margin-bottom: 0;
-    }
-
-    .has-error > .field-inner > label {
-        @apply text-red-500;
-    }
-
-    .field-inner {
-        position: relative;
-    }
-
     .read-only-overlay {
         @apply absolute inset-0 cursor-not-allowed bg-white/25;
         z-index: 100;
