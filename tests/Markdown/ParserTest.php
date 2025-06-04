@@ -50,15 +50,48 @@ class ParserTest extends TestCase
     }
 
     #[Test]
+    public function it_adds_a_renderer()
+    {
+        $this->assertEquals("<p><a href=\"http://example.com\">test</a></p>\n", $this->parser->parse('[test](http://example.com)'));
+
+        $this->parser->addRenderer(function () {
+            return [
+                Link::class,
+                new Fixtures\LinkRenderer,
+            ];
+        });
+
+        $this->assertEquals("<p><a data-custom-renderer href=\"http://example.com\" title=\"\">test</a></p>\n", $this->parser->parse('[test](http://example.com)'));
+    }
+
+    #[Test]
+    public function it_adds_renderers_using_an_array()
+    {
+        $this->assertEquals("<p><a href=\"http://example.com\">test</a></p>\n", $this->parser->parse('[test](http://example.com)'));
+        $this->assertEquals("<h1>Hello world</h1>\n", $this->parser->parse('# Hello world'));
+
+        $this->parser->addRenderers(function () {
+            return [
+                [Link::class, new Fixtures\LinkRenderer],
+                [Heading::class, new Fixtures\HeadingRenderer],
+            ];
+        });
+
+        $this->assertEquals("<p><a data-custom-renderer href=\"http://example.com\" title=\"\">test</a></p>\n", $this->parser->parse('[test](http://example.com)'));
+        $this->assertEquals("<h1 data-custom-renderer>Hello world</h1>\n", $this->parser->parse('# Hello world'));
+    }
+
+    #[Test]
     public function it_creates_a_new_instance_based_on_the_current_instance()
     {
         $this->parser->addExtension(function () {
             return new Fixtures\SmileyExtension;
         });
 
-        $this->parser->addRenderers(function () {
+        $this->parser->addRenderer(function () {
             return [
-                [Link::class, new Fixtures\LinkRenderer],
+                Link::class,
+                new Fixtures\LinkRenderer,
             ];
         });
 
@@ -79,9 +112,10 @@ class ParserTest extends TestCase
             return new Fixtures\FrownyExtension;
         });
 
-        $newParser->addRenderers(function () {
+        $newParser->addRenderer(function () {
             return [
-                [Heading::class, new Fixtures\HeadingRenderer],
+                Heading::class,
+                new Fixtures\HeadingRenderer,
             ];
         });
 
@@ -93,19 +127,5 @@ class ParserTest extends TestCase
         $this->assertCount(1, $this->parser->extensions());
         $this->assertCount(2, $newParser->renderers());
         $this->assertCount(1, $this->parser->renderers());
-    }
-
-    #[Test]
-    public function it_uses_custom_renderers()
-    {
-        $this->assertEquals("<p><a href=\"http://example.com\">test</a></p>\n", $this->parser->parse('[test](http://example.com)'));
-
-        $this->parser->addRenderers(function () {
-            return [
-                [Link::class, new Fixtures\LinkRenderer],
-            ];
-        });
-
-        $this->assertEquals("<p><a data-custom-renderer href=\"http://example.com\" title=\"\">test</a></p>\n", $this->parser->parse('[test](http://example.com)'));
     }
 }
