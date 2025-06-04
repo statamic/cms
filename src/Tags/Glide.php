@@ -203,8 +203,6 @@ class Glide extends Tags
      */
     private function generateGlideUrl($item)
     {
-        $item = $this->stripAppUrl($item);
-
         try {
             $url = $this->isValidExtension($item) ? $this->getManipulator($item)->build() : $this->normalizeItem($item);
         } catch (\Exception $e) {
@@ -229,7 +227,6 @@ class Glide extends Tags
         $cache = GlideManager::cacheDisk();
 
         try {
-            $item = $this->stripAppUrl($item);
             $path = $this->generateImage($item);
             $source = $cache->read($path);
             $url = 'data:'.$cache->mimeType($path).';base64,'.base64_encode($source);
@@ -280,6 +277,10 @@ class Glide extends Tags
     {
         if ($item instanceof AssetContract) {
             return $item;
+        }
+
+        if (Str::startsWith($item, config('app.url'))) {
+            $item = (string) Str::of($item)->after(config('app.url'));
         }
 
         // External URLs are already fine as-is.
@@ -362,14 +363,5 @@ class Glide extends Tags
         }
 
         return Str::startsWith(GlideManager::url(), ['http://', 'https://']);
-    }
-
-    private function stripAppUrl(string $item): string
-    {
-        if (! Str::startsWith($item, config('app.url'))) {
-            return $item;
-        }
-
-        return (string) Str::of($item)->after(config('app.url'));
     }
 }
