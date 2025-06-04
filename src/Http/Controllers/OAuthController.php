@@ -35,6 +35,10 @@ class OAuthController
     {
         $oauth = OAuth::provider($provider);
 
+        if (! $oauth) {
+            throw new NotFoundHttpException();
+        }
+
         try {
             $providerUser = $oauth->getSocialiteUser();
         } catch (InvalidStateException $e) {
