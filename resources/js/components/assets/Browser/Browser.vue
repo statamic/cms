@@ -70,11 +70,16 @@
                     :sort-column="sortColumn"
                     :sort-direction="sortDirection"
                     @selections-updated="(ids) => $emit('selections-updated', ids)"
+                    @visible-columns-updated="visibleColumns = $event"
                     v-slot="{ filteredRows: rows }"
                 >
                     <div :class="modeClass">
                         <div class="space-y-4">
-                            <data-list-search ref="search" v-model="searchQuery" />
+                            <!-- Search and Filter -->
+                            <div class="flex items-center justify-between gap-3">
+                                <data-list-search ref="search" v-model="searchQuery" />
+                                <data-list-column-picker v-if="mode === 'table'" :preferences-key="preferencesKey('columns')" />
+                            </div>
 
                             <breadcrumbs v-if="!restrictFolderNavigation" :path="path" @navigated="selectFolder" />
 
@@ -93,8 +98,18 @@
                                 v-on="sharedAssetEvents"
                                 :columns="columns"
                                 :loading="loading"
+                                :visible-columns="visibleColumns"
                                 @sorted="sorted"
-                            />
+                            >
+                                <template #footer>
+                                    <data-list-pagination
+                                        :resource-meta="meta"
+                                        :per-page="perPage"
+                                        @page-selected="page = $event"
+                                        @per-page-changed="changePerPage"
+                                    />
+                                </template>
+                            </Table>
 
                             <!-- Grid Mode -->
                             <Grid
@@ -131,12 +146,31 @@
                             @per-page-changed="changePerPage"
                         /> -->
 
-                         <data-list-bulk-actions
+                        <BulkActions
                             :url="actionUrl"
+                            :selections="selectedAssets"
                             :context="actionContext"
                             @started="actionStarted"
                             @completed="actionCompleted"
-                        />
+                            v-slot="{ actions }"
+                        >
+                            <div class="fixed inset-x-0 bottom-1 z-100 flex w-full justify-center">
+                                <ButtonGroup>
+                                    <Button
+                                        variant="primary"
+                                        class="text-gray-400!"
+                                        :text="__n(`:count item selected|:count items selected`, selectedAssets.length)"
+                                    />
+                                    <Button
+                                        v-for="action in actions"
+                                        :key="action.handle"
+                                        variant="primary"
+                                        :text="__(action.title)"
+                                        @click="action.run"
+                                    />
+                                </ButtonGroup>
+                            </div>
+                        </BulkActions>
                     </div>
                 </data-list>
             </div>
@@ -165,12 +199,27 @@ import Uploader from '../Uploader.vue';
 import Uploads from '../Uploads.vue';
 import HasActions from '../../data-list/HasActions';
 import { keyBy, sortBy } from 'lodash-es';
-import { Header, Button, Dropdown, DropdownItem, DropdownMenu } from '@statamic/ui';
+import { Header, Button, ButtonGroup, Dropdown, DropdownItem, DropdownMenu } from '@statamic/ui';
+import BulkActions from '@statamic/components/data-list/BulkActions.vue';
 
 export default {
     mixins: [HasActions, HasPagination, HasPreferences],
 
-    components: { DropdownMenu, DropdownItem, Dropdown, AssetThumbnail, AssetEditor, Uploader, Uploads, Grid, Table, Header, Button },
+    components: {
+        DropdownMenu,
+        DropdownItem,
+        Dropdown,
+        AssetThumbnail,
+        AssetEditor,
+        Uploader,
+        Uploads,
+        Grid,
+        Table,
+        Header,
+        Button,
+        ButtonGroup,
+        BulkActions,
+    },
 
     props: {
         allowSelectingExistingUpload: Boolean,
@@ -185,21 +234,16 @@ export default {
         restrictFolderNavigation: Boolean, // Whether to restrict to a single folder and prevent navigation.
         selectedAssets: Array,
         selectedPath: String, // The path to display, determined by a parent component.
+        initialColumns: {
+            type: Array,
+            default: () => [],
+        },
     },
 
     data() {
         return {
-            columns: [
-                { label: __('File'), field: 'basename', visible: true, sortable: true },
-                { label: __('Size'), field: 'size', value: 'size_formatted', visible: true, sortable: true },
-                {
-                    label: __('Last Modified'),
-                    field: 'last_modified',
-                    value: 'last_modified_relative',
-                    visible: true,
-                    sortable: true,
-                },
-            ],
+            columns: this.initialColumns,
+            visibleColumns: this.initialColumns.filter(column => column.visible),
             containers: [],
             initializing: true,
             loading: true,
@@ -281,7 +325,25 @@ export default {
                 order: this.sortDirection,
                 search: this.searchQuery,
                 queryScopes: this.queryScopes,
+                columns: this.visibleColumnParameters,
             };
+        },
+
+        visibleColumnParameters: {
+            get() {
+                if (this.visibleColumns === null || this.visibleColumns === undefined) {
+                    return null;
+                }
+
+                return this.visibleColumns.map(column => column.field).join(',');
+            },
+            set(value) {
+                this.visibleColumns = value.split(',').map(field => this.columns.find(column => column.field === field));
+            },
+        },
+
+        columnShowing(column) {
+            return this.visibleColumns.find(c => c.field === column);
         },
 
         reachedSelectionLimit() {
@@ -525,6 +587,7 @@ export default {
                     const data = response.data;
                     this.assets = data.data.assets;
                     this.meta = data.meta;
+                    this.columns = data.meta.columns;
 
                     if (this.searchQuery) {
                         this.folder = null;

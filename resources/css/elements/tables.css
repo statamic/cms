@@ -13,6 +13,10 @@
 .data-table {
     @apply w-full max-w-full outline-hidden text-gray-500 antialiased border-separate border-spacing-y-0 min-w-full overflow-x-auto text-start;
 
+    &.contained {
+        @apply rounded-xl;
+    }
+
     thead {
         th {
             @apply whitespace-nowrap text-sm font-medium text-gray-800 dark:text-gray-300 text-start;
@@ -20,6 +24,10 @@
 
             &:last-child {
                 @apply text-end;
+            }
+
+            .contained & {
+                @apply py-2.5 border-b;
             }
         }
 
@@ -33,7 +41,10 @@
     }
 
     tbody {
-        @apply text-sm bg-white dark:bg-gray-900 rounded-xl shadow-sm outline-none;
+        @apply text-sm bg-white dark:bg-gray-900 shadow-sm rounded-xl outline-none;
+        .contained & {
+            @apply shadow-none rounded-none;
+        }
 
         tr {
             &:first-child {
@@ -98,6 +109,9 @@
 .data-table {
     thead th.checkbox-column {
         @apply sticky z-1 ps-3 w-8;
+        .contained & {
+            @apply sticky ps-4;
+        }
     }
 
     thead .actions-column {
@@ -108,6 +122,9 @@
 
     tbody .checkbox-column {
         @apply sticky px-3 -start-px;
+        .contained & {
+            @apply sticky ps-4;
+        }
     }
 
     tbody .actions-column {

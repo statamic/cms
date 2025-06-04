@@ -7,6 +7,7 @@
 @import './core/typography.css';
 
 /* Elements */
+@import './elements/base.css';
 @import './elements/buttons.css';
 @import './elements/badges.css';
 @import './elements/dropdowns.css';

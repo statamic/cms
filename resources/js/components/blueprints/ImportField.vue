@@ -1,41 +1,36 @@
 <template>
-    <div class="blueprint-section-field blueprint-section-import blueprint-section-field-w-full">
-        <div class="blueprint-section-field-inner">
-            <div class="blueprint-drag-handle w-4 dark:border-dark-300 ltr:border-r rtl:border-l"></div>
-            <div class="flex flex-1 items-center justify-between">
-                <div class="flex flex-1 items-center py-2 ltr:pl-2 ltr:pr-4 rtl:pl-4 rtl:pr-2">
-                    <svg-icon
-                        class="h-4 w-4 flex-none text-gray-700 dark:text-dark-150 ltr:mr-2 rtl:ml-2"
-                        name="paperclip"
-                        v-tooltip="__('Linked fieldset')"
-                    />
-                    <a class="overflow-hidden text-ellipsis" @click="$emit('edit')">
-                        <span v-text="__('Fieldset')" />
-                        <span class="font-mono text-3xs text-gray-600 dark:text-dark-175 ltr:ml-2 rtl:mr-2">{{
-                            field.fieldset
-                        }}</span>
-                    </a>
+    <div class="blueprint-section-field field-grid-item pr-1.5 w-full bg-white dark:bg-gray-850 rounded-xl ring ring-gray-200 dark:ring-x-0 dark:ring-b-0 dark:ring-gray-700 blueprint-section-field-w-full">
+        <div class="pr-1.5 w-full bg-white dark:bg-gray-850 rounded-xl ring ring-gray-200 dark:ring-x-0 dark:ring-b-0 dark:ring-gray-700">
+            <ui-card class="py-0.75! px-2! z-10 relative blueprint-section/import w-full">
+                <div class="flex items-center gap-2">
+                    <ui-icon name="handles" class="blueprint-drag-handle size-4 cursor-grab text-gray-300" />
+                    <div class="flex flex-1 items-center justify-between">
+                        <div class="flex flex-1 items-center py-2">
+                            <ui-icon class="size-4 me-2 text-blue-600" name="fieldsets" />
+                            <div class="flex items-center gap-2">
+                            <!-- @TODO: Show fieldset.title -->
+                                <button class="cursor-pointer overflow-hidden text-ellipsis text-sm text-blue-600 hover:text-blue-500" v-text="field.fieldset" @click="$emit('edit')" />
+                                <ui-icon name="link" class="text-gray-400" />
+                                <span class="text-gray-500 font-mono text-2xs" v-text="__('fieldset')" />
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <ui-button size="sm" icon="trash" variant="subtle" @click.prevent="$emit('deleted')" v-tooltip="__('Remove')" />
+                            <stack name="field-settings" v-if="isEditing" @closed="editorClosed">
+                                <field-settings
+                                    ref="settings"
+                                    :id="field._id"
+                                    :root="isRoot"
+                                    :fields="fields"
+                                    :config="fieldConfig"
+                                    @committed="settingsUpdated"
+                                    @closed="editorClosed"
+                                />
+                            </stack>
+                        </div>
+                    </div>
                 </div>
-                <div class="flex flex-none ltr:pr-2 rtl:pl-2">
-                    <button
-                        @click.prevent="$emit('deleted')"
-                        class="text-gray-600 hover:text-gray-950 dark:text-dark-150 dark:hover:text-dark-100"
-                    >
-                        <svg-icon name="micro/trash" class="h-4 w-4" />
-                    </button>
-                    <stack name="field-settings" v-if="isEditing" @closed="editorClosed">
-                        <field-settings
-                            ref="settings"
-                            :id="field._id"
-                            :root="isRoot"
-                            :fields="fields"
-                            :config="fieldConfig"
-                            @committed="settingsUpdated"
-                            @closed="editorClosed"
-                        />
-                    </stack>
-                </div>
-            </div>
+            </ui-card>
         </div>
     </div>
 </template>

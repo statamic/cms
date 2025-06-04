@@ -12,6 +12,13 @@ const props = defineProps({
 const icon = shallowRef(null);
 
 const loadIcon = () => {
+    // When the icon is an SVG string, return it as a component
+    if (props.name.startsWith('<svg')) {
+        return defineAsyncComponent(() => {
+            return new Promise((resolve) => resolve({ template: props.name }));
+        });
+    }
+
     // Find the icon in either the icons or ui directory
     const iconPath = props.name.includes('/')
         ? `../../../svg/ui/${props.name.split('/')[1]}.svg`
@@ -39,5 +46,5 @@ watch(
 </script>
 
 <template>
-    <component :is="icon" :class="['size-4 shrink-0']" v-bind="$attrs" />
+    <component :is="icon" :class="['size-4! shrink-0']" v-bind="$attrs" />
 </template>

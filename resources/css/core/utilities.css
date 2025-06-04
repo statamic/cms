@@ -1,27 +1,24 @@
 /* ==========================================================================
    UTILITES
    ========================================================================== */
-
-@utility text-shadow {
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
-}
-
+/* Here we typically need a negative outline-offset because of the inner shadow on inputs */
 @utility focus-outline {
-    @apply border border-blue-300 dark:border-dark-blue-200;
-    outline: 0;
-    box-shadow: 0 0 0 0.2rem rgba(0, 125, 255, 0.25);
+    outline-width: var(--focus-outline-width);
+    outline-offset: var(--focus-outline-offset);
+    outline-color: var(--focus-outline-color, currentColor);
+    outline-style: var(--focus-outline-style, solid);
+}
+/* Same as focus-outline, but without the outline-offset, e.g. a Markdown editor */
+@utility focus-outline-within {
+    outline-offset: 0;
+    outline-width: var(--focus-outline-width);
+    outline-color: var(--focus-outline-color, currentColor);
+    outline-style: var(--focus-outline-style, solid);
 }
 
 @utility focus-none {
-    /* @apply border-0; */
     outline: 0;
     box-shadow: none;
-}
-
-@utility selected-outline {
-    @apply border-blue;
-    outline: 0;
-    box-shadow: 0 0 0 2px var(--color-blue);
 }
 
 @utility loading {
@@ -47,22 +44,6 @@
     } */
 }
 
-@utility shadow-hover-lg {
-    @apply shadow-lg;
-    transition: box-shadow 0.08s ease-in-out;
-    &:hover {
-        @apply shadow-xl;
-    }
-}
-
-@utility w-fit-content {
-    width: fit-content;
-}
-
-@utility break-overflowing-words {
-    word-break: break-word;
-    overflow-wrap: break-word;
-}
 
 @utility saving-overlay {
     @apply absolute inset-0 z-200 flex items-center rounded-sm;
@@ -83,6 +64,77 @@
         [dir='rtl'] & {
             margin-left: 10px;
             margin-right: 0;
+        }
+    }
+}
+
+/* ARCHIECTURAL LINES
+=================================================== */
+/* Notes...
+
+    URL example
+    -----------
+    /cp/collections/create
+
+    What does it do?
+    ----------------
+    - Add a background image of architectural lines to the element.
+    - Target single buttons in any descended footers to add a circular line effect around them.
+
+*/
+/* HTML Example...
+
+<div class="content-card bg-architectural-lines"> <-- background lines added to this element
+    <footer>
+        <button>Create Collection</button> <--- circular line effect added to this descendended button in the footer
+    </footer>
+</div>
+
+*/
+@utility bg-architectural-lines {
+    &::before {
+        content: '';
+        pointer-events: none;
+        position: absolute;
+        inset: 0;
+        background-image: url('../../svg/ui/architectural-lines.svg');
+        background-size: 100%;
+        /* Reduce the chances of the background circles overlapping the button */
+        @media (width < 1300px) {
+            background-position-y: 130%;
+        }
+    }
+    footer {
+        position: relative;
+        &::before {
+            content: '';
+            pointer-events: none;
+            position: absolute;
+            border-block-end: 1px solid black;
+            opacity: 0.06;
+            width: 100vw;
+            top: 50%;
+            transform: translateY(50%);
+        }
+        button:only-child {
+            position: relative;
+            &::before, &::after {
+                content: '';
+                pointer-events: none;
+                position: absolute;
+                inset: 0;
+                border: 1px solid black;
+                opacity: 0.06;
+                width: 60%;
+                aspect-ratio: 1;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                border-radius: 50%;
+            }
+            &::before {
+                width: 45%;
+            }
         }
     }
 }
@@ -117,11 +169,17 @@
     }
 }
 
-@utility clickable {
-    @apply cursor-pointer select-none border bg-linear-to-b from-white to-gray-100 text-gray-800 dark:border-dark-800 dark:from-dark-550 dark:to-dark-600 dark:text-dark-175;
 
-    &:hover {
-        @apply border-gray-500 from-white to-gray-200 dark:border-dark-900 dark:from-dark-550 dark:to-dark-700;
+@utility trim-text-start {
+    text-box: trim-start;
+    /* =JFG. When we have an SVG we probably don't want to text trim, for example in a Markdown field with button controls like Bold, Italic, etc. */
+    &:has(svg) {
+        display: flex;
+    }
+    /* =JFG. Exceptions */
+    /* e.g. for a fieldset, we don't want to trim the text when we have a label like on a collections field, Link Item button */
+    .form-group :has(> &) & {
+        text-box: unset;
     }
 }
 

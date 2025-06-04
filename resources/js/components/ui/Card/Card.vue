@@ -7,10 +7,10 @@ const props = defineProps({
 });
 
 const classes = cva({
-    base: 'bg-white dark:bg-gray-850 rounded-xl border border-gray-200 dark:border-x-0 dark:border-b-0 dark:border-white/15',
+    base: 'bg-white dark:bg-gray-850 rounded-xl ring ring-gray-200 dark:ring-x-0 dark:ring-b-0 dark:ring-gray-700',
     variants: {
         variant: {
-            default: 'shadow-ui-sm',
+            default: 'shadow-ui-md',
             flat: 'shadow-none',
         },
         inset: { false: 'px-4.5 py-5' },
@@ -19,7 +19,7 @@ const classes = cva({
 </script>
 
 <template>
-    <div :class="classes">
+    <div :class="classes" data-ui-card :data-inset="inset">
         <slot />
     </div>
 </template>

@@ -4,10 +4,8 @@ import { SwitchRoot, SwitchThumb } from 'reka-ui';
 import { cva } from 'cva';
 
 const props = defineProps({
-    description: { type: String, default: null },
     required: { type: Boolean, default: false },
     id: { type: String, default: () => useId() },
-    label: { type: String, default: null },
     modelValue: { type: Boolean, default: false },
     size: { type: String, default: 'base' },
 });
@@ -17,11 +15,11 @@ defineEmits(['update:modelValue']);
 const switchRootClasses = cva({
     base: [
         'relative flex rounded-full shrink-0 border-2',
-        'transition-colors focus-within:outline-hidden cursor-pointer',
+        'transition-colors cursor-pointer',
         'data-[state=checked]:border-gray-700',
         'data-[state=checked]:bg-gray-800',
         'data-[state=unchecked]:border-transparent',
-        'data-[state=unchecked]:bg-gray-200',
+        'data-[state=unchecked]:bg-gray-200'
     ],
     variants: {
         size: {

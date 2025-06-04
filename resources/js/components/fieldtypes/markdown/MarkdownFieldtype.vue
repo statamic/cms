@@ -5,7 +5,7 @@
                 class="
                     @container/markdown w-full block bg-white dark:bg-gray-900 rounded-lg
                     border border-gray-300 dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:inset-shadow-2xs dark:inset-shadow-black
-                    text-gray-600 dark:text-gray-300
+                    text-gray-800 dark:text-gray-300
                     appearance-none antialiased shadow-ui-sm disabled:shadow-none not-prose
                 "
                 :class="{ 'markdown-fullscreen': fullScreenMode, 'markdown-dark-mode': darkMode }"
@@ -69,7 +69,7 @@
                                 @drop="draggingFile = false"
                                 @keydown="shortcut"
                             >
-                                <div class="editor" ref="codemirror"></div>
+                                <div class="editor relative focus-within:focus-outline-within" ref="codemirror"></div>
 
                                 <div class="helpers">
                                     <div class="bg-gray-50 dark:bg-gray-950 rounded-b-xl border-t border-gray-200 dark:border-white/15 flex p-1 text-sm w-full">
@@ -220,6 +220,7 @@ export default {
     mixins: [Fieldtype],
 
     components: {
+        Button,
         Selector,
         Uploader,
         Uploads,

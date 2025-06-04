@@ -1,6 +1,6 @@
 <template>
     <data-list :visible-columns="columns" :columns="columns" :rows="items" v-slot="{ filteredRows: rows }">
-        <CardPanel>
+        <ui-panel>
             <data-list-bulk-actions
                 class="rounded-sm"
                 :url="actionUrl"
@@ -31,7 +31,7 @@
                     </dropdown-list>
                 </template>
             </data-list-table>
-        </CardPanel>
+        </ui-panel>
     </data-list>
 </template>
 

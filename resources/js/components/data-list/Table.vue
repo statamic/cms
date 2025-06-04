@@ -1,7 +1,11 @@
 <template>
     <table
         :data-size="relativeColumnsSize"
-        :class="{ 'select-none': shifting, 'data-table': !unstyled }"
+        :class="{
+            'select-none': shifting,
+            'data-table': !unstyled,
+            'contained': contained,
+        }"
         data-table
         ref="table"
         tabindex="0"
@@ -132,6 +136,7 @@ export default {
         reorderable: { type: Boolean, default: false },
         type: { type: String },
         unstyled: { type: Boolean, default: false },
+        contained: { type: Boolean, default: false },
     },
 
     inject: ['sharedState'],

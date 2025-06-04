@@ -32,13 +32,13 @@ const buttonClasses = computed(() => {
                     'dark:from-gray-800 dark:to-gray-850 dark:hover:to-gray-800 hover:bg-gray-50 dark:hover:bg-gray-850 dark:border-b-0 dark:ring-3 dark:ring-black dark:border-white/15 dark:text-gray-300 dark:shadow-md',
                 ],
                 primary: [
-                    'bg-linear-to-b from-primary/90 to-primary hover:bg-primary-hover text-white border border-primary-border shadow-ui-md inset-shadow-2xs inset-shadow-white/25',
+                    'bg-linear-to-b from-primary/90 to-primary hover:bg-primary-hover text-white border border-primary-border shadow-ui-md inset-shadow-2xs inset-shadow-white/25 [&_svg]:text-gray-400',
                     'dark:from-white dark:to-gray-200 dark:hover:from-gray-200 dark:text-gray-800 dark:border-0',
                 ],
                 danger: 'bg-linear-to-b from-red-500/90 to-red-500 hover:bg-red-500/90 text-white border border-red-600 inset-shadow-2xs inset-shadow-red-300 [&_svg]:text-red-200',
                 filled: 'bg-gray-800/5 hover:bg-gray-200 hover:text-gray-900 dark:bg-gray-700/80 dark:hover:bg-gray-700 [&_svg]:text-gray-700 dark:[&_svg]:text-gray-300',
                 ghost: 'bg-transparent hover:bg-gray-400/10 text-gray-800 dark:text-gray-300 dark:hover:bg-gray-700/80 dark:hover:text-gray-200',
-                subtle: 'bg-transparent hover:bg-gray-400/10 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-gray-700/80 dark:hover:text-gray-200',
+                subtle: 'bg-transparent hover:bg-gray-400/10 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-gray-700/80 dark:hover:text-gray-200 [&_svg]:text-gray-400 dark:[&_svg]:text-gray-300',
             },
             size: {
                 lg: 'px-6 h-12 text-base gap-2 rounded-lg text-base',
@@ -55,7 +55,7 @@ const buttonClasses = computed(() => {
                 filled: 'in-data-ui-button-group:border-e [:is([data-ui-button-group]>&:last-child,_[data-ui-button-group]_:last-child>&)]:border-e-0 in-data-ui-button-group:border-gray-300/70',
                 ghost: '',
             },
-            iconOnly: { true: 'px-0' },
+            iconOnly: { true: 'px-0 gap-0' },
             round: { true: 'rounded-full' },
         },
         compoundVariants: [
@@ -63,7 +63,7 @@ const buttonClasses = computed(() => {
             { iconOnly: true, size: 'sm', class: 'w-8 [&_svg]:size-3.5' },
             { iconOnly: true, size: 'xs', class: 'w-6.5 [&_svg]:size-3' },
             { iconOnly: false, iconAppend: true, class: '[&_svg]:-me-1' },
-            { iconOnly: false, iconPrepend: true, class: '[&_svg]:-ms-1' },
+            { iconOnly: false, iconPrepend: true, class: '[&_svg]:-ms-0.5' },
         ],
     })({
         ...props,
@@ -89,8 +89,10 @@ const buttonClasses = computed(() => {
         <Icon v-if="icon" :name="icon" />
         <Icon v-if="loading" name="loading" :size />
 
-        <slot v-if="hasDefaultSlot" />
-        <template v-else>{{ text }}</template>
+        <div class="trim-text-start">
+            <slot v-if="hasDefaultSlot" />
+            <template v-else>{{ text }}</template>
+        </div>
 
         <Icon v-if="iconAppend" :name="iconAppend" />
     </component>

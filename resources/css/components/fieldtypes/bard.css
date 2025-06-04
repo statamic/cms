@@ -15,7 +15,7 @@
     @apply text-sm leading-normal @md/bard:p-2;
     @apply @lg/bard:p-4;
     &:focus {
-        @apply ring-2 ring-inset ring-blue-200 dark:ring-blue-600;
+        @apply focus-outline;
     }
 }
 

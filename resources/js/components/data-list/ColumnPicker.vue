@@ -66,7 +66,7 @@
                                                 class="ltr:mr-2 rtl:ml-2"
                                                 v-model="column.visible"
                                                 @change="columnToggled(column)"
-                                                :disabled="selectedColumns.length === 1"
+                                                :disabled="selectedColumns.length === 1 || column.required"
                                             />
                                             {{ __(column.label) }}
                                         </div>

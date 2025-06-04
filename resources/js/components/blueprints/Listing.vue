@@ -1,6 +1,6 @@
 <template>
     <data-list :visible-columns="columns" :columns="columns" :rows="rows" :sort="false" v-slot="{ filteredRows: rows }">
-        <div class="card p-0">
+        <ui-panel>
             <data-list-table :reorderable="reorderable" @reordered="$emit('reordered', $event)">
                 <template #cell-title="{ row: blueprint }">
                     <div class="flex items-center">
@@ -32,7 +32,7 @@
                     </dropdown-list>
                 </template>
             </data-list-table>
-        </div>
+        </ui-panel>
     </data-list>
 </template>
 

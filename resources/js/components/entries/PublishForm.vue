@@ -2,12 +2,7 @@
     <div>
         <Header>
             <template #title>
-                <span
-                    v-if="!isCreating"
-                    class="little-dot -top-1"
-                    :class="activeLocalization.status"
-                    v-tooltip="__(activeLocalization.status)"
-                />
+                <StatusIndicator v-if="!isCreating" :status="activeLocalization.status" />
                 {{ formattedTitle }}
             </template>
 
@@ -246,20 +241,21 @@ import HasActions from '../publish/HasActions';
 import striptags from 'striptags';
 import clone from '@statamic/util/clone.js';
 import {
-    Header,
-    Dropdown,
-    DropdownMenu,
-    DropdownItem,
-    DropdownSeparator,
     Button,
+    Card,
+    CardPanel,
+    Dropdown,
+    DropdownItem,
+    DropdownMenu,
+    DropdownSeparator,
+    Header,
+    Heading,
+    Icon,
     Panel,
     PanelHeader,
-    Switch,
-    Heading,
+    StatusIndicator,
     Subheading,
-    Card,
-    Icon,
-    CardPanel,
+    Switch,
 } from '@statamic/ui';
 import PublishContainer from '@statamic/components/ui/Publish/Container.vue';
 import PublishTabs from '@statamic/components/ui/Publish/Tabs.vue';
@@ -278,28 +274,29 @@ export default {
     mixins: [HasPreferences, HasHiddenFields, HasActions],
 
     components: {
-        PublishActions,
-        SaveButtonOptions,
-        RevisionHistory,
-        Header,
-        Dropdown,
-        DropdownMenu,
-        DropdownItem,
-        DropdownSeparator,
         Button,
+        Card,
+        CardPanel,
+        Dropdown,
+        DropdownItem,
+        DropdownMenu,
+        DropdownSeparator,
+        Header,
+        Heading,
+        Icon,
+        LivePreview,
+        LocalizationsCard,
         Panel,
         PanelHeader,
-        Switch,
-        Heading,
-        Subheading,
-        Card,
-        Icon,
+        PublishActions,
+        PublishComponents,
         PublishContainer,
         PublishTabs,
-        PublishComponents,
-        CardPanel,
-        LocalizationsCard,
-        LivePreview,
+        RevisionHistory,
+        SaveButtonOptions,
+        StatusIndicator,
+        Subheading,
+        Switch,
     },
 
     props: {

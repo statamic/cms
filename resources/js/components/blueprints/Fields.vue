@@ -1,8 +1,7 @@
 <template>
-    <div class="flex flex-col text-sm">
+    <div class="flex flex-col gap-4">
         <div
-            class="blueprint-section-draggable-zone -mx-1"
-            :class="{ 'flex flex-1 flex-wrap': fields.length }"
+            class="blueprint-section-draggable-zone field-grid gap-2!"
             :data-tab="tabId"
             :data-section="sectionId"
         >
@@ -25,16 +24,9 @@
             />
         </div>
 
-        <div class="blueprint-section-field-actions -mx-1 mt-2 flex">
-            <div class="px-1">
-                <link-fields :exclude-fieldset="excludeFieldset" @linked="$emit('field-linked', $event)" />
-            </div>
-            <div class="px-1">
-                <button class="btn flex w-full items-center justify-center" @click="isSelectingNewFieldtype = true">
-                    <svg-icon name="light/wireframe" class="h-4 w-4 ltr:mr-2 rtl:ml-2" />
-                    {{ __('Create Field') }}
-                </button>
-            </div>
+        <div class="blueprint-section-field-actions flex gap-2">
+            <LinkFields :exclude-fieldset="excludeFieldset" @linked="$emit('field-linked', $event)" />
+            <ui-button icon="add-circle" :text="__('Create Field')" @click="isSelectingNewFieldtype = true" />
         </div>
 
         <stack

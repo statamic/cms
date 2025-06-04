@@ -9,6 +9,7 @@
 @endphp
 
 @extends('statamic::layout')
+@section('title', __('Playground'))
 @section('wrapper_class', 'max-w-7xl')
 
 @section('content')
@@ -17,6 +18,8 @@
 </ui-header>
 
 <div class="space-y-12">
+
+    <ui-switch />
 
     <section class="space-y-4">
         <ui-heading size="lg">Badges</ui-heading>

@@ -1,9 +1,6 @@
 <template>
     <div>
-        <button class="btn flex w-full items-center justify-center" @click="open = true">
-            <svg-icon name="light/hyperlink" class="h-4 w-4 ltr:mr-2 rtl:ml-2" />
-            <span>{{ __('Link Existing') }}</span>
-        </button>
+        <ui-button icon="link" @click="open = true" :text="__('Link Existing')" />
 
         <stack narrow v-if="open" @closed="open = false" name="field-linker" v-slot="{ close }">
             <div class="flex h-full flex-col bg-white dark:bg-dark-800">
