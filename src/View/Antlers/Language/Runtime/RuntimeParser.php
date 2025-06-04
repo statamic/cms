@@ -23,6 +23,7 @@ use Statamic\View\Antlers\Language\Lexer\AntlersLexer;
 use Statamic\View\Antlers\Language\Nodes\AbstractNode;
 use Statamic\View\Antlers\Language\Nodes\AntlersNode;
 use Statamic\View\Antlers\Language\Nodes\Position;
+use Statamic\View\Antlers\Language\Parser\ComponentCompiler;
 use Statamic\View\Antlers\Language\Parser\DocumentParser;
 use Statamic\View\Antlers\Language\Parser\LanguageKeywords;
 use Statamic\View\Antlers\Language\Parser\LanguageParser;
@@ -117,12 +118,16 @@ class RuntimeParser implements Parser
      */
     private $isolateRuntimes = false;
 
+    protected $componentCompiler;
+
     public function __construct(DocumentParser $documentParser, NodeProcessor $nodeProcessor, AntlersLexer $lexer, LanguageParser $antlersParser)
     {
         $this->documentParser = $documentParser;
         $this->nodeProcessor = $nodeProcessor;
         $this->antlersLexer = $lexer;
         $this->antlersParser = $antlersParser;
+
+        $this->componentCompiler = new ComponentCompiler();
     }
 
     /**
@@ -333,6 +338,8 @@ class RuntimeParser implements Parser
      */
     protected function renderText($text, $data = [])
     {
+        $text = $this->componentCompiler->compile($text);
+
         $this->parseStack += 1;
         $text = $this->runPreParserCallbacks($text);
 
