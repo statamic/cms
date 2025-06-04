@@ -263,7 +263,7 @@ return [
     'units.MB' => ':count MB',
     'units.ms' => ':countms',
     'units.s' => ':counts',
-    'updater_require_version_command' => 'To require a specific version, run the following command',
+    'updater_require_version_command' => 'To require this specific version, run the following command',
     'updater_update_to_latest_command' => 'To update to the latest version, run the following command',
     'uploader_append_timestamp' => 'Append timestamp',
     'uploader_choose_new_filename' => 'Choose new filename',

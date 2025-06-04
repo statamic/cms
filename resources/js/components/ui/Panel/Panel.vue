@@ -18,6 +18,7 @@ const props = defineProps({
         <PanelHeader v-if="heading">
             <Heading v-html="heading" />
             <Subheading v-if="subheading" v-html="subheading" />
+            <slot name="header-actions" />
         </PanelHeader>
         <slot />
     </div>
