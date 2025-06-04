@@ -43,10 +43,6 @@ class FolderAsset extends JsonResource
 
     private function getVideoThumbnail()
     {
-        if (! ThumbnailExtractor::hasCachedThumbnail($this->resource)) {
-            return [];
-        }
-
         return [
             'thumbnail' => $this->thumbnailUrl('small'),
         ];

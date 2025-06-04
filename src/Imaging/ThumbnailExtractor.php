@@ -31,11 +31,6 @@ class ThumbnailExtractor
         );
     }
 
-    public static function hasCachedThumbnail(Asset $asset)
-    {
-        return file_exists(static::getCachePath($asset));
-    }
-
     public static function getCachePath(Asset $asset)
     {
         $fileName = 'thumb_'.md5($asset->id()).'.jpg';
