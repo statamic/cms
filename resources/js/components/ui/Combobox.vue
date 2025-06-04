@@ -71,7 +71,7 @@ const itemClasses = cva({
         },
         selected: {
             false: 'text-gray-800 dark:text-gray-300 data-highlighted:bg-gray-100 data-highlighted:text-gray-900 dark:data-highlighted:bg-gray-700 dark:data-highlighted:text-gray-300',
-            true: 'bg-blue-50 text-blue-500!',
+            true: 'bg-blue-50 text-blue-600!',
         },
     },
 });
