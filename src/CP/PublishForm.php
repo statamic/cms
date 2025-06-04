@@ -9,6 +9,7 @@ class PublishForm implements Responsable
 {
     public string $title = '';
     private array $values = [];
+    private $parent = null;
     private string $submitUrl;
     private string $submitMethod = 'PATCH';
 
@@ -35,6 +36,13 @@ class PublishForm implements Responsable
         return $this;
     }
 
+    public function parent($parent): self
+    {
+        $this->parent = $parent;
+
+        return $this;
+    }
+
     public function submittingTo(string $url, string $method = 'PATCH'): self
     {
         $this->submitUrl = $url;
@@ -45,7 +53,11 @@ class PublishForm implements Responsable
 
     public function submit(array $values): array
     {
-        $fields = $this->blueprint->fields()->addValues($values);
+        $fields = $this
+            ->blueprint
+            ->fields()
+            ->setParent($this->parent ?? null)
+            ->addValues($values);
 
         $fields->validate();
 
@@ -57,6 +69,7 @@ class PublishForm implements Responsable
         $fields = $this
             ->blueprint
             ->fields()
+            ->setParent($this->parent ?? null)
             ->addValues($this->values)
             ->preProcess();
 
