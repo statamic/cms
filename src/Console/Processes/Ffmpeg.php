@@ -13,15 +13,15 @@ class Ffmpeg extends Process
         return $this;
     }
 
-    public function extractThumbnail(string $path, string $output)
+    public function extractThumbnail(string $path, string $outputFilePath)
     {
-        $this->run($this->buildCommand($path, $output));
+        $this->run($this->buildCommand($path, $outputFilePath));
 
-        if (! file_exists($output)) {
+        if (! file_exists($outputFilePath)) {
             return null;
         }
 
-        return $output;
+        return $outputFilePath;
     }
 
     private function buildCommand(string $path, string $output)
