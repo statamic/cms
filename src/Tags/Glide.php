@@ -280,7 +280,7 @@ class Glide extends Tags
         }
 
         if (Str::startsWith($item, config('app.url'))) {
-            $item = (string) Str::of($item)->after(config('app.url'));
+            $item = Str::after($item, config('app.url'));
         }
 
         // External URLs are already fine as-is.
