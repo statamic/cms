@@ -63,15 +63,6 @@ class Parser
         return $this;
     }
 
-    public function addRenderers(Closure $closure): self
-    {
-        $this->converter = null;
-
-        $this->renderers[] = $closure;
-
-        return $this;
-    }
-
     public function addExtensions(Closure $closure): self
     {
         return $this->addExtension($closure);
@@ -88,6 +79,15 @@ class Parser
         }
 
         return $extensions;
+    }
+
+    public function addRenderers(Closure $closure): self
+    {
+        $this->converter = null;
+
+        $this->renderers[] = $closure;
+
+        return $this;
     }
 
     public function renderers(): array
