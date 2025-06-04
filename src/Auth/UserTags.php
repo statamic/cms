@@ -735,9 +735,7 @@ class UserTags extends Tags
                                     ->reject(fn ($field) => in_array($field->handle(), ['password', 'password_confirmation', 'roles', 'groups'])
                                             || $field->fieldtype()->handle() === 'assets'
                                     )
-                                    ->map(fn ($field) =>
-                                        $this->getRenderableField($field, 'user.profile')
-                                    )
+                                    ->map(fn ($field) => $this->getRenderableField($field, 'user.profile'))
                                     ->values()
                                     ->all(),
                         ])
