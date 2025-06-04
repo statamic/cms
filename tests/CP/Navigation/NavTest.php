@@ -105,23 +105,6 @@ class NavTest extends TestCase
         $item = $this->build()->get('Utilities')->last();
 
         $this->assertNull($item->icon());
-    }
-
-    #[Test]
-    public function it_can_create_a_nav_item_with_references_to_a_bundled_light_svg_icon()
-    {
-        File::put($svg = statamic_path('resources/svg/icons/light/test.svg'), '<svg>the totally real svg</svg>');
-
-        $this->actingAs(tap(User::make()->makeSuper())->save());
-
-        Nav::utilities('Test')->icon('test');
-
-        $item = $this->build()->get('Utilities')->last();
-
-        $this->assertEquals('test', $item->icon());
-        $this->assertEquals('<svg>the totally real svg</svg>', $item->svg());
-
-        File::delete($svg);
         $this->assertEquals(\Statamic\Statamic::svg('icons/collections', 'size-4 shrink-0'), $item->svg());
     }
 
@@ -231,7 +214,7 @@ class NavTest extends TestCase
     #[Test]
     public function it_sets_parent_icon_on_children()
     {
-        File::put($svg = statamic_path('resources/svg/icons/light/droid.svg'), '<svg>droid</svg>');
+        File::put($svg = statamic_path('resources/svg/icons/droid.svg'), '<svg>droid</svg>');
 
         $this->actingAs(tap(User::make()->makeSuper())->save());
 
