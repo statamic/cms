@@ -31,7 +31,12 @@ class ThumbnailExtractor
         );
     }
 
-    protected function getCachePath(Asset $asset)
+    public static function hasCachedThumbnail(Asset $asset)
+    {
+        return file_exists(static::getCachePath($asset));
+    }
+
+    public static function getCachePath(Asset $asset)
     {
         $fileName = 'thumb_'.md5($asset->id()).'.jpg';
         $cacheDirectory = static::cachePath();
@@ -46,7 +51,7 @@ class ThumbnailExtractor
 
     public function generateThumbnail(Asset $asset)
     {
-        $cachePath = $this->getCachePath($asset);
+        $cachePath = static::getCachePath($asset);
 
         if (file_exists($cachePath)) {
             return $cachePath;
@@ -64,7 +69,7 @@ class ThumbnailExtractor
 
         return $this->ffmpeg->extractThumbnail(
             $asset->absoluteUrl(),
-            $this->getCachePath($asset)
+            static::getCachePath($asset)
         );
     }
 }

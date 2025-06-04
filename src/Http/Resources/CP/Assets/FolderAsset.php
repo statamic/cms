@@ -5,6 +5,7 @@ namespace Statamic\Http\Resources\CP\Assets;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Fluent;
 use Statamic\Facades\Action;
+use Statamic\Imaging\ThumbnailExtractor;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\Hookable;
 
@@ -42,6 +43,10 @@ class FolderAsset extends JsonResource
 
     private function getVideoThumbnail()
     {
+        if (! ThumbnailExtractor::hasCachedThumbnail($this->resource)) {
+            return [];
+        }
+
         return [
             'thumbnail' => $this->thumbnailUrl('small'),
         ];

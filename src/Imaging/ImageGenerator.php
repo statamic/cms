@@ -148,7 +148,7 @@ class ImageGenerator
     public function generateVideoThumbnail($asset, array $params)
     {
         if (! $this->canGenerateThumbnail($asset)) {
-            return null;
+            return '';
         }
 
         if ($path = $this->thumbnailExtractor->generateThumbnail($asset)) {
@@ -161,7 +161,7 @@ class ImageGenerator
             );
         }
 
-        return null;
+        return '';
     }
 
     /**
