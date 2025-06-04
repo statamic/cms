@@ -356,11 +356,9 @@ class URL
         $url = array_shift($parts);
         $queryAndFragments = implode($parts);
 
-        if (in_array($url, ['', '/']) && ! $queryAndFragments) {
-            return '/';
-        }
-
-        if (static::$enforceTrailingSlashes) {
+        if (in_array($url, ['', '/'])) {
+            $url = '/';
+        } elseif (static::$enforceTrailingSlashes) {
             $url = Str::ensureRight($url, '/');
         } else {
             $url = Str::removeRight($url, '/');
