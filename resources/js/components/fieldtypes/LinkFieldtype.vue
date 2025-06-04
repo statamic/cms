@@ -39,11 +39,11 @@
 <!-- This is a hack to...  -->
 <style scoped>
     /* [1] Make the relationship input full height when it's in a link field. */
-    ::v-deep(.relationship-input) > div:first-child {
+    :deep(.relationship-input) > div:first-child {
         @apply h-full;
     }
     /* [/2] Make the combobox text smaller when it's in a link field so it's not jarring when looking between the two. */
-    ::v-deep [data-ui-combobox-anchor] {
+    :deep([data-ui-combobox-anchor]) {
         font-size: var(--text-sm)!important;
     }
 </style>
