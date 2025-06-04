@@ -454,4 +454,9 @@ class Process
 
         return $that;
     }
+
+    protected function isWindows()
+    {
+        return DIRECTORY_SEPARATOR === '\\';
+    }
 }
