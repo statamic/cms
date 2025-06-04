@@ -55,7 +55,9 @@ class StoreBlueprintTest extends TestCase
         $this
             ->actingAs($user)
             ->submit($collection, ['title' => 'My Test Blueprint'])
-            ->assertRedirect('/cp/taxonomies/test/blueprints/my_test_blueprint/edit');
+            ->assertJson([
+                'redirect' => 'http://localhost/cp/taxonomies/test/blueprints/my_test_blueprint/edit',
+            ]);
 
         $this->assertCount(2, Facades\Blueprint::in('taxonomies/test'));
         $blueprint = Facades\Blueprint::in('taxonomies/test')->last();
@@ -86,7 +88,9 @@ class StoreBlueprintTest extends TestCase
         $this
             ->actingAs($user)
             ->submit($collection, ['title' => 'My Test Blueprint'])
-            ->assertRedirect('/cp/taxonomies/test_collection/blueprints/my_test_blueprint/edit');
+            ->assertJson([
+                'redirect' => 'http://localhost/cp/taxonomies/test_collection/blueprints/my_test_blueprint/edit',
+            ]);
 
         $this->assertCount(2, Facades\Blueprint::in('taxonomies/test_collection'));
 

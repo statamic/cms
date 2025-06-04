@@ -8,3 +8,4 @@ export { default as ValidatesFieldConditions } from './components/field-conditio
 export * from './components/ui/index.js';
 export * from './components/elevated-sessions';
 export * as SavePipeline from './components/ui/Publish/SavePipeline.js';
+export { default as DateFormatter } from './components/DateFormatter.js';

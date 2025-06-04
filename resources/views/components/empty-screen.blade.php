@@ -19,8 +19,8 @@
             If there's no "can", show it.
             If there's a "can", and its false, don't show it.
         --}}
-        @unless (! isset($button_url) || (isset($can) && ! $can))
-            <a href="{{ $button_url }}" class="btn-primary btn-lg">{{ $button_text }}</a>
+        @unless (! isset($buttonUrl) || (isset($can) && ! $can))
+            <a href="{{ $buttonUrl }}" class="btn-primary btn-lg">{{ $buttonText }}</a>
         @endunless
     </div>
 </div>
