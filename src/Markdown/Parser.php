@@ -81,7 +81,7 @@ class Parser
         return $extensions;
     }
 
-    public function addRenderers(Closure $closure): self
+    public function addRenderer(Closure $closure): self
     {
         $this->converter = null;
 
@@ -90,12 +90,25 @@ class Parser
         return $this;
     }
 
+    public function addRenderers(Closure $closure): self
+    {
+        return $this->addRenderer($closure);
+    }
+
     public function renderers(): array
     {
         $renderers = [];
 
         foreach ($this->renderers as $closure) {
-            foreach ($closure() as $renderer) {
+            $closureRenderers = $closure();
+
+            // When the first item isn't an array, assume it's a single
+            // renderer and wrap it in an array.
+            if (! is_array($closureRenderers[0])) {
+                $closureRenderers = [$closureRenderers];
+            }
+
+            foreach ($closureRenderers as $renderer) {
                 $renderers[] = $renderer;
             }
         }
