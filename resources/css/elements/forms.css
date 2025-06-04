@@ -1,25 +1,4 @@
-/* ==========================================================================
-   BASE FORM ELEMENTS
-   ========================================================================== */
-
-label {
-    @apply block text-sm font-semibold leading-normal text-gray-800 dark:text-dark-150;
-}
-
-/* input {
-    @apply placeholder:text-gray-600 dark:placeholder:text-dark-175;
-} */
-
-/* input[type='checkbox'],
-input[type='radio'] {
-    @apply text-lg;
-} */
-
-/* select {
-    @apply cursor-pointer border-2 border-gray-300 bg-gray-300 text-base;
-} */
-
-/* Text Fields
+/* Legacy Stuff to be removed
   ========================================================================== */
 
 .input-text {
@@ -35,15 +14,6 @@ input[type='radio'] {
 
     &:not(textarea) {
         height: 2.375rem;
-    }
-}
-
-/*  Used inside tables, grids, and so on */
-.input-text-minimal {
-    @apply w-full appearance-none bg-white p-2 shadow-none dark:bg-dark-550;
-
-    &:focus {
-        @apply bg-gray-200 outline-hidden dark:bg-dark-600;
     }
 }
 
