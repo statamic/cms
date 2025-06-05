@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .table-fieldtype-table {
-    @apply relative mb-4 w-full rounded-sm border text-gray shadow-sm outline-hidden dark:border-dark-900 dark:text-dark-150 ltr:text-left rtl:text-right;
+    @apply relative mb-4 w-full rounded-md border text-gray shadow-ui-sm outline-hidden dark:border-dark-900 dark:text-dark-150 ltr:text-left rtl:text-right;
     border-collapse: separate;
     border-spacing: 0;
     table-layout: fixed;
@@ -11,7 +11,7 @@
 
 .table-fieldtype-table thead {
     th {
-        @apply z-10 border-b bg-gray-200 p-2 text-sm font-medium text-gray-900 dark:border-dark-900 dark:bg-dark-700 dark:text-dark-150 ltr:border-r rtl:border-l;
+        @apply z-10 border-b bg-gray-50 p-2 text-sm font-medium text-gray-900 dark:border-dark-900 dark:bg-dark-700 dark:text-dark-150 ltr:border-r rtl:border-l;
         display: table-cell;
         position: sticky;
         top: -1px;
@@ -57,7 +57,7 @@
         &.table-drag-handle {
             @apply h-full w-3 p-2 ltr:border-r rtl:border-l;
             cursor: grab;
-            background: var(--color-gray-200) url('../../../svg/icons/light/drag-dots.svg') center center no-repeat;
+            background: var(--color-white) url('../../../svg/icons/light/drag-dots.svg') center center no-repeat;
             background-size: 7px 17px;
 
             .dark & {

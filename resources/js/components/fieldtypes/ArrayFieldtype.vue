@@ -77,7 +77,7 @@
                                 <td>
                                     <input
                                         type="text"
-                                        class="input-text font-bold"
+                                        class="input-text font-medium"
                                         v-model="element.key"
                                         :readonly="isReadOnly"
                                     />
@@ -93,7 +93,7 @@
                                 <td class="row-controls" v-if="!isReadOnly">
                                     <a
                                         @click="deleteOrConfirm(index)"
-                                        class="inline text-lg antialiased opacity-25 hover:opacity-75"
+                                        class="inline text-lg antialiased opacity-25 hover:opacity-75 cursor-pointer"
                                         >&times;</a
                                     >
                                 </td>
@@ -102,9 +102,9 @@
                     </sortable-list>
                 </table>
 
-                <button class="btn" @click="addValue" :disabled="atMax" v-if="!isReadOnly">
+                <Button @click="addValue" icon="plus" :disabled="atMax" v-if="!isReadOnly">
                     {{ addButton }}
-                </button>
+                </Button>
 
                 <confirmation-modal
                     v-if="deleting !== false"
@@ -124,12 +124,14 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 import { SortableList, SortableHelpers } from '../sortable/Sortable';
+import { Button } from '@statamic/ui';
 
 export default {
     mixins: [Fieldtype, SortableHelpers],
 
     components: {
         SortableList,
+        Button,
     },
 
     data() {
