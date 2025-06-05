@@ -5,7 +5,6 @@ namespace Statamic\Http\Resources\CP\Assets;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Fluent;
 use Statamic\Facades\Action;
-use Statamic\Imaging\ThumbnailExtractor;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\Hookable;
 
