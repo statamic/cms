@@ -79,40 +79,31 @@
                     </div>
                 </div>
 
-                <!-- Title attribute -->
-                <div
-                    class="dark:placeholder:dark-text-dark-175 mb-4 flex h-8 w-full items-center rounded-sm border bg-gray-100 p-2 text-gray-800 shadow-inner placeholder:text-gray-600 dark:border-dark-200 dark:bg-dark-600 dark:text-dark-150"
-                >
-                    <input
+                <div class="space-y-3">
+                    <!-- Title attribute -->
+                    <ui-input
                         type="text"
                         ref="input"
                         v-model="title"
-                        class="input placeholder-gray-50 h-auto text-sm"
                         :placeholder="`${__('Label')} (${__('Optional')})`"
                     />
-                </div>
 
-                <!-- Rel attribute -->
-                <div
-                    class="dark:placeholder:dark-text-dark-175 flex h-8 w-full items-center rounded-sm border bg-gray-100 p-2 text-gray-800 shadow-inner placeholder:text-gray-600 dark:border-dark-200 dark:bg-dark-600 dark:text-dark-150"
-                >
-                    <input
+                    <!-- Rel attribute -->
+                    <ui-input
                         type="text"
                         ref="input"
                         v-model="rel"
-                        class="input placeholder-gray-50 h-auto text-sm"
                         :placeholder="`${__('Relationship')} (${__('Optional')})`"
                     />
                 </div>
 
-                <label
-                    for="target-blank"
-                    class="mt-4 flex cursor-pointer items-center font-normal text-gray-800 hover:text-black dark:text-dark-150 dark:hover:text-dark-100"
-                    v-if="canHaveTarget"
-                >
-                    <input class="checkbox ltr:mr-2 rtl:ml-2" type="checkbox" v-model="targetBlank" id="target-blank" />
-                    {{ __('Open in new window') }}
-                </label>
+                <ui-checkbox-group name="target_blank" label="Choose if the link should open in a new window" class="mt-4">
+                    <ui-checkbox-item
+                        label="Open in new window"
+                        v-model="targetBlank"
+                        id="target-blank"
+                    />
+                </ui-checkbox-group>
             </div>
 
             <footer

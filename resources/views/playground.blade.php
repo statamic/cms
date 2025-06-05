@@ -77,10 +77,10 @@
             <ui-checkbox-group name="meals" label="Select your favorite meals">
                 <ui-checkbox-item
                     label="Breakfast"
-                description="The morning meal. Should include eggs."
-                value="breakfast"
-            />
-            <ui-checkbox-item label="Lunch" description="The mid-day meal. Should be protein heavy." value="lunch" />
+                    description="The morning meal. Should include eggs."
+                    value="breakfast"
+                />
+                <ui-checkbox-item label="Lunch" description="The mid-day meal. Should be protein heavy." value="lunch" />
                 <ui-checkbox-item label="Dinner" description="The evening meal. Should be delicious." value="dinner" />
             </ui-checkbox-group>
         </div>
