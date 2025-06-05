@@ -10,7 +10,7 @@ trait ContainsData
 
     public function get($key, $fallback = null)
     {
-        return $this->data[$key] ?? $fallback;
+        return data_get($this->data, $key, $fallback);
     }
 
     public function has($key)
