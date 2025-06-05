@@ -183,6 +183,22 @@ class EntryTest extends TestCase
     }
 
     #[Test]
+    public function it_gets_nested_data_values()
+    {
+        $collection = tap(Collection::make('test'))->save();
+        $entry = (new Entry)->collection('test');
+
+        $return = $entry->set('foo', ['bar' => 'baz']);
+
+        $this->assertEquals($entry, $return);
+        $this->assertTrue($entry->has('foo'));
+        $this->assertEquals(['bar' => 'baz'], $entry->get('foo'));
+        $this->assertEquals(['bar' => 'baz'], $entry->value('foo'));
+        $this->assertEquals('baz', $entry->get('foo.bar'));
+        $this->assertEquals('fallback', $entry->get('unknown', 'fallback'));
+    }
+
+    #[Test]
     public function it_sets_data_values_using_magic_properties()
     {
         $entry = new Entry;
@@ -836,6 +852,7 @@ class EntryTest extends TestCase
         $relationshipFieldtype = new class extends Fieldtype
         {
             protected static $handle = 'relationship';
+
             protected $relationship = true;
 
             public function augment($values)
