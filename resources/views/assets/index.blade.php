@@ -6,7 +6,7 @@
 @section('title', __('Assets'))
 
 @section('content')
-    <x-statamic::empty-state
+    <x-statamic::empty-screen
         title="{{ __('Asset Containers') }}"
         description="{{ __('statamic::messages.asset_container_intro') }}"
         svg="empty/asset-container"

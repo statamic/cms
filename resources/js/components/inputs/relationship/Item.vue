@@ -1,9 +1,9 @@
 <template>
     <div
-        class="shadow-ui-sm relative z-2 flex w-full items-center gap-2 rounded-lg border border-gray-200 bg-white px-1.5 py-2 text-base dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
+        class="shadow-ui-sm relative z-2 flex w-full h-full items-center gap-2 rounded-lg border border-gray-200 bg-white px-1.5 py-2 mb-1.5 last:mb-0 text-base dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
         :class="{ invalid: item.invalid }"
     >
-        <ui-icon name="handles" class="item-move sortable-handle size-4 cursor-grab text-gray-400" v-if="sortable" />
+        <ui-icon name="handles" class="item-move sortable-handle size-4 cursor-grab text-gray-300" v-if="sortable" />
         <div class="flex flex-1 items-center">
             <ui-status-indicator v-if="item.status" :status="item.status" class="me-2" />
 
@@ -39,14 +39,24 @@
                 <div
                     v-if="item.hint"
                     v-text="item.hint"
-                    class="text-4xs me-2 hidden whitespace-nowrap text-gray-600 uppercase @sm:block"
+                    class="text-2xs tracking-tight me-2 hidden whitespace-nowrap text-gray-500 @sm:block"
                 />
 
                 <div class="flex items-center" v-if="!readOnly">
-                    <dropdown-list>
-                        <dropdown-item :text="__('Edit')" @click="edit" v-if="editable" />
-                        <dropdown-item :text="__('Unlink')" class="warning" @click="$emit('removed')" />
-                    </dropdown-list>
+                    <Dropdown>
+                        <DropdownMenu>
+                            <DropdownItem
+                                v-if="editable"
+                                :text="__('Edit')"
+                                @click="edit"
+                            />
+                            <DropdownItem
+                                :text="__('Unlink')"
+                                variant="destructive"
+                                @click="$emit('removed')"
+                            />
+                        </DropdownMenu>
+                    </Dropdown>
                 </div>
             </div>
         </div>
@@ -56,9 +66,13 @@
 <script>
 import { getActivePinia } from 'pinia';
 import InlineEditForm from './InlineEditForm.vue';
+import { Dropdown, DropdownMenu, DropdownItem } from '@statamic/ui';
 
 export default {
     components: {
+        DropdownItem,
+        DropdownMenu,
+        Dropdown,
         InlineEditForm,
     },
 

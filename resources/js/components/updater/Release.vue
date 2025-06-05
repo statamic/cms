@@ -1,36 +1,31 @@
 <template>
-    <div class="card update-release mb-10">
-        <div class="mb-6 flex justify-between">
+    <ui-panel>
+        <ui-panel-header class="flex items-center justify-between">
             <div>
-                <h1>{{ release.version }}</h1>
-                <h5 class="date" v-text="__('Released on :date', { date })" />
+                <ui-heading :text="release.version" />
+                <ui-subheading :text="`${__('Released on :date', { date })}`" />
             </div>
-            <div v-if="showActions">
-                <button
-                    class="btn"
-                    :disabled="release.type === 'current'"
-                    v-text="installButtonText"
-                    @click="confirmationPrompt = release"
-                />
-            </div>
-        </div>
-        <div class="card-body">
-            <div v-html="body"></div>
-        </div>
-
-        <confirmation-modal
-            v-if="confirmationPrompt"
-            :buttonText="__('OK')"
-            :cancellable="false"
-            @confirm="confirmationPrompt = null"
-        >
-            <div class="prose">
-                <p v-text="confirmationText" />
-                <code-block copyable :text="command" />
-                <p v-html="link"></p>
-            </div>
-        </confirmation-modal>
-    </div>
+            <ui-modal :title="__('Update to :version', { version: release.version })">
+                <template #trigger>
+                    <ui-button
+                        v-if="showActions"
+                        icon="clipboard"
+                        size="sm"
+                        :disabled="release.type === 'current'"
+                        :text="__('Get Command')"
+                    />
+                </template>
+                <div class="prose space-y-3">
+                    <p v-text="confirmationText" />
+                    <ui-input v-model="command" readonly copyable class="font-mono text-sm dark" />
+                    <p v-html="link" />
+                </div>
+            </ui-modal>
+        </ui-panel-header>
+        <ui-card>
+            <div v-html="body" class="prose" />
+        </ui-card>
+    </ui-panel>
 </template>
 
 <script>
@@ -98,7 +93,7 @@ export default {
         link() {
             return (
                 __('Learn more about :link', {
-                    link: `<a href="https://statamic.dev/updating" target="_blank">${__('Updates')}</a>`,
+                    link: `<a href="https://statamic.dev/updating" target="_blank" class="font-medium underline text-blue-500 dark:text-blue-400">${__('updating Statamic')}</a>`,
                 }) + '.'
             );
         },

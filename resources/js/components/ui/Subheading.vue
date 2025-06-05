@@ -4,6 +4,7 @@ import { cva } from 'cva';
 const props = defineProps({
     size: { type: String, default: 'base' },
     text: { type: [String, Number, Boolean, null], default: null },
+    icon: { type: String, default: null },
 });
 
 const classes = cva({
@@ -15,12 +16,16 @@ const classes = cva({
             lg: 'text-base',
             xl: 'text-lg',
         },
+        icon: {
+            true: 'flex items-center gap-2',
+        },
     },
-})({ ...props });
+})({ ...props, icon: props.icon ? true : false });
 </script>
 
 <template>
     <div :class="classes" data-ui-subheading>
+        <ui-icon v-if="icon" :name="icon" class="size-2 text-gray-400 dark:text-gray-600" />
         <slot v-if="!text" />
         <span v-else v-html="text" />
     </div>

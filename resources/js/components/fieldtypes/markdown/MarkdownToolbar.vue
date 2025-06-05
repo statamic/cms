@@ -33,7 +33,7 @@
                 variant="ghost"
                 class="px-2! [&_svg]:size-3.5"
                 @click="$emit('toggle-mode', 'write')"
-                :class="{ 'text-black! dark:text-white!': mode == 'write' }"
+                :class="mode === 'write' ? 'text-gray-800! dark:text-white!' : 'text-gray-400!'"
                 v-text="__('Write')"
                 :aria-pressed="mode === 'write' ? 'true' : 'false'"
             />
@@ -42,7 +42,7 @@
                 variant="ghost"
                 class="px-2! [&_svg]:size-3.5"
                 @click="$emit('toggle-mode', 'preview')"
-                :class="{ 'text-black! dark:text-white!': mode == 'preview' }"
+                :class="mode === 'preview' ? 'text-gray-800! dark:text-white!' : 'text-gray-400!'"
                 v-text="__('Preview')"
                 :aria-pressed="mode === 'preview' ? 'true' : 'false'"
             />

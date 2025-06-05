@@ -15,6 +15,7 @@ class Parser
 
     protected $converter;
     protected $extensions = [];
+    protected $renderers = [];
     protected $config = [];
 
     public function __construct(array $config = [])
@@ -37,8 +38,12 @@ class Parser
 
         $env = $converter->getEnvironment();
 
-        foreach ($this->extensions() as $ext) {
-            $env->addExtension($ext);
+        foreach ($this->extensions() as $extension) {
+            $env->addExtension($extension);
+        }
+
+        foreach ($this->renderers() as $renderer) {
+            $env->addRenderer(...$renderer);
         }
 
         return $this->converter = $converter;
@@ -65,15 +70,50 @@ class Parser
 
     public function extensions(): array
     {
-        $exts = [];
+        $extensions = [];
 
         foreach ($this->extensions as $closure) {
-            foreach (Arr::wrap($closure()) as $ext) {
-                $exts[] = $ext;
+            foreach (Arr::wrap($closure()) as $extension) {
+                $extensions[] = $extension;
             }
         }
 
-        return $exts;
+        return $extensions;
+    }
+
+    public function addRenderer(Closure $closure): self
+    {
+        $this->converter = null;
+
+        $this->renderers[] = $closure;
+
+        return $this;
+    }
+
+    public function addRenderers(Closure $closure): self
+    {
+        return $this->addRenderer($closure);
+    }
+
+    public function renderers(): array
+    {
+        $renderers = [];
+
+        foreach ($this->renderers as $closure) {
+            $closureRenderers = $closure();
+
+            // When the first item isn't an array, assume it's a single
+            // renderer and wrap it in an array.
+            if (! is_array($closureRenderers[0])) {
+                $closureRenderers = [$closureRenderers];
+            }
+
+            foreach ($closureRenderers as $renderer) {
+                $renderers[] = $renderer;
+            }
+        }
+
+        return $renderers;
     }
 
     public function withStatamicDefaults()
@@ -149,6 +189,10 @@ class Parser
 
         foreach ($this->extensions as $ext) {
             $parser->addExtensions($ext);
+        }
+
+        foreach ($this->renderers as $renderer) {
+            $parser->addRenderers($renderer);
         }
 
         return $parser;
