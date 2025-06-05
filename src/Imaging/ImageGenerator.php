@@ -44,15 +44,12 @@ class ImageGenerator
      */
     private $skip_validation;
 
-    private ThumbnailExtractor $thumbnailExtractor;
-
     /**
      * GlideController constructor.
      */
-    public function __construct(Server $server, ThumbnailExtractor $thumbnailExtractor)
+    public function __construct(Server $server)
     {
         $this->server = $server;
-        $this->thumbnailExtractor = $thumbnailExtractor;
     }
 
     public function getServer(): Server
@@ -151,7 +148,7 @@ class ImageGenerator
             return '';
         }
 
-        if ($path = $this->thumbnailExtractor->generateThumbnail($asset)) {
+        if ($path = app(ThumbnailExtractor::class)->generateThumbnail($asset)) {
             $this->skip_validation = true;
 
             return $this->doGenerateByPath(
