@@ -1,6 +1,6 @@
 <template>
     <div
-        class="shadow-ui-sm relative z-2 flex w-full h-full items-center gap-2 rounded-lg border border-gray-200 bg-white px-1.5 py-2 mb-1.5 last:mb-0 text-base dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
+        class="shadow-ui-sm relative z-2 flex w-full h-full items-center gap-2 rounded-lg border border-gray-200 bg-white px-1.5 py-1.5 mb-1.5 last:mb-0 text-base dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
         :class="{ invalid: item.invalid }"
     >
         <ui-icon name="handles" class="item-move sortable-handle size-4 cursor-grab text-gray-300" v-if="sortable" />
@@ -44,6 +44,9 @@
 
                 <div class="flex items-center" v-if="!readOnly">
                     <Dropdown>
+                        <template #trigger>
+                            <Button icon="ui/dots" variant="ghost" size="xs" class="" v-bind="attrs" />
+                        </template>
                         <DropdownMenu>
                             <DropdownItem
                                 v-if="editable"
@@ -66,10 +69,11 @@
 <script>
 import { getActivePinia } from 'pinia';
 import InlineEditForm from './InlineEditForm.vue';
-import { Dropdown, DropdownMenu, DropdownItem } from '@statamic/ui';
+import { Button, Dropdown, DropdownMenu, DropdownItem } from '@statamic/ui';
 
 export default {
     components: {
+        Button,
         DropdownItem,
         DropdownMenu,
         Dropdown,
