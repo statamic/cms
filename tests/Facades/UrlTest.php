@@ -115,11 +115,25 @@ class UrlTest extends TestCase
             'directory with trailing slashes to nested directory' => ['/foo/', '/foo/bar', false],
 
             'homepage with query string to homepage' => ['/?baz=qux', '/', false],
-            'directory with query string  to homepage' => ['/foo?baz=qux', '/', true],
-            'nested directory with query string  to homepage' => ['/foo/bar?baz=qux', '/', true],
-            'nested directory with query string  to directory' => ['/foo/bar?baz=qux', '/foo', true],
-            'directory with query string  to nested directory' => ['/foo?baz=qux', '/foo/bar', false],
-            'homepage with query string  to nested directory' => ['/?baz=qux', '/foo', false],
+            'directory with query string to homepage' => ['/foo?baz=qux', '/', true],
+            'nested directory with query string to homepage' => ['/foo/bar?baz=qux', '/', true],
+            'nested directory with query string to directory' => ['/foo/bar?baz=qux', '/foo', true],
+            'directory with query string to nested directory' => ['/foo?baz=qux', '/foo/bar', false],
+            'homepage with query string to nested directory' => ['/?baz=qux', '/foo', false],
+
+            'homepage with query string to homepage with query string' => ['/?baz=qux', '/?alpha=true', false],
+            'directory with query string to homepage with query string' => ['/foo?baz=qux', '/?alpha=true', true],
+            'nested directory with query string to homepage with query string' => ['/foo/bar?baz=qux', '/?alpha=true', true],
+            'nested directory with query string to directory with query string' => ['/foo/bar?baz=qux', '/foo?alpha=true', true],
+            'directory with query string to nested directory with query string' => ['/foo?baz=qux', '/foo/bar?alpha=true', false],
+            'homepage with query string to nested directory with query string' => ['/?baz=qux', '/foo?alpha=true', false],
+
+            'homepage with anchor fragment to homepage with anchor fragment' => ['/#alpha', '/#beta', false],
+            'directory with anchor fragment to homepage with anchor fragment' => ['/foo#alpha', '/#beta', true],
+            'nested directory with anchor fragment to homepage with anchor fragment' => ['/foo/bar#alpha', '/#beta', true],
+            'nested directory with anchor fragment to directory with anchor fragment' => ['/foo/bar#alpha', '/foo#beta', true],
+            'directory with anchor fragment to nested directory with anchor fragment' => ['/foo#alpha', '/foo/bar#beta', false],
+            'homepage with anchor fragment to nested directory with anchor fragment' => ['/#alpha', '/foo#beta', false],
         ];
     }
 
