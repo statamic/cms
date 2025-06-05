@@ -46,5 +46,5 @@ watch(
 </script>
 
 <template>
-    <component :is="icon" :class="['size-4 [.related-item_button_&]:size-3 shrink-0']" v-bind="$attrs" />
+    <component :is="icon" :class="['size-4 shrink-0']" v-bind="$attrs" />
 </template>
