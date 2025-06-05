@@ -94,9 +94,8 @@ class URL
      */
     public function isAncestorOf($child, $ancestor)
     {
-        $child = Str::before($child, '?');
-        $child = Str::ensureRight($child, '/');
-        $ancestor = Str::ensureRight($ancestor, '/');
+        $child = Str::ensureRight(self::removeQueryAndFragment($child), '/');
+        $ancestor = Str::ensureRight(self::removeQueryAndFragment($ancestor), '/');
 
         if ($child === $ancestor) {
             return false;
