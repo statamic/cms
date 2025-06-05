@@ -137,7 +137,7 @@ class URL
      */
     public function prependSiteUrl($url, $locale = null, $controller = true)
     {
-        $prepend = rtrim(Config::getSiteUrl($locale), '/');
+        $prepend = Config::getSiteUrl($locale);
 
         // If we don't want the front controller, we'll have to strip
         // it out since it should be in the site URL already.
@@ -147,9 +147,7 @@ class URL
             $prepend = Str::removeRight($prepend, $file);
         }
 
-        $prepend = Str::ensureRight($prepend, '/');
-
-        return Str::ensureLeft(ltrim($url, '/'), $prepend);
+        return self::tidy($prepend.'/'.$url);
     }
 
     /**
@@ -265,7 +263,7 @@ class URL
     {
         $rootUrl = url()->to('/');
 
-        return Str::ensureRight($rootUrl, '/');
+        return self::tidy($rootUrl, '/');
     }
 
     /**
