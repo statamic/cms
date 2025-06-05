@@ -1,5 +1,5 @@
 .bard-fieldtype-wrapper {
-    @apply relative rounded-sm border outline-hidden dark:border-dark-900;
+    @apply relative rounded-xl border outline-hidden dark:border-dark-900;
 
     * {
         outline: none;
@@ -41,7 +41,7 @@
 }
 
 .bard-fixed-toolbar {
-    @apply top-0 z-5 flex items-start justify-between rounded-t border-b bg-white p-1 text-sm shadow-none dark:border-dark-900 dark:bg-dark-800;
+    @apply top-0 z-5 flex items-start justify-between rounded-t-xl border-b border-gray-300 bg-gray-50 p-1 text-sm shadow-none px-2 py-1 dark:border-white/15 dark:bg-gray-950;
 
     .bard-toolbar-button {
         @apply m-0 flex h-8 w-8 items-center justify-center rounded-sm px-1 text-center text-base text-gray-800 dark:text-dark-150;
