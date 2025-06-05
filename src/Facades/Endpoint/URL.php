@@ -14,18 +14,27 @@ use Statamic\Support\Str;
  */
 class URL
 {
+    private static $enforceTrailingSlashes = false;
     private static $externalUriCache = [];
 
     /**
-     * Removes occurrences of "//" in a $path (except when part of a protocol)
-     * Alias of Path::tidy().
+     * Enforce trailing slashes service provider helper.
+     */
+    public function enforceTrailingSlashes(bool $bool = true): void
+    {
+        static::$enforceTrailingSlashes = $bool;
+    }
+
+    /**
+     * Removes occurrences of "//" in a $path (except when part of a protocol).
+     *
+     * Also normalizes trailing slash (configurable via `enforceTrailingSlashes()` function).
      *
      * @param  string  $url  URL to remove "//" from
-     * @return string
      */
-    public function tidy($url)
+    public function tidy($url): string
     {
-        return Path::tidy($url);
+        return self::normalizeTrailingSlash(Path::tidy($url));
     }
 
     /**
@@ -85,9 +94,8 @@ class URL
      */
     public function isAncestorOf($child, $ancestor)
     {
-        $child = Str::before($child, '?');
-        $child = Str::ensureRight($child, '/');
-        $ancestor = Str::ensureRight($ancestor, '/');
+        $child = Str::ensureRight(self::removeQueryAndFragment($child), '/');
+        $ancestor = Str::ensureRight(self::removeQueryAndFragment($ancestor), '/');
 
         if ($child === $ancestor) {
             return false;
@@ -129,7 +137,7 @@ class URL
      */
     public function prependSiteUrl($url, $locale = null, $controller = true)
     {
-        $prepend = rtrim(Config::getSiteUrl($locale), '/');
+        $prepend = Config::getSiteUrl($locale);
 
         // If we don't want the front controller, we'll have to strip
         // it out since it should be in the site URL already.
@@ -139,9 +147,7 @@ class URL
             $prepend = Str::removeRight($prepend, $file);
         }
 
-        $prepend = Str::ensureRight($prepend, '/');
-
-        return Str::ensureLeft(ltrim($url, '/'), $prepend);
+        return self::tidy($prepend.'/'.$url);
     }
 
     /**
@@ -159,9 +165,8 @@ class URL
      * Make an absolute URL relative.
      *
      * @param  string  $url
-     * @return string
      */
-    public function makeRelative($url)
+    public function makeRelative($url): string
     {
         $parsed = parse_url($url);
 
@@ -175,16 +180,15 @@ class URL
             $url .= '#'.$parsed['fragment'];
         }
 
-        return $url;
+        return self::tidy($url);
     }
 
     /**
      * Make a relative URL absolute.
      *
      * @param  string  $url
-     * @return string
      */
-    public function makeAbsolute($url)
+    public function makeAbsolute($url): string
     {
         // If it doesn't start with a slash, we'll just leave it as-is.
         if (! Str::startsWith($url, '/')) {
@@ -259,7 +263,7 @@ class URL
     {
         $rootUrl = url()->to('/');
 
-        return Str::ensureRight($rootUrl, '/');
+        return self::tidy($rootUrl, '/');
     }
 
     /**
@@ -333,5 +337,28 @@ class URL
         $url = Str::before($url, '#'); // Remove anchor fragment
 
         return $url;
+    }
+
+    /**
+     * Normalize trailing slash before query and fragment (trims by default, but can be enforced).
+     */
+    public function normalizeTrailingSlash(string $url): string
+    {
+        $parts = str($url)
+            ->split(pattern: '/([?#])/', flags: PREG_SPLIT_DELIM_CAPTURE)
+            ->all();
+
+        $url = array_shift($parts);
+        $queryAndFragments = implode($parts);
+
+        if (in_array($url, ['', '/'])) {
+            $url = '/';
+        } elseif (static::$enforceTrailingSlashes) {
+            $url = Str::ensureRight($url, '/');
+        } else {
+            $url = Str::removeRight($url, '/');
+        }
+
+        return $url.$queryAndFragments;
     }
 }

@@ -9,6 +9,13 @@ use Tests\TestCase;
 
 class UrlTest extends TestCase
 {
+    public function tearDown(): void
+    {
+        URL::enforceTrailingSlashes(false);
+
+        parent::tearDown();
+    }
+
     protected function resolveApplicationConfiguration($app)
     {
         parent::resolveApplicationConfiguration($app);
@@ -108,24 +115,38 @@ class UrlTest extends TestCase
             'directory with trailing slashes to nested directory' => ['/foo/', '/foo/bar', false],
 
             'homepage with query string to homepage' => ['/?baz=qux', '/', false],
-            'directory with query string  to homepage' => ['/foo?baz=qux', '/', true],
-            'nested directory with query string  to homepage' => ['/foo/bar?baz=qux', '/', true],
-            'nested directory with query string  to directory' => ['/foo/bar?baz=qux', '/foo', true],
-            'directory with query string  to nested directory' => ['/foo?baz=qux', '/foo/bar', false],
-            'homepage with query string  to nested directory' => ['/?baz=qux', '/foo', false],
+            'directory with query string to homepage' => ['/foo?baz=qux', '/', true],
+            'nested directory with query string to homepage' => ['/foo/bar?baz=qux', '/', true],
+            'nested directory with query string to directory' => ['/foo/bar?baz=qux', '/foo', true],
+            'directory with query string to nested directory' => ['/foo?baz=qux', '/foo/bar', false],
+            'homepage with query string to nested directory' => ['/?baz=qux', '/foo', false],
+
+            'homepage with query string to homepage with query string' => ['/?baz=qux', '/?alpha=true', false],
+            'directory with query string to homepage with query string' => ['/foo?baz=qux', '/?alpha=true', true],
+            'nested directory with query string to homepage with query string' => ['/foo/bar?baz=qux', '/?alpha=true', true],
+            'nested directory with query string to directory with query string' => ['/foo/bar?baz=qux', '/foo?alpha=true', true],
+            'directory with query string to nested directory with query string' => ['/foo?baz=qux', '/foo/bar?alpha=true', false],
+            'homepage with query string to nested directory with query string' => ['/?baz=qux', '/foo?alpha=true', false],
+
+            'homepage with anchor fragment to homepage with anchor fragment' => ['/#alpha', '/#beta', false],
+            'directory with anchor fragment to homepage with anchor fragment' => ['/foo#alpha', '/#beta', true],
+            'nested directory with anchor fragment to homepage with anchor fragment' => ['/foo/bar#alpha', '/#beta', true],
+            'nested directory with anchor fragment to directory with anchor fragment' => ['/foo/bar#alpha', '/foo#beta', true],
+            'directory with anchor fragment to nested directory with anchor fragment' => ['/foo#alpha', '/foo/bar#beta', false],
+            'homepage with anchor fragment to nested directory with anchor fragment' => ['/#alpha', '/foo#beta', false],
         ];
     }
 
     #[Test]
     public function gets_site_url()
     {
-        $this->assertEquals('http://absolute-url-resolved-from-request.com/', URL::getSiteUrl());
+        $this->assertEquals('http://absolute-url-resolved-from-request.com', URL::getSiteUrl());
 
         \Illuminate\Support\Facades\URL::forceScheme('https');
-        $this->assertEquals('https://absolute-url-resolved-from-request.com/', URL::getSiteUrl());
+        $this->assertEquals('https://absolute-url-resolved-from-request.com', URL::getSiteUrl());
 
         \Illuminate\Support\Facades\URL::forceScheme('http');
-        $this->assertEquals('http://absolute-url-resolved-from-request.com/', URL::getSiteUrl());
+        $this->assertEquals('http://absolute-url-resolved-from-request.com', URL::getSiteUrl());
     }
 
     #[Test]
@@ -142,23 +163,23 @@ class UrlTest extends TestCase
     public static function absoluteProvider()
     {
         return [
-            ['http://example.com', 'http://example.com'],
-            ['http://example.com/', 'http://example.com/'],
-            ['/', 'http://absolute-url-resolved-from-request.com/'],
+            ['http://example.com', 'http://example.com'], // absolute url provided, so url is left alone.
+            ['http://example.com/', 'http://example.com/'], // absolute url provided, so url is left alone.
+            ['/', 'http://absolute-url-resolved-from-request.com'],
             ['/foo', 'http://absolute-url-resolved-from-request.com/foo'],
-            ['/foo/', 'http://absolute-url-resolved-from-request.com/foo/'],
+            ['/foo/', 'http://absolute-url-resolved-from-request.com/foo'],
 
-            ['http://example.com', 'http://example.com', 'https'], // absolute url provided, so scheme is left alone.
-            ['http://example.com/', 'http://example.com/', 'https'], // absolute url provided, so scheme is left alone.
-            ['/', 'https://absolute-url-resolved-from-request.com/', 'https'],
+            ['http://example.com', 'http://example.com', 'https'], // absolute url provided, so scheme and trailing slash are left alone.
+            ['http://example.com/', 'http://example.com/', 'https'], // absolute url provided, so scheme and trailing slash are left alone.
+            ['/', 'https://absolute-url-resolved-from-request.com', 'https'],
             ['/foo', 'https://absolute-url-resolved-from-request.com/foo', 'https'],
-            ['/foo/', 'https://absolute-url-resolved-from-request.com/foo/', 'https'],
+            ['/foo/', 'https://absolute-url-resolved-from-request.com/foo', 'https'],
 
-            ['https://example.com', 'https://example.com', 'http'], // absolute url provided, so scheme is left alone.
-            ['https://example.com/', 'https://example.com/', 'http'], // absolute url provided, so scheme is left alone.
-            ['/', 'http://absolute-url-resolved-from-request.com/', 'http'],
+            ['https://example.com', 'https://example.com', 'http'], // absolute url provided, so scheme and trailing slash are left alone.
+            ['https://example.com/', 'https://example.com/', 'http'], // absolute url provided, so scheme and trailing slash are left alone.
+            ['/', 'http://absolute-url-resolved-from-request.com', 'http'],
             ['/foo', 'http://absolute-url-resolved-from-request.com/foo', 'http'],
-            ['/foo/', 'http://absolute-url-resolved-from-request.com/foo/', 'http'],
+            ['/foo/', 'http://absolute-url-resolved-from-request.com/foo', 'http'],
         ];
     }
 
@@ -175,50 +196,50 @@ class UrlTest extends TestCase
             ['http://example.com', '/'],
             ['http://example.com/', '/'],
             ['http://example.com/foo', '/foo'],
-            ['http://example.com/foo/', '/foo/'],
+            ['http://example.com/foo/', '/foo'],
             ['http://example.com/foo/bar', '/foo/bar'],
-            ['http://example.com/foo/bar/', '/foo/bar/'],
+            ['http://example.com/foo/bar/', '/foo/bar'],
             ['/', '/'],
             ['/foo', '/foo'],
-            ['/foo/', '/foo/'],
+            ['/foo/', '/foo'],
             ['/foo/bar', '/foo/bar'],
-            ['/foo/bar/', '/foo/bar/'],
+            ['/foo/bar/', '/foo/bar'],
 
             ['http://example.com?bar=baz', '/?bar=baz'],
             ['http://example.com/?bar=baz', '/?bar=baz'],
             ['http://example.com/foo?bar=baz', '/foo?bar=baz'],
-            ['http://example.com/foo/?bar=baz', '/foo/?bar=baz'],
+            ['http://example.com/foo/?bar=baz', '/foo?bar=baz'],
             ['http://example.com/foo/bar?bar=baz', '/foo/bar?bar=baz'],
-            ['http://example.com/foo/bar/?bar=baz', '/foo/bar/?bar=baz'],
+            ['http://example.com/foo/bar/?bar=baz', '/foo/bar?bar=baz'],
             ['/?bar=baz', '/?bar=baz'],
             ['/foo?bar=baz', '/foo?bar=baz'],
-            ['/foo/?bar=baz', '/foo/?bar=baz'],
+            ['/foo/?bar=baz', '/foo?bar=baz'],
             ['/foo/bar?bar=baz', '/foo/bar?bar=baz'],
-            ['/foo/bar/?bar=baz', '/foo/bar/?bar=baz'],
+            ['/foo/bar/?bar=baz', '/foo/bar?bar=baz'],
 
             ['http://example.com#fragment', '/#fragment'],
             ['http://example.com/#fragment', '/#fragment'],
             ['http://example.com/foo#fragment', '/foo#fragment'],
-            ['http://example.com/foo/#fragment', '/foo/#fragment'],
+            ['http://example.com/foo/#fragment', '/foo#fragment'],
             ['http://example.com/foo/bar#fragment', '/foo/bar#fragment'],
-            ['http://example.com/foo/bar/#fragment', '/foo/bar/#fragment'],
+            ['http://example.com/foo/bar/#fragment', '/foo/bar#fragment'],
             ['/#fragment', '/#fragment'],
             ['/foo#fragment', '/foo#fragment'],
-            ['/foo/#fragment', '/foo/#fragment'],
+            ['/foo/#fragment', '/foo#fragment'],
             ['/foo/bar#fragment', '/foo/bar#fragment'],
-            ['/foo/bar/#fragment', '/foo/bar/#fragment'],
+            ['/foo/bar/#fragment', '/foo/bar#fragment'],
 
             ['http://example.com?bar=baz#fragment', '/?bar=baz#fragment'],
             ['http://example.com/?bar=baz#fragment', '/?bar=baz#fragment'],
             ['http://example.com/foo?bar=baz#fragment', '/foo?bar=baz#fragment'],
-            ['http://example.com/foo/?bar=baz#fragment', '/foo/?bar=baz#fragment'],
+            ['http://example.com/foo/?bar=baz#fragment', '/foo?bar=baz#fragment'],
             ['http://example.com/foo/bar?bar=baz#fragment', '/foo/bar?bar=baz#fragment'],
-            ['http://example.com/foo/bar/?bar=baz#fragment', '/foo/bar/?bar=baz#fragment'],
+            ['http://example.com/foo/bar/?bar=baz#fragment', '/foo/bar?bar=baz#fragment'],
             ['/?bar=baz#fragment', '/?bar=baz#fragment'],
             ['/foo?bar=baz#fragment', '/foo?bar=baz#fragment'],
-            ['/foo/?bar=baz#fragment', '/foo/?bar=baz#fragment'],
+            ['/foo/?bar=baz#fragment', '/foo?bar=baz#fragment'],
             ['/foo/bar?bar=baz#fragment', '/foo/bar?bar=baz#fragment'],
-            ['/foo/bar/?bar=baz#fragment', '/foo/bar/?bar=baz#fragment'],
+            ['/foo/bar/?bar=baz#fragment', '/foo/bar?bar=baz#fragment'],
         ];
     }
 
@@ -239,5 +260,136 @@ class UrlTest extends TestCase
         $this->assertEquals('https://example.com/about', URL::removeQueryAndFragment('https://example.com/about#anchor'));
         $this->assertEquals('https://example.com/about', URL::removeQueryAndFragment('https://example.com/about?foo=bar&baz=qux'));
         $this->assertEquals('https://example.com/about', URL::removeQueryAndFragment('https://example.com/about?foo=bar&baz=qux#anchor'));
+    }
+
+    #[Test]
+    #[DataProvider('enforceTrailingSlashesProvider')]
+    public function enforces_trailing_slashes($url, $expected)
+    {
+        URL::enforceTrailingSlashes();
+
+        $this->assertSame($expected, URL::normalizeTrailingSlash($url));
+        $this->assertSame($expected, URL::tidy($url));
+    }
+
+    public static function enforceTrailingSlashesProvider()
+    {
+        return [
+            ['', '/'],
+            ['/', '/'],
+
+            ['?query', '/?query'],
+            ['#anchor', '/#anchor'],
+            ['?foo=bar&baz=qux', '/?foo=bar&baz=qux'],
+            ['?foo=bar&baz=qux#anchor', '/?foo=bar&baz=qux#anchor'],
+
+            ['/?query', '/?query'],
+            ['/#anchor', '/#anchor'],
+            ['/?foo=bar&baz=qux', '/?foo=bar&baz=qux'],
+            ['/?foo=bar&baz=qux#anchor', '/?foo=bar&baz=qux#anchor'],
+
+            ['/about?query', '/about/?query'],
+            ['/about#anchor', '/about/#anchor'],
+            ['/about?foo=bar&baz=qux', '/about/?foo=bar&baz=qux'],
+            ['/about?foo=bar&baz=qux#anchor', '/about/?foo=bar&baz=qux#anchor'],
+
+            ['/about/?query', '/about/?query'],
+            ['/about/#anchor', '/about/#anchor'],
+            ['/about/?foo=bar&baz=qux', '/about/?foo=bar&baz=qux'],
+            ['/about/?foo=bar&baz=qux#anchor', '/about/?foo=bar&baz=qux#anchor'],
+
+            ['https://example.com?query', 'https://example.com/?query'],
+            ['https://example.com#anchor', 'https://example.com/#anchor'],
+            ['https://example.com?foo=bar&baz=qux', 'https://example.com/?foo=bar&baz=qux'],
+            ['https://example.com?foo=bar&baz=qux#anchor', 'https://example.com/?foo=bar&baz=qux#anchor'],
+
+            ['https://example.com/?query', 'https://example.com/?query'],
+            ['https://example.com/#anchor', 'https://example.com/#anchor'],
+            ['https://example.com/?foo=bar&baz=qux', 'https://example.com/?foo=bar&baz=qux'],
+            ['https://example.com/?foo=bar&baz=qux#anchor', 'https://example.com/?foo=bar&baz=qux#anchor'],
+
+            ['https://example.com/about?query', 'https://example.com/about/?query'],
+            ['https://example.com/about#anchor', 'https://example.com/about/#anchor'],
+            ['https://example.com/about?foo=bar&baz=qux', 'https://example.com/about/?foo=bar&baz=qux'],
+            ['https://example.com/about?foo=bar&baz=qux#anchor', 'https://example.com/about/?foo=bar&baz=qux#anchor'],
+
+            ['https://example.com/about/?query', 'https://example.com/about/?query'],
+            ['https://example.com/about/#anchor', 'https://example.com/about/#anchor'],
+            ['https://example.com/about/?foo=bar&baz=qux', 'https://example.com/about/?foo=bar&baz=qux'],
+            ['https://example.com/about/?foo=bar&baz=qux#anchor', 'https://example.com/about/?foo=bar&baz=qux#anchor'],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('removeTrailingSlashesProvider')]
+    public function removes_trailing_slashes($url, $expected)
+    {
+        $this->assertSame($expected, URL::normalizeTrailingSlash($url));
+        $this->assertSame($expected, URL::tidy($url));
+    }
+
+    public static function removeTrailingSlashesProvider()
+    {
+        return [
+            ['', '/'],
+            ['/', '/'],
+
+            ['?query', '/?query'],
+            ['#anchor', '/#anchor'],
+            ['?foo=bar&baz=qux', '/?foo=bar&baz=qux'],
+            ['?foo=bar&baz=qux#anchor', '/?foo=bar&baz=qux#anchor'],
+
+            ['/?query', '/?query'],
+            ['/#anchor', '/#anchor'],
+            ['/?foo=bar&baz=qux', '/?foo=bar&baz=qux'],
+            ['/?foo=bar&baz=qux#anchor', '/?foo=bar&baz=qux#anchor'],
+
+            ['/about?query', '/about?query'],
+            ['/about#anchor', '/about#anchor'],
+            ['/about?foo=bar&baz=qux', '/about?foo=bar&baz=qux'],
+            ['/about?foo=bar&baz=qux#anchor', '/about?foo=bar&baz=qux#anchor'],
+
+            ['/about/?query', '/about?query'],
+            ['/about/#anchor', '/about#anchor'],
+            ['/about/?foo=bar&baz=qux', '/about?foo=bar&baz=qux'],
+            ['/about/?foo=bar&baz=qux#anchor', '/about?foo=bar&baz=qux#anchor'],
+
+            ['https://example.com?query', 'https://example.com?query'],
+            ['https://example.com#anchor', 'https://example.com#anchor'],
+            ['https://example.com?foo=bar&baz=qux', 'https://example.com?foo=bar&baz=qux'],
+            ['https://example.com?foo=bar&baz=qux#anchor', 'https://example.com?foo=bar&baz=qux#anchor'],
+
+            ['https://example.com/?query', 'https://example.com?query'],
+            ['https://example.com/#anchor', 'https://example.com#anchor'],
+            ['https://example.com/?foo=bar&baz=qux', 'https://example.com?foo=bar&baz=qux'],
+            ['https://example.com/?foo=bar&baz=qux#anchor', 'https://example.com?foo=bar&baz=qux#anchor'],
+
+            ['https://example.com/about?query', 'https://example.com/about?query'],
+            ['https://example.com/about#anchor', 'https://example.com/about#anchor'],
+            ['https://example.com/about?foo=bar&baz=qux', 'https://example.com/about?foo=bar&baz=qux'],
+            ['https://example.com/about?foo=bar&baz=qux#anchor', 'https://example.com/about?foo=bar&baz=qux#anchor'],
+
+            ['https://example.com/about/?query', 'https://example.com/about?query'],
+            ['https://example.com/about/#anchor', 'https://example.com/about#anchor'],
+            ['https://example.com/about/?foo=bar&baz=qux', 'https://example.com/about?foo=bar&baz=qux'],
+            ['https://example.com/about/?foo=bar&baz=qux#anchor', 'https://example.com/about?foo=bar&baz=qux#anchor'],
+        ];
+    }
+
+    #[Test]
+    public function it_can_configure_and_unconfigure_enforcing_of_trailing_slashes()
+    {
+        $this->assertSame('https://example.com?query', URL::normalizeTrailingSlash('https://example.com?query'));
+        $this->assertSame('https://example.com?query', URL::tidy('https://example.com?query'));
+
+        URL::enforceTrailingSlashes();
+
+        $this->assertSame('https://example.com/?query', URL::normalizeTrailingSlash('https://example.com?query'));
+        $this->assertSame('https://example.com/?query', URL::tidy('https://example.com?query'));
+
+        URL::enforceTrailingSlashes(false);
+
+        $this->assertSame('https://example.com?query', URL::normalizeTrailingSlash('https://example.com?query'));
+        $this->assertSame('https://example.com?query', URL::tidy('https://example.com?query'));
     }
 }
