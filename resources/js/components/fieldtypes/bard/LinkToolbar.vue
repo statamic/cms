@@ -102,6 +102,8 @@
                         label="Open in new window"
                         v-model="targetBlank"
                         id="target-blank"
+                        size="sm"
+                        align="center"
                     />
                 </ui-checkbox-group>
             </div>
