@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .table-fieldtype-table {
-    @apply relative mb-4 w-full rounded-md border text-gray shadow-ui-sm outline-hidden dark:border-dark-900 dark:text-dark-150 ltr:text-left rtl:text-right;
+    @apply relative mb-4 w-full rounded-lg border text-gray shadow-ui-sm outline-hidden dark:border-dark-900 dark:text-dark-150 ltr:text-left rtl:text-right;
     border-collapse: separate;
     border-spacing: 0;
     table-layout: fixed;
@@ -17,10 +17,10 @@
         top: -1px;
 
         &:first-child {
-            @apply ltr:rounded-tl ltr:pl-3 rtl:rounded-tr rtl:pr-3;
+            @apply ltr:rounded-tl-lg ltr:pl-3 rtl:rounded-tr-lg rtl:pr-3;
         }
         &:last-child {
-            @apply ltr:rounded-tr ltr:border-r-0 rtl:rounded-tl rtl:border-l-0;
+            @apply ltr:rounded-tr-lg ltr:border-r-0 rtl:rounded-tl-lg rtl:border-l-0;
         }
         &.grid-drag-handle-header {
             @apply w-3;
@@ -73,10 +73,10 @@
     tr:last-child td {
         @apply border-b-0;
         &:first-child {
-            @apply ltr:rounded-bl rtl:rounded-br;
+            @apply ltr:rounded-bl-lg rtl:rounded-br-lg;
         }
         &:last-child {
-            @apply ltr:rounded-br rtl:rounded-bl;
+            @apply ltr:rounded-br-lg rtl:rounded-bl-lg;
         }
     }
 
