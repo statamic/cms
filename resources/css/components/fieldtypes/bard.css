@@ -7,7 +7,11 @@
 }
 
 .bard-editor {
-    @apply relative rounded-sm bg-gray-100 p-0 text-gray-800 shadow-inner dark:bg-dark-650 dark:text-dark-150;
+    @apply relative rounded-sm p-0 text-gray-800 dark:bg-dark-650 dark:text-dark-150;
+    /* The focus state inherits this */
+    > * {
+        @apply rounded-b-lg;
+    }
 }
 
 .bard-editor .ProseMirror {
