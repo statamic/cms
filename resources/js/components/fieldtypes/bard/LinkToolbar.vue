@@ -1,7 +1,7 @@
 <template>
     <div class="bard-link-toolbar">
         <div>
-            <div class="border-b px-4 py-4 dark:border-dark-900">
+            <div class="border-b px-4 py-4 bg-white dark:border-dark-900 border-gray-200 dark:bg-gray-900 dark:border-black rounded-b-xl">
                 <div class="flex">
                     <div
                         class="mb-4 flex h-8 items-center rounded-sm border bg-gray-100 text-gray-800 shadow-inner dark:border-dark-200 dark:bg-dark-600 dark:text-dark-150 ltr:mr-1 rtl:ml-1"
@@ -116,26 +116,33 @@
             </div>
 
             <footer
-                class="flex items-center justify-end space-x-3 rounded-b-md bg-gray-100 p-2 font-normal dark:bg-dark-575 rtl:space-x-reverse"
+                class="flex items-center justify-end space-x-3 rounded-b-md bg-gray-100 p-2 font-normal dark:bg-dark-575 rtl:space-x-reverse rounded-b-xl"
             >
-                <button
+                <ui-button
+                    variant="ghost"
+                    size="xs"
+                    class="text-xs text-gray-600 hover:text-gray-800 dark:text-dark-175 dark:hover:text-dark-100"
                     @click="$emit('canceled')"
-                    class="dark:hover-text-dark-100 text-xs text-gray-600 hover:text-gray-800 dark:text-dark-175"
                 >
                     {{ __('Cancel') }}
-                </button>
-                <button :aria-label="__('Remove Link')" @click="remove" class="btn btn-sm">
+                </ui-button>
+                <ui-button
+                    size="sm"
+                    :aria-label="__('Remove Link')"
+                    @click="remove"
+                >
                     {{ __('Remove Link') }}
-                </button>
-                <button
+                </ui-button>
+                <ui-button
+                    variant="primary"
+                    size="sm"
                     :disabled="!canCommit"
-                    v-tooltip="__('Apply Link')"
                     :aria-label="__('Apply Link')"
+                    v-tooltip="__('Apply Link')"
                     @click="commit"
-                    class="btn btn-sm"
                 >
                     {{ __('Save') }}
-                </button>
+                </ui-button>
             </footer>
         </div>
 
