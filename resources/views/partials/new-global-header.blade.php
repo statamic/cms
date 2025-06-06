@@ -25,6 +25,7 @@
                     <ui-button text="{{ __($breadcrumb->text()) }}" size="sm" variant="ghost" icon-append="ui/chevron-vertical" class="[&_svg]:size-2" />
                 </template>
                 <ui-dropdown-header
+                    class="grid grid-cols-[auto_1fr_auto] items-center"
                     text="{{ __($breadcrumb->text()) }}"
                     icon="{{ $breadcrumb->icon() }}"
                     @if($breadcrumb->hasConfigureUrl())
