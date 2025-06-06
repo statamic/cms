@@ -93,8 +93,7 @@ class CoreNav
                                     'configure_url' => User::current()->can('edit', $collection) ? $collection->editUrl() : null,
                                 ],
                             ]);
-                    })
-                    ->ray();
+                    });
             });
 
         Nav::content('Navigation')
