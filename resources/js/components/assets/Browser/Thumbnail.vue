@@ -28,11 +28,5 @@ export default {
             type: Boolean,
         },
     },
-
-    computed: {
-        showSvg() {
-            return this.asset.extension === 'svg';
-        },
-    },
 };
 </script>
