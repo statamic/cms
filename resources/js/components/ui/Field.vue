@@ -2,6 +2,7 @@
 import { cva } from 'cva';
 import { computed } from 'vue';
 import { Description, Label } from '@statamic/components/ui/index.js';
+import renderMarkdown from '@statamic/util/markdown.js';
 
 defineOptions({
     inheritAttrs: false,
@@ -80,6 +81,8 @@ const classes = computed(() =>
         },
     })({ ...props }),
 );
+
+const instructions = computed(() => props.instructions ? renderMarkdown(props.instructions) : null);
 </script>
 
 <template>

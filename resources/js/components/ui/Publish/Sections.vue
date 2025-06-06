@@ -5,6 +5,7 @@ import FieldsProvider from './FieldsProvider.vue';
 import Fields from './Fields.vue';
 import ShowField from '@statamic/components/field-conditions/ShowField.js';
 import { injectContainerContext } from './Container.vue';
+import renderMarkdown from '@statamic/util/markdown.js';
 
 const { blueprint, store } = injectContainerContext();
 const tab = injectTabContext();
@@ -14,6 +15,10 @@ const visibleSections = sections.filter(section => {
         return new ShowField(store, store.values, store.extraValues).showField(field, field.handle);
     });
 });
+
+function renderInstructions(instructions) {
+    return instructions ? renderMarkdown(instructions) : '';
+}
 </script>
 
 <template>
@@ -22,7 +27,7 @@ const visibleSections = sections.filter(section => {
             v-for="(section, i) in visibleSections"
             :key="i"
             :heading="section.display"
-            :subheading="section.instructions"
+            :subheading="renderInstructions(section.instructions)"
             class="mb-6"
         >
             <FieldsProvider :fields="section.fields">
