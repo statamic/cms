@@ -28,7 +28,7 @@
                 <h2 v-if="group.title" v-text="group.title" class="mb-2 px-2" />
                 <div class="fieldtype-selector">
                     <ui-panel>
-                        <ui-panel-header class="px-2! py-1.5!">
+                        <ui-panel-header v-if="group.description" class="px-2! py-1.5!">
                             <ui-description :text="group.description" />
                         </ui-panel-header>
                         <div class="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-1.5">
