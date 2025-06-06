@@ -44,17 +44,31 @@
                         <Switch size="xs" v-model="enabled" />
                     </Tooltip>
 
-                    <!-- @TODO: Replace with UI/Dropdown when Actions are more isolatable -->
-                    <dropdown-list>
-                        <dropdown-actions :actions="fieldActions" v-if="fieldActions.length" />
-                        <div class="divider" />
-                        <dropdown-item
-                            :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))"
-                            @click="toggleCollapsedState"
-                        />
-                        <dropdown-item :text="__('Duplicate Set')" @click="duplicate" />
-                        <dropdown-item :text="__('Delete Set')" class="warning" @click="deleteNode" />
-                    </dropdown-list>
+                    <Dropdown>
+                        <template #trigger>
+                            <Button icon="ui/dots" variant="ghost" size="xs" />
+                        </template>
+                        <DropdownMenu>
+                            <DropdownItem
+                                v-if="fieldActions.length"
+                                v-for="action in fieldActions"
+                                :text="action.title"
+                                :variant="action.dangerous ? 'destructive' : 'default'"
+                                @click="action.run(action)"
+                            />
+                            <DropdownSeparator v-if="fieldActions.length" />
+                            <DropdownItem
+                                :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))"
+                                @click="toggleCollapsedState"
+                            />
+                            <DropdownItem :text="__('Duplicate Set')" @click="duplicate" />
+                            <DropdownItem
+                                :text="__('Delete Set')"
+                                variant="destructive"
+                                @click="deleteNode"
+                            />
+                        </DropdownMenu>
+                    </Dropdown>
                 </div>
             </header>
 
@@ -84,8 +98,7 @@ import SetField from '../replicator/Field.vue';
 import ManagesPreviewText from '../replicator/ManagesPreviewText';
 import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
 import HasFieldActions from '../../field-actions/HasFieldActions.js';
-import DropdownActions from '../../field-actions/DropdownActions.vue';
-import { Badge, Icon, Subheading, Switch, Tooltip } from '@statamic/ui';
+import { Badge, Button, Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, Icon, Subheading, Switch, Tooltip } from '@statamic/ui';
 import { Motion } from 'motion-v';
 import FieldsProvider from '@statamic/components/ui/Publish/FieldsProvider.vue';
 import Fields from '@statamic/components/ui/Publish/Fields.vue';
@@ -104,6 +117,11 @@ export default {
     ],
 
     components: {
+        Button,
+        Dropdown,
+        DropdownMenu,
+        DropdownItem,
+        DropdownSeparator,
         Fields,
         FieldsProvider,
         Switch,
@@ -113,7 +131,6 @@ export default {
         Icon,
         NodeViewWrapper,
         SetField,
-        DropdownActions,
         Motion,
     },
 
