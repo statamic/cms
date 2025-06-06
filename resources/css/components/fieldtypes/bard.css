@@ -1,4 +1,4 @@
-.bard-fieldtype-wrapper {
+.bard-fieldtype {
     @apply relative rounded-xl border outline-hidden dark:border-dark-900;
 
     * {
@@ -299,15 +299,7 @@
     outline: 0;
 }
 
-.bard-fieldtype .bard-content > {
-    p {
-        @apply text-gray-800 dark:text-dark-150;
-        word-break: break-word;
-
-        line-height: 1.7;
-        text-size-adjust: 100%;
-    }
-
+.bard-fieldtype .bard-content {
     blockquote,
     ol,
     p,
