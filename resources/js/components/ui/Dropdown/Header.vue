@@ -5,7 +5,6 @@ import { Icon, Button } from '@statamic/ui';
 
 defineProps({
     icon: { type: String, default: null },
-    linkToConfig: { type: Boolean, default: false },
     appendIcon: { type: String, default: null },
     appendHref: { type: String, default: null },
     text: { type: String, default: null },

@@ -202,7 +202,6 @@ export default {
         createUrls: { type: Object, required: true },
         createLabel: { type: String, required: true },
         blueprints: { type: Array, required: true },
-        breadcrumbUrl: { type: String, required: true },
         structured: { type: Boolean, default: false },
         sortColumn: { type: String, required: true },
         sortDirection: { type: String, required: true },

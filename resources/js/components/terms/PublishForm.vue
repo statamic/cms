@@ -173,7 +173,6 @@ export default {
         initialOriginMeta: Object,
         initialSite: String,
         taxonomyHandle: String,
-        breadcrumbs: Array,
         initialActions: Object,
         method: String,
         initialPublished: Boolean,
@@ -282,6 +281,10 @@ export default {
         afterSaveOption() {
             return this.getPreference('after_save');
         },
+
+        direction() {
+            return this.$config.get('direction', 'ltr');
+        },
     },
 
     watch: {
@@ -291,6 +294,15 @@ export default {
 
         saving(saving) {
             this.$progress.loading(`${this.publishContainer}-entry-publish-form`, saving);
+        },
+
+        title(title) {
+            if (this.isBase) {
+                const arrow = this.direction === 'ltr' ? '‹' : '›';
+                const parts = document.title.split(arrow);
+
+                document.title = `${title} ${arrow} ${parts[1]?.trim()}`;
+            }
         },
     },
 

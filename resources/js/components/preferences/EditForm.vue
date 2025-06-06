@@ -62,7 +62,6 @@ export default {
         values: { required: true, type: Object },
         title: { required: true, type: String },
         name: { type: String, default: 'base' },
-        breadcrumbs: Array,
         action: String,
         readOnly: { type: Boolean, default: false },
         reloadOnSave: { type: Boolean, default: false },

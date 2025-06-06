@@ -6,14 +6,6 @@
 @section('title', __('Blueprints'))
 
 @section('content')
-    @include(
-        'statamic::partials.breadcrumb',
-        [
-            'url' => cp_route('taxonomies.show', $taxonomy->handle()),
-            'title' => $taxonomy->title(),
-        ]
-    )
-
     <taxonomy-blueprint-listing
         inline-template
         :initial-rows="{{ json_encode($blueprints) }}"
