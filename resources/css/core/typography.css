@@ -151,3 +151,34 @@ code {
         @apply mb-2;
     }
 } */
+
+.prose {
+
+    h2 {
+        @apply mb-4 text-xl font-medium text-gray-900 dark:text-white;
+    }
+
+    h3 {
+        @apply mb-3 text-lg font-medium text-gray-800 dark:text-gray-100;
+    }
+
+    ul {
+        @apply mb-6 list-disc pl-5 space-y-2;
+    }
+
+    li {
+        @apply text-gray-700 dark:text-gray-300 leading-relaxed last:mb-0;
+    }
+
+    p {
+        @apply mb-4 text-gray-700 dark:text-gray-300 leading-relaxed;
+    }
+
+    a {
+        @apply text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline underline-offset-2;
+    }
+
+    code {
+        @apply px-1.5 py-0.5 rounded text-sm font-mono bg-gray-100 dark:bg-dark-700 text-gray-800 dark:text-gray-200;
+    }
+}

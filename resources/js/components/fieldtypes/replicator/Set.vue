@@ -2,8 +2,18 @@
 import Fields from '@statamic/components/ui/Publish/Fields.vue';
 import FieldsProvider from '@statamic/components/ui/Publish/FieldsProvider.vue';
 import { computed, inject } from 'vue';
-import { Icon, Switch, Subheading, Badge, Tooltip } from '@statamic/ui';
-import DropdownActions from '@statamic/components/field-actions/DropdownActions.vue';
+import {
+    Icon,
+    Switch,
+    Subheading,
+    Badge,
+    Tooltip,
+    Dropdown,
+    DropdownItem,
+    DropdownSeparator,
+    Button,
+    DropdownMenu,
+} from '@statamic/ui';
 import { Motion } from 'motion-v';
 import { injectContainerContext } from '@statamic/components/ui/Publish/Container.vue';
 import PreviewHtml from '@statamic/components/fieldtypes/replicator/PreviewHtml.js';
@@ -153,17 +163,31 @@ function destroy() {
                         <Switch size="xs" :model-value="enabled" @update:model-value="toggleEnabledState" />
                     </Tooltip>
 
-                    <!-- @TODO: Replace with UI/Dropdown when Actions are more isolatable -->
-                    <dropdown-list>
-                        <dropdown-actions :actions="fieldActions" v-if="fieldActions.length" />
-                        <div class="divider" />
-                        <dropdown-item
-                            :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))"
-                            @click="toggleCollapsedState"
-                        />
-                        <dropdown-item :text="__('Duplicate Set')" @click="emit('duplicated')" v-if="canAddSet" />
-                        <dropdown-item :text="__('Delete Set')" class="warning" @click="destroy" />
-                    </dropdown-list>
+                    <Dropdown>
+                        <template #trigger>
+                            <Button icon="ui/dots" variant="ghost" size="xs" />
+                        </template>
+                        <DropdownMenu>
+                            <DropdownItem
+                                v-if="fieldActions.length"
+                                v-for="action in fieldActions"
+                                :text="action.title"
+                                :variant="action.dangerous ? 'destructive' : 'default'"
+                                @click="action.run(action)"
+                            />
+                            <DropdownSeparator v-if="fieldActions.length" />
+                            <DropdownItem
+                                :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))"
+                                @click="toggleCollapsedState"
+                            />
+                            <DropdownItem :text="__('Duplicate Set')" @click="emit('duplicated')" />
+                            <DropdownItem
+                                :text="__('Delete Set')"
+                                variant="destructive"
+                                @click="destroy"
+                            />
+                        </DropdownMenu>
+                    </Dropdown>
                 </div>
             </header>
 

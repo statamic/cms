@@ -13,6 +13,7 @@ const props = defineProps({
     pill: { type: Boolean, default: false },
     size: { type: String, default: 'default' },
     subText: { type: String, default: null },
+    subTextBefore: { type: Boolean, default: false },
     text: { type: [String, Number, Boolean, null], default: null },
     variant: { type: String, default: 'default' },
 });
@@ -69,10 +70,11 @@ const badgeClasses = computed(() => {
 
 <template>
     <component :is="tag" :class="badgeClasses" :href="props.href" data-ui-badge>
+        <span v-if="props.subText && subTextBefore" class="text-[0.625rem] leading-tight font-medium opacity-70">{{ subText }}</span>
         <Icon v-if="icon" :name="icon" />
         <slot v-if="hasDefaultSlot" />
         <template v-else>{{ text }}</template>
         <Icon v-if="iconAppend" :name="iconAppend" />
-        <span v-if="props.subText" class="text-[0.625rem] leading-tight font-medium opacity-70">{{ subText }}</span>
+        <span v-if="props.subText && !subTextBefore" class="text-[0.625rem] leading-tight font-medium opacity-70">{{ subText }}</span>
     </component>
 </template>

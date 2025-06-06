@@ -34,7 +34,7 @@
                         </div>
                     </publish-field-fullscreen-header>
 
-                    <div class="bard-fixed-toolbar" v-if="!readOnly && showFixedToolbar && !fullScreenMode">
+                    <div class="bard-fixed-toolbar flex items-center justify-between rounded-t-xl border-b border-gray-300 bg-gray-50 px-2 py-1 dark:border-white/15 dark:bg-gray-950" v-if="!readOnly && showFixedToolbar && !fullScreenMode">
                         <div class="no-select flex flex-1 flex-wrap items-center" v-if="toolbarIsFixed">
                             <component
                                 v-for="button in visibleButtons(buttons)"

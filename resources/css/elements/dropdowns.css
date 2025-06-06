@@ -10,9 +10,11 @@
         @apply block w-full rounded-xs px-2 py-1 text-xs font-normal text-gray-800 dark:text-dark-100 ltr:text-left rtl:text-right;
         line-height: 1.4;
         white-space: nowrap;
+        @apply rounded-sm;
+        cursor: pointer;
 
         &:hover {
-            @apply bg-blue text-white dark:bg-dark-600;
+            @apply bg-gray-100 dark:bg-dark-600;
         }
 
         .icon {
@@ -43,10 +45,10 @@
 
     button.warning,
     a.warning {
-        @apply text-red-500;
+        @apply text-red-600;
 
         &:hover {
-            @apply bg-red-500 text-white;
+            @apply bg-red-50;
         }
     }
 

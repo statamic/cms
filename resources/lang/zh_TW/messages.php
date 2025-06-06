@@ -132,7 +132,7 @@ return [
     'getting_started_widget_header' => '開始使用 Statamic',
     'getting_started_widget_intro' => '要開始建構你的新 Statamic 網站，我們建議從這幾個步驟開始：',
     'getting_started_widget_navigation' => '建立多層連結列表，可用來組成導航列、底部連結等。',
-    'getting_started_widget_pro' => 'Statmic Pro 包含無限使用者帳號、角色、權限、Git 整合、修訂版、多網站、以及更多功能！',
+    'getting_started_widget_pro' => 'Statamic Pro 包含無限使用者帳號、角色、權限、Git 整合、修訂版、多網站、以及更多功能！',
     'git_disabled' => 'Statamic Git 整合目前已禁用。',
     'git_nothing_to_commit' => '無可提交的內容，內容路徑很乾淨！',
     'git_utility_description' => '管理 Git 追蹤的內容。',

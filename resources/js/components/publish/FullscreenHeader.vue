@@ -5,9 +5,20 @@
             <slot />
         </div>
         <div class="flex w-full items-center justify-end py-2.5">
-            <dropdown-list class="mr-2" v-if="fieldActions.length">
-                <dropdown-actions :actions="fieldActions" v-if="fieldActions.length" />
-            </dropdown-list>
+            <Dropdown class="mr-2">
+                <template #trigger>
+                    <Button icon="ui/dots" variant="ghost" size="xs" />
+                </template>
+                <DropdownMenu>
+                    <DropdownItem
+                        v-if="fieldActions.length"
+                        v-for="action in fieldActions"
+                        :text="action.title"
+                        :variant="action.dangerous ? 'destructive' : 'default'"
+                        @click="action.run(action)"
+                    />
+                </DropdownMenu>
+            </Dropdown>
             <button
                 class="btn-quick-action"
                 v-for="(action, index) in fieldActions.filter((a) => a.quick)"
@@ -22,11 +33,14 @@
 </template>
 
 <script>
-import DropdownActions from '../field-actions/DropdownActions.vue';
+import { Button, Dropdown, DropdownMenu, DropdownItem } from '@statamic/ui';
 
 export default {
     components: {
-        DropdownActions,
+        Button,
+        Dropdown,
+        DropdownMenu,
+        DropdownItem,
     },
 
     props: {
