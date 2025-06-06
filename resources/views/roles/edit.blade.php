@@ -14,7 +14,6 @@
         initial-handle="{{ $role->handle() }}"
         :initial-super="{{ Statamic\Support\Str::bool($super) }}"
         :initial-permissions="{{ json_encode($permissions) }}"
-        breadcrumb-url="{{ cp_route('roles.index') }}"
         v-cloak
     ></role-publish-form>
 @endsection

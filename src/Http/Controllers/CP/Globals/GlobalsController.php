@@ -73,23 +73,7 @@ class GlobalsController extends CpController
             'values' => $fields->values(),
             'meta' => $fields->meta(),
             'set' => $set,
-            'breadcrumb' => $this->breadcrumb($set),
         ]);
-    }
-
-    private function breadcrumb(GlobalSetContract $set)
-    {
-        if ($localized = $set->inSelectedSite()) {
-            return [
-                'title' => $localized->title(),
-                'url' => $localized->editUrl(),
-            ];
-        }
-
-        return [
-            'title' => __('Globals'),
-            'url' => cp_route('globals.index'),
-        ];
     }
 
     public function update(Request $request, $set)

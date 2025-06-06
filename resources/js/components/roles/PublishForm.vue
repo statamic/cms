@@ -74,7 +74,6 @@ export default {
         canAssignSuper: Boolean,
         action: String,
         method: String,
-        breadcrumbUrl: String,
         indexUrl: String,
     },
 

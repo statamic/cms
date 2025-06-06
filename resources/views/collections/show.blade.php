@@ -7,7 +7,6 @@
         title="{{ $collection->title() }}"
         handle="{{ $collection->handle() }}"
         icon="{{ $collection->icon() }}"
-        breadcrumb-url="{{ cp_route("collections.index") }}"
         :can-create="{{ Statamic\Support\Str::bool($canCreate) }}"
         :create-urls="{{ Js::from($createUrls) }}"
         create-label="{{ $collection->createLabel() }}"

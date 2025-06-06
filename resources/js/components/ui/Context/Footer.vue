@@ -4,6 +4,7 @@ import { cva } from 'cva';
 import { Icon } from '@statamic/ui';
 
 defineProps({
+    href: { type: String, default: null },
     icon: { type: String, default: null },
     text: { type: String, default: null },
 });
@@ -22,7 +23,7 @@ const footerClasses = cva({
 <template>
     <footer :class="footerClasses({ noSlot: !usingSlot })" data-ui-context-footer>
         <slot v-if="usingSlot" />
-        <div v-else class="flex items-center gap-2">
+        <component v-else :is="href ? 'a' : 'div'" :href="href" class="flex items-center gap-2">
             <div
                 v-if="icon"
                 class="flex size-6 items-center justify-center rounded-lg bg-gray-100 p-1 text-gray-700 dark:bg-gray-900 dark:text-gray-500"
@@ -34,6 +35,6 @@ const footerClasses = cva({
             >
                 {{ text }}
             </div>
-        </div>
+        </component>
     </footer>
 </template>

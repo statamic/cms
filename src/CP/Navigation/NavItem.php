@@ -30,6 +30,7 @@ class NavItem
     protected $manipulations;
     protected $original;
     protected $attributes;
+    protected $extra;
 
     /**
      * Get or set display.
@@ -220,6 +221,19 @@ class NavItem
     }
 
     /**
+     * Get or set extra data.
+     *
+     * @param  array|null  $extra
+     * @return mixed
+     */
+    public function extra($extra = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('extra')
+            ->value($extra);
+    }
+
+    /**
      * Get or set child nav items.
      *
      * @param  array|null  $items
@@ -247,7 +261,7 @@ class NavItem
             ->map(function ($navItem) use ($generateNewIds) {
                 return $navItem
                     ->id($generateNewIds ? $this->id().'::' : $navItem->id())
-                    ->icon($this->icon())
+                    ->icon($navItem->icon() ?? $this->icon())
                     ->section($this->section())
                     ->isChild(true);
             })

@@ -23,7 +23,6 @@ trait ManagesPreferences
             'blueprint' => $blueprint->toPublishArray(),
             'values' => $fields->values(),
             'meta' => $fields->meta(),
-            'showBreadcrumb' => Statamic::pro() && User::current()->can('manage preferences'),
             'saveAsOptions' => $this->getSaveAsOptions()->values()->all(),
         ]);
     }

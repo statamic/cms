@@ -8,7 +8,8 @@
     z-index: 4;
 
     .vue-portal-target {
-        @apply pointer-events-auto; /* allow clicks that we disabled above */
+        @apply pointer-events-auto;
+        /* allow clicks that we disabled above */
         isolation: isolate;
     }
 }
@@ -60,10 +61,6 @@
         [dir='rtl'] & {
             transform: translateX(16px);
         }
-    }
-
-    .breadcrumb svg {
-        display: none !important;
     }
 }
 

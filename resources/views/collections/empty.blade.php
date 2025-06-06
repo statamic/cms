@@ -6,10 +6,6 @@
 @section('content')
 
 <header class="mb-6">
-    @include('statamic::partials.breadcrumb', [
-        'url' => cp_route('collections.index'),
-        'title' => __('Collections')
-    ])
     <h1 v-pre>{{ __($collection->title()) }}</h1>
 </header>
 
