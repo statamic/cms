@@ -3,15 +3,23 @@ import { injectTabContext } from './TabProvider.vue';
 import { CardPanel } from '@statamic/ui';
 import FieldsProvider from './FieldsProvider.vue';
 import Fields from './Fields.vue';
+import ShowField from '@statamic/components/field-conditions/ShowField.js';
+import { injectContainerContext } from './Container.vue';
 
+const { blueprint, store } = injectContainerContext();
 const tab = injectTabContext();
 const sections = tab.sections;
+const visibleSections = sections.filter(section => {
+    return section.fields.some((field) => {
+        return new ShowField(store, store.values, store.extraValues).showField(field, field.handle);
+    });
+});
 </script>
 
 <template>
     <div>
         <CardPanel
-            v-for="(section, i) in sections"
+            v-for="(section, i) in visibleSections"
             :key="i"
             :heading="section.display"
             :subheading="section.instructions"
