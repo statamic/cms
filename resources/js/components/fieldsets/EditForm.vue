@@ -44,7 +44,7 @@ export default {
         Button,
     },
 
-    props: ['action', 'initialFieldset', 'breadcrumbUrl'],
+    props: ['action', 'initialFieldset'],
 
     data() {
         return {

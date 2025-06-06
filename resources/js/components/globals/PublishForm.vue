@@ -1,8 +1,6 @@
 <template>
     <div>
         <header class="mb-6">
-            <breadcrumb :url="globalsUrl" :title="__('Globals')" />
-
             <div class="flex items-center">
                 <h1 class="flex-1" v-text="__(title)" />
 

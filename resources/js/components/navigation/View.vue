@@ -1,8 +1,6 @@
 <template>
     <div>
         <header class="mb-6" v-if="mounted">
-            <breadcrumb :url="breadcrumbUrl" :title="__('Navigation')" />
-
             <div class="flex items-center">
                 <h1 class="flex-1" v-text="__(title)" />
 
@@ -252,7 +250,6 @@ export default {
         title: { type: String, required: true },
         handle: { type: String, required: true },
         collections: { type: Array, required: true },
-        breadcrumbUrl: { type: String, required: true },
         editUrl: { type: String, required: true },
         pagesUrl: { type: String, required: true },
         submitUrl: { type: String, required: true },

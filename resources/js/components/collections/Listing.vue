@@ -179,8 +179,14 @@ export default {
             items: this.initialRows,
             columns: this.initialColumns,
             requestUrl: cp_url(`collections`),
-            mode: 'table',
+            mode: this.$preferences.get('collections.listing_mode', 'grid'),
         };
+    },
+
+    watch: {
+        mode(mode) {
+            this.$preferences.set('collections.listing_mode', mode);
+        },
     },
 
     methods: {

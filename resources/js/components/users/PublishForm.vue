@@ -1,7 +1,6 @@
 <template>
     <div>
         <header class="mb-6">
-            <breadcrumb :url="cp_url('users')" :title="__('Users')" />
             <div class="flex items-center">
                 <h1 class="flex-1" v-text="title" />
                 <dropdown-list class="ltr:mr-4 rtl:ml-4" v-if="canEditBlueprint || hasItemActions">

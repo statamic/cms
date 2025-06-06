@@ -5,7 +5,6 @@ namespace Statamic\Http\Controllers\CP\Collections;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Entries\Entry as EntryContract;
-use Statamic\CP\Breadcrumbs;
 use Statamic\Exceptions\BlueprintNotFoundException;
 use Statamic\Facades\Action;
 use Statamic\Facades\Asset;
@@ -159,7 +158,6 @@ class EntriesController extends CpController
             'hasWorkingCopy' => $entry->hasWorkingCopy(),
             'preloadedAssets' => $this->extractAssetsFromValues($values),
             'revisionsEnabled' => $entry->revisionsEnabled(),
-            'breadcrumbs' => $this->breadcrumbs($collection),
             'canManagePublishState' => User::current()->can('publish', $entry),
             'previewTargets' => $collection->previewTargets()->all(),
             'autosaveInterval' => $collection->autosaveInterval(),
@@ -326,7 +324,6 @@ class EntriesController extends CpController
                 ];
             })->values()->all(),
             'revisionsEnabled' => $collection->revisionsEnabled(),
-            'breadcrumbs' => $this->breadcrumbs($collection),
             'canManagePublishState' => User::current()->can('publish '.$collection->handle().' entries'),
             'previewTargets' => $collection->previewTargets()->all(),
             'autosaveInterval' => $collection->autosaveInterval(),
@@ -488,20 +485,6 @@ class EntriesController extends CpController
                 'is_root' => false,
             ])
             ->build($entry->route());
-    }
-
-    protected function breadcrumbs($collection)
-    {
-        return new Breadcrumbs([
-            [
-                'text' => __('Collections'),
-                'url' => cp_route('collections.index'),
-            ],
-            [
-                'text' => $collection->title(),
-                'url' => $collection->breadcrumbUrl(),
-            ],
-        ]);
     }
 
     protected function getAuthorizedSitesForCollection($collection)
