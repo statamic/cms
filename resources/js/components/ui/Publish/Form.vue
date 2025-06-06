@@ -3,7 +3,7 @@ import Container from './Container.vue';
 import Tabs from './Tabs.vue';
 import { Header, Button } from '@statamic/ui';
 import uniqid from 'uniqid';
-import { ref, useTemplateRef } from 'vue';
+import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
 import { SavePipeline } from '@statamic/exports.js';
 const { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks } = SavePipeline;
 
@@ -55,6 +55,19 @@ function save() {
             Statamic.$toast.success('Saved');
         });
 }
+
+const saveKeyBinding = ref(null);
+
+onMounted(() => {
+    Statamic.$keys.bindGlobal(['mod+s'], (e) => {
+        e.preventDefault();
+        save();
+    });
+});
+
+onUnmounted(() => {
+    saveKeyBinding.destroy();
+});
 </script>
 
 <template>
