@@ -1,7 +1,7 @@
 <template>
     <Button
         class="px-2! [&_svg]:size-3.5"
-        :class="{ 'is-active': active }"
+        :class="{ active }"
         variant="ghost"
         size="sm"
         :aria-label="button.text"

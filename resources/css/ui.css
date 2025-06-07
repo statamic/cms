@@ -85,6 +85,9 @@
     --shadow-ui-lg: 0px 4px 7px -4px rgba(0,0,0,0.15);
     --shadow-ui-xl: 0px 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
 
+    /* Custom value because gray-100 is too light and gray-200 is too dark, e.g. Bard active buttons */
+    --color-button-active-light-theme: hsl(from var(--color-gray-200) h s l / 0.6);
+
     --animate-wiggle: wiggle 200ms ease-in-out infinite;
 
     @keyframes wiggle {

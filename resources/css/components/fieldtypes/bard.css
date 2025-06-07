@@ -1,3 +1,5 @@
+/* BARD 
+=================================================== */
 .bard-fieldtype {
     @apply relative rounded-xl border outline-hidden dark:border-dark-900;
 
@@ -5,29 +7,28 @@
         outline: none;
     }
 }
-
+/* BARD / EDITOR
+=================================================== */
 .bard-editor {
     @apply relative rounded-sm p-0 text-gray-800 dark:bg-dark-650 dark:text-dark-150;
     /* The focus state inherits this */
     > * {
         @apply rounded-b-lg;
     }
-}
-
-.bard-editor .ProseMirror {
-    @apply min-h-40 p-2 text-sm leading-tight;
-    @apply text-sm leading-normal @md/bard:p-2;
-    @apply @lg/bard:p-4;
-    &:focus {
-        @apply focus-outline;
+    .ProseMirror {
+        @apply min-h-40 p-2 text-sm leading-tight;
+        @apply text-sm leading-normal @md/bard:p-2;
+        @apply @lg/bard:p-4;
+        &:focus {
+            @apply focus-outline;
+        }
+    }
+    .bard-error {
+        @apply whitespace-nowrap bg-red-100 p-2 text-xs text-red-500 @lg:px-4;
     }
 }
-
-.bard-editor .bard-error {
-    @apply whitespace-nowrap bg-red-100 p-2 text-xs text-red-500 @lg:px-4;
-}
-
-/*  Modes */
+/* BARD / MODES
+=================================================== */
 .bard-editor.mode\:read-only .ProseMirror {
     @apply bg-gray-300 text-gray-700 dark:bg-dark-600 dark:text-dark-175;
 }
@@ -43,7 +44,8 @@
         @apply mb-0 leading-normal;
     }
 }
-
+/* BARD / MODES / FIXED
+=================================================== */
 .bard-fixed-toolbar {
     @apply top-0 z-5 flex items-start justify-between rounded-t-xl border-b border-gray-300 bg-gray-50 p-1 text-sm shadow-none px-2 py-1 dark:border-white/15 dark:bg-gray-950;
 
@@ -76,27 +78,35 @@
     button sup {
         @apply font-sans;
     }
+
+    .active {
+        @apply button-active;
+        svg {
+            @apply text-black;
+        }
+    }
+
+    /* e.g. the blueprint configuration */
+    &.dark {
+        @apply rounded-full bg-gray-900 px-4 shadow-lg;
+    
+        button {
+            @apply mx-0.5 my-0 flex h-8 w-8 items-center justify-center rounded-sm bg-transparent px-1 text-center text-base text-gray-700;
+            svg {
+                @apply h-4 w-auto;
+            }
+        }
+    
+        button.active {
+            @apply text-white;
+        }
+    }
 }
 
 /* Only top-level Bard fields should have a sticky header */
 .workspace .publish-fields:not(.replicator-set-body) > .bard-fieldtype .bard-fixed-toolbar,
 .live-preview .publish-fields:not(.replicator-set-body) > .bard-fieldtype .bard-fixed-toolbar {
     @apply sticky;
-}
-
-.bard-fixed-toolbar.dark {
-    @apply rounded-full bg-black px-4 shadow-lg;
-
-    button {
-        @apply mx-0.5 my-0 flex h-8 w-8 items-center justify-center rounded-sm bg-transparent px-1 text-center text-base text-gray-700 outline-hidden;
-        svg {
-            @apply h-4 w-auto;
-        }
-    }
-
-    button.active {
-        @apply text-white;
-    }
 }
 
 /*  Fixed toolbar inside another bard field */
@@ -130,7 +140,8 @@
         top: 0;
     }
 }
-
+/* BARD / MODES / FLOATING
+=================================================== */
 .bard-floating-toolbar {
     @apply flex rounded-full bg-black px-0 shadow-lg;
     white-space: nowrap;
