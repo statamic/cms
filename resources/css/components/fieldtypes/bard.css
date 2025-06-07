@@ -264,6 +264,7 @@
             padding: 7px 8px;
             top: 0;
             background: unset;
+            border: unset;
 
             button {
                 @apply mx-1;
