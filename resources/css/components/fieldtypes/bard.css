@@ -1,302 +1,313 @@
 /* BARD 
 =================================================== */
-.bard-fieldtype {
-    @apply relative rounded-xl border outline-hidden dark:border-dark-900;
+@layer components {
+    .bard-fieldtype {
+        @apply relative rounded-xl border outline-hidden dark:border-dark-900;
 
-    * {
-        outline: none;
+        * {
+            outline: none;
+        }
     }
 }
 /* BARD / EDITOR
 =================================================== */
-.bard-editor {
-    @apply relative rounded-sm p-0 text-gray-800 dark:bg-dark-650 dark:text-dark-150;
-    /* The focus state inherits this */
-    > * {
-        @apply rounded-b-lg;
-    }
-    .ProseMirror {
-        @apply min-h-40 p-2 text-sm leading-tight;
-        @apply text-sm leading-normal @md/bard:p-2;
-        @apply @lg/bard:p-4;
-        &:focus {
-            @apply focus-outline;
+@layer components {
+    .bard-editor {
+        @apply relative rounded-sm p-0 text-gray-800 dark:bg-dark-650 dark:text-dark-150;
+        /* The focus state inherits this */
+        > * {
+            @apply rounded-b-lg;
         }
-    }
-    .bard-error {
-        @apply whitespace-nowrap bg-red-100 p-2 text-xs text-red-500 @lg:px-4;
+        .ProseMirror {
+            @apply min-h-40 p-2 text-sm leading-tight;
+            @apply text-sm leading-normal @md/bard:p-2;
+            @apply @lg/bard:p-4;
+            &:focus {
+                @apply focus-outline;
+            }
+        }
+        .bard-error {
+            @apply whitespace-nowrap bg-red-100 p-2 text-xs text-red-500 @lg:px-4;
+        }
     }
 }
 /* BARD / MODES
 =================================================== */
-.bard-editor.mode\:read-only .ProseMirror {
-    @apply bg-gray-300 text-gray-700 dark:bg-dark-600 dark:text-dark-175;
-}
+@layer components {
+    .bard-editor.mode\:read-only .ProseMirror {
+        @apply bg-gray-300 text-gray-700 dark:bg-dark-600 dark:text-dark-175;
+    }
 
-.bard-editor.mode\:minimal .ProseMirror {
-    min-height: 80px;
-}
+    .bard-editor.mode\:minimal .ProseMirror {
+        min-height: 80px;
+    }
 
-.bard-editor.mode\:inline .ProseMirror {
-    @apply p-2;
-    min-height: 38px;
-    p {
-        @apply mb-0 leading-normal;
+    .bard-editor.mode\:inline .ProseMirror {
+        @apply p-2;
+        min-height: 38px;
+        p {
+            @apply mb-0 leading-normal;
+        }
     }
 }
 /* BARD / MODES / FIXED
 =================================================== */
-.bard-fixed-toolbar {
-    @apply top-0 z-5 flex items-start justify-between rounded-t-xl border-b border-gray-300 bg-gray-50 p-1 text-sm shadow-none px-2 py-1 dark:border-white/15 dark:bg-gray-950;
+@layer components {
+    .bard-fixed-toolbar {
+        @apply top-0 z-5 flex items-start justify-between rounded-t-xl border-b border-gray-300 bg-gray-50 p-1 text-sm shadow-none px-2 py-1 dark:border-white/15 dark:bg-gray-950;
 
-    .bard-toolbar-button {
-        @apply m-0 flex h-8 w-8 items-center justify-center rounded-sm px-1 text-center text-base text-gray-800 dark:text-dark-150;
-        svg {
-            @apply h-4 w-auto;
-        }
-    }
-
-    .bard-toolbar-button:hover {
-        @apply bg-gray-200 dark:bg-dark-650;
-    }
-
-    .bard-toolbar-button.active {
-        @apply bg-gray-300 text-black dark:bg-dark-600 dark:text-white;
-    }
-
-    .bard-toolbar-button:focus {
-        @apply focus-outline;
-    }
-
-    .bard-toolbar-button:disabled {
-        @apply opacity-50;
-        &:hover {
-            @apply text-gray-800 dark:text-dark-100;
-        }
-    }
-
-    button sup {
-        @apply font-sans;
-    }
-
-    .active {
-        @apply button-active;
-        svg {
-            @apply text-black;
-        }
-    }
-
-    /* e.g. the blueprint configuration */
-    &.dark {
-        @apply rounded-full bg-gray-900 px-4 shadow-lg;
-    
-        button {
-            @apply mx-0.5 my-0 flex h-8 w-8 items-center justify-center rounded-sm bg-transparent px-1 text-center text-base text-gray-700;
+        .bard-toolbar-button {
+            @apply m-0 flex h-8 w-8 items-center justify-center rounded-sm px-1 text-center text-base text-gray-800 dark:text-dark-150;
             svg {
                 @apply h-4 w-auto;
             }
         }
-    
-        button.active {
-            @apply text-white;
+
+        .bard-toolbar-button:hover {
+            @apply bg-gray-200 dark:bg-dark-650;
+        }
+
+        .bard-toolbar-button.active {
+            @apply bg-gray-300 text-black dark:bg-dark-600 dark:text-white;
+        }
+
+        .bard-toolbar-button:focus {
+            @apply focus-outline;
+        }
+
+        .bard-toolbar-button:disabled {
+            @apply opacity-50;
+            &:hover {
+                @apply text-gray-800 dark:text-dark-100;
+            }
+        }
+
+        button sup {
+            @apply font-sans;
+        }
+
+        .active {
+            @apply button-active;
+            svg {
+                @apply text-black;
+            }
+        }
+
+        /* e.g. the blueprint configuration */
+        &.dark {
+            @apply rounded-full bg-gray-900 px-4 shadow-lg;
+        
+            button {
+                @apply mx-0.5 my-0 flex h-8 w-8 items-center justify-center rounded-sm bg-transparent px-1 text-center text-base text-gray-700;
+                svg {
+                    @apply h-4 w-auto;
+                }
+            }
+        
+            button.active {
+                @apply text-white;
+            }
         }
     }
-}
 
-/* Only top-level Bard fields should have a sticky header */
-.workspace .publish-fields:not(.replicator-set-body) > .bard-fieldtype .bard-fixed-toolbar,
-.live-preview .publish-fields:not(.replicator-set-body) > .bard-fieldtype .bard-fixed-toolbar {
-    @apply sticky;
-}
-
-/*  Fixed toolbar inside another bard field */
-.bard-fieldtype .bard-fieldtype .bard-fixed-toolbar {
-    z-index: 4;
-    top: 40px;
-}
-
-/*  Fixed toolbar inside a stack */
-.stack-content .bard-fixed-toolbar {
-    top: -24px;
-}
-
-/*  Responive Wangjangling */
-@media (width >= theme(--breakpoint-md)) {
-    /*  Fixed toolbar below fixed global header */
-    .bard-fixed-toolbar {
-        top: 52px;
+    /* Only top-level Bard fields should have a sticky header */
+    .workspace .publish-fields:not(.replicator-set-body) > .bard-fieldtype .bard-fixed-toolbar,
+    .live-preview .publish-fields:not(.replicator-set-body) > .bard-fieldtype .bard-fixed-toolbar {
+        @apply sticky;
     }
+
+    /*  Fixed toolbar inside another bard field */
     .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar {
-        top: 92px;
+        z-index: 4;
+        top: 40px;
     }
 
     /*  Fixed toolbar inside a stack */
-    .stack-content .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar {
-        top: 16px;
+    .stack-content .bard-fixed-toolbar {
+        top: -24px;
     }
 
-    /* We don't need the `top` when in Live Preview */
-    .live-preview .bard-fixed-toolbar {
-        top: 0;
+    /*  Responive Wangjangling */
+    @media (width >= theme(--breakpoint-md)) {
+        /*  Fixed toolbar below fixed global header */
+        .bard-fixed-toolbar {
+            top: 52px;
+        }
+        .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar {
+            top: 92px;
+        }
+
+        /*  Fixed toolbar inside a stack */
+        .stack-content .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar {
+            top: 16px;
+        }
+
+        /* We don't need the `top` when in Live Preview */
+        .live-preview .bard-fixed-toolbar {
+            top: 0;
+        }
     }
 }
 /* BARD / MODES / FLOATING
 =================================================== */
-.bard-floating-toolbar {
-    @apply flex rounded-full bg-black px-0 shadow-lg;
-    white-space: nowrap;
+@layer components {
+    .bard-floating-toolbar {
+        @apply flex rounded-full bg-black px-0 shadow-lg;
+        white-space: nowrap;
 
-    &:before {
-        content: '';
-        border: 6px solid transparent;
-        border-top-color: black;
-        position: absolute;
-        top: 100%;
-        left: 50%;
-        [dir='rtl'] & {
-            left: auto;
-            right: 50%;
+        &:before {
+            content: '';
+            border: 6px solid transparent;
+            border-top-color: black;
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            [dir='rtl'] & {
+                left: auto;
+                right: 50%;
+            }
+            margin-left: -3px;
         }
-        margin-left: -3px;
-    }
 
-    .bard-toolbar-button {
-        @apply flex h-10 w-10 items-center justify-center rounded-lg bg-black text-center text-gray-200;
-        font-size: 16px;
-        transition: all 0.1s ease-in-out;
-        svg {
-            @apply h-4 w-4;
+        .bard-toolbar-button {
+            @apply flex h-10 w-10 items-center justify-center rounded-lg bg-black text-center text-gray-200;
+            font-size: 16px;
+            transition: all 0.1s ease-in-out;
+            svg {
+                @apply h-4 w-4;
+            }
+        }
+
+        .bard-toolbar-button:hover {
+            @apply text-white;
+        }
+
+        .bard-toolbar-button.active {
+            @apply text-blue;
+        }
+
+        .bard-toolbar-button:focus {
+            outline: none;
+        }
+
+        .bard-toolbar-button:disabled {
+            @apply opacity-50;
+            &:hover {
+                @apply text-gray-200;
+            }
+        }
+
+        button sup {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
         }
     }
 
-    .bard-toolbar-button:hover {
-        @apply text-white;
+    .bard-add-set-button {
+        @apply absolute top-[-6px] z-1 flex items-center justify-center ltr:-left-4 rtl:-right-4;
     }
 
-    .bard-toolbar-button.active {
-        @apply text-blue;
-    }
+    .bard-footer-toolbar {
+        @apply flex items-center justify-between rounded-b border-t bg-white p-2 text-xs text-gray-700 shadow-none dark:border-dark-300 dark:bg-dark-550 dark:text-dark-175;
+        padding: 8px 12px;
 
-    .bard-toolbar-button:focus {
-        outline: none;
-    }
-
-    .bard-toolbar-button:disabled {
-        @apply opacity-50;
-        &:hover {
-            @apply text-gray-200;
+        .bard-fullscreen & {
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
         }
     }
 
-    button sup {
-        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    .bard-set:active .sortable-handle:hover ~ * .popover {
+        display: none;
     }
-}
 
-.bard-add-set-button {
-    @apply absolute top-[-6px] z-1 flex items-center justify-center ltr:-left-4 rtl:-right-4;
-}
-
-.bard-footer-toolbar {
-    @apply flex items-center justify-between rounded-b border-t bg-white p-2 text-xs text-gray-700 shadow-none dark:border-dark-300 dark:bg-dark-550 dark:text-dark-175;
-    padding: 8px 12px;
-
-    .bard-fullscreen & {
-        position: sticky;
-        bottom: 0;
-        z-index: 10;
+    .bard-set.has-error > .replicator-set-header label {
+        @apply text-red-500;
     }
-}
-
-.bard-set:active .sortable-handle:hover ~ * .popover {
-    display: none;
-}
-
-.bard-set.has-error > .replicator-set-header label {
-    @apply text-red-500;
 }
 
 /* The set selection options for each text block
   ========================================================================== */
+@layer components {
+    .bard-set-selector {
+        /*  transition: all .15s ease-in-out; */
 
-.bard-set-selector {
-    /*  transition: all .15s ease-in-out; */
-
-    .dropdown-menu {
-        left: -5px;
-        [dir='rtl'] & {
-            left: auto;
-            right: -5px;
-        }
-        right: auto;
-        [dir='rtl'] & {
+        .dropdown-menu {
+            left: -5px;
+            [dir='rtl'] & {
+                left: auto;
+                right: -5px;
+            }
             right: auto;
-            left: auto;
+            [dir='rtl'] & {
+                right: auto;
+                left: auto;
+            }
         }
     }
-}
 
-.set-picker .popover .popover-content {
-    min-width: 320px !important;
+    .set-picker .popover .popover-content {
+        min-width: 320px !important;
+    }
 }
-
 /* Fullscreen mode
    ========================================================================== */
+@layer states {
+    .bard-fullscreen {
+        @apply fixed inset-0 min-h-screen overflow-scroll rounded-none bg-gray-100 pt-14 dark:bg-dark-700;
 
-.bard-fullscreen {
-    @apply fixed inset-0 min-h-screen overflow-scroll rounded-none bg-gray-100 pt-14 dark:bg-dark-700;
-
-    & > .bard-editor {
-        @apply relative mx-auto my-6 max-w-5xl rounded-lg bg-white px-8 shadow-ui-md dark:bg-dark-800 dark:shadow-lg;
-    }
-
-
-    .bard-fixed-toolbar {
-        @apply fixed h-12 w-full bg-linear-to-b from-white to-gray-100 shadow dark:from-dark-400 dark:to-dark-500 dark:shadow-lg;
-        padding: 7px 8px;
-        top: 0;
-
-        button {
-            @apply mx-1;
+        & > .bard-editor {
+            @apply relative mx-auto my-6 max-w-5xl rounded-lg bg-white px-8 shadow-ui-md dark:bg-dark-800 dark:shadow-lg;
         }
-    }
 
-    & > .bard-editor > div > .ProseMirror {
-        @apply px-6 py-16;
-        min-height: calc(100vh - 120px);
 
-        &:focus {
-            @apply ring-0;
-        }
-    }
+        .bard-fixed-toolbar {
+            @apply fixed h-12 w-full bg-linear-to-b from-white to-gray-100 shadow dark:from-dark-400 dark:to-dark-500 dark:shadow-lg;
+            padding: 7px 8px;
+            top: 0;
 
-    .bard-content:not(.bard-set *) > {
-        p > code,
-        pre code {
-            @apply bg-gray-300;
-        }
-    }
-
-    .bard-set-selector {
-        @apply ltr:ml-6 rtl:mr-6;
-    }
-
-    .bard-field-options {
-        @apply fixed inset-x-0 top-0 w-full bg-gray-700 p-4;
-        @apply ltr:text-right rtl:text-left;
-        z-index: 1; /*  to appear over the top of .bard-editor */
-
-        .icon {
-            font-size: 24px;
-        }
-        a {
-            margin-left: 16px;
-            [dir='rtl'] & {
-                margin-right: 16px;
-                margin-left: 0;
+            button {
+                @apply mx-1;
             }
-            color: #fff;
-            opacity: 1;
+        }
+
+        & > .bard-editor > div > .ProseMirror {
+            @apply px-6 py-16;
+            min-height: calc(100vh - 120px);
+
+            &:focus {
+                @apply ring-0;
+            }
+        }
+
+        .bard-content:not(.bard-set *) > {
+            p > code,
+            pre code {
+                @apply bg-gray-300;
+            }
+        }
+
+        .bard-set-selector {
+            @apply ltr:ml-6 rtl:mr-6;
+        }
+
+        .bard-field-options {
+            @apply fixed inset-x-0 top-0 w-full bg-gray-700 p-4;
+            @apply ltr:text-right rtl:text-left;
+            z-index: 1; /*  to appear over the top of .bard-editor */
+
+            .icon {
+                font-size: 24px;
+            }
+            a {
+                margin-left: 16px;
+                [dir='rtl'] & {
+                    margin-right: 16px;
+                    margin-left: 0;
+                }
+                color: #fff;
+                opacity: 1;
+            }
         }
     }
 }
@@ -306,329 +317,334 @@
    Selectors are specific so they don't cascade into the sets, which
    all sit inline within the rest of the elements.
    ========================================================================== */
-.bard-fieldtype .ProseMirror {
-    outline: 0;
-}
-
-.bard-fieldtype .bard-content {
-    blockquote,
-    ol,
-    p,
-    ul {
-        margin-top: 0;
-        margin-bottom: 0.85em;
-
-        b,
-        strong {
-            font-weight: 700;
-        }
-
-        em,
-        i {
-            font-style: italic;
-        }
-
-        a {
-            @apply break-words text-blue underline dark:text-dark-blue-100;
-        }
-
-        a:active,
-        a:focus,
-        a:hover {
-            outline: 0;
-            text-decoration: underline;
-        }
-
-        img {
-            border: 0;
-            max-width: 100%;
-        }
+@layer components {
+    .bard-fieldtype .ProseMirror {
+        outline: 0;
     }
 
-    blockquote,
-    blockquote ol li,
-    blockquote ul li,
-    ol li,
-    ul li {
-        > p {
+    .bard-fieldtype .bard-content {
+        blockquote,
+        ol,
+        p,
+        ul {
             margin-top: 0;
             margin-bottom: 0.85em;
-        }
-    }
 
-    hr {
-        @apply bg-gray-600 dark:bg-dark-300;
-        height: 4px;
-        padding: 0;
-        margin: 1.7em 0;
-        overflow: hidden;
-        border: none;
-    }
+            b,
+            strong {
+                font-weight: 700;
+            }
 
-    hr:after,
-    hr:before {
-        display: table;
-        content: ' ';
-    }
+            em,
+            i {
+                font-style: italic;
+            }
 
-    hr:after {
-        clear: both;
-    }
+            a {
+                @apply break-words text-blue underline dark:text-dark-blue-100;
+            }
 
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6 {
-        margin-top: 1.275em;
-        margin-bottom: 0.85em;
-        font-weight: 700;
+            a:active,
+            a:focus,
+            a:hover {
+                outline: 0;
+                text-decoration: underline;
+            }
 
-        b,
-        strong {
-            font-weight: 900;
-        }
-
-        a {
-            @apply break-words text-blue underline dark:text-dark-blue-100;
-        }
-
-        a:active,
-        a:focus,
-        a:hover {
-            outline: 0;
-            text-decoration: underline;
-        }
-    }
-
-    h1 {
-        font-size: 2em;
-    }
-
-    h2 {
-        font-size: 1.75em;
-    }
-
-    h3 {
-        font-size: 1.5em;
-    }
-
-    h4 {
-        font-size: 1.25em;
-    }
-
-    h5 {
-        font-size: 1em;
-    }
-
-    h6 {
-        font-size: 1em;
-        @apply text-gray-700;
-    }
-
-    h1:first-child,
-    h2:first-child,
-    h3:first-child,
-    h4:first-child,
-    h5:first-child,
-    h6:first-child {
-        margin-top: 0;
-    }
-
-    ul,
-    blockquote ul,
-    .tableWrapper table ul {
-        list-style-type: disc;
-    }
-
-    ol,
-    blockquote ol,
-    .tableWrapper table ol {
-        list-style-type: decimal;
-    }
-
-    ol,
-    ul,
-    blockquote ol,
-    blockquote ul {
-        margin: 0 0 0.85em;
-        padding: 0 0 0 2em;
-
-        [dir='rtl'] & {
-            padding-right: 2em;
-            padding-left: 0;
-        }
-    }
-
-    .tableWrapper table ol,
-    .tableWrapper table ul {
-        margin: 0;
-        padding: 0 0 0 2em;
-
-        [dir='rtl'] & {
-            padding-right: 2em;
-            padding-left: 0;
-        }
-    }
-
-    ol ol,
-    ol ul,
-    ul ol,
-    ul ul {
-        margin-top: 0;
-        margin-bottom: 0;
-        padding-left: 2em;
-        [dir='rtl'] & {
-            padding-right: 2em;
-            padding-left: 0;
-        }
-    }
-
-    ul ul {
-        list-style-type: circle;
-    }
-
-    ol ol {
-        list-style-type: decimal;
-    }
-
-    ul ol {
-        list-style-type: decimal;
-    }
-
-    ol ul {
-        list-style-type: circle;
-    }
-
-    blockquote {
-        @apply border-blue px-4 text-gray-800 dark:border-dark-blue-100 dark:text-dark-150 ltr:border-l-4 rtl:border-r-4;
-        margin: 0 0 0.85em;
-    }
-
-    blockquote:first-child {
-        margin-top: 0;
-    }
-
-    blockquote:last-child {
-        margin-bottom: 0;
-    }
-
-    .tableWrapper table,
-    blockquote > .tableWrapper table,
-    ol li > .tableWrapper table,
-    ul li > .tableWrapper table {
-        @apply m-0 mb-4 w-full overflow-hidden bg-white text-sm dark:bg-dark-500;
-        border-collapse: collapse;
-        table-layout: fixed;
-
-        th {
-            @apply bg-gray-200 font-bold dark:bg-dark-575 ltr:text-left rtl:text-right;
-        }
-
-        td,
-        th {
-            @apply relative border px-2 py-1 align-top dark:border-dark-200;
-            min-width: 1em;
-        }
-
-        .selectedCell {
-            @apply relative;
-
-            &:after {
-                @apply pointer-events-none absolute inset-0 bg-gray-400 opacity-25 dark:bg-dark-200;
-                content: '';
+            img {
+                border: 0;
+                max-width: 100%;
             }
         }
 
-        a {
-            @apply break-words text-blue underline dark:text-dark-blue-100;
+        blockquote,
+        blockquote ol li,
+        blockquote ul li,
+        ol li,
+        ul li {
+            > p {
+                margin-top: 0;
+                margin-bottom: 0.85em;
+            }
         }
 
-        a:active,
-        a:focus,
-        a:hover {
-            outline: 0;
-            text-decoration: underline;
+        hr {
+            @apply bg-gray-600 dark:bg-dark-300;
+            height: 4px;
+            padding: 0;
+            margin: 1.7em 0;
+            overflow: hidden;
+            border: none;
         }
-    }
 
-    p > code {
-        @apply rounded-xs bg-gray-400 font-mono text-xs dark:bg-dark-750;
-        padding: 2px 4px;
-        top: -1px;
-    }
+        hr:after,
+        hr:before {
+            display: table;
+            content: ' ';
+        }
 
-    pre {
-        margin-bottom: 0.85em;
-    }
+        hr:after {
+            clear: both;
+        }
 
-    pre code {
-        @apply block w-full rounded-sm bg-gray-400 p-4 font-mono text-xs dark:bg-dark-950 dark:text-dark-100;
-        line-height: 1.8;
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            margin-top: 1.275em;
+            margin-bottom: 0.85em;
+            font-weight: 700;
+
+            b,
+            strong {
+                font-weight: 900;
+            }
+
+            a {
+                @apply break-words text-blue underline dark:text-dark-blue-100;
+            }
+
+            a:active,
+            a:focus,
+            a:hover {
+                outline: 0;
+                text-decoration: underline;
+            }
+        }
+
+        h1 {
+            font-size: 2em;
+        }
+
+        h2 {
+            font-size: 1.75em;
+        }
+
+        h3 {
+            font-size: 1.5em;
+        }
+
+        h4 {
+            font-size: 1.25em;
+        }
+
+        h5 {
+            font-size: 1em;
+        }
+
+        h6 {
+            font-size: 1em;
+            @apply text-gray-700;
+        }
+
+        h1:first-child,
+        h2:first-child,
+        h3:first-child,
+        h4:first-child,
+        h5:first-child,
+        h6:first-child {
+            margin-top: 0;
+        }
+
+        ul,
+        blockquote ul,
+        .tableWrapper table ul {
+            list-style-type: disc;
+        }
+
+        ol,
+        blockquote ol,
+        .tableWrapper table ol {
+            list-style-type: decimal;
+        }
+
+        ol,
+        ul,
+        blockquote ol,
+        blockquote ul {
+            margin: 0 0 0.85em;
+            padding: 0 0 0 2em;
+
+            [dir='rtl'] & {
+                padding-right: 2em;
+                padding-left: 0;
+            }
+        }
+
+        .tableWrapper table ol,
+        .tableWrapper table ul {
+            margin: 0;
+            padding: 0 0 0 2em;
+
+            [dir='rtl'] & {
+                padding-right: 2em;
+                padding-left: 0;
+            }
+        }
+
+        ol ol,
+        ol ul,
+        ul ol,
+        ul ul {
+            margin-top: 0;
+            margin-bottom: 0;
+            padding-left: 2em;
+            [dir='rtl'] & {
+                padding-right: 2em;
+                padding-left: 0;
+            }
+        }
+
+        ul ul {
+            list-style-type: circle;
+        }
+
+        ol ol {
+            list-style-type: decimal;
+        }
+
+        ul ol {
+            list-style-type: decimal;
+        }
+
+        ol ul {
+            list-style-type: circle;
+        }
+
+        blockquote {
+            @apply border-blue px-4 text-gray-800 dark:border-dark-blue-100 dark:text-dark-150 ltr:border-l-4 rtl:border-r-4;
+            margin: 0 0 0.85em;
+        }
+
+        blockquote:first-child {
+            margin-top: 0;
+        }
+
+        blockquote:last-child {
+            margin-bottom: 0;
+        }
+
+        .tableWrapper table,
+        blockquote > .tableWrapper table,
+        ol li > .tableWrapper table,
+        ul li > .tableWrapper table {
+            @apply m-0 mb-4 w-full overflow-hidden bg-white text-sm dark:bg-dark-500;
+            border-collapse: collapse;
+            table-layout: fixed;
+
+            th {
+                @apply bg-gray-200 font-bold dark:bg-dark-575 ltr:text-left rtl:text-right;
+            }
+
+            td,
+            th {
+                @apply relative border px-2 py-1 align-top dark:border-dark-200;
+                min-width: 1em;
+            }
+
+            .selectedCell {
+                @apply relative;
+
+                &:after {
+                    @apply pointer-events-none absolute inset-0 bg-gray-400 opacity-25 dark:bg-dark-200;
+                    content: '';
+                }
+            }
+
+            a {
+                @apply break-words text-blue underline dark:text-dark-blue-100;
+            }
+
+            a:active,
+            a:focus,
+            a:hover {
+                outline: 0;
+                text-decoration: underline;
+            }
+        }
+
+        p > code {
+            @apply rounded-xs bg-gray-400 font-mono text-xs dark:bg-dark-750;
+            padding: 2px 4px;
+            top: -1px;
+        }
+
+        pre {
+            margin-bottom: 0.85em;
+        }
+
+        pre code {
+            @apply block w-full rounded-sm bg-gray-400 p-4 font-mono text-xs dark:bg-dark-950 dark:text-dark-100;
+            line-height: 1.8;
+        }
     }
 }
 
 /* Placeholder
 ========================================================================== */
-
-.bard-fieldtype .ProseMirror > p.is-editor-empty:first-child::before {
-    @apply text-gray-600 dark:text-dark-200;
-    content: attr(data-placeholder);
-    float: left;
-    [dir='rtl'] & {
-        float: right;
+@layer components {
+    .bard-fieldtype .ProseMirror > p.is-editor-empty:first-child::before {
+        @apply text-gray-600 dark:text-dark-200;
+        content: attr(data-placeholder);
+        float: left;
+        [dir='rtl'] & {
+            float: right;
+        }
+        height: 0;
+        pointer-events: none;
     }
-    height: 0;
-    pointer-events: none;
 }
 
 /* Link toolbar
   ========================================================================== */
+@layer components {
+    .bard-link-toolbar {
+        .input {
+            @apply h-8 border-none bg-transparent p-0 text-xs shadow-none;
+            width: 240px;
+            outline: none;
+        }
 
-.bard-link-toolbar {
-    .input {
-        @apply h-8 border-none bg-transparent p-0 text-xs shadow-none;
-        width: 240px;
-        outline: none;
-    }
+        .bard-toolbar-button {
+            @apply p-0 text-gray-700 outline-hidden;
+            font-size: 16px;
 
-    .bard-toolbar-button {
-        @apply p-0 text-gray-700 outline-hidden;
-        font-size: 16px;
-
-        &:hover {
-            @apply text-gray-900;
+            &:hover {
+                @apply text-gray-900;
+            }
         }
     }
-}
 
-.bard-inline-image-container {
-    @apply relative mb-6 whitespace-normal rounded-sm border bg-white dark:border-dark-900 dark:bg-dark-600;
-    &:hover {
-        cursor: grab;
+    .bard-inline-image-container {
+        @apply relative mb-6 whitespace-normal rounded-sm border bg-white dark:border-dark-900 dark:bg-dark-600;
+        &:hover {
+            cursor: grab;
+        }
     }
 }
 
 /* Bard Table
   ========================================================================== */
+@layer components {
+    .bard-fieldtype .ProseMirror {
+        &.resize-cursor {
+            @apply cursor-col-resize;
+        }
 
-.bard-fieldtype .ProseMirror {
-    &.resize-cursor {
-        @apply cursor-col-resize;
-    }
+        .tableWrapper {
+            @apply overflow-x-auto;
+        }
 
-    .tableWrapper {
-        @apply overflow-x-auto;
-    }
-
-    table .column-resize-handle {
-        @apply pointer-events-none absolute bottom-0 top-0 bg-blue-200;
-        width: 3px;
-        right: -2px;
-        [dir='rtl'] & {
-            right: auto;
-            left: -2px;
+        table .column-resize-handle {
+            @apply pointer-events-none absolute bottom-0 top-0 bg-blue-200;
+            width: 3px;
+            right: -2px;
+            [dir='rtl'] & {
+                right: auto;
+                left: -2px;
+            }
         }
     }
 }
