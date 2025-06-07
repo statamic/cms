@@ -260,11 +260,10 @@
             @apply relative mx-auto my-6 max-w-5xl rounded-lg bg-white px-8 shadow-ui-md dark:bg-dark-800 dark:shadow-lg;
         }
 
-
         .bard-fixed-toolbar {
-            @apply fixed h-12 w-full bg-linear-to-b from-white to-gray-100 shadow dark:from-dark-400 dark:to-dark-500 dark:shadow-lg;
             padding: 7px 8px;
             top: 0;
+            background: unset;
 
             button {
                 @apply mx-1;

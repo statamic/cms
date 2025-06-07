@@ -27,6 +27,7 @@
         text-box: unset;
     }
 }
+
 /* UTILITIES / STATES
 =================================================== */
 /* Here we typically need a negative outline-offset because of the inner shadow on inputs */
@@ -97,6 +98,10 @@
             margin-right: 0;
         }
     }
+}
+
+@utility bg-frosted {
+    @apply bg-white/85 backdrop-blur-sm;
 }
 
 /* UTILITIES / STATES / DECORATION / ARCHIECTURAL LINES
