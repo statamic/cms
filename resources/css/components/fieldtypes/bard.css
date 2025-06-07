@@ -1,6 +1,6 @@
 /* BARD 
 =================================================== */
-@layer components {
+@layer ui {
     .bard-fieldtype {
         @apply relative rounded-xl border outline-hidden dark:border-dark-900;
 
@@ -11,7 +11,7 @@
 }
 /* BARD / EDITOR
 =================================================== */
-@layer components {
+@layer ui {
     .bard-editor {
         @apply relative rounded-sm p-0 text-gray-800 dark:bg-dark-650 dark:text-dark-150;
         /* The focus state inherits this */
@@ -33,7 +33,7 @@
 }
 /* BARD / MODES
 =================================================== */
-@layer components {
+@layer ui {
     .bard-editor.mode\:read-only .ProseMirror {
         @apply bg-gray-300 text-gray-700 dark:bg-dark-600 dark:text-dark-175;
     }
@@ -52,7 +52,7 @@
 }
 /* BARD / MODES / FIXED
 =================================================== */
-@layer components {
+@layer ui {
     .bard-fixed-toolbar {
         @apply top-0 z-5 flex items-start justify-between rounded-t-xl border-b border-gray-300 bg-gray-50 p-1 text-sm shadow-none px-2 py-1 dark:border-white/15 dark:bg-gray-950;
 
@@ -150,7 +150,7 @@
 }
 /* BARD / MODES / FLOATING
 =================================================== */
-@layer components {
+@layer ui {
     .bard-floating-toolbar {
         @apply flex rounded-full bg-black px-0 shadow-lg;
         white-space: nowrap;
@@ -228,7 +228,7 @@
 
 /* The set selection options for each text block
   ========================================================================== */
-@layer components {
+@layer ui {
     .bard-set-selector {
         /*  transition: all .15s ease-in-out; */
 
@@ -252,7 +252,7 @@
 }
 /* Fullscreen mode
    ========================================================================== */
-@layer states {
+@layer ui-states {
     .bard-fullscreen {
         @apply fixed inset-0 min-h-screen overflow-scroll rounded-none bg-gray-100 pt-14 dark:bg-dark-700;
 
@@ -316,7 +316,7 @@
    Selectors are specific so they don't cascade into the sets, which
    all sit inline within the rest of the elements.
    ========================================================================== */
-@layer components {
+@layer ui {
     .bard-fieldtype .ProseMirror {
         outline: 0;
     }
@@ -583,7 +583,7 @@
 
 /* Placeholder
 ========================================================================== */
-@layer components {
+@layer ui {
     .bard-fieldtype .ProseMirror > p.is-editor-empty:first-child::before {
         @apply text-gray-600 dark:text-dark-200;
         content: attr(data-placeholder);
@@ -598,7 +598,7 @@
 
 /* Link toolbar
   ========================================================================== */
-@layer components {
+@layer ui {
     .bard-link-toolbar {
         .input {
             @apply h-8 border-none bg-transparent p-0 text-xs shadow-none;
@@ -626,7 +626,7 @@
 
 /* Bard Table
   ========================================================================== */
-@layer components {
+@layer ui {
     .bard-fieldtype .ProseMirror {
         &.resize-cursor {
             @apply cursor-col-resize;

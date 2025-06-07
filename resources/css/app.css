@@ -1,5 +1,5 @@
 /* =Jay. Tailwind already uses "Cascade Layers" internally. Here we are just adding an extra layer (to their internal layers) to manage states--particulary with complex fields like Bard--where specificity is much easier to handle with layers. */
-@layer base, components, states, utilities;
+@layer base, components, utilities, ui, ui-states;
 
 /* =Jay. Map layers to Tailwind's internal layers so that we can inject custom layers as needed */
 @layer base {
