@@ -244,17 +244,17 @@
    ========================================================================== */
 
 .bard-fullscreen {
-    @apply fixed inset-0 min-h-screen overflow-scroll rounded-none bg-gray-200 pt-14 dark:bg-dark-700;
+    @apply fixed inset-0 min-h-screen overflow-scroll rounded-none bg-gray-100 pt-14 dark:bg-dark-700;
 
     & > .bard-editor {
-        @apply relative mx-auto my-6 max-w-5xl rounded-sm bg-white px-8 shadow dark:bg-dark-800 dark:shadow-lg;
+        @apply relative mx-auto my-6 max-w-5xl rounded-lg bg-white px-8 shadow-ui-md dark:bg-dark-800 dark:shadow-lg;
     }
 
-    & > .bard-fixed-toolbar {
+
+    .bard-fixed-toolbar {
         @apply fixed h-12 w-full bg-linear-to-b from-white to-gray-100 shadow dark:from-dark-400 dark:to-dark-500 dark:shadow-lg;
         padding: 7px 8px;
         top: 0;
-        z-index: 999;
 
         button {
             @apply mx-1;

@@ -1,6 +1,6 @@
 <template>
-    <header class="fixed inset-x-0 top-0 z-max flex items-center justify-between bg-white px-4 shadow dark:bg-dark-550">
-        <h2 class="w-full" v-text="__(title)" />
+    <header class="fixed inset-x-0 top-0 z-max flex items-center justify-between bg-white/90 px-4 shadow dark:bg-dark-550">
+        <h2 class="shrink-0" v-text="__(title)" />
         <div class="grow-1 flex min-w-max items-center gap-4">
             <slot />
         </div>

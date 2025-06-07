@@ -1,4 +1,19 @@
-/* UTILITIES
+/* UTILITIES / LAYOUT
+=================================================== */
+[v-cloak],
+[x-cloak] {
+    display: none;
+}
+
+@utility max-h-screen-px {
+    max-height: calc(100vh - 1px) !important;
+}
+
+.z-max {
+    z-index: var(--z-index-max);
+}
+
+/* UTILITIES / TEXT
 =================================================== */
 @utility trim-text-start {
     text-box: trim-start;
@@ -12,16 +27,6 @@
         text-box: unset;
     }
 }
-
-[v-cloak],
-[x-cloak] {
-    display: none;
-}
-
-@utility max-h-screen-px {
-    max-height: calc(100vh - 1px) !important;
-}
-
 /* UTILITIES / STATES
 =================================================== */
 /* Here we typically need a negative outline-offset because of the inner shadow on inputs */
