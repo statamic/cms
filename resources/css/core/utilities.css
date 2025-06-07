@@ -1,6 +1,29 @@
-/* ==========================================================================
-   UTILITES
-   ========================================================================== */
+/* UTILITIES
+=================================================== */
+@utility trim-text-start {
+    text-box: trim-start;
+    /* =JFG. When we have an SVG we probably don't want to text trim, for example in a Markdown field with button controls like Bold, Italic, etc. */
+    &:has(svg) {
+        display: flex;
+    }
+    /* =JFG. Exceptions */
+    /* e.g. for a fieldset, we don't want to trim the text when we have a label like on a collections field, Link Item button */
+    .form-group :has(> &) & {
+        text-box: unset;
+    }
+}
+
+[v-cloak],
+[x-cloak] {
+    display: none;
+}
+
+@utility max-h-screen-px {
+    max-height: calc(100vh - 1px) !important;
+}
+
+/* UTILITIES / STATES
+=================================================== */
 /* Here we typically need a negative outline-offset because of the inner shadow on inputs */
 @utility focus-outline {
     outline-width: var(--focus-outline-width);
@@ -44,7 +67,6 @@
     } */
 }
 
-
 @utility saving-overlay {
     @apply absolute inset-0 z-200 flex items-center rounded-sm;
     background: rgba(255, 255, 255, 0.9);
@@ -68,7 +90,7 @@
     }
 }
 
-/* ARCHIECTURAL LINES
+/* UTILITIES / STATES / DECORATION / ARCHIECTURAL LINES
 =================================================== */
 /* Notes...
 
@@ -139,6 +161,8 @@
     }
 }
 
+/* UTILITIES / STATES / DECORATION / CHECKERBOARD
+=================================================== */
 @utility bg-checkerboard {
     --checkerboard-light: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h12v12H0zm12 12h12v12H12z' fill='%23f3f4f6'/%3E%3C/svg%3E");
     --checkerboard-dark: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h12v12H0zm12 12h12v12H12z' fill='%231f2937'/%3E%3C/svg%3E");
@@ -167,27 +191,4 @@
             background-image: var(--checkerboard-dark);
         }
     }
-}
-
-
-@utility trim-text-start {
-    text-box: trim-start;
-    /* =JFG. When we have an SVG we probably don't want to text trim, for example in a Markdown field with button controls like Bold, Italic, etc. */
-    &:has(svg) {
-        display: flex;
-    }
-    /* =JFG. Exceptions */
-    /* e.g. for a fieldset, we don't want to trim the text when we have a label like on a collections field, Link Item button */
-    .form-group :has(> &) & {
-        text-box: unset;
-    }
-}
-
-[v-cloak],
-[x-cloak] {
-    display: none;
-}
-
-@utility max-h-screen-px {
-    max-height: calc(100vh - 1px) !important;
 }
