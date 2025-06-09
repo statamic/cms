@@ -36,8 +36,8 @@
                     </div>
                 </div>
                 <CodeEditor
+                    ref="codeEditor"
                     :mode="mode"
-                    :modes="modes"
                     :theme="config.theme"
                     :rulers="config.rulers"
                     :disabled="isReadOnly"
@@ -127,6 +127,11 @@ export default {
         },
     },
 
+    mounted() {
+        // CodeMirror needs to be manually refreshed when made visible in the DOM.
+        this.$events.$on('tab-switched', () => this.$refs.codeEditor?.refresh());
+    },
+
     methods: {
         modeUpdated(mode) {
             this.updateDebounced({ code: this.value.code, mode });
@@ -140,5 +145,15 @@ export default {
             this.fullScreenMode = !this.fullScreenMode;
         },
     },
+
+    watch: {
+        fullScreenMode(fullScreenMode) {
+            this.$refs.codeEditor?.codemirror.setOption('fullScreen', fullScreenMode);
+
+            if (! fullScreenMode) {
+                this.$refs.codeEditor.$el.removeAttribute('style');
+            }
+        }
+    }
 };
 </script>

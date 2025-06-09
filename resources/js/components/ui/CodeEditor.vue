@@ -39,43 +39,13 @@ const emit = defineEmits(['update:modelValue', 'focus', 'blur']);
 
 const props = defineProps({
     mode: String,
-    modes: {
-        type: Array,
-        default: () => [
-            { value: 'clike', label: 'C-Like' },
-            { value: 'css', label: 'CSS' },
-            { value: 'diff', label: 'Diff' },
-            { value: 'go', label: 'Go' },
-            { value: 'haml', label: 'HAML' },
-            { value: 'handlebars', label: 'Handlebars' },
-            { value: 'htmlmixed', label: 'HTML' },
-            { value: 'less', label: 'LESS' },
-            { value: 'markdown', label: 'Markdown' },
-            { value: 'gfm', label: 'Markdown (GHF)' },
-            { value: 'nginx', label: 'Nginx' },
-            { value: 'text/x-java', label: 'Java' },
-            { value: 'javascript', label: 'JavaScript' },
-            { value: 'jsx', label: 'JSX' },
-            { value: 'text/x-objectivec', label: 'Objective-C' },
-            { value: 'php', label: 'PHP' },
-            { value: 'python', label: 'Python' },
-            { value: 'ruby', label: 'Ruby' },
-            { value: 'scss', label: 'SCSS' },
-            { value: 'shell', label: 'Shell' },
-            { value: 'sql', label: 'SQL' },
-            { value: 'twig', label: 'Twig' },
-            { value: 'vue', label: 'Vue' },
-            { value: 'xml', label: 'XML' },
-            { value: 'yaml-frontmatter', label: 'YAML Frontmatter' }
-        ],
-    },
     theme: {
         type: String,
         default: 'material',
     },
     rulers: {
-        type: Array,
-        default: () => [],
+        type: Object,
+        default: () => {},
     },
     disabled: Boolean,
     keyMap: {
@@ -101,12 +71,17 @@ const props = defineProps({
     modelValue: String,
 });
 
+const codemirror = ref(null);
+const codemirrorElement = useTemplateRef('codemirror');
+
 defineOptions({
     inheritAttrs: false,
 });
 
-const codemirror = ref(null);
-const codemirrorElement = useTemplateRef('codemirror');
+defineExpose({
+    codemirror,
+    refresh,
+})
 
 onMounted(() => {
     nextTick(() => initCodeMirror());
@@ -120,7 +95,7 @@ function initCodeMirror() {
             direction: document.querySelector('html').getAttribute('dir') ?? 'ltr',
             addModeClass: true,
             keyMap: props.keyMap,
-            tabSize: props.indentSize,
+            tabSize: props.tabSize,
             indentWithTabs: props.indentType !== 'spaces',
             lineNumbers: props.lineNumbers,
             lineWrapping: props.lineWrapping,
@@ -142,27 +117,10 @@ function initCodeMirror() {
     // Refresh to ensure CodeMirror visible and the proper size
     // Most applicable when loaded by another field like Bard
     refresh();
-
-    // todo
-    // codemirror.value.setOption('fullScreen', this.fullScreenMode);
-
-    // if (this.fullScreenMode === false) {
-    //     document.documentElement.removeAttribute('style');
-    // }
-
-    // CodeMirror also needs to be manually refreshed when made visible in the DOM
-    // $events.$on('tab-switched', this.refresh);
-    // todo
-}
-
-function focus() {
-    codemirror.value.focus();
 }
 
 function refresh() {
-    nextTick(() => {
-        codemirror.value.refresh();
-    })
+    nextTick(() => codemirror.value.refresh());
 }
 
 watch(
