@@ -4,20 +4,26 @@
             <Dropdown v-if="container.can_edit || container.can_delete || container.can_create">
                 <DropdownMenu>
                     <DropdownItem
+                        icon="container-add"
                         v-if="canCreateContainers"
                         :text="__('Create Container')"
                         :href="createContainerUrl"
                     />
                     <DropdownItem
+                        icon="edit"
                         v-if="container.can_edit"
                         :text="__('Edit Container')"
                         :href="container.edit_url"
                     />
                     <DropdownItem
+                        icon="blueprint-edit"
                         :text="__('Edit Blueprint')"
                         :href="container.blueprint_url"
                     />
+                    <DropdownSeparator />
                     <DropdownItem
+                        icon="trash"
+                        variant="destructive"
                         v-if="container.can_delete"
                         :text="__('Delete Container')"
                         @click="$event.preventDefault(); $refs.deleter.confirm()"
@@ -197,7 +203,7 @@ import Uploader from '../Uploader.vue';
 import Uploads from '../Uploads.vue';
 import HasActions from '../../data-list/HasActions';
 import { keyBy, sortBy } from 'lodash-es';
-import { Header, Button, ButtonGroup, Dropdown, DropdownItem, DropdownMenu } from '@statamic/ui';
+import { Header, Button, ButtonGroup, Dropdown, DropdownSeparator, DropdownItem, DropdownMenu } from '@statamic/ui';
 import BulkActions from '@statamic/components/data-list/BulkActions.vue';
 
 export default {
@@ -207,6 +213,7 @@ export default {
         DropdownMenu,
         DropdownItem,
         Dropdown,
+        DropdownSeparator,
         AssetThumbnail,
         AssetEditor,
         Uploader,
