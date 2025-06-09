@@ -38,7 +38,10 @@ import 'codemirror/mode/yaml-frontmatter/yaml-frontmatter';
 const emit = defineEmits(['update:modelValue', 'focus', 'blur']);
 
 const props = defineProps({
-    mode: String,
+    mode: {
+        type: String,
+        required: true,
+    },
     theme: {
         type: String,
         default: 'material',
@@ -47,7 +50,10 @@ const props = defineProps({
         type: Object,
         default: () => {},
     },
-    disabled: Boolean,
+    disabled: {
+        type: Boolean,
+        default: false,
+    },
     keyMap: {
         type: String,
         default: 'sublime',
