@@ -81,8 +81,6 @@
                                 <data-list-column-picker v-if="mode === 'table'" :preferences-key="preferencesKey('columns')" />
                             </div>
 
-                            <breadcrumbs v-if="!restrictFolderNavigation" :path="path" @navigated="selectFolder" />
-
                             <uploads
                                 v-if="uploads.length"
                                 :uploads="uploads"
