@@ -5,7 +5,7 @@ import FieldsProvider from './FieldsProvider.vue';
 import Fields from './Fields.vue';
 import ShowField from '@statamic/components/field-conditions/ShowField.js';
 import { injectContainerContext } from './Container.vue';
-import renderMarkdown from '@statamic/util/markdown.js';
+import markdown from '@statamic/util/markdown.js';
 
 const { blueprint, store } = injectContainerContext();
 const tab = injectTabContext();
@@ -17,7 +17,7 @@ const visibleSections = sections.filter(section => {
 });
 
 function renderInstructions(instructions) {
-    return instructions ? renderMarkdown(instructions) : '';
+    return instructions ? markdown(instructions, { openLinksInNewTabs: true }) : '';
 }
 </script>
 

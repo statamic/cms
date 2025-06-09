@@ -1,17 +1,15 @@
 import { marked } from 'marked';
 
-export default function renderMarkdown(markdown) {
-    let renderer = new marked.Renderer();
+export default function (markdown, options = {}) {
+    const renderer = new marked.Renderer();
 
-    renderer.link = function (href, title, text) {
-        let link = marked.Renderer.prototype.link.call(this, href, title, text);
+    if (options.openLinksInNewTabs) {
+        renderer.link = function(href, title, text) {
+            return marked.Renderer.prototype.link
+                .call(this, href, title, text)
+                .replace("<a", "<a target='_blank' ");
+        };
+    }
 
-        return link.replace("<a","<a target='_blank' ");
-    };
-
-    marked.setOptions({
-        renderer: renderer
-    });
-
-    return marked(markdown);
+    return marked.parse(markdown, { renderer });
 }
