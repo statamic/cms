@@ -65,9 +65,7 @@ onMounted(() => {
     });
 });
 
-onUnmounted(() => {
-    saveKeyBinding.destroy();
-});
+onUnmounted(() => saveKeyBinding.destroy());
 </script>
 
 <template>
