@@ -96,15 +96,15 @@
         /* e.g. the blueprint configuration */
         &.dark {
             @apply rounded-full bg-gray-900 px-4 shadow-lg;
-        
+
             button {
-                @apply mx-0.5 my-0 flex h-8 w-8 items-center justify-center rounded-sm bg-transparent px-1 text-center text-base text-gray-700;
+                @apply mx-0.5 my-0 flex h-8 w-8 items-center justify-center rounded-sm bg-transparent px-1 text-center text-base text-gray-500;
                 svg {
                     @apply h-4 w-auto;
                 }
             }
-        
-            button.active {
+
+            button.active svg {
                 @apply text-white;
             }
         }
