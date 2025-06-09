@@ -33,6 +33,7 @@ import Permission from '../components/Permission';
 import autosize from 'autosize';
 import DateFormatter from '@statamic/components/DateFormatter.js';
 import wait from '@statamic/util/wait.js';
+import markdown from '@statamic/util/markdown.js';
 
 let bootingCallbacks = [];
 let bootedCallbacks = [];
@@ -187,8 +188,8 @@ export default {
             __n(key, number, replacements) {
                 return __n(key, number, replacements);
             },
-            $markdown(value) {
-                return markdown(value);
+            $markdown(value, options = {}) {
+                return markdown(value, options);
             },
             cp_url(url) {
                 return cp_url(url);
