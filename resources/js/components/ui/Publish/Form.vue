@@ -56,10 +56,10 @@ function save() {
         });
 }
 
-const saveKeyBinding = ref(null);
+let saveKeyBinding;
 
 onMounted(() => {
-    Statamic.$keys.bindGlobal(['mod+s'], (e) => {
+    saveKeyBinding = Statamic.$keys.bindGlobal(['mod+s'], (e) => {
         e.preventDefault();
         save();
     });
