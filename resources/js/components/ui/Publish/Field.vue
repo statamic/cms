@@ -72,7 +72,17 @@ const shouldShowField = computed(() => {
     return new ShowField(store, values.value, extraValues.value).showField(props.config, fullPath.value);
 });
 
-const shouldShowLabel = computed(() => !props.config.hide_display);
+const shouldShowLabelText = computed(() => !props.config.hide_display);
+
+const shouldShowLabel = computed(
+    () =>
+        shouldShowLabelText.value || // Need to see the text
+        isReadOnly.value || // Need to see the "Read Only" text
+        isRequired.value || // Need to see the asterisk
+        isLocked.value || // Need to see the avatar
+        isLocalizable.value || // Need to see the icon
+        isSyncable.value, // Need to see the icon
+);
 
 const isLocalizable = computed(() => props.config.localizable);
 
@@ -107,7 +117,7 @@ function desync() {
     >
         <template #label>
             <Label v-if="shouldShowLabel" :for="fieldId" :required="isRequired">
-                {{ __(config.display) }}
+                <template v-if="shouldShowLabelText">{{ __(config.display) }}</template>
                 <button v-if="!isReadOnly && isSyncable" v-show="isSynced" @click="desync">
                     <Tooltip :text="__('messages.field_synced_with_origin')">
                         <Icon name="synced" class="text-gray-400" />
