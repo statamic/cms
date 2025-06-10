@@ -263,14 +263,14 @@ function pushTaggableOption(e) {
                         @paste.prevent="onPaste"
                         @keydown.enter.prevent="pushTaggableOption"
                     />
-                    <div v-else-if="!searchable && (dropdownOpen || !modelValue)">
+                    <button type="button" v-else-if="!searchable && (dropdownOpen || !modelValue)">
                         <span class="text-gray-400 dark:text-gray-500" v-text="placeholder" />
-                    </div>
-                    <div v-else class="cursor-pointer">
+                    </button>
+                    <button type="button" v-else class="cursor-pointer">
                         <slot name="selected-option" v-bind="{ option: selectedOption }">
                             <span v-text="getOptionLabel(selectedOption)" />
                         </slot>
-                    </div>
+                    </button>
                 </ComboboxTrigger>
                 <div class="flex items-center">
                     <Button icon="x" variant="filled" size="xs" round v-if="clearable && modelValue" @click="clear" />
