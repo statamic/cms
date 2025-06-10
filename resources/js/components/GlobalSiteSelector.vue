@@ -10,7 +10,7 @@
         >
             <template #selected-option="{ option }">
                 <div
-                    class="anti flex items-center px-2 text-sm text-gray hover:text-gray-800 dark:text-dark-100 dark:hover:text-dark-175"
+                    class="anti flex items-center text-sm text-gray hover:text-gray-800 dark:text-dark-100 dark:hover:text-dark-175"
                 >
                     <svg-icon name="light/sites" class="h-4 w-4 ltr:mr-2 rtl:ml-2" />
                     <div class="whitespace-nowrap">{{ __(option.name) }}</div>

@@ -43,12 +43,12 @@ defineOptions({
 const attrs = useAttrs();
 
 const anchorClasses = cva({
-    base: 'focus-within:focus-outline w-full flex items-center justify-between border border-gray-300 dark:border-b-0 dark:ring-3 dark:ring-gray-900 dark:border-white/15 text-gray-800 dark:text-gray-300 antialiased appearance-none shadow-ui-sm dark:shadow-md',
+    base: 'focus-within:focus-outline w-full flex items-center justify-between gap-2 border border-gray-300 dark:border-b-0 dark:ring-3 dark:ring-gray-900 dark:border-white/15 text-gray-800 dark:text-gray-300 antialiased appearance-none shadow-ui-sm dark:shadow-md',
     variants: {
         size: {
-            base: 'text-base rounded-lg ps-3 py-2 h-10 leading-[1.375rem]',
-            sm: 'text-sm rounded-md ps-2.5 py-1.5 h-8 leading-[1.125rem]',
-            xs: 'text-xs rounded-xs ps-2 py-1.5 h-6 leading-[1.125rem]',
+            base: 'text-base rounded-lg ps-3 pe-2.5 py-2 h-10 leading-[1.375rem]',
+            sm: 'text-sm rounded-md ps-2.5 pe-2 py-1.5 h-7 leading-[1.125rem]',
+            xs: 'text-xs rounded-xs ps-2 pe-1.5 py-1.5 h-6 leading-[1.125rem]',
         },
         flat: {
             true: 'shadow-none',
@@ -263,7 +263,7 @@ function pushTaggableOption(e) {
                         </slot>
                     </div>
                 </ComboboxTrigger>
-                <div class="flex items-center space-x-2 px-2">
+                <div class="flex items-center">
                     <Button icon="x" variant="filled" size="xs" round v-if="clearable && modelValue" @click="clear" />
                     <ComboboxTrigger class="flex items-center">
                         <Icon name="ui/chevron-down" />
