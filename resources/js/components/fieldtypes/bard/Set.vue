@@ -1,5 +1,20 @@
 <template>
     <node-view-wrapper>
+        <Motion
+            layout
+            class="flex justify-center py-3 relative group"
+            :initial="{ paddingTop: '0.75rem', paddingBottom: '0.75rem' }"
+            :hover="{ paddingTop: '1.25rem', paddingBottom: '1.25rem' }"
+            :transition="{ duration: 0.2 }"
+        >
+            <div v-if="showConnector" class="absolute group-hover:opacity-0 transition-opacity delay-25 duration-125 inset-y-0 h-full left-3.5 border-l-1 border-gray-400 dark:border-gray-600 border-dashed z-0 dark:bg-dark-700" />
+            <button class="w-full absolute inset-0 h-full opacity-0 group-hover:opacity-100 transition-opacity delay-25 duration-75 cursor-pointer" @click="addSetButtonClicked">
+                <div class="h-full flex flex-col justify-center">
+                    <div class="rounded-full bg-gray-200 h-2" />
+                </div>
+            </button>
+            <Button v-if="enabled" @click="addSetButtonClicked" round icon="plus" size="sm" class="-my-4 z-3 opacity-0 group-hover:opacity-100 transition-opacity delay-25 duration-75" />
+        </Motion>
         <div
             class="shadow-ui-sm relative z-2 w-full rounded-lg border border-gray-200 bg-white text-base dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
             :class="{
@@ -105,16 +120,17 @@ import Fields from '@statamic/components/ui/Publish/Fields.vue';
 import { within } from '@popperjs/core/lib/utils/within.js';
 
 export default {
-    props: [
-        'editor', // the editor instance
-        'node', // access the current node
-        'decorations', // an array of decorations
-        'selected', // true when there is a NodeSelection at the current node view
-        'extension', // access to the node extension, for example to get options
-        'getPos', // get the document position of the current node
-        'updateAttributes', // update attributes of the current node.
-        'deleteNode', // delete the current node
-    ],
+    props: {
+        editor: { type: Object, required: true },
+        node: { type: Object, required: true },
+        decorations: { type: Array, required: true },
+        selected: { type: Boolean, required: true },
+        extension: { type: Object, required: true },
+        getPos: { type: Function, required: true },
+        updateAttributes: { type: Function, required: true },
+        deleteNode: { type: Function, required: true },
+        showConnector: { type: Boolean, default: true },
+    },
 
     components: {
         Button,

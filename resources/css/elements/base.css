@@ -20,10 +20,10 @@
     --z-index-max: 9999;
 }
 
-/* FOCUS STATES 
+/* FOCUS STATES
 =================================================== */
 @layer base {
-    /* (Except the focus-within class will handle the focus outline target instead) */
+    /* (Except where the focus-within class will handle the focus outline target instead) */
     :not([class*='focus-within'] *) {
         :focus-visible& {
             outline-width: var(--focus-outline-width);

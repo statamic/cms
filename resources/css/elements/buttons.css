@@ -333,7 +333,7 @@ td .btn-icon {
 }
 
 .btn-quick-action {
-    @apply inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full p-0 text-center text-xl leading-none text-gray-600 outline-hidden dark:text-dark-150;
+    @apply inline-flex size-8 shrink-0 items-center justify-center rounded-full p-0 text-center text-xl leading-none text-gray-600 outline-hidden dark:text-dark-150;
 
     &:hover {
         @apply hover:bg-gray-400/10 dark:bg-dark-700;

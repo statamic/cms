@@ -85,7 +85,7 @@
         }
         button,
         a {
-            @apply flex shrink-0 rounded-full p-1.5 text-gray-800 dark:text-dark-100;
+            @apply flex shrink-0 rounded-full text-gray-800 dark:text-dark-100;
             &:hover {
                 @apply text-white;
             }

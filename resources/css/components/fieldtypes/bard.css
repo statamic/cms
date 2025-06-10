@@ -3,10 +3,6 @@
 @layer ui {
     .bard-fieldtype {
         @apply relative rounded-xl border outline-hidden dark:border-dark-900;
-
-        * {
-            outline: none;
-        }
     }
 }
 /* BARD / EDITOR
@@ -22,9 +18,6 @@
             @apply min-h-40 p-2 text-sm leading-tight;
             @apply text-sm leading-normal @md/bard:p-2;
             @apply @lg/bard:p-4;
-            &:focus {
-                @apply focus-outline;
-            }
         }
         .bard-error {
             @apply whitespace-nowrap bg-red-100 p-2 text-xs text-red-500 @lg:px-4;
@@ -96,15 +89,15 @@
         /* e.g. the blueprint configuration */
         &.dark {
             @apply rounded-full bg-gray-900 px-4 shadow-lg;
-        
+
             button {
-                @apply mx-0.5 my-0 flex h-8 w-8 items-center justify-center rounded-sm bg-transparent px-1 text-center text-base text-gray-700;
+                @apply mx-0.5 my-0 flex h-8 w-8 items-center justify-center rounded-sm bg-transparent px-1 text-center text-base text-gray-500;
                 svg {
                     @apply h-4 w-auto;
                 }
             }
-        
-            button.active {
+
+            button.active svg {
                 @apply text-white;
             }
         }
@@ -274,10 +267,6 @@
         & > .bard-editor > div > .ProseMirror {
             @apply px-6 py-16;
             min-height: calc(100vh - 120px);
-
-            &:focus {
-                @apply ring-0;
-            }
         }
 
         .bard-content:not(.bard-set *) > {
