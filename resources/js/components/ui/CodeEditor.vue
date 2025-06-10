@@ -2,6 +2,7 @@
 import CodeMirror from 'codemirror';
 import { computed, markRaw, nextTick, onMounted, ref, useAttrs, useTemplateRef, watch } from 'vue';
 import ElementContainer from '@statamic/components/ElementContainer.vue';
+import { Select } from '@statamic/ui';
 
 // Addons
 import 'codemirror/addon/edit/matchbrackets';
@@ -35,13 +36,9 @@ import 'codemirror/mode/xml/xml';
 import 'codemirror/mode/yaml/yaml';
 import 'codemirror/mode/yaml-frontmatter/yaml-frontmatter';
 
-const emit = defineEmits(['update:modelValue', 'focus', 'blur']);
+const emit = defineEmits(['update:mode', 'update:code', 'focus', 'blur']);
 
 const props = defineProps({
-    mode: {
-        type: String,
-        required: true,
-    },
     theme: {
         type: String,
         default: 'material',
@@ -74,18 +71,50 @@ const props = defineProps({
         type: Boolean,
         default: true,
     },
-    modelValue: String,
+    allowModeSelection: {
+        type: Boolean,
+        default: true,
+    },
+    mode: String,
+    code: String,
 });
 
+const modes = ref([
+    { value: 'clike', label: 'C-Like' },
+    { value: 'css', label: 'CSS' },
+    { value: 'diff', label: 'Diff' },
+    { value: 'go', label: 'Go' },
+    { value: 'haml', label: 'HAML' },
+    { value: 'handlebars', label: 'Handlebars' },
+    { value: 'htmlmixed', label: 'HTML' },
+    { value: 'less', label: 'LESS' },
+    { value: 'markdown', label: 'Markdown' },
+    { value: 'gfm', label: 'Markdown (GHF)' },
+    { value: 'nginx', label: 'Nginx' },
+    { value: 'text/x-java', label: 'Java' },
+    { value: 'javascript', label: 'JavaScript' },
+    { value: 'jsx', label: 'JSX' },
+    { value: 'text/x-objectivec', label: 'Objective-C' },
+    { value: 'php', label: 'PHP' },
+    { value: 'python', label: 'Python' },
+    { value: 'ruby', label: 'Ruby' },
+    { value: 'scss', label: 'SCSS' },
+    { value: 'shell', label: 'Shell' },
+    { value: 'sql', label: 'SQL' },
+    { value: 'twig', label: 'Twig' },
+    { value: 'vue', label: 'Vue' },
+    { value: 'xml', label: 'XML' },
+    { value: 'yaml-frontmatter', label: 'YAML' },
+]);
+
 const codemirror = ref(null);
-const codemirrorElement = useTemplateRef('codemirror');
+const codemirrorElement = useTemplateRef('codemirrorElement');
 
 defineOptions({
     inheritAttrs: false,
 });
 
 defineExpose({
-    codemirror,
     refresh,
 })
 
@@ -96,7 +125,7 @@ onMounted(() => {
 function initCodeMirror() {
     codemirror.value = markRaw(
         CodeMirror(codemirrorElement.value, {
-            value: props.modelValue || '',
+            value: props.code || '',
             mode: props.mode,
             direction: document.querySelector('html').getAttribute('dir') ?? 'ltr',
             addModeClass: true,
@@ -114,7 +143,7 @@ function initCodeMirror() {
     );
 
     codemirror.value.on('change', (cm) => {
-        emit('update:modelValue', cm.doc.getValue());
+        emit('update:code', cm.doc.getValue());
     });
 
     codemirror.value.on('focus', () => emit('focus'));
@@ -130,17 +159,17 @@ function refresh() {
 }
 
 watch(
-    () => props.mode,
+    () => props.disabled,
     (value) => {
-        codemirror.value?.setOption('mode', value);
+        codemirror.value?.setOption('readOnly', value ? 'nocursor' : false);
     },
     { immediate: true }
 );
 
 watch(
-    () => props.disabled,
+    () => props.mode,
     (value) => {
-        codemirror.value?.setOption('readOnly', value ? 'nocursor' : false);
+        codemirror.value?.setOption('mode', value);
     },
     { immediate: true }
 );
@@ -156,8 +185,16 @@ watch(
     { immediate: true }
 );
 
+const modeLabel = computed(() => {
+    return modes.find((m) => m.value === props.mode)?.label || props.mode;
+});
+
 const exactTheme = computed(() => {
     return props.theme === 'light' ? 'default' : 'material';
+});
+
+const themeClass = computed(() => {
+    return `theme-${props.theme}`;
 });
 
 const rulers = computed(() => {
@@ -177,10 +214,65 @@ const rulers = computed(() => {
         };
     });
 });
+
+const fullScreenMode = ref(false);
+
+function toggleFullscreen() {
+    fullScreenMode.value = !fullScreenMode.value;
+}
+
+watch(
+    () => fullScreenMode.value,
+    (fullScreenMode) => {
+        codemirror.value.setOption('fullScreen', fullScreenMode);
+
+        if (!fullScreenMode) {
+            codemirrorElement.value.removeAttribute('style');
+        }
+    }
+)
 </script>
 
 <template>
-    <ElementContainer @resized="refresh">
-        <div ref="codemirror"></div>
-    </ElementContainer>
+    <portal name="code-fullscreen" :disabled="!fullScreenMode" target-class="code-fieldtype">
+        <div class="code-fieldtype-container" :class="[themeClass, { 'code-fullscreen': fullScreenMode }]">
+            <publish-field-fullscreen-header
+                v-if="fullScreenMode"
+                :title="config.display"
+                :field-actions="fieldActions"
+                @close="toggleFullscreen"
+            >
+                <div class="code-fieldtype-toolbar-fullscreen">
+                    <div>
+                        <Select
+                            class="w-32"
+                            v-if="allowModeSelection"
+                            :options="modes"
+                            :disabled="disabled"
+                            :model-value="mode"
+                            @update:modelValue="$emit('update:mode', $event)"
+                        />
+                        <div v-else v-text="modeLabel" class="font-mono text-xs text-gray-700"></div>
+                    </div>
+                </div>
+            </publish-field-fullscreen-header>
+            <div class="code-fieldtype-toolbar" v-if="!fullScreenMode">
+                <div>
+                    <Select
+                        class="w-32"
+                        v-if="allowModeSelection"
+                        :options="modes"
+                        :disabled="disabled"
+                        :model-value="mode"
+                        @update:modelValue="$emit('update:mode', $event)"
+                    />
+
+                    <div v-else v-text="modeLabel" class="font-mono text-xs text-gray-700"></div>
+                </div>
+            </div>
+            <ElementContainer @resized="refresh">
+                <div ref="codemirrorElement"></div>
+            </ElementContainer>
+        </div>
+    </portal>
 </template>
