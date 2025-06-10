@@ -244,7 +244,7 @@ function pushTaggableOption(e) {
             @update:model-value="updateModelValue"
         >
             <ComboboxAnchor :class="[anchorClasses, $attrs.class]" data-ui-combobox-anchor>
-                <ComboboxTrigger as="div" class="min-h-full w-full">
+                <ComboboxTrigger as="div" class="min-h-full w-full flex items-center">
                     <ComboboxInput
                         v-if="searchable && (dropdownOpen || !modelValue || (multiple && placeholder))"
                         ref="input"
