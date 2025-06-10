@@ -75,6 +75,10 @@ const props = defineProps({
         type: Boolean,
         default: true,
     },
+    showModeLabel: {
+        type: Boolean,
+        default: true,
+    },
     mode: String,
     modelValue: String,
     title: {
@@ -226,6 +230,10 @@ const rulers = computed(() => {
     });
 });
 
+const showToolbar = computed(() => {
+    return props.allowModeSelection || props.showModeLabel;
+});
+
 function toggleFullscreen() {
     fullScreenMode.value = !fullScreenMode.value;
 }
@@ -269,11 +277,11 @@ watch(
                     :model-value="mode"
                     @update:modelValue="$emit('update:mode', $event)"
                 />
-                <div v-else v-text="modeLabel" class="font-mono text-xs text-gray-700"></div>
+                <div v-else-if="showModeLabel" v-text="modeLabel" class="font-mono text-xs text-gray-700"></div>
             </publish-field-fullscreen-header>
             <div
                 class="flex items-center justify-between rounded-t-xl border-b border-gray-300 bg-gray-50 px-2 py-1 dark:border-white/15 dark:bg-gray-950"
-                v-if="!fullScreenMode"
+                v-if="showToolbar"
             >
                 <div>
                     <Select
