@@ -90,7 +90,7 @@ class AssetUploader extends Uploader
             '*' => '-',
             '%' => '-',
             "'" => '-',
-            "--" => '-',
+            '--' => '-',
         ];
 
         return (string) Str::of(urldecode($string))
