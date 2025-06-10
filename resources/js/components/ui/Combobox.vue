@@ -192,9 +192,40 @@ function deselect(option) {
 
 const dropdownOpen = ref(false);
 
+function updateDropdownOpen(open) {
+    // Prevent dropdown from opening when it's a taggable combobox with no options.
+    if (props.taggable && props.options.length === 0) {
+        return;
+    }
+
+    dropdownOpen.value = open;
+}
+
 function updateModelValue(value) {
     searchQuery.value = '';
     emit('update:modelValue', value);
+}
+
+function onPaste(e) {
+    if (!props.taggable) {
+        return;
+    }
+
+    const pastedValue = e.clipboardData.getData('text');
+
+    updateModelValue([...props.modelValue, ...pastedValue.split(',').map((v) => v.trim())]);
+}
+
+// When it's a taggable combobox with no options, we need to push the value here as updateModelValue won't be called.
+function pushTaggableOption(e) {
+    if (props.taggable && props.options.length === 0) {
+        if (props.modelValue.includes(e.target.value)) {
+            searchQuery.value = '';
+            return;
+        }
+
+        updateModelValue([...props.modelValue, e.target.value]);
+    }
 }
 </script>
 
@@ -207,18 +238,21 @@ function updateModelValue(value) {
             :reset-search-term-on-blur="false"
             :reset-search-term-on-select="false"
             :disabled="disabled || (multiple && limitReached)"
-            v-model:open="dropdownOpen"
+            :open="dropdownOpen"
             :model-value="modelValue"
+            @update:open="updateDropdownOpen"
             @update:model-value="updateModelValue"
         >
             <ComboboxAnchor :class="[anchorClasses, $attrs.class]" data-ui-combobox-anchor>
                 <ComboboxTrigger as="div" class="min-h-full w-full">
                     <ComboboxInput
-                        v-if="searchable && (dropdownOpen || !modelValue)"
+                        v-if="searchable && (dropdownOpen || !modelValue || (multiple && placeholder))"
                         ref="input"
                         class="w-full text-gray-700 opacity-100 focus:outline-none"
                         v-model="searchQuery"
                         :placeholder
+                        @paste.prevent="onPaste"
+                        @keydown.enter.prevent="pushTaggableOption"
                     />
                     <div v-else-if="!searchable && (dropdownOpen || !modelValue)">
                         <span class="text-gray-400 dark:text-gray-600" v-text="placeholder" />
