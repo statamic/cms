@@ -19,12 +19,12 @@
                     >
                         <svg-icon name="folder-image" class="h-5 w-5 text-gray-700 dark:text-dark-175" />
                         <span
-                            class="text-sm text-gray-800 group-hover:text-blue dark:text-dark-150 dark:group-hover:text-dark-100 ltr:ml-2 rtl:mr-2"
+                            class="text-sm text-gray-800 group-hover:text-blue-600 dark:text-dark-150 dark:group-hover:text-dark-100 ltr:ml-2 rtl:mr-2"
                             >{{ asset.path }}</span
                         >
                         <svg-icon
                             name="micro/chevron-right"
-                            class="h-5 w-5 text-gray-700 group-hover:text-blue dark:text-dark-175 dark:group-hover:text-dark-100 rtl:rotate-180"
+                            class="h-5 w-5 text-gray-700 group-hover:text-blue-600 dark:text-dark-175 dark:group-hover:text-dark-100 rtl:rotate-180"
                         />
                     </button>
                     <button

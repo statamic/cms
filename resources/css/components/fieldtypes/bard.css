@@ -330,7 +330,7 @@
             }
 
             a {
-                @apply break-words text-blue underline dark:text-dark-blue-100;
+                @apply break-words text-blue-600 underline dark:text-dark-blue-100;
             }
 
             a:active,
@@ -392,7 +392,7 @@
             }
 
             a {
-                @apply break-words text-blue underline dark:text-dark-blue-100;
+                @apply break-words text-blue-600 underline dark:text-dark-blue-100;
             }
 
             a:active,
@@ -543,7 +543,7 @@
             }
 
             a {
-                @apply break-words text-blue underline dark:text-dark-blue-100;
+                @apply break-words text-blue-600 underline dark:text-dark-blue-100;
             }
 
             a:active,

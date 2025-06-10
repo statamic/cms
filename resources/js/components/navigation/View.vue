@@ -10,7 +10,7 @@
 
                 <a
                     @click="$refs.tree.cancel"
-                    class="text-2xs text-blue underline ltr:mr-4 rtl:ml-4"
+                    class="text-2xs text-blue-600 underline ltr:mr-4 rtl:ml-4"
                     v-if="isDirty"
                     v-text="__('Discard changes')"
                 />
@@ -83,7 +83,7 @@
                                 class="h-8 w-8 text-gray-800 dark:text-dark-175 ltr:mr-4 rtl:ml-4"
                             />
                             <div class="mb-4 flex-1 md:mb-0 md:ltr:mr-6 md:rtl:ml-6">
-                                <h3 class="mb-2 text-blue dark:text-blue-600">
+                                <h3 class="mb-2 text-blue-600 dark:text-blue-600">
                                     {{ __('Configure Navigation') }}
                                     <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span>
                                 </h3>
@@ -99,7 +99,7 @@
                                 class="h-8 w-8 text-gray-800 dark:text-dark-175 ltr:mr-4 rtl:ml-4"
                             />
                             <div class="mb-4 flex-1 md:mb-0 md:ltr:mr-6 md:rtl:ml-6">
-                                <h3 class="mb-2 text-blue dark:text-blue-600">
+                                <h3 class="mb-2 text-blue-600 dark:text-blue-600">
                                     {{ __('Link to URL') }}
                                     <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span>
                                 </h3>
@@ -116,7 +116,7 @@
                                 class="h-8 w-8 text-gray-800 dark:text-dark-175 ltr:mr-4 rtl:ml-4"
                             />
                             <div class="mb-4 flex-1 md:mb-0 md:ltr:mr-6 md:rtl:ml-6">
-                                <h3 class="mb-2 text-blue dark:text-blue-600">
+                                <h3 class="mb-2 text-blue-600 dark:text-blue-600">
                                     {{ __('Link to Entry') }}
                                     <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span>
                                 </h3>
@@ -132,7 +132,7 @@
                                 class="h-8 w-8 text-gray-800 dark:text-dark-175 ltr:mr-4 rtl:ml-4"
                             />
                             <div class="mb-4 flex-1 md:mb-0 md:ltr:mr-6 md:rtl:ml-6">
-                                <h3 class="mb-2 text-blue dark:text-blue-600">
+                                <h3 class="mb-2 text-blue-600 dark:text-blue-600">
                                     {{ __('Read the Documentation') }}
                                     <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span>
                                 </h3>

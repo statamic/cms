@@ -67,7 +67,7 @@
                     <a
                         :href="editEntryUrl"
                         target="_blank"
-                        class="flex items-center justify-center text-xs text-blue underline hover:text-blue ltr:mr-4 rtl:ml-4"
+                        class="flex items-center justify-center text-xs text-blue-600 underline hover:text-blue-600 ltr:mr-4 rtl:ml-4"
                     >
                         <svg-icon name="light/external-link" class="h-4 w-4 ltr:mr-2 rtl:ml-2" />
                         {{ __('Edit Entry') }}

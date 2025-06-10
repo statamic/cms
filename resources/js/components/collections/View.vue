@@ -26,7 +26,7 @@
 
             <template v-if="view === 'tree'">
                 <a
-                    class="text-2xs text-blue underline ltr:mr-4 rtl:ml-4"
+                    class="text-2xs text-blue-600 underline ltr:mr-4 rtl:ml-4"
                     v-if="treeIsDirty"
                     v-text="__('Discard changes')"
                     @click="cancelTreeProgress"
