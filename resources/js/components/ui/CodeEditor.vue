@@ -186,7 +186,7 @@ watch(
 );
 
 const modeLabel = computed(() => {
-    return modes.find((m) => m.value === props.mode)?.label || props.mode;
+    return modes.value.find((m) => m.value === props.mode)?.label || props.mode;
 });
 
 const exactTheme = computed(() => {
