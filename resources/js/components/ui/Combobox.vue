@@ -34,6 +34,7 @@ const props = defineProps({
     ignoreFilter: { type: Boolean, default: false },
     options: { type: Array, default: null },
     flat: { type: Boolean, default: false },
+    buttonAppearance: { type: Boolean, default: true },
 });
 
 defineOptions({
@@ -43,7 +44,7 @@ defineOptions({
 const attrs = useAttrs();
 
 const anchorClasses = cva({
-    base: 'focus-within:focus-outline w-full flex items-center justify-between gap-2 border border-gray-300 dark:border-b-0 dark:ring-3 dark:ring-gray-900 dark:border-white/15 text-gray-800 dark:text-gray-300 antialiased appearance-none shadow-ui-sm dark:shadow-md',
+    base: 'focus-within:focus-outline w-full flex items-center justify-between gap-2 text-gray-800 dark:text-gray-300 antialiased appearance-none',
     variants: {
         size: {
             base: 'text-base rounded-lg ps-3 pe-2.5 py-2 h-10 leading-[1.375rem]',
@@ -54,8 +55,16 @@ const anchorClasses = cva({
             true: 'shadow-none',
             false: 'bg-linear-to-b from-white to-gray-50 hover:to-gray-100 dark:from-gray-800/30 dark:to-gray-800 dark:hover:to-gray-850 shadow-ui-sm',
         },
+        buttonAppearance: {
+            true: 'border border-gray-300 dark:border-b-0 dark:ring-3 dark:ring-gray-900 dark:border-white/15 shadow-ui-sm dark:shadow-md',
+            false: '',
+        },
     },
-})({ ...props });
+})({ 
+    size: props.size,
+    flat: props.flat,
+    buttonAppearance: props.buttonAppearance
+});
 
 const itemClasses = cva({
     base: [
@@ -255,7 +264,7 @@ function pushTaggableOption(e) {
                         @keydown.enter.prevent="pushTaggableOption"
                     />
                     <div v-else-if="!searchable && (dropdownOpen || !modelValue)">
-                        <span class="text-gray-400 dark:text-gray-600" v-text="placeholder" />
+                        <span class="text-gray-400 dark:text-gray-500" v-text="placeholder" />
                     </div>
                     <div v-else class="cursor-pointer">
                         <slot name="selected-option" v-bind="{ option: selectedOption }">
