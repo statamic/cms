@@ -20,6 +20,10 @@ const fieldtypeComponent = computed(() => {
     return `${props.config.component || props.config.type}-fieldtype`;
 });
 
+const fieldtypeComponentExists = computed(() => {
+    return Statamic.$app.component(fieldtypeComponent.value) !== undefined;
+});
+
 const fullPath = computed(() => [fieldPathPrefix, handle].filter(Boolean).join('.'));
 const metaFullPath = computed(() => [metaPathPrefix, handle].filter(Boolean).join('.'));
 const value = computed(() => data_get(store.values, fullPath.value));
@@ -133,7 +137,11 @@ function desync() {
         <template #actions>
             <publish-field-actions v-if="fieldActions?.length" :actions="fieldActions" />
         </template>
+        <div class="text-xs text-red-500" v-if="!fieldtypeComponentExists">
+            Component <code v-text="fieldtypeComponent"></code> does not exist.
+        </div>
         <Component
+            v-else
             ref="fieldtype"
             :is="fieldtypeComponent"
             :id="fieldId"
