@@ -63,7 +63,7 @@
         <div><command-palette /></div>
         <ui-button
             icon="visit-website"
-            class="[&_svg]:size-5 -me-3"
+            class="[&_svg]:size-4 -me-3"
             variant="ghost"
             href="{{ Statamic\Facades\Site::selected()->url() }}"
             target="_blank"
