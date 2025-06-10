@@ -12,6 +12,8 @@
         :allow-mode-selection="config.mode_selectable"
         :mode="mode"
         :model-value="value.code"
+        :title="config.display"
+        :field-actions="fieldActions"
         @update:mode="modeUpdated"
         @update:model-value="codeUpdated"
     />
@@ -41,10 +43,10 @@ export default {
             return [
                 {
                     title: __('Toggle Fullscreen Mode'),
-                    icon: ({ vm }) => (vm.fullScreenMode ? 'shrink-all' : 'expand-bold'),
+                    icon: ({ vm }) => (vm.$refs.codeEditor.fullScreenMode ? 'shrink-all' : 'expand-bold'),
                     quick: true,
                     visibleWhenReadOnly: true,
-                    run: this.toggleFullscreen,
+                    run: ({ vm }) => vm.$refs.codeEditor.toggleFullscreen(),
                 },
             ];
         },

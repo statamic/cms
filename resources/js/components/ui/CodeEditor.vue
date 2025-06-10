@@ -77,6 +77,14 @@ const props = defineProps({
     },
     mode: String,
     modelValue: String,
+    title: {
+        type: String,
+        default: () => __('Code Editor'),
+    },
+    fieldActions: {
+        type: Array,
+        default: () => [],
+    },
 });
 
 const modes = ref([
@@ -109,6 +117,7 @@ const modes = ref([
 
 const codemirror = ref(null);
 const codemirrorElement = useTemplateRef('codemirrorElement');
+const fullScreenMode = ref(false);
 
 defineOptions({
     inheritAttrs: false,
@@ -116,6 +125,8 @@ defineOptions({
 
 defineExpose({
     refresh,
+    toggleFullscreen,
+    fullScreenMode,
 });
 
 onMounted(() => {
@@ -215,8 +226,6 @@ const rulers = computed(() => {
     });
 });
 
-const fullScreenMode = ref(false);
-
 function toggleFullscreen() {
     fullScreenMode.value = !fullScreenMode.value;
 }
@@ -238,40 +247,39 @@ watch(
         <div class="code-fieldtype-container" :class="[themeClass, { 'code-fullscreen': fullScreenMode }]">
             <publish-field-fullscreen-header
                 v-if="fullScreenMode"
-                :title="config.display"
+                :title="title"
                 :field-actions="fieldActions"
                 @close="toggleFullscreen"
             >
-                <div class="code-fieldtype-toolbar-fullscreen">
-                    <div>
-                        <Select
-                            class="w-32"
-                            v-if="allowModeSelection"
-                            :options="modes"
-                            :disabled="disabled"
-                            :model-value="mode"
-                            @update:modelValue="$emit('update:mode', $event)"
-                        />
-                        <div v-else v-text="modeLabel" class="font-mono text-xs text-gray-700"></div>
-                    </div>
-                </div>
+                <Select
+                    class="w-32"
+                    size="sm"
+                    v-if="allowModeSelection"
+                    :options="modes"
+                    :disabled="disabled"
+                    :model-value="mode"
+                    @update:modelValue="$emit('update:mode', $event)"
+                />
+                <div v-else v-text="modeLabel" class="font-mono text-xs text-gray-700"></div>
             </publish-field-fullscreen-header>
             <div class="code-fieldtype-toolbar" v-if="!fullScreenMode">
                 <div>
                     <Select
                         class="w-32"
+                        size="xs"
                         v-if="allowModeSelection"
                         :options="modes"
                         :disabled="disabled"
                         :model-value="mode"
+                        searchable
                         @update:modelValue="$emit('update:mode', $event)"
                     />
 
-                    <div v-else v-text="modeLabel" class="font-mono text-xs text-gray-700"></div>
+                    <span v-else v-text="modeLabel" class="font-mono text-xs text-gray-700" />
                 </div>
             </div>
             <ElementContainer @resized="refresh">
-                <div ref="codemirrorElement"></div>
+                <div ref="codemirrorElement" class="font-mono text-sm"></div>
             </ElementContainer>
         </div>
     </portal>
