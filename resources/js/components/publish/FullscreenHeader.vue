@@ -26,7 +26,7 @@
                 v-tooltip="action.title"
                 @click="action.run()"
             >
-                <svg-icon :name="action.icon" class="h-4 w-4 fill-gray-600" />
+                <svg-icon :name="action.icon" class="size-3.5 fill-gray-600" />
             </button>
         </div>
     </header>

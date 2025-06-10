@@ -343,7 +343,7 @@ export default {
             return [
                 {
                     title: __('Expand All Sets'),
-                    icon: 'arrows-horizontal-expand',
+                    icon: 'expand-vertical-4',
                     quick: true,
                     visibleWhenReadOnly: true,
                     run: this.expandAll,
@@ -351,7 +351,7 @@ export default {
                 },
                 {
                     title: __('Collapse All Sets'),
-                    icon: 'arrows-horizontal-collapse',
+                    icon: 'shrink-vertical',
                     quick: true,
                     visibleWhenReadOnly: true,
                     run: this.collapseAll,
@@ -359,7 +359,7 @@ export default {
                 },
                 {
                     title: __('Toggle Fullscreen Mode'),
-                    icon: ({ vm }) => (vm.fullScreenMode ? 'shrink-all' : 'expand-bold'),
+                    icon: ({ vm }) => (vm.fullScreenMode ? 'shrink-all' : 'expand'),
                     quick: true,
                     run: this.toggleFullscreen,
                     visibleWhenReadOnly: true,
