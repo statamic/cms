@@ -32,6 +32,7 @@ const attrs = useAttrs();
         :option-label
         :option-value
         :options
+        :placeholder
         :searchable="false"
         :model-value="modelValue"
         @update:modelValue="emit('update:modelValue', $event)"
