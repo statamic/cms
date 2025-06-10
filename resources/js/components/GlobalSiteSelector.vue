@@ -1,15 +1,14 @@
 <template>
     <div class="site-selector flex h-full items-center border-l border-r dark:border-dark-900 ltr:mr-4 rtl:ml-4">
-        <v-select
+        <Combobox
             :options="sites"
-            label="name"
-            :get-option-key="(option) => option.handle"
-            :model-value="activeName"
-            :clearable="false"
+            option-label="name"
+            option-value="handle"
             :searchable="false"
+            :model-value="active"
             @update:model-value="selected"
         >
-            <template #selected-option="option">
+            <template #selected-option="{ option }">
                 <div
                     class="anti flex items-center px-2 text-sm text-gray hover:text-gray-800 dark:text-dark-100 dark:hover:text-dark-175"
                 >
@@ -17,15 +16,19 @@
                     <div class="whitespace-nowrap">{{ __(option.name) }}</div>
                 </div>
             </template>
-            <template #option="{ name, handle }">
-                <div :class="{ 'text-gray-500': handle === active }">{{ __(name) }}</div>
+            <template #option="option">
+                <div :class="{ 'text-gray-500': handle === active }">{{ __(option.name) }}</div>
             </template>
-        </v-select>
+        </Combobox>
     </div>
 </template>
 
 <script>
+import { Combobox } from '@statamic/ui';
+
 export default {
+    components: { Combobox },
+
     computed: {
         sites() {
             return Statamic.$config.get('sites');
@@ -41,9 +44,9 @@ export default {
     },
 
     methods: {
-        selected(site) {
-            if (site.handle !== this.active) {
-                window.location = cp_url(`select-site/${site.handle}`);
+        selected(siteHandle) {
+            if (siteHandle !== this.active) {
+                window.location = cp_url(`select-site/${siteHandle}`);
             }
         },
     },
