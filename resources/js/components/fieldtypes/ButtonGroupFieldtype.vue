@@ -1,19 +1,17 @@
 <template>
-    <div class="button-group-fieldtype-wrapper" :class="{ 'inline-mode': config.inline }">
-        <ButtonGroup ref="buttonGroup">
-            <Button
-                v-for="(option, $index) in options"
-                :key="$index"
-                ref="button"
-                :name="name"
-                @click="updateSelectedOption(option.value)"
-                :value="option.value"
-                :disabled="isReadOnly"
-                :variant="value == option.value ? 'primary' : 'default'"
-                :text="option.label || option.value"
-            />
-        </ButtonGroup>
-    </div>
+    <ButtonGroup ref="buttonGroup">
+        <Button
+            v-for="(option, $index) in options"
+            :key="$index"
+            ref="button"
+            :name="name"
+            @click="updateSelectedOption(option.value)"
+            :value="option.value"
+            :disabled="isReadOnly"
+            :variant="value == option.value ? 'primary' : 'default'"
+            :text="option.label || option.value"
+        />
+    </ButtonGroup>
 </template>
 
 <script>
