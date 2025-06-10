@@ -33,4 +33,8 @@
             border-radius: inherit;
         }
     }
+    /* e.g. When we have .focus-within:focus-outline on the global Site selector (which uses the Reka combobox), we don't want to see further focus states like on the dropdown arrow */
+    [class*='focus-within'] * {
+        outline: none;
+    }
 }
