@@ -116,7 +116,7 @@ defineOptions({
 
 defineExpose({
     refresh,
-})
+});
 
 onMounted(() => {
     nextTick(() => initCodeMirror());
@@ -163,7 +163,7 @@ watch(
     (value) => {
         codemirror.value?.setOption('readOnly', value ? 'nocursor' : false);
     },
-    { immediate: true }
+    { immediate: true },
 );
 
 watch(
@@ -171,7 +171,7 @@ watch(
     (value) => {
         codemirror.value?.setOption('mode', value);
     },
-    { immediate: true }
+    { immediate: true },
 );
 
 watch(
@@ -182,7 +182,7 @@ watch(
 
         codemirror.value?.doc.setValue(value);
     },
-    { immediate: true }
+    { immediate: true },
 );
 
 const modeLabel = computed(() => {
@@ -198,7 +198,7 @@ const themeClass = computed(() => {
 });
 
 const rulers = computed(() => {
-    if (! props.rulers) {
+    if (!props.rulers) {
         return [];
     }
 
@@ -229,8 +229,8 @@ watch(
         if (!fullScreenMode) {
             codemirrorElement.value.removeAttribute('style');
         }
-    }
-)
+    },
+);
 </script>
 
 <template>
