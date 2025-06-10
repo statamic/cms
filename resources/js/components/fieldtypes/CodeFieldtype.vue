@@ -11,9 +11,9 @@
         :line-wrapping="config.line_wrapping"
         :allow-mode-selection="config.mode_selectable"
         :mode="mode"
-        :code="value.code"
+        :model-value="value.code"
         @update:mode="modeUpdated"
-        @update:code="codeUpdated"
+        @update:model-value="codeUpdated"
     />
 </template>
 

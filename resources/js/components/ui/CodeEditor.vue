@@ -36,7 +36,7 @@ import 'codemirror/mode/xml/xml';
 import 'codemirror/mode/yaml/yaml';
 import 'codemirror/mode/yaml-frontmatter/yaml-frontmatter';
 
-const emit = defineEmits(['update:mode', 'update:code', 'focus', 'blur']);
+const emit = defineEmits(['update:mode', 'update:model-value', 'focus', 'blur']);
 
 const props = defineProps({
     theme: {
@@ -76,7 +76,7 @@ const props = defineProps({
         default: true,
     },
     mode: String,
-    code: String,
+    modelValue: String,
 });
 
 const modes = ref([
@@ -125,7 +125,7 @@ onMounted(() => {
 function initCodeMirror() {
     codemirror.value = markRaw(
         CodeMirror(codemirrorElement.value, {
-            value: props.code || '',
+            value: props.modelValue || '',
             mode: props.mode,
             direction: document.querySelector('html').getAttribute('dir') ?? 'ltr',
             addModeClass: true,
@@ -143,7 +143,7 @@ function initCodeMirror() {
     );
 
     codemirror.value.on('change', (cm) => {
-        emit('update:code', cm.doc.getValue());
+        emit('update:model-value', cm.doc.getValue());
     });
 
     codemirror.value.on('focus', () => emit('focus'));
