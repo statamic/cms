@@ -9,6 +9,7 @@ import { default as CardPanel } from './Card/Panel.vue';
 import { default as CharacterCounter } from './CharacterCounter.vue';
 import { default as Checkbox } from './Checkbox/Item.vue';
 import { default as CheckboxGroup } from './Checkbox/Group.vue';
+import { default as CodeEditor } from './CodeEditor.vue';
 import { default as Combobox } from './Combobox.vue';
 import { default as Context } from './Context/Context.vue';
 import { default as ContextFooter } from './Context/Footer.vue';
@@ -72,6 +73,7 @@ export {
     CharacterCounter,
     Checkbox,
     CheckboxGroup,
+    CodeEditor,
     Combobox,
     Context,
     ContextFooter,
