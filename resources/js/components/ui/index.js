@@ -9,6 +9,7 @@ import { default as CardPanel } from './Card/Panel.vue';
 import { default as CharacterCounter } from './CharacterCounter.vue';
 import { default as Checkbox } from './Checkbox/Item.vue';
 import { default as CheckboxGroup } from './Checkbox/Group.vue';
+import { default as CodeEditor } from './CodeEditor.vue';
 import { default as Combobox } from './Combobox.vue';
 import { default as Context } from './Context/Context.vue';
 import { default as ContextFooter } from './Context/Footer.vue';
@@ -35,6 +36,15 @@ import { default as Label } from './Label.vue';
 import { default as Panel } from './Panel/Panel.vue';
 import { default as PanelFooter } from './Panel/Footer.vue';
 import { default as PanelHeader } from './Panel/Header.vue';
+import { default as PublishComponents } from './Publish/Components.vue';
+import { default as PublishContainer } from './Publish/Container.vue';
+import { default as PublishField } from './Publish/Field.vue';
+import { default as PublishFields } from './Publish/Fields.vue';
+import { default as FieldsProvider } from './Publish/FieldsProvider.vue';
+import { default as PublishForm } from './Publish/Form.vue';
+import { default as PublishLocalizations } from './Publish/Localizations.vue';
+import { default as PublishSections } from './Publish/Sections.vue';
+import { default as TabProvider } from './Publish/TabProvider.vue';
 import { default as PublishTabs } from './Publish/Tabs.vue';
 import { default as Radio } from './Radio/Item.vue';
 import { default as RadioGroup } from './Radio/Group.vue';
@@ -63,6 +73,7 @@ export {
     CharacterCounter,
     Checkbox,
     CheckboxGroup,
+    CodeEditor,
     Combobox,
     Context,
     ContextFooter,
@@ -89,6 +100,15 @@ export {
     Panel,
     PanelFooter,
     PanelHeader,
+    PublishComponents,
+    PublishContainer,
+    PublishField,
+    PublishFields,
+    FieldsProvider,
+    PublishForm,
+    PublishLocalizations,
+    PublishSections,
+    TabProvider,
     PublishTabs,
     Radio,
     RadioGroup,

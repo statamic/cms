@@ -1,5 +1,5 @@
 <template>
-    <publish-container
+    <PublishContainer
         v-if="blueprint"
         ref="container"
         name="sites"
@@ -9,24 +9,24 @@
         :meta="meta"
         :errors="errors"
         @updated="values = $event"
-        v-slot="{ setFieldValue, setFieldMeta }"
     >
-        <div>
-            <Header :title="pageTitle" icon="site">
-                <Button type="submit" variant="primary" @click="submit">{{ __('Save') }}</Button>
-            </Header>
-            <publish-tabs @updated="setFieldValue" @meta-updated="setFieldMeta" :enable-sidebar="false" />
-        </div>
-    </publish-container>
+        <Header :title="pageTitle" icon="site">
+            <Button type="submit" variant="primary" @click="submit">{{ __('Save') }}</Button>
+        </Header>
+
+        <PublishTabs />
+    </PublishContainer>
 </template>
 
 <script>
-import { Header, Button } from '@statamic/ui';
+import { Header, Button, PublishContainer, PublishTabs } from '@statamic/ui';
 
 export default {
     components: {
         Header,
         Button,
+        PublishContainer,
+        PublishTabs,
     },
 
     props: {

@@ -18,16 +18,15 @@
                             class="mb-2 text-2xs text-gray"
                             v-text="__('Changes to this field in the fieldset will stay in sync.')"
                         />
-                        <v-select
-                            name="field"
+                        <Combobox
+                            class="w-full"
                             :placeholder="__('Fields')"
                             :options="fieldSuggestions"
-                            :multiple="false"
-                            :searchable="true"
-                            :reduce="(opt) => opt.value"
-                            v-model="reference"
+                            searchable
+                            :model-value="reference"
+                            @update:modelValue="reference = $event"
                         >
-                            <template v-slot:option="option">
+                            <template #option="option">
                                 <div class="flex items-center">
                                     <span
                                         v-text="option.fieldset"
@@ -36,13 +35,13 @@
                                     <span v-text="option.label" />
                                 </div>
                             </template>
-                            <template v-slot:no-options>
+                            <template #no-options>
                                 <div
                                     class="px-4 py-2 text-sm text-gray-700 dark:text-dark-200 ltr:text-left rtl:text-right"
                                     v-text="__('No options to choose from.')"
                                 />
                             </template>
-                        </v-select>
+                        </Combobox>
                         <button
                             class="btn-primary mt-6 w-full"
                             :class="{ 'opacity-50': !reference }"
@@ -62,22 +61,21 @@
                             class="mb-2 text-2xs text-gray dark:text-dark-175"
                             v-text="__('Changes to this fieldset will stay in sync.')"
                         />
-                        <v-select
-                            name="field"
+                        <Combobox
+                            class="w-full"
                             :placeholder="__('Fieldsets')"
                             :options="fieldsetSuggestions"
-                            :multiple="false"
-                            :searchable="true"
-                            :reduce="(opt) => opt.value"
-                            v-model="fieldset"
+                            searchable
+                            :model-value="fieldset"
+                            @update:modelValue="fieldset = $event"
                         >
-                            <template v-slot:no-options>
+                            <template #no-options>
                                 <div
                                     class="px-4 py-2 text-sm text-gray-700 dark:text-dark-200 ltr:text-left rtl:text-right"
                                     v-text="__('No options to choose from.')"
                                 />
                             </template>
-                        </v-select>
+                        </Combobox>
                         <p class="mb-2 mt-6 text-sm font-medium" v-text="__('Prefix')" />
                         <p
                             class="mb-2 text-2xs text-gray dark:text-dark-175"
@@ -100,8 +98,11 @@
 
 <script>
 import uniqid from 'uniqid';
+import { Combobox } from '@statamic/ui';
 
 export default {
+    components: { Combobox },
+
     props: {
         excludeFieldset: String,
     },
