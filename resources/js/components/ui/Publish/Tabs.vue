@@ -5,6 +5,7 @@ import { injectContainerContext } from './Container.vue';
 import Sections from '@statamic/components/ui/Publish/Sections.vue';
 import { ref, computed, useSlots } from 'vue';
 import ElementContainer from '@statamic/components/ElementContainer.vue';
+import ShowField from '@statamic/components/field-conditions/ShowField.js';
 
 const slots = useSlots();
 const { blueprint, store } = injectContainerContext();
@@ -14,6 +15,15 @@ const sidebarTab = computed(() => tabs.value.find((tab) => tab.handle === 'sideb
 const mainTabs = computed(() =>
     shouldShowSidebar.value && sidebarTab.value ? tabs.value.filter((tab) => tab.handle !== 'sidebar') : tabs.value,
 );
+const visibleMainTabs = computed(() => {
+    return mainTabs.value.filter((tab) => {
+        return tab.sections.some((section) => {
+            return section.fields.some((field) => {
+                return new ShowField(store, store.values, store.extraValues).showField(field, field.handle);
+            });
+        });
+    });
+});
 const shouldShowSidebar = computed(() => (slots.sidebar || sidebarTab.value) && width.value > 920);
 
 const fieldTabMap = computed(() => {
@@ -48,10 +58,10 @@ function tabHasError(tab) {
 
 <template>
     <ElementContainer @resized="width = $event.width">
-        <Tabs :default-tab="mainTabs[0].handle">
-            <TabList v-if="mainTabs.length > 1" class="mb-6">
+        <Tabs :default-tab="visibleMainTabs[0].handle">
+            <TabList v-if="visibleMainTabs.length > 1" class="mb-6">
                 <TabTrigger
-                    v-for="tab in mainTabs"
+                    v-for="tab in visibleMainTabs"
                     :key="tab.handle"
                     :name="tab.handle"
                     :text="tab.display"

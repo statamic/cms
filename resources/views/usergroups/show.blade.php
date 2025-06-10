@@ -4,7 +4,6 @@
 
 @extends('statamic::layout')
 @section('title', Statamic::crumb($group->title(), 'User Group'))
-@section('wrapper_class', 'max-w-full')
 
 @section('content')
     <ui-header title="{{ __($group->title()) }}">

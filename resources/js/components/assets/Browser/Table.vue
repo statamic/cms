@@ -1,7 +1,7 @@
 <template>
     <Panel class="relative overflow-x-auto overscroll-x-contain">
         <PanelHeader class="p-1! flex items-center justify-between">
-            <breadcrumbs v-if="!restrictFolderNavigation" :path="path" @navigated="selectFolder" />
+            <Breadcrumbs v-if="!restrictFolderNavigation" :path="path" @navigated="selectFolder" />
         </PanelHeader>
         <Card inset>
             <data-list-table
@@ -18,13 +18,13 @@
                         v-for="(folder, i) in folders"
                         :key="folder.path"
                         class="pointer-events-auto"
-                        :class="{ 'bg-blue-50': dragOverFolder === folder.path }"
+                        :class="{ 'bg-blue-50': draggingFolder === folder.path }"
                         :draggable="canMoveFolder(folder)"
-                        @dragover.prevent="dragOverFolder = folder.path"
-                        @dragleave.prevent="dragOverFolder = null"
-                        @drop="handleFolderDrop(folder); dragOverFolder = null"
+                        @dragover.prevent="draggingFolder = folder.path"
+                        @dragleave.prevent="draggingFolder = null"
+                        @drop="handleFolderDrop(folder); draggingFolder = null"
                         @dragstart="draggingFolder = folder.path"
-                        @dragend="draggingFolder = null; dragOverFolder = null"
+                        @dragend="draggingFolder = null; draggingFolder = null"
                     >
                         <td />
                         <td v-for="column in visibleColumns">

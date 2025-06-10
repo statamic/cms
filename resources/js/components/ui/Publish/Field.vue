@@ -20,6 +20,10 @@ const fieldtypeComponent = computed(() => {
     return `${props.config.component || props.config.type}-fieldtype`;
 });
 
+const fieldtypeComponentExists = computed(() => {
+    return Statamic.$app.component(fieldtypeComponent.value) !== undefined;
+});
+
 const fullPath = computed(() => [fieldPathPrefix, handle].filter(Boolean).join('.'));
 const metaFullPath = computed(() => [metaPathPrefix, handle].filter(Boolean).join('.'));
 const value = computed(() => data_get(store.values, fullPath.value));
@@ -72,6 +76,18 @@ const shouldShowField = computed(() => {
     return new ShowField(store, values.value, extraValues.value).showField(props.config, fullPath.value);
 });
 
+const shouldShowLabelText = computed(() => !props.config.hide_display);
+
+const shouldShowLabel = computed(
+    () =>
+        shouldShowLabelText.value || // Need to see the text
+        isReadOnly.value || // Need to see the "Read Only" text
+        isRequired.value || // Need to see the asterisk
+        isLocked.value || // Need to see the avatar
+        isLocalizable.value || // Need to see the icon
+        isSyncable.value, // Need to see the icon
+);
+
 const isLocalizable = computed(() => props.config.localizable);
 
 const isReadOnly = computed(() => {
@@ -104,8 +120,8 @@ function desync() {
         :disabled="isReadOnly"
     >
         <template #label>
-            <Label :for="fieldId" :required="isRequired">
-                {{ __(config.display) }}
+            <Label v-if="shouldShowLabel" :for="fieldId" :required="isRequired">
+                <template v-if="shouldShowLabelText">{{ __(config.display) }}</template>
                 <button v-if="!isReadOnly && isSyncable" v-show="isSynced" @click="desync">
                     <Tooltip :text="__('messages.field_synced_with_origin')">
                         <Icon name="synced" class="text-gray-400" />
@@ -121,7 +137,11 @@ function desync() {
         <template #actions>
             <publish-field-actions v-if="fieldActions?.length" :actions="fieldActions" />
         </template>
+        <div class="text-xs text-red-500" v-if="!fieldtypeComponentExists">
+            Component <code v-text="fieldtypeComponent"></code> does not exist.
+        </div>
         <Component
+            v-else
             ref="fieldtype"
             :is="fieldtypeComponent"
             :id="fieldId"
