@@ -30,7 +30,6 @@
                         fixed top-14 inset-x-0 bottom-0 min-h-[calc(100vh-3.5rem)]
                     ">
                         @include('statamic::partials.nav-main')
-                        {{-- <div class="" :class="wrapperClass"> --}}
                         <div class="p-2 h-full flex-1 overflow-y-auto">
                             <div class="relative content-card @yield('content-card-modifiers') min-h-full transition-padding duration-300">
                                 @yield('content')

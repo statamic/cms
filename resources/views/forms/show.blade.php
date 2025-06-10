@@ -4,7 +4,6 @@
 
 @extends('statamic::layout')
 @section('title', Statamic::crumb($form->title(), 'Forms'))
-@section('wrapper_class', 'max-w-full')
 
 @section('content')
     <header class="mb-6">

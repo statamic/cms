@@ -1,6 +1,5 @@
 @extends("statamic::layout")
 @section("title", Statamic::crumb($collection->title(), "Collections"))
-@section("wrapper_class", "max-w-full")
 
 @section("content")
     <collection-view

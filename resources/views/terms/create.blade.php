@@ -2,7 +2,6 @@
 @inject('str', 'Statamic\Support\Str')
 @extends('statamic::layout')
 @section('title', Breadcrumbs::title($taxonomyCreateLabel))
-@section('wrapper_class', 'max-w-7xl')
 
 @section('content')
     <base-term-create-form

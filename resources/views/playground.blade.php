@@ -10,7 +10,6 @@
 
 @extends('statamic::layout')
 @section('title', __('Playground'))
-@section('wrapper_class', 'max-w-7xl')
 
 @section('content')
 <ui-header title="Playground" icon="playground">
