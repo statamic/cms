@@ -244,7 +244,16 @@ watch(
 
 <template>
     <portal name="code-fullscreen" :disabled="!fullScreenMode" target-class="code-fieldtype">
-        <div class="code-fieldtype-container" :class="[themeClass, { 'code-fullscreen': fullScreenMode }]">
+        <div
+            :class="[
+                '@container/markdown block w-full overflow-hidden rounded-lg bg-white dark:bg-gray-900',
+                'border border-gray-300 dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:inset-shadow-2xs dark:inset-shadow-black',
+                'text-gray-800 dark:text-gray-300',
+                'shadow-ui-sm not-prose appearance-none antialiased disabled:shadow-none',
+                themeClass,
+                { 'code-fullscreen': fullScreenMode },
+            ]"
+        >
             <publish-field-fullscreen-header
                 v-if="fullScreenMode"
                 :title="title"
@@ -262,7 +271,10 @@ watch(
                 />
                 <div v-else v-text="modeLabel" class="font-mono text-xs text-gray-700"></div>
             </publish-field-fullscreen-header>
-            <div class="code-fieldtype-toolbar" v-if="!fullScreenMode">
+            <div
+                class="flex items-center justify-between rounded-t-xl border-b border-gray-300 bg-gray-50 px-2 py-1 dark:border-white/15 dark:bg-gray-950"
+                v-if="!fullScreenMode"
+            >
                 <div>
                     <Select
                         class="w-32"

@@ -15,9 +15,6 @@
 .CodeMirror pre {
     padding: 0 16px; /* Horizontal padding of content */
 }
-.CodeMirror-wrap {
-    @apply rounded-b;
-}
 
 .CodeMirror-scrollbar-filler,
 .CodeMirror-gutter-filler {
