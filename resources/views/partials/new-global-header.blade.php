@@ -55,6 +55,11 @@
         @endforeach
     </div>
     <div class="flex-1 flex gap-4 items-center justify-end">
+        @if (Statamic\Facades\Site::authorized()->count() > 1)
+            <global-site-selector>
+                <template slot="icon">@cp_svg('icons/light/sites')</template>
+            </global-site-selector>
+        @endif
         <div><command-palette /></div>
         <ui-button
             icon="visit-website"
