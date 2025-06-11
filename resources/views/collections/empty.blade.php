@@ -1,17 +1,6 @@
-@php
-    use function Statamic\trans as __;
-    $collectionData = [
-        'handle' => $collection->handle(),
-        'createLabel' => $collection->createLabel(),
-        'entryBlueprints' => $collection->entryBlueprints()->map(function($blueprint) {
-            return [
-                'handle' => $blueprint->handle(),
-                'title' => $blueprint->title()
-            ];
-        })->values()->all()
-    ];
-@endphp
+@php use function Statamic\trans as __; @endphp
 
+@inject('str', 'Statamic\Support\Str')
 @extends('statamic::layout')
 @section('title', Statamic::crumb($collection->title(), 'Collections'))
 @section('content-card-modifiers', 'bg-architectural-lines')
@@ -23,12 +12,14 @@
 </header>
 
 <collection-empty-state
-    :collection='@json($collectionData)'
-    :site="$site"
-    :can-edit="@can('edit', $collection) true @else false @endcan"
-    :can-create="@can('create', ['Statamic\Contracts\Entries\Entry', $collection, \Statamic\Facades\Site::get($site)]) true @else false @endcan"
-    :can-configure-fields="@can('configure fields') true @else false @endcan"
-    :can-store="@can('store', 'Statamic\Contracts\Entries\Collection') true @else false @endcan"
+    :collection='@json($collection)'
+    :create-label="{{ $collection->createLabel() }}"
+    :blueprints="{{ Js::from($blueprints) }}"
+    site="{{ $site }}"
+    :can-edit="{{ $str::bool($user->can('edit', $collection)) }}"
+    :can-create="{{ $str::bool($user->can('create', ['Statamic\Contracts\Entries\Entry', $collection, \Statamic\Facades\Site::get($site)])) }}"
+    :can-configure-fields="{{ $str::bool($user->can('configure fields')) }}"
+    :can-store="{{ $str::bool($user->can('create', 'Statamic\Contracts\Entries\Collection')) }}"
 ></collection-empty-state>
 
     @include('statamic::partials.docs-callout', [
