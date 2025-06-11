@@ -61,6 +61,10 @@ const props = defineProps({
         type: Object,
         default: () => ({}),
     },
+    searchQuery: {
+        type: String,
+        default: null,
+    },
 });
 
 const id = uniqid();
@@ -73,12 +77,14 @@ const initializing = ref(true);
 const loading = ref(true);
 let popping = false;
 let source = null;
+const searchQuery = ref(null);
 
 const rawParameters = computed(() => ({
     page: currentPage.value,
     perPage: perPage.value,
     sort: props.sortColumn,
     order: props.sortDirection,
+    search: searchQuery.value,
 }));
 
 function setParameters(params) {
@@ -86,6 +92,7 @@ function setParameters(params) {
     perPage.value = parseInt(params.perPage);
     emit('update:sortColumn', params.sort);
     emit('update:sortDirection', params.order);
+    searchQuery.value = params.search;
 }
 
 const parameters = computed(() => {
@@ -224,6 +231,10 @@ function setPerPage(value) {
     perPage.value = value;
 }
 
+function setSearchQuery(query) {
+    searchQuery.value = query;
+}
+
 provideListingContext({
     loading,
     items,
@@ -238,6 +249,8 @@ provideListingContext({
     perPage,
     setPerPage,
     setCurrentPage,
+    searchQuery,
+    setSearchQuery,
 });
 
 const slotProps = computed(() => ({
