@@ -62,6 +62,7 @@ import StackTest from '../components/stacks/StackTest.vue';
 import CodeBlock from '../components/CodeBlock.vue';
 import BlueprintCreateForm from '../components/blueprints/BlueprintCreateForm.vue';
 import BlueprintResetter from '../components/blueprints/BlueprintResetter.vue';
+import EmptyState from '../components/collections/EmptyState.vue';
 import { defineAsyncComponent } from 'vue';
 import DateTime from '../components/DateTime.vue';
 import UpdaterWidget from '../components/updater/UpdaterWidget.vue';
@@ -156,4 +157,7 @@ export default function registerGlobalComponents(app) {
 
     app.component('blueprint-create-form', BlueprintCreateForm);
     app.component('blueprint-resetter', BlueprintResetter);
+    
+    // Collections
+    app.component('collection-empty-state', EmptyState);
 }
