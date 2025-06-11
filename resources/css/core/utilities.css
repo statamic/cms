@@ -17,15 +17,19 @@
 =================================================== */
 @utility trim-text-start {
     text-box: trim-start;
-    /* =JFG. When we have an SVG we probably don't want to text trim, for example in a Markdown field with button controls like Bold, Italic, etc. */
+    /* =Jay. When we have an SVG we probably don't want to text trim, for example in a Markdown field with button controls like Bold, Italic, etc. */
     &:has(svg) {
         display: flex;
     }
-    /* =JFG. Exceptions */
+    /* =Jay. Exceptions */
     /* e.g. for a fieldset, we don't want to trim the text when we have a label like on a collections field, Link Item button */
     .form-group :has(> &) & {
         text-box: unset;
     }
+}
+@utility trim-cap-alphabetic {
+    /* =Jay. Sometimes this is handy e.g. the text inside the command palette searchbox */
+    text-box: cap alphabetic;
 }
 
 /* UTILITIES / STATES

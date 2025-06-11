@@ -8,10 +8,10 @@
         <ui-card-panel :heading="__('Collection Details')">
             <div class="space-y-8">
                 <ui-field :label="__('Title')" :instructions="__('messages.collection_configure_title_instructions')" :instructions-below="true">
-                    <ui-input v-model="title" autofocus tabindex="1" />
+                    <ui-input v-model="title" autofocus />
                 </ui-field>
                 <ui-field :label="__('Handle')" :instructions="__('messages.collection_configure_handle_instructions')" :instructions-below="true">
-                    <ui-input v-model="handle" tabindex="2" :loading="slug.busy" />
+                    <ui-input v-model="handle" :loading="slug.busy" />
                 </ui-field>
             </div>
         </ui-card-panel>
