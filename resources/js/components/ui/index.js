@@ -61,6 +61,8 @@ import { default as TimePicker } from './TimePicker/TimePicker.vue';
 import { default as Tooltip } from './Tooltip.vue';
 import { default as Widget } from './Widget.vue';
 import { default as Pagination } from './Pagination.vue';
+import { default as Modal } from './Modal/Modal.vue';
+import { default as ModalClose } from './Modal/Close.vue';
 
 export {
     Badge,
@@ -126,4 +128,6 @@ export {
     Tooltip,
     Widget,
     Pagination,
+    Modal,
+    ModalClose,
 };
