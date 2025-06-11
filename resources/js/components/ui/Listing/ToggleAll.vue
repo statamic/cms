@@ -12,7 +12,7 @@ function toggle() {
 
 function checkMaximumAmountOfItems() {
     let newSelections = items.value.map((row) => row.id);
-    if (maxSelections) newSelections = newSelections.slice(0, maxSelections);
+    if (maxSelections.value) newSelections = newSelections.slice(0, maxSelections.value);
     selections.value.splice(0, selections.value.length, ...newSelections);
 }
 
