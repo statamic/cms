@@ -4,7 +4,7 @@
             <template v-if="canEdit">
                 <a :href="editUrl" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
                     <div class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175">
-                        <svg-icon name="hammer-wrench" />
+                        <Icon name="configure" />
                     </div>
                     <div class="flex-1 mb-4 md:mb-0 md:rtl:ml-6 md:ltr:mr-6">
                         <h3 class="mb-2 text-blue-600 dark:text-blue-600">{{ __('Configure Collection') }} →</h3>
@@ -17,7 +17,7 @@
                 <template v-if="multipleBlueprints">
                     <div class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
                         <div class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175">
-                            <svg-icon name="content-writing" />
+                            <Icon name="fieldtype-blueprints" />
                         </div>
                         <div class="flex-1 mb-4 md:mb-0 md:rtl:ml-6 md:ltr:mr-6">
                             <h3 class="mb-2 text-blue-600 dark:text-blue-600">{{ createLabel }}</h3>
@@ -33,7 +33,7 @@
                 <template v-else>
                     <a :href="createUrl()" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
                         <div class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175">
-                            <svg-icon name="content-writing" />
+                            <Icon name="fieldtype-entries" />
                         </div>
                         <div class="flex-1 mb-4 md:mb-0 md:rtl:ml-6 md:ltr:mr-6">
                             <h3 class="mb-2 text-blue-600 dark:text-blue-600">{{ createLabel }} →</h3>
@@ -46,7 +46,7 @@
             <template v-if="canConfigureFields">
                 <a :href="blueprintsUrl" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
                     <div class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175">
-                        <svg-icon name="blueprint" />
+                        <Icon name="fieldtype-blueprints" />
                     </div>
                     <div class="flex-1 mb-4 md:mb-0 md:rtl:ml-6 md:ltr:mr-6">
                         <h3 class="mb-2 text-blue-600 dark:text-blue-600">{{ __('Configure Blueprints') }} →</h3>
@@ -58,7 +58,7 @@
             <template v-if="canStore">
                 <a :href="scaffoldUrl" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
                     <div class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175">
-                        <svg-icon name="crane" />
+                        <Icon name="scaffold" />
                     </div>
                     <div class="flex-1 mb-4 md:mb-0 md:rtl:ml-6 md:ltr:mr-6">
                         <h3 class="mb-2 text-blue-600 dark:text-blue-600">{{ __('Scaffold Views') }} →</h3>
@@ -68,7 +68,7 @@
             </template>
 
             <div class="hidden first:flex justify-center items-center p-8 w-full">
-                <svg-icon :name="svg || 'empty/content'" />
+                <Icon :name="svg || 'empty/content'" />
             </div>
         </div>
     </div>
@@ -76,6 +76,7 @@
 
 <script setup>
 import { computed } from 'vue';
+import { Icon } from '@statamic/ui';
 
 const props = defineProps({
     collection: { type: Object, required: true },
