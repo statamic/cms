@@ -126,7 +126,7 @@ function request() {
             signal: source.signal,
         })
         .then((response) => {
-            emit('update:columns', response.data.meta.columns);
+            setColumns(response.data.meta.columns);
             activeFilterBadges.value = { ...response.data.meta.activeFilterBadges };
             items.value = Object.values(response.data.data);
             meta.value = response.data.meta;
@@ -187,6 +187,8 @@ const visibleColumns = computed(() => {
     return visibleColumns.length ? visibleColumns : props.columns;
 });
 
+const hiddenColumns = computed(() => props.columns.filter((column) => !column.visible));
+
 const sortableColumns = computed(() => {
     return props.columns.filter((column) => column.sortable).map((column) => column.field);
 });
@@ -194,6 +196,16 @@ const sortableColumns = computed(() => {
 function isColumnVisible(column) {
     return visibleColumns.value.find((c) => c.field === column);
 }
+
+function setColumns(columns) {
+    emit('update:columns', columns);
+}
+
+const testColumns = computed(() => {
+    return props.columns.map((column) => {
+        return [column.field, column.visible];
+    });
+});
 
 function setSortColumn(column) {
     if (!props.sortable) return;
@@ -240,7 +252,9 @@ provideListingContext({
     items,
     meta,
     columns: toRef(() => props.columns),
+    setColumns,
     visibleColumns,
+    hiddenColumns,
     sortColumn: toRef(() => props.sortColumn),
     setSortColumn,
     selections,
@@ -251,6 +265,7 @@ provideListingContext({
     setCurrentPage,
     searchQuery,
     setSearchQuery,
+    preferencesPrefix: toRef(() => props.preferencesPrefix),
 });
 
 const slotProps = computed(() => ({

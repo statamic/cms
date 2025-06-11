@@ -5,6 +5,7 @@ import { DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle, Di
 
 const props = defineProps({
     title: { type: String, default: '' },
+    open: { type: Boolean, default: false },
 });
 
 const hasModalTitleComponent = hasComponent('ModalTitle');
@@ -25,7 +26,7 @@ const modalClasses = cva({
 </script>
 
 <template>
-    <DialogRoot>
+    <DialogRoot :open="open" @update:open="$emit('update:open', $event)">
         <DialogTrigger data-ui-modal-trigger>
             <slot name="trigger" />
         </DialogTrigger>
