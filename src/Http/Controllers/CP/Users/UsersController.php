@@ -227,11 +227,11 @@ class UsersController extends CpController
         $blueprint = $user->blueprint();
 
         if (! User::current()->can('assign roles')) {
-            $blueprint->ensureFieldHasConfig('roles', ['visibility' => 'read_only']);
+            $blueprint->ensureFieldHasConfig('roles', ['visibility' => 'hidden']);
         }
 
         if (! User::current()->can('assign user groups')) {
-            $blueprint->ensureFieldHasConfig('groups', ['visibility' => 'read_only']);
+            $blueprint->ensureFieldHasConfig('groups', ['visibility' => 'hidden']);
         }
 
         if (User::current()->isSuper() && User::current()->id() !== $user->id()) {
