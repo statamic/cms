@@ -25,7 +25,7 @@
                                 icon="rename"
                                 @click="renamePreset"
                             />
-                            <DropdownSeparator />
+                            <DropdownSeparator v-if="canDeletePreset(handle)" />
                             <DropdownItem
                                 v-if="canDeletePreset(handle)"
                                 :text="__('Delete')"

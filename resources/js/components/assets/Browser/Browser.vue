@@ -20,7 +20,7 @@
                         :text="__('Edit Blueprint')"
                         :href="container.blueprint_url"
                     />
-                    <DropdownSeparator />
+                    <DropdownSeparator v-if="container.can_delete" />
                     <DropdownItem
                         icon="trash"
                         variant="destructive"

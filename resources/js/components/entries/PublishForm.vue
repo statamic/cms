@@ -21,7 +21,7 @@
                     </template>
                     <DropdownMenu>
                         <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" v-if="canEditBlueprint" :href="actions.editBlueprint" />
-                        <DropdownSeparator />
+                        <DropdownSeparator v-if="canEditBlueprint && itemActions.length" />
                         <DropdownItem
                             v-for="action in itemActions"
                             :key="action.handle"
