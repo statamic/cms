@@ -201,12 +201,6 @@ function setColumns(columns) {
     emit('update:columns', columns);
 }
 
-const testColumns = computed(() => {
-    return props.columns.map((column) => {
-        return [column.field, column.visible];
-    });
-});
-
 function setSortColumn(column) {
     if (!props.sortable) return;
 
