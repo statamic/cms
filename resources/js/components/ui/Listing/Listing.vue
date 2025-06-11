@@ -1,0 +1,275 @@
+<script>
+import createContext from '@statamic/util/createContext.js';
+
+export const [injectListingContext, provideListingContext] = createContext('Listing');
+</script>
+
+<script setup>
+import { ref, toRef, computed, watch, nextTick, onMounted, onBeforeUnmount } from 'vue';
+import { Icon } from '@statamic/ui';
+import axios from 'axios';
+import BulkActions from './BulkActions.vue';
+import uniqid from 'uniqid';
+
+const emit = defineEmits(['update:columns', 'update:sortColumn', 'update:sortDirection', 'update:selections']);
+
+const props = defineProps({
+    url: {
+        type: String,
+        required: true,
+    },
+    allowBulkActions: {
+        type: Boolean,
+        default: true,
+    },
+    reorderable: {
+        type: Boolean,
+        default: false,
+    },
+    preferencesPrefix: {
+        type: String,
+    },
+    columns: {
+        type: Array,
+        default: () => [],
+    },
+    sortColumn: {
+        type: String,
+        default: '',
+    },
+    sortDirection: {
+        type: String,
+        default: 'asc',
+    },
+    sortable: {
+        type: Boolean,
+        default: true,
+    },
+    selections: {
+        type: Array,
+        default: () => [],
+    },
+    maxSelections: {
+        type: Number,
+        default: Infinity,
+    },
+    pushQuery: {
+        type: Boolean,
+        default: true,
+    },
+    additionalParameters: {
+        type: Object,
+        default: () => ({}),
+    },
+});
+
+const id = uniqid();
+const items = ref([]);
+const meta = ref({});
+const activeFilterBadges = ref([]);
+const currentPage = ref(1);
+const perPage = ref(10);
+const initializing = ref(true);
+const loading = ref(true);
+let popping = false;
+let source = null;
+
+const rawParameters = computed(() => ({
+    page: currentPage.value,
+    perPage: perPage.value,
+    sort: props.sortColumn,
+    order: props.sortDirection,
+}));
+
+function setParameters(params) {
+    currentPage.value = parseInt(params.page);
+    perPage.value = parseInt(params.perPage);
+    emit('update:sortColumn', params.sort);
+    emit('update:sortDirection', params.order);
+}
+
+const parameters = computed(() => {
+    const params = Object.fromEntries(
+        Object.entries(rawParameters.value).filter(([key, value]) => {
+            return value !== null && value !== undefined && value !== '';
+        }),
+    );
+
+    return { ...params, ...props.additionalParameters };
+});
+
+const shouldRequestFirstPage = computed(() => {
+    if (currentPage.value > 1 && items.value.length === 0) {
+        currentPage.value = 1;
+        return true;
+    }
+
+    return false;
+});
+
+function request() {
+    loading.value = true;
+
+    if (source) source.abort();
+    source = new AbortController();
+
+    axios
+        .get(props.url, {
+            params: parameters.value,
+            signal: source.signal,
+        })
+        .then((response) => {
+            emit('update:columns', response.data.meta.columns);
+            activeFilterBadges.value = { ...response.data.meta.activeFilterBadges };
+            items.value = Object.values(response.data.data);
+            meta.value = response.data.meta;
+            if (shouldRequestFirstPage.value) return request();
+            initializing.value = false;
+            loading.value = false;
+        })
+        .catch((e) => {
+            if (axios.isCancel(e)) return;
+            initializing.value = false;
+            loading.value = false;
+            if (e.request && !e.response) return;
+            Statamic.$toast.error(e.response ? e.response.data.message : __('Something went wrong'), {
+                duration: null,
+            });
+        });
+}
+
+function pushState() {
+    if (!props.pushQuery || popping) return;
+
+    // This ensures no additionalParameters are added to the URL
+    const keys = Object.keys(rawParameters.value);
+    const searchParams = new URLSearchParams(
+        Object.fromEntries(
+            keys.filter((key) => parameters.value.hasOwnProperty(key)).map((key) => [key, parameters.value[key]]),
+        ),
+    );
+
+    window.history.pushState({ parameters: parameters.value }, '', '?' + searchParams.toString());
+}
+
+function popState(event) {
+    if (!props.pushQuery || !event.state) return;
+
+    popping = true;
+    setParameters(event.state.parameters);
+    nextTick(() => (popping = false));
+}
+
+function autoApplyState() {
+    if (!props.pushQuery || !window.location.search) return;
+
+    const searchParams = new URLSearchParams(window.location.search);
+    const parameters = Object.fromEntries(searchParams.entries());
+    popping = true;
+    setParameters(parameters);
+    nextTick(() => (popping = false));
+}
+
+const selections = computed({
+    get: () => props.selections,
+    set: (selections) => emit('update:selections', selections),
+});
+
+const visibleColumns = computed(() => {
+    const visibleColumns = props.columns.filter((column) => column.visible);
+    return visibleColumns.length ? visibleColumns : props.columns;
+});
+
+const sortableColumns = computed(() => {
+    return props.columns.filter((column) => column.sortable).map((column) => column.field);
+});
+
+function isColumnVisible(column) {
+    return visibleColumns.value.find((c) => c.field === column);
+}
+
+function setSortColumn(column) {
+    if (!props.sortable) return;
+
+    if (!sortableColumns.value.includes(column)) return;
+
+    // If sorting by the same column, toggle the direction.
+    // Otherwise, set the default direction.
+    if (props.sortColumn === column) {
+        toggleSortDirection();
+    } else {
+        emit('update:sortDirection', getDefaultSortDirectionForColumn(column));
+    }
+
+    emit('update:sortColumn', column);
+}
+
+function getColumnFieldtype(column) {
+    return props.columns.find((c) => c.field === column)?.fieldtype;
+}
+
+function getDefaultSortDirectionForColumn(column) {
+    return getColumnFieldtype(column) === 'date' ? 'desc' : 'asc';
+}
+
+function toggleSortDirection() {
+    emit('update:sortDirection', props.sortDirection === 'asc' ? 'desc' : 'asc');
+}
+
+function setCurrentPage(page) {
+    currentPage.value = page;
+}
+
+function setPerPage(value) {
+    perPage.value = value;
+}
+
+provideListingContext({
+    loading,
+    items,
+    meta,
+    columns: toRef(() => props.columns),
+    visibleColumns,
+    sortColumn: toRef(() => props.sortColumn),
+    setSortColumn,
+    selections,
+    maxSelections: toRef(() => props.maxSelections),
+    allowBulkActions: toRef(() => props.allowBulkActions),
+    perPage,
+    setPerPage,
+    setCurrentPage,
+});
+
+const slotProps = computed(() => ({
+    isColumnVisible,
+}));
+
+watch(parameters, () => {
+    request();
+    pushState();
+});
+
+watch(loading, (loading) => Statamic.$progress.loading(id, loading));
+
+onMounted(() => {
+    if (props.pushQuery) {
+        window.history.replaceState({ parameters: parameters.value }, '');
+        window.addEventListener('popstate', popState);
+    }
+});
+
+onBeforeUnmount(() => {
+    if (props.pushQuery) window.removeEventListener('popstate', popState);
+});
+
+request();
+autoApplyState();
+</script>
+
+<template>
+    <slot name="initializing" v-if="initializing">
+        <Icon name="loading" />
+    </slot>
+    <slot v-if="!initializing" v-bind="slotProps" />
+    <BulkActions />
+</template>
