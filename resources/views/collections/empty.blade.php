@@ -13,7 +13,7 @@
 
     <collection-empty-state
         :collection='@json($collection)'
-        :create-label="{{ $collection->createLabel() }}"
+        create-label="{{ $collection->createLabel() }}"
         :blueprints="{{ Js::from($blueprints) }}"
         site="{{ $site }}"
         :can-edit="{{ $str::bool($user->can('edit', $collection)) }}"
