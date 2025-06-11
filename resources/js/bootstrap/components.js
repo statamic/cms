@@ -33,7 +33,6 @@ import EntryListing from '../components/entries/Listing.vue';
 import CollectionListing from '../components/collections/Listing.vue';
 import TaxonomyListing from '../components/taxonomies/Listing.vue';
 import TermListing from '../components/terms/Listing.vue';
-import AssetContainerList from '../components/AssetContainerList.vue';
 import AddonList from '../components/AddonList.vue';
 import AddonDetails from '../components/AddonDetails.vue';
 import CollectionWidget from '../components/entries/CollectionWidget.vue';
@@ -111,7 +110,6 @@ export default function registerGlobalComponents(app) {
     app.component('collection-list', CollectionListing);
     app.component('taxonomy-list', TaxonomyListing);
     app.component('term-list', TermListing);
-    app.component('asset-container-list', AssetContainerList);
     app.component('addon-list', AddonList);
     app.component('addon-details', AddonDetails);
 
