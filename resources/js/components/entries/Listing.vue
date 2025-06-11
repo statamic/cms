@@ -227,7 +227,6 @@ export default {
             initialSite: this.site,
             pushQuery: true,
             previousFilters: null,
-            selections: [],
         };
     },
 
