@@ -56,6 +56,10 @@ function save() {
         ])
         .then((response) => {
             Statamic.$toast.success('Saved');
+
+            if (response.data.redirect) {
+                window.location = response.data.redirect;
+            }
         });
 }
 
