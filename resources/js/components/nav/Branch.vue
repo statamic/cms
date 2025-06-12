@@ -70,15 +70,17 @@
                     v-tooltip="isSection ? __('Custom Section') : __('Custom Item')"
                 />
 
-                <dropdown-list class="ltr:ml-4 rtl:mr-4">
-                    <slot
-                        name="branch-options"
-                        :item="item"
-                        :depth="depth"
-                        :remove-branch="remove"
-                        :is-top-level="isTopLevel"
-                    />
-                </dropdown-list>
+                <Dropdown placement="left-start" class="me-4">
+                    <DropdownMenu>
+                        <slot
+                            name="branch-options"
+                            :item="item"
+                            :depth="depth"
+                            :remove-branch="remove"
+                            :is-top-level="isTopLevel"
+                        />
+                    </DropdownMenu>
+                </Dropdown>
             </div>
         </div>
     </div>
@@ -86,8 +88,14 @@
 
 <script>
 import { data_get } from '../../bootstrap/globals.js';
+import { Dropdown, DropdownMenu } from '@statamic/ui';
 
 export default {
+    components: {
+        Dropdown,
+        DropdownMenu,
+    },
+
     props: {
         item: Object,
         parentSection: Object,

@@ -19,7 +19,7 @@
 
         {{ __(tab.display) }}
 
-        <dropdown-list v-if="isActive" ref="dropdown" placement="bottom-start" class="ltr:text-left rtl:text-right">
+        <Dropdown v-if="isActive" placement="left-start" class="me-3">
             <template #trigger>
                 <button
                     class="hover:text-gray-900 active:text-gray-900 dark:hover:text-gray-400 ltr:ml-2 rtl:mr-2"
@@ -28,9 +28,11 @@
                     <svg-icon name="micro/chevron-down-xs" class="w-2" />
                 </button>
             </template>
-            <dropdown-item @click="edit" v-text="__('Edit')" />
-            <dropdown-item @click="remove" class="warning" v-text="__('Delete')" />
-        </dropdown-list>
+            <DropdownMenu>
+                <DropdownItem :text="__('Edit')" icon="edit" @click="edit" />
+                <DropdownItem :text="__('Delete')" icon="trash" variant="destructive" @click="remove" />
+            </DropdownMenu>
+        </Dropdown>
 
         <confirmation-modal
             v-if="editing"
@@ -97,7 +99,11 @@
 </template>
 
 <script>
+import { Dropdown, DropdownMenu, DropdownItem } from '@statamic/ui';
+
 export default {
+    components: { Dropdown, DropdownMenu, DropdownItem },
+
     props: {
         tab: {
             type: Object,

@@ -11,15 +11,12 @@
         </FieldsProvider>
 
         <td class="grid-row-controls row-controls" v-if="!grid.isReadOnly && (canAddRows || canDelete)">
-            <dropdown-list>
-                <dropdown-item :text="__('Duplicate Row')" @click="$emit('duplicate', index)" v-if="canAddRows" />
-                <dropdown-item
-                    v-if="canDelete"
-                    :text="__('Delete Row')"
-                    class="warning"
-                    @click="$emit('removed', index)"
-                />
-            </dropdown-list>
+            <Dropdown v-if="canAddRows || canDelete" placement="left-start">
+                <DropdownMenu>
+                    <DropdownItem v-if="canAddRows" :text="__('Duplicate Row')" icon="duplicate" @click="$emit('duplicate', index)" />
+                    <DropdownItem v-if="canDelete" :text="__('Delete Row')" icon="trash" variant="destructive" @click="$emit('removed', index)" />
+                </DropdownMenu>
+            </Dropdown>
         </td>
     </tr>
 </template>
@@ -34,9 +31,10 @@
 import GridCell from './Cell.vue';
 import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
 import FieldsProvider from '@statamic/components/ui/Publish/FieldsProvider.vue';
+import { Dropdown, DropdownMenu, DropdownItem } from '@statamic/ui';
 
 export default {
-    components: { FieldsProvider, GridCell },
+    components: { Dropdown, DropdownMenu, DropdownItem, FieldsProvider, GridCell },
 
     mixins: [ValidatesFieldConditions],
 

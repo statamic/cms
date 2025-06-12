@@ -13,7 +13,7 @@
             :sort-column="sortColumn"
             :sort-direction="sortDirection"
             @visible-columns-updated="visibleColumns = $event"
-            v-slot="{ hasSelections }"
+            @selections-updated="selections = $event"
         >
             <div>
                 <div class="card relative overflow-hidden p-0">
@@ -75,12 +75,31 @@
 
                     <div v-show="items.length === 0" class="p-6 text-center text-gray-500" v-text="__('No results')" />
 
-                    <data-list-bulk-actions
+                    <BulkActions
                         :url="actionUrl"
+                        :selections="selections"
                         :context="actionContext"
                         @started="actionStarted"
                         @completed="actionCompleted"
-                    />
+                        v-slot="{ actions }"
+                    >
+                        <div class="fixed inset-x-0 bottom-1 z-100 flex w-full justify-center">
+                            <ButtonGroup>
+                                <Button
+                                    variant="primary"
+                                    class="text-gray-400!"
+                                    :text="__n(`:count item selected|:count items selected`, selections.length)"
+                                />
+                                <Button
+                                    v-for="action in actions"
+                                    :key="action.handle"
+                                    variant="primary"
+                                    :text="__(action.title)"
+                                    @click="action.run"
+                                />
+                            </ButtonGroup>
+                        </div>
+                    </BulkActions>
 
                     <data-list-table
                         v-show="items.length"
@@ -99,18 +118,31 @@
                             <span class="font-mono text-2xs">{{ term.slug }}</span>
                         </template>
                         <template #actions="{ row: term, index }">
-                            <dropdown-list placement="left-start">
-                                <dropdown-item :text="__('View')" :redirect="term.permalink" />
-                                <dropdown-item :text="__('Edit')" :redirect="term.edit_url" />
-                                <div class="divider" />
-                                <data-list-inline-actions
-                                    :item="term.id"
-                                    :url="actionUrl"
-                                    :actions="term.actions"
-                                    @started="actionStarted"
-                                    @completed="actionCompleted"
-                                />
-                            </dropdown-list>
+                            <ItemActions
+                                :url="actionUrl"
+                                :actions="term.actions"
+                                :item="term.id"
+                                @started="actionStarted"
+                                @completed="actionCompleted"
+                                v-slot="{ actions }"
+                            >
+                                <Dropdown placement="left-start" class="me-3">
+                                    <DropdownMenu>
+                                        <DropdownLabel :text="__('Actions')" />
+                                        <DropdownItem :text="__('Visit URL')" :href="term.permalink" icon="eye" />
+                                        <DropdownItem :text="__('Edit')" :href="term.edit_url" icon="edit" />
+                                        <DropdownSeparator v-if="actions.length" />
+                                        <DropdownItem
+                                            v-for="action in actions"
+                                            :key="action.handle"
+                                            :text="__(action.title)"
+                                            :icon="action.icon"
+                                            :variant="action.dangerous ? 'destructive' : 'default'"
+                                            @click="action.run"
+                                        />
+                                    </DropdownMenu>
+                                </Dropdown>
+                            </ItemActions>
                         </template>
                     </data-list-table>
                 </div>
@@ -128,9 +160,32 @@
 
 <script>
 import Listing from '../Listing.vue';
+import {
+    Button,
+    ButtonGroup,
+    Dropdown,
+    DropdownItem,
+    DropdownLabel,
+    DropdownMenu,
+    DropdownSeparator,
+} from '@statamic/ui';
+import BulkActions from '@statamic/components/actions/BulkActions.vue';
+import ItemActions from '@statamic/components/actions/ItemActions.vue';
 
 export default {
     mixins: [Listing],
+
+    components: {
+        Button,
+        ButtonGroup,
+        Dropdown,
+        DropdownMenu,
+        DropdownLabel,
+        DropdownSeparator,
+        DropdownItem,
+        BulkActions,
+        ItemActions
+    },
 
     props: {
         taxonomy: String,

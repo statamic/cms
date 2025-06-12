@@ -3,23 +3,34 @@
         <header class="mb-6">
             <div class="flex items-center">
                 <h1 class="flex-1" v-text="title" />
-                <dropdown-list class="ltr:mr-4 rtl:ml-4" v-if="canEditBlueprint || hasItemActions">
-                    <dropdown-item
-                        :text="__('Edit Blueprint')"
-                        v-if="canEditBlueprint"
-                        :redirect="actions.editBlueprint"
-                    />
-                    <li class="divider" />
-                    <data-list-inline-actions
-                        v-if="hasItemActions"
-                        :item="values.id"
-                        :url="itemActionUrl"
-                        :actions="itemActions"
-                        :is-dirty="isDirty"
-                        @started="actionStarted"
-                        @completed="actionCompleted"
-                    />
-                </dropdown-list>
+
+                <ItemActions
+                    v-if="canEditBlueprint || hasItemActions"
+                    :item="values.id"
+                    :url="itemActionUrl"
+                    :actions="itemActions"
+                    :is-dirty="isDirty"
+                    @started="actionStarted"
+                    @completed="actionCompleted"
+                >
+                    <Dropdown class="me-4">
+                        <template #trigger>
+                            <Button icon="ui/dots" variant="ghost" />
+                        </template>
+                        <DropdownMenu>
+                            <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" v-if="canEditBlueprint" :href="actions.editBlueprint" />
+                            <DropdownSeparator v-if="canEditBlueprint && itemActions.length" />
+                            <DropdownItem
+                                v-for="action in itemActions"
+                                :key="action.handle"
+                                :text="__(action.title)"
+                                :icon="action.icon"
+                                :variant="action.dangerous ? 'destructive' : 'default'"
+                                @click="action.run"
+                            />
+                        </DropdownMenu>
+                    </Dropdown>
+                </ItemActions>
 
                 <TwoFactor v-if="twoFactor" v-bind="twoFactor" trigger-class="ltr:mr-4 rtl:ml-4" />
 
@@ -67,11 +78,19 @@ import HasHiddenFields from '../publish/HasHiddenFields';
 import HasActions from '../publish/HasActions';
 import TwoFactor from '@statamic/components/two-factor/TwoFactor.vue';
 import clone from '@statamic/util/clone.js';
+import { Button, Dropdown, DropdownMenu, DropdownItem, DropdownSeparator } from '@statamic/ui';
+import ItemActions from '@statamic/components/actions/ItemActions.vue';
 
 export default {
     mixins: [HasHiddenFields, HasActions],
 
     components: {
+        ItemActions,
+        Dropdown,
+        DropdownMenu,
+        DropdownItem,
+        DropdownSeparator,
+        Button,
         ChangePassword,
         TwoFactor,
     },

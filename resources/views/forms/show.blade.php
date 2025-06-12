@@ -13,43 +13,50 @@
             </h1>
 
             @if (\Statamic\Facades\User::current()->can('edit', $form) || \Statamic\Facades\User::current()->can('delete', $form))
-                <dropdown-list class="ltr:mr-2 rtl:ml-2">
-                    @can('edit', $form)
-                        <dropdown-item :text="__('Edit Form')" redirect="{{ $form->editUrl() }}"></dropdown-item>
-                    @endcan
+                <ui-dropdown placement="left-start" class="me-2">
+                    <ui-dropdown-menu>
+                        @can('edit', $form)
+                            <ui-dropdown-item :text="__('Edit Form')" icon="edit" href="{{ $form->editUrl() }}"></ui-dropdown-item>
+                        @endcan
 
-                    @can('configure form fields')
-                        <dropdown-item
-                            :text="__('Edit Blueprint')"
-                            redirect="{{ cp_route('forms.blueprint.edit', $form->handle()) }}"
-                        ></dropdown-item>
-                    @endcan
+                        @can('configure form fields')
+                            <ui-dropdown-item
+                                :text="__('Edit Blueprint')"
+                                icon="blueprint-edit"
+                                href="{{ cp_route('forms.blueprint.edit', $form->handle()) }}"
+                            ></ui-dropdown-item>
+                        @endcan
 
-                    @can('delete', $form)
-                        <dropdown-item :text="__('Delete Form')" class="warning" @click="$refs.deleter.confirm()">
-                            <resource-deleter
-                                ref="deleter"
-                                resource-title="{{ $form->title() }}"
-                                route="{{ $form->deleteUrl() }}"
-                                redirect="{{ cp_route('forms.index') }}"
-                            ></resource-deleter>
-                        </dropdown-item>
-                    @endcan
-                </dropdown-list>
+                        @can('delete', $form)
+                            <ui-dropdown-item :text="__('Delete Form')" icon="trash" variant="destructive" @click="$refs.deleter.confirm()"></ui-dropdown-item>
+                        @endcan
+                    </ui-dropdown-menu>
+                </ui-dropdown>
+
+                @can('delete', $form)
+                    <resource-deleter
+                        ref="deleter"
+                        resource-title="{{ $form->title() }}"
+                        route="{{ $form->deleteUrl() }}"
+                        redirect="{{ cp_route('forms.index') }}"
+                    ></resource-deleter>
+                @endcan
             @endif
 
             @if (($exporters = $form->exporters()) && $exporters->isNotEmpty())
-                <dropdown-list>
-                    <template v-slot:trigger>
-                        <button class="btn" slot="trigger">{{ __('Export Submissions') }}</button>
+                <ui-dropdown>
+                    <template #trigger>
+                        <ui-button :text="__('Export Submissions')"></ui-button>
                     </template>
-                    @foreach ($exporters as $exporter)
-                        <dropdown-item
-                            text="{{ $exporter->title() }}"
-                            redirect="{{ $exporter->downloadUrl() }}"
-                        ></dropdown-item>
-                    @endforeach
-                </dropdown-list>
+                    <ui-dropdown-menu>
+                        @foreach ($exporters as $exporter)
+                            <ui-dropdown-item
+                                text="{{ $exporter->title() }}"
+                                href="{{ $exporter->downloadUrl() }}"
+                            ></ui-dropdown-item>
+                        @endforeach
+                    </ui-dropdown-menu>
+                </ui-dropdown>
             @endif
         </div>
     </header>

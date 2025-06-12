@@ -15,21 +15,18 @@
                     <span class="font-mono text-xs">{{ value }}</span>
                 </template>
                 <template #actions="{ row: blueprint, index }">
-                    <dropdown-list>
-                        <dropdown-item :text="__('Edit')" :redirect="blueprint.edit_url" />
-                        <dropdown-item
-                            :text="__('Delete')"
-                            class="warning"
-                            @click="$refs[`deleter_${blueprint.id}`].confirm()"
-                        >
-                            <resource-deleter
-                                :ref="`deleter_${blueprint.id}`"
-                                :resource="blueprint"
-                                @deleted="removeRow(blueprint)"
-                            >
-                            </resource-deleter>
-                        </dropdown-item>
-                    </dropdown-list>
+                    <Dropdown placement="left-start" class="me-3">
+                        <DropdownMenu>
+                            <DropdownItem :text="__('Edit')" icon="edit" :href="blueprint.edit_url" />
+                            <DropdownItem :text="__('Delete')" icon="trash" variant="destructive" @click="$refs[`deleter_${blueprint.id}`].confirm()" />
+                        </DropdownMenu>
+                    </Dropdown>
+
+                    <resource-deleter
+                        :ref="`deleter_${blueprint.id}`"
+                        :resource="blueprint"
+                        @deleted="removeRow(blueprint)"
+                    />
                 </template>
             </data-list-table>
         </ui-panel>
@@ -38,9 +35,12 @@
 
 <script>
 import Listing from '../Listing.vue';
+import { Dropdown, DropdownItem, DropdownLabel, DropdownMenu, DropdownSeparator } from '@statamic/ui';
 
 export default {
     mixins: [Listing],
+
+    components: { Dropdown, DropdownMenu, DropdownLabel, DropdownSeparator, DropdownItem },
 
     props: ['initialRows', 'reorderable'],
 
