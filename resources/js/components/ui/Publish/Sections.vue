@@ -6,14 +6,17 @@ import Fields from './Fields.vue';
 import ShowField from '@statamic/components/field-conditions/ShowField.js';
 import { injectContainerContext } from './Container.vue';
 import markdown from '@statamic/util/markdown.js';
+import { computed } from 'vue';
 
 const { blueprint, store } = injectContainerContext();
 const tab = injectTabContext();
 const sections = tab.sections;
-const visibleSections = sections.filter(section => {
-    return section.fields.some((field) => {
-        return new ShowField(store, store.values, store.extraValues).showField(field, field.handle);
-    });
+const visibleSections = computed(() => {
+   return sections.filter(section => {
+       return section.fields.some((field) => {
+           return new ShowField(store, store.values, store.extraValues).showField(field, field.handle);
+       });
+   });
 });
 
 function renderInstructions(instructions) {
