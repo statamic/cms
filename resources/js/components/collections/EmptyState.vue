@@ -22,10 +22,10 @@ function getCreateUrl(blueprint = null) {
 
 <template>
     <ui-card-panel :heading="__('Start designing your collection with these steps')" class="max-w-md m-auto">
-        <div class="flex flex-wrap gap-9 py-4 px-1">
+        <div class="flex flex-wrap [:has(>&)]:p-1.5">
             <template v-if="canEdit">
                 <!-- CONFIGURE COLLECTION -->
-                <a :href="cp_url(`collections/${collection.handle}/edit`)" class="w-full flex gap-2 items-start hover:bg-gray-100 dark:hover:bg-dark-550 rounded-md group">
+                <a :href="cp_url(`collections/${collection.handle}/edit`)" class="w-full flex gap-2 px-3 py-5 pb-6.5 items-start hover:bg-gray-100 dark:hover:bg-dark-550 rounded-md group">
                     <div class="[&_svg]:size-10 [&_svg]:text-gray-400 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175">
                         <Icon name="configure-large" />
                     </div>
@@ -40,7 +40,7 @@ function getCreateUrl(blueprint = null) {
                 <!-- CREATE ENTRY -->
                 <!-- [1] If there's more than one blueprint output it them in a list -->
                 <template v-if="blueprints.length > 1">
-                    <div class="w-full flex gap-2 items-start hover:bg-gray-100 dark:hover:bg-dark-550 rounded-md group">
+                    <div class="w-full flex gap-2 px-3 py-5 pb-6.5 items-start hover:bg-gray-100 dark:hover:bg-dark-550 rounded-md group">
                         <div class="[&_svg]:size-10 [&_svg]:text-gray-400 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175">
                             <Icon name="fieldtype-entries-large" />
                         </div>
@@ -57,7 +57,7 @@ function getCreateUrl(blueprint = null) {
                 </template>
                 <!-- [/2] Otherwise wrap a link around the container -->
                 <template v-else>
-                    <a :href="getCreateUrl(blueprints[0]?.handle)" class="w-full flex gap-2 items-start hover:bg-gray-100 dark:hover:bg-dark-550 rounded-md group">
+                    <a :href="getCreateUrl(blueprints[0]?.handle)" class="w-full flex gap-2 px-3 py-5 pb-6.5 items-start hover:bg-gray-100 dark:hover:bg-dark-550 rounded-md group">
                         <div class="[&_svg]:size-10 [&_svg]:text-gray-400 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175">
                             <Icon name="fieldtype-entries-large" />
                         </div>
@@ -71,7 +71,7 @@ function getCreateUrl(blueprint = null) {
 
             <template v-if="canConfigureFields">
                 <!-- CONFIGURE BLUEPRINTS -->
-                <a :href="cp_url(`collections/${collection.handle}/blueprints`)" class="w-full flex gap-2 items-start hover:bg-gray-100 dark:hover:bg-dark-550 rounded-md group">
+                <a :href="cp_url(`collections/${collection.handle}/blueprints`)" class="w-full flex gap-2 px-3 py-5 pb-6.5 items-start hover:bg-gray-100 dark:hover:bg-dark-550 rounded-md group">
                     <div class="[&_svg]:size-10 [&_svg]:text-gray-400 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175">
                         <Icon name="blueprints-large" />
                     </div>
@@ -84,7 +84,7 @@ function getCreateUrl(blueprint = null) {
 
             <template v-if="canStore">
                 <!-- SCAFFOLD VIEWS -->
-                <a :href="cp_url(`collections/${collection.handle}/scaffold`)" class="w-full flex gap-2 items-start hover:bg-gray-100 dark:hover:bg-dark-550 rounded-md group">
+                <a :href="cp_url(`collections/${collection.handle}/scaffold`)" class="w-full flex gap-2 px-3 py-5 pb-6.5 items-start hover:bg-gray-100 dark:hover:bg-dark-550 rounded-md group">
                     <div class="[&_svg]:size-10 [&_svg]:text-gray-400 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175">
                         <Icon name="scaffold-large" />
                     </div>
