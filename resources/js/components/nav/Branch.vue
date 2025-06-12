@@ -5,7 +5,7 @@
             <div class="flex flex-1 items-center" :class="{ 'opacity-50': isHidden || isInHiddenSection }">
                 <template v-if="!isSection && !isChild">
                     <i v-if="isAlreadySvg" class="h-4 w-4 ltr:mr-2 rtl:ml-2" v-html="icon"></i>
-                    <svg-icon v-else class="h-4 w-4 ltr:mr-2 rtl:ml-2" :name="'light/' + icon" />
+                    <Icon v-else class="h-4 w-4 ltr:mr-2 rtl:ml-2" :name="icon" />
                 </template>
 
                 <a
@@ -88,10 +88,11 @@
 
 <script>
 import { data_get } from '../../bootstrap/globals.js';
-import { Dropdown, DropdownMenu } from '@statamic/ui';
+import { Icon, Dropdown, DropdownMenu } from '@statamic/ui';
 
 export default {
     components: {
+        Icon,
         Dropdown,
         DropdownMenu,
     },
