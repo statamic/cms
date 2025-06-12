@@ -22,8 +22,8 @@
         :can-store="{{ $str::bool($user->can('create', 'Statamic\Contracts\Entries\Collection')) }}"
     ></collection-empty-state>
 
-    @include('statamic::partials.docs-callout', [
-        'topic' => __('Collections'),
-        'url' => Statamic::docsUrl('collections')
-    ])
+    <x-statamic::docs-callout
+        :topic="__('Collections')"
+        :url="Statamic::docsUrl('collections')"
+    />
 @stop
