@@ -28,7 +28,7 @@ const badgeClasses = computed(() => {
         variants: {
             size: {
                 sm: 'text-2xs py-0 leading-normal px-1 rounded-[0.1875rem] [&_svg]:size-2',
-                default: 'text-xs py-0.5 px-2.5 rounded-sm [&_svg]:size-2.5',
+                default: 'text-xs py-0.5 px-2.25 rounded-sm [&_svg]:size-2.5',
                 lg: 'font-medium text-sm py-0.5 leading-relaxed px-2.5 rounded-lg [&_svg]:size-3 [&_svg]:me-1',
             },
             color: {
