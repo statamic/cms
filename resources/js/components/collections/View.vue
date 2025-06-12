@@ -121,7 +121,7 @@
             :initial-sort-direction="sortDirection"
             :initial-columns="columns"
             :filters="filters"
-            :action-url="actionUrl"
+            :action-url="entriesActionUrl"
             :reordering="reordering"
             :reorder-url="reorderUrl"
             :site="site"
