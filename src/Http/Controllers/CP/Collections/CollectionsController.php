@@ -55,10 +55,25 @@ class CollectionsController extends CpController
                 || User::current()->can('view', $collection)
                 && $collection->sites()->contains(Site::selected()->handle());
         })->map(function ($collection) {
+            $entriesCount = $collection->queryEntries()
+                ->where('site', Site::selected())
+                ->when(User::current()->cant('view-other-authors-entries', [EntryContract::class, $collection]), function ($query) use ($collection) {
+                    $blueprintsWithoutAuthor = $collection->entryBlueprints()
+                        ->filter(fn ($blueprint) => ! $blueprint->hasField('author'))
+                        ->map->handle()->all();
+
+                    $query->where(function ($query) use ($blueprintsWithoutAuthor) {
+                        $query
+                            ->whereIn('blueprint', $blueprintsWithoutAuthor)
+                            ->orWhere('author', User::current()->id());
+                    });
+                })
+                ->count();
+
             return [
                 'id' => $collection->handle(),
                 'title' => $collection->title(),
-                'entries' => $collection->queryEntries()->where('site', Site::selected())->count(),
+                'entries' => $entriesCount,
                 'edit_url' => $collection->editUrl(),
                 'delete_url' => $collection->deleteUrl(),
                 'entries_url' => cp_route('collections.show', $collection->handle()),
