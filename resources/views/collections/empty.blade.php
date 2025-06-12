@@ -7,7 +7,7 @@
 
 @section('content')
 
-    <header class="mb-6">
+    <header class="mb-6 text-center">
         <h1 v-pre>{{ __($collection->title()) }}</h1>
     </header>
 
