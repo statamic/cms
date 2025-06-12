@@ -8,7 +8,7 @@
 
         <uploader
             ref="uploader"
-            :container="container"
+            :container="container.handle"
             :enabled="canUpload"
             :path="folder"
             @updated="uploadsUpdated"
@@ -224,7 +224,7 @@ export default {
          * The initial container to be displayed in the selector.
          */
         container() {
-            return this.config.container || this.meta.container;
+            return this.meta.container;
         },
 
         /**
@@ -374,7 +374,7 @@ export default {
 
         canBrowse() {
             const hasPermission =
-                this.can('configure asset containers') || this.can('view ' + this.container + ' assets');
+                this.can('configure asset containers') || this.can('view ' + this.container.handle + ' assets');
 
             if (!hasPermission) return false;
 
@@ -384,7 +384,7 @@ export default {
         canUpload() {
             const hasPermission =
                 this.config.allow_uploads &&
-                (this.can('configure asset containers') || this.can('upload ' + this.container + ' assets'));
+                (this.can('configure asset containers') || this.can('upload ' + this.container.handle + ' assets'));
 
             if (!hasPermission) return false;
 
@@ -586,7 +586,7 @@ export default {
 
         uploadSelected(upload) {
             const path = `${this.folder}/${upload.basename}`.replace(/^\/+/, '');
-            const id = `${this.container}::${path}`;
+            const id = `${this.container.handle}::${path}`;
 
             this.uploads.splice(this.uploads.indexOf(upload), 1);
 
