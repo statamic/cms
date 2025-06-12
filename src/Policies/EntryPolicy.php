@@ -30,6 +30,10 @@ class EntryPolicy
             return false;
         }
 
+        if ($this->hasAnotherAuthor($user, $entry)) {
+            return $user->hasPermission("view other authors {$entry->collectionHandle()} entries");
+        }
+
         return $this->edit($user, $entry)
             || $user->hasPermission("view {$entry->collectionHandle()} entries");
     }
