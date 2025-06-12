@@ -1,12 +1,12 @@
 <template>
     <div class="site-selector flex h-full items-center dark:border-dark-900 ltr:mr-4 rtl:ml-4">
-        <Combobox
+        <Select
             :options="sites"
             option-label="name"
             option-value="handle"
             :searchable="false"
             :model-value="active"
-            :buttonAppearance="false"
+            :button-appearance="false"
             @update:model-value="selected"
         >
             <template #selected-option="{ option }">
@@ -20,15 +20,15 @@
             <template #option="option">
                 <div :class="{ 'text-gray-500': handle === active }">{{ __(option.name) }}</div>
             </template>
-        </Combobox>
+        </Select>
     </div>
 </template>
 
 <script>
-import { Combobox } from '@statamic/ui';
+import { Select } from '@statamic/ui';
 
 export default {
-    components: { Combobox },
+    components: { Select },
 
     computed: {
         sites() {
