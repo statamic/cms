@@ -21,77 +21,81 @@ function getCreateUrl(blueprint = null) {
 </script>
 
 <template>
-    <div class="card p-4 content">
-        <div class="flex flex-wrap">
-            <template v-if="canEdit">
-                <a :href="cp_url(`collections/${collection.handle}/edit`)" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
-                    <div class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175">
-                        <Icon name="configure" />
-                    </div>
-                    <div class="flex-1 mb-4 md:mb-0 md:rtl:ml-6 md:ltr:mr-6">
-                        <h3 class="mb-2 text-blue-600 dark:text-blue-600">{{ __('Configure Collection') }} →</h3>
-                        <p>{{ __('statamic::messages.collection_next_steps_configure_description') }}</p>
-                    </div>
-                </a>
-            </template>
+    <ui-card-panel :heading="__('Start designing your collection with these steps')">
+        <div class="space-y-8">
+            <div class="p-4 content">
+                <div class="flex flex-wrap">
+                    <template v-if="canEdit">
+                        <a :href="cp_url(`collections/${collection.handle}/edit`)" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
+                            <div class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175">
+                                <Icon name="configure" />
+                            </div>
+                            <div class="flex-1 mb-4 md:mb-0 md:rtl:ml-6 md:ltr:mr-6">
+                                <h3 class="mb-2 text-blue-600 dark:text-blue-600">{{ __('Configure Collection') }} →</h3>
+                                <p>{{ __('statamic::messages.collection_next_steps_configure_description') }}</p>
+                            </div>
+                        </a>
+                    </template>
 
-            <template v-if="canCreate">
-                <template v-if="blueprints.length">
-                    <div class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
-                        <div class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175">
-                            <Icon name="fieldtype-blueprints" />
-                        </div>
-                        <div class="flex-1 mb-4 md:mb-0 md:rtl:ml-6 md:ltr:mr-6">
-                            <h3 class="mb-2 text-blue-600 dark:text-blue-600">{{ __(createLabel) }}</h3>
-                            <p>{{ __('statamic::messages.collection_next_steps_create_entry_description') }}</p>
-                            <template v-for="blueprint in blueprints" :key="blueprint.handle">
-                                <a :href="getCreateUrl(blueprint.handle)" class="text-blue-600 text-sm rtl:ml-2 ltr:mr-2">
-                                    {{ blueprint.title }} →
-                                </a>
-                            </template>
-                        </div>
-                    </div>
-                </template>
-                <template v-else>
-                    <a :href="getCreateUrl()" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
-                        <div class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175">
-                            <Icon name="fieldtype-entries" />
-                        </div>
-                        <div class="flex-1 mb-4 md:mb-0 md:rtl:ml-6 md:ltr:mr-6">
-                            <h3 class="mb-2 text-blue-600 dark:text-blue-600">{{ __(createLabel) }} →</h3>
-                            <p>{{ __('statamic::messages.collection_next_steps_create_entry_description') }}</p>
-                        </div>
-                    </a>
-                </template>
-            </template>
+                    <template v-if="canCreate">
+                        <template v-if="blueprints.length">
+                            <div class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
+                                <div class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175">
+                                    <Icon name="fieldtype-entries" />
+                                </div>
+                                <div class="flex-1 mb-4 md:mb-0 md:rtl:ml-6 md:ltr:mr-6">
+                                    <h3 class="mb-2 text-blue-600 dark:text-blue-600">{{ __(createLabel) }}</h3>
+                                    <p>{{ __('statamic::messages.collection_next_steps_create_entry_description') }}</p>
+                                    <template v-for="blueprint in blueprints" :key="blueprint.handle">
+                                        <a :href="getCreateUrl(blueprint.handle)" class="text-blue-600 text-sm rtl:ml-2 ltr:mr-2">
+                                            {{ blueprint.title }} →
+                                        </a>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+                        <template v-else>
+                            <a :href="getCreateUrl()" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
+                                <div class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175">
+                                    <Icon name="fieldtype-entries" />
+                                </div>
+                                <div class="flex-1 mb-4 md:mb-0 md:rtl:ml-6 md:ltr:mr-6">
+                                    <h3 class="mb-2 text-blue-600 dark:text-blue-600">{{ __(createLabel) }} →</h3>
+                                    <p>{{ __('statamic::messages.collection_next_steps_create_entry_description') }}</p>
+                                </div>
+                            </a>
+                        </template>
+                    </template>
 
-            <template v-if="canConfigureFields">
-                <a :href="cp_url(`collections/${collection.handle}/blueprints`)" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
-                    <div class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175">
-                        <Icon name="fieldtype-blueprints" />
-                    </div>
-                    <div class="flex-1 mb-4 md:mb-0 md:rtl:ml-6 md:ltr:mr-6">
-                        <h3 class="mb-2 text-blue-600 dark:text-blue-600">{{ __('Configure Blueprints') }} →</h3>
-                        <p>{{ __('statamic::messages.collection_next_steps_blueprints_description') }}</p>
-                    </div>
-                </a>
-            </template>
+                    <template v-if="canConfigureFields">
+                        <a :href="cp_url(`collections/${collection.handle}/blueprints`)" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
+                            <div class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175">
+                                <Icon name="fieldtype-blueprints" />
+                            </div>
+                            <div class="flex-1 mb-4 md:mb-0 md:rtl:ml-6 md:ltr:mr-6">
+                                <h3 class="mb-2 text-blue-600 dark:text-blue-600">{{ __('Configure Blueprints') }} →</h3>
+                                <p>{{ __('statamic::messages.collection_next_steps_blueprints_description') }}</p>
+                            </div>
+                        </a>
+                    </template>
 
-            <template v-if="canStore">
-                <a :href="cp_url(`collections/${collection.handle}/scaffold`)" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
-                    <div class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175">
-                        <Icon name="scaffold" />
-                    </div>
-                    <div class="flex-1 mb-4 md:mb-0 md:rtl:ml-6 md:ltr:mr-6">
-                        <h3 class="mb-2 text-blue-600 dark:text-blue-600">{{ __('Scaffold Views') }} →</h3>
-                        <p>{{ __('statamic::messages.collection_next_steps_scaffold_description') }}</p>
-                    </div>
-                </a>
-            </template>
+                    <template v-if="canStore">
+                        <a :href="cp_url(`collections/${collection.handle}/scaffold`)" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
+                            <div class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175">
+                                <Icon name="scaffold" />
+                            </div>
+                            <div class="flex-1 mb-4 md:mb-0 md:rtl:ml-6 md:ltr:mr-6">
+                                <h3 class="mb-2 text-blue-600 dark:text-blue-600">{{ __('Scaffold Views') }} →</h3>
+                                <p>{{ __('statamic::messages.collection_next_steps_scaffold_description') }}</p>
+                            </div>
+                        </a>
+                    </template>
 
-            <div class="hidden first:flex justify-center items-center p-8 w-full">
-                <Icon :name="svg || 'empty/content'" />
+                    <div class="hidden first:flex justify-center items-center p-8 w-full">
+                        <Icon :name="svg || 'empty/content'" />
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
+    </ui-card-panel>
 </template>
