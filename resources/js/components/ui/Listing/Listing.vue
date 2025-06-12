@@ -78,29 +78,35 @@ const loading = ref(true);
 let popping = false;
 let source = null;
 const searchQuery = ref(null);
+const columns = ref(props.columns);
+const sortColumn = ref(props.sortColumn || (props.columns.length ? props.columns[0].field : null));
+const sortDirection = ref(props.sortDirection || getDefaultSortDirectionForColumn(sortColumn.value));
+const selections = ref(props.selections || []);
 
 const rawParameters = computed(() => ({
     page: currentPage.value,
     perPage: perPage.value,
-    sort: props.sortColumn,
-    order: props.sortDirection,
+    sort: sortColumn.value,
+    order: sortDirection.value,
     search: searchQuery.value,
     columns: visibleColumns.value.map((column) => column.field).join(','),
 }));
 
+watch(columns, (newColumns) => emit('update:columns', newColumns));
+watch(sortColumn, (newSortColumn) => emit('update:sortColumn', newSortColumn));
+watch(sortDirection, (newSortDirection) => emit('update:sortDirection', newSortDirection));
+watch(selections, (newSelections) => emit('update:selections', newSelections), { deep: true });
+
 function setParameters(params) {
     currentPage.value = parseInt(params.page);
     perPage.value = parseInt(params.perPage);
-    emit('update:sortColumn', params.sort);
-    emit('update:sortDirection', params.order);
+    sortColumn.value = params.sort;
+    sortDirection.value = params.order;
     searchQuery.value = params.search;
-    emit(
-        'update:columns',
-        props.columns.map((column) => ({
-            ...column,
-            visible: params.columns.split(',').includes(column.field),
-        })),
-    );
+    columns.value = columns.value.map((column) => ({
+        ...column,
+        visible: params.columns.split(',').includes(column.field),
+    }));
 }
 
 const parameters = computed(() => {
@@ -185,20 +191,15 @@ function autoApplyState() {
     nextTick(() => (popping = false));
 }
 
-const selections = computed({
-    get: () => props.selections,
-    set: (selections) => emit('update:selections', selections),
-});
-
 const visibleColumns = computed(() => {
-    const visibleColumns = props.columns.filter((column) => column.visible);
-    return visibleColumns.length ? visibleColumns : props.columns;
+    const visibleColumns = columns.value.filter((column) => column.visible);
+    return visibleColumns.length ? visibleColumns : columns.value;
 });
 
-const hiddenColumns = computed(() => props.columns.filter((column) => !column.visible));
+const hiddenColumns = computed(() => columns.value.filter((column) => !column.visible));
 
 const sortableColumns = computed(() => {
-    return props.columns.filter((column) => column.sortable).map((column) => column.field);
+    return columns.value.filter((column) => column.sortable).map((column) => column.field);
 });
 
 function isColumnVisible(column) {
@@ -207,9 +208,9 @@ function isColumnVisible(column) {
 
 function setColumns(newColumns) {
     // Avoid unnecessary updates and infinite loops if the columns haven't changed.
-    if (JSON.stringify(newColumns) === JSON.stringify(props.columns)) return;
+    if (JSON.stringify(newColumns) === JSON.stringify(columns.value)) return;
 
-    emit('update:columns', newColumns);
+    columns.value = newColumns;
 }
 
 function setSortColumn(column) {
@@ -219,17 +220,17 @@ function setSortColumn(column) {
 
     // If sorting by the same column, toggle the direction.
     // Otherwise, set the default direction.
-    if (props.sortColumn === column) {
+    if (sortColumn.value === column) {
         toggleSortDirection();
     } else {
-        emit('update:sortDirection', getDefaultSortDirectionForColumn(column));
+        sortDirection.value = getDefaultSortDirectionForColumn(column);
     }
 
-    emit('update:sortColumn', column);
+    sortColumn.value = column;
 }
 
 function getColumnFieldtype(column) {
-    return props.columns.find((c) => c.field === column)?.fieldtype;
+    return columns.value.find((c) => c.field === column)?.fieldtype;
 }
 
 function getDefaultSortDirectionForColumn(column) {
@@ -237,7 +238,7 @@ function getDefaultSortDirectionForColumn(column) {
 }
 
 function toggleSortDirection() {
-    emit('update:sortDirection', props.sortDirection === 'asc' ? 'desc' : 'asc');
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
 }
 
 function setCurrentPage(page) {
@@ -256,11 +257,11 @@ provideListingContext({
     loading,
     items,
     meta,
-    columns: toRef(() => props.columns),
+    columns,
     setColumns,
     visibleColumns,
     hiddenColumns,
-    sortColumn: toRef(() => props.sortColumn),
+    sortColumn,
     setSortColumn,
     selections,
     maxSelections: toRef(() => props.maxSelections),
