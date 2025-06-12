@@ -2,10 +2,13 @@
 
 namespace Statamic\Data;
 
+use Statamic\Exceptions\RecursiveAugmentationException;
 use Statamic\Facades\Blink;
 
 trait HasOrigin
 {
+    private $resolvingValues = false;
+
     /**
      * @var string
      */
@@ -31,13 +34,32 @@ trait HasOrigin
             ->merge($computedKeys);
     }
 
+    private function guardRecursiveAugmentation()
+    {
+        if ($this->resolvingValues) {
+            $className = get_class($this);
+            throw new RecursiveAugmentationException("Recursion detected while augmenting [{$className}] with ID [{$this->id}].");
+        }
+
+        $this->resolvingValues = true;
+    }
+
+    private function ungardRecursiveAugmentation()
+    {
+        $this->resolvingValues = false;
+    }
+
     public function values()
     {
+        $this->guardRecursiveAugmentation();
+
         $originFallbackValues = method_exists($this, 'getOriginFallbackValues') ? $this->getOriginFallbackValues() : collect();
 
         $originValues = $this->hasOrigin() ? $this->origin()->values() : collect();
 
         $computedData = method_exists($this, 'computedData') ? $this->computedData() : [];
+
+        $this->ungardRecursiveAugmentation();
 
         return collect()
             ->merge($originFallbackValues)
