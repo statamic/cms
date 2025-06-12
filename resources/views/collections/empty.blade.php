@@ -7,10 +7,6 @@
 
 @section('content')
 
-    <header class="mb-6">
-        <h1 v-pre>{{ __($collection->title()) }}</h1>
-    </header>
-
     <collection-empty-state
         :collection='@json($collection)'
         create-label="{{ $collection->createLabel() }}"
@@ -22,8 +18,8 @@
         :can-store="{{ $str::bool($user->can('create', 'Statamic\Contracts\Entries\Collection')) }}"
     ></collection-empty-state>
 
-    @include('statamic::partials.docs-callout', [
-        'topic' => __('Collections'),
-        'url' => Statamic::docsUrl('collections')
-    ])
+    <x-statamic::docs-callout
+        :topic="__('Collections')"
+        :url="Statamic::docsUrl('collections')"
+    />
 @stop
