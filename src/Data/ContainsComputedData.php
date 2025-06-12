@@ -2,6 +2,8 @@
 
 namespace Statamic\Data;
 
+use Statamic\Fields\Value;
+
 trait ContainsComputedData
 {
     protected $withComputedData = true;
@@ -17,11 +19,22 @@ trait ContainsComputedData
 
     public function computedData()
     {
+        return $this->getComputedData(false);
+    }
+
+    public function getComputedData($wrapInValue)
+    {
         if (! method_exists($this, 'getComputedCallbacks')) {
             return collect();
         }
 
-        return collect($this->getComputedCallbacks())->map(function ($callback, $field) {
+        return collect($this->getComputedCallbacks())->map(function ($callback, $field) use ($wrapInValue) {
+            if ($wrapInValue) {
+                return new Value(function () use ($field) {
+                    return $this->getComputed($field);
+                });
+            }
+
             return $this->getComputed($field);
         });
     }
