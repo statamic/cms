@@ -7,13 +7,6 @@
 
 @section('content')
 
-    <header class="py-8 mt-8 text-center">
-        <h1 class="text-[25px] font-medium antialiased flex justify-center items-center gap-2" v-pre>
-            <Icon name="collections" />
-            {{ __($collection->title()) }}
-        </h1>
-    </header>
-
     <collection-empty-state
         :collection='@json($collection)'
         create-label="{{ $collection->createLabel() }}"

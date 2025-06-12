@@ -21,6 +21,13 @@ function getCreateUrl(blueprint = null) {
 </script>
 
 <template>
+    <header class="py-8 mt-8 text-center">
+        <h1 class="text-[25px] font-medium antialiased flex justify-center items-center gap-2">
+            <Icon name="collections" class="size-5 text-gray-500"></Icon>
+            {{ __(collection.title) }}
+        </h1>
+    </header>
+
     <ui-card-panel :heading="__('Start designing your collection with these steps')" class="max-w-md m-auto">
         <div class="flex flex-wrap [:has(>&)]:p-1.5">
             <template v-if="canEdit">
