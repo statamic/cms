@@ -85,6 +85,7 @@ const rawParameters = computed(() => ({
     sort: props.sortColumn,
     order: props.sortDirection,
     search: searchQuery.value,
+    columns: visibleColumns.value.map((column) => column.field).join(','),
 }));
 
 function setParameters(params) {
@@ -93,6 +94,13 @@ function setParameters(params) {
     emit('update:sortColumn', params.sort);
     emit('update:sortDirection', params.order);
     searchQuery.value = params.search;
+    emit(
+        'update:columns',
+        props.columns.map((column) => ({
+            ...column,
+            visible: params.columns.split(',').includes(column.field),
+        })),
+    );
 }
 
 const parameters = computed(() => {
@@ -197,8 +205,11 @@ function isColumnVisible(column) {
     return visibleColumns.value.find((c) => c.field === column);
 }
 
-function setColumns(columns) {
-    emit('update:columns', columns);
+function setColumns(newColumns) {
+    // Avoid unnecessary updates and infinite loops if the columns haven't changed.
+    if (JSON.stringify(newColumns) === JSON.stringify(props.columns)) return;
+
+    emit('update:columns', newColumns);
 }
 
 function setSortColumn(column) {
@@ -266,7 +277,8 @@ const slotProps = computed(() => ({
     isColumnVisible,
 }));
 
-watch(parameters, () => {
+watch(parameters, (newParams, oldParams) => {
+    if (JSON.stringify(newParams) === JSON.stringify(oldParams)) return;
     request();
     pushState();
 });
