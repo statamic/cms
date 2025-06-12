@@ -8,6 +8,9 @@ import { SavePipeline } from '@statamic/exports.js';
 const { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks } = SavePipeline;
 
 const props = defineProps({
+    icon: {
+        type: String,
+    },
     title: {
         type: String,
         default: () => uniqid(),
@@ -69,7 +72,7 @@ onUnmounted(() => saveKeyBinding.destroy());
 </script>
 
 <template>
-    <Header :title="title">
+    <Header :title="title" :icon="icon">
         <Button variant="primary" text="Save" @click="save" :disabled="saving" />
     </Header>
     <Container
