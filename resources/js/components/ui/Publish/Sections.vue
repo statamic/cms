@@ -17,7 +17,7 @@ const visibleSections = sections.filter(section => {
 });
 
 function renderInstructions(instructions) {
-    return instructions ? markdown(instructions, { openLinksInNewTabs: true }) : '';
+    return instructions ? markdown(__(instructions), { openLinksInNewTabs: true }) : '';
 }
 </script>
 
@@ -26,7 +26,7 @@ function renderInstructions(instructions) {
         <CardPanel
             v-for="(section, i) in visibleSections"
             :key="i"
-            :heading="section.display"
+            :heading="__(section.display)"
             :subheading="renderInstructions(section.instructions)"
             class="mb-6"
         >
