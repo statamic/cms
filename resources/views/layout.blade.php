@@ -12,8 +12,7 @@
             <div id="statamic" v-cloak>
                 @include('statamic::partials.session-expiry')
                 @include('statamic::partials.licensing-alerts')
-                {{-- @include('statamic::partials.global-header') --}}
-                @include('statamic::partials.new-global-header')
+                 @include('statamic::partials.global-header')
 
                 <div
                     class="@yield('content-class') pt-14"
