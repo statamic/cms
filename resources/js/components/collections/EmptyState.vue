@@ -36,7 +36,8 @@ function getCreateUrl(blueprint = null) {
             </template>
 
             <template v-if="canCreate">
-                <template v-if="blueprints.length">
+                <!-- [1] If there's more than one blueprint output it them in a list -->
+                <template v-if="blueprints.length > 1">
                     <div class="w-full p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
                         <div class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175">
                             <Icon name="fieldtype-entries" />
@@ -52,8 +53,9 @@ function getCreateUrl(blueprint = null) {
                         </div>
                     </div>
                 </template>
+                <!-- [/2] Otherwise wrap a link around the container -->
                 <template v-else>
-                    <a :href="getCreateUrl()" class="w-full p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
+                    <a :href="getCreateUrl(blueprints[0]?.handle)" class="w-full p-4 flex items-start hover:bg-gray-200 dark:hover:bg-dark-550 rounded-md group">
                         <div class="h-8 w-8 rtl:ml-4 ltr:mr-4 text-gray-800 dark:text-dark-175">
                             <Icon name="fieldtype-entries" />
                         </div>
