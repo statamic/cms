@@ -53,6 +53,11 @@ class EntryPolicy
         return $user->hasPermission("edit {$entry->collectionHandle()} entries");
     }
 
+    public function viewOtherAuthorsEntries($user, $collection)
+    {
+        return $user->hasPermission("view other authors {$collection->handle()} entries");
+    }
+
     public function editOtherAuthorsEntries($user, $collection, $blueprint = null)
     {
         $blueprint = $blueprint ?? $collection->entryBlueprint();

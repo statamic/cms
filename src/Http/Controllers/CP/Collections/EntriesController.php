@@ -84,6 +84,19 @@ class EntriesController extends CpController
             $query->whereIn('site', Site::authorized()->map->handle()->all());
         }
 
+        if (User::current()->cant('view-other-authors-entries', [EntryContract::class, $collection])) {
+            // Mirror the behavior of the hasAnotherAuthor() method in the EntryPolicy.
+            $blueprintsWithoutAuthor = $collection->entryBlueprints()
+                ->filter(fn ($blueprint) => ! $blueprint->hasField('author'))
+                ->map->handle()->all();
+
+            $query->where(function ($query) use ($blueprintsWithoutAuthor) {
+                $query
+                    ->whereIn('blueprint', $blueprintsWithoutAuthor)
+                    ->orWhere('author', User::current()->id());
+            });
+        }
+
         return $query;
     }
 
