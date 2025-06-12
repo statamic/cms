@@ -22,31 +22,35 @@
                         </span>
                     </div>
                     <aside class="flex items-center gap-2">
-                        <dropdown-list placement="left-start">
-                            <dropdown-item :text="__('View')" :redirect="collection.entries_url" />
-                            <dropdown-item v-if="collection.url" :text="__('Visit URL')" :external-link="collection.url" />
-                            <dropdown-item
-                                v-if="collection.editable"
-                                :text="__('Edit Collection')"
-                                :redirect="collection.edit_url"
-                            />
-                            <dropdown-item
-                                v-if="collection.blueprint_editable"
-                                :text="__('Edit Blueprints')"
-                                :redirect="collection.blueprints_url"
-                            />
-                            <dropdown-item
-                                v-if="collection.editable"
-                                :text="__('Scaffold Views')"
-                                :redirect="collection.scaffold_url"
-                            />
-                            <data-list-inline-actions
-                                :item="collection.id"
-                                :url="collection.actions_url"
-                                :actions="collection.actions"
-                                @completed="actionCompleted"
-                            ></data-list-inline-actions>
-                        </dropdown-list>
+                        <ItemActions
+                            :url="collection.actions_url"
+                            :actions="collection.actions"
+                            :item="collection.id"
+                            @started="actionStarted"
+                            @completed="actionCompleted"
+                            v-slot="{ actions }"
+                        >
+                            <Dropdown placement="left-start" class="me-3">
+                                <DropdownMenu>
+                                    <DropdownLabel :text="__('Actions')" />
+                                    <DropdownItem :text="__('View')" icon="eye" :href="collection.entries_url" />
+                                    <DropdownItem v-if="collection.url" :text="__('Visit URL')" icon="external-link" target="_blank" :href="collection.url" />
+                                    <DropdownItem v-if="collection.editable" :text="__('Edit Collection')" icon="edit" :href="collection.edit_url" />
+                                    <DropdownItem v-if="collection.blueprint_editable" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="collection.blueprints_url" />
+                                    <DropdownItem v-if="collection.editable" :text="__('Scaffold Views')" icon="scaffold-large" :href="collection.scaffold_url" />
+                                    <DropdownSeparator v-if="actions.length" />
+                                    <DropdownItem
+                                        v-for="action in actions"
+                                        :key="action.handle"
+                                        :text="__(action.title)"
+                                        :icon="action.icon"
+                                        :variant="action.dangerous ? 'destructive' : 'default'"
+                                        @click="action.run"
+                                    />
+                                </DropdownMenu>
+                            </Dropdown>
+                        </ItemActions>
+
                         <create-entry-button
                             :url="collection.create_entry_url"
                             variant="default"
@@ -126,31 +130,34 @@
                     </div>
                 </template>
                 <template #actions="{ row: collection, index }">
-                    <dropdown-list placement="left-start">
-                        <dropdown-item :text="__('View')" :redirect="collection.entries_url" />
-                        <dropdown-item v-if="collection.url" :text="__('Visit URL')" :external-link="collection.url" />
-                        <dropdown-item
-                            v-if="collection.editable"
-                            :text="__('Edit Collection')"
-                            :redirect="collection.edit_url"
-                        />
-                        <dropdown-item
-                            v-if="collection.blueprint_editable"
-                            :text="__('Edit Blueprints')"
-                            :redirect="collection.blueprints_url"
-                        />
-                        <dropdown-item
-                            v-if="collection.editable"
-                            :text="__('Scaffold Views')"
-                            :redirect="collection.scaffold_url"
-                        />
-                        <data-list-inline-actions
-                            :item="collection.id"
-                            :url="collection.actions_url"
-                            :actions="collection.actions"
-                            @completed="actionCompleted"
-                        ></data-list-inline-actions>
-                    </dropdown-list>
+                    <ItemActions
+                        :url="collection.actions_url"
+                        :actions="collection.actions"
+                        :item="collection.id"
+                        @started="actionStarted"
+                        @completed="actionCompleted"
+                        v-slot="{ actions }"
+                    >
+                        <Dropdown placement="left-start" class="me-3">
+                            <DropdownMenu>
+                                <DropdownLabel :text="__('Actions')" />
+                                <DropdownItem :text="__('View')" icon="eye" :href="collection.entries_url" />
+                                <DropdownItem v-if="collection.url" :text="__('Visit URL')" icon="external-link" target="_blank" :href="collection.url" />
+                                <DropdownItem v-if="collection.editable" :text="__('Edit Collection')" icon="edit" :href="collection.edit_url" />
+                                <DropdownItem v-if="collection.blueprint_editable" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="collection.blueprints_url" />
+                                <DropdownItem v-if="collection.editable" :text="__('Scaffold Views')" icon="scaffold-large" :href="collection.scaffold_url" />
+                                <DropdownSeparator v-if="actions.length" />
+                                <DropdownItem
+                                    v-for="action in actions"
+                                    :key="action.handle"
+                                    :text="__(action.title)"
+                                    :icon="action.icon"
+                                    :variant="action.dangerous ? 'destructive' : 'default'"
+                                    @click="action.run"
+                                />
+                            </DropdownMenu>
+                        </Dropdown>
+                    </ItemActions>
                 </template>
             </data-list-table>
         </ui-panel>
@@ -159,12 +166,32 @@
 
 <script>
 import Listing from '../Listing.vue';
-import { CardPanel, StatusIndicator, Badge } from '@statamic/ui';
+import {
+    CardPanel,
+    StatusIndicator,
+    Badge,
+    Dropdown,
+    DropdownMenu,
+    DropdownLabel,
+    DropdownItem,
+    DropdownSeparator,
+} from '@statamic/ui';
+import ItemActions from '@statamic/components/actions/ItemActions.vue';
 
 export default {
     mixins: [Listing],
 
-    components: { CardPanel, StatusIndicator, Badge },
+    components: {
+        CardPanel,
+        StatusIndicator,
+        Badge,
+        Dropdown,
+        DropdownMenu,
+        DropdownLabel,
+        DropdownItem,
+        DropdownSeparator,
+        ItemActions,
+    },
 
     props: {
         canCreateCollections: Boolean,

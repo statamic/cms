@@ -12,7 +12,7 @@ class NavComposer
     const VIEWS = [
         'statamic::partials.nav-main',
         'statamic::partials.nav-mobile',
-        'statamic::partials.new-global-header',
+        'statamic::partials.global-header',
     ];
 
     public function compose(View $view)

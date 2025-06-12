@@ -14,6 +14,7 @@
                 :is-dirty="isDirty"
                 @started="actionStarted"
                 @completed="actionCompleted"
+                v-slot="{ actions }"
             >
                 <Dropdown v-if="canEditBlueprint || hasItemActions">
                     <template #trigger>
@@ -21,9 +22,9 @@
                     </template>
                     <DropdownMenu>
                         <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" v-if="canEditBlueprint" :href="actions.editBlueprint" />
-                        <DropdownSeparator />
+                        <DropdownSeparator v-if="canEditBlueprint && itemActions.length" />
                         <DropdownItem
-                            v-for="action in itemActions"
+                            v-for="action in actions"
                             :key="action.handle"
                             :text="__(action.title)"
                             :icon="action.icon"

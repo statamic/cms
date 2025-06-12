@@ -128,15 +128,28 @@
                                 }}</span>
                             </button>
 
-                            <dropdown-list class="mr-4" v-if="actionsMenu.length">
-                                <data-list-inline-actions
-                                    :item="id"
-                                    :url="actionUrl"
-                                    :actions="actionsMenu"
-                                    @started="actionStarted"
-                                    @completed="actionCompleted"
-                                />
-                            </dropdown-list>
+                            <ItemActions
+                                v-if="actionsMenu.length"
+                                :item="id"
+                                :url="actionUrl"
+                                :actions="actionsMenu"
+                                @started="actionStarted"
+                                @completed="actionCompleted"
+                                v-slot="{ actions }"
+                            >
+                                <Dropdown class="me-4">
+                                    <DropdownMenu>
+                                        <DropdownItem
+                                            v-for="action in actions"
+                                            :key="action.handle"
+                                            :text="__(action.title)"
+                                            :icon="action.icon"
+                                            :variant="action.dangerous ? 'destructive' : 'default'"
+                                            @click="action.run"
+                                        />
+                                    </DropdownMenu>
+                                </Dropdown>
+                            </ItemActions>
                         </div>
 
                         <!-- Image Preview -->
@@ -300,6 +313,8 @@ import PdfViewer from './PdfViewer.vue';
 import PublishFields from '../../publish/Fields.vue';
 import HasHiddenFields from '../../publish/HasHiddenFields';
 import { pick, flatten } from 'lodash-es';
+import { Dropdown, DropdownMenu, DropdownItem } from '@statamic/ui';
+import ItemActions from '@statamic/components/actions/ItemActions.vue';
 
 export default {
     emits: ['previous', 'next', 'saved', 'closed', 'action-completed'],
@@ -307,6 +322,10 @@ export default {
     mixins: [HasHiddenFields],
 
     components: {
+        Dropdown,
+        DropdownMenu,
+        DropdownItem,
+        ItemActions,
         EditorActions,
         FocalPointEditor,
         PdfViewer,
@@ -484,7 +503,7 @@ export default {
             if (this.$dirty.has(this.publishContainer)) {
                 this.save();
             }
-            
+
             this.$emit('next');
         },
 

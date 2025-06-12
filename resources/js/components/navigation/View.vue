@@ -4,9 +4,12 @@
             <div class="flex items-center">
                 <h1 class="flex-1" v-text="__(title)" />
 
-                <dropdown-list v-if="canEdit" class="ltr:mr-2 rtl:ml-2">
-                    <slot name="twirldown" />
-                </dropdown-list>
+                <Dropdown placement="left-start" class="me-2">
+                    <DropdownMenu>
+                        <DropdownItem v-if="canEdit" :text="__('Edit Navigation')" icon="edit" :href="editUrl" />
+                        <DropdownItem v-if="canEditBlueprint" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="blueprintUrl" />
+                    </DropdownMenu>
+                </Dropdown>
 
                 <a
                     @click="$refs.tree.cancel"
@@ -23,7 +26,7 @@
                     @input="siteSelected"
                 />
 
-                <dropdown-list v-if="canEdit" :disabled="!hasCollections">
+                <Dropdown v-if="canEdit" placement="left-start" :disabled="!hasCollections">
                     <template #trigger>
                         <button
                             class="btn"
@@ -38,9 +41,11 @@
                             />
                         </button>
                     </template>
-                    <dropdown-item :text="__('Add Nav Item')" @click="linkPage()" />
-                    <dropdown-item :text="__('Link to Entry')" @click="linkEntries()" />
-                </dropdown-list>
+                    <DropdownMenu>
+                        <DropdownItem :text="__('Add Nav Item')" @click="linkPage()" />
+                        <DropdownItem :text="__('Link to Entry')" @click="linkEntries()" />
+                    </DropdownMenu>
+                </Dropdown>
 
                 <button
                     v-if="canEdit"
@@ -165,15 +170,15 @@
             </template>
 
             <template v-if="canEdit" #branch-options="{ branch, removeBranch, stat, depth }">
-                <dropdown-item v-if="isEntryBranch(stat)" :text="__('Edit Entry')" :redirect="branch.edit_url" />
-                <dropdown-item :text="__('Edit nav item')" @click="editPage(branch)" />
-                <dropdown-item v-if="depth < maxDepth" :text="__('Add child nav item')" @click="linkPage(stat)" />
-                <dropdown-item
+                <DropdownItem v-if="isEntryBranch(stat)" :text="__('Edit Entry')" :href="branch.edit_url" />
+                <DropdownItem :text="__('Edit nav item')" @click="editPage(branch)" />
+                <DropdownItem v-if="depth < maxDepth" :text="__('Add child nav item')" @click="linkPage(stat)" />
+                <DropdownItem
                     v-if="depth < maxDepth && hasCollections"
                     :text="__('Add child link to entry')"
                     @click="linkEntries(stat)"
                 />
-                <dropdown-item :text="__('Remove')" class="warning" @click="deleteTreeBranch(branch, removeBranch)" />
+                <DropdownItem :text="__('Remove')" variant="destructive" @click="deleteTreeBranch(branch, removeBranch)" />
             </template>
         </page-tree>
 
@@ -236,9 +241,14 @@ import SiteSelector from '../SiteSelector.vue';
 import uniqid from 'uniqid';
 import { defineAsyncComponent } from 'vue';
 import { mapValues, pick } from 'lodash-es';
+import { Dropdown, DropdownMenu, DropdownItem, Button } from '@statamic/ui';
 
 export default {
     components: {
+        Button,
+        Dropdown,
+        DropdownMenu,
+        DropdownItem,
         PageTree: defineAsyncComponent(() => import('../structures/PageTree.vue')),
         PageEditor,
         PageSelector,
@@ -251,6 +261,7 @@ export default {
         handle: { type: String, required: true },
         collections: { type: Array, required: true },
         editUrl: { type: String, required: true },
+        blueprintUrl: { type: String, required: true },
         pagesUrl: { type: String, required: true },
         submitUrl: { type: String, required: true },
         maxDepth: { type: Number, default: Infinity },
@@ -260,6 +271,7 @@ export default {
         blueprint: { type: Object, required: true },
         canEdit: { type: Boolean, required: true },
         canSelectAcrossSites: { type: Boolean, required: true },
+        canEditBlueprint: { type: Boolean, required: true },
     },
 
     data() {

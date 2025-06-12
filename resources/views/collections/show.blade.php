@@ -14,8 +14,15 @@
         sort-direction="{{ $collection->sortDirection() }}"
         :columns="{{ $columns->toJson() }}"
         :filters="{{ $filters->toJson() }}"
-        action-url="{{ cp_route("collections.entries.actions.run", $collection->handle()) }}"
+        :actions="{{ Js::from($actions) }}"
+        action-url="{{ cp_route("collections.actions.run", $collection->handle()) }}"
+        entries-action-url="{{ cp_route("collections.entries.actions.run", $collection->handle()) }}"
         reorder-url="{{ cp_route("collections.entries.reorder", $collection->handle()) }}"
+        edit-url="{{ $collection->editUrl() }}"
+        blueprints-url="{{ cp_route("collections.blueprints.index", $collection) }}"
+        scaffold-url="{{ cp_route("collections.scaffold", $collection->handle()) }}"
+        :can-edit="{{ Statamic\Support\Str::bool($user->can("edit", $collection)) }}"
+        :can-edit-blueprints="{{ Statamic\Support\Str::bool($user->can("configure fields")) }}"
         initial-site="{{ $site }}"
         :sites="{{ json_encode($sites) }}"
         :can-change-localization-delete-behavior="{{ Statamic\Support\Str::bool($canChangeLocalizationDeleteBehavior) }}"
@@ -27,48 +34,5 @@
         :structure-expects-root="{{ Statamic\Support\Str::bool($structure->expectsRoot()) }}"
         :structure-show-slugs="{{ Statamic\Support\Str::bool($structure->showSlugs()) }}"
         @endif
-    >
-        @if (
-
-            auth()
-                ->user()
-                ->can("edit", $collection) ||
-            auth()
-                ->user()
-                ->can("delete", $collection) ||
-            auth()
-                ->user()
-                ->can("configure fields") ||
-            $actions->isNotEmpty()        )
-            <template #twirldown="{ actionCompleted }">
-                @can("edit", $collection)
-                    <dropdown-item
-                        :text="__('Edit Collection')"
-                        redirect="{{ $collection->editUrl() }}"
-                    ></dropdown-item>
-                @endcan
-
-                @can("configure fields")
-                    <dropdown-item
-                        :text="__('Edit Blueprints')"
-                        redirect="{{ cp_route("collections.blueprints.index", $collection) }}"
-                    ></dropdown-item>
-                @endcan
-
-                @can("edit", $collection)
-                    <dropdown-item
-                        :text="__('Scaffold Views')"
-                        redirect="{{ cp_route("collections.scaffold", $collection->handle()) }}"
-                    ></dropdown-item>
-                @endcan
-
-                <data-list-inline-actions
-                    item="{{ $collection->handle() }}"
-                    url="{{ cp_route("collections.actions.run", ["collection" => $collection->handle()]) }}"
-                    :actions="{{ $actions }}"
-                    @completed="actionCompleted"
-                ></data-list-inline-actions>
-            </template>
-        @endif
-    </collection-view>
+    ></collection-view>
 @endsection

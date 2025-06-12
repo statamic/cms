@@ -1,9 +1,32 @@
 <template>
     <div>
         <Header :title="__(title)" :icon="icon">
-            <dropdown-list class="ltr:mr-2 rtl:ml-2" v-if="!!this.$slots.twirldown">
-                <slot name="twirldown" :actionCompleted="actionCompleted" />
-            </dropdown-list>
+            <ItemActions
+                :url="actionUrl"
+                :actions="actions"
+                :item="handle"
+                @started="actionStarted"
+                @completed="actionCompleted"
+                v-slot="{ actions }"
+            >
+                <Dropdown placement="left-start" class="me-2">
+                    <DropdownMenu>
+                        <DropdownLabel :text="__('Actions')" />
+                        <DropdownItem v-if="canEdit" :text="__('Edit Collection')" icon="edit" :href="editUrl" />
+                        <DropdownItem v-if="canEditBlueprints" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="blueprintsUrl" />
+                        <DropdownItem v-if="canEdit" :text="__('Scaffold Views')" icon="scaffold-large" :href="scaffoldUrl" />
+                        <DropdownSeparator v-if="canEdit || canEditBlueprints || actions.length" />
+                        <DropdownItem
+                            v-for="action in actions"
+                            :key="action.handle"
+                            :text="__(action.title)"
+                            :icon="action.icon"
+                            :variant="action.dangerous ? 'destructive' : 'default'"
+                            @click="action.run"
+                        />
+                    </DropdownMenu>
+                </Dropdown>
+            </ItemActions>
 
             <div class="btn-group ltr:mr-4 rtl:ml-4" v-if="canUseStructureTree && !treeIsDirty">
                 <button
@@ -98,7 +121,7 @@
             :initial-sort-direction="sortDirection"
             :initial-columns="columns"
             :filters="filters"
-            :action-url="actionUrl"
+            :action-url="entriesActionUrl"
             :reordering="reordering"
             :reorder-url="reorderUrl"
             :site="site"
@@ -137,19 +160,19 @@
             <template #branch-options="{ branch, removeBranch, depth }">
                 <template v-if="depth < structureMaxDepth">
                     <h6 class="px-2" v-text="__('Create Child Entry')" v-if="blueprints.length > 1" />
-                    <li class="divider" v-if="blueprints.length > 1" />
-                    <dropdown-item
+                    <DropdownSeparator v-if="blueprints.length > 1" />
+                    <DropdownItem
                         v-for="blueprint in blueprints"
                         :key="blueprint.handle"
                         @click="createEntry(blueprint.handle, branch.id)"
-                        v-text="blueprints.length > 1 ? __(blueprint.title) : __('Create Child Entry')"
+                        :text="blueprints.length > 1 ? __(blueprint.title) : __('Create Child Entry')"
                     />
                 </template>
                 <template v-if="branch.can_delete">
-                    <li class="divider"></li>
-                    <dropdown-item
+                    <DropdownSeparator />
+                    <DropdownItem
                         :text="__('Delete')"
-                        class="warning"
+                        variant="destructive"
                         @click="deleteTreeBranch(branch, removeBranch)"
                     />
                 </template>
@@ -181,12 +204,20 @@ import DeleteLocalizationConfirmation from './DeleteLocalizationConfirmation.vue
 import SiteSelector from '../SiteSelector.vue';
 import HasActions from '../publish/HasActions';
 import { defineAsyncComponent } from 'vue';
-import { Header } from '@statamic/ui';
+import { Dropdown, DropdownItem, DropdownLabel, DropdownMenu, DropdownSeparator, Header } from '@statamic/ui';
+import ItemActions from '@statamic/components/actions/ItemActions.vue';
+import { __ } from '@statamic/bootstrap/globals.js';
 
 export default {
     mixins: [HasActions],
 
     components: {
+        DropdownSeparator,
+        DropdownItem,
+        DropdownLabel,
+        DropdownMenu,
+        ItemActions,
+        Dropdown,
         Header,
         PageTree: defineAsyncComponent(() => import('../structures/PageTree.vue')),
         DeleteEntryConfirmation,
@@ -207,8 +238,15 @@ export default {
         sortDirection: { type: String, required: true },
         columns: { type: Array, required: true },
         filters: { type: Array, required: true },
+        actions: { type: Array, required: true },
         actionUrl: { type: String, required: true },
+        entriesActionUrl: { type: String, required: true },
         reorderUrl: { type: String, required: true },
+        editUrl: { type: String, required: true },
+        blueprintsUrl: { type: String, required: true },
+        scaffoldUrl: { type: String, required: true },
+        canEdit: { type: Boolean, required: true },
+        canEditBlueprints: { type: Boolean, required: true },
         initialSite: { type: String, required: true },
         sites: { type: Array },
         totalSitesCount: { type: Number },

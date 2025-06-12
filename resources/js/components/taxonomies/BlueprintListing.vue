@@ -1,14 +1,36 @@
+<template>
+    <div>
+        <Header :title="__('Blueprints')" icon="blueprints">
+            <Button v-if="reorderable" :disabled="!hasBeenReordered" @click="saveOrder">
+                {{ __('Save Order') }}
+            </Button>
+
+            <Button :text="__('Create Blueprint')" :href="createUrl" variant="primary" />
+        </Header>
+
+        <BlueprintListing
+            :initial-rows="rows"
+            :reorderable="reorderable"
+            @reordered="reordered"
+        />
+    </div>
+</template>
+
 <script>
+import { Header, Button } from '@statamic/ui';
 import BlueprintListing from '../blueprints/Listing.vue';
 
 export default {
     components: {
+        Header,
+        Button,
         BlueprintListing,
     },
 
     props: {
         initialRows: Array,
         reorderUrl: String,
+        createUrl: String,
     },
 
     data() {
@@ -16,6 +38,12 @@ export default {
             rows: this.initialRows,
             hasBeenReordered: false,
         };
+    },
+
+    computed: {
+        reorderable() {
+            return this.rows.length > 1;
+        },
     },
 
     methods: {

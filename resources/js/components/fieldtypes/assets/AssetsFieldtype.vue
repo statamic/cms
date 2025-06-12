@@ -8,7 +8,7 @@
 
         <uploader
             ref="uploader"
-            :container="container"
+            :container="container.handle"
             :enabled="canUpload"
             :path="folder"
             @updated="uploadsUpdated"
@@ -54,14 +54,27 @@
                         <span>.</span>
                     </div>
                     <div class="flex items-center justify-end">
-                        <dropdown-list v-if="meta.rename_folder">
-                            <data-list-inline-actions
-                                :item="folder"
-                                :url="meta.rename_folder.url"
-                                :actions="[meta.rename_folder.action]"
-                                @completed="renameFolderActionCompleted"
-                            />
-                        </dropdown-list>
+                        <ItemActions
+                            v-if="meta.rename_folder"
+                            :url="meta.rename_folder.url"
+                            :actions="[meta.rename_folder.action]"
+                            :item="folder"
+                             @completed="renameFolderActionCompleted"
+                            v-slot="{ actions }"
+                        >
+                            <Dropdown placement="left-start">
+                                <DropdownMenu>
+                                    <DropdownItem
+                                        v-for="action in actions"
+                                        :key="action.handle"
+                                        :text="__(action.title)"
+                                        :icon="action.icon"
+                                        :variant="action.dangerous ? 'destructive' : 'default'"
+                                        @click="action.run"
+                                    />
+                                </DropdownMenu>
+                            </Dropdown>
+                        </ItemActions>
                     </div>
                 </div>
 
@@ -166,7 +179,8 @@ import Uploader from '../../assets/Uploader.vue';
 import Uploads from '../../assets/Uploads.vue';
 import { SortableList } from '../../sortable/Sortable';
 import { isEqual } from 'lodash-es';
-import { Button } from '@statamic/ui';
+import { Button, Dropdown, DropdownMenu, DropdownItem } from '@statamic/ui';
+import ItemActions from '@statamic/components/actions/ItemActions.vue';
 
 export default {
     components: {
@@ -177,6 +191,10 @@ export default {
         Uploader,
         Uploads,
         SortableList,
+        Dropdown,
+        DropdownMenu,
+        DropdownItem,
+        ItemActions,
     },
 
     mixins: [Fieldtype],
@@ -224,7 +242,7 @@ export default {
          * The initial container to be displayed in the selector.
          */
         container() {
-            return this.config.container || this.meta.container;
+            return this.meta.container;
         },
 
         /**
@@ -374,7 +392,7 @@ export default {
 
         canBrowse() {
             const hasPermission =
-                this.can('configure asset containers') || this.can('view ' + this.container + ' assets');
+                this.can('configure asset containers') || this.can('view ' + this.container.handle + ' assets');
 
             if (!hasPermission) return false;
 
@@ -384,7 +402,7 @@ export default {
         canUpload() {
             const hasPermission =
                 this.config.allow_uploads &&
-                (this.can('configure asset containers') || this.can('upload ' + this.container + ' assets'));
+                (this.can('configure asset containers') || this.can('upload ' + this.container.handle + ' assets'));
 
             if (!hasPermission) return false;
 
@@ -586,7 +604,7 @@ export default {
 
         uploadSelected(upload) {
             const path = `${this.folder}/${upload.basename}`.replace(/^\/+/, '');
-            const id = `${this.container}::${path}`;
+            const id = `${this.container.handle}::${path}`;
 
             this.uploads.splice(this.uploads.indexOf(upload), 1);
 
