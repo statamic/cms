@@ -77,75 +77,36 @@
             @canceled="changed = false"
         >
             <template #empty>
-                <div class="card content w-full p-4">
-                    <div class="flex w-full flex-wrap">
-                        <a
-                            :href="editUrl"
-                            class="group flex w-full items-start rounded-md p-4 hover:bg-gray-200 dark:hover:bg-dark-550 lg:w-1/2"
-                        >
-                            <svg-icon
-                                name="light/hammer-wrench"
-                                class="h-8 w-8 text-gray-800 dark:text-dark-175 ltr:mr-4 rtl:ml-4"
-                            />
-                            <div class="mb-4 flex-1 md:mb-0 md:ltr:mr-6 md:rtl:ml-6">
-                                <h3 class="mb-2 text-blue-600 dark:text-blue-600">
-                                    {{ __('Configure Navigation') }}
-                                    <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span>
-                                </h3>
-                                <p>{{ __('messages.navigation_configure_settings_intro') }}</p>
-                            </div>
-                        </a>
-                        <a
-                            @click="linkPage()"
-                            class="group flex w-full items-start rounded-md p-4 hover:bg-gray-200 dark:hover:bg-dark-550 lg:w-1/2"
-                        >
-                            <svg-icon
-                                name="paperclip"
-                                class="h-8 w-8 text-gray-800 dark:text-dark-175 ltr:mr-4 rtl:ml-4"
-                            />
-                            <div class="mb-4 flex-1 md:mb-0 md:ltr:mr-6 md:rtl:ml-6">
-                                <h3 class="mb-2 text-blue-600 dark:text-blue-600">
-                                    {{ __('Link to URL') }}
-                                    <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span>
-                                </h3>
-                                <p>{{ __('messages.navigation_link_to_url_instructions') }}</p>
-                            </div>
-                        </a>
-                        <a
-                            @click="linkEntries()"
-                            v-if="hasCollections"
-                            class="group flex w-full items-start rounded-md p-4 hover:bg-gray-200 dark:hover:bg-dark-550 lg:w-1/2"
-                        >
-                            <svg-icon
-                                name="light/hierarchy-files"
-                                class="h-8 w-8 text-gray-800 dark:text-dark-175 ltr:mr-4 rtl:ml-4"
-                            />
-                            <div class="mb-4 flex-1 md:mb-0 md:ltr:mr-6 md:rtl:ml-6">
-                                <h3 class="mb-2 text-blue-600 dark:text-blue-600">
-                                    {{ __('Link to Entry') }}
-                                    <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span>
-                                </h3>
-                                <p>{{ __('messages.navigation_link_to_entry_instructions') }}</p>
-                            </div>
-                        </a>
-                        <a
-                            :href="docs_url('navigation')"
-                            class="group flex w-full items-start rounded-md p-4 hover:bg-gray-200 dark:hover:bg-dark-550 lg:w-1/2"
-                        >
-                            <svg-icon
-                                name="light/book-pages"
-                                class="h-8 w-8 text-gray-800 dark:text-dark-175 ltr:mr-4 rtl:ml-4"
-                            />
-                            <div class="mb-4 flex-1 md:mb-0 md:ltr:mr-6 md:rtl:ml-6">
-                                <h3 class="mb-2 text-blue-600 dark:text-blue-600">
-                                    {{ __('Read the Documentation') }}
-                                    <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span>
-                                </h3>
-                                <p>{{ __('messages.navigation_documentation_instructions') }}</p>
-                            </div>
-                        </a>
-                    </div>
-                </div>
+                <EmptyStateMenu :heading="__('Start designing your navigation with these steps')">
+                    <EmptyStateItem
+                        :href="editUrl"
+                        icon="configure-large"
+                        :heading="__('Configure Navigation')"
+                        :description="__('messages.navigation_configure_settings_intro')"
+                    />
+
+                    <EmptyStateItem
+                        icon="fieldtype-link"
+                        :heading="__('Link to URL')"
+                        :description="__('messages.navigation_link_to_url_instructions')"
+                        @click="linkPage"
+                    />
+
+                    <EmptyStateItem
+                        v-if="hasCollections"
+                        icon="navigation"
+                        :heading="__('Link to Entry')"
+                        :description="__('messages.navigation_link_to_entry_instructions')"
+                        @click="linkEntries()"
+                    />
+
+                    <EmptyStateItem
+                        :href="docs_url('navigation')"
+                        icon="support"
+                        :heading="__('Read the Documentation')"
+                        :description="__('messages.navigation_documentation_instructions')"
+                    />
+                </EmptyStateMenu>
             </template>
 
             <template #branch-icon="{ branch }">
@@ -241,7 +202,7 @@ import SiteSelector from '../SiteSelector.vue';
 import uniqid from 'uniqid';
 import { defineAsyncComponent } from 'vue';
 import { mapValues, pick } from 'lodash-es';
-import { Dropdown, DropdownMenu, DropdownItem, Button } from '@statamic/ui';
+import { Dropdown, DropdownMenu, DropdownItem, Button, EmptyStateMenu, EmptyStateItem } from '@statamic/ui';
 
 export default {
     components: {
@@ -254,6 +215,8 @@ export default {
         PageSelector,
         RemovePageConfirmation,
         SiteSelector,
+        EmptyStateMenu,
+        EmptyStateItem,
     },
 
     props: {
