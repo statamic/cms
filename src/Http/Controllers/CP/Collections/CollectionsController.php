@@ -62,11 +62,10 @@ class CollectionsController extends CpController
                         ->filter(fn ($blueprint) => ! $blueprint->hasField('author'))
                         ->map->handle()->all();
 
-                    $query->where(function ($query) use ($blueprintsWithoutAuthor) {
-                        $query
-                            ->whereIn('blueprint', $blueprintsWithoutAuthor)
-                            ->orWhere('author', User::current()->id());
-                    });
+                    $query->where(fn ($query) => $query
+                        ->whereIn('blueprint', $blueprintsWithoutAuthor)
+                        ->orWhere('author', User::current()->id())
+                    );
                 })
                 ->count();
 
