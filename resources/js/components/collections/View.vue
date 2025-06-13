@@ -14,7 +14,7 @@
                         <DropdownLabel :text="__('Actions')" />
                         <DropdownItem v-if="canEdit" :text="__('Edit Collection')" icon="edit" :href="editUrl" />
                         <DropdownItem v-if="canEditBlueprints" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="blueprintsUrl" />
-                        <DropdownItem v-if="canEdit" :text="__('Scaffold Views')" icon="scaffold-large" :href="scaffoldUrl" />
+                        <DropdownItem v-if="canEdit" :text="__('Scaffold Views')" icon="scaffold" :href="scaffoldUrl" />
                         <DropdownSeparator v-if="canEdit || canEditBlueprints || actions.length" />
                         <DropdownItem
                             v-for="action in actions"
