@@ -152,10 +152,12 @@ class Entries extends Relationship
                     ->filter(fn ($blueprint) => ! $blueprint->hasField('author'))
                     ->map->handle()->all();
 
-                $query->where(fn ($query) => $query
-                    ->whereIn('blueprint', $blueprintsWithoutAuthor)
-                    ->orWhere('author', User::current()->id())
-                );
+                $query
+                    ->whereNotIn('collection', [$collection->handle()])
+                    ->orWhere(fn ($query) => $query
+                        ->whereIn('blueprint', $blueprintsWithoutAuthor)
+                        ->orWhere('author', User::current()->id())
+                    );
             });
 
         $this->activeFilterBadges = $this->queryFilters($query, $filters, $this->getSelectionFilterContext());
