@@ -144,6 +144,20 @@ class Entries extends Relationship
             $query->whereIn('blueprint', $blueprints);
         }
 
+        collect($this->getConfiguredCollections())
+            ->map(fn ($handle) => Collection::findByHandle($handle))
+            ->filter(fn ($collection) => User::current()->cant('view-other-authors-entries', [EntryContract::class, $collection]))
+            ->each(function ($collection) use ($query) {
+                $blueprintsWithoutAuthor = $collection->entryBlueprints()
+                    ->filter(fn ($blueprint) => ! $blueprint->hasField('author'))
+                    ->map->handle()->all();
+
+                    $query->where(fn ($query) => $query
+                        ->whereIn('blueprint', $blueprintsWithoutAuthor)
+                        ->orWhere('author', User::current()->id())
+                    );
+            });
+
         $this->activeFilterBadges = $this->queryFilters($query, $filters, $this->getSelectionFilterContext());
 
         if ($sort = $this->getSortColumn($request)) {
