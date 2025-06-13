@@ -7,8 +7,9 @@ export const [injectContainerContext, provideContainerContext] = createContext('
 <script setup>
 import uniqid from 'uniqid';
 import { usePublishContainerStore } from '@statamic/stores/publish-container.js';
-import { watch, provide, getCurrentInstance, ref } from 'vue';
+import { watch, provide, getCurrentInstance, ref, onBeforeUnmount } from 'vue';
 import Component from '@statamic/components/Component.js';
+import { getActivePinia } from 'pinia';
 
 const emit = defineEmits(['updated']);
 
@@ -165,6 +166,11 @@ defineExpose({
     setFieldValue,
     clearDirtyState,
     pushComponent,
+});
+
+onBeforeUnmount(() => {
+    store.$dispose();
+    delete getActivePinia().state.value[store.$id];
 });
 
 // Backwards compatibility.
