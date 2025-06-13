@@ -52,6 +52,12 @@ import { default as Select } from './Select/Select.vue';
 import { default as StatusIndicator } from './StatusIndicator.vue';
 import { default as Subheading } from './Subheading.vue';
 import { default as Switch } from './Switch.vue';
+import { default as TableCell } from './Table/Cell.vue';
+import { default as TableColumn } from './Table/Column.vue';
+import { default as TableColumns } from './Table/Columns.vue';
+import { default as TableRow } from './Table/Row.vue';
+import { default as TableRows } from './Table/Rows.vue';
+import { default as Table } from './Table/Table.vue';
 import { default as TabContent } from './Tabs/Content.vue';
 import { default as TabList } from './Tabs/List.vue';
 import { default as TabTrigger } from './Tabs/Trigger.vue';
@@ -116,6 +122,12 @@ export {
     StatusIndicator,
     Subheading,
     Switch,
+    TableCell,
+    TableColumn,
+    TableColumns,
+    TableRow,
+    TableRows,
+    Table,
     TabContent,
     TabList,
     TabTrigger,

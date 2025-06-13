@@ -27,13 +27,16 @@
                     </template>
                     <ui-dropdown-header
                         class="grid grid-cols-[auto_1fr_auto] items-center"
-                        text="{{ __($breadcrumb->text()) }}"
                         icon="{{ $breadcrumb->icon() }}"
                         @if($breadcrumb->hasConfigureUrl())
                             append-icon="cog-solid"
                             append-href="{{ $breadcrumb->configureUrl() }}"
                         @endif
-                    ></ui-dropdown-header>
+                    >
+                        <a href="{{ $breadcrumb->url() }}">
+                            {{ __($breadcrumb->text()) }}
+                        </a>
+                    </ui-dropdown-header>
                     @if($breadcrumb->hasLinks())
                         <ui-dropdown-menu>
                             @foreach($breadcrumb->links() as $link)

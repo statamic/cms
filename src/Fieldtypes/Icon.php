@@ -11,8 +11,6 @@ use Statamic\Support\Str;
 
 class Icon extends Fieldtype
 {
-    public const DEFAULT_FOLDER = 'regular';
-
     protected $categories = ['media'];
     protected $icon = 'icon_picker';
 
@@ -55,7 +53,6 @@ class Icon extends Fieldtype
                         'display' => __('Folder'),
                         'instructions' => __('statamic::fieldtypes.icon.config.folder'),
                         'type' => 'text',
-                        'placeholder' => static::DEFAULT_FOLDER,
                     ],
                     'default' => [
                         'display' => __('Default Value'),
@@ -83,10 +80,7 @@ class Icon extends Fieldtype
             $directory = statamic_path('resources/svg/icons');
         }
 
-        $folder = $this->config(
-            'folder',
-            $hasConfiguredDirectory ? null : self::DEFAULT_FOLDER // Only apply a default folder if using Statamic icons.
-        );
+        $folder = $this->config('folder');
 
         $path = Path::tidy($directory.'/'.$folder);
 

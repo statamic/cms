@@ -64,7 +64,7 @@ function tabHasError(tab) {
                     v-for="tab in visibleMainTabs"
                     :key="tab.handle"
                     :name="tab.handle"
-                    :text="tab.display"
+                    :text="__(tab.display)"
                     :class="{ '!text-red-500': tabHasError(tab) }"
                 />
             </TabList>

@@ -74,6 +74,7 @@ const calendarEvents = computed(() => ({
             :modelValue="modelValue"
             :granularity="granularity"
             :locale="$date.locale"
+            :disabled="disabled"
             @update:model-value="emit('update:modelValue', $event)"
             v-bind="$attrs"
             prevent-deselect
