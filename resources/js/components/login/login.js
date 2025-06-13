@@ -1,3 +1,5 @@
+import { startAuthentication, browserSupportsWebAuthn } from '@simplewebauthn/browser';
+
 export default {
 
     props: {
@@ -6,12 +8,27 @@ export default {
         },
         hasError: {
             default: false
+        },
+        webAuthnRoutes: {
+            default: {},
+            type: Object,
         }
+    },
+
+    computed: {
+        showWebAuthn() {
+            return browserSupportsWebAuthn();
+        },
+
+        showWebAuthnError() {
+            return this.webAuthnError !== false;
+        },
     },
 
     data() {
         return {
-            busy: false
+            busy: false,
+            webAuthnError: false,
         }
     },
 
@@ -19,6 +36,33 @@ export default {
         if (this.hasError) {
             this.$el.parentElement.parentElement.classList.add('animation-shake');
         }
+    },
+
+    methods: {
+        async webAuthn() {
+            const authOptionsResponse = await fetch(this.webAuthnRoutes.options);
+            const startAuthResponse = await startAuthentication(await authOptionsResponse.json());
+
+            this.$axios.post(this.webAuthnRoutes.verify, startAuthResponse)
+                .then(response => {
+                    if (response && response.data.redirect) {
+                        location.href = response.data.redirect;
+                        return;
+                    }
+
+                    this.webAuthnError = response.data.message;
+                }).catch(e => this.handleAxiosError(e));
+        },
+
+        handleAxiosError(e) {
+            if (e.response) {
+                const { message, errors } = e.response.data;
+                this.webAuthnError = message;
+                return;
+            }
+
+            this.webAuthnError = __('Something went wrong');
+        },
     }
 
 };
