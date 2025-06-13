@@ -26,6 +26,8 @@ import { default as DropdownItem } from './Dropdown/Item.vue';
 import { default as DropdownLabel } from './Dropdown/Label.vue';
 import { default as DropdownMenu } from './Dropdown/Menu.vue';
 import { default as DropdownSeparator } from './Dropdown/Separator.vue';
+import { default as EmptyStateMenu } from './EmptyState/Menu.vue';
+import { default as EmptyStateItem } from './EmptyState/Item.vue';
 import { default as Editable } from './Editable.vue';
 import { default as Field } from './Field.vue';
 import { default as Header } from './Header.vue';
@@ -96,6 +98,8 @@ export {
     DropdownLabel,
     DropdownMenu,
     DropdownSeparator,
+    EmptyStateMenu,
+    EmptyStateItem,
     Editable,
     Field,
     Header,
