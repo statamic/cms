@@ -25,6 +25,7 @@ const visibleMainTabs = computed(() => {
     });
 });
 const shouldShowSidebar = computed(() => (slots.sidebar || sidebarTab.value) && width.value > 920);
+const tab = ref(visibleMainTabs.value[0].handle);
 
 const fieldTabMap = computed(() => {
     let map = {};
@@ -58,7 +59,7 @@ function tabHasError(tab) {
 
 <template>
     <ElementContainer @resized="width = $event.width">
-        <Tabs :default-tab="visibleMainTabs[0].handle">
+        <Tabs v-model:modelValue="tab">
             <TabList v-if="visibleMainTabs.length > 1" class="mb-6">
                 <TabTrigger
                     v-for="tab in visibleMainTabs"
