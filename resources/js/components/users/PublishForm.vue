@@ -1,51 +1,46 @@
 <template>
     <div>
-        <header class="mb-6">
-            <div class="flex items-center">
-                <h1 class="flex-1" v-text="title" />
+        <Header :title="title" icon="users">
+            <ItemActions
+                v-if="canEditBlueprint || hasItemActions"
+                :item="values.id"
+                :url="itemActionUrl"
+                :actions="itemActions"
+                :is-dirty="isDirty"
+                @started="actionStarted"
+                @completed="actionCompleted"
+            >
+                <Dropdown>
+                    <template #trigger>
+                        <Button icon="ui/dots" variant="ghost" />
+                    </template>
+                    <DropdownMenu>
+                        <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" v-if="canEditBlueprint" :href="actions.editBlueprint" />
+                        <DropdownSeparator v-if="canEditBlueprint && itemActions.length" />
+                        <DropdownItem
+                            v-for="action in itemActions"
+                            :key="action.handle"
+                            :text="__(action.title)"
+                            :icon="action.icon"
+                            :variant="action.dangerous ? 'destructive' : 'default'"
+                            @click="action.run"
+                        />
+                    </DropdownMenu>
+                </Dropdown>
+            </ItemActions>
 
-                <ItemActions
-                    v-if="canEditBlueprint || hasItemActions"
-                    :item="values.id"
-                    :url="itemActionUrl"
-                    :actions="itemActions"
-                    :is-dirty="isDirty"
-                    @started="actionStarted"
-                    @completed="actionCompleted"
-                >
-                    <Dropdown class="me-4">
-                        <template #trigger>
-                            <Button icon="ui/dots" variant="ghost" />
-                        </template>
-                        <DropdownMenu>
-                            <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" v-if="canEditBlueprint" :href="actions.editBlueprint" />
-                            <DropdownSeparator v-if="canEditBlueprint && itemActions.length" />
-                            <DropdownItem
-                                v-for="action in itemActions"
-                                :key="action.handle"
-                                :text="__(action.title)"
-                                :icon="action.icon"
-                                :variant="action.dangerous ? 'destructive' : 'default'"
-                                @click="action.run"
-                            />
-                        </DropdownMenu>
-                    </Dropdown>
-                </ItemActions>
+            <TwoFactor v-if="twoFactor" v-bind="twoFactor" />
 
-                <TwoFactor v-if="twoFactor" v-bind="twoFactor" trigger-class="ltr:mr-4 rtl:ml-4" />
+            <change-password
+                v-if="canEditPassword"
+                :save-url="actions.password"
+                :requires-current-password="requiresCurrentPassword"
+            />
 
-                <change-password
-                    v-if="canEditPassword"
-                    :save-url="actions.password"
-                    :requires-current-password="requiresCurrentPassword"
-                    trigger-class="ltr:mr-4 rtl:ml-4"
-                />
+            <Button variant="primary" @click.prevent="save" v-text="__('Save')" />
 
-                <button class="btn-primary" @click.prevent="save" v-text="__('Save')" />
-
-                <slot name="action-buttons-right" />
-            </div>
-        </header>
+            <slot name="action-buttons-right" />
+        </Header>
 
         <PublishContainer
             v-if="fieldset"
@@ -77,6 +72,7 @@ import {
     DropdownSeparator,
     PublishContainer,
     PublishTabs,
+    Header,
 } from '@statamic/ui';
 import ItemActions from '@statamic/components/actions/ItemActions.vue';
 import { SavePipeline } from '@statamic/exports.js';
@@ -101,6 +97,7 @@ export default {
         TwoFactor,
         PublishContainer,
         PublishTabs,
+        Header,
     },
 
     props: {

@@ -1,62 +1,54 @@
 <template>
     <div>
-        <header class="mb-6" v-if="mounted">
-            <div class="flex items-center">
-                <h1 class="flex-1" v-text="__(title)" />
+        <Header v-if="mounted" :title="title" icon="navigation">
+            <Dropdown placement="left-start">
+                <DropdownMenu>
+                    <DropdownItem v-if="canEdit" :text="__('Edit Navigation')" icon="edit" :href="editUrl" />
+                    <DropdownItem v-if="canEditBlueprint" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="blueprintUrl" />
+                </DropdownMenu>
+            </Dropdown>
 
-                <Dropdown placement="left-start" class="me-2">
-                    <DropdownMenu>
-                        <DropdownItem v-if="canEdit" :text="__('Edit Navigation')" icon="edit" :href="editUrl" />
-                        <DropdownItem v-if="canEditBlueprint" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="blueprintUrl" />
-                    </DropdownMenu>
-                </Dropdown>
+            <a
+                @click="$refs.tree.cancel"
+                class="text-2xs text-blue-600 underline"
+                v-if="isDirty"
+                v-text="__('Discard changes')"
+            />
 
-                <a
-                    @click="$refs.tree.cancel"
-                    class="text-2xs text-blue-600 underline ltr:mr-4 rtl:ml-4"
-                    v-if="isDirty"
-                    v-text="__('Discard changes')"
-                />
+            <site-selector
+                v-if="sites.length > 1"
+                :sites="sites"
+                :value="site"
+                @input="siteSelected"
+            />
 
-                <site-selector
-                    v-if="sites.length > 1"
-                    class="ltr:mr-4 rtl:ml-4"
-                    :sites="sites"
-                    :value="site"
-                    @input="siteSelected"
-                />
+            <Dropdown v-if="canEdit && hasCollections" placement="left-start" :disabled="!hasCollections">
+                <template #trigger>
+                    <Button
+                        :text="__('Add Nav Item')"
+                        icon-append="ui/chevron-down"
+                    />
+                </template>
+                <DropdownMenu>
+                    <DropdownItem :text="__('Add Nav Item')" @click="linkPage()" />
+                    <DropdownItem :text="__('Link to Entry')" @click="linkEntries()" />
+                </DropdownMenu>
+            </Dropdown>
 
-                <Dropdown v-if="canEdit" placement="left-start" :disabled="!hasCollections">
-                    <template #trigger>
-                        <button
-                            class="btn"
-                            :class="{ 'flex items-center ltr:pr-4 rtl:pl-4': hasCollections }"
-                            @click="addLink"
-                        >
-                            {{ __('Add Nav Item') }}
-                            <svg-icon
-                                name="micro/chevron-down-xs"
-                                class="w-2 ltr:ml-4 rtl:mr-4"
-                                v-if="hasCollections"
-                            />
-                        </button>
-                    </template>
-                    <DropdownMenu>
-                        <DropdownItem :text="__('Add Nav Item')" @click="linkPage()" />
-                        <DropdownItem :text="__('Link to Entry')" @click="linkEntries()" />
-                    </DropdownMenu>
-                </Dropdown>
+            <Button
+                v-else-if="canEdit && !hasCollections"
+                :text="__('Add Nav Item')"
+                @click="addLink"
+            />
 
-                <button
-                    v-if="canEdit"
-                    class="btn-primary ltr:ml-4 rtl:mr-4"
-                    :class="{ disabled: !changed }"
-                    :disabled="!changed"
-                    @click="$refs.tree.save"
-                    v-text="__('Save Changes')"
-                />
-            </div>
-        </header>
+            <Button
+                v-if="canEdit"
+                :disabled="!changed"
+                variant="primary"
+                :text="__('Save Changes')"
+                @click="$refs.tree?.save"
+            />
+        </Header>
 
         <page-tree
             ref="tree"
@@ -202,7 +194,7 @@ import SiteSelector from '../SiteSelector.vue';
 import uniqid from 'uniqid';
 import { defineAsyncComponent } from 'vue';
 import { mapValues, pick } from 'lodash-es';
-import { Dropdown, DropdownMenu, DropdownItem, Button, EmptyStateMenu, EmptyStateItem } from '@statamic/ui';
+import { Dropdown, DropdownMenu, DropdownItem, Button, EmptyStateMenu, EmptyStateItem, Header } from '@statamic/ui';
 
 export default {
     components: {
@@ -217,6 +209,7 @@ export default {
         SiteSelector,
         EmptyStateMenu,
         EmptyStateItem,
+        Header,
     },
 
     props: {

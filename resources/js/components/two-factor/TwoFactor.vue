@@ -4,6 +4,7 @@ import DisableTwoFactor from './Disable.vue';
 import TwoFactorSetup from './Setup.vue';
 import TwoFactorRecoveryCodesModal from './RecoveryCodesModal.vue';
 import { requireElevatedSession } from '@statamic/components/elevated-sessions';
+import { Button } from '@statamic/ui';
 
 const props = defineProps(['wasSetup', 'isEnforced', 'routes']);
 
@@ -36,7 +37,7 @@ function resetComplete() {
 <template>
     <popover placement="bottom" ref="popper">
         <template #trigger>
-            <button class="btn" v-text="__('Two Factor Authentication')" />
+            <Button v-text="__('Two Factor Authentication')" />
         </template>
         <div class="max-w-sm p-4">
             <template v-if="!isSetup">

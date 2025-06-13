@@ -63,8 +63,7 @@
                     @input="site = $event.handle"
                 />
 
-                <button
-                    class="btn ltr:mr-4 rtl:ml-4"
+                <Button
                     :class="{ disabled: !treeIsDirty, 'btn-danger': deletedEntries.length }"
                     :disabled="!treeIsDirty"
                     @click="saveTree"
@@ -86,18 +85,17 @@
                     @input="site = $event.handle"
                 />
 
-                <button
-                    class="btn ltr:mr-4 rtl:ml-4"
+                <Button
                     v-if="!reordering"
                     @click="reordering = true"
                     v-text="__('Reorder')"
                 />
 
                 <template v-if="reordering">
-                    <button class="btn ltr:ml-2 rtl:mr-2" @click="reordering = false" v-text="__('Cancel')" />
+                    <Button @click="reordering = false" v-text="__('Cancel')" />
 
-                    <button
-                        class="btn-primary ltr:ml-2 rtl:mr-2"
+                    <Button
+                        variant="primary"
                         @click="$refs.list.saveOrder"
                         v-text="__('Save Order')"
                     />
@@ -204,9 +202,8 @@ import DeleteLocalizationConfirmation from './DeleteLocalizationConfirmation.vue
 import SiteSelector from '../SiteSelector.vue';
 import HasActions from '../publish/HasActions';
 import { defineAsyncComponent } from 'vue';
-import { Dropdown, DropdownItem, DropdownLabel, DropdownMenu, DropdownSeparator, Header } from '@statamic/ui';
+import { Dropdown, DropdownItem, DropdownLabel, DropdownMenu, DropdownSeparator, Header, Button } from '@statamic/ui';
 import ItemActions from '@statamic/components/actions/ItemActions.vue';
-import { __ } from '@statamic/bootstrap/globals.js';
 
 export default {
     mixins: [HasActions],
@@ -219,6 +216,7 @@ export default {
         ItemActions,
         Dropdown,
         Header,
+        Button,
         PageTree: defineAsyncComponent(() => import('../structures/PageTree.vue')),
         DeleteEntryConfirmation,
         DeleteLocalizationConfirmation,

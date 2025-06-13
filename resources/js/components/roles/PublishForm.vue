@@ -1,6 +1,6 @@
 <template>
     <div>
-        <Header :title="__(initialTitle) || __('Create Role')">
+        <Header :title="__(initialTitle) || __('Create Role')" icon="permissions">
             <Button type="submit" variant="primary" @click="save" :text="__('Save')" />
         </Header>
 
