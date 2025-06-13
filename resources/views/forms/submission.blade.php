@@ -2,11 +2,13 @@
 @section('title', Statamic::crumb('Submission ' . $submission->id(), $submission->form->title(), 'Forms'))
 
 @section('content')
-    <publish-form
+    <ui-publish-form
+        icon="forms"
         :title="$date.format('{{ $submission->date() }}')"
         :blueprint="{{ Js::from($blueprint) }}"
-        :meta="{{ Js::from($meta) }}"
-        :values="{{ Js::from($values) }}"
+        :initial-values="{{ Js::from($values) }}"
+        :initial-meta="{{ Js::from($meta) }}"
+        :submit-url="null"
         read-only
-    ></publish-form>
+    ></ui-publish-form>
 @endsection
