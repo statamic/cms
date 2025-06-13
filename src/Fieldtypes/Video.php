@@ -8,6 +8,16 @@ class Video extends Fieldtype
 {
     protected $categories = ['media'];
 
+    public function preload()
+    {
+        /** @todo Fetch these from some repository so folks can add their own */
+        return [
+            ['name' => 'Cloudflare Stream', 'handle' => 'cloudflare_stream'],
+            ['name' => 'Vimeo', 'handle' => 'vimeo'],
+            ['name' => 'YouTube', 'handle' => 'youtube'],
+        ];
+    }
+
     protected function configFieldItems(): array
     {
         return [
