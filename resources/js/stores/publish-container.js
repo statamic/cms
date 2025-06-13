@@ -21,6 +21,7 @@ export const usePublishContainerStore = function (name, initial) {
             preloadedAssets: [],
             autosaveInterval: null,
             reference: initial.reference,
+            readOnly: initial.readOnly,
         }),
         actions: {
             setFieldValue(payload) {

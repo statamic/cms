@@ -68,6 +68,10 @@ const props = defineProps({
         type: String,
         default: () => __('Are you sure?'),
     },
+    readOnly: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const store = usePublishContainerStore(props.name, {
@@ -81,6 +85,7 @@ const store = usePublishContainerStore(props.name, {
     localizedFields: props.localizedFields,
     site: props.site,
     reference: props.reference,
+    readOnly: props.readOnly,
 });
 
 const components = ref([]);

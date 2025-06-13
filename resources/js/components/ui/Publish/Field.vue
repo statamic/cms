@@ -91,6 +91,7 @@ const shouldShowLabel = computed(
 const isLocalizable = computed(() => props.config.localizable);
 
 const isReadOnly = computed(() => {
+    if (store.readOnly) return true;
     if (store.isRoot === false && !isLocalizable.value) return true;
 
     return isLocked.value || props.config.visibility === 'read_only' || false;
