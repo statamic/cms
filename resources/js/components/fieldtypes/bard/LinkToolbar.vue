@@ -1,7 +1,7 @@
 <template>
     <div class="bard-link-toolbar">
         <div>
-            <div class="border-b px-4 py-4 dark:border-dark-900">
+            <div class="border-b px-4 py-4 bg-white dark:border-dark-900 border-gray-200 dark:bg-gray-900 dark:border-black rounded-b-xl">
                 <div class="flex">
                     <div
                         class="mb-4 flex h-8 items-center rounded-sm border bg-gray-100 text-gray-800 shadow-inner dark:border-dark-200 dark:bg-dark-600 dark:text-dark-150 ltr:mr-1 rtl:ml-1"
@@ -79,63 +79,63 @@
                     </div>
                 </div>
 
-                <!-- Title attribute -->
-                <div
-                    class="dark:placeholder:dark-text-dark-175 mb-4 flex h-8 w-full items-center rounded-sm border bg-gray-100 p-2 text-gray-800 shadow-inner placeholder:text-gray-600 dark:border-dark-200 dark:bg-dark-600 dark:text-dark-150"
-                >
-                    <input
+                <div class="space-y-3">
+                    <!-- Title attribute -->
+                    <ui-input
                         type="text"
                         ref="input"
                         v-model="title"
-                        class="input placeholder-gray-50 h-auto text-sm"
                         :placeholder="`${__('Label')} (${__('Optional')})`"
                     />
-                </div>
 
-                <!-- Rel attribute -->
-                <div
-                    class="dark:placeholder:dark-text-dark-175 flex h-8 w-full items-center rounded-sm border bg-gray-100 p-2 text-gray-800 shadow-inner placeholder:text-gray-600 dark:border-dark-200 dark:bg-dark-600 dark:text-dark-150"
-                >
-                    <input
+                    <!-- Rel attribute -->
+                    <ui-input
                         type="text"
                         ref="input"
                         v-model="rel"
-                        class="input placeholder-gray-50 h-auto text-sm"
                         :placeholder="`${__('Relationship')} (${__('Optional')})`"
                     />
                 </div>
 
-                <label
-                    for="target-blank"
-                    class="mt-4 flex cursor-pointer items-center font-normal text-gray-800 hover:text-black dark:text-dark-150 dark:hover:text-dark-100"
-                    v-if="canHaveTarget"
-                >
-                    <input class="checkbox ltr:mr-2 rtl:ml-2" type="checkbox" v-model="targetBlank" id="target-blank" />
-                    {{ __('Open in new window') }}
-                </label>
+                <ui-checkbox-group name="target_blank" label="Choose if the link should open in a new window" class="mt-4">
+                    <ui-checkbox-item
+                        label="Open in new window"
+                        v-model="targetBlank"
+                        id="target-blank"
+                        size="sm"
+                        align="center"
+                    />
+                </ui-checkbox-group>
             </div>
 
             <footer
-                class="flex items-center justify-end space-x-3 rounded-b-md bg-gray-100 p-2 font-normal dark:bg-dark-575 rtl:space-x-reverse"
+                class="flex items-center justify-end space-x-3 rounded-b-md bg-gray-100 p-2 font-normal dark:bg-dark-575 rtl:space-x-reverse rounded-b-xl"
             >
-                <button
+                <ui-button
+                    variant="ghost"
+                    size="xs"
+                    class="text-xs text-gray-600 hover:text-gray-800 dark:text-dark-175 dark:hover:text-dark-100"
                     @click="$emit('canceled')"
-                    class="dark:hover-text-dark-100 text-xs text-gray-600 hover:text-gray-800 dark:text-dark-175"
                 >
                     {{ __('Cancel') }}
-                </button>
-                <button :aria-label="__('Remove Link')" @click="remove" class="btn btn-sm">
+                </ui-button>
+                <ui-button
+                    size="sm"
+                    :aria-label="__('Remove Link')"
+                    @click="remove"
+                >
                     {{ __('Remove Link') }}
-                </button>
-                <button
+                </ui-button>
+                <ui-button
+                    variant="primary"
+                    size="sm"
                     :disabled="!canCommit"
-                    v-tooltip="__('Apply Link')"
                     :aria-label="__('Apply Link')"
+                    v-tooltip="__('Apply Link')"
                     @click="commit"
-                    class="btn btn-sm"
                 >
                     {{ __('Save') }}
-                </button>
+                </ui-button>
             </footer>
         </div>
 

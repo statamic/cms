@@ -1,5 +1,28 @@
 # Release Notes
 
+## 5.57.0 (2025-06-04)
+
+### What's new
+- Added the option to add renderers to markdown parsers [#11827](https://github.com/statamic/cms/issues/11827) by @CapitaineToinon
+- Add renderer methods to `Markdown` facade docblock [#11845](https://github.com/statamic/cms/issues/11845) by @duncanmcclean
+- Add `not_in` parameter to Assets tag [#11820](https://github.com/statamic/cms/issues/11820) by @nopticon
+- Added `X-Statamic-Uncacheable` header to prevent responses being statically cached [#11817](https://github.com/statamic/cms/issues/11817) by @macaws
+
+### What's fixed
+- Throw 404 response when OAuth provider doesn't exist [#11844](https://github.com/statamic/cms/issues/11844) by @duncanmcclean
+- Fix edition check in outpost [#11843](https://github.com/statamic/cms/issues/11843) by @duncanmcclean
+- Updated Statamic references in language files [#11835](https://github.com/statamic/cms/issues/11835) by @tommulroy
+- Fix create/edit CP nav descendants not properly triggering active status [#11832](https://github.com/statamic/cms/issues/11832) by @jesseleite
+- Fix editability of nav items without content reference [#11822](https://github.com/statamic/cms/issues/11822) by @duncanmcclean
+- Entries fieldtype: Only show "Allow Creating" option when using stack selector [#11816](https://github.com/statamic/cms/issues/11816) by @duncanmcclean
+- French translations [#11826](https://github.com/statamic/cms/issues/11826) by @ebeauchamps
+- Added null check for fieldActions within replicator [#11828](https://github.com/statamic/cms/issues/11828) by @martyf
+- Perform null check on data in video fieldtype [#11821](https://github.com/statamic/cms/issues/11821) by @martyf
+- Added checks for `Closure` instances instead of `is_callable` inside `Route::statamic(...)` [#11809](https://github.com/statamic/cms/issues/11809) by @JohnathonKoster
+- Further increase trackDirtyState timeout [#11811](https://github.com/statamic/cms/issues/11811) by @simonerd
+
+
+
 ## 5.56.0 (2025-05-20)
 
 ### What's new

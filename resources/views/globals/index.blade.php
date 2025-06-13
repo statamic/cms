@@ -18,7 +18,7 @@
         </ui-header>
 
         <global-listing
-            :globals="{{ json_encode($globals) }}"
+            :initial-globals="{{ json_encode($globals) }}"
         ></global-listing>
     @else
         <x-statamic::empty-screen

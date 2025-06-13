@@ -7,8 +7,9 @@ export const [injectContainerContext, provideContainerContext] = createContext('
 <script setup>
 import uniqid from 'uniqid';
 import { usePublishContainerStore } from '@statamic/stores/publish-container.js';
-import { watch, provide, getCurrentInstance, ref } from 'vue';
+import { watch, provide, getCurrentInstance, ref, onBeforeUnmount } from 'vue';
 import Component from '@statamic/components/Component.js';
+import { getActivePinia } from 'pinia';
 
 const emit = defineEmits(['updated']);
 
@@ -67,6 +68,10 @@ const props = defineProps({
         type: String,
         default: () => __('Are you sure?'),
     },
+    readOnly: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const store = usePublishContainerStore(props.name, {
@@ -80,6 +85,7 @@ const store = usePublishContainerStore(props.name, {
     localizedFields: props.localizedFields,
     site: props.site,
     reference: props.reference,
+    readOnly: props.readOnly,
 });
 
 const components = ref([]);
@@ -165,6 +171,11 @@ defineExpose({
     setFieldValue,
     clearDirtyState,
     pushComponent,
+});
+
+onBeforeUnmount(() => {
+    store.$dispose();
+    delete getActivePinia().state.value[store.$id];
 });
 
 // Backwards compatibility.

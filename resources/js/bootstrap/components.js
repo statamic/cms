@@ -33,7 +33,6 @@ import EntryListing from '../components/entries/Listing.vue';
 import CollectionListing from '../components/collections/Listing.vue';
 import TaxonomyListing from '../components/taxonomies/Listing.vue';
 import TermListing from '../components/terms/Listing.vue';
-import AssetContainerList from '../components/AssetContainerList.vue';
 import AddonList from '../components/AddonList.vue';
 import AddonDetails from '../components/AddonDetails.vue';
 import CollectionWidget from '../components/entries/CollectionWidget.vue';
@@ -47,8 +46,6 @@ import ValidationErrors from '../components/ValidationErrors.vue';
 import Slugify from '../components/slugs/Slugify.vue';
 import ElementContainer from '../components/ElementContainer.vue';
 import Avatar from '../components/Avatar.vue';
-import Breadcrumb from '../components/Breadcrumb.vue';
-import Breadcrumbs from '../components/Breadcrumbs.vue';
 import CreateEntryButton from '../components/entries/CreateEntryButton.vue';
 import Popover from '../components/Popover.vue';
 import Portal from '../components/portals/Portal.vue';
@@ -113,7 +110,6 @@ export default function registerGlobalComponents(app) {
     app.component('collection-list', CollectionListing);
     app.component('taxonomy-list', TaxonomyListing);
     app.component('term-list', TermListing);
-    app.component('asset-container-list', AssetContainerList);
     app.component('addon-list', AddonList);
     app.component('addon-details', AddonDetails);
 
@@ -132,8 +128,6 @@ export default function registerGlobalComponents(app) {
     app.component('slugify', Slugify);
     app.component('element-container', ElementContainer);
     app.component('avatar', Avatar);
-    app.component('breadcrumb', Breadcrumb);
-    app.component('breadcrumbs', Breadcrumbs);
     app.component('create-entry-button', CreateEntryButton);
     app.component('popover', Popover);
     app.component('portal', Portal);

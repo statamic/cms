@@ -6,23 +6,19 @@
                     <a :href="taxonomy.terms_url">{{ __(taxonomy.title) }}</a>
                 </template>
                 <template #actions="{ row: taxonomy, index }">
-                    <dropdown-list placement="left-start">
-                        <dropdown-item :text="__('Edit')" :redirect="taxonomy.edit_url" />
-                        <dropdown-item :text="__('Edit Blueprints')" :redirect="taxonomy.blueprints_url" />
-                        <dropdown-item
-                            v-if="taxonomy.deleteable"
-                            :text="__('Delete')"
-                            class="warning"
-                            @click="$refs[`deleter_${taxonomy.id}`].confirm()"
-                        >
-                            <resource-deleter
-                                :ref="`deleter_${taxonomy.id}`"
-                                :resource="taxonomy"
-                                @deleted="removeRow(taxonomy)"
-                            >
-                            </resource-deleter>
-                        </dropdown-item>
-                    </dropdown-list>
+                    <Dropdown>
+                        <DropdownMenu>
+                            <DropdownItem :text="__('Edit')" icon="cog" :href="taxonomy.edit_url" />
+                            <DropdownItem :text="__('Edit Blueprints')" icon="blueprint-edit" :href="taxonomy.blueprints_url" />
+                            <DropdownItem :text="__('Delete Taxonomy')" icon="trash" variant="destructive" @click="$refs[`deleter_${taxonomy.id}`].confirm()" />
+                        </DropdownMenu>
+                    </Dropdown>
+
+                    <resource-deleter
+                        :ref="`deleter_${taxonomy.id}`"
+                        :resource="taxonomy"
+                        @deleted="removeRow(taxonomy)"
+                    />
                 </template>
             </data-list-table>
         </Panel>
@@ -31,13 +27,16 @@
 
 <script>
 import Listing from '../Listing.vue';
-import { Panel } from '@statamic/ui';
+import { Panel, Dropdown, DropdownMenu, DropdownItem } from '@statamic/ui';
 
 export default {
     mixins: [Listing],
 
     components: {
         Panel,
+        Dropdown,
+        DropdownMenu,
+        DropdownItem,
     },
 
     props: ['initial-rows', 'initial-columns'],

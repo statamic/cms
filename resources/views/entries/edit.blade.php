@@ -1,7 +1,7 @@
+@use(Statamic\CP\Breadcrumbs\Breadcrumbs)
 @inject('str', 'Statamic\Support\Str')
 @extends('statamic::layout')
-@section('title', $breadcrumbs->title($title))
-@section('wrapper_class', 'max-w-7xl')
+@section('title', Breadcrumbs::title($title))
 
 @section('content')
     <entry-publish-form
@@ -29,7 +29,6 @@
         :revisions-enabled="{{ $str::bool($revisionsEnabled) }}"
         :initial-read-only="{{ $str::bool($readOnly) }}"
         :preloaded-assets="{{ json_encode($preloadedAssets) }}"
-        :breadcrumbs="{{ $breadcrumbs->toJson() }}"
         :can-edit-blueprint="{{ $str::bool($user->can('configure fields')) }}"
         :can-manage-publish-state="{{ $str::bool($canManagePublishState) }}"
         create-another-url="{{ cp_route('collections.entries.create', [$collection, $locale]) }}"

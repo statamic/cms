@@ -1,5 +1,5 @@
 <template>
-    <div class="relationship-input @container" :class="{ 'relationship-input-empty': items.length == 0 }">
+    <div class="relationship-input @container w-full h-full" :class="{ 'relationship-input-empty': items.length == 0 }">
         <RelationshipSelectField
             v-if="!initializing && usesSelectField"
             :config="config"
@@ -20,8 +20,8 @@
 
         <template v-if="shouldShowSelectedItems">
             <div
+                v-if="items.length"
                 ref="items"
-                class="grid grid-cols-1 gap-2 outline-hidden @xl:grid-cols-2"
                 :class="{ 'mt-2': usesSelectField && items.length }"
             >
                 <component
@@ -51,7 +51,7 @@
                 class="relationship-input-buttons @container relative"
                 :class="{ 'mt-4': items.length > 0 }"
             >
-                <div class="flex flex-wrap items-center gap-3">
+                <div class="flex flex-wrap items-center gap-2">
                     <CreateButton
                         v-if="canCreate && creatables.length"
                         :creatables="creatables"

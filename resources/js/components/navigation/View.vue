@@ -1,59 +1,54 @@
 <template>
     <div>
-        <header class="mb-6" v-if="mounted">
-            <breadcrumb :url="breadcrumbUrl" :title="__('Navigation')" />
+        <Header v-if="mounted" :title="title" icon="navigation">
+            <Dropdown placement="left-start">
+                <DropdownMenu>
+                    <DropdownItem v-if="canEdit" :text="__('Edit Navigation')" icon="edit" :href="editUrl" />
+                    <DropdownItem v-if="canEditBlueprint" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="blueprintUrl" />
+                </DropdownMenu>
+            </Dropdown>
 
-            <div class="flex items-center">
-                <h1 class="flex-1" v-text="__(title)" />
+            <a
+                @click="$refs.tree.cancel"
+                class="text-2xs text-blue-600 underline"
+                v-if="isDirty"
+                v-text="__('Discard changes')"
+            />
 
-                <dropdown-list v-if="canEdit" class="ltr:mr-2 rtl:ml-2">
-                    <slot name="twirldown" />
-                </dropdown-list>
+            <site-selector
+                v-if="sites.length > 1"
+                :sites="sites"
+                :value="site"
+                @input="siteSelected"
+            />
 
-                <a
-                    @click="$refs.tree.cancel"
-                    class="text-2xs text-blue underline ltr:mr-4 rtl:ml-4"
-                    v-if="isDirty"
-                    v-text="__('Discard changes')"
-                />
+            <Dropdown v-if="canEdit && hasCollections" placement="left-start" :disabled="!hasCollections">
+                <template #trigger>
+                    <Button
+                        :text="__('Add Nav Item')"
+                        icon-append="ui/chevron-down"
+                    />
+                </template>
+                <DropdownMenu>
+                    <DropdownItem :text="__('Add Nav Item')" @click="linkPage()" />
+                    <DropdownItem :text="__('Link to Entry')" @click="linkEntries()" />
+                </DropdownMenu>
+            </Dropdown>
 
-                <site-selector
-                    v-if="sites.length > 1"
-                    class="ltr:mr-4 rtl:ml-4"
-                    :sites="sites"
-                    :value="site"
-                    @input="siteSelected"
-                />
+            <Button
+                v-else-if="canEdit && !hasCollections"
+                :text="__('Add Nav Item')"
+                @click="addLink"
+            />
 
-                <dropdown-list v-if="canEdit" :disabled="!hasCollections">
-                    <template #trigger>
-                        <button
-                            class="btn"
-                            :class="{ 'flex items-center ltr:pr-4 rtl:pl-4': hasCollections }"
-                            @click="addLink"
-                        >
-                            {{ __('Add Nav Item') }}
-                            <svg-icon
-                                name="micro/chevron-down-xs"
-                                class="w-2 ltr:ml-4 rtl:mr-4"
-                                v-if="hasCollections"
-                            />
-                        </button>
-                    </template>
-                    <dropdown-item :text="__('Add Nav Item')" @click="linkPage()" />
-                    <dropdown-item :text="__('Link to Entry')" @click="linkEntries()" />
-                </dropdown-list>
-
-                <button
-                    v-if="canEdit"
-                    class="btn-primary ltr:ml-4 rtl:mr-4"
-                    :class="{ disabled: !changed }"
-                    :disabled="!changed"
-                    @click="$refs.tree.save"
-                    v-text="__('Save Changes')"
-                />
-            </div>
-        </header>
+            <Button
+                v-if="canEdit"
+                :disabled="!changed"
+                variant="primary"
+                :text="__('Save Changes')"
+                @click="$refs.tree?.save"
+            />
+        </Header>
 
         <page-tree
             ref="tree"
@@ -74,75 +69,36 @@
             @canceled="changed = false"
         >
             <template #empty>
-                <div class="card content w-full p-4">
-                    <div class="flex w-full flex-wrap">
-                        <a
-                            :href="editUrl"
-                            class="group flex w-full items-start rounded-md p-4 hover:bg-gray-200 dark:hover:bg-dark-550 lg:w-1/2"
-                        >
-                            <svg-icon
-                                name="light/hammer-wrench"
-                                class="h-8 w-8 text-gray-800 dark:text-dark-175 ltr:mr-4 rtl:ml-4"
-                            />
-                            <div class="mb-4 flex-1 md:mb-0 md:ltr:mr-6 md:rtl:ml-6">
-                                <h3 class="mb-2 text-blue dark:text-blue-600">
-                                    {{ __('Configure Navigation') }}
-                                    <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span>
-                                </h3>
-                                <p>{{ __('messages.navigation_configure_settings_intro') }}</p>
-                            </div>
-                        </a>
-                        <a
-                            @click="linkPage()"
-                            class="group flex w-full items-start rounded-md p-4 hover:bg-gray-200 dark:hover:bg-dark-550 lg:w-1/2"
-                        >
-                            <svg-icon
-                                name="paperclip"
-                                class="h-8 w-8 text-gray-800 dark:text-dark-175 ltr:mr-4 rtl:ml-4"
-                            />
-                            <div class="mb-4 flex-1 md:mb-0 md:ltr:mr-6 md:rtl:ml-6">
-                                <h3 class="mb-2 text-blue dark:text-blue-600">
-                                    {{ __('Link to URL') }}
-                                    <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span>
-                                </h3>
-                                <p>{{ __('messages.navigation_link_to_url_instructions') }}</p>
-                            </div>
-                        </a>
-                        <a
-                            @click="linkEntries()"
-                            v-if="hasCollections"
-                            class="group flex w-full items-start rounded-md p-4 hover:bg-gray-200 dark:hover:bg-dark-550 lg:w-1/2"
-                        >
-                            <svg-icon
-                                name="light/hierarchy-files"
-                                class="h-8 w-8 text-gray-800 dark:text-dark-175 ltr:mr-4 rtl:ml-4"
-                            />
-                            <div class="mb-4 flex-1 md:mb-0 md:ltr:mr-6 md:rtl:ml-6">
-                                <h3 class="mb-2 text-blue dark:text-blue-600">
-                                    {{ __('Link to Entry') }}
-                                    <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span>
-                                </h3>
-                                <p>{{ __('messages.navigation_link_to_entry_instructions') }}</p>
-                            </div>
-                        </a>
-                        <a
-                            :href="docs_url('navigation')"
-                            class="group flex w-full items-start rounded-md p-4 hover:bg-gray-200 dark:hover:bg-dark-550 lg:w-1/2"
-                        >
-                            <svg-icon
-                                name="light/book-pages"
-                                class="h-8 w-8 text-gray-800 dark:text-dark-175 ltr:mr-4 rtl:ml-4"
-                            />
-                            <div class="mb-4 flex-1 md:mb-0 md:ltr:mr-6 md:rtl:ml-6">
-                                <h3 class="mb-2 text-blue dark:text-blue-600">
-                                    {{ __('Read the Documentation') }}
-                                    <span v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span>
-                                </h3>
-                                <p>{{ __('messages.navigation_documentation_instructions') }}</p>
-                            </div>
-                        </a>
-                    </div>
-                </div>
+                <EmptyStateMenu :heading="__('Start designing your navigation with these steps')">
+                    <EmptyStateItem
+                        :href="editUrl"
+                        icon="configure-large"
+                        :heading="__('Configure Navigation')"
+                        :description="__('messages.navigation_configure_settings_intro')"
+                    />
+
+                    <EmptyStateItem
+                        icon="fieldtype-link"
+                        :heading="__('Link to URL')"
+                        :description="__('messages.navigation_link_to_url_instructions')"
+                        @click="linkPage"
+                    />
+
+                    <EmptyStateItem
+                        v-if="hasCollections"
+                        icon="navigation"
+                        :heading="__('Link to Entry')"
+                        :description="__('messages.navigation_link_to_entry_instructions')"
+                        @click="linkEntries()"
+                    />
+
+                    <EmptyStateItem
+                        :href="docs_url('navigation')"
+                        icon="support"
+                        :heading="__('Read the Documentation')"
+                        :description="__('messages.navigation_documentation_instructions')"
+                    />
+                </EmptyStateMenu>
             </template>
 
             <template #branch-icon="{ branch }">
@@ -167,15 +123,15 @@
             </template>
 
             <template v-if="canEdit" #branch-options="{ branch, removeBranch, stat, depth }">
-                <dropdown-item v-if="isEntryBranch(stat)" :text="__('Edit Entry')" :redirect="branch.edit_url" />
-                <dropdown-item :text="__('Edit nav item')" @click="editPage(branch)" />
-                <dropdown-item v-if="depth < maxDepth" :text="__('Add child nav item')" @click="linkPage(stat)" />
-                <dropdown-item
+                <DropdownItem v-if="isEntryBranch(stat)" :text="__('Edit Entry')" :href="branch.edit_url" />
+                <DropdownItem :text="__('Edit nav item')" @click="editPage(branch)" />
+                <DropdownItem v-if="depth < maxDepth" :text="__('Add child nav item')" @click="linkPage(stat)" />
+                <DropdownItem
                     v-if="depth < maxDepth && hasCollections"
                     :text="__('Add child link to entry')"
                     @click="linkEntries(stat)"
                 />
-                <dropdown-item :text="__('Remove')" class="warning" @click="deleteTreeBranch(branch, removeBranch)" />
+                <DropdownItem :text="__('Remove')" variant="destructive" @click="deleteTreeBranch(branch, removeBranch)" />
             </template>
         </page-tree>
 
@@ -238,22 +194,30 @@ import SiteSelector from '../SiteSelector.vue';
 import uniqid from 'uniqid';
 import { defineAsyncComponent } from 'vue';
 import { mapValues, pick } from 'lodash-es';
+import { Dropdown, DropdownMenu, DropdownItem, Button, EmptyStateMenu, EmptyStateItem, Header } from '@statamic/ui';
 
 export default {
     components: {
+        Button,
+        Dropdown,
+        DropdownMenu,
+        DropdownItem,
         PageTree: defineAsyncComponent(() => import('../structures/PageTree.vue')),
         PageEditor,
         PageSelector,
         RemovePageConfirmation,
         SiteSelector,
+        EmptyStateMenu,
+        EmptyStateItem,
+        Header,
     },
 
     props: {
         title: { type: String, required: true },
         handle: { type: String, required: true },
         collections: { type: Array, required: true },
-        breadcrumbUrl: { type: String, required: true },
         editUrl: { type: String, required: true },
+        blueprintUrl: { type: String, required: true },
         pagesUrl: { type: String, required: true },
         submitUrl: { type: String, required: true },
         maxDepth: { type: Number, default: Infinity },
@@ -263,6 +227,7 @@ export default {
         blueprint: { type: Object, required: true },
         canEdit: { type: Boolean, required: true },
         canSelectAcrossSites: { type: Boolean, required: true },
+        canEditBlueprint: { type: Boolean, required: true },
     },
 
     data() {

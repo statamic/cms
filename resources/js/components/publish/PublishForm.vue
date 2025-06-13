@@ -11,8 +11,6 @@
         v-slot="{ setFieldValue, setFieldMeta }"
     >
         <div>
-            <breadcrumbs v-if="breadcrumbs" :crumbs="breadcrumbs" />
-
             <div class="mb-6 flex items-center">
                 <h1 class="flex-1">{{ title }}</h1>
                 <button v-if="action" type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
@@ -36,7 +34,6 @@ export default {
         values: { required: true, type: Object },
         title: { required: true, type: String },
         name: { type: String, default: 'base' },
-        breadcrumbs: Array,
         action: String,
         method: { type: String, default: 'post' },
         readOnly: { type: Boolean, default: false },

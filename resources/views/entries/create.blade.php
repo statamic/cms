@@ -1,7 +1,7 @@
+@use(Statamic\CP\Breadcrumbs\Breadcrumbs)
 @inject('str', 'Statamic\Support\Str')
 @extends('statamic::layout')
-@section('title', $breadcrumbs->title($collectionCreateLabel))
-@section('wrapper_class', 'max-w-7xl')
+@section('title', Breadcrumbs::title($collectionCreateLabel))
 
 @section('content')
     <base-entry-create-form
@@ -16,7 +16,6 @@
         :published="{{ json_encode($published) }}"
         :localizations="{{ json_encode($localizations) }}"
         :revisions="{{ Statamic\Support\Str::bool($revisionsEnabled) }}"
-        :breadcrumbs="{{ $breadcrumbs->toJson() }}"
         site="{{ $locale }}"
         parent="{{ $parent }}"
         create-another-url="{{ cp_route('collections.entries.create', [$collection, $locale, 'blueprint' => $blueprint['handle'], 'parent' => $values['parent'] ?? null]) }}"

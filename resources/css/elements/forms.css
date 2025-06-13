@@ -185,7 +185,7 @@ input.input-text-minimal:read-only,
 .radio-box {
     @apply relative h-full cursor-pointer rounded-sm border p-4;
     &.selected {
-        @apply border-blue text-blue shadow;
+        @apply border-blue text-blue-600 shadow;
     }
 }
 
@@ -311,7 +311,7 @@ input[type='file'] {
     a {
         @apply text-gray-800 underline dark:text-dark-175;
         &:hover {
-            @apply text-blue dark:text-dark-blue-100;
+            @apply text-blue-600 dark:text-dark-blue-100;
         }
     }
 }

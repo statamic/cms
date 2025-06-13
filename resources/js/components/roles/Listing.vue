@@ -9,22 +9,19 @@
                     <span class="font-mono text-xs">{{ handle }}</span>
                 </template>
                 <template #actions="{ row: role, index }">
-                    <dropdown-list>
-                        <dropdown-item :text="__('Edit')" :redirect="role.edit_url" />
-                        <dropdown-item
-                            :text="__('Delete')"
-                            class="warning"
-                            @click="$refs[`deleter_${role.id}`].confirm()"
-                        >
-                            <resource-deleter
-                                :ref="`deleter_${role.id}`"
-                                :resource="role"
-                                :requires-elevated-session="true"
-                                @deleted="removeRow(role)"
-                            >
-                            </resource-deleter>
-                        </dropdown-item>
-                    </dropdown-list>
+                    <Dropdown placement="left-start" class="me-3">
+                        <DropdownMenu>
+                            <DropdownItem :text="__('Edit')" icon="edit" :href="role.edit_url" />
+                            <DropdownItem :text="__('Delete')" icon="trash" variant="destructive" @click="$refs[`deleter_${role.id}`].confirm()" />
+                        </DropdownMenu>
+                    </Dropdown>
+
+                    <resource-deleter
+                        :ref="`deleter_${role.id}`"
+                        :resource="role"
+                        :requires-elevated-session="true"
+                        @deleted="removeRow(role)"
+                    />
                 </template>
             </data-list-table>
         </ui-panel>
@@ -33,9 +30,12 @@
 
 <script>
 import Listing from '../Listing.vue';
+import { Dropdown, DropdownItem, DropdownLabel, DropdownMenu, DropdownSeparator } from '@statamic/ui';
 
 export default {
     mixins: [Listing],
+
+    components: { Dropdown, DropdownMenu, DropdownLabel, DropdownSeparator, DropdownItem },
 
     props: ['initialRows', 'initialColumns'],
 

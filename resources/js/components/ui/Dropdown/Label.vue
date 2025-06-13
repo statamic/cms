@@ -12,7 +12,7 @@ const hasDefaultSlot = !!slots.default;
 
 <template>
     <DropdownMenuLabel
-        class="col-span-2 grid items-center rounded-lg px-3 py-2 text-xs text-gray-500 dark:text-gray-400"
+        class="col-span-2 grid items-center rounded-lg px-2 py-2 text-xs text-gray-500 dark:text-gray-400"
         data-ui-dropdown-label
     >
         <slot v-if="hasDefaultSlot" />

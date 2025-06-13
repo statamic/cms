@@ -4,8 +4,8 @@
 
 @extends('statamic::layout')
 @section('title', __('Create Collection'))
-
 @section('content-card-modifiers', 'bg-architectural-lines')
+
 @section('content')
-<collection-create-form route="{{ cp_route('collections.store') }}"></collection-create-form>
+    <collection-create-form route="{{ cp_route('collections.store') }}"></collection-create-form>
 @stop

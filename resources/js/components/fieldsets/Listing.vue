@@ -9,31 +9,16 @@
                     <span class="font-mono text-xs">{{ value }}</span>
                 </template>
                 <template #actions="{ row: fieldset, index }">
-                    <dropdown-list>
-                        <dropdown-item :text="__('Edit')" :redirect="fieldset.edit_url" />
-                        <dropdown-item
-                            v-if="fieldset.is_resettable"
-                            :text="__('Reset')"
-                            class="warning"
-                            @click="$refs[`resetter_${fieldset.id}`].confirm()"
-                        >
-                            <fieldset-resetter :ref="`resetter_${fieldset.id}`" :resource="fieldset" :reload="true">
-                            </fieldset-resetter>
-                        </dropdown-item>
-                        <dropdown-item
-                            v-if="fieldset.is_deletable"
-                            :text="__('Delete')"
-                            class="warning"
-                            @click="$refs[`deleter_${fieldset.id}`].confirm()"
-                        >
-                            <fieldset-deleter
-                                :ref="`deleter_${fieldset.id}`"
-                                :resource="fieldset"
-                                @deleted="removeRow(fieldset)"
-                            >
-                            </fieldset-deleter>
-                        </dropdown-item>
-                    </dropdown-list>
+                    <Dropdown>
+                        <DropdownMenu>
+                            <DropdownItem :text="__('Edit')" icon="edit" :href="fieldset.edit_url" />
+                            <DropdownItem v-if="fieldset.is_resettable" :text="__('Reset')" variant="destructive" @click="$refs[`resetter_${fieldset.id}`].confirm()" />
+                            <DropdownItem v-if="fieldset.is_deletable" :text="__('Delete')" icon="trash" variant="destructive" @click="$refs[`deleter_${fieldset.id}`].confirm()" />
+                        </DropdownMenu>
+                    </Dropdown>
+
+                    <fieldset-resetter :ref="`resetter_${fieldset.id}`" :resource="fieldset" :reload="true" />
+                    <fieldset-deleter :ref="`deleter_${fieldset.id}`" :resource="fieldset" @deleted="removeRow(fieldset)" />
                 </template>
             </data-list-table>
         </ui-panel>
@@ -42,6 +27,7 @@
 
 <script>
 import Listing from '../Listing.vue';
+import { Dropdown, DropdownMenu, DropdownItem } from '@statamic/ui';
 import FieldsetDeleter from './FieldsetDeleter.vue';
 import FieldsetResetter from './FieldsetResetter.vue';
 
@@ -49,6 +35,9 @@ export default {
     mixins: [Listing],
 
     components: {
+        Dropdown,
+        DropdownMenu,
+        DropdownItem,
         FieldsetDeleter,
         FieldsetResetter,
     },

@@ -8,14 +8,6 @@
 @section('content')
 
 <header class="mb-6">
-    @include(
-        'statamic::partials.breadcrumb',
-        [
-            'url' => cp_route('utilities.index'),
-            'title' => __('Utilities'),
-        ]
-    )
-
     <div class="flex items-center justify-between">
         <h1>Git</h1>
 

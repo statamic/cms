@@ -66,6 +66,6 @@ const sizerClasses = cva({
                 :data-last="selected === width && width !== 100"
             />
         </div>
-        <div class="pointer-events-none absolute inset-0 z-10 flex w-full items-center justify-center text-center font-semibold">{{ selected }}%</div>
+        <div class="pointer-events-none absolute inset-0 z-10 flex w-full items-center justify-center text-center font-medium text-gray-800">{{ selected }}%</div>
     </div>
 </template>

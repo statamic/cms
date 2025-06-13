@@ -2,6 +2,7 @@
 import { cva } from 'cva';
 import { computed } from 'vue';
 import { Description, Label } from '@statamic/components/ui/index.js';
+import markdown from '@statamic/util/markdown.js';
 
 defineOptions({
     inheritAttrs: false,
@@ -61,7 +62,7 @@ const classes = computed(() =>
             /* When label exists but no description follows */
             '[&>[data-ui-label]:not(:has(+[data-ui-description]))]:mb-2',
             /* When label is followed by description */
-            '*:data-ui-description:mb-2',
+            '*:data-ui-description:mb-2 *:data-ui-description:mt-1',
         ],
         variants: {
             variant: {
@@ -80,6 +81,8 @@ const classes = computed(() =>
         },
     })({ ...props }),
 );
+
+const instructions = computed(() => props.instructions ? markdown(props.instructions, { openLinksInNewTabs: true }) : null);
 </script>
 
 <template>

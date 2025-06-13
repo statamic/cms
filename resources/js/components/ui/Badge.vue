@@ -13,6 +13,7 @@ const props = defineProps({
     pill: { type: Boolean, default: false },
     size: { type: String, default: 'default' },
     subText: { type: String, default: null },
+    subTextBefore: { type: Boolean, default: false },
     text: { type: [String, Number, Boolean, null], default: null },
     variant: { type: String, default: 'default' },
 });
@@ -27,7 +28,7 @@ const badgeClasses = computed(() => {
         variants: {
             size: {
                 sm: 'text-2xs py-0 leading-normal px-1 rounded-[0.1875rem] [&_svg]:size-2',
-                default: 'text-xs py-0.5 px-1.5 rounded-sm [&_svg]:size-2.5',
+                default: 'text-xs py-0.5 px-2.25 rounded-sm [&_svg]:size-2.5',
                 lg: 'font-medium text-sm py-0.5 leading-relaxed px-2.5 rounded-lg [&_svg]:size-3 [&_svg]:me-1',
             },
             color: {
@@ -69,10 +70,11 @@ const badgeClasses = computed(() => {
 
 <template>
     <component :is="tag" :class="badgeClasses" :href="props.href" data-ui-badge>
+        <span v-if="props.subText && subTextBefore" class="text-[0.625rem] leading-tight font-medium opacity-70">{{ subText }}</span>
         <Icon v-if="icon" :name="icon" />
         <slot v-if="hasDefaultSlot" />
         <template v-else>{{ text }}</template>
         <Icon v-if="iconAppend" :name="iconAppend" />
-        <span v-if="props.subText" class="text-[0.625rem] leading-tight font-medium opacity-70">{{ subText }}</span>
+        <span v-if="props.subText && !subTextBefore" class="text-[0.625rem] leading-tight font-medium opacity-70">{{ subText }}</span>
     </component>
 </template>

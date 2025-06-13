@@ -24,7 +24,7 @@ const classes = cva({
     base: 'font-medium [&:has(+[data-ui-subheading])]:mb-0.5 antialiased flex items-center gap-2',
     variants: {
         size: {
-            base: 'text-sm text-gray-600 dark:text-white',
+            base: 'text-sm tracking-tight text-gray-700 dark:text-white',
             lg: 'text-base text-gray-700 dark:text-white',
             xl: 'text-lg text-gray-800 dark:text-white',
             '2xl': 'text-2xl text-gray-800 dark:text-white',

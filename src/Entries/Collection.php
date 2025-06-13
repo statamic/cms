@@ -278,14 +278,6 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         return cp_route('collections.show', $this->handle());
     }
 
-    public function breadcrumbUrl()
-    {
-        $referer = request()->header('referer');
-        $showUrl = $this->showUrl();
-
-        return $referer && Str::before($referer, '?') === $showUrl ? $referer : $showUrl;
-    }
-
     public function editUrl()
     {
         return cp_route('collections.edit', $this->handle());

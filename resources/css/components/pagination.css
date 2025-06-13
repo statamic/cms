@@ -26,7 +26,7 @@
     }
 
     li.current a {
-        @apply bg-gray-100 text-blue shadow-inner dark:bg-dark-700 dark:text-dark-blue-100;
+        @apply bg-gray-100 text-blue-600 shadow-inner dark:bg-dark-700 dark:text-dark-blue-100;
     }
 }
 

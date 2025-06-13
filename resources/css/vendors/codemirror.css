@@ -4,19 +4,16 @@
 
 .CodeMirror {
     /* Set height, width, borders, and global font properties here */
-    @apply py-3 text-base text-gray-800 dark:text-gray-300 font-normal leading-normal min-h-20;
+    @apply text-gray-800 dark:text-gray-300 font-normal leading-normal min-h-20;
 }
 
 /* PADDING */
 
 .CodeMirror-lines {
-    padding: 4px 0; /* Vertical padding around content */
+    padding: 16px 0; /* Vertical padding around content */
 }
 .CodeMirror pre {
     padding: 0 16px; /* Horizontal padding of content */
-}
-.CodeMirror-wrap {
-    @apply rounded-b;
 }
 
 .CodeMirror-scrollbar-filler,
@@ -480,7 +477,7 @@ span.CodeMirror-selectedtext {
 }
 
 .CodeMirror-fullscreen {
-    @apply fixed inset-0 h-auto rounded-none pt-14;
+    @apply fixed inset-0 h-auto rounded-none pt-13;
 }
 
 .CodeMirror-rulers {
@@ -491,14 +488,6 @@ span.CodeMirror-selectedtext {
 
 .CodeMirror-ruler {
     @apply bottom-0 top-0;
-}
-
-/* Light Theme
-  ========================================================================== */
-.code-fieldtype .theme-light {
-    .CodeMirror {
-        @apply border p-0;
-    }
 }
 
 /* Material Theme

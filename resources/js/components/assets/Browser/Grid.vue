@@ -1,7 +1,7 @@
 <template>
     <ui-panel v-if="!containerIsEmpty">
         <ui-panel-header class="p-1! flex items-center justify-between">
-            <breadcrumbs v-if="!restrictFolderNavigation" :path="path" @navigated="selectFolder" />
+            <Breadcrumbs v-if="!restrictFolderNavigation" :path="path" @navigated="selectFolder" />
             <ui-slider size="sm" class="mr-2 w-24!" variant="subtle" v-model="thumbnailSize" :min="60" :max="300" :step="25" />
         </ui-panel-header>
 
@@ -45,8 +45,8 @@
                                     v-for="action in actions"
                                     :key="action.handle"
                                     :text="__(action.title)"
-                                    icon="edit"
-                                    :class="{ 'text-red-500': action.dangerous }"
+                                    :icon="action.icon"
+                                    :variant="action.dangerous ? 'destructive' : 'default'"
                                     @click="action.run"
                                 />
                             </ContextMenu>
@@ -138,8 +138,8 @@
                                                     v-for="action in actions"
                                                     :key="action.handle"
                                                     :text="__(action.title)"
-                                                    icon="edit"
-                                                    :class="{ 'text-red-500': action.dangerous }"
+                                                    :icon="action.icon"
+                                                    :variant="action.dangerous ? 'destructive' : 'default'"
                                                     @click="action.run"
                                                 />
                                             </DropdownMenu>
@@ -155,8 +155,8 @@
                                     v-for="action in actions"
                                     :key="action.handle"
                                     :text="__(action.title)"
-                                    icon="edit"
-                                    :class="{ 'text-red-500': action.dangerous }"
+                                    :icon="action.icon"
+                                    :variant="action.dangerous ? 'destructive' : 'default'"
                                     @click="action.run"
                                 />
                             </ContextMenu>
@@ -184,6 +184,7 @@ export default {
     mixins: [AssetBrowserMixin],
 
     components: {
+        Breadcrumbs,
         ContextItem,
         ContextLabel,
         ContextMenu,

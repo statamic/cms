@@ -11,28 +11,33 @@
                 {{ formattedTitle }}
             </template>
 
-            <Dropdown class="ltr:mr-4 rtl:ml-4" v-if="canEditBlueprint || hasItemActions">
-                <template #trigger>
-                    <Button icon="ui/dots" variant="ghost" />
-                </template>
-                <DropdownMenu>
-                    <DropdownItem
-                        :text="__('Edit Blueprint')"
-                        v-if="canEditBlueprint"
-                        :redirect="actions.editBlueprint"
-                    />
-                    <DropdownSeparator />
-                    <data-list-inline-actions
-                        v-if="!isCreating && hasItemActions"
-                        :item="values.id"
-                        :url="itemActionUrl"
-                        :actions="itemActions"
-                        :is-dirty="isDirty"
-                        @started="actionStarted"
-                        @completed="actionCompleted"
-                    />
-                </DropdownMenu>
-            </Dropdown>
+            <ItemActions
+                v-if="!isCreating && hasItemActions"
+                :item="values.id"
+                :url="itemActionUrl"
+                :actions="itemActions"
+                :is-dirty="isDirty"
+                @started="actionStarted"
+                @completed="actionCompleted"
+            >
+                <Dropdown class="ltr:mr-4 rtl:ml-4" v-if="canEditBlueprint || hasItemActions">
+                    <template #trigger>
+                        <Button icon="ui/dots" variant="ghost" />
+                    </template>
+                    <DropdownMenu>
+                        <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" v-if="canEditBlueprint" :redirect="actions.editBlueprint" />
+                        <DropdownSeparator v-if="canEditBlueprint && itemActions.length" />
+                        <DropdownItem
+                            v-for="action in itemActions"
+                            :key="action.handle"
+                            :text="__(action.title)"
+                            :icon="action.icon"
+                            :variant="action.dangerous ? 'destructive' : 'default'"
+                            @click="action.run"
+                        />
+                    </DropdownMenu>
+                </Dropdown>
+            </ItemActions>
 
             <div class="text-2xs flex pt-px text-gray-600 ltr:mr-4 rtl:ml-4" v-if="readOnly">
                 <svg-icon name="light/lock" class="-mt-1 w-4 ltr:mr-1 rtl:ml-1" /> {{ __('Read Only') }}
@@ -134,6 +139,7 @@ import { SavePipeline } from '@statamic/exports.js';
 import { ref, computed } from 'vue';
 const { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } = SavePipeline;
 import LocalizationsCard from '@statamic/components/ui/Publish/Localizations.vue';
+import ItemActions from '@statamic/components/actions/ItemActions.vue';
 
 let saving = ref(false);
 let errors = ref({});
@@ -143,6 +149,7 @@ export default {
     mixins: [HasPreferences, HasHiddenFields, HasActions],
 
     components: {
+        ItemActions,
         Header,
         Badge,
         Dropdown,
@@ -173,7 +180,6 @@ export default {
         initialOriginMeta: Object,
         initialSite: String,
         taxonomyHandle: String,
-        breadcrumbs: Array,
         initialActions: Object,
         method: String,
         initialPublished: Boolean,
@@ -282,6 +288,10 @@ export default {
         afterSaveOption() {
             return this.getPreference('after_save');
         },
+
+        direction() {
+            return this.$config.get('direction', 'ltr');
+        },
     },
 
     watch: {
@@ -291,6 +301,15 @@ export default {
 
         saving(saving) {
             this.$progress.loading(`${this.publishContainer}-entry-publish-form`, saving);
+        },
+
+        title(title) {
+            if (this.isBase) {
+                const arrow = this.direction === 'ltr' ? '‹' : '›';
+                const parts = document.title.split(arrow);
+
+                document.title = `${title} ${arrow} ${parts[1]?.trim()}`;
+            }
         },
     },
 

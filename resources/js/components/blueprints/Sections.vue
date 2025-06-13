@@ -1,7 +1,7 @@
 <template>
     <div>
         <div ref="sections" class="blueprint-sections flex flex-wrap outline-hidden" :data-tab="tabId">
-            <blueprint-section
+            <BlueprintSection
                 ref="section"
                 v-for="(section, i) in sections"
                 :key="section._id"

@@ -74,13 +74,19 @@
 @theme {
     --text-4xs: 0.4rem;
     --text-3xs: 0.5rem;
-    --text-2xs: 0.625rem;
+    --text-2xs: 0.7rem;
+    --text-xs: 0.825rem;
+
+    --tracking-tight: -0.015em;
 
     --shadow-ui-xs: 0px 1px 3px -1px rgba(0,0,0,0.10);
     --shadow-ui-sm: 0px 2px 3px -2px rgba(0,0,0,0.15);
     --shadow-ui-md: 0px 2px 4px -2px rgba(0,0,0,0.37);
     --shadow-ui-lg: 0px 4px 7px -4px rgba(0,0,0,0.15);
     --shadow-ui-xl: 0px 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
+
+    /* Custom value because gray-100 is too light and gray-200 is too dark, e.g. Bard active buttons */
+    --color-button-active-light-theme: hsl(from var(--color-gray-200) h s l / 0.6);
 
     --animate-wiggle: wiggle 200ms ease-in-out infinite;
 
@@ -106,7 +112,7 @@
 
 @layer components {
     .content-card {
-        @apply min-h-full px-6 md:px-12 pb-6 bg-white border dark:bg-gray-900 dark:border-y-0 dark:border-r-0 border-gray-200 dark:border-white/10 rounded-xl dark:rounded-none;
+        @apply min-h-full px-6 md:px-12 pb-6 bg-white border dark:bg-gray-900 dark:border-y-0 dark:border-r-0 border-gray-200 dark:border-white/10 rounded-2xl dark:rounded-none;
     }
 }
 

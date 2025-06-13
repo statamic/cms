@@ -151,8 +151,8 @@
                                                 v-for="action in actions"
                                                 :key="action.handle"
                                                 :text="__(action.title)"
-                                                icon="edit"
-                                                :class="{ 'text-red-500': action.dangerous }"
+                                                :icon="action.icon"
+                                                :variant="action.dangerous ? 'destructive' : 'default'"
                                                 @click="action.run"
                                             />
                                         </DropdownMenu>
@@ -227,7 +227,6 @@ export default {
             initialSite: this.site,
             pushQuery: true,
             previousFilters: null,
-            selections: [],
         };
     },
 

@@ -59,7 +59,7 @@
                             <td class="w-64">
                                 <a
                                     href="{{ route('statamic.cp.updater.product', $addon->slug()) }}"
-                                    class="font-bold text-blue ltr:mr-2 rtl:ml-2"
+                                    class="font-bold text-blue-600 ltr:mr-2 rtl:ml-2"
                                 >
                                     {{ $addon->name() }}
                                 </a>

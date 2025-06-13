@@ -7,6 +7,8 @@ use Statamic\Facades;
 
 class ReplaceAsset extends Action
 {
+    protected $icon = 'replace';
+
     public static function title()
     {
         return __('Replace');

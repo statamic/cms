@@ -6,24 +6,33 @@
                 {{ formattedTitle }}
             </template>
 
-            <Dropdown v-if="canEditBlueprint || hasItemActions">
-                <template #trigger>
-                    <Button icon="ui/dots" variant="ghost" />
-                </template>
-                <DropdownMenu>
-                    <DropdownItem :text="__('Edit Blueprint')" v-if="canEditBlueprint" :href="actions.editBlueprint" />
-                    <DropdownSeparator />
-                    <data-list-inline-actions
-                        v-if="!isCreating && hasItemActions"
-                        :item="values.id"
-                        :url="itemActionUrl"
-                        :actions="itemActions"
-                        :is-dirty="isDirty"
-                        @started="actionStarted"
-                        @completed="actionCompleted"
-                    />
-                </DropdownMenu>
-            </Dropdown>
+            <ItemActions
+                v-if="!isCreating && hasItemActions"
+                :item="values.id"
+                :url="itemActionUrl"
+                :actions="itemActions"
+                :is-dirty="isDirty"
+                @started="actionStarted"
+                @completed="actionCompleted"
+            >
+                <Dropdown v-if="canEditBlueprint || hasItemActions">
+                    <template #trigger>
+                        <Button icon="ui/dots" variant="ghost" />
+                    </template>
+                    <DropdownMenu>
+                        <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" v-if="canEditBlueprint" :href="actions.editBlueprint" />
+                        <DropdownSeparator v-if="canEditBlueprint && itemActions.length" />
+                        <DropdownItem
+                            v-for="action in itemActions"
+                            :key="action.handle"
+                            :text="__(action.title)"
+                            :icon="action.icon"
+                            :variant="action.dangerous ? 'destructive' : 'default'"
+                            @click="action.run"
+                        />
+                    </DropdownMenu>
+                </Dropdown>
+            </ItemActions>
 
             <div class="text-2xs me-4 flex pt-px text-gray-600" v-if="readOnly">
                 <svg-icon name="light/lock" class="me-1 -mt-1 w-4" /> {{ __('Read Only') }}
@@ -232,6 +241,7 @@
 </template>
 
 <script>
+import ItemActions from '../../components/actions/ItemActions.vue';
 import PublishActions from './PublishActions.vue';
 import SaveButtonOptions from '../publish/SaveButtonOptions.vue';
 import RevisionHistory from '../revision-history/History.vue';
@@ -284,6 +294,7 @@ export default {
         Header,
         Heading,
         Icon,
+        ItemActions,
         LivePreview,
         LocalizationsCard,
         Panel,
@@ -316,7 +327,6 @@ export default {
         initialSite: String,
         initialIsWorkingCopy: Boolean,
         collectionHandle: String,
-        breadcrumbs: Array,
         initialActions: Object,
         method: String,
         isCreating: Boolean,
@@ -504,7 +514,9 @@ export default {
         title(title) {
             if (this.isBase) {
                 const arrow = this.direction === 'ltr' ? '‹' : '›';
-                document.title = `${title} ${arrow} ${this.breadcrumbs[1].text} ${arrow} ${this.breadcrumbs[0].text} ${arrow} ${__('Statamic')}`;
+                const parts = document.title.split(arrow);
+
+                document.title = `${title} ${arrow} ${parts[1]?.trim()}`;
             }
         },
     },

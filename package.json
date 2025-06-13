@@ -99,8 +99,8 @@
   },
   "devDependencies": {
     "@rollup/plugin-inject": "^5.0.3",
-    "@tailwindcss/typography": "^0.5.9",
-    "@tailwindcss/vite": "^4.0.6",
+    "@tailwindcss/typography": "^0.5.10",
+    "@tailwindcss/vite": "^4.1.8",
     "@vitejs/plugin-vue": "^5.2.1",
     "@vue/test-utils": "^2.4.6",
     "jsdom": "^26.0.0",
@@ -111,8 +111,8 @@
     "prettier-plugin-blade": "^2.1.19",
     "prettier-plugin-tailwindcss": "^0.6.11",
     "rollup-plugin-visualizer": "^5.14.0",
-    "tailwindcss": "^4.0.17",
-    "vite": "^6.0",
+    "tailwindcss": "^4.1.8",
+    "vite": "^6.3.5",
     "vitest": "^3.0.5"
   }
 }

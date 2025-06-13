@@ -30,6 +30,7 @@ class NavItem
     protected $manipulations;
     protected $original;
     protected $attributes;
+    protected $extra;
 
     /**
      * Get or set display.
@@ -198,7 +199,7 @@ class NavItem
      */
     public function svg()
     {
-        $value = $this->icon() ?? 'entries';
+        $value = $this->icon() ?? 'collections';
 
         return Str::startsWith($value, '<svg') ? $value : Statamic::svg('icons/'.$value, 'size-4 shrink-0');
     }
@@ -217,6 +218,19 @@ class NavItem
                 return is_array($value) ? Html::attributes($value) : $value;
             })
             ->value($attrs);
+    }
+
+    /**
+     * Get or set extra data.
+     *
+     * @param  array|null  $extra
+     * @return mixed
+     */
+    public function extra($extra = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('extra')
+            ->value($extra);
     }
 
     /**
@@ -247,7 +261,7 @@ class NavItem
             ->map(function ($navItem) use ($generateNewIds) {
                 return $navItem
                     ->id($generateNewIds ? $this->id().'::' : $navItem->id())
-                    ->icon($this->icon())
+                    ->icon($navItem->icon() ?? $this->icon())
                     ->section($this->section())
                     ->isChild(true);
             })

@@ -8,6 +8,7 @@
             :model-value="datePickerValue"
             :granularity="datePickerGranularity"
             :inline="isInline"
+            :disabled="isReadOnly"
             @update:model-value="datePickerUpdated"
         />
     </div>
