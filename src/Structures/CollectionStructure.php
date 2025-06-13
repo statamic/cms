@@ -2,12 +2,12 @@
 
 namespace Statamic\Structures;
 
-use Statamic\Facades\User;
-use Statamic\Facades\Blink;
-use Statamic\Facades\Collection;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Structures\CollectionTree;
 use Statamic\Contracts\Structures\CollectionTreeRepository;
+use Statamic\Facades\Blink;
+use Statamic\Facades\Collection;
+use Statamic\Facades\User;
 
 class CollectionStructure extends Structure
 {
