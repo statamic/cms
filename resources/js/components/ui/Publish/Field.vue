@@ -112,6 +112,7 @@ function desync() {
 <template>
     <Field
         v-show="shouldShowField"
+        :class="`${config.type}-fieldtype`"
         :id="fieldId"
         :instructions="config.instructions"
         :instructions-below="config.instructions_position === 'below'"
