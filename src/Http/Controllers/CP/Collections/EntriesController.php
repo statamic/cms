@@ -84,6 +84,18 @@ class EntriesController extends CpController
             $query->whereIn('site', Site::authorized()->map->handle()->all());
         }
 
+        if (User::current()->cant('view-other-authors-entries', [EntryContract::class, $collection])) {
+            // Mirror the behavior of the hasAnotherAuthor() method in the EntryPolicy.
+            $blueprintsWithoutAuthor = $collection->entryBlueprints()
+                ->filter(fn ($blueprint) => ! $blueprint->hasField('author'))
+                ->map->handle()->all();
+
+            $query->where(fn ($query) => $query
+                ->whereIn('blueprint', $blueprintsWithoutAuthor)
+                ->orWhere('author', User::current()->id())
+            );
+        }
+
         return $query;
     }
 
@@ -101,9 +113,7 @@ class EntriesController extends CpController
 
         $blueprint->setParent($entry);
 
-        if (User::current()->cant('edit-other-authors-entries', [EntryContract::class, $collection, $blueprint])) {
-            $blueprint->ensureFieldHasConfig('author', ['visibility' => 'read_only']);
-        }
+        $this->modifyAuthorFieldVisibility($collection, $blueprint);
 
         [$values, $meta, $extraValues] = $this->extractFromFields($entry, $blueprint);
 
@@ -300,9 +310,7 @@ class EntriesController extends CpController
             throw new \Exception(__('A valid blueprint is required.'));
         }
 
-        if (User::current()->cant('edit-other-authors-entries', [EntryContract::class, $collection, $blueprint])) {
-            $blueprint->ensureFieldHasConfig('author', ['visibility' => 'read_only']);
-        }
+        $this->modifyAuthorFieldVisibility($collection, $blueprint);
 
         $values = Entry::make()->collection($collection)->values()->all();
 
@@ -567,5 +575,16 @@ class EntriesController extends CpController
         if (Site::multiEnabled() && ! $collection->sites()->contains($site->handle())) {
             return redirect()->back()->with('error', __('Collection is not available on site ":handle".', ['handle' => $site->handle]));
         }
+    }
+
+    protected function modifyAuthorFieldVisibility($collection, $blueprint)
+    {
+        $authorVisibility = match (true) {
+            User::current()->cant('view-other-authors-entries', [EntryContract::class, $collection]) => 'hidden',
+            User::current()->cant('edit-other-authors-entries', [EntryContract::class, $collection, $blueprint]) => 'read_only',
+            default => 'visible',
+        };
+
+        $blueprint->ensureFieldHasConfig('author', ['visibility' => $authorVisibility]);
     }
 }

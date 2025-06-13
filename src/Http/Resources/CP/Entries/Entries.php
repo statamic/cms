@@ -3,7 +3,9 @@
 namespace Statamic\Http\Resources\CP\Entries;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Statamic\Contracts\Entries\Entry;
 use Statamic\CP\Column;
+use Statamic\Facades\User;
 use Statamic\Http\Resources\CP\Concerns\HasRequestedColumns;
 
 class Entries extends ResourceCollection
@@ -41,6 +43,10 @@ class Entries extends ResourceCollection
             ->sortable(false);
 
         $columns->put('status', $status);
+
+        if (User::current()->cant('view-other-authors-entries', [Entry::class, $this->blueprint->parent()])) {
+            $columns->get('author')->listable(false);
+        }
 
         if ($key = $this->columnPreferenceKey) {
             $columns->setPreferred($key);
