@@ -47,6 +47,7 @@ class Step {}
 
 class Start extends Step {
     handle(payload) {
+        if (errors) errors.value = {};
         if (saving) saving.value = true;
         if (container) container.value.saving();
 
