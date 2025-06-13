@@ -47,6 +47,7 @@ class Step {}
 
 class Start extends Step {
     handle(payload) {
+        if (errors) errors.value = {};
         if (saving) saving.value = true;
         if (container) container.value.saving();
 
@@ -84,8 +85,11 @@ export class Request extends Step {
                         if (errors) errors.value = messages;
                         Statamic.$toast.error(message);
                         e = new PipelineStopped();
-                    } else if (e.response) {
+                    } else if (e.response && e.response.data.message) {
                         Statamic.$toast.error(e.response.data.message);
+                        e = new PipelineStopped();
+                    } else if (e.response) {
+                        Statamic.$toast.error(`Something went wrong`);
                         e = new PipelineStopped();
                     }
                     reject(e);

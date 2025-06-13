@@ -112,6 +112,7 @@ function desync() {
 <template>
     <Field
         v-show="shouldShowField"
+        :class="`${config.type}-fieldtype`"
         :id="fieldId"
         :instructions="config.instructions"
         :instructions-below="config.instructions_position === 'below'"
@@ -121,7 +122,11 @@ function desync() {
     >
         <template #label>
             <Label v-if="shouldShowLabel" :for="fieldId" :required="isRequired">
-                <template v-if="shouldShowLabelText">{{ __(config.display) }}</template>
+                <template v-if="shouldShowLabelText">
+                    <Tooltip :text="config.handle" :delay="1000">
+                        {{ __(config.display) }}
+                    </Tooltip>
+                </template>
                 <button v-if="!isReadOnly && isSyncable" v-show="isSynced" @click="desync">
                     <Tooltip :text="__('messages.field_synced_with_origin')">
                         <Icon name="synced" class="text-gray-400" />
