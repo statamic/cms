@@ -2,10 +2,12 @@
 
 namespace Statamic\Structures;
 
-use Statamic\Contracts\Structures\CollectionTree;
-use Statamic\Contracts\Structures\CollectionTreeRepository;
+use Statamic\Facades\User;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Structures\CollectionTree;
+use Statamic\Contracts\Structures\CollectionTreeRepository;
 
 class CollectionStructure extends Structure
 {
@@ -74,6 +76,16 @@ class CollectionStructure extends Structure
 
         $thisCollectionsEntries = $this->collection()->queryEntries()
             ->where('site', $locale)
+            ->when(User::current()->cant('view-other-authors-entries', [Entry::class, $this->collection()]), function ($query) {
+                $blueprintsWithoutAuthor = $this->collection()->entryBlueprints()
+                    ->filter(fn ($blueprint) => ! $blueprint->hasField('author'))
+                    ->map->handle()->all();
+
+                $query->where(fn ($query) => $query
+                    ->whereIn('blueprint', $blueprintsWithoutAuthor)
+                    ->orWhere('author', User::current()->id())
+                );
+            })
             ->pluck('id');
 
         $otherCollectionEntries = $entryIds->diff($thisCollectionsEntries);
