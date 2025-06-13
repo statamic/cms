@@ -3,7 +3,7 @@ import { Tabs, TabList, TabTrigger, TabContent } from '@statamic/ui';
 import TabProvider from './TabProvider.vue';
 import { injectContainerContext } from './Container.vue';
 import Sections from '@statamic/components/ui/Publish/Sections.vue';
-import { ref, computed, useSlots } from 'vue';
+import { ref, computed, useSlots, onMounted, watch } from 'vue';
 import ElementContainer from '@statamic/components/ElementContainer.vue';
 import ShowField from '@statamic/components/field-conditions/ShowField.js';
 
@@ -26,6 +26,25 @@ const visibleMainTabs = computed(() => {
 });
 const shouldShowSidebar = computed(() => (slots.sidebar || sidebarTab.value) && width.value > 920);
 const tab = ref(visibleMainTabs.value[0].handle);
+
+onMounted(() => setActiveTabFromHash());
+
+function setActiveTabFromHash() {
+    if (window.location.hash.length === 0) return;
+
+    const handle = window.location.hash.substr(1);
+
+    if (visibleMainTabs.value.some((tab) => tab.handle === handle)) {
+        tab.value = handle;
+    } else {
+        tab.value = visibleMainTabs.value[0].handle;
+    }
+}
+
+watch(
+    () => tab.value,
+    (tab) => window.location.hash = tab,
+);
 
 const fieldTabMap = computed(() => {
     let map = {};
