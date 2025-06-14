@@ -12,13 +12,20 @@ trait CompilesNavs
         $viewName = '___nav'.sha1($component->outerDocumentContent);
 
         $compiled = (new StatamicTagCompiler())
-            ->prependCompiledContent('$__currentStatamicNavView = \''.$viewName.'\';')
-            ->appendCompiledContent('unset($__currentStatamicNavView);')
             ->setInterceptNav(false)
             ->compile($component->outerDocumentContent);
 
-        file_put_contents(storage_path('framework/views/'.$viewName.'.blade.php'), $compiled);
+        return <<<PHP
+<?php \$___statamicNavCallback = function (\$___scope, \$___statamicNavCallback) {
+    extract(\$___scope);
+    ob_start();
+?>$compiled<?php
+    return ob_get_clean();
+};
 
-        return '@include(\'compiled__views::'.$viewName.'\', get_defined_vars())';
+echo \$___statamicNavCallback(get_defined_vars(), \$___statamicNavCallback);
+unset(\$___statamicNavCallback);
+?>
+PHP;
     }
 }
