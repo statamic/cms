@@ -170,9 +170,23 @@ class Assets extends Fieldtype
 
     public function preload()
     {
+        $container = $this->container();
+
         return [
             'data' => $this->getItemData($this->field->value() ?? $this->defaultValue),
-            'container' => $container = $this->container()->handle(),
+            'container' => [
+                'id' => $container->id(),
+                'title' => $container->title(),
+                'edit_url' => $container->editUrl(),
+                'delete_url' => $container->deleteUrl(),
+                'blueprint_url' => cp_route('asset-containers.blueprint.edit', $container->handle()),
+                'can_edit' => User::current()->can('edit', $container),
+                'can_delete' => User::current()->can('delete', $container),
+                'allow_uploads' => $container->allowUploads(),
+                'create_folders' => $container->createFolders(),
+                'sort_field' => $container->sortField(),
+                'sort_direction' => $container->sortDirection(),
+            ],
             'dynamicFolder' => $dynamicFolder = $this->dynamicFolder(),
             'rename_folder' => $this->renameFolderAction($dynamicFolder),
             'columns' => $this->getColumns(),

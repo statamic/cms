@@ -1,7 +1,7 @@
 <template>
     <div class="flex items-center gap-2">
         <Switch :model-value="value" @update:model-value="update" :id="fieldId" :disabled="isReadOnly" />
-        <Heading v-if="inlineLabel" v-html="$markdown(__(inlineLabel))" />
+        <Heading v-if="inlineLabel" v-html="$markdown(__(inlineLabel), { openLinksInNewTabs: true })" />
     </div>
 </template>
 

@@ -6,14 +6,6 @@
 @section('title', __('Edit Blueprint'))
 
 @section('content')
-    @include(
-        'statamic::partials.breadcrumb',
-        [
-            'url' => cp_route('user-groups.index'),
-            'title' => __('User Groups'),
-        ]
-    )
-
     <blueprint-builder
         action="{{ cp_route('user-groups.blueprint.update') }}"
         :initial-blueprint="{{ json_encode($blueprintVueObject) }}"

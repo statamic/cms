@@ -122,10 +122,6 @@ export default {
         stackCount() {
             return this.$stacks.count();
         },
-
-        wrapperClass() {
-            return this.$config.get('wrapperClass', 'max-w-6xl');
-        },
     },
 
     mounted() {

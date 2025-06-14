@@ -1,6 +1,6 @@
 <template>
     <ui-panel>
-    <data-list :rows="rows" :columns="columns" v-slot="{}">
+        <data-list :rows="rows" :columns="columns" v-slot="{}">
             <data-list-table>
                 <template #cell-title="{ row: group, index }">
                     <a :href="group.show_url">{{ __(group.title) }}</a>
@@ -9,21 +9,14 @@
                     <span class="font-mono text-xs">{{ handle }}</span>
                 </template>
                 <template #actions="{ row: group, index }">
-                    <dropdown-list>
-                        <dropdown-item :text="__('Edit')" :redirect="group.edit_url" />
-                        <dropdown-item
-                            :text="__('Delete')"
-                            class="warning"
-                            @click="$refs[`deleter_${group.id}`].confirm()"
-                        >
-                            <resource-deleter
-                                :ref="`deleter_${group.id}`"
-                                :resource="group"
-                                @deleted="removeRow(group)"
-                            >
-                            </resource-deleter>
-                        </dropdown-item>
-                    </dropdown-list>
+                    <Dropdown placement="left-start" class="me-3">
+                        <DropdownMenu>
+                            <DropdownItem :text="__('Edit')" icon="edit" :href="group.edit_url" />
+                            <DropdownItem :text="__('Delete')" icon="trash" variant="destructive" @click="$refs[`deleter_${group.id}`].confirm()" />
+                        </DropdownMenu>
+                    </Dropdown>
+
+                    <resource-deleter :ref="`deleter_${group.id}`" :resource="group" @deleted="removeRow(group)" />
                 </template>
             </data-list-table>
         </data-list>
@@ -32,9 +25,16 @@
 
 <script>
 import Listing from '../Listing.vue';
+import { Dropdown, DropdownMenu, DropdownItem } from '@statamic/ui';
 
 export default {
     mixins: [Listing],
+
+    components: {
+        Dropdown,
+        DropdownMenu,
+        DropdownItem,
+    },
 
     props: {
         initialRows: Array,

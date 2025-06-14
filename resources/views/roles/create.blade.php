@@ -11,7 +11,6 @@
         method="post"
         :can-assign-super="{{ Statamic\Support\Str::bool($user->isSuper()) }}"
         :initial-permissions="{{ json_encode($permissions) }}"
-        breadcrumb-url="{{ cp_route('roles.index') }}"
         index-url="{{ cp_route('roles.index') }}"
         v-cloak
     ></role-publish-form>

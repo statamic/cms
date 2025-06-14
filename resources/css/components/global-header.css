@@ -1,7 +1,5 @@
-/* ==========================================================================
-   THE GLOBAL HEADER
-   ========================================================================== */
-
+/* GROUP GLOBAL HEADER
+=================================================== */
 .global-header {
     @apply relative flex h-13 w-full items-center bg-white shadow dark:bg-dark-600 dark:shadow-lg ltr:pr-4 rtl:pl-4;
     z-index: 3; /* The search focus overlay sits underneath using z-index 2. */
@@ -29,39 +27,8 @@
     }
 }
 
-.site-selector {
-    .v-select {
-        @apply h-full;
-    }
-    .vs__dropdown-toggle {
-        @apply border-none bg-none;
-    }
-    .vs__actions {
-        @apply hidden;
-    }
-    .vs__search {
-        @apply p-0;
-        [dir='rtl'] & {
-            @apply p-0;
-        }
-        [dir='ltr'] & {
-            @apply p-0;
-        }
-    }
-    .vs__selected-options {
-        @apply border-none bg-none p-0 shadow-none;
-    }
-    .vs__selected {
-        @apply flex;
-    }
-    .vs__dropdown-toggle {
-        @apply h-full rounded-none bg-transparent;
-        box-shadow: none;
-    }
-
-    .vs--single.vs--unsearchable .vs__selected-options {
-        @apply bg-none;
-    }
+.site-selector [data-ui-combobox-anchor] {
+    font-size: 0.9rem;
 }
 
 .session-expiry-stripe {

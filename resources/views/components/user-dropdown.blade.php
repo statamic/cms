@@ -1,7 +1,7 @@
 <ui-dropdown align="end" x-cloak>
     <template #trigger>
         <ui-button :icon-only="true" variant="ghost">
-            <img src="{{ $user->avatar() }}" class="size-7 rounded-full" alt="{{ $user->name() }}" />
+            <img src="{{ $user->avatar() }}" class="size-7 rounded-full [button:has(&)]:rounded-full" alt="{{ $user->name() }}" />
         </ui-button>
     </template>
 

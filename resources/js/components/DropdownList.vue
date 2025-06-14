@@ -12,10 +12,10 @@
         <template #trigger>
             <slot name="trigger">
                 <button class="rotating-dots-button" :aria-label="__('Open Dropdown')" type="button">
-                    <svg class="rotating-dots text-gray-400 fill-current" width="12" viewBox="0 0 24 24">
-                        <circle cx="3" cy="12" r="3" />
-                        <circle cx="12" cy="12" r="3" />
-                        <circle cx="21" cy="12" r="3" />
+                    <svg class="rotating-dots text-gray-400 fill-current" width="13" viewBox="0 0 15 3">
+                        <circle cx="13.5" cy="1.5" r="1.5"/>
+                        <circle cx="7.5" cy="1.5" r="1.5"/>
+                        <circle cx="1.5" cy="1.5" r="1.5"/>
                     </svg>
                 </button>
             </slot>

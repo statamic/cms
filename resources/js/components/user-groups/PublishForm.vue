@@ -1,9 +1,14 @@
 <template>
     <div>
-        <Header :title="__(title)">
-            <dropdown-list class="ltr:mr-2 rtl:ml-2" v-if="canEditBlueprint">
-                <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
-            </dropdown-list>
+        <Header :title="__(title)" icon="groups">
+            <Dropdown v-if="canEditBlueprint" class="me-2">
+                <template #trigger>
+                    <Button icon="ui/dots" variant="ghost" />
+                </template>
+                <DropdownMenu>
+                    <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" :href="actions.editBlueprint" />
+                </DropdownMenu>
+            </Dropdown>
 
             <Button variant="primary" @click.prevent="save" :text="__('Save')" />
 
@@ -38,7 +43,7 @@
 <script>
 import HasHiddenFields from '../publish/HasHiddenFields';
 import clone from '@statamic/util/clone.js';
-import { Header, Button } from '@statamic/ui';
+import { Header, Button, Dropdown, DropdownMenu, DropdownItem } from '@statamic/ui';
 
 export default {
     mixins: [HasHiddenFields],
@@ -46,6 +51,9 @@ export default {
     components: {
         Header,
         Button,
+        Dropdown,
+        DropdownMenu,
+        DropdownItem,
     },
 
     props: {

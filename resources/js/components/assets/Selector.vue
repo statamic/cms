@@ -2,7 +2,7 @@
     <div class="flex h-full flex-col justify-end bg-white dark:bg-dark-800">
         <div class="flex-1 overflow-scroll">
             <asset-browser
-                :initial-container="container"
+                :container="container"
                 :initial-per-page="$config.get('paginationSize')"
                 :initial-columns="columns"
                 :selected-path="folder"
@@ -47,7 +47,7 @@
 <script>
 export default {
     props: {
-        container: String,
+        container: Object,
         folder: String,
         selected: Array,
         maxFiles: Number,

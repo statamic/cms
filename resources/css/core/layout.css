@@ -5,10 +5,11 @@
    /* ==========================================================================
    THE MAIN NAV (LEFT SIDEBAR)
    ========================================================================== */
-
 .nav-main {
     @apply flex flex-col gap-6 py-6 px-3 text-sm antialiased select-none;
-    @apply h-full overflow-y-auto fixed top-14 left-0 w-46;
+    /* Same as the main element, accounting for the header with a class of h-14, which is the same as 3.5rem */
+    @apply h-[calc(100vh-3.5rem)];
+    @apply overflow-y-auto fixed top-14 left-0 w-46;
     @apply [&_svg]:text-gray-500 dark:[&_svg]:text-gray-600;
     transition: all 0.3s ease-in-out;
 

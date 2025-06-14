@@ -21,7 +21,7 @@ export default function useActions() {
         return actions?.map(action => {
             return {
                 ...action,
-                run: findMatchingConfirmableAction(confirmableActions, action.handle)?.confirm,
+                run: () => findMatchingConfirmableAction(confirmableActions, action.handle)?.confirm(),
             };
         });
     }

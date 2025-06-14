@@ -13,6 +13,7 @@
             :sort-column="sortColumn"
             :sort-direction="sortDirection"
             @visible-columns-updated="visibleColumns = $event"
+            @selections-updated="selections = $event"
         >
             <div>
                 <div class="space-y-3">
@@ -54,12 +55,32 @@
 
                     <div v-show="items.length === 0" class="p-6 text-center text-gray-500" v-text="__('No results')" />
 
-                    <data-list-bulk-actions
+                    <BulkActions
                         :url="actionUrl"
+                        :selections="selections"
                         :context="actionContext"
                         @started="actionStarted"
                         @completed="actionCompleted"
-                    />
+                        v-slot="{ actions }"
+                    >
+                        <div class="fixed inset-x-0 bottom-1 z-100 flex w-full justify-center">
+                            <ButtonGroup>
+                                <Button
+                                    variant="primary"
+                                    class="text-gray-400!"
+                                    :text="__n(`:count item selected|:count items selected`, selections.length)"
+                                />
+                                <Button
+                                    v-for="action in actions"
+                                    :key="action.handle"
+                                    variant="primary"
+                                    :text="__(action.title)"
+                                    @click="action.run"
+                                />
+                            </ButtonGroup>
+                        </div>
+                    </BulkActions>
+
                     <Panel class="relative overflow-x-auto overscroll-x-contain">
                         <data-list-table
                             v-show="items.length"
@@ -110,31 +131,41 @@
                                 </div>
                             </template>
                             <template #actions="{ row: user, index }">
-                                <Dropdown placement="left-start" class="me-3">
-                                    <DropdownMenu>
-                                        <DropdownLabel :text="__('Actions')" />
-                                        <DropdownItem
-                                            :text="__('Edit')"
-                                            :href="user.edit_url"
-                                            icon="edit"
-                                            v-if="user.editable"
-                                        />
-                                        <DropdownItem
-                                            :text="__('View')"
-                                            :href="user.edit_url"
-                                            icon="eye"
-                                            v-else
-                                        />
-                                        <DropdownSeparator v-if="user.actions.length" />
-                                        <data-list-list-actions
-                                            :item="user.id"
-                                            :url="actionUrl"
-                                            :actions="user.actions"
-                                            @started="actionStarted"
-                                            @completed="actionCompleted"
-                                        />
-                                    </DropdownMenu>
-                                </Dropdown>
+                                <ItemActions
+                                    :url="actionUrl"
+                                    :actions="user.actions"
+                                    :item="user.id"
+                                    @started="actionStarted"
+                                    @completed="actionCompleted"
+                                    v-slot="{ actions }"
+                                >
+                                    <Dropdown placement="left-start" class="me-3">
+                                        <DropdownMenu>
+                                            <DropdownLabel :text="__('Actions')" />
+                                            <DropdownItem
+                                                :text="__('Edit')"
+                                                :href="user.edit_url"
+                                                icon="edit"
+                                                v-if="user.editable"
+                                            />
+                                            <DropdownItem
+                                                :text="__('View')"
+                                                :href="user.edit_url"
+                                                icon="eye"
+                                                v-else
+                                            />
+                                            <DropdownSeparator v-if="actions.length" />
+                                            <DropdownItem
+                                                v-for="action in actions"
+                                                :key="action.handle"
+                                                :text="__(action.title)"
+                                                :icon="action.icon"
+                                                :variant="action.dangerous ? 'destructive' : 'default'"
+                                                @click="action.run"
+                                            />
+                                        </DropdownMenu>
+                                    </Dropdown>
+                                </ItemActions>
                             </template>
                         </data-list-table>
                     </Panel>
@@ -162,7 +193,10 @@ import {
     DropdownItem,
     DropdownLabel,
     DropdownSeparator,
+    ButtonGroup,
 } from '@statamic/ui';
+import ItemActions from '@statamic/components/actions/ItemActions.vue';
+import BulkActions from '@statamic/components/actions/BulkActions.vue';
 
 export default {
     mixins: [Listing],
@@ -175,6 +209,9 @@ export default {
         DropdownItem,
         DropdownLabel,
         DropdownSeparator,
+        ButtonGroup,
+        ItemActions,
+        BulkActions,
     },
 
     props: {

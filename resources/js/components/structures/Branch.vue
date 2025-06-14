@@ -54,16 +54,26 @@
 
                 <slot name="branch-icon" :branch="page" />
 
-                <dropdown-list class="ltr:ml-4 rtl:mr-4" :class="{ invisible: isRoot, hidden: !editable }">
-                    <slot name="branch-options" :branch="page" :depth="depth" :remove-branch="remove" />
-                </dropdown-list>
+                <Dropdown placement="left-start" class="me-4" :class="{ invisible: isRoot, hidden: !editable }">
+                    <DropdownMenu>
+                        <slot
+                            name="branch-options"
+                            :branch="page"
+                            :depth="depth"
+                            :remove-branch="remove"
+                        />
+                    </DropdownMenu>
+                </Dropdown>
             </div>
         </div>
     </div>
 </template>
 
 <script>
+import { Dropdown, DropdownMenu } from '@statamic/ui';
+
 export default {
+    components: { Dropdown, DropdownMenu },
     props: {
         page: Object,
         depth: Number,

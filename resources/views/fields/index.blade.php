@@ -24,7 +24,7 @@
                         <a href="{{ Statamic::docsUrl('blueprints') }}" class="font-bold text-blue">
                             {{ __('Read the Docs') }}
                         </a>
-                        <span class="inline-block h-4 w-4 text-blue ltr:ml-2 rtl:mr-2">
+                        <span class="inline-block h-4 w-4 text-blue-600 ltr:ml-2 rtl:mr-2">
                             @cp_svg('icons/light/external-link')
                         </span>
                     </p>
@@ -36,7 +36,7 @@
                     @unless ($blueprints->isEmpty())
                         <a
                             href="{{ cp_route('blueprints.index') }}"
-                            class="text-sm font-bold text-blue hover:text-gray-900"
+                            class="text-sm font-bold text-blue-600 hover:text-gray-900"
                         >
                             {{ __('View All') }}
                             <span class="font-normal">({{ $blueprints->count() }})</span>
@@ -55,7 +55,7 @@
                         <a href="{{ Statamic::docsUrl('fieldsets') }}" class="font-bold text-blue">
                             {{ __('Read the Docs') }}
                         </a>
-                        <span class="inline-block h-4 w-4 text-blue ltr:ml-2 rtl:mr-2">
+                        <span class="inline-block h-4 w-4 text-blue-600 ltr:ml-2 rtl:mr-2">
                             @cp_svg('icons/light/external-link')
                         </span>
                     </p>
@@ -67,7 +67,7 @@
                     @unless ($fieldsets->isEmpty())
                         <a
                             href="{{ cp_route('fieldsets.index') }}"
-                            class="text-sm font-bold text-blue hover:text-gray-900"
+                            class="text-sm font-bold text-blue-600 hover:text-gray-900"
                         >
                             {{ __('View All') }}
                             <span class="font-normal">({{ $fieldsets->count() }})</span>

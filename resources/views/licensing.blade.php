@@ -132,7 +132,7 @@
                                 <span class="font-bold">
                                     <a
                                         href="{{ $addon->addon()->marketplaceUrl() }}"
-                                        class="text-gray hover:text-blue dark:text-dark-175 dark:hover:text-dark-blue-100"
+                                        class="text-gray hover:text-blue-600 dark:text-dark-175 dark:hover:text-dark-blue-100"
                                     >
                                         {{ $addon->name() }}
                                     </a>

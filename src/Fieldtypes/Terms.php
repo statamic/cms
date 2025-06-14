@@ -56,7 +56,6 @@ class Terms extends Relationship
         'initialIsRoot' => 'isRoot',
         'initialReadOnly' => 'readOnly',
         'revisionsEnabled' => 'revisionsEnabled',
-        'breadcrumbs' => 'breadcrumbs',
         'taxonomyHandle' => 'taxonomy',
     ];
 

@@ -1,7 +1,7 @@
 <template>
     <ui-panel v-if="!containerIsEmpty">
         <ui-panel-header class="p-1! flex items-center justify-between">
-            <breadcrumbs v-if="!restrictFolderNavigation" :path="path" @navigated="selectFolder" />
+            <Breadcrumbs v-if="!restrictFolderNavigation" :path="path" @navigated="selectFolder" />
             <ui-slider size="sm" class="mr-2 w-24!" variant="subtle" v-model="thumbnailSize" :min="60" :max="300" :step="25" />
         </ui-panel-header>
 
@@ -184,6 +184,7 @@ export default {
     mixins: [AssetBrowserMixin],
 
     components: {
+        Breadcrumbs,
         ContextItem,
         ContextLabel,
         ContextMenu,

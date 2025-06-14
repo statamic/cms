@@ -1,7 +1,5 @@
-/* ==========================================================================
-   BUTTONS
-   ========================================================================== */
-
+/* GROUP BUTTONS
+=================================================== */
 button {
     @apply font-normal;
 }
@@ -31,7 +29,8 @@ button {
     height: 2.375rem; /*  38px */
 }
 
-/*  Default, non-primary action button */
+/* GROUP BUTTONS / DEFAULT - the default, non-primary action button
+=================================================== */
 .btn,
 .btn-default {
     @apply text-gray-800 shadow-sm dark:text-dark-150;
@@ -92,7 +91,8 @@ button {
     }
 }
 
-/*  Primary action button */
+/* GROUP BUTTONS / PRIMARY
+=================================================== */
 .btn-primary {
     @apply border! border-blue-700! border-b-blue-800! bg-linear-to-b! from-blue-500! to-blue-600! bg-clip-padding! text-white! dark:border-blue-900! dark:border-b-dark-blue-200! dark:from-dark-blue-100! dark:to-dark-blue-150!;
     box-shadow:
@@ -116,7 +116,8 @@ button {
     }
 }
 
-/*  Danger/delete button */
+/* GROUP BUTTONS / DANGER/DELETE
+=================================================== */
 .btn-danger {
     @apply border border-red-600 border-b-red-900 bg-linear-to-b from-red-500 to-red-600 bg-clip-padding text-white;
     box-shadow:
@@ -165,8 +166,8 @@ button {
     }
 }
 
-/* Size Variations
-  ========================================================================== */
+/* GROUP BUTTONS / SIZE VARIATIONS
+=================================================== */
 .btn-sm {
     @apply h-8 px-2 py-1;
 }
@@ -185,9 +186,8 @@ button {
     padding: 2px 40px;
 }
 
-/* Shape Variations
-  ========================================================================== */
-
+/* GROUP BUTTONS / SHAPE VARIATIONS
+=================================================== */
 .btn-round {
     @apply flex items-center rounded-full p-0 text-center;
     background: linear-gradient(180deg, #fff, #f9fafb);
@@ -222,9 +222,8 @@ button {
     }
 }
 
-/* Button Group
-  ========================================================================== */
-
+/* GROUP BUTTON GROUP
+=================================================== */
 .btn-group {
     @apply flex cursor-auto items-center justify-start p-0;
     height: 2.375rem;
@@ -261,9 +260,8 @@ button {
     }
 }
 
-/* With Icons
-  ========================================================================== */
-
+/* GROUP BUTTONS / WITH ICONS
+=================================================== */
 .btn-icon {
     padding: 1px 8px;
     border-radius: 2px;
@@ -315,9 +313,8 @@ td .btn-icon {
     }
 }
 
-/* Close button. For closing things.
-  ========================================================================== */
-
+/* GROUP BUTTONS / CLOSE BUTTON (for closing things)
+=================================================== */
 .btn-close {
     @apply inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full p-0 text-center text-xl leading-none text-gray-600 outline-hidden dark:text-dark-150 ltr:ml-4 rtl:mr-4;
 
@@ -333,10 +330,10 @@ td .btn-icon {
 }
 
 .btn-quick-action {
-    @apply inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full p-0 text-center text-xl leading-none text-gray-600 outline-hidden dark:text-dark-150;
+    @apply inline-flex size-8 shrink-0 items-center justify-center rounded-full p-0 text-center text-xl leading-none text-gray-600 outline-hidden dark:text-dark-150;
 
     &:hover {
-        @apply bg-gray-400 dark:bg-dark-700;
+        @apply hover:bg-gray-400/10 dark:bg-dark-700;
     }
 
     &:active,

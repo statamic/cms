@@ -3,11 +3,14 @@ import Container from './Container.vue';
 import Tabs from './Tabs.vue';
 import { Header, Button } from '@statamic/ui';
 import uniqid from 'uniqid';
-import { ref, useTemplateRef } from 'vue';
+import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
 import { SavePipeline } from '@statamic/exports.js';
 const { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks } = SavePipeline;
 
 const props = defineProps({
+    icon: {
+        type: String,
+    },
     title: {
         type: String,
         default: () => uniqid(),
@@ -34,6 +37,10 @@ const props = defineProps({
         type: String,
         default: 'patch',
     },
+    readOnly: {
+        type: Boolean,
+        default: false,
+    }
 });
 
 const containerName = Statamic.$slug.separatedBy('_').create(props.title);
@@ -53,13 +60,28 @@ function save() {
         ])
         .then((response) => {
             Statamic.$toast.success('Saved');
+
+            if (response.data.redirect) {
+                window.location = response.data.redirect;
+            }
         });
 }
+
+let saveKeyBinding;
+
+onMounted(() => {
+    saveKeyBinding = Statamic.$keys.bindGlobal(['mod+s'], (e) => {
+        e.preventDefault();
+        save();
+    });
+});
+
+onUnmounted(() => saveKeyBinding.destroy());
 </script>
 
 <template>
-    <Header :title="title">
-        <Button variant="primary" text="Save" @click="save" :disabled="saving" />
+    <Header :title="title" :icon="icon">
+        <Button v-if="!readOnly" variant="primary" text="Save" @click="save" :disabled="saving" />
     </Header>
     <Container
         ref="container"
@@ -68,6 +90,7 @@ function save() {
         :values="values"
         :meta="meta"
         :errors="errors"
+        :read-only="readOnly"
         @updated="values = $event"
     >
         <Tabs />

@@ -34,6 +34,7 @@ const props = defineProps({
     ignoreFilter: { type: Boolean, default: false },
     options: { type: Array, default: null },
     flat: { type: Boolean, default: false },
+    buttonAppearance: { type: Boolean, default: true },
 });
 
 defineOptions({
@@ -43,19 +44,27 @@ defineOptions({
 const attrs = useAttrs();
 
 const anchorClasses = cva({
-    base: 'focus-within:focus-outline w-full flex items-center justify-between border border-gray-300 dark:border-b-0 dark:ring-3 dark:ring-gray-900 dark:border-white/15 text-gray-800 dark:text-gray-300 antialiased appearance-none shadow-ui-sm dark:shadow-md',
+    base: 'focus-within:focus-outline w-full flex items-center justify-between gap-2 text-gray-800 dark:text-gray-300 antialiased appearance-none',
     variants: {
         size: {
-            base: 'text-base rounded-lg ps-3 py-2 h-10 leading-[1.375rem]',
-            sm: 'text-sm rounded-md ps-2.5 py-1.5 h-8 leading-[1.125rem]',
-            xs: 'text-xs rounded-xs ps-2 py-1.5 h-6 leading-[1.125rem]',
+            base: 'text-base rounded-lg ps-3 pe-2.5 py-2 h-10 leading-[1.375rem]',
+            sm: 'text-sm rounded-md ps-2.5 pe-2 py-1.5 h-7 leading-[1.125rem]',
+            xs: 'text-xs rounded-xs ps-2 pe-1.5 py-1.5 h-6 leading-[1.125rem]',
         },
         flat: {
             true: 'shadow-none',
             false: 'bg-linear-to-b from-white to-gray-50 hover:to-gray-100 dark:from-gray-800/30 dark:to-gray-800 dark:hover:to-gray-850 shadow-ui-sm',
         },
+        buttonAppearance: {
+            true: 'border border-gray-300 dark:border-b-0 dark:ring-3 dark:ring-gray-900 dark:border-white/15 shadow-ui-sm dark:shadow-md',
+            false: '',
+        },
     },
-})({ ...props });
+})({ 
+    size: props.size,
+    flat: props.flat,
+    buttonAppearance: props.buttonAppearance
+});
 
 const itemClasses = cva({
     base: [
@@ -192,9 +201,40 @@ function deselect(option) {
 
 const dropdownOpen = ref(false);
 
+function updateDropdownOpen(open) {
+    // Prevent dropdown from opening when it's a taggable combobox with no options.
+    if (props.taggable && props.options.length === 0) {
+        return;
+    }
+
+    dropdownOpen.value = open;
+}
+
 function updateModelValue(value) {
     searchQuery.value = '';
     emit('update:modelValue', value);
+}
+
+function onPaste(e) {
+    if (!props.taggable) {
+        return;
+    }
+
+    const pastedValue = e.clipboardData.getData('text');
+
+    updateModelValue([...props.modelValue, ...pastedValue.split(',').map((v) => v.trim())]);
+}
+
+// When it's a taggable combobox with no options, we need to push the value here as updateModelValue won't be called.
+function pushTaggableOption(e) {
+    if (props.taggable && props.options.length === 0) {
+        if (props.modelValue.includes(e.target.value)) {
+            searchQuery.value = '';
+            return;
+        }
+
+        updateModelValue([...props.modelValue, e.target.value]);
+    }
 }
 </script>
 
@@ -207,29 +247,32 @@ function updateModelValue(value) {
             :reset-search-term-on-blur="false"
             :reset-search-term-on-select="false"
             :disabled="disabled || (multiple && limitReached)"
-            v-model:open="dropdownOpen"
+            :open="dropdownOpen"
             :model-value="modelValue"
+            @update:open="updateDropdownOpen"
             @update:model-value="updateModelValue"
         >
             <ComboboxAnchor :class="[anchorClasses, $attrs.class]" data-ui-combobox-anchor>
-                <ComboboxTrigger as="div" class="min-h-full w-full">
+                <ComboboxTrigger as="div" class="min-h-full w-full flex items-center">
                     <ComboboxInput
-                        v-if="searchable && (dropdownOpen || !modelValue)"
+                        v-if="searchable && (dropdownOpen || !modelValue || (multiple && placeholder))"
                         ref="input"
                         class="w-full text-gray-700 opacity-100 focus:outline-none"
                         v-model="searchQuery"
                         :placeholder
+                        @paste.prevent="onPaste"
+                        @keydown.enter.prevent="pushTaggableOption"
                     />
-                    <div v-else-if="!searchable && (dropdownOpen || !modelValue)">
-                        <span class="text-gray-400 dark:text-gray-600" v-text="placeholder" />
-                    </div>
-                    <div v-else class="cursor-pointer">
+                    <button type="button" v-else-if="!searchable && (dropdownOpen || !modelValue)">
+                        <span class="text-gray-400 dark:text-gray-500" v-text="placeholder" />
+                    </button>
+                    <button type="button" v-else class="cursor-pointer">
                         <slot name="selected-option" v-bind="{ option: selectedOption }">
                             <span v-text="getOptionLabel(selectedOption)" />
                         </slot>
-                    </div>
+                    </button>
                 </ComboboxTrigger>
-                <div class="flex items-center space-x-2 px-2">
+                <div class="flex items-center">
                     <Button icon="x" variant="filled" size="xs" round v-if="clearable && modelValue" @click="clear" />
                     <ComboboxTrigger class="flex items-center">
                         <Icon name="ui/chevron-down" />

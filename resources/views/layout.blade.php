@@ -12,8 +12,7 @@
             <div id="statamic" v-cloak>
                 @include('statamic::partials.session-expiry')
                 @include('statamic::partials.licensing-alerts')
-                {{-- @include('statamic::partials.global-header') --}}
-                @include('statamic::partials.new-global-header')
+                 @include('statamic::partials.global-header')
 
                 <div
                     class="@yield('content-class') pt-14"
@@ -26,11 +25,10 @@
                     {{-- @include('statamic::partials.nav-mobile') --}}
 
                     <main id="main" class="
-                        flex bg-gray-100 dark:bg-gray-900 dark:border-t rounded-t-xl dark:border-white/10
+                    flex bg-gray-100 dark:bg-gray-900 dark:border-t rounded-t-2xl dark:border-white/10
                         fixed top-14 inset-x-0 bottom-0 min-h-[calc(100vh-3.5rem)]
                     ">
                         @include('statamic::partials.nav-main')
-                        {{-- <div class="" :class="wrapperClass"> --}}
                         <div class="p-2 h-full flex-1 overflow-y-auto">
                             <div class="relative content-card @yield('content-card-modifiers') min-h-full transition-padding duration-300">
                                 @yield('content')

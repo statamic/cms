@@ -24,7 +24,7 @@ const iconOnly = computed(() => (props.icon && !hasDefaultSlot && !props.text) |
 
 const buttonClasses = computed(() => {
     const classes = cva({
-        base: 'inline-flex items-center justify-center whitespace-nowrap shrink-0 font-medium antialiased cursor-pointer no-underline disabled:opacity-75 disabled:cursor-default disabled:pointer-events-none [&_svg]:shrink-0 [&_svg]:text-gray-600',
+        base: 'inline-flex items-center justify-center whitespace-nowrap shrink-0 font-medium antialiased cursor-pointer no-underline disabled:text-gray-400 dark:disabled:text-gray-600 disabled:cursor-default disabled:pointer-events-none [&_svg]:shrink-0 [&_svg]:text-gray-500',
         variants: {
             variant: {
                 default: [
@@ -43,14 +43,14 @@ const buttonClasses = computed(() => {
             size: {
                 lg: 'px-6 h-12 text-base gap-2 rounded-lg text-base',
                 base: 'px-4 h-10 text-sm gap-2 rounded-lg',
-                sm: 'px-3 h-8 [[data-ui-dropdown-trigger]_&]:h-6 [.relationship-input_&]:h-4! text-[0.8125rem] leading-none gap-2 rounded-lg [&_svg]:size-3',
-                xs: 'px-2 h-6.5 text-xs gap-1.5 rounded-md [&_svg]:size-3',
+                sm: 'px-3 h-8 text-[0.8125rem] leading-none gap-2 rounded-lg [&_svg]:size-2.5',
+                xs: 'px-2 h-6.5 text-xs gap-1.5 rounded-md [&_svg]:size-2.5',
             },
             groupBorder: {
                 default:
                     'in-data-ui-button-group:border-s-0 [:is([data-ui-button-group]>&:first-child,_[data-ui-button-group]_:first-child>&)]:border-s-[1px]',
                 primary:
-                    'in-data-ui-button-group:border-e-0 [:is([data-ui-button-group]>&:last-child,_[data-ui-button-group]_:last-child>&)]:border-e-[1px] [:is([data-ui-button-group]>&:not(:first-child),_[data-ui-button-group]_:not(:first-child)>&)]:border-s-primary-gap',
+                    'in-data-ui-button-group:border-s-0 [:is([data-ui-button-group]>&:first-child,_[data-ui-button-group]_:first-child>&)]:border-s-[1px] [:is([data-ui-button-group]>&:last-child,_[data-ui-button-group]_:last-child>&)]:border-e-[1px] [:is([data-ui-button-group]>&:not(:first-child),_[data-ui-button-group]_:not(:first-child)>&)]:border-s-primary-gap',
                 danger: 'in-data-ui-button-group:border-s-0 in-data-ui-button-group:border-e [:is([data-ui-button-group]>&:last-child,_[data-ui-button-group]_:last-child>&)]:border-e-0 in-data-ui-button-group:border-red-600',
                 filled: 'in-data-ui-button-group:border-e [:is([data-ui-button-group]>&:last-child,_[data-ui-button-group]_:last-child>&)]:border-e-0 in-data-ui-button-group:border-gray-300/70',
                 ghost: '',

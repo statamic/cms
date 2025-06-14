@@ -42,7 +42,7 @@
                             <div class="field-inner">
                                 <label class="mb-2 text-sm font-medium">{{ __('Icon') }}</label>
                                 <publish-field-meta
-                                    :config="{ handle: 'icon', type: 'icon', folder: 'light' }"
+                                    :config="{ handle: 'icon', type: 'icon' }"
                                     :initial-value="config.icon"
                                     v-slot="{ meta, value, loading, config: fieldtypeConfig }"
                                 >

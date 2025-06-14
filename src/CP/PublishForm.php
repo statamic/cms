@@ -7,9 +7,11 @@ use Statamic\Fields\Blueprint;
 
 class PublishForm implements Responsable
 {
-    public string $title = '';
+    private string $icon = '';
+    private string $title = '';
     private array $values = [];
     private $parent = null;
+    private bool $readOnly = false;
     private string $submitUrl;
     private string $submitMethod = 'PATCH';
 
@@ -20,6 +22,13 @@ class PublishForm implements Responsable
     public static function make(Blueprint $blueprint): self
     {
         return new self($blueprint);
+    }
+
+    public function icon(string $icon): self
+    {
+        $this->icon = $icon;
+
+        return $this;
     }
 
     public function title(string $title): self
@@ -39,6 +48,13 @@ class PublishForm implements Responsable
     public function parent($parent): self
     {
         $this->parent = $parent;
+
+        return $this;
+    }
+
+    public function readOnly(bool $readOnly = true): self
+    {
+        $this->readOnly = $readOnly;
 
         return $this;
     }
@@ -75,9 +91,11 @@ class PublishForm implements Responsable
 
         return view('statamic::publish.form', [
             'blueprint' => $this->blueprint->toPublishArray(),
+            'icon' => $this->icon,
             'title' => $this->title,
             'values' => $fields->values(),
             'meta' => $fields->meta(),
+            'readOnly' => $this->readOnly,
             'submitUrl' => $this->submitUrl,
             'submitMethod' => $this->submitMethod,
         ]);

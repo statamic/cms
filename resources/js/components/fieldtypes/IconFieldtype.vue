@@ -13,7 +13,7 @@
     >
         <template #option="option">
             <div class="flex items-center">
-                <svg-icon v-if="!option.html" :name="`${meta.set}/${option.label}`" class="size-4" />
+                <Icon v-if="!option.html" :name="getOptionIcon(option)" class="size-4" />
                 <div v-if="option.html" v-html="option.html" class="size-4" />
                 <span class="ms-3 truncate">
                     {{ __(option.label) }}
@@ -22,7 +22,7 @@
         </template>
         <template #selected-option="{ option }">
             <div class="flex items-center">
-                <svg-icon v-if="!option.html" :name="`${meta.set}/${option.label}`" class="flex size-4 items-center" />
+                <Icon v-if="!option.html" :name="getOptionIcon(option)" class="flex size-4 items-center" />
                 <div v-if="option.html" v-html="option.html" class="size-4" />
                 <span class="ms-3 truncate text-sm text-gray-800 dark:text-gray-200">
                     {{ __(option.label) }}
@@ -35,12 +35,12 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 import { ref, watch } from 'vue';
-import { Combobox } from '@statamic/ui';
+import { Combobox, Icon } from '@statamic/ui';
 const iconsCache = ref({});
 const loaders = ref({});
 
 export default {
-    components: { Combobox },
+    components: { Combobox, Icon },
     mixins: [Fieldtype],
 
     data() {
@@ -102,6 +102,14 @@ export default {
                 .finally(() => {
                     loaders.value = { ...loaders.value, [this.cacheKey]: false };
                 });
+        },
+
+        getOptionIcon(option) {
+            if (this.meta.set) {
+                return `${this.meta.set}/${option.label}`;
+            }
+
+            return option.label;
         },
     },
 };

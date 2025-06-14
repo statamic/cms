@@ -6,7 +6,7 @@
         <div :class="{ 'publish-fields': fullScreenMode }">
             <div :class="fullScreenMode && wrapperClasses">
                 <div
-                    class="bard-fieldtype-wrapper"
+                    class="bard-fieldtype"
                     :class="{ 'bard-fullscreen': fullScreenMode }"
                     ref="container"
                     @dragstart.stop="ignorePageHeader(true)"
@@ -34,7 +34,7 @@
                         </div>
                     </publish-field-fullscreen-header>
 
-                    <div class="bard-fixed-toolbar" v-if="!readOnly && showFixedToolbar && !fullScreenMode">
+                    <div class="bard-fixed-toolbar flex items-center justify-between rounded-t-xl border-b border-gray-300 bg-gray-50 px-2 py-1 dark:border-white/15 dark:bg-gray-950" v-if="!readOnly && showFixedToolbar && !fullScreenMode">
                         <div class="no-select flex flex-1 flex-wrap items-center" v-if="toolbarIsFixed">
                             <component
                                 v-for="button in visibleButtons(buttons)"
@@ -343,7 +343,7 @@ export default {
             return [
                 {
                     title: __('Expand All Sets'),
-                    icon: 'arrows-horizontal-expand',
+                    icon: 'expand-vertical-4',
                     quick: true,
                     visibleWhenReadOnly: true,
                     run: this.expandAll,
@@ -351,7 +351,7 @@ export default {
                 },
                 {
                     title: __('Collapse All Sets'),
-                    icon: 'arrows-horizontal-collapse',
+                    icon: 'shrink-vertical',
                     quick: true,
                     visibleWhenReadOnly: true,
                     run: this.collapseAll,
@@ -359,7 +359,7 @@ export default {
                 },
                 {
                     title: __('Toggle Fullscreen Mode'),
-                    icon: ({ vm }) => (vm.fullScreenMode ? 'shrink-all' : 'expand-bold'),
+                    icon: ({ vm }) => (vm.fullScreenMode ? 'shrink-all' : 'expand'),
                     quick: true,
                     run: this.toggleFullscreen,
                     visibleWhenReadOnly: true,

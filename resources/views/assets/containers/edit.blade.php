@@ -6,19 +6,8 @@
 @section('title', __('Configure Asset Container'))
 
 @section('content')
-    <header class="mb-6">
-        @include(
-            'statamic::partials.breadcrumb',
-            [
-                'url' => cp_route('assets.browse.show', $container->handle()),
-                'title' => $container->title(),
-            ]
-        )
-        <h1>@yield('title')</h1>
-    </header>
-
     <asset-container-edit-form
-        initial-title="{{ $container->title() }}"
+        initial-title="{{ __('Configure Asset Container') }}"
         :blueprint="{{ json_encode($blueprint) }}"
         :initial-values="{{ json_encode($values) }}"
         :meta="{{ json_encode($meta) }}"

@@ -6,6 +6,7 @@ defineEmits(['update:modelValue']);
 
 const props = defineProps({
     elastic: { type: Boolean, default: false },
+    disabled: { type: Boolean, default: false },
     required: { type: Boolean, default: false },
     resize: { type: String, default: 'vertical' },
     rows: { type: [Number, String], default: 4 },
@@ -41,6 +42,7 @@ const classes = cva({
             :rows="rows"
             v-bind="$attrs"
             :value="modelValue"
+            :disabled="disabled"
             data-ui-control
             @input="$emit('update:modelValue', $event.target.value)"
         />

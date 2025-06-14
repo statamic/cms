@@ -123,7 +123,6 @@ class Code extends Fieldtype
                         'instructions' => __('statamic::fieldtypes.any.config.antlers'),
                         'type' => 'toggle',
                     ],
-
                 ],
             ],
         ];

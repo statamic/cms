@@ -16,7 +16,6 @@
         :initial-is-root="true"
         :initial-origin-values="{}"
         :revisions-enabled="revisions"
-        :breadcrumbs="breadcrumbs"
         :initial-site="site"
         :parent="parent"
         :can-manage-publish-state="canManagePublishState"
@@ -41,7 +40,6 @@ export default {
         'meta',
         'localizations',
         'revisions',
-        'breadcrumbs',
         'site',
         'parent',
         'canManagePublishState',

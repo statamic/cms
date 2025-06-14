@@ -1,14 +1,13 @@
+@use(Statamic\CP\Breadcrumbs\Breadcrumbs)
 @inject('str', 'Statamic\Support\Str')
 @extends('statamic::layout')
-@section('title', $breadcrumbs->title($taxonomyCreateLabel))
-@section('wrapper_class', 'max-w-7xl')
+@section('title', Breadcrumbs::title($taxonomyCreateLabel))
 
 @section('content')
     <base-term-create-form
         :actions="{{ json_encode($actions) }}"
         taxonomy-handle="{{ $taxonomy }}"
         taxonomy-create-label="{{ $taxonomyCreateLabel }}"
-        :breadcrumbs="{{ $breadcrumbs->toJson() }}"
         :fieldset="{{ json_encode($blueprint) }}"
         :values="{{ json_encode($values) }}"
         :meta="{{ json_encode($meta) }}"

@@ -28,6 +28,7 @@ export default {
             meta: {},
             pushQuery: false,
             popping: false,
+            selections: [],
         };
     },
 

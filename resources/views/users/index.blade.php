@@ -4,7 +4,6 @@
 
 @extends('statamic::layout')
 @section('title', __('Users'))
-@section('wrapper_class', 'max-w-full')
 
 @section('content')
     <ui-header title="{{ __('Users') }}" icon="users">

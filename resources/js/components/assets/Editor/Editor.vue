@@ -19,12 +19,12 @@
                     >
                         <svg-icon name="folder-image" class="h-5 w-5 text-gray-700 dark:text-dark-175" />
                         <span
-                            class="text-sm text-gray-800 group-hover:text-blue dark:text-dark-150 dark:group-hover:text-dark-100 ltr:ml-2 rtl:mr-2"
+                            class="text-sm text-gray-800 group-hover:text-blue-600 dark:text-dark-150 dark:group-hover:text-dark-100 ltr:ml-2 rtl:mr-2"
                             >{{ asset.path }}</span
                         >
                         <svg-icon
                             name="micro/chevron-right"
-                            class="h-5 w-5 text-gray-700 group-hover:text-blue dark:text-dark-175 dark:group-hover:text-dark-100 rtl:rotate-180"
+                            class="h-5 w-5 text-gray-700 group-hover:text-blue-600 dark:text-dark-175 dark:group-hover:text-dark-100 rtl:rotate-180"
                         />
                     </button>
                     <button
@@ -128,15 +128,28 @@
                                 }}</span>
                             </button>
 
-                            <dropdown-list class="mr-4" v-if="actionsMenu.length">
-                                <data-list-inline-actions
-                                    :item="id"
-                                    :url="actionUrl"
-                                    :actions="actionsMenu"
-                                    @started="actionStarted"
-                                    @completed="actionCompleted"
-                                />
-                            </dropdown-list>
+                            <ItemActions
+                                v-if="actionsMenu.length"
+                                :item="id"
+                                :url="actionUrl"
+                                :actions="actionsMenu"
+                                @started="actionStarted"
+                                @completed="actionCompleted"
+                                v-slot="{ actions }"
+                            >
+                                <Dropdown class="me-4">
+                                    <DropdownMenu>
+                                        <DropdownItem
+                                            v-for="action in actions"
+                                            :key="action.handle"
+                                            :text="__(action.title)"
+                                            :icon="action.icon"
+                                            :variant="action.dangerous ? 'destructive' : 'default'"
+                                            @click="action.run"
+                                        />
+                                    </DropdownMenu>
+                                </Dropdown>
+                            </ItemActions>
                         </div>
 
                         <!-- Image Preview -->
@@ -196,33 +209,26 @@
                     </div>
 
                     <!-- Fields Area -->
-                    <publish-container
+                    <PublishContainer
                         v-if="fields"
                         ref="container"
                         :name="publishContainer"
+                        :reference="id"
                         :blueprint="fieldset"
                         :values="values"
                         :extra-values="extraValues"
                         :meta="meta"
                         :errors="errors"
                         @updated="values = { ...$event, focus: values.focus }"
-                        v-slot="{ setFieldValue, setFieldMeta }"
                     >
                         <div class="h-1/2 w-full overflow-scroll sm:p-4 md:h-full md:w-1/3 md:grow md:pt-px">
                             <div v-if="saving" class="loading">
                                 <loading-graphic text="Saving" />
                             </div>
 
-                            <div v-if="error" class="mb-4 bg-red-500 p-4 text-white shadow" v-text="error" />
-
-                            <publish-sections
-                                :sections="fieldset.tabs[0].sections"
-                                :read-only="readOnly"
-                                @updated="setFieldValue"
-                                @meta-updated="setFieldMeta"
-                            />
+                            <PublishTabs />
                         </div>
-                    </publish-container>
+                    </PublishContainer>
                 </div>
 
                 <div
@@ -297,9 +303,10 @@
 import EditorActions from './EditorActions.vue';
 import FocalPointEditor from './FocalPointEditor.vue';
 import PdfViewer from './PdfViewer.vue';
-import PublishFields from '../../publish/Fields.vue';
 import HasHiddenFields from '../../publish/HasHiddenFields';
 import { pick, flatten } from 'lodash-es';
+import { Dropdown, DropdownMenu, DropdownItem, PublishContainer, PublishTabs } from '@statamic/ui';
+import ItemActions from '@statamic/components/actions/ItemActions.vue';
 
 export default {
     emits: ['previous', 'next', 'saved', 'closed', 'action-completed'],
@@ -307,10 +314,15 @@ export default {
     mixins: [HasHiddenFields],
 
     components: {
+        Dropdown,
+        DropdownMenu,
+        DropdownItem,
+        ItemActions,
         EditorActions,
         FocalPointEditor,
         PdfViewer,
-        PublishFields,
+        PublishContainer,
+        PublishTabs,
     },
 
     props: {
@@ -484,7 +496,7 @@ export default {
             if (this.$dirty.has(this.publishContainer)) {
                 this.save();
             }
-            
+
             this.$emit('next');
         },
 

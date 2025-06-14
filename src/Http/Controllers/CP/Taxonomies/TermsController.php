@@ -4,7 +4,6 @@ namespace Statamic\Http\Controllers\CP\Taxonomies;
 
 use Illuminate\Http\Request;
 use Statamic\Contracts\Taxonomies\Term as TermContract;
-use Statamic\CP\Breadcrumbs;
 use Statamic\Facades\Action;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Site;
@@ -141,7 +140,6 @@ class TermsController extends CpController
             'hasWorkingCopy' => $term->hasWorkingCopy(),
             'preloadedAssets' => $this->extractAssetsFromValues($values),
             'revisionsEnabled' => $term->revisionsEnabled(),
-            'breadcrumbs' => $this->breadcrumbs($taxonomy),
             'previewTargets' => $taxonomy->previewTargets()->all(),
             'itemActions' => Action::for($term, ['taxonomy' => $taxonomy->handle(), 'view' => 'form']),
             'hasTemplate' => view()->exists($term->template()),
@@ -263,7 +261,6 @@ class TermsController extends CpController
                     'livePreviewUrl' => cp_route('taxonomies.terms.preview.create', [$taxonomy->handle(), $handle]),
                 ];
             })->values()->all(),
-            'breadcrumbs' => $this->breadcrumbs($taxonomy),
             'previewTargets' => $taxonomy->previewTargets()->all(),
         ];
 
@@ -344,20 +341,6 @@ class TermsController extends CpController
             })
             ->filter()
             ->values();
-    }
-
-    protected function breadcrumbs($taxonomy)
-    {
-        return new Breadcrumbs([
-            [
-                'text' => __('Taxonomies'),
-                'url' => cp_route('taxonomies.index'),
-            ],
-            [
-                'text' => $taxonomy->title(),
-                'url' => $taxonomy->breadcrumbUrl(),
-            ],
-        ]);
     }
 
     protected function getAuthorizedSitesForTaxonomy($taxonomy)

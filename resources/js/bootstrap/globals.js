@@ -1,7 +1,7 @@
-import { marked } from 'marked';
 import { translate, translateChoice } from '../translations/translator';
 import uid from 'uniqid';
 import PreviewHtml from '../components/fieldtypes/replicator/PreviewHtml';
+import renderMarkdown from '@statamic/util/markdown.js';
 
 export function cp_url(url) {
     url = Statamic.$config.get('cpUrl') + '/' + url;
@@ -80,8 +80,8 @@ export function field_width_class(width) {
     return `${widths[width] || 'field-w-100'}`;
 }
 
-export function markdown(value) {
-    return marked(value);
+export function markdown(value, options = {}) {
+    return renderMarkdown(value, options);
 }
 
 export function __(string, replacements) {

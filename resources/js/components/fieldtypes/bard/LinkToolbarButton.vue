@@ -1,15 +1,18 @@
 <template>
     <popover ref="popover" placement="bottom-end" @closed="popoverClosed" :clickaway="false">
         <template #trigger>
-            <button
-                class="bard-toolbar-button"
+            <Button
+                class="px-2! [&_svg]:size-3.5"
                 :class="{ active }"
-                v-tooltip="button.text"
+                variant="ghost"
+                size="sm"
                 :aria-label="button.text"
+                v-tooltip="button.text"
                 @click="toggleLinkToolbar"
             >
-                <svg-icon :name="button.svg" v-if="button.svg"></svg-icon>
-            </button>
+                <svg-icon :name="button.svg" v-if="button.svg" class="size-4" />
+                <div class="flex items-center" v-html="button.html" v-if="button.html" />
+            </Button>
         </template>
         <template #default>
             <link-toolbar

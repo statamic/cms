@@ -12,15 +12,9 @@
         v-slot="{ setFieldValue }"
     >
         <div>
-            <div class="mb-6 flex items-center">
-                <h1 class="flex-1">
-                    <small class="subhead block">
-                        <a :href="listingUrl" v-text="__('Assets')" />
-                    </small>
-                    {{ title }}
-                </h1>
-                <button type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
-            </div>
+            <Header :title="title" icon="cog">
+                <Button type="submit" variant="primary" @click="submit">{{ __('Save') }}</Button>
+            </Header>
 
             <configure-tabs @updated="setFieldValue" :enable-sidebar="false" />
         </div>
@@ -28,7 +22,14 @@
 </template>
 
 <script>
+import { Header, Button } from '@statamic/ui';
+
 export default {
+    components: {
+        Header,
+        Button,
+    },
+
     props: {
         blueprint: Object,
         initialValues: Object,

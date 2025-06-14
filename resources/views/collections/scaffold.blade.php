@@ -7,13 +7,6 @@
 
 @section('content')
 <header class="mb-6">
-    @include(
-        'statamic::partials.breadcrumb',
-        [
-            'url' => cp_route('collections.show', $collection->handle()),
-            'title' => $collection->title(),
-        ]
-    )
     <h1>{{ __('Scaffold Views') }}</h1>
 </header>
 

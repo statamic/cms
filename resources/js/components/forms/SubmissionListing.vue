@@ -95,16 +95,34 @@
                                 </a>
                             </template>
                             <template #actions="{ row: submission, index }">
-                                <dropdown-list>
-                                    <dropdown-item :text="__('View')" :redirect="submission.url" />
-                                    <data-list-inline-actions
-                                        :item="submission.id"
-                                        :url="actionUrl"
-                                        :actions="submission.actions"
-                                        @started="actionStarted"
-                                        @completed="actionCompleted"
-                                    />
-                                </dropdown-list>
+                                <ItemActions
+                                    :url="actionUrl"
+                                    :actions="submission.actions"
+                                    :item="submission.id"
+                                    @started="actionStarted"
+                                    @completed="actionCompleted"
+                                    v-slot="{ actions }"
+                                >
+                                    <Dropdown placement="left-start" class="me-3">
+                                        <DropdownMenu>
+                                            <DropdownLabel :text="__('Actions')" />
+                                            <DropdownItem
+                                                :text="__('View')"
+                                                :href="submission.url"
+                                                icon="eye"
+                                            />
+                                            <DropdownSeparator v-if="actions.length" />
+                                            <DropdownItem
+                                                v-for="action in actions"
+                                                :key="action.handle"
+                                                :text="__(action.title)"
+                                                :icon="action.icon"
+                                                :variant="action.dangerous ? 'destructive' : 'default'"
+                                                @click="action.run"
+                                            />
+                                        </DropdownMenu>
+                                    </Dropdown>
+                                </ItemActions>
                             </template>
                         </data-list-table>
                     </div>
@@ -125,9 +143,13 @@
 
 <script>
 import Listing from '../Listing.vue';
+import { Dropdown, DropdownMenu, DropdownLabel, DropdownItem, DropdownSeparator } from '@statamic/ui';
+import ItemActions from '@statamic/components/actions/ItemActions.vue';
 
 export default {
     mixins: [Listing],
+
+    components: { Dropdown, DropdownMenu, DropdownLabel, DropdownItem, DropdownSeparator, ItemActions },
 
     props: {
         form: String,

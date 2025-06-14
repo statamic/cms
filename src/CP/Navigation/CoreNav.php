@@ -67,6 +67,12 @@ class CoreNav
             ->route('collections.index')
             ->icon('collections')
             ->can('index', Collection::class)
+            ->extra([
+                'breadcrumbs' => [
+                    'create_label' => 'Create Collection',
+                    'create_url' => User::current()->can('create', Collection::class) ? cp_route('collections.create') : null,
+                ],
+            ])
             ->children(function () {
                 return CollectionAPI::all()->sortBy->title()
                     ->filter(function ($collection) {
@@ -80,7 +86,13 @@ class CoreNav
                                     ? $collection->showUrl()
                                     : $collection->editUrl()
                             )
-                            ->can('view', $collection);
+                            ->can('view', $collection)
+                            ->icon($collection->icon())
+                            ->extra([
+                                'breadcrumbs' => [
+                                    'configure_url' => User::current()->can('edit', $collection) ? $collection->editUrl() : null,
+                                ],
+                            ]);
                     });
             });
 
@@ -88,6 +100,12 @@ class CoreNav
             ->route('navigation.index')
             ->icon('navigation')
             ->can('index', NavContract::class)
+            ->extra([
+                'breadcrumbs' => [
+                    'create_label' => 'Create Navigation',
+                    'create_url' => User::current()->can('create', NavContract::class) ? cp_route('navigation.create') : null,
+                ],
+            ])
             ->children(function () {
                 return NavAPI::all()->sortBy->title()
                     ->filter(function ($nav) {
@@ -101,7 +119,12 @@ class CoreNav
                                     ? $nav->showUrl()
                                     : $nav->editUrl()
                             )
-                            ->can('view', $nav);
+                            ->can('view', $nav)
+                            ->extra([
+                                'breadcrumbs' => [
+                                    'configure_url' => User::current()->can('edit', $nav) ? $nav->editUrl() : null,
+                                ],
+                            ]);
                     });
             });
 
@@ -109,11 +132,22 @@ class CoreNav
             ->route('taxonomies.index')
             ->icon('taxonomies')
             ->can('index', Taxonomy::class)
+            ->extra([
+                'breadcrumbs' => [
+                    'create_label' => 'Create Taxonomy',
+                    'create_url' => User::current()->can('create', Taxonomy::class) ? cp_route('taxonomies.create') : null,
+                ],
+            ])
             ->children(function () {
                 return TaxonomyAPI::all()->sortBy->title()->map(function ($taxonomy) {
                     return Nav::item($taxonomy->title())
                         ->url($taxonomy->showUrl())
-                        ->can('view', $taxonomy);
+                        ->can('view', $taxonomy)
+                        ->extra([
+                            'breadcrumbs' => [
+                                'configure_url' => User::current()->can('edit', $taxonomy) ? $taxonomy->editUrl() : null,
+                            ],
+                        ]);
                 });
             });
 
@@ -121,11 +155,22 @@ class CoreNav
             ->route('assets.index')
             ->icon('assets')
             ->can('index', AssetContainer::class)
+            ->extra([
+                'breadcrumbs' => [
+                    'create_label' => 'Create Asset Container',
+                    'create_url' => User::current()->can('create', AssetContainer::class) ? cp_route('asset-containers.create') : null,
+                ],
+            ])
             ->children(function () {
                 return AssetContainerAPI::all()->sortBy->title()->map(function ($assetContainer) {
                     return Nav::item($assetContainer->title())
                         ->url($assetContainer->showUrl())
-                        ->can('view', $assetContainer);
+                        ->can('view', $assetContainer)
+                        ->extra([
+                            'breadcrumbs' => [
+                                'configure_url' => User::current()->can('edit', $assetContainer) ? $assetContainer->editUrl() : null,
+                            ],
+                        ]);
                 });
             });
 
@@ -133,6 +178,12 @@ class CoreNav
             ->route('globals.index')
             ->icon('globals')
             ->can('index', GlobalSet::class)
+            ->extra([
+                'breadcrumbs' => [
+                    'create_label' => 'Create Global Set',
+                    'create_url' => User::current()->can('create', GlobalSet::class) ? cp_route('globals.create') : null,
+                ],
+            ])
             ->children(function () {
                 return GlobalSetAPI::all()->sortBy->title()
                     ->filter(function ($globalSet) {
@@ -144,7 +195,12 @@ class CoreNav
 
                         return Nav::item($globalSet->title())
                             ->url($localized ? $localized->editUrl() : $globalSet->editUrl())
-                            ->can('view', $globalSet);
+                            ->can('view', $globalSet)
+                            ->extra([
+                                'breadcrumbs' => [
+                                    'configure_url' => User::current()->can('edit', $globalSet) ? $globalSet->editUrl() : null,
+                                ],
+                            ]);
                     })->filter();
             });
 
@@ -182,11 +238,18 @@ class CoreNav
             ->route('forms.index')
             ->icon('forms')
             ->can('index', Form::class)
+            ->extra([
+                'breadcrumbs' => [
+                    'create_label' => 'Create Form',
+                    'create_url' => cp_route('forms.create'),
+                ],
+            ])
             ->children(function () {
                 return FormAPI::all()->sortBy->title()->map(function ($form) {
                     return Nav::item($form->title())
                         ->url($form->showUrl())
-                        ->can('view', $form);
+                        ->can('view', $form)
+                        ->extra(['breadcrumbs' => ['configure_url' => $form->editUrl()]]);
                 });
             });
 

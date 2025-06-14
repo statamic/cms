@@ -8,7 +8,7 @@
         @confirm="confirmed"
         @cancel="cancel"
     >
-        <template slot="body">
+        <template #body>
             <template v-if="Object.keys(resource.imported_by).length > 0">
                 <p class="mb-2">
                     {{
