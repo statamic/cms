@@ -28,15 +28,11 @@ trait ContainsComputedData
             return collect();
         }
 
-        return collect($this->getComputedCallbacks())->map(function ($callback, $field) use ($wrapInValue) {
-            if ($wrapInValue) {
-                return new Value(function () use ($field) {
-                    return $this->getComputed($field);
-                });
-            }
-
-            return $this->getComputed($field);
-        });
+        return collect($this->getComputedCallbacks())
+            ->map(fn ($callback, $field) => $wrapInValue ?
+                new Value(fn () => $this->getComputed($field)) :
+                $this->getComputed($field)
+            );
     }
 
     public function getComputed($key)
