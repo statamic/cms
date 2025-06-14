@@ -323,7 +323,7 @@ class Composer extends Process
      */
     private function composerBinary(): string
     {
-        $isWindows = DIRECTORY_SEPARATOR === '\\';
+        $isWindows = $this->isWindows();
 
         $output = $this->run($isWindows ? 'where composer' : 'which composer');
 
