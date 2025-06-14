@@ -1,5 +1,14 @@
 <template>
-    <div class="flex flex-col space-y-3 p-1.5 bg-gray-100 border border-gray-300 dark:bg-gray-900 dark:border-gray-700 rounded-xl">
+    <div
+        class="flex flex-col space-y-3 rounded-xl border border-gray-300 bg-gray-100 p-1.5 dark:border-gray-700 dark:bg-gray-900"
+    >
+        <Select
+            :options="providers"
+            option-label="name"
+            option-value="handle"
+            :placeholder="__('Provider...')"
+            v-model="provider"
+        />
         <ui-input-group>
             <ui-input-group-prepend :text="__('URL')" />
             <ui-input
@@ -24,42 +33,27 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
+import { Select } from '@statamic/ui';
 
 export default {
+    components: { Select },
+
     mixins: [Fieldtype],
 
+    data() {
+        return {
+            embedUrl: null,
+            provider: null,
+        };
+    },
+
     computed: {
-        shouldShowPreview() {
-            return !this.isInvalid && (this.isEmbeddable || this.isVideo);
+        providers() {
+            return this.meta.providers;
         },
 
-        embedUrl() {
-            let embed_url = this.value || '';
-
-            if (embed_url.includes('youtube')) {
-                embed_url = embed_url.includes('shorts/')
-                    ? embed_url.replace('shorts/', 'embed/')
-                    : embed_url.replace('watch?v=', 'embed/');
-            }
-
-            if (embed_url.includes('youtu.be')) {
-                embed_url = embed_url.replace('youtu.be', 'www.youtube.com/embed');
-            }
-
-            if (embed_url.includes('vimeo')) {
-                embed_url = embed_url.replace('/vimeo.com', '/player.vimeo.com/video');
-
-                if (!this.value.includes('progressive_redirect') && embed_url.split('/').length > 5) {
-                    let hash = embed_url.substr(embed_url.lastIndexOf('/') + 1);
-                    embed_url = embed_url.substr(0, embed_url.lastIndexOf('/')) + '?h=' + hash.replace('?', '&');
-                }
-            }
-
-            if (embed_url.includes('&') && !embed_url.includes('?')) {
-                embed_url = embed_url.replace('&', '?');
-            }
-
-            return embed_url;
+        shouldShowPreview() {
+            return !this.isInvalid && (this.isEmbeddable || this.isVideo);
         },
 
         isEmbeddable() {
@@ -81,8 +75,21 @@ export default {
 
         isVideo() {
             const url = this.value || '';
-            const isVideo = url.includes('.mp4') || url.includes('.ogv') || url.includes('.mov') || url.includes('.webm');
+            const isVideo =
+                url.includes('.mp4') || url.includes('.ogv') || url.includes('.mov') || url.includes('.webm');
             return !this.isEmbeddable && isVideo;
+        },
+    },
+
+    watch: {
+        value() {
+            this.$axios
+                .get(this.meta.url, { params: { url: this.value } })
+                .then((response) => response.data)
+                .then((data) => {
+                    this.provider = data.provider;
+                    this.embedUrl = data.embed_url;
+                });
         },
     },
 };
