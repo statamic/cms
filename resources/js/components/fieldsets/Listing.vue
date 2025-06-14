@@ -9,7 +9,7 @@
                     <span class="font-mono text-xs">{{ value }}</span>
                 </template>
                 <template #actions="{ row: fieldset, index }">
-                    <Dropdown>
+                    <Dropdown class="me-3">
                         <DropdownMenu>
                             <DropdownItem :text="__('Edit')" icon="edit" :href="fieldset.edit_url" />
                             <DropdownItem v-if="fieldset.is_resettable" :text="__('Reset')" variant="destructive" @click="$refs[`resetter_${fieldset.id}`].confirm()" />
