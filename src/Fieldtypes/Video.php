@@ -12,9 +12,12 @@ class Video extends Fieldtype
     {
         /** @todo Fetch these from some repository so folks can add their own */
         return [
-            ['name' => 'Cloudflare Stream', 'handle' => 'cloudflare_stream'],
-            ['name' => 'Vimeo', 'handle' => 'vimeo'],
-            ['name' => 'YouTube', 'handle' => 'youtube'],
+            'providers' => [
+                ['name' => 'Cloudflare Stream', 'handle' => 'cloudflare_stream'],
+                ['name' => 'Vimeo', 'handle' => 'vimeo'],
+                ['name' => 'YouTube', 'handle' => 'youtube'],
+            ],
+            'url' => cp_route('video.details'),
         ];
     }
 
