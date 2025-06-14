@@ -49,13 +49,18 @@ class FolderAsset extends JsonResource
 
     private function thumbnails()
     {
+        $data = ['thumbnail' => null];
+
         if ($this->isImage() || $this->isSvg()) {
-            return $this->getImageThumbnail();
+            $data = $this->getImageThumbnail();
         } elseif (config('statamic.assets.video_thumbnails', true) && $this->isVideo()) {
-            return $this->getVideoThumbnail();
+            $data = $this->getVideoThumbnail();
         }
 
-        return ['thumbnail' => null];
+        return array_merge(
+            $data,
+            $this->runAssetHook() ?? []
+        );
     }
 
     private function runAssetHook()
@@ -69,8 +74,6 @@ class FolderAsset extends JsonResource
 
     public function toArray($request)
     {
-        $hookData = $this->runAssetHook();
-
         return [
             'id' => $this->id(),
             'basename' => $this->basename(),
@@ -86,7 +89,6 @@ class FolderAsset extends JsonResource
                 'folder' => $this->folder(),
             ]),
 
-            $this->mergeWhen(! empty($hookData), $hookData),
             $this->merge($this->thumbnails()),
         ];
     }
