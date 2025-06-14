@@ -42,50 +42,18 @@ export default {
 
     data() {
         return {
+            embedUrl: null,
             provider: null,
         };
     },
 
     computed: {
         providers() {
-            return this.meta;
+            return this.meta.providers;
         },
 
         shouldShowPreview() {
             return !this.isInvalid && (this.isEmbeddable || this.isVideo);
-        },
-
-        embedUrl() {
-            let embed_url = this.value || '';
-
-            if (embed_url.includes('youtube')) {
-                embed_url = embed_url.includes('shorts/')
-                    ? embed_url.replace('shorts/', 'embed/')
-                    : embed_url.replace('watch?v=', 'embed/');
-                this.provider = 'youtube';
-            }
-
-            if (embed_url.includes('youtu.be')) {
-                embed_url = embed_url.replace('youtu.be', 'www.youtube.com/embed');
-                this.provider = 'youtube';
-            }
-
-            if (embed_url.includes('vimeo')) {
-                embed_url = embed_url.replace('/vimeo.com', '/player.vimeo.com/video');
-
-                if (!this.value.includes('progressive_redirect') && embed_url.split('/').length > 5) {
-                    let hash = embed_url.substr(embed_url.lastIndexOf('/') + 1);
-                    embed_url = embed_url.substr(0, embed_url.lastIndexOf('/')) + '?h=' + hash.replace('?', '&');
-                }
-
-                this.provider = 'vimeo';
-            }
-
-            if (embed_url.includes('&') && !embed_url.includes('?')) {
-                embed_url = embed_url.replace('&', '?');
-            }
-
-            return embed_url;
         },
 
         isEmbeddable() {
@@ -110,6 +78,18 @@ export default {
             const isVideo =
                 url.includes('.mp4') || url.includes('.ogv') || url.includes('.mov') || url.includes('.webm');
             return !this.isEmbeddable && isVideo;
+        },
+    },
+
+    watch: {
+        value() {
+            this.$axios
+                .get(this.meta.url, { params: { url: this.value } })
+                .then((response) => response.data)
+                .then((data) => {
+                    this.provider = data.provider;
+                    this.embedUrl = data.embed_url;
+                });
         },
     },
 };
