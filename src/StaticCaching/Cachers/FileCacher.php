@@ -154,6 +154,10 @@ class FileCacher extends AbstractCacher
     public function getFiles($site): LazyCollection
     {
         $cachePath = $this->getCachePath($site);
+        if (! File::exists($cachePath)) {
+            return LazyCollection::make();
+        }
+
         $directoryIterator = new \RecursiveDirectoryIterator($cachePath, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::UNIX_PATHS);
         $iterator = new \RecursiveIteratorIterator($directoryIterator);
 
