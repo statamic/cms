@@ -5,6 +5,7 @@ namespace Statamic\StaticCaching\Cachers;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\LazyCollection;
 use Statamic\Events\UrlInvalidated;
 use Statamic\Facades\File;
 use Statamic\Facades\Site;
@@ -136,7 +137,35 @@ class FileCacher extends AbstractCacher
                 $this->forgetUrl($key, $domain);
             });
 
+        $this->getFiles($site)
+            ->filter(fn ($file) => str_starts_with($file, $url.'_'))
+            ->each(function ($file, $path) {
+                $this->writer->delete($path);
+            });
+
         UrlInvalidated::dispatch($url, $domain);
+    }
+
+    /**
+     * Get lazy collection file listing.
+     * 
+     * @param Site $site
+     * @return LazyCollection
+     */
+    public function getFiles($site): LazyCollection
+    {
+        $cachePath = $this->getCachePath($site);
+        $directoryIterator = new \RecursiveDirectoryIterator($cachePath, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::UNIX_PATHS);
+        $iterator = new \RecursiveIteratorIterator($directoryIterator);
+        return LazyCollection::make(function () use ($iterator, $cachePath) {
+            foreach ($iterator as $file) {
+                if (!$file->isFile() || $file->getExtension() !== 'html') {
+                    continue;
+                }
+
+                yield $file->getPathName() => Str::replaceFirst($cachePath, '', $file->getPathName());
+            }
+        });
     }
 
     public function getCachePaths()
