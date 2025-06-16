@@ -167,7 +167,7 @@ class FileCacher extends AbstractCacher
                     continue;
                 }
 
-                yield $file->getPathName() => Str::replaceFirst($cachePath, '', $file->getPathName());
+                yield $file->getPathName() => Str::start(Str::replaceFirst($cachePath, '', $file->getPathName()), '/');
             }
         });
     }
