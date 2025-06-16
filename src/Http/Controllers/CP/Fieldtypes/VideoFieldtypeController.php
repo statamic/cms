@@ -10,15 +10,33 @@ class VideoFieldtypeController extends CpController
 {
     public function details(Request $request)
     {
-        $url = $request->query('url');
-
-        return [
-            'provider' => $provider = $this->getProvider($url),
-            'embed_url' => $this->getEmbedUrl($provider, $url),
-        ];
+        return $this->providerFromUrl($request->query('url'))->toArray();
     }
 
-    private function getEmbedUrl(VideoType $provider, string $url): string
+    private function providerFromUrl(string $url): Provider
+    {
+        $type = $this->type($url);
+        $embedUrl = $this->embedUrl($type, $url);
+        $prepend = $this->prepend($type);
+
+        return new Provider(
+            prepend: $prepend,
+            provider: $type,
+            embedUrl: $embedUrl
+        );
+    }
+
+    private function type(string $url): VideoType
+    {
+        return match (true) {
+            str($url)->contains(['youtube.com', 'youtu.be']) => VideoType::YouTube,
+            str($url)->contains('vimeo.com') => VideoType::Vimeo,
+            // is_int($url) => VideoType::CloudflareStream,
+            default => VideoType::CloudflareStream,
+        };
+    }
+
+    private function embedUrl(VideoType $provider, string $url): string
     {
         return match ($provider) {
             VideoType::CloudflareStream => $this->cloudflareStreamEmbedUrl($url),
@@ -28,14 +46,9 @@ class VideoFieldtypeController extends CpController
         };
     }
 
-    private function getProvider(string $url): VideoType
+    private function cloudflareStreamEmbedUrl(string $id): string
     {
-        return match (true) {
-            str($url)->contains(['youtube.com', 'youtu.be']) => VideoType::YouTube,
-            str($url)->contains('vimeo.com') => VideoType::Vimeo,
-            is_int($url) => VideoType::CloudflareStream,
-            default => VideoType::Custom,
-        };
+        return "https://iframe.cloudflarestream.com/{$id}";
     }
 
     private function youTubeEmbedUrl(string $url): string
@@ -54,8 +67,30 @@ class VideoFieldtypeController extends CpController
         return str($url)->replace('vimeo.com/', 'player.vimeo.com/video/');
     }
 
-    private function cloudflareStreamEmbedUrl(string $id): string
+    private function prepend(VideoType $provider): string
     {
-        return "https://iframe.cloudflarestream.com/{$id}";
+        return match ($provider) {
+            VideoType::CloudflareStream => __('ID'),
+            default => __('URL'),
+        };
+    }
+}
+
+class Provider
+{
+    public function __construct(
+        public string $prepend,
+        public VideoType $provider,
+        public string $embedUrl,
+    ) {
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'prepend' => $this->prepend,
+            'provider' => $this->provider,
+            'embed_url' => $this->embedUrl,
+        ];
     }
 }

@@ -5,7 +5,7 @@ namespace Statamic\Enums;
 enum VideoType: string
 {
     case CloudflareStream = 'cloudflare_stream';
-    case Custom = 'custom';
+    case Invalid = 'invalid';
     case Vimeo = 'vimeo';
     case YouTube = 'youtube';
 }

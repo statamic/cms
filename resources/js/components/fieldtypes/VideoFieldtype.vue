@@ -10,7 +10,7 @@
             v-model="provider"
         />
         <ui-input-group>
-            <ui-input-group-prepend :text="__('URL')" />
+            <ui-input-group-prepend :text="prepend" />
             <ui-input
                 :model-value="value"
                 :isReadOnly="isReadOnly"
@@ -22,7 +22,7 @@
         </ui-input-group>
         <ui-description v-if="isInvalid" class="text-red-500">{{ __('statamic::validation.url') }}</ui-description>
         <iframe
-            v-if="shouldShowPreview"
+            v-if="embedUrl"
             :src="embedUrl"
             frameborder="0"
             allow="fullscreen"
@@ -43,6 +43,7 @@ export default {
     data() {
         return {
             embedUrl: null,
+            prepend: __('URL'),
             provider: null,
         };
     },
@@ -52,32 +53,9 @@ export default {
             return this.meta.providers;
         },
 
-        shouldShowPreview() {
-            return !this.isInvalid && (this.isEmbeddable || this.isVideo);
-        },
-
-        isEmbeddable() {
-            const url = this.value || '';
-            const isYoutube = url.includes('youtube') || url.includes('youtu.be');
-            const isVimeo = url.includes('vimeo');
-            return isYoutube || isVimeo;
-        },
-
         isInvalid() {
             let htmlRegex = new RegExp(/<([A-Z][A-Z0-9]*)\b[^>]*>.*?<\/\1>|<([A-Z][A-Z0-9]*)\b[^\/]*\/>/i);
             return htmlRegex.test(this.value || '');
-        },
-
-        isUrl() {
-            const url = this.value || '';
-            return url.startsWith('http://') || url.startsWith('https://');
-        },
-
-        isVideo() {
-            const url = this.value || '';
-            const isVideo =
-                url.includes('.mp4') || url.includes('.ogv') || url.includes('.mov') || url.includes('.webm');
-            return !this.isEmbeddable && isVideo;
         },
     },
 
@@ -87,8 +65,9 @@ export default {
                 .get(this.meta.url, { params: { url: this.value } })
                 .then((response) => response.data)
                 .then((data) => {
-                    this.provider = data.provider;
                     this.embedUrl = data.embed_url;
+                    this.prepend = data.prepend;
+                    this.provider = data.provider;
                 });
         },
     },
