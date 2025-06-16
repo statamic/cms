@@ -158,7 +158,7 @@ class FileCacher extends AbstractCacher
             return LazyCollection::make();
         }
 
-        $directoryIterator = new \RecursiveDirectoryIterator($cachePath, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::UNIX_PATHS);
+        $directoryIterator = new \RecursiveDirectoryIterator($cachePath, \FilesystemIterator::SKIP_DOTS);
         $iterator = new \RecursiveIteratorIterator($directoryIterator);
 
         return LazyCollection::make(function () use ($iterator, $cachePath) {
