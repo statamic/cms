@@ -436,8 +436,8 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         if ($isNew && ! $this->hasOrigin() && $this->collection()->propagate()) {
             $this->collection()->sites()
                 ->reject($this->site()->handle())
-                ->each(function ($siteHandle) {
-                    $this->makeLocalization($siteHandle)->save();
+                ->each(function ($siteHandle) use ($withEvents) {
+                    $this->makeLocalization($siteHandle)->{$withEvents ? 'save' : 'saveQuietly'}();
                 });
         }
 

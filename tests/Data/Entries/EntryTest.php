@@ -1445,7 +1445,7 @@ class EntryTest extends TestCase
     }
 
     #[Test]
-    public function it_propagates_entry_if_configured()
+    public function it_doesnt_fire_events_when_propagating_entry_and_saved_quietly()
     {
         Event::fake();
 
@@ -1467,42 +1467,42 @@ class EntryTest extends TestCase
             ->locale('en')
             ->collection($collection);
 
-        $return = $entry->save();
+        $return = $entry->saveQuietly();
 
         $this->assertIsObject($fr = $entry->descendants()->get('fr'));
         $this->assertIsObject($de = $entry->descendants()->get('de'));
         $this->assertNull($entry->descendants()->get('es')); // collection not configured for this site
 
-        Event::assertDispatchedTimes(EntrySaving::class, 3);
-        Event::assertDispatched(EntrySaving::class, function ($event) use ($entry) {
+        Event::assertDispatchedTimes(EntrySaving::class, 0);
+        Event::assertNotDispatched(EntrySaving::class, function ($event) use ($entry) {
             return $event->entry === $entry;
         });
-        Event::assertDispatched(EntrySaving::class, function ($event) use ($fr) {
+        Event::assertNotDispatched(EntrySaving::class, function ($event) use ($fr) {
             return $event->entry === $fr;
         });
-        Event::assertDispatched(EntrySaving::class, function ($event) use ($de) {
+        Event::assertNotDispatched(EntrySaving::class, function ($event) use ($de) {
             return $event->entry === $de;
         });
 
-        Event::assertDispatchedTimes(EntryCreated::class, 3);
-        Event::assertDispatched(EntryCreated::class, function ($event) use ($entry) {
+        Event::assertDispatchedTimes(EntryCreated::class, 0);
+        Event::assertNotDispatched(EntryCreated::class, function ($event) use ($entry) {
             return $event->entry === $entry;
         });
-        Event::assertDispatched(EntryCreated::class, function ($event) use ($fr) {
+        Event::assertNotDispatched(EntryCreated::class, function ($event) use ($fr) {
             return $event->entry === $fr;
         });
-        Event::assertDispatched(EntryCreated::class, function ($event) use ($de) {
+        Event::assertNotDispatched(EntryCreated::class, function ($event) use ($de) {
             return $event->entry === $de;
         });
 
-        Event::assertDispatchedTimes(EntrySaved::class, 3);
-        Event::assertDispatched(EntrySaved::class, function ($event) use ($entry) {
+        Event::assertDispatchedTimes(EntrySaved::class, 0);
+        Event::assertNotDispatched(EntrySaved::class, function ($event) use ($entry) {
             return $event->entry === $entry;
         });
-        Event::assertDispatched(EntrySaved::class, function ($event) use ($fr) {
+        Event::assertNotDispatched(EntrySaved::class, function ($event) use ($fr) {
             return $event->entry === $fr;
         });
-        Event::assertDispatched(EntrySaved::class, function ($event) use ($de) {
+        Event::assertNotDispatched(EntrySaved::class, function ($event) use ($de) {
             return $event->entry === $de;
         });
     }
