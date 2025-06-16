@@ -31,7 +31,6 @@ class VideoFieldtypeController extends CpController
         return match (true) {
             str($url)->contains(['youtube.com', 'youtu.be']) => VideoType::YouTube,
             str($url)->contains('vimeo.com') => VideoType::Vimeo,
-            // is_int($url) => VideoType::CloudflareStream,
             default => VideoType::CloudflareStream,
         };
     }
