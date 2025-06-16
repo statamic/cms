@@ -2,14 +2,16 @@
     <div
         class="flex flex-col space-y-3 rounded-xl border border-gray-300 bg-gray-100 p-1.5 dark:border-gray-700 dark:bg-gray-900"
     >
-        <Select
-            :options="providers"
-            option-label="name"
-            option-value="handle"
-            :placeholder="__('Provider...')"
-            v-model="provider"
-        />
         <ui-input-group>
+            <div class="w-1/4">
+                <Select
+                    :options="providers"
+                    option-label="name"
+                    option-value="handle"
+                    :placeholder="__('Provider...')"
+                    v-model="provider"
+                />
+            </div>
             <ui-input-group-prepend :text="prepend" />
             <ui-input
                 :model-value="value"
