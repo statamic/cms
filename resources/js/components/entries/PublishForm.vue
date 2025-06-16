@@ -14,6 +14,7 @@
                 :is-dirty="isDirty"
                 @started="actionStarted"
                 @completed="actionCompleted"
+                v-slot="{ actions: itemActions }"
             >
                 <Dropdown v-if="canEditBlueprint || hasItemActions">
                     <template #trigger>
