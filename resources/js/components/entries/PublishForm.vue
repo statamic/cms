@@ -165,7 +165,7 @@
                             <LocalizationsCard
                                 v-if="showLocalizationSelector"
                                 :localizations
-                                :localizing
+                                :localizing="localizing !== null"
                                 @selected="localizationSelected"
                             />
                         </div>
@@ -626,7 +626,7 @@ export default {
 
             this.$dirty.remove(this.publishContainer);
 
-            this.localizing = localization.handle;
+            this.localizing = localization;
 
             if (localization.exists) {
                 this.editLocalization(localization);
