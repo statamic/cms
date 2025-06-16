@@ -149,17 +149,17 @@ class FileCacher extends AbstractCacher
     /**
      * Get lazy collection file listing.
      * 
-     * @param Site $site
-     * @return LazyCollection
+     * @param  Site  $site
      */
     public function getFiles($site): LazyCollection
     {
         $cachePath = $this->getCachePath($site);
         $directoryIterator = new \RecursiveDirectoryIterator($cachePath, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::UNIX_PATHS);
         $iterator = new \RecursiveIteratorIterator($directoryIterator);
+        
         return LazyCollection::make(function () use ($iterator, $cachePath) {
             foreach ($iterator as $file) {
-                if (!$file->isFile() || $file->getExtension() !== 'html') {
+                if (! $file->isFile() || $file->getExtension() !== 'html') {
                     continue;
                 }
 
