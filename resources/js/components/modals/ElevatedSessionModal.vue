@@ -8,7 +8,7 @@
                     <div class="flex items-center">
                         <Input
                             type="password"
-                            v-model:model-value="password"
+                            v-model="password"
                             ref="password"
                             tabindex="1"
                             autofocus
@@ -33,7 +33,7 @@
                     <div class="flex items-center">
                         <Input
                             type="text"
-                            v-model:model-value="verificationCode"
+                            v-model="verificationCode"
                             ref="verificationCode"
                             tabindex="1"
                             autofocus

@@ -83,7 +83,7 @@ function complete() {
                                 inputmode="numeric"
                                 autofocus
                                 autocomplete="off"
-                                v-model:model-value="code"
+                                v-model="code"
                             />
                             <div v-if="error" class="mt-2 text-xs text-red-500" v-html="error"></div>
                         </div>
