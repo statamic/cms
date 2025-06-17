@@ -631,7 +631,9 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
             return collect($section['fields'] ?? [])->map(function ($field, $fieldIndex) use ($sectionIndex) {
                 return $field + ['fieldIndex' => $fieldIndex, 'sectionIndex' => $sectionIndex];
             });
-        })->keyBy('handle');
+        })->keyBy(function ($field) {
+            return $field['import'] ?? $field['handle'];
+        });
     }
 
     protected function ensureFieldInTabHasConfig($handle, $tab, $config)
