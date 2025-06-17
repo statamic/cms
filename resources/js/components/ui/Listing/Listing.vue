@@ -22,6 +22,15 @@ const props = defineProps({
         type: Boolean,
         default: true,
     },
+    actionsUrl: {
+        type: String,
+    },
+    actionSucceeded: {
+        type: Function,
+    },
+    actionFailed: {
+        type: Function,
+    },
     reorderable: {
         type: Boolean,
         default: false,
@@ -159,6 +168,10 @@ function request() {
         });
 }
 
+function refresh() {
+    request();
+}
+
 function pushState() {
     if (!props.pushQuery || popping) return;
 
@@ -255,6 +268,7 @@ function setSearchQuery(query) {
 
 provideListingContext({
     loading,
+    refresh,
     items,
     meta,
     columns,
@@ -265,7 +279,10 @@ provideListingContext({
     setSortColumn,
     selections,
     maxSelections: toRef(() => props.maxSelections),
+    actionsUrl: toRef(() => props.actionsUrl),
     allowBulkActions: toRef(() => props.allowBulkActions),
+    onActionSuccess: props.actionSucceeded,
+    onActionFailure: props.actionFailed,
     perPage,
     setPerPage,
     setCurrentPage,

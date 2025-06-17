@@ -1,11 +1,12 @@
 <script setup>
-import { Button, Panel, PanelFooter } from '@statamic/ui';
+import { Panel, PanelFooter } from '@statamic/ui';
 import { ref, computed, useTemplateRef } from 'vue';
 import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
 import TableField from '@statamic/components/data-list/TableField.vue';
 import ToggleAll from './ToggleAll.vue';
 import Pagination from './Pagination.vue';
 import HeaderCell from './HeaderCell.vue';
+import RowActions from './RowActions.vue';
 
 const props = defineProps({
     unstyled: {
@@ -167,7 +168,11 @@ function selectRange(from, to) {
                     <!--                        />-->
                     <!--                    </td>-->
                     <td class="actions-column">
-                        <slot name="actions" :row="row" :index="actualIndex(row)" :display-index="index"></slot>
+                        <RowActions :row="row">
+                            <template v-if="$slots['prepended-row-actions']" #prepended-actions="{ row }">
+                                <slot name="prepended-row-actions" :row="row" />
+                            </template>
+                        </RowActions>
                     </td>
                 </tr>
             </tbody>
