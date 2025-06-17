@@ -9,7 +9,7 @@
                     <span class="font-mono text-xs">{{ handle }}</span>
                 </template>
                 <template #actions="{ row: group, index }">
-                    <Dropdown placement="left-start">
+                    <Dropdown placement="left-start" class="me-3">
                         <DropdownMenu>
                             <DropdownItem :text="__('Edit')" icon="edit" :href="group.edit_url" />
                             <DropdownItem :text="__('Delete')" icon="trash" variant="destructive" @click="$refs[`deleter_${group.id}`].confirm()" />

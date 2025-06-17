@@ -26,6 +26,8 @@ import { default as DropdownItem } from './Dropdown/Item.vue';
 import { default as DropdownLabel } from './Dropdown/Label.vue';
 import { default as DropdownMenu } from './Dropdown/Menu.vue';
 import { default as DropdownSeparator } from './Dropdown/Separator.vue';
+import { default as EmptyStateMenu } from './EmptyState/Menu.vue';
+import { default as EmptyStateItem } from './EmptyState/Item.vue';
 import { default as Editable } from './Editable.vue';
 import { default as Field } from './Field.vue';
 import { default as Header } from './Header.vue';
@@ -52,6 +54,12 @@ import { default as Select } from './Select/Select.vue';
 import { default as StatusIndicator } from './StatusIndicator.vue';
 import { default as Subheading } from './Subheading.vue';
 import { default as Switch } from './Switch.vue';
+import { default as TableCell } from './Table/Cell.vue';
+import { default as TableColumn } from './Table/Column.vue';
+import { default as TableColumns } from './Table/Columns.vue';
+import { default as TableRow } from './Table/Row.vue';
+import { default as TableRows } from './Table/Rows.vue';
+import { default as Table } from './Table/Table.vue';
 import { default as TabContent } from './Tabs/Content.vue';
 import { default as TabList } from './Tabs/List.vue';
 import { default as TabTrigger } from './Tabs/Trigger.vue';
@@ -93,6 +101,8 @@ export {
     DropdownLabel,
     DropdownMenu,
     DropdownSeparator,
+    EmptyStateMenu,
+    EmptyStateItem,
     Editable,
     Field,
     Header,
@@ -119,6 +129,12 @@ export {
     StatusIndicator,
     Subheading,
     Switch,
+    TableCell,
+    TableColumn,
+    TableColumns,
+    TableRow,
+    TableRows,
+    Table,
     TabContent,
     TabList,
     TabTrigger,

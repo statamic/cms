@@ -37,7 +37,7 @@
                                     <DropdownItem v-if="collection.url" :text="__('Visit URL')" icon="external-link" target="_blank" :href="collection.url" />
                                     <DropdownItem v-if="collection.editable" :text="__('Edit Collection')" icon="edit" :href="collection.edit_url" />
                                     <DropdownItem v-if="collection.blueprint_editable" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="collection.blueprints_url" />
-                                    <DropdownItem v-if="collection.editable" :text="__('Scaffold Views')" icon="scaffold-large" :href="collection.scaffold_url" />
+                                    <DropdownItem v-if="collection.editable" :text="__('Scaffold Views')" icon="scaffold" :href="collection.scaffold_url" />
                                     <DropdownSeparator v-if="actions.length" />
                                     <DropdownItem
                                         v-for="action in actions"
@@ -145,7 +145,7 @@
                                 <DropdownItem v-if="collection.url" :text="__('Visit URL')" icon="external-link" target="_blank" :href="collection.url" />
                                 <DropdownItem v-if="collection.editable" :text="__('Edit Collection')" icon="edit" :href="collection.edit_url" />
                                 <DropdownItem v-if="collection.blueprint_editable" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="collection.blueprints_url" />
-                                <DropdownItem v-if="collection.editable" :text="__('Scaffold Views')" icon="scaffold-large" :href="collection.scaffold_url" />
+                                <DropdownItem v-if="collection.editable" :text="__('Scaffold Views')" icon="scaffold" :href="collection.scaffold_url" />
                                 <DropdownSeparator v-if="actions.length" />
                                 <DropdownItem
                                     v-for="action in actions"

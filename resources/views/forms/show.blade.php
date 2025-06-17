@@ -6,60 +6,54 @@
 @section('title', Statamic::crumb($form->title(), 'Forms'))
 
 @section('content')
-    <header class="mb-6">
-        <div class="flex items-center">
-            <h1 v-pre class="flex-1">
-                {{ __($form->title()) }}
-            </h1>
+    <ui-header title="{{ __($form->title()) }}" icon="forms">
+        @if (\Statamic\Facades\User::current()->can('edit', $form) || \Statamic\Facades\User::current()->can('delete', $form))
+            <ui-dropdown placement="left-start" class="me-2">
+                <ui-dropdown-menu>
+                    @can('edit', $form)
+                        <ui-dropdown-item :text="__('Edit Form')" icon="edit" href="{{ $form->editUrl() }}"></ui-dropdown-item>
+                    @endcan
 
-            @if (\Statamic\Facades\User::current()->can('edit', $form) || \Statamic\Facades\User::current()->can('delete', $form))
-                <ui-dropdown placement="left-start" class="me-2">
-                    <ui-dropdown-menu>
-                        @can('edit', $form)
-                            <ui-dropdown-item :text="__('Edit Form')" icon="edit" href="{{ $form->editUrl() }}"></ui-dropdown-item>
-                        @endcan
+                    @can('configure form fields')
+                        <ui-dropdown-item
+                            :text="__('Edit Blueprint')"
+                            icon="blueprint-edit"
+                            href="{{ cp_route('forms.blueprint.edit', $form->handle()) }}"
+                        ></ui-dropdown-item>
+                    @endcan
 
-                        @can('configure form fields')
-                            <ui-dropdown-item
-                                :text="__('Edit Blueprint')"
-                                icon="blueprint-edit"
-                                href="{{ cp_route('forms.blueprint.edit', $form->handle()) }}"
-                            ></ui-dropdown-item>
-                        @endcan
+                    @can('delete', $form)
+                        <ui-dropdown-item :text="__('Delete Form')" icon="trash" variant="destructive" @click="$refs.deleter.confirm()"></ui-dropdown-item>
+                    @endcan
+                </ui-dropdown-menu>
+            </ui-dropdown>
 
-                        @can('delete', $form)
-                            <ui-dropdown-item :text="__('Delete Form')" icon="trash" variant="destructive" @click="$refs.deleter.confirm()"></ui-dropdown-item>
-                        @endcan
-                    </ui-dropdown-menu>
-                </ui-dropdown>
+            @can('delete', $form)
+                <resource-deleter
+                    ref="deleter"
+                    resource-title="{{ $form->title() }}"
+                    route="{{ $form->deleteUrl() }}"
+                    redirect="{{ cp_route('forms.index') }}"
+                ></resource-deleter>
+            @endcan
+        @endif
 
-                @can('delete', $form)
-                    <resource-deleter
-                        ref="deleter"
-                        resource-title="{{ $form->title() }}"
-                        route="{{ $form->deleteUrl() }}"
-                        redirect="{{ cp_route('forms.index') }}"
-                    ></resource-deleter>
-                @endcan
-            @endif
-
-            @if (($exporters = $form->exporters()) && $exporters->isNotEmpty())
-                <ui-dropdown>
-                    <template #trigger>
-                        <ui-button :text="__('Export Submissions')"></ui-button>
-                    </template>
-                    <ui-dropdown-menu>
-                        @foreach ($exporters as $exporter)
-                            <ui-dropdown-item
-                                text="{{ $exporter->title() }}"
-                                href="{{ $exporter->downloadUrl() }}"
-                            ></ui-dropdown-item>
-                        @endforeach
-                    </ui-dropdown-menu>
-                </ui-dropdown>
-            @endif
-        </div>
-    </header>
+        @if (($exporters = $form->exporters()) && $exporters->isNotEmpty())
+            <ui-dropdown>
+                <template #trigger>
+                    <ui-button :text="__('Export Submissions')"></ui-button>
+                </template>
+                <ui-dropdown-menu>
+                    @foreach ($exporters as $exporter)
+                        <ui-dropdown-item
+                            text="{{ $exporter->title() }}"
+                            href="{{ $exporter->downloadUrl() }}"
+                        ></ui-dropdown-item>
+                    @endforeach
+                </ui-dropdown-menu>
+            </ui-dropdown>
+        @endif
+    </ui-header>
 
     @if (! empty($form->metrics()))
         <div class="metrics mb-6">

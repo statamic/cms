@@ -8,6 +8,9 @@ import { SavePipeline } from '@statamic/exports.js';
 const { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks } = SavePipeline;
 
 const props = defineProps({
+    icon: {
+        type: String,
+    },
     title: {
         type: String,
         default: () => uniqid(),
@@ -34,6 +37,10 @@ const props = defineProps({
         type: String,
         default: 'patch',
     },
+    readOnly: {
+        type: Boolean,
+        default: false,
+    }
 });
 
 const containerName = Statamic.$slug.separatedBy('_').create(props.title);
@@ -53,6 +60,10 @@ function save() {
         ])
         .then((response) => {
             Statamic.$toast.success('Saved');
+
+            if (response.data.redirect) {
+                window.location = response.data.redirect;
+            }
         });
 }
 
@@ -69,8 +80,8 @@ onUnmounted(() => saveKeyBinding.destroy());
 </script>
 
 <template>
-    <Header :title="title">
-        <Button variant="primary" text="Save" @click="save" :disabled="saving" />
+    <Header :title="title" :icon="icon">
+        <Button v-if="!readOnly" variant="primary" text="Save" @click="save" :disabled="saving" />
     </Header>
     <Container
         ref="container"
@@ -79,6 +90,7 @@ onUnmounted(() => saveKeyBinding.destroy());
         :values="values"
         :meta="meta"
         :errors="errors"
+        :read-only="readOnly"
         @updated="values = $event"
     >
         <Tabs />

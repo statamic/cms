@@ -6,7 +6,7 @@
 @section('title', Statamic::crumb($group->title(), 'User Group'))
 
 @section('content')
-    <ui-header title="{{ __($group->title()) }}">
+    <ui-header title="{{ __($group->title()) }}" icon="groups">
         @can('delete', $group)
             <ui-button
                 @click="$refs.deleter.confirm()"

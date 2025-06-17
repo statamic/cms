@@ -1,6 +1,6 @@
 <template>
     <div>
-        <Header :title="__(title)">
+        <Header :title="__(title)" icon="groups">
             <Dropdown v-if="canEditBlueprint" class="me-2">
                 <template #trigger>
                     <Button icon="ui/dots" variant="ghost" />

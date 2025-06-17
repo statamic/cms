@@ -6,7 +6,7 @@
                     <a :href="taxonomy.terms_url">{{ __(taxonomy.title) }}</a>
                 </template>
                 <template #actions="{ row: taxonomy, index }">
-                    <Dropdown>
+                    <Dropdown class="me-3">
                         <DropdownMenu>
                             <DropdownItem :text="__('Edit')" icon="cog" :href="taxonomy.edit_url" />
                             <DropdownItem :text="__('Edit Blueprints')" icon="blueprint-edit" :href="taxonomy.blueprints_url" />

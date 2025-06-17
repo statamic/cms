@@ -14,7 +14,7 @@
                 :is-dirty="isDirty"
                 @started="actionStarted"
                 @completed="actionCompleted"
-                v-slot="{ actions }"
+                v-slot="{ actions: itemActions }"
             >
                 <Dropdown v-if="canEditBlueprint || hasItemActions">
                     <template #trigger>
@@ -24,7 +24,7 @@
                         <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" v-if="canEditBlueprint" :href="actions.editBlueprint" />
                         <DropdownSeparator v-if="canEditBlueprint && itemActions.length" />
                         <DropdownItem
-                            v-for="action in actions"
+                            v-for="action in itemActions"
                             :key="action.handle"
                             :text="__(action.title)"
                             :icon="action.icon"
@@ -165,7 +165,7 @@
                             <LocalizationsCard
                                 v-if="showLocalizationSelector"
                                 :localizations
-                                :localizing
+                                :localizing="localizing !== null"
                                 @selected="localizationSelected"
                             />
                         </div>
@@ -626,7 +626,7 @@ export default {
 
             this.$dirty.remove(this.publishContainer);
 
-            this.localizing = localization.handle;
+            this.localizing = localization;
 
             if (localization.exists) {
                 this.editLocalization(localization);
