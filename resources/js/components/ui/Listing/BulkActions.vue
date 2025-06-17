@@ -17,12 +17,7 @@ function actionStarted() {
 
 function actionCompleted(successful = null, response = {}) {
     busy.value = false;
-
-    if (successful) {
-        actionSuccess(response);
-    } else {
-        actionFailed(response);
-    }
+    successful ? actionSuccess(response) : actionFailed(response);
 }
 
 function actionSuccess(response) {
