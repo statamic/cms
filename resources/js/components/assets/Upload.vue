@@ -35,13 +35,13 @@
             @cancel="showNewFilenameModal = false"
             @confirm="confirmNewFilename"
         >
-            <text-input autoselect v-model="newFilename" @keydown.enter="confirmNewFilename" />
+            <Input autoselect v-model="newFilename" @keydown.enter="confirmNewFilename" />
         </confirmation-modal>
     </div>
 </template>
 
 <script>
-import { Button, Dropdown, DropdownMenu, DropdownItem } from '@statamic/ui';
+import { Button, Dropdown, DropdownMenu, DropdownItem, Input } from '@statamic/ui';
 
 export default {
     components: {
@@ -49,6 +49,7 @@ export default {
         Dropdown,
         DropdownMenu,
         DropdownItem,
+        Input,
     },
 
     props: {
