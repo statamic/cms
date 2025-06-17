@@ -35,6 +35,9 @@ import { default as Heading } from './Heading.vue';
 import { default as Icon } from './Icon.vue';
 import { default as Input } from './Input/Input.vue';
 import { default as Label } from './Label.vue';
+import { default as Modal } from './Modal/Modal.vue';
+import { default as ModalClose } from './Modal/Close.vue';
+import { default as ModalTitle } from './Modal/Title.vue';
 import { default as Panel } from './Panel/Panel.vue';
 import { default as PanelFooter } from './Panel/Footer.vue';
 import { default as PanelHeader } from './Panel/Header.vue';
@@ -107,6 +110,9 @@ export {
     Icon,
     Input,
     Label,
+    Modal,
+    ModalClose,
+    ModalTitle,
     Panel,
     PanelFooter,
     PanelHeader,
