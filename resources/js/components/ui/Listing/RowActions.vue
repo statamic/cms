@@ -11,7 +11,7 @@ const props = defineProps({
     },
 });
 
-const { actionsUrl, onActionSuccess, onActionFailure, refresh } = injectListingContext();
+const { actionUrl, onActionSuccess, onActionFailure, refresh } = injectListingContext();
 const busy = ref(false);
 
 watch(busy, (busy) => Statamic.$progress.loading('action', busy));
@@ -44,7 +44,7 @@ function actionFailed(response) {
 
 <template>
     <ItemActions
-        :url="actionsUrl"
+        :url="actionUrl"
         :actions="row.actions"
         :item="row.id"
         @started="actionStarted"

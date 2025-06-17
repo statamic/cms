@@ -22,7 +22,7 @@ const props = defineProps({
         type: Boolean,
         default: true,
     },
-    actionsUrl: {
+    actionUrl: {
         type: String,
     },
     actionSucceeded: {
@@ -279,7 +279,7 @@ provideListingContext({
     setSortColumn,
     selections,
     maxSelections: toRef(() => props.maxSelections),
-    actionsUrl: toRef(() => props.actionsUrl),
+    actionUrl: toRef(() => props.actionUrl),
     allowBulkActions: toRef(() => props.allowBulkActions),
     onActionSuccess: props.actionSucceeded,
     onActionFailure: props.actionFailed,
