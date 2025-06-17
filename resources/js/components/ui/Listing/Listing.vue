@@ -29,12 +29,6 @@ const props = defineProps({
         type: Object,
         default: () => ({}),
     },
-    actionSucceeded: {
-        type: Function,
-    },
-    actionFailed: {
-        type: Function,
-    },
     reorderable: {
         type: Boolean,
         default: false,
@@ -291,8 +285,6 @@ provideListingContext({
     actionUrl: toRef(() => props.actionUrl),
     actionContext: toRef(() => props.actionContext),
     allowBulkActions: toRef(() => props.allowBulkActions),
-    onActionSuccess: props.actionSucceeded,
-    onActionFailure: props.actionFailed,
     perPage,
     setPerPage,
     setCurrentPage,

@@ -11,7 +11,7 @@ const props = defineProps({
     },
 });
 
-const { actionUrl, onActionSuccess, onActionFailure, refresh } = injectListingContext();
+const { actionUrl, refresh } = injectListingContext();
 const busy = ref(false);
 
 watch(busy, (busy) => Statamic.$progress.loading('action', busy));
@@ -24,11 +24,9 @@ function actionCompleted(successful = null, response = {}) {
     busy.value = false;
 
     if (successful) {
-        const success = () => actionSuccess(response);
-        onActionSuccess ? onActionSuccess({ response, success, refresh }) : success();
+        actionSuccess(response);
     } else {
-        const failed = () => actionFailed(response);
-        onActionFailure ? onActionFailure({ response, failed }) : failed();
+        actionFailed(response);
     }
 }
 

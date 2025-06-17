@@ -5,8 +5,7 @@ import { computed, ref, watch } from 'vue';
 import { Button, ButtonGroup } from '@statamic/ui';
 import BulkActions from '@statamic/components/actions/BulkActions.vue';
 
-const { actionUrl, actionContext, onActionSuccess, onActionFailure, selections, refresh, clearSelections } =
-    injectListingContext();
+const { actionUrl, actionContext, selections, refresh, clearSelections } = injectListingContext();
 const busy = ref(false);
 const hasSelections = computed(() => selections.value.length > 0);
 
@@ -20,11 +19,9 @@ function actionCompleted(successful = null, response = {}) {
     busy.value = false;
 
     if (successful) {
-        const success = () => actionSuccess(response);
-        onActionSuccess ? onActionSuccess({ response, success, refresh }) : success();
+        actionSuccess(response);
     } else {
-        const failed = () => actionFailed(response);
-        onActionFailure ? onActionFailure({ response, failed }) : failed();
+        actionFailed(response);
     }
 }
 
