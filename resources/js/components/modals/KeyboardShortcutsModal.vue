@@ -1,10 +1,7 @@
 <template>
-    <modal v-if="open" name="keyboard-shortcuts" :width="380" @closed="open = false" click-to-close>
+    <Modal :title="__('Keyboard Shortcuts')" v-model:open="open" :width="380">
         <div class="-max-h-screen-px">
-            <h1 class="border-b bg-gray-200 p-4 text-center dark:border-dark-900 dark:bg-dark-700">
-                {{ __('Keyboard Shortcuts') }}
-            </h1>
-            <div class="relative p-6">
+            <div class="relative pt-2">
                 <div class="shortcut-pair">
                     <span class="shortcut-combo">
                         <span class="shortcut">shift</span><span class="shortcut-joiner">+</span
@@ -54,11 +51,17 @@
                 </div>
             </div>
         </div>
-    </modal>
+    </Modal>
 </template>
 
 <script>
+import { Modal } from '@statamic/ui';
+
 export default {
+    components: {
+        Modal,
+    },
+
     data() {
         return {
             open: false,

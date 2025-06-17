@@ -1,73 +1,73 @@
 <template>
-    <modal name="elevated-session" height="auto" :width="500" @closed="modalClosed" v-slot="{ close }" click-to-close>
-        <div class="-max-h-screen-px">
-            <div
-                class="flex items-center justify-between rounded-t-lg border-b bg-gray-200 px-5 py-3 text-lg font-semibold dark:border-dark-900 dark:bg-dark-550"
-            >
-                {{ method === 'password_confirmation' ? __('Confirm Your Password') : __('Verification Code') }}
-            </div>
-
-            <div class="publish-fields p-2">
-                <div class="form-group w-full">
-                    <template v-if="method === 'password_confirmation'">
-                        <label v-text="__('messages.elevated_session_enter_password')" />
-                        <small class="help-block text-red-500" v-if="errors.password" v-text="errors.password[0]" />
-                        <div class="flex items-center">
-                            <input
-                                type="password"
-                                v-model="password"
-                                ref="password"
-                                class="input-text"
-                                tabindex="1"
-                                autofocus
-                                @keydown.enter.prevent="submit"
-                            />
-                            <button
-                                @click="submit(close)"
-                                class="btn-primary ltr:ml-2 rtl:mr-2"
-                                v-text="__('Confirm')"
-                            />
-                        </div>
-                    </template>
-
-                    <template v-if="method === 'verification_code'">
-                        <label v-text="__('messages.elevated_session_enter_verification_code')" />
-                        <small
-                            class="help-block text-red-500"
-                            v-if="errors.verification_code"
-                            v-text="errors.verification_code[0]"
+    <Modal :title="title" :open="open" @update:open="modalClosed">
+        <div class="publish-fields p-2">
+            <div class="form-group w-full">
+                <template v-if="method === 'password_confirmation'">
+                    <label v-text="__('messages.elevated_session_enter_password')" />
+                    <small class="help-block text-red-500" v-if="errors.password" v-text="errors.password[0]" />
+                    <div class="flex items-center">
+                        <Input
+                            type="password"
+                            v-model="password"
+                            ref="password"
+                            tabindex="1"
+                            autofocus
+                            @keydown.enter.prevent="submit"
                         />
-                        <div class="flex items-center">
-                            <input
-                                type="text"
-                                v-model="verificationCode"
-                                ref="verificationCode"
-                                class="input-text"
-                                tabindex="1"
-                                autofocus
-                                @keydown.enter.prevent="submit"
-                            />
-                            <button
-                                @click="resendCode"
-                                class="btn ltr:ml-2 rtl:mr-2"
-                                :disabled="resendDisabled"
-                                v-text="__('Resend code')"
-                            />
-                            <button
-                                @click="submit(close)"
-                                class="btn-primary ltr:ml-2 rtl:mr-2"
-                                v-text="__('Confirm')"
-                            />
+                        <Button
+                            @click="submit"
+                            class="ms-2"
+                            :text="__('Confirm')"
+                            variant="primary"
+                        />
+                    </div>
+                </template>
+
+                <template v-if="method === 'verification_code'">
+                    <label v-text="__('messages.elevated_session_enter_verification_code')" />
+                    <small
+                        class="help-block text-red-500"
+                        v-if="errors.verification_code"
+                        v-text="errors.verification_code[0]"
+                    />
+                    <div class="flex items-center">
+                        <Input
+                            type="text"
+                            v-model="verificationCode"
+                            ref="verificationCode"
+                            tabindex="1"
+                            autofocus
+                            @keydown.enter.prevent="submit"
+                        />
+                        <Button
+                            @click="resendCode"
+                            class="ms-2"
+                            :disabled="resendDisabled"
+                            :text="__('Resend code')"
+                        />
+                        <Button
+                            @click="submit"
+                            class="ms-2"
+                            variant="primary"
+                            :text="__('Confirm')"
+                        />
                         </div>
-                    </template>
-                </div>
+                </template>
             </div>
         </div>
-    </modal>
+    </Modal>
 </template>
 
 <script>
+import { Modal, Input, Button } from '@statamic/ui';
+
 export default {
+    components: {
+        Modal,
+        Input,
+        Button,
+    },
+
     props: {
         method: String,
     },
@@ -79,11 +79,18 @@ export default {
             errors: [],
             shouldResolve: false,
             resendDisabled: false,
+            open: true,
         };
     },
 
+    computed: {
+        title() {
+            return this.method === 'password_confirmation' ? __('Confirm Your Password') : __('Verification Code');
+        },
+    },
+
     methods: {
-        submit(close) {
+        submit() {
             let payload = {
                 password: this.password,
                 verification_code: this.verificationCode,
@@ -93,7 +100,7 @@ export default {
                 .post(cp_url('elevated-session'), payload)
                 .then((response) => {
                     this.shouldResolve = true;
-                    close();
+                    this.modalClosed();
                 })
                 .catch((error) => {
                     this.errors = error.response.data.errors;
@@ -119,6 +126,7 @@ export default {
         },
 
         modalClosed() {
+            this.open = false;
             this.$emit('closed', this.shouldResolve);
         },
     },
