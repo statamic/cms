@@ -60,7 +60,7 @@ const anchorClasses = cva({
             false: '',
         },
     },
-})({ 
+})({
     size: props.size,
     flat: props.flat,
     buttonAppearance: props.buttonAppearance
@@ -268,7 +268,8 @@ function pushTaggableOption(e) {
                     </button>
                     <button type="button" v-else class="cursor-pointer">
                         <slot name="selected-option" v-bind="{ option: selectedOption }">
-                            <span v-text="getOptionLabel(selectedOption)" />
+                            <span v-if="labelHtml" v-html="getOptionLabel(selectedOption)" />
+                            <span v-else v-text="getOptionLabel(selectedOption)" />
                         </slot>
                     </button>
                 </ComboboxTrigger>
