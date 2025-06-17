@@ -25,6 +25,10 @@ const props = defineProps({
     actionUrl: {
         type: String,
     },
+    actionContext: {
+        type: Object,
+        default: () => ({}),
+    },
     actionSucceeded: {
         type: Function,
     },
@@ -266,6 +270,10 @@ function setSearchQuery(query) {
     searchQuery.value = query;
 }
 
+function clearSelections() {
+    selections.value.splice(0, selections.value.length);
+}
+
 provideListingContext({
     loading,
     refresh,
@@ -279,7 +287,9 @@ provideListingContext({
     setSortColumn,
     selections,
     maxSelections: toRef(() => props.maxSelections),
+    clearSelections,
     actionUrl: toRef(() => props.actionUrl),
+    actionContext: toRef(() => props.actionContext),
     allowBulkActions: toRef(() => props.allowBulkActions),
     onActionSuccess: props.actionSucceeded,
     onActionFailure: props.actionFailed,
