@@ -51,14 +51,20 @@ class URL
     }
 
     /**
-     * Get the slug of a URL.
+     * Get the slug at the end of a URL.
      *
      * @param  string  $url  URL to parse
      * @return string
      */
     public function slug($url)
     {
-        return basename($url);
+        $url = Str::ensureRight(self::removeQueryAndFragment($url), '/');
+
+        if (parse_url($url)['path'] === '/') {
+            return null;
+        }
+
+        return basename(self::removeQueryAndFragment($url));
     }
 
     /**
