@@ -321,7 +321,7 @@ class URL
      *
      * @param  string  $url
      */
-    public function removeQueryAndFragment($url): string
+    public function removeQueryAndFragment($url): ?string
     {
         $url = Str::before($url, '?'); // Remove query params
         $url = Str::before($url, '#'); // Remove anchor fragment

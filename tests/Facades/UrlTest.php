@@ -434,6 +434,8 @@ class UrlTest extends TestCase
     #[Test]
     public function it_can_remove_query_and_fragment()
     {
+        $this->assertEquals(null, URL::removeQueryAndFragment(null));
+
         $this->assertEquals('https://example.com', URL::removeQueryAndFragment('https://example.com?query'));
         $this->assertEquals('https://example.com', URL::removeQueryAndFragment('https://example.com#anchor'));
         $this->assertEquals('https://example.com', URL::removeQueryAndFragment('https://example.com?foo=bar&baz=qux'));
