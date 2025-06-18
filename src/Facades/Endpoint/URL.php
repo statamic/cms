@@ -286,7 +286,7 @@ class URL
 
         $isExternal = self::$siteUrlsCache
             ->filter(fn ($siteUrl) => Str::startsWith($url, $siteUrl))
-            ->isNotEmpty();
+            ->isEmpty();
 
         return self::$externalAppUriCache[$url] = $isExternal;
     }
