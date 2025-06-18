@@ -39,7 +39,6 @@ class VideoFieldtypeController extends CpController
     {
         return match ($provider) {
             VideoType::CloudflareStream => $this->cloudflareStreamEmbedUrl($url),
-            VideoType::Custom => $url,
             VideoType::Vimeo => $this->vimeoEmbedUrl($url),
             VideoType::YouTube => $this->youTubeEmbedUrl($url),
         };
