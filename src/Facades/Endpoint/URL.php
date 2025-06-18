@@ -32,7 +32,7 @@ class URL
      *
      * @param  string  $url  URL to remove "//" from
      */
-    public function tidy($url): string
+    public function tidy(?string $url): string
     {
         return self::normalizeTrailingSlash(Path::tidy($url));
     }
@@ -42,7 +42,7 @@ class URL
      *
      * @param mixed string  Open ended number of arguments
      */
-    public function assemble(...$segments): string
+    public function assemble(?string ...$segments): string
     {
         return self::tidy(Path::assemble($segments));
     }
@@ -52,7 +52,7 @@ class URL
      *
      * @param  string  $url  URL to parse
      */
-    public function slug($url): ?string
+    public function slug(?string $url): ?string
     {
         $url = Str::ensureRight(self::removeQueryAndFragment($url), '/');
 
@@ -69,7 +69,7 @@ class URL
      * @param  string  $url  URL to modify
      * @param  string  $slug  New slug to use
      */
-    public function replaceSlug($url, $slug): string
+    public function replaceSlug(?string $url, string $slug): string
     {
         if (parse_url(Str::ensureRight($url, '/'))['path'] === '/') {
             return self::tidy($url);
@@ -89,10 +89,8 @@ class URL
 
     /**
      * Get the parent URL.
-     *
-     * @param  string  $url
      */
-    public function parent($url): string
+    public function parent(?string $url): string
     {
         $url = Str::ensureRight(self::removeQueryAndFragment($url), '/');
 
@@ -108,7 +106,7 @@ class URL
     /**
      * Checks if one URL is an ancestor of another.
      */
-    public function isAncestorOf($child, $ancestor): bool
+    public function isAncestorOf(?string $child, ?string $ancestor): bool
     {
         $child = Str::ensureRight(self::removeQueryAndFragment($child), '/');
         $ancestor = Str::ensureRight(self::removeQueryAndFragment($ancestor), '/');
@@ -122,12 +120,8 @@ class URL
 
     /**
      * Make sure the site root is prepended to a URL.
-     *
-     * @param  string  $url
-     * @param  string|null  $locale
-     * @param  bool  $controller
      */
-    public function prependSiteRoot($url, $locale = null, $controller = true): string
+    public function prependSiteRoot(?string $url, ?string $locale = null, bool $controller = true): string
     {
         // Backwards compatibility fix:
         // 2.1 added the $locale argument in the second position to match prependSiteurl.
@@ -144,12 +138,8 @@ class URL
 
     /**
      * Make sure the site root url is prepended to a URL.
-     *
-     * @param  string  $url
-     * @param  string|null  $locale
-     * @param  bool  $controller
      */
-    public function prependSiteUrl($url, $locale = null, $controller = true): string
+    public function prependSiteUrl(?string $url, ?string $locale = null, bool $controller = true): string
     {
         $prepend = Str::removeRight(Config::getSiteUrl($locale), '/');
 
@@ -166,20 +156,16 @@ class URL
 
     /**
      * Removes the site root url from the beginning of a URL.
-     *
-     * @param  string  $url
      */
-    public function removeSiteUrl($url): string
+    public function removeSiteUrl(?string $url): string
     {
         return self::tidy(preg_replace('#^'.Config::getSiteUrl().'#', '/', $url));
     }
 
     /**
      * Make an absolute URL relative.
-     *
-     * @param  string  $url
      */
-    public function makeRelative($url): string
+    public function makeRelative(?string $url): string
     {
         $parsed = parse_url($url);
 
@@ -198,10 +184,8 @@ class URL
 
     /**
      * Make a relative URL absolute.
-     *
-     * @param  string  $url
      */
-    public function makeAbsolute($url): string
+    public function makeAbsolute(?string $url): string
     {
         // If it doesn't start with a slash, we'll just leave it as-is.
         if (Str::startsWith($url, ['http:', 'https:']) && self::isExternalToApplication($url)) {
@@ -225,20 +209,16 @@ class URL
 
     /**
      * Formats a URL properly.
-     *
-     * @param  string  $url
      */
-    public function format($url): string
+    public function format(?string $url): string
     {
         return self::tidy('/'.trim($url, '/'));
     }
 
     /**
      * Checks whether a URL is external to current site.
-     *
-     * @param  string  $url
      */
-    public function isExternal($url): bool
+    public function isExternal(?string $url): bool
     {
         if (isset(self::$externalSiteUriCache[$url])) {
             return self::$externalSiteUriCache[$url];
@@ -261,10 +241,8 @@ class URL
 
     /**
      * Checks whether a URL is external to whole Statamic application.
-     *
-     * @param  string  $url
      */
-    public function isExternalToApplication($url): bool
+    public function isExternalToApplication(?string $url): bool
     {
         if (isset(self::$externalAppUriCache[$url])) {
             return self::$externalAppUriCache[$url];
@@ -313,10 +291,8 @@ class URL
 
     /**
      * Encode a URL.
-     *
-     * @param  string  $url
      */
-    public function encode($url): string
+    public function encode(?string $url): string
     {
         $dont_encode = [
             '%2F' => '/',
@@ -340,11 +316,8 @@ class URL
 
     /**
      * Return a gravatar image.
-     *
-     * @param  string  $email
-     * @param  int  $size
      */
-    public function gravatar($email, $size = null): string
+    public function gravatar(string $email, ?int $size = null): string
     {
         $url = 'https://www.gravatar.com/avatar/'.e(md5(strtolower($email)));
 
@@ -357,10 +330,8 @@ class URL
 
     /**
      * Remove query and fragment from end of URL.
-     *
-     * @param  string  $url
      */
-    public function removeQueryAndFragment($url): ?string
+    public function removeQueryAndFragment(?string $url): ?string
     {
         $url = Str::before($url, '?'); // Remove query params
         $url = Str::before($url, '#'); // Remove anchor fragment
@@ -371,7 +342,7 @@ class URL
     /**
      * Normalize trailing slash before query and fragment (trims by default, but can be enforced).
      */
-    public function normalizeTrailingSlash(string $url): string
+    public function normalizeTrailingSlash(?string $url): string
     {
         $parts = str($url)
             ->split(pattern: '/([?#])/', flags: PREG_SPLIT_DELIM_CAPTURE)

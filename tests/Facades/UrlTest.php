@@ -525,6 +525,7 @@ class UrlTest extends TestCase
     public static function enforceTrailingSlashesProvider()
     {
         return [
+            [null, '/'],
             ['', '/'],
             ['/', '/'],
 
@@ -581,6 +582,7 @@ class UrlTest extends TestCase
     public static function removeTrailingSlashesProvider()
     {
         return [
+            [null, '/'],
             ['', '/'],
             ['/', '/'],
 
