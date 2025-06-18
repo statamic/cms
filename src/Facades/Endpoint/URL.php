@@ -81,12 +81,15 @@ class URL
      */
     public function parent($url)
     {
-        $url_array = explode('/', $url);
-        array_pop($url_array);
+        $url = Str::ensureRight(self::removeQueryAndFragment($url), '/');
 
-        $url = implode('/', $url_array);
+        if (parse_url($url)['path'] === '/') {
+            return self::tidy($url);
+        }
 
-        return ($url == '') ? '/' : $url;
+        $url = preg_replace('/[^\/]*\/$/', '', $url);
+
+        return self::tidy($url);
     }
 
     /**
