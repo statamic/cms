@@ -279,7 +279,7 @@ class URL
     {
         $rootUrl = url()->to('/');
 
-        return self::tidy($rootUrl, '/');
+        return self::tidy($rootUrl);
     }
 
     /**
