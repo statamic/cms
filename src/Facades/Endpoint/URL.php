@@ -170,7 +170,7 @@ class URL
      */
     public function removeSiteUrl($url): string
     {
-        return preg_replace('#^'.Config::getSiteUrl().'#', '/', $url);
+        return self::tidy(preg_replace('#^'.Config::getSiteUrl().'#', '/', $url));
     }
 
     /**
