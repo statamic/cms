@@ -100,6 +100,57 @@ class UrlTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('assembleProvider')]
+    public function it_can_assemble_urls($segments, $assembled)
+    {
+        $this->assertSame($assembled, URL::assemble(...$segments));
+
+        URL::enforceTrailingSlashes();
+
+        $parts = str($assembled)
+            ->split(pattern: '/([?#])/', flags: PREG_SPLIT_DELIM_CAPTURE)
+            ->all();
+
+        $url = array_shift($parts);
+        $queryAndFragments = implode($parts);
+        $assembledWithTrailingSlash = Str::ensureRight($url, '/').$queryAndFragments;
+
+        $this->assertSame($assembledWithTrailingSlash, URL::assemble(...$segments));
+    }
+
+    public static function assembleProvider()
+    {
+        return [
+            'relative homepage' => [['/'], '/'],
+            'absolute homepage' => [['http://localhost'], 'http://localhost'],
+            'absolute homepage with trailing slash' => [['http://localhost/'], 'http://localhost'],
+
+            'relative route' => [['/', 'foo'], '/foo'],
+            'relative route with trailing slash' => [['/', 'foo/'], '/foo'],
+            'absolute route' => [['http://localhost', 'foo'], 'http://localhost/foo'],
+            'absolute route with trailing slashes' => [['http://localhost/', 'foo/'], 'http://localhost/foo'],
+
+            'relative nested route' => [['/', 'foo', 'bar'], '/foo/bar'],
+            'relative nested route with trailing slashes' => [['/', 'foo/', 'bar/'], '/foo/bar'],
+            'absolute nested route' => [['http://localhost', 'foo', 'bar'], 'http://localhost/foo/bar'],
+            'absolute nested route with trailing slashes' => [['http://localhost/', 'foo/', 'bar/'], 'http://localhost/foo/bar'],
+
+            'with query from relative url' => [['/', 'entries', 'foo', '?alpha'], '/entries/foo?alpha'],
+            'with query from relative url with trailing slashes' => [['/', 'entries/', 'foo/', '?alpha'], '/entries/foo?alpha'],
+            'with query from absolute url' => [['http://localhost', 'entries', 'foo', '?alpha'], 'http://localhost/entries/foo?alpha'],
+            'with query from absolute url with trailing slashes' => [['http://localhost/', 'entries/', 'foo/', '?alpha'], 'http://localhost/entries/foo?alpha'],
+            'with anchor fragment from relative url' => [['/', 'entries', 'foo', '#alpha'], '/entries/foo#alpha'],
+            'with anchor fragment from relative url with trailing slashes' => [['/', 'entries/', 'foo/', '#alpha'], '/entries/foo#alpha'],
+            'with anchor fragment from absolute url' => [['http://localhost', 'entries', 'foo', '#alpha'], 'http://localhost/entries/foo#alpha'],
+            'with anchor fragment from absolute url with trailing slashes' => [['http://localhost/', 'entries/', 'foo/', '#alpha'], 'http://localhost/entries/foo#alpha'],
+            'with query and anchor fragment from relative url' => [['/', 'entries', 'foo', '?alpha#beta'], '/entries/foo?alpha#beta'],
+            'with query and anchor fragment from relative url with trailing slashes' => [['/', 'entries/', 'foo/', '?alpha#beta'], '/entries/foo?alpha#beta'],
+            'with query and anchor fragment from absolute url' => [['http://localhost', 'entries', 'foo', '?alpha#beta'], 'http://localhost/entries/foo?alpha#beta'],
+            'with query and anchor fragment from absolute url with trailing slashes' => [['http://localhost/', 'entries/', 'foo/', '?alpha#beta'], 'http://localhost/entries/foo?alpha#beta'],
+        ];
+    }
+
+    #[Test]
     #[DataProvider('slugProvider')]
     public function it_gets_the_slug_at_the_end_of_a_url($url, $slug)
     {
@@ -518,15 +569,24 @@ class UrlTest extends TestCase
     {
         $this->assertSame('https://example.com?query', URL::normalizeTrailingSlash('https://example.com?query'));
         $this->assertSame('https://example.com?query', URL::tidy('https://example.com?query'));
+        $this->assertSame('https://example.com/foo', URL::parent('https://example.com/foo/bar'));
+        $this->assertSame('http://localhost/foo', URL::prependSiteUrl('/foo'));
+        $this->assertSame('https://example.com/bar', URL::replaceSlug('https://example.com/foo', 'bar'));
 
         URL::enforceTrailingSlashes();
 
         $this->assertSame('https://example.com/?query', URL::normalizeTrailingSlash('https://example.com?query'));
         $this->assertSame('https://example.com/?query', URL::tidy('https://example.com?query'));
+        $this->assertSame('https://example.com/foo/', URL::parent('https://example.com/foo/bar'));
+        $this->assertSame('http://localhost/foo/', URL::prependSiteUrl('/foo'));
+        $this->assertSame('https://example.com/bar/', URL::replaceSlug('https://example.com/foo', 'bar'));
 
         URL::enforceTrailingSlashes(false);
 
         $this->assertSame('https://example.com?query', URL::normalizeTrailingSlash('https://example.com?query'));
         $this->assertSame('https://example.com?query', URL::tidy('https://example.com?query'));
+        $this->assertSame('https://example.com/foo', URL::parent('https://example.com/foo/bar'));
+        $this->assertSame('http://localhost/foo', URL::prependSiteUrl('/foo'));
+        $this->assertSame('https://example.com/bar', URL::replaceSlug('https://example.com/foo', 'bar'));
     }
 }
