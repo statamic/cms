@@ -1,8 +1,34 @@
 <script setup>
 import { Badge, Button, Modal, ModalClose } from '@statamic/ui';
-import { ref } from 'vue';
+import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
+import { computed } from 'vue';
 
-const activeCount = ref(2);
+const { activeFilters, activeFilterBadges, setFilter } = injectListingContext();
+
+const badgeCount = computed(() => {
+    let count = Object.keys(activeFilterBadges.value).length;
+
+    if (activeFilterBadges.value.hasOwnProperty('fields')) {
+        count = count + Object.keys(activeFilterBadges.value.fields).length - 1;
+    }
+
+    return count;
+});
+
+const fieldFilterBadges = computed(() => {
+    return activeFilterBadges.value.fields || {};
+});
+
+const standardBadges = computed(() => {
+    const { fields, ...badges } = activeFilterBadges.value;
+    return badges;
+});
+
+function removeFieldFilter(handle) {
+    const fields = { ...activeFilters.value.fields };
+    delete fields[handle];
+    setFilter('fields', fields);
+}
 </script>
 
 <template>
@@ -12,8 +38,8 @@ const activeCount = ref(2);
                 <Button icon="filter" class="relative">
                     {{ __('Filter') }}
                     <Badge
-                        v-if="activeCount"
-                        :text="activeCount"
+                        v-if="badgeCount"
+                        :text="badgeCount"
                         pill
                         variant="filled"
                         class="absolute -top-1.5 -right-1.5"
@@ -30,5 +56,20 @@ const activeCount = ref(2);
                 </div>
             </template>
         </Modal>
+
+        <Button
+            v-for="(badge, handle) in fieldFilterBadges"
+            variant="filled"
+            icon-append="x"
+            :text="badge"
+            @click="removeFieldFilter(handle)"
+        />
+        <Button
+            v-for="(badge, handle) in standardBadges"
+            variant="filled"
+            icon-append="x"
+            :text="badge"
+            @click="setFilter(handle, null)"
+        />
     </div>
 </template>

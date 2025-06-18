@@ -77,6 +77,7 @@ const props = defineProps({
 const id = uniqid();
 const items = ref([]);
 const meta = ref({});
+const activeFilters = ref({});
 const activeFilterBadges = ref([]);
 const currentPage = ref(1);
 const perPage = ref(10);
@@ -97,6 +98,7 @@ const rawParameters = computed(() => ({
     order: sortDirection.value,
     search: searchQuery.value,
     columns: visibleColumns.value.map((column) => column.field).join(','),
+    filters: Object.keys(activeFilters.value).length === 0 ? null : utf8btoa(JSON.stringify(activeFilters.value)),
 }));
 
 watch(columns, (newColumns) => emit('update:columns', newColumns));
@@ -114,6 +116,7 @@ function setParameters(params) {
         ...column,
         visible: params.columns.split(',').includes(column.field),
     }));
+    activeFilters.value = params.filters ? JSON.parse(utf8atob(params.filters)) : {};
 }
 
 const parameters = computed(() => {
@@ -264,8 +267,29 @@ function setSearchQuery(query) {
     searchQuery.value = query;
 }
 
+function clearSearchQuery() {
+    searchQuery.value = null;
+}
+
 function clearSelections() {
     selections.value.splice(0, selections.value.length);
+}
+
+function setFilters(filters) {
+    activeFilters.value = filters || {};
+}
+
+function setFilter(handle, values) {
+    if (values) {
+        activeFilters.value[handle] = values;
+    } else {
+        delete activeFilters.value[handle];
+    }
+}
+
+function clearFilters() {
+    activeFilters.value = {};
+    activeFilterBadges.value = [];
 }
 
 provideListingContext({
@@ -290,7 +314,13 @@ provideListingContext({
     setCurrentPage,
     searchQuery,
     setSearchQuery,
+    clearSearchQuery,
     preferencesPrefix: toRef(() => props.preferencesPrefix),
+    activeFilters,
+    activeFilterBadges,
+    setFilter,
+    setFilters,
+    clearFilters,
 });
 
 const slotProps = computed(() => ({
