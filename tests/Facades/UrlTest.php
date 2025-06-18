@@ -70,6 +70,8 @@ class UrlTest extends TestCase
         $this->assertTrue(URL::isExternal('http://that-site.com'));
         $this->assertTrue(URL::isExternal('http://that-site.com/'));
         $this->assertTrue(URL::isExternal('http://that-site.com/some-slug'));
+        $this->assertTrue(URL::isExternal('http://that-site.com/some-slug?foo'));
+        $this->assertTrue(URL::isExternal('http://that-site.com/some-slug#anchor'));
         $this->assertFalse(URL::isExternal('http://this-site.com'));
         $this->assertFalse(URL::isExternal('http://this-site.com/'));
         $this->assertFalse(URL::isExternal('http://this-site.com/some-slug'));
@@ -86,6 +88,8 @@ class UrlTest extends TestCase
         $this->assertTrue(URL::isExternal('http://that-site.com'));
         $this->assertTrue(URL::isExternal('http://that-site.com/'));
         $this->assertTrue(URL::isExternal('http://that-site.com/some-slug'));
+        $this->assertTrue(URL::isExternal('http://that-site.com/some-slug?foo'));
+        $this->assertTrue(URL::isExternal('http://that-site.com/some-slug#anchor'));
         $this->assertFalse(URL::isExternal('http://absolute-url-resolved-from-request.com'));
         $this->assertFalse(URL::isExternal('http://absolute-url-resolved-from-request.com/'));
         $this->assertFalse(URL::isExternal('http://absolute-url-resolved-from-request.com/some-slug'));
