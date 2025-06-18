@@ -64,6 +64,24 @@ class UrlTest extends TestCase
     }
 
     #[Test]
+    public function it_removes_site_url()
+    {
+        $this->setSiteValue('en', 'url', 'http://site.com/');
+
+        $this->assertEquals('/', URL::removeSiteUrl('http://site.com'));
+        $this->assertEquals('/foo', URL::removeSiteUrl('http://site.com/foo'));
+        $this->assertEquals('/foo', URL::removeSiteUrl('http://site.com/foo/'));
+        $this->assertEquals('http://not-site.com/foo', URL::removeSiteUrl('http://not-site.com/foo/'));
+
+        URL::enforceTrailingSlashes();
+
+        $this->assertEquals('/', URL::removeSiteUrl('http://site.com/'));
+        $this->assertEquals('/foo/', URL::removeSiteUrl('http://site.com/foo'));
+        $this->assertEquals('/foo/', URL::removeSiteUrl('http://site.com/foo/'));
+        $this->assertEquals('http://not-site.com/foo/', URL::removeSiteUrl('http://not-site.com/foo/'));
+    }
+
+    #[Test]
     public function it_determines_external_url()
     {
         $this->setSiteValue('en', 'url', 'http://this-site.com/');
