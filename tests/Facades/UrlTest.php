@@ -24,7 +24,8 @@ class UrlTest extends TestCase
         $app['config']->set('app.url', 'http://absolute-url-resolved-from-request.com');
     }
 
-    public function testPrependsSiteUrl()
+    #[Test]
+    public function it_prepends_site_url()
     {
         $this->setSiteValue('en', 'url', 'http://site.com/');
 
@@ -34,7 +35,8 @@ class UrlTest extends TestCase
         );
     }
 
-    public function testPrependsSiteUrlWithController()
+    #[Test]
+    public function it_prepends_site_url_with_controller()
     {
         $this->setSiteValue('en', 'url', 'http://site.com/index.php/');
 
@@ -44,7 +46,8 @@ class UrlTest extends TestCase
         );
     }
 
-    public function testPrependsSiteUrlWithoutController()
+    #[Test]
+    public function it_prepends_site_url_without_controller()
     {
         // Override with what would be used on a normal request.
         request()->server->set('SCRIPT_NAME', '/index.php');
@@ -57,7 +60,8 @@ class UrlTest extends TestCase
         );
     }
 
-    public function testDeterminesExternalUrl()
+    #[Test]
+    public function it_determines_external_url()
     {
         $this->setSiteValue('en', 'url', 'http://this-site.com/');
         $this->assertTrue(URL::isExternal('http://that-site.com'));
@@ -72,7 +76,8 @@ class UrlTest extends TestCase
         $this->assertFalse(URL::isExternal(null));
     }
 
-    public function testDeterminesExternalUrlWhenUsingRelativeInConfig()
+    #[Test]
+    public function it_determines_external_url_when_using_relative_in_config()
     {
         $this->setSiteValue('en', 'url', '/');
         $this->assertTrue(URL::isExternal('http://that-site.com'));
