@@ -5,6 +5,7 @@ namespace Tests\Facades;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\URL;
+use Statamic\Support\Str;
 use Tests\TestCase;
 
 class UrlTest extends TestCase
@@ -84,6 +85,45 @@ class UrlTest extends TestCase
         $this->assertFalse(URL::isExternal('#anchor'));
         $this->assertFalse(URL::isExternal(''));
         $this->assertFalse(URL::isExternal(null));
+    }
+
+    #[Test]
+    #[DataProvider('parentProvider')]
+    public function it_gets_the_parent_url($child, $parent)
+    {
+        $this->assertSame($parent, URL::parent($child));
+
+        URL::enforceTrailingSlashes();
+
+        $this->assertSame(Str::ensureRight($parent, '/'), URL::parent($child));
+    }
+
+    public static function parentProvider()
+    {
+        return [
+            'relative homepage to homepage' => ['/', '/'],
+            'absolute homepage to homepage' => ['http://localhost', 'http://localhost'],
+            'absolute homepage to homepage with trailing slash' => ['http://localhost/', 'http://localhost'],
+
+            'relative route to parent homepage' => ['/foo', '/'],
+            'relative route to parent homepage with trailing slash' => ['/foo/', '/'],
+            'absolute route to parent homepage' => ['http://localhost/foo', 'http://localhost'],
+            'absolute route to parent homepage with trailing slash' => ['http://localhost/foo/', 'http://localhost'],
+
+            'relative nested route to parent homepage' => ['/foo/bar', '/foo'],
+            'relative nested route to parent homepage with trailing slash' => ['/foo/bar/', '/foo'],
+            'absolute nested route to parent homepage' => ['http://localhost/foo/bar', 'http://localhost/foo'],
+            'absolute nested route to parent homepage with trailing slash' => ['http://localhost/foo/bar/', 'http://localhost/foo'],
+
+            'removes query from relative url' => ['/?alpha', '/'],
+            'removes query from absolute url' => ['http://localhost/?alpha', 'http://localhost'],
+            'removes anchor fragment from relative url' => ['/#alpha', '/'],
+            'removes anchor fragment from absolute url' => ['http://localhost/#alpha', 'http://localhost'],
+            'removes query and anchor fragment from relative url' => ['/?alpha#beta', '/'],
+            'removes query and anchor fragment from absolute url' => ['http://localhost/?alpha#beta', 'http://localhost'],
+
+            'preserves scheme and host' => ['https://example.com/foo/bar/', 'https://example.com/foo'],
+        ];
     }
 
     #[Test]
