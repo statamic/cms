@@ -4,7 +4,6 @@ namespace Statamic\Facades\Endpoint;
 
 use Statamic\Facades\Config;
 use Statamic\Facades\Path;
-use Statamic\Facades\Pattern;
 use Statamic\Facades\Site;
 use Statamic\Support\Str;
 
@@ -253,10 +252,9 @@ class URL
             return self::$externalSiteUriCache[$url] = false;
         }
 
-        $isExternal = ! Pattern::startsWith(
-            Str::ensureRight($url, '/'),
-            Site::current()->absoluteUrl()
-        );
+        $url = Str::ensureRight($url, '/');
+
+        $isExternal = ! Str::startsWith($url, Str::ensureRight(Site::current()->absoluteUrl(), '/'));
 
         return self::$externalSiteUriCache[$url] = $isExternal;
     }
@@ -280,15 +278,20 @@ class URL
             return self::$externalAppUriCache[$url] = false;
         }
 
+        $url = Str::ensureRight($url, '/');
+
         self::$siteUrlsCache ??= Site::all()
             ->map->url()
-            ->filter(fn ($siteUrl) => Str::startsWith($siteUrl, ['http:', 'https:']));
+            ->filter(fn ($siteUrl) => Str::startsWith($siteUrl, ['http:', 'https:']))
+            ->map(fn ($siteUrl) => Str::ensureRight($siteUrl, '/'));
 
-        $isExternal = self::$siteUrlsCache
+        $isExternalToSites = self::$siteUrlsCache
             ->filter(fn ($siteUrl) => Str::startsWith($url, $siteUrl))
             ->isEmpty();
 
-        return self::$externalAppUriCache[$url] = $isExternal;
+        $isExternalToCurrentRequestDomain = ! Str::startsWith($url, Str::ensureRight(url()->to('/'), '/'));
+
+        return self::$externalAppUriCache[$url] = $isExternalToSites && $isExternalToCurrentRequestDomain;
     }
 
     public function clearUrlCache()
