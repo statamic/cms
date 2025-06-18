@@ -52,6 +52,12 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
         $this->supplements = collect();
     }
 
+    public function __clone()
+    {
+        $this->term = clone $this->term;
+        $this->supplements = clone $this->supplements;
+    }
+
     public function get($key, $fallback = null)
     {
         return $this->data()->get($key, $fallback);

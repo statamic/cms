@@ -261,6 +261,66 @@ EOT
     }
 
     #[Test]
+    public function it_dynamically_renders_specific_fields_using_params()
+    {
+        $this->createForm([
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'display' => 'Section One',
+                            'fields' => [
+                                ['handle' => 'first_name', 'field' => ['type' => 'text']],
+                                ['handle' => 'middle_name', 'field' => ['type' => 'text', 'display' => 'Middle Name']],
+                                ['handle' => 'last_name', 'field' => ['type' => 'text', 'display' => 'Last Name']],
+                                [
+                                    'handle' => 'group_one',
+                                    'field' => [
+                                        'type' => 'group',
+                                        'display' => 'Group One',
+                                        'fields' => [
+                                            ['handle' => 'nested_one', 'field' => ['type' => 'text', 'display' => 'Nested One']],
+                                            ['handle' => 'nested_two', 'field' => ['type' => 'text', 'display' => 'Nested Two']],
+                                        ],
+                                    ],
+                                ],
+                                [
+                                    'handle' => 'group_two',
+                                    'field' => [
+                                        'type' => 'group',
+                                        'display' => 'Group Two',
+                                        'fields' => [
+                                            ['handle' => 'nested_three', 'field' => ['type' => 'text', 'display' => 'Nested One']],
+                                            ['handle' => 'nested_four', 'field' => ['type' => 'text', 'display' => 'Nested Two']],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ], 'survey');
+
+        $output = $this->normalizeHtml($this->tag(<<<'EOT'
+{{ form:survey }}
+    <div class="get-top-level-field">{{ form:fields get="middle_name" }}{{ handle }},{{ /form:fields }}</div>
+    <div class="get-group-field">{{ form:fields get="group_one" }}{{ handle }},{{ /form:fields }}</div>
+    <div class="get-nested-field">{{ form:fields get="group_one.nested_two" }}{{ handle }},{{ /form:fields }}</div>
+    <div class="only-piped-fields">{{ form:fields only="middle_name|group_one" }}{{ handle }},{{ /form:fields }}</div>
+    <div class="except-piped-fields">{{ form:fields except="middle_name|group_one" }}{{ handle }},{{ /form:fields }}</div>
+{{ /form:survey }}
+EOT
+        ));
+
+        $this->assertStringContainsString('<div class="get-top-level-field">middle_name,</div>', $output);
+        $this->assertStringContainsString('<div class="get-group-field">group_one,</div>', $output);
+        $this->assertStringContainsString('<div class="get-nested-field">group_one.nested_two,</div>', $output);
+        $this->assertStringContainsString('<div class="only-piped-fields">middle_name,group_one,</div>', $output);
+        $this->assertStringContainsString('<div class="except-piped-fields">first_name,last_name,group_two,</div>', $output);
+    }
+
+    #[Test]
     public function it_dynamically_renders_fields_with_form_handle()
     {
         foreach (['contact', 'contact-form', 'kontakt_formular'] as $handle) {

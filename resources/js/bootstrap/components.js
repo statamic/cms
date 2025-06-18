@@ -56,6 +56,7 @@ import ConfirmationModal from '../components/modals/ConfirmationModal.vue';
 import FavoriteCreator from '../components/FavoriteCreator.vue';
 import KeyboardShortcutsModal from '../components/modals/KeyboardShortcutsModal.vue';
 import FieldActionModal from '../components/field-actions/FieldActionModal.vue';
+import ElevatedSessionModal from '../components/modals/ElevatedSessionModal.vue';
 import ResourceDeleter from '../components/ResourceDeleter.vue';
 import Stack from '../components/stacks/Stack.vue';
 import StackTest from '../components/stacks/StackTest.vue';
@@ -147,6 +148,7 @@ export default function registerGlobalComponents(app) {
     app.component('keyboard-shortcuts-modal', KeyboardShortcutsModal);
     app.component('resource-deleter', ResourceDeleter);
     app.component('field-action-modal', FieldActionModal);
+    app.component('elevated-session-modal', ElevatedSessionModal);
 
     app.component('stack', Stack);
     app.component('stack-test', StackTest);

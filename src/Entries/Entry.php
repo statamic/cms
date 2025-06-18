@@ -88,6 +88,12 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         $this->supplements = collect();
     }
 
+    public function __clone()
+    {
+        $this->data = clone $this->data;
+        $this->supplements = clone $this->supplements;
+    }
+
     public function id($id = null)
     {
         return $this->fluentlyGetOrSet('id')->args(func_get_args());
@@ -636,6 +642,11 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
         }
 
         return $this->blueprint()->field('date')->fieldtype()->secondsEnabled();
+    }
+
+    public function hasExplicitDate(): bool
+    {
+        return $this->hasDate() && $this->date;
     }
 
     public function sites()

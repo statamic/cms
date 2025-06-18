@@ -17,6 +17,7 @@ use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 #[Group('user')]
+#[Group('2fa')]
 class FileUserTest extends TestCase
 {
     use PermissibleContractTests, PreventSavingStacheItemsToDisk, UserContractTests;
@@ -167,5 +168,23 @@ class FileUserTest extends TestCase
         $user->addToGroup(['a', 'b', 'c']);
 
         $this->assertEquals(['a', 'b', 'c'], $user->get('groups'));
+    }
+
+    #[Test]
+    public function it_clones_internal_collections()
+    {
+        $user = $this->user();
+        $user->set('foo', 'A');
+        $user->setSupplement('bar', 'A');
+
+        $clone = clone $user;
+        $clone->set('foo', 'B');
+        $clone->setSupplement('bar', 'B');
+
+        $this->assertEquals('A', $user->get('foo'));
+        $this->assertEquals('B', $clone->get('foo'));
+
+        $this->assertEquals('A', $user->getSupplement('bar'));
+        $this->assertEquals('B', $clone->getSupplement('bar'));
     }
 }

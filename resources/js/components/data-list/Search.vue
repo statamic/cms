@@ -3,7 +3,7 @@
         type="text"
         ref="input"
         :placeholder="__(placeholder)"
-        :value="value"
+        :value="modelValue"
         @input="emitEvent"
         @keyup.esc="reset"
         autofocus
@@ -15,14 +15,12 @@
 import debounce from '@statamic/util/debounce.js';
 
 export default {
-    props: ['value'],
-
     props: {
         placeholder: {
             type: String,
             default: 'Search...',
         },
-        value: {
+        modelValue: {
             type: String,
             default: '',
         },
@@ -30,11 +28,11 @@ export default {
 
     methods: {
         emitEvent: debounce(function (event) {
-            this.$emit('input', event.target.value);
+            this.$emit('update:model-value', event.target.value);
         }, 300),
 
         reset() {
-            this.$emit('input', '');
+            this.$emit('update:model-value', '');
         },
 
         focus() {

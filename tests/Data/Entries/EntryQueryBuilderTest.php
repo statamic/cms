@@ -9,6 +9,8 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
+use Statamic\Query\Exceptions\MultipleRecordsFoundException;
+use Statamic\Query\Exceptions\RecordsNotFoundException;
 use Statamic\Query\Scopes\Scope;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -766,10 +768,131 @@ class EntryQueryBuilderTest extends TestCase
     {
         $this->createDummyCollectionAndEntries();
 
-        $count = 0;
-        Entry::query()->chunk(2, function ($entries) use (&$count) {
-            $this->assertCount($count++ == 0 ? 2 : 1, $entries);
+        $chunks = 0;
+
+        Entry::query()->chunk(2, function ($entries, $page) use (&$chunks) {
+            if ($page === 1) {
+                $this->assertCount(2, $entries);
+                $this->assertEquals(['Post 1', 'Post 2'], $entries->map->title->all());
+            } else {
+                $this->assertCount(1, $entries);
+                $this->assertEquals(['Post 3'], $entries->map->title->all());
+            }
+
+            $chunks++;
         });
+
+        $this->assertEquals(2, $chunks);
+    }
+
+    #[Test]
+    public function entries_are_found_using_chunk_with_limits_where_limit_is_less_than_total()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $chunks = 0;
+
+        Entry::query()->limit(2)->chunk(1, function ($entries, $page) use (&$chunks) {
+            if ($page === 1) {
+                $this->assertCount(1, $entries);
+                $this->assertEquals(['Post 1'], $entries->map->title->all());
+            } else {
+                $this->assertCount(1, $entries);
+                $this->assertEquals(['Post 2'], $entries->map->title->all());
+            }
+
+            $chunks++;
+        });
+
+        $this->assertEquals(2, $chunks);
+    }
+
+    #[Test]
+    public function entries_are_found_using_chunk_with_limits_where_limit_is_more_than_total()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $chunks = 0;
+
+        Entry::query()->limit(10)->chunk(2, function ($entries, $page) use (&$chunks) {
+            if ($page === 1) {
+                $this->assertCount(2, $entries);
+                $this->assertEquals(['Post 1', 'Post 2'], $entries->map->title->all());
+            } elseif ($page === 2) {
+                $this->assertCount(1, $entries);
+                $this->assertEquals(['Post 3'], $entries->map->title->all());
+            } else {
+                $this->fail('Should have had two pages.');
+            }
+
+            $chunks++;
+        });
+
+        $this->assertEquals(2, $chunks);
+    }
+
+    #[Test]
+    public function entries_are_found_using_chunk_with_offset()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $chunks = 0;
+
+        Entry::query()->offset(1)->chunk(2, function ($entries, $page) use (&$chunks) {
+            if ($page === 1) {
+                $this->assertCount(2, $entries);
+                $this->assertEquals(['Post 2', 'Post 3'], $entries->map->title->all());
+            } else {
+                $this->fail('Should only have had one page.');
+            }
+
+            $chunks++;
+        });
+
+        $this->assertEquals(1, $chunks);
+    }
+
+    #[Test]
+    public function entries_are_found_using_chunk_with_offset_where_more_than_total()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $chunks = 0;
+
+        Entry::query()->offset(3)->chunk(2, function ($entries, $page) use (&$chunks) {
+            $chunks++;
+        });
+
+        $this->assertEquals(0, $chunks);
+    }
+
+    #[Test]
+    public function entries_are_found_using_chunk_with_limits_and_offsets()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        EntryFactory::id('id-4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4'])->create();
+        EntryFactory::id('id-5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5'])->create();
+        EntryFactory::id('id-6')->slug('post-6')->collection('posts')->data(['title' => 'Post 6'])->create();
+        EntryFactory::id('id-7')->slug('post-7')->collection('posts')->data(['title' => 'Post 7'])->create();
+
+        $chunks = 0;
+
+        Entry::query()->orderBy('id', 'asc')->offset(2)->limit(3)->chunk(2, function ($entries, $page) use (&$chunks) {
+            if ($page === 1) {
+                $this->assertCount(2, $entries);
+                $this->assertEquals(['Post 3', 'Post 4'], $entries->map->title->all());
+            } elseif ($page === 2) {
+                $this->assertCount(1, $entries);
+                $this->assertEquals(['Post 5'], $entries->map->title->all());
+            } else {
+                $this->fail('Should only have had two pages.');
+            }
+
+            $chunks++;
+        });
+
+        $this->assertEquals(2, $chunks);
     }
 
     #[Test]
@@ -921,6 +1044,112 @@ class EntryQueryBuilderTest extends TestCase
             'post-3',
             'thing-2',
         ], Entry::query()->where('type', 'b')->pluck('slug')->all());
+    }
+
+    #[Test]
+    public function entry_can_be_found_using_first_or_fail()
+    {
+        Collection::make('posts')->save();
+        $entry = EntryFactory::collection('posts')->id('hoff')->slug('david-hasselhoff')->data(['title' => 'David Hasselhoff'])->create();
+
+        $firstOrFail = Entry::query()
+            ->where('collection', 'posts')
+            ->where('id', 'hoff')
+            ->firstOrFail();
+
+        $this->assertSame($entry, $firstOrFail);
+    }
+
+    #[Test]
+    public function exception_is_thrown_when_entry_does_not_exist_using_first_or_fail()
+    {
+        $this->expectException(RecordsNotFoundException::class);
+
+        Entry::query()
+            ->where('collection', 'posts')
+            ->where('id', 'ze-hoff')
+            ->firstOrFail();
+    }
+
+    #[Test]
+    public function entry_can_be_found_using_first_or()
+    {
+        Collection::make('posts')->save();
+        $entry = EntryFactory::collection('posts')->id('hoff')->slug('david-hasselhoff')->data(['title' => 'David Hasselhoff'])->create();
+
+        $firstOrFail = Entry::query()
+            ->where('collection', 'posts')
+            ->where('id', 'hoff')
+            ->firstOr(function () {
+                return 'fallback';
+            });
+
+        $this->assertSame($entry, $firstOrFail);
+    }
+
+    #[Test]
+    public function callback_is_called_when_entry_does_not_exist_using_first_or()
+    {
+        $firstOrFail = Entry::query()
+            ->where('collection', 'posts')
+            ->where('id', 'hoff')
+            ->firstOr(function () {
+                return 'fallback';
+            });
+
+        $this->assertSame('fallback', $firstOrFail);
+    }
+
+    #[Test]
+    public function sole_entry_is_returned()
+    {
+        Collection::make('posts')->save();
+        $entry = EntryFactory::collection('posts')->id('hoff')->slug('david-hasselhoff')->data(['title' => 'David Hasselhoff'])->create();
+
+        $sole = Entry::query()
+            ->where('collection', 'posts')
+            ->where('id', 'hoff')
+            ->sole();
+
+        $this->assertSame($entry, $sole);
+    }
+
+    #[Test]
+    public function exception_is_thrown_by_sole_when_multiple_entries_are_returned_from_query()
+    {
+        Collection::make('posts')->save();
+        EntryFactory::collection('posts')->id('hoff')->slug('david-hasselhoff')->data(['title' => 'David Hasselhoff'])->create();
+        EntryFactory::collection('posts')->id('smoff')->slug('joe-hasselsmoff')->data(['title' => 'Joe Hasselsmoff'])->create();
+
+        $this->expectException(MultipleRecordsFoundException::class);
+
+        Entry::query()
+            ->where('collection', 'posts')
+            ->sole();
+    }
+
+    #[Test]
+    public function exception_is_thrown_by_sole_when_no_entries_are_returned_from_query()
+    {
+        $this->expectException(RecordsNotFoundException::class);
+
+        Entry::query()
+            ->where('collection', 'posts')
+            ->sole();
+    }
+
+    #[Test]
+    public function exists_returns_true_when_results_are_found()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $this->assertTrue(Entry::query()->exists());
+    }
+
+    #[Test]
+    public function exists_returns_false_when_no_results_are_found()
+    {
+        $this->assertFalse(Entry::query()->exists());
     }
 }
 

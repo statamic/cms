@@ -151,6 +151,8 @@ class RoutesTest extends TestCase
                 });
 
             });
+
+            Route::statamic('/callables-test', 'auth');
         });
     }
 
@@ -595,6 +597,17 @@ class RoutesTest extends TestCase
         $this->get('/basic-route-with-data')
             ->assertOk()
             ->assertSee('Custom layout');
+    }
+
+    #[Test]
+    public function it_checks_for_closure_instances_instead_of_callables()
+    {
+        $this->viewShouldReturnRaw('auth', 'Hello, world.');
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+
+        $this->get('/callables-test')
+            ->assertOk()
+            ->assertSee('Hello, world.');
     }
 }
 
