@@ -139,6 +139,52 @@ class UrlTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('replaceSlugProvider')]
+    public function it_replaces_the_slug_at_the_end_of_a_url($url, $replaced)
+    {
+        $this->assertSame($replaced, URL::replaceSlug($url, 'bar'));
+
+        URL::enforceTrailingSlashes();
+
+        $replaced = preg_replace('/localhost$/', 'localhost/', $replaced);
+        $replaced = str_replace('bar', 'bar/', $replaced);
+
+        $this->assertSame($replaced, URL::replaceSlug($url, 'bar'));
+    }
+
+    public static function replaceSlugProvider()
+    {
+        return [
+            'relative homepage should have no slug' => ['/', '/'],
+            'absolute homepage should have no slug' => ['http://localhost', 'http://localhost'],
+            'absolute homepage with trailing slash should have no slug' => ['http://localhost/', 'http://localhost'],
+
+            'relative route to slug' => ['/foo', '/bar'],
+            'relative route to slug with trailing slash' => ['/foo/', '/bar'],
+            'absolute route to slug' => ['http://localhost/foo', 'http://localhost/bar'],
+            'absolute route to slug with trailing slash' => ['http://localhost/foo/', 'http://localhost/bar'],
+
+            'relative nested route to slug' => ['/entries/foo', '/entries/bar'],
+            'relative nested route to slug with trailing slash' => ['/entries/foo/', '/entries/bar'],
+            'absolute nested route to slug' => ['http://localhost/entries/foo', 'http://localhost/entries/bar'],
+            'absolute nested route to slug with trailing slash' => ['http://localhost/entries/bar', 'http://localhost/entries/bar'],
+
+            'removes query from relative url' => ['/entries/foo?alpha', '/entries/bar?alpha'],
+            'removes query from relative url with trailing slash' => ['/entries/foo/?alpha', '/entries/bar?alpha'],
+            'removes query from absolute url' => ['http://localhost/entries/foo?alpha', 'http://localhost/entries/bar?alpha'],
+            'removes query from absolute url with trailing slash' => ['http://localhost/entries/foo/?alpha', 'http://localhost/entries/bar?alpha'],
+            'removes anchor fragment from relative url' => ['/entries/foo#alpha', '/entries/bar#alpha'],
+            'removes anchor fragment from relative url with trailing slash' => ['/entries/foo/#alpha', '/entries/bar#alpha'],
+            'removes anchor fragment from absolute url' => ['http://localhost/entries/foo#alpha', 'http://localhost/entries/bar#alpha'],
+            'removes anchor fragment from absolute url with trailing slash' => ['http://localhost/entries/foo/#alpha', 'http://localhost/entries/bar#alpha'],
+            'removes query and anchor fragment from relative url' => ['/entries/foo?alpha#beta', '/entries/bar?alpha#beta'],
+            'removes query and anchor fragment from relative url with trailing slash' => ['/entries/foo/?alpha#beta', '/entries/bar?alpha#beta'],
+            'removes query and anchor fragment from absolute url' => ['http://localhost/entries/foo?alpha#beta', 'http://localhost/entries/bar?alpha#beta'],
+            'removes query and anchor fragment from absolute url with trailing slash' => ['http://localhost/entries/foo/?alpha#beta', 'http://localhost/entries/bar?alpha#beta'],
+        ];
+    }
+
+    #[Test]
     #[DataProvider('parentProvider')]
     public function it_gets_the_parent_url($child, $parent)
     {
