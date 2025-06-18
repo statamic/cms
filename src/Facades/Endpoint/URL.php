@@ -68,7 +68,7 @@ class URL
     }
 
     /**
-     * Swaps the slug of a $url with the $slug provided.
+     * Replace the slug at the end of a URL with the provided slug.
      *
      * @param  string  $url  URL to modify
      * @param  string  $slug  New slug to use
@@ -76,7 +76,20 @@ class URL
      */
     public function replaceSlug($url, $slug)
     {
-        return Path::replaceSlug($url, $slug);
+        if (parse_url(Str::ensureRight($url, '/'))['path'] === '/') {
+            return self::tidy($url);
+        }
+
+        $parts = str($url)
+            ->split(pattern: '/([?#])/', flags: PREG_SPLIT_DELIM_CAPTURE)
+            ->all();
+
+        $url = Str::removeRight(array_shift($parts), '/');
+        $queryAndFragments = implode($parts);
+
+        $url = self::tidy(Path::replaceSlug($url, $slug));
+
+        return $url.$queryAndFragments;
     }
 
     /**
