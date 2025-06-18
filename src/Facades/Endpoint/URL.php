@@ -41,11 +41,9 @@ class URL
      *
      * @param mixed string  Open ended number of arguments
      */
-    public function assemble($args): string
+    public function assemble(...$segments): string
     {
-        $args = func_get_args();
-
-        return Path::assemble($args);
+        return self::tidy(Path::assemble($segments));
     }
 
     /**
