@@ -140,7 +140,7 @@ class URL
      */
     public function prependSiteUrl($url, $locale = null, $controller = true)
     {
-        $prepend = Config::getSiteUrl($locale);
+        $prepend = Str::removeRight(Config::getSiteUrl($locale), '/');
 
         // If we don't want the front controller, we'll have to strip
         // it out since it should be in the site URL already.
