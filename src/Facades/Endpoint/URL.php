@@ -40,9 +40,8 @@ class URL
      * Assembles a URL from an ordered list of segments.
      *
      * @param mixed string  Open ended number of arguments
-     * @return string
      */
-    public function assemble($args)
+    public function assemble($args): string
     {
         $args = func_get_args();
 
@@ -53,9 +52,8 @@ class URL
      * Get the slug at the end of a URL.
      *
      * @param  string  $url  URL to parse
-     * @return string
      */
-    public function slug($url)
+    public function slug($url): ?string
     {
         $url = Str::ensureRight(self::removeQueryAndFragment($url), '/');
 
@@ -71,9 +69,8 @@ class URL
      *
      * @param  string  $url  URL to modify
      * @param  string  $slug  New slug to use
-     * @return string
      */
-    public function replaceSlug($url, $slug)
+    public function replaceSlug($url, $slug): string
     {
         if (parse_url(Str::ensureRight($url, '/'))['path'] === '/') {
             return self::tidy($url);
@@ -95,9 +92,8 @@ class URL
      * Get the parent URL.
      *
      * @param  string  $url
-     * @return string
      */
-    public function parent($url)
+    public function parent($url): string
     {
         $url = Str::ensureRight(self::removeQueryAndFragment($url), '/');
 
@@ -113,7 +109,7 @@ class URL
     /**
      * Checks if one URL is an ancestor of another.
      */
-    public function isAncestorOf($child, $ancestor)
+    public function isAncestorOf($child, $ancestor): bool
     {
         $child = Str::ensureRight(self::removeQueryAndFragment($child), '/');
         $ancestor = Str::ensureRight(self::removeQueryAndFragment($ancestor), '/');
@@ -131,9 +127,8 @@ class URL
      * @param  string  $url
      * @param  string|null  $locale
      * @param  bool  $controller
-     * @return string
      */
-    public function prependSiteRoot($url, $locale = null, $controller = true)
+    public function prependSiteRoot($url, $locale = null, $controller = true): string
     {
         // Backwards compatibility fix:
         // 2.1 added the $locale argument in the second position to match prependSiteurl.
@@ -154,9 +149,8 @@ class URL
      * @param  string  $url
      * @param  string|null  $locale
      * @param  bool  $controller
-     * @return string
      */
-    public function prependSiteUrl($url, $locale = null, $controller = true)
+    public function prependSiteUrl($url, $locale = null, $controller = true): string
     {
         $prepend = Str::removeRight(Config::getSiteUrl($locale), '/');
 
@@ -175,9 +169,8 @@ class URL
      * Removes the site root url from the beginning of a URL.
      *
      * @param  string  $url
-     * @return string
      */
-    public function removeSiteUrl($url)
+    public function removeSiteUrl($url): string
     {
         return preg_replace('#^'.Config::getSiteUrl().'#', '/', $url);
     }
@@ -221,10 +214,8 @@ class URL
 
     /**
      * Get the current URL.
-     *
-     * @return string
      */
-    public function getCurrent()
+    public function getCurrent(): string
     {
         return self::format(app('request')->path());
     }
@@ -233,9 +224,8 @@ class URL
      * Formats a URL properly.
      *
      * @param  string  $url
-     * @return string
      */
-    public function format($url)
+    public function format($url): string
     {
         return self::tidy('/'.trim($url, '/'));
     }
@@ -244,9 +234,8 @@ class URL
      * Checks whether a URL is external or not.
      *
      * @param  string  $url
-     * @return bool
      */
-    public function isExternal($url)
+    public function isExternal($url): bool
     {
         if (isset(self::$externalUriCache[$url])) {
             return self::$externalUriCache[$url];
@@ -277,10 +266,8 @@ class URL
 
     /**
      * Get the current site url from Apache headers.
-     *
-     * @return string
      */
-    public function getSiteUrl()
+    public function getSiteUrl(): string
     {
         $rootUrl = url()->to('/');
 
@@ -291,9 +278,8 @@ class URL
      * Encode a URL.
      *
      * @param  string  $url
-     * @return string
      */
-    public function encode($url)
+    public function encode($url): string
     {
         $dont_encode = [
             '%2F' => '/',
@@ -320,9 +306,8 @@ class URL
      *
      * @param  string  $email
      * @param  int  $size
-     * @return string
      */
-    public function gravatar($email, $size = null)
+    public function gravatar($email, $size = null): string
     {
         $url = 'https://www.gravatar.com/avatar/'.e(md5(strtolower($email)));
 
@@ -337,9 +322,8 @@ class URL
      * Remove query and fragment from end of URL.
      *
      * @param  string  $url
-     * @return string
      */
-    public function removeQueryAndFragment($url)
+    public function removeQueryAndFragment($url): string
     {
         $url = Str::before($url, '?'); // Remove query params
         $url = Str::before($url, '#'); // Remove anchor fragment
