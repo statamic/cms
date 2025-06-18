@@ -228,11 +228,11 @@ class URL
             return false;
         }
 
+        $url = Str::ensureRight($url, '/');
+
         if (Str::startsWith($url, ['/', '?', '#'])) {
             return self::$externalSiteUriCache[$url] = false;
         }
-
-        $url = Str::ensureRight($url, '/');
 
         $isExternal = ! Str::startsWith($url, Str::ensureRight(Site::current()->absoluteUrl(), '/'));
 
@@ -252,11 +252,11 @@ class URL
             return false;
         }
 
+        $url = Str::ensureRight($url, '/');
+
         if (Str::startsWith($url, ['/', '?', '#'])) {
             return self::$externalAppUriCache[$url] = false;
         }
-
-        $url = Str::ensureRight($url, '/');
 
         self::$siteUrlsCache ??= Site::all()
             ->map->url()
