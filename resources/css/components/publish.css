@@ -37,6 +37,8 @@ code.parent-url {
         padding: 0 0 3px 0;
     }
 }
+
+
 /* GROUP PUBLISH COMPONENT / FIELDS
 =================================================== */
 .publish-fields,
@@ -63,6 +65,8 @@ code.parent-url {
     .field-w-75  { --col-span: calc(var(--grid-columns) * 0.75); }
     .field-w-undefined, .field-w-100 { --col-span: calc(var(--grid-columns) * 1); }
 }
+
+
 /* GROUP PUBLISH COMPONENT / FIELD GRID (e.g. BLUEPRINT)
 =================================================== */
 .field-grid {
@@ -70,6 +74,33 @@ code.parent-url {
         grid-column: span var(--col-span, var(--grid-columns));
     }
 }
+
+
+/* GROUP PUBLISH COMPONENT / FIELDS / FLUID
+=================================================== */
+/* =Jay. Use this class if the fields should be fluid and fill the remaining space e.g. /cp/collections/pages/edit.
+Here flexbox is much better suited to create a layout that grows to fill space. */
+.publish-fields-fluid {
+    @apply gap-2;
+
+    display: flex;
+    flex-wrap: wrap;
+    > * {
+        flex-grow: 1;
+    }
+
+    @variant lg {
+    /* Here we have to cut short the proper width very slightly to account for the gap value. Because we're using flex-grow it should be pretty unnoticeable */
+        .field-w-25  { flex-basis: 24.5%; }
+        .field-w-33  { flex-basis: 32.5%; }
+        .field-w-50  { flex-basis: 49.4%; }
+        .field-w-66  { flex-basis: 66.1%; }
+        .field-w-75  { flex-basis: 74.5%; }
+        .field-w-undefined, .field-w-100 { flex-basis: 100%; }
+    }
+}
+
+
 /* GROUP PUBLISH COMPONENT / FIELD
 =================================================== */
 .publish-field {
