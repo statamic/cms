@@ -7,10 +7,11 @@ use Statamic\Fields\Blueprint;
 
 class PublishForm implements Responsable
 {
-    public string $icon = '';
-    public string $title = '';
+    private string $icon = '';
+    private string $title = '';
     private array $values = [];
     private $parent = null;
+    private bool $readOnly = false;
     private string $submitUrl;
     private string $submitMethod = 'PATCH';
 
@@ -51,6 +52,13 @@ class PublishForm implements Responsable
         return $this;
     }
 
+    public function readOnly(bool $readOnly = true): self
+    {
+        $this->readOnly = $readOnly;
+
+        return $this;
+    }
+
     public function submittingTo(string $url, string $method = 'PATCH'): self
     {
         $this->submitUrl = $url;
@@ -81,14 +89,21 @@ class PublishForm implements Responsable
             ->addValues($this->values)
             ->preProcess();
 
-        return view('statamic::publish.form', [
+        $viewData = [
             'blueprint' => $this->blueprint->toPublishArray(),
             'icon' => $this->icon,
             'title' => $this->title,
             'values' => $fields->values(),
             'meta' => $fields->meta(),
+            'readOnly' => $this->readOnly,
             'submitUrl' => $this->submitUrl,
             'submitMethod' => $this->submitMethod,
-        ]);
+        ];
+
+        if ($request->wantsJson()) {
+            return $viewData;
+        }
+
+        return view('statamic::publish.form', $viewData);
     }
 }

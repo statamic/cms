@@ -9,5 +9,6 @@
         :initial-meta="{{ Js::from($meta) }}"
         submit-url="{{ $submitUrl }}"
         submit-method="{{ $submitMethod }}"
+        :read-only="{{ Js::from($readOnly) }}"
     ></ui-publish-form>
 @endsection

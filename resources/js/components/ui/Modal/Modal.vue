@@ -2,9 +2,13 @@
 import { cva } from 'cva';
 import { hasComponent } from '@statamic/composables/has-component.js';
 import { DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle, DialogTrigger } from 'reka-ui';
+import { getCurrentInstance, ref, watch } from 'vue';
+
+const emit = defineEmits(['update:open']);
 
 const props = defineProps({
     title: { type: String, default: '' },
+    open: { type: Boolean, default: false },
 });
 
 const hasModalTitleComponent = hasComponent('ModalTitle');
@@ -22,10 +26,32 @@ const modalClasses = cva({
         'slide-in-from-top-2',
     ],
 })({});
+
+const instance = getCurrentInstance();
+const isUsingOpenProp = instance && 'open' in instance.vnode.props;
+
+const open = ref(props.open);
+
+watch(
+    () => props.open,
+    (value) => open.value = value,
+);
+
+// When the parent component controls the open state, emit an update event
+// so it can update its state, which eventually gets passed down as a prop.
+// Otherwise, just update the local state.
+function updateOpen(value) {
+    if (isUsingOpenProp) {
+        emit('update:open', value);
+        return;
+    }
+
+    open.value = value;
+}
 </script>
 
 <template>
-    <DialogRoot>
+    <DialogRoot :open @update:open="updateOpen">
         <DialogTrigger data-ui-modal-trigger>
             <slot name="trigger" />
         </DialogTrigger>

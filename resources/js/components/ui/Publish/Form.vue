@@ -37,6 +37,10 @@ const props = defineProps({
         type: String,
         default: 'patch',
     },
+    readOnly: {
+        type: Boolean,
+        default: false,
+    }
 });
 
 const containerName = Statamic.$slug.separatedBy('_').create(props.title);
@@ -77,7 +81,7 @@ onUnmounted(() => saveKeyBinding.destroy());
 
 <template>
     <Header :title="title" :icon="icon">
-        <Button variant="primary" text="Save" @click="save" :disabled="saving" />
+        <Button v-if="!readOnly" variant="primary" text="Save" @click="save" :disabled="saving" />
     </Header>
     <Container
         ref="container"
@@ -86,6 +90,7 @@ onUnmounted(() => saveKeyBinding.destroy());
         :values="values"
         :meta="meta"
         :errors="errors"
+        :read-only="readOnly"
         @updated="values = $event"
     >
         <Tabs />

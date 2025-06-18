@@ -14,6 +14,7 @@
                 :is-dirty="isDirty"
                 @started="actionStarted"
                 @completed="actionCompleted"
+                v-slot="{ actions: itemActions }"
             >
                 <Dropdown v-if="canEditBlueprint || hasItemActions">
                     <template #trigger>
@@ -164,7 +165,7 @@
                             <LocalizationsCard
                                 v-if="showLocalizationSelector"
                                 :localizations
-                                :localizing
+                                :localizing="localizing !== null"
                                 @selected="localizationSelected"
                             />
                         </div>
@@ -232,8 +233,8 @@
             <div class="publish-fields">
                 <div class="form-group publish-field field-w-full">
                     <label v-text="__('Origin')" />
-                    <div class="help-block -mt-2" v-text="__('messages.entry_origin_instructions')"></div>
-                    <select-input v-model="selectedOrigin" :options="originOptions" :placeholder="false" />
+                    <div class="help-block mt-2" v-text="__('messages.entry_origin_instructions')"></div>
+                    <Select class="w-full" v-model="selectedOrigin" :options="originOptions" :placeholder="false" />
                 </div>
             </div>
         </confirmation-modal>
@@ -266,6 +267,7 @@ import {
     StatusIndicator,
     Subheading,
     Switch,
+    Select,
 } from '@statamic/ui';
 import PublishContainer from '@statamic/components/ui/Publish/Container.vue';
 import PublishTabs from '@statamic/components/ui/Publish/Tabs.vue';
@@ -308,6 +310,7 @@ export default {
         StatusIndicator,
         Subheading,
         Switch,
+        Select,
     },
 
     props: {
@@ -625,7 +628,7 @@ export default {
 
             this.$dirty.remove(this.publishContainer);
 
-            this.localizing = localization.handle;
+            this.localizing = localization;
 
             if (localization.exists) {
                 this.editLocalization(localization);
