@@ -2,7 +2,6 @@
 
 namespace Statamic\Facades\Endpoint;
 
-use Statamic\Data\Services\ContentService;
 use Statamic\Facades\Config;
 use Statamic\Facades\Path;
 use Statamic\Facades\Pattern;
@@ -314,19 +313,6 @@ class URL
         ];
 
         return strtr(rawurlencode($url), $dont_encode);
-    }
-
-    /**
-     * Given a localized URI, get the default URI.
-     *
-     * @param  string  $locale  The locale of the provided URI
-     * @param  string  $uri  The URI from which to find the default
-     */
-    public function getDefaultUri($locale, $uri)
-    {
-        return $uri; // TODO
-
-        return app(ContentService::class)->defaultUri($locale, $uri);
     }
 
     /**
