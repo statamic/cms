@@ -9,6 +9,7 @@
                 :is-dirty="isDirty"
                 @started="actionStarted"
                 @completed="actionCompleted"
+                v-slot="{ actions: itemActions }"
             >
                 <Dropdown>
                     <template #trigger>

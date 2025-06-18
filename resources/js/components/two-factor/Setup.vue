@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue';
 import LoadingGraphic from '@statamic/components/LoadingGraphic.vue';
 import TwoFactorRecoveryCodesModal from '@statamic/components/two-factor/RecoveryCodesModal.vue';
 import axios from 'axios';
+import { Modal, Input, Button } from '@statamic/ui';
 
 const emit = defineEmits(['setup-complete', 'cancel', 'cancel']);
 
@@ -52,21 +53,14 @@ function complete() {
 </script>
 
 <template>
-    <modal v-if="setupModalOpen" name="two-factor-setup" @closed="$emit('cancel')">
+    <Modal v-if="setupModalOpen" :title="__('Set up Two Factor Authentication')" :open="true" @update:model-value="$emit('cancel')">
         <div>
             <div v-if="loading" class="absolute inset-0 z-200 flex items-center justify-center text-center">
                 <loading-graphic />
             </div>
 
             <template v-else>
-                <div class="-max-h-screen-px">
-                    <div
-                        class="flex items-center justify-between rounded-t-lg border-b bg-gray-200 px-5 py-3 text-lg font-semibold dark:border-dark-900 dark:bg-dark-550"
-                    >
-                        {{ __('Set up Two Factor Authentication') }}
-                    </div>
-                </div>
-                <div class="p-5">
+                <div>
                     <p class="mb-6">{{ __('statamic::messages.two_factor_setup_instructions') }}</p>
 
                     <div class="flex justify-center space-x-6">
@@ -82,9 +76,7 @@ function complete() {
                             >
                                 {{ __('Verification Code') }}
                             </label>
-                            <input
-                                type="text"
-                                class="input-text"
+                            <Input
                                 name="code"
                                 pattern="[0-9]*"
                                 maxlength="6"
@@ -97,24 +89,25 @@ function complete() {
                         </div>
                     </div>
                 </div>
-                <div
-                    class="flex items-center justify-end border-t bg-gray-200 p-4 text-sm dark:border-dark-900 dark:bg-dark-550"
-                >
-                    <button
-                        class="text-gray hover:text-gray-900 dark:text-dark-150 dark:hover:text-dark-100"
-                        @click="$emit('close')"
-                        v-text="__('Cancel')"
-                    />
-                    <button
-                        class="btn-primary ltr:ml-4 rtl:mr-4"
-                        :disabled="!code"
-                        @click="confirm"
-                        v-text="__('Confirm')"
-                    />
-                </div>
             </template>
         </div>
-    </modal>
+
+        <template #footer>
+            <div class="flex items-center justify-end space-x-3 pt-3 pb-1">
+                <Button
+                    variant="ghost"
+                    @click="$emit('close')"
+                    :text="__('Cancel')"
+                />
+                <Button
+                    :disabled="!code"
+                    variant="primary"
+                    @click="confirm"
+                    :text="__('Confirm')"
+                />
+            </div>
+        </template>
+    </Modal>
 
     <TwoFactorRecoveryCodesModal
         v-if="recoveryCodesModalOpen"

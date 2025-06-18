@@ -1,10 +1,8 @@
 <template>
     <div>
-        <div class="flex items-center" v-if="isToggleMode">
-            <toggle-input :model-value="isRevealed" @update:model-value="update" :read-only="isReadOnly" :id="id" />
-            <label v-if="config.input_label" class="font-normal! ms-2" :for="id">
-                {{ __(config.input_label) }}
-            </label>
+        <div class="flex items-center gap-2" v-if="isToggleMode">
+            <Switch :model-value="isRevealed" @update:model-value="update" :read-only="isReadOnly" :id="id" />
+            <Heading v-if="config.input_label" v-html="$markdown(__(config.input_label), { openLinksInNewTabs: true })" />
         </div>
         <Button
             v-else
@@ -19,11 +17,13 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import { Button } from '@/components/ui';
+import { Switch, Heading, Button } from '@/components/ui';
 import { useId } from 'vue'
 
 export default {
     components: {
+        Switch,
+        Heading,
         Button,
     },
 

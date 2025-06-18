@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col gap-4">
+    <div>
         <div
             class="blueprint-section-draggable-zone field-grid gap-2!"
             :data-tab="tabId"

@@ -89,7 +89,7 @@ class PublishForm implements Responsable
             ->addValues($this->values)
             ->preProcess();
 
-        return view('statamic::publish.form', [
+        $viewData = [
             'blueprint' => $this->blueprint->toPublishArray(),
             'icon' => $this->icon,
             'title' => $this->title,
@@ -98,6 +98,12 @@ class PublishForm implements Responsable
             'readOnly' => $this->readOnly,
             'submitUrl' => $this->submitUrl,
             'submitMethod' => $this->submitMethod,
-        ]);
+        ];
+
+        if ($request->wantsJson()) {
+            return $viewData;
+        }
+
+        return view('statamic::publish.form', $viewData);
     }
 }
