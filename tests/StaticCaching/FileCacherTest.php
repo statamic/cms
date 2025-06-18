@@ -304,7 +304,7 @@ class FileCacherTest extends TestCase
         $writer = \Mockery::spy(Writer::class);
         $cache = app(Repository::class);
         $cacher = $this->fileCacher([
-            'path' => public_path('static')
+            'path' => public_path('static'),
         ], $writer, $cache, []);
 
         File::put($cacher->getFilePath('/one'), '');
@@ -314,10 +314,10 @@ class FileCacherTest extends TestCase
 
         $cacher->invalidateUrl('/one', 'http://example.com');
 
-        File::delete($cacher->getFilePath('one'), '');
-        File::delete($cacher->getFilePath('one?foo=bar'), '');
-        File::delete($cacher->getFilePath('onemore'));
-        File::delete($cacher->getFilePath('two'));
+        File::delete($cacher->getFilePath('/one'));
+        File::delete($cacher->getFilePath('/one?foo=bar'));
+        File::delete($cacher->getFilePath('/onemore'));
+        File::delete($cacher->getFilePath('/two'));
 
         $writer->shouldHaveReceived('delete')->times(2);
         $writer->shouldHaveReceived('delete')->with(str_replace('//', '/', $cacher->getFilePath('/one')))->once();
