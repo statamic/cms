@@ -10,6 +10,11 @@ import { Icon } from '@statamic/ui';
 import axios from 'axios';
 import BulkActions from './BulkActions.vue';
 import uniqid from 'uniqid';
+import CustomizeColumns from './CustomizeColumns.vue';
+import Presets from './Presets.vue';
+import Search from './Search.vue';
+import Filters from './Filters.vue';
+import Table from './Table.vue';
 
 const emit = defineEmits(['update:columns', 'update:sortColumn', 'update:sortDirection', 'update:selections']);
 
@@ -359,6 +364,14 @@ autoApplyState();
     <slot name="initializing" v-if="initializing">
         <Icon name="loading" />
     </slot>
-    <slot v-if="!initializing" v-bind="slotProps" />
+    <slot v-if="!initializing" v-bind="slotProps">
+        <Presets />
+        <div class="flex items-center gap-3">
+            <Search />
+            <Filters />
+            <CustomizeColumns />
+        </div>
+        <Table />
+    </slot>
     <BulkActions />
 </template>
