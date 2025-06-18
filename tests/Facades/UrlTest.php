@@ -29,10 +29,11 @@ class UrlTest extends TestCase
     {
         $this->setSiteValue('en', 'url', 'http://site.com/');
 
-        $this->assertEquals(
-            'http://site.com/foo',
-            URL::prependSiteUrl('/foo')
-        );
+        $this->assertEquals('http://site.com/foo', URL::prependSiteUrl('/foo'));
+
+        URL::enforceTrailingSlashes();
+
+        $this->assertEquals('http://site.com/foo/', URL::prependSiteUrl('/foo'));
     }
 
     #[Test]
@@ -40,10 +41,11 @@ class UrlTest extends TestCase
     {
         $this->setSiteValue('en', 'url', 'http://site.com/index.php/');
 
-        $this->assertEquals(
-            'http://site.com/index.php/foo',
-            URL::prependSiteUrl('/foo')
-        );
+        $this->assertEquals('http://site.com/index.php/foo', URL::prependSiteUrl('/foo'));
+
+        URL::enforceTrailingSlashes();
+
+        $this->assertEquals('http://site.com/index.php/foo/', URL::prependSiteUrl('/foo'));
     }
 
     #[Test]
@@ -54,10 +56,11 @@ class UrlTest extends TestCase
 
         $this->setSiteValue('en', 'url', 'http://site.com/index.php/');
 
-        $this->assertEquals(
-            'http://site.com/foo',
-            URL::prependSiteUrl('/foo', null, false)
-        );
+        $this->assertEquals('http://site.com/foo', URL::prependSiteUrl('/foo', null, false));
+
+        URL::enforceTrailingSlashes();
+
+        $this->assertEquals('http://site.com/foo/', URL::prependSiteUrl('/foo', null, false));
     }
 
     #[Test]
