@@ -14,7 +14,9 @@ use Statamic\Support\Str;
 class URL
 {
     private static $enforceTrailingSlashes = false;
-    private static $externalUriCache = [];
+    private static $siteUrlsCache;
+    private static $externalSiteUriCache = [];
+    private static $externalAppUriCache = [];
 
     /**
      * Enforce trailing slashes service provider helper.
@@ -203,8 +205,12 @@ class URL
     public function makeAbsolute($url): string
     {
         // If it doesn't start with a slash, we'll just leave it as-is.
-        if (! Str::startsWith($url, '/')) {
+        if (Str::startsWith($url, ['http:', 'https:']) && self::isExternalToApplication($url)) {
             return $url;
+        }
+
+        if (! Str::startsWith($url, '/')) {
+            return self::tidy($url);
         }
 
         return self::tidy(Str::ensureLeft($url, self::getSiteUrl()));
@@ -229,22 +235,22 @@ class URL
     }
 
     /**
-     * Checks whether a URL is external or not.
+     * Checks whether a URL is external to current site.
      *
      * @param  string  $url
      */
     public function isExternal($url): bool
     {
-        if (isset(self::$externalUriCache[$url])) {
-            return self::$externalUriCache[$url];
+        if (isset(self::$externalSiteUriCache[$url])) {
+            return self::$externalSiteUriCache[$url];
         }
 
         if (! $url) {
             return false;
         }
 
-        if (Str::startsWith($url, ['/', '#'])) {
-            return self::$externalUriCache[$url] = false;
+        if (Str::startsWith($url, ['/', '?', '#'])) {
+            return self::$externalSiteUriCache[$url] = false;
         }
 
         $isExternal = ! Pattern::startsWith(
@@ -252,14 +258,44 @@ class URL
             Site::current()->absoluteUrl()
         );
 
-        self::$externalUriCache[$url] = $isExternal;
-
-        return $isExternal;
+        return self::$externalSiteUriCache[$url] = $isExternal;
     }
 
-    public function clearExternalUrlCache()
+    /**
+     * Checks whether a URL is external to whole Statamic application.
+     *
+     * @param  string  $url
+     */
+    public function isExternalToApplication($url): bool
     {
-        self::$externalUriCache = [];
+        if (isset(self::$externalAppUriCache[$url])) {
+            return self::$externalAppUriCache[$url];
+        }
+
+        if (! $url) {
+            return false;
+        }
+
+        if (Str::startsWith($url, ['/', '?', '#'])) {
+            return self::$externalAppUriCache[$url] = false;
+        }
+
+        self::$siteUrlsCache ??= Site::all()
+            ->map->url()
+            ->filter(fn ($siteUrl) => Str::startsWith($siteUrl, ['http:', 'https:']));
+
+        $isExternal = self::$siteUrlsCache
+            ->filter(fn ($siteUrl) => Str::startsWith($url, $siteUrl))
+            ->isNotEmpty();
+
+        return self::$externalAppUriCache[$url] = $isExternal;
+    }
+
+    public function clearUrlCache()
+    {
+        self::$siteUrlsCache = null;
+        self::$externalSiteUriCache = [];
+        self::$externalAppUriCache = [];
     }
 
     /**
