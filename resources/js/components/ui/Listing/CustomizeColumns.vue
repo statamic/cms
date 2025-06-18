@@ -70,12 +70,10 @@ function reset() {
 
 <template>
     <div>
+        <Tooltip :text="__('Customize Columns')">
+            <Button icon="sliders-vertical" @click="open = true" />
+        </Tooltip>
         <Modal :title="__('Customize Columns')" v-model:open="open">
-            <template #trigger>
-                <Tooltip :text="__('Customize Columns')">
-                    <Button icon="sliders-vertical" />
-                </Tooltip>
-            </template>
             <div class="flex h-full flex-col">
                 <div class="dark:bg-dark-600 flex min-h-0 grow rounded-t-md bg-gray-100">
                     <!-- Available Columns -->
