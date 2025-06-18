@@ -11,7 +11,7 @@ const props = defineProps({
     },
 });
 
-const { actionUrl, refresh } = injectListingContext();
+const { actionUrl, actionContext, refresh } = injectListingContext();
 const busy = ref(false);
 
 watch(busy, (busy) => Statamic.$progress.loading('action', busy));
@@ -38,13 +38,13 @@ function actionFailed(response) {
 <template>
     <ItemActions
         :url="actionUrl"
-        :actions="row.actions"
         :item="row.id"
+        :context="actionContext"
         @started="actionStarted"
         @completed="actionCompleted"
-        v-slot="{ actions }"
+        v-slot="{ actions, loadActions }"
     >
-        <Dropdown placement="left-start" class="me-3">
+        <Dropdown @mouseover="loadActions" placement="left-start" class="me-3">
             <DropdownMenu>
                 <DropdownLabel :text="__('Actions')" />
                 <slot name="prepended-actions" :row="row" />
