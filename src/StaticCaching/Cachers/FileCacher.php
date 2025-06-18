@@ -216,7 +216,7 @@ class FileCacher extends AbstractCacher
             $basename = $slug.'_lqs_'.md5($query).'.html';
         }
 
-        return $this->getCachePath($site).$pathParts['dirname'].'/'.$basename;
+        return $this->getCachePath($site).Str::finish($pathParts['dirname'], '/').$basename;
     }
 
     private function isBasenameTooLong($basename)

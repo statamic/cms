@@ -320,8 +320,8 @@ class FileCacherTest extends TestCase
         File::delete($cacher->getFilePath('/two'));
 
         $writer->shouldHaveReceived('delete')->times(2);
-        $writer->shouldHaveReceived('delete')->with(str_replace('//', '/', $cacher->getFilePath('/one')))->once();
-        $writer->shouldHaveReceived('delete')->with(str_replace('//', '/', $cacher->getFilePath('/one?foo=bar')))->once();
+        $writer->shouldHaveReceived('delete')->with($cacher->getFilePath('/one'))->once();
+        $writer->shouldHaveReceived('delete')->with($cacher->getFilePath('/one?foo=bar'))->once();
     }
 
     #[Test]
