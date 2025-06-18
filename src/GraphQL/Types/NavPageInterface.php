@@ -19,6 +19,8 @@ class NavPageInterface extends InterfaceType
 
     public function fields(): array
     {
+        $this->nav->blueprint()->addGqlTypes();
+
         if ($fields = $this->nav->blueprint()->fields()->toGql()->all()) {
             return $fields;
         }
