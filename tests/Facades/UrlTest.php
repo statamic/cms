@@ -100,6 +100,45 @@ class UrlTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('slugProvider')]
+    public function it_gets_the_slug_at_the_end_of_a_url($url, $slug)
+    {
+        $this->assertSame($slug, URL::slug($url));
+    }
+
+    public static function slugProvider()
+    {
+        return [
+            'relative homepage should have no slug' => ['/', null],
+            'absolute homepage should have no slug' => ['http://localhost', null],
+            'absolute homepage with trailing slash should have no slug' => ['http://localhost/', null],
+
+            'relative route to slug' => ['/foo', 'foo'],
+            'relative route to slug with trailing slash' => ['/foo/', 'foo'],
+            'absolute route to slug' => ['http://localhost/foo', 'foo'],
+            'absolute route to slug with trailing slash' => ['http://localhost/foo/', 'foo'],
+
+            'relative nested route to slug' => ['/entries/foo', 'foo'],
+            'relative nested route to slug with trailing slash' => ['/entries/foo/', 'foo'],
+            'absolute nested route to slug' => ['http://localhost/entries/foo', 'foo'],
+            'absolute nested route to slug with trailing slash' => ['http://localhost/entries/foo/', 'foo'],
+
+            'removes query from relative url' => ['/entries/foo?alpha', 'foo'],
+            'removes query from relative url with trailing slash' => ['/entries/foo/?alpha', 'foo'],
+            'removes query from absolute url' => ['http://localhost/entries/foo?alpha', 'foo'],
+            'removes query from absolute url with trailing slash' => ['http://localhost/entries/foo/?alpha', 'foo'],
+            'removes anchor fragment from relative url' => ['/entries/foo#alpha', 'foo'],
+            'removes anchor fragment from relative url with trailing slash' => ['/entries/foo/#alpha', 'foo'],
+            'removes anchor fragment from absolute url' => ['http://localhost/entries/foo#alpha', 'foo'],
+            'removes anchor fragment from absolute url with trailing slash' => ['http://localhost/entries/foo/#alpha', 'foo'],
+            'removes query and anchor fragment from relative url' => ['/entries/foo?alpha#beta', 'foo'],
+            'removes query and anchor fragment from relative url with trailing slash' => ['/entries/foo/?alpha#beta', 'foo'],
+            'removes query and anchor fragment from absolute url' => ['http://localhost/entries/foo?alpha#beta', 'foo'],
+            'removes query and anchor fragment from absolute url with trailing slash' => ['http://localhost/entries/foo/?alpha#beta', 'foo'],
+        ];
+    }
+
+    #[Test]
     #[DataProvider('parentProvider')]
     public function it_gets_the_parent_url($child, $parent)
     {
