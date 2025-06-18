@@ -364,25 +364,30 @@ class UrlTest extends TestCase
         }
 
         $this->assertSame($expected, URL::makeAbsolute($url));
+
+        URL::enforceTrailingSlashes();
+
+        $this->assertSame(Str::ensureRight($expected, '/'), URL::makeAbsolute($url));
     }
 
     public static function absoluteProvider()
     {
         return [
-            ['http://example.com', 'http://example.com'], // absolute url provided, so url is left alone.
-            ['http://example.com/', 'http://example.com/'], // absolute url provided, so url is left alone.
+            ['http://external.com', 'http://external.com'], // external absolute url provided, so url is left alone.
+            ['http://external.com/', 'http://external.com'], // external absolute url provided, so url is left alone.
+            ['http://absolute-url-resolved-from-request.com/foo', 'http://absolute-url-resolved-from-request.com/foo'], // already absolute, but we can still normalize trailing slashes and scheme
             ['/', 'http://absolute-url-resolved-from-request.com'],
             ['/foo', 'http://absolute-url-resolved-from-request.com/foo'],
             ['/foo/', 'http://absolute-url-resolved-from-request.com/foo'],
 
-            ['http://example.com', 'http://example.com', 'https'], // absolute url provided, so scheme and trailing slash are left alone.
-            ['http://example.com/', 'http://example.com/', 'https'], // absolute url provided, so scheme and trailing slash are left alone.
+            ['http://external.com', 'http://external.com', 'https'], // external absolute url provided, so scheme and trailing slash are left alone.
+            ['http://external.com/', 'http://external.com', 'https'], // external absolute url provided, so scheme and trailing slash are left alone.
             ['/', 'https://absolute-url-resolved-from-request.com', 'https'],
             ['/foo', 'https://absolute-url-resolved-from-request.com/foo', 'https'],
             ['/foo/', 'https://absolute-url-resolved-from-request.com/foo', 'https'],
 
-            ['https://example.com', 'https://example.com', 'http'], // absolute url provided, so scheme and trailing slash are left alone.
-            ['https://example.com/', 'https://example.com/', 'http'], // absolute url provided, so scheme and trailing slash are left alone.
+            ['https://external.com', 'https://external.com', 'http'], // external absolute url provided, so scheme and trailing slash are left alone.
+            ['https://external.com/', 'https://external.com', 'http'], // external absolute url provided, so scheme and trailing slash are left alone.
             ['/', 'http://absolute-url-resolved-from-request.com', 'http'],
             ['/foo', 'http://absolute-url-resolved-from-request.com/foo', 'http'],
             ['/foo/', 'http://absolute-url-resolved-from-request.com/foo', 'http'],
