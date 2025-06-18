@@ -591,6 +591,10 @@ class UrlTest extends TestCase
         $this->assertSame('https://example.com?query', URL::tidy('https://example.com?query'));
         $this->assertSame('https://example.com/foo', URL::parent('https://example.com/foo/bar'));
         $this->assertSame('http://localhost/foo', URL::prependSiteUrl('/foo'));
+        $this->assertSame('/foo', URL::removeSiteUrl('http://localhost/foo'));
+        $this->assertSame('http://absolute-url-resolved-from-request.com/foo?query', URL::makeAbsolute('/foo?query'));
+        $this->assertSame('/foo?query', URL::makeRelative('https://example.com/foo?query'));
+        $this->assertSame('https://example.com/bar?query', URL::assemble('https://example.com', 'bar', '?query'));
         $this->assertSame('https://example.com/bar', URL::replaceSlug('https://example.com/foo', 'bar'));
 
         URL::enforceTrailingSlashes();
@@ -599,6 +603,10 @@ class UrlTest extends TestCase
         $this->assertSame('https://example.com/?query', URL::tidy('https://example.com?query'));
         $this->assertSame('https://example.com/foo/', URL::parent('https://example.com/foo/bar'));
         $this->assertSame('http://localhost/foo/', URL::prependSiteUrl('/foo'));
+        $this->assertSame('/foo/', URL::removeSiteUrl('http://localhost/foo'));
+        $this->assertSame('http://absolute-url-resolved-from-request.com/foo/?query', URL::makeAbsolute('/foo?query'));
+        $this->assertSame('/foo/?query', URL::makeRelative('https://example.com/foo?query'));
+        $this->assertSame('https://example.com/bar/?query', URL::assemble('https://example.com', 'bar', '?query'));
         $this->assertSame('https://example.com/bar/', URL::replaceSlug('https://example.com/foo', 'bar'));
 
         URL::enforceTrailingSlashes(false);
@@ -607,6 +615,10 @@ class UrlTest extends TestCase
         $this->assertSame('https://example.com?query', URL::tidy('https://example.com?query'));
         $this->assertSame('https://example.com/foo', URL::parent('https://example.com/foo/bar'));
         $this->assertSame('http://localhost/foo', URL::prependSiteUrl('/foo'));
+        $this->assertSame('/foo', URL::removeSiteUrl('http://localhost/foo'));
+        $this->assertSame('http://absolute-url-resolved-from-request.com/foo?query', URL::makeAbsolute('/foo?query'));
+        $this->assertSame('/foo?query', URL::makeRelative('https://example.com/foo?query'));
+        $this->assertSame('https://example.com/bar?query', URL::assemble('https://example.com', 'bar', '?query'));
         $this->assertSame('https://example.com/bar', URL::replaceSlug('https://example.com/foo', 'bar'));
     }
 }
