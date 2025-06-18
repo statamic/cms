@@ -72,6 +72,10 @@ const props = defineProps({
         type: String,
         default: null,
     },
+    filters: {
+        type: Array,
+        default: () => [],
+    },
 });
 
 const id = uniqid();
@@ -316,6 +320,7 @@ provideListingContext({
     setSearchQuery,
     clearSearchQuery,
     preferencesPrefix: toRef(() => props.preferencesPrefix),
+    filters: toRef(() => props.filters),
     activeFilters,
     activeFilterBadges,
     setFilter,
