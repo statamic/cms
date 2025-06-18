@@ -7,6 +7,7 @@ use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\Assert;
 use Statamic\Facades\Config;
 use Statamic\Facades\Site;
+use Statamic\Facades\URL;
 use Statamic\Http\Middleware\CP\AuthenticateSession;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
@@ -138,6 +139,8 @@ YAML);
         Site::setSites($sites);
 
         Config::set('statamic.system.multisite', Site::hasMultiple());
+
+        URL::clearUrlCache();
     }
 
     protected function setSiteValue($site, $key, $value)
@@ -145,6 +148,8 @@ YAML);
         Site::setSiteValue($site, $key, $value);
 
         Config::set('statamic.system.multisite', Site::hasMultiple());
+
+        URL::clearUrlCache();
     }
 
     protected function assertEveryItem($items, $callback)
