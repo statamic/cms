@@ -272,13 +272,6 @@ class URL
         return self::$externalAppUriCache[$url] = $isExternalToSites && $isExternalToCurrentRequestDomain;
     }
 
-    public function clearUrlCache()
-    {
-        self::$siteUrlsCache = null;
-        self::$externalSiteUriCache = [];
-        self::$externalAppUriCache = [];
-    }
-
     /**
      * Get the current site url from Apache headers.
      */
@@ -360,5 +353,15 @@ class URL
         }
 
         return $url.$queryAndFragments;
+    }
+
+    /**
+     * Clear URL property caches.
+     */
+    public function clearUrlCache(): void
+    {
+        self::$siteUrlsCache = null;
+        self::$externalSiteUriCache = [];
+        self::$externalAppUriCache = [];
     }
 }
