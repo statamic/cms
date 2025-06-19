@@ -169,7 +169,7 @@ class URL
      */
     public function makeAbsolute(?string $url): string
     {
-        // If it doesn't start with a slash, we'll just leave it as-is.
+        // If URL is external to this Statamic application, we'll just leave it as-is.
         if (self::isAbsolute($url) && self::isExternalToApplication($url)) {
             return $url;
         }
