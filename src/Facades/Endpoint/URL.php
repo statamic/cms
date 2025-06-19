@@ -26,15 +26,22 @@ class URL
     }
 
     /**
-     * Removes occurrences of "//" in a $path (except when part of a protocol).
-     *
-     * Also normalizes trailing slash (configurable via `enforceTrailingSlashes()` function).
-     *
-     * @param  string  $url  URL to remove "//" from
+     * Tidies a URL.
      */
     public function tidy(?string $url): string
     {
-        return self::normalizeTrailingSlash(Path::tidy($url));
+        // Remove occurrences of '//', except when part of protocol.
+        $url = Path::tidy($url);
+
+        // If not an absolute URL, enforce leading slash.
+        if (! self::isAbsolute($url)) {
+            $url = Str::ensureLeft($url, '/');
+        }
+
+        // Trim trailing slash, unless enforced with `enforceTrailingSlashes()`.
+        $url = self::normalizeTrailingSlash($url);
+
+        return $url;
     }
 
     /**
@@ -189,15 +196,7 @@ class URL
      */
     public function getCurrent(): string
     {
-        return self::format(app('request')->path());
-    }
-
-    /**
-     * Formats a URL properly.
-     */
-    public function format(?string $url): string
-    {
-        return self::tidy('/'.trim($url, '/'));
+        return self::tidy(request()->path());
     }
 
     /**

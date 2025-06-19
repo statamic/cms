@@ -25,6 +25,63 @@ class UrlTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('tidyProvider')]
+    public function it_can_tidy_urls($url, $expected)
+    {
+        $this->setSiteValue('en', 'url', 'http://this-site.com/');
+
+        $this->assertSame($expected, URL::tidy($url));
+
+        URL::enforceTrailingSlashes();
+
+        $expected = preg_replace('/this-site\.com$/', 'this-site.com/', $expected);
+        $expected = str_replace('page', 'page/', $expected);
+
+        $this->assertSame($expected, URL::tidy($url));
+    }
+
+    public static function tidyProvider()
+    {
+        return [
+            'null case tidies to relative homepage' => [null, '/'],
+            'relative homepage' => ['/', '/'],
+            'relative homepage enforce slash' => ['', '/'],
+
+            'relative route' => ['/page', '/page'],
+            'relative route enforce leading slash' => ['page', '/page'],
+            'relative route normalizes trailing slash' => ['/page/', '/page'],
+            'relative nested route enforce leading slash' => ['foo/page', '/foo/page'],
+            'relative nested route enforce leading slash with query param' => ['foo/page?query', '/foo/page?query'],
+            'relative nested route enforce leading slash with anchor fragment' => ['foo/page#anchor', '/foo/page#anchor'],
+            'relative nested route enforce leading slash with qauery and anchor fragment' => ['foo/page?query#anchor', '/foo/page?query#anchor'],
+            'relative nested route normalizes trailing slash' => ['foo/page/', '/foo/page'],
+            'relative nested route normalizes trailing slash with query param' => ['/foo/page?query', '/foo/page?query'],
+            'relative nested route normalizes trailing slash with anchor fragment' => ['/foo/page#anchor', '/foo/page#anchor'],
+            'relative nested route normalizes trailing slash with query and anchor fragment' => ['/foo/page?query#anchor', '/foo/page?query#anchor'],
+
+            'absolute url homepage' => ['http://this-site.com', 'http://this-site.com'],
+            'absolute url route' => ['http://this-site.com/page', 'http://this-site.com/page'],
+            'absolute url query' => ['http://this-site.com/page?query', 'http://this-site.com/page?query'],
+            'absolute url anchor' => ['http://this-site.com/page#anchor', 'http://this-site.com/page#anchor'],
+            'absolute url homepage normalizes trailing slash' => ['http://this-site.com/', 'http://this-site.com'],
+            'absolute url route normalizes trailing slash' => ['http://this-site.com/page/', 'http://this-site.com/page'],
+            'absolute url query normalizes trailing slash' => ['http://this-site.com/page/?query', 'http://this-site.com/page?query'],
+            'absolute url anchor normalizes trailing slash' => ['http://this-site.com/page/#anchor', 'http://this-site.com/page#anchor'],
+
+            'fix multiple slashes' => ['////foo///bar////page', '/foo/bar/page'],
+            'fix multiple slashes and enforce leading slash' => ['foo///bar////page', '/foo/bar/page'],
+            'fix multiple slashes and normalize trailing slash' => ['////foo///bar////page///', '/foo/bar/page'],
+            'fixing multiple slashes on absolute url tidies to double slash protocol' => ['http:////this-site.com/foo///bar////page', 'http://this-site.com/foo/bar/page'],
+            'fixing multiple slashes on external url tidies to double slash protocol' => ['http:////external-site.com/foo///bar////page', 'http://external-site.com/foo/bar/page'],
+
+            // TODO: Don't touch trailing slashes on external URLs...
+            // 'external url doesnt touch trailing slash' => ['http://external-site.com/', 'http://external-site.com/'],
+            // 'external nested url doesnt touch trailing slash' => ['http://external-site.com/page/', 'http://external-site.com/page/'],
+            // 'external nested url doesnt touch trailing slash or query fragment' => ['http://external-site.com/page/?query#fragment', 'http://external-site.com/page/?query#fragment'],
+        ];
+    }
+
+    #[Test]
     public function it_prepends_site_url()
     {
         $this->setSiteValue('en', 'url', 'http://site.com/');
