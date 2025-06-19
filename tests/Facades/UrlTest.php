@@ -596,6 +596,24 @@ class UrlTest extends TestCase
     }
 
     #[Test]
+    public function it_can_get_gravatar_image_urls_from_email()
+    {
+        $hashGravatarEmail = function ($email) {
+            return e(md5(strtolower($email)));
+        };
+
+        $this->assertSame(
+            'https://www.gravatar.com/avatar/'.$hashGravatarEmail('Jeremy@pearl.jam'),
+            URL::gravatar('Jeremy@pearl.jam'),
+        );
+
+        $this->assertSame(
+            'https://www.gravatar.com/avatar/'.$hashGravatarEmail('Jeremy@pearl.jam').'?s=32',
+            URL::gravatar('Jeremy@pearl.jam', 32),
+        );
+    }
+
+    #[Test]
     public function it_can_remove_query_and_fragment()
     {
         $this->assertEquals(null, URL::removeQueryAndFragment(null));
