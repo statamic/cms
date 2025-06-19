@@ -1,35 +1,28 @@
 <template>
     <div class="w-full">
-        <div class="flex">
-            <div class="form-group publish-field select-fieldtype field-w-full">
-                <label class="publish-field-label">{{ __('Required') }}</label>
-                <div class="help-block -mt-2">
-                    <p>{{ __('messages.field_validation_required_instructions') }}</p>
-                </div>
-                <toggle-input v-model="isRequired" />
-            </div>
+        <Field
+            :label="__('Required')"
+            :instructions="__('messages.field_validation_required_instructions')"
+        >
+            <Switch v-model="isRequired" />
+        </Field>
 
-            <div class="form-group publish-field select-fieldtype field-w-full">
-                <label class="publish-field-label">{{ __('Sometimes') }}</label>
-                <div class="help-block -mt-2">
-                    <p>{{ __('messages.field_validation_sometimes_instructions') }}</p>
-                </div>
-                <toggle-input v-model="sometimesValidate" />
-            </div>
-        </div>
+        <Field
+            :label="__('Sometimes')"
+            :instructions="__('messages.field_validation_sometimes_instructions')"
+        >
+            <Switch v-model="sometimesValidate" />
+        </Field>
 
-        <div class="form-group publish-field select-fieldtype field-w-full">
-            <label class="publish-field-label">{{ __('Rules') }}</label>
-            <div class="help-block -mt-2">
-                <p>
-                    {{ __('messages.field_validation_advanced_instructions') }}
-                    <a :href="laravelDocsLink" target="_blank">{{ __('Learn more') }}</a>
-                    <span v-if="helpBlock" class="italic text-gray-500 ltr:float-right rtl:float-left">
-                        {{ __('Example') }}:
-                        <span class="italic text-blue-400">{{ helpBlock }}</span>
-                    </span>
-                </p>
-            </div>
+        <Field :label="__('Rules')">
+            <Description>
+                {{ __('messages.field_validation_advanced_instructions') }}
+                <a :href="laravelDocsLink" target="_blank">{{ __('Learn more') }}</a>
+                <span v-if="helpBlock" class="italic text-gray-500 ltr:float-right rtl:float-left">
+                    {{ __('Example') }}:
+                    <span class="italic text-blue-400">{{ helpBlock }}</span>
+                </span>
+            </Description>
 
             <v-select
                 v-if="!customRule"
@@ -95,7 +88,7 @@
                     </div>
                 </sortable-list>
             </div>
-        </div>
+        </Field>
     </div>
 </template>
 
@@ -110,10 +103,15 @@ import RULES from './Rules.js';
 import SemVer from 'semver';
 import { SortableList } from '../sortable/Sortable';
 import { sortBy } from 'lodash-es';
+import { Description, Field } from '@statamic/ui';
+import Switch from '@statamic/components/ui/Switch.vue'
 
 export default {
     components: {
+        Description,
         SortableList,
+        Field,
+        Switch,
     },
 
     props: {
