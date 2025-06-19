@@ -33,6 +33,11 @@ class URL
         // Remove occurrences of '//', except when part of protocol.
         $url = Path::tidy($url);
 
+        // If URL is external to this Statamic application, we'll avoid normalizing leading/trailing slashes.
+        // if (self::isAbsolute($url) && self::isExternalToApplication($url)) {
+        //     return $url;
+        // }
+
         // If not an absolute URL, enforce leading slash.
         if (! self::isAbsolute($url)) {
             $url = Str::ensureLeft($url, '/');
