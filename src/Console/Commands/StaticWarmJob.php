@@ -24,6 +24,18 @@ class StaticWarmJob implements ShouldBeUnique, ShouldQueue
 
     public function handle()
     {
-        (new Client($this->clientConfig))->send($this->request);
+        $response = (new Client($this->clientConfig))->send($this->request);
+
+        if ($response->hasHeader('X-Statamic-Pagination')) {
+            [$currentPage, $totalPages, $pageName] = $response->getHeader('X-Statamic-Pagination');
+
+            collect(range($currentPage, $totalPages))
+                ->map(function (int $page) use ($pageName) {
+                    return "{$this->request->getUri()}?{$pageName}={$page}";
+                })
+                ->each(function (string $uri) {
+                    StaticWarmJob::dispatch(new Request('GET', $uri), $this->clientConfig);
+                });
+        }
     }
 }
