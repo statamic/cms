@@ -183,7 +183,7 @@ class URL
     }
 
     /**
-     * Make a relative URL absolute.
+     * Make a relative URL absolute (prepends domain if not already absolute).
      */
     public function makeAbsolute(?string $url): string
     {
@@ -192,11 +192,14 @@ class URL
             return $url;
         }
 
-        if (! Str::startsWith($url, '/')) {
+        if (Str::startsWith($url, ['http:', 'https:'])) {
             return self::tidy($url);
         }
 
-        return self::tidy(Str::ensureLeft($url, self::getSiteUrl()));
+        $url = Str::ensureLeft($url, '/');
+        $url = Str::ensureLeft($url, self::getSiteUrl());
+
+        return self::tidy($url);
     }
 
     /**

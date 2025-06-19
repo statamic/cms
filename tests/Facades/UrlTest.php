@@ -414,18 +414,21 @@ class UrlTest extends TestCase
             ['http://external.com/', 'http://external.com/'], // external absolute url provided, so url is left alone.
             ['http://this-site.com/foo/', 'http://this-site.com/foo'], // already absolute, but we can still normalize trailing slashes
             ['/', 'http://absolute-url-resolved-from-request.com'],
+            ['foo', 'http://absolute-url-resolved-from-request.com/foo'],
             ['/foo', 'http://absolute-url-resolved-from-request.com/foo'],
             ['/foo/', 'http://absolute-url-resolved-from-request.com/foo'],
 
             ['http://external.com', 'http://external.com', 'https'], // external absolute url provided, so scheme and trailing slash are left alone.
             ['http://external.com/', 'http://external.com/', 'https'], // external absolute url provided, so scheme and trailing slash are left alone.
             ['/', 'https://absolute-url-resolved-from-request.com', 'https'],
+            ['foo', 'https://absolute-url-resolved-from-request.com/foo', 'https'],
             ['/foo', 'https://absolute-url-resolved-from-request.com/foo', 'https'],
             ['/foo/', 'https://absolute-url-resolved-from-request.com/foo', 'https'],
 
             ['https://external.com', 'https://external.com', 'http'], // external absolute url provided, so scheme and trailing slash are left alone.
             ['https://external.com/', 'https://external.com/', 'http'], // external absolute url provided, so scheme and trailing slash are left alone.
             ['/', 'http://absolute-url-resolved-from-request.com', 'http'],
+            ['foo', 'http://absolute-url-resolved-from-request.com/foo', 'http'],
             ['/foo', 'http://absolute-url-resolved-from-request.com/foo', 'http'],
             ['/foo/', 'http://absolute-url-resolved-from-request.com/foo', 'http'],
         ];
