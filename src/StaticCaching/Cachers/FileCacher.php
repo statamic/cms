@@ -9,6 +9,7 @@ use Illuminate\Support\LazyCollection;
 use Statamic\Events\UrlInvalidated;
 use Statamic\Facades\File;
 use Statamic\Facades\Site;
+use Statamic\Facades\Path;
 use Statamic\StaticCaching\Page;
 use Statamic\StaticCaching\Replacers\CsrfTokenReplacer;
 use Statamic\Support\Arr;
@@ -167,7 +168,7 @@ class FileCacher extends AbstractCacher
                     continue;
                 }
 
-                yield $file->getPathName() => Str::start(Str::replaceFirst($cachePath, '', $file->getPathName()), '/');
+                yield Path::tidy($file->getPathName()) => Str::start(Str::replaceFirst($cachePath, '', $file->getPathName()), '/');
             }
         });
     }
@@ -216,7 +217,7 @@ class FileCacher extends AbstractCacher
             $basename = $slug.'_lqs_'.md5($query).'.html';
         }
 
-        return $this->getCachePath($site).Str::finish($pathParts['dirname'], '/').$basename;
+        return Path::tidy($this->getCachePath($site).Str::finish($pathParts['dirname'], '/').$basename);
     }
 
     private function isBasenameTooLong($basename)
