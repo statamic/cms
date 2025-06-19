@@ -452,6 +452,8 @@ class UrlTest extends TestCase
             ['/foo/', '/foo'],
             ['/foo/bar', '/foo/bar'],
             ['/foo/bar/', '/foo/bar'],
+            ['foo', '/foo'],
+            ['foo/bar', '/foo/bar'],
 
             ['http://example.com?bar=baz', '/?bar=baz'],
             ['http://example.com/?bar=baz', '/?bar=baz'],

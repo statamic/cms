@@ -163,13 +163,13 @@ class URL
     }
 
     /**
-     * Make an absolute URL relative.
+     * Make an absolute URL relative (with leading slash).
      */
     public function makeRelative(?string $url): string
     {
         $parsed = parse_url($url);
 
-        $url = $parsed['path'] ?? '/';
+        $url = Str::ensureLeft($parsed['path'] ?? '/', '/');
 
         if (isset($parsed['query'])) {
             $url .= '?'.$parsed['query'];
