@@ -446,7 +446,7 @@ class UrlTest extends TestCase
 
     #[Test]
     #[DataProvider('relativeProvider')]
-    public function makes_urls_relative($url, $expected)
+    public function it_makes_urls_relative($url, $expected)
     {
         $this->assertSame($expected, URL::makeRelative($url));
     }
