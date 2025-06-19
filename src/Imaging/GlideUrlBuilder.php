@@ -64,6 +64,8 @@ class GlideUrlBuilder extends ImageUrlBuilder
             $params['mark'] = 'asset::'.Str::toBase64Url($asset->containerId().'/'.$asset->path());
         }
 
-        return URL::prependSiteRoot($builder->getUrl($path, $params));
+        return URL::makeRelative(
+            URL::prependSiteUrl($builder->getUrl($path, $params))
+        );
     }
 }
