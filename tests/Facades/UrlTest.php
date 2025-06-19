@@ -82,6 +82,28 @@ class UrlTest extends TestCase
     }
 
     #[Test]
+    public function it_determines_absolute_url()
+    {
+        $this->assertTrue(URL::isAbsolute('http://example.com'));
+        $this->assertTrue(URL::isAbsolute('http://example.com/'));
+        $this->assertTrue(URL::isAbsolute('http://example.com/some-slug'));
+        $this->assertTrue(URL::isAbsolute('http://example.com/some-slug?foo'));
+        $this->assertTrue(URL::isAbsolute('http://example.com/some-slug#anchor'));
+        $this->assertTrue(URL::isAbsolute('http://example.com'));
+        $this->assertTrue(URL::isAbsolute('http://example.com/'));
+        $this->assertTrue(URL::isAbsolute('http://example.com/some-slug'));
+        $this->assertFalse(URL::isAbsolute('/'));
+        $this->assertFalse(URL::isAbsolute('/foo'));
+        $this->assertFalse(URL::isAbsolute('/foo/bar?query'));
+        $this->assertFalse(URL::isAbsolute('foo'));
+        $this->assertFalse(URL::isAbsolute('image.png'));
+        $this->assertFalse(URL::isAbsolute('?query'));
+        $this->assertFalse(URL::isAbsolute('#anchor'));
+        $this->assertFalse(URL::isAbsolute(''));
+        $this->assertFalse(URL::isAbsolute(null));
+    }
+
+    #[Test]
     public function it_determines_external_url()
     {
         $this->setSiteValue('en', 'url', 'http://this-site.com/');

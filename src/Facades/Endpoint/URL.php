@@ -170,11 +170,11 @@ class URL
     public function makeAbsolute(?string $url): string
     {
         // If it doesn't start with a slash, we'll just leave it as-is.
-        if (Str::startsWith($url, ['http:', 'https:']) && self::isExternalToApplication($url)) {
+        if (self::isAbsolute($url) && self::isExternalToApplication($url)) {
             return $url;
         }
 
-        if (Str::startsWith($url, ['http:', 'https:'])) {
+        if (self::isAbsolute($url)) {
             return self::tidy($url);
         }
 
@@ -198,6 +198,14 @@ class URL
     public function format(?string $url): string
     {
         return self::tidy('/'.trim($url, '/'));
+    }
+
+    /**
+     * Check whether a URL is absolute.
+     */
+    public function isAbsolute(?string $url): bool
+    {
+        return Str::startsWith($url, ['http:', 'https:']);
     }
 
     /**
@@ -245,7 +253,7 @@ class URL
 
         self::$siteUrlsCache ??= Site::all()
             ->map->url()
-            ->filter(fn ($siteUrl) => Str::startsWith($siteUrl, ['http:', 'https:']))
+            ->filter(fn ($siteUrl) => self::isAbsolute($siteUrl))
             ->map(fn ($siteUrl) => Str::ensureRight($siteUrl, '/'));
 
         $isExternalToSites = self::$siteUrlsCache
