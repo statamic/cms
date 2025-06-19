@@ -151,7 +151,7 @@ class FileCacher extends AbstractCacher
      *
      * @param  Site  $site
      */
-    public function getFiles($site): LazyCollection
+    private function getFiles($site): LazyCollection
     {
         $cachePath = $this->getCachePath($site);
         if (! $cachePath || ! File::exists($cachePath)) {

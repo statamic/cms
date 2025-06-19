@@ -305,7 +305,7 @@ class FileCacherTest extends TestCase
         $cache = app(Repository::class);
         $cacher = $this->fileCacher([
             'path' => public_path('static'),
-        ], $writer, $cache, []);
+        ], $writer, $cache);
 
         File::put($cacher->getFilePath('/one'), '');
         File::put($cacher->getFilePath('/one?foo=bar'), '');
