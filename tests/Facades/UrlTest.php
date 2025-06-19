@@ -375,18 +375,6 @@ class UrlTest extends TestCase
     }
 
     #[Test]
-    public function gets_site_url()
-    {
-        $this->assertEquals('http://absolute-url-resolved-from-request.com', URL::getSiteUrl());
-
-        \Illuminate\Support\Facades\URL::forceScheme('https');
-        $this->assertEquals('https://absolute-url-resolved-from-request.com', URL::getSiteUrl());
-
-        \Illuminate\Support\Facades\URL::forceScheme('http');
-        $this->assertEquals('http://absolute-url-resolved-from-request.com', URL::getSiteUrl());
-    }
-
-    #[Test]
     #[DataProvider('absoluteProvider')]
     public function it_makes_urls_absolute($url, $expected, $forceScheme = false)
     {

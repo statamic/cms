@@ -197,7 +197,7 @@ class URL
         }
 
         $url = Str::ensureLeft($url, '/');
-        $url = Str::ensureLeft($url, self::getSiteUrl());
+        $url = Str::ensureLeft($url, self::getRequestRootUrl());
 
         return self::tidy($url);
     }
@@ -273,16 +273,6 @@ class URL
         $isExternalToCurrentRequestDomain = ! Str::startsWith($url, Str::ensureRight(url()->to('/'), '/'));
 
         return self::$externalAppUriCache[$url] = $isExternalToSites && $isExternalToCurrentRequestDomain;
-    }
-
-    /**
-     * Get the current site url from Apache headers.
-     */
-    public function getSiteUrl(): string
-    {
-        $rootUrl = url()->to('/');
-
-        return self::tidy($rootUrl);
     }
 
     /**
@@ -366,5 +356,15 @@ class URL
         self::$siteUrlsCache = null;
         self::$externalSiteUriCache = [];
         self::$externalAppUriCache = [];
+    }
+
+    /**
+     * Get the current site url from Apache headers.
+     */
+    private function getRequestRootUrl(): string
+    {
+        $rootUrl = url()->to('/');
+
+        return self::tidy($rootUrl);
     }
 }
