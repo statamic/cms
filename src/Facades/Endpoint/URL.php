@@ -274,7 +274,7 @@ class URL
      */
     public function encode(?string $url): string
     {
-        $dont_encode = [
+        $dontEncode = [
             '%2F' => '/',
             '%40' => '@',
             '%3A' => ':',
@@ -291,7 +291,7 @@ class URL
             '%25' => '%',
         ];
 
-        return strtr(rawurlencode($url), $dont_encode);
+        return self::tidy(strtr(rawurlencode($url), $dontEncode));
     }
 
     /**

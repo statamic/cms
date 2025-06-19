@@ -564,6 +564,38 @@ class UrlTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('encodeProvider')]
+    public function it_can_encode_urls($url, $expected)
+    {
+        $this->assertSame($expected, URL::encode($url));
+
+        URL::enforceTrailingSlashes();
+
+        $expected = str_replace('page', 'page/', $expected);
+
+        $this->assertSame($expected, URL::encode($url));
+    }
+
+    public static function encodeProvider()
+    {
+        $encodable = '\'"$^<>[](){}';
+        $encoded = '%27%22%24%5E%3C%3E%5B%5D%28%29%7B%7D';
+
+        return [
+            'null case tidies to relative homepage' => [null, '/'],
+            'relative homepage' => ['/', '/'],
+            'relative homepage enforce slash' => ['', '/'],
+
+            'relative route with encodable' => ["/{$encodable}/page", "/{$encoded}/page"],
+            'relative route with encodable enforce leading slash' => ["{$encodable}/page", "/{$encoded}/page"],
+            'relative route with encodable normalize trailing slash' => ["/{$encodable}/page/", "/{$encoded}/page"],
+
+            'doesnt encode specific characters' => ['http://example.com/page?param&characters=-/@:;,+!*|%#fragment', 'http://example.com/page?param&characters=-/@:;,+!*|%#fragment'],
+            'doesnt encode specific characters but still can normalize trailing slash' => ['http://example.com/page/?param&characters=-/@:;,+!*|%#fragment', 'http://example.com/page?param&characters=-/@:;,+!*|%#fragment'],
+        ];
+    }
+
+    #[Test]
     public function it_can_remove_query_and_fragment()
     {
         $this->assertEquals(null, URL::removeQueryAndFragment(null));
@@ -712,6 +744,7 @@ class UrlTest extends TestCase
         $this->assertSame('/foo?query', URL::makeRelative('https://example.com/foo?query'));
         $this->assertSame('https://example.com/bar?query', URL::assemble('https://example.com', 'bar', '?query'));
         $this->assertSame('https://example.com/bar', URL::replaceSlug('https://example.com/foo', 'bar'));
+        $this->assertSame('https://example.com/foo%24bar', URL::encode('https://example.com/foo$bar'));
 
         URL::enforceTrailingSlashes();
 
@@ -724,6 +757,7 @@ class UrlTest extends TestCase
         $this->assertSame('/foo/?query', URL::makeRelative('https://example.com/foo?query'));
         $this->assertSame('https://example.com/bar/?query', URL::assemble('https://example.com', 'bar', '?query'));
         $this->assertSame('https://example.com/bar/', URL::replaceSlug('https://example.com/foo', 'bar'));
+        $this->assertSame('https://example.com/foo%24bar/', URL::encode('https://example.com/foo$bar'));
 
         URL::enforceTrailingSlashes(false);
 
@@ -736,5 +770,6 @@ class UrlTest extends TestCase
         $this->assertSame('/foo?query', URL::makeRelative('https://example.com/foo?query'));
         $this->assertSame('https://example.com/bar?query', URL::assemble('https://example.com', 'bar', '?query'));
         $this->assertSame('https://example.com/bar', URL::replaceSlug('https://example.com/foo', 'bar'));
+        $this->assertSame('https://example.com/foo%24bar', URL::encode('https://example.com/foo$bar'));
     }
 }
