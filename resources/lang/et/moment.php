@@ -1,9 +1,9 @@
 <?php
 
 return [
-    'relativeTime.future' => '%s-s',
+    'relativeTime.future' => '%s pärast',
     'relativeTime.past' => '%s tagasi',
-    'relativeTime.s' => 'paar sekundit',
+    'relativeTime.s' => 'mõni sekund',
     'relativeTime.ss' => '%d sekundit',
     'relativeTime.m' => 'minut',
     'relativeTime.mm' => '%d minutit',
@@ -11,7 +11,7 @@ return [
     'relativeTime.hh' => '%d tundi',
     'relativeTime.d' => 'päev',
     'relativeTime.dd' => '%d päeva',
-    'relativeTime.M' => 'kuu aega',
+    'relativeTime.M' => 'kuu',
     'relativeTime.MM' => '%d kuud',
     'relativeTime.y' => 'aasta',
     'relativeTime.yy' => '%d aastat',
