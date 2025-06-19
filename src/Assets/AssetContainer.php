@@ -143,7 +143,7 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
             ->rtrim('/')
             ->after(config('app.url'));
 
-        return ($url === '') ? '/' : $url;
+        return URL::tidy($url);
     }
 
     /**
