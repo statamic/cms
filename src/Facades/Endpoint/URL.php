@@ -23,7 +23,7 @@ class URL
      */
     public function enforceTrailingSlashes(bool $bool = true): void
     {
-        static::$enforceTrailingSlashes = $bool;
+        self::$enforceTrailingSlashes = $bool;
     }
 
     /**
@@ -332,7 +332,7 @@ class URL
 
         if (in_array($url, ['', '/'])) {
             $url = '/';
-        } elseif (static::$enforceTrailingSlashes) {
+        } elseif (self::$enforceTrailingSlashes) {
             $url = Str::ensureRight($url, '/');
         } else {
             $url = Str::removeRight($url, '/');
