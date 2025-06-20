@@ -232,4 +232,63 @@ EXPECTED;
             Blade::render($template)
         );
     }
+
+    #[Test]
+    public function it_supports_imported_classes_and_functions()
+    {
+        $template = <<<'BLADE'
+@use (Statamic\Support\Html)
+
+<ul>
+<s:nav:main as="the_items">
+@foreach ($the_items as $item)
+<li>{{ Html::entities($item['title']) }}</li>
+@endforeach
+</s:nav:main>
+</ul>
+BLADE;
+
+        $expected = <<<'EXPECTED'
+<ul>
+<li>Home</li>
+<li>About</li>
+<li>Projects</li>
+<li>Contact</li>
+</ul>
+EXPECTED;
+
+        $this->assertSame(
+            $expected,
+            Blade::render($template),
+        );
+    }
+
+    #[Test]
+    public function it_doesnt_mangle_php_inside_nav_tag()
+    {
+        $template = <<<'BLADE'
+<ul>
+<s:nav:main as="the_items">
+@foreach ($the_items as $item)
+@php $theValue = $item['title'].'-value'; @endphp
+<li>{{ $theValue }}</li>
+@endforeach
+</s:nav:main>
+</ul>
+BLADE;
+
+        $expected = <<<'EXPECTED'
+<ul>
+<li>Home-value</li>
+<li>About-value</li>
+<li>Projects-value</li>
+<li>Contact-value</li>
+</ul>
+EXPECTED;
+
+        $this->assertSame(
+            $expected,
+            Blade::render($template),
+        );
+    }
 }
