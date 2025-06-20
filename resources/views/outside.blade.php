@@ -1,19 +1,20 @@
 <!DOCTYPE html>
-<html lang="{{ config('app.locale') }}" dir="{{ Statamic\Facades\Site::current()->direction ?? 'rtl' }}">
+<html
+    lang="{{ Statamic::cpLocale() }}"
+    dir="{{ Statamic::cpDirection() }}"
+>
     <head>
         @include('statamic::partials.head')
     </head>
-    <body class="outside {{ config('statamic.cp.theme') }}-theme @yield('body_class')">
-        <div id="statamic">
-            <div id="main" class="flex flex-col justify-center">
-                <div>
-                    @yield('content')
-                </div>
-            </div>
 
-            <portal-targets></portal-targets>
-        </div>
-        @include('statamic::partials.scripts')
-        @yield('scripts')
+    <body class="bg-gray-50 font-sans leading-normal">
+        <config-provider>
+            <div id="statamic" v-cloak>
+                @yield('content')
+                <portal-targets></portal-targets>
+            </div>
+            @include('statamic::partials.scripts')
+            @yield('scripts')
+        </config-provider>
     </body>
 </html>
