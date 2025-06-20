@@ -101,6 +101,7 @@ const sortColumn = ref(props.sortColumn || (props.columns.length ? props.columns
 const sortDirection = ref(props.sortDirection || getDefaultSortDirectionForColumn(sortColumn.value));
 const selections = ref(props.selections || []);
 const hasActions = computed(() => !!props.actionUrl);
+const hasFilters = computed(() => props.filters && props.filters.length > 0);
 const showBulkActions = computed(() => props.allowBulkActions && hasActions.value);
 
 const rawParameters = computed(() => ({
@@ -382,7 +383,7 @@ autoApplyState();
         <div class="flex items-center gap-3 py-3">
             <div class="flex flex-1 items-center gap-3">
                 <Search />
-                <Filters />
+                <Filters v-if="hasFilters" />
             </div>
             <CustomizeColumns />
         </div>
