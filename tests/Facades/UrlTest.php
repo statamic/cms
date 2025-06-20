@@ -34,8 +34,10 @@ class UrlTest extends TestCase
 
         URL::enforceTrailingSlashes();
 
-        $expected = preg_replace('/this-site\.com$/', 'this-site.com/', $expected);
-        $expected = str_replace('page', 'page/', $expected);
+        if (! Str::contains($url, 'external-site.com')) {
+            $expected = preg_replace('/this-site\.com$/', 'this-site.com/', $expected);
+            $expected = str_replace('page', 'page/', $expected);
+        }
 
         $this->assertSame($expected, URL::tidy($url));
     }
@@ -74,10 +76,9 @@ class UrlTest extends TestCase
             'fixing multiple slashes on absolute url tidies to double slash protocol' => ['http:////this-site.com/foo///bar////page', 'http://this-site.com/foo/bar/page'],
             'fixing multiple slashes on external url tidies to double slash protocol' => ['http:////external-site.com/foo///bar////page', 'http://external-site.com/foo/bar/page'],
 
-            // TODO: Don't touch trailing slashes on external URLs...
-            // 'external url doesnt touch trailing slash' => ['http://external-site.com/', 'http://external-site.com/'],
-            // 'external nested url doesnt touch trailing slash' => ['http://external-site.com/page/', 'http://external-site.com/page/'],
-            // 'external nested url doesnt touch trailing slash or query fragment' => ['http://external-site.com/page/?query#fragment', 'http://external-site.com/page/?query#fragment'],
+            'external url doesnt touch trailing slash' => ['http://external-site.com/', 'http://external-site.com/'],
+            'external nested url doesnt touch trailing slash' => ['http://external-site.com/page/', 'http://external-site.com/page/'],
+            'external nested url doesnt touch trailing slash or query fragment' => ['http://external-site.com/page/?query#fragment', 'http://external-site.com/page/?query#fragment'],
         ];
     }
 

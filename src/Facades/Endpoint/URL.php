@@ -35,9 +35,9 @@ class URL
         $url = Path::tidy($url);
 
         // If URL is external to this Statamic application, we'll avoid normalizing leading/trailing slashes.
-        // if (self::isAbsolute($url) && self::isExternalToApplication($url)) {
-        //     return $url;
-        // }
+        if (self::isAbsolute($url) && self::isExternalToApplication($url)) {
+            return $url;
+        }
 
         // If not an absolute URL, enforce leading slash.
         if (! self::isAbsolute($url)) {
@@ -351,8 +351,7 @@ class URL
         }
 
         return self::$absoluteSiteUrlsCache = Site::all()
-            ->map
-            ->url()
+            ->map(fn ($site) => $site->rawConfig()['url'] ?? null)
             ->filter(fn ($siteUrl) => self::isAbsolute($siteUrl))
             ->map(fn ($siteUrl) => Str::ensureRight($siteUrl, '/'));
     }
