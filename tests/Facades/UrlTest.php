@@ -390,7 +390,11 @@ class UrlTest extends TestCase
 
         URL::enforceTrailingSlashes();
 
-        $this->assertSame(Str::ensureRight($parent, '/'), URL::parent($child));
+        if (! Str::contains($parent, 'external')) {
+            $parent = Str::ensureRight($parent, '/');
+        }
+
+        $this->assertSame($parent, URL::parent($child));
     }
 
     public static function parentProvider()
@@ -419,9 +423,10 @@ class UrlTest extends TestCase
 
             'preserves scheme and host' => ['https://secure-site.com/foo/bar/', 'https://secure-site.com/foo'],
 
-            // TODO...
-            // 'preserves lack of trailing slash on external site' => ['https://secure-site.com/foo/bar', 'https://secure-site.com/foo'],
-            // 'preserves trailing slash on external site' => ['https://secure-site.com/foo/bar/', 'https://secure-site.com/foo/'],
+            'preserves lack of trailing slash on external site' => ['https://external-site.com/foo', 'https://external-site.com'],
+            'preserves trailing slash on external site' => ['https://external-site.com/foo/', 'https://external-site.com/'],
+            'preserves lack of trailing slash on external site on nested route' => ['https://external-site.com/foo/bar', 'https://external-site.com/foo'],
+            'preserves trailing slash on external site on nested route' => ['https://external-site.com/foo/bar/', 'https://external-site.com/foo/'],
         ];
     }
 

@@ -98,15 +98,21 @@ class URL
      */
     public function parent(?string $url): string
     {
+        $trailingSlash = self::isAbsolute($url) && self::isExternalToApplication($url)
+            ? self::hasTrailingSlash($url)
+            : self::$enforceTrailingSlashes;
+
+        $strMethod = $trailingSlash
+            ? 'ensureRight'
+            : 'removeRight';
+
         $url = Str::ensureRight(self::removeQueryAndFragment($url), '/');
 
-        if (parse_url($url)['path'] === '/') {
-            return self::tidy($url);
+        if (parse_url($url)['path'] !== '/') {
+            $url = preg_replace('/[^\/]*\/$/', '', $url);
         }
 
-        $url = preg_replace('/[^\/]*\/$/', '', $url);
-
-        return self::tidy($url);
+        return Str::$strMethod(self::tidy($url), '/') ?: '/';
     }
 
     /**
@@ -362,6 +368,14 @@ class URL
     private function getDomainFromAbsolute(string $url): string
     {
         return preg_replace('/(https*:\/\/[^\/]+)(.*)/', '$1', $url);
+    }
+
+    /**
+     * Get the current root URL from request headers.
+     */
+    private function hasTrailingSlash(string $url): string
+    {
+        return substr(preg_replace('/([^?#]*)(.*)/', '$1', $url), -1) === '/';
     }
 
     /**
