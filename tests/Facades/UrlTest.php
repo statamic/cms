@@ -13,6 +13,7 @@ class UrlTest extends TestCase
     public function tearDown(): void
     {
         URL::enforceTrailingSlashes(false);
+        URL::clearUrlCache();
 
         parent::tearDown();
     }
@@ -124,19 +125,19 @@ class UrlTest extends TestCase
     #[Test]
     public function it_removes_site_url()
     {
-        $this->setSiteValue('en', 'url', 'http://site.com/');
+        $this->setSiteValue('en', 'url', 'http://this-site.com/');
 
-        $this->assertEquals('/', URL::removeSiteUrl('http://site.com'));
-        $this->assertEquals('/foo', URL::removeSiteUrl('http://site.com/foo'));
-        $this->assertEquals('/foo', URL::removeSiteUrl('http://site.com/foo/'));
-        $this->assertEquals('http://not-site.com/foo', URL::removeSiteUrl('http://not-site.com/foo/'));
+        $this->assertEquals('/', URL::removeSiteUrl('http://this-site.com'));
+        $this->assertEquals('/foo', URL::removeSiteUrl('http://this-site.com/foo'));
+        $this->assertEquals('/foo', URL::removeSiteUrl('http://this-site.com/foo/'));
+        $this->assertEquals('http://external-site.com/foo/', URL::removeSiteUrl('http://external-site.com/foo/'));
 
         URL::enforceTrailingSlashes();
 
-        $this->assertEquals('/', URL::removeSiteUrl('http://site.com/'));
-        $this->assertEquals('/foo/', URL::removeSiteUrl('http://site.com/foo'));
-        $this->assertEquals('/foo/', URL::removeSiteUrl('http://site.com/foo/'));
-        $this->assertEquals('http://not-site.com/foo/', URL::removeSiteUrl('http://not-site.com/foo/'));
+        $this->assertEquals('/', URL::removeSiteUrl('http://this-site.com/'));
+        $this->assertEquals('/foo/', URL::removeSiteUrl('http://this-site.com/foo'));
+        $this->assertEquals('/foo/', URL::removeSiteUrl('http://this-site.com/foo/'));
+        $this->assertEquals('http://external-site.com/foo', URL::removeSiteUrl('http://external-site.com/foo'));
     }
 
     #[Test]
@@ -166,11 +167,11 @@ class UrlTest extends TestCase
     {
         $this->setSiteValue('en', 'url', 'http://this-site.com/');
 
-        $this->assertTrue(URL::isExternal('http://that-site.com'));
-        $this->assertTrue(URL::isExternal('http://that-site.com/'));
-        $this->assertTrue(URL::isExternal('http://that-site.com/some-slug'));
-        $this->assertTrue(URL::isExternal('http://that-site.com/some-slug?foo'));
-        $this->assertTrue(URL::isExternal('http://that-site.com/some-slug#anchor'));
+        $this->assertTrue(URL::isExternal('http://external-site.com'));
+        $this->assertTrue(URL::isExternal('http://external-site.com/'));
+        $this->assertTrue(URL::isExternal('http://external-site.com/some-slug'));
+        $this->assertTrue(URL::isExternal('http://external-site.com/some-slug?foo'));
+        $this->assertTrue(URL::isExternal('http://external-site.com/some-slug#anchor'));
         $this->assertFalse(URL::isExternal('http://this-site.com'));
         $this->assertFalse(URL::isExternal('http://this-site.com/'));
         $this->assertFalse(URL::isExternal('http://this-site.com/some-slug'));
@@ -184,11 +185,11 @@ class UrlTest extends TestCase
     public function it_determines_external_url_when_using_relative_in_config()
     {
         $this->setSiteValue('en', 'url', '/');
-        $this->assertTrue(URL::isExternal('http://that-site.com'));
-        $this->assertTrue(URL::isExternal('http://that-site.com/'));
-        $this->assertTrue(URL::isExternal('http://that-site.com/some-slug'));
-        $this->assertTrue(URL::isExternal('http://that-site.com/some-slug?foo'));
-        $this->assertTrue(URL::isExternal('http://that-site.com/some-slug#anchor'));
+        $this->assertTrue(URL::isExternal('http://external-site.com'));
+        $this->assertTrue(URL::isExternal('http://external-site.com/'));
+        $this->assertTrue(URL::isExternal('http://external-site.com/some-slug'));
+        $this->assertTrue(URL::isExternal('http://external-site.com/some-slug?foo'));
+        $this->assertTrue(URL::isExternal('http://external-site.com/some-slug#anchor'));
         $this->assertFalse(URL::isExternal('http://absolute-url-resolved-from-request.com'));
         $this->assertFalse(URL::isExternal('http://absolute-url-resolved-from-request.com/'));
         $this->assertFalse(URL::isExternal('http://absolute-url-resolved-from-request.com/some-slug'));
@@ -368,6 +369,11 @@ class UrlTest extends TestCase
     #[DataProvider('parentProvider')]
     public function it_gets_the_parent_url($child, $parent)
     {
+        $this->setSites([
+            'en' => ['url' => 'http://this-site.com/', 'locale' => 'en_US', 'name' => 'English'],
+            'fr' => ['url' => 'https://secure-site.com/', 'locale' => 'fr_FR', 'name' => 'French'],
+        ]);
+
         $this->assertSame($parent, URL::parent($child));
 
         URL::enforceTrailingSlashes();
@@ -379,27 +385,31 @@ class UrlTest extends TestCase
     {
         return [
             'relative homepage to homepage' => ['/', '/'],
-            'absolute homepage to homepage' => ['http://localhost', 'http://localhost'],
-            'absolute homepage to homepage with trailing slash' => ['http://localhost/', 'http://localhost'],
+            'absolute homepage to homepage' => ['http://this-site.com', 'http://this-site.com'],
+            'absolute homepage to homepage with trailing slash' => ['http://this-site.com/', 'http://this-site.com'],
 
             'relative route to parent homepage' => ['/foo', '/'],
             'relative route to parent homepage with trailing slash' => ['/foo/', '/'],
-            'absolute route to parent homepage' => ['http://localhost/foo', 'http://localhost'],
-            'absolute route to parent homepage with trailing slash' => ['http://localhost/foo/', 'http://localhost'],
+            'absolute route to parent homepage' => ['http://this-site.com/foo', 'http://this-site.com'],
+            'absolute route to parent homepage with trailing slash' => ['http://this-site.com/foo/', 'http://this-site.com'],
 
             'relative nested route to parent homepage' => ['/foo/bar', '/foo'],
             'relative nested route to parent homepage with trailing slash' => ['/foo/bar/', '/foo'],
-            'absolute nested route to parent homepage' => ['http://localhost/foo/bar', 'http://localhost/foo'],
-            'absolute nested route to parent homepage with trailing slash' => ['http://localhost/foo/bar/', 'http://localhost/foo'],
+            'absolute nested route to parent homepage' => ['http://this-site.com/foo/bar', 'http://this-site.com/foo'],
+            'absolute nested route to parent homepage with trailing slash' => ['http://this-site.com/foo/bar/', 'http://this-site.com/foo'],
 
             'removes query from relative url' => ['/?alpha', '/'],
-            'removes query from absolute url' => ['http://localhost/?alpha', 'http://localhost'],
+            'removes query from absolute url' => ['http://this-site.com/?alpha', 'http://this-site.com'],
             'removes anchor fragment from relative url' => ['/#alpha', '/'],
-            'removes anchor fragment from absolute url' => ['http://localhost/#alpha', 'http://localhost'],
+            'removes anchor fragment from absolute url' => ['http://this-site.com/#alpha', 'http://this-site.com'],
             'removes query and anchor fragment from relative url' => ['/?alpha#beta', '/'],
-            'removes query and anchor fragment from absolute url' => ['http://localhost/?alpha#beta', 'http://localhost'],
+            'removes query and anchor fragment from absolute url' => ['http://this-site.com/?alpha#beta', 'http://this-site.com'],
 
-            'preserves scheme and host' => ['https://example.com/foo/bar/', 'https://example.com/foo'],
+            'preserves scheme and host' => ['https://secure-site.com/foo/bar/', 'https://secure-site.com/foo'],
+
+            // TODO...
+            // 'preserves lack of trailing slash on external site' => ['https://secure-site.com/foo/bar', 'https://secure-site.com/foo'],
+            // 'preserves trailing slash on external site' => ['https://secure-site.com/foo/bar/', 'https://secure-site.com/foo/'],
         ];
     }
 
@@ -468,7 +478,7 @@ class UrlTest extends TestCase
 
         URL::enforceTrailingSlashes();
 
-        $expected = Str::contains($url, 'external.com')
+        $expected = Str::contains($url, 'external-site.com')
             ? $url
             : Str::ensureRight($expected, '/');
 
@@ -478,23 +488,23 @@ class UrlTest extends TestCase
     public static function absoluteProvider()
     {
         return [
-            ['http://external.com', 'http://external.com'], // external absolute url provided, so url is left alone.
-            ['http://external.com/', 'http://external.com/'], // external absolute url provided, so url is left alone.
+            ['http://external-site.com', 'http://external-site.com'], // external absolute url provided, so url is left alone.
+            ['http://external-site.com/', 'http://external-site.com/'], // external absolute url provided, so url is left alone.
             ['http://this-site.com/foo/', 'http://this-site.com/foo'], // already absolute, but we can still normalize trailing slashes
             ['/', 'http://absolute-url-resolved-from-request.com'],
             ['foo', 'http://absolute-url-resolved-from-request.com/foo'],
             ['/foo', 'http://absolute-url-resolved-from-request.com/foo'],
             ['/foo/', 'http://absolute-url-resolved-from-request.com/foo'],
 
-            ['http://external.com', 'http://external.com', 'https'], // external absolute url provided, so scheme and trailing slash are left alone.
-            ['http://external.com/', 'http://external.com/', 'https'], // external absolute url provided, so scheme and trailing slash are left alone.
+            ['http://external-site.com', 'http://external-site.com', 'https'], // external absolute url provided, so scheme and trailing slash are left alone.
+            ['http://external-site.com/', 'http://external-site.com/', 'https'], // external absolute url provided, so scheme and trailing slash are left alone.
             ['/', 'https://absolute-url-resolved-from-request.com', 'https'],
             ['foo', 'https://absolute-url-resolved-from-request.com/foo', 'https'],
             ['/foo', 'https://absolute-url-resolved-from-request.com/foo', 'https'],
             ['/foo/', 'https://absolute-url-resolved-from-request.com/foo', 'https'],
 
-            ['https://external.com', 'https://external.com', 'http'], // external absolute url provided, so scheme and trailing slash are left alone.
-            ['https://external.com/', 'https://external.com/', 'http'], // external absolute url provided, so scheme and trailing slash are left alone.
+            ['https://external-site.com', 'https://external-site.com', 'http'], // external absolute url provided, so scheme and trailing slash are left alone.
+            ['https://external-site.com/', 'https://external-site.com/', 'http'], // external absolute url provided, so scheme and trailing slash are left alone.
             ['/', 'http://absolute-url-resolved-from-request.com', 'http'],
             ['foo', 'http://absolute-url-resolved-from-request.com/foo', 'http'],
             ['/foo', 'http://absolute-url-resolved-from-request.com/foo', 'http'],
@@ -568,6 +578,8 @@ class UrlTest extends TestCase
     #[DataProvider('encodeProvider')]
     public function it_can_encode_urls($url, $expected)
     {
+        $this->setSiteValue('en', 'url', 'http://this-site.com/');
+
         $this->assertSame($expected, URL::encode($url));
 
         URL::enforceTrailingSlashes();
@@ -591,8 +603,11 @@ class UrlTest extends TestCase
             'relative route with encodable enforce leading slash' => ["{$encodable}/page", "/{$encoded}/page"],
             'relative route with encodable normalize trailing slash' => ["/{$encodable}/page/", "/{$encoded}/page"],
 
-            'doesnt encode specific characters' => ['http://example.com/page?param&characters=-/@:;,+!*|%#fragment', 'http://example.com/page?param&characters=-/@:;,+!*|%#fragment'],
-            'doesnt encode specific characters but still can normalize trailing slash' => ['http://example.com/page/?param&characters=-/@:;,+!*|%#fragment', 'http://example.com/page?param&characters=-/@:;,+!*|%#fragment'],
+            'doesnt encode specific characters' => ['http://this-site.com/page?param&characters=-/@:;,+!*|%#fragment', 'http://this-site.com/page?param&characters=-/@:;,+!*|%#fragment'],
+            'doesnt encode specific characters but still can normalize trailing slash' => ['http://this-site.com/page/?param&characters=-/@:;,+!*|%#fragment', 'http://this-site.com/page?param&characters=-/@:;,+!*|%#fragment'],
+
+            'absolute external url doesnt enforce trailing slash' => ['http://external-site.com.com/foo?param&characters=-/@:;,+!*|%#fragment', 'http://external-site.com.com/foo?param&characters=-/@:;,+!*|%#fragment'],
+            'absolute external url doesnt remove trailing slash' => ['http://external-site.com.com/foo/?param&characters=-/@:;,+!*|%#fragment', 'http://external-site.com.com/foo/?param&characters=-/@:;,+!*|%#fragment'],
         ];
     }
 
@@ -618,6 +633,8 @@ class UrlTest extends TestCase
     #[DataProvider('removeQueryAndFragmentProvider')]
     public function it_can_remove_query_and_fragment($url, $expected)
     {
+        $this->setSiteValue('en', 'url', 'http://this-site.com/');
+
         $this->assertSame($expected, URL::removeQueryAndFragment($url));
 
         URL::enforceTrailingSlashes();
@@ -647,10 +664,15 @@ class UrlTest extends TestCase
             'relative route normalizes trailing slash with anchor fragment' => ['/foo/page/#anchor', '/foo/page'],
             'relative route normalizes trailing slash with query and anchor fragment' => ['/foo/page/?query#anchor', '/foo/page'],
 
-            'absolute url query' => ['http://example.com/page?query', 'http://example.com/page'],
-            'absolute url anchor' => ['http://example.com/page#anchor', 'http://example.com/page'],
-            'absolute url query normalizes trailing slash' => ['http://example.com/page/?query', 'http://example.com/page'],
-            'absolute url anchor normalizes trailing slash' => ['http://example.com/page/#anchor', 'http://example.com/page'],
+            'absolute url query' => ['http://this-site.com/page?query', 'http://this-site.com/page'],
+            'absolute url anchor' => ['http://this-site.com/page#anchor', 'http://this-site.com/page'],
+            'absolute url query normalizes trailing slash' => ['http://this-site.com/page/?query', 'http://this-site.com/page'],
+            'absolute url anchor normalizes trailing slash' => ['http://this-site.com/page/#anchor', 'http://this-site.com/page'],
+
+            'absolute external url query doesnt enforce trailing slash' => ['http://external-site.com/foo?query', 'http://external-site.com/foo'],
+            'absolute external url anchor doesnt enforce trailing slash' => ['http://external-site.com/foo#anchor', 'http://external-site.com/foo'],
+            'absolute external url query doesnt remove trailing slash' => ['http://external-site.com/foo/?query', 'http://external-site.com/foo/'],
+            'absolute external url anchor doesnt remove trailing slash' => ['http://external-site.com/foo/#anchor', 'http://external-site.com/foo/'],
         ];
     }
 
@@ -658,6 +680,8 @@ class UrlTest extends TestCase
     #[DataProvider('enforceTrailingSlashesProvider')]
     public function enforces_trailing_slashes($url, $expected)
     {
+        $this->setSiteValue('en', 'url', 'http://this-site.com/');
+
         URL::enforceTrailingSlashes();
 
         $this->assertSame($expected, URL::tidy($url));
@@ -680,35 +704,47 @@ class UrlTest extends TestCase
             ['/?foo=bar&baz=qux', '/?foo=bar&baz=qux'],
             ['/?foo=bar&baz=qux#anchor', '/?foo=bar&baz=qux#anchor'],
 
+            ['/about', '/about/'],
             ['/about?query', '/about/?query'],
             ['/about#anchor', '/about/#anchor'],
             ['/about?foo=bar&baz=qux', '/about/?foo=bar&baz=qux'],
             ['/about?foo=bar&baz=qux#anchor', '/about/?foo=bar&baz=qux#anchor'],
 
+            ['/about/', '/about/'],
             ['/about/?query', '/about/?query'],
             ['/about/#anchor', '/about/#anchor'],
             ['/about/?foo=bar&baz=qux', '/about/?foo=bar&baz=qux'],
             ['/about/?foo=bar&baz=qux#anchor', '/about/?foo=bar&baz=qux#anchor'],
 
-            ['https://example.com?query', 'https://example.com/?query'],
-            ['https://example.com#anchor', 'https://example.com/#anchor'],
-            ['https://example.com?foo=bar&baz=qux', 'https://example.com/?foo=bar&baz=qux'],
-            ['https://example.com?foo=bar&baz=qux#anchor', 'https://example.com/?foo=bar&baz=qux#anchor'],
+            ['http://this-site.com', 'http://this-site.com/'],
+            ['http://this-site.com?query', 'http://this-site.com/?query'],
+            ['http://this-site.com#anchor', 'http://this-site.com/#anchor'],
+            ['http://this-site.com?foo=bar&baz=qux', 'http://this-site.com/?foo=bar&baz=qux'],
+            ['http://this-site.com?foo=bar&baz=qux#anchor', 'http://this-site.com/?foo=bar&baz=qux#anchor'],
 
-            ['https://example.com/?query', 'https://example.com/?query'],
-            ['https://example.com/#anchor', 'https://example.com/#anchor'],
-            ['https://example.com/?foo=bar&baz=qux', 'https://example.com/?foo=bar&baz=qux'],
-            ['https://example.com/?foo=bar&baz=qux#anchor', 'https://example.com/?foo=bar&baz=qux#anchor'],
+            ['http://this-site.com/', 'http://this-site.com/'],
+            ['http://this-site.com/?query', 'http://this-site.com/?query'],
+            ['http://this-site.com/#anchor', 'http://this-site.com/#anchor'],
+            ['http://this-site.com/?foo=bar&baz=qux', 'http://this-site.com/?foo=bar&baz=qux'],
+            ['http://this-site.com/?foo=bar&baz=qux#anchor', 'http://this-site.com/?foo=bar&baz=qux#anchor'],
 
-            ['https://example.com/about?query', 'https://example.com/about/?query'],
-            ['https://example.com/about#anchor', 'https://example.com/about/#anchor'],
-            ['https://example.com/about?foo=bar&baz=qux', 'https://example.com/about/?foo=bar&baz=qux'],
-            ['https://example.com/about?foo=bar&baz=qux#anchor', 'https://example.com/about/?foo=bar&baz=qux#anchor'],
+            ['http://this-site.com/about', 'http://this-site.com/about/'],
+            ['http://this-site.com/about?query', 'http://this-site.com/about/?query'],
+            ['http://this-site.com/about#anchor', 'http://this-site.com/about/#anchor'],
+            ['http://this-site.com/about?foo=bar&baz=qux', 'http://this-site.com/about/?foo=bar&baz=qux'],
+            ['http://this-site.com/about?foo=bar&baz=qux#anchor', 'http://this-site.com/about/?foo=bar&baz=qux#anchor'],
 
-            ['https://example.com/about/?query', 'https://example.com/about/?query'],
-            ['https://example.com/about/#anchor', 'https://example.com/about/#anchor'],
-            ['https://example.com/about/?foo=bar&baz=qux', 'https://example.com/about/?foo=bar&baz=qux'],
-            ['https://example.com/about/?foo=bar&baz=qux#anchor', 'https://example.com/about/?foo=bar&baz=qux#anchor'],
+            ['http://this-site.com/about/', 'http://this-site.com/about/'],
+            ['http://this-site.com/about/?query', 'http://this-site.com/about/?query'],
+            ['http://this-site.com/about/#anchor', 'http://this-site.com/about/#anchor'],
+            ['http://this-site.com/about/?foo=bar&baz=qux', 'http://this-site.com/about/?foo=bar&baz=qux'],
+            ['http://this-site.com/about/?foo=bar&baz=qux#anchor', 'http://this-site.com/about/?foo=bar&baz=qux#anchor'],
+
+            ['http://external-site.com', 'http://external-site.com'],
+            ['http://external-site.com/about', 'http://external-site.com/about'],
+            ['http://external-site.com/about?query', 'http://external-site.com/about?query'],
+            ['http://external-site.com/about#anchor', 'http://external-site.com/about#anchor'],
+            ['http://external-site.com/about?query#anchor', 'http://external-site.com/about?query#anchor'],
         ];
     }
 
@@ -716,6 +752,8 @@ class UrlTest extends TestCase
     #[DataProvider('removeTrailingSlashesProvider')]
     public function removes_trailing_slashes($url, $expected)
     {
+        $this->setSiteValue('en', 'url', 'http://this-site.com/');
+
         $this->assertSame($expected, URL::tidy($url));
     }
 
@@ -736,73 +774,85 @@ class UrlTest extends TestCase
             ['/?foo=bar&baz=qux', '/?foo=bar&baz=qux'],
             ['/?foo=bar&baz=qux#anchor', '/?foo=bar&baz=qux#anchor'],
 
+            ['/about', '/about'],
             ['/about?query', '/about?query'],
             ['/about#anchor', '/about#anchor'],
             ['/about?foo=bar&baz=qux', '/about?foo=bar&baz=qux'],
             ['/about?foo=bar&baz=qux#anchor', '/about?foo=bar&baz=qux#anchor'],
 
+            ['/about/', '/about'],
             ['/about/?query', '/about?query'],
             ['/about/#anchor', '/about#anchor'],
             ['/about/?foo=bar&baz=qux', '/about?foo=bar&baz=qux'],
             ['/about/?foo=bar&baz=qux#anchor', '/about?foo=bar&baz=qux#anchor'],
 
-            ['https://example.com?query', 'https://example.com?query'],
-            ['https://example.com#anchor', 'https://example.com#anchor'],
-            ['https://example.com?foo=bar&baz=qux', 'https://example.com?foo=bar&baz=qux'],
-            ['https://example.com?foo=bar&baz=qux#anchor', 'https://example.com?foo=bar&baz=qux#anchor'],
+            ['http://this-site.com', 'http://this-site.com'],
+            ['http://this-site.com?query', 'http://this-site.com?query'],
+            ['http://this-site.com#anchor', 'http://this-site.com#anchor'],
+            ['http://this-site.com?foo=bar&baz=qux', 'http://this-site.com?foo=bar&baz=qux'],
+            ['http://this-site.com?foo=bar&baz=qux#anchor', 'http://this-site.com?foo=bar&baz=qux#anchor'],
 
-            ['https://example.com/?query', 'https://example.com?query'],
-            ['https://example.com/#anchor', 'https://example.com#anchor'],
-            ['https://example.com/?foo=bar&baz=qux', 'https://example.com?foo=bar&baz=qux'],
-            ['https://example.com/?foo=bar&baz=qux#anchor', 'https://example.com?foo=bar&baz=qux#anchor'],
+            ['http://this-site.com/', 'http://this-site.com'],
+            ['http://this-site.com/?query', 'http://this-site.com?query'],
+            ['http://this-site.com/#anchor', 'http://this-site.com#anchor'],
+            ['http://this-site.com/?foo=bar&baz=qux', 'http://this-site.com?foo=bar&baz=qux'],
+            ['http://this-site.com/?foo=bar&baz=qux#anchor', 'http://this-site.com?foo=bar&baz=qux#anchor'],
 
-            ['https://example.com/about?query', 'https://example.com/about?query'],
-            ['https://example.com/about#anchor', 'https://example.com/about#anchor'],
-            ['https://example.com/about?foo=bar&baz=qux', 'https://example.com/about?foo=bar&baz=qux'],
-            ['https://example.com/about?foo=bar&baz=qux#anchor', 'https://example.com/about?foo=bar&baz=qux#anchor'],
+            ['http://this-site.com/about', 'http://this-site.com/about'],
+            ['http://this-site.com/about?query', 'http://this-site.com/about?query'],
+            ['http://this-site.com/about#anchor', 'http://this-site.com/about#anchor'],
+            ['http://this-site.com/about?foo=bar&baz=qux', 'http://this-site.com/about?foo=bar&baz=qux'],
+            ['http://this-site.com/about?foo=bar&baz=qux#anchor', 'http://this-site.com/about?foo=bar&baz=qux#anchor'],
 
-            ['https://example.com/about/?query', 'https://example.com/about?query'],
-            ['https://example.com/about/#anchor', 'https://example.com/about#anchor'],
-            ['https://example.com/about/?foo=bar&baz=qux', 'https://example.com/about?foo=bar&baz=qux'],
-            ['https://example.com/about/?foo=bar&baz=qux#anchor', 'https://example.com/about?foo=bar&baz=qux#anchor'],
+            ['http://this-site.com/about/', 'http://this-site.com/about'],
+            ['http://this-site.com/about/?query', 'http://this-site.com/about?query'],
+            ['http://this-site.com/about/#anchor', 'http://this-site.com/about#anchor'],
+            ['http://this-site.com/about/?foo=bar&baz=qux', 'http://this-site.com/about?foo=bar&baz=qux'],
+            ['http://this-site.com/about/?foo=bar&baz=qux#anchor', 'http://this-site.com/about?foo=bar&baz=qux#anchor'],
+
+            ['http://external-site.com/', 'http://external-site.com/'],
+            ['http://external-site.com/about/', 'http://external-site.com/about/'],
+            ['http://external-site.com/about/?query', 'http://external-site.com/about/?query'],
+            ['http://external-site.com/about/#anchor', 'http://external-site.com/about/#anchor'],
+            ['http://external-site.com/about/?query#anchor', 'http://external-site.com/about/?query#anchor'],
         ];
     }
 
     #[Test]
     public function it_can_configure_and_unconfigure_enforcing_of_trailing_slashes()
     {
-        $this->assertSame('https://example.com?query', URL::tidy('https://example.com?query'));
-        $this->assertSame('https://example.com/foo', URL::parent('https://example.com/foo/bar'));
-        $this->assertSame('http://localhost/foo', URL::prependSiteUrl('/foo'));
-        $this->assertSame('/foo', URL::removeSiteUrl('http://localhost/foo'));
-        $this->assertSame('http://absolute-url-resolved-from-request.com/foo?query', URL::makeAbsolute('/foo?query'));
-        $this->assertSame('/foo?query', URL::makeRelative('https://example.com/foo?query'));
-        $this->assertSame('https://example.com/bar?query', URL::assemble('https://example.com', 'bar', '?query'));
-        $this->assertSame('https://example.com/bar', URL::replaceSlug('https://example.com/foo', 'bar'));
-        $this->assertSame('https://example.com/foo%24bar', URL::encode('https://example.com/foo$bar'));
+        $this->assertSame('http://localhost?query', URL::tidy('http://localhost/?query'));
+        $this->assertSame('http://localhost/foo', URL::parent('http://localhost/foo/bar/'));
+        $this->assertSame('http://localhost/foo', URL::prependSiteUrl('/foo/'));
+        $this->assertSame('/foo', URL::removeSiteUrl('http://localhost/foo/'));
+        $this->assertSame('http://absolute-url-resolved-from-request.com/foo?query', URL::makeAbsolute('/foo/?query'));
+        $this->assertSame('/foo?query', URL::makeRelative('http://localhost/foo/?query'));
+        $this->assertSame('http://localhost/bar?query', URL::assemble('http://localhost', 'bar', '?query'));
+        $this->assertSame('http://localhost/bar', URL::replaceSlug('http://localhost/foo/', 'bar'));
+        $this->assertSame('http://localhost/foo%24bar', URL::encode('http://localhost/foo$bar'));
 
         URL::enforceTrailingSlashes();
 
-        $this->assertSame('https://example.com/?query', URL::tidy('https://example.com?query'));
-        $this->assertSame('https://example.com/foo/', URL::parent('https://example.com/foo/bar'));
+        $this->assertSame('http://localhost/?query', URL::tidy('http://localhost?query'));
+        $this->assertSame('http://localhost/foo/', URL::parent('http://localhost/foo/bar'));
         $this->assertSame('http://localhost/foo/', URL::prependSiteUrl('/foo'));
         $this->assertSame('/foo/', URL::removeSiteUrl('http://localhost/foo'));
         $this->assertSame('http://absolute-url-resolved-from-request.com/foo/?query', URL::makeAbsolute('/foo?query'));
-        $this->assertSame('/foo/?query', URL::makeRelative('https://example.com/foo?query'));
-        $this->assertSame('https://example.com/bar/?query', URL::assemble('https://example.com', 'bar', '?query'));
-        $this->assertSame('https://example.com/bar/', URL::replaceSlug('https://example.com/foo', 'bar'));
-        $this->assertSame('https://example.com/foo%24bar/', URL::encode('https://example.com/foo$bar'));
+        $this->assertSame('/foo/?query', URL::makeRelative('http://localhost/foo?query'));
+        $this->assertSame('http://localhost/bar/?query', URL::assemble('http://localhost', 'bar', '?query'));
+        $this->assertSame('http://localhost/bar/', URL::replaceSlug('http://localhost/foo', 'bar'));
+        $this->assertSame('http://localhost/foo%24bar/', URL::encode('http://localhost/foo$bar'));
 
         URL::enforceTrailingSlashes(false);
 
-        $this->assertSame('https://example.com?query', URL::tidy('https://example.com?query'));
-        $this->assertSame('https://example.com/foo', URL::parent('https://example.com/foo/bar'));
-        $this->assertSame('http://localhost/foo', URL::prependSiteUrl('/foo'));
-        $this->assertSame('/foo', URL::removeSiteUrl('http://localhost/foo'));
-        $this->assertSame('http://absolute-url-resolved-from-request.com/foo?query', URL::makeAbsolute('/foo?query'));
-        $this->assertSame('/foo?query', URL::makeRelative('https://example.com/foo?query'));
-        $this->assertSame('https://example.com/bar?query', URL::assemble('https://example.com', 'bar', '?query'));
-        $this->assertSame('https://example.com/bar', URL::replaceSlug('https://example.com/foo', 'bar'));
-        $this->assertSame('https://example.com/foo%24bar', URL::encode('https://example.com/foo$bar'));
+        $this->assertSame('http://localhost?query', URL::tidy('http://localhost/?query'));
+        $this->assertSame('http://localhost/foo', URL::parent('http://localhost/foo/bar/'));
+        $this->assertSame('http://localhost/foo', URL::prependSiteUrl('/foo/'));
+        $this->assertSame('/foo', URL::removeSiteUrl('http://localhost/foo/'));
+        $this->assertSame('http://absolute-url-resolved-from-request.com/foo?query', URL::makeAbsolute('/foo/?query'));
+        $this->assertSame('/foo?query', URL::makeRelative('http://localhost/foo/?query'));
+        $this->assertSame('http://localhost/bar?query', URL::assemble('http://localhost', 'bar', '?query'));
+        $this->assertSame('http://localhost/bar', URL::replaceSlug('http://localhost/foo/', 'bar'));
+        $this->assertSame('http://localhost/foo%24bar', URL::encode('http://localhost/foo$bar'));
     }
 }
