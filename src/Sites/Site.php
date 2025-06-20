@@ -52,7 +52,7 @@ class Site implements Augmentable
 
     public function url()
     {
-        return URL::tidy($this->config['url']);
+        return URL::tidy($this->config['url'], true);
     }
 
     public function direction()

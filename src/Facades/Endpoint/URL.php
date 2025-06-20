@@ -29,13 +29,13 @@ class URL
     /**
      * Tidy a URL (normalize slashes).
      */
-    public function tidy(?string $url): string
+    public function tidy(?string $url, bool $force = false): string
     {
         // Remove occurrences of '//', except when part of protocol.
         $url = Path::tidy($url);
 
-        // If URL is external to this Statamic application, we'll avoid normalizing leading/trailing slashes.
-        if (self::isAbsolute($url) && self::isExternalToApplication($url)) {
+        // If URL is external to this Statamic application, we'll leave leading/trailing slashes by default.
+        if (! $force && self::isAbsolute($url) && self::isExternalToApplication($url)) {
             return $url;
         }
 

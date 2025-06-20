@@ -84,6 +84,18 @@ class UrlTest extends TestCase
     }
 
     #[Test]
+    public function it_can_force_tidy_unconfigured_external_urls()
+    {
+        $this->assertSame('http://external.com/', URL::tidy('http://external.com/'));
+        $this->assertSame('http://external.com', URL::tidy('http://external.com/', force: true));
+
+        URL::enforceTrailingSlashes();
+
+        $this->assertSame('http://external.com', URL::tidy('http://external.com'));
+        $this->assertSame('http://external.com/', URL::tidy('http://external.com', force: true));
+    }
+
+    #[Test]
     public function it_prepends_site_url()
     {
         $this->setSiteValue('en', 'url', 'http://site.com/');
