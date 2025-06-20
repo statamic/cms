@@ -18,7 +18,7 @@ class URL
     private static $externalAppUriCache = [];
 
     /**
-     * Enforce trailing slashes service provider helper.
+     * Configure whether or not to enforce trailing slashes when normalizing URL output throughout this class.
      */
     public function enforceTrailingSlashes(bool $bool = true): void
     {
@@ -26,7 +26,7 @@ class URL
     }
 
     /**
-     * Tidies a URL.
+     * Tidy a URL (normalize slashes).
      */
     public function tidy(?string $url): string
     {
@@ -50,9 +50,7 @@ class URL
     }
 
     /**
-     * Assembles a URL from an ordered list of segments.
-     *
-     * @param mixed string  Open ended number of arguments
+     * Assemble a URL from an ordered list of segments.
      */
     public function assemble(?string ...$segments): string
     {
@@ -61,8 +59,6 @@ class URL
 
     /**
      * Get the slug at the end of a URL.
-     *
-     * @param  string  $url  URL to parse
      */
     public function slug(?string $url): ?string
     {
@@ -77,9 +73,6 @@ class URL
 
     /**
      * Replace the slug at the end of a URL with the provided slug.
-     *
-     * @param  string  $url  URL to modify
-     * @param  string  $slug  New slug to use
      */
     public function replaceSlug(?string $url, string $slug): string
     {
@@ -116,7 +109,7 @@ class URL
     }
 
     /**
-     * Checks if one URL is an ancestor of another.
+     * Check if one URL is an ancestor of another.
      */
     public function isAncestorOf(?string $child, ?string $ancestor): bool
     {
@@ -131,7 +124,7 @@ class URL
     }
 
     /**
-     * Make sure the site root url is prepended to a URL.
+     * Prepend site URL to a URL.
      */
     public function prependSiteUrl(?string $url, ?string $locale = null, bool $controller = true): string
     {
@@ -149,7 +142,7 @@ class URL
     }
 
     /**
-     * Removes the site root url from the beginning of a URL.
+     * Remove current site URL from the beginning of a URL.
      */
     public function removeSiteUrl(?string $url): string
     {
@@ -213,7 +206,7 @@ class URL
     }
 
     /**
-     * Checks whether a URL is external to current site.
+     * Check whether a URL is external to current site.
      */
     public function isExternal(?string $url): bool
     {
@@ -237,7 +230,7 @@ class URL
     }
 
     /**
-     * Checks whether a URL is external to whole Statamic application.
+     * Check whether a URL is external to whole Statamic application.
      */
     public function isExternalToApplication(?string $url): bool
     {
@@ -295,7 +288,7 @@ class URL
     }
 
     /**
-     * Return a gravatar image.
+     * Return a gravatar image URL for an email address.
      */
     public function gravatar(string $email, ?int $size = null): string
     {
@@ -353,7 +346,7 @@ class URL
     }
 
     /**
-     * Get the current site url from Apache headers.
+     * Get the current root URL from request headers.
      */
     private function getRequestRootUrl(): string
     {
