@@ -305,7 +305,7 @@ class URL
         $url = Str::before($url, '?'); // Remove query params
         $url = Str::before($url, '#'); // Remove anchor fragment
 
-        return $url;
+        return self::tidy($url);
     }
 
     /**

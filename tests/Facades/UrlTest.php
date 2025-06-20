@@ -614,24 +614,43 @@ class UrlTest extends TestCase
     }
 
     #[Test]
-    public function it_can_remove_query_and_fragment()
+    #[DataProvider('removeQueryAndFragmentProvider')]
+    public function it_can_remove_query_and_fragment($url, $expected)
     {
-        $this->assertEquals(null, URL::removeQueryAndFragment(null));
+        $this->assertSame($expected, URL::removeQueryAndFragment($url));
 
-        $this->assertEquals('https://example.com', URL::removeQueryAndFragment('https://example.com?query'));
-        $this->assertEquals('https://example.com', URL::removeQueryAndFragment('https://example.com#anchor'));
-        $this->assertEquals('https://example.com', URL::removeQueryAndFragment('https://example.com?foo=bar&baz=qux'));
-        $this->assertEquals('https://example.com', URL::removeQueryAndFragment('https://example.com?foo=bar&baz=qux#anchor'));
+        URL::enforceTrailingSlashes();
 
-        $this->assertEquals('https://example.com/', URL::removeQueryAndFragment('https://example.com/?query'));
-        $this->assertEquals('https://example.com/', URL::removeQueryAndFragment('https://example.com/#anchor'));
-        $this->assertEquals('https://example.com/', URL::removeQueryAndFragment('https://example.com/?foo=bar&baz=qux'));
-        $this->assertEquals('https://example.com/', URL::removeQueryAndFragment('https://example.com/?foo=bar&baz=qux#anchor'));
+        $expected = preg_replace('/this-site\.com$/', 'this-site.com/', $expected);
+        $expected = str_replace('page', 'page/', $expected);
 
-        $this->assertEquals('https://example.com/about', URL::removeQueryAndFragment('https://example.com/about?query'));
-        $this->assertEquals('https://example.com/about', URL::removeQueryAndFragment('https://example.com/about#anchor'));
-        $this->assertEquals('https://example.com/about', URL::removeQueryAndFragment('https://example.com/about?foo=bar&baz=qux'));
-        $this->assertEquals('https://example.com/about', URL::removeQueryAndFragment('https://example.com/about?foo=bar&baz=qux#anchor'));
+        $this->assertSame($expected, URL::removeQueryAndFragment($url));
+    }
+
+    public static function removeQueryAndFragmentProvider()
+    {
+        return [
+            'null case tidies to relative homepage' => [null, '/'],
+
+            'relative homepage with query param' => ['/?query', '/'],
+            'relative homepage with anchor fragment' => ['/#anchor', '/'],
+            'relative homepage with query and anchor fragment' => ['/?query#anchor', '/'],
+            'relative homepage enforce slash with query param' => ['?query', '/'],
+            'relative homepage enforce slash with anchor fragment' => ['#anchor', '/'],
+            'relative homepage enforce slash with query and anchor fragment' => ['?query#anchor', '/'],
+
+            'relative route enforce leading slash with query param' => ['foo/page?query', '/foo/page'],
+            'relative route enforce leading slash with anchor fragment' => ['foo/page#anchor', '/foo/page'],
+            'relative route enforce leading slash with query and anchor fragment' => ['foo/page?query#anchor', '/foo/page'],
+            'relative route normalizes trailing slash with query param' => ['/foo/page/?query', '/foo/page'],
+            'relative route normalizes trailing slash with anchor fragment' => ['/foo/page/#anchor', '/foo/page'],
+            'relative route normalizes trailing slash with query and anchor fragment' => ['/foo/page/?query#anchor', '/foo/page'],
+
+            'absolute url query' => ['http://example.com/page?query', 'http://example.com/page'],
+            'absolute url anchor' => ['http://example.com/page#anchor', 'http://example.com/page'],
+            'absolute url query normalizes trailing slash' => ['http://example.com/page/?query', 'http://example.com/page'],
+            'absolute url anchor normalizes trailing slash' => ['http://example.com/page/#anchor', 'http://example.com/page'],
+        ];
     }
 
     #[Test]
