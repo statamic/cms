@@ -378,7 +378,7 @@ autoApplyState();
         <Icon name="loading" />
     </slot>
     <slot v-if="!initializing" v-bind="slotProps">
-        <Presets />
+        <Presets v-if="preferencesPrefix" />
         <div class="flex items-center gap-3">
             <Search />
             <Filters />
