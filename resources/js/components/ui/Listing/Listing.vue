@@ -379,9 +379,9 @@ autoApplyState();
     </slot>
     <slot v-if="!initializing" v-bind="slotProps">
         <Presets v-if="preferencesPrefix" />
-        <div class="flex items-center gap-3">
             <Search />
             <Filters />
+        <div class="flex items-center gap-3 py-3">
             <CustomizeColumns />
         </div>
         <Table>
