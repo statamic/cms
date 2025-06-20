@@ -71,6 +71,8 @@ import { default as Textarea } from './Textarea.vue';
 import { default as TimePicker } from './TimePicker/TimePicker.vue';
 import { default as Tooltip } from './Tooltip.vue';
 import { default as Widget } from './Widget.vue';
+import { default as Pagination } from './Pagination.vue';
+import { default as Listing } from './Listing/Listing.vue';
 
 export {
     Badge,
@@ -146,4 +148,6 @@ export {
     TimePicker,
     Tooltip,
     Widget,
+    Pagination,
+    Listing,
 };
