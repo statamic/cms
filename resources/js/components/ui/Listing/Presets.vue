@@ -19,7 +19,7 @@ const isConfirmingDeletion = ref(false);
 watch([activeFilters, searchQuery], () => (activePreset.value = getPresetFromActiveFilters()), { deep: true });
 
 function getPresets() {
-    return Statamic.$preferences.get(preferencesKey.value);
+    return Statamic.$preferences.get(preferencesKey.value, {});
 }
 
 function refreshPresets() {
