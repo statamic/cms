@@ -5,7 +5,7 @@ export const [injectListingContext, provideListingContext] = createContext('List
 </script>
 
 <script setup>
-import { ref, toRef, computed, watch, nextTick, onMounted, onBeforeUnmount } from 'vue';
+import { ref, toRef, computed, watch, nextTick, onMounted, onBeforeUnmount, useSlots } from 'vue';
 import { Icon } from '@statamic/ui';
 import axios from 'axios';
 import BulkActions from './BulkActions.vue';
@@ -83,6 +83,7 @@ const props = defineProps({
     },
 });
 
+const slots = useSlots();
 const id = uniqid();
 const items = ref([]);
 const meta = ref({});
@@ -114,6 +115,15 @@ watch(columns, (newColumns) => emit('update:columns', newColumns));
 watch(sortColumn, (newSortColumn) => emit('update:sortColumn', newSortColumn));
 watch(sortDirection, (newSortDirection) => emit('update:sortDirection', newSortDirection));
 watch(selections, (newSelections) => emit('update:selections', newSelections), { deep: true });
+
+const forwardedTableCellSlots = computed(() => {
+    return Object.keys(slots)
+        .filter((slotName) => slotName.startsWith('cell-'))
+        .reduce((acc, slotName) => {
+            acc[slotName] = slots[slotName];
+            return acc;
+        }, {});
+});
 
 function setParameters(params) {
     currentPage.value = parseInt(params.page);
@@ -371,7 +381,11 @@ autoApplyState();
             <Filters />
             <CustomizeColumns />
         </div>
-        <Table />
+        <Table>
+            <template v-for="(slot, slotName) in forwardedTableCellSlots" :key="slotName" #[slotName]="slotProps">
+                <component :is="slot" v-bind="slotProps" />
+            </template>
+        </Table>
     </slot>
     <BulkActions />
 </template>
