@@ -89,6 +89,7 @@
                     v-else
                     ref="field"
                     :is="fieldtypeComponent"
+                    :id="fieldId"
                     :config="config"
                     :value="value"
                     :meta="meta"

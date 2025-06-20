@@ -29,11 +29,8 @@
         )
     @endunless
 
-    @include(
-        'statamic::partials.docs-callout',
-        [
-            'topic' => __('User Groups'),
-            'url' => Statamic::docsUrl('users#user-groups'),
-        ]
-    )
+    <x-statamic::docs-callout
+        :topic="__('User Groups')"
+        :url="Statamic::docsUrl('users#user-groups')"
+    />
 @endsection
