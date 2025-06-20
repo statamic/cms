@@ -567,10 +567,24 @@ EOT;
         $this->assertSame('Yes', $this->renderString($template, ['variable' => ['One']], true));
     }
 
+    public function test_urlencode()
+    {
+        $this->assertSame('please+and+thank+you%2FMommy', $this->resultOf('{{ test_url_encode | urlencode }}'));
+    }
+
+    public function test_urlencode_except_slashes()
+    {
+        $this->assertSame('please+and+thank+you/Mommy', $this->resultOf('{{ test_url_encode | urlencode_except_slashes }}'));
+    }
+
     public function test_rawurlencode()
     {
-        $this->assertSame('please%20and%20thank%20you/Mommy', $this->resultOf('{{ test_url_encode | rawurlencode }}'));
-        $this->assertSame('please%20and%20thank%20you%2FMommy', $this->resultOf('{{ test_url_encode | rawurlencode(false) }}'));
+        $this->assertSame('please%20and%20thank%20you%2FMommy', $this->resultOf('{{ test_url_encode | rawurlencode }}'));
+    }
+
+    public function test_rawurlencode_except_slashes()
+    {
+        $this->assertSame('please%20and%20thank%20you/Mommy', $this->resultOf('{{ test_url_encode | rawurlencode_except_slashes }}'));
     }
 }
 

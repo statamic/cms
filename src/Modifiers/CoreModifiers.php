@@ -1932,12 +1932,18 @@ class CoreModifiers extends Modifier
      *
      * @return string
      */
-    public function rawurlencode($value, $params)
+    public function rawurlencode($value)
     {
-        if (! Arr::get($params, 0, true)) {
-            return rawurlencode($value);
-        }
+        return rawurlencode($value);
+    }
 
+    /**
+     * URL-encode according to RFC 3986, but allowing slashes to persist
+     *
+     * @return string
+     */
+    public function rawurlencode_except_slashes($value)
+    {
         return implode('/', array_map('rawurlencode', explode('/', $value)));
     }
 
@@ -2847,6 +2853,16 @@ class CoreModifiers extends Modifier
      * @return string
      */
     public function urlencode($value)
+    {
+        return urlencode($value);
+    }
+
+    /**
+     * URL-encodes string, but allowing slashes to persist
+     *
+     * @return string
+     */
+    public function urlencode_except_slashes($value)
     {
         return implode('/', array_map('urlencode', explode('/', $value)));
     }
