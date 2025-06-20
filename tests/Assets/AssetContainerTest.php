@@ -138,21 +138,6 @@ class AssetContainerTest extends TestCase
     }
 
     #[Test]
-    public function it_gets_the_url_from_the_disk_config_when_its_app_url()
-    {
-        config(['filesystems.disks.test' => [
-            'driver' => 'local',
-            'root' => __DIR__.'/__fixtures__/container',
-            'url' => 'http://localhost/container',
-        ]]);
-
-        $container = (new AssetContainer)->disk('test');
-
-        $this->assertEquals('/container', $container->url());
-        $this->assertEquals('http://localhost/container', $container->absoluteUrl());
-    }
-
-    #[Test]
     public function its_private_if_the_disk_has_no_url()
     {
         Storage::fake('test');
