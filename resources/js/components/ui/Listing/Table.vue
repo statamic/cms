@@ -23,8 +23,17 @@ const props = defineProps({
     },
 });
 
-const { visibleColumns, selections, items, allowBulkActions, maxSelections, sortColumn, setSortColumn, loading } =
-    injectListingContext();
+const {
+    visibleColumns,
+    selections,
+    items,
+    hasActions,
+    showBulkActions,
+    maxSelections,
+    sortColumn,
+    setSortColumn,
+    loading,
+} = injectListingContext();
 const tableRef = useTemplateRef('table');
 const shifting = ref(false);
 let lastItemClicked = null;
@@ -100,20 +109,20 @@ function selectRange(from, to) {
             @keydown.shift="shifting = true"
             @keyup="shifting = false"
         >
-            <thead v-if="allowBulkActions || visibleColumns.length > 1">
+            <thead v-if="showBulkActions || visibleColumns.length > 1">
                 <tr>
                     <th
-                        v-if="allowBulkActions || reorderable"
+                        v-if="showBulkActions || reorderable"
                         :class="{ 'checkbox-column': !reorderable, 'handle-column': reorderable }"
                     >
-                        <ToggleAll v-if="allowBulkActions && !singleSelect" />
+                        <ToggleAll v-if="showBulkActions && !singleSelect" />
                     </th>
                     <HeaderCell v-for="column in visibleColumns" :key="column.field" :column />
                     <!--                    <th class="type-column" v-if="type">-->
                     <!--                        <template v-if="type === 'entries'">{{ __('Collection') }}</template>-->
                     <!--                        <template v-if="type === 'terms'">{{ __('Taxonomy') }}</template>-->
                     <!--                    </th>-->
-                    <th class="actions-column" />
+                    <th class="actions-column" v-if="hasActions" />
                 </tr>
             </thead>
             <tbody>
@@ -125,7 +134,7 @@ function selectRange(from, to) {
                     :data-row="isSelected(row.id) ? 'selected' : 'unselected'"
                 >
                     <td class="table-drag-handle" v-if="reorderable"></td>
-                    <td class="checkbox-column" v-if="allowBulkActions && !reorderable">
+                    <td class="checkbox-column" v-if="showBulkActions && !reorderable">
                         <input
                             v-if="!reorderable"
                             type="checkbox"
@@ -167,7 +176,7 @@ function selectRange(from, to) {
                     <!--                            :label="type === 'entries' ? __(row.collection.title) : __(row.taxonomy.title)"-->
                     <!--                        />-->
                     <!--                    </td>-->
-                    <td class="actions-column">
+                    <td class="actions-column" v-if="hasActions">
                         <RowActions :row="row">
                             <template v-if="$slots['prepended-row-actions']" #prepended-actions="{ row }">
                                 <slot name="prepended-row-actions" :row="row" />

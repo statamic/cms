@@ -100,6 +100,8 @@ const columns = ref(props.columns);
 const sortColumn = ref(props.sortColumn || (props.columns.length ? props.columns[0].field : null));
 const sortDirection = ref(props.sortDirection || getDefaultSortDirectionForColumn(sortColumn.value));
 const selections = ref(props.selections || []);
+const hasActions = computed(() => !!props.actionUrl);
+const showBulkActions = computed(() => props.allowBulkActions && hasActions.value);
 
 const rawParameters = computed(() => ({
     page: currentPage.value,
@@ -327,7 +329,8 @@ provideListingContext({
     clearSelections,
     actionUrl: toRef(() => props.actionUrl),
     actionContext: toRef(() => props.actionContext),
-    allowBulkActions: toRef(() => props.allowBulkActions),
+    showBulkActions,
+    hasActions,
     perPage,
     setPerPage,
     setCurrentPage,
@@ -387,5 +390,5 @@ autoApplyState();
             </template>
         </Table>
     </slot>
-    <BulkActions />
+    <BulkActions v-if="showBulkActions" />
 </template>
