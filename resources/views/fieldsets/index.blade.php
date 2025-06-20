@@ -37,11 +37,8 @@
         )
     @endunless
 
-    @include(
-        'statamic::partials.docs-callout',
-        [
-            'topic' => __('Fieldsets'),
-            'url' => Statamic::docsUrl('fieldsets'),
-        ]
-    )
+    <x-statamic::docs-callout
+        :topic="__('Blueprints')"
+        :url="Statamic::docsUrl('blueprints')"
+    />
 @endsection

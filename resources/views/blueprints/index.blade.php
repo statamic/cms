@@ -284,9 +284,8 @@
     @endforeach
     </section>
 
-    @include('statamic::partials.docs-callout', [
-        'topic' => __('Blueprints'),
-        'url' => Statamic::docsUrl('blueprints')
-    ])
-
+    <x-statamic::docs-callout
+        :topic="__('Blueprints')"
+        :url="Statamic::docsUrl('blueprints')"
+    />
 @endsection
