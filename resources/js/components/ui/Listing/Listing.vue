@@ -23,6 +23,10 @@ const props = defineProps({
         type: String,
         required: true,
     },
+    allowPresets: {
+        type: Boolean,
+        default: true,
+    },
     allowBulkActions: {
         type: Boolean,
         default: true,
@@ -102,6 +106,7 @@ const sortDirection = ref(props.sortDirection || getDefaultSortDirectionForColum
 const selections = ref(props.selections || []);
 const hasActions = computed(() => !!props.actionUrl);
 const hasFilters = computed(() => props.filters && props.filters.length > 0);
+const showPresets = computed(() => props.allowPresets && props.preferencesPrefix);
 const showBulkActions = computed(() => props.allowBulkActions && hasActions.value);
 
 const rawParameters = computed(() => ({
@@ -379,7 +384,7 @@ autoApplyState();
         <Icon name="loading" />
     </slot>
     <slot v-if="!initializing" v-bind="slotProps">
-        <Presets v-if="preferencesPrefix" />
+        <Presets v-if="showPresets" />
         <div class="flex items-center gap-3 py-3">
             <div class="flex flex-1 items-center gap-3">
                 <Search />
