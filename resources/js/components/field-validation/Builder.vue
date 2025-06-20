@@ -1,6 +1,7 @@
 <template>
-    <div class="w-full">
+    <div class="w-full publish-fields">
         <Field
+            class="form-group field-w-33"
             :label="__('Required')"
             :instructions="__('messages.field_validation_required_instructions')"
         >
@@ -8,13 +9,14 @@
         </Field>
 
         <Field
+            class="form-group field-w-33"
             :label="__('Sometimes')"
             :instructions="__('messages.field_validation_sometimes_instructions')"
         >
             <Switch v-model="sometimesValidate" />
         </Field>
 
-        <Field :label="__('Rules')">
+        <Field class="form-group field-w-100" :label="__('Rules')">
             <Description>
                 {{ __('messages.field_validation_advanced_instructions') }}
                 <a :href="laravelDocsLink" target="_blank">{{ __('Learn more') }}</a>
@@ -57,7 +59,7 @@
                 </template>
             </v-select>
 
-            <text-input
+            <Input
                 v-else
                 v-model="customRule"
                 ref="customRuleInput"
@@ -65,7 +67,7 @@
                 @blur="add(customRule)"
             />
 
-            <div class="v-select">
+            <div>
                 <sortable-list
                     item-class="sortable-item"
                     handle-class="sortable-item"
@@ -73,18 +75,20 @@
                     :mirror="false"
                     v-model="rules"
                 >
-                    <div class="vs__selected-options-outside flex flex-wrap outline-hidden">
-                        <span v-for="rule in rules" :key="rule" class="vs__selected sortable-item mt-2">
-                            {{ rule }}
-                            <button
-                                @click="remove(rule)"
-                                type="button"
-                                :aria-label="__('Delete Rule')"
-                                class="vs__deselect"
-                            >
-                                <span>×</span>
-                            </button>
-                        </span>
+                    <div class="vs__selected-options-outside flex flex-wrap gap-2 pt-3">
+                        <div v-for="rule in rules" :key="rule" class="vs__selected sortable-item">
+                            <Badge size="lg" color="white">
+                                {{ rule }}
+                                <button
+                                    type="button"
+                                    class="-mx-3 cursor-pointer px-3 text-gray-400 hover:text-gray-700"
+                                    :aria-label="__('Delete Rule')"
+                                    @click="remove(rule)"
+                                >
+                                    <span>&times;</span>
+                                </button>
+                            </Badge>
+                        </div>
                     </div>
                 </sortable-list>
             </div>
@@ -103,7 +107,7 @@ import RULES from './Rules.js';
 import SemVer from 'semver';
 import { SortableList } from '../sortable/Sortable';
 import { sortBy } from 'lodash-es';
-import { Description, Field } from '@statamic/ui';
+import { Description, Field, Input, Badge } from '@statamic/ui';
 import Switch from '@statamic/components/ui/Switch.vue'
 
 export default {
@@ -112,6 +116,8 @@ export default {
         SortableList,
         Field,
         Switch,
+        Input,
+        Badge,
     },
 
     props: {

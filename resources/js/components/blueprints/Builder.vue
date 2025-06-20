@@ -13,7 +13,7 @@
                 </ui-field>
             </ui-card>
             <ui-card class="mt-2">
-                <ui-field :label="__('Hidden')" :instructions="__('messages.blueprints_hidden_instructions')" :error="errors.hidden">
+                <ui-field :label="__('Hidden')" :instructions="__('messages.blueprints_hidden_instructions')" :error="errors.hidden" variant="inline">
                     <ui-switch v-model="blueprint.hidden" />
                 </ui-field>
             </ui-card>

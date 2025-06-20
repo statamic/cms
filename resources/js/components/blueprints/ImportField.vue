@@ -23,6 +23,7 @@
                                     :root="isRoot"
                                     :fields="fields"
                                     :config="fieldConfig"
+                                    :is-inside-set="isInsideSet"
                                     @committed="settingsUpdated"
                                     @closed="editorClosed"
                                 />
@@ -43,6 +44,10 @@ export default {
     mixins: [Field],
 
     components: { FieldSettings },
+
+    inject: {
+        isInsideSet: { default: false },
+    },
 
     computed: {
         fieldConfig() {
