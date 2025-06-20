@@ -2,6 +2,7 @@
 
 namespace Statamic\Facades\Endpoint;
 
+use Illuminate\Support\Collection;
 use Statamic\Facades\Config;
 use Statamic\Facades\Path;
 use Statamic\Facades\Site;
@@ -13,9 +14,9 @@ use Statamic\Support\Str;
 class URL
 {
     private static $enforceTrailingSlashes = false;
-    private static $siteUrlsCache;
-    private static $externalSiteUriCache = [];
-    private static $externalAppUriCache = [];
+    private static $absoluteSiteUrlsCache;
+    private static $externalSiteUrlsCache;
+    private static $externalAppUrlsCache;
 
     /**
      * Configure whether or not to enforce trailing slashes when normalizing URL output throughout this class.
@@ -210,8 +211,8 @@ class URL
      */
     public function isExternal(?string $url): bool
     {
-        if (isset(self::$externalSiteUriCache[$url])) {
-            return self::$externalSiteUriCache[$url];
+        if (isset(self::$externalSiteUrlsCache[$url])) {
+            return self::$externalSiteUrlsCache[$url];
         }
 
         if (! $url) {
@@ -221,12 +222,12 @@ class URL
         $url = Str::ensureRight($url, '/');
 
         if (Str::startsWith($url, ['/', '?', '#'])) {
-            return self::$externalSiteUriCache[$url] = false;
+            return self::$externalSiteUrlsCache[$url] = false;
         }
 
         $isExternal = ! Str::startsWith($url, Str::ensureRight(Site::current()->absoluteUrl(), '/'));
 
-        return self::$externalSiteUriCache[$url] = $isExternal;
+        return self::$externalSiteUrlsCache[$url] = $isExternal;
     }
 
     /**
@@ -234,8 +235,8 @@ class URL
      */
     public function isExternalToApplication(?string $url): bool
     {
-        if (isset(self::$externalAppUriCache[$url])) {
-            return self::$externalAppUriCache[$url];
+        if (isset(self::$externalAppUrlsCache[$url])) {
+            return self::$externalAppUrlsCache[$url];
         }
 
         if (! $url) {
@@ -245,21 +246,16 @@ class URL
         $url = Str::ensureRight($url, '/');
 
         if (Str::startsWith($url, ['/', '?', '#'])) {
-            return self::$externalAppUriCache[$url] = false;
+            return self::$externalAppUrlsCache[$url] = false;
         }
 
-        self::$siteUrlsCache ??= Site::all()
-            ->map->url()
-            ->filter(fn ($siteUrl) => self::isAbsolute($siteUrl))
-            ->map(fn ($siteUrl) => Str::ensureRight($siteUrl, '/'));
-
-        $isExternalToSites = self::$siteUrlsCache
+        $isExternalToSites = self::getAbsoluteSiteUrls()
             ->filter(fn ($siteUrl) => Str::startsWith($url, $siteUrl))
             ->isEmpty();
 
         $isExternalToCurrentRequestDomain = ! Str::startsWith($url, Str::ensureRight(url()->to('/'), '/'));
 
-        return self::$externalAppUriCache[$url] = $isExternalToSites && $isExternalToCurrentRequestDomain;
+        return self::$externalAppUrlsCache[$url] = $isExternalToSites && $isExternalToCurrentRequestDomain;
     }
 
     /**
@@ -317,9 +313,9 @@ class URL
      */
     public function clearUrlCache(): void
     {
-        self::$siteUrlsCache = null;
-        self::$externalSiteUriCache = [];
-        self::$externalAppUriCache = [];
+        self::$absoluteSiteUrlsCache = null;
+        self::$externalSiteUrlsCache = null;
+        self::$externalAppUrlsCache = null;
     }
 
     /**
@@ -343,6 +339,22 @@ class URL
         }
 
         return $url.$queryAndFragments;
+    }
+
+    /**
+     * Get and cache absolute site URLs for external checks.
+     */
+    private function getAbsoluteSiteUrls(): Collection
+    {
+        if (self::$absoluteSiteUrlsCache) {
+            return self::$absoluteSiteUrlsCache;
+        }
+
+        return self::$absoluteSiteUrlsCache = Site::all()
+            ->map
+            ->url()
+            ->filter(fn ($siteUrl) => self::isAbsolute($siteUrl))
+            ->map(fn ($siteUrl) => Str::ensureRight($siteUrl, '/'));
     }
 
     /**
