@@ -140,7 +140,7 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
 
         $url = rtrim($this->disk()->url('/'), '/');
 
-        return ($url === '') ? '/' : $url;
+        return URL::tidy($url);
     }
 
     /**
