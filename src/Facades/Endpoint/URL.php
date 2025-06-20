@@ -313,9 +313,19 @@ class URL
     }
 
     /**
+     * Clear URL property caches.
+     */
+    public function clearUrlCache(): void
+    {
+        self::$siteUrlsCache = null;
+        self::$externalSiteUriCache = [];
+        self::$externalAppUriCache = [];
+    }
+
+    /**
      * Normalize trailing slash before query and fragment (trims by default, but can be enforced).
      */
-    public function normalizeTrailingSlash(?string $url): string
+    private function normalizeTrailingSlash(?string $url): string
     {
         $parts = str($url)
             ->split(pattern: '/([?#])/', flags: PREG_SPLIT_DELIM_CAPTURE)
@@ -333,16 +343,6 @@ class URL
         }
 
         return $url.$queryAndFragments;
-    }
-
-    /**
-     * Clear URL property caches.
-     */
-    public function clearUrlCache(): void
-    {
-        self::$siteUrlsCache = null;
-        self::$externalSiteUriCache = [];
-        self::$externalAppUriCache = [];
     }
 
     /**

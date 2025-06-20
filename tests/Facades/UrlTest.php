@@ -640,7 +640,6 @@ class UrlTest extends TestCase
     {
         URL::enforceTrailingSlashes();
 
-        $this->assertSame($expected, URL::normalizeTrailingSlash($url));
         $this->assertSame($expected, URL::tidy($url));
     }
 
@@ -697,7 +696,6 @@ class UrlTest extends TestCase
     #[DataProvider('removeTrailingSlashesProvider')]
     public function removes_trailing_slashes($url, $expected)
     {
-        $this->assertSame($expected, URL::normalizeTrailingSlash($url));
         $this->assertSame($expected, URL::tidy($url));
     }
 
@@ -753,7 +751,6 @@ class UrlTest extends TestCase
     #[Test]
     public function it_can_configure_and_unconfigure_enforcing_of_trailing_slashes()
     {
-        $this->assertSame('https://example.com?query', URL::normalizeTrailingSlash('https://example.com?query'));
         $this->assertSame('https://example.com?query', URL::tidy('https://example.com?query'));
         $this->assertSame('https://example.com/foo', URL::parent('https://example.com/foo/bar'));
         $this->assertSame('http://localhost/foo', URL::prependSiteUrl('/foo'));
@@ -766,7 +763,6 @@ class UrlTest extends TestCase
 
         URL::enforceTrailingSlashes();
 
-        $this->assertSame('https://example.com/?query', URL::normalizeTrailingSlash('https://example.com?query'));
         $this->assertSame('https://example.com/?query', URL::tidy('https://example.com?query'));
         $this->assertSame('https://example.com/foo/', URL::parent('https://example.com/foo/bar'));
         $this->assertSame('http://localhost/foo/', URL::prependSiteUrl('/foo'));
@@ -779,7 +775,6 @@ class UrlTest extends TestCase
 
         URL::enforceTrailingSlashes(false);
 
-        $this->assertSame('https://example.com?query', URL::normalizeTrailingSlash('https://example.com?query'));
         $this->assertSame('https://example.com?query', URL::tidy('https://example.com?query'));
         $this->assertSame('https://example.com/foo', URL::parent('https://example.com/foo/bar'));
         $this->assertSame('http://localhost/foo', URL::prependSiteUrl('/foo'));
