@@ -10,6 +10,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Query\Builder;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Compare;
@@ -836,7 +837,18 @@ class CoreModifiers extends Modifier
         // Get the requested variable, which is the first parameter.
         $var = Arr::get($params, 0);
 
-        // If the requested value is a collection, we convert it to an array.
+        // If the requested value is a query builder and no variable is requested,
+        // we'll resolve the query and return the result as an array
+        if ($value instanceof Builder && $var === null) {
+            return $value->get()->all();
+        }
+
+        // If the requested value is a query builder, we'll resolve it
+        if ($value instanceof Builder) {
+            $value = $value->get()->all();
+        }
+
+        // If the requested value is a collection, we'll convert it to an array.
         if ($value instanceof Collection) {
             $value = $value->all();
         }

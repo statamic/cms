@@ -4,6 +4,7 @@ namespace Modifiers;
 
 use Facades\Tests\Factories\EntryFactory;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Entry;
 use Statamic\Modifiers\Modify;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -11,6 +12,22 @@ use Tests\TestCase;
 class GetTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+
+    #[Test]
+    public function it_resolves_a_query_builder(): void
+    {
+        $collection = 'blog';
+        $entry = EntryFactory::collection($collection)
+            ->data(['title' => 'Famous Gandalf quotes'])
+            ->create();
+
+        $modified = $this->modify(Entry::query()->where('collection', $collection));
+        $this->assertTrue(is_array($modified));
+        $this->assertEquals($entry, $modified[0]);
+
+        $modified = $this->modify(Entry::query()->where('collection', $collection), [0]);
+        $this->assertEquals($entry, $modified);
+    }
 
     #[Test]
     public function it_returns_the_requested_index_from_an_array(): void
