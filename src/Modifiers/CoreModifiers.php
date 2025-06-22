@@ -828,9 +828,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Get any variable from a relationship.
-     *
-     * @return string
+     * Get any variable from a relationship, an array, a collection or a query builder.
      */
     public function get($value, $params)
     {
