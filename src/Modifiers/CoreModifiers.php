@@ -833,9 +833,12 @@ class CoreModifiers extends Modifier
      */
     public function get($value, $params)
     {
-        // If the requested value is an array, we'll just grab the first one.
+        // Get the requested variable, which is the first parameter.
+        $var = Arr::get($params, 0);
+
+        // If the requested value is an array, we'll grab the index or just the first one.
         if (is_array($value)) {
-            $value = Arr::get($value, 0);
+            $value = Arr::get($value, $var ?? 0);
         }
 
         // If it's not already an object, we'll assume we have an ID and get that.
@@ -845,9 +848,6 @@ class CoreModifiers extends Modifier
         if (! $item) {
             return $value;
         }
-
-        // Get the requested variable, which is the first parameter.
-        $var = Arr::get($params, 0);
 
         // Convert the item to an array, since we'll want access to all the
         // available data. Then grab the requested variable from there.

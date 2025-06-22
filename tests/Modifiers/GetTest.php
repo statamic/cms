@@ -13,7 +13,17 @@ class GetTest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     #[Test]
-    public function it_returns_the_first_item_from_an_array(): void
+    public function it_returns_the_requested_index_from_an_array(): void
+    {
+        $modified = $this->modify(['You shall not pass!', 'Fool of a Took'], [1]);
+        $this->assertEquals('Fool of a Took', $modified);
+
+        $modified = $this->modify(['one' => 'You shall not pass!', 'two' => 'Fool of a Took'], ['two']);
+        $this->assertEquals('Fool of a Took', $modified);
+    }
+
+    #[Test]
+    public function it_returns_the_first_item_from_an_array_if_no_index_is_given(): void
     {
         $modified = $this->modify(['You', 'shall', 'not pass!']);
         $this->assertEquals('You', $modified);
