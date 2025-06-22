@@ -836,6 +836,11 @@ class CoreModifiers extends Modifier
         // Get the requested variable, which is the first parameter.
         $var = Arr::get($params, 0);
 
+        // If the requested value is a collection, we convert it to an array.
+        if ($value instanceof Collection) {
+            $value = $value->all();
+        }
+
         // If the requested value is an array, we'll grab the index or just the first one.
         if (is_array($value)) {
             $value = Arr::get($value, $var ?? 0);
