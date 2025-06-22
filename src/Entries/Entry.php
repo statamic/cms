@@ -1109,6 +1109,6 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             $this->slug = $slug($this);
         }
 
-        return array_keys(Arr::except(get_object_vars($this), ['cachedKeys', 'computedCallbackCache', 'siteCache', 'augmentationReferenceKey']));
+        return array_keys(Arr::except(get_object_vars($this), ['cachedKeys', 'computedCallbackCache', 'siteCache', 'augmentationReferenceKey', 'resolvingValues']));
     }
 }

@@ -2698,4 +2698,31 @@ class EntryTest extends TestCase
 
         $entry->values();
     }
+
+    #[Test]
+    public function entries_can_be_serialized_after_resolving_values()
+    {
+        $entry = EntryFactory::id('entry-id')
+            ->collection('test')
+            ->slug('entry-slug')
+            ->create();
+
+        $customEntry = CustomEntry::fromEntry($entry);
+
+        $serialized = serialize($customEntry);
+        $unserialized = unserialize($serialized);
+
+        $this->assertSame('entry-slug', $unserialized->slug);
+    }
+}
+
+class CustomEntry extends Entry
+{
+    public static function fromEntry(Entry $entry)
+    {
+        return (new static)
+            ->slug($entry->slug)
+            ->collection($entry->collection)
+            ->data($entry->data);
+    }
 }

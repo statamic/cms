@@ -7,7 +7,7 @@ use Statamic\Facades\Blink;
 
 trait HasOrigin
 {
-    private $resolvingValues = false;
+    protected $resolvingValues = false;
 
     /**
      * @var string
