@@ -2123,7 +2123,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Resolves a specific index or the all items from an array, a Collection, or a Query Builder.
+     * Resolves a specific index or all items from an array, a Collection, or a Query Builder.
      */
     public function resolve($value, $params)
     {
