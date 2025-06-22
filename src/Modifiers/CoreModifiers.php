@@ -2123,6 +2123,24 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Resolves a specific index or the all items from an array, a Collection, or a Query Builder.
+     */
+    public function resolve($value, $params)
+    {
+        $key = Arr::get($params, 0);
+
+        if (Compare::isQueryBuilder($value)) {
+            $value = $value->get();
+        }
+
+        if ($value instanceof Collection) {
+            $value = $value->all();
+        }
+
+        return Arr::get($value, $key);
+    }
+
+    /**
      * Reverses the order of a string or list.
      *
      * @param  string|array|Collection  $value
