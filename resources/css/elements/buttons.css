@@ -32,7 +32,7 @@ button {
 
 /*  Default, non-primary action button */
 .btn, .btn-default {
-    @apply text-gray-800 dark:text-dark-150 shadow-button;
+    @apply text-gray-800 dark:text-dark-150 shadow-button min-w-0;
     background: linear-gradient(180deg, #fff, #f9fafb);
     background-clip: padding-box;
     border: 1px solid #D3DDE7;
