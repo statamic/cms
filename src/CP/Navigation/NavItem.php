@@ -114,7 +114,7 @@ class NavItem
         return $this
             ->fluentlyGetOrSet('url')
             ->setter(function ($url) {
-                if (Str::startsWith($url, ['http://', 'https://'])) {
+                if (URL::isAbsolute($url)) {
                     return $url;
                 }
 

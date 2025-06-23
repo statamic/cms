@@ -4,6 +4,7 @@ namespace Statamic\CP\Navigation;
 
 use Facades\Statamic\CP\Navigation\NavItemIdHasher;
 use Statamic\Facades\CP\Nav;
+use Statamic\Facades\URL;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -233,7 +234,7 @@ class NavTransformer
             $url = str_replace(url('/'), '', $url);
         }
 
-        if (Str::startsWith($url, ['http://', 'https://'])) {
+        if (URL::isAbsolute($url)) {
             return $url;
         }
 
