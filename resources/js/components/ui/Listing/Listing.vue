@@ -15,13 +15,17 @@ import Presets from './Presets.vue';
 import Search from './Search.vue';
 import Filters from './Filters.vue';
 import Table from './Table.vue';
+import { sortBy } from 'lodash-es';
+import fuzzysort from 'fuzzysort';
 
 const emit = defineEmits(['update:columns', 'update:sortColumn', 'update:sortDirection', 'update:selections']);
 
 const props = defineProps({
     url: {
         type: String,
-        required: true,
+    },
+    items: {
+        type: Array,
     },
     allowPresets: {
         type: Boolean,
@@ -47,7 +51,6 @@ const props = defineProps({
     },
     columns: {
         type: Array,
-        default: () => [],
     },
     sortColumn: {
         type: String,
@@ -89,7 +92,7 @@ const props = defineProps({
 
 const slots = useSlots();
 const id = uniqid();
-const items = ref([]);
+const rawItems = ref(props.items);
 const meta = ref({});
 const activeFilters = ref({});
 const activeFilterBadges = ref([]);
@@ -100,14 +103,40 @@ const loading = ref(true);
 let popping = false;
 let source = null;
 const searchQuery = ref(null);
-const columns = ref(props.columns);
-const sortColumn = ref(props.sortColumn || (props.columns.length ? props.columns[0].field : null));
+const columns = ref(initializeColumns());
+const sortColumn = ref(props.sortColumn || (columns.value.length ? columns.value[0].field : null));
 const sortDirection = ref(props.sortDirection || getDefaultSortDirectionForColumn(sortColumn.value));
 const selections = ref(props.selections || []);
 const hasActions = computed(() => !!props.actionUrl);
 const hasFilters = computed(() => props.filters && props.filters.length > 0);
 const showPresets = computed(() => props.allowPresets && props.preferencesPrefix);
 const showBulkActions = computed(() => props.allowBulkActions && hasActions.value);
+
+const items = computed({
+    get() {
+        let items = rawItems.value;
+
+        // If items are provided as a prop, we will sort and filter them locally.
+        // Otherwise, they will be fetched from the server.
+        if (!props.items) return items;
+
+        if (searchQuery.value) {
+            items = fuzzysort
+                .go(searchQuery.value, items, {
+                    all: true,
+                    keys: visibleColumns.value.map((c) => c.field),
+                })
+                .map((result) => result.obj);
+        }
+
+        items = sortBy(items, sortColumn.value);
+
+        return sortDirection.value === 'desc' ? items.reverse() : items;
+    },
+    set(newItems) {
+        rawItems.value = newItems;
+    },
+});
 
 const rawParameters = computed(() => ({
     page: currentPage.value,
@@ -166,6 +195,8 @@ const shouldRequestFirstPage = computed(() => {
 });
 
 function request() {
+    if (props.items) return;
+
     loading.value = true;
 
     if (source) source.abort();
@@ -242,6 +273,51 @@ const hiddenColumns = computed(() => columns.value.filter((column) => !column.vi
 const sortableColumns = computed(() => {
     return columns.value.filter((column) => column.sortable).map((column) => column.field);
 });
+
+function initializeColumns() {
+    if (props.columns) {
+        return props.columns.map((column) => {
+            if (typeof column === 'string') {
+                return { field: column, label: getColumnSentenceCaseLabel(column), sortable: true };
+            }
+            return column;
+        });
+    }
+
+    if (props.items && props.items.length > 0) {
+        return Object.keys(props.items[0] || {}).map((field) => ({
+            field,
+            label: getColumnSentenceCaseLabel(field),
+            sortable: true,
+        }));
+    }
+
+    return [
+        {
+            field: 'id',
+            label: 'ID',
+        },
+    ];
+}
+
+function getColumnSentenceCaseLabel(field) {
+    return __(
+        field
+            .replace(/_/g, ' ')
+            .split(' ')
+            .map((word) => getColumnSentenceCaseWord(word))
+            .join(' '),
+    );
+}
+
+function getColumnSentenceCaseWord(word) {
+    return (
+        {
+            id: 'ID',
+            url: 'URL',
+        }[word] || word.charAt(0).toUpperCase() + word.slice(1)
+    );
+}
 
 function isColumnVisible(column) {
     return visibleColumns.value.find((c) => c.field === column);
@@ -375,7 +451,14 @@ onBeforeUnmount(() => {
     if (props.pushQuery) window.removeEventListener('popstate', popState);
 });
 
-request();
+if (props.items) {
+    items.value = props.items;
+    initializing.value = false;
+    loading.value = false;
+} else {
+    request();
+}
+
 autoApplyState();
 </script>
 
