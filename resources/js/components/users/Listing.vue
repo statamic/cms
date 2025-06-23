@@ -9,6 +9,7 @@
             :allow-presets="allowFilterPresets"
             :sort-column="initialSortColumn"
             :sort-direction="initialSortDirection"
+            push-query
         >
             <template #cell-email="{ row: user }">
                 <a class="title-index-field" :href="user.edit_url" @click.stop>
@@ -71,7 +72,6 @@ export default {
         return {
             preferencesPrefix: 'users',
             requestUrl: cp_url('users'),
-            pushQuery: true,
         };
     },
 

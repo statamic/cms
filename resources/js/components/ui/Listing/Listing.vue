@@ -71,7 +71,7 @@ const props = defineProps({
     },
     pushQuery: {
         type: Boolean,
-        default: true,
+        default: false,
     },
     additionalParameters: {
         type: Object,
