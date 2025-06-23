@@ -18,6 +18,7 @@
         </ui-header>
 
         <form-listing
+            :items="{{ json_encode($forms) }}"
             :initial-columns="{{ json_encode($initialColumns) }}"
             action-url="{{ $actionUrl }}"
         ></form-listing>

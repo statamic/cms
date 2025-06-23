@@ -5,7 +5,6 @@ namespace Statamic\Http\Controllers\CP\Forms;
 use Illuminate\Http\Request;
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\CP\Column;
-use Statamic\Facades\Action;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\Scope;
@@ -41,20 +40,9 @@ class FormsController extends CpController
                     'blueprint_url' => cp_route('forms.blueprint.edit', $form->handle()),
                     'can_edit' => User::current()->can('edit', $form),
                     'can_edit_blueprint' => User::current()->can('configure form fields', $form),
-                    'actions' => Action::for($form),
                 ];
             })
             ->values();
-
-        if ($request->wantsJson()) {
-            return [
-                'meta' => [
-                    'columns' => $columns,
-                    'activeFilterBadges' => [],
-                ],
-                'data' => $forms,
-            ];
-        }
 
         return view('statamic::forms.index', [
             'forms' => $forms,
