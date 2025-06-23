@@ -396,6 +396,9 @@ autoApplyState();
             <template v-for="(slot, slotName) in forwardedTableCellSlots" :key="slotName" #[slotName]="slotProps">
                 <component :is="slot" v-bind="slotProps" />
             </template>
+            <template v-if="$slots['prepended-row-actions']" #prepended-row-actions="{ row }">
+                <slot name="prepended-row-actions" :row="row" />
+            </template>
         </Table>
     </slot>
     <BulkActions v-if="showBulkActions" />
