@@ -73,6 +73,8 @@ import { default as Tooltip } from './Tooltip.vue';
 import { default as Widget } from './Widget.vue';
 import { default as Pagination } from './Pagination.vue';
 import { default as Listing } from './Listing/Listing.vue';
+import { default as ListingTable } from './Listing/Table.vue';
+import { default as ListingTableBody } from './Listing/TableBody.vue';
 
 export {
     Badge,
@@ -150,4 +152,6 @@ export {
     Widget,
     Pagination,
     Listing,
+    ListingTable,
+    ListingTableBody,
 };

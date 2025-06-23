@@ -1,12 +1,11 @@
 <script setup>
 import { Panel, PanelFooter } from '@statamic/ui';
-import { ref, computed, useTemplateRef } from 'vue';
+import { ref, computed, useTemplateRef, useSlots } from 'vue';
 import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
-import TableField from '@statamic/components/data-list/TableField.vue';
 import ToggleAll from './ToggleAll.vue';
 import Pagination from './Pagination.vue';
 import HeaderCell from './HeaderCell.vue';
-import RowActions from './RowActions.vue';
+import TableBody from './TableBody.vue';
 
 const props = defineProps({
     unstyled: {
@@ -17,28 +16,12 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
-    reorderable: {
-        type: Boolean,
-        default: false,
-    },
 });
 
-const {
-    visibleColumns,
-    selections,
-    items,
-    hasActions,
-    showBulkActions,
-    maxSelections,
-    sortColumn,
-    setSortColumn,
-    loading,
-} = injectListingContext();
-const tableRef = useTemplateRef('table');
+const { visibleColumns, selections, hasActions, showBulkActions, maxSelections, loading, reorderable } =
+    injectListingContext();
 const shifting = ref(false);
-let lastItemClicked = null;
 const hasSelections = computed(() => selections.value.length > 0);
-const reachedSelectionLimit = computed(() => selections.value.length === maxSelections);
 const singleSelect = computed(() => maxSelections === 1);
 
 const relativeColumnsSize = computed(() => {
@@ -48,48 +31,16 @@ const relativeColumnsSize = computed(() => {
     return 'xl';
 });
 
-function actualIndex(row) {
-    return items.value.findIndex((item) => item.id === row.id);
-}
+const slots = useSlots();
 
-function isSelected(id) {
-    return selections.value.includes(id);
-}
-
-function checkboxClicked(row, index, event) {
-    if (event.shiftKey && lastItemClicked !== null) {
-        tableRef.value.focus();
-        selectRange(Math.min(lastItemClicked, index), Math.max(lastItemClicked, index));
-    } else {
-        toggleSelection(row.id, index);
-    }
-
-    if (event.target.checked) {
-        lastItemClicked = index;
-    }
-}
-
-function toggleSelection(id) {
-    const i = selections.value.indexOf(id);
-
-    if (i > -1) {
-        selections.value.splice(i, 1);
-        return;
-    }
-
-    if (singleSelect.value) selections.value.pop();
-
-    if (!reachedSelectionLimit.value) selections.value.push(id);
-}
-
-function selectRange(from, to) {
-    for (let i = from; i <= to; i++) {
-        let row = items.value[i].id;
-        if (!selections.value.includes(row) && !reachedSelectionLimit.value) {
-            selections.value.push(row);
-        }
-    }
-}
+const forwardedTableCellSlots = computed(() => {
+    return Object.keys(slots)
+        .filter((slotName) => slotName.startsWith('cell-'))
+        .reduce((acc, slotName) => {
+            acc[slotName] = slots[slotName];
+            return acc;
+        }, {});
+});
 </script>
 
 <template>
@@ -125,66 +76,11 @@ function selectRange(from, to) {
                     <th class="actions-column" v-if="hasActions" />
                 </tr>
             </thead>
-            <tbody>
-                <slot name="tbody-start" />
-                <tr
-                    v-for="(row, index) in items"
-                    :key="row.id"
-                    class="sortable-row outline-hidden"
-                    :data-row="isSelected(row.id) ? 'selected' : 'unselected'"
-                >
-                    <td class="table-drag-handle" v-if="reorderable"></td>
-                    <td class="checkbox-column" v-if="showBulkActions && !reorderable">
-                        <input
-                            v-if="!reorderable"
-                            type="checkbox"
-                            :value="row.id"
-                            :checked="isSelected(row.id)"
-                            :disabled="reachedSelectionLimit && !singleSelect && !isSelected(row.id)"
-                            :id="`checkbox-${row.id}`"
-                            @click="checkboxClicked(row, index, $event)"
-                        />
-                    </td>
-                    <td
-                        v-for="column in visibleColumns"
-                        :key="column.field"
-                        :width="column.width"
-                        :data-column="`${column.field}`"
-                    >
-                        <slot
-                            :name="`cell-${column.field}`"
-                            :value="row[column.value || column.field]"
-                            :values="row"
-                            :row="row"
-                            :index="actualIndex(row)"
-                            :display-index="index"
-                            :checkbox-id="`checkbox-${row.id}`"
-                        >
-                            <table-field
-                                :handle="column.field"
-                                :value="row[column.value || column.field]"
-                                :values="row"
-                                :fieldtype="column.fieldtype"
-                                :key="column.field"
-                            />
-                        </slot>
-                    </td>
-                    <!--                    <td class="type-column" v-if="type">-->
-                    <!--                        <Badge-->
-                    <!--                            size="sm"-->
-                    <!--                            v-if="type === 'entries' || type === 'terms'"-->
-                    <!--                            :label="type === 'entries' ? __(row.collection.title) : __(row.taxonomy.title)"-->
-                    <!--                        />-->
-                    <!--                    </td>-->
-                    <td class="actions-column" v-if="hasActions">
-                        <RowActions :row="row">
-                            <template v-if="$slots['prepended-row-actions']" #prepended-actions="{ row }">
-                                <slot name="prepended-row-actions" :row="row" />
-                            </template>
-                        </RowActions>
-                    </td>
-                </tr>
-            </tbody>
+            <TableBody>
+                <template v-for="(slot, slotName) in forwardedTableCellSlots" :key="slotName" #[slotName]="slotProps">
+                    <component :is="slot" v-bind="slotProps" />
+                </template>
+            </TableBody>
         </table>
         <PanelFooter>
             <Pagination />
