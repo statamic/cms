@@ -47,6 +47,10 @@ main {
     transition: all 0.3s ease-in-out;
 }
 
+.nav-closed main {
+    @apply ps-0;
+}
+
 
 
 .nav-closed .nav-main {
