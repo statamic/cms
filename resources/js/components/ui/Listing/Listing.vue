@@ -160,6 +160,7 @@ watch(columns, (newColumns) => emit('update:columns', newColumns));
 watch(sortColumn, (newSortColumn) => emit('update:sortColumn', newSortColumn));
 watch(sortDirection, (newSortDirection) => emit('update:sortDirection', newSortDirection));
 watch(selections, (newSelections) => emit('update:selections', newSelections), { deep: true });
+watch(searchQuery, (newSearchQuery) => emit('update:searchQuery', newSearchQuery));
 
 const forwardedTableCellSlots = computed(() => {
     return Object.keys(slots)
