@@ -222,6 +222,7 @@ return [
     'session_expiry_logged_out_for_inactivity' => 'You have been logged out because you\'ve been inactive for a while.',
     'session_expiry_logging_out_in_seconds' => 'You have been inactive for a while and will be logged out in :seconds seconds. Click to extend your session.',
     'session_expiry_new_window' => 'Opens in a new window. Come back once you\'ve logged in.',
+    'set_new_password_instructions' => 'Confirm your email address and create a new password.',
     'show_slugs_instructions' => 'Whether to display slugs in the tree view.',
     'site_configure_attributes_instructions' => 'Add arbitrary attributes to your site\'s config which can be accessed in your templates. [Learn more](https://statamic.dev/multi-site#additional-attributes).',
     'site_configure_handle_instructions' => 'A unique reference to this site. Non-trivial to change later.',
