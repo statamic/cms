@@ -2229,14 +2229,8 @@ class CoreModifiers extends Modifier
             $segment = $this->getFromContext($context, $params);
         }
 
-        $url = parse_url($value);
-
-        // Get everything after a possible domain
-        // and make sure it starts with a /
-        $uris = Stringy::ensureLeft(Arr::get($url, 'path'), '/');
-
-        //Boom
-        $segments = explode('/', $uris);
+        // Explode segments
+        $segments = explode('/', URL::makeRelative($value));
 
         return Arr::get($segments, $segment);
     }
