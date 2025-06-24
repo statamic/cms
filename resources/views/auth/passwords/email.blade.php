@@ -14,13 +14,17 @@
             <div class="relative space-y-3 rounded-xl border border-gray-300 bg-white p-4 shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)]">
                 <header class="flex flex-col justify-center items-center mb-8 py-3">
                     @if (! old('email'))
-                        <ui-button icon="key" class="shadow-ui-xl rounded-xl mb-4" />
+                        <ui-card class="p-2! mb-4 flex items-center justify-center">
+                            <ui-icon name="key" class="size-5" />
+                        </ui-card>
                         <ui-heading :level="1" size="xl">
                             {{ __('Reset Your Password') }}
                         </ui-heading>
                         <ui-description :text="__('statamic::messages.forgot_password_enter_email')" class="text-center" />
                     @else
-                        <ui-button icon="mail-check" class="shadow-ui-xl rounded-xl mb-4" />
+                        <ui-card class="p-2! mb-4 flex items-center justify-center">
+                            <ui-icon name="mail-check" class="size-5" />
+                        </ui-card>
                         <ui-heading :level="1" size="xl">
                             {{ __('Password Reset Sent') }}
                         </ui-heading>
