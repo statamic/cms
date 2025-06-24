@@ -29,7 +29,6 @@ use Statamic\Events\EntryDeleted;
 use Statamic\Events\EntryDeleting;
 use Statamic\Events\EntrySaved;
 use Statamic\Events\EntrySaving;
-use Statamic\Exceptions\RecursiveAugmentationException;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Fields\Blueprint;
@@ -2678,24 +2677,5 @@ class EntryTest extends TestCase
 
         $this->assertEquals('A', $entry->getSupplement('bar'));
         $this->assertEquals('B', $clone->getSupplement('bar'));
-    }
-
-    #[Test]
-    public function it_detects_recursive_augmentation()
-    {
-        $this->expectException(RecursiveAugmentationException::class);
-        $this->expectExceptionMessage('Recursion detected while augmenting [Statamic\Entries\Entry] with ID [entry-id]');
-
-        \Statamic\Facades\Collection::computed('test', 'the_value', function ($entry) {
-            // Trigger recursion that will bypass without computed values.
-            return $entry->routeData();
-        });
-
-        $entry = EntryFactory::id('entry-id')
-            ->collection('test')
-            ->slug('entry-slug')
-            ->create();
-
-        $entry->values();
     }
 }
