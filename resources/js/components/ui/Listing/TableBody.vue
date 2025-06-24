@@ -8,7 +8,6 @@ import Table from '@statamic/components/ui/Listing/Table.vue';
 const { items, selections, reorderable, showBulkActions, visibleColumns, hasActions, maxSelections } =
     injectListingContext();
 
-const shifting = ref(false);
 let lastItemClicked = null;
 const reachedSelectionLimit = computed(() => selections.value.length === maxSelections);
 const singleSelect = computed(() => maxSelections === 1);
@@ -57,7 +56,7 @@ function selectRange(from, to) {
 </script>
 
 <template>
-    <tbody @keydown.shift="shifting = true" @keyup="shifting = false">
+    <tbody>
         <slot name="tbody-start" />
         <tr
             v-for="(row, index) in items"
