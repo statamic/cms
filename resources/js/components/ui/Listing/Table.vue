@@ -59,6 +59,9 @@ const forwardedTableCellSlots = computed(() => {
         <TableHead />
         <TableBody>
             <template #tbody-start><slot name="tbody-start" /></template>
+            <template #prepended-row-actions="slotProps">
+                <slot name="prepended-row-actions" v-bind="slotProps" />
+            </template>
             <template v-for="(slot, slotName) in forwardedTableCellSlots" :key="slotName" #[slotName]="slotProps">
                 <component :is="slot" v-bind="slotProps" />
             </template>
