@@ -87,12 +87,12 @@ class UrlTest extends TestCase
     public function it_can_force_tidy_unconfigured_external_urls()
     {
         $this->assertSame('http://external.com/', URL::tidy('http://external.com/'));
-        $this->assertSame('http://external.com', URL::tidy('http://external.com/', force: true));
+        $this->assertSame('http://external.com', URL::tidy('http://external.com/', external: true));
 
         URL::enforceTrailingSlashes();
 
         $this->assertSame('http://external.com', URL::tidy('http://external.com'));
-        $this->assertSame('http://external.com/', URL::tidy('http://external.com', force: true));
+        $this->assertSame('http://external.com/', URL::tidy('http://external.com', external: true));
     }
 
     #[Test]
