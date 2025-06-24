@@ -115,6 +115,8 @@ const columns = ref(initializeColumns());
 const sortColumn = ref(props.sortColumn || (columns.value.length ? columns.value[0].field : null));
 const sortDirection = ref(props.sortDirection || getDefaultSortDirectionForColumn(sortColumn.value));
 const selections = ref(props.selections || []);
+const allowsMultipleSelections = computed(() => props.maxSelections > 1);
+const hasReachedSelectionLimit = computed(() => selections.value.length === props.maxSelections);
 const hasActions = computed(() => !!props.actionUrl);
 const hasFilters = computed(() => props.filters && props.filters.length > 0);
 const showPresets = computed(() => props.allowPresets && props.preferencesPrefix);
@@ -379,6 +381,44 @@ function clearSearchQuery() {
     searchQuery.value = null;
 }
 
+let lastSelectionClicked = null;
+
+function selectionClicked(index, event) {
+    const item = items.value[index];
+
+    if (event.shiftKey && lastSelectionClicked !== null) {
+        selectRange(Math.min(lastSelectionClicked, index), Math.max(lastSelectionClicked, index));
+    } else {
+        toggleSelection(item.id);
+    }
+
+    if (selections.value.includes(item.id)) {
+        lastSelectionClicked = index;
+    }
+}
+
+function toggleSelection(id) {
+    const i = selections.value.indexOf(id);
+
+    if (i > -1) {
+        selections.value.splice(i, 1);
+        return;
+    }
+
+    if (!allowsMultipleSelections.value) selections.value.pop();
+
+    if (!hasReachedSelectionLimit.value) selections.value.push(id);
+}
+
+function selectRange(from, to) {
+    for (let i = from; i <= to; i++) {
+        let row = items.value[i].id;
+        if (!selections.value.includes(row) && !hasReachedSelectionLimit.value) {
+            selections.value.push(row);
+        }
+    }
+}
+
 function clearSelections() {
     selections.value.splice(0, selections.value.length);
 }
@@ -413,6 +453,10 @@ provideListingContext({
     setSortColumn,
     selections,
     maxSelections: toRef(() => props.maxSelections),
+    allowsMultipleSelections,
+    selectionClicked,
+    selectRange,
+    toggleSelection,
     clearSelections,
     actionUrl: toRef(() => props.actionUrl),
     actionContext: toRef(() => props.actionContext),

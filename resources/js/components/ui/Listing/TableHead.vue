@@ -2,10 +2,8 @@
 import HeaderCell from '@statamic/components/ui/Listing/HeaderCell.vue';
 import ToggleAll from '@statamic/components/ui/Listing/ToggleAll.vue';
 import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
-import { computed } from 'vue';
 
-const { showBulkActions, reorderable, hasActions, visibleColumns, maxSelections } = injectListingContext();
-const singleSelect = computed(() => maxSelections === 1);
+const { showBulkActions, reorderable, hasActions, visibleColumns, allowsMultipleSelections } = injectListingContext();
 </script>
 
 <template>
@@ -15,7 +13,7 @@ const singleSelect = computed(() => maxSelections === 1);
                 v-if="showBulkActions || reorderable"
                 :class="{ 'checkbox-column': !reorderable, 'handle-column': reorderable }"
             >
-                <ToggleAll v-if="showBulkActions && !singleSelect" />
+                <ToggleAll v-if="showBulkActions && allowsMultipleSelections" />
             </th>
             <HeaderCell v-for="column in visibleColumns" :key="column.field" :column />
             <!--                    <th class="type-column" v-if="type">-->

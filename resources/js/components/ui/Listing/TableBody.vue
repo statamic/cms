@@ -5,12 +5,19 @@ import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vu
 import { computed, ref, watch } from 'vue';
 import Table from '@statamic/components/ui/Listing/Table.vue';
 
-const { items, selections, reorderable, showBulkActions, visibleColumns, hasActions, maxSelections } =
-    injectListingContext();
-
-let lastItemClicked = null;
-const reachedSelectionLimit = computed(() => selections.value.length === maxSelections);
-const singleSelect = computed(() => maxSelections === 1);
+const {
+    items,
+    selections,
+    reorderable,
+    showBulkActions,
+    visibleColumns,
+    hasActions,
+    selectRange,
+    selectionClicked,
+    toggleSelection,
+    hasReachedSelectionLimit,
+    allowsMultipleSelections,
+} = injectListingContext();
 
 function actualIndex(row) {
     return items.value.findIndex((item) => item.id === row.id);
@@ -18,40 +25,6 @@ function actualIndex(row) {
 
 function isSelected(id) {
     return selections.value.includes(id);
-}
-
-function checkboxClicked(row, index, event) {
-    if (event.shiftKey && lastItemClicked !== null) {
-        selectRange(Math.min(lastItemClicked, index), Math.max(lastItemClicked, index));
-    } else {
-        toggleSelection(row.id, index);
-    }
-
-    if (event.target.checked) {
-        lastItemClicked = index;
-    }
-}
-
-function toggleSelection(id) {
-    const i = selections.value.indexOf(id);
-
-    if (i > -1) {
-        selections.value.splice(i, 1);
-        return;
-    }
-
-    if (singleSelect.value) selections.value.pop();
-
-    if (!reachedSelectionLimit.value) selections.value.push(id);
-}
-
-function selectRange(from, to) {
-    for (let i = from; i <= to; i++) {
-        let row = items.value[i].id;
-        if (!selections.value.includes(row) && !reachedSelectionLimit.value) {
-            selections.value.push(row);
-        }
-    }
 }
 </script>
 
@@ -71,9 +44,9 @@ function selectRange(from, to) {
                     type="checkbox"
                     :value="row.id"
                     :checked="isSelected(row.id)"
-                    :disabled="reachedSelectionLimit && !singleSelect && !isSelected(row.id)"
+                    :disabled="hasReachedSelectionLimit && allowsMultipleSelections && !isSelected(row.id)"
                     :id="`checkbox-${row.id}`"
-                    @click="checkboxClicked(row, index, $event)"
+                    @click="selectionClicked(index, $event)"
                 />
             </td>
             <td

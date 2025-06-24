@@ -17,8 +17,7 @@ const props = defineProps({
     },
 });
 
-const { visibleColumns, selections, hasActions, showBulkActions, maxSelections, loading, reorderable } =
-    injectListingContext();
+const { visibleColumns, selections, hasActions, showBulkActions, loading, reorderable } = injectListingContext();
 const shifting = ref(false);
 const hasSelections = computed(() => selections.value.length > 0);
 
