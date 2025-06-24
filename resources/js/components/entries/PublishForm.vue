@@ -39,7 +39,7 @@
                 <svg-icon name="light/lock" class="me-1 -mt-1 w-4" /> {{ __('Read Only') }}
             </div>
 
-            <div class="hidden items-center gap-3 md:flex">
+            <div class="flex items-center gap-3">
                 <save-button-options
                     v-if="!readOnly"
                     :show-options="!revisionsEnabled && !isInline"

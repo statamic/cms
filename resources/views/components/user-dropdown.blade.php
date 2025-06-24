@@ -1,13 +1,13 @@
 <ui-dropdown align="end" x-cloak>
     <template #trigger>
         <ui-button :icon-only="true" variant="ghost">
-            <img src="{{ $user->avatar() }}" class="size-7 rounded-full [button:has(&)]:rounded-full" alt="{{ $user->name() }}" />
+            <x-statamic::avatar :user="$user" />
         </ui-button>
     </template>
 
     <ui-dropdown-header>
         <div class="flex items-center gap-2">
-            <img src="{{ $user->avatar() }}" class="size-8 rounded-full" alt="{{ $user->name() }}" />
+            <x-statamic::avatar :user="$user" class="size-8!" />
             <div>
                 <div class="text-sm">{{ $user->email() }}</div>
                 @if ($user->isSuper())

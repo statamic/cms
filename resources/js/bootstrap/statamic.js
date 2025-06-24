@@ -178,7 +178,7 @@ export default {
         });
 
         Object.assign(this.$app.config.globalProperties, {
-            $theme: new Theme(this.initialConfig.user.theme),
+            $theme: new Theme(this.initialConfig.user?.theme),
         });
 
         Object.assign(this.$app.config.globalProperties, {
