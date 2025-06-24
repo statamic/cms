@@ -96,6 +96,18 @@ class UrlTest extends TestCase
     }
 
     #[Test]
+    public function it_can_tidy_with_or_with_trailing_slashes_via_param_regardless_of_app_default()
+    {
+        $this->assertSame('/about?foo=bar', URL::tidy('/about/?foo=bar', withTrailingSlash: false));
+        $this->assertSame('/about/?foo=bar', URL::tidy('/about?foo=bar', withTrailingSlash: true));
+
+        URL::enforceTrailingSlashes();
+
+        $this->assertSame('/about?foo=bar', URL::tidy('/about/?foo=bar', withTrailingSlash: false));
+        $this->assertSame('/about/?foo=bar', URL::tidy('/about?foo=bar', withTrailingSlash: true));
+    }
+
+    #[Test]
     public function it_prepends_site_url()
     {
         $this->setSiteValue('en', 'url', 'http://site.com/');
