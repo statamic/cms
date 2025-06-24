@@ -15,7 +15,7 @@ class OutsideLogoTest extends TestCase
     {
         $this->assertStringContainsString(
             'statamic-wordmark',
-            Blade::render('<x-outside-logo />')
+            Blade::render('<x-statamic::outside-logo />')
         );
     }
 
@@ -24,7 +24,7 @@ class OutsideLogoTest extends TestCase
     {
         config(['statamic.cp.custom_logo_url' => 'https://example.com/logo.png']);
 
-        $rendered = Blade::render('<x-outside-logo />');
+        $rendered = Blade::render('<x-statamic::outside-logo />');
 
         $this->assertStringContainsString('https://example.com/logo.png', $rendered);
         $this->assertStringContainsString('white-label-logo', $rendered);
@@ -38,7 +38,7 @@ class OutsideLogoTest extends TestCase
             'statamic.cp.custom_dark_logo_url' => 'https://example.com/logo-dark.png',
         ]);
 
-        $rendered = Blade::render('<x-outside-logo />');
+        $rendered = Blade::render('<x-statamic::outside-logo />');
 
         $this->assertStringContainsString('https://example.com/logo.png', $rendered);
         $this->assertStringContainsString('https://example.com/logo-dark.png', $rendered);
@@ -51,7 +51,7 @@ class OutsideLogoTest extends TestCase
     {
         config(['statamic.cp.custom_logo_text' => 'My Custom CMS']);
 
-        $rendered = Blade::render('<x-outside-logo />');
+        $rendered = Blade::render('<x-statamic::outside-logo />');
 
         $this->assertStringContainsString('My Custom CMS', $rendered);
         $this->assertStringContainsString('text-lg font-medium opacity-50', $rendered);
