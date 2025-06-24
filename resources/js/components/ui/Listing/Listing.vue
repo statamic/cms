@@ -19,7 +19,14 @@ import Pagination from './Pagination.vue';
 import { sortBy } from 'lodash-es';
 import fuzzysort from 'fuzzysort';
 
-const emit = defineEmits(['update:columns', 'update:sortColumn', 'update:sortDirection', 'update:selections']);
+const emit = defineEmits([
+    'update:columns',
+    'update:sortColumn',
+    'update:sortDirection',
+    'update:selections',
+    'update:searchQuery',
+    'requestCompleted',
+]);
 
 const props = defineProps({
     url: {
@@ -216,6 +223,7 @@ function request() {
             if (shouldRequestFirstPage.value) return request();
             initializing.value = false;
             loading.value = false;
+            emit('requestCompleted', { response });
         })
         .catch((e) => {
             if (axios.isCancel(e)) return;
