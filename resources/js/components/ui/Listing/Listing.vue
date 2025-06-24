@@ -423,10 +423,6 @@ provideListingContext({
     clearFilters,
 });
 
-const slotProps = computed(() => ({
-    isColumnVisible,
-}));
-
 watch(parameters, (newParams, oldParams) => {
     if (JSON.stringify(newParams) === JSON.stringify(oldParams)) return;
     request();
@@ -461,7 +457,7 @@ autoApplyState();
     <slot name="initializing" v-if="initializing">
         <Icon name="loading" />
     </slot>
-    <slot v-if="!initializing" v-bind="slotProps">
+    <slot v-if="!initializing" :items="items" :is-column-visible="isColumnVisible">
         <Presets v-if="showPresets" />
         <div class="flex items-center gap-3 py-3">
             <div class="flex flex-1 items-center gap-3">
