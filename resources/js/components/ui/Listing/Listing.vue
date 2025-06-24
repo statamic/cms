@@ -292,12 +292,7 @@ function initializeColumns() {
         }));
     }
 
-    return [
-        {
-            field: 'id',
-            label: 'ID',
-        },
-    ];
+    return [];
 }
 
 function getColumnSentenceCaseLabel(field) {
