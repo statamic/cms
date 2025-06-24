@@ -42,31 +42,27 @@ const forwardedTableCellSlots = computed(() => {
 </script>
 
 <template>
-    <Panel class="relative overflow-x-auto overscroll-x-contain">
-        <table
-            :data-size="relativeColumnsSize"
-            :class="{
-                'select-none': shifting,
-                'data-table': !unstyled,
-                contained: contained,
-                'opacity-50': loading,
-            }"
-            data-table
-            ref="table"
-            tabindex="0"
-            :data-has-selections="hasSelections ? true : null"
-            @keydown.shift="shifting = true"
-            @keyup="shifting = false"
-        >
-            <TableHead />
-            <TableBody>
-                <template v-for="(slot, slotName) in forwardedTableCellSlots" :key="slotName" #[slotName]="slotProps">
-                    <component :is="slot" v-bind="slotProps" />
-                </template>
-            </TableBody>
-        </table>
-        <PanelFooter>
-            <Pagination />
-        </PanelFooter>
-    </Panel>
+    <table
+        :data-size="relativeColumnsSize"
+        :class="{
+            'select-none': shifting,
+            'data-table': !unstyled,
+            contained: contained,
+            'opacity-50': loading,
+        }"
+        data-table
+        ref="table"
+        tabindex="0"
+        :data-has-selections="hasSelections ? true : null"
+        @keydown.shift="shifting = true"
+        @keyup="shifting = false"
+    >
+        <TableHead />
+        <TableBody>
+            <template #tbody-start><slot name="tbody-start" /></template>
+            <template v-for="(slot, slotName) in forwardedTableCellSlots" :key="slotName" #[slotName]="slotProps">
+                <component :is="slot" v-bind="slotProps" />
+            </template>
+        </TableBody>
+    </table>
 </template>

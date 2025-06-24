@@ -6,7 +6,7 @@ export const [injectListingContext, provideListingContext] = createContext('List
 
 <script setup>
 import { ref, toRef, computed, watch, nextTick, onMounted, onBeforeUnmount, useSlots } from 'vue';
-import { Icon } from '@statamic/ui';
+import { Icon, Panel, PanelFooter } from '@statamic/ui';
 import axios from 'axios';
 import BulkActions from './BulkActions.vue';
 import uniqid from 'uniqid';
@@ -15,6 +15,7 @@ import Presets from './Presets.vue';
 import Search from './Search.vue';
 import Filters from './Filters.vue';
 import Table from './Table.vue';
+import Pagination from './Pagination.vue';
 import { sortBy } from 'lodash-es';
 import fuzzysort from 'fuzzysort';
 
@@ -466,14 +467,19 @@ autoApplyState();
             </div>
             <CustomizeColumns />
         </div>
-        <Table>
-            <template v-for="(slot, slotName) in forwardedTableCellSlots" :key="slotName" #[slotName]="slotProps">
-                <component :is="slot" v-bind="slotProps" />
-            </template>
-            <template v-if="$slots['prepended-row-actions']" #prepended-row-actions="{ row }">
-                <slot name="prepended-row-actions" :row="row" />
-            </template>
-        </Table>
+        <Panel class="relative overflow-x-auto overscroll-x-contain">
+            <Table>
+                <template v-for="(slot, slotName) in forwardedTableCellSlots" :key="slotName" #[slotName]="slotProps">
+                    <component :is="slot" v-bind="slotProps" />
+                </template>
+                <template v-if="$slots['prepended-row-actions']" #prepended-row-actions="{ row }">
+                    <slot name="prepended-row-actions" :row="row" />
+                </template>
+            </Table>
+            <PanelFooter>
+                <Pagination />
+            </PanelFooter>
+        </Panel>
     </slot>
     <BulkActions v-if="showBulkActions" />
 </template>
