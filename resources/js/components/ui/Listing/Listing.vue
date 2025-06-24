@@ -477,6 +477,10 @@ provideListingContext({
     clearFilters,
 });
 
+defineExpose({
+    refresh,
+});
+
 watch(parameters, (newParams, oldParams) => {
     if (JSON.stringify(newParams) === JSON.stringify(oldParams)) return;
     request();
