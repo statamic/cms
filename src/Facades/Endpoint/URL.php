@@ -29,7 +29,7 @@ class URL
     /**
      * Tidy a URL (normalize slashes).
      */
-    public function tidy(?string $url, bool $force = false): string
+    public function tidy(?string $url, bool $force = false, ?bool $withTrailingSlash = null): string
     {
         // Remove occurrences of '//', except when part of protocol.
         $url = Path::tidy($url);
@@ -44,8 +44,8 @@ class URL
             $url = Str::ensureLeft($url, '/');
         }
 
-        // Trim trailing slash, unless enforced with `enforceTrailingSlashes()`.
-        $url = self::normalizeTrailingSlash($url);
+        // Trim trailing slash, unless `enforceTrailingSlashes()` or explicit `$withTrailingSlash` boolean is used.
+        $url = self::normalizeTrailingSlash($url, $withTrailingSlash);
 
         return $url;
     }
@@ -327,7 +327,7 @@ class URL
     /**
      * Normalize trailing slash before query and fragment (trims by default, but can be enforced).
      */
-    private function normalizeTrailingSlash(?string $url): string
+    private function normalizeTrailingSlash(?string $url, ?bool $withTrailingSlash = null): string
     {
         $parts = str($url)
             ->split(pattern: '/([?#])/', flags: PREG_SPLIT_DELIM_CAPTURE)
@@ -336,9 +336,11 @@ class URL
         $url = array_shift($parts);
         $queryAndFragments = implode($parts);
 
+        $withTrailingSlash ??= self::$enforceTrailingSlashes;
+
         if (in_array($url, ['', '/'])) {
             $url = '/';
-        } elseif (self::$enforceTrailingSlashes) {
+        } elseif ($withTrailingSlash) {
             $url = Str::ensureRight($url, '/');
         } else {
             $url = Str::removeRight($url, '/');
