@@ -56,6 +56,7 @@ import { default as RadioGroup } from './Radio/Group.vue';
 import { default as Select } from './Select/Select.vue';
 import { default as StatusIndicator } from './StatusIndicator.vue';
 import { default as Subheading } from './Subheading.vue';
+import { default as Slider } from './Slider.vue';
 import { default as Switch } from './Switch.vue';
 import { default as TableCell } from './Table/Cell.vue';
 import { default as TableColumn } from './Table/Column.vue';
@@ -75,6 +76,9 @@ import { default as Pagination } from './Pagination.vue';
 import { default as Listing } from './Listing/Listing.vue';
 import { default as ListingTable } from './Listing/Table.vue';
 import { default as ListingTableBody } from './Listing/TableBody.vue';
+import { default as ListingPagination } from './Listing/Pagination.vue';
+import { default as ListingSearch } from './Listing/Search.vue';
+import { default as ListingCustomizeColumns } from './Listing/CustomizeColumns.vue';
 
 export {
     Badge,
@@ -135,6 +139,7 @@ export {
     Select,
     StatusIndicator,
     Subheading,
+    Slider,
     Switch,
     TableCell,
     TableColumn,
@@ -154,4 +159,7 @@ export {
     Listing,
     ListingTable,
     ListingTableBody,
+    ListingPagination,
+    ListingSearch,
+    ListingCustomizeColumns,
 };
