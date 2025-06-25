@@ -19,12 +19,6 @@ class ArrayableLink extends ArrayableString
             : ['url' => $this->url()];
     }
 
-    #[\ReturnTypeWillChange]
-    public function jsonSerialize()
-    {
-        return $this->url(); // Use a string for backwards compatibility in the REST API, etc.
-    }
-
     public function url()
     {
         if (! is_object($this->value)) {
