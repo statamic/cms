@@ -57,7 +57,7 @@ return [
     'collection_next_steps_create_entry_description' => 'Create the first entry or stub out a handful of placeholder entries—whatever suits the mood.',
     'collection_next_steps_scaffold_description' => 'Generate index and detail views from the name of the collection at the click of a button.',
     'collection_revisions_instructions' => 'Enable revisions for this Collection.',
-    'collection_scaffold_instructions' => 'Choose which empty views to generate. Existing files will not be overwritten.',
+    'collection_scaffold_instructions' => 'Select and configure views to generate. Any existing files will be preserved.',
     'collections_blueprint_instructions' => 'Entries in this collection may use any of these blueprints.',
     'collections_default_publish_state_instructions' => 'While creating new entries in this collection the published toggle will default to **true** instead of **false** (draft).',
     'collections_future_date_behavior_instructions' => 'How future dated entries should behave.',
