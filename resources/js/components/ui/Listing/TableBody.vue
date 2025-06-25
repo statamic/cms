@@ -41,11 +41,6 @@ function isSelected(id) {
     >
         <tbody>
             <slot name="tbody-start" />
-            <tr>
-                <td colspan="6">
-                    {{ reorderable ? 'Reorderable' : 'Not reorderable' }}
-                </td>
-            </tr>
             <tr
                 v-for="(row, index) in items"
                 :key="row.id"
