@@ -50,7 +50,7 @@
                                 </template>
                             </ui-field>
 
-                            <ui-checkbox-item name="remember" :label="__('Remember me')" name="remember"  />
+                            <ui-checkbox-item name="remember" :label="__('Remember me')" />
 
                             <ui-button type="submit" variant="primary" :disabled="busy" :text="__('Continue')" />
 
