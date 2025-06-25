@@ -450,6 +450,22 @@ function clearFilters() {
     activeFilterBadges.value = [];
 }
 
+function autoApplyFilters() {
+    if (!props.filters || props.filters.length === 0) return;
+
+    let values = {};
+
+    const isEmpty = (value) => (Array.isArray(value) ? value.length === 0 : Object.keys(value).length === 0);
+
+    props.filters
+        .filter((filter) => !isEmpty(filter.auto_apply))
+        .forEach((filter) => {
+            values[filter.handle] = filter.auto_apply;
+        });
+
+    setFilters(values);
+}
+
 function reordered(order) {
     emit('reordered', order);
 }
@@ -543,6 +559,8 @@ onMounted(() => {
 onBeforeUnmount(() => {
     if (props.pushQuery) window.removeEventListener('popstate', popState);
 });
+
+autoApplyFilters();
 
 if (props.items) {
     items.value = props.items;
