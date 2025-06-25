@@ -240,7 +240,12 @@ function request() {
             if (shouldRequestFirstPage.value) return request();
             initializing.value = false;
             loading.value = false;
-            emit('requestCompleted', { response, items: items.value, parameters: parameters.value });
+            emit('requestCompleted', {
+                response,
+                items: items.value,
+                parameters: parameters.value,
+                activeFilters: activeFilters.value,
+            });
         })
         .catch((e) => {
             if (axios.isCancel(e)) return;
@@ -543,6 +548,7 @@ provideListingContext({
 
 defineExpose({
     refresh,
+    setFilter,
 });
 
 watch(parameters, (newParams, oldParams) => {
