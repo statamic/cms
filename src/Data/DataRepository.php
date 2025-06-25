@@ -3,8 +3,8 @@
 namespace Statamic\Data;
 
 use Statamic\Facades\Site;
+use Statamic\Facades\URL;
 use Statamic\Support\Arr;
-use Statamic\Support\Str;
 
 class DataRepository
 {
@@ -49,13 +49,8 @@ class DataRepository
 
         $url = $site->relativePath($url);
 
-        if (Str::contains($url, '?')) {
-            $url = substr($url, 0, strpos($url, '?'));
-        }
-
-        if (Str::endsWith($url, '/') && Str::length($url) > 1) {
-            $url = rtrim($url, '/');
-        }
+        $url = URL::removeQueryAndFragment($url);
+        $url = URL::tidy($url, withTrailingSlash: false);
 
         return $this->findByUri($url, $site->handle());
     }

@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Statamic\Facades\Site;
+use Statamic\Facades\URL;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\UrlExcluder;
 use Statamic\Support\Str;
@@ -53,12 +54,12 @@ abstract class AbstractCacher implements Cacher
             // This could potentially just be Site::current()->absoluteUrl() but at the
             // moment that method gets the URL based on the request. For now, we will
             // manually get it from the config, as to not break any existing sites.
-            $baseUrl = Str::startsWith($url = Site::current()->url(), '/')
-                ? Str::removeRight(config('app.url'), '/').$url
-                : $url;
+            $baseUrl = URL::isAbsolute($url = Site::current()->url())
+                ? $url
+                : config('app.url').$url;
         }
 
-        return rtrim($baseUrl, '/');
+        return URL::tidy($baseUrl, external: true, withTrailingSlash: false);
     }
 
     /**
