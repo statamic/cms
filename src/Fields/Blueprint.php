@@ -645,7 +645,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
 
         // If field is deferred as an ensured field, we'll need to update it instead
         if (! isset($fields[$handle]) && isset($this->ensuredFields[$handle])) {
-            return $this->ensureEnsuredFieldConfig($handle, $config);
+            return $this->ensureEnsuredFieldHasConfig($handle, $config);
         }
 
         $fieldKey = $fields[$handle]['fieldIndex'];
@@ -666,7 +666,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
         return $this->resetBlueprintCache()->resetFieldsCache();
     }
 
-    protected function ensureEnsuredFieldConfig($handle, $config)
+    protected function ensureEnsuredFieldHasConfig($handle, $config)
     {
         if (! isset($this->ensuredFields[$handle])) {
             return $this;
