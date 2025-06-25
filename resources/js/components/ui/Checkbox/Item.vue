@@ -7,18 +7,21 @@ const props = defineProps({
     description: { type: String, default: null },
     disabled: { type: Boolean, default: false },
     label: { type: String, default: null },
+    modelValue: { type: Boolean, default: false },
     name: { type: String, default: null },
     size: { type: String, default: 'base' },
     solo: { type: Boolean, default: false },
     value: { type: [String, Number, Boolean], required: true },
 });
 
+const emit = defineEmits(['update:modelValue']);
+
 const id = useId();
 
 const checkboxClasses = computed(() => {
     const sizes = {
         sm: 'size-3.75',
-        base: 'size-4'
+        base: 'size-4',
     };
 
     return `shadow-ui-xs mt-0.5 ${sizes[props.size]} cursor-default rounded-sm border border-gray-300 bg-white data-[state=checked]:border-gray-900 data-[state=checked]:bg-gray-900 dark:border-none dark:data-[state=checked]:bg-white data-[disabled]:bg-gray-100 data-[disabled]:border-gray-200 data-[disabled]:text-gray-400 data-[disabled]:cursor-not-allowed shrink-0`;
@@ -36,6 +39,8 @@ const containerClasses = computed(() => {
             :id
             :name="name"
             :value="value"
+            :modelValue="modelValue"
+            @update:modelValue="emit('update:modelValue', $event)"
             :class="checkboxClasses"
         >
             <CheckboxIndicator
@@ -52,11 +57,11 @@ const containerClasses = computed(() => {
                 </svg>
             </CheckboxIndicator>
         </CheckboxRoot>
-        <label class="flex flex-col" :for="id" v-if="!solo">
-            <span class="text-sm font-normal text-gray-600 antialiased dark:text-gray-400">
+        <div class="flex flex-col" v-if="!solo">
+            <label class="text-sm font-normal text-gray-600 antialiased dark:text-gray-400" :for="id">
                 <slot>{{ label || value }}</slot>
-            </span>
-            <span v-if="description" class="mt-0.5 block text-xs leading-snug text-gray-500">{{ description }}</span>
-        </label>
+            </label>
+            <p v-if="description" class="mt-0.5 block text-xs leading-snug text-gray-500">{{ description }}</p>
+        </div>
     </div>
 </template>
