@@ -643,6 +643,11 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
             return $this;
         }
 
+        // If field is deferred as an ensured field, we'll need to update it instead
+        if (! isset($fields[$handle]) && isset($this->ensuredFields[$handle])) {
+            return $this->ensureEnsuredFieldHasConfig($handle, $config);
+        }
+
         $fieldKey = $fields[$handle]['fieldIndex'];
         $sectionKey = $fields[$handle]['sectionIndex'];
 
@@ -657,6 +662,19 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
             $existingConfig = Arr::get($field, 'field', []);
             $this->contents['tabs'][$tab]['sections'][$sectionKey]['fields'][$fieldKey]['field'] = array_merge($existingConfig, $config);
         }
+
+        return $this->resetBlueprintCache()->resetFieldsCache();
+    }
+
+    private function ensureEnsuredFieldHasConfig($handle, $config)
+    {
+        if (! isset($this->ensuredFields[$handle])) {
+            return $this;
+        }
+
+        $existingConfig = Arr::get($this->ensuredFields[$handle], 'config', []);
+
+        $this->ensuredFields[$handle]['config'] = array_merge($existingConfig, $config);
 
         return $this->resetBlueprintCache()->resetFieldsCache();
     }
