@@ -63,21 +63,23 @@
                 </ui-panel-header>
 
                 <ui-card class="h-40">
-                    <data-list :rows="collection.entries" :columns="collection.columns" :sort="false">
-                        <data-list-table unstyled class="[&_td]:p-0.5 [&_td]:text-sm [&_thead]:hidden w-full">
-                            <template #cell-title="{ row: entry }" class="w-full">
-                                <div class="flex items-center gap-2">
-                                    <StatusIndicator :status="entry.status" />
-                                    <a :href="entry.edit_url" class="line-clamp-1 overflow-hidden text-ellipsis" :text="entry.title" />
-                                </div>
-                            </template>
-                            <template #cell-date="{ row: entry }" v-if="collection.dated">
-                                <div class="text-end font-mono text-gray-400 ps-6">
-                                    <date-time :of="entry.date" date-only />
-                                </div>
-                            </template>
-                        </data-list-table>
-                    </data-list>
+                    <ui-listing :items="collection.entries" :columns="collection.columns">
+                        <table class="w-full [&_td]:p-0.5 [&_td]:text-sm">
+                            <ui-listing-table-body>
+                                <template #cell-title="{ row: entry }" class="w-full">
+                                    <div class="flex items-center gap-2">
+                                        <StatusIndicator :status="entry.status" />
+                                        <a :href="entry.edit_url" class="line-clamp-1 overflow-hidden text-ellipsis" :text="entry.title" />
+                                    </div>
+                                </template>
+                                <template #cell-date="{ row: entry }" v-if="collection.dated">
+                                    <div class="text-end font-mono text-gray-400 ps-6">
+                                        <date-time :of="entry.date" date-only />
+                                    </div>
+                                </template>
+                            </ui-listing-table-body>
+                        </table>
+                    </ui-listing>
                     <ui-subheading v-if="collection.entries.length === 0" class="text-center h-full flex items-center justify-center">{{ __('Nothing to see here, yet.') }}</ui-subheading>
                 </ui-card>
 
