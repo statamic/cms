@@ -468,6 +468,7 @@ watch(
             searchQuery.value = null;
             sortColumn.value = 'order';
             sortDirection.value = 'asc';
+            currentPage.value = 1;
         } else {
             if (stateBeforeReordering.value) {
                 const { filters, search, sort, order } = stateBeforeReordering.value;
