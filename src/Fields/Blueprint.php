@@ -666,7 +666,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
         return $this->resetBlueprintCache()->resetFieldsCache();
     }
 
-    protected function ensureEnsuredFieldHasConfig($handle, $config)
+    private function ensureEnsuredFieldHasConfig($handle, $config)
     {
         if (! isset($this->ensuredFields[$handle])) {
             return $this;
