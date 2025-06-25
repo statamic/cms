@@ -115,11 +115,11 @@
                                 <div class="card mb-5 p-0">
                                     <div v-if="collectionHasRoutes" :class="{ hi: !shouldShowSidebar }">
                                         <div
-                                            class="flex items-center space-x-2 p-3 rtl:space-x-reverse"
+                                            class="flex flex-wrap items-center gap-2 p-3 rtl:space-x-reverse"
                                             v-if="showLivePreviewButton || showVisitUrlButton"
                                         >
                                             <button
-                                                class="btn flex w-full items-center justify-center"
+                                                class="btn flex flex-1 items-center justify-center px-2"
                                                 v-if="showLivePreviewButton"
                                                 @click="openLivePreview"
                                             >
@@ -130,7 +130,7 @@
                                                 <span>{{ __('Live Preview') }}</span>
                                             </button>
                                             <a
-                                                class="btn flex w-full items-center justify-center"
+                                                class="btn flex flex-1 items-center justify-center px-2"
                                                 v-if="showVisitUrlButton"
                                                 :href="permalink"
                                                 target="_blank"
