@@ -82,15 +82,17 @@ function removeFieldFilter(handle) {
         <Button
             v-for="(badge, handle) in fieldFilterBadges"
             variant="filled"
-            icon-append="x"
+            :icon-append="reorderable ? null : 'x'"
             :text="badge"
+            :disabled="reorderable"
             @click="removeFieldFilter(handle)"
         />
         <Button
             v-for="(badge, handle) in standardBadges"
             variant="filled"
-            icon-append="x"
+            :icon-append="reorderable ? null : 'x'"
             :text="badge"
+            :disabled="reorderable"
             @click="setFilter(handle, null)"
         />
     </div>
