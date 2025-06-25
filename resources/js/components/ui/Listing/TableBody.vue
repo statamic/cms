@@ -19,6 +19,7 @@ const {
     toggleSelection,
     hasReachedSelectionLimit,
     allowsMultipleSelections,
+    isColumnVisible,
 } = injectListingContext();
 
 function actualIndex(row) {
@@ -73,6 +74,7 @@ function isSelected(id) {
                         :index="actualIndex(row)"
                         :display-index="index"
                         :checkbox-id="`checkbox-${row.id}`"
+                        :is-column-visible="isColumnVisible"
                     >
                         <table-field
                             :handle="column.field"

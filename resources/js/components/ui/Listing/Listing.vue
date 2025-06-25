@@ -515,6 +515,7 @@ provideListingContext({
     columns,
     setColumns,
     visibleColumns,
+    isColumnVisible,
     hiddenColumns,
     sortColumn,
     setSortColumn,
