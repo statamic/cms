@@ -113,6 +113,7 @@ const rawItems = ref(props.items);
 const meta = ref({});
 const activeFilters = ref({});
 const activeFilterBadges = ref([]);
+const stateBeforeReordering = ref(null);
 const currentPage = ref(1);
 const perPage = ref(10);
 const initializing = ref(true);
@@ -452,6 +453,24 @@ function clearFilters() {
 function reordered(order) {
     emit('reordered', order);
 }
+
+watch(
+    () => props.reorderable,
+    (reorderable) => {
+        if (reorderable) {
+            stateBeforeReordering.value = { filters: activeFilters.value, search: searchQuery.value };
+            activeFilters.value = {};
+            searchQuery.value = null;
+        } else {
+            if (stateBeforeReordering.value) {
+                const { filters, search } = stateBeforeReordering.value;
+                activeFilters.value = filters;
+                searchQuery.value = search;
+                stateBeforeReordering.value = null;
+            }
+        }
+    },
+);
 
 provideListingContext({
     loading,
