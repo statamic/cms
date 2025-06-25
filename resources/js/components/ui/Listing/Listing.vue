@@ -26,6 +26,7 @@ const emit = defineEmits([
     'update:selections',
     'update:searchQuery',
     'requestCompleted',
+    'reordered',
 ]);
 
 const props = defineProps({
@@ -448,6 +449,10 @@ function clearFilters() {
     activeFilterBadges.value = [];
 }
 
+function reordered(order) {
+    emit('reordered', order);
+}
+
 provideListingContext({
     loading,
     refresh,
@@ -483,6 +488,8 @@ provideListingContext({
     setFilter,
     setFilters,
     clearFilters,
+    reorderable: toRef(() => props.reorderable),
+    reordered,
 });
 
 defineExpose({
