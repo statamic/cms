@@ -60,6 +60,10 @@ const props = defineProps({
     columns: {
         type: Array,
     },
+    allowCustomizingColumns: {
+        type: Boolean,
+        default: true,
+    },
     sortColumn: {
         type: String,
         default: '',
@@ -87,6 +91,10 @@ const props = defineProps({
     additionalParameters: {
         type: Object,
         default: () => ({}),
+    },
+    allowSearch: {
+        type: Boolean,
+        default: true,
     },
     searchQuery: {
         type: String,
@@ -519,10 +527,10 @@ autoApplyState();
         <Presets v-if="showPresets" />
         <div class="flex items-center gap-3 py-3">
             <div class="flex flex-1 items-center gap-3">
-                <Search />
+                <Search v-if="allowSearch" />
                 <Filters v-if="hasFilters" />
             </div>
-            <CustomizeColumns />
+            <CustomizeColumns v-if="allowCustomizingColumns" />
         </div>
         <Panel class="relative overflow-x-auto overscroll-x-contain">
             <Table>
