@@ -236,7 +236,7 @@ function request() {
             if (shouldRequestFirstPage.value) return request();
             initializing.value = false;
             loading.value = false;
-            emit('requestCompleted', { response });
+            emit('requestCompleted', { response, items: items.value, parameters: parameters.value });
         })
         .catch((e) => {
             if (axios.isCancel(e)) return;
