@@ -152,7 +152,7 @@ return [
     'git_utility_description' => 'Manage Git tracked content.',
     'global_search_open_using_slash' => 'Focus global search using the <kbd>/</kbd> key',
     'global_set_config_intro' => 'Global Sets manage content available across the entire site, like company details, contact information, or front-end settings.',
-    'global_set_no_fields_description' => 'You can add fields to the Blueprint, or you can manually add variables to the set itself.',
+    'global_set_no_fields_description' => 'Add fields to the Blueprint or manually set data in the set\'s YAML file.',
     'globals_blueprint_instructions' => 'Controls the fields to be displayed when editing the variables.',
     'globals_configure_handle_instructions' => 'Used to reference this global set on the frontend. It\'s non-trivial to change later.',
     'globals_configure_intro' => 'A global set is a group of variables available across all front-end pages.',
