@@ -19,7 +19,7 @@ const checkboxClasses = computed(() => {
         sm: 'size-3.75',
         base: 'size-4'
     };
-    
+
     return `shadow-ui-xs mt-0.5 ${sizes[props.size]} cursor-default rounded-sm border border-gray-300 bg-white data-[state=checked]:border-gray-900 data-[state=checked]:bg-gray-900 dark:border-none dark:data-[state=checked]:bg-white data-[disabled]:bg-gray-100 data-[disabled]:border-gray-200 data-[disabled]:text-gray-400 data-[disabled]:cursor-not-allowed shrink-0`;
 });
 
@@ -39,7 +39,7 @@ const containerClasses = computed(() => {
             <CheckboxIndicator
                 class="relative flex h-full w-full items-center justify-center text-white dark:text-gray-800"
             >
-                <svg viewBox="0 0 10 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg viewBox="0 0 10 8" fill="none" xmlns="http://www.w3.org/2000/svg" class="size-2.5">
                     <path
                         d="M9 1L3.5 6.5L1 4"
                         stroke="currentColor"
