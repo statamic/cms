@@ -105,6 +105,10 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    filtersForReordering: {
+        type: Function,
+        default: null,
+    },
 });
 
 const slots = useSlots();
@@ -480,7 +484,7 @@ watch(
                 sort: sortColumn.value,
                 order: sortDirection.value,
             };
-            activeFilters.value = {};
+            activeFilters.value = props.filtersForReordering ? props.filtersForReordering() : {};
             searchQuery.value = null;
             sortColumn.value = 'order';
             sortDirection.value = 'asc';
