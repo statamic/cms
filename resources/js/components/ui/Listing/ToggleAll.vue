@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
 
-const { items, selections, maxSelections, clearSelections } = injectListingContext();
+const { items, selections, maxSelections, clearSelections, reorderable } = injectListingContext();
 const anyItemsChecked = computed(() => selections.value.length > 0);
 const indeterminate = computed(() => anyItemsChecked.value && selections.value.length < items.value.length);
 
@@ -18,7 +18,7 @@ function checkMaximumAmountOfItems() {
 </script>
 
 <template>
-    <label for="checkerOfAllBoxes" class="relative flex cursor-pointer items-center justify-center">
+    <label v-if="!reorderable" for="checkerOfAllBoxes" class="relative flex cursor-pointer items-center justify-center">
         <input
             type="checkbox"
             @change="toggle"

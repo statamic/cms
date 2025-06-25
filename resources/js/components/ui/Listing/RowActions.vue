@@ -11,7 +11,7 @@ const props = defineProps({
     },
 });
 
-const { actionUrl, actionContext, refresh } = injectListingContext();
+const { actionUrl, actionContext, refresh, reorderable } = injectListingContext();
 const busy = ref(false);
 
 watch(busy, (busy) => Statamic.$progress.loading('action', busy));
@@ -37,6 +37,7 @@ function actionFailed(response) {
 
 <template>
     <ItemActions
+        v-if="!reorderable"
         :url="actionUrl"
         :item="row.id"
         :context="actionContext"
