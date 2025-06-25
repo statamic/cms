@@ -2678,4 +2678,28 @@ class EntryTest extends TestCase
         $this->assertEquals('A', $entry->getSupplement('bar'));
         $this->assertEquals('B', $clone->getSupplement('bar'));
     }
+
+    #[Test]
+    public function using_route_data_in_computed_props_does_not_cause_infinite_loops()
+    {
+        $collection =
+            \Statamic\Facades\Collection::make('pages')
+                ->routes('{slug}')
+                ->structureContents(['root' => true])  // We need to be in a structure to create the infinite loop condition.
+                ->save();
+
+        \Statamic\Facades\Collection::computed('pages', 'custom', function ($entry) {
+            return 'Custom: '.$entry->uri();
+        });
+
+        EntryFactory::id('entry-id')
+            ->slug('entry-slug')
+            ->collection('pages')
+            ->create();
+
+        Blink::store('entry-uris')->flush();
+
+        $entry = Facades\Entry::find('entry-id');
+        $this->assertSame('Custom: /', $entry->custom);
+    }
 }
