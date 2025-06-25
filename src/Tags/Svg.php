@@ -37,7 +37,7 @@ class Svg extends Tags
         $svg = null;
 
         foreach ($cascade as $location) {
-            $file = Url::assemble($location, $name);
+            $file = URL::assemble($location, $name);
             if (File::exists($file)) {
                 $svg = StaticStringy::collapseWhitespace(
                     File::get($file)
