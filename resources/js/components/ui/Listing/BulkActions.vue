@@ -43,24 +43,18 @@ function actionFailed(response) {
         <Motion
             v-if="hasSelections"
             layout
-            class="fixed inset-x-0 bottom-1 z-100 flex w-full justify-center"
+            class="fixed inset-x-0 bottom-6 z-100 flex w-full justify-center"
             :initial="{ y: 100, opacity: 0 }"
             :animate="{ y: 0, opacity: 1 }"
             :transition="{ duration: 0.2, ease: 'easeInOut' }"
         >
             <ButtonGroup>
                 <Button
-                    variant="primary"
-                    class="text-gray-400!"
-                    :text="__n(`:count item selected|:count items selected`, selections.length)"
+                    class="text-blue-500!"
+                    :text="__n(`Deselect :count item|Deselect all :count items`, selections.length)"
+                    @click="clearSelections"
                 />
-                <Button
-                    v-for="action in actions"
-                    :key="action.handle"
-                    variant="primary"
-                    :text="__(action.title)"
-                    @click="action.run"
-                />
+                <Button v-for="action in actions" :key="action.handle" :text="__(action.title)" @click="action.run" />
             </ButtonGroup>
         </Motion>
     </BulkActions>
