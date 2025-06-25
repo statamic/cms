@@ -1,5 +1,14 @@
 # Release Notes
 
+## 5.58.1 (2025-06-25)
+
+### What's fixed
+- Fix Overflow buttons preview [#11891](https://github.com/statamic/cms/issues/11891) by @marcorieser
+- Revert detect recursion when augmenting Entries (#11854) [#11894](https://github.com/statamic/cms/issues/11894) by @JohnathonKoster
+- Add entry serialization test [#11900](https://github.com/statamic/cms/issues/11900) by @jasonvarga
+
+
+
 ## 5.58.0 (2025-06-20)
 
 ### What's new

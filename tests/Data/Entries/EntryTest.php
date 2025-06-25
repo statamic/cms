@@ -29,7 +29,6 @@ use Statamic\Events\EntryDeleted;
 use Statamic\Events\EntryDeleting;
 use Statamic\Events\EntrySaved;
 use Statamic\Events\EntrySaving;
-use Statamic\Exceptions\RecursiveAugmentationException;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Fields\Blueprint;
@@ -2725,21 +2724,29 @@ class EntryTest extends TestCase
     }
 
     #[Test]
-    public function it_detects_recursive_augmentation()
+    public function entries_can_be_serialized_after_resolving_values()
     {
-        $this->expectException(RecursiveAugmentationException::class);
-        $this->expectExceptionMessage('Recursion detected while augmenting [Statamic\Entries\Entry] with ID [entry-id]');
-
-        \Statamic\Facades\Collection::computed('test', 'the_value', function ($entry) {
-            // Trigger recursion that will bypass without computed values.
-            return $entry->routeData();
-        });
-
         $entry = EntryFactory::id('entry-id')
             ->collection('test')
             ->slug('entry-slug')
             ->create();
 
-        $entry->values();
+        $customEntry = CustomEntry::fromEntry($entry);
+
+        $serialized = serialize($customEntry);
+        $unserialized = unserialize($serialized);
+
+        $this->assertSame('entry-slug', $unserialized->slug);
+    }
+}
+
+class CustomEntry extends Entry
+{
+    public static function fromEntry(Entry $entry)
+    {
+        return (new static)
+            ->slug($entry->slug)
+            ->collection($entry->collection)
+            ->data($entry->data);
     }
 }
