@@ -1,3 +1,4 @@
+import { default as AuthCard } from './AuthCard.vue';
 import { default as Badge } from './Badge.vue';
 import { default as Button } from './Button/Button.vue';
 import { default as ButtonGroup } from './Button/Group.vue';
@@ -73,6 +74,7 @@ import { default as Tooltip } from './Tooltip.vue';
 import { default as Widget } from './Widget.vue';
 
 export {
+    AuthCard,
     Badge,
     Button,
     ButtonGroup,

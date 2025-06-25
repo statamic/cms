@@ -7,7 +7,7 @@
 @section('title', __('Two-Factor Authentication'))
 
 @section('content')
-    <div class="relative mx-auto max-w-[400px] items-center justify-center pt-20">
+    <div class="relative mx-auto max-w-[400px] items-center justify-center">
         <div class="flex items-center justify-center py-6">
             <x-statamic::outside-logo />
         </div>
