@@ -3,13 +3,14 @@ import { CheckboxIndicator, CheckboxRoot, useId } from 'reka-ui';
 import { computed } from 'vue';
 
 const props = defineProps({
+    align: { type: String, default: 'start', validator: (value) => ['start', 'center'].includes(value) },
     description: { type: String, default: null },
     disabled: { type: Boolean, default: false },
     label: { type: String, default: null },
-    value: { type: [String, Number, Boolean], required: true },
-    solo: { type: Boolean, default: false },
+    name: { type: String, default: null },
     size: { type: String, default: 'base' },
-    align: { type: String, default: 'start', validator: (value) => ['start', 'center'].includes(value) },
+    solo: { type: Boolean, default: false },
+    value: { type: [String, Number, Boolean], required: true },
 });
 
 const id = useId();
@@ -33,6 +34,7 @@ const containerClasses = computed(() => {
         <CheckboxRoot
             :disabled
             :id
+            :name="name"
             :value="value"
             :class="checkboxClasses"
         >
