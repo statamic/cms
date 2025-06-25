@@ -338,9 +338,11 @@ class URL
 
         $withTrailingSlash ??= self::$enforceTrailingSlashes;
 
+        $isFile = Str::contains(basename(parse_url($url)['path'] ?? ''), '.');
+
         if (in_array($url, ['', '/'])) {
             $url = '/';
-        } elseif ($withTrailingSlash) {
+        } elseif ($withTrailingSlash && ! $isFile) {
             $url = Str::ensureRight($url, '/');
         } else {
             $url = Str::removeRight($url, '/');

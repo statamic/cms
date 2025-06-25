@@ -108,6 +108,15 @@ class UrlTest extends TestCase
     }
 
     #[Test]
+    public function it_doesnt_enforce_trailing_slash_if_last_segment_looks_like_file_with_extension()
+    {
+        URL::enforceTrailingSlashes();
+
+        $this->assertSame('/about/', URL::tidy('/about'));
+        $this->assertSame('/about.txt', URL::tidy('/about.txt'));
+    }
+
+    #[Test]
     public function it_prepends_site_url()
     {
         $this->setSiteValue('en', 'url', 'http://site.com/');
