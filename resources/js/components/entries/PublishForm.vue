@@ -103,9 +103,10 @@
                         <div class="space-y-6">
                             <!-- Live Preview / Visit URL Buttons -->
                             <div v-if="collectionHasRoutes">
-                                <div class="grid grid-cols-2 gap-4" v-if="showLivePreviewButton || showVisitUrlButton">
+                                <div class="flex flex-wrap gap-4" v-if="showLivePreviewButton || showVisitUrlButton">
                                     <Button
                                         :text="__('Live Preview')"
+                                        class="flex-1"
                                         icon="live-preview"
                                         @click="openLivePreview"
                                         v-if="showLivePreviewButton"
@@ -113,6 +114,7 @@
                                     <Button
                                         :href="permalink"
                                         :text="__('Visit URL')"
+                                        class="flex-1"
                                         icon="external-link"
                                         target="_blank"
                                         v-if="showVisitUrlButton"
