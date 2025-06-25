@@ -458,14 +458,23 @@ watch(
     () => props.reorderable,
     (reorderable) => {
         if (reorderable) {
-            stateBeforeReordering.value = { filters: activeFilters.value, search: searchQuery.value };
+            stateBeforeReordering.value = {
+                filters: activeFilters.value,
+                search: searchQuery.value,
+                sort: sortColumn.value,
+                order: sortDirection.value,
+            };
             activeFilters.value = {};
             searchQuery.value = null;
+            sortColumn.value = 'order';
+            sortDirection.value = 'asc';
         } else {
             if (stateBeforeReordering.value) {
-                const { filters, search } = stateBeforeReordering.value;
+                const { filters, search, sort, order } = stateBeforeReordering.value;
                 activeFilters.value = filters;
                 searchQuery.value = search;
+                sortColumn.value = sort;
+                sortDirection.value = order;
                 stateBeforeReordering.value = null;
             }
         }
