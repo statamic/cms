@@ -52,7 +52,7 @@ function updateOpen(value) {
 
 <template>
     <DialogRoot :open @update:open="updateOpen">
-        <DialogTrigger data-ui-modal-trigger>
+        <DialogTrigger data-ui-modal-trigger as-child>
             <slot name="trigger" />
         </DialogTrigger>
         <DialogPortal>
