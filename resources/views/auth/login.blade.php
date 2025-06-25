@@ -41,7 +41,6 @@
                                 <ui-input
                                     name="password"
                                     type="password"
-                                    viewable
                                     value="{{ old('password') }}"
                                 />
                                 <template #actions>
