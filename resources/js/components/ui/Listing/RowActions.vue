@@ -40,6 +40,7 @@ function actionFailed(response) {
         :url="actionUrl"
         :item="row.id"
         :context="actionContext"
+        :actions="row.actions"
         @started="actionStarted"
         @completed="actionCompleted"
         v-slot="{ actions, loadActions }"
