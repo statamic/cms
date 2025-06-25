@@ -1,4 +1,9 @@
 <template>
+    <ui-header :title="__('Scaffold Views')" icon="scaffold">
+        <ui-button variant="primary" tabindex="4" :disabled="!canSubmit" @click="submit">
+            {{ __('Create Views') }}
+        </ui-button>
+    </ui-header>
     <ui-panel :heading="__('messages.collection_scaffold_instructions')">
         <table class="data-table">
             <tbody>
@@ -35,10 +40,6 @@
             </tbody>
         </table>
     </ui-panel>
-
-    <ui-button class="float-right" variant="primary" tabindex="4" :disabled="!canSubmit" @click="submit">
-        {{ __('Create Views') }}
-    </ui-button>
 
 </template>
 
