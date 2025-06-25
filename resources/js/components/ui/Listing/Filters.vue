@@ -5,7 +5,7 @@ import { computed } from 'vue';
 import FieldFilter from '@statamic/components/data-list/FieldFilter.vue';
 import DataListFilter from '@statamic/components/data-list/Filter.vue';
 
-const { filters, activeFilters, activeFilterBadges, setFilter } = injectListingContext();
+const { filters, activeFilters, activeFilterBadges, setFilter, reorderable } = injectListingContext();
 
 const badgeCount = computed(() => {
     let count = Object.keys(activeFilterBadges.value).length;
@@ -37,7 +37,7 @@ function removeFieldFilter(handle) {
     <div class="flex flex-1 items-center gap-3 overflow-x-auto">
         <Modal :title="__('Apply Filters')">
             <template #trigger>
-                <Button icon="filter" class="relative">
+                <Button icon="filter" class="relative" :disabled="reorderable">
                     {{ __('Filter') }}
                     <Badge
                         v-if="badgeCount"

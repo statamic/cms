@@ -3,7 +3,7 @@ import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vu
 import { Input } from '@statamic/ui';
 import debounce from '@statamic/util/debounce.js';
 
-const { searchQuery, setSearchQuery } = injectListingContext();
+const { searchQuery, setSearchQuery, reorderable } = injectListingContext();
 const placeholder = 'Search...';
 const searchQueryUpdated = debounce((event) => setSearchQuery(event.target.value), 300);
 </script>
@@ -16,6 +16,7 @@ const searchQueryUpdated = debounce((event) => setSearchQuery(event.target.value
             icon="magnifying-glass"
             :placeholder="__(placeholder)"
             :value="searchQuery"
+            :disabled="reorderable"
             @input="searchQueryUpdated"
             @keyup.esc="setSearchQuery(null)"
         />

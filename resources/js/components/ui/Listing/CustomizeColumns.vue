@@ -4,7 +4,7 @@ import { SortableList } from '@statamic/components/sortable/Sortable.js';
 import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
 import { computed, ref } from 'vue';
 
-const { preferencesPrefix, columns, visibleColumns, hiddenColumns, setColumns } = injectListingContext();
+const { preferencesPrefix, columns, visibleColumns, hiddenColumns, setColumns, reorderable } = injectListingContext();
 const preferencesKey = ref(`${preferencesPrefix.value}.columns`);
 const saving = ref(false);
 const open = ref(false);
@@ -71,7 +71,7 @@ function reset() {
 <template>
     <div>
         <Tooltip :text="__('Customize Columns')">
-            <Button icon="sliders-vertical" @click="open = true" />
+            <Button icon="sliders-vertical" :disabled="reorderable" @click="open = true" />
         </Tooltip>
         <Modal :title="__('Customize Columns')" v-model:open="open">
             <div class="flex h-full flex-col">
