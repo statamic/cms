@@ -45,7 +45,7 @@ class Entries extends ResourceCollection
         $columns->put('status', $status);
 
         if (User::current()->cant('view-other-authors-entries', [Entry::class, $this->blueprint->parent()])) {
-            $columns->get('author')->listable(false);
+            $columns->get('author')?->listable(false);
         }
 
         if ($key = $this->columnPreferenceKey) {
