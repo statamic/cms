@@ -11,9 +11,9 @@ const {
     selections,
     reorderable,
     reordered,
-    showBulkActions,
     visibleColumns,
     hasActions,
+    allowsSelections,
     selectRange,
     selectionClicked,
     toggleSelection,
@@ -49,7 +49,7 @@ function isSelected(id) {
                 :data-row="isSelected(row.id) ? 'selected' : 'unselected'"
             >
                 <td class="table-drag-handle" v-if="reorderable"></td>
-                <td class="checkbox-column" v-if="showBulkActions && !reorderable">
+                <td class="checkbox-column" v-if="allowsSelections && !reorderable">
                     <input
                         v-if="!reorderable"
                         type="checkbox"
