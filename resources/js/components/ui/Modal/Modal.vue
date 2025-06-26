@@ -63,7 +63,7 @@ function updateOpen(value) {
                 <div
                     class="relative space-y-3 rounded-xl border border-gray-400/60 bg-white p-4 shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:border-none dark:bg-gray-800 dark:shadow-[0_10px_15px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/15"
                 >
-                    <DialogTitle v-if="!hasModalTitleComponent" data-ui-modal-title>
+                    <DialogTitle v-if="!hasModalTitleComponent" data-ui-modal-title class="font-medium">
                         {{ title }}
                     </DialogTitle>
                     <slot />

@@ -4,10 +4,9 @@
             <Button type="submit" variant="primary" @click="save" :text="__('Save')" />
         </Header>
 
-        <div class="card configure-tab publish-fields @container mb-6 p-0">
+        <ui-card class="space-y-6">
             <form-group
                 handle="title"
-                class="dark:border-dark-900 border-b"
                 :display="__('Title')"
                 :errors="errors.title"
                 :instructions="__('messages.role_title_instructions')"
@@ -16,7 +15,6 @@
             />
 
             <form-group
-                class="dark:border-dark-900 border-b"
                 fieldtype="slug"
                 handle="handle"
                 :display="__('Handle')"
@@ -38,13 +36,17 @@
                 :instructions="__('permissions.super_desc')"
                 v-model="isSuper"
             />
-        </div>
+        </ui-card>
 
-        <div v-if="!isSuper">
-            <div class="content mt-6" v-for="group in permissions" :key="group.handle">
-                <h2 class="mt-10 mb-2 text-base">{{ group.label }}</h2>
-                <role-permission-tree class="card p-0" :depth="1" :initial-permissions="group.permissions" />
-            </div>
+        <div v-if="!isSuper" class="space-y-6 mt-6">
+            <ui-panel v-for="group in permissions" :key="group.handle">
+                <ui-panel-header>
+                    <ui-heading :text="group.label" />
+                </ui-panel-header>
+                <ui-card>
+                    <role-permission-tree :depth="1" :initial-permissions="group.permissions" />
+                </ui-card>
+            </ui-panel>
         </div>
     </div>
 </template>

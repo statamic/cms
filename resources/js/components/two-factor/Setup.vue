@@ -61,31 +61,26 @@ function complete() {
 
             <template v-else>
                 <div>
-                    <p class="mb-6">{{ __('statamic::messages.two_factor_setup_instructions') }}</p>
+                    <ui-description class="mb-6">{{ __('statamic::messages.two_factor_setup_instructions') }}</ui-description>
 
                     <div class="flex justify-center space-x-6">
                         <div class="bg-white" v-html="qrCode"></div>
-                        <div>
-                            <p>
-                                {{ __('Setup Key') }}: <code>{{ secretKey }}</code>
-                            </p>
+                        <div class="space-y-6">
+                            <ui-field :label="__('Setup Key')">
+                                <ui-input copyable readonly :value="secretKey" />
+                            </ui-field>
 
-                            <label
-                                for="code"
-                                class="mb-2 mt-4 block text-sm font-medium text-gray-700 dark:text-dark-150"
-                            >
-                                {{ __('Verification Code') }}
-                            </label>
-                            <Input
-                                name="code"
-                                pattern="[0-9]*"
-                                maxlength="6"
-                                inputmode="numeric"
-                                autofocus
-                                autocomplete="off"
-                                v-model="code"
-                            />
-                            <div v-if="error" class="mt-2 text-xs text-red-500" v-html="error"></div>
+                            <ui-field :label="__('Verification Code')" :error="error">
+                                <ui-input
+                                    name="code"
+                                    pattern="[0-9]*"
+                                    maxlength="6"
+                                    inputmode="numeric"
+                                    autofocus
+                                    autocomplete="off"
+                                    v-model="code"
+                                />
+                            </ui-field>
                         </div>
                     </div>
                 </div>

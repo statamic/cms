@@ -54,7 +54,7 @@ main {
 
 
 .nav-closed .nav-main {
-    @apply md:-start-46;
+    @apply -start-46;
 }
 
 .nav-closed main {

@@ -44,6 +44,10 @@ class FormsController extends CpController
             })
             ->values();
 
+        if ($forms->count() === 0) {
+            return view('statamic::forms.empty');
+        }
+
         return view('statamic::forms.index', [
             'forms' => $forms,
             'initialColumns' => $columns,

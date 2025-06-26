@@ -7,35 +7,29 @@ import BaseEntryCreateForm from '../components/entries/BaseCreateForm.vue';
 import BaseTermCreateForm from '../components/terms/BaseCreateForm.vue';
 import CreateTermButton from '../components/terms/CreateTermButton.vue';
 import FieldsetListing from '../components/fieldsets/Listing.vue';
-import FieldsetCreateForm from '../components/fieldsets/CreateForm.vue';
 import FieldsetEditForm from '../components/fieldsets/EditForm.vue';
 import BlueprintListing from '../components/blueprints/Listing.vue';
 import BlueprintBuilder from '../components/blueprints/Builder.vue';
-import FormCreateForm from '../components/forms/CreateForm.vue';
 import FormListing from '../components/forms/Listing.vue';
 import FormSubmissionListing from '../components/forms/SubmissionListing.vue';
 import GlobalListing from '../components/globals/Listing.vue';
 import GlobalEditForm from '../components/globals/EditForm.vue';
 import GlobalPublishForm from '../components/globals/PublishForm.vue';
-import GlobalCreateForm from '../components/globals/CreateForm.vue';
 import UserListing from '../components/users/Listing.vue';
 import UserWizard from '../components/users/Wizard.vue';
 import RoleListing from '../components/roles/Listing.vue';
 import RolePublishForm from '../components/roles/PublishForm.vue';
 import UserGroupListing from '../components/user-groups/Listing.vue';
 import UserGroupPublishForm from '../components/user-groups/PublishForm.vue';
-import CollectionCreateForm from '../components/collections/CreateForm.vue';
 import CollectionScaffolder from '../components/collections/Scaffolder.vue';
 import CollectionEditForm from '../components/collections/EditForm.vue';
 import CollectionView from '../components/collections/View.vue';
 import CollectionBlueprintListing from '../components/collections/BlueprintListing.vue';
 import SessionExpiry from '../components/SessionExpiry.vue';
 import NavigationListing from '../components/navigation/Listing.vue';
-import NavigationCreateForm from '../components/navigation/CreateForm.vue';
 import NavigationEditForm from '../components/navigation/EditForm.vue';
 import PreferencesEditForm from '../components/preferences/EditForm.vue';
 import NavigationView from '../components/navigation/View.vue';
-import TaxonomyCreateForm from '../components/taxonomies/CreateForm.vue';
 import TaxonomyEditForm from '../components/taxonomies/EditForm.vue';
 import TaxonomyBlueprintListing from '../components/taxonomies/BlueprintListing.vue';
 import AssetContainerCreateForm from '../components/asset-containers/CreateForm.vue';
@@ -61,35 +55,29 @@ export default {
         BaseTermCreateForm,
         CreateTermButton,
         FieldsetListing,
-        FieldsetCreateForm,
         FieldsetEditForm,
         BlueprintListing,
         BlueprintBuilder,
-        FormCreateForm,
         FormListing,
         FormSubmissionListing,
         GlobalListing,
         GlobalEditForm,
         GlobalPublishForm,
-        GlobalCreateForm,
         UserListing,
         UserWizard,
         RoleListing,
         RolePublishForm,
         UserGroupListing,
         UserGroupPublishForm,
-        CollectionCreateForm,
         CollectionScaffolder,
         CollectionEditForm,
         CollectionView,
         CollectionBlueprintListing,
         SessionExpiry,
         NavigationListing,
-        NavigationCreateForm,
         NavigationEditForm,
         PreferencesEditForm,
         NavigationView,
-        TaxonomyCreateForm,
         TaxonomyEditForm,
         TaxonomyBlueprintListing,
         AssetContainerCreateForm,

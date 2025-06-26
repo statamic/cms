@@ -26,7 +26,12 @@
                         <Button icon="ui/dots" variant="ghost" />
                     </template>
                     <DropdownMenu>
-                        <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" v-if="canEditBlueprint" :redirect="actions.editBlueprint" />
+                        <DropdownItem
+                            :text="__('Edit Blueprint')"
+                            icon="blueprint-edit"
+                            v-if="canEditBlueprint"
+                            :redirect="actions.editBlueprint"
+                        />
                         <DropdownSeparator v-if="canEditBlueprint && itemActions.length" />
                         <DropdownItem
                             v-for="action in itemActions"
@@ -85,9 +90,10 @@
                             class="space-y-6"
                             v-if="showLivePreviewButton || showVisitUrlButton || showLocalizationSelector"
                         >
-                            <div class="grid grid-cols-2 gap-4" v-if="showLivePreviewButton || showVisitUrlButton">
+                            <div class="flex flex-wrap gap-4" v-if="showLivePreviewButton || showVisitUrlButton">
                                 <Button
                                     :text="__('Live Preview')"
+                                    class="flex-1"
                                     icon="live-preview"
                                     v-if="showLivePreviewButton"
                                     @click="openLivePreview"
@@ -95,6 +101,7 @@
                                 <Button
                                     :href="permalink"
                                     :text="__('Visit URL')"
+                                    class="flex-1"
                                     icon="external-link"
                                     v-if="showVisitUrlButton"
                                     target="_blank"

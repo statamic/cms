@@ -13,6 +13,6 @@
     @elseif (isset($customLogoText))
         <div class="mx-auto mb-8 max-w-xs text-center text-lg font-medium opacity-50">{{ $customLogoText }}</div>
     @else
-        @cp_svg('statamic-wordmark')
+        @cp_svg('icons/statamic-logo-lime', 'h-6')
     @endif
 </div>

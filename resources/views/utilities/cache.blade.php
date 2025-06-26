@@ -7,7 +7,7 @@
 
 @section('content')
 
-    <ui-header title="{{ __('Cache Manager') }}">
+    <ui-header title="{{ __('Cache Manager') }}" icon="cache">
         <form method="POST" action="{{ cp_route('utilities.cache.clear', 'all') }}">
             @csrf
             <ui-button

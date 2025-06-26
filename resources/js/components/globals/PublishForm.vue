@@ -38,12 +38,9 @@
 
         <div
             v-if="fieldset.empty"
-            class="mt-10 rounded-lg border-2 border-dashed px-8 py-32 text-center dark:border-dark-300"
+            class="px-8 py-16 border border-dashed border-gray-400 dark:border-gray-600 rounded-lg text-center"
         >
-            <div class="mx-auto max-w-md opacity-50">
-                <h1 class="my-6" v-text="__('This Global Set has no fields.')" />
-                <p v-text="__('messages.global_set_no_fields_description')" />
-            </div>
+            <ui-heading class="mx-auto max-w-md" :text="__('messages.global_set_no_fields_description')" />
         </div>
 
         <PublishContainer

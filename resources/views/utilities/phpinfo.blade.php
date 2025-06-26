@@ -7,7 +7,7 @@
 
 @section('content')
 
-<ui-header title="{{ __('PHP Info') }}"></ui-header>
+<ui-header title="{{ __('PHP Info') }}" icon="info"></ui-header>
 
 <section class="space-y-6">
     <ui-card-panel heading="{{ __('PHP version') }}">

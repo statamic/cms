@@ -1,3 +1,4 @@
+import { default as AuthCard } from './AuthCard.vue';
 import { default as Badge } from './Badge.vue';
 import { default as Button } from './Button/Button.vue';
 import { default as ButtonGroup } from './Button/Group.vue';
@@ -82,6 +83,7 @@ import { default as ListingFilters } from './Listing/Filters.vue';
 import { default as ListingCustomizeColumns } from './Listing/CustomizeColumns.vue';
 
 export {
+    AuthCard,
     Badge,
     Button,
     ButtonGroup,
