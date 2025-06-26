@@ -9,6 +9,7 @@
             :allow-presets="allowFilterPresets"
             :sort-column="initialSortColumn"
             :sort-direction="initialSortDirection"
+            :additional-parameters="additionalParameters"
             push-query
         >
             <template #cell-email="{ row: user }">
