@@ -1,58 +1,39 @@
-<template>
-    <data-list :visible-columns="columns" :columns="columns" :rows="rows" v-slot="{ filteredRows: rows }">
-        <ui-panel>
-            <data-list-table>
-                <template #cell-title="{ row: fieldset }">
-                    <a :href="fieldset.edit_url">{{ __(fieldset.title) }}</a>
-                </template>
-                <template #cell-handle="{ value }">
-                    <span class="font-mono text-xs">{{ value }}</span>
-                </template>
-                <template #actions="{ row: fieldset, index }">
-                    <Dropdown class="me-3">
-                        <DropdownMenu>
-                            <DropdownItem :text="__('Edit')" icon="edit" :href="fieldset.edit_url" />
-                            <DropdownItem v-if="fieldset.is_resettable" :text="__('Reset')" variant="destructive" @click="$refs[`resetter_${fieldset.id}`].confirm()" />
-                            <DropdownItem v-if="fieldset.is_deletable" :text="__('Delete')" icon="trash" variant="destructive" @click="$refs[`deleter_${fieldset.id}`].confirm()" />
-                        </DropdownMenu>
-                    </Dropdown>
+<script setup>
+import { ref } from 'vue';
+import { Listing, DropdownItem } from '@statamic/ui';
 
-                    <fieldset-resetter :ref="`resetter_${fieldset.id}`" :resource="fieldset" :reload="true" />
-                    <fieldset-deleter :ref="`deleter_${fieldset.id}`" :resource="fieldset" @deleted="removeRow(fieldset)" />
-                </template>
-            </data-list-table>
-        </ui-panel>
-    </data-list>
-</template>
+const props = defineProps(['initialRows', 'actionUrl']);
 
-<script>
-import Listing from '../Listing.vue';
-import { Dropdown, DropdownMenu, DropdownItem } from '@statamic/ui';
-import FieldsetDeleter from './FieldsetDeleter.vue';
-import FieldsetResetter from './FieldsetResetter.vue';
+const rows = ref(props.initialRows);
 
-export default {
-    mixins: [Listing],
+const columns = ref([
+    { label: __('Title'), field: 'title' },
+    { label: __('Handle'), field: 'handle', width: '25%' },
+    { label: __('Fields'), field: 'fields', width: '15%' },
+]);
 
-    components: {
-        Dropdown,
-        DropdownMenu,
-        DropdownItem,
-        FieldsetDeleter,
-        FieldsetResetter,
-    },
-
-    props: ['initialRows'],
-
-    data() {
-        return {
-            rows: this.initialRows,
-            columns: [
-                { label: __('Title'), field: 'title' },
-                { label: __('Handle'), field: 'handle', width: '25%' },
-                { label: __('Fields'), field: 'fields', width: '15%' },
-            ],
-        };
-    },
-};
+function reloadPage() {
+    window.location.reload();
+}
 </script>
+
+<template>
+    <Listing
+        :items="rows"
+        :columns="columns"
+        :action-url="actionUrl"
+        :allow-search="false"
+        :allow-customizing-columns="false"
+        @refreshing="reloadPage"
+    >
+        <template #cell-title="{ row: fieldset }">
+            <a :href="fieldset.edit_url">{{ __(fieldset.title) }}</a>
+        </template>
+        <template #cell-handle="{ value }">
+            <span class="font-mono text-xs">{{ value }}</span>
+        </template>
+        <template #prepended-row-actions="{ row: fieldset }">
+            <DropdownItem :text="__('Edit')" icon="edit" :href="fieldset.edit_url" />
+        </template>
+    </Listing>
+</template>

@@ -21,7 +21,10 @@
                     <h3 class="little-heading mb-2 ltr:pl-0 rtl:pr-0">{{ $key }}</h3>
                 @endif
 
-                <fieldset-listing :initial-rows="{{ json_encode($f) }}"></fieldset-listing>
+                <fieldset-listing
+                    :initial-rows="{{ json_encode($f) }}"
+                    action-url="{{ cp_route('fieldsets.actions.run') }}"
+                ></fieldset-listing>
             </div>
         @endforeach
     @else
