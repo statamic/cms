@@ -53,7 +53,7 @@
                         <data-list-column-picker :preferences-key="preferencesKey('columns')" />
                     </div>
 
-                    <div v-show="items.length === 0" class="p-6 text-center text-gray-500" v-text="__('No results')" />
+                    <div v-show="items.length === 0" class="p-6 border border-dashed border-gray-300 rounded-lg text-center text-gray-500" v-text="__('No users found')" />
 
                     <BulkActions
                         :url="actionUrl"
@@ -81,7 +81,7 @@
                         </div>
                     </BulkActions>
 
-                    <Panel class="relative overflow-x-auto overscroll-x-contain">
+                    <Panel class="relative overflow-x-auto overscroll-x-contain" v-if="items.length">
                         <data-list-table
                             v-show="items.length"
                             :allow-bulk-actions="true"
