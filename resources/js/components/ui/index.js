@@ -78,6 +78,7 @@ import { default as ListingTable } from './Listing/Table.vue';
 import { default as ListingTableBody } from './Listing/TableBody.vue';
 import { default as ListingPagination } from './Listing/Pagination.vue';
 import { default as ListingSearch } from './Listing/Search.vue';
+import { default as ListingFilters } from './Listing/Filters.vue';
 import { default as ListingCustomizeColumns } from './Listing/CustomizeColumns.vue';
 
 export {
@@ -161,5 +162,6 @@ export {
     ListingTableBody,
     ListingPagination,
     ListingSearch,
+    ListingFilters,
     ListingCustomizeColumns,
 };
