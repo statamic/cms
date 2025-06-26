@@ -5,6 +5,8 @@ namespace Statamic\Facades;
 use Illuminate\Support\Facades\Facade;
 
 /**
+ * TODO: Update these...
+ *
  * @method static string tidy($url)
  * @method static string assemble($args)
  * @method static string slug($url)
@@ -19,6 +21,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static string getCurrent()
  * @method static string format($url)
  * @method static bool isExternal($url)
+ * @method static bool isExternalToApplication($url)
  * @method static string getSiteUrl()
  * @method static string encode($url)
  * @method static mixed getDefaultUri($locale, $uri)
