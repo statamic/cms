@@ -8,6 +8,7 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
+use Statamic\Hooks\CP\Blueprint as BlueprintHook;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -257,6 +258,9 @@ class BlueprintRepository
 
     protected function makeBlueprintFromFile($path, $namespace = null)
     {
+        $hook = (new BlueprintHook())->makeFromFile($path, $namespace);
+        [$path, $namespace] = [$hook->path, $hook->namespace];
+
         return Blink::store(self::BLINK_FROM_FILE)->once($path, function () use ($path, $namespace) {
             if (! $namespace || ! isset($this->additionalNamespaces[$namespace])) {
                 [$namespace, $handle] = $this->getNamespaceAndHandle(
