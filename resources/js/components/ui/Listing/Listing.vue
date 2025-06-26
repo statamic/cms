@@ -108,6 +108,10 @@ const props = defineProps({
         type: Function,
         default: null,
     },
+    perPage: {
+        type: Number,
+        default: 15,
+    },
 });
 
 const slots = useSlots();
@@ -118,7 +122,7 @@ const activeFilters = ref({});
 const activeFilterBadges = ref([]);
 const stateBeforeReordering = ref(null);
 const currentPage = ref(1);
-const perPage = ref(10);
+const perPage = ref(props.perPage);
 const initializing = ref(true);
 const loading = ref(true);
 let popping = false;
