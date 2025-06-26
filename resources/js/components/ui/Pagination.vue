@@ -8,7 +8,7 @@ import { computed } from 'vue';
 const emit = defineEmits(['page-selected', 'per-page-changed']);
 
 const props = defineProps({
-    showTotals: { type: Boolean, default: false },
+    showTotals: { type: Boolean, default: true },
     perPage: { type: Number },
     resourceMeta: { type: Object, required: true },
     scrollToTop: { type: Boolean, default: true },
@@ -161,7 +161,7 @@ function getRange(start, end) {
             />
 
             <Button
-                v-if="showPageLinks"
+                v-if="showPage"
                 v-for="(page, i) in pages"
                 size="sm"
                 round
