@@ -522,6 +522,7 @@ provideListingContext({
     selections,
     maxSelections: toRef(() => props.maxSelections),
     allowsMultipleSelections,
+    hasReachedSelectionLimit,
     selectionClicked,
     selectRange,
     toggleSelection,
