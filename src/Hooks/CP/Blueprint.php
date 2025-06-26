@@ -12,7 +12,7 @@ class Blueprint
     {
         $payload = $this->runHooksWith('makeFromFile', [
             'namespace' => $namespace,
-            'path' => $path
+            'path' => $path,
         ]);
 
         return $payload;
