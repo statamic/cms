@@ -8,7 +8,6 @@ import { computed } from 'vue';
 const emit = defineEmits(['page-selected', 'per-page-changed']);
 
 const props = defineProps({
-    inline: { type: Boolean, default: false },
     showTotals: { type: Boolean, default: false },
     perPage: { type: Number },
     resourceMeta: { type: Object, required: true },
@@ -145,13 +144,13 @@ function getRange(start, end) {
 
 <template>
     <div class="flex">
-        <div class="flex flex-1 items-center" v-if="!inline">
+        <div class="flex flex-1 items-center">
             <div class="text-sm text-gray-500" v-if="showTotals && totalItems > 0">
                 {{ __(':start-:end of :total', { start: fromItem, end: toItem, total: totalItems }) }}
             </div>
         </div>
 
-        <div v-if="hasMultiplePages" class="flex items-center gap-1" :class="{ 'pagination-inline': inline }">
+        <div v-if="hasMultiplePages" class="flex items-center gap-1">
             <Button
                 size="sm"
                 :variant="hasPrevious && !showPageLinks ? 'filled' : 'ghost'"
