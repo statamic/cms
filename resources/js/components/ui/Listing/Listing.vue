@@ -112,6 +112,14 @@ const props = defineProps({
         type: Number,
         default: 15,
     },
+    showPaginationTotals: {
+        type: Boolean,
+        default: true,
+    },
+    showPaginationPageLinks: {
+        type: Boolean,
+        default: true,
+    },
 });
 
 const slots = useSlots();
@@ -539,6 +547,8 @@ provideListingContext({
     perPage,
     setPerPage,
     setCurrentPage,
+    showPaginationTotals: toRef(() => props.showPaginationTotals),
+    showPaginationPageLinks: toRef(() => props.showPaginationPageLinks),
     searchQuery,
     setSearchQuery,
     clearSearchQuery,
