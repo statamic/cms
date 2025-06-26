@@ -161,7 +161,7 @@ function getRange(start, end) {
             />
 
             <Button
-                v-if="showPage"
+                v-if="showPageLinks"
                 v-for="(page, i) in pages"
                 size="sm"
                 round
