@@ -136,19 +136,11 @@
                             </Grid>
 
                             <div
-                                class="p-4 text-gray-700"
+                                class="p-6 border border-dashed border-gray-300 rounded-lg text-center text-gray-500"
                                 v-if="containerIsEmpty"
                                 v-text="searchQuery ? __('No results') : __('This container is empty')"
                             />
                         </div>
-
-                        <!-- <data-list-pagination
-                            class="mt-6"
-                            :resource-meta="meta"
-                            :per-page="perPage"
-                            @page-selected="page = $event"
-                            @per-page-changed="changePerPage"
-                        /> -->
 
                         <BulkActions
                             :url="actionUrl"
