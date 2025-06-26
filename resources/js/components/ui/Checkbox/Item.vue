@@ -7,7 +7,7 @@ const props = defineProps({
     description: { type: String, default: null },
     disabled: { type: Boolean, default: false },
     label: { type: String, default: null },
-    modelValue: { type: Boolean, default: false },
+    modelValue: { type: [Boolean, null], default: null },
     name: { type: String, default: null },
     size: { type: String, default: 'base' },
     solo: { type: Boolean, default: false },
@@ -30,6 +30,16 @@ const checkboxClasses = computed(() => {
 const containerClasses = computed(() => {
     return `flex items-${props.align} gap-2`;
 });
+
+const conditionalProps = computed(() => {
+    if (props.modelValue === null) {
+        return {};
+    }
+
+    return {
+        modelValue: props.modelValue,
+    };
+});
 </script>
 
 <template>
@@ -39,7 +49,7 @@ const containerClasses = computed(() => {
             :id
             :name="name"
             :value="value"
-            :modelValue="modelValue"
+            v-bind="conditionalProps"
             @update:modelValue="emit('update:modelValue', $event)"
             :class="checkboxClasses"
         >
