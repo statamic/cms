@@ -590,7 +590,7 @@ autoApplyState();
     <slot name="initializing" v-if="initializing">
         <Icon name="loading" />
     </slot>
-    <slot v-if="!initializing" :items="items" :is-column-visible="isColumnVisible">
+    <slot v-if="!initializing" :items="items" :is-column-visible="isColumnVisible" :loading="loading">
         <Presets v-if="showPresets" />
         <div class="flex items-center gap-3 py-3">
             <div class="flex flex-1 items-center gap-3">
