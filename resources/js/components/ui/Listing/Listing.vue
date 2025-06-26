@@ -614,7 +614,14 @@ autoApplyState();
             </div>
             <CustomizeColumns v-if="allowCustomizingColumns" />
         </div>
-        <Panel class="relative overflow-x-auto overscroll-x-contain">
+
+        <div
+            v-if="!items.length"
+            class="rounded-lg border border-dashed border-gray-300 p-6 text-center text-gray-500"
+            v-text="__('No results')"
+        />
+
+        <Panel v-else class="relative overflow-x-auto overscroll-x-contain">
             <Table>
                 <template v-for="(slot, slotName) in forwardedTableCellSlots" :key="slotName" #[slotName]="slotProps">
                     <component :is="slot" v-bind="slotProps" />
