@@ -94,7 +94,14 @@
                             @existing-selected="existingUploadSelected"
                         />
 
+                        <div
+                            v-if="containerIsEmpty"
+                            class="rounded-lg border border-dashed border-gray-300 p-6 text-center text-gray-500"
+                            v-text="__('No results')"
+                        />
+
                         <Panel
+                            v-else
                             :class="{
                                 'relative overflow-x-auto overscroll-x-contain': mode === 'table',
                             }"
