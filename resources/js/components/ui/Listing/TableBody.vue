@@ -22,10 +22,6 @@ const {
     isColumnVisible,
 } = injectListingContext();
 
-function actualIndex(row) {
-    return items.value.findIndex((item) => item.id === row.id);
-}
-
 function isSelected(id) {
     return selections.value.includes(id);
 }
@@ -69,11 +65,7 @@ function isSelected(id) {
                     <slot
                         :name="`cell-${column.field}`"
                         :value="row[column.value || column.field]"
-                        :values="row"
                         :row="row"
-                        :index="actualIndex(row)"
-                        :display-index="index"
-                        :checkbox-id="`checkbox-${row.id}`"
                         :is-column-visible="isColumnVisible"
                     >
                         <table-field
