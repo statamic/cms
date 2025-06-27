@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Fields;
 
 use Illuminate\Http\Request;
 use Statamic\Facades;
+use Statamic\Fields\Blueprint;
 use Statamic\Fields\Fieldset;
 use Statamic\Fields\FieldTransformer;
 use Statamic\Http\Controllers\CP\CpController;
@@ -29,8 +30,15 @@ class FieldsetController extends CpController
                     $this->groupKey($fieldset) => [
                         'handle' => $fieldset->handle(),
                         'id' => $fieldset->handle(),
+                        'delete_url' => $fieldset->deleteUrl(),
                         'edit_url' => $fieldset->editUrl(),
+                        'reset_url' => $fieldset->resetUrl(),
                         'fields' => $fieldset->fields()->all()->count(),
+                        'imported_by' => collect($fieldset->importedBy())->flatten(1)->mapToGroups(function ($item) {
+                            return [$this->group($item) => ['handle' => $item->handle(), 'title' => $item->title()]];
+                        }),
+                        'is_deletable' => $fieldset->isDeletable(),
+                        'is_resettable' => $fieldset->isResettable(),
                         'title' => $fieldset->title(),
                     ],
                 ];
@@ -45,6 +53,29 @@ class FieldsetController extends CpController
         }
 
         return view('statamic::fieldsets.index', compact('fieldsets'));
+    }
+
+    private function group(Blueprint|Fieldset $item)
+    {
+        if ($item instanceof Fieldset) {
+            return __('Fieldsets');
+        }
+
+        if ($namespace = $item->namespace()) {
+            return match (Str::before($namespace, '.')) {
+                'collections' => __('Collections'),
+                'taxonomies' => __('Taxonomies'),
+                'navigation' => __('Navigation'),
+                'globals' => __('Globals'),
+                'assets' => __('Asset Containers'),
+                'forms' => __('Forms'),
+            };
+        }
+
+        return match ($item->handle()) {
+            'user', 'user_group' => __('Users'),
+            default => __('Other'),
+        };
     }
 
     public function edit($fieldset)
@@ -122,6 +153,28 @@ class FieldsetController extends CpController
         session()->flash('success', __('Fieldset created'));
 
         return ['redirect' => $fieldset->editUrl()];
+    }
+
+    public function destroy($fieldset)
+    {
+        $fieldset = Facades\Fieldset::find($fieldset);
+
+        $this->authorize('delete', $fieldset);
+
+        $fieldset->delete();
+
+        return response('');
+    }
+
+    public function reset($fieldset)
+    {
+        $fieldset = Facades\Fieldset::find($fieldset);
+
+        $this->authorize('delete', $fieldset);
+
+        $fieldset->reset();
+
+        return response('');
     }
 
     private function groupKey(Fieldset $fieldset): string

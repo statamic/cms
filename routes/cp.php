@@ -49,7 +49,6 @@ use Statamic\Http\Controllers\CP\DuplicatesController;
 use Statamic\Http\Controllers\CP\FieldActionModalController;
 use Statamic\Http\Controllers\CP\Fields\BlueprintController;
 use Statamic\Http\Controllers\CP\Fields\FieldsController;
-use Statamic\Http\Controllers\CP\Fields\FieldsetActionController;
 use Statamic\Http\Controllers\CP\Fields\FieldsetController;
 use Statamic\Http\Controllers\CP\Fields\FieldtypesController;
 use Statamic\Http\Controllers\CP\Fields\MetaController;
@@ -272,12 +271,11 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::post('update', [FieldsController::class, 'update'])->name('fields.update');
         Route::post('field-meta', [MetaController::class, 'show']);
         Route::delete('fieldsets/{fieldset}/reset', [FieldsetController::class, 'reset'])->name('fieldsets.reset');
-        Route::post('fieldsets/actions', [FieldsetActionController::class, 'run'])->name('fieldsets.actions.run');
-        Route::post('fieldsets/actions/list', [FieldsetActionController::class, 'bulkActions'])->name('fieldsets.actions.bulk');
-        Route::resource('fieldsets', FieldsetController::class)->except(['show', 'destroy']);
+        Route::resource('fieldsets', FieldsetController::class)->except(['show']);
         Route::get('blueprints', [BlueprintController::class, 'index'])->name('blueprints.index');
         Route::get('blueprints/{namespace}/{handle}', [BlueprintController::class, 'edit'])->name('blueprints.edit');
         Route::patch('blueprints/{namespace}/{handle}', [BlueprintController::class, 'update'])->name('blueprints.update');
+        Route::delete('blueprints/{namespace}/{handle}/reset', [BlueprintController::class, 'reset'])->name('blueprints.reset');
         Route::get('fieldtypes', [FieldtypesController::class, 'index']);
     });
 
