@@ -14,7 +14,7 @@
         "statamic/cms": "^6.0"
     },
     "require-dev": {
-        "orchestra/testbench": "^9.2 || ^10.0",
+        "orchestra/testbench": "^9.2 || ^10.0"
     },
     "config": {
         "allow-plugins": {
