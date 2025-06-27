@@ -58,7 +58,7 @@ const forwardedTableCellSlots = computed(() => {
     >
         <TableHead />
         <TableBody>
-            <template #tbody-start><slot name="tbody-start" /></template>
+            <template v-if="$slots['tbody-start']" #tbody-start><slot name="tbody-start" /></template>
             <template v-if="$slots['prepended-row-actions']" #prepended-row-actions="slotProps">
                 <slot name="prepended-row-actions" v-bind="slotProps" />
             </template>
