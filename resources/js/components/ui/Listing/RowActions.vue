@@ -2,7 +2,7 @@
 import { Dropdown, DropdownItem, DropdownLabel, DropdownMenu, DropdownSeparator } from '@statamic/ui';
 import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
 import ItemActions from '@statamic/components/actions/ItemActions.vue';
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 const props = defineProps({
     row: {
@@ -11,8 +11,14 @@ const props = defineProps({
     },
 });
 
-const { actionUrl, actionContext, refresh, reorderable } = injectListingContext();
+const { actionUrl, actionContext, refresh, reorderable, allowActionsWhileReordering } = injectListingContext();
 const busy = ref(false);
+
+const shouldShowActions = computed(() => {
+    if (reorderable.value && !allowActionsWhileReordering.value) return false;
+
+    return true;
+});
 
 watch(busy, (busy) => Statamic.$progress.loading('action', busy));
 
@@ -41,7 +47,7 @@ function dropdownHovered(loadActions) {
 
 <template>
     <ItemActions
-        v-if="!reorderable"
+        v-if="shouldShowActions"
         :url="actionUrl"
         :item="row.id"
         :context="actionContext"

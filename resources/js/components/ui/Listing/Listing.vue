@@ -52,6 +52,10 @@ const props = defineProps({
         type: Object,
         default: () => ({}),
     },
+    allowActionsWhileReordering: {
+        type: Boolean,
+        default: false,
+    },
     reorderable: {
         type: Boolean,
         default: false,
@@ -552,6 +556,7 @@ provideListingContext({
     actionContext: toRef(() => props.actionContext),
     showBulkActions,
     hasActions,
+    allowActionsWhileReordering: toRef(() => props.allowActionsWhileReordering),
     perPage,
     setPerPage,
     setCurrentPage,
