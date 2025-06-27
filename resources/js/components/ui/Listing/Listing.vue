@@ -126,7 +126,7 @@ const props = defineProps({
 const slots = useSlots();
 const id = uniqid();
 const rawItems = ref(props.items);
-const meta = ref({});
+const meta = ref();
 const activeFilters = ref({});
 const activeFilterBadges = ref([]);
 const stateBeforeReordering = ref(null);
@@ -635,7 +635,7 @@ autoApplyState();
                     <slot name="prepended-row-actions" :row="row" />
                 </template>
             </Table>
-            <PanelFooter>
+            <PanelFooter v-if="meta">
                 <Pagination />
             </PanelFooter>
         </Panel>
