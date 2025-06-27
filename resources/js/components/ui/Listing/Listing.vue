@@ -272,6 +272,7 @@ function request() {
 }
 
 function refresh() {
+    emit('refreshing');
     request();
 }
 
