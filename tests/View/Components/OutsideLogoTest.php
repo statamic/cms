@@ -5,6 +5,7 @@ namespace Tests\View\Components;
 use Illuminate\Support\Facades\Blade;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Statamic;
 use Tests\TestCase;
 
 #[Group('view-components')]
@@ -14,7 +15,7 @@ class OutsideLogoTest extends TestCase
     public function it_renders_default_statamic_logo_when_no_custom_logo_is_set()
     {
         $this->assertStringContainsString(
-            'statamic-wordmark',
+            Statamic::svg('icons/statamic-logo-lime.svg'),
             Blade::render('<x-statamic::outside-logo />')
         );
     }

@@ -40,7 +40,7 @@ class CpServiceProvider extends ServiceProvider
         View::composer(NavComposer::VIEWS, NavComposer::class);
         View::composer(CustomLogoComposer::VIEWS, CustomLogoComposer::class);
 
-        Blade::component('outside-logo', OutsideLogo::class);
+        Blade::component('statamic::outside-logo', OutsideLogo::class);
 
         Blade::directive('cp_svg', function ($expression) {
             return "<?php echo Statamic::svg({$expression}) ?>";

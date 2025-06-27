@@ -10,7 +10,7 @@ class OutsideLogo extends Component
 {
     public function render()
     {
-        return view('components.outside-logo', [
+        return view('statamic::components.outside-logo', [
             'customLogo' => $this->customLogo(),
             'customDarkLogo' => $this->customLogo(dark: true),
             'customLogoText' => $this->customLogo(text: true),
