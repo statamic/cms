@@ -148,15 +148,25 @@ class Entries extends Relationship
             ->map(fn ($handle) => Collection::findByHandle($handle))
             ->filter(fn ($collection) => User::current()->cant('view-other-authors-entries', [EntryContract::class, $collection]))
             ->each(function ($collection) use ($query) {
-                $blueprintsWithoutAuthor = $collection->entryBlueprints()
-                    ->filter(fn ($blueprint) => ! $blueprint->hasField('author'))
+                $blueprints = $collection->entryBlueprints();
+
+                $blueprintsWithAuthor = $blueprints
+                    ->filter(fn ($blueprint) => $blueprint->hasField('author'))
+                    ->map->handle()->all();
+
+                $blueprintsWithoutAuthor = $blueprints
+                    ->diff($blueprintsWithAuthor)
                     ->map->handle()->all();
 
                 $query
                     ->whereNotIn('collection', [$collection->handle()])
                     ->orWhere(fn ($query) => $query
-                        ->whereIn('blueprint', $blueprintsWithoutAuthor)
-                        ->orWhere('author', User::current()->id())
+                        ->where(fn ($query) => $query
+                            ->whereIn('blueprint', $blueprintsWithAuthor)
+                            ->whereIn('author', [User::current()->id()])
+                            ->orWhereJsonContains('author', User::current()->id())
+                        )
+                        ->orWhereIn('blueprint', $blueprintsWithoutAuthor)
                     );
             });
 
