@@ -1,72 +1,82 @@
-<script>
-import Listing from '../Listing.vue';
-import { Widget, StatusIndicator } from '@statamic/ui';
+<script setup>
+import { computed } from 'vue';
+import {
+    Widget,
+    StatusIndicator,
+    Listing,
+    ListingTableBody as TableBody,
+    ListingPagination as Pagination,
+    Icon,
+} from '@statamic/ui';
 
-export default {
-    mixins: [Listing],
-
-    components: {
-        StatusIndicator,
-        Widget,
+const props = defineProps({
+    additionalColumns: Array,
+    collection: String,
+    title: String,
+    initialPerPage: {
+        type: Number,
+        default: 5,
     },
-
-    props: {
-        additionalColumns: Array,
-        collection: String,
-        title: String,
+    initialSortColumn: {
+        type: String,
     },
-
-    data() {
-        return {
-            cols: [{ label: 'Title', field: 'title', visible: true }, ...this.additionalColumns],
-            listingKey: 'entries',
-            requestUrl: cp_url(`collections/${this.collection}/entries`),
-        };
+    initialSortDirection: {
+        type: String,
     },
+});
 
-    methods: {
-        columnShowing(column) {
-            return this.cols.find((c) => c.field === column);
-        },
-    },
-};
+const requestUrl = cp_url(`collections/${props.collection}/entries`);
+
+const cols = computed(() => [{ label: 'Title', field: 'title', visible: true }, ...props.additionalColumns]);
+
+const widgetProps = computed(() => ({
+    title: props.title,
+    icon: 'collections',
+}));
+
+function columnShowing(column) {
+    return cols.value.find((c) => c.field === column);
+}
 </script>
 
 <template>
-    <Widget :title="title" icon="collections">
-        <data-list v-if="!initializing && items.length" :rows="items" :columns="cols" :sort="false">
-            <div v-if="initializing" class="loading">
-                <loading-graphic />
-            </div>
-
-            <data-list-table v-else :loading="loading" unstyled class="[&_td]:p-0.5 [&_td]:text-sm [&_thead]:hidden">
-                <template #cell-title="{ row: entry }">
-                    <div class="flex items-center gap-2">
-                        <StatusIndicator v-if="!columnShowing('status')" :status="entry.status" />
-                        <a :href="entry.edit_url" class="line-clamp-1 overflow-hidden text-ellipsis">{{
-                            entry.title
-                        }}</a>
-                    </div>
-                </template>
-                <template #cell-status="{ row: entry }">
-                    <StatusIndicator :status="entry.status" :show-dot="false" show-label />
-                </template>
-            </data-list-table>
-        </data-list>
-
-        <p v-if="!initializing && !items.length" class="p-3 text-center text-sm text-gray-600">
-            {{ __('There are no entries in this collection') }}
-        </p>
-
-        <template #actions>
-            <data-list-pagination
-                v-if="meta.last_page != 1"
-                :resource-meta="meta"
-                @page-selected="selectPage"
-                :scroll-to-top="false"
-                :show-page-links="false"
-            />
-            <slot name="actions" />
+    <Listing
+        :url="requestUrl"
+        :columns="cols"
+        :per-page="initialPerPage"
+        :show-pagination-totals="false"
+        :show-pagination-page-links="false"
+        :sort-column="initialSortColumn"
+        :sort-direction="initialSortDirection"
+    >
+        <template #initializing>
+            <Widget v-bind="widgetProps"><Icon name="loading" /></Widget>
         </template>
-    </Widget>
+        <template #default="{ items, loading }">
+            <Widget v-bind="widgetProps">
+                <p v-if="!items.length" class="p-3 text-center text-sm text-gray-600">
+                    {{ __('There are no entries in this collection') }}
+                </p>
+                <table class="w-full [&_td]:p-0.5 [&_td]:text-sm" :class="{ 'opacity-50': loading }">
+                    <TableBody>
+                        <template #cell-title="{ row: entry }">
+                            <div class="flex items-center gap-2">
+                                <StatusIndicator v-if="!columnShowing('status')" :status="entry.status" />
+                                <a :href="entry.edit_url" class="line-clamp-1 overflow-hidden text-ellipsis">{{
+                                    entry.title
+                                }}</a>
+                            </div>
+                        </template>
+                        <template #cell-status="{ row: entry }">
+                            <StatusIndicator :status="entry.status" :show-dot="false" show-label />
+                        </template>
+                    </TableBody>
+                </table>
+                <template #actions>
+                    <Pagination />
+                    <slot name="actions" />
+                </template>
+            </Widget>
+        </template>
+    </Listing>
 </template>

@@ -158,6 +158,8 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::get('navigation/{navigation}/pages/{edit}/edit', [NavigationPagesController::class, 'edit'])->name('navigation.pages.edit');
 
     Route::resource('collections', CollectionsController::class);
+    Route::post('collections/actions', [CollectionActionController::class, 'run'])->name('collections.actions.run');
+    Route::post('collections/actions/list', [CollectionActionController::class, 'bulkActions'])->name('collections.actions.bulk');
     Route::get('collections/{collection}/scaffold', [ScaffoldCollectionController::class, 'index'])->name('collections.scaffold');
     Route::post('collections/{collection}/scaffold', [ScaffoldCollectionController::class, 'create'])->name('collections.scaffold.create');
     Route::resource('collections.blueprints', CollectionBlueprintsController::class);
@@ -165,7 +167,6 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     Route::get('collections/{collection}/tree', [CollectionTreeController::class, 'index'])->name('collections.tree.index');
     Route::patch('collections/{collection}/tree', [CollectionTreeController::class, 'update'])->name('collections.tree.update');
-    Route::post('collections/{collection}/actions', [CollectionActionController::class, 'run'])->name('collections.actions.run');
 
     Route::group(['prefix' => 'collections/{collection}/entries'], function () {
         Route::get('/', [EntriesController::class, 'index'])->name('collections.entries.index');

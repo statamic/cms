@@ -19,4 +19,9 @@ class FieldsetPolicy
     {
         // handled by before()
     }
+
+    public function delete($user, $fieldset)
+    {
+        // handled by before()
+    }
 }

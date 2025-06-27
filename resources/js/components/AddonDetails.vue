@@ -1,12 +1,15 @@
 <template>
     <div>
-        <div class="mb-6 flex items-center">
-            <h1 class="flex-1" v-text="addon.name" />
-            <a :href="addon.url" target="_blank" class="btn">
-                <svg-icon name="light/external-link" class="h-3 w-3 shrink-0 ltr:mr-2 rtl:ml-2" />
-                {{ __('View on Marketplace') }}
-            </a>
-        </div>
+        <ui-header :title="addon.name" icon="addons">
+            <ui-button :text="__('Back')" icon="arrow-left" @click="$emit('close')" />
+            <ui-button
+                variant="primary"
+                :href="addon.url"
+                target="_blank"
+                icon="external-link"
+                :text="__('View on Marketplace')"
+            />
+        </ui-header>
         <div class="flex flex-col-reverse gap-6 space-y-6 xl:grid xl:grid-cols-3 xl:space-y-0">
             <div class="lg:col-span-2">
                 <div class="card prose max-w-full p-6" v-html="description" />
@@ -59,6 +62,8 @@ export default {
     components: {
         AddonEditions,
     },
+
+    emits: ['close'],
 
     props: ['addon'],
 

@@ -134,18 +134,13 @@ class BrowserController extends CpController
         $columns = $this->visibleColumns();
 
         return [
-            'data' => [
-                'assets' => collect($assets ?? [])
-                    ->map(fn ($asset) => (new FolderAsset($asset))
-                        ->blueprint($container->blueprint())
-                        ->columns($columns)
-                        ->resolve()
-                    )
-                    ->all(),
-                'folder' => array_merge((new Folder($folder))->resolve(), [
-                    'folders' => Folder::collection($folders->values()),
-                ]),
-            ],
+            'data' => collect($assets ?? [])
+                ->map(fn ($asset) => (new FolderAsset($asset))
+                    ->blueprint($container->blueprint())
+                    ->columns($columns)
+                    ->resolve()
+                )
+                ->all(),
             'links' => [
                 'asset_action' => cp_route('assets.actions.run'),
                 'folder_action' => cp_route('assets.folders.actions.run', $container->id()),
@@ -159,6 +154,9 @@ class BrowserController extends CpController
                 'to' => $totalItems > 0 ? $page * $perPage : null,
                 'total' => $totalItems,
                 'columns' => $columns,
+                'folder' => array_merge((new Folder($folder))->resolve(), [
+                    'folders' => Folder::collection($folders->values()),
+                ]),
             ],
         ];
     }

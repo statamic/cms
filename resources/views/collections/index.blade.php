@@ -12,6 +12,7 @@
             :initial-columns="{{ json_encode($columns) }}"
             :can-create-collections="{{ $user->can('create', 'Statamic\Contracts\Entries\Collection') ? 'true' : 'false' }}"
             create-url="{{ cp_route('collections.create') }}"
+            action-url="{{ cp_route('collections.actions.run') }}"
         ></collection-list>
     @else
         <x-statamic::empty-screen

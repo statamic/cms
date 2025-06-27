@@ -15,7 +15,7 @@
         :columns="{{ $columns->toJson() }}"
         :filters="{{ $filters->toJson() }}"
         :actions="{{ Js::from($actions) }}"
-        action-url="{{ cp_route("collections.actions.run", $collection->handle()) }}"
+        action-url="{{ cp_route("collections.actions.run") }}"
         entries-action-url="{{ cp_route("collections.entries.actions.run", $collection->handle()) }}"
         reorder-url="{{ cp_route("collections.entries.reorder", $collection->handle()) }}"
         edit-url="{{ $collection->editUrl() }}"
