@@ -27,6 +27,7 @@ const emit = defineEmits([
     'update:searchQuery',
     'requestCompleted',
     'reordered',
+    'refreshing',
 ]);
 
 const props = defineProps({
