@@ -5,7 +5,7 @@ import ConfirmableAction from './ConfirmableAction.vue';
 import axios from 'axios';
 
 const props = defineProps({
-    url: { type: String, required: true },
+    url: { type: String },
     actions: { type: Array },
     context: { type: Object, default: () => ({}) },
     item: { required: true },

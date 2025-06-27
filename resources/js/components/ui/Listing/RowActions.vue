@@ -33,6 +33,10 @@ function actionSuccess(response) {
 function actionFailed(response) {
     Statamic.$toast.error(response.message || __('Action failed'));
 }
+
+function dropdownHovered(loadActions) {
+    if (actionUrl.value) loadActions();
+}
 </script>
 
 <template>
@@ -46,11 +50,11 @@ function actionFailed(response) {
         @completed="actionCompleted"
         v-slot="{ actions, loadActions }"
     >
-        <Dropdown @mouseover="loadActions" placement="left-start" class="me-3">
+        <Dropdown @mouseover="dropdownHovered(loadActions)" placement="left-start" class="me-3">
             <DropdownMenu>
                 <DropdownLabel :text="__('Actions')" />
                 <slot name="prepended-actions" :row="row" />
-                <DropdownSeparator v-if="$slots['prepended-actions']" />
+                <DropdownSeparator v-if="$slots['prepended-actions'] && actions.length" />
                 <DropdownItem
                     v-for="action in actions"
                     :key="action.handle"

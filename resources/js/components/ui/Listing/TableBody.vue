@@ -92,7 +92,7 @@ function isSelected(id) {
                 <!--                            :label="type === 'entries' ? __(row.collection.title) : __(row.taxonomy.title)"-->
                 <!--                        />-->
                 <!--                    </td>-->
-                <td class="actions-column" v-if="hasActions">
+                <td class="actions-column" v-if="hasActions || $slots['prepended-row-actions']">
                     <RowActions :row="row">
                         <template v-if="$slots['prepended-row-actions']" #prepended-actions="{ row }">
                             <slot name="prepended-row-actions" :row="row" />
