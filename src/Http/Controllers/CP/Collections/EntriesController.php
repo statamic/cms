@@ -25,6 +25,7 @@ use Statamic\Support\Str;
 class EntriesController extends CpController
 {
     use ExtractsFromEntryFields,
+        QueriesAuthorEntries,
         QueriesFilters;
 
     public function index(FilteredRequest $request, $collection)
@@ -85,24 +86,7 @@ class EntriesController extends CpController
         }
 
         if (User::current()->cant('view-other-authors-entries', [EntryContract::class, $collection])) {
-            $blueprints = $collection->entryBlueprints();
-
-            $blueprintsWithAuthor = $blueprints
-                ->filter(fn ($blueprint) => $blueprint->hasField('author'))
-                ->map->handle()->all();
-
-             $blueprintsWithoutAuthor = $blueprints
-                ->diff($blueprintsWithAuthor)
-                ->map->handle()->all();
-
-            $query->where(fn ($query) => $query
-                ->where(fn ($query) => $query
-                    ->whereIn('blueprint', $blueprintsWithAuthor)
-                    ->whereIn('author', [User::current()->id()])
-                    ->orWhereJsonContains('author', User::current()->id())
-                )
-                ->orWhereIn('blueprint', $blueprintsWithoutAuthor)
-            );
+            $this->queryAuthorEntries($query, $collection);
         }
 
         return $query;

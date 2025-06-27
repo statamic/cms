@@ -24,6 +24,8 @@ use function Statamic\trans as __;
 
 class CollectionsController extends CpController
 {
+    use QueriesAuthorEntries;
+
     public function index(Request $request)
     {
         $this->authorize('index', CollectionContract::class, __('You are not authorized to view collections.'));
@@ -57,26 +59,10 @@ class CollectionsController extends CpController
         })->map(function ($collection) {
             $entriesCount = $collection->queryEntries()
                 ->where('site', Site::selected())
-                ->when(User::current()->cant('view-other-authors-entries', [EntryContract::class, $collection]), function ($query) use ($collection) {
-                    $blueprints = $collection->entryBlueprints();
-
-                    $blueprintsWithAuthor = $blueprints
-                        ->filter(fn ($blueprint) => $blueprint->hasField('author'))
-                        ->map->handle()->all();
-
-                    $blueprintsWithoutAuthor = $blueprints
-                        ->diff($blueprintsWithAuthor)
-                        ->map->handle()->all();
-
-                    $query->where(fn ($query) => $query
-                        ->where(fn ($query) => $query
-                            ->whereIn('blueprint', $blueprintsWithAuthor)
-                            ->whereIn('author', [User::current()->id()])
-                            ->orWhereJsonContains('author', User::current()->id())
-                        )
-                        ->orWhereIn('blueprint', $blueprintsWithoutAuthor)
-                    );
-                })
+                ->when(
+                    User::current()->cant('view-other-authors-entries', [EntryContract::class, $collection]),
+                    fn ($query) => $this->queryAuthorEntries($query, $collection)
+                )
                 ->count();
 
             return [
