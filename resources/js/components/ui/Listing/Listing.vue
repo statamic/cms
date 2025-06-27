@@ -608,7 +608,7 @@ autoApplyState();
     </slot>
     <slot v-if="!initializing" :items="items" :is-column-visible="isColumnVisible" :loading="loading">
         <Presets v-if="showPresets" />
-        <div class="flex items-center gap-3 py-3">
+        <div v-if="allowSearch || hasFilters || allowCustomizingColumns" class="flex items-center gap-3 py-3">
             <div class="flex flex-1 items-center gap-3">
                 <Search v-if="allowSearch" />
                 <Filters v-if="hasFilters" />
