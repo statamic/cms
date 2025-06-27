@@ -31,25 +31,6 @@
     font-size: 0.9rem;
 }
 
-.session-expiry-stripe {
-    @apply fixed top-0 w-full cursor-pointer bg-red-500 px-4 py-2 text-center text-xs text-white outline-hidden;
-    z-index: 999;
-    height: 48px;
-
-    &:hover {
-        @apply bg-red-700;
-    }
-
-    &:active,
-    &:focus {
-        outline: none;
-    }
-
-    &:active {
-        height: 49px;
-    }
-}
-
 .global-header .white-label-logo {
     max-height: 32px;
     max-width: 280px;
