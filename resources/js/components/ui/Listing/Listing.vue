@@ -166,11 +166,13 @@ const items = computed({
                 .map((result) => result.obj);
         }
 
-        items = sortBy(items, (obj) => {
-            let value = obj[sortColumn.value];
-            if (typeof value === 'string') value = value.toLowerCase();
-            return value;
-        });
+        if (props.sortable) {
+            items = sortBy(items, (obj) => {
+                let value = obj[sortColumn.value];
+                if (typeof value === 'string') value = value.toLowerCase();
+                return value;
+            });
+        }
 
         return sortDirection.value === 'desc' ? items.reverse() : items;
     },
