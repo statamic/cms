@@ -19,8 +19,9 @@ function reloadPage() {
     window.location.reload();
 }
 
-function removeRow(index) {
-    this.rows.splice(index, 1);
+function removeRow(row) {
+    const i = rows.value.findIndex((r) => r.id === row.id);
+    rows.value.splice(i, 1);
 }
 </script>
 <template>
@@ -31,9 +32,9 @@ function removeRow(index) {
         :allow-customizing-columns="false"
         @refreshing="reloadPage"
     >
-        <template #cell-title="{ row: group, index }">
+        <template #cell-title="{ row: group }">
             <a :href="group.show_url">{{ __(group.title) }}</a>
-            <resource-deleter :ref="`deleter_${group.id}`" :resource="group" @deleted="removeRow(index)" />
+            <resource-deleter :ref="`deleter_${group.id}`" :resource="group" @deleted="removeRow(group)" />
         </template>
         <template #cell-handle="{ value: handle }">
             <span class="font-mono text-xs">{{ handle }}</span>
