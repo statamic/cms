@@ -2,11 +2,11 @@
 
 namespace Statamic\Http\Controllers\CP\Collections;
 
+use Illuminate\Support\Collection as SupportCollection;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
-use Statamic\Support\FileCollection;
 
 trait QueriesAuthorEntries
 {
@@ -24,14 +24,14 @@ trait QueriesAuthorEntries
             );
     }
 
-    protected function blueprintsWithAuthor(FileCollection $blueprints): array
+    protected function blueprintsWithAuthor(SupportCollection $blueprints): array
     {
         return $blueprints
             ->filter(fn (Blueprint $blueprint) => $blueprint->hasField('author'))
             ->map->handle()->all();
     }
 
-    protected function blueprintsWithoutAuthor(FileCollection $blueprints): array
+    protected function blueprintsWithoutAuthor(SupportCollection $blueprints): array
     {
         return $blueprints
             ->filter(fn (Blueprint $blueprint) => ! $blueprint->hasField('author'))
