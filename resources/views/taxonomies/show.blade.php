@@ -48,9 +48,9 @@
     @if ($hasTerms)
         <term-list
             taxonomy="{{ $taxonomy->handle() }}"
-            initial-sort-column="{{ $taxonomy->sortField() }}"
-            initial-sort-direction="{{ $taxonomy->sortDirection() }}"
-            :initial-columns="{{ $columns->toJson() }}"
+            sort-column="{{ $taxonomy->sortField() }}"
+            sort-direction="{{ $taxonomy->sortDirection() }}"
+            :columns="{{ $columns->toJson() }}"
             :filters="{{ $filters->toJson() }}"
             action-url="{{ cp_route('taxonomies.terms.actions.run', $taxonomy->handle()) }}"
         ></term-list>
