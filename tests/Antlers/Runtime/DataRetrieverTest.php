@@ -103,4 +103,42 @@ class DataRetrieverTest extends ParserTestCase
         $value = $this->getPathValue('view.object.private_property', $data);
         $this->assertNull($value);
     }
+
+    public function test_object_properties_are_usable_in_antlers_conditions()
+    {
+        $object = new class
+        {
+            public string $truthyStringProperty = 'Hello Public World!';
+
+            public bool $truthyBoolProperty = true;
+
+            public string $falsyStringProperty = '';
+
+            public bool $falsyBoolProperty = false;
+
+            protected string $protectedProperty = 'Hello Protected World!';
+
+            private string $privateProperty = 'Hello Private World!';
+        };
+
+        Cascade::set('object', $object);
+
+        $value = (string) Antlers::parse('{{ if object:truthy_string_property }}yes{{ else }}no{{ /if }}');
+        $this->assertSame('yes', $value);
+
+        $value = (string) Antlers::parse('{{ if object:truthy_bool_property }}yes{{ else }}no{{ /if }}');
+        $this->assertSame('yes', $value);
+
+        $value = (string) Antlers::parse('{{ if object:falsy_string_property }}yes{{ else }}no{{ /if }}');
+        $this->assertSame('no', $value);
+
+        $value = (string) Antlers::parse('{{ if object:falsy_bool_property }}yes{{ else }}no{{ /if }}');
+        $this->assertSame('no', $value);
+
+        $value = (string) Antlers::parse('{{ if object:protected_property }}yes{{ else }}no{{ /if }}');
+        $this->assertSame('no', $value);
+
+        $value = (string) Antlers::parse('{{ if object:private_property }}yes{{ else }}no{{ /if }}');
+        $this->assertSame('no', $value);
+    }
 }
