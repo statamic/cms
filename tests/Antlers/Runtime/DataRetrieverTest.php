@@ -141,4 +141,21 @@ class DataRetrieverTest extends ParserTestCase
         $value = (string) Antlers::parse('{{ if object:private_property }}yes{{ else }}no{{ /if }}');
         $this->assertSame('no', $value);
     }
+
+    public function test_objects_with_no_matching_property_or_method_are_returned_as_null()
+    {
+        $data = [
+            'object' => new class
+            {
+            },
+        ];
+
+        $value = $this->getPathValue('object.no_existent', $data);
+        $this->assertNull($value);
+
+        Cascade::set('object', $data['object']);
+
+        $value = (string) Antlers::parse('{{ if object:no_existent }}yes{{ else }}no{{ /if }}');
+        $this->assertSame('no', $value);
+    }
 }

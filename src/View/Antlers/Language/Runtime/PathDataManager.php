@@ -875,6 +875,12 @@ class PathDataManager
             if ($doCompact) {
                 $this->compact($path->isFinal);
             }
+        } elseif (is_object($this->reducedVar)) {
+            $this->reducedVar = null;
+
+            if ($doCompact) {
+                $this->compact($path->isFinal);
+            }
         } elseif (is_array($this->reducedVar)) {
             if (is_numeric($varPath) && ! Arr::isAssoc($this->reducedVar) && $varPath < count($this->reducedVar) && array_key_exists($varPath, $this->reducedVar)) {
                 $this->resolvedPath[] = $varPath;
