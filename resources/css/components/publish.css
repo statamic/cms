@@ -123,6 +123,10 @@ Here flexbox is much better suited to create a layout that grows to fill space. 
             }
         }
     }
+
+    code {
+        @apply bg-blue-50 text-blue-600 font-medium px-1 rounded-sm;
+    }
 }
 
 .publish-field-label {
