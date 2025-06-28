@@ -76,4 +76,27 @@ class DataRetrieverTest extends ParserTestCase
         $value = $this->getPathValue('page[view:nested:nested1:nested2]', $data);
         $this->assertSame(12345, $value);
     }
+
+    public function test_object_properties_are_retrieved()
+    {
+        $data = [
+            'view' => [
+                'object' => new class
+                {
+                    public string $publicProperty = 'Hello Public World!';
+                    protected string $protectedProperty = 'Hello Protected World!';
+                    private string $privateProperty = 'Hello Private World!';
+                },
+            ],
+        ];
+
+        $value = $this->getPathValue('view.object.public_property', $data);
+        $this->assertSame('Hello Public World!', $value);
+
+        $value = $this->getPathValue('view.object.protected_property', $data);
+        $this->assertNull($value);
+
+        $value = $this->getPathValue('view.object.private_property', $data);
+        $this->assertNull($value);
+    }
 }
