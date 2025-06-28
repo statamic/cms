@@ -116,6 +116,12 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         $this->supplements = collect();
     }
 
+    public function __clone()
+    {
+        $this->data = clone $this->data;
+        $this->supplements = clone $this->supplements;
+    }
+
     public function id($id = null)
     {
         if ($id) {
@@ -767,6 +773,13 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         $this->disk()->rename($oldMetaPath, $this->metaPath());
 
         return $this;
+    }
+
+    public function moveQuietly($folder, $filename = null)
+    {
+        $this->withEvents = false;
+
+        return $this->move(...func_get_args());
     }
 
     /**

@@ -31,6 +31,8 @@ class DeleteTemporaryAttachments implements ShouldQueue
                 $this->submission->remove($field->handle());
             });
 
-        $this->submission->saveQuietly();
+        if ($this->submission->form()->store()) {
+            $this->submission->saveQuietly();
+        }
     }
 }

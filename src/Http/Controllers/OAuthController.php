@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\InvalidStateException;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\OAuth;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -16,6 +17,10 @@ class OAuthController
     {
         $referer = $request->headers->get('referer');
         $guard = config('statamic.users.guards.web', 'web');
+
+        if (! OAuth::providers()->has($provider)) {
+            throw new NotFoundHttpException();
+        }
 
         if (Str::startsWith(parse_url($referer)['path'], Str::ensureLeft(config('statamic.cp.route'), '/'))) {
             $guard = config('statamic.users.guards.cp', 'web');
@@ -29,6 +34,10 @@ class OAuthController
     public function handleProviderCallback(Request $request, string $provider)
     {
         $oauth = OAuth::provider($provider);
+
+        if (! $oauth) {
+            throw new NotFoundHttpException();
+        }
 
         try {
             $providerUser = $oauth->getSocialiteUser();

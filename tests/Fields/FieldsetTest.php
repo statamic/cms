@@ -168,6 +168,32 @@ class FieldsetTest extends TestCase
     }
 
     #[Test]
+    public function it_can_check_if_has_field()
+    {
+        FieldsetRepository::shouldReceive('find')
+            ->with('partial')
+            ->andReturn((new Fieldset)->setContents([
+                'fields' => [
+                    ['handle' => 'two', 'field' => ['type' => 'text']],
+                ],
+            ]))
+            ->once();
+
+        $fieldset = new Fieldset;
+
+        $fieldset->setContents([
+            'fields' => [
+                ['handle' => 'one', 'field' => ['type' => 'text']],
+                ['import' => 'partial'],
+            ],
+        ]);
+
+        $this->assertTrue($fieldset->hasField('one'));
+        $this->assertTrue($fieldset->hasField('two'));
+        $this->assertFalse($fieldset->hasField('three'));
+    }
+
+    #[Test]
     public function gets_blueprints_importing_fieldset()
     {
         $fieldset = Fieldset::make('seo')->setContents(['fields' => [
