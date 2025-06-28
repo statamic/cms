@@ -2,6 +2,8 @@
 
 namespace Tests\Antlers\Runtime;
 
+use Statamic\Facades\Antlers;
+use Statamic\Facades\Cascade;
 use Statamic\View\Antlers\Language\Runtime\PathDataManager;
 use Tests\Antlers\ParserTestCase;
 
@@ -84,7 +86,9 @@ class DataRetrieverTest extends ParserTestCase
                 'object' => new class
                 {
                     public string $publicProperty = 'Hello Public World!';
+
                     protected string $protectedProperty = 'Hello Protected World!';
+
                     private string $privateProperty = 'Hello Private World!';
                 },
             ],
