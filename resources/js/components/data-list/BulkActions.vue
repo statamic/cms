@@ -1,16 +1,19 @@
 <template>
-    <div v-if="showAlways || hasSelections" class="data-list-bulk-actions">
-        <div class="input-group input-group-sm relative">
-            <div class="input-group-prepend">
-                <div
-                    class="hidden text-gray-700 dark:text-dark-175 md:inline-block"
-                    v-text="__n(`:count item selected|:count items selected`, selections.length)"
-                />
-                <div class="text-gray-700 dark:text-dark-175 md:hidden" v-text="selections.length" />
-            </div>
-
+    <Motion
+        v-if="hasSelections"
+        layout
+        class="absolute inset-x-0 bottom-6 z-100 flex w-full justify-center"
+        :initial="{ y: 100, opacity: 0 }"
+        :animate="{ y: 0, opacity: 1 }"
+        :transition="{ duration: 0.2, ease: 'easeInOut' }"
+    >
+        <ButtonGroup>
+            <Button
+                class="text-blue-500!"
+                :text="__n(`Deselect :count item|Deselect all :count items`, selections.length)"
+                @click="deselectAll"
+            />
             <data-list-action
-                v-if="hasSelections"
                 v-for="(action, index) in sortedActions"
                 :key="action.handle"
                 :action="action"
@@ -19,37 +22,30 @@
                 @selected="run"
                 v-slot="{ action, select }"
             >
-                <button
-                    class="input-group-item"
-                    :class="{
-                        'text-red-500': action.dangerous,
-                        'ltr:rounded-r rtl:rounded-l': index + 1 === sortedActions.length,
-                    }"
-                    @click="select"
-                    v-text="__(action.title)"
-                />
+                <Button @click="select" :text="__(action.title)" />
             </data-list-action>
-        </div>
-    </div>
+        </ButtonGroup>
+    </Motion>
 </template>
 
 <script>
 import Actions from './Actions';
+import { Button, ButtonGroup } from '@statamic/ui';
+import { Motion } from 'motion-v';
 
 export default {
     mixins: [Actions],
 
+    components: {
+        Button,
+        ButtonGroup,
+        Motion,
+    },
+
     inject: ['sharedState'],
 
     props: {
-        context: {
-            type: Object,
-            default: () => {},
-        },
-        showAlways: {
-            type: Boolean,
-            default: false,
-        },
+        context: { type: Object, default: () => {} }
     },
 
     data() {
@@ -69,7 +65,12 @@ export default {
     },
 
     watch: {
-        selections: 'getActions',
+        selections: {
+            deep: true,
+            handler() {
+                this.getActions();
+            }
+        },
     },
 
     methods: {
@@ -91,6 +92,10 @@ export default {
             this.$axios.post(this.url + '/list', data).then((response) => {
                 this.actions = response.data;
             });
+        },
+
+        deselectAll() {
+            this.sharedState.selections = [];
         },
     },
 };

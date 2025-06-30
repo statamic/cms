@@ -46,7 +46,7 @@
 
     /*  Dynamic Mode */
     .array-dynamic .btn {
-        @apply block h-auto w-full border-0 text-blue shadow-none ltr:text-left rtl:text-right;
+        @apply block h-auto w-full border-0 text-blue-600 shadow-none ltr:text-left rtl:text-right;
         background: #f4f4f4;
         padding: 10px 10px 11px;
         margin: 15px 0 0;

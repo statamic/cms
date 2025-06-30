@@ -6,6 +6,8 @@
         @focus="$emit('focus')"
         @blur="$emit('blur')"
         :initial-widths="config.options"
+        :size="config.size"
+        variant="filled"
     />
 </template>
 

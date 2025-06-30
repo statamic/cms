@@ -8,14 +8,6 @@
 @section('content')
 
 <header class="mb-6">
-    @include(
-        'statamic::partials.breadcrumb',
-        [
-            'url' => cp_route('utilities.index'),
-            'title' => __('Utilities'),
-        ]
-    )
-
     <div class="flex items-center justify-between">
         <h1>Git</h1>
 
@@ -39,7 +31,7 @@
                 <code class="font-normal">{{ $path }}</code>
             </h2>
             <pre
-                class="mt-4 rounded bg-gray-300 p-4 font-mono text-sm text-gray-700 dark:bg-dark-800 dark:text-dark-150"
+                class="mt-4 rounded-sm bg-gray-300 p-4 font-mono text-sm text-gray-700 dark:bg-dark-800 dark:text-dark-150"
                 dir="ltr"
             >
 {{ $status->status }}</pre

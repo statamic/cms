@@ -1,9 +1,9 @@
 <template>
     <div>
         <div class="mb-2 flex justify-end">
-            <a class="text-2xs text-blue underline ltr:mr-4 rtl:ml-4" v-text="__('Expand All')" @click="expandAll" />
+            <a class="text-2xs text-blue-600 underline ltr:mr-4 rtl:ml-4" v-text="__('Expand All')" @click="expandAll" />
             <a
-                class="text-2xs text-blue underline ltr:mr-2 rtl:ml-2"
+                class="text-2xs text-blue-600 underline ltr:mr-2 rtl:ml-2"
                 v-text="__('Collapse All')"
                 @click="collapseAll"
             />
@@ -35,7 +35,7 @@
                 @close:node="nodeClosed"
             >
                 <template #placeholder>
-                    <div class="w-full rounded border border-dashed border-blue-400 bg-blue-500/10 p-2">&nbsp;</div>
+                    <div class="w-full rounded-sm border border-dashed border-blue-400 bg-blue-500/10 p-2">&nbsp;</div>
                 </template>
 
                 <template #default="{ node, stat }">

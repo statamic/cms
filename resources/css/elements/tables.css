@@ -2,12 +2,7 @@
    TABLES
    ========================================================================== */
 
-.data-list-header {
-    @apply flex flex-wrap items-center px-4 py-3;
-}
-
 .data-list-search-input {
-    /*  @apply text-sm px-4 py-2 flex-1 rounded border; */
     @apply bg-white;
 
     &:focus {
@@ -15,77 +10,52 @@
     }
 }
 
-.data-list-bulk-actions {
-    @apply absolute z-1 w-full bg-white py-2 dark:bg-dark-750;
-    padding-left: 56px;
-    [dir='rtl'] & {
-        padding-right: 56px;
-        padding-left: 0;
-    }
-}
-
-.mode-grid .data-list-bulk-actions {
-    @apply static z-10 w-full bg-white pb-1 pt-3 dark:bg-dark-800 ltr:pl-4 rtl:pr-4;
-}
-
-.mode-grid .rotating-dots-button {
-    @apply bg-white dark:bg-dark-400;
-}
-
-.data-list-footer {
-    @apply flex items-center border-t py-3 ltr:pr-4 rtl:pl-4;
-}
-
 .data-table {
-    @apply w-full max-w-full text-gray-700 outline-none dark:text-dark-150 ltr:text-left rtl:text-right;
-    overflow-x: auto;
+    @apply w-full max-w-full outline-hidden text-gray-500 antialiased border-separate border-spacing-y-0 min-w-full overflow-x-auto text-start;
+
+    &.contained {
+        @apply rounded-xl;
+    }
 
     thead {
-        @apply bg-gray-100 text-xs text-gray-900;
-        @apply dark:bg-dark-700 dark:text-dark-100;
-
-        tr {
-            @apply border-b dark:border-dark-900;
-        }
-
         th {
-            @apply whitespace-nowrap px-4 py-3 font-medium;
-            &:first-child {
-                @apply ltr:rounded-tl-lg rtl:rounded-tr-lg;
-            }
-            &:last-child {
-                @apply ltr:rounded-tr-lg rtl:rounded-tl-lg;
-            }
-            &:hover {
-                @apply text-gray-900 dark:text-dark-100;
+            @apply whitespace-nowrap text-sm font-medium text-gray-800 dark:text-gray-300 text-start;
+            @apply px-4 py-2;
+
+            .contained & {
+                @apply py-2.5 border-b;
             }
         }
+
         th.handle-column {
             @apply w-4 p-0;
         }
+
         .type-column {
-            @apply ltr:text-right rtl:text-left;
+            @apply text-end;
         }
     }
 
     tbody {
-        outline: none;
+        @apply text-sm bg-white dark:bg-gray-900 shadow-sm rounded-xl outline-none;
+        .contained & {
+            @apply shadow-none rounded-none;
+        }
+
         tr {
-            @apply border-b border-gray-400 text-sm dark:border-dark-900;
-
-            &.row-selected {
-                @apply bg-gray-200 dark:bg-dark-600;
-            }
-
             &:first-child {
                 td:first-child,
                 th:first-child {
-                    @apply ltr:rounded-tl-md rtl:rounded-tr-md;
+                    @apply ltr:rounded-tl-xl rtl:rounded-tr-xl;
                 }
 
                 td:last-child,
                 th:last-child {
-                    @apply ltr:rounded-tr-md rtl:rounded-tl-md;
+                    @apply ltr:rounded-tr-xl rtl:rounded-tl-xl;
+                }
+
+                td {
+                    @apply border-0;
                 }
             }
 
@@ -94,17 +64,17 @@
 
                 td:first-child,
                 th:first-child {
-                    @apply ltr:rounded-bl-md rtl:rounded-br-md;
+                    @apply ltr:rounded-bl-xl rtl:rounded-br-xl;
                 }
 
                 td:last-child,
                 th:last-child {
-                    @apply ltr:rounded-br-md rtl:rounded-bl-md;
+                    @apply ltr:rounded-br-xl rtl:rounded-bl-xl;
                 }
             }
 
             &:hover {
-                @apply bg-gray-100 dark:bg-dark-575;
+                @apply bg-gray-50 dark:bg-white/10;
             }
 
             th {
@@ -112,38 +82,17 @@
             }
 
             td {
-                @apply break-words px-4 py-2;
+                @apply pl-4.5 pr-2.5 py-3 border-t border-gray-200 dark:border-white/10;
+                @apply text-gray-800 dark:text-gray-200;
             }
 
             td.table-drag-handle {
-                @apply h-full w-1 px-0 py-2 ltr:border-r rtl:border-l;
+                @apply h-full w-1 px-0 py-2 border-e;
             }
         }
 
         .type-column {
-            @apply ltr:text-right rtl:text-left;
-        }
-    }
-
-    .sortable-column {
-        @apply cursor-pointer select-none;
-
-        &:hover {
-            @apply text-blue-500 dark:text-dark-blue-100;
-        }
-
-        &.current-column {
-            svg {
-                opacity: 1;
-            }
-        }
-
-        svg {
-            opacity: 0;
-        }
-
-        svg.asc {
-            transform: scaleY(-1);
+            @apply text-end;
         }
     }
 
@@ -155,249 +104,56 @@
 /* Sticky Meta Columns */
 .data-table {
     thead th.checkbox-column {
-        @apply sticky z-1 p-0 ltr:-left-px ltr:pr-2 rtl:-right-px rtl:pl-2;
+        @apply sticky z-1 ps-3 w-8;
+        .contained & {
+            @apply sticky ps-4;
+        }
+    }
+
+    thead .actions-column {
+        @apply sticky p-0 -end-px ps-2 text-end;
         width: 45px;
         min-width: 45px;
-        &:after {
-            @apply absolute bottom-0 top-0 -z-1 ltr:left-0 ltr:right-0 rtl:left-0 rtl:right-0;
-            content: '';
-            background-image: linear-gradient(to right, theme(colors.gray.100) 70%, theme(colors.gray.100 / 0%) 100%);
+    }
 
-            .dark & {
-                background-image: linear-gradient(
-                    to right,
-                    theme(colors.dark.550) 70%,
-                    theme(colors.dark.550 / 0%) 100%
-                );
-            }
-        }
-
-        &:has(input:checked) {
-            &:after {
-                .dark & {
-                    background-image: linear-gradient(
-                        to right,
-                        theme(colors.dark.750) 70%,
-                        theme(colors.dark.750 / 0%) 100%
-                    );
-                    @apply border-b border-dark-550;
-                }
-            }
+    tbody .checkbox-column {
+        @apply sticky px-3 -start-px;
+        .contained & {
+            @apply sticky ps-4;
         }
     }
 
-    thead th.actions-column {
-        @apply sticky p-0 ltr:-right-px ltr:pl-2 ltr:text-right rtl:-left-px rtl:pr-2 rtl:text-left;
-        width: 45px;
-        min-width: 45px;
-        &:after {
-            @apply absolute bottom-0 top-0 -z-1 ltr:left-0 ltr:right-0 rtl:left-0 rtl:right-0;
-            content: '';
-            background-image: linear-gradient(to left, theme(colors.gray.100) 70%, theme(colors.gray.100 / 0%) 100%);
-
-            .dark & {
-                background-image: linear-gradient(
-                    to left,
-                    theme(colors.dark.550) 70%,
-                    theme(colors.dark.550 / 0%) 100%
-                );
-            }
-        }
-
-        &:has(input:checked) {
-            &:after {
-                .dark & {
-                    background-image: linear-gradient(
-                        to left,
-                        theme(colors.dark.750) 70%,
-                        theme(colors.dark.750 / 0%) 100%
-                    );
-                    @apply border-b border-dark-550;
-                }
-            }
-        }
-    }
-
-    tbody th.checkbox-column {
-        @apply sticky px-3 ltr:-left-px rtl:-right-px;
-        &:after {
-            @apply absolute bottom-0 top-0 -z-1 ltr:left-0 ltr:right-0 rtl:left-0 rtl:right-0;
-            content: '';
-            background-image: linear-gradient(to right, rgba(255, 255, 255, 1) 70%, rgba(255, 255, 255, 0) 100%);
-
-            .dark & {
-                background-image: linear-gradient(
-                    to right,
-                    theme(colors.dark.600) 70%,
-                    theme(colors.dark.600 / 0%) 100%
-                );
-            }
-        }
-    }
-
-    tbody th.actions-column {
-        @apply sticky p-0 ltr:-right-px ltr:pl-2 ltr:text-right rtl:-left-px rtl:pr-2 rtl:text-left;
-        min-width: 45px;
-        width: 45px;
-        &:after {
-            @apply absolute bottom-0 top-0 -z-1 ltr:left-0 ltr:right-0 rtl:left-0 rtl:right-0;
-            content: '';
-            background-image: linear-gradient(to left, rgba(255, 255, 255, 1) 70%, rgba(255, 255, 255, 0) 100%);
-
-            .dark & {
-                background-image: linear-gradient(
-                    to left,
-                    theme(colors.dark.600) 70%,
-                    theme(colors.dark.600 / 0%) 100%
-                );
-            }
-        }
-    }
-
-    tbody tr.row-selected .checkbox-column:after {
-        background-image: linear-gradient(to right, theme(colors.gray.200) 70%, theme(colors.gray.200 / 0%) 100%);
-
-        .dark & {
-            background-image: linear-gradient(to right, theme(colors.dark.600) 70%, theme(colors.dark.600 / 0%) 100%);
-        }
-    }
-
-    tbody tr.row-selected .actions-column:after {
-        background-image: linear-gradient(to left, theme(colors.gray.200) 70%, theme(colors.gray.200 / 0%) 100%);
-
-        .dark & {
-            background-image: linear-gradient(to left, theme(colors.dark.600) 70%, theme(colors.dark.600 / 0%) 100%);
-        }
-    }
-
-    tbody tr:hover .checkbox-column:after {
-        background-image: linear-gradient(to right, theme(colors.gray.100) 70%, theme(colors.gray.100 / 0%) 100%);
-
-        .dark & {
-            background-image: linear-gradient(to right, theme(colors.dark.500) 70%, theme(colors.dark.500 / 0%) 100%);
-        }
-    }
-
-    tbody tr:hover .actions-column:after {
-        background-image: linear-gradient(to left, theme(colors.gray.100) 70%, theme(colors.gray.100 / 0%) 100%);
-
-        .dark & {
-            background-image: linear-gradient(to left, theme(colors.dark.500) 70%, theme(colors.dark.500 / 0%) 100%);
-        }
+    tbody .actions-column {
+        @apply sticky p-0 ps-2 text-end w-12;
     }
 }
 
-.data-list-header ~ .data-table {
-    thead th {
-        border-radius: 0;
+/* Row Selection */
+
+.data-table[data-has-selections] {
+    tbody tr[data-row="unselected"] td {
+        @apply text-gray-500! dark:text-gray-400!;
     }
 }
 
-.data-list-filter-link {
-    @apply border-gray-400 p-3 pb-2 text-gray-600 dark:border-dark-900 dark:text-dark-150 ltr:mr-2 rtl:ml-2;
-
-    &:hover {
-        @apply border-b-3 text-gray-700 dark:border-dark-900 dark:text-dark-100;
-    }
-
-    &:focus {
-        @apply border-blue-300 dark:border-dark-blue-100;
-        outline: 0;
-        box-shadow: inset 0 0 0 0.2rem rgba(0, 125, 255, 0.25);
-    }
-
-    &.active {
-        @apply border-b-3 border-blue text-gray-800 dark:border-dark-blue-100 dark:text-dark-100;
-    }
-}
-
-td.table-drag-handle {
-    @apply h-full w-3 p-2 dark:border-dark-900 ltr:border-r rtl:border-l;
+.table-drag-handle {
+    @apply h-full w-3 p-2 dark:border-dark-900 border-e;
     min-width: 16px;
     cursor: grab;
-    background: theme('colors.gray.200') url('../../svg/icons/light/drag-dots.svg') center center no-repeat;
+    background: var(--color-gray-200) url('../../svg/icons/light/drag-dots.svg') center center no-repeat;
     background-size: 7px 17px;
 
     .dark & {
-        background-color: theme(colors.dark.700);
+        background-color: var(--color-dark-700);
     }
 
     &:hover {
-        @apply bg-gray-300 dark:bg-dark-750;
-    }
-}
-
-.table-row-placeholder {
-    background: hsla(210, 30%, 95%, 1);
-}
-
-.delete-column {
-    background: #fff;
-    border: 1px solid #ccc;
-    border-radius: 22px;
-    color: #777;
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
-    line-height: 1;
-    text-align: center;
-    height: 22px;
-    width: 22px;
-    float: right;
-    [dir='rtl'] & {
-        float: left;
-    }
-    cursor: pointer;
-
-    &:hover {
-        box-shadow: none;
-        color: #555;
+        @apply bg-gray-300 dark:bg-gray-700;
     }
 }
 
 .column-sortable {
-    cursor: pointer;
-    position: relative;
-
-    &:before {
-        content: '';
-        position: absolute;
-        bottom: -1px;
-        left: 0;
-        [dir='rtl'] & {
-            left: auto;
-            right: 0;
-        }
-        right: 0;
-        [dir='rtl'] & {
-            right: auto;
-            left: 0;
-        }
-        height: 2px;
-    }
-
-    &:hover:before {
-        @apply bg-gray-300;
-    }
-    &.active:before {
-        @apply bg-blue;
-    }
-    .icon {
-        position: relative;
-        float: right;
-        [dir='rtl'] & {
-            float: left;
-        }
-        top: 6px;
-        right: 5px;
-        [dir='rtl'] & {
-            right: auto;
-            left: 5px;
-        }
-    }
-
-    .icon,
-    .icon:before {
-        line-height: 0;
-    }
+    @apply cursor-pointer relative;
 }
 
 .column-status {
@@ -406,23 +162,9 @@ td.table-drag-handle {
 }
 
 .column-actions {
-    @apply ltr:text-right rtl:text-left;
-    width: 30px;
+    @apply text-end w-12;
 }
 
-table.control {
-    @apply select-none;
-}
-
-.flush table.control {
-    tr th:first-child {
-        padding-left: 30px;
-        [dir='rtl'] & {
-            padding-right: 30px;
-            padding-left: 0;
-        }
-    }
-}
 
 /* Index Fields
   ========================================================================== */
@@ -430,36 +172,26 @@ table.control {
 .bard-index-field,
 .code-index-field,
 .markdown-index-field,
-.text-index-field,
 .textarea-index-field {
     @apply line-clamp-2 text-xs;
 }
 
 .title-index-field {
-    @apply line-clamp-2;
-    min-width: 10vw;
-}
-
-.relationship-index-field {
-    min-width: 10vw;
-    .relationship-index-field-item {
-        @apply flex items-center rounded border bg-gray-100 px-1 text-2xs dark:border-dark-400 dark:bg-dark-500 ltr:mr-1 rtl:ml-1;
-        a {
-            @apply line-clamp-1;
-        }
-    }
+    @apply text-sm font-medium line-clamp-2 flex items-center gap-2 hover:text-black dark:hover:text-white;
+    min-width: 15vw;
+    max-width: 30vw;
 }
 
 .date-index-field {
-    @apply whitespace-nowrap text-gray-800 dark:text-dark-150;
+    @apply whitespace-nowrap;
 }
 
 .slug-index-field {
-    @apply line-clamp-2 font-mono text-2xs;
+    @apply line-clamp-2 font-mono text-xs;
 }
 
 .status-index-field {
-    @apply inline-block shrink justify-center rounded-full bg-gray-300 px-2 py-0.5 text-center text-xs text-gray-800 dark:bg-dark-200 dark:text-dark-150;
+    @apply inline-block shrink justify-center rounded-full bg-gray-300 px-2 py-0.5 text-center text-xs text-gray-800 dark:bg-gray-200 dark:text-dark-150;
 
     &.status-published:not(.status-private) {
         @apply bg-green-200 text-green-900 dark:bg-green-300 dark:text-green-950;
@@ -476,6 +208,6 @@ table.control {
 
     .role-index-field-item,
     .groups-index-field-item {
-        @apply mb-1 line-clamp-1 inline-block rounded border bg-gray-100 px-1 text-2xs dark:border-dark-900 dark:bg-dark-700;
+        @apply mb-1 line-clamp-1 inline-block rounded-sm border bg-gray-100 px-1 text-2xs dark:border-dark-900 dark:bg-gray-700;
     }
 }

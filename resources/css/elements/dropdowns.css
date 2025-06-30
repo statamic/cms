@@ -7,12 +7,14 @@
 
     button,
     a {
-        @apply block w-full rounded-sm px-2 py-1 text-xs font-normal text-gray-800 dark:text-dark-100 ltr:text-left rtl:text-right;
+        @apply block w-full rounded-xs px-2 py-1 text-xs font-normal text-gray-800 dark:text-dark-100 ltr:text-left rtl:text-right;
         line-height: 1.4;
         white-space: nowrap;
+        @apply rounded-sm;
+        cursor: pointer;
 
         &:hover {
-            @apply bg-blue text-white dark:bg-dark-600;
+            @apply bg-gray-100 dark:bg-dark-600;
         }
 
         .icon {
@@ -43,10 +45,10 @@
 
     button.warning,
     a.warning {
-        @apply text-red-500;
+        @apply text-red-600;
 
         &:hover {
-            @apply bg-red-500 text-white;
+            @apply bg-red-50;
         }
     }
 
@@ -74,7 +76,7 @@
     @apply relative;
 
     .quick-list-content {
-        @apply absolute right-full top-1/2 mr-[8px] flex min-w-max origin-right -translate-y-1/2 rounded-full bg-white p-0.5 shadow-quick transition dark:bg-dark-550;
+        @apply absolute right-full top-1/2 mr-[8px] flex min-w-max origin-right -translate-y-1/2 rounded-full bg-white p-0.5 shadow-sm transition dark:bg-dark-550;
         &::before {
             content: '';
             position: absolute;
@@ -83,9 +85,9 @@
         }
         button,
         a {
-            @apply flex shrink-0 rounded-full p-1.5 text-gray-800 dark:text-dark-100;
+            @apply flex shrink-0 rounded-full text-gray-800 dark:text-dark-100;
             &:hover {
-                @apply bg-blue text-white;
+                @apply text-white;
             }
         }
         &:empty {

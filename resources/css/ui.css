@@ -1,0 +1,118 @@
+@theme inline {
+
+    --color-primary: var(--color-zinc-800);
+    --color-primary-border: color-mix(in oklch, var(--color-primary) 100%, black 20%);
+    --color-primary-hover: color-mix(in oklch, var(--color-primary) 100%, black 30%);
+    --color-primary-gap: color-mix(in oklch, var(--color-primary) 100%, black 50%);
+    --color-gray-50: var(--color-zinc-50);
+    --color-gray-100: var(--color-zinc-100);
+    --color-gray-200: var(--color-zinc-200);
+    --color-gray-300: var(--color-zinc-300);
+    --color-gray-400: var(--color-zinc-400);
+    --color-gray-500: var(--color-zinc-500);
+    --color-gray-600: var(--color-zinc-600);
+    --color-gray-700: var(--color-zinc-700);
+    --color-gray-800: var(--color-zinc-800);
+    --color-gray-850: oklch(24.48% 0.0056 285.98);
+    --color-gray-900: var(--color-zinc-900);
+    --color-gray-950: var(--color-zinc-950);
+    --color-volt: oklch(93.86% 0.2018 122.24);
+
+    /* Temp */
+    --color-dark-100: #dfe1e5;
+    --color-dark-150: #bbbdc0;
+    --color-dark-175: #93979a;
+    --color-dark-200: #5f6163;
+    --color-dark-250: #555759;
+    --color-dark-275: #515356;
+    --color-dark-300: #4e5157;
+    --color-dark-350: #43454a;
+    --color-dark-400: #414245;
+    --color-dark-500: #404143;
+    --color-dark-550: #3b3f41;
+    --color-dark-575: #393b40;
+    --color-dark-600: #2b2d30;
+    --color-dark-650: #242628;
+    --color-dark-700: #212223;
+    --color-dark-750: #22242a;
+    --color-dark-800: #1e1f22;
+    --color-dark-900: #171717;
+    --color-dark-950: #161616;
+    --color-dark-975: #131314;
+
+    --color-dark-blue-100: #2870F5;
+    --color-dark-blue-125: #1e68f1;
+    --color-dark-blue-150: #1f67ec;
+    --color-dark-blue-175: #1560ec;
+    --color-dark-blue-200: #2a4270;
+
+    --color-orange-light: #fcc062;
+    --color-orange: #f5a82f;
+    --color-orange-dark: #e08a1e;
+
+    --color-pink-light: #ff5ba7;
+    --color-pink: #ff269e;
+    --color-pink-dark: #e00095;
+
+    --color-purple-light: #e0b7ff;
+    --color-purple: #c471ed;
+    --color-purple-dark: #a855cd;
+
+    --color-yellow-light: #ffffe0;
+    --color-yellow: #fbfab0;
+    --color-yellow-dark: #e8dc1e;
+
+    --color-amber: #ffd700;
+    --color-green: #00ff00;
+    --color-red: #ff0000;
+    --color-dark-red: #900000;
+    --color-blue: #0000ff;
+    --color-gray: #808080;
+    --color-dark-gray: #404040;
+}
+
+@theme {
+    --text-4xs: 0.4rem;
+    --text-3xs: 0.5rem;
+    --text-2xs: 0.7rem;
+    --text-xs: 0.825rem;
+
+    --tracking-tight: -0.015em;
+
+    --shadow-ui-xs: 0px 1px 3px -1px rgba(0,0,0,0.10);
+    --shadow-ui-sm: 0px 2px 3px -2px rgba(0,0,0,0.15);
+    --shadow-ui-md: 0px 2px 4px -2px rgba(0,0,0,0.37);
+    --shadow-ui-lg: 0px 4px 7px -4px rgba(0,0,0,0.15);
+    --shadow-ui-xl: 0px 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
+
+    /* Custom value because gray-100 is too light and gray-200 is too dark, e.g. Bard active buttons */
+    --color-button-active-light-theme: hsl(from var(--color-gray-200) h s l / 0.6);
+
+    --animate-wiggle: wiggle 200ms ease-in-out infinite;
+
+    @keyframes wiggle {
+        0%,
+        100% {
+            transform: rotate(-3deg);
+        }
+        50% {
+            transform: rotate(3deg);
+        }
+    }
+}
+
+.popoverAnimation {
+    @apply duration-100 will-change-[transform,opacity];
+    @apply data-[state=open]:animate-in data-[state=closed]:animate-out;
+    @apply data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0;
+    @apply data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95;
+    @apply data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2;
+    @apply data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2;
+}
+
+@layer components {
+    .content-card {
+        @apply min-h-full px-6 md:px-12 pb-6 bg-white border dark:bg-gray-900 dark:border-y-0 dark:border-r-0 border-gray-200 dark:border-white/10 rounded-2xl dark:rounded-none;
+    }
+}
+

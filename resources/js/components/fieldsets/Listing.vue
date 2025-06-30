@@ -1,71 +1,62 @@
-<template>
-    <data-list :visible-columns="columns" :columns="columns" :rows="rows" v-slot="{ filteredRows: rows }">
-        <div class="card relative overflow-hidden p-0">
-            <div class="overflow-x-auto overflow-y-hidden">
-                <data-list-table>
-                    <template #cell-title="{ row: fieldset }">
-                        <a :href="fieldset.edit_url">{{ __(fieldset.title) }}</a>
-                    </template>
-                    <template #cell-handle="{ value }">
-                        <span class="font-mono text-xs">{{ value }}</span>
-                    </template>
-                    <template #actions="{ row: fieldset, index }">
-                        <dropdown-list>
-                            <dropdown-item :text="__('Edit')" :redirect="fieldset.edit_url" />
-                            <dropdown-item
-                                v-if="fieldset.is_resettable"
-                                :text="__('Reset')"
-                                class="warning"
-                                @click="$refs[`resetter_${fieldset.id}`].confirm()"
-                            >
-                                <fieldset-resetter :ref="`resetter_${fieldset.id}`" :resource="fieldset" :reload="true">
-                                </fieldset-resetter>
-                            </dropdown-item>
-                            <dropdown-item
-                                v-if="fieldset.is_deletable"
-                                :text="__('Delete')"
-                                class="warning"
-                                @click="$refs[`deleter_${fieldset.id}`].confirm()"
-                            >
-                                <fieldset-deleter
-                                    :ref="`deleter_${fieldset.id}`"
-                                    :resource="fieldset"
-                                    @deleted="removeRow(fieldset)"
-                                >
-                                </fieldset-deleter>
-                            </dropdown-item>
-                        </dropdown-list>
-                    </template>
-                </data-list-table>
-            </div>
-        </div>
-    </data-list>
-</template>
-
-<script>
-import Listing from '../Listing.vue';
+<script setup>
+import { ref } from 'vue';
+import { Listing, DropdownItem } from '@statamic/ui';
 import FieldsetDeleter from './FieldsetDeleter.vue';
 import FieldsetResetter from './FieldsetResetter.vue';
 
-export default {
-    mixins: [Listing],
+const props = defineProps(['initialRows', 'actionUrl']);
 
-    components: {
-        FieldsetDeleter,
-        FieldsetResetter,
-    },
+const rows = ref(props.initialRows);
 
-    props: ['initialRows'],
+const columns = ref([
+    { label: __('Title'), field: 'title' },
+    { label: __('Handle'), field: 'handle', width: '25%' },
+    { label: __('Fields'), field: 'fields', width: '15%' },
+]);
 
-    data() {
-        return {
-            rows: this.initialRows,
-            columns: [
-                { label: __('Title'), field: 'title' },
-                { label: __('Handle'), field: 'handle', width: '25%' },
-                { label: __('Fields'), field: 'fields', width: '15%' },
-            ],
-        };
-    },
-};
+function reloadPage() {
+    window.location.reload();
+}
+
+function removeRow(row) {
+    const i = rows.value.findIndex((r) => r.id === row.id);
+    rows.value.splice(i, 1);
+}
 </script>
+
+<template>
+    <Listing
+        :items="rows"
+        :columns="columns"
+        :action-url="actionUrl"
+        :allow-search="false"
+        :allow-customizing-columns="false"
+        @refreshing="reloadPage"
+    >
+        <template #cell-title="{ row: fieldset }">
+            <a :href="fieldset.edit_url">{{ __(fieldset.title) }}</a>
+            <fieldset-resetter :ref="`resetter_${fieldset.id}`" :resource="fieldset" :reload="true" />
+            <fieldset-deleter :ref="`deleter_${fieldset.id}`" :resource="fieldset" @deleted="removeRow(fieldset)" />
+        </template>
+        <template #cell-handle="{ value }">
+            <span class="font-mono text-xs">{{ value }}</span>
+        </template>
+        <template #prepended-row-actions="{ row: fieldset }">
+            <DropdownItem :text="__('Edit')" icon="edit" :href="fieldset.edit_url" />
+            <DropdownItem
+                v-if="fieldset.is_resettable"
+                :text="__('Reset')"
+                icon="history"
+                variant="destructive"
+                @click="$refs[`resetter_${fieldset.id}`].confirm()"
+            />
+            <DropdownItem
+                v-if="fieldset.is_deletable"
+                :text="__('Delete')"
+                icon="trash"
+                variant="destructive"
+                @click="$refs[`deleter_${fieldset.id}`].confirm()"
+            />
+        </template>
+    </Listing>
+</template>

@@ -1,53 +1,54 @@
 <template>
-    <tr class="cursor-grab bg-white hover:bg-gray-100 dark:bg-dark-750 dark:hover:bg-dark-700">
-        <td class="flex h-full items-center">
+    <tr class="cursor-grab bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-900">
+        <td class="flex gap-3 h-full items-center p-3">
             <div
                 v-if="canShowSvg"
-                class="img svg-img flex h-7 w-7 items-center justify-center bg-cover bg-center bg-no-repeat text-center"
+                class="img svg-img flex size-7 items-center justify-center bg-cover bg-center bg-no-repeat text-center"
                 :style="'background-image:url(' + thumbnail + ')'"
             ></div>
             <button
-                class="flex h-7 w-7 cursor-pointer items-center justify-center whitespace-nowrap"
-                @click="editOrOpen"
                 v-else
+                class="flex size-7 cursor-pointer items-center justify-center whitespace-nowrap"
+                @click="editOrOpen"
             >
                 <img
-                    class="asset-thumbnail h-7 max-h-full w-7 max-w-full rounded object-cover"
+                    class="asset-thumbnail size-7 text-gray-600 max-h-full max-w-full rounded-sm object-cover"
                     loading="lazy"
                     :src="thumbnail"
                     :alt="asset.basename"
                     v-if="isImage"
                 />
-                <file-icon :extension="asset.extension" v-else class="h-7 w-7" />
+                <file-icon :extension="asset.extension" v-else class="size-7" />
             </button>
             <button
                 v-if="showFilename"
                 @click="editOrOpen"
-                class="flex w-full flex-1 items-center truncate text-xs ltr:ml-3 ltr:text-left rtl:mr-3 rtl:text-right"
+                class="flex w-full flex-1 items-center truncate text-sm text-gray-600 dark:text-gray-400 text-start"
                 :title="__('Edit')"
                 :aria-label="__('Edit Asset')"
             >
                 {{ asset.basename }}
             </button>
-            <button
+            <ui-badge
                 v-if="showSetAlt && needsAlt"
-                class="asset-set-alt px-4 text-sm text-blue hover:text-black dark:text-dark-blue-100 dark:hover:text-dark-100"
-                type="button"
+                as="button"
+                color="sky"
+                variant="outline"
+                :text="__('Set Alt')"
                 @click="editOrOpen"
-            >
-                {{ asset.values.alt ? '✅' : __('Set Alt') }}
-            </button>
-            <div v-text="asset.size" class="asset-filesize hidden px-2 text-xs text-gray-600 @xs:inline" />
+            />
+            <div v-text="asset.size" class="asset-filesize hidden px-2 text-sm text-gray-500 dark:text-gray-400 @xs:inline" />
         </td>
-        <td class="w-8 p-0 align-middle ltr:text-right rtl:text-left" v-if="!readOnly">
-            <button
-                class="flex h-8 w-6 items-center p-1 text-lg text-gray-600 antialiased hover:text-gray-900 dark:text-dark-150 dark:hover:text-dark-100"
+        <td class="p-3 align-middle text-end" v-if="!readOnly">
+            <ui-button
                 @click="remove"
-                :title="__('Remove')"
+                icon="x"
+                round
+                size="xs"
+                variant="ghost"
                 :aria-label="__('Remove Asset')"
-            >
-                ×
-            </button>
+                :title="__('Remove')"
+            />
 
             <asset-editor
                 v-if="editing"

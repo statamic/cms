@@ -1,24 +1,13 @@
 <template>
-    <div class="flex items-center">
+    <div class="flex gap-3">
         <!-- Link type selector -->
-        <div class="w-28 ltr:mr-4 rtl:ml-4">
-            <v-select
-                v-model="option"
-                append-to-body
-                :calculate-position="positionOptions"
-                :options="options"
-                :clearable="false"
-                :reduce="(option) => option.value"
-            >
-                <template #option="{ label }">
-                    {{ __(label) }}
-                </template>
-            </v-select>
+        <div class="w-fit">
+            <Select :options v-model="option" />
         </div>
 
-        <div class="flex-1 truncate">
+        <div class="flex-1 flex">
             <!-- URL text input -->
-            <text-input v-if="option === 'url'" v-model="urlValue" />
+            <Input v-if="option === 'url'" v-model="urlValue" />
 
             <!-- Entry select -->
             <relationship-fieldtype
@@ -47,12 +36,25 @@
     </div>
 </template>
 
+<!-- This is a hack to...  -->
+<style scoped>
+    /* [1] Make the relationship input full height when it's in a link field. */
+    :deep(.relationship-input) > div:first-child {
+        @apply h-full;
+    }
+    /* [/2] Make the combobox text smaller when it's in a link field so it's not jarring when looking between the two. */
+    :deep([data-ui-combobox-anchor]) {
+        font-size: var(--text-sm)!important;
+    }
+</style>
+
 <script>
 import Fieldtype from './Fieldtype.vue';
-import PositionsSelectOptions from '../../mixins/PositionsSelectOptions';
+import { Input, Select } from '@statamic/ui';
 
 export default {
-    mixins: [Fieldtype, PositionsSelectOptions],
+    components: { Input, Text, Select },
+    mixins: [Fieldtype],
 
     provide: {
         isInLinkField: true,

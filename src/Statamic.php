@@ -286,7 +286,7 @@ class Statamic
     {
         return static::cpVite()->withEntryPoints([
             'resources/js/index.js',
-            'resources/css/tailwind.css',
+            'resources/css/app.css',
         ]);
     }
 

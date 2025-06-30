@@ -6,7 +6,6 @@
         method="post"
         :initial-title="taxonomyCreateLabel"
         :taxonomy-handle="taxonomyHandle"
-        :breadcrumbs="breadcrumbs"
         :initial-fieldset="fieldset"
         :initial-values="values"
         :initial-meta="meta"
@@ -30,7 +29,6 @@ export default {
         'actions',
         'taxonomyHandle',
         'taxonomyCreateLabel',
-        'breadcrumbs',
         'fieldset',
         'values',
         'meta',

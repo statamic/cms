@@ -1,31 +1,39 @@
 <template>
     <div>
-        <template v-if="isToggleMode">
-            <div class="toggle-fieldtype-wrapper">
-                <toggle-input :model-value="isRevealed" @update:model-value="update" :read-only="isReadOnly" />
-                <label v-if="config.input_label" class="font-normal ltr:ml-2 rtl:mr-2">{{
-                    __(config.input_label)
-                }}</label>
-            </div>
-        </template>
-
-        <template v-else>
-            <button
-                @click="buttonReveal"
-                class="btn"
-                :disabled="isReadOnly"
-                :v-tooltip="__(config.instructions)"
-                v-text="config.input_label || __('Show Fields')"
-            />
-        </template>
+        <div class="flex items-center gap-2" v-if="isToggleMode">
+            <Switch :model-value="isRevealed" @update:model-value="update" :read-only="isReadOnly" :id="id" />
+            <Heading v-if="config.input_label" v-html="$markdown(__(config.input_label), { openLinksInNewTabs: true })" />
+        </div>
+        <Button
+            v-else
+            icon="eye-closed"
+            @click="buttonReveal"
+            :disabled="isReadOnly"
+            :v-tooltip="__(config.instructions)"
+            :text="config.input_label || __('Show Fields')"
+        />
     </div>
 </template>
 
 <script>
 import Fieldtype from './Fieldtype.vue';
+import { Switch, Heading, Button } from '@/components/ui';
+import { useId } from 'vue'
 
 export default {
+    components: {
+        Switch,
+        Heading,
+        Button,
+    },
+
     mixins: [Fieldtype],
+
+    setup() {
+        const id = useId();
+
+        return { id };
+    },
 
     computed: {
         isRevealed() {

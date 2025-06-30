@@ -128,19 +128,12 @@ class Nav
      * @param  mixed  $preferences
      * @return \Illuminate\Support\Collection
      */
-    public function build($preferences = true, $withHidden = false)
+    public function build($preferences = true, bool $editing = false, bool $commands = false)
     {
-        return (new NavBuilder($this->makeBaseItems(), $withHidden))->build($preferences);
-    }
-
-    /**
-     * Build navigation without applying preferences.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public function buildWithoutPreferences($withHidden = false)
-    {
-        return $this->build(false, $withHidden);
+        return (new NavBuilder($this->makeBaseItems()))
+            ->withHidden($editing)
+            ->withCommandPalette($commands)
+            ->build($preferences);
     }
 
     /**

@@ -9,29 +9,24 @@
             <div class="filename">{{ basename }}</div>
         </div>
 
-        <div v-if="status !== 'error'" class="mx-2 h-4 flex-1 rounded bg-white">
-            <div class="h-full rounded bg-blue" :style="{ width: percent + '%' }" />
+        <div v-if="status !== 'error'" class="mx-2 h-4 flex-1 rounded-sm bg-white">
+            <div class="h-full rounded-sm bg-blue" :style="{ width: percent + '%' }" />
         </div>
 
         <div class="ml-4 flex items-center gap-2 px-2" v-if="status === 'error'">
             {{ error }}
-            <dropdown-list v-if="errorStatus === 409">
+            <Dropdown v-if="errorStatus === 409">
                 <template #trigger>
-                    <button class="btn btn-xs ml-4" v-text="`${__('Fix')}...`" />
+                    <Button size="xs" :text="`${__('Fix')}...`" />
                 </template>
-                <dropdown-item @click="retryAndOverwrite" :text="__('messages.uploader_overwrite_existing')" />
-                <dropdown-item
-                    @click="openNewFilenameModal"
-                    :text="`${__('messages.uploader_choose_new_filename')}...`"
-                />
-                <dropdown-item @click="retryWithTimestamp" :text="__('messages.uploader_append_timestamp')" />
-                <dropdown-item
-                    @click="selectExisting"
-                    v-if="allowSelectingExisting"
-                    :text="__('messages.uploader_discard_use_existing')"
-                />
-            </dropdown-list>
-            <button class="btn btn-xs" @click="clear" v-text="__('Discard')" />
+                <DropdownMenu>
+                    <DropdownItem @click="retryAndOverwrite" :text="__('messages.uploader_overwrite_existing')" />
+                    <DropdownItem @click="openNewFilenameModal" :text="`${__('messages.uploader_choose_new_filename')}...`" />
+                    <DropdownItem @click="retryWithTimestamp" :text="__('messages.uploader_append_timestamp')" />
+                    <DropdownItem @click="selectExisting" v-if="allowSelectingExisting" :text="__('messages.uploader_discard_use_existing')" />
+                </DropdownMenu>
+            </Dropdown>
+            <Button size="xs" @click="clear" :text="__('Discard')" />
         </div>
 
         <confirmation-modal
@@ -40,13 +35,23 @@
             @cancel="showNewFilenameModal = false"
             @confirm="confirmNewFilename"
         >
-            <text-input autoselect v-model="newFilename" @keydown.enter="confirmNewFilename" />
+            <Input autoselect v-model="newFilename" @keydown.enter="confirmNewFilename" />
         </confirmation-modal>
     </div>
 </template>
 
 <script>
+import { Button, Dropdown, DropdownMenu, DropdownItem, Input } from '@statamic/ui';
+
 export default {
+    components: {
+        Button,
+        Dropdown,
+        DropdownMenu,
+        DropdownItem,
+        Input,
+    },
+
     props: {
         extension: String,
         basename: String,

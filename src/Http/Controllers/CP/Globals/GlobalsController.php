@@ -32,7 +32,9 @@ class GlobalsController extends CpController
                 'handle' => $set->handle(),
                 'title' => $set->title(),
                 'deleteable' => User::current()->can('delete', $set),
+                'configurable' => User::current()->can('edit', $set),
                 'edit_url' => $localized ? $localized->editUrl() : $set->editUrl(),
+                'configure_url' => $set->editUrl(),
                 'delete_url' => $set->deleteUrl(),
             ];
         })->filter()->values();
@@ -73,23 +75,7 @@ class GlobalsController extends CpController
             'values' => $fields->values(),
             'meta' => $fields->meta(),
             'set' => $set,
-            'breadcrumb' => $this->breadcrumb($set),
         ]);
-    }
-
-    private function breadcrumb(GlobalSetContract $set)
-    {
-        if ($localized = $set->inSelectedSite()) {
-            return [
-                'title' => $localized->title(),
-                'url' => $localized->editUrl(),
-            ];
-        }
-
-        return [
-            'title' => __('Globals'),
-            'url' => cp_route('globals.index'),
-        ];
     }
 
     public function update(Request $request, $set)

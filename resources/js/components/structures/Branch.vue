@@ -28,7 +28,7 @@
 
                 <button
                     v-if="hasChildren"
-                    class="flex p-2 text-gray-600 outline-none transition duration-100 hover:text-gray-700 dark:text-dark-175 dark:hover:text-dark-150"
+                    class="flex p-2 text-gray-600 outline-hidden transition duration-100 hover:text-gray-700 dark:text-dark-175 dark:hover:text-dark-150"
                     :class="{ '-rotate-90': !isOpen }"
                     @click.stop="$emit('toggle-open')"
                 >
@@ -54,16 +54,26 @@
 
                 <slot name="branch-icon" :branch="page" />
 
-                <dropdown-list class="ltr:ml-4 rtl:mr-4" :class="{ invisible: isRoot, hidden: !editable }">
-                    <slot name="branch-options" :branch="page" :depth="depth" :remove-branch="remove" />
-                </dropdown-list>
+                <Dropdown placement="left-start" class="me-4" :class="{ invisible: isRoot, hidden: !editable }">
+                    <DropdownMenu>
+                        <slot
+                            name="branch-options"
+                            :branch="page"
+                            :depth="depth"
+                            :remove-branch="remove"
+                        />
+                    </DropdownMenu>
+                </Dropdown>
             </div>
         </div>
     </div>
 </template>
 
 <script>
+import { Dropdown, DropdownMenu } from '@statamic/ui';
+
 export default {
+    components: { Dropdown, DropdownMenu },
     props: {
         page: Object,
         depth: Number,

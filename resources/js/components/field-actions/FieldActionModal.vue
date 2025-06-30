@@ -13,7 +13,7 @@
 
                 <div v-if="warningText" v-text="warningText" class="text-red-500" :class="{ 'mb-4': hasFields }" />
 
-                <publish-container
+                <PublishContainer
                     v-if="hasFields && !resolving"
                     :name="containerName"
                     :blueprint="blueprint"
@@ -21,14 +21,11 @@
                     :meta="meta"
                     :errors="errors"
                     @updated="values = $event"
-                    v-slot="{ setFieldValue, setFieldMeta }"
                 >
-                    <publish-fields
-                        :fields="blueprint.tabs[0].fields"
-                        @updated="setFieldValue"
-                        @meta-updated="setFieldMeta"
-                    />
-                </publish-container>
+                    <FieldsProvider :fields="blueprint.tabs[0].fields">
+                        <PublishFields />
+                    </FieldsProvider>
+                </PublishContainer>
             </div>
         </confirmation-modal>
     </div>
@@ -36,8 +33,11 @@
 
 <script>
 import uniqid from 'uniqid';
+import { PublishContainer, FieldsProvider, PublishFields } from '@statamic/ui';
 
 export default {
+    components: { PublishContainer, FieldsProvider, PublishFields },
+
     props: {
         fields: {
             type: Object,

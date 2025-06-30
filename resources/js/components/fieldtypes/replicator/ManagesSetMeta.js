@@ -4,8 +4,8 @@ export default {
     mixins: [ManagesRowMeta],
 
     methods: {
-        updateSetMeta(set, value, previews) {
-            this.updateRowMeta(set, value, previews);
+        updateSetMeta(set, value) {
+            this.updateRowMeta(set, value);
         },
 
         removeSetMeta(set) {

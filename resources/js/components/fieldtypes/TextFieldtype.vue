@@ -1,5 +1,5 @@
 <template>
-    <text-input
+    <Input
         ref="input"
         :model-value="value"
         :classes="config.classes"
@@ -7,13 +7,13 @@
         :autocomplete="config.autocomplete"
         :autoselect="config.autoselect"
         :type="config.input_type"
-        :isReadOnly="isReadOnly"
+        :disabled="isReadOnly"
         :prepend="__(config.prepend)"
         :append="__(config.append)"
         :limit="config.character_limit"
         :placeholder="__(config.placeholder)"
         :name="name"
-        :id="fieldId"
+        :id="id"
         :direction="config.direction"
         @update:model-value="inputUpdated"
         @focus="$emit('focus')"
@@ -23,9 +23,14 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
+import { Input } from '@statamic/ui';
 
 export default {
     mixins: [Fieldtype],
+
+    components: {
+        Input,
+    },
 
     methods: {
         inputUpdated(value) {

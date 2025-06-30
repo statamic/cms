@@ -235,18 +235,11 @@ class Replicator extends Fieldtype
             })->toArray();
         });
 
-        $previews = collect($existing)->map(function ($fields) {
-            return collect($fields)->map(function () {
-                return null;
-            })->all();
-        })->all();
-
         return [
             'existing' => $existing,
             'new' => $new,
             'defaults' => $defaults,
             'collapsed' => [],
-            'previews' => $previews,
         ];
     }
 

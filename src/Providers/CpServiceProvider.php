@@ -24,6 +24,7 @@ use Statamic\Http\View\Composers\SessionExpiryComposer;
 use Statamic\Licensing\LicenseManager;
 use Statamic\Licensing\Outpost;
 use Statamic\Notifications\ElevatedSessionVerificationCode;
+use Statamic\View\Components\OutsideLogo;
 
 class CpServiceProvider extends ServiceProvider
 {
@@ -39,6 +40,8 @@ class CpServiceProvider extends ServiceProvider
         View::composer(NavComposer::VIEWS, NavComposer::class);
         View::composer(CustomLogoComposer::VIEWS, CustomLogoComposer::class);
 
+        Blade::component('statamic::outside-logo', OutsideLogo::class);
+
         Blade::directive('cp_svg', function ($expression) {
             return "<?php echo Statamic::svg({$expression}) ?>";
         });
@@ -52,6 +55,8 @@ class CpServiceProvider extends ServiceProvider
         $this->registerMiddlewareGroups();
 
         $this->registerElevatedSessionMacros();
+
+        $this->bootSelfClosingUiTags();
     }
 
     public function register()
@@ -156,5 +161,13 @@ class CpServiceProvider extends ServiceProvider
 
             User::current()->notify(new ElevatedSessionVerificationCode($verificationCode));
         });
+    }
+
+    private function bootSelfClosingUiTags()
+    {
+        // Converts <ui-component /> to <ui-component></ui-component>
+        Blade::prepareStringsForCompilationUsing(fn ($template) => str_contains($template, '<ui-')
+            ? preg_replace_callback('/<(ui-[a-zA-Z0-9_-]+)([^>]*)\/>/', fn ($match) => "<{$match[1]}{$match[2]}></{$match[1]}>", $template)
+            : $template);
     }
 }

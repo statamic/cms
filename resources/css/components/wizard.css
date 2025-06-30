@@ -29,7 +29,7 @@
 
     .step.complete:before,
     .step.complete:after {
-        @apply bg-blue !important;
+        @apply bg-blue!;
     }
 
     .ball {

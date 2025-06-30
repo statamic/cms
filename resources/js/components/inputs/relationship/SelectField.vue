@@ -1,67 +1,51 @@
 <template>
     <div>
-        <v-select
-            ref="input"
-            label="title"
-            append-to-body
-            :calculate-position="positionOptions"
-            :close-on-select="true"
-            :disabled="readOnly"
-            :multiple="multiple"
-            :options="options"
-            :get-option-key="(option) => option.id"
-            :get-option-label="(option) => __(option.title)"
-            :create-option="(value) => createOption(value)"
-            :placeholder="__(config.placeholder) || __('Choose...')"
-            :searchable="true"
+        <Combobox
+            class="w-full"
+            searchable
+            :options
+            :multiple
+            option-value="id"
+            option-label="title"
             :taggable="isTaggable"
-            :model-value="items"
-            @update:model-value="input"
+            :max-selections="maxSelections"
+            :disabled="readOnly"
+            :ignore-filter="typeahead"
+            :placeholder="__(config.placeholder) || __('Choose...')"
+            :model-value="items.map((item) => item.id)"
+            @update:modelValue="itemsSelected"
             @search="search"
-            @search:focus="$emit('focus')"
-            @search:blur="$emit('blur')"
         >
             <template #option="{ title, hint, status }">
-                <div class="flex items-center justify-between">
+                <div class="flex w-full items-center justify-between">
                     <div class="flex items-center">
-                        <div v-if="status" class="little-dot hidden@sm:block ltr:mr-2 rtl:ml-2" :class="status" />
-                        <div v-text="title" />
+                        <StatusIndicator v-if="status" class="me-2" :status="status" />
+                        <div v-text="title" class="truncate" />
                     </div>
-                    <div v-if="hint" class="whitespace-nowrap text-4xs uppercase text-gray-600" v-text="hint" />
+                    <ui-badge v-if="hint" size="sm" variant="flat" v-text="hint" />
                 </div>
             </template>
-            <template #selected-option-container v-if="multiple"><i class="hidden"></i></template>
-            <template #search="{ events, attributes }" v-if="multiple">
-                <input
-                    :placeholder="__(config.placeholder) || __('Choose...')"
-                    class="vs__search"
-                    type="search"
-                    v-on="events"
-                    v-bind="attributes"
-                />
-            </template>
             <template #no-options>
-                <div class="px-4 py-2 text-sm text-gray-700 ltr:text-left rtl:text-right" v-text="noOptionsText" />
+                <div v-text="noOptionsText" />
             </template>
-        </v-select>
+            <template #selected-option>
+                <span v-if="items.length === 1" v-text="items[0].title"></span>
+            </template>
+            <template #selected-options>
+                <!-- We don't want to display the selected options here. The RelationshipInput component does that for us. -->
+                <div></div>
+            </template>
+        </Combobox>
     </div>
 </template>
 
-<style scoped>
-.draggable-source--is-dragging {
-    @apply border-dashed bg-transparent opacity-75;
-}
-</style>
-
 <script>
-import PositionsSelectOptions from '../../../mixins/PositionsSelectOptions';
-import { SortableList } from '../../sortable/Sortable';
+import { Combobox, StatusIndicator } from '@statamic/ui';
 
 export default {
-    mixins: [PositionsSelectOptions],
-
     components: {
-        SortableList,
+        StatusIndicator,
+        Combobox,
     },
 
     props: {
@@ -70,6 +54,7 @@ export default {
         typeahead: Boolean,
         multiple: Boolean,
         taggable: Boolean,
+        maxSelections: Number,
         config: Object,
         readOnly: Boolean,
         site: String,
@@ -81,6 +66,8 @@ export default {
             options: [],
         };
     },
+
+    emits: ['input'],
 
     computed: {
         isTaggable() {
@@ -133,10 +120,17 @@ export default {
             this.request({ search }).then((response) => loading(false));
         },
 
-        input(items) {
+        itemsSelected(items) {
             if (!this.multiple) {
                 items = items === null ? [] : [items];
             }
+
+            items = items.map((id) => {
+                let option = this.options.find((option) => option.id === id);
+                let existing = this.items.find((item) => item.id === id);
+
+                return existing || option || { id: value, title: value };
+            });
 
             this.$emit('input', items);
         },

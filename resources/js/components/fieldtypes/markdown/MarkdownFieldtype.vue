@@ -2,7 +2,12 @@
     <portal name="markdown-fullscreen" :disabled="!fullScreenMode" target-class="markdown-fieldtype">
         <element-container @resized="refresh">
             <div
-                class="markdown-fieldtype-wrapper @container/markdown"
+                class="
+                    @container/markdown w-full block bg-white dark:bg-gray-900 rounded-lg
+                    border border-gray-300 dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:inset-shadow-2xs dark:inset-shadow-black
+                    text-gray-800 dark:text-gray-300
+                    appearance-none antialiased shadow-ui-sm disabled:shadow-none not-prose
+                "
                 :class="{ 'markdown-fullscreen': fullScreenMode, 'markdown-dark-mode': darkMode }"
             >
                 <uploader
@@ -21,85 +26,40 @@
                             :field-actions="fieldActions"
                             @close="toggleFullscreen"
                         >
-                            <div class="markdown-toolbar">
-                                <div class="markdown-modes">
-                                    <button
-                                        @click="mode = 'write'"
-                                        :class="{ active: mode == 'write' }"
-                                        v-text="__('Write')"
-                                        :aria-pressed="mode === 'write' ? 'true' : 'false'"
-                                    />
-                                    <button
-                                        @click="mode = 'preview'"
-                                        :class="{ active: mode == 'preview' }"
-                                        v-text="__('Preview')"
-                                        :aria-pressed="mode === 'preview' ? 'true' : 'false'"
-                                    />
-                                </div>
-                                <div class="markdown-buttons" v-if="!isReadOnly">
-                                    <button
-                                        v-for="button in buttons"
-                                        v-tooltip="button.text"
-                                        :aria-label="button.text"
-                                        @click="button.command(editor)"
-                                    >
-                                        <svg-icon :name="button.svg" class="h-4 w-4" />
-                                    </button>
-                                    <button
-                                        @click="toggleDarkMode"
-                                        v-tooltip="darkMode ? __('Light Mode') : __('Dark Mode')"
-                                        :aria-label="__('Toggle Dark Mode')"
-                                        v-if="fullScreenMode"
-                                    >
-                                        <svg-icon name="dark-mode" class="h-4 w-4" />
-                                    </button>
-                                </div>
-                            </div>
+                            <markdown-toolbar
+                                :mode="mode"
+                                :buttons="buttons"
+                                :is-read-only="isReadOnly"
+                                :show-dark-mode="fullScreenMode"
+                                :dark-mode="darkMode"
+                                :is-fullscreen="true"
+                                @toggle-mode="mode = $event"
+                                @toggle-dark-mode="toggleDarkMode"
+                                @button-click="handleButtonClick"
+                            />
                         </publish-field-fullscreen-header>
 
-                        <div class="markdown-toolbar" v-if="!fullScreenMode">
-                            <div class="markdown-modes">
-                                <button
-                                    @click="mode = 'write'"
-                                    :class="{ active: mode == 'write' }"
-                                    v-text="__('Write')"
-                                    :aria-pressed="mode === 'write' ? 'true' : 'false'"
-                                />
-                                <button
-                                    @click="mode = 'preview'"
-                                    :class="{ active: mode == 'preview' }"
-                                    v-text="__('Preview')"
-                                    :aria-pressed="mode === 'preview' ? 'true' : 'false'"
-                                />
-                            </div>
-                            <div class="markdown-buttons" v-if="!isReadOnly">
-                                <button
-                                    v-for="button in buttons"
-                                    v-tooltip="button.text"
-                                    :aria-label="button.text"
-                                    @click="button.command(editor)"
-                                >
-                                    <svg-icon :name="button.svg" class="h-4 w-4" />
-                                </button>
-                                <button
-                                    @click="toggleDarkMode"
-                                    v-tooltip="darkMode ? __('Light Mode') : __('Dark Mode')"
-                                    :aria-label="__('Toggle Dark Mode')"
-                                    v-if="fullScreenMode"
-                                >
-                                    <svg-icon name="dark-mode" class="h-4 w-4" />
-                                </button>
-                            </div>
-                        </div>
+                        <markdown-toolbar
+                            v-if="!fullScreenMode"
+                            :mode="mode"
+                            :buttons="buttons"
+                            :is-read-only="isReadOnly"
+                            :show-dark-mode="false"
+                            :dark-mode="darkMode"
+                            :is-fullscreen="false"
+                            @toggle-mode="mode = $event"
+                            @toggle-dark-mode="toggleDarkMode"
+                            @button-click="handleButtonClick"
+                        />
 
                         <div class="drag-notification" v-show="dragging">
-                            <svg-icon name="upload" class="mb-4 h-12 w-12" />
+                            <svg-icon name="upload" class="mb-4 size-12" />
                             {{ __('Drop File to Upload') }}
                         </div>
 
                         <uploads v-if="uploads.length" :uploads="uploads" class="-mt-px" />
 
-                        <div :class="`mode-wrap mode-${mode}`" @click="focus">
+                        <div :class="`mode-wrap mode-${mode}`, { 'prose p-3': mode == 'preview' }" @click="focus">
                             <div
                                 class="markdown-writer"
                                 ref="writer"
@@ -109,26 +69,23 @@
                                 @drop="draggingFile = false"
                                 @keydown="shortcut"
                             >
-                                <div class="editor" ref="codemirror"></div>
+                                <div class="editor relative focus-within:focus-outline-within" ref="codemirror"></div>
 
                                 <div class="helpers">
-                                    <div class="flex w-full">
+                                    <div class="bg-gray-50 dark:bg-gray-950 rounded-b-xl border-t border-gray-200 dark:border-white/15 flex p-1 text-sm w-full">
                                         <div class="markdown-cheatsheet-helper">
-                                            <button
-                                                class="text-link flex items-center"
+                                            <Button
+                                                icon="markdown"
+                                                size="sm"
+                                                variant="ghost"
                                                 @click="showCheatsheet = true"
                                                 :aria-label="__('Show Markdown Cheatsheet')"
-                                            >
-                                                <svg-icon
-                                                    name="markdown-icon"
-                                                    class="h-4 w-6 items-start ltr:mr-2 rtl:ml-2"
-                                                />
-                                                <span>{{ __('Markdown Cheatsheet') }}</span>
-                                            </button>
+                                                :text="__('Markdown Cheatsheet')"
+                                            />
                                         </div>
                                     </div>
-                                    <div v-if="fullScreenMode" class="flex items-center ltr:pr-2 rtl:pl-2">
-                                        <div class="whitespace-nowrap ltr:mr-4 rtl:ml-4">
+                                    <div v-if="fullScreenMode" class="flex items-center pe-2">
+                                        <div class="whitespace-nowrap me-2">
                                             <span v-text="count.words" /> {{ __('Words') }}
                                         </div>
                                         <div class="whitespace-nowrap">
@@ -138,7 +95,7 @@
                                 </div>
 
                                 <div class="drag-notification" v-if="assetsEnabled && draggingFile">
-                                    <svg-icon name="upload" class="mb-4 h-12 w-12" />
+                                    <svg-icon name="upload" class="mb-4 size-12" />
                                     {{ __('Drop File to Upload') }}
                                 </div>
                             </div>
@@ -146,7 +103,7 @@
                             <div
                                 v-show="mode == 'preview'"
                                 v-html="markdownPreviewText"
-                                class="markdown-preview prose-sm @md/markdown:prose-base"
+                                class="markdown-preview p-3 prose prose-sm @md/markdown:prose-base"
                             ></div>
                         </div>
                     </div>
@@ -193,6 +150,7 @@ import { marked } from 'marked';
 import { markRaw } from 'vue';
 import PlainTextRenderer from 'marked-plaintext';
 import throttle from '@statamic/util/throttle.js';
+import { Button } from '@statamic/ui';
 
 import CodeMirror from 'codemirror/lib/codemirror';
 import 'codemirror/addon/edit/closebrackets';
@@ -213,6 +171,7 @@ import { availableButtons } from './buttons';
 import Selector from '../../assets/Selector.vue';
 import Uploader from '../../assets/Uploader.vue';
 import Uploads from '../../assets/Uploads.vue';
+import MarkdownToolbar from './MarkdownToolbar.vue';
 // Keymaps
 import 'codemirror/keymap/sublime';
 
@@ -261,12 +220,14 @@ export default {
     mixins: [Fieldtype],
 
     components: {
+        Button,
         Selector,
         Uploader,
         Uploads,
+        MarkdownToolbar,
     },
 
-    data: function () {
+    data() {
         return {
             data: this.value || '',
             buttons: [],
@@ -291,17 +252,21 @@ export default {
     },
 
     watch: {
-        data(data) {
-            this.updateDebounced(data);
-            this.updateCount(data);
+        data: {
+            handler(data) {
+                this.updateDebounced(data);
+                this.updateCount(data);
+            },
         },
-
-        mode(mode) {
-            if (mode === 'preview') this.updateMarkdownPreview();
+        mode: {
+            handler(mode) {
+                if (mode === 'preview') this.updateMarkdownPreview();
+            },
         },
-
-        readOnly(readOnly) {
-            this.codemirror.setOption('readOnly', readOnly ? 'nocursor' : false);
+        readOnly: {
+            handler(readOnly) {
+                this.codemirror.setOption('readOnly', readOnly ? 'nocursor' : false);
+            },
         },
     },
 
@@ -313,12 +278,8 @@ export default {
             this.updateCount(this.data);
         }
 
-        let el = document.querySelector(`label[for="${this.fieldId}"]`);
-        if (el) {
-            el.addEventListener('click', () => {
-                this.codemirror.focus();
-            });
-        }
+        const label = document.querySelector(`label[for="${this.fieldId}"]`);
+        label?.addEventListener('click', () => this.codemirror.focus());
     },
 
     beforeUnmount() {
@@ -340,317 +301,226 @@ export default {
             this.trackHeightUpdates();
         },
 
-        toggleFullScreen() {
-            if (this.fullScreenMode) {
-                this.closeFullScreen();
-            } else {
-                this.openFullScreen();
-            }
+        toggleFullscreen() {
+            this.fullScreenMode = !this.fullScreenMode;
+            this.trackHeightUpdates();
         },
 
         toggleDarkMode() {
             this.darkMode = !this.darkMode;
         },
 
-        getText: function (selection) {
-            var i = this.selections.indexOf(selection);
+        getText(selection) {
+            const i = this.selections.indexOf(selection);
 
             return this.codemirror.getSelections()[i];
         },
 
         toggleInline(type) {
-            var self = this;
-            var replacements = [];
-            let elements = {
-                bold: {
-                    pattern: /^\*{2}(.*)\*{2}$/,
-                    delimiter: '**',
-                },
-                code: {
-                    pattern: /^\`(.*)\`$/,
-                    delimiter: '`',
-                },
-                italic: {
-                    pattern: /^\_(.*)\_$/,
-                    delimiter: '_',
-                },
-                strikethrough: {
-                    pattern: /^\~\~(.*)\~\~$/,
-                    delimiter: '~~',
-                },
+            const elements = {
+                bold: { pattern: /^\*{2}(.*)\*{2}$/, delimiter: '**' },
+                code: { pattern: /^\`(.*)\`$/, delimiter: '`' },
+                italic: { pattern: /^\_(.*)\_$/, delimiter: '_' },
+                strikethrough: { pattern: /^\~\~(.*)\~\~$/, delimiter: '~~' },
             };
 
-            self.selections.forEach(function (selection) {
-                let delimiter = elements[type]['delimiter'];
-                let replacement = self.getText(selection).match(elements[type]['pattern'])
-                    ? self.removeInline(selection, elements[type]['delimiter'])
-                    : delimiter + self.getText(selection) + delimiter;
-
-                replacements.push(replacement);
+            const replacements = this.selections.map(selection => {
+                const text = this.getText(selection);
+                const { delimiter, pattern } = elements[type];
+                return text.match(pattern)
+                    ? this.removeInline(selection, delimiter)
+                    : `${delimiter}${text}${delimiter}`;
             });
 
             this.codemirror.replaceSelections(replacements, 'around');
-
             this.codemirror.focus();
         },
 
         toggleBlock(type) {
-            var self = this;
-            var replacements = [];
-            let elements = {
-                code: {
-                    pattern: /^\`\`\`(.*)\n(.*)\n\`\`\`$/,
-                    delimiter: '\`\`\`',
-                },
-            };
-
-            self.selections.forEach(function (selection) {
-                let text = self.getText(selection);
-                let delimiter = elements[type]['delimiter'];
-                let replacement = text.match(elements[type]['pattern'])
-                    ? self.removeInline(selection, delimiter)
-                    : delimiter + '\n' + text + '\n' + delimiter;
-
-                replacements.push(replacement);
+            const replacements = this.selections.map(selection => {
+                const text = this.getText(selection);
+                const delimiter = '```';
+                return text.match(new RegExp(`^\`\`\`(.*)\n(.*)\n\`\`\`$`))
+                    ? this.removeInline(selection, delimiter)
+                    : `${delimiter}\n${text}\n${delimiter}`;
             });
 
             this.codemirror.replaceSelections(replacements, 'around');
-
             this.codemirror.focus();
         },
 
-        removeInline: function (selection, delimiter) {
-            var text = this.getText(selection);
-            var blockLength = delimiter.length;
-
-            return text.substring(blockLength, text.length - blockLength);
+        removeInline(selection, delimiter) {
+            const text = this.getText(selection);
+            return text.slice(delimiter.length, -delimiter.length);
         },
 
         toggleLine(type) {
-            let startPoint = this.codemirror.getCursor('start');
-            let endPoint = this.codemirror.getCursor('end');
-            let patterns = {
+            const startPoint = this.codemirror.getCursor('start');
+            const endPoint = this.codemirror.getCursor('end');
+            const patterns = {
                 quote: /^(\s*)\>\s+/,
                 'unordered-list': /^(\s*)(\*|\-|\+)\s+/,
                 'ordered-list': /^(\s*)\d+\.\s+/,
             };
-            let map = {
+            const prefixes = {
                 quote: '> ',
                 'unordered-list': '- ',
                 'ordered-list': '1. ',
             };
 
             for (let i = startPoint.line; i <= endPoint.line; i++) {
-                let text = this.codemirror.getLine(i);
-                text = this.isInside(type) ? text.replace(patterns[type], '$1') : map[type] + text;
+                const text = this.codemirror.getLine(i);
+                const newText = this.isInside(type)
+                    ? text.replace(patterns[type], '$1')
+                    : prefixes[type] + text;
 
-                this.codemirror.replaceRange(text, { line: i, ch: 0 }, { line: i, ch: Infinity });
+                this.codemirror.replaceRange(newText, { line: i, ch: 0 }, { line: i, ch: Infinity });
             }
 
             this.codemirror.focus();
         },
 
-        // Get the state of the current position to see what elements it may be inside
         getState(position) {
             position = position || this.codemirror.getCursor('start');
-            let state = this.codemirror.getTokenAt(position);
-
+            const state = this.codemirror.getTokenAt(position);
             if (!state.type) return {};
 
-            let types = state.type.split(' ');
+            const types = state.type.split(' ');
+            const ret = {};
+            const text = this.codemirror.getLine(position.line);
 
-            let ret = {},
-                data,
-                text;
-
-            for (var i = 0; i < types.length; i++) {
-                data = types[i];
-
-                if (data === 'strong') {
-                    ret.bold = true;
-                } else if (data === 'variable-2') {
-                    text = this.codemirror.getLine(position.line);
-                    if (/^\s*\d+\.\s/.test(text)) {
-                        ret['ordered-list'] = true;
-                    } else {
-                        ret['unordered-list'] = true;
-                    }
-                } else if (data === 'atom') {
-                    ret.quote = true;
-                } else if (data === 'em') {
-                    ret.italic = true;
-                } else if (data === 'quote') {
-                    ret.quote = true;
-                } else if (data === 'strikethrough') {
-                    ret.strikethrough = true;
-                } else if (data === 'comment') {
-                    ret.code = true;
-                } else if (data === 'link') {
-                    ret.link = true;
-                } else if (data === 'tag') {
-                    ret.image = true;
-                } else if (data.match(/^header(\-[1-6])?$/)) {
-                    ret[data.replace('header', 'heading')] = true;
+            types.forEach(type => {
+                switch (type) {
+                    case 'strong':
+                        ret.bold = true;
+                        break;
+                    case 'variable-2':
+                        ret[/^\s*\d+\.\s/.test(text) ? 'ordered-list' : 'unordered-list'] = true;
+                        break;
+                    case 'atom':
+                    case 'quote':
+                        ret.quote = true;
+                        break;
+                    case 'em':
+                        ret.italic = true;
+                        break;
+                    case 'strikethrough':
+                        ret.strikethrough = true;
+                        break;
+                    case 'comment':
+                        ret.code = true;
+                        break;
+                    case 'link':
+                        ret.link = true;
+                        break;
+                    case 'tag':
+                        ret.image = true;
+                        break;
+                    default:
+                        if (type.match(/^header(\-[1-6])?$/)) {
+                            ret[type.replace('header', 'heading')] = true;
+                        }
                 }
-            }
+            });
 
             return ret;
         },
 
-        // Check if position is inside a specific element
         isInside(type) {
             return this.getState()[type] ?? false;
         },
 
         insertTable() {
-            let doc = this.codemirror.getDoc();
-            let cursor = doc.getCursor();
-            let line = doc.getLine(cursor.line);
-            let pos = { line: cursor.line };
-            let table = '|     |     |\n| --- | --- |\n|     |     |';
+            const doc = this.codemirror.getDoc();
+            const cursor = doc.getCursor();
+            const line = doc.getLine(cursor.line);
+            const pos = { line: cursor.line };
+            const table = '|     |     |\n| --- | --- |\n|     |     |';
 
             if (line.length === 0) {
                 doc.replaceRange(table, pos);
-                this.codemirror.focus();
-                this.codemirror.setCursor(cursor.line, 2);
             } else {
                 doc.replaceRange('\n\n' + table, pos);
-                this.codemirror.focus();
-                this.codemirror.setCursor(cursor.line + 2, 2);
+                cursor.line += 2;
             }
+
+            this.codemirror.focus();
+            this.codemirror.setCursor(cursor.line, 2);
         },
 
-        insertImage: function (url, alt) {
-            var cm = this.codemirror.doc;
+        insertImage(url, alt) {
+            const doc = this.codemirror.doc;
+            const selection = doc.somethingSelected() ? doc.getSelection() : alt || '';
 
-            var selection = '';
-            if (cm.somethingSelected()) {
-                selection = cm.getSelection();
-            } else if (alt) {
-                selection = alt;
-            }
+            const imageText = `![${selection}](${url || ''})`;
+            doc.replaceSelection(imageText, 'start');
 
-            var url = url || '';
-
-            // Replace the string
-            var str = '![' + selection + '](' + url + ')';
-
-            cm.replaceSelection(str, 'start');
             // Select the text
-            var line = cm.getCursor().line;
-            var start = cm.getCursor().ch + 2; // move past the ![
-            var end = start + selection.length;
-            cm.setSelection({ line: line, ch: start }, { line: line, ch: end });
+            const line = doc.getCursor().line;
+            const start = doc.getCursor().ch + 2; // move past the ![
+            const end = start + selection.length;
+            doc.setSelection({ line, ch: start }, { line, ch: end });
 
             this.codemirror.focus();
         },
 
-        /**
-         * Appends an image to the end of the data
-         *
-         * @param  String url  URL of the image
-         * @param  String alt  Alt text
-         */
-        appendImage: function (url, alt) {
-            alt = alt || '';
-            this.data += '\n\n![' + alt + '](' + url + ')';
+        appendImage(url, alt = '') {
+            this.data += `\n\n![${alt}](${url})`;
         },
 
-        insertLink: function (url, text) {
-            var cm = this.codemirror.doc;
-
-            var selection = '';
-            if (cm.somethingSelected()) {
-                selection = cm.getSelection();
-            } else if (text) {
-                selection = text;
-            }
+        insertLink(url, text) {
+            const doc = this.codemirror.doc;
+            const selection = doc.somethingSelected() ? doc.getSelection() : text || '';
 
             if (!url) {
                 url = prompt(__('Enter URL'), 'https://');
-                if (!url) {
-                    return;
-                }
+                if (!url) return;
             }
 
-            // Replace the string
-            var str = '[' + selection + '](' + url + ')';
-            cm.replaceSelection(str, 'start');
+            const linkText = `[${selection}](${url})`;
+            doc.replaceSelection(linkText, 'start');
 
             // Select the text
-            var line = cm.getCursor().line;
-            var start = cm.getCursor().ch + 1; // move past the first [
-            var end = start + selection.length;
-            cm.setSelection({ line: line, ch: start }, { line: line, ch: end });
+            const line = doc.getCursor().line;
+            const start = doc.getCursor().ch + 1; // move past the first [
+            const end = start + selection.length;
+            doc.setSelection({ line, ch: start }, { line, ch: end });
 
             this.codemirror.focus();
         },
 
-        appendLink: function (url, text) {
-            text = text || '';
-            this.data += '\n\n[' + text + '](' + url + ')';
+        appendLink(url, text = '') {
+            this.data += `\n\n[${text}](${url})`;
         },
 
         /**
          * Open the asset selector
          */
-        addAsset: function () {
+        addAsset () {
             this.showAssetSelector = true;
         },
 
         /**
          * Execute a keyboard shortcut, when applicable
          */
-        shortcut: function (e) {
-            var key = e.keyCode;
-            var mod = e.metaKey === true || e.ctrlKey === true;
+        shortcut(e) {
+            const mod = e.metaKey || e.ctrlKey;
+            if (!mod) return;
 
-            if (mod && key === 66) {
-                // cmd+b
-                this.toggleInline('bold');
-                e.preventDefault();
-            }
+            const shortcuts = {
+                66: () => this.toggleInline('bold'), // cmd+b
+                73: () => this.toggleInline('italic'), // cmd+i
+                190: () => this.toggleLine('quote'), // cmd+.
+                192: () => this.toggleInline('code'), // cmd+`
+                76: () => this.toggleLine('unordered-list'), // cmd+l
+                79: () => this.toggleLine('ordered-list'), // cmd+o
+                220: () => this.toggleBlock('code'), // cmd+\
+                75: () => this.insertLink(), // cmd+k
+            };
 
-            if (mod && key === 73) {
-                // cmd+i
-                this.toggleInline('italic');
+            if (shortcuts[e.keyCode]) {
                 e.preventDefault();
-            }
-
-            if (mod && key === 190) {
-                // cmd+.
-                this.toggleLine('quote');
-                e.preventDefault();
-            }
-
-            if (mod && key === 192) {
-                // ctrl+` (tick)
-                this.toggleInline('code');
-                e.preventDefault();
-            }
-
-            if (mod && key === 76) {
-                // cmd+l
-                this.toggleLine('unordered-list');
-                e.preventDefault();
-            }
-
-            if (mod && key === 79) {
-                // cmd+o
-                this.toggleLine('ordered-list');
-                e.preventDefault();
-            }
-
-            if (mod && key === 220) {
-                // cmd+\
-                this.toggleBlock('code');
-                e.preventDefault();
-            }
-
-            if (mod && key === 75) {
-                // cmd+k
-                this.insertLink();
-                e.preventDefault();
+                shortcuts[e.keyCode]();
             }
         },
 
@@ -659,24 +529,20 @@ export default {
          *
          * @param  Array assets  All the assets that were selected
          */
-        assetsSelected: function (assets) {
-            // If one asset is chosen, it's safe to replace the selection.
-            // Otherwise we'll just tack on the assets to the end of the text.
-            var method = assets.length === 1 ? 'insert' : 'append';
-
+        assetsSelected(assets) {
             this.closeAssetSelector();
-
-            // We don't want to maintain the asset selections
             this.selectedAssets = [];
 
-            this.$axios.post(cp_url('assets-fieldtype'), { assets }).then((response) => {
-                response.data.forEach((asset) => {
-                    var alt = asset.values.alt || '';
-                    var url = encodeURI('statamic://' + asset.reference);
+            this.$axios.post(cp_url('assets-fieldtype'), { assets }).then(({ data }) => {
+                data.forEach(asset => {
+                    const alt = asset.values.alt || '';
+                    const url = encodeURI(`statamic://${asset.reference}`);
+                    const method = assets.length === 1 ? 'insert' : 'append';
+
                     if (asset.isImage) {
-                        this[method + 'Image'](url, alt);
+                        this[`${method}Image`](url, alt);
                     } else {
-                        this[method + 'Link'](url, alt);
+                        this[`${method}Link`](url, alt);
                     }
                 });
             });
@@ -792,23 +658,24 @@ export default {
         },
 
         updateCount(data) {
-            let trimmed = data.trim();
+            const trimmed = data.trim();
+            const characters = ucs2decode(trimmed.replace(/\s/g, '')).length;
+            const words = trimmed.split(/\s+/).filter(word => word.length > 0).length;
 
-            this.count.characters = ucs2decode(trimmed.replace(/\s/g, '')).length;
-            this.count.words = trimmed.split(/\s+/).filter((word) => word.length > 0).length;
+            this.count = { characters, words };
         },
 
-        toggleFullscreen() {
-            this.fullScreenMode = !this.fullScreenMode;
+        handleButtonClick(command) {
+            command(this);
         },
     },
 
     computed: {
-        assetsEnabled: function () {
-            return Boolean(this.config && this.config.container);
+        assetsEnabled() {
+            return Boolean(this.config?.container);
         },
 
-        container: function () {
+        container() {
             return this.config.container;
         },
 
@@ -816,7 +683,7 @@ export default {
             return this;
         },
 
-        folder: function () {
+        folder() {
             return this.config.folder || '/';
         },
 

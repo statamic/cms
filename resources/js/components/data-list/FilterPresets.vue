@@ -1,41 +1,53 @@
 <template>
-    <div class="pt-2 ltr:pr-2 rtl:pl-2">
-        <div class="flex flex-wrap items-center">
-            <button
-                class="pill-tab ltr:mr-1 rtl:ml-1"
-                :class="{ active: !activePreset }"
-                @click="viewAll"
-                v-text="__('All')"
-            />
-
+    <div>
+        <div
+            class="relative flex shrink-0 space-x-2 border-b border-gray-200 text-sm text-gray-400 dark:border-gray-700 dark:text-gray-500"
+        >
+            <FilterTrigger :active="!activePreset" @click="viewAll" :text="__('All')" />
             <template v-for="(preset, handle) in presets">
-                <button class="pill-tab active ltr:mr-1 rtl:ml-1" v-if="handle === activePreset">
+                <FilterTrigger v-if="handle === activePreset" :active="true">
                     {{ preset.display }}
-                    <dropdown-list class="ltr:ml-2 rtl:mr-2" placement="bottom-start">
-                        <template v-slot:trigger>
-                            <button class="opacity-50 hover:opacity-100">
-                                <svg-icon name="micro/chevron-down-xs" class="h-2 w-2" />
-                            </button>
+                    <Dropdown class="w-48!">
+                        <template #trigger>
+                            <Button
+                                class="absolute top-1.5 -right-3"
+                                variant="ghost"
+                                size="xs"
+                                @click="viewPreset(handle)"
+                                icon="ui/chevron-down"
+                            />
                         </template>
-                        <dropdown-item :text="__('Duplicate')" @click="createPreset" />
-                        <dropdown-item v-if="canRenamePreset(handle)" :text="__('Rename')" @click="renamePreset" />
-                        <div class="divider" />
-                        <dropdown-item
-                            v-if="canDeletePreset(handle)"
-                            :text="__('Delete')"
-                            class="warning"
-                            @click="showDeleteModal = true"
-                        />
-                    </dropdown-list>
-                </button>
-                <button class="pill-tab ltr:mr-1 rtl:ml-1" v-else @click="viewPreset(handle)">
+                        <DropdownMenu>
+                            <DropdownItem :text="__('Duplicate')" icon="duplicate" @click="createPreset" />
+                            <DropdownItem
+                                v-if="canRenamePreset(handle)"
+                                :text="__('Rename')"
+                                icon="rename"
+                                @click="renamePreset"
+                            />
+                            <DropdownSeparator v-if="canDeletePreset(handle)" />
+                            <DropdownItem
+                                v-if="canDeletePreset(handle)"
+                                :text="__('Delete')"
+                                icon="delete"
+                                variant="warning"
+                                @click="showDeleteModal = true"
+                            />
+                        </DropdownMenu>
+                    </Dropdown>
+                </FilterTrigger>
+                <FilterTrigger v-else @click="viewPreset(handle)">
                     {{ preset.display }}
-                </button>
+                </FilterTrigger>
             </template>
-
-            <button class="pill-tab" @click="createPreset" v-tooltip="__('Create New View')">
-                <svg-icon name="add" class="h-3 w-3" />
-            </button>
+            <Button
+                @click="createPreset"
+                variant="ghost"
+                size="sm"
+                :text="__('New View')"
+                icon="add-bookmark"
+                class="relative top-0.5 [&_svg]:size-4"
+            />
         </div>
 
         <confirmation-modal
@@ -49,7 +61,7 @@
 
             <div v-if="presets && Object.keys(presets).includes(savingPresetSlug)">
                 <small
-                    class="help-block mb-0 mt-2 text-red-500"
+                    class="help-block mt-2 mb-0 text-red-500"
                     v-text="__('messages.filters_view_already_exists')"
                 ></small>
             </div>
@@ -72,7 +84,7 @@
                 "
             >
                 <small
-                    class="help-block mb-0 mt-2 text-red-500"
+                    class="help-block mt-2 mb-0 text-red-500"
                     v-text="__('messages.filters_view_already_exists')"
                 ></small>
             </div>
@@ -91,7 +103,19 @@
 </template>
 
 <script>
+import FilterTrigger from './FilterTrigger.vue';
+import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownSeparator } from '@statamic/ui';
+
 export default {
+    components: {
+        FilterTrigger,
+        Button,
+        Dropdown,
+        DropdownItem,
+        DropdownMenu,
+        DropdownSeparator,
+    },
+
     props: {
         activeFilters: Object,
         activePreset: String,

@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .table-fieldtype-table {
-    @apply relative mb-4 w-full rounded border text-gray shadow-sm outline-none dark:border-dark-900 dark:text-dark-150 ltr:text-left rtl:text-right;
+    @apply relative mb-4 w-full rounded-lg border text-gray shadow-ui-sm outline-hidden dark:border-dark-900 dark:text-dark-150 ltr:text-left rtl:text-right;
     border-collapse: separate;
     border-spacing: 0;
     table-layout: fixed;
@@ -11,16 +11,16 @@
 
 .table-fieldtype-table thead {
     th {
-        @apply z-10 border-b bg-gray-200 p-2 text-sm font-medium text-gray-900 dark:border-dark-900 dark:bg-dark-700 dark:text-dark-150 ltr:border-r rtl:border-l;
+        @apply z-10 border-b bg-gray-50 p-2 text-sm font-medium text-gray-900 dark:border-dark-900 dark:bg-dark-700 dark:text-dark-150 ltr:border-r rtl:border-l;
         display: table-cell;
         position: sticky;
         top: -1px;
 
         &:first-child {
-            @apply ltr:rounded-tl ltr:pl-3 rtl:rounded-tr rtl:pr-3;
+            @apply ltr:rounded-tl-lg ltr:pl-3 rtl:rounded-tr-lg rtl:pr-3;
         }
         &:last-child {
-            @apply ltr:rounded-tr ltr:border-r-0 rtl:rounded-tl rtl:border-l-0;
+            @apply ltr:rounded-tr-lg ltr:border-r-0 rtl:rounded-tl-lg rtl:border-l-0;
         }
         &.grid-drag-handle-header {
             @apply w-3;
@@ -29,7 +29,7 @@
 }
 
 .table-fieldtype-table .input-text {
-    @apply rounded-none border-none bg-white text-sm shadow-none outline-none;
+    @apply rounded-none border-none bg-white text-sm shadow-none outline-hidden;
     @apply dark:bg-dark-650;
     &:focus {
         @apply bg-gray-100 shadow-inner ring-0 dark:bg-dark-700;
@@ -37,10 +37,10 @@
 }
 
 .table-fieldtype-table tbody {
-    @apply outline-none;
+    @apply outline-hidden;
 
     tr {
-        @apply outline-none;
+        @apply outline-hidden;
     }
 
     td {
@@ -57,11 +57,11 @@
         &.table-drag-handle {
             @apply h-full w-3 p-2 ltr:border-r rtl:border-l;
             cursor: grab;
-            background: theme('colors.gray.200') url('../../../svg/icons/light/drag-dots.svg') center center no-repeat;
+            background: var(--color-white) url('../../../svg/icons/light/drag-dots.svg') center center no-repeat;
             background-size: 7px 17px;
 
             .dark & {
-                background-color: theme(colors.dark.600);
+                background-color: var(--color-dark-600);
             }
 
             &:hover {
@@ -73,10 +73,10 @@
     tr:last-child td {
         @apply border-b-0;
         &:first-child {
-            @apply ltr:rounded-bl rtl:rounded-br;
+            @apply ltr:rounded-bl-lg rtl:rounded-br-lg;
         }
         &:last-child {
-            @apply ltr:rounded-br rtl:rounded-bl;
+            @apply ltr:rounded-br-lg rtl:rounded-bl-lg;
         }
     }
 
@@ -91,7 +91,7 @@
     &:focus-within {
         @apply bg-gray-200 dark:bg-dark-750;
         button {
-            @apply outline-none ring-0;
+            @apply outline-hidden ring-0;
         }
     }
 }

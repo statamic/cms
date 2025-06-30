@@ -1,50 +1,30 @@
 <template>
-    <data-list :columns="columns" :rows="rows" v-slot="{ filteredRows: rows }">
-        <div class="card p-0">
-            <data-list-table>
-                <template #cell-title="{ row: structure }">
-                    <a
-                        :href="structure.available_in_selected_site ? structure.show_url : structure.edit_url"
-                        class="flex items-center"
-                        v-text="__(structure.title)"
-                    />
-                </template>
-                <template #actions="{ row: structure, index }">
-                    <dropdown-list>
-                        <dropdown-item :text="__('Edit')" :redirect="structure.edit_url" />
-                        <dropdown-item
-                            v-if="structure.deleteable"
-                            :text="__('Delete')"
-                            class="warning"
-                            @click="$refs[`deleter_${structure.id}`].confirm()"
-                        >
-                            <resource-deleter
-                                :ref="`deleter_${structure.id}`"
-                                :resource="structure"
-                                @deleted="removeRow(structure)"
-                            >
-                            </resource-deleter>
-                        </dropdown-item>
-                    </dropdown-list>
-                </template>
-            </data-list-table>
-        </div>
-    </data-list>
+    <CardList :heading="__('Title')">
+        <CardListItem v-for="item in navigations" :key="item.id">
+            <a
+                :href="item.available_in_selected_site ? item.show_url : item.edit_url"
+                v-text="__(item.title)"
+            />
+            <Dropdown placement="left-start">
+                <DropdownMenu>
+                    <DropdownItem :text="__('Edit')" icon="edit" :href="item.edit_url" />
+                    <DropdownItem v-if="item.deleteable" :text="__('Delete')" icon="trash" variant="destructive" @click="$refs[`deleter_${item.id}`][0].confirm()" />
+                </DropdownMenu>
+            </Dropdown>
+
+            <resource-deleter :ref="`deleter_${item.id}`" :resource="item" reload />
+        </CardListItem>
+    </CardList>
 </template>
 
 <script>
-import Listing from '../Listing.vue';
+import { CardList, CardListItem, Dropdown, DropdownMenu, DropdownItem } from '@statamic/ui';
 
 export default {
-    mixins: [Listing],
+    components: { CardList, CardListItem, Dropdown, DropdownMenu, DropdownItem },
 
-    props: ['initialRows'],
-
-    data() {
-        return {
-            rows: this.initialRows,
-            columns: [{ label: __('Title'), field: 'title', visible: true }],
-        };
+    props: {
+        navigations: { type: Array, required: true },
     },
 };
 </script>

@@ -4,41 +4,35 @@
 
 @extends('statamic::layout')
 @section('title', __('Users'))
-@section('wrapper_class', 'max-w-full')
 
 @section('content')
-    <header class="mb-6 flex items-center">
-        <h1 class="flex-1">
-            {{ __('Users') }}
-        </h1>
+    <ui-header title="{{ __('Users') }}" icon="users">
 
         @can('configure fields')
-            <dropdown-list class="ltr:mr-2 rtl:ml-2">
-                <dropdown-item
-                    :text="__('Edit Blueprint')"
-                    redirect="{{ cp_route('users.blueprint.edit') }}"
-                ></dropdown-item>
-            </dropdown-list>
+            <ui-button
+                :text="__('Edit User Blueprint')"
+                href="{{ cp_route('users.blueprint.edit') }}"
+            ></ui-button>
         @endcan
 
         @if (Statamic::pro() && $user->can('create', 'Statamic\Contracts\Auth\User'))
-            <a href="{{ cp_route('users.create') }}" class="btn-primary ltr:ml-4 rtl:mr-4">{{ __('Create User') }}</a>
+            <ui-button
+                href="{{ cp_route('users.create') }}"
+                variant="primary"
+                :text="__('Create User')"
+            ></ui-button>
         @endif
-    </header>
+    </ui-header>
 
     <user-listing
-        listing-key="users"
         initial-sort-column="{{ config('statamic.users.sort_field', 'email') }}"
         initial-sort-direction="{{ config('statamic.users.sort_direction', 'asc') }}"
         :filters="{{ $filters->toJson() }}"
         action-url="{{ cp_route('users.actions.run') }}"
     ></user-listing>
 
-    @include(
-        'statamic::partials.docs-callout',
-        [
-            'topic' => __('Users'),
-            'url' => Statamic::docsUrl('users'),
-        ]
-    )
+    <x-statamic::docs-callout
+        :topic="__('Users')"
+        :url="Statamic::docsUrl('users')"
+    />
 @endsection

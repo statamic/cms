@@ -13,8 +13,8 @@
 #nprogress .peg {
     @apply absolute block h-full w-full opacity-100 ltr:right-0 rtl:left-0;
     box-shadow:
-        0 0 5px theme('colors.blue.DEFAULT'),
-        0 0 2px theme('colors.blue.DEFAULT');
+        0 0 5px var(--color-blue),
+        0 0 2px var(--color-blue);
 }
 
 .nprogress-custom-parent {

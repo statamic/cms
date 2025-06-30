@@ -6,7 +6,7 @@
 }
 
 .vfm__content {
-    @apply rounded-lg dark:bg-dark-600 dark:shadow-dark !important;
+    @apply rounded-lg! dark:bg-dark-600! dark:shadow-lg!;
     @apply overflow-clip bg-white shadow-2xl;
 
     [dir='rtl'] & {

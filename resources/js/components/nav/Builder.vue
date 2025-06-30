@@ -1,76 +1,91 @@
 <template>
     <div>
         <header class="mb-6">
-            <breadcrumb v-if="indexUrl" :url="indexUrl" :title="__('CP Nav Preferences')" />
-
             <div class="flex items-center">
                 <h1 class="flex-1">{{ __(title) }}</h1>
 
-                <dropdown-list class="ltr:mr-2 rtl:ml-2">
-                    <dropdown-item
-                        :text="__('Reset Nav Customizations')"
-                        class="warning"
-                        @click="confirmingReset = true"
-                    ></dropdown-item>
-                </dropdown-list>
+                <Dropdown placement="left-start" class="me-2">
+                    <DropdownMenu>
+                        <DropdownItem :text="__('Reset Nav Customizations')" variant="destructive" @click="confirmingReset = true" />
+                    </DropdownMenu>
+                </Dropdown>
 
                 <a
                     @click="discardChanges"
-                    class="text-2xs text-blue underline ltr:mr-4 rtl:ml-4"
+                    class="text-2xs text-blue-600 underline ltr:mr-4 rtl:ml-4"
                     v-if="isDirty"
                     v-text="__('Discard changes')"
                 />
 
-                <dropdown-list>
+                <Dropdown placement="left-start" class="me-2">
                     <template #trigger>
-                        <button class="btn flex items-center ltr:pr-4 rtl:pl-4">
-                            {{ __('Add Item') }}
-                            <svg-icon name="micro/chevron-down-xs" class="w-2 ltr:ml-4 rtl:mr-4" />
-                        </button>
+                        <Button icon-append="ui/chevron-down" :text="__('Add Item')" />
                     </template>
-                    <dropdown-item :text="__('Add Nav Item')" @click="addItem($refs.tree.rootChildren[0])" />
-                    <dropdown-item :text="__('Add Section')" @click="addSection" />
-                </dropdown-list>
+                    <DropdownMenu>
+                        <DropdownItem :text="__('Add Nav Item')" @click="addItem($refs.tree.rootChildren[0])" />
+                        <DropdownItem :text="__('Add Section')" @click="addSection" />
+                    </DropdownMenu>
+                </Dropdown>
+
+<!--                <div class="ms-4">-->
+<!--                    <Button-->
+<!--                        v-if="!hasSaveAsOptions"-->
+<!--                        :text="__('Save Changes')"-->
+<!--                        :disabled="!changed"-->
+<!--                        @click="save"-->
+<!--                    />-->
+<!--                    <Dropdown v-else>-->
+<!--                        <template #trigger>-->
+<!--                            <Button-->
+<!--                                :text="__('Save Changes')"-->
+<!--                                icon-append="ui/chevron-down"-->
+<!--                                :disabled="!changed"-->
+<!--                                @click="save"-->
+<!--                            />-->
+<!--                        </template>-->
+<!--                        <DropdownMenu>-->
+<!--                            <DropdownLabel v-text="__('Save to')" />-->
+<!--                            <DropdownItem-->
+<!--                                v-for="option in saveAsOptions"-->
+<!--                                :text="option.label"-->
+<!--                                @click="saveAs(option.url)"-->
+<!--                            />-->
+<!--                        </DropdownMenu>-->
+<!--                    </Dropdown>-->
+<!--                </div>-->
+
 
                 <div class="ltr:ml-4 ltr:text-left rtl:mr-4 rtl:text-right" :class="{ 'btn-group': hasSaveAsOptions }">
                     <button
-                        class="btn-primary ltr:pl-4 rtl:pr-4"
-                        :class="{ disabled: !changed }"
+                        class="btn-primary rtl:pr-4 ltr:pl-4"
+                        :class="{ 'disabled': !changed }"
                         :disabled="!changed"
                         @click="save"
-                        v-text="__('Save Changes')"
-                    />
+                        v-text="__('Save Changes')" />
 
-                    <dropdown-list v-if="hasSaveAsOptions" class="ltr:ml-0 rtl:mr-0">
+                    <Dropdown v-if="hasSaveAsOptions" placement="left-start" class="me-2">
                         <template #trigger>
                             <button class="btn-primary flex items-center ltr:rounded-l-none rtl:rounded-r-none">
                                 <svg-icon name="micro/chevron-down-xs" class="w-2" />
                             </button>
                         </template>
-                        <h6 class="p-2">{{ __('Save to') }}...</h6>
-                        <dropdown-item
-                            v-for="option in saveAsOptions"
-                            :key="option.url"
-                            @click="saveAs(option.url)"
-                            class="group"
-                        >
-                            <div class="flex items-start ltr:pr-4 rtl:pl-4">
-                                <svg-icon
-                                    :name="option.icon"
-                                    class="w-4 shrink-0 text-gray group-hover:text-white ltr:mr-2 rtl:ml-2"
-                                />
-                                <span class="whitespace-normal">{{ __(option.label) }}</span>
-                            </div>
-                        </dropdown-item>
-                    </dropdown-list>
+                        <DropdownMenu>
+                            <DropdownLabel v-text="__('Save to')" />
+                            <DropdownItem
+                                v-for="option in saveAsOptions"
+                                :text="option.label"
+                                @click="saveAs(option.url)"
+                            />
+                        </DropdownMenu>
+                    </Dropdown>
                 </div>
             </div>
         </header>
 
         <div class="mb-2 flex justify-end">
-            <a class="text-2xs text-blue underline ltr:mr-4 rtl:ml-4" v-text="__('Expand All')" @click="expandAll" />
+            <a class="text-2xs text-blue-600 underline ltr:mr-4 rtl:ml-4" v-text="__('Expand All')" @click="expandAll" />
             <a
-                class="text-2xs text-blue underline ltr:mr-2 rtl:ml-2"
+                class="text-2xs text-blue-600 underline ltr:mr-2 rtl:ml-2"
                 v-text="__('Collapse All')"
                 @click="collapseAll"
             />
@@ -97,7 +112,7 @@
             >
                 <template #placeholder>
                     <div
-                        class="w-full rounded border border-dashed border-blue-400 bg-blue-500/10 p-2"
+                        class="w-full rounded-sm border border-dashed border-blue-400 bg-blue-500/10 p-2"
                         :class="{
                             'mt-8': isSectionNode(draggingStat),
                             'ml-[-24px]': isDraggingIntoTopLevel,
@@ -123,26 +138,26 @@
                         @toggle-open="stat.open = !stat.open"
                     >
                         <template #branch-options="{ isTopLevel }">
-                            <dropdown-item v-if="stat.level < 3" :text="__('Add Item')" @click="addItem(stat)" />
-                            <dropdown-item :text="__('Edit')" @click="editItem(stat)" />
-                            <dropdown-item
+                            <DropdownItem v-if="stat.level < 3" :text="__('Add Item')" @click="addItem(stat)" />
+                            <DropdownItem :text="__('Edit')" @click="editItem(stat)" />
+                            <DropdownItem
                                 v-if="!isSectionNode(stat) && !isTopLevel"
                                 :text="__('Pin to Top Level')"
                                 @click="pinItem(stat)"
                             />
-                            <dropdown-item
+                            <DropdownItem
                                 v-if="!isSectionNode(stat)"
                                 :text="__('Duplicate')"
                                 @click="aliasItem(stat)"
                             />
-                            <li class="divider" />
-                            <dropdown-item
+                            <DropdownSeparator />
+                            <DropdownItem
                                 v-if="itemIsVisible(stat)"
                                 :text="isHideable(stat) ? __('Hide') : __('Remove')"
-                                class="warning"
+                                variant="destructive"
                                 @click="isHideable(stat) ? hideItem(stat) : removeItem(stat)"
                             />
-                            <dropdown-item v-else :text="__('Show')" @click="showItem(stat)" />
+                            <DropdownItem v-else :text="__('Show')" @click="showItem(stat)" />
                         </template>
                     </tree-branch>
                 </template>
@@ -203,9 +218,16 @@ import TopLevelTreeBranch from './TopLevelBranch.vue';
 import ItemEditor from './ItemEditor.vue';
 import SectionEditor from './SectionEditor.vue';
 import { data_get } from '../../bootstrap/globals.js';
+import { Button, Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, DropdownLabel } from '@statamic/ui';
 
 export default {
     components: {
+        DropdownLabel,
+        Button,
+        Dropdown,
+        DropdownMenu,
+        DropdownItem,
+        DropdownSeparator,
         Draggable,
         TreeBranch,
         ItemEditor,

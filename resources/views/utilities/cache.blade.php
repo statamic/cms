@@ -7,25 +7,18 @@
 
 @section('content')
 
-<header class="mb-6">
-    @include(
-        'statamic::partials.breadcrumb',
-        [
-            'url' => cp_route('utilities.index'),
-            'title' => __('Utilities'),
-        ]
-    )
-    <div class="flex items-center justify-between">
-        <h1>{{ __('Cache Manager') }}</h1>
-
+    <ui-header title="{{ __('Cache Manager') }}" icon="cache">
         <form method="POST" action="{{ cp_route('utilities.cache.clear', 'all') }}">
             @csrf
-            <button class="btn-primary">{{ __('Clear All') }}</button>
+            <ui-button
+                text="{{ __('Clear All') }}"
+                type="submit"
+                variant="primary"
+            />
         </form>
-    </div>
-</header>
+    </ui-header>
 
-<div class="card p-0">
+<ui-card-panel>
     <div class="p-4">
         <div class="flex items-center justify-between">
             <div class="ltr:pr-8 rtl:pl-8">
@@ -76,7 +69,7 @@
             @endif
         </div>
     </div>
-    <div class="border-t bg-gray-200 p-4 dark:border-dark-900 dark:bg-dark-700">
+    <div class="border-t bg-gray-100 p-4 dark:border-dark-900 dark:bg-dark-700">
         <div class="flex items-center justify-between">
             <div class="ltr:pr-8 rtl:pl-8">
                 <h2 class="font-bold">{{ __('Static Page Cache') }}</h2>
@@ -126,7 +119,7 @@
         </div>
     </div>
 
-    <div class="rounded-b border-t bg-gray-200 p-4 dark:border-dark-900 dark:bg-dark-700">
+    <div class="rounded-b border-t bg-gray-100 p-4 dark:border-dark-900 dark:bg-dark-700">
         <div class="flex items-center justify-between">
             <div class="ltr:pr-8 rtl:pl-8">
                 <h2 class="font-bold">{{ __('Image Cache') }}</h2>
@@ -150,6 +143,6 @@
             </div>
         </div>
     </div>
-</div>
+</ui-card-panel>
 
 @stop

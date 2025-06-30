@@ -19,7 +19,10 @@ class NavTransformer
      */
     public function __construct(array $submitted)
     {
-        $this->coreNav = Nav::buildWithoutPreferences(true);
+        $this->coreNav = Nav::build(
+            preferences: false,
+            editing: true,
+        );
 
         $this->submitted = $this->removeEmptyCustomSections($submitted);
     }

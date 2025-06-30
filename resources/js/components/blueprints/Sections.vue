@@ -1,7 +1,7 @@
 <template>
     <div>
-        <div ref="sections" class="blueprint-sections -mx-2 flex flex-wrap outline-none" :data-tab="tabId">
-            <blueprint-section
+        <div ref="sections" class="blueprint-sections flex flex-wrap outline-hidden" :data-tab="tabId">
+            <BlueprintSection
                 ref="section"
                 v-for="(section, i) in sections"
                 :key="section._id"
@@ -15,16 +15,10 @@
                 @deleted="deleteSection(i)"
             />
 
-            <div class="blueprint-add-section-container w-full">
-                <button class="blueprint-add-section-button outline-none" @click="addAndEditSection">
-                    <div class="flex items-center text-center leading-none">
-                        <svg-icon name="micro/plus" class="h-3 w-3 ltr:mr-2 rtl:ml-2" />
-                        <div v-text="addSectionText" />
-                    </div>
-
-                    <div class="blueprint-section-draggable-zone outline-none" :data-tab="tabId" />
-                </button>
-            </div>
+            <button class="w-full flex gap-2 items-center justify-center relative min-h-24 text-gray-500 hover:text-gray-700 dark:hover:text-gray-400 cursor-pointer border border-dashed border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600 rounded-xl outline-hidden" @click="addAndEditSection">
+                <ui-icon name="plus" class="size-4" />
+                <div v-text="addSectionText" />
+            </button>
         </div>
     </div>
 </template>

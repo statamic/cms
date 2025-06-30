@@ -1,11 +1,11 @@
 <template>
-    <text-input
+    <Input
         ref="input"
         type="number"
         :name="name"
         :focus="config.focus"
         :model-value="value"
-        :is-read-only="isReadOnly"
+        :disabled="isReadOnly"
         :id="fieldId"
         :min="config.min"
         :prepend="__(config.prepend)"
@@ -19,9 +19,11 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
+import { Input } from '@statamic/ui';
 
 export default {
     mixins: [Fieldtype],
+    components: { Input },
     props: {
         prepend: { default: null },
         append: { default: null },

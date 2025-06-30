@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use Statamic\Actions\RenameAssetFolder;
 use Statamic\Assets\OrderedQueryBuilder;
 use Statamic\Contracts\Entries\Entry;
+use Statamic\CP\Column;
 use Statamic\Exceptions\AssetContainerNotFoundException;
 use Statamic\Facades\Action;
 use Statamic\Facades\Asset;
@@ -169,12 +170,61 @@ class Assets extends Fieldtype
 
     public function preload()
     {
+        $container = $this->container();
+
         return [
             'data' => $this->getItemData($this->field->value() ?? $this->defaultValue),
-            'container' => $container = $this->container()->handle(),
+            'container' => [
+                'id' => $container->id(),
+                'title' => $container->title(),
+                'edit_url' => $container->editUrl(),
+                'delete_url' => $container->deleteUrl(),
+                'blueprint_url' => cp_route('asset-containers.blueprint.edit', $container->handle()),
+                'can_edit' => User::current()->can('edit', $container),
+                'can_delete' => User::current()->can('delete', $container),
+                'allow_uploads' => $container->allowUploads(),
+                'create_folders' => $container->createFolders(),
+                'sort_field' => $container->sortField(),
+                'sort_direction' => $container->sortDirection(),
+            ],
             'dynamicFolder' => $dynamicFolder = $this->dynamicFolder(),
             'rename_folder' => $this->renameFolderAction($dynamicFolder),
+            'columns' => $this->getColumns(),
         ];
+    }
+
+    protected function getColumns()
+    {
+        $columns = $this->container()->blueprint()->columns()->map(fn ($column) => clone $column);
+
+        $basename = Column::make('basename')
+            ->label(__('File'))
+            ->visible(true)
+            ->defaultVisibility(true)
+            ->sortable(true)
+            ->required(true);
+
+        $size = Column::make('size')
+            ->label(__('Size'))
+            ->value('size_formatted')
+            ->visible(true)
+            ->defaultVisibility(true)
+            ->sortable(true);
+
+        $lastModified = Column::make('last_modified')
+            ->label(__('Last Modified'))
+            ->value('last_modified_relative')
+            ->visible(true)
+            ->defaultVisibility(true)
+            ->sortable(true);
+
+        $columns->put('basename', $basename);
+        $columns->put('size', $size);
+        $columns->put('last_modified', $lastModified);
+
+        $columns->setPreferred("assets.{$this->container()->handle()}.columns");
+
+        return $columns->rejectUnlisted()->values();
     }
 
     private function dynamicFolder()

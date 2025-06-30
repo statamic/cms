@@ -33,6 +33,10 @@ class NavigationController extends CpController
             ];
         })->values();
 
+        if ($navs->isEmpty()) {
+            return view('statamic::navigation.empty');
+        }
+
         return view('statamic::navigation.index', compact('navs'));
     }
 

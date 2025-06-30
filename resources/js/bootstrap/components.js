@@ -33,10 +33,10 @@ import EntryListing from '../components/entries/Listing.vue';
 import CollectionListing from '../components/collections/Listing.vue';
 import TaxonomyListing from '../components/taxonomies/Listing.vue';
 import TermListing from '../components/terms/Listing.vue';
-import AssetContainerList from '../components/AssetContainerList.vue';
 import AddonList from '../components/AddonList.vue';
 import AddonDetails from '../components/AddonDetails.vue';
-import CollectionWidget from '../components/entries/Widget.vue';
+import CollectionWidget from '../components/entries/CollectionWidget.vue';
+import FormWidget from '../components/forms/FormWidget.vue';
 import SvgIcon from '../components/SvgIcon.vue';
 import FileIcon from '../components/FileIcon.vue';
 import LoadingGraphic from '../components/LoadingGraphic.vue';
@@ -46,8 +46,6 @@ import ValidationErrors from '../components/ValidationErrors.vue';
 import Slugify from '../components/slugs/Slugify.vue';
 import ElementContainer from '../components/ElementContainer.vue';
 import Avatar from '../components/Avatar.vue';
-import Breadcrumb from '../components/Breadcrumb.vue';
-import Breadcrumbs from '../components/Breadcrumbs.vue';
 import CreateEntryButton from '../components/entries/CreateEntryButton.vue';
 import Popover from '../components/Popover.vue';
 import Portal from '../components/portals/Portal.vue';
@@ -61,9 +59,11 @@ import ResourceDeleter from '../components/ResourceDeleter.vue';
 import Stack from '../components/stacks/Stack.vue';
 import StackTest from '../components/stacks/StackTest.vue';
 import CodeBlock from '../components/CodeBlock.vue';
+import BlueprintCreateForm from '../components/blueprints/BlueprintCreateForm.vue';
 import BlueprintResetter from '../components/blueprints/BlueprintResetter.vue';
 import { defineAsyncComponent } from 'vue';
 import DateTime from '../components/DateTime.vue';
+import UpdaterWidget from '../components/updater/UpdaterWidget.vue';
 
 export default function registerGlobalComponents(app) {
     // Core
@@ -110,12 +110,13 @@ export default function registerGlobalComponents(app) {
     app.component('collection-list', CollectionListing);
     app.component('taxonomy-list', TaxonomyListing);
     app.component('term-list', TermListing);
-    app.component('asset-container-list', AssetContainerList);
     app.component('addon-list', AddonList);
     app.component('addon-details', AddonDetails);
 
     // Widgets
     app.component('collection-widget', CollectionWidget);
+    app.component('form-widget', FormWidget);
+    app.component('updater-widget', UpdaterWidget);
 
     // Reusable
     app.component('svg-icon', SvgIcon);
@@ -127,8 +128,6 @@ export default function registerGlobalComponents(app) {
     app.component('slugify', Slugify);
     app.component('element-container', ElementContainer);
     app.component('avatar', Avatar);
-    app.component('breadcrumb', Breadcrumb);
-    app.component('breadcrumbs', Breadcrumbs);
     app.component('create-entry-button', CreateEntryButton);
     app.component('popover', Popover);
     app.component('portal', Portal);
@@ -153,5 +152,6 @@ export default function registerGlobalComponents(app) {
     app.component('stack', Stack);
     app.component('stack-test', StackTest);
 
+    app.component('blueprint-create-form', BlueprintCreateForm);
     app.component('blueprint-resetter', BlueprintResetter);
 }

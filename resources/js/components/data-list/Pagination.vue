@@ -1,41 +1,51 @@
 <template>
-    <div class="flex w-full">
+    <div class="flex">
         <div class="flex flex-1 items-center" v-if="!inline">
-            <div class="text-xs text-gray-700" v-if="showTotals && totalItems > 0">
+            <div class="text-sm text-gray-500" v-if="showTotals && totalItems > 0">
                 {{ __(':start-:end of :total', { start: fromItem, end: toItem, total: totalItems }) }}
             </div>
         </div>
 
-        <ul v-if="hasMultiplePages" class="pagination" :class="{ 'pagination-inline': inline }">
-            <li v-if="hasPrevious">
-                <a @click="selectPreviousPage"
-                    ><span class="text-xs" v-html="direction === 'ltr' ? '&larr;' : '&rarr;'"></span
-                ></a>
-            </li>
+        <div v-if="hasMultiplePages" class="flex items-center gap-1" :class="{ 'pagination-inline': inline }">
+            <Button
+                size="sm"
+                :variant="hasPrevious && !showPageLinks ? 'filled' : 'ghost'"
+                round
+                icon="ui/chevron-left"
+                :disabled="!hasPrevious"
+                @click="selectPreviousPage"
+            />
 
-            <li v-for="(page, i) in pages" v-if="showPageLinks" :key="i" :class="{ current: page == currentPage }">
-                <span v-if="page === 'separator'" class="unclickable">...</span>
-                <a v-else @click="selectPage(page)">{{ page }}</a>
-            </li>
+            <Button
+                v-if="showPageLinks"
+                v-for="(page, i) in pages"
+                size="sm"
+                round
+                :variant="page == currentPage ? 'filled' : 'ghost'"
+                :key="i"
+                @click="selectPage(page)"
+                :disabled="page === 'separator' || page === currentPage"
+                :text="page === 'separator' ? '...' : String(page)"
+            />
 
-            <li v-if="hasNext">
-                <a @click="selectNextPage"
-                    ><span class="text-xs" v-html="direction === 'ltr' ? '&rarr;' : '&larr;'"></span
-                ></a>
-            </li>
-        </ul>
+            <Button
+                size="sm"
+                :variant="hasNext && !showPageLinks ? 'filled' : 'ghost'"
+                round
+                icon="ui/chevron-right"
+                :disabled="!hasNext"
+                @click="selectNextPage"
+            />
+        </div>
 
-        <div class="flex flex-1">
-            <div class="flex-1"></div>
-
-            <select-input
-                v-if="perPage && isPerPageEvenUseful"
-                class="ltr:ml-6 rtl:mr-6"
-                name="perPage"
-                :placeholder="__('Per Page')"
+        <div class="flex items-center flex-1 justify-end" v-if="perPage && isPerPageEvenUseful">
+            <span class="text-sm text-gray-500 me-3">{{ __('Per Page') }}</span>
+            <Select
+                class="w-auto!"
+                size="sm"
                 :options="perPageOptions"
-                :value="perPage"
-                @input="$emit('per-page-changed', $event)"
+                :model-value="perPage"
+                @update:model-value="$emit('per-page-changed', $event)"
             />
         </div>
     </div>
@@ -44,36 +54,25 @@
 <script>
 import HasInputOptions from '../fieldtypes/HasInputOptions.js';
 import { flatten, sortBy, range } from 'lodash-es';
+import { Select, Button } from '@statamic/ui';
 
 const onEachSide = 3;
 
 export default {
     mixins: [HasInputOptions],
 
+    components: {
+        Select,
+        Button,
+    },
+
     props: {
-        inline: {
-            type: Boolean,
-            default: false,
-        },
-        showTotals: {
-            type: Boolean,
-            default: false,
-        },
-        perPage: {
-            type: Number,
-        },
-        resourceMeta: {
-            type: Object,
-            required: true,
-        },
-        scrollToTop: {
-            type: Boolean,
-            default: true,
-        },
-        showPageLinks: {
-            type: Boolean,
-            default: true,
-        },
+        inline: { type: Boolean, default: false },
+        showTotals: { type: Boolean, default: false },
+        perPage: { type: Number },
+        resourceMeta: { type: Object, required: true },
+        scrollToTop: { type: Boolean, default: true },
+        showPageLinks: { type: Boolean, default: true },
     },
 
     data() {

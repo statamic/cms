@@ -1,18 +1,19 @@
 <template>
     <div>
-        <header class="mb-3">
-            <breadcrumb :url="cp_url('user-groups')" :title="__('User Groups')" />
-            <div class="flex items-center">
-                <h1 class="flex-1" v-text="__(title)" />
-                <dropdown-list class="ltr:mr-2 rtl:ml-2" v-if="canEditBlueprint">
-                    <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
-                </dropdown-list>
+        <Header :title="__(title)" icon="groups">
+            <Dropdown v-if="canEditBlueprint" class="me-2">
+                <template #trigger>
+                    <Button icon="ui/dots" variant="ghost" />
+                </template>
+                <DropdownMenu>
+                    <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" :href="actions.editBlueprint" />
+                </DropdownMenu>
+            </Dropdown>
 
-                <button class="btn-primary" @click.prevent="save" v-text="__('Save')" />
+            <Button variant="primary" @click.prevent="save" :text="__('Save')" />
 
-                <slot name="action-buttons-right" />
-            </div>
-        </header>
+            <slot name="action-buttons-right" />
+        </Header>
 
         <publish-container
             v-if="fieldset"
@@ -42,9 +43,18 @@
 <script>
 import HasHiddenFields from '../publish/HasHiddenFields';
 import clone from '@statamic/util/clone.js';
+import { Header, Button, Dropdown, DropdownMenu, DropdownItem } from '@statamic/ui';
 
 export default {
     mixins: [HasHiddenFields],
+
+    components: {
+        Header,
+        Button,
+        Dropdown,
+        DropdownMenu,
+        DropdownItem,
+    },
 
     props: {
         publishContainer: String,

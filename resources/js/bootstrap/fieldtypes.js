@@ -14,6 +14,7 @@ import AssetsFieldtype from '../components/fieldtypes/assets/AssetsFieldtype.vue
 import AssetsIndexFieldtype from '../components/fieldtypes/assets/AssetsIndexFieldtype.vue';
 import AssetFolderFieldtype from '../components/fieldtypes/AssetFolderFieldtype.vue';
 import BardButtonsSettingFieldtype from '../components/fieldtypes/bard/BardButtonsSettingFieldtype.vue';
+import BlueprintsFieldtype from '../components/fieldtypes/BlueprintsFieldtype.vue';
 import ButtonGroupFieldtype from '../components/fieldtypes/ButtonGroupFieldtype.vue';
 import CheckboxesFieldtype from '../components/fieldtypes/CheckboxesFieldtype.vue';
 import Routes from '../components/collections/Routes.vue';
@@ -60,6 +61,7 @@ import WidthFieldtype from '../components/fieldtypes/WidthFieldtype.vue';
 import VideoFieldtype from '../components/fieldtypes/VideoFieldtype.vue';
 import SetPicker from '../components/fieldtypes/replicator/SetPicker.vue';
 import SetField from '../components/fieldtypes/replicator/Field.vue';
+import TimeFieldtype from '../components/fieldtypes/TimeFieldtype.vue';
 
 export default function registerFieldtypes(app) {
     app.component('select-input', Select);
@@ -84,6 +86,7 @@ export default function registerFieldtypes(app) {
     );
     app.component('bard_buttons_setting-fieldtype', BardButtonsSettingFieldtype);
     app.component('button_group-fieldtype', ButtonGroupFieldtype);
+    app.component('blueprints-fieldtype', BlueprintsFieldtype);
     app.component('checkboxes-fieldtype', CheckboxesFieldtype);
     app.component(
         'code-fieldtype',
@@ -132,10 +135,7 @@ export default function registerFieldtypes(app) {
     app.component('tags-fieldtype-index', TagsIndexFieldtype);
     app.component('taggable-fieldtype-index', TagsIndexFieldtype);
     app.component('template_folder-fieldtype', TemplateFolderFieldtype);
-    app.component(
-        'time-fieldtype',
-        defineAsyncComponent(() => import('../components/fieldtypes/TimeFieldtype.vue')),
-    );
+    app.component('time-fieldtype', TimeFieldtype);
     app.component('toggle-fieldtype', ToggleFieldtype);
     app.component('toggle-fieldtype-index', ToggleIndexFieldtype);
     app.component('width-fieldtype', WidthFieldtype);

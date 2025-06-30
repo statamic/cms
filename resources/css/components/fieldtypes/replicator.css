@@ -3,18 +3,18 @@
    ========================================================================== */
 
 .replicator-set-container {
-    @apply outline-none;
+    @apply outline-hidden;
 }
 
 .replicator-set {
-    @apply relative rounded bg-white shadow-set outline-none dark:bg-dark-800 dark:shadow-dark-set;
+    @apply relative rounded-sm bg-white shadow-sm outline-hidden dark:bg-dark-800 dark:shadow-lg;
 }
 
 .replicator-set-header {
     @apply flex select-none rounded-t border-b bg-gray-300 dark:border-dark-900 dark:bg-dark-650 ltr:pr-3 rtl:pl-3;
 
     &.collapsed {
-        @apply rounded border-b-0;
+        @apply rounded-sm border-b-0;
     }
 
     .sortable-handle {

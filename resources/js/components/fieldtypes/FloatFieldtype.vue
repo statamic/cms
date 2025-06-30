@@ -1,5 +1,5 @@
 <template>
-    <text-input
+    <Input
         type="text"
         tabindex="0"
         :name="name"
@@ -15,9 +15,12 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
+import { Input } from '@statamic/ui';
 
 export default {
     mixins: [Fieldtype],
+
+    components: { Input },
 
     props: ['focus'],
 };

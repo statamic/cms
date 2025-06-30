@@ -1,5 +1,4 @@
 @extends('statamic::layout')
-@section('wrapper_class', 'max-w-full')
 @section('title', 'GraphQL')
 
 @section('content')

@@ -2,86 +2,80 @@
    GLOBAL CONTROL PANEL LAYOUT ELEMENTS
    ========================================================================== */
 
-body {
-    @apply relative w-full bg-gray-300 dark:bg-dark-800;
-}
+   /* ==========================================================================
+   THE MAIN NAV (LEFT SIDEBAR)
+   ========================================================================== */
+.nav-main {
+    @apply flex flex-col gap-6 py-6 px-3 text-sm antialiased select-none;
+    /* Same as the main element, accounting for the header with a class of h-14, which is the same as 3.5rem */
+    @apply h-[calc(100vh-3.5rem)];
+    @apply overflow-y-auto fixed top-14 left-0 w-46;
+    @apply [&_svg]:text-gray-500 dark:[&_svg]:text-gray-600;
+    transition: all 0.3s ease-in-out;
 
-#statamic {
-    min-height: 100vh;
-}
-
-#main {
-    @apply flex;
-    padding-bottom: 72px;
-    position: relative;
-    z-index: 1;
-}
-
-#main .workspace {
-    transition: padding 0.3s;
-    @apply w-full;
-}
-
-a {
-    text-decoration: none;
-    cursor: pointer;
-}
-
-.break-all {
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-@screen md {
-    #main {
-        padding-top: 52px;
+    ul {
+        @apply flex flex-col gap-0;
     }
 
-    #main .workspace {
-        padding-left: 14rem;
-        [dir='rtl'] & {
-            padding-right: 14rem;
-            padding-left: 0;
-        }
+    ul li a {
+        @apply flex items-center gap-3 text-gray-700 hover:bg-gray-400/10 px-2 py-1 rounded-md dark:text-gray-400 hover:text-black dark:hover:text-gray-200 hover:[&_svg]:text-gray-700 dark:hover:[&_svg]:text-gray-200;
     }
 
-    #main.nav-closed {
-        .nav-main {
-            left: -14rem;
-            [dir='rtl'] & {
-                left: auto;
-                right: -14rem;
-            }
-        }
+    ul li a.active {
+        @apply text-black bg-gray-400/10 [&_svg]:text-black dark:text-white [&_svg]:dark:text-gray-200 font-medium;
+    }
 
-        .workspace {
-            padding-left: 0;
-            [dir='rtl'] & {
-                padding-right: 0;
-                padding-left: 0;
-            }
-        }
+    ul li ul {
+        @apply ml-3.5 pl-3.5 translate-x-px my-1.5 text-[0.8125rem] min-w-0 flex-col gap-1 border-s border-gray-300 dark:border-gray-600;
+    }
+
+    ul li ul li a {
+        @apply py-0 hover:bg-transparent;
+    }
+
+    ul li ul li a.active {
+        @apply text-black dark:text-white font-medium bg-transparent;
+    }
+
+    .section-title {
+        @apply text-sm px-2 text-black font-medium mb-1 dark:text-gray-200;
     }
 }
 
-/* Page Wrapper
-  ========================================================================== */
-.page-wrapper {
-    @apply p-3 pt-6;
+main {
+    @apply ps-46;
+    transition: all 0.3s ease-in-out;
 }
 
-@screen md {
-    .page-wrapper {
-        @apply mx-auto max-w-xl px-8;
-    }
+.nav-closed main {
+    @apply ps-0;
 }
 
-.fieldtype-hidden {
-    display: none;
+
+
+.nav-closed .nav-main {
+    @apply -start-46;
 }
+
+.nav-closed main {
+    @apply md:ps-0;
+}
+
+
+
+
+
 
 /* Draggable Mirrors
   ========================================================================== */
+
+.draggable-mirror {
+    position: relative;
+    z-index: 1000;
+}
+.draggable-source--is-dragging {
+    opacity: 0.5;
+}
 
 /* Mirrors that have been appended to the body should appear on top of everything. (Portals are 4) */
 body > .draggable-mirror {

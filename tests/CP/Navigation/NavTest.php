@@ -96,7 +96,7 @@ class NavTest extends TestCase
     }
 
     #[Test]
-    public function it_can_create_a_nav_item_which_uses_default_entries_icon()
+    public function it_can_create_a_nav_item_which_uses_default_collections_icon()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
 
@@ -105,24 +105,7 @@ class NavTest extends TestCase
         $item = $this->build()->get('Utilities')->last();
 
         $this->assertNull($item->icon());
-        $this->assertEquals(\Statamic\Statamic::svg('icons/light/entries'), $item->svg());
-    }
-
-    #[Test]
-    public function it_can_create_a_nav_item_with_references_to_a_bundled_light_svg_icon()
-    {
-        File::put($svg = statamic_path('resources/svg/icons/light/test.svg'), '<svg>the totally real svg</svg>');
-
-        $this->actingAs(tap(User::make()->makeSuper())->save());
-
-        Nav::utilities('Test')->icon('test');
-
-        $item = $this->build()->get('Utilities')->last();
-
-        $this->assertEquals('test', $item->icon());
-        $this->assertEquals('<svg>the totally real svg</svg>', $item->svg());
-
-        File::delete($svg);
+        $this->assertEquals(\Statamic\Statamic::svg('icons/collections', 'size-4 shrink-0'), $item->svg());
     }
 
     #[Test]
@@ -231,7 +214,7 @@ class NavTest extends TestCase
     #[Test]
     public function it_sets_parent_icon_on_children()
     {
-        File::put($svg = statamic_path('resources/svg/icons/light/droid.svg'), '<svg>droid</svg>');
+        File::put($svg = statamic_path('resources/svg/icons/droid.svg'), '<svg>droid</svg>');
 
         $this->actingAs(tap(User::make()->makeSuper())->save());
 
@@ -247,13 +230,13 @@ class NavTest extends TestCase
         $item = $this->build()->get('Droids')->first();
 
         $this->assertEquals('droid', $item->icon());
-        $this->assertEquals('<svg>droid</svg>', $item->svg());
+        $this->assertEquals('<svg class="size-4 shrink-0">droid</svg>', $item->svg());
         $this->assertEquals('droid', $item->children()->get(0)->icon());
-        $this->assertEquals('<svg>droid</svg>', $item->children()->get(0)->svg());
+        $this->assertEquals('<svg class="size-4 shrink-0">droid</svg>', $item->children()->get(0)->svg());
         $this->assertEquals('droid', $item->children()->get(1)->icon());
-        $this->assertEquals('<svg>droid</svg>', $item->children()->get(1)->svg());
+        $this->assertEquals('<svg class="size-4 shrink-0">droid</svg>', $item->children()->get(1)->svg());
         $this->assertEquals('droid', $item->children()->get(2)->icon());
-        $this->assertEquals('<svg>droid</svg>', $item->children()->get(2)->svg());
+        $this->assertEquals('<svg class="size-4 shrink-0">droid</svg>', $item->children()->get(2)->svg());
 
         File::delete($svg);
     }

@@ -43,6 +43,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
     private $cachedRoutes = null;
     protected $mount;
     protected $title;
+    protected $icon;
     protected $template;
     protected $layout;
     protected $sites;
@@ -229,6 +230,16 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             ->args(func_get_args());
     }
 
+    public function icon($icon = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('icon')
+            ->getter(function ($icon) {
+                return $icon ?? 'collections';
+            })
+            ->args(func_get_args());
+    }
+
     public function absoluteUrl($site = null)
     {
         if (! $mount = $this->mount()) {
@@ -265,14 +276,6 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
     public function showUrl()
     {
         return cp_route('collections.show', $this->handle());
-    }
-
-    public function breadcrumbUrl()
-    {
-        $referer = request()->header('referer');
-        $showUrl = $this->showUrl();
-
-        return $referer && Str::before($referer, '?') === $showUrl ? $referer : $showUrl;
     }
 
     public function editUrl()
@@ -550,6 +553,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         $formerlyToArray = [
             'title' => $this->title,
             'handle' => $this->handle,
+            'icon' => $this->icon,
             'routes' => $this->routes,
             'dated' => $this->dated,
             'past_date_behavior' => $this->pastDateBehavior(),

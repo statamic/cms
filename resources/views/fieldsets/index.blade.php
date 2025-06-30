@@ -7,15 +7,18 @@
 
 @section('content')
     @unless ($fieldsets->isEmpty())
-        <div class="mb-6 flex">
-            <h1 class="flex-1">{{ __('Fieldsets') }}</h1>
-            <a href="{{ cp_route('fieldsets.create') }}" class="btn-primary">{{ __('Create Fieldset') }}</a>
-        </div>
+        <ui-header title="{{ __('Fieldsets') }}" icon="fieldsets">
+            <ui-button
+                href="{{ cp_route('fieldsets.create') }}"
+                text="{{ __('Create Fieldset') }}"
+                variant="primary"
+            ></ui-button>
+        </ui-header>
 
         @foreach ($fieldsets as $key => $f)
             <div class="mb-4">
                 @if ($fieldsets->count() > 1)
-                    <h3 class="little-heading mb-2 ltr:pl-0 rtl:pr-0">{{ $key }}</h3>
+                    <h3 class="little-heading mb-2 ps-0">{{ $key }}</h3>
                 @endif
 
                 <fieldset-listing :initial-rows="{{ json_encode($f) }}"></fieldset-listing>
@@ -34,11 +37,8 @@
         )
     @endunless
 
-    @include(
-        'statamic::partials.docs-callout',
-        [
-            'topic' => __('Fieldsets'),
-            'url' => Statamic::docsUrl('fieldsets'),
-        ]
-    )
+    <x-statamic::docs-callout
+        :topic="__('Blueprints')"
+        :url="Statamic::docsUrl('blueprints')"
+    />
 @endsection

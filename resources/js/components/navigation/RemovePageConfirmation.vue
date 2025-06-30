@@ -1,47 +1,39 @@
-<template>
-    <modal name="remove-page-confirmation">
-        <div class="confirmation-modal flex h-full flex-col">
-            <div class="p-4 pb-0 text-lg font-medium">
-                {{ __('Remove Page') }}
-            </div>
-            <div class="flex-1 px-4 py-6 text-gray dark:text-dark-150">
-                <p class="mb-4" v-text="__('Are you sure you want to remove this page?')" />
-                <p class="mb-4" v-text="__('Only the references will be removed. Entries will not be deleted.')" />
-                <label class="flex items-center" v-if="children">
-                    <input type="checkbox" class="ltr:mr-2 rtl:ml-2" v-model="shouldDeleteChildren" />
-                    {{ __n('Remove child page|Remove :count child pages', children) }}
-                </label>
-            </div>
-            <div
-                class="flex items-center justify-end border-t bg-gray-200 p-4 text-sm dark:border-dark-900 dark:bg-dark-550"
-            >
-                <button
-                    class="text-gray hover:text-gray-900 dark:text-dark-150 dark:hover:text-dark-100"
-                    @click="$emit('cancel')"
-                    v-text="__('Cancel')"
-                />
-                <button
-                    class="btn-danger ltr:ml-4 rtl:mr-4"
-                    @click="$emit('confirm', shouldDeleteChildren)"
-                    v-text="__('Remove')"
-                />
-            </div>
-        </div>
-    </modal>
-</template>
+<script setup>
+import { Modal, Button } from '@statamic/ui';
+import { ref } from 'vue';
 
-<script>
-export default {
-    emits: ['confirm', 'cancel'],
+const emits = defineEmits(['confirm', 'cancel']);
 
-    props: {
-        children: Number,
-    },
+const props = defineProps({
+    children: Number,
+});
 
-    data() {
-        return {
-            shouldDeleteChildren: false,
-        };
-    },
-};
+const modalOpen = ref(true);
+const shouldDeleteChildren = ref(false);
 </script>
+
+<template>
+    <Modal :title="__('Remove Page')" v-model:open="modalOpen">
+        <p class="mb-4" v-text="__('Are you sure you want to remove this page?')" />
+        <p class="mb-4" v-text="__('Only the references will be removed. Entries will not be deleted.')" />
+        <label class="flex items-center" v-if="children">
+            <input type="checkbox" class="ltr:mr-2 rtl:ml-2" v-model="shouldDeleteChildren" />
+            {{ __n('Remove child page|Remove :count child pages', children) }}
+        </label>
+
+        <template #footer>
+            <div class="flex items-center justify-end space-x-3 pt-3 pb-1">
+                <Button
+                    variant="ghost"
+                    @click="$emit('cancel')"
+                    :text="__('Cancel')"
+                />
+                <Button
+                    variant="danger"
+                    @click="$emit('confirm', shouldDeleteChildren)"
+                    :text="__('Remove')"
+                />
+            </div>
+        </template>
+    </Modal>
+</template>

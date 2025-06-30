@@ -15,7 +15,7 @@
             @apply mb-0;
         }
         .field-inner {
-            @apply ltr:pr-8 rtl:pl-8;
+            @apply pe-8;
         }
     }
 }

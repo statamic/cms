@@ -7,7 +7,7 @@
 
 @section('content')
     @if ($requestError)
-        <div class="no-results mx-auto max-w-2xl md:pt-30">
+        <div class="no-results mx-auto max-w-6xl md:pt-30">
             <div class="flex flex-wrap items-center">
                 <div class="w-full md:w-1/2">
                     <h1 class="mb-8">{{ __('Updates') }}</h1>
@@ -59,7 +59,7 @@
                             <td class="w-64">
                                 <a
                                     href="{{ route('statamic.cp.updater.product', $addon->slug()) }}"
-                                    class="font-bold text-blue ltr:mr-2 rtl:ml-2"
+                                    class="font-bold text-blue-600 ltr:mr-2 rtl:ml-2"
                                 >
                                     {{ $addon->name() }}
                                 </a>
@@ -96,12 +96,9 @@
             </div>
         @endif
 
-        @include(
-            'statamic::partials.docs-callout',
-            [
-                'topic' => __('Updates'),
-                'url' => Statamic::docsUrl('updating'),
-            ]
-        )
+        <x-statamic::docs-callout
+            :topic="__('Updates')"
+            :url="Statamic::docsUrl('updating')"
+        />
     @endif
 @endsection

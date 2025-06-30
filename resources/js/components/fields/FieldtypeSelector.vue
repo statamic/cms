@@ -1,71 +1,50 @@
 <template>
-    <div class="h-full overflow-auto bg-gray-100 dark:bg-dark-600">
-        <div
-            class="flex items-center justify-between border-b bg-gray-300 px-6 py-2 text-lg font-medium dark:border-dark-900 dark:bg-dark-600"
-        >
-            {{ __('Fieldtypes') }}
-            <button type="button" class="btn-close" @click="close">×</button>
-        </div>
+    <div class="h-full overflow-auto bg-white dark:bg-gray-800 p-3 rounded-l-xl">
+        <header class="flex items-center justify-between pl-3">
+            <ui-heading :text="__('Fieldtypes')" size="lg" icon="cog" />
+            <ui-button type="button" icon="x" variant="subtle" @click="close" />
+        </header>
 
         <div v-if="!fieldtypesLoaded" class="absolute inset-0 z-200 flex items-center justify-center text-center">
             <loading-graphic />
         </div>
 
-        <div
-            class="flex items-center border-b bg-white px-6 py-4 dark:border-dark-900 dark:bg-dark-550"
-            v-if="fieldtypesLoaded"
-        >
-            <input
-                type="text"
-                class="input-text w-full flex-1 text-sm"
-                autofocus
+        <div class="flex p-3" v-if="fieldtypesLoaded">
+            <ui-input
                 v-model="search"
                 ref="search"
+                autofocus
                 @keydown.esc="cancelSearch"
                 :placeholder="`${__('Search')}...`"
             />
         </div>
 
-        <div class="p-4" v-if="fieldtypesLoaded">
+        <div class="p-2 space-y-8" v-if="fieldtypesLoaded">
             <div
                 v-for="group in displayedFieldtypes"
                 :key="group.handle"
                 v-show="group.fieldtypes.length > 0"
-                class="mb-8"
             >
-                <h2 v-if="group.title" v-text="group.title" class="mb-1 px-2" />
-                <p
-                    v-if="group.description"
-                    v-text="group.description"
-                    class="mb-2 px-2 text-sm text-gray-700 dark:text-dark-150"
-                />
+                <h2 v-if="group.title" v-text="group.title" class="mb-2 px-2" />
                 <div class="fieldtype-selector">
-                    <div class="fieldtype-list">
-                        <div class="p-2" v-for="fieldtype in group.fieldtypes" :key="fieldtype.handle">
+                    <ui-panel>
+                        <ui-panel-header v-if="group.description" class="px-2! py-1.5!">
+                            <ui-description :text="group.description" />
+                        </ui-panel-header>
+                        <div class="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-1.5">
+                        <div v-for="fieldtype in group.fieldtypes" :key="fieldtype.handle">
                             <button
-                                class="group flex w-full items-center rounded border border-gray-500 bg-white shadow-sm hover:border-gray-600 hover:shadow-md dark:border-dark-900 dark:bg-dark-700 dark:shadow-dark-sm dark:hover:border-dark-950 ltr:pr-3 rtl:pl-3"
+                                class="flex items-center gap-2 w-full px-3 py-2.5 group bg-white dark:bg-gray-850 shadow-ui-sm rounded-xl border border-gray-200 dark:border-x-0 dark:border-b-0 dark:border-gray-700 cursor-pointer"
+                                type="button"
                                 @click="select(fieldtype)"
+                                :title="fieldtype.icon"
                             >
-                                <div
-                                    class="flex items-center border-gray-500 bg-gray-200 p-2 group-hover:border-gray-600 dark:border-dark-900 dark:bg-dark-600 dark:group-hover:border-dark-950 ltr:rounded-l ltr:border-r rtl:rounded-r rtl:border-l"
-                                >
-                                    <svg-icon
-                                        class="h-5 w-5 text-gray-800 dark:text-dark-150"
-                                        :name="
-                                            fieldtype.icon.startsWith('<svg')
-                                                ? fieldtype.icon
-                                                : `light/${fieldtype.icon}`
-                                        "
-                                        default="light/generic-field"
-                                    ></svg-icon>
-                                </div>
-                                <span
-                                    class="text-md text-gray-800 group-hover:text-gray-900 dark:text-dark-150 dark:group-hover:text-dark-100 ltr:pl-3 rtl:pr-3"
-                                    >{{ fieldtype.text }}</span
-                                >
+                                <ui-icon :name="`fieldtype-${fieldtype.icon}`" class="text-gray-500 group-hover:text-gray-800 dark:text-gray-400 dark:group-hover:text-gray-100" />
+                                <span class="text-sm text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-gray-100" v-text="fieldtype.text" />
                             </button>
+                            </div>
                         </div>
-                    </div>
+                    </ui-panel>
                 </div>
             </div>
         </div>
@@ -76,6 +55,7 @@
 import fuzzysort from 'fuzzysort';
 import { ref } from 'vue';
 import { mapValues } from 'lodash-es';
+
 const loadedFieldtypes = ref(null);
 
 export default {
@@ -233,7 +213,9 @@ export default {
             immediate: true,
             handler() {
                 this.$nextTick(() => {
-                    if (this.$refs.search) this.$refs.search.focus();
+                    if (this.$refs.search?.$el?.querySelector('input')) {
+                        this.$refs.search.$el.querySelector('input').focus();
+                    }
                 });
             },
         },

@@ -91,6 +91,11 @@ abstract class Action implements Arrayable
         return false;
     }
 
+    public function icon(): string
+    {
+        return $this->icon ?? '';
+    }
+
     public function buttonText()
     {
         /** @translation */
@@ -129,6 +134,7 @@ abstract class Action implements Arrayable
         return [
             'handle' => $this->handle(),
             'title' => $this->title(),
+            'icon' => $this->icon(),
             'confirm' => $this->confirm,
             'buttonText' => $this->buttonText(),
             'confirmationText' => $this->confirmationText(),

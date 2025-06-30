@@ -1,34 +1,22 @@
 <template>
     <tr :class="[sortableItemClass, { 'opacity-50': isExcessive }]">
         <td class="drag-handle" :class="sortableHandleClass" v-if="grid.isReorderable"></td>
-        <grid-cell
-            v-for="(field, i) in fields"
-            :show-inner="showField(field, fieldPath(field.handle))"
-            :key="field.handle"
-            :field="field"
-            :value="values[field.handle]"
-            :meta="meta[field.handle]"
-            :index="i"
-            :row-index="index"
-            :grid-name="name"
-            :errors="errors(field.handle)"
-            :field-path="fieldPath(field.handle)"
-            @updated="updated(field.handle, $event)"
-            @meta-updated="metaUpdated(field.handle, $event)"
-            @focus="$emit('focus')"
-            @blur="$emit('blur')"
-        />
+
+        <FieldsProvider
+            :fields="fields"
+            :field-path-prefix="`${fieldPathPrefix}.${index}`"
+            :meta-path-prefix="`${metaPathPrefix}.existing.${values._id}`"
+        >
+            <grid-cell v-for="(field, i) in fields" :key="field.handle" :field="field" />
+        </FieldsProvider>
 
         <td class="grid-row-controls row-controls" v-if="!grid.isReadOnly && (canAddRows || canDelete)">
-            <dropdown-list>
-                <dropdown-item :text="__('Duplicate Row')" @click="$emit('duplicate', index)" v-if="canAddRows" />
-                <dropdown-item
-                    v-if="canDelete"
-                    :text="__('Delete Row')"
-                    class="warning"
-                    @click="$emit('removed', index)"
-                />
-            </dropdown-list>
+            <Dropdown v-if="canAddRows || canDelete" placement="left-start">
+                <DropdownMenu>
+                    <DropdownItem v-if="canAddRows" :text="__('Duplicate Row')" icon="duplicate" @click="$emit('duplicate', index)" />
+                    <DropdownItem v-if="canDelete" :text="__('Delete Row')" icon="trash" variant="destructive" @click="$emit('removed', index)" />
+                </DropdownMenu>
+            </Dropdown>
         </td>
     </tr>
 </template>
@@ -42,9 +30,11 @@
 <script>
 import GridCell from './Cell.vue';
 import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
+import FieldsProvider from '@statamic/components/ui/Publish/FieldsProvider.vue';
+import { Dropdown, DropdownMenu, DropdownItem } from '@statamic/ui';
 
 export default {
-    components: { GridCell },
+    components: { Dropdown, DropdownMenu, DropdownItem, FieldsProvider, GridCell },
 
     mixins: [ValidatesFieldConditions],
 
@@ -70,6 +60,9 @@ export default {
             required: true,
         },
         fieldPathPrefix: {
+            type: String,
+        },
+        metaPathPrefix: {
             type: String,
         },
         canDelete: {

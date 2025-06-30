@@ -1,17 +1,12 @@
 <template>
     <div>
-        <header class="mb-6">
-            <breadcrumb :url="breadcrumbUrl" :title="__('Roles & Permissions')" />
-            <div class="flex items-center justify-between">
-                <h1 v-text="__(initialTitle) || __('Create Role')" />
-                <button type="submit" class="btn-primary" @click="save">{{ __('Save') }}</button>
-            </div>
-        </header>
+        <Header :title="__(initialTitle) || __('Create Role')" icon="permissions">
+            <Button type="submit" variant="primary" @click="save" :text="__('Save')" />
+        </Header>
 
-        <div class="card configure-tab publish-fields mb-6 p-0 @container">
+        <ui-card class="space-y-6">
             <form-group
                 handle="title"
-                class="border-b dark:border-dark-900"
                 :display="__('Title')"
                 :errors="errors.title"
                 :instructions="__('messages.role_title_instructions')"
@@ -20,7 +15,6 @@
             />
 
             <form-group
-                class="border-b dark:border-dark-900"
                 fieldtype="slug"
                 handle="handle"
                 :display="__('Handle')"
@@ -42,18 +36,23 @@
                 :instructions="__('permissions.super_desc')"
                 v-model="isSuper"
             />
-        </div>
+        </ui-card>
 
-        <div v-if="!isSuper">
-            <div class="content mt-6" v-for="group in permissions" :key="group.handle">
-                <h2 class="mb-2 mt-10 text-base">{{ group.label }}</h2>
-                <role-permission-tree class="card p-0" :depth="1" :initial-permissions="group.permissions" />
-            </div>
+        <div v-if="!isSuper" class="space-y-6 mt-6">
+            <ui-panel v-for="group in permissions" :key="group.handle">
+                <ui-panel-header>
+                    <ui-heading :text="group.label" />
+                </ui-panel-header>
+                <ui-card>
+                    <role-permission-tree :depth="1" :initial-permissions="group.permissions" />
+                </ui-card>
+            </ui-panel>
         </div>
     </div>
 </template>
 
 <script>
+import { Header, Button } from '@statamic/ui';
 import { requireElevatedSession } from '@statamic/components/elevated-sessions';
 
 const checked = function (permissions) {
@@ -64,6 +63,11 @@ const checked = function (permissions) {
 };
 
 export default {
+    components: {
+        Header,
+        Button,
+    },
+
     props: {
         initialTitle: String,
         initialHandle: String,
@@ -72,7 +76,6 @@ export default {
         canAssignSuper: Boolean,
         action: String,
         method: String,
-        breadcrumbUrl: String,
         indexUrl: String,
     },
 

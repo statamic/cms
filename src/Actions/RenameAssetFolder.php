@@ -7,6 +7,8 @@ use Statamic\Rules\AlphaDashSpace;
 
 class RenameAssetFolder extends Action
 {
+    protected $icon = 'folder-edit';
+
     public static function title()
     {
         return __('Rename Folder');

@@ -7,22 +7,19 @@
 
 @section('content')
 
-<div class="widgets @container -mx-4 flex flex-wrap py-2">
+<ui-header title="{{ __('Dashboard') }}" icon="dashboard" />
+
+<div class="widgets @container/widgets flex flex-wrap py-2 gap-y-6 -mx-3">
     @foreach ($widgets as $widget)
-        <div
-            class="widget md:{{ Statamic\Support\Str::tailwindWidthClass($widget['width']) }} {{ $widget['classes'] }} mb-8 w-full px-4"
-        >
+        <div class="{{ Statamic\Support\Str::tailwindWidthClass($widget['width']) }} {{ $widget['classes'] }} px-3">
             {!! $widget['html'] !!}
         </div>
     @endforeach
 </div>
 
-@include(
-    'statamic::partials.docs-callout',
-    [
-        'topic' => __('Widgets'),
-        'url' => Statamic::docsUrl('widgets'),
-    ]
-)
+    <x-statamic::docs-callout
+        :topic="__('Widgets')"
+        :url="Statamic::docsUrl('widgets')"
+    />
 
 @stop

@@ -1,7 +1,7 @@
-import { marked } from 'marked';
 import { translate, translateChoice } from '../translations/translator';
 import uid from 'uniqid';
 import PreviewHtml from '../components/fieldtypes/replicator/PreviewHtml';
+import renderMarkdown from '@statamic/util/markdown.js';
 
 export function cp_url(url) {
     url = Statamic.$config.get('cpUrl') + '/' + url;
@@ -67,8 +67,21 @@ export function tailwind_width_class(width) {
     return `${widths[width] || 'w-full'}`;
 }
 
-export function markdown(value) {
-    return marked(value);
+export function field_width_class(width) {
+    const widths = {
+        25: 'field-w-25',
+        33: 'field-w-33',
+        50: 'field-w-50',
+        66: 'field-w-66',
+        75: 'field-w-75',
+        100: 'field-w-100',
+    };
+
+    return `${widths[width] || 'field-w-100'}`;
+}
+
+export function markdown(value, options = {}) {
+    return renderMarkdown(value, options);
 }
 
 export function __(string, replacements) {

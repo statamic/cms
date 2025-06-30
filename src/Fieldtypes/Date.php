@@ -128,14 +128,11 @@ class Date extends Fieldtype
     private function preProcessSingle($value)
     {
         if (! $value) {
-            return ['date' => null, 'time' => null];
+            return null;
         }
 
         if ($value === 'now') {
-            return [
-                'date' => now(tz: 'UTC')->format(self::DEFAULT_DATE_FORMAT),
-                'time' => now(tz: 'UTC')->format($this->config('time_seconds_enabled') ? 'H:i:s' : 'H:i'),
-            ];
+            return now('UTC')->toIso8601ZuluString();
         }
 
         // If the value is an array, this field probably used to be a range. In this case, we'll use the start date.
@@ -143,9 +140,7 @@ class Date extends Fieldtype
             $value = $value['start'];
         }
 
-        $date = $this->parseSaved($value);
-
-        return $this->splitDateTimeForPreProcessSingle($date);
+        return $this->parseSaved($value)->toIso8601ZuluString();
     }
 
     private function preProcessRange($value)
@@ -161,8 +156,8 @@ class Date extends Fieldtype
             $carbon = $this->parseSavedToCarbon($value);
 
             return [
-                'start' => $this->splitDateTimeForPreProcessSingle($carbon->copy()->startOfDay()->utc()),
-                'end' => $this->splitDateTimeForPreProcessSingle($carbon->copy()->endOfDay()->utc()),
+                'start' => $carbon->copy()->startOfDay()->utc()->toIso8601ZuluString(),
+                'end' => $carbon->copy()->endOfDay()->utc()->toIso8601ZuluString(),
             ];
         }
 
@@ -196,11 +191,11 @@ class Date extends Fieldtype
 
     private function processSingle($data)
     {
-        if (is_null($data['date'])) {
+        if (is_null($data)) {
             return null;
         }
 
-        return $this->processDateTime($data['date'].' '.($data['time'] ?? '00:00'));
+        return $this->processDateTime($data);
     }
 
     private function processRange($data)
@@ -210,8 +205,8 @@ class Date extends Fieldtype
         }
 
         return [
-            'start' => $this->processDateTime($data['start']['date'].' '.($data['start']['time'] ?? '00:00')),
-            'end' => $this->processDateTime($data['end']['date'].' '.($data['end']['time'] ?? '23:59')),
+            'start' => $this->processDateTime($data['start']),
+            'end' => $this->processDateTime($data['end']),
         ];
     }
 
@@ -228,6 +223,11 @@ class Date extends Fieldtype
             return;
         }
 
+        $common = [
+            'mode' => $this->config('mode', 'single'),
+            'time_enabled' => $this->config('time_enabled'),
+        ];
+
         if ($this->config('mode') === 'range') {
             // If the value is a string, this field probably used to be a single date.
             // In this case, we'll use the date for both the start and end of the range.
@@ -235,13 +235,10 @@ class Date extends Fieldtype
                 $value = ['start' => $value, 'end' => $value];
             }
 
-            $start = $this->parseSaved($value['start']);
-            $end = $this->parseSaved($value['end']);
-
             return [
-                'start' => $this->splitDateTimeForPreProcessSingle($start),
-                'end' => $this->splitDateTimeForPreProcessSingle($end),
-                'mode' => $this->config('mode', 'single'),
+                'start' => $this->parseSaved($value['start'])->toIso8601ZuluString(),
+                'end' => $this->parseSaved($value['end'])->toIso8601ZuluString(),
+                ...$common,
             ];
         }
 
@@ -250,12 +247,9 @@ class Date extends Fieldtype
             $value = $value['start'];
         }
 
-        $date = $this->parseSaved($value);
-
         return [
-            ...$this->splitDateTimeForPreProcessSingle($date),
-            'mode' => $this->config('mode', 'single'),
-            'time_enabled' => $this->config('time_enabled'),
+            'date' => $this->parseSaved($value)->toIso8601ZuluString(),
+            ...$common,
         ];
     }
 
@@ -389,12 +383,7 @@ class Date extends Fieldtype
             return $this->preProcessSingleValidatable($value);
         }
 
-        if (isset($value['start'])) {
-            // It was already processed.
-            return $value;
-        }
-
-        return $this->preProcessRangeValidatable($value['date']);
+        return $this->preProcessRangeValidatable($value);
     }
 
     private function preProcessSingleValidatable($value)
@@ -403,17 +392,7 @@ class Date extends Fieldtype
             return $value;
         }
 
-        if (! $value['date']) {
-            return null;
-        }
-
-        $time = $value['time'] ?? '00:00';
-
-        if (substr_count($time, ':') === 1) {
-            $time .= ':00';
-        }
-
-        return Carbon::createFromFormat(self::DEFAULT_DATETIME_WITH_SECONDS_FORMAT, $value['date'].' '.$time);
+        return Carbon::parse($value);
     }
 
     private function preProcessRangeValidatable($value)
@@ -423,8 +402,8 @@ class Date extends Fieldtype
         }
 
         return [
-            'start' => Carbon::createFromFormat(self::DEFAULT_DATE_FORMAT, $value['start'])->startOfDay(),
-            'end' => Carbon::createFromFormat(self::DEFAULT_DATE_FORMAT, $value['end'])->startOfDay(),
+            'start' => Carbon::parse($value['start']),
+            'end' => Carbon::parse($value['end']),
         ];
     }
 }

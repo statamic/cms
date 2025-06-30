@@ -157,7 +157,6 @@ return [
     'select.config.multiple' => 'السماح بتحديدات متعددة.',
     'select.config.options' => 'حدد المفاتيح والتسميات الاختيارية لها.',
     'select.config.placeholder' => 'تعيين نص العنصر النائب.',
-    'select.config.push_tags' => 'إضافة العلامات التي تم إنشاؤها حديثًا إلى قائمة الخيارات.',
     'select.config.searchable' => 'تمكين البحث من خلال الخيارات الممكنة.',
     'select.config.taggable' => 'السماح بإضافة خيارات جديدة بالإضافة إلى الخيارات المعرفة مسبقًا',
     'select.title' => 'تحديد',

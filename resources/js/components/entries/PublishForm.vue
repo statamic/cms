@@ -1,305 +1,199 @@
 <template>
     <div>
-        <breadcrumb v-if="breadcrumbs" :url="breadcrumbs[1].url" :title="breadcrumbs[1].text" />
+        <Header>
+            <template #title>
+                <StatusIndicator v-if="!isCreating" :status="activeLocalization.status" />
+                {{ formattedTitle }}
+            </template>
 
-        <div class="mb-6 flex items-baseline">
-            <h1 class="flex-1 self-start ltr:mr-4 rtl:ml-4">
-                <div class="flex items-baseline">
-                    <span
-                        v-if="!isCreating"
-                        class="little-dot -top-1 ltr:mr-2 rtl:ml-2"
-                        :class="activeLocalization.status"
-                        v-tooltip="__(activeLocalization.status)"
-                    />
-                    <span class="break-overflowing-words" v-html="formattedTitle" />
-                </div>
-            </h1>
+            <ItemActions
+                v-if="!isCreating && hasItemActions"
+                :item="values.id"
+                :url="itemActionUrl"
+                :actions="itemActions"
+                :is-dirty="isDirty"
+                @started="actionStarted"
+                @completed="actionCompleted"
+                v-slot="{ actions: itemActions }"
+            >
+                <Dropdown v-if="canEditBlueprint || hasItemActions">
+                    <template #trigger>
+                        <Button icon="ui/dots" variant="ghost" />
+                    </template>
+                    <DropdownMenu>
+                        <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" v-if="canEditBlueprint" :href="actions.editBlueprint" />
+                        <DropdownSeparator v-if="canEditBlueprint && itemActions.length" />
+                        <DropdownItem
+                            v-for="action in itemActions"
+                            :key="action.handle"
+                            :text="__(action.title)"
+                            :icon="action.icon"
+                            :variant="action.dangerous ? 'destructive' : 'default'"
+                            @click="action.run"
+                        />
+                    </DropdownMenu>
+                </Dropdown>
+            </ItemActions>
 
-            <dropdown-list class="ltr:mr-4 rtl:ml-4" v-if="canEditBlueprint || hasItemActions">
-                <dropdown-item :text="__('Edit Blueprint')" v-if="canEditBlueprint" :redirect="actions.editBlueprint" />
-                <li class="divider" />
-                <data-list-inline-actions
-                    v-if="!isCreating && hasItemActions"
-                    :item="values.id"
-                    :url="itemActionUrl"
-                    :actions="itemActions"
-                    :is-dirty="isDirty"
-                    @started="actionStarted"
-                    @completed="actionCompleted"
-                />
-            </dropdown-list>
-
-            <div class="flex pt-px text-2xs text-gray-600 ltr:mr-4 rtl:ml-4" v-if="readOnly">
-                <svg-icon name="light/lock" class="-mt-1 w-4 ltr:mr-1 rtl:ml-1" /> {{ __('Read Only') }}
+            <div class="text-2xs me-4 flex pt-px text-gray-600" v-if="readOnly">
+                <svg-icon name="light/lock" class="me-1 -mt-1 w-4" /> {{ __('Read Only') }}
             </div>
 
-            <div class="hidden items-center md:flex">
+            <div class="flex items-center gap-3">
                 <save-button-options
                     v-if="!readOnly"
                     :show-options="!revisionsEnabled && !isInline"
-                    :button-class="saveButtonClass"
                     :preferences-prefix="preferencesPrefix"
                 >
-                    <button :class="saveButtonClass" :disabled="!canSave" @click.prevent="save" v-text="saveText" />
+                    <Button
+                        :disabled="!canSave"
+                        :variant="!revisionsEnabled ? 'primary' : 'default'"
+                        @click.prevent="save"
+                        v-text="saveText"
+                    />
                 </save-button-options>
 
                 <save-button-options
                     v-if="revisionsEnabled && !isCreating"
                     :show-options="!isInline"
-                    button-class="btn-primary"
                     :preferences-prefix="preferencesPrefix"
                 >
-                    <button
-                        class="btn-primary flex items-center ltr:ml-4 rtl:mr-4"
+                    <Button
+                        variant="primary"
                         :disabled="!canPublish"
                         @click="confirmingPublish = true"
-                        v-text="publishButtonText"
+                        :text="publishButtonText"
                     />
                 </save-button-options>
             </div>
 
             <slot name="action-buttons-right" />
-        </div>
+        </Header>
 
-        <publish-container
+        <PublishContainer
             v-if="fieldset"
             ref="container"
             :name="publishContainer"
+            :reference="initialReference"
             :blueprint="fieldset"
             :values="values"
             :extra-values="extraValues"
-            :reference="initialReference"
             :meta="meta"
+            :origin-values="originValues"
+            :origin-meta="originMeta"
             :errors="errors"
+            :is-root="isRoot"
             :site="site"
             :localized-fields="localizedFields"
-            :is-root="isRoot"
             :track-dirty-state="trackDirtyState"
+            :sync-field-confirmation-text="syncFieldConfirmationText"
             @updated="values = $event"
-            v-slot="{ container, components, setFieldMeta }"
         >
-            <live-preview
-                :name="publishContainer"
+            <LivePreview
+                :enabled="isPreviewing"
                 :url="livePreviewUrl"
-                :previewing="isPreviewing"
                 :targets="previewTargets"
-                :values="values"
-                :blueprint="fieldset.handle"
-                :reference="initialReference"
-                @opened-via-keyboard="openLivePreview"
+                @opened="openLivePreview"
                 @closed="closeLivePreview"
             >
-                <div>
-                    <component
-                        v-for="component in components"
-                        :key="component.id"
-                        :is="component.name"
-                        :container="container"
-                        v-bind="component.props"
-                        v-on="component.events"
-                    />
+                <PublishComponents />
 
-                    <transition name="live-preview-tabs-drop">
-                        <publish-tabs
-                            v-show="tabsVisible"
-                            :read-only="readOnly"
-                            :syncable="hasOrigin"
-                            @updated="setFieldValue"
-                            @meta-updated="setFieldMeta"
-                            @synced="syncField"
-                            @desynced="desyncField"
-                            @focus="container.$emit('focus', $event)"
-                            @blur="container.$emit('blur', $event)"
-                        >
-                            <template #actions="{ shouldShowSidebar }">
-                                <div class="card mb-5 p-0">
-                                    <div v-if="collectionHasRoutes" :class="{ hi: !shouldShowSidebar }">
-                                        <div
-                                            class="flex flex-wrap items-center gap-2 p-3 rtl:space-x-reverse"
-                                            v-if="showLivePreviewButton || showVisitUrlButton"
-                                        >
-                                            <button
-                                                class="btn flex flex-1 items-center justify-center px-2"
-                                                v-if="showLivePreviewButton"
-                                                @click="openLivePreview"
-                                            >
-                                                <svg-icon
-                                                    name="light/synchronize"
-                                                    class="h-4 w-4 shrink-0 ltr:mr-2 rtl:ml-2"
-                                                />
-                                                <span>{{ __('Live Preview') }}</span>
-                                            </button>
-                                            <a
-                                                class="btn flex flex-1 items-center justify-center px-2"
-                                                v-if="showVisitUrlButton"
-                                                :href="permalink"
-                                                target="_blank"
-                                            >
-                                                <svg-icon
-                                                    name="light/external-link"
-                                                    class="h-4 w-4 shrink-0 ltr:mr-2 rtl:ml-2"
-                                                />
-                                                <span>{{ __('Visit URL') }}</span>
-                                            </a>
-                                        </div>
-                                    </div>
-
-                                    <div
-                                        v-if="!revisionsEnabled"
-                                        class="flex items-center justify-between px-4 py-2"
-                                        :class="{
-                                            'border-t dark:border-dark-900':
-                                                showLivePreviewButton || showVisitUrlButton,
-                                        }"
-                                    >
-                                        <label v-text="__('Published')" class="publish-field-label font-medium" />
-                                        <toggle-input
-                                            :model-value="published"
-                                            :read-only="!canManagePublishState"
-                                            @update:model-value="setFieldValue('published', $event)"
-                                        />
-                                    </div>
-
-                                    <div
-                                        v-if="revisionsEnabled && !isCreating"
-                                        class="p-4"
-                                        :class="{
-                                            'border-t dark:border-dark-900':
-                                                showLivePreviewButton || showVisitUrlButton,
-                                        }"
-                                    >
-                                        <label class="publish-field-label mb-2 font-medium" v-text="__('Revisions')" />
-                                        <div class="mb-1 flex items-center" v-if="published">
-                                            <span class="w-6 text-center text-green-600">&check;</span>
-                                            <span class="text-2xs" v-text="__('Entry has a published version')"></span>
-                                        </div>
-                                        <div class="mb-1 flex items-center" v-else>
-                                            <span class="w-6 text-center text-orange">!</span>
-                                            <span class="text-2xs" v-text="__('Entry has not been published')"></span>
-                                        </div>
-                                        <div class="mb-1 flex items-center" v-if="!isWorkingCopy && published">
-                                            <span class="w-6 text-center text-green-600">&check;</span>
-                                            <span class="text-2xs" v-text="__('This is the published version')"></span>
-                                        </div>
-                                        <div class="mb-1 flex items-center" v-if="isDirty">
-                                            <span class="w-6 text-center text-orange">!</span>
-                                            <span class="text-2xs" v-text="__('Unsaved changes')"></span>
-                                        </div>
-                                        <button
-                                            class="btn-flat mt-4 flex w-full items-center justify-center px-2"
-                                            v-if="!isCreating && revisionsEnabled"
-                                            @click="showRevisionHistory = true"
-                                        >
-                                            <svg-icon name="light/history" class="h-4 w-4 ltr:mr-2 rtl:ml-2" />
-                                            <span>{{ __('View History') }}</span>
-                                        </button>
-                                    </div>
-
-                                    <div class="border-t p-4 dark:border-dark-900" v-if="localizations.length > 1">
-                                        <label class="publish-field-label mb-2 font-medium" v-text="__('Sites')" />
-                                        <div
-                                            v-for="option in localizations"
-                                            :key="option.handle"
-                                            class="-mx-4 flex items-center px-4 py-2 text-sm"
-                                            :class="[
-                                                option.active
-                                                    ? 'bg-blue-100 dark:bg-dark-300'
-                                                    : 'hover:bg-gray-200 dark:hover:bg-dark-400',
-                                                !canSave && !option.exists ? 'cursor-not-allowed' : 'cursor-pointer',
-                                            ]"
-                                            @click="localizationSelected(option)"
-                                        >
-                                            <div
-                                                class="flex flex-1 items-center"
-                                                :class="{ 'line-through': !option.exists }"
-                                            >
-                                                <span
-                                                    class="little-dot ltr:mr-2 rtl:ml-2"
-                                                    :class="{
-                                                        'bg-green-600': option.published,
-                                                        'bg-gray-500': !option.published,
-                                                        'bg-red-500': !option.exists,
-                                                    }"
-                                                />
-                                                {{ __(option.name) }}
-                                                <loading-graphic
-                                                    :size="14"
-                                                    text=""
-                                                    class="ltr:ml-2 rtl:mr-2"
-                                                    v-if="localizing && localizing.handle === option.handle"
-                                                />
-                                            </div>
-                                            <div
-                                                class="badge-sm bg-orange dark:bg-orange-dark"
-                                                v-if="option.origin"
-                                                v-text="__('Origin')"
-                                            />
-                                            <div
-                                                class="badge-sm bg-blue dark:bg-dark-blue-175"
-                                                v-if="option.active"
-                                                v-text="__('Active')"
-                                            />
-                                            <div
-                                                class="badge-sm bg-purple dark:bg-purple-dark"
-                                                v-if="option.root && !option.origin && !option.active"
-                                                v-text="__('Root')"
-                                            />
-                                        </div>
-                                    </div>
+                <PublishTabs>
+                    <template #actions>
+                        <div class="space-y-6">
+                            <!-- Live Preview / Visit URL Buttons -->
+                            <div v-if="collectionHasRoutes">
+                                <div class="flex flex-wrap gap-4" v-if="showLivePreviewButton || showVisitUrlButton">
+                                    <Button
+                                        :text="__('Live Preview')"
+                                        class="flex-1"
+                                        icon="live-preview"
+                                        @click="openLivePreview"
+                                        v-if="showLivePreviewButton"
+                                    />
+                                    <Button
+                                        :href="permalink"
+                                        :text="__('Visit URL')"
+                                        class="flex-1"
+                                        icon="external-link"
+                                        target="_blank"
+                                        v-if="showVisitUrlButton"
+                                    />
                                 </div>
-                            </template>
-                        </publish-tabs>
-                    </transition>
-                </div>
-                <template v-slot:buttons>
-                    <button
+                            </div>
+
+                            <!-- Published Switch -->
+                            <Panel class="flex justify-between px-5 py-3" v-if="!revisionsEnabled">
+                                <Heading :text="__('Published')" />
+                                <Switch
+                                    :model-value="published"
+                                    :read-only="!canManagePublishState"
+                                    @update:model-value="setFieldValue('published', $event)"
+                                />
+                            </Panel>
+
+                            <!-- Revisions -->
+                            <Panel v-if="revisionsEnabled && !isCreating">
+                                <PanelHeader class="flex items-center justify-between">
+                                    <Heading :text="__('Revisions')" />
+                                    <Button
+                                        @click="showRevisionHistory = true"
+                                        icon="history"
+                                        :text="__('View History')"
+                                        size="xs"
+                                        class="-me-4"
+                                    />
+                                </PanelHeader>
+                                <Card class="space-y-2">
+                                    <Subheading v-if="published" class="flex items-center gap-2">
+                                        <Icon name="checkmark" class="text-green-600" />
+                                        {{ __('Entry has a published version') }}
+                                    </Subheading>
+                                    <Subheading v-else class="flex items-center gap-2 text-yellow-600">
+                                        <Icon name="warning-diamond" />
+                                        {{ __('Entry has not been published') }}
+                                    </Subheading>
+                                    <Subheading v-if="!isWorkingCopy && published" class="flex items-center gap-2">
+                                        <Icon name="checkmark" class="text-green-600" />
+                                        {{ __('This is the published version') }}
+                                    </Subheading>
+                                    <Subheading v-if="isDirty" class="flex items-center gap-2 text-yellow-600">
+                                        <Icon name="warning-diamond" />
+                                        {{ __('Unsaved changes') }}
+                                    </Subheading>
+                                </Card>
+                            </Panel>
+
+                            <LocalizationsCard
+                                v-if="showLocalizationSelector"
+                                :localizations
+                                :localizing="localizing !== null"
+                                @selected="localizationSelected"
+                            />
+                        </div>
+                    </template>
+                </PublishTabs>
+                <template #buttons>
+                    <Button
                         v-if="!readOnly"
-                        class="ltr:ml-4 rtl:mr-4"
-                        :class="{
-                            btn: revisionsEnabled,
-                            'btn-primary': isCreating || !revisionsEnabled,
-                        }"
+                        size="sm"
+                        :variant="revisionsEnabled ? 'default' : 'primary'"
                         :disabled="!canSave"
                         @click.prevent="save"
-                        v-text="saveText"
-                    ></button>
+                        :text="saveText"
+                    ></Button>
 
-                    <button
-                        v-if="revisionsEnabled && !isCreating"
-                        class="btn-primary flex items-center ltr:ml-4 rtl:mr-4"
+                    <Button
+                        v-if="revisionsEnabled"
+                        size="sm"
+                        variant="primary"
                         :disabled="!canPublish"
                         @click="confirmingPublish = true"
-                    >
-                        <span v-text="publishButtonText" />
-                        <svg-icon name="micro/chevron-down-xs" class="w-2 ltr:ml-2 rtl:mr-2" />
-                    </button>
+                        :text="publishButtonText"
+                    />
                 </template>
-            </live-preview>
-        </publish-container>
-
-        <div class="mt-6 flex items-center md:hidden">
-            <button
-                v-if="!readOnly"
-                class="btn-lg"
-                :class="{
-                    'btn-primary w-full': !revisionsEnabled,
-                    'btn w-1/2 ltr:mr-4 rtl:ml-4': revisionsEnabled,
-                }"
-                :disabled="!canSave"
-                @click.prevent="save"
-                v-text="__(revisionsEnabled ? 'Save Changes' : 'Save')"
-            />
-
-            <button
-                v-if="revisionsEnabled"
-                class="btn btn-lg btn-primary flex w-1/2 items-center justify-center ltr:ml-2 rtl:mr-2"
-                :disabled="!canPublish"
-                @click="confirmingPublish = true"
-            >
-                <span v-text="publishButtonText" />
-                <svg-icon name="micro/chevron-down-xs" class="w-2 ltr:ml-2 rtl:mr-2" />
-            </button>
-        </div>
+            </LivePreview>
+        </PublishContainer>
 
         <stack
             name="revision-history"
@@ -341,8 +235,8 @@
             <div class="publish-fields">
                 <div class="form-group publish-field field-w-full">
                     <label v-text="__('Origin')" />
-                    <div class="help-block -mt-2" v-text="__('messages.entry_origin_instructions')"></div>
-                    <select-input v-model="selectedOrigin" :options="originOptions" :placeholder="false" />
+                    <div class="help-block mt-2" v-text="__('messages.entry_origin_instructions')"></div>
+                    <Select class="w-full" v-model="selectedOrigin" :options="originOptions" :placeholder="false" />
                 </div>
             </div>
         </confirmation-modal>
@@ -350,6 +244,7 @@
 </template>
 
 <script>
+import ItemActions from '../../components/actions/ItemActions.vue';
 import PublishActions from './PublishActions.vue';
 import SaveButtonOptions from '../publish/SaveButtonOptions.vue';
 import RevisionHistory from '../revision-history/History.vue';
@@ -358,14 +253,66 @@ import HasHiddenFields from '../publish/HasHiddenFields';
 import HasActions from '../publish/HasActions';
 import striptags from 'striptags';
 import clone from '@statamic/util/clone.js';
+import {
+    Button,
+    Card,
+    CardPanel,
+    Dropdown,
+    DropdownItem,
+    DropdownMenu,
+    DropdownSeparator,
+    Header,
+    Heading,
+    Icon,
+    Panel,
+    PanelHeader,
+    StatusIndicator,
+    Subheading,
+    Switch,
+    Select,
+} from '@statamic/ui';
+import PublishContainer from '@statamic/components/ui/Publish/Container.vue';
+import PublishTabs from '@statamic/components/ui/Publish/Tabs.vue';
+import PublishComponents from '@statamic/components/ui/Publish/Components.vue';
+import LocalizationsCard from '@statamic/components/ui/Publish/Localizations.vue';
+import LivePreview from '@statamic/components/ui/LivePreview/LivePreview.vue';
+import { SavePipeline } from '@statamic/exports.js';
+import { computed, ref } from 'vue';
+const { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } = SavePipeline;
+
+let saving = ref(false);
+let errors = ref({});
+let container = null;
 
 export default {
     mixins: [HasPreferences, HasHiddenFields, HasActions],
 
     components: {
+        Button,
+        Card,
+        CardPanel,
+        Dropdown,
+        DropdownItem,
+        DropdownMenu,
+        DropdownSeparator,
+        Header,
+        Heading,
+        Icon,
+        ItemActions,
+        LivePreview,
+        LocalizationsCard,
+        Panel,
+        PanelHeader,
         PublishActions,
-        SaveButtonOptions,
+        PublishComponents,
+        PublishContainer,
+        PublishTabs,
         RevisionHistory,
+        SaveButtonOptions,
+        StatusIndicator,
+        Subheading,
+        Switch,
+        Select,
     },
 
     props: {
@@ -385,7 +332,6 @@ export default {
         initialSite: String,
         initialIsWorkingCopy: Boolean,
         collectionHandle: String,
-        breadcrumbs: Array,
         initialActions: Object,
         method: String,
         isCreating: Boolean,
@@ -408,7 +354,6 @@ export default {
     data() {
         return {
             actions: this.initialActions,
-            saving: false,
             localizing: false,
             trackDirtyState: true,
             fieldset: this.initialFieldset,
@@ -425,8 +370,6 @@ export default {
             selectingOrigin: false,
             selectedOrigin: null,
             isWorkingCopy: this.initialIsWorkingCopy,
-            error: null,
-            errors: {},
             isPreviewing: false,
             tabsVisible: true,
             state: 'new',
@@ -448,20 +391,25 @@ export default {
             quickSaveKeyBinding: null,
             quickSave: false,
             isAutosave: false,
+            syncFieldConfirmationText: __('messages.sync_entry_field_confirmation_text'),
         };
     },
 
     computed: {
+        saving() {
+            return saving.value;
+        },
+
+        errors() {
+            return errors.value;
+        },
+
         store() {
             return this.$refs.container.store;
         },
 
         formattedTitle() {
             return striptags(__(this.title));
-        },
-
-        hasErrors() {
-            return this.error || Object.keys(this.errors).length;
         },
 
         somethingIsLoading() {
@@ -498,6 +446,10 @@ export default {
 
         showVisitUrlButton() {
             return !!this.permalink;
+        },
+
+        showLocalizationSelector() {
+            return this.localizations.length > 1;
         },
 
         isBase() {
@@ -541,13 +493,6 @@ export default {
             return !this.published;
         },
 
-        saveButtonClass() {
-            return {
-                btn: this.revisionsEnabled,
-                'btn-primary': this.isCreating || !this.revisionsEnabled,
-            };
-        },
-
         afterSaveOption() {
             return this.getPreference('after_save');
         },
@@ -574,94 +519,58 @@ export default {
         title(title) {
             if (this.isBase) {
                 const arrow = this.direction === 'ltr' ? '‹' : '›';
-                document.title = `${title} ${arrow} ${this.breadcrumbs[1].text} ${arrow} ${this.breadcrumbs[0].text} ${arrow} ${__('Statamic')}`;
+                const parts = document.title.split(arrow);
+
+                document.title = `${title} ${arrow} ${parts[1]?.trim()}`;
             }
         },
     },
 
     methods: {
-        clearErrors() {
-            this.error = null;
-            this.errors = {};
-        },
-
         save() {
             if (!this.canSave) {
                 this.quickSave = false;
                 return;
             }
 
-            this.saving = true;
-            this.clearErrors();
-
-            setTimeout(() => this.runBeforeSaveHook(), 151); // 150ms is the debounce time for fieldtype updates
-        },
-
-        runBeforeSaveHook() {
-            this.$refs.container.saving();
-
-            Statamic.$hooks
-                .run('entry.saving', {
-                    collection: this.collectionHandle,
-                    values: this.values,
-                    container: this.$refs.container,
-                    storeName: this.publishContainer,
-                })
-                .then(this.performSaveRequest)
-                .catch((error) => {
-                    this.saving = false;
-                    this.$toast.error(error || 'Something went wrong');
-                });
-        },
-
-        performSaveRequest() {
-            // Once the hook has completed, we need to make the actual request.
-            // We build the payload here because the before hook may have modified values.
-            const payload = {
-                ...this.visibleValues,
-                ...{
-                    _blueprint: this.fieldset.handle,
-                    _localized: this.localizedFields,
-                    _parent: this.parent,
-                },
-            };
-
-            this.$axios[this.method](this.actions.save, payload)
+            new Pipeline()
+                .provide({ container, errors, saving })
+                .through([
+                    new BeforeSaveHooks('entry', {
+                        collection: this.collectionHandle,
+                        values: this.values,
+                        container: this.$refs.container,
+                        storeName: this.publishContainer,
+                    }),
+                    new Request(this.actions.save, this.method, {
+                        ...this.visibleValues,
+                        ...{
+                            _blueprint: this.fieldset.handle,
+                            _localized: this.localizedFields,
+                            _parent: this.parent,
+                        },
+                    }),
+                    new AfterSaveHooks('entry', {
+                        collection: this.collectionHandle,
+                        reference: this.initialReference,
+                    }),
+                ])
                 .then((response) => {
-                    this.saving = false;
-                    if (!response.data.saved) {
-                        return this.$toast.error(__(`Couldn't save entry`));
-                    }
-                    this.title = response.data.data.title;
-                    this.isWorkingCopy = true;
-                    if (!this.revisionsEnabled) this.permalink = response.data.data.permalink;
-                    if (!this.isCreating && !this.isAutosave) this.$toast.success(__('Saved'));
-                    this.$refs.container.saved();
-                    this.runAfterSaveHook(response);
-                })
-                .catch((error) => this.handleAxiosError(error));
-        },
-
-        runAfterSaveHook(response) {
-            // Once the save request has completed, we want to run the "after" hook.
-            // Devs can do what they need and we'll wait for them, but they can't cancel anything.
-            Statamic.$hooks
-                .run('entry.saved', {
-                    collection: this.collectionHandle,
-                    reference: this.initialReference,
-                    response,
-                })
-                .then(() => {
                     // If revisions are enabled, just emit event.
                     if (this.revisionsEnabled) {
                         clearTimeout(this.trackDirtyStateTimeout);
                         this.trackDirtyState = false;
                         this.values = this.resetValuesFromResponse(response.data.data.values);
                         this.extraValues = response.data.data.extraValues;
-                        this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 750);
+                        this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500);
                         this.$nextTick(() => this.$emit('saved', response));
                         return;
                     }
+
+                    this.title = response.data.data.title;
+                    this.isWorkingCopy = true;
+                    if (!this.revisionsEnabled) this.permalink = response.data.data.permalink;
+                    if (!this.isCreating && !this.isAutosave) this.$toast.success(__('Saved'));
 
                     let nextAction = this.quickSave || this.isAutosave ? 'continue_editing' : this.afterSaveOption;
 
@@ -681,9 +590,7 @@ export default {
                     else {
                         clearTimeout(this.trackDirtyStateTimeout);
                         this.trackDirtyState = false;
-                        this.values = this.resetValuesFromResponse(response.data.data.values);
-                        this.extraValues = response.data.data.extraValues;
-                        this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 750);
+                        this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500);
                         this.initialPublished = response.data.data.published;
                         this.activeLocalization.published = response.data.data.published;
                         this.activeLocalization.status = response.data.data.status;
@@ -693,27 +600,17 @@ export default {
                     this.quickSave = false;
                     this.isAutosave = false;
                 })
-                .catch((e) => console.error(e));
+                .catch((e) => {
+                    if (!(e instanceof PipelineStopped)) {
+                        this.$toast.error(__('Something went wrong'));
+                        console.error(e);
+                    }
+                });
         },
 
         confirmPublish() {
             if (this.canPublish) {
                 this.confirmingPublish = true;
-            }
-        },
-
-        handleAxiosError(e) {
-            this.saving = false;
-            if (e.response && e.response.status === 422) {
-                const { message, errors } = e.response.data;
-                this.error = message;
-                this.errors = errors;
-                this.$toast.error(message);
-                this.$reveal.invalid();
-            } else if (e.response) {
-                this.$toast.error(e.response.data.message);
-            } else {
-                this.$toast.error(e || 'Something went wrong');
             }
         },
 
@@ -773,7 +670,7 @@ export default {
                 this.initialPublished = data.values.published;
                 this.readOnly = data.readOnly;
 
-                this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 750); // after any fieldtypes do a debounced update
+                this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500); // after any fieldtypes do a debounced update
             });
         },
 
@@ -856,7 +753,7 @@ export default {
                 clearTimeout(this.trackDirtyStateTimeout);
                 this.trackDirtyState = false;
                 this.values = this.resetValuesFromResponse(response.data.data.values);
-                this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 750);
+                this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500);
                 this.activeLocalization.title = response.data.data.title;
                 this.activeLocalization.published = response.data.data.published;
                 this.activeLocalization.status = response.data.data.status;
@@ -912,7 +809,7 @@ export default {
                 clearTimeout(this.trackDirtyStateTimeout);
                 this.trackDirtyState = false;
                 this.values = this.resetValuesFromResponse(response.data.values);
-                this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 750);
+                this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500);
                 this.initialPublished = response.data.published;
                 this.activeLocalization.published = response.data.published;
                 this.activeLocalization.status = response.data.status;
@@ -949,6 +846,8 @@ export default {
             this.originBehavior === 'active'
                 ? this.localizations.find((l) => l.active)?.handle
                 : this.localizations.find((l) => l.root)?.handle;
+
+        container = computed(() => this.$refs.container);
     },
 
     unmounted() {

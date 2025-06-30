@@ -27,6 +27,7 @@ class Widget extends BaseWidget
             'fields' => $this->config('fields', []),
             'submissions' => collect($form->submissions())->reverse()->take((int) $this->config('limit', 5))->toArray(),
             'title' => $this->config('title', $form->title()),
+            'limit' => $this->config('limit', 5),
         ]);
     }
 }

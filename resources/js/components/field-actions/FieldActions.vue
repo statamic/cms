@@ -2,28 +2,44 @@
     <div class="field-dropdown">
         <div class="quick-list">
             <div class="quick-list-content">
-                <a
+                <Button
                     v-for="(action, index) in actions.filter((a) => a.quick)"
                     :key="index"
                     @click="action.run()"
                     v-tooltip="action.title"
+                    :icon-only="true"
+                    size="sm"
+                    variant="ghost"
                 >
-                    <svg-icon :name="action.icon" class="h-3 w-3" />
-                </a>
+                    <svg-icon :name="action.icon" class="size-3" />
+                </Button>
             </div>
-            <dropdown-list placement="left-start" :offset="[7, -3]">
-                <dropdown-actions :actions="actions" />
-            </dropdown-list>
+            <Dropdown>
+                <template #trigger>
+                    <Button icon="ui/dots" variant="ghost" size="xs" />
+                </template>
+                <DropdownMenu>
+                    <DropdownItem
+                        v-for="action in actions"
+                        :text="action.title"
+                        :variant="action.dangerous ? 'destructive' : 'default'"
+                        @click="action.run(action)"
+                    />
+                </DropdownMenu>
+            </Dropdown>
         </div>
     </div>
 </template>
 
 <script>
-import DropdownActions from '../field-actions/DropdownActions.vue';
+import { Button, Dropdown, DropdownMenu, DropdownItem } from '@statamic/ui';
 
 export default {
     components: {
-        DropdownActions,
+        Button,
+        Dropdown,
+        DropdownMenu,
+        DropdownItem,
     },
 
     props: {

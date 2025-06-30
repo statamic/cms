@@ -50,7 +50,7 @@ class CoreNav
         if (count(config('statamic.cp.widgets')) > 0 || config('statamic.cp.start_page') === 'dashboard') {
             Nav::topLevel('Dashboard')
                 ->route('dashboard')
-                ->icon('charts');
+                ->icon('dashboard');
         }
 
         return $this;
@@ -65,8 +65,14 @@ class CoreNav
     {
         Nav::content('Collections')
             ->route('collections.index')
-            ->icon('content-writing')
+            ->icon('collections')
             ->can('index', Collection::class)
+            ->extra([
+                'breadcrumbs' => [
+                    'create_label' => 'Create Collection',
+                    'create_url' => User::current()->can('create', Collection::class) ? cp_route('collections.create') : null,
+                ],
+            ])
             ->children(function () {
                 return CollectionAPI::all()->sortBy->title()
                     ->filter(function ($collection) {
@@ -80,14 +86,26 @@ class CoreNav
                                     ? $collection->showUrl()
                                     : $collection->editUrl()
                             )
-                            ->can('view', $collection);
+                            ->can('view', $collection)
+                            ->icon($collection->icon())
+                            ->extra([
+                                'breadcrumbs' => [
+                                    'configure_url' => User::current()->can('edit', $collection) ? $collection->editUrl() : null,
+                                ],
+                            ]);
                     });
             });
 
         Nav::content('Navigation')
             ->route('navigation.index')
-            ->icon('hierarchy-files')
+            ->icon('navigation')
             ->can('index', NavContract::class)
+            ->extra([
+                'breadcrumbs' => [
+                    'create_label' => 'Create Navigation',
+                    'create_url' => User::current()->can('create', NavContract::class) ? cp_route('navigation.create') : null,
+                ],
+            ])
             ->children(function () {
                 return NavAPI::all()->sortBy->title()
                     ->filter(function ($nav) {
@@ -101,19 +119,35 @@ class CoreNav
                                     ? $nav->showUrl()
                                     : $nav->editUrl()
                             )
-                            ->can('view', $nav);
+                            ->can('view', $nav)
+                            ->extra([
+                                'breadcrumbs' => [
+                                    'configure_url' => User::current()->can('edit', $nav) ? $nav->editUrl() : null,
+                                ],
+                            ]);
                     });
             });
 
         Nav::content('Taxonomies')
             ->route('taxonomies.index')
-            ->icon('tags')
+            ->icon('taxonomies')
             ->can('index', Taxonomy::class)
+            ->extra([
+                'breadcrumbs' => [
+                    'create_label' => 'Create Taxonomy',
+                    'create_url' => User::current()->can('create', Taxonomy::class) ? cp_route('taxonomies.create') : null,
+                ],
+            ])
             ->children(function () {
                 return TaxonomyAPI::all()->sortBy->title()->map(function ($taxonomy) {
                     return Nav::item($taxonomy->title())
                         ->url($taxonomy->showUrl())
-                        ->can('view', $taxonomy);
+                        ->can('view', $taxonomy)
+                        ->extra([
+                            'breadcrumbs' => [
+                                'configure_url' => User::current()->can('edit', $taxonomy) ? $taxonomy->editUrl() : null,
+                            ],
+                        ]);
                 });
             });
 
@@ -121,18 +155,35 @@ class CoreNav
             ->route('assets.index')
             ->icon('assets')
             ->can('index', AssetContainer::class)
+            ->extra([
+                'breadcrumbs' => [
+                    'create_label' => 'Create Asset Container',
+                    'create_url' => User::current()->can('create', AssetContainer::class) ? cp_route('asset-containers.create') : null,
+                ],
+            ])
             ->children(function () {
                 return AssetContainerAPI::all()->sortBy->title()->map(function ($assetContainer) {
                     return Nav::item($assetContainer->title())
                         ->url($assetContainer->showUrl())
-                        ->can('view', $assetContainer);
+                        ->can('view', $assetContainer)
+                        ->extra([
+                            'breadcrumbs' => [
+                                'configure_url' => User::current()->can('edit', $assetContainer) ? $assetContainer->editUrl() : null,
+                            ],
+                        ]);
                 });
             });
 
         Nav::content('Globals')
             ->route('globals.index')
-            ->icon('earth')
+            ->icon('globals')
             ->can('index', GlobalSet::class)
+            ->extra([
+                'breadcrumbs' => [
+                    'create_label' => 'Create Global Set',
+                    'create_url' => User::current()->can('create', GlobalSet::class) ? cp_route('globals.create') : null,
+                ],
+            ])
             ->children(function () {
                 return GlobalSetAPI::all()->sortBy->title()
                     ->filter(function ($globalSet) {
@@ -144,7 +195,12 @@ class CoreNav
 
                         return Nav::item($globalSet->title())
                             ->url($localized ? $localized->editUrl() : $globalSet->editUrl())
-                            ->can('view', $globalSet);
+                            ->can('view', $globalSet)
+                            ->extra([
+                                'breadcrumbs' => [
+                                    'configure_url' => User::current()->can('edit', $globalSet) ? $globalSet->editUrl() : null,
+                                ],
+                            ]);
                     })->filter();
             });
 
@@ -160,7 +216,7 @@ class CoreNav
     {
         Nav::fields('Blueprints')
             ->route('blueprints.index')
-            ->icon('blueprint')
+            ->icon('blueprints')
             ->can('configure fields');
 
         Nav::fields('Fieldsets')
@@ -180,19 +236,26 @@ class CoreNav
     {
         Nav::tools('Forms')
             ->route('forms.index')
-            ->icon('drawer-file')
+            ->icon('forms')
             ->can('index', Form::class)
+            ->extra([
+                'breadcrumbs' => [
+                    'create_label' => 'Create Form',
+                    'create_url' => cp_route('forms.create'),
+                ],
+            ])
             ->children(function () {
                 return FormAPI::all()->sortBy->title()->map(function ($form) {
                     return Nav::item($form->title())
                         ->url($form->showUrl())
-                        ->can('view', $form);
+                        ->can('view', $form)
+                        ->extra(['breadcrumbs' => ['configure_url' => $form->editUrl()]]);
                 });
             });
 
         Nav::tools('Updates')
             ->route('updater')
-            ->icon('loading-bar')
+            ->icon('updates')
             ->view('statamic::nav.updates')
             ->can('view updates');
 
@@ -214,7 +277,7 @@ class CoreNav
         if (config('statamic.graphql.enabled') && Statamic::pro()) {
             Nav::tools('GraphQL')
                 ->route('graphql.index')
-                ->icon('array')
+                ->icon('graphql')
                 ->attributes(['target' => '_blank'])
                 ->can('view graphql');
         }
@@ -236,7 +299,7 @@ class CoreNav
         if (count($utilities)) {
             Nav::tools('Utilities')
                 ->route('utilities.index')
-                ->icon('settings-slider')
+                ->icon('utilities')
                 ->children($utilities);
         }
 
@@ -252,12 +315,12 @@ class CoreNav
     {
         Nav::settings(Site::multiEnabled() ? 'Sites' : 'Site')
             ->route('sites.edit')
-            ->icon('sites')
+            ->icon('site')
             ->can('configure sites');
 
         Nav::settings('Preferences')
             ->route('preferences.index')
-            ->icon('settings')
+            ->icon('preferences')
             ->children([
                 Nav::item('General')->route('preferences.index'),
                 Nav::item('CP Nav')->route('preferences.nav.index'),
@@ -279,12 +342,12 @@ class CoreNav
 
         Nav::users('Users')
             ->route('users.index')
-            ->icon('users-box')
+            ->icon('users')
             ->can('index', UserContract::class);
 
         Nav::users('Groups')
             ->route('user-groups.index')
-            ->icon('users-multiple')
+            ->icon('groups')
             ->can('edit user groups')
             ->children(function () {
                 return UserGroupAPI::all()->sortBy->title()->map(function ($userGroup) {
@@ -295,7 +358,7 @@ class CoreNav
 
         Nav::users('Permissions')
             ->route('roles.index')
-            ->icon('shield-key')
+            ->icon('permissions')
             ->can('edit roles')
             ->children(function () {
                 return RoleAPI::all()->sortBy->title()->map(function ($role) {

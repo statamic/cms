@@ -4,7 +4,7 @@
             <div class="input-group">
                 <div class="input-group-prepend flex items-center">
                     <select
-                        class="appearance-none border-0 bg-transparent text-sm shadow-none outline-none"
+                        class="appearance-none border-0 bg-transparent text-sm shadow-none outline-hidden"
                         @input="setKey($event.target.value)"
                     >
                         <option
@@ -41,7 +41,7 @@
                         <td>
                             <input
                                 type="text"
-                                class="input-text-minimal"
+                                class="w-full"
                                 :id="fieldId + '__' + element.key"
                                 v-model="data[index].value"
                                 :readonly="isReadOnly"
@@ -77,7 +77,7 @@
                                 <td>
                                     <input
                                         type="text"
-                                        class="input-text font-bold"
+                                        class="input-text font-medium"
                                         v-model="element.key"
                                         :readonly="isReadOnly"
                                     />
@@ -93,7 +93,7 @@
                                 <td class="row-controls" v-if="!isReadOnly">
                                     <a
                                         @click="deleteOrConfirm(index)"
-                                        class="inline text-lg antialiased opacity-25 hover:opacity-75"
+                                        class="inline text-lg antialiased opacity-25 hover:opacity-75 cursor-pointer"
                                         >&times;</a
                                     >
                                 </td>
@@ -102,9 +102,9 @@
                     </sortable-list>
                 </table>
 
-                <button class="btn" @click="addValue" :disabled="atMax" v-if="!isReadOnly">
+                <Button @click="addValue" icon="plus" :disabled="atMax" v-if="!isReadOnly">
                     {{ addButton }}
-                </button>
+                </Button>
 
                 <confirmation-modal
                     v-if="deleting !== false"
@@ -124,12 +124,14 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 import { SortableList, SortableHelpers } from '../sortable/Sortable';
+import { Button } from '@statamic/ui';
 
 export default {
     mixins: [Fieldtype, SortableHelpers],
 
     components: {
         SortableList,
+        Button,
     },
 
     data() {
@@ -205,11 +207,12 @@ export default {
         replicatorPreview() {
             if (!this.showFieldPreviews || !this.config.replicator_preview) return;
 
-            return this.value.reduce((carry, value, key) => {
-                let str = `${key}: ${value}`;
-                if (carry) str = carry + ', ' + str;
-                return str;
-            }, '');
+            if (!this.value) return '';
+
+            return Object.entries(this.value)
+                .map(([key, value]) => `${key}: ${value}`)
+                .filter(Boolean)
+                .join(', ');
         },
     },
 

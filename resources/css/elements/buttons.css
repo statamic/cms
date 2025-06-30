@@ -1,40 +1,41 @@
-/* ==========================================================================
-   BUTTONS
-   ========================================================================== */
-
-button {
-    @apply font-normal;
-}
-
-/*  Base button styles that shouldn't need overriding */
-[class^='btn'],
-[class*=' btn'] {
-    @apply relative h-auto cursor-pointer select-none rounded;
-    @apply inline-flex justify-center whitespace-nowrap align-middle leading-none;
-    @apply items-center text-center text-sm subpixel-antialiased;
-
-    height: 2.375rem; /*  38px */
-    letter-spacing: -0.01em;
-    padding: 0.475rem 1.25rem;
-
-    &:focus {
-        /* @apply ring-2 outline-none dark:outline-2 dark:outline-dark-blue-100; */
-        @apply outline-none ring-2;
+/* GROUP BUTTONS
+=================================================== */
+@layer base {
+    button {
+        @apply font-normal;
     }
-
-    &:disabled {
-        @apply cursor-default;
+    
+    /*  Base button styles that shouldn't need overriding */
+    [class^='btn'],
+    [class*=' btn'] {
+        @apply relative h-auto cursor-pointer select-none rounded-sm;
+        @apply inline-flex justify-center whitespace-nowrap align-middle leading-none;
+        @apply items-center text-center text-sm subpixel-antialiased;
+    
+        height: 2.375rem; /*  38px */
+        letter-spacing: -0.01em;
+        padding: 0.475rem 1.25rem;
+    
+        &:focus {
+            /* @apply ring-2 outline-none dark:outline-2 dark:outline-dark-blue-100; */
+            @apply outline-hidden ring-2;
+        }
+    
+        &:disabled {
+            @apply cursor-default;
+        }
+    }
+    
+    .btn-height {
+        height: 2.375rem; /*  38px */
     }
 }
 
-.btn-height {
-    height: 2.375rem; /*  38px */
-}
-
-/*  Default, non-primary action button */
+/* GROUP BUTTONS / DEFAULT - the default, non-primary action button
+=================================================== */
 .btn,
 .btn-default {
-    @apply text-gray-800 shadow-button dark:text-dark-150;
+    @apply text-gray-800 shadow-sm dark:text-dark-150;
     background: linear-gradient(180deg, #fff, #f9fafb);
     background-clip: padding-box;
     border: 1px solid #d3dde7;
@@ -42,17 +43,17 @@ button {
     box-shadow:
         inset 0 1px 0 0 #fff,
         0 1px 0 0 rgba(0, 0, 0, 0.05),
-        0 2px 1px 0 theme(colors.gray.600 / 0.15),
+        0 2px 1px 0 --theme(--color-gray-600 / 0.15),
         0 0 0 0 transparent;
 
     .dark & {
-        background: linear-gradient(180deg, theme(colors.dark.550), theme(colors.dark.600));
+        background: linear-gradient(180deg, var(--color-dark-550), var(--color-dark-600));
         background-clip: padding-box;
-        border-color: theme(colors.dark.700);
+        border-color: var(--color-dark-700);
         box-shadow:
-            inset 0 1px 0 0 theme(colors.dark.300),
+            inset 0 1px 0 0 var(--color-dark-300),
             0 1px 0 0 rgba(200, 200, 200, 0.05),
-            0 2px 1px 0 theme(colors.dark.900 / 0.15),
+            0 2px 1px 0 --theme(--color-dark-900 / 0.15),
             0 0 0 0 transparent;
     }
 
@@ -64,9 +65,9 @@ button {
         border-bottom: 1px solid #bfc7d0;
 
         .dark & {
-            background: linear-gradient(180deg, theme(colors.dark.600), theme(colors.dark.700));
+            background: linear-gradient(180deg, var(--color-dark-600), var(--color-dark-700));
             background-clip: padding-box;
-            border-color: theme(colors.dark.800);
+            border-color: var(--color-dark-800);
         }
     }
 
@@ -77,13 +78,13 @@ button {
     &.active,
     &.active:hover {
         box-shadow: inset 2px 2px 3px 0 rgba(25, 30, 35, 0.1);
-        background: theme('colors.gray.400');
+        background: var(--color-gray-400);
         border-color: #aeb9c3 !important;
 
         .dark & {
-            @apply shadow-inner-dark;
-            background: theme('colors.dark.400');
-            border-color: theme(colors.dark.700) !important;
+            /* @apply shadow-inner-dark; */
+            background: var(--color-dark-400);
+            border-color: var(--color-dark-700) !important;
         }
     }
 
@@ -92,42 +93,44 @@ button {
     }
 }
 
-/*  Primary action button */
+/* GROUP BUTTONS / PRIMARY
+=================================================== */
 .btn-primary {
-    @apply border border-blue-700 border-b-blue-800 bg-gradient-to-b from-blue-500 to-blue-600 bg-clip-padding text-white dark:border-blue-900 dark:border-b-dark-blue-200 dark:from-dark-blue-100 dark:to-dark-blue-150 !important;
+    @apply border! border-blue-700! border-b-blue-800! bg-linear-to-b! from-blue-500! to-blue-600! bg-clip-padding! text-white! dark:border-blue-900! dark:border-b-dark-blue-200! dark:from-dark-blue-100! dark:to-dark-blue-150!;
     box-shadow:
-        inset 0 1px 0 0 theme('colors.blue.400'),
+        inset 0 1px 0 0 var(--color-blue-400),
         0 1px 0 0 rgba(25, 30, 35, 0.05),
-        0 3px 2px -1px theme(colors.blue.900 / 0.15),
+        0 3px 2px -1px --theme(--color-blue-900 / 0.15),
         0 0 0 0 transparent;
 
     &:hover:not(:disabled),
     :active:not(:disabled) {
-        @apply border-blue-800 border-b-blue-900 from-blue-600 to-blue-700 dark:border-blue-900 dark:border-b-dark-blue-200 dark:from-dark-blue-125 dark:to-dark-blue-175 !important;
+        @apply border-blue-800! border-b-blue-900! from-blue-600! to-blue-700! dark:border-blue-900! dark:border-b-dark-blue-200! dark:from-dark-blue-125! dark:to-dark-blue-175!;
         box-shadow:
-            inset 0 1px 0 0 theme('colors.blue.500'),
+            inset 0 1px 0 0 var(--color-blue-500),
             0 1px 0 0 rgba(25, 30, 35, 0.05),
-            0 3px 2px -1px theme(colors.blue.900 / 0.15),
+            0 3px 2px -1px --theme(--color-blue-900 / 0.15),
             0 0 0 0 transparent;
     }
 
     &:disabled {
-        @apply text-blue-200 opacity-75 dark:text-dark-blue-200 !important;
+        @apply text-blue-200! opacity-75! dark:text-dark-blue-200!;
     }
 }
 
-/*  Danger/delete button */
+/* GROUP BUTTONS / DANGER/DELETE
+=================================================== */
 .btn-danger {
-    @apply border border-red-600 border-b-red-900 bg-gradient-to-b from-red-500 to-red-600 bg-clip-padding text-white;
+    @apply border border-red-600 border-b-red-900 bg-linear-to-b from-red-500 to-red-600 bg-clip-padding text-white;
     box-shadow:
-        inset 0 1px 0 0 theme('colors.red.400'),
+        inset 0 1px 0 0 var(--color-red-400),
         0 1px 0 0 rgba(0, 0, 0, 0.05),
-        0 3px 2px -1px theme(colors.red.900 / 0.15),
+        0 3px 2px -1px --theme(--color-red-900 / 0.15),
         0 0 0 0 transparent;
 
     &:hover:not(:disabled),
     &:active:not(:disabled) {
-        @apply border border-red-700 border-b-red-900 bg-gradient-to-b from-red-600 to-red-700 bg-clip-padding;
+        @apply border border-red-700 border-b-red-900 bg-linear-to-b from-red-600 to-red-700 bg-clip-padding;
     }
 
     &:disabled {
@@ -152,7 +155,7 @@ button {
     }
 
     &:focus {
-        @apply outline-none ring-2;
+        @apply outline-hidden ring-2;
     }
 
     &:active,
@@ -165,8 +168,8 @@ button {
     }
 }
 
-/* Size Variations
-  ========================================================================== */
+/* GROUP BUTTONS / SIZE VARIATIONS
+=================================================== */
 .btn-sm {
     @apply h-8 px-2 py-1;
 }
@@ -185,9 +188,8 @@ button {
     padding: 2px 40px;
 }
 
-/* Shape Variations
-  ========================================================================== */
-
+/* GROUP BUTTONS / SHAPE VARIATIONS
+=================================================== */
 .btn-round {
     @apply flex items-center rounded-full p-0 text-center;
     background: linear-gradient(180deg, #fff, #f9fafb);
@@ -198,9 +200,9 @@ button {
     width: 32px;
 
     .dark & {
-        background: linear-gradient(180deg, theme(colors.dark.500), theme(colors.dark.550));
+        background: linear-gradient(180deg, var(--color-dark-500), var(--color-dark-550));
         background-clip: padding-box;
-        border-color: theme(colors.dark.400);
+        border-color: var(--color-dark-400);
     }
 
     &:hover:not(:disabled),
@@ -210,9 +212,9 @@ button {
         border-color: #c4cdd5;
 
         .dark & {
-            background: linear-gradient(180deg, theme(colors.dark.550), theme(colors.dark.600));
+            background: linear-gradient(180deg, var(--color-dark-550), var(--color-dark-600));
             background-clip: padding-box;
-            border-color: theme(colors.dark.500);
+            border-color: var(--color-dark-500);
         }
     }
 
@@ -222,9 +224,8 @@ button {
     }
 }
 
-/* Button Group
-  ========================================================================== */
-
+/* GROUP BUTTON GROUP
+=================================================== */
 .btn-group {
     @apply flex cursor-auto items-center justify-start p-0;
     height: 2.375rem;
@@ -261,9 +262,8 @@ button {
     }
 }
 
-/* With Icons
-  ========================================================================== */
-
+/* GROUP BUTTONS / WITH ICONS
+=================================================== */
 .btn-icon {
     padding: 1px 8px;
     border-radius: 2px;
@@ -315,11 +315,10 @@ td .btn-icon {
     }
 }
 
-/* Close button. For closing things.
-  ========================================================================== */
-
+/* GROUP BUTTONS / CLOSE BUTTON (for closing things)
+=================================================== */
 .btn-close {
-    @apply inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full p-0 text-center text-xl leading-none text-gray-600 outline-none dark:text-dark-150 ltr:ml-4 rtl:mr-4;
+    @apply inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full p-0 text-center text-xl leading-none text-gray-600 outline-hidden dark:text-dark-150 ltr:ml-4 rtl:mr-4;
 
     &:hover {
         @apply bg-gray-400 dark:bg-dark-700;
@@ -333,10 +332,10 @@ td .btn-icon {
 }
 
 .btn-quick-action {
-    @apply inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full p-0 text-center text-xl leading-none text-gray-600 outline-none dark:text-dark-150;
+    @apply inline-flex size-8 shrink-0 items-center justify-center rounded-full p-0 text-center text-xl leading-none text-gray-600 outline-hidden dark:text-dark-150;
 
     &:hover {
-        @apply bg-gray-400 dark:bg-dark-700;
+        @apply hover:bg-gray-400/10 dark:bg-dark-700;
     }
 
     &:active,
@@ -347,14 +346,10 @@ td .btn-icon {
 }
 
 .super-btn {
-    @apply flex items-start space-x-4 rounded-md border border-transparent p-4 hover:bg-gray-200 rtl:space-x-reverse;
-    @apply dark:hover:border-dark-400 dark:hover:bg-dark-575;
+    @apply flex items-start gap-5 rounded-xl border border-transparent p-3 hover:bg-gray-50 rtl:space-x-reverse;
+    @apply dark:hover:border-black/40 dark:hover:bg-black/20;
 
     svg {
-        @apply h-8 w-8 text-gray-800 dark:text-dark-200;
-    }
-
-    h3 {
-        @apply mb-2 text-blue dark:text-blue-600;
+        @apply h-8 w-8 mt-1 text-gray-600 dark:text-gray-500;
     }
 }

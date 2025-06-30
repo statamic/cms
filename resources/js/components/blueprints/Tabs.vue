@@ -3,7 +3,7 @@
         <div v-if="!singleTab && tabs.length > 0" class="tabs-container relative">
             <div
                 ref="tabs"
-                class="tabs flex flex-1 space-x-3 overflow-auto ltr:pr-6 rtl:space-x-reverse rtl:pl-6"
+                class="tabs flex flex-1 space-x-3 overflow-auto pe-6"
                 role="tablist"
             >
                 <tab
@@ -19,15 +19,13 @@
                     @updated="updateTab(tab._id, $event)"
                     @mouseenter="mouseEnteredTab(tab._id)"
                 />
-                <div class="fade-left" v-if="canScrollLeft" />
             </div>
-            <div class="fade-right ltr:right-10 rtl:left-10" />
             <button
-                class="btn-round relative top-1 flex items-center justify-center ltr:ml-2 rtl:mr-2"
+                class="btn-round relative top-1 flex items-center justify-center ms-2"
                 @click="addAndEditTab"
                 v-tooltip="addTabText"
             >
-                <svg-icon name="add" class="h-3 w-3" />
+                <svg-icon name="add" class="size-3" />
             </button>
         </div>
         <button v-if="!singleTab && tabs.length === 0" class="btn" @click="addAndEditTab" v-text="addTabText" />

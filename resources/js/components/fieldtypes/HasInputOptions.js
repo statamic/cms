@@ -7,7 +7,7 @@ export default {
                 return Object.entries(options).map(([key, value]) => {
                     return {
                         value: Array.isArray(options) ? value : key,
-                        label: __(value) || key,
+                        label: `${__(value) || key}`,
                     };
                 });
             }
@@ -25,13 +25,13 @@ export default {
 
                     return {
                         value: option[valueKey],
-                        label: __(option[labelKey]) || option[valueKey],
+                        label: `${__(option[labelKey]) || option[valueKey]}`,
                     };
                 }
 
                 return {
                     value: option,
-                    label: __(option) || option,
+                    label: `${__(option) || option}`,
                 };
             });
         },

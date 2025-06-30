@@ -1,31 +1,35 @@
 <template>
-    <div class="site-selector flex h-full items-center border-l border-r dark:border-dark-900 ltr:mr-4 rtl:ml-4">
-        <v-select
+    <div class="site-selector flex h-full items-center dark:border-dark-900 ltr:mr-4 rtl:ml-4">
+        <Select
             :options="sites"
-            label="name"
-            :get-option-key="(option) => option.handle"
-            :model-value="activeName"
-            :clearable="false"
+            option-label="name"
+            option-value="handle"
             :searchable="false"
+            :model-value="active"
+            :button-appearance="false"
             @update:model-value="selected"
         >
-            <template #selected-option="option">
+            <template #selected-option="{ option }">
                 <div
-                    class="anti flex items-center px-2 text-sm text-gray hover:text-gray-800 dark:text-dark-100 dark:hover:text-dark-175"
+                    class="anti flex items-center text-sm font-medium text-gray text-[0.8125rem] hover:text-gray-800 dark:text-dark-100 dark:hover:text-dark-175"
                 >
-                    <svg-icon name="light/sites" class="h-4 w-4 ltr:mr-2 rtl:ml-2" />
+                    <svg-icon name="sites" class="h-4 w-4 ltr:mr-2 rtl:ml-2 text-gray-500" />
                     <div class="whitespace-nowrap">{{ __(option.name) }}</div>
                 </div>
             </template>
-            <template #option="{ name, handle }">
-                <div :class="{ 'text-gray-500': handle === active }">{{ __(name) }}</div>
+            <template #option="option">
+                <div :class="{ 'text-gray-500': handle === active }">{{ __(option.name) }}</div>
             </template>
-        </v-select>
+        </Select>
     </div>
 </template>
 
 <script>
+import { Select } from '@statamic/ui';
+
 export default {
+    components: { Select },
+
     computed: {
         sites() {
             return Statamic.$config.get('sites');
@@ -41,9 +45,9 @@ export default {
     },
 
     methods: {
-        selected(site) {
-            if (site.handle !== this.active) {
-                window.location = cp_url(`select-site/${site.handle}`);
+        selected(siteHandle) {
+            if (siteHandle !== this.active) {
+                window.location = cp_url(`select-site/${siteHandle}`);
             }
         },
     },

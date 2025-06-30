@@ -1,36 +1,28 @@
 <template>
     <div>
-        <button class="btn flex w-full items-center justify-center" @click="open = true">
-            <svg-icon name="light/hyperlink" class="h-4 w-4 ltr:mr-2 rtl:ml-2" />
-            <span>{{ __('Link Existing') }}</span>
-        </button>
+        <ui-button icon="link" @click="open = true" :text="__('Link Existing')" />
 
         <stack narrow v-if="open" @closed="open = false" name="field-linker" v-slot="{ close }">
-            <div class="flex h-full flex-col bg-white dark:bg-dark-800">
-                <div
-                    class="flex items-center justify-between border-b border-gray-300 bg-gray-200 px-6 py-2 text-lg font-medium dark:border-dark-900 dark:bg-dark-600"
-                >
-                    {{ __('Link Fields') }}
-                    <button type="button" class="btn-close" @click="close" v-html="'&times'" />
-                </div>
+            <div class="h-full overflow-auto bg-white dark:bg-gray-800 p-3 rounded-l-xl">
+                <header class="flex items-center justify-between pl-3">
+                    <Heading :text="__('Link Fields')" size="lg" icon="fieldsets" />
+                    <Button type="button" icon="x" variant="subtle" @click="close" />
+                </header>
 
-                <div class="flex-1 overflow-auto p-6">
-                    <div>
-                        <p class="mb-2 text-sm font-medium" v-text="__('Link a single field')" />
-                        <p
-                            class="mb-2 text-2xs text-gray"
-                            v-text="__('Changes to this field in the fieldset will stay in sync.')"
-                        />
-                        <v-select
-                            name="field"
+                <div class="flex-1 overflow-auto px-3 py-4">
+                    <Field
+                        :label="__('Link a single field')"
+                        :instructions="__('Changes to this field in the fieldset will stay in sync.')"
+                    >
+                        <Combobox
+                            class="w-full"
                             :placeholder="__('Fields')"
                             :options="fieldSuggestions"
-                            :multiple="false"
-                            :searchable="true"
-                            :reduce="(opt) => opt.value"
-                            v-model="reference"
+                            searchable
+                            :model-value="reference"
+                            @update:modelValue="reference = $event"
                         >
-                            <template v-slot:option="option">
+                            <template #option="option">
                                 <div class="flex items-center">
                                     <span
                                         v-text="option.fieldset"
@@ -39,62 +31,65 @@
                                     <span v-text="option.label" />
                                 </div>
                             </template>
-                            <template v-slot:no-options>
+                            <template #no-options>
                                 <div
                                     class="px-4 py-2 text-sm text-gray-700 dark:text-dark-200 ltr:text-left rtl:text-right"
                                     v-text="__('No options to choose from.')"
                                 />
                             </template>
-                        </v-select>
-                        <button
-                            class="btn-primary mt-6 w-full"
-                            :class="{ 'opacity-50': !reference }"
-                            :disabled="!reference"
-                            @click="linkField"
-                            v-text="__('Link')"
-                        />
-                    </div>
+                        </Combobox>
+                    </Field>
+
+                    <Button
+                        class="w-full mt-6"
+                        variant="primary"
+                        :disabled="!reference"
+                        :text="__('Link')"
+                        @click="linkField"
+                    />
+
                     <div class="my-4 flex items-center">
                         <div class="flex-1 border-b border-gray-300 dark:border-dark-200" />
                         <div class="mx-4 text-2xs text-gray-600 dark:text-dark-175" v-text="__('or')"></div>
                         <div class="flex-1 border-b border-gray-300 dark:border-dark-200" />
                     </div>
-                    <div>
-                        <p class="mb-2 text-sm font-medium" v-text="__('Link a fieldset')" />
-                        <p
-                            class="mb-2 text-2xs text-gray dark:text-dark-175"
-                            v-text="__('Changes to this fieldset will stay in sync.')"
-                        />
-                        <v-select
-                            name="field"
+
+                    <Field
+                        class="mb-6"
+                        :label="__('Link a fieldset')"
+                        :instructions="__('Changes to this fieldset will stay in sync.')"
+                    >
+                        <Combobox
+                            class="w-full"
                             :placeholder="__('Fieldsets')"
                             :options="fieldsetSuggestions"
-                            :multiple="false"
-                            :searchable="true"
-                            :reduce="(opt) => opt.value"
-                            v-model="fieldset"
+                            searchable
+                            :model-value="fieldset"
+                            @update:modelValue="fieldset = $event"
                         >
-                            <template v-slot:no-options>
+                            <template #no-options>
                                 <div
                                     class="px-4 py-2 text-sm text-gray-700 dark:text-dark-200 ltr:text-left rtl:text-right"
                                     v-text="__('No options to choose from.')"
                                 />
                             </template>
-                        </v-select>
-                        <p class="mb-2 mt-6 text-sm font-medium" v-text="__('Prefix')" />
-                        <p
-                            class="mb-2 text-2xs text-gray dark:text-dark-175"
-                            v-text="__('messages.fieldset_link_fields_prefix_instructions')"
-                        />
-                        <text-input v-model="importPrefix" :placeholder="__('e.g. hero_')" />
-                        <button
-                            class="btn-primary mt-6 w-full"
-                            :class="{ 'opacity-50': !fieldset }"
-                            :disabled="!fieldset"
-                            @click="linkFieldset"
-                            v-text="__('Link')"
-                        />
-                    </div>
+                        </Combobox>
+                    </Field>
+
+                    <Field
+                        :label="__('Prefix')"
+                        :instructions="__('messages.fieldset_link_fields_prefix_instructions')"
+                    >
+                        <Input v-model="importPrefix" :placeholder="__('e.g. hero_')" />
+                    </Field>
+
+                    <Button
+                        class="w-full mt-6"
+                        variant="primary"
+                        :disabled="!fieldset"
+                        :text="__('Link')"
+                        @click="linkFieldset"
+                    />
                 </div>
             </div>
         </stack>
@@ -103,8 +98,11 @@
 
 <script>
 import uniqid from 'uniqid';
+import { Combobox, Button, Input, Heading, Field } from '@statamic/ui';
 
 export default {
+    components: { Heading, Combobox, Button, Input, Field },
+
     props: {
         excludeFieldset: String,
     },

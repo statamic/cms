@@ -7,33 +7,30 @@
 
 @section('content')
     @unless ($roles->isEmpty())
-        <header class="mb-6 flex items-center justify-between">
-            <h1>{{ __('Roles & Permissions') }}</h1>
-            <a href="{{ cp_route('roles.create') }}" class="btn-primary">{{ __('Create Role') }}</a>
-        </header>
+        <ui-header title="{{ __('Roles & Permissions') }}" icon="permissions">
+            <ui-button
+                href="{{ cp_route('roles.create') }}"
+                variant="primary"
+                :text="__('Create Role')"
+            ></ui-button>
+        </ui-header>
 
         <role-listing
             :initial-rows="{{ json_encode($roles) }}"
             :initial-columns="{{ json_encode($columns) }}"
         ></role-listing>
     @else
-        @include(
-            'statamic::partials.empty-state',
-            [
-                'title' => __('Roles & Permissions'),
-                'description' => __('statamic::messages.role_intro'),
-                'svg' => 'empty/users',
-                'button_text' => __('Create Role'),
-                'button_url' => cp_route('roles.create'),
-            ]
-        )
+        <x-statamic::empty-screen
+            :title="__('Roles & Permissions')"
+            :description="__('statamic::messages.role_intro')"
+            :svg="'empty/users'"
+            :button-text="__('Create Role')"
+            :button-url="cp_route('roles.create')"
+        />
     @endunless
 
-    @include(
-        'statamic::partials.docs-callout',
-        [
-            'topic' => __('Roles & Permissions'),
-            'url' => Statamic::docsUrl('users#permissions'),
-        ]
-    )
+    <x-statamic::docs-callout
+        :topic="__('Roles & Permissions')"
+        :url="Statamic::docsUrl('users#permissions')"
+    />
 @endsection
