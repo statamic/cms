@@ -2,8 +2,15 @@
 import { Pagination } from '@statamic/ui';
 import { injectListingContext } from '@statamic/components/ui/Listing/Listing.vue';
 
-const { meta, perPage, setPerPage, setCurrentPage, showPaginationTotals, showPaginationPageLinks } =
-    injectListingContext();
+const {
+    meta,
+    perPage,
+    setPerPage,
+    setCurrentPage,
+    showPaginationTotals,
+    showPaginationPageLinks,
+    showPaginationPerPageSelector,
+} = injectListingContext();
 </script>
 
 <template>
@@ -12,6 +19,7 @@ const { meta, perPage, setPerPage, setCurrentPage, showPaginationTotals, showPag
         :resource-meta="meta"
         :show-totals="showPaginationTotals"
         :show-page-links="showPaginationPageLinks"
+        :show-per-page-selector="showPaginationPerPageSelector"
         @page-selected="setCurrentPage"
         @per-page-changed="setPerPage"
     />

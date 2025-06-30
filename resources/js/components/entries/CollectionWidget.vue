@@ -46,6 +46,7 @@ function columnShowing(column) {
         :per-page="initialPerPage"
         :show-pagination-totals="false"
         :show-pagination-page-links="false"
+        :show-pagination-per-page-selector="false"
         :sort-column="initialSortColumn"
         :sort-direction="initialSortDirection"
     >

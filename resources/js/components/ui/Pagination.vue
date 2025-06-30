@@ -13,6 +13,7 @@ const props = defineProps({
     resourceMeta: { type: Object, required: true },
     scrollToTop: { type: Boolean, default: true },
     showPageLinks: { type: Boolean, default: true },
+    showPerPageSelector: { type: Boolean, default: true },
 });
 
 const onEachSide = 3;
@@ -67,6 +68,7 @@ const perPageOptions = computed(() => {
 });
 
 const isPerPageEvenUseful = computed(() => props.resourceMeta.total > perPageOptions.value[0].value);
+const showPerPageSelector = computed(() => props.showPerPageSelector && isPerPageEvenUseful.value);
 const fromItem = computed(() => props.resourceMeta.from || 0);
 const toItem = computed(() => props.resourceMeta.to || 0);
 const totalItems = computed(() => props.resourceMeta.total);
@@ -182,7 +184,7 @@ function getRange(start, end) {
             />
         </div>
 
-        <div class="flex flex-1 items-center justify-end" v-if="perPage && isPerPageEvenUseful">
+        <div class="flex flex-1 items-center justify-end" v-if="perPage && showPerPageSelector">
             <span class="me-3 text-sm text-gray-500">{{ __('Per Page') }}</span>
             <Select
                 class="w-auto!"
