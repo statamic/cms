@@ -112,7 +112,7 @@
         <template #cell-title="{ row: collection }">
             <a :href="collection.available_in_selected_site ? collection.entries_url : collection.edit_url" class="flex items-center gap-2">
                 <ui-icon :name="collection.icon || 'collections'" />
-                {{ __(collection.title) }} {{ collection.actions_url }}
+                {{ __(collection.title) }}
             </a>
         </template>
         <template #cell-entries_count="{ row: collection }">
