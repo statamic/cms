@@ -5,15 +5,15 @@ import { twMerge } from 'tailwind-merge';
 import { Icon } from '@statamic/ui';
 
 const props = defineProps({
+    append: { type: [String, Number, Boolean, null], default: null },
     as: { type: String, default: 'div' },
     color: { type: String, default: 'default' },
     href: { type: String, default: null },
     icon: { type: String, default: null },
     iconAppend: { type: String, default: null },
     pill: { type: Boolean, default: false },
+    prepend: { type: [String, Number, Boolean, null], default: null },
     size: { type: String, default: 'default' },
-    subText: { type: String, default: null },
-    subTextBefore: { type: Boolean, default: false },
     text: { type: [String, Number, Boolean, null], default: null },
     variant: { type: String, default: 'default' },
 });
@@ -70,11 +70,11 @@ const badgeClasses = computed(() => {
 
 <template>
     <component :is="tag" :class="badgeClasses" :href="props.href" data-ui-badge>
-        <span v-if="props.subText && subTextBefore" class="text-[0.625rem] leading-tight font-medium opacity-70">{{ subText }}</span>
+        <span v-if="props.prepend" class="leading-tight font-medium pe-1">{{ prepend }}</span>
         <Icon v-if="icon" :name="icon" />
         <slot v-if="hasDefaultSlot" />
         <template v-else>{{ text }}</template>
         <Icon v-if="iconAppend" :name="iconAppend" />
-        <span v-if="props.subText && !subTextBefore" class="text-[0.625rem] leading-tight font-medium opacity-70">{{ subText }}</span>
+        <span v-if="props.append" class="leading-tight font-medium ps-1">{{ append }}</span>
     </component>
 </template>
