@@ -185,7 +185,7 @@ return [
     'navigation_configure_blueprint_instructions' => 'Choose from existing Blueprints or create a new one.',
     'navigation_configure_collections_instructions' => 'Enable linking to entries in these collections.',
     'navigation_configure_handle_instructions' => 'Used to reference this navigation on the frontend. It\'s non-trivial to change later.',
-    'navigation_configure_intro' => 'Navigations are multi-level lists of links that can be used to build navbars, footers, sitemaps, and other forms of frontend navigation.',
+    'navigation_configure_intro' => 'Create multi-level lists of links for navbars, footers, sitemaps, and other forms of site navigation.',
     'navigation_configure_select_across_sites' => 'Allow selecting entries from other sites.',
     'navigation_configure_settings_intro' => 'Enable linking to collections, set a max depth, and other behaviors.',
     'navigation_configure_title_instructions' => 'Use a name that matches where it will be used, like \'Main Nav\' or \'Footer Nav\'',
