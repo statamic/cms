@@ -82,7 +82,7 @@
                     class="ltr:mr-4 rtl:ml-4"
                     :sites="sites"
                     :value="site"
-                    @input="site = $event.handle"
+                    @input="site = $event"
                 />
 
                 <Button
@@ -115,9 +115,9 @@
             v-if="view === 'list'"
             ref="list"
             :collection="handle"
-            :initial-sort-column="sortColumn"
-            :initial-sort-direction="sortDirection"
-            :initial-columns="columns"
+            :sort-column="sortColumn"
+            :sort-direction="sortDirection"
+            :columns="columns"
             :filters="filters"
             :action-url="entriesActionUrl"
             :reordering="reordering"

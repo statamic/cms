@@ -42,6 +42,7 @@ let runButtonText = computed(() => {
 
 function onDone() {
     running.value = false;
+    reset();
 }
 
 function confirm() {
@@ -67,17 +68,7 @@ function runAction() {
 function reset() {
     confirming.value = false;
     values.value = clone(props.action.values);
-
-    // TODO: `reset-action-modals` listeners are over-registering still
-    // You can see it with this:
-    // console.log('resetting!');
 }
-
-Statamic.$events.$on('reset-action-modals', reset);
-
-onUnmounted(() => {
-    Statamic.$events.$off('reset-action-modals', reset);
-});
 
 defineExpose({
     handle: props.action.handle,

@@ -69,13 +69,11 @@ class SearchedAssetsCollection extends ResourceCollection
     {
         $this->setColumns();
 
-        return [
-            'assets' => $this->collection->each(function ($asset) {
-                $asset
-                    ->blueprint($this->blueprint)
-                    ->columns($this->columns);
-            }),
-        ];
+        return $this->collection->each(function ($asset) {
+            $asset
+                ->blueprint($this->blueprint)
+                ->columns($this->columns);
+        });
     }
 
     public function with($request)
