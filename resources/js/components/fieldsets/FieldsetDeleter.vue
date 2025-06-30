@@ -10,25 +10,17 @@
     >
         <template #default>
             <template v-if="Object.keys(resource.imported_by).length > 0">
-                <p class="mb-2">
-                    {{
-                        __(
-                            `Before you can delete this fieldset, you need to remove references to it in blueprints and fieldsets:`,
-                        )
-                    }}
-                </p>
+                <ui-description>
+                    {{ __('Before you can delete this fieldset, you need to remove references to it in blueprints and fieldsets:') }}
+                </ui-description>
 
                 <div v-for="(items, group) in resource.imported_by">
-                    <h3 class="little-heading mb-2 ltr:pl-0 rtl:pr-0">{{ group }}</h3>
-
-                    <ul class="list-disc ltr:pl-4 rtl:pr-4">
-                        <li
-                            v-for="item in items"
-                            :key="item.handle"
-                            class="mb-1.5 font-mono text-sm"
-                            v-text="item.title"
-                        ></li>
-                    </ul>
+                    <ui-badge
+                        v-for="item in items"
+                        :key="item.handle"
+                        :text="item.title"
+                        :prepend="group"
+                    />
                 </div>
             </template>
 

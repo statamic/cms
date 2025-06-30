@@ -41,8 +41,7 @@ class ViewNavigationListingTest extends TestCase
             ->actingAs($user)
             ->visitIndex()
             ->assertSuccessful()
-            ->assertViewHas('navs', collect([]))
-            ->assertSee('no-results');
+            ->assertSee('Get started by creating your first navigation');
     }
 
     #[Test]
@@ -112,7 +111,7 @@ class ViewNavigationListingTest extends TestCase
         $response = $this
             ->actingAs($user)
             ->visitIndex()
-            ->assertSee('Create Navigation');
+            ->assertSee('Create a Navigation');
     }
 
     #[Test]

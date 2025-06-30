@@ -1,81 +1,33 @@
-<script>
-import Listing from '../Listing.vue';
-import { Widget, Badge } from '@statamic/ui';
+<script setup>
+import { Widget, Badge, Listing, Icon, Tooltip } from '@statamic/ui';
+import { ref } from 'vue';
 
-export default {
-    mixins: [Listing],
-
-    components: {
-        Badge,
-        Widget,
-    },
-
-    props: {
-        count: Number,
-        hasStatamicUpdate: Boolean,
-        updatableAddons: Object,
-    },
-
-    data() {
-        return {
-            cols: [
-                { label: 'Package', field: 'name', visible: true },
-                { label: 'Current', field: 'current_version', visible: true },
-                { label: 'Latest', field: 'latest_version', visible: true },
-            ],
-            items: [],
-            currentPage: 1,
-        };
-    },
-
-    methods: {
-        getItems() {
-            const items = [];
-
-            if (this.hasStatamicUpdate) {
-                items.push({ name: 'Statamic Core', type: 'core', slug: 'statamic' });
-            }
-
-            Object.entries(this.updatableAddons || {}).forEach(([slug, name]) => {
-                items.push({ name, type: 'addon', slug });
-            });
-
-            return items;
-        },
-    },
-
-    created() {
-        this.items = this.getItems();
-    },
-};
+defineProps({
+    items: Object,
+});
 </script>
 
 <template>
-    <Widget :title="__('Updates')" icon="updates">
-        <data-list v-if="items.length" :rows="items" :columns="cols" :sort="false">
-            <data-list-table unstyled class="[&_td]:p-0.5 [&_td]:text-sm [&_thead]:hidden">
-                <template #cell-name="{ row: update }">
-                    <a :href="cp_url(`updater/${update.slug}`)" class="flex items-center gap-2">
-                        <span>{{ update.name.name || update.name }}</span>
-                        <Badge size="sm" pill color="green" text="2" />
-                    </a>
-                </template>
-            </data-list-table>
-        </data-list>
-
-        <p v-else class="p-3 text-center text-sm text-gray-600">
-            {{ __('Everything is up to date.') }}
-        </p>
-
-        <template #actions>
-            <data-list-pagination
-                v-if="meta.last_page != 1"
-                :resource-meta="meta"
-                @page-selected="selectPage"
-                :scroll-to-top="false"
-                :show-page-links="false"
-            />
-            <slot name="actions" />
-        </template>
-    </Widget>
+    <Listing :items="items" v-slot="{ items }">
+        <Widget :title="__('Updates')" icon="updates">
+            <table v-if="items.length" class="">
+                <tr v-for="update in items" class="text-sm">
+                    <td class="py-1 pr-4 leading-tight">
+                        <a :href="update.url" class="flex items-center gap-2" v-text="update.name" />
+                    </td>
+                    <td>
+                        <Badge pill variant="flat" :color="update.critical ? 'red' : 'green'" :text="update.count" />
+                        <Tooltip :text="__('Critical')">
+                            <div class="inline-flex">
+                                <Icon v-if="update.critical" name="warning-diamond" color="red" />
+                            </div>
+                        </Tooltip>
+                    </td>
+                </tr>
+            </table>
+            <p v-else class="p-3 text-center text-sm text-gray-600">
+                {{ __('Everything is up to date.') }}
+            </p>
+        </Widget>
+    </Listing>
 </template>
