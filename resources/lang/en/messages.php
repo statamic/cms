@@ -222,7 +222,7 @@ return [
     'session_expiry_enter_two_factor_code' => 'Enter the code from your authenticator app to continue where you left off',
     'session_expiry_enter_two_factor_recovery_code' => 'Enter a two-factor recovery code to continue where you left off',
     'session_expiry_logged_out_for_inactivity' => 'You have been logged out because you\'ve been inactive for a while.',
-    'session_expiry_logging_out_in_seconds' => 'You have been inactive for a while and will be logged out in :seconds seconds. Click to extend your session.',
+    'session_expiry_logging_out_in_seconds' => 'You have been inactive for a while and will be logged out in :seconds seconds.',
     'session_expiry_new_window' => 'Opens in a new window. Come back once you\'ve logged in.',
     'set_new_password_instructions' => 'Confirm your email address and create a new password.',
     'show_slugs_instructions' => 'Whether to display slugs in the tree view.',

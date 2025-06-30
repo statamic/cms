@@ -20,7 +20,7 @@ const hasHeader = computed(() => {
                     <ui-icon :name="icon" class="size-5" />
                 </ui-card>
                 <ui-heading :level="1" size="xl" v-if="title" v-text="title" />
-                <ui-description :text="description" v-if="description" />
+                <ui-description :text="description" v-if="description" class="text-center mt-1.5"/>
             </header>
             <slot />
         </div>

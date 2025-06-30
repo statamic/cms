@@ -59,16 +59,12 @@ const classes = computed(() =>
     cva({
         base: [
             'min-w-0',
-            /* When label exists but no description follows */
-            '[&>[data-ui-label]:not(:has(+[data-ui-description]))]:mb-2',
-            /* When label is followed by description */
-            '*:data-ui-description:mb-2 *:data-ui-description:mt-1',
         ],
         variants: {
             variant: {
                 block: 'w-full',
                 inline: [
-                    'grid gap-x-3 gap-y-1.5',
+                    'flex justify-between gap-x-3 gap-y-1.5',
                     'has-[[data-ui-label]~[data-ui-control]]:grid-cols-[1fr_auto]',
                     'has-[[data-ui-control]~[data-ui-label]]:grid-cols-[auto_1fr]',
                     '[&>[data-ui-control]~[data-ui-description]]:row-start-2 [&>[data-ui-control]~[data-ui-description]]:col-start-2',
@@ -93,10 +89,17 @@ const instructions = computed(() => props.instructions ? markdown(props.instruct
             </slot>
             <slot name="actions" />
         </div>
-        <slot v-if="!$slots.actions" name="label">
-            <Label v-if="label" v-bind="labelProps" class="flex-1" />
-        </slot>
-        <Description :text="instructions" v-if="instructions && !instructionsBelow" />
+        <!-- =Jay. Only add bottom margins if there is no switch that follows, because the layout of the switch is with flexbox to the right of the field (rather than underneath the field text).
+
+        [&:not(:has(+[data-ui-switch]))]:mb-1 = add a bottom margin if a switch doesn't follow
+        [&:has([data-ui-description]):not(:has(+[data-ui-switch]))]:mb-2.5 = add an increased bottom margin if there's a description (and a switch doesn't follow)
+        -->
+        <div data-ui-field-text class="[&:not(:has(+[data-ui-switch]))]:mb-1 [&:has([data-ui-description]):not(:has(+[data-ui-switch]))]:mb-2.5">
+            <slot v-if="!$slots.actions" name="label">
+                <Label v-if="label" v-bind="labelProps" class="flex-1" />
+            </slot>
+            <Description :text="instructions" class="mt-1" v-if="instructions && !instructionsBelow" />
+        </div>
         <slot />
         <Description :text="instructions" v-if="instructions && instructionsBelow" class="mt-2" />
         <Description v-if="errors" v-for="(error, i) in errors" :key="i" :text="error" class="mt-2 text-red-500" />

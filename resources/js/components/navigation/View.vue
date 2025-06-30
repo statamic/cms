@@ -124,7 +124,7 @@
 
             <template v-if="canEdit" #branch-options="{ branch, removeBranch, stat, depth }">
                 <DropdownItem v-if="isEntryBranch(stat)" :text="__('Edit Entry')" :href="branch.edit_url" />
-                <DropdownItem :text="__('Edit nav item')" @click="editPage(branch)" />
+                <DropdownItem :text="__('Edit Nav item')" @click="editPage(branch)" />
                 <DropdownItem v-if="depth < maxDepth" :text="__('Add child nav item')" @click="linkPage(stat)" />
                 <DropdownItem
                     v-if="depth < maxDepth && hasCollections"
