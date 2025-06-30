@@ -13,6 +13,10 @@ class CacheResponse
             return $next($request);
         }
 
+        if ($this->isMutation($request)) {
+            return $next($request);
+        }
+
         $cache = app(ResponseCache::class);
 
         if ($response = $cache->get($request)) {
@@ -24,5 +28,11 @@ class CacheResponse
         $cache->put($request, $response);
 
         return $response;
+    }
+
+    protected function isMutation($request): bool
+    {
+        $query = ltrim(strtolower($request->get('query', '')));
+        return str_starts_with($query, 'mutation');
     }
 }
