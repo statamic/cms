@@ -23,6 +23,7 @@ const props = defineProps({
     prepend: { type: String, default: null },
     required: { type: Boolean, default: false },
     size: { type: String, default: 'base' },
+    tabindex: { type: Number, default: null },
     type: { type: String, default: 'text' },
     viewable: { type: Boolean, default: false },
 });
@@ -124,6 +125,7 @@ const copy = () => {
                 :value="modelValue"
                 :placeholder="placeholder"
                 :disabled="disabled"
+                :tabindex="tabindex"
                 data-ui-control
                 data-ui-group-target
                 v-bind="$attrs"
