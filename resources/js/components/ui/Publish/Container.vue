@@ -11,7 +11,7 @@ import { watch, provide, getCurrentInstance, ref, onBeforeUnmount } from 'vue';
 import Component from '@statamic/components/Component.js';
 import { getActivePinia } from 'pinia';
 
-const emit = defineEmits(['updated']);
+const emit = defineEmits(['updated', 'updated:visibleValues']);
 
 const container = getCurrentInstance();
 
@@ -103,6 +103,12 @@ watch(
         if (props.trackDirtyState) dirty();
         emit('updated', values);
     },
+    { deep: true },
+);
+
+watch(
+    () => store.visibleValues,
+    (values) => emit('updated:visibleValues', values),
     { deep: true },
 );
 

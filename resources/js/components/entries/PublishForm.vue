@@ -88,6 +88,7 @@
             :track-dirty-state="trackDirtyState"
             :sync-field-confirmation-text="syncFieldConfirmationText"
             @updated="values = $event"
+            @update:visible-values="visibleValues = $event"
         >
             <LivePreview
                 :enabled="isPreviewing"
@@ -249,7 +250,6 @@ import PublishActions from './PublishActions.vue';
 import SaveButtonOptions from '../publish/SaveButtonOptions.vue';
 import RevisionHistory from '../revision-history/History.vue';
 import HasPreferences from '../data-list/HasPreferences';
-import HasHiddenFields from '../publish/HasHiddenFields';
 import HasActions from '../publish/HasActions';
 import striptags from 'striptags';
 import clone from '@statamic/util/clone.js';
@@ -285,7 +285,7 @@ let errors = ref({});
 let container = null;
 
 export default {
-    mixins: [HasPreferences, HasHiddenFields, HasActions],
+    mixins: [HasPreferences, HasActions],
 
     components: {
         Button,
@@ -359,6 +359,7 @@ export default {
             fieldset: this.initialFieldset,
             title: this.initialTitle,
             values: clone(this.initialValues),
+            visibleValues: {},
             meta: clone(this.initialMeta),
             extraValues: clone(this.initialExtraValues),
             localizations: clone(this.initialLocalizations),
