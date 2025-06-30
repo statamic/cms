@@ -3,11 +3,15 @@
 namespace Statamic\Http\Resources\CP\Assets;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Fluent;
 use Statamic\Facades\Action;
 use Statamic\Support\Str;
+use Statamic\Support\Traits\Hookable;
 
 class FolderAsset extends JsonResource
 {
+    use Hookable;
+
     protected $blueprint;
     protected $columns;
 
@@ -25,6 +29,49 @@ class FolderAsset extends JsonResource
         return $this;
     }
 
+    private function getImageThumbnail()
+    {
+        return [
+            'is_image' => true,
+            'thumbnail' => $this->thumbnailUrl('small'),
+            'can_be_transparent' => $this->isSvg() || $this->extensionIsOneOf(['svg', 'png', 'webp', 'avif']),
+            'alt' => $this->alt,
+            'orientation' => $this->orientation(),
+        ];
+    }
+
+    private function getVideoThumbnail()
+    {
+        return [
+            'thumbnail' => $this->thumbnailUrl('small'),
+        ];
+    }
+
+    private function thumbnails()
+    {
+        $data = ['thumbnail' => null];
+
+        if ($this->isImage() || $this->isSvg()) {
+            $data = $this->getImageThumbnail();
+        } elseif (config('statamic.assets.video_thumbnails', true) && $this->isVideo()) {
+            $data = $this->getVideoThumbnail();
+        }
+
+        return array_merge(
+            $data,
+            $this->runAssetHook() ?? []
+        );
+    }
+
+    private function runAssetHook()
+    {
+        $payload = $this->runHooksWith('asset', [
+            'data' => new Fluent,
+        ]);
+
+        return $payload->data->toArray();
+    }
+
     public function toArray($request)
     {
         return [
@@ -35,22 +82,14 @@ class FolderAsset extends JsonResource
             'size_formatted' => Str::fileSizeForHumans($this->size(), 0),
             'last_modified_relative' => $this->lastModified()->diffForHumans(),
 
-            $this->mergeWhen($this->isImage() || $this->isSvg(), function () {
-                return [
-                    'is_image' => true,
-                    'thumbnail' => $this->thumbnailUrl('small'),
-                    'can_be_transparent' => $this->isSvg() || $this->extensionIsOneOf(['svg', 'png', 'webp', 'avif']),
-                    'alt' => $this->alt,
-                    'orientation' => $this->orientation(),
-                ];
-            }),
-
             $this->merge($this->values()),
 
             'actions' => Action::for($this->resource, [
                 'container' => $this->container()->handle(),
                 'folder' => $this->folder(),
             ]),
+
+            $this->merge($this->thumbnails()),
         ];
     }
 
