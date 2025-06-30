@@ -34,6 +34,7 @@
                                     name="email"
                                     value="{{ old('email') }}"
                                     autofocus
+                                    tabindex="1"
                                 />
                             </ui-field>
 
@@ -42,9 +43,10 @@
                                     name="password"
                                     type="password"
                                     value="{{ old('password') }}"
+                                    tabindex="2"
                                 />
                                 <template #actions>
-                                    <a  href="{{ cp_route('password.request') }}" class="text-blue-400 text-sm hover:text-blue-600">
+                                    <a href="{{ cp_route('password.request') }}" class="text-blue-400 text-sm hover:text-blue-600" tabindex="3">
                                         {{ __('Forgot password?') }}
                                     </a>
                                 </template>
