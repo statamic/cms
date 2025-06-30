@@ -33,6 +33,7 @@ class CacheResponse
     protected function isMutation($request): bool
     {
         $query = ltrim(strtolower($request->get('query', '')));
+
         return str_starts_with($query, 'mutation');
     }
 }
