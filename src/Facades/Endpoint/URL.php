@@ -27,6 +27,14 @@ class URL
     }
 
     /**
+     * Check whether trailing slashes are currently being enforced.
+     */
+    public function isEnforcingTrailingSlashes(): bool
+    {
+        return self::$enforceTrailingSlashes;
+    }
+
+    /**
      * Tidy a URL (normalize slashes).
      */
     public function tidy(?string $url, ?bool $external = false, ?bool $withTrailingSlash = null): string

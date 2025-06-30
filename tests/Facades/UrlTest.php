@@ -896,4 +896,18 @@ class UrlTest extends TestCase
         $this->assertSame('http://localhost/bar', URL::replaceSlug('http://localhost/foo/', 'bar'));
         $this->assertSame('http://localhost/foo%24bar', URL::encode('http://localhost/foo$bar'));
     }
+
+    #[Test]
+    public function it_can_check_if_enforcing_trailing_slashes_using_getter()
+    {
+        $this->assertFalse(URL::isEnforcingTrailingSlashes());
+
+        URL::enforceTrailingSlashes();
+
+        $this->assertTrue(URL::isEnforcingTrailingSlashes());
+
+        URL::enforceTrailingSlashes(false);
+
+        $this->assertFalse(URL::isEnforcingTrailingSlashes());
+    }
 }

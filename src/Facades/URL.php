@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static string encode($url)
  * @method static mixed getDefaultUri($locale, $uri)
  * @method static string gravatar($email, $size = null)
+ * @method static bool isEnforcingTrailingSlashes()
  *
  * @see \Statamic\Facades\Endpoint\Url
  */
