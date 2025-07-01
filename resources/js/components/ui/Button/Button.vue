@@ -89,7 +89,8 @@ const buttonClasses = computed(() => {
         <Icon v-if="icon" :name="icon" />
         <Icon v-if="loading" name="loading" :size />
 
-        <div class="trim-text-start">
+        <!-- =Jay. trim-text-start seems to make smaller buttons look worse such as the collections index "Create Entry" buttons -->
+        <div :class="{ 'trim-text-start': size !== 'xs' && size !== 'sm' }">
             <slot v-if="hasDefaultSlot" />
             <template v-else>{{ text }}</template>
         </div>
