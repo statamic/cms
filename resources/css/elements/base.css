@@ -23,7 +23,11 @@
 /* FOCUS STATES
 =================================================== */
 @layer base {
-    /* (Except where the focus-within class will handle the focus outline target instead) */
+    /* Explicitly show focus without needing to tab */
+    .show-focus:focus,
+    /* e.g. Assets > cancel button on delete modal */
+    [data-dismissable-layer] button:focus,
+    /* and then a global selector for focus-visible everywhere else (except where the focus-within class will handle the focus outline target instead) */
     :not([class*='focus-within'] *) {
         :focus-visible& {
             outline-width: var(--focus-outline-width);
