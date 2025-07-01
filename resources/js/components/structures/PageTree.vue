@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="mb-2 flex justify-end">
+        <div class="mb-3 flex justify-end">
             <a class="text-2xs text-blue-600 underline ltr:mr-4 rtl:ml-4" v-text="__('Expand All')" @click="expandAll" />
             <a
                 class="text-2xs text-blue-600 underline ltr:mr-2 rtl:ml-2"
@@ -9,80 +9,91 @@
             />
         </div>
 
-        <div class="loading card" v-if="loading">
-            <loading-graphic />
-        </div>
+        <ui-panel>
+            <div class="loading card" v-if="loading">
+                <loading-graphic />
+            </div>
 
-        <div v-if="!loading && pages.length == 0" class="no-results flex w-full items-center">
-            <slot name="empty" />
-        </div>
+            <div v-if="!loading && pages.length == 0" class="no-results flex w-full items-center">
+                <slot name="empty" />
+            </div>
 
-        <div v-if="!loading" class="page-tree w-full">
-            <Draggable
-                ref="tree"
-                v-model="treeData"
-                :disable-drag="!editable"
-                :space="1"
-                :indent="24"
-                :dir="direction"
-                :node-key="(stat) => stat.data.id"
-                :each-droppable="eachDroppable"
-                :root-droppable="rootDroppable"
-                :max-level="maxDepth"
-                :stat-handler="statHandler"
-                @after-drop="treeUpdated"
-                @open:node="nodeOpened"
-                @close:node="nodeClosed"
-            >
-                <template #placeholder>
-                    <div class="w-full rounded-sm border border-dashed border-blue-400 bg-blue-500/10 p-2">&nbsp;</div>
-                </template>
+            <ui-panel-header>
+                <div class="page-tree-header font-medium text-sm flex justify-between">
+                    <div>Title</div>
+                    <div class="me-15">Template</div>
+                </div>
+            </ui-panel-header>
+            <div v-if="!loading" class="page-tree">
+                <Draggable
+                    ref="tree"
+                    v-model="treeData"
+                    :disable-drag="!editable"
+                    :space="1"
+                    :indent="24"
+                    :dir="direction"
+                    :node-key="(stat) => stat.data.id"
+                    :each-droppable="eachDroppable"
+                    :root-droppable="rootDroppable"
+                    :max-level="maxDepth"
+                    :stat-handler="statHandler"
+                    @after-drop="treeUpdated"
+                    @open:node="nodeOpened"
+                    @close:node="nodeClosed"
+                >
+                    <template #placeholder>
+                        <div class="w-full rounded-sm border border-dashed border-blue-400 bg-blue-500/10 p-2">&nbsp;</div>
+                    </template>
 
-                <template #default="{ node, stat }">
-                    <tree-branch
-                        :ref="`branch-${node.id}`"
-                        :page="node"
-                        :stat="stat"
-                        :depth="stat.level"
-                        :first-page-is-root="expectsRoot"
-                        :is-open="stat.open"
-                        :has-children="stat.children.length > 0"
-                        :show-slugs="showSlugs"
-                        :show-blueprint="blueprints?.length > 1"
-                        :editable="editable"
-                        :root="isRoot(stat)"
-                        @edit="$emit('edit-page', node, $event)"
-                        @toggle-open="stat.open = !stat.open"
-                        @removed="pageRemoved"
-                        @branch-clicked="$emit('branch-clicked', node)"
-                        class="mb-px"
-                    >
-                        <template #branch-action="props">
-                            <slot name="branch-action" v-bind="{ ...props, stat }" />
-                        </template>
+                    <template #default="{ node, stat }">
+                        <tree-branch
+                            :ref="`branch-${node.id}`"
+                            :page="node"
+                            :stat="stat"
+                            :depth="stat.level"
+                            :first-page-is-root="expectsRoot"
+                            :is-open="stat.open"
+                            :has-children="stat.children.length > 0"
+                            :show-slugs="showSlugs"
+                            :show-blueprint="blueprints?.length > 1"
+                            :editable="editable"
+                            :root="isRoot(stat)"
+                            @edit="$emit('edit-page', node, $event)"
+                            @toggle-open="stat.open = !stat.open"
+                            @removed="pageRemoved"
+                            @branch-clicked="$emit('branch-clicked', node)"
+                            class="mb-px"
+                        >
+                            <template #branch-action="props">
+                                <slot name="branch-action" v-bind="{ ...props, stat }" />
+                            </template>
 
-                        <template #branch-icon="props">
-                            <slot name="branch-icon" v-bind="{ ...props, stat }" />
-                        </template>
+                            <template #branch-icon="props">
+                                <slot name="branch-icon" v-bind="{ ...props, stat }" />
+                            </template>
 
-                        <template #branch-options="props">
-                            <slot name="branch-options" v-bind="{ ...props, stat }" />
-                        </template>
-                    </tree-branch>
-                </template>
-            </Draggable>
-        </div>
+                            <template #branch-options="props">
+                                <slot name="branch-options" v-bind="{ ...props, stat }" />
+                            </template>
+                        </tree-branch>
+                    </template>
+                </Draggable>
+            </div>
+        </ui-panel>
     </div>
 </template>
 
 <script>
 import { dragContext, Draggable, walkTreeData } from '@he-tree/vue';
 import TreeBranch from './Branch.vue';
+import { PanelHeader, Panel } from '@statamic/ui';
 
 export default {
     components: {
         Draggable,
         TreeBranch,
+        PanelHeader,
+        Panel,
     },
 
     props: {

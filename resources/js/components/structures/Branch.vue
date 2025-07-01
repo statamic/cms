@@ -3,7 +3,7 @@
         <slot name="branch-action" :branch="page">
             <div v-if="editable" class="page-move w-6" />
         </slot>
-        <div class="flex flex-1 items-center p-2 text-xs leading-normal ltr:ml-2 rtl:mr-2">
+        <div class="flex flex-1 items-center p-2 text-xs leading-normal">
             <div class="flex grow items-center" @click="$emit('branch-clicked', page)">
                 <div class="little-dot ltr:mr-2 rtl:ml-2" :class="getStatusClass()" v-tooltip="getStatusTooltip()" />
                 <svg-icon
@@ -49,7 +49,7 @@
                 <div
                     v-if="showBlueprint && page.entry_blueprint"
                     v-text="__(page.entry_blueprint.title)"
-                    class="ml-4 shrink text-4xs uppercase text-gray-600 dark:text-dark-175"
+                    class="ms-4 me-4 shrink text-xs text-gray-600 dark:text-dark-175"
                 />
 
                 <slot name="branch-icon" :branch="page" />
@@ -123,7 +123,7 @@ export default {
         getStatusClass() {
             switch (this.page.status) {
                 case 'published':
-                    return 'bg-green-600';
+                    return 'bg-green-400';
                 case 'draft':
                     return 'bg-gray-400 dark:bg-dark-200';
                 default:
