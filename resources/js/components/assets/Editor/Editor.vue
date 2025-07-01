@@ -10,123 +10,33 @@
 
             <template v-if="!loading">
                 <!-- Header -->
-                <div id="asset-editor-header" class="relative flex w-full justify-between px-2">
+                <header id="asset-editor-header" class="relative flex w-full justify-between px-2">
                     <button
-                        class="group flex items-center p-4"
+                        class="group flex items-center gap-3 p-4"
                         @click="open"
                         v-tooltip.right="__('Open in a new window')"
                         :aria-label="__('Open in a new window')"
                     >
-                        <svg-icon name="folder-image" class="h-5 w-5 text-gray-700 dark:text-dark-175" />
-                        <span
-                            class="text-sm text-gray-800 group-hover:text-blue-600 dark:text-dark-150 dark:group-hover:text-dark-100 ltr:ml-2 rtl:mr-2"
-                            >{{ asset.path }}</span
-                        >
-                        <svg-icon
-                            name="micro/chevron-right"
-                            class="h-5 w-5 text-gray-700 group-hover:text-blue-600 dark:text-dark-175 dark:group-hover:text-dark-100 rtl:rotate-180"
-                        />
+                        <ui-icon name="folder-photos" class="size-5 group-hover:text-blue-600" />
+                        <span class="text-sm group-hover:text-blue-600 dark:text-gray-400 dark:group-hover:text-gray-200">
+                            {{ asset.path }}
+                        </span>
                     </button>
-                    <button
-                        class="btn-close absolute top-2 ltr:right-2.5 rtl:left-2.5"
-                        @click="close"
-                        :aria-label="__('Close Editor')"
-                    >
-                        &times;
-                    </button>
-                </div>
+                    <ui-button variant="ghost" icon="x" class="absolute top-1.5 end-1.5" round @click="close" :aria-label="__('Close Editor')" />
+                </header>
 
                 <div class="flex flex-1 grow flex-col overflow-scroll md:flex-row md:justify-between">
                     <!-- Visual Area -->
-                    <div
-                        class="editor-preview md:min-h-auto flex min-h-[45vh] w-full flex-1 flex-col justify-between bg-gray-800 shadow-[inset_0px_4px_3px_0px_black] dark:bg-dark-950 md:w-1/2 md:flex-auto md:grow lg:w-2/3 md:ltr:rounded-tr-md md:rtl:rounded-tl-md"
-                    >
+                    <div class="editor-preview md:min-h-auto flex min-h-[45vh] w-full flex-1 flex-col justify-between bg-gray-800 shadow-[inset_0px_4px_3px_0px_black] dark:bg-gray-900 md:w-1/2 md:flex-auto md:grow lg:w-2/3 md:ltr:rounded-se-md">
                         <!-- Toolbar -->
-                        <div
-                            id="asset-editor-toolbar"
-                            class="flex items-center justify-center space-x-1 px-2 py-4 text-center text-2xs text-white @container/toolbar dark:text-dark-100 sm:space-x-3 rtl:space-x-reverse"
-                            v-if="isToolbarVisible"
-                        >
-                            <button
-                                v-if="isImage && isFocalPointEditorEnabled"
-                                type="button"
-                                class="flex items-center justify-center rounded-sm bg-gray-750 px-3 py-1.5 hover:bg-gray-900 hover:text-yellow-light dark:bg-dark-400 dark:hover:bg-dark-600 dark:hover:text-yellow-dark"
-                                @click.prevent="openFocalPointEditor"
-                            >
-                                <svg-icon name="focal-point" class="h-4" />
-                                <span class="hidden @3xl/toolbar:inline-block ltr:ml-2 rtl:mr-2">{{
-                                    __('Focal Point')
-                                }}</span>
-                            </button>
-
-                            <button
-                                v-if="canRunAction('rename_asset')"
-                                type="button"
-                                class="flex items-center rounded-sm bg-gray-750 px-3 py-1.5 hover:bg-gray-900 hover:text-yellow-light dark:bg-dark-400 dark:hover:bg-dark-600 dark:hover:text-yellow-dark"
-                                @click.prevent="runAction('rename_asset')"
-                            >
-                                <svg-icon name="rename-file" class="h-4" />
-                                <span class="hidden @3xl/toolbar:inline-block ltr:ml-2 rtl:mr-2">{{
-                                    __('Rename')
-                                }}</span>
-                            </button>
-
-                            <button
-                                v-if="canRunAction('move_asset')"
-                                type="button"
-                                class="flex items-center rounded-sm bg-gray-750 px-3 py-1.5 hover:bg-gray-900 hover:text-yellow-light dark:bg-dark-400 dark:hover:bg-dark-600 dark:hover:text-yellow-dark"
-                                @click.prevent="runAction('move_asset')"
-                            >
-                                <svg-icon name="move-file" class="h-4" />
-                                <span class="hidden @3xl/toolbar:inline-block ltr:ml-2 rtl:mr-2">{{ __('Move') }}</span>
-                            </button>
-
-                            <button
-                                v-if="canRunAction('replace_asset')"
-                                type="button"
-                                class="flex items-center rounded-sm bg-gray-750 px-3 py-1.5 hover:bg-gray-900 hover:text-yellow-light dark:bg-dark-400 dark:hover:bg-dark-600 dark:hover:text-yellow-dark"
-                                @click.prevent="runAction('replace_asset')"
-                            >
-                                <svg-icon name="swap" class="h-4" />
-                                <span class="hidden @3xl/toolbar:inline-block ltr:ml-2 rtl:mr-2">{{
-                                    __('Replace')
-                                }}</span>
-                            </button>
-
-                            <button
-                                v-if="canRunAction('reupload_asset')"
-                                type="button"
-                                class="flex items-center rounded-sm bg-gray-750 px-3 py-1.5 hover:bg-gray-900 hover:text-yellow-light dark:bg-dark-400 dark:hover:bg-dark-600 dark:hover:text-yellow-dark"
-                                @click.prevent="runAction('reupload_asset')"
-                            >
-                                <svg-icon name="upload-cloud" class="h-4" />
-                                <span class="hidden @3xl/toolbar:inline-block ltr:ml-2 rtl:mr-2">{{
-                                    __('Reupload')
-                                }}</span>
-                            </button>
-
-                            <button
-                                v-if="asset.allowDownloading"
-                                class="flex items-center rounded-sm bg-gray-750 px-3 py-1.5 hover:bg-gray-900 hover:text-yellow-light dark:bg-dark-400 dark:hover:bg-dark-600 dark:hover:text-yellow-dark"
-                                @click="download"
-                                :aria-label="__('Download file')"
-                            >
-                                <svg-icon name="download-desktop" class="h-4" />
-                                <span class="hidden @3xl/toolbar:inline-block ltr:ml-2 rtl:mr-2">{{
-                                    __('Download')
-                                }}</span>
-                            </button>
-
-                            <button
-                                v-if="allowDeleting && canRunAction('delete')"
-                                @click="runAction('delete')"
-                                class="flex items-center rounded-sm bg-gray-750 px-3 py-1.5 text-center hover:bg-gray-900 hover:text-red-400 dark:bg-dark-400 dark:hover:bg-dark-600 dark:hover:text-dark-red"
-                            >
-                                <svg-icon name="trash" class="h-4" />
-                                <span class="hidden @3xl/toolbar:inline-block ltr:ml-2 rtl:mr-2">{{
-                                    __('Delete')
-                                }}</span>
-                            </button>
+                        <div v-if="isToolbarVisible" class="@container/toolbar dark flex items-center justify-center gap-2 px-2 py-4">
+                            <ui-button v-if="isImage && isFocalPointEditorEnabled" @click.prevent="openFocalPointEditor" icon="focus" variant="filled" v-tooltip="__('Focal Point')" />
+                            <ui-button v-if="canRunAction('rename_asset')" @click.prevent="runAction('rename_asset')" icon="rename" variant="filled" v-tooltip="__('Rename')" />
+                            <ui-button v-if="canRunAction('move_asset')" @click.prevent="runAction('move_asset')" icon="move-folder" variant="filled" v-tooltip="__('Move to Folder')" />
+                            <ui-button v-if="canRunAction('replace_asset')" @click.prevent="runAction('replace_asset')" icon="replace" variant="filled" v-tooltip="__('Replace')" />
+                            <ui-button v-if="canRunAction('reupload_asset')" @click.prevent="runAction('reupload_asset')" icon="upload-cloud" variant="filled" v-tooltip="__('Reupload')" />
+                            <ui-button v-if="asset.allowDownloading" @click="download" icon="download" variant="filled" v-tooltip="__('Download')" />
+                            <ui-button v-if="allowDeleting && canRunAction('delete')" @click="runAction('delete')" icon="trash" variant="filled" v-tooltip="__('Delete')" />
 
                             <ItemActions
                                 v-if="actionsMenu.length"
@@ -162,41 +72,35 @@
                                 <img v-if="asset.isImage" :src="asset.preview" class="asset-thumb" />
 
                                 <!-- SVG -->
-                                <div v-else-if="asset.isSvg" class="bg-checkerboard flex h-full w-full flex-col">
-                                    <div class="flex border-b-2 border-gray-900">
-                                        <div
-                                            class="order-r flex flex-1 items-center justify-center border-gray-900 p-4"
-                                        >
-                                            <img :src="asset.url" class="asset-thumb h-4 w-4" />
+                                <div v-else-if="asset.isSvg" class="flex h-full w-full flex-col">
+                                    <div class="grid grid-cols-3 gap-1">
+                                        <div class="bg-checkerboard flex items-center justify-center p-3 aspect-square">
+                                            <img :src="asset.url" class="asset-thumb relative z-10 size-4" />
                                         </div>
-                                        <div
-                                            class="flex flex-1 items-center justify-center border-gray-900 p-4 ltr:border-l ltr:border-r rtl:border-l rtl:border-r"
-                                        >
-                                            <img :src="asset.url" class="asset-thumb h-12 w-12" />
+                                        <div class="bg-checkerboard flex items-center justify-center p-3 aspect-square">
+                                            <img :src="asset.url" class="asset-thumb relative z-10 size-12" />
                                         </div>
-                                        <div
-                                            class="flex flex-1 items-center justify-center border-gray-900 p-4 ltr:border-l rtl:border-r"
-                                        >
-                                            <img :src="asset.url" class="asset-thumb h-24 w-24" />
+                                        <div class="bg-checkerboard flex items-center justify-center p-3 aspect-square">
+                                            <img :src="asset.url" class="asset-thumb relative z-10 size-24" />
                                         </div>
                                     </div>
-                                    <div class="flex h-full min-h-0 items-center justify-center p-4">
-                                        <img :src="asset.url" class="asset-thumb max-h-full w-2/3 max-w-full" />
+                                    <div class="bg-checkerboard h-full min-h-0 mt-1 flex items-center justify-center p-3 aspect-square">
+                                        <img :src="asset.url" class="asset-thumb relative z-10 max-h-full w-2/3 max-w-full" />
                                     </div>
                                 </div>
 
                                 <!-- Audio -->
                                 <div class="w-full shadow-none" v-else-if="asset.isAudio">
-                                    <audio :src="asset.url" class="w-full" controls preload="auto"></audio>
+                                    <audio :src="asset.url" class="w-full" controls preload="auto" />
                                 </div>
 
                                 <!-- Video -->
-                                <video :src="asset.url" controls v-else-if="asset.isVideo"></video>
+                                <video :src="asset.url" controls v-else-if="asset.isVideo" />
                             </div>
                         </div>
 
                         <div class="h-full" v-else-if="asset.isPdf">
-                            <pdf-viewer :src="asset.pdfUrl"></pdf-viewer>
+                            <pdf-viewer :src="asset.pdfUrl" />
                         </div>
 
                         <div class="h-full" v-else-if="asset.isPreviewable && canUseGoogleDocsViewer">
@@ -231,50 +135,16 @@
                     </PublishContainer>
                 </div>
 
-                <div
-                    class="flex w-full items-center justify-end rounded-b border-t bg-gray-200 px-4 py-3 dark:border-dark-200 dark:bg-dark-550"
-                >
-                    <div
-                        id="asset-meta-data"
-                        class="hidden h-full flex-1 space-x-3 py-1 text-xs text-gray-800 dark:text-dark-150 sm:flex rtl:space-x-reverse"
-                    >
-                        <div
-                            class="flex items-center rounded-sm bg-gray-400 py-1 dark:bg-dark-600 ltr:pl-2 ltr:pr-3 rtl:pl-3 rtl:pr-2"
-                            v-if="isImage"
-                        >
-                            <svg-icon name="image-picture" class="h-3 ltr:mr-2 rtl:ml-2" />
-                            <div class="">
-                                {{ __('messages.width_x_height', { width: asset.width, height: asset.height }) }}
-                            </div>
-                        </div>
-                        <div
-                            class="flex items-center rounded-sm bg-gray-400 py-1 dark:bg-dark-600 ltr:pl-2 ltr:pr-3 rtl:pl-3 rtl:pr-2"
-                        >
-                            <svg-icon name="sd-card" class="h-3 ltr:mr-2 rtl:ml-2" />
-                            <div class="">{{ asset.size }}</div>
-                        </div>
-                        <div
-                            class="flex items-center rounded-sm bg-gray-400 py-1 dark:bg-dark-600 ltr:pl-2 ltr:pr-3 rtl:pl-3 rtl:pr-2"
-                        >
-                            <svg-icon name="thumbprint" class="h-3 ltr:mr-2 rtl:ml-2" />
-                            <div class="" :title="$date.format(asset.lastModified)">
-                                {{ asset.lastModifiedRelative }}
-                            </div>
-                        </div>
+                <div class="flex w-full items-center justify-end rounded-b border-t dark:border-gray-700 bg-gray-100 dark:bg-gray-900 px-4 py-3">
+                    <div class="hidden h-full flex-1 gap-3 py-1 sm:flex">
+                        <ui-badge v-if="isImage" icon="assets" :text="__('messages.width_x_height', { width: asset.width, height: asset.height })" />
+                        <ui-badge icon="memory" :text="asset.size" />
+                        <ui-badge icon="fingerprint" :text="asset.lastModifiedRelative" />
                     </div>
                     <div class="flex items-center space-x-3 rtl:space-x-reverse">
-                        <button type="button" class="btn" @click="navigateToPreviousAsset">
-                            {{ __('<') }}
-                        </button>
-                        <button type="button" class="btn" @click="navigateToNextAsset">
-                            {{ __('>') }}
-                        </button>
-                        <button type="button" class="btn" @click="close">
-                            {{ __('Cancel') }}
-                        </button>
-                        <button type="button" class="btn-primary" @click="saveAndClose" v-if="!readOnly">
-                            {{ __('Save') }}
-                        </button>
+                        <ui-button icon="ui/chevron-left" @click="navigateToPreviousAsset" v-tooltip="__('Previous Asset')" />
+                        <ui-button icon="ui/chevron-right" @click="navigateToNextAsset" v-tooltip="__('Next Asset')" />
+                        <ui-button variant="primary" icon="save" @click="saveAndClose" v-if="!readOnly" :text="__('Save')" />
                     </div>
                 </div>
             </template>

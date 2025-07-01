@@ -27,9 +27,9 @@ const badgeClasses = computed(() => {
         base: 'inline-flex items-center gap-1 font-normal antialiased whitespace-nowrap no-underline not-prose [button]:cursor-pointer group [&_svg]:opacity-60 [&_svg]:group-hover:opacity-100',
         variants: {
             size: {
-                sm: 'text-2xs py-0 leading-normal px-1 rounded-[0.1875rem] [&_svg]:size-2',
-                default: 'text-xs py-0.5 px-2.25 rounded-sm [&_svg]:size-2.5',
-                lg: 'font-medium text-sm py-0.5 leading-relaxed px-2.5 rounded-lg [&_svg]:size-3 [&_svg]:me-1',
+                sm: 'text-2xs py-0 leading-normal px-1 rounded-[0.1875rem] [&_svg]:size-2.5',
+                default: 'text-xs py-0.5 px-2.25 rounded-sm [&_svg]:size-3.5 gap-2',
+                lg: 'font-medium text-sm py-0.5 leading-relaxed px-2.5 rounded-lg [&_svg]:size-3 gap-2',
             },
             color: {
                 amber: 'bg-amber-100 border-amber-400 text-amber-700 [a]:hover:bg-amber-200/70 [button]:hover:bg-amber-200/70',
