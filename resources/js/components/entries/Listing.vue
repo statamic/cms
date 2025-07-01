@@ -29,6 +29,7 @@
                 :text="__('Visit URL')"
                 :href="entry.permalink"
                 icon="eye"
+                target="_blank"
                 v-if="entry.viewable && entry.permalink"
             />
             <DropdownItem :text="__('Edit')" :href="entry.edit_url" icon="edit" v-if="entry.editable" />
