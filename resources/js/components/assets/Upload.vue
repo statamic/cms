@@ -1,5 +1,5 @@
 <template>
-    <div class="p-3 overflow-hidden border border-gray-300 border-t-0 dark:border-gray-700 dark:bg-gray-800 text-sm text-gray-600 dark:text-gray-400">
+    <div class="p-3 overflow-hidden dark:border-gray-700 dark:bg-gray-800 text-sm text-gray-600 dark:text-gray-400">
         <div class="flex flex-1 items-center gap-3">
             <div class="size-7 flex items-center justify-center">
                 <ui-icon name="warning-diamond" class="size-5 text-red-500" v-tooltip="error" v-if="status === 'error'" />

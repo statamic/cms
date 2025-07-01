@@ -78,12 +78,13 @@
                     </div>
                 </div>
 
-                <uploads
-                    v-if="uploads.length"
-                    :uploads="uploads"
-                    allow-selecting-existing
-                    @existing-selected="uploadSelected"
-                />
+                <div v-if="uploads.length" class="border-gray-300 border-l border-r">
+                    <uploads
+                        :uploads="uploads"
+                        allow-selecting-existing
+                        @existing-selected="uploadSelected"
+                    />
+                </div>
 
                 <template v-if="expanded">
                     <sortable-list
