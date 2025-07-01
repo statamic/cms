@@ -1,6 +1,35 @@
 <template>
     <div>
         <Header :title="__(title)" :icon="icon">
+            <template v-if="view === 'tree'">
+                <a
+                    class="text-2xs text-blue-600 underline ltr:mr-4 rtl:ml-4 cursor-pointer"
+                    v-if="treeIsDirty"
+                    v-text="__('Discard changes')"
+                    @click="cancelTreeProgress"
+                />
+
+                <site-selector
+                    v-if="sites.length > 1"
+                    class="ltr:mr-4 rtl:ml-4"
+                    :sites="sites"
+                    :value="site"
+                    @input="site = $event.handle"
+                />
+
+                <Button
+                    :class="{ disabled: !treeIsDirty, 'btn-danger': deletedEntries.length }"
+                    :disabled="!treeIsDirty"
+                    @click="saveTree"
+                    v-text="__('Save Changes')"
+                    v-tooltip="
+                        deletedEntries.length
+                            ? __n('An entry will be deleted|:count entries will be deleted', deletedEntries.length)
+                            : null
+                    "
+                />
+            </template>
+
             <ItemActions
                 :url="actionUrl"
                 :actions="actions"
@@ -28,47 +57,16 @@
                 </Dropdown>
             </ItemActions>
 
-            <div v-if="canUseStructureTree && !treeIsDirty">
-                <ui-button
-                    :href="createUrl"
-                    :text="__('Create Collection')"
-                    variant="primary"
-                    v-if="canCreateCollections"
-                />
-                <ui-toggle-group v-model="view">
-                    <ui-toggle-item icon="navigation" value="tree" />
-                    <ui-toggle-item icon="layout-list" value="list" />
-                </ui-toggle-group>
-            </div>
-
-            <template v-if="view === 'tree'">
-                <a
-                    class="text-2xs text-blue-600 underline ltr:mr-4 rtl:ml-4"
-                    v-if="treeIsDirty"
-                    v-text="__('Discard changes')"
-                    @click="cancelTreeProgress"
-                />
-
-                <site-selector
-                    v-if="sites.length > 1"
-                    class="ltr:mr-4 rtl:ml-4"
-                    :sites="sites"
-                    :value="site"
-                    @input="site = $event.handle"
-                />
-
-                <Button
-                    :class="{ disabled: !treeIsDirty, 'btn-danger': deletedEntries.length }"
-                    :disabled="!treeIsDirty"
-                    @click="saveTree"
-                    v-text="__('Save Changes')"
-                    v-tooltip="
-                        deletedEntries.length
-                            ? __n('An entry will be deleted|:count entries will be deleted', deletedEntries.length)
-                            : null
-                    "
-                />
-            </template>
+            <ui-button
+                :href="createUrl"
+                :text="__('Create Collection')"
+                variant="primary"
+                v-if="canCreateCollections"
+            />
+            <ui-toggle-group v-model="view">
+                <ui-toggle-item icon="navigation" value="tree" />
+                <ui-toggle-item icon="layout-list" value="list" />
+            </ui-toggle-group>
 
             <template v-if="view === 'list' && reorderable">
                 <site-selector
