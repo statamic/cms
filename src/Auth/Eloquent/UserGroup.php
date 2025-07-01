@@ -2,9 +2,9 @@
 
 namespace Statamic\Auth\Eloquent;
 
+use Illuminate\Support\Facades\DB;
 use Statamic\Auth\File\UserGroup as FileUserGroup;
 use Statamic\Facades\User;
-use Illuminate\Support\Facades\DB;
 
 class UserGroup extends FileUserGroup
 {
