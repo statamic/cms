@@ -3,12 +3,18 @@
 namespace Statamic\Http\Controllers\CP\Collections;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Statamic\Contracts\Entries\Collection as CollectionContract;
 use Statamic\Facades\File;
 use Statamic\Http\Controllers\CP\CpController;
 
 class ScaffoldCollectionController extends CpController
 {
+    protected array $templateExtensions = [
+        'antlers' => '.antlers.html',
+        'blade' => '.blade.php',
+    ];
+
     public function index($collection)
     {
         $this->authorize('store', CollectionContract::class, __('You are not authorized to scaffold resources.'));
@@ -37,9 +43,20 @@ class ScaffoldCollectionController extends CpController
         ];
     }
 
+    private function getTemplateFile($filename)
+    {
+        $extension = Arr::get(
+            $this->templateExtensions,
+            config('statamic.templates.engine', 'antlers'),
+            '.antlers.html'
+        );
+
+        return resource_path("views/{$filename}{$extension}");
+    }
+
     private function makeTemplate($filename)
     {
-        $file = resource_path("views/{$filename}.antlers.html");
+        $file = $this->getTemplateFile($filename);
 
         // Don't overwrite existing
         if (! File::get($file)) {
