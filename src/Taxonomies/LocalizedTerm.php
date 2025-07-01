@@ -29,6 +29,7 @@ use Statamic\Facades;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Site;
+use Statamic\Facades\URL;
 use Statamic\GraphQL\ResolvesValues;
 use Statamic\Http\Responses\DataResponse;
 use Statamic\Revisions\Revisable;
@@ -352,14 +353,16 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
 
     public function route()
     {
-        $route = '/'.str_replace('_', '-', $this->taxonomyHandle()).'/{slug}';
+        $taxonomySlug = Str::replace('_', '-', $this->taxonomyHandle());
 
-        if ($this->collection()) {
-            $collectionUrl = $this->collection()->uri($this->locale()) ?? $this->collection()->handle();
-            $route = $collectionUrl.$route;
+        if (! $this->taxonomy()->isAssignedToCollection()) {
+            return URL::tidy("/{$taxonomySlug}/{slug}");
         }
 
-        return $route;
+        $collectionUri = $this->collection()->uri($this->locale())
+            ?? Str::replace('_', '-', $this->collection()->handle());
+
+        return URL::tidy("/{$collectionUri}/{$taxonomySlug}/{slug}");
     }
 
     public function routeData()
