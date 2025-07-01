@@ -7,7 +7,7 @@
             />
             <Dropdown placement="left-start">
                 <DropdownMenu>
-                    <DropdownItem :text="__('Edit')" icon="edit" :href="item.edit_url" />
+                    <DropdownItem :text="__('Configure')" icon="cog" :href="item.edit_url" />
                     <DropdownItem v-if="item.deleteable" :text="__('Delete')" icon="trash" variant="destructive" @click="$refs[`deleter_${item.id}`][0].confirm()" />
                 </DropdownMenu>
             </Dropdown>

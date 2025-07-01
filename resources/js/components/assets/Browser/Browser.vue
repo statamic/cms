@@ -10,9 +10,9 @@
                         :href="createContainerUrl"
                     />
                     <DropdownItem
-                        icon="edit"
+                        icon="cog"
                         v-if="container.can_edit"
-                        :text="__('Edit Container')"
+                        :text="__('Configure Container')"
                         :href="container.edit_url"
                     />
                     <DropdownItem
@@ -86,14 +86,6 @@
                             <ListingCustomizeColumns />
                         </div>
 
-                        <uploads
-                            v-if="uploads.length"
-                            :uploads="uploads"
-                            :allow-selecting-existing="allowSelectingExistingUpload"
-                            class="mb-3 rounded-lg"
-                            @existing-selected="existingUploadSelected"
-                        />
-
                         <div
                             v-if="containerIsEmpty"
                             class="rounded-lg border border-dashed border-gray-300 p-6 text-center text-gray-500"
@@ -119,6 +111,14 @@
                                     :step="25"
                                 />
                             </PanelHeader>
+
+                            <uploads
+                                v-if="uploads.length"
+                                :uploads="uploads"
+                                :allow-selecting-existing="allowSelectingExistingUpload"
+                                class="mb-3 rounded-lg"
+                                @existing-selected="existingUploadSelected"
+                            />
                             <Table
                                 v-if="mode === 'table'"
                                 :assets="items"

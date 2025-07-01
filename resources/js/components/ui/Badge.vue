@@ -70,11 +70,11 @@ const badgeClasses = computed(() => {
 
 <template>
     <component :is="tag" :class="badgeClasses" :href="props.href" data-ui-badge>
-        <span v-if="props.prepend" class="leading-tight font-medium pe-1">{{ prepend }}</span>
+        <span v-if="props.prepend" class="font-medium border-e border-dashed pe-1.5 me-0.5">{{ prepend }}</span>
         <Icon v-if="icon" :name="icon" />
         <slot v-if="hasDefaultSlot" />
         <template v-else>{{ text }}</template>
         <Icon v-if="iconAppend" :name="iconAppend" />
-        <span v-if="props.append" class="leading-tight font-medium ps-1">{{ append }}</span>
+        <span v-if="props.append" class="font-medium border-s border-dashed ms-0.5 ps-1.5">{{ append }}</span>
     </component>
 </template>

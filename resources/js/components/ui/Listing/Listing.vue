@@ -139,7 +139,7 @@ const activeFilters = ref({});
 const activeFilterBadges = ref([]);
 const stateBeforeReordering = ref(null);
 const currentPage = ref(1);
-const perPage = ref(props.perPage);
+const perPage = ref(initializePerPage());
 const initializing = ref(true);
 const loading = ref(true);
 let popping = false;
@@ -418,6 +418,20 @@ function setCurrentPage(page) {
 
 function setPerPage(value) {
     perPage.value = value;
+
+    if (props.preferencesPrefix) {
+        Statamic.$preferences.set(props.preferencesPrefix + '.per_page', value);
+    }
+}
+
+function initializePerPage() {
+    let perPage = props.perPage;
+
+    if (props.preferencesPrefix) {
+        perPage = Statamic.$preferences.get(props.preferencesPrefix + '.per_page', perPage);
+    }
+
+    return perPage;
 }
 
 function setSearchQuery(query) {
