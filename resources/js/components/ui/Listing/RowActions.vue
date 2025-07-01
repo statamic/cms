@@ -66,7 +66,7 @@ function dropdownHovered(loadActions) {
                     :key="action.handle"
                     :text="__(action.title)"
                     :icon="action.icon"
-                    :class="{ 'text-red-500': action.dangerous }"
+                    :variant="action.dangerous ? 'destructive' : 'default'"
                     @click="action.run"
                 />
             </DropdownMenu>
