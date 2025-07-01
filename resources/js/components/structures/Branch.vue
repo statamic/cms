@@ -1,9 +1,9 @@
 <template>
-    <div class="page-tree-branch flex">
+    <div class="page-tree-branch flex" :class="{ 'page-tree-branch--has-children': hasChildren }">
         <slot name="branch-action" :branch="page">
             <div v-if="editable" class="page-move w-6" />
         </slot>
-        <div class="flex flex-1 items-center p-2 text-xs leading-normal">
+        <div class="flex flex-1 items-center p-1.5 text-xs leading-normal">
             <div class="flex grow items-center" @click="$emit('branch-clicked', page)">
                 <div class="little-dot ltr:mr-2 rtl:ml-2" :class="getStatusClass()" v-tooltip="getStatusTooltip()" />
                 <svg-icon
@@ -36,8 +36,8 @@
                 </button>
 
                 <div v-if="page.collection && editable" class="flex items-center ltr:ml-4 rtl:mr-4">
-                    <svg-icon name="light/content-writing" class="h-4 w-4" />
-                    <div class="ltr:ml-1 rtl:mr-1">
+                    <Icon name="navigation" class="h-3.5 w-3.5" />
+                    <div class="ms-2 ">
                         <a :href="page.collection.create_url" v-text="__('Add')" />
                         <span class="text-gray">/</span>
                         <a :href="page.collection.edit_url" v-text="__('Edit')" />
@@ -49,7 +49,7 @@
                 <div
                     v-if="showBlueprint && page.entry_blueprint"
                     v-text="__(page.entry_blueprint.title)"
-                    class="ms-4 me-4 shrink text-xs text-gray-600 dark:text-dark-175"
+                    class="ms-4 me-4 shrink font-mono lowercase text-xs text-gray-400 dark:text-dark-175"
                 />
 
                 <slot name="branch-icon" :branch="page" />
@@ -70,10 +70,10 @@
 </template>
 
 <script>
-import { Dropdown, DropdownMenu } from '@statamic/ui';
+import { Dropdown, DropdownMenu, Icon } from '@statamic/ui';
 
 export default {
-    components: { Dropdown, DropdownMenu },
+    components: { Dropdown, DropdownMenu, Icon },
     props: {
         page: Object,
         depth: Number,
