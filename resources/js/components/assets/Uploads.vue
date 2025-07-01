@@ -1,19 +1,17 @@
 <template>
-    <div class="bg-gray-400 p-2 text-xs dark:bg-dark-800">
-        <upload
-            v-for="(upload, i) in uploads"
-            :key="upload.id"
-            :basename="upload.basename"
-            :extension="upload.extension"
-            :percent="upload.percent"
-            :error="upload.errorMessage"
-            :error-status="upload.errorStatus"
-            :allow-selecting-existing="allowSelectingExisting"
-            @clear="clearUpload(i)"
-            @retry="retry(i, $event)"
-            @existing-selected="existingSelected(i)"
-        />
-    </div>
+    <upload
+        v-for="(upload, i) in uploads"
+        :key="upload.id"
+        :basename="upload.basename"
+        :extension="upload.extension"
+        :percent="upload.percent"
+        :error="upload.errorMessage"
+        :error-status="upload.errorStatus"
+        :allow-selecting-existing="allowSelectingExisting"
+        @clear="clearUpload(i)"
+        @retry="retry(i, $event)"
+        @existing-selected="existingSelected(i)"
+    />
 </template>
 
 <script>
