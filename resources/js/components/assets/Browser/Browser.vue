@@ -10,9 +10,9 @@
                         :href="createContainerUrl"
                     />
                     <DropdownItem
-                        icon="edit"
+                        icon="cog"
                         v-if="container.can_edit"
-                        :text="__('Edit Container')"
+                        :text="__('Configure Container')"
                         :href="container.edit_url"
                     />
                     <DropdownItem

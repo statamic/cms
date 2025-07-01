@@ -3,7 +3,7 @@
         <Header v-if="mounted" :title="title" icon="navigation">
             <Dropdown placement="left-start">
                 <DropdownMenu>
-                    <DropdownItem v-if="canEdit" :text="__('Edit Navigation')" icon="edit" :href="editUrl" />
+                    <DropdownItem v-if="canEdit" :text="__('Configure Navigation')" icon="cog" :href="editUrl" />
                     <DropdownItem v-if="canEditBlueprint" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="blueprintUrl" />
                 </DropdownMenu>
             </Dropdown>
