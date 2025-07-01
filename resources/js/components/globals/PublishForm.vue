@@ -57,6 +57,7 @@
             :is-root="isRoot"
             :sync-field-confirmation-text="syncFieldConfirmationText"
             @updated="values = $event"
+            @update:visible-values="visibleValues = $event"
         >
             <PublishTabs />
         </PublishContainer>
@@ -65,7 +66,6 @@
 
 <script>
 import SiteSelector from '../SiteSelector.vue';
-import HasHiddenFields from '../publish/HasHiddenFields';
 import clone from '@statamic/util/clone.js';
 import { Button, Dropdown, DropdownItem, DropdownMenu, Header } from '@statamic/ui';
 import PublishContainer from '@statamic/components/ui/Publish/Container.vue';
@@ -80,8 +80,6 @@ let errors = ref({});
 let container = null;
 
 export default {
-    mixins: [HasHiddenFields],
-
     components: {
         PublishComponents,
         PublishContainer,
@@ -128,6 +126,7 @@ export default {
             fieldset: this.initialFieldset,
             title: this.initialTitle,
             values: clone(this.initialValues),
+            visibleValues: {},
             meta: clone(this.initialMeta),
             localizations: clone(this.initialLocalizations),
             localizedFields: this.initialLocalizedFields,
