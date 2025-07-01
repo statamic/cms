@@ -71,6 +71,8 @@ import { default as TabTrigger } from './Tabs/Trigger.vue';
 import { default as Tabs } from './Tabs/Tabs.vue';
 import { default as Textarea } from './Textarea.vue';
 import { default as TimePicker } from './TimePicker/TimePicker.vue';
+import { default as ToggleGroup } from './Toggle/Group.vue';
+import { default as ToggleItem } from './Toggle/Item.vue';
 import { default as Tooltip } from './Tooltip.vue';
 import { default as Widget } from './Widget.vue';
 import { default as Pagination } from './Pagination.vue';
@@ -156,6 +158,8 @@ export {
     Tabs,
     Textarea,
     TimePicker,
+    ToggleGroup,
+    ToggleItem,
     Tooltip,
     Widget,
     Pagination,

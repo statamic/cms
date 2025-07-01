@@ -28,23 +28,17 @@
                 </Dropdown>
             </ItemActions>
 
-            <div class="btn-group ltr:mr-4 rtl:ml-4" v-if="canUseStructureTree && !treeIsDirty">
-                <button
-                    class="btn flex items-center px-4"
-                    @click="view = 'tree'"
-                    :class="{ active: view === 'tree' }"
-                    v-tooltip="__('Tree')"
-                >
-                    <svg-icon name="light/structures" class="h-4 w-4" />
-                </button>
-                <button
-                    class="btn flex items-center px-4"
-                    @click="view = 'list'"
-                    :class="{ active: view === 'list' }"
-                    v-tooltip="__('List')"
-                >
-                    <svg-icon name="assets-mode-table" class="h-4 w-4" />
-                </button>
+            <div v-if="canUseStructureTree && !treeIsDirty">
+                <ui-button
+                    :href="createUrl"
+                    :text="__('Create Collection')"
+                    variant="primary"
+                    v-if="canCreateCollections"
+                />
+                <ui-toggle-group v-model="view">
+                    <ui-toggle-item icon="navigation" value="tree" />
+                    <ui-toggle-item icon="layout-list" value="list" />
+                </ui-toggle-group>
             </div>
 
             <template v-if="view === 'tree'">
@@ -202,7 +196,7 @@ import DeleteLocalizationConfirmation from './DeleteLocalizationConfirmation.vue
 import SiteSelector from '../SiteSelector.vue';
 import HasActions from '../publish/HasActions';
 import { defineAsyncComponent } from 'vue';
-import { Dropdown, DropdownItem, DropdownLabel, DropdownMenu, DropdownSeparator, Header, Button } from '@statamic/ui';
+import { Dropdown, DropdownItem, DropdownLabel, DropdownMenu, DropdownSeparator, Header, Button, ToggleGroup, ToggleItem } from '@statamic/ui';
 import ItemActions from '@statamic/components/actions/ItemActions.vue';
 
 export default {
@@ -217,6 +211,8 @@ export default {
         Dropdown,
         Header,
         Button,
+        ToggleGroup,
+        ToggleItem,
         PageTree: defineAsyncComponent(() => import('../structures/PageTree.vue')),
         DeleteEntryConfirmation,
         DeleteLocalizationConfirmation,
