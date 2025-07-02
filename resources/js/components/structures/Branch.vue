@@ -49,7 +49,7 @@
                 <div
                     v-if="showBlueprint && page.entry_blueprint"
                     v-text="__(page.entry_blueprint.title)"
-                    class="ms-4 me-4 shrink lowercase font-mono text-2xs text-gray-500 dark:text-dark-175"
+                    class="ms-4 me-4 shrink lowercase text-2xs text-gray-500 dark:text-dark-175"
                 />
 
                 <slot name="branch-icon" :branch="page" />
