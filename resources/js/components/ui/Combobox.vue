@@ -43,8 +43,8 @@ defineOptions({
 
 const attrs = useAttrs();
 
-const anchorClasses = cva({
-    base: 'focus-within:focus-outline w-full flex items-center justify-between gap-2 text-gray-800 dark:text-gray-300 antialiased appearance-none',
+const triggerClasses = cva({
+    base: 'min-h-full w-full flex items-center',
     variants: {
         size: {
             base: 'text-base rounded-lg ps-3 pe-2.5 py-2 h-10 leading-[1.375rem]',
@@ -241,6 +241,7 @@ function pushTaggableOption(e) {
 <template>
     <div class="flex">
         <ComboboxRoot
+            class="cursor-pointer"
             v-bind="attrs"
             ignore-filter
             :multiple
@@ -252,8 +253,8 @@ function pushTaggableOption(e) {
             @update:open="updateDropdownOpen"
             @update:model-value="updateModelValue"
         >
-            <ComboboxAnchor :class="[anchorClasses, $attrs.class]" data-ui-combobox-anchor>
-                <ComboboxTrigger as="div" class="min-h-full w-full flex items-center">
+            <ComboboxAnchor :class="['focus-within:focus-outline w-full flex items-center justify-between gap-2 text-gray-800 dark:text-gray-300 antialiased appearance-none', $attrs.class]" data-ui-combobox-anchor>
+                <ComboboxTrigger as="div" :class="triggerClasses">
                     <ComboboxInput
                         v-if="searchable && (dropdownOpen || !modelValue || (multiple && placeholder))"
                         ref="input"
@@ -272,13 +273,12 @@ function pushTaggableOption(e) {
                             <span v-else v-text="getOptionLabel(selectedOption)" />
                         </slot>
                     </button>
-                </ComboboxTrigger>
-                <div class="flex items-center">
-                    <Button icon="x" variant="filled" size="xs" round v-if="clearable && modelValue" @click="clear" />
-                    <ComboboxTrigger class="flex items-center">
+
+                    <div class="flex items-center">
+                        <Button icon="x" variant="filled" size="xs" round v-if="clearable && modelValue" @click="clear" />
                         <Icon name="ui/chevron-down" />
-                    </ComboboxTrigger>
-                </div>
+                    </div>
+                </ComboboxTrigger>
             </ComboboxAnchor>
 
             <ComboboxPortal>
