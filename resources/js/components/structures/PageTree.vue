@@ -1,10 +1,10 @@
 <template>
     <div>
         <div class="mb-3 flex justify-end items-center">
-            <a class="text-2xs text-blue-600 underline me-1.5" v-text="__('Expand All')" @click="expandAll" />
+            <a class="text-2xs text-blue-600 underline me-1" v-text="__('Expand All')" @click="expandAll" />
             <span class="text-blue-600 text-2xs">/</span>
             <a
-                class="text-2xs text-blue-600 underline ms-1.5"
+                class="text-2xs text-blue-600 underline ms-1"
                 v-text="__('Collapse All')"
                 @click="collapseAll"
             />
