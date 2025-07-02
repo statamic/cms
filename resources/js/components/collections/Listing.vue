@@ -73,7 +73,7 @@
                                     </div>
                                 </template>
                                 <template #cell-date="{ row: entry }" v-if="collection.dated">
-                                    <div class="text-end font-mono text-xs text-gray-400 ps-6">
+                                    <div class="text-end font-mono text-xs text-gray-500 ps-6">
                                         <date-time :of="entry.date" date-only />
                                     </div>
                                 </template>
