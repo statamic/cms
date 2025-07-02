@@ -1,64 +1,59 @@
 <template>
     <stack narrow name="publish-options" @closed="$emit('closed')" v-slot="{ close }">
-        <div class="flex h-full flex-col bg-white dark:bg-dark-800">
-            <div
-                class="flex items-center justify-between border-b border-gray-300 bg-gray-200 px-6 py-2 text-lg font-medium dark:border-dark-900 dark:bg-dark-600"
+        <div class="m-2 flex h-full flex-col rounded-xl bg-white dark:bg-gray-800">
+            <header
+                class="flex items-center justify-between rounded-t-xl border-b border-gray-300 bg-gray-50 px-4 py-2 dark:border-gray-950 dark:bg-gray-900"
             >
-                {{ __('Publish') }}
-                <button type="button" class="btn-close" @click="close" v-html="'&times'" />
-            </div>
+                <Heading size="lg">{{ __('Publish') }}</Heading>
+                <Button icon="x" variant="ghost" class="-me-2" @click="close" />
+            </header>
 
-            <div class="flex-1 overflow-auto p-6">
+            <div class="flex-1 overflow-auto">
                 <div class="loading flex h-full items-center justify-center" v-if="saving">
-                    <loading-graphic text="" />
+                    <loading-graphic />
                 </div>
 
-                <template v-else>
-                    <select-input class="mb-6" v-model="action" :options="options" />
+                <div class="p-3 flex flex-col space-y-6" v-else>
+                    <Select class="w-full" :options v-model="action" />
 
-                    <div v-if="action">
-                        <date-fieldtype
-                            v-if="action == 'schedule'"
-                            class="mb-6"
-                            name="publishTime"
-                            :value="publishTime"
-                        />
+                    <template v-if="action">
+<!--                        <DatePicker-->
+<!--                            v-if="action == 'schedule'"-->
+<!--                            v-model="publishTime"-->
+<!--                        />-->
 
-                        <textarea-input
-                            class="mb-6 text-sm"
+                        <Textarea
+                            class="text-sm"
                             v-model="revisionMessage"
                             :placeholder="__('Notes about this revision')"
                             @keydown.enter="submit"
                             :focus="true"
                         />
 
-                        <button class="btn-primary mb-6 w-full" v-text="submitButtonText" @click="submit" />
+                        <Button variant="primary" :text="submitButtonText" @click="submit" />
 
-                        <div class="mb-6 flex text-xs text-gray">
-                            <div class="w-4 pt-px ltr:mr-2 rtl:ml-2">
-                                <svg-icon name="info-circle" class="pt-px" />
-                            </div>
-                            <div class="flex-1" v-text="actionInfoText" />
+                        <div class="flex">
+                            <Icon name="info" class="size-4 shrink-0 me-2" />
+                            <Subheading size="sm" class="flex-1" :text="actionInfoText" />
                         </div>
 
-                        <div class="mb-6 flex text-xs text-gray text-red-500" v-if="action === 'schedule'">
-                            <div class="w-4 pt-px ltr:mr-2 rtl:ml-2">
-                                <svg-icon name="info-circle" class="pt-px" />
-                            </div>
-                            <div
-                                class="flex-1"
-                                v-text="__('messages.publish_actions_current_becomes_draft_because_scheduled')"
-                            />
+                        <div class="flex text-red-500" v-if="action === 'schedule'">
+                            <Icon name="info" class="size-4 shrink-0 me-2" />
+                            <Subheading size="sm" class="flex-1 text-red-500" :text="__('messages.publish_actions_current_becomes_draft_because_scheduled')" />
                         </div>
-                    </div>
-                </template>
+                    </template>
+                </div>
             </div>
         </div>
     </stack>
 </template>
 
 <script>
+import { Heading, Button, Select, DatePicker, Textarea, Icon, Subheading } from '@statamic/ui';
+
 export default {
+    components: { Heading, Button, Select, DatePicker, Textarea, Icon, Subheading },
+
     props: {
         actions: Object,
         published: Boolean,
@@ -87,6 +82,8 @@ export default {
                     options.push({ value: 'unpublish', label: __('Unpublish') });
                 }
             }
+
+            options.push({ value: 'schedule', label: __('Schedule') });
 
             options.push({ value: 'revision', label: __('Create Revision') });
 
