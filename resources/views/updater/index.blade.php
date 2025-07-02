@@ -82,20 +82,6 @@
             </div>
         @endif
 
-        @if ($unlistedAddons->count())
-            <h6 class="mt-8">{{ __('Unlisted Addons') }}</h6>
-            <div class="card mt-2 p-0">
-                <table class="data-table">
-                    @foreach ($unlistedAddons as $addon)
-                        <tr>
-                            <td class="w-64">{{ $addon->name() }}</td>
-                            <td>{{ $addon->version() }}</td>
-                        </tr>
-                    @endforeach
-                </table>
-            </div>
-        @endif
-
         <x-statamic::docs-callout
             :topic="__('Updates')"
             :url="Statamic::docsUrl('updating')"
