@@ -2,7 +2,6 @@
 
 namespace Statamic\Support;
 
-use Statamic\Facades\File;
 use Stringy\StaticStringy;
 
 class Svg

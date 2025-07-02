@@ -5,7 +5,6 @@ namespace Statamic\Tags;
 use Rhukster\DomSanitizer\DOMSanitizer;
 use Statamic\Facades\File;
 use Statamic\Facades\URL;
-use Statamic\Fieldtypes\Icon;
 use Statamic\Support\Str;
 use Stringy\StaticStringy;
 
