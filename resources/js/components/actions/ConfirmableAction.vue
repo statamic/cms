@@ -110,10 +110,10 @@ defineExpose({
             v-if="action.fields.length"
             name="confirm-action"
             :blueprint="fieldset"
+            v-model="values"
             :values="values"
             :meta="action.meta"
             :errors="errors"
-            @updated="values = $event"
         >
             <FieldsProvider :fields="action.fields">
                 <PublishFields />

@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import Values from '@statamic/components/publish/Values.js';
 
 export const usePublishContainerStore = function (name, initial) {
     return defineStore(name, {
@@ -23,6 +24,14 @@ export const usePublishContainerStore = function (name, initial) {
             reference: initial.reference,
             readOnly: initial.readOnly,
         }),
+        getters: {
+            visibleValues: (state) => {
+                const omittable = Object.keys(state.hiddenFields).filter(
+                    (field) => state.hiddenFields[field].omitValue,
+                );
+                return new Values(state.values, state.jsonSubmittingFields).except(omittable);
+            },
+        },
         actions: {
             setFieldValue(payload) {
                 const { handle, value } = payload;
