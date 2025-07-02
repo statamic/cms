@@ -60,10 +60,10 @@
 
 <script>
 import ChangePassword from './ChangePassword.vue';
-import HasHiddenFields from '../publish/HasHiddenFields';
 import HasActions from '../publish/HasActions';
 import TwoFactor from '@statamic/components/two-factor/TwoFactor.vue';
 import clone from '@statamic/util/clone.js';
+import resetValuesFromResponse from '@statamic/util/resetValuesFromResponse.js';
 import {
     Button,
     Dropdown,
@@ -84,7 +84,7 @@ let errors = ref({});
 let container = null;
 
 export default {
-    mixins: [HasHiddenFields, HasActions],
+    mixins: [HasActions],
 
     components: {
         ItemActions,
@@ -161,7 +161,7 @@ export default {
         afterActionSuccessfullyCompleted(response) {
             if (response.data) {
                 this.title = response.data.title;
-                this.values = this.resetValuesFromResponse(response.data.values);
+                this.values = resetValuesFromResponse(response.data.values, this.$refs.container.store);
             }
         },
     },
