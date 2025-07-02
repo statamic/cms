@@ -21,8 +21,8 @@
 
             <ui-panel-header>
                 <div class="page-tree-header font-medium text-sm flex justify-between">
-                    <div>Title</div>
-                    <div class="me-15">Template</div>
+                    <div v-text="__('Title')" />
+                    <div class="me-15" v-text="__('Template')" />
                 </div>
             </ui-panel-header>
             <div v-if="!loading" class="page-tree">
