@@ -303,15 +303,12 @@
 import EditorActions from './EditorActions.vue';
 import FocalPointEditor from './FocalPointEditor.vue';
 import PdfViewer from './PdfViewer.vue';
-import HasHiddenFields from '../../publish/HasHiddenFields';
 import { pick, flatten } from 'lodash-es';
 import { Dropdown, DropdownMenu, DropdownItem, PublishContainer, PublishTabs } from '@statamic/ui';
 import ItemActions from '@statamic/components/actions/ItemActions.vue';
 
 export default {
     emits: ['previous', 'next', 'saved', 'closed', 'action-completed'],
-
-    mixins: [HasHiddenFields],
 
     components: {
         Dropdown,
@@ -526,7 +523,7 @@ export default {
             const url = cp_url(`assets/${utf8btoa(this.id)}`);
 
             this.$axios
-                .patch(url, this.visibleValues)
+                .patch(url, this.$refs.container.store.visibleValues)
                 .then((response) => {
                     this.$emit('saved', response.data.asset);
                     this.$toast.success(__('Saved'));
