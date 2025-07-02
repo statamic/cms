@@ -476,6 +476,10 @@ export default {
             this.loading = false;
         },
 
+        afterActionSuccessfullyCompleted() {
+            this.$refs.listing.refresh();
+        },
+
         assetSaved() {
             this.loadAssets();
         },
