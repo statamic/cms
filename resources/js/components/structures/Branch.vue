@@ -36,10 +36,10 @@
                 </button>
 
                 <div v-if="page.collection && editable" class="flex items-center ltr:ml-4 rtl:mr-4">
-                    <Icon name="navigation" class="h-3.5 w-3.5" />
-                    <div class="ms-2 ">
+                    <Icon name="navigation" class="h-3.5 w-3.5 text-gray-500" />
+                    <div class="ms-2">
                         <a :href="page.collection.create_url" v-text="__('Add')" />
-                        <span class="text-gray">/</span>
+                        <span class="mx-0.5">/</span>
                         <a :href="page.collection.edit_url" v-text="__('Edit')" />
                     </div>
                 </div>
@@ -49,7 +49,7 @@
                 <div
                     v-if="showBlueprint && page.entry_blueprint"
                     v-text="__(page.entry_blueprint.title)"
-                    class="ms-4 me-4 shrink font-mono lowercase text-xs text-gray-400 dark:text-dark-175"
+                    class="ms-4 me-4 shrink lowercase font-mono text-2xs text-gray-500 dark:text-dark-175"
                 />
 
                 <slot name="branch-icon" :branch="page" />
