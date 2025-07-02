@@ -1,23 +1,18 @@
 <template>
-        <Input
-            ref="input"
-            :id="fieldId"
-            :name="name"
-            :value="value"
-            @update:modelValue="updateDebounced"
-            @keydown="$emit('keydown', $event)"
-            @focus="$emit('focus')"
-            @blur="$emit('blur')"
-        >
-            <template #append>
-                <Button
-                    size="sm"
-                    :icon="hidden ? 'eye' : 'eye-closed'"
-                    variant="ghost"
-                    @click="toggleHidden"
-                />
-            </template>
-        </Input>
+    <Input
+        ref="input"
+        :id="fieldId"
+        :name="name"
+        :value="value"
+        @update:modelValue="updateDebounced"
+        @keydown="$emit('keydown', $event)"
+        @focus="$emit('focus')"
+        @blur="$emit('blur')"
+    >
+        <template #append>
+            <Button size="sm" :icon="hidden ? 'eye' : 'eye-closed'" variant="ghost" @click="toggleHidden" />
+        </template>
+    </Input>
 </template>
 
 <script>

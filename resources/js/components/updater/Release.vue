@@ -17,7 +17,7 @@
                 </template>
                 <div class="prose space-y-3">
                     <p v-text="confirmationText" />
-                    <ui-input v-model="command" readonly copyable class="font-mono text-sm dark" />
+                    <ui-input v-model="command" readonly copyable class="dark font-mono text-sm" />
                     <p v-html="link" />
                 </div>
             </ui-modal>

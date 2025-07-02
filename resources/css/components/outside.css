@@ -4,11 +4,11 @@
     @apply min-h-screen bg-gray-300 px-2;
 
     label {
-        @apply text-[#596498] dark:text-dark-175;
+        @apply dark:text-dark-175 text-[#596498];
     }
 
     .logo svg {
-        @apply mx-auto mb-20 mb-8 block h-6 w-auto text-black/25 dark:text-white/60;
+        @apply mx-auto mb-8 mb-20 block h-6 w-auto text-black/25 dark:text-white/60;
     }
 }
 
@@ -20,7 +20,8 @@
 
 .dark .outside.rad-theme {
     background: #212223;
-    background-image: radial-gradient(at 32.6% 91.5%, #142038 0px, transparent 50%),
+    background-image:
+        radial-gradient(at 32.6% 91.5%, #142038 0px, transparent 50%),
         radial-gradient(at 87.4% 39.4%, #353945 0px, transparent 50%),
         radial-gradient(at 84.6% 52.5%, #171717 0px, transparent 50%);
 }

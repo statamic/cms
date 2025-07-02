@@ -37,7 +37,17 @@
 </template>
 
 <script>
-import { Header, Button, ButtonGroup, Dropdown, DropdownMenu, DropdownItem, DropdownLabel, PublishContainer, PublishTabs } from '@statamic/ui';
+import {
+    Header,
+    Button,
+    ButtonGroup,
+    Dropdown,
+    DropdownMenu,
+    DropdownItem,
+    DropdownLabel,
+    PublishContainer,
+    PublishTabs,
+} from '@statamic/ui';
 
 export default {
     components: {

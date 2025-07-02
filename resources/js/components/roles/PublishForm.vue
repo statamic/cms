@@ -38,7 +38,7 @@
             />
         </ui-card>
 
-        <div v-if="!isSuper" class="space-y-6 mt-6">
+        <div v-if="!isSuper" class="mt-6 space-y-6">
             <ui-panel v-for="group in permissions" :key="group.handle">
                 <ui-panel-header>
                     <ui-heading :text="group.label" />

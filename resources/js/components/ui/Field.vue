@@ -57,9 +57,7 @@ const labelProps = computed(() => ({
 
 const classes = computed(() =>
     cva({
-        base: [
-            'min-w-0',
-        ],
+        base: ['min-w-0'],
         variants: {
             variant: {
                 block: 'w-full',
@@ -78,7 +76,9 @@ const classes = computed(() =>
     })({ ...props }),
 );
 
-const instructions = computed(() => props.instructions ? markdown(props.instructions, { openLinksInNewTabs: true }) : null);
+const instructions = computed(() =>
+    props.instructions ? markdown(props.instructions, { openLinksInNewTabs: true }) : null,
+);
 </script>
 
 <template>
@@ -94,7 +94,10 @@ const instructions = computed(() => props.instructions ? markdown(props.instruct
         [&:not(:has(+[data-ui-switch]))]:mb-1 = add a bottom margin if a switch doesn't follow
         [&:has([data-ui-description]):not(:has(+[data-ui-switch]))]:mb-2.5 = add an increased bottom margin if there's a description (and a switch doesn't follow)
         -->
-        <div data-ui-field-text class="[&:not(:has(+[data-ui-switch]))]:mb-1 [&:has([data-ui-description]):not(:has(+[data-ui-switch]))]:mb-2.5">
+        <div
+            data-ui-field-text
+            class="[&:has([data-ui-description]):not(:has(+[data-ui-switch]))]:mb-2.5 [&:not(:has(+[data-ui-switch]))]:mb-1"
+        >
             <slot v-if="!$slots.actions" name="label">
                 <Label v-if="label" v-bind="labelProps" class="flex-1" />
             </slot>

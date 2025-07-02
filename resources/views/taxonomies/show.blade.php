@@ -10,7 +10,11 @@
         <ui-dropdown>
             <ui-dropdown-menu>
                 @can('edit', $taxonomy)
-                    <ui-dropdown-item :text="__('Configure Taxonomy')" icon="cog" href="{{ $taxonomy->editUrl() }}"></ui-dropdown-item>
+                    <ui-dropdown-item
+                        :text="__('Configure Taxonomy')"
+                        icon="cog"
+                        href="{{ $taxonomy->editUrl() }}"
+                    ></ui-dropdown-item>
                 @endcan
 
                 @can('configure fields')
@@ -22,7 +26,12 @@
                 @endcan
 
                 @can('delete', $taxonomy)
-                    <ui-dropdown-item :text="__('Delete Taxonomy')" icon="trash" variant="destructive" @click="$refs.deleter.confirm()"></ui-dropdown-item>
+                    <ui-dropdown-item
+                        :text="__('Delete Taxonomy')"
+                        icon="trash"
+                        variant="destructive"
+                        @click="$refs.deleter.confirm()"
+                    ></ui-dropdown-item>
                 @endcan
             </ui-dropdown-menu>
         </ui-dropdown>

@@ -1,5 +1,7 @@
 <template>
-    <div class="flex flex-col space-y-3 p-1.5 bg-gray-100 border border-gray-300 dark:bg-gray-900 dark:border-gray-700 rounded-xl">
+    <div
+        class="flex flex-col space-y-3 rounded-xl border border-gray-300 bg-gray-100 p-1.5 dark:border-gray-700 dark:bg-gray-900"
+    >
         <ui-input-group>
             <ui-input-group-prepend :text="__('URL')" />
             <ui-input
@@ -81,7 +83,8 @@ export default {
 
         isVideo() {
             const url = this.value || '';
-            const isVideo = url.includes('.mp4') || url.includes('.ogv') || url.includes('.mov') || url.includes('.webm');
+            const isVideo =
+                url.includes('.mp4') || url.includes('.ogv') || url.includes('.mov') || url.includes('.webm');
             return !this.isEmbeddable && isVideo;
         },
     },

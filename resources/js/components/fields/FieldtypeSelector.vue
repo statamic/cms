@@ -1,5 +1,5 @@
 <template>
-    <div class="h-full overflow-auto bg-white dark:bg-gray-800 p-3 rounded-l-xl">
+    <div class="h-full overflow-auto rounded-l-xl bg-white p-3 dark:bg-gray-800">
         <header class="flex items-center justify-between pl-3">
             <ui-heading :text="__('Fieldtypes')" size="lg" icon="cog" />
             <ui-button type="button" icon="x" variant="subtle" @click="close" />
@@ -19,12 +19,8 @@
             />
         </div>
 
-        <div class="p-2 space-y-8" v-if="fieldtypesLoaded">
-            <div
-                v-for="group in displayedFieldtypes"
-                :key="group.handle"
-                v-show="group.fieldtypes.length > 0"
-            >
+        <div class="space-y-8 p-2" v-if="fieldtypesLoaded">
+            <div v-for="group in displayedFieldtypes" :key="group.handle" v-show="group.fieldtypes.length > 0">
                 <h2 v-if="group.title" v-text="group.title" class="mb-2 px-2" />
                 <div class="fieldtype-selector">
                     <ui-panel>
@@ -32,16 +28,22 @@
                             <ui-description :text="group.description" />
                         </ui-panel-header>
                         <div class="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-1.5">
-                        <div v-for="fieldtype in group.fieldtypes" :key="fieldtype.handle">
-                            <button
-                                class="flex items-center gap-2 w-full px-3 py-2.5 group bg-white dark:bg-gray-850 shadow-ui-sm rounded-xl border border-gray-200 dark:border-x-0 dark:border-b-0 dark:border-gray-700 cursor-pointer"
-                                type="button"
-                                @click="select(fieldtype)"
-                                :title="fieldtype.icon"
-                            >
-                                <ui-icon :name="`fieldtype-${fieldtype.icon}`" class="text-gray-500 group-hover:text-gray-800 dark:text-gray-400 dark:group-hover:text-gray-100" />
-                                <span class="text-sm text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-gray-100" v-text="fieldtype.text" />
-                            </button>
+                            <div v-for="fieldtype in group.fieldtypes" :key="fieldtype.handle">
+                                <button
+                                    class="group dark:bg-gray-850 shadow-ui-sm flex w-full cursor-pointer items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2.5 dark:border-x-0 dark:border-b-0 dark:border-gray-700"
+                                    type="button"
+                                    @click="select(fieldtype)"
+                                    :title="fieldtype.icon"
+                                >
+                                    <ui-icon
+                                        :name="`fieldtype-${fieldtype.icon}`"
+                                        class="text-gray-500 group-hover:text-gray-800 dark:text-gray-400 dark:group-hover:text-gray-100"
+                                    />
+                                    <span
+                                        class="text-sm text-gray-700 group-hover:text-gray-900 dark:text-gray-300 dark:group-hover:text-gray-100"
+                                        v-text="fieldtype.text"
+                                    />
+                                </button>
                             </div>
                         </div>
                     </ui-panel>

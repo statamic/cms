@@ -23,11 +23,7 @@ const shouldDeleteChildren = ref(false);
                 <ModalClose>
                     <Button variant="ghost" :text="__('Cancel')" />
                 </ModalClose>
-                <Button
-                    variant="primary"
-                    :text="__('Delete')"
-                    @click="$emit('confirm', shouldDeleteChildren)"
-                />
+                <Button variant="primary" :text="__('Delete')" @click="$emit('confirm', shouldDeleteChildren)" />
             </div>
         </template>
     </Modal>

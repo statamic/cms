@@ -1,8 +1,8 @@
 <template>
     <stack narrow name="page-tree-linker" :before-close="shouldClose" @closed="$emit('closed')" v-slot="{ close }">
-        <div class="flex h-full flex-col bg-gray-100 dark:bg-dark-700">
+        <div class="dark:bg-dark-700 flex h-full flex-col bg-gray-100">
             <header
-                class="mb-4 flex items-center justify-between border-b bg-white py-2 text-lg font-medium shadow-md dark:border-dark-950 dark:bg-dark-550 ltr:pl-6 ltr:pr-3 rtl:pl-3 rtl:pr-6"
+                class="dark:border-dark-950 dark:bg-dark-550 mb-4 flex items-center justify-between border-b bg-white py-2 text-lg font-medium shadow-md ltr:pr-3 ltr:pl-6 rtl:pr-6 rtl:pl-3"
             >
                 {{ headerText }}
                 <button type="button" class="btn-close" @click="confirmClose(close)" v-html="'&times'" />
@@ -10,7 +10,7 @@
 
             <div v-if="loading" class="relative flex-1 overflow-auto">
                 <div
-                    class="absolute inset-0 z-10 flex items-center justify-center bg-white bg-opacity-75 text-center dark:bg-dark-700"
+                    class="bg-opacity-75 dark:bg-dark-700 absolute inset-0 z-10 flex items-center justify-center bg-white text-center"
                 >
                     <loading-graphic />
                 </div>
@@ -34,7 +34,7 @@
                     <div>
                         <div
                             v-if="validating"
-                            class="absolute inset-0 z-10 flex items-center justify-center bg-white bg-opacity-75 dark:bg-dark-500"
+                            class="bg-opacity-75 dark:bg-dark-500 absolute inset-0 z-10 flex items-center justify-center bg-white"
                         >
                             <loading-graphic text="" />
                         </div>
@@ -57,7 +57,7 @@
 
             <div
                 v-if="!loading && (!readOnly || type === 'entry')"
-                class="flex flex-row-reverse items-center justify-between border-t bg-gray-200 p-4 dark:border-dark-900 dark:bg-dark-500"
+                class="dark:border-dark-900 dark:bg-dark-500 flex flex-row-reverse items-center justify-between border-t bg-gray-200 p-4"
             >
                 <div v-if="!readOnly">
                     <button @click="confirmClose(close)" class="btn ltr:mr-2 rtl:ml-2">{{ __('Cancel') }}</button>

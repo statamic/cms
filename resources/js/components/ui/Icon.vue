@@ -24,9 +24,7 @@ const loadIcon = () => {
         ? `../../../svg/ui/${props.name.split('/')[1]}.svg`
         : `../../../svg/icons/${props.name}.svg`;
 
-    const iconLoader = props.name.includes('/')
-        ? uiIcons[iconPath]
-        : icons[`../../../svg/icons/${props.name}.svg`];
+    const iconLoader = props.name.includes('/') ? uiIcons[iconPath] : icons[`../../../svg/icons/${props.name}.svg`];
 
     if (!iconLoader) {
         console.warn(`Icon not found: ${props.name}`);

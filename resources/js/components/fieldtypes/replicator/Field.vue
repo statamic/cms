@@ -1,12 +1,12 @@
 <template>
-    <div class="m-0 p-4 @container" :class="classes">
+    <div class="@container m-0 p-4" :class="classes">
         <div class="field-inner">
             <label class="block" :for="fieldId" v-if="showLabel">
                 <span v-if="showLabelText" v-tooltip="{ content: field.handle, delay: 500, autoHide: false }">{{
                     display
                 }}</span>
                 <i class="required" v-if="field.required">*</i>
-                <span v-if="isReadOnly" class="mx-1 text-2xs font-normal text-gray-500" v-text="__('Read Only')" />
+                <span v-if="isReadOnly" class="text-2xs mx-1 font-normal text-gray-500" v-text="__('Read Only')" />
             </label>
 
             <div
@@ -45,7 +45,7 @@
         />
 
         <div v-if="hasError">
-            <small class="help-block mb-0 mt-2 text-red-500" v-for="(error, i) in errors" :key="i" v-text="error" />
+            <small class="help-block mt-2 mb-0 text-red-500" v-for="(error, i) in errors" :key="i" v-text="error" />
         </div>
     </div>
 </template>

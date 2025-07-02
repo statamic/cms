@@ -10,7 +10,7 @@
         background-position: center center;
         background-size: 7px 17px;
         &:hover {
-            @apply bg-gray-300 dark:bg-dark-650;
+            @apply dark:bg-dark-650 bg-gray-300;
         }
     }
 
@@ -20,7 +20,7 @@
 
     &.invalid {
         .item-inner {
-            @apply border-red-300 bg-red-100 text-red-500 dark:border-dark-red dark:bg-red-400 dark:text-red-950;
+            @apply dark:border-dark-red border-red-300 bg-red-100 text-red-500 dark:bg-red-400 dark:text-red-950;
         }
     }
 

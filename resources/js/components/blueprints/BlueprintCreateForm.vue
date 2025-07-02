@@ -7,7 +7,11 @@
     >
         <ui-card-panel :heading="__('Blueprint Details')">
             <div class="space-y-8">
-                <ui-field :label="__('Title')" :instructions="__('messages.blueprints_title_instructions')" :instructions-below="true">
+                <ui-field
+                    :label="__('Title')"
+                    :instructions="__('messages.blueprints_title_instructions')"
+                    :instructions-below="true"
+                >
                     <ui-input v-model="title" autofocus tabindex="1" />
                 </ui-field>
             </div>

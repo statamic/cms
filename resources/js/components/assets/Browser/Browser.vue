@@ -15,30 +15,30 @@
                         :text="__('Configure Container')"
                         :href="container.edit_url"
                     />
-                    <DropdownItem
-                        icon="blueprint-edit"
-                        :text="__('Edit Blueprint')"
-                        :href="container.blueprint_url"
-                    />
+                    <DropdownItem icon="blueprint-edit" :text="__('Edit Blueprint')" :href="container.blueprint_url" />
                     <DropdownSeparator v-if="container.can_delete" />
                     <DropdownItem
                         icon="trash"
                         variant="destructive"
                         v-if="container.can_delete"
                         :text="__('Delete Container')"
-                        @click="$event.preventDefault(); $refs.deleter.confirm()"
+                        @click="
+                            $event.preventDefault();
+                            $refs.deleter.confirm();
+                        "
                     />
                 </DropdownMenu>
             </Dropdown>
 
-            <resource-deleter
-                ref="deleter"
-                :resource-title="__(container.title)"
-                :route="container.delete_url"
-            />
+            <resource-deleter ref="deleter" :resource-title="__(container.title)" :route="container.delete_url" />
 
             <Button v-if="canUpload" :text="__('Upload')" icon="upload" @click="openFileBrowser" />
-            <Button v-if="canCreateFolders" :text="__('Create Folder')" icon="folder-add" @click="creatingFolder = true" />
+            <Button
+                v-if="canCreateFolders"
+                :text="__('Create Folder')"
+                icon="folder-add"
+                @click="creatingFolder = true"
+            />
 
             <ui-toggle-group v-model="mode">
                 <ui-toggle-item icon="layout-grid" value="grid" />
@@ -241,7 +241,7 @@ export default {
     data() {
         return {
             columns: this.initialColumns,
-            visibleColumns: this.initialColumns.filter(column => column.visible),
+            visibleColumns: this.initialColumns.filter((column) => column.visible),
             containers: [],
             initializing: true,
             loading: true,
@@ -342,15 +342,17 @@ export default {
                     return null;
                 }
 
-                return this.visibleColumns.map(column => column.field).join(',');
+                return this.visibleColumns.map((column) => column.field).join(',');
             },
             set(value) {
-                this.visibleColumns = value.split(',').map(field => this.columns.find(column => column.field === field));
+                this.visibleColumns = value
+                    .split(',')
+                    .map((field) => this.columns.find((column) => column.field === field));
             },
         },
 
         columnShowing(column) {
-            return this.visibleColumns.find(c => c.field === column);
+            return this.visibleColumns.find((c) => c.field === column);
         },
 
         reachedSelectionLimit() {
@@ -379,7 +381,7 @@ export default {
             return {
                 'action-completed': this.actionCompleted,
                 'action-started': this.actionStarted,
-                'edit': this.edit,
+                edit: this.edit,
                 'edit-asset': (event) => this.$emit('edit-asset', event),
                 'select-folder': this.selectFolder,
                 'create-folder': this.createFolder,
@@ -567,9 +569,7 @@ export default {
                     if (e.response && e.response.status === 422) {
                         const { message, errors } = e.response.data;
 
-                        errors.directory
-                            ? this.$toast.error(errors.directory[0])
-                            : this.$toast.error(message);
+                        errors.directory ? this.$toast.error(errors.directory[0]) : this.$toast.error(message);
 
                         this.$refs.grid?.focusNewFolderInput();
                         this.$refs.table?.focusNewFolderInput();

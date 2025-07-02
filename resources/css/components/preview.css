@@ -3,7 +3,7 @@
 }
 
 .live-preview-header {
-    @apply relative flex h-13 items-center justify-between py-2 shadow-md ltr:pl-6 ltr:pr-4 rtl:pl-4 rtl:pr-6;
+    @apply relative flex h-13 items-center justify-between py-2 shadow-md ltr:pr-4 ltr:pl-6 rtl:pr-6 rtl:pl-4;
     background: linear-gradient(180deg, #fff, #f9fafb);
     border-bottom: 1px solid #c4cdd6;
     z-index: 2;
@@ -20,7 +20,7 @@
 }
 
 .live-preview-editor {
-    @apply relative flex h-full bg-gray-200 dark:bg-dark-800;
+    @apply dark:bg-dark-800 relative flex h-full bg-gray-200;
     z-index: 3;
 }
 
@@ -39,7 +39,7 @@
 }
 
 .live-preview .tabs-container {
-    @apply mb-0 bg-gray-300 dark:bg-dark-550;
+    @apply dark:bg-dark-550 mb-0 bg-gray-300;
     @apply @4xl/live-preview:mb-6;
 }
 
@@ -74,7 +74,7 @@
 }
 
 .live-preview-resizer {
-    @apply w-4 border-gray-400 shadow-sm dark:border-dark-900 ltr:border-l ltr:border-r rtl:border-l rtl:border-r;
+    @apply dark:border-dark-900 w-4 border-gray-400 shadow-sm ltr:border-r ltr:border-l rtl:border-r rtl:border-l;
     z-index: 1;
     cursor: ew-resize;
     background: var(--color-gray-100) url('../../svg/icons/light/drag-dots.svg') center center no-repeat;

@@ -1,15 +1,19 @@
 <template>
-    <div class="flex-1 flex items-center gap-3 overflow-x-auto py-3">
+    <div class="flex flex-1 items-center gap-3 overflow-x-auto py-3">
         <ui-modal :title="__('Apply Filters')">
             <template #trigger>
                 <Button icon="filter" class="relative">
                     {{ __('Filter') }}
-                    <Badge v-if="activeCount" :text="activeCount" pill variant="filled" class="absolute -top-1.5 -right-1.5" />
+                    <Badge
+                        v-if="activeCount"
+                        :text="activeCount"
+                        pill
+                        variant="filled"
+                        class="absolute -top-1.5 -right-1.5"
+                    />
                 </Button>
             </template>
-            <div class="space-y-6 py-3">
-                FILTERS GO HERE
-            </div>
+            <div class="space-y-6 py-3">FILTERS GO HERE</div>
             <template #footer>
                 <div class="flex items-center justify-end space-x-3 pt-3 pb-1">
                     <ui-modal-close>
@@ -127,7 +131,7 @@ export default {
         DataListFilter,
         FieldFilter,
         Button,
-        Badge
+        Badge,
     },
 
     props: {

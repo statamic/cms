@@ -3,15 +3,15 @@
 
 /* =Jay. Map layers to Tailwind's internal layers so that we can inject custom layers as needed */
 @layer base {
-  @tailwind base;
+    @tailwind base;
 }
 
 @layer components {
-  @tailwind components;
+    @tailwind components;
 }
 
 @layer utilities {
-  @tailwind utilities;
+    @tailwind utilities;
 }
 
 @import 'tailwindcss';
@@ -33,11 +33,11 @@
 */
 
 @layer base {
-  *,
-  ::after,
-  ::before,
-  ::backdrop,
-  ::file-selector-button {
-    border-color: var(--color-gray-200, currentColor);
-  }
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-200, currentColor);
+    }
 }

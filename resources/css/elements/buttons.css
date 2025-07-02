@@ -4,28 +4,28 @@
     button {
         @apply font-normal;
     }
-    
+
     /*  Base button styles that shouldn't need overriding */
     [class^='btn'],
     [class*=' btn'] {
-        @apply relative h-auto cursor-pointer select-none rounded-sm;
-        @apply inline-flex justify-center whitespace-nowrap align-middle leading-none;
+        @apply relative h-auto cursor-pointer rounded-sm select-none;
+        @apply inline-flex justify-center align-middle leading-none whitespace-nowrap;
         @apply items-center text-center text-sm subpixel-antialiased;
-    
+
         height: 2.375rem; /*  38px */
         letter-spacing: -0.01em;
         padding: 0.475rem 1.25rem;
-    
+
         &:focus {
             /* @apply ring-2 outline-none dark:outline-2 dark:outline-dark-blue-100; */
-            @apply outline-hidden ring-2;
+            @apply ring-2 outline-hidden;
         }
-    
+
         &:disabled {
             @apply cursor-default;
         }
     }
-    
+
     .btn-height {
         height: 2.375rem; /*  38px */
     }
@@ -35,7 +35,7 @@
 =================================================== */
 .btn,
 .btn-default {
-    @apply text-gray-800 shadow-sm dark:text-dark-150;
+    @apply dark:text-dark-150 text-gray-800 shadow-sm;
     background: linear-gradient(180deg, #fff, #f9fafb);
     background-clip: padding-box;
     border: 1px solid #d3dde7;
@@ -59,7 +59,7 @@
 
     &:hover:not(:disabled),
     &:active:not(:disabled) {
-        @apply text-gray-800 dark:text-dark-150;
+        @apply dark:text-dark-150 text-gray-800;
         background: linear-gradient(180deg, #f9fafb, #f4f6f8);
         background-clip: padding-box;
         border-bottom: 1px solid #bfc7d0;
@@ -72,7 +72,7 @@
     }
 
     &:focus {
-        @apply ring-2 dark:ring-dark-blue-100;
+        @apply dark:ring-dark-blue-100 ring-2;
     }
 
     &.active,
@@ -89,14 +89,14 @@
     }
 
     &:disabled {
-        @apply text-gray-700 opacity-75 dark:text-dark-200;
+        @apply dark:text-dark-200 text-gray-700 opacity-75;
     }
 }
 
 /* GROUP BUTTONS / PRIMARY
 =================================================== */
 .btn-primary {
-    @apply border! border-blue-700! border-b-blue-800! bg-linear-to-b! from-blue-500! to-blue-600! bg-clip-padding! text-white! dark:border-blue-900! dark:border-b-dark-blue-200! dark:from-dark-blue-100! dark:to-dark-blue-150!;
+    @apply dark:border-b-dark-blue-200! dark:from-dark-blue-100! dark:to-dark-blue-150! border! border-blue-700! border-b-blue-800! bg-linear-to-b! from-blue-500! to-blue-600! bg-clip-padding! text-white! dark:border-blue-900!;
     box-shadow:
         inset 0 1px 0 0 var(--color-blue-400),
         0 1px 0 0 rgba(25, 30, 35, 0.05),
@@ -105,7 +105,7 @@
 
     &:hover:not(:disabled),
     :active:not(:disabled) {
-        @apply border-blue-800! border-b-blue-900! from-blue-600! to-blue-700! dark:border-blue-900! dark:border-b-dark-blue-200! dark:from-dark-blue-125! dark:to-dark-blue-175!;
+        @apply dark:border-b-dark-blue-200! dark:from-dark-blue-125! dark:to-dark-blue-175! border-blue-800! border-b-blue-900! from-blue-600! to-blue-700! dark:border-blue-900!;
         box-shadow:
             inset 0 1px 0 0 var(--color-blue-500),
             0 1px 0 0 rgba(25, 30, 35, 0.05),
@@ -114,7 +114,7 @@
     }
 
     &:disabled {
-        @apply text-blue-200! opacity-75! dark:text-dark-blue-200!;
+        @apply dark:text-dark-blue-200! text-blue-200! opacity-75!;
     }
 }
 
@@ -145,26 +145,26 @@
 
 /*  Earth isn't flat but these buttons are */
 .btn-flat {
-    @apply flex items-center bg-gray-300 text-gray-800 dark:bg-dark-700 dark:text-dark-150;
+    @apply dark:bg-dark-700 dark:text-dark-150 flex items-center bg-gray-300 text-gray-800;
     position: inherit;
 
     &:hover:not(:disabled),
     &:active:not(:disabled),
     &.active {
-        @apply bg-gray-400 dark:bg-dark-750;
+        @apply dark:bg-dark-750 bg-gray-400;
     }
 
     &:focus {
-        @apply outline-hidden ring-2;
+        @apply ring-2 outline-hidden;
     }
 
     &:active,
     &:focus:active {
-        @apply bg-gray-500 dark:bg-dark-800;
+        @apply dark:bg-dark-800 bg-gray-500;
     }
 
     &:disabled {
-        @apply text-gray-600 opacity-75 dark:text-dark-200;
+        @apply dark:text-dark-200 text-gray-600 opacity-75;
     }
 }
 
@@ -318,30 +318,30 @@ td .btn-icon {
 /* GROUP BUTTONS / CLOSE BUTTON (for closing things)
 =================================================== */
 .btn-close {
-    @apply inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full p-0 text-center text-xl leading-none text-gray-600 outline-hidden dark:text-dark-150 ltr:ml-4 rtl:mr-4;
+    @apply dark:text-dark-150 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full p-0 text-center text-xl leading-none text-gray-600 outline-hidden ltr:ml-4 rtl:mr-4;
 
     &:hover {
-        @apply bg-gray-400 dark:bg-dark-700;
+        @apply dark:bg-dark-700 bg-gray-400;
     }
 
     &:active,
     &:focus:hover {
         outline: none;
-        @apply bg-gray-500 dark:bg-dark-750;
+        @apply dark:bg-dark-750 bg-gray-500;
     }
 }
 
 .btn-quick-action {
-    @apply inline-flex size-8 shrink-0 items-center justify-center rounded-full p-0 text-center text-xl leading-none text-gray-600 outline-hidden dark:text-dark-150;
+    @apply dark:text-dark-150 inline-flex size-8 shrink-0 items-center justify-center rounded-full p-0 text-center text-xl leading-none text-gray-600 outline-hidden;
 
     &:hover {
-        @apply hover:bg-gray-400/10 dark:bg-dark-700;
+        @apply dark:bg-dark-700 hover:bg-gray-400/10;
     }
 
     &:active,
     &:focus:hover {
         outline: none;
-        @apply bg-gray-500 dark:bg-dark-750;
+        @apply dark:bg-dark-750 bg-gray-500;
     }
 }
 
@@ -350,6 +350,6 @@ td .btn-icon {
     @apply dark:hover:border-black/40 dark:hover:bg-black/20;
 
     svg {
-        @apply h-8 w-8 mt-1 text-gray-600 dark:text-gray-500;
+        @apply mt-1 h-8 w-8 text-gray-600 dark:text-gray-500;
     }
 }

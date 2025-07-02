@@ -36,7 +36,7 @@ function stateUpdated(state) {
     if (state === 'edit') {
         emit('edit', props.modelValue);
     }
-};
+}
 
 function edit() {
     editableRoot.value.edit();

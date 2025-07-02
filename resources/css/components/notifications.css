@@ -13,11 +13,11 @@
 }
 
 .toasted-container .toasted.statamic {
-    @apply mt-4 rounded-xl bg-white p-0 text-base text-gray-800 shadow dark:bg-dark-900 dark:text-dark-100;
+    @apply dark:bg-dark-900 dark:text-dark-100 mt-4 rounded-xl bg-white p-0 text-base text-gray-800 shadow;
     height: 45px;
 
     i {
-        @apply flex items-center justify-center h-3/4 aspect-square text-white ms-1.5 me-4 rounded-full;
+        @apply ms-1.5 me-4 flex aspect-square h-3/4 items-center justify-center rounded-full text-white;
     }
 
     &.success i {
@@ -29,15 +29,15 @@
     }
 
     &.default i {
-        @apply bg-gray-800 dark:bg-dark-900;
+        @apply dark:bg-dark-900 bg-gray-800;
     }
 
     .action {
-        @apply m-0 flex h-full items-center px-4 text-xl font-normal text-gray-600 dark:text-dark-150 ms-2 opacity-50;
+        @apply dark:text-dark-150 m-0 ms-2 flex h-full items-center px-4 text-xl font-normal text-gray-600 opacity-50;
         /* Compensate for the "x" button being a slightly bigger font-size */
         transform: translateY(-1.5px);
         &:hover {
-            @apply text-gray-900 no-underline dark:text-dark-100;
+            @apply dark:text-dark-100 text-gray-900 no-underline;
         }
     }
 }

@@ -3,17 +3,17 @@
         <div class="publish-sections-section" v-for="(section, i) in visibleSections" :key="i">
             <Panel :heading="__(section.display) || heading" :description="__(section.instructions) || description">
                 <component :is="wrapperComponent">
-                <publish-fields
-                    :fields="section.fields"
-                    :read-only="readOnly"
-                    :syncable="syncable"
-                    :syncable-fields="syncableFields"
-                    @updated="(handle, value) => $emit('updated', handle, value)"
-                    @meta-updated="(handle, value) => $emit('meta-updated', handle, value)"
-                    @synced="$emit('synced', $event)"
-                    @desynced="$emit('desynced', $event)"
-                    @focus="$emit('focus', $event)"
-                    @blur="$emit('blur', $event)"
+                    <publish-fields
+                        :fields="section.fields"
+                        :read-only="readOnly"
+                        :syncable="syncable"
+                        :syncable-fields="syncableFields"
+                        @updated="(handle, value) => $emit('updated', handle, value)"
+                        @meta-updated="(handle, value) => $emit('meta-updated', handle, value)"
+                        @synced="$emit('synced', $event)"
+                        @desynced="$emit('desynced', $event)"
+                        @focus="$emit('focus', $event)"
+                        @blur="$emit('blur', $event)"
                     />
                 </component>
             </Panel>
@@ -47,7 +47,7 @@ export default {
 
     inject: {
         publishContainer: {},
-        wrapFieldsInCards: { default: false }
+        wrapFieldsInCards: { default: false },
     },
 
     computed: {

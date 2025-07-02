@@ -1,8 +1,8 @@
 <template>
     <stack narrow name="nav-item-editor" @closed="$emit('closed')" v-slot="{ close }">
-        <div class="flex h-full flex-col bg-white dark:bg-dark-800">
+        <div class="dark:bg-dark-800 flex h-full flex-col bg-white">
             <div
-                class="flex items-center justify-between border-b border-gray-300 bg-gray-200 px-6 py-2 text-lg font-medium dark:border-dark-900 dark:bg-dark-600"
+                class="dark:border-dark-900 dark:bg-dark-600 flex items-center justify-between border-b border-gray-300 bg-gray-200 px-6 py-2 text-lg font-medium"
             >
                 {{ creating ? __('Add Nav Item') : __('Edit Nav Item') }}
                 <button type="button" class="btn-close" @click="close" v-html="'&times'" />

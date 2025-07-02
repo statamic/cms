@@ -11,7 +11,7 @@
 }
 
 .data-table {
-    @apply w-full max-w-full outline-hidden text-gray-500 antialiased border-separate border-spacing-y-0 min-w-full overflow-x-auto text-start;
+    @apply w-full max-w-full min-w-full border-separate border-spacing-y-0 overflow-x-auto text-start text-gray-500 antialiased outline-hidden;
 
     &.contained {
         @apply rounded-xl;
@@ -19,11 +19,11 @@
 
     thead {
         th {
-            @apply whitespace-nowrap text-sm font-medium text-gray-800 dark:text-gray-300 text-start;
+            @apply text-start text-sm font-medium whitespace-nowrap text-gray-800 dark:text-gray-300;
             @apply px-4 py-2;
 
             .contained & {
-                @apply py-2.5 border-b;
+                @apply border-b py-2.5;
             }
         }
 
@@ -37,9 +37,9 @@
     }
 
     tbody {
-        @apply text-sm bg-white dark:bg-gray-900 shadow-sm rounded-xl outline-none;
+        @apply rounded-xl bg-white text-sm shadow-sm outline-none dark:bg-gray-900;
         .contained & {
-            @apply shadow-none rounded-none;
+            @apply rounded-none shadow-none;
         }
 
         tr {
@@ -82,12 +82,12 @@
             }
 
             td {
-                @apply pl-4.5 pr-2.5 py-3 border-t border-gray-200 dark:border-white/10;
+                @apply border-t border-gray-200 py-3 pr-2.5 pl-4.5 dark:border-white/10;
                 @apply text-gray-800 dark:text-gray-200;
             }
 
             td.table-drag-handle {
-                @apply h-full w-1 px-0 py-2 border-e;
+                @apply h-full w-1 border-e px-0 py-2;
             }
         }
 
@@ -104,40 +104,40 @@
 /* Sticky Meta Columns */
 .data-table {
     thead th.checkbox-column {
-        @apply sticky z-1 ps-3 w-8;
+        @apply sticky z-1 w-8 ps-3;
         .contained & {
             @apply sticky ps-4;
         }
     }
 
     thead .actions-column {
-        @apply sticky p-0 -end-px ps-2 text-end;
+        @apply sticky -end-px p-0 ps-2 text-end;
         width: 45px;
         min-width: 45px;
     }
 
     tbody .checkbox-column {
-        @apply sticky px-3 -start-px;
+        @apply sticky -start-px px-3;
         .contained & {
             @apply sticky ps-4;
         }
     }
 
     tbody .actions-column {
-        @apply sticky p-0 ps-2 text-end w-12;
+        @apply sticky w-12 p-0 ps-2 text-end;
     }
 }
 
 /* Row Selection */
 
 .data-table[data-has-selections] {
-    tbody tr[data-row="unselected"] td {
+    tbody tr[data-row='unselected'] td {
         @apply text-gray-500! dark:text-gray-400!;
     }
 }
 
 .table-drag-handle {
-    @apply h-full w-3 p-2 dark:border-dark-900 border-e;
+    @apply dark:border-dark-900 h-full w-3 border-e p-2;
     min-width: 16px;
     cursor: grab;
     background: var(--color-gray-200) url('../../svg/icons/light/drag-dots.svg') center center no-repeat;
@@ -153,7 +153,7 @@
 }
 
 .column-sortable {
-    @apply cursor-pointer relative;
+    @apply relative cursor-pointer;
 }
 
 .column-status {
@@ -162,9 +162,8 @@
 }
 
 .column-actions {
-    @apply text-end w-12;
+    @apply w-12 text-end;
 }
-
 
 /* Index Fields
   ========================================================================== */
@@ -177,7 +176,7 @@
 }
 
 .title-index-field {
-    @apply text-sm font-medium line-clamp-2 flex items-center gap-2 hover:text-black dark:hover:text-white;
+    @apply line-clamp-2 flex items-center gap-2 text-sm font-medium hover:text-black dark:hover:text-white;
     min-width: 15vw;
     max-width: 30vw;
 }
@@ -191,7 +190,7 @@
 }
 
 .status-index-field {
-    @apply inline-block shrink justify-center rounded-full bg-gray-300 px-2 py-0.5 text-center text-xs text-gray-800 dark:bg-gray-200 dark:text-dark-150;
+    @apply dark:text-dark-150 inline-block shrink justify-center rounded-full bg-gray-300 px-2 py-0.5 text-center text-xs text-gray-800 dark:bg-gray-200;
 
     &.status-published:not(.status-private) {
         @apply bg-green-200 text-green-900 dark:bg-green-300 dark:text-green-950;
@@ -208,6 +207,6 @@
 
     .role-index-field-item,
     .groups-index-field-item {
-        @apply mb-1 line-clamp-1 inline-block rounded-sm border bg-gray-100 px-1 text-2xs dark:border-dark-900 dark:bg-gray-700;
+        @apply text-2xs dark:border-dark-900 mb-1 line-clamp-1 inline-block rounded-sm border bg-gray-100 px-1 dark:bg-gray-700;
     }
 }

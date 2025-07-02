@@ -8,7 +8,7 @@
             <div :class="`${isOpen ? 'popover-open' : ''}`">
                 <div ref="popover" class="popover" v-if="!disabled" v-click-away="clickawayClose">
                     <div
-                        class="popover-content rounded-b-xl rounded-md bg-gray-100 shadow-md dark:bg-dark-550 dark:shadow-lg-lg border border-gray-200 dark:border-gray-700"
+                        class="popover-content dark:bg-dark-550 dark:shadow-lg-lg rounded-md rounded-b-xl border border-gray-200 bg-gray-100 shadow-md dark:border-gray-700"
                     >
                         <slot :close="close" />
                     </div>

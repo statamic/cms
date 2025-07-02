@@ -9,7 +9,7 @@ const props = defineProps({
 
 <template>
     <header class="grid grid-cols-[1fr_auto] items-center justify-between gap-4 py-8" data-ui-header>
-        <h1 class="text-[25px] font-medium antialiased flex items-center gap-2">
+        <h1 class="flex items-center gap-2 text-[25px] font-medium antialiased">
             <Icon v-if="icon" :name="icon" class="size-5 text-gray-500"></Icon>
             <slot name="title">{{ title }}</slot>
         </h1>

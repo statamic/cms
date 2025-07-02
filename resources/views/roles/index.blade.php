@@ -8,11 +8,7 @@
 @section('content')
     @unless ($roles->isEmpty())
         <ui-header title="{{ __('Roles & Permissions') }}" icon="permissions">
-            <ui-button
-                href="{{ cp_route('roles.create') }}"
-                variant="primary"
-                :text="__('Create Role')"
-            ></ui-button>
+            <ui-button href="{{ cp_route('roles.create') }}" variant="primary" :text="__('Create Role')"></ui-button>
         </ui-header>
 
         <role-listing
@@ -29,8 +25,5 @@
         />
     @endunless
 
-    <x-statamic::docs-callout
-        :topic="__('Roles & Permissions')"
-        :url="Statamic::docsUrl('users#permissions')"
-    />
+    <x-statamic::docs-callout :topic="__('Roles & Permissions')" :url="Statamic::docsUrl('users#permissions')" />
 @endsection

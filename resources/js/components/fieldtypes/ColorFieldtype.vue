@@ -8,7 +8,7 @@
                             <div class="m-0 inline-block cursor-pointer rounded-sm p-[2px]">
                                 <div
                                     class="h-8 w-8 rounded-xs"
-                                    :class="{ 'border dark:border-dark-900': !value, 'cursor-not-allowed': isReadOnly }"
+                                    :class="{ 'dark:border-dark-900 border': !value, 'cursor-not-allowed': isReadOnly }"
                                     :style="{ 'background-color': value }"
                                 />
                             </div>
@@ -20,7 +20,7 @@
                         <div v-if="config.swatches.length" class="grid grid-cols-4 gap-3">
                             <div
                                 v-for="swatch in config.swatches"
-                                class="inline-block flex h-10 w-10 cursor-pointer rounded-sm border border-gray-400"
+                                class="flex inline-block h-10 w-10 cursor-pointer rounded-sm border border-gray-400"
                                 :style="{ 'background-color': swatch }"
                                 @click="
                                     () => {

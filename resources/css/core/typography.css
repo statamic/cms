@@ -153,7 +153,6 @@ code {
 } */
 
 .prose {
-
     h2 {
         @apply mb-4 text-xl font-medium text-gray-900 dark:text-white;
     }
@@ -163,22 +162,22 @@ code {
     }
 
     ul {
-        @apply mb-6 list-disc pl-5 space-y-2;
+        @apply mb-6 list-disc space-y-2 pl-5;
     }
 
     li {
-        @apply text-gray-700 dark:text-gray-300 leading-relaxed last:mb-0;
+        @apply leading-relaxed text-gray-700 last:mb-0 dark:text-gray-300;
     }
 
     p {
-        @apply mb-4 text-gray-700 dark:text-gray-300 leading-relaxed;
+        @apply mb-4 leading-relaxed text-gray-700 dark:text-gray-300;
     }
 
     a {
-        @apply text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline underline-offset-2;
+        @apply text-blue-600 underline underline-offset-2 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300;
     }
 
     code {
-        @apply px-1.5 py-0.5 rounded text-sm font-mono bg-gray-100 dark:bg-dark-700 text-gray-800 dark:text-gray-200;
+        @apply dark:bg-dark-700 rounded bg-gray-100 px-1.5 py-0.5 font-mono text-sm text-gray-800 dark:text-gray-200;
     }
 }

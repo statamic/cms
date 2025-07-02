@@ -31,7 +31,7 @@
         <div
             v-if="text"
             :class="{
-                'ml-2 text-sm text-gray dark:text-dark-175': inline,
+                'text-gray dark:text-dark-175 ml-2 text-sm': inline,
                 'mt-2': !inline,
             }"
         >

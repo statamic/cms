@@ -7,7 +7,12 @@
                 </template>
                 <DropdownMenu>
                     <DropdownItem :text="__('Configure')" icon="cog" v-if="canConfigure" :href="configureUrl" />
-                    <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" v-if="canEditBlueprint" :href="actions.editBlueprint" />
+                    <DropdownItem
+                        :text="__('Edit Blueprint')"
+                        icon="blueprint-edit"
+                        v-if="canEditBlueprint"
+                        :href="actions.editBlueprint"
+                    />
                 </DropdownMenu>
             </Dropdown>
 
@@ -38,7 +43,7 @@
 
         <div
             v-if="fieldset.empty"
-            class="px-8 py-16 border border-dashed border-gray-400 dark:border-gray-600 rounded-lg text-center"
+            class="rounded-lg border border-dashed border-gray-400 px-8 py-16 text-center dark:border-gray-600"
         >
             <ui-heading class="mx-auto max-w-md" :text="__('messages.global_set_no_fields_description')" />
         </div>
@@ -206,7 +211,7 @@ export default {
                     new AfterSaveHooks('global-set', {
                         globalSet: this.initialHandle,
                         reference: this.initialReference,
-                    })
+                    }),
                 ])
                 .then((response) => {
                     if (!this.isCreating) this.$toast.success(__('Saved'));

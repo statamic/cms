@@ -1,5 +1,5 @@
 <template>
-    <div class="flex text-2xs">
+    <div class="text-2xs flex">
         <a v-for="asset in value" :key="asset.id" :href="asset.url" target="_blank">
             <asset-thumbnail :asset="asset" class="-my-1 h-8 max-w-3xs" />
         </a>

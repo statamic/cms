@@ -8,11 +8,7 @@
             <Button :text="__('Create Blueprint')" :href="createUrl" variant="primary" />
         </Header>
 
-        <BlueprintListing
-            :initial-rows="rows"
-            :reorderable="reorderable"
-            @reordered="reordered"
-        />
+        <BlueprintListing :initial-rows="rows" :reorderable="reorderable" @reordered="reordered" />
     </div>
 </template>
 

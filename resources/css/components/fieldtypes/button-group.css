@@ -9,23 +9,23 @@
     @apply h-auto flex-col items-stretch justify-start p-0;
 
     button {
-        @apply rounded-none border-b border-l border-r border-t-0;
+        @apply rounded-none border-t-0 border-r border-b border-l;
         height: 2.375rem; /*  38px */
     }
 
     :is(.btn-group button:not(:last-child):not(.active)) {
-        @apply border-l border-r;
+        @apply border-r border-l;
     }
 
     button.active + button {
-        @apply border-l border-r;
+        @apply border-r border-l;
     }
 
     button:first-child {
-        @apply rounded-b-none rounded-t border-t;
+        @apply rounded-t rounded-b-none border-t;
     }
 
     button:last-child {
-        @apply rounded-b rounded-t-none border-b;
+        @apply rounded-t-none rounded-b border-b;
     }
 }

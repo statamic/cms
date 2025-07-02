@@ -17,7 +17,12 @@
         >
             <div class="flex justify-center">
                 @auth
-                    <ui-button as="href" variant="primary" href="{{ cp_route('logout') }}?redirect={{ $redirect }}" class="w-full">
+                    <ui-button
+                        as="href"
+                        variant="primary"
+                        href="{{ cp_route('logout') }}?redirect={{ $redirect }}"
+                        class="w-full"
+                    >
                         {{ __('Log out') }}
                     </ui-button>
                 @else

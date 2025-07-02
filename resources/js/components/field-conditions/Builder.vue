@@ -1,17 +1,10 @@
 <template>
     <div class="w-full">
-        <Field
-            :label="__('Conditions')"
-            :instructions="__('messages.field_conditions_instructions')"
-        >
+        <Field :label="__('Conditions')" :instructions="__('messages.field_conditions_instructions')">
             <div class="mb-6 flex items-center gap-x-4">
                 <Select v-model="when" :options="whenOptions" />
 
-                <Select
-                    v-if="hasConditions"
-                    v-model="type"
-                    :options="typeOptions"
-                />
+                <Select v-if="hasConditions" v-model="type" :options="typeOptions" />
 
                 <Input v-if="hasConditions && isCustom" v-model="customMethod" class="flex-1" />
             </div>
@@ -31,15 +24,12 @@
                 @removed="remove(index)"
             />
 
-            <div class="border-t pt-6 dark:border-dark-900" v-if="hasConditions && isStandard">
+            <div class="dark:border-dark-900 border-t pt-6" v-if="hasConditions && isStandard">
                 <Button :text="__('Add Condition')" @click="add" />
             </div>
         </div>
 
-        <Field
-            :label="__('Always Save')"
-            :instructions="__('messages.field_conditions_always_save_instructions')"
-        >
+        <Field :label="__('Always Save')" :instructions="__('messages.field_conditions_always_save_instructions')">
             <Switch v-model="alwaysSave" />
         </Field>
     </div>

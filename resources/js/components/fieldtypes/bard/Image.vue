@@ -12,7 +12,7 @@
             </div>
 
             <div
-                class="flex items-center justify-center space-x-1 border-t px-2 py-2 text-center text-2xs text-white @container/toolbar dark:border-dark-900 dark:text-dark-150 sm:space-x-3 rtl:space-x-reverse"
+                class="text-2xs dark:border-dark-900 dark:text-dark-150 @container/toolbar flex items-center justify-center space-x-1 border-t px-2 py-2 text-center text-white sm:space-x-3 rtl:space-x-reverse"
             >
                 <button v-if="!src" @click="openSelector" type="button" class="btn btn-sm flex px-3 py-1.5">
                     <svg-icon name="folder-image" class="h-4" />
@@ -44,7 +44,7 @@
 
             <div
                 v-if="showingAltEdit"
-                class="flex items-center rounded-b border-t p-2 dark:border-dark-900"
+                class="dark:border-dark-900 flex items-center rounded-b border-t p-2"
                 @paste.stop
             >
                 <text-input

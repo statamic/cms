@@ -25,7 +25,7 @@
 }
 
 .vs--disabled .vs__dropdown-toggle {
-    @apply bg-gray-200 dark:bg-dark-550;
+    @apply dark:bg-dark-550 bg-gray-200;
 }
 
 .v-select[dir='rtl'] .vs__actions {
@@ -48,7 +48,7 @@
 
 .vs__dropdown-toggle {
     @apply flex w-full appearance-none items-center rounded-sm border border-gray-500 bg-gray-100 p-0 text-gray-800 shadow-inner;
-    @apply dark:border-dark-900 dark:bg-dark-650 dark:text-dark-150 ;
+    @apply dark:border-dark-900 dark:bg-dark-650 dark:text-dark-150;
     height: 2.375rem;
     transition:
         border-color 0.15s ease-in-out,
@@ -72,7 +72,7 @@
 }
 
 .v-select .vs__selected-options {
-    @apply appearance-none text-sm text-gray-800 dark:text-dark-150;
+    @apply dark:text-dark-150 appearance-none text-sm text-gray-800;
     @apply relative flex h-full grow basis-1 rounded-s py-1 leading-normal ltr:pl-2 rtl:pr-2;
     width: calc(100% - 32px);
 
@@ -104,12 +104,12 @@
 }
 
 .vs__open-indicator {
-    @apply flex h-full shrink-0 items-center rounded-e border-e-0 bg-clip-padding px-2 text-sm dark:border-dark-800;
+    @apply dark:border-dark-800 flex h-full shrink-0 items-center rounded-e border-e-0 bg-clip-padding px-2 text-sm;
     /* height: 2.375rem; */
 }
 
 .vs__open-indicator svg {
-    @apply relative flex h-4 w-4 items-center text-gray-900 dark:text-dark-100;
+    @apply dark:text-dark-100 relative flex h-4 w-4 items-center text-gray-900;
     transform: translateY(1px) scale(1);
     transition: -webkit-transform 0.15s cubic-bezier(1, -0.115, 0.975, 0.855);
     transition: transform 0.15s cubic-bezier(1, -0.115, 0.975, 0.855);
@@ -129,7 +129,7 @@
 }
 
 .vs__clear {
-    @apply cursor-pointer bg-transparent text-base text-gray-900 shadow-none dark:text-dark-100 ltr:pl-px ltr:pr-2 @-xs:ltr:pl-2 rtl:pl-2 rtl:pr-px @-xs:rtl:pr-2;
+    @apply dark:text-dark-100 cursor-pointer bg-transparent text-base text-gray-900 shadow-none ltr:pr-2 ltr:pl-px @-xs:ltr:pl-2 rtl:pr-px rtl:pl-2 @-xs:rtl:pr-2;
     &:hover {
         @apply text-blue;
     }
@@ -137,7 +137,7 @@
 
 .vs__dropdown-menu {
     @apply absolute z-[9999] m-0 block w-full;
-    @apply flex flex-col rounded-md bg-white p-4 shadow-md dark:bg-dark-550 dark:shadow-lg ltr:text-left rtl:text-right;
+    @apply dark:bg-dark-550 flex flex-col rounded-md bg-white p-4 shadow-md ltr:text-left rtl:text-right dark:shadow-lg;
     top: 46px;
     padding: 0;
     max-height: 350px;
@@ -156,12 +156,12 @@
 }
 
 .vs__dropdown-option {
-    @apply block cursor-pointer text-sm text-gray-800 dark:text-dark-100;
+    @apply dark:text-dark-100 block cursor-pointer text-sm text-gray-800;
     padding: 6px 12px;
 }
 
 .vs__dropdown-option--highlight {
-    @apply bg-gray-300 dark:bg-dark-blue-200;
+    @apply dark:bg-dark-blue-200 bg-gray-300;
 }
 
 .vs__dropdown-option--selected {
@@ -177,7 +177,7 @@
     }
 
     &.invalid {
-        @apply border-red-300 bg-red-100 text-red-500 dark:border-dark-red dark:bg-red-400 dark:text-red-950;
+        @apply dark:border-dark-red border-red-300 bg-red-100 text-red-500 dark:bg-red-400 dark:text-red-950;
         background-image: none;
 
         .vs__deselect {
@@ -187,10 +187,10 @@
 }
 
 .vs__deselect {
-    @apply flex cursor-pointer items-center p-0 text-gray-600 outline-hidden dark:text-dark-175 ltr:ml-1 rtl:mr-1;
+    @apply dark:text-dark-175 flex cursor-pointer items-center p-0 text-gray-600 outline-hidden ltr:ml-1 rtl:mr-1;
 
     &:hover {
-        @apply text-gray-700 dark:text-dark-100;
+        @apply dark:text-dark-100 text-gray-700;
     }
 
     &:focus {
@@ -231,7 +231,7 @@
 
 .vs__search,
 .vs__search:focus {
-    @apply m-0 max-w-full appearance-none border-transparent bg-transparent p-0 text-sm text-gray-800 outline-hidden dark:text-dark-150 ltr:pr-2 rtl:pl-2;
+    @apply dark:text-dark-150 m-0 max-w-full appearance-none border-transparent bg-transparent p-0 text-sm text-gray-800 outline-hidden ltr:pr-2 rtl:pl-2;
     line-height: 1.4;
     border-left: none;
     box-shadow: none;

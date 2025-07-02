@@ -5,7 +5,7 @@
             <Select :options v-model="option" />
         </div>
 
-        <div class="flex-1 flex">
+        <div class="flex flex-1">
             <!-- URL text input -->
             <Input v-if="option === 'url'" v-model="urlValue" />
 
@@ -38,14 +38,14 @@
 
 <!-- This is a hack to...  -->
 <style scoped>
-    /* [1] Make the relationship input full height when it's in a link field. */
-    :deep(.relationship-input) > div:first-child {
-        @apply h-full;
-    }
-    /* [/2] Make the combobox text smaller when it's in a link field so it's not jarring when looking between the two. */
-    :deep([data-ui-combobox-anchor]) {
-        font-size: var(--text-sm)!important;
-    }
+/* [1] Make the relationship input full height when it's in a link field. */
+:deep(.relationship-input) > div:first-child {
+    @apply h-full;
+}
+/* [/2] Make the combobox text smaller when it's in a link field so it's not jarring when looking between the two. */
+:deep([data-ui-combobox-anchor]) {
+    font-size: var(--text-sm) !important;
+}
 </style>
 
 <script>

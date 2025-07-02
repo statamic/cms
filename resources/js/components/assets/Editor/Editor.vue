@@ -1,7 +1,7 @@
 <template>
     <stack name="asset-editor" :before-close="shouldClose" :full="true" @closed="close">
         <div
-            class="asset-editor relative flex h-full flex-col rounded-sm bg-gray-100 dark:bg-dark-800"
+            class="asset-editor dark:bg-dark-800 relative flex h-full flex-col rounded-sm bg-gray-100"
             :class="isImage ? 'is-image' : 'is-file'"
         >
             <div v-if="loading" class="loading">
@@ -18,25 +18,81 @@
                         :aria-label="__('Open in a new window')"
                     >
                         <ui-icon name="folder-photos" class="size-5 group-hover:text-blue-600" />
-                        <span class="text-sm group-hover:text-blue-600 dark:text-gray-400 dark:group-hover:text-gray-200">
+                        <span
+                            class="text-sm group-hover:text-blue-600 dark:text-gray-400 dark:group-hover:text-gray-200"
+                        >
                             {{ asset.path }}
                         </span>
                     </button>
-                    <ui-button variant="ghost" icon="x" class="absolute top-1.5 end-1.5" round @click="close" :aria-label="__('Close Editor')" />
+                    <ui-button
+                        variant="ghost"
+                        icon="x"
+                        class="absolute end-1.5 top-1.5"
+                        round
+                        @click="close"
+                        :aria-label="__('Close Editor')"
+                    />
                 </header>
 
                 <div class="flex flex-1 grow flex-col overflow-scroll md:flex-row md:justify-between">
                     <!-- Visual Area -->
-                    <div class="editor-preview md:min-h-auto flex min-h-[45vh] w-full flex-1 flex-col justify-between bg-gray-800 shadow-[inset_0px_4px_3px_0px_black] dark:bg-gray-900 md:w-1/2 md:flex-auto md:grow lg:w-2/3 md:ltr:rounded-se-md">
+                    <div
+                        class="editor-preview flex min-h-[45vh] w-full flex-1 flex-col justify-between bg-gray-800 shadow-[inset_0px_4px_3px_0px_black] md:min-h-auto md:w-1/2 md:flex-auto md:grow lg:w-2/3 md:ltr:rounded-se-md dark:bg-gray-900"
+                    >
                         <!-- Toolbar -->
-                        <div v-if="isToolbarVisible" class="@container/toolbar dark flex items-center justify-center gap-2 px-2 py-4">
-                            <ui-button v-if="isImage && isFocalPointEditorEnabled" @click.prevent="openFocalPointEditor" icon="focus" variant="filled" v-tooltip="__('Focal Point')" />
-                            <ui-button v-if="canRunAction('rename_asset')" @click.prevent="runAction('rename_asset')" icon="rename" variant="filled" v-tooltip="__('Rename')" />
-                            <ui-button v-if="canRunAction('move_asset')" @click.prevent="runAction('move_asset')" icon="move-folder" variant="filled" v-tooltip="__('Move to Folder')" />
-                            <ui-button v-if="canRunAction('replace_asset')" @click.prevent="runAction('replace_asset')" icon="replace" variant="filled" v-tooltip="__('Replace')" />
-                            <ui-button v-if="canRunAction('reupload_asset')" @click.prevent="runAction('reupload_asset')" icon="upload-cloud" variant="filled" v-tooltip="__('Reupload')" />
-                            <ui-button v-if="asset.allowDownloading" @click="download" icon="download" variant="filled" v-tooltip="__('Download')" />
-                            <ui-button v-if="allowDeleting && canRunAction('delete')" @click="runAction('delete')" icon="trash" variant="filled" v-tooltip="__('Delete')" />
+                        <div
+                            v-if="isToolbarVisible"
+                            class="dark @container/toolbar flex items-center justify-center gap-2 px-2 py-4"
+                        >
+                            <ui-button
+                                v-if="isImage && isFocalPointEditorEnabled"
+                                @click.prevent="openFocalPointEditor"
+                                icon="focus"
+                                variant="filled"
+                                v-tooltip="__('Focal Point')"
+                            />
+                            <ui-button
+                                v-if="canRunAction('rename_asset')"
+                                @click.prevent="runAction('rename_asset')"
+                                icon="rename"
+                                variant="filled"
+                                v-tooltip="__('Rename')"
+                            />
+                            <ui-button
+                                v-if="canRunAction('move_asset')"
+                                @click.prevent="runAction('move_asset')"
+                                icon="move-folder"
+                                variant="filled"
+                                v-tooltip="__('Move to Folder')"
+                            />
+                            <ui-button
+                                v-if="canRunAction('replace_asset')"
+                                @click.prevent="runAction('replace_asset')"
+                                icon="replace"
+                                variant="filled"
+                                v-tooltip="__('Replace')"
+                            />
+                            <ui-button
+                                v-if="canRunAction('reupload_asset')"
+                                @click.prevent="runAction('reupload_asset')"
+                                icon="upload-cloud"
+                                variant="filled"
+                                v-tooltip="__('Reupload')"
+                            />
+                            <ui-button
+                                v-if="asset.allowDownloading"
+                                @click="download"
+                                icon="download"
+                                variant="filled"
+                                v-tooltip="__('Download')"
+                            />
+                            <ui-button
+                                v-if="allowDeleting && canRunAction('delete')"
+                                @click="runAction('delete')"
+                                icon="trash"
+                                variant="filled"
+                                v-tooltip="__('Delete')"
+                            />
 
                             <ItemActions
                                 v-if="actionsMenu.length"
@@ -74,18 +130,23 @@
                                 <!-- SVG -->
                                 <div v-else-if="asset.isSvg" class="flex h-full w-full flex-col">
                                     <div class="grid grid-cols-3 gap-1">
-                                        <div class="bg-checkerboard flex items-center justify-center p-3 aspect-square">
+                                        <div class="bg-checkerboard flex aspect-square items-center justify-center p-3">
                                             <img :src="asset.url" class="asset-thumb relative z-10 size-4" />
                                         </div>
-                                        <div class="bg-checkerboard flex items-center justify-center p-3 aspect-square">
+                                        <div class="bg-checkerboard flex aspect-square items-center justify-center p-3">
                                             <img :src="asset.url" class="asset-thumb relative z-10 size-12" />
                                         </div>
-                                        <div class="bg-checkerboard flex items-center justify-center p-3 aspect-square">
+                                        <div class="bg-checkerboard flex aspect-square items-center justify-center p-3">
                                             <img :src="asset.url" class="asset-thumb relative z-10 size-24" />
                                         </div>
                                     </div>
-                                    <div class="bg-checkerboard h-full min-h-0 mt-1 flex items-center justify-center p-3 aspect-square">
-                                        <img :src="asset.url" class="asset-thumb relative z-10 max-h-full w-2/3 max-w-full" />
+                                    <div
+                                        class="bg-checkerboard mt-1 flex aspect-square h-full min-h-0 items-center justify-center p-3"
+                                    >
+                                        <img
+                                            :src="asset.url"
+                                            class="asset-thumb relative z-10 max-h-full w-2/3 max-w-full"
+                                        />
                                     </div>
                                 </div>
 
@@ -135,16 +196,32 @@
                     </PublishContainer>
                 </div>
 
-                <div class="flex w-full items-center justify-end rounded-b border-t dark:border-gray-700 bg-gray-100 dark:bg-gray-900 px-4 py-3">
+                <div
+                    class="flex w-full items-center justify-end rounded-b border-t bg-gray-100 px-4 py-3 dark:border-gray-700 dark:bg-gray-900"
+                >
                     <div class="hidden h-full flex-1 gap-3 py-1 sm:flex">
-                        <ui-badge v-if="isImage" icon="assets" :text="__('messages.width_x_height', { width: asset.width, height: asset.height })" />
+                        <ui-badge
+                            v-if="isImage"
+                            icon="assets"
+                            :text="__('messages.width_x_height', { width: asset.width, height: asset.height })"
+                        />
                         <ui-badge icon="memory" :text="asset.size" />
                         <ui-badge icon="fingerprint" :text="asset.lastModifiedRelative" />
                     </div>
                     <div class="flex items-center space-x-3 rtl:space-x-reverse">
-                        <ui-button icon="ui/chevron-left" @click="navigateToPreviousAsset" v-tooltip="__('Previous Asset')" />
+                        <ui-button
+                            icon="ui/chevron-left"
+                            @click="navigateToPreviousAsset"
+                            v-tooltip="__('Previous Asset')"
+                        />
                         <ui-button icon="ui/chevron-right" @click="navigateToNextAsset" v-tooltip="__('Next Asset')" />
-                        <ui-button variant="primary" icon="save" @click="saveAndClose" v-if="!readOnly" :text="__('Save')" />
+                        <ui-button
+                            variant="primary"
+                            icon="save"
+                            @click="saveAndClose"
+                            v-if="!readOnly"
+                            :text="__('Save')"
+                        />
                     </div>
                 </div>
             </template>

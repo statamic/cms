@@ -163,10 +163,10 @@ const modalClasses = cva({
     <DialogRoot v-model:open="open" :modal="true">
         <DialogTrigger>
             <div
-                class="data-[focus-visible]:outline-focus hover flex cursor-text items-center gap-x-2 rounded-md [button:has(>&)]:rounded-md bg-gray-900 text-xs text-gray-400 shadow-[0_-1px_rgba(255,255,255,0.06),0_4px_8px_rgba(0,0,0,0.05),0_1px_6px_-4px_#000] ring-1 ring-gray-900/10 outline-none hover:ring-white/10 md:w-32 md:py-[calc(5/16*1rem)] md:ps-2 md:pe-1.5 md:shadow-[0_1px_5px_-4px_rgba(19,19,22,0.4),0_2px_5px_rgba(32,42,54,0.06)]"
+                class="data-[focus-visible]:outline-focus hover flex cursor-text items-center gap-x-2 rounded-md bg-gray-900 text-xs text-gray-400 shadow-[0_-1px_rgba(255,255,255,0.06),0_4px_8px_rgba(0,0,0,0.05),0_1px_6px_-4px_#000] ring-1 ring-gray-900/10 outline-none hover:ring-white/10 md:w-32 md:py-[calc(5/16*1rem)] md:ps-2 md:pe-1.5 md:shadow-[0_1px_5px_-4px_rgba(19,19,22,0.4),0_2px_5px_rgba(32,42,54,0.06)] [button:has(>&)]:rounded-md"
             >
                 <Icon name="magnifying-glass" class="size-5 flex-none text-gray-600" />
-                <span class="sr-only leading-none md:not-sr-only trim-cap-alphabetic">Search</span>
+                <span class="trim-cap-alphabetic sr-only leading-none md:not-sr-only">Search</span>
                 <kbd
                     class="ml-auto hidden self-center rounded bg-white/5 px-[0.3125rem] py-[0.0625rem] text-[0.625rem]/4 font-medium text-gray-400 ring-1 ring-white/7.5 [word-spacing:-0.15em] ring-inset md:block"
                 >

@@ -23,16 +23,8 @@ const shouldDeleteChildren = ref(false);
 
         <template #footer>
             <div class="flex items-center justify-end space-x-3 pt-3 pb-1">
-                <Button
-                    variant="ghost"
-                    @click="$emit('cancel')"
-                    :text="__('Cancel')"
-                />
-                <Button
-                    variant="danger"
-                    @click="$emit('confirm', shouldDeleteChildren)"
-                    :text="__('Remove')"
-                />
+                <Button variant="ghost" @click="$emit('cancel')" :text="__('Cancel')" />
+                <Button variant="danger" @click="$emit('confirm', shouldDeleteChildren)" :text="__('Remove')" />
             </div>
         </template>
     </Modal>

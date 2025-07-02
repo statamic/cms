@@ -1,8 +1,5 @@
 <!DOCTYPE html>
-<html
-    lang="{{ Statamic::cpLocale() }}"
-    dir="{{ Statamic::cpDirection() }}"
->
+<html lang="{{ Statamic::cpLocale() }}" dir="{{ Statamic::cpDirection() }}">
     <head>
         @include('statamic::partials.head')
     </head>

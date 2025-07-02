@@ -11,7 +11,7 @@
             <div>
                 <div class="text-sm">{{ $user->email() }}</div>
                 @if ($user->isSuper())
-                    <div class="text-xs text-gray-500 font-normal flex items-center gap-1">
+                    <div class="flex items-center gap-1 text-xs font-normal text-gray-500">
                         {{ __('Super Admin') }}
                         @if (session()->get('statamic_impersonated_by'))
                             <ui-badge size="sm" pill :text="__('Impersonating')" />
@@ -25,25 +25,17 @@
     </ui-dropdown-header>
 
     <ui-dropdown-menu>
-        <ui-dropdown-item
-            href="{{ route('statamic.cp.account') }}"
-            icon="avatar"
-            :text="__('Manage profile')"
-        />
-        <ui-dropdown-item
-            href="{{ cp_route('preferences.user.edit') }}"
-            icon="cog"
-            :text="__('Preferences')"
-        />
+        <ui-dropdown-item href="{{ route('statamic.cp.account') }}" icon="avatar" :text="__('Manage profile')" />
+        <ui-dropdown-item href="{{ cp_route('preferences.user.edit') }}" icon="cog" :text="__('Preferences')" />
         @if (config('statamic.cp.support_url'))
             <ui-dropdown-item
                 href="{{ config('statamic.cp.support_url') }}"
                 icon="support"
                 :text="__('Get support')"
                 target="_blank"
-            >
-            </ui-dropdown-item>
+            ></ui-dropdown-item>
         @endif
+
         @if (session()->get('statamic_impersonated_by'))
             <ui-dropdown-item
                 href="{{ cp_route('impersonation.stop') }}"
@@ -51,6 +43,7 @@
                 :text="__('Stop impersonating')"
             />
         @endif
+
         <ui-dropdown-item
             href="{{ route('statamic.cp.logout', ['redirect' => cp_route('index')]) }}"
             icon="sign-out"

@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .table-fieldtype-table {
-    @apply relative mb-4 w-full rounded-lg border text-gray shadow-ui-sm outline-hidden dark:border-dark-900 dark:text-dark-150 ltr:text-left rtl:text-right;
+    @apply text-gray shadow-ui-sm dark:border-dark-900 dark:text-dark-150 relative mb-4 w-full rounded-lg border outline-hidden ltr:text-left rtl:text-right;
     border-collapse: separate;
     border-spacing: 0;
     table-layout: fixed;
@@ -11,7 +11,7 @@
 
 .table-fieldtype-table thead {
     th {
-        @apply z-10 border-b bg-gray-50 p-2 text-sm font-medium text-gray-900 dark:border-dark-900 dark:bg-dark-700 dark:text-dark-150 ltr:border-r rtl:border-l;
+        @apply dark:border-dark-900 dark:bg-dark-700 dark:text-dark-150 z-10 border-b bg-gray-50 p-2 text-sm font-medium text-gray-900 ltr:border-r rtl:border-l;
         display: table-cell;
         position: sticky;
         top: -1px;
@@ -32,7 +32,7 @@
     @apply rounded-none border-none bg-white text-sm shadow-none outline-hidden;
     @apply dark:bg-dark-650;
     &:focus {
-        @apply bg-gray-100 shadow-inner ring-0 dark:bg-dark-700;
+        @apply dark:bg-dark-700 bg-gray-100 shadow-inner ring-0;
     }
 }
 
@@ -44,7 +44,7 @@
     }
 
     td {
-        @apply border-b p-0 dark:border-dark-900 ltr:border-r rtl:border-l;
+        @apply dark:border-dark-900 border-b p-0 ltr:border-r rtl:border-l;
 
         &:first-child.grid-cell {
             @apply ltr:pl-3 rtl:pr-3;
@@ -65,7 +65,7 @@
             }
 
             &:hover {
-                @apply bg-gray-300 dark:bg-dark-750;
+                @apply dark:bg-dark-750 bg-gray-300;
             }
         }
     }
@@ -81,7 +81,7 @@
     }
 
     tr.draggable-source--is-dragging td {
-        @apply bg-gray-100 dark:bg-dark-800;
+        @apply dark:bg-dark-800 bg-gray-100;
     }
 }
 
@@ -89,9 +89,9 @@
     @apply w-8 text-center ltr:pl-0 rtl:pr-0;
     vertical-align: middle;
     &:focus-within {
-        @apply bg-gray-200 dark:bg-dark-750;
+        @apply dark:bg-dark-750 bg-gray-200;
         button {
-            @apply outline-hidden ring-0;
+            @apply ring-0 outline-hidden;
         }
     }
 }

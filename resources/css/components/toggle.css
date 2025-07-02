@@ -11,9 +11,9 @@
     }
 
     .inline-label {
-        @apply font-normal text-gray-700 dark:text-dark-175 ltr:ml-2 rtl:mr-2;
+        @apply dark:text-dark-175 font-normal text-gray-700 ltr:ml-2 rtl:mr-2;
         a {
-            @apply text-gray-800 underline dark:text-dark-150;
+            @apply dark:text-dark-150 text-gray-800 underline;
             &:hover {
                 @apply text-blue;
             }
@@ -27,7 +27,7 @@
 }
 
 .toggle-container {
-    @apply relative shrink-0 cursor-pointer border bg-white dark:border-dark-900 dark:bg-dark-700;
+    @apply dark:border-dark-900 dark:bg-dark-700 relative shrink-0 cursor-pointer border bg-white;
     height: 22px;
     width: 46px;
     border-radius: 20px;

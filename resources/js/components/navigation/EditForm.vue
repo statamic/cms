@@ -1,7 +1,7 @@
 <template>
     <publish-container
         v-if="blueprint"
-        class="max-w-5xl mx-auto"
+        class="mx-auto max-w-5xl"
         ref="container"
         name="collection"
         reference="collection"

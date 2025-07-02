@@ -13,8 +13,19 @@
         <td class="grid-row-controls row-controls" v-if="!grid.isReadOnly && (canAddRows || canDelete)">
             <Dropdown v-if="canAddRows || canDelete" placement="left-start">
                 <DropdownMenu>
-                    <DropdownItem v-if="canAddRows" :text="__('Duplicate Row')" icon="duplicate" @click="$emit('duplicate', index)" />
-                    <DropdownItem v-if="canDelete" :text="__('Delete Row')" icon="trash" variant="destructive" @click="$emit('removed', index)" />
+                    <DropdownItem
+                        v-if="canAddRows"
+                        :text="__('Duplicate Row')"
+                        icon="duplicate"
+                        @click="$emit('duplicate', index)"
+                    />
+                    <DropdownItem
+                        v-if="canDelete"
+                        :text="__('Delete Row')"
+                        icon="trash"
+                        variant="destructive"
+                        @click="$emit('removed', index)"
+                    />
                 </DropdownMenu>
             </Dropdown>
         </td>

@@ -4,7 +4,7 @@
 
 .CodeMirror {
     /* Set height, width, borders, and global font properties here */
-    @apply text-gray-800 dark:text-gray-300 font-normal leading-normal min-h-20;
+    @apply min-h-20 leading-normal font-normal text-gray-800 dark:text-gray-300;
 }
 
 /* PADDING */
@@ -481,13 +481,13 @@ span.CodeMirror-selectedtext {
 }
 
 .CodeMirror-rulers {
-    @apply absolute left-0 right-0 overflow-hidden;
+    @apply absolute right-0 left-0 overflow-hidden;
     top: -50px;
     bottom: -20px;
 }
 
 .CodeMirror-ruler {
-    @apply bottom-0 top-0;
+    @apply top-0 bottom-0;
 }
 
 /* Material Theme

@@ -10,9 +10,9 @@
             </div>
 
             <ui-panel-header>
-                <div class="page-tree-header font-medium text-sm items-center flex justify-between">
+                <div class="page-tree-header flex items-center justify-between text-sm font-medium">
                     <div v-text="__('Tree Structure')" />
-                    <div class="flex gap-2 -me-3">
+                    <div class="-me-3 flex gap-2">
                         <ui-button size="sm" icon="tree-collapse" :text="__('Collapse')" @click="collapseAll" />
                         <ui-button size="sm" icon="tree-expand" :text="__('Expand')" @click="expandAll" />
                     </div>
@@ -36,7 +36,9 @@
                     @close:node="nodeClosed"
                 >
                     <template #placeholder>
-                        <div class="w-full rounded-sm border border-dashed border-blue-400 bg-blue-500/10 p-2">&nbsp;</div>
+                        <div class="w-full rounded-sm border border-dashed border-blue-400 bg-blue-500/10 p-2">
+                            &nbsp;
+                        </div>
                     </template>
 
                     <template #default="{ node, stat }">

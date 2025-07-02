@@ -1,5 +1,5 @@
 <template>
-    <div class="site-selector flex h-full items-center dark:border-dark-900 ltr:mr-4 rtl:ml-4">
+    <div class="site-selector dark:border-dark-900 flex h-full items-center ltr:mr-4 rtl:ml-4">
         <Select
             :options="sites"
             option-label="name"
@@ -11,9 +11,9 @@
         >
             <template #selected-option="{ option }">
                 <div
-                    class="anti flex items-center text-sm font-medium text-gray text-[0.8125rem] hover:text-gray-800 dark:text-dark-100 dark:hover:text-dark-175"
+                    class="anti text-gray dark:text-dark-100 dark:hover:text-dark-175 flex items-center text-sm text-[0.8125rem] font-medium hover:text-gray-800"
                 >
-                    <svg-icon name="sites" class="h-4 w-4 ltr:mr-2 rtl:ml-2 text-gray-500" />
+                    <svg-icon name="sites" class="h-4 w-4 text-gray-500 ltr:mr-2 rtl:ml-2" />
                     <div class="whitespace-nowrap">{{ __(option.name) }}</div>
                 </div>
             </template>

@@ -45,7 +45,7 @@ export default {
     inject: ['sharedState'],
 
     props: {
-        context: { type: Object, default: () => {} }
+        context: { type: Object, default: () => {} },
     },
 
     data() {
@@ -69,7 +69,7 @@ export default {
             deep: true,
             handler() {
                 this.getActions();
-            }
+            },
         },
     },
 

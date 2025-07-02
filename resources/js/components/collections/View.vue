@@ -13,7 +13,12 @@
                     <DropdownMenu>
                         <DropdownLabel :text="__('Actions')" />
                         <DropdownItem v-if="canEdit" :text="__('Configure Collection')" icon="cog" :href="editUrl" />
-                        <DropdownItem v-if="canEditBlueprints" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="blueprintsUrl" />
+                        <DropdownItem
+                            v-if="canEditBlueprints"
+                            :text="__('Edit Blueprints')"
+                            icon="blueprint-edit"
+                            :href="blueprintsUrl"
+                        />
                         <DropdownItem v-if="canEdit" :text="__('Scaffold Views')" icon="scaffold" :href="scaffoldUrl" />
                         <DropdownSeparator v-if="canEdit || canEditBlueprints || actions.length" />
                         <DropdownItem
@@ -36,12 +41,7 @@
                     @click="cancelTreeProgress"
                 />
 
-                <site-selector
-                    v-if="sites.length > 1"
-                    :sites="sites"
-                    :value="site"
-                    @input="site = $event.handle"
-                />
+                <site-selector v-if="sites.length > 1" :sites="sites" :value="site" @input="site = $event.handle" />
 
                 <Button
                     v-if="treeIsDirty"
@@ -49,7 +49,11 @@
                     :text="__('Save Changes')"
                     :variant="deletedEntries.length ? 'danger' : 'default'"
                     @click="saveTree"
-                    v-tooltip="deletedEntries.length ? __n('An entry will be deleted|:count entries will be deleted', deletedEntries.length) : null"
+                    v-tooltip="
+                        deletedEntries.length
+                            ? __n('An entry will be deleted|:count entries will be deleted', deletedEntries.length)
+                            : null
+                    "
                 />
             </template>
 
@@ -73,11 +77,7 @@
                     @input="site = $event"
                 />
 
-                <Button
-                    v-if="!reordering"
-                    @click="reordering = true"
-                    :text="__('Reorder')"
-                />
+                <Button v-if="!reordering" @click="reordering = true" :text="__('Reorder')" />
 
                 <template v-if="reordering">
                     <Button @click="reordering = false" :text="__('Cancel')" />
@@ -129,11 +129,7 @@
             @canceled="markTreeClean"
         >
             <template #branch-icon="{ branch }">
-                <ui-icon
-                    v-if="isRedirectBranch(branch)"
-                    name="external-link"
-                    v-tooltip="__('Redirect')"
-                />
+                <ui-icon v-if="isRedirectBranch(branch)" name="external-link" v-tooltip="__('Redirect')" />
             </template>
 
             <template #branch-options="{ branch, removeBranch, depth }">
@@ -183,7 +179,17 @@ import DeleteLocalizationConfirmation from './DeleteLocalizationConfirmation.vue
 import SiteSelector from '../SiteSelector.vue';
 import HasActions from '../publish/HasActions';
 import { defineAsyncComponent } from 'vue';
-import { Dropdown, DropdownItem, DropdownLabel, DropdownMenu, DropdownSeparator, Header, Button, ToggleGroup, ToggleItem } from '@statamic/ui';
+import {
+    Dropdown,
+    DropdownItem,
+    DropdownLabel,
+    DropdownMenu,
+    DropdownSeparator,
+    Header,
+    Button,
+    ToggleGroup,
+    ToggleItem,
+} from '@statamic/ui';
 import ItemActions from '@statamic/components/actions/ItemActions.vue';
 
 export default {

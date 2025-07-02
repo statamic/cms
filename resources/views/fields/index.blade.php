@@ -12,16 +12,16 @@
 
     <div class="mt-6 flex flex-wrap md:-mx-6">
         <div class="mb-6 w-full md:w-1/2 md:px-6">
-            <div class="card content border-t-6 border-blue p-0">
+            <div class="card content border-blue border-t-6 p-0">
                 <div class="p-6">
                     <h2>
-                        <a href="{{ cp_route('blueprints.index') }}" class="text-gray-900 hover:text-blue">
+                        <a href="{{ cp_route('blueprints.index') }}" class="hover:text-blue text-gray-900">
                             {{ __('Blueprints') }}
                         </a>
                     </h2>
                     <p>{{ __('statamic::messages.fields_blueprints_description') }}</p>
                     <p>
-                        <a href="{{ Statamic::docsUrl('blueprints') }}" class="font-bold text-blue">
+                        <a href="{{ Statamic::docsUrl('blueprints') }}" class="text-blue font-bold">
                             {{ __('Read the Docs') }}
                         </a>
                         <span class="inline-block h-4 w-4 text-blue-600 ltr:ml-2 rtl:mr-2">
@@ -47,12 +47,12 @@
             </div>
         </div>
         <div class="mb-6 w-full md:w-1/2 md:px-6">
-            <div class="card content border-t-6 border-blue p-0">
+            <div class="card content border-blue border-t-6 p-0">
                 <div class="p-6">
                     <h2>{{ __('Fieldsets') }}</h2>
                     <p>{{ __('statamic::messages.fields_fieldsets_description') }}</p>
                     <p>
-                        <a href="{{ Statamic::docsUrl('fieldsets') }}" class="font-bold text-blue">
+                        <a href="{{ Statamic::docsUrl('fieldsets') }}" class="text-blue font-bold">
                             {{ __('Read the Docs') }}
                         </a>
                         <span class="inline-block h-4 w-4 text-blue-600 ltr:ml-2 rtl:mr-2">

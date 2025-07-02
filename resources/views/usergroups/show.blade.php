@@ -20,11 +20,7 @@
         @endcan
 
         @can('edit', $group)
-            <ui-button
-                :text="__('Edit Group')"
-                variant="primary"
-                href="{{ $group->editUrl() }}"
-            ></ui-button>
+            <ui-button :text="__('Edit Group')" variant="primary" href="{{ $group->editUrl() }}"></ui-button>
         @endcan
     </ui-header>
 

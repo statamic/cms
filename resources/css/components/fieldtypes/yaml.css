@@ -4,7 +4,7 @@
 
 .yaml-fieldtype {
     .code-mode {
-        @apply absolute right-3 top-2 z-10 text-xs uppercase tracking-wider text-gray-600;
+        @apply absolute top-2 right-3 z-10 text-xs tracking-wider text-gray-600 uppercase;
     }
     .CodeMirror-wrap {
         @apply rounded-sm;

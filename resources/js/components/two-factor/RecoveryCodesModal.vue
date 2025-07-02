@@ -57,8 +57,8 @@ function copyToClipboard() {
                 <div class="space-y-6">
                     <ui-description>{{ __('statamic::messages.two_factor_recovery_codes') }}</ui-description>
 
-                    <div class="bg-gray-200 py-8 rounded-xl">
-                        <ul class="grid gap-2 md:grid-cols-2 text-center justify-center">
+                    <div class="rounded-xl bg-gray-200 py-8">
+                        <ul class="grid justify-center gap-2 text-center md:grid-cols-2">
                             <li
                                 v-for="recoveryCode in recoveryCodes"
                                 class="font-mono lg:text-base"

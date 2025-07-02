@@ -43,7 +43,7 @@ function setActiveTabFromHash() {
 
 watch(
     () => tab.value,
-    (tab) => window.location.hash = tab,
+    (tab) => (window.location.hash = tab),
 );
 
 const fieldTabMap = computed(() => {

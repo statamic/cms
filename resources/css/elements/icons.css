@@ -75,7 +75,7 @@ svg {
     }
     &.draft,
     &.expired {
-        @apply bg-gray-600 dark:bg-dark-200;
+        @apply dark:bg-dark-200 bg-gray-600;
     }
     &.scheduled,
     &.hollow {
@@ -91,7 +91,7 @@ svg {
 }
 
 .icon-user-initials {
-    @apply bg-pink text-center text-2xs text-white;
+    @apply bg-pink text-2xs text-center text-white;
 }
 
 .svg-icon {

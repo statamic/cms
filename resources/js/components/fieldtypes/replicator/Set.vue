@@ -181,11 +181,7 @@ function destroy() {
                                 @click="toggleCollapsedState"
                             />
                             <DropdownItem :text="__('Duplicate Set')" @click="emit('duplicated')" />
-                            <DropdownItem
-                                :text="__('Delete Set')"
-                                variant="destructive"
-                                @click="destroy"
-                            />
+                            <DropdownItem :text="__('Delete Set')" variant="destructive" @click="destroy" />
                         </DropdownMenu>
                     </Dropdown>
                 </div>

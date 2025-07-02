@@ -12,8 +12,5 @@
         create-url="{{ cp_route('taxonomies.blueprints.create', $taxonomy) }}"
     ></taxonomy-blueprint-listing>
 
-    <x-statamic::docs-callout
-        topic="{{ __('Blueprints') }}"
-        url="{{ Statamic::docsUrl('blueprints') }}"
-    />
+    <x-statamic::docs-callout topic="{{ __('Blueprints') }}" url="{{ Statamic::docsUrl('blueprints') }}" />
 @endsection

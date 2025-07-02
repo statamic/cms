@@ -3,7 +3,7 @@
         <ui-button icon="link" @click="open = true" :text="__('Link Existing')" />
 
         <stack narrow v-if="open" @closed="open = false" name="field-linker" v-slot="{ close }">
-            <div class="h-full overflow-auto bg-white dark:bg-gray-800 p-3 rounded-l-xl">
+            <div class="h-full overflow-auto rounded-l-xl bg-white p-3 dark:bg-gray-800">
                 <header class="flex items-center justify-between pl-3">
                     <Heading :text="__('Link Fields')" size="lg" icon="fieldsets" />
                     <Button type="button" icon="x" variant="subtle" @click="close" />
@@ -26,14 +26,14 @@
                                 <div class="flex items-center">
                                     <span
                                         v-text="option.fieldset"
-                                        class="text-2xs text-gray-500 dark:text-dark-150 ltr:mr-2 rtl:ml-2"
+                                        class="text-2xs dark:text-dark-150 text-gray-500 ltr:mr-2 rtl:ml-2"
                                     />
                                     <span v-text="option.label" />
                                 </div>
                             </template>
                             <template #no-options>
                                 <div
-                                    class="px-4 py-2 text-sm text-gray-700 dark:text-dark-200 ltr:text-left rtl:text-right"
+                                    class="dark:text-dark-200 px-4 py-2 text-sm text-gray-700 ltr:text-left rtl:text-right"
                                     v-text="__('No options to choose from.')"
                                 />
                             </template>
@@ -41,7 +41,7 @@
                     </Field>
 
                     <Button
-                        class="w-full mt-6"
+                        class="mt-6 w-full"
                         variant="primary"
                         :disabled="!reference"
                         :text="__('Link')"
@@ -49,9 +49,9 @@
                     />
 
                     <div class="my-4 flex items-center">
-                        <div class="flex-1 border-b border-gray-300 dark:border-dark-200" />
-                        <div class="mx-4 text-2xs text-gray-600 dark:text-dark-175" v-text="__('or')"></div>
-                        <div class="flex-1 border-b border-gray-300 dark:border-dark-200" />
+                        <div class="dark:border-dark-200 flex-1 border-b border-gray-300" />
+                        <div class="text-2xs dark:text-dark-175 mx-4 text-gray-600" v-text="__('or')"></div>
+                        <div class="dark:border-dark-200 flex-1 border-b border-gray-300" />
                     </div>
 
                     <Field
@@ -69,7 +69,7 @@
                         >
                             <template #no-options>
                                 <div
-                                    class="px-4 py-2 text-sm text-gray-700 dark:text-dark-200 ltr:text-left rtl:text-right"
+                                    class="dark:text-dark-200 px-4 py-2 text-sm text-gray-700 ltr:text-left rtl:text-right"
                                     v-text="__('No options to choose from.')"
                                 />
                             </template>
@@ -84,7 +84,7 @@
                     </Field>
 
                     <Button
-                        class="w-full mt-6"
+                        class="mt-6 w-full"
                         variant="primary"
                         :disabled="!fieldset"
                         :text="__('Link')"

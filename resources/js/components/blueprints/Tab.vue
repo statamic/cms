@@ -22,7 +22,7 @@
         <Dropdown v-if="isActive" placement="left-start" class="me-3">
             <template #trigger>
                 <button
-                    class="hover:text-gray-900 active:text-gray-900 dark:hover:text-gray-400 ltr:ml-2 rtl:mr-2"
+                    class="hover:text-gray-900 active:text-gray-900 ltr:ml-2 rtl:mr-2 dark:hover:text-gray-400"
                     :aria-label="__('Open Dropdown')"
                 >
                     <svg-icon name="micro/chevron-down-xs" class="w-2" />

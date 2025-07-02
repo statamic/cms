@@ -1,18 +1,28 @@
 <template>
-    <ui-card class="py-0.75! px-2! field-grid-item blueprint-section-field" :class="widthClass">
+    <ui-card class="field-grid-item blueprint-section-field px-2! py-0.75!" :class="widthClass">
         <div class="flex items-center gap-2">
             <ui-icon name="handles" class="blueprint-drag-handle size-4 cursor-grab text-gray-300" />
             <div class="flex flex-1 items-center justify-between">
                 <div class="flex flex-1 items-center py-2">
                     <ui-icon
-                        class="size-4 me-2 text-gray-500"
+                        class="me-2 size-4 text-gray-500"
                         :name="field.icon.startsWith('<svg') ? field.icon : `fieldtype-${field.icon}`"
                         v-tooltip="tooltipText"
                     />
                     <div class="flex items-center gap-2">
-                        <button class="cursor-pointer overflow-hidden text-ellipsis text-sm hover:text-blue-500" type="button" v-text="__(labelText)" @click="$emit('edit')" />
+                        <button
+                            class="cursor-pointer overflow-hidden text-sm text-ellipsis hover:text-blue-500"
+                            type="button"
+                            v-text="__(labelText)"
+                            @click="$emit('edit')"
+                        />
                         <ui-icon v-if="isReferenceField" name="link" class="text-gray-400" />
-                        <span v-if="isReferenceField" class="text-gray-500 font-mono text-2xs cursor-help" v-text="__('field')" v-tooltip="__('Imported from: ') + field.field_reference" />
+                        <span
+                            v-if="isReferenceField"
+                            class="text-2xs cursor-help font-mono text-gray-500"
+                            v-text="__('field')"
+                            v-tooltip="__('Imported from: ') + field.field_reference"
+                        />
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
@@ -20,15 +30,34 @@
 
                     <div
                         v-else
-                        class="bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-400  border border-gray-300 dark:border-gray-700 overflow-hidden h-6 w-14 rounded-md flex items-center justify-center"
+                        class="flex h-6 w-14 items-center justify-center overflow-hidden rounded-md border border-gray-300 bg-gray-100 text-gray-600 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400"
                     >
                         <Icon name="eye-slash" class="size-4 opacity-50" />
                     </div>
 
                     <div class="flex items-center">
-                        <ui-button v-if="canDefineLocalizable" size="sm" icon="earth" variant="subtle" v-tooltip="__('Localizable')" @click="localizable = !localizable" />
-                        <ui-button size="sm" icon="duplicate" variant="subtle" @click.prevent="$emit('duplicate')" v-tooltip="__('Duplicate')" />
-                        <ui-button size="sm" icon="trash" variant="subtle" @click.prevent="$emit('deleted')" v-tooltip="__('Remove')" />
+                        <ui-button
+                            v-if="canDefineLocalizable"
+                            size="sm"
+                            icon="earth"
+                            variant="subtle"
+                            v-tooltip="__('Localizable')"
+                            @click="localizable = !localizable"
+                        />
+                        <ui-button
+                            size="sm"
+                            icon="duplicate"
+                            variant="subtle"
+                            @click.prevent="$emit('duplicate')"
+                            v-tooltip="__('Duplicate')"
+                        />
+                        <ui-button
+                            size="sm"
+                            icon="trash"
+                            variant="subtle"
+                            @click.prevent="$emit('deleted')"
+                            v-tooltip="__('Remove')"
+                        />
                     </div>
 
                     <stack name="field-settings" v-if="isEditing" @closed="editorClosed">

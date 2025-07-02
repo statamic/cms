@@ -13,7 +13,7 @@
     }
 
     .page-move {
-        @apply w-6 dark:border-dark-900 dark:text-dark-175 ltr:rounded-l;
+        @apply dark:border-dark-900 dark:text-dark-175 w-6 ltr:rounded-l;
         cursor: grab;
         background-image: url('../../svg/icons/light/drag-dots.svg');
         background-size: 7px 17px;
@@ -27,7 +27,7 @@
 
     .page-root {
         background-color: hsla(210, 30%, 95%, 0.5);
-        @apply flex w-6 items-center dark:border-dark-900 ltr:rounded-l ltr:border-r rtl:rounded-r rtl:border-l;
+        @apply dark:border-dark-900 flex w-6 items-center ltr:rounded-l ltr:border-r rtl:rounded-r rtl:border-l;
     }
 
     /* Nice progressive enhancement to visually connect tree node children by removing the top left border radius */

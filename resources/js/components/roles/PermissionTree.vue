@@ -36,7 +36,7 @@ export default {
     methods: {
         updatePermission(permission, checked) {
             permission.checked = checked;
-        }
-    }
+        },
+    },
 };
 </script>

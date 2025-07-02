@@ -42,17 +42,17 @@
    ========================================================================== */
 
 .asset-table-listing {
-    @apply relative overflow-hidden rounded-sm border dark:border-dark-900;
+    @apply dark:border-dark-900 relative overflow-hidden rounded-sm border;
 
     table {
-        @apply m-0 w-full select-none rounded-b border-none;
+        @apply m-0 w-full rounded-b border-none select-none;
     }
     tbody tr {
         @apply outline-hidden;
     }
 
     tbody tr:not(:last-child) {
-        @apply border-b dark:border-dark-900;
+        @apply dark:border-dark-900 border-b;
     }
 
     tbody tr td {
@@ -117,14 +117,14 @@
    ========================================================================== */
 
 .asset-tile {
-    @apply relative flex min-w-0 cursor-pointer flex-col items-center justify-between rounded-lg outline outline-gray-300 dark:outline-gray-700 overflow-hidden;
+    @apply relative flex min-w-0 cursor-pointer flex-col items-center justify-between overflow-hidden rounded-lg outline outline-gray-300 dark:outline-gray-700;
 
     .selected & {
         @apply outline-3 outline-blue-500;
     }
 
     .asset-thumb {
-        @apply flex items-center justify-center size-full;
+        @apply flex size-full items-center justify-center;
         > img,
         > svg,
         > .svg-img {
@@ -137,7 +137,7 @@
     }
 
     .asset-meta-btn {
-        @apply px-2 py-1 text-blue-600 hover:bg-gray-200 dark:border-dark-300 dark:hover:bg-dark-800 ltr:border-l rtl:border-r;
+        @apply dark:border-dark-300 dark:hover:bg-dark-800 px-2 py-1 text-blue-600 hover:bg-gray-200 ltr:border-l rtl:border-r;
     }
 
     .asset-controls {
@@ -146,7 +146,7 @@
 }
 
 .asset-filename {
-    @apply font-mono text-xs text-gray-500 mt-2 whitespace-nowrap text-center;
+    @apply mt-2 text-center font-mono text-xs whitespace-nowrap text-gray-500;
     .selected & {
         @apply text-blue-500;
     }

@@ -6,7 +6,11 @@
 
         <ui-panel :heading="__('Settings')">
             <ui-card>
-                <ui-field :label="__('Title')" :instructions="__('messages.fieldsets_title_instructions')" :errors="errors.title">
+                <ui-field
+                    :label="__('Title')"
+                    :instructions="__('messages.fieldsets_title_instructions')"
+                    :errors="errors.title"
+                >
                     <ui-input v-model="fieldset.title" />
                 </ui-field>
             </ui-card>

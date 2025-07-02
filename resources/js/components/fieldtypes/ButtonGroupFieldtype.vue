@@ -24,7 +24,7 @@ export default {
     mixins: [Fieldtype, HasInputOptions],
     components: {
         Button,
-        ButtonGroup
+        ButtonGroup,
     },
 
     data() {

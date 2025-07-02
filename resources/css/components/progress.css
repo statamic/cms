@@ -4,7 +4,7 @@
 }
 
 #nprogress .bar {
-    @apply fixed top-0 w-full bg-blue ltr:left-0 rtl:right-0;
+    @apply bg-blue fixed top-0 w-full ltr:left-0 rtl:right-0;
     height: 2px;
     z-index: 10000; /*  above global-header */
 }

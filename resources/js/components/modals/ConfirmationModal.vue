@@ -42,13 +42,13 @@ onMounted(() => emit('opened'));
 const modalOpen = ref(true);
 
 function updateModalOpen(open) {
-    if (! open && props.busy) {
+    if (!open && props.busy) {
         return;
     }
 
     modalOpen.value = open;
 
-    if (! open) emit('cancel');
+    if (!open) emit('cancel');
 }
 
 function submit() {
@@ -62,7 +62,7 @@ function submit() {
     <Modal ref="modal" :title="__(title)" :open="modalOpen" @update:open="updateModalOpen">
         <div
             v-if="busy"
-            class="pointer-events-none absolute inset-0 flex select-none items-center justify-center bg-white bg-opacity-75 dark:bg-dark-700"
+            class="bg-opacity-75 dark:bg-dark-700 pointer-events-none absolute inset-0 flex items-center justify-center bg-white select-none"
         >
             <loading-graphic text="" />
         </div>
@@ -75,12 +75,7 @@ function submit() {
         <template #footer>
             <div class="flex items-center justify-end space-x-3 pt-3 pb-1">
                 <ModalClose asChild>
-                    <Button
-                        v-if="cancellable"
-                        variant="ghost"
-                        :disabled="busy"
-                        :text="__(cancelText)"
-                    />
+                    <Button v-if="cancellable" variant="ghost" :disabled="busy" :text="__(cancelText)" />
                 </ModalClose>
                 <Button
                     type="submit"

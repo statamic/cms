@@ -53,7 +53,12 @@ function complete() {
 </script>
 
 <template>
-    <Modal v-if="setupModalOpen" :title="__('Set up Two Factor Authentication')" :open="true" @update:model-value="$emit('cancel')">
+    <Modal
+        v-if="setupModalOpen"
+        :title="__('Set up Two Factor Authentication')"
+        :open="true"
+        @update:model-value="$emit('cancel')"
+    >
         <div>
             <div v-if="loading" class="absolute inset-0 z-200 flex items-center justify-center text-center">
                 <loading-graphic />
@@ -61,7 +66,9 @@ function complete() {
 
             <template v-else>
                 <div>
-                    <ui-description class="mb-6">{{ __('statamic::messages.two_factor_setup_instructions') }}</ui-description>
+                    <ui-description class="mb-6">{{
+                        __('statamic::messages.two_factor_setup_instructions')
+                    }}</ui-description>
 
                     <div class="flex justify-center space-x-6">
                         <div class="bg-white" v-html="qrCode"></div>
@@ -89,17 +96,8 @@ function complete() {
 
         <template #footer>
             <div class="flex items-center justify-end space-x-3 pt-3 pb-1">
-                <Button
-                    variant="ghost"
-                    @click="$emit('close')"
-                    :text="__('Cancel')"
-                />
-                <Button
-                    :disabled="!code"
-                    variant="primary"
-                    @click="confirm"
-                    :text="__('Confirm')"
-                />
+                <Button variant="ghost" @click="$emit('close')" :text="__('Cancel')" />
+                <Button :disabled="!code" variant="primary" @click="confirm" :text="__('Confirm')" />
             </div>
         </template>
     </Modal>

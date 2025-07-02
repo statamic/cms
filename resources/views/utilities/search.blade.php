@@ -37,8 +37,8 @@
                 <ui-table-row>
                     <ui-table-cell>
                         <div class="flex items-start">
-                            @cp_svg('search-drivers/' . $index->config()['driver'], '-mt-0.5 flex h-6 w-6 shrink-0 me-2', 'search-drivers/local')
-                            <span class="text-gray-800 dark:text-dark-150">{{ $index->title() }}</span>
+                            @cp_svg('search-drivers/' . $index->config()['driver'], 'me-2 -mt-0.5 flex h-6 w-6 shrink-0', 'search-drivers/local')
+                            <span class="dark:text-dark-150 text-gray-800">{{ $index->title() }}</span>
                         </div>
                     </ui-table-cell>
                     <ui-table-cell>
@@ -52,7 +52,7 @@
                                 </ui-badge>
                             </div>
                         @else
-                            <div class="flex flex-wrap gap-1 text-sm text-gray">
+                            <div class="text-gray flex flex-wrap gap-1 text-sm">
                                 @foreach ($index->config()['searchables'] as $searchable)
                                     <ui-badge>
                                         {{ $searchable }}
@@ -89,9 +89,6 @@
     </ui-table>
 </ui-card-panel>
 
-<x-statamic::docs-callout
-    topic="{{ __('Search Indexes') }}"
-    url="{{ Statamic::docsUrl('search#indexes') }}"
-/>
+<x-statamic::docs-callout topic="{{ __('Search Indexes') }}" url="{{ Statamic::docsUrl('search#indexes') }}" />
 
 @stop

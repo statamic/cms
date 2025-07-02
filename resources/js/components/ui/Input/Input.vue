@@ -29,7 +29,8 @@ const props = defineProps({
 });
 
 const hasPrependedIcon = !!props.iconPrepend || !!props.icon || !!slots.prepend;
-const hasAppendedIcon = !!props.iconAppend || !!slots.append || props.clearable || props.viewable || props.copyable || props.loading;
+const hasAppendedIcon =
+    !!props.iconAppend || !!slots.append || props.clearable || props.viewable || props.copyable || props.loading;
 
 const inputClasses = computed(() => {
     const classes = cva({
@@ -151,7 +152,7 @@ const copy = () => {
                         :class="copied ? 'animate-wiggle' : ''"
                     />
                     <Icon v-else-if="iconAppend" :name="iconAppend" />
-                    <loading-graphic v-if="loading" inline text=""/>
+                    <loading-graphic v-if="loading" inline text="" />
                 </slot>
             </div>
             <div v-if="limit" class="absolute inset-y-0 right-2 flex items-center">

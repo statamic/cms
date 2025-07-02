@@ -1,8 +1,8 @@
 <template>
     <stack narrow name="publish-options" @closed="$emit('closed')" v-slot="{ close }">
-        <div class="flex h-full flex-col bg-white dark:bg-dark-800">
+        <div class="dark:bg-dark-800 flex h-full flex-col bg-white">
             <div
-                class="flex items-center justify-between border-b border-gray-300 bg-gray-200 px-6 py-2 text-lg font-medium dark:border-dark-900 dark:bg-dark-600"
+                class="dark:border-dark-900 dark:bg-dark-600 flex items-center justify-between border-b border-gray-300 bg-gray-200 px-6 py-2 text-lg font-medium"
             >
                 {{ __('Publish') }}
                 <button type="button" class="btn-close" @click="close" v-html="'&times'" />
@@ -28,14 +28,14 @@
 
                     <button class="btn-primary mb-6 w-full" v-text="submitButtonText" @click="submit" />
 
-                    <div class="mb-6 flex text-xs text-gray">
+                    <div class="text-gray mb-6 flex text-xs">
                         <div class="w-4 pt-px ltr:mr-2 rtl:ml-2">
                             <svg-icon name="info-circle" class="pt-px" />
                         </div>
                         <div class="flex-1" v-text="actionInfoText" />
                     </div>
 
-                    <div class="mb-6 flex text-xs text-gray text-red-500" v-if="action === 'schedule'">
+                    <div class="text-gray mb-6 flex text-xs text-red-500" v-if="action === 'schedule'">
                         <div class="w-4 pt-px ltr:mr-2 rtl:ml-2">
                             <svg-icon name="info-circle" class="pt-px" />
                         </div>

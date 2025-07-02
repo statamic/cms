@@ -74,9 +74,6 @@ const thumbClasses = cva({
         <SliderTrack :class="trackClasses">
             <SliderRange :class="rangeClasses" />
         </SliderTrack>
-        <SliderThumb
-            :class="thumbClasses"
-            :aria-label="label"
-        />
+        <SliderThumb :class="thumbClasses" :aria-label="label" />
     </SliderRoot>
 </template>

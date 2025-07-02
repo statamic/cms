@@ -56,9 +56,16 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="mx-auto mt-4 space-y-3 lg:space-y-6 max-w-3xl">
-        <header v-if="props.title || props.subtitle" class="text-center max-w-xl mx-auto py-6 lg:pt-12 xl:pt-16">
-            <ui-heading v-if="props.title" size="2xl" :level="1" :icon="props.icon" :text="props.title" class="justify-center" />
+    <div class="mx-auto mt-4 max-w-3xl space-y-3 lg:space-y-6">
+        <header v-if="props.title || props.subtitle" class="mx-auto max-w-xl py-6 text-center lg:pt-12 xl:pt-16">
+            <ui-heading
+                v-if="props.title"
+                size="2xl"
+                :level="1"
+                :icon="props.icon"
+                :text="props.title"
+                class="justify-center"
+            />
             <ui-subheading v-if="props.subtitle" class="mt-6" size="lg" :text="props.subtitle" />
         </header>
 
@@ -66,18 +73,10 @@ onMounted(() => {
         <slot>
             <ui-card-panel :heading="__('Details')">
                 <div class="space-y-8">
-                    <ui-field
-                        :label="__('Title')"
-                        :instructions="props.titleInstructions"
-                        :instructions-below="true"
-                    >
+                    <ui-field :label="__('Title')" :instructions="props.titleInstructions" :instructions-below="true">
                         <ui-input v-model="title" autofocus tabindex="1" />
                     </ui-field>
-                    <ui-field
-                        :label="__('Handle')"
-                        :instructions="props.handleInstructions"
-                        :instructions-below="true"
-                    >
+                    <ui-field :label="__('Handle')" :instructions="props.handleInstructions" :instructions-below="true">
                         <ui-input v-model="handle" tabindex="2" :loading="slug.busy" />
                     </ui-field>
                 </div>

@@ -1,12 +1,14 @@
-@php use function Statamic\trans as __; @endphp
+@php
+    use function Statamic\trans as __;
+@endphp
 
 @extends('statamic::layout')
 @section('title', Statamic::crumb('User Groups'))
 @section('content-card-modifiers', 'bg-architectural-lines')
 
 @section('content')
-    <header class="py-8 mt-8 text-center">
-        <h1 class="text-[25px] font-medium antialiased flex justify-center items-center gap-2">
+    <header class="mt-8 py-8 text-center">
+        <h1 class="flex items-center justify-center gap-2 text-[25px] font-medium antialiased">
             <ui-icon name="groups" class="size-5 text-gray-500"></ui-icon>
             {{ __('User Groups') }}
         </h1>
@@ -21,8 +23,5 @@
         ></ui-empty-state-item>
     </ui-empty-state-menu>
 
-    <x-statamic::docs-callout
-        :topic="__('User Groups')"
-        :url="Statamic::docsUrl('users#user-groups')"
-    />
+    <x-statamic::docs-callout :topic="__('User Groups')" :url="Statamic::docsUrl('users#user-groups')" />
 @endsection

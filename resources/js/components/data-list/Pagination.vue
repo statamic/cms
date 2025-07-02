@@ -38,8 +38,8 @@
             />
         </div>
 
-        <div class="flex items-center flex-1 justify-end" v-if="perPage && isPerPageEvenUseful">
-            <span class="text-sm text-gray-500 me-3">{{ __('Per Page') }}</span>
+        <div class="flex flex-1 items-center justify-end" v-if="perPage && isPerPageEvenUseful">
+            <span class="me-3 text-sm text-gray-500">{{ __('Per Page') }}</span>
             <Select
                 class="w-auto!"
                 size="sm"

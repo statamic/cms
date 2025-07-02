@@ -1,15 +1,24 @@
 <template>
-    <div class="h-full overflow-auto bg-white dark:bg-gray-800 p-3 rounded-l-xl">
+    <div class="h-full overflow-auto rounded-l-xl bg-white p-3 dark:bg-gray-800">
         <div v-if="loading" class="absolute inset-0 z-200 flex items-center justify-center text-center">
             <loading-graphic />
         </div>
 
         <header v-if="!loading" class="flex items-center justify-between pl-3">
-            <Heading :text="__(values.display) || __(config.display) || config.handle" size="lg" :icon="fieldtype.icon.startsWith('<svg') ? fieldtype.icon : `fieldtype-${fieldtype.icon}`" />
+            <Heading
+                :text="__(values.display) || __(config.display) || config.handle"
+                size="lg"
+                :icon="fieldtype.icon.startsWith('<svg') ? fieldtype.icon : `fieldtype-${fieldtype.icon}`"
+            />
             <div class="flex items-center gap-3">
                 <Button variant="ghost" :text="__('Cancel')" @click.prevent="close" />
                 <Button variant="primary" @click.prevent="commit()" :text="__('Apply')" />
-                <Button v-if="isInsideSet" variant="primary" @click.prevent="commit(true)" :text="__('Apply & Close All')" />
+                <Button
+                    v-if="isInsideSet"
+                    variant="primary"
+                    @click.prevent="commit(true)"
+                    :text="__('Apply & Close All')"
+                />
             </div>
         </header>
 
@@ -80,7 +89,7 @@ export default {
         TabList,
         TabTrigger,
         TabContent,
-        CardPanel
+        CardPanel,
     },
 
     props: {
@@ -105,8 +114,8 @@ export default {
 
     inject: {
         commitParentField: {
-            default: () => {}
-        }
+            default: () => {},
+        },
     },
 
     model: {

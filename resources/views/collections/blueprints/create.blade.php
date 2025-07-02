@@ -7,8 +7,5 @@
 @section('content-card-modifiers', 'bg-architectural-lines')
 
 @section('content')
-    <blueprint-create-form
-        route="{{ $action }}"
-        icon="collections"
-    ></blueprint-create-form>
+<blueprint-create-form route="{{ $action }}" icon="collections"></blueprint-create-form>
 @stop

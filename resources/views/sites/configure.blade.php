@@ -15,9 +15,6 @@
     class="-mb-8"
 ></sites-edit-form>
 
-<x-statamic::docs-callout
-    topic="{{ __('Multi-Site') }}"
-    url="{{ Statamic::docsUrl('multi-site') }}"
-/>
+<x-statamic::docs-callout topic="{{ __('Multi-Site') }}" url="{{ Statamic::docsUrl('multi-site') }}" />
 
 @stop

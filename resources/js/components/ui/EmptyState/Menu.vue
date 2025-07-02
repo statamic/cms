@@ -10,11 +10,11 @@ const props = defineProps({
 </script>
 
 <template>
-    <CardPanel :heading="heading" class="max-w-md m-auto">
+    <CardPanel :heading="heading" class="m-auto max-w-md">
         <div class="flex flex-wrap [:has(>&)]:p-1.5">
             <slot />
 
-            <div class="hidden first:flex justify-center items-center p-8 w-full">
+            <div class="hidden w-full items-center justify-center p-8 first:flex">
                 <Icon :name="svg || 'empty/content'" />
             </div>
         </div>

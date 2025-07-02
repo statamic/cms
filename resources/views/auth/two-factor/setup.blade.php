@@ -16,10 +16,7 @@
             title="{{ __('Set up Two Factor Authentication') }}"
             description="{{ __('statamic::messages.two_factor_account_requirement') }}"
         >
-            <enable-two-factor-authentication
-                :routes="{{ json_encode($routes) }}"
-                redirect="{{ $redirect }}"
-            />
+            <enable-two-factor-authentication :routes="{{ json_encode($routes) }}" redirect="{{ $redirect }}" />
         </ui-auth-card>
     </div>
 @endsection

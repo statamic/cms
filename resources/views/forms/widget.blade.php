@@ -1,7 +1,7 @@
 <form-widget
     form="{{ $form->handle() }}"
     title="{{ $title }}"
-    :fields='@json($fields)'
+    :fields="@json($fields)"
     :initial-per-page="{{ $limit }}"
 >
     <template #actions>

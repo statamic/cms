@@ -27,12 +27,12 @@ const hasSlot = !!slots.default;
 
 <template>
     <component
-        :is="hasSlot ? 'div' : (href ? 'a' : 'button')"
+        :is="hasSlot ? 'div' : href ? 'a' : 'button'"
         :href="href"
-        class="w-full flex gap-2 px-3 py-4 pt-5 pb-6.5 items-start hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md group"
+        class="group flex w-full items-start gap-2 rounded-md px-3 py-4 pt-5 pb-6.5 hover:bg-gray-100 dark:hover:bg-gray-800"
     >
-        <Icon :name="icon" class="size-6 me-4 mt-1 text-gray-500" />
-        <div class="flex-1 mb-4 md:mb-0 me-6 text-start">
+        <Icon :name="icon" class="me-4 mt-1 size-6 text-gray-500" />
+        <div class="me-6 mb-4 flex-1 text-start md:mb-0">
             <ui-heading size="xl" :level="3" :text="heading" class="mb-1.5" />
             <ui-description v-if="description" :text="description" />
             <slot />

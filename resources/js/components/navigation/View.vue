@@ -4,50 +4,30 @@
             <Dropdown placement="left-start">
                 <DropdownMenu>
                     <DropdownItem v-if="canEdit" :text="__('Configure Navigation')" icon="cog" :href="editUrl" />
-                    <DropdownItem v-if="canEditBlueprint" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="blueprintUrl" />
+                    <DropdownItem
+                        v-if="canEditBlueprint"
+                        :text="__('Edit Blueprints')"
+                        icon="blueprint-edit"
+                        :href="blueprintUrl"
+                    />
                 </DropdownMenu>
             </Dropdown>
 
-            <ui-button
-                v-if="isDirty"
-                variant="filled"
-                :text="__('Discard changes')"
-                @click="$refs.tree.cancel"
-            />
+            <ui-button v-if="isDirty" variant="filled" :text="__('Discard changes')" @click="$refs.tree.cancel" />
 
-            <site-selector
-                v-if="sites.length > 1"
-                :sites="sites"
-                :value="site"
-                @input="siteSelected"
-            />
+            <site-selector v-if="sites.length > 1" :sites="sites" :value="site" @input="siteSelected" />
 
             <Dropdown v-if="canEdit && hasCollections" placement="left-start" :disabled="!hasCollections">
                 <template #trigger>
-                    <Button
-                        :text="__('Add')"
-                        icon-append="ui/chevron-down"
-                    />
+                    <Button :text="__('Add')" icon-append="ui/chevron-down" />
                 </template>
                 <DropdownMenu>
-                    <DropdownItem
-                        :text="__('Add Nav Item')"
-                        @click="linkPage()"
-                        icon="add-list"
-                    />
-                    <DropdownItem
-                        :text="__('Link to Entry')"
-                        @click="linkEntries()"
-                        icon="add-link"
-                    />
+                    <DropdownItem :text="__('Add Nav Item')" @click="linkPage()" icon="add-list" />
+                    <DropdownItem :text="__('Link to Entry')" @click="linkEntries()" icon="add-link" />
                 </DropdownMenu>
             </Dropdown>
 
-            <Button
-                v-else-if="canEdit && !hasCollections"
-                :text="__('Add Nav Item')"
-                @click="addLink"
-            />
+            <Button v-else-if="canEdit && !hasCollections" :text="__('Add Nav Item')" @click="addLink" />
 
             <Button
                 v-if="canEdit"
@@ -131,17 +111,8 @@
             </template>
 
             <template v-if="canEdit" #branch-options="{ branch, removeBranch, stat, depth }">
-                <DropdownItem
-                    v-if="isEntryBranch(stat)"
-                    :text="__('Edit Entry')"
-                    :href="branch.edit_url"
-                    icon="edit"
-                />
-                <DropdownItem
-                    :text="__('Edit Nav item')"
-                    @click="editPage(branch)"
-                    icon="edit"
-                />
+                <DropdownItem v-if="isEntryBranch(stat)" :text="__('Edit Entry')" :href="branch.edit_url" icon="edit" />
+                <DropdownItem :text="__('Edit Nav item')" @click="editPage(branch)" icon="edit" />
                 <DropdownItem
                     v-if="depth < maxDepth"
                     :text="__('Add child nav item')"
@@ -223,7 +194,16 @@ import SiteSelector from '../SiteSelector.vue';
 import uniqid from 'uniqid';
 import { defineAsyncComponent } from 'vue';
 import { mapValues, pick } from 'lodash-es';
-import { Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, Button, EmptyStateMenu, EmptyStateItem, Header } from '@statamic/ui';
+import {
+    Dropdown,
+    DropdownMenu,
+    DropdownItem,
+    DropdownSeparator,
+    Button,
+    EmptyStateMenu,
+    EmptyStateItem,
+    Header,
+} from '@statamic/ui';
 
 export default {
     components: {

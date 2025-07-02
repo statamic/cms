@@ -58,5 +58,4 @@
         :topic="__('Customizing the Control Panel Nav')"
         :url="Statamic::docsUrl('customizing-the-cp-nav')"
     />
-
 @endsection

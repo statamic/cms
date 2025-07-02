@@ -1,10 +1,12 @@
 <template>
     <div class="bard-link-toolbar">
         <div>
-            <div class="border-b px-4 py-4 bg-white dark:border-dark-900 border-gray-200 dark:bg-gray-900 dark:border-black rounded-b-xl">
+            <div
+                class="dark:border-dark-900 rounded-b-xl border-b border-gray-200 bg-white px-4 py-4 dark:border-black dark:bg-gray-900"
+            >
                 <div class="flex">
                     <div
-                        class="mb-4 flex h-8 items-center rounded-sm border bg-gray-100 text-gray-800 shadow-inner dark:border-dark-200 dark:bg-dark-600 dark:text-dark-150 ltr:mr-1 rtl:ml-1"
+                        class="dark:border-dark-200 dark:bg-dark-600 dark:text-dark-150 mb-4 flex h-8 items-center rounded-sm border bg-gray-100 text-gray-800 shadow-inner ltr:mr-1 rtl:ml-1"
                     >
                         <select class="input w-auto px-1 text-sm" v-model="linkType">
                             <option v-for="visibleLinkType in visibleLinkTypes" :value="visibleLinkType.type">
@@ -14,7 +16,7 @@
                     </div>
 
                     <div
-                        class="dark:placeholder:dark-text-dark-175 mb-4 flex h-8 w-full items-center rounded-sm border bg-gray-100 p-2 text-gray-800 shadow-inner placeholder:text-gray-600 dark:border-dark-200 dark:bg-dark-600 dark:text-dark-150"
+                        class="dark:placeholder:dark-text-dark-175 dark:border-dark-200 dark:bg-dark-600 dark:text-dark-150 mb-4 flex h-8 w-full items-center rounded-sm border bg-gray-100 p-2 text-gray-800 shadow-inner placeholder:text-gray-600"
                     >
                         <!-- URL input -->
                         <input
@@ -97,7 +99,11 @@
                     />
                 </div>
 
-                <ui-checkbox-group name="target_blank" label="Choose if the link should open in a new window" class="mt-4">
+                <ui-checkbox-group
+                    name="target_blank"
+                    label="Choose if the link should open in a new window"
+                    class="mt-4"
+                >
                     <ui-checkbox-item
                         label="Open in new window"
                         v-model="targetBlank"
@@ -109,21 +115,17 @@
             </div>
 
             <footer
-                class="flex items-center justify-end space-x-3 rounded-b-md bg-gray-100 p-2 font-normal dark:bg-dark-575 rtl:space-x-reverse rounded-b-xl"
+                class="dark:bg-dark-575 flex items-center justify-end space-x-3 rounded-b-md rounded-b-xl bg-gray-100 p-2 font-normal rtl:space-x-reverse"
             >
                 <ui-button
                     variant="ghost"
                     size="xs"
-                    class="text-xs text-gray-600 hover:text-gray-800 dark:text-dark-175 dark:hover:text-dark-100"
+                    class="dark:text-dark-175 dark:hover:text-dark-100 text-xs text-gray-600 hover:text-gray-800"
                     @click="$emit('canceled')"
                 >
                     {{ __('Cancel') }}
                 </ui-button>
-                <ui-button
-                    size="sm"
-                    :aria-label="__('Remove Link')"
-                    @click="remove"
-                >
+                <ui-button size="sm" :aria-label="__('Remove Link')" @click="remove">
                     {{ __('Remove Link') }}
                 </ui-button>
                 <ui-button

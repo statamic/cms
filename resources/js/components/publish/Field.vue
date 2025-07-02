@@ -25,18 +25,18 @@
                     <avatar
                         v-if="isLocked"
                         :user="lockingUser"
-                        class="-mt-px h-6 w-6 rounded-full ltr:ml-2 ltr:mr-2 rtl:ml-2 rtl:mr-2"
+                        class="-mt-px h-6 w-6 rounded-full ltr:mr-2 ltr:ml-2 rtl:mr-2 rtl:ml-2"
                         v-tooltip="lockingUser.name"
                     />
                     <span
                         v-if="isReadOnly && !isTab && !isSection"
-                        class="mt-0.5 text-2xs font-normal text-gray-500 dark:text-dark-200 me-1"
+                        class="text-2xs dark:text-dark-200 me-1 mt-0.5 font-normal text-gray-500"
                     >
                         {{ isLocked ? __('Locked') : __('Read Only') }}
                     </span>
                     <svg-icon
                         name="translate"
-                        class="size-4 text-gray-600 me-1"
+                        class="me-1 size-4 text-gray-600"
                         v-if="isLocalizable && !isTab"
                         v-tooltip.top="__('Localizable field')"
                     />
@@ -50,7 +50,7 @@
                     >
                         <svg-icon
                             name="light/hyperlink"
-                            class="mb-1 size-4 text-gray-600 me-1.5"
+                            class="me-1.5 mb-1 size-4 text-gray-600"
                             v-tooltip.top="__('messages.field_synced_with_origin')"
                         />
                     </button>
@@ -64,7 +64,7 @@
                     >
                         <svg-icon
                             name="light/hyperlink-broken"
-                            class="mb-1 size-4 text-gray-600 me-1.5"
+                            class="me-1.5 mb-1 size-4 text-gray-600"
                             v-tooltip.top="__('messages.field_desynced_from_origin')"
                         />
                     </button>
@@ -112,7 +112,7 @@
             />
 
             <div v-if="hasError">
-                <small class="help-block mb-0 mt-2 text-red-500" v-for="(error, i) in errors" :key="i" v-text="error" />
+                <small class="help-block mt-2 mb-0 text-red-500" v-for="(error, i) in errors" :key="i" v-text="error" />
             </div>
         </component>
     </publish-field-meta>

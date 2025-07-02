@@ -1,6 +1,6 @@
 <template>
     <tr class="cursor-grab bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-900">
-        <td class="flex gap-3 h-full items-center p-3">
+        <td class="flex h-full items-center gap-3 p-3">
             <div
                 v-if="canShowSvg"
                 class="img svg-img flex size-7 items-center justify-center bg-cover bg-center bg-no-repeat text-center"
@@ -12,7 +12,7 @@
                 @click="editOrOpen"
             >
                 <img
-                    class="asset-thumbnail size-7 text-gray-600 max-h-full max-w-full rounded-sm object-cover"
+                    class="asset-thumbnail size-7 max-h-full max-w-full rounded-sm object-cover text-gray-600"
                     loading="lazy"
                     :src="thumbnail"
                     :alt="asset.basename"
@@ -23,7 +23,7 @@
             <button
                 v-if="showFilename"
                 @click="editOrOpen"
-                class="flex w-full flex-1 items-center truncate text-sm text-gray-600 dark:text-gray-400 text-start"
+                class="flex w-full flex-1 items-center truncate text-start text-sm text-gray-600 dark:text-gray-400"
                 :title="__('Edit')"
                 :aria-label="__('Edit Asset')"
             >
@@ -37,9 +37,12 @@
                 :text="__('Set Alt')"
                 @click="editOrOpen"
             />
-            <div v-text="asset.size" class="asset-filesize hidden px-2 text-sm text-gray-500 dark:text-gray-400 @xs:inline" />
+            <div
+                v-text="asset.size"
+                class="asset-filesize hidden px-2 text-sm text-gray-500 @xs:inline dark:text-gray-400"
+            />
         </td>
-        <td class="p-3 align-middle text-end" v-if="!readOnly">
+        <td class="p-3 text-end align-middle" v-if="!readOnly">
             <ui-button
                 @click="remove"
                 icon="x"

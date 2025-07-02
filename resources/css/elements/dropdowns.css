@@ -7,14 +7,14 @@
 
     button,
     a {
-        @apply block w-full rounded-xs px-2 py-1 text-xs font-normal text-gray-800 dark:text-dark-100 ltr:text-left rtl:text-right;
+        @apply dark:text-dark-100 block w-full rounded-xs px-2 py-1 text-xs font-normal text-gray-800 ltr:text-left rtl:text-right;
         line-height: 1.4;
         white-space: nowrap;
         @apply rounded-sm;
         cursor: pointer;
 
         &:hover {
-            @apply bg-gray-100 dark:bg-dark-600;
+            @apply dark:bg-dark-600 bg-gray-100;
         }
 
         .icon {
@@ -53,7 +53,7 @@
     }
 
     .divider {
-        @apply h-px overflow-hidden bg-gray-400 dark:bg-dark-900;
+        @apply dark:bg-dark-900 h-px overflow-hidden bg-gray-400;
         margin: 6px -8px;
         /* Hide dividers that come first, last or immediately after another (due to v-if) */
         & + &,
@@ -76,7 +76,7 @@
     @apply relative;
 
     .quick-list-content {
-        @apply absolute right-full top-1/2 mr-[8px] flex min-w-max origin-right -translate-y-1/2 rounded-full bg-white p-0.5 shadow-sm transition dark:bg-dark-550;
+        @apply dark:bg-dark-550 absolute top-1/2 right-full mr-[8px] flex min-w-max origin-right -translate-y-1/2 rounded-full bg-white p-0.5 shadow-sm transition;
         &::before {
             content: '';
             position: absolute;
@@ -85,7 +85,7 @@
         }
         button,
         a {
-            @apply flex shrink-0 rounded-full text-gray-800 dark:text-dark-100;
+            @apply dark:text-dark-100 flex shrink-0 rounded-full text-gray-800;
             &:hover {
                 @apply text-white;
             }

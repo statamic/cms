@@ -10,7 +10,7 @@
             <div class="live-preview fixed flex flex-col">
                 <transition name="live-preview-header-slide">
                     <div v-show="headerVisible" class="live-preview-header">
-                        <div class="text-base font-medium text-gray-700 dark:text-dark-150 ltr:mr-4 rtl:ml-4">
+                        <div class="dark:text-dark-150 text-base font-medium text-gray-700 ltr:mr-4 rtl:ml-4">
                             {{ __('Live Preview') }}
                         </div>
                         <div class="flex items-center">

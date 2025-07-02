@@ -1,12 +1,14 @@
-@php use function Statamic\trans as __; @endphp
+@php
+    use function Statamic\trans as __;
+@endphp
 
 @extends('statamic::layout')
 @section('title', Statamic::crumb('Forms'))
 @section('content-card-modifiers', 'bg-architectural-lines')
 
 @section('content')
-    <header class="py-8 mt-8 text-center">
-        <h1 class="text-[25px] font-medium antialiased flex justify-center items-center gap-2">
+    <header class="mt-8 py-8 text-center">
+        <h1 class="flex items-center justify-center gap-2 text-[25px] font-medium antialiased">
             <ui-icon name="collections" class="size-5 text-gray-500"></ui-icon>
             {{ __('Forms') }}
         </h1>
@@ -21,6 +23,7 @@
                 description="{{ __('statamic::messages.form_create_description') }}"
             ></ui-empty-state-item>
         @endif
+
         <ui-empty-state-item
             href="{{ cp_route('utilities.email') }}"
             icon="mail-settings"
@@ -29,8 +32,5 @@
         ></ui-empty-state-item>
     </ui-empty-state-menu>
 
-    <x-statamic::docs-callout
-        topic="{{ __('Forms') }}"
-        url="{{ Statamic::docsUrl('forms') }}"
-    />
+    <x-statamic::docs-callout topic="{{ __('Forms') }}" url="{{ Statamic::docsUrl('forms') }}" />
 @endsection

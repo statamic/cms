@@ -14,12 +14,7 @@
                             autofocus
                             @keydown.enter.prevent="submit"
                         />
-                        <Button
-                            @click="submit"
-                            class="ms-2"
-                            :text="__('Confirm')"
-                            variant="primary"
-                        />
+                        <Button @click="submit" class="ms-2" :text="__('Confirm')" variant="primary" />
                     </div>
                 </template>
 
@@ -39,19 +34,9 @@
                             autofocus
                             @keydown.enter.prevent="submit"
                         />
-                        <Button
-                            @click="resendCode"
-                            class="ms-2"
-                            :disabled="resendDisabled"
-                            :text="__('Resend code')"
-                        />
-                        <Button
-                            @click="submit"
-                            class="ms-2"
-                            variant="primary"
-                            :text="__('Confirm')"
-                        />
-                        </div>
+                        <Button @click="resendCode" class="ms-2" :disabled="resendDisabled" :text="__('Resend code')" />
+                        <Button @click="submit" class="ms-2" variant="primary" :text="__('Confirm')" />
+                    </div>
                 </template>
             </div>
         </div>

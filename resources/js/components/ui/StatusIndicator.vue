@@ -23,7 +23,7 @@ const props = defineProps({
 });
 
 const statusClass = computed(() => {
-    if (props.status === 'published' && props.private || props.status === 'hidden') {
+    if ((props.status === 'published' && props.private) || props.status === 'hidden') {
         return 'bg-transparent border border-gray-600';
     } else if (props.status === 'published') {
         return 'bg-green-400';

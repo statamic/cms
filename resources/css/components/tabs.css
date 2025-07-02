@@ -3,11 +3,11 @@
    ========================================================================== */
 
 .tabs-container {
-    @apply relative mb-6 flex w-full border-b text-sm dark:border-dark-500;
+    @apply dark:border-dark-500 relative mb-6 flex w-full border-b text-sm;
 
     .fade-left,
     .fade-right {
-        @apply pointer-events-none absolute inset-y-0 z-2 w-4 from-gray-300 dark:from-dark-800;
+        @apply dark:from-dark-800 pointer-events-none absolute inset-y-0 z-2 w-4 from-gray-300;
     }
 
     .fade-left {
@@ -21,7 +21,7 @@
 
 .card .tabs-container .fade-left,
 .card .tabs-container .fade-right {
-    @apply from-white dark:from-dark-600;
+    @apply dark:from-dark-600 from-white;
 }
 
 .tabs {
@@ -32,12 +32,12 @@
 }
 
 .tab-button {
-    @apply flex shrink-0 select-none items-center whitespace-nowrap border-b-2 border-transparent px-2 py-2 text-gray-700 dark:text-dark-150;
+    @apply dark:text-dark-150 flex shrink-0 items-center border-b-2 border-transparent px-2 py-2 whitespace-nowrap text-gray-700 select-none;
     &:hover {
-        @apply text-gray-800 dark:text-dark-100;
+        @apply dark:text-dark-100 text-gray-800;
     }
     &:focus-visible {
-        @apply rounded-t outline-hidden ring-2 ring-inset ring-blue-500 dark:ring-dark-blue-100;
+        @apply dark:ring-dark-blue-100 rounded-t ring-2 ring-blue-500 outline-hidden ring-inset;
     }
     &.active {
         @apply border-blue-500 text-blue-500 dark:border-blue-400 dark:text-blue-400;
@@ -57,14 +57,14 @@
   ========================================================================== */
 
 .pill-tab {
-    @apply flex items-center rounded-sm px-2 py-1 text-gray-700 focus:outline-hidden dark:text-dark-175;
+    @apply dark:text-dark-175 flex items-center rounded-sm px-2 py-1 text-gray-700 focus:outline-hidden;
 
     &:hover {
-        @apply text-gray-900 dark:text-dark-100;
+        @apply dark:text-dark-100 text-gray-900;
     }
 
     &.active {
-        @apply bg-blue-100 text-blue-900 dark:bg-dark-400 dark:text-dark-150;
+        @apply dark:bg-dark-400 dark:text-dark-150 bg-blue-100 text-blue-900;
     }
 }
 

@@ -15,8 +15,5 @@
         :columns="{{ $columns->toJson() }}"
     ></asset-manager>
 
-    <x-statamic::docs-callout
-        topic="{{ __('Assets') }}"
-        url="{{ Statamic::docsUrl('assets') }}"
-    />
+    <x-statamic::docs-callout topic="{{ __('Assets') }}" url="{{ Statamic::docsUrl('assets') }}" />
 @endsection

@@ -11,14 +11,11 @@ export default function useActions() {
     function sortActions(actions) {
         let sorted = sortBy(actions, 'title');
 
-        return [
-            ...sorted.filter((action) => !action.dangerous),
-            ...sorted.filter((action) => action.dangerous),
-        ];
+        return [...sorted.filter((action) => !action.dangerous), ...sorted.filter((action) => action.dangerous)];
     }
 
     function mapRunMethods(actions, confirmableActions) {
-        return actions?.map(action => {
+        return actions?.map((action) => {
             return {
                 ...action,
                 run: () => findMatchingConfirmableAction(confirmableActions, action.handle)?.confirm(),
@@ -43,12 +40,12 @@ export default function useActions() {
             // but we can use handlers to JSON.parse all non-file responses...
             axios
                 .post(url, payload, { responseType: 'blob' })
-                .then(response => {
+                .then((response) => {
                     response.headers['content-disposition']
                         ? handleFileDownload(response, resolve)
                         : handleActionSuccess(response, resolve);
                 })
-                .catch(error => handleActionError(error.response, reject))
+                .catch((error) => handleActionError(error.response, reject))
                 .finally(() => {
                     if (done) done();
                 });
@@ -73,9 +70,8 @@ export default function useActions() {
     }
 
     function handleFileDownload(response, resolve) {
-        const attachmentMatch = response
-            .headers['content-disposition']
-            .match(/^attachment.+filename\*?=(?:UTF-8'')?"?([^"]+)"?/i) || [];
+        const attachmentMatch =
+            response.headers['content-disposition'].match(/^attachment.+filename\*?=(?:UTF-8'')?"?([^"]+)"?/i) || [];
 
         if (!attachmentMatch.length) return;
 

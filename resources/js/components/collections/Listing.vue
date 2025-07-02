@@ -4,19 +4,18 @@
             <ui-toggle-item icon="layout-grid" value="grid" />
             <ui-toggle-item icon="layout-list" value="table" />
         </ui-toggle-group>
-        <ui-button
-            :href="createUrl"
-            :text="__('Create Collection')"
-            variant="primary"
-            v-if="canCreateCollections"
-        />
+        <ui-button :href="createUrl" :text="__('Create Collection')" variant="primary" v-if="canCreateCollections" />
     </ui-header>
-    <div class="@container/collections flex flex-wrap py-2 gap-y-6 -mx-3" v-if="mode === 'grid'">
-        <div v-for="collection in items" class="w-full @4xl:w-1/2 px-3">
+    <div class="@container/collections -mx-3 flex flex-wrap gap-y-6 py-2" v-if="mode === 'grid'">
+        <div v-for="collection in items" class="w-full px-3 @4xl:w-1/2">
             <ui-panel>
                 <ui-panel-header class="flex items-center justify-between">
                     <div class="flex items-center gap-1.5">
-                        <ui-heading size="lg" :text="__(collection.title)" :href="collection.available_in_selected_site ? collection.entries_url : collection.edit_url" />
+                        <ui-heading
+                            size="lg"
+                            :text="__(collection.title)"
+                            :href="collection.available_in_selected_site ? collection.entries_url : collection.edit_url"
+                        />
                         <span class="text-sm text-gray-500">
                             ({{ __('entry_count', { count: collection.entries_count }) }})
                         </span>
@@ -34,10 +33,31 @@
                                 <DropdownMenu>
                                     <DropdownLabel :text="__('Actions')" />
                                     <DropdownItem :text="__('View')" icon="eye" :href="collection.entries_url" />
-                                    <DropdownItem v-if="collection.url" :text="__('Visit URL')" icon="external-link" target="_blank" :href="collection.url" />
-                                    <DropdownItem v-if="collection.editable" :text="__('Configure')" icon="cog" :href="collection.edit_url" />
-                                    <DropdownItem v-if="collection.blueprint_editable" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="collection.blueprints_url" />
-                                    <DropdownItem v-if="collection.editable" :text="__('Scaffold Views')" icon="scaffold" :href="collection.scaffold_url" />
+                                    <DropdownItem
+                                        v-if="collection.url"
+                                        :text="__('Visit URL')"
+                                        icon="external-link"
+                                        target="_blank"
+                                        :href="collection.url"
+                                    />
+                                    <DropdownItem
+                                        v-if="collection.editable"
+                                        :text="__('Configure')"
+                                        icon="cog"
+                                        :href="collection.edit_url"
+                                    />
+                                    <DropdownItem
+                                        v-if="collection.blueprint_editable"
+                                        :text="__('Edit Blueprints')"
+                                        icon="blueprint-edit"
+                                        :href="collection.blueprints_url"
+                                    />
+                                    <DropdownItem
+                                        v-if="collection.editable"
+                                        :text="__('Scaffold Views')"
+                                        icon="scaffold"
+                                        :href="collection.scaffold_url"
+                                    />
                                     <DropdownSeparator v-if="actions.length" />
                                     <DropdownItem
                                         v-for="action in actions"
@@ -69,31 +89,54 @@
                                 <template #cell-title="{ row: entry }" class="w-full">
                                     <div class="flex items-center gap-2">
                                         <StatusIndicator :status="entry.status" />
-                                        <a :href="entry.edit_url" class="line-clamp-1 overflow-hidden text-ellipsis" :text="entry.title" />
+                                        <a
+                                            :href="entry.edit_url"
+                                            class="line-clamp-1 overflow-hidden text-ellipsis"
+                                            :text="entry.title"
+                                        />
                                     </div>
                                 </template>
                                 <template #cell-date="{ row: entry }" v-if="collection.dated">
-                                    <div class="text-end font-mono text-xs text-gray-500 ps-6">
+                                    <div class="ps-6 text-end font-mono text-xs text-gray-500">
                                         <date-time :of="entry.date" date-only />
                                     </div>
                                 </template>
                             </ui-listing-table-body>
                         </table>
                     </ui-listing>
-                    <ui-subheading v-if="collection.entries.length === 0" class="text-center h-full flex items-center justify-center">{{ __('Nothing to see here, yet.') }}</ui-subheading>
+                    <ui-subheading
+                        v-if="collection.entries.length === 0"
+                        class="flex h-full items-center justify-center text-center"
+                        >{{ __('Nothing to see here, yet.') }}</ui-subheading
+                    >
                 </ui-card>
 
                 <ui-panel-footer class="flex items-center gap-6 text-sm text-gray-500">
                     <div class="flex items-center gap-2">
-                        <ui-badge variant="flat" :text="String(collection.published_entries_count)" pill class="bg-gray-200 dark:bg-gray-700" />
+                        <ui-badge
+                            variant="flat"
+                            :text="String(collection.published_entries_count)"
+                            pill
+                            class="bg-gray-200 dark:bg-gray-700"
+                        />
                         <span>{{ __('Published') }}</span>
                     </div>
                     <div class="flex items-center gap-2 text-sm" v-if="collection.scheduled_entries_count > 0">
-                        <ui-badge variant="flat" :text="String(collection.scheduled_entries_count)" pill class="bg-gray-200 dark:" />
+                        <ui-badge
+                            variant="flat"
+                            :text="String(collection.scheduled_entries_count)"
+                            pill
+                            class="dark: bg-gray-200"
+                        />
                         <span>{{ __('Scheduled') }}</span>
                     </div>
                     <div class="flex items-center gap-2 text-sm" v-if="collection.draft_entries_count > 0">
-                        <ui-badge variant="flat" :text="String(collection.draft_entries_count)" pill class="bg-gray-200 dark:" />
+                        <ui-badge
+                            variant="flat"
+                            :text="String(collection.draft_entries_count)"
+                            pill
+                            class="dark: bg-gray-200"
+                        />
                         <span>{{ __('Draft') }}</span>
                     </div>
                 </ui-panel-footer>
@@ -110,7 +153,10 @@
         :allow-customizing-columns="false"
     >
         <template #cell-title="{ row: collection }">
-            <a :href="collection.available_in_selected_site ? collection.entries_url : collection.edit_url" class="flex items-center gap-2">
+            <a
+                :href="collection.available_in_selected_site ? collection.entries_url : collection.edit_url"
+                class="flex items-center gap-2"
+            >
                 <ui-icon :name="collection.icon || 'collections'" />
                 {{ __(collection.title) }}
             </a>
@@ -138,10 +184,26 @@
         </template>
         <template #prepended-row-actions="{ row: collection }">
             <DropdownItem :text="__('View')" icon="eye" :href="collection.entries_url" />
-            <DropdownItem v-if="collection.url" :text="__('Visit URL')" icon="external-link" target="_blank" :href="collection.url" />
+            <DropdownItem
+                v-if="collection.url"
+                :text="__('Visit URL')"
+                icon="external-link"
+                target="_blank"
+                :href="collection.url"
+            />
             <DropdownItem v-if="collection.editable" :text="__('Configure')" icon="cog" :href="collection.edit_url" />
-            <DropdownItem v-if="collection.blueprint_editable" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="collection.blueprints_url" />
-            <DropdownItem v-if="collection.editable" :text="__('Scaffold Views')" icon="scaffold" :href="collection.scaffold_url" />
+            <DropdownItem
+                v-if="collection.blueprint_editable"
+                :text="__('Edit Blueprints')"
+                icon="blueprint-edit"
+                :href="collection.blueprints_url"
+            />
+            <DropdownItem
+                v-if="collection.editable"
+                :text="__('Scaffold Views')"
+                icon="scaffold"
+                :href="collection.scaffold_url"
+            />
         </template>
     </ui-listing>
 </template>

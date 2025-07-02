@@ -7,7 +7,7 @@
                 :icon="isHomeFolder(part) ? 'home' : !isLastFolder(index) ? 'folder' : 'folder-open'"
                 :text="isHomeFolder(part) ? __('All') : part"
                 @click="selectFolder(index)"
-                class="gap-2 h-8!"
+                class="h-8! gap-2"
             />
         </div>
     </div>
@@ -44,7 +44,7 @@ export default {
 
         isLastFolder(index) {
             return index === this.pathParts.length - 1;
-        }
+        },
     },
 };
 </script>

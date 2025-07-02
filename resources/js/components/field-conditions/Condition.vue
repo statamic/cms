@@ -1,6 +1,10 @@
 <template>
-    <div class="flex flex-wrap items-center border-t space-x-4 py-4 dark:border-dark-900">
-        <Description v-if="index === 0" class="w-full mb-4" :text="__('messages.field_conditions_field_instructions')" />
+    <div class="dark:border-dark-900 flex flex-wrap items-center space-x-4 border-t py-4">
+        <Description
+            v-if="index === 0"
+            class="mb-4 w-full"
+            :text="__('messages.field_conditions_field_instructions')"
+        />
 
         <div class="mb-2 w-full md:mb-0 md:w-1/3">
             <Combobox
@@ -19,13 +23,13 @@
                         <span v-text="option.label" />
                         <span
                             v-text="option.value"
-                            class="font-mono text-2xs text-gray-500 dark:text-dark-150"
+                            class="text-2xs dark:text-dark-150 font-mono text-gray-500"
                             :class="{ 'ml-2': option.label }"
                         />
                     </div>
                 </template>
                 <template #selected-option>
-                    <span v-text=" __(field.config.display) || field.handle"></span>
+                    <span v-text="__(field.config.display) || field.handle"></span>
                 </template>
             </Combobox>
         </div>
@@ -39,11 +43,7 @@
             />
         </div>
 
-        <Switch
-            v-if="showValueToggle"
-            :model-value="condition.value === 'true'"
-            @update:model-value="valueUpdated"
-        />
+        <Switch v-if="showValueToggle" :model-value="condition.value === 'true'" @update:model-value="valueUpdated" />
 
         <Combobox
             v-else-if="showValueDropdown"
@@ -59,12 +59,7 @@
             <template #no-options><div class="hidden" /></template>
         </Combobox>
 
-        <Input
-            v-else
-            class="flex-1"
-            :model-value="condition.value"
-            @update:model-value="valueUpdated"
-        />
+        <Input v-else class="flex-1" :model-value="condition.value" @update:model-value="valueUpdated" />
 
         <Button variant="ghost" size="sm" icon="trash" @click="remove" />
     </div>
@@ -73,8 +68,8 @@
 <script>
 import HasInputOptions from '../fieldtypes/HasInputOptions.js';
 import { Description, Combobox, Input, Button } from '@statamic/ui';
-import Select from '@statamic/components/ui/Select/Select.vue'
-import Switch from '@statamic/components/ui/Switch.vue'
+import Select from '@statamic/components/ui/Select/Select.vue';
+import Switch from '@statamic/components/ui/Switch.vue';
 
 export default {
     mixins: [HasInputOptions],

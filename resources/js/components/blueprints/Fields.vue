@@ -1,7 +1,7 @@
 <template>
     <div>
         <div
-            class="blueprint-section-draggable-zone field-grid gap-2! mb-4"
+            class="blueprint-section-draggable-zone field-grid mb-4 gap-2!"
             :data-tab="tabId"
             :data-section="sectionId"
         >

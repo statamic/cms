@@ -1,5 +1,5 @@
 <template>
-    <div class="relationship-input @container w-full h-full" :class="{ 'relationship-input-empty': items.length == 0 }">
+    <div class="relationship-input @container h-full w-full" :class="{ 'relationship-input-empty': items.length == 0 }">
         <RelationshipSelectField
             v-if="!initializing && usesSelectField"
             :config="config"
@@ -19,11 +19,7 @@
         <loading-graphic v-if="initializing" :inline="true" />
 
         <template v-if="shouldShowSelectedItems">
-            <div
-                v-if="items.length"
-                ref="items"
-                :class="{ 'mt-2': usesSelectField && items.length }"
-            >
+            <div v-if="items.length" ref="items" :class="{ 'mt-2': usesSelectField && items.length }">
                 <component
                     :is="itemComponent"
                     v-for="(item, i) in items"

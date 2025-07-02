@@ -1,4 +1,11 @@
-@props(['title', 'description', 'svg', 'button_text', 'button_url', 'can'])
+@props([
+    'title',
+    'description',
+    'svg',
+    'button_text',
+    'button_url',
+    'can',
+])
 
 <div class="no-results mx-auto max-w-md md:mt-4">
     <div class="card rounded-xl p-6 text-center lg:py-10">

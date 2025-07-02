@@ -1,7 +1,7 @@
 <template>
     <div class="overflow-hidden rounded-full" v-tooltip="user.name">
         <img v-if="useAvatar" :src="avatarSrc" class="block" @error="hasAvatarError = true" />
-        <div v-if="useInitials" class="flex h-full w-full items-center justify-center bg-pink text-center text-white">
+        <div v-if="useInitials" class="bg-pink flex h-full w-full items-center justify-center text-center text-white">
             <span>{{ initials }}</span>
         </div>
     </div>

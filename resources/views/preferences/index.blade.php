@@ -54,8 +54,5 @@
         </ui-card-panel>
     </section>
 
-    <x-statamic::docs-callout
-        :topic="__('Preferences')"
-        :url="Statamic::docsUrl('preferences')"
-    />
+    <x-statamic::docs-callout :topic="__('Preferences')" :url="Statamic::docsUrl('preferences')" />
 @endsection

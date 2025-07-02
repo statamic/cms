@@ -4,7 +4,7 @@
             <div v-if="editable" class="page-move w-6" />
         </slot>
         <div class="flex flex-1 items-center p-1.5 text-xs leading-normal">
-            <div class="flex gap-3 grow items-center" @click="$emit('branch-clicked', page)">
+            <div class="flex grow items-center gap-3" @click="$emit('branch-clicked', page)">
                 <ui-status-indicator :status="page.status" v-tooltip="getStatusTooltip()" />
                 <ui-icon v-if="isRoot" name="home" class="size-4" v-tooltip="__('This is the root page')" />
                 <a
@@ -14,16 +14,13 @@
                     v-text="title"
                 />
 
-                <span
-                    v-if="showSlugs"
-                    class="pt-[2px] font-mono text-2xs text-gray-700 dark:text-gray-500"
-                >
+                <span v-if="showSlugs" class="text-2xs pt-[2px] font-mono text-gray-700 dark:text-gray-500">
                     {{ slugPath }}
                 </span>
 
                 <ui-button
                     v-if="hasChildren"
-                    class="transition duration-100 [&_svg]:size-4! -mx-1.5"
+                    class="-mx-1.5 transition duration-100 [&_svg]:size-4!"
                     icon="ui/chevron-down"
                     size="xs"
                     variant="ghost"
@@ -54,12 +51,7 @@
 
                 <Dropdown placement="left-start" :class="{ invisible: isRoot, hidden: !editable }">
                     <DropdownMenu>
-                        <slot
-                            name="branch-options"
-                            :branch="page"
-                            :depth="depth"
-                            :remove-branch="remove"
-                        />
+                        <slot name="branch-options" :branch="page" :depth="depth" :remove-branch="remove" />
                     </DropdownMenu>
                 </Dropdown>
             </div>

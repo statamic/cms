@@ -12,7 +12,7 @@
         <div class="flex flex-wrap items-center">
             <div class="w-full md:w-1/2">
                 <ui-heading level="1" size="2xl" text="{{ __('Licensing') }}"></ui-heading>
-                <p class="my-4 text-lg leading-normal text-gray-700 antialiased dark:text-dark-175">
+                <p class="dark:text-dark-175 my-4 text-lg leading-normal text-gray-700 antialiased">
                     @if ($usingLicenseKeyFile)
                         {{ __('statamic::messages.outpost_license_key_error') }}
                     @else
@@ -30,18 +30,11 @@
     </div>
 @else
     <ui-header title="{{ __('Licensing') }}" icon="license">
-        <ui-button
-            href="{{ $site->url() }}"
-            target="_blank"
-            text="{{ __('Manage on statamic.com') }}"
-        ></ui-button>
+        <ui-button href="{{ $site->url() }}" target="_blank" text="{{ __('Manage on statamic.com') }}"></ui-button>
         @if ($addToCartUrl)
-            <ui-button
-                href="{{ $addToCartUrl }}"
-                target="_blank"
-                text="{{ __('Buy Licenses') }}"
-            ></ui-button>
+            <ui-button href="{{ $addToCartUrl }}" target="_blank" text="{{ __('Buy Licenses') }}"></ui-button>
         @endif
+
         <ui-tooltip side="bottom" text="{{ __('statamic::messages.licensing_sync_instructions') }}">
             <ui-button
                 href="{{ cp_route('utilities.licensing.refresh') }}"
@@ -52,16 +45,17 @@
     </ui-header>
 
     <section class="space-y-6">
-
         @if ($configCached)
             <ui-card-panel heading="{{ __('Configuration is cached') }}">
-                <p class="text-gray-700 text-sm">{!! __('statamic::messages.licensing_config_cached_warning') !!}</p>
+                <p class="text-sm text-gray-700">{!! __('statamic::messages.licensing_config_cached_warning') !!}</p>
             </ui-card-panel>
         @endif
 
         @if ($site->key() && $site->usesIncorrectKeyFormat())
             <ui-card-panel heading="{{ __('statamic::messages.licensing_incorrect_key_format_heading') }}">
-                <p class="text-gray-700 text-sm">{!! __('statamic::messages.licensing_incorrect_key_format_body') !!}</p>
+                <p class="text-sm text-gray-700">
+                    {!! __('statamic::messages.licensing_incorrect_key_format_body') !!}
+                </p>
             </ui-card-panel>
         @endif
 
@@ -69,9 +63,7 @@
             <table class="data-table">
                 <tr>
                     <td class="w-64 font-bold">
-                        <span
-                            class="little-dot {{ $site->valid() ? 'bg-green-600' : 'bg-red-700' }} me-2"
-                        ></span>
+                        <span class="little-dot {{ $site->valid() ? 'bg-green-600' : 'bg-red-700' }} me-2"></span>
                         {{ $site->key() ?? __('No license key') }}
                     </td>
                     <td class="relative">
@@ -132,7 +124,7 @@
                                 <span class="font-bold">
                                     <a
                                         href="{{ $addon->addon()->marketplaceUrl() }}"
-                                        class="text-gray hover:text-blue-600 dark:text-dark-175 dark:hover:text-dark-blue-100"
+                                        class="text-gray dark:text-dark-175 dark:hover:text-dark-blue-100 hover:text-blue-600"
                                     >
                                         {{ $addon->name() }}
                                     </a>
@@ -169,9 +161,6 @@
     </section>
 @endif
 
-    <x-statamic::docs-callout
-        topic="{{ __('Licensing') }}"
-        url="{{ Statamic::docsUrl('licensing') }}"
-    />
+<x-statamic::docs-callout topic="{{ __('Licensing') }}" url="{{ Statamic::docsUrl('licensing') }}" />
 
 @stop

@@ -1,11 +1,7 @@
 <template>
     <div>
         <div v-if="!singleTab && tabs.length > 0" class="tabs-container relative">
-            <div
-                ref="tabs"
-                class="tabs flex flex-1 space-x-3 overflow-auto pe-6"
-                role="tablist"
-            >
+            <div ref="tabs" class="tabs flex flex-1 space-x-3 overflow-auto pe-6" role="tablist">
                 <tab
                     ref="tab"
                     v-for="tab in tabs"
@@ -21,7 +17,7 @@
                 />
             </div>
             <button
-                class="btn-round relative top-1 flex items-center justify-center ms-2"
+                class="btn-round relative top-1 ms-2 flex items-center justify-center"
                 @click="addAndEditTab"
                 v-tooltip="addTabText"
             >

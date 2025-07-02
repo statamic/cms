@@ -16,7 +16,12 @@
                         <Button icon="ui/dots" variant="ghost" />
                     </template>
                     <DropdownMenu>
-                        <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" v-if="canEditBlueprint" :href="actions.editBlueprint" />
+                        <DropdownItem
+                            :text="__('Edit Blueprint')"
+                            icon="blueprint-edit"
+                            v-if="canEditBlueprint"
+                            :href="actions.editBlueprint"
+                        />
                         <DropdownSeparator v-if="canEditBlueprint && itemActions.length" />
                         <DropdownItem
                             v-for="action in itemActions"

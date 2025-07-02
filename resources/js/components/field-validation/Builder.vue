@@ -1,5 +1,5 @@
 <template>
-    <div class="w-full publish-fields">
+    <div class="publish-fields w-full">
         <Field
             class="form-group field-w-33"
             :label="__('Required')"
@@ -20,9 +20,9 @@
             <Description>
                 {{ __('messages.field_validation_advanced_instructions') }}
                 <a :href="laravelDocsLink" target="_blank">{{ __('Learn more') }}</a>
-                <span v-if="helpBlock" class="italic text-gray-500 ltr:float-right rtl:float-left">
+                <span v-if="helpBlock" class="text-gray-500 italic ltr:float-right rtl:float-left">
                     {{ __('Example') }}:
-                    <span class="italic text-blue-400">{{ helpBlock }}</span>
+                    <span class="text-blue-400 italic">{{ helpBlock }}</span>
                 </span>
             </Description>
 
@@ -108,7 +108,7 @@ import SemVer from 'semver';
 import { SortableList } from '../sortable/Sortable';
 import { sortBy } from 'lodash-es';
 import { Description, Field, Input, Badge } from '@statamic/ui';
-import Switch from '@statamic/components/ui/Switch.vue'
+import Switch from '@statamic/components/ui/Switch.vue';
 
 export default {
     components: {

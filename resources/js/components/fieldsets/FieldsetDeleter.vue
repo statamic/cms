@@ -11,16 +11,15 @@
         <template #default>
             <template v-if="Object.keys(resource.imported_by).length > 0">
                 <ui-description>
-                    {{ __('Before you can delete this fieldset, you need to remove references to it in blueprints and fieldsets:') }}
+                    {{
+                        __(
+                            'Before you can delete this fieldset, you need to remove references to it in blueprints and fieldsets:',
+                        )
+                    }}
                 </ui-description>
 
                 <div v-for="(items, group) in resource.imported_by">
-                    <ui-badge
-                        v-for="item in items"
-                        :key="item.handle"
-                        :text="item.title"
-                        :prepend="group"
-                    />
+                    <ui-badge v-for="item in items" :key="item.handle" :text="item.title" :prepend="group" />
                 </div>
             </template>
 

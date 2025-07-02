@@ -13,7 +13,13 @@
         <Modal :title="__('Resume Your Session')" :open="isShowingLogin" height="auto" class="max-w-[500px]!">
             <div v-if="isUsingOauth" class="space-y-3">
                 <ui-description v-text="__('messages.session_expiry_new_window')" />
-                <ui-button variant="primary" class="w-full" :href="oauthProvider.loginUrl" target="_blank" :text="__('Log in with :provider', { provider: oauthProvider.label })" />
+                <ui-button
+                    variant="primary"
+                    class="w-full"
+                    :href="oauthProvider.loginUrl"
+                    target="_blank"
+                    :text="__('Log in with :provider', { provider: oauthProvider.label })"
+                />
             </div>
 
             <div v-if="!isUsingOauth">
@@ -35,7 +41,12 @@
             </div>
         </Modal>
 
-        <Modal :title="__('Resume Your Session')" :open="isShowingTwoFactorChallenge" height="auto" class="max-w-[500px]!">
+        <Modal
+            :title="__('Resume Your Session')"
+            :open="isShowingTwoFactorChallenge"
+            height="auto"
+            class="max-w-[500px]!"
+        >
             <div>
                 <div v-if="twoFactorMode === 'code'" class="space-y-3">
                     <ui-description v-text="__('messages.session_expiry_enter_two_factor_code')" />
@@ -58,11 +69,7 @@
 
                 <div v-if="twoFactorMode === 'recovery_code'" class="form-group w-full">
                     <label v-text="__('messages.session_expiry_enter_two_factor_recovery_code')" />
-                    <ui-description
-                        class="text-red-500"
-                        v-if="errors.recovery_code"
-                        v-text="errors.recovery_code[0]"
-                    />
+                    <ui-description class="text-red-500" v-if="errors.recovery_code" v-text="errors.recovery_code[0]" />
                     <div class="flex items-center">
                         <Input
                             name="recovery_code"
@@ -92,11 +99,7 @@
                         @click="twoFactorMode = 'code'"
                         :text="__('Use one-time code')"
                     />
-                    <Button
-                        variant="primary"
-                        @click="submitTwoFactorChallenge"
-                        :text="__('Continue')"
-                    />
+                    <Button variant="primary" @click="submitTwoFactorChallenge" :text="__('Continue')" />
                 </div>
             </template>
         </Modal>

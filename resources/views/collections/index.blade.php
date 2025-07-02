@@ -25,8 +25,5 @@
         />
     @endunless
 
-    <x-statamic::docs-callout
-        topic="{{ __('Collections') }}"
-        url="{{ Statamic::docsUrl('collections') }}"
-    />
+    <x-statamic::docs-callout topic="{{ __('Collections') }}" url="{{ Statamic::docsUrl('collections') }}" />
 @endsection

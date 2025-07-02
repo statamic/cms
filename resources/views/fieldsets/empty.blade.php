@@ -7,8 +7,8 @@
 @section('content-card-modifiers', 'bg-architectural-lines')
 
 @section('content')
-    <header class="py-8 mt-8 text-center">
-        <h1 class="text-[25px] font-medium antialiased flex justify-center items-center gap-2">
+    <header class="mt-8 py-8 text-center">
+        <h1 class="flex items-center justify-center gap-2 text-[25px] font-medium antialiased">
             <ui-icon name="fieldsets" class="size-5 text-gray-500"></ui-icon>
             {{ __('Fieldsets') }}
         </h1>
@@ -23,8 +23,5 @@
         ></ui-empty-state-item>
     </ui-empty-state-menu>
 
-    <x-statamic::docs-callout
-        :topic="__('Blueprints')"
-        :url="Statamic::docsUrl('blueprints')"
-    />
+    <x-statamic::docs-callout :topic="__('Blueprints')" :url="Statamic::docsUrl('blueprints')" />
 @endsection

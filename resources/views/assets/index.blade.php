@@ -15,8 +15,5 @@
         :can="$user->can('create', \Statamic\Contracts\Assets\AssetContainer::class)"
     />
 
-    <x-statamic::docs-callout
-        topic="{{ __('Assets') }}"
-        url="{{ Statamic::docsUrl('assets') }}"
-    />
+    <x-statamic::docs-callout topic="{{ __('Assets') }}" url="{{ Statamic::docsUrl('assets') }}" />
 @endsection

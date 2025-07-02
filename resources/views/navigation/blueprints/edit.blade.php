@@ -12,8 +12,5 @@
         :use-tabs="false"
     ></blueprint-builder>
 
-    <x-statamic::docs-callout
-        :topic="__('Blueprints')"
-        :url="Statamic::docsUrl('blueprints')"
-    />
+    <x-statamic::docs-callout :topic="__('Blueprints')" :url="Statamic::docsUrl('blueprints')" />
 @endsection

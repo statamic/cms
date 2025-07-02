@@ -6,7 +6,11 @@
 
                 <Dropdown placement="left-start" class="me-2">
                     <DropdownMenu>
-                        <DropdownItem :text="__('Reset Nav Customizations')" variant="destructive" @click="confirmingReset = true" />
+                        <DropdownItem
+                            :text="__('Reset Nav Customizations')"
+                            variant="destructive"
+                            @click="confirmingReset = true"
+                        />
                     </DropdownMenu>
                 </Dropdown>
 
@@ -27,41 +31,41 @@
                     </DropdownMenu>
                 </Dropdown>
 
-<!--                <div class="ms-4">-->
-<!--                    <Button-->
-<!--                        v-if="!hasSaveAsOptions"-->
-<!--                        :text="__('Save Changes')"-->
-<!--                        :disabled="!changed"-->
-<!--                        @click="save"-->
-<!--                    />-->
-<!--                    <Dropdown v-else>-->
-<!--                        <template #trigger>-->
-<!--                            <Button-->
-<!--                                :text="__('Save Changes')"-->
-<!--                                icon-append="ui/chevron-down"-->
-<!--                                :disabled="!changed"-->
-<!--                                @click="save"-->
-<!--                            />-->
-<!--                        </template>-->
-<!--                        <DropdownMenu>-->
-<!--                            <DropdownLabel v-text="__('Save to')" />-->
-<!--                            <DropdownItem-->
-<!--                                v-for="option in saveAsOptions"-->
-<!--                                :text="option.label"-->
-<!--                                @click="saveAs(option.url)"-->
-<!--                            />-->
-<!--                        </DropdownMenu>-->
-<!--                    </Dropdown>-->
-<!--                </div>-->
-
+                <!--                <div class="ms-4">-->
+                <!--                    <Button-->
+                <!--                        v-if="!hasSaveAsOptions"-->
+                <!--                        :text="__('Save Changes')"-->
+                <!--                        :disabled="!changed"-->
+                <!--                        @click="save"-->
+                <!--                    />-->
+                <!--                    <Dropdown v-else>-->
+                <!--                        <template #trigger>-->
+                <!--                            <Button-->
+                <!--                                :text="__('Save Changes')"-->
+                <!--                                icon-append="ui/chevron-down"-->
+                <!--                                :disabled="!changed"-->
+                <!--                                @click="save"-->
+                <!--                            />-->
+                <!--                        </template>-->
+                <!--                        <DropdownMenu>-->
+                <!--                            <DropdownLabel v-text="__('Save to')" />-->
+                <!--                            <DropdownItem-->
+                <!--                                v-for="option in saveAsOptions"-->
+                <!--                                :text="option.label"-->
+                <!--                                @click="saveAs(option.url)"-->
+                <!--                            />-->
+                <!--                        </DropdownMenu>-->
+                <!--                    </Dropdown>-->
+                <!--                </div>-->
 
                 <div class="ltr:ml-4 ltr:text-left rtl:mr-4 rtl:text-right" :class="{ 'btn-group': hasSaveAsOptions }">
                     <button
-                        class="btn-primary rtl:pr-4 ltr:pl-4"
-                        :class="{ 'disabled': !changed }"
+                        class="btn-primary ltr:pl-4 rtl:pr-4"
+                        :class="{ disabled: !changed }"
                         :disabled="!changed"
                         @click="save"
-                        v-text="__('Save Changes')" />
+                        v-text="__('Save Changes')"
+                    />
 
                     <Dropdown v-if="hasSaveAsOptions" placement="left-start" class="me-2">
                         <template #trigger>
@@ -83,7 +87,11 @@
         </header>
 
         <div class="mb-3 flex justify-end">
-            <a class="text-2xs text-blue-600 underline ltr:mr-4 rtl:ml-4 cursor-pointer" v-text="__('Expand All')" @click="expandAll" />
+            <a
+                class="text-2xs cursor-pointer text-blue-600 underline ltr:mr-4 rtl:ml-4"
+                v-text="__('Expand All')"
+                @click="expandAll"
+            />
             <a
                 class="text-2xs text-blue-600 underline ltr:mr-2 rtl:ml-2"
                 v-text="__('Collapse All')"

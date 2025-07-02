@@ -30,11 +30,7 @@
 
         <template #footer>
             <div class="flex items-center justify-end space-x-3 pt-3 pb-1">
-                <Button
-                    variant="ghost"
-                    @click="$emit('cancel')"
-                    :text="__('Cancel')"
-                />
+                <Button variant="ghost" @click="$emit('cancel')" :text="__('Cancel')" />
                 <Button variant="primary" @click="confirm" :text="__('Confirm')" />
             </div>
         </template>

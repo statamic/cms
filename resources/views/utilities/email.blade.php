@@ -14,18 +14,11 @@
         @csrf
 
         <div class="flex items-center gap-2">
-            <ui-input
-                name="email"
-                value="{{ old('email', $user->email()) }}"
-            ></ui-input>
-            <ui-button
-                text="{{ __('Send') }}"
-                type="submit"
-                variant="primary"
-            ></ui-button>
+            <ui-input name="email" value="{{ old('email', $user->email()) }}"></ui-input>
+            <ui-button text="{{ __('Send') }}" type="submit" variant="primary"></ui-button>
         </div>
         @if ($errors->has('email'))
-            <p class="mt-4 text-red-700 text-sm">{{ $errors->first('email') }}</p>
+            <p class="mt-4 text-sm text-red-700">{{ $errors->first('email') }}</p>
         @endif
     </form>
 </ui-card-panel>
@@ -112,7 +105,9 @@
                 <ui-table-cell>
                     @foreach (config('mail.markdown.paths') as $path)
                         {{ $path }}
-                        @if (! $loop->last)<br />@endif
+                        @if (! $loop->last)
+                            <br />
+                        @endif
                     @endforeach
                 </ui-table-cell>
             </ui-table-row>

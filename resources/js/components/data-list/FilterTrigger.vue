@@ -15,11 +15,7 @@ defineProps({
     <button
         :data-state="active ? 'active' : null"
         :value="name"
-        class="
-            cursor-pointer p-2 pb-1 hover:text-gray-600 dark:hover:text-gray-400 translate-y-px
-            data-[state=active]:text-gray-800 dark:data-[state=active]:text-gray-200
-            data-[state=active]:border-b data-[state=active]:border-gray-800 dark:data-[state=active]:border-gray-200
-        "
+        class="translate-y-px cursor-pointer p-2 pb-1 hover:text-gray-600 data-[state=active]:border-b data-[state=active]:border-gray-800 data-[state=active]:text-gray-800 dark:hover:text-gray-400 dark:data-[state=active]:border-gray-200 dark:data-[state=active]:text-gray-200"
     >
         <slot v-if="hasSlot" />
         <span v-else>{{ text }}</span>

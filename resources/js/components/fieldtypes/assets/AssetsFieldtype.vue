@@ -2,7 +2,7 @@
     <div class="@container relative">
         <div
             v-if="hasPendingDynamicFolder"
-            class="w-full rounded-md border border-dashed px-4 py-3 text-sm text-gray-700 dark:border-dark-200 dark:text-dark-175"
+            class="dark:border-dark-200 dark:text-dark-175 w-full rounded-md border border-dashed px-4 py-3 text-sm text-gray-700"
             v-html="pendingText"
         />
 
@@ -20,7 +20,7 @@
                 <div
                     v-if="config.allow_uploads"
                     v-show="dragging && !showSelector"
-                    class="absolute inset-0 flex flex-col gap-2 items-center justify-center bg-white/80 backdrop-blur-sm border border-gray-400 border-dashed rounded-lg"
+                    class="absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-gray-400 bg-white/80 backdrop-blur-sm"
                 >
                     <ui-icon name="upload-cloud" class="size-5 text-gray-500" />
                     <ui-heading size="lg">{{ __('Drop to Upload') }}</ui-heading>
@@ -28,7 +28,7 @@
 
                 <div
                     v-if="!isReadOnly && showPicker"
-                    class="border border-gray-400 dark:border-gray-700 border-dashed rounded-xl p-2 flex items-center gap-4"
+                    class="flex items-center gap-4 rounded-xl border border-dashed border-gray-400 p-2 dark:border-gray-700"
                     :class="{
                         'rounded-b-none': expanded,
                         'bard-drag-handle': isInBardField,
@@ -45,10 +45,14 @@
                         />
                     </div>
 
-                    <div class="text-sm text-gray-600 dark:text-gray-400 flex items-center flex-1" v-if="canUpload">
-                        <ui-icon name="upload-cloud" class="size-5 text-gray-500 me-3" />
+                    <div class="flex flex-1 items-center text-sm text-gray-600 dark:text-gray-400" v-if="canUpload">
+                        <ui-icon name="upload-cloud" class="me-3 size-5 text-gray-500" />
                         <span v-text="__('Drag & drop here or&nbsp;')" />
-                        <button type="button" class="underline underline-offset-2 cursor-pointer hover:text-black dark:hover:text-gray-200" @click.prevent="uploadFile">
+                        <button
+                            type="button"
+                            class="cursor-pointer underline underline-offset-2 hover:text-black dark:hover:text-gray-200"
+                            @click.prevent="uploadFile"
+                        >
                             {{ __('choose a file') }}
                         </button>
                         <span>.</span>
@@ -59,7 +63,7 @@
                             :url="meta.rename_folder.url"
                             :actions="[meta.rename_folder.action]"
                             :item="folder"
-                             @completed="renameFolderActionCompleted"
+                            @completed="renameFolderActionCompleted"
                             v-slot="{ actions }"
                         >
                             <Dropdown placement="left-start">
@@ -78,12 +82,8 @@
                     </div>
                 </div>
 
-                <div v-if="uploads.length" class="border-gray-300 border-l border-r">
-                    <uploads
-                        :uploads="uploads"
-                        allow-selecting-existing
-                        @existing-selected="uploadSelected"
-                    />
+                <div v-if="uploads.length" class="border-r border-l border-gray-300">
+                    <uploads :uploads="uploads" allow-selecting-existing @existing-selected="uploadSelected" />
                 </div>
 
                 <template v-if="expanded">
@@ -101,7 +101,7 @@
                         append-to="body"
                     >
                         <div
-                            class="relative grid gap-6 xl:gap-10 overflow-hidden rounded-xl border border-t-0 rounded-t-none dark:border-dark-700"
+                            class="dark:border-dark-700 relative grid gap-6 overflow-hidden rounded-xl rounded-t-none border border-t-0 xl:gap-10"
                             :class="{ 'rounded-t-none': !isReadOnly && (showPicker || uploads.length) }"
                             ref="assets"
                         >
@@ -120,7 +120,10 @@
                         </div>
                     </sortable-list>
 
-                    <div class="relative overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700 border-t-0! rounded-t-none" v-if="displayMode === 'list'">
+                    <div
+                        class="relative overflow-hidden rounded-xl rounded-t-none border border-t-0! border-gray-300 dark:border-gray-700"
+                        v-if="displayMode === 'list'"
+                    >
                         <table class="w-full">
                             <sortable-list
                                 v-model="assets"

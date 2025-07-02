@@ -1,5 +1,5 @@
 <template>
-    <div class="flex h-full flex-col justify-end bg-white dark:bg-dark-800">
+    <div class="dark:bg-dark-800 flex h-full flex-col justify-end bg-white">
         <div class="flex-1 overflow-scroll">
             <asset-browser
                 :container="container"
@@ -22,7 +22,7 @@
             </asset-browser>
         </div>
 
-        <div class="flex items-center justify-between border-t bg-gray-200 p-4 dark:border-dark-200 dark:bg-dark-500">
+        <div class="dark:border-dark-200 dark:bg-dark-500 flex items-center justify-between border-t bg-gray-200 p-4">
             <div
                 class="text-sm text-gray-700"
                 v-text="

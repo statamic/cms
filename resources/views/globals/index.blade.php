@@ -17,9 +17,7 @@
             @endcan
         </ui-header>
 
-        <global-listing
-            :initial-globals="{{ json_encode($globals) }}"
-        ></global-listing>
+        <global-listing :initial-globals="{{ json_encode($globals) }}"></global-listing>
     @else
         <x-statamic::empty-screen
             title="{{ __('Globals') }}"
@@ -31,8 +29,5 @@
         />
     @endunless
 
-    <x-statamic::docs-callout
-        topic="{{ __('Global Variables') }}"
-        url="{{ Statamic::docsUrl('globals') }}"
-    />
+    <x-statamic::docs-callout topic="{{ __('Global Variables') }}" url="{{ Statamic::docsUrl('globals') }}" />
 @endsection

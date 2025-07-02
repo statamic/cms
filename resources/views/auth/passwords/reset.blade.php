@@ -25,26 +25,15 @@
                 @endif
 
                 <ui-field :label="__('Email Address')" error="{{ $errors->first('email') }}">
-                    <ui-input
-                        name="email"
-                        value="{{ $email ?? old('email') }}"
-                        autofocus
-                        type="email"
-                    />
+                    <ui-input name="email" value="{{ $email ?? old('email') }}" autofocus type="email" />
                 </ui-field>
 
                 <ui-field :label="__('Password')" error="{{ $errors->first('password') }}">
-                    <ui-input
-                        name="password"
-                        type="password"
-                    />
+                    <ui-input name="password" type="password" />
                 </ui-field>
 
                 <ui-field :label="__('Confirm Password')" error="{{ $errors->first('password_confirmation') }}">
-                    <ui-input
-                        name="password_confirmation"
-                        type="password"
-                    />
+                    <ui-input name="password_confirmation" type="password" />
                 </ui-field>
 
                 <ui-button type="submit" variant="primary" :text="$title" />
@@ -53,7 +42,7 @@
     </div>
 
     <div class="mt-4 w-full text-center dark:mt-6">
-        <a href="{{ cp_route('login') }}" class="text-blue-400 text-sm hover:text-blue-600">
+        <a href="{{ cp_route('login') }}" class="text-sm text-blue-400 hover:text-blue-600">
             {{ __('Back to login') }}
         </a>
     </div>

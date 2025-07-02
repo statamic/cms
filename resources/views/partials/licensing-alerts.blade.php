@@ -7,7 +7,7 @@
 @if ($licenses->requestFailed())
     <div class="fixed bottom-0 z-20 w-full p-2">
         <div
-            class="w-full rounded-md border border-yellow-dark bg-yellow px-4 py-3 text-sm dark:border-none dark:bg-dark-blue-100"
+            class="border-yellow-dark bg-yellow dark:bg-dark-blue-100 w-full rounded-md border px-4 py-3 text-sm dark:border-none"
         >
             @if ($licenses->usingLicenseKeyFile())
                 {{ __('statamic::messages.outpost_license_key_error') }}
@@ -47,7 +47,7 @@
                             @can('access licensing utility')
                                 <a
                                     href="{{ cp_route('utilities.licensing') }}"
-                                    class="flex items-center text-2xs underline-offset-1 hover:underline"
+                                    class="text-2xs flex items-center underline-offset-1 hover:underline"
                                     aria-label="{{ __('Manage Licenses') }}"
                                 >
                                     {{ __('Manage Licenses') }}
@@ -76,7 +76,7 @@
                             @can('access licensing utility')
                                 <a
                                     href="{{ cp_route('utilities.licensing') }}"
-                                    class="flex items-center text-2xs text-white hover:text-yellow"
+                                    class="text-2xs hover:text-yellow flex items-center text-white"
                                     aria-label="{{ __('Manage Licenses') }}"
                                 >
                                     {{ __('Manage Licenses') }}

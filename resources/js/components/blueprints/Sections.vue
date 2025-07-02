@@ -15,7 +15,10 @@
                 @deleted="deleteSection(i)"
             />
 
-            <button class="w-full flex gap-2 items-center justify-center relative min-h-24 text-gray-500 hover:text-gray-700 dark:hover:text-gray-400 cursor-pointer border border-dashed border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600 rounded-xl outline-hidden" @click="addAndEditSection">
+            <button
+                class="relative flex min-h-24 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-gray-300 text-gray-500 outline-hidden hover:border-gray-400 hover:text-gray-700 dark:border-gray-700 dark:hover:border-gray-600 dark:hover:text-gray-400"
+                @click="addAndEditSection"
+            >
                 <ui-icon name="plus" class="size-4" />
                 <div v-text="addSectionText" />
             </button>

@@ -2,12 +2,7 @@
     <div>
         <ui-dropdown :disabled="creatables.length === 1">
             <template #trigger>
-                <ui-button
-                    :icon="icon"
-                    variant="filled"
-                    :text="text"
-                    @click="create"
-                />
+                <ui-button :icon="icon" variant="filled" :text="text" @click="create" />
             </template>
             <ui-dropdown-menu>
                 <ui-dropdown-item

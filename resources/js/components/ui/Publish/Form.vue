@@ -40,7 +40,7 @@ const props = defineProps({
     readOnly: {
         type: Boolean,
         default: false,
-    }
+    },
 });
 
 const containerName = Statamic.$slug.separatedBy('_').create(props.title);

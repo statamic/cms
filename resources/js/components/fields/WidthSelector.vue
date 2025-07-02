@@ -1,26 +1,26 @@
 <script setup>
-import { ref, computed } from 'vue'
-import { cva } from 'cva'
+import { ref, computed } from 'vue';
+import { cva } from 'cva';
 
 const props = defineProps({
     modelValue: Number,
     initialWidths: Array,
     size: { type: String, default: 'base' },
     variant: { type: String, default: 'default' },
-})
+});
 
-const emit = defineEmits(['update:model-value'])
+const emit = defineEmits(['update:model-value']);
 
-const isHovering = ref(false)
-const hoveringOver = ref(null)
-const widths = ref(props.initialWidths ?? [25, 33, 50, 66, 75, 100])
+const isHovering = ref(false);
+const hoveringOver = ref(null);
+const widths = ref(props.initialWidths ?? [25, 33, 50, 66, 75, 100]);
 
 const selected = computed(() => {
     if (isHovering.value) {
-        return hoveringOver.value
+        return hoveringOver.value;
     }
-    return props.modelValue
-})
+    return props.modelValue;
+});
 
 const wrapperClasses = cva({
     base: 'relative text-gray-600 dark:text-gray-400 font-mono antialiased bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 overflow-hidden flex cursor-pointer',
@@ -32,7 +32,7 @@ const wrapperClasses = cva({
     },
 })({
     size: props.size,
-})
+});
 
 const sizerClasses = cva({
     base: 'border border-l-0 last:border-r-0 border-y-0 data-[state="selected"]:data-[last="false"]:border-gray-100 dark:border-gray-700 dark:data-[state="selected"]:data-[last="false"]:border-gray-900 flex-1',
@@ -50,7 +50,7 @@ const sizerClasses = cva({
     },
 })({
     variant: props.variant,
-})
+});
 </script>
 
 <template>
@@ -66,6 +66,10 @@ const sizerClasses = cva({
                 :data-last="selected === width && width !== 100"
             />
         </div>
-        <div class="pointer-events-none absolute inset-0 z-10 flex w-full items-center justify-center text-center font-medium text-gray-800">{{ selected }}%</div>
+        <div
+            class="pointer-events-none absolute inset-0 z-10 flex w-full items-center justify-center text-center font-medium text-gray-800"
+        >
+            {{ selected }}%
+        </div>
     </div>
 </template>

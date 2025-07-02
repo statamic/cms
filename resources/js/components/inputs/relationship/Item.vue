@@ -1,6 +1,6 @@
 <template>
     <div
-        class="shadow-ui-sm relative z-2 flex w-full h-full items-center gap-2 rounded-lg border border-gray-200 bg-white px-1.5 py-1.5 mb-1.5 last:mb-0 text-base dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
+        class="shadow-ui-sm relative z-2 mb-1.5 flex h-full w-full items-center gap-2 rounded-lg border border-gray-200 bg-white px-1.5 py-1.5 text-base last:mb-0 dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
         :class="{ invalid: item.invalid }"
     >
         <ui-icon name="handles" class="item-move sortable-handle size-4 cursor-grab text-gray-300" v-if="sortable" />
@@ -39,7 +39,7 @@
                 <div
                     v-if="item.hint"
                     v-text="item.hint"
-                    class="text-2xs tracking-tight me-2 hidden whitespace-nowrap text-gray-500 @sm:block"
+                    class="text-2xs me-2 hidden tracking-tight whitespace-nowrap text-gray-500 @sm:block"
                 />
 
                 <div class="flex items-center" v-if="!readOnly">
@@ -48,16 +48,8 @@
                             <Button icon="ui/dots" variant="ghost" size="xs" v-bind="attrs" />
                         </template>
                         <DropdownMenu>
-                            <DropdownItem
-                                v-if="editable"
-                                :text="__('Edit')"
-                                @click="edit"
-                            />
-                            <DropdownItem
-                                :text="__('Unlink')"
-                                variant="destructive"
-                                @click="$emit('removed')"
-                            />
+                            <DropdownItem v-if="editable" :text="__('Edit')" @click="edit" />
+                            <DropdownItem :text="__('Unlink')" variant="destructive" @click="$emit('removed')" />
                         </DropdownMenu>
                     </Dropdown>
                 </div>

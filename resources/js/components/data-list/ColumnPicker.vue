@@ -2,7 +2,7 @@
     <div>
         <ui-modal :title="__('Customize Columns')">
             <template #trigger>
-                <Button icon="sliders-vertical" v-tooltip="__('Customize Table')"/>
+                <Button icon="sliders-vertical" v-tooltip="__('Customize Table')" />
             </template>
             <div class="flex h-full flex-col">
                 <div class="dark:bg-dark-600 flex min-h-0 grow rounded-t-md bg-gray-100">
@@ -76,7 +76,6 @@
                         </div>
                     </div>
                 </div>
-
             </div>
             <template #footer v-if="preferencesKey">
                 <div class="flex items-center justify-end space-x-3 pt-3 pb-1">

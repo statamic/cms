@@ -34,7 +34,7 @@ const open = ref(props.open);
 
 watch(
     () => props.open,
-    (value) => open.value = value,
+    (value) => (open.value = value),
 );
 
 // When the parent component controls the open state, emit an update event

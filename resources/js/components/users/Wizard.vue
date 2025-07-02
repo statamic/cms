@@ -54,7 +54,7 @@
                     <label class="font-bold ltr:ml-2 rtl:mr-2" for="super">{{ __('Super Admin') }}</label>
                 </div>
                 <div
-                    class="mt-2 flex items-center space-x-1 text-2xs text-gray-600 dark:text-dark-150 rtl:space-x-reverse"
+                    class="text-2xs dark:text-dark-150 mt-2 flex items-center space-x-1 text-gray-600 rtl:space-x-reverse"
                 >
                     <svg-icon name="info-circle" class="mb-px flex h-4 w-4 items-center"></svg-icon>
                     <span>{{ __('messages.user_wizard_super_admin_instructions') }}</span>
@@ -122,7 +122,7 @@
             </div>
 
             <div
-                class="mx-auto mb-20 max-w-2xl rounded-lg border bg-gray-100 py-10 dark:border-dark-900 dark:bg-dark-650"
+                class="dark:border-dark-900 dark:bg-dark-650 mx-auto mb-20 max-w-2xl rounded-lg border bg-gray-100 py-10"
                 v-if="invitation.send"
             >
                 <!-- Subject Line -->
@@ -131,7 +131,7 @@
                     <input
                         type="text"
                         v-model="invitation.subject"
-                        class="input-text bg-white dark:bg-dark-700"
+                        class="input-text dark:bg-dark-700 bg-white"
                         id="invitation_subject"
                     />
                 </div>
@@ -140,7 +140,7 @@
                 <div class="mx-auto max-w-md px-4">
                     <label class="mb-1 text-base font-bold" for="invitation_message">{{ __('Email Content') }}</label>
                     <textarea
-                        class="input-text min-h-40 bg-white p-4 dark:bg-dark-700"
+                        class="input-text dark:bg-dark-700 min-h-40 bg-white p-4"
                         id="invitation_message"
                         v-model="invitation.message"
                         v-elastic
@@ -189,7 +189,7 @@
             </div>
         </div>
 
-        <div class="border-t p-4 dark:border-dark-900">
+        <div class="dark:border-dark-900 border-t p-4">
             <div class="mx-auto flex max-w-md items-center justify-center">
                 <button tabindex="3" class="btn mx-4 w-32" @click="previous" v-if="!completed && !onFirstStep">
                     <span v-html="direction === 'ltr' ? '&larr;' : '&rarr;'"></span> {{ __('Previous') }}

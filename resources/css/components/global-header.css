@@ -1,7 +1,7 @@
 /* GROUP GLOBAL HEADER
 =================================================== */
 .global-header {
-    @apply relative flex h-13 w-full items-center bg-white shadow dark:bg-dark-600 dark:shadow-lg ltr:pr-4 rtl:pl-4;
+    @apply dark:bg-dark-600 relative flex h-13 w-full items-center bg-white shadow ltr:pr-4 rtl:pl-4 dark:shadow-lg;
     z-index: 3; /* The search focus overlay sits underneath using z-index 2. */
 
     .dark & {
@@ -13,8 +13,8 @@
     }
 
     .global-header-icon-button {
-        @apply block h-7 w-7 rounded-full border border-transparent p-1 text-gray outline-hidden hover:border-gray-400 hover:bg-gray-200 hover:text-gray-800;
-        @apply dark:border-transparent dark:text-dark-100 dark:hover:border-dark-900 dark:hover:bg-dark-800 dark:hover:text-dark-100;
+        @apply text-gray block h-7 w-7 rounded-full border border-transparent p-1 outline-hidden hover:border-gray-400 hover:bg-gray-200 hover:text-gray-800;
+        @apply dark:text-dark-100 dark:hover:border-dark-900 dark:hover:bg-dark-800 dark:hover:text-dark-100 dark:border-transparent;
     }
 }
 

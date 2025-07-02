@@ -42,7 +42,7 @@ function resetComplete() {
         <div class="max-w-sm p-4">
             <template v-if="!isSetup">
                 <div>
-                    <p class="mb-4 text-sm text-gray">{{ __('statamic::messages.two_factor_enable_introduction') }}</p>
+                    <p class="text-gray mb-4 text-sm">{{ __('statamic::messages.two_factor_enable_introduction') }}</p>
 
                     <div class="flex space-x-2">
                         <Button @click="openSetupModal">
@@ -53,7 +53,7 @@ function resetComplete() {
             </template>
 
             <template v-else>
-                <p class="mb-4 text-sm text-gray">{{ __('statamic::messages.two_factor_enabled') }}</p>
+                <p class="text-gray mb-4 text-sm">{{ __('statamic::messages.two_factor_enabled') }}</p>
 
                 <div class="flex items-center space-x-4">
                     <Button @click="openRecoveryCodesModal">

@@ -14,9 +14,11 @@
         <ui-auth-card
             icon="key"
             title="{{ $method === 'password_confirmation' ? __('Confirm Your Password') : __('Verification Code') }}"
-            description="{{ $method === 'password_confirmation'
-                ? __('statamic::messages.elevated_session_enter_password')
-                : __('statamic::messages.elevated_session_enter_verification_code') }}"
+            description="{{
+                $method === 'password_confirmation'
+                    ? __('statamic::messages.elevated_session_enter_password')
+                    : __('statamic::messages.elevated_session_enter_verification_code')
+            }}"
         >
             @if (session('status'))
                 <ui-alert variant="success" :text="session('status')" class="mb-6" />
@@ -27,25 +29,18 @@
 
                 @if ($method === 'password_confirmation')
                     <ui-field :label="__('Password')" error="{{ $errors->first('password') }}">
-                        <ui-input
-                            name="password"
-                            type="password"
-                            viewable
-                        />
+                        <ui-input name="password" type="password" viewable />
                     </ui-field>
                 @endif
 
                 @if ($method === 'verification_code')
                     <ui-field :label="__('Verification Code')" error="{{ $errors->first('verification_code') }}">
-                        <ui-input
-                            name="verification_code"
-                            autofocus
-                        />
+                        <ui-input name="verification_code" autofocus />
                     </ui-field>
                 @endif
 
                 <div class="flex items-center gap-4">
-                    <ui-button type="submit" variant="primary" :text="__('Submit')" class="flex-1"/>
+                    <ui-button type="submit" variant="primary" :text="__('Submit')" class="flex-1" />
 
                     @if ($method === 'verification_code')
                         <ui-button

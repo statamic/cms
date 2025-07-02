@@ -2,14 +2,14 @@
    GLOBAL CONTROL PANEL LAYOUT ELEMENTS
    ========================================================================== */
 
-   /* ==========================================================================
+/* ==========================================================================
    THE MAIN NAV (LEFT SIDEBAR)
    ========================================================================== */
 .nav-main {
-    @apply flex flex-col gap-6 py-6 px-3 text-sm antialiased select-none;
+    @apply flex flex-col gap-6 px-3 py-6 text-sm antialiased select-none;
     /* Same as the main element, accounting for the header with a class of h-14, which is the same as 3.5rem */
     @apply h-[calc(100vh-3.5rem)];
-    @apply overflow-y-auto fixed top-14 left-0 w-46;
+    @apply fixed top-14 left-0 w-46 overflow-y-auto;
     @apply [&_svg]:text-gray-500 dark:[&_svg]:text-gray-600;
     transition: all 0.3s ease-in-out;
 
@@ -18,15 +18,15 @@
     }
 
     ul li a {
-        @apply flex items-center gap-3 text-gray-700 hover:bg-gray-400/10 px-2 py-1 rounded-md dark:text-gray-400 hover:text-black dark:hover:text-gray-200 hover:[&_svg]:text-gray-700 dark:hover:[&_svg]:text-gray-200;
+        @apply flex items-center gap-3 rounded-md px-2 py-1 text-gray-700 hover:bg-gray-400/10 hover:text-black dark:text-gray-400 dark:hover:text-gray-200 hover:[&_svg]:text-gray-700 dark:hover:[&_svg]:text-gray-200;
     }
 
     ul li a.active {
-        @apply text-black bg-gray-400/10 [&_svg]:text-black dark:text-white [&_svg]:dark:text-gray-200 font-medium;
+        @apply bg-gray-400/10 font-medium text-black dark:text-white [&_svg]:text-black [&_svg]:dark:text-gray-200;
     }
 
     ul li ul {
-        @apply ml-3.5 pl-3.5 translate-x-px my-1.5 text-[0.8125rem] min-w-0 flex-col gap-1 border-s border-gray-300 dark:border-gray-600;
+        @apply my-1.5 ml-3.5 min-w-0 translate-x-px flex-col gap-1 border-s border-gray-300 pl-3.5 text-[0.8125rem] dark:border-gray-600;
     }
 
     ul li ul li a {
@@ -34,11 +34,11 @@
     }
 
     ul li ul li a.active {
-        @apply text-black dark:text-white font-medium bg-transparent;
+        @apply bg-transparent font-medium text-black dark:text-white;
     }
 
     .section-title {
-        @apply text-sm px-2 text-black font-medium mb-1 dark:text-gray-200;
+        @apply mb-1 px-2 text-sm font-medium text-black dark:text-gray-200;
     }
 }
 
@@ -51,8 +51,6 @@ main {
     @apply ps-0;
 }
 
-
-
 .nav-closed .nav-main {
     @apply -start-46;
 }
@@ -60,11 +58,6 @@ main {
 .nav-closed main {
     @apply md:ps-0;
 }
-
-
-
-
-
 
 /* Draggable Mirrors
   ========================================================================== */

@@ -2,7 +2,14 @@
     <div>
         <ui-header :title="__('Updates')" icon="updates">
             <template #actions>
-                <ui-badge prepend="Statamic" :text="currentVersion" color="green" size="lg" sub-text="Version" sub-text-before />
+                <ui-badge
+                    prepend="Statamic"
+                    :text="currentVersion"
+                    color="green"
+                    size="lg"
+                    sub-text="Version"
+                    sub-text-before
+                />
                 <div v-if="onLatestVersion" v-text="__('Up to date')" />
             </template>
         </ui-header>
@@ -12,7 +19,7 @@
         </ui-card>
 
         <div
-            class="mb-6 flex cursor-pointer items-center justify-between rounded-sm border border-dashed border-yellow-dark bg-yellow p-4 text-xs"
+            class="border-yellow-dark bg-yellow mb-6 flex cursor-pointer items-center justify-between rounded-sm border border-dashed p-4 text-xs"
             v-if="!showingUnlicensedReleases && hasUnlicensedReleases"
             @click="showingUnlicensedReleases = true"
         >

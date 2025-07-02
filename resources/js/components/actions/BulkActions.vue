@@ -43,9 +43,7 @@ function getActions() {
         params.context = props.context;
     }
 
-    axios
-        .post(props.url + '/list', params)
-        .then(response => actions.value = response.data);
+    axios.post(props.url + '/list', params).then((response) => (actions.value = response.data));
 }
 
 let errors = ref({});
@@ -55,8 +53,8 @@ function runAction(action, values, done) {
     emit('started');
 
     runServerAction({ action, values, done, url: props.url, selections: props.selections })
-        .then(data => emit('completed', true, data))
-        .catch(data => {
+        .then((data) => emit('completed', true, data))
+        .catch((data) => {
             errors.value = data.errors;
             emit('completed', false, data);
         });
@@ -74,8 +72,5 @@ function runAction(action, values, done) {
         :errors="errors"
         @confirmed="runAction"
     />
-    <slot
-        v-if="showAlways || hasSelections"
-        :actions="preparedActions"
-    />
+    <slot v-if="showAlways || hasSelections" :actions="preparedActions" />
 </template>

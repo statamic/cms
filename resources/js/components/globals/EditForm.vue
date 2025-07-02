@@ -1,6 +1,6 @@
 <template>
     <publish-container
-        class="max-w-5xl mx-auto"
+        class="mx-auto max-w-5xl"
         v-if="blueprint"
         ref="container"
         name="global"

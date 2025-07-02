@@ -5,18 +5,18 @@
     @apply relative flex h-5 w-12 cursor-pointer;
 
     .field-width-label {
-        @apply pointer-events-none absolute inset-0 z-10 flex w-full items-center justify-center text-center text-4xs font-bold text-gray-700 dark:text-dark-150;
+        @apply text-4xs dark:text-dark-150 pointer-events-none absolute inset-0 z-10 flex w-full items-center justify-center text-center font-bold text-gray-700;
     }
 
     .field-width-notch {
-        @apply relative flex-1 border border-gray-400 dark:border-dark-300 ltr:border-l-0 rtl:border-r-0;
+        @apply dark:border-dark-300 relative flex-1 border border-gray-400 ltr:border-l-0 rtl:border-r-0;
 
         &:first-of-type {
             @apply ltr:rounded-l-sm ltr:border-l rtl:rounded-r-sm rtl:border-r;
         }
 
         &.filled {
-            @apply -my-px border-gray-400 bg-white dark:border-dark-400 dark:bg-dark-575 ltr:border-r-0 ltr:pr-px rtl:border-l-0 rtl:pl-px;
+            @apply dark:border-dark-400 dark:bg-dark-575 -my-px border-gray-400 bg-white ltr:border-r-0 ltr:pr-px rtl:border-l-0 rtl:pl-px;
         }
 
         &.selected {
@@ -32,13 +32,13 @@
     @apply mt-px h-9 w-16;
 
     .field-width-notch {
-        @apply border-y-gray-500 border-r-gray-400 bg-gray-200 dark:border-dark-700 dark:border-y-dark-750 dark:bg-dark-550;
+        @apply dark:border-dark-700 dark:border-y-dark-750 dark:bg-dark-550 border-y-gray-500 border-r-gray-400 bg-gray-200;
         &:last-child {
-            @apply border-r-gray-500 dark:border-dark-750 ltr:rounded-r-sm rtl:rounded-l-sm;
+            @apply dark:border-dark-750 border-r-gray-500 ltr:rounded-r-sm rtl:rounded-l-sm;
         }
 
         &.filled {
-            @apply border-gray-500 bg-linear-to-b from-white to-gray-100 dark:border-dark-750 dark:from-dark-300 dark:to-dark-400;
+            @apply dark:border-dark-750 dark:from-dark-300 dark:to-dark-400 border-gray-500 bg-linear-to-b from-white to-gray-100;
         }
     }
 

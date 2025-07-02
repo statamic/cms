@@ -33,7 +33,7 @@
                             <tr
                                 v-for="(file, i) in value"
                                 :key="file"
-                                class="asset-row bg-white hover:bg-gray-100 dark:bg-dark-600"
+                                class="asset-row dark:bg-dark-600 bg-white hover:bg-gray-100"
                             >
                                 <td class="flex items-center">
                                     <div
@@ -49,7 +49,7 @@
                                 <td class="w-8 p-0 align-middle ltr:text-right rtl:text-left">
                                     <button
                                         @click="remove(i)"
-                                        class="flex h-full w-full items-center p-2 text-gray-600 hover:text-gray-950 dark:text-dark-150 dark:hover:text-dark-100"
+                                        class="dark:text-dark-150 dark:hover:text-dark-100 flex h-full w-full items-center p-2 text-gray-600 hover:text-gray-950"
                                     >
                                         <svg-icon name="micro/trash" class="h-6 w-6" />
                                     </button>

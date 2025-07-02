@@ -159,7 +159,8 @@
         }
         button:only-child {
             position: relative;
-            &::before, &::after {
+            &::before,
+            &::after {
                 content: '';
                 pointer-events: none;
                 position: absolute;

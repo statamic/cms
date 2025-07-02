@@ -1,9 +1,12 @@
 <template>
-    <div class="blueprint-section min-h-40 w-full outline-hidden @container">
+    <div class="blueprint-section @container min-h-40 w-full outline-hidden">
         <ui-panel>
-            <ui-panel-header class="flex items-center justify-between pb-0.75! pt-0! pl-2.75! pr-3.25! ">
-                <div class="flex items-center gap-2 flex-1">
-                    <ui-icon name="handles-sm" class="blueprint-section-drag-handle size-3! cursor-grab text-gray-400" />
+            <ui-panel-header class="flex items-center justify-between pt-0! pr-3.25! pb-0.75! pl-2.75!">
+                <div class="flex flex-1 items-center gap-2">
+                    <ui-icon
+                        name="handles-sm"
+                        class="blueprint-section-drag-handle size-3! cursor-grab text-gray-400"
+                    />
                     <!-- @TODO: Add backwards support for old icons -->
                     <!-- <svg-icon :name="iconName(section.icon)" :directory="iconBaseDirectory" /> -->
                     <ui-heading v-text="__(section.display ?? 'Section')" />
@@ -29,7 +32,7 @@
                 <template v-slot:empty-state>
                     <ui-subheading
                         v-text="__('Drag and drop fields below.')"
-                        class="rounded-xl min-h-16 flex items-center justify-center border border-dashed border-gray-300 p-3 text-center w-full"
+                        class="flex min-h-16 w-full items-center justify-center rounded-xl border border-dashed border-gray-300 p-3 text-center"
                     />
                 </template>
             </Fields>

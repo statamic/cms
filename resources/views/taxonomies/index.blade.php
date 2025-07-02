@@ -8,7 +8,6 @@
 @section('content')
     @unless ($taxonomies->isEmpty())
         <ui-header title="{{ __('Taxonomies') }}" icon="taxonomies">
-
             @can('create', 'Statamic\Contracts\Taxonomies\Taxonomy')
                 <ui-button
                     href="{{ cp_route('taxonomies.create') }}"
@@ -33,8 +32,5 @@
         />
     @endunless
 
-    <x-statamic::docs-callout
-        topic="{{ __('Taxonomies') }}"
-        url="{{ Statamic::docsUrl('taxonomies') }}"
-    />
+    <x-statamic::docs-callout topic="{{ __('Taxonomies') }}" url="{{ Statamic::docsUrl('taxonomies') }}" />
 @endsection

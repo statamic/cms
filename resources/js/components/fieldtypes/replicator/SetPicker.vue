@@ -13,11 +13,11 @@
             <slot name="trigger" />
         </template>
         <template #default>
-            <div class="set-picker-header flex items-center border-b p-3 text-xs dark:border-dark-900">
+            <div class="set-picker-header dark:border-dark-900 flex items-center border-b p-3 text-xs">
                 <input
                     ref="search"
                     type="text"
-                    class="input-text h-auto w-full rounded-sm border px-2 py-1 text-xs dark:border-gray-900 dark:bg-dark-650"
+                    class="input-text dark:bg-dark-650 h-auto w-full rounded-sm border px-2 py-1 text-xs dark:border-gray-900"
                     :placeholder="__('Search Sets')"
                     v-show="showSearch"
                     v-model="search"
@@ -25,7 +25,7 @@
                 <div v-if="showGroupBreadcrumb" class="flex items-center font-medium text-gray-700 dark:text-gray-600">
                     <button
                         @click="unselectGroup"
-                        class="rounded-sm hover:text-gray-900 dark:hover:text-gray-500 ltr:ml-2.5 rtl:mr-2.5"
+                        class="rounded-sm hover:text-gray-900 ltr:ml-2.5 rtl:mr-2.5 dark:hover:text-gray-500"
                     >
                         {{ __('Groups') }}
                     </button>
@@ -38,7 +38,7 @@
                     v-for="(item, i) in items"
                     :key="item.handle"
                     class="cursor-pointer rounded-sm"
-                    :class="{ 'bg-gray-200 dark:bg-dark-600': selectionIndex === i }"
+                    :class="{ 'dark:bg-dark-600 bg-gray-200': selectionIndex === i }"
                     @mouseover="selectionIndex = i"
                 >
                     <div
@@ -49,22 +49,22 @@
                         <svg-icon
                             :name="groupIconName(item.icon)"
                             :directory="iconBaseDirectory"
-                            class="h-9 w-9 rounded-sm border border-gray-600 bg-white p-2 text-gray-800 dark:border-dark-800 dark:bg-dark-650 dark:text-dark-175 ltr:mr-2 rtl:ml-2"
+                            class="dark:border-dark-800 dark:bg-dark-650 dark:text-dark-175 h-9 w-9 rounded-sm border border-gray-600 bg-white p-2 text-gray-800 ltr:mr-2 rtl:ml-2"
                         />
                         <div class="flex-1">
-                            <div class="w-52 truncate text-sm font-medium text-gray-800 dark:text-dark-175">
+                            <div class="dark:text-dark-175 w-52 truncate text-sm font-medium text-gray-800">
                                 {{ __(item.display || item.handle) }}
                             </div>
                             <div
                                 v-if="item.instructions"
-                                class="w-52 truncate text-2xs text-gray-700 dark:text-dark-175"
+                                class="text-2xs dark:text-dark-175 w-52 truncate text-gray-700"
                             >
                                 {{ __(item.instructions) }}
                             </div>
                         </div>
                         <svg-icon
                             name="micro/chevron-right-thin"
-                            class="text-gray-600 group-hover:text-dark-800 dark:group-hover:text-dark-175"
+                            class="group-hover:text-dark-800 dark:group-hover:text-dark-175 text-gray-600"
                         />
                     </div>
                     <div
@@ -75,15 +75,15 @@
                         <svg-icon
                             :name="setIconName(item.icon)"
                             :directory="iconBaseDirectory"
-                            class="h-9 w-9 rounded-sm border border-gray-600 bg-white p-2 text-gray-800 dark:border-dark-800 dark:bg-dark-650 dark:text-dark-175 ltr:mr-2 rtl:ml-2"
+                            class="dark:border-dark-800 dark:bg-dark-650 dark:text-dark-175 h-9 w-9 rounded-sm border border-gray-600 bg-white p-2 text-gray-800 ltr:mr-2 rtl:ml-2"
                         />
                         <div class="flex-1">
-                            <div class="w-52 truncate text-sm font-medium text-gray-800 dark:text-dark-175">
+                            <div class="dark:text-dark-175 w-52 truncate text-sm font-medium text-gray-800">
                                 {{ __(item.display || item.handle) }}
                             </div>
                             <div
                                 v-if="item.instructions"
-                                class="w-52 truncate text-2xs text-gray-700 dark:text-dark-175"
+                                class="text-2xs dark:text-dark-175 w-52 truncate text-gray-700"
                             >
                                 {{ __(item.instructions) }}
                             </div>

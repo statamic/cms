@@ -10,11 +10,7 @@
                 <tr>
                     <td class="w-1/4">
                         <div class="flex items-center gap-3">
-                            <ui-switch
-                                v-model="selected.index"
-                                size="sm"
-                                id="field_index"
-                            />
+                            <ui-switch v-model="selected.index" size="sm" id="field_index" />
                             <label for="field_index" v-text="__('Index Template')" />
                         </div>
                     </td>
@@ -25,11 +21,7 @@
                 <tr>
                     <td class="w-1/4">
                         <div class="flex items-center gap-3">
-                            <ui-switch
-                                v-model="selected.show"
-                                size="sm"
-                                id="field_template"
-                            />
+                            <ui-switch v-model="selected.show" size="sm" id="field_template" />
                             <label for="field_template" v-text="__('Show Template')" />
                         </div>
                     </td>
@@ -40,7 +32,6 @@
             </tbody>
         </table>
     </ui-panel>
-
 </template>
 
 <script>

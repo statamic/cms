@@ -1,5 +1,5 @@
 <template>
-    <div class="flex items-center gap-2 bg-gray-50 dark:bg-gray-800 rounded-lg p-2 @lg:px-4 @lg:py-3">
+    <div class="flex items-center gap-2 rounded-lg bg-gray-50 p-2 @lg:px-4 @lg:py-3 dark:bg-gray-800">
         <ui-subheading size="lg" v-if="config.prepend" :text="__(config.prepend)" class="whitespace-nowrap" />
         <input
             type="range"
@@ -12,9 +12,9 @@
             :readonly="isReadOnly"
             :disabled="isReadOnly"
             :id="fieldId"
-            class="min-w-0 flex-1 w-full"
+            class="w-full min-w-0 flex-1"
         />
-        <ui-badge :text="val"  />
+        <ui-badge :text="val" />
         <ui-subheading size="lg" v-if="config.append" :text="__(config.append)" />
     </div>
 </template>

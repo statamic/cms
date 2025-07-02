@@ -32,14 +32,14 @@
                 </publish-container>
             </div>
 
-            <div class="flex border-t text-gray-800 dark:border-dark-900 dark:text-dark-150">
+            <div class="dark:border-dark-900 dark:text-dark-150 flex border-t text-gray-800">
                 <button
-                    class="flex-1 p-2 text-xs hover:bg-gray-100 dark:hover:bg-dark-600 ltr:rounded-bl rtl:rounded-br"
+                    class="dark:hover:bg-dark-600 flex-1 p-2 text-xs hover:bg-gray-100 ltr:rounded-bl rtl:rounded-br"
                     v-text="__('Clear')"
                     @click="resetAll"
                 />
                 <button
-                    class="flex-1 p-2 text-xs hover:bg-gray-100 dark:border-dark-900 dark:hover:bg-dark-600 ltr:rounded-br ltr:border-l rtl:rounded-bl rtl:border-r"
+                    class="dark:border-dark-900 dark:hover:bg-dark-600 flex-1 p-2 text-xs hover:bg-gray-100 ltr:rounded-br ltr:border-l rtl:rounded-bl rtl:border-r"
                     v-text="__('Close')"
                     @click="$emit('closed')"
                 />

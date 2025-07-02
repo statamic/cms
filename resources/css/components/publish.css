@@ -31,13 +31,12 @@
 }
 
 code.parent-url {
-    @apply block bg-none text-3xs text-gray-700;
+    @apply text-3xs block bg-none text-gray-700;
     padding: 0 0 3px 0;
     [dir='rtl'] & {
         padding: 0 0 3px 0;
     }
 }
-
 
 /* GROUP PUBLISH COMPONENT / FIELDS
 =================================================== */
@@ -58,14 +57,26 @@ code.parent-url {
     }
 }
 @variant lg {
-    .field-w-25  { --col-span: calc(var(--grid-columns) * 0.25); }
-    .field-w-33  { --col-span: calc(var(--grid-columns) * 0.333); }
-    .field-w-50  { --col-span: calc(var(--grid-columns) * 0.5); }
-    .field-w-66  { --col-span: calc(var(--grid-columns) * 0.666); }
-    .field-w-75  { --col-span: calc(var(--grid-columns) * 0.75); }
-    .field-w-undefined, .field-w-100 { --col-span: calc(var(--grid-columns) * 1); }
+    .field-w-25 {
+        --col-span: calc(var(--grid-columns) * 0.25);
+    }
+    .field-w-33 {
+        --col-span: calc(var(--grid-columns) * 0.333);
+    }
+    .field-w-50 {
+        --col-span: calc(var(--grid-columns) * 0.5);
+    }
+    .field-w-66 {
+        --col-span: calc(var(--grid-columns) * 0.666);
+    }
+    .field-w-75 {
+        --col-span: calc(var(--grid-columns) * 0.75);
+    }
+    .field-w-undefined,
+    .field-w-100 {
+        --col-span: calc(var(--grid-columns) * 1);
+    }
 }
-
 
 /* GROUP PUBLISH COMPONENT / FIELD GRID (e.g. BLUEPRINT)
 =================================================== */
@@ -74,7 +85,6 @@ code.parent-url {
         grid-column: span var(--col-span, var(--grid-columns));
     }
 }
-
 
 /* GROUP PUBLISH COMPONENT / FIELDS / FLUID
 =================================================== */
@@ -90,16 +100,28 @@ Here flexbox is much better suited to create a layout that grows to fill space. 
     }
 
     @variant lg {
-    /* Here we have to cut short the proper width very slightly to account for the gap value. Because we're using flex-grow it should be pretty unnoticeable */
-        .field-w-25  { flex-basis: 24.5%; }
-        .field-w-33  { flex-basis: 32.5%; }
-        .field-w-50  { flex-basis: 49.4%; }
-        .field-w-66  { flex-basis: 66.1%; }
-        .field-w-75  { flex-basis: 74.5%; }
-        .field-w-undefined, .field-w-100 { flex-basis: 100%; }
+        /* Here we have to cut short the proper width very slightly to account for the gap value. Because we're using flex-grow it should be pretty unnoticeable */
+        .field-w-25 {
+            flex-basis: 24.5%;
+        }
+        .field-w-33 {
+            flex-basis: 32.5%;
+        }
+        .field-w-50 {
+            flex-basis: 49.4%;
+        }
+        .field-w-66 {
+            flex-basis: 66.1%;
+        }
+        .field-w-75 {
+            flex-basis: 74.5%;
+        }
+        .field-w-undefined,
+        .field-w-100 {
+            flex-basis: 100%;
+        }
     }
 }
-
 
 /* GROUP PUBLISH COMPONENT / FIELD
 =================================================== */
@@ -115,7 +137,7 @@ Here flexbox is much better suited to create a layout that grows to fill space. 
             @apply pr-6;
         }
         .field-dropdown {
-            @apply absolute bottom-[-3px] right-0 block;
+            @apply absolute right-0 bottom-[-3px] block;
         }
         &:not(.has-field-label) {
             .field-inner {
@@ -125,31 +147,31 @@ Here flexbox is much better suited to create a layout that grows to fill space. 
     }
 
     code {
-        @apply bg-blue-50 text-blue-600 font-medium px-1 rounded-sm;
+        @apply rounded-sm bg-blue-50 px-1 font-medium text-blue-600;
     }
 }
 
 .publish-field-label {
-    @apply flex items-center font-medium text-sm mb-2;
+    @apply mb-2 flex items-center text-sm font-medium;
 }
 
 .publish-sections .publish-sections-section {
     @apply mb-8;
-    [data-cards-wrap="fields"] & {
+    [data-cards-wrap='fields'] & {
         @apply mb-12;
     }
 }
 
 .publish-section-header {
-    @apply rounded-t-lg border-b border-gray-400 bg-gray-100 dark:border-dark-900 dark:bg-dark-700;
+    @apply dark:border-dark-900 dark:bg-dark-700 rounded-t-lg border-b border-gray-400 bg-gray-100;
 }
 
 .publish-section-header-inner {
-    @apply px-4 pb-3 pt-4 @lg:px-6;
+    @apply px-4 pt-4 pb-3 @lg:px-6;
 }
 
 .publish-sidebar {
-    @apply shrink-0 ms-8 w-[300px];
+    @apply ms-8 w-[300px] shrink-0;
 
     .publish-fields .form-group {
         @apply p-0;

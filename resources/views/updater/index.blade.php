@@ -31,7 +31,7 @@
             <table class="data-table">
                 <tr>
                     <td class="w-64">
-                        <a href="{{ route('statamic.cp.updater.product', 'statamic') }}" class="font-bold text-blue">
+                        <a href="{{ route('statamic.cp.updater.product', 'statamic') }}" class="text-blue font-bold">
                             {{ __('Statamic') }}
                         </a>
                     </td>
@@ -96,9 +96,6 @@
             </div>
         @endif
 
-        <x-statamic::docs-callout
-            :topic="__('Updates')"
-            :url="Statamic::docsUrl('updating')"
-        />
+        <x-statamic::docs-callout :topic="__('Updates')" :url="Statamic::docsUrl('updating')" />
     @endif
 @endsection

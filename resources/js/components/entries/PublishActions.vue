@@ -13,14 +13,14 @@
                     <loading-graphic />
                 </div>
 
-                <div class="p-3 flex flex-col space-y-6" v-else>
+                <div class="flex flex-col space-y-6 p-3" v-else>
                     <Select class="w-full" :options v-model="action" />
 
                     <template v-if="action">
-<!--                        <DatePicker-->
-<!--                            v-if="action == 'schedule'"-->
-<!--                            v-model="publishTime"-->
-<!--                        />-->
+                        <!--                        <DatePicker-->
+                        <!--                            v-if="action == 'schedule'"-->
+                        <!--                            v-model="publishTime"-->
+                        <!--                        />-->
 
                         <Textarea
                             class="text-sm"
@@ -33,13 +33,17 @@
                         <Button variant="primary" :text="submitButtonText" @click="submit" />
 
                         <div class="flex">
-                            <Icon name="info" class="size-4 shrink-0 me-2" />
+                            <Icon name="info" class="me-2 size-4 shrink-0" />
                             <Subheading size="sm" class="flex-1" :text="actionInfoText" />
                         </div>
 
                         <div class="flex text-red-500" v-if="action === 'schedule'">
-                            <Icon name="info" class="size-4 shrink-0 me-2" />
-                            <Subheading size="sm" class="flex-1 text-red-500" :text="__('messages.publish_actions_current_becomes_draft_because_scheduled')" />
+                            <Icon name="info" class="me-2 size-4 shrink-0" />
+                            <Subheading
+                                size="sm"
+                                class="flex-1 text-red-500"
+                                :text="__('messages.publish_actions_current_becomes_draft_because_scheduled')"
+                            />
                         </div>
                     </template>
                 </div>

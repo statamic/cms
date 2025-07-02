@@ -4,7 +4,7 @@
         :class="{
             'select-none': shifting,
             'data-table': !unstyled,
-            'contained': contained,
+            contained: contained,
         }"
         data-table
         ref="table"

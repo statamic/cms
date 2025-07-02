@@ -8,7 +8,7 @@
             :full="stackSize === 'full'"
             @closed="close"
         >
-            <div class="h-full overflow-scroll overflow-x-auto bg-gray-300 p-6 dark:bg-dark-800">
+            <div class="dark:bg-dark-800 h-full overflow-scroll overflow-x-auto bg-gray-300 p-6">
                 <div v-if="loading" class="absolute inset-0 z-200 flex items-center justify-center text-center">
                     <loading-graphic />
                 </div>

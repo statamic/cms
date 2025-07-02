@@ -45,7 +45,7 @@
                         <button type="button" class="btn btn-primary mb-2" @click="select">{{ __('Finish') }}</button>
                     </div>
                 </div>
-                <h6 class="rounded-b bg-gray-300 p-4 text-center dark:border-dark-200 dark:bg-dark-550">
+                <h6 class="dark:border-dark-200 dark:bg-dark-550 rounded-b bg-gray-300 p-4 text-center">
                     {{ __('messages.focal_point_previews_are_examples') }}
                 </h6>
             </div>

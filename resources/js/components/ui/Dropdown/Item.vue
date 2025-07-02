@@ -34,17 +34,10 @@ const iconClasses = cva({
         },
     },
 })({ variant: props.variant });
-
 </script>
 
 <template>
-    <DropdownMenuItem
-        :class="classes"
-        data-ui-dropdown-item
-        :as="href ? 'a' : 'div'"
-        :href
-        :target
-    >
+    <DropdownMenuItem :class="classes" data-ui-dropdown-item :as="href ? 'a' : 'div'" :href :target>
         <div v-if="icon" class="flex size-6 items-center justify-center p-1">
             <Icon :name="icon" :class="iconClasses" />
         </div>

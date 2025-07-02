@@ -1,5 +1,7 @@
 <template>
-    <header class="fixed inset-x-0 top-0 z-max flex items-center justify-between bg-frosted px-4 shadow dark:bg-dark-550">
+    <header
+        class="z-max bg-frosted dark:bg-dark-550 fixed inset-x-0 top-0 flex items-center justify-between px-4 shadow"
+    >
         <h2 class="shrink-0" v-text="__(title)" />
         <div class="flex min-w-max items-center gap-4">
             <slot />

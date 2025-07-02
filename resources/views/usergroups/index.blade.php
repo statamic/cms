@@ -16,8 +16,5 @@
 
     <user-group-listing :initial-rows="{{ json_encode($groups) }}"></user-group-listing>
 
-    <x-statamic::docs-callout
-        :topic="__('User Groups')"
-        :url="Statamic::docsUrl('users#user-groups')"
-    />
+    <x-statamic::docs-callout :topic="__('User Groups')" :url="Statamic::docsUrl('users#user-groups')" />
 @endsection

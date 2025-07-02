@@ -63,7 +63,7 @@ const triggerClasses = cva({
 })({
     size: props.size,
     flat: props.flat,
-    buttonAppearance: props.buttonAppearance
+    buttonAppearance: props.buttonAppearance,
 });
 
 const itemClasses = cva({
@@ -253,7 +253,13 @@ function pushTaggableOption(e) {
             @update:open="updateDropdownOpen"
             @update:model-value="updateModelValue"
         >
-            <ComboboxAnchor :class="['focus-within:focus-outline w-full flex items-center justify-between gap-2 text-gray-800 dark:text-gray-300 antialiased appearance-none', $attrs.class]" data-ui-combobox-anchor>
+            <ComboboxAnchor
+                :class="[
+                    'focus-within:focus-outline flex w-full appearance-none items-center justify-between gap-2 text-gray-800 antialiased dark:text-gray-300',
+                    $attrs.class,
+                ]"
+                data-ui-combobox-anchor
+            >
                 <ComboboxTrigger as="div" :class="triggerClasses">
                     <ComboboxInput
                         v-if="searchable && (dropdownOpen || !modelValue || (multiple && placeholder))"
@@ -275,7 +281,14 @@ function pushTaggableOption(e) {
                     </button>
 
                     <div class="flex items-center">
-                        <Button icon="x" variant="filled" size="xs" round v-if="clearable && modelValue" @click="clear" />
+                        <Button
+                            icon="x"
+                            variant="filled"
+                            size="xs"
+                            round
+                            v-if="clearable && modelValue"
+                            @click="clear"
+                        />
                         <Icon name="ui/chevron-down" />
                     </div>
                 </ComboboxTrigger>

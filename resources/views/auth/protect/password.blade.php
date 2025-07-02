@@ -1,7 +1,6 @@
 @extends('statamic::outside')
 
 @section('content')
-
     <div class="relative mx-auto max-w-[400px] items-center justify-center">
         <div class="flex items-center justify-center py-6">
             <x-statamic::outside-logo />
@@ -9,7 +8,7 @@
         <ui-auth-card
             icon="key"
             title="{{ __('Protected Page') }}"
-            description="{{ !request()->has('token') ? __('statamic::messages.password_protect_token_missing') : __('statamic::messages.password_protect_enter_password') }}"
+            description="{{ ! request()->has('token') ? __('statamic::messages.password_protect_token_missing') : __('statamic::messages.password_protect_enter_password') }}"
         >
             <form method="POST" class="flex flex-col gap-6">
                 @csrf
@@ -22,7 +21,7 @@
                     />
 
                     <statamic:get_errors:all bag="passwordProtect">
-                        @foreach($messages as $message)
+                        @foreach ($messages as $message)
                             <ui-description class="text-red-500" text="{{ $message['message'] }}" />
                         @endforeach
                     </statamic:get_errors:all>
@@ -34,5 +33,4 @@
             </form>
         </ui-auth-card>
     </div>
-
 @endsection

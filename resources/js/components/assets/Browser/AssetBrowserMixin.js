@@ -16,7 +16,7 @@ export default {
             newFolderName: null,
             draggingAsset: null,
             draggingFolder: null,
-        }
+        };
     },
 
     watch: {
@@ -84,8 +84,8 @@ export default {
 
                 this.$axios
                     .post(this.actionUrl, payload)
-                    .then(response => this.$emit('action-completed', true, response))
-                    .finally(() => this.draggingAsset = null);
+                    .then((response) => this.$emit('action-completed', true, response))
+                    .finally(() => (this.draggingAsset = null));
             }
 
             if (this.draggingFolder) {
@@ -105,8 +105,8 @@ export default {
 
                 this.$axios
                     .post(this.folderActionUrl, payload)
-                    .then(response => this.$emit('action-completed', true, response))
-                    .finally(() => this.draggingFolder = null);
+                    .then((response) => this.$emit('action-completed', true, response))
+                    .finally(() => (this.draggingFolder = null));
             }
         },
     },
