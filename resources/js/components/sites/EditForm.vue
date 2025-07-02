@@ -5,10 +5,9 @@
         name="sites"
         reference="sites"
         :blueprint="blueprint"
-        :values="values"
+        v-model="values"
         :meta="meta"
         :errors="errors"
-        @updated="values = $event"
     >
         <Header :title="pageTitle" icon="site">
             <Button type="submit" variant="primary" @click="submit">{{ __('Save') }}</Button>

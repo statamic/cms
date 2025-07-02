@@ -76,7 +76,7 @@
             :name="publishContainer"
             :reference="initialReference"
             :blueprint="fieldset"
-            :values="values"
+            v-model="values"
             :extra-values="extraValues"
             :meta="meta"
             :origin-values="originValues"
@@ -87,8 +87,6 @@
             :localized-fields="localizedFields"
             :track-dirty-state="trackDirtyState"
             :sync-field-confirmation-text="syncFieldConfirmationText"
-            @updated="values = $event"
-            @update:visible-values="visibleValues = $event"
         >
             <LivePreview
                 :enabled="isPreviewing"
@@ -544,12 +542,9 @@ export default {
                         storeName: this.publishContainer,
                     }),
                     new Request(this.actions.save, this.method, {
-                        ...this.visibleValues,
-                        ...{
-                            _blueprint: this.fieldset.handle,
-                            _localized: this.localizedFields,
-                            _parent: this.parent,
-                        },
+                        _blueprint: this.fieldset.handle,
+                        _localized: this.localizedFields,
+                        _parent: this.parent,
                     }),
                     new AfterSaveHooks('entry', {
                         collection: this.collectionHandle,

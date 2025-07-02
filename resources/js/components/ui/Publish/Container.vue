@@ -26,7 +26,7 @@ const props = defineProps({
     blueprint: {
         type: Object,
     },
-    values: {
+    modelValue: {
         type: Object,
         default: () => ({}),
     },
@@ -75,7 +75,7 @@ const props = defineProps({
 });
 
 const store = usePublishContainerStore(props.name, {
-    values: props.values,
+    values: props.modelValue,
     extraValues: props.extraValues,
     meta: props.meta,
     originValues: props.originValues,
@@ -91,7 +91,7 @@ const store = usePublishContainerStore(props.name, {
 const components = ref([]);
 
 watch(
-    () => props.values,
+    () => props.modelValue,
     (values) => store.setValues(values),
     { deep: true },
 );
@@ -197,5 +197,5 @@ function saved() {
 </script>
 
 <template>
-    <slot :values="values" />
+    <slot />
 </template>

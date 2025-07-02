@@ -215,11 +215,11 @@
                         :name="publishContainer"
                         :reference="id"
                         :blueprint="fieldset"
-                        :values="values"
+                        :model-value="values"
                         :extra-values="extraValues"
                         :meta="meta"
                         :errors="errors"
-                        @updated="values = { ...$event, focus: values.focus }"
+                        @update:model-value="values = { ...$event, focus: values.focus }"
                     >
                         <div class="h-1/2 w-full overflow-scroll sm:p-4 md:h-full md:w-1/3 md:grow md:pt-px">
                             <div v-if="saving" class="loading">

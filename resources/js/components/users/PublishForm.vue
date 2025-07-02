@@ -49,10 +49,9 @@
             :name="publishContainer"
             :reference="initialReference"
             :blueprint="fieldset"
-            :values="values"
+            v-model="values"
             :meta="meta"
             :errors="errors"
-            @updated="values = $event"
         >
             <PublishTabs />
         </PublishContainer>
@@ -77,7 +76,7 @@ import {
 } from '@statamic/ui';
 import ItemActions from '@statamic/components/actions/ItemActions.vue';
 import { SavePipeline } from '@statamic/exports.js';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 const { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } = SavePipeline;
 
 let saving = ref(false);
@@ -147,7 +146,7 @@ export default {
                         container: this.$refs.container,
                         storeName: this.publishContainer,
                     }),
-                    new Request(this.actions.save, this.method, this.visibleValues),
+                    new Request(this.actions.save, this.method),
                     new AfterSaveHooks('user', {
                         reference: this.initialReference,
                     }),
@@ -165,6 +164,10 @@ export default {
                 this.values = this.resetValuesFromResponse(response.data.values);
             }
         },
+    },
+
+    created() {
+        container = computed(() => this.$refs.container);
     },
 
     mounted() {
