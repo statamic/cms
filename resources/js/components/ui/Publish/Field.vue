@@ -68,12 +68,16 @@ const values = computed(() => {
     return fieldPathPrefix ? data_get(store.values, fieldPathPrefix) : store.values;
 });
 
+const visibleValues = computed(() => {
+    return fieldPathPrefix ? data_get(store.visibleValues, fieldPathPrefix) : store.visibleValues;
+});
+
 const extraValues = computed(() => {
     return fieldPathPrefix ? data_get(store.extraValues, fieldPathPrefix) : store.extraValues;
 });
 
 const shouldShowField = computed(() => {
-    return new ShowField(store, values.value, extraValues.value).showField(props.config, fullPath.value);
+    return new ShowField(store, visibleValues.value, extraValues.value).showField(props.config, fullPath.value);
 });
 
 const shouldShowLabelText = computed(() => !props.config.hide_display);
