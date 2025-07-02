@@ -73,11 +73,6 @@ code.parent-url {
     > * {
         grid-column: span var(--col-span, var(--grid-columns));
     }
-    /* Target the group of icon buttons e.g. localisation, duplicate, delete */
-    [data-ui-card] :has(> button):has(svg) button {
-        /* Decrease the width of this sm button slightly, which is usually calc(var(--spacing) * 8) */
-        width: calc(var(--spacing) * 6.75);
-    }
 }
 
 
