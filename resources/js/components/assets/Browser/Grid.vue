@@ -22,7 +22,7 @@
                 "
             >
                 <ItemActions
-                    :url="actionUrl"
+                    :url="folderActionUrl"
                     :actions="folderActions(folder)"
                     :item="folder.path"
                     @started="actionStarted"
