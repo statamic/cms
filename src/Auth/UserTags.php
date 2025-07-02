@@ -733,7 +733,7 @@ class UserTags extends Tags
                         'instructions' => $section->instructions(),
                         'fields' => $section->fields()->addValues($values)->preProcess()->all()
                             ->reject(fn ($field) => in_array($field->handle(), ['password', 'password_confirmation', 'roles', 'groups'])
-                                || $field->fieldtype()->handle() === 'assets'
+                                    || $field->fieldtype()->handle() === 'assets'
                             )
                             ->map(fn ($field) => $this->getRenderableField($field, 'user.profile'))
                             ->values()
