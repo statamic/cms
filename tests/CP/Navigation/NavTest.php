@@ -4,6 +4,7 @@ namespace Tests\CP\Navigation;
 
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\CP\Navigation\NavItem;
 use Statamic\Facades;
@@ -120,8 +121,11 @@ class NavTest extends TestCase
 
         $expected = '<svg><circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" /></svg>';
 
+        // ->icon() should return the raw SVG we passed in
         $this->assertEquals($expected, $item->icon());
-        $this->assertEquals($expected, $item->svg());
+
+        // ->svg() should return the SVG wrapped in classes for styling
+        $this->assertEquals(Str::replace('<svg>', '<svg class="size-4 shrink-0">', $expected), $item->svg());
     }
 
     #[Test]
