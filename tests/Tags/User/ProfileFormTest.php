@@ -179,13 +179,14 @@ EOT
 EOT
         ));
 
-        preg_match_all('/<label>.+<\/label><input.+>/U', $output, $actual);
+        preg_match_all('/(?:<h[23].+>.+<\/h[23]>|<label>.+<\/label><input.+>|<label>.+<\/label><label><input.+><input.+><\/label>)+/U', $output, $actual);
 
         $expected = [
             '<label>Full Name</label><input id="userprofile-form-name-field" type="text" name="name" value="Test User">',
             '<label>Email Address</label><input id="userprofile-form-email-field" type="email" name="email" value="test@example.com">',
             '<label>Phone Number</label><input id="userprofile-form-phone-field" type="text" name="phone" value="12345">',
             '<label>Over 18 years of age?</label><input id="userprofile-form-age-field" type="text" name="age" value="" required>',
+            '<label>Newsletter</label><label><input type="hidden" name="newsletter" value="0"><input id="userprofile-form-newsletter-field" type="checkbox" name="newsletter" value="1" checked></label>',
         ];
 
         $this->assertEquals($expected, $actual[0]);
