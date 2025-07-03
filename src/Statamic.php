@@ -18,7 +18,6 @@ use Statamic\Support\Str;
 use Statamic\Support\Svg;
 use Statamic\Support\TextDirection;
 use Statamic\Tags\FluentTag;
-use Stringy\StaticStringy;
 
 class Statamic
 {
@@ -250,7 +249,9 @@ class Statamic
             $path = statamic_path("resources/svg/{$fallback}.svg");
         }
 
-        return Svg::withClasses(File::get($path), $attrs);
+        return File::exists($path)
+            ? Svg::withClasses(File::get($path), $attrs)
+            : null;
     }
 
     public static function vendorAssetUrl($url = '/')
