@@ -1,3 +1,5 @@
+@use('Statamic\Support\Str')
+
 @extends('statamic::layout')
 
 @section('content')
@@ -10,5 +12,6 @@
         submit-url="{{ $submitUrl }}"
         submit-method="{{ $submitMethod }}"
         :read-only="{{ Js::from($readOnly) }}"
+        :as-config="{{ Str::bool($usingConfigLayout) }}"
     ></ui-publish-form>
 @endsection

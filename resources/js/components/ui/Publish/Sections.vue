@@ -1,14 +1,15 @@
 <script setup>
 import { injectTabContext } from './TabProvider.vue';
-import { CardPanel } from '@statamic/ui';
+import { Panel, PanelHeader, Heading, Subheading, Card } from '@statamic/ui';
 import FieldsProvider from './FieldsProvider.vue';
 import Fields from './Fields.vue';
 import ShowField from '@statamic/components/field-conditions/ShowField.js';
 import { injectContainerContext } from './Container.vue';
 import markdown from '@statamic/util/markdown.js';
 import { computed } from 'vue';
+import { Primitive } from 'reka-ui';
 
-const { blueprint, store } = injectContainerContext();
+const { blueprint, store, asConfig } = injectContainerContext();
 const tab = injectTabContext();
 const sections = tab.sections;
 const visibleSections = computed(() => {
@@ -26,18 +27,22 @@ function renderInstructions(instructions) {
 
 <template>
     <div>
-        <CardPanel
+        <Panel
             v-for="(section, i) in visibleSections"
             :key="i"
-            :heading="__(section.display)"
-            :subheading="renderInstructions(section.instructions)"
-            class="mb-6"
+            :class="asConfig ? 'mb-12' : 'mb-6'"
         >
-            <FieldsProvider :fields="section.fields">
-                <slot :section="section">
-                    <Fields />
-                </slot>
-            </FieldsProvider>
-        </CardPanel>
+            <PanelHeader v-if="section.display">
+                <Heading v-html="__(section.display)" />
+                <Subheading v-if="section.instructions" v-html="renderInstructions" />
+            </PanelHeader>
+            <Primitive :as="asConfig ? 'div' : Card">
+                <FieldsProvider :fields="section.fields">
+                    <slot :section="section">
+                        <Fields />
+                    </slot>
+                </FieldsProvider>
+            </Primitive>
+        </Panel>
     </div>
 </template>
