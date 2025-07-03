@@ -99,7 +99,7 @@ class PublishForm implements Responsable
 
         $viewData = [
             'blueprint' => $this->blueprint->toPublishArray(),
-            'icon' => $this->icon,
+            'icon' => $this->icon ?? ($this->usingConfigLayout ? 'cog' : null),
             'title' => $this->title,
             'values' => $fields->values(),
             'meta' => $fields->meta(),
