@@ -6,7 +6,7 @@ use Stringy\StaticStringy;
 
 class Svg
 {
-    public static function withClasses(string $svg, string $classes): string
+    public static function withClasses(string $svg, ?string $classes = null): string
     {
         $attrs = " class=\"{$classes}\"";
 
