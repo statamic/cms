@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP\Forms;
 use Illuminate\Http\Request;
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\CP\Column;
+use Statamic\CP\PublishForm;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\Scope;
@@ -153,17 +154,11 @@ class FormsController extends CpController
             'email' => $form->email(),
         ]);
 
-        $fields = ($blueprint = $this->editFormBlueprint($form))
-            ->fields()
-            ->addValues($values)
-            ->preProcess();
-
-        return view('statamic::forms.edit', [
-            'blueprint' => $blueprint->toPublishArray(),
-            'values' => $fields->values(),
-            'meta' => $fields->meta(),
-            'form' => $form,
-        ]);
+        return PublishForm::make($this->editFormBlueprint($form))
+            ->title(__('Configure Form'))
+            ->values($values)
+            ->usingConfigLayout()
+            ->submittingTo(cp_route('forms.update', $form->handle()));
     }
 
     public function update($form, Request $request)
@@ -364,6 +359,23 @@ class FormsController extends CpController
             }
         }
 
-        return Blueprint::makeFromTabs($fields);
+        return Blueprint::make()->setContents(collect([
+            'tabs' => [
+                'main' => [
+                    'sections' => collect($fields)->map(function ($section) {
+                        return [
+                            'display' => $section['display'],
+                            'fields' => collect($section['fields'])->map(function ($field, $handle) {
+                                return [
+                                    'handle' => $handle,
+                                    'field' => $field,
+                                ];
+                            })->values()->all(),
+                        ];
+                    })->values()->all(),
+                ],
+            ],
+        ])->all());
+
     }
 }
