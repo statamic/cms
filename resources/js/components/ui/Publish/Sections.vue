@@ -12,11 +12,11 @@ const { blueprint, store } = injectContainerContext();
 const tab = injectTabContext();
 const sections = tab.sections;
 const visibleSections = computed(() => {
-   return sections.filter(section => {
-       return section.fields.some((field) => {
-           return new ShowField(store, store.values, store.extraValues).showField(field, field.handle);
-       });
-   });
+    return sections.filter((section) => {
+        return section.fields.some((field) => {
+            return new ShowField(store, store.visibleValues, store.extraValues).showField(field, field.handle);
+        });
+    });
 });
 
 function renderInstructions(instructions) {

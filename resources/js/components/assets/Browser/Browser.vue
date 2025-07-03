@@ -10,9 +10,9 @@
                         :href="createContainerUrl"
                     />
                     <DropdownItem
-                        icon="edit"
+                        icon="cog"
                         v-if="container.can_edit"
-                        :text="__('Edit Container')"
+                        :text="__('Configure Container')"
                         :href="container.edit_url"
                     />
                     <DropdownItem
@@ -254,7 +254,7 @@ export default {
             creatingFolder: false,
             uploads: [],
             page: 1,
-            preferencesPrefix: null,
+            preferencesPrefix: `assets.${this.container.id}`,
             meta: {},
             sortColumn: this.container.sort_field,
             sortDirection: this.container.sort_direction,
@@ -395,9 +395,7 @@ export default {
     },
 
     mounted() {
-        this.preferencesPrefix = `assets.${this.container.id}`;
         this.mode = this.getPreference('mode') || 'table';
-        this.setInitialPerPage();
     },
 
     unmounted() {
@@ -474,6 +472,10 @@ export default {
 
             this.initializing = false;
             this.loading = false;
+        },
+
+        afterActionSuccessfullyCompleted() {
+            this.$refs.listing.refresh();
         },
 
         assetSaved() {
@@ -621,11 +623,6 @@ export default {
                 }
                 this.$emit('selections-updated', this.selectedAssets);
             }
-        },
-
-        setMode(mode) {
-            this.mode = mode;
-            this.setPreference('mode', mode == 'table' ? null : mode);
         },
 
         shiftDown() {

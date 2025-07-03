@@ -41,4 +41,8 @@
     [class*='focus-within'] * {
         outline: none;
     }
+
+    a {
+        cursor: pointer;
+    }
 }

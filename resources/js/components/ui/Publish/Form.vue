@@ -55,7 +55,7 @@ function save() {
         .provide({ container, errors, saving })
         .through([
             new BeforeSaveHooks('entry'),
-            new Request(props.submitUrl, props.submitMethod, { values: values.value }),
+            new Request(props.submitUrl, props.submitMethod),
             new AfterSaveHooks('entry'),
         ])
         .then((response) => {
@@ -87,11 +87,10 @@ onUnmounted(() => saveKeyBinding.destroy());
         ref="container"
         :name="containerName"
         :blueprint="blueprint"
-        :values="values"
         :meta="meta"
         :errors="errors"
         :read-only="readOnly"
-        @updated="values = $event"
+        v-model="values"
     >
         <Tabs />
     </Container>

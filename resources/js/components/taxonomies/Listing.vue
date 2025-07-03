@@ -22,7 +22,7 @@ function removeRow(row) {
         </template>
 
         <template #prepended-row-actions="{ row: taxonomy, index }">
-            <DropdownItem :text="__('Edit')" icon="cog" :href="taxonomy.edit_url" />
+            <DropdownItem :text="__('Configure')" icon="cog" :href="taxonomy.edit_url" />
             <DropdownItem :text="__('Edit Blueprints')" icon="blueprint-edit" :href="taxonomy.blueprints_url" />
             <DropdownItem
                 :text="__('Delete Taxonomy')"

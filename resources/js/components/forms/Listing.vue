@@ -4,7 +4,7 @@
             <a :href="form.show_url">{{ form.title }}</a>
         </template>
         <template #prepended-row-actions="{ row: form }">
-            <DropdownItem v-if="form.can_edit" :text="__('Edit')" :href="form.edit_url" icon="edit" />
+            <DropdownItem v-if="form.can_edit" :text="__('Configure')" :href="form.edit_url" icon="cog" />
             <DropdownItem
                 v-if="form.can_edit_blueprint"
                 icon="blueprint-edit"

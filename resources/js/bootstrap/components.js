@@ -51,7 +51,6 @@ import Popover from '../components/Popover.vue';
 import Portal from '../components/portals/Portal.vue';
 import PermissionTree from '../components/roles/PermissionTree.vue';
 import ConfirmationModal from '../components/modals/ConfirmationModal.vue';
-import FavoriteCreator from '../components/FavoriteCreator.vue';
 import KeyboardShortcutsModal from '../components/modals/KeyboardShortcutsModal.vue';
 import FieldActionModal from '../components/field-actions/FieldActionModal.vue';
 import ElevatedSessionModal from '../components/modals/ElevatedSessionModal.vue';
@@ -143,7 +142,6 @@ export default function registerGlobalComponents(app) {
         defineAsyncComponent(() => import('../components/Modal.vue')),
     );
     app.component('confirmation-modal', ConfirmationModal);
-    app.component('favorite-creator', FavoriteCreator);
     app.component('keyboard-shortcuts-modal', KeyboardShortcutsModal);
     app.component('resource-deleter', ResourceDeleter);
     app.component('field-action-modal', FieldActionModal);

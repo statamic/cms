@@ -7,7 +7,7 @@ const props = defineProps({
 </script>
 
 <template>
-    <header class="px-4.5 py-2 antialiased" data-ui-panel-header>
+    <header class="px-4.5 py-2 pt-0.5 antialiased" data-ui-panel-header>
         <Heading v-text="props.title" v-if="props.title" />
         <slot v-else />
     </header>
