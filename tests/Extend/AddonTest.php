@@ -10,6 +10,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Extend\Addon;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
+use Statamic\Fields\Blueprint;
 use Tests\TestCase;
 
 class AddonTest extends TestCase
@@ -205,6 +206,42 @@ class AddonTest extends TestCase
         }
 
         $this->fail('Exception was not thrown.');
+    }
+
+    #[Test]
+    public function it_checks_if_addon_has_settings()
+    {
+        // It doesn't need to be a real blueprint, it just needs to be bound.
+        $this->app->bind('statamic.addons.test-addon.settings_blueprint', fn () => []);
+
+        $this->assertTrue($this->makeFromPackage(['slug' => 'test-addon'])->hasSettings());
+        $this->assertFalse($this->makeFromPackage(['slug' => 'another-addon'])->hasSettings());
+    }
+
+    #[Test]
+    public function it_gets_the_settings_blueprint()
+    {
+        $this->app->bind('statamic.addons.test-addon.settings_blueprint', fn () => [
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'fields' => [
+                                [
+                                    'handle' => 'api_key',
+                                    'field' => ['type' => 'text'],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $blueprint = $this->makeFromPackage(['slug' => 'test-addon'])->settingsBlueprint();
+
+        $this->assertInstanceOf(Blueprint::class, $blueprint);
+        $this->assertTrue($blueprint->hasField('api_key'));
     }
 
     #[Test]
