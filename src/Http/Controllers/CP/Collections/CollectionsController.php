@@ -616,7 +616,23 @@ class CollectionsController extends CpController
             ],
         ]);
 
-        return Blueprint::makeFromTabs($fields);
+        return Blueprint::make()->setContents(collect([
+            'tabs' => [
+                'main' => [
+                    'sections' => collect($fields)->map(function ($section) {
+                        return [
+                            'display' => $section['display'],
+                            'fields' => collect($section['fields'])->map(function ($field, $handle) {
+                                return [
+                                    'handle' => $handle,
+                                    'field' => $field,
+                                ];
+                            })->values()->all(),
+                        ];
+                    })->values()->all(),
+                ],
+            ],
+        ])->all());
     }
 
     protected function getAuthorizedSitesForCollection($collection)
