@@ -27,6 +27,7 @@ const columns = ref(props.initialColumns);
         <template #prepended-row-actions="{ row: addon }">
             <DropdownItem v-if="addon.marketplace_url" :text="__('View on the Marketplace')" icon="external-link" :href="addon.marketplace_url" target="_blank" />
             <DropdownItem v-if="addon.updates_url" :text="__('Release Notes')" icon="updates" :href="addon.updates_url" />
+            <DropdownItem v-if="addon.settings_url" :text="__('Settings')" icon="cog" :href="addon.settings_url" />
         </template>
     </Listing>
 </template>

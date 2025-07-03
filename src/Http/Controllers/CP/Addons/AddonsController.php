@@ -1,9 +1,10 @@
 <?php
 
-namespace Statamic\Http\Controllers\CP;
+namespace Statamic\Http\Controllers\CP\Addons;
 
 use Statamic\CP\Column;
 use Statamic\Facades\Addon;
+use Statamic\Http\Controllers\CP\CpController;
 
 class AddonsController extends CpController
 {
@@ -22,7 +23,8 @@ class AddonsController extends CpController
                 'description' => $addon->description(),
                 'marketplace_url' => $addon->marketplaceUrl(),
                 'updates_url' => $addon->marketplaceSlug() ? cp_route('updater.product', $addon->marketplaceSlug()) : null,
-            ])->all(),
+                'settings_url' => $addon->hasSettings() ? cp_route('addons.settings.edit', $addon->slug()) : null,
+            ])->values()->all(),
             'columns' => [
                 Column::make('name'),
                 Column::make('developer'),
