@@ -10,8 +10,6 @@
     "test-watch": "npm run test -- --watch --notify",
     "frontend-dev": "vite -c vite-frontend.config.js",
     "frontend-build": "vite build -c vite-frontend.config.js",
-    "prettier:format": "prettier --write \"**/*.{js,ts,jsx,tsx,cjs,cts,mjs,mts,vue,blade.php,antlers.html,css}\"",
-    "prettier:check": "prettier --check \"**/*.{js,ts,jsx,tsx,cjs,cts,mjs,mts,vue,blade.php,antlers.html,css}\"",
     "knip": "knip"
   },
   "dependencies": {
@@ -106,10 +104,6 @@
     "jsdom": "^26.0.0",
     "knip": "^5.43.6",
     "laravel-vite-plugin": "^1.2.0",
-    "prettier": "^3.4.2",
-    "prettier-plugin-antlers": "^2.0.5",
-    "prettier-plugin-blade": "^2.1.19",
-    "prettier-plugin-tailwindcss": "^0.6.11",
     "rollup-plugin-visualizer": "^5.14.0",
     "tailwindcss": "^4.1.8",
     "vite": "^6.3.5",

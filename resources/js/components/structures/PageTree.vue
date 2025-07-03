@@ -1,15 +1,5 @@
 <template>
     <div>
-        <div class="mb-3 flex justify-end items-center">
-            <a class="text-2xs text-blue-600 underline me-1" v-text="__('Expand All')" @click="expandAll" />
-            <span class="text-blue-600 text-2xs">/</span>
-            <a
-                class="text-2xs text-blue-600 underline ms-1"
-                v-text="__('Collapse All')"
-                @click="collapseAll"
-            />
-        </div>
-
         <ui-panel>
             <div class="loading card" v-if="loading">
                 <loading-graphic />
@@ -20,9 +10,12 @@
             </div>
 
             <ui-panel-header>
-                <div class="page-tree-header font-medium text-sm flex justify-between">
-                    <div v-text="__('Title')" />
-                    <div class="me-15" v-text="__('Template')" />
+                <div class="page-tree-header font-medium text-sm items-center flex justify-between">
+                    <div v-text="__('Tree Structure')" />
+                    <div class="flex gap-2 -me-3">
+                        <ui-button size="sm" icon="tree-collapse" :text="__('Collapse')" @click="collapseAll" />
+                        <ui-button size="sm" icon="tree-expand" :text="__('Expand')" @click="expandAll" />
+                    </div>
                 </div>
             </ui-panel-header>
             <div v-if="!loading" class="page-tree">
