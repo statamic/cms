@@ -15,6 +15,7 @@ use Statamic\Modifiers\Modify;
 use Statamic\Support\Arr;
 use Statamic\Support\DateFormat;
 use Statamic\Support\Str;
+use Statamic\Support\Svg;
 use Statamic\Support\TextDirection;
 use Statamic\Tags\FluentTag;
 use Stringy\StaticStringy;
@@ -243,18 +244,13 @@ class Statamic
 
     public static function svg($name, $attrs = null, $fallback = null)
     {
-        if ($attrs) {
-            $attrs = " class=\"{$attrs}\"";
-        }
-
         $path = statamic_path("resources/svg/{$name}.svg");
+
         if ($fallback && ! File::exists($path)) {
             $path = statamic_path("resources/svg/{$fallback}.svg");
         }
 
-        $svg = StaticStringy::collapseWhitespace(File::get($path));
-
-        return str_replace('<svg', sprintf('<svg%s', $attrs), $svg);
+        return Svg::withClasses(File::get($path), $attrs);
     }
 
     public static function vendorAssetUrl($url = '/')
