@@ -2,7 +2,7 @@
 
 @section('content')
     <ui-publish-form
-        icon="{{ $icon }}"
+        @if ($icon)icon="{{ $icon }}"@endif
         title="{{ $title }}"
         :blueprint="{{ Js::from($blueprint) }}"
         :initial-values="{{ Js::from($values) }}"

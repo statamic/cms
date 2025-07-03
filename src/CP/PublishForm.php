@@ -7,7 +7,7 @@ use Statamic\Fields\Blueprint;
 
 class PublishForm implements Responsable
 {
-    private string $icon = '';
+    private ?string $icon = null;
     private string $title = '';
     private array $values = [];
     private $parent = null;
