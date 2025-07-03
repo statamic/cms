@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Statamic\Contracts\Entries\Collection as CollectionContract;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Column;
+use Statamic\CP\PublishForm;
 use Statamic\Exceptions\SiteNotFoundException;
 use Statamic\Facades\Action;
 use Statamic\Facades\Blueprint;
@@ -204,17 +205,11 @@ class CollectionsController extends CpController
             'origin_behavior' => $collection->originBehavior(),
         ];
 
-        $fields = ($blueprint = $this->editFormBlueprint($collection))
-            ->fields()
-            ->addValues($values)
-            ->preProcess();
-
-        return view('statamic::collections.edit', [
-            'blueprint' => $blueprint->toPublishArray(),
-            'values' => $fields->values(),
-            'meta' => $fields->meta(),
-            'collection' => $collection,
-        ]);
+        return PublishForm::make($this->editFormBlueprint($collection))
+            ->title(__('Configure Collection'))
+            ->values($values)
+            ->usingConfigLayout()
+            ->submittingTo(cp_route('collections.update', $collection->handle()));
     }
 
     public function store(Request $request)
