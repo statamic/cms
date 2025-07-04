@@ -33,7 +33,7 @@ const hasSlot = !!slots.default;
     >
         <Icon :name="icon" class="size-6 me-4 mt-1 text-gray-500" />
         <div class="flex-1 mb-4 md:mb-0 me-6 text-start">
-            <ui-heading size="xl" :level="3" :text="heading" class="mb-1.5" />
+            <ui-heading size="xl" :level="3" :text="heading" class="mb-1.5 font-semibold tracking-tight" />
             <ui-description v-if="description" :text="description" />
             <slot />
         </div>
