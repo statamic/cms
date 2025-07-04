@@ -1,12 +1,12 @@
 <template>
     <div>
-        <ui-panel>
+        <div v-if="!loading && pages.length == 0" class="no-results flex w-full items-center">
+            <slot name="empty" />
+        </div>
+
+        <ui-panel v-show="pages.length">
             <div class="loading card" v-if="loading">
                 <loading-graphic />
-            </div>
-
-            <div v-if="!loading && pages.length == 0" class="no-results flex w-full items-center">
-                <slot name="empty" />
             </div>
 
             <ui-panel-header>
