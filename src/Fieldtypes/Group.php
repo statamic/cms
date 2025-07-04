@@ -7,8 +7,8 @@ use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Values;
 use Statamic\GraphQL\Types\GroupType;
-use Statamic\Support\Str;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class Group extends Fieldtype
 {
