@@ -33,8 +33,8 @@ function renderInstructions(instructions) {
             :class="asConfig ? 'mb-12' : 'mb-6'"
         >
             <PanelHeader v-if="section.display">
-                <Heading v-html="__(section.display)" />
-                <Subheading v-if="section.instructions" v-html="renderInstructions" />
+                <Heading :text="__(section.display)" />
+                <Subheading v-if="section.instructions" :text="renderInstructions(section.instructions)" />
             </PanelHeader>
             <Primitive :as="asConfig ? 'div' : Card">
                 <FieldsProvider :fields="section.fields">
