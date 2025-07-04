@@ -44,7 +44,6 @@
                         >
                             <Dropdown placement="left-start" v-if="folderActions(folder).length">
                                 <DropdownMenu>
-                                    <DropdownLabel :text="__('Actions')" />
                                     <DropdownItem
                                         v-for="action in actions"
                                         :key="action.handle"
