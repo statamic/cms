@@ -1639,6 +1639,63 @@ EOT;
         $this->assertComposerJsonHasPackageVersion('require', 'bobsled/speed-calculator', '^1.0.0');
     }
 
+    #[Test]
+    public function it_doesnt_update_search_index_by_default_when_installed_non_interactively()
+    {
+        Search::shouldReceive('indexes')->never();
+
+        $this
+            ->installCoolRunnings()
+            ->assertSuccessful();
+
+        $this->assertFileExists(base_path('copied.md'));
+    }
+
+    #[Test]
+    public function it_updates_search_index_when_update_search_flag_is_passed()
+    {
+        Search::shouldReceive('indexes')
+            ->once()
+            ->andReturn([]);
+
+        $this
+            ->installCoolRunnings(['--update-search' => true])
+            ->assertSuccessful();
+
+        $this->assertFileExists(base_path('copied.md'));
+    }
+
+    #[Test]
+    public function it_doesnt_update_search_index_by_default_when_installed_interactively()
+    {
+        Search::shouldReceive('indexes')->never();
+
+        $this
+            ->installCoolRunningsInteractively()
+            ->expectsConfirmation('Clear site first?', 'no')
+            ->expectsConfirmation('Would you like to update your search index(es) as well?', 'no')
+            ->doesntExpectOutput('statamic:search:update')
+            ->assertSuccessful();
+
+        $this->assertFileExists(base_path('copied.md'));
+    }
+
+    #[Test]
+    public function it_updates_search_index_when_installed_interactively_confirmed()
+    {
+        Search::shouldReceive('indexes')
+            ->once()
+            ->andReturn([]);
+
+        $this
+            ->installCoolRunningsInteractively()
+            ->expectsConfirmation('Clear site first?', 'no')
+            ->expectsConfirmation('Would you like to update your search index(es) as well?', 'yes')
+            ->assertSuccessful();
+
+        $this->assertFileExists(base_path('copied.md'));
+    }
+
     private function kitRepoPath($path = null)
     {
         return Path::tidy(collect([base_path('repo/cool-runnings'), $path])->filter()->implode('/'));
