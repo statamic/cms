@@ -37,6 +37,67 @@ class NavPreferencesTest extends TestCase
 
         // Recommended syntax...
         $this->assertEquals($reorderedSections, $this->buildNavWithPreferences([
+            'reorder' => [
+                'users',
+                'fields',
+                'content',
+                'tools',
+                'settings',
+            ],
+        ])->keys()->all());
+
+        // Merge unmentioned sections underneath...
+        $this->assertEquals($reorderedSections, $this->buildNavWithPreferences([
+            'reorder' => [
+                'users',
+                'fields',
+            ],
+        ])->keys()->all());
+
+        // Always merge top level section at top, even when explicitly defining in middle...
+        $this->assertEquals($reorderedSections, $this->buildNavWithPreferences([
+            'reorder' => [
+                'users',
+                'top_level',
+                'fields',
+            ],
+        ])->keys()->all());
+
+        // Ensure re-ordering sections still works when modifying a section...
+        $this->assertEquals($reorderedSections, $this->buildNavWithPreferences([
+            'reorder' => [
+                'users',
+                'fields',
+            ],
+            'sections' => [
+                'fields' => [
+                    'items' => [
+                        'top_level::dashboard' => '@alias',
+                    ],
+                ],
+            ],
+        ])->keys()->all());
+
+        // If `reorder: false`, it should just use default section order...
+        $this->assertEquals($defaultSections, $this->buildNavWithPreferences([
+            'reorder' => false,
+        ])->keys()->all());
+
+        // If `reorder` is not specified, it should just use default item order...
+        $this->assertEquals($defaultSections, $this->buildNavWithPreferences([])->keys()->all());
+    }
+
+    #[Test]
+    public function it_can_still_reorder_sections_using_legacy_reorder_boolean_with_inherits()
+    {
+        $defaultSections = ['Top Level', 'Content', 'Fields', 'Tools', 'Settings', 'Users'];
+
+        $this->assertEquals($defaultSections, $this->buildDefaultNav()->keys()->all());
+
+        $reorderedSections = ['Top Level', 'Users', 'Fields', 'Content', 'Tools', 'Settings'];
+
+        // Recommended syntax...
+        $this->assertEquals($reorderedSections, $this->buildNavWithPreferences([
             'reorder' => true,
             'sections' => [
                 'top_level' => '@inherit',
@@ -126,7 +187,124 @@ class NavPreferencesTest extends TestCase
     }
 
     #[Test]
+    public function it_handles_created_and_renamed_sections_properly_when_reordering()
+    {
+        $expected = [
+            'Top Level',
+            'Users',
+            'Fieldios',
+            'New Section',
+            'Content',
+            'Tools',
+            'Settings',
+            'New Section At End',
+        ];
+
+        $this->assertEquals($expected, $this->buildNavWithPreferences([
+            'reorder' => [
+                'users',
+                'fields',
+                'new_section', // We want to explicitly show this section early in the order
+                // 'new_section_at_end', // But let this one generate as an appended section at the end
+            ],
+            'sections' => [
+                'fields' => [
+                    'display' => 'Fieldios', // Even though this section has been renamed, it should still reorder using original section id
+                    'items' => [
+                        'top_level::dashboard' => '@alias',
+                    ],
+                ],
+                'new_section' => [
+                    'items' => [
+                        'top_level::dashboard' => '@alias',
+                    ],
+                ],
+                'new_section_at_end' => [
+                    'items' => [
+                        'top_level::dashboard' => '@alias',
+                    ],
+                ],
+            ],
+        ])->keys()->all());
+    }
+
+    #[Test]
     public function it_can_reorder_items_within_sections()
+    {
+        $defaultContentItems = ['Collections', 'Navigation', 'Taxonomies', 'Assets', 'Globals'];
+
+        $this->assertEquals($defaultContentItems, $this->buildDefaultNav()->get('Content')->map->display()->all());
+
+        $reorderedContentItems = ['Globals', 'Taxonomies', 'Collections', 'Navigation', 'Assets'];
+
+        // Recommended syntax...
+        $this->assertEquals($reorderedContentItems, $this->buildNavWithPreferences([
+            'content' => [
+                'reorder' => [
+                    'content::globals',
+                    'content::taxonomies',
+                    'content::collections',
+                    'content::navigation',
+                    'content::assets',
+                ],
+            ],
+        ])->get('Content')->map->display()->all());
+
+        // With full nesting of sections...
+        $this->assertEquals($reorderedContentItems, $this->buildNavWithPreferences([
+            'sections' => [
+                'content' => [
+                    'reorder' => [
+                        'content::globals',
+                        'content::taxonomies',
+                        'content::collections',
+                        'content::navigation',
+                        'content::assets',
+                    ],
+                ],
+            ],
+        ])->get('Content')->map->display()->all());
+
+        // Merge unmentioned items underneath...
+        $this->assertEquals($reorderedContentItems, $this->buildNavWithPreferences([
+            'content' => [
+                'reorder' => [
+                    'content::globals',
+                    'content::taxonomies',
+                    'content::collections',
+                ],
+            ],
+        ])->get('Content')->map->display()->all());
+
+        // Ensure re-ordering items still works when modifying a item...
+        $this->assertEquals($reorderedContentItems, $this->buildNavWithPreferences([
+            'content' => [
+                'reorder' => [
+                    'content::globals',
+                    'content::taxonomies',
+                    'content::collections',
+                ],
+                'items' => [
+                    'content::taxonomies' => [
+                        'icon' => 'tag',
+                    ],
+                ],
+            ],
+        ])->get('Content')->map->display()->all());
+
+        // If `reorder: false`, it should just use default item order...
+        $this->assertEquals($defaultContentItems, $this->buildNavWithPreferences([
+            'content' => [
+                'reorder' => false,
+            ],
+        ])->get('Content')->map->display()->all());
+
+        // If `reorder` is not specified, it should just use default item order...
+        $this->assertEquals($defaultContentItems, $this->buildNavWithPreferences([])->get('Content')->map->display()->all());
+    }
+
+    #[Test]
+    public function it_can_still_reorder_items_within_sections_using_legacy_reorder_boolean_with_inherits()
     {
         $defaultContentItems = ['Collections', 'Navigation', 'Taxonomies', 'Assets', 'Globals'];
 
@@ -144,7 +322,6 @@ class NavPreferencesTest extends TestCase
                     'content::collections' => '@inherit',
                     'content::navigation' => '@inherit',
                     'content::assets' => '@inherit',
-                    'content::site' => '@inherit',
                 ],
             ],
         ])->get('Content')->map->display()->all());
@@ -158,7 +335,6 @@ class NavPreferencesTest extends TestCase
                 'content::collections' => '@inherit',
                 'content::navigation' => '@inherit',
                 'content::assets' => '@inherit',
-                'content::site' => '@inherit',
             ],
         ])->get('Content')->map->display()->all());
 
@@ -173,7 +349,6 @@ class NavPreferencesTest extends TestCase
                         'content::collections' => '@inherit',
                         'content::navigation' => '@inherit',
                         'content::assets' => '@inherit',
-                        'content::site' => '@inherit',
                     ],
                 ],
             ],
@@ -215,7 +390,6 @@ class NavPreferencesTest extends TestCase
                     'content::collections' => '@inherit',
                     'content::navigation' => '@inherit',
                     'content::assets' => '@inherit',
-                    'content::site' => '@inherit',
                 ],
             ],
         ])->get('Content')->map->display()->all());
@@ -229,7 +403,45 @@ class NavPreferencesTest extends TestCase
                     'content::collections' => '@inherit',
                     'content::navigation' => '@inherit',
                     'content::assets' => '@inherit',
-                    'content::site' => '@inherit',
+                ],
+            ],
+        ])->get('Content')->map->display()->all());
+    }
+
+    #[Test]
+    public function it_handles_created_and_renamed_items_within_sections_properly_when_reordering()
+    {
+        $expected = [
+            'Collections',
+            'Taxonomeees',
+            'New Item',
+            'Assets',
+            'Globals',
+            'New Item At End',
+        ];
+
+        $this->assertEquals($expected, $this->buildNavWithPreferences([
+            'content' => [
+                'reorder' => [
+                    'content::collections',
+                    'content::taxonomies',
+                    'content::new_item', // We want to explicitly show this section item early in the order
+                    // 'content::new_item_at_end', // But let this one generate as an appended section at the end
+                ],
+                'items' => [
+                    'content::taxonomies' => [
+                        'action' => '@modify',
+                        'display' => 'Taxonomeees', // Even though this item has been renamed, it should still reorder using original item id
+                    ],
+                    'content::navigation' => '@hide', // Hide this, why not
+                    'content::new_item' => [
+                        'action' => '@create',
+                        'display' => 'New Item',
+                    ],
+                    'content::new_item_at_end' => [
+                        'action' => '@create',
+                        'display' => 'New Item At End',
+                    ],
                 ],
             ],
         ])->get('Content')->map->display()->all());
@@ -237,6 +449,95 @@ class NavPreferencesTest extends TestCase
 
     #[Test]
     public function it_can_reorder_child_items_within_an_item()
+    {
+        $defaultUtilitiesItems = ['Cache', 'Email', 'Licensing', 'PHP Info', 'Search'];
+
+        $this->assertEquals($defaultUtilitiesItems, $this->buildDefaultNav()->get('Tools')->keyBy->display()->get('Utilities')->resolveChildren()->children()->map->display()->all());
+
+        $reorderedUtilitiesItems = ['Search', 'Cache', 'Licensing', 'Email', 'PHP Info'];
+
+        // Recommended syntax...
+        $this->assertEquals($reorderedUtilitiesItems, $this->buildNavWithPreferences([
+            'tools' => [
+                'tools::utilities' => [
+                    'reorder' => [
+                        'tools::utilities::search',
+                        'tools::utilities::cache',
+                        'tools::utilities::licensing',
+                        'tools::utilities::email',
+                        'tools::utilities::php_info',
+                    ],
+                ],
+            ],
+        ])->get('Tools')->keyBy->display()->get('Utilities')->resolveChildren()->children()->map->display()->all());
+
+        // With full nesting of sections...
+        $this->assertEquals($reorderedUtilitiesItems, $this->buildNavWithPreferences([
+            'sections' => [
+                'tools' => [
+                    'tools::utilities' => [
+                        'reorder' => [
+                            'tools::utilities::search',
+                            'tools::utilities::cache',
+                            'tools::utilities::licensing',
+                            'tools::utilities::email',
+                            'tools::utilities::php_info',
+                        ],
+                    ],
+                ],
+            ],
+        ])->get('Tools')->keyBy->display()->get('Utilities')->resolveChildren()->children()->map->display()->all());
+
+        // Merge unmentioned items underneath...
+        $this->assertEquals($reorderedUtilitiesItems, $this->buildNavWithPreferences([
+            'tools' => [
+                'tools::utilities' => [
+                    'reorder' => [
+                        'tools::utilities::search',
+                        'tools::utilities::cache',
+                        'tools::utilities::licensing',
+                    ],
+                ],
+            ],
+        ])->get('Tools')->keyBy->display()->get('Utilities')->resolveChildren()->children()->map->display()->all());
+
+        // Ensure re-ordering items still works when modifying a item...
+        $this->assertEquals($reorderedUtilitiesItems, $this->buildNavWithPreferences([
+            'tools' => [
+                'tools::utilities' => [
+                    'reorder' => [
+                        'tools::utilities::search',
+                        'tools::utilities::cache',
+                        'tools::utilities::licensing',
+                    ],
+                    'children' => [
+                        'tools::utilities::cache' => [
+                            'action' => '@modify',
+                            'url' => '/cache-money',
+                        ],
+                    ],
+                ],
+            ],
+        ])->get('Tools')->keyBy->display()->get('Utilities')->resolveChildren()->children()->map->display()->all());
+
+        // If `reorder: false`, it should just use default item order...
+        $this->assertEquals($defaultUtilitiesItems, $this->buildNavWithPreferences([
+            'tools' => [
+                'tools::utilities' => [
+                    'reorder' => false,
+                ],
+            ],
+        ])->get('Tools')->keyBy->display()->get('Utilities')->resolveChildren()->children()->map->display()->all());
+
+        // If `reorder` is not specified, it should just use default item order...
+        $this->assertEquals(
+            $defaultUtilitiesItems,
+            $this->buildNavWithPreferences([])->get('Tools')->keyBy->display()->get('Utilities')->resolveChildren()->children()->map->display()->all(),
+        );
+    }
+
+    #[Test]
+    public function it_can_still_reorder_child_items_within_an_item_using_legacy_reorder_boolean_with_inherits()
     {
         $defaultUtilitiesItems = ['Cache', 'Email', 'Licensing', 'PHP Info', 'Search'];
 
@@ -334,6 +635,47 @@ class NavPreferencesTest extends TestCase
                         'tools::utilities::licensing' => '@inherit',
                         'tools::utilities::email' => '@inherit',
                         'tools::utilities::php_info' => '@inherit',
+                    ],
+                ],
+            ],
+        ])->get('Tools')->keyBy->display()->get('Utilities')->resolveChildren()->children()->map->display()->all());
+    }
+
+    #[Test]
+    public function it_handles_created_and_renamed_child_items_properly_when_reordering()
+    {
+        $expected = [
+            'Search',
+            'Cache Moneys!',
+            'New Child Item',
+            'Email',
+            'Licensing',
+            'PHP Info',
+            'New Child Item At End',
+        ];
+
+        $this->assertEquals($expected, $this->buildNavWithPreferences([
+            'tools' => [
+                'tools::utilities' => [
+                    'reorder' => [
+                        'tools::utilities::search',
+                        'tools::utilities::cache',
+                        'tools::utilities::new_item', // We want to explicitly show this section item early in the order
+                        // 'tools::utilities::new_item_at_end', // But let this one generate as an appended section at the end
+                    ],
+                    'children' => [
+                        'tools::utilities::cache' => [
+                            'action' => '@modify',
+                            'display' => 'Cache Moneys!', // Even though this item has been renamed, it should still reorder using original item id
+                        ],
+                        'tools::utilities::new_item' => [
+                            'action' => '@create',
+                            'display' => 'New Child Item',
+                        ],
+                        'tools::utilities::new_item_at_end' => [
+                            'action' => '@create',
+                            'display' => 'New Child Item At End',
+                        ],
                     ],
                 ],
             ],
@@ -1523,12 +1865,6 @@ class NavPreferencesTest extends TestCase
         // But still show empty section when `withHidden` flag is true, so that user can re-add items to this core/extended section...
         $this->assertEquals(['Top Level', 'Content', 'Fields', 'Tools', 'Settings', 'Users', 'SEO Pro'], $navWithHidden->keys()->all());
         $this->assertTrue($navWithHidden->get('SEO Pro')->isEmpty());
-    }
-
-    #[Test]
-    public function it_can_handle_a_bunch_of_useless_config_without_erroring()
-    {
-        $this->markTestSkipped();
     }
 
     #[Test]
