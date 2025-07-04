@@ -33,8 +33,7 @@ import EntryListing from '../components/entries/Listing.vue';
 import CollectionListing from '../components/collections/Listing.vue';
 import TaxonomyListing from '../components/taxonomies/Listing.vue';
 import TermListing from '../components/terms/Listing.vue';
-import AddonList from '../components/AddonList.vue';
-import AddonDetails from '../components/AddonDetails.vue';
+import AddonListing from '../components/addons/Listing.vue';
 import CollectionWidget from '../components/entries/CollectionWidget.vue';
 import FormWidget from '../components/forms/FormWidget.vue';
 import SvgIcon from '../components/SvgIcon.vue';
@@ -109,8 +108,7 @@ export default function registerGlobalComponents(app) {
     app.component('collection-list', CollectionListing);
     app.component('taxonomy-list', TaxonomyListing);
     app.component('term-list', TermListing);
-    app.component('addon-list', AddonList);
-    app.component('addon-details', AddonDetails);
+    app.component('addon-list', AddonListing);
 
     // Widgets
     app.component('collection-widget', CollectionWidget);

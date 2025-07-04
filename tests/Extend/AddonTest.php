@@ -7,9 +7,13 @@ use Foo\Bar\TestAddonServiceProvider;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Contracts\Extend\AddonSettings;
+use Statamic\Contracts\Extend\AddonSettingsRepository;
 use Statamic\Extend\Addon;
+use Statamic\Facades;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
+use Statamic\Fields\Blueprint;
 use Tests\TestCase;
 
 class AddonTest extends TestCase
@@ -19,7 +23,10 @@ class AddonTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+
         $this->addonFixtureDir = Path::tidy(realpath(__DIR__.'/../Fixtures/Addon').'/');
+
+        $this->app['files']->deleteDirectory(storage_path('statamic/addons'));
     }
 
     #[Test]
@@ -205,6 +212,76 @@ class AddonTest extends TestCase
         }
 
         $this->fail('Exception was not thrown.');
+    }
+
+    #[Test]
+    public function it_checks_if_addon_has_settings()
+    {
+        // It doesn't need to be a real blueprint, it just needs to be bound.
+        $this->app->bind('statamic.addons.test-addon.settings_blueprint', fn () => []);
+
+        $this->assertTrue($this->makeFromPackage(['slug' => 'test-addon'])->hasSettings());
+        $this->assertFalse($this->makeFromPackage(['slug' => 'another-addon'])->hasSettings());
+    }
+
+    #[Test]
+    public function it_gets_the_settings_blueprint()
+    {
+        $this->app->bind('statamic.addons.test-addon.settings_blueprint', fn () => [
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'fields' => [
+                                [
+                                    'handle' => 'api_key',
+                                    'field' => ['type' => 'text'],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $blueprint = $this->makeFromPackage(['slug' => 'test-addon'])->settingsBlueprint();
+
+        $this->assertInstanceOf(Blueprint::class, $blueprint);
+        $this->assertTrue($blueprint->hasField('api_key'));
+    }
+
+    #[Test]
+    public function it_gets_settings()
+    {
+        $addon = $this->makeFromPackage();
+        Facades\Addon::shouldReceive('get')->with('vendor/test-addon')->andReturn($addon);
+
+        app(AddonSettingsRepository::class)->make($addon, [
+            'api_key' => '12345',
+            'another_setting' => 'value',
+        ])->save();
+
+        $settings = $addon->settings();
+
+        $this->assertInstanceOf(AddonSettings::class, $settings);
+        $this->assertEquals($addon, $settings->addon());
+        $this->assertEquals([
+            'api_key' => '12345',
+            'another_setting' => 'value',
+        ], $settings->values()->all());
+    }
+
+    #[Test]
+    public function it_gets_settings_instance_even_if_no_settings_are_saved()
+    {
+        $addon = $this->makeFromPackage(['slug' => 'test-addon']);
+        Facades\Addon::shouldReceive('get')->with('vendor/test-addon')->andReturn($addon);
+
+        $settings = $addon->settings();
+
+        $this->assertInstanceOf('Statamic\Extend\AddonSettings', $settings);
+        $this->assertEquals($addon, $settings->addon());
+        $this->assertEquals([], $settings->values()->all());
     }
 
     #[Test]

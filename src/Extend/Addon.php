@@ -5,6 +5,9 @@ namespace Statamic\Extend;
 use Composer\Semver\VersionParser;
 use Facades\Statamic\Licensing\LicenseManager;
 use ReflectionClass;
+use Statamic\Contracts\Extend\AddonSettings;
+use Statamic\Contracts\Extend\AddonSettingsRepository;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Support\Arr;
@@ -357,6 +360,33 @@ final class Addon
     public function config()
     {
         return config($this->handle());
+    }
+
+    public function hasSettings(): bool
+    {
+        return $this->settingsBlueprint() !== null;
+    }
+
+    public function settingsBlueprint()
+    {
+        $binding = "statamic.addons.{$this->slug()}.settings_blueprint";
+
+        if (! app()->bound($binding)) {
+            return null;
+        }
+
+        return Blueprint::make()->setContents(app($binding));
+    }
+
+    public function settings(): AddonSettings
+    {
+        $settings = app(AddonSettingsRepository::class)->find($this->id());
+
+        if (! $settings) {
+            $settings = app(AddonSettingsRepository::class)->make($this);
+        }
+
+        return $settings;
     }
 
     /**
