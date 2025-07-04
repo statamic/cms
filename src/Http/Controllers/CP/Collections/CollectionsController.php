@@ -208,7 +208,7 @@ class CollectionsController extends CpController
         return PublishForm::make($this->editFormBlueprint($collection))
             ->title(__('Configure Collection'))
             ->values($values)
-            ->usingConfigLayout()
+            ->asConfig()
             ->submittingTo(cp_route('collections.update', $collection->handle()));
     }
 

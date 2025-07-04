@@ -69,7 +69,7 @@ class GlobalsController extends CpController
         return PublishForm::make($this->editFormBlueprint($set))
             ->title(__('Configure Global Set'))
             ->values($values)
-            ->usingConfigLayout()
+            ->asConfig()
             ->submittingTo(cp_route('globals.update', $set->handle()));
     }
 

@@ -64,7 +64,7 @@ class AssetContainersController extends CpController
         return PublishForm::make($this->formBlueprint($container))
             ->title(__('Configure Asset Container'))
             ->values($values)
-            ->usingConfigLayout()
+            ->asConfig()
             ->submittingTo(cp_route('asset-containers.update', $container->handle()));
     }
 
@@ -104,7 +104,7 @@ class AssetContainersController extends CpController
         return PublishForm::make($this->formBlueprint())
             ->title(__('Create Asset Container'))
             ->values(['disk' => $this->disks()->first()])
-            ->usingConfigLayout()
+            ->asConfig()
             ->submittingTo(cp_route('asset-containers.store'), 'POST');
     }
 

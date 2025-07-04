@@ -157,7 +157,7 @@ class FormsController extends CpController
         return PublishForm::make($this->editFormBlueprint($form))
             ->title(__('Configure Form'))
             ->values($values)
-            ->usingConfigLayout()
+            ->asConfig()
             ->submittingTo(cp_route('forms.update', $form->handle()));
     }
 

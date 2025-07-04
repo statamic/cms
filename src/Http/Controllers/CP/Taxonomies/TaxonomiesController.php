@@ -149,7 +149,7 @@ class TaxonomiesController extends CpController
         return PublishForm::make($this->editFormBlueprint($taxonomy))
             ->title(__('Configure Taxonomy'))
             ->values($values)
-            ->usingConfigLayout()
+            ->asConfig()
             ->submittingTo(cp_route('taxonomies.update', $taxonomy->handle()));
     }
 

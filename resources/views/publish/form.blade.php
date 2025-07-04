@@ -3,7 +3,7 @@
 @extends('statamic::layout')
 
 @section('content')
-    <div class="@if ($usingConfigLayout) max-w-5xl mx-auto @endif">
+    <div class="@if ($asConfig) max-w-5xl mx-auto @endif">
         <ui-publish-form
             @if ($icon)icon="{{ $icon }}"@endif
             title="{{ $title }}"
@@ -13,7 +13,7 @@
             submit-url="{{ $submitUrl }}"
             submit-method="{{ $submitMethod }}"
             :read-only="{{ Js::from($readOnly) }}"
-            :as-config="{{ Str::bool($usingConfigLayout) }}"
+            :as-config="{{ Str::bool($asConfig) }}"
         ></ui-publish-form>
     </div>
 @endsection

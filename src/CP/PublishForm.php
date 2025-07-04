@@ -14,7 +14,7 @@ class PublishForm implements Responsable
     private bool $readOnly = false;
     private string $submitUrl;
     private string $submitMethod = 'PATCH';
-    private bool $usingConfigLayout = false;
+    private bool $asConfig = false;
 
     public function __construct(private $blueprint)
     {
@@ -68,9 +68,9 @@ class PublishForm implements Responsable
         return $this;
     }
 
-    public function usingConfigLayout()
+    public function asConfig()
     {
-        $this->usingConfigLayout = true;
+        $this->asConfig = true;
 
         return $this;
     }
@@ -99,14 +99,14 @@ class PublishForm implements Responsable
 
         $viewData = [
             'blueprint' => $this->blueprint->toPublishArray(),
-            'icon' => $this->icon ?? ($this->usingConfigLayout ? 'cog' : null),
+            'icon' => $this->icon ?? ($this->asConfig ? 'cog' : null),
             'title' => $this->title,
             'values' => $fields->values(),
             'meta' => $fields->meta(),
             'readOnly' => $this->readOnly,
             'submitUrl' => $this->submitUrl,
             'submitMethod' => $this->submitMethod,
-            'usingConfigLayout' => $this->usingConfigLayout,
+            'asConfig' => $this->asConfig,
         ];
 
         if ($request->wantsJson()) {

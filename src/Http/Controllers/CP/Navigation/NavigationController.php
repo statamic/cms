@@ -60,7 +60,7 @@ class NavigationController extends CpController
         return PublishForm::make($this->editFormBlueprint($nav))
             ->title(__('Configure Navigation'))
             ->values($values)
-            ->usingConfigLayout()
+            ->asConfig()
             ->submittingTo($nav->showUrl());
     }
 
