@@ -13,7 +13,6 @@ import BlueprintBuilder from '../components/blueprints/Builder.vue';
 import FormListing from '../components/forms/Listing.vue';
 import FormSubmissionListing from '../components/forms/SubmissionListing.vue';
 import GlobalListing from '../components/globals/Listing.vue';
-import GlobalEditForm from '../components/globals/EditForm.vue';
 import GlobalPublishForm from '../components/globals/PublishForm.vue';
 import UserListing from '../components/users/Listing.vue';
 import UserWizard from '../components/users/Wizard.vue';
@@ -22,18 +21,13 @@ import RolePublishForm from '../components/roles/PublishForm.vue';
 import UserGroupListing from '../components/user-groups/Listing.vue';
 import UserGroupPublishForm from '../components/user-groups/PublishForm.vue';
 import CollectionScaffolder from '../components/collections/Scaffolder.vue';
-import CollectionEditForm from '../components/collections/EditForm.vue';
 import CollectionView from '../components/collections/View.vue';
 import CollectionBlueprintListing from '../components/collections/BlueprintListing.vue';
 import SessionExpiry from '../components/SessionExpiry.vue';
 import NavigationListing from '../components/navigation/Listing.vue';
-import NavigationEditForm from '../components/navigation/EditForm.vue';
 import PreferencesEditForm from '../components/preferences/EditForm.vue';
 import NavigationView from '../components/navigation/View.vue';
-import TaxonomyEditForm from '../components/taxonomies/EditForm.vue';
 import TaxonomyBlueprintListing from '../components/taxonomies/BlueprintListing.vue';
-import AssetContainerCreateForm from '../components/asset-containers/CreateForm.vue';
-import AssetContainerEditForm from '../components/asset-containers/EditForm.vue';
 import Updater from '../components/updater/Updater.vue';
 import PortalTargets from '../components/portals/PortalTargets.vue';
 import SitesEditForm from '../components/sites/EditForm.vue';
@@ -61,7 +55,6 @@ export default {
         FormListing,
         FormSubmissionListing,
         GlobalListing,
-        GlobalEditForm,
         GlobalPublishForm,
         UserListing,
         UserWizard,
@@ -70,18 +63,13 @@ export default {
         UserGroupListing,
         UserGroupPublishForm,
         CollectionScaffolder,
-        CollectionEditForm,
         CollectionView,
         CollectionBlueprintListing,
         SessionExpiry,
         NavigationListing,
-        NavigationEditForm,
         PreferencesEditForm,
         NavigationView,
-        TaxonomyEditForm,
         TaxonomyBlueprintListing,
-        AssetContainerCreateForm,
-        AssetContainerEditForm,
         NavBuilder: defineAsyncComponent(() => import('../components/nav/Builder.vue')),
         Updater,
         PortalTargets,

@@ -1,7 +1,7 @@
 <script setup>
 import { cva } from 'cva';
 import { computed } from 'vue';
-import { Description, Label } from '@statamic/components/ui/index.js';
+import { Description, Label, Card } from '@statamic/components/ui/index.js';
 import markdown from '@statamic/util/markdown.js';
 
 defineOptions({
@@ -46,6 +46,11 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    as: {
+        type: String,
+        default: 'div',
+        validator: (value) => ['div', 'card'].includes(value),
+    }
 });
 
 const labelProps = computed(() => ({
@@ -79,10 +84,11 @@ const classes = computed(() =>
 );
 
 const instructions = computed(() => props.instructions ? markdown(props.instructions, { openLinksInNewTabs: true }) : null);
+const wrapperComponent = computed(() => props.as === 'card' ? Card : 'div');
 </script>
 
 <template>
-    <div :class="[classes, $attrs.class]" data-ui-input-group>
+    <component :is="wrapperComponent" :class="[classes, $attrs.class]" data-ui-input-group>
         <div v-if="$slots.actions" class="mb-2 flex items-center justify-between gap-x-1">
             <slot name="label">
                 <Label v-if="label" v-bind="labelProps" class="flex-1" />
@@ -103,5 +109,5 @@ const instructions = computed(() => props.instructions ? markdown(props.instruct
         <slot />
         <Description :text="instructions" v-if="instructions && instructionsBelow" class="mt-2" />
         <Description v-if="errors" v-for="(error, i) in errors" :key="i" :text="error" class="mt-2 text-red-500" />
-    </div>
+    </component>
 </template>

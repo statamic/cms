@@ -40,6 +40,10 @@ const props = defineProps({
     readOnly: {
         type: Boolean,
         default: false,
+    },
+    asConfig: {
+        type: Boolean,
+        default: false,
     }
 });
 
@@ -90,6 +94,7 @@ onUnmounted(() => saveKeyBinding.destroy());
         :meta="meta"
         :errors="errors"
         :read-only="readOnly"
+        :as-config="asConfig"
         v-model="values"
     >
         <Tabs />
