@@ -8,6 +8,7 @@ use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Values;
 use Statamic\GraphQL\Types\GroupType;
 use Statamic\Support\Str;
+use Statamic\Support\Arr;
 
 class Group extends Fieldtype
 {
@@ -50,7 +51,9 @@ class Group extends Fieldtype
 
     public function process($data)
     {
-        return $this->fields()->addValues($data ?? [])->process()->values()->filter()->all();
+        $values = $this->fields()->addValues($data ?? [])->process()->values()->all();
+
+        return Arr::removeNullValues($values);
     }
 
     public function preProcess($data)
