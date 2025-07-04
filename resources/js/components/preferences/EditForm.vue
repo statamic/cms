@@ -8,6 +8,7 @@
         :meta="meta"
         :errors="errors"
         :read-only="readOnly"
+        as-config
     >
         <div>
             <Header :title="title" icon="preferences">

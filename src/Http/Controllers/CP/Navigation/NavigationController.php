@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Navigation;
 
 use Illuminate\Http\Request;
 use Statamic\Contracts\Structures\Nav as NavContract;
+use Statamic\CP\PublishForm;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Nav;
 use Statamic\Facades\Site;
@@ -56,17 +57,11 @@ class NavigationController extends CpController
             'select_across_sites' => $nav->canSelectAcrossSites(),
         ];
 
-        $fields = ($blueprint = $this->editFormBlueprint($nav))
-            ->fields()
-            ->addValues($values)
-            ->preProcess();
-
-        return view('statamic::navigation.edit', [
-            'blueprint' => $blueprint->toPublishArray(),
-            'values' => $fields->values(),
-            'meta' => $fields->meta(),
-            'nav' => $nav,
-        ]);
+        return PublishForm::make($this->editFormBlueprint($nav))
+            ->title(__('Configure Navigation'))
+            ->values($values)
+            ->asConfig()
+            ->submittingTo($nav->showUrl());
     }
 
     public function show(Request $request, $nav)
@@ -246,7 +241,23 @@ class NavigationController extends CpController
             ];
         }
 
-        return Blueprint::makeFromTabs($contents);
+        return Blueprint::make()->setContents(collect([
+            'tabs' => [
+                'main' => [
+                    'sections' => collect($contents)->map(function ($section) {
+                        return [
+                            'display' => $section['display'],
+                            'fields' => collect($section['fields'])->map(function ($field, $handle) {
+                                return [
+                                    'handle' => $handle,
+                                    'field' => $field,
+                                ];
+                            })->values()->all(),
+                        ];
+                    })->values()->all(),
+                ],
+            ],
+        ])->all());
     }
 
     public function destroy($nav)

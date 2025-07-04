@@ -92,7 +92,6 @@
     "vue": "^3.4.27",
     "vue-final-modal": "^4.5.4",
     "vue-screen-utils": "^1.0.0-beta.13",
-    "vue-select": "4.0.0-beta.6",
     "vue3-click-away": "^1.2.4"
   },
   "devDependencies": {

@@ -7,13 +7,14 @@ use Statamic\Fields\Blueprint;
 
 class PublishForm implements Responsable
 {
-    private string $icon = '';
+    private ?string $icon = null;
     private string $title = '';
     private array $values = [];
     private $parent = null;
     private bool $readOnly = false;
     private string $submitUrl;
     private string $submitMethod = 'PATCH';
+    private bool $asConfig = false;
 
     public function __construct(private $blueprint)
     {
@@ -67,6 +68,13 @@ class PublishForm implements Responsable
         return $this;
     }
 
+    public function asConfig()
+    {
+        $this->asConfig = true;
+
+        return $this;
+    }
+
     public function submit(array $values): array
     {
         $fields = $this
@@ -91,13 +99,14 @@ class PublishForm implements Responsable
 
         $viewData = [
             'blueprint' => $this->blueprint->toPublishArray(),
-            'icon' => $this->icon,
+            'icon' => $this->icon ?? ($this->asConfig ? 'cog' : null),
             'title' => $this->title,
             'values' => $fields->values(),
             'meta' => $fields->meta(),
             'readOnly' => $this->readOnly,
             'submitUrl' => $this->submitUrl,
             'submitMethod' => $this->submitMethod,
+            'asConfig' => $this->asConfig,
         ];
 
         if ($request->wantsJson()) {
