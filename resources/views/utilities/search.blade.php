@@ -7,7 +7,7 @@
 
 @section('content')
 
-<ui-header title="{{ __('Search') }}">
+<ui-header title="{{ __('Search') }}" icon="magnifying-glass">
     <form method="POST" action="{{ cp_route('utilities.search', 'all') }}">
         @csrf
 

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Statamic\Contracts\Entries\Collection as CollectionContract;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Column;
+use Statamic\CP\PublishForm;
 use Statamic\Exceptions\SiteNotFoundException;
 use Statamic\Facades\Action;
 use Statamic\Facades\Blueprint;
@@ -81,7 +82,7 @@ class CollectionsController extends CpController
                 'blueprint_editable' => User::current()->can('configure fields'),
                 'available_in_selected_site' => $collection->sites()->contains(Site::selected()->handle()),
                 'actions' => Action::for($collection),
-                'actions_url' => cp_route('collections.actions.run', ['collection' => $collection->handle()]),
+                'actions_url' => cp_route('collections.actions.run'),
                 'icon' => $collection->icon(),
             ];
         })->sortBy('title')->values();
@@ -204,17 +205,11 @@ class CollectionsController extends CpController
             'origin_behavior' => $collection->originBehavior(),
         ];
 
-        $fields = ($blueprint = $this->editFormBlueprint($collection))
-            ->fields()
-            ->addValues($values)
-            ->preProcess();
-
-        return view('statamic::collections.edit', [
-            'blueprint' => $blueprint->toPublishArray(),
-            'values' => $fields->values(),
-            'meta' => $fields->meta(),
-            'collection' => $collection,
-        ]);
+        return PublishForm::make($this->editFormBlueprint($collection))
+            ->title(__('Configure Collection'))
+            ->values($values)
+            ->asConfig()
+            ->submittingTo(cp_route('collections.update', $collection->handle()));
     }
 
     public function store(Request $request)
@@ -621,7 +616,23 @@ class CollectionsController extends CpController
             ],
         ]);
 
-        return Blueprint::makeFromTabs($fields);
+        return Blueprint::make()->setContents(collect([
+            'tabs' => [
+                'main' => [
+                    'sections' => collect($fields)->map(function ($section) {
+                        return [
+                            'display' => $section['display'],
+                            'fields' => collect($section['fields'])->map(function ($field, $handle) {
+                                return [
+                                    'handle' => $handle,
+                                    'field' => $field,
+                                ];
+                            })->values()->all(),
+                        ];
+                    })->values()->all(),
+                ],
+            ],
+        ])->all());
     }
 
     protected function getAuthorizedSitesForCollection($collection)

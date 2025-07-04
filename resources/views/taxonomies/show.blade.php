@@ -10,7 +10,7 @@
         <ui-dropdown>
             <ui-dropdown-menu>
                 @can('edit', $taxonomy)
-                    <ui-dropdown-item :text="__('Edit Taxonomy')" icon="cog" href="{{ $taxonomy->editUrl() }}"></ui-dropdown-item>
+                    <ui-dropdown-item :text="__('Configure Taxonomy')" icon="cog" href="{{ $taxonomy->editUrl() }}"></ui-dropdown-item>
                 @endcan
 
                 @can('configure fields')
@@ -48,9 +48,9 @@
     @if ($hasTerms)
         <term-list
             taxonomy="{{ $taxonomy->handle() }}"
-            initial-sort-column="{{ $taxonomy->sortField() }}"
-            initial-sort-direction="{{ $taxonomy->sortDirection() }}"
-            :initial-columns="{{ $columns->toJson() }}"
+            sort-column="{{ $taxonomy->sortField() }}"
+            sort-direction="{{ $taxonomy->sortDirection() }}"
+            :columns="{{ $columns->toJson() }}"
             :filters="{{ $filters->toJson() }}"
             action-url="{{ cp_route('taxonomies.terms.actions.run', $taxonomy->handle()) }}"
         ></term-list>

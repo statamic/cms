@@ -3,53 +3,53 @@
 @endphp
 
 @extends('statamic::outside')
+@section('title', __('Reset Password'))
 
 @section('content')
-    @include('statamic::partials.outside-logo')
+    <div class="relative mx-auto max-w-[400px] items-center justify-center">
+        <div class="flex items-center justify-center py-6">
+            <x-statamic::outside-logo />
+        </div>
+        <ui-auth-card>
+            <header class="flex flex-col justify-center items-center mb-8 py-3">
+                @if (! old('email'))
+                    <ui-card class="p-2! mb-4 flex items-center justify-center">
+                        <ui-icon name="key" class="size-5" />
+                    </ui-card>
+                    <ui-heading :level="1" size="xl">
+                        {{ __('Reset Your Password') }}
+                    </ui-heading>
+                    <ui-description :text="__('statamic::messages.forgot_password_enter_email')" class="text-center" />
+                @else
+                    <ui-card class="p-2! mb-4 flex items-center justify-center">
+                        <ui-icon name="mail-check" class="size-5" />
+                    </ui-card>
+                    <ui-heading :level="1" size="xl">
+                        {{ __('Password Reset Sent') }}
+                    </ui-heading>
+                    <ui-description :text="__('statamic::messages.forgot_password_sent')" class="text-center" />
+                @endif
+            </header>
 
-    <div class="relative mx-auto flex max-w-xs items-center justify-center rounded-sm shadow-lg">
-        <div class="outside-shadow absolute inset-0"></div>
-        <div class="card auth-card">
-            <div class="mb-4 pb-4 text-center">
-                <h1 class="mb-4 text-lg text-gray-800 dark:text-white/80">{{ __('Forgot Your Password?') }}</h1>
-                <p class="text-sm text-gray dark:text-dark-175">
-                    {{ __('statamic::messages.forgot_password_enter_email') }}
-                </p>
-            </div>
-
-            @if (session('status'))
-                <div class="alert alert-success mb-6">
-                    {{ session('status') }}
-                </div>
-            @endif
-
-            <form method="POST" action="{{ cp_route('password.email') }}">
+            <form method="POST" action="{{ cp_route('password.email') }}" class="flex flex-col gap-6">
                 @csrf
 
-                <div class="mb-8">
-                    <label for="email" class="mb-2">{{ __('Email Address') }}</label>
-                    <input
-                        id="email"
-                        type="text"
-                        class="input-text input-text"
+                <ui-field :label="__('Email Address')" error="{{ $errors->first('email') }}">
+                    <ui-input
                         name="email"
                         value="{{ old('email') }}"
+                        autofocus
+                        type="email"
                     />
+                </ui-field>
 
-                    @error('email', 'user.forgot_password')
-                        <div class="mt-2 text-xs text-red-500">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <button type="submit" class="btn-primary">
-                    {{ __('Submit') }}
-                </button>
+                <ui-button type="submit" variant="primary" :text="__('Submit')" />
             </form>
-        </div>
+        </ui-auth-card>
     </div>
 
     <div class="mt-4 w-full text-center dark:mt-6">
-        <a href="{{ cp_route('login') }}" class="forgot-password-link text-sm opacity-75 hover:opacity-100">
+        <a href="{{ cp_route('login') }}" class="text-blue-400 text-sm hover:text-blue-600">
             {{ __('I remember my password') }}
         </a>
     </div>

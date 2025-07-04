@@ -2,69 +2,61 @@
     use function Statamic\trans as __;
 @endphp
 
+@inject('str', 'Statamic\Support\Str')
 @extends('statamic::outside')
+@section('title', __('Confirm Password'))
 
 @section('content')
-    @include('statamic::partials.outside-logo')
-
-    <div class="relative mx-auto flex max-w-xs items-center justify-center rounded shadow-lg">
-        <div class="outside-shadow absolute inset-0"></div>
-        <div class="card auth-card">
-            <div class="mb-4 pb-4 text-center">
-                @if ($method === 'password_confirmation')
-                    <h1 class="mb-4 text-lg text-gray-800 dark:text-white/80">{{ __('Confirm Your Password') }}</h1>
-                    <p class="text-sm text-gray dark:text-dark-175">
-                        {{ __('statamic::messages.elevated_session_enter_password') }}
-                    </p>
-                @else
-                    <h1 class="mb-4 text-lg text-gray-800 dark:text-white/80">{{ __('Verification Code') }}</h1>
-                    <p class="text-sm text-gray dark:text-dark-175">
-                        {{ __('statamic::messages.elevated_session_enter_verification_code') }}
-                    </p>
-                @endif
-            </div>
-
+    <div class="relative mx-auto max-w-[400px] items-center justify-center">
+        <div class="flex items-center justify-center py-6">
+            <x-statamic::outside-logo />
+        </div>
+        <ui-auth-card
+            icon="key"
+            title="{{ $method === 'password_confirmation' ? __('Confirm Your Password') : __('Verification Code') }}"
+            description="{{ $method === 'password_confirmation'
+                ? __('statamic::messages.elevated_session_enter_password')
+                : __('statamic::messages.elevated_session_enter_verification_code') }}"
+        >
             @if (session('status'))
-                <div class="alert alert-success mb-6">
-                    {{ session('status') }}
-                </div>
+                <ui-alert variant="success" :text="session('status')" class="mb-6" />
             @endif
 
-            <form method="POST" action="{{ cp_route('elevated-session.confirm') }}">
+            <form method="POST" action="{{ cp_route('elevated-session.confirm') }}" class="flex flex-col gap-6">
                 @csrf
 
                 @if ($method === 'password_confirmation')
-                    <div class="mb-8">
-                        <label for="password" class="mb-2">{{ __('Password') }}</label>
-                        <input id="password" type="password" class="input-text" name="password" />
-
-                        @error('password')
-                            <div class="mt-2 text-xs text-red-500">{{ $message }}</div>
-                        @enderror
-                    </div>
+                    <ui-field :label="__('Password')" error="{{ $errors->first('password') }}">
+                        <ui-input
+                            name="password"
+                            type="password"
+                            viewable
+                        />
+                    </ui-field>
                 @endif
 
                 @if ($method === 'verification_code')
-                    <div class="mb-8">
-                        <label for="verification_code" class="mb-2">{{ __('Verification Code') }}</label>
-                        <input id="verification_code" type="text" class="input-text" name="verification_code" />
-
-                        @error('verification_code')
-                            <div class="mt-2 text-xs text-red-500">{{ $message }}</div>
-                        @enderror
-                    </div>
+                    <ui-field :label="__('Verification Code')" error="{{ $errors->first('verification_code') }}">
+                        <ui-input
+                            name="verification_code"
+                            autofocus
+                        />
+                    </ui-field>
                 @endif
 
-                <button type="submit" class="btn-primary">
-                    {{ __('Submit') }}
-                </button>
+                <div class="flex items-center gap-4">
+                    <ui-button type="submit" variant="primary" :text="__('Submit')" class="flex-1"/>
 
-                @if ($method === 'verification_code')
-                    <a href="{{ cp_route('elevated-session.resend-code') }}" class="ml-4 text-sm text-gray-700">
-                        {{ __('Resend code') }}
-                    </a>
-                @endif
+                    @if ($method === 'verification_code')
+                        <ui-button
+                            as="href"
+                            class="flex-1"
+                            href="{{ cp_route('elevated-session.resend-code') }}"
+                            :text="__('Resend code')"
+                        />
+                    @endif
+                </div>
             </form>
-        </div>
+        </ui-auth-card>
     </div>
 @endsection

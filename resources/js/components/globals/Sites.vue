@@ -20,11 +20,10 @@
                         </div>
                     </td>
                     <td class="text-sm">
-                        <v-select
+                        <Select
+                            class="w-full"
                             :options="siteOriginOptions(site)"
                             :model-value="site.origin"
-                            :searchable="false"
-                            :reduce="(opt) => opt.value"
                             @update:model-value="site.origin = $event"
                         />
                     </td>
@@ -36,9 +35,14 @@
 
 <script>
 import Fieldtype from '../fieldtypes/Fieldtype.vue';
+import { Select } from '@statamic/ui';
 
 export default {
     mixins: [Fieldtype],
+
+    components: {
+        Select,
+    },
 
     inject: ['storeName'],
 

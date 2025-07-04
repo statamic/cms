@@ -1,7 +1,7 @@
 /* BARD 
 =================================================== */
 @layer ui {
-    .bard-fieldtype {
+    .bard-fieldtype:not(.form-group) {
         @apply relative rounded-xl border outline-hidden dark:border-dark-900;
     }
 }

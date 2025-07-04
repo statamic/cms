@@ -29,7 +29,7 @@
         </div>
     </div>
 @else
-    <ui-header title="{{ __('Licensing') }}">
+    <ui-header title="{{ __('Licensing') }}" icon="license">
         <ui-button
             href="{{ $site->url() }}"
             target="_blank"

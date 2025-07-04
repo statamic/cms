@@ -10,9 +10,9 @@
                         :href="createContainerUrl"
                     />
                     <DropdownItem
-                        icon="edit"
+                        icon="cog"
                         v-if="container.can_edit"
-                        :text="__('Edit Container')"
+                        :text="__('Configure Container')"
                         :href="container.edit_url"
                     />
                     <DropdownItem
@@ -46,12 +46,7 @@
             </ui-toggle-group>
         </Header>
 
-        <div v-if="initializing" class="loading">
-            <loading-graphic />
-        </div>
-
         <uploader
-            v-if="!initializing"
             ref="uploader"
             :container="container.id"
             :path="path"
@@ -67,116 +62,88 @@
                     <span>{{ __('Drop File to Upload') }}</span>
                 </div>
 
-                <data-list
-                    v-if="!initializing"
-                    :rows="assets"
+                <Listing
+                    ref="listing"
+                    :url="requestUrl"
                     :columns="columns"
+                    :action-url="actionUrl"
+                    :action-context="actionContext"
                     :selections="selectedAssets"
-                    :max-selections="maxFiles"
-                    :sort-column="sortColumn"
-                    :sort-direction="sortDirection"
-                    @selections-updated="(ids) => $emit('selections-updated', ids)"
-                    @visible-columns-updated="visibleColumns = $event"
-                    v-slot="{ filteredRows: rows }"
+                    :preferences-prefix="preferencesPrefix"
+                    v-model:search-query="searchQuery"
+                    @request-completed="listingRequestCompleted"
                 >
-                    <div :class="modeClass">
-                        <div class="space-y-4">
-                            <!-- Search and Filter -->
-                            <div class="flex items-center justify-between gap-3">
-                                <data-list-search ref="search" v-model="searchQuery" />
-                                <data-list-column-picker v-if="mode === 'table'" :preferences-key="preferencesKey('columns')" />
+                    <template #initializing>
+                        <div class="loading">
+                            <loading-graphic />
+                        </div>
+                    </template>
+                    <template #default="{ items }">
+                        <div class="flex items-center gap-3 py-3">
+                            <div class="flex flex-1 items-center gap-3">
+                                <ListingSearch />
                             </div>
+                            <ListingCustomizeColumns />
+                        </div>
+
+                        <div
+                            v-if="containerIsEmpty"
+                            class="rounded-lg border border-dashed border-gray-300 p-6 text-center text-gray-500"
+                            v-text="__('No results')"
+                        />
+
+                        <Panel
+                            v-else
+                            :class="{
+                                'relative overflow-x-auto overscroll-x-contain': mode === 'table',
+                            }"
+                        >
+                            <PanelHeader class="flex items-center justify-between p-1!">
+                                <Breadcrumbs v-if="!restrictFolderNavigation" :path="path" @navigated="selectFolder" />
+                                <Slider
+                                    v-if="mode === 'grid'"
+                                    size="sm"
+                                    class="mr-2 w-24!"
+                                    variant="subtle"
+                                    v-model="gridThumbnailSize"
+                                    :min="60"
+                                    :max="300"
+                                    :step="25"
+                                />
+                            </PanelHeader>
 
                             <uploads
                                 v-if="uploads.length"
                                 :uploads="uploads"
                                 :allow-selecting-existing="allowSelectingExistingUpload"
-                                :class="{ '-mt-px': !hasSelections, 'mt-10': hasSelections }"
+                                class="mb-3 rounded-lg"
                                 @existing-selected="existingUploadSelected"
                             />
-
                             <Table
-                                ref="table"
                                 v-if="mode === 'table'"
-                                v-bind="sharedAssetProps"
-                                v-on="sharedAssetEvents"
+                                :assets="items"
+                                :folders="folders"
                                 :columns="columns"
-                                :loading="loading"
                                 :visible-columns="visibleColumns"
-                                @sorted="sorted"
-                            >
-                                <template #footer>
-                                    <data-list-pagination
-                                        :resource-meta="meta"
-                                        :per-page="perPage"
-                                        @page-selected="page = $event"
-                                        @per-page-changed="changePerPage"
-                                    />
-                                </template>
-                            </Table>
-
-                            <!-- Grid Mode -->
-                            <Grid
-                                ref="grid"
-                                v-if="mode === 'grid'"
                                 v-bind="sharedAssetProps"
                                 v-on="sharedAssetEvents"
-                                :assets="assets"
-                                :selected-assets="selectedAssets"
-                                @toggle-selection="toggleSelection"
                             >
-                                <template #footer>
-                                    <data-list-pagination
-                                        :resource-meta="meta"
-                                        :per-page="perPage"
-                                        @page-selected="page = $event"
-                                        @per-page-changed="changePerPage"
-                                    />
-                                </template>
-                            </Grid>
-
-                            <div
-                                class="p-4 text-gray-700"
-                                v-if="containerIsEmpty"
-                                v-text="searchQuery ? __('No results') : __('This container is empty')"
+                            </Table>
+                            <Grid
+                                v-if="mode === 'grid'"
+                                :assets="items"
+                                :action-url="actionUrl"
+                                :thumbnail-size="gridThumbnailSize"
+                                :selected-assets="selectedAssets"
+                                v-bind="sharedAssetProps"
+                                v-on="sharedAssetEvents"
                             />
-                        </div>
-
-                        <!-- <data-list-pagination
-                            class="mt-6"
-                            :resource-meta="meta"
-                            :per-page="perPage"
-                            @page-selected="page = $event"
-                            @per-page-changed="changePerPage"
-                        /> -->
-
-                        <BulkActions
-                            :url="actionUrl"
-                            :selections="selectedAssets"
-                            :context="actionContext"
-                            @started="actionStarted"
-                            @completed="actionCompleted"
-                            v-slot="{ actions }"
-                        >
-                            <div class="fixed inset-x-0 bottom-1 z-100 flex w-full justify-center">
-                                <ButtonGroup>
-                                    <Button
-                                        variant="primary"
-                                        class="text-gray-400!"
-                                        :text="__n(`:count item selected|:count items selected`, selectedAssets.length)"
-                                    />
-                                    <Button
-                                        v-for="action in actions"
-                                        :key="action.handle"
-                                        variant="primary"
-                                        :text="__(action.title)"
-                                        @click="action.run"
-                                    />
-                                </ButtonGroup>
-                            </div>
-                        </BulkActions>
-                    </div>
-                </data-list>
+                            <PanelFooter>
+                                <ListingPagination />
+                            </PanelFooter>
+                        </Panel>
+                    </template>
+                </Listing>
             </div>
         </uploader>
 
@@ -202,14 +169,33 @@ import HasPreferences from '../../data-list/HasPreferences';
 import Uploader from '../Uploader.vue';
 import Uploads from '../Uploads.vue';
 import HasActions from '../../data-list/HasActions';
-import { keyBy, sortBy } from 'lodash-es';
-import { Header, Button, ButtonGroup, Dropdown, DropdownSeparator, DropdownItem, DropdownMenu } from '@statamic/ui';
+import { debounce, sortBy } from 'lodash-es';
+import {
+    Header,
+    Button,
+    ButtonGroup,
+    Dropdown,
+    DropdownSeparator,
+    DropdownItem,
+    DropdownMenu,
+    Panel,
+    PanelHeader,
+    PanelFooter,
+    ListingSearch,
+    ListingCustomizeColumns,
+    Slider,
+} from '@statamic/ui';
 import BulkActions from '@statamic/components/data-list/BulkActions.vue';
+import { Listing, ListingTable, ListingPagination } from '@statamic/ui';
+import Breadcrumbs from './Breadcrumbs.vue';
 
 export default {
     mixins: [HasActions, HasPagination, HasPreferences],
 
     components: {
+        PanelFooter,
+        Panel,
+        PanelHeader,
         DropdownMenu,
         DropdownItem,
         Dropdown,
@@ -224,6 +210,13 @@ export default {
         Button,
         ButtonGroup,
         BulkActions,
+        Listing,
+        ListingTable,
+        ListingPagination,
+        ListingSearch,
+        ListingCustomizeColumns,
+        Breadcrumbs,
+        Slider,
     },
 
     props: {
@@ -261,7 +254,7 @@ export default {
             creatingFolder: false,
             uploads: [],
             page: 1,
-            preferencesPrefix: null,
+            preferencesPrefix: `assets.${this.container.id}`,
             meta: {},
             sortColumn: this.container.sort_field,
             sortDirection: this.container.sort_direction,
@@ -271,10 +264,19 @@ export default {
             shifting: false,
             lastItemClicked: null,
             preventDragging: false,
+            gridThumbnailSize: this.$preferences.get('assets.browser_thumbnail_size', 200),
         };
     },
 
     computed: {
+        requestUrl() {
+            return this.searchQuery
+                ? cp_url(
+                      `assets/browse/search/${this.container.id}/${this.restrictFolderNavigation ? this.path : ''}`,
+                  ).replace(/\/$/, '')
+                : cp_url(`assets/browse/folders/${this.container.id}/${this.path || ''}`).replace(/\/$/, '');
+        },
+
         actionContext() {
             return { container: this.container.id };
         },
@@ -393,11 +395,7 @@ export default {
     },
 
     mounted() {
-        this.initializing = true;
-        this.preferencesPrefix = `assets.${this.container.id}`;
         this.mode = this.getPreference('mode') || 'table';
-        this.setInitialPerPage();
-        this.loadAssets();
     },
 
     unmounted() {
@@ -449,11 +447,35 @@ export default {
                 }
             },
         },
+
+        gridThumbnailSize: {
+            handler: debounce(function (size) {
+                this.$preferences.set('assets.browser_thumbnail_size', size);
+            }, 300),
+        },
     },
 
     methods: {
+        listingRequestCompleted({ response }) {
+            this.assets = response.data.data;
+
+            if (this.searchQuery) {
+                this.folder = null;
+                this.folders = [];
+            } else {
+                const { meta, links } = response.data;
+                this.folder = meta.folder;
+                this.folders = meta.folder.folders;
+                this.actionUrl = links.asset_action;
+                this.folderActionUrl = links.folder_action;
+            }
+
+            this.initializing = false;
+            this.loading = false;
+        },
+
         afterActionSuccessfullyCompleted() {
-            this.loadAssets();
+            this.$refs.listing.refresh();
         },
 
         assetSaved() {
@@ -578,42 +600,7 @@ export default {
         },
 
         loadAssets() {
-            this.loading = true;
-
-            const url = this.searchQuery
-                ? cp_url(
-                      `assets/browse/search/${this.container.id}/${this.restrictFolderNavigation ? this.path : ''}`,
-                  ).replace(/\/$/, '')
-                : cp_url(`assets/browse/folders/${this.container.id}/${this.path || ''}`).replace(/\/$/, '');
-
-            return this.$axios
-                .get(url, { params: this.parameters })
-                .then((response) => {
-                    const data = response.data;
-                    this.assets = data.data.assets;
-                    this.meta = data.meta;
-                    this.columns = data.meta.columns;
-
-                    if (this.searchQuery) {
-                        this.folder = null;
-                        this.folders = [];
-                    } else {
-                        this.folder = data.data.folder;
-                        this.folders = data.data.folder.folders;
-                        this.actionUrl = data.links.asset_action;
-                        this.folderActionUrl = data.links.folder_action;
-                    }
-
-                    this.loading = false;
-                    this.initializing = false;
-                })
-                .catch((e) => {
-                    this.$toast.error(e.response.data.message, { action: null, duration: null });
-                    this.assets = [];
-                    this.folders = [];
-                    this.loading = false;
-                    this.initializing = false;
-                });
+            this.$nextTick(() => this.$refs.listing.refresh());
         },
 
         openFileBrowser() {
@@ -636,11 +623,6 @@ export default {
                 }
                 this.$emit('selections-updated', this.selectedAssets);
             }
-        },
-
-        setMode(mode) {
-            this.mode = mode;
-            this.setPreference('mode', mode == 'table' ? null : mode);
         },
 
         shiftDown() {

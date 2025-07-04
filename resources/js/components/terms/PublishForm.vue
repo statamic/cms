@@ -19,13 +19,19 @@
                 :is-dirty="isDirty"
                 @started="actionStarted"
                 @completed="actionCompleted"
+                v-slot="{ actions: itemActions }"
             >
                 <Dropdown class="ltr:mr-4 rtl:ml-4" v-if="canEditBlueprint || hasItemActions">
                     <template #trigger>
                         <Button icon="ui/dots" variant="ghost" />
                     </template>
                     <DropdownMenu>
-                        <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" v-if="canEditBlueprint" :redirect="actions.editBlueprint" />
+                        <DropdownItem
+                            :text="__('Edit Blueprint')"
+                            icon="blueprint-edit"
+                            v-if="canEditBlueprint"
+                            :redirect="actions.editBlueprint"
+                        />
                         <DropdownSeparator v-if="canEditBlueprint && itemActions.length" />
                         <DropdownItem
                             v-for="action in itemActions"
@@ -58,7 +64,7 @@
             :name="publishContainer"
             :reference="initialReference"
             :blueprint="fieldset"
-            :values="values"
+            v-model="values"
             :meta="meta"
             :origin-values="originValues"
             :origin-meta="originMeta"
@@ -67,7 +73,6 @@
             :site="site"
             :localized-fields="localizedFields"
             :sync-field-confirmation-text="syncFieldConfirmationText"
-            @updated="values = $event"
         >
             <LivePreview
                 :enabled="isPreviewing"
@@ -84,9 +89,10 @@
                             class="space-y-6"
                             v-if="showLivePreviewButton || showVisitUrlButton || showLocalizationSelector"
                         >
-                            <div class="grid grid-cols-2 gap-4" v-if="showLivePreviewButton || showVisitUrlButton">
+                            <div class="flex flex-wrap gap-4" v-if="showLivePreviewButton || showVisitUrlButton">
                                 <Button
                                     :text="__('Live Preview')"
+                                    class="flex-1"
                                     icon="live-preview"
                                     v-if="showLivePreviewButton"
                                     @click="openLivePreview"
@@ -94,6 +100,7 @@
                                 <Button
                                     :href="permalink"
                                     :text="__('Visit URL')"
+                                    class="flex-1"
                                     icon="external-link"
                                     v-if="showVisitUrlButton"
                                     target="_blank"
@@ -117,7 +124,6 @@
 <script>
 import SaveButtonOptions from '../publish/SaveButtonOptions.vue';
 import HasPreferences from '../data-list/HasPreferences';
-import HasHiddenFields from '../publish/HasHiddenFields';
 import HasActions from '../publish/HasActions';
 import striptags from 'striptags';
 import clone from '@statamic/util/clone.js';
@@ -146,7 +152,7 @@ let errors = ref({});
 let container = null;
 
 export default {
-    mixins: [HasPreferences, HasHiddenFields, HasActions],
+    mixins: [HasPreferences, HasActions],
 
     components: {
         ItemActions,
@@ -203,6 +209,7 @@ export default {
             fieldset: this.initialFieldset,
             title: this.initialTitle,
             values: clone(this.initialValues),
+            visibleValues: {},
             meta: clone(this.initialMeta),
             localizations: clone(this.initialLocalizations),
             localizedFields: this.initialLocalizedFields,
@@ -330,12 +337,9 @@ export default {
                         storeName: this.publishContainer,
                     }),
                     new Request(this.actions.save, this.method, {
-                        ...this.visibleValues,
-                        ...{
-                            _blueprint: this.fieldset.handle,
-                            published: this.published,
-                            _localized: this.localizedFields,
-                        },
+                        _blueprint: this.fieldset.handle,
+                        published: this.published,
+                        _localized: this.localizedFields,
                     }),
                     new AfterSaveHooks('entry', {
                         taxonomy: this.taxonomyHandle,

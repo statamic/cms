@@ -24,7 +24,7 @@ const iconOnly = computed(() => (props.icon && !hasDefaultSlot && !props.text) |
 
 const buttonClasses = computed(() => {
     const classes = cva({
-        base: 'inline-flex items-center justify-center whitespace-nowrap shrink-0 font-medium antialiased cursor-pointer no-underline disabled:text-gray-400 dark:disabled:text-gray-600 disabled:cursor-default disabled:pointer-events-none [&_svg]:shrink-0 [&_svg]:text-gray-500',
+        base: 'inline-flex items-center justify-center whitespace-nowrap shrink-0 font-medium antialiased cursor-pointer no-underline disabled:text-gray-400 dark:disabled:text-gray-600 disabled:cursor-not-allowed [&_svg]:shrink-0 [&_svg]:text-gray-500',
         variants: {
             variant: {
                 default: [
@@ -35,7 +35,7 @@ const buttonClasses = computed(() => {
                     'bg-linear-to-b from-primary/90 to-primary hover:bg-primary-hover text-white border border-primary-border shadow-ui-md inset-shadow-2xs inset-shadow-white/25 [&_svg]:text-gray-400',
                     'dark:from-white dark:to-gray-200 dark:hover:from-gray-200 dark:text-gray-800 dark:border-0',
                 ],
-                danger: 'bg-linear-to-b from-red-500/90 to-red-500 hover:bg-red-500/90 text-white border border-red-600 inset-shadow-2xs inset-shadow-red-300 [&_svg]:text-red-200',
+                danger: 'bg-linear-to-b from-red-500/90 to-red-500 hover:bg-red-500/90 text-white border border-red-600 inset-shadow-2xs inset-shadow-red-300 [&_svg]:text-red-200 disabled:text-red-200',
                 filled: 'bg-gray-100 hover:bg-gray-200 hover:text-gray-900 dark:bg-gray-700/80 dark:hover:bg-gray-700 [&_svg]:text-gray-700 dark:[&_svg]:text-gray-300',
                 ghost: 'bg-transparent hover:bg-gray-400/10 text-gray-800 dark:text-gray-300 dark:hover:bg-gray-700/80 dark:hover:text-gray-200',
                 subtle: 'bg-transparent hover:bg-gray-400/10 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-gray-700/80 dark:hover:text-gray-200 [&_svg]:text-gray-400 dark:[&_svg]:text-gray-300',
@@ -43,7 +43,8 @@ const buttonClasses = computed(() => {
             size: {
                 lg: 'px-6 h-12 text-base gap-2 rounded-lg text-base',
                 base: 'px-4 h-10 text-sm gap-2 rounded-lg',
-                sm: 'px-3 h-8 text-[0.8125rem] leading-none gap-2 rounded-lg [&_svg]:size-2.5',
+                sm: 'px-3 h-8 text-[0.8125rem] leading-tight gap-2 rounded-lg [&_svg]:size-3',
+                sm_compact: 'px-3 w-6 h-8 text-[0.8125rem] leading-tight gap-2 rounded-lg [&_svg]:size-3',
                 xs: 'px-2 h-6.5 text-xs gap-1.5 rounded-md [&_svg]:size-2.5',
             },
             groupBorder: {
@@ -61,6 +62,7 @@ const buttonClasses = computed(() => {
         compoundVariants: [
             { iconOnly: true, size: 'base', class: 'w-10 [&_svg]:size-4.5' },
             { iconOnly: true, size: 'sm', class: 'w-8 [&_svg]:size-3.5' },
+            { iconOnly: true, size: 'sm_compact', class: 'w-6 [&_svg]:size-3.5' },
             { iconOnly: true, size: 'xs', class: 'w-6.5 [&_svg]:size-3' },
             { iconOnly: false, iconAppend: true, class: '[&_svg]:-me-1' },
             { iconOnly: false, iconPrepend: true, class: '[&_svg]:-ms-0.5' },
@@ -89,7 +91,8 @@ const buttonClasses = computed(() => {
         <Icon v-if="icon" :name="icon" />
         <Icon v-if="loading" name="loading" :size />
 
-        <div class="trim-text-start">
+        <!-- =Jay. trim-text-start seems to make smaller buttons look worse such as the collections index "Create Entry" buttons -->
+        <div :class="{ 'trim-text-start': size !== 'xs' && size !== 'sm' }">
             <slot v-if="hasDefaultSlot" />
             <template v-else>{{ text }}</template>
         </div>

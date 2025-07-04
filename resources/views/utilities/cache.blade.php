@@ -7,7 +7,7 @@
 
 @section('content')
 
-    <ui-header title="{{ __('Cache Manager') }}">
+    <ui-header title="{{ __('Cache Manager') }}" icon="cache">
         <form method="POST" action="{{ cp_route('utilities.cache.clear', 'all') }}">
             @csrf
             <ui-button
@@ -17,132 +17,117 @@
             />
         </form>
     </ui-header>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-<ui-card-panel>
-    <div class="p-4">
-        <div class="flex items-center justify-between">
-            <div class="ltr:pr-8 rtl:pl-8">
-                <h2 class="font-bold">{{ __('Content Stache') }}</h2>
-                <p class="my-2 text-sm text-gray dark:text-dark-150">
-                    {{ __('statamic::messages.cache_utility_stache_description') }}
-                </p>
-            </div>
-            <div class="flex">
-                <form
-                    method="POST"
-                    action="{{ cp_route('utilities.cache.warm', 'stache') }}"
-                    class="ltr:mr-2 rtl:ml-2"
-                >
-                    @csrf
-                    <button class="btn">{{ __('Warm') }}</button>
-                </form>
-                <form method="POST" action="{{ cp_route('utilities.cache.clear', 'stache') }}">
-                    @csrf
-                    <button class="btn">{{ __('Clear') }}</button>
-                </form>
-            </div>
-        </div>
-        <div class="flex text-sm text-gray dark:text-dark-150">
-            <div class="badge-pill-sm ltr:mr-4 rtl:ml-4">
-                <span class="font-medium text-gray-800 dark:text-dark-150">{{ __('Records') }}:</span>
-                {{ $stache['records'] }}
-            </div>
-            @if ($stache['size'])
-                <div class="badge-pill-sm ltr:mr-4 rtl:ml-4">
-                    <span class="font-medium text-gray-800 dark:text-dark-150">{{ __('Size') }}:</span>
-                    {{ $stache['size'] }}
+        <ui-panel class="h-full flex flex-col">
+            <ui-panel-header class="flex items-center justify-between">
+                <ui-heading>{{ __('Content Stache') }}</ui-heading>
+                <div class="flex gap-2">
+                    <form method="POST" action="{{ cp_route('utilities.cache.warm', 'stache') }}">
+                        @csrf
+                        <ui-button text="{{ __('Warm') }}" type="submit" size="sm" />
+                    </form>
+                    <form method="POST" action="{{ cp_route('utilities.cache.clear', 'stache') }}">
+                        @csrf
+                        <ui-button text="{{ __('Clear') }}" type="submit" size="sm" />
+                    </form>
                 </div>
-            @endif
+            </ui-panel-header>
+            <ui-card class="flex-1">
+                <ui-description>{{ __('statamic::messages.cache_utility_stache_description') }}</ui-description>
+                <div class="flex flex-wrap gap-2 mt-3">
+                    <ui-badge :prepend="__('Records')">
+                        {{ $stache['records'] }}
+                    </ui-badge>
+                    @if ($stache['size'])
+                        <ui-badge :prepend="__('Size')">
+                            {{ $stache['size'] }}
+                        </ui-badge>
+                    @endif
 
-            @if ($stache['time'])
-                <div class="badge-pill-sm ltr:mr-4 rtl:ml-4">
-                    <span class="font-medium text-gray-800 dark:text-dark-150">{{ __('Build time') }}:</span>
-                    {{ $stache['time'] }}
+                    @if ($stache['time'])
+                        <ui-badge :prepend="__('Build time')">
+                            {{ $stache['time'] }}
+                        </ui-badge>
+                    @endif
+
+                    @if ($stache['rebuilt'])
+                        <ui-badge :prepend="__('Last rebuild')">
+                            {{ $stache['rebuilt'] }}
+                        </ui-badge>
+                    @endif
                 </div>
-            @endif
+            </ui-card>
+        </ui-panel>
 
-            @if ($stache['rebuilt'])
-                <div class="badge-pill-sm">
-                    <span class="font-medium text-gray-800 dark:text-dark-150">{{ __('Last rebuild') }}:</span>
-                    {{ $stache['rebuilt'] }}
+        <ui-panel class="h-full flex flex-col">
+            <ui-panel-header class="flex items-center justify-between">
+                <ui-heading>{{ __('Static Page Cache') }}</ui-heading>
+                @if ($static['enabled'])
+                    <div class="flex gap-2">
+                        <form method="POST" action="{{ cp_route('utilities.cache.clear', 'static') }}">
+                            @csrf
+                            <ui-button text="{{ __('Clear') }}" type="submit" size="sm" />
+                        </form>
+                    </div>
+                @endif
+            </ui-panel-header>
+            <ui-card class="flex-1">
+                <ui-description>{{ __('statamic::messages.cache_utility_static_cache_description') }}</ui-description>
+                <div class="flex flex-wrap gap-2 mt-3">
+                    <ui-badge :prepend="__('Strategy')">
+                        {{ $static['strategy'] }}
+                    </ui-badge>
+                    @if ($static['enabled'])
+                        <ui-badge :prepend="__('Cached Pages')">
+                            {{ $static['count'] }}
+                        </ui-badge>
+                    @endif
                 </div>
-            @endif
-        </div>
-    </div>
-    <div class="border-t bg-gray-100 p-4 dark:border-dark-900 dark:bg-dark-700">
-        <div class="flex items-center justify-between">
-            <div class="ltr:pr-8 rtl:pl-8">
-                <h2 class="font-bold">{{ __('Static Page Cache') }}</h2>
-                <p class="my-2 text-sm text-gray dark:text-dark-150">
-                    {{ __('statamic::messages.cache_utility_static_cache_description') }}
-                </p>
-            </div>
-            @if ($static['enabled'])
-                <form method="POST" action="{{ cp_route('utilities.cache.clear', 'static') }}">
-                    @csrf
-                    <button class="btn">{{ __('Clear') }}</button>
-                </form>
-            @endif
-        </div>
-        <div class="flex text-sm text-gray dark:text-dark-150">
-            <div class="badge-pill-sm border bg-white dark:border-dark-900 dark:bg-dark-700 ltr:mr-4 rtl:ml-4">
-                <span class="font-medium text-gray-800 dark:text-dark-150">{{ __('Strategy') }}:</span>
-                {{ $static['strategy'] }}
-            </div>
-            @if ($static['enabled'])
-                <div class="badge-pill-sm border bg-white dark:border-dark-900 dark:bg-dark-700 ltr:mr-4 rtl:ml-4">
-                    <span class="font-medium text-gray-800 dark:text-dark-150">{{ __('Pages') }}:</span>
-                    {{ $static['count'] }}
+            </ui-card>
+        </ui-panel>
+
+        <ui-panel class="h-full flex flex-col">
+            <ui-panel-header class="flex items-center justify-between">
+                <ui-heading>{{ __('Application Cache') }}</ui-heading>
+                <div class="flex gap-2">
+                    <form method="POST" action="{{ cp_route('utilities.cache.clear', 'application') }}">
+                        @csrf
+                        <ui-button text="{{ __('Clear') }}" type="submit" size="sm" />
+                    </form>
                 </div>
-            @endif
-        </div>
-    </div>
+            </ui-panel-header>
+            <ui-card class="flex-1">
+                <ui-description>{{ __('statamic::messages.cache_utility_application_cache_description') }}</ui-description>
+                <div class="flex flex-wrap gap-2 mt-3">
+                    <ui-badge :prepend="__('Driver')">
+                        {{ $cache['driver'] }}
+                    </ui-badge>
+                </div>
+            </ui-card>
+        </ui-panel>
 
-    <div class="border-t p-4 dark:border-dark-900">
-        <div class="flex items-center justify-between">
-            <div class="ltr:pr-8 rtl:pl-8">
-                <h2 class="font-bold">{{ __('Application Cache') }}</h2>
-                <p class="my-2 text-sm text-gray dark:text-dark-150">
-                    {{ __('statamic::messages.cache_utility_application_cache_description') }}
-                </p>
-            </div>
-            <form method="POST" action="{{ cp_route('utilities.cache.clear', 'application') }}">
-                @csrf
-                <button class="btn">{{ __('Clear') }}</button>
-            </form>
-        </div>
-        <div class="flex text-sm text-gray dark:text-dark-150">
-            <div class="badge-pill-sm ltr:mr-4 rtl:ml-4">
-                <span class="font-medium text-gray-800 dark:text-dark-150">{{ __('Driver') }}:</span>
-                {{ $cache['driver'] }}
-            </div>
-        </div>
+        <ui-panel class="h-full flex flex-col">
+            <ui-panel-header class="flex items-center justify-between">
+                <ui-heading>{{ __('Image Cache') }}</ui-heading>
+                <div class="flex gap-2">
+                    <form method="POST" action="{{ cp_route('utilities.cache.clear', 'image') }}">
+                        @csrf
+                        <ui-button text="{{ __('Clear') }}" type="submit" size="sm" />
+                    </form>
+                </div>
+            </ui-panel-header>
+            <ui-card class="flex-1">
+                <ui-description>{{ __('statamic::messages.cache_utility_image_cache_description') }}</ui-description>
+                <div class="flex flex-wrap gap-2 mt-3">
+                    <ui-badge :prepend="__('Cached images')">
+                        {{ $images['count'] }}
+                </ui-badge>
+                    <ui-badge :prepend="__('Size')">
+                        {{ $images['size'] }}
+                    </ui-badge>
+                </div>
+            </ui-card>
+        </ui-panel>
     </div>
-
-    <div class="rounded-b border-t bg-gray-100 p-4 dark:border-dark-900 dark:bg-dark-700">
-        <div class="flex items-center justify-between">
-            <div class="ltr:pr-8 rtl:pl-8">
-                <h2 class="font-bold">{{ __('Image Cache') }}</h2>
-                <p class="my-2 text-sm text-gray dark:text-dark-150">
-                    {{ __('statamic::messages.cache_utility_image_cache_description') }}
-                </p>
-            </div>
-            <form method="POST" action="{{ cp_route('utilities.cache.clear', 'image') }}">
-                @csrf
-                <button class="btn">{{ __('Clear') }}</button>
-            </form>
-        </div>
-        <div class="flex text-sm text-gray dark:text-dark-150">
-            <div class="badge-pill-sm border bg-white dark:border-dark-900 dark:bg-dark-700 ltr:mr-4 rtl:ml-4">
-                <span class="font-medium text-gray-800 dark:text-dark-150">{{ __('Cached images') }}:</span>
-                {{ $images['count'] }}
-            </div>
-            <div class="badge-pill-sm border bg-white dark:border-dark-900 dark:bg-dark-700 ltr:mr-4 rtl:ml-4">
-                <span class="font-medium text-gray-800 dark:text-dark-150">{{ __('Size') }}:</span>
-                {{ $images['size'] }}
-            </div>
-        </div>
-    </div>
-</ui-card-panel>
-
 @stop

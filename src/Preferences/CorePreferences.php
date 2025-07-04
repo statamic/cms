@@ -24,28 +24,6 @@ class CorePreferences
             'display' => __('Start Page'),
             'instructions' => __('statamic::messages.preference_start_page_instructions'),
         ]);
-
-        Preference::register('favorites', [
-            'type' => 'grid',
-            'display' => __('Favorites'),
-            'instructions' => __('statamic::messages.preference_favorites_instructions'),
-            'fields' => [
-                [
-                    'handle' => 'name',
-                    'field' => [
-                        'type' => 'text',
-                        'width' => 33,
-                    ],
-                ],
-                [
-                    'handle' => 'url',
-                    'field' => [
-                        'display' => __('URL'),
-                        'type' => 'text',
-                    ],
-                ],
-            ],
-        ]);
     }
 
     private function localeOptions(): array
@@ -61,6 +39,7 @@ class CorePreferences
             'de_CH' => 'German (Switzerland)',
             'en' => 'English',
             'es' => 'Spanish',
+            'et' => 'Estonian',
             'fa' => 'Persian',
             'fr' => 'French',
             'hu' => 'Hungarian',
@@ -91,7 +70,7 @@ class CorePreferences
                 ['label' => $label, 'native' => $native] = $item;
 
                 if ($locale !== $current && $label !== $native) {
-                    $label .= '<span class="ltr:ml-4 rtl:mr-4 text-gray-600">'.$native.'</span>';
+                    $label .= '<span class="ms-4 text-gray-600">'.$native.'</span>';
                 }
 
                 return $label;

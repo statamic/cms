@@ -45,9 +45,9 @@ function resetComplete() {
                     <p class="mb-4 text-sm text-gray">{{ __('statamic::messages.two_factor_enable_introduction') }}</p>
 
                     <div class="flex space-x-2">
-                        <button class="btn" @click="openSetupModal">
+                        <Button @click="openSetupModal">
                             {{ __('Enable two factor authentication') }}
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </template>
@@ -56,9 +56,9 @@ function resetComplete() {
                 <p class="mb-4 text-sm text-gray">{{ __('statamic::messages.two_factor_enabled') }}</p>
 
                 <div class="flex items-center space-x-4">
-                    <button class="btn" @click="openRecoveryCodesModal">
+                    <Button @click="openRecoveryCodesModal">
                         {{ __('Show recovery codes') }}
-                    </button>
+                    </Button>
 
                     <DisableTwoFactor
                         :url="routes.disable"
@@ -66,9 +66,9 @@ function resetComplete() {
                         @reset-complete="resetComplete"
                         v-slot="{ confirm }"
                     >
-                        <button class="btn-danger" @click="confirm">
+                        <Button variant="danger" @click="confirm">
                             {{ __('Disable two factor authentication') }}
-                        </button>
+                        </Button>
                     </DisableTwoFactor>
                 </div>
             </template>

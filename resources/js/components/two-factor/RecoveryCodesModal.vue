@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue';
 import LoadingGraphic from '@statamic/components/LoadingGraphic.vue';
 import axios from 'axios';
+import { Modal, Button } from '@statamic/ui';
 
 const emit = defineEmits(['cancel', 'close']);
 
@@ -46,51 +47,45 @@ function copyToClipboard() {
 </script>
 
 <template>
-    <modal name="two-factor-recovery-codes" @closed="$emit('cancel')">
+    <Modal :title="__('Recovery Codes')" :open="true" @update:open="$emit('cancel')">
         <div>
             <div v-if="loading" class="absolute inset-0 z-200 flex items-center justify-center text-center">
                 <loading-graphic />
             </div>
 
             <template v-else>
-                <div class="-max-h-screen-px">
-                    <div
-                        class="flex items-center justify-between rounded-t-lg border-b bg-gray-200 px-5 py-3 text-lg font-semibold dark:border-dark-900 dark:bg-dark-550"
-                    >
-                        {{ __('Recovery Codes') }}
-                    </div>
-                </div>
-                <div class="p-5">
-                    <p class="mb-6">{{ __('statamic::messages.two_factor_recovery_codes') }}</p>
+                <div class="space-y-6">
+                    <ui-description>{{ __('statamic::messages.two_factor_recovery_codes') }}</ui-description>
 
-                    <div class="mb-3 bg-gray-200 p-4">
-                        <ul class="grid gap-2 md:grid-cols-2">
+                    <div class="bg-gray-200 py-8 rounded-xl">
+                        <ul class="grid gap-2 md:grid-cols-2 text-center justify-center">
                             <li
                                 v-for="recoveryCode in recoveryCodes"
-                                class="font-mono text-sm"
+                                class="font-mono lg:text-base"
                                 v-text="recoveryCode"
                             ></li>
                         </ul>
                     </div>
 
                     <div class="flex items-center space-x-4">
-                        <button class="btn" v-if="canCopy" @click="copyToClipboard">{{ __('Copy') }}</button>
+                        <Button v-if="canCopy" @click="copyToClipboard">{{ __('Copy') }}</Button>
 
-                        <a class="btn" :href="downloadUrl" download>{{ __('Download') }}</a>
+                        <Button :href="downloadUrl" download>{{ __('Download') }}</Button>
 
-                        <button class="btn" @click.prevent="confirming = true">
+                        <Button @click.prevent="confirming = true">
                             {{ __('Refresh recovery codes') }}
-                        </button>
+                        </Button>
                     </div>
-                </div>
-                <div
-                    class="flex items-center justify-end border-t bg-gray-200 p-4 text-sm dark:border-dark-900 dark:bg-dark-550"
-                >
-                    <button class="btn" @click="$emit('close')" v-text="__('Close')" />
                 </div>
             </template>
         </div>
-    </modal>
+
+        <template #footer>
+            <div class="flex items-center justify-end space-x-3 pt-3 pb-1">
+                <Button variant="primary" @click="$emit('close')" :text="__('Close')" />
+            </div>
+        </template>
+    </Modal>
 
     <confirmation-modal
         v-if="confirming"

@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, onUnmounted } from 'vue';
-import PublishFields from '../publish/Fields.vue';
+import { PublishContainer, FieldsProvider, PublishFields } from '@statamic/ui';
 import { requireElevatedSessionIf } from '@statamic/components/elevated-sessions/index.js';
 
 const props = defineProps({
@@ -42,6 +42,7 @@ let runButtonText = computed(() => {
 
 function onDone() {
     running.value = false;
+    reset();
 }
 
 function confirm() {
@@ -67,17 +68,7 @@ function runAction() {
 function reset() {
     confirming.value = false;
     values.value = clone(props.action.values);
-
-    // TODO: `reset-action-modals` listeners are over-registering still
-    // You can see it with this:
-    // console.log('resetting!');
 }
-
-Statamic.$events.$on('reset-action-modals', reset);
-
-onUnmounted(() => {
-    Statamic.$events.$off('reset-action-modals', reset);
-});
 
 defineExpose({
     handle: props.action.handle,
@@ -115,17 +106,18 @@ defineExpose({
             :class="{ 'mb-4': action.fields.length }"
         />
 
-        <publish-container
+        <PublishContainer
             v-if="action.fields.length"
             name="confirm-action"
             :blueprint="fieldset"
+            v-model="values"
             :values="values"
             :meta="action.meta"
             :errors="errors"
-            @updated="values = $event"
-            v-slot="{ setFieldValue, setFieldMeta }"
         >
-            <publish-fields :fields="action.fields" @updated="setFieldValue" @meta-updated="setFieldMeta" />
-        </publish-container>
+            <FieldsProvider :fields="action.fields">
+                <PublishFields />
+            </FieldsProvider>
+        </PublishContainer>
     </confirmation-modal>
 </template>

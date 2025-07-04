@@ -3,16 +3,16 @@
         <Header v-if="mounted" :title="title" icon="navigation">
             <Dropdown placement="left-start">
                 <DropdownMenu>
-                    <DropdownItem v-if="canEdit" :text="__('Edit Navigation')" icon="edit" :href="editUrl" />
+                    <DropdownItem v-if="canEdit" :text="__('Configure Navigation')" icon="cog" :href="editUrl" />
                     <DropdownItem v-if="canEditBlueprint" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="blueprintUrl" />
                 </DropdownMenu>
             </Dropdown>
 
-            <a
-                @click="$refs.tree.cancel"
-                class="text-2xs text-blue-600 underline"
+            <ui-button
                 v-if="isDirty"
-                v-text="__('Discard changes')"
+                variant="filled"
+                :text="__('Discard changes')"
+                @click="$refs.tree.cancel"
             />
 
             <site-selector
@@ -25,13 +25,21 @@
             <Dropdown v-if="canEdit && hasCollections" placement="left-start" :disabled="!hasCollections">
                 <template #trigger>
                     <Button
-                        :text="__('Add Nav Item')"
+                        :text="__('Add')"
                         icon-append="ui/chevron-down"
                     />
                 </template>
                 <DropdownMenu>
-                    <DropdownItem :text="__('Add Nav Item')" @click="linkPage()" />
-                    <DropdownItem :text="__('Link to Entry')" @click="linkEntries()" />
+                    <DropdownItem
+                        :text="__('Add Nav Item')"
+                        @click="linkPage()"
+                        icon="add-list"
+                    />
+                    <DropdownItem
+                        :text="__('Link to Entry')"
+                        @click="linkEntries()"
+                        icon="add-link"
+                    />
                 </DropdownMenu>
             </Dropdown>
 
@@ -102,36 +110,57 @@
             </template>
 
             <template #branch-icon="{ branch }">
-                <svg-icon
+                <ui-icon
                     v-if="isEntryBranch(branch)"
-                    class="inline-block h-4 w-4 text-gray-500"
-                    name="light/hyperlink"
+                    class="size-3.5! text-gray-500"
+                    name="link"
                     v-tooltip="__('Entry link')"
                 />
-                <svg-icon
+                <ui-icon
                     v-if="isLinkBranch(branch)"
-                    class="inline-block h-4 w-4 text-gray-500"
-                    name="light/external-link"
+                    class="size-3.5! text-gray-500"
+                    name="external-link"
                     v-tooltip="__('External link')"
                 />
-                <svg-icon
+                <ui-icon
                     v-if="isTextBranch(branch)"
-                    class="inline-block h-4 w-4 text-gray-500"
-                    name="light/file-text"
+                    class="size-3.5! text-gray-500"
+                    name="page"
                     v-tooltip="__('Text')"
                 />
             </template>
 
             <template v-if="canEdit" #branch-options="{ branch, removeBranch, stat, depth }">
-                <DropdownItem v-if="isEntryBranch(stat)" :text="__('Edit Entry')" :href="branch.edit_url" />
-                <DropdownItem :text="__('Edit nav item')" @click="editPage(branch)" />
-                <DropdownItem v-if="depth < maxDepth" :text="__('Add child nav item')" @click="linkPage(stat)" />
+                <DropdownItem
+                    v-if="isEntryBranch(stat)"
+                    :text="__('Edit Entry')"
+                    :href="branch.edit_url"
+                    icon="edit"
+                />
+                <DropdownItem
+                    :text="__('Edit Nav item')"
+                    @click="editPage(branch)"
+                    icon="edit"
+                />
+                <DropdownItem
+                    v-if="depth < maxDepth"
+                    :text="__('Add child nav item')"
+                    @click="linkPage(stat)"
+                    icon="add-list"
+                />
                 <DropdownItem
                     v-if="depth < maxDepth && hasCollections"
                     :text="__('Add child link to entry')"
                     @click="linkEntries(stat)"
+                    icon="add-link"
                 />
-                <DropdownItem :text="__('Remove')" variant="destructive" @click="deleteTreeBranch(branch, removeBranch)" />
+                <DropdownSeparator />
+                <DropdownItem
+                    :text="__('Remove')"
+                    variant="destructive"
+                    @click="deleteTreeBranch(branch, removeBranch)"
+                    icon="trash"
+                />
             </template>
         </page-tree>
 
@@ -194,7 +223,7 @@ import SiteSelector from '../SiteSelector.vue';
 import uniqid from 'uniqid';
 import { defineAsyncComponent } from 'vue';
 import { mapValues, pick } from 'lodash-es';
-import { Dropdown, DropdownMenu, DropdownItem, Button, EmptyStateMenu, EmptyStateItem, Header } from '@statamic/ui';
+import { Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, Button, EmptyStateMenu, EmptyStateItem, Header } from '@statamic/ui';
 
 export default {
     components: {
@@ -202,6 +231,7 @@ export default {
         Dropdown,
         DropdownMenu,
         DropdownItem,
+        DropdownSeparator,
         PageTree: defineAsyncComponent(() => import('../structures/PageTree.vue')),
         PageEditor,
         PageSelector,

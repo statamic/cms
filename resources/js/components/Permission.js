@@ -1,6 +1,6 @@
 export default class Permission {
     all() {
-        return Statamic.user.permissions;
+        return Statamic.user?.permissions || [];
     }
 
     has(permission) {

@@ -12,7 +12,7 @@ const props = defineProps({
     },
 });
 
-const { store, syncField, desyncField } = injectContainerContext();
+const { store, syncField, desyncField, asConfig } = injectContainerContext();
 const { fieldPathPrefix, metaPathPrefix } = injectFieldsContext();
 const handle = props.config.handle;
 
@@ -68,12 +68,16 @@ const values = computed(() => {
     return fieldPathPrefix ? data_get(store.values, fieldPathPrefix) : store.values;
 });
 
+const visibleValues = computed(() => {
+    return fieldPathPrefix ? data_get(store.visibleValues, fieldPathPrefix) : store.visibleValues;
+});
+
 const extraValues = computed(() => {
     return fieldPathPrefix ? data_get(store.extraValues, fieldPathPrefix) : store.extraValues;
 });
 
 const shouldShowField = computed(() => {
-    return new ShowField(store, values.value, extraValues.value).showField(props.config, fullPath.value);
+    return new ShowField(store, visibleValues.value, extraValues.value).showField(props.config, fullPath.value);
 });
 
 const shouldShowLabelText = computed(() => !props.config.hide_display);
@@ -100,6 +104,8 @@ const isReadOnly = computed(() => {
 const isLocked = computed(() => false); // todo
 const isSyncable = computed(() => store.isRoot === false);
 const isSynced = computed(() => isSyncable.value && !store.localizedFields.includes(fullPath.value));
+const isNested = computed(() => fullPath.value.includes('.'));
+const wrapperComponent = computed(() => asConfig.value && !isNested.value ? 'card' : 'div');
 
 function sync() {
     syncField(fullPath.value);
@@ -120,6 +126,7 @@ function desync() {
         :required="isRequired"
         :errors="errors"
         :disabled="isReadOnly"
+        :as="wrapperComponent"
     >
         <template #label>
             <Label v-if="shouldShowLabel" :for="fieldId" :required="isRequired">

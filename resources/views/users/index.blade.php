@@ -25,7 +25,6 @@
     </ui-header>
 
     <user-listing
-        listing-key="users"
         initial-sort-column="{{ config('statamic.users.sort_field', 'email') }}"
         initial-sort-direction="{{ config('statamic.users.sort_direction', 'asc') }}"
         :filters="{{ $filters->toJson() }}"

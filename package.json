@@ -10,8 +10,6 @@
     "test-watch": "npm run test -- --watch --notify",
     "frontend-dev": "vite -c vite-frontend.config.js",
     "frontend-build": "vite build -c vite-frontend.config.js",
-    "prettier:format": "prettier --write \"**/*.{js,ts,jsx,tsx,cjs,cts,mjs,mts,vue,blade.php,antlers.html,css}\"",
-    "prettier:check": "prettier --check \"**/*.{js,ts,jsx,tsx,cjs,cts,mjs,mts,vue,blade.php,antlers.html,css}\"",
     "knip": "knip"
   },
   "dependencies": {
@@ -73,7 +71,7 @@
     "mousetrap": "~1.6.5",
     "nprogress": "^0.2.0",
     "pdfobject": "^2.2.7",
-    "pinia": "^2.3.1",
+    "pinia": "^3.0.0",
     "portal-vue": "^3.0.0",
     "pretty": "^2.0.0",
     "pusher-js": "^8.4.0-rc2",
@@ -94,7 +92,6 @@
     "vue": "^3.4.27",
     "vue-final-modal": "^4.5.4",
     "vue-screen-utils": "^1.0.0-beta.13",
-    "vue-select": "4.0.0-beta.6",
     "vue3-click-away": "^1.2.4"
   },
   "devDependencies": {
@@ -106,10 +103,6 @@
     "jsdom": "^26.0.0",
     "knip": "^5.43.6",
     "laravel-vite-plugin": "^1.2.0",
-    "prettier": "^3.4.2",
-    "prettier-plugin-antlers": "^2.0.5",
-    "prettier-plugin-blade": "^2.1.19",
-    "prettier-plugin-tailwindcss": "^0.6.11",
     "rollup-plugin-visualizer": "^5.14.0",
     "tailwindcss": "^4.1.8",
     "vite": "^6.3.5",

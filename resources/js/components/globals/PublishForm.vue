@@ -38,12 +38,9 @@
 
         <div
             v-if="fieldset.empty"
-            class="mt-10 rounded-lg border-2 border-dashed px-8 py-32 text-center dark:border-dark-300"
+            class="px-8 py-16 border border-dashed border-gray-400 dark:border-gray-600 rounded-lg text-center"
         >
-            <div class="mx-auto max-w-md opacity-50">
-                <h1 class="my-6" v-text="__('This Global Set has no fields.')" />
-                <p v-text="__('messages.global_set_no_fields_description')" />
-            </div>
+            <ui-heading class="mx-auto max-w-md" :text="__('messages.global_set_no_fields_description')" />
         </div>
 
         <PublishContainer
@@ -52,23 +49,19 @@
             :name="publishContainer"
             :reference="initialReference"
             :blueprint="fieldset"
-            :values="values"
+            v-model="values"
             :meta="meta"
             :errors="errors"
             :site="site"
             :localized-fields="localizedFields"
             :is-root="isRoot"
             :sync-field-confirmation-text="syncFieldConfirmationText"
-            @updated="values = $event"
-        >
-            <PublishTabs />
-        </PublishContainer>
+        />
     </div>
 </template>
 
 <script>
 import SiteSelector from '../SiteSelector.vue';
-import HasHiddenFields from '../publish/HasHiddenFields';
 import clone from '@statamic/util/clone.js';
 import { Button, Dropdown, DropdownItem, DropdownMenu, Header } from '@statamic/ui';
 import PublishContainer from '@statamic/components/ui/Publish/Container.vue';
@@ -83,8 +76,6 @@ let errors = ref({});
 let container = null;
 
 export default {
-    mixins: [HasHiddenFields],
-
     components: {
         PublishComponents,
         PublishContainer,
@@ -131,6 +122,7 @@ export default {
             fieldset: this.initialFieldset,
             title: this.initialTitle,
             values: clone(this.initialValues),
+            visibleValues: {},
             meta: clone(this.initialMeta),
             localizations: clone(this.initialLocalizations),
             localizedFields: this.initialLocalizedFields,
@@ -206,11 +198,8 @@ export default {
                         storeName: this.publishContainer,
                     }),
                     new Request(this.actions.save, this.method, {
-                        ...this.visibleValues,
-                        ...{
-                            _blueprint: this.fieldset.handle,
-                            _localized: this.localizedFields,
-                        }
+                        _blueprint: this.fieldset.handle,
+                        _localized: this.localizedFields,
                     }),
                     new AfterSaveHooks('global-set', {
                         globalSet: this.initialHandle,

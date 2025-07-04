@@ -1,63 +1,57 @@
 <template>
-    <modal name="delete-entry-confirmation">
-        <div class="confirmation-modal flex h-full flex-col">
-            <div class="p-4 pb-0 text-lg font-medium">
-                {{ __('Delete') }}
-            </div>
-            <div class="flex-1 px-4 py-6 text-gray dark:text-dark-150">
-                <div class="publish-fields">
-                    <div class="form-group" :class="{ 'has-error': this.error }">
-                        <div class="field-inner">
-                            <label class="publish-field-label" for="field_behavior">
-                                <span v-text="__('Localizations')" />
-                                <i class="required ltr:ml-1 rtl:mr-1">*</i>
-                            </label>
-                            <div class="help-block -mt-2"><p v-html="instructions" /></div>
-                        </div>
+    <Modal :title="__('Delete')" :open="true" @update:open="$emit('cancel')">
+        <p>Are you sure you want to delete this?</p>
 
-                        <div class="button-group-fieldtype-wrapper">
-                            <div class="btn-group">
-                                <button
-                                    @click="behavior = 'delete'"
-                                    class="btn px-4"
-                                    :class="{ active: behavior === 'delete' }"
-                                >
-                                    <span v-text="__('Delete')" />
-                                </button>
-                                <button
-                                    @click="behavior = 'copy'"
-                                    class="btn px-4"
-                                    :class="{ active: behavior === 'copy' }"
-                                >
-                                    <span v-text="__('Detach')" />
-                                </button>
-                            </div>
-                        </div>
-
-                        <small
-                            v-if="error"
-                            class="help-block mb-0 mt-2 text-red-500"
-                            v-text="__('statamic::validation.required')"
-                        />
-                    </div>
-                </div>
-            </div>
-            <div
-                class="flex items-center justify-end border-t bg-gray-200 p-4 text-sm dark:border-dark-900 dark:bg-dark-550"
-            >
-                <button
-                    class="text-gray hover:text-gray-900 dark:text-dark-150 dark:hover:text-dark-100"
-                    @click="$emit('cancel')"
-                    v-text="__('Cancel')"
+        <Field
+            :errors="error ? [__('statamic::validation.required')] : null"
+            :instructions
+            :label="__('Localizations')"
+        >
+            <ButtonGroup ref="buttonGroup">
+                <Button
+                    ref="button"
+                    :name="name"
+                    @click="behavior = 'delete'"
+                    value="delete"
+                    :variant="behavior === 'delete' ? 'primary' : 'default'"
+                    :text="__('Delete')"
                 />
-                <button class="btn-danger ltr:ml-4 rtl:mr-4" @click="confirm" v-text="__('Confirm')" />
+
+                <Button
+                    ref="button"
+                    :name="name"
+                    @click="behavior = 'copy'"
+                    value="copy"
+                    :variant="behavior === 'copy' ? 'primary' : 'default'"
+                    :text="__('Detach')"
+                />
+            </ButtonGroup>
+        </Field>
+
+        <template #footer>
+            <div class="flex items-center justify-end space-x-3 pt-3 pb-1">
+                <Button
+                    variant="ghost"
+                    @click="$emit('cancel')"
+                    :text="__('Cancel')"
+                />
+                <Button variant="primary" @click="confirm" :text="__('Confirm')" />
             </div>
-        </div>
-    </modal>
+        </template>
+    </Modal>
 </template>
 
 <script>
+import { Modal, Field, Button, ButtonGroup } from '@statamic/ui';
+
 export default {
+    components: {
+        Modal,
+        Field,
+        Button,
+        ButtonGroup,
+    },
+
     props: {
         entries: { type: Number, required: true },
     },

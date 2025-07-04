@@ -52,7 +52,7 @@
                     <thead>
                         <tr>
                             <th>{{ __('Blueprint') }}</th>
-                            <th>{{ __('Collection') }}</th>
+                            <th class="text-end!">{{ __('Collection') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -284,9 +284,8 @@
     @endforeach
     </section>
 
-    @include('statamic::partials.docs-callout', [
-        'topic' => __('Blueprints'),
-        'url' => Statamic::docsUrl('blueprints')
-    ])
-
+    <x-statamic::docs-callout
+        :topic="__('Blueprints')"
+        :url="Statamic::docsUrl('blueprints')"
+    />
 @endsection

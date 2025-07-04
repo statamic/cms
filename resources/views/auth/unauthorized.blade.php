@@ -6,20 +6,26 @@
 @section('title', __('Unauthorized'))
 
 @section('content')
-    @include('statamic::partials.outside-logo')
-
-    <div class="relative mx-auto flex max-w-xs items-center justify-center rounded-sm shadow-lg">
-        <div class="outside-shadow absolute inset-0"></div>
-        <div class="card auth-card">
-            <div class="mb-6">{{ __('Unauthorized') }}</div>
-
-            @auth
-                <a class="btn-primary" href="{{ cp_route('logout') }}?redirect={{ $redirect }}">
-                    {{ __('Log out') }}
-                </a>
-            @else
-                <a class="btn-primary" href="{{ cp_route('login') }}">{{ __('Log in') }}</a>
-            @endauth
+    <div class="relative mx-auto max-w-[400px] items-center justify-center">
+        <div class="flex items-center justify-center py-6">
+            <x-statamic::outside-logo />
         </div>
+        <ui-auth-card
+            icon="key"
+            title="{{ __('Unauthorized') }}"
+            description="{{ __('You do not have permission to access this URL') }}"
+        >
+            <div class="flex justify-center">
+                @auth
+                    <ui-button as="href" variant="primary" href="{{ cp_route('logout') }}?redirect={{ $redirect }}" class="w-full">
+                        {{ __('Log out') }}
+                    </ui-button>
+                @else
+                    <ui-button as="href" variant="primary" href="{{ cp_route('login') }}" class="w-full">
+                        {{ __('Log in') }}
+                    </ui-button>
+                @endauth
+            </div>
+        </ui-auth-card>
     </div>
 @endsection

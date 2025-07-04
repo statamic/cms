@@ -3,14 +3,19 @@
 @endphp
 
 @extends('statamic::outside')
+@section('title', __('Set New Password'))
 
 @section('content')
-    <h1 class="mb-6 pt-20 text-center text-gray-800 dark:text-white/80">{{ $title }}</h1>
-
-    <div class="relative mx-auto flex max-w-xs items-center justify-center rounded-sm shadow-lg">
-        <div class="outside-shadow absolute inset-0"></div>
-        <div class="card auth-card" x-data="{ busy: false }" v-pre>
-            <form method="POST" action="{{ $action }}" x-on:submit="busy = true">
+    <div class="relative mx-auto max-w-[400px] items-center justify-center">
+        <div class="flex items-center justify-center py-6">
+            <x-statamic::outside-logo />
+        </div>
+        <ui-auth-card
+            icon="key"
+            title="{{ __('Set New Password') }}"
+            :description="__('statamic::messages.set_new_password_instructions')"
+        >
+            <form method="POST" action="{{ $action }}" class="flex flex-col gap-6">
                 @csrf
 
                 <input type="hidden" name="token" value="{{ $token }}" />
@@ -19,48 +24,37 @@
                     <input type="hidden" name="redirect" value="{{ request('redirect') }}" />
                 @endif
 
-                <div class="mb-8">
-                    <label for="email" class="mb-2">{{ __('Email Address') }}</label>
-
-                    <input
-                        id="email"
-                        type="email"
-                        class="input-text input-text"
+                <ui-field :label="__('Email Address')" error="{{ $errors->first('email') }}">
+                    <ui-input
                         name="email"
                         value="{{ $email ?? old('email') }}"
                         autofocus
-                        required
+                        type="email"
                     />
+                </ui-field>
 
-                    @error('email')
-                        <div class="mt-2 text-xs text-red-500">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="mb-8">
-                    <label for="password" class="mb-2">{{ __('Password') }}</label>
-
-                    <input id="password" type="password" class="input-text input-text" name="password" required />
-
-                    @error('password')
-                        <div class="mt-2 text-xs text-red-500">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="mb-8">
-                    <label for="password-confirm" class="mb-2">{{ __('Confirm Password') }}</label>
-
-                    <input
-                        id="password-confirm"
+                <ui-field :label="__('Password')" error="{{ $errors->first('password') }}">
+                    <ui-input
+                        name="password"
                         type="password"
-                        class="input-text input-text"
-                        name="password_confirmation"
-                        required
                     />
-                </div>
+                </ui-field>
 
-                <button type="submit" class="btn-primary" :disabled="busy">{{ $title }}</button>
+                <ui-field :label="__('Confirm Password')" error="{{ $errors->first('password_confirmation') }}">
+                    <ui-input
+                        name="password_confirmation"
+                        type="password"
+                    />
+                </ui-field>
+
+                <ui-button type="submit" variant="primary" :text="$title" />
             </form>
-        </div>
+        </ui-auth-card>
+    </div>
+
+    <div class="mt-4 w-full text-center dark:mt-6">
+        <a href="{{ cp_route('login') }}" class="text-blue-400 text-sm hover:text-blue-600">
+            {{ __('Back to login') }}
+        </a>
     </div>
 @endsection

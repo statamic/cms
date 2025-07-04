@@ -1,7 +1,5 @@
-/* ==========================================================================
-   PUBLISH COMPONENT
-   ========================================================================== */
-
+/* GROUP PUBLISH COMPONENT
+=================================================== */
 .publish-tab-outer {
     @apply flex justify-between;
 }
@@ -40,54 +38,73 @@ code.parent-url {
     }
 }
 
-.publish-fields, .field-grid {
-    @apply flex flex-wrap gap-3 lg:gap-8;
-    --col-width: calc(100% / 12);
+
+/* GROUP PUBLISH COMPONENT / FIELDS
+=================================================== */
+.publish-fields,
+.field-grid {
+    display: grid;
+    --grid-columns: 12;
+    grid-template-columns: repeat(var(--grid-columns), 1fr);
+    @apply gap-3 lg:gap-8;
+
+    aside & {
+        /* Decrease */
+        @apply gap-x-2 gap-y-3 lg:gap-y-6;
+    }
 
     .form-group {
-        --col-span: 12;
-        flex-basis: calc(var(--col-width) * 12 - var(--spacing) * 3);
+        grid-column: span var(--col-span, var(--grid-columns));
+    }
+}
+@variant lg {
+    .field-w-25  { --col-span: calc(var(--grid-columns) * 0.25); }
+    .field-w-33  { --col-span: calc(var(--grid-columns) * 0.333); }
+    .field-w-50  { --col-span: calc(var(--grid-columns) * 0.5); }
+    .field-w-66  { --col-span: calc(var(--grid-columns) * 0.666); }
+    .field-w-75  { --col-span: calc(var(--grid-columns) * 0.75); }
+    .field-w-undefined, .field-w-100 { --col-span: calc(var(--grid-columns) * 1); }
+}
+
+
+/* GROUP PUBLISH COMPONENT / FIELD GRID (e.g. BLUEPRINT)
+=================================================== */
+.field-grid {
+    > * {
+        grid-column: span var(--col-span, var(--grid-columns));
+    }
+}
+
+
+/* GROUP PUBLISH COMPONENT / FIELDS / FLUID
+=================================================== */
+/* =Jay. Use this class if the fields should be fluid and fill the remaining space e.g. /cp/collections/pages/edit.
+Here flexbox is much better suited to create a layout that grows to fill space. */
+.publish-fields-fluid {
+    @apply gap-2;
+
+    display: flex;
+    flex-wrap: wrap;
+    > * {
         flex-grow: 1;
     }
 
-    .field-grid-item {
-        --col-span: 12;
-        flex-basis: calc(var(--col-width) * 12 - calc(var(--spacing) * 1));
-    }
-
-    .field-w-10  { --col-span: 1; }
-    .field-w-20  { --col-span: 2; }
-    .field-w-25  { --col-span: 3; }
-    .field-w-33  { --col-span: 4; }
-    .field-w-40  { --col-span: 5; }
-    .field-w-50  { --col-span: 6; }
-    .field-w-60  { --col-span: 7; }
-    .field-w-66  { --col-span: 8; }
-    .field-w-75  { --col-span: 9; }
-    .field-w-80  { --col-span: 10; }
-    .field-w-90  { --col-span: 11; }
-    .field-w-100 { --col-span: 12; }
-
-    [data-cards-wrap="fields"] & {
-        @apply gap-1;
-        .form-group, .field-grid-item {
-            flex-basis: calc(var(--col-width) * 12 - calc(var(--spacing) * 1));
-        }
+    @variant lg {
+    /* Here we have to cut short the proper width very slightly to account for the gap value. Because we're using flex-grow it should be pretty unnoticeable */
+        .field-w-25  { flex-basis: 24.5%; }
+        .field-w-33  { flex-basis: 32.5%; }
+        .field-w-50  { flex-basis: 49.4%; }
+        .field-w-66  { flex-basis: 66.1%; }
+        .field-w-75  { flex-basis: 74.5%; }
+        .field-w-undefined, .field-w-100 { flex-basis: 100%; }
     }
 }
 
-@variant lg {
-    .publish-fields .form-group {
-        flex-basis: calc(var(--col-width) * var(--col-span) - calc(var(--spacing) * 8));
-    }
 
-    .field-grid .field-grid-item,
-    [data-cards-wrap="fields"] .publish-fields .form-group {
-        flex-basis: calc(var(--col-width) * var(--col-span) - calc(var(--spacing) * 1));
-    }
-}
-
+/* GROUP PUBLISH COMPONENT / FIELD
+=================================================== */
 .publish-field {
+    position: relative;
     .read-only-overlay {
         @apply absolute inset-0 cursor-not-allowed bg-white/25;
         z-index: 100;
@@ -106,14 +123,14 @@ code.parent-url {
             }
         }
     }
-}
 
-.publish-field {
-    @apply relative;
+    code {
+        @apply bg-blue-50 text-blue-600 font-medium px-1 rounded-sm;
+    }
 }
 
 .publish-field-label {
-    @apply flex items-center;
+    @apply flex items-center font-medium text-sm mb-2;
 }
 
 .publish-sections .publish-sections-section {

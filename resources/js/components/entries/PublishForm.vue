@@ -14,6 +14,7 @@
                 :is-dirty="isDirty"
                 @started="actionStarted"
                 @completed="actionCompleted"
+                v-slot="{ actions: itemActions }"
             >
                 <Dropdown v-if="canEditBlueprint || hasItemActions">
                     <template #trigger>
@@ -38,7 +39,7 @@
                 <svg-icon name="light/lock" class="me-1 -mt-1 w-4" /> {{ __('Read Only') }}
             </div>
 
-            <div class="hidden items-center gap-3 md:flex">
+            <div class="flex items-center gap-3">
                 <save-button-options
                     v-if="!readOnly"
                     :show-options="!revisionsEnabled && !isInline"
@@ -75,7 +76,7 @@
             :name="publishContainer"
             :reference="initialReference"
             :blueprint="fieldset"
-            :values="values"
+            v-model="values"
             :extra-values="extraValues"
             :meta="meta"
             :origin-values="originValues"
@@ -86,7 +87,6 @@
             :localized-fields="localizedFields"
             :track-dirty-state="trackDirtyState"
             :sync-field-confirmation-text="syncFieldConfirmationText"
-            @updated="values = $event"
         >
             <LivePreview
                 :enabled="isPreviewing"
@@ -102,9 +102,10 @@
                         <div class="space-y-6">
                             <!-- Live Preview / Visit URL Buttons -->
                             <div v-if="collectionHasRoutes">
-                                <div class="grid grid-cols-2 gap-4" v-if="showLivePreviewButton || showVisitUrlButton">
+                                <div class="flex flex-wrap gap-4" v-if="showLivePreviewButton || showVisitUrlButton">
                                     <Button
                                         :text="__('Live Preview')"
+                                        class="flex-1"
                                         icon="live-preview"
                                         @click="openLivePreview"
                                         v-if="showLivePreviewButton"
@@ -112,6 +113,7 @@
                                     <Button
                                         :href="permalink"
                                         :text="__('Visit URL')"
+                                        class="flex-1"
                                         icon="external-link"
                                         target="_blank"
                                         v-if="showVisitUrlButton"
@@ -164,7 +166,7 @@
                             <LocalizationsCard
                                 v-if="showLocalizationSelector"
                                 :localizations
-                                :localizing
+                                :localizing="localizing !== null"
                                 @selected="localizationSelected"
                             />
                         </div>
@@ -232,8 +234,8 @@
             <div class="publish-fields">
                 <div class="form-group publish-field field-w-full">
                     <label v-text="__('Origin')" />
-                    <div class="help-block -mt-2" v-text="__('messages.entry_origin_instructions')"></div>
-                    <select-input v-model="selectedOrigin" :options="originOptions" :placeholder="false" />
+                    <div class="help-block mt-2" v-text="__('messages.entry_origin_instructions')"></div>
+                    <Select class="w-full" v-model="selectedOrigin" :options="originOptions" :placeholder="false" />
                 </div>
             </div>
         </confirmation-modal>
@@ -246,7 +248,6 @@ import PublishActions from './PublishActions.vue';
 import SaveButtonOptions from '../publish/SaveButtonOptions.vue';
 import RevisionHistory from '../revision-history/History.vue';
 import HasPreferences from '../data-list/HasPreferences';
-import HasHiddenFields from '../publish/HasHiddenFields';
 import HasActions from '../publish/HasActions';
 import striptags from 'striptags';
 import clone from '@statamic/util/clone.js';
@@ -266,6 +267,7 @@ import {
     StatusIndicator,
     Subheading,
     Switch,
+    Select,
 } from '@statamic/ui';
 import PublishContainer from '@statamic/components/ui/Publish/Container.vue';
 import PublishTabs from '@statamic/components/ui/Publish/Tabs.vue';
@@ -281,7 +283,7 @@ let errors = ref({});
 let container = null;
 
 export default {
-    mixins: [HasPreferences, HasHiddenFields, HasActions],
+    mixins: [HasPreferences, HasActions],
 
     components: {
         Button,
@@ -308,6 +310,7 @@ export default {
         StatusIndicator,
         Subheading,
         Switch,
+        Select,
     },
 
     props: {
@@ -354,6 +357,7 @@ export default {
             fieldset: this.initialFieldset,
             title: this.initialTitle,
             values: clone(this.initialValues),
+            visibleValues: {},
             meta: clone(this.initialMeta),
             extraValues: clone(this.initialExtraValues),
             localizations: clone(this.initialLocalizations),
@@ -538,12 +542,9 @@ export default {
                         storeName: this.publishContainer,
                     }),
                     new Request(this.actions.save, this.method, {
-                        ...this.visibleValues,
-                        ...{
-                            _blueprint: this.fieldset.handle,
-                            _localized: this.localizedFields,
-                            _parent: this.parent,
-                        },
+                        _blueprint: this.fieldset.handle,
+                        _localized: this.localizedFields,
+                        _parent: this.parent,
                     }),
                     new AfterSaveHooks('entry', {
                         collection: this.collectionHandle,
@@ -625,7 +626,7 @@ export default {
 
             this.$dirty.remove(this.publishContainer);
 
-            this.localizing = localization.handle;
+            this.localizing = localization;
 
             if (localization.exists) {
                 this.editLocalization(localization);

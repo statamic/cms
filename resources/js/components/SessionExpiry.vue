@@ -1,130 +1,120 @@
 <template>
     <div class="session-expiry">
-        <button v-if="isWarning" class="session-expiry-stripe" @click="extend" v-text="warningText" />
+        <Modal
+            v-if="isWarning && !isShowingLogin"
+            :open="isWarning && !isShowingLogin"
+            :title="__('Your Session is Expiring')"
+            class="max-w-[500px]!"
+        >
+            <ui-description v-text="warningText" />
+            <Button @click="extend" variant="primary" icon="rewind" :text="__('Extend Session')" class="w-full" />
+        </Modal>
 
-        <modal name="session-timeout-login" v-if="isShowingLogin" height="auto" :width="500">
-            <div class="-max-h-screen-px">
-                <div
-                    class="flex items-center justify-between rounded-t-lg border-b bg-gray-200 px-5 py-3 text-lg font-semibold dark:border-dark-900 dark:bg-dark-550"
-                >
-                    {{ __('Resume Your Session') }}
-                </div>
-
-                <div v-if="isUsingOauth" class="p-5">
-                    <a :href="oauthProvider.loginUrl" target="_blank" class="btn-primary">
-                        {{ __('Log in with :provider', { provider: oauthProvider.label }) }}
-                    </a>
-                    <div class="mt-4 text-2xs text-gray">
-                        {{ __('messages.session_expiry_new_window') }}
-                    </div>
-                </div>
-
-                <div v-if="!isUsingOauth" class="publish-fields p-2">
-                    <div class="form-group w-full">
-                        <label v-text="__('messages.session_expiry_enter_password')" />
-                        <small class="help-block text-red-500" v-if="errors.email" v-text="errors.email[0]" />
-                        <small class="help-block text-red-500" v-if="errors.password" v-text="errors.password[0]" />
-                        <div class="flex items-center">
-                            <input
-                                type="password"
-                                v-model="password"
-                                ref="password"
-                                class="input-text"
-                                tabindex="1"
-                                autofocus
-                                @keydown.enter.prevent="submit"
-                            />
-                            <button @click="submit" class="btn-primary ltr:ml-2 rtl:mr-2" v-text="__('Log in')" />
-                        </div>
-                    </div>
-                </div>
+        <Modal :title="__('Resume Your Session')" :open="isShowingLogin" height="auto" class="max-w-[500px]!">
+            <div v-if="isUsingOauth" class="space-y-3">
+                <ui-description v-text="__('messages.session_expiry_new_window')" />
+                <ui-button variant="primary" class="w-full" :href="oauthProvider.loginUrl" target="_blank" :text="__('Log in with :provider', { provider: oauthProvider.label })" />
             </div>
-        </modal>
 
-        <modal name="session-timeout-login" v-if="isShowingTwoFactorChallenge" height="auto" :width="500">
-            <div class="-max-h-screen-px">
-                <div
-                    class="flex items-center justify-between rounded-t-lg border-b bg-gray-200 px-5 py-3 text-lg font-semibold dark:border-dark-900 dark:bg-dark-550"
-                >
-                    {{ __('Resume Your Session') }}
-                </div>
-
-                <div class="publish-fields p-2">
-                    <div v-if="twoFactorMode === 'code'" class="form-group w-full">
-                        <label v-text="__('messages.session_expiry_enter_two_factor_code')" />
-                        <small class="help-block text-red-500" v-if="errors.code" v-text="errors.code[0]" />
-                        <div class="flex items-center">
-                            <input
-                                type="text"
-                                name="code"
-                                v-model="twoFactorCode"
-                                ref="twoFactorCode"
-                                class="input-text"
-                                tabindex="1"
-                                pattern="[0-9]*"
-                                maxlength="6"
-                                inputmode="numeric"
-                                autofocus
-                                autocomplete="one-time-code"
-                                @keydown.enter.prevent="submitTwoFactorChallenge"
-                            />
-                        </div>
-                    </div>
-
-                    <div v-if="twoFactorMode === 'recovery_code'" class="form-group w-full">
-                        <label v-text="__('messages.session_expiry_enter_two_factor_recovery_code')" />
-                        <small
-                            class="help-block text-red-500"
-                            v-if="errors.recovery_code"
-                            v-text="errors.recovery_code[0]"
+            <div v-if="!isUsingOauth">
+                <ui-field :errors="errors" class="space-y-3">
+                    <ui-description v-text="__('messages.session_expiry_enter_password')" />
+                    <div class="flex items-center gap-3">
+                        <Input
+                            type="password"
+                            v-model="password"
+                            :viewable="true"
+                            ref="password"
+                            tabindex="1"
+                            autofocus
+                            @keydown.enter.prevent="submit"
                         />
-                        <div class="flex items-center">
-                            <input
-                                type="text"
-                                name="recovery_code"
-                                v-model="twoFactorRecoveryCode"
-                                ref="twoFactorRecoveryCode"
-                                class="input-text"
-                                tabindex="1"
-                                maxlength="21"
-                                autofocus
-                                autocomplete="off"
-                                @keydown.enter.prevent="submitTwoFactorChallenge"
-                            />
-                        </div>
+                        <Button @click="submit" variant="primary" :text="__('Log in')" />
+                    </div>
+                </ui-field>
+            </div>
+        </Modal>
+
+        <Modal :title="__('Resume Your Session')" :open="isShowingTwoFactorChallenge" height="auto" class="max-w-[500px]!">
+            <div>
+                <div v-if="twoFactorMode === 'code'" class="space-y-3">
+                    <ui-description v-text="__('messages.session_expiry_enter_two_factor_code')" />
+                    <ui-description class="text-red-500" v-if="errors.code" v-text="errors.code[0]" />
+                    <div class="flex items-center">
+                        <Input
+                            name="code"
+                            v-model="twoFactorCode"
+                            ref="twoFactorCode"
+                            tabindex="1"
+                            pattern="[0-9]*"
+                            maxlength="6"
+                            inputmode="numeric"
+                            autofocus
+                            autocomplete="one-time-code"
+                            @keydown.enter.prevent="submitTwoFactorChallenge"
+                        />
                     </div>
                 </div>
 
-                <div
-                    class="flex items-center justify-end border-t bg-gray-200 p-4 text-sm dark:border-dark-900 dark:bg-dark-550"
-                >
-                    <button
-                        v-if="twoFactorMode === 'code'"
-                        class="text-gray hover:text-gray-900 dark:text-dark-150 dark:hover:text-dark-100"
-                        @click="twoFactorMode = 'recovery_code'"
-                        v-text="__('Use recovery code')"
+                <div v-if="twoFactorMode === 'recovery_code'" class="form-group w-full">
+                    <label v-text="__('messages.session_expiry_enter_two_factor_recovery_code')" />
+                    <ui-description
+                        class="text-red-500"
+                        v-if="errors.recovery_code"
+                        v-text="errors.recovery_code[0]"
                     />
-                    <button
-                        v-if="twoFactorMode === 'recovery_code'"
-                        class="text-gray hover:text-gray-900 dark:text-dark-150 dark:hover:text-dark-100"
-                        @click="twoFactorMode = 'code'"
-                        v-text="__('Use one-time code')"
-                    />
-                    <button
-                        class="btn-primary ltr:ml-4 rtl:mr-4"
-                        @click="submitTwoFactorChallenge"
-                        v-text="__('Continue')"
-                    />
+                    <div class="flex items-center">
+                        <Input
+                            name="recovery_code"
+                            v-model="twoFactorRecoveryCode"
+                            ref="twoFactorRecoveryCode"
+                            tabindex="1"
+                            maxlength="21"
+                            autofocus
+                            autocomplete="off"
+                            @keydown.enter.prevent="submitTwoFactorChallenge"
+                        />
+                    </div>
                 </div>
             </div>
-        </modal>
+
+            <template #footer>
+                <div class="flex items-center justify-end space-x-3 pt-3 pb-1">
+                    <Button
+                        v-if="twoFactorMode === 'code'"
+                        variant="ghost"
+                        @click="twoFactorMode = 'recovery_code'"
+                        :text="__('Use recovery code')"
+                    />
+                    <Button
+                        v-if="twoFactorMode === 'recovery_code'"
+                        variant="ghost"
+                        @click="twoFactorMode = 'code'"
+                        :text="__('Use one-time code')"
+                    />
+                    <Button
+                        variant="primary"
+                        @click="submitTwoFactorChallenge"
+                        :text="__('Continue')"
+                    />
+                </div>
+            </template>
+        </Modal>
     </div>
 </template>
 
 <script>
+import { Modal, Input, Button } from '@statamic/ui';
+
 var counter;
 
 export default {
+    components: {
+        Modal,
+        Input,
+        Button,
+    },
+
     props: {
         warnAt: Number,
         lifetime: Number,

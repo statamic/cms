@@ -96,12 +96,9 @@
             </div>
         @endif
 
-        @include(
-            'statamic::partials.docs-callout',
-            [
-                'topic' => __('Updates'),
-                'url' => Statamic::docsUrl('updating'),
-            ]
-        )
+        <x-statamic::docs-callout
+            :topic="__('Updates')"
+            :url="Statamic::docsUrl('updating')"
+        />
     @endif
 @endsection

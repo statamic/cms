@@ -58,18 +58,20 @@ class Start extends Step {
 export class Request extends Step {
     #url;
     #method;
-    #data;
+    #extraData;
 
-    constructor(url, method, data) {
+    constructor(url, method, extraData) {
         super();
         this.#url = url;
         this.#method = method.toLowerCase();
-        this.#data = data;
+        this.#extraData = extraData;
     }
 
     handle(payload) {
         return new Promise((resolve, reject) => {
-            return axios[this.#method](this.#url, this.#data)
+            const data = { ...container.value.store.visibleValues, ...this.#extraData };
+
+            return axios[this.#method](this.#url, data)
                 .then((response) => {
                     if (container && response.data.data?.hasOwnProperty('values')) {
                         container.value.store.setValues(

@@ -5,7 +5,6 @@ namespace Statamic\Tags;
 use Rhukster\DomSanitizer\DOMSanitizer;
 use Statamic\Facades\File;
 use Statamic\Facades\URL;
-use Statamic\Fieldtypes\Icon;
 use Statamic\Support\Str;
 use Stringy\StaticStringy;
 
@@ -31,7 +30,7 @@ class Svg extends Tags
             resource_path(),
             public_path('svg'),
             public_path(),
-            statamic_path('resources/svg/icons/'.Icon::DEFAULT_FOLDER),
+            statamic_path('resources/svg/icons'),
         ];
 
         $svg = null;

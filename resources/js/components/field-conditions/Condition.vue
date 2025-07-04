@@ -1,83 +1,85 @@
 <template>
-    <div class="flex flex-wrap items-center border-t py-4 dark:border-dark-900">
-        <div v-if="index === 0" class="help-block" v-text="__('messages.field_conditions_field_instructions')" />
+    <div class="flex flex-wrap items-center border-t space-x-4 py-4 dark:border-dark-900">
+        <Description v-if="index === 0" class="w-full mb-4" :text="__('messages.field_conditions_field_instructions')" />
 
-        <v-select
-            ref="fieldSelect"
-            :model-value="condition.field"
-            class="mb-2 w-full md:mb-0 md:w-1/3"
-            :options="fieldOptions"
-            :placeholder="__('Field')"
-            :taggable="true"
-            :push-tags="true"
-            :reduce="(field) => field.value"
-            :create-option="(field) => ({ value: field, label: field })"
-            @update:model-value="fieldSelected"
-            search:blur="fieldSelectBlur"
-        >
-            <template #no-options><div class="hidden" /></template>
-            <template #option="option">
-                <div class="flex items-center">
-                    <span v-text="option.label" />
-                    <span
-                        v-text="option.value"
-                        class="font-mono text-2xs text-gray-500 dark:text-dark-150"
-                        :class="{ 'ml-2': option.label }"
-                    />
-                </div>
-            </template>
-        </v-select>
+        <div class="mb-2 w-full md:mb-0 md:w-1/3">
+            <Combobox
+                ref="fieldSelect"
+                :model-value="condition.field"
+                class="w-full"
+                :options="fieldOptions"
+                :placeholder="__('Field')"
+                :taggable="true"
+                @update:modelValue="fieldSelected"
+                search:blur="fieldSelectBlur"
+            >
+                <template #no-options><div class="hidden" /></template>
+                <template #option="option">
+                    <div class="flex items-center">
+                        <span v-text="option.label" />
+                        <span
+                            v-text="option.value"
+                            class="font-mono text-2xs text-gray-500 dark:text-dark-150"
+                            :class="{ 'ml-2': option.label }"
+                        />
+                    </div>
+                </template>
+                <template #selected-option>
+                    <span v-text=" __(field.config.display) || field.handle"></span>
+                </template>
+            </Combobox>
+        </div>
 
-        <select-input
-            :model-value="condition.operator"
-            :options="operatorOptions"
-            :placeholder="false"
-            class="md:ltr:ml-4 md:rtl:mr-4"
-            @update:model-value="operatorSelected"
-        />
+        <div class="w-32">
+            <Select
+                class="w-full"
+                :model-value="condition.operator"
+                :options="operatorOptions"
+                @update:model-value="operatorSelected"
+            />
+        </div>
 
-        <toggle-input
+        <Switch
             v-if="showValueToggle"
-            class="ltr:ml-4 rtl:mr-4"
             :model-value="condition.value === 'true'"
             @update:model-value="valueUpdated"
         />
 
-        <v-select
+        <Combobox
             v-else-if="showValueDropdown"
             ref="valueSelect"
             :model-value="condition.value"
-            class="mb-2 w-full md:mb-0 md:w-52 ltr:ml-4 rtl:mr-4"
+            class="mb-2 w-full md:mb-0 md:w-52"
             :options="valueOptions"
             :placeholder="__('Option')"
             :taggable="false"
-            :push-tags="true"
-            :reduce="(field) => field.value"
-            :create-option="(field) => ({ value: field, label: field })"
             @update:model-value="valueUpdated"
             search:blur="valueSelectBlur"
         >
             <template #no-options><div class="hidden" /></template>
-        </v-select>
+        </Combobox>
 
-        <text-input
+        <Input
             v-else
+            class="flex-1"
             :model-value="condition.value"
-            class="ltr:ml-4 rtl:mr-4"
             @update:model-value="valueUpdated"
         />
 
-        <button @click="remove" class="btn-close group ltr:ml-2 rtl:mr-2">
-            <svg-icon name="micro/trash" class="h-4 w-4 group-hover:text-red-500" />
-        </button>
+        <Button variant="ghost" size="sm" icon="trash" @click="remove" />
     </div>
 </template>
 
 <script>
 import HasInputOptions from '../fieldtypes/HasInputOptions.js';
+import { Description, Combobox, Input, Button } from '@statamic/ui';
+import Select from '@statamic/components/ui/Select/Select.vue'
+import Switch from '@statamic/components/ui/Switch.vue'
 
 export default {
     mixins: [HasInputOptions],
+
+    components: { Description, Combobox, Input, Button, Select, Switch },
 
     props: {
         config: {

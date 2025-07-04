@@ -1,14 +1,14 @@
 <template>
-    <publish-container
+    <PublishContainer
         ref="container"
         :name="name"
         :blueprint="blueprint"
-        :values="currentValues"
-        @updated="currentValues = $event"
+        v-model="currentValues"
         reference="collection"
         :meta="meta"
         :errors="errors"
-        v-slot="{ setFieldValue, setFieldMeta }"
+        :read-only="readOnly"
+        as-config
     >
         <div>
             <Header :title="title" icon="preferences">
@@ -32,18 +32,13 @@
                 </ButtonGroup>
             </Header>
 
-            <publish-tabs
-                @updated="setFieldValue"
-                @meta-updated="setFieldMeta"
-                :enable-sidebar="hasSidebar"
-                :read-only="readOnly"
-            />
+            <PublishTabs />
         </div>
-    </publish-container>
+    </PublishContainer>
 </template>
 
 <script>
-import { Header, Button, ButtonGroup, Dropdown, DropdownMenu, DropdownItem, DropdownLabel } from '@statamic/ui';
+import { Header, Button, ButtonGroup, Dropdown, DropdownMenu, DropdownItem, DropdownLabel, PublishContainer, PublishTabs } from '@statamic/ui';
 
 export default {
     components: {
@@ -54,6 +49,8 @@ export default {
         DropdownMenu,
         DropdownItem,
         DropdownLabel,
+        PublishContainer,
+        PublishTabs,
     },
 
     props: {
