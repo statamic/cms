@@ -12,7 +12,7 @@ const props = defineProps({
     },
 });
 
-const { store, syncField, desyncField } = injectContainerContext();
+const { store, syncField, desyncField, asConfig } = injectContainerContext();
 const { fieldPathPrefix, metaPathPrefix } = injectFieldsContext();
 const handle = props.config.handle;
 
@@ -104,6 +104,8 @@ const isReadOnly = computed(() => {
 const isLocked = computed(() => false); // todo
 const isSyncable = computed(() => store.isRoot === false);
 const isSynced = computed(() => isSyncable.value && !store.localizedFields.includes(fullPath.value));
+const isNested = computed(() => fullPath.value.includes('.'));
+const wrapperComponent = computed(() => asConfig.value && !isNested.value ? 'card' : 'div');
 
 function sync() {
     syncField(fullPath.value);
@@ -124,6 +126,7 @@ function desync() {
         :required="isRequired"
         :errors="errors"
         :disabled="isReadOnly"
+        :as="wrapperComponent"
     >
         <template #label>
             <Label v-if="shouldShowLabel" :for="fieldId" :required="isRequired">
