@@ -7,6 +7,7 @@ use Statamic\Contracts\Taxonomies\Taxonomy as TaxonomyContract;
 use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\Contracts\Taxonomies\TermRepository;
 use Statamic\CP\Column;
+use Statamic\CP\PublishForm;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Scope;
@@ -145,17 +146,11 @@ class TaxonomiesController extends CpController
             'layout' => $taxonomy->layout(),
         ];
 
-        $fields = ($blueprint = $this->editFormBlueprint($taxonomy))
-            ->fields()
-            ->addValues($values)
-            ->preProcess();
-
-        return view('statamic::taxonomies.edit', [
-            'blueprint' => $blueprint->toPublishArray(),
-            'values' => $fields->values(),
-            'meta' => $fields->meta(),
-            'taxonomy' => $taxonomy,
-        ]);
+        return PublishForm::make($this->editFormBlueprint($taxonomy))
+            ->title(__('Configure Taxonomy'))
+            ->values($values)
+            ->asConfig()
+            ->submittingTo(cp_route('taxonomies.update', $taxonomy->handle()));
     }
 
     public function update(Request $request, $taxonomy)
@@ -345,6 +340,22 @@ class TaxonomiesController extends CpController
             ],
         ]);
 
-        return Blueprint::makeFromTabs($fields);
+        return Blueprint::make()->setContents(collect([
+            'tabs' => [
+                'main' => [
+                    'sections' => collect($fields)->map(function ($section) {
+                        return [
+                            'display' => $section['display'],
+                            'fields' => collect($section['fields'])->map(function ($field, $handle) {
+                                return [
+                                    'handle' => $handle,
+                                    'field' => $field,
+                                ];
+                            })->values()->all(),
+                        ];
+                    })->values()->all(),
+                ],
+            ],
+        ])->all());
     }
 }

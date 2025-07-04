@@ -1,42 +1,47 @@
 <template>
-    <div>
+    <div class="max-w-5xl mx-auto">
         <Header :title="__(initialTitle) || __('Create Role')" icon="permissions">
             <Button type="submit" variant="primary" @click="save" :text="__('Save')" />
         </Header>
 
-        <ui-card class="space-y-6">
-            <form-group
-                handle="title"
-                :display="__('Title')"
-                :errors="errors.title"
-                :instructions="__('messages.role_title_instructions')"
-                v-model="title"
-                :focus="true"
-            />
-
-            <form-group
-                fieldtype="slug"
-                handle="handle"
-                :display="__('Handle')"
-                :instructions="__('messages.role_handle_instructions')"
-                :errors="errors.title"
-                v-model="handle"
-            />
-
-            <div class="p-6 pt-0 text-xs text-red-500" v-if="initialHandle && handle != initialHandle">
-                {{ __('messages.role_change_handle_warning') }}
+        <ui-panel>
+            <div class="publish-fields-fluid">
+                <ui-card class="field-w-50">
+                    <form-group
+                        handle="title"
+                        :display="__('Title')"
+                        :errors="errors.title"
+                        :instructions="__('messages.role_title_instructions')"
+                        v-model="title"
+                        :focus="true"
+                    />
+                </ui-card>
+                <ui-card class="field-w-50">
+                    <form-group
+                        fieldtype="slug"
+                        handle="handle"
+                        :display="__('Handle')"
+                        :instructions="__('messages.role_handle_instructions')"
+                        :errors="errors.title"
+                        v-model="handle"
+                    />
+                    <div class="p-6 pt-0 text-xs text-red-500" v-if="initialHandle && handle != initialHandle">
+                        {{ __('messages.role_change_handle_warning') }}
+                    </div>
+                </ui-card>
+                <ui-card class="field-w-100">
+                    <form-group
+                        v-if="canAssignSuper"
+                        class="toggle-fieldtype"
+                        fieldtype="toggle"
+                        handle="super"
+                        :display="__('permissions.super')"
+                        :instructions="__('permissions.super_desc')"
+                        v-model="isSuper"
+                    />
+                </ui-card>
             </div>
-
-            <form-group
-                v-if="canAssignSuper"
-                class="toggle-fieldtype"
-                fieldtype="toggle"
-                handle="super"
-                :display="__('permissions.super')"
-                :instructions="__('permissions.super_desc')"
-                v-model="isSuper"
-            />
-        </ui-card>
+        </ui-panel>
 
         <div v-if="!isSuper" class="space-y-6 mt-6">
             <ui-panel v-for="group in permissions" :key="group.handle">
