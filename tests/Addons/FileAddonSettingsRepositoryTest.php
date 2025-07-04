@@ -8,8 +8,8 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Extend\Addon;
 use Statamic\Extend\FileAddonSettings;
 use Statamic\Extend\FileAddonSettingsRepository;
-use Tests\TestCase;
 use Statamic\Facades;
+use Tests\TestCase;
 
 class FileAddonSettingsRepositoryTest extends TestCase
 {

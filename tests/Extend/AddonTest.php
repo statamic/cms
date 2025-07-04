@@ -10,9 +10,9 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Extend\AddonSettings;
 use Statamic\Contracts\Extend\AddonSettingsRepository;
 use Statamic\Extend\Addon;
+use Statamic\Facades;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
-use Statamic\Facades;
 use Statamic\Fields\Blueprint;
 use Tests\TestCase;
 

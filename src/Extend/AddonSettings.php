@@ -3,8 +3,8 @@
 namespace Statamic\Extend;
 
 use Illuminate\Support\Collection;
-use Statamic\Contracts\Extend\AddonSettingsRepository;
 use Statamic\Contracts\Extend\AddonSettings as Contract;
+use Statamic\Contracts\Extend\AddonSettingsRepository;
 
 abstract class AddonSettings implements Contract
 {
