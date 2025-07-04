@@ -25,6 +25,7 @@ class AddonSettingsController extends CpController
         }
 
         return PublishForm::make($addon->settingsBlueprint())
+            ->asConfig()
             ->icon('cog')
             ->title($addon->name())
             ->values($addon->settings()->values()->all())
