@@ -14,6 +14,7 @@ use Statamic\Console\Commands\StarterKitInstall as InstallCommand;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Config;
 use Statamic\Facades\Path;
+use Statamic\Facades\Search;
 use Statamic\Facades\YAML;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -495,7 +496,8 @@ EOT;
 
         $this
             ->installCoolRunningsInteractively(['--without-user' => true])
-            ->expectsConfirmation('Clear site first?', 'yes');
+            ->expectsConfirmation('Clear site first?', 'yes')
+            ->expectsConfirmation('Would you like to update your search index(es) as well?', 'no');
 
         $this->assertFileExists(base_path('content/collections/pages/home.md'));
         $this->assertFileDoesNotExist(base_path('content/collections/pages/contact.md'));
@@ -1692,6 +1694,7 @@ EOT;
         return $this->installCoolRunningsInteractively(array_merge($options, [
             '--clear-site' => true,   // skip clear site prompt
             '--without-user' => true, // skip create user prompt
+            '--update-search' => true, // skip update search index prompt
         ]), $customHttpFake);
     }
 
