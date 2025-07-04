@@ -24,12 +24,10 @@ class AddonSettingsController extends CpController
             throw new NotFoundHttpException;
         }
 
-        // todo: get raw settings
-
         return PublishForm::make($addon->settingsBlueprint())
             ->icon('cog')
             ->title($addon->name())
-            ->values([])
+            ->values($addon->settings()->values()->all())
             ->submittingTo(cp_route('addons.settings.update', $addon->slug()));
     }
 
@@ -44,6 +42,8 @@ class AddonSettingsController extends CpController
 
         $values = PublishForm::make($addon->settingsBlueprint())->submit($request->all());
 
-        // todo: save the settings
+        $saved = $addon->settings()->merge($values)->save();
+
+        return ['saved' => $saved];
     }
 }

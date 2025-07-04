@@ -7,9 +7,12 @@ use Foo\Bar\TestAddonServiceProvider;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Contracts\Extend\AddonSettings;
+use Statamic\Contracts\Extend\AddonSettingsRepository;
 use Statamic\Extend\Addon;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
+use Statamic\Facades;
 use Statamic\Fields\Blueprint;
 use Tests\TestCase;
 
@@ -20,7 +23,10 @@ class AddonTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+
         $this->addonFixtureDir = Path::tidy(realpath(__DIR__.'/../Fixtures/Addon').'/');
+
+        $this->app['files']->deleteDirectory(storage_path('statamic/addons'));
     }
 
     #[Test]
@@ -242,6 +248,40 @@ class AddonTest extends TestCase
 
         $this->assertInstanceOf(Blueprint::class, $blueprint);
         $this->assertTrue($blueprint->hasField('api_key'));
+    }
+
+    #[Test]
+    public function it_gets_settings()
+    {
+        $addon = $this->makeFromPackage();
+        Facades\Addon::shouldReceive('get')->with('vendor/test-addon')->andReturn($addon);
+
+        app(AddonSettingsRepository::class)->make($addon, [
+            'api_key' => '12345',
+            'another_setting' => 'value',
+        ])->save();
+
+        $settings = $addon->settings();
+
+        $this->assertInstanceOf(AddonSettings::class, $settings);
+        $this->assertEquals($addon, $settings->addon());
+        $this->assertEquals([
+            'api_key' => '12345',
+            'another_setting' => 'value',
+        ], $settings->values()->all());
+    }
+
+    #[Test]
+    public function it_gets_settings_instance_even_if_no_settings_are_saved()
+    {
+        $addon = $this->makeFromPackage(['slug' => 'test-addon']);
+        Facades\Addon::shouldReceive('get')->with('vendor/test-addon')->andReturn($addon);
+
+        $settings = $addon->settings();
+
+        $this->assertInstanceOf('Statamic\Extend\AddonSettings', $settings);
+        $this->assertEquals($addon, $settings->addon());
+        $this->assertEquals([], $settings->values()->all());
     }
 
     #[Test]

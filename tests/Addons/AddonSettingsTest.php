@@ -1,0 +1,120 @@
+<?php
+
+namespace Tests\Addons;
+
+use Foo\Bar\TestAddonServiceProvider;
+use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\Test;
+use Statamic\Contracts\Extend\AddonSettingsRepository;
+use Statamic\Extend\Addon;
+use Tests\TestCase;
+use Statamic\Extend\FileAddonSettings as AddonSettings;
+
+class AddonSettingsTest extends TestCase
+{
+    #[Test]
+    public function it_returns_the_addon()
+    {
+        $addon = $this->makeFromPackage();
+        $settings = new AddonSettings($addon, ['foo' => 'bar']);
+
+        $this->assertEquals($addon, $settings->addon());
+    }
+
+    #[Test]
+    public function it_returns_the_values()
+    {
+        $addon = $this->makeFromPackage();
+        $settings = new AddonSettings($addon, ['foo' => 'bar', 'baz' => 'qux']);
+
+        $this->assertInstanceOf(Collection::class, $settings->values());
+        $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $settings->values()->all());
+    }
+
+    #[Test]
+    public function it_gets_a_value()
+    {
+        $addon = $this->makeFromPackage();
+        $settings = new AddonSettings($addon, ['foo' => 'bar']);
+
+        $this->assertEquals('bar', $settings->get('foo'));
+        $this->assertNull($settings->get('nonexistent'));
+        $this->assertEquals('default', $settings->get('nonexistent', 'default'));
+    }
+
+    #[Test]
+    public function it_checks_if_a_value_exists()
+    {
+        $addon = $this->makeFromPackage();
+        $settings = new AddonSettings($addon, ['foo' => 'bar']);
+
+        $this->assertTrue($settings->has('foo'));
+        $this->assertFalse($settings->has('nonexistent'));
+    }
+
+    #[Test]
+    public function it_sets_a_value()
+    {
+        $addon = $this->makeFromPackage();
+        $settings = new AddonSettings($addon, ['foo' => 'bar']);
+
+        $settings->set('baz', 'qux');
+
+        $this->assertEquals('qux', $settings->get('baz'));
+        $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $settings->values()->all());
+    }
+
+    #[Test]
+    public function it_merges_settings()
+    {
+        $addon = $this->makeFromPackage();
+        $settings = new AddonSettings($addon, ['foo' => 'bar']);
+
+        $settings->merge(['baz' => 'qux']);
+
+        $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $settings->values()->all());
+    }
+
+    #[Test]
+    public function it_saves_settings()
+    {
+        $addon = $this->makeFromPackage();
+        $settings = new AddonSettings($addon, ['foo' => 'bar', 'baz' => 'qux']);
+
+        $this->mock(AddonSettingsRepository::class, function ($mock) use ($settings) {
+            $mock->shouldReceive('save')->with($settings)->andReturn(true)->once();
+        });
+
+        $settings->save();
+    }
+
+    #[Test]
+    public function it_deletes_settings()
+    {
+        $addon = $this->makeFromPackage();
+        $settings = new AddonSettings($addon, ['foo' => 'bar', 'baz' => 'qux']);
+
+        $this->mock(AddonSettingsRepository::class, function ($mock) use ($settings) {
+            $mock->shouldReceive('delete')->with($settings)->andReturn(true)->once();
+        });
+
+        $settings->delete();
+    }
+
+    private function makeFromPackage($attributes = [])
+    {
+        return Addon::makeFromPackage(array_merge([
+            'id' => 'vendor/test-addon',
+            'name' => 'Test Addon',
+            'description' => 'Test description',
+            'namespace' => 'Vendor\\TestAddon',
+            'provider' => TestAddonServiceProvider::class,
+            'autoload' => '',
+            'url' => 'http://test-url.com',
+            'developer' => 'Test Developer LLC',
+            'developerUrl' => 'http://test-developer.com',
+            'version' => '1.0',
+            'editions' => ['foo', 'bar'],
+        ], $attributes));
+    }
+}
