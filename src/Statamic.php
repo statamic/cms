@@ -249,9 +249,11 @@ class Statamic
             $path = statamic_path("resources/svg/{$fallback}.svg");
         }
 
-        return File::exists($path)
-            ? Svg::withClasses(File::get($path), $attrs)
-            : null;
+        if (File::exists($path) && $attrs) {
+            return Svg::withClasses(File::get($path), $attrs);
+        }
+
+        return File::get($path) ?? '';
     }
 
     public static function vendorAssetUrl($url = '/')
