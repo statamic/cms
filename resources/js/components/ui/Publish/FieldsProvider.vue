@@ -5,6 +5,8 @@ export const [injectFieldsContext, provideFieldsContext] = createContext('Publis
 </script>
 
 <script setup>
+import { toRef } from 'vue';
+
 const props = defineProps({
     fields: {
         type: Array,
@@ -20,9 +22,9 @@ const props = defineProps({
 });
 
 provideFieldsContext({
-    fields: props.fields,
-    fieldPathPrefix: props.fieldPathPrefix,
-    metaPathPrefix: props.metaPathPrefix,
+    fields: toRef(() => props.fields),
+    fieldPathPrefix: toRef(() => props.fieldPathPrefix),
+    metaPathPrefix: toRef(() => props.metaPathPrefix),
 });
 </script>
 

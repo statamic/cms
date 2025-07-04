@@ -24,11 +24,11 @@ const fieldtypeComponentExists = computed(() => {
     return Statamic.$app.component(fieldtypeComponent.value) !== undefined;
 });
 
-const fullPath = computed(() => [fieldPathPrefix, handle].filter(Boolean).join('.'));
-const metaFullPath = computed(() => [metaPathPrefix, handle].filter(Boolean).join('.'));
+const fullPath = computed(() => [fieldPathPrefix.value, handle].filter(Boolean).join('.'));
+const metaFullPath = computed(() => [metaPathPrefix.value, handle].filter(Boolean).join('.'));
 const value = computed(() => data_get(store.values, fullPath.value));
 const meta = computed(() => {
-    const key = [metaPathPrefix, handle].filter(Boolean).join('.');
+    const key = [metaPathPrefix.value, handle].filter(Boolean).join('.');
     return data_get(store.meta, key);
 });
 const errors = computed(() => store.errors[fullPath.value]);
@@ -65,15 +65,15 @@ function blurred() {
 }
 
 const values = computed(() => {
-    return fieldPathPrefix ? data_get(store.values, fieldPathPrefix) : store.values;
+    return fieldPathPrefix.value ? data_get(store.values, fieldPathPrefix.value) : store.values;
 });
 
 const visibleValues = computed(() => {
-    return fieldPathPrefix ? data_get(store.visibleValues, fieldPathPrefix) : store.visibleValues;
+    return fieldPathPrefix.value ? data_get(store.visibleValues, fieldPathPrefix.value) : store.visibleValues;
 });
 
 const extraValues = computed(() => {
-    return fieldPathPrefix ? data_get(store.extraValues, fieldPathPrefix) : store.extraValues;
+    return fieldPathPrefix.value ? data_get(store.extraValues, fieldPathPrefix.value) : store.extraValues;
 });
 
 const shouldShowField = computed(() => {
