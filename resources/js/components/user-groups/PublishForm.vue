@@ -25,9 +25,7 @@
             :meta="meta"
             :errors="errors"
             as-config
-        >
-            <PublishTabs />
-        </PublishContainer>
+        />
     </div>
 </template>
 

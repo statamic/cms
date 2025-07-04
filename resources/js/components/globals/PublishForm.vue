@@ -56,9 +56,7 @@
             :localized-fields="localizedFields"
             :is-root="isRoot"
             :sync-field-confirmation-text="syncFieldConfirmationText"
-        >
-            <PublishTabs />
-        </PublishContainer>
+        />
     </div>
 </template>
 
