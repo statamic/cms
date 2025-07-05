@@ -57,13 +57,13 @@ class NavBuilder
             ->resolveChildrenClosures()
             ->validateNesting()
             ->validateViews()
-            ->authorizeItems()
-            ->authorizeChildren()
             ->syncOriginal()
             ->trackCoreSections()
             ->trackOriginalSectionItems()
             ->trackUrls()
             ->applyPreferenceOverrides($preferences)
+            ->authorizeItems()
+            ->authorizeChildren()
             ->buildSections()
             ->blinkUrls()
             ->get();
@@ -156,7 +156,10 @@ class NavBuilder
     {
         collect($this->items)
             ->reject(fn ($item) => is_callable($item->children()))
-            ->each(fn ($item) => $item->children($this->filterAuthorizedNavItems($item->children())));
+            ->each(fn ($item) => $item->children(
+                items: $this->filterAuthorizedNavItems($item->children()),
+                generateNewIds: false,
+            ));
 
         return $this;
     }
@@ -707,7 +710,10 @@ class NavBuilder
 
         $newChildren->each(fn ($item, $index) => $item->order($index + 1));
 
-        $item->children($newChildren, false);
+        $item->children(
+            items: $newChildren,
+            generateNewIds: false,
+        );
 
         return $newChildren;
     }
