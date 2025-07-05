@@ -710,7 +710,10 @@ class NavBuilder
 
         $newChildren->each(fn ($item, $index) => $item->order($index + 1));
 
-        $item->children($newChildren, false);
+        $item->children(
+            items: $newChildren,
+            generateNewIds: false,
+        );
 
         return $newChildren;
     }
