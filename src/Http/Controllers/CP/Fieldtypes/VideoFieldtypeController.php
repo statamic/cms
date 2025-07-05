@@ -2,93 +2,73 @@
 
 namespace Statamic\Http\Controllers\CP\Fieldtypes;
 
+use Embera\Embera;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Request;
-use Statamic\Enums\VideoType;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Fluent;
 use Statamic\Http\Controllers\CP\CpController;
 
 class VideoFieldtypeController extends CpController
 {
     public function details(Request $request)
     {
-        return $this->providerFromUrl($request->query('url'))->toArray();
-    }
-
-    private function providerFromUrl(string $url): Provider
-    {
-        $type = $this->type($url);
-        $embedUrl = $this->embedUrl($type, $url);
-        $prepend = $this->prepend($type);
-
-        return new Provider(
-            prepend: $prepend,
-            provider: $type,
-            embedUrl: $embedUrl
-        );
-    }
-
-    private function type(string $url): VideoType
-    {
-        return match (true) {
-            str($url)->contains(['youtube.com', 'youtu.be']) => VideoType::YouTube,
-            str($url)->contains('vimeo.com') => VideoType::Vimeo,
-            default => VideoType::CloudflareStream,
-        };
-    }
-
-    private function embedUrl(VideoType $provider, string $url): string
-    {
-        return match ($provider) {
-            VideoType::CloudflareStream => $this->cloudflareStreamEmbedUrl($url),
-            VideoType::Vimeo => $this->vimeoEmbedUrl($url),
-            VideoType::YouTube => $this->youTubeEmbedUrl($url),
-        };
-    }
-
-    private function cloudflareStreamEmbedUrl(string $id): string
-    {
-        return "https://iframe.cloudflarestream.com/{$id}";
-    }
-
-    private function youTubeEmbedUrl(string $url): string
-    {
-        if (str($url)->contains('youtu.be')) {
-            return str($url)->replace('youtu.be', 'youtube.com/embed');
+        if (! is_null($url = $request->query('url'))) {
+            return Video::fromUrl($url);
         }
 
-        return str($url)
-            ->replace('watch?v=', 'embed/')
-            ->replace('shorts/', 'embed/');
+        if ($this->isCloudflareStream($request)) {
+            $id = $request->query('id');
+            $embedUrl = "https://iframe.cloudflarestream.com/{$id}";
+            $iframe = "<iframe src='$embedUrl' frameborder='0' allow='fullscreen'></iframe>";
+
+            return new Video(id: $id, provider: 'Cloudflare', embedUrl: $iframe);
+        }
+
+        return Video::notSupported();
     }
 
-    private function vimeoEmbedUrl(string $url): string
+    private function isCloudflareStream(Request $request): bool
     {
-        return str($url)->replace('vimeo.com/', 'player.vimeo.com/video/');
-    }
-
-    private function prepend(VideoType $provider): string
-    {
-        return match ($provider) {
-            VideoType::CloudflareStream => __('ID'),
-            default => __('URL'),
-        };
+        return $request->has('id') && $request->query('type') === 'Cloudflare';
     }
 }
 
-class Provider
+class Video implements Arrayable
 {
+    public static function fromUrl(string $url): self
+    {
+        if (empty($details = (new Embera)->getUrlData($url))) {
+            return static::notSupported();
+        }
+
+        $data = new Fluent(Arr::first($details));
+
+        return new self(
+            id: $data->video_id,
+            provider: strtolower($data->embera_provider_name),
+            embedUrl: $data->html
+        );
+    }
+
+    public static function notSupported(): self
+    {
+        return new self(provider: 'not_supported');
+    }
+
     public function __construct(
-        public string $prepend,
-        public VideoType $provider,
-        public string $embedUrl,
+        public string $provider,
+        public ?string $id = null,
+        public ?string $embedUrl = null,
     ) {
     }
 
     public function toArray(): array
     {
         return [
-            'prepend' => $this->prepend,
-            'provider' => $this->provider,
             'embed_url' => $this->embedUrl,
+            'id' => $this->id,
+            'provider' => $this->provider,
         ];
     }
 }

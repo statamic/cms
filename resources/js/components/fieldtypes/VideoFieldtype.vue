@@ -1,52 +1,50 @@
 <template>
-    <div
-        class="flex flex-col space-y-3 rounded-xl border border-gray-300 bg-gray-100 p-1.5 dark:border-gray-700 dark:bg-gray-900"
-    >
-        <ui-input-group>
-            <div class="w-1/4">
-                <Select
-                    :options="providers"
-                    option-label="name"
-                    option-value="handle"
-                    :placeholder="__('Provider...')"
-                    v-model="provider"
-                />
-            </div>
-            <ui-input-group-prepend :text="prepend" />
-            <ui-input
-                :model-value="value"
-                :isReadOnly="isReadOnly"
-                :placeholder="__(config.placeholder) || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'"
-                @update:model-value="update"
-                @focus="$emit('focus')"
-                @blur="$emit('blur')"
-            />
-        </ui-input-group>
-        <ui-description v-if="isInvalid" class="text-red-500">{{ __('statamic::validation.url') }}</ui-description>
-        <iframe
+    <div class="flex flex-col space-y-3 rounded-xl border border-gray-300 bg-gray-100 p-1.5 dark:border-gray-700 dark:bg-gray-900">
+        <Combobox
+            v-model="provider"
+            :options="providers"
+            option-label="provider"
+            option-value="provider"
+            :placeholder="__('Provider...')"
+        />
+        <Input
+            v-if="provider != 'Cloudflare'"
+            :model-value="url"
+            :isReadOnly="isReadOnly"
+            :placeholder="__(config.placeholder) || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'"
+            :prepend="__('URL')"
+            @update:model-value="detailsFromUrl"
+        />
+        <Input
+            v-if="provider == 'Cloudflare'"
+            :model-value="videoId"
+            :isReadOnly="isReadOnly"
+            :prepend="__('ID')"
+            @update:model-value="detailsFromCloudflare"
+        />
+        <div
             v-if="embedUrl"
-            :src="embedUrl"
-            frameborder="0"
-            allow="fullscreen"
             class="aspect-video rounded-lg"
-        ></iframe>
+            v-html="embedUrl"
+        ></div>
     </div>
 </template>
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import { Select } from '@statamic/ui';
+import { Combobox, Input } from '@statamic/ui';
 
 export default {
-    components: { Select },
+    components: { Combobox, Input },
 
     mixins: [Fieldtype],
 
     data() {
         return {
             embedUrl: null,
-            prepend: __('URL'),
             provider: null,
+            url: null,
+            videoId: null,
         };
     },
 
@@ -54,24 +52,33 @@ export default {
         providers() {
             return this.meta.providers;
         },
-
-        isInvalid() {
-            let htmlRegex = new RegExp(/<([A-Z][A-Z0-9]*)\b[^>]*>.*?<\/\1>|<([A-Z][A-Z0-9]*)\b[^\/]*\/>/i);
-            return htmlRegex.test(this.value || '');
-        },
     },
 
-    watch: {
-        value() {
+    methods: {
+        detailsFromCloudflare(id) {
+            this.videoId = id;
+
+            this.getVideoData({type: this.provider, id: this.videoId});
+        },
+
+        detailsFromUrl(url) {
+            if (url == null) return;
+
+            this.getVideoData({url: url});
+        },
+
+        getVideoData(params) {
             this.$axios
-                .get(this.meta.url, { params: { url: this.value } })
+                .get(this.meta.url, { params: params })
                 .then((response) => response.data)
                 .then((data) => {
                     this.embedUrl = data.embed_url;
-                    this.prepend = data.prepend;
                     this.provider = data.provider;
                 });
+
+            // this.update(whatever);
         },
-    },
+
+    }
 };
 </script>

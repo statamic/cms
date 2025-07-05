@@ -2,6 +2,9 @@
 
 namespace Statamic\Fieldtypes;
 
+use Embera\ProviderCollection\DefaultProviderCollection;
+use Embera\ProviderCollection\SlimProviderCollection;
+use Illuminate\Support\Collection;
 use Statamic\Fields\Fieldtype;
 
 class Video extends Fieldtype
@@ -10,13 +13,11 @@ class Video extends Fieldtype
 
     public function preload()
     {
+        $providers = new Providers();
+
         /** @todo Fetch these from some repository so folks can add their own */
         return [
-            'providers' => [
-                ['name' => 'Cloudflare Stream', 'handle' => 'cloudflare_stream'],
-                ['name' => 'Vimeo', 'handle' => 'vimeo'],
-                ['name' => 'YouTube', 'handle' => 'youtube'],
-            ],
+            'providers' => ray()->pass($providers->get())->all(),
             'url' => cp_route('video.details'),
         ];
     }
@@ -40,5 +41,19 @@ class Video extends Fieldtype
                 ],
             ],
         ];
+    }
+}
+
+class Providers extends SlimProviderCollection
+{
+    public function get(): Collection
+    {
+        return collect($this->providers)
+            ->unique()
+            ->values()
+            ->map(fn(string $class) => ['provider' => class_basename($class)])
+            ->add(['provider' => 'Cloudflare'])
+            ->sortBy('provider')
+            ->values();
     }
 }
