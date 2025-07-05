@@ -11,8 +11,8 @@ use Tests\TestCase;
 
 class NavPreferencesTest extends TestCase
 {
-    use FakesRoles;
     use Concerns\HashedIdAssertions;
+    use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
     protected $shouldPreventNavBeingBuilt = false;
