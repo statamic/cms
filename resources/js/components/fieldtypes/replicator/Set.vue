@@ -18,6 +18,7 @@ import { Motion } from 'motion-v';
 import { injectContainerContext } from '@statamic/components/ui/Publish/Container.vue';
 import PreviewHtml from '@statamic/components/fieldtypes/replicator/PreviewHtml.js';
 import FieldAction from '@statamic/components/field-actions/FieldAction.js';
+import toFieldActions from '@statamic/components/field-actions/toFieldActions.js';
 
 const emit = defineEmits(['collapsed', 'expanded', 'duplicated', 'removed']);
 
@@ -73,9 +74,7 @@ const fieldActionPayload = computed(() => ({
 }));
 
 const fieldActions = computed(() => {
-    return [...Statamic.$fieldActions.get('replicator-fieldtype-set')]
-        .map((action) => new FieldAction(action, fieldActionPayload.value))
-        .filter((action) => action.visible);
+    return toFieldActions('replicator-fieldtype-set', fieldActionPayload.value);
 });
 
 const previewText = computed(() => {
