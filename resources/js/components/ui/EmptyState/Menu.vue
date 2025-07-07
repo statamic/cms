@@ -1,5 +1,5 @@
 <script setup>
-import { CardPanel, Icon } from '@statamic/ui';
+import { CardPanel } from '@statamic/ui';
 
 const props = defineProps({
     heading: {
@@ -17,10 +17,6 @@ const props = defineProps({
     <CardPanel :heading="heading" class="max-w-md m-auto">
         <div class="flex flex-wrap [:has(>&)]:p-1.5">
             <slot />
-
-            <div class="hidden first:flex justify-center items-center p-8 w-full">
-                <Icon :name="svg || 'empty/content'" />
-            </div>
         </div>
     </CardPanel>
 </template>
