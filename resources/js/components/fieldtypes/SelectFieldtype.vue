@@ -15,49 +15,36 @@
     />
 </template>
 
-<script>
-import Fieldtype from './Fieldtype.vue';
+<script setup>
+import { Fieldtype } from 'statamic';
 import HasInputOptions from './HasInputOptions.js';
 import { SortableList } from '../sortable/Sortable';
 import { Badge, Combobox } from '@statamic/ui';
+import { computed } from 'vue';
 
-export default {
-    mixins: [Fieldtype, HasInputOptions],
+const emit = defineEmits(Fieldtype.emits);
+const props = defineProps(Fieldtype.props);
+const { isReadOnly, defineReplicatorPreview, update } = Fieldtype.use(emit, props);
 
-    components: {
-        Badge,
-        Combobox,
-        SortableList,
-    },
+const selectedOptions = computed(() => {
+    let selections = props.value === null ? [] : props.value;
 
-    computed: {
-        selectedOptions() {
-            let selections = this.value === null ? [] : this.value;
+    if (typeof selections === 'string' || typeof selections === 'number') {
+        selections = [selections];
+    }
 
-            if (typeof selections === 'string' || typeof selections === 'number') {
-                selections = [selections];
-            }
+    return selections.map((value) => {
+        return options.value.find((option) => option.value === value) ?? { label: value, value };
+    });
+});
 
-            return selections.map((value) => {
-                return this.options.find((option) => option.value === value) ?? { label: value, value };
-            });
-        },
+const options = computed(() => {
+    return HasInputOptions.methods.normalizeInputOptions(props.meta.options || props.config.options);
+});
 
-        options() {
-            return this.normalizeInputOptions(this.meta.options || this.config.options);
-        },
+defineReplicatorPreview(() => selectedOptions.value.map((option) => option.label).join(', '));
 
-        replicatorPreview() {
-            if (!this.showFieldPreviews || !this.config.replicator_preview) return;
-
-            return this.selectedOptions.map((option) => option.label).join(', ');
-        },
-    },
-
-    methods: {
-        comboboxUpdated(value) {
-            this.update(value || null);
-        },
-    },
-};
+function comboboxUpdated(value) {
+    update(value || null);
+}
 </script>
