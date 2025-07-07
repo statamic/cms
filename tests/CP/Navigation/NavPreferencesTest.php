@@ -5,12 +5,14 @@ namespace Tests\CP\Navigation;
 use Illuminate\Support\Facades\Request;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
+use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class NavPreferencesTest extends TestCase
 {
     use Concerns\HashedIdAssertions;
+    use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
     protected $shouldPreventNavBeingBuilt = false;
@@ -1694,9 +1696,58 @@ class NavPreferencesTest extends TestCase
         $this->assertTrue($tags->isActive());
     }
 
-    private function buildNavWithPreferences($preferences, $withHidden = false)
+    #[Test]
+    public function it_can_hide_items_the_user_does_not_have_permission_to_see()
     {
-        $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
+        $preferences = [
+            'favourites' => [
+                'display' => 'Favourites',
+                'items' => [
+                    'content::collections::articles' => '@alias',
+                    'content::collections::pages' => '@alias',
+                ],
+            ],
+            'author_section' => [
+                'display' => 'Authors',
+                'items' => [
+                    'content::collections::articles' => '@move',
+                ],
+            ],
+            'webmaster_section' => [
+                'display' => 'Webmasters',
+                'items' => [
+                    'content::collections::pages' => '@move',
+                ],
+            ],
+        ];
+
+        // A super user can see these items...
+        $nav = $this->buildNavWithPreferences($preferences);
+        $this->assertCount(2, $nav->get('Favourites'));
+        $this->assertTrue($nav->get('Favourites')->keyBy->display()->has('Articles'));
+        $this->assertTrue($nav->get('Favourites')->keyBy->display()->has('Pages'));
+        $this->assertCount(1, $nav->get('Authors'));
+        $this->assertTrue($nav->get('Authors')->keyBy->display()->has('Articles'));
+        $this->assertCount(1, $nav->get('Webmasters'));
+        $this->assertTrue($nav->get('Webmasters')->keyBy->display()->has('Pages'));
+
+        // But an author with permissions to only view articles...
+        $this->setTestRoles(['author' => ['view articles entries']]);
+        $user = Facades\User::make()->assignRole('author');
+
+        // Should not see pages related section and/or items...
+        $nav = $this->buildNavWithPreferences($preferences, user: $user);
+        $this->assertCount(1, $nav->get('Favourites'));
+        $this->assertTrue($nav->get('Favourites')->keyBy->display()->has('Articles'));
+        $this->assertFalse($nav->get('Favourites')->keyBy->display()->has('Pages'));
+        $this->assertCount(1, $nav->get('Authors'));
+        $this->assertTrue($nav->get('Authors')->keyBy->display()->has('Articles'));
+        $this->assertFalse($nav->has('Webmasters'));
+    }
+
+    private function buildNavWithPreferences($preferences, $withHidden = false, $user = null)
+    {
+        $this->actingAs(tap($user ?? Facades\User::make()->makeSuper())->save());
 
         return Facades\CP\Nav::build($preferences, $withHidden)->pluck('items', 'display');
     }
