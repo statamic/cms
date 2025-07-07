@@ -38,6 +38,12 @@ const use = function(emit, props) {
         customReplicatorPreview.value = computed(definition);
     }
 
+    watch(replicatorPreview, (text) => {
+        if (!props.showFieldPreviews || !props.config.replicator_preview) return;
+
+        emit('replicator-preview-updated', text);
+    }, { immediate: true });
+
     const fieldPathKeys = computed(() => {
         const prefix = props.fieldPathPrefix || props.handle;
 
@@ -87,12 +93,6 @@ const use = function(emit, props) {
             fieldActionPayload.value,
         );
     });
-
-    watch(replicatorPreview, (text) => {
-        if (!props.showFieldPreviews || !props.config.replicator_preview) return;
-
-        emit('replicator-preview-updated', text);
-    }, { immediate: true });
 
     const expose = {
         handle: props.handle,
