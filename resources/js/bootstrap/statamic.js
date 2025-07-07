@@ -34,6 +34,7 @@ import autosize from 'autosize';
 import DateFormatter from '@statamic/components/DateFormatter.js';
 import wait from '@statamic/util/wait.js';
 import markdown from '@statamic/util/markdown.js';
+import VueComponentDebug from 'vue-component-debug';
 
 let bootingCallbacks = [];
 let bootedCallbacks = [];
@@ -146,47 +147,7 @@ export default {
         this.$app.use(PortalVue, { portalName: 'v-portal' });
         this.$app.use(VueClickAway);
         this.$app.use(FloatingVue, { disposeTimeout: 30000, distance: 10 });
-
-        this.$app.mixin({
-            mounted() {
-                if (process.env.NODE_ENV === 'development') {
-                    const component = this.$options.__file || this.$options.__name || 'Anonymous';
-
-                    const startComment = document.createComment(` Start component: ${component} `);
-                    this.$el.parentNode?.insertBefore(startComment, this.$el);
-
-                    const endComment = document.createComment(` End component: ${component} `);
-                    this.$el.parentNode?.insertBefore(endComment, this.$el.nextSibling);
-                }
-            },
-            beforeUnmount() {
-                if (process.env.NODE_ENV === 'development') {
-                    // Clean up comments when components are destroyed.
-                    const component = this.$options.__file || this.$options.__name || 'Anonymous';
-                    const parent = this.$el.parentNode;
-
-                    if (parent) {
-                        let node = this.$el.previousSibling;
-                        while (node && node.nodeType === Node.COMMENT_NODE) {
-                            if (node.nodeValue === ` Start component: ${component} `) {
-                                parent.removeChild(node);
-                                break;
-                            }
-                            node = node.previousSibling;
-                        }
-
-                        node = this.$el.nextSibling;
-                        while (node && node.nodeType === Node.COMMENT_NODE) {
-                            if (node.nodeValue === ` End component: ${component} `) {
-                                parent.removeChild(node);
-                                break;
-                            }
-                            node = node.nextSibling;
-                        }
-                    }
-                }
-            },
-        });
+        this.$app.use(VueComponentDebug);
 
         const portals = markRaw(new Portals());
 
