@@ -78,7 +78,7 @@ class Group extends Fieldtype
             ->addValues((array) $this->field->value())
             ->validator()
             ->withContext([
-                'prefix' => $this->field->handle().'.',
+                'prefix' => $this->field->validationContext('prefix'),
             ])
             ->rules();
 
