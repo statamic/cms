@@ -49,7 +49,7 @@ const triggerClasses = cva({
         size: {
             base: 'text-base rounded-lg ps-3 pe-2.5 py-2 h-10 leading-[1.375rem]',
             sm: 'text-sm rounded-md ps-2.5 pe-2 py-1.5 h-7 leading-[1.125rem]',
-            xs: 'text-xs rounded-xs ps-2 pe-1.5 py-1.5 h-6 leading-[1.125rem]',
+            xs: 'text-xs rounded-sm ps-2 pe-1.5 py-1.5 h-6 leading-[1.125rem]',
         },
         flat: {
             true: 'shadow-none',
@@ -275,7 +275,7 @@ function pushTaggableOption(e) {
                     </button>
 
                     <div class="flex gap-1 items-center">
-                        <Button icon="x" variant="filled" size="xs" round v-if="clearable && modelValue" @click="clear" />
+                        <Button icon="x" variant="ghost" size="xs" round v-if="clearable && modelValue" @click="clear" />
                         <Icon name="ui/chevron-down" />
                     </div>
                 </ComboboxTrigger>
@@ -347,14 +347,14 @@ function pushTaggableOption(e) {
                         <button
                             v-if="!disabled"
                             type="button"
-                            class="vs__deselect"
+                            class="opacity-75 hover:opacity-100 cursor-pointer"
                             :aria-label="__('Deselect option')"
                             @click="deselect(option.value)"
                         >
-                            <span>×</span>
+                            &times;
                         </button>
-                        <button v-else type="button" class="vs__deselect">
-                            <span class="text-gray-300">×</span>
+                        <button v-else type="button" class="opacity-75">
+                            &times;
                         </button>
                     </Badge>
                 </div>

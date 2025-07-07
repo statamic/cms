@@ -20,17 +20,10 @@
                             <th v-for="(column, index) in columnCount" :key="index">
                                 <div class="flex h-6 items-center justify-between">
                                     <span class="column-count">{{ index + 1 }}</span>
-                                    <a
-                                        v-show="canDeleteColumns"
-                                        class="text-lg antialiased opacity-25 hover:opacity-75"
-                                        @click="confirmDeleteColumn(index)"
-                                        :aria-label="__('Delete Column')"
-                                    >
-                                        &times;
-                                    </a>
+                                    <ui-button icon="x" variant="subtle" size="xs" round @click="confirmDeleteColumn(index)" :aria-label="__('Delete Column')" v-tooltip="__('Delete Column')" class="-me-1" />
                                 </div>
                             </th>
-                            <th class="row-controls ltr:pr-0 rtl:pl-0"></th>
+                            <th class="row-controls"></th>
                         </tr>
                     </thead>
 
@@ -57,26 +50,18 @@
                                     />
                                 </td>
                                 <td class="row-controls" v-if="canDeleteRows">
-                                    <button
-                                        @click="confirmDeleteRow(rowIndex)"
-                                        class="inline text-lg antialiased opacity-25 hover:opacity-75"
-                                        :aria-label="__('Delete Row')"
-                                    >
-                                        &times;
-                                    </button>
+                                    <ui-button icon="x" variant="subtle" size="xs" round @click="confirmDeleteRow(rowIndex)" :aria-label="__('Delete Row')" v-tooltip="__('Delete Row')" />
                                 </td>
                             </tr>
                         </tbody>
                     </sortable-list>
                 </table>
 
-                <button class="btn" @click="addRow" :disabled="atRowMax" v-if="canAddRows">
-                    {{ __('Add Row') }}
-                </button>
+                <div class="flex gap-2">
+                    <ui-button @click="addRow" :disabled="atRowMax" v-if="canAddRows" :text="__('Add Row')" size="sm" />
 
-                <button class="btn ltr:ml-2 rtl:mr-2" @click="addColumn" :disabled="atColumnMax" v-if="canAddColumns">
-                    {{ __('Add Column') }}
-                </button>
+                    <ui-button @click="addColumn" :disabled="atColumnMax" v-if="canAddColumns" :text="__('Add Column')" size="sm" />
+                </div>
             </section>
 
             <confirmation-modal

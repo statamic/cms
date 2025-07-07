@@ -495,13 +495,13 @@ span.CodeMirror-selectedtext {
 
 .cm-s-material.CodeMirror {
     background: #263238;
-    @apply dark:bg-dark-650;
+    @apply dark:bg-gray-900;
     color: #eeffff;
 }
 
 .cm-s-material .CodeMirror-gutters {
     background: #263238;
-    @apply dark:bg-dark-650;
+    @apply dark:bg-gray-900;
     color: #546e7a;
     border: none;
 }
