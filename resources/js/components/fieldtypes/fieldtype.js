@@ -76,27 +76,22 @@ const use = function(emit, props) {
         // storeName: this.fieldActionStoreName,
     }));
 
-    const fieldActionBinding = computed(() => `${props.config.type}-fieldtype`);
+    const internalFieldActions = ref([]);
 
-    const defineFieldActions = (actions) => {
-        return [
-            ...Statamic.$fieldActions.get(fieldActionBinding.value),
-            ...actions
-        ]
-            .map((action) => new FieldAction(action, fieldActionPayload.value))
-            .filter((action) => action.visible);
-    };
+    const defineFieldActions = (actions) => internalFieldActions.value = actions;
 
     const fieldActions = computed(() => {
         return toFieldActions(
             `${props.config.type}-fieldtype`,
             fieldActionPayload.value,
+            internalFieldActions.value,
         );
     });
 
     const expose = {
         handle: props.handle,
         name,
+        fieldActions,
     };
 
     return {
