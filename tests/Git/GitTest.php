@@ -309,13 +309,13 @@ EOT;
 ?? "path with spaces/"
 EOT;
 
-        $this->assertEquals($expectedStatus, GitProcess::create(Path::resolve(base_path('content/path with spaces')))->status());
+        $this->assertEquals($expectedStatus, GitProcess::create(Path::resolve(base_path('content')))->status());
 
-        $this->assertStringContainsString('Initial commit.', $this->showLastCommit(base_path('content/path with spaces')));
+        $this->assertStringContainsString('Initial commit.', $this->showLastCommit(base_path('content')));
 
         Git::commit();
 
-        $this->assertStringContainsString('Content saved', $commit = $this->showLastCommit(base_path('content/path with spaces')));
+        $this->assertStringContainsString('Content saved', $commit = $this->showLastCommit(base_path('content')));
         $this->assertStringContainsString('Spock <spock@example.com>', $commit);
         $this->assertStringContainsString('path with spaces/file.yaml', $commit);
         $this->assertStringContainsString('title: File with spaces in path!', $commit);
