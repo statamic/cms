@@ -22,9 +22,15 @@ abstract class AddonSettings implements Contract
         return $this->addon;
     }
 
-    public function values(): Collection
+    public function values($values = null): Collection|self
     {
-        return $this->settings;
+        if (func_num_args() === 0) {
+            return $this->settings;
+        }
+
+        $this->settings = collect($values);
+
+        return $this;
     }
 
     public function get(string $key, $default = null)
