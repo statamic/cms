@@ -6,7 +6,7 @@
 
 @section('content')
     <header class="py-8 mt-8 text-center">
-        <h1 class="text-[25px] font-medium antialiased flex justify-center items-center gap-2">
+        <h1 class="text-[25px] font-medium antialiased flex justify-center items-center gap-3">
             <ui-icon name="taxonomies" class="size-5 text-gray-500"></ui-icon>
             {{ $taxonomy->title() }}
         </h1>
@@ -16,7 +16,7 @@
         @can('edit', $taxonomy)
             <ui-empty-state-item
                 href="{{ cp_route('taxonomies.edit', $taxonomy->handle()) }}"
-                icon="configure-large"
+                icon="configure"
                 heading="{{ __('Configure Collection') }}"
                 description="{{ __('statamic::messages.taxonomy_next_steps_configure_description') }}"
             ></ui-empty-state-item>
@@ -34,7 +34,7 @@
         @can('configure fields')
             <ui-empty-state-item
                 href="{{ cp_route('taxonomies.blueprints.index', [$taxonomy->handle()]) }}"
-                icon="blueprints-large"
+                icon="blueprints"
                 heading="{{ __('Configure Blueprints') }}"
                 description="{{ __('statamic::messages.taxonomy_next_steps_blueprints_description') }}"
             ></ui-empty-state-item>
