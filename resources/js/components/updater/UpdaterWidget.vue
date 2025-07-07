@@ -25,9 +25,9 @@ defineProps({
                     </td>
                 </tr>
             </table>
-            <p v-else class="p-3 text-center text-sm text-gray-600">
+            <ui-description v-else class="flex-1 flex items-center justify-center">
                 {{ __('Everything is up to date.') }}
-            </p>
+            </ui-description>
         </Widget>
     </Listing>
 </template>

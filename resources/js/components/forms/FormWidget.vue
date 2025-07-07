@@ -40,27 +40,29 @@ function formatDate(value) {
         </template>
         <template #default="{ items }">
             <Widget v-bind="widgetProps">
-                <p v-if="!items.length" class="p-3 text-center text-sm text-gray-600">
+                <ui-description v-if="!items.length" class="flex-1 flex items-center justify-center">
                     {{ __('This form is awaiting responses') }}
-                </p>
-                <table class="w-full [&_td]:p-0.5 [&_td]:text-sm">
-                    <TableBody>
-                        <template v-for="field in fields" #[`cell-${field}`]="{ row: submission }">
-                            <a
-                                :href="cp_url(`forms/${form}/submissions/${submission.id}`)"
-                                class="line-clamp-1 overflow-hidden text-ellipsis"
-                            >
-                                {{ submission[field] }}
-                            </a>
-                        </template>
-                        <template #cell-datestamp="{ row: submission }">
-                            <div
-                                class="text-end font-mono text-xs whitespace-nowrap text-gray-500 antialiased"
-                                v-html="formatDate(submission.datestamp)"
-                            />
-                        </template>
-                    </TableBody>
-                </table>
+                </ui-description>
+                <div class="px-4 py-3">
+                    <table class="w-full [&_td]:p-0.5 [&_td]:text-sm">
+                        <TableBody>
+                            <template v-for="field in fields" #[`cell-${field}`]="{ row: submission }">
+                                <a
+                                    :href="cp_url(`forms/${form}/submissions/${submission.id}`)"
+                                    class="line-clamp-1 overflow-hidden text-ellipsis"
+                                >
+                                    {{ submission[field] }}
+                                </a>
+                            </template>
+                            <template #cell-datestamp="{ row: submission }">
+                                <div
+                                    class="text-end font-mono text-xs whitespace-nowrap text-gray-500 antialiased"
+                                    v-html="formatDate(submission.datestamp)"
+                                />
+                            </template>
+                        </TableBody>
+                    </table>
+                </div>
                 <template #actions>
                     <Pagination />
                     <slot name="actions" />

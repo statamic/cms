@@ -1,4 +1,8 @@
 <template>
+    <Header :title="pageTitle" icon="site">
+        <Button type="submit" variant="primary" @click="submit">{{ __('Save') }}</Button>
+    </Header>
+
     <PublishContainer
         v-if="blueprint"
         ref="container"
@@ -8,13 +12,7 @@
         v-model="values"
         :meta="meta"
         :errors="errors"
-    >
-        <Header :title="pageTitle" icon="site">
-            <Button type="submit" variant="primary" @click="submit">{{ __('Save') }}</Button>
-        </Header>
-
-        <PublishTabs />
-    </PublishContainer>
+    />
 </template>
 
 <script>

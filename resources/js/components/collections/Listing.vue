@@ -32,7 +32,6 @@
                         >
                             <Dropdown placement="left-start" class="me-3">
                                 <DropdownMenu>
-                                    <DropdownLabel :text="__('Actions')" />
                                     <DropdownItem :text="__('View')" icon="eye" :href="collection.entries_url" />
                                     <DropdownItem v-if="collection.url" :text="__('Visit URL')" icon="external-link" target="_blank" :href="collection.url" />
                                     <DropdownItem v-if="collection.editable" :text="__('Configure')" icon="cog" :href="collection.edit_url" />
