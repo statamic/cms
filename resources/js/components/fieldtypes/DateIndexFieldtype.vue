@@ -2,30 +2,31 @@
     <div v-text="formatted"></div>
 </template>
 
-<script>
-import IndexFieldtype from './IndexFieldtype.vue';
+<script setup>
+import { IndexFieldtype as Fieldtype } from 'statamic';
 import DateFormatter from '@statamic/components/DateFormatter.js';
+import { computed } from 'vue';
 
-export default {
-    mixins: [IndexFieldtype],
+const emit = defineEmits(Fieldtype.emits);
+const props = defineProps(Fieldtype.props);
+const { expose } = Fieldtype.use(emit, props);
 
-    computed: {
-        formatted() {
-            if (!this.value) {
-                return null;
-            }
+const formatted = computed(() => {
+    if (!props.value) {
+        return null;
+    }
 
-            const formatter = new DateFormatter().options(this.value.time_enabled ? 'datetime' : 'date');
+    const formatter = new DateFormatter().options(props.value.time_enabled ? 'datetime' : 'date');
 
-            if (this.value.mode === 'range') {
-                let start = new Date(this.value.start);
-                let end = new Date(this.value.end);
+    if (props.value.mode === 'range') {
+        let start = new Date(props.value.start);
+        let end = new Date(props.value.end);
 
-                return formatter.date(start) + ' – ' + formatter.date(end);
-            }
+        return formatter.date(start) + ' – ' + formatter.date(end);
+    }
 
-            return formatter.date(this.value.date).toString();
-        },
-    },
-};
+    return formatter.date(props.value.date).toString();
+});
+
+defineExpose(expose);
 </script>
