@@ -38,7 +38,7 @@ class FileAddonSettingsRepositoryTest extends TestCase
     }
 
     #[Test]
-    public function it_finds_addon_settings_by_id()
+    public function it_gets_addon_settings()
     {
         $addon = $this->makeFromPackage();
 
