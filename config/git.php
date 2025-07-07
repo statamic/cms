@@ -104,6 +104,7 @@ return [
         resource_path('preferences.yaml'),
         resource_path('sites.yaml'),
         storage_path('forms'),
+        storage_path('statamic/addons'),
         public_path('assets'),
     ],
 

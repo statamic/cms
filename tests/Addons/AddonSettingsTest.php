@@ -4,8 +4,10 @@ namespace Tests\Addons;
 
 use Foo\Bar\TestAddonServiceProvider;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Extend\AddonSettingsRepository;
+use Statamic\Events\AddonSettingsSaved;
 use Statamic\Extend\Addon;
 use Statamic\Extend\AddonSettings as AddonSettings;
 use Tests\TestCase;
@@ -78,6 +80,8 @@ class AddonSettingsTest extends TestCase
     #[Test]
     public function it_saves_settings()
     {
+        Event::fake();
+
         $addon = $this->makeFromPackage();
         $settings = new AddonSettings($addon, ['foo' => 'bar', 'baz' => 'qux']);
 
@@ -86,6 +90,8 @@ class AddonSettingsTest extends TestCase
         });
 
         $settings->save();
+
+        Event::assertDispatched(AddonSettingsSaved::class);
     }
 
     #[Test]
