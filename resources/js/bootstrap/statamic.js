@@ -147,7 +147,7 @@ export default {
         this.$app.use(PortalVue, { portalName: 'v-portal' });
         this.$app.use(VueClickAway);
         this.$app.use(FloatingVue, { disposeTimeout: 30000, distance: 10 });
-        this.$app.use(VueComponentDebug);
+        this.$app.use(VueComponentDebug, { enabled: import.meta.env.VITE_VUE_COMPONENT_DEBUG === 'true' });
 
         const portals = markRaw(new Portals());
 
