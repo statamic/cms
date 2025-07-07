@@ -1,24 +1,3 @@
-<script setup>
-import { Input } from '@statamic/ui';
-import { Fieldtype } from 'statamic';
-
-const emit = defineEmits(Fieldtype.emits);
-const props = defineProps(Fieldtype.props);
-const {
-    name,
-    isReadOnly,
-    update,
-    updateDebounced,
-    expose
-} = Fieldtype.use(emit, props);
-
-function inputUpdated(value) {
-    return !props.config.debounce ? update(value) : updateDebounced(value);
-}
-
-defineExpose(expose);
-</script>
-
 <template>
     <Input
         ref="input"
@@ -41,3 +20,24 @@ defineExpose(expose);
         @blur="$emit('blur')"
     />
 </template>
+
+<script setup>
+import { Fieldtype } from 'statamic';
+import { Input } from '@statamic/ui';
+
+const emit = defineEmits(Fieldtype.emits);
+const props = defineProps(Fieldtype.props);
+const {
+    name,
+    isReadOnly,
+    update,
+    updateDebounced,
+    expose
+} = Fieldtype.use(emit, props);
+
+function inputUpdated(value) {
+    return !props.config.debounce ? update(value) : updateDebounced(value);
+}
+
+defineExpose(expose);
+</script>
