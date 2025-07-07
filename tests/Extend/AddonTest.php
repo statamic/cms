@@ -279,7 +279,7 @@ class AddonTest extends TestCase
 
         $settings = $addon->settings();
 
-        $this->assertInstanceOf('Statamic\Extend\AddonSettings', $settings);
+        $this->assertInstanceOf(AddonSettings::class, $settings);
         $this->assertEquals($addon, $settings->addon());
         $this->assertEquals([], $settings->values()->all());
     }

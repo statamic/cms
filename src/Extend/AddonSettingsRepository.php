@@ -9,7 +9,7 @@ use Statamic\Contracts\Extend\AddonSettingsRepository as Contract;
 use Statamic\Facades;
 use Statamic\Facades\YAML;
 
-class FileAddonSettingsRepository implements Contract
+class AddonSettingsRepository implements Contract
 {
     public function make(Addon $addon, array $settings = []): AddonSettingsContract
     {
@@ -58,7 +58,7 @@ class FileAddonSettingsRepository implements Contract
     public static function bindings(): array
     {
         return [
-            AddonSettingsContract::class => FileAddonSettings::class,
+            AddonSettingsContract::class => AddonSettings::class,
         ];
     }
 }

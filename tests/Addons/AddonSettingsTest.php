@@ -7,7 +7,7 @@ use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Extend\AddonSettingsRepository;
 use Statamic\Extend\Addon;
-use Statamic\Extend\FileAddonSettings as AddonSettings;
+use Statamic\Extend\AddonSettings as AddonSettings;
 use Tests\TestCase;
 
 class AddonSettingsTest extends TestCase

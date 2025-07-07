@@ -6,8 +6,8 @@ use Foo\Bar\TestAddonServiceProvider;
 use Illuminate\Support\Facades\File;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Extend\Addon;
-use Statamic\Extend\FileAddonSettings;
-use Statamic\Extend\FileAddonSettingsRepository;
+use Statamic\Extend\AddonSettings;
+use Statamic\Extend\AddonSettingsRepository;
 use Statamic\Facades;
 use Tests\TestCase;
 
@@ -19,7 +19,7 @@ class FileAddonSettingsRepositoryTest extends TestCase
     {
         parent::setUp();
 
-        $this->repository = new FileAddonSettingsRepository;
+        $this->repository = new AddonSettingsRepository;
     }
 
     #[Test]
@@ -32,7 +32,7 @@ class FileAddonSettingsRepositoryTest extends TestCase
             'baz' => 'qux',
         ]);
 
-        $this->assertInstanceOf(FileAddonSettings::class, $settings);
+        $this->assertInstanceOf(AddonSettings::class, $settings);
         $this->assertEquals($addon, $settings->addon());
         $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $settings->values()->all());
     }
@@ -54,7 +54,7 @@ YAML);
 
         $settings = $this->repository->find($addon->id());
 
-        $this->assertInstanceOf(FileAddonSettings::class, $settings);
+        $this->assertInstanceOf(AddonSettings::class, $settings);
         $this->assertEquals($addon, $settings->addon());
         $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $settings->values()->all());
     }
