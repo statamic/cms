@@ -71,7 +71,7 @@ const use = function(emit, props) {
         meta: props.meta,
         update,
         updateMeta,
-        isReadOnly,
+        isReadOnly: isReadOnly.value,
         // store: this.fieldActionStore,
         // storeName: this.fieldActionStoreName,
     }));
