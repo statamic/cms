@@ -10,6 +10,7 @@ import { usePublishContainerStore } from '@statamic/stores/publish-container.js'
 import { watch, provide, getCurrentInstance, ref, onBeforeUnmount, toRef } from 'vue';
 import Component from '@statamic/components/Component.js';
 import { getActivePinia } from 'pinia';
+import Tabs from './Tabs.vue';
 
 const emit = defineEmits(['updated', 'update:visibleValues']);
 
@@ -202,5 +203,7 @@ function saved() {
 </script>
 
 <template>
-    <slot />
+    <slot>
+        <Tabs />
+    </slot>
 </template>
