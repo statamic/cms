@@ -264,17 +264,17 @@ function pushTaggableOption(e) {
                         @paste.prevent="onPaste"
                         @keydown.enter.prevent="pushTaggableOption"
                     />
-                    <button type="button" v-else-if="!searchable && (dropdownOpen || !modelValue)">
+                    <button type="button" class="flex-1 text-start" v-else-if="!searchable && (dropdownOpen || !modelValue)">
                         <span class="text-gray-400 dark:text-gray-500" v-text="placeholder" />
                     </button>
-                    <button type="button" v-else class="cursor-pointer">
+                    <button type="button" v-else class="flex-1 text-start cursor-pointer">
                         <slot name="selected-option" v-bind="{ option: selectedOption }">
                             <span v-if="labelHtml" v-html="getOptionLabel(selectedOption)" />
                             <span v-else v-text="getOptionLabel(selectedOption)" />
                         </slot>
                     </button>
 
-                    <div class="flex items-center">
+                    <div class="flex gap-1 items-center">
                         <Button icon="x" variant="filled" size="xs" round v-if="clearable && modelValue" @click="clear" />
                         <Icon name="ui/chevron-down" />
                     </div>
@@ -334,11 +334,11 @@ function pushTaggableOption(e) {
             :model-value="modelValue"
             @update:modelValue="updateModelValue"
         >
-            <div class="vs__selected-options-outside flex flex-wrap gap-2">
+            <div class="flex flex-wrap gap-2">
                 <div
                     v-for="option in selectedOptions"
                     :key="getOptionValue(option)"
-                    class="vs__selected sortable-item mt-2"
+                    class="sortable-item mt-2"
                 >
                     <Badge pill size="lg">
                         <div v-if="labelHtml" v-html="getOptionLabel(option)"></div>
