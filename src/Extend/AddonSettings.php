@@ -10,7 +10,7 @@ class AddonSettings extends AbstractAddonSettings
 
     public function path()
     {
-        return storage_path('statamic/addons/'.$this->addon()->id().'.yaml');
+        return resource_path("addons/{$this->addon()->slug()}.yaml");
     }
 
     public function fileData()

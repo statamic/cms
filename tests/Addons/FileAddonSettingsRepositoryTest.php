@@ -20,6 +20,8 @@ class FileAddonSettingsRepositoryTest extends TestCase
         parent::setUp();
 
         $this->repository = new AddonSettingsRepository;
+
+        $this->app['files']->ensureDirectoryExists(resource_path('addons'));
     }
 
     #[Test]
@@ -45,9 +47,7 @@ class FileAddonSettingsRepositoryTest extends TestCase
         Facades\Addon::shouldReceive('all')->andReturn(collect([$addon]));
         Facades\Addon::shouldReceive('get')->with('vendor/test-addon')->andReturn($addon);
 
-        File::ensureDirectoryExists(storage_path('statamic/addons/vendor/test-addon'));
-
-        File::put(storage_path('statamic/addons/vendor/test-addon.yaml'), <<<'YAML'
+        File::put(resource_path('addons/test-addon.yaml'), <<<'YAML'
 foo: bar
 baz: qux
 YAML);
@@ -72,9 +72,9 @@ YAML);
 
         $settings->save();
 
-        $this->assertFileExists(storage_path('statamic/addons/vendor/test-addon.yaml'));
+        $this->assertFileExists(resource_path('addons/test-addon.yaml'));
 
-        $this->assertEquals(File::get(storage_path('statamic/addons/vendor/test-addon.yaml')), <<<'YAML'
+        $this->assertEquals(File::get(resource_path('addons/test-addon.yaml')), <<<'YAML'
 foo: bar
 baz: qux
 
@@ -89,15 +89,13 @@ YAML);
         Facades\Addon::shouldReceive('all')->andReturn(collect([$addon]));
         Facades\Addon::shouldReceive('get')->with('vendor/test-addon')->andReturn($addon);
 
-        File::ensureDirectoryExists(storage_path('statamic/addons/vendor/test-addon'));
-
-        File::put(storage_path('statamic/addons/vendor/test-addon.yaml'), '');
+        File::put(resource_path('addons/test-addon.yaml'), '');
 
         $settings = $this->repository->find($addon->id());
 
         $settings->delete();
 
-        $this->assertFileDoesNotExist(storage_path('statamic/addons/vendor/test-addon.yaml'));
+        $this->assertFileDoesNotExist(resource_path('addons/test-addon.yaml'));
     }
 
     private function makeFromPackage($attributes = [])

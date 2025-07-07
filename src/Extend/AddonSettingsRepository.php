@@ -18,7 +18,9 @@ class AddonSettingsRepository implements Contract
 
     public function find(string $addon): ?AddonSettingsContract
     {
-        $path = storage_path('statamic/addons/'.$addon.'.yaml');
+        $slug = Str::after($addon, '/');
+
+        $path = resource_path("addons/{$slug}.yaml");
 
         if (! File::exists($path)) {
             return null;
@@ -29,7 +31,7 @@ class AddonSettingsRepository implements Contract
 
     public function save(AddonSettingsContract $settings): bool
     {
-        File::ensureDirectoryExists(dirname($settings->path()));
+        File::ensureDirectoryExists(resource_path('addons'));
 
         File::put($settings->path(), $settings->fileContents());
 
@@ -47,10 +49,7 @@ class AddonSettingsRepository implements Contract
     {
         $yaml = YAML::file($path)->parse();
 
-        $vendor = Str::of($path)->beforeLast('/')->afterLast('/')->__toString();
-        $package = Str::of($path)->afterLast('/')->before('.yaml')->__toString();
-
-        $addon = Facades\Addon::get("{$vendor}/{$package}");
+        $addon = Facades\Addon::all()->first(fn ($addon) => $addon->slug() === basename($path, '.yaml'));
 
         return $this->make($addon, $yaml);
     }

@@ -26,7 +26,7 @@ class AddonTest extends TestCase
 
         $this->addonFixtureDir = Path::tidy(realpath(__DIR__.'/../Fixtures/Addon').'/');
 
-        $this->app['files']->deleteDirectory(storage_path('statamic/addons'));
+        $this->app['files']->deleteDirectory(resource_path('addons'));
     }
 
     #[Test]
