@@ -144,7 +144,7 @@ return [
     'form_create_description' => 'Get started by creating your first form.',
     'getting_started_widget_blueprints' => 'Blueprints define the custom fields used to create and store content.',
     'getting_started_widget_collections' => 'Collections contain the different types of content in the site.',
-    'getting_started_widget_docs' => 'Learn Statamic\'s capabilities the right way',
+    'getting_started_widget_docs' => 'Learn Statamic\'s capabilities the right way.',
     'getting_started_widget_header' => 'Getting Started with Statamic',
     'getting_started_widget_intro' => 'Start building your new Statamic site with these steps.',
     'getting_started_widget_navigation' => 'Create multi-level lists of links for navbars, footers, and more',
