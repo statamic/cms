@@ -20,7 +20,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
         <ui-panel class="h-full flex flex-col">
-            <ui-panel-header class="flex items-center justify-between">
+            <ui-panel-header class="flex items-center justify-between min-h-10">
                 <ui-heading>{{ __('Content Stache') }}</ui-heading>
                 <div class="flex gap-2">
                     <form method="POST" action="{{ cp_route('utilities.cache.warm', 'stache') }}">
@@ -61,7 +61,7 @@
         </ui-panel>
 
         <ui-panel class="h-full flex flex-col">
-            <ui-panel-header class="flex items-center justify-between">
+            <ui-panel-header class="flex items-center justify-between min-h-10">
                 <ui-heading>{{ __('Static Page Cache') }}</ui-heading>
                 @if ($static['enabled'])
                     <div class="flex gap-2">
@@ -88,7 +88,7 @@
         </ui-panel>
 
         <ui-panel class="h-full flex flex-col">
-            <ui-panel-header class="flex items-center justify-between">
+            <ui-panel-header class="flex items-center justify-between min-h-10">
                 <ui-heading>{{ __('Application Cache') }}</ui-heading>
                 <div class="flex gap-2">
                     <form method="POST" action="{{ cp_route('utilities.cache.clear', 'application') }}">
@@ -108,7 +108,7 @@
         </ui-panel>
 
         <ui-panel class="h-full flex flex-col">
-            <ui-panel-header class="flex items-center justify-between">
+            <ui-panel-header class="flex items-center justify-between min-h-10">
                 <ui-heading>{{ __('Image Cache') }}</ui-heading>
                 <div class="flex gap-2">
                     <form method="POST" action="{{ cp_route('utilities.cache.clear', 'image') }}">
