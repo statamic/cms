@@ -254,6 +254,7 @@ class AddonTest extends TestCase
     public function it_gets_settings()
     {
         $addon = $this->makeFromPackage();
+        Facades\Addon::shouldReceive('all')->andReturn(collect([$addon]));
         Facades\Addon::shouldReceive('get')->with('vendor/test-addon')->andReturn($addon);
 
         app(AddonSettingsRepository::class)->make($addon, [
