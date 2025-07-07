@@ -2,7 +2,7 @@ import debounce from '@statamic/util/debounce.js';
 import mixin from './Fieldtype.vue';
 import emits from './emits.js';
 import props from './props.js';
-import { computed, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import FieldAction from '@statamic/components/field-actions/FieldAction.js';
 import toFieldActions from '@statamic/components/field-actions/toFieldActions.js';
 
@@ -24,11 +24,19 @@ const use = function(emit, props) {
         );
     });
 
+    const customReplicatorPreview = ref(null);
+
     const replicatorPreview = computed(() => {
         if (!props.showFieldPreviews || !props.config.replicator_preview) return;
 
+        if (customReplicatorPreview.value) return customReplicatorPreview.value.value;
+
         return props.value;
     });
+
+    function defineReplicatorPreview(definition) {
+        customReplicatorPreview.value = computed(definition);
+    }
 
     const fieldPathKeys = computed(() => {
         const prefix = props.fieldPathPrefix || props.handle;
@@ -95,6 +103,7 @@ const use = function(emit, props) {
         name,
         isReadOnly,
         replicatorPreview,
+        defineReplicatorPreview,
         fieldPathKeys,
         defineFieldActions,
         fieldActions,
