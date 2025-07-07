@@ -58,14 +58,14 @@ const use = function(emit, props) {
 
     const fieldActionPayload = computed(() => ({
         // vm: this,
-        // fieldPathPrefix: this.fieldPathPrefix,
-        // handle: this.handle,
+        fieldPathPrefix: props.fieldPathPrefix,
+        handle: props.handle,
         value: props.value,
-        // config: this.config,
-        // meta: this.meta,
+        config: props.config,
+        meta: props.meta,
         update,
-        // updateMeta: this.updateMeta,
-        // isReadOnly: this.isReadOnly,
+        updateMeta,
+        isReadOnly,
         // store: this.fieldActionStore,
         // storeName: this.fieldActionStoreName,
     }));
