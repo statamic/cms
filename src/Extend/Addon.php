@@ -389,6 +389,24 @@ final class Addon
         return $settings;
     }
 
+    public function settingsUrl()
+    {
+        if (! $this->hasSettingsBlueprint()) {
+            return null;
+        }
+
+        return cp_route('addons.settings.edit', $this->slug());
+    }
+
+    public function updatesUrl()
+    {
+        if (! $this->existsOnMarketplace()) {
+            return null;
+        }
+
+        return cp_route('updater.product', $this->marketplaceSlug());
+    }
+
     /**
      * Get addon changelog.
      *

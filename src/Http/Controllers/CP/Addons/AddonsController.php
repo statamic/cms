@@ -22,8 +22,8 @@ class AddonsController extends CpController
                 'developer' => $addon->developer() ?? $addon->marketplaceSellerSlug(),
                 'description' => $addon->description(),
                 'marketplace_url' => $addon->marketplaceUrl(),
-                'updates_url' => $addon->marketplaceSlug() ? cp_route('updater.product', $addon->marketplaceSlug()) : null,
-                'settings_url' => $addon->hasSettingsBlueprint() ? cp_route('addons.settings.edit', $addon->slug()) : null,
+                'updates_url' => $addon->updatesUrl(),
+                'settings_url' => $addon->settingsUrl(),
             ])->values()->all(),
             'columns' => [
                 Column::make('name'),

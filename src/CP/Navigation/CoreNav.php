@@ -9,6 +9,7 @@ use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Globals\GlobalSet;
 use Statamic\Contracts\Structures\Nav as NavContract;
 use Statamic\Contracts\Taxonomies\Taxonomy;
+use Statamic\Facades\Addon;
 use Statamic\Facades\AssetContainer as AssetContainerAPI;
 use Statamic\Facades\Collection as CollectionAPI;
 use Statamic\Facades\CP\Nav;
@@ -262,7 +263,17 @@ class CoreNav
         Nav::tools('Addons')
             ->route('addons.index')
             ->icon('addons')
-            ->can('configure addons');
+            ->can('configure addons')
+            ->children(function () {
+                return Addon::all()
+                    ->filter->hasSettingsBlueprint()
+                    ->sortBy->name()
+                    ->map(function ($addon) {
+                        return Nav::item($addon->name())
+                            ->url($addon->settingsUrl())
+                            ->icon('cog');
+                    });
+            });
 
         if (Stache::duplicates()->isNotEmpty()) {
             Nav::tools('Duplicate IDs')
