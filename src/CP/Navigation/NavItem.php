@@ -20,7 +20,6 @@ class NavItem
     protected $url;
     protected $icon;
     protected $children;
-    protected $hasImplicitChildren;
     protected $isChild;
     protected $wasOriginallyChild;
     protected $authorization;
@@ -233,14 +232,6 @@ class NavItem
             return $this->children;
         }
 
-        if ($items === true) {
-            $this->hasImplicitChildren = true;
-
-            return $this;
-        } elseif ($items) {
-            $this->hasImplicitChildren = false;
-        }
-
         if (is_callable($items)) {
             $this->children = $items;
 
@@ -299,14 +290,6 @@ class NavItem
             '/create',
             '/edit',
         ]);
-    }
-
-    /**
-     * Check if this nav item has implicit children by assuming nested URL conventions.
-     */
-    protected function hasImplicitChildren(): bool
-    {
-        return (bool) $this->hasImplicitChildren;
     }
 
     /**
@@ -410,7 +393,6 @@ class NavItem
         if ($this->currentUrlIsNotExplicitlyReferencedInNav()) {
             switch (true) {
                 case $this->currentUrlIsRestfulDescendant():
-                case $this->hasImplicitChildren():
                 case $this->wasOriginallyChild():
                     return $this->isActiveByPattern($this->active);
             }
