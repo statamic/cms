@@ -6,6 +6,7 @@ import { cva } from 'cva';
 
 const props = defineProps({
     href: { type: String, default: null },
+    target: { type: String, default: '_self' },
     icon: { type: String, default: null },
     text: { type: String, default: null },
     variant: { type: String, default: 'default' },
@@ -41,7 +42,8 @@ const iconClasses = cva({
         :class="classes"
         data-ui-dropdown-item
         :as="href ? 'a' : 'div'"
-        :href="href"
+        :href
+        :target
     >
         <div v-if="icon" class="flex size-6 items-center justify-center p-1">
             <Icon :name="icon" :class="iconClasses" />

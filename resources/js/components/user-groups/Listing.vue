@@ -40,7 +40,8 @@ function removeRow(row) {
             <span class="font-mono text-xs">{{ handle }}</span>
         </template>
         <template #prepended-row-actions="{ row: group }">
-            <DropdownItem :text="__('Edit')" icon="edit" :href="group.edit_url" />
+            <DropdownItem :text="__('View')" icon="eye" :href="group.show_url" />
+            <DropdownItem :text="__('Configure')" icon="cog" :href="group.edit_url" />
             <DropdownItem
                 :text="__('Delete')"
                 icon="trash"

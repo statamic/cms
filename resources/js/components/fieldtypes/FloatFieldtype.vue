@@ -1,7 +1,7 @@
 <template>
     <Input
         type="text"
-        tabindex="0"
+        :tabindex="0"
         :name="name"
         :focus="focus"
         :model-value="value"

@@ -17,8 +17,14 @@ class DashboardController extends CpController
      */
     public function index(Loader $loader)
     {
-        return view('statamic::dashboard', [
-            'widgets' => $this->getDisplayableWidgets($loader),
+        $widgets = $this->getDisplayableWidgets($loader);
+
+        if ($widgets->isEmpty()) {
+            return view('statamic::dashboard.empty');
+        }
+
+        return view('statamic::dashboard.dashboard', [
+            'widgets' => $widgets,
         ]);
     }
 
@@ -37,6 +43,10 @@ class DashboardController extends CpController
                 return is_string($config) ? ['type' => $config] : $config;
             })
             ->filter(function ($config) {
+                if ($config['type'] === 'getting_started') {
+                    return false;
+                }
+
                 if (! $sites = $config['sites'] ?? null) {
                     return true;
                 }

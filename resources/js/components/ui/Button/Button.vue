@@ -43,7 +43,8 @@ const buttonClasses = computed(() => {
             size: {
                 lg: 'px-6 h-12 text-base gap-2 rounded-lg text-base',
                 base: 'px-4 h-10 text-sm gap-2 rounded-lg',
-                sm: 'px-3 h-8 text-[0.8125rem] leading-none gap-2 rounded-lg [&_svg]:size-2.5',
+                sm: 'px-3 h-8 text-[0.8125rem] leading-tight gap-2 rounded-lg [&_svg]:size-3',
+                sm_compact: 'px-3 w-6 h-8 text-[0.8125rem] leading-tight gap-2 rounded-lg [&_svg]:size-3',
                 xs: 'px-2 h-6.5 text-xs gap-1.5 rounded-md [&_svg]:size-2.5',
             },
             groupBorder: {
@@ -61,6 +62,7 @@ const buttonClasses = computed(() => {
         compoundVariants: [
             { iconOnly: true, size: 'base', class: 'w-10 [&_svg]:size-4.5' },
             { iconOnly: true, size: 'sm', class: 'w-8 [&_svg]:size-3.5' },
+            { iconOnly: true, size: 'sm_compact', class: 'w-6 [&_svg]:size-3.5' },
             { iconOnly: true, size: 'xs', class: 'w-6.5 [&_svg]:size-3' },
             { iconOnly: false, iconAppend: true, class: '[&_svg]:-me-1' },
             { iconOnly: false, iconPrepend: true, class: '[&_svg]:-ms-0.5' },
@@ -89,7 +91,8 @@ const buttonClasses = computed(() => {
         <Icon v-if="icon" :name="icon" />
         <Icon v-if="loading" name="loading" :size />
 
-        <div class="trim-text-start">
+        <!-- =Jay. trim-text-start seems to make smaller buttons look worse such as the collections index "Create Entry" buttons -->
+        <div :class="{ 'trim-text-start': size !== 'xs' && size !== 'sm' }">
             <slot v-if="hasDefaultSlot" />
             <template v-else>{{ text }}</template>
         </div>

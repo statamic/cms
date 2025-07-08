@@ -225,7 +225,6 @@ class ExtensionServiceProvider extends ServiceProvider
 
     protected $widgets = [
         Widgets\Collection::class,
-        Widgets\GettingStarted::class,
         Widgets\Header::class,
         Widgets\Template::class,
         Widgets\Updater::class,

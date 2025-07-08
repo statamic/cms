@@ -1,11 +1,13 @@
-import FieldAction from './FieldAction';
+import toFieldActions from './toFieldActions.js';
 
 export default {
     computed: {
         fieldActions() {
-            return [...this.$fieldActions.get(this.$options.name), ...this.internalFieldActions]
-                .map((action) => new FieldAction(action, this.fieldActionPayload))
-                .filter((action) => action.visible);
+            return toFieldActions(
+                this.fieldActionBinding,
+                this.fieldActionPayload,
+                this.internalFieldActions,
+            );
         },
 
         internalFieldActions() {
@@ -15,5 +17,9 @@ export default {
         fieldActionPayload() {
             return {};
         },
+
+        fieldActionBinding() {
+            return this.config.type + '-fieldtype';
+        }
     },
 };

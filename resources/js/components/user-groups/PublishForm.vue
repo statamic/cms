@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="max-w-5xl mx-auto">
         <Header :title="__(title)" icon="groups">
             <Dropdown v-if="canEditBlueprint" class="me-2">
                 <template #trigger>
@@ -15,35 +15,24 @@
             <slot name="action-buttons-right" />
         </Header>
 
-        <publish-container
+        <PublishContainer
             v-if="fieldset"
             ref="container"
             :name="publishContainer"
             :blueprint="fieldset"
-            :values="values"
+            v-model="values"
             :reference="initialReference"
             :meta="meta"
             :errors="errors"
-            @updated="values = $event"
-            v-slot="{ container, setFieldValue, setFieldMeta }"
-        >
-            <div>
-                <publish-tabs
-                    :enable-sidebar="false"
-                    @updated="setFieldValue"
-                    @meta-updated="setFieldMeta"
-                    @focus="container.$emit('focus', $event)"
-                    @blur="container.$emit('blur', $event)"
-                ></publish-tabs>
-            </div>
-        </publish-container>
+            as-config
+        />
     </div>
 </template>
 
 <script>
 import HasHiddenFields from '../publish/HasHiddenFields';
 import clone from '@statamic/util/clone.js';
-import { Header, Button, Dropdown, DropdownMenu, DropdownItem } from '@statamic/ui';
+import { Header, Button, Dropdown, DropdownMenu, DropdownItem, PublishContainer, PublishTabs } from '@statamic/ui';
 
 export default {
     mixins: [HasHiddenFields],
@@ -54,6 +43,8 @@ export default {
         Dropdown,
         DropdownMenu,
         DropdownItem,
+        PublishContainer,
+        PublishTabs
     },
 
     props: {

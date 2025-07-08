@@ -69,9 +69,9 @@ const perPageOptions = computed(() => {
 
 const isPerPageEvenUseful = computed(() => props.resourceMeta.total > perPageOptions.value[0].value);
 const showPerPageSelector = computed(() => props.showPerPageSelector && isPerPageEvenUseful.value);
-const fromItem = computed(() => props.resourceMeta.from || 0);
-const toItem = computed(() => props.resourceMeta.to || 0);
 const totalItems = computed(() => props.resourceMeta.total);
+const fromItem = computed(() => props.resourceMeta.from || 0);
+const toItem = computed(() => Math.min(props.resourceMeta.to, totalItems.value));
 
 function selectPage(page) {
     if (page === currentPage.value) {

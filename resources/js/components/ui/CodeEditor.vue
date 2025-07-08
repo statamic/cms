@@ -39,56 +39,20 @@ import 'codemirror/mode/yaml-frontmatter/yaml-frontmatter';
 const emit = defineEmits(['update:mode', 'update:model-value', 'focus', 'blur']);
 
 const props = defineProps({
-    theme: {
-        type: String,
-        default: 'material',
-    },
-    rulers: {
-        type: Object,
-        default: () => {},
-    },
-    disabled: {
-        type: Boolean,
-        default: false,
-    },
-    keyMap: {
-        type: String,
-        default: 'sublime',
-    },
-    tabSize: {
-        type: Number,
-        required: false,
-    },
-    indentType: {
-        type: String,
-        default: 'tabs',
-    },
-    lineNumbers: {
-        type: Boolean,
-        default: true,
-    },
-    lineWrapping: {
-        type: Boolean,
-        default: true,
-    },
-    allowModeSelection: {
-        type: Boolean,
-        default: true,
-    },
-    showModeLabel: {
-        type: Boolean,
-        default: true,
-    },
-    mode: String,
-    modelValue: String,
-    title: {
-        type: String,
-        default: () => __('Code Editor'),
-    },
-    fieldActions: {
-        type: Array,
-        default: () => [],
-    },
+    theme: { type: String, default: 'material' },
+    rulers: { type: Object, default: () => {} },
+    disabled: { type: Boolean, default: false },
+    keyMap: { type: String, default: 'sublime' },
+    tabSize: { type: Number, required: false },
+    indentType: { type: String, default: 'tabs' },
+    lineNumbers: { type: Boolean, default: true },
+    lineWrapping: { type: Boolean, default: true },
+    allowModeSelection: { type: Boolean, default: true },
+    showModeLabel: { type: Boolean, default: true },
+    mode: { type: String, default: 'javascript' },
+    modelValue: { type: String, default: '' },
+    title: { type: String, default: () => __('Code Editor') },
+    fieldActions: { type: Array, default: () => [] },
 });
 
 const modes = ref([
@@ -255,7 +219,7 @@ watch(
         <div
             :class="[
                 '@container/markdown block w-full overflow-hidden rounded-lg bg-white dark:bg-gray-900',
-                'border border-gray-300 dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:inset-shadow-2xs dark:inset-shadow-black',
+                // 'border border-gray-300 dark:border-x-0 dark:border-t-0 dark:border-white/15 dark:inset-shadow-2xs dark:inset-shadow-black',
                 'text-gray-800 dark:text-gray-300',
                 'shadow-ui-sm not-prose appearance-none antialiased disabled:shadow-none',
                 themeClass,
@@ -280,12 +244,12 @@ watch(
                 <div v-else-if="showModeLabel" v-text="modeLabel" class="font-mono text-xs text-gray-700"></div>
             </publish-field-fullscreen-header>
             <div
-                class="flex items-center justify-between rounded-t-xl border-b border-gray-300 bg-gray-50 px-2 py-1 dark:border-white/15 dark:bg-gray-950"
+                class="flex items-center justify-between rounded-t-lg bg-gray-50 px-2 py-1 dark:bg-gray-950 border border-b-0 border-gray-300 dark:border-none"
                 v-if="showToolbar"
             >
                 <div>
                     <Select
-                        class="w-32"
+                        class="w-auto"
                         size="xs"
                         v-if="allowModeSelection"
                         :options="modes"

@@ -11,7 +11,7 @@
             <ui-dropdown placement="left-start" class="me-2">
                 <ui-dropdown-menu>
                     @can('edit', $form)
-                        <ui-dropdown-item :text="__('Edit Form')" icon="edit" href="{{ $form->editUrl() }}"></ui-dropdown-item>
+                        <ui-dropdown-item :text="__('Configure Form')" icon="cog" href="{{ $form->editUrl() }}"></ui-dropdown-item>
                     @endcan
 
                     @can('configure form fields')

@@ -26,9 +26,9 @@
                     </div>
 
                     <div class="flex items-center">
-                        <ui-button v-if="canDefineLocalizable" size="sm" icon="earth" variant="subtle" v-tooltip="__('Localizable')" @click="localizable = !localizable" />
-                        <ui-button size="sm" icon="duplicate" variant="subtle" @click.prevent="$emit('duplicate')" v-tooltip="__('Duplicate')" />
-                        <ui-button size="sm" icon="trash" variant="subtle" @click.prevent="$emit('deleted')" v-tooltip="__('Remove')" />
+                        <ui-button v-if="canDefineLocalizable" size="sm_compact" icon="earth" variant="subtle" v-tooltip="__('Localizable')" @click="localizable = !localizable" />
+                        <ui-button size="sm_compact" icon="duplicate" variant="subtle" @click.prevent="$emit('duplicate')" v-tooltip="__('Duplicate')" />
+                        <ui-button size="sm_compact" icon="trash" variant="subtle" @click.prevent="$emit('deleted')" v-tooltip="__('Remove')" />
                     </div>
 
                     <stack name="field-settings" v-if="isEditing" @closed="editorClosed">

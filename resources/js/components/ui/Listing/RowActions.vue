@@ -58,7 +58,6 @@ function dropdownHovered(loadActions) {
     >
         <Dropdown @mouseover="dropdownHovered(loadActions)" placement="left-start" class="me-3">
             <DropdownMenu>
-                <DropdownLabel :text="__('Actions')" />
                 <slot name="prepended-actions" :row="row" />
                 <DropdownSeparator v-if="$slots['prepended-actions'] && actions.length" />
                 <DropdownItem

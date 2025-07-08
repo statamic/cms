@@ -1,5 +1,4 @@
 @import './vendors/codemirror.css';
-@import './vendors/vue-select.css';
 
 @import './core/animation.css';
 @import './core/layout.css';
@@ -65,7 +64,6 @@
 @import './components/fieldtypes/section.css';
 @import './components/fieldtypes/spacer.css';
 @import './components/fieldtypes/table.css';
-@import './components/fieldtypes/tags.css';
 @import './components/fieldtypes/width.css';
 @import './components/fieldtypes/video.css';
 @import './components/fieldtypes/yaml.css';

@@ -7,11 +7,12 @@ export const [injectContainerContext, provideContainerContext] = createContext('
 <script setup>
 import uniqid from 'uniqid';
 import { usePublishContainerStore } from '@statamic/stores/publish-container.js';
-import { watch, provide, getCurrentInstance, ref, onBeforeUnmount } from 'vue';
+import { watch, provide, getCurrentInstance, ref, onBeforeUnmount, toRef } from 'vue';
 import Component from '@statamic/components/Component.js';
 import { getActivePinia } from 'pinia';
+import Tabs from './Tabs.vue';
 
-const emit = defineEmits(['updated']);
+const emit = defineEmits(['updated', 'update:visibleValues']);
 
 const container = getCurrentInstance();
 
@@ -26,7 +27,7 @@ const props = defineProps({
     blueprint: {
         type: Object,
     },
-    values: {
+    modelValue: {
         type: Object,
         default: () => ({}),
     },
@@ -72,10 +73,14 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    asConfig: {
+        type: Boolean,
+        default: false,
+    }
 });
 
 const store = usePublishContainerStore(props.name, {
-    values: props.values,
+    values: props.modelValue,
     extraValues: props.extraValues,
     meta: props.meta,
     originValues: props.originValues,
@@ -91,7 +96,7 @@ const store = usePublishContainerStore(props.name, {
 const components = ref([]);
 
 watch(
-    () => props.values,
+    () => props.modelValue,
     (values) => store.setValues(values),
     { deep: true },
 );
@@ -103,6 +108,12 @@ watch(
         if (props.trackDirtyState) dirty();
         emit('updated', values);
     },
+    { deep: true },
+);
+
+watch(
+    () => store.visibleValues,
+    (values) => emit('update:visibleValues', values),
     { deep: true },
 );
 
@@ -162,6 +173,7 @@ provideContainerContext({
     desyncField,
     container,
     components,
+    asConfig: toRef(() => props.asConfig),
 });
 
 defineExpose({
@@ -191,5 +203,7 @@ function saved() {
 </script>
 
 <template>
-    <slot :values="values" />
+    <slot>
+        <Tabs />
+    </slot>
 </template>

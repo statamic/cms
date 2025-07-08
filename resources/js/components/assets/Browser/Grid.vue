@@ -22,7 +22,7 @@
                 "
             >
                 <ItemActions
-                    :url="actionUrl"
+                    :url="folderActionUrl"
                     :actions="folderActions(folder)"
                     :item="folder.path"
                     @started="actionStarted"
@@ -129,7 +129,6 @@
                                 <div class="absolute end-2 top-1">
                                     <Dropdown placement="left-start">
                                         <DropdownMenu>
-                                            <DropdownLabel :text="__('Actions')" />
                                             <DropdownItem
                                                 :text="__(canEdit ? 'Edit' : 'View')"
                                                 @click="edit(asset.id)"
@@ -150,7 +149,6 @@
                             </div>
                         </template>
                         <ContextMenu>
-                            <ContextLabel :text="__('Actions')" />
                             <ContextItem icon="edit" :text="__(canEdit ? 'Edit' : 'View')" @click="edit(asset.id)" />
                             <ContextSeparator />
                             <ContextItem

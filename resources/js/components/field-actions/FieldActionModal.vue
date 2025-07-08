@@ -17,10 +17,9 @@
                     v-if="hasFields && !resolving"
                     :name="containerName"
                     :blueprint="blueprint"
-                    :values="values"
+                    v-model="values"
                     :meta="meta"
                     :errors="errors"
-                    @updated="values = $event"
                 >
                     <FieldsProvider :fields="blueprint.tabs[0].fields">
                         <PublishFields />

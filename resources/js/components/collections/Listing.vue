@@ -32,10 +32,9 @@
                         >
                             <Dropdown placement="left-start" class="me-3">
                                 <DropdownMenu>
-                                    <DropdownLabel :text="__('Actions')" />
                                     <DropdownItem :text="__('View')" icon="eye" :href="collection.entries_url" />
                                     <DropdownItem v-if="collection.url" :text="__('Visit URL')" icon="external-link" target="_blank" :href="collection.url" />
-                                    <DropdownItem v-if="collection.editable" :text="__('Edit Collection')" icon="edit" :href="collection.edit_url" />
+                                    <DropdownItem v-if="collection.editable" :text="__('Configure')" icon="cog" :href="collection.edit_url" />
                                     <DropdownItem v-if="collection.blueprint_editable" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="collection.blueprints_url" />
                                     <DropdownItem v-if="collection.editable" :text="__('Scaffold Views')" icon="scaffold" :href="collection.scaffold_url" />
                                     <DropdownSeparator v-if="actions.length" />
@@ -73,7 +72,7 @@
                                     </div>
                                 </template>
                                 <template #cell-date="{ row: entry }" v-if="collection.dated">
-                                    <div class="text-end font-mono text-gray-400 ps-6">
+                                    <div class="text-end font-mono text-xs text-gray-500 ps-6">
                                         <date-time :of="entry.date" date-only />
                                     </div>
                                 </template>
@@ -139,7 +138,7 @@
         <template #prepended-row-actions="{ row: collection }">
             <DropdownItem :text="__('View')" icon="eye" :href="collection.entries_url" />
             <DropdownItem v-if="collection.url" :text="__('Visit URL')" icon="external-link" target="_blank" :href="collection.url" />
-            <DropdownItem v-if="collection.editable" :text="__('Edit Collection')" icon="edit" :href="collection.edit_url" />
+            <DropdownItem v-if="collection.editable" :text="__('Configure')" icon="cog" :href="collection.edit_url" />
             <DropdownItem v-if="collection.blueprint_editable" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="collection.blueprints_url" />
             <DropdownItem v-if="collection.editable" :text="__('Scaffold Views')" icon="scaffold" :href="collection.scaffold_url" />
         </template>

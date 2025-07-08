@@ -1,9 +1,11 @@
 <script>
 import HasFieldActions from '../field-actions/HasFieldActions';
 import debounce from '@statamic/util/debounce.js';
+import props from './props.js';
+import emits from './emits.js';
 
 export default {
-    emits: ['update:value', 'focus', 'blur', 'meta-updated', 'replicator-preview-updated'],
+    emits,
 
     mixins: [HasFieldActions],
 
@@ -18,39 +20,7 @@ export default {
         },
     },
 
-    props: {
-        value: {
-            required: true,
-        },
-        config: {
-            type: Object,
-            default: () => {
-                return {};
-            },
-        },
-        handle: {
-            type: String,
-            required: true,
-        },
-        meta: {
-            type: Object,
-            default: () => {
-                return {};
-            },
-        },
-        readOnly: {
-            type: Boolean,
-            default: false,
-        },
-        showFieldPreviews: {
-            type: Boolean,
-            default: false,
-        },
-        namePrefix: String,
-        fieldPathPrefix: String,
-        metaPathPrefix: String,
-        id: String,
-    },
+    props,
 
     methods: {
         update(value) {
@@ -96,6 +66,7 @@ export default {
             return prefix.split('.');
         },
 
+        // Deprecated, use `this.id`/`props.id` instead
         fieldId() {
             return this.id;
         },

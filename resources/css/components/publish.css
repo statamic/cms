@@ -50,7 +50,7 @@ code.parent-url {
 
     aside & {
         /* Decrease */
-        @apply gap-2;
+        @apply gap-x-2 gap-y-3 lg:gap-y-6;
     }
 
     .form-group {
@@ -72,11 +72,6 @@ code.parent-url {
 .field-grid {
     > * {
         grid-column: span var(--col-span, var(--grid-columns));
-    }
-    /* Target the group of icon buttons e.g. localisation, duplicate, delete */
-    [data-ui-card] :has(> button):has(svg) button {
-        /* Decrease the width of this sm button slightly, which is usually calc(var(--spacing) * 8) */
-        width: calc(var(--spacing) * 6.75);
     }
 }
 

@@ -37,7 +37,7 @@ function removeFieldFilter(handle) {
     <div class="flex flex-1 items-center gap-3 overflow-x-auto">
         <Modal :title="__('Apply Filters')">
             <template #trigger>
-                <Button icon="filter" class="relative" :disabled="reorderable">
+                <Button icon="filter-2" class="relative [&_svg]:size-3.5" :disabled="reorderable">
                     {{ __('Filter') }}
                     <Badge
                         v-if="badgeCount"

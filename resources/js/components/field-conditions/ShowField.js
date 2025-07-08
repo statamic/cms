@@ -11,7 +11,9 @@ export default class {
 
     showField(field, dottedKey) {
         let dottedFieldPath = dottedKey || field.handle;
-        let dottedPrefix = dottedKey ? dottedKey.replace(new RegExp('\.' + field.handle + '$'), '') : '';
+
+        let dottedPrefix =
+            dottedKey && dottedKey.includes('.') ? dottedKey.replace(new RegExp('\.' + field.handle + '$'), '') : '';
 
         // If we know the field is to permanently hidden, bypass validation.
         if (field.visibility === 'hidden' || this.shouldForceHiddenField(dottedFieldPath)) {

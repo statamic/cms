@@ -18,7 +18,8 @@
 @utility trim-text-start {
     text-box: trim-start;
     /* =Jay. When we have an SVG we probably don't want to text trim, for example in a Markdown field with button controls like Bold, Italic, etc. */
-    &:has(svg) {
+    &:has(svg),
+    &:has(+ svg) {
         display: flex;
     }
     /* =Jay. Exceptions */

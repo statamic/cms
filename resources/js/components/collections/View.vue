@@ -9,10 +9,9 @@
                 @completed="actionCompleted"
                 v-slot="{ actions }"
             >
-                <Dropdown placement="left-start" class="me-2">
+                <Dropdown placement="left-start">
                     <DropdownMenu>
-                        <DropdownLabel :text="__('Actions')" />
-                        <DropdownItem v-if="canEdit" :text="__('Edit Collection')" icon="edit" :href="editUrl" />
+                        <DropdownItem v-if="canEdit" :text="__('Configure Collection')" icon="cog" :href="editUrl" />
                         <DropdownItem v-if="canEditBlueprints" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="blueprintsUrl" />
                         <DropdownItem v-if="canEdit" :text="__('Scaffold Views')" icon="scaffold" :href="scaffoldUrl" />
                         <DropdownSeparator v-if="canEdit || canEditBlueprints || actions.length" />
@@ -28,58 +27,46 @@
                 </Dropdown>
             </ItemActions>
 
-            <div class="btn-group ltr:mr-4 rtl:ml-4" v-if="canUseStructureTree && !treeIsDirty">
-                <button
-                    class="btn flex items-center px-4"
-                    @click="view = 'tree'"
-                    :class="{ active: view === 'tree' }"
-                    v-tooltip="__('Tree')"
-                >
-                    <svg-icon name="light/structures" class="h-4 w-4" />
-                </button>
-                <button
-                    class="btn flex items-center px-4"
-                    @click="view = 'list'"
-                    :class="{ active: view === 'list' }"
-                    v-tooltip="__('List')"
-                >
-                    <svg-icon name="assets-mode-table" class="h-4 w-4" />
-                </button>
-            </div>
-
             <template v-if="view === 'tree'">
-                <a
-                    class="text-2xs text-blue-600 underline ltr:mr-4 rtl:ml-4"
+                <ui-button
                     v-if="treeIsDirty"
-                    v-text="__('Discard changes')"
+                    variant="filled"
+                    :text="__('Discard changes')"
                     @click="cancelTreeProgress"
                 />
 
                 <site-selector
                     v-if="sites.length > 1"
-                    class="ltr:mr-4 rtl:ml-4"
                     :sites="sites"
                     :value="site"
                     @input="site = $event.handle"
                 />
 
                 <Button
-                    :class="{ disabled: !treeIsDirty, 'btn-danger': deletedEntries.length }"
+                    v-if="treeIsDirty"
                     :disabled="!treeIsDirty"
+                    :text="__('Save Changes')"
+                    :variant="deletedEntries.length ? 'danger' : 'default'"
                     @click="saveTree"
-                    v-text="__('Save Changes')"
-                    v-tooltip="
-                        deletedEntries.length
-                            ? __n('An entry will be deleted|:count entries will be deleted', deletedEntries.length)
-                            : null
-                    "
+                    v-tooltip="deletedEntries.length ? __n('An entry will be deleted|:count entries will be deleted', deletedEntries.length) : null"
                 />
             </template>
+
+            <ui-button
+                v-if="canCreateCollections"
+                :href="createUrl"
+                :text="__('Create Collection')"
+                variant="primary"
+            />
+
+            <ui-toggle-group v-model="view" v-if="canUseStructureTree">
+                <ui-toggle-item icon="navigation" value="tree" />
+                <ui-toggle-item icon="layout-list" value="list" />
+            </ui-toggle-group>
 
             <template v-if="view === 'list' && reorderable">
                 <site-selector
                     v-if="sites.length > 1 && reordering && site"
-                    class="ltr:mr-4 rtl:ml-4"
                     :sites="sites"
                     :value="site"
                     @input="site = $event"
@@ -88,23 +75,17 @@
                 <Button
                     v-if="!reordering"
                     @click="reordering = true"
-                    v-text="__('Reorder')"
+                    :text="__('Reorder')"
                 />
 
                 <template v-if="reordering">
-                    <Button @click="reordering = false" v-text="__('Cancel')" />
-
-                    <Button
-                        variant="primary"
-                        @click="$refs.list.saveOrder"
-                        v-text="__('Save Order')"
-                    />
+                    <Button @click="reordering = false" :text="__('Cancel')" />
+                    <Button @click="$refs.list.saveOrder" :text="__('Save Order')" variant="primary" />
                 </template>
             </template>
 
             <create-entry-button
                 v-if="!reordering && canCreate"
-                button-class="btn-primary"
                 :url="createUrl"
                 :blueprints="blueprints"
                 :text="createLabel"
@@ -147,10 +128,9 @@
             @canceled="markTreeClean"
         >
             <template #branch-icon="{ branch }">
-                <svg-icon
+                <ui-icon
                     v-if="isRedirectBranch(branch)"
-                    class="inline-block h-4 w-4 text-gray-500"
-                    name="light/external-link"
+                    name="external-link"
                     v-tooltip="__('Redirect')"
                 />
             </template>
@@ -202,7 +182,7 @@ import DeleteLocalizationConfirmation from './DeleteLocalizationConfirmation.vue
 import SiteSelector from '../SiteSelector.vue';
 import HasActions from '../publish/HasActions';
 import { defineAsyncComponent } from 'vue';
-import { Dropdown, DropdownItem, DropdownLabel, DropdownMenu, DropdownSeparator, Header, Button } from '@statamic/ui';
+import { Dropdown, DropdownItem, DropdownLabel, DropdownMenu, DropdownSeparator, Header, Button, ToggleGroup, ToggleItem } from '@statamic/ui';
 import ItemActions from '@statamic/components/actions/ItemActions.vue';
 
 export default {
@@ -217,6 +197,8 @@ export default {
         Dropdown,
         Header,
         Button,
+        ToggleGroup,
+        ToggleItem,
         PageTree: defineAsyncComponent(() => import('../structures/PageTree.vue')),
         DeleteEntryConfirmation,
         DeleteLocalizationConfirmation,

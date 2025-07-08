@@ -21,25 +21,23 @@
     />
 </template>
 
-<script>
-import Fieldtype from './Fieldtype.vue';
+<script setup>
+import { Fieldtype } from 'statamic';
 import { Input } from '@statamic/ui';
 
-export default {
-    mixins: [Fieldtype],
+const emit = defineEmits(Fieldtype.emits);
+const props = defineProps(Fieldtype.props);
+const {
+    name,
+    isReadOnly,
+    update,
+    updateDebounced,
+    expose
+} = Fieldtype.use(emit, props);
 
-    components: {
-        Input,
-    },
+function inputUpdated(value) {
+    return !props.config.debounce ? update(value) : updateDebounced(value);
+}
 
-    methods: {
-        inputUpdated(value) {
-            if (!this.config.debounce) {
-                return this.update(value);
-            }
-
-            this.updateDebounced(value);
-        },
-    },
-};
+defineExpose(expose);
 </script>
