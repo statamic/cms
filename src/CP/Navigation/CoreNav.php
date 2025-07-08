@@ -194,8 +194,7 @@ class CoreNav
             ->route('updater')
             ->icon('loading-bar')
             ->view('statamic::nav.updates')
-            ->can('view updates')
-            ->children(true);
+            ->can('view updates');
 
         Nav::tools('Addons')
             ->route('addons.index')
