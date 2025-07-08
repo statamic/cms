@@ -15,6 +15,6 @@ class AddonSettings extends AbstractAddonSettings
 
     public function fileData()
     {
-        return $this->values()->all();
+        return $this->rawValues();
     }
 }

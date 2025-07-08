@@ -9,7 +9,9 @@ interface AddonSettings
 {
     public function addon(): Addon;
 
-    public function values($values = null): Collection|self;
+    public function values($values = null): array|self;
+
+    public function rawValues(): array;
 
     public function get(string $key, $default = null);
 

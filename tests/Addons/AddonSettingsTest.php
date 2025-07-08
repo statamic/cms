@@ -27,10 +27,26 @@ class AddonSettingsTest extends TestCase
     public function it_returns_the_values()
     {
         $addon = $this->makeFromPackage();
-        $settings = new AddonSettings($addon, ['foo' => 'bar', 'baz' => 'qux']);
+        $settings = new AddonSettings($addon, ['website_name' => '{{ config:app:url }}', 'foo' => 'bar']);
 
-        $this->assertInstanceOf(Collection::class, $settings->values());
-        $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $settings->values()->all());
+        $this->assertIsArray($settings->values());
+        $this->assertEquals([
+            'website_name' => 'http://localhost',
+            'foo' => 'bar',
+        ], $settings->values());
+    }
+
+    #[Test]
+    public function it_returns_the_raw_values()
+    {
+        $addon = $this->makeFromPackage();
+        $settings = new AddonSettings($addon, ['website_name' => '{{ config:app:url }}', 'foo' => 'bar']);
+
+        $this->assertIsArray($settings->rawValues());
+        $this->assertEquals([
+            'website_name' => '{{ config:app:url }}',
+            'foo' => 'bar',
+        ], $settings->rawValues());
     }
 
     #[Test]
@@ -62,8 +78,8 @@ class AddonSettingsTest extends TestCase
 
         $settings->set('baz', 'qux');
 
-        $this->assertEquals('qux', $settings->get('baz'));
-        $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $settings->values()->all());
+        $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $settings->values());
+        $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $settings->rawValues());
     }
 
     #[Test]
@@ -74,7 +90,8 @@ class AddonSettingsTest extends TestCase
 
         $settings->merge(['baz' => 'qux']);
 
-        $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $settings->values()->all());
+        $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $settings->values());
+        $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $settings->rawValues());
     }
 
     #[Test]
@@ -83,7 +100,7 @@ class AddonSettingsTest extends TestCase
         Event::fake();
 
         $addon = $this->makeFromPackage();
-        $settings = new AddonSettings($addon, ['foo' => 'bar', 'baz' => 'qux']);
+        $settings = new AddonSettings($addon, ['website_name' => '{{ config:app:url }}', 'foo' => 'bar']);
 
         $this->mock(AddonSettingsRepository::class, function ($mock) use ($settings) {
             $mock->shouldReceive('save')->with($settings)->andReturn(true)->once();
@@ -98,7 +115,7 @@ class AddonSettingsTest extends TestCase
     public function it_deletes_settings()
     {
         $addon = $this->makeFromPackage();
-        $settings = new AddonSettings($addon, ['foo' => 'bar', 'baz' => 'qux']);
+        $settings = new AddonSettings($addon, ['website_name' => '{{ config:app:url }}', 'foo' => 'bar']);
 
         $this->mock(AddonSettingsRepository::class, function ($mock) use ($settings) {
             $mock->shouldReceive('delete')->with($settings)->andReturn(true)->once();

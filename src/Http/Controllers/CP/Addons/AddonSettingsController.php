@@ -28,7 +28,7 @@ class AddonSettingsController extends CpController
             ->asConfig()
             ->icon('cog')
             ->title($addon->name())
-            ->values($addon->settings()->values()->all())
+            ->values($addon->settings()->rawValues())
             ->submittingTo(cp_route('addons.settings.update', $addon->slug()));
     }
 
@@ -43,7 +43,7 @@ class AddonSettingsController extends CpController
 
         $values = PublishForm::make($addon->settingsBlueprint())->submit($request->all());
 
-        $saved = $addon->settings()->merge($values)->save();
+        $saved = $addon->settings()->values($values)->save();
 
         return ['saved' => $saved];
     }
