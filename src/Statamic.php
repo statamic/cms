@@ -293,7 +293,11 @@ class Statamic
     {
         return Vite::getFacadeRoot()
             ->useHotFile('vendor/statamic/cp/hot')
-            ->useBuildDirectory('vendor/statamic/cp/build');
+            ->useBuildDirectory(
+                config('app.debug') && is_dir(public_path('vendor/statamic/cp-dev'))
+                    ? 'vendor/statamic/cp-dev/build'
+                    : 'vendor/statamic/cp/build'
+            );
     }
 
     public static function dateFormat()

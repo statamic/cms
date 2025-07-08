@@ -59,6 +59,10 @@ class AppServiceProvider extends ServiceProvider
         ], 'statamic-cp');
 
         $this->publishes([
+            "{$this->root}/resources/dist-dev" => public_path('vendor/statamic/cp-dev'),
+        ], 'statamic-cp-dev');
+
+        $this->publishes([
             "{$this->root}/resources/dist-frontend" => public_path('vendor/statamic/frontend'),
         ], 'statamic-frontend');
 
