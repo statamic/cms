@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "rm -rf resources/dist/build && vite",
     "build": "vite build",
+    "build-dev": "vite build --mode development",
     "svgo": "svgo -f ./resources/svg/  -r",
     "test": "vitest run",
     "test-watch": "npm run test -- --watch --notify",

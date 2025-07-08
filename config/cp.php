@@ -140,4 +140,18 @@ return [
     'thumbnail_presets' => [
         // 'medium' => 800,
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Development Build
+    |--------------------------------------------------------------------------
+    |
+    | The Control Panel's asset build will be minified and have Vue DevTools
+    | disabled. You may choose to use a development build, which is useful
+    | while building custom Vue components or debugging. You must also
+    | publish the assets. You should not enable this in production.
+    |
+    */
+
+    'enable_development_build' => false,
 ];
