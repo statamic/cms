@@ -49,7 +49,7 @@ const triggerClasses = cva({
         size: {
             base: 'text-base rounded-lg ps-3 pe-2.5 py-2 h-10 leading-[1.375rem]',
             sm: 'text-sm rounded-md ps-2.5 pe-2 py-1.5 h-7 leading-[1.125rem]',
-            xs: 'text-xs rounded-xs ps-2 pe-1.5 py-1.5 h-6 leading-[1.125rem]',
+            xs: 'text-xs rounded-sm ps-2 pe-1.5 py-1.5 h-6 leading-[1.125rem]',
         },
         flat: {
             true: 'shadow-none',
@@ -264,18 +264,18 @@ function pushTaggableOption(e) {
                         @paste.prevent="onPaste"
                         @keydown.enter.prevent="pushTaggableOption"
                     />
-                    <button type="button" v-else-if="!searchable && (dropdownOpen || !modelValue)">
+                    <button type="button" class="flex-1 text-start" v-else-if="!searchable && (dropdownOpen || !modelValue)">
                         <span class="text-gray-400 dark:text-gray-500" v-text="placeholder" />
                     </button>
-                    <button type="button" v-else class="cursor-pointer">
+                    <button type="button" v-else class="flex-1 text-start cursor-pointer">
                         <slot name="selected-option" v-bind="{ option: selectedOption }">
                             <span v-if="labelHtml" v-html="getOptionLabel(selectedOption)" />
                             <span v-else v-text="getOptionLabel(selectedOption)" />
                         </slot>
                     </button>
 
-                    <div class="flex items-center">
-                        <Button icon="x" variant="filled" size="xs" round v-if="clearable && modelValue" @click="clear" />
+                    <div class="flex gap-1 items-center">
+                        <Button icon="x" variant="ghost" size="xs" round v-if="clearable && modelValue" @click="clear" />
                         <Icon name="ui/chevron-down" />
                     </div>
                 </ComboboxTrigger>
@@ -334,11 +334,11 @@ function pushTaggableOption(e) {
             :model-value="modelValue"
             @update:modelValue="updateModelValue"
         >
-            <div class="vs__selected-options-outside flex flex-wrap gap-2">
+            <div class="flex flex-wrap gap-2">
                 <div
                     v-for="option in selectedOptions"
                     :key="getOptionValue(option)"
-                    class="vs__selected sortable-item mt-2"
+                    class="sortable-item mt-2"
                 >
                     <Badge pill size="lg">
                         <div v-if="labelHtml" v-html="getOptionLabel(option)"></div>
@@ -347,14 +347,14 @@ function pushTaggableOption(e) {
                         <button
                             v-if="!disabled"
                             type="button"
-                            class="vs__deselect"
+                            class="opacity-75 hover:opacity-100 cursor-pointer"
                             :aria-label="__('Deselect option')"
                             @click="deselect(option.value)"
                         >
-                            <span>×</span>
+                            &times;
                         </button>
-                        <button v-else type="button" class="vs__deselect">
-                            <span class="text-gray-300">×</span>
+                        <button v-else type="button" class="opacity-75">
+                            &times;
                         </button>
                     </Badge>
                 </div>

@@ -1,9 +1,7 @@
 <script>
+import props from './index-props.js';
+
 export default {
-    props: {
-        handle: { type: String, required: true },
-        value: { required: true },
-        values: { required: true },
-    },
+    props,
 };
 </script>
