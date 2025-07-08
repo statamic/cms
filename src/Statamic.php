@@ -294,7 +294,7 @@ class Statamic
         return Vite::getFacadeRoot()
             ->useHotFile('vendor/statamic/cp/hot')
             ->useBuildDirectory(
-                config('statamic.cp.enable_development_build', false)
+                config('app.debug') && is_dir(public_path('vendor/statamic/cp-dev'))
                     ? 'vendor/statamic/cp-dev/build'
                     : 'vendor/statamic/cp/build'
             );
