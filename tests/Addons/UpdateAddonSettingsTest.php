@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Addons;
+namespace Addons;
 
 use Foo\Bar\TestAddonServiceProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -11,18 +11,20 @@ use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-class EditAddonSettingsTest extends TestCase
+class UpdateAddonSettingsTest extends TestCase
 {
     use FakesRoles, PreventSavingStacheItemsToDisk;
+
+    private $addon;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $addon = $this->makeFromPackage(['slug' => 'test-addon']);
+        $this->addon = $this->makeFromPackage(['slug' => 'test-addon']);
 
-        Facades\Addon::shouldReceive('all')->andReturn(collect([$addon]));
-        Facades\Addon::shouldReceive('get')->with('vendor/test-addon')->andReturn($addon);
+        Facades\Addon::shouldReceive('all')->andReturn(collect([$this->addon]));
+        Facades\Addon::shouldReceive('get')->with('vendor/test-addon')->andReturn($this->addon);
 
         $this->app->bind('statamic.addons.test-addon.settings_blueprint', fn () => [
             'tabs' => [
@@ -43,45 +45,65 @@ class EditAddonSettingsTest extends TestCase
     }
 
     #[Test]
-    public function can_edit_addon_settings()
+    public function can_update_addon_settings()
     {
+        $this->addon->settings()->values(['api_key' => 'original-api-key'])->save();
+
         $this
             ->actingAs(User::make()->makeSuper()->save())
-            ->get(cp_route('addons.settings.edit', 'test-addon'))
+            ->patch(cp_route('addons.settings.edit', 'test-addon'), [
+                'api_key' => 'new-api-key',
+            ])
             ->assertOk()
-            ->assertSee('Test Addon');
+            ->assertJson(['saved' => true]);
+
+        $this->assertEquals('new-api-key', $this->addon->settings()->get('api_key'));
     }
 
     #[Test]
-    public function cant_edit_addon_settings_for_non_existent_addon()
+    public function cant_update_addon_settings_for_non_existent_addon()
     {
         $this
             ->actingAs(User::make()->makeSuper()->save())
-            ->get(cp_route('addons.settings.edit', 'non-existent-addon'))
+            ->patch(cp_route('addons.settings.edit', 'non-existent-addon'), [
+                'api_key' => 'new-api-key',
+            ])
             ->assertNotFound();
     }
 
     #[Test]
-    public function cant_edit_addon_settings_when_addon_doesnt_have_any_settings()
+    public function cant_update_addon_settings_when_addon_doesnt_have_any_settings()
     {
+        $this->addon->settings()->values(['api_key' => 'original-api-key'])->save();
+
         // Forget the settings blueprint from the container.
         $this->app->offsetUnset('statamic.addons.test-addon.settings_blueprint');
 
         $this
             ->actingAs(User::make()->makeSuper()->save())
-            ->get(cp_route('addons.settings.edit', 'test-addon'))
+            ->patch(cp_route('addons.settings.edit', 'test-addon'), [
+                'api_key' => 'new-api-key',
+            ])
             ->assertNotFound();
+
+        $this->assertEquals('original-api-key', $this->addon->settings()->get('api_key'));
     }
 
     #[Test]
-    public function cant_edit_addon_settings_without_configure_addons_permission()
+    public function cant_update_addon_settings_without_configure_addons_permission()
     {
+        $this->addon->settings()->values(['api_key' => 'original-api-key'])->save();
+
         $this->setTestRole('test-role', ['access cp']);
 
         $this
             ->actingAs(User::make()->assignRole('test-role')->save())
-            ->get(cp_route('addons.settings.edit', 'test-addon'))
+            ->patch(cp_route('addons.settings.edit', 'test-addon'), [
+                'api_key' => 'new-api-key',
+            ])
             ->assertRedirect('/cp');
+
+        $this->assertEquals('original-api-key', $this->addon->settings()->get('api_key'));
     }
 
     private function makeFromPackage($attributes = [])
