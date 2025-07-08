@@ -2,7 +2,7 @@
     <portal name="table-fullscreen" :disabled="!fullScreenMode" target-class="table-fieldtype">
         <div
             class="table-fieldtype-container"
-            :class="{ 'table-fullscreen bg-white dark:bg-dark-700': fullScreenMode }"
+            :class="{ 'table-fullscreen bg-white dark:bg-gray-800': fullScreenMode }"
         >
             <publish-field-fullscreen-header
                 v-if="fullScreenMode"
@@ -12,8 +12,8 @@
             >
             </publish-field-fullscreen-header>
 
-            <section :class="{ 'mt-14 p-4 dark:bg-dark-700': fullScreenMode }">
-                <table class="table-fieldtype-table" v-if="rowCount">
+            <section :class="{ 'mt-14 p-4 dark:bg-gray-800': fullScreenMode }">
+                <table class="table-contained" v-if="rowCount">
                     <thead>
                         <tr>
                             <th class="grid-drag-handle-header" v-if="!isReadOnly"></th>
