@@ -40,6 +40,10 @@ class GlobalsController extends CpController
             ];
         })->filter()->values();
 
+        if ($globals->isEmpty()) {
+            return view('statamic::globals.empty');
+        }
+
         return view('statamic::globals.index', [
             'globals' => $globals,
         ]);
