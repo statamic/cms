@@ -898,7 +898,7 @@ class UrlTest extends TestCase
     }
 
     #[Test]
-    public function it_can_check_if_enforcing_trailing_slashes_using_getter()
+    public function it_can_check_if_currently_enforcing_trailing_slashes_using_getter()
     {
         $this->assertFalse(URL::isEnforcingTrailingSlashes());
 
