@@ -11,7 +11,7 @@ use Statamic\Extend\AddonSettingsRepository;
 use Statamic\Facades;
 use Tests\TestCase;
 
-class FileAddonSettingsRepositoryTest extends TestCase
+class AddonSettingsRepositoryTest extends TestCase
 {
     private $repository;
 
