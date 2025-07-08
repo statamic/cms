@@ -153,5 +153,5 @@ return [
     |
     */
 
-    'enable_development_build' => false,
+    'enable_development_build' => env('STATAMIC_ENABLE_DEVELOPMENT_BUILD', false),
 ];
