@@ -362,7 +362,7 @@ final class Addon
         return config($this->handle());
     }
 
-    public function hasSettings(): bool
+    public function hasSettingsBlueprint(): bool
     {
         return $this->settingsBlueprint() !== null;
     }

@@ -215,13 +215,13 @@ class AddonTest extends TestCase
     }
 
     #[Test]
-    public function it_checks_if_addon_has_settings()
+    public function it_checks_if_addon_has_settings_blueprint()
     {
         // It doesn't need to be a real blueprint, it just needs to be bound.
         $this->app->bind('statamic.addons.test-addon.settings_blueprint', fn () => []);
 
-        $this->assertTrue($this->makeFromPackage(['slug' => 'test-addon'])->hasSettings());
-        $this->assertFalse($this->makeFromPackage(['slug' => 'another-addon'])->hasSettings());
+        $this->assertTrue($this->makeFromPackage(['slug' => 'test-addon'])->hasSettingsBlueprint());
+        $this->assertFalse($this->makeFromPackage(['slug' => 'another-addon'])->hasSettingsBlueprint());
     }
 
     #[Test]

@@ -20,7 +20,7 @@ class AddonSettingsController extends CpController
         /** @var \Statamic\Extend\Addon $addon */
         $addon = Addon::all()->first(fn ($a) => $a->slug() === $addon);
 
-        if (! $addon || ! $addon->hasSettings()) {
+        if (! $addon || ! $addon->hasSettingsBlueprint()) {
             throw new NotFoundHttpException;
         }
 
@@ -37,7 +37,7 @@ class AddonSettingsController extends CpController
         /** @var \Statamic\Extend\Addon $addon */
         $addon = Addon::all()->first(fn ($a) => $a->slug() === $addon);
 
-        if (! $addon || ! $addon->hasSettings()) {
+        if (! $addon || ! $addon->hasSettingsBlueprint()) {
             throw new NotFoundHttpException;
         }
 
