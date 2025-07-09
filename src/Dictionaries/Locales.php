@@ -2,8 +2,6 @@
 
 namespace Statamic\Dictionaries;
 
-use DateTimeZone;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Facades\Statamic\Console\Processes\Process;
 
