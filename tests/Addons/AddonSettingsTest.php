@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Extend\AddonSettingsRepository;
 use Statamic\Events\AddonSettingsSaved;
+use Statamic\Events\AddonSettingsSaving;
 use Statamic\Extend\Addon;
 use Statamic\Extend\AddonSettings as AddonSettings;
 use Tests\TestCase;
@@ -105,9 +106,35 @@ class AddonSettingsTest extends TestCase
             $mock->shouldReceive('save')->with($settings)->andReturn(true)->once();
         });
 
-        $settings->save();
+        $return = $settings->save();
 
+        $this->assertTrue($return);
+
+        Event::assertDispatched(AddonSettingsSaving::class);
         Event::assertDispatched(AddonSettingsSaved::class);
+    }
+
+    #[Test]
+    public function if_saving_event_returns_false_the_settings_dont_save()
+    {
+        Event::fake([AddonSettingsSaved::class]);
+
+        Event::listen(AddonSettingsSaving::class, function () {
+            return false;
+        });
+
+        $addon = $this->makeFromPackage();
+        $settings = new AddonSettings($addon, ['website_name' => '{{ config:app:url }}', 'foo' => 'bar']);
+
+        $this->mock(AddonSettingsRepository::class, function ($mock) use ($settings) {
+            $mock->shouldReceive('save')->with($settings)->andReturn(true)->never();
+        });
+
+        $return = $settings->save();
+
+        $this->assertFalse($return);
+
+        Event::assertNotDispatched(AddonSettingsSaved::class);
     }
 
     #[Test]
@@ -120,7 +147,9 @@ class AddonSettingsTest extends TestCase
             $mock->shouldReceive('delete')->with($settings)->andReturn(true)->once();
         });
 
-        $settings->delete();
+        $return = $settings->delete();
+
+        $this->assertTrue($return);
     }
 
     private function makeFromPackage($attributes = [])

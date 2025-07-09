@@ -5,6 +5,7 @@ namespace Statamic\Extend;
 use Statamic\Contracts\Extend\AddonSettings as Contract;
 use Statamic\Contracts\Extend\AddonSettingsRepository;
 use Statamic\Events\AddonSettingsSaved;
+use Statamic\Events\AddonSettingsSaving;
 use Statamic\View\Antlers\Language\Runtime\RuntimeParser;
 
 abstract class AbstractAddonSettings implements Contract
@@ -70,9 +71,15 @@ abstract class AbstractAddonSettings implements Contract
 
     public function save(): bool
     {
-        AddonSettingsSaved::dispatch($this->addon()->id());
+        if (AddonSettingsSaving::dispatch($this) === false) {
+            return false;
+        }
 
-        return app(AddonSettingsRepository::class)->save($this);
+        app(AddonSettingsRepository::class)->save($this);
+
+        AddonSettingsSaved::dispatch($this);
+
+        return true;
     }
 
     public function delete(): bool
