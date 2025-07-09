@@ -56,6 +56,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Dictionaries\Countries::class,
         Dictionaries\Currencies::class,
         Dictionaries\File::class,
+        Dictionaries\Locales::class,
         Dictionaries\Timezones::class,
     ];
 
@@ -225,7 +226,6 @@ class ExtensionServiceProvider extends ServiceProvider
 
     protected $widgets = [
         Widgets\Collection::class,
-        Widgets\GettingStarted::class,
         Widgets\Header::class,
         Widgets\Template::class,
         Widgets\Updater::class,

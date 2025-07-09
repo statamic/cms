@@ -55,24 +55,26 @@ function columnShowing(column) {
         </template>
         <template #default="{ items, loading }">
             <Widget v-bind="widgetProps">
-                <p v-if="!items.length" class="p-3 text-center text-sm text-gray-600">
+                <ui-description v-if="!items.length" class="flex-1 flex items-center justify-center">
                     {{ __('There are no entries in this collection') }}
-                </p>
-                <table class="w-full [&_td]:p-0.5 [&_td]:text-sm" :class="{ 'opacity-50': loading }">
-                    <TableBody>
-                        <template #cell-title="{ row: entry }">
-                            <div class="flex items-center gap-2">
-                                <StatusIndicator v-if="!columnShowing('status')" :status="entry.status" />
-                                <a :href="entry.edit_url" class="line-clamp-1 overflow-hidden text-ellipsis">{{
-                                    entry.title
-                                }}</a>
-                            </div>
-                        </template>
-                        <template #cell-status="{ row: entry }">
-                            <StatusIndicator :status="entry.status" :show-dot="false" show-label />
-                        </template>
-                    </TableBody>
-                </table>
+                </ui-description>
+                <div class="px-4 py-3">
+                    <table class="w-full [&_td]:p-0.5 [&_td]:text-sm " :class="{ 'opacity-50': loading }">
+                        <TableBody>
+                            <template #cell-title="{ row: entry }">
+                                <div class="flex items-center gap-2">
+                                    <StatusIndicator v-if="!columnShowing('status')" :status="entry.status" />
+                                    <a :href="entry.edit_url" class="line-clamp-1 overflow-hidden text-ellipsis">{{
+                                        entry.title
+                                    }}</a>
+                                </div>
+                            </template>
+                            <template #cell-status="{ row: entry }">
+                                <StatusIndicator :status="entry.status" :show-dot="false" show-label />
+                            </template>
+                        </TableBody>
+                    </table>
+                </div>
                 <template #actions>
                     <Pagination />
                     <slot name="actions" />

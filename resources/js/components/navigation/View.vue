@@ -80,7 +80,7 @@
                 <EmptyStateMenu :heading="__('Start designing your navigation with these steps')">
                     <EmptyStateItem
                         :href="editUrl"
-                        icon="configure-large"
+                        icon="configure"
                         :heading="__('Configure Navigation')"
                         :description="__('messages.navigation_configure_settings_intro')"
                     />

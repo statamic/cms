@@ -22,6 +22,7 @@ import { default as CreateForm } from "./CreateForm.vue";
 import { default as DatePicker } from "./DatePicker/DatePicker.vue";
 import { default as DateRangePicker } from "./DateRangePicker/DateRangePicker.vue";
 import { default as Description } from "./Description.vue";
+import { default as DragHandle } from "./DragHandle.vue";
 import { default as Dropdown } from "./Dropdown/Dropdown.vue";
 import { default as DropdownItem } from "./Dropdown/Item.vue";
 import { default as DropdownLabel } from "./Dropdown/Label.vue";
@@ -121,6 +122,7 @@ export {
     DatePicker,
     DateRangePicker,
     Description,
+    DragHandle,
     Dropdown,
     DropdownItem,
     DropdownLabel,

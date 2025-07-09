@@ -27,11 +27,11 @@
                 :model-value="value"
                 @update:modelValue="comboboxUpdated"
             >
-                <div class="vs__selected-options-outside flex flex-wrap gap-2 pt-3">
+                <div class="flex flex-wrap gap-2 pt-3">
                     <div
                         v-for="option in selectedOptions"
                         :key="getOptionValue(option)"
-                        class="vs__selected sortable-item cursor-grab"
+                        class="sortable-item cursor-grab"
                     >
                         <Badge size="lg" color="white">
                             <div v-if="labelHtml" v-html="getOptionLabel(option)"></div>

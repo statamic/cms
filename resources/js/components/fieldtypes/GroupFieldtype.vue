@@ -50,7 +50,7 @@ export default {
     data() {
         return {
             containerWidth: null,
-            focused: false,
+            isFocused: false,
             fullScreenMode: false,
             provide: {
                 group: this.makeGroupProvide(),
@@ -93,7 +93,7 @@ export default {
         blurred() {
             setTimeout(() => {
                 if (!this.$el.contains(document.activeElement)) {
-                    this.focused = false;
+                    this.isFocused = false;
                 }
             }, 1);
         },

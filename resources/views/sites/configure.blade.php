@@ -13,7 +13,6 @@
         :initial-values="{{ json_encode($values) }}"
         :meta="{{ json_encode($meta) }}"
         url="{{ cp_route('sites.update') }}"
-        class="-mb-8"
     ></sites-edit-form>
 
     <x-statamic::docs-callout

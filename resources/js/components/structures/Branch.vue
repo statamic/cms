@@ -122,17 +122,6 @@ export default {
     },
 
     methods: {
-        getStatusClass() {
-            switch (this.page.status) {
-                case 'published':
-                    return 'bg-green-400';
-                case 'draft':
-                    return 'bg-gray-400 dark:bg-dark-200';
-                default:
-                    return 'bg-transparent border border-gray-600';
-            }
-        },
-
         getStatusTooltip() {
             let label = __(this.page.status) || __('Text item');
 

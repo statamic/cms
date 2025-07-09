@@ -44,6 +44,10 @@ class TaxonomiesController extends CpController
             ];
         })->values();
 
+        if ($taxonomies->isEmpty()) {
+            return view('statamic::taxonomies.empty');
+        }
+
         return view('statamic::taxonomies.index', [
             'taxonomies' => $taxonomies,
             'columns' => [
@@ -88,7 +92,7 @@ class TaxonomiesController extends CpController
         ];
 
         if ($taxonomy->queryTerms()->count() === 0) {
-            return view('statamic::taxonomies.empty', $viewData);
+            return view('statamic::terms.empty', $viewData);
         }
 
         return view('statamic::taxonomies.show', $viewData);

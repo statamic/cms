@@ -286,6 +286,10 @@ export default {
                 // storeName: this.storeName,
             };
         },
+
+        fieldActionBinding() {
+            return 'bard-fieldtype-set';
+        }
     },
 
     methods: {
