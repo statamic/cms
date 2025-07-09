@@ -504,6 +504,7 @@ class CollectionTest extends TestCase
         Facades\Blink::shouldReceive('forget')->with('collection-handles')->once();
         Facades\Blink::shouldReceive('forget')->with('mounted-collections')->once();
         Facades\Blink::shouldReceive('flushStartingWith')->with('collection-test')->once();
+        Facades\Blink::shouldReceive('once')->with('collection-test-structure', \Mockery::any())->andReturnNull();
 
         $return = $collection->save();
 
