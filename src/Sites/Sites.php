@@ -204,9 +204,11 @@ class Sites
             [
                 'handle' => 'locale',
                 'field' => [
-                    'type' => 'text',
+                    'type' => 'dictionary',
                     'display' => __('Locale'),
                     'instructions' => __('statamic::messages.site_configure_locale_instructions'),
+                    'dictionary' => 'locales',
+                    'max_items' => 1,
                     'required' => true,
                     'width' => 33,
                     'direction' => 'ltr',
