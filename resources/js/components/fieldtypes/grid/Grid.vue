@@ -40,7 +40,7 @@
                         @blur="blurred"
                     />
 
-                    <ui-button class="mt-4" v-if="canAddRows" v-text="__(addRowButtonLabel)" @click.prevent="addRow" />
+                    <ui-button size="sm" v-if="canAddRows" v-text="__(addRowButtonLabel)" @click.prevent="addRow" />
                 </section>
             </div>
         </element-container>

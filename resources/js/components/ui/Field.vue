@@ -58,17 +58,17 @@ const wrapperComponent = computed(() => props.as === 'card' ? Card : 'div');
 
 <template>
     <component :is="wrapperComponent" :class="[classes, $attrs.class]" data-ui-input-group>
-        <div v-if="$slots.actions" class="mb-2 flex items-center justify-between gap-x-1 h-6" data-ui-field-header>
+        <div v-if="$slots.actions" class="flex items-center justify-between gap-x-1 h-6" data-ui-field-header>
             <slot name="label">
                 <Label v-if="label" v-bind="labelProps" class="flex-1" />
             </slot>
             <slot name="actions" />
         </div>
-        <div data-ui-field-text>
+        <div data-ui-field-text class="mb-1.5">
             <slot v-if="!$slots.actions" name="label">
                 <Label v-if="label" v-bind="labelProps" class="flex-1" />
             </slot>
-            <Description :text="instructions" class="mt-1" v-if="instructions && !instructionsBelow" />
+            <Description :text="instructions" v-if="instructions && !instructionsBelow" class="mb-1.5" />
         </div>
         <slot />
         <Description :text="instructions" v-if="instructions && instructionsBelow" class="mt-2" />
