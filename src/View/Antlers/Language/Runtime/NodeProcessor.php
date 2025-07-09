@@ -517,7 +517,7 @@ class NodeProcessor
 
         if (GlobalRuntimeState::$traceTagAssignments) {
             if (! empty(GlobalRuntimeState::$tracedRuntimeAssignments)) {
-                $data = array_merge(GlobalRuntimeState::$tracedRuntimeAssignments, $data);
+                $data = array_merge(GlobalRuntimeState::$tracedRuntimeAssignments, (is_object($data) && ($data instanceof Arrayable) ? $data->toArray() : $data));
             }
         }
 
