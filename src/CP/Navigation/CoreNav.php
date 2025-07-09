@@ -260,20 +260,15 @@ class CoreNav
             ->view('statamic::nav.updates')
             ->can('view updates');
 
-        Nav::tools('Addons')
-            ->route('addons.index')
-            ->icon('addons')
-            ->can('configure addons')
-            ->children(function () {
-                return Addon::all()
-                    ->filter->hasSettingsBlueprint()
-                    ->sortBy->name()
-                    ->map(function ($addon) {
-                        return Nav::item($addon->name())
-                            ->url($addon->settingsUrl())
-                            ->icon('cog');
-                    });
-            });
+        if (User::current()->can('configure addons')) {
+            Nav::tools('Addons')
+                ->route('addons.index')
+                ->icon('addons')
+                ->can('configure addons')
+                ->children(fn () => $this->makeAddonSettingsItems());
+        } else {
+            $this->makeAddonSettingsItems();
+        }
 
         if (Stache::duplicates()->isNotEmpty()) {
             Nav::tools('Duplicate IDs')
@@ -294,6 +289,19 @@ class CoreNav
         }
 
         return $this;
+    }
+
+    protected function makeAddonSettingsItems()
+    {
+        return Addon::all()
+            ->sortBy->name()
+            ->filter->hasSettingsBlueprint()
+            ->map(function ($addon) {
+                return Nav::tools($addon->name())
+                    ->url($addon->settingsUrl())
+                    ->icon('cog')
+                    ->can('editSettings', $addon);
+            });
     }
 
     /**

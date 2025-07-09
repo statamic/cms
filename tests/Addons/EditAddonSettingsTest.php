@@ -53,6 +53,41 @@ class EditAddonSettingsTest extends TestCase
     }
 
     #[Test]
+    public function can_edit_addon_settings_with_configure_addons_permission()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'configure addons']]);
+
+        $this
+            ->actingAs(User::make()->assignRole('test')->save())
+            ->get(cp_route('addons.settings.edit', 'test-addon'))
+            ->assertOk()
+            ->assertSee('Test Addon');
+    }
+
+    #[Test]
+    public function can_edit_addon_settings_with_edit_addon_settings_permission()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'edit test-addon settings']]);
+
+        $this
+            ->actingAs(User::make()->assignRole('test')->save())
+            ->get(cp_route('addons.settings.edit', 'test-addon'))
+            ->assertOk()
+            ->assertSee('Test Addon');
+    }
+
+    #[Test]
+    public function cant_edit_addon_settings_without_permission()
+    {
+        $this->setTestRoles(['test' => ['access cp']]);
+
+        $this
+            ->actingAs(User::make()->save())
+            ->get(cp_route('addons.settings.edit', 'test-addon'))
+            ->assertRedirect('/cp');
+    }
+
+    #[Test]
     public function cant_edit_addon_settings_for_non_existent_addon()
     {
         $this
@@ -71,17 +106,6 @@ class EditAddonSettingsTest extends TestCase
             ->actingAs(User::make()->makeSuper()->save())
             ->get(cp_route('addons.settings.edit', 'test-addon'))
             ->assertNotFound();
-    }
-
-    #[Test]
-    public function cant_edit_addon_settings_without_configure_addons_permission()
-    {
-        $this->setTestRole('test-role', ['access cp']);
-
-        $this
-            ->actingAs(User::make()->assignRole('test-role')->save())
-            ->get(cp_route('addons.settings.edit', 'test-addon'))
-            ->assertRedirect('/cp');
     }
 
     private function makeFromPackage($attributes = [])

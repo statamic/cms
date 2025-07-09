@@ -3,27 +3,25 @@
 namespace Statamic\Http\Controllers\CP\Addons;
 
 use Statamic\CP\Column;
-use Statamic\Facades\Addon;
+use Statamic\Extend\Addon;
+use Statamic\Facades;
 use Statamic\Http\Controllers\CP\CpController;
 
 class AddonsController extends CpController
 {
-    public function __construct()
-    {
-        $this->middleware(\Illuminate\Auth\Middleware\Authorize::class.':configure addons');
-    }
-
     public function index()
     {
+        $this->authorize('index', Addon::class);
+
         return view('statamic::addons.index', [
-            'addons' => Addon::all()->map(fn ($addon) => [
+            'addons' => Facades\Addon::all()->map(fn (Addon $addon) => [
                 'name' => $addon->name(),
                 'version' => $addon->version(),
                 'developer' => $addon->developer() ?? $addon->marketplaceSellerSlug(),
                 'description' => $addon->description(),
                 'marketplace_url' => $addon->marketplaceUrl(),
-                'updates_url' => $addon->updatesUrl(),
-                'settings_url' => $addon->settingsUrl(),
+                'updates_url' => Facades\User::current()->can('view updates') ? $addon->updatesUrl() : null,
+                'settings_url' => Facades\User::current()->can('editSettings', $addon) ? $addon->settingsUrl() : null,
             ])->values()->all(),
             'columns' => [
                 Column::make('name'),

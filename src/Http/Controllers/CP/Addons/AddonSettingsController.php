@@ -10,11 +10,6 @@ use Statamic\Http\Controllers\CP\CpController;
 
 class AddonSettingsController extends CpController
 {
-    public function __construct()
-    {
-        $this->middleware(\Illuminate\Auth\Middleware\Authorize::class.':configure addons');
-    }
-
     public function edit(Request $request, $addon)
     {
         /** @var \Statamic\Extend\Addon $addon */
@@ -23,6 +18,8 @@ class AddonSettingsController extends CpController
         if (! $addon || ! $addon->hasSettingsBlueprint()) {
             throw new NotFoundHttpException;
         }
+
+        $this->authorize('editSettings', $addon);
 
         return PublishForm::make($addon->settingsBlueprint())
             ->asConfig()
@@ -40,6 +37,8 @@ class AddonSettingsController extends CpController
         if (! $addon || ! $addon->hasSettingsBlueprint()) {
             throw new NotFoundHttpException;
         }
+
+        $this->authorize('editSettings', $addon);
 
         $values = PublishForm::make($addon->settingsBlueprint())->submit($request->all());
 

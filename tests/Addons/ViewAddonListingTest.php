@@ -7,12 +7,13 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Extend\Addon;
 use Statamic\Facades;
 use Statamic\Facades\User;
+use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class ViewAddonListingTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
+    use FakesRoles, PreventSavingStacheItemsToDisk;
 
     #[Test]
     public function it_shows_a_list_of_addons()
@@ -93,6 +94,17 @@ class ViewAddonListingTest extends TestCase
                     'settings_url' => null,
                 ],
             ]);
+    }
+
+    #[Test]
+    public function it_doesnt_show_a_list_of_addons_without_configure_addons_permission()
+    {
+        $this->setTestRoles(['test' => ['access cp']]);
+
+        $this
+            ->actingAs(User::make()->assignRole('test')->save())
+            ->get(cp_route('addons.index'))
+            ->assertRedirect('/cp');
     }
 
     private function makeFromPackage($attributes = [])

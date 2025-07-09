@@ -61,6 +61,59 @@ class UpdateAddonSettingsTest extends TestCase
     }
 
     #[Test]
+    public function can_update_addon_settings_with_configure_addons_permission()
+    {
+        $this->addon->settings()->values(['api_key' => 'original-api-key'])->save();
+
+        $this->setTestRoles(['test' => ['access cp', 'configure addons']]);
+
+        $this
+            ->actingAs(User::make()->assignRole('test')->save())
+            ->patch(cp_route('addons.settings.edit', 'test-addon'), [
+                'api_key' => 'new-api-key',
+            ])
+            ->assertOk()
+            ->assertJson(['saved' => true]);
+
+        $this->assertEquals('new-api-key', $this->addon->settings()->get('api_key'));
+    }
+
+    #[Test]
+    public function can_update_addon_settings_with_edit_addon_settings_permission()
+    {
+        $this->addon->settings()->values(['api_key' => 'original-api-key'])->save();
+
+        $this->setTestRoles(['test' => ['access cp', 'edit test-addon settings']]);
+
+        $this
+            ->actingAs(User::make()->assignRole('test')->save())
+            ->patch(cp_route('addons.settings.edit', 'test-addon'), [
+                'api_key' => 'new-api-key',
+            ])
+            ->assertOk()
+            ->assertJson(['saved' => true]);
+
+        $this->assertEquals('new-api-key', $this->addon->settings()->get('api_key'));
+    }
+
+    #[Test]
+    public function cant_update_addon_settings_without_permission()
+    {
+        $this->addon->settings()->values(['api_key' => 'original-api-key'])->save();
+
+        $this->setTestRoles(['test' => ['access cp']]);
+
+        $this
+            ->actingAs(User::make()->assignRole('test')->save())
+            ->patch(cp_route('addons.settings.edit', 'test-addon'), [
+                'api_key' => 'new-api-key',
+            ])
+            ->assertRedirect('/cp');
+
+        $this->assertEquals('original-api-key', $this->addon->settings()->get('api_key'));
+    }
+
+    #[Test]
     public function cant_update_addon_settings_for_non_existent_addon()
     {
         $this
@@ -85,23 +138,6 @@ class UpdateAddonSettingsTest extends TestCase
                 'api_key' => 'new-api-key',
             ])
             ->assertNotFound();
-
-        $this->assertEquals('original-api-key', $this->addon->settings()->get('api_key'));
-    }
-
-    #[Test]
-    public function cant_update_addon_settings_without_configure_addons_permission()
-    {
-        $this->addon->settings()->values(['api_key' => 'original-api-key'])->save();
-
-        $this->setTestRole('test-role', ['access cp']);
-
-        $this
-            ->actingAs(User::make()->assignRole('test-role')->save())
-            ->patch(cp_route('addons.settings.edit', 'test-addon'), [
-                'api_key' => 'new-api-key',
-            ])
-            ->assertRedirect('/cp');
 
         $this->assertEquals('original-api-key', $this->addon->settings()->get('api_key'));
     }
