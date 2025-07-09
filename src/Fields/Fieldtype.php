@@ -21,22 +21,37 @@ abstract class Fieldtype implements Arrayable
     }
 
     protected static $title;
+
     protected static $binding = 'fieldtypes';
 
     protected $field;
+
     protected $localizable = true;
+
     protected $validatable = true;
+
     protected $defaultable = true;
+
     protected $selectable = true;
+
     protected $selectableInForms = false;
+
     protected $relationship = false;
+
     protected $categories = [];
+
     protected $keywords = [];
+
     protected $rules = [];
+
     protected $extraRules = [];
+
     protected $defaultValue;
+
     protected $configFields = [];
+
     protected static $extraConfigFields = [];
+
     protected $icon;
 
     public static function title()

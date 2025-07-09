@@ -43,6 +43,7 @@ export default {
         return {
             embedUrl: null,
             provider: null,
+            savedValue: null,
             url: null,
             videoId: null,
         };
@@ -56,27 +57,39 @@ export default {
 
     methods: {
         detailsFromCloudflare(id) {
+            if (id == null) return;
+
+            this.savedValue = 'cloudflare::id';
             this.videoId = id;
+            this.url = null;
 
             this.getVideoData({type: this.provider, id: this.videoId});
+
         },
 
         detailsFromUrl(url) {
             if (url == null) return;
 
+            this.savedValue = url;
+            this.videoId = null;
+            this.url = url;
+
             this.getVideoData({url: url});
+
         },
 
         getVideoData(params) {
-            this.$axios
-                .get(this.meta.url, { params: params })
-                .then((response) => response.data)
-                .then((data) => {
-                    this.embedUrl = data.embed_url;
-                    this.provider = data.provider;
-                });
+            this.debounce(() => {
+                this.$axios
+                    .get(this.meta.url, { params: params })
+                    .then((response) => response.data)
+                    .then((data) => {
+                        this.embedUrl = data.embed_url;
+                        this.provider = data.provider;
+                    });
 
-            // this.update(whatever);
+                this.update(this.savedValue);
+            })
         },
 
     }
