@@ -269,7 +269,7 @@ class AddonTest extends TestCase
         $this->assertEquals([
             'api_key' => '12345',
             'another_setting' => 'value',
-        ], $settings->values()->all());
+        ], $settings->values());
     }
 
     #[Test]
@@ -282,7 +282,7 @@ class AddonTest extends TestCase
 
         $this->assertInstanceOf(AddonSettings::class, $settings);
         $this->assertEquals($addon, $settings->addon());
-        $this->assertEquals([], $settings->values()->all());
+        $this->assertEquals([], $settings->values());
     }
 
     #[Test]
