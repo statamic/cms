@@ -59,12 +59,11 @@ export default {
         detailsFromCloudflare(id) {
             if (id == null) return;
 
-            this.savedValue = 'cloudflare::id';
+            this.savedValue = `cloudflare::${id}`;
             this.videoId = id;
             this.url = null;
 
             this.getVideoData({type: this.provider, id: this.videoId});
-
         },
 
         detailsFromUrl(url) {
@@ -75,7 +74,6 @@ export default {
             this.url = url;
 
             this.getVideoData({url: url});
-
         },
 
         getVideoData(params) {
