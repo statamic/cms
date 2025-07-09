@@ -12,7 +12,7 @@ const props = defineProps({
     },
 });
 
-const { store, syncField, desyncField, asConfig } = injectContainerContext();
+const { store, syncField, desyncField, hasOriginValues, asConfig } = injectContainerContext();
 const { fieldPathPrefix, metaPathPrefix } = injectFieldsContext();
 const handle = props.config.handle;
 
@@ -98,13 +98,14 @@ const isLocalizable = computed(() => props.config.localizable);
 
 const isReadOnly = computed(() => {
     if (store.readOnly) return true;
-    if (store.isRoot === false && !isLocalizable.value) return true;
+
+    if (hasOriginValues.value && !isLocalizable.value) return true;
 
     return isLocked.value || props.config.visibility === 'read_only' || false;
 });
 
 const isLocked = computed(() => false); // todo
-const isSyncable = computed(() => store.isRoot === false);
+const isSyncable = computed(() => hasOriginValues.value);
 const isSynced = computed(() => isSyncable.value && !store.localizedFields.includes(fullPath.value));
 const isNested = computed(() => fullPath.value.includes('.'));
 const wrapperComponent = computed(() => asConfig.value && !isNested.value ? 'card' : 'div');
