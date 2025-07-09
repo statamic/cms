@@ -63,6 +63,7 @@ class Providers extends SlimProviderCollection
             ->map(fn (string $class) => ['provider' => class_basename($class)])
             ->add(['provider' => 'Cloudflare'])
             ->sortBy('provider')
+            ->add(['provider' => 'Not Supported'])
             ->values()
             ->all();
     }

@@ -53,7 +53,7 @@ class Video implements Arrayable
 
     public static function notSupported(): self
     {
-        return new self(provider: 'not_supported');
+        return new self(provider: 'Not Supported');
     }
 
     public function __construct(
