@@ -77,17 +77,15 @@ export default {
         },
 
         getVideoData(params) {
-            this.debounce(() => {
-                this.$axios
-                    .get(this.meta.url, { params: params })
-                    .then((response) => response.data)
-                    .then((data) => {
-                        this.embedUrl = data.embed_url;
-                        this.provider = data.provider;
-                    });
+            this.$axios
+                .get(this.meta.url, { params: params })
+                .then((response) => response.data)
+                .then((data) => {
+                    this.embedUrl = data.embed_url;
+                    this.provider = data.provider;
+                });
 
-                this.update(this.savedValue);
-            })
+            this.update(this.savedValue);
         },
 
     }
