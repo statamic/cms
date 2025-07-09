@@ -2,7 +2,6 @@
 
 namespace Statamic\Contracts\Extend;
 
-use Illuminate\Support\Collection;
 use Statamic\Extend\Addon;
 
 interface AddonSettings

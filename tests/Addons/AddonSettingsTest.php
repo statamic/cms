@@ -3,7 +3,6 @@
 namespace Tests\Addons;
 
 use Foo\Bar\TestAddonServiceProvider;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Extend\AddonSettingsRepository;
