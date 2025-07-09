@@ -64,6 +64,10 @@
                 "path": "resources/dist"
             },
             {
+                "url": "https://github.com/statamic/cms/releases/download/{$version}/dist-dev.tar.gz",
+                "path": "resources/dist-dev"
+            },
+            {
                 "url": "https://github.com/statamic/cms/releases/download/{$version}/dist-frontend.tar.gz",
                 "path": "resources/dist-frontend"
             }

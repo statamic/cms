@@ -8,7 +8,7 @@
                     @click="action.run()"
                     v-tooltip="action.title"
                     :icon-only="true"
-                    size="sm"
+                    size="xs"
                     variant="ghost"
                 >
                     <svg-icon :name="action.icon" class="size-3" />

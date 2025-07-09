@@ -135,16 +135,8 @@ function desync() {
                         {{ __(config.display) }}
                     </Tooltip>
                 </template>
-                <button v-if="!isReadOnly && isSyncable" v-show="isSynced" @click="desync">
-                    <Tooltip :text="__('messages.field_synced_with_origin')">
-                        <Icon name="synced" class="text-gray-400" />
-                    </Tooltip>
-                </button>
-                <button v-if="!isReadOnly && isSyncable" v-show="!isSynced" @click="sync">
-                    <Tooltip :text="__('messages.field_desynced_from_origin')">
-                        <Icon name="unsynced" class="text-gray-400" />
-                    </Tooltip>
-                </button>
+                <ui-button size="xs" inset icon="synced" variant="ghost" v-tooltip="__('messages.field_synced_with_origin')" v-if="!isReadOnly && isSyncable" v-show="isSynced" @click="desync" />
+                <ui-button size="xs" inset icon="unsynced" variant="ghost" v-tooltip="__('messages.field_desynced_from_origin')" v-if="!isReadOnly && isSyncable" v-show="!isSynced" @click="sync" />
             </Label>
         </template>
         <template #actions>

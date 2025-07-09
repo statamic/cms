@@ -305,7 +305,7 @@ function pushTaggableOption(e) {
                             :text-value="getOptionLabel(option)"
                             :class="itemClasses({ size: size, selected: isSelected(option) })"
                             as="button"
-                            @select="dropdownOpen = false"
+                            @select="dropdownOpen = multiple"
                         >
                             <slot name="option" v-bind="option">
                                 <img v-if="option.image" :src="option.image" class="size-5 rounded-full" />

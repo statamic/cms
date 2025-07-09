@@ -89,7 +89,7 @@ const wrapperComponent = computed(() => props.as === 'card' ? Card : 'div');
 
 <template>
     <component :is="wrapperComponent" :class="[classes, $attrs.class]" data-ui-input-group>
-        <div v-if="$slots.actions" class="mb-2 flex items-center justify-between gap-x-1">
+        <div v-if="$slots.actions" class="mb-2 flex items-center justify-between gap-x-1 h-6">
             <slot name="label">
                 <Label v-if="label" v-bind="labelProps" class="flex-1" />
             </slot>

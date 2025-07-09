@@ -86,7 +86,7 @@
                 <thead>
                     <tr>
                         <th>{{ __('Blueprint') }}</th>
-                        <th>{{ __('Taxonomy') }}</th>
+                        <th class="text-end!">{{ __('Taxonomy') }}</th>
                     </tr>
                 </thead>
                 <tbody>
