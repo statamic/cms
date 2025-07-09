@@ -38,7 +38,7 @@ class Video implements Arrayable
 {
     public static function fromUrl(string $url): self
     {
-        if (empty($details = (new Embera)->getUrlData($url))) {
+        if (empty($details = (new Embera(['responsive' => true]))->getUrlData($url))) {
             return static::notSupported();
         }
 
