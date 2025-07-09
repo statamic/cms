@@ -46,7 +46,7 @@ class Video implements Arrayable
 
         return new self(
             id: $data->video_id,
-            provider: strtolower($data->embera_provider_name),
+            provider: $data->embera_provider_name,
             embedUrl: $data->html
         );
     }
