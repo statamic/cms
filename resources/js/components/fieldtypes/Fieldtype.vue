@@ -1,8 +1,8 @@
 <script>
 import HasFieldActions from '../field-actions/HasFieldActions';
+import debounce from '@statamic/util/debounce.js';
 import props from './props.js';
 import emits from './emits.js';
-import { debounce as statamicDebounce } from '@statamic/util/debounce.js';
 
 export default {
     emits,
@@ -23,10 +23,6 @@ export default {
     props,
 
     methods: {
-        debounce(closure) {
-            statamicDebounce(closure);
-        },
-
         update(value) {
             this.$emit('update:value', value);
         },
