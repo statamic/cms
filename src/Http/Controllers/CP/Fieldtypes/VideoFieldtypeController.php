@@ -20,7 +20,7 @@ class VideoFieldtypeController extends CpController
         if ($this->isCloudflareStream($request)) {
             $id = $request->query('id');
             $embedUrl = "https://iframe.cloudflarestream.com/{$id}";
-            $iframe = "<iframe src='$embedUrl' frameborder='0' allow='fullscreen'></iframe>";
+            $iframe = "<iframe src='$embedUrl' frameborder='0' allow='fullscreen' style='height: 100%; width: 100%;'></iframe>";
 
             return new Video(id: $id, provider: 'Cloudflare', embedUrl: $iframe);
         }
