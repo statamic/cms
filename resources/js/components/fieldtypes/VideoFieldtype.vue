@@ -16,7 +16,7 @@
             @update:model-value="detailsFromUrl"
         />
         <Input
-            v-if="provider == 'Cloudflare'"
+            v-else
             :model-value="videoId"
             :isReadOnly="isReadOnly"
             :prepend="__('ID')"
