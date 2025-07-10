@@ -318,7 +318,7 @@ function pushTaggableOption(e) {
             </ComboboxPortal>
         </ComboboxRoot>
 
-        <div v-if="maxSelections && maxSelections !== Infinity" class="ms-2 mt-3 text-xs" :class="limitIndicatorColor">
+        <div v-if="maxSelections && maxSelections !== Infinity && multiple" class="ms-2 mt-3 text-xs" :class="limitIndicatorColor">
             <span v-text="selectedOptions.length"></span>/<span v-text="maxSelections"></span>
         </div>
     </div>
