@@ -36,6 +36,7 @@ class DictionaryFieldsTest extends TestCase
                             ['value' => 'countries', 'label' => 'Countries'],
                             ['value' => 'currencies', 'label' => 'Currencies'],
                             ['value' => 'file', 'label' => 'File'],
+                            ['value' => 'locales', 'label' => 'Locales'],
                             ['value' => 'timezones', 'label' => 'Timezones'],
                             ['value' => 'fake_dictionary', 'label' => 'Fake Dictionary'],
                         ],
