@@ -2,8 +2,8 @@
 
 namespace Statamic\Dictionaries;
 
-use Illuminate\Support\Str;
 use Facades\Statamic\Console\Processes\Process;
+use Illuminate\Support\Str;
 
 class Locales extends BasicDictionary
 {
