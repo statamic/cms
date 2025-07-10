@@ -3,7 +3,7 @@
         :focus="config.focus"
         :name="name"
         :id="fieldId"
-        :disabled="isReadOnly"
+        :read-only="isReadOnly"
         :limit="config.character_limit || null"
         :placeholder="__(config.placeholder)"
         :model-value="value"

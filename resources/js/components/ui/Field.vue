@@ -12,6 +12,7 @@ const props = defineProps({
     as: { type: String, default: 'div', validator: (value) => ['div', 'card'].includes(value) },
     badge: { type: String, default: '' },
     disabled: { type: Boolean, default: false },
+    readOnly: { type: Boolean, default: false },
     error: { type: String },
     errors: { type: Object, default: (props) => (props.error ? [props.error] : []) },
     id: { type: String },

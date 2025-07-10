@@ -127,7 +127,7 @@ function desync() {
         :instructions-below="config.instructions_position === 'below'"
         :required="isRequired"
         :errors="errors"
-        :disabled="isReadOnly"
+        :read-only="isReadOnly"
         :as="wrapperComponent"
     >
         <template #label v-if="shouldShowLabel">
