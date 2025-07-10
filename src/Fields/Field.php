@@ -569,6 +569,12 @@ class Field implements Arrayable
                 'validate' => 'boolean',
                 'default' => true,
             ],
+            'actions' => [
+                'display' => __('Actions'),
+                'instructions' => __('statamic::messages.fields_actions_instructions'),
+                'type' => 'toggle',
+                'default' => true,
+            ],
         ])->map(fn ($field, $handle) => compact('handle', 'field'))->values()->all();
 
         return new ConfigFields($fields);

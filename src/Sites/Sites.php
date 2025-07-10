@@ -243,6 +243,7 @@ class Sites
                     'field' => [
                         'type' => 'grid',
                         'hide_display' => true,
+                        'actions' => false,
                         'fullscreen' => false,
                         'mode' => 'stacked',
                         'add_row' => __('Add Site'),
