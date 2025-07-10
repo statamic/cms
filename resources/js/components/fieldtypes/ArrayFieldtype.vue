@@ -1,123 +1,113 @@
 <template>
-    <div class="array-fieldtype-container">
-        <div v-if="isSingle" class="flex items-center">
-            <div class="input-group">
-                <div class="input-group-prepend flex items-center">
-                    <select
-                        class="appearance-none border-0 bg-transparent text-sm shadow-none outline-hidden"
-                        @input="setKey($event.target.value)"
-                    >
-                        <option
-                            v-for="(element, index) in keyedData"
-                            v-text="keys[element.key] || element.key"
-                            :key="element._id"
-                            :value="element.key"
-                            :selected="element.key === selectedKey"
-                        />
-                    </select>
-                    <svg-icon name="micro/chevron-down-xs" class="w-2 ltr:ml-2 rtl:mr-2" />
-                </div>
-                <template v-for="(element, index) in keyedData">
-                    <input
-                        type="text"
-                        class="input-text"
+    <div>
+        <ui-input-group v-if="isSingle">
+            <ui-input-group-prepend>
+                <select
+                    class="appearance-none border-0 bg-transparent text-sm shadow-none outline-hidden"
+                    @input="setKey($event.target.value)"
+                >
+                    <option
+                        v-for="(element, index) in keyedData"
+                        v-text="keys[element.key] || element.key"
                         :key="element._id"
-                        v-if="element.key === selectedKey"
-                        :id="fieldId + '__' + element.key"
-                        v-model="data[index].value"
-                        :readonly="isReadOnly"
+                        :value="element.key"
+                        :selected="element.key === selectedKey"
                     />
-                </template>
-            </div>
-        </div>
+                </select>
+                <ui-icon name="ui/chevron-down" class="size-3 ms-1" />
+            </ui-input-group-prepend>
+            <template v-for="(element, index) in keyedData">
+                <ui-input
+                    v-if="element.key === selectedKey"
+                    v-model="data[index].value"
+                    class="border-l-0"
+                    :key="element._id"
+                    :id="fieldId + '__' + element.key"
+                    :readonly="isReadOnly"
+                />
+            </template>
+        </ui-input-group>
 
-        <div v-else-if="isKeyed" class="array-table-wrapper">
-            <table class="array-table">
+        <table class="table-contained" v-else-if="isKeyed">
+            <tbody>
+                <tr v-if="data" v-for="(element, index) in keyedData" :key="element._id">
+                    <th class="w-1/4">
+                        <label :for="fieldId + '__' + element.key">{{ keys[element.key] || element.key }}</label>
+                    </th>
+                    <td>
+                        <input
+                            type="text"
+                            class="w-full input-text"
+                            :id="fieldId + '__' + element.key"
+                            v-model="data[index].value"
+                            :readonly="isReadOnly"
+                        />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <table class="table-contained" v-if="isDynamic && valueCount">
+            <thead>
+                <tr>
+                    <th class="grid-drag-handle-header" v-if="!isReadOnly"></th>
+                    <th class="w-1/4">{{ keyHeader }}</th>
+                    <th class="">{{ valueHeader }}</th>
+                    <th class="row-controls" v-if="!isReadOnly"></th>
+                </tr>
+            </thead>
+
+            <sortable-list
+                v-model="data"
+                :vertical="true"
+                item-class="sortable-row"
+                handle-class="sortable-handle"
+                :mirror="false"
+            >
                 <tbody>
-                    <tr v-if="data" v-for="(element, index) in keyedData" :key="element._id">
-                        <th class="w-1/4">
-                            <label :for="fieldId + '__' + element.key">{{ keys[element.key] || element.key }}</label>
-                        </th>
+                    <tr class="sortable-row" v-for="(element, index) in data" :key="element._id">
+                        <td class="sortable-handle table-drag-handle" v-if="!isReadOnly"></td>
                         <td>
                             <input
                                 type="text"
-                                class="w-full"
-                                :id="fieldId + '__' + element.key"
-                                v-model="data[index].value"
+                                class="input-text font-medium"
+                                v-model="element.key"
                                 :readonly="isReadOnly"
                             />
                         </td>
+                        <td>
+                            <input
+                                type="text"
+                                class="input-text"
+                                v-model="element.value"
+                                :readonly="isReadOnly"
+                            />
+                        </td>
+                        <td class="row-controls" v-if="!isReadOnly">
+                            <a
+                                @click="deleteOrConfirm(index)"
+                                class="inline text-lg antialiased opacity-25 hover:opacity-75 cursor-pointer"
+                                >&times;</a
+                            >
+                        </td>
                     </tr>
                 </tbody>
-            </table>
-        </div>
+            </sortable-list>
+        </table>
 
-        <template v-else-if="isDynamic">
-            <div class="table-field">
-                <table class="table-fieldtype-table" v-if="valueCount">
-                    <thead>
-                        <tr>
-                            <th class="grid-drag-handle-header" v-if="!isReadOnly"></th>
-                            <th class="w-1/4">{{ keyHeader }}</th>
-                            <th class="">{{ valueHeader }}</th>
-                            <th class="row-controls" v-if="!isReadOnly"></th>
-                        </tr>
-                    </thead>
+        <Button @click="addValue" icon="plus" size="sm" :disabled="atMax" v-if="!isReadOnly && !isSingle && !isKeyed">
+            {{ addButton }}
+        </Button>
 
-                    <sortable-list
-                        v-model="data"
-                        :vertical="true"
-                        item-class="sortable-row"
-                        handle-class="sortable-handle"
-                        :mirror="false"
-                    >
-                        <tbody>
-                            <tr class="sortable-row" v-for="(element, index) in data" :key="element._id">
-                                <td class="sortable-handle table-drag-handle" v-if="!isReadOnly"></td>
-                                <td>
-                                    <input
-                                        type="text"
-                                        class="input-text font-medium"
-                                        v-model="element.key"
-                                        :readonly="isReadOnly"
-                                    />
-                                </td>
-                                <td>
-                                    <input
-                                        type="text"
-                                        class="input-text"
-                                        v-model="element.value"
-                                        :readonly="isReadOnly"
-                                    />
-                                </td>
-                                <td class="row-controls" v-if="!isReadOnly">
-                                    <a
-                                        @click="deleteOrConfirm(index)"
-                                        class="inline text-lg antialiased opacity-25 hover:opacity-75 cursor-pointer"
-                                        >&times;</a
-                                    >
-                                </td>
-                            </tr>
-                        </tbody>
-                    </sortable-list>
-                </table>
-
-                <Button @click="addValue" icon="plus" :disabled="atMax" v-if="!isReadOnly">
-                    {{ addButton }}
-                </Button>
-
-                <confirmation-modal
-                    v-if="deleting !== false"
-                    :title="__('Delete Value')"
-                    :bodyText="__('Are you sure you want to delete this value?')"
-                    :buttonText="__('Delete')"
-                    :danger="true"
-                    @confirm="deleteValue(deleting)"
-                    @cancel="deleteCancelled"
-                >
-                </confirmation-modal>
-            </div>
-        </template>
+        <confirmation-modal
+            v-if="deleting !== false"
+            :title="__('Delete Value')"
+            :bodyText="__('Are you sure you want to delete this value?')"
+            :buttonText="__('Delete')"
+            :danger="true"
+            @confirm="deleteValue(deleting)"
+            @cancel="deleteCancelled"
+        />
     </div>
 </template>
 

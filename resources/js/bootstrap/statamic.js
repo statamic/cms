@@ -7,7 +7,6 @@ import Preferences from '../components/Preference';
 import registerGlobalComponents from './components.js';
 import registerUiComponents from './ui.js';
 import registerFieldtypes from './fieldtypes.js';
-import registerVueSelect from './vue-select/vue-select';
 import useGlobalEventBus from '../composables/global-event-bus';
 import useProgressBar from '../composables/progress-bar';
 import useDirtyState from '../composables/dirty-state';
@@ -34,6 +33,7 @@ import autosize from 'autosize';
 import DateFormatter from '@statamic/components/DateFormatter.js';
 import wait from '@statamic/util/wait.js';
 import markdown from '@statamic/util/markdown.js';
+import VueComponentDebug from 'vue-component-debug';
 
 let bootingCallbacks = [];
 let bootedCallbacks = [];
@@ -146,6 +146,7 @@ export default {
         this.$app.use(PortalVue, { portalName: 'v-portal' });
         this.$app.use(VueClickAway);
         this.$app.use(FloatingVue, { disposeTimeout: 30000, distance: 10 });
+        this.$app.use(VueComponentDebug, { enabled: import.meta.env.VITE_VUE_COMPONENT_DEBUG === 'true' });
 
         const portals = markRaw(new Portals());
 
@@ -178,7 +179,7 @@ export default {
         });
 
         Object.assign(this.$app.config.globalProperties, {
-            $theme: new Theme(this.initialConfig.user.theme),
+            $theme: new Theme(this.initialConfig.user?.theme),
         });
 
         Object.assign(this.$app.config.globalProperties, {
@@ -214,7 +215,6 @@ export default {
         await registerUiComponents(this.$app);
         registerGlobalComponents(this.$app);
         registerFieldtypes(this.$app);
-        registerVueSelect(this.$app);
 
         // Suppress the translation warnings
         this.$app.config.warnHandler = (msg, vm, trace) => {

@@ -28,34 +28,33 @@
 
                 <div
                     v-if="!isReadOnly && showPicker"
-                    class="border border-gray-400 dark:border-gray-700 border-dashed rounded-xl p-2 flex items-center gap-4"
+                    class="border border-gray-400 dark:border-gray-700 border-dashed rounded-xl p-2 flex flex-col @2xs:flex-row items-center gap-4"
                     :class="{
                         'rounded-b-none': expanded,
                         'bard-drag-handle': isInBardField,
                     }"
                 >
-                    <div>
-                        <Button
-                            v-if="canBrowse"
-                            icon="folder-open"
-                            tabindex="0"
-                            :text="__('Browse Assets')"
-                            @click="openSelector"
-                            @keyup.space.enter="openSelector"
-                        />
-                    </div>
+                    <Button
+                        v-if="canBrowse"
+                        icon="folder-open"
+                        tabindex="0"
+                        :text="__('Browse Assets')"
+                        class="w-full @2xs:w-auto"
+                        @click="openSelector"
+                        @keyup.space.enter="openSelector"
+                    />
 
                     <div class="text-sm text-gray-600 dark:text-gray-400 flex items-center flex-1" v-if="canUpload">
-                        <ui-icon name="upload-cloud" class="size-5 text-gray-500 me-3" />
+                        <ui-icon name="upload-cloud" class="size-5 text-gray-500 me-2" />
                         <span v-text="__('Drag & drop here or&nbsp;')" />
                         <button type="button" class="underline underline-offset-2 cursor-pointer hover:text-black dark:hover:text-gray-200" @click.prevent="uploadFile">
                             {{ __('choose a file') }}
                         </button>
                         <span>.</span>
                     </div>
-                    <div class="flex items-center justify-end">
+
+                    <div class="flex items-center justify-end" v-if="meta.rename_folder">
                         <ItemActions
-                            v-if="meta.rename_folder"
                             :url="meta.rename_folder.url"
                             :actions="[meta.rename_folder.action]"
                             :item="folder"
@@ -78,12 +77,13 @@
                     </div>
                 </div>
 
-                <uploads
-                    v-if="uploads.length"
-                    :uploads="uploads"
-                    allow-selecting-existing
-                    @existing-selected="uploadSelected"
-                />
+                <div v-if="uploads.length" class="border-gray-300 border-l border-r">
+                    <uploads
+                        :uploads="uploads"
+                        allow-selecting-existing
+                        @existing-selected="uploadSelected"
+                    />
+                </div>
 
                 <template v-if="expanded">
                     <sortable-list

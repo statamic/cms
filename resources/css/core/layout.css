@@ -47,10 +47,14 @@ main {
     transition: all 0.3s ease-in-out;
 }
 
+.nav-closed main {
+    @apply ps-0;
+}
+
 
 
 .nav-closed .nav-main {
-    @apply md:-start-46;
+    @apply -start-46;
 }
 
 .nav-closed main {

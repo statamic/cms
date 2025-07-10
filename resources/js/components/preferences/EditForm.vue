@@ -3,12 +3,12 @@
         ref="container"
         :name="name"
         :blueprint="blueprint"
-        :values="currentValues"
+        v-model="currentValues"
         reference="collection"
         :meta="meta"
         :errors="errors"
         :read-only="readOnly"
-        @updated="currentValues = $event"
+        as-config
     >
         <div>
             <Header :title="title" icon="preferences">

@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Globals;
 
 use Illuminate\Http\Request;
 use Statamic\Contracts\Globals\GlobalSet as GlobalSetContract;
+use Statamic\CP\PublishForm;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Site;
@@ -39,6 +40,10 @@ class GlobalsController extends CpController
             ];
         })->filter()->values();
 
+        if ($globals->isEmpty()) {
+            return view('statamic::globals.empty');
+        }
+
         return view('statamic::globals.index', [
             'globals' => $globals,
         ]);
@@ -65,17 +70,11 @@ class GlobalsController extends CpController
             })->values(),
         ];
 
-        $fields = ($blueprint = $this->editFormBlueprint($set))
-            ->fields()
-            ->addValues($values)
-            ->preProcess();
-
-        return view('statamic::globals.configure', [
-            'blueprint' => $blueprint->toPublishArray(),
-            'values' => $fields->values(),
-            'meta' => $fields->meta(),
-            'set' => $set,
-        ]);
+        return PublishForm::make($this->editFormBlueprint($set))
+            ->title(__('Configure Global Set'))
+            ->values($values)
+            ->asConfig()
+            ->submittingTo(cp_route('globals.update', $set->handle()));
     }
 
     public function update(Request $request, $set)
@@ -201,6 +200,22 @@ class GlobalsController extends CpController
             ];
         }
 
-        return Blueprint::makeFromTabs($fields);
+        return Blueprint::make()->setContents(collect([
+            'tabs' => [
+                'main' => [
+                    'sections' => collect($fields)->map(function ($section) {
+                        return [
+                            'display' => $section['display'],
+                            'fields' => collect($section['fields'])->map(function ($field, $handle) {
+                                return [
+                                    'handle' => $handle,
+                                    'field' => $field,
+                                ];
+                            })->values()->all(),
+                        ];
+                    })->values()->all(),
+                ],
+            ],
+        ])->all());
     }
 }

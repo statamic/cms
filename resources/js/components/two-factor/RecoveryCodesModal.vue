@@ -54,14 +54,14 @@ function copyToClipboard() {
             </div>
 
             <template v-else>
-                <div class="p-5">
-                    <p class="mb-6">{{ __('statamic::messages.two_factor_recovery_codes') }}</p>
+                <div class="space-y-6">
+                    <ui-description>{{ __('statamic::messages.two_factor_recovery_codes') }}</ui-description>
 
-                    <div class="mb-3 bg-gray-200 p-4">
-                        <ul class="grid gap-2 md:grid-cols-2">
+                    <div class="bg-gray-200 py-8 rounded-xl">
+                        <ul class="grid gap-2 md:grid-cols-2 text-center justify-center">
                             <li
                                 v-for="recoveryCode in recoveryCodes"
-                                class="font-mono text-sm"
+                                class="font-mono lg:text-base"
                                 v-text="recoveryCode"
                             ></li>
                         </ul>

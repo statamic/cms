@@ -24,9 +24,9 @@
     </div>
 @else
     @if ($licenses->invalid())
-        <div class="fixed bottom-0 z-2 w-full p-2" v-cloak v-show="showBanner">
+        <div class="fixed bottom-0 z-2 w-full px-2" v-cloak v-show="showBanner">
             <div
-                class="@if ($licenses->isOnTestDomain()) bg-gray-800 dark:bg-dark-500 text-gray-300 @endif @if ($licenses->isOnPublicDomain()) bg-red-500 text-white @endif w-full rounded-md px-4 py-3 text-sm"
+                class="@if ($licenses->isOnTestDomain()) bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-200 @endif @if ($licenses->isOnPublicDomain()) bg-red-500 text-white @endif w-full rounded-t-xl px-4 py-3 text-sm"
             >
                 @if ($licenses->isOnTestDomain())
                     <div class="flex items-center justify-between">
@@ -41,13 +41,13 @@
                             @endif
                         </span>
                         <div class="flex">
-                            <button @click="hideBanner" class="text-2xs opacity-50 hover:opacity-75 ltr:mr-4 rtl:ml-4">
+                            <button @click="hideBanner" class="text-2xs opacity-60 hover:opacity-75 ltr:mr-4 rtl:ml-4">
                                 {{ __('Dismiss') }}
                             </button>
                             @can('access licensing utility')
                                 <a
                                     href="{{ cp_route('utilities.licensing') }}"
-                                    class="flex items-center text-2xs text-white hover:text-yellow"
+                                    class="flex items-center text-2xs underline-offset-1 hover:underline"
                                     aria-label="{{ __('Manage Licenses') }}"
                                 >
                                     {{ __('Manage Licenses') }}

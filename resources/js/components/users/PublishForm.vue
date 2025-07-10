@@ -49,10 +49,9 @@
             :name="publishContainer"
             :reference="initialReference"
             :blueprint="fieldset"
-            :values="values"
+            v-model="values"
             :meta="meta"
             :errors="errors"
-            @updated="values = $event"
         >
             <PublishTabs />
         </PublishContainer>
@@ -61,10 +60,10 @@
 
 <script>
 import ChangePassword from './ChangePassword.vue';
-import HasHiddenFields from '../publish/HasHiddenFields';
 import HasActions from '../publish/HasActions';
 import TwoFactor from '@statamic/components/two-factor/TwoFactor.vue';
 import clone from '@statamic/util/clone.js';
+import resetValuesFromResponse from '@statamic/util/resetValuesFromResponse.js';
 import {
     Button,
     Dropdown,
@@ -77,7 +76,7 @@ import {
 } from '@statamic/ui';
 import ItemActions from '@statamic/components/actions/ItemActions.vue';
 import { SavePipeline } from '@statamic/exports.js';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 const { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } = SavePipeline;
 
 let saving = ref(false);
@@ -85,7 +84,7 @@ let errors = ref({});
 let container = null;
 
 export default {
-    mixins: [HasHiddenFields, HasActions],
+    mixins: [HasActions],
 
     components: {
         ItemActions,
@@ -147,7 +146,7 @@ export default {
                         container: this.$refs.container,
                         storeName: this.publishContainer,
                     }),
-                    new Request(this.actions.save, this.method, this.visibleValues),
+                    new Request(this.actions.save, this.method),
                     new AfterSaveHooks('user', {
                         reference: this.initialReference,
                     }),
@@ -162,9 +161,13 @@ export default {
         afterActionSuccessfullyCompleted(response) {
             if (response.data) {
                 this.title = response.data.title;
-                this.values = this.resetValuesFromResponse(response.data.values);
+                this.values = resetValuesFromResponse(response.data.values, this.$refs.container.store);
             }
         },
+    },
+
+    created() {
+        container = computed(() => this.$refs.container);
     },
 
     mounted() {

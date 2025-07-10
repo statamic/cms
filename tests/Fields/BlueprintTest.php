@@ -896,6 +896,41 @@ class BlueprintTest extends TestCase
     // todo: duplicate or tweak above test but make the target field not in the first section.
 
     #[Test]
+    public function it_can_ensure_an_deferred_ensured_field_has_specific_config()
+    {
+        $blueprint = (new Blueprint)->setContents(['tabs' => [
+            'tab_one' => [
+                'sections' => [
+                    [
+                        'fields' => [
+                            ['handle' => 'title', 'field' => ['type' => 'text']],
+                        ],
+                    ],
+                ],
+            ],
+        ]]);
+
+        // Let's say somewhere else in the code ensures an `author` field
+        $blueprint->ensureField('author', ['type' => 'text', 'do_not_touch_other_config' => true, 'foo' => 'bar']);
+
+        // Then later, we try to ensure that `author` field has config, we should be able to successfully modify that deferred field
+        $fields = $blueprint
+            ->ensureFieldHasConfig('author', ['foo' => 'baz', 'visibility' => 'read_only'])
+            ->fields();
+
+        $this->assertEquals(['type' => 'text'], $fields->get('title')->config());
+
+        $expectedConfig = [
+            'type' => 'text',
+            'do_not_touch_other_config' => true,
+            'foo' => 'baz',
+            'visibility' => 'read_only',
+        ];
+
+        $this->assertEquals($expectedConfig, $fields->get('author')->config());
+    }
+
+    #[Test]
     public function it_merges_previously_undefined_keys_into_the_config_when_ensuring_a_field_exists_and_it_already_exists()
     {
         $blueprint = (new Blueprint)->setContents(['tabs' => [

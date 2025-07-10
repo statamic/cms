@@ -11,7 +11,7 @@
         >
             <template #selected-option="{ option }">
                 <div
-                    class="anti flex items-center text-sm text-gray text-[0.8125rem] hover:text-gray-800 dark:text-dark-100 dark:hover:text-dark-175"
+                    class="anti flex items-center text-sm font-medium text-gray text-[0.8125rem] hover:text-gray-800 dark:text-dark-100 dark:hover:text-dark-175"
                 >
                     <svg-icon name="sites" class="h-4 w-4 ltr:mr-2 rtl:ml-2 text-gray-500" />
                     <div class="whitespace-nowrap">{{ __(option.name) }}</div>

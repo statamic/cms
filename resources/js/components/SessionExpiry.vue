@@ -1,42 +1,45 @@
 <template>
     <div class="session-expiry">
-        <button v-if="isWarning" class="session-expiry-stripe" @click="extend" v-text="warningText" />
+        <Modal
+            v-if="isWarning && !isShowingLogin"
+            :open="isWarning && !isShowingLogin"
+            :title="__('Your Session is Expiring')"
+            class="max-w-[500px]!"
+        >
+            <ui-description v-text="warningText" />
+            <Button @click="extend" variant="primary" icon="rewind" :text="__('Extend Session')" class="w-full" />
+        </Modal>
 
-        <Modal :title="__('Resume Your Session')" :open="isShowingLogin" height="auto" :width="500">
-            <div v-if="isUsingOauth" class="p-5">
-                <a :href="oauthProvider.loginUrl" target="_blank" class="btn-primary">
-                    {{ __('Log in with :provider', { provider: oauthProvider.label }) }}
-                </a>
-                <div class="mt-4 text-2xs text-gray">
-                    {{ __('messages.session_expiry_new_window') }}
-                </div>
+        <Modal :title="__('Resume Your Session')" :open="isShowingLogin" height="auto" class="max-w-[500px]!">
+            <div v-if="isUsingOauth" class="space-y-3">
+                <ui-description v-text="__('messages.session_expiry_new_window')" />
+                <ui-button variant="primary" class="w-full" :href="oauthProvider.loginUrl" target="_blank" :text="__('Log in with :provider', { provider: oauthProvider.label })" />
             </div>
 
-            <div v-if="!isUsingOauth" class="publish-fields p-2">
-                <div class="form-group w-full">
-                    <label v-text="__('messages.session_expiry_enter_password')" />
-                    <small class="help-block text-red-500" v-if="errors.email" v-text="errors.email[0]" />
-                    <small class="help-block text-red-500" v-if="errors.password" v-text="errors.password[0]" />
-                    <div class="flex items-center">
+            <div v-if="!isUsingOauth">
+                <ui-field :errors="errors" class="space-y-3">
+                    <ui-description v-text="__('messages.session_expiry_enter_password')" />
+                    <div class="flex items-center gap-3">
                         <Input
                             type="password"
                             v-model="password"
+                            :viewable="true"
                             ref="password"
                             tabindex="1"
                             autofocus
                             @keydown.enter.prevent="submit"
                         />
-                        <Button @click="submit" class="ms-2" variant="primary" :text="__('Log in')" />
+                        <Button @click="submit" variant="primary" :text="__('Log in')" />
                     </div>
-                </div>
+                </ui-field>
             </div>
         </Modal>
 
-        <Modal :title="__('Resume Your Session')" :open="isShowingTwoFactorChallenge" height="auto" :width="500">
-            <div class="publish-fields p-2">
-                <div v-if="twoFactorMode === 'code'" class="form-group w-full">
-                    <label v-text="__('messages.session_expiry_enter_two_factor_code')" />
-                    <small class="help-block text-red-500" v-if="errors.code" v-text="errors.code[0]" />
+        <Modal :title="__('Resume Your Session')" :open="isShowingTwoFactorChallenge" height="auto" class="max-w-[500px]!">
+            <div>
+                <div v-if="twoFactorMode === 'code'" class="space-y-3">
+                    <ui-description v-text="__('messages.session_expiry_enter_two_factor_code')" />
+                    <ui-description class="text-red-500" v-if="errors.code" v-text="errors.code[0]" />
                     <div class="flex items-center">
                         <Input
                             name="code"
@@ -55,8 +58,8 @@
 
                 <div v-if="twoFactorMode === 'recovery_code'" class="form-group w-full">
                     <label v-text="__('messages.session_expiry_enter_two_factor_recovery_code')" />
-                    <small
-                        class="help-block text-red-500"
+                    <ui-description
+                        class="text-red-500"
                         v-if="errors.recovery_code"
                         v-text="errors.recovery_code[0]"
                     />

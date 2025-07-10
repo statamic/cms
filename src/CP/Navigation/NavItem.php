@@ -8,6 +8,7 @@ use Statamic\Facades\URL;
 use Statamic\Statamic;
 use Statamic\Support\Html;
 use Statamic\Support\Str;
+use Statamic\Support\Svg;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class NavItem
@@ -201,7 +202,11 @@ class NavItem
     {
         $value = $this->icon() ?? 'collections';
 
-        return Str::startsWith($value, '<svg') ? $value : Statamic::svg('icons/'.$value, 'size-4 shrink-0');
+        if (! Str::startsWith($value, '<svg')) {
+            $value = Statamic::svg("icons/{$value}");
+        }
+
+        return Svg::withClasses($value, 'size-4 shrink-0');
     }
 
     /**

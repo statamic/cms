@@ -40,7 +40,7 @@
                         @blur="blurred"
                     />
 
-                    <button class="btn" v-if="canAddRows" v-text="__(addRowButtonLabel)" @click.prevent="addRow" />
+                    <ui-button size="sm" v-if="canAddRows" v-text="__(addRowButtonLabel)" @click.prevent="addRow" />
                 </section>
             </div>
         </element-container>
@@ -186,7 +186,18 @@ export default {
         },
 
         removed(index) {
-            if (!confirm(__('Are you sure?'))) return;
+            // if the row is empty, don't show the confirmation. this.value[index] is an object with the row data
+            const row = this.value[index];
+            const emptyRow = Object.fromEntries(
+                this.fields.map((field) => [field.handle, this.meta.defaults[field.handle]]),
+            );
+
+            // Check if the row has been modified from its default state
+            const hasChanges = this.fields.some(field => row[field.handle] !== emptyRow[field.handle]);
+
+            if (hasChanges) {
+                if (!confirm(__('Are you sure?'))) return;
+            }
 
             this.update([...this.value.slice(0, index), ...this.value.slice(index + 1)]);
         },

@@ -125,7 +125,7 @@ export default {
             this.store.setFieldValue({
                 handle,
                 value,
-                user: Statamic.user.id,
+                user: Statamic.user?.id,
             });
         },
 
@@ -133,7 +133,7 @@ export default {
             this.store.setFieldMeta({
                 handle,
                 value,
-                user: Statamic.user.id,
+                user: Statamic.user?.id,
             });
         },
 

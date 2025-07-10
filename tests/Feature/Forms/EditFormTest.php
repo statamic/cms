@@ -32,7 +32,7 @@ class EditFormTest extends TestCase
             ->actingAs($user)
             ->get(cp_route('forms.edit', $form->handle()))
             ->assertSuccessful()
-            ->assertViewHas('form', $form);
+            ->assertSee('Configure Form');
     }
 
     #[Test]
@@ -70,7 +70,6 @@ class EditFormTest extends TestCase
             ->actingAs($user)
             ->get(cp_route('forms.edit', $form->handle()))
             ->assertSuccessful()
-            ->assertViewHas('form', $form)
             ->assertSeeInOrder([
                 'Title',
                 'Blueprint',

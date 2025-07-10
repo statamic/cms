@@ -6,6 +6,7 @@
     <div class="mt-12 flex justify-center text-center">
         <ui-badge
             href="{{ $url }}"
+            target="_blank"
             pill
             icon-append="external-link"
             text="{{ $text ?? __("Learn about $topic") }}"

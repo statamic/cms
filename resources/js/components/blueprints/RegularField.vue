@@ -16,20 +16,19 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <width-selector v-if="!isHidden" v-model="width" class="" />
+                    <width-selector v-if="!isHidden" v-model="width" />
 
                     <div
                         v-else
-                        class="relative flex w-12 items-center justify-center border border-gray-400 opacity-50 dark:border-dark-200 "
+                        class="bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-400  border border-gray-300 dark:border-gray-700 overflow-hidden h-6 w-14 rounded-md flex items-center justify-center"
                     >
-                        <svg-icon name="regular/hidden" class="size-4 opacity-50"></svg-icon>
-                        hai
+                        <Icon name="eye-slash" class="size-4 opacity-50" />
                     </div>
 
                     <div class="flex items-center">
-                        <ui-button v-if="canDefineLocalizable" size="sm" icon="earth" variant="subtle" v-tooltip="__('Localizable')" @click="localizable = !localizable" />
-                        <ui-button size="sm" icon="duplicate" variant="subtle" @click.prevent="$emit('duplicate')" v-tooltip="__('Duplicate')" />
-                        <ui-button size="sm" icon="trash" variant="subtle" @click.prevent="$emit('deleted')" v-tooltip="__('Remove')" />
+                        <ui-button v-if="canDefineLocalizable" inset size="sm" icon="earth" :variant="localizable ? 'ghost' : 'subtle'" v-tooltip="__('Localizable')" @click="localizable = !localizable" />
+                        <ui-button inset size="sm" icon="duplicate" variant="subtle" @click.prevent="$emit('duplicate')" v-tooltip="__('Duplicate')" />
+                        <ui-button inset size="sm" icon="trash" variant="subtle" @click.prevent="$emit('deleted')" v-tooltip="__('Remove')" />
                     </div>
 
                     <stack name="field-settings" v-if="isEditing" @closed="editorClosed">
@@ -60,6 +59,7 @@ import WidthSelector from '../fields/WidthSelector.vue';
 import CanDefineLocalizable from '../fields/CanDefineLocalizable';
 import titleize from '../../util/titleize';
 import deslugify from '../../util/deslugify';
+import { Icon } from '@statamic/ui';
 
 export default {
     mixins: [Field, CanDefineLocalizable],
@@ -67,6 +67,7 @@ export default {
     components: {
         FieldSettings,
         WidthSelector,
+        Icon,
     },
 
     props: ['suggestableConditionFields'],

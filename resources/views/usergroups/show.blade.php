@@ -8,9 +8,7 @@
 @section('content')
     <ui-header title="{{ __($group->title()) }}" icon="groups">
         @can('delete', $group)
-            <ui-button
-                @click="$refs.deleter.confirm()"
-            >
+            <ui-button @click="$refs.deleter.confirm()">
                 {{ __('Delete Group') }}
                 <resource-deleter
                     ref="deleter"

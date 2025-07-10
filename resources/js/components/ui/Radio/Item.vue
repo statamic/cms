@@ -12,7 +12,7 @@ const id = useId();
 </script>
 
 <template>
-    <div class="flex items-start gap-3" data-ui-radio-item>
+    <div class="flex items-start gap-1.5" data-ui-radio-item>
         <RadioGroupItem
             :id
             :value="value"

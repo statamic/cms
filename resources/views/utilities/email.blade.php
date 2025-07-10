@@ -7,7 +7,7 @@
 
 @section('content')
 
-<ui-header title="{{ __('Email') }}" />
+<ui-header title="{{ __('Email') }}" icon="mail-settings" />
 
 <ui-card-panel heading="{{ __('Send Test Email') }}">
     <form method="POST" action="{{ cp_route('utilities.email') }}">

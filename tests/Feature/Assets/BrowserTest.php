@@ -229,24 +229,24 @@ class BrowserTest extends TestCase
             ->actingAs($this->userWithPermission())
             ->getJson('/cp/assets/browse/search/one?search=asset')
             ->assertSuccessful()
-            ->assertJsonCount(3, 'data.assets')
-            ->assertJsonPath('data.assets.0.id', 'one::asset-one.txt')
-            ->assertJsonPath('data.assets.1.id', 'one::nested/asset-two.txt')
-            ->assertJsonPath('data.assets.2.id', 'one::nested/subdirectory/asset-three.txt');
+            ->assertJsonCount(3, 'data')
+            ->assertJsonPath('data.0.id', 'one::asset-one.txt')
+            ->assertJsonPath('data.1.id', 'one::nested/asset-two.txt')
+            ->assertJsonPath('data.2.id', 'one::nested/subdirectory/asset-three.txt');
 
         $this
             ->actingAs($this->userWithPermission())
             ->getJson('/cp/assets/browse/search/one/nested?search=asset')
             ->assertSuccessful()
-            ->assertJsonCount(1, 'data.assets')
-            ->assertJsonPath('data.assets.0.id', 'one::nested/asset-two.txt');
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', 'one::nested/asset-two.txt');
 
         $this
             ->actingAs($this->userWithPermission())
             ->getJson('/cp/assets/browse/search/one/nested/subdirectory?search=asset')
             ->assertSuccessful()
-            ->assertJsonCount(1, 'data.assets')
-            ->assertJsonPath('data.assets.0.id', 'one::nested/subdirectory/asset-three.txt');
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', 'one::nested/subdirectory/asset-three.txt');
     }
 
     #[Test]
@@ -315,13 +315,12 @@ class BrowserTest extends TestCase
     private function jsonStructure()
     {
         return [
-            'meta',
             'links' => ['folder_action', 'asset_action'],
             'data' => [
-                'assets' => [
-                    ['id', 'size_formatted', 'last_modified_relative', 'actions'],
-                    ['id', 'size_formatted', 'last_modified_relative', 'actions', 'thumbnail'],
-                ],
+                ['id', 'size_formatted', 'last_modified_relative', 'actions'],
+                ['id', 'size_formatted', 'last_modified_relative', 'actions', 'thumbnail'],
+            ],
+            'meta' => [
                 'folder' => [
                     'title', 'path', 'parent_path', 'actions', 'folders',
                 ],

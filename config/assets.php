@@ -61,7 +61,7 @@ return [
         |--------------------------------------------------------------------------
         |
         | You may define global defaults for all manipulation parameters, such as
-        | quality, format, and sharpness. These can and will be be overwritten
+        | quality, format, and sharpness. These can and will be overwritten
         | on the tag parameter level as well as the preset level.
         |
         */

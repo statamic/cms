@@ -23,7 +23,11 @@
 /* FOCUS STATES
 =================================================== */
 @layer base {
-    /* (Except where the focus-within class will handle the focus outline target instead) */
+    /* Explicitly show focus without needing to tab */
+    .show-focus:focus,
+    /* Explicitly show focus without needing to tab for buttons inside modals, e.g. Assets > cancel button on delete modal */
+    [data-dismissable-layer] button:focus,
+    /* and then a global selector for focus-visible everywhere else (except where the focus-within class will handle the focus outline target instead) */
     :not([class*='focus-within'] *) {
         :focus-visible& {
             outline-width: var(--focus-outline-width);
@@ -36,5 +40,9 @@
     /* e.g. When we have .focus-within:focus-outline on the global Site selector (which uses the Reka combobox), we don't want to see further focus states like on the dropdown arrow */
     [class*='focus-within'] * {
         outline: none;
+    }
+
+    a {
+        cursor: pointer;
     }
 }

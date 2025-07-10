@@ -98,6 +98,8 @@ class ElevatedSessionTest extends TestCase
     #[Test]
     public function it_can_get_status_of_elevated_session_when_session_has_expired_and_user_doesnt_have_a_password()
     {
+        $this->freezeTime();
+
         Notification::fake();
         Str::createRandomStringsUsing(fn () => 'abc');
         $user = tap(User::make()->email('foo@bar.com')->makeSuper())->save();

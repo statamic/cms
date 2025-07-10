@@ -15,7 +15,7 @@ function setupComplete() {
 </script>
 
 <template>
-    <button type="button" class="btn-primary" @click="setupModalOpen = true">{{ __('Set up') }}</button>
+    <ui-button variant="primary" @click="setupModalOpen = true" :text="__('Set up')" class="w-full" />
 
     <TwoFactorSetup
         v-if="setupModalOpen"

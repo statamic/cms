@@ -45,7 +45,7 @@ export default {
         },
 
         fieldPath() {
-            return this.fieldPathPrefix || this.handle;
+            return this.fieldPathPrefix ? `${this.fieldPathPrefix}.${this.handle}` : this.handle;
         },
     },
 

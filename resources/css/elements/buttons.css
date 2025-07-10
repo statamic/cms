@@ -1,32 +1,34 @@
 /* GROUP BUTTONS
 =================================================== */
-button {
-    @apply font-normal;
-}
-
-/*  Base button styles that shouldn't need overriding */
-[class^='btn'],
-[class*=' btn'] {
-    @apply relative h-auto cursor-pointer select-none rounded-sm;
-    @apply inline-flex justify-center whitespace-nowrap align-middle leading-none;
-    @apply items-center text-center text-sm subpixel-antialiased;
-
-    height: 2.375rem; /*  38px */
-    letter-spacing: -0.01em;
-    padding: 0.475rem 1.25rem;
-
-    &:focus {
-        /* @apply ring-2 outline-none dark:outline-2 dark:outline-dark-blue-100; */
-        @apply outline-hidden ring-2;
+@layer base {
+    button {
+        @apply font-normal;
     }
-
-    &:disabled {
-        @apply cursor-default;
+    
+    /*  Base button styles that shouldn't need overriding */
+    [class^='btn'],
+    [class*=' btn'] {
+        @apply relative h-auto cursor-pointer select-none rounded-sm;
+        @apply inline-flex justify-center whitespace-nowrap align-middle leading-none;
+        @apply items-center text-center text-sm subpixel-antialiased;
+    
+        height: 2.375rem; /*  38px */
+        letter-spacing: -0.01em;
+        padding: 0.475rem 1.25rem;
+    
+        &:focus {
+            /* @apply ring-2 outline-none dark:outline-2 dark:outline-dark-blue-100; */
+            @apply outline-hidden ring-2;
+        }
+    
+        &:disabled {
+            @apply cursor-default;
+        }
     }
-}
-
-.btn-height {
-    height: 2.375rem; /*  38px */
+    
+    .btn-height {
+        height: 2.375rem; /*  38px */
+    }
 }
 
 /* GROUP BUTTONS / DEFAULT - the default, non-primary action button

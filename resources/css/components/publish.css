@@ -50,7 +50,7 @@ code.parent-url {
 
     aside & {
         /* Decrease */
-        @apply gap-2;
+        @apply gap-x-2 gap-y-3 lg:gap-y-6;
     }
 
     .form-group {
@@ -104,7 +104,7 @@ Here flexbox is much better suited to create a layout that grows to fill space. 
 /* GROUP PUBLISH COMPONENT / FIELD
 =================================================== */
 .publish-field {
-    @apply relative;
+    position: relative;
     .read-only-overlay {
         @apply absolute inset-0 cursor-not-allowed bg-white/25;
         z-index: 100;
@@ -123,10 +123,14 @@ Here flexbox is much better suited to create a layout that grows to fill space. 
             }
         }
     }
+
+    code {
+        @apply bg-blue-50 text-blue-600 font-medium px-1 rounded-sm;
+    }
 }
 
 .publish-field-label {
-    @apply flex items-center;
+    @apply flex items-center font-medium text-sm mb-2;
 }
 
 .publish-sections .publish-sections-section {

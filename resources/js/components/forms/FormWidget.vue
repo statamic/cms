@@ -1,83 +1,73 @@
-<script>
-import Listing from '../Listing.vue';
+<script setup>
 import DateFormatter from '@statamic/components/DateFormatter.js';
-import { Widget } from '@statamic/ui';
+import { computed } from 'vue';
+import { Widget, Icon, Listing, ListingTableBody as TableBody, ListingPagination as Pagination } from '@statamic/ui';
 
-export default {
-    mixins: [Listing],
+const props = defineProps({
+    form: { type: String, required: true },
+    fields: { type: Array, default: () => [] },
+    title: { type: String },
+    initialPerPage: { type: Number, default: 5 },
+});
 
-    components: {
-        Widget,
-    },
+const requestUrl = cp_url(`forms/${props.form}/submissions`);
 
-    props: {
-        form: { type: String, required: true },
-        fields: { type: Array, default: () => [] },
-        title: { type: String },
-    },
+const cols = computed(() => [
+    ...props.fields.map((field) => ({ label: field, field, visible: true })),
+    { label: 'Date', field: 'datestamp', visible: true },
+]);
 
-    data() {
-        return {
-            cols: [
-                ...this.fields.map((field) => ({ label: field, field, visible: true })),
-                { label: 'Date', field: 'date', visible: true },
-            ],
-            listingKey: 'submissions',
-            requestUrl: cp_url(`forms/${this.form}/submissions`),
-        };
-    },
+const widgetProps = computed(() => ({
+    title: props.title,
+    icon: 'forms',
+}));
 
-    methods: {
-        formatDate(value) {
-            return DateFormatter.format(value, { relative: 'hour' }).toString();
-        },
-    },
-};
+function formatDate(value) {
+    return DateFormatter.format(value, { relative: 'hour' }).toString();
+}
 </script>
 
 <template>
-    <Widget :title="title" icon="forms">
-        <data-list v-if="!initializing && items.length" :rows="items" :columns="cols" :sort="false" class="w-full">
-            <div v-if="initializing" class="loading">
-                <loading-graphic />
-            </div>
-
-            <data-list-table
-                v-else
-                :loading="loading"
-                unstyled
-                class="[&_td]:px-0.5 [&_td]:py-0.75 [&_td]:text-sm [&_thead]:hidden"
-            >
-                <template v-for="field in fields" #[`cell-${field}`]="{ row: submission }">
-                    <a
-                        :href="cp_url(`forms/${form}/submissions/${submission.id}`)"
-                        class="line-clamp-1 overflow-hidden text-ellipsis"
-                    >
-                        {{ submission[field] }}
-                    </a>
-                </template>
-                <template #cell-date="{ row: submission }">
-                    <div
-                        class="text-end font-mono text-xs whitespace-nowrap text-gray-500 antialiased"
-                        v-html="formatDate(submission.datestamp)"
-                    />
-                </template>
-            </data-list-table>
-        </data-list>
-
-        <p v-if="!initializing && !items.length" class="p-3 text-center text-sm text-gray-600">
-            {{ __('This form is awaiting responses') }}
-        </p>
-
-        <template #actions>
-            <data-list-pagination
-                v-if="meta.last_page != 1"
-                :resource-meta="meta"
-                @page-selected="selectPage"
-                :scroll-to-top="false"
-                :show-page-links="false"
-            />
-            <slot name="actions" />
+    <Listing
+        :url="requestUrl"
+        :columns="cols"
+        :per-page="initialPerPage"
+        :show-pagination-totals="false"
+        :show-pagination-page-links="false"
+    >
+        <template #initializing>
+            <Widget v-bind="widgetProps"><Icon name="loading" /></Widget>
         </template>
-    </Widget>
+        <template #default="{ items }">
+            <Widget v-bind="widgetProps">
+                <ui-description v-if="!items.length" class="flex-1 flex items-center justify-center">
+                    {{ __('This form is awaiting responses') }}
+                </ui-description>
+                <div class="px-4 py-3">
+                    <table class="w-full [&_td]:p-0.5 [&_td]:text-sm">
+                        <TableBody>
+                            <template v-for="field in fields" #[`cell-${field}`]="{ row: submission }">
+                                <a
+                                    :href="cp_url(`forms/${form}/submissions/${submission.id}`)"
+                                    class="line-clamp-1 overflow-hidden text-ellipsis"
+                                >
+                                    {{ submission[field] }}
+                                </a>
+                            </template>
+                            <template #cell-datestamp="{ row: submission }">
+                                <div
+                                    class="text-end font-mono text-xs whitespace-nowrap text-gray-500 antialiased"
+                                    v-html="formatDate(submission.datestamp)"
+                                />
+                            </template>
+                        </TableBody>
+                    </table>
+                </div>
+                <template #actions>
+                    <Pagination />
+                    <slot name="actions" />
+                </template>
+            </Widget>
+        </template>
+    </Listing>
 </template>

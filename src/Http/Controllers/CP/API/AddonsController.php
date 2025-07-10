@@ -17,7 +17,7 @@ class AddonsController extends CpController
         $withInstalled = $request->installed ?? false;
 
         $addons = (new AddonsQuery)
-            ->search($request->q)
+            ->search($request->search)
             ->page($request->page)
             ->installed($withInstalled)
             ->paginate();

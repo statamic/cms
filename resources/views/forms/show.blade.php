@@ -11,7 +11,7 @@
             <ui-dropdown placement="left-start" class="me-2">
                 <ui-dropdown-menu>
                     @can('edit', $form)
-                        <ui-dropdown-item :text="__('Edit Form')" icon="edit" href="{{ $form->editUrl() }}"></ui-dropdown-item>
+                        <ui-dropdown-item :text="__('Configure Form')" icon="cog" href="{{ $form->editUrl() }}"></ui-dropdown-item>
                     @endcan
 
                     @can('configure form fields')
@@ -69,9 +69,9 @@
     <form-submission-listing
         form="{{ $form->handle() }}"
         action-url="{{ cp_route('forms.submissions.actions.run', $form->handle()) }}"
-        initial-sort-column="datestamp"
-        initial-sort-direction="desc"
-        :initial-columns="{{ $columns->toJson() }}"
+        sort-column="datestamp"
+        sort-direction="desc"
+        :columns="{{ $columns->toJson() }}"
         :filters="{{ $filters->toJson() }}"
         v-cloak
     >

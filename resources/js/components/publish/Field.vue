@@ -71,7 +71,7 @@
                 </label>
 
                 <ui-description
-                    :class="{ '-mt-1 mb-2': showLabel }"
+                    :class="{ '-mt-1 mb-2.5': showLabel }"
                     v-if="instructions && config.instructions_position !== 'below'"
                     v-html="instructions"
                 />
@@ -89,6 +89,7 @@
                     v-else
                     ref="field"
                     :is="fieldtypeComponent"
+                    :id="fieldId"
                     :config="config"
                     :value="value"
                     :meta="meta"

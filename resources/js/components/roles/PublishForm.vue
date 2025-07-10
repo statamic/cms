@@ -1,50 +1,57 @@
 <template>
-    <div>
+    <div class="max-w-5xl mx-auto">
         <Header :title="__(initialTitle) || __('Create Role')" icon="permissions">
             <Button type="submit" variant="primary" @click="save" :text="__('Save')" />
         </Header>
 
-        <div class="card configure-tab publish-fields @container mb-6 p-0">
-            <form-group
-                handle="title"
-                class="dark:border-dark-900 border-b"
-                :display="__('Title')"
-                :errors="errors.title"
-                :instructions="__('messages.role_title_instructions')"
-                v-model="title"
-                :focus="true"
-            />
-
-            <form-group
-                class="dark:border-dark-900 border-b"
-                fieldtype="slug"
-                handle="handle"
-                :display="__('Handle')"
-                :instructions="__('messages.role_handle_instructions')"
-                :errors="errors.title"
-                v-model="handle"
-            />
-
-            <div class="p-6 pt-0 text-xs text-red-500" v-if="initialHandle && handle != initialHandle">
-                {{ __('messages.role_change_handle_warning') }}
+        <ui-panel>
+            <div class="publish-fields-fluid">
+                <ui-card class="field-w-50">
+                    <form-group
+                        handle="title"
+                        :display="__('Title')"
+                        :errors="errors.title"
+                        :instructions="__('messages.role_title_instructions')"
+                        v-model="title"
+                        :focus="true"
+                    />
+                </ui-card>
+                <ui-card class="field-w-50">
+                    <form-group
+                        fieldtype="slug"
+                        handle="handle"
+                        :display="__('Handle')"
+                        :instructions="__('messages.role_handle_instructions')"
+                        :errors="errors.title"
+                        v-model="handle"
+                    />
+                    <div class="p-6 pt-0 text-xs text-red-500" v-if="initialHandle && handle != initialHandle">
+                        {{ __('messages.role_change_handle_warning') }}
+                    </div>
+                </ui-card>
+                <ui-card class="field-w-100">
+                    <form-group
+                        v-if="canAssignSuper"
+                        class="toggle-fieldtype"
+                        fieldtype="toggle"
+                        handle="super"
+                        :display="__('permissions.super')"
+                        :instructions="__('permissions.super_desc')"
+                        v-model="isSuper"
+                    />
+                </ui-card>
             </div>
+        </ui-panel>
 
-            <form-group
-                v-if="canAssignSuper"
-                class="toggle-fieldtype"
-                fieldtype="toggle"
-                handle="super"
-                :display="__('permissions.super')"
-                :instructions="__('permissions.super_desc')"
-                v-model="isSuper"
-            />
-        </div>
-
-        <div v-if="!isSuper">
-            <div class="content mt-6" v-for="group in permissions" :key="group.handle">
-                <h2 class="mt-10 mb-2 text-base">{{ group.label }}</h2>
-                <role-permission-tree class="card p-0" :depth="1" :initial-permissions="group.permissions" />
-            </div>
+        <div v-if="!isSuper" class="space-y-6 mt-6">
+            <ui-panel v-for="group in permissions" :key="group.handle">
+                <ui-panel-header>
+                    <ui-heading :text="group.label" />
+                </ui-panel-header>
+                <ui-card>
+                    <role-permission-tree :depth="1" :initial-permissions="group.permissions" />
+                </ui-card>
+            </ui-panel>
         </div>
     </div>
 </template>

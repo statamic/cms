@@ -1,7 +1,7 @@
 <script setup>
 import { cva } from 'cva';
 import { computed } from 'vue';
-import { Description, Label } from '@statamic/components/ui/index.js';
+import { Description, Label, Card } from '@statamic/components/ui/index.js';
 import markdown from '@statamic/util/markdown.js';
 
 defineOptions({
@@ -9,66 +9,36 @@ defineOptions({
 });
 
 const props = defineProps({
-    variant: {
-        type: String,
-        default: 'block',
-    },
-    label: {
-        type: String,
-    },
-    id: {
-        type: String,
-    },
-    instructions: {
-        type: String,
-        default: '',
-    },
-    instructionsBelow: {
-        type: Boolean,
-        default: false,
-    },
-    required: {
-        type: Boolean,
-        default: false,
-    },
-    badge: {
-        type: String,
-        default: '',
-    },
-    error: {
-        type: String,
-    },
-    errors: {
-        type: Object,
-        default: (props) => (props.error ? [props.error] : []),
-    },
-    disabled: {
-        type: Boolean,
-        default: false,
-    },
+    as: { type: String, default: 'div', validator: (value) => ['div', 'card'].includes(value) },
+    badge: { type: String, default: '' },
+    disabled: { type: Boolean, default: false },
+    error: { type: String },
+    errors: { type: Object, default: (props) => (props.error ? [props.error] : []) },
+    id: { type: String },
+    instructions: { type: String, default: '' },
+    instructionsBelow: { type: Boolean, default: false },
+    label: { type: String },
+    required: { type: Boolean, default: false },
+    variant: { type: String, default: 'block' },
 });
 
 const labelProps = computed(() => ({
-    text: props.label,
+    badge: props.badge,
     for: props.id,
     required: props.required,
-    badge: props.badge,
+    text: props.label,
 }));
 
 const classes = computed(() =>
     cva({
         base: [
             'min-w-0',
-            /* When label exists but no description follows */
-            '[&>[data-ui-label]:not(:has(+[data-ui-description]))]:mb-2',
-            /* When label is followed by description */
-            '*:data-ui-description:mb-2 *:data-ui-description:mt-1',
         ],
         variants: {
             variant: {
                 block: 'w-full',
                 inline: [
-                    'grid gap-x-3 gap-y-1.5',
+                    'flex justify-between gap-x-3 gap-y-1.5',
                     'has-[[data-ui-label]~[data-ui-control]]:grid-cols-[1fr_auto]',
                     'has-[[data-ui-control]~[data-ui-label]]:grid-cols-[auto_1fr]',
                     '[&>[data-ui-control]~[data-ui-description]]:row-start-2 [&>[data-ui-control]~[data-ui-description]]:col-start-2',
@@ -83,22 +53,25 @@ const classes = computed(() =>
 );
 
 const instructions = computed(() => props.instructions ? markdown(props.instructions, { openLinksInNewTabs: true }) : null);
+const wrapperComponent = computed(() => props.as === 'card' ? Card : 'div');
 </script>
 
 <template>
-    <div :class="[classes, $attrs.class]" data-ui-input-group>
-        <div v-if="$slots.actions" class="mb-2 flex items-center justify-between gap-x-1">
+    <component :is="wrapperComponent" :class="[classes, $attrs.class]" data-ui-input-group>
+        <div v-if="$slots.actions" class="flex items-center justify-between gap-x-1 h-6" data-ui-field-header>
             <slot name="label">
                 <Label v-if="label" v-bind="labelProps" class="flex-1" />
             </slot>
             <slot name="actions" />
         </div>
-        <slot v-if="!$slots.actions" name="label">
-            <Label v-if="label" v-bind="labelProps" class="flex-1" />
-        </slot>
-        <Description :text="instructions" v-if="instructions && !instructionsBelow" />
+        <div data-ui-field-text class="mb-1.5">
+            <slot v-if="!$slots.actions" name="label">
+                <Label v-if="label" v-bind="labelProps" class="flex-1" />
+            </slot>
+            <Description :text="instructions" v-if="instructions && !instructionsBelow" class="mb-1.5" />
+        </div>
         <slot />
         <Description :text="instructions" v-if="instructions && instructionsBelow" class="mt-2" />
         <Description v-if="errors" v-for="(error, i) in errors" :key="i" :text="error" class="mt-2 text-red-500" />
-    </div>
+    </component>
 </template>

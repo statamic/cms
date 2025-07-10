@@ -1,37 +1,40 @@
 <template>
     <div
-        class="replicator-set dark:border-dark-900 mb-4 rounded-sm border shadow-sm"
+        class="bg-white dark:bg-gray-850 rounded-xl ring ring-gray-300 dark:ring-x-0 dark:ring-b-0 dark:ring-gray-700 shadow-ui-md"
         :class="[sortableItemClass, { 'opacity-50': isExcessive }]"
     >
-        <div class="replicator-set-header">
-            <div class="item-move sortable-handle cursor-grab" :class="{ [sortableHandleClass]: grid.isReorderable }" />
-            <div class="replicator-set-header-inner flex w-full items-end justify-end py-2 ltr:pl-2 rtl:pr-2">
-                <button
+        <header class="bg-gray-50 dark:bg-gray-900 rounded-t-xl border-b border-gray-300 dark:border-gray-700 ps-4 pe-2 py-1.5 flex items-center justify-between">
+            <ui-drag-handle :class="{ [sortableHandleClass]: grid.isReorderable }" />
+            <div class="flex flex-1 items-end justify-end">
+                <ui-button
                     v-if="canAddRows"
-                    class="group flex items-center self-end ltr:mr-2 rtl:ml-2"
                     @click="$emit('duplicate', index)"
-                    :aria-label="__('Duplicate Row')"
-                >
-                    <svg-icon name="light/duplicate" class="h-4 w-4 text-gray-600 group-hover:text-gray-900" />
-                </button>
-                <button
+                    v-tooltip="__('Duplicate Row')"
+                    icon="duplicate"
+                    variant="ghost"
+                    inset
+                    size="sm"
+                />
+                <ui-button
                     v-if="canDelete"
-                    class="group flex items-center self-end"
                     @click="$emit('removed', index)"
-                    :aria-label="__('Delete Row')"
-                >
-                    <svg-icon name="micro/trash" class="h-4 w-4 text-gray-600 group-hover:text-gray-900" />
-                </button>
+                    v-tooltip="__('Delete Row')"
+                    icon="trash"
+                    variant="ghost"
+                    inset
+                    size="sm"
+                />
             </div>
+        </header>
+        <div class="px-4 py-3">
+            <FieldsProvider
+                :fields="fields"
+                :field-path-prefix="`${fieldPathPrefix}.${index}`"
+                :meta-path-prefix="`${metaPathPrefix}.existing.${values._id}`"
+            >
+                <PublishFields />
+            </FieldsProvider>
         </div>
-
-        <FieldsProvider
-            :fields="fields"
-            :field-path-prefix="`${fieldPathPrefix}.${index}`"
-            :meta-path-prefix="`${metaPathPrefix}.existing.${values._id}`"
-        >
-            <PublishFields />
-        </FieldsProvider>
     </div>
 </template>
 

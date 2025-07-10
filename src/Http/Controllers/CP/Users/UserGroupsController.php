@@ -38,6 +38,10 @@ class UserGroupsController extends CpController
             return $groups;
         }
 
+        if ($groups->count() === 0) {
+            return view('statamic::usergroups.empty');
+        }
+
         return view('statamic::usergroups.index', [
             'groups' => $groups,
         ]);

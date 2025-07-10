@@ -38,7 +38,7 @@
         <confirmation-modal
             v-if="editingSection"
             :title="editText"
-            @opened="$refs.displayInput.select()"
+            @opened="$refs.displayInput?.select()"
             @confirm="editConfirmed"
             @cancel="editCancelled"
         >

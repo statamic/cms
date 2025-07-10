@@ -1,55 +1,53 @@
-<template>
-    <ui-panel>
-        <data-list :rows="rows" :columns="columns" v-slot="{}">
-            <data-list-table>
-                <template #cell-title="{ row: group, index }">
-                    <a :href="group.show_url">{{ __(group.title) }}</a>
-                </template>
-                <template #cell-handle="{ value: handle }">
-                    <span class="font-mono text-xs">{{ handle }}</span>
-                </template>
-                <template #actions="{ row: group, index }">
-                    <Dropdown placement="left-start" class="me-3">
-                        <DropdownMenu>
-                            <DropdownItem :text="__('Edit')" icon="edit" :href="group.edit_url" />
-                            <DropdownItem :text="__('Delete')" icon="trash" variant="destructive" @click="$refs[`deleter_${group.id}`].confirm()" />
-                        </DropdownMenu>
-                    </Dropdown>
+<script setup>
+import { ref } from 'vue';
+import { DropdownItem, Listing } from '@statamic/ui';
 
-                    <resource-deleter :ref="`deleter_${group.id}`" :resource="group" @deleted="removeRow(group)" />
-                </template>
-            </data-list-table>
-        </data-list>
-    </ui-panel>
-</template>
+const props = defineProps({
+    initialRows: Array,
+});
 
-<script>
-import Listing from '../Listing.vue';
-import { Dropdown, DropdownMenu, DropdownItem } from '@statamic/ui';
+const rows = ref(props.initialRows);
 
-export default {
-    mixins: [Listing],
+const columns = ref([
+    { label: __('Title'), field: 'title' },
+    { label: __('Handle'), field: 'handle' },
+    { label: __('Users'), field: 'users' },
+    { label: __('Roles'), field: 'roles' },
+]);
 
-    components: {
-        Dropdown,
-        DropdownMenu,
-        DropdownItem,
-    },
+function reloadPage() {
+    window.location.reload();
+}
 
-    props: {
-        initialRows: Array,
-    },
-
-    data() {
-        return {
-            rows: this.initialRows,
-            columns: [
-                { label: __('Title'), field: 'title' },
-                { label: __('Handle'), field: 'handle' },
-                { label: __('Users'), field: 'users' },
-                { label: __('Roles'), field: 'roles' },
-            ],
-        };
-    },
-};
+function removeRow(row) {
+    const i = rows.value.findIndex((r) => r.id === row.id);
+    rows.value.splice(i, 1);
+}
 </script>
+<template>
+    <Listing
+        :items="rows"
+        :columns="columns"
+        :allow-search="false"
+        :allow-customizing-columns="false"
+        @refreshing="reloadPage"
+    >
+        <template #cell-title="{ row: group }">
+            <a :href="group.show_url">{{ __(group.title) }}</a>
+            <resource-deleter :ref="`deleter_${group.id}`" :resource="group" @deleted="removeRow(group)" />
+        </template>
+        <template #cell-handle="{ value: handle }">
+            <span class="font-mono text-xs">{{ handle }}</span>
+        </template>
+        <template #prepended-row-actions="{ row: group }">
+            <DropdownItem :text="__('View')" icon="eye" :href="group.show_url" />
+            <DropdownItem :text="__('Configure')" icon="cog" :href="group.edit_url" />
+            <DropdownItem
+                :text="__('Delete')"
+                icon="trash"
+                variant="destructive"
+                @click="$refs[`deleter_${group.id}`].confirm()"
+            />
+        </template>
+    </Listing>
+</template>

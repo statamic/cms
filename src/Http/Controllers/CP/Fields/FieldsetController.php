@@ -48,6 +48,10 @@ class FieldsetController extends CpController
             return $fieldsets;
         }
 
+        if ($fieldsets->count() === 0) {
+            return view('statamic::fieldsets.empty');
+        }
+
         return view('statamic::fieldsets.index', compact('fieldsets'));
     }
 
