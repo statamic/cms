@@ -1,5 +1,28 @@
 # Release Notes
 
+## 5.59.0 (2025-07-10)
+
+### What's new
+- Add optional fallback for missing keys in `{{ trans }}` tag [#11944](https://github.com/statamic/cms/issues/11944) by @daun
+- `resolve` modifier [#11890](https://github.com/statamic/cms/issues/11890) by @marcorieser
+- Allow fetching children of other entries in `{{ children }}` tag [#11922](https://github.com/statamic/cms/issues/11922) by @daun
+- Prompt to update search indexes when installing starter kits [#11924](https://github.com/statamic/cms/issues/11924) by @jesseleite
+
+### What's fixed
+- Use `app.locale` as fallback when there is no explicit site locale [#11939](https://github.com/statamic/cms/issues/11939) by @CasEbb
+- Check if sometimes rule is present before adding nonNull type [#11917](https://github.com/statamic/cms/issues/11917) by @TheBnl
+- Fix issue around spaces in git paths [#11933](https://github.com/statamic/cms/issues/11933) by @jesseleite
+- Fix active state for nav items with implicit children [#11937](https://github.com/statamic/cms/issues/11937) by @jesseleite
+- Fix visibility of custom nav items for users w/ limited permissions [#11930](https://github.com/statamic/cms/issues/11930) by @jesseleite
+- Fix group fieldtype child field validation rules when using {this} within a replicator/grid [#11931](https://github.com/statamic/cms/issues/11931) by @martyf
+- Relax strict type check in `Tree::move()` [#11927](https://github.com/statamic/cms/issues/11927) by @duncanmcclean
+- Prevent group fieldtype from filtering out `false` values [#11928](https://github.com/statamic/cms/issues/11928) by @duncanmcclean
+- Class "DB" not found issue [#11911](https://github.com/statamic/cms/issues/11911) by @leganz
+- Fix casing on dropdown item [#11907](https://github.com/statamic/cms/issues/11907) by @duncanmcclean
+- German translations [#11903](https://github.com/statamic/cms/issues/11903) by @helloDanuk
+
+
+
 ## 5.58.1 (2025-06-25)
 
 ### What's fixed
