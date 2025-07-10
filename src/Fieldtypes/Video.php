@@ -11,7 +11,10 @@ class Video extends Fieldtype
 
     public function augment($value)
     {
-        /** @todo This is dumb */
+        if (is_null($value)) {
+            return null;
+        }
+
         if (str($value)->isUrl()) {
             return $value;
         }
