@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div :class="{ 'mb-4': rows.length > 0 }">
         <sortable-list
             :model-value="rows"
             :vertical="true"
