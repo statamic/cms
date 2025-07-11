@@ -5,6 +5,7 @@ namespace Statamic\Extend;
 use Composer\Semver\VersionParser;
 use Facades\Statamic\Licensing\LicenseManager;
 use ReflectionClass;
+use Statamic\Facades;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Support\Arr;
@@ -148,6 +149,13 @@ final class Addon
     protected $editions = [];
 
     /**
+     * Whether the addon has marketplace data.
+     *
+     * @var bool
+     */
+    protected $hasMarketplaceData = false;
+
+    /**
      * @param  string  $id
      */
     public function __construct($id)
@@ -182,6 +190,10 @@ final class Addon
         foreach (Arr::only($package, $keys) as $key => $value) {
             $method = Str::camel($key);
             $instance->$method($value);
+        }
+
+        if (array_key_exists('marketplaceId', $package)) {
+            $instance->hasMarketplaceData = true;
         }
 
         return $instance;
@@ -239,6 +251,12 @@ final class Addon
      */
     public function marketplaceId($id = null)
     {
+        if (! $this->hasMarketplaceData && func_num_args() === 0) {
+            app(Manifest::class)->fetchPackageDataFromMarketplace();
+
+            return Facades\Addon::get($this->id)->marketplaceId();
+        }
+
         return $id
             ? $this->marketplaceId = $id
             : $this->marketplaceId;
@@ -252,9 +270,72 @@ final class Addon
      */
     public function marketplaceSlug($slug = null)
     {
+        if (! $this->hasMarketplaceData && func_num_args() === 0) {
+            app(Manifest::class)->fetchPackageDataFromMarketplace();
+
+            return Facades\Addon::get($this->id)->marketplaceSlug();
+        }
+
         return $slug
             ? $this->marketplaceSlug = $slug
             : $this->marketplaceSlug;
+    }
+
+    /**
+     * The marketplace URL.
+     *
+     * @param  string  $url
+     * @return string
+     */
+    public function marketplaceUrl($url = null)
+    {
+        if (! $this->hasMarketplaceData && func_num_args() === 0) {
+            app(Manifest::class)->fetchPackageDataFromMarketplace();
+
+            return Facades\Addon::get($this->id)->marketplaceUrl();
+        }
+
+        return $url
+            ? $this->marketplaceUrl = $url
+            : $this->marketplaceUrl;
+    }
+
+    /**
+     * The marketplace slug of the addon's seller.
+     *
+     * @param  string  $slug
+     * @return string
+     */
+    public function marketplaceSellerSlug($slug = null)
+    {
+        if (! $this->hasMarketplaceData && func_num_args() === 0) {
+            app(Manifest::class)->fetchPackageDataFromMarketplace();
+
+            return Facades\Addon::get($this->id)->marketplaceSellerSlug();
+        }
+
+        return $slug
+            ? $this->marketplaceSellerSlug = $slug
+            : $this->marketplaceSellerSlug;
+    }
+
+    /**
+     * Whether the addon is commercial.
+     *
+     * @param  bool  $isCommercial
+     * @return bool
+     */
+    public function isCommercial($isCommercial = null)
+    {
+        if (! $this->hasMarketplaceData && func_num_args() === 0) {
+            app(Manifest::class)->fetchPackageDataFromMarketplace();
+
+            return Facades\Addon::get($this->id)->isCommercial();
+        }
+
+        return $isCommercial
+            ? $this->isCommercial = $isCommercial
+            : $this->isCommercial;
     }
 
     /**
@@ -369,20 +450,39 @@ final class Addon
         return new AddonChangelog($this);
     }
 
+    /**
+     * The latest version of the addon (via marketplace).
+     *
+     * @param  string|null  $latestVersion
+     * @return string|null
+     */
+    public function latestVersion($latestVersion = null)
+    {
+        if (! $this->hasMarketplaceData && func_num_args() === 0) {
+            app(Manifest::class)->fetchPackageDataFromMarketplace();
+
+            return Facades\Addon::get($this->id)->latestVersion();
+        }
+
+        return $latestVersion
+            ? $this->latestVersion = $latestVersion
+            : $this->latestVersion;
+    }
+
     public function isLatestVersion()
     {
         if (Str::startsWith($this->version, 'dev-') || Str::endsWith($this->version, '-dev')) {
             return true;
         }
 
-        if (! $this->latestVersion) {
+        if (! $latestVersion = $this->latestVersion()) {
             return true;
         }
 
         $versionParser = new VersionParser;
 
         $version = $versionParser->normalize($this->version);
-        $latestVersion = $versionParser->normalize($this->latestVersion);
+        $latestVersion = $versionParser->normalize($latestVersion);
 
         return version_compare($version, $latestVersion, '=');
     }
