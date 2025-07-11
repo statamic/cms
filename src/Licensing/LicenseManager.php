@@ -44,6 +44,11 @@ class LicenseManager
         return new MessageBag($this->response('error') === 422 ? $this->response('errors') : []);
     }
 
+    public function outpostIsOffline()
+    {
+        return in_array($this->requestErrorCode(), [403, 500, 503]);
+    }
+
     public function isOnPublicDomain()
     {
         return $this->response('public');
