@@ -54,6 +54,7 @@ class Manifest extends PackageManifest
             'slug' => $statamic['slug'] ?? null,
             'editions' => $statamic['editions'] ?? [],
             'version' => Str::removeLeft($package['version'], 'v'),
+            'raw_version' => $package['version'],
             'namespace' => $namespace,
             'autoload' => $autoload,
             'provider' => $provider,
@@ -79,7 +80,7 @@ class Manifest extends PackageManifest
             ->map(function (array $package) {
                 return [
                     'package' => $package['id'],
-                    'version' => $package['version'], // todo: we strip off the 'v' when building the manifest, but the api doesn't expect that, so we *might* (in some cases) need to add it back
+                    'version' => $package['raw_version'],
                     'edition' => config('statamic.editions.addons.'.$package['id']),
                 ];
             })
