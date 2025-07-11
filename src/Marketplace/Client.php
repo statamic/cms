@@ -44,14 +44,22 @@ class Client
         }
     }
 
+    public function get(string $endpoint, array $params = [])
+    {
+        return $this->request('GET', $endpoint, $params);
+    }
+
+    public function post(string $endpoint, array $params = [])
+    {
+        return $this->request('POST', $endpoint, $params);
+    }
+
     /**
      * Send API request.
      *
-     * @param  string  $endpoint
-     * @param  arra  $params
      * @return mixed
      */
-    public function get($endpoint, $params = [])
+    private function request(string $method, string $endpoint, array $params = [])
     {
         $lock = $this->lock(static::LOCK_KEY, 10);
 
@@ -61,8 +69,8 @@ class Client
         try {
             $lock->block(5);
 
-            return $this->cache()->rememberWithExpiration($key, function () use ($endpoint, $params) {
-                $response = Guzzle::request('GET', $endpoint, [
+            return $this->cache()->rememberWithExpiration($key, function () use ($method, $endpoint, $params) {
+                $response = Guzzle::request($method, $endpoint, [
                     'verify' => $this->verifySsl,
                     'query' => $params,
                 ]);

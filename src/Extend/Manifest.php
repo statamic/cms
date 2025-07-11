@@ -4,6 +4,7 @@ namespace Statamic\Extend;
 
 use Facades\Statamic\Marketplace\Marketplace;
 use Illuminate\Foundation\PackageManifest;
+use Illuminate\Support\Facades\Facade;
 use ReflectionClass;
 use Statamic\Facades\File;
 use Statamic\Support\Arr;
@@ -48,21 +49,12 @@ class Manifest extends PackageManifest
         $statamic = $json['extra']['statamic'] ?? [];
         $author = $json['authors'][0] ?? null;
 
-        $edition = config('statamic.editions.addons.'.$package['name']);
-
-        $marketplaceData = Marketplace::package($package['name'], $package['version'], $edition);
-
         return [
             'id' => $package['name'],
             'slug' => $statamic['slug'] ?? null,
             'editions' => $statamic['editions'] ?? [],
-            'marketplaceId' => data_get($marketplaceData, 'id', null),
-            'marketplaceSlug' => data_get($marketplaceData, 'slug', null),
-            'marketplaceUrl' => data_get($marketplaceData, 'url', null),
-            'marketplaceSellerSlug' => data_get($marketplaceData, 'seller', null),
-            'isCommercial' => data_get($marketplaceData, 'is_commercial', false),
-            'latestVersion' => data_get($marketplaceData, 'latest_version', null),
             'version' => Str::removeLeft($package['version'], 'v'),
+            'raw_version' => $package['version'],
             'namespace' => $namespace,
             'autoload' => $autoload,
             'provider' => $provider,
@@ -80,5 +72,37 @@ class Manifest extends PackageManifest
     public function addons()
     {
         return collect($this->getManifest());
+    }
+
+    public function fetchPackageDataFromMarketplace()
+    {
+        $packages = $this->addons()
+            ->map(function (array $package) {
+                return [
+                    'package' => $package['id'],
+                    'version' => $package['raw_version'],
+                    'edition' => config('statamic.editions.addons.'.$package['id']),
+                ];
+            })
+            ->values()
+            ->all();
+
+        $marketplaceData = Marketplace::packages($packages);
+
+        $this->write($this->manifest = $this->addons()->map(function (array $package) use ($marketplaceData) {
+            $marketplaceData = $marketplaceData->get($package['id']);
+
+            return [
+                ...$package,
+                'marketplaceId' => data_get($marketplaceData, 'id'),
+                'marketplaceSlug' => data_get($marketplaceData, 'slug'),
+                'marketplaceUrl' => data_get($marketplaceData, 'url'),
+                'marketplaceSellerSlug' => data_get($marketplaceData, 'seller'),
+                'isCommercial' => data_get($marketplaceData, 'is_commercial', false),
+                'latestVersion' => data_get($marketplaceData, 'latest_version'),
+            ];
+        })->all());
+
+        Facade::clearResolvedInstance(AddonRepository::class);
     }
 }
