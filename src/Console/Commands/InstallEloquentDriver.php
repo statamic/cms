@@ -127,6 +127,7 @@ class InstallEloquentDriver extends Command
     protected function allRepositories(): Collection
     {
         return collect([
+            'addon_settings' => 'Addon Settings',
             'asset_containers' => 'Asset Containers',
             'assets' => 'Assets',
             'blueprints' => 'Blueprints',
@@ -151,6 +152,9 @@ class InstallEloquentDriver extends Command
     protected function repositoryHasBeenMigrated(string $repository): bool
     {
         switch ($repository) {
+            case 'addon_settings':
+                return config('statamic.system.addon_settings_driver') === 'database';
+
             case 'asset_containers':
                 return config('statamic.eloquent-driver.asset_containers.driver') === 'eloquent';
 
@@ -205,6 +209,30 @@ class InstallEloquentDriver extends Command
 
             case 'tokens':
                 return config('statamic.eloquent-driver.tokens.driver') === 'eloquent';
+        }
+    }
+
+    protected function migrateAddonSettings(): void
+    {
+        spin(
+            callback: function () {
+                $this->runArtisanCommand('vendor:publish --tag=statamic-eloquent-addon-setting-migrations');
+                $this->runArtisanCommand('migrate');
+
+                $this->switchToEloquentDriver('addon_settings');
+            },
+            message: 'Migrating addon settings...'
+        );
+
+        $this->infoMessage('Configured addon settings');
+
+        if ($this->shouldImport('addon settings')) {
+            spin(
+                callback: fn () => $this->runArtisanCommand('statamic:eloquent:import-addon-settings'),
+                message: 'Importing existing addon settings...'
+            );
+
+            $this->infoMessage('Imported existing addon settings');
         }
     }
 
@@ -662,9 +690,25 @@ class InstallEloquentDriver extends Command
 
     private function switchToEloquentDriver(string $repository): void
     {
+        $config = Str::of(File::get(config_path('statamic/eloquent-driver.php')));
+
+        if (! $config->contains("'{$repository}' => [")) {
+            $baseConfig = File::get(base_path('vendor/statamic/eloquent-driver/config/eloquent-driver.php'));
+
+            $matches = [];
+            preg_match("/'{$repository}' => \[(.*?)],/s", $baseConfig, $matches);
+
+            $repositoryInBaseConfig = $matches[0] ?? null;
+
+            $config = $config->replace(
+                '];',
+                PHP_EOL.'    '.$repositoryInBaseConfig.PHP_EOL.'];'
+            );
+        }
+
         File::put(
             config_path('statamic/eloquent-driver.php'),
-            Str::of(File::get(config_path('statamic/eloquent-driver.php')))
+            $config
                 ->replace(
                     "'{$repository}' => [\n        'driver' => 'file'",
                     "'{$repository}' => [\n        'driver' => 'eloquent'"

@@ -251,6 +251,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Updates\RemoveParentField::class,
         Updates\UpdateGlobalVariables::class,
         Updates\PublishMigrationForTwoFactorColumns::class,
+        Updates\AddAddonSettingsToGitConfig::class,
     ];
 
     public function register()
