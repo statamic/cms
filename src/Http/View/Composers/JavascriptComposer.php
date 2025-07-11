@@ -70,7 +70,7 @@ class JavascriptComposer
             'preloadableFieldtypes' => FieldtypeRepository::preloadable()->keys(),
             'livePreview' => config('statamic.live_preview'),
             'permissions' => $this->permissions($user),
-            'hasLicenseBanner' => $licenses->invalid() || $licenses->requestFailed(),
+            'hasLicenseBanner' => ! $licenses->outpostIsOffline() && ($licenses->invalid() || $licenses->requestFailed()),
             'customSvgIcons' => Icon::getCustomSvgIcons(),
         ];
     }
