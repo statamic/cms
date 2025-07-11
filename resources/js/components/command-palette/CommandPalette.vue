@@ -3,26 +3,8 @@ import { ref, computed, watch } from 'vue';
 import CommandPaletteItem from './Item.vue';
 import axios from 'axios';
 import debounce from '@statamic/util/debounce';
-import {
-    DialogContent,
-    DialogOverlay,
-    DialogPortal,
-    DialogRoot,
-    DialogTitle,
-    DialogTrigger,
-    DialogDescription,
-    VisuallyHidden,
-} from 'reka-ui';
-import {
-    ComboboxContent,
-    ComboboxEmpty,
-    ComboboxGroup,
-    ComboboxLabel,
-    ComboboxInput,
-    ComboboxItem,
-    ComboboxRoot,
-    ComboboxViewport,
-} from 'reka-ui';
+import { DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle, DialogTrigger, DialogDescription, VisuallyHidden } from 'reka-ui';
+import { ComboboxContent, ComboboxEmpty, ComboboxGroup, ComboboxLabel, ComboboxInput, ComboboxItem, ComboboxRoot, ComboboxViewport } from 'reka-ui';
 import fuzzysort from 'fuzzysort';
 import { each, groupBy, sortBy, find } from 'lodash-es';
 import { motion } from 'motion-v';
@@ -41,23 +23,23 @@ Statamic.$keys.bindGlobal(['mod+k'], (e) => {
     open.value = true;
 });
 
-each(
-    {
-        esc: () => (open.value = false),
-        'ctrl+n': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown' })),
-        'ctrl+p': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp' })),
-    },
-    (callback, binding) => {
-        Statamic.$keys.bindGlobal([binding], (e) => {
-            if (open.value) {
-                e.preventDefault();
-                callback();
-            }
-        });
-    },
-);
+each({
+    esc: () => open.value = false,
+    'ctrl+n': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown' })),
+    'ctrl+p': () => document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp' })),
+}, (callback, binding) => {
+    Statamic.$keys.bindGlobal([binding], (e) => {
+        if (open.value) {
+            e.preventDefault();
+            callback();
+        }
+    });
+});
 
-const aggregatedItems = computed(() => [...(items.value || []), ...(searchResults.value || [])]);
+const aggregatedItems = computed(() => [
+    ...(items.value || []),
+    ...(searchResults.value || []),
+]);
 
 const results = computed(() => {
     let filtered = fuzzysort
@@ -65,7 +47,7 @@ const results = computed(() => {
             all: true,
             key: 'text',
         })
-        .map((result) => {
+        .map(result => {
             return {
                 score: result._score,
                 html: result.highlight('<span class="text-blue-600 dark:text-blue-400">', '</span>'),
@@ -76,13 +58,13 @@ const results = computed(() => {
     let groups = groupBy(filtered, 'category');
 
     return categories.value
-        .map((category) => {
+        .map(category => {
             return {
                 text: __(category),
                 items: groups[category],
             };
         })
-        .filter((category) => category.items);
+        .filter(category => category.items);
 });
 
 watch(selected, (item) => {
@@ -91,12 +73,9 @@ watch(selected, (item) => {
     reset();
 });
 
-watch(
-    query,
-    debounce(() => {
-        searchContent();
-    }, 300),
-);
+watch(query, debounce(() => {
+    searchContent();
+}, 300));
 
 watch(open, (isOpen) => {
     if (isOpen) return;
