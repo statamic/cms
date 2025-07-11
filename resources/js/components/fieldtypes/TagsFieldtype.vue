@@ -2,12 +2,13 @@
     <Combobox
         class="w-full"
         :clearable="config.clearable"
-        :options="options"
-        :disabled="config.disabled || isReadOnly"
-        :multiple="true"
-        :placeholder="__(config.placeholder)"
-        :taggable="true"
+        :disabled="config.disabled"
         :model-value="value"
+        :multiple="true"
+        :options="options"
+        :placeholder="__(config.placeholder)"
+        :read-only="isReadOnly"
+        :taggable="true"
         @update:modelValue="update"
     />
 </template>

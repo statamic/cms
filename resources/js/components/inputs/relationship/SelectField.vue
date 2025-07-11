@@ -3,16 +3,17 @@
         <Combobox
             class="w-full"
             searchable
-            :options
-            :multiple
-            option-value="id"
-            option-label="title"
-            :taggable="isTaggable"
-            :max-selections="maxSelections"
-            :disabled="readOnly"
+            :disabled="config.disabled"
             :ignore-filter="typeahead"
-            :placeholder="__(config.placeholder) || __('Choose...')"
+            :max-selections="maxSelections"
             :model-value="items.map((item) => item.id)"
+            :multiple
+            :options
+            :placeholder="__(config.placeholder) || __('Choose...')"
+            :read-only="readOnly"
+            :taggable="isTaggable"
+            option-label="title"
+            option-value="id"
             @update:modelValue="itemsSelected"
             @search="search"
         >

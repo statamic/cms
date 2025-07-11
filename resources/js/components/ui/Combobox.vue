@@ -19,22 +19,23 @@ import { SortableList } from '@statamic/components/sortable/Sortable.js';
 const emit = defineEmits(['update:modelValue', 'search']);
 
 const props = defineProps({
-    modelValue: { type: [Object, String, Number], default: null },
-    size: { type: String, default: 'base' },
-    placeholder: { type: String, default: 'Select...' },
-    multiple: { type: Boolean, default: false },
-    clearable: { type: Boolean, default: false },
-    searchable: { type: Boolean, default: true },
-    taggable: { type: Boolean, default: false },
-    disabled: { type: Boolean, default: false },
-    maxSelections: { type: Number, default: null },
-    optionLabel: { type: String, default: 'label' },
-    optionValue: { type: String, default: 'value' },
-    labelHtml: { type: Boolean, default: false },
-    ignoreFilter: { type: Boolean, default: false },
-    options: { type: Array, default: null },
-    flat: { type: Boolean, default: false },
     buttonAppearance: { type: Boolean, default: true },
+    clearable: { type: Boolean, default: false },
+    disabled: { type: Boolean, default: false },
+    flat: { type: Boolean, default: false },
+    ignoreFilter: { type: Boolean, default: false },
+    labelHtml: { type: Boolean, default: false },
+    maxSelections: { type: Number, default: null },
+    modelValue: { type: [Object, String, Number], default: null },
+    multiple: { type: Boolean, default: false },
+    optionLabel: { type: String, default: 'label' },
+    options: { type: Array, default: null },
+    optionValue: { type: String, default: 'value' },
+    placeholder: { type: String, default: 'Select...' },
+    readOnly: { type: Boolean, default: false },
+    searchable: { type: Boolean, default: true },
+    size: { type: String, default: 'base' },
+    taggable: { type: Boolean, default: false },
 });
 
 defineOptions({
@@ -59,11 +60,21 @@ const triggerClasses = cva({
             true: 'border border-gray-300 dark:border-b-0 dark:ring-3 dark:ring-gray-900 dark:border-white/15 shadow-ui-sm dark:shadow-md',
             false: '',
         },
+        // disabled: {
+        //     true: 'data-disabled:text-gray-300 data-disabled:pointer-events-none data-highlighted:outline-hidden',
+        //     false: '',
+        // },
+        readOnly: {
+            true: 'border-dashed',
+        }
     },
+
 })({
     size: props.size,
     flat: props.flat,
-    buttonAppearance: props.buttonAppearance
+    buttonAppearance: props.buttonAppearance,
+    disabled: props.disabled,
+    readOnly: props.readOnly,
 });
 
 const itemClasses = cva({
@@ -247,7 +258,7 @@ function pushTaggableOption(e) {
             :multiple
             :reset-search-term-on-blur="false"
             :reset-search-term-on-select="false"
-            :disabled="disabled || (multiple && limitReached)"
+            :disabled="disabled || (multiple && limitReached) || readOnly"
             :open="dropdownOpen"
             :model-value="modelValue"
             @update:open="updateDropdownOpen"
@@ -323,7 +334,7 @@ function pushTaggableOption(e) {
         </div>
     </div>
 
-    <slot name="selected-options" v-bind="{ disabled, getOptionLabel, getOptionValue, labelHtml, deselect }">
+    <slot name="selected-options" v-bind="{ disabled, readOnly, getOptionLabel, getOptionValue, labelHtml, deselect }">
         <sortable-list
             v-if="multiple"
             item-class="sortable-item"
