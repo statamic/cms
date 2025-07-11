@@ -37,6 +37,14 @@ class Term implements TermContract
         $this->data = collect();
     }
 
+    public function __clone()
+    {
+        $this->data = clone $this->data;
+        $this->data->transform(function ($data) {
+            return clone $data;
+        });
+    }
+
     public function id()
     {
         return $this->taxonomyHandle().'::'.$this->slug();

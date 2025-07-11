@@ -160,12 +160,16 @@ abstract class EloquentQueryBuilder implements Builder
             return $this->whereNested($column, $boolean);
         }
 
-        if (strtolower($operator) == 'like') {
+        if ($operator !== null && strtolower($operator) == 'like') {
             $grammar = $this->builder->getConnection()->getQueryGrammar();
             $this->builder->whereRaw('LOWER('.$grammar->wrap($this->column($column)).') LIKE ?', strtolower($value), $boolean);
 
             return $this;
         }
+
+        [$value, $operator] = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() === 2
+        );
 
         $this->builder->where($this->column($column), $operator, $value, $boolean);
 

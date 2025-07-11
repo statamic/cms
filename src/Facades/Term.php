@@ -27,7 +27,7 @@ use Statamic\Taxonomies\TermCollection;
  * @method static \Illuminate\Support\Collection applySubstitutions($items)
  *
  * @see \Statamic\Contracts\Taxonomies\TermRepository
- * @see \Statamic\Taxonomies\Term
+ * @link \Statamic\Taxonomies\Term
  */
 class Term extends Facade
 {

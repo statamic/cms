@@ -265,6 +265,7 @@ export default {
                 type: 'entries',
                 collections: this.collections,
                 max_items: 1,
+                select_across_sites: this.config.select_across_sites,
             };
         },
 
