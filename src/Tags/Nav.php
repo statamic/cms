@@ -6,7 +6,6 @@ use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Facades\Data;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
-use Statamic\Support\Str;
 
 class Nav extends Structure
 {
@@ -17,9 +16,8 @@ class Nav extends Structure
 
     public function breadcrumbs()
     {
-        $currentUrl = URL::makeAbsolute(URL::getCurrent());
-        $url = Str::removeLeft($currentUrl, Site::current()->absoluteUrl());
-        $url = Str::ensureLeft($url, '/');
+        $url = URL::removeSiteUrl(URL::getCurrent());
+
         $segments = explode('/', $url);
         $segments[0] = '/';
 
@@ -28,13 +26,11 @@ class Nav extends Structure
         }
 
         $crumbs = collect($segments)->map(function () use (&$segments) {
-            $uri = URL::tidy(implode('/', $segments));
+            $uri = URL::tidy(implode('/', $segments), withTrailingSlash: false);
             array_pop($segments);
 
             return $uri;
         })->mapWithKeys(function ($uri) {
-            $uri = Str::ensureLeft($uri, '/');
-
             return [$uri => Data::findByUri($uri, Site::current()->handle())];
         })->filter();
 
