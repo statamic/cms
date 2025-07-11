@@ -57,9 +57,6 @@ class Client
     /**
      * Send API request.
      *
-     * @param  string  $method
-     * @param  string  $endpoint
-     * @param  array  $params
      * @return mixed
      */
     private function request(string $method, string $endpoint, array $params = [])
