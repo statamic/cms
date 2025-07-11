@@ -244,101 +244,6 @@ final class Addon
     }
 
     /**
-     * The marketplace variant ID of the addon.
-     *
-     * @param  int  $id
-     * @return int
-     */
-    public function marketplaceId($id = null)
-    {
-        if (! $this->hasMarketplaceData && func_num_args() === 0) {
-            app(Manifest::class)->fetchPackageDataFromMarketplace();
-
-            return Facades\Addon::get($this->id)->marketplaceId();
-        }
-
-        return $id
-            ? $this->marketplaceId = $id
-            : $this->marketplaceId;
-    }
-
-    /**
-     * The marketplace slug of the addon.
-     *
-     * @param  string  $slug
-     * @return string
-     */
-    public function marketplaceSlug($slug = null)
-    {
-        if (! $this->hasMarketplaceData && func_num_args() === 0) {
-            app(Manifest::class)->fetchPackageDataFromMarketplace();
-
-            return Facades\Addon::get($this->id)->marketplaceSlug();
-        }
-
-        return $slug
-            ? $this->marketplaceSlug = $slug
-            : $this->marketplaceSlug;
-    }
-
-    /**
-     * The marketplace URL.
-     *
-     * @param  string  $url
-     * @return string
-     */
-    public function marketplaceUrl($url = null)
-    {
-        if (! $this->hasMarketplaceData && func_num_args() === 0) {
-            app(Manifest::class)->fetchPackageDataFromMarketplace();
-
-            return Facades\Addon::get($this->id)->marketplaceUrl();
-        }
-
-        return $url
-            ? $this->marketplaceUrl = $url
-            : $this->marketplaceUrl;
-    }
-
-    /**
-     * The marketplace slug of the addon's seller.
-     *
-     * @param  string  $slug
-     * @return string
-     */
-    public function marketplaceSellerSlug($slug = null)
-    {
-        if (! $this->hasMarketplaceData && func_num_args() === 0) {
-            app(Manifest::class)->fetchPackageDataFromMarketplace();
-
-            return Facades\Addon::get($this->id)->marketplaceSellerSlug();
-        }
-
-        return $slug
-            ? $this->marketplaceSellerSlug = $slug
-            : $this->marketplaceSellerSlug;
-    }
-
-    /**
-     * Whether the addon is commercial.
-     *
-     * @param  bool  $isCommercial
-     * @return bool
-     */
-    public function isCommercial($isCommercial = null)
-    {
-        if (! $this->hasMarketplaceData && func_num_args() === 0) {
-            app(Manifest::class)->fetchPackageDataFromMarketplace();
-
-            return Facades\Addon::get($this->id)->isCommercial();
-        }
-
-        return $isCommercial
-            ? $this->isCommercial = $isCommercial
-            : $this->isCommercial;
-    }
-
-    /**
      * The handle of the addon.
      *
      * For referencing in YAML, etc.
@@ -450,39 +355,20 @@ final class Addon
         return new AddonChangelog($this);
     }
 
-    /**
-     * The latest version of the addon (via marketplace).
-     *
-     * @param  string|null  $latestVersion
-     * @return string|null
-     */
-    public function latestVersion($latestVersion = null)
-    {
-        if (! $this->hasMarketplaceData && func_num_args() === 0) {
-            app(Manifest::class)->fetchPackageDataFromMarketplace();
-
-            return Facades\Addon::get($this->id)->latestVersion();
-        }
-
-        return $latestVersion
-            ? $this->latestVersion = $latestVersion
-            : $this->latestVersion;
-    }
-
     public function isLatestVersion()
     {
         if (Str::startsWith($this->version, 'dev-') || Str::endsWith($this->version, '-dev')) {
             return true;
         }
 
-        if (! $latestVersion = $this->latestVersion()) {
+        if (! $this->latestVersion()) {
             return true;
         }
 
         $versionParser = new VersionParser;
 
         $version = $versionParser->normalize($this->version);
-        $latestVersion = $versionParser->normalize($latestVersion);
+        $latestVersion = $versionParser->normalize($this->latestVersion());
 
         return version_compare($version, $latestVersion, '=');
     }
@@ -507,6 +393,12 @@ final class Addon
         }
 
         if (empty($args)) {
+            if (! $this->hasMarketplaceData && in_array($method, ['marketplaceId', 'marketplaceSlug', 'marketplaceUrl', 'marketplaceSellerSlug', 'isCommercial', 'latestVersion'])) {
+                app(Manifest::class)->fetchPackageDataFromMarketplace();
+
+                return Facades\Addon::get($this->id)->$method();
+            }
+
             return $this->$method;
         }
 
