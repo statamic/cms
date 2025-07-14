@@ -60,7 +60,7 @@ export default function useActions() {
             data = JSON.parse(data);
 
             if (data.redirect) {
-                if (data.bypassesDirtyWarning) this.$dirty.disableWarning();
+                if (data.bypassesDirtyWarning) Statamic.$dirty.disableWarning();
                 window.location = data.redirect;
             }
 
