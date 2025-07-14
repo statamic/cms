@@ -119,38 +119,6 @@ class InstallTest extends TestCase
     }
 
     #[Test]
-    public function it_still_installs_from_export_as_paths_for_backwards_compatibility()
-    {
-        $this->setConfig([
-            'export_as' => [
-                'README.md' => 'README-for-new-site.md',
-                'original-dir' => 'renamed-dir',
-            ],
-        ]);
-
-        $this->assertFileDoesNotExist($this->kitVendorPath());
-        $this->assertComposerJsonDoesntHave('repositories');
-        $this->assertFileDoesNotExist($renamedFile = base_path('README.md'));
-        $this->assertFileDoesNotExist($renamedFolder = base_path('original-dir'));
-
-        $this->installCoolRunnings();
-
-        $this->assertFalse(Blink::has('starter-kit-repository-added'));
-        $this->assertFileDoesNotExist($this->kitVendorPath());
-        $this->assertFileDoesNotExist(base_path('composer.json.bak'));
-        $this->assertComposerJsonDoesntHave('repositories');
-        $this->assertFileExists($renamedFile);
-        $this->assertFileExists($renamedFolder);
-
-        $this->assertFileDoesNotExist(base_path('README-for-new-site.md')); // This was renamed back to original path on install
-        $this->assertFileDoesNotExist(base_path('renamed-dir')); // This was renamed back to original path on install
-
-        $this->assertFileHasContent('This readme should get installed to README.md.', $renamedFile);
-        $this->assertFileHasContent('One.', $renamedFolder.'/one.txt');
-        $this->assertFileHasContent('Two.', $renamedFolder.'/two.txt');
-    }
-
-    #[Test]
     public function it_installs_from_github()
     {
         $this->assertFileDoesNotExist($this->kitVendorPath());
@@ -921,8 +889,8 @@ EOT;
                 ],
                 'jamaica' => [
                     'prompt' => false, // Setting `prompt: false` normally skips confirmation and ensures it always gets installed
-                    'export_as' => [
-                        'resources/css/theme.css' => 'resources/css/jamaica.css',
+                    'export_paths' => [
+                        'resources/css/jamaica.css',
                     ],
                 ],
                 'js' => [
@@ -972,7 +940,7 @@ EOT;
         $this->assertFileExists(base_path('resources/css/seo.css'));
         $this->assertFileExists(base_path('resources/css/hockey.css'));
         $this->assertFileDoesNotExist(base_path('resources/css/bobsled.css'));
-        $this->assertFileExists(base_path('resources/css/theme.css'));
+        $this->assertFileExists(base_path('resources/css/jamaica.css'));
         $this->assertComposerJsonHasPackageVersion('require', 'statamic/seo-pro', '^0.2.0');
         $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
         $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
@@ -1005,8 +973,8 @@ EOT;
                     ],
                 ],
                 'jamaica' => [
-                    'export_as' => [
-                        'resources/css/theme.css' => 'resources/css/jamaica.css',
+                    'export_paths' => [
+                        'resources/css/jamaica.css',
                     ],
                 ],
                 'js' => [
@@ -1051,7 +1019,7 @@ EOT;
         $this->assertFileDoesNotExist(base_path('copied.md'));
         $this->assertFileDoesNotExist(base_path('resources/css/seo.css'));
         $this->assertFileDoesNotExist(base_path('resources/css/bobsled.css'));
-        $this->assertFileDoesNotExist(base_path('resources/css/theme.css'));
+        $this->assertFileDoesNotExist(base_path('resources/css/jamaica.css'));
         $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
         $this->assertFileDoesNotExist(base_path('resources/js/vue.js'));
         $this->assertFileDoesNotExist(base_path('resources/js/svelte.js'));
@@ -1072,7 +1040,7 @@ EOT;
         $this->assertFileExists(base_path('copied.md'));
         $this->assertFileExists(base_path('resources/css/seo.css'));
         $this->assertFileDoesNotExist(base_path('resources/css/bobsled.css'));
-        $this->assertFileExists(base_path('resources/css/theme.css'));
+        $this->assertFileExists(base_path('resources/css/jamaica.css'));
         $this->assertFileDoesNotExist(base_path('resources/js/react.js'));
         $this->assertFileExists(base_path('resources/js/vue.js'));
         $this->assertFileDoesNotExist(base_path('resources/js/svelte.js'));
@@ -1577,8 +1545,8 @@ EOT;
                     ],
                 ],
                 'jamaica' => [
-                    'export_as' => [
-                        'resources/css/theme.css' => 'resources/css/jamaica.css',
+                    'export_paths' => [
+                        'resources/css/jamaica.css',
                     ],
                     'modules' => [
                         'bobsled' => [
@@ -1634,7 +1602,7 @@ EOT;
         $this->assertFileDoesNotExist(base_path('resources/js/mootools.js'));
         $this->assertFileDoesNotExist(base_path('resources/css/hockey.css'));
         $this->assertFileDoesNotExist(base_path('resources/dictionaries/players.yaml'));
-        $this->assertFileExists(base_path('resources/css/theme.css'));
+        $this->assertFileExists(base_path('resources/css/jamaica.css'));
         $this->assertFileExists(base_path('resources/css/bobsled.css'));
         $this->assertComposerJsonHasPackageVersion('require', 'bobsled/speed-calculator', '^1.0.0');
     }

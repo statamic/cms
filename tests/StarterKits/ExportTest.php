@@ -130,42 +130,6 @@ class ExportTest extends TestCase
     }
 
     #[Test]
-    public function it_can_still_export_as_to_different_destination_path_for_backwards_compatibility()
-    {
-        $paths = $this->cleanPaths([
-            base_path('README.md'),
-            base_path('test-folder'),
-        ]);
-
-        $this->files->put(base_path('README.md'), 'This is readme for the new site!');
-        $this->files->makeDirectory(base_path('test-folder'));
-        $this->files->put(base_path('test-folder/one.txt'), 'One.');
-        $this->files->put(base_path('test-folder/two.txt'), 'Two.');
-
-        $this->setExportPaths([], [
-            'README.md' => 'README-new-site.md',
-            'test-folder' => 'test-renamed-folder',
-        ]);
-
-        $this->assertFileDoesNotExist($renamedFile = $this->exportPath('README-new-site.md'));
-        $this->assertFileDoesNotExist($renamedFolder = $this->exportPath('test-renamed-folder'));
-
-        $this->exportCoolRunnings();
-
-        $this->assertFileExists($renamedFile);
-        $this->assertFileExists($renamedFolder);
-
-        $this->assertFileDoesNotExist($this->exportPath('README.md')); // This got renamed above
-        $this->assertFileDoesNotExist($this->exportPath('test-folder')); // This got renamed above
-
-        $this->assertFileHasContent('This is readme for the new site!', $renamedFile);
-        $this->assertFileHasContent('One.', $renamedFolder.'/one.txt');
-        $this->assertFileHasContent('Two.', $renamedFolder.'/two.txt');
-
-        $this->cleanPaths($paths);
-    }
-
-    #[Test]
     public function it_can_clear_target_export_path_with_clear_option()
     {
         $paths = $this->cleanPaths([
@@ -593,15 +557,15 @@ EOT
                     ],
                 ],
                 'ssg' => [
-                    'export_as' => [
-                        'resources/views/welcome.blade.php' => 'resources/views/you-are-so-welcome.blade.php',
+                    'export_paths' => [
+                        'resources/views/welcome.blade.php',
                     ],
                 ],
             ],
         ]);
 
         $this->assertFileDoesNotExist($filesystemsConfig = $this->exportPath('config/filesystems.php'));
-        $this->assertFileDoesNotExist($welcomeView = $this->exportPath('resources/views/you-are-so-welcome.blade.php'));
+        $this->assertFileDoesNotExist($welcomeView = $this->exportPath('resources/views/welcome.blade.php'));
 
         $this->exportCoolRunnings();
 
@@ -623,8 +587,8 @@ EOT
                     ],
                     'modules' => [
                         'ssg' => [
-                            'export_as' => [
-                                'resources/views/welcome.blade.php' => 'resources/views/you-are-so-welcome.blade.php',
+                            'export_paths' => [
+                                'resources/views/welcome.blade.php',
                             ],
                         ],
                     ],
@@ -633,7 +597,7 @@ EOT
         ]);
 
         $this->assertFileDoesNotExist($filesystemsConfig = $this->exportPath('config/filesystems.php'));
-        $this->assertFileDoesNotExist($welcomeView = $this->exportPath('resources/views/you-are-so-welcome.blade.php'));
+        $this->assertFileDoesNotExist($welcomeView = $this->exportPath('resources/views/welcome.blade.php'));
 
         $this->exportCoolRunnings();
 
@@ -657,8 +621,8 @@ EOT
                             ],
                         ],
                         'react' => [
-                            'export_as' => [
-                                'resources/views/welcome.blade.php' => 'resources/views/you-are-so-welcome.blade.php',
+                            'export_paths' => [
+                                'resources/views/welcome.blade.php',
                             ],
                         ],
                     ],
@@ -667,7 +631,7 @@ EOT
         ]);
 
         $this->assertFileDoesNotExist($filesystemsConfig = $this->exportPath('config/filesystems.php'));
-        $this->assertFileDoesNotExist($welcomeView = $this->exportPath('resources/views/you-are-so-welcome.blade.php'));
+        $this->assertFileDoesNotExist($welcomeView = $this->exportPath('resources/views/welcome.blade.php'));
 
         $this->exportCoolRunnings();
 
@@ -698,8 +662,8 @@ EOT
                             ],
                         ],
                         'react' => [
-                            'export_as' => [
-                                'resources/views/welcome.blade.php' => 'resources/views/you-are-so-welcome.blade.php',
+                            'export_paths' => [
+                                'resources/views/welcome.blade.php',
                             ],
                         ],
                     ],
@@ -709,7 +673,7 @@ EOT
 
         $this->assertFileDoesNotExist($filesystemsConfig = $this->exportPath('config/filesystems.php'));
         $this->assertFileDoesNotExist($appConfig = $this->exportPath('config/app.php'));
-        $this->assertFileDoesNotExist($welcomeView = $this->exportPath('resources/views/you-are-so-welcome.blade.php'));
+        $this->assertFileDoesNotExist($welcomeView = $this->exportPath('resources/views/welcome.blade.php'));
 
         $this->exportCoolRunnings();
 
@@ -1044,11 +1008,6 @@ EOT
                     'resources/views/welcome.blade.php',
                 ],
             ]],
-            'export as paths' => [[
-                'export_as' => [
-                    'resources/views/welcome.blade.php' => 'resources/js/vue.js',
-                ],
-            ]],
             'dependencies' => [[
                 'dependencies' => [
                     'statamic/seo-pro' => '^1.0',
@@ -1091,25 +1050,11 @@ EOT
                     'non-existent.txt',
                 ],
             ]],
-            'top level export as from' => [[
-                'export_as' => [
-                    'non-existent.txt' => 'resources/views/welcome.blade.php',
-                ],
-            ]],
             'module export' => [[
                 'modules' => [
                     'seo' => [
                         'export_paths' => [
                             'non-existent.txt',
-                        ],
-                    ],
-                ],
-            ]],
-            'module export as from' => [[
-                'modules' => [
-                    'seo' => [
-                        'export_as' => [
-                            'non-existent.txt' => 'resources/views/welcome.blade.php',
                         ],
                     ],
                 ],
@@ -1121,19 +1066,6 @@ EOT
                             'vue' => [
                                 'export_paths' => [
                                     'non-existent.txt',
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
-            ]],
-            'select module export as from' => [[
-                'modules' => [
-                    'js' => [
-                        'options' => [
-                            'vue' => [
-                                'export_as' => [
-                                    'non-existent.txt' => 'resources/views/welcome.blade.php',
                                 ],
                             ],
                         ],
@@ -1235,39 +1167,11 @@ EOT
                     'starter-kit.yaml',
                 ],
             ]],
-            'top level export as from' => [[
-                'export_as' => [
-                    'starter-kit.yaml' => 'resources/views/welcome.blade.php',
-                ],
-            ]],
-            'top level export as to' => [[
-                'export_as' => [
-                    'resources/views/welcome.blade.php' => 'starter-kit.yaml',
-                ],
-            ]],
             'module export' => [[
                 'modules' => [
                     'seo' => [
                         'export_paths' => [
                             'starter-kit.yaml',
-                        ],
-                    ],
-                ],
-            ]],
-            'module export as from' => [[
-                'modules' => [
-                    'seo' => [
-                        'export_as' => [
-                            'starter-kit.yaml' => 'resources/views/welcome.blade.php',
-                        ],
-                    ],
-                ],
-            ]],
-            'module export as to' => [[
-                'modules' => [
-                    'seo' => [
-                        'export_as' => [
-                            'resources/views/welcome.blade.php' => 'starter-kit.yaml',
                         ],
                     ],
                 ],
@@ -1279,32 +1183,6 @@ EOT
                             'vue' => [
                                 'export_paths' => [
                                     'starter-kit.yaml',
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
-            ]],
-            'select module export as from' => [[
-                'modules' => [
-                    'js' => [
-                        'options' => [
-                            'vue' => [
-                                'export_as' => [
-                                    'starter-kit.yaml' => 'resources/views/welcome.blade.php',
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
-            ]],
-            'select module export as to' => [[
-                'modules' => [
-                    'js' => [
-                        'options' => [
-                            'vue' => [
-                                'export_as' => [
-                                    'resources/views/welcome.blade.php' => 'starter-kit.yaml',
                                 ],
                             ],
                         ],
@@ -1334,39 +1212,11 @@ EOT
                     'composer.json',
                 ],
             ]],
-            'top level export as from' => [[
-                'export_as' => [
-                    'composer.json' => 'resources/views/welcome.blade.php',
-                ],
-            ]],
-            'top level export as to' => [[
-                'export_as' => [
-                    'resources/views/welcome.blade.php' => 'composer.json',
-                ],
-            ]],
             'module export' => [[
                 'modules' => [
                     'seo' => [
                         'export_paths' => [
                             'composer.json',
-                        ],
-                    ],
-                ],
-            ]],
-            'module export as from' => [[
-                'modules' => [
-                    'seo' => [
-                        'export_as' => [
-                            'composer.json' => 'resources/views/welcome.blade.php',
-                        ],
-                    ],
-                ],
-            ]],
-            'module export as to' => [[
-                'modules' => [
-                    'seo' => [
-                        'export_as' => [
-                            'resources/views/welcome.blade.php' => 'composer.json',
                         ],
                     ],
                 ],
@@ -1378,32 +1228,6 @@ EOT
                             'vue' => [
                                 'export_paths' => [
                                     'composer.json',
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
-            ]],
-            'select module export as from' => [[
-                'modules' => [
-                    'js' => [
-                        'options' => [
-                            'vue' => [
-                                'export_as' => [
-                                    'composer.json' => 'resources/views/welcome.blade.php',
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
-            ]],
-            'select module export as to' => [[
-                'modules' => [
-                    'js' => [
-                        'options' => [
-                            'vue' => [
-                                'export_as' => [
-                                    'resources/views/welcome.blade.php' => 'composer.json',
                                 ],
                             ],
                         ],
@@ -1681,13 +1505,9 @@ PACKAGE);
         }
     }
 
-    private function setExportPaths($paths, $exportAs = null)
+    private function setExportPaths($paths)
     {
         $config['export_paths'] = $paths;
-
-        if ($exportAs) {
-            $config['export_as'] = $exportAs;
-        }
 
         $this->setConfig($config);
     }
