@@ -44,7 +44,7 @@
             </ButtonGroup>
         </Header>
 
-        <Panel>
+        <Panel class="nav-builder">
             <div class="loading card" v-if="loading">
                 <loading-graphic />
             </div>

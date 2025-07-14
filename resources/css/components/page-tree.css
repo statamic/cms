@@ -1,3 +1,5 @@
+/* GROUP PAGE TREE
+=================================================== */
 .page-tree {
     .tree-node {
         @apply dark:mb-1;
@@ -36,5 +38,27 @@
     /* [2] (always) the first level down that has children */
     .tree-node:has(.is-top-level) + .tree-node:not(:has(.is-top-level)) .page-tree-branch {
         border-top-left-radius: 0;
+    }
+}
+
+/* GROUP PAGE TREE / NAV BUILDER
+=================================================== */
+/* e.g. cp/nav/edit */
+.nav-builder {
+    background: none;
+    .tree-node {
+        @apply pe-1 bg-gray-100;
+        &:has(.is-top-level) {
+            @apply mt-8 pt-1 px-1! bg-gray-100 rounded-t-2xl;
+        }
+        &:has(+ .tree-node .is-top-level) {
+            @apply pb-1 rounded-b-2xl;
+        }
+    }
+    .page-tree-branch {
+        margin-top: 0;
+    }
+    .tree-node:has(.first-branch) + .tree-node {
+        @apply pt-1 rounded-t-2xl;
     }
 }

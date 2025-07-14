@@ -1,5 +1,5 @@
 <template>
-    <div class="page-tree-branch flex" :class="{ 'ml-[-24px]': isTopLevel, 'page-tree-branch--has-children': hasChildren }">
+    <div class="page-tree-branch flex" :class="{ 'ml-[-1.2rem]': isTopLevel, 'page-tree-branch--has-children': hasChildren }">
         <div class="page-move w-6" />
         <div class="flex flex-1 items-center p-1.5 text-xs leading-normal">
             <div class="flex gap-3 grow items-center" :class="{ 'opacity-50': isHidden || isInHiddenSection }">
