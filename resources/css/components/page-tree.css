@@ -46,6 +46,7 @@
 /* e.g. cp/nav/edit */
 .nav-builder {
     background: none;
+    @apply max-w-4xl mx-auto;
     .tree-node {
         @apply pe-1 bg-gray-100;
         &:has(.is-top-level) {
