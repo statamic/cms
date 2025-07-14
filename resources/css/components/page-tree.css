@@ -51,7 +51,8 @@
         &:has(.is-top-level) {
             @apply mt-8 pt-1 px-1! bg-gray-100 rounded-t-2xl;
         }
-        &:has(+ .tree-node .is-top-level) {
+        &:has(+ .tree-node .is-top-level),
+        &:last-child {
             @apply pb-1 rounded-b-2xl;
         }
     }
