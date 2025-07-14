@@ -10,7 +10,7 @@
 
                 <a
                     @click="$emit('edit', $event)"
-                    :class="{ 'text-sm font-medium': isSection }"
+                    :class="{ 'text-sm font-medium is-top-level': isSection }"
                     v-text="__(item.text)"
                 />
 
