@@ -30,8 +30,11 @@
         @apply flex w-6 items-center dark:border-dark-900 ltr:rounded-l ltr:border-r rtl:rounded-r rtl:border-l;
     }
 
-    /* Nice progressive enhancement to visually connect tree node children by removing the top left border radius */
-    .tree-node:has(.page-tree-branch--has-children) + .tree-node .page-tree-branch {
+    /* Nice progressive enhancement to visually connect tree node children by removing the top left border radius.. */
+    /* [1] When there are children */
+    .tree-node:has(.page-tree-branch--has-children):not(:has(+ .tree-node .page-tree-branch--has-children)) + .tree-node .page-tree-branch,
+    /* [2] (always) the first level down */
+    .tree-node:has(.is-top-level) + .tree-node .page-tree-branch {
         border-top-left-radius: 0;
     }
 }
