@@ -32,7 +32,7 @@
 
     /* Nice progressive enhancement to visually connect tree node children by removing the top left border radius.. */
     /* [1] When there are children, except when followed by another tree that has children, or a top level tree */
-    .tree-node:has(.page-tree-branch--has-children):not(:has(+ .tree-node .page-tree-branch--has-children)) + .tree-node:not(:has(+ .tree-node .is-top-level)) .page-tree-branch,
+    .tree-node:not(.nav-builder *):has(.page-tree-branch--has-children):not(:has(+ .tree-node .page-tree-branch--has-children)) + .tree-node .page-tree-branch,
     /* [2] (always) the first level down that has children */
     .tree-node:has(.is-top-level) + .tree-node:not(:has(.is-top-level)) .page-tree-branch {
         border-top-left-radius: 0;
