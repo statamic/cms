@@ -61,7 +61,7 @@
             background: none;
         }
         /* When we're dragging the tree node, make sure the preceeding note is rounded */
-        &:has( + .drag-placeholder-wrapper) {
+        &:has(+ .drag-placeholder-wrapper) {
             @apply pb-1 rounded-b-2xl;
         }
     }
