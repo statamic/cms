@@ -73,12 +73,11 @@ class SitesConfigTest extends TestCase
         Site::swap(new Sites);
 
         $this->assertCount(1, Site::all());
-
         $this->assertSame('default', Site::default()->handle());
         $this->assertSame(config('app.name'), Site::default()->name());
         $this->assertSame('/', Site::default()->url());
-        $this->assertSame('en_US', Site::default()->locale());
-        $this->assertSame('en', Site::default()->lang());
+        $this->assertSame(config('app.locale'), Site::default()->locale());
+        $this->assertSame(config('app.locale'), Site::default()->lang());
     }
 
     #[Test]

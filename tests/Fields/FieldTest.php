@@ -607,6 +607,31 @@ class FieldTest extends TestCase
     }
 
     #[Test]
+    #[Group('graphql')]
+    public function it_keeps_the_graphql_type_nullable_if_its_sometimes_required()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            public function toGqlType()
+            {
+                return new \GraphQL\Type\Definition\FloatType;
+            }
+        };
+
+        FieldtypeRepository::shouldReceive('find')
+            ->with('fieldtype')
+            ->andReturn($fieldtype);
+
+        $field = new Field('test', ['type' => 'fieldtype', 'validate' => 'required|sometimes']);
+
+        $type = $field->toGql();
+
+        $this->assertIsArray($type);
+        $this->assertInstanceOf(\GraphQL\Type\Definition\NullableType::class, $type['type']);
+        $this->assertInstanceOf(\GraphQL\Type\Definition\FloatType::class, $type['type']);
+    }
+
+    #[Test]
     public function it_gets_the_path_of_handles_for_nested_fields()
     {
         $top = (new Field('a', ['type' => 'text']));

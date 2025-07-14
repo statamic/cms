@@ -16,9 +16,9 @@
         <Input
             v-model="slug"
             :id="fieldId"
-            :isReadOnly="isReadOnly"
+            :read-only="isReadOnly"
             :name="slug"
-            :disabled="isReadOnly"
+            :disabled="config.disabled"
             @focus="$emit('focus')"
             @blur="$emit('blur')"
         >

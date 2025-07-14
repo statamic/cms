@@ -1,10 +1,13 @@
 <script setup>
 import { cva } from 'cva';
 import { PopoverArrow, PopoverContent, PopoverPortal, PopoverRoot, PopoverTrigger } from 'reka-ui';
+import { ref, watch } from 'vue';
 
 defineOptions({
     inheritAttrs: false,
 });
+
+const emit = defineEmits(['update:open']);
 
 const props = defineProps({
     align: { type: String, default: 'center' },
@@ -12,6 +15,7 @@ const props = defineProps({
     inset: { type: Boolean, default: false },
     offset: { type: Number, default: 5 },
     side: { type: String, default: 'bottom' },
+    open: { type: Boolean, default: false },
 });
 
 const popoverContentClasses = cva({
@@ -31,11 +35,23 @@ const popoverContentClasses = cva({
 })({
     ...props,
 });
+
+const open = ref(props.open);
+
+watch(
+    () => props.open,
+    (value) => open.value = value,
+);
+
+function updateOpen(value) {
+    emit('update:open', value);
+    open.value = value;
+}
 </script>
 
 <template>
-    <PopoverRoot>
-        <PopoverTrigger data-ui-popover-trigger>
+    <PopoverRoot :open @update:open="updateOpen">
+        <PopoverTrigger data-ui-popover-trigger as-child>
             <slot name="trigger" />
         </PopoverTrigger>
         <PopoverPortal>

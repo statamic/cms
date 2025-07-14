@@ -3,12 +3,13 @@
         v-if="!loading"
         class="w-full"
         clearable
-        :disabled="config.disabled || isReadOnly"
+        :disabled="config.disabled"
+        :model-value="value"
+        :multiple="false"
         :options="options"
         :placeholder="__(config.placeholder || 'Search...')"
+        :read-only="isReadOnly"
         :searchable="true"
-        :multiple="false"
-        :model-value="value"
         @update:modelValue="comboboxUpdated"
     >
         <template #option="option">
