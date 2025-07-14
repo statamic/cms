@@ -63,18 +63,6 @@ abstract class Module
     }
 
     /**
-     * Get `export_as` paths (to be renamed on install) as collection from config.
-     *
-     * This is only here for backwards compatibility. Use new `export` folder convention instead.
-     *
-     * @deprecated
-     */
-    protected function exportAsPaths(): Collection
-    {
-        return collect($this->config('export_as') ?? []);
-    }
-
-    /**
      * Ensure nested module config is not empty.
      *
      * @throws StarterKitException

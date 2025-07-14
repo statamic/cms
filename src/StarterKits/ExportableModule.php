@@ -36,14 +36,6 @@ class ExportableModule extends Module
                 from: $path,
                 starterKitPath: $starterKitPath,
             ));
-
-        $this
-            ->exportAsPaths()
-            ->each(fn ($to, $from) => $this->exportRelativePath(
-                from: $from,
-                to: $to,
-                starterKitPath: $starterKitPath,
-            ));
     }
 
     public function versionDependencies(): self
@@ -107,10 +99,7 @@ class ExportableModule extends Module
     {
         // Here we'll ensure both `export_as` values and keys are included,
         // because we want to make sure `composer.json` is referenced on either end.
-        $flattenedExportPaths = $this
-            ->exportPaths()
-            ->merge($this->exportAsPaths())
-            ->merge($this->exportAsPaths()->keys());
+        $flattenedExportPaths = $this->exportPaths();
 
         if ($flattenedExportPaths->contains('starter-kit.yaml')) {
             throw new StarterKitException('Cannot export [starter-kit.yaml] config.');
@@ -132,7 +121,6 @@ class ExportableModule extends Module
     {
         $this
             ->exportPaths()
-            ->merge($this->exportAsPaths()->keys())
             ->reject(fn ($path) => $this->files->exists(base_path($path)))
             ->each(function ($path) {
                 throw new StarterKitException("Cannot export [{$path}], because it does not exist in your app.");
