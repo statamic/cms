@@ -70,7 +70,6 @@ abstract class Module
     protected function ensureModuleConfigNotEmpty(): self
     {
         $hasConfig = $this->config()->has('export_paths')
-            || $this->config()->has('export_as')
             || $this->config()->has('dependencies')
             || $this->config()->has('dependencies_dev')
             || $this->config()->has('modules');

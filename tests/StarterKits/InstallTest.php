@@ -832,8 +832,8 @@ EOT;
                     ],
                 ],
                 'jamaica' => [
-                    'export_as' => [
-                        'resources/css/theme.css' => 'resources/css/jamaica.css',
+                    'export_paths' => [
+                        'resources/css/jamaica.css',
                     ],
                 ],
             ],
@@ -842,7 +842,7 @@ EOT;
         $this->assertFileDoesNotExist(base_path('copied.md'));
         $this->assertFileDoesNotExist(base_path('resources/css/seo.css'));
         $this->assertFileDoesNotExist(base_path('resources/css/bobsled.css'));
-        $this->assertFileDoesNotExist(base_path('resources/css/theme.css'));
+        $this->assertFileDoesNotExist(base_path('resources/css/jamaica.css'));
         $this->assertComposerJsonDoesntHave('statamic/seo-pro');
         $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
 
@@ -851,7 +851,7 @@ EOT;
         $this->assertFileExists(base_path('copied.md'));
         $this->assertFileDoesNotExist(base_path('resources/css/seo.css'));
         $this->assertFileDoesNotExist(base_path('resources/css/bobsled.css'));
-        $this->assertFileDoesNotExist(base_path('resources/css/theme.css'));
+        $this->assertFileDoesNotExist(base_path('resources/css/jamaica.css'));
         $this->assertComposerJsonDoesntHave('statamic/seo-pro');
         $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
     }
@@ -1356,11 +1356,6 @@ EOT;
             'export paths' => [[
                 'export_paths' => [
                     'copied.md',
-                ],
-            ]],
-            'export as paths' => [[
-                'export_as' => [
-                    'copied.md' => 'resources/js/vue.js',
                 ],
             ]],
             'dependencies' => [[

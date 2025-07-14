@@ -1279,14 +1279,12 @@ EOT
                         'statamic/ssg',
                     ],
                     'prompt' => false,
-                    'export_as' => [
-                        'README.md' => 'README-new-site.md',
-                    ],
                     'dependencies' => [
                         'statamic/seo-pro',
                     ],
                     'export_paths' => [
                         'resources/views',
+                        'README.md',
                     ],
                 ],
                 'js' => [
@@ -1315,14 +1313,12 @@ EOT
                     ],
                 ],
             ],
-            'export_as' => [
-                'test-folder' => 'test-renamed-folder',
-            ],
             'dependencies_dev' => [
                 'statamic/ssg',
             ],
             'export_paths' => [
                 'config/filesystems.php',
+                'test-folder',
             ],
         ]);
 
@@ -1331,9 +1327,7 @@ EOT
         $this->assertConfigSameOrder([
             'export_paths' => [
                 'config/filesystems.php',
-            ],
-            'export_as' => [
-                'test-folder' => 'test-renamed-folder',
+                'test-folder',
             ],
             'dependencies_dev' => [
                 'statamic/ssg' => '^0.4.0',
@@ -1343,9 +1337,7 @@ EOT
                     'prompt' => false,
                     'export_paths' => [
                         'resources/views',
-                    ],
-                    'export_as' => [
-                        'README.md' => 'README-new-site.md',
+                        'README.md',
                     ],
                     'dependencies' => [
                         'statamic/seo-pro' => '^2.2',
