@@ -96,7 +96,7 @@ class ResolveRedirect
             : $parent->pages()->all();
 
         if ($children->isEmpty()) {
-            return null;
+            return 404;
         }
 
         return $children->first();
