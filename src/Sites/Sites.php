@@ -217,9 +217,11 @@ class Sites
             [
                 'handle' => 'lang',
                 'field' => [
-                    'type' => 'text',
+                    'type' => 'dictionary',
                     'display' => __('Language'),
                     'instructions' => __('statamic::messages.site_configure_lang_instructions'),
+                    'dictionary' => 'languages',
+                    'max_items' => 1,
                     'width' => 33,
                     'direction' => 'ltr',
                 ],
