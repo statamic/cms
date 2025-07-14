@@ -56,6 +56,14 @@
         &:last-child {
             @apply pb-1 rounded-b-2xl;
         }
+        /* When we're dragging the tree node, remove the background otherwise it bleeds into the node we're moving it to */
+        &.drag-placeholder-wrapper {
+            background: none;
+        }
+        /* When we're dragging the tree node, make sure the preceeding note is rounded */
+        &:has( + .drag-placeholder-wrapper) {
+            @apply pb-1 rounded-b-2xl;
+        }
     }
     .page-tree-branch {
         margin-top: 0;
