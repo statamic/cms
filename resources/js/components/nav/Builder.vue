@@ -81,7 +81,7 @@
                         <div
                             class="w-full rounded-sm border border-dashed border-blue-400 bg-blue-500/10 p-2"
                             :class="{
-                            'mt-4': isSectionNode(draggingStat),
+                            'mt-6': isSectionNode(draggingStat),
                             'ml-[-24px]': isDraggingIntoTopLevel,
                         }"
                         >
@@ -101,7 +101,7 @@
                             :is-child="isChildItemNode(stat)"
                             :has-children="stat.children.length > 0"
                             class="mb-px"
-                            :class="{ 'mt-4': isSectionNode(stat) }"
+                            :class="{ 'mt-6': isSectionNode(stat) }"
                             @edit="editItem(stat)"
                             @toggle-open="stat.open = !stat.open"
                         >
