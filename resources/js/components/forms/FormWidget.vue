@@ -34,6 +34,7 @@ function formatDate(value) {
         :per-page="initialPerPage"
         :show-pagination-totals="false"
         :show-pagination-page-links="false"
+        :show-pagination-per-page-selector="false"
     >
         <template #initializing>
             <Widget v-bind="widgetProps"><Icon name="loading" /></Widget>
