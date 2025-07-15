@@ -25,7 +25,7 @@
             <div class="flex items-center">
                 <Icon v-if="!option.html" :name="getOptionIcon(option)" class="flex size-4 items-center" />
                 <div v-if="option.html" v-html="option.html" class="size-4" />
-                <span class="truncate text-sm text-gray-800 dark:text-gray-200">
+                <span class="truncate text-sm text-gray-900 dark:text-gray-200">
                     {{ __(option.label) }}
                 </span>
             </div>

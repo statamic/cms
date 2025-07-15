@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .badge {
-    @apply rounded-md bg-gray-300 text-3xs not-italic leading-normal text-gray-800 dark:bg-dark-700 dark:text-dark-150;
+    @apply rounded-md bg-gray-300 text-3xs not-italic leading-normal text-gray-900 dark:bg-dark-700 dark:text-dark-150;
     padding: 1px 5px 0;
 }
 
@@ -22,7 +22,7 @@
 }
 
 .filter-badge {
-    @apply flex items-center rounded-full border border-dashed border-gray-600 bg-white text-2xs text-gray-800 dark:border-dark-900 dark:bg-dark-550 dark:text-dark-150;
+    @apply flex items-center rounded-full border border-dashed border-gray-600 bg-white text-2xs text-gray-900 dark:border-dark-900 dark:bg-dark-550 dark:text-dark-150;
     height: 1.625rem;
     padding-left: 10px;
     [dir='rtl'] & {
@@ -34,7 +34,7 @@
         @apply flex items-center rounded-sm px-2 text-base text-gray-600 dark:text-dark-175;
 
         &:hover {
-            @apply text-gray-800 dark:text-dark-100;
+            @apply text-gray-900 dark:text-dark-100;
         }
 
         &:focus {

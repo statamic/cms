@@ -32,7 +32,7 @@
                 </publish-container>
             </div>
 
-            <div class="flex border-t text-gray-800 dark:border-dark-900 dark:text-dark-150">
+            <div class="flex border-t text-gray-900 dark:border-dark-900 dark:text-dark-150">
                 <button
                     class="flex-1 p-2 text-xs hover:bg-gray-100 dark:hover:bg-dark-600 ltr:rounded-bl rtl:rounded-br"
                     v-text="__('Clear')"

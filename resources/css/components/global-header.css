@@ -13,7 +13,7 @@
     }
 
     .global-header-icon-button {
-        @apply block h-7 w-7 rounded-full border border-transparent p-1 text-gray outline-hidden hover:border-gray-400 hover:bg-gray-200 hover:text-gray-800;
+        @apply block h-7 w-7 rounded-full border border-transparent p-1 text-gray outline-hidden hover:border-gray-400 hover:bg-gray-200 hover:text-gray-900;
         @apply dark:border-transparent dark:text-dark-100 dark:hover:border-dark-900 dark:hover:bg-dark-800 dark:hover:text-dark-100;
     }
 }

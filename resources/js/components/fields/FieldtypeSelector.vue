@@ -39,7 +39,7 @@
                                 @click="select(fieldtype)"
                                 :title="fieldtype.icon"
                             >
-                                <ui-icon :name="`fieldtype-${fieldtype.icon}`" class="text-gray-500 group-hover:text-gray-800 dark:text-gray-400 dark:group-hover:text-gray-100" />
+                                <ui-icon :name="`fieldtype-${fieldtype.icon}`" class="text-gray-500 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-gray-100" />
                                 <span class="text-sm text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-gray-100" v-text="fieldtype.text" />
                             </button>
                             </div>
