@@ -4,7 +4,7 @@
             :id="fieldId"
             :name="name"
             :value="value"
-            @update:modelValue="update"
+            @update:modelValue="updateDebounced"
             @keydown="$emit('keydown', $event)"
             @focus="$emit('focus')"
             @blur="$emit('blur')"
