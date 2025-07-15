@@ -60,9 +60,13 @@
         &.drag-placeholder-wrapper {
             background: none;
         }
-        /* When we're dragging the tree node, make sure the preceeding node is rounded */
+        /* When we're dragging the tree node, make sure the preceding node is rounded */
         &:has(+ .drag-placeholder-wrapper) {
             @apply pb-1 rounded-b-2xl;
+        }
+        /* When we're dragging the tree node, make sure the succeeding node is rounded */
+        .drag-placeholder-wrapper + & {
+            @apply rounded-t-2xl;
         }
     }
     .page-tree-branch {
