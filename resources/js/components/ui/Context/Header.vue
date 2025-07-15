@@ -14,7 +14,7 @@ const slots = useSlots();
 const usingSlot = !!slots.default;
 
 const headerClasses = cva({
-    base: 'col-span-2 px-3.5 py-3 bg-white dark:bg-gray-900 font-medium border-b border-gray-200 dark:border-black text-sm text-gray-800 dark:text-gray-300',
+    base: 'col-span-2 px-3.5 py-3 bg-white dark:bg-gray-900 font-medium border-b border-gray-200 dark:border-black text-sm text-gray-900 dark:text-gray-300',
     variants: {
         usingSlot: {
             true: 'grid grid-cols-[auto_1fr_auto]',

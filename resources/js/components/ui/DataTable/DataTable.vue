@@ -27,7 +27,7 @@ const tableCellVariants = cva({
 });
 
 const titleClasses = cva({
-    base: 'font-medium text-gray-800 dark:text-white',
+    base: 'font-medium text-gray-900 dark:text-white',
     variants: {
         variant: {
             normal: 'text-base',

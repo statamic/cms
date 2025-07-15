@@ -2,7 +2,7 @@
     <div>
         <template v-for="permission in permissions" :key="permission.value">
             <ui-checkbox-item
-                class="pb-2.5 [&_label]:text-gray-800 dark:[&_label]:text-gray-200"
+                class="pb-2.5 [&_label]:text-gray-900 dark:[&_label]:text-gray-200"
                 :description="permission.description"
                 :label="permission.label"
                 :style="`padding-left: ${24 * depth - 24}px`"

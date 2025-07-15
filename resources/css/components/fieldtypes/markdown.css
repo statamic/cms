@@ -15,7 +15,7 @@
     }
 
     .markdown-buttons button {
-        @apply flex h-8 w-8 items-center justify-center rounded-sm px-1 text-center text-base text-gray-800 dark:text-dark-150;
+        @apply flex h-8 w-8 items-center justify-center rounded-sm px-1 text-center text-base text-gray-900 dark:text-dark-150;
 
         &:hover {
             @apply bg-gray-200 dark:bg-dark-750;
@@ -29,7 +29,7 @@
     .markdown-buttons button:disabled {
         @apply opacity-50;
         &:hover {
-            @apply text-gray-800 dark:text-dark-200;
+            @apply text-gray-900 dark:text-dark-200;
         }
     }
 
@@ -67,7 +67,7 @@
     }
 
     .helpers {
-        @apply flex items-center border-t text-xs text-gray-800 dark:border-dark-900 dark:text-dark-150;
+        @apply flex items-center border-t text-xs text-gray-900 dark:border-dark-900 dark:text-dark-150;
 
         button:hover {
             @apply text-blue;
@@ -165,7 +165,7 @@
   ========================================================================== */
 
 .markdown-fieldtype .cm-header {
-    @apply text-gray-800 dark:text-dark-150;
+    @apply text-gray-900 dark:text-dark-150;
 
     &.cm-header-1 {
         @apply text-lg;
@@ -181,7 +181,7 @@
 }
 
 .markdown-fieldtype .cm-quote {
-    @apply text-sm italic text-gray-800 dark:text-dark-150;
+    @apply text-sm italic text-gray-900 dark:text-dark-150;
 }
 
 /* Preview Mode Typography

@@ -90,7 +90,7 @@ const itemClasses = cva({
             xs: 'text-xs',
         },
         selected: {
-            false: 'text-gray-800 dark:text-gray-300 data-highlighted:bg-gray-100 data-highlighted:text-gray-900 dark:data-highlighted:bg-gray-700 dark:data-highlighted:text-gray-300',
+            false: 'text-gray-900 dark:text-gray-300 data-highlighted:bg-gray-100 data-highlighted:text-gray-900 dark:data-highlighted:bg-gray-700 dark:data-highlighted:text-gray-300',
             true: 'bg-blue-50 text-blue-600!',
         },
     },
@@ -264,7 +264,7 @@ function pushTaggableOption(e) {
             @update:open="updateDropdownOpen"
             @update:model-value="updateModelValue"
         >
-            <ComboboxAnchor :class="['focus-within:focus-outline w-full flex items-center justify-between gap-2 text-gray-800 dark:text-gray-300 antialiased appearance-none', $attrs.class]" data-ui-combobox-anchor>
+            <ComboboxAnchor :class="['focus-within:focus-outline w-full flex items-center justify-between gap-2 text-gray-900 dark:text-gray-300 antialiased appearance-none', $attrs.class]" data-ui-combobox-anchor>
                 <ComboboxTrigger as="div" :class="triggerClasses">
                     <ComboboxInput
                         v-if="searchable && (dropdownOpen || !modelValue || (multiple && placeholder))"

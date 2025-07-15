@@ -4,7 +4,9 @@
 
 @inject('licenses', 'Statamic\Licensing\LicenseManager')
 
-@if ($licenses->requestFailed())
+@if ($licenses->outpostIsOffline())
+    {{-- Do nothing. --}}
+@elseif ($licenses->requestFailed())
     <div class="fixed bottom-0 z-20 w-full p-2">
         <div
             class="w-full rounded-md border border-yellow-dark bg-yellow px-4 py-3 text-sm dark:border-none dark:bg-dark-blue-100"

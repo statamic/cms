@@ -44,7 +44,7 @@
             </ButtonGroup>
         </Header>
 
-        <Panel>
+        <Panel class="nav-builder">
             <div class="loading card" v-if="loading">
                 <loading-graphic />
             </div>
@@ -79,7 +79,7 @@
                 >
                     <template #placeholder>
                         <div
-                            class="w-full rounded-sm border border-dashed border-blue-400 bg-blue-500/10 p-2"
+                            class="w-full rounded-lg border border-dashed border-blue-400 bg-blue-500/10 p-2"
                             :class="{
                             'mt-6': isSectionNode(draggingStat),
                             'ml-[-24px]': isDraggingIntoTopLevel,

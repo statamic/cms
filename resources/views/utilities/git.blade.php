@@ -38,26 +38,26 @@
             >
             <div class="mt-4 flex text-sm text-gray dark:text-dark-150">
                 <div class="badge-pill-sm ltr:mr-4 rtl:ml-4">
-                    <span class="font-medium text-gray-800 dark:text-dark-150">{{ __('Affected files') }}:</span>
+                    <span class="font-medium text-gray-900 dark:text-dark-150">{{ __('Affected files') }}:</span>
                     {{ $status->totalCount }}
                 </div>
                 @if ($status->addedCount)
                     <div class="badge-pill-sm ltr:mr-4 rtl:ml-4">
-                        <span class="font-medium text-gray-800 dark:text-dark-150">{{ __('Added') }}:</span>
+                        <span class="font-medium text-gray-900 dark:text-dark-150">{{ __('Added') }}:</span>
                         {{ $status->addedCount }}
                     </div>
                 @endif
 
                 @if ($status->modifiedCount)
                     <div class="badge-pill-sm ltr:mr-4 rtl:ml-4">
-                        <span class="font-medium text-gray-800 dark:text-dark-150">{{ __('Modified') }}:</span>
+                        <span class="font-medium text-gray-900 dark:text-dark-150">{{ __('Modified') }}:</span>
                         {{ $status->modifiedCount }}
                     </div>
                 @endif
 
                 @if ($status->deletedCount)
                     <div class="badge-pill-sm ltr:mr-4 rtl:ml-4">
-                        <span class="font-medium text-gray-800 dark:text-dark-150">{{ __('Deleted') }}:</span>
+                        <span class="font-medium text-gray-900 dark:text-dark-150">{{ __('Deleted') }}:</span>
                         {{ $status->deletedCount }}
                     </div>
                 @endif

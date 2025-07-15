@@ -101,7 +101,7 @@
                                     >
                                         <svg-icon
                                             name="micro/plus"
-                                            class="dark:group-hover:dark-text-100 dark:text-dark-175 h-3 w-3 text-gray-800 group-hover:text-black"
+                                            class="dark:group-hover:dark-text-100 dark:text-dark-175 h-3 w-3 text-gray-900 group-hover:text-black"
                                         />
                                     </button>
                                 </template>

@@ -4,7 +4,7 @@
             <div class="border-b px-4 py-4 bg-white dark:border-dark-900 border-gray-200 dark:bg-gray-900 dark:border-black rounded-b-xl">
                 <div class="flex">
                     <div
-                        class="mb-4 flex h-8 items-center rounded-sm border bg-gray-100 text-gray-800 shadow-inner dark:border-dark-200 dark:bg-dark-600 dark:text-dark-150 ltr:mr-1 rtl:ml-1"
+                        class="mb-4 flex h-8 items-center rounded-sm border bg-gray-100 text-gray-900 shadow-inner dark:border-dark-200 dark:bg-dark-600 dark:text-dark-150 ltr:mr-1 rtl:ml-1"
                     >
                         <select class="input w-auto px-1 text-sm" v-model="linkType">
                             <option v-for="visibleLinkType in visibleLinkTypes" :value="visibleLinkType.type">
@@ -14,7 +14,7 @@
                     </div>
 
                     <div
-                        class="dark:placeholder:dark-text-dark-175 mb-4 flex h-8 w-full items-center rounded-sm border bg-gray-100 p-2 text-gray-800 shadow-inner placeholder:text-gray-600 dark:border-dark-200 dark:bg-dark-600 dark:text-dark-150"
+                        class="dark:placeholder:dark-text-dark-175 mb-4 flex h-8 w-full items-center rounded-sm border bg-gray-100 p-2 text-gray-900 shadow-inner placeholder:text-gray-600 dark:border-dark-200 dark:bg-dark-600 dark:text-dark-150"
                     >
                         <!-- URL input -->
                         <input
@@ -114,7 +114,7 @@
                 <ui-button
                     variant="ghost"
                     size="xs"
-                    class="text-xs text-gray-600 hover:text-gray-800 dark:text-dark-175 dark:hover:text-dark-100"
+                    class="text-xs text-gray-600 hover:text-gray-900 dark:text-dark-175 dark:hover:text-dark-100"
                     @click="$emit('canceled')"
                 >
                     {{ __('Cancel') }}

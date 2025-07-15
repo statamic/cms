@@ -1,5 +1,17 @@
 # Release Notes
 
+## 5.60.0 (2025-07-15)
+
+### What's new
+- Add command to clear asset_meta and asset_container_contents caches [#11960](https://github.com/statamic/cms/issues/11960) by @ryanmitchell
+
+### What's fixed
+- Addon Manifest improvements [#11948](https://github.com/statamic/cms/issues/11948) by @duncanmcclean
+- Licensing fixes [#11950](https://github.com/statamic/cms/issues/11950) by @duncanmcclean
+- Allow classes to extend Markdown Parser [#11946](https://github.com/statamic/cms/issues/11946) by @JohnathonKoster
+
+
+
 ## 5.59.0 (2025-07-10)
 
 ### What's new

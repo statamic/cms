@@ -53,10 +53,10 @@
                         <ui-icon
                             :name="groupIconName(item.icon)"
                             :directory="iconBaseDirectory"
-                            class="h-9 w-9 rounded-sm border border-gray-600 bg-white p-2 text-gray-800 dark:border-dark-800 dark:bg-dark-650 dark:text-dark-175 ltr:mr-2 rtl:ml-2"
+                            class="h-9 w-9 rounded-sm border border-gray-600 bg-white p-2 text-gray-900 dark:border-dark-800 dark:bg-dark-650 dark:text-dark-175 ltr:mr-2 rtl:ml-2"
                         />
                         <div class="flex-1">
-                            <div class="w-52 truncate text-sm font-medium text-gray-800 dark:text-dark-175">
+                            <div class="w-52 truncate text-sm font-medium text-gray-900 dark:text-dark-175">
                                 {{ __(item.display || item.handle) }}
                             </div>
                             <div
@@ -79,10 +79,10 @@
                         <ui-icon
                             :name="setIconName(item.icon)"
                             :directory="iconBaseDirectory"
-                            class="h-9 w-9 rounded-sm border border-gray-600 bg-white p-2 text-gray-800 dark:border-dark-800 dark:bg-dark-650 dark:text-dark-175 ltr:mr-2 rtl:ml-2"
+                            class="h-9 w-9 rounded-sm border border-gray-600 bg-white p-2 text-gray-900 dark:border-dark-800 dark:bg-dark-650 dark:text-dark-175 ltr:mr-2 rtl:ml-2"
                         />
                         <div class="flex-1">
-                            <div class="w-52 truncate text-sm font-medium text-gray-800 dark:text-dark-175">
+                            <div class="w-52 truncate text-sm font-medium text-gray-900 dark:text-dark-175">
                                 {{ __(item.display || item.handle) }}
                             </div>
                             <div
