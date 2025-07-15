@@ -57,7 +57,6 @@ export default {
             },
         };
     },
-    inject: ['store'],
     computed: {
         values() {
             return this.value;
@@ -69,7 +68,7 @@ export default {
             return this.config.fields;
         },
         previews() {
-            return data_get(this.store.previews, this.fieldPathPrefix || this.handle) || {};
+            return data_get(this.publishContainer.previews, this.fieldPathPrefix || this.handle) || {};
         },
         replicatorPreview() {
             if (!this.showFieldPreviews || !this.config.replicator_preview) return;
@@ -140,12 +139,6 @@ export default {
 
         fieldPath(handle) {
             return (this.fieldPathPrefix || this.handle) + '.' + handle;
-        },
-
-        errors(handle) {
-            const state = this.store;
-            if (!state) return [];
-            return state.errors[this.fieldPath(handle)] || [];
         },
 
         toggleFullscreen() {

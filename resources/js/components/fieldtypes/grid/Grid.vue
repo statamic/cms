@@ -69,12 +69,9 @@ export default {
             fullScreenMode: false,
             provide: {
                 grid: this.makeGridProvide(),
-                storeName: this.storeName,
             },
         };
     },
-
-    inject: ['storeName'],
 
     provide: {
         isInGridField: true,

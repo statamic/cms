@@ -44,8 +44,6 @@ export default {
         Select,
     },
 
-    inject: ['storeName'],
-
     data() {
         return {
             sites: this.value,

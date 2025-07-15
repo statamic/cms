@@ -100,15 +100,12 @@ export default {
         AddSetButton,
     },
 
-    inject: ['store', 'storeName'],
-
     data() {
         return {
             focused: false,
             collapsed: clone(this.meta.collapsed),
             fullScreenMode: false,
             provide: {
-                storeName: this.storeName,
                 replicatorSets: this.config.sets,
             },
         };
@@ -145,10 +142,6 @@ export default {
 
         sortableHandleClass() {
             return `${this.name}-sortable-handle`;
-        },
-
-        storeState() {
-            return this.store || {};
         },
 
         replicatorPreview() {
@@ -274,7 +267,7 @@ export default {
         setHasError(index) {
             const prefix = `${this.fieldPathPrefix || this.handle}.${index}.`;
 
-            return Object.keys(this.storeState.errors ?? []).some((handle) => handle.startsWith(prefix));
+            return Object.keys(this.publishContainer.errors ?? []).some((handle) => handle.startsWith(prefix));
         },
     },
 

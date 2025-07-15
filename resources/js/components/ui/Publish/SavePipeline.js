@@ -69,15 +69,15 @@ export class Request extends Step {
 
     handle(payload) {
         return new Promise((resolve, reject) => {
-            const data = { ...container.value.store.visibleValues, ...this.#extraData };
+            const data = { ...container.value.visibleValues, ...this.#extraData };
 
             return axios[this.#method](this.#url, data)
                 .then((response) => {
                     if (container && response.data.data?.hasOwnProperty('values')) {
-                        container.value.store.setValues(
-                            resetValuesFromResponse(response.data.data.values, container.value.store),
+                        container.value.setValues(
+                            resetValuesFromResponse(response.data.data.values, container),
                         );
-                        container.value.store.setExtraValues(response.data.data.extraValues);
+                        container.value.setExtraValues(response.data.data.extraValues);
                     }
                     resolve(response);
                 })

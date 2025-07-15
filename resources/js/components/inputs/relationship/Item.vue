@@ -70,6 +70,7 @@
 import { getActivePinia } from 'pinia';
 import InlineEditForm from './InlineEditForm.vue';
 import { Button, Dropdown, DropdownMenu, DropdownItem } from '@statamic/ui';
+import { containerContextKey } from '@statamic/components/ui/Publish/Container.vue';
 
 export default {
     components: {
@@ -81,8 +82,8 @@ export default {
     },
 
     inject: {
-        storeName: {
-            default: null,
+        publishContainer: {
+            from: containerContextKey,
         },
     },
 
@@ -128,7 +129,7 @@ export default {
             this.item.private = responseData.private;
             this.item.status = responseData.status;
 
-            this.$events.$emit(`live-preview.${this.storeName}.refresh`);
+            this.$events.$emit(`live-preview.${this.publishContainer.name.value}.refresh`);
         },
     },
 };

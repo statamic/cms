@@ -200,7 +200,6 @@ export default {
     mixins: [Fieldtype],
 
     inject: {
-        store: { default: null },
         isInBardField: {
             name: 'isInBardField',
             default: false,
@@ -278,7 +277,7 @@ export default {
                 throw new Error(`Dynamic folder field [${field}] is invalid. Must be one of: id, slug, author`);
             }
 
-            const value = this.store.values[field];
+            const value = this.publishContainer.values[field];
 
             // If value is an array (e.g. a users fieldtype), get the first item.
             return Array.isArray(value) ? value[0] : value;

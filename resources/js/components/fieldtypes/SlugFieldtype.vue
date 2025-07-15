@@ -53,8 +53,6 @@ export default {
         Button,
     },
 
-    inject: ['store'],
-
     data() {
         return {
             slug: this.value,
@@ -79,12 +77,12 @@ export default {
                 key = dottedPrefix + '.' + field;
             }
 
-            return this.store?.values[key] || null;
+            return this.publishContainer?.values[key] || null;
         },
 
         language() {
-            if (!this.store) return;
-            const targetSite = this.store.site;
+            if (!this.publishContainer) return;
+            const targetSite = this.publishContainer.site;
             return targetSite ? Statamic.$config.get('sites').find((site) => site.handle === targetSite).lang : null;
         },
     },

@@ -89,6 +89,7 @@
 import Asset from '../assets/Asset';
 import { NodeViewWrapper } from '@tiptap/vue-3';
 import Selector from '../../assets/Selector.vue';
+import { containerContextKey } from '@statamic/components/ui/Publish/Container.vue';
 
 export default {
     mixins: [Asset],
@@ -98,7 +99,11 @@ export default {
         Selector,
     },
 
-    inject: ['store'],
+    inject: {
+        publishContainer: {
+            from: containerContextKey,
+        },
+    },
 
     props: [
         'editor', // the editor instance
@@ -186,7 +191,7 @@ export default {
         },
 
         loadAsset(id) {
-            let preloaded = this.store.preloadedAssets.find((asset) => asset.id === id);
+            let preloaded = this.publishContainer.preloadedAssets.value.find((asset) => asset.id === id);
 
             if (preloaded) {
                 // TODO
