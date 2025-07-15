@@ -46,7 +46,7 @@ class LicenseManager
 
     public function outpostIsOffline()
     {
-        return in_array($this->requestErrorCode(), [500, 503]);
+        return $this->requestErrorCode() >= 500 && $this->requestErrorCode() < 600;
     }
 
     public function isOnPublicDomain()
