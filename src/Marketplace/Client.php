@@ -72,7 +72,7 @@ class Client
             return $this->cache()->rememberWithExpiration($key, function () use ($method, $endpoint, $params) {
                 $response = Guzzle::request($method, $endpoint, [
                     'verify' => $this->verifySsl,
-                    'query' => $params,
+                    ($method === 'GET' ? 'query' : 'json') => $params,
                 ]);
 
                 $json = json_decode($response->getBody(), true);
