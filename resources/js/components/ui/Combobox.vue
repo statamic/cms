@@ -11,12 +11,12 @@ import {
     ComboboxPortal,
     ComboboxViewport,
 } from 'reka-ui';
-import { computed, nextTick, ref, useAttrs, useTemplateRef, watch } from 'vue';
+import { computed, nextTick, onMounted, ref, useAttrs, useSlots, useTemplateRef, watch } from 'vue';
 import { Button, Icon, Badge } from '@statamic/ui';
 import fuzzysort from 'fuzzysort';
 import { SortableList } from '@statamic/components/sortable/Sortable.js';
 
-const emit = defineEmits(['update:modelValue', 'search']);
+const emit = defineEmits(['update:modelValue', 'search', 'selected']);
 
 const props = defineProps({
     buttonAppearance: { type: Boolean, default: true },
@@ -36,6 +36,7 @@ const props = defineProps({
     searchable: { type: Boolean, default: true },
     size: { type: String, default: 'base' },
     taggable: { type: Boolean, default: false },
+    closeOnSelect: { type: Boolean, default: undefined },
 });
 
 defineOptions({
@@ -162,6 +163,8 @@ const limitIndicatorColor = computed(() => {
     return 'text-gray';
 });
 
+const closeOnSelect = computed(() => props.closeOnSelect || !props.multiple);
+
 const searchQuery = ref('');
 
 const filteredOptions = computed(() => {
@@ -190,16 +193,15 @@ watch(searchQuery, (value) => {
     emit('search', value, () => {});
 });
 
-const inputRef = useTemplateRef('input');
+const triggerRef = useTemplateRef('trigger');
+const searchInputRef = computed(() => triggerRef.value.$el.querySelector('input'));
 
 function clear() {
     searchQuery.value = '';
     emit('update:modelValue', null);
 
     if (props.searchable) {
-        nextTick(() => {
-            inputRef.value.$el.focus();
-        });
+        nextTick(() => searchInputRef.value.focus());
     }
 }
 
@@ -219,11 +221,24 @@ function updateDropdownOpen(open) {
     }
 
     dropdownOpen.value = open;
+
+    if (open) {
+        // todo: figure out if there's some way we can avoid a delay here.
+        nextTick(() => {
+            setTimeout(() => searchInputRef.value.focus(), 50);
+        });
+    }
 }
 
 function updateModelValue(value) {
+    let originalValue = props.modelValue;
+
     searchQuery.value = '';
     emit('update:modelValue', value);
+
+    value
+        .filter((option) => !originalValue.includes(option))
+        .forEach((option) => emit('selected', option));
 }
 
 function onPaste(e) {
@@ -247,6 +262,10 @@ function pushTaggableOption(e) {
         updateModelValue([...props.modelValue, e.target.value]);
     }
 }
+
+defineExpose({
+    filteredOptions,
+});
 </script>
 
 <template>
@@ -265,19 +284,21 @@ function pushTaggableOption(e) {
             @update:model-value="updateModelValue"
         >
             <ComboboxAnchor :class="['focus-within:focus-outline w-full flex items-center justify-between gap-2 text-gray-900 dark:text-gray-300 antialiased appearance-none', $attrs.class]" data-ui-combobox-anchor>
-                <ComboboxTrigger as="div" :class="triggerClasses">
-                    <ComboboxInput
-                        v-if="searchable && (dropdownOpen || !modelValue || (multiple && placeholder))"
-                        ref="input"
-                        class="w-full text-gray-700 opacity-100 focus:outline-none"
-                        v-model="searchQuery"
-                        :placeholder
-                        @paste.prevent="onPaste"
-                        @keydown.enter.prevent="pushTaggableOption"
-                    />
+                <ComboboxTrigger ref="trigger" as="div" :class="triggerClasses">
+                    <slot v-if="searchable && (dropdownOpen || !modelValue || (multiple && placeholder))" name="search" v-bind="{ placeholder }">
+                        <ComboboxInput
+                            class="w-full text-gray-700 opacity-100 focus:outline-none"
+                            v-model="searchQuery"
+                            :placeholder
+                            @paste.prevent="onPaste"
+                            @keydown.enter.prevent="pushTaggableOption"
+                        />
+                    </slot>
+
                     <button type="button" class="flex-1 text-start" v-else-if="!searchable && (dropdownOpen || !modelValue)">
                         <span class="text-gray-400 dark:text-gray-500" v-text="placeholder" />
                     </button>
+
                     <button type="button" v-else class="flex-1 text-start cursor-pointer">
                         <slot name="selected-option" v-bind="{ option: selectedOption }">
                             <span v-if="labelHtml" v-html="getOptionLabel(selectedOption)" />
@@ -303,7 +324,7 @@ function pushTaggableOption(e) {
                 >
                     <ComboboxViewport>
                         <ComboboxEmpty class="py-2 text-sm">
-                            <slot name="no-options">
+                            <slot name="no-options" v-bind="{ searchQuery }">
                                 {{ __('No options to choose from.') }}
                             </slot>
                         </ComboboxEmpty>
@@ -316,7 +337,7 @@ function pushTaggableOption(e) {
                             :text-value="getOptionLabel(option)"
                             :class="itemClasses({ size: size, selected: isSelected(option) })"
                             as="button"
-                            @select="dropdownOpen = multiple"
+                            @select="dropdownOpen = closeOnSelect"
                         >
                             <slot name="option" v-bind="option">
                                 <img v-if="option.image" :src="option.image" class="size-5 rounded-full" />

@@ -17,7 +17,7 @@
         </Field>
 
         <Field class="form-group field-w-100" :label="__('Rules')">
-            <Description>
+            <Description class="mb-1.5">
                 {{ __('messages.field_validation_advanced_instructions') }}
                 <a :href="laravelDocsLink" target="_blank">{{ __('Learn more') }}</a>
                 <span v-if="helpBlock" class="italic text-gray-500 ltr:float-right rtl:float-left">
@@ -26,38 +26,43 @@
                 </span>
             </Description>
 
-            <v-select
+            <Combobox
                 v-if="!customRule"
-                ref="rulesSelect"
-                name="rules"
-                :options="allRules"
-                :reduce="(rule) => rule.value"
-                :placeholder="__('Add Rule')"
-                :multiple="false"
-                :searchable="true"
-                :value="selectedLaravelRule"
                 class="w-full"
-                @input="add"
+                ref="rulesSelect"
+                :options="allRules"
+                :placeholder="__('Add Rule')"
+                :multiple="true"
+                :searchable="true"
+                :close-dropdown-on-select="true"
+                option-label="value"
+                :model-value="rules"
+                @selected="add($event)"
             >
-                <template #search="{ attributes, events }">
+                <template #search="{ placeholder }">
                     <input
                         ref="searchInput"
-                        v-bind="attributes"
-                        v-on="events"
-                        class="vs__search"
+                        class="w-full text-gray-700 opacity-100 focus:outline-none"
+                        v-model="searchQuery"
+                        :placeholder
                         @keydown.enter="ifSearchNotFoundAddCustom"
                         @blur="ifSearchNotFoundAddCustom"
                     />
                 </template>
-                <template #option="{ value, display }">
-                    {{ __(display) }} <code class="ltr:ml-2 rtl:mr-2">{{ valueWithoutTrailingColon(value) }}</code>
+
+                <template #no-options="{ searchQuery }">
+                    {{ __('Add') }} <code class="ms-2">{{ searchQuery }}</code>
                 </template>
-                <template #no-options="{ search }">
-                    <div class="vs__dropdown-option ltr:text-left rtl:text-right">
-                        {{ __('Add') }} <code class="ltr:ml-2 rtl:mr-2">{{ search }}</code>
-                    </div>
+
+                <template #option="option">
+                    {{ __(option.display) }} <code class="ms-2">{{ valueWithoutTrailingColon(option.value) }}</code>
                 </template>
-            </v-select>
+
+                <template #selected-options>
+                    <!-- We're rendering these ourselves so they don't go away when we swap out the combobox for an input. -->
+                    <div></div>
+                </template>
+            </Combobox>
 
             <Input
                 v-else
@@ -67,51 +72,53 @@
                 @blur="add(customRule)"
             />
 
-            <div>
-                <sortable-list
-                    item-class="sortable-item"
-                    handle-class="sortable-item"
-                    :distance="5"
-                    :mirror="false"
-                    v-model="rules"
-                >
-                    <div class="vs__selected-options-outside flex flex-wrap gap-2 pt-3">
-                        <div v-for="rule in rules" :key="rule" class="vs__selected sortable-item">
-                            <Badge size="lg" color="white">
-                                {{ rule }}
-                                <button
-                                    type="button"
-                                    class="-mx-3 cursor-pointer px-3 text-gray-400 hover:text-gray-700"
-                                    :aria-label="__('Delete Rule')"
-                                    @click="remove(rule)"
-                                >
-                                    <span>&times;</span>
-                                </button>
-                            </Badge>
-                        </div>
+            <sortable-list
+                item-class="sortable-item"
+                handle-class="sortable-item"
+                :distance="5"
+                :mirror="false"
+                v-model="rules"
+            >
+                <div class="flex flex-wrap gap-2">
+                    <div
+                        v-for="rule in rules"
+                        :key="rule"
+                        class="sortable-item mt-2"
+                    >
+                        <Badge pill size="lg">
+                            {{ rule }}
+
+                            <button
+                                type="button"
+                                class="opacity-75 hover:opacity-100 cursor-pointer"
+                                :aria-label="__('Deselect option')"
+                                @click="remove(rule)"
+                            >
+                                &times;
+                            </button>
+                        </Badge>
                     </div>
-                </sortable-list>
-            </div>
+                </div>
+            </sortable-list>
         </Field>
     </div>
 </template>
-
-<style scoped>
-.draggable-source--is-dragging {
-    @apply border-dashed bg-transparent opacity-75;
-}
-</style>
 
 <script>
 import RULES from './Rules.js';
 import SemVer from 'semver';
 import { SortableList } from '../sortable/Sortable';
 import { sortBy } from 'lodash-es';
-import { Description, Field, Input, Badge } from '@statamic/ui';
+import { Description, Field, Input, Badge, Button } from '@statamic/ui';
 import Switch from '@statamic/components/ui/Switch.vue'
+import { Combobox } from 'statamic';
+import { ComboboxInput } from 'reka-ui';
 
 export default {
     components: {
+        Button,
+        ComboboxInput,
+        Combobox,
         Description,
         SortableList,
         Field,
@@ -133,6 +140,8 @@ export default {
             rules: [],
             selectedLaravelRule: null,
             customRule: null,
+
+            searchQuery: '',
         };
     },
 
@@ -145,11 +154,7 @@ export default {
             let version = new RegExp('([0-9]+\.[0-9]+)\.[0-9]+').exec(this.laravelVersion)[1];
             let majorVersion = Number(version.split('.', 1)[0]);
 
-            if (majorVersion >= 6) {
-                version = `${majorVersion}.x`;
-            }
-
-            return `https://laravel.com/docs/${version}/validation#available-validation-rules`;
+            return `https://laravel.com/docs/${majorVersion}.x/validation#available-validation-rules`;
         },
 
         laravelRules() {
@@ -176,7 +181,7 @@ export default {
                 return false;
             }
 
-            let rule = this.allRules.filter((rule) => rule.value === this.selectedLaravelRule).first();
+            let rule = this.allRules.find((rule) => rule.value === this.selectedLaravelRule);
 
             return rule.example || false;
         },
@@ -245,6 +250,11 @@ export default {
         ensure(rule) {
             this.resetState();
 
+            // todo: once the empty string issue in hasUnfinishedParameters has been fixed, we can remove this workaround
+            if (!rule) {
+                return;
+            }
+
             if (!this.rules.includes(rule)) {
                 this.rules.push(rule);
             }
@@ -255,15 +265,17 @@ export default {
                 this.resetState();
                 this.selectedLaravelRule = rule;
                 this.customRule = rule;
-                this.$nextTick(() => this.$refs.customRuleInput.$refs.input.focus());
+                this.$nextTick(() => this.$refs.customRuleInput.focus());
             } else {
                 this.ensure(rule);
             }
+
+            this.searchQuery = '';
         },
 
         ifSearchNotFoundAddCustom() {
             let rulesSelect = this.$refs.rulesSelect;
-            let rule = rulesSelect.search;
+            let rule = this.searchQuery;
 
             if (this.searchNotFound(rulesSelect) || this.hasUnfinishedParameters(rule)) return;
 
@@ -277,11 +289,16 @@ export default {
         },
 
         hasUnfinishedParameters(rule) {
+            // todo: figure out why we sometimes get here with an empty rule.
+            if (! rule) {
+                return;
+            }
+
             return rule.substr(rule.length - 1) === ':';
         },
 
         searchNotFound(rulesSelect) {
-            return rulesSelect.search.length === 0 || rulesSelect.filteredOptions.length > 0;
+            return this.searchQuery?.length === 0 || rulesSelect?.filteredOptions.length === 0;
         },
 
         updated(rules) {
