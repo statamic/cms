@@ -11,5 +11,5 @@ export default function createContext(name) {
         return inject(injectionKey);
     };
 
-    return [injectContext, provideContext];
+    return [injectContext, provideContext, injectionKey];
 }
