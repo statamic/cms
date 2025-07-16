@@ -117,38 +117,18 @@ const selectedOption = computed(() => {
     return selectedOptions.value[0];
 });
 
-function getOptionLabel(option) {
-    if (!option) {
-        return;
-    }
-
-    return option[props.optionLabel];
-}
-
-function getOptionValue(option) {
-    if (!option) {
-        return;
-    }
-
-    return option[props.optionValue];
-}
-
-function isSelected(option) {
-    return selectedOptions.value.filter((item) => getOptionValue(item) === getOptionValue(option)).length > 0;
-}
+const getOptionLabel = (option) => option?.[props.optionLabel];
+const getOptionValue = (option) => option?.[props.optionValue];
+const isSelected = (option) => selectedOptions.value.filter((item) => getOptionValue(item) === getOptionValue(option)).length > 0;
 
 const limitReached = computed(() => {
-    if (!props.maxSelections) {
-        return false;
-    }
+    if (! props.maxSelections) return false;
 
     return selectedOptions.value.length >= props.maxSelections;
 });
 
 const limitExceeded = computed(() => {
-    if (!props.maxSelections) {
-        return false;
-    }
+    if (! props.maxSelections) return false;
 
     return selectedOptions.value.length > props.maxSelections;
 });
@@ -163,9 +143,12 @@ const limitIndicatorColor = computed(() => {
     return 'text-gray';
 });
 
-const closeOnSelect = computed(() => props.closeOnSelect || !props.multiple);
-
 const searchQuery = ref('');
+const searchInputRef = useTemplateRef('search');
+
+watch(searchQuery, (value) => {
+    emit('search', value, () => {});
+});
 
 const filteredOptions = computed(() => {
     if (!props.searchable || props.ignoreFilter) {
@@ -189,12 +172,6 @@ const filteredOptions = computed(() => {
         .map((result) => result.obj);
 });
 
-watch(searchQuery, (value) => {
-    emit('search', value, () => {});
-});
-
-const searchInputRef = useTemplateRef('search');
-
 function clear() {
     searchQuery.value = '';
     emit('update:modelValue', null);
@@ -205,13 +182,11 @@ function clear() {
 }
 
 function deselect(option) {
-    emit(
-        'update:modelValue',
-        props.modelValue.filter((item) => item !== option),
-    );
+    emit('update:modelValue', props.modelValue.filter((item) => item !== option));
 }
 
 const dropdownOpen = ref(false);
+const closeOnSelect = computed(() => props.closeOnSelect || !props.multiple);
 
 function updateDropdownOpen(open) {
     // Prevent dropdown from opening when it's a taggable combobox with no options.
