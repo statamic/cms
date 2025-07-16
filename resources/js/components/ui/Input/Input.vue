@@ -1,5 +1,5 @@
 <script setup>
-import { computed, useSlots, ref, useId } from 'vue';
+import { computed, useSlots, ref, useId, useTemplateRef } from 'vue';
 import { cva } from 'cva';
 import { twMerge } from 'tailwind-merge';
 import { Icon, Button, CharacterCounter } from '@statamic/ui';
@@ -108,6 +108,11 @@ const copy = () => {
     copied.value = true;
     setTimeout(() => (copied.value = false), 1000);
 };
+
+const input = useTemplateRef('input');
+const focus = () => input.value.focus();
+
+defineExpose({ focus });
 </script>
 
 <template>
@@ -120,6 +125,7 @@ const copy = () => {
                 </slot>
             </div>
             <input
+                ref="input"
                 :class="inputClasses"
                 :id
                 :type="inputType"

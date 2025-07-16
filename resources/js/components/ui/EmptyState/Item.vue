@@ -26,7 +26,7 @@ const hasSlot = !!slots.default;
 </script>
 
 <template>
-    <li>
+    <li class="w-full">
         <component
             :is="hasSlot ? 'div' : (href ? 'a' : 'button')"
             :href="href"

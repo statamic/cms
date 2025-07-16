@@ -52,13 +52,6 @@
                 />
             </template>
 
-            <ui-button
-                v-if="canCreateCollections"
-                :href="createUrl"
-                :text="__('Create Collection')"
-                variant="primary"
-            />
-
             <ui-toggle-group v-model="view" v-if="canUseStructureTree">
                 <ui-toggle-item icon="navigation" value="tree" />
                 <ui-toggle-item icon="layout-list" value="list" />
