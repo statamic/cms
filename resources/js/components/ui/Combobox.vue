@@ -193,8 +193,7 @@ watch(searchQuery, (value) => {
     emit('search', value, () => {});
 });
 
-const triggerRef = useTemplateRef('trigger');
-const searchInputRef = computed(() => triggerRef.value.$el.querySelector('input'));
+const searchInputRef = useTemplateRef('search');
 
 function clear() {
     searchQuery.value = '';
@@ -221,13 +220,6 @@ function updateDropdownOpen(open) {
     }
 
     dropdownOpen.value = open;
-
-    if (open) {
-        // todo: figure out if there's some way we can avoid a delay here.
-        nextTick(() => {
-            setTimeout(() => searchInputRef.value.focus(), 50);
-        });
-    }
 }
 
 function updateModelValue(value) {
@@ -287,17 +279,17 @@ defineExpose({
             @update:model-value="updateModelValue"
         >
             <ComboboxAnchor :class="['focus-within:focus-outline w-full flex items-center justify-between gap-2 text-gray-900 dark:text-gray-300 antialiased appearance-none', $attrs.class]" data-ui-combobox-anchor>
-                <ComboboxTrigger ref="trigger" as="div" :class="triggerClasses">
-                    <slot v-if="searchable && (dropdownOpen || !modelValue || (multiple && placeholder))" name="search" v-bind="{ placeholder }">
-                        <ComboboxInput
-                            class="w-full text-gray-700 opacity-100 focus:outline-none"
-                            v-model="searchQuery"
-                            :placeholder
-                            @paste.prevent="onPaste"
-                            @keydown.enter.prevent="pushTaggableOption"
-                            @blur="pushTaggableOption"
-                        />
-                    </slot>
+                <ComboboxTrigger as="div" :class="triggerClasses">
+                    <ComboboxInput
+                        v-if="searchable && (dropdownOpen || !modelValue || (multiple && placeholder))"
+                        ref="search"
+                        class="w-full text-gray-700 opacity-100 focus:outline-none"
+                        v-model="searchQuery"
+                        :placeholder
+                        @paste.prevent="onPaste"
+                        @keydown.enter.prevent="pushTaggableOption"
+                        @blur="pushTaggableOption"
+                    />
 
                     <button type="button" class="flex-1 text-start" v-else-if="!searchable && (dropdownOpen || !modelValue)">
                         <span class="text-gray-400 dark:text-gray-500" v-text="placeholder" />
