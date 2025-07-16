@@ -1,7 +1,6 @@
 <template>
     <div class="page-tree-branch flex" :class="{
         'ml-[-1.2rem]': isTopLevel,
-        'page-tree-branch--is-section': isSection,
         'page-tree-branch--has-children': hasChildren,
     }">
         <div class="page-move w-6" />

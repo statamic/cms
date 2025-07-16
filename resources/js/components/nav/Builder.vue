@@ -80,9 +80,10 @@
                         <div
                             class="w-full rounded-lg border border-dashed border-blue-400 bg-blue-500/10 p-2"
                             :class="{
-                            'mt-6': isSectionNode(draggingStat),
-                            'ml-[-24px]': isDraggingIntoTopLevel,
-                        }"
+                                'is-section-placeholder': isSectionNode(draggingStat),
+                                'mt-6': isSectionNode(draggingStat),
+                                'ml-[-24px]': isDraggingIntoTopLevel,
+                            }"
                         >
                             &nbsp;
                         </div>
