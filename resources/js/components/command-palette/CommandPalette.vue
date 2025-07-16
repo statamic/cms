@@ -17,6 +17,7 @@ let categories = ref([]);
 let items = ref(getItems());
 let searchResults = ref([]);
 let selected = ref(null);
+let recentItems = ref(getRecentItems());
 
 Statamic.$keys.bindGlobal(['mod+k'], (e) => {
     e.preventDefault();
@@ -110,6 +111,23 @@ function select(selected) {
 
 function findSelectedItem(selected) {
     return find(aggregatedItems.value, (result) => result.text === selected);
+}
+
+function getRecentItems() {
+    const stored = localStorage.getItem('statamic.command-palette.recent');
+
+    return stored ? JSON.parse(stored) : [];
+}
+
+function addToRecentItems(item) {
+    item.category = __('Recent');
+
+    const filtered = getRecentItems().filter(recentItem => recentItem.text !== item.text);
+    const updated = [item, ...filtered].slice(0, 5);
+
+    localStorage.setItem('statamic.command-palette.recent', JSON.stringify(updated));
+
+    recentItems.value = updated;
 }
 
 function reset() {
