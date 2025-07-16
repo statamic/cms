@@ -38,6 +38,7 @@ each({
 });
 
 const aggregatedItems = computed(() => [
+    ...(recentItems.value || []),
     ...(items.value || []),
     ...(searchResults.value || []),
 ]);
