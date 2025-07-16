@@ -155,21 +155,23 @@ const filteredOptions = computed(() => {
         return props.options;
     }
 
-    let options = JSON.parse(JSON.stringify(props.options));
+    const options = JSON.parse(JSON.stringify(props.options));
 
-    if (props.taggable && searchQuery.value) {
-        options.push({
-            [props.optionLabel]: searchQuery.value,
-            [props.optionValue]: searchQuery.value,
-        });
-    }
-
-    return fuzzysort
+    const results = fuzzysort
         .go(searchQuery.value, options, {
             all: true,
             key: props.optionLabel,
         })
         .map((result) => result.obj);
+
+    if (props.taggable && searchQuery.value && results.length === 0) {
+        results.push({
+            [props.optionLabel]: searchQuery.value,
+            [props.optionValue]: searchQuery.value,
+        });
+    }
+
+    return results;
 });
 
 function clear() {
