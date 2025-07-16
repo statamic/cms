@@ -4,6 +4,7 @@ namespace Statamic\CommandPalette;
 
 enum Category: string
 {
+    case Recent = 'Recent';
     case Actions = 'Actions';
     case History = 'History';
     case Navigation = 'Navigation';
