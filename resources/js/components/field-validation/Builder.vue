@@ -130,10 +130,6 @@ export default {
         };
     },
 
-    mounted() {
-        console.log(this.allRules.find((rule) => rule.value === 'required'));
-    },
-
     computed: {
         laravelVersion() {
             return this.$config.get('laravelVersion');
@@ -239,17 +235,14 @@ export default {
         ensure(rule) {
             this.resetState();
 
-            // todo: once the empty string issue in hasUnfinishedParameters has been fixed, we can remove this workaround
-            if (!rule) {
-                return;
-            }
-
             if (!this.rules.includes(rule)) {
                 this.rules.push(rule);
             }
         },
 
         add(rule) {
+            if (! rule) return;
+
             if (this.hasUnfinishedParameters(rule)) {
                 this.resetState();
                 this.selectedLaravelRule = rule;
@@ -276,11 +269,6 @@ export default {
         },
 
         hasUnfinishedParameters(rule) {
-            // todo: figure out why we sometimes get here with an empty rule.
-            if (! rule) {
-                return;
-            }
-
             return rule.substr(rule.length - 1) === ':';
         },
 
