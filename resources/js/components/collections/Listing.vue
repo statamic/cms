@@ -17,7 +17,7 @@
                 <ui-panel-header class="flex items-center justify-between">
                     <div class="flex items-center gap-1.5">
                         <ui-heading size="lg" :text="__(collection.title)" :href="collection.available_in_selected_site ? collection.entries_url : collection.edit_url" />
-                        <span class="text-sm text-gray-500">
+                        <span class="text-sm text-gray-600">
                             ({{ __('entry_count', { count: collection.entries_count }) }})
                         </span>
                     </div>
@@ -82,7 +82,7 @@
                     <ui-subheading v-if="collection.entries.length === 0" class="text-center h-full flex items-center justify-center">{{ __('Nothing to see here, yet.') }}</ui-subheading>
                 </ui-card>
 
-                <ui-panel-footer class="flex items-center gap-6 text-sm text-gray-500">
+                <ui-panel-footer class="flex items-center gap-6 text-sm text-gray-600">
                     <div class="flex items-center gap-2">
                         <ui-badge variant="flat" :text="String(collection.published_entries_count)" pill class="bg-gray-200 dark:bg-gray-700" />
                         <span>{{ __('Published') }}</span>

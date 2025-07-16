@@ -1,7 +1,7 @@
 <template>
     <div class="flex">
         <div class="flex flex-1 items-center" v-if="!inline">
-            <div class="text-sm text-gray-500" v-if="showTotals && totalItems > 0">
+            <div class="text-sm text-gray-600" v-if="showTotals && totalItems > 0">
                 {{ __(':start-:end of :total', { start: fromItem, end: toItem, total: totalItems }) }}
             </div>
         </div>
@@ -39,7 +39,7 @@
         </div>
 
         <div class="flex items-center flex-1 justify-end" v-if="perPage && isPerPageEvenUseful">
-            <span class="text-sm text-gray-500 me-3">{{ __('Per Page') }}</span>
+            <span class="text-sm text-gray-600 me-3">{{ __('Per Page') }}</span>
             <Select
                 class="w-auto!"
                 size="sm"
