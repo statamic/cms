@@ -69,7 +69,6 @@
                     :stat-handler="statHandler"
                     keep-placeholder
                     trigger-class="page-move"
-                    :drag-open="false"
                     :each-draggable="eachDraggable"
                     :each-droppable="eachDroppable"
                     :root-droppable="rootDroppable"
