@@ -37,7 +37,7 @@ const badgeClasses = computed(() => {
                 blue: 'bg-blue-100/80 border-blue-300 text-blue-700 [a]:hover:bg-blue-200/60 [button]:hover:bg-blue-200/60',
                 cyan: 'bg-cyan-100/80 border-cyan-400 text-cyan-700 [a]:hover:bg-cyan-200/60 [button]:hover:bg-cyan-200/60',
                 default:
-                    'bg-gray-100/80 border-gray-300 dark:bg-gray-700 dark:text-gray-100 text-gray-700 [a]:hover:bg-gray-200/50 [button]:hover:bg-gray-200/50',
+                    'bg-gray-100/80 border-gray-300 dark:bg-gray-800 dark:text-gray-100 text-gray-700 [a]:hover:bg-gray-200/50 [button]:hover:bg-gray-200/50',
                 emerald:
                     'bg-emerald-100/80 border-emerald-400 text-emerald-700 [a]:hover:bg-emerald-200/60 [button]:hover:bg-emerald-200/60',
                 fuchsia:
