@@ -79,7 +79,7 @@ const triggerClasses = cva({
 
 const itemClasses = cva({
     base: [
-        'w-full flex items-center gap-2 relative select-none cursor-pointer',
+        'w-full flex items-center gap-2 relative select-none cursor-pointer text-sm',
         'py-1.5 px-2 antialiased rounded-lg',
         'data-disabled:text-gray-300 data-disabled:pointer-events-none data-highlighted:outline-hidden',
     ],
@@ -264,7 +264,7 @@ function pushTaggableOption(e) {
             @update:open="updateDropdownOpen"
             @update:model-value="updateModelValue"
         >
-            <ComboboxAnchor :class="['focus-within:focus-outline w-full flex items-center justify-between gap-2 text-gray-900 dark:text-gray-300 antialiased appearance-none', $attrs.class]" data-ui-combobox-anchor>
+            <ComboboxAnchor :class="['w-full flex items-center justify-between gap-2 text-gray-900 dark:text-gray-300 antialiased appearance-none', $attrs.class]" data-ui-combobox-anchor>
                 <ComboboxTrigger as="div" :class="triggerClasses">
                     <ComboboxInput
                         v-if="searchable && (dropdownOpen || !modelValue || (multiple && placeholder))"
@@ -276,7 +276,7 @@ function pushTaggableOption(e) {
                         @keydown.enter.prevent="pushTaggableOption"
                     />
                     <button type="button" class="flex-1 text-start" v-else-if="!searchable && (dropdownOpen || !modelValue)">
-                        <span class="text-gray-400 dark:text-gray-500" v-text="placeholder" />
+                        <span class="text-gray-400 dark:text-gray-500 text-[0.8125rem]" v-text="placeholder" />
                     </button>
                     <button type="button" v-else class="flex-1 text-start cursor-pointer">
                         <slot name="selected-option" v-bind="{ option: selectedOption }">

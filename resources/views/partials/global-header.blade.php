@@ -14,13 +14,13 @@
             <img src="{{ $customDarkLogo }}" alt="{{ config('statamic.cp.custom_cms_name') }}" class="max-w-[260px] max-h-9">
         @else
         <div class="flex items-center gap-2 relative">
-            <button class="flex items-center group cursor-pointer" type="button" @click="toggleNav" aria-label="{{ __('Toggle Nav') }}">
+            <button class="flex items-center group rounded-full cursor-pointer" type="button" @click="toggleNav" aria-label="{{ __('Toggle Nav') }}" style="--focus-outline-offset: 0.2rem;">
                 <div class="opacity-0 group-hover:opacity-100 p-1 size-7 transition-opacity duration-150 absolute inset-0 flex items-center justify-center">
                     @cp_svg('icons/burger-menu', 'size-5')
                 </div>
                 @cp_svg('icons/statamic-mark-lime', 'size-7 group-hover:opacity-0 transition-opacity duration-150')
             </button>
-            <a href="{{ route('statamic.cp.index') }}" class="text-gray-300">
+            <a href="{{ route('statamic.cp.index') }}" class="text-gray-300 rounded-xs" style="--focus-outline-offset: var(--outline-offset-button);">
                 {{ $customLogoText ?? config('app.name') }}
             </a>
             @if (Statamic::pro())
