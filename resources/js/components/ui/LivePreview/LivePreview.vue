@@ -16,7 +16,7 @@ const props = defineProps({
     },
     url: {
         type: String,
-        required: true,
+        required: false,
     },
     targets: {
         type: Array,
