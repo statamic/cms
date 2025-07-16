@@ -138,7 +138,7 @@ class Sites
             'default' => [
                 'name' => '{{ config:app:name }}',
                 'url' => '/',
-                'locale' => 'en_US',
+                'locale' => '{{ config:app:locale }}',
             ],
         ];
     }
@@ -204,9 +204,11 @@ class Sites
             [
                 'handle' => 'locale',
                 'field' => [
-                    'type' => 'text',
+                    'type' => 'dictionary',
                     'display' => __('Locale'),
                     'instructions' => __('statamic::messages.site_configure_locale_instructions'),
+                    'dictionary' => 'locales',
+                    'max_items' => 1,
                     'required' => true,
                     'width' => 33,
                     'direction' => 'ltr',
@@ -215,9 +217,11 @@ class Sites
             [
                 'handle' => 'lang',
                 'field' => [
-                    'type' => 'text',
+                    'type' => 'dictionary',
                     'display' => __('Language'),
                     'instructions' => __('statamic::messages.site_configure_lang_instructions'),
+                    'dictionary' => 'languages',
+                    'max_items' => 1,
                     'width' => 33,
                     'direction' => 'ltr',
                 ],
@@ -241,6 +245,7 @@ class Sites
                     'field' => [
                         'type' => 'grid',
                         'hide_display' => true,
+                        'actions' => false,
                         'fullscreen' => false,
                         'mode' => 'stacked',
                         'add_row' => __('Add Site'),

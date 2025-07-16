@@ -19,7 +19,7 @@
 
     thead {
         th {
-            @apply whitespace-nowrap text-sm font-medium text-gray-800 dark:text-gray-300 text-start;
+            @apply whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-300 text-start;
             @apply px-4 py-2;
 
             .contained & {
@@ -83,7 +83,7 @@
 
             td {
                 @apply pl-4.5 pr-2.5 py-3 border-t border-gray-200 dark:border-white/10;
-                @apply text-gray-800 dark:text-gray-200;
+                @apply text-gray-900 dark:text-gray-200;
             }
 
             td.table-drag-handle {
@@ -191,7 +191,7 @@
 }
 
 .status-index-field {
-    @apply inline-block shrink justify-center rounded-full bg-gray-300 px-2 py-0.5 text-center text-xs text-gray-800 dark:bg-gray-200 dark:text-dark-150;
+    @apply inline-block shrink justify-center rounded-full bg-gray-300 px-2 py-0.5 text-center text-xs text-gray-900 dark:bg-gray-200 dark:text-dark-150;
 
     &.status-published:not(.status-private) {
         @apply bg-green-200 text-green-900 dark:bg-green-300 dark:text-green-950;

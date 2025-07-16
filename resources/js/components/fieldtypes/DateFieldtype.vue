@@ -5,10 +5,11 @@
         <Component
             :is="pickerComponent"
             v-if="hasDate || isInline"
-            :model-value="datePickerValue"
+            :disabled="config.disabled"
             :granularity="datePickerGranularity"
             :inline="isInline"
-            :disabled="isReadOnly"
+            :model-value="datePickerValue"
+            :read-only="isReadOnly"
             @update:model-value="datePickerUpdated"
         />
     </div>

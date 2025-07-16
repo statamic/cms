@@ -35,7 +35,7 @@
 =================================================== */
 .btn,
 .btn-default {
-    @apply text-gray-800 shadow-sm dark:text-dark-150;
+    @apply text-gray-900 shadow-sm dark:text-dark-150;
     background: linear-gradient(180deg, #fff, #f9fafb);
     background-clip: padding-box;
     border: 1px solid #d3dde7;
@@ -59,7 +59,7 @@
 
     &:hover:not(:disabled),
     &:active:not(:disabled) {
-        @apply text-gray-800 dark:text-dark-150;
+        @apply text-gray-900 dark:text-dark-150;
         background: linear-gradient(180deg, #f9fafb, #f4f6f8);
         background-clip: padding-box;
         border-bottom: 1px solid #bfc7d0;
@@ -145,7 +145,7 @@
 
 /*  Earth isn't flat but these buttons are */
 .btn-flat {
-    @apply flex items-center bg-gray-300 text-gray-800 dark:bg-dark-700 dark:text-dark-150;
+    @apply flex items-center bg-gray-300 text-gray-900 dark:bg-dark-700 dark:text-dark-150;
     position: inherit;
 
     &:hover:not(:disabled),

@@ -9,7 +9,7 @@
                 <ui-icon v-if="isRoot" name="home" class="size-4" v-tooltip="__('This is the root page')" />
                 <a
                     @click.prevent="$emit('edit', $event)"
-                    :class="{ 'text-sm font-medium': isTopLevel }"
+                    :class="{ 'text-sm font-medium is-top-level': isTopLevel }"
                     :href="page.edit_url"
                     v-text="title"
                 />
@@ -122,17 +122,6 @@ export default {
     },
 
     methods: {
-        getStatusClass() {
-            switch (this.page.status) {
-                case 'published':
-                    return 'bg-green-400';
-                case 'draft':
-                    return 'bg-gray-400 dark:bg-dark-200';
-                default:
-                    return 'bg-transparent border border-gray-600';
-            }
-        },
-
         getStatusTooltip() {
             let label = __(this.page.status) || __('Text item');
 

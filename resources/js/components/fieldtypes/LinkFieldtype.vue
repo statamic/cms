@@ -7,7 +7,7 @@
 
         <div class="flex-1 flex">
             <!-- URL text input -->
-            <Input v-if="option === 'url'" v-model="urlValue" />
+            <Input v-if="option === 'url'" :read-only="isReadOnly" v-model="urlValue" />
 
             <!-- Entry select -->
             <relationship-fieldtype

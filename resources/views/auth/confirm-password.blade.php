@@ -31,6 +31,7 @@
                             name="password"
                             type="password"
                             viewable
+                            autofocus
                         />
                     </ui-field>
                 @endif

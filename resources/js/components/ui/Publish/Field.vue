@@ -41,6 +41,10 @@ const fieldActions = computed(() => {
     return fieldtype.value ? fieldtype.value.fieldActions : [];
 });
 
+const shouldShowFieldActions = computed(() => {
+    return props.config.actions && fieldActions.value?.length > 0;
+});
+
 function valueUpdated(value) {
     const existingValue = data_get(store.values, fullPath.value);
     if (value === existingValue) return;
@@ -85,8 +89,6 @@ const shouldShowLabelText = computed(() => !props.config.hide_display);
 const shouldShowLabel = computed(
     () =>
         shouldShowLabelText.value || // Need to see the text
-        isReadOnly.value || // Need to see the "Read Only" text
-        isRequired.value || // Need to see the asterisk
         isLocked.value || // Need to see the avatar
         isLocalizable.value || // Need to see the icon
         isSyncable.value, // Need to see the icon
@@ -125,11 +127,11 @@ function desync() {
         :instructions-below="config.instructions_position === 'below'"
         :required="isRequired"
         :errors="errors"
-        :disabled="isReadOnly"
+        :read-only="isReadOnly"
         :as="wrapperComponent"
     >
-        <template #label>
-            <Label v-if="shouldShowLabel" :for="fieldId" :required="isRequired">
+        <template #label v-if="shouldShowLabel">
+            <Label :for="fieldId" :required="isRequired">
                 <template v-if="shouldShowLabelText">
                     <Tooltip :text="config.handle" :delay="1000">
                         {{ __(config.display) }}
@@ -139,8 +141,8 @@ function desync() {
                 <ui-button size="xs" inset icon="unsynced" variant="ghost" v-tooltip="__('messages.field_desynced_from_origin')" v-if="!isReadOnly && isSyncable" v-show="!isSynced" @click="sync" />
             </Label>
         </template>
-        <template #actions>
-            <publish-field-actions v-if="fieldActions?.length" :actions="fieldActions" />
+        <template #actions v-if="shouldShowFieldActions">
+            <publish-field-actions :actions="fieldActions" />
         </template>
         <div class="text-xs text-red-500" v-if="!fieldtypeComponentExists">
             Component <code v-text="fieldtypeComponent"></code> does not exist.

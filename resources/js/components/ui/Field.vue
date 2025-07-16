@@ -9,55 +9,25 @@ defineOptions({
 });
 
 const props = defineProps({
-    variant: {
-        type: String,
-        default: 'block',
-    },
-    label: {
-        type: String,
-    },
-    id: {
-        type: String,
-    },
-    instructions: {
-        type: String,
-        default: '',
-    },
-    instructionsBelow: {
-        type: Boolean,
-        default: false,
-    },
-    required: {
-        type: Boolean,
-        default: false,
-    },
-    badge: {
-        type: String,
-        default: '',
-    },
-    error: {
-        type: String,
-    },
-    errors: {
-        type: Object,
-        default: (props) => (props.error ? [props.error] : []),
-    },
-    disabled: {
-        type: Boolean,
-        default: false,
-    },
-    as: {
-        type: String,
-        default: 'div',
-        validator: (value) => ['div', 'card'].includes(value),
-    }
+    as: { type: String, default: 'div', validator: (value) => ['div', 'card'].includes(value) },
+    badge: { type: String, default: '' },
+    disabled: { type: Boolean, default: false },
+    readOnly: { type: Boolean, default: false },
+    error: { type: String },
+    errors: { type: Object, default: (props) => (props.error ? [props.error] : []) },
+    id: { type: String },
+    instructions: { type: String, default: '' },
+    instructionsBelow: { type: Boolean, default: false },
+    label: { type: String },
+    required: { type: Boolean, default: false },
+    variant: { type: String, default: 'block' },
 });
 
 const labelProps = computed(() => ({
-    text: props.label,
+    badge: props.badge,
     for: props.id,
     required: props.required,
-    badge: props.badge,
+    text: props.label,
 }));
 
 const classes = computed(() =>
@@ -89,22 +59,24 @@ const wrapperComponent = computed(() => props.as === 'card' ? Card : 'div');
 
 <template>
     <component :is="wrapperComponent" :class="[classes, $attrs.class]" data-ui-input-group>
-        <div v-if="$slots.actions" class="mb-2 flex items-center justify-between gap-x-1 h-6">
+        <div
+            v-if="$slots.actions"
+            :class="[
+                'flex items-center gap-x-1 h-6',
+                props.label || $slots.label ? 'justify-between' : 'justify-end',
+            ]"
+            data-ui-field-header
+        >
             <slot name="label">
                 <Label v-if="label" v-bind="labelProps" class="flex-1" />
             </slot>
             <slot name="actions" />
         </div>
-        <!-- =Jay. Only add bottom margins if there is no switch that follows, because the layout of the switch is with flexbox to the right of the field (rather than underneath the field text).
-
-        [&:not(:has(+[data-ui-switch]))]:mb-1 = add a bottom margin if a switch doesn't follow
-        [&:has([data-ui-description]):not(:has(+[data-ui-switch]))]:mb-2.5 = add an increased bottom margin if there's a description (and a switch doesn't follow)
-        -->
-        <div data-ui-field-text class="[&:not(:has(+[data-ui-switch]))]:mb-1 [&:has([data-ui-description]):not(:has(+[data-ui-switch]))]:mb-2.5">
+        <div data-ui-field-text class="mb-1.5">
             <slot v-if="!$slots.actions" name="label">
                 <Label v-if="label" v-bind="labelProps" class="flex-1" />
             </slot>
-            <Description :text="instructions" class="mt-1" v-if="instructions && !instructionsBelow" />
+            <Description :text="instructions" v-if="instructions && !instructionsBelow" class="mb-1.5" />
         </div>
         <slot />
         <Description :text="instructions" v-if="instructions && instructionsBelow" class="mt-2" />

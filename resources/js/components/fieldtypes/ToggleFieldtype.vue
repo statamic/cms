@@ -32,3 +32,12 @@ export default {
     },
 };
 </script>
+
+<style>
+/* Center vertically with text inputs */
+.grid-cell .toggle-fieldtype {
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+}
+</style>

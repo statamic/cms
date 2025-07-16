@@ -38,7 +38,7 @@
                     <ui-table-cell>
                         <div class="flex items-start">
                             @cp_svg('search-drivers/' . $index->config()['driver'], '-mt-0.5 flex h-6 w-6 shrink-0 me-2', 'search-drivers/local')
-                            <span class="text-gray-800 dark:text-dark-150">{{ $index->title() }}</span>
+                            <span class="text-gray-900 dark:text-dark-150">{{ $index->title() }}</span>
                         </div>
                     </ui-table-cell>
                     <ui-table-cell>

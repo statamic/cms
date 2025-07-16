@@ -11,6 +11,7 @@ class ConsoleServiceProvider extends ServiceProvider
     protected $commands = [
         Commands\ListCommand::class,
         Commands\AddonsDiscover::class,
+        Commands\AssetsCacheClear::class,
         Commands\AssetsGeneratePresets::class,
         Commands\AssetsMeta::class,
         Commands\GlideClear::class,

@@ -3,12 +3,13 @@
         <select
             v-if="display"
             class="select-input"
+            :disabled="config.disabled"
             :name="name"
-            @change="change"
+            :read-only="isReadOnly"
             :value="modelValue"
-            :disabled="isReadOnly"
-            @focus="$emit('focus')"
             @blur="$emit('blur')"
+            @change="change"
+            @focus="$emit('focus')"
         >
             <option v-if="placeholder" v-text="__(placeholder)" value="" disabled :selected="modelValue === null" />
 

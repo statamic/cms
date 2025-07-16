@@ -26,8 +26,8 @@ const classes = cva({
         size: {
             base: 'text-sm tracking-tight text-gray-700 dark:text-white',
             lg: 'text-base text-gray-700 dark:text-white',
-            xl: 'text-lg text-gray-800 dark:text-white',
-            '2xl': 'text-2xl text-gray-800 dark:text-white',
+            xl: 'text-lg text-gray-900 dark:text-white',
+            '2xl': 'text-2xl text-gray-900 dark:text-white',
         },
     },
 })({ ...props });

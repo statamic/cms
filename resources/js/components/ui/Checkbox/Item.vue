@@ -54,7 +54,7 @@ const conditionalProps = computed(() => {
             :class="checkboxClasses"
         >
             <CheckboxIndicator
-                class="relative flex h-full w-full items-center justify-center text-white dark:text-gray-800"
+                class="relative flex h-full w-full items-center justify-center text-white dark:text-gray-900"
             >
                 <svg viewBox="0 0 10 8" fill="none" xmlns="http://www.w3.org/2000/svg" class="size-2.5">
                     <path

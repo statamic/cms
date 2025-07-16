@@ -21,7 +21,7 @@ const { $slug, $axios, $toast, $keys } = instance.appContext.config.globalProper
 // Common data
 const title = ref(null);
 const handle = ref(null);
-const slug = $slug.async().separatedBy('_');
+const slug = $slug.separatedBy('_');
 
 // Common computed
 const canSubmit = computed(() => title.value && handle.value);
@@ -29,7 +29,7 @@ const canSubmit = computed(() => title.value && handle.value);
 // Common watch
 watch(title, (newTitle) => {
     if (newTitle) {
-        slug.create(newTitle).then((slugValue) => (handle.value = slugValue));
+        handle.value = slug.create(newTitle);
     }
 });
 

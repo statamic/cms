@@ -29,7 +29,7 @@
                         :icon-append="isCurrentSortColumn(column) ? 'up-down' : null"
                         size="sm"
                         variant="ghost"
-                        class="-mt-2 -mb-1 -ml-3 text-sm! font-medium! text-gray-800! dark:text-gray-400!"
+                        class="-mt-2 -mb-1 -ml-3 text-sm! font-medium! text-gray-900! dark:text-gray-400!"
                         @click.prevent="changeSortColumn(column.field)"
                     />
                 </th>

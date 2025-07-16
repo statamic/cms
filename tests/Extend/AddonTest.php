@@ -357,6 +357,7 @@ class AddonTest extends TestCase
             'developerUrl' => 'http://test-developer.com',
             'version' => '1.0',
             'editions' => ['foo', 'bar'],
+            'marketplaceId' => null,
         ], $attributes));
     }
 }

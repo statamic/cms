@@ -1,6 +1,6 @@
 <template>
     <tr :class="[sortableItemClass, { 'opacity-50': isExcessive }]">
-        <td class="drag-handle" :class="sortableHandleClass" v-if="grid.isReorderable"></td>
+        <td v-if="grid.isReorderable" class="drag-handle" :class="sortableHandleClass"></td>
 
         <FieldsProvider
             :fields="fields"
@@ -14,7 +14,7 @@
             <Dropdown v-if="canAddRows || canDelete" placement="left-start">
                 <DropdownMenu>
                     <DropdownItem v-if="canAddRows" :text="__('Duplicate Row')" icon="duplicate" @click="$emit('duplicate', index)" />
-                    <DropdownItem v-if="canDelete" :text="__('Delete Row')" icon="trash" variant="destructive" @click="$emit('removed', index)" />
+                    <DropdownItem v-if="canDelete" :text="__('Delete Row')" icon="trash" variant="destructive" @click="$emit('removed', index, fields)" />
                 </DropdownMenu>
             </Dropdown>
         </td>

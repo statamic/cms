@@ -14,7 +14,6 @@ class Sets extends Fieldtype
     protected $selectable = false;
 
     protected static $iconsDirectory = null;
-    protected static $iconsFolder = 'plump';
 
     /**
      * Converts the "sets" array of a Replicator (or Bard) field into what the
@@ -157,7 +156,7 @@ class Sets extends Fieldtype
         // Then provide to script for <icon-fieldtype> selector components in blueprint config
         Statamic::provideToScript([
             'setIconsDirectory' => static::$iconsDirectory,
-            'setIconsFolder' => static::$iconsFolder,
+            'setIconsFolder' => null,
         ]);
 
         // And finally, provide the file contents of all custom svg icons to script,

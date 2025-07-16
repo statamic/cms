@@ -90,7 +90,6 @@
                                 :sets="groupConfigs"
                                 class="bard-set-selector"
                                 @added="addSet"
-                                @clicked-away="clickedAwayFromSetPicker"
                             >
                                 <template #trigger>
                                     <button
@@ -99,11 +98,10 @@
                                         :style="{ transform: `translateY(${y}px)` }"
                                         :aria-label="__('Add Set')"
                                         v-tooltip="__('Add Set')"
-                                        @click="addSetButtonClicked"
                                     >
                                         <svg-icon
                                             name="micro/plus"
-                                            class="dark:group-hover:dark-text-100 dark:text-dark-175 h-3 w-3 text-gray-800 group-hover:text-black"
+                                            class="dark:group-hover:dark-text-100 dark:text-dark-175 h-3 w-3 text-gray-900 group-hover:text-black"
                                         />
                                     </button>
                                 </template>
@@ -882,17 +880,6 @@ export default {
                 isReadOnly: { get: () => this.readOnly },
             });
             return bard;
-        },
-
-        addSetButtonClicked() {
-            if (this.setConfigs.length === 1) {
-                this.addSet(this.setConfigs[0].handle);
-            }
-        },
-
-        clickedAwayFromSetPicker($event) {
-            if (this.$el.contains($event.target)) return;
-            this.showAddSetButton = false;
         },
     },
 };

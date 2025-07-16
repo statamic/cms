@@ -17,7 +17,7 @@ defineProps({
         :value="name"
         class="
             cursor-pointer p-2 pb-1 hover:text-gray-600 dark:hover:text-gray-400 translate-y-px
-            data-[state=active]:text-gray-800 dark:data-[state=active]:text-gray-200
+            data-[state=active]:text-gray-900 dark:data-[state=active]:text-gray-200
             data-[state=active]:border-b data-[state=active]:border-gray-800 dark:data-[state=active]:border-gray-200
         "
     >

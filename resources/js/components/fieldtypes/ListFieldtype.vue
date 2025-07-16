@@ -35,7 +35,7 @@
                         <td class="row-controls" v-if="!isReadOnly">
                             <button
                                 @click="deleteValue(index)"
-                                class="inline text-lg text-gray-600 antialiased hover:text-gray-800"
+                                class="inline text-lg text-gray-600 antialiased hover:text-gray-900"
                             >
                                 &times;
                             </button>

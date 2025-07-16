@@ -1,0 +1,113 @@
+<?php
+
+namespace Statamic\Dictionaries;
+
+use Facades\Statamic\Console\Processes\Process;
+use Illuminate\Support\Str;
+
+class Languages extends BasicDictionary
+{
+    protected string $valueKey = 'code';
+    protected array $keywords = ['languages'];
+
+    protected function getItemLabel(array $item): string
+    {
+        return $item['name'];
+    }
+
+    protected function getItems(): array
+    {
+        return [
+            ['code' => 'en', 'name' => __('statamic::dictionary-languages.en')],
+            ['code' => 'en_US', 'name' => __('statamic::dictionary-languages.en_US')],
+            ['code' => 'en_GB', 'name' => __('statamic::dictionary-languages.en_GB')],
+            ['code' => 'en_CA', 'name' => __('statamic::dictionary-languages.en_CA')],
+            ['code' => 'en_AU', 'name' => __('statamic::dictionary-languages.en_AU')],
+            ['code' => 'es', 'name' => __('statamic::dictionary-languages.es')],
+            ['code' => 'es_ES', 'name' => __('statamic::dictionary-languages.es_ES')],
+            ['code' => 'es_MX', 'name' => __('statamic::dictionary-languages.es_MX')],
+            ['code' => 'es_AR', 'name' => __('statamic::dictionary-languages.es_AR')],
+            ['code' => 'fr', 'name' => __('statamic::dictionary-languages.fr')],
+            ['code' => 'fr_FR', 'name' => __('statamic::dictionary-languages.fr_FR')],
+            ['code' => 'fr_CA', 'name' => __('statamic::dictionary-languages.fr_CA')],
+            ['code' => 'de', 'name' => __('statamic::dictionary-languages.de')],
+            ['code' => 'de_DE', 'name' => __('statamic::dictionary-languages.de_DE')],
+            ['code' => 'de_AT', 'name' => __('statamic::dictionary-languages.de_AT')],
+            ['code' => 'de_CH', 'name' => __('statamic::dictionary-languages.de_CH')],
+            ['code' => 'it', 'name' => __('statamic::dictionary-languages.it')],
+            ['code' => 'it_IT', 'name' => __('statamic::dictionary-languages.it_IT')],
+            ['code' => 'pt', 'name' => __('statamic::dictionary-languages.pt')],
+            ['code' => 'pt_BR', 'name' => __('statamic::dictionary-languages.pt_BR')],
+            ['code' => 'pt_PT', 'name' => __('statamic::dictionary-languages.pt_PT')],
+            ['code' => 'ru', 'name' => __('statamic::dictionary-languages.ru')],
+            ['code' => 'ja', 'name' => __('statamic::dictionary-languages.ja')],
+            ['code' => 'ko', 'name' => __('statamic::dictionary-languages.ko')],
+            ['code' => 'zh', 'name' => __('statamic::dictionary-languages.zh')],
+            ['code' => 'zh_CN', 'name' => __('statamic::dictionary-languages.zh_CN')],
+            ['code' => 'zh_TW', 'name' => __('statamic::dictionary-languages.zh_TW')],
+            ['code' => 'ar', 'name' => __('statamic::dictionary-languages.ar')],
+            ['code' => 'hi', 'name' => __('statamic::dictionary-languages.hi')],
+            ['code' => 'nl', 'name' => __('statamic::dictionary-languages.nl')],
+            ['code' => 'nl_NL', 'name' => __('statamic::dictionary-languages.nl_NL')],
+            ['code' => 'nl_BE', 'name' => __('statamic::dictionary-languages.nl_BE')],
+            ['code' => 'sv', 'name' => __('statamic::dictionary-languages.sv')],
+            ['code' => 'da', 'name' => __('statamic::dictionary-languages.da')],
+            ['code' => 'no', 'name' => __('statamic::dictionary-languages.no')],
+            ['code' => 'fi', 'name' => __('statamic::dictionary-languages.fi')],
+            ['code' => 'pl', 'name' => __('statamic::dictionary-languages.pl')],
+            ['code' => 'cs', 'name' => __('statamic::dictionary-languages.cs')],
+            ['code' => 'hu', 'name' => __('statamic::dictionary-languages.hu')],
+            ['code' => 'ro', 'name' => __('statamic::dictionary-languages.ro')],
+            ['code' => 'bg', 'name' => __('statamic::dictionary-languages.bg')],
+            ['code' => 'hr', 'name' => __('statamic::dictionary-languages.hr')],
+            ['code' => 'sk', 'name' => __('statamic::dictionary-languages.sk')],
+            ['code' => 'sl', 'name' => __('statamic::dictionary-languages.sl')],
+            ['code' => 'et', 'name' => __('statamic::dictionary-languages.et')],
+            ['code' => 'lv', 'name' => __('statamic::dictionary-languages.lv')],
+            ['code' => 'lt', 'name' => __('statamic::dictionary-languages.lt')],
+            ['code' => 'el', 'name' => __('statamic::dictionary-languages.el')],
+            ['code' => 'tr', 'name' => __('statamic::dictionary-languages.tr')],
+            ['code' => 'he', 'name' => __('statamic::dictionary-languages.he')],
+            ['code' => 'th', 'name' => __('statamic::dictionary-languages.th')],
+            ['code' => 'vi', 'name' => __('statamic::dictionary-languages.vi')],
+            ['code' => 'id', 'name' => __('statamic::dictionary-languages.id')],
+            ['code' => 'ms', 'name' => __('statamic::dictionary-languages.ms')],
+            ['code' => 'tl', 'name' => __('statamic::dictionary-languages.tl')],
+            ['code' => 'uk', 'name' => __('statamic::dictionary-languages.uk')],
+            ['code' => 'be', 'name' => __('statamic::dictionary-languages.be')],
+            ['code' => 'ka', 'name' => __('statamic::dictionary-languages.ka')],
+            ['code' => 'hy', 'name' => __('statamic::dictionary-languages.hy')],
+            ['code' => 'az', 'name' => __('statamic::dictionary-languages.az')],
+            ['code' => 'kk', 'name' => __('statamic::dictionary-languages.kk')],
+            ['code' => 'ky', 'name' => __('statamic::dictionary-languages.ky')],
+            ['code' => 'uz', 'name' => __('statamic::dictionary-languages.uz')],
+            ['code' => 'mn', 'name' => __('statamic::dictionary-languages.mn')],
+            ['code' => 'bn', 'name' => __('statamic::dictionary-languages.bn')],
+            ['code' => 'ur', 'name' => __('statamic::dictionary-languages.ur')],
+            ['code' => 'fa', 'name' => __('statamic::dictionary-languages.fa')],
+            ['code' => 'ta', 'name' => __('statamic::dictionary-languages.ta')],
+            ['code' => 'te', 'name' => __('statamic::dictionary-languages.te')],
+            ['code' => 'ml', 'name' => __('statamic::dictionary-languages.ml')],
+            ['code' => 'kn', 'name' => __('statamic::dictionary-languages.kn')],
+            ['code' => 'gu', 'name' => __('statamic::dictionary-languages.gu')],
+            ['code' => 'pa', 'name' => __('statamic::dictionary-languages.pa')],
+            ['code' => 'mr', 'name' => __('statamic::dictionary-languages.mr')],
+            ['code' => 'ne', 'name' => __('statamic::dictionary-languages.ne')],
+            ['code' => 'si', 'name' => __('statamic::dictionary-languages.si')],
+            ['code' => 'my', 'name' => __('statamic::dictionary-languages.my')],
+            ['code' => 'km', 'name' => __('statamic::dictionary-languages.km')],
+            ['code' => 'lo', 'name' => __('statamic::dictionary-languages.lo')],
+            ['code' => 'am', 'name' => __('statamic::dictionary-languages.am')],
+            ['code' => 'sw', 'name' => __('statamic::dictionary-languages.sw')],
+            ['code' => 'zu', 'name' => __('statamic::dictionary-languages.zu')],
+            ['code' => 'af', 'name' => __('statamic::dictionary-languages.af')],
+            ['code' => 'is', 'name' => __('statamic::dictionary-languages.is')],
+            ['code' => 'ga', 'name' => __('statamic::dictionary-languages.ga')],
+            ['code' => 'cy', 'name' => __('statamic::dictionary-languages.cy')],
+            ['code' => 'mt', 'name' => __('statamic::dictionary-languages.mt')],
+            ['code' => 'eu', 'name' => __('statamic::dictionary-languages.eu')],
+            ['code' => 'ca', 'name' => __('statamic::dictionary-languages.ca')],
+            ['code' => 'gl', 'name' => __('statamic::dictionary-languages.gl')],
+        ];
+    }
+}

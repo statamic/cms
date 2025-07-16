@@ -12,7 +12,7 @@ import Component from '@statamic/components/Component.js';
 import { getActivePinia } from 'pinia';
 import Tabs from './Tabs.vue';
 
-const emit = defineEmits(['updated', 'update:visibleValues']);
+const emit = defineEmits(['update:modelValue', 'update:visibleValues']);
 
 const container = getCurrentInstance();
 
@@ -104,9 +104,9 @@ watch(
 watch(
     () => store.values,
     (values) => {
-        if (values === props.values) return;
+        if (values === props.modelValue) return;
         if (props.trackDirtyState) dirty();
-        emit('updated', values);
+        emit('update:modelValue', values);
     },
     { deep: true },
 );

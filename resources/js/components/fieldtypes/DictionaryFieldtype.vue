@@ -3,12 +3,13 @@
         class="w-full"
         searchable
         ignore-filter
-        :disabled="config.disabled || isReadOnly"
+        :disabled="config.disabled"
         :max-selections="config.max_items"
+        :model-value="value"
+        :multiple
         :options="normalizedOptions"
         :placeholder="__(config.placeholder)"
-        :multiple
-        :model-value="value"
+        :read-only="isReadOnly"
         @update:modelValue="comboboxUpdated"
         @search="search"
     >

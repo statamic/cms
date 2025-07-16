@@ -1,5 +1,5 @@
 <template>
-    <div class="flex">
+    <div class="flex first-branch">
         <div
             v-if="!hasChildren"
             class="w-full rounded-sm border border-dashed border-gray-500 p-2 text-center text-xs text-gray-600"

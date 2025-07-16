@@ -8,6 +8,7 @@ use ReflectionClass;
 use Statamic\Contracts\Extend\AddonSettings;
 use Statamic\Contracts\Extend\AddonSettingsRepository;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Support\Arr;
@@ -151,6 +152,13 @@ final class Addon
     protected $editions = [];
 
     /**
+     * Whether the addon has marketplace data.
+     *
+     * @var bool
+     */
+    protected $hasMarketplaceData = false;
+
+    /**
      * @param  string  $id
      */
     public function __construct($id)
@@ -185,6 +193,10 @@ final class Addon
         foreach (Arr::only($package, $keys) as $key => $value) {
             $method = Str::camel($key);
             $instance->$method($value);
+        }
+
+        if (array_key_exists('marketplaceId', $package)) {
+            $instance->hasMarketplaceData = true;
         }
 
         return $instance;
@@ -232,32 +244,6 @@ final class Addon
     public function vendorName()
     {
         return explode('/', $this->package())[0];
-    }
-
-    /**
-     * The marketplace variant ID of the addon.
-     *
-     * @param  int  $id
-     * @return int
-     */
-    public function marketplaceId($id = null)
-    {
-        return $id
-            ? $this->marketplaceId = $id
-            : $this->marketplaceId;
-    }
-
-    /**
-     * The marketplace slug of the addon.
-     *
-     * @param  string  $slug
-     * @return string
-     */
-    public function marketplaceSlug($slug = null)
-    {
-        return $slug
-            ? $this->marketplaceSlug = $slug
-            : $this->marketplaceSlug;
     }
 
     /**
@@ -423,14 +409,14 @@ final class Addon
             return true;
         }
 
-        if (! $this->latestVersion) {
+        if (! $this->latestVersion()) {
             return true;
         }
 
         $versionParser = new VersionParser;
 
         $version = $versionParser->normalize($this->version);
-        $latestVersion = $versionParser->normalize($this->latestVersion);
+        $latestVersion = $versionParser->normalize($this->latestVersion());
 
         return version_compare($version, $latestVersion, '=');
     }
@@ -455,6 +441,12 @@ final class Addon
         }
 
         if (empty($args)) {
+            if (! $this->hasMarketplaceData && in_array($method, ['marketplaceId', 'marketplaceSlug', 'marketplaceUrl', 'marketplaceSellerSlug', 'isCommercial', 'latestVersion'])) {
+                app(Manifest::class)->fetchPackageDataFromMarketplace();
+
+                return Facades\Addon::get($this->id)->$method();
+            }
+
             return $this->$method;
         }
 

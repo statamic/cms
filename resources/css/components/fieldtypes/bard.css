@@ -9,7 +9,7 @@
 =================================================== */
 @layer ui {
     .bard-editor {
-        @apply relative rounded-sm p-0 text-gray-800 dark:bg-dark-650 dark:text-dark-150;
+        @apply relative rounded-sm p-0 text-gray-900 dark:bg-dark-650 dark:text-dark-150;
         /* The focus state inherits this */
         > * {
             @apply rounded-b-lg;
@@ -50,7 +50,7 @@
         @apply top-0 z-5 flex items-start justify-between rounded-t-xl border-b border-gray-300 bg-gray-50 p-1 text-sm shadow-none px-2 py-1 dark:border-white/15 dark:bg-gray-950;
 
         .bard-toolbar-button {
-            @apply m-0 flex h-8 w-8 items-center justify-center rounded-sm px-1 text-center text-base text-gray-800 dark:text-dark-150;
+            @apply m-0 flex h-8 w-8 items-center justify-center rounded-sm px-1 text-center text-base text-gray-900 dark:text-dark-150;
             svg {
                 @apply h-4 w-auto;
             }
@@ -71,7 +71,7 @@
         .bard-toolbar-button:disabled {
             @apply opacity-50;
             &:hover {
-                @apply text-gray-800 dark:text-dark-100;
+                @apply text-gray-900 dark:text-dark-100;
             }
         }
 
@@ -503,7 +503,7 @@
         }
 
         blockquote {
-            @apply border-blue px-4 text-gray-800 dark:border-dark-blue-100 dark:text-dark-150 ltr:border-l-4 rtl:border-r-4;
+            @apply border-blue px-4 text-gray-900 dark:border-dark-blue-100 dark:text-dark-150 ltr:border-l-4 rtl:border-r-4;
             margin: 0 0 0.85em;
         }
 
