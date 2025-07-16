@@ -188,7 +188,7 @@ function deselect(option) {
 }
 
 const dropdownOpen = ref(false);
-const closeOnSelect = computed(() => props.closeOnSelect || !props.multiple);
+const closeOnSelect = computed(() => !props.closeOnSelect || !props.multiple);
 
 function updateDropdownOpen(open) {
     // Prevent dropdown from opening when it's a taggable combobox with no options.
