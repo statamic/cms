@@ -2,7 +2,7 @@
     <div>
         <ui-header :title="__('Updates')" icon="updates">
             <template #actions>
-                <ui-badge prepend="Statamic Version" :text="currentVersion" color="green" size="lg" />
+                <ui-badge :prepend="__('Statamic Version')" :text="currentVersion" color="green" size="lg" />
                 <div v-if="onLatestVersion" v-text="__('Up to date')" />
             </template>
         </ui-header>
