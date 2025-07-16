@@ -2,9 +2,6 @@
 
 namespace Statamic\Dictionaries;
 
-use Facades\Statamic\Console\Processes\Process;
-use Illuminate\Support\Str;
-
 class Languages extends BasicDictionary
 {
     protected string $valueKey = 'code';
