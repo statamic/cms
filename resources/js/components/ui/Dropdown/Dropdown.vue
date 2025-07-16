@@ -26,7 +26,7 @@ const dropdownContentClasses = cva({
 
 <template>
     <DropdownMenuRoot>
-        <DropdownMenuTrigger data-ui-dropdown-trigger>
+        <DropdownMenuTrigger as-child data-ui-dropdown-trigger>
             <slot name="trigger">
                 <Button icon="ui/dots" variant="ghost" size="sm" v-bind="attrs" />
             </slot>
