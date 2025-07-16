@@ -47,7 +47,9 @@ const submit = () => {
 
 // Common mounted
 onMounted(() => {
-    $keys.bindGlobal(['return'], (e) => {
+    $keys.bindGlobal(['return', 'mod+s'], (e) => {
+        e.preventDefault();
+
         if (canSubmit.value) {
             submit();
         }

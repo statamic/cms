@@ -15,6 +15,8 @@ class Sets extends Fieldtype
 
     protected static $iconsDirectory = null;
 
+    protected static $iconsFolder = null;
+
     /**
      * Converts the "sets" array of a Replicator (or Bard) field into what the
      * <sets-fieldtype> Vue component is expecting, within either the Blueprint
@@ -156,7 +158,7 @@ class Sets extends Fieldtype
         // Then provide to script for <icon-fieldtype> selector components in blueprint config
         Statamic::provideToScript([
             'setIconsDirectory' => static::$iconsDirectory,
-            'setIconsFolder' => null,
+            'setIconsFolder' => static::$iconsFolder,
         ]);
 
         // And finally, provide the file contents of all custom svg icons to script,

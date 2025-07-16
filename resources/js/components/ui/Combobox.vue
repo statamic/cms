@@ -11,12 +11,12 @@ import {
     ComboboxPortal,
     ComboboxViewport,
 } from 'reka-ui';
-import { computed, nextTick, ref, useAttrs, useTemplateRef, watch } from 'vue';
+import { computed, nextTick, onMounted, ref, useAttrs, useSlots, useTemplateRef, watch } from 'vue';
 import { Button, Icon, Badge } from '@statamic/ui';
 import fuzzysort from 'fuzzysort';
 import { SortableList } from '@statamic/components/sortable/Sortable.js';
 
-const emit = defineEmits(['update:modelValue', 'search']);
+const emit = defineEmits(['update:modelValue', 'search', 'selected', 'added']);
 
 const props = defineProps({
     buttonAppearance: { type: Boolean, default: true },
@@ -36,6 +36,7 @@ const props = defineProps({
     searchable: { type: Boolean, default: true },
     size: { type: String, default: 'base' },
     taggable: { type: Boolean, default: false },
+    closeOnSelect: { type: Boolean, default: undefined },
 });
 
 defineOptions({
@@ -79,7 +80,7 @@ const triggerClasses = cva({
 
 const itemClasses = cva({
     base: [
-        'w-full flex items-center gap-2 relative select-none cursor-pointer',
+        'w-full flex items-center gap-2 relative select-none cursor-pointer text-sm',
         'py-1.5 px-2 antialiased rounded-lg',
         'data-disabled:text-gray-300 data-disabled:pointer-events-none data-highlighted:outline-hidden',
     ],
@@ -116,38 +117,18 @@ const selectedOption = computed(() => {
     return selectedOptions.value[0];
 });
 
-function getOptionLabel(option) {
-    if (!option) {
-        return;
-    }
-
-    return option[props.optionLabel];
-}
-
-function getOptionValue(option) {
-    if (!option) {
-        return;
-    }
-
-    return option[props.optionValue];
-}
-
-function isSelected(option) {
-    return selectedOptions.value.filter((item) => getOptionValue(item) === getOptionValue(option)).length > 0;
-}
+const getOptionLabel = (option) => option?.[props.optionLabel];
+const getOptionValue = (option) => option?.[props.optionValue];
+const isSelected = (option) => selectedOptions.value.filter((item) => getOptionValue(item) === getOptionValue(option)).length > 0;
 
 const limitReached = computed(() => {
-    if (!props.maxSelections) {
-        return false;
-    }
+    if (! props.maxSelections) return false;
 
     return selectedOptions.value.length >= props.maxSelections;
 });
 
 const limitExceeded = computed(() => {
-    if (!props.maxSelections) {
-        return false;
-    }
+    if (! props.maxSelections) return false;
 
     return selectedOptions.value.length > props.maxSelections;
 });
@@ -163,54 +144,51 @@ const limitIndicatorColor = computed(() => {
 });
 
 const searchQuery = ref('');
+const searchInputRef = useTemplateRef('search');
+
+watch(searchQuery, (value) => {
+    emit('search', value, () => {});
+});
 
 const filteredOptions = computed(() => {
     if (!props.searchable || props.ignoreFilter) {
         return props.options;
     }
 
-    let options = JSON.parse(JSON.stringify(props.options));
+    const options = JSON.parse(JSON.stringify(props.options));
 
-    if (props.taggable && searchQuery.value) {
-        options.push({
-            [props.optionLabel]: searchQuery.value,
-            [props.optionValue]: searchQuery.value,
-        });
-    }
-
-    return fuzzysort
+    const results = fuzzysort
         .go(searchQuery.value, options, {
             all: true,
             key: props.optionLabel,
         })
         .map((result) => result.obj);
-});
 
-watch(searchQuery, (value) => {
-    emit('search', value, () => {});
-});
+    if (props.taggable && searchQuery.value && results.length === 0) {
+        results.push({
+            [props.optionLabel]: searchQuery.value,
+            [props.optionValue]: searchQuery.value,
+        });
+    }
 
-const inputRef = useTemplateRef('input');
+    return results;
+});
 
 function clear() {
     searchQuery.value = '';
     emit('update:modelValue', null);
 
     if (props.searchable) {
-        nextTick(() => {
-            inputRef.value.$el.focus();
-        });
+        nextTick(() => searchInputRef.value.focus());
     }
 }
 
 function deselect(option) {
-    emit(
-        'update:modelValue',
-        props.modelValue.filter((item) => item !== option),
-    );
+    emit('update:modelValue', props.modelValue.filter((item) => item !== option));
 }
 
 const dropdownOpen = ref(false);
+const closeOnSelect = computed(() => props.closeOnSelect || !props.multiple);
 
 function updateDropdownOpen(open) {
     // Prevent dropdown from opening when it's a taggable combobox with no options.
@@ -222,8 +200,14 @@ function updateDropdownOpen(open) {
 }
 
 function updateModelValue(value) {
+    let originalValue = props.modelValue;
+
     searchQuery.value = '';
     emit('update:modelValue', value);
+
+    value
+        .filter((option) => !originalValue.includes(option))
+        .forEach((option) => emit('selected', option));
 }
 
 function onPaste(e) {
@@ -244,9 +228,16 @@ function pushTaggableOption(e) {
             return;
         }
 
+        emit('added', e.target.value);
+
         updateModelValue([...props.modelValue, e.target.value]);
     }
 }
+
+defineExpose({
+    searchQuery,
+    filteredOptions,
+});
 </script>
 
 <template>
@@ -264,20 +255,23 @@ function pushTaggableOption(e) {
             @update:open="updateDropdownOpen"
             @update:model-value="updateModelValue"
         >
-            <ComboboxAnchor :class="['focus-within:focus-outline w-full flex items-center justify-between gap-2 text-gray-900 dark:text-gray-300 antialiased appearance-none', $attrs.class]" data-ui-combobox-anchor>
+            <ComboboxAnchor :class="['w-full flex items-center justify-between gap-2 text-gray-900 dark:text-gray-300 antialiased appearance-none', $attrs.class]" data-ui-combobox-anchor>
                 <ComboboxTrigger as="div" :class="triggerClasses">
                     <ComboboxInput
                         v-if="searchable && (dropdownOpen || !modelValue || (multiple && placeholder))"
-                        ref="input"
+                        ref="search"
                         class="w-full text-gray-700 opacity-100 focus:outline-none"
                         v-model="searchQuery"
                         :placeholder
                         @paste.prevent="onPaste"
                         @keydown.enter.prevent="pushTaggableOption"
+                        @blur="pushTaggableOption"
                     />
+
                     <button type="button" class="flex-1 text-start" v-else-if="!searchable && (dropdownOpen || !modelValue)">
-                        <span class="text-gray-400 dark:text-gray-500" v-text="placeholder" />
+                        <span class="text-gray-400 dark:text-gray-500 text-[0.8125rem]" v-text="placeholder" />
                     </button>
+
                     <button type="button" v-else class="flex-1 text-start cursor-pointer">
                         <slot name="selected-option" v-bind="{ option: selectedOption }">
                             <span v-if="labelHtml" v-html="getOptionLabel(selectedOption)" />
@@ -303,7 +297,7 @@ function pushTaggableOption(e) {
                 >
                     <ComboboxViewport>
                         <ComboboxEmpty class="py-2 text-sm">
-                            <slot name="no-options">
+                            <slot name="no-options" v-bind="{ searchQuery }">
                                 {{ __('No options to choose from.') }}
                             </slot>
                         </ComboboxEmpty>
@@ -316,7 +310,7 @@ function pushTaggableOption(e) {
                             :text-value="getOptionLabel(option)"
                             :class="itemClasses({ size: size, selected: isSelected(option) })"
                             as="button"
-                            @select="dropdownOpen = multiple"
+                            @select="dropdownOpen = !closeOnSelect"
                         >
                             <slot name="option" v-bind="option">
                                 <img v-if="option.image" :src="option.image" class="size-5 rounded-full" />

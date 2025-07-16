@@ -17,42 +17,26 @@
             </div>
 
             <div v-if="!loading" class="flex-1 overflow-auto px-1">
-                <publish-container
+                <div
+                    v-if="saving"
+                    class="absolute inset-0 z-10 flex items-center justify-center bg-white bg-opacity-75 dark:bg-dark-500"
+                >
+                    <loading-graphic text="" />
+                </div>
+
+                <PublishContainer
                     ref="container"
                     :name="publishContainer"
                     :blueprint="adjustedBlueprint"
-                    :values="values"
-                    :extra-values="extraValues"
                     :meta="meta"
                     :errors="errors"
-                    :localized-fields="localizedFields"
+                    :origin-values="originValues"
+                    :origin-meta="originMeta"
+                    :extra-values="extraValues"
                     :site="site"
-                    class="px-2"
-                    @updated="values = $event"
-                    v-slot="{ container, setFieldMeta }"
-                >
-                    <div>
-                        <div
-                            v-if="validating"
-                            class="absolute inset-0 z-10 flex items-center justify-center bg-white bg-opacity-75 dark:bg-dark-500"
-                        >
-                            <loading-graphic text="" />
-                        </div>
-
-                        <publish-sections
-                            :sections="adjustedBlueprint.tabs[0].sections"
-                            :syncable="type == 'entry'"
-                            :syncable-fields="syncableFields"
-                            :read-only="readOnly"
-                            @updated="setFieldValue"
-                            @meta-updated="setFieldMeta"
-                            @synced="syncField"
-                            @desynced="desyncField"
-                            @focus="container.$emit('focus', $event)"
-                            @blur="container.$emit('blur', $event)"
-                        />
-                    </div>
-                </publish-container>
+                    v-model="values"
+                    v-model:modified-fields="localizedFields"
+                />
             </div>
 
             <div
@@ -79,13 +63,22 @@
 </template>
 
 <script>
-import HasHiddenFields from '../publish/HasHiddenFields';
+import { PublishContainer } from '@statamic/ui';
+import { SavePipeline } from 'statamic';
 import { flatten } from 'lodash-es';
+import { computed, ref } from 'vue';
+const { Pipeline, Request } = SavePipeline;
+
+let saving = ref(false);
+let errors = ref({});
+let container = null;
 
 export default {
     emits: ['closed', 'submitted', 'publish-info-updated', 'localized-fields-updated'],
 
-    mixins: [HasHiddenFields],
+    components: {
+        PublishContainer,
+    },
 
     props: {
         id: String,
@@ -99,6 +92,13 @@ export default {
         readOnly: Boolean,
     },
 
+    setup() {
+        return {
+            saving,
+            errors,
+        }
+    },
+
     data() {
         return {
             type: this.entry ? 'entry' : 'url',
@@ -110,9 +110,6 @@ export default {
             localizedFields: null,
             syncableFields: null,
             loading: true,
-            error: null,
-            errors: {},
-            validating: false,
             saveKeyBinding: null,
             publishContainer: 'tree-page',
         };
@@ -178,46 +175,41 @@ export default {
                 });
             }
 
+            // Make all fields localizable so they can be edited.
+            // Fields are non-localizable by default, but this UI requires all fields to be editable.
+            blueprint.tabs[0].sections.forEach((section, sectionIndex) => {
+                section.fields.forEach((field, fieldIndex) => {
+                    blueprint.tabs[0].sections[sectionIndex].fields[fieldIndex].localizable = true;
+                });
+            });
+
             return blueprint;
         },
     },
 
     watch: {
-        localizedFields(fields) {
-            if (this.loading) return;
+        localizedFields: {
+            deep: true,
+            handler(fields) {
+                if (this.loading) return;
 
-            this.$emit('localized-fields-updated', fields);
+                this.$emit('localized-fields-updated', fields);
+            }
         },
     },
 
     methods: {
         submit() {
-            this.validating = true;
-
             const postUrl = cp_url(`navigation/${this.handle}/pages`);
+            const values = container.value.store.visibleValues;
 
-            this.$axios
-                .post(postUrl, {
+            new Pipeline()
+                .provide({ container, errors, saving })
+                .through([new Request(postUrl, 'POST', {
                     type: this.type,
-                    values: this.visibleValues,
-                })
-                .then((response) => {
-                    this.$emit('submitted', this.visibleValues);
-                })
-                .catch((e) => {
-                    this.validating = false;
-                    if (e.response && e.response.status === 422) {
-                        const { message, errors } = e.response.data;
-                        this.error = message;
-                        this.errors = errors;
-                        this.$toast.error(message);
-                    } else if (e.response) {
-                        this.$toast.error(e.response.data.message);
-                    } else {
-                        console.error(e);
-                        this.$toast.error(e || 'Something went wrong');
-                    }
-                });
+                    values,
+                })])
+                .then(() => this.$emit('submitted', values));
         },
 
         shouldClose() {
@@ -232,30 +224,6 @@ export default {
 
         confirmClose(close) {
             if (this.shouldClose()) close();
-        },
-
-        syncField(handle) {
-            if (!confirm("Are you sure? This field's value will be replaced by the value in the original entry."))
-                return;
-
-            this.localizedFields = this.localizedFields.filter((field) => field !== handle);
-            this.$refs.container.setFieldValue(handle, this.originValues[handle]);
-
-            // Update the meta for this field. For instance, a relationship field would have its data preloaded into it.
-            // If you sync the field, the preloaded data would be outdated and an ID would show instead of the titles.
-            this.meta[handle] = this.originMeta[handle];
-        },
-
-        desyncField(handle) {
-            if (!this.localizedFields.includes(handle)) this.localizedFields.push(handle);
-
-            this.$refs.container.dirty();
-        },
-
-        setFieldValue(handle, value) {
-            this.desyncField(handle);
-
-            this.$refs.container.setFieldValue(handle, value);
         },
 
         getPageValues() {
@@ -319,6 +287,8 @@ export default {
         });
 
         this.getPageValues();
+
+        container = computed(() => this.$refs.container);
     },
 
     unmounted() {

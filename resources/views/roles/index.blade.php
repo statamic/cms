@@ -3,31 +3,21 @@
 @endphp
 
 @extends('statamic::layout')
-@section('title', __('Roles'))
+@section('title', __('Roles & Permissions'))
 
 @section('content')
-    @unless ($roles->isEmpty())
-        <ui-header title="{{ __('Roles & Permissions') }}" icon="permissions">
-            <ui-button
-                href="{{ cp_route('roles.create') }}"
-                variant="primary"
-                :text="__('Create Role')"
-            ></ui-button>
-        </ui-header>
+    <ui-header title="{{ __('Roles & Permissions') }}" icon="permissions">
+        <ui-button
+            href="{{ cp_route('roles.create') }}"
+            variant="primary"
+            :text="__('Create Role')"
+        ></ui-button>
+    </ui-header>
 
-        <role-listing
-            :initial-rows="{{ json_encode($roles) }}"
-            :initial-columns="{{ json_encode($columns) }}"
-        ></role-listing>
-    @else
-        <x-statamic::empty-screen
-            :title="__('Roles & Permissions')"
-            :description="__('statamic::messages.role_intro')"
-            :svg="'empty/users'"
-            :button-text="__('Create Role')"
-            :button-url="cp_route('roles.create')"
-        />
-    @endunless
+    <role-listing
+        :initial-rows="{{ json_encode($roles) }}"
+        :initial-columns="{{ json_encode($columns) }}"
+    ></role-listing>
 
     <x-statamic::docs-callout
         :topic="__('Roles & Permissions')"

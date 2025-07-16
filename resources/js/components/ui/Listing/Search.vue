@@ -10,10 +10,12 @@ const searchQueryUpdated = debounce((event) => setSearchQuery(event.target.value
 
 <template>
     <div class="min-w-64 lg:w-1/3">
+        <label for="listings-search" class="sr-only">{{ __('Search entries') }}</label>
         <Input
             autofocus
             ref="input"
             icon="magnifying-glass"
+            id="listings-search"
             :placeholder="__(placeholder)"
             :value="searchQuery"
             :disabled="reorderable"

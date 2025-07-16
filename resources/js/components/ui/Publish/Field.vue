@@ -19,7 +19,8 @@ const {
     meta: containerMeta,
     syncField,
     desyncField,
-    hasOriginValues,
+    isTrackingOriginValues,
+    originValues: containerOriginValues,
     asConfig,
     errors: containerErrors,
     readOnly: containerReadOnly,
@@ -115,7 +116,6 @@ const shouldShowLabel = computed(
     () =>
         shouldShowLabelText.value || // Need to see the text
         isLocked.value || // Need to see the avatar
-        isLocalizable.value || // Need to see the icon
         isSyncable.value, // Need to see the icon
 );
 
@@ -124,13 +124,21 @@ const isLocalizable = computed(() => props.config.localizable);
 const isReadOnly = computed(() => {
     if (containerReadOnly.value) return true;
 
-    if (hasOriginValues.value && !isLocalizable.value) return true;
+    if (isTrackingOriginValues.value && isSyncable.value && !isLocalizable.value) return true;
 
     return isLocked.value || props.config.visibility === 'read_only' || false;
 });
 
 const isLocked = computed(() => false); // todo
-const isSyncable = computed(() => hasOriginValues.value);
+
+const isSyncable = computed(() => {
+    // Only top-level fields can be synced.
+    if (isNested.value) return false;
+
+    // If origin values have been provided but the field is missing, there's nothing to sync.
+    return isTrackingOriginValues.value && containerOriginValues.value.hasOwnProperty(fullPath.value)
+});
+
 const isSynced = computed(() => isSyncable.value && !localizedFields.value.includes(fullPath.value));
 const isNested = computed(() => fullPath.value.includes('.'));
 const wrapperComponent = computed(() => asConfig.value && !isNested.value ? 'card' : 'div');

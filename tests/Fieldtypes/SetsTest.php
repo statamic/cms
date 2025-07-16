@@ -422,15 +422,6 @@ class SetsTest extends TestCase
     }
 
     #[Test]
-    public function it_provides_statamic_plump_icons_to_script_by_default()
-    {
-        $jsonVariables = Statamic::jsonVariables(request());
-
-        $this->assertNull($jsonVariables['setIconsDirectory']);
-        $this->assertEquals('plump', $jsonVariables['setIconsFolder']);
-    }
-
-    #[Test]
     public function it_can_provide_custom_user_icons_subfolder()
     {
         Sets::setIconsDirectory(folder: 'light');

@@ -14,7 +14,7 @@ const tooltipText = computed(() => (props.markdown ? markdown(props.markdown) : 
 <template>
     <TooltipProvider :ariaLabel="text" :delay-duration="delay">
         <TooltipRoot>
-            <TooltipTrigger>
+            <TooltipTrigger as-child>
                 <slot />
             </TooltipTrigger>
             <TooltipPortal>

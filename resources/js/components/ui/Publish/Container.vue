@@ -11,7 +11,7 @@ import Component from '@statamic/components/Component.js';
 import Tabs from './Tabs.vue';
 import Values from '@statamic/components/publish/Values.js';
 
-const emit = defineEmits(['update:modelValue', 'update:visibleValues']);
+const emit = defineEmits(['update:modelValue', 'update:visibleValues', 'update:modifiedFields']);
 
 const container = getCurrentInstance();
 
@@ -51,7 +51,7 @@ const props = defineProps({
     site: {
         type: String,
     },
-    localizedFields: {
+    modifiedFields: {
         type: Array,
     },
     trackDirtyState: {
@@ -78,7 +78,7 @@ const hiddenFields = ref({});
 const revealerFields = ref([]);
 const meta = ref(props.meta);
 const previews = ref({});
-const localizedFields = ref(props.localizedFields || []);
+const localizedFields = ref(props.modifiedFields || []);
 const components = ref([]);
 
 const visibleValues = computed(() => {
@@ -124,6 +124,12 @@ watch(
 watch(
     visibleValues,
     (values) => emit('update:visibleValues', values),
+    { deep: true },
+);
+
+watch(
+    localizedFields,
+    (values) => emit('update:modifiedFields', values),
     { deep: true },
 );
 
@@ -186,6 +192,7 @@ provideContainerContext({
     values,
     extraValues,
     visibleValues,
+    originValues: toRef(() => props.originValues),
     hiddenFields,
     revealerFields,
     localizedFields,
@@ -199,7 +206,7 @@ provideContainerContext({
     container,
     components,
     asConfig: toRef(() => props.asConfig),
-    hasOriginValues: computed(() => !!props.originValues),
+    isTrackingOriginValues: computed(() => !!props.originValues),
     setValues,
     setFieldValue,
     setFieldMeta,

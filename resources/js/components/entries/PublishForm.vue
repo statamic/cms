@@ -84,7 +84,7 @@
             :errors="errors"
             :is-root="isRoot"
             :site="site"
-            :localized-fields="localizedFields"
+            v-model:modified-fields="localizedFields"
             :track-dirty-state="trackDirtyState"
             :sync-field-confirmation-text="syncFieldConfirmationText"
         >
@@ -363,8 +363,8 @@ export default {
             localizations: clone(this.initialLocalizations),
             localizedFields: this.initialLocalizedFields,
             hasOrigin: this.initialHasOrigin,
-            originValues: this.initialOriginValues || {},
-            originMeta: this.initialOriginMeta || {},
+            originValues: this.initialOriginValues,
+            originMeta: this.initialOriginMeta,
             site: this.initialSite,
             selectingOrigin: false,
             selectedOrigin: null,

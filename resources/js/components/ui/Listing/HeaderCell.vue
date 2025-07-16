@@ -15,7 +15,7 @@ const isCurrentSortColumn = computed(() => props.column.field === sortColumn.val
 </script>
 
 <template>
-    <th>
+    <th scope="col">
         <span v-if="!column.sortable" v-text="__(column.label)" />
         <Button
             v-else

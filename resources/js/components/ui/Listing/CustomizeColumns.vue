@@ -71,7 +71,7 @@ function reset() {
 <template>
     <div>
         <Tooltip :text="__('Customize Columns')">
-            <Button icon="sliders-vertical" :disabled="reorderable" @click="open = true" />
+            <Button icon="sliders-vertical" :disabled="reorderable" @click="open = true" :aria-label="__('Customize Columns')" />
         </Tooltip>
         <Modal :title="__('Customize Columns')" v-model:open="open">
             <div class="flex h-full flex-col">
