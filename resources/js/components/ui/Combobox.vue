@@ -225,6 +225,8 @@ function onPaste(e) {
 // When it's a taggable combobox with no options, we need to push the value here as updateModelValue won't be called.
 function pushTaggableOption(e) {
     if (props.taggable && props.options.length === 0) {
+        if (e.target.value === '') return;
+
         if (props.modelValue.includes(e.target.value)) {
             searchQuery.value = '';
             return;
