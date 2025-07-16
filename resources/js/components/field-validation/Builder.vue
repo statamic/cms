@@ -36,7 +36,6 @@
                 searchable
                 taggable
                 close-on-select
-                option-label="value"
                 :model-value="rules"
                 @selected="add($event)"
                 @added="ifSearchNotFoundAddCustom"
