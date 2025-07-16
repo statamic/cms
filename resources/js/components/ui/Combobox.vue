@@ -188,7 +188,7 @@ function deselect(option) {
 }
 
 const dropdownOpen = ref(false);
-const closeOnSelect = computed(() => !props.closeOnSelect || !props.multiple);
+const closeOnSelect = computed(() => props.closeOnSelect || !props.multiple);
 
 function updateDropdownOpen(open) {
     // Prevent dropdown from opening when it's a taggable combobox with no options.
@@ -310,7 +310,7 @@ defineExpose({
                             :text-value="getOptionLabel(option)"
                             :class="itemClasses({ size: size, selected: isSelected(option) })"
                             as="button"
-                            @select="dropdownOpen = closeOnSelect"
+                            @select="dropdownOpen = !closeOnSelect"
                         >
                             <slot name="option" v-bind="option">
                                 <img v-if="option.image" :src="option.image" class="size-5 rounded-full" />
