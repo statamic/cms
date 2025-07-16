@@ -32,10 +32,10 @@
                 ref="rulesSelect"
                 :options="allRules"
                 :placeholder="__('Add Rule')"
-                :multiple="true"
-                :searchable="true"
-                :taggable="true"
-                :close-dropdown-on-select="true"
+                multiple
+                searchable
+                taggable
+                close-on-select
                 option-label="value"
                 :model-value="rules"
                 @selected="add($event)"
