@@ -152,7 +152,7 @@
 import Fieldtype from '../Fieldtype.vue';
 import { marked } from 'marked';
 import { markRaw } from 'vue';
-import PlainTextRenderer from 'marked-plaintext';
+import { TextRenderer as PlainTextRenderer } from '@davidenke/marked-text-renderer';
 import throttle from '@statamic/util/throttle.js';
 import { Button } from '@statamic/ui';
 
