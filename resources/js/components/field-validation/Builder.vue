@@ -34,28 +34,15 @@
                 :placeholder="__('Add Rule')"
                 :multiple="true"
                 :searchable="true"
+                :taggable="true"
                 :close-dropdown-on-select="true"
                 option-label="value"
                 :model-value="rules"
                 @selected="add($event)"
+                @added="ifSearchNotFoundAddCustom"
             >
-                <template #search="{ placeholder }">
-                    <input
-                        ref="searchInput"
-                        class="w-full text-gray-700 opacity-100 focus:outline-none"
-                        v-model="searchQuery"
-                        :placeholder
-                        @keydown.enter="ifSearchNotFoundAddCustom"
-                        @blur="ifSearchNotFoundAddCustom"
-                    />
-                </template>
-
-                <template #no-options="{ searchQuery }">
-                    {{ __('Add') }} <code class="ms-2">{{ searchQuery }}</code>
-                </template>
-
                 <template #option="option">
-                    {{ __(option.display) }} <code class="ms-2">{{ valueWithoutTrailingColon(option.value) }}</code>
+                    {{ __(option.display) }} <code class="ms-2 text-sm">{{ valueWithoutTrailingColon(option.value) }}</code>
                 </template>
 
                 <template #selected-options>
@@ -111,7 +98,7 @@ import { SortableList } from '../sortable/Sortable';
 import { sortBy } from 'lodash-es';
 import { Description, Field, Input, Badge, Button } from '@statamic/ui';
 import Switch from '@statamic/components/ui/Switch.vue'
-import { Combobox } from 'statamic';
+import { Combobox } from '@statamic/ui';
 import { ComboboxInput } from 'reka-ui';
 
 export default {
@@ -140,9 +127,11 @@ export default {
             rules: [],
             selectedLaravelRule: null,
             customRule: null,
-
-            searchQuery: '',
         };
+    },
+
+    mounted() {
+        console.log(this.allRules.find((rule) => rule.value === 'required'));
     },
 
     computed: {
@@ -269,13 +258,11 @@ export default {
             } else {
                 this.ensure(rule);
             }
-
-            this.searchQuery = '';
         },
 
         ifSearchNotFoundAddCustom() {
             let rulesSelect = this.$refs.rulesSelect;
-            let rule = this.searchQuery;
+            let rule = rulesSelect.searchQuery.value;
 
             if (this.searchNotFound(rulesSelect) || this.hasUnfinishedParameters(rule)) return;
 
@@ -298,7 +285,7 @@ export default {
         },
 
         searchNotFound(rulesSelect) {
-            return this.searchQuery?.length === 0 || rulesSelect?.filteredOptions.length === 0;
+            return rulesSelect.searchQuery.value?.length === 0 || rulesSelect?.filteredOptions.length === 0;
         },
 
         updated(rules) {

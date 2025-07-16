@@ -16,7 +16,7 @@ import { Button, Icon, Badge } from '@statamic/ui';
 import fuzzysort from 'fuzzysort';
 import { SortableList } from '@statamic/components/sortable/Sortable.js';
 
-const emit = defineEmits(['update:modelValue', 'search', 'selected']);
+const emit = defineEmits(['update:modelValue', 'search', 'selected', 'added']);
 
 const props = defineProps({
     buttonAppearance: { type: Boolean, default: true },
@@ -259,11 +259,14 @@ function pushTaggableOption(e) {
             return;
         }
 
+        emit('added', e.target.value);
+
         updateModelValue([...props.modelValue, e.target.value]);
     }
 }
 
 defineExpose({
+    searchQuery,
     filteredOptions,
 });
 </script>
@@ -292,6 +295,7 @@ defineExpose({
                             :placeholder
                             @paste.prevent="onPaste"
                             @keydown.enter.prevent="pushTaggableOption"
+                            @blur="pushTaggableOption"
                         />
                     </slot>
 
