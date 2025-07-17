@@ -9,24 +9,10 @@
         @update:model-value="update"
     >
         <FieldsProvider :fields="fields">
-            <Fields class="p-4" />
+            <Fields />
         </FieldsProvider>
     </PublishContainer>
 </template>
-
-<style>
-.dictionary_fields-fieldtype {
-    background: inherit !important;
-}
-
-.dictionary_fields-fieldtype > div[data-ui-field-text] {
-    display: none;
-}
-
-.dictionary_fields-fieldtype > div.publish-fields-fluid {
-    padding: 0;
-}
-</style>
 
 <script>
 import Fieldtype from './Fieldtype.vue';

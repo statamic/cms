@@ -115,7 +115,12 @@ const isSyncable = computed(() => {
 
 const isSynced = computed(() => isSyncable.value && !store.localizedFields.includes(fullPath.value));
 const isNested = computed(() => fullPath.value.includes('.'));
-const wrapperComponent = computed(() => asConfig.value && !isNested.value ? 'card' : 'div');
+const wrapperComponent = computed(() => {
+    // Todo: Find a way to not need to hard code this.
+    if (props.config.type === 'dictionary_fields') return 'div';
+
+    return asConfig.value && !isNested.value ? 'card' : 'div';
+});
 
 function sync() {
     syncField(fullPath.value);
