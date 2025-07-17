@@ -36,7 +36,7 @@
     /* [1] When there are children, except when followed by another tree that has children, or a top level tree */
     .tree-node:not(.nav-builder *):has(.page-tree-branch--has-children):not(:has(+ .tree-node .page-tree-branch--has-children)) + .tree-node .page-tree-branch,
     /* [2] (always) the first level down that has children */
-    .tree-node:has(.is-top-level) + .tree-node:not(:has(.is-top-level)) .page-tree-branch {
+    .tree-node:has(.is-top-level-branch) + .tree-node:not(:has(.is-top-level-branch)) .page-tree-branch {
         border-top-left-radius: 0;
     }
 }
@@ -52,10 +52,10 @@
         .tree-node-inner {
             @apply px-1;
         }
-        &:has(.is-top-level) {
+        &:has(.is-section) {
             @apply mt-8 pt-1 bg-gray-100 rounded-t-2xl;
         }
-        &:has(+ .tree-node .is-top-level),
+        &:has(+ .tree-node .is-section),
         &:last-child {
             @apply pb-1 rounded-b-2xl;
         }
