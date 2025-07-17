@@ -381,18 +381,11 @@ export default {
             this.$dirty.add(this.publishContainer);
         },
 
-        // We only want to close when clicking the save button, not when saving when navigating between prev/next assets.
-        // TODO: Can likely be refactored when we implement the new publish form components.
-        saveAndClose() {
-            this.save();
-            this.close();
-        },
-
         save() {
             this.saving = true;
             const url = cp_url(`assets/${utf8btoa(this.id)}`);
 
-            this.$axios
+            return this.$axios
                 .patch(url, this.$refs.container.store.visibleValues)
                 .then((response) => {
                     this.$emit('saved', response.data.asset);
@@ -413,7 +406,13 @@ export default {
                     } else {
                         this.$toast.error(__('Something went wrong'));
                     }
+
+                    throw e;
                 });
+        },
+
+        saveAndClose() {
+            this.save().then(() => this.close());
         },
 
         clearErrors() {
