@@ -62,6 +62,7 @@
         /* When we're dragging a section tree node, remove the background otherwise it bleeds into the node we're moving it to */
         &.drag-placeholder-wrapper:has(.is-section-placeholder) {
             background: none;
+            @apply -mx-1;
         }
         /* When we're dragging a section tree node, make sure the preceding node is rounded */
         /* TODO: Help Jay! This is the only block that I can't get working... */
