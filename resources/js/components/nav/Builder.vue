@@ -356,9 +356,7 @@ export default {
         },
 
         checkIfDraggingIntoTopLevelSection() {
-            let stat = dragContext.closestNode;
-            while (stat.level > 1) stat = stat.parent;
-            return stat.data.text === 'Top Level';
+            return this.getParentSectionNode(dragContext.closestNode)?.data?.text === 'Top Level';
         },
 
         // This method is called when an item is being dragged into a position at the root level.
