@@ -170,7 +170,7 @@ function desync() {
             :read-only="isReadOnly"
             show-field-previews
             @update:value="valueUpdated"
-            @meta-updated="metaUpdated"
+            @update:meta="metaUpdated"
             @focus="focused"
             @blur="blurred"
             @replicator-preview-updated="replicatorPreviewUpdated"

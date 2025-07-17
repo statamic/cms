@@ -32,7 +32,7 @@ export default {
         }, 150),
 
         updateMeta(value) {
-            this.$emit('meta-updated', value);
+            this.$emit('update:meta', value);
         },
     },
 
