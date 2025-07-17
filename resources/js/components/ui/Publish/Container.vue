@@ -74,7 +74,7 @@ const props = defineProps({
 });
 
 const store = usePublishContainerStore(props.name, {
-    values: props.modelValue,
+    values: clone(props.modelValue),
     extraValues: props.extraValues,
     meta: props.meta,
     originValues: props.originValues,
@@ -90,14 +90,14 @@ const components = ref([]);
 
 watch(
     () => props.modelValue,
-    (values) => store.setValues(values),
+    (values) => store.setValues(clone(values)),
     { deep: true },
 );
 
 watch(
     () => store.values,
     (values) => {
-        if (values === props.modelValue) return;
+        if (JSON.stringify(values) === JSON.stringify(props.modelValue)) return;
         if (props.trackDirtyState) dirty();
         emit('update:modelValue', values);
     },
