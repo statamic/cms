@@ -146,7 +146,6 @@
 </template>
 
 <script>
-import Listing from '../Listing.vue';
 import {
     CardPanel,
     StatusIndicator,
@@ -160,8 +159,6 @@ import {
 import ItemActions from '@statamic/components/actions/ItemActions.vue';
 
 export default {
-    mixins: [Listing],
-
     components: {
         CardPanel,
         StatusIndicator,
@@ -189,6 +186,7 @@ export default {
             columns: this.initialColumns,
             requestUrl: cp_url(`collections`),
             mode: this.$preferences.get('collections.listing_mode', 'grid'),
+            source: null,
         };
     },
 
@@ -200,15 +198,45 @@ export default {
 
     methods: {
         request() {
-            // If we have initial data, we don't need to perform a request.
-            // Subsequent requests, like after performing actions, we do want to perform a request.
-            if (!this.initializedRequest) {
-                this.loading = false;
-                this.initializedRequest = true;
-                return;
-            }
+            if (this.source) this.source.abort();
+            this.source = new AbortController();
 
-            Listing.methods.request.call(this);
+            this.$axios
+                .get(this.requestUrl, {
+                    params: this.parameters,
+                    signal: this.source.signal,
+                })
+                .then((response) => {
+                    this.columns = response.data.meta.columns;
+                    this.items = Object.values(response.data.data);
+                    this.meta = response.data.meta;
+                    this.loading = false;
+                })
+                .catch((e) => {
+                    if (this.$axios.isCancel(e)) return;
+                    this.loading = false;
+                    this.initializing = false;
+                    if (e.request && !e.response) return;
+                    this.$toast.error(e.response ? e.response.data.message : __('Something went wrong'), {
+                        duration: null,
+                    });
+                });
+        },
+
+        actionStarted() {
+            this.loading = true;
+        },
+
+        actionCompleted(successful, response) {
+            // Intentionally not completing the loading state here since
+            // the listing will refresh and immediately restart it.
+            // this.loading = false;
+
+            successful
+                ? this.$toast.success(response.message || __('Action completed'))
+                : this.$toast.error(response.message || __('Action failed'));
+
+            this.request();
         },
     },
 };
