@@ -48,9 +48,12 @@
     background: none;
     @apply max-w-4xl mx-auto;
     .tree-node {
-        @apply pe-1 bg-gray-100;
+        @apply bg-gray-100;
+        .tree-node-inner {
+            @apply px-1;
+        }
         &:has(.is-top-level) {
-            @apply mt-8 pt-1 px-1! bg-gray-100 rounded-t-2xl;
+            @apply mt-8 pt-1 bg-gray-100 rounded-t-2xl;
         }
         &:has(+ .tree-node .is-top-level),
         &:last-child {
