@@ -4,7 +4,6 @@ import UpdatesBadge from '../components/UpdatesBadge.vue';
 import Container from '../components/publish/Container.vue';
 import PublishForm from '../components/publish/PublishForm.vue';
 import Fields from '../components/publish/Fields.vue';
-import FieldsContainer from '../components/publish/FieldsContainer.vue'; // deprecated
 import Field from '../components/publish/Field.vue';
 import FullscreenHeader from '../components/publish/FullscreenHeader.vue';
 import FieldMeta from '../components/publish/FieldMeta.vue';
