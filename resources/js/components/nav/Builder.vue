@@ -332,9 +332,6 @@ export default {
         },
 
         eachDraggable(stat) {
-            // Prevent the top level section item being dragged. It should always stay at the top.
-            if (stat.data.text === 'Top Level') return false;
-
             this.isDraggingIntoTopLevelSection = false;
 
             return true;
