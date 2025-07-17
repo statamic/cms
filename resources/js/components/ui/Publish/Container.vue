@@ -111,6 +111,12 @@ watch(
 );
 
 watch(
+    () => props.meta,
+    (meta) => store.setMeta(meta),
+    { deep: true },
+);
+
+watch(
     () => props.errors,
     (errors) => store.setErrors(errors),
     { deep: true },
