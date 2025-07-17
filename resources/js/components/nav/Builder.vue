@@ -77,10 +77,9 @@
                 >
                     <template #placeholder>
                         <div
-                            class="w-full rounded-lg border border-dashed border-blue-400 bg-blue-500/10 p-2"
+                            class="rounded-lg border border-dashed border-blue-400 bg-blue-500/10 p-2"
                             :class="{
-                                'is-section-placeholder': isSectionNode(draggingStat),
-                                'mt-6': isSectionNode(draggingStat),
+                                'mt-6 is-section-placeholder': isSectionNode(draggingStat),
                                 'ml-[-24px]': isDraggingIntoTopLevelSection,
                             }"
                         >
