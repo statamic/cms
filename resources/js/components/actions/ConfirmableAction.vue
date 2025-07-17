@@ -115,7 +115,6 @@ defineExpose({
             name="confirm-action"
             :blueprint="fieldset"
             v-model="values"
-            :values="values"
             :meta="action.meta"
             :errors="errors"
         >
