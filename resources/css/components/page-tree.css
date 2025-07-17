@@ -48,6 +48,20 @@
     background: none;
     @apply max-w-4xl mx-auto;
     .tree-node {
+        /* The Dashboard row (i.e. the first branch) */
+        &:has(.first-branch) {
+            /* If Dashboard has been moved */
+            &:has(+ .tree-node .page-tree-branch--has-children) {
+                @apply rounded-xl py-1;
+                /* While it's being moved... */
+                .first-branch:empty {
+                    /* Styli it the same as it's "end" state */
+                    @apply rounded-lg border border-dashed border-blue-400 bg-blue-500/10;
+                    /* And ensure it doesn't collapse */
+                    min-height: 2.65rem;
+                }
+            }
+        }
         @apply bg-gray-100;
         .tree-node-inner {
             @apply px-1;
