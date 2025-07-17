@@ -22,6 +22,7 @@ defineExpose({ focus });
             ref="input"
             icon="magnifying-glass"
             id="listings-search"
+            variant="light"
             :placeholder="__(placeholder)"
             :value="searchQuery"
             :disabled="reorderable"

@@ -26,6 +26,7 @@ const props = defineProps({
     size: { type: String, default: 'base' },
     tabindex: { type: Number, default: null },
     type: { type: String, default: 'text' },
+    variant: { type: String, default: 'default' },
     viewable: { type: Boolean, default: false },
 });
 
@@ -35,7 +36,7 @@ const hasAppendedIcon = !!props.iconAppend || !!slots.append || props.clearable 
 const inputClasses = computed(() => {
     const classes = cva({
         base: [
-            'w-full block bg-white dark:bg-gray-800/20',
+            'w-full block bg-white dark:bg-gray-900',
             'border border-gray-300 dark:border-x-0 dark:border-t-0 dark:border-white/7.5 dark:inset-shadow-2xs dark:inset-shadow-black',
             'text-gray-900 dark:text-gray-300 placeholder:text-gray-500 dark:placeholder:text-gray-500',
             'appearance-none antialiased shadow-ui-sm disabled:shadow-none disabled:opacity-50 read-only:border-dashed not-prose',
@@ -45,6 +46,10 @@ const inputClasses = computed(() => {
                 base: 'text-base rounded-lg px-3 py-2 h-10 leading-[1.375rem]',
                 sm: 'text-sm rounded-md px-2.5 py-1.5 h-8 leading-[1.125rem]',
                 xs: 'text-xs rounded-xs px-2 py-1.5 h-6 leading-[1.125rem]',
+            },
+            variant: {
+                default: '',
+                light: 'dark:bg-gray-800/20',
             },
             hasLimit: {
                 true: 'pe-9',
