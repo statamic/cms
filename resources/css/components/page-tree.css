@@ -59,6 +59,10 @@
         &:last-child {
             @apply pb-1 rounded-b-2xl;
         }
+        &:has(.is-top-level-section-placeholder) {
+            background: none;
+            @apply mt-1;
+        }
         /* When we're dragging a section tree node, remove the background otherwise it bleeds into the node we're moving it to */
         &.drag-placeholder-wrapper:has(.is-section-placeholder) {
             background: none;
