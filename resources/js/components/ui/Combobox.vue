@@ -200,10 +200,12 @@ function updateDropdownOpen(open) {
 }
 
 function updateModelValue(value) {
-    let originalValue = props.modelValue;
+    let originalValue = props.modelValue || [];
 
     searchQuery.value = '';
     emit('update:modelValue', value);
+
+    if (!Array.isArray(value)) value = [value];
 
     value
         .filter((option) => !originalValue.includes(option))
