@@ -1,5 +1,5 @@
 <script setup>
-import { computed, useSlots, ref, useId, useTemplateRef } from 'vue';
+import { computed, useSlots, ref, useId, useTemplateRef, onMounted, nextTick } from 'vue';
 import { cva } from 'cva';
 import { twMerge } from 'tailwind-merge';
 import { Icon, Button, CharacterCounter } from '@statamic/ui';
@@ -28,6 +28,7 @@ const props = defineProps({
     type: { type: String, default: 'text' },
     variant: { type: String, default: 'default' },
     viewable: { type: Boolean, default: false },
+    focus: { type: Boolean, default: false },
 });
 
 const hasPrependedIcon = !!props.iconPrepend || !!props.icon || !!slots.prepend;
@@ -116,6 +117,12 @@ const copy = () => {
 
 const input = useTemplateRef('input');
 const focus = () => input.value.focus();
+
+onMounted(() => {
+    if (props.focus) {
+        nextTick(() => focus());
+    }
+})
 
 defineExpose({ focus });
 </script>
