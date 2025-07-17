@@ -618,17 +618,20 @@ export default {
     },
 
     watch: {
-        assets(assets) {
-            if (this.initializing) return;
+        assets: {
+            deep: true,
+            handler(assets) {
+                if (this.initializing) return;
 
-            // The components deal with passing around asset objects, however
-            // our fieldtype is only concerned with their respective IDs.
-            this.update(this.assetIds);
+                // The components deal with passing around asset objects, however
+                // our fieldtype is only concerned with their respective IDs.
+                this.update(this.assetIds);
 
-            this.updateMeta({
-                ...this.meta,
-                data: [...assets],
-            });
+                this.updateMeta({
+                    ...this.meta,
+                    data: [...assets],
+                });
+            }
         },
 
         loading(loading) {
