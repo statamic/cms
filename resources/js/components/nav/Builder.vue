@@ -69,7 +69,6 @@
                     :stat-handler="statHandler"
                     keep-placeholder
                     trigger-class="page-move"
-                    :each-draggable="eachDraggable"
                     :each-droppable="eachDroppable"
                     :root-droppable="rootDroppable"
                     @change="changed = true"
@@ -329,12 +328,6 @@ export default {
             }
 
             return item;
-        },
-
-        eachDraggable(stat) {
-            this.isDraggingIntoTopLevelSection = false;
-
-            return true;
         },
 
         // This method is called when an item is being dragged into a position that isn't the root level.
@@ -729,6 +722,7 @@ export default {
         },
 
         beforeDragStart(stat) {
+            this.isDraggingIntoTopLevelSection = false;
             this.draggingStat = stat;
         },
 
