@@ -1,22 +1,16 @@
 <template>
     <div class="no-label w-full">
-        <publish-container
-            class="p-3"
-            v-if="filter.fields.length"
-            :name="`filter-${filter.handle}`"
-            :meta="meta"
-            :values="containerValues"
+
+        <ui-publish-container
+            :model-value="containerValues"
+            @update:model-value="updateValues"
+            :meta="filter.meta"
             :track-dirty-state="false"
-            @updated="updateValues"
-            v-slot="{ setFieldValue }"
         >
-            <publish-fields
-                :fields="filter.fields"
-                :name-prefix="`filter-${filter.handle}`"
-                @updated="setFieldValue"
-                @meta-updated="updateMeta"
-            />
-        </publish-container>
+            <ui-publish-fields-provider :fields="filter.fields">
+                <ui-publish-fields />
+            </ui-publish-fields-provider>
+        </ui-publish-container>
 
         <div class="flex border-t dark:border-dark-900">
             <button
@@ -34,22 +28,10 @@
 </template>
 
 <script>
-import PublishFields from '../publish/Fields.vue';
-
 export default {
-    components: {
-        PublishFields,
-    },
-
     props: {
         filter: Object,
         values: Object,
-    },
-
-    data() {
-        return {
-            meta: {},
-        };
     },
 
     computed: {

@@ -2,34 +2,25 @@
     <div>
         <div v-if="hasAvailableFieldFilters">
             <div class="flex flex-col p-3">
-                <v-select
+                <ui-combobox
                     ref="fieldSelect"
                     :placeholder="__('Field')"
                     :options="fieldOptions"
-                    :reduce="(option) => option.value"
                     :model-value="field"
                     @update:model-value="createFilter"
                 />
 
-                <publish-container
+                <ui-publish-container
                     v-if="showFieldFilter"
-                    name="filter-field"
-                    :meta="{}"
-                    :values="containerValues"
+                    :model-value="containerValues"
+                    @update:model-value="updateValues"
+                    :meta="filter.meta"
                     :track-dirty-state="false"
-                    class="filter-fields mt-2"
-                    @updated="updateValues"
-                    v-slot="{ setFieldValue, setFieldMeta }"
                 >
-                    <publish-fields
-                        :fields="filter.fields"
-                        name-prefix="filter-field"
-                        class="no-label w-full"
-                        @updated="setFieldValue"
-                        @meta-updated="setFieldMeta"
-                    />
-                    <!-- TODO: handle showing/hiding of labels more elegantly -->
-                </publish-container>
+                    <ui-publish-fields-provider :fields="filter.fields">
+                        <ui-publish-fields />
+                    </ui-publish-fields-provider>
+                </ui-publish-container>
             </div>
 
             <div class="flex border-t text-gray-900 dark:border-dark-900 dark:text-dark-150">
@@ -45,7 +36,7 @@
                 />
             </div>
         </div>
-        <v-select v-else :disabled="true" :placeholder="__('No available filters')" />
+        <div v-else v-text="__('No available filters')"></div>
     </div>
 </template>
 
@@ -145,7 +136,7 @@ export default {
 
         this.reset();
 
-        this.$refs.fieldSelect.$refs.search.focus();
+        // this.$refs.fieldSelect.$refs.search.focus();
     },
 
     methods: {
