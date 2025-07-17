@@ -15,7 +15,7 @@ defineExpose({ focus });
 </script>
 
 <template>
-    <div class="min-w-64 lg:w-1/3">
+    <div class="flex-1 max-w-md">
         <label for="listings-search" class="sr-only">{{ __('Search entries') }}</label>
         <Input
             autofocus

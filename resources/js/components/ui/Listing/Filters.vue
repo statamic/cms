@@ -34,7 +34,7 @@ function removeFieldFilter(handle) {
 </script>
 
 <template>
-    <div class="flex flex-1 items-center gap-3 overflow-x-auto">
+    <div class="flex flex-1 items-center gap-3 overflow-x-auto py-3">
         <Modal :title="__('Apply Filters')">
             <template #trigger>
                 <Button icon="filter-2" class="relative [&_svg]:size-3.5" :disabled="reorderable">

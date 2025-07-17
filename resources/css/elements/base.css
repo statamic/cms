@@ -15,6 +15,7 @@
     }
 
     /* =Jay. @Jack I figured to stick these in variables since we use them in class names in Bard. I thought technically layout variables maybe shouldn't be theme/should be persistent, so I put them here instead. */
+    --z-index-below: -1;
     --z-index-base: 1;
     --z-index-above: 2;
     --z-index-header: 3;
