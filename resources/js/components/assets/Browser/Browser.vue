@@ -171,11 +171,9 @@ import AssetThumbnail from './Thumbnail.vue';
 import AssetEditor from '../Editor/Editor.vue';
 import Grid from './Grid.vue';
 import Table from './Table.vue';
-import HasPagination from '../../data-list/HasPagination';
 import HasPreferences from '../../data-list/HasPreferences';
 import Uploader from '../Uploader.vue';
 import Uploads from '../Uploads.vue';
-import HasActions from '../../data-list/HasActions';
 import { debounce, sortBy } from 'lodash-es';
 import {
     Header,
@@ -199,7 +197,7 @@ import { Listing, ListingTable, ListingPagination } from '@statamic/ui';
 import Breadcrumbs from './Breadcrumbs.vue';
 
 export default {
-    mixins: [HasActions, HasPagination, HasPreferences],
+    mixins: [HasPreferences],
 
     components: {
         PanelFooter,
