@@ -82,7 +82,7 @@
                             :class="{
                                 'is-section-placeholder': isSectionNode(draggingStat),
                                 'mt-6': isSectionNode(draggingStat),
-                                'ml-[-24px]': isDraggingIntoTopLevel,
+                                'ml-[-24px]': isDraggingIntoTopLevelSection,
                             }"
                         >
                             &nbsp;
@@ -90,7 +90,7 @@
                     </template>
 
                     <template #default="{ node, stat }">
-                        <top-level-tree-branch v-if="stat.level === 1 && stat.data?.text === 'Top Level'" :stat="stat" />
+                        <top-level-section-branch v-if="stat.level === 1 && stat.data?.text === 'Top Level'" :stat="stat" />
                         <tree-branch
                             v-else
                             :item="node"
@@ -105,11 +105,11 @@
                             @edit="editItem(stat)"
                             @toggle-open="stat.open = !stat.open"
                         >
-                            <template #branch-options="{ isTopLevel }">
+                            <template #branch-options="{ inTopLevelSection }">
                                 <DropdownItem v-if="stat.level < 3" :text="__('Add Item')" @click="addItem(stat)" />
                                 <DropdownItem :text="__('Edit')" @click="editItem(stat)" />
                                 <DropdownItem
-                                    v-if="!isSectionNode(stat) && !isTopLevel"
+                                    v-if="!isSectionNode(stat) && !inTopLevelSection"
                                     :text="__('Pin to Top Level')"
                                     @click="pinItem(stat)"
                                 />
@@ -183,7 +183,7 @@
 <script>
 import { dragContext, Draggable, walkTreeData } from '@he-tree/vue';
 import TreeBranch from './Branch.vue';
-import TopLevelTreeBranch from './TopLevelBranch.vue';
+import TopLevelSectionBranch from './TopLevelSectionBranch.vue';
 import ItemEditor from './ItemEditor.vue';
 import SectionEditor from './SectionEditor.vue';
 import { data_get } from '../../bootstrap/globals.js';
@@ -203,7 +203,7 @@ export default {
         TreeBranch,
         ItemEditor,
         SectionEditor,
-        TopLevelTreeBranch,
+        TopLevelSectionBranch,
         Panel,
         PanelHeader,
     },
@@ -250,7 +250,7 @@ export default {
             confirmingReset: false,
             confirmingRemoval: false,
             draggingStat: false,
-            isDraggingIntoTopLevel: false,
+            isDraggingIntoTopLevelSection: false,
         };
     },
 
@@ -332,7 +332,7 @@ export default {
         },
 
         eachDraggable(stat) {
-            // Prevent the top level item being dragged. It should always stay at the top.
+            // Prevent the top level section item being dragged. It should always stay at the top.
             if (stat.data.text === 'Top Level') return false;
 
             return true;
@@ -344,9 +344,9 @@ export default {
             // If the item being dragged is a section, we don't want it being dragged anywhere except the root level.
             if (this.isSectionNode(dragContext.dragNode)) return false;
 
-            // We want to keep track of whether the item is being dragged into the top level.
+            // We want to keep track of whether the item is being dragged into the top level section.
             // This was the most appropriate place to hook into.
-            this.isDraggingIntoTopLevel = this.checkIfDraggingIntoTopLevel();
+            this.isDraggingIntoTopLevelSection = this.checkIfDraggingIntoTopLevelSection();
 
             // We want to prevent creating a tree with too many levels.
             if (dragContext.dragNode.children.length && targetStat.level >= 2) return false;
@@ -355,7 +355,7 @@ export default {
             return true;
         },
 
-        checkIfDraggingIntoTopLevel() {
+        checkIfDraggingIntoTopLevelSection() {
             let stat = dragContext.closestNode;
             while (stat.level > 1) stat = stat.parent;
             return stat.data.text === 'Top Level';
@@ -365,7 +365,7 @@ export default {
         // For non-root level behavior, see eachDroppable. (Why the package separated it into two methods is beyond me.)
         rootDroppable() {
             // If there's no closest node, it means that we're dragging to the very top of the tree.
-            // We don't want to allow dropping before the "top level" node.
+            // We don't want to allow dropping before the "top level" section node.
             if (dragContext.closestNode === null) return false;
 
             // Only allow dropping sections at the root level.

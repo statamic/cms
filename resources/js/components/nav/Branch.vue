@@ -1,6 +1,6 @@
 <template>
     <div class="page-tree-branch flex" :class="{
-        'ml-[-1.2rem]': isTopLevel,
+        'ml-[-1.2rem]': inTopLevelSection,
         'page-tree-branch--has-children': hasChildren,
     }">
         <div class="page-move w-6" />
@@ -81,7 +81,7 @@
                             :item="item"
                             :depth="depth"
                             :remove-branch="remove"
-                            :is-top-level="isTopLevel"
+                            :in-top-level-section="inTopLevelSection"
                         />
                     </DropdownMenu>
                 </Dropdown>
@@ -154,7 +154,7 @@ export default {
         },
 
         isPinnedAlias() {
-            return data_get(this.item, 'manipulations.action') === '@alias' && this.isTopLevel;
+            return data_get(this.item, 'manipulations.action') === '@alias' && this.inTopLevelSection;
         },
 
         isAlias() {
@@ -173,8 +173,8 @@ export default {
             return data_get(this.item, 'manipulations.action') === '@create';
         },
 
-        isTopLevel() {
-            return this.stat.data?.text === 'Top Level' || this.stat.parent?.data?.text === 'Top Level';
+        inTopLevelSection() {
+            return this.parentSection?.data?.text === 'Top Level';
         },
     },
 
