@@ -16,7 +16,7 @@
             @error="uploadError"
             v-slot="{ dragging }"
         >
-            <div class="">
+            <div>
                 <div
                     v-if="config.allow_uploads"
                     v-show="dragging && !showSelector"
@@ -153,7 +153,7 @@
         </uploader>
 
         <stack v-if="showSelector" name="asset-selector" @closed="closeSelector">
-            <selector
+            <Selector
                 :container="container"
                 :folder="folder"
                 :restrict-folder-navigation="restrictNavigation"
@@ -164,8 +164,7 @@
                 :columns="columns"
                 @selected="assetsSelected"
                 @closed="closeSelector"
-            >
-            </selector>
+            />
         </stack>
     </div>
 </template>
