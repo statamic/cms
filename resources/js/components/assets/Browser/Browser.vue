@@ -160,6 +160,8 @@
             @next="editNextAsset"
             @closed="closeAssetEditor"
             @saved="assetSaved"
+            @action-started="actionStarted"
+            @action-completed="actionCompleted"
         />
     </div>
 </template>
@@ -193,7 +195,6 @@ import {
     ToggleGroup,
     ToggleItem,
 } from '@statamic/ui';
-import BulkActions from '@statamic/components/data-list/BulkActions.vue';
 import { Listing, ListingTable, ListingPagination } from '@statamic/ui';
 import Breadcrumbs from './Breadcrumbs.vue';
 
@@ -217,7 +218,6 @@ export default {
         Header,
         Button,
         ButtonGroup,
-        BulkActions,
         Listing,
         ListingTable,
         ListingPagination,
@@ -395,18 +395,8 @@ export default {
         },
     },
 
-    created() {
-        this.$events.$on('editor-action-started', this.actionStarted);
-        this.$events.$on('editor-action-completed', this.actionCompleted);
-    },
-
     mounted() {
         this.mode = this.getPreference('mode') || 'table';
-    },
-
-    unmounted() {
-        this.$events.$off('editor-action-started', this.actionStarted);
-        this.$events.$off('editor-action-completed', this.actionCompleted);
     },
 
     watch: {
@@ -488,7 +478,15 @@ export default {
             this.loading = false;
         },
 
-        afterActionSuccessfullyCompleted() {
+        actionStarted() {
+            this.loading = true;
+        },
+
+        actionCompleted() {
+            // Intentionally not completing the loading state here since
+            // the listing will refresh and immediately restart it.
+            // this.loading = false;
+
             this.$refs.listing.refresh();
         },
 
