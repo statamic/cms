@@ -64,10 +64,8 @@
             background: none;
             @apply -mx-1;
         }
-        /* When we're dragging a section tree node, make sure the preceding node is rounded */
-        /* TODO: Help Jay! This is the only block that I can't get working... */
-        &:has(+ .drag-placeholder-wrapper:has(.is-section-placeholder)) {
-            border: 1px solid blue !important;
+        /* When we're dragging a section tree node, make sure the preceding node is rounded. Check for a suceeding .is-section-placeholder to ensure we don't affect dragging _inside_ sections */
+        &:has(+ .drag-placeholder-wrapper):has(+ * .is-section-placeholder) {
             @apply pb-1 rounded-b-2xl;
         }
         /* When we're dragging a section tree node, make sure the succeeding node is rounded */
