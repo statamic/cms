@@ -17,7 +17,7 @@ export default {
 
     computed: {
         hasChildren() {
-            return this.stat.children.length > 0;
+            return this.stat.children.filter(node => node.hidden === false).length;
         },
     },
 };
