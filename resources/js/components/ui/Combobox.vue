@@ -206,9 +206,10 @@ function updateModelValue(value) {
     emit('update:modelValue', value);
 
     if (!Array.isArray(value)) value = [value];
+    if (!Array.isArray(originalValue)) originalValue = [originalValue];
 
     value
-        .filter((option) => !originalValue.includes(option))
+        .filter((option) => !originalValue?.includes(option))
         .forEach((option) => emit('selected', option));
 }
 
