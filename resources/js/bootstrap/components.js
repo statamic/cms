@@ -7,7 +7,6 @@ import Fields from '../components/publish/Fields.vue';
 import Field from '../components/publish/Field.vue';
 import FullscreenHeader from '../components/publish/FullscreenHeader.vue';
 import FieldMeta from '../components/publish/FieldMeta.vue';
-import FieldActions from '../components/field-actions/FieldActions.vue';
 import ConfigureTabs from '../components/configure/Tabs.vue';
 import PublishTabs from '../components/publish/Tabs.vue';
 import PublishSections from '../components/publish/Sections.vue';
@@ -75,7 +74,6 @@ export default function registerGlobalComponents(app) {
     app.component('publish-fields-container', FieldsContainer);
     app.component('publish-field', Field);
     app.component('publish-field-meta', FieldMeta);
-    app.component('publish-field-actions', FieldActions);
     app.component('publish-field-fullscreen-header', FullscreenHeader);
     app.component('configure-tabs', ConfigureTabs);
     app.component('publish-tabs', PublishTabs);
