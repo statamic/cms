@@ -23,7 +23,7 @@
                     icon="ui/chevron-down"
                     size="xs"
                     variant="ghost"
-                    :class="{ '-rotate-90': !isOpen }"
+                    :class="{ '-rotate-90 is-closed': !isOpen, 'is-open': isOpen }"
                     @click="$emit('toggle-open')"
                 />
             </div>
