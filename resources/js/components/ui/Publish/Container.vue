@@ -11,6 +11,7 @@ import { watch, provide, getCurrentInstance, ref, computed, onBeforeUnmount, toR
 import Component from '@statamic/components/Component.js';
 import { getActivePinia } from 'pinia';
 import Tabs from './Tabs.vue';
+import clone from '@statamic/util/clone.js';
 
 const emit = defineEmits(['update:modelValue', 'update:visibleValues', 'update:modifiedFields']);
 
