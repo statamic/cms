@@ -537,6 +537,25 @@ class ActiveNavItemTest extends TestCase
     }
 
     #[Test]
+    public function active_nav_descendant_url_still_functions_properly_when_parent_item_has_no_children()
+    {
+        Facades\CP\Nav::extend(function ($nav) {
+            $nav->tools('Schopify')->url('/cp/totally-custom-url');
+        });
+
+        $this
+            ->prepareNavCaches()
+            ->get('http://localhost/cp/totally-custom-url/deeper/descendant')
+            ->assertStatus(200);
+
+        $toolsItems = $this->build()->get('Tools');
+
+        $this->assertTrue($this->getItemByDisplay($toolsItems, 'Schopify')->isActive());
+        $this->assertFalse($this->getItemByDisplay($toolsItems, 'Addons')->isActive());
+        $this->assertFalse($this->getItemByDisplay($toolsItems, 'Utilities')->isActive());
+    }
+
+    #[Test]
     public function active_nav_check_still_functions_properly_when_custom_nav_extension_hijacks_a_core_item_child()
     {
         Facades\Collection::make('pages')->title('Pages')->save();

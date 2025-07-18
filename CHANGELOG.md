@@ -1,5 +1,95 @@
 # Release Notes
 
+## 5.60.0 (2025-07-15)
+
+### What's new
+- Add command to clear asset_meta and asset_container_contents caches [#11960](https://github.com/statamic/cms/issues/11960) by @ryanmitchell
+
+### What's fixed
+- Addon Manifest improvements [#11948](https://github.com/statamic/cms/issues/11948) by @duncanmcclean
+- Licensing fixes [#11950](https://github.com/statamic/cms/issues/11950) by @duncanmcclean
+- Allow classes to extend Markdown Parser [#11946](https://github.com/statamic/cms/issues/11946) by @JohnathonKoster
+
+
+
+## 5.59.0 (2025-07-10)
+
+### What's new
+- Add optional fallback for missing keys in `{{ trans }}` tag [#11944](https://github.com/statamic/cms/issues/11944) by @daun
+- `resolve` modifier [#11890](https://github.com/statamic/cms/issues/11890) by @marcorieser
+- Allow fetching children of other entries in `{{ children }}` tag [#11922](https://github.com/statamic/cms/issues/11922) by @daun
+- Prompt to update search indexes when installing starter kits [#11924](https://github.com/statamic/cms/issues/11924) by @jesseleite
+
+### What's fixed
+- Use `app.locale` as fallback when there is no explicit site locale [#11939](https://github.com/statamic/cms/issues/11939) by @CasEbb
+- Check if sometimes rule is present before adding nonNull type [#11917](https://github.com/statamic/cms/issues/11917) by @TheBnl
+- Fix issue around spaces in git paths [#11933](https://github.com/statamic/cms/issues/11933) by @jesseleite
+- Fix active state for nav items with implicit children [#11937](https://github.com/statamic/cms/issues/11937) by @jesseleite
+- Fix visibility of custom nav items for users w/ limited permissions [#11930](https://github.com/statamic/cms/issues/11930) by @jesseleite
+- Fix group fieldtype child field validation rules when using {this} within a replicator/grid [#11931](https://github.com/statamic/cms/issues/11931) by @martyf
+- Relax strict type check in `Tree::move()` [#11927](https://github.com/statamic/cms/issues/11927) by @duncanmcclean
+- Prevent group fieldtype from filtering out `false` values [#11928](https://github.com/statamic/cms/issues/11928) by @duncanmcclean
+- Class "DB" not found issue [#11911](https://github.com/statamic/cms/issues/11911) by @leganz
+- Fix casing on dropdown item [#11907](https://github.com/statamic/cms/issues/11907) by @duncanmcclean
+- German translations [#11903](https://github.com/statamic/cms/issues/11903) by @helloDanuk
+
+
+
+## 5.58.1 (2025-06-25)
+
+### What's fixed
+- Fix Overflow buttons preview [#11891](https://github.com/statamic/cms/issues/11891) by @marcorieser
+- Revert detect recursion when augmenting Entries (#11854) [#11894](https://github.com/statamic/cms/issues/11894) by @JohnathonKoster
+- Add entry serialization test [#11900](https://github.com/statamic/cms/issues/11900) by @jasonvarga
+
+
+
+## 5.58.0 (2025-06-20)
+
+### What's new
+- Detect recursion when augmenting Entries [#11854](https://github.com/statamic/cms/issues/11854) by @JohnathonKoster
+- Add `hasField` method to `Fieldset` [#11882](https://github.com/statamic/cms/issues/11882) by @duncanmcclean
+- Estonian translations [#11886](https://github.com/statamic/cms/issues/11886) by @karlromets
+
+### What's fixed
+- Render markdown after antlers when smartypants is enabled [#11814](https://github.com/statamic/cms/issues/11814) by @ryanmitchell
+- Fix read-only state of roles and groups fields [#11867](https://github.com/statamic/cms/issues/11867) by @aerni
+- Fix files not being removed after cache has been cleared [#11873](https://github.com/statamic/cms/issues/11873) by @indykoning
+- Ensure nav blueprint graphql types are registered [#11881](https://github.com/statamic/cms/issues/11881) by @ryanmitchell
+- Fix issues with Blade nav tag compiler [#11872](https://github.com/statamic/cms/issues/11872) by @JohnathonKoster
+- Ensure propagating entries respects saveQuietly [#11875](https://github.com/statamic/cms/issues/11875) by @ryanmitchell
+- Fix authorization error when creating globals [#11883](https://github.com/statamic/cms/issues/11883) by @duncanmcclean
+- Fixes typo [#11876](https://github.com/statamic/cms/issues/11876) by @adampatterson
+- Updated `AddonServiceProvider::shouldBootRootItems()` to support trailing slashes [#11861](https://github.com/statamic/cms/issues/11861) by @simonworkhouse
+- Prevent null in strtolower() [#11869](https://github.com/statamic/cms/issues/11869) by @martinoak
+- Ensure Glide treats asset urls starting with the app url as internal assets [#11839](https://github.com/statamic/cms/issues/11839) by @marcorieser
+- Remove single quote in Asset upload  [#11858](https://github.com/statamic/cms/issues/11858) by @adampatterson
+
+
+
+## 5.57.0 (2025-06-04)
+
+### What's new
+- Added the option to add renderers to markdown parsers [#11827](https://github.com/statamic/cms/issues/11827) by @CapitaineToinon
+- Add renderer methods to `Markdown` facade docblock [#11845](https://github.com/statamic/cms/issues/11845) by @duncanmcclean
+- Add `not_in` parameter to Assets tag [#11820](https://github.com/statamic/cms/issues/11820) by @nopticon
+- Added `X-Statamic-Uncacheable` header to prevent responses being statically cached [#11817](https://github.com/statamic/cms/issues/11817) by @macaws
+
+### What's fixed
+- Throw 404 response when OAuth provider doesn't exist [#11844](https://github.com/statamic/cms/issues/11844) by @duncanmcclean
+- Fix edition check in outpost [#11843](https://github.com/statamic/cms/issues/11843) by @duncanmcclean
+- Updated Statamic references in language files [#11835](https://github.com/statamic/cms/issues/11835) by @tommulroy
+- Fix create/edit CP nav descendants not properly triggering active status [#11832](https://github.com/statamic/cms/issues/11832) by @jesseleite
+- Fix editability of nav items without content reference [#11822](https://github.com/statamic/cms/issues/11822) by @duncanmcclean
+- Entries fieldtype: Only show "Allow Creating" option when using stack selector [#11816](https://github.com/statamic/cms/issues/11816) by @duncanmcclean
+- French translations [#11826](https://github.com/statamic/cms/issues/11826) by @ebeauchamps
+- Added null check for fieldActions within replicator [#11828](https://github.com/statamic/cms/issues/11828) by @martyf
+- Perform null check on data in video fieldtype [#11821](https://github.com/statamic/cms/issues/11821) by @martyf
+- Added checks for `Closure` instances instead of `is_callable` inside `Route::statamic(...)` [#11809](https://github.com/statamic/cms/issues/11809) by @JohnathonKoster
+- Further increase trackDirtyState timeout [#11811](https://github.com/statamic/cms/issues/11811) by @simonerd
+
+
+
 ## 5.56.0 (2025-05-20)
 
 ### What's new

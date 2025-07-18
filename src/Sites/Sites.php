@@ -138,7 +138,7 @@ class Sites
             'default' => [
                 'name' => '{{ config:app:name }}',
                 'url' => '/',
-                'locale' => 'en_US',
+                'locale' => '{{ config:app:locale }}',
             ],
         ];
     }

@@ -863,8 +863,8 @@ abstract class AddonServiceProvider extends ServiceProvider
         // i.e. It's the "root" provider. If it's in a subdirectory maybe the developer
         // is organizing their providers. Things like tags etc. can be autoloaded but
         // root level things like routes, views, config, blueprints, etc. will not.
-        $thisDir = Path::tidy(dirname((new \ReflectionClass(static::class))->getFileName()));
-        $autoloadDir = $addon->directory().$addon->autoload();
+        $thisDir = Str::ensureRight(Path::tidy(dirname((new \ReflectionClass(static::class))->getFileName())), '/');
+        $autoloadDir = Str::ensureRight($addon->directory().$addon->autoload(), '/');
 
         return $thisDir === $autoloadDir;
     }
