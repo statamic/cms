@@ -109,7 +109,6 @@
 
 <script>
 import { NodeViewWrapper } from '@tiptap/vue-3';
-import SetField from '../replicator/Field.vue';
 import ManagesPreviewText from '../replicator/ManagesPreviewText';
 import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
 import HasFieldActions from '../../field-actions/HasFieldActions.js';
@@ -146,7 +145,6 @@ export default {
         Badge,
         Icon,
         NodeViewWrapper,
-        SetField,
         Motion,
     },
 

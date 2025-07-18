@@ -3,6 +3,7 @@ import { computed, useTemplateRef, watch } from 'vue';
 import { injectContainerContext } from './Container.vue';
 import { injectFieldsContext } from './FieldsProvider.vue';
 import { Field, Icon, Tooltip, Label } from '@statamic/ui';
+import FieldActions from '@statamic/components/field-actions/FieldActions.vue';
 import ShowField from '@statamic/components/field-conditions/ShowField.js';
 
 const props = defineProps({
@@ -155,7 +156,7 @@ function desync() {
             </Label>
         </template>
         <template #actions v-if="shouldShowFieldActions">
-            <publish-field-actions :actions="fieldActions" />
+            <FieldActions :actions="fieldActions" />
         </template>
         <div class="text-xs text-red-500" v-if="!fieldtypeComponentExists">
             Component <code v-text="fieldtypeComponent"></code> does not exist.

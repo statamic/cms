@@ -3,7 +3,6 @@ export { default as IndexFieldtype } from './components/fieldtypes/index-fieldty
 export { default as FieldtypeMixin } from './components/fieldtypes/Fieldtype.vue';
 export { default as IndexFieldtypeMixin } from './components/fieldtypes/IndexFieldtype.vue';
 export { default as BardToolbarButton } from './components/fieldtypes/bard/ToolbarButton.vue';
-export { default as Listing } from './components/Listing.vue';
 export { default as ItemActions } from './components/actions/ItemActions.vue';
 export { default as BulkActions } from './components/actions/BulkActions.vue';
 export * as FieldConditions from './components/field-conditions/FieldConditions';
