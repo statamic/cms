@@ -27,20 +27,12 @@ class Palette
     {
         return $this
             ->buildActions()
-            ->buildHistory()
             ->get();
     }
 
     protected function buildActions(): self
     {
         // TODO: Addressing actions in separate PR.
-
-        return $this;
-    }
-
-    protected function buildHistory(): self
-    {
-        // TODO: Set up ajax route for caching command palette history as user runs commands.
 
         return $this;
     }

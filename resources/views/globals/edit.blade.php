@@ -21,7 +21,6 @@
         :initial-meta="{{ empty($meta) ? '{}' : json_encode($meta) }}"
         :initial-localizations="{{ json_encode($localizations) }}"
         :initial-has-origin="{{ Statamic\Support\Str::bool($hasOrigin) }}"
-        :initial-is-root="{{ Statamic\Support\Str::bool($isRoot) }}"
         :initial-origin-values="{{ json_encode($originValues) }}"
         initial-site="{{ $locale }}"
         :can-configure="{{ json_encode($canConfigure) }}"

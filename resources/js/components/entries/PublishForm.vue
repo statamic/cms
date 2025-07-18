@@ -82,7 +82,6 @@
             :origin-values="originValues"
             :origin-meta="originMeta"
             :errors="errors"
-            :is-root="isRoot"
             :site="site"
             v-model:modified-fields="localizedFields"
             :track-dirty-state="trackDirtyState"
@@ -335,7 +334,6 @@ export default {
         isCreating: Boolean,
         isInline: Boolean,
         initialReadOnly: Boolean,
-        initialIsRoot: Boolean,
         initialPermalink: String,
         revisionsEnabled: Boolean,
         preloadedAssets: Array,
@@ -383,7 +381,6 @@ export default {
 
             confirmingPublish: false,
             readOnly: this.initialReadOnly,
-            isRoot: this.initialIsRoot,
             permalink: this.initialPermalink,
 
             saveKeyBinding: null,
@@ -659,7 +656,6 @@ export default {
                 this.title = data.editing ? data.values.title : this.title;
                 this.actions = data.actions;
                 this.fieldset = data.blueprint;
-                this.isRoot = data.isRoot;
                 this.permalink = data.permalink;
                 this.site = localization.handle;
                 this.localizing = false;

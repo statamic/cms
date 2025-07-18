@@ -1,7 +1,7 @@
 <template>
     <div>
         <div>
-            <Tabs v-model="currentTab">
+            <Tabs v-model="currentTab" :unmount-on-hide="false">
                 <div v-if="!singleTab && tabs.length > 0" class="flex items-center justify-between gap-x-2 mb-6">
                     <TabList class="flex-1">
                         <BlueprintTab

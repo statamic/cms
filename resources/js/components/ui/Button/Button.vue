@@ -39,13 +39,13 @@ const buttonClasses = computed(() => {
                 danger: 'bg-linear-to-b from-red-500/90 to-red-500 hover:bg-red-500/90 text-white border border-red-600 inset-shadow-2xs inset-shadow-red-300 [&_svg]:text-red-200 disabled:text-red-200',
                 filled: 'bg-gray-100 hover:bg-gray-200 hover:text-gray-900 dark:bg-gray-700/80 dark:hover:bg-gray-700 [&_svg]:text-gray-700 dark:[&_svg]:text-gray-300',
                 ghost: 'bg-transparent hover:bg-gray-400/10 text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700/80 dark:hover:text-gray-200',
-                subtle: 'bg-transparent hover:bg-gray-400/10 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-gray-700/80 dark:hover:text-gray-200 [&_svg]:text-gray-400 dark:[&_svg]:text-gray-300',
+                subtle: 'bg-transparent hover:bg-gray-400/10 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-gray-700/80 dark:hover:text-gray-200 [&_svg]:text-gray-400',
             },
             size: {
                 lg: 'px-6 h-12 text-base gap-2 rounded-lg text-base',
                 base: 'px-4 h-10 text-sm gap-2 rounded-lg',
                 sm: 'px-3 h-8 text-[0.8125rem] leading-tight gap-2 rounded-lg [&_svg]:size-3',
-                xs: 'px-2 h-6.5 text-xs gap-1.5 rounded-md [&_svg]:size-2.5',
+                xs: 'px-2 h-6 text-xs gap-1.5 rounded-md [&_svg]:size-2.5',
             },
             groupBorder: {
                 default:
@@ -95,7 +95,7 @@ const buttonClasses = computed(() => {
         <Icon v-if="loading" name="loading" :size />
 
         <!-- =Jay. trim-text-start seems to make smaller buttons look worse such as the collections index "Create Entry" buttons -->
-        <div :class="{ 'trim-text-start': size !== 'xs' && size !== 'sm' }">
+        <div :class="{ 'trim-text-start': size !== 'xs' && size !== 'sm' }" class="flex content-center">
             <slot v-if="hasDefaultSlot" />
             <template v-else>{{ text }}</template>
         </div>

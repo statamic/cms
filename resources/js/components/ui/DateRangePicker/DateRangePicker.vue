@@ -148,5 +148,5 @@ const calendarEvents = computed(() => ({
             </Card>
         </DateRangePickerRoot>
     </div>
-    <Button @click="emit('update:modelValue', null)" type="button" class="" text="Clear" size="xs" />
+    <Button @click="emit('update:modelValue', null)" type="button" text="Clear" size="xs" />
 </template>

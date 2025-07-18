@@ -8,7 +8,6 @@ use Statamic\Assets\AssetUploader;
 use Statamic\Facades\Path;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Resources\CP\Assets\Folder;
-use Statamic\Http\Resources\CP\Assets\FolderAsset;
 use Statamic\Rules\AlphaDashSpace;
 
 class FoldersController extends CpController
