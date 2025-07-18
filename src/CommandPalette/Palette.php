@@ -40,7 +40,7 @@ class Palette
         Facades\CP\Nav::build()
             ->flatMap(fn (array $section) => $section['items'])
             ->filter(fn (NavItem $item) => $item->url())
-            ->flatMap(fn (NavItem $item) => $item->generateCommandPaletteLinks())
+            ->flatMap(fn (NavItem $item) => $item->commandPaletteLinks())
             ->each(fn (Link $link) => $this->addCommand($link));
 
         return $this;
@@ -65,7 +65,7 @@ class Palette
         //     ->each(fn (Link $link) => $this->addCommand($link));
 
         Facades\Fieldset::all()
-            ->map(fn (Fieldset $fieldset) => $fieldset->generateCommandPaletteLink())
+            ->map(fn (Fieldset $fieldset) => $fieldset->commandPaletteLink())
             ->each(fn (Link $link) => $this->addCommand($link));
 
         return $this;

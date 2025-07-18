@@ -298,7 +298,7 @@ class Fieldset
         return true;
     }
 
-    public function generateCommandPaletteLink(): Link
+    public function commandPaletteLink(): Link
     {
         $text = __('Fieldsets').' » '.__($this->title());
 

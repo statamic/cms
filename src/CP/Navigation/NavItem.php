@@ -571,7 +571,7 @@ class NavItem
     /**
      * Transform nav item and associated children to valid command palette `Link` instances.
      */
-    public function generateCommandPaletteLinks(?NavItem $parentItem = null): array
+    public function commandPaletteLinks(?NavItem $parentItem = null): array
     {
         $displayItem = $parentItem ?? $this;
 
@@ -588,7 +588,7 @@ class NavItem
             ->icon($this->icon());
 
         if ($children = $this->resolveChildren()->children()) {
-            $childLinks = $children->flatMap(fn ($child) => $child->generateCommandPaletteLinks($this));
+            $childLinks = $children->flatMap(fn ($child) => $child->commandPaletteLinks($this));
         }
 
         return collect([$link])

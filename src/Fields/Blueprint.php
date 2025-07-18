@@ -792,7 +792,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
         File::put($path ?? $this->buildPath(), $this->fileContents());
     }
 
-    public function generateCommandPaletteLink(string $type, string $url): Link
+    public function commandPaletteLink(string $type, string $url): Link
     {
         $text = __('Blueprints').' » '.__($type).' » '.__($this->title());
 
