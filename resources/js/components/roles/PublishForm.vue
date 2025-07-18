@@ -4,60 +4,54 @@
             <Button type="submit" variant="primary" @click="save" :text="__('Save')" />
         </Header>
 
-        <ui-panel>
+        <Panel>
             <div class="publish-fields-fluid">
-                <ui-card class="field-w-50">
-                    <form-group
-                        handle="title"
-                        :display="__('Title')"
-                        :errors="errors.title"
-                        :instructions="__('messages.role_title_instructions')"
-                        v-model="title"
-                        :focus="true"
-                    />
-                </ui-card>
-                <ui-card class="field-w-50">
-                    <form-group
-                        fieldtype="slug"
-                        handle="handle"
-                        :display="__('Handle')"
-                        :instructions="__('messages.role_handle_instructions')"
-                        :errors="errors.title"
-                        v-model="handle"
-                    />
-                    <div class="p-6 pt-0 text-xs text-red-500" v-if="initialHandle && handle != initialHandle">
-                        {{ __('messages.role_change_handle_warning') }}
-                    </div>
-                </ui-card>
-                <ui-card class="field-w-100">
-                    <form-group
-                        v-if="canAssignSuper"
-                        class="toggle-fieldtype"
-                        fieldtype="toggle"
-                        handle="super"
-                        :display="__('permissions.super')"
-                        :instructions="__('permissions.super_desc')"
-                        v-model="isSuper"
-                    />
-                </ui-card>
+                <Field
+                    as="card"
+                    class="field-w-50"
+                    :label="__('Title')"
+                    :instructions="__('messages.role_title_instructions')"
+                    :errors="errors.title"
+                >
+                    <Input v-model="title" />
+                </Field>
+
+                <Field
+                    as="card"
+                    class="field-w-50"
+                    :label="__('Handle')"
+                    :instructions="__('messages.role_handle_instructions')"
+                    :errors="handleErrors"
+                >
+                    <Input v-model="handle" />
+                </Field>
+
+                <Field
+                    as="card"
+                    v-if="canAssignSuper"
+                    :label="__('permissions.super')"
+                    :instructions="__('permissions.super_desc')"
+                >
+                    <Switch v-model="isSuper" />
+                </Field>
             </div>
-        </ui-panel>
+        </Panel>
 
         <div v-if="!isSuper" class="space-y-6 mt-6">
-            <ui-panel v-for="group in permissions" :key="group.handle">
-                <ui-panel-header>
-                    <ui-heading :text="group.label" />
-                </ui-panel-header>
-                <ui-card>
+            <Panel v-for="group in permissions" :key="group.handle">
+                <PanelHeader>
+                    <Heading :text="group.label" />
+                </PanelHeader>
+                <Card>
                     <role-permission-tree :depth="1" :initial-permissions="group.permissions" />
-                </ui-card>
-            </ui-panel>
+                </Card>
+            </Panel>
         </div>
     </div>
 </template>
 
 <script>
-import { Header, Button } from '@statamic/ui';
+import { Header, Button, Panel, PanelHeader, Heading, Card, Switch, Field, Input } from '@statamic/ui';
 import { requireElevatedSession } from '@statamic/components/elevated-sessions';
 
 const checked = function (permissions) {
@@ -71,6 +65,13 @@ export default {
     components: {
         Header,
         Button,
+        Panel,
+        PanelHeader,
+        Heading,
+        Card,
+        Switch,
+        Field,
+        Input,
     },
 
     props: {
@@ -102,8 +103,14 @@ export default {
     },
 
     computed: {
-        hasErrors() {
-            return this.error || Object.keys(this.errors).length;
+        handleErrors() {
+            let errors = this.errors.handle || [];
+
+            if (this.initialHandle && this.handle !== this.initialHandle) {
+                errors = errors.concat(__('messages.role_change_handle_warning'));
+            }
+
+            return errors;
         },
 
         payload() {
