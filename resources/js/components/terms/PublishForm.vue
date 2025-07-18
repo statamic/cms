@@ -253,7 +253,7 @@ export default {
         },
 
         canSave() {
-            return !this.readOnly && this.isDirty && !this.somethingIsLoading;
+            return !this.readOnly && !this.somethingIsLoading;
         },
 
         livePreviewUrl() {
