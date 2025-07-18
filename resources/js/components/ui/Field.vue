@@ -76,7 +76,7 @@ const wrapperComponent = computed(() => props.as === 'card' ? Card : 'div');
             <slot v-if="!$slots.actions" name="label">
                 <Label v-if="label" v-bind="labelProps" class="flex-1" />
             </slot>
-            <Description :text="instructions" v-if="instructions && !instructionsBelow" class="mb-1.5" />
+            <Description :text="instructions" v-if="instructions && !instructionsBelow" class="mb-1.75 -mt-0.5" />
         </div>
         <slot />
         <Description :text="instructions" v-if="instructions && instructionsBelow" class="mt-2" />
