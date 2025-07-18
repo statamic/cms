@@ -38,20 +38,15 @@
         </Panel>
 
         <div v-if="!isSuper" class="space-y-6 mt-6">
-            <Panel v-for="group in permissions" :key="group.handle">
-                <PanelHeader>
-                    <Heading :text="group.label" />
-                </PanelHeader>
-                <Card>
-                    <role-permission-tree :depth="1" :initial-permissions="group.permissions" />
-                </Card>
-            </Panel>
+            <CardPanel v-for="group in permissions" :key="group.handle" :heading="group.label">
+                <role-permission-tree :depth="1" :initial-permissions="group.permissions" />
+            </CardPanel>
         </div>
     </div>
 </template>
 
 <script>
-import { Header, Button, Panel, PanelHeader, Heading, Card, Switch, Field, Input } from '@statamic/ui';
+import { Header, Button, CardPanel, Panel, PanelHeader, Heading, Card, Switch, Field, Input } from '@statamic/ui';
 import { requireElevatedSession } from '@statamic/components/elevated-sessions';
 
 const checked = function (permissions) {
@@ -65,6 +60,7 @@ export default {
     components: {
         Header,
         Button,
+        CardPanel,
         Panel,
         PanelHeader,
         Heading,
