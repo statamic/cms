@@ -2,6 +2,8 @@
 
 namespace Statamic\Fields;
 
+use Statamic\CommandPalette\Category;
+use Statamic\CommandPalette\Link;
 use Statamic\Events\FieldsetCreated;
 use Statamic\Events\FieldsetCreating;
 use Statamic\Events\FieldsetDeleted;
@@ -294,6 +296,15 @@ class Fieldset
         FieldsetReset::dispatch($this);
 
         return true;
+    }
+
+    public function generateCommandPaletteLink(): Link
+    {
+        $text = __('Fieldsets').' » '.__($this->title());
+
+        return (new Link($text, Category::Fields))
+            ->url($this->editUrl())
+            ->icon('fieldsets');
     }
 
     public static function __callStatic($method, $parameters)

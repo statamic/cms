@@ -4,7 +4,8 @@ namespace Statamic\CommandPalette;
 
 use Illuminate\Support\Collection;
 use Statamic\CP\Navigation\NavItem;
-use Statamic\Facades\CP\Nav;
+use Statamic\Facades;
+use Statamic\Fields\Fieldset;
 use Statamic\Support\Arr;
 
 class Palette
@@ -29,16 +30,30 @@ class Palette
     {
         return $this
             ->buildNav()
+            ->buildFields()
             ->buildActions()
             ->get();
     }
 
     protected function buildNav(): self
     {
-        Nav::build()
+        Facades\CP\Nav::build()
             ->flatMap(fn (array $section) => $section['items'])
             ->filter(fn (NavItem $item) => $item->url())
             ->flatMap(fn (NavItem $item) => $item->generateCommandPaletteLinks())
+            ->each(fn (Link $link) => $this->addCommand($link));
+
+        return $this;
+    }
+
+    protected function buildFields(): self
+    {
+        if (Facades\User::current()->cant('configure fields')) {
+            return $this;
+        }
+
+        Facades\Fieldset::all()
+            ->map(fn (Fieldset $fieldset) => $fieldset->generateCommandPaletteLink())
             ->each(fn (Link $link) => $this->addCommand($link));
 
         return $this;
