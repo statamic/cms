@@ -12,7 +12,7 @@ const props = defineProps({
     },
 });
 
-const { store, syncField, desyncField, asConfig } = injectContainerContext();
+const { store, syncField, desyncField, isTrackingOriginValues, asConfig } = injectContainerContext();
 const { fieldPathPrefix, metaPathPrefix } = injectFieldsContext();
 const handle = props.config.handle;
 
@@ -90,7 +90,6 @@ const shouldShowLabel = computed(
     () =>
         shouldShowLabelText.value || // Need to see the text
         isLocked.value || // Need to see the avatar
-        isLocalizable.value || // Need to see the icon
         isSyncable.value, // Need to see the icon
 );
 
@@ -98,16 +97,30 @@ const isLocalizable = computed(() => props.config.localizable);
 
 const isReadOnly = computed(() => {
     if (store.readOnly) return true;
-    if (store.isRoot === false && !isLocalizable.value) return true;
+
+    if (isTrackingOriginValues.value && isSyncable.value && !isLocalizable.value) return true;
 
     return isLocked.value || props.config.visibility === 'read_only' || false;
 });
 
 const isLocked = computed(() => false); // todo
-const isSyncable = computed(() => store.isRoot === false);
+
+const isSyncable = computed(() => {
+    // Only top-level fields can be synced.
+    if (isNested.value) return false;
+
+    // If origin values have been provided but the field is missing, there's nothing to sync.
+    return isTrackingOriginValues.value && store.originValues.hasOwnProperty(fullPath.value)
+});
+
 const isSynced = computed(() => isSyncable.value && !store.localizedFields.includes(fullPath.value));
 const isNested = computed(() => fullPath.value.includes('.'));
-const wrapperComponent = computed(() => asConfig.value && !isNested.value ? 'card' : 'div');
+const wrapperComponent = computed(() => {
+    // Todo: Find a way to not need to hard code this.
+    if (props.config.type === 'dictionary_fields') return 'div';
+
+    return asConfig.value && !isNested.value ? 'card' : 'div';
+});
 
 function sync() {
     syncField(fullPath.value);
@@ -162,7 +175,7 @@ function desync() {
             :read-only="isReadOnly"
             show-field-previews
             @update:value="valueUpdated"
-            @meta-updated="metaUpdated"
+            @update:meta="metaUpdated"
             @focus="focused"
             @blur="blurred"
             @replicator-preview-updated="replicatorPreviewUpdated"

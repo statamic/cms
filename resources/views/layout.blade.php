@@ -7,7 +7,7 @@
         @include('statamic::partials.head')
     </head>
 
-    <body class="bg-gray-800 dark:bg-gray-950 font-sans leading-normal text-gray-900 dark:text-white">
+    <body class="bg-gray-800 font-sans leading-normal text-gray-900 dark:text-white">
         <config-provider>
             <div id="statamic" v-cloak>
                 @include('statamic::partials.session-expiry')

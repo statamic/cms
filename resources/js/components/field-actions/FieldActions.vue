@@ -1,5 +1,5 @@
 <template>
-    <div class="field-dropdown">
+    <div class="field-dropdown relative -top-0.5">
         <div class="quick-list">
             <div class="quick-list-content">
                 <Button

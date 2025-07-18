@@ -1,5 +1,8 @@
 <template>
-    <div class="page-tree-branch flex" :class="{ 'ml-[-1.2rem]': isTopLevel, 'page-tree-branch--has-children': hasChildren }">
+    <div class="page-tree-branch flex" :class="{
+        'ml-[-24px]': inTopLevelSection,
+        'page-tree-branch--has-children': hasChildren,
+    }">
         <div class="page-move w-6" />
         <div class="flex flex-1 items-center p-1.5 text-xs leading-normal">
             <div class="flex gap-3 grow items-center" :class="{ 'opacity-50': isHidden || isInHiddenSection }">
@@ -10,7 +13,7 @@
 
                 <a
                     @click="$emit('edit', $event)"
-                    :class="{ 'text-sm font-medium is-top-level': isSection }"
+                    :class="{ 'text-sm font-medium is-section': isSection }"
                     v-text="__(item.text)"
                 />
 
@@ -20,7 +23,7 @@
                     icon="ui/chevron-down"
                     size="xs"
                     variant="ghost"
-                    :class="{ '-rotate-90': !isOpen }"
+                    :class="{ '-rotate-90 is-closed': !isOpen, 'is-open': isOpen }"
                     @click="$emit('toggle-open')"
                 />
             </div>
@@ -78,7 +81,7 @@
                             :item="item"
                             :depth="depth"
                             :remove-branch="remove"
-                            :is-top-level="isTopLevel"
+                            :in-top-level-section="inTopLevelSection"
                         />
                     </DropdownMenu>
                 </Dropdown>
@@ -151,7 +154,7 @@ export default {
         },
 
         isPinnedAlias() {
-            return data_get(this.item, 'manipulations.action') === '@alias' && this.isTopLevel;
+            return data_get(this.item, 'manipulations.action') === '@alias' && this.inTopLevelSection;
         },
 
         isAlias() {
@@ -170,8 +173,8 @@ export default {
             return data_get(this.item, 'manipulations.action') === '@create';
         },
 
-        isTopLevel() {
-            return this.stat.data?.text === 'Top Level' || this.stat.parent?.data?.text === 'Top Level';
+        inTopLevelSection() {
+            return this.parentSection?.data?.text === 'Top Level';
         },
     },
 

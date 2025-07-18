@@ -16,7 +16,7 @@
             @error="uploadError"
             v-slot="{ dragging }"
         >
-            <div class="">
+            <div>
                 <div
                     v-if="config.allow_uploads"
                     v-show="dragging && !showSelector"
@@ -153,7 +153,7 @@
         </uploader>
 
         <stack v-if="showSelector" name="asset-selector" @closed="closeSelector">
-            <selector
+            <Selector
                 :container="container"
                 :folder="folder"
                 :restrict-folder-navigation="restrictNavigation"
@@ -164,8 +164,7 @@
                 :columns="columns"
                 @selected="assetsSelected"
                 @closed="closeSelector"
-            >
-            </selector>
+            />
         </stack>
     </div>
 </template>
@@ -619,17 +618,20 @@ export default {
     },
 
     watch: {
-        assets(assets) {
-            if (this.initializing) return;
+        assets: {
+            deep: true,
+            handler(assets) {
+                if (this.initializing) return;
 
-            // The components deal with passing around asset objects, however
-            // our fieldtype is only concerned with their respective IDs.
-            this.update(this.assetIds);
+                // The components deal with passing around asset objects, however
+                // our fieldtype is only concerned with their respective IDs.
+                this.update(this.assetIds);
 
-            this.updateMeta({
-                ...this.meta,
-                data: [...assets],
-            });
+                this.updateMeta({
+                    ...this.meta,
+                    data: [...assets],
+                });
+            }
         },
 
         loading(loading) {

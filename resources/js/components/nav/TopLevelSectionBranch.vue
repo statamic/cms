@@ -2,7 +2,7 @@
     <div class="flex first-branch">
         <div
             v-if="!hasChildren"
-            class="w-full rounded-sm border border-dashed border-gray-500 p-2 text-center text-xs text-gray-600"
+            class="is-top-level-section-placeholder w-full rounded-lg border border-dashed border-blue-400 bg-blue-500/10 p-2"
         >
             &nbsp;
         </div>
@@ -17,7 +17,7 @@ export default {
 
     computed: {
         hasChildren() {
-            return this.stat.children.length > 0;
+            return this.stat.children.filter(node => node.hidden === false).length;
         },
     },
 };

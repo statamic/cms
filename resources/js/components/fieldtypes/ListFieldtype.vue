@@ -1,6 +1,6 @@
 <template>
-    <div class="table-field">
-        <table class="table-fieldtype-table" v-if="data.length > 0">
+    <div>
+        <table class="table-contained" v-if="data.length > 0">
             <sortable-list
                 v-model="data"
                 :vertical="true"
@@ -35,7 +35,7 @@
                         <td class="row-controls" v-if="!isReadOnly">
                             <button
                                 @click="deleteValue(index)"
-                                class="inline text-lg text-gray-600 antialiased hover:text-gray-900"
+                                class="inline text-lg antialiased opacity-25 hover:opacity-75 cursor-pointer"
                             >
                                 &times;
                             </button>
@@ -45,21 +45,23 @@
             </sortable-list>
         </table>
 
-        <button class="btn btn-sm" @click="addItem" v-if="!isReadOnly">
+        <Button @click="addItem" icon="plus" size="sm" v-if="!isReadOnly">
             {{ addButton }}
-        </button>
+        </Button>
     </div>
 </template>
 
 <script>
 import Fieldtype from './Fieldtype.vue';
 import { SortableList, SortableHelpers } from '../sortable/Sortable';
+import { Button } from 'statamic';
 
 export default {
     mixins: [Fieldtype, SortableHelpers],
 
     components: {
         SortableList,
+        Button,
     },
 
     data() {

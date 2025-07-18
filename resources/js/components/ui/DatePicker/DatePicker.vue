@@ -93,7 +93,7 @@ const calendarEvents = computed(() => ({
                         <DatePickerInput
                             v-if="item.part === 'literal'"
                             :part="item.part"
-                            :class="{ 'text-sm text-gray-500 antialiased': !item.contenteditable }"
+                            :class="{ 'text-sm text-gray-600 antialiased': !item.contenteditable }"
                         >
                             {{ item.value }}
                         </DatePickerInput>

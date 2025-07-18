@@ -15,6 +15,28 @@ function checkMaximumAmountOfItems() {
     if (maxSelections.value) newSelections = newSelections.slice(0, maxSelections.value);
     selections.value.splice(0, selections.value.length, ...newSelections);
 }
+
+function getAriaLabel() {
+    if (indeterminate.value) {
+        return __('select_all_items');
+    }
+    return anyItemsChecked.value ? __('deselect_all_items') : __('select_all_items');
+}
+
+function getScreenReaderText() {
+    const totalItems = items.value.length;
+    const selectedItems = selections.value.length;
+    
+    if (indeterminate.value) {
+        return __('items_selected_count', { selected: selectedItems, total: totalItems });
+    }
+    
+    if (anyItemsChecked.value) {
+        return __('all_items_selected', { total: totalItems });
+    }
+    
+    return __('no_items_selected', { total: totalItems });
+}
 </script>
 
 <template>
@@ -26,6 +48,11 @@ function checkMaximumAmountOfItems() {
             :indeterminate="indeterminate"
             id="checkerOfAllBoxes"
             class="relative top-0"
+            :aria-label="getAriaLabel()"
+            :aria-describedby="'toggle-all-description'"
         />
+        <span id="toggle-all-description" class="sr-only">
+            {{ getScreenReaderText() }}
+        </span>
     </label>
 </template>

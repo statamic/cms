@@ -1,14 +1,8 @@
 <template>
     <div>
-        <Button
-            v-if="!singleTab && tabs.length === 0"
-            :text="addTabText"
-            @click="addAndEditTab"
-        />
-
-        <div v-if="!singleTab && tabs.length > 0">
-            <Tabs v-model="currentTab">
-                <div class="flex items-center justify-between gap-x-2 mb-6">
+        <div>
+            <Tabs v-model="currentTab" :unmount-on-hide="false">
+                <div v-if="!singleTab && tabs.length > 0" class="flex items-center justify-between gap-x-2 mb-6">
                     <TabList class="flex-1">
                         <BlueprintTab
                             ref="tab"
@@ -25,6 +19,12 @@
 
                     <Button icon="plus" size="sm" round v-tooltip="addTabText" @click="addAndEditTab" />
                 </div>
+
+                <Button
+                    v-if="!singleTab && tabs.length === 0"
+                    :text="addTabText"
+                    @click="addAndEditTab"
+                />
 
                 <Description v-if="errors" v-for="(error, i) in errors" :key="i" :text="error" class="mt-2 text-red-500" />
 

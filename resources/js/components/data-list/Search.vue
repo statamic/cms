@@ -1,5 +1,5 @@
 <template>
-    <div class="min-w-64 lg:w-1/3">
+    <div class="flex-1 max-w-md">
         <Input
             autofocus
             ref="input"

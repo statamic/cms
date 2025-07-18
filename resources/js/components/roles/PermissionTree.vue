@@ -11,7 +11,7 @@
                 @update:modelValue="updatePermission(permission, $event)"
             />
 
-            <role-permission-tree
+            <PermissionTree
                 v-if="permission.children.length"
                 :depth="depth + 1"
                 :initial-permissions="permission.children"

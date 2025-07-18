@@ -1,9 +1,9 @@
 @theme inline {
-
     --color-primary: var(--color-zinc-800);
     --color-primary-border: color-mix(in oklch, var(--color-primary) 100%, black 20%);
     --color-primary-hover: color-mix(in oklch, var(--color-primary) 100%, black 30%);
     --color-primary-gap: color-mix(in oklch, var(--color-primary) 100%, black 50%);
+    --color-success: var(--color-green-400);
     --color-gray-50: var(--color-zinc-50);
     --color-gray-100: var(--color-zinc-100);
     --color-gray-200: var(--color-zinc-200);
@@ -71,6 +71,12 @@
     --color-dark-gray: #404040;
 }
 
+.dark {
+    @theme inline {
+        --color-success: var(--color-green-500);
+    }
+}
+
 @theme {
     --text-4xs: 0.4rem;
     --text-3xs: 0.5rem;
@@ -116,7 +122,7 @@
 
 @layer components {
     .content-card {
-        @apply min-h-full px-6 md:px-12 pb-6 bg-white border dark:bg-gray-900 dark:border-y-0 dark:border-r-0 border-gray-200 dark:border-white/10 rounded-2xl dark:rounded-none;
+        @apply min-h-full px-6 md:px-12 pb-6 bg-white border dark:bg-gray-900 dark:border-y-0 dark:border-r-0 border-gray-200 dark:border-white/7 rounded-2xl dark:rounded-none;
     }
 }
 

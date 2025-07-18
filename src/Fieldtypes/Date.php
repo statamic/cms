@@ -132,7 +132,7 @@ class Date extends Fieldtype
         }
 
         if ($value === 'now') {
-            return now('UTC')->toIso8601ZuluString();
+            return now('UTC')->toIso8601ZuluString('millisecond');
         }
 
         // If the value is an array, this field probably used to be a range. In this case, we'll use the start date.
@@ -140,7 +140,7 @@ class Date extends Fieldtype
             $value = $value['start'];
         }
 
-        return $this->parseSaved($value)->toIso8601ZuluString();
+        return $this->parseSaved($value)->toIso8601ZuluString('millisecond');
     }
 
     private function preProcessRange($value)
@@ -156,8 +156,8 @@ class Date extends Fieldtype
             $carbon = $this->parseSavedToCarbon($value);
 
             return [
-                'start' => $carbon->copy()->startOfDay()->utc()->toIso8601ZuluString(),
-                'end' => $carbon->copy()->endOfDay()->utc()->toIso8601ZuluString(),
+                'start' => $carbon->copy()->startOfDay()->utc()->toIso8601ZuluString('millisecond'),
+                'end' => $carbon->copy()->endOfDay()->utc()->toIso8601ZuluString('millisecond'),
             ];
         }
 
@@ -236,8 +236,8 @@ class Date extends Fieldtype
             }
 
             return [
-                'start' => $this->parseSaved($value['start'])->toIso8601ZuluString(),
-                'end' => $this->parseSaved($value['end'])->toIso8601ZuluString(),
+                'start' => $this->parseSaved($value['start'])->toIso8601ZuluString('millisecond'),
+                'end' => $this->parseSaved($value['end'])->toIso8601ZuluString('millisecond'),
                 ...$common,
             ];
         }
@@ -248,7 +248,7 @@ class Date extends Fieldtype
         }
 
         return [
-            'date' => $this->parseSaved($value)->toIso8601ZuluString(),
+            'date' => $this->parseSaved($value)->toIso8601ZuluString('millisecond'),
             ...$common,
         ];
     }

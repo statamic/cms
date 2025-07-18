@@ -12,6 +12,7 @@ const { allowsSelections, reorderable, hasActions, visibleColumns, allowsMultipl
             <th
                 v-if="allowsSelections || reorderable"
                 :class="{ 'checkbox-column': !reorderable, 'handle-column': reorderable }"
+                scope="col"
             >
                 <ToggleAll v-if="allowsSelections && allowsMultipleSelections" />
             </th>
@@ -20,7 +21,7 @@ const { allowsSelections, reorderable, hasActions, visibleColumns, allowsMultipl
             <!--                        <template v-if="type === 'entries'">{{ __('Collection') }}</template>-->
             <!--                        <template v-if="type === 'terms'">{{ __('Taxonomy') }}</template>-->
             <!--                    </th>-->
-            <th class="actions-column" v-if="hasActions" />
+            <th scope="col" class="actions-column" v-if="hasActions" />
         </tr>
     </thead>
 </template>

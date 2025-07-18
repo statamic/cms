@@ -249,16 +249,16 @@ const modalClasses = cva({
                                 </ComboboxGroup>
                             </ComboboxViewport>
                             <footer
-                                class="flex items-center gap-4 rounded-b-xl border-t border-gray-200/80 bg-gray-50 px-6 py-3 dark:border-gray-950 dark:bg-gray-900"
+                                class="flex items-center gap-4 rounded-b-xl border-t border-gray-200/80 bg-gray-50 px-6 py-3 dark:border-gray-950 dark:bg-gray-800/20"
                             >
                                 <div class="flex items-center gap-1.5">
                                     <Icon name="up-square" class="size-4 text-gray-500" />
                                     <Icon name="down-square" class="size-4 text-gray-500" />
-                                    <span class="text-sm text-gray-600">Navigate</span>
+                                    <span class="text-sm text-gray-600 dark:text-gray-500">Navigate</span>
                                 </div>
                                 <div class="flex items-center gap-1.5">
                                     <Icon name="return-square" class="size-4 text-gray-500" />
-                                    <span class="text-sm text-gray-600">Select</span>
+                                    <span class="text-sm text-gray-600 dark:text-gray-500">Select</span>
                                 </div>
                             </footer>
                         </ComboboxContent>

@@ -7,12 +7,12 @@ export const [injectContainerContext, provideContainerContext] = createContext('
 <script setup>
 import uniqid from 'uniqid';
 import { usePublishContainerStore } from '@statamic/stores/publish-container.js';
-import { watch, provide, getCurrentInstance, ref, onBeforeUnmount, toRef } from 'vue';
+import { watch, provide, getCurrentInstance, ref, computed, onBeforeUnmount, toRef } from 'vue';
 import Component from '@statamic/components/Component.js';
 import { getActivePinia } from 'pinia';
 import Tabs from './Tabs.vue';
 
-const emit = defineEmits(['update:modelValue', 'update:visibleValues']);
+const emit = defineEmits(['update:modelValue', 'update:visibleValues', 'update:modifiedFields']);
 
 const container = getCurrentInstance();
 
@@ -41,11 +41,9 @@ const props = defineProps({
     },
     originValues: {
         type: Object,
-        default: () => ({}),
     },
     originMeta: {
         type: Object,
-        default: () => ({}),
     },
     errors: {
         type: Object,
@@ -54,12 +52,8 @@ const props = defineProps({
     site: {
         type: String,
     },
-    localizedFields: {
+    modifiedFields: {
         type: Array,
-    },
-    isRoot: {
-        type: [Boolean, undefined],
-        default: undefined,
     },
     trackDirtyState: {
         type: Boolean,
@@ -86,8 +80,7 @@ const store = usePublishContainerStore(props.name, {
     originValues: props.originValues,
     originMeta: props.originMeta,
     errors: props.errors,
-    isRoot: props.isRoot,
-    localizedFields: props.localizedFields,
+    localizedFields: props.modifiedFields,
     site: props.site,
     reference: props.reference,
     readOnly: props.readOnly,
@@ -118,14 +111,21 @@ watch(
 );
 
 watch(
+    () => props.meta,
+    (meta) => store.setMeta(meta),
+    { deep: true },
+);
+
+watch(
     () => props.errors,
     (errors) => store.setErrors(errors),
     { deep: true },
 );
 
 watch(
-    () => props.isRoot,
-    (isRoot) => store.setIsRoot(isRoot),
+    () => store.localizedFields,
+    (values) => emit('update:modifiedFields', values),
+    { deep: true },
 );
 
 watch(
@@ -174,6 +174,7 @@ provideContainerContext({
     container,
     components,
     asConfig: toRef(() => props.asConfig),
+    isTrackingOriginValues: computed(() => !!props.originValues),
 });
 
 defineExpose({

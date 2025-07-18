@@ -14,7 +14,7 @@ import {
     CalendarPrev,
     CalendarNext,
 } from 'reka-ui';
-import { parseDate } from '@internationalized/date';
+import { parseAbsolute } from '@internationalized/date';
 import { Icon } from '@statamic/ui';
 
 defineOptions({ name: 'Calendar' });
@@ -44,10 +44,10 @@ const components = computed(() => ({
 const emit = defineEmits(['update:modelValue']);
 
 const minValue = computed(() =>
-    props.min ? (typeof props.min === 'string' ? parseDate(props.min) : props.min) : null,
+    props.min ? (typeof props.min === 'string' ? parseAbsolute(props.min) : props.min) : null,
 );
 const maxValue = computed(() =>
-    props.max ? (typeof props.max === 'string' ? parseDate(props.max) : props.max) : null,
+    props.max ? (typeof props.max === 'string' ? parseAbsolute(props.max) : props.max) : null,
 );
 </script>
 

@@ -30,27 +30,25 @@
                     <div class="editor-preview md:min-h-auto flex min-h-[45vh] w-full flex-1 flex-col justify-between bg-gray-800 shadow-[inset_0px_4px_3px_0px_black] dark:bg-gray-900 md:w-1/2 md:flex-auto md:grow lg:w-2/3 md:ltr:rounded-se-md">
                         <!-- Toolbar -->
                         <div v-if="isToolbarVisible" class="@container/toolbar dark flex items-center justify-center gap-2 px-2 py-4">
-                            <ui-button v-if="isImage && isFocalPointEditorEnabled" @click.prevent="openFocalPointEditor" icon="focus" variant="filled" v-tooltip="__('Focal Point')" />
-                            <ui-button v-if="canRunAction('rename_asset')" @click.prevent="runAction('rename_asset')" icon="rename" variant="filled" v-tooltip="__('Rename')" />
-                            <ui-button v-if="canRunAction('move_asset')" @click.prevent="runAction('move_asset')" icon="move-folder" variant="filled" v-tooltip="__('Move to Folder')" />
-                            <ui-button v-if="canRunAction('replace_asset')" @click.prevent="runAction('replace_asset')" icon="replace" variant="filled" v-tooltip="__('Replace')" />
-                            <ui-button v-if="canRunAction('reupload_asset')" @click.prevent="runAction('reupload_asset')" icon="upload-cloud" variant="filled" v-tooltip="__('Reupload')" />
-                            <ui-button v-if="asset.allowDownloading" @click="download" icon="download" variant="filled" v-tooltip="__('Download')" />
-                            <ui-button v-if="allowDeleting && canRunAction('delete')" @click="runAction('delete')" icon="trash" variant="filled" v-tooltip="__('Delete')" />
-
                             <ItemActions
-                                v-if="actionsMenu.length"
                                 :item="id"
                                 :url="actionUrl"
-                                :actions="actionsMenu"
+                                :actions="actions"
                                 @started="actionStarted"
                                 @completed="actionCompleted"
                                 v-slot="{ actions }"
                             >
+                                <ui-button v-if="isImage && isFocalPointEditorEnabled" @click.prevent="openFocalPointEditor" icon="focus" variant="filled" v-tooltip="__('Focal Point')" />
+                                <ui-button v-if="canRunAction('rename_asset')" @click.prevent="runAction(actions, 'rename_asset')" icon="rename" variant="filled" v-tooltip="__('Rename')" />
+                                <ui-button v-if="canRunAction('move_asset')" @click.prevent="runAction(actions, 'move_asset')" icon="move-folder" variant="filled" v-tooltip="__('Move to Folder')" />
+                                <ui-button v-if="canRunAction('replace_asset')" @click.prevent="runAction(actions, 'replace_asset')" icon="replace" variant="filled" v-tooltip="__('Replace')" />
+                                <ui-button v-if="canRunAction('reupload_asset')" @click.prevent="runAction(actions, 'reupload_asset')" icon="upload-cloud" variant="filled" v-tooltip="__('Reupload')" />
+                                <ui-button v-if="asset.allowDownloading" @click="download" icon="download" variant="filled" v-tooltip="__('Download')" />
+                                <ui-button v-if="allowDeleting && canRunAction('delete')" @click="runAction(actions, 'delete')" icon="trash" variant="filled" v-tooltip="__('Delete')" />
                                 <Dropdown class="me-4">
                                     <DropdownMenu>
                                         <DropdownItem
-                                            v-for="action in actions"
+                                            v-for="action in filterForActionsMenu(actions)"
                                             :key="action.handle"
                                             :text="__(action.title)"
                                             :icon="action.icon"
@@ -149,15 +147,6 @@
                 </div>
             </template>
 
-            <editor-actions
-                v-if="actions.length"
-                :id="id"
-                :actions="actions"
-                :url="actionUrl"
-                @started="actionStarted"
-                @completed="actionCompleted"
-            />
-
             <focal-point-editor
                 v-if="showFocalPointEditor && isFocalPointEditorEnabled"
                 :data="values.focus"
@@ -170,7 +159,6 @@
 </template>
 
 <script>
-import EditorActions from './EditorActions.vue';
 import FocalPointEditor from './FocalPointEditor.vue';
 import PdfViewer from './PdfViewer.vue';
 import { pick, flatten } from 'lodash-es';
@@ -178,14 +166,13 @@ import { Dropdown, DropdownMenu, DropdownItem, PublishContainer, PublishTabs } f
 import ItemActions from '@statamic/components/actions/ItemActions.vue';
 
 export default {
-    emits: ['previous', 'next', 'saved', 'closed', 'action-completed'],
+    emits: ['previous', 'next', 'saved', 'closed', 'action-started', 'action-completed'],
 
     components: {
         Dropdown,
         DropdownMenu,
         DropdownItem,
         ItemActions,
-        EditorActions,
         FocalPointEditor,
         PdfViewer,
         PublishContainer,
@@ -254,24 +241,6 @@ export default {
 
         isToolbarVisible() {
             return !this.readOnly && this.showToolbar;
-        },
-
-        actionsMenu() {
-            // We filter out the actions that are already in the toolbar.
-            // We don't want them to appear in the dropdown as well.
-            // If we filtered them out in PHP they wouldn't appear as buttons.
-            return this.actions.filter(
-                (action) =>
-                    ![
-                        'rename_asset',
-                        'move_asset',
-                        'replace_asset',
-                        'reupload_asset',
-                        'download_asset',
-                        'delete',
-                        'copy_asset_url',
-                    ].includes(action.handle),
-            );
         },
     },
 
@@ -381,18 +350,11 @@ export default {
             this.$dirty.add(this.publishContainer);
         },
 
-        // We only want to close when clicking the save button, not when saving when navigating between prev/next assets.
-        // TODO: Can likely be refactored when we implement the new publish form components.
-        saveAndClose() {
-            this.save();
-            this.close();
-        },
-
         save() {
             this.saving = true;
             const url = cp_url(`assets/${utf8btoa(this.id)}`);
 
-            this.$axios
+            return this.$axios
                 .patch(url, this.$refs.container.store.visibleValues)
                 .then((response) => {
                     this.$emit('saved', response.data.asset);
@@ -413,7 +375,13 @@ export default {
                     } else {
                         this.$toast.error(__('Something went wrong'));
                     }
+
+                    throw e;
                 });
+        },
+
+        saveAndClose() {
+            this.save().then(() => this.close());
         },
 
         clearErrors() {
@@ -447,24 +415,39 @@ export default {
             return this.actions.find((action) => action.handle == handle);
         },
 
-        runAction(handle) {
-            this.$events.$emit('editor-action-selected', {
-                action: handle,
-                selection: this.id,
-            });
+        runAction(actions, handle) {
+            actions
+                .find((action) => action.handle === handle)
+                .run();
         },
 
-        actionStarted(event) {
-            this.$events.$emit('editor-action-started');
+        actionStarted() {
+            this.$emit('action-started');
         },
 
         actionCompleted(successful, response) {
-            this.$events.$emit('editor-action-completed', successful, response);
             this.$emit('action-completed', successful, response);
             if (successful) {
                 this.close();
             }
         },
+
+        filterForActionsMenu(actions) {
+            // We filter out the actions that are already in the toolbar.
+            // We don't want them to appear in the dropdown as well.
+            // If we filtered them out in PHP they wouldn't appear as buttons.
+            const buttonActions = [
+                'rename_asset',
+                'move_asset',
+                'replace_asset',
+                'reupload_asset',
+                'download_asset',
+                'delete',
+                'copy_asset_url',
+            ];
+
+            return actions.filter((action) => !buttonActions.includes(action.handle));
+        }
     },
 };
 </script>

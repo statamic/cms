@@ -27,7 +27,6 @@
         :initial-origin-meta="{{ json_encode($originMeta) }}"
         initial-site="{{ $locale }}"
         :initial-is-working-copy="{{ $str::bool($hasWorkingCopy) }}"
-        :initial-is-root="{{ $str::bool($isRoot) }}"
         :revisions-enabled="{{ $str::bool($revisionsEnabled) }}"
         :initial-read-only="{{ $str::bool($readOnly) }}"
         :preloaded-assets="{{ json_encode($preloadedAssets) }}"

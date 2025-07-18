@@ -27,7 +27,7 @@ class NavigationPagesController extends CpController
         [$values, $meta] = $this->extractValuesAndMeta($page, $blueprint);
 
         if ($entry = $page->entry()) {
-            [$originValues, $originMeta] = $this->extractValuesAndMeta($entry, $blueprint);
+            [$originValues, $originMeta] = $this->extractOnlyOriginValuesAndMeta($entry, $blueprint);
         }
 
         return [
@@ -55,7 +55,7 @@ class NavigationPagesController extends CpController
         [$values, $meta, $extraValues] = $this->extractValuesAndMeta($page, $blueprint);
 
         if ($entry = $page->entry()) {
-            [$originValues, $originMeta] = $this->extractValuesAndMeta($entry, $blueprint);
+            [$originValues, $originMeta] = $this->extractOnlyOriginValuesAndMeta($entry, $blueprint);
         }
 
         return [
@@ -97,6 +97,22 @@ class NavigationPagesController extends CpController
             ->intersect($navFields)->values()
             ->flip()->forget('url')
             ->flip()->all();
+    }
+
+    private function extractOnlyOriginValuesAndMeta($entry, $blueprint)
+    {
+        [$originValues, $originMeta] = $this->extractValuesAndMeta($entry, $blueprint);
+
+        // The Publish components will only consider fields in originValues syncable.
+        // Fields that exist only in the nav blueprint will have nothing in the
+        // entry to sync back to so we will filter those out.
+        $blueprintKeys = $blueprint->fields()->all()->keys()->all();
+        $entryKeys = array_keys($this->getEntryValues($entry));
+        $uniqueKeys = collect($entryKeys)->diff($blueprintKeys)->push('title')->values()->all();
+        $originValues = collect($originValues)->only($uniqueKeys)->all();
+        $originMeta = collect($originMeta)->only($uniqueKeys)->all();
+
+        return [$originValues, $originMeta];
     }
 
     private function extractValuesAndMeta($page, $blueprint)

@@ -33,7 +33,7 @@ class CoreNav
     public static function make()
     {
         (new static)
-            ->makeTopLevel()
+            ->makeTopLevelSection()
             ->makeContentSection()
             ->makeFieldsSection()
             ->makeToolsSection()
@@ -42,11 +42,11 @@ class CoreNav
     }
 
     /**
-     * Make top level items.
+     * Make top level section items.
      *
      * @return $this
      */
-    protected function makeTopLevel()
+    protected function makeTopLevelSection()
     {
         if (count(config('statamic.cp.widgets')) > 0 || config('statamic.cp.start_page') === 'dashboard') {
             Nav::topLevel('Dashboard')

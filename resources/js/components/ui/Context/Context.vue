@@ -26,7 +26,7 @@ const contextContentClasses = cva({
 
 <template>
     <ContextMenuRoot>
-        <ContextMenuTrigger data-ui-context-trigger>
+        <ContextMenuTrigger as-child data-ui-context-trigger>
             <slot name="trigger">
                 <Button icon="ui/dots" variant="ghost" size="sm" v-bind="attrs" />
             </slot>

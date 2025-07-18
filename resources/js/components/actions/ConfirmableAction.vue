@@ -40,9 +40,13 @@ let runButtonText = computed(() => {
     return __n(props.action.buttonText, props.selections);
 });
 
-function onDone() {
+function onSuccess() {
     running.value = false;
     reset();
+}
+
+function onError() {
+    running.value = false;
 }
 
 function confirm() {
@@ -61,7 +65,7 @@ function confirmed() {
 function runAction() {
     requireElevatedSessionIf(props.action.requiresElevatedSession).then(() => {
         running.value = true;
-        emit('confirmed', props.action, values.value, onDone);
+        emit('confirmed', props.action, values.value, onSuccess, onError);
     });
 }
 
@@ -111,7 +115,6 @@ defineExpose({
             name="confirm-action"
             :blueprint="fieldset"
             v-model="values"
-            :values="values"
             :meta="action.meta"
             :errors="errors"
         >

@@ -147,7 +147,7 @@ function getRange(start, end) {
 <template>
     <div class="flex">
         <div class="flex flex-1 items-center">
-            <div class="text-sm text-gray-500" v-if="showTotals && totalItems > 0">
+            <div class="text-sm text-gray-600" v-if="showTotals && totalItems > 0">
                 {{ __(':start-:end of :total', { start: fromItem, end: toItem, total: totalItems }) }}
             </div>
         </div>
@@ -185,7 +185,7 @@ function getRange(start, end) {
         </div>
 
         <div class="flex flex-1 items-center justify-end" v-if="perPage && showPerPageSelector">
-            <span class="me-3 text-sm text-gray-500">{{ __('Per Page') }}</span>
+            <span class="me-3 text-sm text-gray-600">{{ __('Per Page') }}</span>
             <Select
                 class="w-auto!"
                 size="sm"

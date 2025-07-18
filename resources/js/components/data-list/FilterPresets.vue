@@ -1,7 +1,7 @@
 <template>
     <div>
         <div
-            class="relative flex shrink-0 space-x-2 border-b border-gray-200 text-sm text-gray-400 dark:border-gray-700 dark:text-gray-500"
+            class="relative flex shrink-0 space-x-2 border-b border-gray-200 text-sm text-gray-400 dark:border-gray-700/50 dark:text-gray-500"
         >
             <FilterTrigger :active="!activePreset" @click="viewAll" :text="__('All')" />
             <template v-for="(preset, handle) in presets">

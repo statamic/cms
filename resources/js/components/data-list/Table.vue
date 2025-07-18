@@ -18,6 +18,7 @@
                 <th
                     v-if="allowBulkActions || reorderable"
                     :class="{ 'checkbox-column': !reorderable, 'handle-column': reorderable }"
+                    scope="col"
                 >
                     <data-list-toggle-all ref="toggleAll" v-if="allowBulkActions && !singleSelect" />
                 </th>
@@ -37,7 +38,7 @@
                     <template v-if="type === 'entries'">{{ __('Collection') }}</template>
                     <template v-if="type === 'terms'">{{ __('Taxonomy') }}</template>
                 </th>
-                <th class="actions-column" />
+                <th class="actions-column" scope="col" />
             </tr>
         </thead>
         <sortable-list
