@@ -29,7 +29,6 @@ class UpdaterController extends CpController
             'requestError' => $licenses->requestFailed(),
             'statamic' => Marketplace::statamic()->changelog(),
             'addons' => $addons->filter->existsOnMarketplace(),
-            'unlistedAddons' => $addons->reject->existsOnMarketplace(),
         ]);
     }
 

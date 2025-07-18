@@ -72,21 +72,6 @@
                     </ui-card>
                 </ui-panel>
             @endif
-
-            @if ($unlistedAddons->count())
-                <ui-panel heading="{{ __('Unlisted Addons') }}">
-                    <ui-card class="py-0!">
-                        <ui-table class="w-full">
-                            @foreach ($unlistedAddons as $addon)
-                                <ui-table-row>
-                                    <ui-table-cell class="w-64 font-bold">{{ $addon->name() }}</ui-table-cell>
-                                    <ui-table-cell>{{ $addon->version() }}</ui-table-cell>
-                                </ui-table-row>
-                            @endforeach
-                        </ui-table>
-                    </ui-card>
-                </ui-panel>
-            @endif
         </section>
 
         <x-statamic::docs-callout
