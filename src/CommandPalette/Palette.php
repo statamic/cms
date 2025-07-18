@@ -29,7 +29,7 @@ class Palette
     public function build(): Collection
     {
         return $this
-            ->buildNav()
+            // ->buildNav()
             ->buildFields()
             ->buildActions()
             ->get();
@@ -58,6 +58,10 @@ class Palette
 
         Facades\Taxonomy::all()
             ->flatMap(fn ($taxonomy) => $taxonomy->commandPaletteLinksForBlueprints())
+            ->each(fn (Link $link) => $this->addCommand($link));
+
+        Facades\Nav::all()
+            ->map(fn ($nav) => $nav->commandPaletteLinkForBlueprint())
             ->each(fn (Link $link) => $this->addCommand($link));
 
         // TODO: Womp, got to end of this and realized they don't have `editUrl()` methods, so we'll refactor this to what's above ^
