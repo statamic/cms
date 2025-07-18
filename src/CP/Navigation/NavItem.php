@@ -583,7 +583,7 @@ class NavItem
             $text .= ' » '.__($this->display());
         }
 
-        $link = new Link(text: $text, category: Category::Navigation)
+        $link = (new Link(text: $text, category: Category::Navigation))
             ->url($this->url())
             ->icon($this->icon());
 
