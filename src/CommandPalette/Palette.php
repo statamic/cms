@@ -52,6 +52,18 @@ class Palette
             return $this;
         }
 
+        // TODO: Womp, got to end of this and realized they don't have `editUrl()` methods, so we'll refactor this to what's above ^
+        // collect()
+        //     ->merge(Facades\Collection::all()->flatMap(fn ($collection) => $collection->entryBlueprints()))
+        //     ->merge(Facades\Taxonomy::all()->flatMap(fn ($taxonomy) => $taxonomy->termBlueprints()))
+        //     ->merge(Facades\Nav::all()->map->blueprint())
+        //     ->merge(Facades\GlobalSet::all()->map->blueprint())
+        //     ->merge(Facades\AssetContainer::all()->map->blueprint())
+        //     ->merge(Blueprint::getAdditionalNamespaces()->keys()->flatMap(fn (string $key) => Blueprint::in($key)->sortBy(fn (Blueprint $blueprint) => $blueprint->title())))
+        //     ->flatten()
+        //     ->map(fn (Blueprint $blueprint) => $blueprint->generateCommandPaletteLink())
+        //     ->each(fn (Link $link) => $this->addCommand($link));
+
         Facades\Fieldset::all()
             ->map(fn (Fieldset $fieldset) => $fieldset->generateCommandPaletteLink())
             ->each(fn (Link $link) => $this->addCommand($link));
