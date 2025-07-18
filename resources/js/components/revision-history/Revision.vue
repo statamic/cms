@@ -113,7 +113,6 @@ export default {
                 initialOriginMeta: 'originMeta',
                 initialSite: 'locale',
                 initialIsWorkingCopy: 'hasWorkingCopy',
-                initialIsRoot: 'isRoot',
                 initialReadOnly: 'readOnly',
             },
         };

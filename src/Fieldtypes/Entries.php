@@ -58,7 +58,6 @@ class Entries extends Relationship
         'initialOriginMeta' => 'originMeta',
         'initialSite' => 'locale',
         'initialIsWorkingCopy' => 'hasWorkingCopy',
-        'initialIsRoot' => 'isRoot',
         'initialReadOnly' => 'readOnly',
         'revisionsEnabled' => 'revisionsEnabled',
         'collectionHandle' => 'collection',

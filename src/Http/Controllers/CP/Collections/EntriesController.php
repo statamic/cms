@@ -133,7 +133,6 @@ class EntriesController extends CpController
             'locale' => $entry->locale(),
             'localizedFields' => $entry->data()->keys()->all(),
             'originBehavior' => $collection->originBehavior(),
-            'isRoot' => $entry->isRoot(),
             'hasOrigin' => $hasOrigin,
             'originValues' => $originValues ?? null,
             'originMeta' => $originMeta ?? null,
