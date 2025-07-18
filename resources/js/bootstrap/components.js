@@ -49,7 +49,6 @@ import Avatar from '../components/Avatar.vue';
 import CreateEntryButton from '../components/entries/CreateEntryButton.vue';
 import Popover from '../components/Popover.vue';
 import Portal from '../components/portals/Portal.vue';
-import PermissionTree from '../components/roles/PermissionTree.vue';
 import ConfirmationModal from '../components/modals/ConfirmationModal.vue';
 import KeyboardShortcutsModal from '../components/modals/KeyboardShortcutsModal.vue';
 import FieldActionModal from '../components/field-actions/FieldActionModal.vue';
@@ -132,9 +131,6 @@ export default function registerGlobalComponents(app) {
     app.component('portal', Portal);
     app.component('code-block', CodeBlock);
     app.component('date-time', DateTime);
-
-    // Recursive
-    app.component('role-permission-tree', PermissionTree);
 
     // Modals
     app.component(

@@ -39,7 +39,7 @@
 
         <div v-if="!isSuper" class="space-y-6 mt-6">
             <CardPanel v-for="group in permissions" :key="group.handle" :heading="group.label">
-                <role-permission-tree :depth="1" :initial-permissions="group.permissions" />
+                <PermissionTree :depth="1" :initial-permissions="group.permissions" />
             </CardPanel>
         </div>
     </div>
@@ -48,6 +48,7 @@
 <script>
 import { Header, Button, CardPanel, Panel, PanelHeader, Heading, Card, Switch, Field, Input } from '@statamic/ui';
 import { requireElevatedSession } from '@statamic/components/elevated-sessions';
+import PermissionTree from '@statamic/components/roles/PermissionTree.vue';
 
 const checked = function (permissions) {
     return permissions.reduce((carry, permission) => {
@@ -58,6 +59,7 @@ const checked = function (permissions) {
 
 export default {
     components: {
+        PermissionTree,
         Header,
         Button,
         CardPanel,
