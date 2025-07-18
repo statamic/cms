@@ -62,7 +62,7 @@ const wrapperComponent = computed(() => props.as === 'card' ? Card : 'div');
         <div
             v-if="$slots.actions"
             :class="[
-                'flex items-center gap-x-1 h-6',
+                'flex items-center gap-x-1',
                 props.label || $slots.label ? 'justify-between' : 'justify-end',
             ]"
             data-ui-field-header
@@ -72,7 +72,7 @@ const wrapperComponent = computed(() => props.as === 'card' ? Card : 'div');
             </slot>
             <slot name="actions" />
         </div>
-        <div data-ui-field-text class="mb-1.5">
+        <div v-if="label || (instructions && !instructionsBelow) || ($slots.label && !$slots.actions)" data-ui-field-text class="mb-1.5">
             <slot v-if="!$slots.actions" name="label">
                 <Label v-if="label" v-bind="labelProps" class="flex-1" />
             </slot>
