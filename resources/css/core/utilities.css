@@ -33,6 +33,13 @@
     text-box: cap alphabetic;
 }
 
+@utility placeholder-xs {
+    /* =Jay. The default of 1em on field inputs feels a bit clumsy/big */
+    &::placeholder {
+        font-size: 0.975em;
+    }
+}
+
 /* UTILITIES / STATES
 =================================================== */
 /* Here we typically need a negative outline-offset because of the inner shadow on inputs */

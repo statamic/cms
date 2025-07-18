@@ -1,5 +1,4 @@
 @theme inline {
-
     --color-primary: var(--color-zinc-800);
     --color-primary-border: color-mix(in oklch, var(--color-primary) 100%, black 20%);
     --color-primary-hover: color-mix(in oklch, var(--color-primary) 100%, black 30%);
