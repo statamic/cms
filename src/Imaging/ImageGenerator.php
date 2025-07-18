@@ -15,6 +15,7 @@ use Statamic\Facades\Asset as Assets;
 use Statamic\Facades\Config;
 use Statamic\Facades\File;
 use Statamic\Facades\Glide;
+use Statamic\Facades\URL;
 use Statamic\Support\Str;
 
 class ImageGenerator
@@ -208,7 +209,7 @@ class ImageGenerator
             return [$item->disk()->filesystem()->getDriver(), $item->path()];
         }
 
-        if (Str::startsWith($item, ['http://', 'https://'])) {
+        if (URL::isAbsolute($item)) {
             $parsed = $this->parseUrl($item);
 
             return [$this->guzzleSourceFilesystem($parsed['base']), $parsed['path']];
