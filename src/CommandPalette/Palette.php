@@ -3,6 +3,7 @@
 namespace Statamic\CommandPalette;
 
 use Illuminate\Support\Collection;
+use Statamic\Facades\CP\Nav;
 use Statamic\Support\Arr;
 
 class Palette
@@ -26,8 +27,20 @@ class Palette
     public function build(): Collection
     {
         return $this
+            ->buildNav()
             ->buildActions()
             ->get();
+    }
+
+    protected function buildNav(): self
+    {
+        Nav::build()
+            ->flatMap(fn ($section) => $section['items'])
+            ->filter(fn ($item) => $item->url())
+            ->flatMap(fn ($item) => $item->generateCommandPaletteLinks())
+            ->each(fn ($link) => $this->addCommand($link));
+
+        return $this;
     }
 
     protected function buildActions(): self
