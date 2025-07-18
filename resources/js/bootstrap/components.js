@@ -1,32 +1,13 @@
 import AssetManager from '../components/assets/AssetManager.vue';
 import Browser from '../components/assets/Browser/Browser.vue';
 import UpdatesBadge from '../components/UpdatesBadge.vue';
-import Container from '../components/publish/Container.vue';
-import PublishForm from '../components/publish/PublishForm.vue';
-import Fields from '../components/publish/Fields.vue';
-import Field from '../components/publish/Field.vue';
 import FullscreenHeader from '../components/publish/FullscreenHeader.vue';
 import FieldMeta from '../components/publish/FieldMeta.vue';
-import ConfigureTabs from '../components/configure/Tabs.vue';
-import PublishTabs from '../components/publish/Tabs.vue';
-import PublishSections from '../components/publish/Sections.vue';
-import PublishValidationErrors from '../components/publish/ValidationErrors.vue';
-import FormGroup from '../components/publish/FormGroup.vue';
 import LivePreview from '../components/live-preview/LivePreview.vue';
 import Popout from '../components/live-preview/Popout.vue';
 import EntryPublishForm from '../components/entries/PublishForm.vue';
 import TermPublishForm from '../components/terms/PublishForm.vue';
 import UserPublishForm from '../components/users/PublishForm.vue';
-import DataList from '../components/data-list/DataList.vue';
-import Table from '../components/data-list/Table.vue';
-import Search from '../components/data-list/Search.vue';
-import BulkActions from '../components/data-list/BulkActions.vue';
-import InlineActions from '../components/data-list/InlineActions.vue';
-import ColumnPicker from '../components/data-list/ColumnPicker.vue';
-import ToggleAll from '../components/data-list/ToggleAll.vue';
-import Pagination from '../components/data-list/Pagination.vue';
-import Filters from '../components/data-list/Filters.vue';
-import FilterPresets from '../components/data-list/FilterPresets.vue';
 import EntryListing from '../components/entries/Listing.vue';
 import CollectionListing from '../components/collections/Listing.vue';
 import TaxonomyListing from '../components/taxonomies/Listing.vue';
@@ -40,7 +21,6 @@ import FileIcon from '../components/FileIcon.vue';
 import LoadingGraphic from '../components/LoadingGraphic.vue';
 import DropdownList from '../components/DropdownList.vue';
 import DropdownItem from '../components/DropdownItem.vue';
-import ValidationErrors from '../components/ValidationErrors.vue';
 import Slugify from '../components/slugs/Slugify.vue';
 import ElementContainer from '../components/ElementContainer.vue';
 import Avatar from '../components/Avatar.vue';
@@ -68,18 +48,8 @@ export default function registerGlobalComponents(app) {
     app.component('updates-badge', UpdatesBadge);
 
     // Publish
-    app.component('publish-container', Container);
-    app.component('publish-form', PublishForm);
-    app.component('publish-fields', Fields);
-    app.component('publish-fields-container', FieldsContainer);
-    app.component('publish-field', Field);
     app.component('publish-field-meta', FieldMeta);
     app.component('publish-field-fullscreen-header', FullscreenHeader);
-    app.component('configure-tabs', ConfigureTabs);
-    app.component('publish-tabs', PublishTabs);
-    app.component('publish-sections', PublishSections);
-    app.component('publish-validation-errors', PublishValidationErrors);
-    app.component('form-group', FormGroup);
 
     app.component('live-preview', LivePreview);
     app.component('live-preview-popout', Popout);
@@ -87,18 +57,6 @@ export default function registerGlobalComponents(app) {
     app.component('EntryPublishForm', EntryPublishForm);
     app.component('TermPublishForm', TermPublishForm);
     app.component('UserPublishForm', UserPublishForm);
-
-    // Data List
-    app.component('data-list', DataList);
-    app.component('data-list-table', Table);
-    app.component('data-list-search', Search);
-    app.component('data-list-bulk-actions', BulkActions);
-    app.component('data-list-inline-actions', InlineActions);
-    app.component('data-list-column-picker', ColumnPicker);
-    app.component('data-list-toggle-all', ToggleAll);
-    app.component('data-list-pagination', Pagination);
-    app.component('data-list-filters', Filters);
-    app.component('data-list-filter-presets', FilterPresets);
 
     // Resource Type Lists
     app.component('entry-list', EntryListing);
@@ -119,7 +77,6 @@ export default function registerGlobalComponents(app) {
     app.component('loading-graphic', LoadingGraphic);
     app.component('dropdown-list', DropdownList);
     app.component('dropdown-item', DropdownItem);
-    app.component('validation-errors', ValidationErrors);
     app.component('slugify', Slugify);
     app.component('element-container', ElementContainer);
     app.component('avatar', Avatar);
