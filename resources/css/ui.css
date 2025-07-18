@@ -3,6 +3,7 @@
     --color-primary-border: color-mix(in oklch, var(--color-primary) 100%, black 20%);
     --color-primary-hover: color-mix(in oklch, var(--color-primary) 100%, black 30%);
     --color-primary-gap: color-mix(in oklch, var(--color-primary) 100%, black 50%);
+    --color-success: var(--color-green-400);
     --color-gray-50: var(--color-zinc-50);
     --color-gray-100: var(--color-zinc-100);
     --color-gray-200: var(--color-zinc-200);
@@ -68,6 +69,12 @@
     --color-blue: #0000ff;
     --color-gray: #808080;
     --color-dark-gray: #404040;
+}
+
+.dark {
+    @theme inline {
+        --color-success: var(--color-green-500);
+    }
 }
 
 @theme {
