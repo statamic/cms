@@ -7,6 +7,8 @@ use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Statamic\Fields\FieldRepository;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
+use Statamic\CommandPalette\Category;
+use Statamic\CommandPalette\Link;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Query\QueryableValue;
 use Statamic\CP\Column;
@@ -788,5 +790,14 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
     public function writeFile($path = null)
     {
         File::put($path ?? $this->buildPath(), $this->fileContents());
+    }
+
+    public function generateCommandPaletteLink(string $type, string $url): Link
+    {
+        $text = __('Blueprints').' » '.__($type).' » '.__($this->title());
+
+        return (new Link($text, Category::Fields))
+            ->url($url)
+            ->icon('blueprints');
     }
 }
