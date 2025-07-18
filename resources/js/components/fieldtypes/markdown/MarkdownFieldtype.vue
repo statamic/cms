@@ -81,7 +81,7 @@
                                             <Button
                                                 icon="markdown"
                                                 size="sm"
-                                                variant="ghost"
+                                                variant="subtle"
                                                 @click="showCheatsheet = true"
                                                 :aria-label="__('Show Markdown Cheatsheet')"
                                                 :text="__('Markdown Cheatsheet')"

@@ -54,7 +54,6 @@
             :errors="errors"
             :site="site"
             :localized-fields="localizedFields"
-            :is-root="isRoot"
             :sync-field-confirmation-text="syncFieldConfirmationText"
         />
     </div>
@@ -108,7 +107,6 @@ export default {
         method: String,
         isCreating: Boolean,
         initialReadOnly: Boolean,
-        initialIsRoot: Boolean,
         canEdit: Boolean,
         canConfigure: Boolean,
         configureUrl: String,
@@ -130,7 +128,6 @@ export default {
             originValues: this.initialOriginValues || {},
             originMeta: this.initialOriginMeta || {},
             site: this.initialSite,
-            isRoot: this.initialIsRoot,
             readOnly: this.initialReadOnly,
             syncFieldConfirmationText: __('messages.sync_entry_field_confirmation_text'),
         };
@@ -246,7 +243,6 @@ export default {
                 this.hasOrigin = data.hasOrigin;
                 this.actions = data.actions;
                 this.fieldset = data.blueprint;
-                this.isRoot = data.isRoot;
                 this.site = localization.handle;
                 this.localizing = false;
                 this.$nextTick(() => this.$refs.container.clearDirtyState());

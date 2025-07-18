@@ -33,10 +33,10 @@
     }
 
     /* Nice progressive enhancement to visually connect tree node children by removing the top left border radius.. */
-    /* [1] When there are children, except when followed by another tree that has children, or a top level tree */
-    .tree-node:not(.nav-builder *):has(.page-tree-branch--has-children):not(:has(+ .tree-node .page-tree-branch--has-children)) + .tree-node .page-tree-branch,
-    /* [2] (always) the first level down that has children */
-    .tree-node:has(.is-top-level) + .tree-node:not(:has(.is-top-level)) .page-tree-branch {
+    /* 2nd level down */
+    .tree-node:has(.is-section) + .tree-node .page-tree-branch,
+    /* 3rd level down */
+    .tree-node:has(.page-tree-branch--has-children):has(.is-open) + .tree-node .page-tree-branch {
         border-top-left-radius: 0;
     }
 }
@@ -48,24 +48,32 @@
     background: none;
     @apply max-w-4xl mx-auto;
     .tree-node {
-        @apply pe-1 bg-gray-100;
-        &:has(.is-top-level) {
-            @apply mt-8 pt-1 px-1! bg-gray-100 rounded-t-2xl;
+        @apply bg-gray-100;
+        .tree-node-inner {
+            @apply px-1;
         }
-        &:has(+ .tree-node .is-top-level),
+        &:has(.is-section) {
+            @apply mt-8 pt-1 bg-gray-100 rounded-t-2xl;
+        }
+        &:has(+ .tree-node .is-section),
         &:last-child {
             @apply pb-1 rounded-b-2xl;
         }
-        /* When we're dragging the tree node, remove the background otherwise it bleeds into the node we're moving it to */
-        &.drag-placeholder-wrapper {
+        &:has(.is-top-level-section-placeholder) {
             background: none;
+            @apply mt-1;
         }
-        /* When we're dragging the tree node, make sure the preceding node is rounded */
-        &:has(+ .drag-placeholder-wrapper) {
+        /* When we're dragging a section tree node, remove the background otherwise it bleeds into the node we're moving it to */
+        &.drag-placeholder-wrapper:has(.is-section-placeholder) {
+            background: none;
+            @apply -mx-1 mt-2;
+        }
+        /* When we're dragging a section tree node, make sure the preceding node is rounded. Check for a suceeding .is-section-placeholder to ensure we don't affect dragging _inside_ sections */
+        &:has(+ .drag-placeholder-wrapper):has(+ * .is-section-placeholder) {
             @apply pb-1 rounded-b-2xl;
         }
-        /* When we're dragging the tree node, make sure the succeeding node is rounded */
-        .drag-placeholder-wrapper + & {
+        /* When we're dragging a section tree node, make sure the succeeding node is rounded */
+        .drag-placeholder-wrapper:has(.is-section-placeholder) + & {
             @apply rounded-t-2xl;
         }
     }

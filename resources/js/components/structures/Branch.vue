@@ -9,7 +9,7 @@
                 <ui-icon v-if="isRoot" name="home" class="size-4" v-tooltip="__('This is the root page')" />
                 <a
                     @click.prevent="$emit('edit', $event)"
-                    :class="{ 'text-sm font-medium is-top-level': isTopLevel }"
+                    :class="{ 'text-sm font-medium is-top-level-branch': isTopLevelBranch }"
                     :href="page.edit_url"
                     v-text="title"
                 />
@@ -27,7 +27,7 @@
                     icon="ui/chevron-down"
                     size="xs"
                     variant="ghost"
-                    :class="{ '-rotate-90': !isOpen }"
+                    :class="{ '-rotate-90 is-closed': !isOpen, 'is-open': isOpen }"
                     @click.stop="$emit('toggle-open')"
                 />
 
@@ -92,7 +92,7 @@ export default {
     },
 
     computed: {
-        isTopLevel() {
+        isTopLevelBranch() {
             return this.depth === 1;
         },
 

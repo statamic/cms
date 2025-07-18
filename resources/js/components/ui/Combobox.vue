@@ -200,13 +200,16 @@ function updateDropdownOpen(open) {
 }
 
 function updateModelValue(value) {
-    let originalValue = props.modelValue;
+    let originalValue = props.modelValue || [];
 
     searchQuery.value = '';
     emit('update:modelValue', value);
 
+    if (!Array.isArray(value)) value = [value];
+    if (!Array.isArray(originalValue)) originalValue = [originalValue];
+
     value
-        .filter((option) => !originalValue.includes(option))
+        .filter((option) => !originalValue?.includes(option))
         .forEach((option) => emit('selected', option));
 }
 
@@ -223,6 +226,8 @@ function onPaste(e) {
 // When it's a taggable combobox with no options, we need to push the value here as updateModelValue won't be called.
 function pushTaggableOption(e) {
     if (props.taggable && props.options.length === 0) {
+        if (e.target.value === '') return;
+
         if (props.modelValue.includes(e.target.value)) {
             searchQuery.value = '';
             return;
@@ -260,7 +265,7 @@ defineExpose({
                     <ComboboxInput
                         v-if="searchable && (dropdownOpen || !modelValue || (multiple && placeholder))"
                         ref="search"
-                        class="w-full text-gray-700 opacity-100 focus:outline-none"
+                        class="w-full text-gray-700 opacity-100 focus:outline-none placeholder-xs"
                         v-model="searchQuery"
                         :placeholder
                         @paste.prevent="onPaste"

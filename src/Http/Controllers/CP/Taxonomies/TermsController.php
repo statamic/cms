@@ -117,7 +117,6 @@ class TermsController extends CpController
             'published' => $term->published(),
             'locale' => $term->locale(),
             'localizedFields' => $term->data()->keys()->all(),
-            'isRoot' => $term->isRoot(),
             'hasOrigin' => $hasOrigin,
             'originValues' => $originValues ?? null,
             'originMeta' => $originMeta ?? null,

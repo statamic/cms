@@ -3,6 +3,7 @@ import { computed, useTemplateRef, watch } from 'vue';
 import { injectContainerContext } from './Container.vue';
 import { injectFieldsContext } from './FieldsProvider.vue';
 import { Field, Icon, Tooltip, Label } from '@statamic/ui';
+import FieldActions from '@statamic/components/field-actions/FieldActions.vue';
 import ShowField from '@statamic/components/field-conditions/ShowField.js';
 
 const props = defineProps({
@@ -141,7 +142,12 @@ const isSyncable = computed(() => {
 
 const isSynced = computed(() => isSyncable.value && !localizedFields.value.includes(fullPath.value));
 const isNested = computed(() => fullPath.value.includes('.'));
-const wrapperComponent = computed(() => asConfig.value && !isNested.value ? 'card' : 'div');
+const wrapperComponent = computed(() => {
+    // Todo: Find a way to not need to hard code this.
+    if (props.config.type === 'dictionary_fields') return 'div';
+
+    return asConfig.value && !isNested.value ? 'card' : 'div';
+});
 
 function sync() {
     syncField(fullPath.value);
@@ -176,7 +182,7 @@ function desync() {
             </Label>
         </template>
         <template #actions v-if="shouldShowFieldActions">
-            <publish-field-actions :actions="fieldActions" />
+            <FieldActions :actions="fieldActions" />
         </template>
         <div class="text-xs text-red-500" v-if="!fieldtypeComponentExists">
             Component <code v-text="fieldtypeComponent"></code> does not exist.
@@ -196,7 +202,7 @@ function desync() {
             :read-only="isReadOnly"
             show-field-previews
             @update:value="valueUpdated"
-            @meta-updated="metaUpdated"
+            @update:meta="metaUpdated"
             @focus="focused"
             @blur="blurred"
             @replicator-preview-updated="replicatorPreviewUpdated"

@@ -7,7 +7,6 @@ use Statamic\CommandPalette\Category;
 use Statamic\CommandPalette\ContentSearchResult;
 use Statamic\Contracts\Search\Result;
 use Statamic\Facades\CommandPalette;
-use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Search;
 use Statamic\Facades\User;
 
@@ -15,12 +14,6 @@ class CommandPaletteController extends CpController
 {
     public function index()
     {
-        // TODO:
-        // - Cache nav and/or built command palette?
-        // - Bust cache when nav preferences saved?
-
-        Nav::build(commands: true);
-
         return [
             'categories' => Category::order(),
             'items' => CommandPalette::build(),

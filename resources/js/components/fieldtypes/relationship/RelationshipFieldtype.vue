@@ -160,7 +160,7 @@ export default {
         },
 
         linkExistingItem() {
-            this.$refs.input.$refs.existing.click();
+            this.$refs.input.$refs.existing.$el.click();
         },
 
         unlinkAll() {

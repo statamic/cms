@@ -510,11 +510,13 @@ class Field implements Arrayable
                 'display' => __('Instructions'),
                 'instructions' => __('statamic::messages.fields_instructions_instructions'),
                 'type' => 'textarea',
+                'width' => 75,
             ],
             'instructions_position' => [
                 'display' => __('Instructions Position'),
                 'instructions' => __('statamic::messages.fields_instructions_position_instructions'),
-                'type' => 'select',
+                'type' => 'radio',
+                'width' => 25,
                 'options' => [
                     'above' => __('Above'),
                     'below' => __('Below'),
@@ -538,15 +540,7 @@ class Field implements Arrayable
                 'unless' => [
                     'type' => 'section',
                 ],
-            ],
-            'sortable' => [
-                'display' => __('Sortable'),
-                'instructions' => __('statamic::messages.fields_sortable_instructions'),
-                'type' => 'toggle',
-                'default' => true,
-                'unless' => [
-                    'visibility' => 'equals computed',
-                ],
+                'width' => 50,
             ],
             'visibility' => [
                 'display' => __('Visibility'),
@@ -559,6 +553,17 @@ class Field implements Arrayable
                 ],
                 'default' => 'visible',
                 'type' => 'select',
+                'width' => 50,
+            ],
+            'sortable' => [
+                'display' => __('Sortable'),
+                'instructions' => __('statamic::messages.fields_sortable_instructions'),
+                'type' => 'toggle',
+                'default' => true,
+                'unless' => [
+                    'visibility' => 'equals computed',
+                ],
+                'width' => 25,
             ],
             'replicator_preview' => [
                 'display' => __('Preview'),
@@ -566,6 +571,7 @@ class Field implements Arrayable
                 'type' => 'toggle',
                 'validate' => 'boolean',
                 'default' => true,
+                'width' => 25,
             ],
             'duplicate' => [
                 'display' => __('Duplicate'),
@@ -573,12 +579,16 @@ class Field implements Arrayable
                 'type' => 'toggle',
                 'validate' => 'boolean',
                 'default' => true,
+                'width' => 25,
+
             ],
             'actions' => [
                 'display' => __('Actions'),
                 'instructions' => __('statamic::messages.fields_actions_instructions'),
                 'type' => 'toggle',
                 'default' => true,
+                'width' => 25,
+
             ],
         ])->map(fn ($field, $handle) => compact('handle', 'field'))->values()->all();
 

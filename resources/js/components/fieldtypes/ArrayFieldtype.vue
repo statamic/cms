@@ -84,11 +84,12 @@
                             />
                         </td>
                         <td class="row-controls" v-if="!isReadOnly">
-                            <a
+                            <button
                                 @click="deleteOrConfirm(index)"
                                 class="inline text-lg antialiased opacity-25 hover:opacity-75 cursor-pointer"
-                                >&times;</a
                             >
+                                &times;
+                            </button>
                         </td>
                     </tr>
                 </tbody>

@@ -8,6 +8,8 @@
             :disabled="config.disabled"
             :granularity="datePickerGranularity"
             :inline="isInline"
+            :min="config.earliest_date"
+            :max="config.latest_date"
             :model-value="datePickerValue"
             :read-only="isReadOnly"
             @update:model-value="datePickerUpdated"

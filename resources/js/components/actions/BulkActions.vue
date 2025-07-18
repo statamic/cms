@@ -50,11 +50,11 @@ function getActions() {
 
 let errors = ref({});
 
-function runAction(action, values, done) {
+function runAction(action, values, onSuccess, onError) {
     errors.value = {};
     emit('started');
 
-    runServerAction({ action, values, done, url: props.url, selections: props.selections })
+    runServerAction({ action, values, onSuccess, onError, url: props.url, selections: props.selections })
         .then(data => emit('completed', true, data))
         .catch(data => {
             errors.value = data.errors;
