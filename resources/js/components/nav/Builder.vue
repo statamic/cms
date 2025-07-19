@@ -19,8 +19,8 @@
                     <Button :text="__('Add')" icon-append="ui/chevron-down" />
                 </template>
                 <DropdownMenu>
-                    <DropdownItem :text="__('Add Nav Item')" @click="addItem($refs.tree.rootChildren[0])" icon="add-list" />
-                    <DropdownItem :text="__('Add Section')" @click="addSection" icon="add" />
+                    <DropdownItem :text="__('Add Nav Item')" @click="addItem($refs.tree.rootChildren[0])" icon="plus" />
+                    <DropdownItem :text="__('Add Section')" @click="addSection" icon="add-section" />
                 </DropdownMenu>
             </Dropdown>
 
@@ -104,22 +104,25 @@
                             @toggle-open="stat.open = !stat.open"
                         >
                             <template #branch-options="{ inTopLevelSection }">
-                                <DropdownItem v-if="stat.level < 3" :text="__('Add Item')" @click="addItem(stat)" />
-                                <DropdownItem :text="__('Edit')" @click="editItem(stat)" />
+                                <DropdownItem v-if="stat.level < 3" :text="__('Add Item')" @click="addItem(stat)" icon="plus" />
+                                <DropdownItem :text="__('Edit')" @click="editItem(stat)" icon="edit" />
                                 <DropdownItem
                                     v-if="!isSectionNode(stat) && !inTopLevelSection"
                                     :text="__('Pin to Top Level')"
+                                    icon="pin"
                                     @click="pinItem(stat)"
                                 />
                                 <DropdownItem
                                     v-if="!isSectionNode(stat)"
                                     :text="__('Duplicate')"
+                                    icon="duplicate"
                                     @click="aliasItem(stat)"
                                 />
                                 <DropdownSeparator />
                                 <DropdownItem
                                     v-if="itemIsVisible(stat)"
                                     :text="isHideable(stat) ? __('Hide') : __('Remove')"
+                                    :icon="isHideable(stat) ? 'eye-closed' : 'trash'"
                                     variant="destructive"
                                     @click="isHideable(stat) ? hideItem(stat) : removeItem(stat)"
                                 />
