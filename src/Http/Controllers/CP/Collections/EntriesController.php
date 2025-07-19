@@ -7,7 +7,6 @@ use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Exceptions\BlueprintNotFoundException;
 use Statamic\Facades\Action;
-use Statamic\Facades\Asset;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
@@ -155,7 +154,6 @@ class EntriesController extends CpController
                 ];
             })->values()->all(),
             'hasWorkingCopy' => $entry->hasWorkingCopy(),
-            'preloadedAssets' => $this->extractAssetsFromValues($values),
             'revisionsEnabled' => $entry->revisionsEnabled(),
             'canManagePublishState' => User::current()->can('publish', $entry),
             'previewTargets' => $collection->previewTargets()->all(),
@@ -421,26 +419,6 @@ class EntriesController extends CpController
 
             return null;
         };
-    }
-
-    protected function extractAssetsFromValues($values)
-    {
-        return collect($values)
-            ->filter(function ($value) {
-                return is_string($value);
-            })
-            ->map(function ($value) {
-                preg_match_all('/"asset::([^"]+)"/', $value, $matches);
-
-                return str_replace('\/', '/', $matches[1]) ?? null;
-            })
-            ->flatten(2)
-            ->unique()
-            ->map(function ($id) {
-                return Asset::find($id);
-            })
-            ->filter()
-            ->values();
     }
 
     private function validateUniqueUri($entry, $tree, $parent)

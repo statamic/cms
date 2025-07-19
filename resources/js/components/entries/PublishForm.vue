@@ -336,7 +336,6 @@ export default {
         initialReadOnly: Boolean,
         initialPermalink: String,
         revisionsEnabled: Boolean,
-        preloadedAssets: Array,
         canEditBlueprint: Boolean,
         canManagePublishState: Boolean,
         createAnotherUrl: String,
@@ -823,8 +822,6 @@ export default {
             this.quickSave = true;
             this.save();
         });
-
-        this.$refs.container.store.setPreloadedAssets(this.preloadedAssets);
 
         if (typeof this.autosaveInterval === 'number') {
             this.setAutosaveInterval();

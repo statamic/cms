@@ -192,7 +192,6 @@ export default {
         isInline: Boolean,
         initialReadOnly: Boolean,
         initialPermalink: String,
-        preloadedAssets: Array,
         canEditBlueprint: Boolean,
         createAnotherUrl: String,
         listingUrl: String,
@@ -454,8 +453,6 @@ export default {
             this.quickSave = true;
             this.save();
         });
-
-        this.$refs.container.store.setPreloadedAssets(this.preloadedAssets);
     },
 
     created() {

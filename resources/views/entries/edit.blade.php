@@ -27,7 +27,6 @@
         :initial-is-working-copy="{{ $str::bool($hasWorkingCopy) }}"
         :revisions-enabled="{{ $str::bool($revisionsEnabled) }}"
         :initial-read-only="{{ $str::bool($readOnly) }}"
-        :preloaded-assets="{{ json_encode($preloadedAssets) }}"
         :can-edit-blueprint="{{ $str::bool($user->can('configure fields')) }}"
         :can-manage-publish-state="{{ $str::bool($canManagePublishState) }}"
         create-another-url="{{ cp_route('collections.entries.create', [$collection, $locale]) }}"
