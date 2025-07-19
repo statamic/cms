@@ -114,7 +114,6 @@ const setFieldPreviewValue = (path, value) => {
 watch(
     values,
     (values) => {
-        if (values === props.modelValue) return;
         if (props.trackDirtyState) dirty();
         emit('update:modelValue', values);
     },
