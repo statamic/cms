@@ -87,7 +87,7 @@ onMounted(() => {
         </slot>
 
         <slot name="footer">
-            <footer class="flex justify-center">
+            <footer class="flex justify-center py-3">
                 <ui-button
                     variant="primary"
                     size="lg"
