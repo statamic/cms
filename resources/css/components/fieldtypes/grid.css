@@ -62,7 +62,8 @@
         @apply bg-gray-100;
     }
 
-    .grid-cell [data-ui-field-header] {
+    .grid-cell [data-ui-field-header],
+    .grid-cell [data-ui-label] {
         @apply hidden;
     }
 }
