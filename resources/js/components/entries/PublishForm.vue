@@ -387,6 +387,7 @@ export default {
             quickSaveKeyBinding: null,
             quickSave: false,
             isAutosave: false,
+            autosaveIntervalInstance: null,
             syncFieldConfirmationText: __('messages.sync_entry_field_confirmation_text'),
         };
     },
@@ -784,14 +785,12 @@ export default {
         },
 
         setAutosaveInterval() {
-            const interval = setInterval(() => {
+            this.autosaveIntervalInstance = setInterval(() => {
                 if (!this.isDirty) return;
 
                 this.isAutosave = true;
                 this.save();
             }, this.autosaveInterval);
-
-            this.$refs.container.setAutosaveInterval(interval);
         },
 
         afterActionSuccessfullyCompleted(response) {
@@ -847,7 +846,7 @@ export default {
     },
 
     beforeUnmount() {
-        this.$refs.container.store.clearAutosaveInterval();
+        if (this.autosaveIntervalInstance) clearInterval(this.autosaveIntervalInstance);
     },
 
     unmounted() {
