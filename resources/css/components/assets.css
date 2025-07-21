@@ -187,7 +187,8 @@
     }
 
     .publish-fields {
-        @apply block;
+        @apply grid grid-cols-none!;
+        --grid-columns: none !important;
     }
 }
 
