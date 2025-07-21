@@ -207,6 +207,7 @@ return [
     'preference_locale_instructions' => 'The preferred language for the control panel.',
     'preference_start_page_instructions' => 'The page to be shown when logging into the control panel.',
     'preference_contrast' => 'Choose your preferred contrast level.',
+    'preference_wcag' => 'We\'ve designed the control panel to meet the majority of WCAG 2.2 guidelines by default, but here you can choose to enforce stricter conformance.',
     'publish_actions_create_revision' => 'A revision will be created based off the working copy. The current revision will not change.',
     'publish_actions_current_becomes_draft_because_scheduled' => 'Since the current revision is published and you\'ve selected a date in the future, once you submit, the revision will act like a draft until the selected date.',
     'publish_actions_publish' => 'Changes to the working copy will applied to the entry and it will be published immediately.',

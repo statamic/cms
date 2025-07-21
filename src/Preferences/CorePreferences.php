@@ -35,6 +35,12 @@ class CorePreferences
                 'auto' => __('System'),
             ],
         ]);
+
+        Preference::register('wcag_conformity', [
+            'type' => 'toggle',
+            'display' => __('Strict WCAG 2.2 Conformity'),
+            'instructions' => __('statamic::messages.preference_wcag'),
+        ]);
     }
 
     private function localeOptions(): array

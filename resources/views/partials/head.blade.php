@@ -26,11 +26,15 @@
         if (!theme) theme = localStorage.getItem('statamic.theme') ?? 'auto';
         if (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) theme = 'dark';
         if (theme === 'dark') document.documentElement.classList.add('dark');
-        
+
         let contrast = {!! ($userContrast = $user?->preferences()['contrast'] ?? null) ? "'" . $userContrast . "'" : 'null' !!};
         if (!contrast) contrast = localStorage.getItem('statamic.contrast') ?? 'default';
         if (contrast === 'auto' && window.matchMedia('(prefers-contrast: more)').matches) contrast = 'increased';
         if (contrast === 'increased') document.documentElement.classList.add('contrast-increased');
+
+        let wcagConformity = {!! ($userWcag = $user?->preferences()['wcag_conformity'] ?? null) ? "'" . $userWcag . "'" : 'null' !!};
+        if (!wcagConformity) wcagConformity = localStorage.getItem('statamic.wcag_conformity') ?? false;
+        if (wcagConformity) document.documentElement.classList.add('wcag-conformity');
     })();
 </script>
 

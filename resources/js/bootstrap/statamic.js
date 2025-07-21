@@ -26,6 +26,7 @@ import Bard from '../components/Bard';
 import Components from '../components/Components';
 import Theme from '../components/Theme.js';
 import Contrast from '../components/Contrast.js';
+import Wcag from '../components/Wcag.js';
 import FieldConditions from '../components/FieldConditions';
 import Reveal from '../components/Reveal';
 import Echo from '../components/Echo';
@@ -186,6 +187,7 @@ export default {
         Object.assign(this.$app.config.globalProperties, {
             $theme: new Theme(this.initialConfig.user?.theme),
             $contrast: new Contrast(this.initialConfig.user?.preferences?.contrast),
+            $wcag: new Wcag(this.initialConfig.user?.preferences?.wcag_conformity),
         });
 
         Object.assign(this.$app.config.globalProperties, {
