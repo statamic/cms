@@ -78,4 +78,9 @@
         --focus-outline-offset: 4px;
         @apply rounded-xs;
     }
+
+    .group\/button button:focus {
+        /* Pull the focus state above any adjacent buttons e.g. >> /cp/collections/articles/entries - save button alongside the dropdown arrow */
+        z-index: var(--z-index-above);
+    }
 }

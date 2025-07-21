@@ -3,11 +3,11 @@
         <slot />
         <Dropdown v-if="showOptions" align="end">
             <template #trigger>
-                <Button variant="primary" icon="ui/chevron-down" />
+                <Button variant="primary" icon="ui/chevron-down" :aria-label="__('Save options')" />
             </template>
             <DropdownMenu>
-                <DropdownLabel v-text="__('After Saving')" />
-                <RadioGroup v-model="currentOption">
+                <DropdownLabel id="after-saving-label" v-text="__('After Saving')" />
+                <RadioGroup v-model="currentOption" aria-labelledby="after-saving-label">
                     <Radio :label="__('Go To Listing')" value="listing" />
                     <Radio :label="__('Continue Editing')" value="continue_editing" />
                     <Radio :label="__('Create Another')" value="create_another" />

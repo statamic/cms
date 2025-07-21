@@ -10,6 +10,7 @@
                     :icon-only="true"
                     size="xs"
                     variant="ghost"
+                    :aria-label="action.title"
                 >
                     <svg-icon :name="action.icon" class="size-3" />
                 </Button>
@@ -21,8 +22,10 @@
                 <DropdownMenu>
                     <DropdownItem
                         v-for="action in actions"
+                        :key="action.handle || action.title"
                         :text="action.title"
                         :variant="action.dangerous ? 'destructive' : 'default'"
+                        :aria-label="action.title"
                         @click="action.run(action)"
                     />
                 </DropdownMenu>
