@@ -25,22 +25,24 @@ class CorePreferences
             'instructions' => __('statamic::messages.preference_start_page_instructions'),
         ]);
 
-        Preference::register('contrast', [
-            'type' => 'select',
-            'display' => __('Contrast'),
-            'instructions' => __('statamic::messages.preference_contrast'),
-            'options' => [
-                'default' => __('Default'),
-                'increased' => __('Increased Contrast'),
-                'auto' => __('System'),
-            ],
-        ]);
+        Preference::tab('accessibility', __('Accessibility'), function () {
+            Preference::register('contrast', [
+                'type' => 'select',
+                'display' => __('Increase Contrast'),
+                'instructions' => __('statamic::messages.preference_contrast'),
+                'options' => [
+                    'default' => __('Default'),
+                    'increased' => __('Increased Contrast'),
+                    'auto' => __('System'),
+                ],
+            ]);
 
-        Preference::register('wcag_conformity', [
-            'type' => 'toggle',
-            'display' => __('Strict WCAG 2.2 Conformity'),
-            'instructions' => __('statamic::messages.preference_wcag'),
-        ]);
+            Preference::register('wcag_conformity', [
+                'type' => 'toggle',
+                'display' => __('Strict WCAG 2.2 Conformity'),
+                'instructions' => __('statamic::messages.preference_wcag'),
+            ]);
+        });
     }
 
     private function localeOptions(): array
