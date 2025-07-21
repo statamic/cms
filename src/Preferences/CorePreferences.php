@@ -32,16 +32,16 @@ class CorePreferences
                 'instructions' => __('statamic::messages.preference_wcag'),
             ]);
             Preference::register('contrast', [
-                 'type' => 'select',
-                 'display' => __('Increase Contrast'),
-                 'instructions' => __('statamic::messages.preference_contrast'),
-                 'default' => 'default',
-                 'options' => [
-                     'default' => __('Default'),
-                     'increased' => __('Increased Contrast'),
-                     'auto' => __('System'),
-                 ],
-             ]);
+                'type' => 'button_group',
+                'display' => __('Increase Contrast'),
+                'instructions' => __('statamic::messages.preference_contrast'),
+                'default' => 'default',
+                'options' => [
+                    'default' => __('Default'),
+                    'increased' => __('Increased Contrast'),
+                    'auto' => __('System'),
+                ],
+            ]);
         });
     }
 
