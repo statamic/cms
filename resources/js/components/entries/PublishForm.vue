@@ -238,6 +238,26 @@
                 </div>
             </div>
         </confirmation-modal>
+
+        <confirmation-modal
+            v-if="pendingLocalization"
+            :title="__('Unsaved Changes')"
+            :body-text="__('Are you sure? Unsaved changes will be lost.')"
+            :button-text="__('Continue')"
+            :danger="true"
+            @confirm="confirmSwitchLocalization"
+            @cancel="pendingLocalization = null"
+        />
+
+        <confirmation-modal
+            v-if="syncingField"
+            :title="__('Sync Field')"
+            :body-text="__('Are you sure? This field\'s value will be replaced by the value in the original entry.')"
+            :button-text="__('Sync Field')"
+            :danger="true"
+            @confirm="confirmSyncField"
+            @cancel="syncingField = null"
+        />
     </div>
 </template>
 
@@ -387,6 +407,8 @@ export default {
             quickSave: false,
             isAutosave: false,
             syncFieldConfirmationText: __('messages.sync_entry_field_confirmation_text'),
+            pendingLocalization: null,
+            syncingField: null,
         };
     },
 
@@ -615,11 +637,19 @@ export default {
             if (localization.active) return;
 
             if (this.isDirty) {
-                if (!confirm(__('Are you sure? Unsaved changes will be lost.'))) {
-                    return;
-                }
+                this.pendingLocalization = localization;
+                return;
             }
 
+            this.switchToLocalization(localization);
+        },
+
+        confirmSwitchLocalization() {
+            this.switchToLocalization(this.pendingLocalization);
+            this.pendingLocalization = null;
+        },
+
+        switchToLocalization(localization) {
             this.$dirty.remove(this.publishContainer);
 
             this.localizing = localization;
@@ -765,15 +795,18 @@ export default {
         },
 
         syncField(handle) {
-            if (!confirm("Are you sure? This field's value will be replaced by the value in the original entry."))
-                return;
+            this.syncingField = handle;
+        },
 
+        confirmSyncField() {
+            const handle = this.syncingField;
             this.localizedFields = this.localizedFields.filter((field) => field !== handle);
             this.$refs.container.setFieldValue(handle, this.originValues[handle]);
 
             // Update the meta for this field. For instance, a relationship field would have its data preloaded into it.
             // If you sync the field, the preloaded data would be outdated and an ID would show instead of the titles.
             this.meta[handle] = this.originMeta[handle];
+            this.syncingField = null;
         },
 
         desyncField(handle) {

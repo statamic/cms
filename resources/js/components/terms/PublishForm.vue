@@ -117,6 +117,16 @@
                 </PublishTabs>
             </LivePreview>
         </PublishContainer>
+
+        <confirmation-modal
+            v-if="pendingLocalization"
+            :title="__('Unsaved Changes')"
+            :body-text="__('Are you sure? Unsaved changes will be lost.')"
+            :button-text="__('Continue')"
+            :danger="true"
+            @confirm="confirmSwitchLocalization"
+            @cancel="pendingLocalization = null"
+        />
     </div>
 </template>
 
@@ -224,6 +234,7 @@ export default {
             quickSaveKeyBinding: null,
             quickSave: false,
             syncFieldConfirmationText: __('messages.sync_term_field_confirmation_text'),
+            pendingLocalization: null,
         };
     },
 
@@ -380,11 +391,19 @@ export default {
             if (localization.active) return;
 
             if (this.isDirty) {
-                if (!confirm(__('Are you sure? Unsaved changes will be lost.'))) {
-                    return;
-                }
+                this.pendingLocalization = localization;
+                return;
             }
 
+            this.switchToLocalization(localization);
+        },
+
+        confirmSwitchLocalization() {
+            this.switchToLocalization(this.pendingLocalization);
+            this.pendingLocalization = null;
+        },
+
+        switchToLocalization(localization) {
             this.localizing = localization.handle;
 
             if (localization.exists) {
