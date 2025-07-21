@@ -63,7 +63,8 @@
     }
 
     .grid-cell [data-ui-field-header],
-    .grid-cell [data-ui-label] {
+    .grid-cell [data-ui-label],
+    .grid-cell [data-ui-description] {
         @apply hidden;
     }
 }
