@@ -9,6 +9,8 @@ const props = defineProps({
     value: { type: String, required: true },
     label: { type: String, default: null },
     icon: { type: String, default: null },
+    disabled: { type: Boolean, default: false },
+    ariaDescribedby: { type: String, default: null },
 });
 
 const variant = inject('toggleVariant', 'default');
@@ -17,6 +19,16 @@ const size = inject('toggleSize', 'base');
 const slots = useSlots();
 const hasDefaultSlot = !!slots.default;
 const iconOnly = computed(() => !!props.icon && !hasDefaultSlot && !props.label);
+
+// Compute accessible label
+const accessibleLabel = computed(() => {
+    if (hasDefaultSlot) {
+        // If there's a default slot, let the content speak for itself
+        return props.label || null;
+    }
+    // For icon-only buttons, ensure we have a label
+    return props.label || (props.icon ? `Toggle ${props.value}` : null);
+});
 
 const toggleItemClasses = computed(() => {
     const classes = cva({
@@ -66,8 +78,25 @@ const toggleItemClasses = computed(() => {
 </script>
 
 <template>
-    <ToggleGroupItem :value="value" :aria-label="label" :class="toggleItemClasses" data-ui-group-target>
-        <Icon v-if="icon" :name="icon" class="text-gray-400" />
-        <slot v-if="label">{{ label }}</slot>
+    <ToggleGroupItem 
+        :value="value" 
+        :aria-label="accessibleLabel"
+        :aria-describedby="ariaDescribedby"
+        :disabled="disabled"
+        :class="toggleItemClasses" 
+        data-ui-group-target
+    >
+        <Icon 
+            v-if="icon" 
+            :name="icon" 
+            class="text-gray-400"
+            :aria-hidden="!iconOnly"
+        />
+        <span v-if="hasDefaultSlot">
+            <slot />
+        </span>
+        <span v-else-if="label">
+            {{ label }}
+        </span>
     </ToggleGroupItem>
 </template>
