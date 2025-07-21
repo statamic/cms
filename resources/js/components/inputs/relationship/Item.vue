@@ -111,12 +111,13 @@ export default {
             if (this.item.invalid) return;
 
             if (this.item.reference) {
-                const storeRefs = getActivePinia()
-                    ._s.values()
-                    .map((store) => store.reference);
-                if (Array.from(storeRefs).includes(this.item.reference)) {
-                    this.$toast.error(__("You're already editing this item."));
-                    return;
+                let parentContainer = this.publishContainer.parentContainer;
+                while (parentContainer) {
+                    if (parentContainer.reference.value === this.item.reference) {
+                        this.$toast.error(__("You're already editing this item."));
+                        return;
+                    }
+                    parentContainer = parentContainer.parentContainer;
                 }
             }
 

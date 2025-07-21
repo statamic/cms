@@ -72,6 +72,7 @@ const props = defineProps({
     }
 });
 
+const parentContainer = injectContainerContext(containerContextKey);
 const values = ref(props.modelValue);
 const extraValues = ref(props.extraValues);
 const hiddenFields = ref({});
@@ -186,6 +187,7 @@ function pushComponent(name, { props }) {
 
 provideContainerContext({
     name: toRef(() => props.name),
+    parentContainer,
     blueprint: toRef(() => props.blueprint),
     reference: toRef(() => props.reference),
     values,
