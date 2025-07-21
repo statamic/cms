@@ -203,16 +203,9 @@ class EditNavigationPageTest extends TestCase
                 ],
                 'originValues' => [
                     'title' => 'entry title (preprocessed)',
-                    'foo' => 'entry foo (preprocessed)',
-                    'bar' => 'entry bar (preprocessed)',
-                    'baz' => null,
                 ],
                 'originMeta' => [
                     'title' => ['hello' => 'world'],
-                    'url' => ['hello' => 'world'],
-                    'foo' => ['hello' => 'world'],
-                    'bar' => ['hello' => 'world'],
-                    'baz' => ['hello' => 'world'],
                 ],
                 'localizedFields' => [
                     'foo',
