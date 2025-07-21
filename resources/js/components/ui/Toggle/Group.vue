@@ -42,7 +42,7 @@ const groupClasses = cva({
                 '[&>*:first-child:not(:last-child)_[data-ui-group-target]]:rounded-e-none',
                 '[&>*:last-child:not(:first-child)_[data-ui-group-target]]:rounded-s-none',
             ],
-            false: 'gap-1.5',
+            false: 'gap-1',
         },
     },
 })({

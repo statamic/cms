@@ -9,7 +9,6 @@ const props = defineProps({
     value: { type: String, required: true },
     label: { type: String, default: null },
     icon: { type: String, default: null },
-    iconOnly: { type: Boolean, default: false },
 });
 
 const variant = inject('toggleVariant', 'default');
@@ -17,7 +16,7 @@ const size = inject('toggleSize', 'base');
 
 const slots = useSlots();
 const hasDefaultSlot = !!slots.default;
-const iconOnly = computed(() => (props.icon && !hasDefaultSlot && !props.text) || props.iconOnly);
+const iconOnly = computed(() => !!props.icon && !hasDefaultSlot && !props.label);
 
 const toggleItemClasses = computed(() => {
     const classes = cva({
@@ -49,16 +48,17 @@ const toggleItemClasses = computed(() => {
                 ghost: '',
             },
         },
+
         compoundVariants: [
-            { iconOnly: true, size: 'base', class: 'w-10 [&_svg]:size-4' },
-            { iconOnly: true, size: 'sm', class: 'w-8 [&_svg]:size-3.5' },
-            { iconOnly: true, size: 'xs', class: 'w-6.5 [&_svg]:size-3' },
+            { iconOnly: true, size: 'base', class: 'w-10 px-0! [&_svg]:size-4' },
+            { iconOnly: true, size: 'sm', class: 'w-8 px-0! [&_svg]:size-3.5' },
+            { iconOnly: true, size: 'xs', class: 'w-6.5 px-0! [&_svg]:size-3' },
         ],
     })({
         variant,
         size,
         groupBorder: variant,
-        iconOnly,
+        iconOnly: iconOnly.value,
     });
 
     return twMerge(classes);
@@ -68,6 +68,6 @@ const toggleItemClasses = computed(() => {
 <template>
     <ToggleGroupItem :value="value" :aria-label="label" :class="toggleItemClasses" data-ui-group-target>
         <Icon v-if="icon" :name="icon" class="text-gray-400" />
-        <slot>{{ label }}</slot>
+        <slot v-if="label">{{ label }}</slot>
     </ToggleGroupItem>
 </template>

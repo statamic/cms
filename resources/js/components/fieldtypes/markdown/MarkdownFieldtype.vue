@@ -31,13 +31,13 @@
                             @close="toggleFullscreen"
                         >
                             <markdown-toolbar
-                                :mode="mode"
+                                v-if="fullScreenMode"
+                                v-model:mode="mode"
                                 :buttons="buttons"
                                 :is-read-only="isReadOnly"
                                 :show-dark-mode="fullScreenMode"
                                 :dark-mode="darkMode"
                                 :is-fullscreen="true"
-                                @toggle-mode="mode = $event"
                                 @toggle-dark-mode="toggleDarkMode"
                                 @button-click="handleButtonClick"
                             />
@@ -45,13 +45,12 @@
 
                         <markdown-toolbar
                             v-if="!fullScreenMode"
-                            :mode="mode"
+                            v-model:mode="mode"
                             :buttons="buttons"
                             :is-read-only="isReadOnly"
                             :show-dark-mode="false"
                             :dark-mode="darkMode"
                             :is-fullscreen="false"
-                            @toggle-mode="mode = $event"
                             @toggle-dark-mode="toggleDarkMode"
                             @button-click="handleButtonClick"
                         />
