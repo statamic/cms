@@ -118,7 +118,6 @@ export default {
             originMeta: null,
             extraValues: null,
             localizedFields: null,
-            syncableFields: null,
             loading: true,
             saveKeyBinding: null,
             publishContainer: 'tree-page',
@@ -277,7 +276,6 @@ export default {
             this.originMeta = info.originMeta;
             this.extraValues = info.extraValues;
             this.localizedFields = info.localizedFields;
-            this.syncableFields = info.syncableFields;
         },
 
         emitPublishInfoUpdated(isNew) {
@@ -288,7 +286,6 @@ export default {
                 originMeta: this.originMeta,
                 extraValues: this.extraValues,
                 localizedFields: this.localizedFields,
-                syncableFields: this.syncableFields,
                 entry: this.entry,
                 new: isNew,
             });
