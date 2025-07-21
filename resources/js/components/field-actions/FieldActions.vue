@@ -16,7 +16,7 @@
             </div>
             <Dropdown>
                 <template #trigger>
-                    <Button icon="ui/dots" variant="ghost" size="xs" />
+                    <Button icon="ui/dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
                 </template>
                 <DropdownMenu>
                     <DropdownItem

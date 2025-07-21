@@ -43,7 +43,7 @@ function save() {
         <Header :title="__(title)" icon="groups">
             <Dropdown v-if="canEditBlueprint" class="me-2">
                 <template #trigger>
-                    <Button icon="ui/dots" variant="ghost" />
+                    <Button icon="ui/dots" variant="ghost" :aria-label="__('Open dropdown menu')" />
                 </template>
                 <DropdownMenu>
                     <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" :href="actions.editBlueprint" />
