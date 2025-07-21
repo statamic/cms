@@ -31,6 +31,16 @@
                 </component>
             </div>
         </stack>
+
+        <confirmation-modal
+            v-if="closingWithChanges"
+            :title="__('Unsaved Changes')"
+            :body-text="__('Are you sure? Unsaved changes will be lost.')"
+            :button-text="__('Discard Changes')"
+            :danger="true"
+            @confirm="confirmCloseWithChanges"
+            @cancel="closingWithChanges = false"
+        />
     </div>
 </template>
 
@@ -47,6 +57,7 @@ export default {
             loading: true,
             readOnly: false,
             componentPropValues: {},
+            closingWithChanges: false,
         };
     },
 
@@ -95,12 +106,16 @@ export default {
 
         shouldClose() {
             if (this.$dirty.has(this.publishContainer)) {
-                if (!confirm(__('Are you sure? Unsaved changes will be lost.'))) {
-                    return false;
-                }
+                this.closingWithChanges = true;
+                return false;
             }
 
             return true;
+        },
+
+        confirmCloseWithChanges() {
+            this.closingWithChanges = false;
+            this.$emit('closed');
         },
     },
 };
