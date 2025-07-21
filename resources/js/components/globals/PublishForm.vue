@@ -203,7 +203,6 @@ export default {
                         globalSet: this.initialHandle,
                         values: this.values,
                         container: this.$refs.container,
-                        storeName: this.publishContainer,
                     }),
                     new Request(this.actions.save, this.method, {
                         _blueprint: this.fieldset.handle,

@@ -341,7 +341,6 @@ export default {
                         taxonomy: this.taxonomyHandle,
                         values: this.values,
                         container: this.$refs.container,
-                        storeName: this.publishContainer,
                     }),
                     new Request(this.actions.save, this.method, {
                         _blueprint: this.fieldset.handle,
