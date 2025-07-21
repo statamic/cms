@@ -24,6 +24,16 @@ class CorePreferences
             'display' => __('Start Page'),
             'instructions' => __('statamic::messages.preference_start_page_instructions'),
         ]);
+
+        Preference::register('contrast', [
+            'type' => 'select',
+            'display' => __('Contrast'),
+            'instructions' => __('Choose your preferred contrast level'),
+            'options' => [
+                'default' => __('Default'),
+                'more' => __('More Contrast'),
+            ],
+        ]);
     }
 
     private function localeOptions(): array
