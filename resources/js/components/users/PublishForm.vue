@@ -139,7 +139,6 @@ export default {
                 .through([
                     new BeforeSaveHooks('user', {
                         values: this.values,
-                        container: this.$refs.container,
                     }),
                     new Request(this.actions.save, this.method),
                     new AfterSaveHooks('user', {

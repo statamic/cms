@@ -202,7 +202,6 @@ export default {
                     new BeforeSaveHooks('global-set', {
                         globalSet: this.initialHandle,
                         values: this.values,
-                        container: this.$refs.container,
                     }),
                     new Request(this.actions.save, this.method, {
                         _blueprint: this.fieldset.handle,

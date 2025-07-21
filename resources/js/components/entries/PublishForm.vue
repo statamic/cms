@@ -557,7 +557,6 @@ export default {
                     new BeforeSaveHooks('entry', {
                         collection: this.collectionHandle,
                         values: this.values,
-                        container: this.$refs.container,
                     }),
                     new Request(this.actions.save, this.method, {
                         _blueprint: this.fieldset.handle,
