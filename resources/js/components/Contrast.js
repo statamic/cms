@@ -5,7 +5,6 @@ export default class Contrast {
     #contrast = ref(null);
 
     constructor(preference) {
-        console.log('Contrast constructor called with:', preference);
         this.#preference = ref(preference ?? 'default');
         this.#watchPreferences();
         this.#watchContrast();
@@ -55,7 +54,6 @@ export default class Contrast {
     }
 
     #savePreference(preference) {
-        console.log('Saving contrast preference:', preference);
         if (preference === 'default') {
             Statamic.$preferences.remove('contrast');
             localStorage.removeItem('statamic.contrast');
