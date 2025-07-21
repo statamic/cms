@@ -20,8 +20,6 @@
 
     <ui-switch />
 
-    <p class="text-red-500 with-contrast:text-blue-500">Hello</p>
-
     <section class="space-y-4">
         <ui-heading size="lg">Badges</ui-heading>
         <div class="mb-4 flex gap-3 items-end">
